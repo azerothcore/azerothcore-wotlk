@@ -15,22 +15,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CellImpl.h"
+#include "CreatureScript.h"
+#include "CreatureTextMgr.h"
+#include "GridNotifiers.h"
+#include "MapMgr.h"
+#include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "Vehicle.h"
 /*
  * Scripts for spells with SPELLFAMILY_GENERIC spells used for quests.
  * Ordered alphabetically using questId and scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_q#questID_".
  */
-
-#include "CellImpl.h"
-#include "CreatureTextMgr.h"
-#include "GridNotifiers.h"
-#include "MapMgr.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "SpellAuras.h"
-#include "SpellScript.h"
-#include "Vehicle.h"
 
 class spell_q11065_wrangle_some_aether_rays : public SpellScript
 {
@@ -661,7 +661,7 @@ class spell_q12274_a_fall_from_grace_costume : public SpellScript
 {
     PrepareSpellScript(spell_q12274_a_fall_from_grace_costume)
 
-    bool Validate(SpellInfo const* /*SpellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_SCARLET_RAVEN_PRIEST_IMAGE_MALE, SPELL_SCARLET_RAVEN_PRIEST_IMAGE_FEMALE });
     }
@@ -912,7 +912,7 @@ class spell_q5206_test_fetid_skull : public SpellScript
         return GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_CREATE_RESONATING_SKULL, SPELL_CREATE_BONE_DUST });
     }
@@ -1026,7 +1026,7 @@ class spell_q11396_11399_scourging_crystal_controller : public SpellScript
 {
     PrepareSpellScript(spell_q11396_11399_scourging_crystal_controller);
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_FORCE_SHIELD_ARCANE_PURPLE_X3, SPELL_SCOURGING_CRYSTAL_CONTROLLER });
     }
@@ -1051,7 +1051,7 @@ class spell_q11396_11399_scourging_crystal_controller_dummy : public SpellScript
 {
     PrepareSpellScript(spell_q11396_11399_scourging_crystal_controller_dummy);
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_FORCE_SHIELD_ARCANE_PURPLE_X3 });
     }
@@ -1101,7 +1101,7 @@ class spell_q11587_arcane_prisoner_rescue : public SpellScript
 {
     PrepareSpellScript(spell_q11587_arcane_prisoner_rescue);
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
             {
@@ -1156,7 +1156,7 @@ class spell_q11730_ultrasonic_screwdriver : public SpellScript
         return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCastItem();
     }
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
             {
@@ -1268,7 +1268,7 @@ class spell_q12634_despawn_fruit_tosser : public SpellScript
 {
     PrepareSpellScript(spell_q12634_despawn_fruit_tosser);
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
             {
@@ -1394,7 +1394,7 @@ class spell_q12937_relief_for_the_fallen : public SpellScript
         return GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_TRIGGER_AID_OF_THE_EARTHEN });
     }
@@ -1427,7 +1427,7 @@ class spell_q10041_q10040_who_are_they : public SpellScript
 {
     PrepareSpellScript(spell_q10041_q10040_who_are_they);
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
             {
@@ -1621,7 +1621,7 @@ class spell_q14112_14145_chum_the_water : public SpellScript
 {
     PrepareSpellScript(spell_q14112_14145_chum_the_water);
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
             {
@@ -2569,3 +2569,4 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
     RegisterSpellScript(spell_q9847_a_spirit_ally);
 }
+

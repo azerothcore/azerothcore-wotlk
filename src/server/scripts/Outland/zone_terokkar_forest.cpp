@@ -15,14 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "Group.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 // Ours
 enum fumping
@@ -630,24 +632,33 @@ public:
         return true;
     }
 
-    void SendActionMenu(Player* player, GameObject* /*go*/, uint32 action)
+    void SendActionMenu(Player* player, GameObject* go, uint32 action)
     {
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1:
-                player->CastSpell(player, SPELL_SUMMON_GEZZARAK_THE_HUNTRESS, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_GEZZARAK_THE_HUNTRESS, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2:
-                player->CastSpell(player, SPELL_SUMMON_DARKSCREECHER_AKKARAI, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_DARKSCREECHER_AKKARAI, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 3:
-                player->CastSpell(player, SPELL_SUMMON_KARROG, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_KARROG, false);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 4:
-                player->CastSpell(player, SPELL_SUMMON_VAKKIZ_THE_WINDRAGER, false);
+                _result = player->CastSpell(player, SPELL_SUMMON_VAKKIZ_THE_WINDRAGER, false);
+                break;
+            default:
+                _result = SPELL_CAST_OK;
                 break;
         }
+        if (_result == SPELL_CAST_OK)
+        {
+            go->DespawnOrUnsummon();
+        }
     }
+private:
+    SpellCastResult _result;
 };
 
 /*######

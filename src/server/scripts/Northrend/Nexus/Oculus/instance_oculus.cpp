@@ -16,9 +16,9 @@
  */
 
 #include "Group.h"
+#include "InstanceMapScript.h"
 #include "LFGMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "oculus.h"
 
@@ -295,3 +295,4 @@ void AddSC_instance_oculus()
 {
     new instance_oculus();
 }
+

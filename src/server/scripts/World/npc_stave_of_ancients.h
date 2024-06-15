@@ -18,7 +18,7 @@
 #ifndef NPC_STAVE_OF_ANCIENTS_H
 #define NPC_STAVE_OF_ANCIENTS_H
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 
 enum Common

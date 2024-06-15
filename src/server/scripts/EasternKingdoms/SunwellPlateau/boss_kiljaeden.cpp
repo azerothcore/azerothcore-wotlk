@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 
 enum Yells
@@ -1343,3 +1344,4 @@ void AddSC_boss_kiljaeden()
     new spell_kiljaeden_armageddon_missile();
     new spell_kiljaeden_dragon_breath();
 }
+

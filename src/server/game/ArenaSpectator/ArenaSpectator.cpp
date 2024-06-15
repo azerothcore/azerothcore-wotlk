@@ -42,7 +42,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
         return true;
     }
 
-    if (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609)
+    if (player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && player->GetMapId() == 609)
     {
         handler->PSendSysMessage("Death Knights can't spectate before finishing questline.");
         return true;

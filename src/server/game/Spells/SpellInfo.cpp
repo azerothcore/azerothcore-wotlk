@@ -2107,6 +2107,7 @@ AuraStateType SpellInfo::LoadAuraState() const
         case 9806:  // Phantom Strike
         case 35325: // Glowing Blood
         case 35328: // Lambent Blood
+        case 35329: // Vibrant Blood
         case 16498: // Faerie Fire
         case 6950:
         case 20656:

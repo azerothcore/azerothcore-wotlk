@@ -15,6 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "ItemScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "Spell.h"
 /* ScriptData
 SDName: Item_Scripts
 SD%Complete: 100
@@ -27,11 +32,6 @@ item_flying_machine(i34060, i34061)  Engineering crafted flying machines
 item_gor_dreks_ointment(i30175)     Protecting Our Own(q10488)
 item_only_for_flight                Items which should only useable while flying
 EndContentData */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "Spell.h"
 
 /*#####
 # item_only_for_flight
@@ -256,3 +256,4 @@ void AddSC_item_scripts()
     new item_captured_frog();
     new item_generic_limit_chance_above_60();
 }
+

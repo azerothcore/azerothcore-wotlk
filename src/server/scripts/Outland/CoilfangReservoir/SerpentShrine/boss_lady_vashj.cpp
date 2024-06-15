@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
+#include "SpellScriptLoader.h"
 #include "WorldSession.h"
 #include "serpent_shrine.h"
 
@@ -56,7 +57,9 @@ enum Spells
     SPELL_SUMMON_SPOREBAT2          = 38490,
     SPELL_SUMMON_SPOREBAT3          = 38492,
     SPELL_SUMMON_SPOREBAT4          = 38493,
-    SPELL_TOXIC_SPORES              = 38574
+    SPELL_TOXIC_SPORES              = 38574,
+
+    SPELL_POISON_BOLT               = 38253
 };
 
 enum Misc
@@ -64,6 +67,8 @@ enum Misc
     ITEM_TAINTED_CORE               = 31088,
 
     POINT_HOME                      = 1,
+
+    NPC_TRIGGER                     = 15384
 };
 
 struct boss_lady_vashj : public BossAI
@@ -83,10 +88,13 @@ struct boss_lady_vashj : public BossAI
         _count = 0;
         _recentlySpoken = false;
         _batTimer = 20s;
+        _playerAngle = 0.0f;
         BossAI::Reset();
 
         ScheduleHealthCheckEvent(70, [&]{
             Talk(SAY_PHASE2);
+            scheduler.CancelAll();
+            me->CastStop();
             me->SetReactState(REACT_PASSIVE);
             me->GetMotionMaster()->MovePoint(POINT_HOME, me->GetHomePosition().GetPositionX(), me->GetHomePosition().GetPositionY(), me->GetHomePosition().GetPositionZ(), true, true);
         });
@@ -171,14 +179,17 @@ struct boss_lady_vashj : public BossAI
         {
             return;
         }
-
+        me->AddUnitState(UNIT_STATE_ROOT);
         me->SetFacingTo(me->GetHomePosition().GetOrientation());
         instance->SetData(DATA_ACTIVATE_SHIELD, 0);
-        scheduler.CancelAll();
-
         scheduler.Schedule(2400ms, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_FORKED_LIGHTNING);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+            {
+                _playerAngle = me->GetAngle(target);
+                me->SetOrientation(_playerAngle);
+                DoCast(target, SPELL_FORKED_LIGHTNING);
+            }
             context.Repeat(2400ms, 12450ms);
         }).Schedule(0s, [this](TaskContext context)
         {
@@ -201,6 +212,7 @@ struct boss_lady_vashj : public BossAI
             if (!me->HasAura(SPELL_MAGIC_BARRIER))
             {
                 Talk(SAY_PHASE3);
+                me->ClearUnitState(UNIT_STATE_ROOT);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->GetMotionMaster()->MoveChase(me->GetVictim());
                 scheduler.CancelAll();
@@ -255,10 +267,47 @@ struct boss_lady_vashj : public BossAI
     }
 
 private:
+    float _playerAngle;
     bool _recentlySpoken;
     bool _intro;
     int32 _count;
     std::chrono::seconds _batTimer;
+};
+
+struct npc_tainted_elemental : public ScriptedAI
+{
+    npc_tainted_elemental(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->SetInCombatWithZone();
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+        {
+            me->AddThreat(target, 1000.0f);
+        }
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        scheduler.Schedule(100ms, 500ms, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_POISON_BOLT);
+            context.Repeat(2350ms, 2650ms);
+        }).Schedule(15s, [this](TaskContext)
+        {
+            me->DespawnOrUnsummon();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+    }
+
 };
 
 class spell_lady_vashj_magic_barrier : public AuraScript
@@ -330,11 +379,81 @@ class spell_lady_vashj_spore_drop_effect : public SpellScript
     }
 };
 
+class spell_lady_vashj_summons : public SpellScript
+{
+    PrepareSpellScript(spell_lady_vashj_summons);
+
+    enum SpellIds : uint32
+    {
+        SPELL_SUMMON_WAVE_A_MOB = 38019,
+        SPELL_SUMMON_WAVE_B_MOB = 38247,
+        SPELL_SUMMON_WAVE_C_MOB = 38242,
+        SPELL_SUMMON_WAVE_D_MOB = 38244
+    };
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_WAVE_A_MOB, SPELL_SUMMON_WAVE_B_MOB, SPELL_SUMMON_WAVE_C_MOB, SPELL_SUMMON_WAVE_D_MOB });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        // Filter targets by distance depending on the spell
+        // Coilfang Elites/Striders spawns on top of the stairs. The others at the foot of the stairs.
+        bool top = GetSpellInfo()->Id == SPELL_SUMMON_COILFANG_ELITE || GetSpellInfo()->Id == SPELL_SUMMON_COILFANG_STRIDER;
+        float minDist = top ? 25.f : 60.f;
+        float maxDist = top ? 60.f : 100.f;
+
+        Unit* caster = GetCaster();
+        targets.remove(caster);
+        targets.remove_if([caster, minDist, maxDist](WorldObject const* target) -> bool
+        {
+            float dist = caster->GetExactDist2d(target);
+            return target->GetEntry() != NPC_TRIGGER || (dist < minDist || dist > maxDist);
+        });
+
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void HandleHit()
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            switch (GetSpellInfo()->Id)
+            {
+                case SPELL_SUMMON_ENCHANTED_ELEMENTAL:
+                    target->CastSpell(target, SPELL_SUMMON_WAVE_A_MOB, true);
+                    break;
+                case SPELL_SUMMON_COILFANG_ELITE:
+                    target->CastSpell(target, SPELL_SUMMON_WAVE_B_MOB, true);
+                    break;
+                case SPELL_SUMMON_COILFANG_STRIDER:
+                    target->CastSpell(target, SPELL_SUMMON_WAVE_C_MOB, true);
+                    break;
+                case SPELL_SUMMON_TAINTED_ELEMENTAL:
+                    target->CastSpell(target, SPELL_SUMMON_WAVE_D_MOB, true);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_lady_vashj_summons::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnHit += SpellHitFn(spell_lady_vashj_summons::HandleHit);
+    }
+};
+
 void AddSC_boss_lady_vashj()
 {
     RegisterSerpentShrineAI(boss_lady_vashj);
+    RegisterSerpentShrineAI(npc_tainted_elemental);
     RegisterSpellScript(spell_lady_vashj_magic_barrier);
     RegisterSpellScript(spell_lady_vashj_remove_tainted_cores);
     RegisterSpellScript(spell_lady_vashj_summon_sporebat);
     RegisterSpellScript(spell_lady_vashj_spore_drop_effect);
+    RegisterSpellScript(spell_lady_vashj_summons);
 }
+

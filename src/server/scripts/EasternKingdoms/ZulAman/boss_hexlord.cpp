@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "zulaman.h"
 /* ScriptData
 SDName: Boss_Hex_Lord_Malacrass
 SD%Complete:
 SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
-
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
-#include "zulaman.h"
 
 enum Says
 {
@@ -447,9 +447,9 @@ public:
                     PlayerAbility_Timer = urand(8000, 10000);
                     PlayerClass = target->getClass() - 1;
 
-                    if (PlayerClass == CLASS_DRUID - 1)
+                    if (target->IsClass(CLASS_DRUID))
                         PlayerClass = CLASS_DRUID;
-                    else if (PlayerClass == CLASS_PRIEST - 1 && target->HasSpell(15473))
+                    else if (target->IsClass(CLASS_PRIEST) && target->HasSpell(15473))
                         PlayerClass = CLASS_PRIEST; // shadow priest
 
                     SiphonSoul_Timer = 99999;   // buff lasts 30 sec
@@ -996,3 +996,4 @@ void AddSC_boss_hex_lord_malacrass()
     new boss_alyson_antille();
     new spell_hexlord_unstable_affliction();
 }
+

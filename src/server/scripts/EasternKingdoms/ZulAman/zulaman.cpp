@@ -27,8 +27,8 @@ npc_forest_frog
 EndContentData */
 
 #include "zulaman.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,11 +20,11 @@ CREATE TABLE IF NOT EXISTS `pool_pool` (
   `pool_id` int unsigned NOT NULL DEFAULT '0',
   `mother_pool` int unsigned NOT NULL DEFAULT '0',
   `chance` float NOT NULL DEFAULT '0',
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`pool_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.pool_pool: ~3,723 rows (approximately)
+-- Dumping data for table acore_world.pool_pool: ~3 707 rows (approximately)
 DELETE FROM `pool_pool`;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
 	(105, 107, 0, 'Ghostrider of Karabor (21784) - Clockwise Group'),

@@ -27,9 +27,9 @@ npc_deathstalker_erland
 pyrewood_ambush
 EndContentData */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 

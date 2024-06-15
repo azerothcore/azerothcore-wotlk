@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS `mail` (
   `mailTemplateId` smallint unsigned NOT NULL DEFAULT '0',
   `sender` int unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
   `receiver` int unsigned NOT NULL DEFAULT '0' COMMENT 'Character Global Unique Identifier',
-  `subject` longtext COLLATE utf8mb4_unicode_ci,
-  `body` longtext COLLATE utf8mb4_unicode_ci,
+  `subject` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `body` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `has_items` tinyint unsigned NOT NULL DEFAULT '0',
   `expire_time` int unsigned NOT NULL DEFAULT '0',
   `deliver_time` int unsigned NOT NULL DEFAULT '0',

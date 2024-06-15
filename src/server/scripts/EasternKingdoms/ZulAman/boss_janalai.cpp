@@ -23,9 +23,9 @@ SDCategory: Zul'Aman
 EndScriptData */
 
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "zulaman.h"
 

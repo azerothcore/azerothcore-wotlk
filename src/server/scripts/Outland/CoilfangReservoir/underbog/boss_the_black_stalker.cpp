@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "the_underbog.h"
 
 /*
@@ -216,3 +217,4 @@ void AddSC_boss_the_black_stalker()
     RegisterSpellScript(spell_the_black_stalker_someone_grab_me);
     RegisterSpellScript(spell_the_black_stalker_magnetic_pull);
 }
+

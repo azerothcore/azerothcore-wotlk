@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "black_temple.h"
 
 enum Says
@@ -379,3 +380,4 @@ void AddSC_boss_mother_shahraz()
     new spell_mother_shahraz_fatal_attraction_dummy();
     new spell_mother_shahraz_fatal_attraction_aura();
 }
+

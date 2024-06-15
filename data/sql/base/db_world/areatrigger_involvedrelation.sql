@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `areatrigger_involvedrelation` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Trigger System';
 
--- Dumping data for table acore_world.areatrigger_involvedrelation: ~59 rows (approximately)
+-- Dumping data for table acore_world.areatrigger_involvedrelation: ~57 rows (approximately)
 DELETE FROM `areatrigger_involvedrelation`;
 INSERT INTO `areatrigger_involvedrelation` (`id`, `quest`) VALUES
 	(78, 155),
@@ -68,8 +68,6 @@ INSERT INTO `areatrigger_involvedrelation` (`id`, `quest`) VALUES
 	(4298, 9731),
 	(4300, 9752),
 	(4301, 9786),
-	(4473, 10269),
-	(4475, 10275),
 	(4581, 10750),
 	(4588, 10772),
 	(4899, 11890),

@@ -15,6 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "SpellInfo.h"
 /* ScriptData
 SDName: Nagrand
 SD%Complete: 90
@@ -26,13 +33,6 @@ EndScriptData */
 npc_maghar_captive
 npc_creditmarker_visit_with_ancestors
 EndContentData */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
-#include "SpellInfo.h"
 
 /*#####
 ## npc_maghar_captive
@@ -490,3 +490,4 @@ void AddSC_nagrand()
     new npc_kurenai_captive();
     new go_warmaul_prison();
 }
+

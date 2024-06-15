@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,12 +20,12 @@ CREATE TABLE IF NOT EXISTS `quest_request_items` (
   `ID` int unsigned NOT NULL DEFAULT '0',
   `EmoteOnComplete` smallint unsigned NOT NULL DEFAULT '0',
   `EmoteOnIncomplete` smallint unsigned NOT NULL DEFAULT '0',
-  `CompletionText` text COLLATE utf8mb4_unicode_ci,
+  `CompletionText` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.quest_request_items: ~7,941 rows (approximately)
+-- Dumping data for table acore_world.quest_request_items: ~7 450 rows (approximately)
 DELETE FROM `quest_request_items`;
 INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`, `CompletionText`, `VerifiedBuild`) VALUES
 	(2, 1, 0, 'Yes, mighty $C, I sensed your arrival. I trust you have more news to report to me about your hunt?', 12340),
@@ -1547,7 +1547,7 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(2159, 6, 1, 'How might I be of service to you, young one?  Are you here to rest in the inn?  Do you require a hearthstone?', 12340),
 	(2160, 3, 0, 'Hi there! Come in, take a seat by the fire and warm yourself with a flagon of ale.', 12340),
 	(2161, 1, 0, 'Welcome to Razor Hill!', 12340),
-	(2178, 0, 0, 'The pot is empty and I\'m hungry! What\'s taking you so long?', 42083),
+	(2178, 5, 5, 'The pot is empty and I\'m hungry! What\'s taking you so long?', 42083),
 	(2198, 6, 6, 'You\'ve got the wrong gnome, pal! I was never there! You can\'t prove anything!$B$BWait a second... who are you? What the... where did you find this necklace at?', 12340),
 	(2199, 0, 0, 'Have you got the five silver bars I asked for?  I will share my sad tale of woe with you concerning the necklace you now possess... but only after I get those bars!  Please, help a gnome out, won\'t ya?', 12340),
 	(2200, 1, 0, '', 12340),

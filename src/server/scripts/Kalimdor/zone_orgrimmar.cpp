@@ -27,8 +27,8 @@ npc_shenthul
 npc_thrall_warchief
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "TaskScheduler.h"

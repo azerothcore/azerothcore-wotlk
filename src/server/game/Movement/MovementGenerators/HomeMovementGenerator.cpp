@@ -20,7 +20,6 @@
 #include "CreatureAI.h"
 #include "DisableMgr.h"
 #include "MoveSplineInit.h"
-#include "WorldPacket.h"
 
 void HomeMovementGenerator<Creature>::DoInitialize(Creature* owner)
 {

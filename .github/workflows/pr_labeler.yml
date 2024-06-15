@@ -4,14 +4,14 @@ on:
 
 jobs:
   triage:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     permissions: write-all
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
-      - uses: actions/labeler@v4
+      - uses: actions/labeler@v5
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml

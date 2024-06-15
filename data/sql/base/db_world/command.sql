@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -17,13 +17,13 @@
 -- Dumping structure for table acore_world.command
 DROP TABLE IF EXISTS `command`;
 CREATE TABLE IF NOT EXISTS `command` (
-  `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `security` tinyint unsigned NOT NULL DEFAULT '0',
-  `help` longtext COLLATE utf8mb4_unicode_ci,
+  `help` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Chat System';
 
--- Dumping data for table acore_world.command: ~586 rows (approximately)
+-- Dumping data for table acore_world.command: ~589 rows (approximately)
 DELETE FROM `command`;
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('account', 0, 'Syntax: .account\r\n\r\nDisplay the access level of your account and the email adress if you possess the necessary permissions.'),
@@ -45,7 +45,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('achievement', 2, 'Syntax: .achievement $subcommand\nType .achievement to see the list of possible subcommands or .help achievement $subcommand to see info on subcommands'),
 	('achievement add', 2, 'Syntax: .achievement add $achievement\nAdd an achievement to the targeted player.\n$achievement: can be either achievement id or achievement link'),
 	('achievement checkall', 3, 'Syntax: .achievement checkall\r\nCheck all achievement criteria of the selected player.'),
-	('additem', 2, 'Syntax: .additem #itemID/[#itemName]/#itemLink #itemCount\r\nAdds the specified item to you or the selected character.\nIf #itemCount is negative, you will remove #itemID.'),
+	('additem', 2, 'Syntax: .additem Optional(playerName/playerGUID) #itemID/[#itemName]/#itemLink #itemCount\r\nAdds the specified item to you, the selected character or the specifed character name/GUID.\r\nIf #itemCount is negative, you will remove #itemID.'),
 	('additem set', 2, 'Syntax: .additemset #itemsetid\r\n\r\nAdd items from itemset of id #itemsetid to your or selected character inventory. Will add by one example each item from itemset.'),
 	('announce', 2, 'Syntax: .announce $MessageToBroadcast\r\n\r\nSend a global message to all players online in chat log.'),
 	('appear', 1, 'Syntax: .appear [$charactername]\r\n\r\nTeleport to the given character. Either specify the character name or click on the character\'s portrait,e.g. when you are in a group. Character can be offline.'),
@@ -116,6 +116,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('combatstop', 2, 'Syntax: .combatstop [$playername]\r\nStop combat for selected character. If selected non-player then command applied to self. If $playername provided then attempt applied to online player $playername.'),
 	('cometome', 3, 'Syntax: .cometome $parameter\nMake selected creature come to your current location (new position not saved to DB).'),
 	('commands', 0, 'Syntax: .commands\r\n\r\nDisplay a list of available commands for your account level.'),
+	('commentator', 2, 'Syntax: .commentator [on/off]\r\n\r\nEnable or Disable in game Commentator tag or show current state if on/off not provided.'),
 	('cooldown', 2, 'Syntax: .cooldown [#spell_id]\r\n\r\nRemove all (if spell_id not provided) or #spel_id spell cooldown from selected character or you (if no selection).'),
 	('damage', 2, 'Syntax: .damage $damage_amount [$school [$spellid]]\r\n\r\nApply $damage to target. If not $school and $spellid provided then this flat clean melee damage without any modifiers. If $school provided then damage modified by armor reduction (if school physical), and target absorbing modifiers and result applied as melee damage to target. If spell provided then damage modified and applied as spell damage. $spellid can be shift-link.'),
 	('debug', 2, 'Syntax: .debug $subcommand\nType .debug to see the list of possible subcommands or .help debug $subcommand to see info on subcommands'),
@@ -204,14 +205,15 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('gmnotify', 2, 'Syntax: .gmnotify $notification\r\nDisplays a notification on the screen of all online GM\'s.'),
 	('go', 1, 'Syntax: .go $subcommand\nType .go to see the list of possible subcommands or .help go $subcommand to see info on subcommands'),
 	('go creature', 1, 'Syntax: .go creature #creature_guid\r\nTeleport your character to creature with guid #creature_guid.\r\n.gocreature #creature_name\r\nTeleport your character to creature with this name.\r\n.gocreature id #creature_id\r\nTeleport your character to a creature that was spawned from the template with this entry.\r\n*If* more than one creature is found, then you are teleported to the first that is found inside the database.'),
-	('go creature id', 1, 'Syntax: .go creature id #creature_entry\nTeleports you to the given creature entry.'),
+	('go creature id', 1, 'Syntax: .go creature id #creature_entry\r\nTeleports you to the given creature entry.\r\n*If* more than one creature is found, then you are teleported to the first that is found inside the database.'),
+	('go creature name', 1, 'Syntax: .go creature name #name\r\nTeleports you to the first spawn for the given creature name.\r\n*If* more than one creature is found, then you are teleported to the first that is found inside the database.'),
 	('go graveyard', 1, 'Syntax: .go graveyard #graveyardId\r\n Teleport to graveyard with the graveyardId specified.'),
 	('go grid', 1, 'Syntax: .go grid #gridX #gridY [#mapId]\r\n\r\nTeleport the gm to center of grid with provided indexes at map #mapId (or current map if it not provided).'),
 	('go quest', 1, 'Syntax: .go quest <starter/ender> <quest>.\nTeleports you to the quest starter/ender creature or object.'),
 	('go taxinode', 1, 'Syntax: .go taxinode #taxinode\r\n\r\nTeleport player to taxinode coordinates. You can look up zone using .lookup taxinode $namepart'),
 	('go ticket', 2, 'Syntax: .go ticket #ticketid\r\nTeleports the user to the location where $ticketid was created.'),
 	('go trigger', 1, 'Syntax: .go trigger #trigger_id\r\n\r\nTeleport your character to areatrigger with id #trigger_id. Character will be teleported to trigger target if selected areatrigger is telporting trigger.'),
-	('go xyz', 1, 'Syntax: .go xyz #x #y [#z [#mapid [#orientation]]]\r\n\r\nTeleport player to point with (#x,#y,#z) coordinates at map #mapid with orientation #orientation. If z is not provided, ground/water level will be used. If mapid is not provided, the current map will be used. If #orientation is not provided, the current orientation will be used.'),
+	('go xyz', 1, '\rSyntax: .go xyz #x #y [#z [#mapid [#orientation]]]\r\rTeleport player to point with (#x,#y,#z) coordinates at map #mapid with orientation #orientation.\r\rIf #z is not provided, ground/water level will be used. If #mapid is not provided, the current map will be used. If #orientation is not provided, the current orientation will be used.\r\rNon-numbers are allowed and will be ignored.'),
 	('go zonexy', 1, 'Syntax: .go zonexy #x #y [#zone]\r\n\r\nTeleport player to point with (#x,#y) client coordinates at ground(water) level in zone #zoneid or current zone if #zoneid not provided. You can look up zone using .lookup area $namepart'),
 	('gobject', 2, 'Syntax: .gobject $subcommand\nType .gobject to see the list of possible subcommands or .help gobject $subcommand to see info on subcommands'),
 	('gobject activate', 2, 'Syntax: .gobject activate #guid\r\n\r\nActivates an object like a door or a button.'),
@@ -221,6 +223,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('gobject info', 1, 'Syntax: .gobject info [$object_entry]\r \r Query Gameobject information for selected gameobject or given entry.'),
 	('gobject move', 3, 'Syntax: .gobject move #goguid [#x #y #z]\r\n\r\nMove gameobject #goguid to character coordinates (or to (#x,#y,#z) coordinates if its provide).'),
 	('gobject near', 1, 'Syntax: .gobject near  [#distance]\r\n\r\nOutput gameobjects at distance #distance from player. Output gameobject guids and coordinates sorted by distance from character. If #distance not provided use 10 as default value.'),
+	('gobject respawn', 1, 'Syntax: .gobject respawn #guid./nRespawns the target gameobject.'),
 	('gobject set', 3, 'Syntax: '),
 	('gobject set phase', 3, 'Syntax: .gobject set phase #guid #phasemask\r\n\r\nGameobject with DB guid #guid phasemask changed to #phasemask with related world vision update for players. Gameobject state saved to DB and persistent.'),
 	('gobject set state', 3, 'Syntax: '),
@@ -609,9 +612,9 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('wp load', 3, 'Syntax: .wp load $pathid\nLoad pathid number for selected creature. Creature must have no waypoint data.'),
 	('wp modify', 3, 'Syntax: '),
 	('wp reload', 3, 'Syntax: .wp reload $pathid\nLoad path changes ingame - IMPORTANT: must be applied first for new paths before .wp load #pathid '),
-	('wp show', 3, 'Syntax: .wp show $option\nOptions:\non $pathid (or selected creature with loaded path) - Show path\noff - Hide path\ninfo $slected_waypoint - Show info for selected waypoint.'),
+	('wp show', 3, 'Syntax: .wp show $option\nOptions:\non $pathid (or selected creature with loaded path) - Show path\noff - Hide path\ninfo $selected_waypoint - Show info for selected waypoint.'),
 	('wp unload', 3, 'Syntax: .wp unload\nUnload path for selected creature.'),
-	('wpgps', 3, 'Syntax: .wpgps\n\nOutput current position to sql developer log as partial SQL query to be used in pathing');
+	('wpgps', 3, 'Syntax: .wpgps\r\nOutput current position to sql developer log as partial SQL query to be used in pathing (formated for waypoint_data table).\r\nUse .wpgps sai for waypoint (SAI) table format.');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

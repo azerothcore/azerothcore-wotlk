@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -19,11 +19,11 @@ DROP TABLE IF EXISTS `worldstates`;
 CREATE TABLE IF NOT EXISTS `worldstates` (
   `entry` int unsigned NOT NULL DEFAULT '0',
   `value` int unsigned NOT NULL DEFAULT '0',
-  `comment` tinytext COLLATE utf8mb4_unicode_ci,
+  `comment` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Variable Saves';
 
--- Dumping data for table acore_characters.worldstates: ~102 rows (approximately)
+-- Dumping data for table acore_characters.worldstates: ~105 rows (approximately)
 DELETE FROM `worldstates`;
 INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(1, 0, NULL),
@@ -55,6 +55,7 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(27, 0, NULL),
 	(28, 0, NULL),
 	(29, 0, NULL),
+	(30, 0, NULL),
 	(31, 0, NULL),
 	(32, 0, NULL),
 	(33, 0, NULL),
@@ -102,6 +103,7 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(75, 0, NULL),
 	(76, 0, NULL),
 	(77, 0, NULL),
+	(78, 0, NULL),
 	(79, 0, NULL),
 	(80, 0, NULL),
 	(81, 0, NULL),
@@ -113,6 +115,7 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(87, 0, NULL),
 	(88, 0, NULL),
 	(89, 0, NULL),
+	(90, 0, NULL),
 	(197, 0, 'Fishing Extravaganza - STV_FISHING_PREV_WIN_TIME'),
 	(198, 0, 'Fishing Extravaganza - STV_FISHING_HAS_WINNER'),
 	(199, 0, 'Fishing Extravaganza - STV_FISHING_ANNOUNCE_EVENT_BEGIN'),
@@ -121,13 +124,13 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(3801, 0, NULL),
 	(3802, 1, NULL),
 	(20001, 1454691600, 'NextArenaPointDistributionTime'),
-	(20002, 1661400000, 'NextWeeklyQuestResetTime'),
-	(20003, 1661140800, 'NextBGRandomDailyResetTime'),
+	(20002, 1706158800, 'NextWeeklyQuestResetTime'),
+	(20003, 1705813200, 'NextBGRandomDailyResetTime'),
 	(20004, 0, 'cleaning_flags'),
-	(20005, 1661140800, 'NextDailyQuestResetTime'),
-	(20006, 1661140800, 'NextGuildDailyResetTime'),
-	(20007, 1662004800, 'NextMonthlyQuestResetTime'),
-	(20008, 1661140800, NULL);
+	(20005, 1705813200, 'NextDailyQuestResetTime'),
+	(20006, 1705813200, 'NextGuildDailyResetTime'),
+	(20007, 1706763600, 'NextMonthlyQuestResetTime'),
+	(20008, 1705813200, NULL);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

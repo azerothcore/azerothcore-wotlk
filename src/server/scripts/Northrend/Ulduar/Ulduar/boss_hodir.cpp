@@ -15,13 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ulduar.h"
 
 enum HodirSpellData
@@ -344,6 +346,7 @@ public:
                     {
                         pInstance->SetData(TYPE_HODIR, DONE);
                         me->CastSpell(me, 64899, true); // credit
+                        pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
                     }
 
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -353,7 +356,6 @@ public:
                     me->CombatStop();
                     me->InterruptNonMeleeSpells(true);
                     me->RemoveAllAuras();
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
 
                     events.Reset();
                     summons.DespawnAll();
@@ -381,13 +383,17 @@ public:
                     }
 
                     Talk(TEXT_DEATH);
-                    me->DespawnOrUnsummon(10000);
+                    scheduler.Schedule(14s, [this](TaskContext /*context*/)
+                    {
+                        DoCastSelf(SPELL_TELEPORT);
+                    });
                 }
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
+            scheduler.Update(diff);
             if (me->GetPositionY() <= ENTRANCE_DOOR.GetPositionY() || me->GetPositionY() >= EXIT_DOOR.GetPositionY())
             {
                 boss_hodirAI::EnterEvadeMode();
@@ -493,6 +499,15 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+            }
         }
 
         Creature* GetHelper(uint8 index)

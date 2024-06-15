@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameObjectAI.h"
-#include "ScriptMgr.h"
+#include "GameObjectScript.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "ruins_of_ahnqiraj.h"

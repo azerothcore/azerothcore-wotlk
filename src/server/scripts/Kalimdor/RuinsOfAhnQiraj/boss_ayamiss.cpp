@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Spells
@@ -83,7 +84,7 @@ struct boss_ayamiss : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         me->SetReactState(REACT_AGGRESSIVE);
 
         ScheduleHealthCheckEvent(70, [&] {
@@ -126,7 +127,7 @@ struct boss_ayamiss : public BossAI
         }
         else if (type == WAYPOINT_MOTION_TYPE && id == POINT_GROUND)
         {
-            SetCombatMovement(true);
+            me->SetCombatMovement(true);
             me->SetDisableGravity(false);
 
             me->m_Events.AddEventAtOffset([this]()
@@ -427,3 +428,4 @@ void AddSC_boss_ayamiss()
     RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_2", (NPC_HIVEZARA_SWARMER + 6) * 10);
     RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_3", (NPC_HIVEZARA_SWARMER + 7) * 10);
 }
+

@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "the_underbog.h"
 
@@ -188,3 +189,4 @@ void AddSC_boss_hungarfen()
     RegisterSpellScript(spell_spore_cloud);
     RegisterSpellScript(spell_despawn_underbog_mushrooms);
 }
+

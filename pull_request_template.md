@@ -43,7 +43,7 @@ This PR has been:
 - [ ]
 - [ ]
 
-<!-- If you intend to contribute repeatedly to our project, it is a good idea to join our discord channel. We set ranks for our contributors and give them access to special resources or knowledge: https://discord.com/invite/DasJqPba)
+<!-- If you intend to contribute repeatedly to our project, it is a good idea to join our discord channel. We set ranks for our contributors and give them access to special resources or knowledge: https://discord.com/invite/GyFvXpk7)
      Do not remove the instructions below about testing, they will help users to test your PR -->
 ## How to Test AzerothCore PRs
  

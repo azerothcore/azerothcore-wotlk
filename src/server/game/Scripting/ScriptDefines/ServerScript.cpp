@@ -15,63 +15,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ServerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
 void ScriptMgr::OnNetworkStart()
 {
-    ExecuteScript<ServerScript>([&](ServerScript* script)
-    {
-        script->OnNetworkStart();
-    });
+    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_NETWORK_START, script->OnNetworkStart());
 }
 
 void ScriptMgr::OnNetworkStop()
 {
-    ExecuteScript<ServerScript>([&](ServerScript* script)
-    {
-        script->OnNetworkStop();
-    });
+    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_NETWORK_STOP, script->OnNetworkStop());
 }
 
 void ScriptMgr::OnSocketOpen(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
-    ExecuteScript<ServerScript>([&](ServerScript* script)
-    {
-        script->OnSocketOpen(socket);
-    });
+    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_SOCKET_OPEN, script->OnSocketOpen(socket));
 }
 
 void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
 {
     ASSERT(socket);
 
-    ExecuteScript<ServerScript>([&](ServerScript* script)
-    {
-        script->OnSocketClose(socket);
-    });
-}
-
-bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packet)
-{
-    if (ScriptRegistry<ServerScript>::ScriptPointerList.empty())
-        return true;
-
-    WorldPacket copy(packet);
-
-    auto ret = IsValidBoolScript<ServerScript>([&](ServerScript* script)
-    {
-        return !script->CanPacketReceive(session, copy);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_SOCKET_CLOSE, script->OnSocketClose(socket));
 }
 
 bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
@@ -83,15 +52,28 @@ bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
 
     WorldPacket copy(packet);
 
-    auto ret = IsValidBoolScript<ServerScript>([&](ServerScript* script)
-    {
-        return !script->CanPacketSend(session, copy);
-    });
-
-    if (ret && *ret)
-    {
-        return false;
-    }
-
-    return true;
+    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_SEND, !script->CanPacketSend(session, copy));
 }
+
+bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packet)
+{
+    if (ScriptRegistry<ServerScript>::ScriptPointerList.empty())
+        return true;
+
+    WorldPacket copy(packet);
+
+    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_RECEIVE, !script->CanPacketReceive(session, copy));
+}
+
+ServerScript::ServerScript(const char* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, SERVERHOOK_END)
+{
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < SERVERHOOK_END; ++i)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<ServerScript>::AddScript(this, std::move(enabledHooks));
+}
+
+template class AC_GAME_API ScriptRegistry<ServerScript>;

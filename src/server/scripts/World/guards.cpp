@@ -28,9 +28,9 @@ guard_shattrath_aldor
 guard_shattrath_scryer
 EndContentData */
 
+#include "CreatureScript.h"
 #include "GuardAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 

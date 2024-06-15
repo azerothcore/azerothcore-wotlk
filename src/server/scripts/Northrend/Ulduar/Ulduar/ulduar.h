@@ -215,7 +215,15 @@ enum UlduarGameObjects
     GO_KOLOGARN_DOORS                       = 194553,
     GO_KEEPERS_GATE                         = 194255,
     GO_XT002_DOORS                          = 194631,
+
+    // Tram
     GO_MIMIRON_TRAM                         = 194675,
+    GO_MIMIRON_ACTIVATE_TRAM                = 194437,
+    GO_MIMIRON_CALL_TRAM_CENTER             = 194914,
+    GO_MIMIRON_CALL_TRAM_MIMIRON            = 194912,
+    GO_MIMIRON_TRAM_ROCKET_BOOSTER          = 194904,
+    GO_DOODAD_UL_TRAIN_TURNAROUND01         = 194915, // center
+    GO_DOODAD_UL_TRAIN_TURNAROUND02         = 194913, // mimiron
 
     // Mimiron, Hodir, Vezax
     GO_MIMIRON_ELEVATOR                     = 194749,
@@ -284,6 +292,18 @@ enum UlduarMisc
     TIMER_ALGALON_TO_SUMMON                 = 200,
     TIMER_ALGALON_SUMMONED                  = 100,
 
+    // Algalon the Observer, Freya, Hodir, Mimiron, Thorim, Gossip Keepers
+    SPELL_TELEPORT                          = 62940,
+
+    // Freya, Hodir, Mimiron, Thorim
+    EVENT_KEEPER_TELEPORTED                 = 62941,
+
+    // Ancient Gate
+    NPC_ANCIENT_GATE_WORLD_TRIGGER          = 22515,
+    EMOTE_ANCIENT_GATE_UNLOCKED             = 19,
+
+    // Yogg-Saron
+    ACTION_SARA_UPDATE_SUMMON_KEEPERS       = 4,
     KEEPER_FREYA                            = 0,
     KEEPER_HODIR                            = 1,
     KEEPER_MIMIRON                          = 2,

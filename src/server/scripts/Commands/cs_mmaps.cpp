@@ -25,6 +25,7 @@
 
 #include "CellImpl.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "MMapFactory.h"
@@ -33,7 +34,6 @@
 #include "PathGenerator.h"
 #include "Player.h"
 #include "PointMovementGenerator.h"
-#include "ScriptMgr.h"
 #include "TargetedMovementGenerator.h"
 
 using namespace Acore::ChatCommands;

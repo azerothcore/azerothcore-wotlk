@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 enum SpellScripts
 {
@@ -160,3 +161,4 @@ void AddSC_dustwallow_marsh()
     new spell_ooze_zap_channel_end();
     new spell_energize_aoe();
 }
+

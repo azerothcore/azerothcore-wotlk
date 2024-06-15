@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "ScriptMgr.h"
 
 InstanceScript* ScriptMgr::CreateInstanceScript(InstanceMap* map)
@@ -24,3 +25,21 @@ InstanceScript* ScriptMgr::CreateInstanceScript(InstanceMap* map)
     auto tempScript = ScriptRegistry<InstanceMapScript>::GetScriptById(map->GetScriptId());
     return tempScript ? tempScript->GetInstanceScript(map) : nullptr;
 }
+
+InstanceMapScript::InstanceMapScript(const char* name, uint32 mapId) :
+    ScriptObject(name), MapScript<InstanceMap>(mapId)
+{
+    ScriptRegistry<InstanceMapScript>::AddScript(this);
+}
+
+void InstanceMapScript::checkValidity()
+{
+    checkMap();
+
+    if (GetEntry() && !GetEntry()->IsDungeon())
+    {
+        LOG_ERROR("maps.script", "InstanceMapScript for map {} is invalid.", GetEntry()->MapID);
+    }
+}
+
+template class AC_GAME_API ScriptRegistry<InstanceMapScript>;

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -17,10 +17,10 @@
 -- Dumping structure for table acore_world.gossip_menu_option
 DROP TABLE IF EXISTS `gossip_menu_option`;
 CREATE TABLE IF NOT EXISTS `gossip_menu_option` (
-  `MenuID` smallint unsigned NOT NULL DEFAULT '0',
+  `MenuID` int unsigned NOT NULL DEFAULT '0',
   `OptionID` smallint unsigned NOT NULL DEFAULT '0',
   `OptionIcon` int unsigned NOT NULL DEFAULT '0',
-  `OptionText` text COLLATE utf8mb4_unicode_ci,
+  `OptionText` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `OptionBroadcastTextID` int NOT NULL DEFAULT '0',
   `OptionType` tinyint unsigned NOT NULL DEFAULT '0',
   `OptionNpcFlag` int unsigned NOT NULL DEFAULT '0',
@@ -28,13 +28,13 @@ CREATE TABLE IF NOT EXISTS `gossip_menu_option` (
   `ActionPoiID` int unsigned NOT NULL DEFAULT '0',
   `BoxCoded` tinyint unsigned NOT NULL DEFAULT '0',
   `BoxMoney` int unsigned NOT NULL DEFAULT '0',
-  `BoxText` text COLLATE utf8mb4_unicode_ci,
+  `BoxText` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   `BoxBroadcastTextID` int NOT NULL DEFAULT '0',
   `VerifiedBuild` int DEFAULT NULL,
   PRIMARY KEY (`MenuID`,`OptionID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gossip_menu_option: ~4,516 rows (approximately)
+-- Dumping data for table acore_world.gossip_menu_option: ~4 532 rows (approximately)
 DELETE FROM `gossip_menu_option`;
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
 	(0, 0, 0, 'GOSSIP_OPTION_QUESTGIVER', 0, 2, 2, 0, 0, 0, 0, '', 0, 0),
@@ -1989,6 +1989,22 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(7265, 0, 3, 'I seek more training in the priestly ways.', 7169, 5, 16, 0, 0, 0, 0, '', 0, 0),
 	(7265, 1, 0, 'I wish to unlearn my talents.', 62295, 16, 16, 4461, 0, 0, 0, '', 0, 0),
 	(7265, 2, 0, 'I wish to know about Dual Talent Specialization.', 33762, 20, 1, 10371, 0, 0, 0, '', 0, 0),
+	(7268, 0, 0, 'But his son is dead.', 12511, 1, 1, 7284, 0, 0, 0, '', 0, 0),
+	(7269, 0, 0, 'You tell an incredible tale, Fairbanks. What of the blade? Is it beyond redemption?', 12509, 1, 1, 7268, 0, 0, 0, '', 0, 0),
+	(7270, 0, 0, 'And you did...', 12507, 1, 1, 7269, 0, 0, 0, '', 0, 0),
+	(7271, 0, 0, 'You were right, Fairbanks. That is tragic.', 12505, 1, 1, 7270, 0, 0, 0, '', 0, 0),
+	(7272, 0, 0, 'You mean...', 12503, 1, 1, 7271, 0, 0, 0, '', 0, 0),
+	(7273, 0, 0, 'Continue please, Fairbanks.', 12501, 1, 1, 7272, 0, 0, 0, '', 0, 0),
+	(7274, 0, 0, 'And did he?', 12499, 1, 1, 7273, 0, 0, 0, '', 0, 0),
+	(7275, 0, 0, 'Yet? Yet what??', 12497, 1, 1, 7274, 0, 0, 0, '', 0, 0),
+	(7276, 0, 0, 'A thousand? For one man?', 12495, 1, 1, 7275, 0, 0, 0, '', 0, 0),
+	(7277, 0, 0, 'How do you know all of this?', 12493, 1, 1, 7276, 0, 0, 0, '', 0, 0),
+	(7278, 0, 0, 'You mean...', 12491, 1, 1, 7277, 0, 0, 0, '', 0, 0),
+	(7279, 0, 0, 'Incredible story. So how did he die?', 12489, 1, 1, 7278, 0, 0, 0, '', 0, 0),
+	(7280, 0, 0, 'I still do not fully understand.', 12487, 1, 1, 7279, 0, 0, 0, '', 0, 0),
+	(7281, 0, 0, 'What do you mean?', 12485, 1, 1, 7280, 0, 0, 0, '', 0, 0),
+	(7282, 0, 0, 'Mograine?', 12483, 1, 1, 7281, 0, 0, 0, '', 0, 0),
+	(7283, 0, 0, 'Curse? What\'s going ON here, Fairbanks?', 12481, 1, 1, 7282, 0, 0, 0, '', 0, 0),
 	(7287, 0, 1, 'Show me what I have access to, Vredigar.', 12527, 3, 128, 0, 0, 0, 0, '', 0, 0),
 	(7288, 0, 0, 'Trick or Treat!', 10693, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(7288, 2, 5, 'Make this inn your home.', 2822, 8, 65536, 0, 0, 0, 0, '', 0, 0),
@@ -2634,8 +2650,6 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(8560, 0, 2, 'Show me where I can fly.', 12271, 4, 8192, 0, 0, 0, 0, '', 0, 0),
 	(8568, 1, 0, 'I need a new Blood Elf Orphan Whistle.', 20452, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
 	(8568, 2, 0, 'I need a new Draenei Orphan Whistle.', 20453, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
-	(8568, 3, 0, 'I have lost my draenei orphan whistle!', 0, 1, 1, 0, 0, 0, 0, '', 0, 0),
-	(8568, 4, 0, 'I have lost my blood elf orphan whistle!', 0, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(8590, 0, 0, 'Axe', 20580, 1, 1, 8577, 0, 0, 0, '', 0, 0),
 	(8590, 1, 0, 'Bow', 20581, 1, 1, 8572, 0, 0, 0, '', 0, 0),
 	(8590, 2, 0, 'Fist Weapon', 20584, 1, 1, 8574, 0, 0, 0, '', 0, 0),
@@ -3192,6 +3206,7 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(9511, 0, 0, 'I am ready to be teleported to Dalaran.', 29494, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(9512, 0, 0, 'Unchain and control Flamebringer.', 26462, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(9513, 0, 0, 'I am ready to be teleported to Dalaran.', 29494, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(9517, 0, 0, 'I would like to enter the secret code to receive my Competitor\'s Souvenir.', 26513, 1, 1, 0, 0, 0, 0, NULL, 0, NULL),
 	(9528, 0, 0, 'Yes, I am ready to travel to Venture Bay!', 26605, 1, 1, 0, 0, 0, 0, NULL, 0, 0),
 	(9532, 0, 0, 'Your eminence, may I have a word in private?', 26614, 1, 1, 9536, 0, 0, 0, '', 0, 0),
 	(9536, 0, 0, 'I am ready, your grace. <kiss the ring>', 26616, 1, 1, 9535, 0, 0, 0, '', 0, 0),
@@ -3770,6 +3785,8 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(10241, 0, 0, 'Stamp out the Horde bonfire!', 24526, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(10242, 0, 0, 'Stamp out the Horde bonfire!', 24526, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(10243, 0, 0, 'Stamp out the Alliance bonfire!', 24530, 1, 1, 0, 0, 0, 0, '', 0, 0),
+	(10248, 0, 0, 'How do I earn a Competitor\'s Tabard?', 26508, 1, 1, 90000, 0, 0, 0, NULL, 0, NULL),
+	(10248, 1, 0, 'How can I gain the favor of a Spirit of Competition?', 26509, 1, 1, 90001, 0, 0, 0, NULL, 0, NULL),
 	(10262, 0, 0, 'Eastern Sewer Entrance', 32099, 1, 1, 10045, 126, 0, 0, '', 0, 0),
 	(10262, 1, 0, 'Western Sewer Entrance', 32100, 1, 1, 10044, 127, 0, 0, '', 0, 0),
 	(10262, 2, 0, 'Well Entrance', 32101, 1, 1, 10050, 128, 0, 0, '', 0, 0),
@@ -3793,7 +3810,6 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(10311, 0, 1, 'I want to browse your goods', 3370, 3, 128, 0, 0, 0, 0, '', 0, 0),
 	(10314, 0, 0, 'We are ready to help!', 33353, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(10316, 0, 0, 'Glad to help, my lady. I\'m told you were once the guardian of a fabled sword. Do you know where I might find it?', 33363, 1, 1, 10315, 0, 0, 0, '', 0, 0),
-	(10316, 1, 0, 'Glad to help, my lady. I\'m told you were once the guardian of a fabled sword. Do you know where I might find it?', 33363, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(10317, 0, 6, 'Visit a bank', 35513, 9, 1, 0, 0, 0, 0, '', 0, 0),
 	(10317, 1, 1, 'Visit a trader', 35515, 3, 1, 0, 0, 0, 0, '', 0, 0),
 	(10317, 2, 0, 'Visit a mailbox', 35534, 1, 1, 0, 0, 0, 0, '', 0, 0),
@@ -4036,29 +4052,29 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 	(10971, 0, 0, 'What would you have of me, Banshee Queen?', 37549, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(10976, 0, 0, 'I need another disguise.', 38026, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(10993, 0, 0, 'We are prepared, Highlord. Let us battle for the fate of Azeroth! For the light of dawn!', 38131, 1, 1, 0, 0, 0, 0, '', 0, 0),
-	(10995, 0, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 1, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 2, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 3, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 4, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 5, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 6, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 7, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 8, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 9, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 10, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 11, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 12, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 13, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 14, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 15, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 16, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 17, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 18, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
-	(10995, 19, 0, 'It won\'t.', 0, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 0, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 1, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 2, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 3, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 4, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 5, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 6, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 7, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 8, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 9, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 10, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 11, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 12, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 13, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 14, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 15, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 16, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 17, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 18, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
+	(10995, 19, 0, 'It won\'t.', 38229, 1, 1, 0, 0, 0, 10000000, 'A contribution is required.', 0, 0),
 	(10996, 0, 0, 'Ormus, what happened to your eyes?', 38226, 1, 1, 10997, 0, 0, 0, '', 0, 0),
 	(10996, 5, 1, 'Show me the armor of Scourge lords, Ormus.', 38796, 3, 128, 0, 0, 0, 0, '', 0, 0),
-	(10996, 6, 0, 'I appear to have lost my ring.', 0, 1, 1, 10995, 0, 0, 0, '', 0, 0),
+	(10996, 6, 0, 'I appear to have lost my ring.', 38227, 1, 1, 10995, 0, 0, 0, '', 0, 0),
 	(11013, 1, 0, 'Teleport to the Oratory of the Damned.', 37722, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(11013, 3, 0, 'Teleport to the Rampart of Skulls.', 37723, 1, 1, 0, 0, 0, 0, '', 0, 0),
 	(11013, 4, 0, 'Teleport to the Deathbringer\'s Rise.', 37724, 1, 1, 0, 0, 0, 0, '', 0, 0),

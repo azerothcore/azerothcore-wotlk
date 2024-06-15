@@ -364,11 +364,11 @@ Network.OutKBuff = -1
 
 #
 #    Network.OutUBuff
-#        Description: Amount of memory (in bytes) reserved in the user space per connection for
-#                     output buffering.
-#         Default:    65536
+#        Description: Amount of memory (in bytes) reserved initially in the user space per
+#                     connection for output buffering.
+#         Default:    4096
 
-Network.OutUBuff = 65536
+Network.OutUBuff = 4096
 
 #
 #    Network.TcpNoDelay:
@@ -377,6 +377,16 @@ Network.OutUBuff = 65536
 #                     1 - (Disabled, More traffic, Less latency, TCP_NO_DELAY)
 
 Network.TcpNodelay = 1
+
+#
+#    Network.EnableProxyProtocol
+#        Description: Enables Proxy Protocol v2. When your server is behind a proxy,
+#                     load balancer, or similar component, you need to enable Proxy Protocol v2 on both
+#                     this server and the proxy/load balancer to track the real IP address of players.
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.EnableProxyProtocol = 0
 
 #
 ###################################################################################################
@@ -667,7 +677,7 @@ Appender.Errors=2,5,0,Errors.log
 #
 
 Logger.root=2,Console Server
-Logger.commands.gm=4,Console GM
+#Logger.commands.gm=4,Console GM
 Logger.diff=3,Console Server
 Logger.mmaps=4,Server
 Logger.scripts.hotswap=4,Console Server
@@ -740,6 +750,7 @@ Logger.spells.scripts=2,Console Errors
 #Logger.scripts.ai.sai=4,Console Server
 #Logger.scripts.ai=4,Console Server
 #Logger.scripts.cos=4,Console Server
+#Logger.scripts.midsummer=4,Console Server
 #Logger.scripts=4,Console Server
 #Logger.server.authserver=4,Console Server
 #Logger.spells.aura.effect.nospell=4,Console Server
@@ -1340,6 +1351,15 @@ vmap.petLOS = 1
 #                     0 - (Disabled, players will NOT be able to fire spells through treestumps and other objects).
 
 vmap.BlizzlikePvPLOS = 1
+
+#
+#   vmap.BlizzlikeLOSInOpenWorld
+#       Description: Check line of sight to see game objects in the open world.
+#       Default:    1 (Enabled, Players will be able to cast spells through tree stumps and other objects in the open world).
+#                   0 (Disabled, Players will not be able to cast spells through tree stumps and other objects in the open world).
+#
+
+vmap.BlizzlikeLOSInOpenWorld = 1
 
 #
 #    vmap.enableIndoorCheck
@@ -2740,10 +2760,16 @@ Quests.IgnoreAutoAccept = 0
 Quests.IgnoreAutoComplete = 0
 
 #
+#    Rate.RewardQuestMoney
+#        Description: Allows to tweak the amount of money rewarded by quests (does not affect RewardBonusMoney).
+#        Default:     1
+
+Rate.RewardQuestMoney = 1
+
+#
 #    Rate.RewardBonusMoney
 #        Description: Allows to further tweak the amount of extra money rewarded by quests when the player
-#                     is at MaxPlayerLevel (this amount is specified in quest_template.RewardBonusMoney).
-#                     NOTE: the final amount will also affected by Rate.Drop.Money
+#                     is at MaxPlayerLevel.
 #        Default:     1
 
 Rate.RewardBonusMoney = 1
@@ -2761,15 +2787,6 @@ Rate.RewardBonusMoney = 1
 #        Default:     50.000000
 
 MonsterSight = 50.000000
-
-#
-#    ThreatRadius
-#        Description: Distance for creatures to evade after being pulled away from the combat
-#                     starting point. If ThreatRadius is less than creature aggro radius then aggro
-#                     radius will be used.
-#        Default:     60
-
-ThreatRadius = 60
 
 #
 #    Rate.Creature.Aggro
@@ -3062,9 +3079,9 @@ Rate.RepairCost = 1
 #        Description: Should the player leave their group when they log out?
 #                     (It does not affect raids or dungeon finder groups)
 #
-#        Default:     1 - (Enabled)
+#        Default:     0 - (Disabled)
 
-LeaveGroupOnLogout.Enabled = 1
+LeaveGroupOnLogout.Enabled = 0
 
 #
 #    Group.Raid.LevelRestriction
@@ -3354,7 +3371,7 @@ Guild.BankTabCost1 = 2500000
 Guild.BankTabCost2 = 5000000
 Guild.BankTabCost3 = 10000000
 Guild.BankTabCost4 = 25000000
-Guild.BankTabCost5 = 50000000#
+Guild.BankTabCost5 = 50000000
 
 #
 #     Guild.MemberLimit

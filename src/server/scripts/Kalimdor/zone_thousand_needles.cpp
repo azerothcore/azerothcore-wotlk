@@ -15,6 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /* ScriptData
 SDName: Thousand Needles
 SD%Complete: 100
@@ -29,13 +36,6 @@ npc_plucky
 npc_enraged_panther
 go_panther_cage
 EndContentData */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
-#include "SpellScript.h"
 
 /*######
 # npc_lakota_windsong
@@ -360,3 +360,4 @@ void AddSC_thousand_needles()
     new npc_plucky();
     RegisterSpellScript(spell_panther_cage_key);
 }
+

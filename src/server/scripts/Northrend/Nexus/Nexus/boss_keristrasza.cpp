@@ -16,7 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "nexus.h"
 
@@ -213,3 +214,4 @@ void AddSC_boss_keristrasza()
     new boss_keristrasza();
     new achievement_intense_cold();
 }
+

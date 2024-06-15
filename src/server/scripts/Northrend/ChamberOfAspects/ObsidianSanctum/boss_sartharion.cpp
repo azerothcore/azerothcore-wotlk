@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "obsidian_sanctum.h"
 
 enum Says
@@ -1583,3 +1584,4 @@ void AddSC_boss_sartharion()
 
     new spell_sartharion_lava_strike();
 }
+

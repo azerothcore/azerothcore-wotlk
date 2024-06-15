@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `quest_poi` (
   KEY `idx` (`QuestID`,`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.quest_poi: ~18,907 rows (approximately)
+-- Dumping data for table acore_world.quest_poi: ~18 158 rows (approximately)
 DELETE FROM `quest_poi`;
 INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAreaId`, `Floor`, `Priority`, `Flags`, `VerifiedBuild`) VALUES
 	(1, 0, -1, 0, 23, 0, 0, 1, 0),
@@ -5933,10 +5933,10 @@ INSERT INTO `quest_poi` (`QuestID`, `id`, `ObjectiveIndex`, `MapID`, `WorldMapAr
 	(7302, 1, 1, 30, 401, 0, 0, 1, 0),
 	(7302, 2, 2, 30, 401, 0, 0, 1, 0),
 	(7302, 3, -1, 30, 401, 0, 0, 1, 0),
-	(7321, 0, 4, 0, 15, 0, 0, 1, 0),
-	(7321, 1, 4, 0, 15, 0, 0, 1, 0),
-	(7321, 2, 4, 0, 15, 0, 0, 1, 0),
-	(7321, 3, -1, 0, 15, 0, 0, 1, 0),
+	(7321, 4, -1, 0, 24, 0, 0, 1, 0),
+	(7321, 5, 4, 0, 24, 0, 0, 3, 0),
+	(7321, 6, 4, 0, 24, 0, 0, 3, 0),
+	(7321, 7, 4, 0, 24, 0, 0, 3, 0),
 	(7341, 0, -1, 1, 181, 0, 0, 1, 0),
 	(7342, 0, -1, 0, 341, 0, 0, 3, 0),
 	(7361, 0, -1, 30, 401, 0, 0, 1, 0),

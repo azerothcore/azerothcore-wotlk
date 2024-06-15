@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "AllCreatureScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 #include "ScriptedGossip.h"
@@ -192,3 +194,11 @@ void ScriptMgr::OnCreatureUpdate(Creature* creature, uint32 diff)
         tempScript->OnUpdate(creature, diff);
     }
 }
+
+CreatureScript::CreatureScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<CreatureScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<CreatureScript>;

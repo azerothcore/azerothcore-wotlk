@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,7 +18,7 @@
 DROP TABLE IF EXISTS `liquidtype_dbc`;
 CREATE TABLE IF NOT EXISTS `liquidtype_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `Name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Flags` int NOT NULL DEFAULT '0',
   `Type` int NOT NULL DEFAULT '0',
   `SoundID` int NOT NULL DEFAULT '0',
@@ -32,12 +32,12 @@ CREATE TABLE IF NOT EXISTS `liquidtype_dbc` (
   `ParticleMovement` int NOT NULL DEFAULT '0',
   `ParticleTexSlots` int NOT NULL DEFAULT '0',
   `MaterialID` int NOT NULL DEFAULT '0',
-  `Texture_1` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Texture_2` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Texture_3` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Texture_4` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Texture_5` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Texture_6` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_1` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_2` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_3` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_4` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_5` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Texture_6` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Color_1` int NOT NULL DEFAULT '0',
   `Color_2` int NOT NULL DEFAULT '0',
   `Float_1` float NOT NULL DEFAULT '0',

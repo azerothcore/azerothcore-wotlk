@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,19 +18,19 @@
 DROP TABLE IF EXISTS `acore_string`;
 CREATE TABLE IF NOT EXISTS `acore_string` (
   `entry` int unsigned NOT NULL DEFAULT '0',
-  `content_default` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `locale_koKR` text COLLATE utf8mb4_unicode_ci,
-  `locale_frFR` text COLLATE utf8mb4_unicode_ci,
-  `locale_deDE` text COLLATE utf8mb4_unicode_ci,
-  `locale_zhCN` text COLLATE utf8mb4_unicode_ci,
-  `locale_zhTW` text COLLATE utf8mb4_unicode_ci,
-  `locale_esES` text COLLATE utf8mb4_unicode_ci,
-  `locale_esMX` text COLLATE utf8mb4_unicode_ci,
-  `locale_ruRU` text COLLATE utf8mb4_unicode_ci,
+  `content_default` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `locale_koKR` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `locale_frFR` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `locale_deDE` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `locale_zhCN` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `locale_zhTW` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `locale_esES` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `locale_esMX` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `locale_ruRU` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.acore_string: ~1,154 rows (approximately)
+-- Dumping data for table acore_world.acore_string: ~1 164 rows (approximately)
 DELETE FROM `acore_string`;
 INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES
 	(1, 'You should select a character or a creature.', NULL, NULL, 'Ihr solltet einen Charakter oder eine Kreatur auswählen.', '你必须选择一个目标或者生物。', NULL, 'Debes seleccionar un personaje o una criatura.', 'Debes seleccionar un personaje o una criatura.', NULL),
@@ -500,7 +500,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(512, '%d - |cffffffff|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r ', NULL, NULL, '%d - |cffffffff|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r ', '%d - |cffffffff|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r', NULL, NULL, NULL, NULL),
 	(513, '%d - |cffffffff|Hquest:%d:%d|h[%s]|h|r %s', NULL, NULL, '%d - |cffffffff|Hquest:%d:%d|h[%s]|h|r %s', '%d - |cffffffff|H 任务:%d:%d|h[%s]|h|r %s', NULL, NULL, NULL, NULL),
 	(514, '%d - |cffffffff|Hcreature_entry:%d|h[%s]|h|r ', NULL, NULL, '%d - |cffffffff|Hcreature_entry:%d|h[%s]|h|r ', '%d - |cffffffff|H 生物输入:%d|h[%s]|h|r', NULL, NULL, NULL, NULL),
-	(515, '%d - |cffffffff|Hcreature:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r ', NULL, NULL, '%d - |cffffffff|Hcreature:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r ', '%d%s - |cffffffff|H生物:%d|h[%s X:%f Y:%f Z:%f 地图号:%d]|h|r', NULL, NULL, NULL, NULL),
+	(515, '%d - (entry: %d) |cffffffff|Hcreature:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r', NULL, NULL, '%d - (entry: %d) |cffffffff|Hcreature:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r', '%d%s - (entry: %d) |cffffffff|H生物:%d|h[%s X:%f Y:%f Z:%f 地图号:%d]|h|r', NULL, NULL, NULL, NULL),
 	(516, '%d - |cffffffff|Hgameobject_entry:%d|h[%s]|h|r ', NULL, NULL, '%d - |cffffffff|Hgameobject_entry:%d|h[%s]|h|r ', '%d - |cffffffff|H 游戏对象输入:%d|h[%s]|h|r', NULL, NULL, NULL, NULL),
 	(517, '%d (Entry: %d) - |cffffffff|Hgameobject:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r ', NULL, NULL, '%d (Eintrag: %d) - |cffffffff|Hgameobject:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r ', '%d (输入: %d) - |cffffffff|H 游戏对象:%d|h[%s X:%f Y:%f Z:%f 地图Id:%d]|h|r', NULL, NULL, NULL, NULL),
 	(518, '%d - |cffffffff|Hitemset:%d|h[%s %s]|h|r ', NULL, NULL, '%d - |cffffffff|Hitemset:%d|h[%s %s]|h|r ', '%d - |cffffffff|H套装:%d|h[%s %s]|h|r', NULL, NULL, NULL, NULL),
@@ -572,8 +572,8 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(584, 'No event found!', NULL, NULL, 'Kein Event gefunden!', '没有找到这个事件。', NULL, NULL, NULL, NULL),
 	(585, 'Event not exist!', NULL, NULL, 'Das Event existiert nicht!', '事件不存在!', NULL, NULL, NULL, NULL),
 	(586, 'Event %u: %s%s\nStart: %s End: %s Occurence: %s Length: %s\nNext state change: %s', NULL, NULL, 'Event %u: %s%s\nStart: %s Ende: %s Häufigkeit: %s Länge: %s\nNächster Statuswechsel: %s', '事件 %u: %s%s\n开始时间: %s 结束时间: %s 发生: %s 全程（长度）: %s\n下一次状态改变: %s', NULL, NULL, NULL, NULL),
-	(587, 'Event %u already active!', NULL, NULL, 'Event %u bereits aktiv!', '事件 %u 已经激活了。', NULL, NULL, NULL, NULL),
-	(588, 'Event %u not active!', NULL, NULL, 'Event %u nicht aktiv!', '事件 %u 没有被激活。', NULL, NULL, NULL, NULL),
+	(587, 'Event %u (%s) is already active!', NULL, NULL, 'Event %u (%s) bereits aktiv!', '事件 %u (%s) 已经激活了。', NULL, NULL, NULL, NULL),
+	(588, 'Event %u (%s) is not active!', NULL, NULL, 'Event %u (%s) nicht aktiv!', '事件 %u (%s) 没有被激活。', NULL, NULL, NULL, NULL),
 	(589, '   Point movement to (X:%f Y:%f Z:%f)', NULL, NULL, '   Punktbewegung nach (X:%f Y:%f Z:%f)', '点运动到 (X:%f Y:%f Z:%f)', NULL, NULL, NULL, NULL),
 	(590, '   Fear movement', NULL, NULL, '   Furchtbewegung', '恐惧运动', NULL, NULL, NULL, NULL),
 	(591, '   Distract movement', NULL, NULL, '   Ablenkungsbewegung', '扰乱动作', NULL, NULL, NULL, NULL),
@@ -585,6 +585,8 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(597, 'Current gamemasters:', NULL, NULL, 'Aktuelle Gamemaster:', '目前服务器GM:', NULL, NULL, NULL, NULL),
 	(598, '|    Account    |  GM  |', NULL, NULL, '|    Account    |  GM  |', '|    账号    |  管理员  |', NULL, NULL, NULL, NULL),
 	(599, 'No gamemasters.', NULL, NULL, 'Keine Gamemaster vorhanden.', '没有游戏管理员。', NULL, NULL, NULL, NULL),
+	(600, 'Event %u (%s) is started', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(601, 'Event %u (%s) is stopped', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(705, 'You must wait %s before speaking again.', NULL, NULL, 'Ihr müsst %s warten bevor Ihr wieder sprechen könnt', '你必须等待 %s 才能继续喊话。', NULL, NULL, NULL, NULL),
 	(706, 'This item(s) have problems with equipping/storing in inventory.', NULL, NULL, 'Diese(s) Item(s) hat/haben Probleme mit dem ausrüsten/lagern im Inventar', '这些道具在装备/存放中出现一个问题。', NULL, NULL, NULL, NULL),
 	(707, '%s does not wish to be disturbed: %s', NULL, NULL, '%s möchte nicht gestört werden und kann keine Flüsternachrichten erhalten: %s ', '%s 免打扰状态下无法收到悄悄话: %s', NULL, NULL, NULL, NULL),
@@ -598,8 +600,8 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(715, 'You don\'t meet Battleground level requirements', NULL, NULL, 'Ihr erfüllt die Vorraussetzungen für das Schlachtfeld nicht', '不能达到进入战场的要求.', NULL, NULL, NULL, NULL),
 	(716, 'Map: %s, Area: %s', NULL, NULL, '¦ Letzter Login: %s (Falsche Logins: %u)', '│最後登录： ％s（登录失败： ％u ）', NULL, NULL, NULL, NULL),
 	(717, '|cffff0000[BG Queue Announcer]:|r %s -- [%u-%u] Started!|r', NULL, NULL, '|cffff0000[BG Ansager für Warteschlange]:|r %s -- [%u-%u] beginnt!|r', '|cffff0000[战场列队公告]:|r %s -- [%u-%u] 开始！|r', NULL, NULL, NULL, NULL),
-	(718, '|cffff0000[Arena Queue Announcer]:|r %s -- Joined : %ux%u : %u|r', NULL, NULL, '|cffff0000[BG Ansager für Warteschlange]:|r %s -- beigetreten : %ux%u : %u|r', '|cffff0000[竞技场列队公告]:|r %s -- 加入 : %ux%u : %u|r', NULL, NULL, NULL, NULL),
-	(719, '|cffff0000[Arena Queue Announcer]:|r %s -- Exited : %ux%u : %u|r', NULL, NULL, '|cffff0000[BG Ansager für Warteschlange]:|r %s -- verlassen : %ux%u : %u|r', '|cffff0000[竞技场列队公告]:|r %s -- 退出 : %ux%u : %u|r', NULL, NULL, NULL, NULL),
+	(718, '|cffff0000[Arena Queue Announcer]:|r %s -- Joined : %ux%u : %u|r', NULL, '|cffff0000[Annonce File d\'Attente Arène]:|r %s -- Rejoint : %ux%u : %u|r', '|cffff0000[BG Ansager für Warteschlange]:|r %s -- beigetreten : %ux%u : %u|r', '|cffff0000[竞技场列队公告]:|r %s -- 加入 : %ux%u : %u|r', NULL, NULL, NULL, NULL),
+	(719, '|cffff0000[Arena Queue Announcer]:|r %s -- Exited : %ux%u : %u|r', NULL, '|cffff0000[Annonce File d\'Attente Arène]:|r %s -- Quitté : %ux%u : %u|r', '|cffff0000[BG Ansager für Warteschlange]:|r %s -- verlassen : %ux%u : %u|r', '|cffff0000[竞技场列队公告]:|r %s -- 退出 : %ux%u : %u|r', NULL, NULL, NULL, NULL),
 	(720, 'Your group is too large for this battleground. Please regroup to join.', NULL, NULL, 'Eure Gruppe ist zu groß für das Schlachtfeld. Bitte macht eine neue Gruppe um beizutreten.', '你的队伍有太多玩家，请重新组队已参与战场。', NULL, NULL, NULL, NULL),
 	(721, 'Your group is too large for this arena. Please regroup to join.', NULL, NULL, 'Eure Gruppe ist zu groß für diese Arena. Bitte macht eine neue Gruppe um beizutreten.', '你的队伍有太多玩家，请重新组队已参与竞技场。', NULL, NULL, NULL, NULL),
 	(722, 'Your group has members not in your arena team. Please regroup to join.', NULL, NULL, 'In eurer Gruppe befinden sich Mitglieder die nicht zu eurem Arena-Team gehören. Bitte macht eine neue Gruppe um beizutreten.', '你的队友不在你的竞技场队伍中，请重新组队。', NULL, NULL, NULL, NULL),
@@ -631,6 +633,12 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(750, 'Not enough players. This game will close in %u mins.', NULL, NULL, 'Nicht genug Spieler. Das Spiel wird in %u Minuten geschlossen.', '没有足够玩家，游戏 %u 分钟后被关闭.', NULL, NULL, NULL, NULL),
 	(751, 'Not enough players. This game will close in %u seconds.', NULL, NULL, 'Nicht genug Spieler. Das Spiel wird in %u Sekunden geschlossen.', '没有足够玩家，游戏 %u 秒后被关闭.', NULL, NULL, NULL, NULL),
 	(752, '¦ Last IP: %s (Locked: %s)', NULL, NULL, '¦ Letzte IP: %s (Gesperrt: %s)', '¦ 最后 IP: %s (锁定: %s)', NULL, NULL, NULL, NULL),
+	(773, '|cffff0000[Arena Queue Announcer]:|r %s -- Joined : %ux%u|r', NULL, '|cffff0000[Annonce File d\'Attente Arène]:|r %s -- Rejoint : %ux%u|r', '|cffff0000[BG Ansager für Warteschlange]:|r %s -- beigetreten : %ux%u|r', '|cffff0000[竞技场列队公告]:|r %s -- 加入 : %ux%u|r', NULL, NULL, NULL, NULL),
+	(774, '|cffff0000[Arena Queue Announcer]:|r %s -- Exited : %ux%u|r', NULL, '|cffff0000[Annonce File d\'Attente Arène]:|r %s -- Quitté : %ux%u|r', '|cffff0000[BG Ansager für Warteschlange]:|r %s -- verlassen : %ux%u|r', '|cffff0000[竞技场列队公告]:|r %s -- 退出 : %ux%u|r', NULL, NULL, NULL, NULL),
+	(775, '|cffff0000[Arena Queue Announcer]:|r Joined : %ux%u : %u|r', NULL, '|cffff0000[Annonce File d\'Attente Arène]:|r Rejoint : %ux%u : %u|r', '|cffff0000[BG Ansager für Warteschlange]:|r beigetreten : %ux%u : %u|r', '|cffff0000[竞技场列队公告]:|r 加入 : %ux%u : %u|r', NULL, NULL, NULL, NULL),
+	(776, '|cffff0000[Arena Queue Announcer]:|r Exited : %ux%u : %u|r', NULL, '|cffff0000[Annonce File d\'Attente Arène]:|r Quitté : %ux%u : %u|r', '|cffff0000[BG Ansager für Warteschlange]:|r verlassen : %ux%u : %u|r', '|cffff0000[竞技场列队公告]:|r 退出 : %ux%u : %u|r', NULL, NULL, NULL, NULL),
+	(777, '|cffff0000[Arena Queue Announcer]:|r Joined : %ux%u|r', NULL, '|cffff0000[Annonce File d\'Attente Arène]:|r Rejoint : %ux%u|r', '|cffff0000[BG Ansager für Warteschlange]:|r beigetreten : %ux%u|r', '|cffff0000[竞技场列队公告]:|r 加入 : %ux%u|r', NULL, NULL, NULL, NULL),
+	(778, '|cffff0000[Arena Queue Announcer]:|r Exited : %ux%u|r', NULL, '|cffff0000[Annonce File d\'Attente Arène]:|r Quitté : %ux%u|r', '|cffff0000[BG Ansager für Warteschlange]:|r verlassen : %ux%u|r', '|cffff0000[竞技场列队公告]:|r 退出 : %ux%u|r', NULL, NULL, NULL, NULL),
 	(785, 'Arena testing turned %s', NULL, NULL, 'Arena Prüfung auf %s geschaltet.', '竞技场测试赛开启 %s', NULL, NULL, NULL, NULL),
 	(786, '|cffff0000[Automatic]:|r', NULL, NULL, '|cffff0000[Automatisch]:|r', '|cffff0000[自动公告]:|r', NULL, NULL, NULL, NULL),
 	(787, '|cffffff00[|c1f40af20Announce by|r |cffff0000%s|cffffff00]:|r %s|r', NULL, NULL, '|cffffff00[|c1f40af20Angekündigt von|r |cffff0000%s|cffffff00]:|r %s|r', '|cffffff00[|c1f40af20公告|r |cffff0000%s|cffffff00]:|r %s|r', NULL, NULL, NULL, NULL),
@@ -1002,6 +1010,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(5082, 'Incorrect syntax. Specify either \'starter\' or \'ender\'.', NULL, NULL, 'Falsche syntax. Entweder \'starter\' oder \'ender\' angeben.', NULL, NULL, NULL, NULL, NULL),
 	(5083, 'Character %s (%u) moved from account %s (%u) to account %s (%u).', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(5084, 'Spell cast failed! SpellCastResult returned: %s (%u).', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(5085, 'Object %s (entry :%u guid: %u) respawned!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(6604, 'You cannot say, yell or emote until you become level %d.', NULL, NULL, 'Ihr müsst mindestens Level %d sein, bevor Ihr sprechen, rufen oder emotes nutzen dürft.', '你的等级必须大于|CFF9900CC%d|R才可以说话或者使用表情。', NULL, NULL, NULL, NULL),
 	(6605, 'You cannot whisper until you become level %d.', NULL, NULL, 'Ihr müsst mindestens Level %d sein, bevor Ihr flüstern dürft.', '你的等级大于|CFF9900CC%d|R才可以说悄悄话。', NULL, NULL, NULL, NULL),
 	(6606, 'You cannot write to channels until you become level %d.', NULL, NULL, 'Ihr müsst mindestens Level %d sein, bevor Ihr in Channels schreiben dürft.', '你的等级大于|CFF9900CC%d|R才可以使用聊天频道。', NULL, NULL, NULL, NULL),
@@ -1111,6 +1120,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(10071, 'The Horde captured the South Graveyard!', NULL, NULL, 'Die Horde hat den südlichen Friedhof erobert.', '部落占领了南方的墓地!', NULL, NULL, NULL, NULL),
 	(10072, 'The Horde captured the West Graveyard!', NULL, NULL, 'Die Horde hat den westlichen Friedhof erobert.', '部落占领了西部的墓地!', NULL, NULL, NULL, NULL),
 	(10073, 'The Horde captured the East Graveyard!', NULL, NULL, 'Die Horde hat den östlichen Friedhof erobert.', '部落占领了东部的墓地!', NULL, NULL, NULL, NULL),
+	(10074, 'Halaa is defenseless!', NULL, NULL, NULL, NULL, NULL, '¡Halaa está indefenso!', '¡Halaa está indefenso!', NULL),
 	(11000, '|cffffff00[|c00077766Autobroadcast|cffffff00]: |cFFF222FF%s|r', NULL, NULL, '|cffffff00[|c00077766Autobroadcast|cffffff00]: |cFFF222FF%s|r', '|cffffff00[|c00077766游戏公告|cffffff00]: |cFFF222FF%s|r', NULL, NULL, NULL, NULL),
 	(11001, 'You have not chosen -1 or the current realmID that you are on.', NULL, NULL, 'Ihr habt nicht -1 oder die aktuelle realmId eures Realms angegeben.', '你没有正确选择你的当前服务器ID或者选择默认的服务器ID(-1)。', NULL, NULL, NULL, NULL),
 	(11002, 'Server: %s has kicked %s, reason: %s', NULL, NULL, NULL, '系统公告: %s has kicked %s, 原因: %s', NULL, NULL, NULL, 'Server: %s кикнул %s, причина: %s'),

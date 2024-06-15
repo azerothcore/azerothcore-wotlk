@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "SpellScriptLoader.h"
 #include "ScriptMgr.h"
 #include "SpellScript.h"
 
@@ -74,3 +75,11 @@ void ScriptMgr::CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<S
         scriptVector.emplace_back(tempScript, itr);
     }
 }
+
+SpellScriptLoader::SpellScriptLoader(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<SpellScriptLoader>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<SpellScriptLoader>;

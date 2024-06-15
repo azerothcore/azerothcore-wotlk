@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "trial_of_the_champion.h"
 
 enum EadricSpells
@@ -844,3 +845,4 @@ void AddSC_boss_argent_challenge()
     new spell_toc5_light_rain();
     new spell_reflective_shield();
 }
+

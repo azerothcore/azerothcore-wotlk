@@ -15,14 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "MoveSplineInit.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SmartAI.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
-#include "WaypointMgr.h"
 #include "zulgurub.h"
 
 enum Says
@@ -123,7 +123,7 @@ struct boss_jeklik : public BossAI
 
         me->SetDisableGravity(false);
         me->SetReactState(REACT_PASSIVE);
-        BossAI::SetCombatMovement(false);
+        BossAI::me->SetCombatMovement(false);
         batRidersCount = 0;
 
         DoCastSelf(SPELL_GREEN_CHANNELING, true);
@@ -148,7 +148,7 @@ struct boss_jeklik : public BossAI
         BossAI::PathEndReached(pathId);
 
         me->SetDisableGravity(false);
-        SetCombatMovement(true);
+        me->SetCombatMovement(true);
         me->SetReactState(REACT_AGGRESSIVE);
 
         //
@@ -423,3 +423,4 @@ void AddSC_boss_jeklik()
     RegisterCreatureAI(npc_batrider);
     RegisterSpellScript(spell_batrider_bomb);
 }
+

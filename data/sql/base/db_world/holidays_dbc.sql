@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS `holidays_dbc` (
   `CalendarFlags_10` int NOT NULL DEFAULT '0',
   `HolidayNameID` int NOT NULL DEFAULT '0',
   `HolidayDescriptionID` int NOT NULL DEFAULT '0',
-  `TextureFilename` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `TextureFilename` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Priority` int NOT NULL DEFAULT '0',
   `CalendarFilterType` int NOT NULL DEFAULT '0',
   `Flags` int NOT NULL DEFAULT '0',

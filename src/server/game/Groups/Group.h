@@ -45,7 +45,7 @@ struct MapEntry;
 #define MAX_RAID_SUBGROUPS MAXRAIDSIZE/MAXGROUPSIZE
 #define TARGETICONCOUNT 8
 
-enum RollVote
+enum RollVote : uint8
 {
     PASS              = 0,
     NEED              = 1,

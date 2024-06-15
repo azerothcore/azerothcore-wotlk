@@ -23,9 +23,9 @@
 */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellAuras.h"
 
 using namespace Acore::ChatCommands;
@@ -104,8 +104,7 @@ public:
         {
             if (!normalizePlayerName(*playerName))
             {
-                handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
                 return false;
             }
 
@@ -118,8 +117,7 @@ public:
             {
                 if (time)
                 {
-                    handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-                    handler->SetSentErrorMessage(true);
+                    handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
                     return false;
                 }
 
@@ -153,8 +151,7 @@ public:
 
         if (duration == 0)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 
@@ -172,8 +169,7 @@ public:
             aura = target->AddAura(deserterSpell, target);
             if (!aura)
             {
-                handler->SendSysMessage(LANG_BAD_VALUE);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_BAD_VALUE);
                 return false;
             }
             aura->SetDuration(duration * IN_MILLISECONDS);
@@ -250,8 +246,7 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_NO_CHAR_SELECTED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
             return false;
         }
 
@@ -279,15 +274,13 @@ public:
 
         if (duration == 0)
         {
-            handler->PSendSysMessage("Player %s does not have %s Deserter.", handler->playerLink(player->GetName()), isInstance ? "Instance" : "Battleground");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Player %s does not have %s Deserter.", handler->playerLink(player->GetName()), isInstance ? "Instance" : "Battleground");
             return true;
         }
 
         if (duration < 0)
         {
-            handler->PSendSysMessage("Permanent %s Deserter has been removed from player %s (GUID %u).", isInstance ? "Instance" : "Battleground", handler->playerLink(player->GetName()), player->GetGUID().GetCounter());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Permanent %s Deserter has been removed from player %s (GUID %u).", isInstance ? "Instance" : "Battleground", handler->playerLink(player->GetName()), player->GetGUID().GetCounter());
             return true;
         }
 
@@ -338,8 +331,7 @@ public:
         // Optimization. Do not execute any further functions or Queries if remainTime is 0.
         if (remainTime == 0)
         {
-            handler->SendSysMessage(LANG_BAD_VALUE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_BAD_VALUE);
             return false;
         }
 

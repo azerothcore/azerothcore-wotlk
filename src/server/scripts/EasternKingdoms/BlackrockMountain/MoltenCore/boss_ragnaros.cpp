@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "molten_core.h"
 
 enum Texts
@@ -563,3 +564,4 @@ void AddSC_boss_ragnaros()
     RegisterSpellScript(spell_ragnaros_lava_burst_randomizer);
     RegisterSpellScript(spell_ragnaros_summon_sons_of_flame);
 }
+

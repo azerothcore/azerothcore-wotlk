@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -17,15 +17,15 @@
 -- Dumping structure for table acore_world.gossip_menu_option_locale
 DROP TABLE IF EXISTS `gossip_menu_option_locale`;
 CREATE TABLE IF NOT EXISTS `gossip_menu_option_locale` (
-  `MenuID` smallint unsigned NOT NULL DEFAULT '0',
+  `MenuID` int unsigned NOT NULL DEFAULT '0',
   `OptionID` smallint unsigned NOT NULL DEFAULT '0',
-  `Locale` varchar(4) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `OptionText` text COLLATE utf8mb4_unicode_ci,
-  `BoxText` text COLLATE utf8mb4_unicode_ci,
+  `Locale` varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `OptionText` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `BoxText` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`MenuID`,`OptionID`,`Locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gossip_menu_option_locale: ~32,513 rows (approximately)
+-- Dumping data for table acore_world.gossip_menu_option_locale: ~35 003 rows (approximately)
 DELETE FROM `gossip_menu_option_locale`;
 INSERT INTO `gossip_menu_option_locale` (`MenuID`, `OptionID`, `Locale`, `OptionText`, `BoxText`) VALUES
 	(0, 0, 'deDE', 'GOSSIP_OPTION_QUESTGIVER', ''),

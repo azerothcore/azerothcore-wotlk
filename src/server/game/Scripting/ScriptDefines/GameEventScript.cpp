@@ -15,29 +15,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameEventScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
 void ScriptMgr::OnGameEventStart(uint16 EventID)
 {
-    ExecuteScript<GameEventScript>([&](GameEventScript* script)
-    {
-        script->OnStart(EventID);
-    });
+    CALL_ENABLED_HOOKS(GameEventScript, GAMEEVENTHOOK_ON_START, script->OnStart(EventID));
 }
 
 void ScriptMgr::OnGameEventStop(uint16 EventID)
 {
-    ExecuteScript<GameEventScript>([&](GameEventScript* script)
-    {
-        script->OnStop(EventID);
-    });
+    CALL_ENABLED_HOOKS(GameEventScript, GAMEEVENTHOOK_ON_STOP, script->OnStop(EventID));
 }
 
 void ScriptMgr::OnGameEventCheck(uint16 EventID)
 {
-    ExecuteScript<GameEventScript>([&](GameEventScript* script)
-    {
-        script->OnEventCheck(EventID);
-    });
+    CALL_ENABLED_HOOKS(GameEventScript, GAMEEVENTHOOK_ON_EVENT_CHECK, script->OnEventCheck(EventID));
 }
+
+GameEventScript::GameEventScript(const char* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, GAMEEVENTHOOK_END)
+{
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < GAMEEVENTHOOK_END; ++i)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<GameEventScript>::AddScript(this, std::move(enabledHooks));
+}
+
+template class AC_GAME_API ScriptRegistry<GameEventScript>;

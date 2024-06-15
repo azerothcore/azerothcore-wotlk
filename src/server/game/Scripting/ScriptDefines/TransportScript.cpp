@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TransportScript.h"
 #include "ScriptMgr.h"
 #include "Transport.h"
 
@@ -68,3 +69,11 @@ void ScriptMgr::OnRelocate(Transport* transport, uint32 waypointId, uint32 mapId
         tempScript->OnRelocate(transport, waypointId, mapId, x, y, z);
     }
 }
+
+TransportScript::TransportScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<TransportScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<TransportScript>;

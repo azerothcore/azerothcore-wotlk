@@ -62,16 +62,16 @@ namespace
     inline std::string MakeMessage(std::string_view messageType, std::string_view file, uint32 line, std::string_view function,
         std::string_view message, std::string_view fmtMessage = {}, std::string_view debugInfo = {})
     {
-        std::string msg = Acore::StringFormatFmt("\n>> {}\n\n# Location '{}:{}'\n# Function '{}'\n# Condition '{}'\n", messageType, file, line, function, message);
+        std::string msg = Acore::StringFormatFmt("\n>> {}\n\n# Location: {}:{}\n# Function: {}\n# Condition: {}\n", messageType, file, line, function, message);
 
         if (!fmtMessage.empty())
         {
-            msg.append(Acore::StringFormatFmt("# Message '{}'\n", fmtMessage));
+            msg.append(Acore::StringFormatFmt("# Message: {}\n", fmtMessage));
         }
 
         if (!debugInfo.empty())
         {
-            msg.append(Acore::StringFormatFmt("\n# Debug info: '{}'\n", debugInfo));
+            msg.append(Acore::StringFormatFmt("\n# Debug info: {}\n", debugInfo));
         }
 
         return Acore::StringFormatFmt(

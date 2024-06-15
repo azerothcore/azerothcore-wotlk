@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "VehicleScript.h"
 #include "ScriptMgr.h"
 #include "Vehicle.h"
 
@@ -86,3 +87,11 @@ void ScriptMgr::OnRemovePassenger(Vehicle* veh, Unit* passenger)
         tempScript->OnRemovePassenger(veh, passenger);
     }
 }
+
+VehicleScript::VehicleScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<VehicleScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<VehicleScript>;

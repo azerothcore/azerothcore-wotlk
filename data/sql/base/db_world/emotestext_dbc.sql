@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,7 +18,7 @@
 DROP TABLE IF EXISTS `emotestext_dbc`;
 CREATE TABLE IF NOT EXISTS `emotestext_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `Name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `EmoteID` int NOT NULL DEFAULT '0',
   `EmoteText_1` int NOT NULL DEFAULT '0',
   `EmoteText_2` int NOT NULL DEFAULT '0',

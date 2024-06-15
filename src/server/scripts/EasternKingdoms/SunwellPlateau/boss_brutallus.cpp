@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "WorldSession.h"
 #include "sunwell_plateau.h"
 
@@ -428,7 +430,7 @@ public:
                             UpdateData data;
                             WorldPacket pkt;
                             go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
-                            data.BuildPacket(&pkt);
+                            data.BuildPacket(pkt);
                             i->GetSource()->GetSession()->SendPacket(&pkt);
                         }
                 }
@@ -471,7 +473,7 @@ public:
                             UpdateData data;
                             WorldPacket pkt;
                             go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
-                            data.BuildPacket(&pkt);
+                            data.BuildPacket(pkt);
                             i->GetSource()->GetSession()->SendPacket(&pkt);
                         }
                 }
@@ -548,3 +550,4 @@ void AddSC_boss_brutallus()
     new spell_brutallus_burn();
     new AreaTrigger_at_sunwell_madrigosa();
 }
+

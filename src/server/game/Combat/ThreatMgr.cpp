@@ -654,8 +654,12 @@ void ThreatMgr::ResetAllThreat()
     if (threatList.empty())
         return;
 
-    for (ThreatContainer::StorageType::iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-        (*itr)->SetThreat(0);
+    for (HostileReference* ref : threatList)
+    {
+        // Reset temp threat before setting threat back to 0.
+        ref->resetTempThreat();
+        ref->SetThreat(0.f);
+    }
 
     setDirty(true);
 }

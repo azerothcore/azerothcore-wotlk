@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
+#include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
 
 enum Texts
@@ -1814,3 +1815,4 @@ void AddSC_boss_blood_prince_council()
     new spell_valanar_kinetic_bomb_summon();
     new spell_blood_council_summon_shadow_resonance();
 }
+

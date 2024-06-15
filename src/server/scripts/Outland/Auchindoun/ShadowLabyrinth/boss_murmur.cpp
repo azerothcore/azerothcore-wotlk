@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScriptLoader.h"
 #include "shadow_labyrinth.h"
 
 enum Spells
@@ -56,7 +57,7 @@ struct boss_murmur : public BossAI
 {
     boss_murmur(Creature* creature) : BossAI(creature, DATA_MURMUR)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         scheduler.SetValidator([this]
         {
             return !me->HasUnitState(UNIT_STATE_CASTING);
@@ -257,3 +258,4 @@ void AddSC_boss_murmur()
     RegisterSpellScript(spell_shockwave_knockback);
     RegisterSpellScript(spell_murmur_sonic_boom_effect);
 }
+

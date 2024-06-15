@@ -16,11 +16,12 @@
  */
 
 #include "OutdoorPvPGH.h"
+#include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "MapMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "WorldPacket.h"
 
 OutdoorPvPGH::OutdoorPvPGH()
@@ -130,3 +131,4 @@ void AddSC_outdoorpvp_gh()
 {
     new OutdoorPvP_grizzly_hills();
 }
+

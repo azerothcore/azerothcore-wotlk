@@ -13,6 +13,10 @@ inputs:
     description: version tag to use for docker image
     required: true
     type: string
+  dockerfile:
+    description: dockerfile to use
+    required: false
+    default: apps/docker/Dockerfile
 runs:
   using: composite
   steps:
@@ -29,7 +33,7 @@ runs:
       uses: docker/build-push-action@v5
       with:
         context: ${{ github.workspace }}
-        file: apps/docker/Dockerfile
+        file: ${{ inputs.dockerfile }}
         push: ${{ inputs.push }}
         tags: ${{ steps.meta.outputs.tags }}
         target:  ${{ inputs.component-name }}

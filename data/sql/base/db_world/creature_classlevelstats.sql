@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `creature_classlevelstats` (
   `damage_base` float NOT NULL DEFAULT '0',
   `damage_exp1` float NOT NULL DEFAULT '0',
   `damage_exp2` float NOT NULL DEFAULT '0',
-  `comment` text COLLATE utf8mb4_unicode_ci,
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`level`,`class`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -297,7 +297,7 @@ INSERT INTO `creature_classlevelstats` (`level`, `class`, `basehp0`, `basehp1`, 
 	(65, 4, 3524, 5914, 1, 0, 4724, 278, 35, 37.2381, 80.3794, 80.3794, NULL),
 	(65, 8, 2467, 4731, 4731, 6443, 4214, 124, 26, 31.6015, 68.0244, 69.9742, NULL),
 	(66, 1, 3624, 6116, 1, 0, 5531, 282, 37, 37.9047, 84.8941, 84.8941, NULL),
-	(66, 2, 2899, 6906, 6116, 2846, 5523, 266, 29, 35.0158, 78.472, 84.8941, NULL),
+	(66, 2, 2899, 4892, 6116, 2846, 5523, 266, 29, 35.0158, 78.472, 84.8941, NULL),
 	(66, 4, 3624, 6116, 1, 0, 5104, 282, 37, 37.9047, 84.8941, 84.8941, NULL),
 	(66, 8, 2552, 4892, 4892, 6588, 4460, 125, 27, 32.1734, 72.0499, 78.8784, NULL),
 	(67, 1, 3728, 6326, 1, 0, 5829, 288, 39, 38.5714, 89.6211, 94.901, NULL),

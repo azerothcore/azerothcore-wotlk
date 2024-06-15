@@ -28,8 +28,8 @@ go_mausoleum_door
 go_mausoleum_trigger
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
 /*######

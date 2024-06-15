@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -22,11 +22,11 @@ CREATE TABLE IF NOT EXISTS `spell_bonus_data` (
   `dot_bonus` float NOT NULL DEFAULT '0',
   `ap_bonus` float NOT NULL DEFAULT '0',
   `ap_dot_bonus` float NOT NULL DEFAULT '0',
-  `comments` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `comments` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.spell_bonus_data: ~1,270 rows (approximately)
+-- Dumping data for table acore_world.spell_bonus_data: ~1 270 rows (approximately)
 DELETE FROM `spell_bonus_data`;
 INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`) VALUES
 	(116, 0.172, 0, 0, 0, 'Mage - Frost Bolt'),

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `spell_threat` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.spell_threat: ~107 rows (approximately)
+-- Dumping data for table acore_world.spell_threat: ~106 rows (approximately)
 DELETE FROM `spell_threat`;
 INSERT INTO `spell_threat` (`entry`, `flatMod`, `pctMod`, `apPctMod`) VALUES
 	(78, 5, 1, 0),
@@ -92,7 +92,6 @@ INSERT INTO `spell_threat` (`entry`, `flatMod`, `pctMod`, `apPctMod`) VALUES
 	(26688, 0, 0, 0),
 	(26996, 212, 1, 0),
 	(28176, 0, 0, 0),
-	(29166, 0, 10, 0),
 	(29707, 121, 1, 0),
 	(30324, 164, 1, 0),
 	(30356, 426, 1, 0),

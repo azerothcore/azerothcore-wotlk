@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "zulgurub.h"
 
@@ -801,3 +802,4 @@ void AddSC_boss_mandokir()
     RegisterSpellScript(spell_mandokir_charge);
     RegisterSpellScript(spell_threatening_gaze_charge);
 }
+

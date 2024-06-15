@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -365,7 +366,7 @@ struct npc_toxic_slime : public ScriptedAI
 
     void InitializeAI() override
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         DoCastSelf(SPELL_TOXIN);
 
         InstanceScript* instance = me->GetInstanceScript();
@@ -419,3 +420,4 @@ void AddSC_boss_viscidus()
     RegisterSpellScript(spell_explode_trigger);
     RegisterSpellScript(spell_summon_toxin_slime);
 }
+

@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "violet_hold.h"
 
 enum eSpells
@@ -165,3 +166,4 @@ void AddSC_boss_moragg()
     new boss_moragg();
     new spell_optic_link();
 }
+

@@ -403,7 +403,19 @@ enum AcoreStrings
     LANG_COMMAND_CHEAT_WW               = 362,
     LANG_COMMAND_WHISPEROFFPLAYER       = 363,
     LANG_COMMAND_CHEAT_TAXINODES        = 364,
-    // Room for more level 2              365-399 not used
+
+    // [START] .reset items command strings:
+    LANG_COMMAND_RESET_ITEMS_EQUIPPED   = 365,
+    LANG_COMMAND_RESET_ITEMS_BAGS       = 366,
+    LANG_COMMAND_RESET_ITEMS_BANK       = 367,
+    LANG_COMMAND_RESET_ITEMS_KEYRING    = 368,
+    LANG_COMMAND_RESET_ITEMS_CURRENCY   = 369,
+    LANG_COMMAND_RESET_ITEMS_BUYBACK    = 370,
+    LANG_COMMAND_RESET_ITEMS_ALL        = 371,
+    LANG_COMMAND_RESET_ITEMS_ALL_BAGS   = 372,
+    // [END] reset items command strings
+
+    // Room for more level 2              373-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,
@@ -1159,7 +1171,9 @@ enum AcoreStrings
 
     LANG_CMD_CAST_ERROR_CODE            = 5084,
 
-    // Room for more strings    5084-9999
+    LANG_CMD_GO_RESPAWN                 = 5085,
+
+    // Room for more strings    5086-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1239,6 +1253,7 @@ enum AcoreStrings
     LANG_OPVP_NA_CAPTURE_A              = 10026,
     LANG_OPVP_NA_LOSE_H                = 10027,
     LANG_OPVP_NA_LOSE_A                = 10028,
+    LANG_OPVP_NA_DEFENSELESS           = 10074,
     // opvp tf
     LANG_OPVP_TF_CAPTURE_H              = 10029,
     LANG_OPVP_TF_CAPTURE_A              = 10030,

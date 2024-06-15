@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ahnkahet.h"
 
 enum Spells
@@ -503,3 +504,4 @@ void AddSC_boss_volazj()
     RegisterSpellScript(spell_herald_volzaj_insanity);
     RegisterSpellScript(spell_volazj_whisper);
 }
+

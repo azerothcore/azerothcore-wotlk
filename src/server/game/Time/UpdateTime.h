@@ -35,6 +35,8 @@ public:
     uint32 GetMaxUpdateTime() const;
     uint32 GetMaxUpdateTimeOfCurrentTable() const;
     uint32 GetLastUpdateTime() const;
+    uint32 GetDatasetSize() const;
+    uint32 GetPercentile(uint8 p);
 
     void UpdateWithDiff(uint32 diff);
 
@@ -42,6 +44,8 @@ public:
 
 protected:
     UpdateTime();
+
+    void SortUpdateTimeDataTable();
 
 private:
     DiffTableArray _updateTimeDataTable;
@@ -51,6 +55,9 @@ private:
     uint32 _maxUpdateTime;
     uint32 _maxUpdateTimeOfLastTable;
     uint32 _maxUpdateTimeOfCurrentTable;
+
+    DiffTableArray _orderedUpdateTimeDataTable;
+    bool _needsReorder;
 
     Milliseconds _recordedTime;
 };

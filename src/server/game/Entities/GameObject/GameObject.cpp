@@ -335,21 +335,22 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     if (IsInstanceGameobject())
     {
-        switch (GetStateSavedOnInstance())
+        if (InstanceScript* instance = GetInstanceScript())
         {
-            case 0:
-                SetGoState(GO_STATE_READY);
-                SwitchDoorOrButton(true);
-                break;
-            case 1:
-                SetGoState(GO_STATE_READY);
-                break;
-            case 2:
-                SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                break;
-            default:
-                SetGoState(go_state);
-                break;
+            switch (uint8 state = instance->GetStoredGameObjectState(GetSpawnId()))
+            {
+                case 0:
+                    SetGoState(GO_STATE_READY);
+                    SwitchDoorOrButton(true);
+                    break;
+                case 1:
+                case 2:
+                    SetGoState((GOState)state);
+                    break;
+                default:
+                    SetGoState(go_state);
+                    break;
+            }
         }
     }
     else
@@ -405,7 +406,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         }
     }
 
-    LastUsedScriptID = GetGOInfo()->ScriptId;
+    LastUsedScriptID = GetScriptId();
     AIM_Initialize();
 
     if (uint32 linkedEntry = GetGOInfo()->GetLinkedGameObjectEntry())
@@ -511,7 +512,7 @@ void GameObject::Update(uint32 diff)
                                     UpdateData udata;
                                     WorldPacket packet;
                                     BuildValuesUpdateBlockForPlayer(&udata, caster->ToPlayer());
-                                    udata.BuildPacket(&packet);
+                                    udata.BuildPacket(packet);
                                     caster->ToPlayer()->GetSession()->SendPacket(&packet);
 
                                     SendCustomAnim(GetGoAnimProgress());
@@ -1139,6 +1140,7 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
     GOState go_state = data->go_state;
     uint32 artKit = data->artKit;
 
+    m_goData = data;
     m_spawnId = spawnId;
 
     if (!Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
@@ -1173,8 +1175,6 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
         m_respawnDelayTime = -data->spawntimesecs;
         m_respawnTime = 0;
     }
-
-    m_goData = data;
 
     if (addToMap && !GetMap()->AddToMap(this))
         return false;
@@ -2504,21 +2504,13 @@ void GameObject::SetGoState(GOState state)
      * save it's state on the database to be loaded properly
      * on server restart or crash.
      */
-    if (IsInstanceGameobject() && IsAbleToSaveOnDb())
+    if (IsInstanceGameobject() && IsAllowedToSaveToDB())
     {
-        // Save the gameobject state on the Database
-        if (!FindStateSavedOnInstance())
-        {
-            SaveInstanceData(GameobjectStateToInt(&state));
-        }
-        else
-        {
-            UpdateInstanceData(GameobjectStateToInt(&state));
-        }
+        SaveStateToDB();
     }
 }
 
-bool GameObject::IsInstanceGameobject()
+bool GameObject::IsInstanceGameobject() const
 {
     // Avoid checking for unecessary gameobjects whose
     // states don't matter for the dungeon progression
@@ -2537,7 +2529,7 @@ bool GameObject::IsInstanceGameobject()
     return false;
 }
 
-bool GameObject::ValidateGameobjectType()
+bool GameObject::ValidateGameobjectType() const
 {
     switch (m_goInfo->type)
     {
@@ -2552,7 +2544,7 @@ bool GameObject::ValidateGameobjectType()
     }
 }
 
-uint8 GameObject::GameobjectStateToInt(GOState* state)
+uint8 GameObject::GameobjectStateToInt(GOState* state) const
 {
     uint8 m_state = 3;
 
@@ -2577,69 +2569,22 @@ uint8 GameObject::GameobjectStateToInt(GOState* state)
     return m_state;
 }
 
-bool GameObject::IsAbleToSaveOnDb()
-{
-    return m_saveStateOnDb;
-}
-
-void GameObject::UpdateSaveToDb(bool enable)
-{
-    m_saveStateOnDb = enable;
-
-    if (enable)
-    {
-        SavingStateOnDB();
-    }
-}
-
-void GameObject::SavingStateOnDB()
+void GameObject::SaveStateToDB()
 {
     if (IsInstanceGameobject())
     {
-        GOState param = GetGoState();
-        if (!FindStateSavedOnInstance())
+        if (InstanceScript* instance = GetInstanceScript())
         {
-            SaveInstanceData(GameobjectStateToInt(&param));
+            GOState param = GetGoState();
+            instance->StoreGameObjectState(GetSpawnId(), GameobjectStateToInt(&param));
+
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
+            stmt->SetData(0, GetInstanceId());
+            stmt->SetData(1, GetSpawnId());
+            stmt->SetData(2, GameobjectStateToInt(&param));
+            CharacterDatabase.Execute(stmt);
         }
     }
-}
-
-void GameObject::SaveInstanceData(uint8 state)
-{
-    uint32 id       = GetInstanceId();
-    uint32 guid     = GetSpawnId();
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
-    stmt->SetData(0, id);
-    stmt->SetData(1, guid);
-    stmt->SetData(2, state);
-    CharacterDatabase.Execute(stmt);
-
-    sObjectMgr->NewInstanceSavedGameobjectState(id, guid, state);
-}
-
-void GameObject::UpdateInstanceData(uint8 state)
-{
-    uint32 id       = GetInstanceId();
-    uint32 guid     = GetSpawnId();
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
-    stmt->SetData(0, state);
-    stmt->SetData(1, guid);
-    stmt->SetData(2, id);
-    CharacterDatabase.Execute(stmt);
-
-    sObjectMgr->SetInstanceSavedGameobjectState(id, guid, state);
-}
-
-uint8 GameObject::GetStateSavedOnInstance()
-{
-    return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
-}
-
-bool GameObject::FindStateSavedOnInstance()
-{
-    return sObjectMgr->FindInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
 }
 
 void GameObject::SetDisplayId(uint32 displayid)
@@ -2792,7 +2737,7 @@ GameObject* GameObject::GetLinkedTrap()
     return ObjectAccessor::GetGameObject(*this, m_linkedTrap);
 }
 
-void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
+void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 {
     if (!target)
         return;

@@ -33,18 +33,12 @@
 #include "WorldDatabase.h"
 #include <limits>
 #include <mysqld_error.h>
+#include <sstream>
+#include <vector>
 
 #ifdef ACORE_DEBUG
 #include <boost/stacktrace.hpp>
 #include <sstream>
-#endif
-
-#if MARIADB_VERSION_ID >= 100600
-#define MIN_MYSQL_SERVER_VERSION 100500u
-#define MIN_MYSQL_CLIENT_VERSION 30203u
-#else
-#define MIN_MYSQL_SERVER_VERSION 50700u
-#define MIN_MYSQL_CLIENT_VERSION 50700u
 #endif
 
 class PingOperation : public SQLOperation
@@ -377,6 +371,63 @@ void DatabaseWorkerPool<T>::KeepAlive()
         Enqueue(new PingOperation);
 }
 
+/**
+* @brief Returns true if the version string given is incompatible
+*
+* Intended to be used with mysql_get_server_info()'s output as the source
+*
+* DatabaseIncompatibleVersion("8.0.35") => false
+* DatabaseIncompatibleVersion("5.6.6") => true
+* DatabaseIncompatibleVersion("5.5.5-10.5.5-MariaDB") => false
+* DatabaseIncompatibleVersion("5.5.5-10.4.0-MariaDB") => true
+*
+* Adapted from stackoverflow response
+* https://stackoverflow.com/a/2941508
+*
+* @param mysqlVersion The output from GetServerInfo()/mysql_get_server_info()
+* @return Returns true if the Server version is incompatible
+*/
+bool DatabaseIncompatibleVersion(std::string const mysqlVersion)
+{
+    // anon func to turn a version string into an array of uint8
+    // "1.2.3" => [1, 2, 3]
+    auto parse = [](std::string const& input)
+    {
+        std::vector<uint8> result;
+        std::istringstream parser(input);
+        result.push_back(parser.get());
+        for (int i = 1; i < 3; i++)
+        {
+            // Skip period
+            parser.get();
+            // Append int from parser to output
+            result.push_back(parser.get());
+        }
+        return result;
+    };
+
+    // default to values for MySQL
+    uint8 offset = 0;
+    std::string minVersion = MIN_MYSQL_SERVER_VERSION;
+
+    // If the version string contains "MariaDB", use that
+    if (mysqlVersion.find("MariaDB") != std::string::npos)
+    {
+        // All MariaDB 10.X versions have a prefix of 5.5.5 from the
+        // mysql_get_server_info() function. To make matters more
+        // annoying, this is removed in MariaDB 11.X
+        if (mysqlVersion.rfind("5.5.5-", 0) == 0)
+            offset = 6;
+        minVersion = MIN_MARIADB_SERVER_VERSION;
+    }
+
+    auto parsedMySQLVersion = parse(mysqlVersion.substr(offset));
+    auto parsedMinVersion = parse(minVersion);
+
+    return std::lexicographical_compare(parsedMySQLVersion.begin(), parsedMySQLVersion.end(),
+                                        parsedMinVersion.begin(), parsedMinVersion.end());
+}
+
 template <class T>
 uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConnections)
 {
@@ -402,10 +453,10 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
             _connections[type].clear();
             return error;
         }
-        else if (connection->GetServerVersion() < MIN_MYSQL_SERVER_VERSION)
+        else if (DatabaseIncompatibleVersion(connection->GetServerInfo()))
         {
             LOG_ERROR("sql.driver", "AzerothCore does not support MySQL versions below 5.7 or MariaDB versions below 10.5.\n\nFound server version: {}. Server compiled with: {}.",
-                connection->GetServerVersion(), MYSQL_VERSION_ID);
+                connection->GetServerInfo(), MYSQL_VERSION_ID);
             return 1;
         }
         else

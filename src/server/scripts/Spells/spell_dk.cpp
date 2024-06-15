@@ -15,21 +15,21 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "PetDefines.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "Totem.h"
+#include "UnitAI.h"
 /*
  * Scripts for spells with SPELLFAMILY_DEATHKNIGHT and SPELLFAMILY_GENERIC spells used by deathknight players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_dk_".
  */
-
-#include "PetDefines.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellInfo.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
-#include "Totem.h"
-#include "UnitAI.h"
 
 enum DeathKnightSpells
 {
@@ -1014,7 +1014,7 @@ class spell_dk_blood_boil : public SpellScript
     bool Load() override
     {
         _executed = false;
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCaster()->getClass() == CLASS_DEATH_KNIGHT;
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCaster()->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY);
     }
 
     void HandleAfterHit()
@@ -1258,7 +1258,7 @@ class spell_dk_death_gate : public SpellScript
 
     SpellCastResult CheckClass()
     {
-        if (GetCaster()->getClass() != CLASS_DEATH_KNIGHT)
+        if (!GetCaster()->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
         {
             SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_MUST_BE_DEATH_KNIGHT);
             return SPELL_FAILED_CUSTOM_ERROR;
@@ -2251,3 +2251,4 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_will_of_the_necropolis);
     RegisterSpellScript(spell_dk_ghoul_thrash);
 }
+

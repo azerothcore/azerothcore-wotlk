@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "ruby_sanctum.h"
 
 enum Texts
@@ -244,3 +245,4 @@ void AddSC_boss_saviana_ragefire()
     new spell_saviana_conflagration_init();
     new spell_saviana_conflagration_throwback();
 }
+

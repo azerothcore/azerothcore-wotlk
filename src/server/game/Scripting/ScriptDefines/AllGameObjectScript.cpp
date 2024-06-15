@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AllGameObjectScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
@@ -47,3 +48,11 @@ void ScriptMgr::OnGameObjectSaveToDB(GameObject* go)
         script->OnGameObjectSaveToDB(go);
     });
 }
+
+AllGameObjectScript::AllGameObjectScript(const char* name) :
+    ScriptObject(name)
+{
+    ScriptRegistry<AllGameObjectScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<AllGameObjectScript>;

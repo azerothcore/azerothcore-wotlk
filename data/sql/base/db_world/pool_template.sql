@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -19,11 +19,11 @@ DROP TABLE IF EXISTS `pool_template`;
 CREATE TABLE IF NOT EXISTS `pool_template` (
   `entry` int unsigned NOT NULL DEFAULT '0' COMMENT 'Pool entry',
   `max_limit` int unsigned NOT NULL DEFAULT '0' COMMENT 'Max number of objects (0) is no limit',
-  `description` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.pool_template: ~5,243 rows (approximately)
+-- Dumping data for table acore_world.pool_template: ~5 134 rows (approximately)
 DELETE FROM `pool_template`;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 	(1, 1, ''),
@@ -137,6 +137,32 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 	(109, 2, 'Ethereum Jailor (23008)'),
 	(110, 55, 'Mana Berry Bush (186729) - Eco-Dome Midrealm'),
 	(111, 35, 'Mana Berry Bush (186729) - Eco-Dome Farfield'),
+	(112, 1, 'Durotar Mageroyal A Pool 1/4'),
+	(113, 1, 'Durotar Mageroyal Razorwind Canyon Pool 2/4'),
+	(114, 1, 'Durotar Mageroyal Thunder Ridge 3/4'),
+	(115, 1, 'Durotar Mageroyal Razormane Grounds 4/4'),
+	(116, 1, 'Durotar Earthroot Northmost Pool 1/5'),
+	(117, 5, 'Durotar Earthroot NW Pool 2/5'),
+	(118, 2, 'Durotar Earthroot NE Pool 3/5'),
+	(119, 6, 'Durotar Earthroot Center Pool 4/5'),
+	(120, 2, 'Durotar Earthroot South Pool 5/5'),
+	(121, 3, 'Durotar Peacebloom NW Pool 1/8'),
+	(122, 4, 'Durotar Peacebloom NE Pool 2/8'),
+	(123, 5, 'Durotar Peacebloom East Valley Pool 3/8'),
+	(124, 2, 'Durotar Peacebloom West Zone Exit Pool 4/8'),
+	(125, 4, 'Durotar Peacebloom Southern Razormane Pool 5/8'),
+	(126, 5, 'Durotar Peacebloom Eastern Stretch Pool 6/8'),
+	(127, 3, 'Durotar Peacebloom Senjin Echos Pool 7/8'),
+	(128, 1, 'Durotar Peacebloom Echo Isles Pool 8/8'),
+	(129, 4, 'Durotar Silverleaf NW Pool 1/7'),
+	(130, 3, 'Durotar Silverleaf NW Pool 2/7'),
+	(131, 4, 'Durotar Silverleaf West Pool 3/7'),
+	(132, 5, 'Durotar Silverleaf East Valley Pool 4/7'),
+	(133, 8, 'Durotar Silverleaf East Coast Pool 5/7'),
+	(134, 2, 'Durotar Silverleaf Senjin Echo Pool 6/7'),
+	(135, 1, 'Durotar Silverleaf Echo Isles Pool 7/7'),
+	(136, 1, 'Bloodsail Charts - Stranglethorn Vale'),
+	(137, 1, 'Tanaris - Inconspicuous Landmark Pool'),
 	(145, 1, ''),
 	(146, 1, ''),
 	(147, 1, ''),
@@ -302,7 +328,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 	(352, 1, 'The Rokk <Master of Cooking> - Daily Quests'),
 	(353, 1, 'Old Man Barlowned - Daily Quests'),
 	(354, 1, 'Gretta the Arbiter - Daily Quests'),
-	(355, 1, 'GO Inconspicuous Landmark (142189)'),
 	(356, 1, 'Wind Trader Zhareem - Daily Quests'),
 	(357, 1, 'Nether-Stalker Mah\'duun - Daily Quests'),
 	(358, 1, 'Narasi Snowdawn <The Silver Covenant> - Daily Quests'),
@@ -445,10 +470,6 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 	(495, 15, 'Earthroot in Dun Morogh'),
 	(496, 25, 'Peacebloom in Dun Morogh'),
 	(497, 25, 'Silverleaf in Dun Morogh'),
-	(498, 25, 'Peacebloom in Durotar'),
-	(499, 15, 'Earthroot in Durotar'),
-	(500, 25, 'Silverleaf in Durotar'),
-	(501, 4, 'Mageroyal in Durotar'),
 	(502, 15, 'Earthroot in Mulgore'),
 	(503, 25, 'Peacebloom in Mulgore'),
 	(504, 25, 'Silverleaf in Mulgore'),
@@ -3626,6 +3647,13 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 	(11696, 1, 'Spawn Point 2 - Maraudon - Zone 2100'),
 	(11697, 1, 'Spawn Point 3 - Maraudon - Zone 2100'),
 	(11698, 1, 'Spawn Point 1 - Winterspring - Zone 618'),
+	(11699, 1, 'Desolace Mithril Deposit Pool'),
+	(11700, 1, 'BRD - Dark Iron Deposit - Bridge'),
+	(11701, 1, 'BRD - Dark Iron Deposit - Prison'),
+	(11702, 1, 'BRD - Dark Iron Deposit - Arena'),
+	(11703, 1, 'BRD - Dark Iron Deposit - Gar'),
+	(11704, 1, 'BRD - Dark Iron Deposit - Highway'),
+	(11705, 1, 'BRD - Dark Iron Deposit - City'),
 	(11712, 2, 'Rich Thorium Vein - Dire Maul East'),
 	(12000, 1, 'Hellfire Peninsula - Fel Iron Deposit / Khorium Vein'),
 	(12001, 1, 'Hellfire Peninsula - Fel Iron Deposit / Khorium Vein'),

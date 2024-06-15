@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -26,11 +26,11 @@ CREATE TABLE IF NOT EXISTS `gameobject_loot_template` (
   `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
   `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
-  `Comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Comment` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.gameobject_loot_template: ~17,521 rows (approximately)
+-- Dumping data for table acore_world.gameobject_loot_template: ~17 907 rows (approximately)
 DELETE FROM `gameobject_loot_template`;
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(167, 1349, 0, 100, 1, 1, 0, 1, 1, 'Abercrombie\'s Crate - Abercrombie\'s Crate'),
@@ -14706,7 +14706,7 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(13944, 6457, 0, 1.4, 0, 1, 0, 1, 1, 'Shellfish Trap - Rusted Engineering Parts'),
 	(13944, 6601, 0, 0.1, 0, 1, 0, 1, 1, 'Shellfish Trap - Dervish Boots'),
 	(13944, 6612, 0, 0.2, 0, 1, 0, 1, 1, 'Shellfish Trap - Sage\'s Boots'),
-	(13944, 13545, 0, 84.9, 0, 1, 0, 1, 1, 'Shellfish Trap - Shellfish'),
+	(13944, 13545, 0, 84.9, 0, 1, 0, 1, 2, 'Shellfish Trap - Shellfish'),
 	(13945, 13464, 0, 100, 0, 1, 0, 1, 3, 'Golden Sansam - Golden Sansam'),
 	(13946, 13463, 0, 100, 0, 1, 0, 1, 3, 'Dreamfoil - Dreamfoil'),
 	(13947, 13465, 0, 100, 0, 1, 0, 1, 3, 'Mountain Silversage - Mountain Silversage'),
@@ -15482,6 +15482,7 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(19605, 27513, 0, 0, 0, 1, 1, 1, 1, 'Steam Pump Flotsam - Curious Crate'),
 	(19605, 27515, 0, 2, 0, 1, 1, 1, 1, 'Steam Pump Flotsam - Huge Spotted Feltail'),
 	(19605, 27516, 0, 2, 0, 1, 1, 1, 1, 'Steam Pump Flotsam - Enormous Barbed Gill Trout'),
+	(19605, 34469, 0, 0.5, 0, 1, 1, 1, 1, 'Strange Engine Part'),
 	(19611, 22578, 0, 86, 0, 1, 1, 1, 2, 'Pure Water - Mote of Water'),
 	(19611, 27442, 0, 1, 0, 1, 1, 1, 1, 'Pure Water - Goldenscale Vendorfish'),
 	(19611, 27511, 0, 4, 0, 1, 1, 1, 1, 'Pure Water - Inscribed Scrollcase'),
@@ -15568,7 +15569,7 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(20660, 29582, 0, 100, 1, 1, 0, 1, 1, 'Ethereum Data Cell - Ethereum Data Cell'),
 	(20682, 29741, 0, 100, 1, 1, 0, 1, 1, 'Diagnostic Equipment - Diagnostic Results'),
 	(20712, 12001, 12001, 100, 0, 1, 1, 1, 2, 'Dust Covered Chest - (ReferenceTable)'),
-	(20712, 29434, 0, 100, 0, 1, 0, 2, 2, 'Dust Covered Chest - Badge of Justice'),
+	(20712, 29434, 0, 100, 0, 1, 0, 1, 1, 'Dust Covered Chest - Badge of Justice'),
 	(20721, 25727, 0, 100, 1, 1, 0, 1, 1, 'Sealed Box - Sealed Box'),
 	(20722, 29798, 0, 100, 1, 1, 0, 1, 1, 'Dome Generator Segment - Dome Generator Segment'),
 	(20806, 30315, 0, 100, 1, 1, 0, 1, 1, 'Draenethyst Mine Crystal - Draenethyst Mine Crystal'),
@@ -16691,9 +16692,11 @@ INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, 
 	(21750, 31324, 0, 100, 1, 1, 0, 1, 1, 'Sketh\'lon Feather - Sketh\'lon Feather'),
 	(21757, 31349, 0, 100, 1, 1, 0, 1, 1, 'Grulloc\'s Sack - Grulloc\'s Sack'),
 	(21762, 12003, 12003, 100, 0, 1, 1, 1, 2, 'Reinforced Fel Iron Chest - (ReferenceTable)'),
-	(21764, 1, 35093, 100, 0, 1, 0, 1, 2, 'Reinforced Fel Iron Chest - (ReferenceTable)'),
-	(21764, 2, 35094, 30, 0, 1, 0, 1, 1, 'Reinforced Fel Iron Chest - (ReferenceTable)'),
-	(21764, 3, 25009, 100, 0, 1, 0, 1, 1, 'Reinforced Fel Iron Chest - (ReferenceTable)'),
+	(21764, 1, 35093, 100, 0, 1, 1, 1, 2, 'Reinforced Fel Iron Chest - (ReferenceTable)'),
+	(21764, 2, 35093, 100, 0, 1, 2, 1, 1, 'Reinforced Fel Iron Chest - (ReferenceTable)'),
+	(21764, 3, 35094, 30, 0, 1, 0, 1, 1, 'Reinforced Fel Iron Chest - (ReferenceTable)'),
+	(21764, 4, 25009, 100, 0, 1, 0, 1, 1, 'Reinforced Fel Iron Chest - (ReferenceTable)'),
+	(21764, 29434, 0, 100, 0, 1, 0, 1, 1, 'Badge of Justice'),
 	(21771, 31495, 0, 100, 0, 1, 0, 1, 1, 'Grishnath Orb - Grishnath Orb'),
 	(21772, 31504, 0, 100, 1, 1, 0, 1, 1, 'Nethervine Crystal - Nethervine Crystal'),
 	(21867, 31697, 0, 100, 1, 1, 0, 1, 1, 'Massive Treasure Chest - Dread Relic'),

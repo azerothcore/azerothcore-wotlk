@@ -78,7 +78,7 @@ std::string ByteBuffer::ReadCString(bool requireValidUtf8 /*= true*/)
 {
     std::string value;
 
-    while (rpos() < size()) // prevent crash at wrong string format in packet
+    while (rpos() < size()) // prevent crash the wrong string format in a packet
     {
         char c = read<char>();
         if (c == 0)
@@ -94,7 +94,7 @@ std::string ByteBuffer::ReadCString(bool requireValidUtf8 /*= true*/)
 
 uint32 ByteBuffer::ReadPackedTime()
 {
-    uint32 packedDate = read<uint32>();
+    auto packedDate = read<uint32>();
     tm lt = tm();
 
     lt.tm_min = packedDate & 0x3F;

@@ -16,7 +16,7 @@
  */
 
 #include "Common.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 
 enum Partygoer_Pather

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `creature_queststarter` (
   PRIMARY KEY (`id`,`quest`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Creature System';
 
--- Dumping data for table acore_world.creature_queststarter: ~7,497 rows (approximately)
+-- Dumping data for table acore_world.creature_queststarter: ~7 497 rows (approximately)
 DELETE FROM `creature_queststarter`;
 INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(196, 33),
@@ -4434,7 +4434,7 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(18353, 9917),
 	(18353, 9918),
 	(18353, 9920),
-	(18369, 9955),
+	(18369, 9923),
 	(18383, 10000),
 	(18383, 10027),
 	(18384, 10018),
@@ -4474,7 +4474,7 @@ INSERT INTO `creature_queststarter` (`id`, `quest`) VALUES
 	(18417, 10669),
 	(18417, 10691),
 	(18424, 9951),
-	(18445, 9923),
+	(18445, 9955),
 	(18446, 9968),
 	(18446, 9971),
 	(18446, 9978),

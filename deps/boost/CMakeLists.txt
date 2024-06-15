@@ -12,10 +12,10 @@
 
 if(WIN32)
  set(BOOST_DEBUG ON)
-  if(DEFINED ENV{BOOST_ROOT})
-    set(BOOST_ROOT $ENV{BOOST_ROOT})
+  if(DEFINED ENV{Boost_ROOT})
+    set(Boost_ROOT $ENV{Boost_ROOT})
     list(APPEND BOOST_LIBRARYDIR
-    ${BOOST_ROOT}/lib${PLATFORM}-msvc-14.2)
+    ${Boost_ROOT}/lib${PLATFORM}-msvc-14.2)
   endif()
 
   set(Boost_USE_STATIC_LIBS        ON)
@@ -35,8 +35,8 @@ endif()
 find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system filesystem program_options iostreams regex)
 
 if(NOT Boost_FOUND)
-  if(NOT DEFINED ENV{BOOST_ROOT} AND NOT DEFINED Boost_DIR AND NOT DEFINED BOOST_ROOT AND NOT DEFINED BOOSTROOT)
-    message(FATAL_ERROR "No BOOST_ROOT environment variable could be found! Please make sure it is set and the points to your Boost installation.")
+  if(NOT DEFINED ENV{Boost_ROOT} AND NOT DEFINED Boost_DIR AND NOT DEFINED BOOST_ROOT AND NOT DEFINED BOOSTROOT)
+    message(FATAL_ERROR "No Boost_ROOT environment variable could be found! Please make sure it is set and the points to your Boost installation.")
   endif()
 endif()
 

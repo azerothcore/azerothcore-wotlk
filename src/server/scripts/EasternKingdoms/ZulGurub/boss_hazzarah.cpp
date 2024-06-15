@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "zulgurub.h"
 
 enum Spells
@@ -168,3 +169,4 @@ void AddSC_boss_hazzarah()
     RegisterZulGurubCreatureAI(boss_hazzarah);
     RegisterSpellScript(spell_chain_burn);
 }
+

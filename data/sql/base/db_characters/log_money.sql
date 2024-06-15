@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -19,12 +19,12 @@ DROP TABLE IF EXISTS `log_money`;
 CREATE TABLE IF NOT EXISTS `log_money` (
   `sender_acc` int unsigned NOT NULL,
   `sender_guid` int unsigned NOT NULL,
-  `sender_name` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sender_ip` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sender_name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sender_ip` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `receiver_acc` int unsigned NOT NULL,
-  `receiver_name` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `receiver_name` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `money` bigint unsigned NOT NULL,
-  `topic` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `topic` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `date` datetime NOT NULL,
   `type` tinyint NOT NULL COMMENT '1=COD,2=AH,3=GB DEPOSIT,4=GB WITHDRAW,5=MAIL,6=TRADE'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

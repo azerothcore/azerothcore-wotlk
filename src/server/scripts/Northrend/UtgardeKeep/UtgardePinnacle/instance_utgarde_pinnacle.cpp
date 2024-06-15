@@ -15,7 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "utgarde_pinnacle.h"
 
@@ -270,3 +271,4 @@ void AddSC_instance_utgarde_pinnacle()
 {
     new instance_utgarde_pinnacle();
 }
+

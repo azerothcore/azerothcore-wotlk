@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -26,11 +26,11 @@ CREATE TABLE IF NOT EXISTS `reference_loot_template` (
   `GroupId` tinyint unsigned NOT NULL DEFAULT '0',
   `MinCount` tinyint unsigned NOT NULL DEFAULT '1',
   `MaxCount` tinyint unsigned NOT NULL DEFAULT '1',
-  `Comment` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Comment` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.reference_loot_template: ~14,621 rows (approximately)
+-- Dumping data for table acore_world.reference_loot_template: ~15 523 rows (approximately)
 DELETE FROM `reference_loot_template`;
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(1000, 21929, 0, 16, 0, 1, 1, 1, 2, 'Flame Spessarite'),
@@ -1921,18 +1921,18 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(12000, 18812, 0, 0, 0, 1, 1, 1, 1, NULL),
 	(12000, 19139, 0, 0, 0, 1, 2, 1, 1, NULL),
 	(12000, 19140, 0, 0, 0, 1, 1, 1, 1, NULL),
-	(12001, 28745, 0, 8.33333, 0, 1, 1, 1, 1, 'Mithril Chain of Heroism'),
-	(12001, 28746, 0, 8.33333, 0, 1, 1, 1, 1, 'Fiend Slayer Boots'),
-	(12001, 28747, 0, 8.33333, 0, 1, 1, 1, 1, 'Battlescar Boots'),
-	(12001, 28748, 0, 8.33333, 0, 1, 1, 1, 1, 'Legplates of the Innocent'),
-	(12001, 28749, 0, 8.33333, 0, 1, 1, 1, 1, 'King\'s Defender'),
-	(12001, 28750, 0, 8.33333, 0, 1, 1, 1, 1, 'Girdle of Treachery'),
-	(12001, 28751, 0, 8.33333, 0, 1, 1, 1, 1, 'Heart-Flame Leggings'),
-	(12001, 28752, 0, 8.33333, 0, 1, 1, 1, 1, 'Forestlord Striders'),
-	(12001, 28753, 0, 8.33333, 0, 1, 1, 1, 1, 'Ring of Recurrence'),
-	(12001, 28754, 0, 8.33333, 0, 1, 1, 1, 1, 'Triptych Shield of the Ancients'),
-	(12001, 28755, 0, 8.33333, 0, 1, 1, 1, 1, 'Bladed Shoulderpads of the Merciless'),
-	(12001, 28756, 0, 8.33333, 0, 1, 1, 1, 1, 'Headdress of the High Potentate'),
+	(12001, 28745, 0, 0, 0, 1, 1, 1, 1, 'Mithril Chain of Heroism'),
+	(12001, 28746, 0, 0, 0, 1, 1, 1, 1, 'Fiend Slayer Boots'),
+	(12001, 28747, 0, 0, 0, 1, 1, 1, 1, 'Battlescar Boots'),
+	(12001, 28748, 0, 0, 0, 1, 1, 1, 1, 'Legplates of the Innocent'),
+	(12001, 28749, 0, 0, 0, 1, 1, 1, 1, 'King\'s Defender'),
+	(12001, 28750, 0, 0, 0, 1, 1, 1, 1, 'Girdle of Treachery'),
+	(12001, 28751, 0, 0, 0, 1, 1, 1, 1, 'Heart-Flame Leggings'),
+	(12001, 28752, 0, 0, 0, 1, 1, 1, 1, 'Forestlord Striders'),
+	(12001, 28753, 0, 0, 0, 1, 1, 1, 1, 'Ring of Recurrence'),
+	(12001, 28754, 0, 0, 0, 1, 1, 1, 1, 'Triptych Shield of the Ancients'),
+	(12001, 28755, 0, 0, 0, 1, 1, 1, 1, 'Bladed Shoulderpads of the Merciless'),
+	(12001, 28756, 0, 0, 0, 1, 1, 1, 1, 'Headdress of the High Potentate'),
 	(12002, 47242, 0, 100, 0, 1, 0, 1, 1, 'Trophy of the Crusade'),
 	(12003, 24044, 0, 0, 0, 1, 1, 1, 1, 'Hellreaver'),
 	(12003, 24045, 0, 0, 0, 1, 1, 1, 1, 'Band of Renewal'),
@@ -4338,7 +4338,6 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(24033, 15938, 0, 0, 0, 1, 1, 1, 1, 'Mystical Orb'),
 	(24033, 15939, 0, 0, 0, 1, 1, 1, 1, 'Councillor\'s Scepter'),
 	(24033, 15967, 0, 0, 0, 1, 1, 1, 1, 'Highborne Star'),
-	(24033, 18337, 0, 0, 0, 1, 1, 1, 1, 'Orphic Bracers'),
 	(24033, 18339, 0, 0, 0, 1, 1, 1, 1, 'Eidolon Cloak'),
 	(24033, 18672, 0, 0, 0, 1, 1, 1, 1, 'Elemental Ember'),
 	(24033, 18674, 0, 0, 0, 1, 1, 1, 1, 'Hardened Stone Band'),
@@ -6940,10 +6939,8 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(24708, 14467, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Frostweave Robe'),
 	(24708, 14470, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Runecloth Tunic'),
 	(24708, 14471, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Cindercloth Vest'),
-	(24708, 14473, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Ghostweave Belt'),
 	(24708, 14474, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Frostweave Gloves'),
 	(24708, 14476, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Cindercloth Gloves'),
-	(24708, 14477, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Ghostweave Gloves'),
 	(24708, 14478, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Brightcloth Robe'),
 	(24708, 14479, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Brightcloth Gloves'),
 	(24708, 15727, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Heavy Scorpid Vest'),
@@ -6992,7 +6989,6 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(24709, 13497, 0, 0, 0, 1, 1, 1, 1, 'Recipe: Greater Arcane Protection Potion'),
 	(24709, 13499, 0, 0, 0, 1, 1, 1, 1, 'Recipe: Greater Shadow Protection Potion'),
 	(24709, 13501, 0, 0, 0, 1, 1, 1, 1, 'Recipe: Major Mana Potion'),
-	(24709, 14480, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Ghostweave Vest'),
 	(24709, 14482, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Cindercloth Cloak'),
 	(24709, 14484, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Brightcloth Cloak'),
 	(24709, 14485, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Wizardweave Leggings'),
@@ -7003,7 +6999,6 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(24709, 14492, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Felcloth Boots'),
 	(24709, 14493, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Robe of Winter Night'),
 	(24709, 14494, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Brightcloth Pants'),
-	(24709, 14495, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Ghostweave Pants'),
 	(24709, 14496, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Felcloth Hood'),
 	(24709, 14497, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Mooncloth Leggings'),
 	(24709, 14498, 0, 0, 0, 1, 1, 1, 1, 'Pattern: Runecloth Headband'),
@@ -9488,7 +9483,6 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(34057, 30664, 0, 0, 0, 1, 1, 1, 1, 'Living Root of the Wildheart'),
 	(34057, 32516, 0, 0, 0, 1, 1, 1, 1, 'Wraps of Purification'),
 	(34057, 33055, 0, 0, 0, 1, 1, 1, 1, 'Band of Vile Aggression'),
-	(34058, 30054, 0, 0, 0, 1, 1, 1, 1, 'Ranger-General\'s Chestguard'),
 	(34058, 30057, 0, 0, 0, 1, 1, 1, 1, 'Bracers of Eradication'),
 	(34058, 30058, 0, 0, 0, 1, 1, 1, 1, 'Mallet of the Tides'),
 	(34058, 30059, 0, 0, 0, 1, 1, 1, 1, 'Choker of Animalistic Fury'),
@@ -9501,6 +9495,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(34058, 30066, 0, 0, 0, 1, 1, 1, 1, 'Tempest-Strider Boots'),
 	(34058, 30067, 0, 0, 0, 1, 1, 1, 1, 'Velvet Boots of the Guardian'),
 	(34058, 30665, 0, 0, 0, 1, 1, 1, 1, 'Earring of Soulful Meditation'),
+	(34058, 33054, 0, 0, 0, 1, 1, 1, 1, 'The Seal of Danzalar'),
 	(34059, 30239, 0, 0, 0, 1, 1, 1, 1, 'Gloves of the Vanquished Champion'),
 	(34059, 30240, 0, 0, 0, 1, 1, 1, 1, 'Gloves of the Vanquished Defender'),
 	(34059, 30241, 0, 0, 0, 1, 1, 1, 1, 'Gloves of the Vanquished Hero'),
@@ -10032,13 +10027,13 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(34112, 7, 34111, 1, 0, 1, 0, 1, 1, '(ReferenceTable)'),
 	(34113, 41337, 0, 0, 0, 1, 1, 1, 3, 'Whizzed-Out Gizmo'),
 	(34113, 41338, 0, 0, 0, 1, 1, 1, 3, 'Sprung Whirlygig'),
-	(34114, 39681, 0, 0, 0, 1, 1, 2, 4, 'Handful of Cobalt Bolts');
-INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
+	(34114, 39681, 0, 0, 0, 1, 1, 2, 4, 'Handful of Cobalt Bolts'),
 	(34114, 39683, 0, 0, 0, 1, 1, 1, 1, 'Froststeel Tube'),
 	(34114, 39690, 0, 0, 0, 1, 1, 1, 3, 'Volatile Blasting Trigger'),
 	(34115, 1, 34113, 40, 0, 1, 0, 1, 1, '(ReferenceTable)'),
 	(34115, 2, 34113, 20, 0, 1, 0, 1, 1, '(ReferenceTable)'),
-	(34115, 3, 34114, 20, 0, 1, 0, 1, 1, '(ReferenceTable)'),
+	(34115, 3, 34114, 20, 0, 1, 0, 1, 1, '(ReferenceTable)');
+INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(34133, 40631, 0, 0, 0, 1, 1, 1, 1, 'Crown of the Lost Conqueror'),
 	(34133, 40632, 0, 0, 0, 1, 1, 1, 1, 'Crown of the Lost Protector'),
 	(34133, 40633, 0, 0, 0, 1, 1, 1, 1, 'Crown of the Lost Vanquisher'),
@@ -14224,11 +14219,11 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(35092, 50312, 0, 0, 0, 1, 1, 1, 1, 'Chestguard of Broken Branches'),
 	(35092, 50313, 0, 0, 0, 1, 1, 1, 1, 'Oath of Empress Zoe'),
 	(35092, 50314, 0, 0, 0, 1, 1, 1, 1, 'Strip of Remorse'),
-	(35093, 27452, 0, 0, 0, 1, 1, 1, 1, 'Light Scribe Bands'),
-	(35093, 27453, 0, 0, 0, 1, 1, 1, 1, 'Averinn\'s Ring of Slaying'),
-	(35093, 27454, 0, 0, 0, 1, 1, 1, 1, 'Volcanic Pauldrons'),
-	(35093, 27455, 0, 0, 0, 1, 1, 1, 1, 'Irondrake Faceguard'),
-	(35093, 27456, 0, 0, 0, 1, 1, 1, 1, 'Raiments of Nature\'s Breath'),
+	(35093, 27452, 0, 0, 0, 1, 2, 1, 1, 'Light Scribe Bands'),
+	(35093, 27453, 0, 0, 0, 1, 2, 1, 1, 'Averinn\'s Ring of Slaying'),
+	(35093, 27454, 0, 0, 0, 1, 2, 1, 1, 'Volcanic Pauldrons'),
+	(35093, 27455, 0, 0, 0, 1, 2, 1, 1, 'Irondrake Faceguard'),
+	(35093, 27456, 0, 0, 0, 1, 2, 1, 1, 'Raiments of Nature\'s Breath'),
 	(35093, 27457, 0, 0, 0, 1, 1, 1, 1, 'Life Bearer\'s Gauntlets'),
 	(35093, 27458, 0, 0, 0, 1, 1, 1, 1, 'Oceansong Kilt'),
 	(35093, 27459, 0, 0, 0, 1, 1, 1, 1, 'Vambraces of Daring'),
@@ -14258,18 +14253,6 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(43000, 31892, 0, 0, 0, 1, 1, 1, 1, 'Ace of Storms'),
 	(43000, 31901, 0, 0, 0, 1, 1, 1, 1, 'Ace of Furies'),
 	(43000, 31910, 0, 0, 0, 1, 1, 1, 1, 'Ace of Lunacy'),
-	(43001, 27768, 0, 0, 0, 1, 2, 1, 1, 'Oracle Belt of Timeless Mystery'),
-	(43001, 27769, 0, 0, 0, 1, 2, 1, 1, 'Endbringer'),
-	(43001, 27770, 0, 0, 0, 1, 2, 1, 1, 'Argussian Compass'),
-	(43001, 27771, 0, 0, 0, 1, 2, 1, 1, 'Doomplate Shoulderguards'),
-	(43001, 27772, 0, 0, 0, 1, 2, 1, 1, 'Stormshield of Renewal'),
-	(43001, 27773, 0, 0, 0, 1, 2, 1, 1, 'Barbaric Legstraps'),
-	(43001, 27779, 0, 0, 0, 1, 2, 1, 1, 'Bone Chain Necklace'),
-	(43001, 27780, 0, 0, 0, 1, 2, 1, 1, 'Ring of Fabled Hope'),
-	(43001, 27781, 0, 0, 0, 1, 2, 1, 1, 'Demonfang Ritual Helm'),
-	(43001, 27896, 0, 0, 0, 1, 2, 1, 1, 'Alembic of Infernal Power'),
-	(43001, 27907, 0, 0, 0, 1, 2, 1, 1, 'Mana-Etched Pantaloons'),
-	(43001, 27938, 0, 0, 0, 1, 2, 1, 1, 'Savage Mask of the Lynx Lord'),
 	(43002, 30606, 0, 0, 0, 1, 3, 1, 1, 'Lambent Chrysoprase'),
 	(43002, 30607, 0, 0, 0, 1, 3, 1, 1, 'Splendid Fire Opal'),
 	(43002, 30608, 0, 0, 0, 1, 3, 1, 1, 'Radiant Chrysoprase'),
@@ -14293,7 +14276,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(43009, 30564, 0, 0, 0, 1, 3, 1, 1, 'Shining Fire Opal'),
 	(43009, 30565, 0, 0, 0, 1, 3, 1, 1, 'Assassin\'s Fire Opal'),
 	(43009, 30566, 0, 0, 0, 1, 3, 1, 1, 'Defender\'s Tanzanite'),
-	(43010, 30556, 0, 0, 0, 1, 3, 1, 1, 'Glinting Fire Opal'),
+	(43010, 30559, 0, 0, 0, 1, 3, 1, 1, 'Etched Fire Opal'),
 	(43010, 30560, 0, 0, 0, 1, 3, 1, 1, 'Rune Covered Chrysoprase'),
 	(43010, 30563, 0, 0, 0, 1, 3, 1, 1, 'Regal Tanzanite'),
 	(43011, 30589, 0, 0, 0, 1, 3, 1, 1, 'Dazzling Chrysoprase'),
@@ -15353,7 +15336,19 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 	(526790, 15964, 0, 0, 0, 1, 1, 1, 1, 'Silksand Star'),
 	(526790, 15978, 0, 0, 0, 1, 1, 1, 1, 'Geomancer\'s Rod'),
 	(526790, 15979, 0, 0, 0, 1, 1, 1, 1, 'Embersilk Stave'),
-	(526790, 15990, 0, 0, 0, 1, 1, 1, 1, 'Enduring Shield');
+	(526790, 15990, 0, 0, 0, 1, 1, 1, 1, 'Enduring Shield'),
+	(526791, 21929, 0, 0, 0, 1, 1, 1, 1, 'Flame Spessarite'),
+	(526791, 23077, 0, 0, 0, 1, 1, 1, 1, 'Blood Garnet'),
+	(526791, 23079, 0, 0, 0, 1, 1, 1, 1, 'Deep Peridot'),
+	(526791, 23107, 0, 0, 0, 1, 1, 1, 1, 'Shadow Draenite'),
+	(526791, 23112, 0, 0, 0, 1, 1, 1, 1, 'Golden Draenite'),
+	(526791, 23117, 0, 0, 0, 1, 1, 1, 1, 'Azure Moonstone'),
+	(526792, 23436, 0, 0, 0, 1, 1, 1, 1, 'Living Ruby'),
+	(526792, 23437, 0, 0, 0, 1, 1, 1, 1, 'Talasite'),
+	(526792, 23438, 0, 0, 0, 1, 1, 1, 1, 'Star of Eluna'),
+	(526792, 23439, 0, 0, 0, 1, 1, 1, 1, 'Noble Topaz'),
+	(526792, 23440, 0, 0, 0, 1, 1, 1, 1, 'Nightseye'),
+	(526792, 23441, 0, 0, 0, 1, 1, 1, 1, 'Dawnstone');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

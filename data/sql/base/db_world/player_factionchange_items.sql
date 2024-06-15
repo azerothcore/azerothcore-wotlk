@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,13 +18,13 @@
 DROP TABLE IF EXISTS `player_factionchange_items`;
 CREATE TABLE IF NOT EXISTS `player_factionchange_items` (
   `alliance_id` int unsigned NOT NULL,
-  `alliance_comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `alliance_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `horde_id` int unsigned NOT NULL,
-  `horde_comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `horde_comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`alliance_id`,`horde_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.player_factionchange_items: ~1,395 rows (approximately)
+-- Dumping data for table acore_world.player_factionchange_items: ~1 395 rows (approximately)
 DELETE FROM `player_factionchange_items`;
 INSERT INTO `player_factionchange_items` (`alliance_id`, `alliance_comment`, `horde_id`, `horde_comment`) VALUES
 	(1201, 'Dull Heater Shield', 2376, 'Worn Heater Shield'),

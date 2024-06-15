@@ -17,9 +17,10 @@
 
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
+#include "CreatureScript.h"
 #include "GameTime.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "vault_of_archavon.h"
@@ -268,3 +269,4 @@ void AddSC_instance_vault_of_archavon()
 {
     new instance_vault_of_archavon();
 }
+

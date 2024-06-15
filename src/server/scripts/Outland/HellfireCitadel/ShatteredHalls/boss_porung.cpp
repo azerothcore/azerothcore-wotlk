@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "shattered_halls.h"
 
@@ -316,3 +317,4 @@ void AddSC_boss_porung()
     RegisterShatteredHallsCreatureAI(npc_shattered_hand_scout);
     RegisterSpellScript(spell_tsh_shoot_flame_arrow);
 }
+

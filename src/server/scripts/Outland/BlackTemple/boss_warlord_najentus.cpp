@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "black_temple.h"
 
 enum Yells
@@ -155,3 +156,4 @@ void AddSC_boss_najentus()
     RegisterSpellScript(spell_najentus_needle_spine);
     RegisterSpellScript(spell_najentus_hurl_spine);
 }
+

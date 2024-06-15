@@ -884,23 +884,25 @@ void Channel::SetOwner(ObjectGuid guid, bool exclaim)
         pinfo.SetModerator(true);
         uint8 oldFlag = pinfo.flags;
         pinfo.SetOwner(true);
-
-        Player* player = ObjectAccessor::FindPlayer(_ownerGUID);
-
-        WorldPacket data;
-
-        if (ShouldAnnouncePlayer(player))
-        {
-            MakeModeChange(&data, _ownerGUID, oldFlag);
-            SendToAll(&data);
-        }
-
         FlagsNotify(pinfo.plrPtr);
 
-        if (exclaim && ShouldAnnouncePlayer(player))
+        Player* player = ObjectAccessor::FindPlayer(_ownerGUID);
+        if (player)
         {
-            MakeOwnerChanged(&data, _ownerGUID);
-            SendToAll(&data);
+            if (ShouldAnnouncePlayer(player))
+            {
+                WorldPacket data;
+
+                MakeModeChange(&data, _ownerGUID, oldFlag);
+                SendToAll(&data);
+
+                if (exclaim)
+                {
+                    // MakeOwnerChanged will reset the packet for us
+                    MakeOwnerChanged(&data, _ownerGUID);
+                    SendToAll(&data);
+                }
+            }
         }
     }
 }

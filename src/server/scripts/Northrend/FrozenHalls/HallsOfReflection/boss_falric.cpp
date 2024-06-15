@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "halls_of_reflection.h"
 
 enum Yells
@@ -182,3 +183,4 @@ void AddSC_boss_falric()
 {
     new boss_falric();
 }
+

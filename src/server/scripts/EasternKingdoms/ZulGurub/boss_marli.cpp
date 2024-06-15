@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "zulgurub.h"
 
@@ -342,3 +343,4 @@ void AddSC_boss_marli()
     RegisterSpellScript(spell_enveloping_webs);
     RegisterSpellScript(spell_marli_transform);
 }
+

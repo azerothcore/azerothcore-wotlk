@@ -373,14 +373,6 @@ struct ScriptedAI : public CreatureAI
 
     void SetEquipmentSlots(bool loadDefault, int32 mainHand = EQUIP_NO_CHANGE, int32 offHand = EQUIP_NO_CHANGE, int32 ranged = EQUIP_NO_CHANGE);
 
-    // Used to control if MoveChase() is to be used or not in AttackStart(). Some creatures does not chase victims
-    // NOTE: If you use SetCombatMovement while the creature is in combat, it will do NOTHING - This only affects AttackStart
-    //       You should make the necessary to make it happen so.
-    //       Remember that if you modified _isCombatMovementAllowed (e.g: using SetCombatMovement) it will not be reset at Reset().
-    //       It will keep the last value you set.
-    void SetCombatMovement(bool allowMovement);
-    bool IsCombatMovementAllowed() const { return _isCombatMovementAllowed; }
-
     virtual bool CheckEvadeIfOutOfCombatArea() const { return false; }
 
     // return true for heroic mode. i.e.
@@ -452,7 +444,6 @@ struct ScriptedAI : public CreatureAI
 
 private:
     Difficulty _difficulty;
-    bool _isCombatMovementAllowed;
     bool _isHeroic;
     std::unordered_set<uint32> _uniqueTimedEvents;
 };
@@ -470,6 +461,8 @@ class BossAI : public ScriptedAI
 public:
     BossAI(Creature* creature, uint32 bossId);
     ~BossAI() override {}
+
+    float callForHelpRange;
 
     InstanceScript* const instance;
 

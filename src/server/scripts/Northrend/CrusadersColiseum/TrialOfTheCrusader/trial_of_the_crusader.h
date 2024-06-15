@@ -260,6 +260,7 @@ enum eTexts
 
     // Lord Jaraxxus
     SAY_STAGE_1_05            = 0,
+    SAY_STAGE_1_06_1          = 9,
 
     //  The Lich King
     SAY_STAGE_4_02            = 0,

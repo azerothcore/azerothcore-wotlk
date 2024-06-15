@@ -15,15 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
-#include "WorldSession.h"
 #include "pit_of_saron.h"
 
 enum Yells
@@ -537,3 +537,4 @@ void AddSC_boss_ick()
     new spell_krick_explosive_barrage();
     new spell_exploding_orb_auto_grow();
 }
+

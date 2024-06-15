@@ -287,10 +287,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 case COMMAND_ABANDON:                       // abandon (hunter pet) or dismiss (summoned pet)
                     if (pet->GetCharmerGUID() == GetPlayer()->GetGUID())
                     {
-                        if (pet->IsSummon())
-                            pet->ToTempSummon()->UnSummon();
-                        else
-                            _player->StopCastingCharm();
+                        _player->StopCastingCharm();
                     }
                     else if (pet->GetOwnerGUID() == GetPlayer()->GetGUID())
                     {

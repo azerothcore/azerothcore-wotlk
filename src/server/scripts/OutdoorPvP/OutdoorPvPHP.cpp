@@ -16,13 +16,14 @@
  */
 
 #include "OutdoorPvPHP.h"
+#include "CreatureScript.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 
@@ -368,3 +369,4 @@ void AddSC_outdoorpvp_hp()
 {
     new OutdoorPvP_hellfire_peninsula();
 }
+

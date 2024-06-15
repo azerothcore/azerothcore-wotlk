@@ -202,7 +202,7 @@ GraveyardStruct const* Graveyard::GetClosestGraveyard(Player* player, TeamId tea
             GRAVEYARD_ARCHERUS  = 1405
         };
 
-        if (player->getClass() != CLASS_DEATH_KNIGHT && (graveyardLink.safeLocId == GRAVEYARD_EBON_HOLD || graveyardLink.safeLocId == GRAVEYARD_ARCHERUS))
+        if (!player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_GRAVEYARD) && (graveyardLink.safeLocId == GRAVEYARD_EBON_HOLD || graveyardLink.safeLocId == GRAVEYARD_ARCHERUS))
         {
             continue;
         }

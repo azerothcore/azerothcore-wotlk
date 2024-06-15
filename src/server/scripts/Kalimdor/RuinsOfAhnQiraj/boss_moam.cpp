@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Texts
@@ -203,3 +204,4 @@ void AddSC_boss_moam()
     RegisterSpellScript(spell_moam_mana_drain_filter);
     RegisterSpellScript(spell_moam_summon_mana_fiends);
 }
+

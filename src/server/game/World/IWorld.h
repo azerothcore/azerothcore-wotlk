@@ -178,6 +178,7 @@ enum WorldBoolConfigs
     CONFIG_LEAVE_GROUP_ON_LOGOUT,
     CONFIG_QUEST_POI_ENABLED,
     CONFIG_VMAP_BLIZZLIKE_PVP_LOS,
+    CONFIG_VMAP_BLIZZLIKE_LOS_OPEN_WORLD,
     CONFIG_OBJECT_SPARKLES,
     CONFIG_LOW_LEVEL_REGEN_BOOST,
     CONFIG_OBJECT_QUEST_MARKERS,
@@ -460,6 +461,7 @@ enum Rates
     RATE_BUYVALUE_ITEM_ARTIFACT,
     RATE_BUYVALUE_ITEM_HEIRLOOM,
     RATE_DROP_MONEY,
+    RATE_REWARD_QUEST_MONEY,
     RATE_REWARD_BONUS_MONEY,
     RATE_XP_KILL,
     RATE_XP_BG_KILL_AV,
@@ -608,6 +610,7 @@ public:
     [[nodiscard]] virtual std::string const& GetRealmName() const = 0;
     virtual void SetRealmName(std::string name) = 0;
     virtual void RemoveOldCorpses() = 0;
+    virtual void DoForAllOnlinePlayers(std::function<void(Player*)> exec) = 0;
 };
 
 #endif //AZEROTHCORE_IWORLD_H
