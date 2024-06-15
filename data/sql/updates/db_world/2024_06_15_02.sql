@@ -1,3 +1,4 @@
+-- DB update 2024_06_15_01 -> 2024_06_15_02
 --
 DELETE FROM `creature_formations` WHERE `leaderGUID` = 148062;
 
