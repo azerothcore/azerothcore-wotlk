@@ -7,7 +7,7 @@ CREATE TABLE `creature_template_model`(
   `Probability` float NOT NULL DEFAULT '0',
   `VerifiedBuild` smallint(5) unsigned NOT NULL,
   PRIMARY KEY (`CreatureID`,`Idx`)
-) ENGINE=MYISAM CHARSET=utf8mb4;
+) ENGINE=InnoDB CHARSET=utf8mb4;
 
 INSERT IGNORE INTO `creature_template_model` (`CreatureID`,`Idx`,`CreatureDisplayID`,`DisplayScale`,`Probability`,`VerifiedBuild`) SELECT `entry`,0,`modelid1`,`scale`,1,`VerifiedBuild` FROM `creature_template` WHERE `modelid1`!=0;
 INSERT IGNORE INTO `creature_template_model` (`CreatureID`,`Idx`,`CreatureDisplayID`,`DisplayScale`,`Probability`,`VerifiedBuild`) SELECT `entry`,1,`modelid2`,`scale`,1,`VerifiedBuild` FROM `creature_template` WHERE `modelid2`!=0;
@@ -21,3 +21,4 @@ ALTER TABLE `creature_template`
   DROP `modelid2`,
   DROP `modelid3`,
   DROP `modelid4`;
+  
