@@ -43,8 +43,7 @@ enum Spells
 
 enum Events
 {
-    EVENT_SPELL_BERSERK             = 1,
-    EVENT_TALK_CHECK                = 2
+    EVENT_TALK_CHECK                = 1
 };
 
 struct boss_najentus : public BossAI
@@ -58,11 +57,10 @@ struct boss_najentus : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
-        ScheduleUniqueTimedEvent(8min, [&]
-        {
+        me->m_Events.AddEventAtOffset([this] {
             Talk(SAY_ENRAGE);
             DoCastSelf(SPELL_BERSERK, true);
-        }, EVENT_SPELL_BERSERK);
+        }, 8min);
 
         ScheduleTimedEvent(25s, 100s, [&]
         {
