@@ -187,7 +187,7 @@ struct boss_archimonde : public BossAI
 
     void Reset() override
     {
-        BossAI::Reset();
+        _Reset();
         _wispCount = 0;
         _isChanneling = false;
         _enraged = false;
@@ -279,7 +279,7 @@ struct boss_archimonde : public BossAI
 
     void JustEngagedWith(Unit* who) override
     {
-        BossAI::JustEngagedWith(who);
+        _JustEngagedWith();
         me->InterruptNonMeleeSpells(false);
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(25s, 35s, [&]
@@ -348,46 +348,43 @@ struct boss_archimonde : public BossAI
     void KilledUnit(Unit* victim) override
     {
         Talk(SAY_SLAY);
-
-        if (victim->IsPlayer())
-        {
-            GainSoulCharge(victim->ToPlayer());
-        }
     }
 
-    void GainSoulCharge(Player* player)
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
-        switch (player->getClass())
+        if (type == GUID_GAIN_SOUL_CHARGE_PLAYER)
         {
-            case CLASS_PALADIN:
-            case CLASS_PRIEST:
-            case CLASS_WARLOCK:
-                player->CastSpell(me, SPELL_SOUL_CHARGE_RED, true);
-                break;
-            case CLASS_DEATH_KNIGHT:
-            case CLASS_MAGE:
-            case CLASS_ROGUE:
-            case CLASS_WARRIOR:
-                player->CastSpell(me, SPELL_SOUL_CHARGE_YELLOW, true);
-                break;
-            case CLASS_DRUID:
-            case CLASS_HUNTER:
-            case CLASS_SHAMAN:
-                player->CastSpell(me, SPELL_SOUL_CHARGE_GREEN, true);
-                break;
-            case CLASS_NONE:
-            default:
-                break;
-        }
-        scheduler.Schedule(2s, 10s, [this](TaskContext)
-        {
-            UnleashSoulCharge();
-        });
-    }
+            if (Player* player = ObjectAccessor::GetPlayer(*me, guid))
+            {
+                switch (player->getClass())
+                {
+                    case CLASS_PALADIN:
+                    case CLASS_PRIEST:
+                    case CLASS_WARLOCK:
+                        player->CastSpell(me, SPELL_SOUL_CHARGE_RED, true);
+                        break;
+                    case CLASS_DEATH_KNIGHT:
+                    case CLASS_MAGE:
+                    case CLASS_ROGUE:
+                    case CLASS_WARRIOR:
+                        player->CastSpell(me, SPELL_SOUL_CHARGE_YELLOW, true);
+                        break;
+                    case CLASS_DRUID:
+                    case CLASS_HUNTER:
+                    case CLASS_SHAMAN:
+                        player->CastSpell(me, SPELL_SOUL_CHARGE_GREEN, true);
+                        break;
+                    case CLASS_NONE:
+                    default:
+                        break;
+                }
 
-    void JustDied(Unit* killer) override
-    {
-        BossAI::JustDied(killer);
+                scheduler.Schedule(2s, 10s, [this](TaskContext)
+                {
+                    UnleashSoulCharge();
+                });
+            }
+        }
     }
 
     void EnterEvadeMode(EvadeReason why) override

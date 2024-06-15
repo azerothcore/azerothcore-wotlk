@@ -256,6 +256,11 @@ public:
                         break;
                 }
             }
+            else if (unit->IsPlayer() && GetBossState(DATA_ARCHIMONDE) == IN_PROGRESS)
+            {
+                if (Creature* archimonde = GetCreature(DATA_ARCHIMONDE))
+                    archimonde->AI()->SetGUID(unit->GetGUID(), GUID_GAIN_SOUL_CHARGE_PLAYER);
+            }
         }
 
         void SetData(uint32 type, uint32 data) override
