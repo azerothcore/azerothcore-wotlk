@@ -21236,11 +21236,11 @@ void Unit::PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPoi
             {
                 if (target->IsGameMaster() && target->GetSession()->IsGMAccount())
                 {
-                    displayid = cinfo->GetFirstVisibleModel()->CreatureDisplayID;
+                    displayId = cinfo->GetFirstVisibleModel()->CreatureDisplayID;
                 }
                 else
                 {
-                    displayid = cinfo->GetFirstInvisibleModel()->CreatureDisplayID;
+                    displayId = cinfo->GetFirstInvisibleModel()->CreatureDisplayID;
                 }
             }
         }
