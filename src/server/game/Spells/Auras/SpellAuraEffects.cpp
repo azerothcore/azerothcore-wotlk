@@ -3270,7 +3270,7 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
             }
         }
 
-        if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry)) // FIGURE OUT HOW TO FIX THIS PART
+        if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
         {
             CreatureModel model = *ObjectMgr::ChooseDisplayId(creatureInfo);
             sObjectMgr->GetCreatureModelRandomGender(&model, creatureInfo);
