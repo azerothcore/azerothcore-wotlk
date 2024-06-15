@@ -718,11 +718,15 @@ struct npc_pet_gen_toxic_wasteling : public PassiveAI
     }
 };
 
+enum FetchBall
+{
+    SPELL_PET_TOY_FETCH_BALL_COME_HERE = 48649,
+    SPELL_PET_TOY_FETCH_BALL_HAS_BALL  = 48708
+};
+
 struct npc_pet_gen_fetch_ball : public NullCreatureAI
 {
-    npc_pet_gen_fetch_ball(Creature* c) : NullCreatureAI(c)
-    {
-    }
+    npc_pet_gen_fetch_ball(Creature* c) : NullCreatureAI(c) { }
 
     uint32 checkTimer;
     ObjectGuid targetGUID;
@@ -735,12 +739,12 @@ struct npc_pet_gen_fetch_ball : public NullCreatureAI
         me->SetOwnerGUID(summoner->GetGUID());
         checkTimer = 0;
         targetGUID.Clear();
-        me->CastSpell(me, 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/, true);
+        me->CastSpell(me, SPELL_PET_TOY_FETCH_BALL_COME_HERE, true);
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
     {
-        if (spellInfo->Id == 48649 /*SPELL_PET_TOY_FETCH_BALL_COME_HERE*/)
+        if (spellInfo->Id == SPELL_PET_TOY_FETCH_BALL_COME_HERE)
         {
             target->GetMotionMaster()->MovePoint(50, me->GetHomePosition());
             targetGUID = target->GetGUID();
@@ -757,8 +761,8 @@ struct npc_pet_gen_fetch_ball : public NullCreatureAI
                 if (me->GetDistance2d(target) < 2.0f)
                 {
                     target->AI()->EnterEvadeMode();
-                    target->CastSpell(target, 48708 /*SPELL_PET_TOY_FETCH_BALL_HAS_BALL*/, true);
-                    me->DespawnOrUnsummon(1);
+                    target->CastSpell(target, SPELL_PET_TOY_FETCH_BALL_HAS_BALL, true);
+                    me->DespawnOrUnsummon();
                 }
         }
     }

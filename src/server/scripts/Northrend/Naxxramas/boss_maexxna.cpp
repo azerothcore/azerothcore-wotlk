@@ -16,13 +16,16 @@
  */
 
 #include "CreatureScript.h"
+#include "Player.h"
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
 enum Spells
 {
-    SPELL_WEB_WRAP                      = 28622,
     SPELL_WEB_SPRAY_10                  = 29484,
     SPELL_WEB_SPRAY_25                  = 54125,
     SPELL_POISON_SHOCK_10               = 28741,
@@ -30,7 +33,11 @@ enum Spells
     SPELL_NECROTIC_POISON_10            = 54121,
     SPELL_NECROTIC_POISON_25            = 28776,
     SPELL_FRENZY_10                     = 54123,
-    SPELL_FRENZY_25                     = 54124
+    SPELL_FRENZY_25                     = 54124,
+    SPELL_WEB_WRAP_STUN                 = 28622,
+    SPELL_WEB_WRAP_SUMMON               = 28627,
+    SPELL_WEB_WRAP_KILL_WEBS            = 52512,
+    SPELL_WEB_WRAP_PACIFY_5             = 28618 // 5 seconds pacify silence
 };
 
 enum Events
@@ -40,7 +47,8 @@ enum Events
     EVENT_NECROTIC_POISON               = 3,
     EVENT_WEB_WRAP                      = 4,
     EVENT_HEALTH_CHECK                  = 5,
-    EVENT_SUMMON_SPIDERLINGS            = 6
+    EVENT_SUMMON_SPIDERLINGS            = 6,
+    EVENT_WEB_WRAP_APPLY_STUN           = 7
 };
 
 enum Emotes
@@ -56,11 +64,33 @@ enum Misc
     NPC_MAEXXNA_SPIDERLING              = 17055
 };
 
-const Position PosWrap[3] =
+const Position PosWrap[7] =
 {
-    {3546.796f, -3869.082f, 296.450f, 0.0f},
-    {3531.271f, -3847.424f, 299.450f, 0.0f},
-    {3497.067f, -3843.384f, 302.384f, 0.0f}
+    {3496.615f,  -3834.182f,  320.7863f},
+    {3509.108f,  -3833.922f,  320.4750f},
+    {3523.644f,  -3838.309f,  320.5775f},
+    {3538.152f,  -3846.353f,  320.5188f},
+    {3546.219f,  -3856.167f,  320.9324f},
+    {3555.135f,  -3869.507f,  320.8307f},
+    {3560.282f,  -3886.143f,  321.2827f}
+};
+
+struct WebTargetSelector
+{
+    WebTargetSelector(Unit* maexxna) : _maexxna(maexxna) {}
+    bool operator()(Unit const* target) const
+    {
+        if (!target->IsPlayer()) // never web nonplayers (pets, guardians, etc.)
+            return false;
+        if (_maexxna->GetVictim() == target) // never target tank
+            return false;
+        if (target->HasAura(SPELL_WEB_WRAP_STUN)) // never target targets that are already webbed
+            return false;
+        return true;
+    }
+
+    private:
+        Unit const* _maexxna;
 };
 
 class boss_maexxna : public CreatureScript
@@ -83,6 +113,8 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
+
+        GuidList wraps;
 
         bool IsInRoom()
         {
@@ -151,7 +183,55 @@ public:
         void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
-            summons.DespawnAll();
+        }
+
+        void DoCastWebWrap()
+        {
+            std::list<Unit*> candidates;
+            SelectTargetList(candidates, RAID_MODE(1, 2), SelectTargetMethod::Random, 0, WebTargetSelector(me));
+
+            std::vector<uint32> positions {0, 1, 2, 3, 4, 5, 6};
+            Acore::Containers::RandomShuffle(positions);
+
+            if (candidates.empty())
+                return;
+
+            for (int i = 0; i < RAID_MODE(1, 2) ; i++)
+            {
+                if (candidates.empty())
+                    break;
+                const Position &randomPos = PosWrap[positions[i]];
+
+                auto itr = candidates.begin();
+
+                if (candidates.size() > 1)
+                    std::advance(itr, urand(0, candidates.size() - 1));
+
+                Unit *target = *itr;
+                candidates.erase(itr);
+
+                float dx = randomPos.GetPositionX() - target->GetPositionX();
+                float dy = randomPos.GetPositionY() - target->GetPositionY();
+                float distXY = std::hypotf(dx, dy);
+
+                // smooth knockback arc that avoids the ceiling
+                float horizontalSpeed = distXY / 1.5f;
+                float verticalSpeed = 28.0f;
+                if (distXY <= 10.0f)
+                    verticalSpeed = 12.0f;
+                else if (distXY <= 20.0f)
+                    verticalSpeed = 16.0f;
+                else if (distXY <= 30.0f)
+                    verticalSpeed = 20.0f;
+                else if (distXY <= 40.0f)
+                    verticalSpeed = 24.0f;
+
+                target->KnockbackFrom(randomPos.GetPositionX(), randomPos.GetPositionY(), -horizontalSpeed, verticalSpeed);
+                me->CastSpell(target, SPELL_WEB_WRAP_PACIFY_5, true); // pacify silence for 5 seconds
+
+                wraps.push_back(target->GetGUID());
+            }
+            events.ScheduleEvent(EVENT_WEB_WRAP_APPLY_STUN, 2s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -199,21 +279,21 @@ public:
                     break;
                 case EVENT_WEB_WRAP:
                     Talk(EMOTE_WEB_WRAP);
-                    for (uint8 i = 0; i < RAID_MODE(1, 2); ++i)
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0, true, true, -SPELL_WEB_WRAP))
-                        {
-                            target->RemoveAura(RAID_MODE(SPELL_WEB_SPRAY_10, SPELL_WEB_SPRAY_25));
-                            uint8 pos = urand(0, 2);
-                            if (Creature* wrap = me->SummonCreature(NPC_WEB_WRAP, PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
-                            {
-                                wrap->AI()->SetGUID(target->GetGUID());
-                                target->GetMotionMaster()->MoveJump(PosWrap[pos].GetPositionX(), PosWrap[pos].GetPositionY(), PosWrap[pos].GetPositionZ(), 20, 20);
-                            }
-                        }
-                    }
+                    DoCastWebWrap();
                     events.Repeat(40s);
                     break;
+                case EVENT_WEB_WRAP_APPLY_STUN:
+                {
+                    for (auto& p : wraps)
+                    {
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, p))
+                        {
+                            player->CastSpell(player, SPELL_WEB_WRAP_STUN, true);
+                        }
+                    }
+                    wraps.clear();
+                    break;
+                }
             }
             DoMeleeAttackIfReady();
         }
@@ -232,38 +312,75 @@ public:
 
     struct boss_maexxna_webwrapAI : public NullCreatureAI
     {
-        explicit boss_maexxna_webwrapAI(Creature* c) : NullCreatureAI(c) {}
+        explicit boss_maexxna_webwrapAI(Creature* c) : NullCreatureAI(c) { }
 
         ObjectGuid victimGUID;
 
-        void SetGUID(ObjectGuid guid, int32  /*param*/) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
-            victimGUID = guid;
-
-            if (me->m_spells[0] && victimGUID)
-            {
-                if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
-                {
-                    victim->CastSpell(victim, me->m_spells[0], true, nullptr, nullptr, me->GetGUID());
-                }
-            }
+            if (!summoner)
+                return;
+            victimGUID = summoner->GetGUID();
         }
 
         void JustDied(Unit* /*killer*/) override
         {
-            if (me->m_spells[0] && victimGUID)
+            if (victimGUID)
             {
                 if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
                 {
-                    victim->RemoveAurasDueToSpell(me->m_spells[0], me->GetGUID());
+                    if (victim->IsAlive())
+                    {
+                        victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_STUN);
+                        victim->RemoveAurasDueToSpell(SPELL_WEB_WRAP_SUMMON);
+                    }
+                }
+            }
+        }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (victimGUID)
+            {
+                if (Unit* victim = ObjectAccessor::GetUnit(*me, victimGUID))
+                {
+                    if (!victim->IsAlive())
+                    {
+                        me->CastSpell(me, SPELL_WEB_WRAP_KILL_WEBS, true);
+                    }
                 }
             }
         }
     };
 };
 
+class spell_web_wrap_damage : public AuraScript
+{
+public:
+    PrepareAuraScript(spell_web_wrap_damage);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WEB_WRAP_SUMMON });
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        if (aurEff->GetTickNumber() == 2)
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_WEB_WRAP_SUMMON, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_web_wrap_damage::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
 void AddSC_boss_maexxna()
 {
     new boss_maexxna();
     new boss_maexxna_webwrap();
+    RegisterSpellScript(spell_web_wrap_damage);
 }

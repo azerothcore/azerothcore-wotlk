@@ -4,7 +4,10 @@ on:
     branches:
       - 'master'
   pull_request:
-    types: ['opened', 'synchronize', 'reopened']
+    types:
+      - opened
+      - reopened
+      - synchronize
 
 concurrency:
   group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
@@ -13,44 +16,32 @@ concurrency:
 jobs:
   build:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
         include:
-          - os: ubuntu-20.04
-            compiler: clang12
-          - os: ubuntu-20.04
-            compiler: gcc10
+          - os: ubuntu-22.04
+            compiler:
+              CC: clang-15
+              CXX: clang++-15
+          - os: ubuntu-22.04
+            compiler:
+              CC: gcc-12
+              CXX: g++-12
+          - os: ubuntu-24.04
+            compiler:
+              CC: clang-18
+              CXX: clang++-18
+          - os: ubuntu-24.04
+            compiler:
+              CC: gcc-14
+              CXX: g++-14
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}-nopch
-    env:
-      COMPILER: ${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v4
-      - name: Cache
-        uses: actions/cache@v3
+      - uses: ./.github/actions/linux-build
         with:
-          path: var/ccache
-          key: ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}:${{ github.sha }}
-          restore-keys: |
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}:${{ github.ref }}
-            ccache:${{ matrix.os }}:${{ matrix.compiler }}
-      - name: Configure OS
-        run: source ./acore.sh install-deps
-        env:
-          CONTINUOUS_INTEGRATION: true
-      - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf-core.sh
-      - name: Process pending sql
-        run: bash bin/acore-db-pendings
-      - name: Build
-        run: source ./apps/ci/ci-compile.sh
-      - name: Dry run authserver
-        run: source ./apps/ci/ci-dry-run.sh authserver
-      - name: Dry run worldserver
-        run: source ./apps/ci/ci-dry-run.sh worldserver
-      - name: Check startup errors
-        run: source ./apps/ci/ci-error-check.sh
-      - name: Run unit tests
-        run: source ./apps/ci/ci-run-unit-tests.sh
+          CC: ${{ matrix.compiler.CC }}
+          CXX: ${{ matrix.compiler.CXX }}
+          pch: false

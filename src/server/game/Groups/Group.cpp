@@ -520,7 +520,7 @@ bool Group::AddMember(Player* player)
                         player->BuildValuesUpdateBlockForPlayer(&newData, itrMember);
                         if (newData.HasData())
                         {
-                            newData.BuildPacket(&newDataPacket);
+                            newData.BuildPacket(newDataPacket);
                             itrMember->SendDirectMessage(&newDataPacket);
                         }
                     }
@@ -529,7 +529,7 @@ bool Group::AddMember(Player* player)
 
             if (groupData.HasData())
             {
-                groupData.BuildPacket(&groupDataPacket);
+                groupData.BuildPacket(groupDataPacket);
                 player->SendDirectMessage(&groupDataPacket);
             }
 

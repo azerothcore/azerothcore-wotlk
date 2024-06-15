@@ -107,7 +107,7 @@ public:
     void RemoveMember(Creature* member);
     void FormationReset(bool dismiss, bool initMotionMaster);
 
-    void LeaderMoveTo(float x, float y, float z, bool run);
+    void LeaderMoveTo(float x, float y, float z, uint32 move_type);
     void MemberEngagingTarget(Creature* member, Unit* target);
     Unit* GetNewTargetForMember(Creature* member);
     void MemberEvaded(Creature* member);

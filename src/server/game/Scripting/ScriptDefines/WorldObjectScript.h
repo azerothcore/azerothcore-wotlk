@@ -19,11 +19,22 @@
 #define SCRIPT_OBJECT_WORLD_OBJECT_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum WorldObjectHook
+{
+    WORLDOBJECTHOOK_ON_WORLD_OBJECT_DESTROY,
+    WORLDOBJECTHOOK_ON_WORLD_OBJECT_CREATE,
+    WORLDOBJECTHOOK_ON_WORLD_OBJECT_SET_MAP,
+    WORLDOBJECTHOOK_ON_WORLD_OBJECT_RESET_MAP,
+    WORLDOBJECTHOOK_ON_WORLD_OBJECT_UPDATE,
+    WORLDOBJECTHOOK_END
+};
 
 class WorldObjectScript : public ScriptObject
 {
 protected:
-    WorldObjectScript(const char* name);
+    WorldObjectScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
