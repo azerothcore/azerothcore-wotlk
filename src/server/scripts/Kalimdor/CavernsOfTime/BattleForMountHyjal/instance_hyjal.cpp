@@ -369,7 +369,7 @@ public:
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
                         _bossWave = DATA_WINTERCHILL;
-                        ScheduleWaves(1ms, START_WAVE_WINTERCHILL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_WINTERCHILL - 1]);
+                        ScheduleWaves(1ms, START_WAVE_WINTERCHILL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_WINTERCHILL]);
                     }
                     else if (GetBossState(DATA_ANETHERON) != DONE)
                     {
@@ -378,7 +378,7 @@ public:
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
                         _bossWave = DATA_ANETHERON;
-                        ScheduleWaves(1ms, START_WAVE_ANETHERON, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_ANETHERON - 1]);
+                        ScheduleWaves(1ms, START_WAVE_ANETHERON, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_ANETHERON]);
                     }
                     else if (GetBossState(DATA_KAZROGAL) != DONE)
                     {
@@ -387,7 +387,7 @@ public:
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
                         _bossWave = DATA_KAZROGAL;
-                        ScheduleWaves(1ms, START_WAVE_KAZROGAL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_KAZROGAL - 1]);
+                        ScheduleWaves(1ms, START_WAVE_KAZROGAL, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_KAZROGAL]);
                     }
                     else if (GetBossState(DATA_AZGALOR) != DONE)
                     {
@@ -396,7 +396,7 @@ public:
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
                         _bossWave = DATA_AZGALOR;
-                        ScheduleWaves(1ms, START_WAVE_AZGALOR, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_AZGALOR - 1]);
+                        ScheduleWaves(1ms, START_WAVE_AZGALOR, MAX_WAVES_STANDARD, hyjalWaveTimers[DATA_AZGALOR]);
                     }
                     else if (GetBossState(DATA_ARCHIMONDE) != DONE)
                     {
