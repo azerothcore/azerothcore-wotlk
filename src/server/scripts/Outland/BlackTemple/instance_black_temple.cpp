@@ -253,16 +253,8 @@ public:
         void HandleScriptEffect(SpellEffIndex effIndex)
         {
             PreventHitDefaultEffect(effIndex);
-            Unit* target = GetHitUnit();
-            if (!target)
-                return;
-
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_CHARM);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_STUN);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_DECREASE_SPEED);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_ROOT);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_CONFUSE);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_FEAR);
+            if (Unit* target = GetHitUnit())
+                target->RemoveAurasWithMechanic(IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK);
         }
 
         void Register() override
