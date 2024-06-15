@@ -491,7 +491,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     }
 
     SetDisplayId(model.CreatureDisplayID, model.DisplayScale);
-    SetNativeDisplayId(model.CreatureDisplayID, model.DisplayScale);
+    SetNativeDisplayId(model.CreatureDisplayID);
 
     // Load creature equipment
     if (!data)
@@ -1180,7 +1180,7 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
     if (minfo && !IsTotem())                               // Cancel load if no model defined or if totem
     {
         SetDisplayId(display.CreatureDisplayID, display.DisplayScale);
-        SetNativeDisplayId(display.CreatureDisplayID, display.DisplayScale);
+        SetNativeDisplayId(display.CreatureDisplayID);
     }
 
     LoadCreaturesAddon();
@@ -2091,7 +2091,7 @@ void Creature::Respawn(bool force)
                 if (minfo)                                             // Cancel load if no model defined
                 {
                     SetDisplayId(display.CreatureDisplayID, display.DisplayScale);
-                    SetNativeDisplayId(display.CreatureDisplayID, display.DisplayScale);
+                    SetNativeDisplayId(display.CreatureDisplayID);
                 }
             }
 
