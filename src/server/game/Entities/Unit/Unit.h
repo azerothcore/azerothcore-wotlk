@@ -2264,7 +2264,7 @@ public:
     virtual void SetDisplayId(uint32 modelId, float displayScale = 1.f);
     [[nodiscard]] uint32 GetNativeDisplayId() const { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
     void RestoreDisplayId();
-    void SetNativeDisplayId(uint32 displayId, float displayScale = 1.f) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, displayId); }
+    void SetNativeDisplayId(uint32 displayId) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, displayId); }
     void setTransForm(uint32 spellid) { m_transform = spellid;}
     [[nodiscard]] uint32 getTransForm() const { return m_transform;}
 
