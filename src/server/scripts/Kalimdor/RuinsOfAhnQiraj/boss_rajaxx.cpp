@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Yells
@@ -381,3 +382,4 @@ void AddSC_boss_rajaxx()
     RegisterSpellScript(spell_rajaxx_thundercrash);
     RegisterRuinsOfAhnQirajCreatureAI(npc_general_andorov);
 }
+

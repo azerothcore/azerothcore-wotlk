@@ -15,12 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "CreatureAI.h"
 #include "EventMap.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "sunken_temple.h"
 
@@ -300,3 +302,4 @@ void AddSC_instance_sunken_temple()
     new spell_temple_of_atal_hakkar_hex_of_jammal_an();
     new spell_temple_of_atal_hakkar_awaken_the_soulflayer();
 }
+

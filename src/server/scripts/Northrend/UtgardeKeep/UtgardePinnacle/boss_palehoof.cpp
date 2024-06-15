@@ -15,7 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "ScriptedCreature.h"
 #include "utgarde_pinnacle.h"
 
@@ -820,3 +821,4 @@ void AddSC_boss_palehoof()
     new npc_frenzied_worgen();
     new go_palehoof_sphere();
 }
+

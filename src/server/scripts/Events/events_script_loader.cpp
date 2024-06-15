@@ -23,6 +23,7 @@ void AddSC_event_winter_veil_scripts();
 void AddSC_event_love_in_the_air();
 void AddSC_event_midsummer_scripts();
 void AddSC_event_childrens_week();
+void AddSC_event_firework_show_scripts();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -35,4 +36,5 @@ void AddEventsScripts()
     AddSC_event_love_in_the_air();
     AddSC_event_midsummer_scripts();
     AddSC_event_childrens_week();
+    AddSC_event_firework_show_scripts();
 }

@@ -39,7 +39,7 @@ char* DBCDatabaseLoader::Load(uint32& records, char**& indexTable)
     std::string query = Acore::StringFormat("SELECT * FROM `%s` ORDER BY `ID` DESC", _sqlTableName);
 
     // no error if empty set
-    QueryResult result = WorldDatabase.Query(query.c_str());
+    QueryResult result = WorldDatabase.Query(query);
     if (!result)
         return nullptr;
 

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,11 +18,11 @@
 DROP TABLE IF EXISTS `areatrigger_scripts`;
 CREATE TABLE IF NOT EXISTS `areatrigger_scripts` (
   `entry` int NOT NULL,
-  `ScriptName` char(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ScriptName` char(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.areatrigger_scripts: ~143 rows (approximately)
+-- Dumping data for table acore_world.areatrigger_scripts: ~149 rows (approximately)
 DELETE FROM `areatrigger_scripts`;
 INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(171, 'SmartTrigger'),
@@ -78,18 +78,23 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(4052, 'at_battleguard_sartura'),
 	(4113, 'at_thaddius_entrance'),
 	(4156, 'at_naxxramas_hub_portal'),
+	(4216, 'at_karazhan_atiesh_aran'),
 	(4295, 'at_quagmirran_lair'),
 	(4302, 'at_underbog_ghazan'),
+	(4347, 'at_rp_nethekurse'),
 	(4356, 'at_bring_your_orphan_to'),
 	(4389, 'SmartTrigger'),
 	(4422, 'at_area_52_entrance'),
 	(4466, 'at_area_52_entrance'),
 	(4471, 'at_area_52_entrance'),
 	(4472, 'at_area_52_entrance'),
+	(4473, 'SmartTrigger'),
+	(4475, 'SmartTrigger'),
 	(4479, 'SmartTrigger'),
 	(4495, 'SmartTrigger'),
 	(4497, 'at_commander_dawnforge'),
 	(4498, 'SmartTrigger'),
+	(4522, 'at_karazhan_side_entrance'),
 	(4524, 'at_shattered_halls_execution'),
 	(4560, 'at_legion_teleporter'),
 	(4575, 'SmartTrigger'),
@@ -106,13 +111,14 @@ INSERT INTO `areatrigger_scripts` (`entry`, `ScriptName`) VALUES
 	(4871, 'SmartTrigger'),
 	(4872, 'SmartTrigger'),
 	(4873, 'SmartTrigger'),
+	(4896, 'SmartTrigger'),
 	(4937, 'at_sunwell_eredar_twins'),
 	(4951, 'SmartTrigger'),
 	(4956, 'SmartTrigger'),
 	(4990, 'SmartTrigger'),
 	(5030, 'SmartTrigger'),
-	(5046, 'at_sholazar_waygate'),
-	(5047, 'at_sholazar_waygate'),
+	(5046, 'SmartTrigger'),
+	(5047, 'SmartTrigger'),
 	(5056, 'SmartTrigger'),
 	(5057, 'SmartTrigger'),
 	(5058, 'SmartTrigger'),

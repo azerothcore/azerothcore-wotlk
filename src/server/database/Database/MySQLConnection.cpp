@@ -27,8 +27,8 @@
 #include "Timer.h"
 #include "Tokenize.h"
 #include "Transaction.h"
-#include "Util.h"
 #include <errmsg.h>
+#include <mysql.h>
 #include <mysqld_error.h>
 
 MySQLConnectionInfo::MySQLConnectionInfo(std::string_view infoString)
@@ -227,7 +227,11 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
 
     uint32 _s = getMSTime();
 
+#if !defined(MARIADB_VERSION_ID) && (MYSQL_VERSION_ID >= 80300)
+    if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetParameterCount(), nullptr))
+#else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
+#endif
     {
         uint32 lErrno = mysql_errno(m_Mysql);
         LOG_ERROR("sql.sql", "SQL(p): {}\n [ERROR]: [{}] {}", m_mStmt->getQueryString(), lErrno, mysql_stmt_error(msql_STMT));
@@ -275,7 +279,11 @@ bool MySQLConnection::_Query(PreparedStatementBase* stmt, MySQLPreparedStatement
 
     uint32 _s = getMSTime();
 
+#if !defined(MARIADB_VERSION_ID) && (MYSQL_VERSION_ID >= 80300)
+    if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetParameterCount(), nullptr))
+#else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
+#endif
     {
         uint32 lErrno = mysql_errno(m_Mysql);
         LOG_ERROR("sql.sql", "SQL(p): {}\n [ERROR]: [{}] {}", m_mStmt->getQueryString(), lErrno, mysql_stmt_error(msql_STMT));
@@ -484,6 +492,11 @@ void MySQLConnection::Unlock()
 uint32 MySQLConnection::GetServerVersion() const
 {
     return mysql_get_server_version(m_Mysql);
+}
+
+std::string MySQLConnection::GetServerInfo() const
+{
+    return mysql_get_server_info(m_Mysql);
 }
 
 MySQLPreparedStatement* MySQLConnection::GetPreparedStatement(uint32 index)

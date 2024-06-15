@@ -15,13 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file
- * of creature using it or can't be bound to any player class.
- * Ordered alphabetically using scriptname.
- * Scriptnames of files in this file should be prefixed with "spell_gen_"
- */
-
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
@@ -29,18 +22,25 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
 #include "SkillDiscovery.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "Vehicle.h"
 #include <array>
+/*
+ * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file
+ * of creature using it or can't be bound to any player class.
+ * Ordered alphabetically using scriptname.
+ * Scriptnames of files in this file should be prefixed with "spell_gen_"
+ */
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -446,7 +446,7 @@ class spell_pet_hit_expertise_scalling : public AuraScript
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
         {
-            if (modOwner->getClass() == CLASS_HUNTER)
+            if (modOwner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
                 amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 8.0f);
             else if (modOwner->getPowerType() == POWER_MANA)
                 amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 8.0f);
@@ -459,7 +459,7 @@ class spell_pet_hit_expertise_scalling : public AuraScript
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
         {
-            if (modOwner->getClass() == CLASS_HUNTER)
+            if (modOwner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
                 amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 17.0f);
             else if (modOwner->getPowerType() == POWER_MANA)
                 amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 17.0f);
@@ -472,7 +472,7 @@ class spell_pet_hit_expertise_scalling : public AuraScript
     {
         if (Player* modOwner = GetUnitOwner()->GetSpellModOwner())
         {
-            if (modOwner->getClass() == CLASS_HUNTER)
+            if (modOwner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
                 amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 26.0f);
             else if (modOwner->getPowerType() == POWER_MANA)
                 amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 26.0f);
@@ -628,6 +628,7 @@ class spell_gen_black_magic_enchant : public AuraScript
 };
 
 // 53642 - The Might of Mograine
+// 64174 - Protective Gaze
 class spell_gen_area_aura_select_players : public AuraScript
 {
     PrepareAuraScript(spell_gen_area_aura_select_players);
@@ -642,6 +643,24 @@ class spell_gen_area_aura_select_players : public AuraScript
     }
 };
 
+// 62650 - Fortitude of Frost
+// 62670 - Resilience of Nature
+// 62671 - Speed of Invention
+// 62702 - Fury of the Storm
+class spell_gen_area_aura_select_players_and_caster : public AuraScript
+{
+    PrepareAuraScript(spell_gen_area_aura_select_players_and_caster);
+
+    bool CheckAreaTarget(Unit* target)
+    {
+        return target->GetTypeId() == TYPEID_PLAYER || target == GetCaster();
+    }
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_gen_area_aura_select_players_and_caster::CheckAreaTarget);
+    }
+};
+
 /* 29883 - Blink             (spell_gen_select_target_count_15_1)
    38573 - Spore Drop Effect (spell_gen_select_target_count_15_1)
    38633 - Arcane Volley     (spell_gen_select_target_count_15_1)
@@ -653,7 +672,6 @@ class spell_gen_area_aura_select_players : public AuraScript
    54847 - Mojo Volley       (spell_gen_select_target_count_15_2)
    59452 - Mojo Volley       (spell_gen_select_target_count_15_2)
    46008 - Negative Energy   (spell_gen_select_target_count_15_5)
-   38017 - Wave A - 1                 (spell_gen_select_target_count_7_1)
    40851 - Disgruntled                (spell_gen_select_target_count_7_1)
    45680 - Shadow Bolt                (spell_gen_select_target_count_7_1)
    45976 - Open Portal                (spell_gen_select_target_count_7_1)
@@ -769,13 +787,12 @@ class spell_gen_proc_not_self : public AuraScript
         if (Unit* caster = GetCaster())
             if (Unit* target = eventInfo.GetActionTarget())
             {
+                ObjectGuid targetGUID = target->GetGUID();
                 uint32 spellID = aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-                caster->m_Events.AddEventAtOffset([caster, target, spellID]()
+                caster->m_Events.AddEventAtOffset([caster, targetGUID, spellID]()
                 {
-                    if (target)
-                    {
+                    if (Unit *target = ObjectAccessor::GetUnit(*caster, targetGUID))
                         caster->CastSpell(target, spellID, true);
-                    }
                 }, 100ms);
             }
     }
@@ -1674,7 +1691,7 @@ class spell_gen_pet_summoned : public SpellScript
         Player* player = GetCaster()->ToPlayer();
         if (player->GetLastPetNumber() && player->CanResummonPet(player->GetLastPetSpell()))
         {
-            PetType newPetType = (player->getClass() == CLASS_HUNTER) ? HUNTER_PET : SUMMON_PET;
+            PetType newPetType = (player->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET)) ? HUNTER_PET : SUMMON_PET;
             Pet* newPet = new Pet(player, newPetType);
             if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true, 100))
             {
@@ -1952,7 +1969,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
         return GetCaster()->GetTypeId() == TYPEID_PLAYER;
     }
 
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({
             SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER,
@@ -3546,11 +3563,11 @@ class spell_gen_on_tournament_mount : public AuraScript
             case NPC_ARGENT_WARHORSE:
                 {
                     if (player->HasAchieved(ACHIEVEMENT_CHAMPION_ALLIANCE) || player->HasAchieved(ACHIEVEMENT_CHAMPION_HORDE))
-                        return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_CHAMPION : SPELL_PENNANT_ARGENT_CRUSADE_CHAMPION;
+                        return player->IsClass(CLASS_DEATH_KNIGHT) ? SPELL_PENNANT_EBON_BLADE_CHAMPION : SPELL_PENNANT_ARGENT_CRUSADE_CHAMPION;
                     else if (player->HasAchieved(ACHIEVEMENT_ARGENT_VALOR))
-                        return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_VALIANT : SPELL_PENNANT_ARGENT_CRUSADE_VALIANT;
+                        return player->IsClass(CLASS_DEATH_KNIGHT) ? SPELL_PENNANT_EBON_BLADE_VALIANT : SPELL_PENNANT_ARGENT_CRUSADE_VALIANT;
                     else
-                        return player->getClass() == CLASS_DEATH_KNIGHT ? SPELL_PENNANT_EBON_BLADE_ASPIRANT : SPELL_PENNANT_ARGENT_CRUSADE_ASPIRANT;
+                        return player->IsClass(CLASS_DEATH_KNIGHT) ? SPELL_PENNANT_EBON_BLADE_ASPIRANT : SPELL_PENNANT_ARGENT_CRUSADE_ASPIRANT;
                 }
             default:
                 return 0;
@@ -5136,6 +5153,43 @@ class spell_gen_choking_vines : public AuraScript
     }
 };
 
+ // 28865 - Consumption
+class spell_gen_consumption : public SpellScript
+{
+    PrepareSpellScript(spell_gen_consumption);
+
+    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    {
+        Map* map = GetCaster()->GetMap();
+        if (!map)
+        {
+            return;
+        }
+        int32 value = 0;
+        if (map->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL) // NAXX25 N
+        {
+            value = urand(4500, 4700);
+        }
+        else if (map->GetId() == 533) // NAXX10 N
+        {
+            value = urand(3000, 3200);
+        }
+        else if (map->GetId() == 532) // Karazhan
+        {
+            value = urand(1110, 1310);
+        }
+        if (value)
+        {
+            SetEffectValue(value);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_gen_consumption::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5158,6 +5212,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_disabled_above_63);
     RegisterSpellScript(spell_gen_black_magic_enchant);
     RegisterSpellScript(spell_gen_area_aura_select_players);
+    RegisterSpellScript(spell_gen_area_aura_select_players_and_caster);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5);
@@ -5289,4 +5344,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_jubling_cooldown);
     RegisterSpellScript(spell_gen_yehkinya_bramble);
     RegisterSpellScript(spell_gen_choking_vines);
+    RegisterSpellScript(spell_gen_consumption);
 }
+

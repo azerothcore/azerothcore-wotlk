@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "TaskScheduler.h"
+#include "SpellScriptLoader.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Emotes
@@ -188,7 +188,7 @@ struct npc_buru_egg : public ScriptedAI
     npc_buru_egg(Creature* creature) : ScriptedAI(creature)
     {
         _instance = me->GetInstanceScript();
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         me->SetReactState(REACT_PASSIVE);
         me->SetControlled(true, UNIT_STATE_STUNNED);
     }
@@ -270,3 +270,4 @@ void AddSC_boss_buru()
     RegisterRuinsOfAhnQirajCreatureAI(npc_buru_egg);
     RegisterSpellScript(spell_egg_explosion);
 }
+

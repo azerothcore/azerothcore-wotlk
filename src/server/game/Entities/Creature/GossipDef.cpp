@@ -22,6 +22,7 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "QuestDef.h"
+#include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -211,11 +212,9 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID)
     }
 
     data << uint32(_questMenu.GetMenuItemCount());      // max count 0x20
-    uint32 count = 0;
 
     for (uint32 iI = 0; iI < _questMenu.GetMenuItemCount(); ++iI)
     {
-        ++count;
         QuestMenuItem const& item = _questMenu.GetItem(iI);
         uint32 questID = item.QuestId;
         if (Quest const* quest = sObjectMgr->GetQuestTemplate(questID))

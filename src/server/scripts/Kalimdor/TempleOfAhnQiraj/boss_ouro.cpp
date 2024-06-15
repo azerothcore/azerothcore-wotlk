@@ -17,10 +17,10 @@
 
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "temple_of_ahnqiraj.h"
 
@@ -106,7 +106,7 @@ struct boss_ouro : public BossAI
 {
     boss_ouro(Creature* creature) : BossAI(creature, DATA_OURO)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         me->SetControlled(true, UNIT_STATE_ROOT);
     }
 
