@@ -21,4 +21,3 @@ ALTER TABLE `creature_template`
   DROP `modelid2`,
   DROP `modelid3`,
   DROP `modelid4`;
-  
