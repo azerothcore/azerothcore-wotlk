@@ -1396,14 +1396,14 @@ bool Player::TakeQuestSourceItem(uint32 questId, bool msg)
 uint32 Player::CalculateQuestRewardXP(Quest const* quest)
 {
     // apply world quest rate
-    uint32 XP = uint32(quest->XPValue(GetLevel()) * GetQuestRate(quest->IsDFQuest()));
+    uint32 xp = uint32(quest->XPValue(GetLevel()) * GetQuestRate(quest->IsDFQuest()));
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
     for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
-        AddPct(XP, (*i)->GetAmount());
+        AddPct(xp, (*i)->GetAmount());
 
-    return XP;
+    return xp;
 }
 
 bool Player::GetQuestRewardStatus(uint32 quest_id) const
