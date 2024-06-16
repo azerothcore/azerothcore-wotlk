@@ -94,7 +94,7 @@ enum PaladinSpells
 
     SPELL_PALADIN_HOLY_VENGEANCE                 = 31803,
     SPELL_PALADIN_BLOOD_CORRUPTION               = 53742,
-    SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT       = 42463,
+    SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT       = 42463
 };
 
 enum PaladinSpellIcons
