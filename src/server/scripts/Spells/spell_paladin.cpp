@@ -1131,6 +1131,9 @@ class spell_pal_seal_of_vengeance : public SpellScript
             if (aura)
                 stacks = aura->GetStackAmount();
 
+            if (stacks && stacks < 5)
+                stacks++;
+
             damage = ((damage * stacks) / 5);
 
             SetHitDamage(damage);
