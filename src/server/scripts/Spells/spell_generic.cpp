@@ -141,28 +141,14 @@ class spell_the_flag_of_ownership : public SpellScript
             return;
         caster->CastSpell(target, 52605, true);
 
-        const BroadcastText* bct = sObjectMgr->GetBroadcastText(BROADCAST_TEXT_FLAG_OF_OWNERSHIP);
-        if (!bct)
-            return;
-        Player* player = caster->ToPlayer();
-        LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-
-        std::string formatString = bct->GetText(loc_idx, caster->getGender());
-        std::string targetName = target->GetName();
-        size_t pos = formatString.find("$n");
-        if (pos != std::string::npos) {
-            formatString.replace(pos, 2, targetName.c_str());
-        }
-
-        // TextEmote without the string replacement duplicates the character name
-        pos = formatString.find("%s ");
-        if (pos != std::string::npos) {
-            formatString.replace(pos, 3, "");
-        }
+        LocaleConstant loc_idx = caster->ToPlayer()->GetSession()->GetSessionDbLocaleIndex();
+        BroadcastText const* bct = sObjectMgr->GetBroadcastText(BROADCAST_TEXT_FLAG_OF_OWNERSHIP);
+        std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName().c_str(), target->GetName().c_str());
 
         char buff[100];
-        snprintf(buff, sizeof(buff), formatString.c_str());
+        caster->Talk(bctMsg, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
         caster->TextEmote(buff, caster);
+
         haveTarget = true;
     }
 
