@@ -1,12 +1,13 @@
 DROP TABLE IF EXISTS `creature_template_model`;
 CREATE TABLE `creature_template_model`(
   `CreatureID` int unsigned NOT NULL,
-  `Idx` int unsigned NOT NULL DEFAULT '0',
+  `Idx` smallint unsigned NOT NULL DEFAULT '0',
   `CreatureDisplayID` int unsigned NOT NULL,
   `DisplayScale` float NOT NULL DEFAULT '1',
   `Probability` float NOT NULL DEFAULT '0',
   `VerifiedBuild` smallint unsigned,
-  PRIMARY KEY (`CreatureID`,`Idx`)
+  PRIMARY KEY (`CreatureID`,`Idx`),
+  CONSTRAINT creature_template_model_chk_1 CHECK (`Idx` <= 3)
 ) ENGINE=InnoDB CHARSET=utf8mb4;
 
 INSERT IGNORE INTO `creature_template_model` (`CreatureID`,`Idx`,`CreatureDisplayID`,`DisplayScale`,`Probability`,`VerifiedBuild`) SELECT `entry`,0,`modelid1`,`scale`,1,`VerifiedBuild` FROM `creature_template` WHERE `modelid1`!=0;
