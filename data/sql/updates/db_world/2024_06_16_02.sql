@@ -1,3 +1,4 @@
+-- DB update 2024_06_16_01 -> 2024_06_16_02
 UPDATE `creature_model_info` SET `BoundingRadius` = 2.10000014305114746                                        WHERE `DisplayID` = 21174;
 UPDATE `creature_model_info` SET `BoundingRadius` = 80,                   `CombatReach` = 24                   WHERE `DisplayID` = 21145;
 UPDATE `creature_model_info` SET                                          `CombatReach` = 5.774999618530273437 WHERE `DisplayID` = 21443;
