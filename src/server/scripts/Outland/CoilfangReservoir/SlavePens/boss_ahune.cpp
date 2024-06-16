@@ -53,6 +53,7 @@ enum Spells
     SPELL_RESURFACE          = 46402,
     SPELL_SUBMERGED          = 37751,
     SPELL_STAND              = 37752,
+    SPELL_BIRTH              = 37745,
 
     //Earther Ring Flamecaller
     SPELL_FIND_OPENING_VISUAL   = 45964,
@@ -232,6 +233,7 @@ struct boss_ahune : public BossAI
         switch (eventId)
         {
         case EVENT_INITIAL_EMERGE:
+            DoCastSelf(SPELL_BIRTH);
             DoCastSelf(SPELL_STAND);
             DoCastSelf(SPELL_AHUNE_SPANKY_HANDS);
             DoCastSelf(SPELL_AHUNES_SHIELD);
@@ -260,6 +262,7 @@ struct boss_ahune : public BossAI
         DoCastSelf(SPELL_AHUNES_SHIELD);
         me->RemoveAurasDueToSpell(SPELL_AHUNE_SELF_STUN);
         me->RemoveAurasDueToSpell(SPELL_STAY_SUBMERGED);
+        DoCastSelf(SPELL_BIRTH);
         DoCastSelf(SPELL_STAND);
         DoCastSelf(SPELL_RESURFACE, true);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
