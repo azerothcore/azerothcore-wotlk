@@ -1,3 +1,4 @@
+-- DB update 2024_06_15_04 -> 2024_06_16_00
 DROP TABLE IF EXISTS `creature_template_model`;
 CREATE TABLE `creature_template_model`(
   `CreatureID` int unsigned NOT NULL,
