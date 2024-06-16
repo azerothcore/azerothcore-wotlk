@@ -451,7 +451,6 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
 
         uint32 moneyRew = 0;
         Player* player = _session->GetPlayer();
-        uint8 playerLevel = player ? player->GetLevel() : 0;
         if (player && (player->getLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player)))
         {
             moneyRew = quest->GetRewMoneyMaxLevel();
@@ -704,7 +703,6 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
 
     uint32 moneyRew = 0;
     Player* player = _session->GetPlayer();
-    uint8 playerLevel = player ? player->GetLevel() : 0;
     if (player && (player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player)))
     {
         moneyRew = quest->GetRewMoneyMaxLevel();
