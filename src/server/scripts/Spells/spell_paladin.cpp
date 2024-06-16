@@ -94,7 +94,8 @@ enum PaladinSpells
 
     SPELL_PALADIN_HOLY_VENGEANCE                 = 31803,
     SPELL_PALADIN_BLOOD_CORRUPTION               = 53742,
-    SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT       = 42463
+    SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT       = 42463,
+    SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT      = 53739
 };
 
 enum PaladinSpellIcons
@@ -1114,6 +1115,11 @@ class spell_pal_seal_of_righteousness : public AuraScript
 class spell_pal_seal_of_vengeance : public SpellScript
 {
     PrepareSpellScript(spell_pal_seal_of_vengeance);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT, SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT });
+    }
 
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {

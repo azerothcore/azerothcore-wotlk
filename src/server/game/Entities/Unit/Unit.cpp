@@ -7842,7 +7842,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 }
                             }
 
-                            CastSpell(victim, 42463, true, castItem, triggeredByAura);
+                            CastSpell(victim, 42463, true, castItem, triggeredByAura); // Seal of Vengeance
 
                             if (!stacker)
                                 return false;
@@ -7873,7 +7873,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 }
                             }
 
-                            CastSpell(victim, 53739, true, castItem, triggeredByAura);
+                            CastSpell(victim, 53739, true, castItem, triggeredByAura); // Seal of Corruption
 
                             if (!stacker)
                                 return false;
