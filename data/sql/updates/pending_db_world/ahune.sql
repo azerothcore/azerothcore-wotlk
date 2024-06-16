@@ -12,13 +12,6 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_earthen_ring_flamecaller' WHE
 UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 0x02000000, `MovementType` = 2 WHERE `entry` IN (25964, 25965, 25966); -- Shaman Beam Bunnies
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 0x00000080, `ScriptName` = 'npc_ahune_ice_spear_bunny' WHERE `entry` = 25985; -- Ahune Ice Spear Bunny
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 0x00000002 | 0x00000080 WHERE `entry` = 26239;
--- UPDATE `creature` SET `orientation`=2.408554 WHERE `guid`=202734; -- Luma
--- UPDATE `creature` SET `orientation`=3.804818 WHERE `guid`=202737; -- Flamecaller -- Not necessary, revamping spawns from sniffs
--- UPDATE `creature_template` SET `unit_flags`=33554688 WHERE `entry`=25865; -- 40 > 94.5 (does not match brute), (131072+4) > (33554432+256)
--- UPDATE `creature_template` SET `HealthModifier`=18.8 WHERE `entry`=25755; -- 8 > 18.8 -- Does not match brute
--- UPDATE `creature_template` SET `HealthModifier`=3.538 WHERE `entry`=25756; -- 1.5 > 3.538 -- Does not match brute
--- UPDATE `creature_template` SET `HealthModifier`=1.5 WHERE `entry`=25757; -- No change
--- UPDATE `creature_template` SET `HealthModifier`=4 WHERE `entry`=40446; -- No change
 
 UPDATE `gameobject_template` SET `ScriptName` = 'go_ahune_ice_spear' WHERE `entry` = 188077; -- Ice Spear
 
@@ -48,30 +41,6 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (46398, 'spell_ice_bombardment_dest_picker');
 
 UPDATE `creature_text` SET `comment` = 'Ahune Bunny - EMOTE_EARTHEN_ASSAULT' WHERE `CreatureID` = 25745 AND `id` = 0; -- Missing space before hyphen
-
-/*
-DELETE FROM `creature_text` WHERE `entry` IN (25754, 25697, 40446);
-INSERT INTO `creature_text` (`entry`, `groupid`, `id`, `text`, `type`, `language`, `probability`, `emote`, `duration`, `sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
-(25745,0,0,'The Earthen Ring\'s Assault Begins.',41,0,100,0,0,0,24930,1,'Ahune Bunny - EMOTE_EARTHEN_ASSAULT'),
-(25754,0,0,'Ahune Retreats.  His defenses diminish.',41,0,100,0,0,0,24931,1,'Earthen Ring Flamecaller - EMOTE_RETREAT'),
-(25754,1,0,'Ahune will soon resurface.',41,0,100,0,0,0,24932,1,'Earthen Ring Flamecaller - EMOTE_RESURFACE'),
-(40446,0,0,'How DARE you! You will not stop the coming of Lord Ahune!',14,0,100,0,0,0,40437,0,'Skar\'this the Summoner'),
-(25697,0,0,'The Ice Stone has melted!',14,0,100,0,0,0,24895,0,'Luma Skymother - SAY_PLAYER_1'),
-(25697,1,0,'Ahune, your strength grows no more!',14,0,100,0,0,0,24893,0,'Luma Skymother - SAY_PLAYER_2'),
-(25697,2,0,'Your frozen reign will not come to pass!',14,0,100,0,0,0,24894,0,'Luma Skymother - SAY_PLAYER_3');
-*/
-
-/*
-DELETE FROM `gossip_menu` WHERE `entry`=11389;
-INSERT INTO `gossip_menu` VALUES
-(11389,15864);
-*/
-
-/*
-DELETE FROM `gossip_menu_option` WHERE `menu_id`=11389;
-INSERT INTO `gossip_menu_option` (`menu_id`,`id`,`option_icon`,`option_text`,`OptionBroadcastTextID`,`option_id`,`npc_option_npcflag`,`action_menu_id`,`action_poi_id`,`box_coded`,`box_money`,`box_text`,`BoxBroadcastTextID`) VALUES
-(11389,1,0,'Disturb the stone and summon Lord Ahune.',40443,1,1,0,0,0,0,NULL,0);
-*/
 
 DELETE FROM `creature_template_addon` WHERE `entry` IN (25740, 25754, 25755, 25865, 25952, 25985);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `visibilityDistanceType`, `auras`) VALUES
@@ -187,55 +156,6 @@ DELETE FROM `smart_scripts` WHERE `entryorguid` = 25757 AND `source_type` = 0;
 INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type`,`event_phase_mask`,`event_chance`,`event_flags`,`event_param1`,`event_param2`,`event_param3`,`event_param4`,`action_type`,`action_param1`,`action_param2`,`action_param3`,`action_param4`,`action_param5`,`action_param6`,`target_type`,`target_param1`,`target_param2`,`target_param3`,`target_x`,`target_y`,`target_z`,`target_o`,`comment`) VALUES
 (25757,0,0,0,54,0,100,0,0,0,0,0,11,12550,0,0,0,0,0,1,0,0,0,0,0,0,0,'Ahunite Frostwind - On Just Summoned - Cast \'Lightning Shield\''),
 (25757,0,1,0,0,0,100,0,2000,2000,5000,7000,11,46568,0,0,0,0,0,18,120,0,0,0,0,0,0,'Ahunite Frostwind - In Combat - Cast \'Wind Buffet\'');
-
-/*
-DELETE FROM `item_loot_template` WHERE `entry`=35512;
-INSERT INTO `item_loot_template` (`Entry`,`Item`,`Reference`,`Chance`,`QuestRequired`,`LootMode`,`GroupId`,`MinCount`,`MaxCount`,`Comment`) VALUES
-(35512,17202,0,100,0,1,0,2,5,NULL);
--- Commented cause loot scary
-DELETE FROM `item_loot_template` WHERE `Entry`=54536;
-INSERT INTO `item_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`) VALUES
-(54536, 54806, 0, 3, 0, 1, 0, 1, 1),
-(54536, 23247, 0, 100, 0, 1, 1, 5, 10),
-(54536, 53641, 0, 3, 0, 1, 0, 1, 1);
-*/
-
-/*
-DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID AND @CGUID+8;
-INSERT INTO `creature` (`guid`,`id`,`map`,`spawnMask`,`phaseMask`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`MovementType`,`npcflag`,`unit_flags`,`dynamicflags`) VALUES
-(@CGUID,25745,547,1,1,0,0,-96.64146,-230.8864,4.780959,1.413717,300,0,0,1,1,0,0,0,0), -- [PH] Ahune Summon Loc Bunny
-(@CGUID+1,25964,547,1,1,0,0,-90.00211,-224.9285,-1.378754,2.956095,300,0,0,1,1,2,0,0,0), -- Shaman Beam Bunny 000
-(@CGUID+2,25965,547,1,1,0,0,-97.39627,-223.761,-1.494899,0.9130945,300,0,0,1,1,2,0,0,0), -- Shaman Beam Bunny 001
-(@CGUID+3,25966,547,1,1,0,0,-103.3054,-224.0149,0.5259815,5.676991,300,0,0,1,1,2,0,0,0), -- Shaman Beam Bunny 002
-(@CGUID+4,26190,547,1,1,0,0,-95.33572,-207.4834,16.28742,4.904375,300,0,0,1,1,0,0,0,0), -- [PH] Spank Target Bunny
-(@CGUID+5,25952,547,1,1,0,0,-96.64146,-230.8864,4.780959,1.413717,300,0,0,1,1,0,0,0,0), -- Slippery Floor Bunny
-(@CGUID+6,25952,547,1,1,0,0,-69.83901,-162.474,-2.303646,2.513274,300,0,0,1,1,0,0,0,0), -- Slippery Floor Bunny
-(@CGUID+7,26239,547,1,1,0,0,-99.10214,-233.1872,-1.22297,1.466077,300,0,0,1,1,0,0,0,0), -- Ghost of Ahune
-(@CGUID+8,25746,547,1,1,0,0,-96.8723,-212.8425,-1.149142,4.153883,300,0,0,1,1,0,0,0,0); -- [PH] Ahune Loot Loc Bunny
-
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID AND @OGUID+19;
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
-(@OGUID+0, 187882, 547, 0, 0, 1, 1, -69.90455, -162.2449, -2.366563, 2.426008, 0, 0, 0.9366722, 0.3502074, 120, 255, 1,0), -- Icestone
-(@OGUID+1, 188067, 547, 0, 0, 1, 1,-79.397, -219.7025, -4.042892, -2.199115, 0, 0, -0.8910065, 0.4539906, 120, 255, 1, 0), -- Ice Block
-(@OGUID+2, 188067, 547, 0, 0, 1, 1, -115.5985, -162.7724, -1.924025, -0.5585039, 0, 0, -0.2756367, 0.9612619, 120, 255, 1, 0), -- Ice Block
-(@OGUID+3, 188067, 547, 0, 0, 1, 1, -71.89625, -145.4974, -1.551813, -1.954766, 0, 0, -0.8290367, 0.5591941, 120, 255, 1, 0), -- Ice Block
-(@OGUID+4, 188067, 547, 0, 0, 1, 1, -49.27251, -168.9859, -1.898811, 2.007128, 0, 0, 0.8433914, 0.5372996, 120, 255, 1, 0), -- Ice Block
-(@OGUID+5, 188067, 547, 0, 0, 1, 1, -75.95139, -182.771, -4.882017, -1.151916, 0, 0, -0.5446386, 0.8386708, 120, 255, 1, 0), -- Ice Block
-(@OGUID+6, 188067, 547, 0, 0, 1, 1, -83.52528, -172.1806, -3.816522, 0.01745246, 0, 0, 0.00872612, 0.9999619, 120, 255, 1, 0), -- Ice Block
-(@OGUID+7, 188067, 547, 0, 0, 1, 1, -83.52528, -217.3293, -3.0728, -0.4886912, 0, 0, -0.2419214, 0.9702958, 120, 255, 1, 0), -- Ice Block
-(@OGUID+8, 188072, 547, 0, 0, 1, 1, -71.48915, -160.7316, -4.18569, -0.4188786, 0, 0, -0.2079115, 0.9781476, 120, 255, 1, 0), -- Ice Stone Mount
-(@OGUID+9, 188072, 547, 0, 0, 1, 1, -69.21773, -163.491, -2.044773, 2.967041, 0, 0, 0.9961939, 0.08716504, 120, 255, 1, 0), -- Ice Stone Mount
-(@OGUID+10, 188072, 547, 0, 0, 1, 1, -71.82486, -164.475, -3.962982, -0.9250239, 0, 0, -0.4461975, 0.8949345, 120, 255, 1, 0), -- Ice Stone Mount
-(@OGUID+11, 188072, 547, 0, 0, 1, 1, -69.20837, -160.345, -4.25643, 1.850049, 0, 0, 0.7986355, 0.601815, 120, 255, 1, 0), -- Ice Stone Mount
-(@OGUID+12, 188073, 547, 0, 0, 1, 1, -89.75205, -113.5002, -2.709442, 0.453785, 0, 0, 0.2249508, 0.9743701, 120, 255, 1, 0), -- Ahune Bonfire
-(@OGUID+13, 188073, 547, 0, 0, 1, 1,-114.9574, -117.3017, -2.71, 2.007128, 0, 0, 0.8433914, 0.5372996, 120, 255, 1, 0), -- Ahune Bonfire
-(@OGUID+14, 188142, 547, 0, 0, 1, 1,  -74.65959, -243.8125, -2.735999, 2.216565, 0, 0, 0.8949337, 0.4461992, 120, 255, 1, 0), -- Ice Block, Big
-(@OGUID+15, 188142, 547, 0, 0, 1, 1, -72.75314, -185.1547, -4.930593, 0.157079, 0, 0, 0.07845879, 0.9969174, 120, 255, 1, 0), -- Ice Block, Big
-(@OGUID+16, 188142, 547, 0, 0, 1, 1, -103.7134, -245.5041, -1.377881, -1.291542, 0, 0, -0.6018143, 0.7986361, 120, 255, 1, 0), -- Ice Block, Big
-(@OGUID+17, 188142, 547, 0, 0, 1, 1, -118.9196, -204.8023, -1.504161, 1.919862, 0, 0, 0.8191519, 0.5735767, 120, 255, 1, 0), -- Ice Block, Big
-(@OGUID+18, 188142, 547, 0, 0, 1, 1, -117.3857, -165.9649, -2.018646, 0.5585039, 0, 0, 0.2756367, 0.9612619, 120, 255, 1, 0), -- Ice Block, Big
-(@OGUID+19, 188142, 547, 0, 0, 1, 1, -75.42784, -221.16, -2.882941, 0.4886912, 0, 0, 0.2419214, 0.9702958, 120, 255, 1, 0); -- Ice Block, Big
-*/
 
 -- Clean up spawns
 DELETE FROM `creature` WHERE `guid` IN (202734, 202735, 202736, 202737, 245704, 245800, 245801, 245810, 245811, 245812);
@@ -395,40 +315,3 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (@PATH+20,10,-90.07465,-229.0938,16.58224,0,0,0,100,0),
 (@PATH+20,11,-88.24558,-231.7715,22.47455,0,0,0,100,0),
 (@PATH+20,12,-91.0969,-232.6422,24.65563,0,0,0,100,0);
-
-/*
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID AND @CGUID+8 AND `eventEntry`=1;
-INSERT INTO `game_event_creature` (`eventEntry`,`guid`) VALUES
-(1,@CGUID),
-(1,@CGUID+1),
-(1,@CGUID+2),
-(1,@CGUID+3),
-(1,@CGUID+4),
-(1,@CGUID+5),
-(1,@CGUID+6),
-(1,@CGUID+7),
-(1,@CGUID+8);
-
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @OGUID AND @OGUID+19 AND `eventEntry`=1;
-INSERT INTO `game_event_gameobject` (`eventEntry`,`guid`) VALUES
-(1,@OGUID),
-(1,@OGUID+1),
-(1,@OGUID+2),
-(1,@OGUID+3),
-(1,@OGUID+4),
-(1,@OGUID+5),
-(1,@OGUID+6),
-(1,@OGUID+7),
-(1,@OGUID+8),
-(1,@OGUID+9),
-(1,@OGUID+10),
-(1,@OGUID+11),
-(1,@OGUID+12),
-(1,@OGUID+13),
-(1,@OGUID+14),
-(1,@OGUID+15),
-(1,@OGUID+16),
-(1,@OGUID+17),
-(1,@OGUID+18),
-(1,@OGUID+19);
-*/
