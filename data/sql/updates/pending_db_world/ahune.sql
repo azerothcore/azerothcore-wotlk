@@ -13,6 +13,8 @@ UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 0x02000000, `Moveme
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 0x00000080, `ScriptName` = 'npc_ahune_ice_spear_bunny' WHERE `entry` = 25985; -- Ahune Ice Spear Bunny
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 0x00000002 | 0x00000080 WHERE `entry` = 26239;
 
+UPDATE `creature_model_info` SET `BoundingRadius` = 7.1468, `CombatReach` = 22 WHERE `DisplayID` = 23447;
+
 UPDATE `gameobject_template` SET `ScriptName` = 'go_ahune_ice_spear' WHERE `entry` = 188077; -- Ice Spear
 
 DELETE FROM `creature_template_movement` WHERE `CreatureId` = 26190;
