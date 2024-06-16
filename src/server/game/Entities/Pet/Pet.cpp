@@ -256,6 +256,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
     if (current && owner->IsPetNeedBeTemporaryUnsummoned())
     {
+        owner->SetLastPetSpell(petInfo->CreatedBySpellId);
         owner->SetTemporaryUnsummonedPetNumber(petInfo->PetNumber);
         return false;
     }
