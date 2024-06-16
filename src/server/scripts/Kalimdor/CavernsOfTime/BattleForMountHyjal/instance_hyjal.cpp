@@ -92,7 +92,7 @@ public:
 
         void Initialize() override
         {
-            _bossWave = 0;
+            _bossWave = TO_BE_DECIDED;
             _retreat = 0;
             trash = 0;
             _currentWave = 0;
@@ -185,12 +185,12 @@ public:
                 case NPC_GARGO:
                 case NPC_FROST:
                 case NPC_INFER:
-                    if (_bossWave)
+                    if (_bossWave != TO_BE_DECIDED)
                         creature->AI()->DoAction(_bossWave);
                     else if (_retreat)
                         creature->AI()->DoAction(_retreat);
 
-                    if (creature->IsSummon() && _bossWave)
+                    if (creature->IsSummon() && _bossWave != TO_BE_DECIDED)
                     {
                         DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, ++trash);    // Update the instance wave count on new trash spawn
                         _encounterNPCs.insert(creature->GetGUID());             // Used for despawning on wipe
@@ -228,7 +228,7 @@ public:
                     case NPC_STALK:
                         if (creature->IsSummon())
                         {
-                            if (_bossWave)
+                            if (_bossWave != TO_BE_DECIDED)
                             {
                                 DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, --trash);    // Update the instance wave count on new trash death
                                 _encounterNPCs.erase(creature->GetGUID());    // Used for despawning on wipe
@@ -268,7 +268,7 @@ public:
             switch (type)
             {
                 case DATA_ALLIANCE_RETREAT:
-                    _bossWave = 0;
+                    _bossWave = TO_BE_DECIDED;
                     _retreat = DATA_ALLIANCE_RETREAT;
                     // Spawn Ancient Gems
                     for (ObjectGuid const& guid : _ancientGemAlliance)
@@ -317,7 +317,7 @@ public:
                     SaveToDB();
                     break;
                 case DATA_HORDE_RETREAT:
-                    _bossWave = 0;
+                    _bossWave = TO_BE_DECIDED;
                     _retreat = DATA_HORDE_RETREAT;
                     for (ObjectGuid const& guid : _ancientGemHorde)
                     {
@@ -364,7 +364,7 @@ public:
                     _retreat = 0;
                     if (GetBossState(DATA_WINTERCHILL) != DONE)
                     {
-                        if (!_bossWave)
+                        if (_bossWave == TO_BE_DECIDED)
                             for (ObjectGuid const& guid : _baseAlliance)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
@@ -373,7 +373,7 @@ public:
                     }
                     else if (GetBossState(DATA_ANETHERON) != DONE)
                     {
-                        if (!_bossWave)
+                        if (_bossWave == TO_BE_DECIDED)
                             for (ObjectGuid const& guid : _baseAlliance)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
@@ -382,7 +382,7 @@ public:
                     }
                     else if (GetBossState(DATA_KAZROGAL) != DONE)
                     {
-                        if (!_bossWave)
+                        if (_bossWave == TO_BE_DECIDED)
                             for (ObjectGuid const& guid : _baseHorde)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
@@ -391,7 +391,7 @@ public:
                     }
                     else if (GetBossState(DATA_AZGALOR) != DONE)
                     {
-                        if (!_bossWave)
+                        if (_bossWave == TO_BE_DECIDED)
                             for (ObjectGuid const& guid : _baseHorde)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
@@ -404,7 +404,7 @@ public:
                         ScheduleWaves(1ms, START_WAVE_NIGHT_ELF, MAX_WAVES_NIGHT_ELF, hyjalNightElfWaveTimers[0]);
                     }
 
-                    if (_bossWave)
+                    if (_bossWave != TO_BE_DECIDED)
                         DoUpdateWorldState(WORLD_STATE_WAVES, 0);
 
                     break;
@@ -460,7 +460,7 @@ public:
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon();
 
-                    if (_bossWave && (GetBossState(_bossWave) != DONE))
+                    if (_bossWave != TO_BE_DECIDED && (GetBossState(_bossWave) != DONE))
                         SetBossState(_bossWave, NOT_STARTED);
 
                     SetData(DATA_RESET_WAVES, 0);
@@ -471,7 +471,7 @@ public:
                     _summonedNPCs.clear();
                     _currentWave = 0;
                     trash = 0;
-                    _bossWave = 0;
+                    _bossWave = TO_BE_DECIDED;
                     _retreat = 0;
                     DoUpdateWorldState(WORLD_STATE_WAVES, _currentWave);
                     DoUpdateWorldState(WORLD_STATE_ENEMY, trash);
