@@ -1,3 +1,4 @@
+-- DB update 2024_06_16_02 -> 2024_06_16_03
 --
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (57491, 60241);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
