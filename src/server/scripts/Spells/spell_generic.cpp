@@ -114,7 +114,7 @@ private:
     bool _hasFlag;
 };
 
-enum flagOfOwnership
+enum FlagOfOwnership
 {
     TEXT_FLAG_OF_OWNERSHIP  = 28008,
     SPELL_TAUNT_FLAG        = 52605
