@@ -353,8 +353,12 @@ public:
                     me->SetSheath(SHEATH_STATE_UNARMED);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                     if (InstanceScript* instance = me->GetInstanceScript())
-                        if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_RAZUVIOUS)))
-                            me->SetFacingToObject(cr);
+                    {
+                        if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_RAZUVIOUS)))
+                        {
+                            me->SetFacingToObject(creature);
+                        }
+                    }
                     break;
                 case ACTION_TALK:
                     Talk(SAY_DEATH_KNIGHT_UNDERSTUDY);
