@@ -409,8 +409,6 @@ struct boss_archimonde : public BossAI
         {
             if (Creature* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
             {
-                doomfireSpirit->SetVisible(false);
-                doomfire->SetVisible(false);
                 doomfireSpirit->SetWalk(false);
                 doomfireSpirit->SetReactState(REACT_PASSIVE);
                 doomfire->SetReactState(REACT_PASSIVE);
