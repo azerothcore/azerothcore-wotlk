@@ -48,11 +48,6 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
-enum broadcastTextIDs
-{
-    BROADCAST_TEXT_FLAG_OF_OWNERSHIP     = 28008
-};
-
 // 46642 - 5,000 Gold
 class spell_gen_5000_gold : public SpellScript
 {
@@ -119,6 +114,12 @@ private:
     bool _hasFlag;
 };
 
+enum flagOfOwnership
+{
+    TEXT_FLAG_OF_OWNERSHIP  = 28008,
+    SPELL_TAUNT_FLAG        = 52605
+};
+
 // 51640 - Taunt Flag Targeting
 class spell_the_flag_of_ownership : public SpellScript
 {
@@ -139,10 +140,10 @@ class spell_the_flag_of_ownership : public SpellScript
         Player* target = GetHitPlayer();
         if (!target)
             return;
-        caster->CastSpell(target, 52605, true); /*Taunt Flag*/
+        caster->CastSpell(target, SPELL_TAUNT_FLAG, true);
 
         LocaleConstant loc_idx = caster->ToPlayer()->GetSession()->GetSessionDbLocaleIndex();
-        BroadcastText const* bct = sObjectMgr->GetBroadcastText(BROADCAST_TEXT_FLAG_OF_OWNERSHIP);
+        BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_FLAG_OF_OWNERSHIP);
         std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName().c_str(), target->GetName().c_str());
         caster->Talk(bctMsg, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
 
