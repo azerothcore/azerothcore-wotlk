@@ -1,11 +1,11 @@
 DROP TABLE IF EXISTS `creature_template_model`;
 CREATE TABLE `creature_template_model`(
-  `CreatureID` int(10) unsigned NOT NULL,
-  `Idx` int(10) unsigned NOT NULL DEFAULT '0',
-  `CreatureDisplayID` int(10) unsigned NOT NULL,
+  `CreatureID` int unsigned NOT NULL,
+  `Idx` int unsigned NOT NULL DEFAULT '0',
+  `CreatureDisplayID` int unsigned NOT NULL,
   `DisplayScale` float NOT NULL DEFAULT '1',
   `Probability` float NOT NULL DEFAULT '0',
-  `VerifiedBuild` smallint(5) unsigned NOT NULL,
+  `VerifiedBuild` smallint unsigned,
   PRIMARY KEY (`CreatureID`,`Idx`)
 ) ENGINE=InnoDB CHARSET=utf8mb4;
 
