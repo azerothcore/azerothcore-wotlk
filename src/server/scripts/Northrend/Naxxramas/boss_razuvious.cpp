@@ -387,10 +387,13 @@ public:
         void JustEngagedWith(Unit* who) override
         {
             scheduler.CancelGroup(GROUP_OOC_RP);
-            if (Creature* cr = me->FindNearestCreature(NPC_RAZUVIOUS, 100.0f))
+            if (InstanceScript* instance = me->GetInstanceScript())
             {
-                cr->SetInCombatWithZone();
-                cr->AI()->AttackStart(who);
+                if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_RAZUVIOUS)))
+                {
+                    creature->SetInCombatWithZone();
+                    creature->AI()->AttackStart(who);
+                }
             }
         }
 
