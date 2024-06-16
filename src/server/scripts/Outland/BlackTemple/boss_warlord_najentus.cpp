@@ -43,12 +43,19 @@ enum Spells
 
 enum Events
 {
-    EVENT_TALK_CHECK                = 1
+    EVENT_TALK_CHECK                = 1,
+    EVENT_ENRAGE                    = 2
 };
 
 struct boss_najentus : public BossAI
 {
     boss_najentus(Creature* creature) : BossAI(creature, DATA_HIGH_WARLORD_NAJENTUS), _canTalk(true) { }
+
+    void Reset() override
+    {
+        _Reset();
+        me->m_Events.CancelEventGroup(EVENT_ENRAGE);
+    }
 
     void JustEngagedWith(Unit* who) override
     {
@@ -60,7 +67,7 @@ struct boss_najentus : public BossAI
         me->m_Events.AddEventAtOffset([this] {
             Talk(SAY_ENRAGE);
             DoCastSelf(SPELL_BERSERK, true);
-        }, 8min);
+        }, 8min, EVENT_ENRAGE);
 
         ScheduleTimedEvent(25s, 100s, [&]
         {
