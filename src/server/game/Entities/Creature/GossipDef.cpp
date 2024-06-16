@@ -25,7 +25,6 @@
 #include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
-#include "SpellAuraEffects.h"
 
 GossipMenu::GossipMenu()
 {
@@ -462,12 +461,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
         uint32 questXp;
         if (player && !sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player))
         {
-            questXp = uint32(quest->XPValue(playerLevel) * player->GetQuestRate());
-
-            // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
-            Unit::AuraEffectList const& ModXPPctAuras = player->GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
-            for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
-                AddPct(questXp, (*i)->GetAmount());
+            questXp = player->CalculateQuestRewardXP(quest);
         }
         else
         {
@@ -720,12 +714,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
     uint32 questXp;
     if (player && !sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player))
     {
-        questXp = uint32(quest->XPValue(playerLevel) * player->GetQuestRate());
-
-        // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
-        Unit::AuraEffectList const& ModXPPctAuras = player->GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
-        for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
-            AddPct(questXp, (*i)->GetAmount());
+        questXp = player->CalculateQuestRewardXP(quest);
     }
     else
     {
