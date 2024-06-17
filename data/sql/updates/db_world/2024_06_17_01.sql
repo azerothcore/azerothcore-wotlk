@@ -1,3 +1,4 @@
+-- DB update 2024_06_17_00 -> 2024_06_17_01
 SET @OGUID := 1267; -- 21 free guids required
 SET @CGUID := 12529; -- 21 free guids required
 
