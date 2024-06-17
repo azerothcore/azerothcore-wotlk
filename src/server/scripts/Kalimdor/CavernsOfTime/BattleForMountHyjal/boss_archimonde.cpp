@@ -255,7 +255,7 @@ struct boss_archimonde : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* who) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
         me->InterruptNonMeleeSpells(false);
@@ -323,7 +323,7 @@ struct boss_archimonde : public BossAI
         instance->SetData(DATA_SPAWN_WAVES, 1);
     }
 
-    void KilledUnit(Unit* victim) override
+    void KilledUnit(Unit* /*victim*/) override
     {
         Talk(SAY_SLAY);
     }
