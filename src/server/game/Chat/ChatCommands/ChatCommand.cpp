@@ -322,7 +322,7 @@ namespace Acore::Impl::ChatCommands
         oldTail = newTail;
     }
 
-    if (!sScriptMgr->CanTryExecuteCommand(handler, cmdStr))
+    if (!sScriptMgr->OnTryExecuteCommand(handler, cmdStr))
         return true;
 
     /* if we matched a command at some point, invoke it */
