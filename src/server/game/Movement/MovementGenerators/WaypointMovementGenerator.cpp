@@ -200,7 +200,7 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
 
     //Call for creature group update
     if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
-        creature->GetFormation()->LeaderMoveTo(formationDest.x, formationDest.y, formationDest.z, node->move_type == WAYPOINT_MOVE_TYPE_RUN);
+        creature->GetFormation()->LeaderMoveTo(formationDest.x, formationDest.y, formationDest.z, node->move_type);
 
     return true;
 }
@@ -346,6 +346,27 @@ void FlightPathMovementGenerator::LoadPath(Player* player)
         }
 
         _pointsForPathSwitch.push_back({ uint32(i_path.size() - 1), int32(ceil(cost * discount)) });
+    }
+
+    // TODO: fixes crash, but can be handled in a better way once we will know how to reproduce it.
+    if (GetCurrentNode() >= i_path.size())
+    {
+        std::string paths;
+        std::deque<uint32> const& taxi = player->m_taxi.GetPath();
+        for (uint32 src = 0, dst = 1; dst < taxi.size(); src = dst++)
+        {
+            uint32 path, cost;
+            sObjectMgr->GetTaxiPath(taxi[src], taxi[dst], path, cost);
+            paths += std::to_string(path) + " ";
+        }
+
+        LOG_ERROR("movement.flightpath", "Failed to build correct path for player: {}. Current node: {}, max nodes: {}. Paths: {}. Player pos: {}.", player->GetGUID().ToString(), GetCurrentNode(), i_path.size(), paths, player->GetPosition().ToString());
+
+        // Lets choose the second last element so that a player would still have some flight.
+        if (int(i_path.size()) - 2 >= 0)
+            i_currentNode = uint32(i_path.size() - 2);
+        else
+            i_currentNode = uint32(i_path.size() - 1);
     }
 }
 

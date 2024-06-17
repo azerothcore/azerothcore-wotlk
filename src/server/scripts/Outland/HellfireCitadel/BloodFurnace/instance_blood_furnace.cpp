@@ -16,8 +16,8 @@
  */
 
 #include "CreatureAI.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
 #include "blood_furnace.h"
 
 DoorData const doorData[] =

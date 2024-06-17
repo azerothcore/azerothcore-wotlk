@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "zulgurub.h"
 
@@ -93,7 +94,7 @@ struct boss_jindo : public BossAI
 
     void EnterEvadeMode(EvadeReason evadeReason) override
     {
-        if (_EnterEvadeMode(evadeReason))
+        if (CreatureAI::_EnterEvadeMode(evadeReason))
         {
             Reset();
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCE);
@@ -321,3 +322,4 @@ void AddSC_boss_jindo()
     RegisterSpellScript(spell_random_aggro);
     RegisterSpellScript(spell_delusions_of_jindo);
 }
+

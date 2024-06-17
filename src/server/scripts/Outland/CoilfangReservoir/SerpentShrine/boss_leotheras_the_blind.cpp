@@ -16,9 +16,10 @@
  */
 
 #include "CreatureGroups.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "serpent_shrine.h"
 
@@ -93,8 +94,6 @@ struct boss_leotheras_the_blind : public BossAI
             }
 
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-
-            DoResetThreatList();
             me->ClearTarget();
             me->SendMeleeAttackStop();
             scheduler.CancelGroup(GROUP_DEMON);
@@ -111,6 +110,7 @@ struct boss_leotheras_the_blind : public BossAI
                 DoCastSelf(SPELL_SUMMON_SHADOW_OF_LEOTHERAS);
             }).Schedule(6s, [this](TaskContext)
             {
+                DoResetThreatList();
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetReactState(REACT_AGGRESSIVE);
@@ -137,6 +137,7 @@ struct boss_leotheras_the_blind : public BossAI
                     me->LoadEquipment();
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetInCombatWithZone();
                     Talk(SAY_AGGRO);
 
                     scheduler.Schedule(10min, [this](TaskContext)
@@ -166,17 +167,33 @@ struct boss_leotheras_the_blind : public BossAI
         });
     }
 
+    void MoveToTargetIfOutOfRange(Unit* target)
+    {
+        if (me->GetDistance2d(target) > 40.0f)
+        {
+            me->GetMotionMaster()->MoveChase(target, 5.0f, 0);
+            me->AddThreat(target, 0.0f);
+        }
+        else
+        {
+            me->GetMotionMaster()->Clear();
+        }
+    }
+
     void DemonTime()
     {
         DoResetThreatList();
         me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
         me->InterruptNonMeleeSpells(false);
         me->LoadEquipment(0, true);
-        me->GetMotionMaster()->MoveChase(me->GetVictim(), 25.0f);
         DoCastSelf(SPELL_METAMORPHOSIS, true);
 
         scheduler.CancelGroup(GROUP_COMBAT);
-        scheduler.Schedule(24250ms, GROUP_DEMON, [this](TaskContext)
+        scheduler.Schedule(1s, GROUP_DEMON, [this](TaskContext context)
+        {
+            MoveToTargetIfOutOfRange(me->GetVictim());
+            context.Repeat(1s);
+        }).Schedule(24250ms, GROUP_DEMON, [this](TaskContext)
         {
             Talk(SAY_INNER_DEMONS);
             me->CastCustomSpell(SPELL_INSIDIOUS_WHISPER, SPELLVALUE_MAX_TARGETS, 5, me, false);
@@ -186,6 +203,7 @@ struct boss_leotheras_the_blind : public BossAI
             me->LoadEquipment();
             me->GetMotionMaster()->MoveChase(me->GetVictim(), 0.0f);
             me->RemoveAurasDueToSpell(SPELL_METAMORPHOSIS);
+            scheduler.CancelGroup(GROUP_DEMON);
             ElfTime();
         });
     }
@@ -252,6 +270,11 @@ struct npc_inner_demon : public ScriptedAI
         {
             affectedPlayer->RemoveAurasDueToSpell(SPELL_INSIDIOUS_WHISPER);
         }
+    }
+
+    bool CanBeSeen(Player const* player) override
+    {
+        return player && player->GetGUID() == me->GetSummonerGUID();
     }
 
     bool CanReceiveDamage(Unit* attacker)
@@ -434,3 +457,4 @@ void AddSC_boss_leotheras_the_blind()
     RegisterSpellScript(spell_leotheras_demon_link);
     RegisterSpellScript(spell_leotheras_clear_consuming_madness);
 }
+

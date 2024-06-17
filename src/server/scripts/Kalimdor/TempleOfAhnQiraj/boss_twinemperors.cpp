@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -485,3 +487,4 @@ void AddSC_boss_twinemperors()
     new at_twin_emperors();
     RegisterSpellScript(spell_mutate_explode_bug);
 }
+

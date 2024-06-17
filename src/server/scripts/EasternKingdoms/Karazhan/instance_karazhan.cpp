@@ -17,12 +17,13 @@
 
 #include "Creature.h"
 #include "GameObject.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "karazhan.h"
 
 const Position OptionalSpawn[] =
@@ -626,3 +627,4 @@ void AddSC_instance_karazhan()
     new spell_karazhan_overload();
     new spell_karazhan_blink();
 }
+

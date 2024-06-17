@@ -18,7 +18,6 @@
 #include "GridNotifiers.h"
 #include "Map.h"
 #include "ObjectAccessor.h"
-#include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "Transport.h"
 #include "UpdateData.h"
@@ -100,7 +99,7 @@ void VisibleNotifier::SendToSelf()
         return;
 
     WorldPacket packet;
-    i_data.BuildPacket(&packet);
+    i_data.BuildPacket(packet);
     i_player.GetSession()->SendPacket(&packet);
 
     for (std::vector<Unit*>::const_iterator it = i_visibleNow.begin(); it != i_visibleNow.end(); ++it)

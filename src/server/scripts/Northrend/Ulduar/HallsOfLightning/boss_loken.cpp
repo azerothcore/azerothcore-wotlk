@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "halls_of_lightning.h"
 
 enum LokenSpells
@@ -289,3 +290,4 @@ void AddSC_boss_loken()
     new boss_loken();
     new spell_loken_pulsing_shockwave();
 }
+

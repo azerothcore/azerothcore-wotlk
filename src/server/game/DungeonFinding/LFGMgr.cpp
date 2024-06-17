@@ -34,6 +34,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "SpellAuras.h"
@@ -43,9 +44,6 @@ namespace lfg
 {
     LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false)
     {
-        new LFGPlayerScript();
-        new LFGGroupScript();
-
         for (uint8 team = 0; team < 2; ++team)
         {
             m_raidBrowserUpdateTimer[team] = 10000;
@@ -1057,7 +1055,7 @@ namespace lfg
                     baseAP = p->GetTotalAttackPowerValue(BASE_ATTACK);
                     rangedAP = p->GetTotalAttackPowerValue(RANGED_ATTACK);
                     maxPower = 0;
-                    if (p->getClass() == CLASS_DRUID)
+                    if (p->IsClass(CLASS_DRUID))
                         maxPower = p->GetMaxPower(POWER_MANA);
                     else
                         maxPower = (p->getPowerType() == POWER_RAGE || p->getPowerType() == POWER_RUNIC_POWER) ? p->GetMaxPower(p->getPowerType()) / 10 : p->GetMaxPower(p->getPowerType());

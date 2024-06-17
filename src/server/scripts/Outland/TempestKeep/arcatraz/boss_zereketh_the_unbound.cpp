@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "arcatraz.h"
 
 enum Say
@@ -111,3 +112,4 @@ void AddSC_boss_zereketh_the_unbound()
     RegisterArcatrazCreatureAI(boss_zereketh_the_unbound);
     RegisterSpellScript(spell_zereketh_seed_of_corruption);
 }
+

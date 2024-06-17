@@ -15,7 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
@@ -537,7 +538,7 @@ public:
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!canResurrectCheck && damage >= me->GetHealth())
+            if ((!canResurrectCheck || canResurrect) && damage >= me->GetHealth())
                 damage = me->GetHealth() - 1;
         }
 

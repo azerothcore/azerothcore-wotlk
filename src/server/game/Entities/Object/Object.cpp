@@ -186,7 +186,7 @@ void Object::BuildMovementUpdateBlock(UpdateData* data, uint32 flags) const
     data->AddUpdateBlock(buf);
 }
 
-void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
+void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
 {
     if (!target)
         return;
@@ -250,11 +250,11 @@ void Object::SendUpdateToPlayer(Player* player)
     WorldPacket packet;
 
     BuildCreateUpdateBlockForPlayer(&upd, player);
-    upd.BuildPacket(&packet);
+    upd.BuildPacket(packet);
     player->GetSession()->SendPacket(&packet);
 }
 
-void Object::BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const
+void Object::BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target)
 {
     ByteBuffer buf(500);
 
@@ -494,7 +494,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     }
 }
 
-void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
+void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 {
     if (!target)
         return;
@@ -542,7 +542,7 @@ void Object::ClearUpdateMask(bool remove)
     }
 }
 
-void Object::BuildFieldsUpdate(Player* player, UpdateDataMapType& data_map) const
+void Object::BuildFieldsUpdate(Player* player, UpdateDataMapType& data_map)
 {
     UpdateDataMapType::iterator iter = data_map.find(player);
 
@@ -2883,6 +2883,22 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= nullptr*/)
         SendMessageToSet(WorldPackets::Misc::Playsound(sound_id).Write(), true);
 }
 
+void WorldObject::PlayRadiusSound(uint32 sound_id, float radius)
+{
+    std::list<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
+    {
+        if (player)
+        {
+            player->SendDirectMessage(WorldPackets::Misc::Playsound(sound_id).Write());
+        }
+    }
+}
+
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
 {
     if (target)
@@ -2892,6 +2908,22 @@ void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
     else
     {
         SendMessageToSet(WorldPackets::Misc::PlayMusic(music_id).Write(), true);
+    }
+}
+
+void WorldObject::PlayRadiusMusic(uint32 music_id, float radius)
+{
+    std::list<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
+    {
+        if (player)
+        {
+            player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music_id).Write());
+        }
     }
 }
 

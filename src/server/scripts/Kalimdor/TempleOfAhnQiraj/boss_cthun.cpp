@@ -15,18 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "temple_of_ahnqiraj.h"
 /* ScriptData
 SDName: Boss_Cthun
 SD%Complete: 95
 SDComment: Darkglare tracking issue
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
@@ -146,7 +147,7 @@ struct boss_eye_of_cthun : public BossAI
 {
     boss_eye_of_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         me->m_SightDistance = 90.f;
     }
 
@@ -376,7 +377,7 @@ struct boss_cthun : public BossAI
 {
     boss_cthun(Creature* creature) : BossAI(creature, DATA_CTHUN)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
     }
 
     void Reset() override
@@ -596,7 +597,7 @@ struct npc_eye_tentacle : public ScriptedAI
             }
         }
 
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -650,7 +651,7 @@ struct npc_claw_tentacle : public ScriptedAI
 {
     npc_claw_tentacle(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
 
         if (Creature* portal = me->SummonCreature(NPC_SMALL_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
         {
@@ -719,7 +720,7 @@ struct npc_giant_claw_tentacle : public ScriptedAI
 {
     npc_giant_claw_tentacle(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
 
         if (Creature* portal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
         {
@@ -869,7 +870,7 @@ struct npc_giant_eye_tentacle : public ScriptedAI
 {
     npc_giant_eye_tentacle(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
 
         if (Creature* portal = me->SummonCreature(NPC_GIANT_PORTAL, *me, TEMPSUMMON_CORPSE_DESPAWN))
         {
@@ -1053,3 +1054,4 @@ void AddSC_boss_cthun()
     new at_cthun_stomach_exit();
     new at_cthun_center();
 }
+

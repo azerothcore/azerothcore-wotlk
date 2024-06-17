@@ -15,13 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "GameObject.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "karazhan.h"
 
@@ -105,9 +107,12 @@ struct boss_shade_of_aran : public BossAI
     void Reset() override
     {
         BossAI::Reset();
+        // Reset the mana of the boss fully before resetting drinking
+        // If this was omitted, the boss would start drinking on reset if the mana was low on a wipe
+        me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
         _drinkScheduler.CancelAll();
-        _lastSuperSpell = 0;
 
+        _lastSuperSpell = 0;
         _currentNormalSpell = 0;
 
         _drinking = false;
@@ -201,27 +206,28 @@ struct boss_shade_of_aran : public BossAI
     void OnPowerUpdate(Powers /*power*/, int32 /*gain*/, int32 /*updateVal*/, uint32 currentPower) override
     {
         // Should drink at 10%, need 10% mana for mass polymorph
-        if (!_hasDrunk && me->GetMaxPower(POWER_MANA) && (currentPower * 100 / me->GetMaxPower(POWER_MANA)) < 13)
+        if (!_hasDrunk && me->GetMaxPower(POWER_MANA) && (currentPower * 100 / me->GetMaxPower(POWER_MANA)) < 13.5)
         {
-            _drinking = true;
             _hasDrunk = true;
-            me->InterruptNonMeleeSpells(true);
-            me->RemoveAurasDueToSpell(SPELL_ARCANE_MISSILE);
-            Talk(SAY_DRINK);
             me->SetReactState(REACT_PASSIVE);
 
             // Start drinking after conjuring drinks
-            _drinkScheduler.Schedule(1s, GROUP_DRINKING, [this](TaskContext)
+            _drinkScheduler.Schedule(0s, GROUP_DRINKING, [this](TaskContext)
             {
+                me->InterruptNonMeleeSpells(true);
+                me->RemoveAurasDueToSpell(SPELL_ARCANE_MISSILE);
+                Talk(SAY_DRINK);
                 DoCastAOE(SPELL_MASS_POLY);
-            }).Schedule(2s, GROUP_DRINKING, [this](TaskContext)
+                // If we set drinking earlier it will break when someone attacks aran while casting poly
+                _drinking = true;
+            }).Schedule(3s, GROUP_DRINKING, [this](TaskContext)
             {
                 DoCastSelf(SPELL_CONJURE);
-            }).Schedule(4s, GROUP_DRINKING, [this](TaskContext)
+            }).Schedule(6s, GROUP_DRINKING, [this](TaskContext)
             {
                 me->SetStandState(UNIT_STAND_STATE_SIT);
                 DoCastSelf(SPELL_DRINK);
-            }).Schedule(10s, GROUP_DRINKING, [this](TaskContext)
+            }).Schedule(12s, GROUP_DRINKING, [this](TaskContext)
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->SetReactState(REACT_AGGRESSIVE);
@@ -301,7 +307,20 @@ struct boss_shade_of_aran : public BossAI
                 DoCastSelf(SPELL_BLINK_CENTER, true);
 
                 std::vector<uint32> superSpells = { SPELL_SUMMON_BLIZZARD, SPELL_AEXPLOSION, SPELL_FLAME_WREATH };
-                _lastSuperSpell = Acore::Containers::SelectRandomContainerElementIf(superSpells, [&](uint32 superSpell) -> bool { return superSpell != _lastSuperSpell; });
+
+                // Workaround for SelectRandomContainerElementIf
+                std::vector<uint32> allowedSpells;
+                std::copy_if(superSpells.begin(), superSpells.end(), std::back_inserter(allowedSpells), [&](uint32 superSpell) -> bool { return superSpell != _lastSuperSpell; });
+                _lastSuperSpell = allowedSpells[urand(0, allowedSpells.size() - 1)];
+
+                //  SelectRandomContainerElementIf produces unexpected output. Reintroduce when issue is resolved:
+                //  Sample results:
+                //       Selected Super Spell: 3722304989
+                //       superSpells elements : 29969 29973 30004
+                //  _lastSuperSpell = Acore::Containers::SelectRandomContainerElementIf(superSpells, [&](uint32 superSpell) -> bool { return superSpell != _lastSuperSpell; });
+
+                me->InterruptNonMeleeSpells(true); // Super spell should have prio over normal spells
+
                 switch (_lastSuperSpell)
                 {
                     case SPELL_AEXPLOSION:
@@ -474,3 +493,4 @@ void AddSC_boss_shade_of_aran()
     RegisterSpellScript(spell_flamewreath_aura);
     new at_karazhan_atiesh_aran();
 }
+

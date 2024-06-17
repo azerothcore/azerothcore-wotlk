@@ -21,6 +21,7 @@
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "Group.h"
+#include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "PetPackets.h"
@@ -104,6 +105,14 @@ void Pet::AddToWorld()
 
     if (GetOwnerGUID().IsPlayer())
     {
+        if (Player* owner = GetOwner())
+        {
+            if (getPetType() == SUMMON_PET && owner->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_PET))
+            {
+                owner->SetLastPetSpell(GetUInt32Value(UNIT_CREATED_BY_SPELL));
+            }
+        }
+
         sScriptMgr->OnPetAddToWorld(this);
     }
 }
@@ -229,7 +238,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     bool forceLoadFromDB = false;
     sScriptMgr->OnBeforeLoadPetFromDB(owner, petEntry, petnumber, current, forceLoadFromDB);
 
-    if (!forceLoadFromDB && (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet())) // DK Pet exception
+    if (!forceLoadFromDB && (owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET) && !owner->CanSeeDKPet())) // DK Pet exception
         return false;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(petInfo->CreatedBySpellId);
@@ -247,6 +256,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
     if (current && owner->IsPetNeedBeTemporaryUnsummoned())
     {
+        owner->SetLastPetSpell(petInfo->CreatedBySpellId);
         owner->SetTemporaryUnsummonedPetNumber(petInfo->PetNumber);
         return false;
     }
@@ -1034,12 +1044,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             if (petType == MAX_PET_TYPE)
             {
                 // The petType was not overwritten by the hook, continue with default initialization
-                if (owner->getClass() == CLASS_WARLOCK ||
-                        owner->getClass() == CLASS_SHAMAN ||          // Fire Elemental
-                        owner->getClass() == CLASS_DEATH_KNIGHT ||    // Risen Ghoul
-                        owner->getClass() == CLASS_MAGE)              // Water Elemental with glyph
+                if (owner->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_PET) ||
+                        owner->IsClass(CLASS_SHAMAN, CLASS_CONTEXT_PET) ||          // Fire Elemental
+                        owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET) ||    // Risen Ghoul
+                        owner->IsClass(CLASS_MAGE, CLASS_CONTEXT_PET))              // Water Elemental with glyph
                     petType = SUMMON_PET;
-                else if (owner->getClass() == CLASS_HUNTER)
+                else if (owner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET))
                 {
                     petType = HUNTER_PET;
                 }
@@ -1071,7 +1081,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
     uint32 attackTime = BASE_ATTACK_TIME;
-    if (owner->getClass() != CLASS_HUNTER && cinfo->BaseAttackTime >= 1000)
+    if (!owner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET) && cinfo->BaseAttackTime >= 1000)
         attackTime = cinfo->BaseAttackTime;
 
     SetAttackTime(BASE_ATTACK, attackTime);
@@ -1941,16 +1951,16 @@ void Pet::InitLevelupSpellsForLevel()
     {
         for (uint32 spellId : defSpells->spellid)
         {
-            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spellId);
-            if (!spellEntry)
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
                 continue;
 
             // will called first if level down
-            if (spellEntry->SpellLevel > level && sScriptMgr->CanUnlearnSpellDefault(this, spellEntry))
-                unlearnSpell(spellEntry->Id, true);
+            if (spellInfo->SpellLevel > level && sScriptMgr->CanUnlearnSpellDefault(this, spellInfo))
+                unlearnSpell(spellInfo->Id, true);
             // will called if level up
             else
-                learnSpell(spellEntry->Id);
+                learnSpell(spellInfo->Id);
         }
     }
 }
@@ -2290,17 +2300,14 @@ bool Pet::IsPermanentPetFor(Player* owner) const
     switch (getPetType())
     {
         case SUMMON_PET:
-            switch (owner->getClass())
-            {
-                case CLASS_WARLOCK:
-                    return GetCreatureTemplate()->type == CREATURE_TYPE_DEMON;
-                case CLASS_DEATH_KNIGHT:
-                    return GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD;
-                case CLASS_MAGE:
-                    return GetEntry() == 37994;
-                default:
-                    return false;
-            }
+            if (owner->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_PET))
+                return GetCreatureTemplate()->type == CREATURE_TYPE_DEMON;
+            else if (owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET))
+                return GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD;
+            else if (owner->IsClass(CLASS_MAGE, CLASS_CONTEXT_PET))
+                return GetEntry() == 37994;
+            else
+                return false;
         case HUNTER_PET:
             return true;
         default:
@@ -2411,9 +2418,9 @@ void Pet::SynchronizeLevelWithOwner()
     }
 }
 
-void Pet::SetDisplayId(uint32 modelId)
+void Pet::SetDisplayId(uint32 modelId, float displayScale /*= 1.f*/)
 {
-    Guardian::SetDisplayId(modelId);
+    Guardian::SetDisplayId(modelId, displayScale);
 
     if (!isControlled())
         return;

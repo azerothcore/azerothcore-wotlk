@@ -15,13 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 
 //
@@ -881,3 +882,4 @@ void AddSC_emerald_dragons()
     new spell_mark_of_nature();
     RegisterSpellScript(spell_shadow_bolt_whirl);
 };
+

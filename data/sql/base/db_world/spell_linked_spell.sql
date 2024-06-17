@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
   `spell_trigger` int NOT NULL,
   `spell_effect` int NOT NULL DEFAULT '0',
   `type` tinyint unsigned NOT NULL DEFAULT '0',
-  `comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `comment` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   UNIQUE KEY `trigger_effect_type` (`spell_trigger`,`spell_effect`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Spell System';
 
@@ -259,7 +259,7 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(29137, 29101, 1, 'Flame of Stormwind'),
 	(29138, 29132, 1, 'Flame of Thunder Bluff'),
 	(29139, 29133, 1, 'Flame of Undercity'),
-	(30658, 30571, 1, 'Magtheridon - Quake Trigger'),
+	(29683, 32214, 0, 'Spotlight 20% player buff'),
 	(30843, 41624, 0, 'Prince Enfeelble'),
 	(31286, 6608, 1, 'Lash: Cast \'Dropped Weapon\' (6608) on hit on the same target'),
 	(31606, 38776, 1, 'As the Crow Flies quest'),

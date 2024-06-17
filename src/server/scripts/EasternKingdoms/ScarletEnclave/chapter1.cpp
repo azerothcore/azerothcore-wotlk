@@ -16,17 +16,19 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
+#include "GameObjectScript.h"
 #include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 
  /*######
@@ -61,7 +63,7 @@ struct npc_eye_of_acherus : public ScriptedAI
 {
     npc_eye_of_acherus(Creature* creature) : ScriptedAI(creature)
     {
-        creature->SetDisplayId(creature->GetCreatureTemplate()->Modelid1);
+        creature->SetDisplayFromModel(0);
         creature->SetReactState(REACT_PASSIVE);
     }
 
@@ -966,7 +968,7 @@ public:
         {
             me->SetImmuneToAll(true);
             me->SetFaction(FACTION_FRIENDLY);
-            me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
+            me->SetDisplayFromModel(0); // Modelid2 is a horse.
         }
 
         ObjectGuid minerGUID;
@@ -1255,3 +1257,4 @@ void AddSC_the_scarlet_enclave_c1()
 
     RegisterSpellScript(spell_death_knight_initiate_visual);
 }
+

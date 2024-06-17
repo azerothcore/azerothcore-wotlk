@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "InstanceMapScript.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
@@ -1194,7 +1196,12 @@ public:
         {
             if (InstanceScript *instance = player->GetInstanceScript())
             {
-                if (instance->CheckRequiredBosses(BOSS_SAPPHIRON))
+                bool AreAllWingsCleared = instance->GetBossState(BOSS_MAEXXNA) == DONE
+                    && (instance->GetBossState(BOSS_LOATHEB) == DONE)
+                    && (instance->GetBossState(BOSS_THADDIUS) == DONE)
+                    && (instance->GetBossState(BOSS_HORSEMAN) == DONE);
+
+                if (AreAllWingsCleared)
                 {
                     player->TeleportTo(533, sapphironEntryTP.m_positionX, sapphironEntryTP.m_positionY, sapphironEntryTP.m_positionZ, sapphironEntryTP.m_orientation);
                     return true;
@@ -1211,3 +1218,4 @@ void AddSC_instance_naxxramas()
     new boss_naxxramas_misc();
     new at_naxxramas_hub_portal();
 }
+

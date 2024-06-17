@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -17,17 +17,17 @@
 -- Dumping structure for table acore_world.version
 DROP TABLE IF EXISTS `version`;
 CREATE TABLE IF NOT EXISTS `version` (
-  `core_version` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Core revision dumped at startup.',
-  `core_revision` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `db_version` varchar(120) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Version of world DB.',
+  `core_version` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '' COMMENT 'Core revision dumped at startup.',
+  `core_revision` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `db_version` varchar(120) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'Version of world DB.',
   `cache_id` int DEFAULT '0',
   PRIMARY KEY (`core_version`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Version Notes';
 
--- Dumping data for table acore_world.version: ~0 rows (approximately)
+-- Dumping data for table acore_world.version: ~1 rows (approximately)
 DELETE FROM `version`;
 INSERT INTO `version` (`core_version`, `core_revision`, `db_version`, `cache_id`) VALUES
-	('AzerothCore rev. 5d6dfca80cf1 2022-08-21 09:48:09 +0200 (new-squash-POGGIES branch) (Win64, RelWithDebInfo, Static)', '5d6dfca80cf1', 'ACDB 335.9-dev', 9);
+	('AzerothCore rev. bd8a08e50dfe+ 2024-01-20 14:48:23 +0100 (it-is-time-for-the-yearly-squash!-hopefully-the-archive-skipping-between-commits-issue-is-solved-now.-only-time-will-tell.-HAPPY-NEW-2024 branch) (Win64, RelWithDebInfo, Static)', 'bd8a08e50dfe+', 'ACDB 335.11-dev', 11);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

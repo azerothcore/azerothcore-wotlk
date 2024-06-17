@@ -15,19 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Group.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "UnitAI.h"
 /*
  * Scripts for spells with SPELLFAMILY_PALADIN and SPELLFAMILY_GENERIC spells used by paladin players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_pal_".
  */
-
-#include "Group.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
-#include "UnitAI.h"
 
 enum PaladinSpells
 {
@@ -484,7 +483,7 @@ class spell_pal_blessing_of_sanctuary : public AuraScript
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        return GetTarget()->getPowerType() == POWER_MANA;
+        return GetTarget()->HasActivePowerType(POWER_MANA);
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
@@ -970,7 +969,7 @@ class spell_pal_lay_on_hands : public SpellScript
 
         // Xinef: Glyph of Divinity
         if (Unit* target = GetExplTargetUnit())
-            if (target->getPowerType() == POWER_MANA)
+            if (target->HasActivePowerType(POWER_MANA))
                 _manaAmount = target->GetPower(POWER_MANA);
 
         return SPELL_CAST_OK;
@@ -1134,3 +1133,4 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_righteous_defense);
     RegisterSpellScript(spell_pal_seal_of_righteousness);
 }
+

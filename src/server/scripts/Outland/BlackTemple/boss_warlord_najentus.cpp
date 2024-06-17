@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "black_temple.h"
 
 enum Yells
@@ -42,13 +43,19 @@ enum Spells
 
 enum Events
 {
-    EVENT_SPELL_BERSERK             = 1,
-    EVENT_TALK_CHECK                = 2
+    EVENT_TALK_CHECK                = 1,
+    EVENT_ENRAGE                    = 2
 };
 
 struct boss_najentus : public BossAI
 {
     boss_najentus(Creature* creature) : BossAI(creature, DATA_HIGH_WARLORD_NAJENTUS), _canTalk(true) { }
+
+    void Reset() override
+    {
+        _Reset();
+        me->m_Events.CancelEventGroup(EVENT_ENRAGE);
+    }
 
     void JustEngagedWith(Unit* who) override
     {
@@ -57,11 +64,10 @@ struct boss_najentus : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
 
-        ScheduleUniqueTimedEvent(8min, [&]
-        {
+        me->m_Events.AddEventAtOffset([this] {
             Talk(SAY_ENRAGE);
             DoCastSelf(SPELL_BERSERK, true);
-        }, EVENT_SPELL_BERSERK);
+        }, 8min, EVENT_ENRAGE);
 
         ScheduleTimedEvent(25s, 100s, [&]
         {
@@ -155,3 +161,4 @@ void AddSC_boss_najentus()
     RegisterSpellScript(spell_najentus_needle_spine);
     RegisterSpellScript(spell_najentus_hurl_spine);
 }
+

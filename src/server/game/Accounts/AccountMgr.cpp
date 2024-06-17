@@ -68,6 +68,8 @@ namespace AccountMgr
         if (!result)
             return AOR_NAME_NOT_EXIST;
 
+        sScriptMgr->OnBeforeAccountDelete(accountId);
+
         // Obtain accounts characters
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARS_BY_ACCOUNT_ID);
         stmt->SetData(0, accountId);
@@ -276,11 +278,6 @@ namespace AccountMgr
     bool IsPlayerAccount(uint32 gmlevel)
     {
         return gmlevel == SEC_PLAYER;
-    }
-
-    bool IsGMAccount(uint32 gmlevel)
-    {
-        return gmlevel >= SEC_MODERATOR && gmlevel <= SEC_CONSOLE;
     }
 
     bool IsAdminAccount(uint32 gmlevel)
