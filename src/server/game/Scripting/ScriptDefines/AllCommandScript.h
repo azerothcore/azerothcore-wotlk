@@ -44,7 +44,7 @@ public:
      * @param handler Contains information about the ChatHandler
      * @param cmdStr Contains information about the command name
      */
-    [[nodiscard]] virtual bool CanTryExecuteCommand(ChatHandler& /*handler*/, std::string_view /*cmdStr*/) { return true; }
+    [[nodiscard]] virtual bool OnTryExecuteCommand(ChatHandler& /*handler*/, std::string_view /*cmdStr*/) { return true; }
 };
 
 // Compatibility for old scripts
