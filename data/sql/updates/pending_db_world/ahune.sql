@@ -5,7 +5,8 @@ SET @NPC := @CGUID+10;
 SET @PATH := @NPC * 10;
 
 UPDATE `creature_template` SET `difficulty_entry_1` = 0 WHERE `entry` IN (25740, 25755, 25756, 25865);
-UPDATE `creature_template` SET `modelid1` = 23344, `unit_flags` = `unit_flags` | 0x00000040, `mechanic_immune_mask` = `mechanic_immune_mask` | 0x02000000 WHERE `entry` = 25740; -- Ahune
+UPDATE `creature_template` SET `unit_flags` = `unit_flags` | 0x00000040, `mechanic_immune_mask` = `mechanic_immune_mask` | 0x02000000 WHERE `entry` = 25740; -- Ahune
+UPDATE `creature_template_model` SET `CreatureDisplayID` = 23344 WHERE `CreatureID` = 25740 AND `Idx` = 0; -- ToDo: replace entries with sniffed shtuff.
 UPDATE `creature_template` SET `minlevel` = 80, `maxlevel` = 80, `unit_flags` = `unit_flags` | 0x00000004 | 0x00000100 | 131072 | 33554432, `flags_extra` = `flags_extra` | 0x40000000, `ScriptName` = 'npc_frozen_core' WHERE `entry` = 25865; -- Frozen Core (might be interruptable)
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_ahune_bunny' WHERE `entry` = 25745;
 UPDATE `creature_template` SET `ScriptName` = 'npc_earthen_ring_flamecaller' WHERE `entry` = 25754;
