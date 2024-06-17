@@ -161,10 +161,10 @@ INSERT INTO `smart_scripts` (`entryorguid`,`source_type`,`id`,`link`,`event_type
 (25757,0,1,0,0,0,100,0,2000,2000,5000,7000,11,46568,0,0,0,0,0,18,120,0,0,0,0,0,0,'Ahunite Frostwind - In Combat - Cast \'Wind Buffet\'');
 
 -- Clean up spawns
-DELETE FROM `creature` WHERE `guid` IN (202734, 202735, 202736, 202737, 245704, 245800, 245801, 245810, 245811, 245812);
+DELETE FROM `creature` WHERE `guid` IN (202734, 202735, 202736, 202737, 245704, 245800, 245801, 245810, 245811, 245812) AND `id1` IN (25697, 25754, 25710, 28015, 25971, 25972, 25973);
 DELETE FROM `game_event_creature` WHERE `guid` IN (202734, 202735, 202736, 202737, 245704, 245800, 245801, 245810, 245811, 245812);
 -- Ensure free GUIDs
-DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+20;
+DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+20 AND `id1` IN (25697, 25710, 25745, 25746, 25754, 25952, 25961, 25964, 25965, 25966, 5971, 25972, 25973, 26120, 26121, 26190, 26230, 40446);
 DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+20;
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-245801, -245800) AND `source_type` = 0;
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
@@ -216,10 +216,10 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (1, @CGUID+20);
 
 -- Clean up spawns
-DELETE FROM `gameobject` WHERE `guid` IN (87, 88, 11207, 11208, 11209, 11210, 11211, 11212, 11213, 11214, 11215, 11216, 11217, 220100, 220101, 220102, 220103, 220104, 220105, 220106, 220111, 220112);
+DELETE FROM `gameobject` WHERE `guid` IN (87, 88, 11207, 11208, 11209, 11210, 11211, 11212, 11213, 11214, 11215, 11216, 11217, 220100, 220101, 220102, 220103, 220104, 220105, 220106, 220111, 220112) AND `id` IN (181371, 187882, 188067, 188072, 188073, 188142, 195000);
 DELETE FROM `game_event_gameobject` WHERE `guid` IN (87, 88, 11207, 11208, 11209, 11210, 11211, 11212, 11213, 11214, 11215, 11216, 11217, 220100, 220101, 220102, 220103, 220104, 220105, 220106, 220111, 220112);
 -- Ensure free GUIDs
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+20;
+DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+20 AND `id` IN (187882, 188067, 188072, 188073, 188142, 195000);
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+20;
 DELETE FROM `pool_gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+20;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
