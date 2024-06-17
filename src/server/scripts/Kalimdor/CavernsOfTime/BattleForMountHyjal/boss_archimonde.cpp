@@ -244,8 +244,6 @@ struct boss_archimonde : public BossAI
                 {
                     if (Creature* nordrassil = me->SummonCreature(CREATURE_CHANNEL_TARGET, nordrassilPosition, TEMPSUMMON_TIMED_DESPAWN, 1200000))
                     {
-                        nordrassil->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        nordrassil->SetDisplayId(DISPLAY_ID_TRIGGER);
                         DoCast(nordrassil, SPELL_DRAIN_WORLD_TREE);
                         _isChanneling = true;
                         nordrassil->AI()->DoCast(me, SPELL_DRAIN_WORLD_TREE_2, true);
