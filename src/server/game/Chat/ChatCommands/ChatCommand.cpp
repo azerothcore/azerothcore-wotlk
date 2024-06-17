@@ -322,12 +322,12 @@ namespace Acore::Impl::ChatCommands
         oldTail = newTail;
     }
 
+    if (!sScriptMgr->CanTryExecuteCommand(handler, cmdStr))
+        return true;
+
     /* if we matched a command at some point, invoke it */
     if (cmd)
     {
-        if (!sScriptMgr->CanExecuteCommand(handler, cmdStr))
-            return true;
-
         handler.SetSentErrorMessage(false);
         if (cmd->IsInvokerVisible(handler) && cmd->_invoker(&handler, oldTail))
         { /* invocation succeeded, log this */
