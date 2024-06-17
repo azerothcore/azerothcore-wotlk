@@ -718,156 +718,107 @@ private:
     Unit const* _victim;
 };
 
-class spell_ulduar_stone_grip_cast_target : public SpellScriptLoader
+class spell_ulduar_stone_grip_cast_target : public SpellScript
 {
-public:
-    spell_ulduar_stone_grip_cast_target() : SpellScriptLoader("spell_ulduar_stone_grip_cast_target") { }
+    PrepareSpellScript(spell_ulduar_stone_grip_cast_target);
 
-    class spell_ulduar_stone_grip_cast_target_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_ulduar_stone_grip_cast_target_SpellScript);
+        if (GetCaster()->GetTypeId() != TYPEID_UNIT)
+            return false;
+        return true;
+    }
 
-        bool Load() override
-        {
-            if (GetCaster()->GetTypeId() != TYPEID_UNIT)
-                return false;
-            return true;
-        }
-
-        void FilterTargetsInitial(std::list<WorldObject*>& targets)
-        {
-            // Remove "main tank" and non-player targets
-            targets.remove_if (StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
-            // Maximum affected targets per difficulty mode
-            uint32 maxTargets = 1;
-            if (GetSpellInfo()->Id == 63981)
-                maxTargets = 3;
-
-            // Return a random amount of targets based on maxTargets
-            while (maxTargets < targets.size())
-            {
-                std::list<WorldObject*>::iterator itr = targets.begin();
-                advance(itr, urand(0, targets.size() - 1));
-                targets.erase(itr);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ulduar_stone_grip_cast_target_SpellScript::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
-        return new spell_ulduar_stone_grip_cast_target_SpellScript();
+        // Remove "main tank" and non-player targets
+        targets.remove_if (StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
+        // Maximum affected targets per difficulty mode
+        uint32 maxTargets = 1;
+        if (GetSpellInfo()->Id == 63981)
+            maxTargets = 3;
+
+        // Return a random amount of targets based on maxTargets
+        while (maxTargets < targets.size())
+        {
+            std::list<WorldObject*>::iterator itr = targets.begin();
+            advance(itr, urand(0, targets.size() - 1));
+            targets.erase(itr);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_ulduar_stone_grip_cast_target::FilterTargetsInitial, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_ulduar_stone_grip : public SpellScriptLoader
+class spell_ulduar_stone_grip_aura : public AuraScript
 {
-public:
-    spell_ulduar_stone_grip() : SpellScriptLoader("spell_ulduar_stone_grip") { }
+    PrepareAuraScript(spell_ulduar_stone_grip_aura);
 
-    class spell_ulduar_stone_grip_AuraScript : public AuraScript
+    void OnRemoveStun(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_ulduar_stone_grip_AuraScript);
+        if (Player* owner = GetOwner()->ToPlayer())
+            owner->RemoveAurasDueToSpell(aurEff->GetAmount());
+    }
 
-        void OnRemoveStun(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            if (Player* owner = GetOwner()->ToPlayer())
-                owner->RemoveAurasDueToSpell(aurEff->GetAmount());
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_ulduar_stone_grip_AuraScript::OnRemoveStun, EFFECT_2, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_ulduar_stone_grip_AuraScript();
+        OnEffectRemove += AuraEffectRemoveFn(spell_ulduar_stone_grip_aura::OnRemoveStun, EFFECT_2, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_ulduar_squeezed_lifeless : public SpellScriptLoader
+class spell_ulduar_squeezed_lifeless : public SpellScript
 {
-public:
-    spell_ulduar_squeezed_lifeless() : SpellScriptLoader("spell_ulduar_squeezed_lifeless") { }
+    PrepareSpellScript(spell_ulduar_squeezed_lifeless);
 
-    class spell_ulduar_squeezed_lifeless_SpellScript : public SpellScript
+    void HandleInstaKill(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_ulduar_squeezed_lifeless_SpellScript);
+        if (!GetHitPlayer() || !GetHitPlayer()->GetVehicle())
+            return;
 
-        void HandleInstaKill(SpellEffIndex  /*effIndex*/)
-        {
-            if (!GetHitPlayer() || !GetHitPlayer()->GetVehicle())
-                return;
+        // Hack to set correct position is in _ExitVehicle()
+        GetHitPlayer()->ExitVehicle();
+    }
 
-            // Hack to set correct position is in _ExitVehicle()
-            GetHitPlayer()->ExitVehicle();
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ulduar_squeezed_lifeless_SpellScript::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_ulduar_squeezed_lifeless_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_ulduar_squeezed_lifeless::HandleInstaKill, EFFECT_1, SPELL_EFFECT_INSTAKILL);
     }
 };
 
-class spell_kologarn_stone_shout : public SpellScriptLoader
+class spell_kologarn_stone_shout : public SpellScript
 {
-public:
-    spell_kologarn_stone_shout() :  SpellScriptLoader("spell_kologarn_stone_shout") { }
+    PrepareSpellScript(spell_kologarn_stone_shout);
 
-    class spell_kologarn_stone_shout_AuraScript : public AuraScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareAuraScript(spell_kologarn_stone_shout_AuraScript);
-
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            uint32 triggerSpellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, triggerSpellId, false);
-        }
-
-        void Register() override
-        {
-            if (m_scriptSpellId == SPELL_STONE_SHOUT_10 || m_scriptSpellId == SPELL_STONE_SHOUT_25)
-                OnEffectPeriodic += AuraEffectPeriodicFn(spell_kologarn_stone_shout_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_kologarn_stone_shout_AuraScript();
+        targets.remove_if (PlayerOrPetCheck());
     }
 
-    class spell_kologarn_stone_shout_SpellScript : public SpellScript
+    void Register() override
     {
-        PrepareSpellScript(spell_kologarn_stone_shout_SpellScript);
+        if (m_scriptSpellId != SPELL_STONE_SHOUT_10 && m_scriptSpellId != SPELL_STONE_SHOUT_25)
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_stone_shout::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if (PlayerOrPetCheck());
-        }
+class spell_kologarn_stone_shout_aura : public AuraScript
+{
+    PrepareAuraScript(spell_kologarn_stone_shout_aura);
 
-        void Register() override
-        {
-            if (m_scriptSpellId != SPELL_STONE_SHOUT_10 && m_scriptSpellId != SPELL_STONE_SHOUT_25)
-                OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kologarn_stone_shout_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_kologarn_stone_shout_SpellScript();
+        uint32 triggerSpellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, triggerSpellId, false);
+    }
+
+    void Register() override
+    {
+        if (m_scriptSpellId == SPELL_STONE_SHOUT_10 || m_scriptSpellId == SPELL_STONE_SHOUT_25)
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_kologarn_stone_shout_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -928,10 +879,10 @@ void AddSC_boss_kologarn()
     RegisterUlduarCreatureAI(boss_kologarn_pit_kill_bunny);
 
     // Spells
-    new spell_ulduar_stone_grip_cast_target();
-    new spell_ulduar_stone_grip();
-    new spell_ulduar_squeezed_lifeless();
-    new spell_kologarn_stone_shout();
+    RegisterSpellScript(spell_ulduar_stone_grip_cast_target);
+    RegisterSpellScript(spell_ulduar_stone_grip_aura);
+    RegisterSpellScript(spell_ulduar_squeezed_lifeless);
+    RegisterSpellAndAuraScriptPair(spell_kologarn_stone_shout, spell_kologarn_stone_shout_aura);
 
     // Achievements
     new achievement_kologarn_looks_could_kill();

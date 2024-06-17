@@ -36,6 +36,7 @@
 #include "LFGMgr.h"
 #include "Log.h"
 #include "MapMgr.h"
+#include <numeric>
 #include "Pet.h"
 #include "PoolMgr.h"
 #include "ReputationMgr.h"
@@ -576,20 +577,20 @@ void ObjectMgr::LoadCreatureTemplates()
 {
     uint32 oldMSTime = getMSTime();
 
-//                                                   0      1                   2                   3                   4            5            6         7         8
-    QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, modelid1, modelid2, modelid3, "
-//                        9         10    11       12        13              14        15        16   17       18       19          20         21          22
-                         "modelid4, name, subname, IconName, gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, speed_swim, speed_flight, "
-//                        23               24     25      26         27              28              29               30            31             32          33          34
-                         "detection_range, scale, `rank`, dmgschool, DamageModifier, BaseAttackTime, RangeAttackTime, BaseVariance, RangeVariance, unit_class, unit_flags, unit_flags2, "
-//                        35            36      37            38             39             40            41
-                         "dynamicflags, family, trainer_type, trainer_spell, trainer_class, trainer_race, type, "
-//                        42          43      44              45        46              47         48       49       50      51
-                         "type_flags, lootid, pickpocketloot, skinloot, PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, "
-//                        52          53        54          55          56         57          58                         59           60              61            62             63
-                         "ctm.Ground, ctm.Swim, ctm.Flight, ctm.Rooted, ctm.Chase, ctm.Random, ctm.InteractionPauseTimer, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, "
-//                        64            65          66           67                    68                        69           70
-                         "RacialLeader, movementId, RegenHealth, mechanic_immune_mask, spell_school_immune_mask, flags_extra, ScriptName "
+//                                                   0      1                   2                   3                   4            5            6     7        8
+    QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, name, subname, IconName, "
+//                        9               10        11        12   13       14       15          16         17          18            19               20     21      22
+                         "gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, speed_swim, speed_flight, detection_range, scale, `rank`, dmgschool, "
+//                        23              24              25               26            27             28          29          30           31            32      33            34
+                         "DamageModifier, BaseAttackTime, RangeAttackTime, BaseVariance, RangeVariance, unit_class, unit_flags, unit_flags2, dynamicflags, family, trainer_type, trainer_spell, "
+//                        35             36            37    38          39      40              41
+                         "trainer_class, trainer_race, type, type_flags, lootid, pickpocketloot, skinloot, "
+//                        42              43         44       45       46      47            48          49        50          51
+                         "PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, ctm.Ground, ctm.Swim, ctm.Flight, ctm.Rooted, "
+//                        52         53          54                         55           56              57            58             59                  60            61          62           63
+                         "ctm.Chase, ctm.Random, ctm.InteractionPauseTimer, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, "
+//                        64                        65           66
+                         "spell_school_immune_mask, flags_extra, ScriptName "
                          "FROM creature_template ct LEFT JOIN creature_template_movement ctm ON ct.entry = ctm.CreatureId ORDER BY entry DESC;");
 
     if (!result)
@@ -608,6 +609,9 @@ void ObjectMgr::LoadCreatureTemplates()
         LoadCreatureTemplate(fields);
         ++count;
     } while (result->NextRow());
+
+    // We load the creature models after loading but before checking
+    LoadCreatureTemplateModels();
 
     sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
 
@@ -658,47 +662,42 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
     {
         creatureTemplate.KillCredit[i] = fields[4 + i].Get<uint32>();
     }
-
-    creatureTemplate.Modelid1         = fields[6].Get<uint32>();
-    creatureTemplate.Modelid2         = fields[7].Get<uint32>();
-    creatureTemplate.Modelid3         = fields[8].Get<uint32>();
-    creatureTemplate.Modelid4         = fields[9].Get<uint32>();
-    creatureTemplate.Name             = fields[10].Get<std::string>();
-    creatureTemplate.SubName          = fields[11].Get<std::string>();
-    creatureTemplate.IconName         = fields[12].Get<std::string>();
-    creatureTemplate.GossipMenuId     = fields[13].Get<uint32>();
-    creatureTemplate.minlevel         = fields[14].Get<uint8>();
-    creatureTemplate.maxlevel         = fields[15].Get<uint8>();
-    creatureTemplate.expansion        = uint32(fields[16].Get<int16>());
-    creatureTemplate.faction          = uint32(fields[17].Get<uint16>());
-    creatureTemplate.npcflag          = fields[18].Get<uint32>();
-    creatureTemplate.speed_walk       = fields[19].Get<float>();
-    creatureTemplate.speed_run        = fields[20].Get<float>();
-    creatureTemplate.speed_swim       = fields[21].Get<float>();
-    creatureTemplate.speed_flight     = fields[22].Get<float>();
-    creatureTemplate.detection_range  = fields[23].Get<float>();
-    creatureTemplate.scale            = fields[24].Get<float>();
-    creatureTemplate.rank             = uint32(fields[25].Get<uint8>());
-    creatureTemplate.dmgschool        = uint32(fields[26].Get<int8>());
-    creatureTemplate.DamageModifier   = fields[27].Get<float>();
-    creatureTemplate.BaseAttackTime   = fields[28].Get<uint32>();
-    creatureTemplate.RangeAttackTime  = fields[29].Get<uint32>();
-    creatureTemplate.BaseVariance     = fields[30].Get<float>();
-    creatureTemplate.RangeVariance    = fields[31].Get<float>();
-    creatureTemplate.unit_class       = uint32(fields[32].Get<uint8>());
-    creatureTemplate.unit_flags       = fields[33].Get<uint32>();
-    creatureTemplate.unit_flags2      = fields[34].Get<uint32>();
-    creatureTemplate.dynamicflags     = fields[35].Get<uint32>();
-    creatureTemplate.family           = uint32(fields[36].Get<uint8>());
-    creatureTemplate.trainer_type     = uint32(fields[37].Get<uint8>());
-    creatureTemplate.trainer_spell    = fields[38].Get<uint32>();
-    creatureTemplate.trainer_class    = uint32(fields[39].Get<uint8>());
-    creatureTemplate.trainer_race     = uint32(fields[40].Get<uint8>());
-    creatureTemplate.type             = uint32(fields[41].Get<uint8>());
-    creatureTemplate.type_flags       = fields[42].Get<uint32>();
-    creatureTemplate.lootid           = fields[43].Get<uint32>();
-    creatureTemplate.pickpocketLootId = fields[44].Get<uint32>();
-    creatureTemplate.SkinLootId       = fields[45].Get<uint32>();
+    creatureTemplate.Name             = fields[6].Get<std::string>();
+    creatureTemplate.SubName          = fields[7].Get<std::string>();
+    creatureTemplate.IconName         = fields[8].Get<std::string>();
+    creatureTemplate.GossipMenuId     = fields[9].Get<uint32>();
+    creatureTemplate.minlevel         = fields[10].Get<uint8>();
+    creatureTemplate.maxlevel         = fields[11].Get<uint8>();
+    creatureTemplate.expansion        = uint32(fields[12].Get<int16>());
+    creatureTemplate.faction          = uint32(fields[13].Get<uint16>());
+    creatureTemplate.npcflag          = fields[14].Get<uint32>();
+    creatureTemplate.speed_walk       = fields[15].Get<float>();
+    creatureTemplate.speed_run        = fields[16].Get<float>();
+    creatureTemplate.speed_swim       = fields[17].Get<float>();
+    creatureTemplate.speed_flight     = fields[18].Get<float>();
+    creatureTemplate.detection_range  = fields[19].Get<float>();
+    creatureTemplate.scale            = fields[20].Get<float>();
+    creatureTemplate.rank             = uint32(fields[21].Get<uint8>());
+    creatureTemplate.dmgschool        = uint32(fields[22].Get<int8>());
+    creatureTemplate.DamageModifier   = fields[23].Get<float>();
+    creatureTemplate.BaseAttackTime   = fields[24].Get<uint32>();
+    creatureTemplate.RangeAttackTime  = fields[25].Get<uint32>();
+    creatureTemplate.BaseVariance     = fields[26].Get<float>();
+    creatureTemplate.RangeVariance    = fields[27].Get<float>();
+    creatureTemplate.unit_class       = uint32(fields[28].Get<uint8>());
+    creatureTemplate.unit_flags       = fields[29].Get<uint32>();
+    creatureTemplate.unit_flags2      = fields[30].Get<uint32>();
+    creatureTemplate.dynamicflags     = fields[31].Get<uint32>();
+    creatureTemplate.family           = uint32(fields[32].Get<uint8>());
+    creatureTemplate.trainer_type     = uint32(fields[33].Get<uint8>());
+    creatureTemplate.trainer_spell    = fields[34].Get<uint32>();
+    creatureTemplate.trainer_class    = uint32(fields[35].Get<uint8>());
+    creatureTemplate.trainer_race     = uint32(fields[36].Get<uint8>());
+    creatureTemplate.type             = uint32(fields[37].Get<uint8>());
+    creatureTemplate.type_flags       = fields[38].Get<uint32>();
+    creatureTemplate.lootid           = fields[39].Get<uint32>();
+    creatureTemplate.pickpocketLootId = fields[40].Get<uint32>();
+    creatureTemplate.SkinLootId       = fields[41].Get<uint32>();
 
     for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
     {
@@ -710,49 +709,49 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
         creatureTemplate.spells[i] = 0;
     }
 
-    creatureTemplate.PetSpellDataId = fields[46].Get<uint32>();
-    creatureTemplate.VehicleId      = fields[47].Get<uint32>();
-    creatureTemplate.mingold        = fields[48].Get<uint32>();
-    creatureTemplate.maxgold        = fields[49].Get<uint32>();
-    creatureTemplate.AIName         = fields[50].Get<std::string>();
-    creatureTemplate.MovementType   = uint32(fields[51].Get<uint8>());
+    creatureTemplate.PetSpellDataId = fields[42].Get<uint32>();
+    creatureTemplate.VehicleId      = fields[43].Get<uint32>();
+    creatureTemplate.mingold        = fields[44].Get<uint32>();
+    creatureTemplate.maxgold        = fields[45].Get<uint32>();
+    creatureTemplate.AIName         = fields[46].Get<std::string>(); // stopped here, fix it
+    creatureTemplate.MovementType   = uint32(fields[47].Get<uint8>());
+    if (!fields[48].IsNull())
+    {
+        creatureTemplate.Movement.Ground = static_cast<CreatureGroundMovementType>(fields[48].Get<uint8>());
+    }
+
+    creatureTemplate.Movement.Swim = fields[49].Get<bool>();
+    if (!fields[50].IsNull())
+    {
+        creatureTemplate.Movement.Flight = static_cast<CreatureFlightMovementType>(fields[50].Get<uint8>());
+    }
+
+    creatureTemplate.Movement.Rooted = fields[51].Get<bool>();
     if (!fields[52].IsNull())
     {
-        creatureTemplate.Movement.Ground = static_cast<CreatureGroundMovementType>(fields[52].Get<uint8>());
+        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[52].Get<uint8>());
     }
-
-    creatureTemplate.Movement.Swim = fields[53].Get<bool>();
+    if (!fields[53].IsNull())
+    {
+        creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[53].Get<uint8>());
+    }
     if (!fields[54].IsNull())
     {
-        creatureTemplate.Movement.Flight = static_cast<CreatureFlightMovementType>(fields[54].Get<uint8>());
+        creatureTemplate.Movement.InteractionPauseTimer = fields[54].Get<uint32>();
     }
 
-    creatureTemplate.Movement.Rooted = fields[55].Get<bool>();
-    if (!fields[56].IsNull())
-    {
-        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[56].Get<uint8>());
-    }
-    if (!fields[57].IsNull())
-    {
-        creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[57].Get<uint8>());
-    }
-    if (!fields[58].IsNull())
-    {
-        creatureTemplate.Movement.InteractionPauseTimer = fields[58].Get<uint32>();
-    }
-
-    creatureTemplate.HoverHeight           = fields[59].Get<float>();
-    creatureTemplate.ModHealth             = fields[60].Get<float>();
-    creatureTemplate.ModMana               = fields[61].Get<float>();
-    creatureTemplate.ModArmor              = fields[62].Get<float>();
-    creatureTemplate.ModExperience         = fields[63].Get<float>();
-    creatureTemplate.RacialLeader          = fields[64].Get<bool>();
-    creatureTemplate.movementId            = fields[65].Get<uint32>();
-    creatureTemplate.RegenHealth           = fields[66].Get<bool>();
-    creatureTemplate.MechanicImmuneMask    = fields[67].Get<uint32>();
-    creatureTemplate.SpellSchoolImmuneMask = fields[68].Get<uint8>();
-    creatureTemplate.flags_extra           = fields[69].Get<uint32>();
-    creatureTemplate.ScriptID              = GetScriptId(fields[70].Get<std::string>());
+    creatureTemplate.HoverHeight           = fields[55].Get<float>();
+    creatureTemplate.ModHealth             = fields[56].Get<float>();
+    creatureTemplate.ModMana               = fields[57].Get<float>();
+    creatureTemplate.ModArmor              = fields[58].Get<float>();
+    creatureTemplate.ModExperience         = fields[59].Get<float>();
+    creatureTemplate.RacialLeader          = fields[60].Get<bool>();
+    creatureTemplate.movementId            = fields[61].Get<uint32>();
+    creatureTemplate.RegenHealth           = fields[62].Get<bool>();
+    creatureTemplate.MechanicImmuneMask    = fields[63].Get<uint32>();
+    creatureTemplate.SpellSchoolImmuneMask = fields[64].Get<uint8>();
+    creatureTemplate.flags_extra           = fields[65].Get<uint32>();
+    creatureTemplate.ScriptID              = GetScriptId(fields[66].Get<std::string>());
 
     // useful if the creature template load is being triggered from outside this class
     if (triggerHook)
@@ -760,6 +759,58 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
         sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
     }
 
+}
+
+void ObjectMgr::LoadCreatureTemplateModels()
+{
+    uint32 oldMSTime = getMSTime();
+
+    //                                               0           1                  2             3
+    QueryResult result = WorldDatabase.Query("SELECT CreatureID, CreatureDisplayID, DisplayScale, Probability FROM creature_template_model ORDER BY Idx ASC");
+
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 creature template model definitions. DB table `creature_template_model` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 creatureId = fields[0].Get<uint32>();
+        uint32 creatureDisplayId = fields[1].Get<uint32>();
+        float displayScale = fields[2].Get<float>();
+        float probability = fields[3].Get<float>();
+
+        CreatureTemplate const* cInfo = GetCreatureTemplate(creatureId);
+        if (!cInfo)
+        {
+            LOG_ERROR("sql.sql", "Creature template (Entry: {}) does not exist but has a record in `creature_template_model`", creatureId);
+            continue;
+        }
+
+        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(creatureDisplayId);
+        if (!displayEntry)
+        {
+            LOG_ERROR("sql.sql", "Creature (Entry: {}) lists non-existing CreatureDisplayID id ({}), this can crash the client.", creatureId, creatureDisplayId);
+            continue;
+        }
+
+        CreatureModelInfo const* modelInfo = GetCreatureModelInfo(creatureDisplayId);
+        if (!modelInfo)
+            LOG_ERROR("sql.sql", "No model data exist for `CreatureDisplayID` = {} listed by creature (Entry: {%u}}).", creatureDisplayId, creatureId);
+
+        if (displayScale <= 0.0f)
+            displayScale = 1.0f;
+
+        const_cast<CreatureTemplate*>(cInfo)->Models.emplace_back(creatureDisplayId, displayScale, probability);
+
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} creature template models in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadCreatureTemplateResistances()
@@ -1112,76 +1163,6 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     if (!factionTemplate)
         LOG_ERROR("sql.sql", "Creature (Entry: {}) has non-existing faction template ({}).", cInfo->Entry, cInfo->faction);
 
-    // used later for scale
-    CreatureDisplayInfoEntry const* displayScaleEntry = nullptr;
-
-    if (cInfo->Modelid1)
-    {
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->Modelid1);
-        if (!displayEntry)
-        {
-            LOG_ERROR("sql.sql", "Creature (Entry: {}) lists non-existing Modelid1 id ({}), this can crash the client.", cInfo->Entry, cInfo->Modelid1);
-            const_cast<CreatureTemplate*>(cInfo)->Modelid1 = 0;
-        }
-        else if (!displayScaleEntry)
-            displayScaleEntry = displayEntry;
-
-        CreatureModelInfo const* modelInfo = GetCreatureModelInfo(cInfo->Modelid1);
-        if (!modelInfo)
-            LOG_ERROR("sql.sql", "No model data exist for `Modelid1` = {} listed by creature (Entry: {}).", cInfo->Modelid1, cInfo->Entry);
-    }
-
-    if (cInfo->Modelid2)
-    {
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->Modelid2);
-        if (!displayEntry)
-        {
-            LOG_ERROR("sql.sql", "Creature (Entry: {}) lists non-existing Modelid2 id ({}), this can crash the client.", cInfo->Entry, cInfo->Modelid2);
-            const_cast<CreatureTemplate*>(cInfo)->Modelid2 = 0;
-        }
-        else if (!displayScaleEntry)
-            displayScaleEntry = displayEntry;
-
-        CreatureModelInfo const* modelInfo = GetCreatureModelInfo(cInfo->Modelid2);
-        if (!modelInfo)
-            LOG_ERROR("sql.sql", "No model data exist for `Modelid2` = {} listed by creature (Entry: {}).", cInfo->Modelid2, cInfo->Entry);
-    }
-
-    if (cInfo->Modelid3)
-    {
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->Modelid3);
-        if (!displayEntry)
-        {
-            LOG_ERROR("sql.sql", "Creature (Entry: {}) lists non-existing Modelid3 id ({}), this can crash the client.", cInfo->Entry, cInfo->Modelid3);
-            const_cast<CreatureTemplate*>(cInfo)->Modelid3 = 0;
-        }
-        else if (!displayScaleEntry)
-            displayScaleEntry = displayEntry;
-
-        CreatureModelInfo const* modelInfo = GetCreatureModelInfo(cInfo->Modelid3);
-        if (!modelInfo)
-            LOG_ERROR("sql.sql", "No model data exist for `Modelid3` = {} listed by creature (Entry: {}).", cInfo->Modelid3, cInfo->Entry);
-    }
-
-    if (cInfo->Modelid4)
-    {
-        CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->Modelid4);
-        if (!displayEntry)
-        {
-            LOG_ERROR("sql.sql", "Creature (Entry: {}) lists non-existing Modelid4 id ({}), this can crash the client.", cInfo->Entry, cInfo->Modelid4);
-            const_cast<CreatureTemplate*>(cInfo)->Modelid4 = 0;
-        }
-        else if (!displayScaleEntry)
-            displayScaleEntry = displayEntry;
-
-        CreatureModelInfo const* modelInfo = GetCreatureModelInfo(cInfo->Modelid4);
-        if (!modelInfo)
-            LOG_ERROR("sql.sql", "No model data exist for `Modelid4` = {} listed by creature (Entry: {}).", cInfo->Modelid4, cInfo->Entry);
-    }
-
-    if (!displayScaleEntry)
-        LOG_ERROR("sql.sql", "Creature (Entry: {}) does not have any existing display id in Modelid1/Modelid2/Modelid3/Modelid4.", cInfo->Entry);
-
     for (int k = 0; k < MAX_KILL_CREDIT; ++k)
     {
         if (cInfo->KillCredit[k])
@@ -1193,6 +1174,11 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
             }
         }
     }
+
+    if (!cInfo->Models.size())
+        LOG_ERROR("sql.sql", "Creature (Entry: {}) does not have any existing display id in creature_template_model.", cInfo->Entry);
+    else if (std::accumulate(cInfo->Models.begin(), cInfo->Models.end(), 0.0f, [](float sum, CreatureModel const& model) { return sum + model.Probability; }) <= 0.0f)
+        LOG_ERROR("sql.sql", "Creature (Entry: {}) has zero total chance for all models in creature_template_model.", cInfo->Entry);
 
     if (!cInfo->unit_class || ((1 << (cInfo->unit_class - 1)) & CLASSMASK_ALL_CREATURES) == 0)
     {
@@ -1278,15 +1264,6 @@ void ObjectMgr::CheckCreatureTemplate(CreatureTemplate const* cInfo)
     {
         LOG_ERROR("sql.sql", "Creature (Entry: {}) has wrong movement generator type ({}), ignored and set to IDLE.", cInfo->Entry, cInfo->MovementType);
         const_cast<CreatureTemplate*>(cInfo)->MovementType = IDLE_MOTION_TYPE;
-    }
-
-    /// if not set custom creature scale then load scale from CreatureDisplayInfo.dbc
-    if (cInfo->scale <= 0.0f)
-    {
-        if (displayScaleEntry)
-            const_cast<CreatureTemplate*>(cInfo)->scale = displayScaleEntry->scale;
-        else
-            const_cast<CreatureTemplate*>(cInfo)->scale = 1.0f;
     }
 
     if (cInfo->expansion > (MAX_EXPANSIONS - 1))
@@ -1722,13 +1699,19 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelId) const
     return nullptr;
 }
 
-uint32 ObjectMgr::ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data /*= nullptr*/)
+CreatureModel const* ObjectMgr::ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data /*= nullptr*/)
 {
     // Load creature model (display id)
     if (data && data->displayid)
-        return data->displayid;
+        if (CreatureModel const* model = cinfo->GetModelWithDisplayId(data->displayid))
+            return model;
 
-    return cinfo->GetRandomValidModelId();
+    if (!(cinfo->flags_extra & CREATURE_FLAG_EXTRA_TRIGGER))
+        if (CreatureModel const* model = cinfo->GetRandomValidModel())
+            return model;
+
+    // Triggers by default receive the invisible model
+    return cinfo->GetFirstInvisibleModel();
 }
 
 void ObjectMgr::ChooseCreatureFlags(const CreatureTemplate* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, const CreatureData* data /*= nullptr*/)
@@ -1750,9 +1733,9 @@ void ObjectMgr::ChooseCreatureFlags(const CreatureTemplate* cinfo, uint32& npcfl
     }
 }
 
-CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32* displayID)
+CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(CreatureModel* model, CreatureTemplate const* creatureTemplate) const
 {
-    CreatureModelInfo const* modelInfo = GetCreatureModelInfo(*displayID);
+    CreatureModelInfo const* modelInfo = GetCreatureModelInfo(model->CreatureDisplayID);
     if (!modelInfo)
         return nullptr;
 
@@ -1761,11 +1744,20 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32* display
     {
         CreatureModelInfo const* minfo_tmp = GetCreatureModelInfo(modelInfo->modelid_other_gender);
         if (!minfo_tmp)
-            LOG_ERROR("sql.sql", "Model (Entry: {}) has modelid_other_gender {} not found in table `creature_model_info`. ", *displayID, modelInfo->modelid_other_gender);
+            LOG_ERROR("sql.sql", "Model (Entry: {}) has modelid_other_gender {} not found in table `creature_model_info`. ", model->CreatureDisplayID, modelInfo->modelid_other_gender);
         else
         {
             // Model ID changed
-            *displayID = modelInfo->modelid_other_gender;
+            model->CreatureDisplayID = modelInfo->modelid_other_gender;
+            if (creatureTemplate)
+            {
+                auto itr = std::find_if(creatureTemplate->Models.begin(), creatureTemplate->Models.end(), [&](CreatureModel const& templateModel)
+                    {
+                        return templateModel.CreatureDisplayID == modelInfo->modelid_other_gender;
+                    });
+                if (itr != creatureTemplate->Models.end())
+                    *model = *itr;
+            }
             return minfo_tmp;
         }
     }
@@ -1790,10 +1782,15 @@ void ObjectMgr::LoadCreatureModelInfo()
     _creatureModelStore.rehash(result->GetRowCount());
     uint32 count = 0;
 
+    // List of ModelDataIDs that use Invisible models
+    uint32 triggerCreatureModelDataID[14] = { 1731, 1752, 2206, 2296, 2372, 2382, 2481, 2512, 2513, 2611, 2636, 2790, 3230, 3274 };
+
     do
     {
         Field* fields = result->Fetch();
 
+        uint32 displayId = fields[0].Get<uint32>();
+        CreatureDisplayInfoEntry const* creatureDisplay = sCreatureDisplayInfoStore.LookupEntry(displayId);
         uint32 modelId = fields[0].Get<uint32>();
 
         CreatureModelInfo& modelInfo = _creatureModelStore[modelId];
@@ -1802,6 +1799,7 @@ void ObjectMgr::LoadCreatureModelInfo()
         modelInfo.combat_reach         = fields[2].Get<float>();
         modelInfo.gender               = fields[3].Get<uint8>();
         modelInfo.modelid_other_gender = fields[4].Get<uint32>();
+        modelInfo.is_trigger           = false;
 
         // Checks
 
@@ -1822,6 +1820,18 @@ void ObjectMgr::LoadCreatureModelInfo()
 
         if (modelInfo.combat_reach < 0.1f)
             modelInfo.combat_reach = DEFAULT_COMBAT_REACH;
+
+        if (CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(creatureDisplay->ModelId))
+        {
+            for (uint32 i = 0; i < 14; i++)
+            {
+                if (modelData->Id == triggerCreatureModelDataID[i])
+                {
+                    modelInfo.is_trigger = true;
+                    break;
+                }
+            }
+        }
 
         ++count;
     } while (result->NextRow());
@@ -6586,7 +6596,8 @@ void ObjectMgr::GetTaxiPath(uint32 source, uint32 destination, uint32& path, uin
 
 uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, TeamId teamId, bool allowed_alt_team /* = false */)
 {
-    uint32 mount_id = 0;
+    CreatureModel mountModel;
+    CreatureTemplate const* mount_info = nullptr;
 
     // select mount creature id
     TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(id);
@@ -6602,22 +6613,23 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, TeamId teamId, bool allowed_a
             mount_entry = node->MountCreatureID[teamId];
         }
 
-        CreatureTemplate const* mount_info = GetCreatureTemplate(mount_entry);
+        mount_info = GetCreatureTemplate(mount_entry);
         if (mount_info)
         {
-            mount_id = mount_info->GetRandomValidModelId();
-            if (!mount_id)
+            CreatureModel const* model = mount_info->GetRandomValidModel();
+            if (!model)
             {
                 LOG_ERROR("sql.sql", "No displayid found for the taxi mount with the entry {}! Can't load it!", mount_entry);
                 return 0;
             }
+            mountModel = *model;
         }
     }
 
     // minfo is not actually used but the mount_id was updated
-    GetCreatureModelRandomGender(&mount_id);
+    GetCreatureModelRandomGender(&mountModel, mount_info);
 
-    return mount_id;
+    return mountModel.CreatureDisplayID;
 }
 
 void ObjectMgr::LoadAreaTriggers()
