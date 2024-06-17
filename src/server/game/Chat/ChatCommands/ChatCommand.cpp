@@ -343,9 +343,6 @@ namespace Acore::Impl::ChatCommands
         return true;
     }
 
-    if (!sScriptMgr->CanExecuteCommand(handler, cmdStr))
-        return true;
-
     return false;
 }
 
