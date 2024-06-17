@@ -326,9 +326,7 @@ namespace Acore::Impl::ChatCommands
     if (cmd)
     {
         if (!sScriptMgr->CanExecuteCommand(handler, cmdStr))
-        {
             return true;
-        }
 
         handler.SetSentErrorMessage(false);
         if (cmd->IsInvokerVisible(handler) && cmd->_invoker(&handler, oldTail))
@@ -346,9 +344,7 @@ namespace Acore::Impl::ChatCommands
     }
 
     if (!sScriptMgr->CanExecuteCommand(handler, cmdStr))
-    {
         return true;
-    }
 
     return false;
 }
