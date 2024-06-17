@@ -322,8 +322,14 @@ namespace Acore::Impl::ChatCommands
         oldTail = newTail;
     }
 
+    /* if we matched a command at some point, invoke it */
     if (cmd)
-    { /* if we matched a command at some point, invoke it */
+    {
+        if (!sScriptMgr->CanExecuteCommand(handler, cmdStr))
+        {
+            return true;
+        }
+
         handler.SetSentErrorMessage(false);
         if (cmd->IsInvokerVisible(handler) && cmd->_invoker(&handler, oldTail))
         { /* invocation succeeded, log this */
@@ -332,11 +338,6 @@ namespace Acore::Impl::ChatCommands
         }
         else if (!handler.HasSentErrorMessage()) /* invocation failed, we should show usage */
         {
-            if (!sScriptMgr->CanExecuteCommand(handler, cmdStr))
-            {
-                return true;
-            }
-
             cmd->SendCommandHelp(handler);
             handler.SetSentErrorMessage(true);
         }
