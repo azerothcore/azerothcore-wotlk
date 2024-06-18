@@ -1,3 +1,4 @@
+-- DB update 2024_06_18_05 -> 2024_06_18_06
 --
 UPDATE `creature_text` SET `BroadcastTextId` = 21123 WHERE `BroadcastTextId` = 21223 AND `CreatureID` = 23311;
 
