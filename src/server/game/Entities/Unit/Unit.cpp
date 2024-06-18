@@ -7833,18 +7833,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                             triggered_spell_id = 31803;
 
-                            // On target with 5 stacks of Holy Vengeance direct damage is done
                             if (Aura* aur = victim->GetAura(triggered_spell_id, GetGUID()))
                             {
                                 if (aur->GetStackAmount() == 5)
                                 {
                                     if (stacker)
                                         aur->RefreshDuration();
-
-                                    CastSpell(victim, 42463, true, castItem, triggeredByAura);
-                                    return true;
                                 }
                             }
+
+                            CastSpell(victim, 42463, true, castItem, triggeredByAura); // Seal of Vengeance
 
                             if (!stacker)
                                 return false;
@@ -7866,18 +7864,16 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
 
                             triggered_spell_id = 53742;
 
-                            // On target with 5 stacks of Blood Corruption direct damage is done
                             if (Aura* aur = victim->GetAura(triggered_spell_id, GetGUID()))
                             {
                                 if (aur->GetStackAmount() == 5)
                                 {
                                     if (stacker)
                                         aur->RefreshDuration();
-
-                                    CastSpell(victim, 53739, true, castItem, triggeredByAura);
-                                    return true;
                                 }
                             }
+
+                            CastSpell(victim, 53739, true, castItem, triggeredByAura); // Seal of Corruption
 
                             if (!stacker)
                                 return false;
