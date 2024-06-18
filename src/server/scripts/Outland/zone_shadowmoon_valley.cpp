@@ -1830,17 +1830,384 @@ public:
     }
 };
 
+/*
+######
+# Dragonmaw Races
+######
+*/
+
+enum DragonmawRaces
+{
+    QUEST_MUCKJAW           = 11064,
+    QUEST_TROPE             = 11067,
+    QUEST_CORLOK            = 11068,
+    QUEST_ICHMAN            = 11069,
+    QUEST_MULVERICK         = 11070,
+    QUEST_SKYSHATTER        = 11071,
+
+    NPC_MUCKJAW             = 23340,
+    NPC_TROPE               = 23342,
+    NPC_CORLOK              = 23344,
+    NPC_ICHMAN              = 23345,
+    NPC_MULVERICK           = 23346,
+    NPC_SKYSHATTER          = 23348,
+
+    PATH_MUCKJAW            = 233401,
+    PATH_TROPE              = 233421,
+    PATH_CORLOK             = 233441,
+    PATH_ICHMAN             = 233451,
+    PATH_MULVERICK          = 233461,
+    PATH_SKYSHATTER         = 233481,
+
+    NPC_TARGET_MUCKJAW      = 23356,
+    NPC_TARGET_TROPE        = 23357,
+    NPC_TARGET_CORLOK       = 23358,
+    NPC_TARGET_ICHMAN       = 23359,
+    NPC_TARGET_MULVERICK    = 23360,
+    NPC_TARGET_SKYSHATTER   = 23361,
+
+    SAY_START               = 0,
+    SAY_COMPLETE            = 1,
+    SAY_SKYSHATTER_SPECIAL  = 2,
+};
+
+struct dragonmaw_race_npc : public ScriptedAI
+{
+    dragonmaw_race_npc(Creature* creature) : ScriptedAI(creature) { }
+
+    Player* _player;
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+        me->SetWalk(true);
+        me->SetDisableGravity(false);
+        me->GetMotionMaster()->MoveIdle();
+    }
+
+    void sQuestAccept(Player* player, Quest const* /*quest*/) override
+    {
+        _player = player;
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+        if (_player)
+            Talk(SAY_START, _player);
+
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            me->GetMotionMaster()->MovePath(PATH_MUCKJAW, false);
+            break;
+        case NPC_TROPE:
+            me->GetMotionMaster()->MovePath(PATH_TROPE, false);
+            break;
+        case NPC_CORLOK:
+            me->GetMotionMaster()->MovePath(PATH_CORLOK, false);
+            break;
+        case NPC_ICHMAN:
+            me->GetMotionMaster()->MovePath(PATH_ICHMAN, false);
+            break;
+        case NPC_MULVERICK:
+            me->GetMotionMaster()->MovePath(PATH_MULVERICK, false);
+            break;
+        case NPC_SKYSHATTER:
+            me->GetMotionMaster()->MovePath(PATH_SKYSHATTER, false);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void TakeOff()
+    {
+        me->SetDisableGravity(true);
+    }
+
+    void StartRace()
+    {
+        me->SetWalk(false);
+        ScheduleTimedEvent(5s, [&]
+        {
+                if (!_player)
+                    FailQuest();
+                else if (!me->IsWithinDist(_player, 100.f))
+                    FailQuest();
+        }, 5s);
+    }
+
+    void FailQuest()
+    {
+        if (_player)
+        {
+            switch (me->GetEntry())
+            {
+            case NPC_MUCKJAW:
+                _player->FailQuest(QUEST_MUCKJAW);
+                break;
+            case NPC_TROPE:
+                _player->FailQuest(QUEST_TROPE);
+                break;
+            case NPC_CORLOK:
+                _player->FailQuest(QUEST_CORLOK);
+                break;
+            case NPC_ICHMAN:
+                _player->FailQuest(QUEST_ICHMAN);
+                break;
+            case NPC_MULVERICK:
+                _player->FailQuest(QUEST_MULVERICK);
+                break;
+            case NPC_SKYSHATTER:
+                _player->FailQuest(QUEST_SKYSHATTER);
+                break;
+            default:
+                break;
+            }
+        }
+        scheduler.CancelAll();
+        me->DespawnOnEvade();
+    }
+
+    void StartRaceAttacks()
+    {
+        /*
+        * Timers are placeholders
+        * After spawned, the rest is done via SmartAI
+        */
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            ScheduleTimedEvent(4s, [&]
+            {
+                if (_player)
+                    me->SummonCreature(NPC_TARGET_MUCKJAW, me->GetRandomPoint(_player->GetPosition(), 15.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+
+            }, 4s, 8s);
+            break;
+        case NPC_TROPE:
+            ScheduleTimedEvent(4s, [&]
+            {
+                if (_player)
+                    me->SummonCreature(NPC_TARGET_TROPE, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+
+            }, 1s, 3s);
+            break;
+        case NPC_CORLOK:
+            ScheduleTimedEvent(4s, [&]
+            {
+                if (_player)
+                    me->SummonCreature(NPC_TARGET_CORLOK, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+
+            }, 1s, 3s);
+            break;
+        case NPC_ICHMAN:
+            ScheduleTimedEvent(4s, [&]
+            {
+                if (_player)
+                    me->SummonCreature(NPC_TARGET_ICHMAN, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+
+            }, 1s, 3s);
+            break;
+        case NPC_MULVERICK:
+            ScheduleTimedEvent(4s, [&]
+            {
+                if (_player)
+                    me->SummonCreature(NPC_TARGET_MULVERICK, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+
+            }, 1s, 3s);
+            break;
+        case NPC_SKYSHATTER:
+            ScheduleTimedEvent(4s, [&]
+            {
+                if (_player)
+                    me->SummonCreature(NPC_TARGET_SKYSHATTER, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+
+            }, 1s, 3s);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void FinishRace()
+    {
+        scheduler.CancelAll();
+        me->SetHover(false);
+        me->SetDisableGravity(false);
+        me->SetWalk(true);
+
+        if (_player)
+        {
+            Talk(SAY_COMPLETE, _player);
+            switch (me->GetEntry())
+            {
+            case NPC_MUCKJAW:
+                _player->AreaExploredOrEventHappens(QUEST_MUCKJAW);
+                break;
+            case NPC_TROPE:
+                _player->AreaExploredOrEventHappens(QUEST_TROPE);
+                break;
+            case NPC_CORLOK:
+                _player->AreaExploredOrEventHappens(QUEST_CORLOK);
+                break;
+            case NPC_ICHMAN:
+                _player->AreaExploredOrEventHappens(QUEST_ICHMAN);
+                break;
+            case NPC_MULVERICK:
+                _player->AreaExploredOrEventHappens(QUEST_MULVERICK);
+                break;
+            case NPC_SKYSHATTER:
+                _player->AreaExploredOrEventHappens(QUEST_SKYSHATTER);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    void MovementInform(uint32 /*type*/, uint32 id) override
+    {
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            switch (id)
+            {
+            case 4:
+                TakeOff();
+                break;
+            case 7:
+                StartRace();
+                break;
+            case 9:
+                StartRaceAttacks();
+                break;
+            case 35:
+                FinishRace();
+                break;
+            case 37:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_TROPE:
+            switch (id)
+            {
+            case 5:
+                TakeOff();
+                break;
+            case 7:
+                StartRace();
+                break;
+            case 10:
+                StartRaceAttacks();
+                break;
+            case 53:
+                FinishRace();
+                break;
+            case 60:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_CORLOK:
+            switch (id)
+            {
+            case 6:
+                TakeOff();
+                break;
+            case 9:
+                StartRace();
+                break;
+            case 12:
+                StartRaceAttacks();
+                break;
+            case 79:
+                FinishRace();
+                break;
+            case 89:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_ICHMAN:
+            switch (id)
+            {
+            case 4:
+                TakeOff();
+                StartRace();
+                break;
+            case 12:
+                StartRaceAttacks();
+                break;
+            case 107:
+                FinishRace();
+                break;
+            case 111:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_MULVERICK:
+            switch (id)
+            {
+            case 5:
+                TakeOff();
+                break;
+            case 9:
+                StartRace();
+                break;
+            case 12:
+                StartRaceAttacks();
+                break;
+            case 166:
+                FinishRace();
+                break;
+            case 172:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_SKYSHATTER:
+            switch (id)
+            {
+            case 3:
+                TakeOff();
+                break;
+            case 7:
+                StartRace();
+                if (_player)
+                    Talk(SAY_SKYSHATTER_SPECIAL, _player);
+                break;
+            case 10:
+                StartRaceAttacks();
+                break;
+            case 140:
+                FinishRace();
+                break;
+            case 145:
+                Reset();
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+};
+
 void AddSC_shadowmoon_valley()
 {
-    // Ours
     new spell_q10612_10613_the_fel_and_the_furious();
     new spell_q10563_q10596_to_legion_hold();
-
-    // Theirs
     new npc_invis_infernal_caster();
     new npc_infernal_attacker();
     new npc_mature_netherwing_drake();
     RegisterCreatureAI(npc_enslaved_netherwing_drake);
+    RegisterCreatureAI(dragonmaw_race_npc);
     new npc_dragonmaw_peon();
     new npc_drake_dealer_hurlunk();
     new npcs_flanis_swiftwing_and_kagrosh();
