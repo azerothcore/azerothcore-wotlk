@@ -671,4 +671,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (23361, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 86, 40945, 2, 7, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Oldie\'s Target - On Just Summoned - Cross Cast \'Sky Shatter\''),
 (23361, 0, 1, 0, 8, 0, 100, 0, 40945, 0, 0, 0, 0, 0, 11, 41064, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Oldie\'s Target - On Spellhit \'Sky Shatter\' - Cast \'Sky Shatter\'');
 
+DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (23356, 23357, 23358, 23359, 23360, 23361)) AND (`source_type` = 0) AND (`id` IN (2));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(23356, 0, 2, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Target - On Initialize - Set Reactstate Passive'),
+(23357, 0, 2, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Target - On Initialize - Set Reactstate Passive'),
+(23358, 0, 2, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Target - On Initialize - Set Reactstate Passive'),
+(23359, 0, 2, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Target - On Initialize - Set Reactstate Passive'),
+(23360, 0, 2, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Target - On Initialize - Set Reactstate Passive'),
+(23361, 0, 2, 0, 37, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Target - On Initialize - Set Reactstate Passive');
+
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (40890, 40894, 40909, 40928, 40930, 40945) AND `ScriptName`='spell_quest_dragonmaw_race_generic';
