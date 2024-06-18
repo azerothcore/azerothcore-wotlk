@@ -1976,58 +1976,90 @@ struct dragonmaw_race_npc : public ScriptedAI
         if (!_player)
             return;
 
-        Position summonPos;
-        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
-        summonPos.m_positionZ = _player->GetPositionZ();  // So they don't spawn at ground height
-
         switch (me->GetEntry())
         {
         case NPC_MUCKJAW:
             ScheduleTimedEvent(4s, [&]
             {
                 if (_player)
-                    me->SummonCreature(NPC_TARGET_MUCKJAW, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
-
+                {
+                    Position summonPos;
+                    summonPos = me->GetRandomPoint(_player->GetPosition(), 15.f);
+                    summonPos.m_positionZ = _player->GetPositionZ();  // So they don't spawn at ground height
+                    me->SummonCreature(NPC_TARGET_MUCKJAW, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                }
+                else
+                    return;
             }, 4s, 8s);
             break;
         case NPC_TROPE:
             ScheduleTimedEvent(4s, [&]
             {
-                if (_player)
-                    me->SummonCreature(NPC_TARGET_TROPE, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
-
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();
+                        me->SummonCreature(NPC_TARGET_TROPE, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
             }, 1s, 3s);
             break;
         case NPC_CORLOK:
             ScheduleTimedEvent(4s, [&]
             {
-                if (_player)
-                    me->SummonCreature(NPC_TARGET_CORLOK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
-
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();
+                        me->SummonCreature(NPC_TARGET_CORLOK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
             }, 1s, 3s);
             break;
         case NPC_ICHMAN:
             ScheduleTimedEvent(4s, [&]
             {
-                if (_player)
-                    me->SummonCreature(NPC_TARGET_ICHMAN, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
-
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();
+                        me->SummonCreature(NPC_TARGET_ICHMAN, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
             }, 1s, 3s);
             break;
         case NPC_MULVERICK:
             ScheduleTimedEvent(4s, [&]
             {
-                if (_player)
-                    me->SummonCreature(NPC_TARGET_MULVERICK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
-
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();
+                        me->SummonCreature(NPC_TARGET_MULVERICK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
             }, 1s, 3s);
             break;
         case NPC_SKYSHATTER:
             ScheduleTimedEvent(4s, [&]
             {
-                if (_player)
-                    me->SummonCreature(NPC_TARGET_SKYSHATTER, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
-
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 7.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();  // So they don't spawn at ground height
+                        me->SummonCreature(NPC_TARGET_SKYSHATTER, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
             }, 1s, 3s);
             break;
         default:

@@ -670,3 +670,5 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 (23361, 0, 0, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 86, 40945, 2, 7, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Oldie\'s Target - On Just Summoned - Cross Cast \'Sky Shatter\''),
 (23361, 0, 1, 0, 8, 0, 100, 0, 40945, 0, 0, 0, 0, 0, 11, 41064, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Race: Oldie\'s Target - On Spellhit \'Sky Shatter\' - Cast \'Sky Shatter\'');
+
+DELETE FROM `spell_script_names` WHERE `spell_id` IN (40890, 40894, 40909, 40928, 40930, 40945) AND `ScriptName`='spell_quest_dragonmaw_race_generic';
