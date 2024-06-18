@@ -1,3 +1,4 @@
+-- DB update 2024_06_18_02 -> 2024_06_18_03
 -- Force-Commander Gorax
 UPDATE `creature_template_addon` SET `path_id` = 1926400 WHERE `entry` = 19264;
 
