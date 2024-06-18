@@ -1973,13 +1973,20 @@ struct dragonmaw_race_npc : public ScriptedAI
         * Timers are placeholders
         * After spawned, the rest is done via SmartAI
         */
+        if (!_player)
+            return;
+
+        Position summonPos;
+        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
+        summonPos.m_positionZ = _player->GetPositionZ();  // So they don't spawn at ground height
+
         switch (me->GetEntry())
         {
         case NPC_MUCKJAW:
             ScheduleTimedEvent(4s, [&]
             {
                 if (_player)
-                    me->SummonCreature(NPC_TARGET_MUCKJAW, me->GetRandomPoint(_player->GetPosition(), 15.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+                    me->SummonCreature(NPC_TARGET_MUCKJAW, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
 
             }, 4s, 8s);
             break;
@@ -1987,7 +1994,7 @@ struct dragonmaw_race_npc : public ScriptedAI
             ScheduleTimedEvent(4s, [&]
             {
                 if (_player)
-                    me->SummonCreature(NPC_TARGET_TROPE, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+                    me->SummonCreature(NPC_TARGET_TROPE, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
 
             }, 1s, 3s);
             break;
@@ -1995,7 +2002,7 @@ struct dragonmaw_race_npc : public ScriptedAI
             ScheduleTimedEvent(4s, [&]
             {
                 if (_player)
-                    me->SummonCreature(NPC_TARGET_CORLOK, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+                    me->SummonCreature(NPC_TARGET_CORLOK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
 
             }, 1s, 3s);
             break;
@@ -2003,7 +2010,7 @@ struct dragonmaw_race_npc : public ScriptedAI
             ScheduleTimedEvent(4s, [&]
             {
                 if (_player)
-                    me->SummonCreature(NPC_TARGET_ICHMAN, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+                    me->SummonCreature(NPC_TARGET_ICHMAN, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
 
             }, 1s, 3s);
             break;
@@ -2011,7 +2018,7 @@ struct dragonmaw_race_npc : public ScriptedAI
             ScheduleTimedEvent(4s, [&]
             {
                 if (_player)
-                    me->SummonCreature(NPC_TARGET_MULVERICK, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+                    me->SummonCreature(NPC_TARGET_MULVERICK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
 
             }, 1s, 3s);
             break;
@@ -2019,7 +2026,7 @@ struct dragonmaw_race_npc : public ScriptedAI
             ScheduleTimedEvent(4s, [&]
             {
                 if (_player)
-                    me->SummonCreature(NPC_TARGET_SKYSHATTER, me->GetRandomPoint(_player->GetPosition(), 10.f), TEMPSUMMON_TIMED_DESPAWN, 30000);
+                    me->SummonCreature(NPC_TARGET_SKYSHATTER, summonPos, TEMPSUMMON_TIMED_DESPAWN, 30000);
 
             }, 1s, 3s);
             break;
