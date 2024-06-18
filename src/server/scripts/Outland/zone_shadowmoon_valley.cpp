@@ -1873,9 +1873,10 @@ enum DragonmawRaces
 
 struct dragonmaw_race_npc : public ScriptedAI
 {
-    dragonmaw_race_npc(Creature* creature) : ScriptedAI(creature) { }
-
-    Player* _player;
+    dragonmaw_race_npc(Creature* creature) : ScriptedAI(creature)
+    {
+        _player = nullptr;
+    }
 
     void Reset() override
     {
@@ -2236,6 +2237,9 @@ struct dragonmaw_race_npc : public ScriptedAI
     {
         scheduler.Update(diff);
     }
+
+    private:
+        Player* _player;
 };
 
 void AddSC_shadowmoon_valley()
