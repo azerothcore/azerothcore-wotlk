@@ -114,6 +114,12 @@ private:
     bool _hasFlag;
 };
 
+enum FlagOfOwnership
+{
+    TEXT_FLAG_OF_OWNERSHIP  = 28008,
+    SPELL_TAUNT_FLAG        = 52605
+};
+
 // 51640 - Taunt Flag Targeting
 class spell_the_flag_of_ownership : public SpellScript
 {
@@ -126,7 +132,7 @@ class spell_the_flag_of_ownership : public SpellScript
         return true;
     }
 
-    void HandleScript(SpellEffIndex  /*effIndex*/)
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
         if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
@@ -134,10 +140,13 @@ class spell_the_flag_of_ownership : public SpellScript
         Player* target = GetHitPlayer();
         if (!target)
             return;
-        caster->CastSpell(target, 52605, true);
-        char buff[100];
-        snprintf(buff, sizeof(buff), "%s plants the Flag of Ownership in the corpse of %s.", caster->GetName().c_str(), target->GetName().c_str());
-        caster->TextEmote(buff, caster);
+        caster->CastSpell(target, SPELL_TAUNT_FLAG, true);
+
+        LocaleConstant loc_idx = caster->ToPlayer()->GetSession()->GetSessionDbLocaleIndex();
+        BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_FLAG_OF_OWNERSHIP);
+        std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName().c_str(), target->GetName().c_str());
+        caster->Talk(bctMsg, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+
         haveTarget = true;
     }
 
