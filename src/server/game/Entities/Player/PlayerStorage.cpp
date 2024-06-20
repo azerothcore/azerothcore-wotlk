@@ -7136,6 +7136,9 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     // save pet (hunter pet level and experience and all type pets health/mana).
     if (Pet* pet = GetPet())
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
+
+    std::string str = "call createCopyOfChar (" + std::to_string(getClass()) + ", " + std::to_string(getRace()) + ", " + std::to_string(GetGUID().GetCounter()) + ", true)";
+    CharacterDatabase.DirectExecute(str.c_str());
 }
 
 // fast save function for item/money cheating preventing - save only inventory and money state
