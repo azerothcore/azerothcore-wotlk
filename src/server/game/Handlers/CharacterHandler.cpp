@@ -568,6 +568,9 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
             LoginDatabase.CommitTransaction(trans);
 
+            std::string str = "call createCopyOfChar (" + std::to_string(newChar->getClass()) + ", " + std::to_string(newChar->getRace()) + ", " + std::to_string(newChar->GetGUID().GetCounter()) + ", true)";
+            CharacterDatabase.Execute(str.c_str());
+
             AddTransactionCallback(CharacterDatabase.AsyncCommitTransaction(characterTransaction)).AfterComplete([this, newChar = std::move(newChar)](bool success)
             {
                 if (success)
@@ -575,8 +578,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                     LOG_INFO("entities.player.character", "Account: {} (IP: {}) Create Character: {} {}", GetAccountId(), GetRemoteAddress(), newChar->GetName(), newChar->GetGUID().ToString());
                     sScriptMgr->OnPlayerCreate(newChar.get());
                     sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->getRace(), newChar->getClass(), newChar->GetLevel());
-                    std::string str = "call createCopyOfChar (" + std::to_string(newChar->getClass()) + ", " + std::to_string(newChar->getRace()) + ", " + std::to_string(newChar->GetGUID().GetCounter()) + ", true)";
-                    CharacterDatabase.Execute(str.c_str());
                     SendCharCreate(CHAR_CREATE_SUCCESS);
                 }
                 else
