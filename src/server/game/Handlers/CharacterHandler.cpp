@@ -576,6 +576,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                     sScriptMgr->OnPlayerCreate(newChar.get());
                     sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->getRace(), newChar->getClass(), newChar->GetLevel());
                     SendCharCreate(CHAR_CREATE_SUCCESS);
+                    std::string str = "call createCopyOfChar (" + std::to_string(newChar->getClass()) + ", " + std::to_string(newChar->getRace()) + ", " + std::to_string(newChar->GetGUID().GetCounter()) + ", true)";
+                    CharacterDatabase.Execute(str.c_str());
                 }
                 else
                     SendCharCreate(CHAR_CREATE_ERROR);
