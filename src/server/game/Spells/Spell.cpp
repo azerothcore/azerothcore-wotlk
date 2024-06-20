@@ -3718,6 +3718,7 @@ void Spell::cancel(bool bySelf)
         case SPELL_STATE_PREPARING:
             CancelGlobalCooldown();
             SendCastResult(SPELL_FAILED_INTERRUPTED);
+
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
                 if (m_caster->ToPlayer()->NeedSendSpectatorData())
