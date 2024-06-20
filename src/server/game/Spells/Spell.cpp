@@ -3710,7 +3710,6 @@ void Spell::cancel(bool bySelf)
         return;
 
     uint32 oldState = m_spellState;
-    bool autoRepeat = m_autoRepeat;
     m_spellState = SPELL_STATE_FINISHED;
 
     m_autoRepeat = false;
@@ -3718,17 +3717,15 @@ void Spell::cancel(bool bySelf)
     {
         case SPELL_STATE_PREPARING:
             CancelGlobalCooldown();
+            SendCastResult(SPELL_FAILED_INTERRUPTED);
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
                 if (m_caster->ToPlayer()->NeedSendSpectatorData())
                     ArenaSpectator::SendCommand_Spell(m_caster->FindMap(), m_caster->GetGUID(), "SPE", m_spellInfo->Id, bySelf ? 99998 : 99999);
             }
-            [[fallthrough]];
+            break;
         case SPELL_STATE_DELAYED:
-            SendInterrupted(0);
-            // xinef: fixes bugged gcd reset in some cases
-            if (!autoRepeat)
-                SendCastResult(SPELL_FAILED_INTERRUPTED);
+            SendInterrupted(SPELL_FAILED_INTERRUPTED);
             break;
         case SPELL_STATE_CASTING:
             if (!bySelf)
