@@ -1,3 +1,4 @@
+-- DB update 2024_06_20_05 -> 2024_06_20_06
 --
 DELETE FROM `creature_text` WHERE `CreatureID` = 15076 AND `ID` = 0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
