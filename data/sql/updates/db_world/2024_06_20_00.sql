@@ -1,3 +1,4 @@
+-- DB update 2024_06_18_06 -> 2024_06_20_00
 --
 UPDATE `command` SET `help`='Syntax: .cast #spellid [triggered]\r\n  Cast #spellid to selected target. If no target selected cast to self. If \'triggered\' or part provided then spell cast with triggered flag.' WHERE `name`='cast';
 UPDATE `command` SET `help`='Syntax: .cast back #spellid [triggered]\r\n  Selected target will cast #spellid to your character. If \'triggered\' or part provided then spell cast with triggered flag.' WHERE `name`='cast back';
