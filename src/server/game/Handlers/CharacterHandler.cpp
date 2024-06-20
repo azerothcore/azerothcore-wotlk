@@ -576,8 +576,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                     sScriptMgr->OnPlayerCreate(newChar.get());
                     sCharacterCache->AddCharacterCacheEntry(newChar->GetGUID(), GetAccountId(), newChar->GetName(), newChar->getGender(), newChar->getRace(), newChar->getClass(), newChar->GetLevel());
                     SendCharCreate(CHAR_CREATE_SUCCESS);
-                    std::string str = "call createCopyOfChar (" + std::to_string(newChar->getClass()) + ", " + std::to_string(newChar->getRace()) + ", " + std::to_string(newChar->GetGUID().GetCounter()) + ", true)";
-                    CharacterDatabase.Execute(str.c_str());
                 }
                 else
                     SendCharCreate(CHAR_CREATE_ERROR);
@@ -790,6 +788,8 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     ObjectGuid playerGuid = holder.GetGuid();
 
     Player* pCurrChar = new Player(this);
+
+
     // for send server info and strings (config)
     ChatHandler chH = ChatHandler(pCurrChar->GetSession());
 
@@ -801,6 +801,13 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         delete pCurrChar; // delete it manually
         m_playerLoading = false;
         return;
+    }
+    if (pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST))
+    {
+        std::string str = "call createCopyOfChar (" + std::to_string(pCurrChar->getClass()) + ", " + std::to_string(pCurrChar->getRace()) + ", " + std::to_string(pCurrChar->GetGUID().GetCounter()) + ", true)";
+        CharacterDatabase.DirectExecute(str.c_str());
+        //reload stuff
+        pCurrChar->LoadFromDB(playerGuid, holder);
     }
 
     pCurrChar->GetMotionMaster()->Initialize();
