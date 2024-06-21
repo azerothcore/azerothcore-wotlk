@@ -3181,6 +3181,8 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 if (diminishMod == 0.0f)
                 {
                     m_spellAura->Remove();
+                    if (m_diminishGroup == DIMINISHING_TAUNT)
+                        return SPELL_MISS_IMMUNE;
                     bool found = false;
                     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                         if (effectMask & (1 << i) && m_spellInfo->Effects[i].Effect != SPELL_EFFECT_APPLY_AURA)
