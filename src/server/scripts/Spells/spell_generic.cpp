@@ -61,7 +61,7 @@ class spell_gen_hearth : public SpellScript
 
     void Register() override
     {
-        AfterCast += SpellCastFn(ResetCooldown);
+        AfterCast += SpellCastFn(spell_gen_hearth::ResetCooldown);
     }
 };
 
