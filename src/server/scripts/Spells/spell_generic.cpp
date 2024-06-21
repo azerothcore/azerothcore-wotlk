@@ -48,6 +48,23 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+// hearth 8690
+class spell_gen_hearth : public SpellScript
+{
+    PrepareSpellScript(spell_gen_hearth);
+
+    void ResetCooldown()
+    {
+        if(GetCaster()->IsPlayer())
+            GetCaster()->ToPlayer()->RemoveSpellCooldown(8690, true);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(ResetCooldown);
+    }
+}
+
 // 46642 - 5,000 Gold
 class spell_gen_5000_gold : public SpellScript
 {
