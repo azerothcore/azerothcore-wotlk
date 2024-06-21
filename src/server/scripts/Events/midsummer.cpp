@@ -676,7 +676,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
 
         // prevent duplicates
-        if (std::find(_dancerList.begin(), _dancerList.end(), dancer) != _dancerList.end())
+        if (std::find(_dancerList.begin(), _dancerList.end(), dancer->GetGUID()) != _dancerList.end())
             return;
 
         _dancerList.push_back(dancer->GetGUID());
