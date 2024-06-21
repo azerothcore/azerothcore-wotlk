@@ -38,6 +38,9 @@ ArenaTeam::ArenaTeam()
     Stats.Rating      = sWorld->getIntConfig(CONFIG_ARENA_START_RATING);
     Stats.WeekWins    = 0;
     Stats.SeasonWins  = 0;
+
+    if (sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID) < 6 && sWorld->getIntConfig(CONFIG_ARENA_START_RATING) == 0)
+        Stats.Rating = 1500;
 }
 
 ArenaTeam::~ArenaTeam()
@@ -127,10 +130,12 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     // Set player's personal rating
     uint32 personalRating = 0;
 
-    if (sWorld->getIntConfig(CONFIG_ARENA_START_PERSONAL_RATING) > 0)
+    if (sWorld->getIntConfig(CONFIG_ARENA_START_PERSONAL_RATING) > 0 )
         personalRating = sWorld->getIntConfig(CONFIG_ARENA_START_PERSONAL_RATING);
-    else if (GetRating() >= 1000)
+    else if (GetRating() >= 1000 && sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID) >= 5)
         personalRating = 1000;
+    else if (sWorld->getIntConfig(CONFIG_ARENA_SEASON_ID) < 6)
+        personalRating = 1500;
 
     // xinef: sync query
     // Try to get player's match maker rating from db and fall back to config setting if not found
