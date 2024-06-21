@@ -710,7 +710,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         std::erase_if(_dancerList, [this](ObjectGuid dancerGUID)
         {
             Player* dancer = ObjectAccessor::GetPlayer(*me, dancerGUID);
-            return dancer && !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
+            return !dancer || !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
         });
     }
 
