@@ -173,8 +173,8 @@ protected:
             }
         }
 
-        for (int removeIndex : newSocketsToRemoveIndexes)
-            _newSockets.erase(_newSockets.begin() + removeIndex);
+        for (auto it = newSocketsToRemoveIndexes.rbegin(); it != newSocketsToRemoveIndexes.rend(); ++it)
+            _newSockets.erase(_newSockets.begin() + *it);
     }
 
     void Run()
