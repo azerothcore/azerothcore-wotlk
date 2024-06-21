@@ -158,7 +158,9 @@ enum Points
 
 enum Misc
 {
-    MAX_FLAMECALLERS = 3
+    MAX_FLAMECALLERS = 3,
+    QUEST_SUMMON_AHUNE = 11691,
+    ITEM_MAGMA_TOTEM = 34953
 };
 
 Position const SummonPositions[] =
@@ -307,8 +309,8 @@ struct npc_frozen_core : public ScriptedAI
         if (Creature* ahune = _instance->GetCreature(DATA_AHUNE))
             Unit::Kill(me, ahune);
 
-        DoCast(SPELL_SUMMON_LOOT_MISSILE);
-        DoCast(SPELL_MINION_DESPAWNER);
+        DoCastSelf(SPELL_SUMMON_LOOT_MISSILE, true);
+        DoCastSelf(SPELL_MINION_DESPAWNER, true);
     }
 
     void DoAction(int32 action) override
@@ -661,6 +663,9 @@ struct go_ahune_ice_stone : public GameObjectAI
     bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
     {
         ClearGossipMenuFor(player);
+
+        player->DestroyItemCount(ITEM_MAGMA_TOTEM, 1, true, false);
+        player->AreaExploredOrEventHappens(QUEST_SUMMON_AHUNE); //auto rewarded
 
         if (Creature* ahuneBunny = _instance->GetCreature(DATA_AHUNE_BUNNY))
             ahuneBunny->AI()->DoAction(ACTION_START_EVENT);
