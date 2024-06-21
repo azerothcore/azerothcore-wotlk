@@ -676,10 +676,10 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
 
         // prevent duplicates
-        if (std::find(_dancerList.begin(), _dancerList.end(), dancer) != _dancerList.end())
+        if (std::find(_dancerList.begin(), _dancerList.end(), dancer->GetGUID()) != _dancerList.end())
             return;
 
-        _dancerList.push_back(dancer);
+        _dancerList.push_back(dancer->GetGUID());
     }
 
     void LocateRibbonPole()
@@ -707,11 +707,11 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
             return;
 
         // remove non-dancing players from list
-        std::erase_if(_dancerList, [](Player* dancer)
-            {
-                if (dancer) /// @todo: replace with GUID storage rather than Player object
-                    return !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
-            });
+        std::erase_if(_dancerList, [this](ObjectGuid dancerGUID)
+        {
+            Player* dancer = ObjectAccessor::GetPlayer(*me, dancerGUID);
+            return !dancer || !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
+        });
     }
 
     void DoFlameCircleChecks()
@@ -789,9 +789,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
                 for (uint8 i = 0; (i < MAX_COUNT_SPEW_LAVA_TARGETS) && (i < _dancerList.size()); i++)
                 {
-                    Player* dancerTarget = _dancerList[i];
-
-                    if (dancerTarget)
+                    if (Player* dancerTarget = ObjectAccessor::GetPlayer(*me, _dancerList[i]))
                     {
                         Creature* fireSpiralBunny = dancerTarget->SummonCreature(NPC_RIBBON_POLE_FIRE_SPIRAL_BUNNY, dancerTarget->GetPositionX(), dancerTarget->GetPositionY(), dancerTarget->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                         if (fireSpiralBunny)
@@ -824,7 +822,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
     }
 
 private:
-    std::vector<Player*> _dancerList;
+    GuidVector _dancerList;
     GameObject* _ribbonPole;
     Creature* _bunny;
 };
