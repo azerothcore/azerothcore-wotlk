@@ -883,7 +883,7 @@ void Player::FailQuest(uint32 questId)
     {
         QuestStatus qStatus = GetQuestStatus(questId);
         // xinef: if quest is marked as failed, dont do it again
-        if ((qStatus != QUEST_STATUS_INCOMPLETE) && (!quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_TIMED)))
+        if ((qStatus != QUEST_STATUS_INCOMPLETE) && (!quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CAN_FAIL_IN_ANY_STATE)))
             return;
 
         SetQuestStatus(questId, QUEST_STATUS_FAILED);
