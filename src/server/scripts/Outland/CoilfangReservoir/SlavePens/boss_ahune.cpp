@@ -205,6 +205,9 @@ struct boss_ahune : public BossAI
     {
         instance->DoCastSpellOnPlayers(SPELL_AHUNE_ACHIEVEMENT);
 
+        DoCast(SPELL_SUMMON_LOOT_MISSILE);
+        DoCast(SPELL_MINION_DESPAWNER);
+
         if (Creature* ahuneBunny = instance->GetCreature(DATA_AHUNE_BUNNY))
             Unit::Kill(me, ahuneBunny);
         if (Creature* frozenCore = instance->GetCreature(DATA_FROZEN_CORE))
@@ -227,17 +230,6 @@ struct boss_ahune : public BossAI
         {
             Submerge();
             events.ScheduleEvent(EVENT_EMERGE, 35s);
-        }
-    }
-
-    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-    {
-        if (!attacker || attacker->GetTypeId() != TYPEID_UNIT || attacker->ToCreature()->GetEntry() != NPC_FROZEN_CORE)
-        {
-            if (damage >= me->GetHealth())
-            {
-                damage = 0;
-            }
         }
     }
 
@@ -319,9 +311,6 @@ struct npc_frozen_core : public ScriptedAI
     {
         if (Creature* ahune = _instance->GetCreature(DATA_AHUNE))
             Unit::Kill(me, ahune);
-
-        DoCast(SPELL_SUMMON_LOOT_MISSILE);
-        DoCast(SPELL_MINION_DESPAWNER);
     }
 
     void DoAction(int32 action) override
