@@ -55,7 +55,7 @@ class spell_gen_hearth : public SpellScript
 
     void ResetCooldown()
     {
-        if(GetCaster()->IsPlayer())
+        if (GetCaster()->IsPlayer())
             GetCaster()->ToPlayer()->RemoveSpellCooldown(8690, true);
     }
 
@@ -63,7 +63,7 @@ class spell_gen_hearth : public SpellScript
     {
         AfterCast += SpellCastFn(ResetCooldown);
     }
-}
+};
 
 // 46642 - 5,000 Gold
 class spell_gen_5000_gold : public SpellScript
@@ -5362,5 +5362,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_yehkinya_bramble);
     RegisterSpellScript(spell_gen_choking_vines);
     RegisterSpellScript(spell_gen_consumption);
+    RegisterSpellScript(spell_gen_hearth);
 }
 
