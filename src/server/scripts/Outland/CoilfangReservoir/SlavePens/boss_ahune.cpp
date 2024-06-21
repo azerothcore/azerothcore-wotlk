@@ -232,16 +232,7 @@ struct boss_ahune : public BossAI
 
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
-        if (!attacker || attacker->GetTypeId() != TYPEID_UNIT)
-        {
-            if (damage >= me->GetHealth())
-            {
-                damage = 0;
-            }
-            return;
-        }
-
-        if (attacker->ToCreature()->GetEntry() != NPC_FROZEN_CORE)
+        if (!attacker || attacker->GetTypeId() != TYPEID_UNIT || attacker->ToCreature()->GetEntry() != NPC_FROZEN_CORE)
         {
             if (damage >= me->GetHealth())
             {
