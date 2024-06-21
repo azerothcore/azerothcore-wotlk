@@ -709,7 +709,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         // remove non-dancing players from list
         std::erase_if(_dancerList, [](Player* dancer)
             {
-                if (dancer)
+                if (dancer) /// @todo: replace with GUID storage rather than Player object
                     return !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
             });
     }
