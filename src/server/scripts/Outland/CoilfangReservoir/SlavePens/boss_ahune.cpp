@@ -158,7 +158,9 @@ enum Points
 
 enum Misc
 {
-    MAX_FLAMECALLERS = 3
+    MAX_FLAMECALLERS = 3,
+    QUEST_SUMMON_AHUNE = 11691,
+    ITEM_MAGMA_TOTEM = 34953
 };
 
 Position const SummonPositions[] =
@@ -225,6 +227,26 @@ struct boss_ahune : public BossAI
         {
             Submerge();
             events.ScheduleEvent(EVENT_EMERGE, 35s);
+        }
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (!attacker || attacker->GetTypeId() != TYPEID_UNIT)
+        {
+            if (damage >= me->GetHealth())
+            {
+                damage = 0;
+            }
+            return;
+        }
+
+        if (attacker->ToCreature()->GetEntry() != NPC_FROZEN_CORE)
+        {
+            if (damage >= me->GetHealth())
+            {
+                damage = 0;
+            }
         }
     }
 
@@ -661,6 +683,9 @@ struct go_ahune_ice_stone : public GameObjectAI
     bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
     {
         ClearGossipMenuFor(player);
+
+        player->DestroyItemCount(ITEM_MAGMA_TOTEM, 1, true, false);
+        player->AreaExploredOrEventHappens(QUEST_SUMMON_AHUNE); //auto rewarded
 
         if (Creature* ahuneBunny = _instance->GetCreature(DATA_AHUNE_BUNNY))
             ahuneBunny->AI()->DoAction(ACTION_START_EVENT);
