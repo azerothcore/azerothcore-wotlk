@@ -247,38 +247,32 @@ class spell_black_template_free_friend : public SpellScript
     }
 };
 
-class spell_black_temple_curse_of_the_bleakheart : public SpellScriptLoader
+class spell_black_temple_curse_of_the_bleakheart_aura : public AuraScript
 {
-public:
-    spell_black_temple_curse_of_the_bleakheart() : SpellScriptLoader("spell_black_temple_curse_of_the_bleakheart") { }
+    PrepareAuraScript(spell_black_temple_curse_of_the_bleakheart_aura);
 
-    class spell_black_temple_curse_of_the_bleakheart_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_black_temple_curse_of_the_bleakheart_AuraScript);
+        return ValidateSpellInfo({ SPELL_CHEST_PAINS });
+    }
 
-        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = 5000;
-        }
-
-        void Update(AuraEffect const*  /*effect*/)
-        {
-            PreventDefaultAction();
-            if (roll_chance_i(20))
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_CHEST_PAINS, true);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_black_temple_curse_of_the_bleakheart_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_the_bleakheart_AuraScript::Update, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
     {
-        return new spell_black_temple_curse_of_the_bleakheart_AuraScript();
+        isPeriodic = true;
+        amplitude = 5000;
+    }
+
+    void Update(AuraEffect const*  /*effect*/)
+    {
+        PreventDefaultAction();
+        if (roll_chance_i(20))
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_CHEST_PAINS, true);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_black_temple_curse_of_the_bleakheart_aura::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_the_bleakheart_aura::Update, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -553,7 +547,7 @@ void AddSC_instance_black_temple()
     new instance_black_temple();
     RegisterSpellScript(spell_black_template_harpooners_mark_aura);
     RegisterSpellScript(spell_black_template_free_friend);
-    new spell_black_temple_curse_of_the_bleakheart();
+    RegisterSpellScript(spell_black_temple_curse_of_the_bleakheart_aura);
     new spell_black_temple_skeleton_shot();
     new spell_black_temple_wyvern_sting();
     new spell_black_temple_charge_rage();
