@@ -1508,31 +1508,20 @@ public:
     }
 };
 
-class spell_hodir_toasty_fire : public SpellScriptLoader
+class spell_hodir_toasty_fire_aura : public AuraScript
 {
-public:
-    spell_hodir_toasty_fire() : SpellScriptLoader("spell_hodir_toasty_fire") { }
+    PrepareAuraScript(spell_hodir_toasty_fire_aura);
 
-    class spell_hodir_toasty_fire_AuraScript : public AuraScript
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hodir_toasty_fire_AuraScript);
+        if (Unit* target = GetTarget())
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_MAGE_TOASTY_FIRE_AURA, 0, GetCaster());
+    }
 
-        void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_MAGE_TOASTY_FIRE_AURA, 0, GetCaster());
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_hodir_toasty_fire_AuraScript();
+        AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
     }
 };
 
@@ -1590,6 +1579,6 @@ void AddSC_boss_hodir()
     new achievement_i_have_the_coolest_friends();
     new achievement_staying_buffed_all_winter_10();
     new achievement_staying_buffed_all_winter_25();
-    new spell_hodir_toasty_fire();
+    RegisterSpellScript(spell_hodir_toasty_fire_aura);
     new spell_hodir_starlight();
 }
