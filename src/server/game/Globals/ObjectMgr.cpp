@@ -8824,22 +8824,21 @@ void ObjectMgr::LoadCreatureOutfits()
         }
         co.gender        = fields[i++].Get<uint8>();
         // Set correct displayId
+        _creatureTemplateStore[entry].unit_flags2 |= UNIT_FLAG2_MIRROR_IMAGE; // Needed so client requests mirror packet
+        _creatureTemplateStore[entry].Models.clear();
         switch (co.gender)
         {
             case GENDER_FEMALE:
-                _creatureTemplateStore[entry].Modelid1 = rEntry->model_f;
+                _creatureTemplateStore[entry].Models.emplace_back(rEntry->model_f, 1.0f, 1.0f);
                 break;
             case GENDER_MALE:
-                _creatureTemplateStore[entry].Modelid1 = rEntry->model_m;
+                _creatureTemplateStore[entry].Models.emplace_back(rEntry->model_m, 1.0f, 1.0f);
                 break;
             default:
                 LOG_ERROR("server.loading", ">> Creature entry {} in `creature_template_outfits` has invalid gender {}", entry, uint32(co.gender));
+                _creatureTemplateStore[entry].Models.emplace_back(rEntry->model_m, 1.0f, 1.0f);
                 continue;
         }
-        _creatureTemplateStore[entry].Modelid2 = 0;
-        _creatureTemplateStore[entry].Modelid3 = 0;
-        _creatureTemplateStore[entry].Modelid4 = 0;
-        _creatureTemplateStore[entry].unit_flags2 |= UNIT_FLAG2_MIRROR_IMAGE; // Needed so client requests mirror packet
 
         co.skin          = fields[i++].Get<uint8>();
         co.face          = fields[i++].Get<uint8>();
