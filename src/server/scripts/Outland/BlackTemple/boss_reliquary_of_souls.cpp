@@ -687,40 +687,29 @@ class spell_reliquary_of_souls_aura_of_desire_aura : public AuraScript
     }
 };
 
-class spell_reliquary_of_souls_aura_of_anger : public SpellScriptLoader
+class spell_reliquary_of_souls_aura_of_anger_aura : public AuraScript
 {
-public:
-    spell_reliquary_of_souls_aura_of_anger() : SpellScriptLoader("spell_reliquary_of_souls_aura_of_anger") { }
+    PrepareAuraScript(spell_reliquary_of_souls_aura_of_anger_aura);
 
-    class spell_reliquary_of_souls_aura_of_anger_AuraScript : public AuraScript
+    void CalculateAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        PrepareAuraScript(spell_reliquary_of_souls_aura_of_anger_AuraScript);
+        if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_0))
+            amount = amount * effect->GetTickNumber();
+    }
 
-        void CalculateAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_0))
-                amount = amount * effect->GetTickNumber();
-        }
-
-        void Update(AuraEffect const*  /*effect*/)
-        {
-            if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_0))
-                effect->RecalculateAmount();
-            if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
-                effect->RecalculateAmount();
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_reliquary_of_souls_aura_of_anger_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_reliquary_of_souls_aura_of_anger_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_reliquary_of_souls_aura_of_anger_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Update(AuraEffect const*  /*effect*/)
     {
-        return new spell_reliquary_of_souls_aura_of_anger_AuraScript();
+        if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_0))
+            effect->RecalculateAmount();
+        if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
+            effect->RecalculateAmount();
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_reliquary_of_souls_aura_of_anger_aura::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_reliquary_of_souls_aura_of_anger_aura::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_reliquary_of_souls_aura_of_anger_aura::Update, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -760,7 +749,7 @@ void AddSC_boss_reliquary_of_souls()
     RegisterSpellScript(spell_reliquary_of_souls_aura_of_suffering_aura);
     RegisterSpellAndAuraScriptPair(spell_reliquary_of_souls_fixate, spell_reliquary_of_souls_fixate_aura);
     RegisterSpellScript(spell_reliquary_of_souls_aura_of_desire_aura);
-    new spell_reliquary_of_souls_aura_of_anger();
+    RegisterSpellScript(spell_reliquary_of_souls_aura_of_anger_aura);
     new spell_reliquary_of_souls_spite();
 }
 
