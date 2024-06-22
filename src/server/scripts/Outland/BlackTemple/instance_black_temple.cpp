@@ -230,31 +230,20 @@ private:
     GuidSet _turtleSet;
 };
 
-class spell_black_template_free_friend : public SpellScriptLoader
+class spell_black_template_free_friend : public SpellScript
 {
-public:
-    spell_black_template_free_friend() : SpellScriptLoader("spell_black_template_free_friend") { }
+    PrepareSpellScript(spell_black_template_free_friend);
 
-    class spell_black_template_free_friend_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_black_template_free_friend_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->RemoveAurasWithMechanic(IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK);
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->RemoveAurasWithMechanic(IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_black_template_free_friend_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_black_template_free_friend_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_black_template_free_friend::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -563,7 +552,7 @@ void AddSC_instance_black_temple()
 {
     new instance_black_temple();
     RegisterSpellScript(spell_black_template_harpooners_mark_aura);
-    new spell_black_template_free_friend();
+    RegisterSpellScript(spell_black_template_free_friend);
     new spell_black_temple_curse_of_the_bleakheart();
     new spell_black_temple_skeleton_shot();
     new spell_black_temple_wyvern_sting();
