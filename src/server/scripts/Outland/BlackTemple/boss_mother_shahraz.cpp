@@ -193,31 +193,20 @@ class spell_mother_shahraz_random_periodic_aura : public AuraScript
     }
 };
 
-class spell_mother_shahraz_beam_periodic : public SpellScriptLoader
+class spell_mother_shahraz_beam_periodic_aura : public AuraScript
 {
-public:
-    spell_mother_shahraz_beam_periodic() : SpellScriptLoader("spell_mother_shahraz_beam_periodic") { }
+    PrepareAuraScript(spell_mother_shahraz_beam_periodic_aura);
 
-    class spell_mother_shahraz_beam_periodic_AuraScript : public AuraScript
+    void Update(AuraEffect const* effect)
     {
-        PrepareAuraScript(spell_mother_shahraz_beam_periodic_AuraScript);
+        PreventDefaultAction();
+        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0))
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void Update(AuraEffect const* effect)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0))
-                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_beam_periodic_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_mother_shahraz_beam_periodic_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_beam_periodic_aura::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -368,7 +357,7 @@ void AddSC_boss_mother_shahraz()
 {
     new boss_mother_shahraz();
     RegisterSpellScript(spell_mother_shahraz_random_periodic_aura);
-    new spell_mother_shahraz_beam_periodic();
+    RegisterSpellScript(spell_mother_shahraz_beam_periodic_aura);
     new spell_mother_shahraz_saber_lash();
     new spell_mother_shahraz_fatal_attraction();
     new spell_mother_shahraz_fatal_attraction_dummy();
