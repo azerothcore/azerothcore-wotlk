@@ -386,31 +386,20 @@ class spell_black_temple_spell_absorption_aura : public AuraScript
     }
 };
 
-class spell_black_temple_bloodbolt : public SpellScriptLoader
+class spell_black_temple_bloodbolt : public SpellScript
 {
-public:
-    spell_black_temple_bloodbolt() : SpellScriptLoader("spell_black_temple_bloodbolt") { }
+    PrepareSpellScript(spell_black_temple_bloodbolt);
 
-    class spell_black_temple_bloodbolt_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_black_temple_bloodbolt_SpellScript);
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, GetEffectValue(), true);
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, GetEffectValue(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_black_temple_bloodbolt_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_black_temple_bloodbolt_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_black_temple_bloodbolt::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -508,7 +497,7 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_charge_rage_aura);
     RegisterSpellScript(spell_black_temple_shadow_inferno_aura);
     RegisterSpellScript(spell_black_temple_spell_absorption_aura);
-    new spell_black_temple_bloodbolt();
+    RegisterSpellScript(spell_black_temple_bloodbolt);
     new spell_black_temple_consuming_strikes();
     new spell_black_temple_curse_of_vitality();
     new spell_black_temple_dementia();
