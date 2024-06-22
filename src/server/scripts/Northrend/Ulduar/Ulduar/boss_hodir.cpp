@@ -1237,6 +1237,7 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
     {
         uint8 _counter = 0;
         bool _prev = false;
+        return true;
     }
 
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
