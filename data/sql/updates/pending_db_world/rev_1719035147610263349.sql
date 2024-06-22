@@ -12,3 +12,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_reliquary_of_souls_spite_aur
 UPDATE `spell_script_names` SET `ScriptName`='spell_black_template_harpooners_mark_aura' WHERE `spell_id`=40084;
 UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_curse_of_the_bleakheart_aura' WHERE `spell_id`=41170;
 UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_skeleton_shot_aura' WHERE `spell_id`=41171;
+UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_wyvern_sting_aura' WHERE `spell_id`=41186;

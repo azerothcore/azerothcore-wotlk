@@ -292,30 +292,24 @@ class spell_black_temple_skeleton_shot_aura : public AuraScript
     }
 };
 
-class spell_black_temple_wyvern_sting : public SpellScriptLoader
+class spell_black_temple_wyvern_sting_aura : public AuraScript
 {
-public:
-    spell_black_temple_wyvern_sting() : SpellScriptLoader("spell_black_temple_wyvern_sting") { }
+    PrepareAuraScript(spell_black_temple_wyvern_sting_aura);
 
-    class spell_black_temple_wyvern_sting_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_black_temple_wyvern_sting_AuraScript)
+        return ValidateSpellInfo({ SPELL_WYVERN_STING });
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(GetTarget(), SPELL_WYVERN_STING, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_wyvern_sting_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_black_temple_wyvern_sting_AuraScript();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(GetTarget(), SPELL_WYVERN_STING, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_wyvern_sting_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -538,7 +532,7 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_template_free_friend);
     RegisterSpellScript(spell_black_temple_curse_of_the_bleakheart_aura);
     RegisterSpellScript(spell_black_temple_skeleton_shot_aura);
-    new spell_black_temple_wyvern_sting();
+    RegisterSpellScript(spell_black_temple_wyvern_sting_aura);
     new spell_black_temple_charge_rage();
     new spell_black_temple_shadow_inferno();
     new spell_black_temple_spell_absorption();
