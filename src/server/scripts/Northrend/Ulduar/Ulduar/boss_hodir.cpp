@@ -1224,70 +1224,64 @@ class spell_hodir_biting_cold_main_aura : public AuraScript
     }
 };
 
-class spell_hodir_biting_cold_player_aura : public SpellScriptLoader
+class spell_hodir_biting_cold_player_aura : public AuraScript
 {
-public:
-    spell_hodir_biting_cold_player_aura() : SpellScriptLoader("spell_hodir_biting_cold_player_aura") { }
+    PrepareAuraScript(spell_hodir_biting_cold_player_aura);
 
-    class spell_hodir_biting_cold_player_aura_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hodir_biting_cold_player_aura_AuraScript)
+        return ValidateSpellInfo({ SPELL_FLASH_FREEZE_TRAPPED_PLAYER, SPELL_MAGE_TOASTY_FIRE_AURA, SPELL_BITING_COLD_DAMAGE });
+    }
 
-        uint8 counter {0};
-        bool prev {false};
+    uint8 counter {0};
+    bool prev {false};
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    {
+        if (Unit* target = GetTarget())
         {
-            if (Unit* target = GetTarget())
+            if (target->GetMapId() == 603)
+                SetDuration(GetMaxDuration());
+            if (target->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
+                return;
+            if (target->isMoving() || target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
             {
-                if (target->GetMapId() == 603)
-                    SetDuration(GetMaxDuration());
-                if (target->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
-                    return;
-                if (target->isMoving() || target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
+                if (prev)
                 {
-                    if (prev)
-                    {
-                        ModStackAmount(-1);
-                        prev = false;
-                    }
-                    else
-                        prev = true;
-
-                    if (counter >= 2)
-                        counter -= 2;
-                    else if (counter)
-                        --counter;
+                    ModStackAmount(-1);
+                    prev = false;
                 }
                 else
-                {
-                    prev = false;
-                    ++counter;
-                    if (counter >= 4)
-                    {
-                        if (GetStackAmount() == 2) // increasing from 2 to 3 (not checking >= to improve performance)
-                            if (InstanceScript* pInstance = target->GetInstanceScript())
-                                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
-                                    hodir->AI()->SetData(2, 1);
-                        ModStackAmount(1);
-                        counter = 0;
-                    }
-                }
+                    prev = true;
 
-                const int32 dmg = 200 * pow(2.0f, GetStackAmount());
-                target->CastCustomSpell(target, SPELL_BITING_COLD_DAMAGE, &dmg, 0, 0, true);
+                if (counter >= 2)
+                    counter -= 2;
+                else if (counter)
+                    --counter;
             }
-        }
+            else
+            {
+                prev = false;
+                ++counter;
+                if (counter >= 4)
+                {
+                    if (GetStackAmount() == 2) // increasing from 2 to 3 (not checking >= to improve performance)
+                        if (InstanceScript* pInstance = target->GetInstanceScript())
+                            if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
+                                hodir->AI()->SetData(2, 1);
+                    ModStackAmount(1);
+                    counter = 0;
+                }
+            }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_biting_cold_player_aura_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            const int32 dmg = 200 * pow(2.0f, GetStackAmount());
+            target->CastCustomSpell(target, SPELL_BITING_COLD_DAMAGE, &dmg, 0, 0, true);
         }
-    };
+    }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_hodir_biting_cold_player_aura_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_biting_cold_player_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1615,7 +1609,7 @@ void AddSC_boss_hodir()
 
     RegisterSpellScript(spell_hodir_shatter_chest);
     RegisterSpellScript(spell_hodir_biting_cold_main_aura);
-    new spell_hodir_biting_cold_player_aura();
+    RegisterSpellScript(spell_hodir_biting_cold_player_aura);
     new spell_hodir_periodic_icicle();
     new spell_hodir_flash_freeze();
     new spell_hodir_storm_power();
