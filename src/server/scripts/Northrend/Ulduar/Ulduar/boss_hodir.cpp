@@ -1395,39 +1395,28 @@ class spell_hodir_flash_freeze_aura : public AuraScript
     }
 };
 
-class spell_hodir_storm_power : public SpellScriptLoader
+class spell_hodir_storm_power_aura : public AuraScript
 {
-public:
-    spell_hodir_storm_power() : SpellScriptLoader("spell_hodir_storm_power") { }
+    PrepareAuraScript(spell_hodir_storm_power_aura);
 
-    class spell_hodir_storm_power_AuraScript : public AuraScript
+    void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hodir_storm_power_AuraScript)
+        if (Unit* caster = GetCaster())
+            if (Aura* a = caster->GetAura(GetId() == SPELL_SHAMAN_STORM_POWER_10 ? SPELL_SHAMAN_STORM_CLOUD_10 : SPELL_SHAMAN_STORM_CLOUD_25))
+                a->ModStackAmount(-1);
+    }
 
-        void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Aura* a = caster->GetAura(GetId() == SPELL_SHAMAN_STORM_POWER_10 ? SPELL_SHAMAN_STORM_CLOUD_10 : SPELL_SHAMAN_STORM_CLOUD_25))
-                    a->ModStackAmount(-1);
-        }
-
-        void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, GetId(), 0, GetCaster());
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_hodir_storm_power_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectApply += AuraEffectApplyFn(spell_hodir_storm_power_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_hodir_storm_power_AuraScript();
+        if (Unit* target = GetTarget())
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, GetId(), 0, GetCaster());
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_hodir_storm_power_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_hodir_storm_power_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
     }
 };
 
@@ -1598,7 +1587,7 @@ void AddSC_boss_hodir()
     RegisterSpellScript(spell_hodir_biting_cold_player_aura);
     RegisterSpellScript(spell_hodir_periodic_icicle);
     RegisterSpellAndAuraScriptPair(spell_hodir_flash_freeze, spell_hodir_flash_freeze_aura);
-    new spell_hodir_storm_power();
+    RegisterSpellScript(spell_hodir_storm_power_aura);
     new spell_hodir_storm_cloud();
 
     new achievement_cheese_the_freeze();
