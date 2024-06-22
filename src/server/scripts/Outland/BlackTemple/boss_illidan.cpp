@@ -1250,31 +1250,25 @@ class spell_illidan_demon_transform2_aura : public AuraScript
     }
 };
 
-class spell_illidan_flame_burst : public SpellScriptLoader
+class spell_illidan_flame_burst : public SpellScript
 {
-public:
-    spell_illidan_flame_burst() : SpellScriptLoader("spell_illidan_flame_burst") { }
+    PrepareSpellScript(spell_illidan_flame_burst);
 
-    class spell_illidan_flame_burst_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_illidan_flame_burst_SpellScript);
+        return ValidateSpellInfo({ SPELL_FLAME_BURST_EFFECT });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, SPELL_FLAME_BURST_EFFECT, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_flame_burst_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_illidan_flame_burst_SpellScript();
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_FLAME_BURST_EFFECT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_flame_burst::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1393,7 +1387,7 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_shadow_prison);
     RegisterSpellScript(spell_illidan_demon_transform1_aura);
     RegisterSpellScript(spell_illidan_demon_transform2_aura);
-    new spell_illidan_flame_burst();
+    RegisterSpellScript(spell_illidan_flame_burst);
     new spell_illidan_found_target();
     new spell_illidan_cage_trap();
     new spell_illidan_cage_trap_stun();
