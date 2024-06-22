@@ -1525,31 +1525,20 @@ public:
     }
 };
 
-class spell_hodir_starlight : public SpellScriptLoader
+class spell_hodir_starlight_aura : public AuraScript
 {
-public:
-    spell_hodir_starlight() : SpellScriptLoader("spell_hodir_starlight") { }
+    PrepareAuraScript(spell_hodir_starlight_aura);
 
-    class spell_hodir_starlight_AuraScript : public AuraScript
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hodir_starlight_AuraScript);
+        if (Unit* target = GetTarget())
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_DRUID_STARLIGHT_AREA_AURA, 0, GetCaster());
+    }
 
-        void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_DRUID_STARLIGHT_AREA_AURA, 0, GetCaster());
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_hodir_starlight_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MELEE_SLOW, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_hodir_starlight_AuraScript();
+        AfterEffectApply += AuraEffectApplyFn(spell_hodir_starlight_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MELEE_SLOW, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
     }
 };
 
@@ -1580,5 +1569,5 @@ void AddSC_boss_hodir()
     new achievement_i_have_the_coolest_friends();
     new achievement_staying_buffed_all_winter_10();
     new achievement_staying_buffed_all_winter_25();
-    new spell_hodir_starlight();
+    RegisterSpellScript(spell_hodir_starlight_aura);
 }
