@@ -1179,37 +1179,31 @@ class spell_illidan_shadow_prison : public SpellScript
     }
 };
 
-class spell_illidan_demon_transform1 : public SpellScriptLoader
+class spell_illidan_demon_transform1_aura : public AuraScript
 {
-public:
-    spell_illidan_demon_transform1() : SpellScriptLoader("spell_illidan_demon_transform1") { }
+    PrepareAuraScript(spell_illidan_demon_transform1_aura);
 
-    class spell_illidan_demon_transform1_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_illidan_demon_transform1_AuraScript);
+        return ValidateSpellInfo({ SPELL_DEMON_TRANSFORM_2 });
+    }
 
-        bool Load() override
-        {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            SetDuration(0);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_TRANSFORM_2, true);
-            GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_demon_transform1_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Load() override
     {
-        return new spell_illidan_demon_transform1_AuraScript();
+        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
+    {
+        PreventDefaultAction();
+        SetDuration(0);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_TRANSFORM_2, true);
+        GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_demon_transform1_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1403,7 +1397,7 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_glaive_throw);
     RegisterSpellScript(spell_illidan_tear_of_azzinoth_summon_channel_aura);
     RegisterSpellScript(spell_illidan_shadow_prison);
-    new spell_illidan_demon_transform1();
+    RegisterSpellScript(spell_illidan_demon_transform1_aura);
     new spell_illidan_demon_transform2();
     new spell_illidan_flame_burst();
     new spell_illidan_found_target();
