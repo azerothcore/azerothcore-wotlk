@@ -1239,7 +1239,6 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
         bool _prev = false;
     }
 
-
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
         if (Unit* target = GetTarget())
