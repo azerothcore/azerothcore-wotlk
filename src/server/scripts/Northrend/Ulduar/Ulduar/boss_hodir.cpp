@@ -1198,35 +1198,29 @@ class spell_hodir_shatter_chest : public SpellScript
     };
 };
 
-class spell_hodir_biting_cold_main_aura : public SpellScriptLoader
+class spell_hodir_biting_cold_main_aura : public AuraScript
 {
-public:
-    spell_hodir_biting_cold_main_aura() : SpellScriptLoader("spell_hodir_biting_cold_main_aura") { }
+    PrepareAuraScript(spell_hodir_biting_cold_main_aura);
 
-    class spell_hodir_biting_cold_main_aura_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hodir_biting_cold_main_aura_AuraScript)
+        return ValidateSpellInfo({ SPELL_BITING_COLD_PLAYER_AURA, SPELL_MAGE_TOASTY_FIRE_AURA });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            if ((aurEff->GetTickNumber() % 4) == 0)
-                if (Unit* target = GetTarget())
-                    if (target->GetTypeId() == TYPEID_PLAYER
-                        && !target->isMoving()
-                        && !target->HasAura(SPELL_BITING_COLD_PLAYER_AURA)
-                        && !target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
-                        target->CastSpell(target, SPELL_BITING_COLD_PLAYER_AURA, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_biting_cold_main_aura_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_hodir_biting_cold_main_aura_AuraScript();
+        if ((aurEff->GetTickNumber() % 4) == 0)
+            if (Unit* target = GetTarget())
+                if (target->GetTypeId() == TYPEID_PLAYER
+                    && !target->isMoving()
+                    && !target->HasAura(SPELL_BITING_COLD_PLAYER_AURA)
+                    && !target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
+                    target->CastSpell(target, SPELL_BITING_COLD_PLAYER_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_biting_cold_main_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1620,7 +1614,7 @@ void AddSC_boss_hodir()
     new npc_ulduar_hodir_mage();
 
     RegisterSpellScript(spell_hodir_shatter_chest);
-    new spell_hodir_biting_cold_main_aura();
+    RegisterSpellScript(spell_hodir_biting_cold_main_aura);
     new spell_hodir_biting_cold_player_aura();
     new spell_hodir_periodic_icicle();
     new spell_hodir_flash_freeze();
