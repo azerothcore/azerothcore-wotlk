@@ -650,38 +650,27 @@ class spell_illidari_council_reflective_shield_aura : public AuraScript
     }
 };
 
-class spell_illidari_council_judgement : public SpellScriptLoader
+class spell_illidari_council_judgement : public SpellScript
 {
-public:
-    spell_illidari_council_judgement() : SpellScriptLoader("spell_illidari_council_judgement") { }
+    PrepareSpellScript(spell_illidari_council_judgement);
 
-    class spell_illidari_council_judgement_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_illidari_council_judgement_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        Unit::AuraEffectList const& auras = GetCaster()->GetAuraEffectsByType(SPELL_AURA_DUMMY);
+        for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
         {
-            Unit::AuraEffectList const& auras = GetCaster()->GetAuraEffectsByType(SPELL_AURA_DUMMY);
-            for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
-            {
-                if ((*i)->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL && (*i)->GetEffIndex() == EFFECT_2)
-                    if (sSpellMgr->GetSpellInfo((*i)->GetAmount()))
-                    {
-                        GetCaster()->CastSpell(GetHitUnit(), (*i)->GetAmount(), true);
-                        break;
-                    }
-            }
+            if ((*i)->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL && (*i)->GetEffIndex() == EFFECT_2)
+                if (sSpellMgr->GetSpellInfo((*i)->GetAmount()))
+                {
+                    GetCaster()->CastSpell(GetHitUnit(), (*i)->GetAmount(), true);
+                    break;
+                }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidari_council_judgement_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_illidari_council_judgement_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_illidari_council_judgement::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -726,7 +715,7 @@ void AddSC_boss_illidari_council()
     RegisterSpellScript(spell_illidari_council_balance_of_power_aura);
     RegisterSpellScript(spell_illidari_council_empyreal_balance);
     RegisterSpellScript(spell_illidari_council_reflective_shield_aura);
-    new spell_illidari_council_judgement();
+    RegisterSpellScript(spell_illidari_council_judgement);
     new spell_illidari_council_deadly_strike();
 }
 
