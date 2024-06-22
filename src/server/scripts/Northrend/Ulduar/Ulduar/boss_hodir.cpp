@@ -1235,8 +1235,8 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
 
     bool Load() override
     {
-        uint8 _counter = 0;
-        bool _prev = false;
+        _counter = 0;
+        _prev = false;
         return true;
     }
 
