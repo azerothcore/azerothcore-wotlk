@@ -1332,34 +1332,28 @@ class spell_illidan_cage_trap : public SpellScript
     }
 };
 
-class spell_illidan_cage_trap_stun : public SpellScriptLoader
+class spell_illidan_cage_trap_stun_aura : public AuraScript
 {
-public:
-    spell_illidan_cage_trap_stun() : SpellScriptLoader("spell_illidan_cage_trap_stun") { }
+    PrepareAuraScript(spell_illidan_cage_trap_stun_aura);
 
-    class spell_illidan_cage_trap_stun_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_illidan_cage_trap_stun_AuraScript);
+        return ValidateSpellInfo({ SPELL_CAGED_DEBUFF });
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            SetDuration(0);
-
-            for (uint32 i = SPELL_CAGED_SUMMON1; i <= SPELL_CAGED_SUMMON8; ++i)
-                GetTarget()->CastSpell(GetTarget(), i, true);
-            GetTarget()->CastSpell(GetTarget(), SPELL_CAGED_DEBUFF, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_cage_trap_stun_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_illidan_cage_trap_stun_AuraScript();
+        PreventDefaultAction();
+        SetDuration(0);
+
+        for (uint32 i = SPELL_CAGED_SUMMON1; i <= SPELL_CAGED_SUMMON8; ++i)
+            GetTarget()->CastSpell(GetTarget(), i, true);
+        GetTarget()->CastSpell(GetTarget(), SPELL_CAGED_DEBUFF, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_cage_trap_stun_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1378,6 +1372,6 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_flame_burst);
     RegisterSpellScript(spell_illidan_found_target);
     RegisterSpellScript(spell_illidan_cage_trap);
-    new spell_illidan_cage_trap_stun();
+    RegisterSpellScript(spell_illidan_cage_trap_stun_aura);
 }
 
