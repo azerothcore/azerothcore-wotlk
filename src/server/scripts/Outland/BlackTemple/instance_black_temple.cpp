@@ -188,57 +188,46 @@ public:
     }
 };
 
-class spell_black_template_harpooners_mark : public SpellScriptLoader
+class spell_black_template_harpooners_mark_aura : public AuraScript
 {
-public:
-    spell_black_template_harpooners_mark() : SpellScriptLoader("spell_black_template_harpooners_mark") { }
+    PrepareAuraScript(spell_black_template_harpooners_mark_aura);
 
-    class spell_black_template_harpooners_mark_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_black_template_harpooners_mark_AuraScript)
-
-        bool Load() override
-        {
-            _turtleSet.clear();
-            return true;
-        }
-
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            std::list<Creature*> creatureList;
-            GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_DRAGON_TURTLE);
-            for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-            {
-                (*itr)->TauntApply(GetUnitOwner());
-                (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
-                _turtleSet.insert((*itr)->GetGUID());
-            }
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            for (ObjectGuid const& guid : _turtleSet)
-                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
-                {
-                    turtle->TauntFadeOut(GetUnitOwner());
-                    turtle->AddThreat(GetUnitOwner(), -10000000.0f);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_black_template_harpooners_mark_AuraScript::HandleEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_black_template_harpooners_mark_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-    private:
-        GuidSet _turtleSet;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_black_template_harpooners_mark_AuraScript();
+        _turtleSet.clear();
+        return true;
     }
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        std::list<Creature*> creatureList;
+        GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_DRAGON_TURTLE);
+        for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+        {
+            (*itr)->TauntApply(GetUnitOwner());
+            (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+            _turtleSet.insert((*itr)->GetGUID());
+        }
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        for (ObjectGuid const& guid : _turtleSet)
+            if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
+            {
+                turtle->TauntFadeOut(GetUnitOwner());
+                turtle->AddThreat(GetUnitOwner(), -10000000.0f);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_black_template_harpooners_mark_aura::HandleEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_black_template_harpooners_mark_aura::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+
+private:
+    GuidSet _turtleSet;
 };
 
 class spell_black_template_free_friend : public SpellScriptLoader
@@ -573,7 +562,7 @@ public:
 void AddSC_instance_black_temple()
 {
     new instance_black_temple();
-    new spell_black_template_harpooners_mark();
+    RegisterSpellScript(spell_black_template_harpooners_mark_aura);
     new spell_black_template_free_friend();
     new spell_black_temple_curse_of_the_bleakheart();
     new spell_black_temple_skeleton_shot();
