@@ -403,30 +403,19 @@ class spell_black_temple_bloodbolt : public SpellScript
     }
 };
 
-class spell_black_temple_consuming_strikes : public SpellScriptLoader
+class spell_black_temple_consuming_strikes_aura : public AuraScript
 {
-public:
-    spell_black_temple_consuming_strikes() : SpellScriptLoader("spell_black_temple_consuming_strikes") { }
+    PrepareAuraScript(spell_black_temple_consuming_strikes_aura);
 
-    class spell_black_temple_consuming_strikes_AuraScript : public AuraScript
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
-        PrepareAuraScript(spell_black_temple_consuming_strikes_AuraScript);
+        PreventDefaultAction();
+        GetTarget()->CastCustomSpell(GetSpellInfo()->Effects[EFFECT_1].CalcValue(), SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage(), GetTarget(), true);
+    }
 
-        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            GetTarget()->CastCustomSpell(GetSpellInfo()->Effects[EFFECT_1].CalcValue(), SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage(), GetTarget(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_black_temple_consuming_strikes_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_temple_consuming_strikes_AuraScript();
+        OnEffectProc += AuraEffectProcFn(spell_black_temple_consuming_strikes_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -498,7 +487,7 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_shadow_inferno_aura);
     RegisterSpellScript(spell_black_temple_spell_absorption_aura);
     RegisterSpellScript(spell_black_temple_bloodbolt);
-    new spell_black_temple_consuming_strikes();
+    RegisterSpellScript(spell_black_temple_consuming_strikes_aura);
     new spell_black_temple_curse_of_vitality();
     new spell_black_temple_dementia();
 }
