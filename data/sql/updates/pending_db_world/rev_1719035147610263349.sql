@@ -5,3 +5,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_mother_shahraz_saber_lash_au
 UPDATE `spell_script_names` SET `ScriptName`='spell_illidari_council_balance_of_power_aura' WHERE `spell_id`=41341;
 UPDATE `spell_script_names` SET `ScriptName`='spell_illidari_council_reflective_shield_aura' WHERE `spell_id`=41475;
 UPDATE `spell_script_names` SET `ScriptName`='spell_illidari_council_deadly_strike_aura' WHERE `spell_id`=41480;
+UPDATE `spell_script_names` SET `ScriptName`='spell_reliquary_of_souls_aura_of_suffering_aura' WHERE `spell_id`=41292;

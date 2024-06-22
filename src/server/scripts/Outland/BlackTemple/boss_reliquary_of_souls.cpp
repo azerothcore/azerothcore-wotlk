@@ -582,35 +582,29 @@ public:
     };
 };
 
-class spell_reliquary_of_souls_aura_of_suffering : public SpellScriptLoader
+class spell_reliquary_of_souls_aura_of_suffering_aura : public AuraScript
 {
-public:
-    spell_reliquary_of_souls_aura_of_suffering() : SpellScriptLoader("spell_reliquary_of_souls_aura_of_suffering") { }
+    PrepareAuraScript(spell_reliquary_of_souls_aura_of_suffering_aura);
 
-    class spell_reliquary_of_souls_aura_of_suffering_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_reliquary_of_souls_aura_of_suffering_AuraScript)
+        return ValidateSpellInfo({ SPELL_AURA_OF_SUFFERING_TRIGGER });
+    }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->CastSpell(GetTarget(), SPELL_AURA_OF_SUFFERING_TRIGGER, true);
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_AURA_OF_SUFFERING_TRIGGER);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_reliquary_of_souls_aura_of_suffering_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_aura_of_suffering_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_reliquary_of_souls_aura_of_suffering_AuraScript();
+        GetTarget()->CastSpell(GetTarget(), SPELL_AURA_OF_SUFFERING_TRIGGER, true);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_AURA_OF_SUFFERING_TRIGGER);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_reliquary_of_souls_aura_of_suffering_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_aura_of_suffering_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -785,7 +779,7 @@ void AddSC_boss_reliquary_of_souls()
     new boss_essence_of_suffering();
     new boss_essence_of_desire();
     new boss_essence_of_anger();
-    new spell_reliquary_of_souls_aura_of_suffering();
+    RegisterSpellScript(spell_reliquary_of_souls_aura_of_suffering_aura);
     new spell_reliquary_of_souls_fixate();
     new spell_reliquary_of_souls_aura_of_desire();
     new spell_reliquary_of_souls_aura_of_anger();
