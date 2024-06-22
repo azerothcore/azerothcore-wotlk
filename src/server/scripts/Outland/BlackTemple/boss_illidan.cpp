@@ -1066,52 +1066,41 @@ class spell_illidan_parasitic_shadowfiend_aura : public AuraScript
     }
 };
 
-class spell_illidan_parasitic_shadowfiend_trigger : public SpellScriptLoader
+class spell_illidan_parasitic_shadowfiend_trigger : public SpellScript
 {
-public:
-    spell_illidan_parasitic_shadowfiend_trigger() : SpellScriptLoader("spell_illidan_parasitic_shadowfiend_trigger") { }
+    PrepareSpellScript(spell_illidan_parasitic_shadowfiend_trigger);
 
-    class spell_illidan_parasitic_shadowfiend_trigger_AuraScript : public AuraScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareAuraScript(spell_illidan_parasitic_shadowfiend_trigger_AuraScript)
-
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
-                GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_trigger_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_illidan_parasitic_shadowfiend_trigger_AuraScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Creature* target = GetHitCreature())
+            target->DespawnOrUnsummon(1);
     }
 
-    class spell_illidan_parasitic_shadowfiend_trigger_SpellScript : public SpellScript
+    void Register() override
     {
-        PrepareSpellScript(spell_illidan_parasitic_shadowfiend_trigger_SpellScript);
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_parasitic_shadowfiend_trigger::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Creature* target = GetHitCreature())
-                target->DespawnOrUnsummon(1);
-        }
+class spell_illidan_parasitic_shadowfiend_trigger_aura : public AuraScript
+{
+    PrepareAuraScript(spell_illidan_parasitic_shadowfiend_trigger_aura);
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_parasitic_shadowfiend_trigger_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return new spell_illidan_parasitic_shadowfiend_trigger_SpellScript();
+        return ValidateSpellInfo({ SPELL_SUMMON_PARASITIC_SHADOWFIENDS });
+    }
+
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
+            GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_trigger_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1433,7 +1422,7 @@ void AddSC_boss_illidan()
     new npc_akama_illidan();
     RegisterSpellScript(spell_illidan_draw_soul);
     RegisterSpellScript(spell_illidan_parasitic_shadowfiend_aura);
-    new spell_illidan_parasitic_shadowfiend_trigger();
+    RegisterSpellAndAuraScriptPair(spell_illidan_parasitic_shadowfiend_trigger, spell_illidan_parasitic_shadowfiend_trigger_aura);
     new spell_illidan_glaive_throw();
     new spell_illidan_tear_of_azzinoth_summon_channel();
     new spell_illidan_shadow_prison();
