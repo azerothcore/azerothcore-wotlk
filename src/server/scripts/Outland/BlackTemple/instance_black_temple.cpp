@@ -276,30 +276,19 @@ class spell_black_temple_curse_of_the_bleakheart_aura : public AuraScript
     }
 };
 
-class spell_black_temple_skeleton_shot : public SpellScriptLoader
+class spell_black_temple_skeleton_shot_aura : public AuraScript
 {
-public:
-    spell_black_temple_skeleton_shot() : SpellScriptLoader("spell_black_temple_skeleton_shot") { }
+    PrepareAuraScript(spell_black_temple_skeleton_shot_aura);
 
-    class spell_black_temple_skeleton_shot_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_black_temple_skeleton_shot_AuraScript)
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+            GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_2].CalcValue(), true);
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_2].CalcValue(), true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_skeleton_shot_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_temple_skeleton_shot_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_skeleton_shot_aura::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -548,7 +537,7 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_template_harpooners_mark_aura);
     RegisterSpellScript(spell_black_template_free_friend);
     RegisterSpellScript(spell_black_temple_curse_of_the_bleakheart_aura);
-    new spell_black_temple_skeleton_shot();
+    RegisterSpellScript(spell_black_temple_skeleton_shot_aura);
     new spell_black_temple_wyvern_sting();
     new spell_black_temple_charge_rage();
     new spell_black_temple_shadow_inferno();
