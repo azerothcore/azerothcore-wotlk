@@ -198,38 +198,27 @@ public:
     };
 };
 
-class spell_gurtogg_bloodboil : public SpellScriptLoader
+class spell_gurtogg_bloodboil : public SpellScript
 {
-public:
-    spell_gurtogg_bloodboil() : SpellScriptLoader("spell_gurtogg_bloodboil") { }
+    PrepareSpellScript(spell_gurtogg_bloodboil);
 
-    class spell_gurtogg_bloodboil_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_gurtogg_bloodboil_SpellScript);
+        if (targets.empty())
+            return;
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster(), false));
+        if (targets.size() > GetSpellValue()->MaxAffectedTargets)
         {
-            if (targets.empty())
-                return;
-
-            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster(), false));
-            if (targets.size() > GetSpellValue()->MaxAffectedTargets)
-            {
-                std::list<WorldObject*>::iterator itr = targets.begin();
-                std::advance(itr, GetSpellValue()->MaxAffectedTargets);
-                targets.erase(itr, targets.end());
-            }
+            std::list<WorldObject*>::iterator itr = targets.begin();
+            std::advance(itr, GetSpellValue()->MaxAffectedTargets);
+            targets.erase(itr, targets.end());
         }
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gurtogg_bloodboil_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gurtogg_bloodboil_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gurtogg_bloodboil::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -264,7 +253,7 @@ public:
 void AddSC_boss_gurtogg_bloodboil()
 {
     new boss_gurtogg_bloodboil();
-    new spell_gurtogg_bloodboil();
+    RegisterSpellScript(spell_gurtogg_bloodboil);
     new spell_gurtogg_eject();
 }
 
