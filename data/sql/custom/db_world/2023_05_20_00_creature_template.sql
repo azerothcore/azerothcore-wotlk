@@ -2,9 +2,7 @@
 SET @BOT_START = 70587;
 SET @BOT_END   = 70595;
 
-DELETE FROM `creature_template` WHERE `entry` BETWEEN @BOT_START AND @BOT_END;
-
-INSERT INTO `creature_template`
+INSERT IGNORE INTO `creature_template`
 (`entry`,`difficulty_entry_1`,`difficulty_entry_2`,`difficulty_entry_3`,`KillCredit1`,`KillCredit2`,
 `name`,`subname`,`IconName`,`gossip_menu_id`,`minlevel`,`maxlevel`,`exp`,
 `faction`,`npcflag`,`speed_walk`,`speed_run`,`scale`,`rank`,`dmgschool`,`BaseAttackTime`,`RangeAttackTime`,
