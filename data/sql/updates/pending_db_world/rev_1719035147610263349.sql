@@ -22,3 +22,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_dementia_aura' 
 UPDATE `spell_script_names` SET `ScriptName`='spell_illidan_parasitic_shadowfiend_aura' WHERE `spell_id`=41917;
 UPDATE `spell_script_names` SET `ScriptName`='spell_illidan_tear_of_azzinoth_summon_channel_aura' WHERE `spell_id`=39857;
 UPDATE `spell_script_names` SET `ScriptName`='spell_illidan_demon_transform1_aura' WHERE `spell_id`=40511;
+UPDATE `spell_script_names` SET `ScriptName`='spell_illidan_demon_transform2_aura' WHERE `spell_id`=40398;

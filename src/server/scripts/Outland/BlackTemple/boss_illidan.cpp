@@ -1207,52 +1207,46 @@ class spell_illidan_demon_transform1_aura : public AuraScript
     }
 };
 
-class spell_illidan_demon_transform2 : public SpellScriptLoader
+class spell_illidan_demon_transform2_aura : public AuraScript
 {
-public:
-    spell_illidan_demon_transform2() : SpellScriptLoader("spell_illidan_demon_transform2") { }
+    PrepareAuraScript(spell_illidan_demon_transform2_aura);
 
-    class spell_illidan_demon_transform2_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_illidan_demon_transform2_AuraScript);
+        return ValidateSpellInfo({ SPELL_DEMON_FORM, SPELL_DEMON_TRANSFORM_3 });
+    }
 
-        bool Load() override
-        {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-
-            if (aurEff->GetTickNumber() == 1)
-            {
-                if (GetUnitOwner()->GetDisplayId() == GetUnitOwner()->GetNativeDisplayId())
-                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_FORM, true);
-                else
-                    GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DEMON_FORM);
-            }
-            else if (aurEff->GetTickNumber() == 2)
-            {
-                SetDuration(0);
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_TRANSFORM_3, true);
-                if (Aura* aura = GetUnitOwner()->GetAura(SPELL_DEMON_TRANSFORM_3))
-                    aura->SetDuration(4500);
-
-                if (!GetUnitOwner()->HasAura(SPELL_DEMON_FORM))
-                    GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_demon_transform2_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Load() override
     {
-        return new spell_illidan_demon_transform2_AuraScript();
+        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+
+        if (aurEff->GetTickNumber() == 1)
+        {
+            if (GetUnitOwner()->GetDisplayId() == GetUnitOwner()->GetNativeDisplayId())
+                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_FORM, true);
+            else
+                GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DEMON_FORM);
+        }
+        else if (aurEff->GetTickNumber() == 2)
+        {
+            SetDuration(0);
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_TRANSFORM_3, true);
+            if (Aura* aura = GetUnitOwner()->GetAura(SPELL_DEMON_TRANSFORM_3))
+                aura->SetDuration(4500);
+
+            if (!GetUnitOwner()->HasAura(SPELL_DEMON_FORM))
+                GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_demon_transform2_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1398,7 +1392,7 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_tear_of_azzinoth_summon_channel_aura);
     RegisterSpellScript(spell_illidan_shadow_prison);
     RegisterSpellScript(spell_illidan_demon_transform1_aura);
-    new spell_illidan_demon_transform2();
+    RegisterSpellScript(spell_illidan_demon_transform2_aura);
     new spell_illidan_flame_burst();
     new spell_illidan_found_target();
     new spell_illidan_cage_trap();
