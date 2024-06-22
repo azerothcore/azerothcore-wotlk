@@ -1442,6 +1442,23 @@ class spell_hodir_storm_cloud_aura : public AuraScript
     }
 };
 
+class spell_hodir_toasty_fire_aura : public AuraScript
+{
+    PrepareAuraScript(spell_hodir_toasty_fire_aura);
+
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_MAGE_TOASTY_FIRE_AURA, 0, GetCaster());
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
+    }
+};
+
 class achievement_cheese_the_freeze : public AchievementCriteriaScript
 {
 public:
@@ -1508,23 +1525,6 @@ public:
     }
 };
 
-class spell_hodir_toasty_fire_aura : public AuraScript
-{
-    PrepareAuraScript(spell_hodir_toasty_fire_aura);
-
-    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Unit* target = GetTarget())
-            if (target->GetTypeId() == TYPEID_PLAYER)
-                target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_MAGE_TOASTY_FIRE_AURA, 0, GetCaster());
-    }
-
-    void Register() override
-    {
-        AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
-    }
-};
-
 class spell_hodir_starlight : public SpellScriptLoader
 {
 public:
@@ -1572,6 +1572,7 @@ void AddSC_boss_hodir()
     RegisterSpellAndAuraScriptPair(spell_hodir_flash_freeze, spell_hodir_flash_freeze_aura);
     RegisterSpellScript(spell_hodir_storm_power_aura);
     RegisterSpellScript(spell_hodir_storm_cloud_aura);
+    RegisterSpellScript(spell_hodir_toasty_fire_aura);
 
     new achievement_cheese_the_freeze();
     new achievement_getting_cold_in_here();
@@ -1579,6 +1580,5 @@ void AddSC_boss_hodir()
     new achievement_i_have_the_coolest_friends();
     new achievement_staying_buffed_all_winter_10();
     new achievement_staying_buffed_all_winter_25();
-    RegisterSpellScript(spell_hodir_toasty_fire_aura);
     new spell_hodir_starlight();
 }
