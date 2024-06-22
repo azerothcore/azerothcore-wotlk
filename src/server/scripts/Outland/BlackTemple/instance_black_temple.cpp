@@ -330,31 +330,25 @@ class spell_black_temple_charge_rage_aura : public AuraScript
     }
 };
 
-class spell_black_temple_shadow_inferno : public SpellScriptLoader
+class spell_black_temple_shadow_inferno_aura : public AuraScript
 {
-public:
-    spell_black_temple_shadow_inferno() : SpellScriptLoader("spell_black_temple_shadow_inferno") { }
+    PrepareAuraScript(spell_black_temple_shadow_inferno_aura);
 
-    class spell_black_temple_shadow_inferno_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_black_temple_shadow_inferno_AuraScript);
+        return ValidateSpellInfo({ SPELL_SHADOW_INFERNO_DAMAGE });
+    }
 
-        void Update(AuraEffect const* effect)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->CastCustomSpell(SPELL_SHADOW_INFERNO_DAMAGE, SPELLVALUE_BASE_POINT0, effect->GetAmount(), GetUnitOwner(), TRIGGERED_FULL_MASK);
-            GetAura()->GetEffect(effect->GetEffIndex())->SetAmount(effect->GetAmount() + 500);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_shadow_inferno_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Update(AuraEffect const* effect)
     {
-        return new spell_black_temple_shadow_inferno_AuraScript();
+        PreventDefaultAction();
+        GetUnitOwner()->CastCustomSpell(SPELL_SHADOW_INFERNO_DAMAGE, SPELLVALUE_BASE_POINT0, effect->GetAmount(), GetUnitOwner(), TRIGGERED_FULL_MASK);
+        GetAura()->GetEffect(effect->GetEffIndex())->SetAmount(effect->GetAmount() + 500);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_shadow_inferno_aura::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -523,7 +517,7 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_skeleton_shot_aura);
     RegisterSpellScript(spell_black_temple_wyvern_sting_aura);
     RegisterSpellScript(spell_black_temple_charge_rage_aura);
-    new spell_black_temple_shadow_inferno();
+    RegisterSpellScript(spell_black_temple_shadow_inferno_aura);
     new spell_black_temple_spell_absorption();
     new spell_black_temple_bloodbolt();
     new spell_black_temple_consuming_strikes();
