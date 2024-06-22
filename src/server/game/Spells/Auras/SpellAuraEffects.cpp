@@ -2760,7 +2760,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                 {
                     uint32 model_id = 0;
 
-                    if (uint32 modelid = ci->GetRandomValidModelId())
+                    if (uint32 modelid = ObjectMgr::ChooseDisplayId(ci)->CreatureDisplayID)
                         model_id = modelid;                     // Will use the default model here
 
                     // Polymorph (sheep)
@@ -2812,10 +2812,10 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                 uint32 cr_id = target->GetAuraEffectsByType(SPELL_AURA_MOUNTED).front()->GetMiscValue();
                 if (CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(cr_id))
                 {
-                    uint32 displayID = ObjectMgr::ChooseDisplayId(ci);
-                    sObjectMgr->GetCreatureModelRandomGender(&displayID);
+                    CreatureModel model = *ObjectMgr::ChooseDisplayId(ci);
+                    sObjectMgr->GetCreatureModelRandomGender(&model, ci);
 
-                    target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, displayID);
+                    target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, model.CreatureDisplayID);
                 }
             }
         }
@@ -3327,15 +3327,9 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
 
         if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
         {
-            if (GetMiscValueB() > 0) // Choose proper modelid
-            {
-                displayId = GetMiscValueB() == 2 && creatureInfo->Modelid2 > 0 ? creatureInfo->Modelid2 : creatureInfo->Modelid1;
-            }
-            else // Should we choose random modelid in this case?
-            {
-                displayId = ObjectMgr::ChooseDisplayId(creatureInfo);
-            }
-            sObjectMgr->GetCreatureModelRandomGender(&displayId);
+            CreatureModel model = *ObjectMgr::ChooseDisplayId(creatureInfo);
+            sObjectMgr->GetCreatureModelRandomGender(&model, creatureInfo);
+            displayId = model.CreatureDisplayID;
 
             vehicleId = creatureInfo->VehicleId;
 
@@ -4211,6 +4205,7 @@ void AuraEffect::HandleModMechanicImmunity(AuraApplication const* aurApp, uint8 
         case 34471: // The Beast Within
         case 19574: // Bestial Wrath
         case 38484: // Bestial Wrath
+        case 40081: // Free friend (Black Temple)
             mechanic = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CHARM, apply);
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, apply);
@@ -5868,10 +5863,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
 
                             if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
                             {
-                                uint32 displayID = ObjectMgr::ChooseDisplayId(creatureInfo);
-                                sObjectMgr->GetCreatureModelRandomGender(&displayID);
+                                CreatureModel model = *ObjectMgr::ChooseDisplayId(creatureInfo);
+                                sObjectMgr->GetCreatureModelRandomGender(&model, creatureInfo);
 
-                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, displayID);
+                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, model.CreatureDisplayID);
                             }
                         }
                         break;
@@ -5898,10 +5893,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
 
                             if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
                             {
-                                uint32 displayID = ObjectMgr::ChooseDisplayId(creatureInfo);
-                                sObjectMgr->GetCreatureModelRandomGender(&displayID);
+                                CreatureModel model = *ObjectMgr::ChooseDisplayId(creatureInfo);
+                                sObjectMgr->GetCreatureModelRandomGender(&model, creatureInfo);
 
-                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, displayID);
+                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, model.CreatureDisplayID);
                             }
                         }
                         break;

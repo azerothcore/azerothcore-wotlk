@@ -555,6 +555,11 @@ public:
                 BossAI::AttackStart(target);
         }
 
+        void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+        {
+            CreatureAI::EnterEvadeMode(why);
+        }
+
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
         bool CanAIAttack(Unit const* target) const override

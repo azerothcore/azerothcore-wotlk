@@ -161,23 +161,35 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
         }
         // guess size
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
-        data << uint32(entry);                              // creature entry
+        data << uint32(entry);                                       // creature entry
         data << Name;
-        data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
+        data << uint8(0) << uint8(0) << uint8(0);                    // name2, name3, name4, always empty
         data << Title;
-        data << ci->IconName;                               // "Directions" for guard, string for Icons 2.3.0
-        data << uint32(ci->type_flags);                     // flags
-        data << uint32(ci->type);                           // CreatureType.dbc
-        data << uint32(ci->family);                         // CreatureFamily.dbc
-        data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
-        data << uint32(ci->KillCredit[0]);                  // new in 3.1, kill credit
-        data << uint32(ci->KillCredit[1]);                  // new in 3.1, kill credit
-        data << uint32(ci->Modelid1);                       // Modelid1
-        data << uint32(ci->Modelid2);                       // Modelid2
-        data << uint32(ci->Modelid3);                       // Modelid3
-        data << uint32(ci->Modelid4);                       // Modelid4
-        data << float(ci->ModHealth);                       // dmg/hp modifier
-        data << float(ci->ModMana);                         // dmg/mana modifier
+        data << ci->IconName;                                        // "Directions" for guard, string for Icons 2.3.0
+        data << uint32(ci->type_flags);                              // flags
+        data << uint32(ci->type);                                    // CreatureType.dbc
+        data << uint32(ci->family);                                  // CreatureFamily.dbc
+        data << uint32(ci->rank);                                    // Creature Rank (elite, boss, etc)
+        data << uint32(ci->KillCredit[0]);                           // new in 3.1, kill credit
+        data << uint32(ci->KillCredit[1]);                           // new in 3.1, kill credit
+        if (ci->GetModelByIdx(0))
+            data << uint32(ci->GetModelByIdx(0)->CreatureDisplayID); // Modelid1
+        else
+            data << uint32(0);                                       // Modelid1
+        if (ci->GetModelByIdx(1))
+            data << uint32(ci->GetModelByIdx(1)->CreatureDisplayID); // Modelid2
+        else
+            data << uint32(0);                                       // Modelid2
+        if (ci->GetModelByIdx(2))
+            data << uint32(ci->GetModelByIdx(2)->CreatureDisplayID); // Modelid3
+        else
+            data << uint32(0);                                       // Modelid3
+        if (ci->GetModelByIdx(3))
+            data << uint32(ci->GetModelByIdx(3)->CreatureDisplayID); // Modelid4
+        else
+            data << uint32(0);                                       // Modelid4
+        data << float(ci->ModHealth);                                // dmg/hp modifier
+        data << float(ci->ModMana);                                  // dmg/mana modifier
         data << uint8(ci->RacialLeader);
 
         CreatureQuestItemList const* items = sObjectMgr->GetCreatureQuestItemList(entry);
@@ -188,7 +200,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recvData)
             for (size_t i = 0; i < MAX_CREATURE_QUEST_ITEMS; ++i)
                 data << uint32(0);
 
-        data << uint32(ci->movementId);                     // CreatureMovementInfo.dbc
+        data << uint32(ci->movementId);                              // CreatureMovementInfo.dbc
         SendPacket(&data);
     }
     else

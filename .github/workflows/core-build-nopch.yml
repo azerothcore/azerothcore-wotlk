@@ -17,7 +17,7 @@ concurrency:
 jobs:
   build:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - os: ubuntu-22.04

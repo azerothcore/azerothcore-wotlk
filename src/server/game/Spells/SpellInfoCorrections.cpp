@@ -4859,6 +4859,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 5;
     });
 
+    // Presence Of Mind
+    ApplySpellFix({ 12043 }, [](SpellInfo* spellInfo)
+    {
+        // It should not share cooldown mods with category[1151] spells (Arcane Power [12042], Decimate [47271])
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

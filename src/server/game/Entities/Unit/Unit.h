@@ -2301,10 +2301,10 @@ public:
     virtual float GetNativeObjectScale() const { return 1.0f; }
     virtual void RecalculateObjectScale();
     [[nodiscard]] uint32 GetDisplayId() const { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
-    virtual void SetDisplayId(uint32 modelId);
+    virtual void SetDisplayId(uint32 modelId, float displayScale = 1.f);
     [[nodiscard]] uint32 GetNativeDisplayId() const { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
     void RestoreDisplayId();
-    void SetNativeDisplayId(uint32 modelId) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, modelId); }
+    void SetNativeDisplayId(uint32 displayId) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, displayId); }
     void setTransForm(uint32 spellid) { m_transform = spellid;}
     [[nodiscard]] uint32 getTransForm() const { return m_transform;}
 

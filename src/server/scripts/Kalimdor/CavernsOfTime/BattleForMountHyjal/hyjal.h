@@ -27,18 +27,13 @@
 
 uint32 const EncounterCount     = 5;
 
-enum HyjalBosses
-{
-    BOSS_ARCHIMONDE = 0,
-};
-
 enum DataTypes
 {
-    DATA_WINTERCHILL            = 1,
-    DATA_ANETHERON              = 2,
-    DATA_KAZROGAL               = 3,
-    DATA_AZGALOR                = 4,
-    DATA_ARCHIMONDE             = 5,
+    DATA_WINTERCHILL            = 0,
+    DATA_ANETHERON              = 1,
+    DATA_KAZROGAL               = 2,
+    DATA_AZGALOR                = 3,
+    DATA_ARCHIMONDE             = 4,
 
     DATA_ALLIANCE_RETREAT       = 11,
     DATA_HORDE_RETREAT          = 12,
@@ -154,7 +149,9 @@ enum HyjalMisc
 
     AREA_NORDRASSIL             = 3710,
 
-    SPELL_ETERNAL_SILENCE       = 42201
+    SPELL_ETERNAL_SILENCE       = 42201,
+
+    GUID_GAIN_SOUL_CHARGE_PLAYER = 1
 };
 
 enum HyjalPaths
