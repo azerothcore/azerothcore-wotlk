@@ -8,3 +8,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_illidari_council_deadly_stri
 UPDATE `spell_script_names` SET `ScriptName`='spell_reliquary_of_souls_aura_of_suffering_aura' WHERE `spell_id`=41292;
 UPDATE `spell_script_names` SET `ScriptName`='spell_reliquary_of_souls_aura_of_desire_aura' WHERE `spell_id`=41350;
 UPDATE `spell_script_names` SET `ScriptName`='spell_reliquary_of_souls_aura_of_anger_aura' WHERE `spell_id`=41337;
+UPDATE `spell_script_names` SET `ScriptName`='spell_reliquary_of_souls_spite_aura' WHERE `spell_id`=41376;

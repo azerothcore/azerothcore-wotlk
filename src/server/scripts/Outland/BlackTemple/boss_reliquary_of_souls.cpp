@@ -713,30 +713,24 @@ class spell_reliquary_of_souls_aura_of_anger_aura : public AuraScript
     }
 };
 
-class spell_reliquary_of_souls_spite : public SpellScriptLoader
+class spell_reliquary_of_souls_spite_aura : public AuraScript
 {
-public:
-    spell_reliquary_of_souls_spite() : SpellScriptLoader("spell_reliquary_of_souls_spite") { }
+    PrepareAuraScript(spell_reliquary_of_souls_spite_aura);
 
-    class spell_reliquary_of_souls_spite_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_reliquary_of_souls_spite_AuraScript)
+        return ValidateSpellInfo({ SPELL_SPITE_DAMAGE });
+    }
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(GetTarget(), SPELL_SPITE_DAMAGE, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_spite_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DAMAGE_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_reliquary_of_souls_spite_AuraScript();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(GetTarget(), SPELL_SPITE_DAMAGE, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_spite_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DAMAGE_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -750,6 +744,6 @@ void AddSC_boss_reliquary_of_souls()
     RegisterSpellAndAuraScriptPair(spell_reliquary_of_souls_fixate, spell_reliquary_of_souls_fixate_aura);
     RegisterSpellScript(spell_reliquary_of_souls_aura_of_desire_aura);
     RegisterSpellScript(spell_reliquary_of_souls_aura_of_anger_aura);
-    new spell_reliquary_of_souls_spite();
+    RegisterSpellScript(spell_reliquary_of_souls_spite_aura);
 }
 
