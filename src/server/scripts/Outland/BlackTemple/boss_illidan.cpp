@@ -1126,47 +1126,41 @@ class spell_illidan_glaive_throw : public SpellScript
     }
 };
 
-class spell_illidan_tear_of_azzinoth_summon_channel : public SpellScriptLoader
+class spell_illidan_tear_of_azzinoth_summon_channel_aura : public AuraScript
 {
-public:
-    spell_illidan_tear_of_azzinoth_summon_channel() : SpellScriptLoader("spell_illidan_tear_of_azzinoth_summon_channel") { }
+    PrepareAuraScript(spell_illidan_tear_of_azzinoth_summon_channel_aura);
 
-    class spell_illidan_tear_of_azzinoth_summon_channel_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_illidan_tear_of_azzinoth_summon_channel_AuraScript);
+        return ValidateSpellInfo({ SPELL_UNCAGED_WRATH, SPELL_CHARGE });
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
+    {
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
         {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
+            if (GetTarget()->GetDistance2d(caster) > 25.0f)
             {
-                if (GetTarget()->GetDistance2d(caster) > 25.0f)
-                {
-                    SetDuration(0);
-                    GetTarget()->CastSpell(GetTarget(), SPELL_UNCAGED_WRATH, true);
-                }
+                SetDuration(0);
+                GetTarget()->CastSpell(GetTarget(), SPELL_UNCAGED_WRATH, true);
             }
-
-            // xinef: ugly hax, dunno how it really works on blizz
-            Map::PlayerList const& pl = GetTarget()->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                if (Player* player = itr->GetSource())
-                    if (player->GetPositionX() > 693.4f || player->GetPositionY() < 271.8f || player->GetPositionX() < 658.43f || player->GetPositionY() > 338.68f)
-                    {
-                        GetTarget()->CastSpell(player, SPELL_CHARGE, true);
-                        break;
-                    }
         }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_tear_of_azzinoth_summon_channel_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
+        // xinef: ugly hax, dunno how it really works on blizz
+        Map::PlayerList const& pl = GetTarget()->GetMap()->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+            if (Player* player = itr->GetSource())
+                if (player->GetPositionX() > 693.4f || player->GetPositionY() < 271.8f || player->GetPositionX() < 658.43f || player->GetPositionY() > 338.68f)
+                {
+                    GetTarget()->CastSpell(player, SPELL_CHARGE, true);
+                    break;
+                }
+    }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_illidan_tear_of_azzinoth_summon_channel_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_tear_of_azzinoth_summon_channel_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1418,7 +1412,7 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_parasitic_shadowfiend_aura);
     RegisterSpellAndAuraScriptPair(spell_illidan_parasitic_shadowfiend_trigger, spell_illidan_parasitic_shadowfiend_trigger_aura);
     RegisterSpellScript(spell_illidan_glaive_throw);
-    new spell_illidan_tear_of_azzinoth_summon_channel();
+    RegisterSpellScript(spell_illidan_tear_of_azzinoth_summon_channel_aura);
     new spell_illidan_shadow_prison();
     new spell_illidan_demon_transform1();
     new spell_illidan_demon_transform2();
