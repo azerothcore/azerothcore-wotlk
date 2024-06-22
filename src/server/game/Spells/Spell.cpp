@@ -3710,6 +3710,7 @@ void Spell::cancel(bool bySelf)
         return;
 
     uint32 oldState = m_spellState;
+    bool autoRepeat = m_autoRepeat;
     m_spellState = SPELL_STATE_FINISHED;
 
     m_autoRepeat = false;
@@ -3724,9 +3725,11 @@ void Spell::cancel(bool bySelf)
             }
             [[fallthrough]];
         case SPELL_STATE_DELAYED:
-            SendInterrupted(SPELL_FAILED_INTERRUPTED);
+            SendInterrupted(0);
+            // xinef: fixes bugged gcd reset in some cases
+            if (!autoRepeat)
+                SendCastResult(SPELL_FAILED_INTERRUPTED);
             break;
-
         case SPELL_STATE_CASTING:
             if (!bySelf)
             {

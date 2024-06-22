@@ -530,7 +530,7 @@ public:
                     }
 
                     context.Repeat(timerptr[_currentWave]);
-                    if (++_currentWave < maxWaves && _bossWave)
+                    if (++_currentWave < maxWaves && _bossWave != TO_BE_DECIDED)
                     {
                         DoUpdateWorldState(WORLD_STATE_WAVES, _currentWave);
                         DoUpdateWorldState(WORLD_STATE_ENEMY, 1);
