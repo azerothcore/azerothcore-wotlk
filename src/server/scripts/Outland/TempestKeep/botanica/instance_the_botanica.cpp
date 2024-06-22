@@ -42,57 +42,46 @@ public:
     }
 };
 
-class spell_botanica_call_of_the_falcon : public SpellScriptLoader
+class spell_botanica_call_of_the_falcon_aura : public AuraScript
 {
-public:
-    spell_botanica_call_of_the_falcon() : SpellScriptLoader("spell_botanica_call_of_the_falcon") { }
+    PrepareAuraScript(spell_botanica_call_of_the_falcon_aura);
 
-    class spell_botanica_call_of_the_falcon_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_botanica_call_of_the_falcon_AuraScript)
-
-        bool Load() override
-        {
-            _falconSet.clear();
-            return true;
-        }
-
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            std::list<Creature*> creatureList;
-            GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_BLOODFALCON);
-            for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
-            {
-                (*itr)->TauntApply(GetUnitOwner());
-                (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
-                _falconSet.insert((*itr)->GetGUID());
-            }
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            for (ObjectGuid const& guid : _falconSet)
-                if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
-                {
-                    falcon->TauntFadeOut(GetUnitOwner());
-                    falcon->AddThreat(GetUnitOwner(), -10000000.0f);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_botanica_call_of_the_falcon_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_botanica_call_of_the_falcon_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-    private:
-        GuidSet _falconSet;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_botanica_call_of_the_falcon_AuraScript();
+        _falconSet.clear();
+        return true;
     }
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        std::list<Creature*> creatureList;
+        GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_BLOODFALCON);
+        for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+        {
+            (*itr)->TauntApply(GetUnitOwner());
+            (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+            _falconSet.insert((*itr)->GetGUID());
+        }
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        for (ObjectGuid const& guid : _falconSet)
+            if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
+            {
+                falcon->TauntFadeOut(GetUnitOwner());
+                falcon->AddThreat(GetUnitOwner(), -10000000.0f);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_botanica_call_of_the_falcon_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_botanica_call_of_the_falcon_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+
+private:
+    GuidSet _falconSet;
 };
 
 class spell_botanica_shift_form : public SpellScriptLoader
@@ -171,7 +160,7 @@ public:
 void AddSC_instance_the_botanica()
 {
     new instance_the_botanica();
-    new spell_botanica_call_of_the_falcon();
+    RegisterSpellScript(spell_botanica_call_of_the_falcon_aura);
     new spell_botanica_shift_form();
 }
 
