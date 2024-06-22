@@ -1180,33 +1180,22 @@ public:
     };
 };
 
-class spell_hodir_shatter_chest : public SpellScriptLoader
+class spell_hodir_shatter_chest : public SpellScript
 {
-public:
-    spell_hodir_shatter_chest() : SpellScriptLoader("spell_hodir_shatter_chest") { }
+    PrepareSpellScript(spell_hodir_shatter_chest);
 
-    class spell_hodir_shatter_chestSpellScript : public SpellScript
+    void DestroyWinterCache(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_hodir_shatter_chestSpellScript)
+        PreventHitDefaultEffect(effIndex);
 
-        void destroyWinterCache(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-
-            if (Unit* hodir = GetCaster())
-                hodir->GetAI()->DoAction(EVENT_FAIL_HM);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
-        };
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_hodir_shatter_chestSpellScript();
+        if (Unit* hodir = GetCaster())
+            hodir->GetAI()->DoAction(EVENT_FAIL_HM);
     }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_hodir_shatter_chest::DestroyWinterCache, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
+    };
 };
 
 class spell_hodir_biting_cold_main_aura : public SpellScriptLoader
@@ -1630,13 +1619,13 @@ void AddSC_boss_hodir()
     new npc_ulduar_hodir_shaman();
     new npc_ulduar_hodir_mage();
 
+    RegisterSpellScript(spell_hodir_shatter_chest);
     new spell_hodir_biting_cold_main_aura();
     new spell_hodir_biting_cold_player_aura();
     new spell_hodir_periodic_icicle();
     new spell_hodir_flash_freeze();
     new spell_hodir_storm_power();
     new spell_hodir_storm_cloud();
-    new spell_hodir_shatter_chest();
 
     new achievement_cheese_the_freeze();
     new achievement_getting_cold_in_here();
