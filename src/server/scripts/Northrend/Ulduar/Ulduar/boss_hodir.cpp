@@ -1323,86 +1323,75 @@ public:
     }
 };
 
-class spell_hodir_flash_freeze : public SpellScriptLoader
+class spell_hodir_flash_freeze : public SpellScript
 {
-public:
-    spell_hodir_flash_freeze() : SpellScriptLoader("spell_hodir_flash_freeze") { }
+    PrepareSpellScript(spell_hodir_flash_freeze);
 
-    class spell_hodir_flash_freeze_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_hodir_flash_freeze_SpellScript);
+        targets.remove_if(FlashFreezeCheck());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(FlashFreezeCheck());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_flash_freeze_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_flash_freeze_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    class spell_hodir_flash_freeze_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_hodir_flash_freeze_AuraScript)
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_flash_freeze::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_flash_freeze::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
+class spell_hodir_flash_freeze_aura : public AuraScript
+{
+    PrepareAuraScript(spell_hodir_flash_freeze_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FLASH_FREEZE_INSTAKILL, SPELL_FLASH_FREEZE_TRAPPED_PLAYER, SPELL_FLASH_FREEZE_TRAPPED_NPC });
+    }
+
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
+    {
+        if (aurEff->GetTotalTicks() > 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()) - 1)
         {
-            if (aurEff->GetTotalTicks() > 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()) - 1)
+            Unit* target = GetTarget();
+            Unit* caster = GetCaster();
+            if (!target || !caster || caster->GetTypeId() != TYPEID_UNIT)
+                return;
+
+            if (Aura* aur = target->GetAura(target->GetTypeId() == TYPEID_PLAYER ? SPELL_FLASH_FREEZE_TRAPPED_PLAYER : SPELL_FLASH_FREEZE_TRAPPED_NPC))
             {
-                Unit* target = GetTarget();
-                Unit* caster = GetCaster();
-                if (!target || !caster || caster->GetTypeId() != TYPEID_UNIT)
-                    return;
-
-                if (Aura* aur = target->GetAura(target->GetTypeId() == TYPEID_PLAYER ? SPELL_FLASH_FREEZE_TRAPPED_PLAYER : SPELL_FLASH_FREEZE_TRAPPED_NPC))
+                if (Unit* caster2 = aur->GetCaster())
                 {
-                    if (Unit* caster2 = aur->GetCaster())
+                    if (caster2->GetTypeId() == TYPEID_UNIT)
                     {
-                        if (caster2->GetTypeId() == TYPEID_UNIT)
-                        {
-                            caster2->ToCreature()->DespawnOrUnsummon();
-                        }
-                    }
-                    target->CastSpell(target, SPELL_FLASH_FREEZE_INSTAKILL, true);
-                    return;
-                }
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                {
-                    caster->ToCreature()->AI()->SetData(1, 1);
-                    if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_PLR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 5 * 60 * 1000) )
-                    {
-                        c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_PLAYER, true);
-                        caster->ToCreature()->AI()->JustSummoned(c);
+                        caster2->ToCreature()->DespawnOrUnsummon();
                     }
                 }
-                else if (target->GetTypeId() == TYPEID_UNIT)
+                target->CastSpell(target, SPELL_FLASH_FREEZE_INSTAKILL, true);
+                return;
+            }
+            if (target->GetTypeId() == TYPEID_PLAYER)
+            {
+                caster->ToCreature()->AI()->SetData(1, 1);
+                if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_PLR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 5 * 60 * 1000) )
                 {
-                    if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_NPC, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000) )
-                    {
-                        c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_NPC, true);
-                        caster->ToCreature()->AI()->JustSummoned(c);
-                    }
+                    c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_PLAYER, true);
+                    caster->ToCreature()->AI()->JustSummoned(c);
+                }
+            }
+            else if (target->GetTypeId() == TYPEID_UNIT)
+            {
+                if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_NPC, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000) )
+                {
+                    c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_NPC, true);
+                    caster->ToCreature()->AI()->JustSummoned(c);
                 }
             }
         }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_flash_freeze_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_hodir_flash_freeze_SpellScript();
     }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_hodir_flash_freeze_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_flash_freeze_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1608,7 +1597,7 @@ void AddSC_boss_hodir()
     RegisterSpellScript(spell_hodir_biting_cold_main_aura);
     RegisterSpellScript(spell_hodir_biting_cold_player_aura);
     RegisterSpellScript(spell_hodir_periodic_icicle);
-    new spell_hodir_flash_freeze();
+    RegisterSpellAndAuraScriptPair(spell_hodir_flash_freeze, spell_hodir_flash_freeze_aura);
     new spell_hodir_storm_power();
     new spell_hodir_storm_cloud();
 
