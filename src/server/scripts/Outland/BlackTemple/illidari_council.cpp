@@ -556,191 +556,141 @@ public:
     };
 };
 
-class spell_illidari_council_balance_of_power : public SpellScriptLoader
+class spell_illidari_council_balance_of_power_aura : public AuraScript
 {
-public:
-    spell_illidari_council_balance_of_power() : SpellScriptLoader("spell_illidari_council_balance_of_power") { }
+    PrepareAuraScript(spell_illidari_council_balance_of_power_aura);
 
-    class spell_illidari_council_balance_of_power_AuraScript : public AuraScript
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        PrepareAuraScript(spell_illidari_council_balance_of_power_AuraScript);
+        // Set absorbtion amount to unlimited (no absorb)
+        amount = -1;
+    }
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set absorbtion amount to unlimited (no absorb)
-            amount = -1;
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_illidari_council_balance_of_power_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_illidari_council_balance_of_power_AuraScript();
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_illidari_council_balance_of_power_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
     }
 };
 
-class spell_illidari_council_empyreal_balance : public SpellScriptLoader
+class spell_illidari_council_empyreal_balance : public SpellScript
 {
-public:
-    spell_illidari_council_empyreal_balance() : SpellScriptLoader("spell_illidari_council_empyreal_balance") { }
+    PrepareSpellScript(spell_illidari_council_empyreal_balance);
 
-    class spell_illidari_council_empyreal_balance_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_illidari_council_empyreal_balance_SpellScript);
+        _sharedHealth = 0;
+        _sharedHealthMax = 0;
+        _targetCount = 0;
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
 
-        bool Load() override
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
         {
-            _sharedHealth = 0;
-            _sharedHealthMax = 0;
-            _targetCount = 0;
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
+            _targetCount++;
+            _sharedHealth += target->GetHealth();
+            _sharedHealthMax += target->GetMaxHealth();
+        }
+    }
+
+    void HandleAfterCast()
+    {
+        if (_targetCount != 4)
+        {
+            GetCaster()->ToCreature()->AI()->EnterEvadeMode();
+            return;
         }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
+        float pct = (_sharedHealth / _sharedHealthMax) * 100.0f;
+        std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+        for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+            if (Creature* target = ObjectAccessor::GetCreature(*GetCaster(), ihit->targetGUID))
             {
-                _targetCount++;
-                _sharedHealth += target->GetHealth();
-                _sharedHealthMax += target->GetMaxHealth();
+                target->LowerPlayerDamageReq(target->GetMaxHealth());
+                target->SetHealth(CalculatePct(target->GetMaxHealth(), pct));
             }
-        }
+    }
 
-        void HandleAfterCast()
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidari_council_empyreal_balance::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        AfterCast += SpellCastFn(spell_illidari_council_empyreal_balance::HandleAfterCast);
+    }
+
+private:
+    float _sharedHealth;
+    float _sharedHealthMax;
+    uint8 _targetCount;
+};
+
+class spell_illidari_council_reflective_shield_aura : public AuraScript
+{
+    PrepareAuraScript(spell_illidari_council_reflective_shield_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_REFLECTIVE_SHIELD_T });
+    }
+
+    void ReflectDamage(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        Unit* target = GetTarget();
+        if (dmgInfo.GetAttacker() == target)
+            return;
+
+        int32 bp = absorbAmount / 2;
+        target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_REFLECTIVE_SHIELD_T, &bp, nullptr, nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        AfterEffectAbsorb += AuraEffectAbsorbFn(spell_illidari_council_reflective_shield_aura::ReflectDamage, EFFECT_0);
+    }
+};
+
+class spell_illidari_council_judgement : public SpellScript
+{
+    PrepareSpellScript(spell_illidari_council_judgement);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit::AuraEffectList const& auras = GetCaster()->GetAuraEffectsByType(SPELL_AURA_DUMMY);
+        for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
         {
-            if (_targetCount != 4)
-            {
-                GetCaster()->ToCreature()->AI()->EnterEvadeMode();
-                return;
-            }
-
-            float pct = (_sharedHealth / _sharedHealthMax) * 100.0f;
-            std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-            for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
-                if (Creature* target = ObjectAccessor::GetCreature(*GetCaster(), ihit->targetGUID))
+            if ((*i)->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL && (*i)->GetEffIndex() == EFFECT_2)
+                if (sSpellMgr->GetSpellInfo((*i)->GetAmount()))
                 {
-                    target->LowerPlayerDamageReq(target->GetMaxHealth());
-                    target->SetHealth(CalculatePct(target->GetMaxHealth(), pct));
+                    GetCaster()->CastSpell(GetHitUnit(), (*i)->GetAmount(), true);
+                    break;
                 }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidari_council_empyreal_balance_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            AfterCast += SpellCastFn(spell_illidari_council_empyreal_balance_SpellScript::HandleAfterCast);
-        }
-
-    private:
-        float _sharedHealth;
-        float _sharedHealthMax;
-        uint8 _targetCount;
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_illidari_council_empyreal_balance_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_illidari_council_judgement::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_illidari_council_reflective_shield : public SpellScriptLoader
+class spell_illidari_council_deadly_strike_aura : public AuraScript
 {
-public:
-    spell_illidari_council_reflective_shield() : SpellScriptLoader("spell_illidari_council_reflective_shield") { }
+    PrepareAuraScript(spell_illidari_council_deadly_strike_aura);
 
-    class spell_illidari_council_reflective_shield_AuraScript : public AuraScript
+    void Update(AuraEffect const* effect)
     {
-        PrepareAuraScript(spell_illidari_council_reflective_shield_AuraScript);
-
-        void ReflectDamage(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+        PreventDefaultAction();
+        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
         {
-            Unit* target = GetTarget();
-            if (dmgInfo.GetAttacker() == target)
-                return;
-
-            int32 bp = absorbAmount / 2;
-            target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_REFLECTIVE_SHIELD_T, &bp, nullptr, nullptr, true, nullptr, aurEff);
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
+            GetUnitOwner()->m_Events.AddEvent(new VerasEnvenom(*GetUnitOwner(), target->GetGUID()), GetUnitOwner()->m_Events.CalculateTime(urand(1500, 3500)));
         }
-
-        void Register() override
-        {
-            AfterEffectAbsorb += AuraEffectAbsorbFn(spell_illidari_council_reflective_shield_AuraScript::ReflectDamage, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_illidari_council_reflective_shield_AuraScript();
     }
-};
 
-class spell_illidari_council_judgement : public SpellScriptLoader
-{
-public:
-    spell_illidari_council_judgement() : SpellScriptLoader("spell_illidari_council_judgement") { }
-
-    class spell_illidari_council_judgement_SpellScript : public SpellScript
+    void Register() override
     {
-        PrepareSpellScript(spell_illidari_council_judgement_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            Unit::AuraEffectList const& auras = GetCaster()->GetAuraEffectsByType(SPELL_AURA_DUMMY);
-            for (Unit::AuraEffectList::const_iterator i = auras.begin(); i != auras.end(); ++i)
-            {
-                if ((*i)->GetSpellInfo()->GetSpellSpecific() == SPELL_SPECIFIC_SEAL && (*i)->GetEffIndex() == EFFECT_2)
-                    if (sSpellMgr->GetSpellInfo((*i)->GetAmount()))
-                    {
-                        GetCaster()->CastSpell(GetHitUnit(), (*i)->GetAmount(), true);
-                        break;
-                    }
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidari_council_judgement_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_illidari_council_judgement_SpellScript();
-    }
-};
-
-class spell_illidari_council_deadly_strike : public SpellScriptLoader
-{
-public:
-    spell_illidari_council_deadly_strike() : SpellScriptLoader("spell_illidari_council_deadly_strike") { }
-
-    class spell_illidari_council_deadly_strike_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_illidari_council_deadly_strike_AuraScript);
-
-        void Update(AuraEffect const* effect)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-            {
-                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
-                GetUnitOwner()->m_Events.AddEvent(new VerasEnvenom(*GetUnitOwner(), target->GetGUID()), GetUnitOwner()->m_Events.CalculateTime(urand(1500, 3500)));
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidari_council_deadly_strike_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_illidari_council_deadly_strike_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidari_council_deadly_strike_aura::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -751,10 +701,10 @@ void AddSC_boss_illidari_council()
     new boss_lady_malande();
     new boss_veras_darkshadow();
     new boss_high_nethermancer_zerevor();
-    new spell_illidari_council_balance_of_power();
-    new spell_illidari_council_empyreal_balance();
-    new spell_illidari_council_reflective_shield();
-    new spell_illidari_council_judgement();
-    new spell_illidari_council_deadly_strike();
+    RegisterSpellScript(spell_illidari_council_balance_of_power_aura);
+    RegisterSpellScript(spell_illidari_council_empyreal_balance);
+    RegisterSpellScript(spell_illidari_council_reflective_shield_aura);
+    RegisterSpellScript(spell_illidari_council_judgement);
+    RegisterSpellScript(spell_illidari_council_deadly_strike_aura);
 }
 

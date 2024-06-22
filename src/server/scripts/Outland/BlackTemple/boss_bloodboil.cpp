@@ -198,73 +198,51 @@ public:
     };
 };
 
-class spell_gurtogg_bloodboil : public SpellScriptLoader
+class spell_gurtogg_bloodboil : public SpellScript
 {
-public:
-    spell_gurtogg_bloodboil() : SpellScriptLoader("spell_gurtogg_bloodboil") { }
+    PrepareSpellScript(spell_gurtogg_bloodboil);
 
-    class spell_gurtogg_bloodboil_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_gurtogg_bloodboil_SpellScript);
+        if (targets.empty())
+            return;
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster(), false));
+        if (targets.size() > GetSpellValue()->MaxAffectedTargets)
         {
-            if (targets.empty())
-                return;
-
-            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster(), false));
-            if (targets.size() > GetSpellValue()->MaxAffectedTargets)
-            {
-                std::list<WorldObject*>::iterator itr = targets.begin();
-                std::advance(itr, GetSpellValue()->MaxAffectedTargets);
-                targets.erase(itr, targets.end());
-            }
+            std::list<WorldObject*>::iterator itr = targets.begin();
+            std::advance(itr, GetSpellValue()->MaxAffectedTargets);
+            targets.erase(itr, targets.end());
         }
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gurtogg_bloodboil_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gurtogg_bloodboil_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gurtogg_bloodboil::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_gurtogg_eject : public SpellScriptLoader
+class spell_gurtogg_eject : public SpellScript
 {
-public:
-    spell_gurtogg_eject() : SpellScriptLoader("spell_gurtogg_eject") { }
+    PrepareSpellScript(spell_gurtogg_eject);
 
-    class spell_gurtogg_eject_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_gurtogg_eject_SpellScript);
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->GetThreatMgr().ModifyThreatByPercent(target, -20);
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->GetThreatMgr().ModifyThreatByPercent(target, -20);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_gurtogg_eject_SpellScript::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gurtogg_eject_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_gurtogg_eject::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_boss_gurtogg_bloodboil()
 {
     new boss_gurtogg_bloodboil();
-    new spell_gurtogg_bloodboil();
-    new spell_gurtogg_eject();
+    RegisterSpellScript(spell_gurtogg_bloodboil);
+    RegisterSpellScript(spell_gurtogg_eject);
 }
 
