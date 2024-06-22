@@ -1420,31 +1420,25 @@ class spell_hodir_storm_power_aura : public AuraScript
     }
 };
 
-class spell_hodir_storm_cloud : public SpellScriptLoader
+class spell_hodir_storm_cloud_aura : public AuraScript
 {
-public:
-    spell_hodir_storm_cloud() : SpellScriptLoader("spell_hodir_storm_cloud") { }
+    PrepareAuraScript(spell_hodir_storm_cloud_aura);
 
-    class spell_hodir_storm_cloud_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hodir_storm_cloud_AuraScript)
+        return ValidateSpellInfo({ SPELL_SHAMAN_STORM_CLOUD_10, SPELL_SHAMAN_STORM_POWER_10, SPELL_SHAMAN_STORM_POWER_25 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetTarget())
-                target->CastSpell((Unit*)nullptr, (GetId() == SPELL_SHAMAN_STORM_CLOUD_10 ? SPELL_SHAMAN_STORM_POWER_10 : SPELL_SHAMAN_STORM_POWER_25), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_storm_cloud_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_hodir_storm_cloud_AuraScript();
+        PreventDefaultAction();
+        if (Unit* target = GetTarget())
+            target->CastSpell((Unit*)nullptr, (GetId() == SPELL_SHAMAN_STORM_CLOUD_10 ? SPELL_SHAMAN_STORM_POWER_10 : SPELL_SHAMAN_STORM_POWER_25), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_storm_cloud_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1588,7 +1582,7 @@ void AddSC_boss_hodir()
     RegisterSpellScript(spell_hodir_periodic_icicle);
     RegisterSpellAndAuraScriptPair(spell_hodir_flash_freeze, spell_hodir_flash_freeze_aura);
     RegisterSpellScript(spell_hodir_storm_power_aura);
-    new spell_hodir_storm_cloud();
+    RegisterSpellScript(spell_hodir_storm_cloud_aura);
 
     new achievement_cheese_the_freeze();
     new achievement_getting_cold_in_here();
