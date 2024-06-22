@@ -1293,31 +1293,20 @@ private:
     bool _prev;
 };
 
-class spell_hodir_periodic_icicle : public SpellScriptLoader
+class spell_hodir_periodic_icicle : public SpellScript
 {
-public:
-    spell_hodir_periodic_icicle() : SpellScriptLoader("spell_hodir_periodic_icicle") { }
+    PrepareSpellScript(spell_hodir_periodic_icicle);
 
-    class spell_hodir_periodic_icicle_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_hodir_periodic_icicle_SpellScript);
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+        Acore::Containers::RandomResize(targets, 1);
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-            Acore::Containers::RandomResize(targets, 1);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_periodic_icicle_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_hodir_periodic_icicle_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_periodic_icicle::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1618,7 +1607,7 @@ void AddSC_boss_hodir()
     RegisterSpellScript(spell_hodir_shatter_chest);
     RegisterSpellScript(spell_hodir_biting_cold_main_aura);
     RegisterSpellScript(spell_hodir_biting_cold_player_aura);
-    new spell_hodir_periodic_icicle();
+    RegisterSpellScript(spell_hodir_periodic_icicle);
     new spell_hodir_flash_freeze();
     new spell_hodir_storm_power();
     new spell_hodir_storm_cloud();
