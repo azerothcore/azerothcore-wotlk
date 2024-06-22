@@ -1104,31 +1104,25 @@ class spell_illidan_parasitic_shadowfiend_trigger_aura : public AuraScript
     }
 };
 
-class spell_illidan_glaive_throw : public SpellScriptLoader
+class spell_illidan_glaive_throw : public SpellScript
 {
-public:
-    spell_illidan_glaive_throw() : SpellScriptLoader("spell_illidan_glaive_throw") { }
+    PrepareSpellScript(spell_illidan_glaive_throw);
 
-    class spell_illidan_glaive_throw_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_illidan_glaive_throw_SpellScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_GLAIVE });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, SPELL_SUMMON_GLAIVE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_glaive_throw_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_illidan_glaive_throw_SpellScript();
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_SUMMON_GLAIVE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_glaive_throw::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1423,7 +1417,7 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_draw_soul);
     RegisterSpellScript(spell_illidan_parasitic_shadowfiend_aura);
     RegisterSpellAndAuraScriptPair(spell_illidan_parasitic_shadowfiend_trigger, spell_illidan_parasitic_shadowfiend_trigger_aura);
-    new spell_illidan_glaive_throw();
+    RegisterSpellScript(spell_illidan_glaive_throw);
     new spell_illidan_tear_of_azzinoth_summon_channel();
     new spell_illidan_shadow_prison();
     new spell_illidan_demon_transform1();
