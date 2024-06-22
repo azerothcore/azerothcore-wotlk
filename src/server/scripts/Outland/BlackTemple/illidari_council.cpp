@@ -572,68 +572,57 @@ class spell_illidari_council_balance_of_power_aura : public AuraScript
     }
 };
 
-class spell_illidari_council_empyreal_balance : public SpellScriptLoader
+class spell_illidari_council_empyreal_balance : public SpellScript
 {
-public:
-    spell_illidari_council_empyreal_balance() : SpellScriptLoader("spell_illidari_council_empyreal_balance") { }
+    PrepareSpellScript(spell_illidari_council_empyreal_balance);
 
-    class spell_illidari_council_empyreal_balance_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_illidari_council_empyreal_balance_SpellScript);
-
-        bool Load() override
-        {
-            _sharedHealth = 0;
-            _sharedHealthMax = 0;
-            _targetCount = 0;
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-            {
-                _targetCount++;
-                _sharedHealth += target->GetHealth();
-                _sharedHealthMax += target->GetMaxHealth();
-            }
-        }
-
-        void HandleAfterCast()
-        {
-            if (_targetCount != 4)
-            {
-                GetCaster()->ToCreature()->AI()->EnterEvadeMode();
-                return;
-            }
-
-            float pct = (_sharedHealth / _sharedHealthMax) * 100.0f;
-            std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-            for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
-                if (Creature* target = ObjectAccessor::GetCreature(*GetCaster(), ihit->targetGUID))
-                {
-                    target->LowerPlayerDamageReq(target->GetMaxHealth());
-                    target->SetHealth(CalculatePct(target->GetMaxHealth(), pct));
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidari_council_empyreal_balance_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            AfterCast += SpellCastFn(spell_illidari_council_empyreal_balance_SpellScript::HandleAfterCast);
-        }
-
-    private:
-        float _sharedHealth;
-        float _sharedHealthMax;
-        uint8 _targetCount;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_illidari_council_empyreal_balance_SpellScript();
+        _sharedHealth = 0;
+        _sharedHealthMax = 0;
+        _targetCount = 0;
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
     }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+        {
+            _targetCount++;
+            _sharedHealth += target->GetHealth();
+            _sharedHealthMax += target->GetMaxHealth();
+        }
+    }
+
+    void HandleAfterCast()
+    {
+        if (_targetCount != 4)
+        {
+            GetCaster()->ToCreature()->AI()->EnterEvadeMode();
+            return;
+        }
+
+        float pct = (_sharedHealth / _sharedHealthMax) * 100.0f;
+        std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+        for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
+            if (Creature* target = ObjectAccessor::GetCreature(*GetCaster(), ihit->targetGUID))
+            {
+                target->LowerPlayerDamageReq(target->GetMaxHealth());
+                target->SetHealth(CalculatePct(target->GetMaxHealth(), pct));
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidari_council_empyreal_balance::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        AfterCast += SpellCastFn(spell_illidari_council_empyreal_balance::HandleAfterCast);
+    }
+
+private:
+    float _sharedHealth;
+    float _sharedHealthMax;
+    uint8 _targetCount;
 };
 
 class spell_illidari_council_reflective_shield : public SpellScriptLoader
@@ -741,7 +730,7 @@ void AddSC_boss_illidari_council()
     new boss_veras_darkshadow();
     new boss_high_nethermancer_zerevor();
     RegisterSpellScript(spell_illidari_council_balance_of_power_aura);
-    new spell_illidari_council_empyreal_balance();
+    RegisterSpellScript(spell_illidari_council_empyreal_balance);
     new spell_illidari_council_reflective_shield();
     new spell_illidari_council_judgement();
     new spell_illidari_council_deadly_strike();
