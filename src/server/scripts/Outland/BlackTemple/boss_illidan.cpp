@@ -1045,30 +1045,24 @@ class spell_illidan_draw_soul : public SpellScript
     }
 };
 
-class spell_illidan_parasitic_shadowfiend : public SpellScriptLoader
+class spell_illidan_parasitic_shadowfiend_aura : public AuraScript
 {
-public:
-    spell_illidan_parasitic_shadowfiend() : SpellScriptLoader("spell_illidan_parasitic_shadowfiend") { }
+    PrepareAuraScript(spell_illidan_parasitic_shadowfiend_aura);
 
-    class spell_illidan_parasitic_shadowfiend_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_illidan_parasitic_shadowfiend_AuraScript)
+        return ValidateSpellInfo({ SPELL_SUMMON_PARASITIC_SHADOWFIENDS });
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
-                GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_illidan_parasitic_shadowfiend_AuraScript();
+        if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
+            GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1438,7 +1432,7 @@ void AddSC_boss_illidan()
     new boss_illidan_stormrage();
     new npc_akama_illidan();
     RegisterSpellScript(spell_illidan_draw_soul);
-    new spell_illidan_parasitic_shadowfiend();
+    RegisterSpellScript(spell_illidan_parasitic_shadowfiend_aura);
     new spell_illidan_parasitic_shadowfiend_trigger();
     new spell_illidan_glaive_throw();
     new spell_illidan_tear_of_azzinoth_summon_channel();

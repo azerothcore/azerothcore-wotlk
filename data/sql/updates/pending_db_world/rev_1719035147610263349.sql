@@ -19,3 +19,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_spell_absorptio
 UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_consuming_strikes_aura' WHERE `spell_id`=41248;
 UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_curse_of_vitality_aura' WHERE `spell_id`=41351;
 UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_dementia_aura' WHERE `spell_id`=41404;
+UPDATE `spell_script_names` SET `ScriptName`='spell_illidan_parasitic_shadowfiend_aura' WHERE `spell_id`=41917;
