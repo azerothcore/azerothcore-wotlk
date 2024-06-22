@@ -1164,29 +1164,18 @@ class spell_illidan_tear_of_azzinoth_summon_channel_aura : public AuraScript
     }
 };
 
-class spell_illidan_shadow_prison : public SpellScriptLoader
+class spell_illidan_shadow_prison : public SpellScript
 {
-public:
-    spell_illidan_shadow_prison() : SpellScriptLoader("spell_illidan_shadow_prison") { }
+    PrepareSpellScript(spell_illidan_shadow_prison);
 
-    class spell_illidan_shadow_prison_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_illidan_shadow_prison_SpellScript);
+        targets.remove_if(PlayerOrPetCheck());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(PlayerOrPetCheck());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_illidan_shadow_prison_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_illidan_shadow_prison_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_illidan_shadow_prison::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1413,7 +1402,7 @@ void AddSC_boss_illidan()
     RegisterSpellAndAuraScriptPair(spell_illidan_parasitic_shadowfiend_trigger, spell_illidan_parasitic_shadowfiend_trigger_aura);
     RegisterSpellScript(spell_illidan_glaive_throw);
     RegisterSpellScript(spell_illidan_tear_of_azzinoth_summon_channel_aura);
-    new spell_illidan_shadow_prison();
+    RegisterSpellScript(spell_illidan_shadow_prison);
     new spell_illidan_demon_transform1();
     new spell_illidan_demon_transform2();
     new spell_illidan_flame_burst();
