@@ -1023,31 +1023,25 @@ public:
     }
 };
 
-class spell_illidan_draw_soul : public SpellScriptLoader
+class spell_illidan_draw_soul : public SpellScript
 {
-public:
-    spell_illidan_draw_soul() : SpellScriptLoader("spell_illidan_draw_soul") { }
+    PrepareSpellScript(spell_illidan_draw_soul);
 
-    class spell_illidan_draw_soul_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_illidan_draw_soul_SpellScript);
+        return ValidateSpellInfo({ SPELL_DRAW_SOUL_HEAL });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(GetCaster(), SPELL_DRAW_SOUL_HEAL, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_draw_soul_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_illidan_draw_soul_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), SPELL_DRAW_SOUL_HEAL, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_draw_soul::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1443,7 +1437,7 @@ void AddSC_boss_illidan()
 {
     new boss_illidan_stormrage();
     new npc_akama_illidan();
-    new spell_illidan_draw_soul();
+    RegisterSpellScript(spell_illidan_draw_soul);
     new spell_illidan_parasitic_shadowfiend();
     new spell_illidan_parasitic_shadowfiend_trigger();
     new spell_illidan_glaive_throw();
