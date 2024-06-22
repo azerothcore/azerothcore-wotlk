@@ -275,34 +275,28 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
     }
 };
 
-class spell_mother_shahraz_fatal_attraction_dummy : public SpellScriptLoader
+class spell_mother_shahraz_fatal_attraction_dummy : public SpellScript
 {
-public:
-    spell_mother_shahraz_fatal_attraction_dummy() : SpellScriptLoader("spell_mother_shahraz_fatal_attraction_dummy") { }
+    PrepareSpellScript(spell_mother_shahraz_fatal_attraction_dummy);
 
-    class spell_mother_shahraz_fatal_attraction_dummy_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_mother_shahraz_fatal_attraction_dummy_SpellScript);
+        return ValidateSpellInfo({ SPELL_FATAL_ATTRACTION_DAMAGE });
+    }
 
-        void HandleDummy(SpellEffIndex  /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-            {
-                target->CastSpell(target, SPELL_FATAL_ATTRACTION_DAMAGE, true);
-                if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_FATAL_ATTRACTION_AURA, EFFECT_1))
-                    aurEff->SetAmount(aurEff->GetTickNumber());
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_mother_shahraz_fatal_attraction_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_mother_shahraz_fatal_attraction_dummy_SpellScript();
+        if (Unit* target = GetHitUnit())
+        {
+            target->CastSpell(target, SPELL_FATAL_ATTRACTION_DAMAGE, true);
+            if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_FATAL_ATTRACTION_AURA, EFFECT_1))
+                aurEff->SetAmount(aurEff->GetTickNumber());
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_mother_shahraz_fatal_attraction_dummy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -343,7 +337,7 @@ void AddSC_boss_mother_shahraz()
     RegisterSpellScript(spell_mother_shahraz_beam_periodic_aura);
     RegisterSpellScript(spell_mother_shahraz_saber_lash_aura);
     RegisterSpellScript(spell_mother_shahraz_fatal_attraction);
-    new spell_mother_shahraz_fatal_attraction_dummy();
+    RegisterSpellScript(spell_mother_shahraz_fatal_attraction_dummy);
     new spell_mother_shahraz_fatal_attraction_aura();
 }
 
