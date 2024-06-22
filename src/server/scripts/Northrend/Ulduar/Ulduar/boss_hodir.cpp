@@ -1233,8 +1233,12 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_FLASH_FREEZE_TRAPPED_PLAYER, SPELL_MAGE_TOASTY_FIRE_AURA, SPELL_BITING_COLD_DAMAGE });
     }
 
-    uint8 counter {0};
-    bool prev {false};
+    bool Load() override
+    {
+        uint8 _counter = 0;
+        bool _prev = false;
+    }
+
 
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
@@ -1246,31 +1250,31 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
                 return;
             if (target->isMoving() || target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
             {
-                if (prev)
+                if (_prev)
                 {
                     ModStackAmount(-1);
-                    prev = false;
+                    _prev = false;
                 }
                 else
-                    prev = true;
+                    _prev = true;
 
-                if (counter >= 2)
-                    counter -= 2;
-                else if (counter)
-                    --counter;
+                if (_counter >= 2)
+                    _counter -= 2;
+                else if (_counter)
+                    --_counter;
             }
             else
             {
-                prev = false;
-                ++counter;
-                if (counter >= 4)
+                _prev = false;
+                ++_counter;
+                if (_counter >= 4)
                 {
                     if (GetStackAmount() == 2) // increasing from 2 to 3 (not checking >= to improve performance)
                         if (InstanceScript* pInstance = target->GetInstanceScript())
                             if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
                                 hodir->AI()->SetData(2, 1);
                     ModStackAmount(1);
-                    counter = 0;
+                    _counter = 0;
                 }
             }
 
@@ -1283,6 +1287,10 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_biting_cold_player_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
+
+private:
+    uint8 _counter;
+    bool _prev;
 };
 
 class spell_hodir_periodic_icicle : public SpellScriptLoader
