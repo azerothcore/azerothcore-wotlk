@@ -300,33 +300,22 @@ class spell_mother_shahraz_fatal_attraction_dummy : public SpellScript
     }
 };
 
-class spell_mother_shahraz_fatal_attraction_aura : public SpellScriptLoader
+class spell_mother_shahraz_fatal_attraction_aura : public AuraScript
 {
-public:
-    spell_mother_shahraz_fatal_attraction_aura() : SpellScriptLoader("spell_mother_shahraz_fatal_attraction_aura") { }
+    PrepareAuraScript(spell_mother_shahraz_fatal_attraction_aura);
 
-    class spell_mother_shahraz_fatal_attraction_aura_AuraScript : public AuraScript
+    void Update(AuraEffect const* effect)
     {
-        PrepareAuraScript(spell_mother_shahraz_fatal_attraction_aura_AuraScript);
-
-        void Update(AuraEffect const* effect)
+        if (effect->GetTickNumber() > uint32(effect->GetAmount() + 1))
         {
-            if (effect->GetTickNumber() > uint32(effect->GetAmount() + 1))
-            {
-                PreventDefaultAction();
-                SetDuration(0);
-            }
+            PreventDefaultAction();
+            SetDuration(0);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_fatal_attraction_aura_AuraScript::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_mother_shahraz_fatal_attraction_aura_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_fatal_attraction_aura::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -338,6 +327,6 @@ void AddSC_boss_mother_shahraz()
     RegisterSpellScript(spell_mother_shahraz_saber_lash_aura);
     RegisterSpellScript(spell_mother_shahraz_fatal_attraction);
     RegisterSpellScript(spell_mother_shahraz_fatal_attraction_dummy);
-    new spell_mother_shahraz_fatal_attraction_aura();
+    RegisterSpellScript(spell_mother_shahraz_fatal_attraction_aura);
 }
 
