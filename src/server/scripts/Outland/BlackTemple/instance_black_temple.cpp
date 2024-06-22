@@ -313,31 +313,20 @@ class spell_black_temple_wyvern_sting_aura : public AuraScript
     }
 };
 
-class spell_black_temple_charge_rage : public SpellScriptLoader
+class spell_black_temple_charge_rage_aura : public AuraScript
 {
-public:
-    spell_black_temple_charge_rage() : SpellScriptLoader("spell_black_temple_charge_rage") { }
+    PrepareAuraScript(spell_black_temple_charge_rage_aura);
 
-    class spell_black_temple_charge_rage_AuraScript : public AuraScript
+    void Update(AuraEffect const* effect)
     {
-        PrepareAuraScript(spell_black_temple_charge_rage_AuraScript);
+        PreventDefaultAction();
+        if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)nullptr, 50.0f))
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void Update(AuraEffect const* effect)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)nullptr, 50.0f))
-                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_charge_rage_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_temple_charge_rage_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_charge_rage_aura::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -533,7 +522,7 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_curse_of_the_bleakheart_aura);
     RegisterSpellScript(spell_black_temple_skeleton_shot_aura);
     RegisterSpellScript(spell_black_temple_wyvern_sting_aura);
-    new spell_black_temple_charge_rage();
+    RegisterSpellScript(spell_black_temple_charge_rage_aura);
     new spell_black_temple_shadow_inferno();
     new spell_black_temple_spell_absorption();
     new spell_black_temple_bloodbolt();
