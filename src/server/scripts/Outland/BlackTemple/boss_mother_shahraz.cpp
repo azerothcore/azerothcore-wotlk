@@ -171,31 +171,25 @@ public:
     };
 };
 
-class spell_mother_shahraz_random_periodic : public SpellScriptLoader
+class spell_mother_shahraz_random_periodic_aura : public AuraScript
 {
-public:
-    spell_mother_shahraz_random_periodic() : SpellScriptLoader("spell_mother_shahraz_random_periodic") { }
+    PrepareAuraScript(spell_mother_shahraz_random_periodic_aura);
 
-    class spell_mother_shahraz_random_periodic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_mother_shahraz_random_periodic_AuraScript);
+        return ValidateSpellInfo({ SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC });
+    }
 
-        void Update(AuraEffect const* effect)
-        {
-            PreventDefaultAction();
-            if (effect->GetTickNumber() % 5 == 1)
-                GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_random_periodic_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Update(AuraEffect const* effect)
     {
-        return new spell_mother_shahraz_random_periodic_AuraScript();
+        PreventDefaultAction();
+        if (effect->GetTickNumber() % 5 == 1)
+            GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_random_periodic_aura::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -373,7 +367,7 @@ public:
 void AddSC_boss_mother_shahraz()
 {
     new boss_mother_shahraz();
-    new spell_mother_shahraz_random_periodic();
+    RegisterSpellScript(spell_mother_shahraz_random_periodic_aura);
     new spell_mother_shahraz_beam_periodic();
     new spell_mother_shahraz_saber_lash();
     new spell_mother_shahraz_fatal_attraction();
