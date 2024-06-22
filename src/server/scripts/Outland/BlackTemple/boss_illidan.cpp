@@ -1298,43 +1298,37 @@ class spell_illidan_found_target : public SpellScript
     }
 };
 
-class spell_illidan_cage_trap : public SpellScriptLoader
+class spell_illidan_cage_trap : public SpellScript
 {
-public:
-    spell_illidan_cage_trap() : SpellScriptLoader("spell_illidan_cage_trap") { }
+    PrepareSpellScript(spell_illidan_cage_trap);
 
-    class spell_illidan_cage_trap_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_illidan_cage_trap_SpellScript);
+        return ValidateSpellInfo({ SPELL_CAGE_TRAP });
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Creature* target = GetHitCreature())
-                if (GetCaster()->GetExactDist2d(target) < 4.0f)
-                {
-                    target->AI()->DoAction(ACTION_ILLIDAN_CAGED);
-                    target->CastSpell(target, SPELL_CAGE_TRAP, true);
-                    GetCaster()->ToCreature()->DespawnOrUnsummon(1);
-                    if (GameObject* gobject = GetCaster()->FindNearestGameObject(GO_CAGE_TRAP, 10.0f))
-                        gobject->SetLootState(GO_JUST_DEACTIVATED);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_cage_trap_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_illidan_cage_trap_SpellScript();
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+        if (Creature* target = GetHitCreature())
+            if (GetCaster()->GetExactDist2d(target) < 4.0f)
+            {
+                target->AI()->DoAction(ACTION_ILLIDAN_CAGED);
+                target->CastSpell(target, SPELL_CAGE_TRAP, true);
+                GetCaster()->ToCreature()->DespawnOrUnsummon(1);
+                if (GameObject* gobject = GetCaster()->FindNearestGameObject(GO_CAGE_TRAP, 10.0f))
+                    gobject->SetLootState(GO_JUST_DEACTIVATED);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_cage_trap::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1383,7 +1377,7 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_demon_transform2_aura);
     RegisterSpellScript(spell_illidan_flame_burst);
     RegisterSpellScript(spell_illidan_found_target);
-    new spell_illidan_cage_trap();
+    RegisterSpellScript(spell_illidan_cage_trap);
     new spell_illidan_cage_trap_stun();
 }
 
