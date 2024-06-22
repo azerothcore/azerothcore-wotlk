@@ -1272,35 +1272,29 @@ class spell_illidan_flame_burst : public SpellScript
     }
 };
 
-class spell_illidan_found_target : public SpellScriptLoader
+class spell_illidan_found_target : public SpellScript
 {
-public:
-    spell_illidan_found_target() : SpellScriptLoader("spell_illidan_found_target") { }
+    PrepareSpellScript(spell_illidan_found_target);
 
-    class spell_illidan_found_target_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_illidan_found_target_SpellScript);
+        return ValidateSpellInfo({ SPELL_CONSUME_SOUL, SPELL_FIND_TARGET });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                if (GetCaster()->GetDistance(target) < 2.0f)
-                {
-                    GetCaster()->CastSpell(target, SPELL_CONSUME_SOUL, true);
-                    GetCaster()->CastSpell(GetCaster(), SPELL_FIND_TARGET, true);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_found_target_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_illidan_found_target_SpellScript();
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            if (GetCaster()->GetDistance(target) < 2.0f)
+            {
+                GetCaster()->CastSpell(target, SPELL_CONSUME_SOUL, true);
+                GetCaster()->CastSpell(GetCaster(), SPELL_FIND_TARGET, true);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_found_target::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1388,7 +1382,7 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_demon_transform1_aura);
     RegisterSpellScript(spell_illidan_demon_transform2_aura);
     RegisterSpellScript(spell_illidan_flame_burst);
-    new spell_illidan_found_target();
+    RegisterSpellScript(spell_illidan_found_target);
     new spell_illidan_cage_trap();
     new spell_illidan_cage_trap_stun();
 }
