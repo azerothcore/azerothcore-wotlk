@@ -645,51 +645,45 @@ class spell_reliquary_of_souls_fixate_aura : public AuraScript
     }
 };
 
-class spell_reliquary_of_souls_aura_of_desire : public SpellScriptLoader
+class spell_reliquary_of_souls_aura_of_desire_aura : public AuraScript
 {
-public:
-    spell_reliquary_of_souls_aura_of_desire() : SpellScriptLoader("spell_reliquary_of_souls_aura_of_desire") { }
+    PrepareAuraScript(spell_reliquary_of_souls_aura_of_desire_aura);
 
-    class spell_reliquary_of_souls_aura_of_desire_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_reliquary_of_souls_aura_of_desire_AuraScript);
+        return ValidateSpellInfo({ SPELL_AURA_OF_DESIRE_DAMAGE });
+    }
 
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            return eventInfo.GetActor() && eventInfo.GetActionTarget();
-        }
-
-        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            eventInfo.GetActionTarget()->CastCustomSpell(SPELL_AURA_OF_DESIRE_DAMAGE, SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage() / 2, eventInfo.GetActor(), true);
-        }
-
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_2))
-                amount = std::max<int32>(-100, -5 * int32(effect->GetTickNumber()));
-        }
-
-        void Update(AuraEffect const*  /*effect*/)
-        {
-            PreventDefaultAction();
-            if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
-                effect->RecalculateAmount();
-        }
-
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_reliquary_of_souls_aura_of_desire_AuraScript::CheckProc);
-            OnEffectProc += AuraEffectProcFn(spell_reliquary_of_souls_aura_of_desire_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT);
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_reliquary_of_souls_aura_of_desire_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_reliquary_of_souls_aura_of_desire_AuraScript::Update, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return new spell_reliquary_of_souls_aura_of_desire_AuraScript();
+        return eventInfo.GetActor() && eventInfo.GetActionTarget();
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActionTarget()->CastCustomSpell(SPELL_AURA_OF_DESIRE_DAMAGE, SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage() / 2, eventInfo.GetActor(), true);
+    }
+
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_2))
+            amount = std::max<int32>(-100, -5 * int32(effect->GetTickNumber()));
+    }
+
+    void Update(AuraEffect const*  /*effect*/)
+    {
+        PreventDefaultAction();
+        if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
+            effect->RecalculateAmount();
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_reliquary_of_souls_aura_of_desire_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_reliquary_of_souls_aura_of_desire_aura::HandleProc, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_reliquary_of_souls_aura_of_desire_aura::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_INCREASE_ENERGY_PERCENT);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_reliquary_of_souls_aura_of_desire_aura::Update, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -765,7 +759,7 @@ void AddSC_boss_reliquary_of_souls()
     new boss_essence_of_anger();
     RegisterSpellScript(spell_reliquary_of_souls_aura_of_suffering_aura);
     RegisterSpellAndAuraScriptPair(spell_reliquary_of_souls_fixate, spell_reliquary_of_souls_fixate_aura);
-    new spell_reliquary_of_souls_aura_of_desire();
+    RegisterSpellScript(spell_reliquary_of_souls_aura_of_desire_aura);
     new spell_reliquary_of_souls_aura_of_anger();
     new spell_reliquary_of_souls_spite();
 }
