@@ -222,31 +222,20 @@ class spell_gurtogg_bloodboil : public SpellScript
     }
 };
 
-class spell_gurtogg_eject : public SpellScriptLoader
+class spell_gurtogg_eject : public SpellScript
 {
-public:
-    spell_gurtogg_eject() : SpellScriptLoader("spell_gurtogg_eject") { }
+    PrepareSpellScript(spell_gurtogg_eject);
 
-    class spell_gurtogg_eject_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_gurtogg_eject_SpellScript);
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->GetThreatMgr().ModifyThreatByPercent(target, -20);
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->GetThreatMgr().ModifyThreatByPercent(target, -20);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_gurtogg_eject_SpellScript::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gurtogg_eject_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_gurtogg_eject::HandleScriptEffect, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -254,6 +243,6 @@ void AddSC_boss_gurtogg_bloodboil()
 {
     new boss_gurtogg_bloodboil();
     RegisterSpellScript(spell_gurtogg_bloodboil);
-    new spell_gurtogg_eject();
+    RegisterSpellScript(spell_gurtogg_eject);
 }
 
