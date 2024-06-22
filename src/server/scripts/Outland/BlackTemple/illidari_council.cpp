@@ -556,30 +556,19 @@ public:
     };
 };
 
-class spell_illidari_council_balance_of_power : public SpellScriptLoader
+class spell_illidari_council_balance_of_power_aura : public AuraScript
 {
-public:
-    spell_illidari_council_balance_of_power() : SpellScriptLoader("spell_illidari_council_balance_of_power") { }
+    PrepareAuraScript(spell_illidari_council_balance_of_power_aura);
 
-    class spell_illidari_council_balance_of_power_AuraScript : public AuraScript
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        PrepareAuraScript(spell_illidari_council_balance_of_power_AuraScript);
+        // Set absorbtion amount to unlimited (no absorb)
+        amount = -1;
+    }
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set absorbtion amount to unlimited (no absorb)
-            amount = -1;
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_illidari_council_balance_of_power_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_illidari_council_balance_of_power_AuraScript();
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_illidari_council_balance_of_power_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
     }
 };
 
@@ -751,7 +740,7 @@ void AddSC_boss_illidari_council()
     new boss_lady_malande();
     new boss_veras_darkshadow();
     new boss_high_nethermancer_zerevor();
-    new spell_illidari_council_balance_of_power();
+    RegisterSpellScript(spell_illidari_council_balance_of_power_aura);
     new spell_illidari_council_empyreal_balance();
     new spell_illidari_council_reflective_shield();
     new spell_illidari_council_judgement();
