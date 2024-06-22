@@ -625,34 +625,28 @@ private:
     uint8 _targetCount;
 };
 
-class spell_illidari_council_reflective_shield : public SpellScriptLoader
+class spell_illidari_council_reflective_shield_aura : public AuraScript
 {
-public:
-    spell_illidari_council_reflective_shield() : SpellScriptLoader("spell_illidari_council_reflective_shield") { }
+    PrepareAuraScript(spell_illidari_council_reflective_shield_aura);
 
-    class spell_illidari_council_reflective_shield_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_illidari_council_reflective_shield_AuraScript);
+        return ValidateSpellInfo({ SPELL_REFLECTIVE_SHIELD_T });
+    }
 
-        void ReflectDamage(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            Unit* target = GetTarget();
-            if (dmgInfo.GetAttacker() == target)
-                return;
-
-            int32 bp = absorbAmount / 2;
-            target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_REFLECTIVE_SHIELD_T, &bp, nullptr, nullptr, true, nullptr, aurEff);
-        }
-
-        void Register() override
-        {
-            AfterEffectAbsorb += AuraEffectAbsorbFn(spell_illidari_council_reflective_shield_AuraScript::ReflectDamage, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void ReflectDamage(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
-        return new spell_illidari_council_reflective_shield_AuraScript();
+        Unit* target = GetTarget();
+        if (dmgInfo.GetAttacker() == target)
+            return;
+
+        int32 bp = absorbAmount / 2;
+        target->CastCustomSpell(dmgInfo.GetAttacker(), SPELL_REFLECTIVE_SHIELD_T, &bp, nullptr, nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        AfterEffectAbsorb += AuraEffectAbsorbFn(spell_illidari_council_reflective_shield_aura::ReflectDamage, EFFECT_0);
     }
 };
 
@@ -731,7 +725,7 @@ void AddSC_boss_illidari_council()
     new boss_high_nethermancer_zerevor();
     RegisterSpellScript(spell_illidari_council_balance_of_power_aura);
     RegisterSpellScript(spell_illidari_council_empyreal_balance);
-    new spell_illidari_council_reflective_shield();
+    RegisterSpellScript(spell_illidari_council_reflective_shield_aura);
     new spell_illidari_council_judgement();
     new spell_illidari_council_deadly_strike();
 }
