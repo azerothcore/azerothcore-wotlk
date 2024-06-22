@@ -435,32 +435,26 @@ class spell_black_temple_curse_of_vitality_aura : public AuraScript
     }
 };
 
-class spell_black_temple_dementia : public SpellScriptLoader
+class spell_black_temple_dementia_aura : public AuraScript
 {
-public:
-    spell_black_temple_dementia() : SpellScriptLoader("spell_black_temple_dementia") { }
+    PrepareAuraScript(spell_black_temple_dementia_aura);
 
-    class spell_black_temple_dementia_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_black_temple_dementia_AuraScript);
+        return ValidateSpellInfo({ SPELL_DEMENTIA1, SPELL_DEMENTIA2 });
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            if (roll_chance_i(50))
-                GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA1, true);
-            else
-                GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA2, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_dementia_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_black_temple_dementia_AuraScript();
+        if (roll_chance_i(50))
+            GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA1, true);
+        else
+            GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA2, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_dementia_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -478,6 +472,6 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_bloodbolt);
     RegisterSpellScript(spell_black_temple_consuming_strikes_aura);
     RegisterSpellScript(spell_black_temple_curse_of_vitality_aura);
-    new spell_black_temple_dementia();
+    RegisterSpellScript(spell_black_temple_dementia_aura);
 }
 
