@@ -608,56 +608,40 @@ class spell_reliquary_of_souls_aura_of_suffering_aura : public AuraScript
     }
 };
 
-class spell_reliquary_of_souls_fixate : public SpellScriptLoader
+class spell_reliquary_of_souls_fixate : public SpellScript
 {
-public:
-    spell_reliquary_of_souls_fixate() : SpellScriptLoader("spell_reliquary_of_souls_fixate") { }
+    PrepareSpellScript(spell_reliquary_of_souls_fixate);
 
-    class spell_reliquary_of_souls_fixate_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_reliquary_of_souls_fixate_SpellScript);
+        if (targets.empty())
+            return;
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            if (targets.empty())
-                return;
-
-            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
-            WorldObject* target = targets.front();
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_reliquary_of_souls_fixate_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_reliquary_of_souls_fixate_SpellScript();
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        WorldObject* target = targets.front();
+        targets.clear();
+        targets.push_back(target);
     }
 
-    class spell_reliquary_of_souls_fixate_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_reliquary_of_souls_fixate_AuraScript)
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_reliquary_of_souls_fixate::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->RemoveAurasDueToSpell(GetSpellInfo()->Effects[EFFECT_1].TriggerSpell, GetTarget()->GetGUID());
-        }
+class spell_reliquary_of_souls_fixate_aura : public AuraScript
+{
+    PrepareAuraScript(spell_reliquary_of_souls_fixate_aura);
 
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_fixate_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_reliquary_of_souls_fixate_AuraScript();
+        if (Unit* caster = GetCaster())
+            caster->RemoveAurasDueToSpell(GetSpellInfo()->Effects[EFFECT_1].TriggerSpell, GetTarget()->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_reliquary_of_souls_fixate_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -780,7 +764,7 @@ void AddSC_boss_reliquary_of_souls()
     new boss_essence_of_desire();
     new boss_essence_of_anger();
     RegisterSpellScript(spell_reliquary_of_souls_aura_of_suffering_aura);
-    new spell_reliquary_of_souls_fixate();
+    RegisterSpellAndAuraScriptPair(spell_reliquary_of_souls_fixate, spell_reliquary_of_souls_fixate_aura);
     new spell_reliquary_of_souls_aura_of_desire();
     new spell_reliquary_of_souls_aura_of_anger();
     new spell_reliquary_of_souls_spite();
