@@ -352,48 +352,37 @@ class spell_black_temple_shadow_inferno_aura : public AuraScript
     }
 };
 
-class spell_black_temple_spell_absorption : public SpellScriptLoader
+class spell_black_temple_spell_absorption_aura : public AuraScript
 {
-public:
-    spell_black_temple_spell_absorption() : SpellScriptLoader("spell_black_temple_spell_absorption") { }
+    PrepareAuraScript(spell_black_temple_spell_absorption_aura);
 
-    class spell_black_temple_spell_absorption_AuraScript : public AuraScript
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        PrepareAuraScript(spell_black_temple_spell_absorption_AuraScript);
+        // Set absorbtion amount to unlimited
+        amount = -1;
+    }
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set absorbtion amount to unlimited
-            amount = -1;
-        }
-
-        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            absorbAmount = dmgInfo.GetDamage();
-        }
-
-        void Update(AuraEffect const* effect)
-        {
-            PreventDefaultAction();
-            uint32 count = GetUnitOwner()->GetAuraCount(SPELL_CHAOTIC_CHARGE);
-            if (count == 0)
-                return;
-
-            GetUnitOwner()->CastCustomSpell(GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, SPELLVALUE_BASE_POINT0, effect->GetAmount()*count, GetUnitOwner(), TRIGGERED_FULL_MASK);
-            GetUnitOwner()->RemoveAurasDueToSpell(SPELL_CHAOTIC_CHARGE);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_black_temple_spell_absorption_AuraScript::CalculateAmount, EFFECT_2, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_black_temple_spell_absorption_AuraScript::Absorb, EFFECT_2);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_spell_absorption_AuraScript::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
-        return new spell_black_temple_spell_absorption_AuraScript();
+        absorbAmount = dmgInfo.GetDamage();
+    }
+
+    void Update(AuraEffect const* effect)
+    {
+        PreventDefaultAction();
+        uint32 count = GetUnitOwner()->GetAuraCount(SPELL_CHAOTIC_CHARGE);
+        if (count == 0)
+            return;
+
+        GetUnitOwner()->CastCustomSpell(GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, SPELLVALUE_BASE_POINT0, effect->GetAmount()*count, GetUnitOwner(), TRIGGERED_FULL_MASK);
+        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_CHAOTIC_CHARGE);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_black_temple_spell_absorption_aura::CalculateAmount, EFFECT_2, SPELL_AURA_SCHOOL_ABSORB);
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_black_temple_spell_absorption_aura::Absorb, EFFECT_2);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_spell_absorption_aura::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
     }
 };
 
@@ -518,7 +507,7 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_wyvern_sting_aura);
     RegisterSpellScript(spell_black_temple_charge_rage_aura);
     RegisterSpellScript(spell_black_temple_shadow_inferno_aura);
-    new spell_black_temple_spell_absorption();
+    RegisterSpellScript(spell_black_temple_spell_absorption_aura);
     new spell_black_temple_bloodbolt();
     new spell_black_temple_consuming_strikes();
     new spell_black_temple_curse_of_vitality();

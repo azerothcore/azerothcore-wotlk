@@ -15,3 +15,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_skeleton_shot_a
 UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_wyvern_sting_aura' WHERE `spell_id`=41186;
 UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_charge_rage_aura' WHERE `spell_id`=39575;
 UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_shadow_inferno_aura' WHERE `spell_id`=39645;
+UPDATE `spell_script_names` SET `ScriptName`='spell_black_temple_spell_absorption_aura' WHERE `spell_id`=41034;
