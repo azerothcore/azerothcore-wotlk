@@ -674,34 +674,23 @@ class spell_illidari_council_judgement : public SpellScript
     }
 };
 
-class spell_illidari_council_deadly_strike : public SpellScriptLoader
+class spell_illidari_council_deadly_strike_aura : public AuraScript
 {
-public:
-    spell_illidari_council_deadly_strike() : SpellScriptLoader("spell_illidari_council_deadly_strike") { }
+    PrepareAuraScript(spell_illidari_council_deadly_strike_aura);
 
-    class spell_illidari_council_deadly_strike_AuraScript : public AuraScript
+    void Update(AuraEffect const* effect)
     {
-        PrepareAuraScript(spell_illidari_council_deadly_strike_AuraScript);
-
-        void Update(AuraEffect const* effect)
+        PreventDefaultAction();
+        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
         {
-            PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-            {
-                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
-                GetUnitOwner()->m_Events.AddEvent(new VerasEnvenom(*GetUnitOwner(), target->GetGUID()), GetUnitOwner()->m_Events.CalculateTime(urand(1500, 3500)));
-            }
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
+            GetUnitOwner()->m_Events.AddEvent(new VerasEnvenom(*GetUnitOwner(), target->GetGUID()), GetUnitOwner()->m_Events.CalculateTime(urand(1500, 3500)));
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidari_council_deadly_strike_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_illidari_council_deadly_strike_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidari_council_deadly_strike_aura::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -716,6 +705,6 @@ void AddSC_boss_illidari_council()
     RegisterSpellScript(spell_illidari_council_empyreal_balance);
     RegisterSpellScript(spell_illidari_council_reflective_shield_aura);
     RegisterSpellScript(spell_illidari_council_judgement);
-    new spell_illidari_council_deadly_strike();
+    RegisterSpellScript(spell_illidari_council_deadly_strike_aura);
 }
 
