@@ -1,3 +1,4 @@
+-- DB update 2024_06_21_02 -> 2024_06_22_00
 -- Refik
 DELETE FROM `gossip_menu` WHERE `MenuID` = 8868 and `TextID` = 10652;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
