@@ -419,30 +419,19 @@ class spell_black_temple_consuming_strikes_aura : public AuraScript
     }
 };
 
-class spell_black_temple_curse_of_vitality : public SpellScriptLoader
+class spell_black_temple_curse_of_vitality_aura : public AuraScript
 {
-public:
-    spell_black_temple_curse_of_vitality() : SpellScriptLoader("spell_black_temple_curse_of_vitality") { }
+    PrepareAuraScript(spell_black_temple_curse_of_vitality_aura);
 
-    class spell_black_temple_curse_of_vitality_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_black_temple_curse_of_vitality_AuraScript);
+        if (GetUnitOwner()->HealthBelowPct(50))
+            SetDuration(0);
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            if (GetUnitOwner()->HealthBelowPct(50))
-                SetDuration(0);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_vitality_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_temple_curse_of_vitality_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_vitality_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -488,7 +477,7 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_spell_absorption_aura);
     RegisterSpellScript(spell_black_temple_bloodbolt);
     RegisterSpellScript(spell_black_temple_consuming_strikes_aura);
-    new spell_black_temple_curse_of_vitality();
+    RegisterSpellScript(spell_black_temple_curse_of_vitality_aura);
     new spell_black_temple_dementia();
 }
 
