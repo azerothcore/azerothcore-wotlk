@@ -1301,31 +1301,25 @@ public:
     }
 };
 
-class spell_pos_empowered_blizzard : public SpellScriptLoader
+class spell_pos_empowered_blizzard_aura : public AuraScript
 {
-public:
-    spell_pos_empowered_blizzard() : SpellScriptLoader("spell_pos_empowered_blizzard") { }
+    PrepareAuraScript(spell_pos_empowered_blizzard_aura);
 
-    class spell_pos_empowered_blizzardAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_pos_empowered_blizzardAuraScript)
+        return ValidateSpellInfo({ 70131 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-                caster->CastSpell((float)urand(447, 480), (float)urand(200, 235), 528.71f, 70131, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_empowered_blizzardAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_pos_empowered_blizzardAuraScript();
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell((float)urand(447, 480), (float)urand(200, 235), 528.71f, 70131, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_empowered_blizzard_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1537,7 +1531,7 @@ void AddSC_pit_of_saron()
     new npc_pos_freed_slave();
     new npc_pos_leader_second();
 
-    new spell_pos_empowered_blizzard();
+    RegisterSpellScript(spell_pos_empowered_blizzard_aura);
     new spell_pos_slave_trigger_closest();
     new spell_pos_rimefang_frost_nova();
     new spell_pos_blight();
