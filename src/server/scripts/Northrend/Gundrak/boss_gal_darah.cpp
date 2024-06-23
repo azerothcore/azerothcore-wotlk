@@ -240,30 +240,24 @@ class spell_galdarah_impaling_charge : public SpellScript
     }
 };
 
-class spell_galdarah_transform : public SpellScriptLoader
+class spell_galdarah_transform : public SpellScript
 {
-public:
-    spell_galdarah_transform() : SpellScriptLoader("spell_galdarah_transform") { }
+    PrepareSpellScript(spell_galdarah_transform);
 
-    class spell_galdarah_transform_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_galdarah_transform_SpellScript);
+        return ValidateSpellInfo({ SPELL_TRANSFORM_TO_RHINO });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->RemoveAurasDueToSpell(SPELL_TRANSFORM_TO_RHINO);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_galdarah_transform_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        return new spell_galdarah_transform_SpellScript();
+        if (Unit* target = GetHitUnit())
+            target->RemoveAurasDueToSpell(SPELL_TRANSFORM_TO_RHINO);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_galdarah_transform::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -287,6 +281,6 @@ void AddSC_boss_gal_darah()
 {
     new boss_gal_darah();
     RegisterSpellScript(spell_galdarah_impaling_charge);
-    new spell_galdarah_transform();
+    RegisterSpellScript(spell_galdarah_transform);
     new achievement_share_the_love();
 }
