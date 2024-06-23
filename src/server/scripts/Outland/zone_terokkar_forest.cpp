@@ -36,53 +36,42 @@ enum fumping
     SPELL_SUMMON_HAISHULUD              = 39248,
 };
 
-class spell_q10930_big_bone_worm : public SpellScriptLoader
+class spell_q10930_big_bone_worm : public SpellScript
 {
-public:
-    spell_q10930_big_bone_worm() : SpellScriptLoader("spell_q10930_big_bone_worm") { }
+    PrepareSpellScript(spell_q10930_big_bone_worm);
 
-    class spell_q10930_big_bone_worm_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_q10930_big_bone_worm_SpellScript);
-
-        void SetDest(SpellDestination& dest)
-        {
-            Position const offset = { 0.5f, 0.5f, 5.0f, 0.0f };
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10930_big_bone_worm_SpellScript::SetDest, EFFECT_1, TARGET_DEST_CASTER);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_q10930_big_bone_worm_SpellScript();
+        Position const offset = { 0.5f, 0.5f, 5.0f, 0.0f };
+        dest.RelocateOffset(offset);
     }
 
-    class spell_q10930_big_bone_worm_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_q10930_big_bone_worm_AuraScript);
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10930_big_bone_worm::SetDest, EFFECT_1, TARGET_DEST_CASTER);
+    }
+};
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
-                return;
+class spell_q10930_big_bone_worm_aura : public AuraScript
+{
+    PrepareAuraScript(spell_q10930_big_bone_worm_aura);
 
-            GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_HAISHULUD, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_q10930_big_bone_worm_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return new spell_q10930_big_bone_worm_AuraScript();
+        return ValidateSpellInfo({ SPELL_SUMMON_HAISHULUD, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3 });
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_HAISHULUD, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_q10930_big_bone_worm_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -701,7 +690,7 @@ public:
 void AddSC_terokkar_forest()
 {
     // Ours
-    new spell_q10930_big_bone_worm();
+    RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
     new spell_q10929_fumping();
     new npc_greatfather_aldrimus();
     new spell_q10036_torgos();
