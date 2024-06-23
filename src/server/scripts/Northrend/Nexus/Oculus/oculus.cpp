@@ -704,32 +704,21 @@ class spell_oculus_call_ruby_emerald_amber_drake : public SpellScript
     }
 };
 
-class spell_oculus_ride_ruby_emerald_amber_drake_que : public SpellScriptLoader
+class spell_oculus_ride_ruby_emerald_amber_drake_que_aura : public AuraScript
 {
-public:
-    spell_oculus_ride_ruby_emerald_amber_drake_que() : SpellScriptLoader("spell_oculus_ride_ruby_emerald_amber_drake_que") { }
+    PrepareAuraScript(spell_oculus_ride_ruby_emerald_amber_drake_que_aura);
 
-    class spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript);
+        // caster of the triggered spell is wrong for an unknown reason, handle it here correctly
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+            GetTarget()->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void HandlePeriodic(AuraEffect const* aurEff)
-        {
-            // caster of the triggered spell is wrong for an unknown reason, handle it here correctly
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-                GetTarget()->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_oculus_ride_ruby_emerald_amber_drake_que_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_oculus_ride_ruby_emerald_amber_drake_que_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -951,7 +940,7 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_touch_the_nightmare);
     RegisterSpellScript(spell_oculus_dream_funnel_aura);
     RegisterSpellScript(spell_oculus_call_ruby_emerald_amber_drake);
-    new spell_oculus_ride_ruby_emerald_amber_drake_que();
+    RegisterSpellScript(spell_oculus_ride_ruby_emerald_amber_drake_que_aura);
     new spell_oculus_evasive_charges();
     new spell_oculus_soar();
     new spell_oculus_rider_aura();
