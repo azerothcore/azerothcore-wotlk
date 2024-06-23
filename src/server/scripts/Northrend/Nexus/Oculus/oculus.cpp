@@ -753,60 +753,54 @@ class spell_oculus_evasive_charges_aura : public AuraScript
     }
 };
 
-class spell_oculus_soar : public SpellScriptLoader
+class spell_oculus_soar_aura : public AuraScript
 {
-public:
-    spell_oculus_soar() : SpellScriptLoader("spell_oculus_soar") { }
+    PrepareAuraScript(spell_oculus_soar_aura);
 
-    class spell_oculus_soarAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_oculus_soarAuraScript);
+        return ValidateSpellInfo({ SPELL_SOAR_BUFF });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            Unit* caster = GetCaster();
-
-            if (!caster)
-                return;
-
-            if (!caster->getAttackers().empty())
-            {
-                if (caster->HasAura(SPELL_SOAR_BUFF))
-                    caster->RemoveAurasDueToSpell(SPELL_SOAR_BUFF);
-
-                PreventDefaultAction();
-                return;
-            }
-
-            if (!caster->HasAura(SPELL_SOAR_BUFF))
-                caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
-
-            // We handle the health regen here, normal heal regen isn't working....
-            if (caster->GetHealth() < caster->GetMaxHealth())
-                caster->SetHealth(caster->GetHealth() + (uint32)((double)caster->GetMaxHealth() * 0.2));
-        }
-
-        void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-
-            if (!caster)
-                return;
-
-            if (!caster->HasAura(SPELL_SOAR_BUFF))
-                caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_oculus_soarAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            OnEffectApply += AuraEffectApplyFn(spell_oculus_soarAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_oculus_soarAuraScript();
+        Unit* caster = GetCaster();
+
+        if (!caster)
+            return;
+
+        if (!caster->getAttackers().empty())
+        {
+            if (caster->HasAura(SPELL_SOAR_BUFF))
+                caster->RemoveAurasDueToSpell(SPELL_SOAR_BUFF);
+
+            PreventDefaultAction();
+            return;
+        }
+
+        if (!caster->HasAura(SPELL_SOAR_BUFF))
+            caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
+
+        // We handle the health regen here, normal heal regen isn't working....
+        if (caster->GetHealth() < caster->GetMaxHealth())
+            caster->SetHealth(caster->GetHealth() + (uint32)((double)caster->GetMaxHealth() * 0.2));
+    }
+
+    void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+
+        if (!caster)
+            return;
+
+        if (!caster->HasAura(SPELL_SOAR_BUFF))
+            caster->CastSpell(caster, SPELL_SOAR_BUFF, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_oculus_soar_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        OnEffectApply += AuraEffectApplyFn(spell_oculus_soar_aura::HandleOnEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -936,7 +930,7 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_call_ruby_emerald_amber_drake);
     RegisterSpellScript(spell_oculus_ride_ruby_emerald_amber_drake_que_aura);
     RegisterSpellScript(spell_oculus_evasive_charges_aura);
-    new spell_oculus_soar();
+    RegisterSpellScript(spell_oculus_soar_aura);
     new spell_oculus_rider_aura();
     new spell_oculus_drake_flag();
 }
