@@ -47,6 +47,7 @@ enum eSpells
     SPELL_TELEPORT_VISUAL           = 52096,
 
     SPELL_SOULSTORM_VISUAL          = 68870,
+    SPELL_SOULSTORM_VISUAL2         = 68904,
     SPELL_SOULSTORM                 = 68872,
 };
 
@@ -295,13 +296,13 @@ class spell_bronjahm_soulstorm_channel_ooc_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 68904 });
+        return ValidateSpellInfo({ SPELL_SOULSTORM_VISUAL2, SPELL_SOULSTORM_VISUAL2+1, SPELL_SOULSTORM_VISUAL2+2, SPELL_SOULSTORM_VISUAL2+3 });
     }
 
     void HandlePeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), 68904 + (aurEff->GetTickNumber() % 4), true);
+        GetTarget()->CastSpell(GetTarget(), SPELL_SOULSTORM_VISUAL2 + (aurEff->GetTickNumber() % 4), true);
     }
 
     void Register() override
