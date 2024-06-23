@@ -804,77 +804,71 @@ class spell_oculus_soar_aura : public AuraScript
     }
 };
 
-class spell_oculus_rider_aura : public SpellScriptLoader
+class spell_oculus_rider_aura : public AuraScript
 {
-public:
-    spell_oculus_rider_aura() : SpellScriptLoader("spell_oculus_rider_aura") { }
+    PrepareAuraScript(spell_oculus_rider_aura);
 
-    class spell_oculus_rider_auraAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_oculus_rider_auraAuraScript);
+        return ValidateSpellInfo({ SPELL_SOAR_TRIGGER, SPELL_RUBY_EVASIVE_AURA, SPELL_DRAKE_FLAG_VISUAL });
+    }
 
-        ObjectGuid _drakeGUID;
+    ObjectGuid _drakeGUID;
 
-        void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
-            Creature* drake = caster->GetVehicleCreatureBase();
-
-            if (!drake)
-                return;
-
-            switch (aurEff->GetEffIndex())
-            {
-                case EFFECT_1:
-                    _drakeGUID = drake->GetGUID();
-                    caster->AddAura(SPELL_DRAKE_FLAG_VISUAL, caster);
-                    caster->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    caster->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
-                    drake->CastSpell(drake, SPELL_SOAR_TRIGGER);
-                    if (drake->GetEntry() == NPC_RUBY_DRAKE)
-                        drake->CastSpell(drake, SPELL_RUBY_EVASIVE_AURA);
-                    break;
-                case EFFECT_2:
-                    caster->AddAura(SPELL_SCALE_STATS, drake);
-                    PreventDefaultAction();
-                    break;
-            }
-        }
-
-        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-
-            if (!caster)
-                return;
-
-            Creature* drake = ObjectAccessor::GetCreature(*caster, _drakeGUID);
-
-            if (drake)
-            {
-                drake->RemoveUnitFlag(UNIT_FLAG_POSSESSED);
-                drake->RemoveAurasDueToSpell(GetId());
-                drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
-                drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);
-            }
-            caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_auraAuraScript::HandleOnEffectApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_auraAuraScript::HandleOnEffectApply, EFFECT_2, SPELL_AURA_LINKED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            OnEffectRemove += AuraEffectRemoveFn(spell_oculus_rider_auraAuraScript::HandleOnEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_oculus_rider_auraAuraScript();
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        Creature* drake = caster->GetVehicleCreatureBase();
+
+        if (!drake)
+            return;
+
+        switch (aurEff->GetEffIndex())
+        {
+            case EFFECT_1:
+                _drakeGUID = drake->GetGUID();
+                caster->AddAura(SPELL_DRAKE_FLAG_VISUAL, caster);
+                caster->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                caster->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+                drake->CastSpell(drake, SPELL_SOAR_TRIGGER);
+                if (drake->GetEntry() == NPC_RUBY_DRAKE)
+                    drake->CastSpell(drake, SPELL_RUBY_EVASIVE_AURA);
+                break;
+            case EFFECT_2:
+                caster->AddAura(SPELL_SCALE_STATS, drake);
+                PreventDefaultAction();
+                break;
+        }
+    }
+
+    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+
+        if (!caster)
+            return;
+
+        Creature* drake = ObjectAccessor::GetCreature(*caster, _drakeGUID);
+
+        if (drake)
+        {
+            drake->RemoveUnitFlag(UNIT_FLAG_POSSESSED);
+            drake->RemoveAurasDueToSpell(GetId());
+            drake->RemoveAurasDueToSpell(SPELL_SOAR_TRIGGER);
+            drake->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_AURA);
+        }
+        caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_aura::HandleOnEffectApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectApply += AuraEffectApplyFn(spell_oculus_rider_aura::HandleOnEffectApply, EFFECT_2, SPELL_AURA_LINKED, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectRemove += AuraEffectRemoveFn(spell_oculus_rider_aura::HandleOnEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
@@ -931,7 +925,7 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_ride_ruby_emerald_amber_drake_que_aura);
     RegisterSpellScript(spell_oculus_evasive_charges_aura);
     RegisterSpellScript(spell_oculus_soar_aura);
-    new spell_oculus_rider_aura();
+    RegisterSpellScript(spell_oculus_rider_aura);
     new spell_oculus_drake_flag();
 }
 
