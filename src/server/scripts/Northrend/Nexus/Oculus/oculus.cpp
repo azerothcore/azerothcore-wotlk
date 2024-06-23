@@ -559,37 +559,26 @@ class spell_oculus_stop_time_aura : public AuraScript
 };
 
 // 50240 - Evasive Maneuvers
-class spell_oculus_evasive_maneuvers : public SpellScriptLoader
+class spell_oculus_evasive_maneuvers_aura : public AuraScript
 {
-public:
-    spell_oculus_evasive_maneuvers() : SpellScriptLoader("spell_oculus_evasive_maneuvers") { }
+    PrepareAuraScript(spell_oculus_evasive_maneuvers_aura);
 
-    class spell_oculus_evasive_maneuvers_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_oculus_evasive_maneuvers_AuraScript);
+        return ValidateSpellInfo({ SPELL_RUBY_EVASIVE_CHARGES });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_RUBY_EVASIVE_CHARGES });
-        }
-
-        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
-        {
-            PreventDefaultAction();
-            GetTarget()->RemoveAuraFromStack(SPELL_RUBY_EVASIVE_CHARGES);
-            if (!GetTarget()->HasAura(SPELL_RUBY_EVASIVE_CHARGES))
-                SetDuration(0);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_oculus_evasive_maneuvers_AuraScript::HandleProc, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
-        return new spell_oculus_evasive_maneuvers_AuraScript();
+        PreventDefaultAction();
+        GetTarget()->RemoveAuraFromStack(SPELL_RUBY_EVASIVE_CHARGES);
+        if (!GetTarget()->HasAura(SPELL_RUBY_EVASIVE_CHARGES))
+            SetDuration(0);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_oculus_evasive_maneuvers_aura::HandleProc, EFFECT_2, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -1011,7 +1000,7 @@ void AddSC_oculus()
     new npc_centrifuge_construct();
 
     RegisterSpellScript(spell_oculus_stop_time_aura);
-    new spell_oculus_evasive_maneuvers();
+    RegisterSpellScript(spell_oculus_evasive_maneuvers_aura);
     new spell_oculus_shock_lance();
     new spell_oculus_temporal_rift();
     new spell_oculus_touch_the_nightmare();

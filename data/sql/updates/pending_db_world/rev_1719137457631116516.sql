@@ -12,3 +12,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_dred_grievious_bite_aura' WH
 UPDATE `spell_script_names` SET `ScriptName`='spell_moorabi_mojo_frenzy_aura' WHERE `spell_id`=55163;
 UPDATE `spell_script_names` SET `ScriptName`='spell_sladran_grip_of_sladran_aura' WHERE `spell_id`=55093;
 UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_stop_time_aura' WHERE `spell_id`=49838;
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_evasive_maneuvers_aura' WHERE `spell_id`=50240;
