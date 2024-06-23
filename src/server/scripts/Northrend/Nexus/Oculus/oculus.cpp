@@ -872,40 +872,34 @@ class spell_oculus_rider_aura : public AuraScript
     }
 };
 
-class spell_oculus_drake_flag : public SpellScriptLoader
+class spell_oculus_drake_flag_aura : public AuraScript
 {
-public:
-    spell_oculus_drake_flag() : SpellScriptLoader("spell_oculus_drake_flag") { }
+    PrepareAuraScript(spell_oculus_drake_flag_aura);
 
-    class spell_oculus_drake_flagAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_oculus_drake_flagAuraScript);
+        return ValidateSpellInfo({ SPELL_DRAKE_FLAG_VISUAL });
+    }
 
-        void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-
-            if (!caster)
-                return;
-
-            Creature* drake = caster->GetVehicleCreatureBase();
-
-            if (!drake)
-            {
-                caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_oculus_drake_flagAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_oculus_drake_flagAuraScript();
+        Unit* caster = GetCaster();
+
+        if (!caster)
+            return;
+
+        Creature* drake = caster->GetVehicleCreatureBase();
+
+        if (!drake)
+        {
+            caster->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            caster->RemoveAurasDueToSpell(SPELL_DRAKE_FLAG_VISUAL);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_oculus_drake_flag_aura::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
@@ -926,6 +920,6 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_evasive_charges_aura);
     RegisterSpellScript(spell_oculus_soar_aura);
     RegisterSpellScript(spell_oculus_rider_aura);
-    new spell_oculus_drake_flag();
+    RegisterSpellScript(spell_oculus_drake_flag_aura);
 }
 
