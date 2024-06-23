@@ -406,29 +406,23 @@ public:
     };
 };
 
-class spell_drakkari_colossus_emerge : public SpellScriptLoader
+class spell_drakkari_colossus_emerge : public SpellScript
 {
-public:
-    spell_drakkari_colossus_emerge() : SpellScriptLoader("spell_drakkari_colossus_emerge") { }
+    PrepareSpellScript(spell_drakkari_colossus_emerge);
 
-    class spell_drakkari_colossus_emerge_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_drakkari_colossus_emerge_SpellScript);
+        return ValidateSpellInfo({ SPELL_FREEZE_ANIM });
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            GetCaster()->CastSpell(GetCaster(), SPELL_FREEZE_ANIM, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_drakkari_colossus_emerge_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_drakkari_colossus_emerge_SpellScript();
+        GetCaster()->CastSpell(GetCaster(), SPELL_FREEZE_ANIM, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_drakkari_colossus_emerge::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -494,7 +488,7 @@ void AddSC_boss_drakkari_colossus()
     new boss_drakkari_colossus();
     new boss_drakkari_elemental();
     new npc_living_mojo();
-    new spell_drakkari_colossus_emerge();
+    RegisterSpellScript(spell_drakkari_colossus_emerge);
     new spell_drakkari_colossus_surge();
     new spell_drakkari_colossus_face_me();
 }
