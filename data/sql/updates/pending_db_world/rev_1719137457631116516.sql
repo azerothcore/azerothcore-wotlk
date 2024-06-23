@@ -25,3 +25,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_frost_tomb_aura' WHERE `spel
 UPDATE `spell_script_names` SET `ScriptName`='spell_optic_link_aura' WHERE `spell_id`=54396;
 UPDATE `spell_script_names` SET `ScriptName`='spell_destroy_door_seal_aura' WHERE `spell_id`=58040;
 UPDATE `spell_script_names` SET `ScriptName`='spell_shield_of_bones_aura' WHERE `spell_id` IN (69069,70207);
+UPDATE `spell_script_names` SET `ScriptName`='spell_wailing_souls_periodic_aura' WHERE `spell_id`=68875;
