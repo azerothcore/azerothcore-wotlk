@@ -45,13 +45,18 @@ npc_enraged_spirit
 EndContentData */
 
 // Ours
+enum TheFelAndTheFurious
+{
+    SPELL_ROCKET_LAUNCHER = 38083
+};
+
 class spell_q10612_10613_the_fel_and_the_furious : public SpellScript
 {
     PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 38083 });
+        return ValidateSpellInfo({ SPELL_ROCKET_LAUNCHER });
     }
 
     void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
@@ -75,7 +80,7 @@ class spell_q10612_10613_the_fel_and_the_furious : public SpellScript
             {
                 cr2->SetFaction(FACTION_MONSTER);
                 cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                GetCaster()->CastSpell(cr2, 38083, true);
+                GetCaster()->CastSpell(cr2, SPELL_ROCKET_LAUNCHER, true);
             }
 
             go->SetLootState(GO_JUST_DEACTIVATED);
