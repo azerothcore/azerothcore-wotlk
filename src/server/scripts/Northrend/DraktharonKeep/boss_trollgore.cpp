@@ -221,30 +221,19 @@ class spell_trollgore_corpse_explode_aura : public AuraScript
     }
 };
 
-class spell_trollgore_invader_taunt : public SpellScriptLoader
+class spell_trollgore_invader_taunt : public SpellScript
 {
-public:
-    spell_trollgore_invader_taunt() : SpellScriptLoader("spell_trollgore_invader_taunt") { }
+    PrepareSpellScript(spell_trollgore_invader_taunt);
 
-    class spell_trollgore_invader_taunt_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_trollgore_invader_taunt_SpellScript);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_trollgore_invader_taunt_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_trollgore_invader_taunt_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_trollgore_invader_taunt::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -269,6 +258,6 @@ void AddSC_boss_trollgore()
     new boss_trollgore();
     RegisterSpellScript(spell_trollgore_consume);
     RegisterSpellScript(spell_trollgore_corpse_explode_aura);
-    new spell_trollgore_invader_taunt();
+    RegisterSpellScript(spell_trollgore_invader_taunt);
     new achievement_consumption_junction();
 }
