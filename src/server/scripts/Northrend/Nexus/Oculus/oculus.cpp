@@ -583,42 +583,31 @@ class spell_oculus_evasive_maneuvers_aura : public AuraScript
 };
 
 // 49840 - Shock Lance
-class spell_oculus_shock_lance : public SpellScriptLoader
+class spell_oculus_shock_lance : public SpellScript
 {
-public:
-    spell_oculus_shock_lance() : SpellScriptLoader("spell_oculus_shock_lance") { }
+    PrepareSpellScript(spell_oculus_shock_lance);
 
-    class spell_oculus_shock_lance_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_oculus_shock_lance_SpellScript);
+        return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
-        }
-
-        void CalcDamage()
-        {
-            int32 damage = GetHitDamage();
-            if (Unit* target = GetHitUnit())
-                if (Aura* aura = target->GetAura(SPELL_AMBER_SHOCK_CHARGE, GetCaster()->GetGUID())) // shock charges from same caster
-                {
-                    damage += aura->GetStackAmount() * 6525;
-                    aura->Remove();
-                }
-
-            SetHitDamage(damage);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_oculus_shock_lance_SpellScript::CalcDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CalcDamage()
     {
-        return new spell_oculus_shock_lance_SpellScript();
+        int32 damage = GetHitDamage();
+        if (Unit* target = GetHitUnit())
+            if (Aura* aura = target->GetAura(SPELL_AMBER_SHOCK_CHARGE, GetCaster()->GetGUID())) // shock charges from same caster
+            {
+                damage += aura->GetStackAmount() * 6525;
+                aura->Remove();
+            }
+
+        SetHitDamage(damage);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_oculus_shock_lance::CalcDamage);
     }
 };
 
@@ -1001,7 +990,7 @@ void AddSC_oculus()
 
     RegisterSpellScript(spell_oculus_stop_time_aura);
     RegisterSpellScript(spell_oculus_evasive_maneuvers_aura);
-    new spell_oculus_shock_lance();
+    RegisterSpellScript(spell_oculus_shock_lance);
     new spell_oculus_temporal_rift();
     new spell_oculus_touch_the_nightmare();
     new spell_oculus_dream_funnel();
