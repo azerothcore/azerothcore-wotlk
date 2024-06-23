@@ -21,3 +21,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_soar_aura' WHERE `spe
 UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_drake_flag_aura' WHERE `spell_id`=53797;
 UPDATE `spell_script_names` SET `ScriptName`='spell_boss_magus_telestra_summon_telestra_clones_aura' WHERE `spell_id`=47710;
 UPDATE `spell_script_names` SET `ScriptName`='spell_ticking_time_bomb_aura' WHERE `spell_id`=59686;
+UPDATE `spell_script_names` SET `ScriptName`='spell_frost_tomb_aura' WHERE `spell_id`=42672;
