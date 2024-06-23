@@ -197,30 +197,24 @@ class spell_q10923_evil_draws_near_summon : public SpellScript
     }
 };
 
-class spell_q10923_evil_draws_near_periodic : public SpellScriptLoader
+class spell_q10923_evil_draws_near_periodic_aura : public AuraScript
 {
-public:
-    spell_q10923_evil_draws_near_periodic() : SpellScriptLoader("spell_q10923_evil_draws_near_periodic") { }
+    PrepareAuraScript(spell_q10923_evil_draws_near_periodic_aura);
 
-    class spell_q10923_evil_draws_near_periodic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_q10923_evil_draws_near_periodic_AuraScript);
+        return ValidateSpellInfo({ SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2 });
+    }
 
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_q10923_evil_draws_near_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_q10923_evil_draws_near_periodic_AuraScript();
+        PreventDefaultAction();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL1, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL2), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_q10923_evil_draws_near_periodic_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -678,7 +672,7 @@ void AddSC_terokkar_forest()
     new npc_greatfather_aldrimus();
     RegisterSpellScript(spell_q10036_torgos);
     RegisterSpellScript(spell_q10923_evil_draws_near_summon);
-    new spell_q10923_evil_draws_near_periodic();
+    RegisterSpellScript(spell_q10923_evil_draws_near_periodic_aura);
     new spell_q10923_evil_draws_near_visual();
     new spell_q10898_skywing();
 
