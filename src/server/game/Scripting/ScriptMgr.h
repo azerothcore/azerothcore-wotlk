@@ -672,7 +672,7 @@ public: /* MiscScript */
 public: /* CommandSC */
 
     void OnHandleDevCommand(Player* player, bool& enable);
-    bool CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
+    bool OnTryExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
 
 public: /* DatabaseScript */
 

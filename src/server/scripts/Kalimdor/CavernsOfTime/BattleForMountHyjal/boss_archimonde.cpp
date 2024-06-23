@@ -187,21 +187,12 @@ struct boss_archimonde : public BossAI
 
     void Reset() override
     {
-        BossAI::Reset();
+        _Reset();
         _wispCount = 0;
         _isChanneling = false;
         _enraged = false;
         _availableAuras.clear();
         _availableSpells.clear();
-
-        if (Map* map = me->GetMap())
-        {
-            map->DoForAllPlayers([&](Player* player)
-            {
-                player->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, false);
-                player->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, false);
-            });
-        }
 
         if (instance->GetBossState(DATA_AZGALOR) != DONE)
         {
@@ -216,7 +207,7 @@ struct boss_archimonde : public BossAI
         ScheduleHealthCheckEvent(10, [&]{
             scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
-            DoCastProtection();
+            DoCastAOE(SPELL_PROTECTION_OF_ELUNE, true);
             Talk(SAY_ENRAGE);
             _enraged = true;
             me->GetMotionMaster()->Clear(false);
@@ -225,7 +216,7 @@ struct boss_archimonde : public BossAI
             {
                 if (_wispCount >= 30)
                 {
-                    Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                    me->KillSelf();
                 }
                 Position wispPosition = { me->GetPositionX() + float(rand() % WISP_OFFSET), me->GetPositionY() + float(rand() % WISP_OFFSET), me->GetPositionZ(), 0.0f };
                 if (Creature* wisp = me->SummonCreature(CREATURE_ANCIENT_WISP, wispPosition))
@@ -253,8 +244,6 @@ struct boss_archimonde : public BossAI
                 {
                     if (Creature* nordrassil = me->SummonCreature(CREATURE_CHANNEL_TARGET, nordrassilPosition, TEMPSUMMON_TIMED_DESPAWN, 1200000))
                     {
-                        nordrassil->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        nordrassil->SetDisplayId(DISPLAY_ID_TRIGGER);
                         DoCast(nordrassil, SPELL_DRAIN_WORLD_TREE);
                         _isChanneling = true;
                         nordrassil->AI()->DoCast(me, SPELL_DRAIN_WORLD_TREE_2, true);
@@ -264,22 +253,9 @@ struct boss_archimonde : public BossAI
         }
     }
 
-    void DoCastProtection()
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        if (Map* map = me->GetMap())
-        {
-            map->DoForAllPlayers([&](Player* player)
-            {
-                player->AddAura(SPELL_PROTECTION_OF_ELUNE, player);
-                player->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
-                player->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
-            });
-        }
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        BossAI::JustEngagedWith(who);
+        _JustEngagedWith();
         me->InterruptNonMeleeSpells(false);
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(25s, 35s, [&]
@@ -345,49 +321,46 @@ struct boss_archimonde : public BossAI
         instance->SetData(DATA_SPAWN_WAVES, 1);
     }
 
-    void KilledUnit(Unit* victim) override
+    void KilledUnit(Unit* /*victim*/) override
     {
         Talk(SAY_SLAY);
-
-        if (victim->IsPlayer())
-        {
-            GainSoulCharge(victim->ToPlayer());
-        }
     }
 
-    void GainSoulCharge(Player* player)
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
-        switch (player->getClass())
+        if (type == GUID_GAIN_SOUL_CHARGE_PLAYER)
         {
-            case CLASS_PALADIN:
-            case CLASS_PRIEST:
-            case CLASS_WARLOCK:
-                player->CastSpell(me, SPELL_SOUL_CHARGE_RED, true);
-                break;
-            case CLASS_DEATH_KNIGHT:
-            case CLASS_MAGE:
-            case CLASS_ROGUE:
-            case CLASS_WARRIOR:
-                player->CastSpell(me, SPELL_SOUL_CHARGE_YELLOW, true);
-                break;
-            case CLASS_DRUID:
-            case CLASS_HUNTER:
-            case CLASS_SHAMAN:
-                player->CastSpell(me, SPELL_SOUL_CHARGE_GREEN, true);
-                break;
-            case CLASS_NONE:
-            default:
-                break;
-        }
-        scheduler.Schedule(2s, 10s, [this](TaskContext)
-        {
-            UnleashSoulCharge();
-        });
-    }
+            if (Player* player = ObjectAccessor::GetPlayer(*me, guid))
+            {
+                switch (player->getClass())
+                {
+                    case CLASS_PALADIN:
+                    case CLASS_PRIEST:
+                    case CLASS_WARLOCK:
+                        player->CastSpell(me, SPELL_SOUL_CHARGE_RED, true);
+                        break;
+                    case CLASS_DEATH_KNIGHT:
+                    case CLASS_MAGE:
+                    case CLASS_ROGUE:
+                    case CLASS_WARRIOR:
+                        player->CastSpell(me, SPELL_SOUL_CHARGE_YELLOW, true);
+                        break;
+                    case CLASS_DRUID:
+                    case CLASS_HUNTER:
+                    case CLASS_SHAMAN:
+                        player->CastSpell(me, SPELL_SOUL_CHARGE_GREEN, true);
+                        break;
+                    case CLASS_NONE:
+                    default:
+                        break;
+                }
 
-    void JustDied(Unit* killer) override
-    {
-        BossAI::JustDied(killer);
+                scheduler.Schedule(2s, 10s, [this](TaskContext)
+                {
+                    UnleashSoulCharge();
+                });
+            }
+        }
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -434,8 +407,6 @@ struct boss_archimonde : public BossAI
         {
             if (Creature* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
             {
-                doomfireSpirit->SetVisible(false);
-                doomfire->SetVisible(false);
                 doomfireSpirit->SetWalk(false);
                 doomfireSpirit->SetReactState(REACT_PASSIVE);
                 doomfire->SetReactState(REACT_PASSIVE);
@@ -498,42 +469,6 @@ class spell_red_sky_effect : public SpellScript
     }
 };
 
-class spell_finger_of_death : public SpellScript
-{
-    PrepareSpellScript(spell_finger_of_death);
-
-    void HandleHit(SpellEffIndex /*effIndex*/)
-    {
-        if (GetHitUnit() && GetHitUnit()->GetAura(SPELL_PROTECTION_OF_ELUNE))
-            PreventHitDamage();
-        else
-            GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_finger_of_death::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-    }
-};
-
-class spell_hand_of_death : public SpellScript
-{
-    PrepareSpellScript(spell_hand_of_death);
-
-    void HandleHit(SpellEffIndex /*effIndex*/)
-    {
-        if (GetHitUnit() && GetHitUnit()->GetAura(SPELL_PROTECTION_OF_ELUNE))
-            PreventHitDamage();
-        else
-            GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_hand_of_death::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-    }
-};
-
 class spell_air_burst : public SpellScript
 {
     PrepareSpellScript(spell_air_burst);
@@ -555,8 +490,6 @@ class spell_air_burst : public SpellScript
 void AddSC_boss_archimonde()
 {
     RegisterSpellScript(spell_red_sky_effect);
-    RegisterSpellScript(spell_hand_of_death);
-    RegisterSpellScript(spell_finger_of_death);
     RegisterSpellScript(spell_air_burst);
     RegisterHyjalAI(boss_archimonde);
     RegisterHyjalAI(npc_ancient_wisp);

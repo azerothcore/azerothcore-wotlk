@@ -246,35 +246,44 @@ public:
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->GetMap()->LoadGrid(heraldOfThrallPos.GetPositionX(), heraldOfThrallPos.GetPositionY());
                 me->SummonCreature(NPC_HERALD_OF_THRALL, heraldOfThrallPos, TEMPSUMMON_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
-                _scheduler.Schedule(2s, [this](TaskContext /*context*/)
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                scheduler.Schedule(2s, [this](TaskContext /*context*/)
+                {
+                    Talk(SAY_THRALL_ON_QUEST_REWARD_0);
+                }).Schedule(9s, [this](TaskContext /*context*/)
+                {
+                    Talk(SAY_THRALL_ON_QUEST_REWARD_1);
+                    DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    me->GetMap()->DoForAllPlayers([&](Player* player)
                     {
-                        Talk(SAY_THRALL_ON_QUEST_REWARD_0);
-                    })
-                .Schedule(13s, [this](TaskContext /*context*/)
-                    {
-                        Talk(SAY_THRALL_ON_QUEST_REWARD_1);
-                    })
-                .Schedule(15s, [this](TaskContext /*context*/)
-                    {
-                        DoCastAOE(SPELL_WARCHIEF_BLESSING, true);
-                        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        me->GetMap()->DoForAllPlayers([&](Player* p)
+                        if (player->IsAlive() && !player->IsGameMaster())
+                        {
+                            if (player->GetAreaId() == AREA_ORGRIMMAR)
                             {
-                                if (p->IsAlive() && !p->IsGameMaster())
-                                {
-                                    if (p->GetAreaId() == AREA_ORGRIMMAR || p->GetAreaId() == AREA_RAZOR_HILL || p->GetAreaId() == AREA_CROSSROADS || p->GetAreaId() == AREA_CAMP_TAURAJO)
-                                    {
-                                        p->CastSpell(p, SPELL_WARCHIEF_BLESSING, true);
-                                    }
-                                }
-                            });
+                                player->CastSpell(player, SPELL_WARCHIEF_BLESSING, true);
+                            }
+                        }
                     });
+                }).Schedule(19s, [this](TaskContext /*context*/)
+                {
+                    me->GetMap()->DoForAllPlayers([&](Player* player)
+                    {
+                        if (player->IsAlive() && !player->IsGameMaster())
+                        {
+                            if (player->GetAreaId() == AREA_CROSSROADS)
+                            {
+                                player->CastSpell(player, SPELL_WARCHIEF_BLESSING, true);
+                            }
+                        }
+                    });
+                });
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
-            _scheduler.Update(diff);
+            scheduler.Update(diff);
 
             if (!UpdateVictim())
                 return;
@@ -295,9 +304,6 @@ public:
 
             DoMeleeAttackIfReady();
         }
-
-        protected:
-            TaskScheduler _scheduler;
     };
 };
 
