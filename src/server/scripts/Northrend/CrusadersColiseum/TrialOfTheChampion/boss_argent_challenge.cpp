@@ -782,13 +782,18 @@ class spell_toc5_light_rain : public SpellScript
     }
 };
 
+enum ReflectiveShield
+{
+    SPELL_REFLECTIVE_SHIELD_DAMAGE = 33619
+};
+
 class spell_reflective_shield_aura : public AuraScript
 {
     PrepareAuraScript(spell_reflective_shield_aura);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 33619 });
+        return ValidateSpellInfo({ SPELL_REFLECTIVE_SHIELD_DAMAGE });
     }
 
     void HandleAfterEffectAbsorb(AuraEffect*   /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
@@ -797,7 +802,7 @@ class spell_reflective_shield_aura : public AuraScript
             if( GetOwner() && attacker->GetGUID() != GetOwner()->GetGUID() )
             {
                 int32 damage = (int32)(absorbAmount * 0.25f);
-                GetOwner()->ToUnit()->CastCustomSpell(attacker, 33619, &damage, nullptr, nullptr, true);
+                GetOwner()->ToUnit()->CastCustomSpell(attacker, SPELL_REFLECTIVE_SHIELD_DAMAGE, &damage, nullptr, nullptr, true);
             }
     }
 
