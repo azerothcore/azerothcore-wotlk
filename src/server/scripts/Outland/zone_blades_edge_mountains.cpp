@@ -1142,6 +1142,11 @@ class spell_oscillating_field : public SpellScript
 {
     PrepareSpellScript(spell_oscillating_field);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_OSCILLATION_FIELD });
+    }
+
     void HandleEffect(SpellEffIndex /*effIndex*/)
     {
         if (Player* player = GetHitPlayer())
