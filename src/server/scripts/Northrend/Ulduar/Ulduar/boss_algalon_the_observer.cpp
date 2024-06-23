@@ -46,7 +46,6 @@ enum Spells
     SPELL_COSMIC_SMASH_VISUAL_STATE     = 62300,
     SPELL_SELF_STUN                     = 65256,
     SPELL_KILL_CREDIT                   = 65184,
-    SPELL_TELEPORT                      = 62940,
     SPELL_DUAL_WIELD                    = 42459,
 
     // Algalon Stalker
@@ -1193,68 +1192,51 @@ public:
     }
 };
 
-class spell_algalon_phase_punch : public SpellScriptLoader
+class spell_algalon_phase_punch_aura : public AuraScript
 {
-public:
-    spell_algalon_phase_punch() : SpellScriptLoader("spell_algalon_phase_punch") { }
+    PrepareAuraScript(spell_algalon_phase_punch_aura);
 
-    class spell_algalon_phase_punch_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_algalon_phase_punch_AuraScript);
+        return ValidateSpellInfo(PhasePunchAlphaId);
+    }
 
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (GetStackAmount() != 1)
-                GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 2]);
-            GetTarget()->CastSpell(GetTarget(), PhasePunchAlphaId[GetStackAmount() - 1], TRIGGERED_FULL_MASK);
-            if (GetStackAmount() == 5)
-                Remove(AURA_REMOVE_BY_DEFAULT);
-        }
-
-        void OnRemove(AuraEffect const*, AuraEffectHandleModes)
-        {
-            if (GetStackAmount() != 5)
-                GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 1]);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_phase_punch_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectRemove += AuraEffectRemoveFn(spell_algalon_phase_punch_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_algalon_phase_punch_AuraScript();
+        PreventDefaultAction();
+        if (GetStackAmount() != 1)
+            GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 2]);
+        GetTarget()->CastSpell(GetTarget(), PhasePunchAlphaId[GetStackAmount() - 1], TRIGGERED_FULL_MASK);
+        if (GetStackAmount() == 5)
+            Remove(AURA_REMOVE_BY_DEFAULT);
+    }
+
+    void OnRemove(AuraEffect const*, AuraEffectHandleModes)
+    {
+        if (GetStackAmount() != 5)
+            GetTarget()->RemoveAurasDueToSpell(PhasePunchAlphaId[GetStackAmount() - 1]);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_phase_punch_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectRemove += AuraEffectRemoveFn(spell_algalon_phase_punch_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_algalon_collapse : public SpellScriptLoader
+class spell_algalon_collapse_aura : public AuraScript
 {
-public:
-    spell_algalon_collapse() : SpellScriptLoader("spell_algalon_collapse") { }
+    PrepareAuraScript(spell_algalon_collapse_aura);
 
-    class spell_algalon_collapse_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_algalon_collapse_AuraScript);
+        PreventDefaultAction();
+        Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(1), nullptr, NODAMAGE);
+    }
 
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            Unit::DealDamage(GetTarget(), GetTarget(), GetTarget()->CountPctFromMaxHealth(1), nullptr, NODAMAGE);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_collapse_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_algalon_collapse_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_collapse_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1267,172 +1249,123 @@ public:
     }
 };
 
-class spell_algalon_trigger_3_adds : public SpellScriptLoader
+class spell_algalon_trigger_3_adds : public SpellScript
 {
-public:
-    spell_algalon_trigger_3_adds() : SpellScriptLoader("spell_algalon_trigger_3_adds") { }
+    PrepareSpellScript(spell_algalon_trigger_3_adds);
 
-    class spell_algalon_trigger_3_adds_SpellScript : public SpellScript
+    void SelectTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_algalon_trigger_3_adds_SpellScript);
+        targets.remove_if(ActiveConstellationFilter());
+    }
 
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(ActiveConstellationFilter());
-        }
-
-        void HandleDummyEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Creature* target = GetHitCreature();
-            if (!target)
-                return;
-
-            target->AI()->DoAction(ACTION_ACTIVATE_STAR);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_algalon_trigger_3_adds_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_algalon_trigger_3_adds_SpellScript::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummyEffect(SpellEffIndex effIndex)
     {
-        return new spell_algalon_trigger_3_adds_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        Creature* target = GetHitCreature();
+        if (!target)
+            return;
+
+        target->AI()->DoAction(ACTION_ACTIVATE_STAR);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_algalon_trigger_3_adds::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_algalon_trigger_3_adds::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_algalon_cosmic_smash_damage : public SpellScriptLoader
+class spell_algalon_cosmic_smash_damage : public SpellScript
 {
-public:
-    spell_algalon_cosmic_smash_damage() : SpellScriptLoader("spell_algalon_cosmic_smash_damage") { }
+    PrepareSpellScript(spell_algalon_cosmic_smash_damage);
 
-    class spell_algalon_cosmic_smash_damage_SpellScript : public SpellScript
+    void RecalculateDamage()
     {
-        PrepareSpellScript(spell_algalon_cosmic_smash_damage_SpellScript);
+        if (!GetExplTargetDest() || !GetHitUnit())
+            return;
 
-        void RecalculateDamage()
-        {
-            if (!GetExplTargetDest() || !GetHitUnit())
-                return;
+        float distance = GetHitUnit()->GetDistance2d(GetExplTargetDest()->GetPositionX(), GetExplTargetDest()->GetPositionY());
+        if (distance >= 10.0f)
+            SetHitDamage(int32(float(GetHitDamage()) / distance));
+        else if (distance > 6.0f)
+            SetHitDamage(int32(float(GetHitDamage()) / distance) * 2);
+    }
 
-            float distance = GetHitUnit()->GetDistance2d(GetExplTargetDest()->GetPositionX(), GetExplTargetDest()->GetPositionY());
-            if (distance >= 10.0f)
-                SetHitDamage(int32(float(GetHitDamage()) / distance));
-            else if (distance > 6.0f)
-                SetHitDamage(int32(float(GetHitDamage()) / distance) * 2);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_algalon_cosmic_smash_damage_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_algalon_cosmic_smash_damage_SpellScript();
+        OnHit += SpellHitFn(spell_algalon_cosmic_smash_damage::RecalculateDamage);
     }
 };
 
-class spell_algalon_big_bang : public SpellScriptLoader
+class spell_algalon_big_bang : public SpellScript
 {
-public:
-    spell_algalon_big_bang() : SpellScriptLoader("spell_algalon_big_bang") { }
+    PrepareSpellScript(spell_algalon_big_bang);
 
-    class spell_algalon_big_bang_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_algalon_big_bang_SpellScript);
+        _targetCount = 0;
+        return true;
+    }
 
-        bool Load() override
-        {
-            _targetCount = 0;
-            return true;
-        }
-
-        void CountTargets(std::list<WorldObject*>& targets)
-        {
-            _targetCount = targets.size();
-        }
-
-        void CheckTargets()
-        {
-            Unit* caster = GetCaster();
-            if (!_targetCount && caster && caster->GetAI())
-                caster->GetAI()->DoAction(ACTION_ASCEND);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_algalon_big_bang_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            AfterCast += SpellCastFn(spell_algalon_big_bang_SpellScript::CheckTargets);
-        }
-
-        uint32 _targetCount;
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CountTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_algalon_big_bang_SpellScript();
+        _targetCount = targets.size();
+    }
+
+    void CheckTargets()
+    {
+        Unit* caster = GetCaster();
+        if (!_targetCount && caster && caster->GetAI())
+            caster->GetAI()->DoAction(ACTION_ASCEND);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_algalon_big_bang::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        AfterCast += SpellCastFn(spell_algalon_big_bang::CheckTargets);
+    }
+
+private:
+    uint32 _targetCount;
+};
+
+class spell_algalon_remove_phase_aura : public AuraScript
+{
+    PrepareAuraScript(spell_algalon_remove_phase_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLACK_HOLE_DAMAGE });
+    }
+
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->RemoveAurasByType(SPELL_AURA_PHASE);
+        GetTarget()->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_DAMAGE);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_remove_phase_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_algalon_remove_phase : public SpellScriptLoader
+class spell_algalon_supermassive_fail : public SpellScript
 {
-public:
-    spell_algalon_remove_phase() : SpellScriptLoader("spell_algalon_remove_phase") { }
+    PrepareSpellScript(spell_algalon_supermassive_fail);
 
-    class spell_algalon_remove_phase_AuraScript : public AuraScript
+    void RecalculateDamage()
     {
-        PrepareAuraScript(spell_algalon_remove_phase_AuraScript);
+        if (!GetHitPlayer())
+            return;
 
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            GetTarget()->RemoveAurasByType(SPELL_AURA_PHASE);
-            GetTarget()->RemoveAurasDueToSpell(SPELL_BLACK_HOLE_DAMAGE);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_algalon_remove_phase_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_algalon_remove_phase_AuraScript();
+        GetHitPlayer()->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_SPELL_HIT, GetSpellInfo()->Id, true);
     }
-};
 
-class spell_algalon_supermassive_fail : public SpellScriptLoader
-{
-public:
-    spell_algalon_supermassive_fail() : SpellScriptLoader("spell_algalon_supermassive_fail") { }
-
-    class spell_algalon_supermassive_fail_SpellScript : public SpellScript
+    void Register() override
     {
-        PrepareSpellScript(spell_algalon_supermassive_fail_SpellScript);
-
-        void RecalculateDamage()
-        {
-            if (!GetHitPlayer())
-                return;
-
-            GetHitPlayer()->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_SPELL_HIT, GetSpellInfo()->Id, true);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_algalon_supermassive_fail_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_algalon_supermassive_fail_SpellScript();
+        OnHit += SpellHitFn(spell_algalon_supermassive_fail::RecalculateDamage);
     }
 };
 
@@ -1471,13 +1404,13 @@ void AddSC_boss_algalon_the_observer()
     new go_celestial_planetarium_access();
 
     // Spells
-    new spell_algalon_phase_punch();
-    new spell_algalon_collapse();
-    new spell_algalon_trigger_3_adds();
-    new spell_algalon_cosmic_smash_damage();
-    new spell_algalon_big_bang();
-    new spell_algalon_remove_phase();
-    new spell_algalon_supermassive_fail();
+    RegisterSpellScript(spell_algalon_phase_punch_aura);
+    RegisterSpellScript(spell_algalon_collapse_aura);
+    RegisterSpellScript(spell_algalon_trigger_3_adds);
+    RegisterSpellScript(spell_algalon_cosmic_smash_damage);
+    RegisterSpellScript(spell_algalon_big_bang);
+    RegisterSpellScript(spell_algalon_remove_phase_aura);
+    RegisterSpellScript(spell_algalon_supermassive_fail);
 
     // Achievements
     new achievement_algalon_he_feeds_on_your_tears();

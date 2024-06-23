@@ -82,6 +82,7 @@ enum Spells
     SPELL_SARTHARION_FLAME_BREATH               = 56908,
     SPELL_SARTHARION_TAIL_LASH                  = 56910,
     SPELL_CYCLONE_AURA_PERIODIC                 = 57598,
+    SPELL_LAVA_STRIKE_DUMMY                     = 57578,
     SPELL_LAVA_STRIKE_DUMMY_TRIGGER             = 57697,
     SPELL_LAVA_STRIKE_SUMMON                    = 57572,
     SPELL_SARTHARION_PYROBUFFET                 = 56916,
@@ -102,6 +103,7 @@ enum Spells
     // Misc
     SPELL_FADE_ARMOR                            = 60708,
     SPELL_FLAME_TSUNAMI_DAMAGE_AURA             = 57492,
+    SPELL_FLAME_TSUNAMI_LEAP                    = 60241,
     SPELL_SARTHARION_PYROBUFFET_TRIGGER         = 57557,
 };
 
@@ -1512,65 +1514,107 @@ public:
     };
 };
 
-class spell_sartharion_lava_strike : public SpellScriptLoader
+class spell_sartharion_lava_strike : public SpellScript
 {
-public:
-    spell_sartharion_lava_strike() : SpellScriptLoader("spell_sartharion_lava_strike") {}
+    PrepareSpellScript(spell_sartharion_lava_strike);
 
-    class spell_sartharion_lava_strike_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_sartharion_lava_strike_SpellScript);
+        return ValidateSpellInfo({ SPELL_LAVA_STRIKE_SUMMON, SPELL_LAVA_STRIKE_DUMMY_TRIGGER });
+    }
 
-        bool spawned;
-
-        bool Load() override
-        {
-            spawned = false;
-            return true;
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (!GetCaster() || !GetHitUnit())
-                return;
-
-            GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ(), SPELL_LAVA_STRIKE_DUMMY_TRIGGER, true);
-        }
-
-        void HandleSchoolDamage(SpellEffIndex /*effIndex*/)
-        {
-            if (!GetCaster() || !GetHitUnit() || spawned)
-            {
-                return;
-            }
-
-            if (InstanceScript* pInstance = GetCaster()->GetInstanceScript())
-            {
-                if (Creature* sarth = ObjectAccessor::GetCreature(*GetHitUnit(), pInstance->GetGuidData(DATA_SARTHARION)))
-                {
-                    sarth->AI()->SetData(DATA_VOLCANO_BLOWS, GetHitUnit()->GetGUID().GetCounter());
-                    sarth->CastSpell(GetHitUnit(), SPELL_LAVA_STRIKE_SUMMON, true);
-                    spawned = true;
-                }
-            }
-        }
-
-        void Register() override
-        {
-            if (m_scriptSpellId == 57578) // Dummy lava strike
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-            else
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_sartharion_lava_strike_SpellScript();
+        _spawned = false;
+        return true;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster() || !GetHitUnit())
+        {
+            return;
+        }
+
+        GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ(), SPELL_LAVA_STRIKE_DUMMY_TRIGGER, true);
+    }
+
+    void HandleSchoolDamage(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster() || !GetHitUnit() || _spawned)
+        {
+            return;
+        }
+
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+        {
+            if (Creature* sarth = ObjectAccessor::GetCreature(*GetHitUnit(), instance->GetGuidData(DATA_SARTHARION)))
+            {
+                sarth->AI()->SetData(DATA_VOLCANO_BLOWS, GetHitUnit()->GetGUID().GetCounter());
+                sarth->CastSpell(GetHitUnit(), SPELL_LAVA_STRIKE_SUMMON, true);
+                _spawned = true;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        if (m_scriptSpellId == SPELL_LAVA_STRIKE_DUMMY)
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+        else
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    }
+
+private:
+    bool _spawned;
+};
+
+// 57491 - Flame Tsunami
+class spell_obsidian_sanctum_flame_tsunami : public SpellScript
+{
+    PrepareSpellScript(spell_obsidian_sanctum_flame_tsunami);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FLAME_TSUNAMI_LEAP });
+    }
+
+    void HandleHit(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            if (!target->HasAura(SPELL_FLAME_TSUNAMI_LEAP))
+            {
+                target->CastSpell(target, SPELL_FLAME_TSUNAMI_LEAP, true);
+                bool isFacingSouth = std::fabs(GetCaster()->GetOrientation() - M_PI) < M_PI / 4;
+                target->KnockbackFrom(isFacingSouth ? 3283.44f : 3208.44f , target->GetPositionY(), 12.5f, 9.0f);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_obsidian_sanctum_flame_tsunami::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
+// 60241 - Flame Tsunami
+class spell_obsidian_sanctum_flame_tsunami_leap : public SpellScript
+{
+    PrepareSpellScript(spell_obsidian_sanctum_flame_tsunami_leap);
+
+    void HandleLeapBack(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_obsidian_sanctum_flame_tsunami_leap::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
     }
 };
 
@@ -1581,7 +1625,7 @@ void AddSC_boss_sartharion()
     new boss_sartharion_tenebron();
     new boss_sartharion_vesperon();
     new npc_twilight_summon();
-
-    new spell_sartharion_lava_strike();
+    RegisterSpellScript(spell_sartharion_lava_strike);
+    RegisterSpellScript(spell_obsidian_sanctum_flame_tsunami);
+    RegisterSpellScript(spell_obsidian_sanctum_flame_tsunami_leap);
 }
-

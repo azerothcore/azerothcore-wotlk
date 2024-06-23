@@ -1437,151 +1437,133 @@ public:
     }
 };
 
-class spell_load_into_catapult : public SpellScriptLoader
+enum LoadIntoCataPult
 {
-    enum Spells
+    SPELL_PASSENGER_LOADED = 62340
+};
+
+class spell_load_into_catapult_aura : public AuraScript
+{
+    PrepareAuraScript(spell_load_into_catapult_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        SPELL_PASSENGER_LOADED = 62340,
-    };
+        return ValidateSpellInfo({ SPELL_PASSENGER_LOADED });
+    }
 
-public:
-    spell_load_into_catapult() : SpellScriptLoader("spell_load_into_catapult") { }
-
-    class spell_load_into_catapult_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_load_into_catapult_AuraScript);
+        Unit* owner = GetOwner()->ToUnit();
+        if (!owner)
+            return;
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* owner = GetOwner()->ToUnit();
-            if (!owner)
-                return;
+        owner->CastSpell(owner, SPELL_PASSENGER_LOADED, true);
+    }
 
-            owner->CastSpell(owner, SPELL_PASSENGER_LOADED, true);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* owner = GetOwner()->ToUnit();
-            if (!owner)
-                return;
-
-            owner->RemoveAurasDueToSpell(SPELL_PASSENGER_LOADED);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_load_into_catapult_AuraScript::OnApply, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_load_into_catapult_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_load_into_catapult_AuraScript();
+        Unit* owner = GetOwner()->ToUnit();
+        if (!owner)
+            return;
+
+        owner->RemoveAurasDueToSpell(SPELL_PASSENGER_LOADED);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_load_into_catapult_aura::OnApply, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_load_into_catapult_aura::OnRemove, EFFECT_0, SPELL_AURA_CONTROL_VEHICLE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
-class spell_auto_repair : public SpellScriptLoader
+enum AutoRepair
 {
-    enum Spells
+    SPELL_AUTO_REPAIR = 62705,
+};
+
+class spell_auto_repair : public SpellScript
+{
+    PrepareSpellScript(spell_auto_repair);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        SPELL_AUTO_REPAIR = 62705,
-    };
+        return ValidateSpellInfo({ SPELL_AUTO_REPAIR });
+    }
 
-public:
-    spell_auto_repair() : SpellScriptLoader("spell_auto_repair") {}
-
-    class spell_auto_repair_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_auto_repair_SpellScript);
+        std::list<WorldObject*> tmplist;
+        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            if (!(*itr)->ToUnit()->HasAura(SPELL_AUTO_REPAIR))
+                tmplist.push_back(*itr);
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            std::list<WorldObject*> tmplist;
-            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if (!(*itr)->ToUnit()->HasAura(SPELL_AUTO_REPAIR))
-                    tmplist.push_back(*itr);
+        targets.clear();
+        for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
+            targets.push_back(*itr);
+    }
 
-            targets.clear();
-            for (std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr)
-                targets.push_back(*itr);
-        }
-
-        void HandleScript(SpellEffIndex /*eff*/)
-        {
-            Vehicle* vehicle = GetHitUnit()->GetVehicleKit();
-            if (!vehicle)
-                return;
-
-            Unit* driver = vehicle->GetPassenger(0);
-            if (!driver)
-                return;
-
-            //driver->TextEmote(VEHICLE_EMOTE_REPAIR, driver, true); // No source
-
-            // Actually should/could use basepoints (100) for this spell effect as percentage of health, but oh well.
-            vehicle->GetBase()->SetFullHealth();
-
-            // Achievement
-            if (InstanceScript* instance = vehicle->GetBase()->GetInstanceScript())
-                instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auto_repair_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_auto_repair_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*eff*/)
     {
-        return new spell_auto_repair_SpellScript();
+        Vehicle* vehicle = GetHitUnit()->GetVehicleKit();
+        if (!vehicle)
+            return;
+
+        Unit* driver = vehicle->GetPassenger(0);
+        if (!driver)
+            return;
+
+        //driver->TextEmote(VEHICLE_EMOTE_REPAIR, driver, true); // No source
+
+        // Actually should/could use basepoints (100) for this spell effect as percentage of health, but oh well.
+        vehicle->GetBase()->SetFullHealth();
+
+        // Achievement
+        if (InstanceScript* instance = vehicle->GetBase()->GetInstanceScript())
+            instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auto_repair::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_auto_repair::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_systems_shutdown : public SpellScriptLoader
+class spell_systems_shutdown_aura : public AuraScript
 {
-public:
-    spell_systems_shutdown() : SpellScriptLoader("spell_systems_shutdown") { }
+    PrepareAuraScript(spell_systems_shutdown_aura);
 
-    class spell_systems_shutdown_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_systems_shutdown_AuraScript);
+        return ValidateSpellInfo({ SPELL_GATHERING_SPEED });
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Creature* owner = GetOwner()->ToCreature();
-            if (!owner)
-                return;
-
-            owner->SetControlled(true, UNIT_STATE_STUNNED);
-            owner->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
-            if (Vehicle* veh = owner->GetVehicleKit())
-                if (Unit* cannon = veh->GetPassenger(SEAT_CANNON))
-                    cannon->GetAI()->DoAction(ACTION_DELAY_CANNON);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Creature* owner = GetOwner()->ToCreature();
-            if (!owner)
-                return;
-
-            owner->SetControlled(false, UNIT_STATE_STUNNED);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_systems_shutdown_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_systems_shutdown_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_systems_shutdown_AuraScript();
+        Creature* owner = GetOwner()->ToCreature();
+        if (!owner)
+            return;
+
+        owner->SetControlled(true, UNIT_STATE_STUNNED);
+        owner->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
+        if (Vehicle* vehicle = owner->GetVehicleKit())
+            if (Unit* cannon = vehicle->GetPassenger(SEAT_CANNON))
+                cannon->GetAI()->DoAction(ACTION_DELAY_CANNON);
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Creature* owner = GetOwner()->ToCreature();
+        if (!owner)
+            return;
+
+        owner->SetControlled(false, UNIT_STATE_STUNNED);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_systems_shutdown_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_systems_shutdown_aura::OnRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1625,431 +1607,344 @@ public:
     }
 };
 
-class spell_pursue : public SpellScriptLoader
+class spell_pursue : public SpellScript
 {
-public:
-    spell_pursue() : SpellScriptLoader("spell_pursue") {}
+    PrepareSpellScript(spell_pursue);
 
-    class spell_pursue_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_pursue_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
+        targets.remove_if(FlameLeviathanPursuedTargetSelector());
+        if (targets.empty())
         {
-            targets.remove_if(FlameLeviathanPursuedTargetSelector());
-            if (targets.empty())
-            {
-                if (Creature* caster = GetCaster()->ToCreature())
-                    caster->AI()->EnterEvadeMode();
-            }
-            else
-            {
-                //! In the end, only one target should be selected
-                WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
-                targets.clear();
-                if (_target)
-                    targets.push_back(_target);
-            }
+            if (Creature* caster = GetCaster()->ToCreature())
+                caster->AI()->EnterEvadeMode();
         }
-
-        void HandleScript(SpellEffIndex /*eff*/)
+        else
         {
-            Creature* target = GetHitCreature();
-            Unit* caster = GetCaster();
-            if (!target || !caster)
-                return;
-
-            caster->GetThreatMgr().ResetAllThreat();
-            caster->GetAI()->AttackStart(target);    // Chase target
-            caster->AddThreat(target, 10000000.0f);
+            //! In the end, only one target should be selected
+            WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
+            targets.clear();
+            if (_target)
+                targets.push_back(_target);
         }
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pursue_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_pursue_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*eff*/)
     {
-        return new spell_pursue_SpellScript();
+        Creature* target = GetHitCreature();
+        Unit* caster = GetCaster();
+        if (!target || !caster)
+            return;
+
+        caster->GetThreatMgr().ResetAllThreat();
+        caster->GetAI()->AttackStart(target);    // Chase target
+        caster->AddThreat(target, 10000000.0f);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_pursue::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_pursue::HandleScript, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
-class spell_vehicle_throw_passenger : public SpellScriptLoader
+class spell_vehicle_throw_passenger : public SpellScript
 {
-public:
-    spell_vehicle_throw_passenger() : SpellScriptLoader("spell_vehicle_throw_passenger") {}
+    PrepareSpellScript(spell_vehicle_throw_passenger);
 
-    class spell_vehicle_throw_passenger_SpellScript : public SpellScript
+    void HandleScript()
     {
-        PrepareSpellScript(spell_vehicle_throw_passenger_SpellScript);
-        void HandleScript()
-        {
-            Spell* baseSpell = GetSpell();
-            SpellCastTargets targets = baseSpell->m_targets;
-            if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
-                if (Unit* passenger = vehicle->GetPassenger(3))
+        Spell* baseSpell = GetSpell();
+        SpellCastTargets targets = baseSpell->m_targets;
+        if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
+            if (Unit* passenger = vehicle->GetPassenger(3))
+            {
+                // use 99 because it is 3d search
+                std::list<WorldObject*> targetList;
+                Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
+                Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
+                Cell::VisitAllObjects(GetCaster(), searcher, 99.0f);
+                float minDist = 99 * 99;
+                Unit* target = nullptr;
+                for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
                 {
-                    // use 99 because it is 3d search
-                    std::list<WorldObject*> targetList;
-                    Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
-                    Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
-                    Cell::VisitAllObjects(GetCaster(), searcher, 99.0f);
-                    float minDist = 99 * 99;
-                    Unit* target = nullptr;
-                    for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                    {
-                        if (Unit* unit = (*itr)->ToUnit())
-                            if (unit->GetEntry() == NPC_SEAT)
-                                if (Vehicle* seat = unit->GetVehicleKit())
-                                    if (!seat->GetPassenger(0))
-                                        if (Unit* device = seat->GetPassenger(2))
-                                            if (!device->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                    if (Unit* unit = (*itr)->ToUnit())
+                        if (unit->GetEntry() == NPC_SEAT)
+                            if (Vehicle* seat = unit->GetVehicleKit())
+                                if (!seat->GetPassenger(0))
+                                    if (Unit* device = seat->GetPassenger(2))
+                                        if (!device->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                                        {
+                                            float dist = unit->GetExactDistSq(targets.GetDstPos());
+                                            if (dist < minDist)
                                             {
-                                                float dist = unit->GetExactDistSq(targets.GetDstPos());
-                                                if (dist < minDist)
-                                                {
-                                                    minDist = dist;
-                                                    target = unit;
-                                                }
+                                                minDist = dist;
+                                                target = unit;
                                             }
-                    }
-                    if (target && target->IsWithinDist2d(targets.GetDstPos(), GetSpellInfo()->Effects[EFFECT_0].CalcRadius() * 2)) // now we use *2 because the location of the seat is not correct
-                    {
-                        passenger->ExitVehicle();
-                        passenger->EnterVehicle(target, 0);
-                    }
-                    else
-                    {
-                        passenger->ExitVehicle();
-                        float x, y, z;
-                        targets.GetDstPos()->GetPosition(x, y, z);
-                        passenger->GetMotionMaster()->MoveJump(x, y, z, targets.GetSpeedXY(), targets.GetSpeedZ());
-                    }
+                                        }
                 }
-        }
-
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_vehicle_throw_passenger_SpellScript::HandleScript);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_vehicle_throw_passenger_SpellScript();
-    }
-};
-
-class spell_tar_blaze : public SpellScriptLoader
-{
-public:
-    spell_tar_blaze() : SpellScriptLoader("spell_tar_blaze") { }
-
-    class spell_tar_blaze_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_tar_blaze_AuraScript);
-
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            GetUnitOwner()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_tar_blaze_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_tar_blaze_AuraScript();
-    }
-};
-
-class spell_vehicle_grab_pyrite : public SpellScriptLoader
-{
-public:
-    spell_vehicle_grab_pyrite() : SpellScriptLoader("spell_vehicle_grab_pyrite") {}
-
-    class spell_vehicle_grab_pyrite_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_vehicle_grab_pyrite_SpellScript);
-        void HandleScript(SpellEffIndex  /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                if (Unit* seat = GetCaster()->GetVehicleBase())
+                if (target && target->IsWithinDist2d(targets.GetDstPos(), GetSpellInfo()->Effects[EFFECT_0].CalcRadius() * 2)) // now we use *2 because the location of the seat is not correct
                 {
-                    if (Vehicle* vSeat = seat->GetVehicleKit())
-                        if (Unit* pyrite = vSeat->GetPassenger(1))
-                            pyrite->ExitVehicle();
-
-                    if (Unit* parent = seat->GetVehicleBase())
-                    {
-                        GetCaster()->CastSpell(parent, 62496 /*SPELL_ADD_PYRITE*/, true);
-                        target->CastSpell(seat, GetEffectValue());
-
-                        if (target->GetTypeId() == TYPEID_UNIT)
-                            target->ToCreature()->DespawnOrUnsummon(1300);
-                    }
+                    passenger->ExitVehicle();
+                    passenger->EnterVehicle(target, 0);
                 }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_vehicle_grab_pyrite_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_vehicle_grab_pyrite_SpellScript();
-    }
-};
-
-class spell_vehicle_circuit_overload : public SpellScriptLoader
-{
-public:
-    spell_vehicle_circuit_overload() : SpellScriptLoader("spell_vehicle_circuit_overload") { }
-
-    class spell_vehicle_circuit_overload_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_vehicle_circuit_overload_AuraScript);
-
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            if (Unit* target = GetTarget())
-                if (int(target->GetAppliedAuras().count(SPELL_OVERLOAD_CIRCUIT)) >= (target->GetMap()->Is25ManRaid() ? 4 : 2))
+                else
                 {
-                    target->CastSpell(target, SPELL_SYSTEMS_SHUTDOWN, true);
-                    target->RemoveAurasDueToSpell(SPELL_OVERLOAD_CIRCUIT);
+                    passenger->ExitVehicle();
+                    float x, y, z;
+                    targets.GetDstPos()->GetPosition(x, y, z);
+                    passenger->GetMotionMaster()->MoveJump(x, y, z, targets.GetSpeedXY(), targets.GetSpeedZ());
                 }
-        }
+            }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_vehicle_circuit_overload_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_vehicle_circuit_overload_AuraScript();
+        AfterCast += SpellCastFn(spell_vehicle_throw_passenger::HandleScript);
     }
 };
 
-class spell_orbital_supports : public SpellScriptLoader
+class spell_tar_blaze_aura : public AuraScript
 {
-public:
-    spell_orbital_supports() : SpellScriptLoader("spell_orbital_supports") { }
+    PrepareAuraScript(spell_tar_blaze_aura);
 
-    class spell_orbital_supports_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_orbital_supports_AuraScript);
+        GetUnitOwner()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        bool CheckAreaTarget(Unit* target)
-        {
-            return target->GetEntry() == NPC_LEVIATHAN;
-        }
-        void Register() override
-        {
-            DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_orbital_supports_AuraScript::CheckAreaTarget);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_orbital_supports_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_tar_blaze_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_thorims_hammer : public SpellScriptLoader
+enum VehicleGrabPyrite
 {
-public:
-    spell_thorims_hammer() : SpellScriptLoader("spell_thorims_hammer") { }
+    SPELL_ADD_PYRITE = 62496
+};
 
-    class spell_thorims_hammer_SpellScript : public SpellScript
+class spell_vehicle_grab_pyrite : public SpellScript
+{
+    PrepareSpellScript(spell_vehicle_grab_pyrite);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_thorims_hammer_SpellScript);
+        return ValidateSpellInfo({ SPELL_ADD_PYRITE });
+    }
 
-        void RecalculateDamage(SpellEffIndex effIndex)
-        {
-            if (!GetHitUnit() || effIndex == EFFECT_1)
-            {
-                PreventHitDefaultEffect(effIndex);
-                return;
-            }
-
-            float dist = GetHitUnit()->GetExactDist2d(GetCaster());
-            if (dist <= 7.0f)
-            {
-                SetHitDamage(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
-            }
-            else
-            {
-                dist -= 6.0f;
-                SetHitDamage(int32(GetSpellInfo()->Effects[EFFECT_1].CalcValue() / std::max(dist, 1.0f)));
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_thorims_hammer_SpellScript::RecalculateDamage, EFFECT_ALL, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_thorims_hammer_SpellScript();
+        if (Unit* target = GetHitUnit())
+            if (Unit* seat = GetCaster()->GetVehicleBase())
+            {
+                if (Vehicle* vehicle = seat->GetVehicleKit())
+                    if (Unit* pyrite = vehicle->GetPassenger(1))
+                        pyrite->ExitVehicle();
+
+                if (Unit* parent = seat->GetVehicleBase())
+                {
+                    GetCaster()->CastSpell(parent, SPELL_ADD_PYRITE, true);
+                    target->CastSpell(seat, GetEffectValue());
+
+                    if (target->GetTypeId() == TYPEID_UNIT)
+                        target->ToCreature()->DespawnOrUnsummon(1300);
+                }
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_vehicle_grab_pyrite::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_transitus_shield_beam : public SpellScriptLoader
+class spell_vehicle_circuit_overload_aura : public AuraScript
 {
-public:
-    spell_transitus_shield_beam() : SpellScriptLoader("spell_transitus_shield_beam") { }
+    PrepareAuraScript(spell_vehicle_circuit_overload_aura);
 
-    class spell_transitus_shield_beam_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_transitus_shield_beam_AuraScript);
+        return ValidateSpellInfo({ SPELL_SYSTEMS_SHUTDOWN });
+    }
 
-        void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-            {
-                return;
-            }
-
-            Unit* target = GetTarget();
-
-            if (!target)
-            {
-                return;
-            }
-
-            switch (aurEff->GetEffIndex())
-            {
-            case EFFECT_0:
-                caster->AddAura(SPELL_TRANSITUS_SHIELD_IMPACT, target);
-                break;
-            }
-        }
-
-        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-
-            if (!caster)
-            {
-                return;
-            }
-
-            Unit* target = GetTarget();
-
-            if (target)
-            {
-                target->RemoveAurasDueToSpell(SPELL_TRANSITUS_SHIELD_IMPACT);
-            }
-        }
-
-        void Register()
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_transitus_shield_beam_AuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            OnEffectRemove += AuraEffectRemoveFn(spell_transitus_shield_beam_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_transitus_shield_beam_AuraScript();
+        if (Unit* target = GetTarget())
+            if (int(target->GetAppliedAuras().count(SPELL_OVERLOAD_CIRCUIT)) >= (target->GetMap()->Is25ManRaid() ? 4 : 2))
+            {
+                target->CastSpell(target, SPELL_SYSTEMS_SHUTDOWN, true);
+                target->RemoveAurasDueToSpell(SPELL_OVERLOAD_CIRCUIT);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_vehicle_circuit_overload_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_shield_generator : public SpellScriptLoader
+class spell_orbital_supports_aura : public AuraScript
 {
-public:
-    spell_shield_generator() : SpellScriptLoader("spell_shield_generator") { }
+    PrepareAuraScript(spell_orbital_supports_aura);
 
-    class spell_shield_generator_AuraScript : public AuraScript
+    bool CheckAreaTarget(Unit* target)
     {
-        PrepareAuraScript(spell_shield_generator_AuraScript);
-
-        uint32 absorbPct;
-
-        bool Load() override
-        {
-            absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
-            return true;
-        }
-
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set absorbtion amount to unlimited
-            amount = -1;
-        }
-
-        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_shield_generator_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_shield_generator_AuraScript::Absorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+        return target->GetEntry() == NPC_LEVIATHAN;
+    }
+    void Register() override
     {
-        return new spell_shield_generator_AuraScript();
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_orbital_supports_aura::CheckAreaTarget);
     }
 };
 
-class spell_demolisher_ride_vehicle : public SpellScriptLoader
+class spell_thorims_hammer : public SpellScript
 {
-public:
-    spell_demolisher_ride_vehicle() : SpellScriptLoader("spell_demolisher_ride_vehicle") {}
+    PrepareSpellScript(spell_thorims_hammer);
 
-    class spell_demolisher_ride_vehicle_SpellScript : public SpellScript
+    void RecalculateDamage(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_demolisher_ride_vehicle_SpellScript);
-
-        SpellCastResult CheckCast()
+        if (!GetHitUnit() || effIndex == EFFECT_1)
         {
-            if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
-                return SPELL_CAST_OK;
+            PreventHitDefaultEffect(effIndex);
+            return;
+        }
 
-            Unit* target = this->GetExplTargetUnit();
-            if (!target || target->GetEntry() != NPC_SALVAGED_DEMOLISHER)
-                return SPELL_FAILED_DONT_REPORT;
+        float dist = GetHitUnit()->GetExactDist2d(GetCaster());
+        if (dist <= 7.0f)
+        {
+            SetHitDamage(GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+        }
+        else
+        {
+            dist -= 6.0f;
+            SetHitDamage(int32(GetSpellInfo()->Effects[EFFECT_1].CalcValue() / std::max(dist, 1.0f)));
+        }
+    }
 
-            Vehicle* veh = target->GetVehicleKit();
-            if (veh && veh->GetPassenger(0))
-                if (Unit* target2 = veh->GetPassenger(1))
-                    if (Vehicle* veh2 = target2->GetVehicleKit())
-                    {
-                        if (!veh2->GetPassenger(0))
-                            target2->HandleSpellClick(GetCaster());
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_thorims_hammer::RecalculateDamage, EFFECT_ALL, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
 
-                        return SPELL_FAILED_DONT_REPORT;
-                    }
+class spell_transitus_shield_beam_aura : public AuraScript
+{
+    PrepareAuraScript(spell_transitus_shield_beam_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TRANSITUS_SHIELD_IMPACT });
+    }
+
+    void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+        {
+            return;
+        }
+
+        Unit* target = GetTarget();
+
+        if (!target)
+        {
+            return;
+        }
+
+        switch (aurEff->GetEffIndex())
+        {
+        case EFFECT_0:
+            caster->AddAura(SPELL_TRANSITUS_SHIELD_IMPACT, target);
+            break;
+        }
+    }
+
+    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+
+        if (!caster)
+        {
+            return;
+        }
+
+        Unit* target = GetTarget();
+
+        if (target)
+        {
+            target->RemoveAurasDueToSpell(SPELL_TRANSITUS_SHIELD_IMPACT);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_transitus_shield_beam_aura::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectRemove += AuraEffectRemoveFn(spell_transitus_shield_beam_aura::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
+class spell_shield_generator_aura : public AuraScript
+{
+    PrepareAuraScript(spell_shield_generator_aura);
+
+    bool Load() override
+    {
+        _absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue(GetCaster());
+        return true;
+    }
+
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        // Set absorbtion amount to unlimited
+        amount = -1;
+    }
+
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        absorbAmount = CalculatePct(dmgInfo.GetDamage(), _absorbPct);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_shield_generator_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_shield_generator_aura::Absorb, EFFECT_0);
+    }
+
+private:
+    uint32 _absorbPct;
+};
+
+class spell_demolisher_ride_vehicle : public SpellScript
+{
+    PrepareSpellScript(spell_demolisher_ride_vehicle);
+
+    SpellCastResult CheckCast()
+    {
+        if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
             return SPELL_CAST_OK;
-        }
 
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_demolisher_ride_vehicle_SpellScript::CheckCast);
-        }
-    };
+        Unit* target = this->GetExplTargetUnit();
+        if (!target || target->GetEntry() != NPC_SALVAGED_DEMOLISHER)
+            return SPELL_FAILED_DONT_REPORT;
 
-    SpellScript* GetSpellScript() const override
+        Vehicle* vehicle = target->GetVehicleKit();
+        if (vehicle && vehicle->GetPassenger(0))
+            if (Unit* target2 = vehicle->GetPassenger(1))
+                if (Vehicle* vehicle2 = target2->GetVehicleKit())
+                {
+                    if (!vehicle2->GetPassenger(0))
+                        target2->HandleSpellClick(GetCaster());
+
+                    return SPELL_FAILED_DONT_REPORT;
+                }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
     {
-        return new spell_demolisher_ride_vehicle_SpellScript();
+        OnCheckCast += SpellCheckCastFn(spell_demolisher_ride_vehicle::CheckCast);
     }
 };
 
@@ -2143,19 +2038,19 @@ void AddSC_boss_flame_leviathan()
     new go_ulduar_tower();
 
     // Spells
-    new spell_load_into_catapult();
-    new spell_auto_repair();
-    new spell_systems_shutdown();
-    new spell_pursue();
-    new spell_vehicle_throw_passenger();
-    new spell_tar_blaze();
-    new spell_vehicle_grab_pyrite();
-    new spell_vehicle_circuit_overload();
-    new spell_orbital_supports();
-    new spell_thorims_hammer();
-    new spell_transitus_shield_beam();
-    new spell_shield_generator();
-    new spell_demolisher_ride_vehicle();
+    RegisterSpellScript(spell_load_into_catapult_aura);
+    RegisterSpellScript(spell_auto_repair);
+    RegisterSpellScript(spell_systems_shutdown_aura);
+    RegisterSpellScript(spell_pursue);
+    RegisterSpellScript(spell_vehicle_throw_passenger);
+    RegisterSpellScript(spell_tar_blaze_aura);
+    RegisterSpellScript(spell_vehicle_grab_pyrite);
+    RegisterSpellScript(spell_vehicle_circuit_overload_aura);
+    RegisterSpellScript(spell_orbital_supports_aura);
+    RegisterSpellScript(spell_thorims_hammer);
+    RegisterSpellScript(spell_transitus_shield_beam_aura);
+    RegisterSpellScript(spell_shield_generator_aura);
+    RegisterSpellScript(spell_demolisher_ride_vehicle);
 
     // Achievements
     new achievement_flame_leviathan_towers("achievement_flame_leviathan_orbital_bombardment", 1);
