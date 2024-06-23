@@ -687,31 +687,20 @@ class spell_oculus_dream_funnel_aura : public AuraScript
     }
 };
 
-class spell_oculus_call_ruby_emerald_amber_drake : public SpellScriptLoader
+class spell_oculus_call_ruby_emerald_amber_drake : public SpellScript
 {
-public:
-    spell_oculus_call_ruby_emerald_amber_drake() : SpellScriptLoader("spell_oculus_call_ruby_emerald_amber_drake") { }
+    PrepareSpellScript(spell_oculus_call_ruby_emerald_amber_drake);
 
-    class spell_oculus_call_ruby_emerald_amber_drake_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_oculus_call_ruby_emerald_amber_drake_SpellScript);
+        // Adjust effect summon position
+        Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
 
-        void SetDest(SpellDestination& dest)
-        {
-            // Adjust effect summon position
-            Position const offset = { 0.0f, 0.0f, 12.0f, 0.0f };
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_oculus_call_ruby_emerald_amber_drake_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_oculus_call_ruby_emerald_amber_drake_SpellScript();
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_oculus_call_ruby_emerald_amber_drake::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
     }
 };
 
@@ -961,7 +950,7 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_temporal_rift_aura);
     RegisterSpellScript(spell_oculus_touch_the_nightmare);
     RegisterSpellScript(spell_oculus_dream_funnel_aura);
-    new spell_oculus_call_ruby_emerald_amber_drake();
+    RegisterSpellScript(spell_oculus_call_ruby_emerald_amber_drake);
     new spell_oculus_ride_ruby_emerald_amber_drake_que();
     new spell_oculus_evasive_charges();
     new spell_oculus_soar();
