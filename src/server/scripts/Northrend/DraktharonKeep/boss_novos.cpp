@@ -289,31 +289,20 @@ class spell_novos_despawn_crystal_handler : public SpellScript
     }
 };
 
-class spell_novos_crystal_handler_death : public SpellScriptLoader
+class spell_novos_crystal_handler_death_aura : public AuraScript
 {
-public:
-    spell_novos_crystal_handler_death() : SpellScriptLoader("spell_novos_crystal_handler_death") { }
+    PrepareAuraScript(spell_novos_crystal_handler_death_aura);
 
-    class spell_novos_crystal_handler_death_AuraScript : public AuraScript
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_novos_crystal_handler_death_AuraScript)
+        GetUnitOwner()->InterruptNonMeleeSpells(false);
+        if (GameObject* crystal = GetUnitOwner()->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_DOOR, 5.0f))
+            crystal->SetGoState(GO_STATE_READY);
+    }
 
-        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->InterruptNonMeleeSpells(false);
-            if (GameObject* crystal = GetUnitOwner()->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_DOOR, 5.0f))
-                crystal->SetGoState(GO_STATE_READY);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_novos_crystal_handler_death_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_novos_crystal_handler_death_AuraScript();
+        OnEffectApply += AuraEffectApplyFn(spell_novos_crystal_handler_death_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -359,7 +348,7 @@ void AddSC_boss_novos()
 {
     new boss_novos();
     RegisterSpellScript(spell_novos_despawn_crystal_handler);
-    new spell_novos_crystal_handler_death();
+    RegisterSpellScript(spell_novos_crystal_handler_death_aura);
     new spell_novos_summon_minions();
     new achievement_oh_novos();
 }
