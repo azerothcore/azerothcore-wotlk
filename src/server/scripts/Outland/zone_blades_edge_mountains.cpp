@@ -223,31 +223,25 @@ public:
     }
 };
 
-class spell_npc22275_crystal_prison : public SpellScriptLoader
+class spell_npc22275_crystal_prison_aura : public AuraScript
 {
-public:
-    spell_npc22275_crystal_prison() : SpellScriptLoader("spell_npc22275_crystal_prison") { }
+    PrepareAuraScript(spell_npc22275_crystal_prison_aura);
 
-    class spell_npc22275_crystal_prison_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_npc22275_crystal_prison_AuraScript);
+        return ValidateSpellInfo({ 40898 });
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            SetDuration(0);
-            GetTarget()->CastSpell(GetTarget(), 40898, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_npc22275_crystal_prison_AuraScript();
+        PreventDefaultAction();
+        SetDuration(0);
+        GetTarget()->CastSpell(GetTarget(), 40898, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1172,7 +1166,7 @@ void AddSC_blades_edge_mountains()
     // Ours
     new npc_deaths_door_fell_cannon_target_bunny();
     new npc_deaths_fel_cannon();
-    new spell_npc22275_crystal_prison();
+    RegisterSpellScript(spell_npc22275_crystal_prison_aura);
     // Theirs
     new npc_nether_drake();
     new npc_daranelle();
