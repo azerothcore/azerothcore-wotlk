@@ -1390,35 +1390,24 @@ class spell_pos_slave_trigger_closest : public SpellScript
     }
 };
 
-class spell_pos_rimefang_frost_nova : public SpellScriptLoader
+class spell_pos_rimefang_frost_nova : public SpellScript
 {
-public:
-    spell_pos_rimefang_frost_nova() : SpellScriptLoader("spell_pos_rimefang_frost_nova") { }
+    PrepareSpellScript(spell_pos_rimefang_frost_nova);
 
-    class spell_pos_rimefang_frost_novaSpellScript : public SpellScript
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_pos_rimefang_frost_novaSpellScript);
+        if (Unit* target = GetHitUnit())
+            if (Unit* caster = GetCaster())
+            {
+                Unit::Kill(caster, target);
+                if (target->GetTypeId() == TYPEID_UNIT)
+                    target->ToCreature()->DespawnOrUnsummon(30000);
+            }
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                if (Unit* caster = GetCaster())
-                {
-                    Unit::Kill(caster, target);
-                    if (target->GetTypeId() == TYPEID_UNIT)
-                        target->ToCreature()->DespawnOrUnsummon(30000);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_pos_rimefang_frost_novaSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_pos_rimefang_frost_novaSpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_pos_rimefang_frost_nova::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1522,7 +1511,7 @@ void AddSC_pit_of_saron()
 
     RegisterSpellScript(spell_pos_empowered_blizzard_aura);
     RegisterSpellScript(spell_pos_slave_trigger_closest);
-    new spell_pos_rimefang_frost_nova();
+    RegisterSpellScript(spell_pos_rimefang_frost_nova);
     new spell_pos_blight();
     new spell_pos_glacial_strike();
 
