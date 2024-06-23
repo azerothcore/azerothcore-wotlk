@@ -1133,31 +1133,20 @@ public:
     }
 };
 
-class spell_oscillating_field : public SpellScriptLoader
+class spell_oscillating_field : public SpellScript
 {
-public:
-    spell_oscillating_field() : SpellScriptLoader("spell_oscillating_field") { }
+    PrepareSpellScript(spell_oscillating_field);
 
-    class spell_oscillating_field_SpellScript : public SpellScript
+    void HandleEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_oscillating_field_SpellScript);
+        if (Player* player = GetHitPlayer())
+            if (player->GetAuraCount(SPELL_OSCILLATION_FIELD) == 5 && player->GetQuestStatus(QUEST_GAUGING_THE_RESONANT_FREQUENCY) == QUEST_STATUS_INCOMPLETE)
+                player->CompleteQuest(QUEST_GAUGING_THE_RESONANT_FREQUENCY);
+    }
 
-        void HandleEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Player* player = GetHitPlayer())
-                if (player->GetAuraCount(SPELL_OSCILLATION_FIELD) == 5 && player->GetQuestStatus(QUEST_GAUGING_THE_RESONANT_FREQUENCY) == QUEST_STATUS_INCOMPLETE)
-                    player->CompleteQuest(QUEST_GAUGING_THE_RESONANT_FREQUENCY);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_oscillating_field_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_oscillating_field_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_oscillating_field::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -1174,5 +1163,5 @@ void AddSC_blades_edge_mountains()
     new go_simon_cluster();
     new go_apexis_relic();
     new npc_oscillating_frequency_scanner_master_bunny();
-    new spell_oscillating_field();
+    RegisterSpellScript(spell_oscillating_field);
 }
