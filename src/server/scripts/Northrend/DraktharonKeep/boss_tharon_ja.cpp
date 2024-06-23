@@ -260,30 +260,19 @@ class spell_tharon_ja_dummy_aura : public AuraScript
     }
 };
 
-class spell_tharon_ja_clear_gift_of_tharon_ja : public SpellScriptLoader
+class spell_tharon_ja_clear_gift_of_tharon_ja : public SpellScript
 {
-public:
-    spell_tharon_ja_clear_gift_of_tharon_ja() : SpellScriptLoader("spell_tharon_ja_clear_gift_of_tharon_ja") { }
+    PrepareSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja);
 
-    class spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript);
+        if (Unit* target = GetHitUnit())
+            target->RemoveAura(SPELL_GIFT_OF_THARON_JA);
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->RemoveAura(SPELL_GIFT_OF_THARON_JA);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_tharon_ja_clear_gift_of_tharon_ja::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -292,6 +281,6 @@ void AddSC_boss_tharon_ja()
     new boss_tharon_ja();
     RegisterSpellScript(spell_tharon_ja_curse_of_life_aura);
     RegisterSpellScript(spell_tharon_ja_dummy_aura);
-    new spell_tharon_ja_clear_gift_of_tharon_ja();
+    RegisterSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja);
 }
 
