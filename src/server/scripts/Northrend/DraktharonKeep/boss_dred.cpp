@@ -175,29 +175,18 @@ class spell_dred_grievious_bite_aura : public AuraScript
     }
 };
 
-class spell_dred_raptor_call : public SpellScriptLoader
+class spell_dred_raptor_call : public SpellScript
 {
-public:
-    spell_dred_raptor_call() : SpellScriptLoader("spell_dred_raptor_call") { }
+    PrepareSpellScript(spell_dred_raptor_call);
 
-    class spell_dred_raptor_call_SpellScript : public SpellScript
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_dred_raptor_call_SpellScript);
+        GetCaster()->SummonCreature(RAND(NPC_DRAKKARI_GUTRIPPER, NPC_DRAKKARI_SCYTHECLAW), -522.02f, -718.89f, 30.26f, 2.41f);
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            GetCaster()->SummonCreature(RAND(NPC_DRAKKARI_GUTRIPPER, NPC_DRAKKARI_SCYTHECLAW), -522.02f, -718.89f, 30.26f, 2.41f);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dred_raptor_call_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_dred_raptor_call_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_dred_raptor_call::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -221,6 +210,6 @@ void AddSC_boss_dred()
 {
     new boss_dred();
     RegisterSpellScript(spell_dred_grievious_bite_aura);
-    new spell_dred_raptor_call();
+    RegisterSpellScript(spell_dred_raptor_call);
     new achievement_better_off_dred();
 }
