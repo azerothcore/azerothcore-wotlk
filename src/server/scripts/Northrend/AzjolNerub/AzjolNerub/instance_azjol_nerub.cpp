@@ -114,31 +114,20 @@ public:
     }
 };
 
-class spell_azjol_nerub_fixate : public SpellScriptLoader
+class spell_azjol_nerub_fixate : public SpellScript
 {
-public:
-    spell_azjol_nerub_fixate() : SpellScriptLoader("spell_azjol_nerub_fixate") { }
+    PrepareSpellScript(spell_azjol_nerub_fixate);
 
-    class spell_azjol_nerub_fixate_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_azjol_nerub_fixate_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), GetEffectValue(), true);
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(GetCaster(), GetEffectValue(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_azjol_nerub_fixate_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_azjol_nerub_fixate_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_azjol_nerub_fixate::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -173,6 +162,6 @@ public:
 void AddSC_instance_azjol_nerub()
 {
     new instance_azjol_nerub();
-    new spell_azjol_nerub_fixate();
+    RegisterSpellScript(spell_azjol_nerub_fixate);
     new spell_azjol_nerub_web_wrap();
 }
