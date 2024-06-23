@@ -10,3 +10,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_tharon_ja_curse_of_life_aura
 UPDATE `spell_script_names` SET `ScriptName`='spell_tharon_ja_dummy_aura' WHERE `spell_id`=49551;
 UPDATE `spell_script_names` SET `ScriptName`='spell_dred_grievious_bite_aura' WHERE `spell_id`=48920;
 UPDATE `spell_script_names` SET `ScriptName`='spell_moorabi_mojo_frenzy_aura' WHERE `spell_id`=55163;
+UPDATE `spell_script_names` SET `ScriptName`='spell_sladran_grip_of_sladran_aura' WHERE `spell_id`=55093;
