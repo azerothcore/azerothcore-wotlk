@@ -652,29 +652,18 @@ class spell_oculus_temporal_rift_aura : public AuraScript
 };
 
 // 50341 - Touch the Nightmare
-class spell_oculus_touch_the_nightmare : public SpellScriptLoader
+class spell_oculus_touch_the_nightmare : public SpellScript
 {
-public:
-    spell_oculus_touch_the_nightmare() : SpellScriptLoader("spell_oculus_touch_the_nightmare") { }
+    PrepareSpellScript(spell_oculus_touch_the_nightmare);
 
-    class spell_oculus_touch_the_nightmare_SpellScript : public SpellScript
+    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_oculus_touch_the_nightmare_SpellScript);
+        SetHitDamage(int32(GetCaster()->CountPctFromMaxHealth(30)));
+    }
 
-        void HandleDamageCalc(SpellEffIndex /*effIndex*/)
-        {
-            SetHitDamage(int32(GetCaster()->CountPctFromMaxHealth(30)));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_oculus_touch_the_nightmare_SpellScript::HandleDamageCalc, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_oculus_touch_the_nightmare_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_oculus_touch_the_nightmare::HandleDamageCalc, EFFECT_2, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -981,7 +970,7 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_evasive_maneuvers_aura);
     RegisterSpellScript(spell_oculus_shock_lance);
     RegisterSpellScript(spell_oculus_temporal_rift_aura);
-    new spell_oculus_touch_the_nightmare();
+    RegisterSpellScript(spell_oculus_touch_the_nightmare);
     new spell_oculus_dream_funnel();
     new spell_oculus_call_ruby_emerald_amber_drake();
     new spell_oculus_ride_ruby_emerald_amber_drake_que();
