@@ -176,30 +176,24 @@ enum eQ10923EvilDrawsNear
     NPC_AUCHENAI_DEATH_SPIRIT               = 21967
 };
 
-class spell_q10923_evil_draws_near_summon : public SpellScriptLoader
+class spell_q10923_evil_draws_near_summon : public SpellScript
 {
-public:
-    spell_q10923_evil_draws_near_summon() : SpellScriptLoader("spell_q10923_evil_draws_near_summon") { }
+    PrepareSpellScript(spell_q10923_evil_draws_near_summon);
 
-    class spell_q10923_evil_draws_near_summon_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q10923_evil_draws_near_summon_SpellScript);
+        return ValidateSpellInfo({ SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA });
+    }
 
-        void HandleSendEvent(SpellEffIndex  /*effIndex*/)
-        {
-            if (Creature* auchenai = GetCaster()->FindNearestCreature(NPC_AUCHENAI_DEATH_SPIRIT, 10.0f, true))
-                auchenai->CastSpell(auchenai, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA, true);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_q10923_evil_draws_near_summon_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleSendEvent(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_q10923_evil_draws_near_summon_SpellScript();
+        if (Creature* auchenai = GetCaster()->FindNearestCreature(NPC_AUCHENAI_DEATH_SPIRIT, 10.0f, true))
+            auchenai->CastSpell(auchenai, SPELL_DUSTIN_UNDEAD_DRAGON_VISUAL_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_q10923_evil_draws_near_summon::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -683,7 +677,7 @@ void AddSC_terokkar_forest()
     new spell_q10929_fumping();
     new npc_greatfather_aldrimus();
     RegisterSpellScript(spell_q10036_torgos);
-    new spell_q10923_evil_draws_near_summon();
+    RegisterSpellScript(spell_q10923_evil_draws_near_summon);
     new spell_q10923_evil_draws_near_periodic();
     new spell_q10923_evil_draws_near_visual();
     new spell_q10898_skywing();
