@@ -16,3 +16,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_evasive_maneuvers_aur
 UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_temporal_rift_aura' WHERE `spell_id`=49592;
 UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_dream_funnel_aura' WHERE `spell_id`=50344;
 UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_ride_ruby_emerald_amber_drake_que_aura' WHERE `spell_id` IN (49427,49459,49463);
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_evasive_charges_aura' WHERE `spell_id`=50241;

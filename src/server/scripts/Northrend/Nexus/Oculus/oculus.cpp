@@ -722,40 +722,34 @@ class spell_oculus_ride_ruby_emerald_amber_drake_que_aura : public AuraScript
     }
 };
 
-class spell_oculus_evasive_charges : public SpellScriptLoader
+class spell_oculus_evasive_charges_aura : public AuraScript
 {
-public:
-    spell_oculus_evasive_charges() : SpellScriptLoader("spell_oculus_evasive_charges") { }
+    PrepareAuraScript(spell_oculus_evasive_charges_aura);
 
-    class spell_oculus_evasive_chargesAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_oculus_evasive_chargesAuraScript);
+        return ValidateSpellInfo({ SPELL_RUBY_EVASIVE_MANEUVERS });
+    }
 
-        void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
-        }
-
-        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-            {
-                caster->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_MANEUVERS);
-                caster->ModifyAuraState(AURA_STATE_UNKNOWN22, false);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_oculus_evasive_chargesAuraScript::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            OnEffectRemove += AuraEffectRemoveFn(spell_oculus_evasive_chargesAuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleOnEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_oculus_evasive_chargesAuraScript();
+        if (Unit* caster = GetCaster())
+            caster->ModifyAuraState(AURA_STATE_UNKNOWN22, true);
+    }
+
+    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            caster->RemoveAurasDueToSpell(SPELL_RUBY_EVASIVE_MANEUVERS);
+            caster->ModifyAuraState(AURA_STATE_UNKNOWN22, false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_oculus_evasive_charges_aura::HandleOnEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectRemove += AuraEffectRemoveFn(spell_oculus_evasive_charges_aura::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -941,7 +935,7 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_dream_funnel_aura);
     RegisterSpellScript(spell_oculus_call_ruby_emerald_amber_drake);
     RegisterSpellScript(spell_oculus_ride_ruby_emerald_amber_drake_que_aura);
-    new spell_oculus_evasive_charges();
+    RegisterSpellScript(spell_oculus_evasive_charges_aura);
     new spell_oculus_soar();
     new spell_oculus_rider_aura();
     new spell_oculus_drake_flag();
