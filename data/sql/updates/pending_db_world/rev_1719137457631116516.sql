@@ -19,3 +19,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_ride_ruby_emerald_amb
 UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_evasive_charges_aura' WHERE `spell_id`=50241;
 UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_soar_aura' WHERE `spell_id`=50325;
 UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_drake_flag_aura' WHERE `spell_id`=53797;
+UPDATE `spell_script_names` SET `ScriptName`='spell_boss_magus_telestra_summon_telestra_clones_aura' WHERE `spell_id`=47710;

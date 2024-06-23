@@ -230,48 +230,42 @@ public:
     };
 };
 
-class spell_boss_magus_telestra_summon_telestra_clones : public SpellScriptLoader
+class spell_boss_magus_telestra_summon_telestra_clones_aura : public AuraScript
 {
-public:
-    spell_boss_magus_telestra_summon_telestra_clones() : SpellScriptLoader("spell_boss_magus_telestra_summon_telestra_clones") { }
+    PrepareAuraScript(spell_boss_magus_telestra_summon_telestra_clones_aura);
 
-    class spell_boss_magus_telestra_summon_telestra_clones_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_boss_magus_telestra_summon_telestra_clones_AuraScript);
+        return ValidateSpellInfo({ SPELL_FIRE_MAGUS_SUMMON, SPELL_FROST_MAGUS_SUMMON, SPELL_ARCANE_MAGUS_SUMMON });
+    }
 
-        bool Load() override
-        {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FIRE_MAGUS_SUMMON, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FROST_MAGUS_SUMMON, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_ARCANE_MAGUS_SUMMON, true);
-
-            GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            GetUnitOwner()->SetControlled(true, UNIT_STATE_STUNNED);
-            GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
-        }
-
-        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            GetUnitOwner()->SetControlled(false, UNIT_STATE_STUNNED);
-            GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_boss_magus_telestra_summon_telestra_clones_AuraScript::HandleApply, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_boss_magus_telestra_summon_telestra_clones_AuraScript::HandleRemove, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Load() override
     {
-        return new spell_boss_magus_telestra_summon_telestra_clones_AuraScript();
+        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FIRE_MAGUS_SUMMON, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FROST_MAGUS_SUMMON, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_ARCANE_MAGUS_SUMMON, true);
+
+        GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetControlled(true, UNIT_STATE_STUNNED);
+        GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
+    }
+
+    void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetControlled(false, UNIT_STATE_STUNNED);
+        GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_boss_magus_telestra_summon_telestra_clones_aura::HandleApply, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_boss_magus_telestra_summon_telestra_clones_aura::HandleRemove, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -345,7 +339,7 @@ public:
 void AddSC_boss_magus_telestra()
 {
     new boss_magus_telestra();
-    new spell_boss_magus_telestra_summon_telestra_clones();
+    RegisterSpellScript(spell_boss_magus_telestra_summon_telestra_clones_aura);
     new spell_boss_magus_telestra_gravity_well();
     new achievement_split_personality();
 }
