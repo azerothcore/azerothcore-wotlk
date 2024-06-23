@@ -192,38 +192,32 @@ class spell_trollgore_consume : public SpellScript
     }
 };
 
-class spell_trollgore_corpse_explode : public SpellScriptLoader
+class spell_trollgore_corpse_explode_aura : public AuraScript
 {
-public:
-    spell_trollgore_corpse_explode() : SpellScriptLoader("spell_trollgore_corpse_explode") { }
+    PrepareAuraScript(spell_trollgore_corpse_explode_aura);
 
-    class spell_trollgore_corpse_explode_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_trollgore_corpse_explode_AuraScript);
+        return ValidateSpellInfo({ SPELL_CORPSE_EXPLODE_DAMAGE });
+    }
 
-        void PeriodicTick(AuraEffect const* aurEff)
-        {
-            if (aurEff->GetTickNumber() == 2)
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(GetTarget(), SPELL_CORPSE_EXPLODE_DAMAGE, true);
-        }
-
-        void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* target = GetTarget()->ToCreature())
-                target->DespawnOrUnsummon(1);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_trollgore_corpse_explode_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_trollgore_corpse_explode_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void PeriodicTick(AuraEffect const* aurEff)
     {
-        return new spell_trollgore_corpse_explode_AuraScript();
+        if (aurEff->GetTickNumber() == 2)
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(GetTarget(), SPELL_CORPSE_EXPLODE_DAMAGE, true);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* target = GetTarget()->ToCreature())
+            target->DespawnOrUnsummon(1);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_trollgore_corpse_explode_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_trollgore_corpse_explode_aura::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -274,7 +268,7 @@ void AddSC_boss_trollgore()
 {
     new boss_trollgore();
     RegisterSpellScript(spell_trollgore_consume);
-    new spell_trollgore_corpse_explode();
+    RegisterSpellScript(spell_trollgore_corpse_explode_aura);
     new spell_trollgore_invader_taunt();
     new achievement_consumption_junction();
 }
