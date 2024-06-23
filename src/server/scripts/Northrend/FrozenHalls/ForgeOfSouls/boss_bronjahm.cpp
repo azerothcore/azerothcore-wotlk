@@ -263,40 +263,29 @@ public:
     }
 };
 
-class spell_bronjahm_magic_bane : public SpellScriptLoader
+class spell_bronjahm_magic_bane : public SpellScript
 {
-public:
-    spell_bronjahm_magic_bane() :  SpellScriptLoader("spell_bronjahm_magic_bane") { }
+    PrepareSpellScript(spell_bronjahm_magic_bane);
 
-    class spell_bronjahm_magic_bane_SpellScript : public SpellScript
+    void RecalculateDamage()
     {
-        PrepareSpellScript(spell_bronjahm_magic_bane_SpellScript);
+        if (GetHitUnit()->getPowerType() != POWER_MANA)
+            return;
 
-        void RecalculateDamage()
+        if (Unit* caster = GetCaster())
         {
-            if (GetHitUnit()->getPowerType() != POWER_MANA)
-                return;
+            const int32 maxDamage = caster->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
+            int32 newDamage = GetHitDamage();
+            newDamage += GetHitUnit()->GetMaxPower(POWER_MANA) / 2;
+            newDamage = std::min<int32>(maxDamage, newDamage);
 
-            if (Unit* caster = GetCaster())
-            {
-                const int32 maxDamage = caster->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
-                int32 newDamage = GetHitDamage();
-                newDamage += GetHitUnit()->GetMaxPower(POWER_MANA) / 2;
-                newDamage = std::min<int32>(maxDamage, newDamage);
-
-                SetHitDamage(newDamage);
-            }
+            SetHitDamage(newDamage);
         }
+    }
 
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_bronjahm_magic_bane_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_bronjahm_magic_bane_SpellScript();
+        OnHit += SpellHitFn(spell_bronjahm_magic_bane::RecalculateDamage);
     }
 };
 
@@ -401,7 +390,7 @@ void AddSC_boss_bronjahm()
     new boss_bronjahm();
     new npc_fos_corrupted_soul_fragment();
 
-    new spell_bronjahm_magic_bane();
+    RegisterSpellScript(spell_bronjahm_magic_bane);
     new spell_bronjahm_soulstorm_channel_ooc();
     new spell_bronjahm_soulstorm_visual();
     new spell_bronjahm_soulstorm_targeting();
