@@ -668,33 +668,22 @@ class spell_oculus_touch_the_nightmare : public SpellScript
 };
 
 // 50344 - Dream Funnel
-class spell_oculus_dream_funnel : public SpellScriptLoader
+class spell_oculus_dream_funnel_aura : public AuraScript
 {
-public:
-    spell_oculus_dream_funnel() : SpellScriptLoader("spell_oculus_dream_funnel") { }
+    PrepareAuraScript(spell_oculus_dream_funnel_aura);
 
-    class spell_oculus_dream_funnel_AuraScript : public AuraScript
+    void HandleEffectCalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
     {
-        PrepareAuraScript(spell_oculus_dream_funnel_AuraScript);
+        if (Unit* caster = GetCaster())
+            amount = int32(caster->CountPctFromMaxHealth(5));
 
-        void HandleEffectCalcAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
-        {
-            if (Unit* caster = GetCaster())
-                amount = int32(caster->CountPctFromMaxHealth(5));
+        canBeRecalculated = false;
+    }
 
-            canBeRecalculated = false;
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_oculus_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_oculus_dream_funnel_AuraScript::HandleEffectCalcAmount, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_oculus_dream_funnel_AuraScript();
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_oculus_dream_funnel_aura::HandleEffectCalcAmount, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_oculus_dream_funnel_aura::HandleEffectCalcAmount, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -971,7 +960,7 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_shock_lance);
     RegisterSpellScript(spell_oculus_temporal_rift_aura);
     RegisterSpellScript(spell_oculus_touch_the_nightmare);
-    new spell_oculus_dream_funnel();
+    RegisterSpellScript(spell_oculus_dream_funnel_aura);
     new spell_oculus_call_ruby_emerald_amber_drake();
     new spell_oculus_ride_ruby_emerald_amber_drake_que();
     new spell_oculus_evasive_charges();
