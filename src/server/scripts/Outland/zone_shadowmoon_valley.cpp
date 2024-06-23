@@ -89,43 +89,32 @@ class spell_q10612_10613_the_fel_and_the_furious : public SpellScript
     }
 };
 
-class spell_q10563_q10596_to_legion_hold : public SpellScriptLoader
+class spell_q10563_q10596_to_legion_hold_aura : public AuraScript
 {
-public:
-    spell_q10563_q10596_to_legion_hold() : SpellScriptLoader("spell_q10563_q10596_to_legion_hold") { }
+    PrepareAuraScript(spell_q10563_q10596_to_legion_hold_aura);
 
-    class spell_q10563_q10596_to_legion_hold_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_q10563_q10596_to_legion_hold_AuraScript)
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        if (Player* player = GetTarget()->ToPlayer())
         {
-            if (Player* player = GetTarget()->ToPlayer())
-            {
-                player->KilledMonsterCredit(21502);
-                player->SetControlled(false, UNIT_STATE_STUNNED);
-            }
+            player->KilledMonsterCredit(21502);
+            player->SetControlled(false, UNIT_STATE_STUNNED);
         }
+    }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Player* player = GetTarget()->ToPlayer())
-            {
-                player->SetControlled(true, UNIT_STATE_STUNNED);
-                player->SummonCreature(21633, -3311.13f, 2946.15f, 171.1f, 4.86f, TEMPSUMMON_TIMED_DESPAWN, 64000);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_q10563_q10596_to_legion_hold_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_q10563_q10596_to_legion_hold_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_q10563_q10596_to_legion_hold_AuraScript();
+        if (Player* player = GetTarget()->ToPlayer())
+        {
+            player->SetControlled(true, UNIT_STATE_STUNNED);
+            player->SummonCreature(21633, -3311.13f, 2946.15f, 171.1f, 4.86f, TEMPSUMMON_TIMED_DESPAWN, 64000);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_q10563_q10596_to_legion_hold_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_q10563_q10596_to_legion_hold_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1828,7 +1817,7 @@ void AddSC_shadowmoon_valley()
 {
     // Ours
     RegisterSpellScript(spell_q10612_10613_the_fel_and_the_furious);
-    new spell_q10563_q10596_to_legion_hold();
+    RegisterSpellScript(spell_q10563_q10596_to_legion_hold_aura);
 
     // Theirs
     new npc_invis_infernal_caster();
