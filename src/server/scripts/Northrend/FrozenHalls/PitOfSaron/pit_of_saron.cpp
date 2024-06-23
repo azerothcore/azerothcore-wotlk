@@ -1358,46 +1358,35 @@ private:
     Creature& _owner;
 };
 
-class spell_pos_slave_trigger_closest : public SpellScriptLoader
+class spell_pos_slave_trigger_closest : public SpellScript
 {
-public:
-    spell_pos_slave_trigger_closest() : SpellScriptLoader("spell_pos_slave_trigger_closest") { }
+    PrepareSpellScript(spell_pos_slave_trigger_closest);
 
-    class spell_pos_slave_trigger_closestSpellScript : public SpellScript
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_pos_slave_trigger_closestSpellScript);
+        if (Unit* target = GetHitUnit())
+            if (target->GetUInt32Value(UNIT_NPC_EMOTESTATE)) // prevent using multiple times
+            {
+                if (Unit* caster = GetCaster())
+                    if (Player* p = caster->ToPlayer())
+                    {
+                        p->RewardPlayerAndGroupAtEvent(36764, caster); // alliance
+                        p->RewardPlayerAndGroupAtEvent(36770, caster); // horde
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                if (target->GetUInt32Value(UNIT_NPC_EMOTESTATE)) // prevent using multiple times
-                {
-                    if (Unit* caster = GetCaster())
-                        if (Player* p = caster->ToPlayer())
+                        target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                        if (Creature* c = target->ToCreature())
                         {
-                            p->RewardPlayerAndGroupAtEvent(36764, caster); // alliance
-                            p->RewardPlayerAndGroupAtEvent(36770, caster); // horde
-
-                            target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                            if (Creature* c = target->ToCreature())
-                            {
-                                c->DespawnOrUnsummon(7000);
-                                c->AI()->Talk(0, p);
-                                c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
-                            }
+                            c->DespawnOrUnsummon(7000);
+                            c->AI()->Talk(0, p);
+                            c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
                         }
-                }
-        }
+                    }
+            }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_pos_slave_trigger_closestSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_pos_slave_trigger_closestSpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_pos_slave_trigger_closest::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1532,7 +1521,7 @@ void AddSC_pit_of_saron()
     new npc_pos_leader_second();
 
     RegisterSpellScript(spell_pos_empowered_blizzard_aura);
-    new spell_pos_slave_trigger_closest();
+    RegisterSpellScript(spell_pos_slave_trigger_closest);
     new spell_pos_rimefang_frost_nova();
     new spell_pos_blight();
     new spell_pos_glacial_strike();
