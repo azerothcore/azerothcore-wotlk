@@ -342,29 +342,18 @@ class spell_bronjahm_soulstorm_visual_aura : public AuraScript
     }
 };
 
-class spell_bronjahm_soulstorm_targeting : public SpellScriptLoader
+class spell_bronjahm_soulstorm_targeting : public SpellScript
 {
-public:
-    spell_bronjahm_soulstorm_targeting() : SpellScriptLoader("spell_bronjahm_soulstorm_targeting") { }
+    PrepareSpellScript(spell_bronjahm_soulstorm_targeting);
 
-    class spell_bronjahm_soulstorm_targeting_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_bronjahm_soulstorm_targeting_SpellScript);
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f, false));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f, false));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bronjahm_soulstorm_targeting_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_bronjahm_soulstorm_targeting_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bronjahm_soulstorm_targeting::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
@@ -376,6 +365,6 @@ void AddSC_boss_bronjahm()
     RegisterSpellScript(spell_bronjahm_magic_bane);
     RegisterSpellScript(spell_bronjahm_soulstorm_channel_ooc_aura);
     RegisterSpellScript(spell_bronjahm_soulstorm_visual_aura);
-    new spell_bronjahm_soulstorm_targeting();
+    RegisterSpellScript(spell_bronjahm_soulstorm_targeting);
 }
 
