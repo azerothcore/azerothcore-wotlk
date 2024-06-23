@@ -315,6 +315,11 @@ class spell_bronjahm_soulstorm_visual_aura : public AuraScript
 {
     PrepareAuraScript(spell_bronjahm_soulstorm_visual_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ 68886, 68896, 68897, 68898 });
+    }
+
     void HandlePeriodicTick(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
