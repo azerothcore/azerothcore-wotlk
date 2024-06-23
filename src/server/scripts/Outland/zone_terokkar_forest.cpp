@@ -235,32 +235,21 @@ class spell_q10923_evil_draws_near_visual : public SpellScript
     }
 };
 
-class spell_q10898_skywing : public SpellScriptLoader
+class spell_q10898_skywing : public SpellScript
 {
-public:
-    spell_q10898_skywing() : SpellScriptLoader("spell_q10898_skywing") { }
+    PrepareSpellScript(spell_q10898_skywing);
 
-    class spell_q10898_skywing_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_q10898_skywing_SpellScript);
+        // Adjust effect summon position
+        Position const offset = { frand(-7.0f, 7.0f), frand(-7.0f, 7.0f), 11.0f, 0.0f };
+        dest.Relocate(*GetCaster());
+        dest.RelocateOffset(offset);
+    }
 
-        void SetDest(SpellDestination& dest)
-        {
-            // Adjust effect summon position
-            Position const offset = { frand(-7.0f, 7.0f), frand(-7.0f, 7.0f), 11.0f, 0.0f };
-            dest.Relocate(*GetCaster());
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10898_skywing_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q10898_skywing_SpellScript();
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10898_skywing::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
     }
 };
 
@@ -663,7 +652,7 @@ void AddSC_terokkar_forest()
     RegisterSpellScript(spell_q10923_evil_draws_near_summon);
     RegisterSpellScript(spell_q10923_evil_draws_near_periodic_aura);
     RegisterSpellScript(spell_q10923_evil_draws_near_visual);
-    new spell_q10898_skywing();
+    RegisterSpellScript(spell_q10898_skywing);
 
     // Theirs
     new npc_unkor_the_ruthless();
