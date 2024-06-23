@@ -757,39 +757,28 @@ class spell_eadric_radiance : public SpellScript
     }
 };
 
-class spell_toc5_light_rain : public SpellScriptLoader
+class spell_toc5_light_rain : public SpellScript
 {
-public:
-    spell_toc5_light_rain() : SpellScriptLoader("spell_toc5_light_rain") { }
+    PrepareSpellScript(spell_toc5_light_rain);
 
-    class spell_toc5_light_rain_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_toc5_light_rain_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
+        for( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
         {
-            for( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
-            {
-                if ((*itr)->GetTypeId() == TYPEID_UNIT)
-                    if ((*itr)->ToCreature()->GetEntry() == NPC_FOUNTAIN_OF_LIGHT)
-                    {
-                        targets.erase(itr);
-                        itr = targets.begin();
-                        continue;
-                    }
-                ++itr;
-            }
+            if ((*itr)->GetTypeId() == TYPEID_UNIT)
+                if ((*itr)->ToCreature()->GetEntry() == NPC_FOUNTAIN_OF_LIGHT)
+                {
+                    targets.erase(itr);
+                    itr = targets.begin();
+                    continue;
+                }
+            ++itr;
         }
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_toc5_light_rain_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_toc5_light_rain_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_toc5_light_rain::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
     }
 };
 
@@ -831,7 +820,7 @@ void AddSC_boss_argent_challenge()
     new npc_memory();
     new npc_argent_soldier();
     RegisterSpellScript(spell_eadric_radiance);
-    new spell_toc5_light_rain();
+    RegisterSpellScript(spell_toc5_light_rain);
     new spell_reflective_shield();
 }
 
