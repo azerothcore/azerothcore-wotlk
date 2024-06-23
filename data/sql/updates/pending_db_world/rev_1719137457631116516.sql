@@ -28,3 +28,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_shield_of_bones_aura' WHERE 
 UPDATE `spell_script_names` SET `ScriptName`='spell_wailing_souls_periodic_aura' WHERE `spell_id`=68875;
 UPDATE `spell_script_names` SET `ScriptName`='spell_bronjahm_soulstorm_channel_ooc_aura' WHERE `spell_id`=69008;
 UPDATE `spell_script_names` SET `ScriptName`='spell_bronjahm_soulstorm_visual_aura' WHERE `spell_id`=68870;
+UPDATE `spell_script_names` SET `ScriptName`='spell_krick_explosive_barrage_aura' WHERE `spell_id`=69012;

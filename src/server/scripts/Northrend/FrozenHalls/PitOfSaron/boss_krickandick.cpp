@@ -458,38 +458,32 @@ public:
     }
 };
 
-class spell_krick_explosive_barrage : public SpellScriptLoader
+class spell_krick_explosive_barrage_aura : public AuraScript
 {
-public:
-    spell_krick_explosive_barrage() : SpellScriptLoader("spell_krick_explosive_barrage") { }
+    PrepareAuraScript(spell_krick_explosive_barrage_aura);
 
-    class spell_krick_explosive_barrage_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_krick_explosive_barrage_AuraScript);
+        return ValidateSpellInfo({ SPELL_EXPLOSIVE_BARRAGE_SUMMON });
+    }
 
-        void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-                if (caster->GetTypeId() == TYPEID_UNIT)
-                {
-                    Map::PlayerList const& players = caster->GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (Player* player = itr->GetSource())
-                            if (player->IsWithinDist(caster, 100.0f))
-                                caster->CastSpell(player, SPELL_EXPLOSIVE_BARRAGE_SUMMON, true);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_krick_explosive_barrage_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
     {
-        return new spell_krick_explosive_barrage_AuraScript();
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+            if (caster->GetTypeId() == TYPEID_UNIT)
+            {
+                Map::PlayerList const& players = caster->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                    if (Player* player = itr->GetSource())
+                        if (player->IsWithinDist(caster, 100.0f))
+                            caster->CastSpell(player, SPELL_EXPLOSIVE_BARRAGE_SUMMON, true);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_krick_explosive_barrage_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -534,7 +528,7 @@ void AddSC_boss_ick()
     new boss_ick();
     new boss_krick();
 
-    new spell_krick_explosive_barrage();
+    RegisterSpellScript(spell_krick_explosive_barrage_aura);
     new spell_exploding_orb_auto_grow();
 }
 
