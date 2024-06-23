@@ -25,7 +25,11 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
-// Ours
+enum q10935Exorcism
+{
+    SPELL_HOLY_FIRE             = 39323,
+    SPELL_HEAL_BARADA           = 39322
+};
 
 class spell_q10935_the_exorcism_of_colonel_jules : public SpellScript
 {
@@ -33,7 +37,7 @@ class spell_q10935_the_exorcism_of_colonel_jules : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 39323, SPELL_HOLY_FIRE, 39322, SPELL_HEAL_BARADA });
+        return ValidateSpellInfo({ SPELL_HOLY_FIRE, SPELL_HEAL_BARADA });
     }
 
     void HandleDummy(SpellEffIndex effIndex)
@@ -44,9 +48,9 @@ class spell_q10935_the_exorcism_of_colonel_jules : public SpellScript
             return;
 
         if (GetCaster()->IsHostileTo(target))
-            GetCaster()->CastSpell(target, 39323 /*SPELL_HOLY_FIRE*/, true);
+            GetCaster()->CastSpell(target, SPELL_HOLY_FIRE, true);
         else
-            GetCaster()->CastSpell(target, 39322 /*SPELL_HEAL_BARADA*/, true);
+            GetCaster()->CastSpell(target, SPELL_HEAL_BARADA, true);
     }
 
     void Register() override
