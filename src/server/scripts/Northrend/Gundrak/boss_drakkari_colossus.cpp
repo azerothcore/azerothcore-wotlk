@@ -426,30 +426,24 @@ class spell_drakkari_colossus_emerge : public SpellScript
     }
 };
 
-class spell_drakkari_colossus_surge : public SpellScriptLoader
+class spell_drakkari_colossus_surge : public SpellScript
 {
-public:
-    spell_drakkari_colossus_surge() : SpellScriptLoader("spell_drakkari_colossus_surge") { }
+    PrepareSpellScript(spell_drakkari_colossus_surge);
 
-    class spell_drakkari_colossus_surge_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_drakkari_colossus_surge_SpellScript);
+        return ValidateSpellInfo({ SPELL_SURGE_DAMAGE });
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, SPELL_SURGE_DAMAGE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_drakkari_colossus_surge_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_drakkari_colossus_surge_SpellScript();
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, SPELL_SURGE_DAMAGE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_drakkari_colossus_surge::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -489,7 +483,7 @@ void AddSC_boss_drakkari_colossus()
     new boss_drakkari_elemental();
     new npc_living_mojo();
     RegisterSpellScript(spell_drakkari_colossus_emerge);
-    new spell_drakkari_colossus_surge();
+    RegisterSpellScript(spell_drakkari_colossus_surge);
     new spell_drakkari_colossus_face_me();
 }
 
