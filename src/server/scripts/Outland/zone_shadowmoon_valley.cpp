@@ -45,53 +45,47 @@ npc_enraged_spirit
 EndContentData */
 
 // Ours
-class spell_q10612_10613_the_fel_and_the_furious : public SpellScriptLoader
+class spell_q10612_10613_the_fel_and_the_furious : public SpellScript
 {
-public:
-    spell_q10612_10613_the_fel_and_the_furious() : SpellScriptLoader("spell_q10612_10613_the_fel_and_the_furious") { }
+    PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious);
 
-    class spell_q10612_10613_the_fel_and_the_furious_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious_SpellScript);
+        return ValidateSpellInfo({ 38083 });
+    }
 
-        void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
+    void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
+    {
+        Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!charmer)
+            return;
+
+        std::list<GameObject*> gList;
+        GetCaster()->GetGameObjectListWithEntryInGrid(gList, 184979, 30.0f);
+        uint8 counter = 0;
+        for (std::list<GameObject*>::const_iterator itr = gList.begin(); itr != gList.end(); ++itr, ++counter)
         {
-            Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
-            if (!charmer)
-                return;
-
-            std::list<GameObject*> gList;
-            GetCaster()->GetGameObjectListWithEntryInGrid(gList, 184979, 30.0f);
-            uint8 counter = 0;
-            for (std::list<GameObject*>::const_iterator itr = gList.begin(); itr != gList.end(); ++itr, ++counter)
+            if (counter >= 10)
+                break;
+            GameObject* go = *itr;
+            if (!go->isSpawned())
+                continue;
+            Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
+            if (cr2)
             {
-                if (counter >= 10)
-                    break;
-                GameObject* go = *itr;
-                if (!go->isSpawned())
-                    continue;
-                Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
-                if (cr2)
-                {
-                    cr2->SetFaction(FACTION_MONSTER);
-                    cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                    GetCaster()->CastSpell(cr2, 38083, true);
-                }
-
-                go->SetLootState(GO_JUST_DEACTIVATED);
-                charmer->KilledMonsterCredit(21959);
+                cr2->SetFaction(FACTION_MONSTER);
+                cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
+                GetCaster()->CastSpell(cr2, 38083, true);
             }
-        }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q10612_10613_the_fel_and_the_furious_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            go->SetLootState(GO_JUST_DEACTIVATED);
+            charmer->KilledMonsterCredit(21959);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q10612_10613_the_fel_and_the_furious_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_q10612_10613_the_fel_and_the_furious::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1833,7 +1827,7 @@ public:
 void AddSC_shadowmoon_valley()
 {
     // Ours
-    new spell_q10612_10613_the_fel_and_the_furious();
+    RegisterSpellScript(spell_q10612_10613_the_fel_and_the_furious);
     new spell_q10563_q10596_to_legion_hold();
 
     // Theirs
