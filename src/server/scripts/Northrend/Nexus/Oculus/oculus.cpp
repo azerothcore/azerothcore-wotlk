@@ -532,40 +532,29 @@ public:
 };
 
 // 49838 - Stop Time
-class spell_oculus_stop_time : public SpellScriptLoader
+class spell_oculus_stop_time_aura : public AuraScript
 {
-public:
-    spell_oculus_stop_time() : SpellScriptLoader("spell_oculus_stop_time") { }
+    PrepareAuraScript(spell_oculus_stop_time_aura);
 
-    class spell_oculus_stop_time_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_oculus_stop_time_AuraScript);
+        return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
-        }
-
-        void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
-            Unit* target = GetTarget();
-            for (uint32 i = 0; i < 5; ++i)
-                caster->CastSpell(target, SPELL_AMBER_SHOCK_CHARGE, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_oculus_stop_time_AuraScript::Apply, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Apply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_oculus_stop_time_AuraScript();
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        Unit* target = GetTarget();
+        for (uint32 i = 0; i < 5; ++i)
+            caster->CastSpell(target, SPELL_AMBER_SHOCK_CHARGE, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_oculus_stop_time_aura::Apply, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1021,7 +1010,7 @@ void AddSC_oculus()
     new npc_oculus_drake();
     new npc_centrifuge_construct();
 
-    new spell_oculus_stop_time();
+    RegisterSpellScript(spell_oculus_stop_time_aura);
     new spell_oculus_evasive_maneuvers();
     new spell_oculus_shock_lance();
     new spell_oculus_temporal_rift();
