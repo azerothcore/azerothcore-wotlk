@@ -343,32 +343,26 @@ public:
     };
 };
 
-class spell_frost_tomb : public SpellScriptLoader
+class spell_frost_tomb_aura : public AuraScript
 {
-public:
-    spell_frost_tomb() : SpellScriptLoader("spell_frost_tomb") { }
+    PrepareAuraScript(spell_frost_tomb_aura);
 
-    class spell_frost_tombAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_frost_tombAuraScript);
+        return ValidateSpellInfo({ SPELL_FROST_TOMB_SUMMON });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (aurEff->GetTickNumber() == 1)
-                if( Unit* target = GetTarget() )
-                    target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tombAuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_frost_tombAuraScript();
+        PreventDefaultAction();
+        if (aurEff->GetTickNumber() == 1)
+            if( Unit* target = GetTarget() )
+                target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tomb_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -377,6 +371,6 @@ void AddSC_boss_keleseth()
     new boss_keleseth();
     new npc_frost_tomb();
     new npc_vrykul_skeleton();
-    new spell_frost_tomb();
+    RegisterSpellScript(spell_frost_tomb_aura);
 }
 

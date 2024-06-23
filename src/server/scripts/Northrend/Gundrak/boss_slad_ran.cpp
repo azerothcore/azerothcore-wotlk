@@ -200,34 +200,28 @@ public:
     };
 };
 
-class spell_sladran_grip_of_sladran : public SpellScriptLoader
+class spell_sladran_grip_of_sladran_aura : public AuraScript
 {
-public:
-    spell_sladran_grip_of_sladran() : SpellScriptLoader("spell_sladran_grip_of_sladran") { }
+    PrepareAuraScript(spell_sladran_grip_of_sladran_aura);
 
-    class spell_sladran_grip_of_sladran_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_sladran_grip_of_sladran_AuraScript);
+        return ValidateSpellInfo({ SPELL_SNAKE_WRAP });
+    }
 
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (GetStackAmount() >= 5)
-            {
-                SetDuration(0);
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SNAKE_WRAP, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_sladran_grip_of_sladran_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_sladran_grip_of_sladran_AuraScript();
+        PreventDefaultAction();
+        if (GetStackAmount() >= 5)
+        {
+            SetDuration(0);
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SNAKE_WRAP, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sladran_grip_of_sladran_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -250,6 +244,6 @@ public:
 void AddSC_boss_slad_ran()
 {
     new boss_slad_ran();
-    new spell_sladran_grip_of_sladran();
+    RegisterSpellScript(spell_sladran_grip_of_sladran_aura);
     new achievement_snakes_whyd_it_have_to_be_snakes();
 }
