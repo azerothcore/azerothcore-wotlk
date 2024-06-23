@@ -98,29 +98,23 @@ class spell_dtk_raise_dead_aura : public AuraScript
     }
 };
 
-class spell_dtk_summon_random_drakkari : public SpellScriptLoader
+class spell_dtk_summon_random_drakkari : public SpellScript
 {
-public:
-    spell_dtk_summon_random_drakkari() : SpellScriptLoader("spell_dtk_summon_random_drakkari") { }
+    PrepareSpellScript(spell_dtk_summon_random_drakkari);
 
-    class spell_dtk_summon_random_drakkari_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_dtk_summon_random_drakkari_SpellScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_DRAKKARI_SHAMAN, SPELL_SUMMON_DRAKKARI_GUARDIAN });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            GetCaster()->CastSpell(GetCaster(), RAND(SPELL_SUMMON_DRAKKARI_SHAMAN, SPELL_SUMMON_DRAKKARI_GUARDIAN), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dtk_summon_random_drakkari_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        return new spell_dtk_summon_random_drakkari_SpellScript();
+        GetCaster()->CastSpell(GetCaster(), RAND(SPELL_SUMMON_DRAKKARI_SHAMAN, SPELL_SUMMON_DRAKKARI_GUARDIAN), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dtk_summon_random_drakkari::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -128,5 +122,5 @@ void AddSC_instance_drak_tharon_keep()
 {
     new instance_drak_tharon_keep();
     RegisterSpellScript(spell_dtk_raise_dead_aura);
-    new spell_dtk_summon_random_drakkari();
+    RegisterSpellScript(spell_dtk_summon_random_drakkari);
 }
