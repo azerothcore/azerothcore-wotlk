@@ -365,31 +365,25 @@ private:
     uint32 _spellEntry;
 };
 
-class spell_hadronox_leech_poison : public SpellScriptLoader
+class spell_hadronox_leech_poison_aura : public AuraScript
 {
-public:
-    spell_hadronox_leech_poison() : SpellScriptLoader("spell_hadronox_leech_poison") { }
+    PrepareAuraScript(spell_hadronox_leech_poison_aura);
 
-    class spell_hadronox_leech_poison_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hadronox_leech_poison_AuraScript)
+        return ValidateSpellInfo({ SPELL_LEECH_POISON_HEAL });
+    }
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, SPELL_LEECH_POISON_HEAL, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_hadronox_leech_poison_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_LEECH, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_hadronox_leech_poison_AuraScript();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(caster, SPELL_LEECH_POISON_HEAL, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_hadronox_leech_poison_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_LEECH, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -416,7 +410,7 @@ void AddSC_boss_hadronox()
     RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion", 15000, SPELL_SUMMON_ANUBAR_CHAMPION);
     RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer", 10000, SPELL_SUMMON_ANUBAR_NECROMANCER);
     RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend", 5000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
-    new spell_hadronox_leech_poison();
+    RegisterSpellScript(spell_hadronox_leech_poison_aura);
     new achievement_hadronox_denied();
 }
 
