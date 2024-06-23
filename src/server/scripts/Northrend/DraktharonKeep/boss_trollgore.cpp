@@ -171,30 +171,24 @@ public:
     }
 };
 
-class spell_trollgore_consume : public SpellScriptLoader
+class spell_trollgore_consume : public SpellScript
 {
-public:
-    spell_trollgore_consume() : SpellScriptLoader("spell_trollgore_consume") { }
+    PrepareSpellScript(spell_trollgore_consume);
 
-    class spell_trollgore_consume_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_trollgore_consume_SpellScript);
+        return ValidateSpellInfo({ SPELL_CONSUME_AURA });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(GetCaster(), SPELL_CONSUME_AURA, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_trollgore_consume_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        return new spell_trollgore_consume_SpellScript();
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), SPELL_CONSUME_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_trollgore_consume::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -279,7 +273,7 @@ public:
 void AddSC_boss_trollgore()
 {
     new boss_trollgore();
-    new spell_trollgore_consume();
+    RegisterSpellScript(spell_trollgore_consume);
     new spell_trollgore_corpse_explode();
     new spell_trollgore_invader_taunt();
     new achievement_consumption_junction();
