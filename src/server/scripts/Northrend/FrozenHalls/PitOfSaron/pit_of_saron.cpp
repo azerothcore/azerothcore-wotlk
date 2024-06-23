@@ -1411,31 +1411,25 @@ class spell_pos_rimefang_frost_nova : public SpellScript
     }
 };
 
-class spell_pos_blight : public SpellScriptLoader
+class spell_pos_blight_aura : public AuraScript
 {
-public:
-    spell_pos_blight() : SpellScriptLoader("spell_pos_blight") { }
+    PrepareAuraScript(spell_pos_blight_aura);
 
-    class spell_pos_blightAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_pos_blightAuraScript)
+        return ValidateSpellInfo({ 69604 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
-                if (Unit* target = GetTarget())
-                    target->CastSpell(target, 69604, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_blightAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_pos_blightAuraScript();
+        if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
+            if (Unit* target = GetTarget())
+                target->CastSpell(target, 69604, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_blight_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -1512,7 +1506,7 @@ void AddSC_pit_of_saron()
     RegisterSpellScript(spell_pos_empowered_blizzard_aura);
     RegisterSpellScript(spell_pos_slave_trigger_closest);
     RegisterSpellScript(spell_pos_rimefang_frost_nova);
-    new spell_pos_blight();
+    RegisterSpellScript(spell_pos_blight_aura);
     new spell_pos_glacial_strike();
 
     new at_tyrannus_event_starter();

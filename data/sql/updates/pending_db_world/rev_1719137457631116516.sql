@@ -31,3 +31,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_bronjahm_soulstorm_visual_au
 UPDATE `spell_script_names` SET `ScriptName`='spell_krick_explosive_barrage_aura' WHERE `spell_id`=69012;
 UPDATE `spell_script_names` SET `ScriptName`='spell_exploding_orb_auto_grow_aura' WHERE `spell_id`=69020;
 UPDATE `spell_script_names` SET `ScriptName`='spell_pos_empowered_blizzard_aura' WHERE `spell_id`=70132;
+UPDATE `spell_script_names` SET `ScriptName`='spell_pos_blight_aura' WHERE `spell_id` IN (69603,69604,70285,70286);
