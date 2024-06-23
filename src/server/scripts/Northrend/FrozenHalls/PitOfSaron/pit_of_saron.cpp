@@ -1301,20 +1301,25 @@ public:
     }
 };
 
+enum EmpoweredBlizzard
+{
+    SPELL_EMPOWERED_BLIZZARD = 70131
+};
+
 class spell_pos_empowered_blizzard_aura : public AuraScript
 {
     PrepareAuraScript(spell_pos_empowered_blizzard_aura);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 70131 });
+        return ValidateSpellInfo({ SPELL_EMPOWERED_BLIZZARD });
     }
 
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
         PreventDefaultAction();
         if (Unit* caster = GetCaster())
-            caster->CastSpell((float)urand(447, 480), (float)urand(200, 235), 528.71f, 70131, true);
+            caster->CastSpell((float)urand(447, 480), (float)urand(200, 235), 528.71f, SPELL_EMPOWERED_BLIZZARD, true);
     }
 
     void Register() override
