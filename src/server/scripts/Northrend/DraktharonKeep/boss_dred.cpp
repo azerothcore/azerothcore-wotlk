@@ -155,34 +155,23 @@ public:
     };
 };
 
-class spell_dred_grievious_bite : public SpellScriptLoader
+class spell_dred_grievious_bite_aura : public AuraScript
 {
-public:
-    spell_dred_grievious_bite() : SpellScriptLoader("spell_dred_grievious_bite") { }
+    PrepareAuraScript(spell_dred_grievious_bite_aura);
 
-    class spell_dred_grievious_bite_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_dred_grievious_bite_AuraScript);
+        if (Unit* target = GetTarget())
+            if (target->GetHealth() == target->GetMaxHealth())
+            {
+                PreventDefaultAction();
+                SetDuration(0);
+            }
+    }
 
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->GetHealth() == target->GetMaxHealth())
-                {
-                    PreventDefaultAction();
-                    SetDuration(0);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dred_grievious_bite_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_dred_grievious_bite_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dred_grievious_bite_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -231,7 +220,7 @@ public:
 void AddSC_boss_dred()
 {
     new boss_dred();
-    new spell_dred_grievious_bite();
+    RegisterSpellScript(spell_dred_grievious_bite_aura);
     new spell_dred_raptor_call();
     new achievement_better_off_dred();
 }

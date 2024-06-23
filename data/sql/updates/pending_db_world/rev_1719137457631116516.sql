@@ -8,3 +8,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_trollgore_corpse_explode_aur
 UPDATE `spell_script_names` SET `ScriptName`='spell_novos_crystal_handler_death_aura' WHERE `spell_id`=47336;
 UPDATE `spell_script_names` SET `ScriptName`='spell_tharon_ja_curse_of_life_aura' WHERE `spell_id` IN (49527,59972);
 UPDATE `spell_script_names` SET `ScriptName`='spell_tharon_ja_dummy_aura' WHERE `spell_id`=49551;
+UPDATE `spell_script_names` SET `ScriptName`='spell_dred_grievious_bite_aura' WHERE `spell_id`=48920;
