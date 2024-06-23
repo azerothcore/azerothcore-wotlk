@@ -447,33 +447,22 @@ class spell_drakkari_colossus_surge : public SpellScript
     }
 };
 
-class spell_drakkari_colossus_face_me : public SpellScriptLoader
+class spell_drakkari_colossus_face_me : public SpellScript
 {
-public:
-    spell_drakkari_colossus_face_me() : SpellScriptLoader("spell_drakkari_colossus_face_me") { }
+    PrepareSpellScript(spell_drakkari_colossus_face_me);
 
-    class spell_drakkari_colossus_face_me_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_drakkari_colossus_face_me_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+        if (Unit* target = GetHitUnit())
         {
-            if (Unit* target = GetHitUnit())
-            {
-                GetCaster()->SetInFront(target);
-                GetCaster()->SetFacingTo(GetCaster()->GetAngle(target));
-            }
+            GetCaster()->SetInFront(target);
+            GetCaster()->SetFacingTo(GetCaster()->GetAngle(target));
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_drakkari_colossus_face_me_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_drakkari_colossus_face_me_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_drakkari_colossus_face_me::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -484,6 +473,6 @@ void AddSC_boss_drakkari_colossus()
     new npc_living_mojo();
     RegisterSpellScript(spell_drakkari_colossus_emerge);
     RegisterSpellScript(spell_drakkari_colossus_surge);
-    new spell_drakkari_colossus_face_me();
+    RegisterSpellScript(spell_drakkari_colossus_face_me);
 }
 
