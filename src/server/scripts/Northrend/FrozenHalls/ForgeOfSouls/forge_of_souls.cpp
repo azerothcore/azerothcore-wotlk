@@ -256,13 +256,18 @@ public:
     }
 };
 
+enum ShieldOfBones
+{
+    SPELL_SHIELD_OF_BONES_DAMAGE = 69642
+};
+
 class spell_shield_of_bones_aura : public AuraScript
 {
     PrepareAuraScript(spell_shield_of_bones_aura);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 69642 });
+        return ValidateSpellInfo({ SPELL_SHIELD_OF_BONES_DAMAGE });
     }
 
     int32 amount;
@@ -282,7 +287,7 @@ class spell_shield_of_bones_aura : public AuraScript
             if (Unit* caster = GetCaster())
             {
                 fired = true;
-                caster->CastSpell(caster, 69642, true);
+                caster->CastSpell(caster, SPELL_SHIELD_OF_BONES_DAMAGE, true);
             }
     }
 
