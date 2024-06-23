@@ -782,34 +782,28 @@ class spell_toc5_light_rain : public SpellScript
     }
 };
 
-class spell_reflective_shield : public SpellScriptLoader
+class spell_reflective_shield_aura : public AuraScript
 {
-public:
-    spell_reflective_shield() : SpellScriptLoader("spell_reflective_shield") { }
+    PrepareAuraScript(spell_reflective_shield_aura);
 
-    class spell_reflective_shield_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_reflective_shield_AuraScript)
+        return ValidateSpellInfo({ 33619 });
+    }
 
-        void HandleAfterEffectAbsorb(AuraEffect*   /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            if( Unit* attacker = dmgInfo.GetAttacker() )
-                if( GetOwner() && attacker->GetGUID() != GetOwner()->GetGUID() )
-                {
-                    int32 damage = (int32)(absorbAmount * 0.25f);
-                    GetOwner()->ToUnit()->CastCustomSpell(attacker, 33619, &damage, nullptr, nullptr, true);
-                }
-        }
-
-        void Register() override
-        {
-            AfterEffectAbsorb += AuraEffectAbsorbFn(spell_reflective_shield_AuraScript::HandleAfterEffectAbsorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleAfterEffectAbsorb(AuraEffect*   /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
-        return new spell_reflective_shield_AuraScript();
+        if( Unit* attacker = dmgInfo.GetAttacker() )
+            if( GetOwner() && attacker->GetGUID() != GetOwner()->GetGUID() )
+            {
+                int32 damage = (int32)(absorbAmount * 0.25f);
+                GetOwner()->ToUnit()->CastCustomSpell(attacker, 33619, &damage, nullptr, nullptr, true);
+            }
+    }
+
+    void Register() override
+    {
+        AfterEffectAbsorb += AuraEffectAbsorbFn(spell_reflective_shield_aura::HandleAfterEffectAbsorb, EFFECT_0);
     }
 };
 
@@ -821,6 +815,6 @@ void AddSC_boss_argent_challenge()
     new npc_argent_soldier();
     RegisterSpellScript(spell_eadric_radiance);
     RegisterSpellScript(spell_toc5_light_rain);
-    new spell_reflective_shield();
+    RegisterSpellScript(spell_reflective_shield_aura);
 }
 
