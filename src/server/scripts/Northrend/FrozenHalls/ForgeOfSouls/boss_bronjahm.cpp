@@ -310,46 +310,35 @@ class spell_bronjahm_soulstorm_channel_ooc_aura : public AuraScript
     }
 };
 
-class spell_bronjahm_soulstorm_visual : public SpellScriptLoader
+class spell_bronjahm_soulstorm_visual_aura : public AuraScript
 {
-public:
-    spell_bronjahm_soulstorm_visual() : SpellScriptLoader("spell_bronjahm_soulstorm_visual") { }
+    PrepareAuraScript(spell_bronjahm_soulstorm_visual_aura);
 
-    class spell_bronjahm_soulstorm_visual_AuraScript : public AuraScript
+    void HandlePeriodicTick(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_bronjahm_soulstorm_visual_AuraScript);
-
-        void HandlePeriodicTick(AuraEffect const* aurEff)
+        PreventDefaultAction();
+        uint32 spellId = 0;
+        switch (aurEff->GetTickNumber() % 4)
         {
-            PreventDefaultAction();
-            uint32 spellId = 0;
-            switch (aurEff->GetTickNumber() % 4)
-            {
-                case 0:
-                    spellId = 68886;
-                    break;
-                case 1:
-                    spellId = 68896;
-                    break;
-                case 2:
-                    spellId = 68897;
-                    break;
-                case 3:
-                    spellId = 68898;
-                    break;
-            }
-            GetTarget()->CastSpell(GetTarget(), spellId, true);
+            case 0:
+                spellId = 68886;
+                break;
+            case 1:
+                spellId = 68896;
+                break;
+            case 2:
+                spellId = 68897;
+                break;
+            case 3:
+                spellId = 68898;
+                break;
         }
+        GetTarget()->CastSpell(GetTarget(), spellId, true);
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_bronjahm_soulstorm_visual_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_bronjahm_soulstorm_visual_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_bronjahm_soulstorm_visual_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -386,7 +375,7 @@ void AddSC_boss_bronjahm()
 
     RegisterSpellScript(spell_bronjahm_magic_bane);
     RegisterSpellScript(spell_bronjahm_soulstorm_channel_ooc_aura);
-    new spell_bronjahm_soulstorm_visual();
+    RegisterSpellScript(spell_bronjahm_soulstorm_visual_aura);
     new spell_bronjahm_soulstorm_targeting();
 }
 
