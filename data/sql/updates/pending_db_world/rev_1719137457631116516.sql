@@ -23,3 +23,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_boss_magus_telestra_summon_t
 UPDATE `spell_script_names` SET `ScriptName`='spell_ticking_time_bomb_aura' WHERE `spell_id`=59686;
 UPDATE `spell_script_names` SET `ScriptName`='spell_frost_tomb_aura' WHERE `spell_id`=42672;
 UPDATE `spell_script_names` SET `ScriptName`='spell_optic_link_aura' WHERE `spell_id`=54396;
+UPDATE `spell_script_names` SET `ScriptName`='spell_destroy_door_seal_aura' WHERE `spell_id`=58040;
