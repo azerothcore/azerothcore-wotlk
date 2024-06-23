@@ -169,13 +169,18 @@ public:
     }
 };
 
+enum SharedSufferingAura
+{
+    SPELL_SHARED_SUFFERING_DAMAGE = 72373
+};
+
 class spell_hor_shared_suffering_aura : public AuraScript
 {
     PrepareAuraScript(spell_hor_shared_suffering_aura);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 72373 });
+        return ValidateSpellInfo({ SPELL_SHARED_SUFFERING_DAMAGE });
     }
 
     void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes  /*mode*/)
@@ -195,7 +200,7 @@ class spell_hor_shared_suffering_aura : public AuraScript
                                     ++count;
                         ticks = (a->GetDuration() / int32(a->GetSpellInfo()->Effects[0].Amplitude)) + 1;
                         int32 dmg = (ticks * dmgPerTick) / count;
-                        caster->CastCustomSpell(GetTarget(), 72373, nullptr, &dmg, nullptr, true);
+                        caster->CastCustomSpell(GetTarget(), SPELL_SHARED_SUFFERING_DAMAGE, nullptr, &dmg, nullptr, true);
                     }
     }
 
