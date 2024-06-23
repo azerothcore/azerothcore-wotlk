@@ -151,30 +151,19 @@ enum q10036Torgos
     NPC_TORGOS                  = 18707
 };
 
-class spell_q10036_torgos : public SpellScriptLoader
+class spell_q10036_torgos : public SpellScript
 {
-public:
-    spell_q10036_torgos() : SpellScriptLoader("spell_q10036_torgos") { }
+    PrepareSpellScript(spell_q10036_torgos);
 
-    class spell_q10036_torgos_SpellScript : public SpellScript
+    void HandleSendEvent(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_q10036_torgos_SpellScript);
+        if (Creature* torgos = GetCaster()->FindNearestCreature(NPC_TORGOS, 100.0f, true))
+            torgos->GetAI()->AttackStart(GetCaster());
+    }
 
-        void HandleSendEvent(SpellEffIndex  /*effIndex*/)
-        {
-            if (Creature* torgos = GetCaster()->FindNearestCreature(NPC_TORGOS, 100.0f, true))
-                torgos->GetAI()->AttackStart(GetCaster());
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_q10036_torgos_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q10036_torgos_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_q10036_torgos::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -693,7 +682,7 @@ void AddSC_terokkar_forest()
     RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
     new spell_q10929_fumping();
     new npc_greatfather_aldrimus();
-    new spell_q10036_torgos();
+    RegisterSpellScript(spell_q10036_torgos);
     new spell_q10923_evil_draws_near_summon();
     new spell_q10923_evil_draws_near_periodic();
     new spell_q10923_evil_draws_near_visual();
