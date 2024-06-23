@@ -612,53 +612,42 @@ class spell_oculus_shock_lance : public SpellScript
 };
 
 // 49592 - Temporal Rift
-class spell_oculus_temporal_rift : public SpellScriptLoader
+class spell_oculus_temporal_rift_aura : public AuraScript
 {
-public:
-    spell_oculus_temporal_rift() : SpellScriptLoader("spell_oculus_temporal_rift") { }
+    PrepareAuraScript(spell_oculus_temporal_rift_aura);
 
-    class spell_oculus_temporal_rift_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_oculus_temporal_rift_AuraScript);
+        return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_AMBER_SHOCK_CHARGE });
-        }
-
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo || !damageInfo->GetDamage())
-            {
-                return;
-            }
-
-            int32 amount = aurEff->GetAmount() + damageInfo->GetDamage();
-
-            uint8 num = amount / 15000;
-            if (amount >= 15000)
-            {
-                if (Unit* caster = GetCaster())
-                    for (uint8 i  = 0; i < num; ++i )
-                        caster->CastSpell(GetTarget(), SPELL_AMBER_SHOCK_CHARGE, true);
-            }
-
-            const_cast<AuraEffect*>(aurEff)->SetAmount(amount - 15000 * num);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_oculus_temporal_rift_AuraScript::HandleProc, EFFECT_2, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
-        return new spell_oculus_temporal_rift_AuraScript();
+        PreventDefaultAction();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+        if (!damageInfo || !damageInfo->GetDamage())
+        {
+            return;
+        }
+
+        int32 amount = aurEff->GetAmount() + damageInfo->GetDamage();
+
+        uint8 num = amount / 15000;
+        if (amount >= 15000)
+        {
+            if (Unit* caster = GetCaster())
+                for (uint8 i  = 0; i < num; ++i )
+                    caster->CastSpell(GetTarget(), SPELL_AMBER_SHOCK_CHARGE, true);
+        }
+
+        const_cast<AuraEffect*>(aurEff)->SetAmount(amount - 15000 * num);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_oculus_temporal_rift_aura::HandleProc, EFFECT_2, SPELL_AURA_DUMMY);
     }
 };
 
@@ -991,7 +980,7 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_stop_time_aura);
     RegisterSpellScript(spell_oculus_evasive_maneuvers_aura);
     RegisterSpellScript(spell_oculus_shock_lance);
-    new spell_oculus_temporal_rift();
+    RegisterSpellScript(spell_oculus_temporal_rift_aura);
     new spell_oculus_touch_the_nightmare();
     new spell_oculus_dream_funnel();
     new spell_oculus_call_ruby_emerald_amber_drake();
