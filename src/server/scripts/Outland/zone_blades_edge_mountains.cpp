@@ -223,20 +223,25 @@ public:
     }
 };
 
+enum CrystalPrison
+{
+    SPELL_CRYSTAL_SHATTER = 40898
+};
+
 class spell_npc22275_crystal_prison_aura : public AuraScript
 {
     PrepareAuraScript(spell_npc22275_crystal_prison_aura);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 40898 });
+        return ValidateSpellInfo({ SPELL_CRYSTAL_SHATTER });
     }
 
     void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
         PreventDefaultAction();
         SetDuration(0);
-        GetTarget()->CastSpell(GetTarget(), 40898, true);
+        GetTarget()->CastSpell(GetTarget(), SPELL_CRYSTAL_SHATTER, true);
     }
 
     void Register() override
