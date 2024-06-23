@@ -734,37 +734,26 @@ public:
     }
 };
 
-class spell_eadric_radiance : public SpellScriptLoader
+class spell_eadric_radiance : public SpellScript
 {
-public:
-    spell_eadric_radiance() : SpellScriptLoader("spell_eadric_radiance") { }
+    PrepareSpellScript(spell_eadric_radiance);
 
-    class spell_eadric_radiance_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_eadric_radiance_SpellScript);
+        std::list<WorldObject*> tmplist;
+        for( std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            if( (*itr)->ToUnit()->HasInArc(M_PI, GetCaster()) )
+                tmplist.push_back(*itr);
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            std::list<WorldObject*> tmplist;
-            for( std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if( (*itr)->ToUnit()->HasInArc(M_PI, GetCaster()) )
-                    tmplist.push_back(*itr);
+        targets.clear();
+        for( std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr )
+            targets.push_back(*itr);
+    }
 
-            targets.clear();
-            for( std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr )
-                targets.push_back(*itr);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_eadric_radiance_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -841,7 +830,7 @@ void AddSC_boss_argent_challenge()
     new boss_paletress();
     new npc_memory();
     new npc_argent_soldier();
-    new spell_eadric_radiance();
+    RegisterSpellScript(spell_eadric_radiance);
     new spell_toc5_light_rain();
     new spell_reflective_shield();
 }
