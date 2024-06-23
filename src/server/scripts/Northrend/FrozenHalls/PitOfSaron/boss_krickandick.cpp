@@ -487,39 +487,33 @@ class spell_krick_explosive_barrage_aura : public AuraScript
     }
 };
 
-class spell_exploding_orb_auto_grow : public SpellScriptLoader
+class spell_exploding_orb_auto_grow_aura : public AuraScript
 {
-public:
-    spell_exploding_orb_auto_grow() : SpellScriptLoader("spell_exploding_orb_auto_grow") { }
+    PrepareAuraScript(spell_exploding_orb_auto_grow_aura);
 
-    class spell_exploding_orb_auto_grow_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_exploding_orb_auto_grow_AuraScript);
+        return ValidateSpellInfo({ SPELL_EXPLOSIVE_BARRAGE_DAMAGE, SPELL_HASTY_GROW, SPELL_AUTO_GROW, SPELL_EXPLODING_ORB_VISUAL });
+    }
 
-        void HandlePeriodicTick(AuraEffect const* aurEff)
-        {
-            if (aurEff->GetTickNumber() >= 16)
-                if (Unit* target = GetTarget())
-                {
-                    PreventDefaultAction();
-                    target->CastSpell(target, SPELL_EXPLOSIVE_BARRAGE_DAMAGE, false);
-                    target->RemoveAurasDueToSpell(SPELL_HASTY_GROW);
-                    target->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
-                    target->RemoveAurasDueToSpell(SPELL_EXPLODING_ORB_VISUAL);
-                    if (target->GetTypeId() == TYPEID_UNIT)
-                        target->ToCreature()->DespawnOrUnsummon(2000);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_exploding_orb_auto_grow_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodicTick(AuraEffect const* aurEff)
     {
-        return new spell_exploding_orb_auto_grow_AuraScript();
+        if (aurEff->GetTickNumber() >= 16)
+            if (Unit* target = GetTarget())
+            {
+                PreventDefaultAction();
+                target->CastSpell(target, SPELL_EXPLOSIVE_BARRAGE_DAMAGE, false);
+                target->RemoveAurasDueToSpell(SPELL_HASTY_GROW);
+                target->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
+                target->RemoveAurasDueToSpell(SPELL_EXPLODING_ORB_VISUAL);
+                if (target->GetTypeId() == TYPEID_UNIT)
+                    target->ToCreature()->DespawnOrUnsummon(2000);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_exploding_orb_auto_grow_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -529,6 +523,6 @@ void AddSC_boss_ick()
     new boss_krick();
 
     RegisterSpellScript(spell_krick_explosive_barrage_aura);
-    new spell_exploding_orb_auto_grow();
+    RegisterSpellScript(spell_exploding_orb_auto_grow_aura);
 }
 
