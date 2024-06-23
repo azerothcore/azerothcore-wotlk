@@ -208,33 +208,22 @@ public:
     };
 };
 
-class spell_tharon_ja_curse_of_life : public SpellScriptLoader
+class spell_tharon_ja_curse_of_life_aura : public AuraScript
 {
-public:
-    spell_tharon_ja_curse_of_life() : SpellScriptLoader("spell_tharon_ja_curse_of_life") { }
+    PrepareAuraScript(spell_tharon_ja_curse_of_life_aura);
 
-    class spell_tharon_ja_curse_of_life_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_tharon_ja_curse_of_life_AuraScript);
-
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
+        if (GetUnitOwner()->HealthBelowPct(50))
         {
-            if (GetUnitOwner()->HealthBelowPct(50))
-            {
-                PreventDefaultAction();
-                SetDuration(0);
-            }
+            PreventDefaultAction();
+            SetDuration(0);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_tharon_ja_curse_of_life_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_tharon_ja_curse_of_life_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_tharon_ja_curse_of_life_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -307,7 +296,7 @@ public:
 void AddSC_boss_tharon_ja()
 {
     new boss_tharon_ja();
-    new spell_tharon_ja_curse_of_life();
+    RegisterSpellScript(spell_tharon_ja_curse_of_life_aura);
     new spell_tharon_ja_dummy();
     new spell_tharon_ja_clear_gift_of_tharon_ja();
 }

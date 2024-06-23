@@ -6,3 +6,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_reflective_shield_aura' WHER
 UPDATE `spell_script_names` SET `ScriptName`='spell_dtk_raise_dead_aura' WHERE `spell_id` IN (48597,48605);
 UPDATE `spell_script_names` SET `ScriptName`='spell_trollgore_corpse_explode_aura' WHERE `spell_id` IN (49555,59807);
 UPDATE `spell_script_names` SET `ScriptName`='spell_novos_crystal_handler_death_aura' WHERE `spell_id`=47336;
+UPDATE `spell_script_names` SET `ScriptName`='spell_tharon_ja_curse_of_life_aura' WHERE `spell_id` IN (49527,59972);
