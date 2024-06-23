@@ -2315,22 +2315,27 @@ public:
     }
 };
 
+enum GunshipCannonFire
+{
+    SPELL_GUNSHIP_CANNON_FIRE = 70021
+};
+
 class spell_hor_gunship_cannon_fire_aura : public AuraScript
 {
     PrepareAuraScript(spell_hor_gunship_cannon_fire_aura);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 70021 });
+        return ValidateSpellInfo({ SPELL_GUNSHIP_CANNON_FIRE });
     }
 
     void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
         PreventDefaultAction();
         if (Unit* caster = GetCaster())
-            if (Creature* c = caster->SummonCreature(WORLD_TRIGGER, CannonFirePos[caster->GetEntry() == NPC_JAINA_PART2 ? 0 : 1][urand(0, 2)], TEMPSUMMON_TIMED_DESPAWN, 1))
+            if (Creature* creature = caster->SummonCreature(WORLD_TRIGGER, CannonFirePos[caster->GetEntry() == NPC_JAINA_PART2 ? 0 : 1][urand(0, 2)], TEMPSUMMON_TIMED_DESPAWN, 1))
             {
-                c->CastSpell((Unit*)nullptr, 70021, true);
+                creature->CastSpell((Unit*)nullptr, SPELL_GUNSHIP_CANNON_FIRE, true);
             }
     }
 
