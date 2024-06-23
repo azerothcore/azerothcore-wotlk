@@ -132,38 +132,27 @@ public:
     };
 };
 
-class spell_optic_link : public SpellScriptLoader
+class spell_optic_link_aura : public AuraScript
 {
-public:
-    spell_optic_link() : SpellScriptLoader("spell_optic_link") { }
+    PrepareAuraScript(spell_optic_link_aura);
 
-    class spell_optic_linkAuraScript : public AuraScript
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_optic_linkAuraScript)
+        if (Unit* target = GetTarget())
+            if (Unit* caster = GetCaster())
+                if (GetAura() && GetAura()->GetEffect(0))
+                    GetAura()->GetEffect(0)->SetAmount(aurEff->GetSpellInfo()->Effects[EFFECT_0].BasePoints + (((int32)target->GetExactDist(caster)) * 25) + (aurEff->GetTickNumber() * 100));
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            if (Unit* target = GetTarget())
-                if (Unit* caster = GetCaster())
-                    if (GetAura() && GetAura()->GetEffect(0))
-                        GetAura()->GetEffect(0)->SetAmount(aurEff->GetSpellInfo()->Effects[EFFECT_0].BasePoints + (((int32)target->GetExactDist(caster)) * 25) + (aurEff->GetTickNumber() * 100));
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_optic_linkAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_optic_linkAuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_optic_link_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
 void AddSC_boss_moragg()
 {
     new boss_moragg();
-    new spell_optic_link();
+    RegisterSpellScript(spell_optic_link_aura);
 }
 
