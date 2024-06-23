@@ -131,31 +131,25 @@ class spell_azjol_nerub_fixate : public SpellScript
     }
 };
 
-class spell_azjol_nerub_web_wrap : public SpellScriptLoader
+class spell_azjol_nerub_web_wrap_aura : public AuraScript
 {
-public:
-    spell_azjol_nerub_web_wrap() : SpellScriptLoader("spell_azjol_nerub_web_wrap") { }
+    PrepareAuraScript(spell_azjol_nerub_web_wrap_aura);
 
-    class spell_azjol_nerub_web_wrap_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_azjol_nerub_web_wrap_AuraScript);
+        return ValidateSpellInfo({ SPELL_WEB_WRAP_TRIGGER });
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (!target->HasAura(SPELL_WEB_WRAP_TRIGGER))
-                target->CastSpell(target, SPELL_WEB_WRAP_TRIGGER, true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_azjol_nerub_web_wrap_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_ROOT, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_azjol_nerub_web_wrap_AuraScript();
+        Unit* target = GetTarget();
+        if (!target->HasAura(SPELL_WEB_WRAP_TRIGGER))
+            target->CastSpell(target, SPELL_WEB_WRAP_TRIGGER, true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_azjol_nerub_web_wrap_aura::OnRemove, EFFECT_0, SPELL_AURA_MOD_ROOT, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -163,5 +157,5 @@ void AddSC_instance_azjol_nerub()
 {
     new instance_azjol_nerub();
     RegisterSpellScript(spell_azjol_nerub_fixate);
-    new spell_azjol_nerub_web_wrap();
+    RegisterSpellScript(spell_azjol_nerub_web_wrap_aura);
 }
