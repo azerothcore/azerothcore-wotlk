@@ -11,12 +11,17 @@ DB:
   - any-glob-to-any-file: 'data/**/*.sql'
 
 CORE:
-- all:
-    - changed-files:
-        - any-glob-to-any-file: 'src/**/*'
-        - all-globs-to-all-files:
-          - '!src/server/scripts/**/*'
-          - '!src/test/**/*'
+- changed-files:
+    - any-glob-to-any-file:
+      - 'src/*'
+      - 'src/common/**/*'
+      - 'src/genrev/**/*'
+      - 'src/server/*'
+      - 'src/server/apps/**/*'
+      - 'src/server/database/**/*'
+      - 'src/server/game/**/*'
+      - 'src/server/shared/**/*'
+      - 'src/tools/**/*'
 
 Script:
 - changed-files:
@@ -30,7 +35,7 @@ UnitTests:
 
 Documentation:
 - changed-files:
-    - any-glob-to-any-file: '*.md'
+    - any-glob-to-any-file: '**/*.md'
 
 Bash:
 - changed-files:
@@ -43,7 +48,7 @@ Bash:
 
 CMake:
 - changed-files:
-    - any-glob-to-any-file: '*.cmake'
+    - any-glob-to-any-file: '**/*.cmake'
 
 Workflow:
 - changed-files:

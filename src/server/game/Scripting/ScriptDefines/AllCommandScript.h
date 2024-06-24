@@ -24,7 +24,7 @@
 enum AllCommandHook
 {
     ALLCOMMANDHOOK_ON_HANDLE_DEV_COMMAND,
-    ALLCOMMANDHOOK_CAN_EXECUTE_COMMAND,
+    ALLCOMMANDHOOK_ON_TRY_EXECUTE_COMMAND,
     ALLCOMMANDHOOK_END
 };
 
@@ -39,12 +39,12 @@ public:
     virtual void OnHandleDevCommand(Player* /*player*/, bool& /*enable*/) { }
 
     /**
-     * @brief This hook runs execute chat command
+     * @brief This hook is triggered when a command is parsed, but before it is executed
      *
      * @param handler Contains information about the ChatHandler
      * @param cmdStr Contains information about the command name
      */
-    [[nodiscard]] virtual bool CanExecuteCommand(ChatHandler& /*handler*/, std::string_view /*cmdStr*/) { return true; }
+    [[nodiscard]] virtual bool OnTryExecuteCommand(ChatHandler& /*handler*/, std::string_view /*cmdStr*/) { return true; }
 };
 
 // Compatibility for old scripts

@@ -94,7 +94,7 @@ struct boss_jindo : public BossAI
 
     void EnterEvadeMode(EvadeReason evadeReason) override
     {
-        if (_EnterEvadeMode(evadeReason))
+        if (CreatureAI::_EnterEvadeMode(evadeReason))
         {
             Reset();
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DANCE);
