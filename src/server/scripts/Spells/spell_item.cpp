@@ -3981,8 +3981,7 @@ class spell_item_eye_of_grillok_aura : public AuraScript
 
         caster->CastSpell(caster, SPELL_EYE_OF_GRILLOK, true);
 
-        Creature* creatureTarget = GetTarget()->ToCreature();
-        creatureTarget->DespawnOrUnsummon();
+        GetTarget()->ToCreature()->DespawnOrUnsummon();
     }
 
     void Register() override
