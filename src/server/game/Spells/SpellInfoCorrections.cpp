@@ -4804,6 +4804,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
     });
 
+    // Flame Wave
+    ApplySpellFix({ 33800 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
+        spellInfo->Effects[EFFECT_1].Amplitude = 500;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
