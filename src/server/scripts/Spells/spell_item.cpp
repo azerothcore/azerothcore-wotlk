@@ -3938,6 +3938,59 @@ class spell_item_scroll_of_retribution : public SpellScript
     }
 };
 
+// 38554 - Absorb Eye of Grillok (Zezzak's Shard)
+enum EyeofGrillok
+{
+    SPELL_EYE_OF_GRILLOK = 38495,
+    NPC_EYE_OF_GRILLOK   = 19440
+};
+
+class spell_item_eye_of_grillok : public SpellScript
+{
+    PrepareSpellScript(spell_item_eye_of_grillok)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_EYE_OF_GRILLOK && !target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_eye_of_grillok::CheckCast);
+    }
+};
+
+class spell_item_eye_of_grillok_aura : public AuraScript
+{
+    PrepareAuraScript(spell_item_eye_of_grillok_aura)
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_EYE_OF_GRILLOK });
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !GetTarget())
+            return;
+
+        caster->CastSpell(caster, SPELL_EYE_OF_GRILLOK, true);
+
+        Creature* creatureTarget = GetTarget()->ToCreature();
+        creatureTarget->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_eye_of_grillok_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4059,5 +4112,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_worn_troll_dice);
     RegisterSpellScript(spell_item_venomhide_feed);
     RegisterSpellScript(spell_item_scroll_of_retribution);
+    RegisterSpellScript(spell_item_eye_of_grillok);
+    RegisterSpellScript(spell_item_eye_of_grillok_aura);
 }
 
