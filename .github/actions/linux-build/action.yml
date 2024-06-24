@@ -160,6 +160,7 @@ runs:
         # -s checks if the file's size is greater than 0 bytes
         # ! -s checks if the file's size is less than/equal to 0 bytes
         # if the error log is empty, exit without error
+        printf "Hey KI tzunu\n\n"
         [[ ! -s "$error_log" ]] && exit 0
         printf "The Errors.log file contains startup errors:\n\n"
         cat "$error_log"
