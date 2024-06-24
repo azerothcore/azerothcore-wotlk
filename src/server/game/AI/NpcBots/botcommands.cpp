@@ -3137,10 +3137,14 @@ public:
         trans->Append("DROP TEMPORARY TABLE IF EXISTS creature_template_temp_npcbot_create");
         trans->Append("CREATE TEMPORARY TABLE creature_template_temp_npcbot_create ENGINE=MEMORY SELECT * FROM creature_template WHERE entry = (SELECT entry FROM creature_template_npcbot_extras WHERE class = {} LIMIT 1)", uint32(*bclass));
         trans->Append("UPDATE creature_template_temp_npcbot_create SET entry = {}, name = \"{}\"", newentry, namestr.c_str());
-        if (modelId)
-            trans->Append("UPDATE creature_template_temp_npcbot_create SET modelid1 = {}", modelId);
         trans->Append("INSERT INTO creature_template SELECT * FROM creature_template_temp_npcbot_create");
         trans->Append("DROP TEMPORARY TABLE creature_template_temp_npcbot_create");
+        if (modelId)
+            trans->Append("DROP TEMPORARY TABLE IF EXISTS creature_template_model_temp_npcbot_create");
+            trans->Append("CREATE TEMPORARY TABLE creature_template_model_temp_npcbot_create ENGINE=MEMORY SELECT * FROM creature_template_model WHERE CreatureID = (SELECT entry FROM creature_template_npcbot_extras WHERE class = {} LIMIT 1)", uint32(*bclass));
+            trans->Append("UPDATE creature_template_model_temp_npcbot_create SET CreatureID = {}, CreatureDisplayID = {}", newentry, modelId);
+            trans->Append("INSERT INTO creature_template_model SELECT * FROM creature_template_model_temp_npcbot_create");
+            trans->Append("DROP TEMPORARY TABLE creature_template_model_temp_npcbot_create");
         trans->Append("REPLACE INTO creature_template_npcbot_extras VALUES ({}, {}, {})", newentry, uint32(*bclass), uint32(*race));
         trans->Append("REPLACE INTO creature_equip_template SELECT {}, 1, ids.itemID1, ids.itemID2, ids.itemID3, -1 FROM (SELECT itemID1, itemID2, itemID3 FROM creature_equip_template WHERE CreatureID = (SELECT entry FROM creature_template_npcbot_extras WHERE class = {} LIMIT 1)) ids", newentry, uint32(*bclass));
         if (can_change_appearance)
