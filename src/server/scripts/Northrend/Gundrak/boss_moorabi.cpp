@@ -170,34 +170,23 @@ public:
     };
 };
 
-class spell_moorabi_mojo_frenzy : public SpellScriptLoader
+class spell_moorabi_mojo_frenzy_aura : public AuraScript
 {
-public:
-    spell_moorabi_mojo_frenzy() : SpellScriptLoader("spell_moorabi_mojo_frenzy") { }
+    PrepareAuraScript(spell_moorabi_mojo_frenzy_aura);
 
-    class spell_moorabi_mojo_frenzy_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_moorabi_mojo_frenzy_AuraScript);
+        PreventDefaultAction();
 
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
+        if (GetUnitOwner()->GetMap()->IsHeroic())
+            GetUnitOwner()->SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f * (GetUnitOwner()->GetHealthPct()*GetUnitOwner()->GetHealthPct() / 10000.0f));
+        else
+            GetUnitOwner()->SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f * (GetUnitOwner()->GetHealthPct() / 100.0f));
+    }
 
-            if (GetUnitOwner()->GetMap()->IsHeroic())
-                GetUnitOwner()->SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f * (GetUnitOwner()->GetHealthPct()*GetUnitOwner()->GetHealthPct() / 10000.0f));
-            else
-                GetUnitOwner()->SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f * (GetUnitOwner()->GetHealthPct() / 100.0f));
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_moorabi_mojo_frenzy_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_moorabi_mojo_frenzy_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_moorabi_mojo_frenzy_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -217,6 +206,6 @@ public:
 void AddSC_boss_moorabi()
 {
     new boss_moorabi();
-    new spell_moorabi_mojo_frenzy();
+    RegisterSpellScript(spell_moorabi_mojo_frenzy_aura);
     new achievement_less_rabi();
 }

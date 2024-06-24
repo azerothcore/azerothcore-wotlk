@@ -323,50 +323,41 @@ public:
     }
 };
 
-class spell_hadronox_summon_periodic : public SpellScriptLoader
+class spell_hadronox_summon_periodic_aura : public AuraScript
 {
+    PrepareAuraScript(spell_hadronox_summon_periodic_aura);
+
 public:
-    spell_hadronox_summon_periodic(const char* name, uint32 delay, uint32 spellEntry) : SpellScriptLoader(name), _delay(delay), _spellEntry(spellEntry) { }
+    spell_hadronox_summon_periodic_aura(uint32 delay, uint32 spellEntry) : _delay(delay), _spellEntry(spellEntry) { }
 
-    class spell_hadronox_summon_periodic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-    public:
-        spell_hadronox_summon_periodic_AuraScript(uint32 delay, uint32 spellEntry) : _delay(delay), _spellEntry(spellEntry) { }
-        PrepareAuraScript(spell_hadronox_summon_periodic_AuraScript);
+        return ValidateSpellInfo({ SPELL_WEB_FRONT_DOORS });
+    }
 
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            Unit* owner = GetUnitOwner();
-            if (InstanceScript* instance = owner->GetInstanceScript())
-                if (instance->GetBossState(DATA_HADRONOX_EVENT) != DONE)
-                {
-                    if (!owner->HasAura(SPELL_WEB_FRONT_DOORS))
-                        owner->CastSpell(owner, _spellEntry, true);
-                    else if (!instance->IsEncounterInProgress())
-                        owner->RemoveAurasDueToSpell(SPELL_WEB_FRONT_DOORS);
-                }
-        }
-
-        void OnApply(AuraEffect const* auraEffect, AuraEffectHandleModes)
-        {
-            GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(_delay);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hadronox_summon_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectApply += AuraEffectApplyFn(spell_hadronox_summon_periodic_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-    private:
-        uint32 _delay;
-        uint32 _spellEntry;
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_hadronox_summon_periodic_AuraScript(_delay, _spellEntry);
+        PreventDefaultAction();
+        Unit* owner = GetUnitOwner();
+        if (InstanceScript* instance = owner->GetInstanceScript())
+            if (instance->GetBossState(DATA_HADRONOX_EVENT) != DONE)
+            {
+                if (!owner->HasAura(SPELL_WEB_FRONT_DOORS))
+                    owner->CastSpell(owner, _spellEntry, true);
+                else if (!instance->IsEncounterInProgress())
+                    owner->RemoveAurasDueToSpell(SPELL_WEB_FRONT_DOORS);
+            }
+    }
+
+    void OnApply(AuraEffect const* auraEffect, AuraEffectHandleModes)
+    {
+        GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(_delay);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hadronox_summon_periodic_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectApply += AuraEffectApplyFn(spell_hadronox_summon_periodic_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 
 private:
@@ -374,31 +365,25 @@ private:
     uint32 _spellEntry;
 };
 
-class spell_hadronox_leech_poison : public SpellScriptLoader
+class spell_hadronox_leech_poison_aura : public AuraScript
 {
-public:
-    spell_hadronox_leech_poison() : SpellScriptLoader("spell_hadronox_leech_poison") { }
+    PrepareAuraScript(spell_hadronox_leech_poison_aura);
 
-    class spell_hadronox_leech_poison_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hadronox_leech_poison_AuraScript)
+        return ValidateSpellInfo({ SPELL_LEECH_POISON_HEAL });
+    }
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, SPELL_LEECH_POISON_HEAL, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_hadronox_leech_poison_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_LEECH, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_hadronox_leech_poison_AuraScript();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(caster, SPELL_LEECH_POISON_HEAL, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_hadronox_leech_poison_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_LEECH, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -422,10 +407,10 @@ void AddSC_boss_hadronox()
 {
     new boss_hadronox();
     new npc_anub_ar_crusher();
-    new spell_hadronox_summon_periodic("spell_hadronox_summon_periodic_champion", 15000, SPELL_SUMMON_ANUBAR_CHAMPION);
-    new spell_hadronox_summon_periodic("spell_hadronox_summon_periodic_necromancer", 10000, SPELL_SUMMON_ANUBAR_NECROMANCER);
-    new spell_hadronox_summon_periodic("spell_hadronox_summon_periodic_crypt_fiend", 5000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
-    new spell_hadronox_leech_poison();
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion", 15000, SPELL_SUMMON_ANUBAR_CHAMPION);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer", 10000, SPELL_SUMMON_ANUBAR_NECROMANCER);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend", 5000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
+    RegisterSpellScript(spell_hadronox_leech_poison_aura);
     new achievement_hadronox_denied();
 }
 

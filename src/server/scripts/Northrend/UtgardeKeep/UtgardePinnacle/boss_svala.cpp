@@ -396,56 +396,40 @@ public:
     };
 };
 
-class spell_svala_ritual_strike : public SpellScriptLoader
+class spell_svala_ritual_strike : public SpellScript
 {
-public:
-    spell_svala_ritual_strike() : SpellScriptLoader("spell_svala_ritual_strike") { }
+    PrepareSpellScript(spell_svala_ritual_strike);
 
-    class spell_svala_ritual_strike_SpellScript : public SpellScript
+    void HandleDummyEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_svala_ritual_strike_SpellScript);
-
-        void HandleDummyEffect(SpellEffIndex /*effIndex*/)
+        if (Unit* unitTarget = GetHitUnit())
         {
-            if (Unit* unitTarget = GetHitUnit())
-            {
-                if (unitTarget->GetTypeId() != TYPEID_UNIT)
-                    return;
+            if (unitTarget->GetTypeId() != TYPEID_UNIT)
+                return;
 
-                Unit::DealDamage(GetCaster(), unitTarget, 7000, nullptr, DIRECT_DAMAGE);
-            }
+            Unit::DealDamage(GetCaster(), unitTarget, 7000, nullptr, DIRECT_DAMAGE);
         }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_svala_ritual_strike_SpellScript::HandleDummyEffect, EFFECT_2, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_svala_ritual_strike_SpellScript();
     }
 
-    class spell_svala_ritual_strike_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_svala_ritual_strike_AuraScript);
+        OnEffectHitTarget += SpellEffectFn(spell_svala_ritual_strike::HandleDummyEffect, EFFECT_2, SPELL_EFFECT_DUMMY);
+    }
+};
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set amount based on difficulty
-            amount = (GetCaster()->GetMap()->IsHeroic() ? 2000 : 1000);
-        }
+class spell_svala_ritual_strike_aura : public AuraScript
+{
+    PrepareAuraScript(spell_svala_ritual_strike_aura);
 
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_svala_ritual_strike_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        return new spell_svala_ritual_strike_AuraScript();
+        // Set amount based on difficulty
+        amount = (GetCaster()->GetMap()->IsHeroic() ? 2000 : 1000);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_svala_ritual_strike_aura::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -453,6 +437,6 @@ void AddSC_boss_svala()
 {
     new boss_svala();
     new npc_ritual_channeler();
-    new spell_svala_ritual_strike();
+    RegisterSpellAndAuraScriptPair(spell_svala_ritual_strike, spell_svala_ritual_strike_aura);
 }
 
