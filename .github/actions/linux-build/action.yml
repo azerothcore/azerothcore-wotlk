@@ -156,7 +156,7 @@ runs:
     - name: Check startup errors
       shell: bash
       run: |
-        error_log="./env/dist/bin/Errors.log"
+        error_log="env/dist/bin/Errors.log"
         # -s checks if the file's size is greater than 0 bytes
         # ! -s checks if the file's size is less than/equal to 0 bytes
         # if the error log is empty, exit without error
