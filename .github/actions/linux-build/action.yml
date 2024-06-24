@@ -164,8 +164,8 @@ runs:
         ls -la
         printf "Hey again"
         ls -la env/dist/bin
-        print "Hola"
-        if [[ ! -s "$error_log" ]]; then
+        printf "Hola"
+        if [[ ! -s $error_log ]]; then
           exit 0
         fi        
         printf "The Errors.log file contains startup errors:\n\n"
