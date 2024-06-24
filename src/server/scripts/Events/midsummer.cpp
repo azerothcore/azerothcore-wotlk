@@ -31,6 +31,7 @@
 
 enum eBonfire
 {
+    GO_MIDSUMMER_BONFIRE_SPELL_FOCUS            = 181371,
     GO_MIDSUMMER_BONFIRE_CAMPFIRE_SPELL_FOCUS   = 181377,
     GO_AHUNE_BONFIRE                            = 188073,
 
@@ -182,6 +183,10 @@ struct npc_midsummer_bonfire : public ScriptedAI
 {
     npc_midsummer_bonfire(Creature* creature) : ScriptedAI(creature)
     {
+        //  Midsummer Bonfire Spawn Trap also spawns this NPC (currently unwanted)
+        if (me->ToTempSummon())
+            me->DespawnOrUnsummon();
+
         _isStampedOut  = nullptr;
         _teamId     = TEAM_NEUTRAL;
         _type       = BONFIRE_TYPE_NONE;
@@ -300,6 +305,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
             if ((_bonfire = me->FindNearestGameObject(GoBonfireCity[i], 10.0f)))
             {
                 _type = BONFIRE_TYPE_CITY;
+                Ignite();
                 return true;
             }
         }
@@ -360,6 +366,23 @@ private:
     uint8 _type;
     GameObject* _spellFocus;
     GameObject* _bonfire;
+};
+
+struct npc_midsummer_bonfire_despawner : public ScriptedAI
+{
+    npc_midsummer_bonfire_despawner(Creature* creature) : ScriptedAI(creature)
+    {
+        std::list<GameObject*> gobjList;
+        me->GetGameObjectListWithEntryInGrid(gobjList, GO_MIDSUMMER_BONFIRE_SPELL_FOCUS, 10.0f);
+        for (std::list<GameObject*>::const_iterator itr = gobjList.begin(); itr != gobjList.end(); ++itr)
+        {
+            // spawnID is 0 for temp spawns
+            if (0 == (*itr)->GetSpawnId())
+                (*itr)->DespawnOrUnsummon();
+        }
+
+        me->DespawnOrUnsummon();
+    }
 };
 
 enum torchToss
@@ -1265,6 +1288,7 @@ void AddSC_event_midsummer_scripts()
 
     // NPCs
     RegisterCreatureAI(npc_midsummer_bonfire);
+    RegisterCreatureAI(npc_midsummer_bonfire_despawner);
     RegisterCreatureAI(npc_midsummer_torch_target);
     RegisterCreatureAI(npc_midsummer_ribbon_pole_target);
 

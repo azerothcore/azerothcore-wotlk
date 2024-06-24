@@ -208,107 +208,79 @@ public:
     };
 };
 
-class spell_tharon_ja_curse_of_life : public SpellScriptLoader
+class spell_tharon_ja_curse_of_life_aura : public AuraScript
 {
-public:
-    spell_tharon_ja_curse_of_life() : SpellScriptLoader("spell_tharon_ja_curse_of_life") { }
+    PrepareAuraScript(spell_tharon_ja_curse_of_life_aura);
 
-    class spell_tharon_ja_curse_of_life_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_tharon_ja_curse_of_life_AuraScript);
-
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
+        if (GetUnitOwner()->HealthBelowPct(50))
         {
-            if (GetUnitOwner()->HealthBelowPct(50))
-            {
-                PreventDefaultAction();
-                SetDuration(0);
-            }
+            PreventDefaultAction();
+            SetDuration(0);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_tharon_ja_curse_of_life_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_tharon_ja_curse_of_life_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_tharon_ja_curse_of_life_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
-class spell_tharon_ja_dummy : public SpellScriptLoader
+class spell_tharon_ja_dummy_aura : public AuraScript
 {
-public:
-    spell_tharon_ja_dummy() : SpellScriptLoader("spell_tharon_ja_dummy") { }
+    PrepareAuraScript(spell_tharon_ja_dummy_aura);
 
-    class spell_tharon_ja_dummy_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_tharon_ja_dummy_AuraScript)
+        return ValidateSpellInfo({ SPELL_FLESH_VISUAL, SPELL_GIFT_OF_THARON_JA, SPELL_TURN_BONES });
+    }
 
-        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FLESH_VISUAL, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_GIFT_OF_THARON_JA, true);
-            GetUnitOwner()->SetDisplayId(GetUnitOwner()->GetNativeDisplayId() + 1);
-        }
-
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->GetThreatMgr().ResetAllThreat();
-            GetUnitOwner()->GetMotionMaster()->Clear();
-            GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_TURN_BONES, false);
-            GetUnitOwner()->GetAI()->DoAction(ACTION_TURN_BONES);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_tharon_ja_dummy_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_tharon_ja_dummy_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_tharon_ja_dummy_AuraScript();
+        PreventDefaultAction();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FLESH_VISUAL, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_GIFT_OF_THARON_JA, true);
+        GetUnitOwner()->SetDisplayId(GetUnitOwner()->GetNativeDisplayId() + 1);
+    }
+
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        PreventDefaultAction();
+        GetUnitOwner()->GetThreatMgr().ResetAllThreat();
+        GetUnitOwner()->GetMotionMaster()->Clear();
+        GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_TURN_BONES, false);
+        GetUnitOwner()->GetAI()->DoAction(ACTION_TURN_BONES);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_tharon_ja_dummy_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_tharon_ja_dummy_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_tharon_ja_clear_gift_of_tharon_ja : public SpellScriptLoader
+class spell_tharon_ja_clear_gift_of_tharon_ja : public SpellScript
 {
-public:
-    spell_tharon_ja_clear_gift_of_tharon_ja() : SpellScriptLoader("spell_tharon_ja_clear_gift_of_tharon_ja") { }
+    PrepareSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja);
 
-    class spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript);
+        if (Unit* target = GetHitUnit())
+            target->RemoveAura(SPELL_GIFT_OF_THARON_JA);
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->RemoveAura(SPELL_GIFT_OF_THARON_JA);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_tharon_ja_clear_gift_of_tharon_ja::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_boss_tharon_ja()
 {
     new boss_tharon_ja();
-    new spell_tharon_ja_curse_of_life();
-    new spell_tharon_ja_dummy();
-    new spell_tharon_ja_clear_gift_of_tharon_ja();
+    RegisterSpellScript(spell_tharon_ja_curse_of_life_aura);
+    RegisterSpellScript(spell_tharon_ja_dummy_aura);
+    RegisterSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja);
 }
 

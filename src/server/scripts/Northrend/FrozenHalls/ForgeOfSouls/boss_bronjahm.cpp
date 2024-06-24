@@ -47,6 +47,7 @@ enum eSpells
     SPELL_TELEPORT_VISUAL           = 52096,
 
     SPELL_SOULSTORM_VISUAL          = 68870,
+    SPELL_SOULSTORM_VISUAL2         = 68904,
     SPELL_SOULSTORM                 = 68872,
 };
 
@@ -263,136 +264,102 @@ public:
     }
 };
 
-class spell_bronjahm_magic_bane : public SpellScriptLoader
+class spell_bronjahm_magic_bane : public SpellScript
 {
-public:
-    spell_bronjahm_magic_bane() :  SpellScriptLoader("spell_bronjahm_magic_bane") { }
+    PrepareSpellScript(spell_bronjahm_magic_bane);
 
-    class spell_bronjahm_magic_bane_SpellScript : public SpellScript
+    void RecalculateDamage()
     {
-        PrepareSpellScript(spell_bronjahm_magic_bane_SpellScript);
+        if (GetHitUnit()->getPowerType() != POWER_MANA)
+            return;
 
-        void RecalculateDamage()
+        if (Unit* caster = GetCaster())
         {
-            if (GetHitUnit()->getPowerType() != POWER_MANA)
-                return;
+            const int32 maxDamage = caster->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
+            int32 newDamage = GetHitDamage();
+            newDamage += GetHitUnit()->GetMaxPower(POWER_MANA) / 2;
+            newDamage = std::min<int32>(maxDamage, newDamage);
 
-            if (Unit* caster = GetCaster())
-            {
-                const int32 maxDamage = caster->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
-                int32 newDamage = GetHitDamage();
-                newDamage += GetHitUnit()->GetMaxPower(POWER_MANA) / 2;
-                newDamage = std::min<int32>(maxDamage, newDamage);
-
-                SetHitDamage(newDamage);
-            }
+            SetHitDamage(newDamage);
         }
+    }
 
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_bronjahm_magic_bane_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_bronjahm_magic_bane_SpellScript();
+        OnHit += SpellHitFn(spell_bronjahm_magic_bane::RecalculateDamage);
     }
 };
 
-class spell_bronjahm_soulstorm_channel_ooc : public SpellScriptLoader
+class spell_bronjahm_soulstorm_channel_ooc_aura : public AuraScript
 {
-public:
-    spell_bronjahm_soulstorm_channel_ooc() : SpellScriptLoader("spell_bronjahm_soulstorm_channel_ooc") { }
+    PrepareAuraScript(spell_bronjahm_soulstorm_channel_ooc_aura);
 
-    class spell_bronjahm_soulstorm_channel_ooc_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_bronjahm_soulstorm_channel_ooc_AuraScript);
+        return ValidateSpellInfo({ SPELL_SOULSTORM_VISUAL2, SPELL_SOULSTORM_VISUAL2+1, SPELL_SOULSTORM_VISUAL2+2, SPELL_SOULSTORM_VISUAL2+3 });
+    }
 
-        void HandlePeriodicTick(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), 68904 + (aurEff->GetTickNumber() % 4), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_bronjahm_soulstorm_channel_ooc_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodicTick(AuraEffect const* aurEff)
     {
-        return new spell_bronjahm_soulstorm_channel_ooc_AuraScript();
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), SPELL_SOULSTORM_VISUAL2 + (aurEff->GetTickNumber() % 4), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_bronjahm_soulstorm_channel_ooc_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_bronjahm_soulstorm_visual : public SpellScriptLoader
+class spell_bronjahm_soulstorm_visual_aura : public AuraScript
 {
-public:
-    spell_bronjahm_soulstorm_visual() : SpellScriptLoader("spell_bronjahm_soulstorm_visual") { }
+    PrepareAuraScript(spell_bronjahm_soulstorm_visual_aura);
 
-    class spell_bronjahm_soulstorm_visual_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_bronjahm_soulstorm_visual_AuraScript);
+        return ValidateSpellInfo({ 68886, 68896, 68897, 68898 });
+    }
 
-        void HandlePeriodicTick(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            uint32 spellId = 0;
-            switch (aurEff->GetTickNumber() % 4)
-            {
-                case 0:
-                    spellId = 68886;
-                    break;
-                case 1:
-                    spellId = 68896;
-                    break;
-                case 2:
-                    spellId = 68897;
-                    break;
-                case 3:
-                    spellId = 68898;
-                    break;
-            }
-            GetTarget()->CastSpell(GetTarget(), spellId, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_bronjahm_soulstorm_visual_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodicTick(AuraEffect const* aurEff)
     {
-        return new spell_bronjahm_soulstorm_visual_AuraScript();
+        PreventDefaultAction();
+        uint32 spellId = 0;
+        switch (aurEff->GetTickNumber() % 4)
+        {
+            case 0:
+                spellId = 68886;
+                break;
+            case 1:
+                spellId = 68896;
+                break;
+            case 2:
+                spellId = 68897;
+                break;
+            case 3:
+                spellId = 68898;
+                break;
+        }
+        GetTarget()->CastSpell(GetTarget(), spellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_bronjahm_soulstorm_visual_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_bronjahm_soulstorm_targeting : public SpellScriptLoader
+class spell_bronjahm_soulstorm_targeting : public SpellScript
 {
-public:
-    spell_bronjahm_soulstorm_targeting() : SpellScriptLoader("spell_bronjahm_soulstorm_targeting") { }
+    PrepareSpellScript(spell_bronjahm_soulstorm_targeting);
 
-    class spell_bronjahm_soulstorm_targeting_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_bronjahm_soulstorm_targeting_SpellScript);
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f, false));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f, false));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bronjahm_soulstorm_targeting_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_bronjahm_soulstorm_targeting_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_bronjahm_soulstorm_targeting::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
@@ -401,9 +368,9 @@ void AddSC_boss_bronjahm()
     new boss_bronjahm();
     new npc_fos_corrupted_soul_fragment();
 
-    new spell_bronjahm_magic_bane();
-    new spell_bronjahm_soulstorm_channel_ooc();
-    new spell_bronjahm_soulstorm_visual();
-    new spell_bronjahm_soulstorm_targeting();
+    RegisterSpellScript(spell_bronjahm_magic_bane);
+    RegisterSpellScript(spell_bronjahm_soulstorm_channel_ooc_aura);
+    RegisterSpellScript(spell_bronjahm_soulstorm_visual_aura);
+    RegisterSpellScript(spell_bronjahm_soulstorm_targeting);
 }
 

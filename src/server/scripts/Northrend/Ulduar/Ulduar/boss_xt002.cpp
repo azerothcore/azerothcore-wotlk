@@ -882,7 +882,7 @@ class spell_xt002_tympanic_tantrum : public SpellScript
 // 64234, 63024 - Gravity Bomb
 enum GravityBomb
 {
-    SPELL_GRAVTY_BOMB_10 = 63025
+    SPELL_GRAVITY_BOMB_TRIGGER_10 = 63025
 };
 
 class spell_xt002_gravity_bomb : public SpellScript
@@ -917,7 +917,7 @@ class spell_xt002_gravity_bomb_aura : public AuraScript
                 if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
                     if (Creature* creature = xt002->SummonCreature(NPC_VOID_ZONE, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000))
                     {
-                        int32 damage = GetSpellInfo()->Id == SPELL_GRAVTY_BOMB_10 ? 5000 : 7500;
+                        int32 damage = GetSpellInfo()->Id ==  SPELL_GRAVITY_BOMB_TRIGGER_10 ? 5000 : 7500;
                         creature->CastCustomSpell(creature, SPELL_VOID_ZONE_DAMAGE, &damage, 0, 0, true);
                     }
     }

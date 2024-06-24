@@ -156,6 +156,8 @@ public:
             {
                 case GO_DOOR_HALAZZI:
                     HalazziDoorGUID = go->GetGUID();
+                    if (GetBossState(DATA_HALAZZIEVENT) == DONE)
+                        go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case GO_GATE_ZULJIN:
                     ZulJinGateGUID = go->GetGUID();
@@ -216,7 +218,7 @@ public:
 
         void CheckInstanceStatus()
         {
-            if (BossKilled >= DATA_HALAZZIEVENT)
+            if (BossKilled >= DATA_HALAZZIEVENT)     //chang >= to > because first door gate is a ext boss
                 HandleGameObject(HexLordGateGUID, true);
 
             if (BossKilled >= DATA_HEXLORDEVENT)
@@ -275,9 +277,9 @@ public:
                         {
                             QuestMinute += 15;
                             DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
-                        }
-                        SummonHostage(0);
-                        SaveToDB();
+                            SummonHostage(0);
+                            ++BossKilled;
+						}
                     }
                     break;
                 case DATA_AKILZONEVENT:
@@ -289,22 +291,29 @@ public:
                         {
                             QuestMinute += 10;
                             DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, QuestMinute);
+                            SummonHostage(1);
+                            ++BossKilled;
                         }
-                        SummonHostage(1);
-                        SaveToDB();
                     }
                     break;
                 case DATA_JANALAIEVENT:
                     m_auiEncounter[DATA_JANALAIEVENT] = data;
                     if (data == DONE)
+					{
                         SummonHostage(2);
-                    SaveToDB();
+                        ++BossKilled;
+					}
+
                     break;
                 case DATA_HALAZZIEVENT:
                     m_auiEncounter[DATA_HALAZZIEVENT] = data;
-                    HandleGameObject(HalazziDoorGUID, data != IN_PROGRESS);
-                    if (data == DONE) SummonHostage(3);
-                    SaveToDB();
+                    //HandleGameObject(HalazziDoorGUID, data != IN_PROGRESS);
+                    if (data == DONE)
+                    {
+                        SummonHostage(3);
+                        HandleGameObject(HalazziDoorGUID, true);
+                        ++BossKilled;
+                    }
                     break;
                 case DATA_HEXLORDEVENT:
                     m_auiEncounter[DATA_HEXLORDEVENT] = data;
@@ -312,7 +321,8 @@ public:
                         HandleGameObject(HexLordGateGUID, false);
                     else if (data == NOT_STARTED)
                         CheckInstanceStatus();
-                    SaveToDB();
+                    else if (data == DONE)
+                        ++BossKilled;
                     break;
                 case DATA_ZULJINEVENT:
                     m_auiEncounter[DATA_ZULJINEVENT] = data;
@@ -333,8 +343,7 @@ public:
 
             if (data == DONE)
             {
-                ++BossKilled;
-                if (QuestMinute && BossKilled > DATA_HALAZZIEVENT)
+                if (QuestMinute && BossKilled >= DATA_HALAZZIEVENT)
                 {
                     QuestMinute = 0;
                     DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);

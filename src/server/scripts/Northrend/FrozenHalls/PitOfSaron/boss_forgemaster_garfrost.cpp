@@ -299,78 +299,67 @@ public:
     }
 };
 
-class spell_garfrost_permafrost : public SpellScriptLoader
+class spell_garfrost_permafrost : public SpellScript
 {
-public:
-    spell_garfrost_permafrost() : SpellScriptLoader("spell_garfrost_permafrost") { }
+    PrepareSpellScript(spell_garfrost_permafrost);
 
-    class spell_garfrost_permafrost_SpellScript : public SpellScript
+    std::list<WorldObject*> targetList;
+
+    void Unload() override
     {
-        PrepareSpellScript(spell_garfrost_permafrost_SpellScript);
+        targetList.clear();
+    }
 
-        std::list<WorldObject*> targetList;
-
-        void Unload() override
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (Unit* caster = GetCaster())
         {
-            targetList.clear();
-        }
+            std::list<GameObject*> blockList;
+            caster->GetGameObjectListWithEntryInGrid(blockList, GO_SARONITE_ROCK, 100.0f);
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            if (Unit* caster = GetCaster())
+            if (!blockList.empty())
             {
-                std::list<GameObject*> blockList;
-                caster->GetGameObjectListWithEntryInGrid(blockList, GO_SARONITE_ROCK, 100.0f);
-
-                if (!blockList.empty())
-                {
-                    for (std::list<WorldObject*>::iterator itrU = targets.begin(); itrU != targets.end(); ++itrU)
-                        if (WorldObject* target = (*itrU))
+                for (std::list<WorldObject*>::iterator itrU = targets.begin(); itrU != targets.end(); ++itrU)
+                    if (WorldObject* target = (*itrU))
+                    {
+                        bool valid = true;
+                        if (!caster->IsWithinMeleeRange(target->ToUnit()))
+                            for (std::list<GameObject*>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
+                                if (!(*itr)->IsInvisibleDueToDespawn())
+                                    if ((*itr)->IsInBetween(caster, target, 4.0f))
+                                    {
+                                        valid = false;
+                                        break;
+                                    }
+                        if (valid)
                         {
-                            bool valid = true;
-                            if (!caster->IsWithinMeleeRange(target->ToUnit()))
-                                for (std::list<GameObject*>::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
-                                    if (!(*itr)->IsInvisibleDueToDespawn())
-                                        if ((*itr)->IsInBetween(caster, target, 4.0f))
-                                        {
-                                            valid = false;
-                                            break;
-                                        }
-                            if (valid)
-                            {
-                                if (Aura* aur = target->ToUnit()->GetAura(70336))
-                                    if (aur->GetStackAmount() >= 10 && caster->GetTypeId() == TYPEID_UNIT)
-                                        caster->ToCreature()->AI()->SetData(1, aur->GetStackAmount());
-                                targetList.push_back(*itrU);
-                            }
+                            if (Aura* aur = target->ToUnit()->GetAura(70336))
+                                if (aur->GetStackAmount() >= 10 && caster->GetTypeId() == TYPEID_UNIT)
+                                    caster->ToCreature()->AI()->SetData(1, aur->GetStackAmount());
+                            targetList.push_back(*itrU);
                         }
-                }
-                else
-                {
-                    targetList = targets;
-                    return;
-                }
+                    }
             }
-
-            targets = targetList;
+            else
+            {
+                targetList = targets;
+                return;
+            }
         }
 
-        void FilterTargetsNext(std::list<WorldObject*>& targets)
-        {
-            targets = targetList;
-        }
+        targets = targetList;
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost_SpellScript::FilterTargetsNext, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost_SpellScript::FilterTargetsNext, EFFECT_2, TARGET_UNIT_DEST_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargetsNext(std::list<WorldObject*>& targets)
     {
-        return new spell_garfrost_permafrost_SpellScript();
+        targets = targetList;
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost::FilterTargetsNext, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_garfrost_permafrost::FilterTargetsNext, EFFECT_2, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
@@ -378,6 +367,6 @@ void AddSC_boss_garfrost()
 {
     new boss_garfrost();
 
-    new spell_garfrost_permafrost();
+    RegisterSpellScript(spell_garfrost_permafrost);
 }
 
