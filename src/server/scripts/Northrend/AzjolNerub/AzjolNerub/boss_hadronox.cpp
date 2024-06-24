@@ -407,9 +407,9 @@ void AddSC_boss_hadronox()
 {
     new boss_hadronox();
     new npc_anub_ar_crusher();
-    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion", 15000, SPELL_SUMMON_ANUBAR_CHAMPION);
-    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer", 10000, SPELL_SUMMON_ANUBAR_NECROMANCER);
-    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend", 5000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion_aura", 15000, SPELL_SUMMON_ANUBAR_CHAMPION);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer_aura", 10000, SPELL_SUMMON_ANUBAR_NECROMANCER);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend_aura", 5000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
     RegisterSpellScript(spell_hadronox_leech_poison_aura);
     new achievement_hadronox_denied();
 }
