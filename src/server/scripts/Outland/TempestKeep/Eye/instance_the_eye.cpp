@@ -145,37 +145,26 @@ public:
     }
 };
 
-class spell_the_eye_countercharge : public SpellScriptLoader
+class spell_the_eye_countercharge_aura : public AuraScript
 {
-public:
-    spell_the_eye_countercharge() : SpellScriptLoader("spell_the_eye_countercharge") { }
+    PrepareAuraScript(spell_the_eye_countercharge_aura);
 
-    class spell_the_eye_counterchargeScript : public AuraScript
+    bool PrepareProc(ProcEventInfo&  /*eventInfo*/)
     {
-        PrepareAuraScript(spell_the_eye_counterchargeScript);
+        // xinef: prevent charge drop
+        PreventDefaultAction();
+        return true;
+    }
 
-        bool PrepareProc(ProcEventInfo&  /*eventInfo*/)
-        {
-            // xinef: prevent charge drop
-            PreventDefaultAction();
-            return true;
-        }
-
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_the_eye_counterchargeScript::PrepareProc);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_the_eye_counterchargeScript();
+        DoCheckProc += AuraCheckProcFn(spell_the_eye_countercharge_aura::PrepareProc);
     }
 };
 
 void AddSC_instance_the_eye()
 {
     new instance_the_eye();
-    new spell_the_eye_countercharge();
+    RegisterSpellScript(spell_the_eye_countercharge_aura);
 }
 
