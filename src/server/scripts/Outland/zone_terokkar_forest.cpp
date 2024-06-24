@@ -75,53 +75,42 @@ class spell_q10930_big_bone_worm_aura : public AuraScript
     }
 };
 
-class spell_q10929_fumping : SpellScriptLoader
+class spell_q10929_fumping : public SpellScript
 {
-public:
-    spell_q10929_fumping() : SpellScriptLoader("spell_q10929_fumping") { }
+    PrepareSpellScript(spell_q10929_fumping);
 
-    class spell_q10929_fumping_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_q10929_fumping_SpellScript);
-
-        void SetDest(SpellDestination& dest)
-        {
-            Position const offset = { 0.5f, 0.5f, 5.0f, 0.0f };
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10929_fumping_SpellScript::SetDest, EFFECT_1, TARGET_DEST_CASTER);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_q10929_fumping_SpellScript();
+        Position const offset = { 0.5f, 0.5f, 5.0f, 0.0f };
+        dest.RelocateOffset(offset);
     }
 
-    class spell_q10929_fumping_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_q10929_fumping_AuraScript);
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q10929_fumping::SetDest, EFFECT_1, TARGET_DEST_CASTER);
+    }
+};
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
-                return;
+class spell_q10929_fumping_aura : public AuraScript
+{
+    PrepareAuraScript(spell_q10929_fumping_aura);
 
-            GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_SAND_GNOME1, SPELL_SUMMON_SAND_GNOME3, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_q10929_fumping_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return new spell_q10929_fumping_AuraScript();
+        return ValidateSpellInfo({ SPELL_SUMMON_SAND_GNOME1, SPELL_SUMMON_SAND_GNOME3, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3 });
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_SAND_GNOME1, SPELL_SUMMON_SAND_GNOME3, SPELL_SUMMON_MATURE_BONE_SIFTER1, SPELL_SUMMON_MATURE_BONE_SIFTER3), true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_q10929_fumping_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -646,7 +635,7 @@ void AddSC_terokkar_forest()
 {
     // Ours
     RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
-    new spell_q10929_fumping();
+    RegisterSpellAndAuraScriptPair(spell_q10929_fumping, spell_q10929_fumping_aura);
     new npc_greatfather_aldrimus();
     RegisterSpellScript(spell_q10036_torgos);
     RegisterSpellScript(spell_q10923_evil_draws_near_summon);
