@@ -161,6 +161,10 @@ runs:
         # ! -s checks if the file's size is less than/equal to 0 bytes
         # if the error log is empty, exit without error
         printf "Hey KI tzunu\n\n"
+        ls -la
+        printf "Hey again"
+        ls -la env/dist/bin
+        print "Hola"
         if [[ ! -s "$error_log" ]]; then
           exit 0
         fi        
