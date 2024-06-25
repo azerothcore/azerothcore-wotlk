@@ -4804,6 +4804,48 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
     });
 
+    // Unholy Frenzy
+    ApplySpellFix({ 31626 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RecoveryTime = 5000;
+        spellInfo->CategoryRecoveryTime = 5000;
+    });
+
+    // World Breaker, Destroy Deathforged Infernal
+    ApplySpellFix({ 38006, 38055 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RecoveryTime = 10000;
+        spellInfo->CategoryRecoveryTime = 10000;
+    });
+
+    // Heroism, Bloodlust, Sonic Boom
+    ApplySpellFix({ 37471, 37472, 38052 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RecoveryTime = 15000;
+        spellInfo->CategoryRecoveryTime = 15000;
+    });
+
+    // Healing, Shadowmend
+    ApplySpellFix({ 37455, 37456 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RecoveryTime = 20000;
+        spellInfo->CategoryRecoveryTime = 20000;
+    });
+
+    // Turbo Boost
+    ApplySpellFix({ 37920 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RecoveryTime = 30000;
+        spellInfo->CategoryRecoveryTime = 30000;
+    });
+
+    // Raise Dead
+    ApplySpellFix({ 34019 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RecoveryTime = 60000;
+        spellInfo->CategoryRecoveryTime = 60000;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

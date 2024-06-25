@@ -753,9 +753,6 @@ public:
     // Talent Additional Set
     [[nodiscard]] bool IsAdditionalTalentSpell(uint32 spellId) const;
 
-    [[nodiscard]] bool HasSpellCooldownOverride(uint32 spellId) const;
-    [[nodiscard]] SpellCooldownOverride GetSpellCooldownOverride(uint32 spellId) const;
-
 private:
     SpellInfo* _GetSpellInfo(uint32 spellId) { return spellId < GetSpellInfoStoreSize() ? mSpellInfoMap[spellId] : nullptr; }
 
@@ -784,7 +781,6 @@ public:
     void LoadPetDefaultSpells();
     void LoadSpellAreas();
     void LoadSpellInfoStore();
-    void LoadSpellCooldownOverrides();
     void UnloadSpellInfoStore();
     void UnloadSpellInfoImplicitTargetConditionLists();
     void LoadSpellInfoCustomAttributes();
