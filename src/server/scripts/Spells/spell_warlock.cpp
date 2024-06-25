@@ -705,9 +705,19 @@ class spell_warl_seed_of_corruption : public SpellScript
 };
 
 // -27243 - Seed of Corruption
+// Monster spells, triggered only on amount drop (not on death)
+// 32863 - Seed of Corruption
+// 36123 - Seed of Corruption
+// 38252 - Seed of Corruption
+// 39367 - Seed of Corruption
+// 44141 - Seed of Corruption
+// 70388 - Seed of Corruption
 class spell_warl_seed_of_corruption_aura: public AuraScript
 {
     PrepareAuraScript(spell_warl_seed_of_corruption_aura);
+
+public:
+    spell_warl_seed_of_corruption_aura(bool isGeneric) : _isGeneric(isGeneric) { }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
@@ -715,18 +725,18 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
             SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1,
             SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R2,
             SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R3,
+            SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC,
             SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL
         });
     }
 
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
-        Unit* caster = GetCaster();
-        if (!caster)
+        if (!GetCaster() || _isGeneric)
             return;
 
         // effect 1 scales with 14% of caster's SP (DBC data)
-        amount = caster->SpellDamageBonusDone(GetUnitOwner(), GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE, aurEff->GetEffIndex(), aurEff->GetPctMods());
+        amount = GetCaster()->SpellDamageBonusDone(GetUnitOwner(), GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE, aurEff->GetEffIndex(), aurEff->GetPctMods());
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -739,7 +749,7 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
         int32 amount = aurEff->GetAmount() - damageInfo->GetDamage();
         if (amount > 0)
         {
-            const_cast<AuraEffect*>(aurEff)->SetAmount(amount);
+            GetAura()->GetEffect(EFFECT_1)->SetAmount(amount);
             if (!GetTarget()->HealthBelowPctDamaged(1, damageInfo->GetDamage()))
                 return;
         }
@@ -752,10 +762,18 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
             return;
 
         AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
-        if ((removeMode != AURA_REMOVE_BY_DEATH && removeMode != AURA_REMOVE_BY_DEFAULT) || IsExpired())
+        if (IsExpired() || (removeMode != AURA_REMOVE_BY_DEFAULT && (_isGeneric || removeMode != AURA_REMOVE_BY_DEATH)))
             return;
 
-        GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
+        if (_isGeneric)
+        {
+            uint32 bp1 = GetSpellInfo()->GetEffect(EFFECT_1).CalcValue();
+            GetCaster()->CastCustomSpell(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELLVALUE_BASE_POINT0, bp1, GetTarget(), true, nullptr, aurEff);
+        }
+        else
+        {
+            GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
+        }
         GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
     }
 
@@ -765,63 +783,9 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_seed_of_corruption_aura::CalculateAmount, EFFECT_1, SPELL_AURA_DUMMY);
         OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
-};
 
-// 32863 - Seed of Corruption
-// 36123 - Seed of Corruption
-// 38252 - Seed of Corruption
-// 39367 - Seed of Corruption
-// 44141 - Seed of Corruption
-// 70388 - Seed of Corruption
-// Monster spells, triggered only on amount drop (not on death)
-class spell_warl_seed_of_corruption_generic_aura: public AuraScript
-{
-    PrepareAuraScript(spell_warl_seed_of_corruption_generic_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({
-            SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC,
-            SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL
-        });
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        if (!damageInfo || !damageInfo->GetDamage())
-            return;
-
-        int32 amount = aurEff->GetAmount() - damageInfo->GetDamage();
-        if (amount > 0)
-        {
-            const_cast<AuraEffect*>(aurEff)->SetAmount(amount);
-            if (!GetTarget()->HealthBelowPctDamaged(1, damageInfo->GetDamage()))
-                return;
-        }
-        Remove(AURA_REMOVE_BY_DEFAULT);
-    }
-
-    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-    {
-        if (!GetCaster())
-            return;
-
-        AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
-        if ((removeMode != AURA_REMOVE_BY_DEFAULT) || IsExpired())
-            return;
-
-        uint32 bp1 = GetSpellInfo()->GetEffect(EFFECT_1).CalcValue();
-        GetCaster()->CastCustomSpell(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELLVALUE_BASE_POINT0, bp1, GetTarget(), true, nullptr, aurEff);
-        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
-    }
-
-    void Register() override
-    {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_warl_seed_of_corruption_generic_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_generic_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
-    }
+private:
+    bool _isGeneric;
 };
 
 // 29858 - Soulshatter
@@ -1471,8 +1435,8 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_life_tap);
     RegisterSpellScript(spell_warl_ritual_of_doom_effect);
     RegisterSpellScript(spell_warl_seed_of_corruption);
-    RegisterSpellScript(spell_warl_seed_of_corruption_aura);
-    RegisterSpellScript(spell_warl_seed_of_corruption_generic_aura);
+    RegisterSpellScriptWithArgs(spell_warl_seed_of_corruption_aura, "spell_warl_seed_of_corruption_aura", false);
+    RegisterSpellScriptWithArgs(spell_warl_seed_of_corruption_aura, "spell_warl_seed_of_corruption_generic_aura", true);
     RegisterSpellScript(spell_warl_shadow_ward);
     RegisterSpellScript(spell_warl_siphon_life);
     RegisterSpellScript(spell_warl_soulshatter);
