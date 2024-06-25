@@ -762,7 +762,7 @@ public:
             return;
 
         AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
-        if (IsExpired() || (removeMode != AURA_REMOVE_BY_DEFAULT && (_isGeneric || removeMode != AURA_REMOVE_BY_DEATH)))
+        if (removeMode != AURA_REMOVE_BY_DEFAULT && (_isGeneric || removeMode != AURA_REMOVE_BY_DEATH))
             return;
 
         if (_isGeneric)
