@@ -1,4 +1,6 @@
 --
+DELETE FROM `spell_script_names` WHERE `spell_id` = 32865;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES(32865, 'spell_warl_seed_of_corruption');
 DELETE FROM `spell_script_names` WHERE `spell_id` = -27243;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES(-27243, 'spell_warl_seed_of_corruption_aura');
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (32863, 38252, 44141, 70388);
