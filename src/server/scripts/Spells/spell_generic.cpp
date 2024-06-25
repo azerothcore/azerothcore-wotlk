@@ -5199,7 +5199,6 @@ class spell_gen_consumption : public SpellScript
     }
 };
 
-
 // 37591 - Drunken Haze | 29690 - Drunken Skull Crack
 enum DrunkenHaze
 {
