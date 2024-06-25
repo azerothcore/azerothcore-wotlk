@@ -1,3 +1,4 @@
+-- DB update 2024_06_25_02 -> 2024_06_25_03
 -- adjust chances in tbc reference
 UPDATE `reference_loot_template` SET `Chance` = 2 WHERE `Reference` = 11114 AND `Item` = 34834; -- lager
 UPDATE `reference_loot_template` SET `Chance` = 2 WHERE `Reference` = 11114 AND `Item` = 34836; -- line
