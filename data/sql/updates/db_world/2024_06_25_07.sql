@@ -1,3 +1,4 @@
+-- DB update 2024_06_25_06 -> 2024_06_25_07
 -- Kirin'Var Apprentice
 UPDATE `creature_template_addon` SET `auras` = '33900' WHERE (`entry` = 20409);
 UPDATE `creature_addon` SET `auras` = '33900' WHERE `guid` IN (72371, 72374, 72375, 72377, 72378, 72379);

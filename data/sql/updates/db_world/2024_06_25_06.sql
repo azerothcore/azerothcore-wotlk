@@ -1,3 +1,4 @@
+-- DB update 2024_06_25_05 -> 2024_06_25_06
 -- Durnholde Lodges (First one was already linked)
 -- "Additional NPCs" 83958 & 83934
 UPDATE `creature_formations` SET `groupAI` = 3 WHERE `leaderGUID` = 83929;

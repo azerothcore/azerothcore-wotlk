@@ -1,3 +1,4 @@
+-- DB update 2024_06_25_04 -> 2024_06_25_05
 -- Lashh'an Kalir & Lashh'an Talonite
 DELETE FROM `creature` WHERE (`id1` = 20109);
 

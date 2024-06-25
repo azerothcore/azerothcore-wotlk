@@ -1,3 +1,4 @@
+-- DB update 2024_06_25_03 -> 2024_06_25_04
 -- loot cleanup
 DELETE FROM `creature_loot_template` WHERE `Entry` = 20784 AND `Item` = 31943; -- Armbreaker Huffaz
 DELETE FROM `creature_loot_template` WHERE `Entry` = 20785 AND `Item` = 31573; -- Fel Tinkerer Zortan
