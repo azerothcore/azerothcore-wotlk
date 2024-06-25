@@ -63,6 +63,8 @@ nbproject/
 .idea
 cmake-build-*/*
 coverage-report/
+.direnv
+result
 
 #
 # Eclipse
