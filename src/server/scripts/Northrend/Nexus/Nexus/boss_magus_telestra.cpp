@@ -230,99 +230,82 @@ public:
     };
 };
 
-class spell_boss_magus_telestra_summon_telestra_clones : public SpellScriptLoader
+class spell_boss_magus_telestra_summon_telestra_clones_aura : public AuraScript
 {
-public:
-    spell_boss_magus_telestra_summon_telestra_clones() : SpellScriptLoader("spell_boss_magus_telestra_summon_telestra_clones") { }
+    PrepareAuraScript(spell_boss_magus_telestra_summon_telestra_clones_aura);
 
-    class spell_boss_magus_telestra_summon_telestra_clones_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_boss_magus_telestra_summon_telestra_clones_AuraScript);
+        return ValidateSpellInfo({ SPELL_FIRE_MAGUS_SUMMON, SPELL_FROST_MAGUS_SUMMON, SPELL_ARCANE_MAGUS_SUMMON });
+    }
 
-        bool Load() override
-        {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FIRE_MAGUS_SUMMON, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FROST_MAGUS_SUMMON, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_ARCANE_MAGUS_SUMMON, true);
-
-            GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            GetUnitOwner()->SetControlled(true, UNIT_STATE_STUNNED);
-            GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
-        }
-
-        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            GetUnitOwner()->SetControlled(false, UNIT_STATE_STUNNED);
-            GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_boss_magus_telestra_summon_telestra_clones_AuraScript::HandleApply, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_boss_magus_telestra_summon_telestra_clones_AuraScript::HandleRemove, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Load() override
     {
-        return new spell_boss_magus_telestra_summon_telestra_clones_AuraScript();
+        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FIRE_MAGUS_SUMMON, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FROST_MAGUS_SUMMON, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_ARCANE_MAGUS_SUMMON, true);
+
+        GetUnitOwner()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetControlled(true, UNIT_STATE_STUNNED);
+        GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
+    }
+
+    void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetUnitOwner()->SetControlled(false, UNIT_STATE_STUNNED);
+        GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_boss_magus_telestra_summon_telestra_clones_aura::HandleApply, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_boss_magus_telestra_summon_telestra_clones_aura::HandleRemove, EFFECT_1, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_boss_magus_telestra_gravity_well : public SpellScriptLoader
+class spell_boss_magus_telestra_gravity_well : public SpellScript
 {
-public:
-    spell_boss_magus_telestra_gravity_well() : SpellScriptLoader("spell_boss_magus_telestra_gravity_well") { }
+    PrepareSpellScript(spell_boss_magus_telestra_gravity_well);
 
-    class spell_boss_magus_telestra_gravity_well_SpellScript : public SpellScript
+    void SelectTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_boss_magus_telestra_gravity_well_SpellScript);
+        targets.remove_if(Acore::RandomCheck(50));
+    }
 
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::RandomCheck(50));
-        }
-
-        void HandlePull(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Unit* target = GetHitUnit();
-            if (!target)
-                return;
-
-            Position pos;
-            if (target->GetDistance(GetCaster()) < 5.0f)
-            {
-                pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
-                float o = frand(0, 2 * M_PI);
-                target->MovePositionToFirstCollision(pos, 20.0f, o);
-                pos.m_positionZ += frand(5.0f, 15.0f);
-            }
-            else
-                pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
-
-            float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue) * 0.1f;
-            float speedZ = target->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
-
-            target->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_boss_magus_telestra_gravity_well_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_boss_magus_telestra_gravity_well_SpellScript::HandlePull, EFFECT_0, SPELL_EFFECT_PULL_TOWARDS_DEST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandlePull(SpellEffIndex effIndex)
     {
-        return new spell_boss_magus_telestra_gravity_well_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        Position pos;
+        if (target->GetDistance(GetCaster()) < 5.0f)
+        {
+            pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
+            float o = frand(0, 2 * M_PI);
+            target->MovePositionToFirstCollision(pos, 20.0f, o);
+            pos.m_positionZ += frand(5.0f, 15.0f);
+        }
+        else
+            pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
+
+        float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue) * 0.1f;
+        float speedZ = target->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
+
+        target->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_boss_magus_telestra_gravity_well::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_boss_magus_telestra_gravity_well::HandlePull, EFFECT_0, SPELL_EFFECT_PULL_TOWARDS_DEST);
     }
 };
 
@@ -345,7 +328,7 @@ public:
 void AddSC_boss_magus_telestra()
 {
     new boss_magus_telestra();
-    new spell_boss_magus_telestra_summon_telestra_clones();
-    new spell_boss_magus_telestra_gravity_well();
+    RegisterSpellScript(spell_boss_magus_telestra_summon_telestra_clones_aura);
+    RegisterSpellScript(spell_boss_magus_telestra_gravity_well);
     new achievement_split_personality();
 }

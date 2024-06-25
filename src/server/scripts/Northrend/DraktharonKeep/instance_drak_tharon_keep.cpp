@@ -77,67 +77,50 @@ public:
     }
 };
 
-class spell_dtk_raise_dead : public SpellScriptLoader
+class spell_dtk_raise_dead_aura : public AuraScript
 {
-public:
-    spell_dtk_raise_dead() : SpellScriptLoader("spell_dtk_raise_dead") { }
+    PrepareAuraScript(spell_dtk_raise_dead_aura);
 
-    class spell_dtk_raise_dead_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_dtk_raise_dead_AuraScript)
+        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+    }
 
-        bool Load() override
-        {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1);
-            GetUnitOwner()->SummonCreature(NPC_RISEN_DRAKKARI_WARRIOR, *GetUnitOwner());
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_dtk_raise_dead_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_dtk_raise_dead_AuraScript();
+        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1);
+        GetUnitOwner()->SummonCreature(NPC_RISEN_DRAKKARI_WARRIOR, *GetUnitOwner());
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_dtk_raise_dead_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_dtk_summon_random_drakkari : public SpellScriptLoader
+class spell_dtk_summon_random_drakkari : public SpellScript
 {
-public:
-    spell_dtk_summon_random_drakkari() : SpellScriptLoader("spell_dtk_summon_random_drakkari") { }
+    PrepareSpellScript(spell_dtk_summon_random_drakkari);
 
-    class spell_dtk_summon_random_drakkari_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_dtk_summon_random_drakkari_SpellScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_DRAKKARI_SHAMAN, SPELL_SUMMON_DRAKKARI_GUARDIAN });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            GetCaster()->CastSpell(GetCaster(), RAND(SPELL_SUMMON_DRAKKARI_SHAMAN, SPELL_SUMMON_DRAKKARI_GUARDIAN), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dtk_summon_random_drakkari_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        return new spell_dtk_summon_random_drakkari_SpellScript();
+        GetCaster()->CastSpell(GetCaster(), RAND(SPELL_SUMMON_DRAKKARI_SHAMAN, SPELL_SUMMON_DRAKKARI_GUARDIAN), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dtk_summon_random_drakkari::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_instance_drak_tharon_keep()
 {
     new instance_drak_tharon_keep();
-    new spell_dtk_raise_dead();
-    new spell_dtk_summon_random_drakkari();
+    RegisterSpellScript(spell_dtk_raise_dead_aura);
+    RegisterSpellScript(spell_dtk_summon_random_drakkari);
 }

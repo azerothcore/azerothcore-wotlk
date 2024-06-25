@@ -1157,32 +1157,21 @@ public:
 ** DESTROY DOOR SEAL SPELL SCRIPT
 ***********/
 
-class spell_destroy_door_seal : public SpellScriptLoader
+class spell_destroy_door_seal_aura : public AuraScript
 {
-public:
-    spell_destroy_door_seal() : SpellScriptLoader("spell_destroy_door_seal") { }
+    PrepareAuraScript(spell_destroy_door_seal_aura);
 
-    class spell_destroy_door_sealAuraScript : public AuraScript
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        PrepareAuraScript(spell_destroy_door_sealAuraScript)
+        PreventDefaultAction();
+        if (Unit* target = GetTarget())
+            if (InstanceScript* pInstance = target->GetInstanceScript())
+                pInstance->SetData(DATA_DECRASE_DOOR_HEALTH, 0);
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetTarget())
-                if (InstanceScript* pInstance = target->GetInstanceScript())
-                    pInstance->SetData(DATA_DECRASE_DOOR_HEALTH, 0);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_destroy_door_sealAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_destroy_door_sealAuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_destroy_door_seal_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1232,6 +1221,6 @@ void AddSC_violet_hold()
     new npc_azure_raider();
     new npc_azure_stalker();
 
-    new spell_destroy_door_seal();
+    RegisterSpellScript(spell_destroy_door_seal_aura);
     RegisterCreatureAI(npc_violet_hold_defense_system);
 }
