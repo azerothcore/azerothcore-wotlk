@@ -1,3 +1,4 @@
+-- DB update 2024_06_25_08 -> 2024_06_25_09
 -- Soulbind
 DELETE FROM `spell_scripts` WHERE `id`=36153;
 INSERT INTO `spell_scripts` (`id`, `effIndex`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES
