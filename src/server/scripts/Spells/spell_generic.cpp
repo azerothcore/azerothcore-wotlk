@@ -5236,7 +5236,7 @@ class spell_gen_sober_up : public AuraScript
             }
 
             uint16 level = aurEff->GetSpellInfo()->Effects[InebriateEffIndex].CalcValue();
-            player->SetDrunkValue(player->GetDrunkValue() - (level > 100 ? 100 : level)); // Some (maybe it's only 29690) spells can have over 100 inebriate points 
+            player->SetDrunkValue(player->GetDrunkValue() - (level > 100 ? 100 : level)); // Some (maybe it's only 29690) spells can have over 100 inebriate points
         }
     }
 
