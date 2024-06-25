@@ -736,7 +736,7 @@ public:
             return;
 
         // effect 1 scales with 14% of caster's SP (DBC data)
-        amount = GetCaster()->SpellDamageBonusDone(GetUnitOwner(), GetSpellInfo(), amount, SPELL_DIRECT_DAMAGE, aurEff->GetEffIndex(), aurEff->GetPctMods());
+        amount = GetCaster()->SpellDamageBonusDone(GetUnitOwner(), GetSpellInfo(), amount, DOT, aurEff->GetEffIndex(), aurEff->GetPctMods());
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
