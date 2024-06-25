@@ -130,6 +130,7 @@ runs:
         AC_CHARACTER_DATABASE_INFO=localhost;3306;root;root;acore_characters
         AC_WORLD_DATABASE_INFO=localhost;3306;root;root;acore_world
         AC_DATA_DIR=env/dist/bin/data
+        AC_LOGS_DIR=env/dist/logs
         EOF
 
     - name: get dbc files
@@ -147,11 +148,11 @@ runs:
 
     - name: Dry run authserver
       shell: bash
-      run: timeout 5m ./authserver --dry-run
+      run: timeout 5m env/dist/bin/authserver --dry-run
 
     - name: Dry run worldserver
       shell: bash
-      run: timeout 5m ./worldserver --dry-run
+      run: timeout 5m env/dist/bin/worldserver --dry-run
 
     - name: Check startup errors
       shell: bash
@@ -165,6 +166,7 @@ runs:
         printf "Hey again"
         ls -la env/dist/bin
         printf "Hola"
+        ls -la $AC_LOGS_DIR
         if [[ ! -s $error_log ]]; then
           exit 0
         fi        
