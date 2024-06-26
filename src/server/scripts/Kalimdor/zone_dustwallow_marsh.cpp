@@ -30,48 +30,37 @@ enum SpellScripts
     SPELL_ENERGIZED             = 42492,
 };
 
-class spell_ooze_zap : public SpellScriptLoader
+class spell_ooze_zap : public SpellScript
 {
-public:
-    spell_ooze_zap() : SpellScriptLoader("spell_ooze_zap") { }
+    PrepareSpellScript(spell_ooze_zap);
 
-    class spell_ooze_zap_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_ooze_zap_SpellScript);
+        return ValidateSpellInfo({ SPELL_OOZE_ZAP });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_OOZE_ZAP });
-        }
-
-        SpellCastResult CheckRequirement()
-        {
-            if (!GetCaster()->HasAura(GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
-                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW; // This is actually correct
-
-            if (!GetExplTargetUnit())
-                return SPELL_FAILED_BAD_TARGETS;
-
-            return SPELL_CAST_OK;
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (GetHitUnit())
-                GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            OnCheckCast += SpellCheckCastFn(spell_ooze_zap_SpellScript::CheckRequirement);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    SpellCastResult CheckRequirement()
     {
-        return new spell_ooze_zap_SpellScript();
+        if (!GetCaster()->HasAura(GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW; // This is actually correct
+
+        if (!GetExplTargetUnit())
+            return SPELL_FAILED_BAD_TARGETS;
+
+        return SPELL_CAST_OK;
+    }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (GetHitUnit())
+            GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ooze_zap::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_ooze_zap::CheckRequirement);
     }
 };
 
@@ -157,7 +146,7 @@ public:
 
 void AddSC_dustwallow_marsh()
 {
-    new spell_ooze_zap();
+    RegisterSpellScript(spell_ooze_zap);
     new spell_ooze_zap_channel_end();
     new spell_energize_aoe();
 }
