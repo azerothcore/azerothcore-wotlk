@@ -695,39 +695,33 @@ class spell_kalecgos_curse_of_boundless_agony_aura : public AuraScript
     }
 };
 
-class spell_kalecgos_spectral_realm_dummy : public SpellScriptLoader
+class spell_kalecgos_spectral_realm_dummy : public SpellScript
 {
-public:
-    spell_kalecgos_spectral_realm_dummy() : SpellScriptLoader("spell_kalecgos_spectral_realm_dummy") { }
+    PrepareSpellScript(spell_kalecgos_spectral_realm_dummy);
 
-    class spell_kalecgos_spectral_realm_dummy_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_kalecgos_spectral_realm_dummy_SpellScript);
+        return ValidateSpellInfo({ SPELL_SPECTRAL_EXHAUSTION, SPELL_TELEPORT_SPECTRAL });
+    }
 
-        SpellCastResult CheckCast()
-        {
-            if (GetCaster()->HasAura(SPELL_SPECTRAL_EXHAUSTION))
-                return SPELL_FAILED_CASTER_AURASTATE;
-
-            return SPELL_CAST_OK;
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetCaster(), SPELL_TELEPORT_SPECTRAL, true);
-        }
-
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_kalecgos_spectral_realm_dummy_SpellScript::CheckCast);
-            OnEffectHitTarget += SpellEffectFn(spell_kalecgos_spectral_realm_dummy_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    SpellCastResult CheckCast()
     {
-        return new spell_kalecgos_spectral_realm_dummy_SpellScript();
+        if (GetCaster()->HasAura(SPELL_SPECTRAL_EXHAUSTION))
+            return SPELL_FAILED_CASTER_AURASTATE;
+
+        return SPELL_CAST_OK;
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetCaster(), SPELL_TELEPORT_SPECTRAL, true);
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_kalecgos_spectral_realm_dummy::CheckCast);
+        OnEffectHitTarget += SpellEffectFn(spell_kalecgos_spectral_realm_dummy::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -765,7 +759,7 @@ void AddSC_boss_kalecgos()
     new boss_kalec();
     RegisterSpellScript(spell_kalecgos_spectral_blast_dummy);
     RegisterSpellScript(spell_kalecgos_curse_of_boundless_agony_aura);
-    new spell_kalecgos_spectral_realm_dummy();
+    RegisterSpellScript(spell_kalecgos_spectral_realm_dummy);
     new spell_kalecgos_spectral_realm();
 }
 
