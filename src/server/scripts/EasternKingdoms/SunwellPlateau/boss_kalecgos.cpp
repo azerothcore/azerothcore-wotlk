@@ -725,30 +725,24 @@ class spell_kalecgos_spectral_realm_dummy : public SpellScript
     }
 };
 
-class spell_kalecgos_spectral_realm : public SpellScriptLoader
+class spell_kalecgos_spectral_realm_aura : public AuraScript
 {
-public:
-    spell_kalecgos_spectral_realm() : SpellScriptLoader("spell_kalecgos_spectral_realm") { }
+    PrepareAuraScript(spell_kalecgos_spectral_realm_aura);
 
-    class spell_kalecgos_spectral_realm_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_kalecgos_spectral_realm_AuraScript);
+        return ValidateSpellInfo({ SPELL_SPECTRAL_EXHAUSTION, SPELL_TELEPORT_NORMAL_REALM });
+    }
 
-        void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SPECTRAL_EXHAUSTION, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_TELEPORT_NORMAL_REALM, true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_kalecgos_spectral_realm_AuraScript::OnRemove, EFFECT_1, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_kalecgos_spectral_realm_AuraScript();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SPECTRAL_EXHAUSTION, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_TELEPORT_NORMAL_REALM, true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_kalecgos_spectral_realm_aura::OnRemove, EFFECT_1, SPELL_AURA_MOD_INVISIBILITY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -760,6 +754,6 @@ void AddSC_boss_kalecgos()
     RegisterSpellScript(spell_kalecgos_spectral_blast_dummy);
     RegisterSpellScript(spell_kalecgos_curse_of_boundless_agony_aura);
     RegisterSpellScript(spell_kalecgos_spectral_realm_dummy);
-    new spell_kalecgos_spectral_realm();
+    RegisterSpellScript(spell_kalecgos_spectral_realm_aura);
 }
 
