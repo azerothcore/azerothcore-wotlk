@@ -438,45 +438,34 @@ enum VoodooSpells
 };
 
 // 17009
-class spell_voodoo : public SpellScriptLoader
+class spell_voodoo : public SpellScript
 {
-public:
-    spell_voodoo() : SpellScriptLoader("spell_voodoo") { }
+    PrepareSpellScript(spell_voodoo);
 
-    class spell_voodoo_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_voodoo_SpellScript)
+        return ValidateSpellInfo(
+            {
+                SPELL_BREW,
+                SPELL_GHOSTLY,
+                SPELL_HEX1,
+                SPELL_HEX2,
+                SPELL_HEX3,
+                SPELL_GROW,
+                SPELL_LAUNCH
+            });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo(
-                {
-                    SPELL_BREW,
-                    SPELL_GHOSTLY,
-                    SPELL_HEX1,
-                    SPELL_HEX2,
-                    SPELL_HEX3,
-                    SPELL_GROW,
-                    SPELL_LAUNCH
-                });
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            uint32 spellid = RAND(SPELL_BREW, SPELL_GHOSTLY, RAND(SPELL_HEX1, SPELL_HEX2, SPELL_HEX3), SPELL_GROW, SPELL_LAUNCH);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, spellid, false);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_voodoo_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_voodoo_SpellScript();
+        uint32 spellid = RAND(SPELL_BREW, SPELL_GHOSTLY, RAND(SPELL_HEX1, SPELL_HEX2, SPELL_HEX3), SPELL_GROW, SPELL_LAUNCH);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, spellid, false);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_voodoo::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -487,6 +476,6 @@ void AddSC_durotar()
     new npc_troll_volunteer();
     RegisterSpellScript(spell_mount_check_aura);
     RegisterSpellScript(spell_voljin_war_drums);
-    new spell_voodoo();
+    RegisterSpellScript(spell_voodoo);
 }
 
