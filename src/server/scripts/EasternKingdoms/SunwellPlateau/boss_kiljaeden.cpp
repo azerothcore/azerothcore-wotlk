@@ -1098,30 +1098,24 @@ class spell_kiljaeden_sinister_reflection_clone : public SpellScript
     }
 };
 
-class spell_kiljaeden_flame_dart : public SpellScriptLoader
+class spell_kiljaeden_flame_dart : public SpellScript
 {
-public:
-    spell_kiljaeden_flame_dart() : SpellScriptLoader("spell_kiljaeden_flame_dart") { }
+    PrepareSpellScript(spell_kiljaeden_flame_dart);
 
-    class spell_kiljaeden_flame_dart_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_kiljaeden_flame_dart_SpellScript);
+        return ValidateSpellInfo({ SPELL_FLAME_DART_EXPLOSION });
+    }
 
-        void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, SPELL_FLAME_DART_EXPLOSION, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_flame_dart_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_kiljaeden_flame_dart_SpellScript();
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_FLAME_DART_EXPLOSION, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_flame_dart::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -1308,7 +1302,7 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_shadow_spike_aura);
     RegisterSpellScript(spell_kiljaeden_sinister_reflection);
     RegisterSpellScript(spell_kiljaeden_sinister_reflection_clone);
-    new spell_kiljaeden_flame_dart();
+    RegisterSpellScript(spell_kiljaeden_flame_dart);
     new spell_kiljaeden_darkness();
     new spell_kiljaeden_power_of_the_blue_flight();
     new spell_kiljaeden_vengeance_of_the_blue_flight();
