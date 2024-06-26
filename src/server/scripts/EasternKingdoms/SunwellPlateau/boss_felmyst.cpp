@@ -539,29 +539,18 @@ public:
     }
 };
 
-class spell_felmyst_open_brutallus_back_doors : public SpellScriptLoader
+class spell_felmyst_open_brutallus_back_doors : public SpellScript
 {
-public:
-    spell_felmyst_open_brutallus_back_doors() : SpellScriptLoader("spell_felmyst_open_brutallus_back_doors") { }
+    PrepareSpellScript(spell_felmyst_open_brutallus_back_doors);
 
-    class spell_felmyst_open_brutallus_back_doors_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        PrepareSpellScript(spell_felmyst_open_brutallus_back_doors_SpellScript);
+        unitList.remove_if(DoorsGuidCheck());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            unitList.remove_if(DoorsGuidCheck());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_felmyst_open_brutallus_back_doors_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_felmyst_open_brutallus_back_doors_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_felmyst_open_brutallus_back_doors::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
     }
 };
 
@@ -572,6 +561,6 @@ void AddSC_boss_felmyst()
     new npc_demonic_vapor_trail();
     RegisterSpellScript(spell_felmyst_fog_of_corruption);
     RegisterSpellScript(spell_felmyst_fog_of_corruption_charm_aura);
-    new spell_felmyst_open_brutallus_back_doors();
+    RegisterSpellScript(spell_felmyst_open_brutallus_back_doors);
 }
 
