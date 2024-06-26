@@ -172,40 +172,28 @@ public:
 };
 
 // 23487 Separation Anxiety (server side)
-class spell_garr_separation_nexiety : public SpellScriptLoader
+class spell_garr_separation_nexiety_aura : public AuraScript
 {
-public:
-    spell_garr_separation_nexiety() : SpellScriptLoader("spell_garr_separation_nexiety") {}
+    PrepareAuraScript(spell_garr_separation_nexiety_aura);
 
-    class spell_garr_separation_nexiety_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_garr_separation_nexiety_AuraScript);
+        return ValidateSpellInfo({ SPELL_SEPARATION_ANXIETY_MINION });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_SEPARATION_ANXIETY_MINION });
-        }
-
-        void HandlePeriodic(AuraEffect const* aurEff)
-        {
-            Unit const* caster = GetCaster();
-            Unit* target = GetTarget();
-            if (caster && target && target->GetDistance(caster) > 40.0f && !target->HasAura(SPELL_SEPARATION_ANXIETY_MINION))
-            {
-                target->CastSpell(target, SPELL_SEPARATION_ANXIETY_MINION, true, nullptr, aurEff);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_garr_separation_nexiety_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    // Should return a fully valid AuraScript pointer.
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
-        return new spell_garr_separation_nexiety_AuraScript();
+        Unit const* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (caster && target && target->GetDistance(caster) > 40.0f && !target->HasAura(SPELL_SEPARATION_ANXIETY_MINION))
+        {
+            target->CastSpell(target, SPELL_SEPARATION_ANXIETY_MINION, true, nullptr, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_garr_separation_nexiety_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -250,7 +238,7 @@ void AddSC_boss_garr()
     new npc_garr_firesworn();
 
     // Spells
-    new spell_garr_separation_nexiety();
+    RegisterSpellScript(spell_garr_separation_nexiety_aura);
     new spell_garr_frenzy();
 }
 
