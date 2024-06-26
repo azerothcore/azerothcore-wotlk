@@ -1044,40 +1044,34 @@ class spell_kiljaeden_shadow_spike_aura : public AuraScript
     }
 };
 
-class spell_kiljaeden_sinister_reflection : public SpellScriptLoader
+class spell_kiljaeden_sinister_reflection : public SpellScript
 {
-public:
-    spell_kiljaeden_sinister_reflection() : SpellScriptLoader("spell_kiljaeden_sinister_reflection") { }
+    PrepareSpellScript(spell_kiljaeden_sinister_reflection);
 
-    class spell_kiljaeden_sinister_reflection_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_kiljaeden_sinister_reflection_SpellScript);
+        return ValidateSpellInfo({ SPELL_SINISTER_REFLECTION_SUMMON, SPELL_SINISTER_REFLECTION_CLONE });
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-            {
-                target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
-                //target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_sinister_reflection_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_kiljaeden_sinister_reflection_SpellScript();
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+        {
+            target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
+            //target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_sinister_reflection::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1323,7 +1317,7 @@ void AddSC_boss_kiljaeden()
     new boss_kiljaeden();
     new npc_kalecgos_kj();
     RegisterSpellScript(spell_kiljaeden_shadow_spike_aura);
-    new spell_kiljaeden_sinister_reflection();
+    RegisterSpellScript(spell_kiljaeden_sinister_reflection);
     new spell_kiljaeden_sinister_reflection_clone();
     new spell_kiljaeden_flame_dart();
     new spell_kiljaeden_darkness();
