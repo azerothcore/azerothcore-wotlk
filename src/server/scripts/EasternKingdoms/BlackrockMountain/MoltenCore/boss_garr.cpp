@@ -172,9 +172,9 @@ public:
 };
 
 // 23487 Separation Anxiety (server side)
-class spell_garr_separation_nexiety_aura : public AuraScript
+class spell_garr_separation_anxiety_aura : public AuraScript
 {
-    PrepareAuraScript(spell_garr_separation_nexiety_aura);
+    PrepareAuraScript(spell_garr_separation_anxiety_aura);
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
@@ -193,7 +193,7 @@ class spell_garr_separation_nexiety_aura : public AuraScript
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_garr_separation_nexiety_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_garr_separation_anxiety_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -227,7 +227,7 @@ void AddSC_boss_garr()
     new npc_garr_firesworn();
 
     // Spells
-    RegisterSpellScript(spell_garr_separation_nexiety_aura);
+    RegisterSpellScript(spell_garr_separation_anxiety_aura);
     RegisterSpellScript(spell_garr_frenzy);
 }
 
