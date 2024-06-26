@@ -634,32 +634,21 @@ class spell_majordomo_separation_nexiety_aura : public AuraScript
 };
 
 // 19774 Summon Ragnaros
-class spell_summon_ragnaros : public SpellScriptLoader
+class spell_summon_ragnaros : public SpellScript
 {
-public:
-    spell_summon_ragnaros() : SpellScriptLoader("spell_summon_ragnaros") {}
+    PrepareSpellScript(spell_summon_ragnaros);
 
-    class spell_summon_ragnaros_SpellScript : public SpellScript
+    void HandleHit()
     {
-        PrepareSpellScript(spell_summon_ragnaros_SpellScript);
-
-        void HandleHit()
+        if (Unit* caster = GetCaster())
         {
-            if (Unit* caster = GetCaster())
-            {
-                caster->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS);
-            }
+            caster->SummonCreature(NPC_RAGNAROS, RagnarosSummonPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 2 * HOUR * IN_MILLISECONDS);
         }
+    }
 
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_summon_ragnaros_SpellScript::HandleHit);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_summon_ragnaros_SpellScript();
+        AfterCast += SpellCastFn(spell_summon_ragnaros::HandleHit);
     }
 };
 
@@ -670,6 +659,6 @@ void AddSC_boss_majordomo()
     // Spells
     RegisterSpellScript(spell_hate_to_zero);
     RegisterSpellScript(spell_majordomo_separation_nexiety_aura);
-    new spell_summon_ragnaros();
+    RegisterSpellScript(spell_summon_ragnaros);
 }
 
