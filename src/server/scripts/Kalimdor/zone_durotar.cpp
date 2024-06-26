@@ -361,49 +361,38 @@ public:
 
 typedef npc_troll_volunteer::npc_troll_volunteerAI VolunteerAI;
 
-class spell_mount_check : public SpellScriptLoader
+class spell_mount_check_aura : public AuraScript
 {
-public:
-    spell_mount_check() : SpellScriptLoader("spell_mount_check") { }
+    PrepareAuraScript(spell_mount_check_aura);
 
-    class spell_mount_check_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_mount_check_AuraScript)
+        return ValidateSpellInfo({ SPELL_MOUNTING_CHECK });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_MOUNTING_CHECK });
-        }
-
-        void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            Unit* target = GetTarget();
-            Unit* owner = target->GetOwner();
-
-            if (!owner)
-                return;
-
-            if (owner->IsMounted() && !target->IsMounted())
-            {
-                if (VolunteerAI* volunteerAI = CAST_AI(VolunteerAI, target->GetAI()))
-                    target->Mount(volunteerAI->GetMountId());
-            }
-            else if (!owner->IsMounted() && target->IsMounted())
-                target->Dismount();
-
-            target->SetSpeed(MOVE_RUN, owner->GetSpeedRate(MOVE_RUN));
-            target->SetSpeed(MOVE_WALK, owner->GetSpeedRate(MOVE_WALK));
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mount_check_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_mount_check_AuraScript();
+        Unit* target = GetTarget();
+        Unit* owner = target->GetOwner();
+
+        if (!owner)
+            return;
+
+        if (owner->IsMounted() && !target->IsMounted())
+        {
+            if (VolunteerAI* volunteerAI = CAST_AI(VolunteerAI, target->GetAI()))
+                target->Mount(volunteerAI->GetMountId());
+        }
+        else if (!owner->IsMounted() && target->IsMounted())
+            target->Dismount();
+
+        target->SetSpeed(MOVE_RUN, owner->GetSpeedRate(MOVE_RUN));
+        target->SetSpeed(MOVE_WALK, owner->GetSpeedRate(MOVE_WALK));
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mount_check_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -507,7 +496,7 @@ void AddSC_durotar()
     new npc_tiger_matriarch_credit();
     new npc_tiger_matriarch();
     new npc_troll_volunteer();
-    new spell_mount_check();
+    RegisterSpellScript(spell_mount_check_aura);
     new spell_voljin_war_drums();
     new spell_voodoo();
 }
