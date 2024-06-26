@@ -1075,37 +1075,26 @@ class spell_kiljaeden_sinister_reflection : public SpellScript
     }
 };
 
-class spell_kiljaeden_sinister_reflection_clone : public SpellScriptLoader
+class spell_kiljaeden_sinister_reflection_clone : public SpellScript
 {
-public:
-    spell_kiljaeden_sinister_reflection_clone() : SpellScriptLoader("spell_kiljaeden_sinister_reflection_clone") { }
+    PrepareSpellScript(spell_kiljaeden_sinister_reflection_clone);
 
-    class spell_kiljaeden_sinister_reflection_clone_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_kiljaeden_sinister_reflection_clone_SpellScript);
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        WorldObject* target = targets.front();
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        targets.clear();
+        if (target && target->GetTypeId() == TYPEID_UNIT)
         {
-            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
-            WorldObject* target = targets.front();
-
-            targets.clear();
-            if (target && target->GetTypeId() == TYPEID_UNIT)
-            {
-                target->ToCreature()->AI()->SetData(1, GetCaster()->getClass());
-                targets.push_back(target);
-            }
+            target->ToCreature()->AI()->SetData(1, GetCaster()->getClass());
+            targets.push_back(target);
         }
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_clone_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_sinister_reflection_clone_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_clone::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1318,7 +1307,7 @@ void AddSC_boss_kiljaeden()
     new npc_kalecgos_kj();
     RegisterSpellScript(spell_kiljaeden_shadow_spike_aura);
     RegisterSpellScript(spell_kiljaeden_sinister_reflection);
-    new spell_kiljaeden_sinister_reflection_clone();
+    RegisterSpellScript(spell_kiljaeden_sinister_reflection_clone);
     new spell_kiljaeden_flame_dart();
     new spell_kiljaeden_darkness();
     new spell_kiljaeden_power_of_the_blue_flight();
