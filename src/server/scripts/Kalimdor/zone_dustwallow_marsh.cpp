@@ -64,37 +64,26 @@ class spell_ooze_zap : public SpellScript
     }
 };
 
-class spell_ooze_zap_channel_end : public SpellScriptLoader
+class spell_ooze_zap_channel_end : public SpellScript
 {
-public:
-    spell_ooze_zap_channel_end() : SpellScriptLoader("spell_ooze_zap_channel_end") { }
+    PrepareSpellScript(spell_ooze_zap_channel_end);
 
-    class spell_ooze_zap_channel_end_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_ooze_zap_channel_end_SpellScript);
+        return ValidateSpellInfo({ SPELL_OOZE_ZAP_CHANNEL_END });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_OOZE_ZAP_CHANNEL_END });
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Player* player = GetCaster()->ToPlayer())
-                player->CastSpell(player, SPELL_OOZE_CHANNEL_CREDIT, true);
-            Unit::Kill(GetHitUnit(), GetHitUnit());
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_channel_end_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_ooze_zap_channel_end_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Player* player = GetCaster()->ToPlayer())
+            player->CastSpell(player, SPELL_OOZE_CHANNEL_CREDIT, true);
+        Unit::Kill(GetHitUnit(), GetHitUnit());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ooze_zap_channel_end::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -147,7 +136,7 @@ public:
 void AddSC_dustwallow_marsh()
 {
     RegisterSpellScript(spell_ooze_zap);
-    new spell_ooze_zap_channel_end();
+    RegisterSpellScript(spell_ooze_zap_channel_end);
     new spell_energize_aoe();
 }
 
