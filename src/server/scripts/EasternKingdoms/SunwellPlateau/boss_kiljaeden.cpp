@@ -1228,29 +1228,18 @@ class spell_kiljaeden_armageddon_missile : public SpellScript
     }
 };
 
-class spell_kiljaeden_dragon_breath : public SpellScriptLoader
+class spell_kiljaeden_dragon_breath : public SpellScript
 {
-public:
-    spell_kiljaeden_dragon_breath() : SpellScriptLoader("spell_kiljaeden_dragon_breath") { }
+    PrepareSpellScript(spell_kiljaeden_dragon_breath);
 
-    class spell_kiljaeden_dragon_breath_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_kiljaeden_dragon_breath_SpellScript);
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_dragon_breath_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ALLY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_dragon_breath_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_dragon_breath::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ALLY);
     }
 };
 
@@ -1268,6 +1257,6 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_vengeance_of_the_blue_flight_aura);
     RegisterSpellScript(spell_kiljaeden_armageddon_periodic_aura);
     RegisterSpellScript(spell_kiljaeden_armageddon_missile);
-    new spell_kiljaeden_dragon_breath();
+    RegisterSpellScript(spell_kiljaeden_dragon_breath);
 }
 
