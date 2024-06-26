@@ -457,42 +457,31 @@ public:
 };
 
 // 10247 - Summon Zul'Farrak Zombies
-class spell_zulfarrak_summon_zulfarrak_zombies : public SpellScriptLoader
+class spell_zulfarrak_summon_zulfarrak_zombies : public SpellScript
 {
-public:
-    spell_zulfarrak_summon_zulfarrak_zombies() : SpellScriptLoader("spell_zulfarrak_summon_zulfarrak_zombies") { }
+    PrepareSpellScript(spell_zulfarrak_summon_zulfarrak_zombies);
 
-    class spell_zulfarrak_summon_zulfarrak_zombies_SpellScript : public SpellScript
+    void HandleSummon(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_zulfarrak_summon_zulfarrak_zombies_SpellScript);
-
-        void HandleSummon(SpellEffIndex effIndex)
+        if (effIndex == EFFECT_0)
         {
-            if (effIndex == EFFECT_0)
-            {
-                if (roll_chance_i(30))
-                {
-                    PreventHitDefaultEffect(effIndex);
-                    return;
-                }
-            }
-            else if (roll_chance_i(40))
+            if (roll_chance_i(30))
             {
                 PreventHitDefaultEffect(effIndex);
                 return;
             }
         }
-
-        void Register() override
+        else if (roll_chance_i(40))
         {
-            OnEffectHit += SpellEffectFn(spell_zulfarrak_summon_zulfarrak_zombies_SpellScript::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
-            OnEffectHit += SpellEffectFn(spell_zulfarrak_summon_zulfarrak_zombies_SpellScript::HandleSummon, EFFECT_1, SPELL_EFFECT_SUMMON);
+            PreventHitDefaultEffect(effIndex);
+            return;
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_zulfarrak_summon_zulfarrak_zombies_SpellScript;
+        OnEffectHit += SpellEffectFn(spell_zulfarrak_summon_zulfarrak_zombies::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
+        OnEffectHit += SpellEffectFn(spell_zulfarrak_summon_zulfarrak_zombies::HandleSummon, EFFECT_1, SPELL_EFFECT_SUMMON);
     }
 };
 
@@ -536,7 +525,7 @@ public:
 void AddSC_instance_zulfarrak()
 {
     new instance_zulfarrak();
-    new spell_zulfarrak_summon_zulfarrak_zombies();
+    RegisterSpellScript(spell_zulfarrak_summon_zulfarrak_zombies);
     new spell_zulfarrak_unlocking();
 }
 
