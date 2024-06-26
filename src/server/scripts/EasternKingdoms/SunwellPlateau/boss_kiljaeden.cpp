@@ -1119,32 +1119,26 @@ class spell_kiljaeden_flame_dart : public SpellScript
     }
 };
 
-class spell_kiljaeden_darkness : public SpellScriptLoader
+class spell_kiljaeden_darkness_aura : public AuraScript
 {
-public:
-    spell_kiljaeden_darkness() : SpellScriptLoader("spell_kiljaeden_darkness") { }
+    PrepareAuraScript(spell_kiljaeden_darkness_aura);
 
-    class spell_kiljaeden_darkness_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_kiljaeden_darkness_AuraScript);
+        return ValidateSpellInfo({ SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE });
+    }
 
-        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT)
-                GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
-
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_darkness_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_kiljaeden_darkness_AuraScript();
+        if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT)
+            GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
+
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_darkness_aura::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1303,7 +1297,7 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_sinister_reflection);
     RegisterSpellScript(spell_kiljaeden_sinister_reflection_clone);
     RegisterSpellScript(spell_kiljaeden_flame_dart);
-    new spell_kiljaeden_darkness();
+    RegisterSpellScript(spell_kiljaeden_darkness_aura);
     new spell_kiljaeden_power_of_the_blue_flight();
     new spell_kiljaeden_vengeance_of_the_blue_flight();
     new spell_kiljaeden_armageddon_periodic();
