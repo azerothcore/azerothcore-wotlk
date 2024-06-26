@@ -1,3 +1,4 @@
+-- DB update 2024_06_26_04 -> 2024_06_26_05
 -- Raise Dead
 DELETE FROM `spell_cooldown_overrides` WHERE `Id`=34019;
 INSERT INTO `spell_cooldown_overrides` (`Id`, `RecoveryTime`, `CategoryRecoveryTime`, `StartRecoveryTime`, `StartRecoveryCategory`, `Comment`) VALUES
