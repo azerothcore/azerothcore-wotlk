@@ -65,7 +65,6 @@ enum Actions
 enum Misc
 {
     GROUP_OOC_RP                    = 0,
-    PATH_RAZUVIOUS                  = 1283120,
     POINT_DEATH_KNIGHT              = 0,
 };
 
