@@ -581,40 +581,29 @@ public:
 };
 
 // 20538 Hate to Zero (SERVERSIDE)
-class spell_hate_to_zero : public SpellScriptLoader
+class spell_hate_to_zero : public SpellScript
 {
-public:
-    spell_hate_to_zero() : SpellScriptLoader("spell_hate_to_zero") {}
+    PrepareSpellScript(spell_hate_to_zero);
 
-    class spell_hate_to_zero_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_hate_to_zero_SpellScript);
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
 
-        bool Load() override
+    void HandleHit(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
         {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleHit(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* caster = GetCaster())
+            if (Creature* creatureCaster = caster->ToCreature())
             {
-                if (Creature* creatureCaster = caster->ToCreature())
-                {
-                    creatureCaster->GetThreatMgr().ResetAllThreat();
-                }
+                creatureCaster->GetThreatMgr().ResetAllThreat();
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_hate_to_zero_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_hate_to_zero_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_hate_to_zero::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -691,7 +680,7 @@ void AddSC_boss_majordomo()
     new boss_majordomo();
 
     // Spells
-    new spell_hate_to_zero();
+    RegisterSpellScript(spell_hate_to_zero);
     new spell_majordomo_separation_nexiety();
     new spell_summon_ragnaros();
 }
