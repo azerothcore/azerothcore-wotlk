@@ -1212,30 +1212,19 @@ class spell_kiljaeden_armageddon_periodic_aura : public AuraScript
     }
 };
 
-class spell_kiljaeden_armageddon_missile : public SpellScriptLoader
+class spell_kiljaeden_armageddon_missile : public SpellScript
 {
-public:
-    spell_kiljaeden_armageddon_missile() : SpellScriptLoader("spell_kiljaeden_armageddon_missile") { }
+    PrepareSpellScript(spell_kiljaeden_armageddon_missile);
 
-    class spell_kiljaeden_armageddon_missile_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_kiljaeden_armageddon_missile_SpellScript);
+        Position const offset = { 0.0f, 0.0f, -20.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
 
-        void SetDest(SpellDestination& dest)
-        {
-            Position const offset = { 0.0f, 0.0f, -20.0f, 0.0f };
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_kiljaeden_armageddon_missile_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_armageddon_missile_SpellScript();
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_kiljaeden_armageddon_missile::SetDest, EFFECT_0, TARGET_DEST_CASTER);
     }
 };
 
@@ -1278,7 +1267,7 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_power_of_the_blue_flight);
     RegisterSpellScript(spell_kiljaeden_vengeance_of_the_blue_flight_aura);
     RegisterSpellScript(spell_kiljaeden_armageddon_periodic_aura);
-    new spell_kiljaeden_armageddon_missile();
+    RegisterSpellScript(spell_kiljaeden_armageddon_missile);
     new spell_kiljaeden_dragon_breath();
 }
 
