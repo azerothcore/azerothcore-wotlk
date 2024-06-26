@@ -1195,31 +1195,20 @@ class spell_kiljaeden_vengeance_of_the_blue_flight_aura : public AuraScript
     }
 };
 
-class spell_kiljaeden_armageddon_periodic : public SpellScriptLoader
+class spell_kiljaeden_armageddon_periodic_aura : public AuraScript
 {
-public:
-    spell_kiljaeden_armageddon_periodic() : SpellScriptLoader("spell_kiljaeden_armageddon_periodic") { }
+    PrepareAuraScript(spell_kiljaeden_armageddon_periodic_aura);
 
-    class spell_kiljaeden_armageddon_periodic_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_kiljaeden_armageddon_periodic_AuraScript);
+        PreventDefaultAction();
+        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void HandlePeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_armageddon_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_armageddon_periodic_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_armageddon_periodic_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1288,7 +1277,7 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_darkness_aura);
     RegisterSpellScript(spell_kiljaeden_power_of_the_blue_flight);
     RegisterSpellScript(spell_kiljaeden_vengeance_of_the_blue_flight_aura);
-    new spell_kiljaeden_armageddon_periodic();
+    RegisterSpellScript(spell_kiljaeden_armageddon_periodic_aura);
     new spell_kiljaeden_armageddon_missile();
     new spell_kiljaeden_dragon_breath();
 }
