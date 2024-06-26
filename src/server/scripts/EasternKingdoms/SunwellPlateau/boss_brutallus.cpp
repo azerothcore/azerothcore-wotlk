@@ -470,32 +470,26 @@ class spell_madrigosa_deactivate_barrier : public SpellScript
     }
 };
 
-class spell_brutallus_burn : public SpellScriptLoader
+class spell_brutallus_burn : public SpellScript
 {
-public:
-    spell_brutallus_burn() : SpellScriptLoader("spell_brutallus_burn") { }
+    PrepareSpellScript(spell_brutallus_burn);
 
-    class spell_brutallus_burn_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_brutallus_burn_SpellScript);
+        return ValidateSpellInfo({ SPELL_BURN_DAMAGE });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                if (!target->HasAura(SPELL_BURN_DAMAGE))
-                    target->CastSpell(target, SPELL_BURN_DAMAGE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_brutallus_burn_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_brutallus_burn_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            if (!target->HasAura(SPELL_BURN_DAMAGE))
+                target->CastSpell(target, SPELL_BURN_DAMAGE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_brutallus_burn::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -525,7 +519,7 @@ void AddSC_boss_brutallus()
     new npc_madrigosa();
     RegisterSpellScript(spell_madrigosa_activate_barrier);
     RegisterSpellScript(spell_madrigosa_deactivate_barrier);
-    new spell_brutallus_burn();
+    RegisterSpellScript(spell_brutallus_burn);
     new AreaTrigger_at_sunwell_madrigosa();
 }
 
