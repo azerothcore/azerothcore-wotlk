@@ -82,6 +82,7 @@ enum Spells
     SPELL_SUMMON_ICE_SPEAR_GO = 46369,
     SPELL_ICE_SPEAR_DELAY     = 46878,
     SPELL_ICE_SPEAR_VISUAL    = 75498,
+    // todo: 46588 damage component
 
     // Slippery Floor
     SPELL_SLIPPERY_FLOOR_AMBIENT     = 46314,
