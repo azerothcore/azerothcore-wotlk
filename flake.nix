@@ -33,11 +33,9 @@
         in
         rec {
           default = server;
-          serverWithModules = server.override {
+
+          serverWithEluna = server.override {
             modules = [
-              (mkModulePackage "azerothcore" "mod-autobalance" "9048d394b4ec10cf6cb39e9f7becf8fd3ebcd123"
-                "sha256-pdzBORwApqUu7vXQyZxkaSdqmHy1NRzxmJxfNzYyz9Q="
-              )
               (mkModulePackage "azerothcore" "mod-eluna" "c652ee8e1a8dea6e4ee54ed5dc93837aca6f2ddc"
                 "sha256-vXtihngtkWcZG/ZHaRxgSfXMHDx2jofJg0GiAh673Jk="
               )
