@@ -8,3 +8,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_muru_darkness_aura' WHERE `s
 UPDATE `spell_script_names` SET `ScriptName`='spell_entropius_void_zone_visual_aura' WHERE `spell_id`=46265;
 UPDATE `spell_script_names` SET `ScriptName`='spell_kalecgos_curse_of_boundless_agony_aura' WHERE `spell_id`=45032;
 UPDATE `spell_script_names` SET `ScriptName`='spell_kalecgos_spectral_realm_aura' WHERE `spell_id`=46021;
+UPDATE `spell_script_names` SET `ScriptName`='spell_felmyst_fog_of_corruption_charm_aura' WHERE `spell_id`=45717;

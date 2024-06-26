@@ -498,37 +498,31 @@ class spell_felmyst_fog_of_corruption : public SpellScript
     }
 };
 
-class spell_felmyst_fog_of_corruption_charm : public SpellScriptLoader
+class spell_felmyst_fog_of_corruption_charm_aura : public AuraScript
 {
-public:
-    spell_felmyst_fog_of_corruption_charm() : SpellScriptLoader("spell_felmyst_fog_of_corruption_charm") { }
+    PrepareAuraScript(spell_felmyst_fog_of_corruption_charm_aura);
 
-    class spell_felmyst_fog_of_corruption_charm_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_felmyst_fog_of_corruption_charm_AuraScript);
+        return ValidateSpellInfo({ SPELL_FOG_OF_CORRUPTION_CHARM2, SPELL_FOG_OF_CORRUPTION_CHARM });
+    }
 
-        void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->CastSpell(GetTarget(), SPELL_FOG_OF_CORRUPTION_CHARM2, true);
-        }
-
-        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM);
-            GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM2);
-            Unit::Kill(GetCaster(), GetTarget(), false);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_felmyst_fog_of_corruption_charm_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_felmyst_fog_of_corruption_charm_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_felmyst_fog_of_corruption_charm_AuraScript();
+        GetTarget()->CastSpell(GetTarget(), SPELL_FOG_OF_CORRUPTION_CHARM2, true);
+    }
+
+    void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM);
+        GetTarget()->RemoveAurasDueToSpell(SPELL_FOG_OF_CORRUPTION_CHARM2);
+        Unit::Kill(GetCaster(), GetTarget(), false);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_felmyst_fog_of_corruption_charm_aura::HandleApply, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_felmyst_fog_of_corruption_charm_aura::HandleRemove, EFFECT_0, SPELL_AURA_AOE_CHARM, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -577,7 +571,7 @@ void AddSC_boss_felmyst()
     new npc_demonic_vapor();
     new npc_demonic_vapor_trail();
     RegisterSpellScript(spell_felmyst_fog_of_corruption);
-    new spell_felmyst_fog_of_corruption_charm();
+    RegisterSpellScript(spell_felmyst_fog_of_corruption_charm_aura);
     new spell_felmyst_open_brutallus_back_doors();
 }
 
