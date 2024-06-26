@@ -358,31 +358,25 @@ class spell_muru_summon_blood_elves_periodic_aura : public AuraScript
     }
 };
 
-class spell_muru_darkness : public SpellScriptLoader
+class spell_muru_darkness_aura : public AuraScript
 {
-public:
-    spell_muru_darkness() : SpellScriptLoader("spell_muru_darkness") { }
+    PrepareAuraScript(spell_muru_darkness_aura);
 
-    class spell_muru_darkness_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_muru_darkness_AuraScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_DARK_FIEND });
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            if (aurEff->GetTickNumber() == 3)
-                for (uint8 i = 0; i < 8; ++i)
-                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND + i, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_muru_darkness_AuraScript::OnPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_muru_darkness_AuraScript();
+        if (aurEff->GetTickNumber() == 3)
+            for (uint8 i = 0; i < 8; ++i)
+                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND + i, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_muru_darkness_aura::OnPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -507,7 +501,7 @@ void AddSC_boss_muru()
     new npc_singularity();
 
     RegisterSpellScript(spell_muru_summon_blood_elves_periodic_aura);
-    new spell_muru_darkness();
+    RegisterSpellScript(spell_muru_darkness_aura);
     new spell_entropius_negative_energy();
     new spell_entropius_void_zone_visual();
     new spell_entropius_black_hole_effect();
