@@ -3,8 +3,7 @@ UPDATE `spell_dbc` SET `Effect_1` = 164,`EffectTriggerSpell_1` = 38495 WHERE (`I
 
 DELETE FROM `spell_script_names` WHERE `spell_id`=38554;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(38554, 'spell_item_eye_of_grillok'),
-(38554, 'spell_item_eye_of_grillok_aura');
+(38554, 'spell_item_eye_of_grillok');
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 38554);
 

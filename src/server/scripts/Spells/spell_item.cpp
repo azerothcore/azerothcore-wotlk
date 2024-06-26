@@ -4111,7 +4111,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_worn_troll_dice);
     RegisterSpellScript(spell_item_venomhide_feed);
     RegisterSpellScript(spell_item_scroll_of_retribution);
-    RegisterSpellScript(spell_item_eye_of_grillok);
-    RegisterSpellScript(spell_item_eye_of_grillok_aura);
+    RegisterSpellAndAuraScriptPair(spell_item_eye_of_grillok, spell_item_eye_of_grillok_aura);
 }
 
