@@ -682,7 +682,7 @@ public:
                     {
                         me->GetMotionMaster()->MoveIdle();
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, false);
+                        me->DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                         me->CastSpell(me, SPELL_EXPOSE_WEAKNESS, true);
                         me->CastSpell(me, SPELL_SPIDER_FRENZY, true);
                         me->CastSpell(me, SPELL_SUBMERGE, false);
