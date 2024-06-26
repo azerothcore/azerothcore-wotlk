@@ -127,7 +127,17 @@ public:
 
         void ScheduleInteractWithDeathKnight()
         {
-            scheduler.Schedule(2s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            scheduler.Schedule(1s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            {
+                // if (rpBuddyGUID)
+                    // if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                        // me->SetFacingToObject(understudy);
+            }).Schedule(50ms, GROUP_OOC_RP, [this](TaskContext /*context*/)
+            {
+                if (rpBuddyGUID)
+                    if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                        me->SetFacingToObject(understudy);
+            }).Schedule(2s, GROUP_OOC_RP, [this](TaskContext /*context*/)
             {
                 if (rpBuddyGUID)
                     if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
@@ -147,10 +157,6 @@ public:
                         understudy->AI()->DoAction(ACTION_BACK_TO_TRAINING);
                 ScheduleRP();
             });
-
-            if (rpBuddyGUID)
-                if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
-                    me->SetFacingToObject(understudy);
 
             if (roll_chance_i(75))
             {
@@ -201,21 +207,23 @@ public:
                 if (Creature* understudy = GetClosestCreatureWithEntry(me, NPC_DEATH_KNIGHT_UNDERSTUDY, 20.0f))
                 {
                     rpBuddyGUID = understudy->GetGUID();
-                    me->GetMotionMaster()->MovementExpired(false);
-                    me->GetMotionMaster()->MoveIdle();
+                    me->PauseMovement();
                 }
                 scheduler.Schedule(0s, GROUP_OOC_RP, [this](TaskContext /*context*/)
                 {
                     if (rpBuddyGUID)
                         if (Creature* understudy = ObjectAccessor::GetCreature(*me, rpBuddyGUID))
+                        {
+                            me->SetFacingToObject(understudy);
                             me->GetMotionMaster()->MovePoint(POINT_DEATH_KNIGHT, understudy->GetNearPosition(INTERACTION_DISTANCE, understudy->GetRelativeAngle(me)));
+                        }
                 });
             }
         }
 
         void ScheduleRP()
         {
-            scheduler.Schedule(10s, 10s, GROUP_OOC_RP, [this](TaskContext /*context*/) // TODO: increase this time to 60s-80s
+            scheduler.Schedule(0s, 1s, GROUP_OOC_RP, [this](TaskContext /*context*/) // TODO: increase this time to 60s-80s
             {
                 _roleplayWaypoint = RAID_MODE(TABLE_WAYPOINT_RP_10, TABLE_WAYPOINT_RP_25)[_roleplayWaypointNextIndex];
                 _roleplayReady = true;
