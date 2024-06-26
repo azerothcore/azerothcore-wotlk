@@ -271,37 +271,31 @@ enum cataclysmBreath
     SPELL_WITHERED_TOUCH        = 46300
 };
 
-class spell_cataclysm_breath : public SpellScriptLoader
+class spell_cataclysm_breath : public SpellScript
 {
-public:
-    spell_cataclysm_breath() : SpellScriptLoader("spell_cataclysm_breath") { }
+    PrepareSpellScript(spell_cataclysm_breath);
 
-    class spell_cataclysm_breath_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_cataclysm_breath_SpellScript);
+        return ValidateSpellInfo({ SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH });
+    }
 
-        void HandleAfterCast()
-        {
-            if (Unit* target = GetExplTargetUnit())
-                for (uint8 i = 0; i < 4; ++i)
-                    GetCaster()->CastSpell(target, RAND(SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH), true);
-        }
-
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_cataclysm_breath_SpellScript::HandleAfterCast);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleAfterCast()
     {
-        return new spell_cataclysm_breath_SpellScript();
+        if (Unit* target = GetExplTargetUnit())
+            for (uint8 i = 0; i < 4; ++i)
+                GetCaster()->CastSpell(target, RAND(SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH), true);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_cataclysm_breath::HandleAfterCast);
     }
 };
 
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
-    new spell_cataclysm_breath();
+    RegisterSpellScript(spell_cataclysm_breath);
 }
 
