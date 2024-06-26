@@ -449,31 +449,25 @@ class spell_eredar_twins_handle_touch : public SpellScript
     }
 };
 
-class spell_eredar_twins_blaze : public SpellScriptLoader
+class spell_eredar_twins_blaze : public SpellScript
 {
-public:
-    spell_eredar_twins_blaze() : SpellScriptLoader("spell_eredar_twins_blaze") { }
+    PrepareSpellScript(spell_eredar_twins_blaze);
 
-    class spell_eredar_twins_blaze_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_eredar_twins_blaze_SpellScript);
+        return ValidateSpellInfo({ SPELL_BLAZE_SUMMON });
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, SPELL_BLAZE_SUMMON, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_eredar_twins_blaze_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_eredar_twins_blaze_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_BLAZE_SUMMON, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_eredar_twins_blaze::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -505,7 +499,7 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScript(spell_eredar_twins_apply_dark_touched);
     RegisterSpellScript(spell_eredar_twins_apply_flame_touched);
     RegisterSpellScript(spell_eredar_twins_handle_touch);
-    new spell_eredar_twins_blaze();
+    RegisterSpellScript(spell_eredar_twins_blaze);
     new AreaTrigger_at_sunwell_eredar_twins();
 }
 
