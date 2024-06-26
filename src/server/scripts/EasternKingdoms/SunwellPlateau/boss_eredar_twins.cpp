@@ -366,30 +366,24 @@ public:
     };
 };
 
-class spell_eredar_twins_apply_dark_touched : public SpellScriptLoader
+class spell_eredar_twins_apply_dark_touched : public SpellScript
 {
-public:
-    spell_eredar_twins_apply_dark_touched() : SpellScriptLoader("spell_eredar_twins_apply_dark_touched") { }
+    PrepareSpellScript(spell_eredar_twins_apply_dark_touched);
 
-    class spell_eredar_twins_apply_dark_touched_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_eredar_twins_apply_dark_touched_SpellScript);
+        return ValidateSpellInfo({ SPELL_DARK_TOUCHED });
+    }
 
-        void HandleApplyTouch()
-        {
-            if (Player* target = GetHitPlayer())
-                target->CastSpell(target, SPELL_DARK_TOUCHED, true);
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_eredar_twins_apply_dark_touched_SpellScript::HandleApplyTouch);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleApplyTouch()
     {
-        return new spell_eredar_twins_apply_dark_touched_SpellScript();
+        if (Player* target = GetHitPlayer())
+            target->CastSpell(target, SPELL_DARK_TOUCHED, true);
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_eredar_twins_apply_dark_touched::HandleApplyTouch);
     }
 };
 
@@ -520,7 +514,7 @@ void AddSC_boss_eredar_twins()
 {
     new boss_sacrolash();
     new boss_alythess();
-    new spell_eredar_twins_apply_dark_touched();
+    RegisterSpellScript(spell_eredar_twins_apply_dark_touched);
     new spell_eredar_twins_apply_flame_touched();
     new spell_eredar_twins_handle_touch();
     new spell_eredar_twins_blaze();
