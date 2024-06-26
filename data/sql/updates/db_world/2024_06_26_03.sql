@@ -1,3 +1,4 @@
+-- DB update 2024_06_26_02 -> 2024_06_26_03
 -- Update gameobject 'Transpolyporter' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (143230, 142175))
