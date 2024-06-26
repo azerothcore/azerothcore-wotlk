@@ -380,42 +380,36 @@ class spell_muru_darkness_aura : public AuraScript
     }
 };
 
-class spell_entropius_negative_energy : public SpellScriptLoader
+class spell_entropius_negative_energy : public SpellScript
 {
-public:
-    spell_entropius_negative_energy() : SpellScriptLoader("spell_entropius_negative_energy") { }
+    PrepareSpellScript(spell_entropius_negative_energy);
 
-    class spell_entropius_negative_energy_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_entropius_negative_energy_SpellScript);
+        return ValidateSpellInfo({ SPELL_NEGATIVE_ENERGY_CHAIN });
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            Acore::Containers::RandomResize(targets, GetCaster()->GetAI()->GetData(DATA_NEGATIVE_ENERGY_TARGETS));
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, SPELL_NEGATIVE_ENERGY_CHAIN, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_entropius_negative_energy_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_entropius_negative_energy_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_entropius_negative_energy_SpellScript();
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Acore::Containers::RandomResize(targets, GetCaster()->GetAI()->GetData(DATA_NEGATIVE_ENERGY_TARGETS));
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, SPELL_NEGATIVE_ENERGY_CHAIN, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_entropius_negative_energy::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_entropius_negative_energy::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -502,7 +496,7 @@ void AddSC_boss_muru()
 
     RegisterSpellScript(spell_muru_summon_blood_elves_periodic_aura);
     RegisterSpellScript(spell_muru_darkness_aura);
-    new spell_entropius_negative_energy();
+    RegisterSpellScript(spell_entropius_negative_energy);
     new spell_entropius_void_zone_visual();
     new spell_entropius_black_hole_effect();
 }
