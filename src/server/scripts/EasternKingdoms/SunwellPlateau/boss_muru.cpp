@@ -439,46 +439,35 @@ class spell_entropius_void_zone_visual_aura : public AuraScript
     }
 };
 
-class spell_entropius_black_hole_effect : public SpellScriptLoader
+class spell_entropius_black_hole_effect : public SpellScript
 {
-public:
-    spell_entropius_black_hole_effect() : SpellScriptLoader("spell_entropius_black_hole_effect") { }
+    PrepareSpellScript(spell_entropius_black_hole_effect);
 
-    class spell_entropius_black_hole_effect_SpellScript : public SpellScript
+    void HandlePull(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_entropius_black_hole_effect_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
 
-        void HandlePull(SpellEffIndex effIndex)
+        Position pos;
+        if (target->GetDistance(GetCaster()) < 5.0f)
         {
-            PreventHitDefaultEffect(effIndex);
-            Unit* target = GetHitUnit();
-            if (!target)
-                return;
-
-            Position pos;
-            if (target->GetDistance(GetCaster()) < 5.0f)
-            {
-                float o = frand(0, 2 * M_PI);
-                pos.Relocate(GetCaster()->GetPositionX() + 4.0f * cos(o), GetCaster()->GetPositionY() + 4.0f * std::sin(o), GetCaster()->GetPositionZ() + frand(10.0f, 15.0f));
-            }
-            else
-                pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
-
-            float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue) * 0.1f;
-            float speedZ = target->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
-
-            target->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
+            float o = frand(0, 2 * M_PI);
+            pos.Relocate(GetCaster()->GetPositionX() + 4.0f * cos(o), GetCaster()->GetPositionY() + 4.0f * std::sin(o), GetCaster()->GetPositionZ() + frand(10.0f, 15.0f));
         }
+        else
+            pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_entropius_black_hole_effect_SpellScript::HandlePull, EFFECT_0, SPELL_EFFECT_PULL_TOWARDS_DEST);
-        }
-    };
+        float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue) * 0.1f;
+        float speedZ = target->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
 
-    SpellScript* GetSpellScript() const override
+        target->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
+    }
+
+    void Register() override
     {
-        return new spell_entropius_black_hole_effect_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_entropius_black_hole_effect::HandlePull, EFFECT_0, SPELL_EFFECT_PULL_TOWARDS_DEST);
     }
 };
 
@@ -492,6 +481,6 @@ void AddSC_boss_muru()
     RegisterSpellScript(spell_muru_darkness_aura);
     RegisterSpellScript(spell_entropius_negative_energy);
     RegisterSpellScript(spell_entropius_void_zone_visual_aura);
-    new spell_entropius_black_hole_effect();
+    RegisterSpellScript(spell_entropius_black_hole_effect);
 }
 
