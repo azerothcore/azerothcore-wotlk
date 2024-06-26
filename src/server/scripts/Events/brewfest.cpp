@@ -1035,30 +1035,37 @@ class spell_brewfest_apple_trap : public SpellScript
 
 enum Catch
 {
-    NPC_WILD_WOLPERTINGER = 23487,
+    NPC_WILD_WOLPERTINGER                    = 23487,
 
-    ITEM_STUNNED_WOLPERTINGER = 32906
+    SPELL_CREATE_STUNNED_WOLPERTINGER_ITEM   = 41622,
+    SPELL_WOLPERTINGER_NET                   = 41621,
+
+    EVENT_CREATE_STUNNED_WOLPERTINGER        = 1
 };
 
-class spell_catch_the_wild_wolpertinger : public AuraScript
+class spell_catch_the_wild_wolpertinger : public SpellScript
 {
-    PrepareAuraScript(spell_catch_the_wild_wolpertinger);
+public:
+    PrepareSpellScript(spell_catch_the_wild_wolpertinger);
 
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    bool Validate(SpellInfo const* /*SpellInfo*/) override
     {
-        if (Creature* wild = GetTarget()->ToCreature())
-        {
-            if (wild->GetEntry() == NPC_WILD_WOLPERTINGER)
-            {
-                wild->ToCreature()->DespawnOrUnsummon(1s, 0s);
-                GetCaster()->ToPlayer()->AddItem(ITEM_STUNNED_WOLPERTINGER, 1);
-            }
-        }
+        return ValidateSpellInfo({ SPELL_WOLPERTINGER_NET });
+    }
+
+    SpellCastResult CheckRequirement()
+    {
+        if (Unit* caster = GetCaster())
+            if (Creature* wild = caster->FindNearestCreature(NPC_WILD_WOLPERTINGER, 15.0f))
+                if (!wild->HasAura(SPELL_WOLPERTINGER_NET))
+                    return SPELL_CAST_OK;
+
+        return SPELL_FAILED_CASTER_AURASTATE;
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_catch_the_wild_wolpertinger::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
+        OnCheckCast += SpellCheckCastFn(spell_catch_the_wild_wolpertinger::CheckRequirement);
     }
 };
 
@@ -2057,6 +2064,52 @@ class spell_direbrew_disarm : public AuraScript
     }
 };
 
+struct npc_wild_wolpertinger : public ScriptedAI
+{
+public:
+    npc_wild_wolpertinger(Creature* creature) : ScriptedAI(creature) { }
+
+    ObjectGuid PlayerGUID;
+
+    void Reset() override
+    {
+        me->RemoveUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_WOLPERTINGER_NET)
+        {
+            PlayerGUID = caster->GetGUID();
+            me->SetReactState(REACT_PASSIVE);
+            me->CombatStop(false);
+            caster->CombatStop();
+            me->SetUnitFlag(UNIT_FLAG_PACIFIED | UNIT_FLAG_DISABLE_MOVE);
+            me->StopMovingOnCurrentPos();
+            events.ScheduleEvent(EVENT_CREATE_STUNNED_WOLPERTINGER, 5s);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        events.Update(diff);
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_CREATE_STUNNED_WOLPERTINGER:
+                if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID))
+                    player->CastSpell(player, SPELL_CREATE_STUNNED_WOLPERTINGER_ITEM, true);
+                me->DespawnOrUnsummon();
+                break;
+        }
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 void AddSC_event_brewfest_scripts()
 {
     // Npcs
@@ -2067,6 +2120,7 @@ void AddSC_event_brewfest_scripts()
     RegisterCreatureAI(npc_dark_iron_attack_mole_machine);
     RegisterCreatureAI(npc_dark_iron_guzzler);
     RegisterCreatureAI(npc_brewfest_super_brew_trigger);
+    RegisterCreatureAI(npc_wild_wolpertinger);
 
     // Spells
     // ram
