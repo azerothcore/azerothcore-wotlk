@@ -193,42 +193,31 @@ class spell_geddon_inferno_aura : public AuraScript
 };
 
 // 20478 Armageddon
-class spell_geddon_armageddon : public SpellScriptLoader
+class spell_geddon_armageddon_aura : public AuraScript
 {
-public:
-    spell_geddon_armageddon() : SpellScriptLoader("spell_geddon_armageddon") { }
+    PrepareAuraScript(spell_geddon_armageddon_aura);
 
-    class spell_geddon_armageddon_AuraScript : public AuraScript
+    void HandleAfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_geddon_armageddon_AuraScript);
-
-        void HandleAfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        if (Creature* pCreatureTarget = GetTarget()->ToCreature())
         {
-            if (Creature* pCreatureTarget = GetTarget()->ToCreature())
-            {
-                pCreatureTarget->SetReactState(REACT_PASSIVE);
-                pCreatureTarget->AttackStop();
-            }
+            pCreatureTarget->SetReactState(REACT_PASSIVE);
+            pCreatureTarget->AttackStop();
         }
+    }
 
-        void HandleAfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* pCreatureTarget = GetTarget()->ToCreature())
-            {
-                pCreatureTarget->SetReactState(REACT_AGGRESSIVE);
-            }
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_geddon_armageddon_AuraScript::HandleAfterApply, EFFECT_1, SPELL_AURA_MOD_PACIFY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_geddon_armageddon_AuraScript::HandleAfterRemove, EFFECT_1, SPELL_AURA_MOD_PACIFY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleAfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_geddon_armageddon_AuraScript();
+        if (Creature* pCreatureTarget = GetTarget()->ToCreature())
+        {
+            pCreatureTarget->SetReactState(REACT_AGGRESSIVE);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_geddon_armageddon_aura::HandleAfterApply, EFFECT_1, SPELL_AURA_MOD_PACIFY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_geddon_armageddon_aura::HandleAfterRemove, EFFECT_1, SPELL_AURA_MOD_PACIFY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -238,6 +227,6 @@ void AddSC_boss_baron_geddon()
 
     // Spells
     RegisterSpellScript(spell_geddon_inferno_aura);
-    new spell_geddon_armageddon();
+    RegisterSpellScript(spell_geddon_armageddon_aura);
 }
 
