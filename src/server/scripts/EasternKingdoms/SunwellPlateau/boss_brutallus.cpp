@@ -406,46 +406,35 @@ public:
     }
 };
 
-class spell_madrigosa_activate_barrier : public SpellScriptLoader
+class spell_madrigosa_activate_barrier : public SpellScript
 {
-public:
-    spell_madrigosa_activate_barrier() : SpellScriptLoader("spell_madrigosa_activate_barrier") { }
+    PrepareSpellScript(spell_madrigosa_activate_barrier);
 
-    class spell_madrigosa_activate_barrier_SpellScript : public SpellScript
+    void HandleActivateObject(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_madrigosa_activate_barrier_SpellScript);
-
-        void HandleActivateObject(SpellEffIndex effIndex)
+        PreventHitDefaultEffect(effIndex);
+        if (GameObject* go = GetHitGObj())
         {
-            PreventHitDefaultEffect(effIndex);
-            if (GameObject* go = GetHitGObj())
+            go->SetGoState(GO_STATE_READY);
+            if (Map* map = go->GetMap())
             {
-                go->SetGoState(GO_STATE_READY);
-                if (Map* map = go->GetMap())
-                {
-                    Map::PlayerList const& PlayerList = map->GetPlayers();
-                    for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                        if (i->GetSource())
-                        {
-                            UpdateData data;
-                            WorldPacket pkt;
-                            go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
-                            data.BuildPacket(pkt);
-                            i->GetSource()->GetSession()->SendPacket(&pkt);
-                        }
-                }
+                Map::PlayerList const& PlayerList = map->GetPlayers();
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    if (i->GetSource())
+                    {
+                        UpdateData data;
+                        WorldPacket pkt;
+                        go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
+                        data.BuildPacket(pkt);
+                        i->GetSource()->GetSession()->SendPacket(&pkt);
+                    }
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_madrigosa_activate_barrier_SpellScript::HandleActivateObject, EFFECT_0, SPELL_EFFECT_ACTIVATE_OBJECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_madrigosa_activate_barrier_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_madrigosa_activate_barrier::HandleActivateObject, EFFECT_0, SPELL_EFFECT_ACTIVATE_OBJECT);
     }
 };
 
@@ -545,7 +534,7 @@ void AddSC_boss_brutallus()
 {
     new boss_brutallus();
     new npc_madrigosa();
-    new spell_madrigosa_activate_barrier();
+    RegisterSpellScript(spell_madrigosa_activate_barrier);
     new spell_madrigosa_deactivate_barrier();
     new spell_brutallus_burn();
     new AreaTrigger_at_sunwell_madrigosa();
