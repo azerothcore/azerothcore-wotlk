@@ -608,9 +608,9 @@ class spell_hate_to_zero : public SpellScript
 };
 
 // 21094 Separation Anxiety (server side)
-class spell_majordomo_separation_nexiety_aura : public AuraScript
+class spell_majordomo_separation_anxiety_aura : public AuraScript
 {
-    PrepareAuraScript(spell_majordomo_separation_nexiety_aura);
+    PrepareAuraScript(spell_majordomo_separation_anxiety_aura);
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
@@ -629,7 +629,7 @@ class spell_majordomo_separation_nexiety_aura : public AuraScript
 
     void Register() override
     {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_majordomo_separation_nexiety_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_majordomo_separation_anxiety_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -658,7 +658,7 @@ void AddSC_boss_majordomo()
 
     // Spells
     RegisterSpellScript(spell_hate_to_zero);
-    RegisterSpellScript(spell_majordomo_separation_nexiety_aura);
+    RegisterSpellScript(spell_majordomo_separation_anxiety_aura);
     RegisterSpellScript(spell_summon_ragnaros);
 }
 
