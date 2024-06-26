@@ -87,49 +87,38 @@ class spell_ooze_zap_channel_end : public SpellScript
     }
 };
 
-class spell_energize_aoe : public SpellScriptLoader
+class spell_energize_aoe : public SpellScript
 {
-public:
-    spell_energize_aoe() : SpellScriptLoader("spell_energize_aoe") { }
+    PrepareSpellScript(spell_energize_aoe);
 
-    class spell_energize_aoe_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_energize_aoe_SpellScript);
+        return ValidateSpellInfo({ SPELL_ENERGIZED });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ENERGIZED });
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end();)
-            {
-                if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->ToPlayer()->GetQuestStatus(GetSpellInfo()->Effects[EFFECT_1].CalcValue()) == QUEST_STATUS_INCOMPLETE)
-                    ++itr;
-                else
-                    targets.erase(itr++);
-            }
-            targets.push_back(GetCaster());
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_energize_aoe_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_energize_aoe_SpellScript();
+        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end();)
+        {
+            if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->ToPlayer()->GetQuestStatus(GetSpellInfo()->Effects[EFFECT_1].CalcValue()) == QUEST_STATUS_INCOMPLETE)
+                ++itr;
+            else
+                targets.erase(itr++);
+        }
+        targets.push_back(GetCaster());
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_energize_aoe::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_energize_aoe::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENTRY);
     }
 };
 
@@ -137,6 +126,6 @@ void AddSC_dustwallow_marsh()
 {
     RegisterSpellScript(spell_ooze_zap);
     RegisterSpellScript(spell_ooze_zap_channel_end);
-    new spell_energize_aoe();
+    RegisterSpellScript(spell_energize_aoe);
 }
 
