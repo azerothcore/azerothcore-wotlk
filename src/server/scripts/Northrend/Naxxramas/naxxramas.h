@@ -76,7 +76,8 @@ enum NXData
     DATA_KELTHUZAD_PORTAL_1         = 126,
     DATA_KELTHUZAD_PORTAL_2         = 127,
     DATA_KELTHUZAD_PORTAL_3         = 128,
-    DATA_KELTHUZAD_PORTAL_4         = 129
+    DATA_KELTHUZAD_PORTAL_4         = 129,
+    DATA_RAZUVIOUS                  = 130
 };
 
 enum NXGOs
@@ -135,6 +136,9 @@ enum NXNPCs
     NPC_THADDIUS                    = 15928,
     NPC_STALAGG                     = 15929,
     NPC_FEUGEN                      = 15930,
+
+    // Razuvious
+    NPC_RAZUVIOUS                   = 16061,
 
     // Four horseman
     NPC_BARON_RIVENDARE             = 30549,

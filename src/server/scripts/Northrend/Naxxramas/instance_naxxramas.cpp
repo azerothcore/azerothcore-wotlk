@@ -139,6 +139,7 @@ public:
         ObjectGuid _thaddiusGUID;
         ObjectGuid _stalaggGUID;
         ObjectGuid _feugenGUID;
+        ObjectGuid _razuviousGUID;
         ObjectGuid _zeliekGUID;
         ObjectGuid _rivendareGUID;
         ObjectGuid _blaumeuxGUID;
@@ -227,6 +228,8 @@ public:
                 case NPC_FEUGEN:
                     _feugenGUID = creature->GetGUID();
                     return;
+                case NPC_RAZUVIOUS:
+                    _razuviousGUID = creature->GetGUID();
                 case NPC_LADY_BLAUMEUX:
                     _blaumeuxGUID = creature->GetGUID();
                     return;
@@ -1092,6 +1095,8 @@ public:
                     return _stalaggGUID;
                 case DATA_FEUGEN_BOSS:
                     return _feugenGUID;
+                case DATA_RAZUVIOUS:
+                    return _razuviousGUID;
                 case DATA_LICH_KING_BOSS:
                     return _lichkingGUID;
                 default:
