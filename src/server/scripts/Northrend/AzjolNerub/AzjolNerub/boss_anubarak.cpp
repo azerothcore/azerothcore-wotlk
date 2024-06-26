@@ -194,7 +194,7 @@ class boss_anub_arak : public CreatureScript
                         if (me->HealthBelowPct(eventId*25))
                         {
                             Talk(SAY_SUBMERGE);
-                            me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, false);
+                            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                             me->CastSpell(me, SPELL_IMPALE_PERIODIC, true);
                             me->CastSpell(me, SPELL_SUBMERGE, false);
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
