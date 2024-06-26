@@ -476,31 +476,25 @@ public:
     };
 };
 
-class spell_felmyst_fog_of_corruption : public SpellScriptLoader
+class spell_felmyst_fog_of_corruption : public SpellScript
 {
-public:
-    spell_felmyst_fog_of_corruption() : SpellScriptLoader("spell_felmyst_fog_of_corruption") { }
+    PrepareSpellScript(spell_felmyst_fog_of_corruption);
 
-    class spell_felmyst_fog_of_corruption_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_felmyst_fog_of_corruption_SpellScript);
+        return ValidateSpellInfo({ SPELL_FOG_OF_CORRUPTION_CHARM });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(GetCaster(), SPELL_FOG_OF_CORRUPTION_CHARM, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_felmyst_fog_of_corruption_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_felmyst_fog_of_corruption_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), SPELL_FOG_OF_CORRUPTION_CHARM, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_felmyst_fog_of_corruption::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -582,7 +576,7 @@ void AddSC_boss_felmyst()
     new boss_felmyst();
     new npc_demonic_vapor();
     new npc_demonic_vapor_trail();
-    new spell_felmyst_fog_of_corruption();
+    RegisterSpellScript(spell_felmyst_fog_of_corruption);
     new spell_felmyst_fog_of_corruption_charm();
     new spell_felmyst_open_brutallus_back_doors();
 }
