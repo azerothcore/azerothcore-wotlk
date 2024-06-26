@@ -1167,37 +1167,31 @@ class spell_kiljaeden_power_of_the_blue_flight : public SpellScript
     }
 };
 
-class spell_kiljaeden_vengeance_of_the_blue_flight : public SpellScriptLoader
+class spell_kiljaeden_vengeance_of_the_blue_flight_aura : public AuraScript
 {
-public:
-    spell_kiljaeden_vengeance_of_the_blue_flight() : SpellScriptLoader("spell_kiljaeden_vengeance_of_the_blue_flight") { }
+    PrepareAuraScript(spell_kiljaeden_vengeance_of_the_blue_flight_aura);
 
-    class spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript);
+        return ValidateSpellInfo({ SPELL_POSSESS_DRAKE_IMMUNITY });
+    }
 
-        void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_POSSESS_DRAKE_IMMUNITY, true);
-        }
-
-        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->RemoveAurasDueToSpell(SPELL_POSSESS_DRAKE_IMMUNITY);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
-            OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleRemove, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_POSSESS_DRAKE_IMMUNITY, true);
+    }
+
+    void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_POSSESS_DRAKE_IMMUNITY);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_aura::HandleApply, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+        OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_aura::HandleApply, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_aura::HandleRemove, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_aura::HandleRemove, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1293,7 +1287,7 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_flame_dart);
     RegisterSpellScript(spell_kiljaeden_darkness_aura);
     RegisterSpellScript(spell_kiljaeden_power_of_the_blue_flight);
-    new spell_kiljaeden_vengeance_of_the_blue_flight();
+    RegisterSpellScript(spell_kiljaeden_vengeance_of_the_blue_flight_aura);
     new spell_kiljaeden_armageddon_periodic();
     new spell_kiljaeden_armageddon_missile();
     new spell_kiljaeden_dragon_breath();
