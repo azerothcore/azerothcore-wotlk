@@ -579,32 +579,26 @@ class spell_karazhan_overload_aura : public AuraScript
     }
 };
 
-class spell_karazhan_blink : public SpellScriptLoader
+class spell_karazhan_blink : public SpellScript
 {
-public:
-    spell_karazhan_blink() : SpellScriptLoader("spell_karazhan_blink") { }
+    PrepareSpellScript(spell_karazhan_blink);
 
-    class spell_karazhan_blink_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_karazhan_blink_SpellScript);
+        return ValidateSpellInfo({ SPELL_BLINK });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->GetThreatMgr().ResetAllThreat();
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, SPELL_BLINK, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_karazhan_blink_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_karazhan_blink_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->GetThreatMgr().ResetAllThreat();
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, SPELL_BLINK, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_karazhan_blink::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -613,6 +607,6 @@ void AddSC_instance_karazhan()
     new instance_karazhan();
     RegisterSpellScript(spell_karazhan_brittle_bones_aura);
     RegisterSpellScript(spell_karazhan_overload_aura);
-    new spell_karazhan_blink();
+    RegisterSpellScript(spell_karazhan_blink);
 }
 
