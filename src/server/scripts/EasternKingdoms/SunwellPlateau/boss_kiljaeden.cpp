@@ -1142,34 +1142,28 @@ class spell_kiljaeden_darkness_aura : public AuraScript
     }
 };
 
-class spell_kiljaeden_power_of_the_blue_flight : public SpellScriptLoader
+class spell_kiljaeden_power_of_the_blue_flight : public SpellScript
 {
-public:
-    spell_kiljaeden_power_of_the_blue_flight() : SpellScriptLoader("spell_kiljaeden_power_of_the_blue_flight") { }
+    PrepareSpellScript(spell_kiljaeden_power_of_the_blue_flight);
 
-    class spell_kiljaeden_power_of_the_blue_flight_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_kiljaeden_power_of_the_blue_flight_SpellScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_BLUE_DRAKE, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Player* player = GetHitPlayer())
-            {
-                player->CastSpell(player, SPELL_SUMMON_BLUE_DRAKE, true);
-                player->CastSpell(player, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_power_of_the_blue_flight_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_kiljaeden_power_of_the_blue_flight_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Player* player = GetHitPlayer())
+        {
+            player->CastSpell(player, SPELL_SUMMON_BLUE_DRAKE, true);
+            player->CastSpell(player, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_power_of_the_blue_flight::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1298,7 +1292,7 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_sinister_reflection_clone);
     RegisterSpellScript(spell_kiljaeden_flame_dart);
     RegisterSpellScript(spell_kiljaeden_darkness_aura);
-    new spell_kiljaeden_power_of_the_blue_flight();
+    RegisterSpellScript(spell_kiljaeden_power_of_the_blue_flight);
     new spell_kiljaeden_vengeance_of_the_blue_flight();
     new spell_kiljaeden_armageddon_periodic();
     new spell_kiljaeden_armageddon_missile();
