@@ -608,40 +608,28 @@ class spell_hate_to_zero : public SpellScript
 };
 
 // 21094 Separation Anxiety (server side)
-class spell_majordomo_separation_nexiety : public SpellScriptLoader
+class spell_majordomo_separation_nexiety_aura : public AuraScript
 {
-public:
-    spell_majordomo_separation_nexiety() : SpellScriptLoader("spell_majordomo_separation_nexiety") {}
+    PrepareAuraScript(spell_majordomo_separation_nexiety_aura);
 
-    class spell_majordomo_separation_nexiety_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_majordomo_separation_nexiety_AuraScript);
+        return ValidateSpellInfo({ SPELL_SEPARATION_ANXIETY_MINION });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_SEPARATION_ANXIETY_MINION });
-        }
-
-        void HandlePeriodic(AuraEffect const* aurEff)
-        {
-            Unit const* caster = GetCaster();
-            Unit* target = GetTarget();
-            if (caster && target && target->GetDistance(caster) > 40.0f && !target->HasAura(SPELL_SEPARATION_ANXIETY_MINION))
-            {
-                target->CastSpell(target, SPELL_SEPARATION_ANXIETY_MINION, true, nullptr, aurEff);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_majordomo_separation_nexiety_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    // Should return a fully valid AuraScript pointer.
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
-        return new spell_majordomo_separation_nexiety_AuraScript();
+        Unit const* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (caster && target && target->GetDistance(caster) > 40.0f && !target->HasAura(SPELL_SEPARATION_ANXIETY_MINION))
+        {
+            target->CastSpell(target, SPELL_SEPARATION_ANXIETY_MINION, true, nullptr, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_majordomo_separation_nexiety_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -681,7 +669,7 @@ void AddSC_boss_majordomo()
 
     // Spells
     RegisterSpellScript(spell_hate_to_zero);
-    new spell_majordomo_separation_nexiety();
+    RegisterSpellScript(spell_majordomo_separation_nexiety_aura);
     new spell_summon_ragnaros();
 }
 
