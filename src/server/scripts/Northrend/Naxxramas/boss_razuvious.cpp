@@ -183,7 +183,7 @@ public:
         void ScheduleRP()
         {
             _rpBuddyGUID = Acore::Containers::SelectRandomContainerElement(summons);
-            scheduler.Schedule(1s, GROUP_OOC_RP, [this](TaskContext context)
+            scheduler.Schedule(60s, 80s, GROUP_OOC_RP, [this](TaskContext context)
             {
                 if (_rpBuddyGUID)
                     if (Creature* understudy = ObjectAccessor::GetCreature(*me, _rpBuddyGUID))
@@ -191,7 +191,7 @@ public:
                         if (me->GetDistance2d(understudy) <= 6.0f)
                         {
                             me->PauseMovement();
-                            scheduler.Schedule(1s, GROUP_OOC_RP, [this](TaskContext /*context*/)
+                            scheduler.Schedule(500ms, GROUP_OOC_RP, [this](TaskContext /*context*/)
                             {
                                 if (_rpBuddyGUID)
                                     if (Creature* understudy = ObjectAccessor::GetCreature(*me, _rpBuddyGUID))
@@ -200,7 +200,7 @@ public:
                         return;
                         }
                     }
-                context.Repeat(1s);
+                context.Repeat(2s);
             });
         }
 
