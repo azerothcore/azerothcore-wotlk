@@ -633,42 +633,36 @@ private:
     Unit* _victim;
 };
 
-class spell_kalecgos_spectral_blast_dummy : public SpellScriptLoader
+class spell_kalecgos_spectral_blast_dummy : public SpellScript
 {
-public:
-    spell_kalecgos_spectral_blast_dummy() : SpellScriptLoader("spell_kalecgos_spectral_blast_dummy") { }
+    PrepareSpellScript(spell_kalecgos_spectral_blast_dummy);
 
-    class spell_kalecgos_spectral_blast_dummy_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_kalecgos_spectral_blast_dummy_SpellScript);
+        return ValidateSpellInfo({ SPELL_SPECTRAL_BLAST_PORTAL, SPELL_SPECTRAL_BLAST_AA, SPELL_TELEPORT_SPECTRAL });
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(SpectralBlastCheck(GetCaster()->GetVictim()));
-            Acore::Containers::RandomResize(targets, 1);
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-            {
-                target->CastSpell(target, SPELL_SPECTRAL_BLAST_PORTAL, true);
-                target->CastSpell(target, SPELL_SPECTRAL_BLAST_AA, true);
-                target->CastSpell(target, SPELL_TELEPORT_SPECTRAL, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kalecgos_spectral_blast_dummy_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_kalecgos_spectral_blast_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_kalecgos_spectral_blast_dummy_SpellScript();
+        targets.remove_if(SpectralBlastCheck(GetCaster()->GetVictim()));
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+        {
+            target->CastSpell(target, SPELL_SPECTRAL_BLAST_PORTAL, true);
+            target->CastSpell(target, SPELL_SPECTRAL_BLAST_AA, true);
+            target->CastSpell(target, SPELL_TELEPORT_SPECTRAL, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kalecgos_spectral_blast_dummy::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_kalecgos_spectral_blast_dummy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -775,7 +769,7 @@ void AddSC_boss_kalecgos()
     new boss_kalecgos();
     new boss_sathrovarr();
     new boss_kalec();
-    new spell_kalecgos_spectral_blast_dummy();
+    RegisterSpellScript(spell_kalecgos_spectral_blast_dummy);
     new spell_kalecgos_curse_of_boundless_agony();
     new spell_kalecgos_spectral_realm_dummy();
     new spell_kalecgos_spectral_realm();
