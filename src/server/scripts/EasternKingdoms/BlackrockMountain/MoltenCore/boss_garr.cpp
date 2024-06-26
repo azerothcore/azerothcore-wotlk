@@ -198,37 +198,26 @@ class spell_garr_separation_nexiety_aura : public AuraScript
 };
 
 //19515 Frenzy (SERVERSIDE)
-class spell_garr_frenzy : public SpellScriptLoader
+class spell_garr_frenzy : public SpellScript
 {
-public:
-    spell_garr_frenzy() : SpellScriptLoader("spell_garr_frenzy") {}
+    PrepareSpellScript(spell_garr_frenzy);
 
-    class spell_garr_frenzy_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_garr_frenzy_SpellScript);
+        return ValidateSpellInfo({ SPELL_FRENZY });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_FRENZY });
-        }
-
-        void HandleHit(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-            {
-                target->CastSpell(target, SPELL_FRENZY);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_garr_frenzy_SpellScript::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleHit(SpellEffIndex /*effIndex*/)
     {
-        return new spell_garr_frenzy_SpellScript();
+        if (Unit* target = GetHitUnit())
+        {
+            target->CastSpell(target, SPELL_FRENZY);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_garr_frenzy::HandleHit, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -239,6 +228,6 @@ void AddSC_boss_garr()
 
     // Spells
     RegisterSpellScript(spell_garr_separation_nexiety_aura);
-    new spell_garr_frenzy();
+    RegisterSpellScript(spell_garr_frenzy);
 }
 
