@@ -314,7 +314,7 @@ public:
                     {
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         bool berserk = me->HasAura(SPELL_BERSERK);
-                        me->CastSpell(me, SPELL_CLEAR_ALL_DEBUFFS, false);
+                        DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                         if (berserk)
                             me->CastSpell(me, SPELL_BERSERK, true);
                         Talk(EMOTE_SUBMERGE);
