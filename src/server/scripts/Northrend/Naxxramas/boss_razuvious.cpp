@@ -186,13 +186,11 @@ public:
             _rpBuddyGUID = Acore::Containers::SelectRandomContainerElement(summons);
             scheduler.Schedule(1s, GROUP_OOC_RP, [this](TaskContext context)
             {
-                bool isRpBuddyInRange;
                 if (_rpBuddyGUID)
                     if (Creature* understudy = ObjectAccessor::GetCreature(*me, _rpBuddyGUID))
                     {
                         if (me->GetDistance2d(understudy) <= 6.0f)
                         {
-                            isRpBuddyInRange = true;
                             me->PauseMovement();
                             scheduler.Schedule(1s, GROUP_OOC_RP, [this](TaskContext /*context*/)
                             {
@@ -200,10 +198,10 @@ public:
                                     if (Creature* understudy = ObjectAccessor::GetCreature(*me, _rpBuddyGUID))
                                         me->GetMotionMaster()->MovePoint(POINT_DEATH_KNIGHT, understudy->GetNearPosition(3.2f, understudy->GetRelativeAngle(me)));
                             });
+                        return;
                         }
                     }
-                if (!isRpBuddyInRange)
-                    context.Repeat(1s);
+                context.Repeat(1s);
             });
         }
 
