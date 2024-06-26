@@ -557,31 +557,25 @@ class spell_karazhan_brittle_bones_aura : public AuraScript
     }
 };
 
-class spell_karazhan_overload : public SpellScriptLoader
+class spell_karazhan_overload_aura : public AuraScript
 {
-public:
-    spell_karazhan_overload() : SpellScriptLoader("spell_karazhan_overload") { }
+    PrepareAuraScript(spell_karazhan_overload_aura);
 
-    class spell_karazhan_overload_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_karazhan_overload_AuraScript);
+        return ValidateSpellInfo({ SPELL_OVERLOAD });
+    }
 
-        void PeriodicTick(AuraEffect const* auraEffect)
-        {
-            PreventDefaultAction();
-            //Should stop at 3200 damage, maybe check needed(?)
-            GetUnitOwner()->CastCustomSpell(SPELL_OVERLOAD, SPELLVALUE_BASE_POINT0, int32(auraEffect->GetAmount() * pow(2.0, auraEffect->GetTickNumber())), GetUnitOwner(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karazhan_overload_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void PeriodicTick(AuraEffect const* auraEffect)
     {
-        return new spell_karazhan_overload_AuraScript();
+        PreventDefaultAction();
+        //Should stop at 3200 damage, maybe check needed(?)
+        GetUnitOwner()->CastCustomSpell(SPELL_OVERLOAD, SPELLVALUE_BASE_POINT0, int32(auraEffect->GetAmount() * pow(2.0, auraEffect->GetTickNumber())), GetUnitOwner(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karazhan_overload_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -618,7 +612,7 @@ void AddSC_instance_karazhan()
 {
     new instance_karazhan();
     RegisterSpellScript(spell_karazhan_brittle_bones_aura);
-    new spell_karazhan_overload();
+    RegisterSpellScript(spell_karazhan_overload_aura);
     new spell_karazhan_blink();
 }
 
