@@ -528,38 +528,32 @@ public:
     };
 };
 
-class spell_karazhan_brittle_bones : public SpellScriptLoader
+class spell_karazhan_brittle_bones_aura : public AuraScript
 {
-public:
-    spell_karazhan_brittle_bones() : SpellScriptLoader("spell_karazhan_brittle_bones") { }
+    PrepareAuraScript(spell_karazhan_brittle_bones_aura);
 
-    class spell_karazhan_brittle_bones_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_karazhan_brittle_bones_AuraScript);
+        return ValidateSpellInfo({ SPELL_RATTLED });
+    }
 
-        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = 5000;
-        }
-
-        void Update(AuraEffect const*  /*effect*/)
-        {
-            PreventDefaultAction();
-            if (roll_chance_i(35))
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_RATTLED, true);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_karazhan_brittle_bones_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_karazhan_brittle_bones_AuraScript::Update, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
     {
-        return new spell_karazhan_brittle_bones_AuraScript();
+        isPeriodic = true;
+        amplitude = 5000;
+    }
+
+    void Update(AuraEffect const*  /*effect*/)
+    {
+        PreventDefaultAction();
+        if (roll_chance_i(35))
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_RATTLED, true);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_karazhan_brittle_bones_aura::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_karazhan_brittle_bones_aura::Update, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -623,7 +617,7 @@ public:
 void AddSC_instance_karazhan()
 {
     new instance_karazhan();
-    new spell_karazhan_brittle_bones();
+    RegisterSpellScript(spell_karazhan_brittle_bones_aura);
     new spell_karazhan_overload();
     new spell_karazhan_blink();
 }
