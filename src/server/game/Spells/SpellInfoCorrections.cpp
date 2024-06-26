@@ -4807,7 +4807,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Eye of Grillok
     ApplySpellFix({ 38495 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 38530;
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 38530; // Quest Credit for Eye of Grillok
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
