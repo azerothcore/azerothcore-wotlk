@@ -1027,31 +1027,20 @@ public:
     };
 };
 
-class spell_kiljaeden_shadow_spike : public SpellScriptLoader
+class spell_kiljaeden_shadow_spike_aura : public AuraScript
 {
-public:
-    spell_kiljaeden_shadow_spike() : SpellScriptLoader("spell_kiljaeden_shadow_spike") { }
+    PrepareAuraScript(spell_kiljaeden_shadow_spike_aura);
 
-    class spell_kiljaeden_shadow_spike_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_kiljaeden_shadow_spike_AuraScript);
+        PreventDefaultAction();
+        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void HandlePeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_shadow_spike_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_shadow_spike_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_shadow_spike_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1333,7 +1322,7 @@ void AddSC_boss_kiljaeden()
     new npc_kiljaeden_controller();
     new boss_kiljaeden();
     new npc_kalecgos_kj();
-    new spell_kiljaeden_shadow_spike();
+    RegisterSpellScript(spell_kiljaeden_shadow_spike_aura);
     new spell_kiljaeden_sinister_reflection();
     new spell_kiljaeden_sinister_reflection_clone();
     new spell_kiljaeden_flame_dart();
