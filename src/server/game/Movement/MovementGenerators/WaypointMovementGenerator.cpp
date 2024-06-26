@@ -287,17 +287,15 @@ void WaypointMovementGenerator<Creature>::MovementInform(Creature* creature)
     }
 }
 
-void WaypointMovementGenerator<Creature>::Pause(uint32 timer/* = 0*/)
+void WaypointMovementGenerator<Creature>::Pause(uint32 /*timer*/)
 {
-    stalled = timer ? false : true;
-    i_nextMoveTime.Reset(timer ? timer : 1);
+    stalled = true;
+    i_nextMoveTime.Reset(1);
 }
 
-void WaypointMovementGenerator<Creature>::Resume(uint32 overrideTimer/* = 0*/)
+void WaypointMovementGenerator<Creature>::Resume(uint32 /*overrideTimer/*/)
 {
     stalled = false;
-    if (overrideTimer)
-        i_nextMoveTime.Reset(overrideTimer);
 }
 
 //----------------------------------------------------//
