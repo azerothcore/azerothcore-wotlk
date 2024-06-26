@@ -326,41 +326,35 @@ public:
     };
 };
 
-class spell_muru_summon_blood_elves_periodic : public SpellScriptLoader
+class spell_muru_summon_blood_elves_periodic_aura : public AuraScript
 {
-public:
-    spell_muru_summon_blood_elves_periodic() : SpellScriptLoader("spell_muru_summon_blood_elves_periodic") { }
+    PrepareAuraScript(spell_muru_summon_blood_elves_periodic_aura);
 
-    class spell_muru_summon_blood_elves_periodic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_muru_summon_blood_elves_periodic_AuraScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_FURY_MAGE1, SPELL_SUMMON_FURY_MAGE2, SPELL_SUMMON_BERSERKER1, SPELL_SUMMON_BERSERKER2 });
+    }
 
-        void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            // first tick after 10 seconds
-            GetAura()->GetEffect(aurEff->GetEffIndex())->SetPeriodicTimer(10000);
-        }
-
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE1, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE2, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER1, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER2, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER1, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER2, true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_muru_summon_blood_elves_periodic_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_muru_summon_blood_elves_periodic_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_muru_summon_blood_elves_periodic_AuraScript();
+        // first tick after 10 seconds
+        GetAura()->GetEffect(aurEff->GetEffIndex())->SetPeriodicTimer(10000);
+    }
+
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
+    {
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE1, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE2, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER1, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER2, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER1, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER2, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_muru_summon_blood_elves_periodic_aura::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_muru_summon_blood_elves_periodic_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -512,7 +506,7 @@ void AddSC_boss_muru()
     new boss_entropius();
     new npc_singularity();
 
-    new spell_muru_summon_blood_elves_periodic();
+    RegisterSpellScript(spell_muru_summon_blood_elves_periodic_aura);
     new spell_muru_darkness();
     new spell_entropius_negative_energy();
     new spell_entropius_void_zone_visual();
