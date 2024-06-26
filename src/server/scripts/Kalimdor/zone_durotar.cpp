@@ -396,44 +396,33 @@ class spell_mount_check_aura : public AuraScript
     }
 };
 
-class spell_voljin_war_drums : public SpellScriptLoader
+class spell_voljin_war_drums : public SpellScript
 {
-public:
-    spell_voljin_war_drums() : SpellScriptLoader("spell_voljin_war_drums") { }
+    PrepareSpellScript(spell_voljin_war_drums);
 
-    class spell_voljin_war_drums_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_voljin_war_drums_SpellScript)
+        return ValidateSpellInfo({ SPELL_MOTIVATE_1, SPELL_MOTIVATE_2 });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_MOTIVATE_1, SPELL_MOTIVATE_2 });
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            Unit* caster = GetCaster();
-            if (Unit* target = GetHitUnit())
-            {
-                uint32 motivate = 0;
-                if (target->GetEntry() == NPC_CITIZEN_1)
-                    motivate = SPELL_MOTIVATE_1;
-                else if (target->GetEntry() == NPC_CITIZEN_2)
-                    motivate = SPELL_MOTIVATE_2;
-                if (motivate)
-                    caster->CastSpell(target, motivate, false);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_voljin_war_drums_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_voljin_war_drums_SpellScript();
+        Unit* caster = GetCaster();
+        if (Unit* target = GetHitUnit())
+        {
+            uint32 motivate = 0;
+            if (target->GetEntry() == NPC_CITIZEN_1)
+                motivate = SPELL_MOTIVATE_1;
+            else if (target->GetEntry() == NPC_CITIZEN_2)
+                motivate = SPELL_MOTIVATE_2;
+            if (motivate)
+                caster->CastSpell(target, motivate, false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_voljin_war_drums::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -497,7 +486,7 @@ void AddSC_durotar()
     new npc_tiger_matriarch();
     new npc_troll_volunteer();
     RegisterSpellScript(spell_mount_check_aura);
-    new spell_voljin_war_drums();
+    RegisterSpellScript(spell_voljin_war_drums);
     new spell_voodoo();
 }
 
