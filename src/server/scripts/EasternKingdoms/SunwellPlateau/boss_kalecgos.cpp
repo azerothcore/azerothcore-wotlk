@@ -666,38 +666,32 @@ class spell_kalecgos_spectral_blast_dummy : public SpellScript
     }
 };
 
-class spell_kalecgos_curse_of_boundless_agony : public SpellScriptLoader
+class spell_kalecgos_curse_of_boundless_agony_aura : public AuraScript
 {
-public:
-    spell_kalecgos_curse_of_boundless_agony() : SpellScriptLoader("spell_kalecgos_curse_of_boundless_agony") { }
+    PrepareAuraScript(spell_kalecgos_curse_of_boundless_agony_aura);
 
-    class spell_kalecgos_curse_of_boundless_agony_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_kalecgos_curse_of_boundless_agony_AuraScript);
+        return ValidateSpellInfo({ SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR });
+    }
 
-        void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
-                if (instance->IsEncounterInProgress())
-                    GetUnitOwner()->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR, SPELLVALUE_MAX_TARGETS, 1, GetUnitOwner(), true);
-        }
-
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            if (aurEff->GetTickNumber() > 1 && aurEff->GetTickNumber() % 5 == 1)
-                GetAura()->GetEffect(aurEff->GetEffIndex())->SetAmount(aurEff->GetAmount() * 2);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kalecgos_curse_of_boundless_agony_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_kalecgos_curse_of_boundless_agony_AuraScript();
+        if (InstanceScript* instance = GetUnitOwner()->GetInstanceScript())
+            if (instance->IsEncounterInProgress())
+                GetUnitOwner()->CastCustomSpell(SPELL_CURSE_OF_BOUNDLESS_AGONY_PLR, SPELLVALUE_MAX_TARGETS, 1, GetUnitOwner(), true);
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        if (aurEff->GetTickNumber() > 1 && aurEff->GetTickNumber() % 5 == 1)
+            GetAura()->GetEffect(aurEff->GetEffIndex())->SetAmount(aurEff->GetAmount() * 2);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_kalecgos_curse_of_boundless_agony_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_kalecgos_curse_of_boundless_agony_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -770,7 +764,7 @@ void AddSC_boss_kalecgos()
     new boss_sathrovarr();
     new boss_kalec();
     RegisterSpellScript(spell_kalecgos_spectral_blast_dummy);
-    new spell_kalecgos_curse_of_boundless_agony();
+    RegisterSpellScript(spell_kalecgos_curse_of_boundless_agony_aura);
     new spell_kalecgos_spectral_realm_dummy();
     new spell_kalecgos_spectral_realm();
 }
