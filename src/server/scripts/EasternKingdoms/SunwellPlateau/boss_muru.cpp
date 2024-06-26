@@ -413,35 +413,29 @@ class spell_entropius_negative_energy : public SpellScript
     }
 };
 
-class spell_entropius_void_zone_visual : public SpellScriptLoader
+class spell_entropius_void_zone_visual_aura : public AuraScript
 {
-public:
-    spell_entropius_void_zone_visual() : SpellScriptLoader("spell_entropius_void_zone_visual") { }
+    PrepareAuraScript(spell_entropius_void_zone_visual_aura);
 
-    class spell_entropius_void_zone_visual_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_entropius_void_zone_visual_AuraScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_DARK_FIEND_ENTROPIUS });
+    }
 
-        void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            SetDuration(3000);
-        }
-
-        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND_ENTROPIUS, true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_entropius_void_zone_visual_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_entropius_void_zone_visual_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_entropius_void_zone_visual_AuraScript();
+        SetDuration(3000);
+    }
+
+    void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND_ENTROPIUS, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_entropius_void_zone_visual_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_entropius_void_zone_visual_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -497,7 +491,7 @@ void AddSC_boss_muru()
     RegisterSpellScript(spell_muru_summon_blood_elves_periodic_aura);
     RegisterSpellScript(spell_muru_darkness_aura);
     RegisterSpellScript(spell_entropius_negative_energy);
-    new spell_entropius_void_zone_visual();
+    RegisterSpellScript(spell_entropius_void_zone_visual_aura);
     new spell_entropius_black_hole_effect();
 }
 
