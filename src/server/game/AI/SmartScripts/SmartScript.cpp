@@ -1770,41 +1770,24 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 break;
             }
             // Can use target floats as offset
-            case SMART_TARGET_SELF:
-            case SMART_TARGET_CREATURE_RANGE:
-            case SMART_TARGET_CREATURE_DISTANCE:
-            case SMART_TARGET_GAMEOBJECT_RANGE:
-            case SMART_TARGET_GAMEOBJECT_DISTANCE:
-            case SMART_TARGET_STORED:
-            case SMART_TARGET_CREATURE_GUID:
-            case SMART_TARGET_GAMEOBJECT_GUID:
-            case SMART_TARGET_CLOSEST_CREATURE:
-            case SMART_TARGET_CLOSEST_GAMEOBJECT:
-            case SMART_TARGET_OWNER_OR_SUMMONER:
-            case SMART_TARGET_ACTION_INVOKER:
-            case SMART_TARGET_CLOSEST_ENEMY:
-            case SMART_TARGET_CLOSEST_FRIENDLY:
-            {
-                {
-                    // we want to move to random element
-                    if (targets.empty())
-                        return;
-                    else
-                        target = Acore::Containers::SelectRandomContainerElement(targets);
-
-                    float x, y, z;
-                    target->GetPosition(x, y, z);
-                    if (e.action.moveToPos.ContactDistance > 0)
-                    {
-                        target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
-                    }
-                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
-
-                    break;
-                }
-            }
             default:
+            {
+                // we want to move to random element
+                if (targets.empty())
+                    return;
+                else
+                    target = Acore::Containers::SelectRandomContainerElement(targets);
+
+                float x, y, z;
+                target->GetPosition(x, y, z);
+                if (e.action.moveToPos.ContactDistance > 0)
+                {
+                    target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
+                }
+                me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+
                 break;
+            }
             }
 
             break;
