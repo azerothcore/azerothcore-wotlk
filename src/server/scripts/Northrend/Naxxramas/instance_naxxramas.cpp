@@ -230,6 +230,7 @@ public:
                     return;
                 case NPC_RAZUVIOUS:
                     _razuviousGUID = creature->GetGUID();
+                    return;
                 case NPC_LADY_BLAUMEUX:
                     _blaumeuxGUID = creature->GetGUID();
                     return;
