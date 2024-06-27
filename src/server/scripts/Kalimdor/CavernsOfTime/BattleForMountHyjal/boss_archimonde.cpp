@@ -143,28 +143,42 @@ struct npc_doomfire_spirit : public ScriptedAI
 {
     npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
+    uint32 m_uiChangeTargetTimer;
+    float m_fAngle;
+
     void Reset() override
     {
-        scheduler.CancelAll();
-        ScheduleTimedEvent(0s, [&] {
-            me->GetMotionMaster()->MovePoint(NEAR_POINT, DoomfireMovement(me->GetPosition()));
-            }, 1500ms);
+        m_uiChangeTargetTimer = 1500;
+        m_fAngle = urand(0, M_PI * 2);
+        
     }
 
-    Position DoomfireMovement(Position mePos)
+    Position GetFirstRandomAngleCollisionPosition(float dist, float angle)
     {
-        float angle = mePos.GetOrientation();
-        float distance = 100.0f;
-        float newAngle = angle + ((rand() % 181) - 90) * M_PI / 180;
-        float x = mePos.GetPositionX() + distance * cos(newAngle);
-        float y = mePos.GetPositionY() + distance * sin(newAngle);
-
-        Position targetPos = Position(x, y, me->GetPositionZ());
-        return targetPos;
+        Position pos;
+        for (uint32 i = 0; i < 10; ++i)
+        {
+            me->WorldObject::GetFirstCollisionPosition(dist, angle);
+            if (me->GetDistance(pos) > dist * 0.8f) // if at least 80% distance, good enough
+                break;
+            angle += (M_PI / 5); // else try slightly different angle
+        }
+        return pos;
     }
 
     void UpdateAI(uint32 diff) override
     {
+        if (m_uiChangeTargetTimer < diff)
+        {
+            float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * 0.785402f);
+            Position pos = GetFirstRandomAngleCollisionPosition(8.f, nextOrientation); // both orientation and distance verified with sniffs
+            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
+
+            m_uiChangeTargetTimer = 1000;
+        }
+        else
+            m_uiChangeTargetTimer -= diff;
+
         scheduler.Update(diff);
 
         if (!UpdateVictim())
