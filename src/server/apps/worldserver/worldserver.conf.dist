@@ -4381,7 +4381,7 @@ DailyRBGArenaPoints.MinLevel = 71
 
 #
 #    MunchingBlizzlike.Enabled
-#        Description: Disable the Blizzlike implementation of munching with e.g. Warrior's Rend or Mage's Ignite
+#        Description: Enable the Blizzlike implementation of munching with e.g. Warrior's Rend or Mage's Ignite
 #        Default: true - (Blizzlike)
 
 MunchingBlizzlike.Enabled = true
