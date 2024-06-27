@@ -119,55 +119,44 @@ public:
 
 // 19411 Lava Bomb
 // 20474 Lava Bomb
-class spell_magmadar_lava_bomb : public SpellScriptLoader
+class spell_magmadar_lava_bomb : public SpellScript
 {
-public:
-    spell_magmadar_lava_bomb() : SpellScriptLoader("spell_magmadar_lava_bomb") {}
+    PrepareSpellScript(spell_magmadar_lava_bomb);
 
-    class spell_magmadar_lava_bomb_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_magmadar_lava_bomb_SpellScript);
+        return ValidateSpellInfo({ SPELL_LAVA_BOMB_EFFECT, SPELL_LAVA_BOMB_RANGED_EFFECT });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
         {
-            return ValidateSpellInfo({ SPELL_LAVA_BOMB_EFFECT, SPELL_LAVA_BOMB_RANGED_EFFECT });
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
+            uint32 spellId = 0;
+            switch (m_scriptSpellId)
             {
-                uint32 spellId = 0;
-                switch (m_scriptSpellId)
+                case SPELL_LAVA_BOMB:
                 {
-                    case SPELL_LAVA_BOMB:
-                    {
-                        spellId = SPELL_LAVA_BOMB_EFFECT;
-                        break;
-                    }
-                    case SPELL_LAVA_BOMB_RANGED:
-                    {
-                        spellId = SPELL_LAVA_BOMB_RANGED_EFFECT;
-                        break;
-                    }
-                    default:
-                    {
-                        return;
-                    }
+                    spellId = SPELL_LAVA_BOMB_EFFECT;
+                    break;
                 }
-                target->CastSpell(target, spellId, true, nullptr, nullptr, GetCaster()->GetGUID());
+                case SPELL_LAVA_BOMB_RANGED:
+                {
+                    spellId = SPELL_LAVA_BOMB_RANGED_EFFECT;
+                    break;
+                }
+                default:
+                {
+                    return;
+                }
             }
+            target->CastSpell(target, spellId, true, nullptr, nullptr, GetCaster()->GetGUID());
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_magmadar_lava_bomb_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_magmadar_lava_bomb_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_magmadar_lava_bomb::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -176,6 +165,6 @@ void AddSC_boss_magmadar()
     new boss_magmadar();
 
     // Spells
-    new spell_magmadar_lava_bomb();
+    RegisterSpellScript(spell_magmadar_lava_bomb);
 }
 
