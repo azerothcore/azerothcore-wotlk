@@ -1780,10 +1780,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 float x, y, z;
                 target->GetPosition(x, y, z);
-                if (e.action.moveToPos.ContactDistance > 0)
-                {
+
+                if (e.action.moveToPos.combatReach)
+                    target->GetNearPoint(me, x, y, z, target->GetCombatReach() + e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
+                else if (e.action.moveToPos.ContactDistance)
                     target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
-                }
+
                 me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
 
                 break;
