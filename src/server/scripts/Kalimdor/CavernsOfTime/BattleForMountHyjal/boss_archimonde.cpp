@@ -172,7 +172,7 @@ struct npc_doomfire_spirit : public ScriptedAI
             float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * 0.785402f);
             Position pos = GetFirstRandomAngleCollisionPosition(8.f, nextOrientation); // both orientation and distance verified with sniffs
             me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
-            
+
             m_uiChangeTargetTimer = 1000;
         }
         else
