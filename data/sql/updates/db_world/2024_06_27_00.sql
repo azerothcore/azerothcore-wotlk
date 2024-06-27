@@ -1,3 +1,4 @@
+-- DB update 2024_06_26_05 -> 2024_06_27_00
 -- Treebole
 UPDATE `creature_template_addon` SET `path_id` = 222150 WHERE (`entry` = 22215);
 
