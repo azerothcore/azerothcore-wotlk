@@ -143,14 +143,13 @@ struct npc_doomfire_spirit : public ScriptedAI
 {
     npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
-    uint32 m_uiChangeTargetTimer;
-    float m_fAngle;
+    uint32 m_uiChangeTargetTimer = 1500;
+    float m_fAngle = urand(0, M_PI * 2);
 
     void Reset() override
     {
         m_uiChangeTargetTimer = 1500;
         m_fAngle = urand(0, M_PI * 2);
-        
     }
 
     Position GetFirstRandomAngleCollisionPosition(float dist, float angle)
@@ -158,7 +157,7 @@ struct npc_doomfire_spirit : public ScriptedAI
         Position pos;
         for (uint32 i = 0; i < 10; ++i)
         {
-            me->WorldObject::GetFirstCollisionPosition(dist, angle);
+            pos = me->WorldObject::GetFirstCollisionPosition(dist, angle);
             if (me->GetDistance(pos) > dist * 0.8f) // if at least 80% distance, good enough
                 break;
             angle += (M_PI / 5); // else try slightly different angle
@@ -173,19 +172,13 @@ struct npc_doomfire_spirit : public ScriptedAI
             float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * 0.785402f);
             Position pos = GetFirstRandomAngleCollisionPosition(8.f, nextOrientation); // both orientation and distance verified with sniffs
             me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
-
+            
             m_uiChangeTargetTimer = 1000;
         }
         else
             m_uiChangeTargetTimer -= diff;
 
         scheduler.Update(diff);
-
-        if (!UpdateVictim())
-            return;
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
     }
 };
 
@@ -394,11 +387,6 @@ struct boss_archimonde : public BossAI
         {
             summoned->CastSpell(summoned, SPELL_DOOMFIRE_SPAWN);
             summoned->CastSpell(summoned, SPELL_DOOMFIRE, true, 0, 0, me->GetGUID());
-        }
-        else if (summoned->GetEntry() == CREATURE_DOOMFIRE_SPIRIT)
-        {
-            Position randomPosition = summoned->GetRandomNearPosition(40.0f);
-            summoned->GetMotionMaster()->MovePoint(0, randomPosition);
         }
         else
         {
