@@ -265,7 +265,7 @@ struct boss_archimonde : public BossAI
         _JustEngagedWith();
         me->InterruptNonMeleeSpells(false);
         Talk(SAY_AGGRO);
-        ScheduleTimedEvent(25s, 35s, [&]
+        ScheduleTimedEvent(40s, [&]
         {
             scheduler.DelayGroup(GROUP_FEAR, 5s);
             Talk(SAY_AIR_BURST);
