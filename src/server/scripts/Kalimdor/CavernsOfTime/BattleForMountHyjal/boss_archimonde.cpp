@@ -265,7 +265,7 @@ struct boss_archimonde : public BossAI
         _JustEngagedWith();
         me->InterruptNonMeleeSpells(false);
         Talk(SAY_AGGRO);
-        ScheduleTimedEvent(40s, [&]
+        ScheduleTimedEvent(25s, 35s, [&]
         {
             scheduler.DelayGroup(GROUP_FEAR, 5s);
             Talk(SAY_AIR_BURST);
@@ -320,7 +320,7 @@ struct boss_archimonde : public BossAI
             DoCastVictim(SPELL_RED_SKY_EFFECT);
             DoCastVictim(SPELL_HAND_OF_DEATH);
         }, 3s);
-        scheduler.Schedule(25s, 35s, GROUP_FEAR, [this](TaskContext context)
+        scheduler.Schedule(40s, GROUP_FEAR, [this](TaskContext context)
         {
             DoCastAOE(SPELL_FEAR);
             context.Repeat(42s);
