@@ -21,6 +21,10 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1994401, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Lashh\'an Wing Guard - Actionlist - Set Reactstate Aggressive'),
 (1994401, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Lashh\'an Wing Guard - Actionlist - Start Attacking');
 
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 2) AND (`SourceEntry` = 19944);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 2, 19944, 0, 0, 30, 1, 184826, 100, 0, 0, 0, 0, '', 'Only execute SAI if Object Lashh\'an Circle Spell Focus is within 100y');
+
 -- Angered Arakkoa Protector
 DELETE FROM `creature` WHERE (`id1` = 21470);
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 21470;
