@@ -296,6 +296,7 @@ struct boss_netherspite : public BossAI
     {
         BossAI::JustDied(killer);
         HandleDoors(true);
+        DestroyPortals();
     }
 
     void UpdateAI(uint32 diff) override
