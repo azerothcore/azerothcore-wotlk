@@ -1,3 +1,4 @@
+-- DB update 2024_06_27_00 -> 2024_06_27_01
 --
 -- FORCE_GOSSIP
 UPDATE `creature_template` SET `detection_range` = 40, `type_flags` = `type_flags` | 134217728, `movementId` = 1988  WHERE `entry` = 17225;
