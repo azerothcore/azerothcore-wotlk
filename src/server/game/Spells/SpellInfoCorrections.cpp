@@ -4590,7 +4590,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Holiday - Midsummer, Ribbon Pole Periodic Visual
     ApplySpellFix({ 45406 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST );
+        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST | AURA_INTERRUPT_FLAG_TALK );
     });
 
     // Improved Mind Flay and Smite
