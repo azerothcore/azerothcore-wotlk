@@ -25,39 +25,37 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
-// Ours
-
-class spell_q10935_the_exorcism_of_colonel_jules : public SpellScriptLoader
+enum q10935Exorcism
 {
-public:
-    spell_q10935_the_exorcism_of_colonel_jules() : SpellScriptLoader("spell_q10935_the_exorcism_of_colonel_jules") { }
+    SPELL_HOLY_FIRE             = 39323,
+    SPELL_HEAL_BARADA           = 39322
+};
 
-    class spell_q10935_the_exorcism_of_colonel_jules_SpellScript : public SpellScript
+class spell_q10935_the_exorcism_of_colonel_jules : public SpellScript
+{
+    PrepareSpellScript(spell_q10935_the_exorcism_of_colonel_jules);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q10935_the_exorcism_of_colonel_jules_SpellScript);
+        return ValidateSpellInfo({ SPELL_HOLY_FIRE, SPELL_HEAL_BARADA });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Creature* target = GetHitCreature();
-            if (!target)
-                return;
-
-            if (GetCaster()->IsHostileTo(target))
-                GetCaster()->CastSpell(target, 39323 /*SPELL_HOLY_FIRE*/, true);
-            else
-                GetCaster()->CastSpell(target, 39322 /*SPELL_HEAL_BARADA*/, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q10935_the_exorcism_of_colonel_jules_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_q10935_the_exorcism_of_colonel_jules_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        Creature* target = GetHitCreature();
+        if (!target)
+            return;
+
+        if (GetCaster()->IsHostileTo(target))
+            GetCaster()->CastSpell(target, SPELL_HOLY_FIRE, true);
+        else
+            GetCaster()->CastSpell(target, SPELL_HEAL_BARADA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q10935_the_exorcism_of_colonel_jules::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -607,7 +605,7 @@ public:
 void AddSC_hellfire_peninsula()
 {
     // Ours
-    new spell_q10935_the_exorcism_of_colonel_jules();
+    RegisterSpellScript(spell_q10935_the_exorcism_of_colonel_jules);
 
     // Theirs
     new npc_aeranas();
