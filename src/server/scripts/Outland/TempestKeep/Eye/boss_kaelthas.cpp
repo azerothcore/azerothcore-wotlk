@@ -399,27 +399,7 @@ struct boss_kaelthas : public BossAI
                 }, EVENT_PREFIGHT_PHASE52);
                 break;
             case ACTION_PROGRESS_PHASE_CHECK:
-                if (_phase == PHASE_WEAPONS)
-                {
-                    bool aliveWeapon = false;
-                    summons.DoForAllSummons([&aliveWeapon](WorldObject* summon)
-                    {
-                        if (Creature* summonedCreature = summon->ToCreature())
-                        {
-                            if (summonedCreature->IsAlive())
-                            {
-                                if (summonedCreature->GetEntry() >= NPC_NETHERSTRAND_LONGBOW && summonedCreature->GetEntry() <= NPC_STAFF_OF_DISINTEGRATION)
-                                {
-                                    aliveWeapon = true;
-                                    return;
-                                }
-                            }
-                        }
-                    });
-                    if (!aliveWeapon)
-                        PhaseAllAdvisorsExecute();
-                }
-                else if (_phase == PHASE_ALL_ADVISORS)
+                if (_phase == PHASE_ALL_ADVISORS)
                 {
                     bool advisorAlive = false;
                     summons.DoForAllSummons([&advisorAlive](WorldObject* summon)
