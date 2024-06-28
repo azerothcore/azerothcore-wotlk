@@ -907,13 +907,6 @@ class spell_midsummer_ribbon_pole : public AuraScript
                     target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
             }
 
-            if (!target->HasAura(SPELL_TEST_RIBBON_POLE_CHANNEL_BLUE)
-                && !target->HasAura(SPELL_TEST_RIBBON_POLE_CHANNEL_RED)
-                && !target->HasAura(SPELL_TEST_RIBBON_POLE_CHANNEL_PINK))
-            {
-                SetDuration(1);
-            }
-
             // Achievement
             if ((time(nullptr) - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
                 target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
