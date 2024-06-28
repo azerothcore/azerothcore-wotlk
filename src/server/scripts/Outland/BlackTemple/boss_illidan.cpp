@@ -1023,419 +1023,337 @@ public:
     }
 };
 
-class spell_illidan_draw_soul : public SpellScriptLoader
+class spell_illidan_draw_soul : public SpellScript
 {
-public:
-    spell_illidan_draw_soul() : SpellScriptLoader("spell_illidan_draw_soul") { }
+    PrepareSpellScript(spell_illidan_draw_soul);
 
-    class spell_illidan_draw_soul_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_illidan_draw_soul_SpellScript);
+        return ValidateSpellInfo({ SPELL_DRAW_SOUL_HEAL });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(GetCaster(), SPELL_DRAW_SOUL_HEAL, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_draw_soul_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_illidan_draw_soul_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), SPELL_DRAW_SOUL_HEAL, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_draw_soul::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_illidan_parasitic_shadowfiend : public SpellScriptLoader
+class spell_illidan_parasitic_shadowfiend_aura : public AuraScript
 {
-public:
-    spell_illidan_parasitic_shadowfiend() : SpellScriptLoader("spell_illidan_parasitic_shadowfiend") { }
+    PrepareAuraScript(spell_illidan_parasitic_shadowfiend_aura);
 
-    class spell_illidan_parasitic_shadowfiend_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_illidan_parasitic_shadowfiend_AuraScript)
+        return ValidateSpellInfo({ SPELL_SUMMON_PARASITIC_SHADOWFIENDS });
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
-                GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_illidan_parasitic_shadowfiend_AuraScript();
+        if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
+            GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_illidan_parasitic_shadowfiend_trigger : public SpellScriptLoader
+class spell_illidan_parasitic_shadowfiend_trigger : public SpellScript
 {
-public:
-    spell_illidan_parasitic_shadowfiend_trigger() : SpellScriptLoader("spell_illidan_parasitic_shadowfiend_trigger") { }
+    PrepareSpellScript(spell_illidan_parasitic_shadowfiend_trigger);
 
-    class spell_illidan_parasitic_shadowfiend_trigger_AuraScript : public AuraScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareAuraScript(spell_illidan_parasitic_shadowfiend_trigger_AuraScript)
-
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
-                GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_trigger_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_illidan_parasitic_shadowfiend_trigger_AuraScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Creature* target = GetHitCreature())
+            target->DespawnOrUnsummon(1);
     }
 
-    class spell_illidan_parasitic_shadowfiend_trigger_SpellScript : public SpellScript
+    void Register() override
     {
-        PrepareSpellScript(spell_illidan_parasitic_shadowfiend_trigger_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Creature* target = GetHitCreature())
-                target->DespawnOrUnsummon(1);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_parasitic_shadowfiend_trigger_SpellScript::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_illidan_parasitic_shadowfiend_trigger_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_parasitic_shadowfiend_trigger::HandleScriptEffect, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_illidan_glaive_throw : public SpellScriptLoader
+class spell_illidan_parasitic_shadowfiend_trigger_aura : public AuraScript
 {
-public:
-    spell_illidan_glaive_throw() : SpellScriptLoader("spell_illidan_glaive_throw") { }
+    PrepareAuraScript(spell_illidan_parasitic_shadowfiend_trigger_aura);
 
-    class spell_illidan_glaive_throw_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_illidan_glaive_throw_SpellScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_PARASITIC_SHADOWFIENDS });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, SPELL_SUMMON_GLAIVE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_glaive_throw_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_illidan_glaive_throw_SpellScript();
+        if (!GetTarget()->HasAura(SPELL_SHADOW_PRISON) && GetTarget()->GetInstanceScript() && GetTarget()->GetInstanceScript()->IsEncounterInProgress())
+            GetTarget()->CastSpell(GetTarget(), SPELL_SUMMON_PARASITIC_SHADOWFIENDS, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_illidan_parasitic_shadowfiend_trigger_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_illidan_tear_of_azzinoth_summon_channel : public SpellScriptLoader
+class spell_illidan_glaive_throw : public SpellScript
 {
-public:
-    spell_illidan_tear_of_azzinoth_summon_channel() : SpellScriptLoader("spell_illidan_tear_of_azzinoth_summon_channel") { }
+    PrepareSpellScript(spell_illidan_glaive_throw);
 
-    class spell_illidan_tear_of_azzinoth_summon_channel_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_illidan_tear_of_azzinoth_summon_channel_AuraScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_GLAIVE });
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-            {
-                if (GetTarget()->GetDistance2d(caster) > 25.0f)
-                {
-                    SetDuration(0);
-                    GetTarget()->CastSpell(GetTarget(), SPELL_UNCAGED_WRATH, true);
-                }
-            }
-
-            // xinef: ugly hax, dunno how it really works on blizz
-            Map::PlayerList const& pl = GetTarget()->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                if (Player* player = itr->GetSource())
-                    if (player->GetPositionX() > 693.4f || player->GetPositionY() < 271.8f || player->GetPositionX() < 658.43f || player->GetPositionY() > 338.68f)
-                    {
-                        GetTarget()->CastSpell(player, SPELL_CHARGE, true);
-                        break;
-                    }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_tear_of_azzinoth_summon_channel_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_illidan_tear_of_azzinoth_summon_channel_AuraScript();
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_SUMMON_GLAIVE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_glaive_throw::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_illidan_shadow_prison : public SpellScriptLoader
+class spell_illidan_tear_of_azzinoth_summon_channel_aura : public AuraScript
 {
-public:
-    spell_illidan_shadow_prison() : SpellScriptLoader("spell_illidan_shadow_prison") { }
+    PrepareAuraScript(spell_illidan_tear_of_azzinoth_summon_channel_aura);
 
-    class spell_illidan_shadow_prison_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_illidan_shadow_prison_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(PlayerOrPetCheck());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_illidan_shadow_prison_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_illidan_shadow_prison_SpellScript();
+        return ValidateSpellInfo({ SPELL_UNCAGED_WRATH, SPELL_CHARGE });
     }
-};
 
-class spell_illidan_demon_transform1 : public SpellScriptLoader
-{
-public:
-    spell_illidan_demon_transform1() : SpellScriptLoader("spell_illidan_demon_transform1") { }
-
-    class spell_illidan_demon_transform1_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_illidan_demon_transform1_AuraScript);
-
-        bool Load() override
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
         {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            SetDuration(0);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_TRANSFORM_2, true);
-            GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_demon_transform1_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_illidan_demon_transform1_AuraScript();
-    }
-};
-
-class spell_illidan_demon_transform2 : public SpellScriptLoader
-{
-public:
-    spell_illidan_demon_transform2() : SpellScriptLoader("spell_illidan_demon_transform2") { }
-
-    class spell_illidan_demon_transform2_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_illidan_demon_transform2_AuraScript);
-
-        bool Load() override
-        {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-
-            if (aurEff->GetTickNumber() == 1)
-            {
-                if (GetUnitOwner()->GetDisplayId() == GetUnitOwner()->GetNativeDisplayId())
-                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_FORM, true);
-                else
-                    GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DEMON_FORM);
-            }
-            else if (aurEff->GetTickNumber() == 2)
+            if (GetTarget()->GetDistance2d(caster) > 25.0f)
             {
                 SetDuration(0);
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_TRANSFORM_3, true);
-                if (Aura* aura = GetUnitOwner()->GetAura(SPELL_DEMON_TRANSFORM_3))
-                    aura->SetDuration(4500);
-
-                if (!GetUnitOwner()->HasAura(SPELL_DEMON_FORM))
-                    GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
+                GetTarget()->CastSpell(GetTarget(), SPELL_UNCAGED_WRATH, true);
             }
         }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_demon_transform2_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_illidan_demon_transform2_AuraScript();
-    }
-};
-
-class spell_illidan_flame_burst : public SpellScriptLoader
-{
-public:
-    spell_illidan_flame_burst() : SpellScriptLoader("spell_illidan_flame_burst") { }
-
-    class spell_illidan_flame_burst_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_illidan_flame_burst_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, SPELL_FLAME_BURST_EFFECT, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_flame_burst_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_illidan_flame_burst_SpellScript();
-    }
-};
-
-class spell_illidan_found_target : public SpellScriptLoader
-{
-public:
-    spell_illidan_found_target() : SpellScriptLoader("spell_illidan_found_target") { }
-
-    class spell_illidan_found_target_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_illidan_found_target_SpellScript);
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                if (GetCaster()->GetDistance(target) < 2.0f)
+        // xinef: ugly hax, dunno how it really works on blizz
+        Map::PlayerList const& pl = GetTarget()->GetMap()->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+            if (Player* player = itr->GetSource())
+                if (player->GetPositionX() > 693.4f || player->GetPositionY() < 271.8f || player->GetPositionX() < 658.43f || player->GetPositionY() > 338.68f)
                 {
-                    GetCaster()->CastSpell(target, SPELL_CONSUME_SOUL, true);
-                    GetCaster()->CastSpell(GetCaster(), SPELL_FIND_TARGET, true);
+                    GetTarget()->CastSpell(player, SPELL_CHARGE, true);
+                    break;
                 }
-        }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_found_target_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_illidan_found_target_SpellScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_tear_of_azzinoth_summon_channel_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_illidan_cage_trap : public SpellScriptLoader
+class spell_illidan_shadow_prison : public SpellScript
 {
-public:
-    spell_illidan_cage_trap() : SpellScriptLoader("spell_illidan_cage_trap") { }
+    PrepareSpellScript(spell_illidan_shadow_prison);
 
-    class spell_illidan_cage_trap_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_illidan_cage_trap_SpellScript);
+        targets.remove_if(PlayerOrPetCheck());
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Creature* target = GetHitCreature())
-                if (GetCaster()->GetExactDist2d(target) < 4.0f)
-                {
-                    target->AI()->DoAction(ACTION_ILLIDAN_CAGED);
-                    target->CastSpell(target, SPELL_CAGE_TRAP, true);
-                    GetCaster()->ToCreature()->DespawnOrUnsummon(1);
-                    if (GameObject* gobject = GetCaster()->FindNearestGameObject(GO_CAGE_TRAP, 10.0f))
-                        gobject->SetLootState(GO_JUST_DEACTIVATED);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_illidan_cage_trap_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_illidan_cage_trap_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_illidan_shadow_prison::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_illidan_cage_trap_stun : public SpellScriptLoader
+class spell_illidan_demon_transform1_aura : public AuraScript
 {
-public:
-    spell_illidan_cage_trap_stun() : SpellScriptLoader("spell_illidan_cage_trap_stun") { }
+    PrepareAuraScript(spell_illidan_demon_transform1_aura);
 
-    class spell_illidan_cage_trap_stun_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_illidan_cage_trap_stun_AuraScript);
+        return ValidateSpellInfo({ SPELL_DEMON_TRANSFORM_2 });
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
+    bool Load() override
+    {
+        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
+    {
+        PreventDefaultAction();
+        SetDuration(0);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_TRANSFORM_2, true);
+        GetUnitOwner()->ToCreature()->LoadEquipment(0, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_demon_transform1_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_illidan_demon_transform2_aura : public AuraScript
+{
+    PrepareAuraScript(spell_illidan_demon_transform2_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DEMON_FORM, SPELL_DEMON_TRANSFORM_3 });
+    }
+
+    bool Load() override
+    {
+        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+
+        if (aurEff->GetTickNumber() == 1)
         {
-            PreventDefaultAction();
+            if (GetUnitOwner()->GetDisplayId() == GetUnitOwner()->GetNativeDisplayId())
+                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_FORM, true);
+            else
+                GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DEMON_FORM);
+        }
+        else if (aurEff->GetTickNumber() == 2)
+        {
             SetDuration(0);
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DEMON_TRANSFORM_3, true);
+            if (Aura* aura = GetUnitOwner()->GetAura(SPELL_DEMON_TRANSFORM_3))
+                aura->SetDuration(4500);
 
-            for (uint32 i = SPELL_CAGED_SUMMON1; i <= SPELL_CAGED_SUMMON8; ++i)
-                GetTarget()->CastSpell(GetTarget(), i, true);
-            GetTarget()->CastSpell(GetTarget(), SPELL_CAGED_DEBUFF, true);
+            if (!GetUnitOwner()->HasAura(SPELL_DEMON_FORM))
+                GetUnitOwner()->ToCreature()->LoadEquipment(1, true);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_cage_trap_stun_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_illidan_cage_trap_stun_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_demon_transform2_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_illidan_flame_burst : public SpellScript
+{
+    PrepareSpellScript(spell_illidan_flame_burst);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FLAME_BURST_EFFECT });
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_FLAME_BURST_EFFECT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_flame_burst::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_illidan_found_target : public SpellScript
+{
+    PrepareSpellScript(spell_illidan_found_target);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CONSUME_SOUL, SPELL_FIND_TARGET });
+    }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            if (GetCaster()->GetDistance(target) < 2.0f)
+            {
+                GetCaster()->CastSpell(target, SPELL_CONSUME_SOUL, true);
+                GetCaster()->CastSpell(GetCaster(), SPELL_FIND_TARGET, true);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_found_target::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_illidan_cage_trap : public SpellScript
+{
+    PrepareSpellScript(spell_illidan_cage_trap);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CAGE_TRAP });
+    }
+
+    bool Load() override
+    {
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+        if (Creature* target = GetHitCreature())
+            if (GetCaster()->GetExactDist2d(target) < 4.0f)
+            {
+                target->AI()->DoAction(ACTION_ILLIDAN_CAGED);
+                target->CastSpell(target, SPELL_CAGE_TRAP, true);
+                GetCaster()->ToCreature()->DespawnOrUnsummon(1);
+                if (GameObject* gobject = GetCaster()->FindNearestGameObject(GO_CAGE_TRAP, 10.0f))
+                    gobject->SetLootState(GO_JUST_DEACTIVATED);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidan_cage_trap::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_illidan_cage_trap_stun_aura : public AuraScript
+{
+    PrepareAuraScript(spell_illidan_cage_trap_stun_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CAGED_DEBUFF, SPELL_CAGED_SUMMON1, SPELL_CAGED_SUMMON1+1, SPELL_CAGED_SUMMON1+2, SPELL_CAGED_SUMMON1+3, SPELL_CAGED_SUMMON1+4, SPELL_CAGED_SUMMON1+5, SPELL_CAGED_SUMMON1+6, SPELL_CAGED_SUMMON8 });
+    }
+
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
+    {
+        PreventDefaultAction();
+        SetDuration(0);
+
+        for (uint32 i = SPELL_CAGED_SUMMON1; i <= SPELL_CAGED_SUMMON8; ++i)
+            GetTarget()->CastSpell(GetTarget(), i, true);
+        GetTarget()->CastSpell(GetTarget(), SPELL_CAGED_DEBUFF, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_illidan_cage_trap_stun_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1443,17 +1361,17 @@ void AddSC_boss_illidan()
 {
     new boss_illidan_stormrage();
     new npc_akama_illidan();
-    new spell_illidan_draw_soul();
-    new spell_illidan_parasitic_shadowfiend();
-    new spell_illidan_parasitic_shadowfiend_trigger();
-    new spell_illidan_glaive_throw();
-    new spell_illidan_tear_of_azzinoth_summon_channel();
-    new spell_illidan_shadow_prison();
-    new spell_illidan_demon_transform1();
-    new spell_illidan_demon_transform2();
-    new spell_illidan_flame_burst();
-    new spell_illidan_found_target();
-    new spell_illidan_cage_trap();
-    new spell_illidan_cage_trap_stun();
+    RegisterSpellScript(spell_illidan_draw_soul);
+    RegisterSpellScript(spell_illidan_parasitic_shadowfiend_aura);
+    RegisterSpellAndAuraScriptPair(spell_illidan_parasitic_shadowfiend_trigger, spell_illidan_parasitic_shadowfiend_trigger_aura);
+    RegisterSpellScript(spell_illidan_glaive_throw);
+    RegisterSpellScript(spell_illidan_tear_of_azzinoth_summon_channel_aura);
+    RegisterSpellScript(spell_illidan_shadow_prison);
+    RegisterSpellScript(spell_illidan_demon_transform1_aura);
+    RegisterSpellScript(spell_illidan_demon_transform2_aura);
+    RegisterSpellScript(spell_illidan_flame_burst);
+    RegisterSpellScript(spell_illidan_found_target);
+    RegisterSpellScript(spell_illidan_cage_trap);
+    RegisterSpellScript(spell_illidan_cage_trap_stun_aura);
 }
 

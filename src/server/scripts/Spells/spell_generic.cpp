@@ -5220,6 +5220,59 @@ class spell_gen_consumption : public SpellScript
     }
 };
 
+// 37591 - Drunken Haze | 29690 - Drunken Skull Crack
+enum DrunkenHaze
+{
+    SPELL_DRUNKEN_HAZE        = 37591,
+    SPELL_DRUNKEN_SKULL_CRACK = 29690
+};
+
+class spell_gen_sober_up : public AuraScript
+{
+    PrepareAuraScript(spell_gen_sober_up);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUNKEN_HAZE, SPELL_DRUNKEN_SKULL_CRACK });
+    }
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (!target && !target->ToPlayer())
+            return;
+
+        SpellEffIndex InebriateEffIndex;
+        if (Player* player = target->ToPlayer())
+        {
+            switch (GetSpellInfo()->Id)
+            {
+                case SPELL_DRUNKEN_HAZE:
+                    InebriateEffIndex = EFFECT_1;
+                    break;
+                case SPELL_DRUNKEN_SKULL_CRACK:
+                    InebriateEffIndex = EFFECT_2;
+                    break;
+            }
+
+            uint16 level = aurEff->GetSpellInfo()->Effects[InebriateEffIndex].CalcValue();
+            player->SetDrunkValue(player->GetDrunkValue() - (level > 100 ? 100 : level)); // Some (maybe it's only 29690) spells can have over 100 inebriate points
+        }
+    }
+
+    void Register() override
+    {
+        if (m_scriptSpellId == SPELL_DRUNKEN_HAZE)
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_gen_sober_up::OnRemove, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        }
+        else
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_gen_sober_up::OnRemove, EFFECT_1, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        }
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5375,5 +5428,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_yehkinya_bramble);
     RegisterSpellScript(spell_gen_choking_vines);
     RegisterSpellScript(spell_gen_consumption);
+    RegisterSpellScript(spell_gen_sober_up);
 }
 

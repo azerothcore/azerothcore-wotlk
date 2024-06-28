@@ -804,7 +804,7 @@ void ObjectMgr::LoadCreatureTemplateModels()
 
         CreatureModelInfo const* modelInfo = GetCreatureModelInfo(creatureDisplayId);
         if (!modelInfo)
-            LOG_ERROR("sql.sql", "No model data exist for `CreatureDisplayID` = {} listed by creature (Entry: {%u}}).", creatureDisplayId, creatureId);
+            LOG_ERROR("sql.sql", "No model data exist for `CreatureDisplayID` = {} listed by creature (Entry: {}).", creatureDisplayId, creatureId);
 
         if (displayScale <= 0.0f)
             displayScale = 1.0f;
