@@ -1,3 +1,4 @@
+-- DB update 2024_06_28_00 -> 2024_06_28_01
 -- Lashh'an Wing Guard
 DELETE FROM `creature_text` WHERE `CreatureID` = 19944;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
