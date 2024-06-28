@@ -907,13 +907,6 @@ class spell_midsummer_ribbon_pole : public AuraScript
                     target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
             }
 
-            if (!target->HasAura(SPELL_TEST_RIBBON_POLE_CHANNEL_BLUE)
-                && !target->HasAura(SPELL_TEST_RIBBON_POLE_CHANNEL_RED)
-                && !target->HasAura(SPELL_TEST_RIBBON_POLE_CHANNEL_PINK))
-            {
-                SetDuration(1);
-            }
-
             // Achievement
             if ((time(nullptr) - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
                 target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
@@ -975,6 +968,26 @@ class spell_midsummer_ribbon_pole_visual : public SpellScript
     void Register() override
     {
         OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_midsummer_ribbon_pole_visual::UpdateTarget, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
+    }
+};
+
+class spell_midsummer_ribbon_pole_visual_aura : public AuraScript
+{
+    PrepareAuraScript(spell_midsummer_ribbon_pole_visual_aura);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_RIBBON_POLE_PERIODIC_VISUAL });
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_midsummer_ribbon_pole_visual_aura::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1305,7 +1318,7 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_gen_crab_disguise);
     RegisterSpellScript(spell_midsummer_ribbon_pole_firework);
     RegisterSpellScript(spell_midsummer_ribbon_pole);
-    RegisterSpellScript(spell_midsummer_ribbon_pole_visual);
+    RegisterSpellAndAuraScriptPair(spell_midsummer_ribbon_pole_visual, spell_midsummer_ribbon_pole_visual_aura);
     RegisterSpellScript(spell_midsummer_torch_quest);
     RegisterSpellScript(spell_midsummer_fling_torch);
     RegisterSpellScript(spell_midsummer_juggling_torch);
