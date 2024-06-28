@@ -186,6 +186,7 @@ public:
             scheduler.Schedule(60s, 80s, GROUP_OOC_RP, [this](TaskContext context)
             {
                 if (_rpBuddyGUID)
+                {
                     if (Creature* understudy = ObjectAccessor::GetCreature(*me, _rpBuddyGUID))
                     {
                         if (me->GetDistance2d(understudy) <= 6.0f)
@@ -197,9 +198,10 @@ public:
                                     if (Creature* understudy = ObjectAccessor::GetCreature(*me, _rpBuddyGUID))
                                         me->GetMotionMaster()->MovePoint(POINT_DEATH_KNIGHT, understudy->GetNearPosition(3.2f, understudy->GetRelativeAngle(me)));
                             });
-                        return;
+                            return;
                         }
                     }
+                }
                 context.Repeat(2s);
             });
         }
