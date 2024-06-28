@@ -3,3 +3,7 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (1554, 25952, 547, 3717, 3717, 3, 1, 0, -97.468841552734375, -231.198196411132812, -2.10892963409423828, 1.466076612472534179, 7200, 0, 0, 42, 0, 0, 0, 0, 0, 55141);
 
 UPDATE `creature_template_movement` SET `Flight` = 1 WHERE `CreatureId` = 25952;
+
+DELETE FROM `game_event_creature` WHERE `eventEntry` = 1 AND `guid` = 1554;
+INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
+(1, 1554);
