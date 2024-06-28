@@ -1,0 +1,16 @@
+index 742777b18..694e1b63e 100644
+--- a/src/common/Configuration/Config.cpp
++++ b/src/common/Configuration/Config.cpp
+@@ -524,6 +524,12 @@ std::string const ConfigMgr::GetConfigPath()
+ #if AC_PLATFORM == AC_PLATFORM_WINDOWS
+     return "configs/";
+ #else
++    char const* val = std::getenv("CONFIG_DIR");
++    if (val != NULL)
++    {
++        return std::string(val) + "/";
++    }
++
+     return std::string(_CONF_DIR) + "/";
+ #endif
+ }

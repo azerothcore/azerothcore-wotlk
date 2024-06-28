@@ -19,8 +19,10 @@ clangStdenv.mkDerivation {
 
   nativeBuildInputs = [ cmake ];
 
+  patches = [ ./config_dir.patch ];
+
   # The name of the directory needs to have the same name as the module it's used when linking
-  patchPhase = ''
+  postPatch = ''
     for i in ${lib.concatStringsSep " " modules};
     do
         for j in $(ls -1 $i);
