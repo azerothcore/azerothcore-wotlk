@@ -392,7 +392,7 @@ struct boss_kaelthas : public BossAI
                             }
                         }
                     });
-                    scheduler.Schedule(2min, GROUP_PROGRESS_PHASE, [this](TaskContext)
+                    scheduler.Schedule(90s, GROUP_PROGRESS_PHASE, [this](TaskContext)
                     {
                         PhaseAllAdvisorsExecute();
                     });
