@@ -1,3 +1,4 @@
+-- DB update 2024_06_27_03 -> 2024_06_28_00
 --
 DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (33802,38609,31943,62821,62807,51103,69146,70823,70824,70825);
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
