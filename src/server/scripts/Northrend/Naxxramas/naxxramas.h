@@ -58,25 +58,26 @@ enum NXData
     DATA_STALAGG_BOSS               = 108,
     DATA_FEUGEN_BOSS                = 109,
     DATA_THADDIUS_GATE              = 110,
-    DATA_GOTHIK_ENTER_GATE          = 111,
-    DATA_GOTHIK_INNER_GATE          = 112,
-    DATA_GOTHIK_EXIT_GATE           = 113,
-    DATA_HORSEMEN_GATE              = 114,
-    DATA_LICH_KING_BOSS             = 115,
-    DATA_KELTHUZAD_FLOOR            = 116,
-    DATA_ABOMINATION_KILLED         = 117,
-    DATA_FRENZY_REMOVED             = 118,
-    DATA_CHARGES_CROSSED            = 119,
-    DATA_SPORE_KILLED               = 120,
-    DATA_HUNDRED_CLUB               = 121,
-    DATA_DANCE_FAIL                 = 122,
-    DATA_IMMORTAL_FAIL              = 123,
-    DATA_KELTHUZAD_GATE             = 124,
-    DATA_HAD_THADDIUS_GREET         = 125,
-    DATA_KELTHUZAD_PORTAL_1         = 126,
-    DATA_KELTHUZAD_PORTAL_2         = 127,
-    DATA_KELTHUZAD_PORTAL_3         = 128,
-    DATA_KELTHUZAD_PORTAL_4         = 129
+    DATA_GOTHIK_BOSS                = 111,
+    DATA_GOTHIK_ENTER_GATE          = 112,
+    DATA_GOTHIK_INNER_GATE          = 113,
+    DATA_GOTHIK_EXIT_GATE           = 114,
+    DATA_HORSEMEN_GATE              = 115,
+    DATA_LICH_KING_BOSS             = 116,
+    DATA_KELTHUZAD_FLOOR            = 117,
+    DATA_ABOMINATION_KILLED         = 118,
+    DATA_FRENZY_REMOVED             = 119,
+    DATA_CHARGES_CROSSED            = 120,
+    DATA_SPORE_KILLED               = 121,
+    DATA_HUNDRED_CLUB               = 122,
+    DATA_DANCE_FAIL                 = 123,
+    DATA_IMMORTAL_FAIL              = 124,
+    DATA_KELTHUZAD_GATE             = 125,
+    DATA_HAD_THADDIUS_GREET         = 126,
+    DATA_KELTHUZAD_PORTAL_1         = 127,
+    DATA_KELTHUZAD_PORTAL_2         = 128,
+    DATA_KELTHUZAD_PORTAL_3         = 129,
+    DATA_KELTHUZAD_PORTAL_4         = 130
 };
 
 enum NXGOs
@@ -162,6 +163,9 @@ enum NXNPCs
     NPC_LIVING_MONSTROSITY          = 16021,
     NPC_SURGICAL_ASSIST             = 16022,
     NPC_SLUDGE_BELCHER              = 16029,
+
+    // Gothik
+    NPC_GOTHIK                      = 16060
 };
 
 enum NXMisc
