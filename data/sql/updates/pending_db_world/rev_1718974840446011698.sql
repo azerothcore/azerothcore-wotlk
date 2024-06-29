@@ -293,4 +293,5 @@ UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 524288 WHERE `ent
 40142, -- Halion
 40143, -- Halion (1)
 40144, -- Halion (2)
-40145); -- Halion (3)
+40145 -- Halion (3)
+);
