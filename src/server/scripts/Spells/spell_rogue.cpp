@@ -380,7 +380,7 @@ class spell_rog_killing_spree_aura : public AuraScript
         GetTarget()->RemoveAurasDueToSpell(SPELL_ROGUE_KILLING_SPREE_DMG_BUFF);
     }
 
-    public:
+public:
     void AddTarget(Unit* target)
     {
         _targets.push_back(target->GetGUID());
