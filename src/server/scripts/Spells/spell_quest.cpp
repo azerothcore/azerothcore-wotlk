@@ -1087,14 +1087,36 @@ enum Quest11515Data
     NPC_EMACIATED_FELBLOOD  = 24955
 };
 
-class spell_q11515_fel_siphon_dummy : public SpellScriptLoader
+class spell_q11515_fel_siphon_dummy : public SpellScript
 {
-public:
-    spell_q11515_fel_siphon_dummy() : SpellScriptLoader("spell_q11515_fel_siphon_dummy") { }
+    PrepareSpellScript(spell_q11515_fel_siphon_dummy);
 
-    SpellScript* GetSpellScript() const override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return new spell_generic_quest_update_entry_SpellScript(SPELL_EFFECT_DUMMY, EFFECT_0, NPC_FELBLOOD_INITIATE, NPC_EMACIATED_FELBLOOD, true);
+    return ValidateSpellInfo(
+        {
+            SPELL_SUMMON_ARCANE_PRISONER_MALE,
+            SPELL_SUMMON_ARCANE_PRISONER_FEMALE,
+            SPELL_ARCANE_PRISONER_KILL_CREDIT
+        });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+    Unit* caster = GetCaster();
+    if (Unit* unitTarget = GetHitUnit())
+    {
+        uint32 spellId = SPELL_SUMMON_ARCANE_PRISONER_MALE;
+        if (rand() % 2)
+            spellId = SPELL_SUMMON_ARCANE_PRISONER_FEMALE;
+        caster->CastSpell(caster, spellId, true);
+        unitTarget->CastSpell(caster, SPELL_ARCANE_PRISONER_KILL_CREDIT, true);
+    }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q11587_arcane_prisoner_rescue::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2536,7 +2558,7 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q11396_11399_force_shield_arcane_purple_x3);
     RegisterSpellScript(spell_q11396_11399_scourging_crystal_controller);
     RegisterSpellScript(spell_q11396_11399_scourging_crystal_controller_dummy);
-    new spell_q11515_fel_siphon_dummy();
+    RegisterSpellScript(spell_q11515_fel_siphon_dummy);
     RegisterSpellScript(spell_q11587_arcane_prisoner_rescue);
     RegisterSpellScript(spell_q11730_ultrasonic_screwdriver);
     RegisterSpellScript(spell_q12459_seeds_of_natures_wrath);
