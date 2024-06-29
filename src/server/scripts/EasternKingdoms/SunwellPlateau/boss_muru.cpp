@@ -326,183 +326,148 @@ public:
     };
 };
 
-class spell_muru_summon_blood_elves_periodic : public SpellScriptLoader
+class spell_muru_summon_blood_elves_periodic_aura : public AuraScript
 {
-public:
-    spell_muru_summon_blood_elves_periodic() : SpellScriptLoader("spell_muru_summon_blood_elves_periodic") { }
+    PrepareAuraScript(spell_muru_summon_blood_elves_periodic_aura);
 
-    class spell_muru_summon_blood_elves_periodic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_muru_summon_blood_elves_periodic_AuraScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_FURY_MAGE1, SPELL_SUMMON_FURY_MAGE2, SPELL_SUMMON_BERSERKER1, SPELL_SUMMON_BERSERKER2 });
+    }
 
-        void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            // first tick after 10 seconds
-            GetAura()->GetEffect(aurEff->GetEffIndex())->SetPeriodicTimer(10000);
-        }
-
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE1, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE2, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER1, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER2, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER1, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER2, true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_muru_summon_blood_elves_periodic_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_muru_summon_blood_elves_periodic_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_muru_summon_blood_elves_periodic_AuraScript();
+        // first tick after 10 seconds
+        GetAura()->GetEffect(aurEff->GetEffIndex())->SetPeriodicTimer(10000);
+    }
+
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
+    {
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE1, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_FURY_MAGE2, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER1, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER2, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER1, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_BERSERKER2, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_muru_summon_blood_elves_periodic_aura::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_muru_summon_blood_elves_periodic_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_muru_darkness : public SpellScriptLoader
+class spell_muru_darkness_aura : public AuraScript
 {
-public:
-    spell_muru_darkness() : SpellScriptLoader("spell_muru_darkness") { }
+    PrepareAuraScript(spell_muru_darkness_aura);
 
-    class spell_muru_darkness_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_muru_darkness_AuraScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_DARK_FIEND });
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            if (aurEff->GetTickNumber() == 3)
-                for (uint8 i = 0; i < 8; ++i)
-                    GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND + i, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_muru_darkness_AuraScript::OnPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_muru_darkness_AuraScript();
+        if (aurEff->GetTickNumber() == 3)
+            for (uint8 i = 0; i < 8; ++i)
+                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND + i, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_muru_darkness_aura::OnPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_entropius_negative_energy : public SpellScriptLoader
+class spell_entropius_negative_energy : public SpellScript
 {
-public:
-    spell_entropius_negative_energy() : SpellScriptLoader("spell_entropius_negative_energy") { }
+    PrepareSpellScript(spell_entropius_negative_energy);
 
-    class spell_entropius_negative_energy_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_entropius_negative_energy_SpellScript);
+        return ValidateSpellInfo({ SPELL_NEGATIVE_ENERGY_CHAIN });
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            Acore::Containers::RandomResize(targets, GetCaster()->GetAI()->GetData(DATA_NEGATIVE_ENERGY_TARGETS));
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, SPELL_NEGATIVE_ENERGY_CHAIN, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_entropius_negative_energy_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_entropius_negative_energy_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_entropius_negative_energy_SpellScript();
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Acore::Containers::RandomResize(targets, GetCaster()->GetAI()->GetData(DATA_NEGATIVE_ENERGY_TARGETS));
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, SPELL_NEGATIVE_ENERGY_CHAIN, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_entropius_negative_energy::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_entropius_negative_energy::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_entropius_void_zone_visual : public SpellScriptLoader
+class spell_entropius_void_zone_visual_aura : public AuraScript
 {
-public:
-    spell_entropius_void_zone_visual() : SpellScriptLoader("spell_entropius_void_zone_visual") { }
+    PrepareAuraScript(spell_entropius_void_zone_visual_aura);
 
-    class spell_entropius_void_zone_visual_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_entropius_void_zone_visual_AuraScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_DARK_FIEND_ENTROPIUS });
+    }
 
-        void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            SetDuration(3000);
-        }
-
-        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND_ENTROPIUS, true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_entropius_void_zone_visual_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_entropius_void_zone_visual_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_entropius_void_zone_visual_AuraScript();
+        SetDuration(3000);
+    }
+
+    void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_SUMMON_DARK_FIEND_ENTROPIUS, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_entropius_void_zone_visual_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_entropius_void_zone_visual_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_entropius_black_hole_effect : public SpellScriptLoader
+class spell_entropius_black_hole_effect : public SpellScript
 {
-public:
-    spell_entropius_black_hole_effect() : SpellScriptLoader("spell_entropius_black_hole_effect") { }
+    PrepareSpellScript(spell_entropius_black_hole_effect);
 
-    class spell_entropius_black_hole_effect_SpellScript : public SpellScript
+    void HandlePull(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_entropius_black_hole_effect_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
 
-        void HandlePull(SpellEffIndex effIndex)
+        Position pos;
+        if (target->GetDistance(GetCaster()) < 5.0f)
         {
-            PreventHitDefaultEffect(effIndex);
-            Unit* target = GetHitUnit();
-            if (!target)
-                return;
-
-            Position pos;
-            if (target->GetDistance(GetCaster()) < 5.0f)
-            {
-                float o = frand(0, 2 * M_PI);
-                pos.Relocate(GetCaster()->GetPositionX() + 4.0f * cos(o), GetCaster()->GetPositionY() + 4.0f * std::sin(o), GetCaster()->GetPositionZ() + frand(10.0f, 15.0f));
-            }
-            else
-                pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
-
-            float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue) * 0.1f;
-            float speedZ = target->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
-
-            target->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
+            float o = frand(0, 2 * M_PI);
+            pos.Relocate(GetCaster()->GetPositionX() + 4.0f * cos(o), GetCaster()->GetPositionY() + 4.0f * std::sin(o), GetCaster()->GetPositionZ() + frand(10.0f, 15.0f));
         }
+        else
+            pos.Relocate(GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ() + 1.0f);
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_entropius_black_hole_effect_SpellScript::HandlePull, EFFECT_0, SPELL_EFFECT_PULL_TOWARDS_DEST);
-        }
-    };
+        float speedXY = float(GetSpellInfo()->Effects[effIndex].MiscValue) * 0.1f;
+        float speedZ = target->GetDistance(pos) / speedXY * 0.5f * Movement::gravity;
 
-    SpellScript* GetSpellScript() const override
+        target->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
+    }
+
+    void Register() override
     {
-        return new spell_entropius_black_hole_effect_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_entropius_black_hole_effect::HandlePull, EFFECT_0, SPELL_EFFECT_PULL_TOWARDS_DEST);
     }
 };
 
@@ -512,10 +477,10 @@ void AddSC_boss_muru()
     new boss_entropius();
     new npc_singularity();
 
-    new spell_muru_summon_blood_elves_periodic();
-    new spell_muru_darkness();
-    new spell_entropius_negative_energy();
-    new spell_entropius_void_zone_visual();
-    new spell_entropius_black_hole_effect();
+    RegisterSpellScript(spell_muru_summon_blood_elves_periodic_aura);
+    RegisterSpellScript(spell_muru_darkness_aura);
+    RegisterSpellScript(spell_entropius_negative_energy);
+    RegisterSpellScript(spell_entropius_void_zone_visual_aura);
+    RegisterSpellScript(spell_entropius_black_hole_effect);
 }
 
