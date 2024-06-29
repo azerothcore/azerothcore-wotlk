@@ -739,7 +739,7 @@ struct CreatureDisplayInfoExtraEntry
 {
     //uint32 ID;                                            // 0
     uint32 DisplayRaceID;                                   // 1
-    uint32 DisplaySexID;                                    // 2
+    //uint32 DisplaySexID;                                  // 2
     //uint32 SkinID;                                        // 3
     //uint32 FaceID;                                        // 4
     //uint32 HairStyleID;                                   // 5

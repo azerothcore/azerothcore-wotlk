@@ -4590,7 +4590,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Holiday - Midsummer, Ribbon Pole Periodic Visual
     ApplySpellFix({ 45406 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST );
+        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST | AURA_INTERRUPT_FLAG_TALK );
     });
 
     // Improved Mind Flay and Smite
@@ -4804,12 +4804,10 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
     });
 
-    // Flame Wave
-    ApplySpellFix({ 33800 }, [](SpellInfo* spellInfo)
+    // Eye of Grillok
+    ApplySpellFix({ 38495 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
-        spellInfo->Effects[EFFECT_1].Amplitude = 500;
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 38530; // Quest Credit for Eye of Grillok
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
@@ -4932,6 +4930,14 @@ void SpellMgr::LoadSpellInfoCorrections()
     factionTemplateEntry->hostileMask |= 8;
     factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1921)); // The Taunka
     factionTemplateEntry->hostileMask |= 8;
+
+    // Remove 1 from guards friendly mask, making able to attack players
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1857)); // Area 52 Bruiser
+    factionTemplateEntry->friendlyMask &= ~1;
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1806)); // Netherstorm Agent
+    factionTemplateEntry->friendlyMask &= ~1;
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1812)); // K3 Bruiser
+    factionTemplateEntry->friendlyMask &= ~1;
 
     // Remove vehicles attr, making accessories selectable
     VehicleSeatEntry* vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4689)); // Siege Engine, Accessory
