@@ -1,3 +1,4 @@
+-- DB update 2024_06_29_06 -> 2024_06_29_07
 -- Eye of Grillok
 UPDATE `spell_dbc` SET `Effect_1` = 164,`EffectTriggerSpell_1` = 38495 WHERE (`ID` = 38529);
 
