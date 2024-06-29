@@ -1,3 +1,4 @@
+-- DB update 2024_06_29_08 -> 2024_06_29_09
 --
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 524288 WHERE `entry` IN
 (10184, -- Onyxia
