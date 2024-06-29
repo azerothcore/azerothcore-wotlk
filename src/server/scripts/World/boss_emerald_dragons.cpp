@@ -816,41 +816,30 @@ class spell_shadow_bolt_whirl : public AuraScript
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadow_bolt_whirl::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
-class spell_mark_of_nature : public SpellScriptLoader
+class spell_mark_of_nature : public SpellScript
 {
-public:
-    spell_mark_of_nature() : SpellScriptLoader("spell_mark_of_nature") { }
+    PrepareSpellScript(spell_mark_of_nature);
 
-    class spell_mark_of_nature_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_mark_of_nature_SpellScript);
+        return ValidateSpellInfo({ SPELL_MARK_OF_NATURE, SPELL_AURA_OF_NATURE });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_MARK_OF_NATURE, SPELL_AURA_OF_NATURE });
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(MarkOfNatureTargetSelector());
-        }
-
-        void HandleEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_AURA_OF_NATURE, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mark_of_nature_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_mark_of_nature_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_mark_of_nature_SpellScript();
+        targets.remove_if(MarkOfNatureTargetSelector());
+    }
+
+    void HandleEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_AURA_OF_NATURE, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mark_of_nature::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_mark_of_nature::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -868,7 +857,7 @@ void AddSC_emerald_dragons()
 
     // dragon spellscripts
     RegisterSpellScript(spell_dream_fog_sleep);
-    new spell_mark_of_nature();
+    RegisterSpellScript(spell_mark_of_nature);
     RegisterSpellScript(spell_shadow_bolt_whirl);
 };
 
