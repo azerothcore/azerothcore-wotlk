@@ -1,3 +1,4 @@
+-- DB update 2024_06_29_04 -> 2024_06_29_05
 -- Tideress
 UPDATE `creature` SET position_x = 1958.41, position_y = -945.92, position_z = 70.11, orientation = 4.153880, MovementType = 2 WHERE `id1` = 12759 AND `guid` = 34224;
 UPDATE `creature_addon` SET `path_id` = 342240 WHERE `guid` = 34224;
