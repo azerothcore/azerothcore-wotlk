@@ -829,14 +829,24 @@ enum Quest55Data
     NPC_WEAKENED_MORBENT    = 24782,
 };
 
-class spell_q55_sacred_cleansing : public SpellScriptLoader
+class spell_q55_sacred_cleansing : public SpellScript
 {
-public:
-    spell_q55_sacred_cleansing() : SpellScriptLoader("spell_q55_sacred_cleansing") { }
+    PrepareSpellScript(spell_q55_sacred_cleansing);
 
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
     {
-        return new spell_generic_quest_update_entry_SpellScript(SPELL_EFFECT_DUMMY, EFFECT_1, NPC_MORBENT, NPC_WEAKENED_MORBENT, true);
+    Item* target = GetHitItem();
+    Unit* caster = GetCaster();
+    if (!target && caster->GetTypeId() != TYPEID_PLAYER)
+        return;
+
+    uint32 const spellId = roll_chance_i(20) ? SPELL_BENDING_SHINBONE1 : SPELL_BENDING_SHINBONE2;
+    caster->CastSpell(caster, spellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q1846_bending_shinbone::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2518,7 +2528,7 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q11653_youre_not_so_big_now);
     RegisterSpellScript(spell_q10985_light_of_the_naaru);
     RegisterSpellScript(spell_q9718_crow_transform);
-    new spell_q55_sacred_cleansing();
+    RegisterSpellScript(spell_q55_sacred_cleansing);
     RegisterSpellScript(spell_q1846_bending_shinbone);
     RegisterSpellScript(spell_q2203_thaumaturgy_channel);
     RegisterSpellScript(spell_q5206_test_fetid_skull);
