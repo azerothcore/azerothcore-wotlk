@@ -432,7 +432,7 @@ class spell_ignis_scorch_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo( { SPELL_SCORCHED_GROUND_10, SPELL_SCORCHED_GROUND_25 });
+        return ValidateSpellInfo({ SPELL_SCORCHED_GROUND_10, SPELL_SCORCHED_GROUND_25 });
     }
 
     void HandleEffectPeriodic(AuraEffect const* aurEff)
@@ -458,7 +458,7 @@ class spell_ignis_grab_initial : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo( { SPELL_GRAB_TRIGGERED });
+        return ValidateSpellInfo({ SPELL_GRAB_TRIGGERED });
     }
 
     void HandleScript(SpellEffIndex  /*effIndex*/)
