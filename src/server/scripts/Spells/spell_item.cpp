@@ -3973,7 +3973,7 @@ class spell_item_eye_of_grillok_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_EYE_OF_GRILLOK });
     }
 
-    void OnPeriodic(AuraEffect const* aurEff)
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
         Unit* caster = GetCaster();
         if (!caster || !GetTarget())
