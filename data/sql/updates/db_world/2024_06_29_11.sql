@@ -1,3 +1,4 @@
+-- DB update 2024_06_29_10 -> 2024_06_29_11
 --
 -- trigger AI
 UPDATE `creature_template` SET `ScriptName` = 'npc_gothik_trigger' WHERE `entry` = 16137;
