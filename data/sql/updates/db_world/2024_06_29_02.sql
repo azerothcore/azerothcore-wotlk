@@ -1,3 +1,4 @@
+-- DB update 2024_06_29_01 -> 2024_06_29_02
 -- Horvon the Armorer, Greatfather Aldrimus
 DELETE FROM `creature_template_addon` WHERE `entry` IN (19879,19698);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
