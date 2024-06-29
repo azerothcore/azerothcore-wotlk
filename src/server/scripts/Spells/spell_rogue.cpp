@@ -281,53 +281,6 @@ class spell_rog_deadly_poison : public SpellScript
 };
 
 // 51690 - Killing Spree
-#define KillingSpreeScriptName "spell_rog_killing_spree"
-class spell_rog_killing_spree : public SpellScript
-{
-    PrepareSpellScript(spell_rog_killing_spree);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_ROGUE_KILLING_SPREE });
-    }
-
-    SpellCastResult CheckCast()
-    {
-        // Kologarn area, Killing Spree should not work
-        if (GetCaster()->GetMapId() == 603 /*Ulduar*/ && GetCaster()->GetDistance2d(1766.936f, -24.748f) < 50.0f)
-            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-        return SPELL_CAST_OK;
-    }
-
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        if (targets.empty() || GetCaster()->GetVehicleBase() || GetCaster()->HasUnitState(UNIT_STATE_ROOT))
-            FinishCast(SPELL_FAILED_OUT_OF_RANGE);
-        else
-        {
-            // Added attribute not breaking stealth, removes auras here
-            GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
-            GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
-        }
-    }
-
-    void HandleDummy(SpellEffIndex /*effIndex*/)
-    {
-        if (Aura* aura = GetCaster()->GetAura(SPELL_ROGUE_KILLING_SPREE))
-        {
-            if (spell_rog_killing_spree_aura* script = dynamic_cast<spell_rog_killing_spree_aura*>(aura->GetScriptByName(KillingSpreeScriptName)))
-                script->AddTarget(GetHitUnit());
-        }
-    }
-
-    void Register() override
-    {
-        OnCheckCast += SpellCheckCastFn(spell_rog_killing_spree::CheckCast);
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rog_killing_spree::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
-        OnEffectHitTarget += SpellEffectFn(spell_rog_killing_spree::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-    }
-};
-
 class spell_rog_killing_spree_aura : public AuraScript
 {
     PrepareAuraScript(spell_rog_killing_spree_aura);
@@ -380,7 +333,7 @@ class spell_rog_killing_spree_aura : public AuraScript
         GetTarget()->RemoveAurasDueToSpell(SPELL_ROGUE_KILLING_SPREE_DMG_BUFF);
     }
 
-    public:
+public:
     void AddTarget(Unit* target)
     {
         _targets.push_back(target->GetGUID());
@@ -395,6 +348,54 @@ class spell_rog_killing_spree_aura : public AuraScript
 
 private:
     GuidList _targets;
+};
+
+#define KillingSpreeScriptName "spell_rog_killing_spree"
+typedef spell_rog_killing_spree_aura spell_rog_killing_spree_aura_script;
+class spell_rog_killing_spree : public SpellScript
+{
+    PrepareSpellScript(spell_rog_killing_spree);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_KILLING_SPREE });
+    }
+
+    SpellCastResult CheckCast()
+    {
+        // Kologarn area, Killing Spree should not work
+        if (GetCaster()->GetMapId() == 603 /*Ulduar*/ && GetCaster()->GetDistance2d(1766.936f, -24.748f) < 50.0f)
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        return SPELL_CAST_OK;
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty() || GetCaster()->GetVehicleBase() || GetCaster()->HasUnitState(UNIT_STATE_ROOT))
+            FinishCast(SPELL_FAILED_OUT_OF_RANGE);
+        else
+        {
+            // Added attribute not breaking stealth, removes auras here
+            GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+            GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
+        }
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Aura* aura = GetCaster()->GetAura(SPELL_ROGUE_KILLING_SPREE))
+        {
+            if (spell_rog_killing_spree_aura* script = dynamic_cast<spell_rog_killing_spree_aura_script*>(aura->GetScriptByName(KillingSpreeScriptName)))
+                script->AddTarget(GetHitUnit());
+        }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_rog_killing_spree::CheckCast);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rog_killing_spree::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_rog_killing_spree::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+    }
 };
 
 // -31130 - Nerves of Steel
