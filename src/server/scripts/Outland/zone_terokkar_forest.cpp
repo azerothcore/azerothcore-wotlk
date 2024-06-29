@@ -114,27 +114,6 @@ class spell_q10929_fumping_aura : public AuraScript
     }
 };
 
-class npc_greatfather_aldrimus : public CreatureScript
-{
-public:
-    npc_greatfather_aldrimus() : CreatureScript("npc_greatfather_aldrimus") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_greatfather_aldrimusAI(creature);
-    }
-
-    struct npc_greatfather_aldrimusAI : public ScriptedAI
-    {
-        npc_greatfather_aldrimusAI(Creature* c) : ScriptedAI(c) {}
-
-        bool CanBeSeen(Player const* player) override
-        {
-            return player->GetQuestStatus(10253) == QUEST_STATUS_REWARDED;
-        }
-    };
-};
-
 enum q10036Torgos
 {
     NPC_TORGOS                  = 18707
@@ -636,7 +615,6 @@ void AddSC_terokkar_forest()
     // Ours
     RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
     RegisterSpellAndAuraScriptPair(spell_q10929_fumping, spell_q10929_fumping_aura);
-    new npc_greatfather_aldrimus();
     RegisterSpellScript(spell_q10036_torgos);
     RegisterSpellScript(spell_q10923_evil_draws_near_summon);
     RegisterSpellScript(spell_q10923_evil_draws_near_periodic_aura);
