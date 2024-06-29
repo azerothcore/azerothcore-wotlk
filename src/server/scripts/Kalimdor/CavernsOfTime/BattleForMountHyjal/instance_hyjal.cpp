@@ -405,7 +405,22 @@ public:
                     }
 
                     if (_bossWave != TO_BE_DECIDED)
+                    {
                         DoUpdateWorldState(WORLD_STATE_WAVES, 0);
+                        scheduler.Schedule(30s, [this](TaskContext context)
+                        {
+                            if (IsEncounterInProgress())
+                            {
+                                // Reset the instance if its empty.
+                                // This is necessary because bosses get stuck fighting unreachable mobs.
+                                // Remove this when we are sure pathing no longer causes this.
+                                if (!instance->GetPlayersCountExceptGMs())
+                                    SetData(DATA_RESET_ALLIANCE, 0);
+                                else
+                                    context.Repeat();
+                            }
+                        });
+                    }
 
                     break;
                 case DATA_SPAWN_INFERNALS:
@@ -478,8 +493,6 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ENEMYCOUNT, trash);
                     break;
             }
-
-            // LOG_DEBUG("scripts", "Instance Hyjal: Instance data updated for event {} (Data={})", type, data);
 
             if (data == DONE)
             {
