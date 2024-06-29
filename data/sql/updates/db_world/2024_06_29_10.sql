@@ -1,3 +1,4 @@
+-- DB update 2024_06_29_09 -> 2024_06_29_10
 -- Finding the Keymaster.
 DELETE FROM `event_scripts` WHERE `id`=12857;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`) VALUES
