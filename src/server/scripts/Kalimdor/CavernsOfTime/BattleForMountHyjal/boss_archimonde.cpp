@@ -143,12 +143,17 @@ struct npc_doomfire_spirit : public ScriptedAI
 {
     npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
-    uint32 m_uiChangeTargetTimer = 1500;
     float m_fAngle = urand(0, M_PI * 2);
 
     void Reset() override
     {
-        m_uiChangeTargetTimer = 1500;
+        scheduler.CancelAll();
+        ScheduleTimedEvent(1500ms, [&] {
+            float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * 0.785402f);
+            Position pos = GetFirstRandomAngleCollisionPosition(8.f, nextOrientation); // both orientation and distance verified with sniffs
+            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
+            }, 1s);
+
         m_fAngle = urand(0, M_PI * 2);
     }
 
@@ -167,17 +172,6 @@ struct npc_doomfire_spirit : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (m_uiChangeTargetTimer < diff)
-        {
-            float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * 0.785402f);
-            Position pos = GetFirstRandomAngleCollisionPosition(8.f, nextOrientation); // both orientation and distance verified with sniffs
-            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
-
-            m_uiChangeTargetTimer = 1000;
-        }
-        else
-            m_uiChangeTargetTimer -= diff;
-
         scheduler.Update(diff);
     }
 };
