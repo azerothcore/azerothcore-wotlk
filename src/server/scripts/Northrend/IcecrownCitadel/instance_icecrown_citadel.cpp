@@ -123,8 +123,10 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_SINDRAGOSA, DATA_SINDRAGOSA },
-    { 0,              0               }
+    { NPC_SINDRAGOSA,     DATA_SINDRAGOSA     },
+    { NPC_THE_SKYBREAKER, DATA_THE_SKYBREAKER },
+    { NPC_ORGRIMS_HAMMER, DATA_ORGRIMS_HAMMER },
+    { 0,                  0                   }
 };
 
 // this doesnt have to only store questgivers, also can be used for related quest spawns
@@ -449,6 +451,12 @@ public:
                     break;
                 case NPC_CROK_SCOURGEBANE:
                     CrokScourgebaneGUID = creature->GetGUID();
+                    break;
+                case NPC_THE_SKYBREAKER:
+                    TheSkybreakerGUID = creature->GetGUID();
+                    break;
+                case NPC_ORGRIMS_HAMMER:
+                    OrgrimsHammerGUID = creature->GetGUID();
                     break;
                 // we can only do this because there are no gaps in their entries
                 case NPC_CAPTAIN_ARNATH:
@@ -1011,6 +1019,10 @@ public:
                     return BloodQueenLanaThelGUID;
                 case DATA_CROK_SCOURGEBANE:
                     return CrokScourgebaneGUID;
+                case DATA_THE_SKYBREAKER:
+                    return TheSkybreakerGUID;
+                case DATA_ORGRIMS_HAMMER:
+                    return OrgrimsHammerGUID;
                 case DATA_CAPTAIN_ARNATH:
                 case DATA_CAPTAIN_BRANDON:
                 case DATA_CAPTAIN_GRONDEL:
@@ -1981,6 +1993,8 @@ public:
         ObjectGuid BloodCouncilControllerGUID;
         ObjectGuid BloodQueenLanaThelGUID;
         ObjectGuid CrokScourgebaneGUID;
+        ObjectGuid TheSkybreakerGUID;
+        ObjectGuid OrgrimsHammerGUID;
         ObjectGuid CrokCaptainGUIDs[4];
         ObjectGuid SisterSvalnaGUID;
         ObjectGuid ValithriaDreamwalkerGUID;
