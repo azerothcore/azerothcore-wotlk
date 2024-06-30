@@ -18,6 +18,7 @@
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
+#include "Config.h"
 #include "GameTime.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
@@ -585,7 +586,7 @@ public:
             _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, isVictory ? DONE : FAIL);
             me->GetMap()->SetZoneMusic(AREA_ICECROWN_CITADEL, 0);
 
-            if (Creature* creature = me->FindNearestCreature(me->GetEntry() == NPC_ORGRIMS_HAMMER ? NPC_THE_SKYBREAKER : NPC_ORGRIMS_HAMMER, 200.0f))
+            if (Creature* creature = _instance->GetCreature(me->GetEntry() == NPC_ORGRIMS_HAMMER ? DATA_THE_SKYBREAKER : DATA_ORGRIMS_HAMMER))
             {
                 _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, creature);
                 if (Aura* a = creature->GetAura(SPELL_CHECK_FOR_PLAYERS))
@@ -646,7 +647,7 @@ public:
 
                 me->GetTransport()->ToMotionTransport()->EnableMovement(true);
 
-                if (Creature* ship = me->FindNearestCreature(_teamIdInInstance == TEAM_HORDE ? NPC_ORGRIMS_HAMMER : NPC_THE_SKYBREAKER, 200.0f))
+                if (Creature* ship = _instance->GetCreature(_teamIdInInstance == TEAM_HORDE ? DATA_ORGRIMS_HAMMER : DATA_THE_SKYBREAKER))
                 {
                     ship->CastSpell(ship, SPELL_TELEPORT_PLAYERS_ON_VICTORY, true);
                     ship->CastSpell(ship, SPELL_ACHIEVEMENT, true);
@@ -672,6 +673,30 @@ public:
             {
                 uint32 teleportSpellId = _teamIdInInstance == TEAM_HORDE ? SPELL_TELEPORT_PLAYERS_ON_RESET_H : SPELL_TELEPORT_PLAYERS_ON_RESET_A;
                 me->m_Events.AddEvent(new ResetEncounterEvent(me, teleportSpellId, _instance->GetGuidData(DATA_ENEMY_GUNSHIP)), me->m_Events.CalculateTime(8000));
+            }
+        }
+
+        void UpdateAI(uint32 /*diff*/) override
+        {
+            if (!sConfigMgr->GetOption<int32>("WipeGunshipBlizzlike.Enable", 1))
+                return;
+
+            if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
+                return;
+
+            bool playerOnDeck = false;
+            me->GetMap()->DoForAllPlayers([&](Player* player)
+                {
+                    if (!player->GetVehicle() && player->IsAlive())
+                        playerOnDeck = true;
+                });
+
+            // Wipe if no player is on the deck
+            if (!playerOnDeck)
+            {
+                // Script runs on enemy ship. We want to kill our ship.
+                if (Creature* ship = _instance->GetCreature(_teamIdInInstance == TEAM_HORDE ? DATA_ORGRIMS_HAMMER : DATA_THE_SKYBREAKER))
+                    Creature::Kill(me, ship);
             }
         }
 
@@ -807,9 +832,9 @@ public:
                 _events.ScheduleEvent(EVENT_INTRO_H_6, 11s);
                 _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 1ms);
 
-                if (Creature* skybreaker = me->FindNearestCreature(NPC_THE_SKYBREAKER, 200.0f))
+                if (Creature* skybreaker = _instance->GetCreature(DATA_THE_SKYBREAKER))
                     _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, skybreaker, 1);
-                if (Creature* orgrimsHammer = me->FindNearestCreature(NPC_ORGRIMS_HAMMER, 200.0f))
+                if (Creature* orgrimsHammer = _instance->GetCreature(DATA_ORGRIMS_HAMMER))
                 {
                     _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, orgrimsHammer, 2);
                     orgrimsHammer->CastSpell(orgrimsHammer, SPELL_CHECK_FOR_PLAYERS, true);
@@ -1143,9 +1168,9 @@ public:
                 _events.ScheduleEvent(EVENT_INTRO_A_7, 11s);
                 _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 1ms);
 
-                if (Creature* orgrimsHammer = me->FindNearestCreature(NPC_ORGRIMS_HAMMER, 200.0f))
+                if (Creature* orgrimsHammer = _instance->GetCreature(DATA_ORGRIMS_HAMMER))
                     _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, orgrimsHammer, 1);
-                if (Creature* skybreaker = me->FindNearestCreature(NPC_THE_SKYBREAKER, 200.0f))
+                if (Creature* skybreaker = _instance->GetCreature(DATA_THE_SKYBREAKER))
                 {
                     _instance->SendEncounterUnit(ENCOUNTER_FRAME_ENGAGE, skybreaker, 2);
                     skybreaker->CastSpell(skybreaker, SPELL_CHECK_FOR_PLAYERS, true);
