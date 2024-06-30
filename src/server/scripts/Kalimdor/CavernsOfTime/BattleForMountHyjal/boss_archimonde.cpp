@@ -143,13 +143,14 @@ struct npc_doomfire_spirit : public ScriptedAI
 {
     npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
+    float const m_turnConstant = 0.785402f;
     float m_fAngle = urand(0, M_PI * 2);
 
     void Reset() override
     {
         scheduler.CancelAll();
         ScheduleTimedEvent(0s, [&] {
-            float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * 0.785402f);
+            float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * m_turnConstant);
             Position pos = GetFirstRandomAngleCollisionPosition(8.f, nextOrientation); // both orientation and distance verified with sniffs
             me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
             }, 1600ms);
