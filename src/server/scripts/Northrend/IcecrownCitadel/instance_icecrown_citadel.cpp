@@ -395,12 +395,6 @@ public:
                 case NPC_LADY_DEATHWHISPER:
                     LadyDeathwhisperGUID = creature->GetGUID();
                     break;
-                case NPC_THE_SKYBREAKER:
-                    TheSkybreakerGUID = creature->GetGUID();
-                    break;
-                case NPC_ORGRIMS_HAMMER:
-                    OrgrimsHammerGUID = creature->GetGUID();
-                    break;
                 case NPC_DEATHBRINGER_SAURFANG:
                     DeathbringerSaurfangGUID = creature->GetGUID();
                     break;
@@ -991,10 +985,6 @@ public:
                     return GunshipGUID;
                 case DATA_ENEMY_GUNSHIP:
                     return EnemyGunshipGUID;
-                case DATA_THE_SKYBREAKER:
-                    return TheSkybreakerGUID;
-                case DATA_ORGRIMS_HAMMER:
-                    return OrgrimsHammerGUID;
                 case DATA_DEATHBRINGER_SAURFANG:
                     return DeathbringerSaurfangGUID;
                 case DATA_SAURFANG_EVENT_NPC:
@@ -1974,8 +1964,6 @@ public:
         ObjectGuid GunshipGUID;
         ObjectGuid EnemyGunshipGUID;
         ObjectGuid GunshipArmoryGUID;
-        ObjectGuid TheSkybreakerGUID;
-        ObjectGuid OrgrimsHammerGUID;
         ObjectGuid DeathbringerSaurfangGUID;
         ObjectGuid DeathbringerSaurfangDoorGUID;
         ObjectGuid DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
