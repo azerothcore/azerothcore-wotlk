@@ -692,7 +692,7 @@ public:
                         playerOnBoat = true;
                 });
 
-            // Wipe if no player is in the deck
+            // Wipe if no player is on the deck
             if (!playerOnBoat)
                 if (Creature* ship = _instance->GetCreature(_teamIdInInstance == TEAM_HORDE ? DATA_ORGRIMS_HAMMER : DATA_THE_SKYBREAKER))
                     Creature::Kill(me, ship);
