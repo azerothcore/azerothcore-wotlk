@@ -335,7 +335,7 @@ public:
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                     if (InstanceScript* instance = me->GetInstanceScript())
                     {
-                        if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAZUVIOUS)))
+                        if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAZUVIOUS_BOSS)))
                         {
                             me->SetFacingToObject(creature);
                         }
