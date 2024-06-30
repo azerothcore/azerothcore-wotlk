@@ -361,90 +361,68 @@ public:
 
 typedef npc_troll_volunteer::npc_troll_volunteerAI VolunteerAI;
 
-class spell_mount_check : public SpellScriptLoader
+class spell_mount_check_aura : public AuraScript
 {
-public:
-    spell_mount_check() : SpellScriptLoader("spell_mount_check") { }
+    PrepareAuraScript(spell_mount_check_aura);
 
-    class spell_mount_check_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_mount_check_AuraScript)
+        return ValidateSpellInfo({ SPELL_MOUNTING_CHECK });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_MOUNTING_CHECK });
-        }
-
-        void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            Unit* target = GetTarget();
-            Unit* owner = target->GetOwner();
-
-            if (!owner)
-                return;
-
-            if (owner->IsMounted() && !target->IsMounted())
-            {
-                if (VolunteerAI* volunteerAI = CAST_AI(VolunteerAI, target->GetAI()))
-                    target->Mount(volunteerAI->GetMountId());
-            }
-            else if (!owner->IsMounted() && target->IsMounted())
-                target->Dismount();
-
-            target->SetSpeed(MOVE_RUN, owner->GetSpeedRate(MOVE_RUN));
-            target->SetSpeed(MOVE_WALK, owner->GetSpeedRate(MOVE_WALK));
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mount_check_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_mount_check_AuraScript();
+        Unit* target = GetTarget();
+        Unit* owner = target->GetOwner();
+
+        if (!owner)
+            return;
+
+        if (owner->IsMounted() && !target->IsMounted())
+        {
+            if (VolunteerAI* volunteerAI = CAST_AI(VolunteerAI, target->GetAI()))
+                target->Mount(volunteerAI->GetMountId());
+        }
+        else if (!owner->IsMounted() && target->IsMounted())
+            target->Dismount();
+
+        target->SetSpeed(MOVE_RUN, owner->GetSpeedRate(MOVE_RUN));
+        target->SetSpeed(MOVE_WALK, owner->GetSpeedRate(MOVE_WALK));
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mount_check_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_voljin_war_drums : public SpellScriptLoader
+class spell_voljin_war_drums : public SpellScript
 {
-public:
-    spell_voljin_war_drums() : SpellScriptLoader("spell_voljin_war_drums") { }
+    PrepareSpellScript(spell_voljin_war_drums);
 
-    class spell_voljin_war_drums_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_voljin_war_drums_SpellScript)
+        return ValidateSpellInfo({ SPELL_MOTIVATE_1, SPELL_MOTIVATE_2 });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_MOTIVATE_1, SPELL_MOTIVATE_2 });
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            Unit* caster = GetCaster();
-            if (Unit* target = GetHitUnit())
-            {
-                uint32 motivate = 0;
-                if (target->GetEntry() == NPC_CITIZEN_1)
-                    motivate = SPELL_MOTIVATE_1;
-                else if (target->GetEntry() == NPC_CITIZEN_2)
-                    motivate = SPELL_MOTIVATE_2;
-                if (motivate)
-                    caster->CastSpell(target, motivate, false);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_voljin_war_drums_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_voljin_war_drums_SpellScript();
+        Unit* caster = GetCaster();
+        if (Unit* target = GetHitUnit())
+        {
+            uint32 motivate = 0;
+            if (target->GetEntry() == NPC_CITIZEN_1)
+                motivate = SPELL_MOTIVATE_1;
+            else if (target->GetEntry() == NPC_CITIZEN_2)
+                motivate = SPELL_MOTIVATE_2;
+            if (motivate)
+                caster->CastSpell(target, motivate, false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_voljin_war_drums::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -460,45 +438,34 @@ enum VoodooSpells
 };
 
 // 17009
-class spell_voodoo : public SpellScriptLoader
+class spell_voodoo : public SpellScript
 {
-public:
-    spell_voodoo() : SpellScriptLoader("spell_voodoo") { }
+    PrepareSpellScript(spell_voodoo);
 
-    class spell_voodoo_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_voodoo_SpellScript)
+        return ValidateSpellInfo(
+            {
+                SPELL_BREW,
+                SPELL_GHOSTLY,
+                SPELL_HEX1,
+                SPELL_HEX2,
+                SPELL_HEX3,
+                SPELL_GROW,
+                SPELL_LAUNCH
+            });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo(
-                {
-                    SPELL_BREW,
-                    SPELL_GHOSTLY,
-                    SPELL_HEX1,
-                    SPELL_HEX2,
-                    SPELL_HEX3,
-                    SPELL_GROW,
-                    SPELL_LAUNCH
-                });
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            uint32 spellid = RAND(SPELL_BREW, SPELL_GHOSTLY, RAND(SPELL_HEX1, SPELL_HEX2, SPELL_HEX3), SPELL_GROW, SPELL_LAUNCH);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, spellid, false);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_voodoo_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_voodoo_SpellScript();
+        uint32 spellid = RAND(SPELL_BREW, SPELL_GHOSTLY, RAND(SPELL_HEX1, SPELL_HEX2, SPELL_HEX3), SPELL_GROW, SPELL_LAUNCH);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, spellid, false);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_voodoo::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -507,8 +474,8 @@ void AddSC_durotar()
     new npc_tiger_matriarch_credit();
     new npc_tiger_matriarch();
     new npc_troll_volunteer();
-    new spell_mount_check();
-    new spell_voljin_war_drums();
-    new spell_voodoo();
+    RegisterSpellScript(spell_mount_check_aura);
+    RegisterSpellScript(spell_voljin_war_drums);
+    RegisterSpellScript(spell_voodoo);
 }
 

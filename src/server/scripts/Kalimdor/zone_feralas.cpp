@@ -33,39 +33,28 @@ enum GordunniTrap
     GO_GORDUNNI_DIRT_MOUND = 144064,
 };
 
-class spell_gordunni_trap : public SpellScriptLoader
+class spell_gordunni_trap : public SpellScript
 {
-public:
-    spell_gordunni_trap() : SpellScriptLoader("spell_gordunni_trap") { }
+    PrepareSpellScript(spell_gordunni_trap);
 
-    class spell_gordunni_trap_SpellScript : public SpellScript
+    void HandleDummy()
     {
-        PrepareSpellScript(spell_gordunni_trap_SpellScript);
+        if (Unit* caster = GetCaster())
+            if (GameObject* chest = caster->SummonGameObject(GO_GORDUNNI_DIRT_MOUND, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
+            {
+                chest->SetSpellId(GetSpellInfo()->Id);
+                caster->RemoveGameObject(chest, false);
+            }
+    }
 
-        void HandleDummy()
-        {
-            if (Unit* caster = GetCaster())
-                if (GameObject* chest = caster->SummonGameObject(GO_GORDUNNI_DIRT_MOUND, caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0))
-                {
-                    chest->SetSpellId(GetSpellInfo()->Id);
-                    caster->RemoveGameObject(chest, false);
-                }
-        }
-
-        void Register() override
-        {
-            OnCast += SpellCastFn(spell_gordunni_trap_SpellScript::HandleDummy);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_gordunni_trap_SpellScript();
+        OnCast += SpellCastFn(spell_gordunni_trap::HandleDummy);
     }
 };
 
 void AddSC_feralas()
 {
-    new spell_gordunni_trap();
+    RegisterSpellScript(spell_gordunni_trap);
 }
 

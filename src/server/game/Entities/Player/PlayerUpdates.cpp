@@ -435,31 +435,27 @@ void Player::UpdateNextMailTimeAndUnreads()
 {
     // Update the next delivery time and unread mails
     time_t cTime = GameTime::GetGameTime().count();
-    // Get the next delivery time
-    CharacterDatabasePreparedStatement* stmtNextDeliveryTime =
-        CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
-    stmtNextDeliveryTime->SetData(0, GetGUID().GetCounter());
-    stmtNextDeliveryTime->SetData(1, uint32(cTime));
-    PreparedQueryResult resultNextDeliveryTime =
-        CharacterDatabase.Query(stmtNextDeliveryTime);
-    if (resultNextDeliveryTime)
-    {
-        Field* fields          = resultNextDeliveryTime->Fetch();
-        m_nextMailDelivereTime = time_t(fields[0].Get<uint32>());
-    }
 
-    // Get unread mails count
-    CharacterDatabasePreparedStatement* stmtUnreadAmount =
-        CharacterDatabase.GetPreparedStatement(
-            CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
-    stmtUnreadAmount->SetData(0, GetGUID().GetCounter());
-    stmtUnreadAmount->SetData(1, uint32(cTime));
-    PreparedQueryResult resultUnreadAmount =
-        CharacterDatabase.Query(stmtUnreadAmount);
-    if (resultUnreadAmount)
+    m_nextMailDelivereTime = 0;
+    unReadMails = 0;
+
+    for (Mail const* mail : GetMails())
     {
-        Field* fields = resultUnreadAmount->Fetch();
-        unReadMails   = uint8(fields[0].Get<uint64>());
+        if (mail->deliver_time > cTime)
+        {
+            if (!m_nextMailDelivereTime || m_nextMailDelivereTime > mail->deliver_time)
+                m_nextMailDelivereTime = mail->deliver_time;
+        }
+
+        // must be not checked yet
+        if (mail->checked & MAIL_CHECK_MASK_READ)
+            continue;
+
+        // and already delivered or expired
+        if (cTime < mail->deliver_time || cTime > mail->expire_time)
+            continue;
+
+        unReadMails++;
     }
 }
 

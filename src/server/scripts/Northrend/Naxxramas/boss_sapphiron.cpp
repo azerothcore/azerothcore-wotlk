@@ -417,51 +417,40 @@ public:
     };
 };
 
-class spell_sapphiron_frost_explosion : public SpellScriptLoader
+class spell_sapphiron_frost_explosion : public SpellScript
 {
-public:
-    spell_sapphiron_frost_explosion() : SpellScriptLoader("spell_sapphiron_frost_explosion") { }
+    PrepareSpellScript(spell_sapphiron_frost_explosion);
 
-    class spell_sapphiron_frost_explosion_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_sapphiron_frost_explosion_SpellScript);
+        Unit* caster = GetCaster();
+        if (!caster || !caster->ToCreature())
+            return;
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        std::list<WorldObject*> tmplist;
+        for (auto& target : targets)
         {
-            Unit* caster = GetCaster();
-            if (!caster || !caster->ToCreature())
-                return;
-
-            std::list<WorldObject*> tmplist;
-            for (auto& target : targets)
+            if (CAST_AI(boss_sapphiron::boss_sapphironAI, caster->ToCreature()->AI())->IsValidExplosionTarget(target))
             {
-                if (CAST_AI(boss_sapphiron::boss_sapphironAI, caster->ToCreature()->AI())->IsValidExplosionTarget(target))
-                {
-                    tmplist.push_back(target);
-                }
-            }
-            targets.clear();
-            for (auto& itr : tmplist)
-            {
-                targets.push_back(itr);
+                tmplist.push_back(target);
             }
         }
-
-        void Register() override
+        targets.clear();
+        for (auto& itr : tmplist)
         {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sapphiron_frost_explosion_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+            targets.push_back(itr);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_sapphiron_frost_explosion_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sapphiron_frost_explosion::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
 void AddSC_boss_sapphiron()
 {
     new boss_sapphiron();
-    new spell_sapphiron_frost_explosion();
+    RegisterSpellScript(spell_sapphiron_frost_explosion);
 }
 

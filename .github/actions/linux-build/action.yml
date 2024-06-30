@@ -47,6 +47,7 @@ runs:
       shell: bash
       run: |
         sudo apt update
+        sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
         sudo apt-get -y install ccache clang cmake curl google-perftools \
           libmysqlclient-dev make unzip build-essential cmake-data  \
           libboost-all-dev libbz2-dev libncurses5-dev libmysql++-dev \
@@ -129,6 +130,7 @@ runs:
         AC_CHARACTER_DATABASE_INFO=localhost;3306;root;root;acore_characters
         AC_WORLD_DATABASE_INFO=localhost;3306;root;root;acore_world
         AC_DATA_DIR=env/dist/data
+        AC_LOGS_DIR=env/dist/logs
         EOF
 
     - name: get dbc files
@@ -155,7 +157,7 @@ runs:
     - name: Check startup errors
       shell: bash
       run: |
-        error_log="./env/dist/bin/Errors.log"
+        error_log="$AC_LOGS_DIR/Errors.log"
         # -s checks if the file's size is greater than 0 bytes
         # ! -s checks if the file's size is less than/equal to 0 bytes
         # if the error log is empty, exit without error
