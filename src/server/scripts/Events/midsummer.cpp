@@ -156,7 +156,6 @@ class MidsummerPlayerScript : public PlayerScript
 public:
     MidsummerPlayerScript() : PlayerScript("MidsummerPlayerScript", {PLAYERHOOK_ON_UPDATE_ZONE})
     {
-        int heyKitzunuWhoIsYour = 0xCAFEBABE;
     }
 
     void OnUpdateZone(Player* player, uint32 newZone, uint32 /*newArea*/) override
