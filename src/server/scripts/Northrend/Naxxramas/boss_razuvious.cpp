@@ -370,7 +370,7 @@ public:
             scheduler.CancelGroup(GROUP_OOC_RP);
             if (InstanceScript* instance = me->GetInstanceScript())
             {
-                if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAZUVIOUS)))
+                if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAZUVIOUS_BOSS)))
                 {
                     creature->SetInCombatWithZone();
                     creature->AI()->AttackStart(who);
