@@ -258,41 +258,40 @@ enum ShattrathQuests
 {
     // QuestID : Creature Template ID
     // Heroic Daily Quests
-    QUEST_H_NAZZAN = 11354, // 24410
-    QUEST_H_KELIDAN = 11362, // 24413
-    QUEST_H_BLADEFIST = 11363, // 24414
-    QUEST_H_QUAG = 11368, // 24419
-    QUEST_H_BLACKSTALKER = 11369, // 24420
-    QUEST_H_WARLORD = 11370, // 24421
-    QUEST_H_IKISS = 11372, // 24422
-    QUEST_H_SHAFFAR = 11373, // 24423
-    QUEST_H_EXARCH = 11374, // 24424
-    QUEST_H_MURMUR = 11375, // 24425
-    QUEST_H_EPOCH = 11378, // 24427
-    QUEST_H_AEONUS = 11382, // 24428
-    QUEST_H_WARP = 11384, // 24431
-    QUEST_H_CALCULATOR = 11386, // 21504
-    QUEST_H_SKYRISS = 11388, // 24435
-    QUEST_H_KAEL = 11499, // 24855
-
+    QUEST_H_NAZZAN              = 11354, // 24410
+    QUEST_H_KELIDAN             = 11362, // 24413
+    QUEST_H_BLADEFIST           = 11363, // 24414
+    QUEST_H_QUAG                = 11368, // 24419
+    QUEST_H_BLACKSTALKER        = 11369, // 24420
+    QUEST_H_WARLORD             = 11370, // 24421
+    QUEST_H_IKISS               = 11372, // 24422
+    QUEST_H_SHAFFAR             = 11373, // 24423
+    QUEST_H_EXARCH              = 11374, // 24424
+    QUEST_H_MURMUR              = 11375, // 24425
+    QUEST_H_EPOCH               = 11378, // 24427
+    QUEST_H_AEONUS              = 11382, // 24428
+    QUEST_H_WARP                = 11384, // 24431
+    QUEST_H_CALCULATOR          = 11386, // 21504
+    QUEST_H_SKYRISS             = 11388, // 24435
+    QUEST_H_KAEL                = 11499, // 24855
     // Normal Daily Quests
-    QUEST_N_CENTURIONS = 11364, // 24411
-    QUEST_N_MYRMIDONS = 11371, // 24415
-    QUEST_N_INSTRUCTORS = 11376, // 24426
-    QUEST_N_LORDS = 11383, // 24429
-    QUEST_N_CHANNELERS = 11385, // 24430
-    QUEST_N_DESTROYERS = 11387, // 24432
-    QUEST_N_SENTINELS = 11389, // 24434
-    QUEST_N_SISTERS = 11500, // 24854
+    QUEST_N_CENTURIONS          = 11364, // 24411
+    QUEST_N_MYRMIDONS           = 11371, // 24415
+    QUEST_N_INSTRUCTORS         = 11376, // 24426
+    QUEST_N_LORDS               = 11383, // 24429
+    QUEST_N_CHANNELERS          = 11385, // 24430
+    QUEST_N_DESTROYERS          = 11387, // 24432
+    QUEST_N_SENTINELS           = 11389, // 24434
+    QUEST_N_SISTERS             = 11500, // 24854
 
-    EVENT_UPDATE_QUEST_STATUS = 1,
+    EVENT_UPDATE_QUEST_STATUS   = 1,
 
-    POOL_SHATTRATH_DAILY_H = 356,
-    POOL_SHATTRATH_DAILY_N = 357,
+    POOL_SHATTRATH_DAILY_H      = 356,
+    POOL_SHATTRATH_DAILY_N      = 357,
 
     // Image NPCs
-    NPC_SHATTRATH_DAILY_H = 24854,
-    NPC_SHATTRATH_DAILY_N = 24410,
+    NPC_SHATTRATH_DAILY_H       = 24854,
+    NPC_SHATTRATH_DAILY_N       = 24410
 };
 
 struct npc_shattrath_daily_quest : public NullCreatureAI
