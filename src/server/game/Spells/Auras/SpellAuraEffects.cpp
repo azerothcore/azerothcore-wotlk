@@ -6394,23 +6394,6 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                                 Unit::Kill(target, target);
                                 return;
                             }
-                        // Eye of Grillok
-                        case 38495:
-                            triggerSpellId = 38530;
-                            break;
-                        // Absorb Eye of Grillok (Zezzak's Shard)
-                        case 38554:
-                            {
-                                if (!caster || target->GetTypeId() != TYPEID_UNIT)
-                                    return;
-
-                                caster->CastSpell(caster, 38495, true, nullptr, this);
-
-                                Creature* creatureTarget = target->ToCreature();
-
-                                creatureTarget->DespawnOrUnsummon();
-                                return;
-                            }
                         // Tear of Azzinoth Summon Channel - it's not really supposed to do anything, and this only prevents the console spam
                         case 39857:
                             triggerSpellId = 39856;

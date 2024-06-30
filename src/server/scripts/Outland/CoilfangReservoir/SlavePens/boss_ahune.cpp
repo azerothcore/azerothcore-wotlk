@@ -82,7 +82,6 @@ enum Spells
     SPELL_SUMMON_ICE_SPEAR_GO = 46369,
     SPELL_ICE_SPEAR_DELAY     = 46878,
     SPELL_ICE_SPEAR_VISUAL    = 75498,
-    // todo: 46588 damage component
 
     // Slippery Floor
     SPELL_SLIPPERY_FLOOR_AMBIENT     = 46314,
@@ -236,10 +235,10 @@ struct boss_ahune : public BossAI
         switch (eventId)
         {
         case EVENT_INITIAL_EMERGE:
-            DoCastSelf(SPELL_BIRTH);
-            DoCastSelf(SPELL_STAND);
-            DoCastSelf(SPELL_AHUNE_SPANKY_HANDS);
-            DoCastSelf(SPELL_AHUNES_SHIELD);
+            DoCastSelf(SPELL_BIRTH, true);
+            DoCastSelf(SPELL_STAND, true);
+            DoCastSelf(SPELL_AHUNE_SPANKY_HANDS, true);
+            DoCastSelf(SPELL_AHUNES_SHIELD, true);
             me->SetStandState(UNIT_STAND_STATE_STAND); // Likely needs to be moved to SPELL_STAND script, forced temporarily
             break;
         case EVENT_EMERGE:
@@ -249,7 +248,7 @@ struct boss_ahune : public BossAI
             if (Creature* frozenCore = instance->GetCreature(DATA_FROZEN_CORE))
                 DoCast(frozenCore, SPELL_SYNCH_HEALTH, true);
             else
-                DoCastSelf(SPELL_SUICIDE);
+                DoCastSelf(SPELL_SUICIDE, true);
             events.Repeat(3s);
             break;
         default:
@@ -262,11 +261,11 @@ struct boss_ahune : public BossAI
         if (Creature* frozenCore = instance->GetCreature(DATA_FROZEN_CORE))
             frozenCore->AI()->DoAction(ACTION_AHUNE_RESURFACE);
 
-        DoCastSelf(SPELL_AHUNES_SHIELD);
+        DoCastSelf(SPELL_AHUNES_SHIELD, true);
         me->RemoveAurasDueToSpell(SPELL_AHUNE_SELF_STUN);
         me->RemoveAurasDueToSpell(SPELL_STAY_SUBMERGED);
-        DoCastSelf(SPELL_BIRTH);
-        DoCastSelf(SPELL_STAND);
+        DoCastSelf(SPELL_BIRTH, true);
+        DoCastSelf(SPELL_STAND, true);
         DoCastSelf(SPELL_RESURFACE, true);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetStandState(UNIT_STAND_STATE_STAND);
