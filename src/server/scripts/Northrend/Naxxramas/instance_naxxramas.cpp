@@ -1099,7 +1099,7 @@ public:
                     return _stalaggGUID;
                 case DATA_FEUGEN_BOSS:
                     return _feugenGUID;
-                case DATA_RAZUVIOUS:
+                case DATA_RAZUVIOUS_BOSS:
                     return _razuviousGUID;
                 case DATA_GOTHIK_BOSS:
                     return _gothikGUID;
