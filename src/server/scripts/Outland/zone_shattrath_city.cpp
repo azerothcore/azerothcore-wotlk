@@ -284,7 +284,7 @@ enum ShattrathQuests
     QUEST_N_SENTINELS           = 11389, // 24434
     QUEST_N_SISTERS             = 11500, // 24854
 
-    EVENT_UPDATE_QUEST_STATUS   = 1,
+    ACTION_UPDATE_QUEST_STATUS   = 1,
 
     POOL_SHATTRATH_DAILY_H      = 356,
     POOL_SHATTRATH_DAILY_N      = 357,
@@ -300,7 +300,7 @@ struct npc_shattrath_daily_quest : public NullCreatureAI
 
     void DoAction(int32 action) override
     {
-        if (action == EVENT_UPDATE_QUEST_STATUS)
+        if (action == ACTION_UPDATE_QUEST_STATUS)
         {
             if (!me->GetEntry())
                 return;
