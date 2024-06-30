@@ -395,6 +395,12 @@ public:
                 case NPC_LADY_DEATHWHISPER:
                     LadyDeathwhisperGUID = creature->GetGUID();
                     break;
+                case NPC_THE_SKYBREAKER:
+                    TheSkybreakerGUID = creature->GetGUID();
+                    break;
+                case NPC_ORGRIMS_HAMMER:
+                    OrgrimsHammerGUID = creature->GetGUID();
+                    break;
                 case NPC_DEATHBRINGER_SAURFANG:
                     DeathbringerSaurfangGUID = creature->GetGUID();
                     break;
@@ -451,12 +457,6 @@ public:
                     break;
                 case NPC_CROK_SCOURGEBANE:
                     CrokScourgebaneGUID = creature->GetGUID();
-                    break;
-                case NPC_THE_SKYBREAKER:
-                    TheSkybreakerGUID = creature->GetGUID();
-                    break;
-                case NPC_ORGRIMS_HAMMER:
-                    OrgrimsHammerGUID = creature->GetGUID();
                     break;
                 // we can only do this because there are no gaps in their entries
                 case NPC_CAPTAIN_ARNATH:
@@ -991,6 +991,10 @@ public:
                     return GunshipGUID;
                 case DATA_ENEMY_GUNSHIP:
                     return EnemyGunshipGUID;
+                case DATA_THE_SKYBREAKER:
+                    return TheSkybreakerGUID;
+                case DATA_ORGRIMS_HAMMER:
+                    return OrgrimsHammerGUID;
                 case DATA_DEATHBRINGER_SAURFANG:
                     return DeathbringerSaurfangGUID;
                 case DATA_SAURFANG_EVENT_NPC:
@@ -1019,10 +1023,6 @@ public:
                     return BloodQueenLanaThelGUID;
                 case DATA_CROK_SCOURGEBANE:
                     return CrokScourgebaneGUID;
-                case DATA_THE_SKYBREAKER:
-                    return TheSkybreakerGUID;
-                case DATA_ORGRIMS_HAMMER:
-                    return OrgrimsHammerGUID;
                 case DATA_CAPTAIN_ARNATH:
                 case DATA_CAPTAIN_BRANDON:
                 case DATA_CAPTAIN_GRONDEL:
@@ -1974,6 +1974,8 @@ public:
         ObjectGuid GunshipGUID;
         ObjectGuid EnemyGunshipGUID;
         ObjectGuid GunshipArmoryGUID;
+        ObjectGuid TheSkybreakerGUID;
+        ObjectGuid OrgrimsHammerGUID;
         ObjectGuid DeathbringerSaurfangGUID;
         ObjectGuid DeathbringerSaurfangDoorGUID;
         ObjectGuid DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
@@ -1993,8 +1995,6 @@ public:
         ObjectGuid BloodCouncilControllerGUID;
         ObjectGuid BloodQueenLanaThelGUID;
         ObjectGuid CrokScourgebaneGUID;
-        ObjectGuid TheSkybreakerGUID;
-        ObjectGuid OrgrimsHammerGUID;
         ObjectGuid CrokCaptainGUIDs[4];
         ObjectGuid SisterSvalnaGUID;
         ObjectGuid ValithriaDreamwalkerGUID;
