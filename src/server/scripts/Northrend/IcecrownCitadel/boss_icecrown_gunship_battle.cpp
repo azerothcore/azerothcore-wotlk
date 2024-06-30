@@ -586,7 +586,7 @@ public:
             _instance->SetBossState(DATA_ICECROWN_GUNSHIP_BATTLE, isVictory ? DONE : FAIL);
             me->GetMap()->SetZoneMusic(AREA_ICECROWN_CITADEL, 0);
 
-            if (Creature* creature = _instance->GetCreature(me->GetEntry() == NPC_ORGRIMS_HAMMER ? NPC_THE_SKYBREAKER : NPC_ORGRIMS_HAMMER))
+            if (Creature* creature = _instance->GetCreature(me->GetEntry() == NPC_ORGRIMS_HAMMER ? DATA_THE_SKYBREAKER : DATA_ORGRIMS_HAMMER))
             {
                 _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, creature);
                 if (Aura* a = creature->GetAura(SPELL_CHECK_FOR_PLAYERS))
@@ -647,7 +647,7 @@ public:
 
                 me->GetTransport()->ToMotionTransport()->EnableMovement(true);
 
-                if (Creature* ship = _instance->GetCreature(_teamIdInInstance == TEAM_HORDE ? NPC_ORGRIMS_HAMMER : NPC_THE_SKYBREAKER))
+                if (Creature* ship = _instance->GetCreature(_teamIdInInstance == TEAM_HORDE ? DATA_ORGRIMS_HAMMER : DATA_THE_SKYBREAKER))
                 {
                     ship->CastSpell(ship, SPELL_TELEPORT_PLAYERS_ON_VICTORY, true);
                     ship->CastSpell(ship, SPELL_ACHIEVEMENT, true);
