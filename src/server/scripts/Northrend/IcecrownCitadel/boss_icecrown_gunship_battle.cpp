@@ -684,18 +684,20 @@ public:
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
 
-            bool playerOnBoat = false;
+            bool playerOnDeck = false;
             me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
-                    // Script runs on enemy ship. We want to kill our ship.
                     if (!player->GetVehicle() && player->IsAlive())
-                        playerOnBoat = true;
+                        playerOnDeck = true;
                 });
 
             // Wipe if no player is on the deck
-            if (!playerOnBoat)
+            if (!playerOnDeck)
+            {
+                // Script runs on enemy ship. We want to kill our ship.
                 if (Creature* ship = _instance->GetCreature(_teamIdInInstance == TEAM_HORDE ? DATA_ORGRIMS_HAMMER : DATA_THE_SKYBREAKER))
                     Creature::Kill(me, ship);
+            }
         }
 
         void SetGUID(ObjectGuid guid, int32 id/* = 0*/) override
