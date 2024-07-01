@@ -676,9 +676,10 @@ class spell_warl_ritual_of_doom_effect : public SpellScript
 };
 
 // -27285 - Seed of Corruption
-class spell_warl_seed_of_corruption : public SpellScript
+// 32865 - Seed of Corruption
+class spell_warl_seed_of_corruption_damage : public SpellScript
 {
-    PrepareSpellScript(spell_warl_seed_of_corruption);
+    PrepareSpellScript(spell_warl_seed_of_corruption_damage);
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
@@ -701,7 +702,7 @@ class spell_warl_seed_of_corruption : public SpellScript
 
     void Register() override
     {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warl_seed_of_corruption::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warl_seed_of_corruption_damage::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
@@ -1468,7 +1469,7 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_health_funnel);
     RegisterSpellScript(spell_warl_life_tap);
     RegisterSpellScript(spell_warl_ritual_of_doom_effect);
-    RegisterSpellScript(spell_warl_seed_of_corruption);
+    RegisterSpellScript(spell_warl_seed_of_corruption_damage);
     RegisterSpellScript(spell_warl_seed_of_corruption_aura);
     RegisterSpellScript(spell_warl_seed_of_corruption_generic_aura);
     RegisterSpellScript(spell_warl_shadow_ward);
