@@ -716,49 +716,43 @@ class spell_blood_queen_bloodbolt : public SpellScript
     }
 };
 
-class spell_blood_queen_frenzied_bloodthirst : public SpellScriptLoader
+class spell_blood_queen_frenzied_bloodthirst_aura : public AuraScript
 {
-public:
-    spell_blood_queen_frenzied_bloodthirst() : SpellScriptLoader("spell_blood_queen_frenzied_bloodthirst") { }
+    PrepareAuraScript(spell_blood_queen_frenzied_bloodthirst_aura);
 
-    class spell_blood_queen_frenzied_bloodthirst_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_blood_queen_frenzied_bloodthirst_AuraScript);
+        return ValidateSpellInfo({ SPELL_UNCONTROLLABLE_FRENZY });
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
-                    bloodQueen->AI()->Talk(EMOTE_BLOODTHIRST, GetTarget());
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                if (InstanceScript* instance = target->GetInstanceScript())
-                    if (Creature* bloodQueen = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
-                        if (bloodQueen->IsAlive() && bloodQueen->IsInCombat())
-                        {
-                            // this needs to be done BEFORE charm aura or we hit an assert in Unit::SetCharmedBy
-                            if (target->GetVehicleKit())
-                                target->RemoveVehicleKit();
-
-                            bloodQueen->AI()->Talk(SAY_MIND_CONTROL);
-                            bloodQueen->CastSpell(target, SPELL_UNCONTROLLABLE_FRENZY, true);
-                        }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_blood_queen_frenzied_bloodthirst_AuraScript::OnApply, EFFECT_0, SPELL_AURA_OVERRIDE_SPELLS, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_blood_queen_frenzied_bloodthirst_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_OVERRIDE_SPELLS, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_blood_queen_frenzied_bloodthirst_AuraScript();
+        if (InstanceScript* instance = GetTarget()->GetInstanceScript())
+            if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
+                bloodQueen->AI()->Talk(EMOTE_BLOODTHIRST, GetTarget());
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            if (InstanceScript* instance = target->GetInstanceScript())
+                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
+                    if (bloodQueen->IsAlive() && bloodQueen->IsInCombat())
+                    {
+                        // this needs to be done BEFORE charm aura or we hit an assert in Unit::SetCharmedBy
+                        if (target->GetVehicleKit())
+                            target->RemoveVehicleKit();
+
+                        bloodQueen->AI()->Talk(SAY_MIND_CONTROL);
+                        bloodQueen->CastSpell(target, SPELL_UNCONTROLLABLE_FRENZY, true);
+                    }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_blood_queen_frenzied_bloodthirst_aura::OnApply, EFFECT_0, SPELL_AURA_OVERRIDE_SPELLS, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_blood_queen_frenzied_bloodthirst_aura::OnRemove, EFFECT_0, SPELL_AURA_OVERRIDE_SPELLS, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -974,7 +968,7 @@ void AddSC_boss_blood_queen_lana_thel()
     RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen);
     RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_target);
     RegisterSpellScript(spell_blood_queen_bloodbolt);
-    new spell_blood_queen_frenzied_bloodthirst();
+    RegisterSpellScript(spell_blood_queen_frenzied_bloodthirst_aura);
     new spell_blood_queen_essence_of_the_blood_queen();
     new spell_blood_queen_vampiric_bite();
     new spell_blood_queen_swarming_shadows_floor_dmg();
