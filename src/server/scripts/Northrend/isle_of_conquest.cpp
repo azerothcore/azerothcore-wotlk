@@ -427,50 +427,39 @@ class spell_ioc_parachute_ic_aura : public AuraScript
     }
 };
 
-class spell_ioc_launch : public SpellScriptLoader
+class spell_ioc_launch : public SpellScript
 {
-public:
-    spell_ioc_launch() : SpellScriptLoader("spell_ioc_launch") { }
+    PrepareSpellScript(spell_ioc_launch);
 
-    class spell_ioc_launch_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_ioc_launch_SpellScript);
+        if (Player* player = GetHitPlayer())
+            player->AddAura(SPELL_LAUNCH_NO_FALLING_DAMAGE, player); // prevents falling damage
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (Player* player = GetHitPlayer())
-                player->AddAura(SPELL_LAUNCH_NO_FALLING_DAMAGE, player); // prevents falling damage
-        }
-
-        void Launch()
-        {
-            WorldLocation const* const position = GetExplTargetDest();
-
-            if (Player* player = GetHitPlayer())
-            {
-                player->ExitVehicle();
-                player->DisableSpline();
-                player->GetMap()->PlayerRelocation(player, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), GetCaster()->GetOrientation());
-
-                float dist = position->GetExactDist2d(player->GetPositionX(), player->GetPositionY());
-                float elevation = GetSpell()->m_targets.GetElevation();
-                float speedZ = std::max(10.0f, float(50.0f * std::sin(elevation)));
-                float speedXY = dist * 10.0f / speedZ;
-
-                player->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), speedXY, speedZ);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ioc_launch_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_FORCE_CAST);
-            AfterHit += SpellHitFn(spell_ioc_launch_SpellScript::Launch);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Launch()
     {
-        return new spell_ioc_launch_SpellScript();
+        WorldLocation const* const position = GetExplTargetDest();
+
+        if (Player* player = GetHitPlayer())
+        {
+            player->ExitVehicle();
+            player->DisableSpline();
+            player->GetMap()->PlayerRelocation(player, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), GetCaster()->GetOrientation());
+
+            float dist = position->GetExactDist2d(player->GetPositionX(), player->GetPositionY());
+            float elevation = GetSpell()->m_targets.GetElevation();
+            float speedZ = std::max(10.0f, float(50.0f * std::sin(elevation)));
+            float speedXY = dist * 10.0f / speedZ;
+
+            player->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), speedXY, speedZ);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ioc_launch::HandleScript, EFFECT_1, SPELL_EFFECT_FORCE_CAST);
+        AfterHit += SpellHitFn(spell_ioc_launch::Launch);
     }
 };
 
@@ -484,6 +473,6 @@ void AddSC_isle_of_conquest()
     RegisterSpellScript(spell_ioc_bomb_blast_criteria);
     RegisterSpellScript(spell_ioc_gunship_portal);
     RegisterSpellScript(spell_ioc_parachute_ic_aura);
-    new spell_ioc_launch();
+    RegisterSpellScript(spell_ioc_launch);
 }
 
