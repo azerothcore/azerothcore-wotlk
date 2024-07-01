@@ -2871,36 +2871,30 @@ class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScript
     }
 };
 
-class spell_the_lich_king_harvest_soul : public SpellScriptLoader
+class spell_the_lich_king_harvest_soul_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_harvest_soul() : SpellScriptLoader("spell_the_lich_king_harvest_soul") { }
+    PrepareAuraScript(spell_the_lich_king_harvest_soul_aura);
 
-    class spell_the_lich_king_harvest_soul_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_harvest_soul_AuraScript);
+        return ValidateSpellInfo({ SPELL_HARVESTED_SOUL_LK_BUFF });
+    }
 
-        bool Load() override
-        {
-            return GetOwner()->GetInstanceScript() != nullptr;
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            // m_originalCaster to allow stacking from different casters, meh
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                GetTarget()->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetGuidData(DATA_THE_LICH_KING));
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_harvest_soul_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Load() override
     {
-        return new spell_the_lich_king_harvest_soul_AuraScript();
+        return GetOwner()->GetInstanceScript() != nullptr;
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        // m_originalCaster to allow stacking from different casters, meh
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+            GetTarget()->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetGuidData(DATA_THE_LICH_KING));
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_harvest_soul_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -3619,7 +3613,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_vile_spirits_visual);
     RegisterSpellScript(spell_the_lich_king_vile_spirit_move_target_search);
     RegisterSpellScript(spell_the_lich_king_vile_spirit_damage_target_search);
-    new spell_the_lich_king_harvest_soul();
+    RegisterSpellScript(spell_the_lich_king_harvest_soul_aura);
     new npc_strangulate_vehicle();
     new npc_terenas_menethil();
     new spell_the_lich_king_lights_favor();
