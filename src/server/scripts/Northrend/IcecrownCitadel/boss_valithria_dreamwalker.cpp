@@ -1257,58 +1257,47 @@ private:
     int32 _decayRate;
 };
 
-class spell_dreamwalker_summoner : public SpellScriptLoader
+class spell_dreamwalker_summoner : public SpellScript
 {
-public:
-    spell_dreamwalker_summoner() : SpellScriptLoader("spell_dreamwalker_summoner") { }
+    PrepareSpellScript(spell_dreamwalker_summoner);
 
-    class spell_dreamwalker_summoner_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_dreamwalker_summoner_SpellScript);
+        if (!GetCaster()->GetInstanceScript())
+            return false;
+        return true;
+    }
 
-        bool Load() override
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
+        std::list<WorldObject*> list_copy = targets;
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+        if (targets.empty())
         {
-            if (!GetCaster()->GetInstanceScript())
-                return false;
-            return true;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
-            std::list<WorldObject*> list_copy = targets;
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
-            if (targets.empty())
-            {
-                if (list_copy.empty())
-                    return;
-                targets = list_copy;
-            }
-
-            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void HandleForceCast(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit())
+            if (list_copy.empty())
                 return;
-
-            GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
+            targets = list_copy;
         }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dreamwalker_summoner_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summoner_SpellScript::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(target);
+    }
 
-    SpellScript* GetSpellScript() const override
+    void HandleForceCast(SpellEffIndex effIndex)
     {
-        return new spell_dreamwalker_summoner_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit())
+            return;
+
+        GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dreamwalker_summoner::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summoner::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
@@ -1483,7 +1472,7 @@ void AddSC_boss_valithria_dreamwalker()
     RegisterSpellScript(spell_dreamwalker_nightmare_cloud_aura);
     RegisterSpellScript(spell_dreamwalker_mana_void_aura);
     RegisterSpellScript(spell_dreamwalker_decay_periodic_timer_aura);
-    new spell_dreamwalker_summoner();
+    RegisterSpellScript(spell_dreamwalker_summoner);
     new spell_dreamwalker_summon_suppresser();
     new spell_dreamwalker_summon_suppresser_effect();
     new spell_valithria_suppression();
