@@ -1840,43 +1840,32 @@ public:
     }
 };
 
-class spell_the_lich_king_infest : public SpellScriptLoader
+class spell_the_lich_king_infest_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_infest() :  SpellScriptLoader("spell_the_lich_king_infest") { }
+    PrepareAuraScript(spell_the_lich_king_infest_aura);
 
-    class spell_the_lich_king_infest_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_the_lich_king_infest_AuraScript);
-
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
+        if (GetUnitOwner()->HealthAbovePct(90))
         {
-            if (GetUnitOwner()->HealthAbovePct(90))
-            {
-                PreventDefaultAction();
-                Remove(AURA_REMOVE_BY_ENEMY_SPELL);
-            }
+            PreventDefaultAction();
+            Remove(AURA_REMOVE_BY_ENEMY_SPELL);
         }
+    }
 
-        void OnUpdate(AuraEffect* aurEff)
-        {
-            // multiply, starting from 2nd tick
-            if (aurEff->GetTickNumber() == 1)
-                return;
-
-            aurEff->SetAmount(int32(aurEff->GetAmount() * 1.15f));
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_infest_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_the_lich_king_infest_AuraScript::OnUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnUpdate(AuraEffect* aurEff)
     {
-        return new spell_the_lich_king_infest_AuraScript();
+        // multiply, starting from 2nd tick
+        if (aurEff->GetTickNumber() == 1)
+            return;
+
+        aurEff->SetAmount(int32(aurEff->GetAmount() * 1.15f));
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_infest_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_the_lich_king_infest_aura::OnUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -3772,7 +3761,7 @@ void AddSC_boss_the_lich_king()
 
     // fight stuff below
     new npc_shambling_horror_icc();
-    new spell_the_lich_king_infest();
+    RegisterSpellScript(spell_the_lich_king_infest_aura);
     new spell_the_lich_king_necrotic_plague();
     new spell_the_lich_king_necrotic_plague_jump();
     new spell_the_lich_king_shadow_trap_visual();
