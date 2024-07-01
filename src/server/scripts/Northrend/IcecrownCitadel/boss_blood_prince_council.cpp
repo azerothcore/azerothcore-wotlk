@@ -1526,30 +1526,19 @@ class spell_taldaram_summon_flame_ball : public SpellScript
     }
 };
 
-class spell_taldaram_ball_of_inferno_flame : public SpellScriptLoader
+class spell_taldaram_ball_of_inferno_flame : public SpellScript
 {
-public:
-    spell_taldaram_ball_of_inferno_flame() : SpellScriptLoader("spell_taldaram_ball_of_inferno_flame") { }
+    PrepareSpellScript(spell_taldaram_ball_of_inferno_flame);
 
-    class spell_taldaram_ball_of_inferno_flame_SpellScript : public SpellScript
+    void ModAuraStack()
     {
-        PrepareSpellScript(spell_taldaram_ball_of_inferno_flame_SpellScript);
+        if (Aura* aur = GetHitAura())
+            aur->SetStackAmount(uint8(GetSpellInfo()->StackAmount));
+    }
 
-        void ModAuraStack()
-        {
-            if (Aura* aur = GetHitAura())
-                aur->SetStackAmount(uint8(GetSpellInfo()->StackAmount));
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_taldaram_ball_of_inferno_flame_SpellScript::ModAuraStack);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_taldaram_ball_of_inferno_flame_SpellScript();
+        AfterHit += SpellHitFn(spell_taldaram_ball_of_inferno_flame::ModAuraStack);
     }
 };
 
@@ -1769,7 +1758,7 @@ void AddSC_boss_blood_prince_council()
     RegisterSpellScript(spell_blood_council_shadow_prison_damage);
     RegisterSpellScript(spell_taldaram_glittering_sparks);
     RegisterSpellScript(spell_taldaram_summon_flame_ball);
-    new spell_taldaram_ball_of_inferno_flame();
+    RegisterSpellScript(spell_taldaram_ball_of_inferno_flame);
     new spell_valanar_kinetic_bomb();
     new spell_valanar_kinetic_bomb_absorb();
     new spell_valanar_kinetic_bomb_knockback();
