@@ -2475,48 +2475,37 @@ private:
     uint32 _entry;
 };
 
-class spell_igb_rocket_artillery : public SpellScriptLoader
+class spell_igb_rocket_artillery : public SpellScript
 {
-public:
-    spell_igb_rocket_artillery() : SpellScriptLoader("spell_igb_rocket_artillery") { }
+    PrepareSpellScript(spell_igb_rocket_artillery);
 
-    class spell_igb_rocket_artillery_SpellScript : public SpellScript
+    void SelectRandomTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_igb_rocket_artillery_SpellScript);
+        TeamId teamId = TEAM_HORDE;
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            teamId = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
+        targets.remove_if(IgbArtilleryCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
 
-        void SelectRandomTarget(std::list<WorldObject*>& targets)
+        if (!targets.empty())
         {
-            TeamId teamId = TEAM_HORDE;
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                teamId = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
-            targets.remove_if(IgbArtilleryCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
-
-            if (!targets.empty())
-            {
-                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-                targets.clear();
-                targets.push_back(target);
-            }
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+            targets.clear();
+            targets.push_back(target);
         }
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(),
-                GetHitUnit()->GetMapHeight(GetCaster()->GetPhaseMask(), GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ()),
-                uint32(GetEffectValue()), TRIGGERED_NONE);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_rocket_artillery_SpellScript::SelectRandomTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_igb_rocket_artillery_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_igb_rocket_artillery_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(),
+            GetHitUnit()->GetMapHeight(GetCaster()->GetPhaseMask(), GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ()),
+            uint32(GetEffectValue()), TRIGGERED_NONE);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_rocket_artillery::SelectRandomTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_igb_rocket_artillery::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2677,7 +2666,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_incinerating_blast);
     RegisterSpellScript(spell_igb_burning_pitch_selector);
     RegisterSpellScript(spell_igb_burning_pitch);
-    new spell_igb_rocket_artillery();
+    RegisterSpellScript(spell_igb_rocket_artillery);
     new spell_igb_rocket_artillery_explosion();
     new spell_igb_below_zero();
     new spell_igb_on_gunship_deck();
