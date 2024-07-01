@@ -1297,31 +1297,20 @@ enum BloodsporeRuination
     EVENT_RESET_ORIENTATION
 };
 
-class spell_q11719_bloodspore_ruination_45997 : public SpellScriptLoader
+class spell_q11719_bloodspore_ruination_45997 : public SpellScript
 {
-public:
-    spell_q11719_bloodspore_ruination_45997() : SpellScriptLoader("spell_q11719_bloodspore_ruination_45997") { }
+    PrepareSpellScript(spell_q11719_bloodspore_ruination_45997);
 
-    class spell_q11719_bloodspore_ruination_45997_SpellScript : public SpellScript
+    void HandleEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_q11719_bloodspore_ruination_45997_SpellScript);
+        if (Unit* caster = GetCaster())
+            if (Creature* laurith = caster->FindNearestCreature(NPC_BLOODMAGE_LAURITH, 100.0f))
+                laurith->AI()->SetGUID(caster->GetGUID());
+    }
 
-        void HandleEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Creature* laurith = caster->FindNearestCreature(NPC_BLOODMAGE_LAURITH, 100.0f))
-                    laurith->AI()->SetGUID(caster->GetGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_q11719_bloodspore_ruination_45997_SpellScript::HandleEffect, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q11719_bloodspore_ruination_45997_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_q11719_bloodspore_ruination_45997::HandleEffect, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -2068,7 +2057,7 @@ void AddSC_borean_tundra()
     new npc_valiance_keep_cannoneer();
     new npc_warmage_coldarra();
     new npc_hidden_cultist();
-    new spell_q11719_bloodspore_ruination_45997();
+    RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
 }
 
