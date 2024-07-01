@@ -2836,44 +2836,38 @@ private:
     WorldObject* _target;
 };
 
-class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScriptLoader
+class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScript
 {
-public:
-    spell_the_lich_king_vile_spirit_damage_target_search() : SpellScriptLoader("spell_the_lich_king_vile_spirit_damage_target_search") { }
+    PrepareSpellScript(spell_the_lich_king_vile_spirit_damage_target_search);
 
-    class spell_the_lich_king_vile_spirit_damage_target_search_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_vile_spirit_damage_target_search_SpellScript);
+        return ValidateSpellInfo({ SPELL_VILE_SPIRIT_DAMAGE_SEARCH, SPELL_SPIRIT_BURST });
+    }
 
-        void CheckTargetCount(std::list<WorldObject*>& targets)
-        {
-            if (targets.empty())
-                return;
-
-            if (TempSummon* summon = GetCaster()->ToTempSummon())
-                if (Unit* summoner = summon->GetSummonerUnit())
-                    summoner->GetAI()->SetData(DATA_VILE, 1);
-
-            if (Creature* c = GetCaster()->ToCreature())
-            {
-                c->RemoveAurasDueToSpell(SPELL_VILE_SPIRIT_DAMAGE_SEARCH);
-                c->GetMotionMaster()->Clear(true);
-                c->StopMoving();
-                c->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, true);
-                c->DespawnOrUnsummon(3000);
-                c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_vile_spirit_damage_target_search_SpellScript::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CheckTargetCount(std::list<WorldObject*>& targets)
     {
-        return new spell_the_lich_king_vile_spirit_damage_target_search_SpellScript();
+        if (targets.empty())
+            return;
+
+        if (TempSummon* summon = GetCaster()->ToTempSummon())
+            if (Unit* summoner = summon->GetSummonerUnit())
+                summoner->GetAI()->SetData(DATA_VILE, 1);
+
+        if (Creature* c = GetCaster()->ToCreature())
+        {
+            c->RemoveAurasDueToSpell(SPELL_VILE_SPIRIT_DAMAGE_SEARCH);
+            c->GetMotionMaster()->Clear(true);
+            c->StopMoving();
+            c->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, true);
+            c->DespawnOrUnsummon(3000);
+            c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_vile_spirit_damage_target_search::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -3624,7 +3618,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_vile_spirits_aura);
     RegisterSpellScript(spell_the_lich_king_vile_spirits_visual);
     RegisterSpellScript(spell_the_lich_king_vile_spirit_move_target_search);
-    new spell_the_lich_king_vile_spirit_damage_target_search();
+    RegisterSpellScript(spell_the_lich_king_vile_spirit_damage_target_search);
     new spell_the_lich_king_harvest_soul();
     new npc_strangulate_vehicle();
     new npc_terenas_menethil();
