@@ -475,59 +475,48 @@ public:
     }
 };
 
-class spell_marrowgar_coldflame : public SpellScriptLoader
+class spell_marrowgar_coldflame : public SpellScript
 {
-public:
-    spell_marrowgar_coldflame() : SpellScriptLoader("spell_marrowgar_coldflame") { }
+    PrepareSpellScript(spell_marrowgar_coldflame);
 
-    class spell_marrowgar_coldflame_SpellScript : public SpellScript
+    void SelectTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_marrowgar_coldflame_SpellScript);
+        targets.clear();
+        Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 1, -1.0f, true,true,  -SPELL_IMPALED); // -1.0f as it takes into account object size
+        if (!target)
+            target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true); // if only tank or noone outside of boss' model
+        if (!target)
+            return;
 
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            targets.clear();
-            Unit* target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 1, -1.0f, true,true,  -SPELL_IMPALED); // -1.0f as it takes into account object size
-            if (!target)
-                target = GetCaster()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true); // if only tank or noone outside of boss' model
-            if (!target)
-                return;
+        targets.push_back(target);
+    }
 
-            targets.push_back(target);
-        }
-
-        void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
-        {
-            Unit* caster = GetCaster();
-            float angle = caster->GetAngle(GetHitUnit());
-            float dist = caster->GetObjectSize() / 2.0f;
-            float z = caster->GetPositionZ() + 2.5f;
-            float nx = caster->GetPositionX() + dist * cos(angle);
-            float ny = caster->GetPositionY() + dist * std::sin(angle);
-
-            if (!caster->IsWithinLOS(nx, ny, z))
-            {
-                nx = caster->GetPositionX() + 0.5f * cos(angle);
-                ny = caster->GetPositionY() + 0.5f * std::sin(angle);
-            }
-
-            if (caster->IsWithinLOS(nx, ny, z))
-            {
-                caster->SetOrientation(angle);
-                caster->CastSpell(nx, ny, z, uint32(GetEffectValue()), true);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_marrowgar_coldflame_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_marrowgar_coldflame_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_marrowgar_coldflame_SpellScript();
+        Unit* caster = GetCaster();
+        float angle = caster->GetAngle(GetHitUnit());
+        float dist = caster->GetObjectSize() / 2.0f;
+        float z = caster->GetPositionZ() + 2.5f;
+        float nx = caster->GetPositionX() + dist * cos(angle);
+        float ny = caster->GetPositionY() + dist * std::sin(angle);
+
+        if (!caster->IsWithinLOS(nx, ny, z))
+        {
+            nx = caster->GetPositionX() + 0.5f * cos(angle);
+            ny = caster->GetPositionY() + 0.5f * std::sin(angle);
+        }
+
+        if (caster->IsWithinLOS(nx, ny, z))
+        {
+            caster->SetOrientation(angle);
+            caster->CastSpell(nx, ny, z, uint32(GetEffectValue()), true);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_marrowgar_coldflame::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_marrowgar_coldflame::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -705,7 +694,7 @@ void AddSC_boss_lord_marrowgar()
     RegisterIcecrownCitadelCreatureAI(boss_lord_marrowgar);
     new npc_coldflame();
     new npc_bone_spike();
-    new spell_marrowgar_coldflame();
+    RegisterSpellScript(spell_marrowgar_coldflame);
     new spell_marrowgar_coldflame_bonestorm();
     new spell_marrowgar_bone_spike_graveyard();
     new spell_marrowgar_bone_storm();
