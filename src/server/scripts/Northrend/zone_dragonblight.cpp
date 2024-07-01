@@ -2085,35 +2085,24 @@ class spell_q12096_q12092_dummy : public SpellScript
     }
 };
 
-class spell_q12096_q12092_bark : public SpellScriptLoader // Bark of the Walkers
+class spell_q12096_q12092_bark : public SpellScript
 {
-public:
-    spell_q12096_q12092_bark() : SpellScriptLoader("spell_q12096_q12092_bark") { }
+    PrepareSpellScript(spell_q12096_q12092_bark);
 
-    class spell_q12096_q12092_bark_SpellScript : public SpellScript
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_q12096_q12092_bark_SpellScript);
+        Creature* lothalor = GetHitCreature();
+        if (!lothalor || lothalor->GetEntry() != NPC_LOTHALOR)
+            return;
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            Creature* lothalor = GetHitCreature();
-            if (!lothalor || lothalor->GetEntry() != NPC_LOTHALOR)
-                return;
+        lothalor->AI()->Talk(SAY_LOTHALOR);
+        lothalor->RemoveAura(SPELL_CONFUSED);
+        lothalor->DespawnOrUnsummon(4000);
+    }
 
-            lothalor->AI()->Talk(SAY_LOTHALOR);
-            lothalor->RemoveAura(SPELL_CONFUSED);
-            lothalor->DespawnOrUnsummon(4000);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_bark_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q12096_q12092_bark_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_bark::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2280,7 +2269,7 @@ void AddSC_dragonblight()
     // Theirs
     new npc_commander_eligor_dawnbringer();
     RegisterSpellScript(spell_q12096_q12092_dummy);
-    new spell_q12096_q12092_bark();
+    RegisterSpellScript(spell_q12096_q12092_bark);
     new npc_torturer_lecraft();
 
     RegisterSpellScript(spell_dragonblight_corrosive_spit);
