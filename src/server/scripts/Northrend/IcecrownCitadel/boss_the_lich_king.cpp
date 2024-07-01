@@ -2797,53 +2797,43 @@ class spell_the_lich_king_vile_spirits_visual : public SpellScript
     }
 };
 
-class spell_the_lich_king_vile_spirit_move_target_search : public SpellScriptLoader
+class spell_the_lich_king_vile_spirit_move_target_search : public SpellScript
 {
-public:
-    spell_the_lich_king_vile_spirit_move_target_search() : SpellScriptLoader("spell_the_lich_king_vile_spirit_move_target_search") { }
+    PrepareSpellScript(spell_the_lich_king_vile_spirit_move_target_search);
 
-    class spell_the_lich_king_vile_spirit_move_target_search_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_the_lich_king_vile_spirit_move_target_search_SpellScript);
-
-        bool Load() override
-        {
-            _target = nullptr;
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            if (targets.empty())
-                return;
-
-            _target = Acore::Containers::SelectRandomContainerElement(targets);
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (GetHitUnit() != _target)
-                return;
-
-            GetCaster()->ToCreature()->SetInCombatWithZone();
-            GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
-            GetCaster()->AddThreat(GetHitUnit(), GetCaster()->GetMaxHealth() * 0.2f);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_vile_spirit_move_target_search_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_vile_spirit_move_target_search_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-
-        WorldObject* _target;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_the_lich_king_vile_spirit_move_target_search_SpellScript();
+        _target = nullptr;
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
     }
+
+    void SelectTarget(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            return;
+
+        _target = Acore::Containers::SelectRandomContainerElement(targets);
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (GetHitUnit() != _target)
+            return;
+
+        GetCaster()->ToCreature()->SetInCombatWithZone();
+        GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
+        GetCaster()->AddThreat(GetHitUnit(), GetCaster()->GetMaxHealth() * 0.2f);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_vile_spirit_move_target_search::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_vile_spirit_move_target_search::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+
+private:
+    WorldObject* _target;
 };
 
 class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScriptLoader
@@ -3633,7 +3623,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_life_siphon);
     RegisterSpellScript(spell_the_lich_king_vile_spirits_aura);
     RegisterSpellScript(spell_the_lich_king_vile_spirits_visual);
-    new spell_the_lich_king_vile_spirit_move_target_search();
+    RegisterSpellScript(spell_the_lich_king_vile_spirit_move_target_search);
     new spell_the_lich_king_vile_spirit_damage_target_search();
     new spell_the_lich_king_harvest_soul();
     new npc_strangulate_vehicle();
