@@ -1728,30 +1728,19 @@ class spell_the_lich_king_jump : public SpellScript
     }
 };
 
-class spell_the_lich_king_jump_remove_aura : public SpellScriptLoader
+class spell_the_lich_king_jump_remove_aura : public SpellScript
 {
-public:
-    spell_the_lich_king_jump_remove_aura() : SpellScriptLoader("spell_the_lich_king_jump_remove_aura") { }
+    PrepareSpellScript(spell_the_lich_king_jump_remove_aura);
 
-    class spell_the_lich_king_jump_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_the_lich_king_jump_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_jump_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_jump_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_jump_remove_aura::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -3788,7 +3777,7 @@ void AddSC_boss_the_lich_king()
     new npc_tirion_fordring_tft();
     RegisterSpellScript(spell_the_lich_king_quake);
     RegisterSpellScript(spell_the_lich_king_jump);
-    new spell_the_lich_king_jump_remove_aura();
+    RegisterSpellScript(spell_the_lich_king_jump_remove_aura);
     new spell_trigger_spell_from_caster("spell_the_lich_king_mass_resurrection", SPELL_MASS_RESURRECTION_REAL);
     new spell_the_lich_king_play_movie();
 
