@@ -1505,31 +1505,20 @@ class spell_putricide_eat_ooze : public SpellScript
     }
 };
 
-class spell_putricide_regurgitated_ooze : public SpellScriptLoader
+class spell_putricide_regurgitated_ooze : public SpellScript
 {
-public:
-    spell_putricide_regurgitated_ooze() : SpellScriptLoader("spell_putricide_regurgitated_ooze") { }
+    PrepareSpellScript(spell_putricide_regurgitated_ooze);
 
-    class spell_putricide_regurgitated_ooze_SpellScript : public SpellScript
+    // the only purpose of this hook is to fail the achievement
+    void ExtraEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_putricide_regurgitated_ooze_SpellScript);
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            instance->SetData(DATA_NAUSEA_ACHIEVEMENT, uint32(false));
+    }
 
-        // the only purpose of this hook is to fail the achievement
-        void ExtraEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                instance->SetData(DATA_NAUSEA_ACHIEVEMENT, uint32(false));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_putricide_regurgitated_ooze_SpellScript::ExtraEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_putricide_regurgitated_ooze_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_putricide_regurgitated_ooze::ExtraEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -1556,6 +1545,6 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_mutated_transformation_dismiss_aura);
     RegisterSpellScript(spell_putricide_mutated_transformation_dmg);
     RegisterSpellScript(spell_putricide_eat_ooze);
-    new spell_putricide_regurgitated_ooze();
+    RegisterSpellScript(spell_putricide_regurgitated_ooze);
 }
 
