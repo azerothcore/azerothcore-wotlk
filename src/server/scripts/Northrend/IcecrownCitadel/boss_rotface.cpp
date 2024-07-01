@@ -758,40 +758,29 @@ class spell_rotface_unstable_ooze_explosion_init : public SpellScript
     }
 };
 
-class spell_rotface_unstable_ooze_explosion : public SpellScriptLoader
+class spell_rotface_unstable_ooze_explosion : public SpellScript
 {
-public:
-    spell_rotface_unstable_ooze_explosion() : SpellScriptLoader("spell_rotface_unstable_ooze_explosion") { }
+    PrepareSpellScript(spell_rotface_unstable_ooze_explosion);
 
-    class spell_rotface_unstable_ooze_explosion_SpellScript : public SpellScript
+    void CheckTarget(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_rotface_unstable_ooze_explosion_SpellScript);
+        PreventHitDefaultEffect(EFFECT_0);
+        if (!GetExplTargetDest())
+            return;
 
-        void CheckTarget(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(EFFECT_0);
-            if (!GetExplTargetDest())
-                return;
+        uint32 triggered_spell_id = GetSpellInfo()->Effects[effIndex].TriggerSpell;
 
-            uint32 triggered_spell_id = GetSpellInfo()->Effects[effIndex].TriggerSpell;
+        float x, y, z;
+        GetExplTargetDest()->GetPosition(x, y, z);
+        // let Rotface handle the cast - caster dies before this executes
+        if (InstanceScript* script = GetCaster()->GetInstanceScript())
+            if (Creature* rotface = script->instance->GetCreature(script->GetGuidData(DATA_ROTFACE)))
+                rotface->CastSpell(x, y, z, triggered_spell_id, true/*, nullptr, nullptr, GetCaster()->GetGUID()*/); // caster not available on clientside, no log in such case
+    }
 
-            float x, y, z;
-            GetExplTargetDest()->GetPosition(x, y, z);
-            // let Rotface handle the cast - caster dies before this executes
-            if (InstanceScript* script = GetCaster()->GetInstanceScript())
-                if (Creature* rotface = script->instance->GetCreature(script->GetGuidData(DATA_ROTFACE)))
-                    rotface->CastSpell(x, y, z, triggered_spell_id, true/*, nullptr, nullptr, GetCaster()->GetGUID()*/); // caster not available on clientside, no log in such case
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_rotface_unstable_ooze_explosion_SpellScript::CheckTarget, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_rotface_unstable_ooze_explosion_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_rotface_unstable_ooze_explosion::CheckTarget, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
     }
 };
 
@@ -930,7 +919,7 @@ void AddSC_boss_rotface()
     RegisterSpellScript(spell_rotface_large_ooze_combine);
     RegisterSpellScript(spell_rotface_large_ooze_buff_combine);
     RegisterSpellScript(spell_rotface_unstable_ooze_explosion_init);
-    new spell_rotface_unstable_ooze_explosion();
+    RegisterSpellScript(spell_rotface_unstable_ooze_explosion);
     new spell_rotface_unstable_ooze_explosion_suicide();
 
     new npc_precious_icc();
