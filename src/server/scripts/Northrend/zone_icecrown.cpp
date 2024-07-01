@@ -1206,31 +1206,20 @@ class spell_fight_fire_bomber : public SpellScript
     }
 };
 
-class spell_anti_air_rocket_bomber : public SpellScriptLoader
+class spell_anti_air_rocket_bomber : public SpellScript
 {
-public:
-    spell_anti_air_rocket_bomber() : SpellScriptLoader("spell_anti_air_rocket_bomber") { }
+    PrepareSpellScript(spell_anti_air_rocket_bomber);
 
-    class spell_anti_air_rocket_bomber_SpellScript : public SpellScript
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_anti_air_rocket_bomber_SpellScript)
+        PreventHitDefaultEffect(effIndex);
+        const WorldLocation* loc = GetExplTargetDest();
+        GetCaster()->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), GetSpellInfo()->Effects[effIndex].CalcValue(), true);
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            const WorldLocation* loc = GetExplTargetDest();
-            GetCaster()->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), GetSpellInfo()->Effects[effIndex].CalcValue(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_anti_air_rocket_bomber_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_anti_air_rocket_bomber_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_anti_air_rocket_bomber::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2166,7 +2155,7 @@ void AddSC_icecrown()
     RegisterSpellScript(spell_switch_infragreen_bomber_station);
     RegisterSpellAndAuraScriptPair(spell_charge_shield_bomber, spell_charge_shield_bomber_aura);
     RegisterSpellScript(spell_fight_fire_bomber);
-    new spell_anti_air_rocket_bomber();
+    RegisterSpellScript(spell_anti_air_rocket_bomber);
     new npc_infra_green_bomber_generic();
     new spell_onslaught_or_call_bone_gryphon();
     RegisterSpellScript(spell_deliver_gryphon);
