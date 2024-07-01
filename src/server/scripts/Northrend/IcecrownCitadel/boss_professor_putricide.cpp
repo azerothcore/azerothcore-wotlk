@@ -1243,37 +1243,26 @@ class spell_putricide_unbound_plague_dmg_aura : public AuraScript
     }
 };
 
-class spell_putricide_choking_gas_bomb : public SpellScriptLoader
+class spell_putricide_choking_gas_bomb : public SpellScript
 {
-public:
-    spell_putricide_choking_gas_bomb() : SpellScriptLoader("spell_putricide_choking_gas_bomb") { }
+    PrepareSpellScript(spell_putricide_choking_gas_bomb);
 
-    class spell_putricide_choking_gas_bomb_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_putricide_choking_gas_bomb_SpellScript);
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
+        uint32 skipIndex = urand(0, 2);
+        for (uint32 i = 0; i < 3; ++i)
         {
-            uint32 skipIndex = urand(0, 2);
-            for (uint32 i = 0; i < 3; ++i)
-            {
-                if (i == skipIndex)
-                    continue;
+            if (i == skipIndex)
+                continue;
 
-                uint32 spellId = uint32(GetSpellInfo()->Effects[i].CalcValue());
-                GetCaster()->CastSpell(GetCaster(), spellId, true, nullptr, nullptr, GetCaster()->GetGUID());
-            }
+            uint32 spellId = uint32(GetSpellInfo()->Effects[i].CalcValue());
+            GetCaster()->CastSpell(GetCaster(), spellId, true, nullptr, nullptr, GetCaster()->GetGUID());
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_putricide_choking_gas_bomb_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_putricide_choking_gas_bomb_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_putricide_choking_gas_bomb::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1616,7 +1605,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_mutated_plague_aura);
     RegisterSpellScript(spell_putricide_unbound_plague);
     RegisterSpellScript(spell_putricide_unbound_plague_dmg_aura);
-    new spell_putricide_choking_gas_bomb();
+    RegisterSpellScript(spell_putricide_choking_gas_bomb);
     new spell_putricide_clear_aura_effect_value();
     new spell_putricide_mutation_init();
     new spell_putricide_mutated_transformation();
