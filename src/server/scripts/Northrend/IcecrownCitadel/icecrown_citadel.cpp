@@ -2409,30 +2409,24 @@ class spell_icc_yd_summon_undead : public SpellScript
     }
 };
 
-class spell_icc_shattered_bones : public SpellScriptLoader
+class spell_icc_shattered_bones : public SpellScript
 {
-public:
-    spell_icc_shattered_bones() : SpellScriptLoader("spell_icc_shattered_bones") { }
+    PrepareSpellScript(spell_icc_shattered_bones);
 
-    class spell_icc_shattered_bones_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_icc_shattered_bones_SpellScript);
+        return ValidateSpellInfo({ 70963 });
+    }
 
-        void HandleDummy()
-        {
-            for (uint8 i = 0; i < 10; ++i)
-                GetCaster()->CastSpell((Unit*)nullptr, 70963, true);
-        }
-
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_icc_shattered_bones_SpellScript::HandleDummy);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy()
     {
-        return new spell_icc_shattered_bones_SpellScript();
+        for (uint8 i = 0; i < 10; ++i)
+            GetCaster()->CastSpell((Unit*)nullptr, 70963, true);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_icc_shattered_bones::HandleDummy);
     }
 };
 
@@ -3687,7 +3681,7 @@ void AddSC_icecrown_citadel()
     RegisterSpellScript(spell_icc_yf_frozen_orb_aura);
     RegisterSpellScript(spell_icc_yh_volley_aura);
     RegisterSpellScript(spell_icc_yd_summon_undead);
-    new spell_icc_shattered_bones();
+    RegisterSpellScript(spell_icc_shattered_bones);
     new npc_icc_skybreaker_hierophant();
     new npc_icc_skybreaker_marksman();
     new npc_icc_skybreaker_vicar();
