@@ -767,79 +767,69 @@ public:
     }
 };
 
-class spell_sindragosa_s_fury : public SpellScriptLoader
+class spell_sindragosa_s_fury : public SpellScript
 {
-public:
-    spell_sindragosa_s_fury() : SpellScriptLoader("spell_sindragosa_s_fury") { }
+    PrepareSpellScript(spell_sindragosa_s_fury);
 
-    class spell_sindragosa_s_fury_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_sindragosa_s_fury_SpellScript);
+        _targetCount = 0;
 
-        bool Load() override
-        {
-            _targetCount = 0;
+        // This script should execute only in Icecrown Citadel
+        if (InstanceMap* instance = GetCaster()->GetMap()->ToInstanceMap())
+            if (instance->GetInstanceScript())
+                if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
+                    return true;
 
-            // This script should execute only in Icecrown Citadel
-            if (InstanceMap* instance = GetCaster()->GetMap()->ToInstanceMap())
-                if (instance->GetInstanceScript())
-                    if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
-                        return true;
-
-            return false;
-        }
-
-        void SelectDest()
-        {
-            if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
-            {
-                float destX = float(rand_norm()) * 75.0f + 4350.0f;
-                float destY = float(rand_norm()) * 75.0f + 2450.0f;
-                float destZ = 205.0f; // random number close to ground, get exact in next call
-                GetCaster()->UpdateGroundPositionZ(destX, destY, destZ);
-                dest->Relocate(destX, destY, destZ);
-            }
-        }
-
-        void CountTargets(std::list<WorldObject*>& targets)
-        {
-            _targetCount = targets.size();
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-
-            if (!GetHitUnit()->IsAlive() || (GetHitUnit()->GetTypeId() == TYPEID_PLAYER && GetHitUnit()->ToPlayer()->IsGameMaster()) || !_targetCount)
-                return;
-
-            float resistance = float(GetHitUnit()->GetResistance(SpellSchoolMask(GetSpellInfo()->SchoolMask)));
-            float ResistFactor = ((resistance * 2.0f) / (resistance + 510.0f));
-            if (ResistFactor > 0.9f)
-                ResistFactor = 0.9f;
-
-            uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
-
-            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
-            damageInfo.damage = damage;
-            GetCaster()->SendSpellNonMeleeDamageLog(&damageInfo);
-            GetCaster()->DealSpellDamage(&damageInfo, false);
-        }
-
-        void Register() override
-        {
-            BeforeCast += SpellCastFn(spell_sindragosa_s_fury_SpellScript::SelectDest);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_s_fury_SpellScript::CountTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_sindragosa_s_fury_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-        }
-
-        uint32 _targetCount;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_sindragosa_s_fury_SpellScript();
+        return false;
     }
+
+    void SelectDest()
+    {
+        if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
+        {
+            float destX = float(rand_norm()) * 75.0f + 4350.0f;
+            float destY = float(rand_norm()) * 75.0f + 2450.0f;
+            float destZ = 205.0f; // random number close to ground, get exact in next call
+            GetCaster()->UpdateGroundPositionZ(destX, destY, destZ);
+            dest->Relocate(destX, destY, destZ);
+        }
+    }
+
+    void CountTargets(std::list<WorldObject*>& targets)
+    {
+        _targetCount = targets.size();
+    }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        if (!GetHitUnit()->IsAlive() || (GetHitUnit()->GetTypeId() == TYPEID_PLAYER && GetHitUnit()->ToPlayer()->IsGameMaster()) || !_targetCount)
+            return;
+
+        float resistance = float(GetHitUnit()->GetResistance(SpellSchoolMask(GetSpellInfo()->SchoolMask)));
+        float ResistFactor = ((resistance * 2.0f) / (resistance + 510.0f));
+        if (ResistFactor > 0.9f)
+            ResistFactor = 0.9f;
+
+        uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
+
+        SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
+        damageInfo.damage = damage;
+        GetCaster()->SendSpellNonMeleeDamageLog(&damageInfo);
+        GetCaster()->DealSpellDamage(&damageInfo, false);
+    }
+
+    void Register() override
+    {
+        BeforeCast += SpellCastFn(spell_sindragosa_s_fury::SelectDest);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_s_fury::CountTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_sindragosa_s_fury::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+    }
+
+private:
+    uint32 _targetCount;
 };
 
 class UnchainedMagicTargetSelector
@@ -1955,7 +1945,7 @@ void AddSC_boss_sindragosa()
 {
     new boss_sindragosa();
     new npc_ice_tomb();
-    new spell_sindragosa_s_fury();
+    RegisterSpellScript(spell_sindragosa_s_fury);
     RegisterSpellScript(spell_sindragosa_unchained_magic);
     new spell_sindragosa_permeating_chill();
     new spell_sindragosa_instability();
