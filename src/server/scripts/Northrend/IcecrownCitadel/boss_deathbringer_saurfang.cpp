@@ -1163,59 +1163,36 @@ class spell_deathbringer_blood_link : public SpellScript
     }
 };
 
-class spell_deathbringer_blood_power : public SpellScriptLoader
+class spell_deathbringer_blood_power : public SpellScript
 {
-public:
-    spell_deathbringer_blood_power() : SpellScriptLoader("spell_deathbringer_blood_power") { }
+    PrepareSpellScript(spell_deathbringer_blood_power);
 
-    class spell_deathbringer_blood_power_SpellScript : public SpellScript
+    void ModAuraValue()
     {
-        PrepareSpellScript(spell_deathbringer_blood_power_SpellScript);
-
-        void ModAuraValue()
-        {
-            if (Aura* aura = GetHitAura())
-                aura->RecalculateAmountOfEffects();
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_deathbringer_blood_power_SpellScript::ModAuraValue);
-        }
-    };
-
-    class spell_deathbringer_blood_power_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_deathbringer_blood_power_AuraScript);
-
-        void RecalculateHook(AuraEffect const* /*aurEffect*/, int32& amount, bool& canBeRecalculated)
-        {
-            amount = int32(GetUnitOwner()->GetPower(POWER_ENERGY));
-            canBeRecalculated = true;
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_deathbringer_blood_power_AuraScript::RecalculateHook, EFFECT_0, SPELL_AURA_MOD_SCALE);
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_deathbringer_blood_power_AuraScript::RecalculateHook, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        }
-
-        bool Load() override
-        {
-            if (GetUnitOwner()->getPowerType() != POWER_ENERGY)
-                return false;
-            return true;
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_deathbringer_blood_power_SpellScript();
+        if (Aura* aura = GetHitAura())
+            aura->RecalculateAmountOfEffects();
     }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_deathbringer_blood_power_AuraScript();
+        AfterHit += SpellHitFn(spell_deathbringer_blood_power::ModAuraValue);
+    }
+};
+
+class spell_deathbringer_blood_power_aura : public AuraScript
+{
+    PrepareAuraScript(spell_deathbringer_blood_power_aura);
+
+    void RecalculateHook(AuraEffect const* /*aurEffect*/, int32& amount, bool& canBeRecalculated)
+    {
+        amount = int32(GetUnitOwner()->GetPower(POWER_ENERGY));
+        canBeRecalculated = true;
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_deathbringer_blood_power_aura::RecalculateHook, EFFECT_0, SPELL_AURA_MOD_SCALE);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_deathbringer_blood_power_aura::RecalculateHook, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
     }
 };
 
@@ -1397,7 +1374,7 @@ void AddSC_boss_deathbringer_saurfang()
     RegisterSpellScript(spell_deathbringer_blood_link_aura);
     RegisterSpellScript(spell_deathbringer_blood_link_blood_beast_aura);
     RegisterSpellScript(spell_deathbringer_blood_link);
-    new spell_deathbringer_blood_power();
+    RegisterSpellAndAuraScriptPair(spell_deathbringer_blood_power, spell_deathbringer_blood_power_aura);
     new spell_deathbringer_blood_nova_targeting();
     new spell_deathbringer_boiling_blood();
     new achievement_ive_gone_and_made_a_mess();
