@@ -878,34 +878,23 @@ class spell_blood_queen_swarming_shadows_floor_dmg : public SpellScript
     }
 };
 
-class spell_blood_queen_presence_of_the_darkfallen : public SpellScriptLoader
+class spell_blood_queen_presence_of_the_darkfallen : public SpellScript
 {
-public:
-    spell_blood_queen_presence_of_the_darkfallen() : SpellScriptLoader("spell_blood_queen_presence_of_the_darkfallen") { }
+    PrepareSpellScript(spell_blood_queen_presence_of_the_darkfallen);
 
-    class spell_blood_queen_presence_of_the_darkfallen_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_blood_queen_presence_of_the_darkfallen_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit())
+            return;
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit())
-                return;
+        if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
+            GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL));
+    }
 
-            if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_blood_queen_presence_of_the_darkfallen_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_queen_presence_of_the_darkfallen_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_blood_queen_presence_of_the_darkfallen::HandleScript, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
@@ -939,7 +928,7 @@ void AddSC_boss_blood_queen_lana_thel()
     RegisterSpellScript(spell_blood_queen_essence_of_the_blood_queen_aura);
     RegisterSpellScript(spell_blood_queen_vampiric_bite);
     RegisterSpellScript(spell_blood_queen_swarming_shadows_floor_dmg);
-    new spell_blood_queen_presence_of_the_darkfallen();
+    RegisterSpellScript(spell_blood_queen_presence_of_the_darkfallen);
     new achievement_once_bitten_twice_shy("achievement_once_bitten_twice_shy_n_10", 0, false);
     new achievement_once_bitten_twice_shy("achievement_once_bitten_twice_shy_v_10", 0, true);
     new achievement_once_bitten_twice_shy("achievement_once_bitten_twice_shy_n_25", 1, false);
