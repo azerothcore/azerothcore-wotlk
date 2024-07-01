@@ -903,34 +903,23 @@ class spell_putricide_slime_puddle : public SpellScript
     }
 };
 
-class spell_putricide_slime_puddle_spawn : public SpellScriptLoader
+class spell_putricide_slime_puddle_spawn : public SpellScript
 {
-public:
-    spell_putricide_slime_puddle_spawn() : SpellScriptLoader("spell_putricide_slime_puddle_spawn") { }
+    PrepareSpellScript(spell_putricide_slime_puddle_spawn);
 
-    class spell_putricide_slime_puddle_spawn_SpellScript : public SpellScript
+    void SelectDest()
     {
-        PrepareSpellScript(spell_putricide_slime_puddle_spawn_SpellScript);
-
-        void SelectDest()
+        if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
         {
-            if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
-            {
-                float destZ = 395.0f; // random number close to ground, get exact in next call
-                GetCaster()->UpdateGroundPositionZ(dest->GetPositionX(), dest->GetPositionY(), destZ);
-                dest->m_positionZ = destZ;
-            }
+            float destZ = 395.0f; // random number close to ground, get exact in next call
+            GetCaster()->UpdateGroundPositionZ(dest->GetPositionX(), dest->GetPositionY(), destZ);
+            dest->m_positionZ = destZ;
         }
+    }
 
-        void Register() override
-        {
-            BeforeCast += SpellCastFn(spell_putricide_slime_puddle_spawn_SpellScript::SelectDest);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_putricide_slime_puddle_spawn_SpellScript();
+        BeforeCast += SpellCastFn(spell_putricide_slime_puddle_spawn::SelectDest);
     }
 };
 
@@ -1700,7 +1689,7 @@ void AddSC_boss_professor_putricide()
     new npc_volatile_ooze();
     new npc_gas_cloud();
     RegisterSpellScript(spell_putricide_slime_puddle);
-    new spell_putricide_slime_puddle_spawn();
+    RegisterSpellScript(spell_putricide_slime_puddle_spawn);
     new spell_putricide_grow_stacker();
     new spell_putricide_unstable_experiment();
     new spell_putricide_tear_gas_effect();
