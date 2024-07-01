@@ -885,29 +885,18 @@ class spell_sindragosa_unchained_magic : public SpellScript
     }
 };
 
-class spell_sindragosa_permeating_chill : public SpellScriptLoader
+class spell_sindragosa_permeating_chill_aura : public AuraScript
 {
-public:
-    spell_sindragosa_permeating_chill() : SpellScriptLoader("spell_sindragosa_permeating_chill") { }
+    PrepareAuraScript(spell_sindragosa_permeating_chill_aura);
 
-    class spell_sindragosa_permeating_chill_AuraScript : public AuraScript
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        PrepareAuraScript(spell_sindragosa_permeating_chill_AuraScript);
+        return eventInfo.GetProcTarget() && eventInfo.GetProcTarget()->GetEntry() == NPC_SINDRAGOSA;
+    }
 
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            return eventInfo.GetProcTarget() && eventInfo.GetProcTarget()->GetEntry() == NPC_SINDRAGOSA;
-        }
-
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_sindragosa_permeating_chill_AuraScript::CheckProc);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_sindragosa_permeating_chill_AuraScript();
+        DoCheckProc += AuraCheckProcFn(spell_sindragosa_permeating_chill_aura::CheckProc);
     }
 };
 
@@ -1947,7 +1936,7 @@ void AddSC_boss_sindragosa()
     new npc_ice_tomb();
     RegisterSpellScript(spell_sindragosa_s_fury);
     RegisterSpellScript(spell_sindragosa_unchained_magic);
-    new spell_sindragosa_permeating_chill();
+    RegisterSpellScript(spell_sindragosa_permeating_chill_aura);
     new spell_sindragosa_instability();
     new spell_sindragosa_icy_grip();
     new spell_sindragosa_icy_grip_jump();

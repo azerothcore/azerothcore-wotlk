@@ -19,3 +19,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_putricide_gaseous_bloat_aura
 UPDATE `spell_script_names` SET `ScriptName`='spell_putricide_mutated_plague_aura' WHERE `spell_id` IN (72451,72463,72671,72672) AND `ScriptName`='spell_putricide_mutated_plague';
 UPDATE `spell_script_names` SET `ScriptName`='spell_putricide_unbound_plague_dmg_aura' WHERE `spell_id` IN (70911,72854,72855,72856) AND `ScriptName`='spell_putricide_unbound_plague_dmg';
 UPDATE `spell_script_names` SET `ScriptName`='spell_putricide_mutated_transformation_dismiss_aura' WHERE `spell_id` IN (70405,72508,72509,72510) AND `ScriptName`='spell_putricide_mutated_transformation_dismiss';
+UPDATE `spell_script_names` SET `ScriptName`='spell_sindragosa_permeating_chill_aura' WHERE `spell_id`=70107 AND `ScriptName`='spell_sindragosa_permeating_chill';
