@@ -945,44 +945,33 @@ class spell_sindragosa_icy_grip : public SpellScript
     }
 };
 
-class spell_sindragosa_icy_grip_jump : public SpellScriptLoader
+class spell_sindragosa_icy_grip_jump : public SpellScript
 {
-public:
-    spell_sindragosa_icy_grip_jump() : SpellScriptLoader("spell_sindragosa_icy_grip_jump") { }
+    PrepareSpellScript(spell_sindragosa_icy_grip_jump);
 
-    class spell_sindragosa_icy_grip_jump_SpellScript : public SpellScript
+    void HandleSpecial(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_sindragosa_icy_grip_jump_SpellScript);
+        PreventHitDefaultEffect(effIndex);
 
-        void HandleSpecial(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
+        float x = GetHitUnit()->GetPositionX();
+        float y = GetHitUnit()->GetPositionY();
+        float z = GetHitUnit()->GetPositionZ() + 0.1f;
+        float speedXY, speedZ;
 
-            float x = GetHitUnit()->GetPositionX();
-            float y = GetHitUnit()->GetPositionY();
-            float z = GetHitUnit()->GetPositionZ() + 0.1f;
-            float speedXY, speedZ;
+        if (GetSpellInfo()->Effects[effIndex].MiscValue)
+            speedZ = float(GetSpellInfo()->Effects[effIndex].MiscValue) / 10;
+        else if (GetSpellInfo()->Effects[effIndex].MiscValueB)
+            speedZ = float(GetSpellInfo()->Effects[effIndex].MiscValueB) / 10;
+        else
+            speedZ = 10.0f;
+        speedXY = GetCaster()->GetExactDist2d(x, y) * 10.0f / speedZ;
 
-            if (GetSpellInfo()->Effects[effIndex].MiscValue)
-                speedZ = float(GetSpellInfo()->Effects[effIndex].MiscValue) / 10;
-            else if (GetSpellInfo()->Effects[effIndex].MiscValueB)
-                speedZ = float(GetSpellInfo()->Effects[effIndex].MiscValueB) / 10;
-            else
-                speedZ = 10.0f;
-            speedXY = GetCaster()->GetExactDist2d(x, y) * 10.0f / speedZ;
+        GetCaster()->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
+    }
 
-            GetCaster()->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunchTarget += SpellEffectFn(spell_sindragosa_icy_grip_jump_SpellScript::HandleSpecial, EFFECT_0, SPELL_EFFECT_JUMP);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_sindragosa_icy_grip_jump_SpellScript();
+        OnEffectLaunchTarget += SpellEffectFn(spell_sindragosa_icy_grip_jump::HandleSpecial, EFFECT_0, SPELL_EFFECT_JUMP);
     }
 };
 
@@ -1917,7 +1906,7 @@ void AddSC_boss_sindragosa()
     RegisterSpellScript(spell_sindragosa_permeating_chill_aura);
     RegisterSpellScript(spell_sindragosa_instability_aura);
     RegisterSpellScript(spell_sindragosa_icy_grip);
-    new spell_sindragosa_icy_grip_jump();
+    RegisterSpellScript(spell_sindragosa_icy_grip_jump);
     new spell_sindragosa_ice_tomb_filter();
     new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb", SPELL_ICE_TOMB_DUMMY);
     new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb_dummy", SPELL_FROST_BEACON);
