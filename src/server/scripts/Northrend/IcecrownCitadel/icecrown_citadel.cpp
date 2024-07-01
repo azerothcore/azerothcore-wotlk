@@ -1890,47 +1890,36 @@ public:
     }
 };
 
-class spell_icc_stoneform : public SpellScriptLoader
+class spell_icc_stoneform_aura : public AuraScript
 {
-public:
-    spell_icc_stoneform() : SpellScriptLoader("spell_icc_stoneform") { }
+    PrepareAuraScript(spell_icc_stoneform_aura);
 
-    class spell_icc_stoneform_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_icc_stoneform_AuraScript);
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        if (Creature* target = GetTarget()->ToCreature())
         {
-            if (Creature* target = GetTarget()->ToCreature())
-            {
-                target->SetReactState(REACT_PASSIVE);
-                target->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                target->SetImmuneToPC(true);
-                target->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_02);
-            }
+            target->SetReactState(REACT_PASSIVE);
+            target->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            target->SetImmuneToPC(true);
+            target->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_02);
         }
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* target = GetTarget()->ToCreature())
-            {
-                target->SetReactState(REACT_AGGRESSIVE);
-                target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                target->SetImmuneToPC(false);
-                target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_icc_stoneform_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_icc_stoneform_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_icc_stoneform_AuraScript();
+        if (Creature* target = GetTarget()->ToCreature())
+        {
+            target->SetReactState(REACT_AGGRESSIVE);
+            target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            target->SetImmuneToPC(false);
+            target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_icc_stoneform_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_icc_stoneform_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -3780,7 +3769,7 @@ void AddSC_icecrown_citadel()
     new npc_frostwing_vrykul();
     new npc_impaling_spear();
     new npc_arthas_teleport_visual();
-    new spell_icc_stoneform();
+    RegisterSpellScript(spell_icc_stoneform_aura);
     new spell_icc_sprit_alarm();
     new spell_icc_geist_alarm();
     new spell_frost_giant_death_plague();
