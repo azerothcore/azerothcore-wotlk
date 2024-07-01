@@ -2756,39 +2756,29 @@ class spell_the_lich_king_life_siphon : public SpellScript
     }
 };
 
-class spell_the_lich_king_vile_spirits : public SpellScriptLoader
+class spell_the_lich_king_vile_spirits_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_vile_spirits() : SpellScriptLoader("spell_the_lich_king_vile_spirits") { }
+    PrepareAuraScript(spell_the_lich_king_vile_spirits_aura);
 
-    class spell_the_lich_king_vile_spirits_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_the_lich_king_vile_spirits_AuraScript);
-
-        bool Load() override
-        {
-            _is25Man = GetUnitOwner()->GetMap()->Is25ManRaid();
-            return true;
-        }
-
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            if (_is25Man || ((aurEff->GetTickNumber() - 1) % 5))
-                GetTarget()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff, GetCasterGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_vile_spirits_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-
-        bool _is25Man;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_the_lich_king_vile_spirits_AuraScript();
+        _is25Man = GetUnitOwner()->GetMap()->Is25ManRaid();
+        return true;
     }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        if (_is25Man || ((aurEff->GetTickNumber() - 1) % 5))
+            GetTarget()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_vile_spirits_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+
+private:
+    bool _is25Man;
 };
 
 class spell_the_lich_king_vile_spirits_visual : public SpellScriptLoader
@@ -3652,7 +3642,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_valkyr_target_search);
     RegisterSpellScript(spell_the_lich_king_cast_back_to_caster);
     RegisterSpellScript(spell_the_lich_king_life_siphon);
-    new spell_the_lich_king_vile_spirits();
+    RegisterSpellScript(spell_the_lich_king_vile_spirits_aura);
     new spell_the_lich_king_vile_spirits_visual();
     new spell_the_lich_king_vile_spirit_move_target_search();
     new spell_the_lich_king_vile_spirit_damage_target_search();
