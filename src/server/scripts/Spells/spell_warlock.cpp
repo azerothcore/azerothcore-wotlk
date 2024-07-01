@@ -705,7 +705,7 @@ class spell_warl_seed_of_corruption : public SpellScript
 };
 
 // -27243 - Seed of Corruption
-// Monster spells, triggered only on amount drop (not on death)
+// Monster spells, triggered only on detonation threshold reached (not on death)
 // 32863 - Seed of Corruption
 // 36123 - Seed of Corruption
 // 38252 - Seed of Corruption
