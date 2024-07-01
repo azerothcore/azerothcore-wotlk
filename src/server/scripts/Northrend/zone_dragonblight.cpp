@@ -2044,50 +2044,44 @@ enum StrengthenAncientsMisc
     NPC_LOTHALOR                = 26321
 };
 
-class spell_q12096_q12092_dummy : public SpellScriptLoader // Strengthen the Ancients: On Interact Dummy to Woodlands Walker
+class spell_q12096_q12092_dummy : public SpellScript
 {
-public:
-    spell_q12096_q12092_dummy() : SpellScriptLoader("spell_q12096_q12092_dummy") { }
+    PrepareSpellScript(spell_q12096_q12092_dummy);
 
-    class spell_q12096_q12092_dummy_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q12096_q12092_dummy_SpellScript);
+        return ValidateSpellInfo({ SPELL_CREATE_ITEM_BARK });
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            uint32 roll = rand() % 2;
-
-            Creature* tree = GetHitCreature();
-            Player* player = GetCaster()->ToPlayer();
-
-            if (!tree || !player)
-                return;
-
-            tree->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
-
-            if (roll == 1) // friendly version
-            {
-                tree->CastSpell(player, SPELL_CREATE_ITEM_BARK);
-                tree->AI()->Talk(SAY_WALKER_FRIENDLY, player);
-                tree->DespawnOrUnsummon(1000);
-            }
-            else if (roll == 0) // enemy version
-            {
-                tree->AI()->Talk(SAY_WALKER_ENEMY, player);
-                tree->SetFaction(FACTION_MONSTER);
-                tree->Attack(player, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_q12096_q12092_dummy_SpellScript();
+        uint32 roll = rand() % 2;
+
+        Creature* tree = GetHitCreature();
+        Player* player = GetCaster()->ToPlayer();
+
+        if (!tree || !player)
+            return;
+
+        tree->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+
+        if (roll == 1) // friendly version
+        {
+            tree->CastSpell(player, SPELL_CREATE_ITEM_BARK);
+            tree->AI()->Talk(SAY_WALKER_FRIENDLY, player);
+            tree->DespawnOrUnsummon(1000);
+        }
+        else if (roll == 0) // enemy version
+        {
+            tree->AI()->Talk(SAY_WALKER_ENEMY, player);
+            tree->SetFaction(FACTION_MONSTER);
+            tree->Attack(player, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_dummy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2285,7 +2279,7 @@ void AddSC_dragonblight()
 
     // Theirs
     new npc_commander_eligor_dawnbringer();
-    new spell_q12096_q12092_dummy();
+    RegisterSpellScript(spell_q12096_q12092_dummy);
     new spell_q12096_q12092_bark();
     new npc_torturer_lecraft();
 
