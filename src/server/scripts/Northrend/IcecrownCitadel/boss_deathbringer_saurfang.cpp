@@ -1042,65 +1042,59 @@ public:
     }
 };
 
-class spell_deathbringer_blood_link_aura : public SpellScriptLoader
+class spell_deathbringer_blood_link_aura : public AuraScript
 {
-public:
-    spell_deathbringer_blood_link_aura() : SpellScriptLoader("spell_deathbringer_blood_link_aura") { }
+    PrepareAuraScript(spell_deathbringer_blood_link_aura);
 
-    class spell_deathbringer_blood_link_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_deathbringer_blood_link_AuraScript);
+        return ValidateSpellInfo({ SPELL_BLOOD_LINK_DUMMY });
+    }
 
-        void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (GetUnitOwner()->getPowerType() == POWER_ENERGY && GetUnitOwner()->GetPower(POWER_ENERGY) == GetUnitOwner()->GetMaxPower(POWER_ENERGY))
-                if (Creature* saurfang = GetUnitOwner()->ToCreature())
-                    saurfang->AI()->DoAction(ACTION_MARK_OF_THE_FALLEN_CHAMPION);
-        }
-
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
-        }
-
-        void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            Unit* victim = eventInfo.GetActionTarget();
-            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-
-            //uint32 markCount = 0;
-            //if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
-            //markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
-            int32 basepoints = int32(1.0f /*+ 0.5f + 0.5f*markCount*/);
-            switch (procSpell->Id) // some spells give more Blood Power
-            {
-                case 72380:
-                case 72438:
-                case 72439:
-                case 72440: // Blood Nova
-                    basepoints = int32(2.0f /*+ 0.5f + 0.75f*markCount*/);
-                    break;
-            }
-
-            victim->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
-            return;
-        }
-
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_AuraScript::CheckProc);
-            OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathbringer_blood_link_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
     {
-        return new spell_deathbringer_blood_link_AuraScript();
+        PreventDefaultAction();
+        if (GetUnitOwner()->getPowerType() == POWER_ENERGY && GetUnitOwner()->GetPower(POWER_ENERGY) == GetUnitOwner()->GetMaxPower(POWER_ENERGY))
+            if (Creature* saurfang = GetUnitOwner()->ToCreature())
+                saurfang->AI()->DoAction(ACTION_MARK_OF_THE_FALLEN_CHAMPION);
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
+    }
+
+    void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* victim = eventInfo.GetActionTarget();
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+
+        //uint32 markCount = 0;
+        //if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
+        //markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
+        int32 basepoints = int32(1.0f /*+ 0.5f + 0.5f*markCount*/);
+        switch (procSpell->Id) // some spells give more Blood Power
+        {
+            case 72380:
+            case 72438:
+            case 72439:
+            case 72440: // Blood Nova
+                basepoints = int32(2.0f /*+ 0.5f + 0.75f*markCount*/);
+                break;
+        }
+
+        victim->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
+        return;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathbringer_blood_link_aura::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1412,7 +1406,7 @@ void AddSC_boss_deathbringer_saurfang()
     new npc_high_overlord_saurfang_icc();
     new npc_muradin_bronzebeard_icc();
     new npc_saurfang_event();
-    new spell_deathbringer_blood_link_aura();
+    RegisterSpellScript(spell_deathbringer_blood_link_aura);
     new spell_deathbringer_blood_link_blood_beast_aura();
     new spell_deathbringer_blood_link();
     new spell_deathbringer_blood_power();
