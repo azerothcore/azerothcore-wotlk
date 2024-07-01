@@ -2246,59 +2246,48 @@ class spell_igb_periodic_trigger_with_power_cost_aura : public AuraScript
     }
 };
 
-class spell_igb_overheat : public SpellScriptLoader
+class spell_igb_overheat_aura : public AuraScript
 {
-public:
-    spell_igb_overheat() : SpellScriptLoader("spell_igb_overheat") { }
+    PrepareAuraScript(spell_igb_overheat_aura);
 
-    class spell_igb_overheat_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_igb_overheat_AuraScript);
+        if (GetAura()->GetType() != UNIT_AURA_TYPE)
+            return false;
+        return GetUnitOwner()->IsVehicle();
+    }
 
-        bool Load() override
+    void SendClientControl(uint8 value)
+    {
+        if (Vehicle* vehicle = GetUnitOwner()->GetVehicleKit())
         {
-            if (GetAura()->GetType() != UNIT_AURA_TYPE)
-                return false;
-            return GetUnitOwner()->IsVehicle();
-        }
-
-        void SendClientControl(uint8 value)
-        {
-            if (Vehicle* vehicle = GetUnitOwner()->GetVehicleKit())
+            if (Unit* passenger = vehicle->GetPassenger(0))
             {
-                if (Unit* passenger = vehicle->GetPassenger(0))
+                if (Player* player = passenger->ToPlayer())
                 {
-                    if (Player* player = passenger->ToPlayer())
-                    {
-                        WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
-                        data << GetUnitOwner()->GetPackGUID();
-                        data << uint8(value);
-                        player->GetSession()->SendPacket(&data);
-                    }
+                    WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
+                    data << GetUnitOwner()->GetPackGUID();
+                    data << uint8(value);
+                    player->GetSession()->SendPacket(&data);
                 }
             }
         }
+    }
 
-        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            SendClientControl(0);
-        }
-
-        void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            SendClientControl(1);
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_igb_overheat_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_igb_overheat_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_igb_overheat_AuraScript();
+        SendClientControl(0);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        SendClientControl(1);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_igb_overheat_aura::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_igb_overheat_aura::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2716,7 +2705,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_explosion);
     RegisterSpellScript(spell_igb_teleport_players_on_victory);
     RegisterSpellScript(spell_igb_periodic_trigger_with_power_cost_aura);
-    new spell_igb_overheat();
+    RegisterSpellScript(spell_igb_overheat_aura);
     new spell_igb_cannon_blast();
     new spell_igb_incinerating_blast();
     new spell_igb_burning_pitch_selector();
