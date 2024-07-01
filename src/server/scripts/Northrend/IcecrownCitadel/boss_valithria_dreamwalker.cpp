@@ -1301,49 +1301,43 @@ class spell_dreamwalker_summoner : public SpellScript
     }
 };
 
-class spell_dreamwalker_summon_suppresser : public SpellScriptLoader
+class spell_dreamwalker_summon_suppresser_aura : public AuraScript
 {
-public:
-    spell_dreamwalker_summon_suppresser() : SpellScriptLoader("spell_dreamwalker_summon_suppresser") { }
+    PrepareAuraScript(spell_dreamwalker_summon_suppresser_aura);
 
-    class spell_dreamwalker_summon_suppresser_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_dreamwalker_summon_suppresser_AuraScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_SUPPRESSER });
+    }
 
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        std::list<Creature*> summoners;
+        caster->GetCreaturesWithEntryInRange(summoners, 200.0f, NPC_WORLD_TRIGGER);
+        std::list<Creature*> list_copy = summoners;
+        summoners.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+        if (summoners.empty())
         {
-            PreventDefaultAction();
-            Unit* caster = GetCaster();
-            if (!caster)
+            if (list_copy.empty())
                 return;
-
-            std::list<Creature*> summoners;
-            caster->GetCreaturesWithEntryInRange(summoners, 200.0f, NPC_WORLD_TRIGGER);
-            std::list<Creature*> list_copy = summoners;
-            summoners.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
-            if (summoners.empty())
-            {
-                if (list_copy.empty())
-                    return;
-                summoners = list_copy;
-            }
-            Acore::Containers::RandomResize(summoners, 2);
-
-            for (uint32 i = 0; i < 3; ++i)
-                caster->CastSpell(summoners.front(), SPELL_SUMMON_SUPPRESSER, true);
-            for (uint32 i = 0; i < 3; ++i)
-                caster->CastSpell(summoners.back(), SPELL_SUMMON_SUPPRESSER, true);
+            summoners = list_copy;
         }
+        Acore::Containers::RandomResize(summoners, 2);
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_summon_suppresser_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
+        for (uint32 i = 0; i < 3; ++i)
+            caster->CastSpell(summoners.front(), SPELL_SUMMON_SUPPRESSER, true);
+        for (uint32 i = 0; i < 3; ++i)
+            caster->CastSpell(summoners.back(), SPELL_SUMMON_SUPPRESSER, true);
+    }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_dreamwalker_summon_suppresser_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_summon_suppresser_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1473,7 +1467,7 @@ void AddSC_boss_valithria_dreamwalker()
     RegisterSpellScript(spell_dreamwalker_mana_void_aura);
     RegisterSpellScript(spell_dreamwalker_decay_periodic_timer_aura);
     RegisterSpellScript(spell_dreamwalker_summoner);
-    new spell_dreamwalker_summon_suppresser();
+    RegisterSpellScript(spell_dreamwalker_summon_suppresser_aura);
     new spell_dreamwalker_summon_suppresser_effect();
     new spell_valithria_suppression();
 

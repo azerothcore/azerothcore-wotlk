@@ -11,3 +11,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_festergut_blighted_spores_au
 UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_nightmare_cloud_aura' WHERE `spell_id`=71970 AND `ScriptName`='spell_dreamwalker_nightmare_cloud';
 UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_mana_void_aura' WHERE `spell_id`=71085 AND `ScriptName`='spell_dreamwalker_mana_void';
 UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_decay_periodic_timer_aura' WHERE `spell_id` IN (70912,70913,70915,70916) AND `ScriptName`='spell_dreamwalker_decay_periodic_timer';
+UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_summon_suppresser_aura' WHERE `spell_id`=70912 AND `ScriptName`='spell_dreamwalker_summon_suppresser';
