@@ -1629,35 +1629,24 @@ class spell_valanar_kinetic_bomb_knockback : public SpellScript
     }
 };
 
-class spell_valanar_kinetic_bomb_summon : public SpellScriptLoader
+class spell_valanar_kinetic_bomb_summon : public SpellScript
 {
-public:
-    spell_valanar_kinetic_bomb_summon() : SpellScriptLoader("spell_valanar_kinetic_bomb_summon") { }
+    PrepareSpellScript(spell_valanar_kinetic_bomb_summon);
 
-    class spell_valanar_kinetic_bomb_summon_SpellScript : public SpellScript
+    void SelectDest()
     {
-        PrepareSpellScript(spell_valanar_kinetic_bomb_summon_SpellScript);
-
-        void SelectDest()
+        if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
         {
-            if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
-            {
-                float angle = dest->GetAngle(GetCaster());
-                Position offset = {6.0f * cos(angle), 6.0f * std::sin(angle), 10.0f, 0.0f};
-                dest->RelocateOffset(offset);
-                GetCaster()->UpdateAllowedPositionZ(dest->GetPositionX(), dest->GetPositionY(), dest->m_positionZ);
-            }
+            float angle = dest->GetAngle(GetCaster());
+            Position offset = {6.0f * cos(angle), 6.0f * std::sin(angle), 10.0f, 0.0f};
+            dest->RelocateOffset(offset);
+            GetCaster()->UpdateAllowedPositionZ(dest->GetPositionX(), dest->GetPositionY(), dest->m_positionZ);
         }
+    }
 
-        void Register() override
-        {
-            BeforeCast += SpellCastFn(spell_valanar_kinetic_bomb_summon_SpellScript::SelectDest);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_valanar_kinetic_bomb_summon_SpellScript();
+        BeforeCast += SpellCastFn(spell_valanar_kinetic_bomb_summon::SelectDest);
     }
 };
 
@@ -1729,7 +1718,7 @@ void AddSC_boss_blood_prince_council()
     RegisterSpellAndAuraScriptPair(spell_valanar_kinetic_bomb, spell_valanar_kinetic_bomb_aura);
     RegisterSpellScript(spell_valanar_kinetic_bomb_absorb_aura);
     RegisterSpellScript(spell_valanar_kinetic_bomb_knockback);
-    new spell_valanar_kinetic_bomb_summon();
+    RegisterSpellScript(spell_valanar_kinetic_bomb_summon);
     new spell_blood_council_summon_shadow_resonance();
 }
 
