@@ -1161,54 +1161,48 @@ class spell_charge_shield_bomber_aura : public AuraScript
     }
 };
 
-class spell_fight_fire_bomber : public SpellScriptLoader
+class spell_fight_fire_bomber : public SpellScript
 {
-public:
-    spell_fight_fire_bomber() : SpellScriptLoader("spell_fight_fire_bomber") { }
+    PrepareSpellScript(spell_fight_fire_bomber);
 
-    class spell_fight_fire_bomber_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_fight_fire_bomber_SpellScript)
+        return ValidateSpellInfo({ SPELL_COSMETIC_FIRE, SPELL_EXTINGUISH_FIRE, SPELL_BURNING });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Vehicle* kit = GetCaster()->GetVehicle();
-            if (!kit)
-                return;
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Vehicle* kit = GetCaster()->GetVehicle();
+        if (!kit)
+            return;
 
-            bool extinguished = false;
-            uint8 fireCount = 0;
-            for (uint8 seat = 3; seat <= 5; ++seat)
-                if (Unit* banner = kit->GetPassenger(seat))
-                    if (banner->HasAura(SPELL_COSMETIC_FIRE))
+        bool extinguished = false;
+        uint8 fireCount = 0;
+        for (uint8 seat = 3; seat <= 5; ++seat)
+            if (Unit* banner = kit->GetPassenger(seat))
+                if (banner->HasAura(SPELL_COSMETIC_FIRE))
+                {
+                    if (!extinguished)
                     {
-                        if (!extinguished)
+                        GetCaster()->CastSpell(banner, SPELL_EXTINGUISH_FIRE, true);
+                        extinguished = true;
+                        if (urand(0, 2))
                         {
-                            GetCaster()->CastSpell(banner, SPELL_EXTINGUISH_FIRE, true);
-                            extinguished = true;
-                            if (urand(0, 2))
-                            {
-                                banner->RemoveAurasDueToSpell(SPELL_COSMETIC_FIRE);
-                                continue;
-                            }
+                            banner->RemoveAurasDueToSpell(SPELL_COSMETIC_FIRE);
+                            continue;
                         }
-                        fireCount++;
                     }
+                    fireCount++;
+                }
 
-            if (fireCount == 0)
-                GetCaster()->RemoveAurasDueToSpell(SPELL_BURNING);
-        }
+        if (fireCount == 0)
+            GetCaster()->RemoveAurasDueToSpell(SPELL_BURNING);
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_fight_fire_bomber_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_fight_fire_bomber_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_fight_fire_bomber::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2171,7 +2165,7 @@ void AddSC_icecrown()
     new npc_tirions_gambit_tirion();
     RegisterSpellScript(spell_switch_infragreen_bomber_station);
     RegisterSpellAndAuraScriptPair(spell_charge_shield_bomber, spell_charge_shield_bomber_aura);
-    new spell_fight_fire_bomber();
+    RegisterSpellScript(spell_fight_fire_bomber);
     new spell_anti_air_rocket_bomber();
     new npc_infra_green_bomber_generic();
     new spell_onslaught_or_call_bone_gryphon();
