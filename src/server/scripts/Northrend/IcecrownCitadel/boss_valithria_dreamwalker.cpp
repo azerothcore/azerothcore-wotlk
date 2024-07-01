@@ -1341,40 +1341,29 @@ class spell_dreamwalker_summon_suppresser_aura : public AuraScript
     }
 };
 
-class spell_dreamwalker_summon_suppresser_effect : public SpellScriptLoader
+class spell_dreamwalker_summon_suppresser_effect : public SpellScript
 {
-public:
-    spell_dreamwalker_summon_suppresser_effect() : SpellScriptLoader("spell_dreamwalker_summon_suppresser_effect") { }
+    PrepareSpellScript(spell_dreamwalker_summon_suppresser_effect);
 
-    class spell_dreamwalker_summon_suppresser_effect_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_dreamwalker_summon_suppresser_effect_SpellScript);
+        if (!GetCaster()->GetInstanceScript())
+            return false;
+        return true;
+    }
 
-        bool Load() override
-        {
-            if (!GetCaster()->GetInstanceScript())
-                return false;
-            return true;
-        }
-
-        void HandleForceCast(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit())
-                return;
-
-            GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summon_suppresser_effect_SpellScript::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleForceCast(SpellEffIndex effIndex)
     {
-        return new spell_dreamwalker_summon_suppresser_effect_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit())
+            return;
+
+        GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summon_suppresser_effect::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
@@ -1468,7 +1457,7 @@ void AddSC_boss_valithria_dreamwalker()
     RegisterSpellScript(spell_dreamwalker_decay_periodic_timer_aura);
     RegisterSpellScript(spell_dreamwalker_summoner);
     RegisterSpellScript(spell_dreamwalker_summon_suppresser_aura);
-    new spell_dreamwalker_summon_suppresser_effect();
+    RegisterSpellScript(spell_dreamwalker_summon_suppresser_effect);
     new spell_valithria_suppression();
 
     new achievement_portal_jockey();
