@@ -935,55 +935,44 @@ class spell_wintergrasp_force_building : public SpellScript
 /* 56661, 61408 - Build Siege Engine
    56663 - Build Catapult
    56575 - Build Demolisher */
-class spell_wintergrasp_create_vehicle : public SpellScriptLoader
+class spell_wintergrasp_create_vehicle : public SpellScript
 {
-public:
-    spell_wintergrasp_create_vehicle() : SpellScriptLoader("spell_wintergrasp_create_vehicle") { }
+    PrepareSpellScript(spell_wintergrasp_create_vehicle);
 
-    class spell_wintergrasp_create_vehicle_SpellScript : public SpellScript
+    void HandleSummon(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_wintergrasp_create_vehicle_SpellScript);
+        PreventHitEffect(effIndex);
 
-        void HandleSummon(SpellEffIndex effIndex)
+        if (Unit* caster = GetCaster())
         {
-            PreventHitEffect(effIndex);
-
-            if (Unit* caster = GetCaster())
+            Unit* originalCaster = GetOriginalCaster();
+            if (!originalCaster)
             {
-                Unit* originalCaster = GetOriginalCaster();
-                if (!originalCaster)
-                {
-                    return;
-                }
+                return;
+            }
 
-                SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
-                if (!properties)
-                {
-                    return;
-                }
+            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
+            if (!properties)
+            {
+                return;
+            }
 
-                uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
-                int32 duration = GetSpellInfo()->GetDuration();
-                if (TempSummon* summon = caster->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, originalCaster, GetSpellInfo()->Id))
+            uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
+            int32 duration = GetSpellInfo()->GetDuration();
+            if (TempSummon* summon = caster->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, originalCaster, GetSpellInfo()->Id))
+            {
+                if (summon->IsInMap(caster))
                 {
-                    if (summon->IsInMap(caster))
-                    {
-                        summon->SetCreatorGUID(originalCaster->GetGUID());
-                        summon->HandleSpellClick(caster);
-                    }
+                    summon->SetCreatorGUID(originalCaster->GetGUID());
+                    summon->HandleSpellClick(caster);
                 }
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_wintergrasp_create_vehicle_SpellScript::HandleSummon, EFFECT_1, SPELL_EFFECT_SUMMON);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_wintergrasp_create_vehicle_SpellScript;
+        OnEffectHit += SpellEffectFn(spell_wintergrasp_create_vehicle::HandleSummon, EFFECT_1, SPELL_EFFECT_SUMMON);
     }
 };
 
@@ -1232,7 +1221,7 @@ void AddSC_wintergrasp()
 
     // SPELLs
     RegisterSpellScript(spell_wintergrasp_force_building);
-    new spell_wintergrasp_create_vehicle();
+    RegisterSpellScript(spell_wintergrasp_create_vehicle);
     new spell_wintergrasp_rp_gg();
     new spell_wintergrasp_portal();
     new spell_wintergrasp_water();
