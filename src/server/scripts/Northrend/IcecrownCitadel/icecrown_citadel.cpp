@@ -2295,30 +2295,24 @@ class spell_icc_web_wrap_aura : public AuraScript
     }
 };
 
-class spell_icc_dark_reckoning : public SpellScriptLoader
+class spell_icc_dark_reckoning_aura : public AuraScript
 {
-public:
-    spell_icc_dark_reckoning() : SpellScriptLoader("spell_icc_dark_reckoning") { }
+    PrepareAuraScript(spell_icc_dark_reckoning_aura);
 
-    class spell_icc_dark_reckoning_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_icc_dark_reckoning_AuraScript);
+        return ValidateSpellInfo({ 69482 });
+    }
 
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(GetTarget(), 69482, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_icc_dark_reckoning_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_icc_dark_reckoning_AuraScript();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(GetTarget(), 69482, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_icc_dark_reckoning_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -3717,7 +3711,7 @@ void AddSC_icecrown_citadel()
 
     // pussywizard below:
     RegisterSpellScript(spell_icc_web_wrap_aura);
-    new spell_icc_dark_reckoning();
+    RegisterSpellScript(spell_icc_dark_reckoning_aura);
     new spell_stinky_precious_decimate();
     new spell_icc_yf_frozen_orb();
     new spell_icc_yh_volley();
