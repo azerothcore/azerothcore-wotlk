@@ -2061,36 +2061,30 @@ class spell_the_lich_king_shadow_trap_visual_aura : public AuraScript
     }
 };
 
-class spell_the_lich_king_shadow_trap_periodic : public SpellScriptLoader
+class spell_the_lich_king_shadow_trap_periodic : public SpellScript
 {
-public:
-    spell_the_lich_king_shadow_trap_periodic() : SpellScriptLoader("spell_the_lich_king_shadow_trap_periodic") { }
+    PrepareSpellScript(spell_the_lich_king_shadow_trap_periodic);
 
-    class spell_the_lich_king_shadow_trap_periodic_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_shadow_trap_periodic_SpellScript);
+        return ValidateSpellInfo({ SPELL_SHADOW_TRAP_KNOCKBACK });
+    }
 
-        void CheckTargetCount(std::list<WorldObject*>& targets)
-        {
-            if (targets.empty())
-                return;
-
-            GetCaster()->CastSpell((Unit*)nullptr, SPELL_SHADOW_TRAP_KNOCKBACK, true);
-            if (Aura* a = GetCaster()->GetAura(SPELL_SHADOW_TRAP_AURA))
-                a->SetDuration(0);
-            if (GetCaster()->GetTypeId() == TYPEID_UNIT)
-                GetCaster()->ToCreature()->DespawnOrUnsummon(3000);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_shadow_trap_periodic_SpellScript::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CheckTargetCount(std::list<WorldObject*>& targets)
     {
-        return new spell_the_lich_king_shadow_trap_periodic_SpellScript();
+        if (targets.empty())
+            return;
+
+        GetCaster()->CastSpell((Unit*)nullptr, SPELL_SHADOW_TRAP_KNOCKBACK, true);
+        if (Aura* a = GetCaster()->GetAura(SPELL_SHADOW_TRAP_AURA))
+            a->SetDuration(0);
+        if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+            GetCaster()->ToCreature()->DespawnOrUnsummon(3000);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_shadow_trap_periodic::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -3739,7 +3733,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_necrotic_plague_aura);
     RegisterSpellAndAuraScriptPair(spell_the_lich_king_necrotic_plague_jump, spell_the_lich_king_necrotic_plague_jump_aura);
     RegisterSpellScript(spell_the_lich_king_shadow_trap_visual_aura);
-    new spell_the_lich_king_shadow_trap_periodic();
+    RegisterSpellScript(spell_the_lich_king_shadow_trap_periodic);
     new spell_the_lich_king_ice_burst_target_search();
     new npc_icc_ice_sphere();
     new spell_the_lich_king_raging_spirit();
