@@ -2230,30 +2230,19 @@ class spell_igb_teleport_players_on_victory : public SpellScript
     }
 };
 
-class spell_igb_periodic_trigger_with_power_cost : public SpellScriptLoader
+class spell_igb_periodic_trigger_with_power_cost_aura : public AuraScript
 {
-public:
-    spell_igb_periodic_trigger_with_power_cost() : SpellScriptLoader("spell_igb_periodic_trigger_with_power_cost") { }
+    PrepareAuraScript(spell_igb_periodic_trigger_with_power_cost_aura);
 
-    class spell_igb_periodic_trigger_with_power_cost_AuraScript : public AuraScript
+    void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_igb_periodic_trigger_with_power_cost_AuraScript);
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
+    }
 
-        void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_periodic_trigger_with_power_cost_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_igb_periodic_trigger_with_power_cost_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_periodic_trigger_with_power_cost_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -2726,7 +2715,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_explosion_main_aura);
     RegisterSpellScript(spell_igb_explosion);
     RegisterSpellScript(spell_igb_teleport_players_on_victory);
-    new spell_igb_periodic_trigger_with_power_cost();
+    RegisterSpellScript(spell_igb_periodic_trigger_with_power_cost_aura);
     new spell_igb_overheat();
     new spell_igb_cannon_blast();
     new spell_igb_incinerating_blast();

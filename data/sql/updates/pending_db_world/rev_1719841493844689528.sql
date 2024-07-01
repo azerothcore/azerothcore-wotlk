@@ -35,3 +35,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_the_lich_king_soul_rip_aura'
 UPDATE `spell_script_names` SET `ScriptName`='spell_igb_rocket_pack_aura' WHERE `spell_id`=68721 AND `ScriptName`='spell_igb_rocket_pack';
 UPDATE `spell_script_names` SET `ScriptName`='spell_igb_rocket_pack_useable_aura' WHERE `spell_id`=70348 AND `ScriptName`='spell_igb_rocket_pack_useable';
 UPDATE `spell_script_names` SET `ScriptName`='spell_igb_explosion_main_aura' WHERE `spell_id` IN (72134,72137) AND `ScriptName`='spell_igb_explosion_main';
+UPDATE `spell_script_names` SET `ScriptName`='spell_igb_periodic_trigger_with_power_cost_aura' WHERE `spell_id` IN (69470,69487) AND `ScriptName`='spell_igb_periodic_trigger_with_power_cost';
