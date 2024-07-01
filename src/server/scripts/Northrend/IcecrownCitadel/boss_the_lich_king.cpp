@@ -1675,42 +1675,31 @@ public:
     }
 };
 
-class spell_the_lich_king_quake : public SpellScriptLoader
+class spell_the_lich_king_quake : public SpellScript
 {
-public:
-    spell_the_lich_king_quake() : SpellScriptLoader("spell_the_lich_king_quake") { }
+    PrepareSpellScript(spell_the_lich_king_quake);
 
-    class spell_the_lich_king_quake_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_the_lich_king_quake_SpellScript);
+        return GetCaster()->GetInstanceScript() != nullptr;
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetInstanceScript() != nullptr;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            if (GameObject* platform = ObjectAccessor::GetGameObject(*GetCaster(), GetCaster()->GetInstanceScript()->GetGuidData(DATA_ARTHAS_PLATFORM)))
-                targets.remove_if(HeightDifferenceCheck(platform, 5.0f, false));
-        }
-
-        void HandleSendEvent(SpellEffIndex /*effIndex*/)
-        {
-            if (GetCaster()->IsAIEnabled)
-                GetCaster()->GetAI()->DoAction(ACTION_START_ATTACK);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_quake_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHit += SpellEffectFn(spell_the_lich_king_quake_SpellScript::HandleSendEvent, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_the_lich_king_quake_SpellScript();
+        if (GameObject* platform = ObjectAccessor::GetGameObject(*GetCaster(), GetCaster()->GetInstanceScript()->GetGuidData(DATA_ARTHAS_PLATFORM)))
+            targets.remove_if(HeightDifferenceCheck(platform, 5.0f, false));
+    }
+
+    void HandleSendEvent(SpellEffIndex /*effIndex*/)
+    {
+        if (GetCaster()->IsAIEnabled)
+            GetCaster()->GetAI()->DoAction(ACTION_START_ATTACK);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_quake::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHit += SpellEffectFn(spell_the_lich_king_quake::HandleSendEvent, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -3803,7 +3792,7 @@ void AddSC_boss_the_lich_king()
 {
     new boss_the_lich_king();
     new npc_tirion_fordring_tft();
-    new spell_the_lich_king_quake();
+    RegisterSpellScript(spell_the_lich_king_quake);
     new spell_the_lich_king_jump();
     new spell_the_lich_king_jump_remove_aura();
     new spell_trigger_spell_from_caster("spell_the_lich_king_mass_resurrection", SPELL_MASS_RESURRECTION_REAL);
