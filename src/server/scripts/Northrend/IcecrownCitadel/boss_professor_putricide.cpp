@@ -1161,77 +1161,66 @@ class spell_putricide_mutated_plague_aura : public AuraScript
     }
 };
 
-class spell_putricide_unbound_plague : public SpellScriptLoader
+class spell_putricide_unbound_plague : public SpellScript
 {
-public:
-    spell_putricide_unbound_plague() : SpellScriptLoader("spell_putricide_unbound_plague") { }
+    PrepareSpellScript(spell_putricide_unbound_plague);
 
-    class spell_putricide_unbound_plague_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_putricide_unbound_plague_SpellScript);
+        return ValidateSpellInfo({ SPELL_UNBOUND_PLAGUE, SPELL_UNBOUND_PLAGUE_SEARCHER });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (AuraEffect const* eff = GetCaster()->GetAuraEffect(SPELL_UNBOUND_PLAGUE_SEARCHER, EFFECT_0))
         {
-            return ValidateSpellInfo({ SPELL_UNBOUND_PLAGUE, SPELL_UNBOUND_PLAGUE_SEARCHER });
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            if (AuraEffect const* eff = GetCaster()->GetAuraEffect(SPELL_UNBOUND_PLAGUE_SEARCHER, EFFECT_0))
+            if (eff->GetTickNumber() < 2)
             {
-                if (eff->GetTickNumber() < 2)
-                {
-                    targets.clear();
-                    return;
-                }
+                targets.clear();
+                return;
             }
-
-            targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
-            Acore::Containers::RandomResize(targets, 1);
         }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
+        targets.remove_if(Acore::UnitAuraCheck(true, sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster())));
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetHitUnit())
+            return;
+
+        InstanceScript* instance = GetCaster()->GetInstanceScript();
+        if (!instance)
+            return;
+
+        uint32 plagueId = sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster());
+
+        if (!GetHitUnit()->HasAura(plagueId))
         {
-            if (!GetHitUnit())
-                return;
-
-            InstanceScript* instance = GetCaster()->GetInstanceScript();
-            if (!instance)
-                return;
-
-            uint32 plagueId = sSpellMgr->GetSpellIdForDifficulty(SPELL_UNBOUND_PLAGUE, GetCaster());
-
-            if (!GetHitUnit()->HasAura(plagueId))
+            if (Creature* professor = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
             {
-                if (Creature* professor = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
+                if (Aura* oldPlague = GetCaster()->GetAura(plagueId, professor->GetGUID()))
                 {
-                    if (Aura* oldPlague = GetCaster()->GetAura(plagueId, professor->GetGUID()))
+                    if (Aura* newPlague = professor->AddAura(plagueId, GetHitUnit()))
                     {
-                        if (Aura* newPlague = professor->AddAura(plagueId, GetHitUnit()))
-                        {
-                            newPlague->SetMaxDuration(oldPlague->GetMaxDuration());
-                            newPlague->SetDuration(oldPlague->GetDuration());
-                            oldPlague->Remove();
-                            GetCaster()->RemoveAurasDueToSpell(SPELL_UNBOUND_PLAGUE_SEARCHER);
-                            GetCaster()->CastSpell(GetCaster(), SPELL_PLAGUE_SICKNESS, true);
-                            GetCaster()->CastSpell(GetCaster(), SPELL_UNBOUND_PLAGUE_PROTECTION, true);
-                            professor->CastSpell(GetHitUnit(), SPELL_UNBOUND_PLAGUE_SEARCHER, true);
-                        }
+                        newPlague->SetMaxDuration(oldPlague->GetMaxDuration());
+                        newPlague->SetDuration(oldPlague->GetDuration());
+                        oldPlague->Remove();
+                        GetCaster()->RemoveAurasDueToSpell(SPELL_UNBOUND_PLAGUE_SEARCHER);
+                        GetCaster()->CastSpell(GetCaster(), SPELL_PLAGUE_SICKNESS, true);
+                        GetCaster()->CastSpell(GetCaster(), SPELL_UNBOUND_PLAGUE_PROTECTION, true);
+                        professor->CastSpell(GetHitUnit(), SPELL_UNBOUND_PLAGUE_SEARCHER, true);
                     }
                 }
             }
         }
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_unbound_plague_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-            OnEffectHitTarget += SpellEffectFn(spell_putricide_unbound_plague_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_putricide_unbound_plague_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_unbound_plague::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+        OnEffectHitTarget += SpellEffectFn(spell_putricide_unbound_plague::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1636,7 +1625,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_ooze_channel);
     RegisterSpellScript(spell_putricide_ooze_eruption_searcher);
     RegisterSpellScript(spell_putricide_mutated_plague_aura);
-    new spell_putricide_unbound_plague();
+    RegisterSpellScript(spell_putricide_unbound_plague);
     new spell_putricide_unbound_plague_dmg();
     new spell_putricide_choking_gas_bomb();
     new spell_putricide_clear_aura_effect_value();
