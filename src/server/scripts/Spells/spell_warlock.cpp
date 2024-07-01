@@ -743,6 +743,22 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
         amount = GetCaster()->SpellDamageBonusDone(GetUnitOwner(), GetSpellInfo(), amount, DOT, aurEff->GetEffIndex(), aurEff->GetPctMods());
     }
 
+    void Detonate(AuraEffect const* aurEff)
+    {
+        if (!GetCaster() || !GetTarget())
+            return;
+
+        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
+        if (_isPlayerSpell)
+        {
+            GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
+        }
+        else
+        {
+            GetCaster()->CastCustomSpell(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELLVALUE_BASE_POINT0, GetSpellInfo()->GetEffect(EFFECT_1).CalcValue(), GetTarget(), true, nullptr, aurEff);
+        }
+    }
+
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
@@ -750,54 +766,33 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
         if (!damageInfo || !damageInfo->GetDamage())
             return;
 
-        int32 amount = aurEff->GetAmount() - damageInfo->GetDamage();
-        if (amount > 0)
+        int32 remainingDamage = aurEff->GetAmount() - damageInfo->GetDamage();
+        if (remainingDamage > 0)
         {
-            GetAura()->GetEffect(EFFECT_1)->SetAmount(amount);
-            if (!GetTarget()->HealthBelowPctDamaged(1, damageInfo->GetDamage()))
-                return;
+            GetAura()->GetEffect(EFFECT_1)->SetAmount(remainingDamage);
         }
-        // Detonate
-        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
-        if (_isPlayerSpell)
+        else // damage threshold has been reached
         {
-            GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
-        }
-        else
-        {
-            GetCaster()->CastCustomSpell(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELLVALUE_BASE_POINT0, GetSpellInfo()->GetEffect(EFFECT_1).CalcValue(), GetTarget(), true, nullptr, aurEff);
+            Remove(AURA_REMOVE_BY_DEFAULT);
+            Detonate(aurEff);
         }
     }
 
     void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        if (!GetCaster())
-            return;
-
         AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
-        if (!_isPlayerSpell || removeMode != AURA_REMOVE_BY_DEATH)
-            return;
-
-        // Detonate
-        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
-        if (_isPlayerSpell)
-        {
-            GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
-        }
-        else
-        {
-            GetCaster()->CastCustomSpell(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELLVALUE_BASE_POINT0, GetSpellInfo()->GetEffect(EFFECT_1).CalcValue(), GetTarget(), true, nullptr, aurEff);
-        }
+        if (removeMode == AURA_REMOVE_BY_DEATH)
+            Detonate(aurEff);
     }
 
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_warl_seed_of_corruption_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
         if (_isPlayerSpell)
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_seed_of_corruption_aura::CalculateAmount, EFFECT_1, SPELL_AURA_DUMMY);
+            AfterEffectRemove += AuraEffectRemoveFn(spell_warl_seed_of_corruption_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
         }
+        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 
 private:
