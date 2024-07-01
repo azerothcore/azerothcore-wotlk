@@ -284,47 +284,36 @@ public:
     }
 };
 
-class spell_festergut_pungent_blight : public SpellScriptLoader
+class spell_festergut_pungent_blight : public SpellScript
 {
-public:
-    spell_festergut_pungent_blight() : SpellScriptLoader("spell_festergut_pungent_blight") { }
+    PrepareSpellScript(spell_festergut_pungent_blight);
 
-    class spell_festergut_pungent_blight_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_festergut_pungent_blight_SpellScript);
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            Unit* caster = GetCaster();
-            if (caster->GetTypeId() != TYPEID_UNIT)
-                return;
-
-            // Get Inhaled Blight id for our difficulty
-            uint32 blightId = sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), caster);
-
-            // ...and remove it
-            caster->RemoveAurasDueToSpell(blightId);
-            caster->ToCreature()->AI()->Talk(EMOTE_PUNGENT_BLIGHT);
-
-            if (InstanceScript* inst = caster->GetInstanceScript())
-                if (Creature* professor = ObjectAccessor::GetCreature(*caster, inst->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
-                    professor->AI()->DoAction(ACTION_FESTERGUT_GAS);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_festergut_pungent_blight_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_festergut_pungent_blight_SpellScript();
+        Unit* caster = GetCaster();
+        if (caster->GetTypeId() != TYPEID_UNIT)
+            return;
+
+        // Get Inhaled Blight id for our difficulty
+        uint32 blightId = sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), caster);
+
+        // ...and remove it
+        caster->RemoveAurasDueToSpell(blightId);
+        caster->ToCreature()->AI()->Talk(EMOTE_PUNGENT_BLIGHT);
+
+        if (InstanceScript* inst = caster->GetInstanceScript())
+            if (Creature* professor = ObjectAccessor::GetCreature(*caster, inst->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
+                professor->AI()->DoAction(ACTION_FESTERGUT_GAS);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_festergut_pungent_blight::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -496,7 +485,7 @@ public:
 void AddSC_boss_festergut()
 {
     new boss_festergut();
-    new spell_festergut_pungent_blight();
+    RegisterSpellScript(spell_festergut_pungent_blight);
     new spell_festergut_blighted_spores();
     new spell_festergut_gastric_bloat();
     new achievement_flu_shot_shortage();
