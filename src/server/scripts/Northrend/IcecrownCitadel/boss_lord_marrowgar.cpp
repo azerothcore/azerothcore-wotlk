@@ -618,47 +618,37 @@ class spell_marrowgar_bone_storm : public SpellScript
     }
 };
 
-class spell_marrowgar_bone_slice : public SpellScriptLoader
+class spell_marrowgar_bone_slice : public SpellScript
 {
-public:
-    spell_marrowgar_bone_slice() : SpellScriptLoader("spell_marrowgar_bone_slice") { }
+    PrepareSpellScript(spell_marrowgar_bone_slice);
 
-    class spell_marrowgar_bone_slice_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_marrowgar_bone_slice_SpellScript);
-
-        bool Load() override
-        {
-            _targetCount = 0;
-            return true;
-        }
-
-        void CountTargets(std::list<WorldObject*>& targets)
-        {
-            _targetCount = std::min<uint32>(targets.size(), GetSpellInfo()->MaxAffectedTargets);
-        }
-
-        void SplitDamage()
-        {
-            if (!_targetCount)
-                return; // This spell can miss all targets
-
-            SetHitDamage(GetHitDamage() / _targetCount);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_marrowgar_bone_slice_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnHit += SpellHitFn(spell_marrowgar_bone_slice_SpellScript::SplitDamage);
-        }
-
-        uint32 _targetCount;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_marrowgar_bone_slice_SpellScript();
+        _targetCount = 0;
+        return true;
     }
+
+    void CountTargets(std::list<WorldObject*>& targets)
+    {
+        _targetCount = std::min<uint32>(targets.size(), GetSpellInfo()->MaxAffectedTargets);
+    }
+
+    void SplitDamage()
+    {
+        if (!_targetCount)
+            return; // This spell can miss all targets
+
+        SetHitDamage(GetHitDamage() / _targetCount);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_marrowgar_bone_slice::CountTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnHit += SpellHitFn(spell_marrowgar_bone_slice::SplitDamage);
+    }
+
+private:
+    uint32 _targetCount;
 };
 
 void AddSC_boss_lord_marrowgar()
@@ -670,6 +660,6 @@ void AddSC_boss_lord_marrowgar()
     RegisterSpellScript(spell_marrowgar_coldflame_bonestorm);
     RegisterSpellScript(spell_marrowgar_bone_spike_graveyard);
     RegisterSpellScript(spell_marrowgar_bone_storm);
-    new spell_marrowgar_bone_slice();
+    RegisterSpellScript(spell_marrowgar_bone_slice);
 }
 
