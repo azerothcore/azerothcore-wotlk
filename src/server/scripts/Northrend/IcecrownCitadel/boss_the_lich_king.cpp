@@ -3291,44 +3291,33 @@ public:
     }
 };
 
-class spell_the_lich_king_dark_hunger : public SpellScriptLoader
+class spell_the_lich_king_dark_hunger_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_dark_hunger() : SpellScriptLoader("spell_the_lich_king_dark_hunger") { }
+    PrepareAuraScript(spell_the_lich_king_dark_hunger_aura);
 
-    class spell_the_lich_king_dark_hunger_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_dark_hunger_AuraScript);
+        return ValidateSpellInfo({ SPELL_DARK_HUNGER_HEAL });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_DARK_HUNGER_HEAL });
-        }
-
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo || !damageInfo->GetDamage())
-            {
-                return;
-            }
-
-            int32 heal = static_cast<int32>(damageInfo->GetDamage() / 2);
-            GetTarget()->CastCustomSpell(SPELL_DARK_HUNGER_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), true, nullptr, aurEff);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_the_lich_king_dark_hunger_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
-        return new spell_the_lich_king_dark_hunger_AuraScript();
+        PreventDefaultAction();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+        if (!damageInfo || !damageInfo->GetDamage())
+        {
+            return;
+        }
+
+        int32 heal = static_cast<int32>(damageInfo->GetDamage() / 2);
+        GetTarget()->CastCustomSpell(SPELL_DARK_HUNGER_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_the_lich_king_dark_hunger_aura::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -3603,7 +3592,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_lights_favor_aura);
     RegisterSpellScript(spell_the_lich_king_restore_soul);
     new npc_spirit_warden();
-    new spell_the_lich_king_dark_hunger();
+    RegisterSpellScript(spell_the_lich_king_dark_hunger_aura);
     new spell_the_lich_king_soul_rip();
     new npc_icc_lk_checktarget();
     new spell_the_lich_king_summon_spirit_bomb();
