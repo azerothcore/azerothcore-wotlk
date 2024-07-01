@@ -11,3 +11,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21894, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Xeleth - On Just Summoned - Start Attacking'),
 (21894, 0, 2, 0, 0, 0, 100, 0, 0, 0, 14000, 16000, 0, 0, 11, 36414, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Xeleth - In Combat - Cast \'Focused Bursts\''),
 (21894, 0, 3, 0, 0, 0, 75, 0, 8000, 14000, 8000, 14000, 0, 0, 11, 36398, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Xeleth - In Combat - Cast \'Tongue Lash\' (75%)');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 37904);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(17, 0, 37904, 0, 0, 29, 0, 21894, 70, 0, 1, 0, 0, '', 'Allow using \'Imbued Silver Spear\' if no alive \'Xeleth\' is within 70y.');
