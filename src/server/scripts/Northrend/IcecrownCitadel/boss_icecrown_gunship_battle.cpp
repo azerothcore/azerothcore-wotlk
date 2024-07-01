@@ -2438,31 +2438,25 @@ class spell_igb_burning_pitch_selector : public SpellScript
     }
 };
 
-class spell_igb_burning_pitch : public SpellScriptLoader
+class spell_igb_burning_pitch : public SpellScript
 {
-public:
-    spell_igb_burning_pitch() : SpellScriptLoader("spell_igb_burning_pitch") { }
+    PrepareSpellScript(spell_igb_burning_pitch);
 
-    class spell_igb_burning_pitch_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_burning_pitch_SpellScript);
+        return ValidateSpellInfo({ 8000, SPELL_BURNING_PITCH });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastCustomSpell(uint32(GetEffectValue()), SPELLVALUE_BASE_POINT0, 8000, nullptr, TRIGGERED_FULL_MASK);
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BURNING_PITCH, TRIGGERED_FULL_MASK);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_igb_burning_pitch_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastCustomSpell(uint32(GetEffectValue()), SPELLVALUE_BASE_POINT0, 8000, nullptr, TRIGGERED_FULL_MASK);
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BURNING_PITCH, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2682,7 +2676,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_cannon_blast);
     RegisterSpellScript(spell_igb_incinerating_blast);
     RegisterSpellScript(spell_igb_burning_pitch_selector);
-    new spell_igb_burning_pitch();
+    RegisterSpellScript(spell_igb_burning_pitch);
     new spell_igb_rocket_artillery();
     new spell_igb_rocket_artillery_explosion();
     new spell_igb_below_zero();
