@@ -1267,31 +1267,20 @@ class spell_putricide_choking_gas_bomb : public SpellScript
 };
 
 // Removes aura with id stored in effect value
-class spell_putricide_clear_aura_effect_value : public SpellScriptLoader
+class spell_putricide_clear_aura_effect_value : public SpellScript
 {
-public:
-    spell_putricide_clear_aura_effect_value() : SpellScriptLoader("spell_putricide_clear_aura_effect_value") { }
+    PrepareSpellScript(spell_putricide_clear_aura_effect_value);
 
-    class spell_putricide_clear_aura_effect_value_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_putricide_clear_aura_effect_value_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        uint32 auraId = sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), GetCaster());
+        GetHitUnit()->RemoveAurasDueToSpell(auraId);
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            uint32 auraId = sSpellMgr->GetSpellIdForDifficulty(uint32(GetEffectValue()), GetCaster());
-            GetHitUnit()->RemoveAurasDueToSpell(auraId);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_putricide_clear_aura_effect_value_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_putricide_clear_aura_effect_value_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_putricide_clear_aura_effect_value::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1606,7 +1595,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_unbound_plague);
     RegisterSpellScript(spell_putricide_unbound_plague_dmg_aura);
     RegisterSpellScript(spell_putricide_choking_gas_bomb);
-    new spell_putricide_clear_aura_effect_value();
+    RegisterSpellScript(spell_putricide_clear_aura_effect_value);
     new spell_putricide_mutation_init();
     new spell_putricide_mutated_transformation();
     new spell_putricide_mutated_transformation_dismiss();
