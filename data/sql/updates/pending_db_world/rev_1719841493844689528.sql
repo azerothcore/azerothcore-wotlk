@@ -8,3 +8,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_icc_dark_reckoning_aura' WHE
 UPDATE `spell_script_names` SET `ScriptName`='spell_icc_yf_frozen_orb_aura' WHERE `spell_id`=71274 AND `ScriptName`='spell_icc_yf_frozen_orb';
 UPDATE `spell_script_names` SET `ScriptName`='spell_icc_yh_volley_aura' WHERE `spell_id`=71252 AND `ScriptName`='spell_icc_yh_volley';
 UPDATE `spell_script_names` SET `ScriptName`='spell_festergut_blighted_spores_aura' WHERE `spell_id` IN (69290,71222,73033,73034) AND `ScriptName`='spell_festergut_blighted_spores';
+UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_nightmare_cloud_aura' WHERE `spell_id`=71970 AND `ScriptName`='spell_dreamwalker_nightmare_cloud';

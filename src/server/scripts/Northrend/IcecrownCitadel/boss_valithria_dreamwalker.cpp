@@ -1185,39 +1185,29 @@ class spell_dreamwalker_twisted_nightmares : public SpellScript
     }
 };
 
-class spell_dreamwalker_nightmare_cloud : public SpellScriptLoader
+class spell_dreamwalker_nightmare_cloud_aura : public AuraScript
 {
-public:
-    spell_dreamwalker_nightmare_cloud() : SpellScriptLoader("spell_dreamwalker_nightmare_cloud") { }
+    PrepareAuraScript(spell_dreamwalker_nightmare_cloud_aura);
 
-    class spell_dreamwalker_nightmare_cloud_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_dreamwalker_nightmare_cloud_AuraScript);
-
-        bool Load() override
-        {
-            _instance = GetOwner()->GetInstanceScript();
-            return _instance != nullptr;
-        }
-
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) != IN_PROGRESS)
-                PreventDefaultAction();
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_nightmare_cloud_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-
-        InstanceScript* _instance;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dreamwalker_nightmare_cloud_AuraScript();
+        _instance = GetOwner()->GetInstanceScript();
+        return _instance != nullptr;
     }
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) != IN_PROGRESS)
+            PreventDefaultAction();
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_nightmare_cloud_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+
+private:
+    InstanceScript* _instance;
 };
 
 class spell_dreamwalker_mana_void : public SpellScriptLoader
@@ -1511,7 +1501,7 @@ void AddSC_boss_valithria_dreamwalker()
 
     RegisterSpellScript(spell_dreamwalker_summon_portal);
     RegisterSpellScript(spell_dreamwalker_twisted_nightmares);
-    new spell_dreamwalker_nightmare_cloud();
+    RegisterSpellScript(spell_dreamwalker_nightmare_cloud_aura);
     new spell_dreamwalker_mana_void();
     new spell_dreamwalker_decay_periodic_timer();
     new spell_dreamwalker_summoner();
