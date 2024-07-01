@@ -1728,56 +1728,40 @@ class spell_frostwarden_handler_order_whelp : public SpellScript
     }
 };
 
-class spell_frostwarden_handler_focus_fire : public SpellScriptLoader
+class spell_frostwarden_handler_focus_fire : public SpellScript
 {
-public:
-    spell_frostwarden_handler_focus_fire() : SpellScriptLoader("spell_frostwarden_handler_focus_fire") { }
+    PrepareSpellScript(spell_frostwarden_handler_focus_fire);
 
-    class spell_frostwarden_handler_focus_fire_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_frostwarden_handler_focus_fire_SpellScript);
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->AddThreat(GetHitUnit(), float(GetEffectValue()));
-            GetCaster()->GetAI()->SetData(DATA_WHELP_MARKER, 1);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_frostwarden_handler_focus_fire_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    class spell_frostwarden_handler_focus_fire_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_frostwarden_handler_focus_fire_AuraScript);
-
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-            {
-                caster->AddThreat(GetTarget(), -float(GetSpellInfo()->Effects[EFFECT_1].CalcValue()));
-                caster->GetAI()->SetData(DATA_WHELP_MARKER, 0);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_frostwarden_handler_focus_fire_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_frostwarden_handler_focus_fire_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->AddThreat(GetHitUnit(), float(GetEffectValue()));
+        GetCaster()->GetAI()->SetData(DATA_WHELP_MARKER, 1);
     }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_frostwarden_handler_focus_fire_AuraScript();
+        OnEffectHitTarget += SpellEffectFn(spell_frostwarden_handler_focus_fire::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_frostwarden_handler_focus_fire_aura : public AuraScript
+{
+    PrepareAuraScript(spell_frostwarden_handler_focus_fire_aura);
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+        {
+            caster->AddThreat(GetTarget(), -float(GetSpellInfo()->Effects[EFFECT_1].CalcValue()));
+            caster->GetAI()->SetData(DATA_WHELP_MARKER, 0);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_frostwarden_handler_focus_fire_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1852,7 +1836,7 @@ void AddSC_boss_sindragosa()
 
     new npc_sindragosa_trash();
     RegisterSpellScript(spell_frostwarden_handler_order_whelp);
-    new spell_frostwarden_handler_focus_fire();
+    RegisterSpellAndAuraScriptPair(spell_frostwarden_handler_focus_fire, spell_frostwarden_handler_focus_fire_aura);
 
     new spell_sindragosa_frost_breath();
 }
