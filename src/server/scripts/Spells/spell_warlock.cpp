@@ -706,22 +706,9 @@ class spell_warl_seed_of_corruption : public SpellScript
 };
 
 // -27243 - Seed of Corruption
-// Monster spells, triggered only on detonation threshold reached (not on death)
-// 32863 - Seed of Corruption
-// 36123 - Seed of Corruption
-// 38252 - Seed of Corruption
-// 39367 - Seed of Corruption
-// 44141 - Seed of Corruption
-// 70388 - Seed of Corruption
 class spell_warl_seed_of_corruption_aura: public AuraScript
 {
     PrepareAuraScript(spell_warl_seed_of_corruption_aura);
-
-    bool Load() override
-    {
-        _isPlayerSpell = GetSpellInfo()->IsRankOf(sSpellMgr->GetSpellInfo(SPELL_WARLOCK_SEED_OF_CORRUPTION_R1));
-        return true;
-    }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
@@ -729,7 +716,6 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
             SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1,
             SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R2,
             SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R3,
-            SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC,
             SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL
         });
     }
@@ -749,14 +735,7 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
             return;
 
         GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
-        if (_isPlayerSpell)
-        {
-            GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
-        }
-        else
-        {
-            GetCaster()->CastCustomSpell(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELLVALUE_BASE_POINT0, GetSpellInfo()->GetEffect(EFFECT_1).CalcValue(), GetTarget(), true, nullptr, aurEff);
-        }
+        GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -787,16 +766,60 @@ class spell_warl_seed_of_corruption_aura: public AuraScript
 
     void Register() override
     {
-        if (_isPlayerSpell)
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_seed_of_corruption_aura::CalculateAmount, EFFECT_1, SPELL_AURA_DUMMY);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_warl_seed_of_corruption_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_seed_of_corruption_aura::CalculateAmount, EFFECT_1, SPELL_AURA_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_warl_seed_of_corruption_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
         OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
+};
 
-private:
-    bool _isPlayerSpell;
+// Monster spells, triggered only on detonation threshold reached (not on death)
+// 32863 - Seed of Corruption
+// 36123 - Seed of Corruption
+// 38252 - Seed of Corruption
+// 39367 - Seed of Corruption
+// 44141 - Seed of Corruption
+// 70388 - Seed of Corruption
+class spell_warl_seed_of_corruption_generic_aura: public AuraScript
+{
+    PrepareAuraScript(spell_warl_seed_of_corruption_generic_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL });
+    }
+
+    void Detonate(AuraEffect const* aurEff)
+    {
+        if (!GetCaster() || !GetTarget())
+            return;
+
+        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
+        GetCaster()->CastCustomSpell(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELLVALUE_BASE_POINT0, GetSpellInfo()->GetEffect(EFFECT_1).CalcValue(), GetTarget(), true, nullptr, aurEff);
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        int32 remainingDamage = aurEff->GetAmount() - damageInfo->GetDamage();
+        if (remainingDamage > 0)
+        {
+            GetAura()->GetEffect(EFFECT_1)->SetAmount(remainingDamage);
+        }
+        else // damage threshold has been reached
+        {
+            Remove(AURA_REMOVE_BY_DEFAULT);
+            Detonate(aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_generic_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
 };
 
 // 29858 - Soulshatter
@@ -1447,6 +1470,7 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_ritual_of_doom_effect);
     RegisterSpellScript(spell_warl_seed_of_corruption);
     RegisterSpellScript(spell_warl_seed_of_corruption_aura);
+    RegisterSpellScript(spell_warl_seed_of_corruption_generic_aura);
     RegisterSpellScript(spell_warl_shadow_ward);
     RegisterSpellScript(spell_warl_siphon_life);
     RegisterSpellScript(spell_warl_soulshatter);
