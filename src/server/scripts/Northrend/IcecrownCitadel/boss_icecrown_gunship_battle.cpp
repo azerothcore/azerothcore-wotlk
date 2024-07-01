@@ -2209,35 +2209,24 @@ private:
     InstanceScript* _inst;
 };
 
-class spell_igb_teleport_players_on_victory : public SpellScriptLoader
+class spell_igb_teleport_players_on_victory : public SpellScript
 {
-public:
-    spell_igb_teleport_players_on_victory() : SpellScriptLoader("spell_igb_teleport_players_on_victory") { }
+    PrepareSpellScript(spell_igb_teleport_players_on_victory);
 
-    class spell_igb_teleport_players_on_victory_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_igb_teleport_players_on_victory_SpellScript);
+        return GetCaster()->GetInstanceScript();
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetInstanceScript();
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            InstanceScript* instance = GetCaster()->GetInstanceScript();
-            targets.remove_if(IgbTeleportOnVictoryCheck(instance));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_teleport_players_on_victory_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_igb_teleport_players_on_victory_SpellScript();
+        InstanceScript* instance = GetCaster()->GetInstanceScript();
+        targets.remove_if(IgbTeleportOnVictoryCheck(instance));
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_teleport_players_on_victory::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
     }
 };
 
@@ -2736,7 +2725,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_gunship_fall_teleport);
     RegisterSpellScript(spell_igb_explosion_main_aura);
     RegisterSpellScript(spell_igb_explosion);
-    new spell_igb_teleport_players_on_victory();
+    RegisterSpellScript(spell_igb_teleport_players_on_victory);
     new spell_igb_periodic_trigger_with_power_cost();
     new spell_igb_overheat();
     new spell_igb_cannon_blast();
