@@ -1011,29 +1011,18 @@ public:
     }
 };
 
-class spell_sindragosa_ice_tomb_filter : public SpellScriptLoader
+class spell_sindragosa_ice_tomb_filter : public SpellScript
 {
-public:
-    spell_sindragosa_ice_tomb_filter() : SpellScriptLoader("spell_sindragosa_ice_tomb_filter") { }
+    PrepareSpellScript(spell_sindragosa_ice_tomb_filter);
 
-    class spell_sindragosa_ice_tomb_filter_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        PrepareSpellScript(spell_sindragosa_ice_tomb_filter_SpellScript);
+        unitList.remove_if(SindragosaIceTombCheck());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            unitList.remove_if(SindragosaIceTombCheck());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_filter_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_sindragosa_ice_tomb_filter_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_filter::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1896,7 +1885,7 @@ void AddSC_boss_sindragosa()
     RegisterSpellScript(spell_sindragosa_instability_aura);
     RegisterSpellScript(spell_sindragosa_icy_grip);
     RegisterSpellScript(spell_sindragosa_icy_grip_jump);
-    new spell_sindragosa_ice_tomb_filter();
+    RegisterSpellScript(spell_sindragosa_ice_tomb_filter);
     new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb", SPELL_ICE_TOMB_DUMMY);
     new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb_dummy", SPELL_FROST_BEACON);
     RegisterSpellScript(spell_sindragosa_frost_beacon_aura);
