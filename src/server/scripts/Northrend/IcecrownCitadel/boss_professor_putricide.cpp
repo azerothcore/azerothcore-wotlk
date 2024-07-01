@@ -945,55 +945,44 @@ class spell_putricide_grow_stacker_aura : public AuraScript
     }
 };
 
-class spell_putricide_unstable_experiment : public SpellScriptLoader
+class spell_putricide_unstable_experiment : public SpellScript
 {
-public:
-    spell_putricide_unstable_experiment() : SpellScriptLoader("spell_putricide_unstable_experiment") { }
+    PrepareSpellScript(spell_putricide_unstable_experiment);
 
-    class spell_putricide_unstable_experiment_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_putricide_unstable_experiment_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (GetCaster()->GetTypeId() != TYPEID_UNIT)
+            return;
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (GetCaster()->GetTypeId() != TYPEID_UNIT)
-                return;
+        Creature* creature = GetCaster()->ToCreature();
 
-            Creature* creature = GetCaster()->ToCreature();
+        uint8 stage = creature->AI()->GetData(DATA_EXPERIMENT_STAGE);
+        creature->AI()->SetData(DATA_EXPERIMENT_STAGE, stage ? 0 : 1);
 
-            uint8 stage = creature->AI()->GetData(DATA_EXPERIMENT_STAGE);
-            creature->AI()->SetData(DATA_EXPERIMENT_STAGE, stage ? 0 : 1);
-
-            Creature* target = nullptr;
-            std::list<Creature*> creList;
-            GetCreatureListWithEntryInGrid(creList, GetCaster(), NPC_ABOMINATION_WING_MAD_SCIENTIST_STALKER, 200.0f);
-            for (std::list<Creature*>::iterator itr = creList.begin(); itr != creList.end(); ++itr)
-                if (((*itr)->GetPositionX() > 4350.0f && stage == 0) || ((*itr)->GetPositionX() < 4350.0f && stage == 1))
-                {
-                    target = (*itr);
-                    break;
-                }
-
-            if (target)
+        Creature* target = nullptr;
+        std::list<Creature*> creList;
+        GetCreatureListWithEntryInGrid(creList, GetCaster(), NPC_ABOMINATION_WING_MAD_SCIENTIST_STALKER, 200.0f);
+        for (std::list<Creature*>::iterator itr = creList.begin(); itr != creList.end(); ++itr)
+            if (((*itr)->GetPositionX() > 4350.0f && stage == 0) || ((*itr)->GetPositionX() < 4350.0f && stage == 1))
             {
-                if (Aura* aura = target->GetAura(uint32(GetSpellInfo()->Effects[stage].CalcValue())))
-                    if (aura->GetOwner() == target) // avoid assert(false) at any cost
-                        aura->UpdateOwner(5000, target); // update whole aura so previous periodic ticks before refreshed by new one
+                target = (*itr);
+                break;
             }
 
-            GetCaster()->CastSpell(target, uint32(GetSpellInfo()->Effects[stage].CalcValue()), true, nullptr, nullptr, GetCaster()->GetGUID());
-        }
-
-        void Register() override
+        if (target)
         {
-            OnEffectHitTarget += SpellEffectFn(spell_putricide_unstable_experiment_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            if (Aura* aura = target->GetAura(uint32(GetSpellInfo()->Effects[stage].CalcValue())))
+                if (aura->GetOwner() == target) // avoid assert(false) at any cost
+                    aura->UpdateOwner(5000, target); // update whole aura so previous periodic ticks before refreshed by new one
         }
-    };
 
-    SpellScript* GetSpellScript() const override
+        GetCaster()->CastSpell(target, uint32(GetSpellInfo()->Effects[stage].CalcValue()), true, nullptr, nullptr, GetCaster()->GetGUID());
+    }
+
+    void Register() override
     {
-        return new spell_putricide_unstable_experiment_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_putricide_unstable_experiment::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1685,7 +1674,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_slime_puddle);
     RegisterSpellScript(spell_putricide_slime_puddle_spawn);
     RegisterSpellScript(spell_putricide_grow_stacker_aura);
-    new spell_putricide_unstable_experiment();
+    RegisterSpellScript(spell_putricide_unstable_experiment);
     new spell_putricide_tear_gas_effect();
     new spell_putricide_gaseous_bloat();
     new spell_putricide_ooze_channel();
