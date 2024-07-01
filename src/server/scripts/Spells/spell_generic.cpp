@@ -5221,7 +5221,7 @@ class spell_gen_sober_up : public AuraScript
         if (!target && !target->ToPlayer())
             return;
 
-        SpellEffIndex InebriateEffIndex;
+        SpellEffIndex InebriateEffIndex = EFFECT_0;
         if (Player* player = target->ToPlayer())
         {
             switch (GetSpellInfo()->Id)
