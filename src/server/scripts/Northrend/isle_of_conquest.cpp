@@ -338,36 +338,30 @@ enum blastCriteria
     SPELL_BOMB_INATION_CREDIT       = 68367,
 };
 
-class spell_ioc_bomb_blast_criteria : public SpellScriptLoader
+class spell_ioc_bomb_blast_criteria : public SpellScript
 {
-public:
-    spell_ioc_bomb_blast_criteria() : SpellScriptLoader("spell_ioc_bomb_blast_criteria") { }
+    PrepareSpellScript(spell_ioc_bomb_blast_criteria);
 
-    class spell_ioc_bomb_blast_criteria_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_ioc_bomb_blast_criteria_SpellScript);
+        return ValidateSpellInfo({ SPELL_BOMB_INABLE_CREDIT, SPELL_BOMB_INATION_CREDIT });
+    }
 
-        void HandleGameObjectDamage(SpellEffIndex  /*effIndex*/)
-        {
-            Unit* owner = GetCaster()->GetOwner();
-            if (!owner)
-                return;
-
-            if (GetSpellInfo()->Id == SPELL_SEAFORIUM_BLAST)
-                owner->CastSpell(owner, SPELL_BOMB_INABLE_CREDIT, true);
-            else if (GetSpellInfo()->Id == SPELL_HUGE_SEAFORIUM_BLAST)
-                owner->CastSpell(owner, SPELL_BOMB_INATION_CREDIT, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ioc_bomb_blast_criteria_SpellScript::HandleGameObjectDamage, EFFECT_1, SPELL_EFFECT_GAMEOBJECT_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleGameObjectDamage(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_ioc_bomb_blast_criteria_SpellScript();
+        Unit* owner = GetCaster()->GetOwner();
+        if (!owner)
+            return;
+
+        if (GetSpellInfo()->Id == SPELL_SEAFORIUM_BLAST)
+            owner->CastSpell(owner, SPELL_BOMB_INABLE_CREDIT, true);
+        else if (GetSpellInfo()->Id == SPELL_HUGE_SEAFORIUM_BLAST)
+            owner->CastSpell(owner, SPELL_BOMB_INATION_CREDIT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ioc_bomb_blast_criteria::HandleGameObjectDamage, EFFECT_1, SPELL_EFFECT_GAMEOBJECT_DAMAGE);
     }
 };
 
@@ -504,7 +498,7 @@ void AddSC_isle_of_conquest()
     new npc_ioc_gunship_captain();
     new boss_isle_of_conquest();
     RegisterSpellScript(spell_ioc_repair_turret_aura);
-    new spell_ioc_bomb_blast_criteria();
+    RegisterSpellScript(spell_ioc_bomb_blast_criteria);
     new spell_ioc_gunship_portal();
     new spell_ioc_parachute_ic();
     new spell_ioc_launch();
