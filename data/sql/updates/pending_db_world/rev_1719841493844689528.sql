@@ -25,3 +25,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_sindragosa_frost_beacon_aura
 UPDATE `spell_script_names` SET `ScriptName`='spell_sindragosa_soul_preservation_aura' WHERE `spell_id`=72465 AND `ScriptName`='spell_sindragosa_soul_preservation';
 UPDATE `spell_script_names` SET `ScriptName`='spell_the_lich_king_infest_aura' WHERE `spell_id` IN (70541,73779,73780,73781) AND `ScriptName`='spell_the_lich_king_infest';
 UPDATE `spell_script_names` SET `ScriptName`='spell_the_lich_king_necrotic_plague_aura' WHERE `spell_id` IN (70337,73912,73913,73914) AND `ScriptName`='spell_the_lich_king_necrotic_plague';
+UPDATE `spell_script_names` SET `ScriptName`='spell_the_lich_king_shadow_trap_visual_aura' WHERE `spell_id`=73530 AND `ScriptName`='spell_the_lich_king_shadow_trap_visual';

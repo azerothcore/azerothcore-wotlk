@@ -2040,30 +2040,24 @@ private:
     int32 _lastAmount;
 };
 
-class spell_the_lich_king_shadow_trap_visual : public SpellScriptLoader
+class spell_the_lich_king_shadow_trap_visual_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_shadow_trap_visual() : SpellScriptLoader("spell_the_lich_king_shadow_trap_visual") { }
+    PrepareAuraScript(spell_the_lich_king_shadow_trap_visual_aura);
 
-    class spell_the_lich_king_shadow_trap_visual_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_shadow_trap_visual_AuraScript);
+        return ValidateSpellInfo({ SPELL_SHADOW_TRAP_AURA });
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_TRAP_AURA, TRIGGERED_NONE);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_shadow_trap_visual_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_the_lich_king_shadow_trap_visual_AuraScript();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_TRAP_AURA, TRIGGERED_NONE);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_shadow_trap_visual_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -3744,7 +3738,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_infest_aura);
     RegisterSpellScript(spell_the_lich_king_necrotic_plague_aura);
     RegisterSpellAndAuraScriptPair(spell_the_lich_king_necrotic_plague_jump, spell_the_lich_king_necrotic_plague_jump_aura);
-    new spell_the_lich_king_shadow_trap_visual();
+    RegisterSpellScript(spell_the_lich_king_shadow_trap_visual_aura);
     new spell_the_lich_king_shadow_trap_periodic();
     new spell_the_lich_king_ice_burst_target_search();
     new npc_icc_ice_sphere();
