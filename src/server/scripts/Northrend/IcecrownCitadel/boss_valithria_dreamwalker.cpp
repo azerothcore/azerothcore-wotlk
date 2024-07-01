@@ -1367,62 +1367,51 @@ class spell_dreamwalker_summon_suppresser_effect : public SpellScript
     }
 };
 
-class spell_valithria_suppression : public SpellScriptLoader
+class spell_valithria_suppression_aura : public AuraScript
 {
-public:
-    spell_valithria_suppression() : SpellScriptLoader("spell_valithria_suppression") { }
+    PrepareAuraScript(spell_valithria_suppression_aura);
 
-    class spell_valithria_suppression_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_valithria_suppression_AuraScript);
+        const_cast<AuraEffect*>(aurEff)->SetAmount(0);
 
-        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            const_cast<AuraEffect*>(aurEff)->SetAmount(0);
+        Unit* target = GetTarget();
+        Unit::AuraApplicationMap& aam = target->GetAppliedAuras();
+        Unit::AuraApplicationMapBounds range = aam.equal_range(GetSpellInfo()->Id);
+        uint32 count = target->GetAuraCount(GetSpellInfo()->Id);
 
-            Unit* target = GetTarget();
-            Unit::AuraApplicationMap& aam = target->GetAppliedAuras();
-            Unit::AuraApplicationMapBounds range = aam.equal_range(GetSpellInfo()->Id);
-            uint32 count = target->GetAuraCount(GetSpellInfo()->Id);
+        if (range.first == range.second)
+            return;
 
-            if (range.first == range.second)
-                return;
+        for (Unit::AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
+            if (count == 1 || itr->second->GetBase()->GetEffect(EFFECT_0)->GetAmount())
+            {
+                itr->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(count * GetSpellInfo()->Effects[0].CalcValue());
+                break;
+            }
+    }
 
-            for (Unit::AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
-                if (count == 1 || itr->second->GetBase()->GetEffect(EFFECT_0)->GetAmount())
-                {
-                    itr->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(count * GetSpellInfo()->Effects[0].CalcValue());
-                    break;
-                }
-        }
-
-        void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
-        {
-            Unit* target = GetTarget();
-            Unit::AuraApplicationMap& aam = target->GetAppliedAuras();
-            Unit::AuraApplicationMapBounds range = aam.equal_range(GetSpellInfo()->Id);
-            uint32 count = target->GetAuraCount(GetSpellInfo()->Id);
-
-            if (range.first == range.second)
-                return;
-
-            for (Unit::AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
-                if (itr->second->GetBase()->GetEffect(EFFECT_0)->GetAmount())
-                    itr->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(0);
-
-            range.first->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(count * GetSpellInfo()->Effects[0].CalcValue());
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_valithria_suppression_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_valithria_suppression_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
     {
-        return new spell_valithria_suppression_AuraScript();
+        Unit* target = GetTarget();
+        Unit::AuraApplicationMap& aam = target->GetAppliedAuras();
+        Unit::AuraApplicationMapBounds range = aam.equal_range(GetSpellInfo()->Id);
+        uint32 count = target->GetAuraCount(GetSpellInfo()->Id);
+
+        if (range.first == range.second)
+            return;
+
+        for (Unit::AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
+            if (itr->second->GetBase()->GetEffect(EFFECT_0)->GetAmount())
+                itr->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(0);
+
+        range.first->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(count * GetSpellInfo()->Effects[0].CalcValue());
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_valithria_suppression_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_valithria_suppression_aura::OnRemove, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1458,7 +1447,7 @@ void AddSC_boss_valithria_dreamwalker()
     RegisterSpellScript(spell_dreamwalker_summoner);
     RegisterSpellScript(spell_dreamwalker_summon_suppresser_aura);
     RegisterSpellScript(spell_dreamwalker_summon_suppresser_effect);
-    new spell_valithria_suppression();
+    RegisterSpellScript(spell_valithria_suppression_aura);
 
     new achievement_portal_jockey();
 }
