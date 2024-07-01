@@ -1608,35 +1608,24 @@ class spell_valanar_kinetic_bomb_absorb_aura : public AuraScript
     }
 };
 
-class spell_valanar_kinetic_bomb_knockback : public SpellScriptLoader
+class spell_valanar_kinetic_bomb_knockback : public SpellScript
 {
-public:
-    spell_valanar_kinetic_bomb_knockback() : SpellScriptLoader("spell_valanar_kinetic_bomb_knockback") { }
+    PrepareSpellScript(spell_valanar_kinetic_bomb_knockback);
 
-    class spell_valanar_kinetic_bomb_knockback_SpellScript : public SpellScript
+    void KnockIntoAir(SpellMissInfo missInfo)
     {
-        PrepareSpellScript(spell_valanar_kinetic_bomb_knockback_SpellScript);
-
-        void KnockIntoAir(SpellMissInfo missInfo)
+        if (missInfo != SPELL_MISS_NONE)
         {
-            if (missInfo != SPELL_MISS_NONE)
-            {
-                return;
-            }
-
-            if (Creature* target = GetHitCreature())
-                target->AI()->DoAction(ACTION_KINETIC_BOMB_JUMP);
+            return;
         }
 
-        void Register() override
-        {
-            BeforeHit += BeforeSpellHitFn(spell_valanar_kinetic_bomb_knockback_SpellScript::KnockIntoAir);
-        }
-    };
+        if (Creature* target = GetHitCreature())
+            target->AI()->DoAction(ACTION_KINETIC_BOMB_JUMP);
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_valanar_kinetic_bomb_knockback_SpellScript();
+        BeforeHit += BeforeSpellHitFn(spell_valanar_kinetic_bomb_knockback::KnockIntoAir);
     }
 };
 
@@ -1739,7 +1728,7 @@ void AddSC_boss_blood_prince_council()
     RegisterSpellScript(spell_taldaram_ball_of_inferno_flame);
     RegisterSpellAndAuraScriptPair(spell_valanar_kinetic_bomb, spell_valanar_kinetic_bomb_aura);
     RegisterSpellScript(spell_valanar_kinetic_bomb_absorb_aura);
-    new spell_valanar_kinetic_bomb_knockback();
+    RegisterSpellScript(spell_valanar_kinetic_bomb_knockback);
     new spell_valanar_kinetic_bomb_summon();
     new spell_blood_council_summon_shadow_resonance();
 }
