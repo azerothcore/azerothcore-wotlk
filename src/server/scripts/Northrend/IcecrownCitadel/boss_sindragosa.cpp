@@ -1137,37 +1137,31 @@ class spell_sindragosa_mystic_buffet : public SpellScript
     }
 };
 
-class spell_sindragosa_soul_preservation : public SpellScriptLoader
+class spell_sindragosa_soul_preservation_aura : public AuraScript
 {
-public:
-    spell_sindragosa_soul_preservation() : SpellScriptLoader("spell_sindragosa_soul_preservation") { }
+    PrepareAuraScript(spell_sindragosa_soul_preservation_aura);
 
-    class spell_sindragosa_soul_preservation_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_sindragosa_soul_preservation_AuraScript);
+        return ValidateSpellInfo({ 72466, 72424 });
+    }
 
-        void PeriodicTick(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* s = GetTarget())
-                if (GetStackAmount() >= (s->GetMap()->Is25ManRaid() ? 75 : 30))
-                {
-                    s->CastSpell(s, 72466, true);
-                    s->RemoveAurasDueToSpell(72424);
-                    if (s->GetTypeId() == TYPEID_UNIT) s->ToCreature()->SetLootMode(3);
-                    SetDuration(1);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_soul_preservation_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void PeriodicTick(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_sindragosa_soul_preservation_AuraScript();
+        PreventDefaultAction();
+        if (Unit* s = GetTarget())
+            if (GetStackAmount() >= (s->GetMap()->Is25ManRaid() ? 75 : 30))
+            {
+                s->CastSpell(s, 72466, true);
+                s->RemoveAurasDueToSpell(72424);
+                if (s->GetTypeId() == TYPEID_UNIT) s->ToCreature()->SetLootMode(3);
+                SetDuration(1);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_soul_preservation_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
