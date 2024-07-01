@@ -14,4 +14,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 37904);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(17, 0, 37904, 0, 0, 29, 0, 21894, 70, 0, 1, 0, 0, '', 'Allow using \'Imbued Silver Spear\' if no alive \'Xeleth\' is within 70y.');
+(17, 0, 37904, 0, 0, 29, 0, 21894, 80, 0, 1, 0, 0, '', 'Allow using \'Imbued Silver Spear\' if no alive \'Xeleth\' is within 80y.');
