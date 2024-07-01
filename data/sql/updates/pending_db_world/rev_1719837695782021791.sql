@@ -4,3 +4,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_ioc_repair_turret_aura' WHER
 UPDATE `spell_script_names` SET `ScriptName`='spell_ioc_parachute_ic_aura' WHERE `spell_id`=66656 AND `ScriptName`='spell_ioc_parachute_ic';
 UPDATE `spell_script_names` SET `ScriptName`='spell_q12243_fire_upon_the_waters_aura' WHERE `spell_id`=48522 AND `ScriptName`='spell_q12243_fire_upon_the_waters';
 UPDATE `spell_script_names` SET `ScriptName`='spell_q13003_thursting_hodirs_spear_aura' WHERE `spell_id`=56689 AND `ScriptName`='spell_q13003_thursting_hodirs_spear';
+UPDATE `spell_script_names` SET `ScriptName`='spell_close_rift_aura' WHERE `spell_id`=56763 AND `ScriptName`='spell_close_rift';

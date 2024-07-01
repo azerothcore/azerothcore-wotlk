@@ -1009,45 +1009,34 @@ enum CloseRift
     SPELL_DESPAWN_RIFT          = 61665
 };
 
-class spell_close_rift : public SpellScriptLoader
+class spell_close_rift_aura : public AuraScript
 {
-public:
-    spell_close_rift() : SpellScriptLoader("spell_close_rift") { }
+    PrepareAuraScript(spell_close_rift_aura);
 
-    class spell_close_rift_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_close_rift_AuraScript);
-
-        bool Load() override
-        {
-            _counter = 0;
-            return true;
-        }
-
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_DESPAWN_RIFT });
-        }
-
-        void HandlePeriodic(AuraEffect const* /* aurEff */)
-        {
-            if (++_counter == 5)
-                GetTarget()->CastSpell((Unit*)nullptr, SPELL_DESPAWN_RIFT, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_close_rift_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-
-    private:
-        uint8 _counter;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_close_rift_AuraScript();
+        _counter = 0;
+        return true;
     }
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DESPAWN_RIFT });
+    }
+
+    void HandlePeriodic(AuraEffect const* /* aurEff */)
+    {
+        if (++_counter == 5)
+            GetTarget()->CastSpell((Unit*)nullptr, SPELL_DESPAWN_RIFT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_close_rift_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+
+private:
+    uint8 _counter;
 };
 
 enum CollapsingCave
@@ -1194,7 +1183,7 @@ void AddSC_storm_peaks()
     new npc_freed_protodrake();
     new npc_icefang();
     new npc_hyldsmeet_protodrake();
-    new spell_close_rift();
+    RegisterSpellScript(spell_close_rift_aura);
     new npc_vehicle_d16_propelled_delivery();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
 }
