@@ -2291,65 +2291,59 @@ class spell_igb_overheat_aura : public AuraScript
     }
 };
 
-class spell_igb_cannon_blast : public SpellScriptLoader
+class spell_igb_cannon_blast : public SpellScript
 {
-public:
-    spell_igb_cannon_blast() : SpellScriptLoader("spell_igb_cannon_blast") { }
+    PrepareSpellScript(spell_igb_cannon_blast);
 
-    class spell_igb_cannon_blast_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_cannon_blast_SpellScript);
+        return ValidateSpellInfo({ SPELL_OVERHEAT });
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void CalculatePower()
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
-            SpellInfo const* spellInfo = GetSpellInfo();
-            if (!spellInfo)
-                return;
-
-            // Check if the effect is energize
-            if (spellInfo->Effects[EFFECT_1].Effect == SPELL_EFFECT_ENERGIZE)
-            {
-                int32 energizeAmount = spellInfo->Effects[EFFECT_1].CalcValue(caster);
-
-                // Apply the power gain directly to the caster
-                caster->ModifyPower(POWER_ENERGY, energizeAmount);
-            }
-
-            if (caster->GetPower(POWER_ENERGY) >= 100)
-            {
-                caster->CastSpell(caster, SPELL_OVERHEAT, true);
-                if (Vehicle* vehicle = caster->GetVehicleKit())
-                    if (Unit* passenger = vehicle->GetPassenger(0))
-                        sCreatureTextMgr->SendChat(caster->ToCreature(), SAY_OVERHEAT, passenger);
-            }
-
-        }
-
-        void PreventPowerGainOnHit(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-        }
-
-        void Register() override
-        {
-            OnCast += SpellCastFn(spell_igb_cannon_blast_SpellScript::CalculatePower);
-            OnEffectHitTarget += SpellEffectFn(spell_igb_cannon_blast_SpellScript::PreventPowerGainOnHit, EFFECT_1, SPELL_EFFECT_ENERGIZE);
-
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_igb_cannon_blast_SpellScript();
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void CalculatePower()
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        SpellInfo const* spellInfo = GetSpellInfo();
+        if (!spellInfo)
+            return;
+
+        // Check if the effect is energize
+        if (spellInfo->Effects[EFFECT_1].Effect == SPELL_EFFECT_ENERGIZE)
+        {
+            int32 energizeAmount = spellInfo->Effects[EFFECT_1].CalcValue(caster);
+
+            // Apply the power gain directly to the caster
+            caster->ModifyPower(POWER_ENERGY, energizeAmount);
+        }
+
+        if (caster->GetPower(POWER_ENERGY) >= 100)
+        {
+            caster->CastSpell(caster, SPELL_OVERHEAT, true);
+            if (Vehicle* vehicle = caster->GetVehicleKit())
+                if (Unit* passenger = vehicle->GetPassenger(0))
+                    sCreatureTextMgr->SendChat(caster->ToCreature(), SAY_OVERHEAT, passenger);
+        }
+
+    }
+
+    void PreventPowerGainOnHit(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_igb_cannon_blast::CalculatePower);
+        OnEffectHitTarget += SpellEffectFn(spell_igb_cannon_blast::PreventPowerGainOnHit, EFFECT_1, SPELL_EFFECT_ENERGIZE);
+
     }
 };
 
@@ -2706,7 +2700,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_teleport_players_on_victory);
     RegisterSpellScript(spell_igb_periodic_trigger_with_power_cost_aura);
     RegisterSpellScript(spell_igb_overheat_aura);
-    new spell_igb_cannon_blast();
+    RegisterSpellScript(spell_igb_cannon_blast);
     new spell_igb_incinerating_blast();
     new spell_igb_burning_pitch_selector();
     new spell_igb_burning_pitch();
