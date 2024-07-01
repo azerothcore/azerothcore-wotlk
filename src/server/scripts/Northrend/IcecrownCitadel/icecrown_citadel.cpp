@@ -2105,44 +2105,33 @@ public:
     }
 };
 
-class spell_svalna_revive_champion : public SpellScriptLoader
+class spell_svalna_revive_champion : public SpellScript
 {
-public:
-    spell_svalna_revive_champion() : SpellScriptLoader("spell_svalna_revive_champion") { }
+    PrepareSpellScript(spell_svalna_revive_champion);
 
-    class spell_svalna_revive_champion_SpellScript : public SpellScript
+    void RemoveAliveTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_svalna_revive_champion_SpellScript);
+        targets.remove_if(AliveCheck());
+        Acore::Containers::RandomResize(targets, 2);
+    }
 
-        void RemoveAliveTarget(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(AliveCheck());
-            Acore::Containers::RandomResize(targets, 2);
-        }
-
-        void Land(SpellEffIndex /*effIndex*/)
-        {
-            Creature* caster = GetCaster()->ToCreature();
-            if (!caster)
-                return;
-
-            Position pos = caster->GetNearPosition(5.0f, 0.0f);
-            pos.m_positionZ = caster->GetMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true, 50.0f);
-            pos.m_positionZ += 0.1f;
-            caster->SendMeleeAttackStop(caster->GetVictim());
-            caster->GetMotionMaster()->MoveLand(POINT_LAND, pos, 7.0f);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_svalna_revive_champion_SpellScript::RemoveAliveTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
-            OnEffectHit += SpellEffectFn(spell_svalna_revive_champion_SpellScript::Land, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Land(SpellEffIndex /*effIndex*/)
     {
-        return new spell_svalna_revive_champion_SpellScript();
+        Creature* caster = GetCaster()->ToCreature();
+        if (!caster)
+            return;
+
+        Position pos = caster->GetNearPosition(5.0f, 0.0f);
+        pos.m_positionZ = caster->GetMap()->GetHeight(caster->GetPhaseMask(), pos.GetPositionX(), pos.GetPositionY(), caster->GetPositionZ(), true, 50.0f);
+        pos.m_positionZ += 0.1f;
+        caster->SendMeleeAttackStop(caster->GetVictim());
+        caster->GetMotionMaster()->MoveLand(POINT_LAND, pos, 7.0f);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_svalna_revive_champion::RemoveAliveTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
+        OnEffectHit += SpellEffectFn(spell_svalna_revive_champion::Land, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -3741,7 +3730,7 @@ void AddSC_icecrown_citadel()
     RegisterSpellScript(spell_frost_giant_death_plague);
     RegisterSpellScript(spell_icc_harvest_blight_specimen);
     new spell_trigger_spell_from_caster("spell_svalna_caress_of_death", SPELL_IMPALING_SPEAR_KILL);
-    new spell_svalna_revive_champion();
+    RegisterSpellScript(spell_svalna_revive_champion);
     new spell_svalna_remove_spear();
     new spell_icc_soul_missile();
     new at_icc_saurfang_portal();
