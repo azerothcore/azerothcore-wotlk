@@ -1030,80 +1030,70 @@ class spell_putricide_gaseous_bloat_aura : public AuraScript
     }
 };
 
-class spell_putricide_ooze_channel : public SpellScriptLoader
+class spell_putricide_ooze_channel : public SpellScript
 {
-public:
-    spell_putricide_ooze_channel() : SpellScriptLoader("spell_putricide_ooze_channel") { }
+    PrepareSpellScript(spell_putricide_ooze_channel);
 
-    class spell_putricide_ooze_channel_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* spell) override
     {
-        PrepareSpellScript(spell_putricide_ooze_channel_SpellScript);
-
-        bool Validate(SpellInfo const* spell) override
-        {
-            return ValidateSpellInfo({ spell->ExcludeTargetAuraSpell });
-        }
-
-        // set up initial variables and check if caster is creature
-        // this will let use safely use ToCreature() casts in entire script
-        bool Load() override
-        {
-            _target = nullptr;
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            // dbc has only 1 field for excluding, this will prevent anyone from getting both at the same time
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VOLATILE_OOZE_PROTECTION));
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_GASEOUS_BLOAT_PROTECTION));
-
-            if (targets.empty())
-            {
-                FinishCast(SPELL_FAILED_NO_VALID_TARGETS);
-                GetCaster()->ToCreature()->DespawnOrUnsummon(1);    // despawn next update
-                return;
-            }
-
-            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
-            _target = target;
-        }
-
-        void SetTarget(std::list<WorldObject*>& targets)
-        {
-            targets.clear();
-            if (_target)
-                targets.push_back(_target);
-        }
-
-        void StartAttack()
-        {
-            GetCaster()->ClearUnitState(UNIT_STATE_CASTING);
-            GetCaster()->GetThreatMgr().ClearAllThreat();
-            GetCaster()->ToCreature()->SetInCombatWithZone();
-            GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
-            GetCaster()->AddThreat(GetHitUnit(), 500000000.0f);    // value seen in sniff
-            if (Creature* c = GetCaster()->ToCreature())
-                c->AI()->SetGUID(GetHitUnit()->GetGUID(), -1);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_ooze_channel_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_ooze_channel_SpellScript::SetTarget, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_ooze_channel_SpellScript::SetTarget, EFFECT_2, TARGET_UNIT_SRC_AREA_ENEMY);
-            AfterHit += SpellHitFn(spell_putricide_ooze_channel_SpellScript::StartAttack);
-        }
-
-        WorldObject* _target;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_putricide_ooze_channel_SpellScript();
+        return ValidateSpellInfo({ spell->ExcludeTargetAuraSpell });
     }
+
+    // set up initial variables and check if caster is creature
+    // this will let use safely use ToCreature() casts in entire script
+    bool Load() override
+    {
+        _target = nullptr;
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void SelectTarget(std::list<WorldObject*>& targets)
+    {
+        // dbc has only 1 field for excluding, this will prevent anyone from getting both at the same time
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VOLATILE_OOZE_PROTECTION));
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_GASEOUS_BLOAT_PROTECTION));
+
+        if (targets.empty())
+        {
+            FinishCast(SPELL_FAILED_NO_VALID_TARGETS);
+            GetCaster()->ToCreature()->DespawnOrUnsummon(1);    // despawn next update
+            return;
+        }
+
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(target);
+        _target = target;
+    }
+
+    void SetTarget(std::list<WorldObject*>& targets)
+    {
+        targets.clear();
+        if (_target)
+            targets.push_back(_target);
+    }
+
+    void StartAttack()
+    {
+        GetCaster()->ClearUnitState(UNIT_STATE_CASTING);
+        GetCaster()->GetThreatMgr().ClearAllThreat();
+        GetCaster()->ToCreature()->SetInCombatWithZone();
+        GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
+        GetCaster()->AddThreat(GetHitUnit(), 500000000.0f);    // value seen in sniff
+        if (Creature* c = GetCaster()->ToCreature())
+            c->AI()->SetGUID(GetHitUnit()->GetGUID(), -1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_ooze_channel::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_ooze_channel::SetTarget, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_ooze_channel::SetTarget, EFFECT_2, TARGET_UNIT_SRC_AREA_ENEMY);
+        AfterHit += SpellHitFn(spell_putricide_ooze_channel::StartAttack);
+    }
+
+private:
+    WorldObject* _target;
 };
 
 class spell_putricide_ooze_eruption_searcher : public SpellScriptLoader
@@ -1660,7 +1650,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_unstable_experiment);
     RegisterSpellScript(spell_putricide_tear_gas_effect);
     RegisterSpellScript(spell_putricide_gaseous_bloat_aura);
-    new spell_putricide_ooze_channel();
+    RegisterSpellScript(spell_putricide_ooze_channel);
     new spell_putricide_ooze_eruption_searcher();
     new spell_putricide_mutated_plague();
     new spell_putricide_unbound_plague();
