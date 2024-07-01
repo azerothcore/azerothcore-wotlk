@@ -2088,38 +2088,27 @@ class spell_the_lich_king_shadow_trap_periodic : public SpellScript
     }
 };
 
-class spell_the_lich_king_ice_burst_target_search : public SpellScriptLoader
+class spell_the_lich_king_ice_burst_target_search : public SpellScript
 {
-public:
-    spell_the_lich_king_ice_burst_target_search() : SpellScriptLoader("spell_the_lich_king_ice_burst_target_search") { }
+    PrepareSpellScript(spell_the_lich_king_ice_burst_target_search);
 
-    class spell_the_lich_king_ice_burst_target_search_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_ice_burst_target_search_SpellScript);
+        return ValidateSpellInfo({ SPELL_ICE_BURST });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ICE_BURST });
-        }
-
-        void CheckTargetCount(std::list<WorldObject*>& unitList)
-        {
-            if (unitList.empty())
-                return;
-
-            if (GetCaster()->GetTypeId() == TYPEID_UNIT)
-                GetCaster()->ToCreature()->AI()->DoAction(-1);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_ice_burst_target_search_SpellScript::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CheckTargetCount(std::list<WorldObject*>& unitList)
     {
-        return new spell_the_lich_king_ice_burst_target_search_SpellScript();
+        if (unitList.empty())
+            return;
+
+        if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+            GetCaster()->ToCreature()->AI()->DoAction(-1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_ice_burst_target_search::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -3734,7 +3723,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellAndAuraScriptPair(spell_the_lich_king_necrotic_plague_jump, spell_the_lich_king_necrotic_plague_jump_aura);
     RegisterSpellScript(spell_the_lich_king_shadow_trap_visual_aura);
     RegisterSpellScript(spell_the_lich_king_shadow_trap_periodic);
-    new spell_the_lich_king_ice_burst_target_search();
+    RegisterSpellScript(spell_the_lich_king_ice_burst_target_search);
     new npc_icc_ice_sphere();
     new spell_the_lich_king_raging_spirit();
     new npc_raging_spirit();
