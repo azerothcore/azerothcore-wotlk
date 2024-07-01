@@ -2781,30 +2781,19 @@ private:
     bool _is25Man;
 };
 
-class spell_the_lich_king_vile_spirits_visual : public SpellScriptLoader
+class spell_the_lich_king_vile_spirits_visual : public SpellScript
 {
-public:
-    spell_the_lich_king_vile_spirits_visual() : SpellScriptLoader("spell_the_lich_king_vile_spirits_visual") { }
+    PrepareSpellScript(spell_the_lich_king_vile_spirits_visual);
 
-    class spell_the_lich_king_vile_spirits_visual_SpellScript : public SpellScript
+    void ModDestHeight(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_the_lich_king_vile_spirits_visual_SpellScript);
+        Position offset = {0.0f, 0.0f, 15.0f, 0.0f};
+        const_cast<WorldLocation*>(GetExplTargetDest())->RelocateOffset(offset);
+    }
 
-        void ModDestHeight(SpellEffIndex /*effIndex*/)
-        {
-            Position offset = {0.0f, 0.0f, 15.0f, 0.0f};
-            const_cast<WorldLocation*>(GetExplTargetDest())->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_the_lich_king_vile_spirits_visual_SpellScript::ModDestHeight, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_vile_spirits_visual_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_the_lich_king_vile_spirits_visual::ModDestHeight, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -3643,7 +3632,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_cast_back_to_caster);
     RegisterSpellScript(spell_the_lich_king_life_siphon);
     RegisterSpellScript(spell_the_lich_king_vile_spirits_aura);
-    new spell_the_lich_king_vile_spirits_visual();
+    RegisterSpellScript(spell_the_lich_king_vile_spirits_visual);
     new spell_the_lich_king_vile_spirit_move_target_search();
     new spell_the_lich_king_vile_spirit_damage_target_search();
     new spell_the_lich_king_harvest_soul();
