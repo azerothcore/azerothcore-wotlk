@@ -3365,30 +3365,19 @@ public:
     }
 };
 
-class spell_the_lich_king_summon_spirit_bomb : public SpellScriptLoader
+class spell_the_lich_king_summon_spirit_bomb : public SpellScript
 {
-public:
-    spell_the_lich_king_summon_spirit_bomb() : SpellScriptLoader("spell_the_lich_king_summon_spirit_bomb") { }
+    PrepareSpellScript(spell_the_lich_king_summon_spirit_bomb);
 
-    class spell_the_lich_king_summon_spirit_bomb_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_the_lich_king_summon_spirit_bomb_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->CastSpell((Unit*)nullptr, uint32(GetEffectValue()), true);
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->CastSpell((Unit*)nullptr, uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_summon_spirit_bomb_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_summon_spirit_bomb_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_summon_spirit_bomb::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -3589,7 +3578,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_dark_hunger_aura);
     RegisterSpellScript(spell_the_lich_king_soul_rip_aura);
     new npc_icc_lk_checktarget();
-    new spell_the_lich_king_summon_spirit_bomb();
+    RegisterSpellScript(spell_the_lich_king_summon_spirit_bomb);
     new npc_lk_spirit_bomb();
     new spell_the_lich_king_trigger_vile_spirit();
     new npc_lk_wicked_spirit();
