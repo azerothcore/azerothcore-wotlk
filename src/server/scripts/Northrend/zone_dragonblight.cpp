@@ -947,44 +947,33 @@ class spell_q12478_frostmourne_cavern : public SpellScript
     }
 };
 
-class spell_q12243_fire_upon_the_waters : public SpellScriptLoader
+class spell_q12243_fire_upon_the_waters_aura : public AuraScript
 {
-public:
-    spell_q12243_fire_upon_the_waters() : SpellScriptLoader("spell_q12243_fire_upon_the_waters") { }
+    PrepareAuraScript(spell_q12243_fire_upon_the_waters_aura);
 
-    class spell_q12243_fire_upon_the_waters_AuraScript : public AuraScript
+    void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_q12243_fire_upon_the_waters_AuraScript);
-
-        void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        std::list<Creature*> servants;
+        GetTarget()->GetCreatureListWithEntryInGrid(servants, 27233 /*NPC_ONSLAUGHT_DECKHAND*/, 40.0f);
+        for (std::list<Creature*>::const_iterator itr = servants.begin(); itr != servants.end(); ++itr)
         {
-            std::list<Creature*> servants;
-            GetTarget()->GetCreatureListWithEntryInGrid(servants, 27233 /*NPC_ONSLAUGHT_DECKHAND*/, 40.0f);
-            for (std::list<Creature*>::const_iterator itr = servants.begin(); itr != servants.end(); ++itr)
-            {
-                (*itr)->SetSpeed(MOVE_RUN, 0.7f, true);
-                (*itr)->GetMotionMaster()->MoveFleeing(GetTarget(), GetDuration());
-            }
+            (*itr)->SetSpeed(MOVE_RUN, 0.7f, true);
+            (*itr)->GetMotionMaster()->MoveFleeing(GetTarget(), GetDuration());
         }
+    }
 
-        void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            std::list<Creature*> servants;
-            GetTarget()->GetCreatureListWithEntryInGrid(servants, 27233 /*NPC_ONSLAUGHT_DECKHAND*/, 100.0f);
-            for (std::list<Creature*>::const_iterator itr = servants.begin(); itr != servants.end(); ++itr)
-                (*itr)->SetSpeed(MOVE_RUN, 1.1f, true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_q12243_fire_upon_the_waters_AuraScript::HandleApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_q12243_fire_upon_the_waters_AuraScript::HandleRemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_q12243_fire_upon_the_waters_AuraScript();
+        std::list<Creature*> servants;
+        GetTarget()->GetCreatureListWithEntryInGrid(servants, 27233 /*NPC_ONSLAUGHT_DECKHAND*/, 100.0f);
+        for (std::list<Creature*>::const_iterator itr = servants.begin(); itr != servants.end(); ++itr)
+            (*itr)->SetSpeed(MOVE_RUN, 1.1f, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_q12243_fire_upon_the_waters_aura::HandleApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_q12243_fire_upon_the_waters_aura::HandleRemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2296,7 +2285,7 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_call_wintergarde_gryphon);
     new npc_heated_battle();
     RegisterSpellScript(spell_q12478_frostmourne_cavern);
-    new spell_q12243_fire_upon_the_waters();
+    RegisterSpellScript(spell_q12243_fire_upon_the_waters_aura);
     new npc_q24545_lich_king();
     new at_q24545_frostmourne_cavern();
     new npc_q24545_wretched_ghoul();
