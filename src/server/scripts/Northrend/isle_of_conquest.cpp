@@ -365,54 +365,43 @@ class spell_ioc_bomb_blast_criteria : public SpellScript
     }
 };
 
-class spell_ioc_gunship_portal : public SpellScriptLoader
+class spell_ioc_gunship_portal : public SpellScript
 {
-public:
-    spell_ioc_gunship_portal() : SpellScriptLoader("spell_ioc_gunship_portal") { }
+    PrepareSpellScript(spell_ioc_gunship_portal);
 
-    class spell_ioc_gunship_portal_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_ioc_gunship_portal_SpellScript);
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            /*Player* caster = GetCaster()->ToPlayer();
-             *
-             * HACK: GetWorldLocation() returns real position and not transportposition.
-             * ServertoClient: SMSG_MOVE_TELEPORT (0x0B39)
-             * counter: 45
-             * Tranpsort Guid: Full: xxxx Type: MOTransport Low: xxx
-             * Transport Position X: 0 Y: 0 Z: 0 O: 0
-             * Position: X: 7.305609 Y: -0.095246 Z: 34.51022 O: 0
-
-            caster->TeleportTo(GetHitCreature()->GetWorldLocation(), TELE_TO_NOT_LEAVE_TRANSPORT);*/
-        }
-
-        void HandleScript2(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Player* caster = GetCaster()->ToPlayer();
-            if (!caster->IsBeingTeleported())
-                if (Battleground* bg = caster->GetBattleground())
-                    bg->DoAction(2 /**/, caster->GetGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal_SpellScript::HandleScript2, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_ioc_gunship_portal_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        /*Player* caster = GetCaster()->ToPlayer();
+         *
+         * HACK: GetWorldLocation() returns real position and not transportposition.
+         * ServertoClient: SMSG_MOVE_TELEPORT (0x0B39)
+         * counter: 45
+         * Tranpsort Guid: Full: xxxx Type: MOTransport Low: xxx
+         * Transport Position X: 0 Y: 0 Z: 0 O: 0
+         * Position: X: 7.305609 Y: -0.095246 Z: 34.51022 O: 0
+
+        caster->TeleportTo(GetHitCreature()->GetWorldLocation(), TELE_TO_NOT_LEAVE_TRANSPORT);*/
+    }
+
+    void HandleScript2(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Player* caster = GetCaster()->ToPlayer();
+        if (!caster->IsBeingTeleported())
+            if (Battleground* bg = caster->GetBattleground())
+                bg->DoAction(2 /**/, caster->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal::HandleScript2, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -499,7 +488,7 @@ void AddSC_isle_of_conquest()
     new boss_isle_of_conquest();
     RegisterSpellScript(spell_ioc_repair_turret_aura);
     RegisterSpellScript(spell_ioc_bomb_blast_criteria);
-    new spell_ioc_gunship_portal();
+    RegisterSpellScript(spell_ioc_gunship_portal);
     new spell_ioc_parachute_ic();
     new spell_ioc_launch();
 }
