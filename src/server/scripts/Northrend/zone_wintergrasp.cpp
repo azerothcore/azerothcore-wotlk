@@ -1035,33 +1035,22 @@ class spell_wintergrasp_portal : public SpellScript
 };
 
 // 36444 - Wintergrasp Water
-class spell_wintergrasp_water : public SpellScriptLoader
+class spell_wintergrasp_water : public SpellScript
 {
-public:
-    spell_wintergrasp_water() : SpellScriptLoader("spell_wintergrasp_water") { }
+    PrepareSpellScript(spell_wintergrasp_water);
 
-    class spell_wintergrasp_water_SpellScript : public SpellScript
+    SpellCastResult CheckCast()
     {
-        PrepareSpellScript(spell_wintergrasp_water_SpellScript);
+        Unit* target = GetCaster();
+        if (!target || !target->IsVehicle())
+            return SPELL_FAILED_DONT_REPORT;
 
-        SpellCastResult CheckCast()
-        {
-            Unit* target = GetCaster();
-            if (!target || !target->IsVehicle())
-                return SPELL_FAILED_DONT_REPORT;
+        return SPELL_CAST_OK;
+    }
 
-            return SPELL_CAST_OK;
-        }
-
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_wintergrasp_water_SpellScript::CheckCast);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_wintergrasp_water_SpellScript();
+        OnCheckCast += SpellCheckCastFn(spell_wintergrasp_water::CheckCast);
     }
 };
 
@@ -1212,7 +1201,7 @@ void AddSC_wintergrasp()
     RegisterSpellScript(spell_wintergrasp_create_vehicle);
     RegisterSpellScript(spell_wintergrasp_rp_gg);
     RegisterSpellScript(spell_wintergrasp_portal);
-    new spell_wintergrasp_water();
+    RegisterSpellScript(spell_wintergrasp_water);
     new spell_wintergrasp_hide_small_elementals();
     new spell_wg_reduce_damage_by_distance();
 
