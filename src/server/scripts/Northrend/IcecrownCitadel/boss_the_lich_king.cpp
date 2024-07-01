@@ -2340,43 +2340,37 @@ public:
     }
 };
 
-class spell_the_lich_king_defile : public SpellScriptLoader
+class spell_the_lich_king_defile : public SpellScript
 {
-public:
-    spell_the_lich_king_defile() : SpellScriptLoader("spell_the_lich_king_defile") { }
+    PrepareSpellScript(spell_the_lich_king_defile);
 
-    class spell_the_lich_king_defile_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_defile_SpellScript);
+        return ValidateSpellInfo({ SPELL_DEFILE_GROW });
+    }
 
-        void CorrectRange(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(VehicleCheck());
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
-            uint32 strangulatedAura[4] = {68980, 74325, 74296, 74297};
-            targets.remove_if(Acore::UnitAuraCheck(true, strangulatedAura[GetCaster()->GetMap()->GetDifficulty()]));
-        }
-
-        void ChangeDamageAndGrow()
-        {
-            SetHitDamage(int32(GetHitDamage() * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X)));
-            // HACK: target player should cast this spell on defile
-            // however with current aura handling auras cast by different units
-            // cannot stack on the same aura object increasing the stack count
-            GetCaster()->CastSpell(GetCaster(), SPELL_DEFILE_GROW, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_defile_SpellScript::CorrectRange, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_defile_SpellScript::CorrectRange, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnHit += SpellHitFn(spell_the_lich_king_defile_SpellScript::ChangeDamageAndGrow);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CorrectRange(std::list<WorldObject*>& targets)
     {
-        return new spell_the_lich_king_defile_SpellScript();
+        targets.remove_if(VehicleCheck());
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
+        uint32 strangulatedAura[4] = {68980, 74325, 74296, 74297};
+        targets.remove_if(Acore::UnitAuraCheck(true, strangulatedAura[GetCaster()->GetMap()->GetDifficulty()]));
+    }
+
+    void ChangeDamageAndGrow()
+    {
+        SetHitDamage(int32(GetHitDamage() * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X)));
+        // HACK: target player should cast this spell on defile
+        // however with current aura handling auras cast by different units
+        // cannot stack on the same aura object increasing the stack count
+        GetCaster()->CastSpell(GetCaster(), SPELL_DEFILE_GROW, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_defile::CorrectRange, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_defile::CorrectRange, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnHit += SpellHitFn(spell_the_lich_king_defile::ChangeDamageAndGrow);
     }
 };
 
@@ -3716,7 +3710,7 @@ void AddSC_boss_the_lich_king()
     new npc_icc_ice_sphere();
     RegisterSpellScript(spell_the_lich_king_raging_spirit);
     new npc_raging_spirit();
-    new spell_the_lich_king_defile();
+    RegisterSpellScript(spell_the_lich_king_defile);
     new spell_the_lich_king_soul_reaper();
     new npc_valkyr_shadowguard();
     new spell_the_lich_king_summon_into_air();
