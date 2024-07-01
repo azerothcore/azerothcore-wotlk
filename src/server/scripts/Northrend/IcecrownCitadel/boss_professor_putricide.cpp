@@ -1121,54 +1121,43 @@ class spell_putricide_ooze_eruption_searcher : public SpellScript
     }
 };
 
-class spell_putricide_mutated_plague : public SpellScriptLoader
+class spell_putricide_mutated_plague_aura : public AuraScript
 {
-public:
-    spell_putricide_mutated_plague() : SpellScriptLoader("spell_putricide_mutated_plague") { }
+    PrepareAuraScript(spell_putricide_mutated_plague_aura);
 
-    class spell_putricide_mutated_plague_AuraScript : public AuraScript
+    void HandleTriggerSpell(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_putricide_mutated_plague_AuraScript);
+        PreventDefaultAction();
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
 
-        void HandleTriggerSpell(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
+        uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
+        SpellInfo const* spell = sSpellMgr->AssertSpellInfo(triggerSpell);
+        spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, caster);
 
-            uint32 triggerSpell = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-            SpellInfo const* spell = sSpellMgr->AssertSpellInfo(triggerSpell);
-            spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, caster);
+        int32 damage = spell->Effects[EFFECT_0].CalcValue(caster);
+        damage = damage * pow(2.5f, GetStackAmount());
 
-            int32 damage = spell->Effects[EFFECT_0].CalcValue(caster);
-            damage = damage * pow(2.5f, GetStackAmount());
+        GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true, nullptr, aurEff, GetCasterGUID());
+    }
 
-            GetTarget()->CastCustomSpell(triggerSpell, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true, nullptr, aurEff, GetCasterGUID());
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            uint32 healSpell = uint32(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
-            SpellInfo const* spell = sSpellMgr->GetSpellInfo(healSpell);
-            if (!spell)
-                return;
-            spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, GetTarget());
-            int32 healAmount = spell->Effects[EFFECT_0].CalcValue();
-            healAmount *= GetStackAmount();
-            GetTarget()->CastCustomSpell(healSpell, SPELLVALUE_BASE_POINT0, healAmount, GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_putricide_mutated_plague_AuraScript::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_putricide_mutated_plague_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_putricide_mutated_plague_AuraScript();
+        uint32 healSpell = uint32(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
+        SpellInfo const* spell = sSpellMgr->GetSpellInfo(healSpell);
+        if (!spell)
+            return;
+        spell = sSpellMgr->GetSpellForDifficultyFromSpell(spell, GetTarget());
+        int32 healAmount = spell->Effects[EFFECT_0].CalcValue();
+        healAmount *= GetStackAmount();
+        GetTarget()->CastCustomSpell(healSpell, SPELLVALUE_BASE_POINT0, healAmount, GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_putricide_mutated_plague_aura::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_putricide_mutated_plague_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1646,7 +1635,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_gaseous_bloat_aura);
     RegisterSpellScript(spell_putricide_ooze_channel);
     RegisterSpellScript(spell_putricide_ooze_eruption_searcher);
-    new spell_putricide_mutated_plague();
+    RegisterSpellScript(spell_putricide_mutated_plague_aura);
     new spell_putricide_unbound_plague();
     new spell_putricide_unbound_plague_dmg();
     new spell_putricide_choking_gas_bomb();
