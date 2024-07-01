@@ -1138,41 +1138,30 @@ public:
     }
 };
 
-class spell_dreamwalker_summon_portal : public SpellScriptLoader
+class spell_dreamwalker_summon_portal : public SpellScript
 {
-public:
-    spell_dreamwalker_summon_portal() : SpellScriptLoader("spell_dreamwalker_summon_portal") { }
+    PrepareSpellScript(spell_dreamwalker_summon_portal);
 
-    class spell_dreamwalker_summon_portal_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_dreamwalker_summon_portal_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Unit* target = GetHitUnit();
-            if (!target)
-                return;
+        uint32 spellId = (GetSpellInfo()->Id == 72224 ? 71301 : 71977); // spell implicit target replaced to TARGET_DEST_DEST
+        float minDist = 20.0f;
+        float maxDist = 30.0f;
+        float dist = (maxDist - minDist) * rand_norm() + minDist;
+        float startAngle = 3 * M_PI / 2;
+        float maxAddAngle = ((target->GetMap()->GetSpawnMode() % 2) == 0 ? M_PI : 2 * M_PI);
+        float angle = startAngle + rand_norm() * maxAddAngle;
+        target->CastSpell(target->GetPositionX() + cos(angle)*dist, target->GetPositionY() + std::sin(angle)*dist, target->GetPositionZ(), spellId, true);
+    }
 
-            uint32 spellId = (GetSpellInfo()->Id == 72224 ? 71301 : 71977); // spell implicit target replaced to TARGET_DEST_DEST
-            float minDist = 20.0f;
-            float maxDist = 30.0f;
-            float dist = (maxDist - minDist) * rand_norm() + minDist;
-            float startAngle = 3 * M_PI / 2;
-            float maxAddAngle = ((target->GetMap()->GetSpawnMode() % 2) == 0 ? M_PI : 2 * M_PI);
-            float angle = startAngle + rand_norm() * maxAddAngle;
-            target->CastSpell(target->GetPositionX() + cos(angle)*dist, target->GetPositionY() + std::sin(angle)*dist, target->GetPositionZ(), spellId, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summon_portal_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_dreamwalker_summon_portal_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summon_portal::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1531,7 +1520,7 @@ void AddSC_boss_valithria_dreamwalker()
     new npc_blistering_zombie();
     new npc_gluttonous_abomination();
 
-    new spell_dreamwalker_summon_portal();
+    RegisterSpellScript(spell_dreamwalker_summon_portal);
     new spell_dreamwalker_twisted_nightmares();
     new spell_dreamwalker_nightmare_cloud();
     new spell_dreamwalker_mana_void();
