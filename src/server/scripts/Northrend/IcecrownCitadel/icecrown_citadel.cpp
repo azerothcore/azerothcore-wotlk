@@ -2072,36 +2072,25 @@ class spell_frost_giant_death_plague : public SpellScript
     }
 };
 
-class spell_icc_harvest_blight_specimen : public SpellScriptLoader
+class spell_icc_harvest_blight_specimen : public SpellScript
 {
-public:
-    spell_icc_harvest_blight_specimen() : SpellScriptLoader("spell_icc_harvest_blight_specimen") { }
+    PrepareSpellScript(spell_icc_harvest_blight_specimen);
 
-    class spell_icc_harvest_blight_specimen_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_icc_harvest_blight_specimen_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
-        }
-
-        void HandleQuestComplete(SpellEffIndex /*effIndex*/)
-        {
-            GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_icc_harvest_blight_specimen_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            OnEffectHitTarget += SpellEffectFn(spell_icc_harvest_blight_specimen_SpellScript::HandleQuestComplete, EFFECT_1, SPELL_EFFECT_QUEST_COMPLETE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleQuestComplete(SpellEffIndex /*effIndex*/)
     {
-        return new spell_icc_harvest_blight_specimen_SpellScript();
+        GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_icc_harvest_blight_specimen::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnEffectHitTarget += SpellEffectFn(spell_icc_harvest_blight_specimen::HandleQuestComplete, EFFECT_1, SPELL_EFFECT_QUEST_COMPLETE);
     }
 };
 
@@ -3750,7 +3739,7 @@ void AddSC_icecrown_citadel()
     RegisterSpellScript(spell_icc_sprit_alarm);
     RegisterSpellScript(spell_icc_geist_alarm);
     RegisterSpellScript(spell_frost_giant_death_plague);
-    new spell_icc_harvest_blight_specimen();
+    RegisterSpellScript(spell_icc_harvest_blight_specimen);
     new spell_trigger_spell_from_caster("spell_svalna_caress_of_death", SPELL_IMPALING_SPEAR_KILL);
     new spell_svalna_revive_champion();
     new spell_svalna_remove_spear();
