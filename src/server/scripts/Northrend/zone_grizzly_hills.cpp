@@ -1215,35 +1215,24 @@ class spell_z_check_aura : public AuraScript
 };
 
 // 49181 - Warhead Fuse
-class spell_warhead_fuse : public SpellScriptLoader
+class spell_warhead_fuse_aura : public AuraScript
 {
-public:
-    spell_warhead_fuse() : SpellScriptLoader("spell_warhead_fuse") { }
+    PrepareAuraScript(spell_warhead_fuse_aura);
 
-    class spell_warhead_fuse_AuraScript : public AuraScript
+    void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_warhead_fuse_AuraScript);
-
-        void HandleOnEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        if (Unit* rocketUnit = GetTarget()->GetVehicleBase())
         {
-            if (Unit* rocketUnit = GetTarget()->GetVehicleBase())
+            if (Creature* rocketCrea = rocketUnit->ToCreature())
             {
-                if (Creature* rocketCrea = rocketUnit->ToCreature())
-                {
-                    rocketCrea->AI()->DoAction(0);
-                }
+                rocketCrea->AI()->DoAction(0);
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_warhead_fuse_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_warhead_fuse_AuraScript();
+        OnEffectRemove += AuraEffectRemoveFn(spell_warhead_fuse_aura::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1289,7 +1278,7 @@ void AddSC_grizzly_hills()
     RegisterSpellScript(spell_z_check_aura);
     RegisterSpellScript(spell_warhead_detonate);
     RegisterSpellScript(spell_vehicle_warhead_fuse);
-    new spell_warhead_fuse();
+    RegisterSpellScript(spell_warhead_fuse_aura);
     RegisterSpellScript(spell_q12227_outhouse_groans);
     RegisterSpellScript(spell_q12227_camera_shake);
     RegisterSpellScript(spell_frog_kiss);
