@@ -1744,38 +1744,27 @@ class spell_the_lich_king_jump_remove_aura : public SpellScript
     }
 };
 
-class spell_the_lich_king_play_movie : public SpellScriptLoader
+class spell_the_lich_king_play_movie : public SpellScript
 {
-public:
-    spell_the_lich_king_play_movie() : SpellScriptLoader("spell_the_lich_king_play_movie") { }
+    PrepareSpellScript(spell_the_lich_king_play_movie);
 
-    class spell_the_lich_king_play_movie_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_play_movie_SpellScript);
+        if (!sMovieStore.LookupEntry(MOVIE_FALL_OF_THE_LICH_KING))
+            return false;
+        return true;
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            if (!sMovieStore.LookupEntry(MOVIE_FALL_OF_THE_LICH_KING))
-                return false;
-            return true;
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Player* player = GetHitPlayer())
-                player->SendMovieStart(MOVIE_FALL_OF_THE_LICH_KING);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_play_movie_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_the_lich_king_play_movie_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Player* player = GetHitPlayer())
+            player->SendMovieStart(MOVIE_FALL_OF_THE_LICH_KING);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_play_movie::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -3779,7 +3768,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_jump);
     RegisterSpellScript(spell_the_lich_king_jump_remove_aura);
     new spell_trigger_spell_from_caster("spell_the_lich_king_mass_resurrection", SPELL_MASS_RESURRECTION_REAL);
-    new spell_the_lich_king_play_movie();
+    RegisterSpellScript(spell_the_lich_king_play_movie);
 
     // fight stuff below
     new npc_shambling_horror_icc();
