@@ -317,48 +317,37 @@ class spell_festergut_pungent_blight : public SpellScript
     }
 };
 
-class spell_festergut_blighted_spores : public SpellScriptLoader
+class spell_festergut_blighted_spores_aura : public AuraScript
 {
-public:
-    spell_festergut_blighted_spores() : SpellScriptLoader("spell_festergut_blighted_spores") { }
+    PrepareAuraScript(spell_festergut_blighted_spores_aura);
 
-    class spell_festergut_blighted_spores_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_festergut_blighted_spores_AuraScript);
+        return ValidateSpellInfo({ SPELL_INOCULATED });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_INOCULATED });
-        }
-
-        void ExtraEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            if (Aura* a = aurEff->GetBase())
-                if (a->GetDuration() > a->GetMaxDuration() - 1000) // this does not stack for different casters and previous is removed by new DoT, prevent it from giving inoculation in such case
-                    return;
-            uint32 inoculatedId = sSpellMgr->GetSpellIdForDifficulty(SPELL_INOCULATED, GetTarget());
-            uint8 inoculatedStack = 1;
-            if (Aura* a = GetTarget()->GetAura(inoculatedId))
-            {
-                inoculatedStack += a->GetStackAmount();
-                if (a->GetDuration() > a->GetMaxDuration() - 10000) // player may gain only one stack at a time, no matter how many spores explode near him
-                    return;
-            }
-            GetTarget()->CastSpell(GetTarget(), SPELL_INOCULATED, true);
-            if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-                if (Creature* festergut = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_FESTERGUT)))
-                    festergut->AI()->SetData(DATA_INOCULATED_STACK, inoculatedStack);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_festergut_blighted_spores_AuraScript::ExtraEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void ExtraEffect(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_festergut_blighted_spores_AuraScript();
+        if (Aura* a = aurEff->GetBase())
+            if (a->GetDuration() > a->GetMaxDuration() - 1000) // this does not stack for different casters and previous is removed by new DoT, prevent it from giving inoculation in such case
+                return;
+        uint32 inoculatedId = sSpellMgr->GetSpellIdForDifficulty(SPELL_INOCULATED, GetTarget());
+        uint8 inoculatedStack = 1;
+        if (Aura* a = GetTarget()->GetAura(inoculatedId))
+        {
+            inoculatedStack += a->GetStackAmount();
+            if (a->GetDuration() > a->GetMaxDuration() - 10000) // player may gain only one stack at a time, no matter how many spores explode near him
+                return;
+        }
+        GetTarget()->CastSpell(GetTarget(), SPELL_INOCULATED, true);
+        if (InstanceScript* instance = GetTarget()->GetInstanceScript())
+            if (Creature* festergut = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_FESTERGUT)))
+                festergut->AI()->SetData(DATA_INOCULATED_STACK, inoculatedStack);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_festergut_blighted_spores_aura::ExtraEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -486,7 +475,7 @@ void AddSC_boss_festergut()
 {
     new boss_festergut();
     RegisterSpellScript(spell_festergut_pungent_blight);
-    new spell_festergut_blighted_spores();
+    RegisterSpellScript(spell_festergut_blighted_spores_aura);
     new spell_festergut_gastric_bloat();
     new achievement_flu_shot_shortage();
 
