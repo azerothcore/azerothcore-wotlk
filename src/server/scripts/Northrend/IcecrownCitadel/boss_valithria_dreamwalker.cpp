@@ -1165,34 +1165,23 @@ class spell_dreamwalker_summon_portal : public SpellScript
     }
 };
 
-class spell_dreamwalker_twisted_nightmares : public SpellScriptLoader
+class spell_dreamwalker_twisted_nightmares : public SpellScript
 {
-public:
-    spell_dreamwalker_twisted_nightmares() : SpellScriptLoader("spell_dreamwalker_twisted_nightmares") { }
+    PrepareSpellScript(spell_dreamwalker_twisted_nightmares);
 
-    class spell_dreamwalker_twisted_nightmares_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_dreamwalker_twisted_nightmares_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit())
+            return;
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit())
-                return;
+        if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
+            GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
+    }
 
-            if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_twisted_nightmares_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_dreamwalker_twisted_nightmares_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_twisted_nightmares::HandleScript, EFFECT_2, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
@@ -1521,7 +1510,7 @@ void AddSC_boss_valithria_dreamwalker()
     new npc_gluttonous_abomination();
 
     RegisterSpellScript(spell_dreamwalker_summon_portal);
-    new spell_dreamwalker_twisted_nightmares();
+    RegisterSpellScript(spell_dreamwalker_twisted_nightmares);
     new spell_dreamwalker_nightmare_cloud();
     new spell_dreamwalker_mana_void();
     new spell_dreamwalker_decay_periodic_timer();
