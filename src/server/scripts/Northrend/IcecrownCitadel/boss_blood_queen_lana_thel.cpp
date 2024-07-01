@@ -863,29 +863,18 @@ class spell_blood_queen_vampiric_bite : public SpellScript
     }
 };
 
-class spell_blood_queen_swarming_shadows_floor_dmg : public SpellScriptLoader
+class spell_blood_queen_swarming_shadows_floor_dmg : public SpellScript
 {
-public:
-    spell_blood_queen_swarming_shadows_floor_dmg() : SpellScriptLoader("spell_blood_queen_swarming_shadows_floor_dmg") { }
+    PrepareSpellScript(spell_blood_queen_swarming_shadows_floor_dmg);
 
-    class spell_blood_queen_swarming_shadows_floor_dmg_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_blood_queen_swarming_shadows_floor_dmg_SpellScript);
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_swarming_shadows_floor_dmg_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_queen_swarming_shadows_floor_dmg_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_swarming_shadows_floor_dmg::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -949,7 +938,7 @@ void AddSC_boss_blood_queen_lana_thel()
     RegisterSpellScript(spell_blood_queen_frenzied_bloodthirst_aura);
     RegisterSpellScript(spell_blood_queen_essence_of_the_blood_queen_aura);
     RegisterSpellScript(spell_blood_queen_vampiric_bite);
-    new spell_blood_queen_swarming_shadows_floor_dmg();
+    RegisterSpellScript(spell_blood_queen_swarming_shadows_floor_dmg);
     new spell_blood_queen_presence_of_the_darkfallen();
     new achievement_once_bitten_twice_shy("achievement_once_bitten_twice_shy_n_10", 0, false);
     new achievement_once_bitten_twice_shy("achievement_once_bitten_twice_shy_v_10", 0, true);
