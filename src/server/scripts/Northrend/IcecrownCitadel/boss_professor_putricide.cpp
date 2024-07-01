@@ -1357,74 +1357,73 @@ class spell_putricide_mutation_init_aura : public AuraScript
     }
 };
 
-class spell_putricide_mutated_transformation : public SpellScriptLoader
+class spell_putricide_mutated_transformation : public SpellScript
 {
-public:
-    spell_putricide_mutated_transformation() : SpellScriptLoader("spell_putricide_mutated_transformation") { }
+    PrepareSpellScript(spell_putricide_mutated_transformation);
 
-    class spell_putricide_mutated_transformation_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_putricide_mutated_transformation_SpellScript);
+        return ValidateSpellInfo({
+            SPELL_ABOMINATION_VEHICLE_POWER_DRAIN,
+            SPELL_MUTATED_TRANSFORMATION_DAMAGE,
+            SPELL_MUTATED_TRANSFORMATION_NAME,
+            VEHICLE_SPELL_RIDE_HARDCODED
+        });
+    }
 
-        void HandleSummon(SpellEffIndex effIndex)
+    void HandleSummon(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Unit* caster = GetOriginalCaster();
+        if (!caster)
+            return;
+
+        InstanceScript* instance = caster->GetInstanceScript();
+        if (!instance)
+            return;
+
+        Creature* putricide = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
+        if (!putricide)
+            return;
+
+        if (putricide->AI()->GetData(DATA_ABOMINATION))
         {
-            PreventHitDefaultEffect(effIndex);
-            Unit* caster = GetOriginalCaster();
-            if (!caster)
-                return;
-
-            InstanceScript* instance = caster->GetInstanceScript();
-            if (!instance)
-                return;
-
-            Creature* putricide = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
-            if (!putricide)
-                return;
-
-            if (putricide->AI()->GetData(DATA_ABOMINATION))
-            {
-                if (Player* player = caster->ToPlayer())
-                    Spell::SendCastResult(player, GetSpellInfo(), 0, SPELL_FAILED_CUSTOM_ERROR, SPELL_CUSTOM_ERROR_TOO_MANY_ABOMINATIONS);
-                return;
-            }
-
-            if (!putricide->IsInCombat())
-                putricide->SetInCombatWithZone();
-
-            uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
-            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
-            uint32 duration = uint32(GetSpellInfo()->GetDuration());
-
-            Position pos = caster->GetPosition();
-            TempSummon* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id);
-            if (!summon || !summon->IsVehicle())
-                return;
-
-            summon->CastSpell(summon, SPELL_ABOMINATION_VEHICLE_POWER_DRAIN, true);
-            summon->CastSpell(summon, SPELL_MUTATED_TRANSFORMATION_DAMAGE, true);
-            caster->CastSpell(summon, SPELL_MUTATED_TRANSFORMATION_NAME, true);
-
-            //EnterVehicle(summon, 0);    // VEHICLE_SPELL_RIDE_HARDCODED is used according to sniff, this is ok
-            caster->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, 1, summon, TRIGGERED_FULL_MASK);
-            summon->SetCreatorGUID(caster->GetGUID());
-            putricide->AI()->JustSummoned(summon);
-
-            summon->setPowerType(POWER_ENERGY);
-            summon->SetMaxPower(POWER_ENERGY, 100);
-            summon->SetPower(POWER_ENERGY, 0);
-            summon->SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER, 0);
-            summon->SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 0);
+            if (Player* player = caster->ToPlayer())
+                Spell::SendCastResult(player, GetSpellInfo(), 0, SPELL_FAILED_CUSTOM_ERROR, SPELL_CUSTOM_ERROR_TOO_MANY_ABOMINATIONS);
+            return;
         }
 
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_putricide_mutated_transformation_SpellScript::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
-        }
-    };
+        if (!putricide->IsInCombat())
+            putricide->SetInCombatWithZone();
 
-    SpellScript* GetSpellScript() const override
+        uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
+        SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
+        uint32 duration = uint32(GetSpellInfo()->GetDuration());
+
+        Position pos = caster->GetPosition();
+        TempSummon* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id);
+        if (!summon || !summon->IsVehicle())
+            return;
+
+        summon->CastSpell(summon, SPELL_ABOMINATION_VEHICLE_POWER_DRAIN, true);
+        summon->CastSpell(summon, SPELL_MUTATED_TRANSFORMATION_DAMAGE, true);
+        caster->CastSpell(summon, SPELL_MUTATED_TRANSFORMATION_NAME, true);
+
+        //EnterVehicle(summon, 0);    // VEHICLE_SPELL_RIDE_HARDCODED is used according to sniff, this is ok
+        caster->CastCustomSpell(VEHICLE_SPELL_RIDE_HARDCODED, SPELLVALUE_BASE_POINT0, 1, summon, TRIGGERED_FULL_MASK);
+        summon->SetCreatorGUID(caster->GetGUID());
+        putricide->AI()->JustSummoned(summon);
+
+        summon->setPowerType(POWER_ENERGY);
+        summon->SetMaxPower(POWER_ENERGY, 100);
+        summon->SetPower(POWER_ENERGY, 0);
+        summon->SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER, 0);
+        summon->SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 0);
+    }
+
+    void Register() override
     {
-        return new spell_putricide_mutated_transformation_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_putricide_mutated_transformation::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
     }
 };
 
@@ -1581,7 +1580,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_choking_gas_bomb);
     RegisterSpellScript(spell_putricide_clear_aura_effect_value);
     RegisterSpellAndAuraScriptPair(spell_putricide_mutation_init, spell_putricide_mutation_init_aura);
-    new spell_putricide_mutated_transformation();
+    RegisterSpellScript(spell_putricide_mutated_transformation);
     new spell_putricide_mutated_transformation_dismiss();
     new spell_putricide_mutated_transformation_dmg();
     new spell_putricide_eat_ooze();
