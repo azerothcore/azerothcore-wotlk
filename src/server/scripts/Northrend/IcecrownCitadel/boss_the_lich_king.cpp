@@ -3321,32 +3321,26 @@ class spell_the_lich_king_dark_hunger_aura : public AuraScript
     }
 };
 
-class spell_the_lich_king_soul_rip : public SpellScriptLoader
+class spell_the_lich_king_soul_rip_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_soul_rip() : SpellScriptLoader("spell_the_lich_king_soul_rip") { }
+    PrepareAuraScript(spell_the_lich_king_soul_rip_aura);
 
-    class spell_the_lich_king_soul_rip_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_soul_rip_AuraScript);
+        return ValidateSpellInfo({ SPELL_SOUL_RIP_DAMAGE, 5000 });
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            // shouldn't be needed, this is channeled
-            if (Unit* caster = GetCaster())
-                caster->CastCustomSpell(SPELL_SOUL_RIP_DAMAGE, SPELLVALUE_BASE_POINT0, 5000 * aurEff->GetTickNumber(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_soul_rip_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_the_lich_king_soul_rip_AuraScript();
+        PreventDefaultAction();
+        // shouldn't be needed, this is channeled
+        if (Unit* caster = GetCaster())
+            caster->CastCustomSpell(SPELL_SOUL_RIP_DAMAGE, SPELLVALUE_BASE_POINT0, 5000 * aurEff->GetTickNumber(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_soul_rip_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -3593,7 +3587,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_restore_soul);
     new npc_spirit_warden();
     RegisterSpellScript(spell_the_lich_king_dark_hunger_aura);
-    new spell_the_lich_king_soul_rip();
+    RegisterSpellScript(spell_the_lich_king_soul_rip_aura);
     new npc_icc_lk_checktarget();
     new spell_the_lich_king_summon_spirit_bomb();
     new npc_lk_spirit_bomb();
