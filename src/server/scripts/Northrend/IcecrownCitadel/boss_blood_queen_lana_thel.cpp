@@ -679,51 +679,40 @@ private:
     LanaThelAI* _ai;
 };
 
-class spell_blood_queen_bloodbolt : public SpellScriptLoader
+class spell_blood_queen_bloodbolt : public SpellScript
 {
-public:
-    spell_blood_queen_bloodbolt() : SpellScriptLoader("spell_blood_queen_bloodbolt") { }
+    PrepareSpellScript(spell_blood_queen_bloodbolt);
 
-    class spell_blood_queen_bloodbolt_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_blood_queen_bloodbolt_SpellScript);
+        return ValidateSpellInfo({ SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL });
-        }
-
-        bool Load() override
-        {
-            return GetCaster()->GetEntry() == NPC_BLOOD_QUEEN_LANA_THEL;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            uint32 targetCount = (targets.size() + 2) / 3;
-            targets.remove_if(BloodboltHitCheck(static_cast<LanaThelAI*>(GetCaster()->GetAI())));
-            Acore::Containers::RandomResize(targets, targetCount);
-            // mark targets now, effect hook has missile travel time delay (might cast next in that time)
-            for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                GetCaster()->GetAI()->SetGUID((*itr)->GetGUID(), GUID_BLOODBOLT);
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetHitUnit(), SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_bloodbolt_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_blood_queen_bloodbolt_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_blood_queen_bloodbolt_SpellScript();
+        return GetCaster()->GetEntry() == NPC_BLOOD_QUEEN_LANA_THEL;
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        uint32 targetCount = (targets.size() + 2) / 3;
+        targets.remove_if(BloodboltHitCheck(static_cast<LanaThelAI*>(GetCaster()->GetAI())));
+        Acore::Containers::RandomResize(targets, targetCount);
+        // mark targets now, effect hook has missile travel time delay (might cast next in that time)
+        for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            GetCaster()->GetAI()->SetGUID((*itr)->GetGUID(), GUID_BLOODBOLT);
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_bloodbolt::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_blood_queen_bloodbolt::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -984,7 +973,7 @@ void AddSC_boss_blood_queen_lana_thel()
     RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_aura);
     RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen);
     RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_target);
-    new spell_blood_queen_bloodbolt();
+    RegisterSpellScript(spell_blood_queen_bloodbolt);
     new spell_blood_queen_frenzied_bloodthirst();
     new spell_blood_queen_essence_of_the_blood_queen();
     new spell_blood_queen_vampiric_bite();
