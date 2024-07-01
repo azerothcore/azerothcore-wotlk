@@ -1427,30 +1427,19 @@ class spell_putricide_mutated_transformation : public SpellScript
     }
 };
 
-class spell_putricide_mutated_transformation_dismiss : public SpellScriptLoader
+class spell_putricide_mutated_transformation_dismiss_aura : public AuraScript
 {
-public:
-    spell_putricide_mutated_transformation_dismiss() : SpellScriptLoader("spell_putricide_mutated_transformation_dismiss") { }
+    PrepareAuraScript(spell_putricide_mutated_transformation_dismiss_aura);
 
-    class spell_putricide_mutated_transformation_dismiss_AuraScript : public AuraScript
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_putricide_mutated_transformation_dismiss_AuraScript);
+        if (Vehicle* veh = GetTarget()->GetVehicleKit())
+            veh->RemoveAllPassengers();
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Vehicle* veh = GetTarget()->GetVehicleKit())
-                veh->RemoveAllPassengers();
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_putricide_mutated_transformation_dismiss_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_putricide_mutated_transformation_dismiss_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_putricide_mutated_transformation_dismiss_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1581,7 +1570,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_clear_aura_effect_value);
     RegisterSpellAndAuraScriptPair(spell_putricide_mutation_init, spell_putricide_mutation_init_aura);
     RegisterSpellScript(spell_putricide_mutated_transformation);
-    new spell_putricide_mutated_transformation_dismiss();
+    RegisterSpellScript(spell_putricide_mutated_transformation_dismiss_aura);
     new spell_putricide_mutated_transformation_dmg();
     new spell_putricide_eat_ooze();
     new spell_putricide_regurgitated_ooze();
