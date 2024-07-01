@@ -40,3 +40,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_igb_overheat_aura' WHERE `sp
 UPDATE `spell_script_names` SET `ScriptName`='spell_igb_on_gunship_deck_aura' WHERE `spell_id` IN (70120,70121) AND `ScriptName`='spell_igb_on_gunship_deck';
 UPDATE `spell_script_names` SET `ScriptName`='spell_blood_council_shadow_prison_aura' WHERE `spell_id`=73001 AND `ScriptName`='spell_blood_council_shadow_prison';
 UPDATE `spell_script_names` SET `ScriptName`='spell_valanar_kinetic_bomb_absorb_aura' WHERE `spell_id`=72054 AND `ScriptName`='spell_valanar_kinetic_bomb_absorb';
+UPDATE `spell_script_names` SET `ScriptName`='spell_rotface_unstable_ooze_explosion_suicide_aura' WHERE `spell_id`=71441 AND `ScriptName`='spell_rotface_unstable_ooze_explosion_suicide';

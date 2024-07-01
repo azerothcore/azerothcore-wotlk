@@ -784,37 +784,26 @@ class spell_rotface_unstable_ooze_explosion : public SpellScript
     }
 };
 
-class spell_rotface_unstable_ooze_explosion_suicide : public SpellScriptLoader
+class spell_rotface_unstable_ooze_explosion_suicide_aura : public AuraScript
 {
-public:
-    spell_rotface_unstable_ooze_explosion_suicide() : SpellScriptLoader("spell_rotface_unstable_ooze_explosion_suicide") { }
+    PrepareAuraScript(spell_rotface_unstable_ooze_explosion_suicide_aura);
 
-    class spell_rotface_unstable_ooze_explosion_suicide_AuraScript : public AuraScript
+    void DespawnSelf(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_rotface_unstable_ooze_explosion_suicide_AuraScript);
+        PreventDefaultAction();
+        Unit* target = GetTarget();
+        if (target->GetTypeId() != TYPEID_UNIT)
+            return;
 
-        void DespawnSelf(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            Unit* target = GetTarget();
-            if (target->GetTypeId() != TYPEID_UNIT)
-                return;
+        target->SetVisible(false);
+        target->RemoveAllAuras();
+        //target->ToCreature()->DespawnOrUnsummon();
+        target->ToCreature()->DespawnOrUnsummon(60000);
+    }
 
-            target->SetVisible(false);
-            target->RemoveAllAuras();
-            //target->ToCreature()->DespawnOrUnsummon();
-            target->ToCreature()->DespawnOrUnsummon(60000);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_rotface_unstable_ooze_explosion_suicide_AuraScript::DespawnSelf, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_rotface_unstable_ooze_explosion_suicide_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_rotface_unstable_ooze_explosion_suicide_aura::DespawnSelf, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -920,7 +909,7 @@ void AddSC_boss_rotface()
     RegisterSpellScript(spell_rotface_large_ooze_buff_combine);
     RegisterSpellScript(spell_rotface_unstable_ooze_explosion_init);
     RegisterSpellScript(spell_rotface_unstable_ooze_explosion);
-    new spell_rotface_unstable_ooze_explosion_suicide();
+    RegisterSpellScript(spell_rotface_unstable_ooze_explosion_suicide_aura);
 
     new npc_precious_icc();
 }
