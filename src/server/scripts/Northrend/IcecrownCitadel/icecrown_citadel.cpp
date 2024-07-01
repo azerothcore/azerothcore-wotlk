@@ -2386,32 +2386,26 @@ class spell_icc_yh_volley_aura : public AuraScript
     }
 };
 
-class spell_icc_yd_summon_undead : public SpellScriptLoader
+class spell_icc_yd_summon_undead : public SpellScript
 {
-public:
-    spell_icc_yd_summon_undead() : SpellScriptLoader("spell_icc_yd_summon_undead") { }
+    PrepareSpellScript(spell_icc_yd_summon_undead);
 
-    class spell_icc_yd_summon_undead_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_icc_yd_summon_undead_SpellScript);
+        return ValidateSpellInfo({ 71302 });
+    }
 
-        void HandleDummyLaunch(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* c = GetCaster())
-                if (c->GetMapId() == 631)
-                    for (uint8 i = 0; i < 5; ++i)
-                        c->CastSpell(c, 71302, true);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_icc_yd_summon_undead_SpellScript::HandleDummyLaunch, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummyLaunch(SpellEffIndex /*effIndex*/)
     {
-        return new spell_icc_yd_summon_undead_SpellScript();
+        if (Unit* c = GetCaster())
+            if (c->GetMapId() == 631)
+                for (uint8 i = 0; i < 5; ++i)
+                    c->CastSpell(c, 71302, true);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_icc_yd_summon_undead::HandleDummyLaunch, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -3692,7 +3686,7 @@ void AddSC_icecrown_citadel()
     RegisterSpellScript(spell_stinky_precious_decimate);
     RegisterSpellScript(spell_icc_yf_frozen_orb_aura);
     RegisterSpellScript(spell_icc_yh_volley_aura);
-    new spell_icc_yd_summon_undead();
+    RegisterSpellScript(spell_icc_yd_summon_undead);
     new spell_icc_shattered_bones();
     new npc_icc_skybreaker_hierophant();
     new npc_icc_skybreaker_marksman();
