@@ -2556,49 +2556,39 @@ class spell_igb_below_zero : public SpellScript
     }
 };
 
-class spell_igb_on_gunship_deck : public SpellScriptLoader
+class spell_igb_on_gunship_deck_aura : public AuraScript
 {
-public:
-    spell_igb_on_gunship_deck() : SpellScriptLoader("spell_igb_on_gunship_deck") { }
+    PrepareAuraScript(spell_igb_on_gunship_deck_aura);
 
-    class spell_igb_on_gunship_deck_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_igb_on_gunship_deck_AuraScript);
-
-        bool Load() override
-        {
-            if (InstanceScript* instance = GetOwner()->GetInstanceScript())
-                _teamIdInInstance = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
-            else
-                _teamIdInInstance = TEAM_ALLIANCE;
-            return true;
-        }
-
-        bool CheckAreaTarget(Unit* unit)
-        {
-            return unit->GetTypeId() == TYPEID_PLAYER;
-        }
-
-        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            bool enemy = GetSpellInfo()->Id == uint32(_teamIdInInstance == TEAM_HORDE ? SPELL_ON_SKYBREAKER_DECK : SPELL_ON_ORGRIMS_HAMMER_DECK);
-            if (Creature* gunship = GetOwner()->FindNearestCreature(_teamIdInInstance == TEAM_HORDE ? NPC_ORGRIMS_HAMMER : NPC_THE_SKYBREAKER, 200.0f))
-                gunship->AI()->SetGUID(GetTarget()->GetGUID(), enemy ? ACTION_SHIP_VISITS_ENEMY : ACTION_SHIP_VISITS_SELF);
-        }
-
-        void Register() override
-        {
-            DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_on_gunship_deck_AuraScript::CheckAreaTarget);
-            AfterEffectApply += AuraEffectApplyFn(spell_igb_on_gunship_deck_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-        TeamId _teamIdInInstance;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_igb_on_gunship_deck_AuraScript();
+        if (InstanceScript* instance = GetOwner()->GetInstanceScript())
+            _teamIdInInstance = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
+        else
+            _teamIdInInstance = TEAM_ALLIANCE;
+        return true;
     }
+
+    bool CheckAreaTarget(Unit* unit)
+    {
+        return unit->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        bool enemy = GetSpellInfo()->Id == uint32(_teamIdInInstance == TEAM_HORDE ? SPELL_ON_SKYBREAKER_DECK : SPELL_ON_ORGRIMS_HAMMER_DECK);
+        if (Creature* gunship = GetOwner()->FindNearestCreature(_teamIdInInstance == TEAM_HORDE ? NPC_ORGRIMS_HAMMER : NPC_THE_SKYBREAKER, 200.0f))
+            gunship->AI()->SetGUID(GetTarget()->GetGUID(), enemy ? ACTION_SHIP_VISITS_ENEMY : ACTION_SHIP_VISITS_SELF);
+    }
+
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_on_gunship_deck_aura::CheckAreaTarget);
+        AfterEffectApply += AuraEffectApplyFn(spell_igb_on_gunship_deck_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+
+private:
+    TeamId _teamIdInInstance;
 };
 
 class achievement_im_on_a_boat : public AchievementCriteriaScript
@@ -2657,7 +2647,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_rocket_artillery);
     RegisterSpellScript(spell_igb_rocket_artillery_explosion);
     RegisterSpellScript(spell_igb_below_zero);
-    new spell_igb_on_gunship_deck();
+    RegisterSpellScript(spell_igb_on_gunship_deck_aura);
     new achievement_im_on_a_boat();
     RegisterSpellScript(spell_igb_battle_experience_check);
 }
