@@ -1459,55 +1459,49 @@ class spell_putricide_mutated_transformation_dmg : public SpellScript
     }
 };
 
-class spell_putricide_eat_ooze : public SpellScriptLoader
+class spell_putricide_eat_ooze : public SpellScript
 {
-public:
-    spell_putricide_eat_ooze() : SpellScriptLoader("spell_putricide_eat_ooze") { }
+    PrepareSpellScript(spell_putricide_eat_ooze);
 
-    class spell_putricide_eat_ooze_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_putricide_eat_ooze_SpellScript);
+        return ValidateSpellInfo({ SPELL_GROW_STACKER });
+    }
 
-        void SelectTarget(std::list<WorldObject*>& targets)
+    void SelectTarget(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            return;
+
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        WorldObject* target = targets.front();
+        targets.clear();
+        targets.push_back(target);
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        Creature* target = GetHitCreature();
+        if (!target)
+            return;
+
+        if (Aura* grow = target->GetAura(uint32(GetEffectValue())))
         {
-            if (targets.empty())
-                return;
-
-            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
-            WorldObject* target = targets.front();
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            Creature* target = GetHitCreature();
-            if (!target)
-                return;
-
-            if (Aura* grow = target->GetAura(uint32(GetEffectValue())))
+            if (grow->GetStackAmount() <= 4)
             {
-                if (grow->GetStackAmount() <= 4)
-                {
-                    target->RemoveAurasDueToSpell(SPELL_GROW_STACKER);
-                    target->RemoveAura(grow);
-                    target->DespawnOrUnsummon(1);
-                }
-                else
-                    grow->ModStackAmount(-4);
+                target->RemoveAurasDueToSpell(SPELL_GROW_STACKER);
+                target->RemoveAura(grow);
+                target->DespawnOrUnsummon(1);
             }
+            else
+                grow->ModStackAmount(-4);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_putricide_eat_ooze_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_eat_ooze_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_putricide_eat_ooze_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_putricide_eat_ooze::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_eat_ooze::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
     }
 };
 
@@ -1561,7 +1555,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_mutated_transformation);
     RegisterSpellScript(spell_putricide_mutated_transformation_dismiss_aura);
     RegisterSpellScript(spell_putricide_mutated_transformation_dmg);
-    new spell_putricide_eat_ooze();
+    RegisterSpellScript(spell_putricide_eat_ooze);
     new spell_putricide_regurgitated_ooze();
 }
 
