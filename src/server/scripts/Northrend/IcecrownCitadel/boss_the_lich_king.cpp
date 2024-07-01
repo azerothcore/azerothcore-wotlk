@@ -2721,14 +2721,14 @@ class spell_the_lich_king_valkyr_target_search : public SpellScript
     }
 };
 
-class spell_the_lich_king_cast_back_to_caster : public SpellScriptLoader
+class spell_the_lich_king_cast_back_to_caster : public SpellScript
 {
-public:
-    spell_the_lich_king_cast_back_to_caster() :  SpellScriptLoader("spell_the_lich_king_cast_back_to_caster") { }
+    PrepareSpellScript(spell_the_lich_king_cast_back_to_caster);
 
-    class spell_the_lich_king_cast_back_to_caster_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_the_lich_king_cast_back_to_caster_SpellScript);
+        GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+    }
 
     void Register() override
     {
@@ -2867,7 +2867,7 @@ class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScript
 
     SpellScript* GetSpellScript() const override
     {
-        return new spell_the_lich_king_cast_back_to_caster_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_cast_back_to_caster::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -3796,7 +3796,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_summon_into_air);
     RegisterSpellScript(spell_the_lich_king_teleport_to_frostmourne_hc);
     RegisterSpellScript(spell_the_lich_king_valkyr_target_search);
-    new spell_the_lich_king_cast_back_to_caster();
+    RegisterSpellScript(spell_the_lich_king_cast_back_to_caster);
     new spell_the_lich_king_life_siphon();
     new spell_the_lich_king_vile_spirits();
     new spell_the_lich_king_vile_spirits_visual();
