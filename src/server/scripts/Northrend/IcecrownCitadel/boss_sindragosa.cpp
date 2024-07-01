@@ -1026,83 +1026,73 @@ class spell_sindragosa_ice_tomb_filter : public SpellScript
     }
 };
 
-class spell_sindragosa_ice_tomb : public SpellScriptLoader
+class spell_sindragosa_ice_tomb_trap : public SpellScript
 {
-public:
-    spell_sindragosa_ice_tomb() : SpellScriptLoader("spell_sindragosa_ice_tomb_trap") { }
+    PrepareSpellScript(spell_sindragosa_ice_tomb_trap);
 
-    class spell_sindragosa_ice_tomb_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_sindragosa_ice_tomb_SpellScript);
-
-        std::list<WorldObject*> targetList;
-
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            if (!sObjectMgr->GetCreatureTemplate(NPC_ICE_TOMB))
-                return false;
-            if (!sObjectMgr->GetGameObjectTemplate(GO_ICE_BLOCK))
-                return false;
-            return true;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            unitList.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
-            targetList.clear();
-            targetList = unitList;
-        }
-
-        void FilterTargetsSubseq(std::list<WorldObject*>& unitList)
-        {
-            unitList.clear();
-            unitList = targetList;
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_SpellScript::FilterTargetsSubseq, EFFECT_2, TARGET_UNIT_DEST_AREA_ENEMY);
-        }
-    };
-
-    class spell_sindragosa_ice_tomb_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_sindragosa_ice_tomb_AuraScript);
-
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-        }
-
-        void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* c = GetCaster())
-                GetTarget()->m_Events.AddEvent(new IceTombSummonEvent(GetTarget(), c->GetGUID()), GetTarget()->m_Events.CalculateTime(500));
-        }
-
-        void ExtraRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
-            GetTarget()->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_ice_tomb_AuraScript::PeriodicTick, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_sindragosa_ice_tomb_AuraScript::ExtraRemoveEffect, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectApply += AuraEffectApplyFn(spell_sindragosa_ice_tomb_AuraScript::AfterApply, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_sindragosa_ice_tomb_SpellScript();
+        if (!sObjectMgr->GetCreatureTemplate(NPC_ICE_TOMB))
+            return false;
+        if (!sObjectMgr->GetGameObjectTemplate(GO_ICE_BLOCK))
+            return false;
+        return true;
     }
 
-    AuraScript* GetAuraScript() const override
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        return new spell_sindragosa_ice_tomb_AuraScript();
+        unitList.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+        _targetList.clear();
+        _targetList = unitList;
+    }
+
+    void FilterTargetsSubseq(std::list<WorldObject*>& unitList)
+    {
+        unitList.clear();
+        unitList = _targetList;
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_trap::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_trap::FilterTargetsSubseq, EFFECT_2, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
+
+private:
+    std::list<WorldObject*> _targetList;
+};
+
+class spell_sindragosa_ice_tomb_trap_aura : public AuraScript
+{
+    PrepareAuraScript(spell_sindragosa_ice_tomb_trap_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ASPHYXIATION, SPELL_ICE_TOMB_UNTARGETABLE });
+    }
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+    }
+
+    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* c = GetCaster())
+            GetTarget()->m_Events.AddEvent(new IceTombSummonEvent(GetTarget(), c->GetGUID()), GetTarget()->m_Events.CalculateTime(500));
+    }
+
+    void ExtraRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
+        GetTarget()->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_ice_tomb_trap_aura::PeriodicTick, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_sindragosa_ice_tomb_trap_aura::ExtraRemoveEffect, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_sindragosa_ice_tomb_trap_aura::AfterApply, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1889,9 +1879,9 @@ void AddSC_boss_sindragosa()
     new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb", SPELL_ICE_TOMB_DUMMY);
     new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb_dummy", SPELL_FROST_BEACON);
     RegisterSpellScript(spell_sindragosa_frost_beacon_aura);
-    new spell_sindragosa_ice_tomb();
-    new spell_sindragosa_mystic_buffet();
-    new spell_sindragosa_soul_preservation();
+    RegisterSpellAndAuraScriptPair(spell_sindragosa_ice_tomb_trap, spell_sindragosa_ice_tomb_trap_aura);
+    RegisterSpellScript(spell_sindragosa_mystic_buffet);
+    RegisterSpellScript(spell_sindragosa_soul_preservation_aura);
     new achievement_all_you_can_eat();
 
     new npc_spinestalker();
