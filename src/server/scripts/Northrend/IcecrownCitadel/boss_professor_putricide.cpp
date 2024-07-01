@@ -1096,34 +1096,28 @@ private:
     WorldObject* _target;
 };
 
-class spell_putricide_ooze_eruption_searcher : public SpellScriptLoader
+class spell_putricide_ooze_eruption_searcher : public SpellScript
 {
-public:
-    spell_putricide_ooze_eruption_searcher() : SpellScriptLoader("spell_putricide_ooze_eruption_searcher") { }
+    PrepareSpellScript(spell_putricide_ooze_eruption_searcher);
 
-    class spell_putricide_ooze_eruption_searcher_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_putricide_ooze_eruption_searcher_SpellScript);
+        return ValidateSpellInfo({ SPELL_OOZE_ERUPTION });
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            uint32 adhesiveId = sSpellMgr->GetSpellIdForDifficulty(SPELL_VOLATILE_OOZE_ADHESIVE, GetCaster());
-            if (GetHitUnit()->HasAura(adhesiveId))
-            {
-                GetHitUnit()->RemoveAurasDueToSpell(adhesiveId, GetCaster()->GetGUID(), 0, AURA_REMOVE_BY_ENEMY_SPELL);
-                GetCaster()->CastSpell(GetHitUnit(), SPELL_OOZE_ERUPTION, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_putricide_ooze_eruption_searcher_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_putricide_ooze_eruption_searcher_SpellScript();
+        uint32 adhesiveId = sSpellMgr->GetSpellIdForDifficulty(SPELL_VOLATILE_OOZE_ADHESIVE, GetCaster());
+        if (GetHitUnit()->HasAura(adhesiveId))
+        {
+            GetHitUnit()->RemoveAurasDueToSpell(adhesiveId, GetCaster()->GetGUID(), 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            GetCaster()->CastSpell(GetHitUnit(), SPELL_OOZE_ERUPTION, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_putricide_ooze_eruption_searcher::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1651,7 +1645,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_tear_gas_effect);
     RegisterSpellScript(spell_putricide_gaseous_bloat_aura);
     RegisterSpellScript(spell_putricide_ooze_channel);
-    new spell_putricide_ooze_eruption_searcher();
+    RegisterSpellScript(spell_putricide_ooze_eruption_searcher);
     new spell_putricide_mutated_plague();
     new spell_putricide_unbound_plague();
     new spell_putricide_unbound_plague_dmg();
