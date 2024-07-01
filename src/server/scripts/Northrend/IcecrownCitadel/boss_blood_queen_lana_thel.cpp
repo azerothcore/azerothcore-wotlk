@@ -649,30 +649,19 @@ class spell_blood_queen_pact_of_the_darkfallen : public SpellScript
     }
 };
 
-class spell_blood_queen_pact_of_the_darkfallen_dmg_target : public SpellScriptLoader
+class spell_blood_queen_pact_of_the_darkfallen_dmg_target : public SpellScript
 {
-public:
-    spell_blood_queen_pact_of_the_darkfallen_dmg_target() : SpellScriptLoader("spell_blood_queen_pact_of_the_darkfallen_dmg_target") { }
+    PrepareSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_target);
 
-    class spell_blood_queen_pact_of_the_darkfallen_dmg_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        PrepareSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_SpellScript);
+        unitList.remove_if(Acore::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
+        unitList.push_back(GetCaster());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            unitList.remove_if(Acore::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
-            unitList.push_back(GetCaster());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_pact_of_the_darkfallen_dmg_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_queen_pact_of_the_darkfallen_dmg_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_pact_of_the_darkfallen_dmg_target::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
     }
 };
 
@@ -994,7 +983,7 @@ void AddSC_boss_blood_queen_lana_thel()
     new boss_blood_queen_lana_thel();
     RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_aura);
     RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen);
-    new spell_blood_queen_pact_of_the_darkfallen_dmg_target();
+    RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_target);
     new spell_blood_queen_bloodbolt();
     new spell_blood_queen_frenzied_bloodthirst();
     new spell_blood_queen_essence_of_the_blood_queen();
