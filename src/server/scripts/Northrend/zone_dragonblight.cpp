@@ -931,30 +931,19 @@ enum eFrostmourneCavern
     NPC_PRINCE_ARTHAS               = 27455,
 };
 
-class spell_q12478_frostmourne_cavern : public SpellScriptLoader
+class spell_q12478_frostmourne_cavern : public SpellScript
 {
-public:
-    spell_q12478_frostmourne_cavern() : SpellScriptLoader("spell_q12478_frostmourne_cavern") { }
+    PrepareSpellScript(spell_q12478_frostmourne_cavern);
 
-    class spell_q12478_frostmourne_cavern_SpellScript : public SpellScript
+    void HandleSendEvent(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_q12478_frostmourne_cavern_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->SummonCreature(NPC_PRINCE_ARTHAS, 4821.3f, -580.14f, 163.541f, 4.57f);
+    }
 
-        void HandleSendEvent(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->SummonCreature(NPC_PRINCE_ARTHAS, 4821.3f, -580.14f, 163.541f, 4.57f);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_q12478_frostmourne_cavern_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q12478_frostmourne_cavern_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_q12478_frostmourne_cavern::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -2306,7 +2295,7 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_q12237_drop_off_villager);
     RegisterSpellScript(spell_call_wintergarde_gryphon);
     new npc_heated_battle();
-    new spell_q12478_frostmourne_cavern();
+    RegisterSpellScript(spell_q12478_frostmourne_cavern);
     new spell_q12243_fire_upon_the_waters();
     new npc_q24545_lich_king();
     new at_q24545_frostmourne_cavern();
