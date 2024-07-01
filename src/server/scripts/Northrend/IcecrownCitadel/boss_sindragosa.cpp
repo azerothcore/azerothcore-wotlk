@@ -1815,8 +1815,8 @@ void AddSC_boss_sindragosa()
     RegisterSpellScript(spell_sindragosa_icy_grip);
     RegisterSpellScript(spell_sindragosa_icy_grip_jump);
     RegisterSpellScript(spell_sindragosa_ice_tomb_filter);
-    new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb", SPELL_ICE_TOMB_DUMMY);
-    new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb_dummy", SPELL_FROST_BEACON);
+    RegisterSpellScriptWithArgs(spell_trigger_spell_from_caster, "spell_sindragosa_ice_tomb", SPELL_ICE_TOMB_DUMMY);
+    RegisterSpellScriptWithArgs(spell_trigger_spell_from_caster, "spell_sindragosa_ice_tomb_dummy", SPELL_FROST_BEACON);
     RegisterSpellScript(spell_sindragosa_frost_beacon_aura);
     RegisterSpellAndAuraScriptPair(spell_sindragosa_ice_tomb_trap, spell_sindragosa_ice_tomb_trap_aura);
     RegisterSpellScript(spell_sindragosa_mystic_buffet);

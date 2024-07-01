@@ -3532,7 +3532,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_quake);
     RegisterSpellScript(spell_the_lich_king_jump);
     RegisterSpellScript(spell_the_lich_king_jump_remove_aura);
-    new spell_trigger_spell_from_caster("spell_the_lich_king_mass_resurrection", SPELL_MASS_RESURRECTION_REAL);
+    RegisterSpellScriptWithArgs(spell_trigger_spell_from_caster, "spell_the_lich_king_mass_resurrection", SPELL_MASS_RESURRECTION_REAL);
     RegisterSpellScript(spell_the_lich_king_play_movie);
 
     // fight stuff below
