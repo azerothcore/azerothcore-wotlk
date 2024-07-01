@@ -1869,52 +1869,41 @@ class spell_the_lich_king_infest_aura : public AuraScript
     }
 };
 
-class spell_the_lich_king_necrotic_plague : public SpellScriptLoader
+class spell_the_lich_king_necrotic_plague_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_necrotic_plague() :  SpellScriptLoader("spell_the_lich_king_necrotic_plague") { }
+    PrepareAuraScript(spell_the_lich_king_necrotic_plague_aura);
 
-    class spell_the_lich_king_necrotic_plague_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_necrotic_plague_AuraScript);
+        return ValidateSpellInfo({ SPELL_NECROTIC_PLAGUE_JUMP });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_NECROTIC_PLAGUE_JUMP });
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            bool dispel = false;
-            switch (GetTargetApplication()->GetRemoveMode())
-            {
-                case AURA_REMOVE_BY_ENEMY_SPELL:
-                    dispel = true;
-                case AURA_REMOVE_BY_EXPIRE:
-                case AURA_REMOVE_BY_DEATH:
-                    break;
-                default:
-                    return;
-            }
-
-            CustomSpellValues values;
-            if (dispel)
-                values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
-            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
-
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_the_lich_king_necrotic_plague_AuraScript();
+        bool dispel = false;
+        switch (GetTargetApplication()->GetRemoveMode())
+        {
+            case AURA_REMOVE_BY_ENEMY_SPELL:
+                dispel = true;
+            case AURA_REMOVE_BY_EXPIRE:
+            case AURA_REMOVE_BY_DEATH:
+                break;
+            default:
+                return;
+        }
+
+        CustomSpellValues values;
+        if (dispel)
+            values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
+        GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -3762,7 +3751,7 @@ void AddSC_boss_the_lich_king()
     // fight stuff below
     new npc_shambling_horror_icc();
     RegisterSpellScript(spell_the_lich_king_infest_aura);
-    new spell_the_lich_king_necrotic_plague();
+    RegisterSpellScript(spell_the_lich_king_necrotic_plague_aura);
     new spell_the_lich_king_necrotic_plague_jump();
     new spell_the_lich_king_shadow_trap_visual();
     new spell_the_lich_king_shadow_trap_periodic();
