@@ -975,36 +975,25 @@ class spell_sindragosa_icy_grip_jump : public SpellScript
     }
 };
 
-class spell_sindragosa_frost_beacon : public SpellScriptLoader
+class spell_sindragosa_frost_beacon_aura : public AuraScript
 {
-public:
-    spell_sindragosa_frost_beacon() : SpellScriptLoader("spell_sindragosa_frost_beacon") { }
+    PrepareAuraScript(spell_sindragosa_frost_beacon_aura);
 
-    class spell_sindragosa_frost_beacon_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_sindragosa_frost_beacon_AuraScript);
+        return ValidateSpellInfo({ SPELL_ICE_TOMB_DAMAGE });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ICE_TOMB_DAMAGE });
-        }
-
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(GetTarget(), SPELL_ICE_TOMB_DAMAGE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_frost_beacon_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
     {
-        return new spell_sindragosa_frost_beacon_AuraScript();
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(GetTarget(), SPELL_ICE_TOMB_DAMAGE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_frost_beacon_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1910,7 +1899,7 @@ void AddSC_boss_sindragosa()
     new spell_sindragosa_ice_tomb_filter();
     new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb", SPELL_ICE_TOMB_DUMMY);
     new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb_dummy", SPELL_FROST_BEACON);
-    new spell_sindragosa_frost_beacon();
+    RegisterSpellScript(spell_sindragosa_frost_beacon_aura);
     new spell_sindragosa_ice_tomb();
     new spell_sindragosa_mystic_buffet();
     new spell_sindragosa_soul_preservation();
