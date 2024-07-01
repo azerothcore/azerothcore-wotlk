@@ -1253,45 +1253,34 @@ private:
     WorldObject* _target;
 };
 
-class spell_deathbringer_boiling_blood : public SpellScriptLoader
+class spell_deathbringer_boiling_blood : public SpellScript
 {
-public:
-    spell_deathbringer_boiling_blood() : SpellScriptLoader("spell_deathbringer_boiling_blood") { }
+    PrepareSpellScript(spell_deathbringer_boiling_blood);
 
-    class spell_deathbringer_boiling_blood_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_deathbringer_boiling_blood_SpellScript);
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove(GetCaster()->GetVictim());
-            if (targets.empty())
-                return;
-
-            if (GetSpellInfo()->Id == 72385 || GetSpellInfo()->Id == 72442) // 10n, 10h
-            {
-                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-                targets.clear();
-                targets.push_back(target);
-            }
-            else
-                Acore::Containers::RandomResize(targets, 3);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_deathbringer_boiling_blood_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_deathbringer_boiling_blood_SpellScript();
+        targets.remove(GetCaster()->GetVictim());
+        if (targets.empty())
+            return;
+
+        if (GetSpellInfo()->Id == 72385 || GetSpellInfo()->Id == 72442) // 10n, 10h
+        {
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+            targets.clear();
+            targets.push_back(target);
+        }
+        else
+            Acore::Containers::RandomResize(targets, 3);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_deathbringer_boiling_blood::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1366,7 +1355,7 @@ void AddSC_boss_deathbringer_saurfang()
     RegisterSpellScript(spell_deathbringer_blood_link);
     RegisterSpellAndAuraScriptPair(spell_deathbringer_blood_power, spell_deathbringer_blood_power_aura);
     RegisterSpellScript(spell_deathbringer_blood_nova_targeting);
-    new spell_deathbringer_boiling_blood();
+    RegisterSpellScript(spell_deathbringer_boiling_blood);
     new achievement_ive_gone_and_made_a_mess();
     new npc_icc_blood_beast();
 }
