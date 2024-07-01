@@ -2530,35 +2530,29 @@ class spell_igb_rocket_artillery_explosion : public SpellScript
     }
 };
 
-class spell_igb_below_zero : public SpellScriptLoader
+class spell_igb_below_zero : public SpellScript
 {
-public:
-    spell_igb_below_zero() : SpellScriptLoader("spell_igb_below_zero") { }
+    PrepareSpellScript(spell_igb_below_zero);
 
-    class spell_igb_below_zero_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_below_zero_SpellScript);
+        return ValidateSpellInfo({ SPELL_EJECT_ALL_PASSENGERS });
+    }
 
-        void RemovePassengers(SpellMissInfo missInfo)
+    void RemovePassengers(SpellMissInfo missInfo)
+    {
+        if (missInfo != SPELL_MISS_NONE)
         {
-            if (missInfo != SPELL_MISS_NONE)
-            {
-                return;
-            }
-
-            GetHitUnit()->SetPower(POWER_ENERGY, 0);
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
+            return;
         }
 
-        void Register() override
-        {
-            BeforeHit += BeforeSpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
-        }
-    };
+        GetHitUnit()->SetPower(POWER_ENERGY, 0);
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_igb_below_zero_SpellScript();
+        BeforeHit += BeforeSpellHitFn(spell_igb_below_zero::RemovePassengers);
     }
 };
 
@@ -2662,7 +2656,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_burning_pitch);
     RegisterSpellScript(spell_igb_rocket_artillery);
     RegisterSpellScript(spell_igb_rocket_artillery_explosion);
-    new spell_igb_below_zero();
+    RegisterSpellScript(spell_igb_below_zero);
     new spell_igb_on_gunship_deck();
     new achievement_im_on_a_boat();
     RegisterSpellScript(spell_igb_battle_experience_check);
