@@ -2028,53 +2028,47 @@ class spell_icc_geist_alarm : public SpellScript
     }
 };
 
-class spell_frost_giant_death_plague : public SpellScriptLoader
+class spell_frost_giant_death_plague : public SpellScript
 {
-public:
-    spell_frost_giant_death_plague() : SpellScriptLoader("spell_frost_giant_death_plague") { }
+    PrepareSpellScript(spell_frost_giant_death_plague);
 
-    class spell_frost_giant_death_plague_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_frost_giant_death_plague_SpellScript);
+        return ValidateSpellInfo({ SPELL_DEATH_PLAGUE_AURA, SPELL_DEATH_PLAGUE_KILL, SPELL_RECENTLY_INFECTED });
+    }
 
-        // First effect
-        void CountTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(Acore::ObjectGUIDCheck(GetCaster()->GetGUID(), true));
+    // First effect
+    void CountTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        targets.remove_if(Acore::ObjectGUIDCheck(GetCaster()->GetGUID(), true));
 
-            bool kill = true;
-            for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if (!(*itr)->ToUnit()->HasAura(SPELL_DEATH_PLAGUE_AURA))
-                {
-                    kill = false;
-                    break;
-                }
-            if (kill)
-                GetCaster()->CastSpell(GetCaster(), SPELL_DEATH_PLAGUE_KILL, true);
-            else
+        bool kill = true;
+        for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            if (!(*itr)->ToUnit()->HasAura(SPELL_DEATH_PLAGUE_AURA))
             {
-                GetCaster()->CastSpell(GetCaster(), SPELL_RECENTLY_INFECTED, true);
-                targets.push_back(GetCaster());
+                kill = false;
+                break;
             }
-        }
-
-        void HandleScript(SpellEffIndex  /*effIndex*/)
+        if (kill)
+            GetCaster()->CastSpell(GetCaster(), SPELL_DEATH_PLAGUE_KILL, true);
+        else
         {
-            if (!GetHitUnit()->HasAura(SPELL_RECENTLY_INFECTED) && !GetHitUnit()->HasAura(SPELL_DEATH_PLAGUE_AURA))
-                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_DEATH_PLAGUE_AURA, true);
+            GetCaster()->CastSpell(GetCaster(), SPELL_RECENTLY_INFECTED, true);
+            targets.push_back(GetCaster());
         }
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_frost_giant_death_plague_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-            OnEffectHitTarget += SpellEffectFn(spell_frost_giant_death_plague_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_frost_giant_death_plague_SpellScript();
+        if (!GetHitUnit()->HasAura(SPELL_RECENTLY_INFECTED) && !GetHitUnit()->HasAura(SPELL_DEATH_PLAGUE_AURA))
+            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_DEATH_PLAGUE_AURA, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_frost_giant_death_plague::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+        OnEffectHitTarget += SpellEffectFn(spell_frost_giant_death_plague::HandleScript, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
@@ -3755,7 +3749,7 @@ void AddSC_icecrown_citadel()
     RegisterSpellScript(spell_icc_stoneform_aura);
     RegisterSpellScript(spell_icc_sprit_alarm);
     RegisterSpellScript(spell_icc_geist_alarm);
-    new spell_frost_giant_death_plague();
+    RegisterSpellScript(spell_frost_giant_death_plague);
     new spell_icc_harvest_blight_specimen();
     new spell_trigger_spell_from_caster("spell_svalna_caress_of_death", SPELL_IMPALING_SPEAR_KILL);
     new spell_svalna_revive_champion();
