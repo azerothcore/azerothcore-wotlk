@@ -34,47 +34,41 @@ enum eDrakeHunt
     SPELL_SUBDUED                       = 46675
 };
 
-class spell_q11919_q11940_drake_hunt : public SpellScriptLoader
+class spell_q11919_q11940_drake_hunt_aura : public AuraScript
 {
-public:
-    spell_q11919_q11940_drake_hunt() : SpellScriptLoader("spell_q11919_q11940_drake_hunt") { }
+    PrepareAuraScript(spell_q11919_q11940_drake_hunt_aura);
 
-    class spell_q11919_q11940_drake_hunt_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_q11919_q11940_drake_hunt_AuraScript)
+        return ValidateSpellInfo({ SPELL_SUBDUED, SPELL_DRAKE_HATCHLING_SUBDUED });
+    }
 
-        bool Load() override
-        {
-            return GetOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE || !GetCaster())
-                return;
-
-            Creature* owner = GetOwner()->ToCreature();
-            owner->RemoveAllAurasExceptType(SPELL_AURA_DUMMY);
-            owner->CombatStop(true);
-            owner->GetThreatMgr().ClearAllThreat();
-            owner->GetMotionMaster()->Clear(false);
-            owner->GetMotionMaster()->MoveFollow(GetCaster(), 4.0f, M_PI, MOTION_SLOT_ACTIVE);
-            owner->CastSpell(owner, SPELL_SUBDUED, true);
-            GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
-            owner->SetFaction(FACTION_FRIENDLY);
-            owner->SetImmuneToAll(true);
-            owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_q11919_q11940_drake_hunt_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Load() override
     {
-        return new spell_q11919_q11940_drake_hunt_AuraScript();
+        return GetOwner()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE || !GetCaster())
+            return;
+
+        Creature* owner = GetOwner()->ToCreature();
+        owner->RemoveAllAurasExceptType(SPELL_AURA_DUMMY);
+        owner->CombatStop(true);
+        owner->GetThreatMgr().ClearAllThreat();
+        owner->GetMotionMaster()->Clear(false);
+        owner->GetMotionMaster()->MoveFollow(GetCaster(), 4.0f, M_PI, MOTION_SLOT_ACTIVE);
+        owner->CastSpell(owner, SPELL_SUBDUED, true);
+        GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
+        owner->SetFaction(FACTION_FRIENDLY);
+        owner->SetImmuneToAll(true);
+        owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_q11919_q11940_drake_hunt_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2059,7 +2053,7 @@ public:
 void AddSC_borean_tundra()
 {
     // Ours
-    new spell_q11919_q11940_drake_hunt();
+    RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
     new npc_thassarian();
     new npc_thassarian2();
     new npc_leryssa();
