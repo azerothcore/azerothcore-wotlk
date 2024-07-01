@@ -1006,33 +1006,27 @@ class spell_putricide_tear_gas_effect : public SpellScript
     }
 };
 
-class spell_putricide_gaseous_bloat : public SpellScriptLoader
+class spell_putricide_gaseous_bloat_aura : public AuraScript
 {
-public:
-    spell_putricide_gaseous_bloat() : SpellScriptLoader("spell_putricide_gaseous_bloat") { }
+    PrepareAuraScript(spell_putricide_gaseous_bloat_aura);
 
-    class spell_putricide_gaseous_bloat_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_putricide_gaseous_bloat_AuraScript);
+        return ValidateSpellInfo({ SPELL_GASEOUS_BLOAT });
+    }
 
-        void HandleExtraEffect(AuraEffect const* /*aurEff*/)
-        {
-            Unit* target = GetTarget();
-            target->RemoveAuraFromStack(GetSpellInfo()->Id, GetCasterGUID());
-            /*if (!target->HasAura(GetId()))
-                if (Unit* caster = GetCaster())
-                    caster->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, caster, false);*/
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_putricide_gaseous_bloat_AuraScript::HandleExtraEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleExtraEffect(AuraEffect const* /*aurEff*/)
     {
-        return new spell_putricide_gaseous_bloat_AuraScript();
+        Unit* target = GetTarget();
+        target->RemoveAuraFromStack(GetSpellInfo()->Id, GetCasterGUID());
+        /*if (!target->HasAura(GetId()))
+            if (Unit* caster = GetCaster())
+                caster->CastCustomSpell(SPELL_GASEOUS_BLOAT, SPELLVALUE_AURA_STACK, 10, caster, false);*/
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_putricide_gaseous_bloat_aura::HandleExtraEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -1665,7 +1659,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_grow_stacker_aura);
     RegisterSpellScript(spell_putricide_unstable_experiment);
     RegisterSpellScript(spell_putricide_tear_gas_effect);
-    new spell_putricide_gaseous_bloat();
+    RegisterSpellScript(spell_putricide_gaseous_bloat_aura);
     new spell_putricide_ooze_channel();
     new spell_putricide_ooze_eruption_searcher();
     new spell_putricide_mutated_plague();
