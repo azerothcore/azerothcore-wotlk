@@ -1106,44 +1106,33 @@ enum WarheadSpells
     SPELL_WARHEAD_FUSE = 49181
 };
 // 49107 - Vehicle: Warhead Fuse
-class spell_vehicle_warhead_fuse : public SpellScriptLoader
+class spell_vehicle_warhead_fuse : public SpellScript
 {
-public:
-    spell_vehicle_warhead_fuse() : SpellScriptLoader("spell_vehicle_warhead_fuse") { }
+    PrepareSpellScript(spell_vehicle_warhead_fuse);
 
-    class spell_vehicle_warhead_fuse_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_vehicle_warhead_fuse_SpellScript);
+        return sSpellMgr->GetSpellInfo(SPELL_WARHEAD_Z_CHECK)
+                && sSpellMgr->GetSpellInfo(SPELL_WARHEAD_SEEKING_LUMBERSHIP)
+                && sSpellMgr->GetSpellInfo(SPELL_WARHEAD_FUSE);
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return sSpellMgr->GetSpellInfo(SPELL_WARHEAD_Z_CHECK)
-                    && sSpellMgr->GetSpellInfo(SPELL_WARHEAD_SEEKING_LUMBERSHIP)
-                    && sSpellMgr->GetSpellInfo(SPELL_WARHEAD_FUSE);
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-            {
-                return;
-            }
-
-            caster->CastSpell(caster, SPELL_WARHEAD_Z_CHECK, true);
-            caster->CastSpell(caster, SPELL_WARHEAD_SEEKING_LUMBERSHIP, true);
-            caster->CastSpell(caster, SPELL_WARHEAD_FUSE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_vehicle_warhead_fuse_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_vehicle_warhead_fuse_SpellScript();
+        Unit* caster = GetCaster();
+        if (!caster)
+        {
+            return;
+        }
+
+        caster->CastSpell(caster, SPELL_WARHEAD_Z_CHECK, true);
+        caster->CastSpell(caster, SPELL_WARHEAD_SEEKING_LUMBERSHIP, true);
+        caster->CastSpell(caster, SPELL_WARHEAD_FUSE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_vehicle_warhead_fuse::HandleDummy, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1324,7 +1313,7 @@ void AddSC_grizzly_hills()
     new npc_rocket_propelled_warhead();
     new spell_z_check();
     new spell_warhead_detonate();
-    new spell_vehicle_warhead_fuse();
+    RegisterSpellScript(spell_vehicle_warhead_fuse);
     new spell_warhead_fuse();
     RegisterSpellScript(spell_q12227_outhouse_groans);
     RegisterSpellScript(spell_q12227_camera_shake);
