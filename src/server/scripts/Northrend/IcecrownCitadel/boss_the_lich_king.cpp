@@ -2604,45 +2604,34 @@ public:
     }
 };
 
-class spell_the_lich_king_summon_into_air : public SpellScriptLoader
+class spell_the_lich_king_summon_into_air : public SpellScript
 {
-public:
-    spell_the_lich_king_summon_into_air() : SpellScriptLoader("spell_the_lich_king_summon_into_air") { }
+    PrepareSpellScript(spell_the_lich_king_summon_into_air);
 
-    class spell_the_lich_king_summon_into_air_SpellScript : public SpellScript
+    void ModDestHeight(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_the_lich_king_summon_into_air_SpellScript);
-
-        void ModDestHeight(SpellEffIndex effIndex)
+        float addZ;
+        switch (GetSpellInfo()->Effects[effIndex].MiscValue)
         {
-            float addZ;
-            switch (GetSpellInfo()->Effects[effIndex].MiscValue)
-            {
-                case NPC_SPIRIT_BOMB:
-                    addZ = 30.0f;
-                    break;
-                case NPC_VILE_SPIRIT:
-                    addZ = 13.0f;
-                    break;
-                default:
-                    addZ = 15.0f;
-                    break;
-            }
-            Position const offset = {0.0f, 0.0f, addZ, 0.0f};
-            WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
-            dest->RelocateOffset(offset);
-            GetHitDest()->RelocateOffset(offset);
+            case NPC_SPIRIT_BOMB:
+                addZ = 30.0f;
+                break;
+            case NPC_VILE_SPIRIT:
+                addZ = 13.0f;
+                break;
+            default:
+                addZ = 15.0f;
+                break;
         }
+        Position const offset = {0.0f, 0.0f, addZ, 0.0f};
+        WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
+        dest->RelocateOffset(offset);
+        GetHitDest()->RelocateOffset(offset);
+    }
 
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_the_lich_king_summon_into_air_SpellScript::ModDestHeight, EFFECT_0, SPELL_EFFECT_SUMMON);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_summon_into_air_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_the_lich_king_summon_into_air::ModDestHeight, EFFECT_0, SPELL_EFFECT_SUMMON);
     }
 };
 
@@ -3702,7 +3691,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_defile);
     RegisterSpellScript(spell_the_lich_king_soul_reaper_aura);
     new npc_valkyr_shadowguard();
-    new spell_the_lich_king_summon_into_air();
+    RegisterSpellScript(spell_the_lich_king_summon_into_air);
     new spell_the_lich_king_teleport_to_frostmourne_hc();
     new spell_the_lich_king_valkyr_target_search();
     new spell_the_lich_king_cast_back_to_caster();
