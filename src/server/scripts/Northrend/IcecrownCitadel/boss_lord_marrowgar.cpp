@@ -571,43 +571,32 @@ class spell_marrowgar_bone_spike_graveyard : public SpellScript
     }
 };
 
-class spell_marrowgar_coldflame_bonestorm : public SpellScriptLoader
+class spell_marrowgar_coldflame_bonestorm : public SpellScript
 {
-public:
-    spell_marrowgar_coldflame_bonestorm() : SpellScriptLoader("spell_marrowgar_coldflame_bonestorm") { }
+    PrepareSpellScript(spell_marrowgar_coldflame_bonestorm);
 
-    class spell_marrowgar_coldflame_SpellScript : public SpellScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_marrowgar_coldflame_SpellScript);
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
+        PreventHitDefaultEffect(effIndex);
+        Unit* caster = GetCaster();
+        float x = caster->GetPositionX();
+        float y = caster->GetPositionY();
+        float z = caster->GetPositionZ() + 2.5f;
+        for (uint8 i = 0; i < 4; ++i)
         {
-            PreventHitDefaultEffect(effIndex);
-            Unit* caster = GetCaster();
-            float x = caster->GetPositionX();
-            float y = caster->GetPositionY();
-            float z = caster->GetPositionZ() + 2.5f;
-            for (uint8 i = 0; i < 4; ++i)
+            float nx = x + 2.5f * cos((M_PI / 4) + (i * (M_PI / 2)));
+            float ny = y + 2.5f * std::sin((M_PI / 4) + (i * (M_PI / 2)));
+            if (caster->IsWithinLOS(nx, ny, z))
             {
-                float nx = x + 2.5f * cos((M_PI / 4) + (i * (M_PI / 2)));
-                float ny = y + 2.5f * std::sin((M_PI / 4) + (i * (M_PI / 2)));
-                if (caster->IsWithinLOS(nx, ny, z))
-                {
-                    caster->SetOrientation((M_PI / 4) + (i * (M_PI / 2)));
-                    caster->CastSpell(nx, ny, z, uint32(GetEffectValue() + i), true);
-                }
+                caster->SetOrientation((M_PI / 4) + (i * (M_PI / 2)));
+                caster->CastSpell(nx, ny, z, uint32(GetEffectValue() + i), true);
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_marrowgar_coldflame_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_marrowgar_coldflame_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_marrowgar_coldflame_bonestorm::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -689,7 +678,7 @@ void AddSC_boss_lord_marrowgar()
     new npc_coldflame();
     new npc_bone_spike();
     RegisterSpellScript(spell_marrowgar_coldflame);
-    new spell_marrowgar_coldflame_bonestorm();
+    RegisterSpellScript(spell_marrowgar_coldflame_bonestorm);
     RegisterSpellScript(spell_marrowgar_bone_spike_graveyard);
     new spell_marrowgar_bone_storm();
     new spell_marrowgar_bone_slice();
