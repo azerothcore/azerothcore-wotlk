@@ -351,39 +351,28 @@ class spell_festergut_blighted_spores_aura : public AuraScript
     }
 };
 
-class spell_festergut_gastric_bloat : public SpellScriptLoader
+class spell_festergut_gastric_bloat : public SpellScript
 {
-public:
-    spell_festergut_gastric_bloat() : SpellScriptLoader("spell_festergut_gastric_bloat") { }
+    PrepareSpellScript(spell_festergut_gastric_bloat);
 
-    class spell_festergut_gastric_bloat_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_festergut_gastric_bloat_SpellScript);
+        return ValidateSpellInfo({ SPELL_GASTRIC_EXPLOSION });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_GASTRIC_EXPLOSION });
-        }
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            Aura const* aura = GetHitUnit()->GetAura(GetSpellInfo()->Id);
-            if (!(aura && aura->GetStackAmount() == 10))
-                return;
-
-            GetHitUnit()->RemoveAurasDueToSpell(GetSpellInfo()->Id);
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_GASTRIC_EXPLOSION, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_festergut_gastric_bloat_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_festergut_gastric_bloat_SpellScript();
+        Aura const* aura = GetHitUnit()->GetAura(GetSpellInfo()->Id);
+        if (!(aura && aura->GetStackAmount() == 10))
+            return;
+
+        GetHitUnit()->RemoveAurasDueToSpell(GetSpellInfo()->Id);
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_GASTRIC_EXPLOSION, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_festergut_gastric_bloat::HandleScript, EFFECT_2, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -476,7 +465,7 @@ void AddSC_boss_festergut()
     new boss_festergut();
     RegisterSpellScript(spell_festergut_pungent_blight);
     RegisterSpellScript(spell_festergut_blighted_spores_aura);
-    new spell_festergut_gastric_bloat();
+    RegisterSpellScript(spell_festergut_gastric_bloat);
     new achievement_flu_shot_shortage();
 
     new npc_stinky_icc();
