@@ -1229,42 +1229,32 @@ class spell_dreamwalker_mana_void_aura : public AuraScript
     }
 };
 
-class spell_dreamwalker_decay_periodic_timer : public SpellScriptLoader
+class spell_dreamwalker_decay_periodic_timer_aura : public AuraScript
 {
-public:
-    spell_dreamwalker_decay_periodic_timer() : SpellScriptLoader("spell_dreamwalker_decay_periodic_timer") { }
+    PrepareAuraScript(spell_dreamwalker_decay_periodic_timer_aura);
 
-    class spell_dreamwalker_decay_periodic_timer_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_dreamwalker_decay_periodic_timer_AuraScript);
-
-        bool Load() override
-        {
-            _decayRate = GetId() != SPELL_TIMER_BLAZING_SKELETON ? 1000 : 5000;
-            return true;
-        }
-
-        void DecayPeriodicTimer(AuraEffect* aurEff)
-        {
-            int32 timer = aurEff->GetPeriodicTimer();
-            if (timer <= 5000)
-                return;
-
-            aurEff->SetPeriodicTimer(timer - _decayRate);
-        }
-
-        void Register() override
-        {
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_dreamwalker_decay_periodic_timer_AuraScript::DecayPeriodicTimer, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-
-        int32 _decayRate;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dreamwalker_decay_periodic_timer_AuraScript();
+        _decayRate = GetId() != SPELL_TIMER_BLAZING_SKELETON ? 1000 : 5000;
+        return true;
     }
+
+    void DecayPeriodicTimer(AuraEffect* aurEff)
+    {
+        int32 timer = aurEff->GetPeriodicTimer();
+        if (timer <= 5000)
+            return;
+
+        aurEff->SetPeriodicTimer(timer - _decayRate);
+    }
+
+    void Register() override
+    {
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_dreamwalker_decay_periodic_timer_aura::DecayPeriodicTimer, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+
+private:
+    int32 _decayRate;
 };
 
 class spell_dreamwalker_summoner : public SpellScriptLoader
@@ -1492,7 +1482,7 @@ void AddSC_boss_valithria_dreamwalker()
     RegisterSpellScript(spell_dreamwalker_twisted_nightmares);
     RegisterSpellScript(spell_dreamwalker_nightmare_cloud_aura);
     RegisterSpellScript(spell_dreamwalker_mana_void_aura);
-    new spell_dreamwalker_decay_periodic_timer();
+    RegisterSpellScript(spell_dreamwalker_decay_periodic_timer_aura);
     new spell_dreamwalker_summoner();
     new spell_dreamwalker_summon_suppresser();
     new spell_dreamwalker_summon_suppresser_effect();

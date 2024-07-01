@@ -10,3 +10,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_icc_yh_volley_aura' WHERE `s
 UPDATE `spell_script_names` SET `ScriptName`='spell_festergut_blighted_spores_aura' WHERE `spell_id` IN (69290,71222,73033,73034) AND `ScriptName`='spell_festergut_blighted_spores';
 UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_nightmare_cloud_aura' WHERE `spell_id`=71970 AND `ScriptName`='spell_dreamwalker_nightmare_cloud';
 UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_mana_void_aura' WHERE `spell_id`=71085 AND `ScriptName`='spell_dreamwalker_mana_void';
+UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_decay_periodic_timer_aura' WHERE `spell_id` IN (70912,70913,70915,70916) AND `ScriptName`='spell_dreamwalker_decay_periodic_timer';
