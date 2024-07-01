@@ -405,31 +405,25 @@ class spell_ioc_gunship_portal : public SpellScript
     }
 };
 
-class spell_ioc_parachute_ic : public SpellScriptLoader
+class spell_ioc_parachute_ic_aura : public AuraScript
 {
-public:
-    spell_ioc_parachute_ic() : SpellScriptLoader("spell_ioc_parachute_ic") { }
+    PrepareAuraScript(spell_ioc_parachute_ic_aura);
 
-    class spell_ioc_parachute_ic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_ioc_parachute_ic_AuraScript)
+        return ValidateSpellInfo({ SPELL_PARACHUTE_IC });
+    }
 
-        void HandleTriggerSpell(AuraEffect const* /*aurEff*/)
-        {
-            if (Player* target = GetTarget()->ToPlayer())
-                if (target->m_movementInfo.fallTime > 2500 && !target->GetTransport())
-                    target->CastSpell(target, SPELL_PARACHUTE_IC, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_ioc_parachute_ic_AuraScript::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleTriggerSpell(AuraEffect const* /*aurEff*/)
     {
-        return new spell_ioc_parachute_ic_AuraScript();
+        if (Player* target = GetTarget()->ToPlayer())
+            if (target->m_movementInfo.fallTime > 2500 && !target->GetTransport())
+                target->CastSpell(target, SPELL_PARACHUTE_IC, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_ioc_parachute_ic_aura::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -489,7 +483,7 @@ void AddSC_isle_of_conquest()
     RegisterSpellScript(spell_ioc_repair_turret_aura);
     RegisterSpellScript(spell_ioc_bomb_blast_criteria);
     RegisterSpellScript(spell_ioc_gunship_portal);
-    new spell_ioc_parachute_ic();
+    RegisterSpellScript(spell_ioc_parachute_ic_aura);
     new spell_ioc_launch();
 }
 
