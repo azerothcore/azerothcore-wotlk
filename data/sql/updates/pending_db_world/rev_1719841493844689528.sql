@@ -29,3 +29,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_the_lich_king_shadow_trap_vi
 UPDATE `spell_script_names` SET `ScriptName`='spell_the_lich_king_soul_reaper_aura' WHERE `spell_id` IN (69409,73797,73798,73799) AND `ScriptName`='spell_the_lich_king_soul_reaper';
 UPDATE `spell_script_names` SET `ScriptName`='spell_the_lich_king_vile_spirits_aura' WHERE `spell_id`=70498 AND `ScriptName`='spell_the_lich_king_vile_spirits';
 UPDATE `spell_script_names` SET `ScriptName`='spell_the_lich_king_harvest_soul_aura' WHERE `spell_id` IN (68980,74296,74297,74325) AND `ScriptName`='spell_the_lich_king_harvest_soul';
+UPDATE `spell_script_names` SET `ScriptName`='spell_the_lich_king_lights_favor_aura' WHERE `spell_id`=69382 AND `ScriptName`='spell_the_lich_king_lights_favor';

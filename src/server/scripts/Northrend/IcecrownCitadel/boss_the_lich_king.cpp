@@ -3170,40 +3170,29 @@ public:
     }
 };
 
-class spell_the_lich_king_lights_favor : public SpellScriptLoader
+class spell_the_lich_king_lights_favor_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_lights_favor() : SpellScriptLoader("spell_the_lich_king_lights_favor") { }
+    PrepareAuraScript(spell_the_lich_king_lights_favor_aura);
 
-    class spell_the_lich_king_lights_favor_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_the_lich_king_lights_favor_AuraScript);
+        if (Unit* caster = GetCaster())
+            if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
+                effect->RecalculateAmount(caster);
+    }
 
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
-                    effect->RecalculateAmount(caster);
-        }
-
-        void CalculateBonus(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
-        {
-            canBeRecalculated = true;
-            amount = 0;
-            if (Unit* caster = GetCaster())
-                amount = int32(caster->GetHealthPct());
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_lights_favor_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_the_lich_king_lights_favor_AuraScript::CalculateBonus, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void CalculateBonus(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
     {
-        return new spell_the_lich_king_lights_favor_AuraScript();
+        canBeRecalculated = true;
+        amount = 0;
+        if (Unit* caster = GetCaster())
+            amount = int32(caster->GetHealthPct());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_lights_favor_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_the_lich_king_lights_favor_aura::CalculateBonus, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
     }
 };
 
@@ -3616,7 +3605,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_harvest_soul_aura);
     new npc_strangulate_vehicle();
     new npc_terenas_menethil();
-    new spell_the_lich_king_lights_favor();
+    RegisterSpellScript(spell_the_lich_king_lights_favor_aura);
     new spell_the_lich_king_restore_soul();
     new npc_spirit_warden();
     new spell_the_lich_king_dark_hunger();
