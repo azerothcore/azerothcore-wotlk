@@ -1210,33 +1210,22 @@ private:
     InstanceScript* _instance;
 };
 
-class spell_dreamwalker_mana_void : public SpellScriptLoader
+class spell_dreamwalker_mana_void_aura : public AuraScript
 {
-public:
-    spell_dreamwalker_mana_void() : SpellScriptLoader("spell_dreamwalker_mana_void") { }
+    PrepareAuraScript(spell_dreamwalker_mana_void_aura);
 
-    class spell_dreamwalker_mana_void_AuraScript : public AuraScript
+    void PeriodicTick(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_dreamwalker_mana_void_AuraScript);
+        // first 3 ticks have amplitude 1 second
+        // remaining tick every 500ms
+        if (aurEff->GetTickNumber() <= 5)
+            if (!(aurEff->GetTickNumber() & 1))
+                PreventDefaultAction();
+    }
 
-        void PeriodicTick(AuraEffect const* aurEff)
-        {
-            // first 3 ticks have amplitude 1 second
-            // remaining tick every 500ms
-            if (aurEff->GetTickNumber() <= 5)
-                if (!(aurEff->GetTickNumber() & 1))
-                    PreventDefaultAction();
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_mana_void_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_dreamwalker_mana_void_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_mana_void_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1502,7 +1491,7 @@ void AddSC_boss_valithria_dreamwalker()
     RegisterSpellScript(spell_dreamwalker_summon_portal);
     RegisterSpellScript(spell_dreamwalker_twisted_nightmares);
     RegisterSpellScript(spell_dreamwalker_nightmare_cloud_aura);
-    new spell_dreamwalker_mana_void();
+    RegisterSpellScript(spell_dreamwalker_mana_void_aura);
     new spell_dreamwalker_decay_periodic_timer();
     new spell_dreamwalker_summoner();
     new spell_dreamwalker_summon_suppresser();
