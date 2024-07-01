@@ -2190,31 +2190,20 @@ public:
     }
 };
 
-class spell_the_lich_king_raging_spirit : public SpellScriptLoader
+class spell_the_lich_king_raging_spirit : public SpellScript
 {
-public:
-    spell_the_lich_king_raging_spirit() : SpellScriptLoader("spell_the_lich_king_raging_spirit") { }
+    PrepareSpellScript(spell_the_lich_king_raging_spirit);
 
-    class spell_the_lich_king_raging_spirit_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_the_lich_king_raging_spirit_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, uint32(GetEffectValue()), true, 0, 0, target->GetGUID());
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, uint32(GetEffectValue()), true, 0, 0, target->GetGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_raging_spirit_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_raging_spirit_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_raging_spirit::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -3725,7 +3714,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_shadow_trap_periodic);
     RegisterSpellScript(spell_the_lich_king_ice_burst_target_search);
     new npc_icc_ice_sphere();
-    new spell_the_lich_king_raging_spirit();
+    RegisterSpellScript(spell_the_lich_king_raging_spirit);
     new npc_raging_spirit();
     new spell_the_lich_king_defile();
     new spell_the_lich_king_soul_reaper();
