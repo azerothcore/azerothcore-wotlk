@@ -2316,33 +2316,22 @@ class spell_icc_dark_reckoning_aura : public AuraScript
     }
 };
 
-class spell_stinky_precious_decimate : public SpellScriptLoader
+class spell_stinky_precious_decimate : public SpellScript
 {
-public:
-    spell_stinky_precious_decimate() : SpellScriptLoader("spell_stinky_precious_decimate") { }
+    PrepareSpellScript(spell_stinky_precious_decimate);
 
-    class spell_stinky_precious_decimate_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_stinky_precious_decimate_SpellScript);
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
+        if (GetHitUnit()->GetHealthPct() > float(GetEffectValue()))
         {
-            if (GetHitUnit()->GetHealthPct() > float(GetEffectValue()))
-            {
-                uint32 newHealth = GetHitUnit()->GetMaxHealth() * uint32(GetEffectValue()) / 100;
-                GetHitUnit()->SetHealth(newHealth);
-            }
+            uint32 newHealth = GetHitUnit()->GetMaxHealth() * uint32(GetEffectValue()) / 100;
+            GetHitUnit()->SetHealth(newHealth);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_stinky_precious_decimate_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_stinky_precious_decimate_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_stinky_precious_decimate::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -3712,7 +3701,7 @@ void AddSC_icecrown_citadel()
     // pussywizard below:
     RegisterSpellScript(spell_icc_web_wrap_aura);
     RegisterSpellScript(spell_icc_dark_reckoning_aura);
-    new spell_stinky_precious_decimate();
+    RegisterSpellScript(spell_stinky_precious_decimate);
     new spell_icc_yf_frozen_orb();
     new spell_icc_yh_volley();
     new spell_icc_yd_summon_undead();
