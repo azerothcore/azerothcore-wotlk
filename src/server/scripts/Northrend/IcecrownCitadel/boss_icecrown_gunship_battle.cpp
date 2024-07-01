@@ -2045,37 +2045,26 @@ class spell_igb_rocket_pack_useable_aura : public AuraScript
     }
 };
 
-class spell_igb_teleport_to_enemy_ship : public SpellScriptLoader
+class spell_igb_teleport_to_enemy_ship : public SpellScript
 {
-public:
-    spell_igb_teleport_to_enemy_ship() : SpellScriptLoader("spell_igb_teleport_to_enemy_ship") { }
+    PrepareSpellScript(spell_igb_teleport_to_enemy_ship);
 
-    class spell_igb_teleport_to_enemy_ship_SpellScript : public SpellScript
+    void RelocateTransportOffset(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_igb_teleport_to_enemy_ship_SpellScript);
+        WorldLocation const* dest = GetHitDest();
+        Unit* target = GetHitUnit();
+        if (!dest || !target || !target->GetTransport())
+            return;
 
-        void RelocateTransportOffset(SpellEffIndex /*effIndex*/)
-        {
-            WorldLocation const* dest = GetHitDest();
-            Unit* target = GetHitUnit();
-            if (!dest || !target || !target->GetTransport())
-                return;
+        float x, y, z, o;
+        dest->GetPosition(x, y, z, o);
+        target->GetTransport()->CalculatePassengerOffset(x, y, z, &o);
+        target->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+    }
 
-            float x, y, z, o;
-            dest->GetPosition(x, y, z, o);
-            target->GetTransport()->CalculatePassengerOffset(x, y, z, &o);
-            target->m_movementInfo.transport.pos.Relocate(x, y, z, o);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_igb_teleport_to_enemy_ship_SpellScript::RelocateTransportOffset, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_igb_teleport_to_enemy_ship_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_igb_teleport_to_enemy_ship::RelocateTransportOffset, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
     }
 };
 
@@ -2779,7 +2768,7 @@ void AddSC_boss_icecrown_gunship_battle()
     new npc_gunship_rocketeer();
     RegisterSpellScript(spell_igb_rocket_pack_aura);
     RegisterSpellScript(spell_igb_rocket_pack_useable_aura);
-    new spell_igb_teleport_to_enemy_ship();
+    RegisterSpellScript(spell_igb_teleport_to_enemy_ship);
     new spell_igb_check_for_players();
     new spell_igb_gunship_fall_teleport();
     new spell_igb_explosion_main();
