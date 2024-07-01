@@ -674,66 +674,60 @@ class spell_rotface_large_ooze_combine : public SpellScript
     }
 };
 
-class spell_rotface_large_ooze_buff_combine : public SpellScriptLoader
+class spell_rotface_large_ooze_buff_combine : public SpellScript
 {
-public:
-    spell_rotface_large_ooze_buff_combine() : SpellScriptLoader("spell_rotface_large_ooze_buff_combine") { }
+    PrepareSpellScript(spell_rotface_large_ooze_buff_combine);
 
-    class spell_rotface_large_ooze_buff_combine_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_rotface_large_ooze_buff_combine_SpellScript);
+        return ValidateSpellInfo({ 69844, SPELL_LARGE_OOZE_BUFF_COMBINE, SPELL_LARGE_OOZE_COMBINE, SPELL_UNSTABLE_OOZE_EXPLOSION, SPELL_LITTLE_OOZE_COMBINE });
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        // large targetting little
+
+        if (!GetHitCreature() || !GetHitCreature()->IsAlive())
+            return;
+
+        if (Aura* unstable = GetCaster()->GetAura(SPELL_UNSTABLE_OOZE))
         {
-            // large targetting little
+            uint8 newStack = uint8(unstable->GetStackAmount() + 1);
+            unstable->SetStackAmount(newStack);
 
-            if (!GetHitCreature() || !GetHitCreature()->IsAlive())
-                return;
+            // red color!
+            if (newStack >= 4)
+                GetCaster()->CastSpell(GetCaster(), 69844, true);
 
-            if (Aura* unstable = GetCaster()->GetAura(SPELL_UNSTABLE_OOZE))
+            // explode!
+            if (newStack >= 5)
             {
-                uint8 newStack = uint8(unstable->GetStackAmount() + 1);
-                unstable->SetStackAmount(newStack);
+                GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_BUFF_COMBINE);
+                GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_COMBINE);
+                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                    if (Creature* rotface = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ROTFACE)))
+                        if (rotface->IsAlive())
+                        {
+                            if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+                                GetCaster()->ToCreature()->AI()->Talk(EMOTE_UNSTABLE_EXPLOSION);
+                            rotface->AI()->Talk(SAY_UNSTABLE_EXPLOSION);
+                        }
 
-                // red color!
-                if (newStack >= 4)
-                    GetCaster()->CastSpell(GetCaster(), 69844, true);
-
-                // explode!
-                if (newStack >= 5)
-                {
-                    GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_BUFF_COMBINE);
-                    GetCaster()->RemoveAurasDueToSpell(SPELL_LARGE_OOZE_COMBINE);
-                    if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                        if (Creature* rotface = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_ROTFACE)))
-                            if (rotface->IsAlive())
-                            {
-                                if (GetCaster()->GetTypeId() == TYPEID_UNIT)
-                                    GetCaster()->ToCreature()->AI()->Talk(EMOTE_UNSTABLE_EXPLOSION);
-                                rotface->AI()->Talk(SAY_UNSTABLE_EXPLOSION);
-                            }
-
-                    if (Creature* cre = GetCaster()->ToCreature())
-                        cre->AI()->DoAction(EVENT_STICKY_OOZE);
-                    GetCaster()->CastSpell(GetCaster(), SPELL_UNSTABLE_OOZE_EXPLOSION, false, nullptr, nullptr, GetCaster()->GetGUID());
-                    if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                        instance->SetData(DATA_OOZE_DANCE_ACHIEVEMENT, uint32(false));
-                }
+                if (Creature* cre = GetCaster()->ToCreature())
+                    cre->AI()->DoAction(EVENT_STICKY_OOZE);
+                GetCaster()->CastSpell(GetCaster(), SPELL_UNSTABLE_OOZE_EXPLOSION, false, nullptr, nullptr, GetCaster()->GetGUID());
+                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                    instance->SetData(DATA_OOZE_DANCE_ACHIEVEMENT, uint32(false));
             }
-
-            GetHitCreature()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
-            GetHitCreature()->DespawnOrUnsummon();
         }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_rotface_large_ooze_buff_combine_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
+        GetHitCreature()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
+        GetHitCreature()->DespawnOrUnsummon();
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_rotface_large_ooze_buff_combine_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_rotface_large_ooze_buff_combine::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -945,7 +939,7 @@ void AddSC_boss_rotface()
     RegisterSpellAndAuraScriptPair(spell_rotface_mutated_infection, spell_rotface_mutated_infection_aura);
     RegisterSpellScript(spell_rotface_little_ooze_combine);
     RegisterSpellScript(spell_rotface_large_ooze_combine);
-    new spell_rotface_large_ooze_buff_combine();
+    RegisterSpellScript(spell_rotface_large_ooze_buff_combine);
     new spell_rotface_unstable_ooze_explosion_init();
     new spell_rotface_unstable_ooze_explosion();
     new spell_rotface_unstable_ooze_explosion_suicide();
