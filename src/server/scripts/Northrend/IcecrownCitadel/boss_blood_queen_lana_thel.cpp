@@ -587,42 +587,31 @@ public:
 // shortened version for clear code
 typedef boss_blood_queen_lana_thel::boss_blood_queen_lana_thelAI LanaThelAI;
 
-class spell_blood_queen_pact_of_the_darkfallen_dmg : public SpellScriptLoader
+class spell_blood_queen_pact_of_the_darkfallen_dmg_aura : public AuraScript
 {
-public:
-    spell_blood_queen_pact_of_the_darkfallen_dmg() : SpellScriptLoader("spell_blood_queen_pact_of_the_darkfallen_dmg") { }
+    PrepareAuraScript(spell_blood_queen_pact_of_the_darkfallen_dmg_aura);
 
-    class spell_blood_queen_pact_of_the_darkfallen_dmg_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_blood_queen_pact_of_the_darkfallen_dmg_AuraScript);
+        return ValidateSpellInfo({ SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE });
-        }
-
-        // this is an additional effect to be executed
-        void PeriodicTick(AuraEffect const* aurEff)
-        {
-            if ((aurEff->GetTickNumber() % 2) == 0)
-                return;
-            SpellInfo const* damageSpell = sSpellMgr->AssertSpellInfo(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE);
-            int32 damage = damageSpell->Effects[EFFECT_0].CalcValue();
-            float herobonus = ((GetTarget()->FindMap() && GetTarget()->FindMap()->IsHeroic()) ? 0.2f : 0.0f);
-            float multiplier = 0.5f + herobonus + 0.1f * uint32(aurEff->GetTickNumber() / 10); // do not convert to 0.01f - we need tick number/10 as INT (damage increases every 10 ticks)
-            damage = int32(damage * multiplier);
-            GetTarget()->CastCustomSpell(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_queen_pact_of_the_darkfallen_dmg_AuraScript::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    // this is an additional effect to be executed
+    void PeriodicTick(AuraEffect const* aurEff)
     {
-        return new spell_blood_queen_pact_of_the_darkfallen_dmg_AuraScript();
+        if ((aurEff->GetTickNumber() % 2) == 0)
+            return;
+        SpellInfo const* damageSpell = sSpellMgr->AssertSpellInfo(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE);
+        int32 damage = damageSpell->Effects[EFFECT_0].CalcValue();
+        float herobonus = ((GetTarget()->FindMap() && GetTarget()->FindMap()->IsHeroic()) ? 0.2f : 0.0f);
+        float multiplier = 0.5f + herobonus + 0.1f * uint32(aurEff->GetTickNumber() / 10); // do not convert to 0.01f - we need tick number/10 as INT (damage increases every 10 ticks)
+        damage = int32(damage * multiplier);
+        GetTarget()->CastCustomSpell(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_queen_pact_of_the_darkfallen_dmg_aura::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1014,7 +1003,7 @@ public:
 void AddSC_boss_blood_queen_lana_thel()
 {
     new boss_blood_queen_lana_thel();
-    new spell_blood_queen_pact_of_the_darkfallen_dmg();
+    RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_aura);
     new spell_blood_queen_pact_of_the_darkfallen();
     new spell_blood_queen_pact_of_the_darkfallen_dmg_target();
     new spell_blood_queen_bloodbolt();
