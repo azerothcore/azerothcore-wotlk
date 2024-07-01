@@ -1463,35 +1463,24 @@ class spell_blood_council_shadow_prison_aura : public AuraScript
     }
 };
 
-class spell_blood_council_shadow_prison_damage : public SpellScriptLoader
+class spell_blood_council_shadow_prison_damage : public SpellScript
 {
-public:
-    spell_blood_council_shadow_prison_damage() : SpellScriptLoader("spell_blood_council_shadow_prison_damage") { }
+    PrepareSpellScript(spell_blood_council_shadow_prison_damage);
 
-    class spell_blood_council_shadow_prison_SpellScript : public SpellScript
+    void AddExtraDamage()
     {
-        PrepareSpellScript(spell_blood_council_shadow_prison_SpellScript);
-
-        void AddExtraDamage()
+        if (Aura* aur = GetHitUnit()->GetAura(GetSpellInfo()->Id))
         {
-            if (Aura* aur = GetHitUnit()->GetAura(GetSpellInfo()->Id))
+            if (AuraEffect const* eff = aur->GetEffect(EFFECT_1))
             {
-                if (AuraEffect const* eff = aur->GetEffect(EFFECT_1))
-                {
-                    SetHitDamage(GetHitDamage() + eff->GetAmount());
-                }
+                SetHitDamage(GetHitDamage() + eff->GetAmount());
             }
         }
+    }
 
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_blood_council_shadow_prison_SpellScript::AddExtraDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_council_shadow_prison_SpellScript();
+        OnHit += SpellHitFn(spell_blood_council_shadow_prison_damage::AddExtraDamage);
     }
 };
 
@@ -1799,7 +1788,7 @@ void AddSC_boss_blood_prince_council()
     new npc_ball_of_flame();
     new npc_kinetic_bomb();
     RegisterSpellScript(spell_blood_council_shadow_prison_aura);
-    new spell_blood_council_shadow_prison_damage();
+    RegisterSpellScript(spell_blood_council_shadow_prison_damage);
     new spell_taldaram_glittering_sparks();
     new spell_taldaram_summon_flame_ball();
     new spell_taldaram_ball_of_inferno_flame();
