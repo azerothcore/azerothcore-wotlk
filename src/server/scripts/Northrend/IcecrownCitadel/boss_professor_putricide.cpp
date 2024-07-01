@@ -873,44 +873,33 @@ public:
     }
 };
 
-class spell_putricide_slime_puddle : public SpellScriptLoader
+class spell_putricide_slime_puddle : public SpellScript
 {
-public:
-    spell_putricide_slime_puddle() : SpellScriptLoader("spell_putricide_slime_puddle") { }
+    PrepareSpellScript(spell_putricide_slime_puddle);
 
-    class spell_putricide_slime_puddle_SpellScript : public SpellScript
+    void ScaleRange(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_putricide_slime_puddle_SpellScript);
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 2.5f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
+    }
 
-        void ScaleRange(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 2.5f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
-        }
-
-        // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
-        void HandleScript(SpellEffIndex  /*effIndex*/)
-        {
-            SpellInfo const* s1 = sSpellMgr->GetSpellInfo(70346);
-            SpellInfo const* s2 = sSpellMgr->GetSpellInfo(72456);
-            if (s1 && s2)
-                if (Unit* target = GetHitUnit())
-                {
-                    Aura::TryRefreshStackOrCreate(s1, MAX_EFFECT_MASK, target, target);
-                    Aura::TryRefreshStackOrCreate(s2, MAX_EFFECT_MASK, target, target);
-                }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_slime_puddle_SpellScript::ScaleRange, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_slime_puddle_SpellScript::ScaleRange, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_putricide_slime_puddle_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    // big hax to unlock Abomination Eat Ooze ability, requires caster aura spell from difficulty X, but unlocks clientside when got base aura
+    void HandleScript(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_putricide_slime_puddle_SpellScript();
+        SpellInfo const* s1 = sSpellMgr->GetSpellInfo(70346);
+        SpellInfo const* s2 = sSpellMgr->GetSpellInfo(72456);
+        if (s1 && s2)
+            if (Unit* target = GetHitUnit())
+            {
+                Aura::TryRefreshStackOrCreate(s1, MAX_EFFECT_MASK, target, target);
+                Aura::TryRefreshStackOrCreate(s2, MAX_EFFECT_MASK, target, target);
+            }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_slime_puddle::ScaleRange, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_slime_puddle::ScaleRange, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_putricide_slime_puddle::HandleScript, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -1710,7 +1699,7 @@ void AddSC_boss_professor_putricide()
     new boss_professor_putricide();
     new npc_volatile_ooze();
     new npc_gas_cloud();
-    new spell_putricide_slime_puddle();
+    RegisterSpellScript(spell_putricide_slime_puddle);
     new spell_putricide_slime_puddle_spawn();
     new spell_putricide_grow_stacker();
     new spell_putricide_unstable_experiment();
