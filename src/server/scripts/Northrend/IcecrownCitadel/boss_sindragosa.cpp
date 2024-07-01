@@ -1765,48 +1765,42 @@ class spell_frostwarden_handler_focus_fire_aura : public AuraScript
     }
 };
 
-class spell_sindragosa_frost_breath : public SpellScriptLoader
+class spell_sindragosa_frost_breath : public SpellScript
 {
-public:
-    spell_sindragosa_frost_breath() : SpellScriptLoader("spell_sindragosa_frost_breath") { }
+    PrepareSpellScript(spell_sindragosa_frost_breath);
 
-    class spell_sindragosa_frost_breath_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_sindragosa_frost_breath_SpellScript);
+        return ValidateSpellInfo({ SPELL_UNSATED_CRAVING, SPELL_FROST_IMBUED_BLADE, SPELL_FROST_INFUSION });
+    }
 
-        void HandleInfusion()
-        {
-            Player* target = GetHitPlayer();
-            if (!target)
-                return;
-
-            // Check difficulty and quest status
-            if (!(target->GetRaidDifficulty() & RAID_DIFFICULTY_MASK_25MAN) || target->GetQuestStatus(QUEST_FROST_INFUSION) != QUEST_STATUS_INCOMPLETE)
-                return;
-
-            // Check if player has Shadow's Edge equipped and not ready for infusion
-            if (!target->HasAura(SPELL_UNSATED_CRAVING) || target->HasAura(SPELL_FROST_IMBUED_BLADE))
-                return;
-
-            Aura* infusion = target->GetAura(SPELL_FROST_INFUSION, target->GetGUID());
-            if (infusion && infusion->GetStackAmount() >= 3)
-            {
-                target->RemoveAura(infusion);
-                target->CastSpell(target, SPELL_FROST_IMBUED_BLADE, TRIGGERED_FULL_MASK);
-            }
-            else
-                target->CastSpell(target, SPELL_FROST_INFUSION, TRIGGERED_FULL_MASK);
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_sindragosa_frost_breath_SpellScript::HandleInfusion);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleInfusion()
     {
-        return new spell_sindragosa_frost_breath_SpellScript();
+        Player* target = GetHitPlayer();
+        if (!target)
+            return;
+
+        // Check difficulty and quest status
+        if (!(target->GetRaidDifficulty() & RAID_DIFFICULTY_MASK_25MAN) || target->GetQuestStatus(QUEST_FROST_INFUSION) != QUEST_STATUS_INCOMPLETE)
+            return;
+
+        // Check if player has Shadow's Edge equipped and not ready for infusion
+        if (!target->HasAura(SPELL_UNSATED_CRAVING) || target->HasAura(SPELL_FROST_IMBUED_BLADE))
+            return;
+
+        Aura* infusion = target->GetAura(SPELL_FROST_INFUSION, target->GetGUID());
+        if (infusion && infusion->GetStackAmount() >= 3)
+        {
+            target->RemoveAura(infusion);
+            target->CastSpell(target, SPELL_FROST_IMBUED_BLADE, TRIGGERED_FULL_MASK);
+        }
+        else
+            target->CastSpell(target, SPELL_FROST_INFUSION, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_sindragosa_frost_breath::HandleInfusion);
     }
 };
 
@@ -1838,5 +1832,5 @@ void AddSC_boss_sindragosa()
     RegisterSpellScript(spell_frostwarden_handler_order_whelp);
     RegisterSpellAndAuraScriptPair(spell_frostwarden_handler_focus_fire, spell_frostwarden_handler_focus_fire_aura);
 
-    new spell_sindragosa_frost_breath();
+    RegisterSpellScript(spell_sindragosa_frost_breath);
 }
