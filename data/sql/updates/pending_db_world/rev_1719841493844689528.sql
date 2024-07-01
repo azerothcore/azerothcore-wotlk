@@ -6,3 +6,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_icc_stoneform_aura' WHERE `s
 UPDATE `spell_script_names` SET `ScriptName`='spell_icc_web_wrap_aura' WHERE `spell_id`=70980 AND `ScriptName`='spell_icc_web_wrap';
 UPDATE `spell_script_names` SET `ScriptName`='spell_icc_dark_reckoning_aura' WHERE `spell_id`=69483 AND `ScriptName`='spell_icc_dark_reckoning';
 UPDATE `spell_script_names` SET `ScriptName`='spell_icc_yf_frozen_orb_aura' WHERE `spell_id`=71274 AND `ScriptName`='spell_icc_yf_frozen_orb';
+UPDATE `spell_script_names` SET `ScriptName`='spell_icc_yh_volley_aura' WHERE `spell_id`=71252 AND `ScriptName`='spell_icc_yh_volley';

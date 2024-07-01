@@ -2358,37 +2358,31 @@ class spell_icc_yf_frozen_orb_aura : public AuraScript
     }
 };
 
-class spell_icc_yh_volley : public SpellScriptLoader
+class spell_icc_yh_volley_aura : public AuraScript
 {
-public:
-    spell_icc_yh_volley() : SpellScriptLoader("spell_icc_yh_volley") { }
+    PrepareAuraScript(spell_icc_yh_volley_aura);
 
-    class spell_icc_yh_volley_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_icc_yh_volley_AuraScript)
+        return ValidateSpellInfo({ 41089 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* c = GetCaster())
-                if (Unit* t = GetTarget())
-                {
-                    if ((aurEff->GetTickNumber() % 5) == 0)
-                        c->SetFacingToObject(t);
-                    int32 basepoints1 = aurEff->GetAmount();
-                    c->CastCustomSpell(t, 41089, 0, &basepoints1, 0, true);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_icc_yh_volley_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_icc_yh_volley_AuraScript();
+        PreventDefaultAction();
+        if (Unit* c = GetCaster())
+            if (Unit* t = GetTarget())
+            {
+                if ((aurEff->GetTickNumber() % 5) == 0)
+                    c->SetFacingToObject(t);
+                int32 basepoints1 = aurEff->GetAmount();
+                c->CastCustomSpell(t, 41089, 0, &basepoints1, 0, true);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_icc_yh_volley_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
     }
 };
 
@@ -3697,7 +3691,7 @@ void AddSC_icecrown_citadel()
     RegisterSpellScript(spell_icc_dark_reckoning_aura);
     RegisterSpellScript(spell_stinky_precious_decimate);
     RegisterSpellScript(spell_icc_yf_frozen_orb_aura);
-    new spell_icc_yh_volley();
+    RegisterSpellScript(spell_icc_yh_volley_aura);
     new spell_icc_yd_summon_undead();
     new spell_icc_shattered_bones();
     new npc_icc_skybreaker_hierophant();
