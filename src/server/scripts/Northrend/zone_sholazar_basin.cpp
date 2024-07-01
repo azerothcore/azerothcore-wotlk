@@ -1211,101 +1211,95 @@ enum KickWhatKick
     SAY_DROSTAN_REPLY_MISS = 0,
 };
 
-class spell_q12589_shoot_rjr : public SpellScriptLoader
+class spell_q12589_shoot_rjr : public SpellScript
 {
-public:
-    spell_q12589_shoot_rjr() : SpellScriptLoader("spell_q12589_shoot_rjr") { }
+    PrepareSpellScript(spell_q12589_shoot_rjr);
 
-    class spell_q12589_shoot_rjr_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q12589_shoot_rjr_SpellScript);
+        return ValidateSpellInfo({ SPELL_MISS_BIRD_APPLE, SPELL_BIRD_FALL, SPELL_MISS_APPLE, SPELL_HIT_APPLE, SPELL_APPLE_FALL });
+    }
 
-        SpellCastResult CheckCast()
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_LUCKY_WILHELM)
+                return SPELL_CAST_OK;
+
+        SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_MUST_TARGET_WILHELM);
+        return SPELL_FAILED_CUSTOM_ERROR;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        uint32 roll = urand(1, 100);
+
+        uint8 ev;
+        if (roll <= 50)
+            ev = EVENT_MISS;
+        else if (roll <= 83)
+            ev = EVENT_HIT;
+        else
+            ev = EVENT_MISS_BIRD;
+
+        Unit* shooter = GetCaster();
+        Creature* wilhelm = GetHitUnit()->ToCreature();
+        Creature* apple = shooter->FindNearestCreature(NPC_APPLE, 30);
+        Creature* drostan = shooter->FindNearestCreature(NPC_DROSTAN, 30);
+
+        if (!wilhelm || !apple || !drostan)
+            return;
+
+        switch (ev)
         {
-            if (Unit* target = GetExplTargetUnit())
-                if (target->GetEntry() == NPC_LUCKY_WILHELM)
-                    return SPELL_CAST_OK;
+            case EVENT_MISS_BIRD:
+                {
+                    Creature* crunchy = shooter->FindNearestCreature(NPC_CRUNCHY, 30);
+                    Creature* bird = shooter->FindNearestCreature(NPC_THICKBIRD, 30);
 
-            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_MUST_TARGET_WILHELM);
-            return SPELL_FAILED_CUSTOM_ERROR;
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            uint32 roll = urand(1, 100);
-
-            uint8 ev;
-            if (roll <= 50)
-                ev = EVENT_MISS;
-            else if (roll <= 83)
-                ev = EVENT_HIT;
-            else
-                ev = EVENT_MISS_BIRD;
-
-            Unit* shooter = GetCaster();
-            Creature* wilhelm = GetHitUnit()->ToCreature();
-            Creature* apple = shooter->FindNearestCreature(NPC_APPLE, 30);
-            Creature* drostan = shooter->FindNearestCreature(NPC_DROSTAN, 30);
-
-            if (!wilhelm || !apple || !drostan)
-                return;
-
-            switch (ev)
-            {
-                case EVENT_MISS_BIRD:
+                    if (!bird || !crunchy)
+                        ; // fall to EVENT_MISS
+                    else
                     {
-                        Creature* crunchy = shooter->FindNearestCreature(NPC_CRUNCHY, 30);
-                        Creature* bird = shooter->FindNearestCreature(NPC_THICKBIRD, 30);
-
-                        if (!bird || !crunchy)
-                            ; // fall to EVENT_MISS
-                        else
-                        {
-                            shooter->CastSpell(bird, SPELL_MISS_BIRD_APPLE);
-                            bird->CastSpell(bird, SPELL_BIRD_FALL);
-                            wilhelm->AI()->Talk(SAY_WILHELM_MISS);
-                            drostan->AI()->Talk(SAY_DROSTAN_REPLY_MISS);
-
-                            Unit::Kill(bird, bird);
-                            crunchy->GetMotionMaster()->MovePoint(0, bird->GetPositionX(), bird->GetPositionY(),
-                                                                  bird->GetMapWaterOrGroundLevel(bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
-                            /// @todo Make crunchy perform emote eat when he reaches the bird
-
-                            break;
-                        }
-                        [[fallthrough]];
-                    }
-                case EVENT_MISS:
-                    {
-                        shooter->CastSpell(wilhelm, SPELL_MISS_APPLE);
+                        shooter->CastSpell(bird, SPELL_MISS_BIRD_APPLE);
+                        bird->CastSpell(bird, SPELL_BIRD_FALL);
                         wilhelm->AI()->Talk(SAY_WILHELM_MISS);
                         drostan->AI()->Talk(SAY_DROSTAN_REPLY_MISS);
-                        break;
-                    }
-                case EVENT_HIT:
-                    {
-                        shooter->CastSpell(apple, SPELL_HIT_APPLE);
-                        apple->CastSpell(apple, SPELL_APPLE_FALL);
-                        wilhelm->AI()->Talk(SAY_WILHELM_HIT);
-                        if (Player* player = shooter->ToPlayer())
-                            player->KilledMonsterCredit(NPC_APPLE);
-                        //apple->DespawnOrUnsummon(); zomg!
+
+                        Unit::Kill(bird, bird);
+                        crunchy->GetMotionMaster()->MovePoint(0, bird->GetPositionX(), bird->GetPositionY(),
+                                                              bird->GetMapWaterOrGroundLevel(bird->GetPositionX(), bird->GetPositionY(), bird->GetPositionZ()));
+                        /// @todo Make crunchy perform emote eat when he reaches the bird
 
                         break;
                     }
-            }
-        }
+                    [[fallthrough]];
+                }
+            case EVENT_MISS:
+                {
+                    shooter->CastSpell(wilhelm, SPELL_MISS_APPLE);
+                    wilhelm->AI()->Talk(SAY_WILHELM_MISS);
+                    drostan->AI()->Talk(SAY_DROSTAN_REPLY_MISS);
+                    break;
+                }
+            case EVENT_HIT:
+                {
+                    shooter->CastSpell(apple, SPELL_HIT_APPLE);
+                    apple->CastSpell(apple, SPELL_APPLE_FALL);
+                    wilhelm->AI()->Talk(SAY_WILHELM_HIT);
+                    if (Player* player = shooter->ToPlayer())
+                        player->KilledMonsterCredit(NPC_APPLE);
+                    //apple->DespawnOrUnsummon(); zomg!
 
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_q12589_shoot_rjr_SpellScript::CheckCast);
-            OnEffectHitTarget += SpellEffectFn(spell_q12589_shoot_rjr_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+                    break;
+                }
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q12589_shoot_rjr_SpellScript();
+        OnCheckCast += SpellCheckCastFn(spell_q12589_shoot_rjr::CheckCast);
+        OnEffectHitTarget += SpellEffectFn(spell_q12589_shoot_rjr::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1522,7 +1516,7 @@ void AddSC_sholazar_basin()
     new npc_adventurous_dwarf();
     new npc_jungle_punch_target();
     RegisterSpellScript(spell_q12620_the_lifewarden_wrath);
-    new spell_q12589_shoot_rjr();
+    RegisterSpellScript(spell_q12589_shoot_rjr);
     new npc_vics_flying_machine();
     new spell_shango_tracks();
 
