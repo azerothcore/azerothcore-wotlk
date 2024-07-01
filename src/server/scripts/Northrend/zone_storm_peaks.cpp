@@ -586,48 +586,37 @@ public:
     }
 };
 
-class spell_q13003_thursting_hodirs_spear : public SpellScriptLoader
+class spell_q13003_thursting_hodirs_spear_aura : public AuraScript
 {
-public:
-    spell_q13003_thursting_hodirs_spear() : SpellScriptLoader("spell_q13003_thursting_hodirs_spear") { }
+    PrepareAuraScript(spell_q13003_thursting_hodirs_spear_aura);
 
-    class spell_q13003_thursting_hodirs_spear_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_q13003_thursting_hodirs_spear_AuraScript);
+        ModStackAmount(60);
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* creature = GetUnitOwner()->ToCreature())
         {
-            ModStackAmount(60);
-        }
-
-        void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* creature = GetUnitOwner()->ToCreature())
+            if (!creature->IsInEvadeMode())
             {
-                if (!creature->IsInEvadeMode())
-                {
-                    creature->RemoveAllAuras();
-                    creature->AI()->EnterEvadeMode();
-                }
+                creature->RemoveAllAuras();
+                creature->AI()->EnterEvadeMode();
             }
         }
+    }
 
-        void HandlePeriodic(AuraEffect const* /* aurEff */)
-        {
-            ModStackAmount(-1);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13003_thursting_hodirs_spear_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectApply += AuraEffectApplyFn(spell_q13003_thursting_hodirs_spear_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_q13003_thursting_hodirs_spear_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const* /* aurEff */)
     {
-        return new spell_q13003_thursting_hodirs_spear_AuraScript();
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13003_thursting_hodirs_spear_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectApply += AuraEffectApplyFn(spell_q13003_thursting_hodirs_spear_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_q13003_thursting_hodirs_spear_aura::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1204,7 +1193,7 @@ void AddSC_storm_peaks()
     new npc_iron_watcher();
     new npc_time_lost_proto_drake();
     new npc_wild_wyrm();
-    new spell_q13003_thursting_hodirs_spear();
+    RegisterSpellScript(spell_q13003_thursting_hodirs_spear_aura);
     new spell_q13007_iron_colossus();
     new npc_roxi_ramrocket();
     new npc_brunnhildar_prisoner();
