@@ -2347,57 +2347,47 @@ class spell_igb_cannon_blast : public SpellScript
     }
 };
 
-class spell_igb_incinerating_blast : public SpellScriptLoader
+class spell_igb_incinerating_blast : public SpellScript
 {
-public:
-    spell_igb_incinerating_blast() : SpellScriptLoader("spell_igb_incinerating_blast") { }
+    PrepareSpellScript(spell_igb_incinerating_blast);
 
-    class spell_igb_incinerating_blast_SpellScript : public SpellScript
+    void StoreEnergy()
     {
-        PrepareSpellScript(spell_igb_incinerating_blast_SpellScript);
-
-        void StoreEnergy()
-        {
-            _energyLeft = GetCaster()->GetPower(POWER_ENERGY) - 10;
-        }
-
-        void RemoveEnergy()
-        {
-            GetCaster()->SetPower(POWER_ENERGY, 0);
-        }
-
-        void CalculateDamage(SpellEffIndex /*effIndex*/)
-        {
-            PreventHitEffect(EFFECT_0);
-            SpellInfo const* si = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
-            if (!si)
-                return;
-            SpellCastTargets targets;
-            Position dest = GetExplTargetDest()->GetPosition();
-            targets.SetDst(dest);
-            CustomSpellValues values;
-            int32 damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8;
-            values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
-            values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage);
-            values.AddSpellMod(SPELLVALUE_BASE_POINT2, damage);
-            GetCaster()->CastSpell(targets, si, &values, TRIGGERED_FULL_MASK);
-            //SetEffectValue(GetEffectValue() + _energyLeft * _energyLeft * 8);
-        }
-
-        void Register() override
-        {
-            OnCast += SpellCastFn(spell_igb_incinerating_blast_SpellScript::StoreEnergy);
-            AfterCast += SpellCastFn(spell_igb_incinerating_blast_SpellScript::RemoveEnergy);
-            OnEffectHit += SpellEffectFn(spell_igb_incinerating_blast_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
-        }
-
-        uint32 _energyLeft;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_igb_incinerating_blast_SpellScript();
+        _energyLeft = GetCaster()->GetPower(POWER_ENERGY) - 10;
     }
+
+    void RemoveEnergy()
+    {
+        GetCaster()->SetPower(POWER_ENERGY, 0);
+    }
+
+    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    {
+        PreventHitEffect(EFFECT_0);
+        SpellInfo const* si = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
+        if (!si)
+            return;
+        SpellCastTargets targets;
+        Position dest = GetExplTargetDest()->GetPosition();
+        targets.SetDst(dest);
+        CustomSpellValues values;
+        int32 damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8;
+        values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
+        values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage);
+        values.AddSpellMod(SPELLVALUE_BASE_POINT2, damage);
+        GetCaster()->CastSpell(targets, si, &values, TRIGGERED_FULL_MASK);
+        //SetEffectValue(GetEffectValue() + _energyLeft * _energyLeft * 8);
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_igb_incinerating_blast::StoreEnergy);
+        AfterCast += SpellCastFn(spell_igb_incinerating_blast::RemoveEnergy);
+        OnEffectHit += SpellEffectFn(spell_igb_incinerating_blast::CalculateDamage, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
+    }
+
+private:
+    uint32 _energyLeft;
 };
 
 class BurningPitchFilterCheck
@@ -2701,7 +2691,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_periodic_trigger_with_power_cost_aura);
     RegisterSpellScript(spell_igb_overheat_aura);
     RegisterSpellScript(spell_igb_cannon_blast);
-    new spell_igb_incinerating_blast();
+    RegisterSpellScript(spell_igb_incinerating_blast);
     new spell_igb_burning_pitch_selector();
     new spell_igb_burning_pitch();
     new spell_igb_rocket_artillery();
