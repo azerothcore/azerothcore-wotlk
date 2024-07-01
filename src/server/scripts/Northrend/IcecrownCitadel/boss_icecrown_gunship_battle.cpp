@@ -2179,30 +2179,19 @@ private:
     Unit* _source;
 };
 
-class spell_igb_explosion : public SpellScriptLoader
+class spell_igb_explosion : public SpellScript
 {
-public:
-    spell_igb_explosion() : SpellScriptLoader("spell_igb_explosion") { }
+    PrepareSpellScript(spell_igb_explosion);
 
-    class spell_igb_explosion_SpellScript : public SpellScript
+    void SelectTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_igb_explosion_SpellScript);
+        targets.remove_if(IgbExplosionCheck(GetCaster()));
+        Acore::Containers::RandomResize(targets, 1);
+    }
 
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(IgbExplosionCheck(GetCaster()));
-            Acore::Containers::RandomResize(targets, 1);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_explosion_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_igb_explosion_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_explosion::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
     }
 };
 
@@ -2746,7 +2735,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_check_for_players);
     RegisterSpellScript(spell_igb_gunship_fall_teleport);
     RegisterSpellScript(spell_igb_explosion_main_aura);
-    new spell_igb_explosion();
+    RegisterSpellScript(spell_igb_explosion);
     new spell_igb_teleport_players_on_victory();
     new spell_igb_periodic_trigger_with_power_cost();
     new spell_igb_overheat();
