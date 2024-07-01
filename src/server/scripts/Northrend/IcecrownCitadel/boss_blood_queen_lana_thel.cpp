@@ -756,44 +756,33 @@ class spell_blood_queen_frenzied_bloodthirst_aura : public AuraScript
     }
 };
 
-class spell_blood_queen_essence_of_the_blood_queen : public SpellScriptLoader
+class spell_blood_queen_essence_of_the_blood_queen_aura : public AuraScript
 {
-public:
-    spell_blood_queen_essence_of_the_blood_queen() : SpellScriptLoader("spell_blood_queen_essence_of_the_blood_queen") { }
+    PrepareAuraScript(spell_blood_queen_essence_of_the_blood_queen_aura);
 
-    class spell_blood_queen_essence_of_the_blood_queen_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_blood_queen_essence_of_the_blood_queen_AuraScript);
+        return ValidateSpellInfo({ SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL });
-        }
-
-        void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo || !damageInfo->GetDamage())
-            {
-                return;
-            }
-
-            int32 heal = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
-            GetTarget()->CastCustomSpell(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), TRIGGERED_FULL_MASK, nullptr, aurEff);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_blood_queen_essence_of_the_blood_queen_AuraScript::OnProc, EFFECT_1, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
-        return new spell_blood_queen_essence_of_the_blood_queen_AuraScript();
+        PreventDefaultAction();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+        if (!damageInfo || !damageInfo->GetDamage())
+        {
+            return;
+        }
+
+        int32 heal = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
+        GetTarget()->CastCustomSpell(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), TRIGGERED_FULL_MASK, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_blood_queen_essence_of_the_blood_queen_aura::OnProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 
@@ -969,7 +958,7 @@ void AddSC_boss_blood_queen_lana_thel()
     RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_target);
     RegisterSpellScript(spell_blood_queen_bloodbolt);
     RegisterSpellScript(spell_blood_queen_frenzied_bloodthirst_aura);
-    new spell_blood_queen_essence_of_the_blood_queen();
+    RegisterSpellScript(spell_blood_queen_essence_of_the_blood_queen_aura);
     new spell_blood_queen_vampiric_bite();
     new spell_blood_queen_swarming_shadows_floor_dmg();
     new spell_blood_queen_presence_of_the_darkfallen();
