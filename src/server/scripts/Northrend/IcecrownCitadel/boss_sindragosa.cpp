@@ -1494,37 +1494,26 @@ public:
     }
 };
 
-class spell_rimefang_icy_blast : public SpellScriptLoader
+class spell_rimefang_icy_blast : public SpellScript
 {
-public:
-    spell_rimefang_icy_blast() : SpellScriptLoader("spell_rimefang_icy_blast") { }
+    PrepareSpellScript(spell_rimefang_icy_blast);
 
-    class spell_rimefang_icy_blast_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_rimefang_icy_blast_SpellScript);
+        return ValidateSpellInfo({ SPELL_ICY_BLAST_AREA });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ICY_BLAST_AREA });
-        }
-
-        void HandleTriggerMissile(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Position const* pos = GetExplTargetDest())
-                if (TempSummon* summon = GetCaster()->SummonCreature(NPC_ICY_BLAST, *pos, TEMPSUMMON_TIMED_DESPAWN, 40000))
-                    summon->CastSpell(summon, SPELL_ICY_BLAST_AREA, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_rimefang_icy_blast_SpellScript::HandleTriggerMissile, EFFECT_1, SPELL_EFFECT_TRIGGER_MISSILE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleTriggerMissile(SpellEffIndex effIndex)
     {
-        return new spell_rimefang_icy_blast_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Position const* pos = GetExplTargetDest())
+            if (TempSummon* summon = GetCaster()->SummonCreature(NPC_ICY_BLAST, *pos, TEMPSUMMON_TIMED_DESPAWN, 40000))
+                summon->CastSpell(summon, SPELL_ICY_BLAST_AREA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_rimefang_icy_blast::HandleTriggerMissile, EFFECT_1, SPELL_EFFECT_TRIGGER_MISSILE);
     }
 };
 
@@ -1869,7 +1858,7 @@ void AddSC_boss_sindragosa()
 
     new npc_spinestalker();
     new npc_rimefang();
-    new spell_rimefang_icy_blast();
+    RegisterSpellScript(spell_rimefang_icy_blast);
     new at_sindragosa_lair();
 
     new npc_sindragosa_trash();
