@@ -921,38 +921,27 @@ class spell_sindragosa_instability_aura : public AuraScript
     }
 };
 
-class spell_sindragosa_icy_grip : public SpellScriptLoader
+class spell_sindragosa_icy_grip : public SpellScript
 {
-public:
-    spell_sindragosa_icy_grip() : SpellScriptLoader("spell_sindragosa_icy_grip") { }
+    PrepareSpellScript(spell_sindragosa_icy_grip);
 
-    class spell_sindragosa_icy_grip_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_sindragosa_icy_grip_SpellScript);
+        return ValidateSpellInfo({ SPELL_ICY_GRIP_JUMP });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ICY_GRIP_JUMP });
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit()->IsWithinLOSInMap(GetCaster()) || GetHitUnit()->HasAura(SPELL_TANK_MARKER_AURA))
-                return;
-
-            GetHitUnit()->CastSpell(GetCaster(), SPELL_ICY_GRIP_JUMP, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_sindragosa_icy_grip_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_sindragosa_icy_grip_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit()->IsWithinLOSInMap(GetCaster()) || GetHitUnit()->HasAura(SPELL_TANK_MARKER_AURA))
+            return;
+
+        GetHitUnit()->CastSpell(GetCaster(), SPELL_ICY_GRIP_JUMP, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_sindragosa_icy_grip::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1927,7 +1916,7 @@ void AddSC_boss_sindragosa()
     RegisterSpellScript(spell_sindragosa_unchained_magic);
     RegisterSpellScript(spell_sindragosa_permeating_chill_aura);
     RegisterSpellScript(spell_sindragosa_instability_aura);
-    new spell_sindragosa_icy_grip();
+    RegisterSpellScript(spell_sindragosa_icy_grip);
     new spell_sindragosa_icy_grip_jump();
     new spell_sindragosa_ice_tomb_filter();
     new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb", SPELL_ICE_TOMB_DUMMY);
