@@ -1055,33 +1055,22 @@ class spell_wintergrasp_water : public SpellScript
 };
 
 // 52107 - (Spell not exist in DBC)
-class spell_wintergrasp_hide_small_elementals : public SpellScriptLoader
+class spell_wintergrasp_hide_small_elementals_aura : public AuraScript
 {
-public:
-    spell_wintergrasp_hide_small_elementals() : SpellScriptLoader("spell_wintergrasp_hide_small_elementals") { }
+    PrepareAuraScript(spell_wintergrasp_hide_small_elementals_aura);
 
-    class spell_wintergrasp_hide_small_elementals_AuraScript : public AuraScript
+    void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_wintergrasp_hide_small_elementals_AuraScript);
+        Unit* target = GetTarget();
+        Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
+        bool enable = !Bf || !Bf->IsWarTime();
+        target->SetPhaseMask(enable ? 1 : 512, true);
+        PreventDefaultAction();
+    }
 
-        void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
-        {
-            Unit* target = GetTarget();
-            Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
-            bool enable = !Bf || !Bf->IsWarTime();
-            target->SetPhaseMask(enable ? 1 : 512, true);
-            PreventDefaultAction();
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_wintergrasp_hide_small_elementals_AuraScript::HandlePeriodicDummy, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_wintergrasp_hide_small_elementals_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_wintergrasp_hide_small_elementals_aura::HandlePeriodicDummy, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1202,7 +1191,7 @@ void AddSC_wintergrasp()
     RegisterSpellScript(spell_wintergrasp_rp_gg);
     RegisterSpellScript(spell_wintergrasp_portal);
     RegisterSpellScript(spell_wintergrasp_water);
-    new spell_wintergrasp_hide_small_elementals();
+    RegisterSpellScript(spell_wintergrasp_hide_small_elementals_aura);
     new spell_wg_reduce_damage_by_distance();
 
     // ACHIEVEMENTs
