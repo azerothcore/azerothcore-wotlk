@@ -1156,8 +1156,9 @@ class spell_charge_shield_bomber_aura : public AuraScript
     {
         if (m_scriptSpellId == SPELL_INFRA_GREEN_SHIELD)
         {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_charge_shield_bomber_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-        OnEffectAbsorb += AuraEffectAbsorbFn(spell_charge_shield_bomber_aura::Absorb, EFFECT_0);
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_charge_shield_bomber_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_charge_shield_bomber_aura::Absorb, EFFECT_0);
+        }
     }
 };
 
