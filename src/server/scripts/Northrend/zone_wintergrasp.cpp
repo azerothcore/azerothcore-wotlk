@@ -1008,35 +1008,29 @@ class spell_wintergrasp_rp_gg : public SpellScript
 };
 
 // 58622 - Teleport to Lake Wintergrasp
-class spell_wintergrasp_portal : public SpellScriptLoader
+class spell_wintergrasp_portal : public SpellScript
 {
-public:
-    spell_wintergrasp_portal() : SpellScriptLoader("spell_wintergrasp_portal") { }
+    PrepareSpellScript(spell_wintergrasp_portal);
 
-    class spell_wintergrasp_portal_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_wintergrasp_portal_SpellScript);
+        return ValidateSpellInfo({ SPELL_TELEPORT_TO_FORTRESS });
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Player* target = GetHitPlayer();
-            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (!wintergrasp || !target || target->GetLevel() < 75 || (wintergrasp->GetDefenderTeam() != target->GetTeamId()))
-                return;
-
-            target->CastSpell(target, SPELL_TELEPORT_TO_FORTRESS, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_portal_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_wintergrasp_portal_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        Player* target = GetHitPlayer();
+        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+        if (!wintergrasp || !target || target->GetLevel() < 75 || (wintergrasp->GetDefenderTeam() != target->GetTeamId()))
+            return;
+
+        target->CastSpell(target, SPELL_TELEPORT_TO_FORTRESS, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_portal::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1217,7 +1211,7 @@ void AddSC_wintergrasp()
     RegisterSpellScript(spell_wintergrasp_force_building);
     RegisterSpellScript(spell_wintergrasp_create_vehicle);
     RegisterSpellScript(spell_wintergrasp_rp_gg);
-    new spell_wintergrasp_portal();
+    RegisterSpellScript(spell_wintergrasp_portal);
     new spell_wintergrasp_water();
     new spell_wintergrasp_hide_small_elementals();
     new spell_wg_reduce_damage_by_distance();
