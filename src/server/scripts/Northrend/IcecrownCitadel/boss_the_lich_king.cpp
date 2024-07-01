@@ -2374,35 +2374,24 @@ class spell_the_lich_king_defile : public SpellScript
     }
 };
 
-class spell_the_lich_king_soul_reaper : public SpellScriptLoader
+class spell_the_lich_king_soul_reaper_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_soul_reaper() :  SpellScriptLoader("spell_the_lich_king_soul_reaper") { }
+    PrepareAuraScript(spell_the_lich_king_soul_reaper_aura);
 
-    class spell_the_lich_king_soul_reaper_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_soul_reaper_AuraScript);
+        return ValidateSpellInfo({ SPELL_SOUL_REAPER_BUFF });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_SOUL_REAPER_BUFF });
-        }
-
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            if (Unit* caster = GetCaster())
-                GetTarget()->CastSpell(caster, SPELL_SOUL_REAPER_BUFF, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_soul_reaper_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_the_lich_king_soul_reaper_AuraScript();
+        if (Unit* caster = GetCaster())
+            GetTarget()->CastSpell(caster, SPELL_SOUL_REAPER_BUFF, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_soul_reaper_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -3711,7 +3700,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_raging_spirit);
     new npc_raging_spirit();
     RegisterSpellScript(spell_the_lich_king_defile);
-    new spell_the_lich_king_soul_reaper();
+    RegisterSpellScript(spell_the_lich_king_soul_reaper_aura);
     new npc_valkyr_shadowguard();
     new spell_the_lich_king_summon_into_air();
     new spell_the_lich_king_teleport_to_frostmourne_hc();
