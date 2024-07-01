@@ -520,60 +520,54 @@ class spell_marrowgar_coldflame : public SpellScript
     }
 };
 
-class spell_marrowgar_bone_spike_graveyard : public SpellScriptLoader
+class spell_marrowgar_bone_spike_graveyard : public SpellScript
 {
-public:
-    spell_marrowgar_bone_spike_graveyard() : SpellScriptLoader("spell_marrowgar_bone_spike_graveyard") { }
+    PrepareSpellScript(spell_marrowgar_bone_spike_graveyard);
 
-    class spell_marrowgar_bone_spike_graveyard_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_marrowgar_bone_spike_graveyard_SpellScript);
+        return ValidateSpellInfo({ SPELL_IMPALED });
+    }
 
-        void HandleSpikes(SpellEffIndex effIndex)
+    void HandleSpikes(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Creature* marrowgar = GetCaster()->ToCreature())
         {
-            PreventHitDefaultEffect(effIndex);
-            if (Creature* marrowgar = GetCaster()->ToCreature())
+            bool didHit = false;
+            CreatureAI* marrowgarAI = marrowgar->AI();
+            uint8 boneSpikeCount = uint8(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
+
+            std::vector<Player*> validPlayers;
+            Map::PlayerList const& pList = marrowgar->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+                if (Player* plr = itr->GetSource())
+                    if (plr->IsAlive() && !plr->IsGameMaster() && plr->GetExactDist2dSq(marrowgar) < (150.0f * 150.0f) && !plr->HasAura(SPELL_IMPALED))
+                        if (!marrowgar->GetVictim() || marrowgar->GetVictim()->GetGUID() != plr->GetGUID())
+                            if (plr->GetGUID() != marrowgarAI->GetGUID(0) && plr->GetGUID() != marrowgarAI->GetGUID(1) && plr->GetGUID() != marrowgarAI->GetGUID(2)) // not a bone slice target
+                                validPlayers.push_back(plr);
+
+            std::vector<Player*>::iterator begin = validPlayers.begin(), end = validPlayers.end();
+
+            std::random_device rd;
+            std::shuffle(begin, end, std::default_random_engine{rd()});
+
+            for (uint8 i = 0; i < boneSpikeCount && i < validPlayers.size(); ++i)
             {
-                bool didHit = false;
-                CreatureAI* marrowgarAI = marrowgar->AI();
-                uint8 boneSpikeCount = uint8(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 3 : 1);
-
-                std::vector<Player*> validPlayers;
-                Map::PlayerList const& pList = marrowgar->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                    if (Player* plr = itr->GetSource())
-                        if (plr->IsAlive() && !plr->IsGameMaster() && plr->GetExactDist2dSq(marrowgar) < (150.0f * 150.0f) && !plr->HasAura(SPELL_IMPALED))
-                            if (!marrowgar->GetVictim() || marrowgar->GetVictim()->GetGUID() != plr->GetGUID())
-                                if (plr->GetGUID() != marrowgarAI->GetGUID(0) && plr->GetGUID() != marrowgarAI->GetGUID(1) && plr->GetGUID() != marrowgarAI->GetGUID(2)) // not a bone slice target
-                                    validPlayers.push_back(plr);
-
-                std::vector<Player*>::iterator begin = validPlayers.begin(), end = validPlayers.end();
-
-                std::random_device rd;
-                std::shuffle(begin, end, std::default_random_engine{rd()});
-
-                for (uint8 i = 0; i < boneSpikeCount && i < validPlayers.size(); ++i)
-                {
-                    Unit* target = validPlayers[i];
-                    didHit = true;
-                    //target->CastCustomSpell(boneSpikeSummonId[i], SPELLVALUE_BASE_POINT0, 0, target, true);
-                    target->CastSpell(target, boneSpikeSummonId[i], true);
-                }
-
-                if (didHit)
-                    marrowgarAI->Talk(SAY_BONESPIKE);
+                Unit* target = validPlayers[i];
+                didHit = true;
+                //target->CastCustomSpell(boneSpikeSummonId[i], SPELLVALUE_BASE_POINT0, 0, target, true);
+                target->CastSpell(target, boneSpikeSummonId[i], true);
             }
-        }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_marrowgar_bone_spike_graveyard_SpellScript::HandleSpikes, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
+            if (didHit)
+                marrowgarAI->Talk(SAY_BONESPIKE);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_marrowgar_bone_spike_graveyard_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_marrowgar_bone_spike_graveyard::HandleSpikes, EFFECT_1, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -696,7 +690,7 @@ void AddSC_boss_lord_marrowgar()
     new npc_bone_spike();
     RegisterSpellScript(spell_marrowgar_coldflame);
     new spell_marrowgar_coldflame_bonestorm();
-    new spell_marrowgar_bone_spike_graveyard();
+    RegisterSpellScript(spell_marrowgar_bone_spike_graveyard);
     new spell_marrowgar_bone_storm();
     new spell_marrowgar_bone_slice();
 }
