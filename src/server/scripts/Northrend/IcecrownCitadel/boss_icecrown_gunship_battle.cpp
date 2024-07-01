@@ -2007,52 +2007,41 @@ class spell_igb_rocket_pack_aura : public AuraScript
     }
 };
 
-class spell_igb_rocket_pack_useable : public SpellScriptLoader
+class spell_igb_rocket_pack_useable_aura : public AuraScript
 {
-public:
-    spell_igb_rocket_pack_useable() : SpellScriptLoader("spell_igb_rocket_pack_useable") { }
+    PrepareAuraScript(spell_igb_rocket_pack_useable_aura);
 
-    class spell_igb_rocket_pack_useable_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_igb_rocket_pack_useable_AuraScript);
+        return GetOwner()->GetInstanceScript();
+    }
 
-        bool Load() override
-        {
-            return GetOwner()->GetInstanceScript();
-        }
-
-        bool CheckAreaTarget(Unit* target)
-        {
-            return target->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetInstanceScript()->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE;
-        }
-
-        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* owner = GetOwner()->ToCreature())
-                if (Player* target = GetTarget()->ToPlayer())
-                    if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
-                        sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_ACTIVE, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
-        }
-
-        void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* owner = GetOwner()->ToCreature())
-                if (Player* target = GetTarget()->ToPlayer())
-                    if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
-                        sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_DISABLED, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
-        }
-
-        void Register() override
-        {
-            DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_rocket_pack_useable_AuraScript::CheckAreaTarget);
-            AfterEffectApply += AuraEffectApplyFn(spell_igb_rocket_pack_useable_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_useable_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool CheckAreaTarget(Unit* target)
     {
-        return new spell_igb_rocket_pack_useable_AuraScript();
+        return target->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetInstanceScript()->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE;
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* owner = GetOwner()->ToCreature())
+            if (Player* target = GetTarget()->ToPlayer())
+                if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
+                    sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_ACTIVE, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* owner = GetOwner()->ToCreature())
+            if (Player* target = GetTarget()->ToPlayer())
+                if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
+                    sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_DISABLED, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
+    }
+
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_rocket_pack_useable_aura::CheckAreaTarget);
+        AfterEffectApply += AuraEffectApplyFn(spell_igb_rocket_pack_useable_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_useable_aura::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2789,7 +2778,7 @@ void AddSC_boss_icecrown_gunship_battle()
     new npc_gunship_gunner();
     new npc_gunship_rocketeer();
     RegisterSpellScript(spell_igb_rocket_pack_aura);
-    new spell_igb_rocket_pack_useable();
+    RegisterSpellScript(spell_igb_rocket_pack_useable_aura);
     new spell_igb_teleport_to_enemy_ship();
     new spell_igb_check_for_players();
     new spell_igb_gunship_fall_teleport();
