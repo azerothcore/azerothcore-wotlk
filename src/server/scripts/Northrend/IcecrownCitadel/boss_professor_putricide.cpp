@@ -1284,92 +1284,76 @@ class spell_putricide_clear_aura_effect_value : public SpellScript
     }
 };
 
-class spell_putricide_mutation_init : public SpellScriptLoader
+class spell_putricide_mutation_init : public SpellScript
 {
-public:
-    spell_putricide_mutation_init() : SpellScriptLoader("spell_putricide_mutation_init") { }
+    PrepareSpellScript(spell_putricide_mutation_init);
 
-    class spell_putricide_mutation_init_SpellScript : public SpellScript
+    SpellCastResult CheckRequirementInternal(SpellCustomErrors& extendedError)
     {
-        PrepareSpellScript(spell_putricide_mutation_init_SpellScript);
+        InstanceScript* instance = GetExplTargetUnit()->GetInstanceScript();
+        if (!instance)
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
-        SpellCastResult CheckRequirementInternal(SpellCustomErrors& extendedError)
+        Creature* professor = ObjectAccessor::GetCreature(*GetExplTargetUnit(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
+        if (!professor)
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+
+        if (professor->AI()->GetData(DATA_PHASE) == 3 || !professor->IsAlive())
         {
-            InstanceScript* instance = GetExplTargetUnit()->GetInstanceScript();
-            if (!instance)
-                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-
-            Creature* professor = ObjectAccessor::GetCreature(*GetExplTargetUnit(), instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE));
-            if (!professor)
-                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-
-            if (professor->AI()->GetData(DATA_PHASE) == 3 || !professor->IsAlive())
-            {
-                extendedError = SPELL_CUSTOM_ERROR_ALL_POTIONS_USED;
-                return SPELL_FAILED_CUSTOM_ERROR;
-            }
-
-            if (professor->AI()->GetData(DATA_ABOMINATION))
-            {
-                extendedError = SPELL_CUSTOM_ERROR_TOO_MANY_ABOMINATIONS;
-                return SPELL_FAILED_CUSTOM_ERROR;
-            }
-
-            return SPELL_CAST_OK;
+            extendedError = SPELL_CUSTOM_ERROR_ALL_POTIONS_USED;
+            return SPELL_FAILED_CUSTOM_ERROR;
         }
 
-        SpellCastResult CheckRequirement()
+        if (professor->AI()->GetData(DATA_ABOMINATION))
         {
-            if (!GetExplTargetUnit())
-                return SPELL_FAILED_BAD_TARGETS;
-
-            if (GetExplTargetUnit()->GetTypeId() != TYPEID_PLAYER)
-                return SPELL_FAILED_TARGET_NOT_PLAYER;
-
-            SpellCustomErrors extension = SPELL_CUSTOM_ERROR_NONE;
-            SpellCastResult result = CheckRequirementInternal(extension);
-            if (result != SPELL_CAST_OK)
-            {
-                Spell::SendCastResult(GetExplTargetUnit()->ToPlayer(), GetSpellInfo(), 0, result, extension);
-                return result;
-            }
-
-            return SPELL_CAST_OK;
+            extendedError = SPELL_CUSTOM_ERROR_TOO_MANY_ABOMINATIONS;
+            return SPELL_FAILED_CUSTOM_ERROR;
         }
 
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_putricide_mutation_init_SpellScript::CheckRequirement);
-        }
-    };
-
-    class spell_putricide_mutation_init_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_putricide_mutation_init_AuraScript);
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            uint32 spellId = 70311;
-            if (GetTarget()->GetMap()->GetSpawnMode() & 1)
-                spellId = 71503;
-
-            GetTarget()->CastSpell(GetTarget(), spellId, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_putricide_mutation_init_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_putricide_mutation_init_SpellScript();
+        return SPELL_CAST_OK;
     }
 
-    AuraScript* GetAuraScript() const override
+    SpellCastResult CheckRequirement()
     {
-        return new spell_putricide_mutation_init_AuraScript();
+        if (!GetExplTargetUnit())
+            return SPELL_FAILED_BAD_TARGETS;
+
+        if (GetExplTargetUnit()->GetTypeId() != TYPEID_PLAYER)
+            return SPELL_FAILED_TARGET_NOT_PLAYER;
+
+        SpellCustomErrors extension = SPELL_CUSTOM_ERROR_NONE;
+        SpellCastResult result = CheckRequirementInternal(extension);
+        if (result != SPELL_CAST_OK)
+        {
+            Spell::SendCastResult(GetExplTargetUnit()->ToPlayer(), GetSpellInfo(), 0, result, extension);
+            return result;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_putricide_mutation_init::CheckRequirement);
+    }
+};
+
+class spell_putricide_mutation_init_aura : public AuraScript
+{
+    PrepareAuraScript(spell_putricide_mutation_init_aura);
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        uint32 spellId = 70311;
+        if (GetTarget()->GetMap()->GetSpawnMode() & 1)
+            spellId = 71503;
+
+        GetTarget()->CastSpell(GetTarget(), spellId, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_putricide_mutation_init_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1596,7 +1580,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_unbound_plague_dmg_aura);
     RegisterSpellScript(spell_putricide_choking_gas_bomb);
     RegisterSpellScript(spell_putricide_clear_aura_effect_value);
-    new spell_putricide_mutation_init();
+    RegisterSpellAndAuraScriptPair(spell_putricide_mutation_init, spell_putricide_mutation_init_aura);
     new spell_putricide_mutated_transformation();
     new spell_putricide_mutated_transformation_dismiss();
     new spell_putricide_mutated_transformation_dmg();
