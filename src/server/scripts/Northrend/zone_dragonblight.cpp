@@ -1475,39 +1475,28 @@ private:
     bool _alive;
 };
 
-class spell_q24545_aod_special : public SpellScriptLoader
+class spell_q24545_aod_special : public SpellScript
 {
-public:
-    spell_q24545_aod_special() : SpellScriptLoader("spell_q24545_aod_special") { }
+    PrepareSpellScript(spell_q24545_aod_special);
 
-    class spell_q24545_aod_special_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_q24545_aod_special_SpellScript);
+        targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
+        Acore::Containers::RandomResize(targets, 2);
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
-            Acore::Containers::RandomResize(targets, 2);
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                if (target->GetTypeId() == TYPEID_UNIT)
-                    target->ToCreature()->AI()->DoAction(GetSpellInfo()->Id == 70790 ? -2 : -1);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_q24545_aod_special_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_q24545_aod_special_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_q24545_aod_special_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            if (target->GetTypeId() == TYPEID_UNIT)
+                target->ToCreature()->AI()->DoAction(GetSpellInfo()->Id == 70790 ? -2 : -1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_q24545_aod_special::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_q24545_aod_special::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2289,7 +2278,7 @@ void AddSC_dragonblight()
     new npc_q24545_lich_king();
     new at_q24545_frostmourne_cavern();
     new npc_q24545_wretched_ghoul();
-    new spell_q24545_aod_special();
+    RegisterSpellScript(spell_q24545_aod_special);
     new npc_q24545_vegard_dummy();
     new npc_q24545_vegard();
     new npc_spiritual_insight();
