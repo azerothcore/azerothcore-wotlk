@@ -977,39 +977,33 @@ class spell_wintergrasp_create_vehicle : public SpellScript
 };
 
 // 49761 - Rocket-Propelled Goblin Grenade
-class spell_wintergrasp_rp_gg : public SpellScriptLoader
+class spell_wintergrasp_rp_gg : public SpellScript
 {
-public:
-    spell_wintergrasp_rp_gg() : SpellScriptLoader("spell_wintergrasp_rp_gg") { }
+    PrepareSpellScript(spell_wintergrasp_rp_gg);
 
-    class spell_wintergrasp_rp_gg_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_wintergrasp_rp_gg_SpellScript);
+        return ValidateSpellInfo({ SPELL_RP_GG_TRIGGER_MISSILE });
+    }
 
-        bool handled;
-        bool Load() override
-        {
-            handled = false;
-            return true;
-        }
-
-        void HandleFinish()
-        {
-            if (!GetExplTargetDest())
-                return;
-
-            GetCaster()->CastSpell(GetExplTargetDest()->GetPositionX(), GetExplTargetDest()->GetPositionY(), GetExplTargetDest()->GetPositionZ(), SPELL_RP_GG_TRIGGER_MISSILE, true);
-        }
-
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_wintergrasp_rp_gg_SpellScript::HandleFinish);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool handled;
+    bool Load() override
     {
-        return new spell_wintergrasp_rp_gg_SpellScript();
+        handled = false;
+        return true;
+    }
+
+    void HandleFinish()
+    {
+        if (!GetExplTargetDest())
+            return;
+
+        GetCaster()->CastSpell(GetExplTargetDest()->GetPositionX(), GetExplTargetDest()->GetPositionY(), GetExplTargetDest()->GetPositionZ(), SPELL_RP_GG_TRIGGER_MISSILE, true);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_wintergrasp_rp_gg::HandleFinish);
     }
 };
 
@@ -1222,7 +1216,7 @@ void AddSC_wintergrasp()
     // SPELLs
     RegisterSpellScript(spell_wintergrasp_force_building);
     RegisterSpellScript(spell_wintergrasp_create_vehicle);
-    new spell_wintergrasp_rp_gg();
+    RegisterSpellScript(spell_wintergrasp_rp_gg);
     new spell_wintergrasp_portal();
     new spell_wintergrasp_water();
     new spell_wintergrasp_hide_small_elementals();
