@@ -1399,33 +1399,22 @@ public:
     }
 };
 
-class spell_onslaught_or_call_bone_gryphon : public SpellScriptLoader
+class spell_onslaught_or_call_bone_gryphon : public SpellScript
 {
-public:
-    spell_onslaught_or_call_bone_gryphon() : SpellScriptLoader("spell_onslaught_or_call_bone_gryphon") { }
+    PrepareSpellScript(spell_onslaught_or_call_bone_gryphon);
 
-    class spell_onslaught_or_call_bone_gryphon_SpellScript : public SpellScript
+    void ChangeSummonPos(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_onslaught_or_call_bone_gryphon_SpellScript);
+        WorldLocation summonPos = *GetExplTargetDest();
+        Position offset = { 0.0f, 0.0f, 3.0f, 0.0f };
+        summonPos.RelocateOffset(offset);
+        SetExplTargetDest(summonPos);
+        GetHitDest()->RelocateOffset(offset);
+    }
 
-        void ChangeSummonPos(SpellEffIndex /*effIndex*/)
-        {
-            WorldLocation summonPos = *GetExplTargetDest();
-            Position offset = { 0.0f, 0.0f, 3.0f, 0.0f };
-            summonPos.RelocateOffset(offset);
-            SetExplTargetDest(summonPos);
-            GetHitDest()->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_onslaught_or_call_bone_gryphon_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_onslaught_or_call_bone_gryphon_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_onslaught_or_call_bone_gryphon::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
     }
 };
 
@@ -2157,7 +2146,7 @@ void AddSC_icecrown()
     RegisterSpellScript(spell_fight_fire_bomber);
     RegisterSpellScript(spell_anti_air_rocket_bomber);
     new npc_infra_green_bomber_generic();
-    new spell_onslaught_or_call_bone_gryphon();
+    RegisterSpellScript(spell_onslaught_or_call_bone_gryphon);
     RegisterSpellScript(spell_deliver_gryphon);
 
     // Theirs
