@@ -1703,34 +1703,28 @@ class spell_the_lich_king_quake : public SpellScript
     }
 };
 
-class spell_the_lich_king_jump : public SpellScriptLoader
+class spell_the_lich_king_jump : public SpellScript
 {
-public:
-    spell_the_lich_king_jump() : SpellScriptLoader("spell_the_lich_king_jump") { }
+    PrepareSpellScript(spell_the_lich_king_jump);
 
-    class spell_the_lich_king_jump_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_jump_SpellScript);
+        return ValidateSpellInfo({ SPELL_RAISE_DEAD, SPELL_JUMP_2 });
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->RemoveAurasDueToSpell(SPELL_RAISE_DEAD);
-            GetHitUnit()->InterruptNonMeleeSpells(true);
-            GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_JUMP_2, true);
-            if (Creature* creature = GetHitCreature())
-                creature->AI()->DoAction(ACTION_BREAK_FROSTMOURNE);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_jump_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_the_lich_king_jump_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->RemoveAurasDueToSpell(SPELL_RAISE_DEAD);
+        GetHitUnit()->InterruptNonMeleeSpells(true);
+        GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_JUMP_2, true);
+        if (Creature* creature = GetHitCreature())
+            creature->AI()->DoAction(ACTION_BREAK_FROSTMOURNE);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_jump::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -3793,7 +3787,7 @@ void AddSC_boss_the_lich_king()
     new boss_the_lich_king();
     new npc_tirion_fordring_tft();
     RegisterSpellScript(spell_the_lich_king_quake);
-    new spell_the_lich_king_jump();
+    RegisterSpellScript(spell_the_lich_king_jump);
     new spell_the_lich_king_jump_remove_aura();
     new spell_trigger_spell_from_caster("spell_the_lich_king_mass_resurrection", SPELL_MASS_RESURRECTION_REAL);
     new spell_the_lich_king_play_movie();
