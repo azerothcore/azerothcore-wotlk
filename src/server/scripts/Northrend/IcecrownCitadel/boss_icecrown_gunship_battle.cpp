@@ -1974,47 +1974,36 @@ public:
     }
 };
 
-class spell_igb_rocket_pack : public SpellScriptLoader
+class spell_igb_rocket_pack_aura : public AuraScript
 {
-public:
-    spell_igb_rocket_pack() : SpellScriptLoader("spell_igb_rocket_pack") { }
+    PrepareAuraScript(spell_igb_rocket_pack_aura);
 
-    class spell_igb_rocket_pack_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_igb_rocket_pack_AuraScript);
+        return ValidateSpellInfo(
+            {
+                SPELL_ROCKET_PACK_DAMAGE,
+                SPELL_ROCKET_BURST
+            });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo(
-                {
-                    SPELL_ROCKET_PACK_DAMAGE,
-                    SPELL_ROCKET_BURST
-                });
-        }
-
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            if (GetTarget()->movespline->Finalized())
-                Remove(AURA_REMOVE_BY_EXPIRE);
-        }
-
-        void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            SpellInfo const* damageInfo = sSpellMgr->AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
-            GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), nullptr, true);
-            GetTarget()->CastSpell((Unit*)nullptr, SPELL_ROCKET_BURST, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_rocket_pack_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_igb_rocket_pack_AuraScript();
+        if (GetTarget()->movespline->Finalized())
+            Remove(AURA_REMOVE_BY_EXPIRE);
+    }
+
+    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        SpellInfo const* damageInfo = sSpellMgr->AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
+        GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), nullptr, true);
+        GetTarget()->CastSpell((Unit*)nullptr, SPELL_ROCKET_BURST, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_rocket_pack_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_aura::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2799,7 +2788,7 @@ void AddSC_boss_icecrown_gunship_battle()
     new npc_gunship_mage();
     new npc_gunship_gunner();
     new npc_gunship_rocketeer();
-    new spell_igb_rocket_pack();
+    RegisterSpellScript(spell_igb_rocket_pack_aura);
     new spell_igb_rocket_pack_useable();
     new spell_igb_teleport_to_enemy_ship();
     new spell_igb_check_for_players();
