@@ -1484,30 +1484,19 @@ class spell_blood_council_shadow_prison_damage : public SpellScript
     }
 };
 
-class spell_taldaram_glittering_sparks : public SpellScriptLoader
+class spell_taldaram_glittering_sparks : public SpellScript
 {
-public:
-    spell_taldaram_glittering_sparks() : SpellScriptLoader("spell_taldaram_glittering_sparks") { }
+    PrepareSpellScript(spell_taldaram_glittering_sparks);
 
-    class spell_taldaram_glittering_sparks_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_taldaram_glittering_sparks_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_taldaram_glittering_sparks_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_taldaram_glittering_sparks_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_taldaram_glittering_sparks::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1789,7 +1778,7 @@ void AddSC_boss_blood_prince_council()
     new npc_kinetic_bomb();
     RegisterSpellScript(spell_blood_council_shadow_prison_aura);
     RegisterSpellScript(spell_blood_council_shadow_prison_damage);
-    new spell_taldaram_glittering_sparks();
+    RegisterSpellScript(spell_taldaram_glittering_sparks);
     new spell_taldaram_summon_flame_ball();
     new spell_taldaram_ball_of_inferno_flame();
     new spell_valanar_kinetic_bomb();
