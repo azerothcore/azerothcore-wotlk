@@ -1140,32 +1140,26 @@ class spell_deathbringer_blood_link_blood_beast_aura : public AuraScript
     }
 };
 
-class spell_deathbringer_blood_link : public SpellScriptLoader
+class spell_deathbringer_blood_link : public SpellScript
 {
-public:
-    spell_deathbringer_blood_link() : SpellScriptLoader("spell_deathbringer_blood_link") { }
+    PrepareSpellScript(spell_deathbringer_blood_link);
 
-    class spell_deathbringer_blood_link_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_deathbringer_blood_link_SpellScript);
+        return ValidateSpellInfo({ SPELL_BLOOD_LINK_POWER });
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            GetHitUnit()->CastCustomSpell(SPELL_BLOOD_LINK_POWER, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetHitUnit(), true);
-            if (Aura* bloodPower = GetHitUnit()->GetAura(SPELL_BLOOD_POWER))
-                bloodPower->RecalculateAmountOfEffects();
-            PreventHitDefaultEffect(EFFECT_0);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_deathbringer_blood_link_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_deathbringer_blood_link_SpellScript();
+        GetHitUnit()->CastCustomSpell(SPELL_BLOOD_LINK_POWER, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetHitUnit(), true);
+        if (Aura* bloodPower = GetHitUnit()->GetAura(SPELL_BLOOD_POWER))
+            bloodPower->RecalculateAmountOfEffects();
+        PreventHitDefaultEffect(EFFECT_0);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_deathbringer_blood_link::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1402,7 +1396,7 @@ void AddSC_boss_deathbringer_saurfang()
     new npc_saurfang_event();
     RegisterSpellScript(spell_deathbringer_blood_link_aura);
     RegisterSpellScript(spell_deathbringer_blood_link_blood_beast_aura);
-    new spell_deathbringer_blood_link();
+    RegisterSpellScript(spell_deathbringer_blood_link);
     new spell_deathbringer_blood_power();
     new spell_deathbringer_blood_nova_targeting();
     new spell_deathbringer_boiling_blood();
