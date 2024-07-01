@@ -1500,40 +1500,29 @@ class spell_taldaram_glittering_sparks : public SpellScript
     }
 };
 
-class spell_taldaram_summon_flame_ball : public SpellScriptLoader
+class spell_taldaram_summon_flame_ball : public SpellScript
 {
-public:
-    spell_taldaram_summon_flame_ball() : SpellScriptLoader("spell_taldaram_summon_flame_ball") { }
+    PrepareSpellScript(spell_taldaram_summon_flame_ball);
 
-    class spell_taldaram_summon_flame_ball_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_taldaram_summon_flame_ball_SpellScript);
-
-        bool Load() override
+        if (GetCaster()->GetTypeId() != TYPEID_UNIT)
         {
-            if (GetCaster()->GetTypeId() != TYPEID_UNIT)
-            {
-                return false;
-            }
-            GetCaster()->CastSpell(GetCaster(), uint32(GetSpellInfo()->Effects[0].CalcValue()), true);
-            return true;
+            return false;
         }
+        GetCaster()->CastSpell(GetCaster(), uint32(GetSpellInfo()->Effects[0].CalcValue()), true);
+        return true;
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->ToCreature()->AI()->DoAction(ACTION_FLAME_BALL_CHASE);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_taldaram_summon_flame_ball_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_taldaram_summon_flame_ball_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->ToCreature()->AI()->DoAction(ACTION_FLAME_BALL_CHASE);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_taldaram_summon_flame_ball::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1779,7 +1768,7 @@ void AddSC_boss_blood_prince_council()
     RegisterSpellScript(spell_blood_council_shadow_prison_aura);
     RegisterSpellScript(spell_blood_council_shadow_prison_damage);
     RegisterSpellScript(spell_taldaram_glittering_sparks);
-    new spell_taldaram_summon_flame_ball();
+    RegisterSpellScript(spell_taldaram_summon_flame_ball);
     new spell_taldaram_ball_of_inferno_flame();
     new spell_valanar_kinetic_bomb();
     new spell_valanar_kinetic_bomb_absorb();
