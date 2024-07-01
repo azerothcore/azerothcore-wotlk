@@ -1224,33 +1224,22 @@ class spell_putricide_unbound_plague : public SpellScript
     }
 };
 
-class spell_putricide_unbound_plague_dmg : public SpellScriptLoader
+class spell_putricide_unbound_plague_dmg_aura : public AuraScript
 {
-public:
-    spell_putricide_unbound_plague_dmg() : SpellScriptLoader("spell_putricide_unbound_plague_dmg") { }
+    PrepareAuraScript(spell_putricide_unbound_plague_dmg_aura);
 
-    class spell_putricide_unbound_plague_dmg_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect* aurEff)
     {
-        PrepareAuraScript(spell_putricide_unbound_plague_dmg_AuraScript);
+        int32 baseAmt = aurEff->GetSpellInfo()->Effects[0].CalcValue();
+        int32 dmg = int32(baseAmt * pow(1.25f, float(aurEff->GetTickNumber())));
+        if (dmg <= 0) // safety check, impossible
+            return;
+        aurEff->SetAmount(dmg);
+    }
 
-        void HandlePeriodic(AuraEffect* aurEff)
-        {
-            int32 baseAmt = aurEff->GetSpellInfo()->Effects[0].CalcValue();
-            int32 dmg = int32(baseAmt * pow(1.25f, float(aurEff->GetTickNumber())));
-            if (dmg <= 0) // safety check, impossible
-                return;
-            aurEff->SetAmount(dmg);
-        }
-
-        void Register() override
-        {
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_putricide_unbound_plague_dmg_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_putricide_unbound_plague_dmg_AuraScript();
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_putricide_unbound_plague_dmg_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -1626,7 +1615,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_ooze_eruption_searcher);
     RegisterSpellScript(spell_putricide_mutated_plague_aura);
     RegisterSpellScript(spell_putricide_unbound_plague);
-    new spell_putricide_unbound_plague_dmg();
+    RegisterSpellScript(spell_putricide_unbound_plague_dmg_aura);
     new spell_putricide_choking_gas_bomb();
     new spell_putricide_clear_aura_effect_value();
     new spell_putricide_mutation_init();
