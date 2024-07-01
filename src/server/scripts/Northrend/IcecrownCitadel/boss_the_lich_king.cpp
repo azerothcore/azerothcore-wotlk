@@ -3438,36 +3438,25 @@ public:
     }
 };
 
-class spell_the_lich_king_trigger_vile_spirit : public SpellScriptLoader
+class spell_the_lich_king_trigger_vile_spirit : public SpellScript
 {
-public:
-    spell_the_lich_king_trigger_vile_spirit() : SpellScriptLoader("spell_the_lich_king_trigger_vile_spirit") { }
+    PrepareSpellScript(spell_the_lich_king_trigger_vile_spirit);
 
-    class spell_the_lich_king_trigger_vile_spirit_SpellScript : public SpellScript
+    void ActivateSpirit()
     {
-        PrepareSpellScript(spell_the_lich_king_trigger_vile_spirit_SpellScript);
+        Creature* target = GetHitCreature();
+        if (!target)
+            return;
 
-        void ActivateSpirit()
-        {
-            Creature* target = GetHitCreature();
-            if (!target)
-                return;
+        target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
+        target->SetImmuneToAll(false);
+        target->ForceValuesUpdateAtIndex(UNIT_FIELD_FLAGS);
+        VileSpiritActivateEvent(target).Execute(0, 0);
+    }
 
-            target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
-            target->SetImmuneToAll(false);
-            target->ForceValuesUpdateAtIndex(UNIT_FIELD_FLAGS);
-            VileSpiritActivateEvent(target).Execute(0, 0);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_the_lich_king_trigger_vile_spirit_SpellScript::ActivateSpirit);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_trigger_vile_spirit_SpellScript();
+        OnHit += SpellHitFn(spell_the_lich_king_trigger_vile_spirit::ActivateSpirit);
     }
 };
 
@@ -3580,7 +3569,7 @@ void AddSC_boss_the_lich_king()
     new npc_icc_lk_checktarget();
     RegisterSpellScript(spell_the_lich_king_summon_spirit_bomb);
     new npc_lk_spirit_bomb();
-    new spell_the_lich_king_trigger_vile_spirit();
+    RegisterSpellScript(spell_the_lich_king_trigger_vile_spirit);
     new npc_lk_wicked_spirit();
     new achievement_been_waiting_long_time();
     new achievement_neck_deep_in_vile();
