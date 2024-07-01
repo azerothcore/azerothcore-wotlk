@@ -900,35 +900,24 @@ class spell_sindragosa_permeating_chill_aura : public AuraScript
     }
 };
 
-class spell_sindragosa_instability : public SpellScriptLoader
+class spell_sindragosa_instability_aura : public AuraScript
 {
-public:
-    spell_sindragosa_instability() : SpellScriptLoader("spell_sindragosa_instability") { }
+    PrepareAuraScript(spell_sindragosa_instability_aura);
 
-    class spell_sindragosa_instability_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_sindragosa_instability_AuraScript);
+        return ValidateSpellInfo({ SPELL_BACKLASH });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_BACKLASH });
-        }
-
-        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_sindragosa_instability_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_sindragosa_instability_AuraScript();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_sindragosa_instability_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1937,7 +1926,7 @@ void AddSC_boss_sindragosa()
     RegisterSpellScript(spell_sindragosa_s_fury);
     RegisterSpellScript(spell_sindragosa_unchained_magic);
     RegisterSpellScript(spell_sindragosa_permeating_chill_aura);
-    new spell_sindragosa_instability();
+    RegisterSpellScript(spell_sindragosa_instability_aura);
     new spell_sindragosa_icy_grip();
     new spell_sindragosa_icy_grip_jump();
     new spell_sindragosa_ice_tomb_filter();
