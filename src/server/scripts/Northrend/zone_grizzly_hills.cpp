@@ -1143,52 +1143,41 @@ enum WarheadDenonate
     NPC_ALLIANCE_LUMBERBOAT_EXPLOSIONS = 27689
 };
 // 49250 - Detonate
-class spell_warhead_detonate : public SpellScriptLoader
+class spell_warhead_detonate : public SpellScript
 {
-public:
-    spell_warhead_detonate() : SpellScriptLoader("spell_warhead_detonate") { }
+    PrepareSpellScript(spell_warhead_detonate);
 
-    class spell_warhead_detonate_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_warhead_detonate_SpellScript);
+        return sSpellMgr->GetSpellInfo(SPELL_PARACHUTE) && sSpellMgr->GetSpellInfo(SPELL_TORPEDO_EXPLOSION);
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return sSpellMgr->GetSpellInfo(SPELL_PARACHUTE) && sSpellMgr->GetSpellInfo(SPELL_TORPEDO_EXPLOSION);
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            Unit* caster = GetCaster();
-            Player* player = GetHitPlayer();
-            if (!player || !caster)
-            {
-                return;
-            }
-
-            player->ExitVehicle();
-            float horizontalSpeed = 3.0f;
-            float verticalSpeed = 40.0f;
-            player->KnockbackFrom(caster->GetPositionX(), caster->GetPositionY(), horizontalSpeed, verticalSpeed);
-            player->RemoveAurasDueToSpell(SPELL_WARHEAD_FUSE);
-
-            std::list<Creature*> explosionBunnys;
-            caster->GetCreatureListWithEntryInGrid(explosionBunnys, NPC_ALLIANCE_LUMBERBOAT_EXPLOSIONS, 90.0f);
-            for (auto itr = explosionBunnys.begin(); itr != explosionBunnys.end(); ++itr)
-            {
-                (*itr)->CastSpell((*itr), SPELL_TORPEDO_EXPLOSION, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_warhead_detonate_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_warhead_detonate_SpellScript();
+        Unit* caster = GetCaster();
+        Player* player = GetHitPlayer();
+        if (!player || !caster)
+        {
+            return;
+        }
+
+        player->ExitVehicle();
+        float horizontalSpeed = 3.0f;
+        float verticalSpeed = 40.0f;
+        player->KnockbackFrom(caster->GetPositionX(), caster->GetPositionY(), horizontalSpeed, verticalSpeed);
+        player->RemoveAurasDueToSpell(SPELL_WARHEAD_FUSE);
+
+        std::list<Creature*> explosionBunnys;
+        caster->GetCreatureListWithEntryInGrid(explosionBunnys, NPC_ALLIANCE_LUMBERBOAT_EXPLOSIONS, 90.0f);
+        for (auto itr = explosionBunnys.begin(); itr != explosionBunnys.end(); ++itr)
+        {
+            (*itr)->CastSpell((*itr), SPELL_TORPEDO_EXPLOSION, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_warhead_detonate::HandleDummy, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1312,7 +1301,7 @@ void AddSC_grizzly_hills()
     RegisterSpellScript(spell_infected_worgen_bite_aura);
     new npc_rocket_propelled_warhead();
     new spell_z_check();
-    new spell_warhead_detonate();
+    RegisterSpellScript(spell_warhead_detonate);
     RegisterSpellScript(spell_vehicle_warhead_fuse);
     new spell_warhead_fuse();
     RegisterSpellScript(spell_q12227_outhouse_groans);
