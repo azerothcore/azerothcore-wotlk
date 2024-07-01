@@ -661,29 +661,23 @@ public:
 };
 
 // Spell 45625: - Arcane Chains: Character Force Cast
-class spell_arcane_chains_character_force_cast : public SpellScriptLoader
+class spell_arcane_chains_character_force_cast : public SpellScript
 {
-public:
-    spell_arcane_chains_character_force_cast() : SpellScriptLoader("spell_arcane_chains_character_force_cast") {}
+    PrepareSpellScript(spell_arcane_chains_character_force_cast);
 
-    class spell_arcane_chains_character_force_cast_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_arcane_chains_character_force_cast_SpellScript);
+        return ValidateSpellInfo({ SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, 45626 });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /* effIndex */)
-        {
-            GetHitUnit()->CastSpell(GetCaster(), SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SET_FACING & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_GCD)); // Player cast back 45626 on npc
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_arcane_chains_character_force_cast_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
     {
-        return new spell_arcane_chains_character_force_cast_SpellScript();
+        GetHitUnit()->CastSpell(GetCaster(), SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SET_FACING & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_GCD)); // Player cast back 45626 on npc
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_arcane_chains_character_force_cast::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2067,7 +2061,7 @@ void AddSC_borean_tundra()
     new npc_lurgglbr();
     new npc_beryl_sorcerer();
     new npc_captured_beryl_sorcerer();
-    new spell_arcane_chains_character_force_cast();
+    RegisterSpellScript(spell_arcane_chains_character_force_cast);
     new npc_imprisoned_beryl_sorcerer();
     new npc_mootoo_the_younger();
     new npc_bonker_togglevolt();
