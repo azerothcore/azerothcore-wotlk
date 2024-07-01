@@ -38,3 +38,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_igb_explosion_main_aura' WHE
 UPDATE `spell_script_names` SET `ScriptName`='spell_igb_periodic_trigger_with_power_cost_aura' WHERE `spell_id` IN (69470,69487) AND `ScriptName`='spell_igb_periodic_trigger_with_power_cost';
 UPDATE `spell_script_names` SET `ScriptName`='spell_igb_overheat_aura' WHERE `spell_id`=69487 AND `ScriptName`='spell_igb_overheat';
 UPDATE `spell_script_names` SET `ScriptName`='spell_igb_on_gunship_deck_aura' WHERE `spell_id` IN (70120,70121) AND `ScriptName`='spell_igb_on_gunship_deck';
+UPDATE `spell_script_names` SET `ScriptName`='spell_blood_council_shadow_prison_aura' WHERE `spell_id`=73001 AND `ScriptName`='spell_blood_council_shadow_prison';

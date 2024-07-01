@@ -1440,32 +1440,26 @@ public:
     }
 };
 
-class spell_blood_council_shadow_prison : public SpellScriptLoader
+class spell_blood_council_shadow_prison_aura : public AuraScript
 {
-public:
-    spell_blood_council_shadow_prison() : SpellScriptLoader("spell_blood_council_shadow_prison") { }
+    PrepareAuraScript(spell_blood_council_shadow_prison_aura);
 
-    class spell_blood_council_shadow_prison_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_blood_council_shadow_prison_AuraScript);
+        return ValidateSpellInfo({ SPELL_SHADOW_PRISON_DAMAGE });
+    }
 
-        void HandleDummyTick(AuraEffect const* aurEff)
-        {
-            if (GetTarget()->GetTypeId() == TYPEID_PLAYER && GetTarget()->isMoving())
-            {
-                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, nullptr, aurEff);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_council_shadow_prison_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleDummyTick(AuraEffect const* aurEff)
     {
-        return new spell_blood_council_shadow_prison_AuraScript();
+        if (GetTarget()->GetTypeId() == TYPEID_PLAYER && GetTarget()->isMoving())
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, nullptr, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_council_shadow_prison_aura::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1804,7 +1798,7 @@ void AddSC_boss_blood_prince_council()
     new npc_dark_nucleus();
     new npc_ball_of_flame();
     new npc_kinetic_bomb();
-    new spell_blood_council_shadow_prison();
+    RegisterSpellScript(spell_blood_council_shadow_prison_aura);
     new spell_blood_council_shadow_prison_damage();
     new spell_taldaram_glittering_sparks();
     new spell_taldaram_summon_flame_ball();
