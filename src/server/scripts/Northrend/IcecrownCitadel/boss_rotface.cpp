@@ -506,84 +506,69 @@ public:
     }
 };
 
-class spell_rotface_mutated_infection : public SpellScriptLoader
+class spell_rotface_mutated_infection : public SpellScript
 {
-public:
-    spell_rotface_mutated_infection() : SpellScriptLoader("spell_rotface_mutated_infection") { }
+    PrepareSpellScript(spell_rotface_mutated_infection);
 
-    class spell_rotface_mutated_infection_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_rotface_mutated_infection_SpellScript);
-
-        bool Load() override
-        {
-            _target = nullptr;
-            return true;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            // remove targets with this aura already
-            // tank is not on this list
-            targets.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
-            targets.remove(GetCaster()->GetVictim());
-            if (targets.empty())
-                return;
-
-            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
-            _target = target;
-        }
-
-        void ReplaceTargets(std::list<WorldObject*>& targets)
-        {
-            targets.clear();
-            if (_target)
-                targets.push_back(_target);
-        }
-
-        void NotifyTargets()
-        {
-            if (Creature* caster = GetCaster()->ToCreature())
-                if (Unit* target = GetHitUnit())
-                    caster->AI()->Talk(EMOTE_MUTATED_INFECTION, target);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rotface_mutated_infection_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rotface_mutated_infection_SpellScript::ReplaceTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rotface_mutated_infection_SpellScript::ReplaceTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ENEMY);
-            AfterHit += SpellHitFn(spell_rotface_mutated_infection_SpellScript::NotifyTargets);
-        }
-
-        WorldObject* _target;
-    };
-
-    class spell_rotface_mutated_infection_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_rotface_mutated_infection_AuraScript);
-
-        void ExtraRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[2].CalcValue(), true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_rotface_mutated_infection_AuraScript::ExtraRemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_rotface_mutated_infection_SpellScript();
+        _target = nullptr;
+        return true;
     }
 
-    AuraScript* GetAuraScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_rotface_mutated_infection_AuraScript();
+        // remove targets with this aura already
+        // tank is not on this list
+        targets.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+        targets.remove(GetCaster()->GetVictim());
+        if (targets.empty())
+            return;
+
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(target);
+        _target = target;
+    }
+
+    void ReplaceTargets(std::list<WorldObject*>& targets)
+    {
+        targets.clear();
+        if (_target)
+            targets.push_back(_target);
+    }
+
+    void NotifyTargets()
+    {
+        if (Creature* caster = GetCaster()->ToCreature())
+            if (Unit* target = GetHitUnit())
+                caster->AI()->Talk(EMOTE_MUTATED_INFECTION, target);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rotface_mutated_infection::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rotface_mutated_infection::ReplaceTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rotface_mutated_infection::ReplaceTargets, EFFECT_2, TARGET_UNIT_SRC_AREA_ENEMY);
+        AfterHit += SpellHitFn(spell_rotface_mutated_infection::NotifyTargets);
+    }
+
+private:
+    WorldObject* _target;
+};
+
+class spell_rotface_mutated_infection_aura : public AuraScript
+{
+    PrepareAuraScript(spell_rotface_mutated_infection_aura);
+
+    void ExtraRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[2].CalcValue(), true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_rotface_mutated_infection_aura::ExtraRemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -969,7 +954,7 @@ void AddSC_boss_rotface()
     new boss_rotface();
     new npc_little_ooze();
     new npc_big_ooze();
-    new spell_rotface_mutated_infection();
+    RegisterSpellAndAuraScriptPair(spell_rotface_mutated_infection, spell_rotface_mutated_infection_aura);
     new spell_rotface_little_ooze_combine();
     new spell_rotface_large_ooze_combine();
     new spell_rotface_large_ooze_buff_combine();
