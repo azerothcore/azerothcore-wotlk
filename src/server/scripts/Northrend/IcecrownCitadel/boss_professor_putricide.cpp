@@ -923,31 +923,25 @@ class spell_putricide_slime_puddle_spawn : public SpellScript
     }
 };
 
-class spell_putricide_grow_stacker : public SpellScriptLoader
+class spell_putricide_grow_stacker_aura : public AuraScript
 {
-public:
-    spell_putricide_grow_stacker() : SpellScriptLoader("spell_putricide_grow_stacker") { }
+    PrepareAuraScript(spell_putricide_grow_stacker_aura);
 
-    class spell_putricide_grow_stacker_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_putricide_grow_stacker_AuraScript);
+        return ValidateSpellInfo({ SPELL_TEAR_GAS_CREATURE });
+    }
 
-        void HandleTriggerSpell(AuraEffect const*  /*aurEff*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->HasAura(SPELL_TEAR_GAS_CREATURE))
-                    PreventDefaultAction();
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_putricide_grow_stacker_AuraScript::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleTriggerSpell(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_putricide_grow_stacker_AuraScript();
+        if (Unit* target = GetTarget())
+            if (target->HasAura(SPELL_TEAR_GAS_CREATURE))
+                PreventDefaultAction();
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_putricide_grow_stacker_aura::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1690,7 +1684,7 @@ void AddSC_boss_professor_putricide()
     new npc_gas_cloud();
     RegisterSpellScript(spell_putricide_slime_puddle);
     RegisterSpellScript(spell_putricide_slime_puddle_spawn);
-    new spell_putricide_grow_stacker();
+    RegisterSpellScript(spell_putricide_grow_stacker_aura);
     new spell_putricide_unstable_experiment();
     new spell_putricide_tear_gas_effect();
     new spell_putricide_gaseous_bloat();

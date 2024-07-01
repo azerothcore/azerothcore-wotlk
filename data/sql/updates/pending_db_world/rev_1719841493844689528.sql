@@ -14,3 +14,4 @@ UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_decay_periodic_t
 UPDATE `spell_script_names` SET `ScriptName`='spell_dreamwalker_summon_suppresser_aura' WHERE `spell_id`=70912 AND `ScriptName`='spell_dreamwalker_summon_suppresser';
 UPDATE `spell_script_names` SET `ScriptName`='spell_valithria_suppression_aura' WHERE `spell_id`=70588 AND `ScriptName`='spell_valithria_suppression';
 UPDATE `spell_script_names` SET `ScriptName`='spell_deathwhisper_mana_barrier_aura' WHERE `spell_id`=70842 AND `ScriptName`='spell_deathwhisper_mana_barrier';
+UPDATE `spell_script_names` SET `ScriptName`='spell_putricide_grow_stacker_aura' WHERE `spell_id`=70345 AND `ScriptName`='spell_putricide_grow_stacker';
