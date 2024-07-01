@@ -1063,55 +1063,44 @@ enum infraGreenBomberQuests
     SEAT_ENGINEERING            = 2
 };
 
-class spell_switch_infragreen_bomber_station : public SpellScriptLoader
+class spell_switch_infragreen_bomber_station : public SpellScript
 {
-public:
-    spell_switch_infragreen_bomber_station() : SpellScriptLoader("spell_switch_infragreen_bomber_station") { }
+    PrepareSpellScript(spell_switch_infragreen_bomber_station);
 
-    class spell_switch_infragreen_bomber_station_SpellScript : public SpellScript
+    uint8 GetSeatNumber(uint32 spellId)
     {
-        PrepareSpellScript(spell_switch_infragreen_bomber_station_SpellScript)
+        if (spellId == SPELL_ENGINEERING)
+            return 2;
+        else if (spellId == SPELL_ANTI_AIR_TURRET)
+            return 1;
+        else
+            return 0;
+    }
 
-        uint8 GetSeatNumber(uint32 spellId)
-        {
-            if (spellId == SPELL_ENGINEERING)
-                return 2;
-            else if (spellId == SPELL_ANTI_AIR_TURRET)
-                return 1;
-            else
-                return 0;
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Vehicle* kit = GetCaster()->GetVehicle();
-            Unit* charmer = GetCaster()->GetCharmer(); // Player controlling station
-            if (!kit || !charmer)
-                return;
-
-            uint8 seatNumber = GetSeatNumber(GetSpellInfo()->Id);
-            SeatMap::iterator itr = kit->GetSeatIteratorForPassenger(GetCaster());
-            if (itr == kit->Seats.end())
-                return;
-
-            // Xinef: Same seat, no change required
-            if (seatNumber == itr->first)
-                return;
-
-            if (Unit* station = kit->GetPassenger(seatNumber))
-                station->HandleSpellClick(charmer, 0);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_switch_infragreen_bomber_station_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_switch_infragreen_bomber_station_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        Vehicle* kit = GetCaster()->GetVehicle();
+        Unit* charmer = GetCaster()->GetCharmer(); // Player controlling station
+        if (!kit || !charmer)
+            return;
+
+        uint8 seatNumber = GetSeatNumber(GetSpellInfo()->Id);
+        SeatMap::iterator itr = kit->GetSeatIteratorForPassenger(GetCaster());
+        if (itr == kit->Seats.end())
+            return;
+
+        // Xinef: Same seat, no change required
+        if (seatNumber == itr->first)
+            return;
+
+        if (Unit* station = kit->GetPassenger(seatNumber))
+            station->HandleSpellClick(charmer, 0);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_switch_infragreen_bomber_station::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2192,7 +2181,7 @@ void AddSC_icecrown()
     new npc_lord_arete();
     new npc_boneguard_footman();
     new npc_tirions_gambit_tirion();
-    new spell_switch_infragreen_bomber_station();
+    RegisterSpellScript(spell_switch_infragreen_bomber_station);
     new spell_charge_shield_bomber();
     new spell_fight_fire_bomber();
     new spell_anti_air_rocket_bomber();
