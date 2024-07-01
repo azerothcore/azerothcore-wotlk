@@ -1923,66 +1923,60 @@ class spell_icc_stoneform_aura : public AuraScript
     }
 };
 
-class spell_icc_sprit_alarm : public SpellScriptLoader
+class spell_icc_sprit_alarm : public SpellScript
 {
-public:
-    spell_icc_sprit_alarm() : SpellScriptLoader("spell_icc_sprit_alarm") { }
+    PrepareSpellScript(spell_icc_sprit_alarm);
 
-    class spell_icc_sprit_alarm_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_icc_sprit_alarm_SpellScript);
+        return ValidateSpellInfo({ SPELL_STONEFORM });
+    }
 
-        void HandleEvent(SpellEffIndex effIndex)
+    void HandleEvent(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        uint32 trapId = 0;
+        switch (GetSpellInfo()->Effects[effIndex].MiscValue)
         {
-            PreventHitDefaultEffect(effIndex);
-            uint32 trapId = 0;
-            switch (GetSpellInfo()->Effects[effIndex].MiscValue)
-            {
-                case EVENT_AWAKEN_WARD_1:
-                    trapId = GO_SPIRIT_ALARM_1;
-                    break;
-                case EVENT_AWAKEN_WARD_2:
-                    trapId = GO_SPIRIT_ALARM_2;
-                    break;
-                case EVENT_AWAKEN_WARD_3:
-                    trapId = GO_SPIRIT_ALARM_3;
-                    break;
-                case EVENT_AWAKEN_WARD_4:
-                    trapId = GO_SPIRIT_ALARM_4;
-                    break;
-                default:
-                    return;
-            }
-
-            if (GameObject* trap = GetCaster()->FindNearestGameObject(trapId, 5.0f))
-            {
-                trap->SetRespawnTime(trap->GetGOInfo()->GetAutoCloseTime() / IN_MILLISECONDS);
-            }
-
-            std::list<Creature*> wards;
-            GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
-            wards.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
-            for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
-            {
-                if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
-                {
-                    (*itr)->AI()->Talk(SAY_TRAP_ACTIVATE);
-                    (*itr)->RemoveAurasDueToSpell(SPELL_STONEFORM);
-                    (*itr)->AI()->SetData(1, 1);
-                    break;
-                }
-            }
+            case EVENT_AWAKEN_WARD_1:
+                trapId = GO_SPIRIT_ALARM_1;
+                break;
+            case EVENT_AWAKEN_WARD_2:
+                trapId = GO_SPIRIT_ALARM_2;
+                break;
+            case EVENT_AWAKEN_WARD_3:
+                trapId = GO_SPIRIT_ALARM_3;
+                break;
+            case EVENT_AWAKEN_WARD_4:
+                trapId = GO_SPIRIT_ALARM_4;
+                break;
+            default:
+                return;
         }
 
-        void Register() override
+        if (GameObject* trap = GetCaster()->FindNearestGameObject(trapId, 5.0f))
         {
-            OnEffectHit += SpellEffectFn(spell_icc_sprit_alarm_SpellScript::HandleEvent, EFFECT_2, SPELL_EFFECT_SEND_EVENT);
+            trap->SetRespawnTime(trap->GetGOInfo()->GetAutoCloseTime() / IN_MILLISECONDS);
         }
-    };
 
-    SpellScript* GetSpellScript() const override
+        std::list<Creature*> wards;
+        GetCaster()->GetCreatureListWithEntryInGrid(wards, NPC_DEATHBOUND_WARD, 150.0f);
+        wards.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        for (std::list<Creature*>::iterator itr = wards.begin(); itr != wards.end(); ++itr)
+        {
+            if ((*itr)->IsAlive() && (*itr)->HasAura(SPELL_STONEFORM))
+            {
+                (*itr)->AI()->Talk(SAY_TRAP_ACTIVATE);
+                (*itr)->RemoveAurasDueToSpell(SPELL_STONEFORM);
+                (*itr)->AI()->SetData(1, 1);
+                break;
+            }
+        }
+    }
+
+    void Register() override
     {
-        return new spell_icc_sprit_alarm_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_icc_sprit_alarm::HandleEvent, EFFECT_2, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -3770,7 +3764,7 @@ void AddSC_icecrown_citadel()
     new npc_impaling_spear();
     new npc_arthas_teleport_visual();
     RegisterSpellScript(spell_icc_stoneform_aura);
-    new spell_icc_sprit_alarm();
+    RegisterSpellScript(spell_icc_sprit_alarm);
     new spell_icc_geist_alarm();
     new spell_frost_giant_death_plague();
     new spell_icc_harvest_blight_specimen();
