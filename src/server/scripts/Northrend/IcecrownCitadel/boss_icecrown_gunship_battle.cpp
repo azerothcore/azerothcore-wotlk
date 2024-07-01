@@ -2111,43 +2111,32 @@ private:
     uint32 _playerCount;
 };
 
-class spell_igb_gunship_fall_teleport : public SpellScriptLoader
+class spell_igb_gunship_fall_teleport : public SpellScript
 {
-public:
-    spell_igb_gunship_fall_teleport() : SpellScriptLoader("spell_igb_gunship_fall_teleport") { }
+    PrepareSpellScript(spell_igb_gunship_fall_teleport);
 
-    class spell_igb_gunship_fall_teleport_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_igb_gunship_fall_teleport_SpellScript);
+        return GetCaster()->GetInstanceScript();
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetInstanceScript();
-        }
-
-        void SelectTransport(WorldObject*& target)
-        {
-            if (InstanceScript* instance = target->GetInstanceScript())
-                target = instance->instance->GetTransport(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE));
-        }
-
-        void RelocateDest(SpellEffIndex /*effIndex*/)
-        {
-            Position offset = {0.0f, 0.0f, 0.0f, 0.0f};
-            offset.m_positionZ = GetCaster()->GetInstanceScript()->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? 36.0f : 21.0f;
-            GetHitDest()->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_igb_gunship_fall_teleport_SpellScript::SelectTransport, EFFECT_0, TARGET_DEST_NEARBY_ENTRY);
-            OnEffectLaunch += SpellEffectFn(spell_igb_gunship_fall_teleport_SpellScript::RelocateDest, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void SelectTransport(WorldObject*& target)
     {
-        return new spell_igb_gunship_fall_teleport_SpellScript();
+        if (InstanceScript* instance = target->GetInstanceScript())
+            target = instance->instance->GetTransport(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE));
+    }
+
+    void RelocateDest(SpellEffIndex /*effIndex*/)
+    {
+        Position offset = {0.0f, 0.0f, 0.0f, 0.0f};
+        offset.m_positionZ = GetCaster()->GetInstanceScript()->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? 36.0f : 21.0f;
+        GetHitDest()->RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_igb_gunship_fall_teleport::SelectTransport, EFFECT_0, TARGET_DEST_NEARBY_ENTRY);
+        OnEffectLaunch += SpellEffectFn(spell_igb_gunship_fall_teleport::RelocateDest, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
     }
 };
 
@@ -2765,7 +2754,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_rocket_pack_useable_aura);
     RegisterSpellScript(spell_igb_teleport_to_enemy_ship);
     RegisterSpellScript(spell_igb_check_for_players);
-    new spell_igb_gunship_fall_teleport();
+    RegisterSpellScript(spell_igb_gunship_fall_teleport);
     new spell_igb_explosion_main();
     new spell_igb_explosion();
     new spell_igb_teleport_players_on_victory();
