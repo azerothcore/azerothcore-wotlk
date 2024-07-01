@@ -1686,56 +1686,45 @@ private:
     Creature* _owner;
 };
 
-class spell_frostwarden_handler_order_whelp : public SpellScriptLoader
+class spell_frostwarden_handler_order_whelp : public SpellScript
 {
-public:
-    spell_frostwarden_handler_order_whelp() : SpellScriptLoader("spell_frostwarden_handler_order_whelp") { }
+    PrepareSpellScript(spell_frostwarden_handler_order_whelp);
 
-    class spell_frostwarden_handler_order_whelp_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_frostwarden_handler_order_whelp_SpellScript);
+        return ValidateSpellInfo({ SPELL_FOCUS_FIRE });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_FOCUS_FIRE });
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            if (targets.empty())
-                return;
-
-            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void HandleForcedCast(SpellEffIndex effIndex)
-        {
-            // caster is Frostwarden Handler, target is player, caster of triggered is whelp
-            PreventHitDefaultEffect(effIndex);
-            std::list<Creature*> unitList;
-            GetCreatureListWithEntryInGrid(unitList, GetCaster(), NPC_FROSTWING_WHELP, 150.0f);
-            if (Creature* creature = GetCaster()->ToCreature())
-                unitList.remove_if(OrderWhelpTargetSelector(creature));
-
-            if (unitList.empty())
-                return;
-
-            Acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_frostwarden_handler_order_whelp_SpellScript::HandleForcedCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_frostwarden_handler_order_whelp_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_frostwarden_handler_order_whelp_SpellScript();
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        if (targets.empty())
+            return;
+
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(target);
+    }
+
+    void HandleForcedCast(SpellEffIndex effIndex)
+    {
+        // caster is Frostwarden Handler, target is player, caster of triggered is whelp
+        PreventHitDefaultEffect(effIndex);
+        std::list<Creature*> unitList;
+        GetCreatureListWithEntryInGrid(unitList, GetCaster(), NPC_FROSTWING_WHELP, 150.0f);
+        if (Creature* creature = GetCaster()->ToCreature())
+            unitList.remove_if(OrderWhelpTargetSelector(creature));
+
+        if (unitList.empty())
+            return;
+
+        Acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_frostwarden_handler_order_whelp::HandleForcedCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_frostwarden_handler_order_whelp::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
@@ -1862,7 +1851,7 @@ void AddSC_boss_sindragosa()
     new at_sindragosa_lair();
 
     new npc_sindragosa_trash();
-    new spell_frostwarden_handler_order_whelp();
+    RegisterSpellScript(spell_frostwarden_handler_order_whelp);
     new spell_frostwarden_handler_focus_fire();
 
     new spell_sindragosa_frost_breath();
