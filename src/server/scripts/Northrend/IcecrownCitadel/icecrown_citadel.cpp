@@ -1980,62 +1980,51 @@ class spell_icc_sprit_alarm : public SpellScript
     }
 };
 
-class spell_icc_geist_alarm : public SpellScriptLoader
+class spell_icc_geist_alarm : public SpellScript
 {
-public:
-    spell_icc_geist_alarm() : SpellScriptLoader("spell_icc_geist_alarm") { }
+    PrepareSpellScript(spell_icc_geist_alarm);
 
-    class spell_icc_geist_alarm_SpellScript : public SpellScript
+    void HandleEvent(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_icc_geist_alarm_SpellScript);
-
-        void HandleEvent(SpellEffIndex effIndex)
+        PreventHitDefaultEffect(effIndex);
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
         {
-            PreventHitDefaultEffect(effIndex);
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            Position p = {4356.77f, 2971.90f, 360.52f, M_PI / 2};
+            if (Creature* l = instance->instance->SummonCreature(NPC_VENGEFUL_FLESHREAPER, p))
             {
-                Position p = {4356.77f, 2971.90f, 360.52f, M_PI / 2};
-                if (Creature* l = instance->instance->SummonCreature(NPC_VENGEFUL_FLESHREAPER, p))
+                bool hasTarget = false;
+                Unit* target = nullptr;
+                if ((target = l->SelectNearestTarget(20.0f)))
+                    hasTarget = true;
+                else
                 {
-                    bool hasTarget = false;
-                    Unit* target = nullptr;
-                    if ((target = l->SelectNearestTarget(20.0f)))
-                        hasTarget = true;
-                    else
+                    target = l->SelectNearestTarget(120.0f);
+                    l->GetMotionMaster()->MoveJump(l->GetPositionX(), l->GetPositionY() + 55.0f, l->GetPositionZ(), 20.0f, 6.0f);
+                }
+                l->AI()->Talk(0);
+                l->AI()->AttackStart(target);
+                l->AddThreat(target, 1.0f);
+                for (uint8 i = 0; i < 5; ++i)
+                {
+                    float dist = 2.0f + rand_norm() * 4.0f;
+                    float angle = rand_norm() * 2 * M_PI;
+                    Position pos(p);
+                    l->MovePosition(pos, dist, angle);
+                    if (Creature* c = l->SummonCreature(NPC_VENGEFUL_FLESHREAPER, pos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30 * MINUTE * IN_MILLISECONDS))
                     {
-                        target = l->SelectNearestTarget(120.0f);
-                        l->GetMotionMaster()->MoveJump(l->GetPositionX(), l->GetPositionY() + 55.0f, l->GetPositionZ(), 20.0f, 6.0f);
-                    }
-                    l->AI()->Talk(0);
-                    l->AI()->AttackStart(target);
-                    l->AddThreat(target, 1.0f);
-                    for (uint8 i = 0; i < 5; ++i)
-                    {
-                        float dist = 2.0f + rand_norm() * 4.0f;
-                        float angle = rand_norm() * 2 * M_PI;
-                        Position pos(p);
-                        l->MovePosition(pos, dist, angle);
-                        if (Creature* c = l->SummonCreature(NPC_VENGEFUL_FLESHREAPER, pos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30 * MINUTE * IN_MILLISECONDS))
-                        {
-                            c->AI()->AttackStart(l->GetVictim());
-                            c->AddThreat(l->GetVictim(), 1.0f);
-                            if (!hasTarget)
-                                c->GetMotionMaster()->MoveJump(c->GetPositionX(), c->GetPositionY() + 55.0f, c->GetPositionZ(), 20.0f, 6.0f);
-                        }
+                        c->AI()->AttackStart(l->GetVictim());
+                        c->AddThreat(l->GetVictim(), 1.0f);
+                        if (!hasTarget)
+                            c->GetMotionMaster()->MoveJump(c->GetPositionX(), c->GetPositionY() + 55.0f, c->GetPositionZ(), 20.0f, 6.0f);
                     }
                 }
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_icc_geist_alarm_SpellScript::HandleEvent, EFFECT_2, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_icc_geist_alarm_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_icc_geist_alarm::HandleEvent, EFFECT_2, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -3765,7 +3754,7 @@ void AddSC_icecrown_citadel()
     new npc_arthas_teleport_visual();
     RegisterSpellScript(spell_icc_stoneform_aura);
     RegisterSpellScript(spell_icc_sprit_alarm);
-    new spell_icc_geist_alarm();
+    RegisterSpellScript(spell_icc_geist_alarm);
     new spell_frost_giant_death_plague();
     new spell_icc_harvest_blight_specimen();
     new spell_trigger_spell_from_caster("spell_svalna_caress_of_death", SPELL_IMPALING_SPEAR_KILL);
