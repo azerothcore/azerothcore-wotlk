@@ -1182,49 +1182,35 @@ class spell_warhead_detonate : public SpellScript
 };
 
 // 61678 - Z Check
-class spell_z_check : public SpellScriptLoader
+class spell_z_check_aura : public AuraScript
 {
-public:
-    spell_z_check() : SpellScriptLoader("spell_z_check") { }
+    PrepareAuraScript(spell_z_check_aura);
 
-    class spell_z_check_AuraScript : public AuraScript
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-    public:
-        spell_z_check_AuraScript() : AuraScript(), _posZ(0) {}
+        _posZ = GetTarget()->GetPositionZ();
+    }
 
-        PrepareAuraScript(spell_z_check_AuraScript);
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        if (_posZ != GetTarget()->GetPositionZ())
         {
-            _posZ = GetTarget()->GetPositionZ();
-        }
-
-        void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-
-            if (_posZ != GetTarget()->GetPositionZ())
+            if (Creature* target = GetTarget()->ToCreature())
             {
-                if (Creature* target = GetTarget()->ToCreature())
-                {
-                    target->AI()->DoAction(0);
-                }
+                target->AI()->DoAction(0);
             }
         }
+    }
 
     private:
-        float _posZ;
+    float _posZ;
 
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_z_check_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_z_check_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_z_check_AuraScript();
+        OnEffectApply += AuraEffectApplyFn(spell_z_check_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_z_check_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1300,7 +1286,7 @@ void AddSC_grizzly_hills()
     RegisterSpellScript(spell_shredder_delivery);
     RegisterSpellScript(spell_infected_worgen_bite_aura);
     new npc_rocket_propelled_warhead();
-    new spell_z_check();
+    RegisterSpellScript(spell_z_check_aura);
     RegisterSpellScript(spell_warhead_detonate);
     RegisterSpellScript(spell_vehicle_warhead_fuse);
     new spell_warhead_fuse();
