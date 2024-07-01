@@ -2635,34 +2635,23 @@ class spell_the_lich_king_summon_into_air : public SpellScript
     }
 };
 
-class spell_the_lich_king_teleport_to_frostmourne_hc : public SpellScriptLoader
+class spell_the_lich_king_teleport_to_frostmourne_hc : public SpellScript
 {
-public:
-    spell_the_lich_king_teleport_to_frostmourne_hc() : SpellScriptLoader("spell_the_lich_king_teleport_to_frostmourne_hc") { }
+    PrepareSpellScript(spell_the_lich_king_teleport_to_frostmourne_hc);
 
-    class spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript : public SpellScript
+    void ModDest(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript);
+        float dist = 2.0f + rand_norm() * 18.0f;
+        float angle = rand_norm() * 2 * M_PI;
+        Position const offset = {dist * cos(angle), dist * std::sin(angle), 0.0f, 0.0f};
+        WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
+        dest->RelocateOffset(offset);
+        GetHitDest()->RelocateOffset(offset);
+    }
 
-        void ModDest(SpellEffIndex  /*effIndex*/)
-        {
-            float dist = 2.0f + rand_norm() * 18.0f;
-            float angle = rand_norm() * 2 * M_PI;
-            Position const offset = {dist * cos(angle), dist * std::sin(angle), 0.0f, 0.0f};
-            WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
-            dest->RelocateOffset(offset);
-            GetHitDest()->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript::ModDest, EFFECT_1, SPELL_EFFECT_TELEPORT_UNITS);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_the_lich_king_teleport_to_frostmourne_hc::ModDest, EFFECT_1, SPELL_EFFECT_TELEPORT_UNITS);
     }
 };
 
@@ -3692,7 +3681,7 @@ void AddSC_boss_the_lich_king()
     RegisterSpellScript(spell_the_lich_king_soul_reaper_aura);
     new npc_valkyr_shadowguard();
     RegisterSpellScript(spell_the_lich_king_summon_into_air);
-    new spell_the_lich_king_teleport_to_frostmourne_hc();
+    RegisterSpellScript(spell_the_lich_king_teleport_to_frostmourne_hc);
     new spell_the_lich_king_valkyr_target_search();
     new spell_the_lich_king_cast_back_to_caster();
     new spell_the_lich_king_life_siphon();
