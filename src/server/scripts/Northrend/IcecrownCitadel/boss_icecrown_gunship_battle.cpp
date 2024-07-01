@@ -2509,30 +2509,24 @@ class spell_igb_rocket_artillery : public SpellScript
     }
 };
 
-class spell_igb_rocket_artillery_explosion : public SpellScriptLoader
+class spell_igb_rocket_artillery_explosion : public SpellScript
 {
-public:
-    spell_igb_rocket_artillery_explosion() : SpellScriptLoader("spell_igb_rocket_artillery_explosion") { }
+    PrepareSpellScript(spell_igb_rocket_artillery_explosion);
 
-    class spell_igb_rocket_artillery_explosion_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_rocket_artillery_explosion_SpellScript);
+        return ValidateSpellInfo({ SPELL_BURNING_PITCH_DAMAGE_A, SPELL_BURNING_PITCH_DAMAGE_H, 5000 });
+    }
 
-        void DamageGunship(SpellEffIndex /*effIndex*/)
-        {
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                GetCaster()->CastCustomSpell(instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_DAMAGE_A : SPELL_BURNING_PITCH_DAMAGE_H, SPELLVALUE_BASE_POINT0, 5000, nullptr, TRIGGERED_FULL_MASK);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_igb_rocket_artillery_explosion_SpellScript::DamageGunship, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void DamageGunship(SpellEffIndex /*effIndex*/)
     {
-        return new spell_igb_rocket_artillery_explosion_SpellScript();
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            GetCaster()->CastCustomSpell(instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_DAMAGE_A : SPELL_BURNING_PITCH_DAMAGE_H, SPELLVALUE_BASE_POINT0, 5000, nullptr, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_igb_rocket_artillery_explosion::DamageGunship, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
     }
 };
 
@@ -2667,7 +2661,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_burning_pitch_selector);
     RegisterSpellScript(spell_igb_burning_pitch);
     RegisterSpellScript(spell_igb_rocket_artillery);
-    new spell_igb_rocket_artillery_explosion();
+    RegisterSpellScript(spell_igb_rocket_artillery_explosion);
     new spell_igb_below_zero();
     new spell_igb_on_gunship_deck();
     new achievement_im_on_a_boat();
