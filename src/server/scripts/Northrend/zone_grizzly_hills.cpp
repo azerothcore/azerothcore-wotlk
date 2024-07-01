@@ -988,35 +988,29 @@ enum InfectedWorgenBite
     SPELL_WORGENS_CALL         = 53095
 };
 
-class spell_infected_worgen_bite : public SpellScriptLoader
+class spell_infected_worgen_bite_aura : public AuraScript
 {
-public:
-    spell_infected_worgen_bite() : SpellScriptLoader("spell_infected_worgen_bite") { }
+    PrepareAuraScript(spell_infected_worgen_bite_aura);
 
-    class spell_infected_worgen_bite_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_infected_worgen_bite_AuraScript);
+        return ValidateSpellInfo({ SPELL_WORGENS_CALL });
+    }
 
-        void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (target->GetTypeId() == TYPEID_PLAYER)
-                if (GetStackAmount() == GetSpellInfo()->StackAmount)
-                {
-                    SetDuration(0);
-                    target->CastSpell(target, SPELL_WORGENS_CALL, true);
-                }
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_infected_worgen_bite_AuraScript::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_infected_worgen_bite_AuraScript();
+        Unit* target = GetTarget();
+        if (target->GetTypeId() == TYPEID_PLAYER)
+            if (GetStackAmount() == GetSpellInfo()->StackAmount)
+            {
+                SetDuration(0);
+                target->CastSpell(target, SPELL_WORGENS_CALL, true);
+            }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_infected_worgen_bite_aura::HandleAfterEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
     }
 };
 
@@ -1326,7 +1320,7 @@ void AddSC_grizzly_hills()
     new npc_venture_co_straggler();
     new npc_lake_frog();
     RegisterSpellScript(spell_shredder_delivery);
-    new spell_infected_worgen_bite();
+    RegisterSpellScript(spell_infected_worgen_bite_aura);
     new npc_rocket_propelled_warhead();
     new spell_z_check();
     new spell_warhead_detonate();
