@@ -1650,54 +1650,43 @@ class spell_valanar_kinetic_bomb_summon : public SpellScript
     }
 };
 
-class spell_blood_council_summon_shadow_resonance : public SpellScriptLoader
+class spell_blood_council_summon_shadow_resonance : public SpellScript
 {
-public:
-    spell_blood_council_summon_shadow_resonance() : SpellScriptLoader("spell_blood_council_summon_shadow_resonance") { }
+    PrepareSpellScript(spell_blood_council_summon_shadow_resonance);
 
-    class spell_blood_council_summon_shadow_resonance_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_blood_council_summon_shadow_resonance_SpellScript);
+        Unit* summoner = GetCaster();
+        float x = dest._position.GetPositionX();
+        float y = dest._position.GetPositionY();
+        float angle = summoner->GetAngle(x, y);
+        if (dest._position.GetExactDist2d(summoner) > 35.0f && x > 4585.0f && y > 2716.0f && y < 2822.0f)
+            return;
 
-        void SetDest(SpellDestination& dest)
-        {
-            Unit* summoner = GetCaster();
-            float x = dest._position.GetPositionX();
-            float y = dest._position.GetPositionY();
-            float angle = summoner->GetAngle(x, y);
-            if (dest._position.GetExactDist2d(summoner) > 35.0f && x > 4585.0f && y > 2716.0f && y < 2822.0f)
-                return;
-
-            for (uint8 a = 0; a < 2; ++a)
-                for (uint8 i = 6; i > 0; --i)
+        for (uint8 a = 0; a < 2; ++a)
+            for (uint8 i = 6; i > 0; --i)
+            {
+                float destX = summoner->GetPositionX() + cos(angle + a * M_PI) * i * 10.0f;
+                float destY = summoner->GetPositionY() + std::sin(angle + a * M_PI) * i * 10.0f;
+                if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY,
+                    summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) &&
+                    destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                 {
-                    float destX = summoner->GetPositionX() + cos(angle + a * M_PI) * i * 10.0f;
-                    float destY = summoner->GetPositionY() + std::sin(angle + a * M_PI) * i * 10.0f;
-                    if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY,
-                        summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) &&
-                        destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
+                    float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());
+                    if (std::fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
                     {
-                        float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());
-                        if (std::fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
-                        {
-                            dest._position.Relocate(destX, destY, destZ);
-                            return;
-                        }
+                        dest._position.Relocate(destX, destY, destZ);
+                        return;
                     }
                 }
+            }
 
-            dest._position.Relocate(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ());
-        }
+        dest._position.Relocate(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ());
+    }
 
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_blood_council_summon_shadow_resonance_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_council_summon_shadow_resonance_SpellScript();
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_blood_council_summon_shadow_resonance::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
     }
 };
 
@@ -1719,6 +1708,6 @@ void AddSC_boss_blood_prince_council()
     RegisterSpellScript(spell_valanar_kinetic_bomb_absorb_aura);
     RegisterSpellScript(spell_valanar_kinetic_bomb_knockback);
     RegisterSpellScript(spell_valanar_kinetic_bomb_summon);
-    new spell_blood_council_summon_shadow_resonance();
+    RegisterSpellScript(spell_blood_council_summon_shadow_resonance);
 }
 
