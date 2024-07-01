@@ -572,39 +572,33 @@ class spell_rotface_mutated_infection_aura : public AuraScript
     }
 };
 
-class spell_rotface_little_ooze_combine : public SpellScriptLoader
+class spell_rotface_little_ooze_combine : public SpellScript
 {
-public:
-    spell_rotface_little_ooze_combine() : SpellScriptLoader("spell_rotface_little_ooze_combine") { }
+    PrepareSpellScript(spell_rotface_little_ooze_combine);
 
-    class spell_rotface_little_ooze_combine_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_rotface_little_ooze_combine_SpellScript);
+        return ValidateSpellInfo({ SPELL_LITTLE_OOZE_COMBINE, SPELL_OOZE_MERGE });
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            // little targetting little
-
-            if (!GetHitCreature() || !GetHitCreature()->IsAlive())
-                return;
-
-            GetCaster()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
-            GetHitCreature()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
-            GetHitCreature()->CastSpell(GetCaster(), SPELL_OOZE_MERGE, true);
-            GetHitCreature()->DespawnOrUnsummon();
-            if (GetCaster()->ToCreature())
-                GetCaster()->ToCreature()->DespawnOrUnsummon();
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_rotface_little_ooze_combine_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_rotface_little_ooze_combine_SpellScript();
+        // little targetting little
+
+        if (!GetHitCreature() || !GetHitCreature()->IsAlive())
+            return;
+
+        GetCaster()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
+        GetHitCreature()->RemoveAurasDueToSpell(SPELL_LITTLE_OOZE_COMBINE);
+        GetHitCreature()->CastSpell(GetCaster(), SPELL_OOZE_MERGE, true);
+        GetHitCreature()->DespawnOrUnsummon();
+        if (GetCaster()->ToCreature())
+            GetCaster()->ToCreature()->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_rotface_little_ooze_combine::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -955,7 +949,7 @@ void AddSC_boss_rotface()
     new npc_little_ooze();
     new npc_big_ooze();
     RegisterSpellAndAuraScriptPair(spell_rotface_mutated_infection, spell_rotface_mutated_infection_aura);
-    new spell_rotface_little_ooze_combine();
+    RegisterSpellScript(spell_rotface_little_ooze_combine);
     new spell_rotface_large_ooze_combine();
     new spell_rotface_large_ooze_buff_combine();
     new spell_rotface_unstable_ooze_explosion_init();
