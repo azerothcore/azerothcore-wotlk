@@ -904,42 +904,31 @@ public:
 /* 56662, 61409 - Build Siege Vehicle (Force)
    56664 - Build Catapult (Force)
    56659 - Build Demolisher (Force) */
-class spell_wintergrasp_force_building : public SpellScriptLoader
+class spell_wintergrasp_force_building : public SpellScript
 {
-public:
-    spell_wintergrasp_force_building() : SpellScriptLoader("spell_wintergrasp_force_building") { }
+    PrepareSpellScript(spell_wintergrasp_force_building);
 
-    class spell_wintergrasp_force_building_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_wintergrasp_force_building_SpellScript);
+        return ValidateSpellInfo(
+            {
+                SPELL_BUILD_CATAPULT_FORCE,
+                SPELL_BUILD_DEMOLISHER_FORCE,
+                SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE,
+                SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE
+            });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo(
-                {
-                    SPELL_BUILD_CATAPULT_FORCE,
-                    SPELL_BUILD_DEMOLISHER_FORCE,
-                    SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE,
-                    SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE
-                });
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, GetEffectValue(), false, nullptr, nullptr, target->GetGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_force_building_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_wintergrasp_force_building_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, GetEffectValue(), false, nullptr, nullptr, target->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_force_building::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1242,7 +1231,7 @@ void AddSC_wintergrasp()
     new go_wg_vehicle_teleporter();
 
     // SPELLs
-    new spell_wintergrasp_force_building();
+    RegisterSpellScript(spell_wintergrasp_force_building);
     new spell_wintergrasp_create_vehicle();
     new spell_wintergrasp_rp_gg();
     new spell_wintergrasp_portal();
