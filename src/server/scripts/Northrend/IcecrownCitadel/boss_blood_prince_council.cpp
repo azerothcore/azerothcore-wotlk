@@ -1542,63 +1542,52 @@ class spell_taldaram_ball_of_inferno_flame : public SpellScript
     }
 };
 
-class spell_valanar_kinetic_bomb : public SpellScriptLoader
+class spell_valanar_kinetic_bomb : public SpellScript
 {
-public:
-    spell_valanar_kinetic_bomb() : SpellScriptLoader("spell_valanar_kinetic_bomb") { }
+    PrepareSpellScript(spell_valanar_kinetic_bomb);
 
-    class spell_valanar_kinetic_bomb_SpellScript : public SpellScript
+    void ChangeSummonPos(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_valanar_kinetic_bomb_SpellScript);
-
-        void ChangeSummonPos(SpellEffIndex /*effIndex*/)
-        {
-            WorldLocation summonPos = *GetExplTargetDest();
-            Position offset = {0.0f, 0.0f, 20.0f, 0.0f};
-            summonPos.RelocateOffset(offset);
-            SetExplTargetDest(summonPos);
-            GetHitDest()->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_valanar_kinetic_bomb_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
-        }
-    };
-
-    class spell_valanar_kinetic_bomb_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_valanar_kinetic_bomb_AuraScript);
-
-        void HandleDummyTick(AuraEffect const* /*aurEff*/)
-        {
-            Unit* target = GetTarget();
-            if (target->GetTypeId() != TYPEID_UNIT)
-                return;
-
-            if (Creature* bomb = target->FindNearestCreature(NPC_KINETIC_BOMB, 1.0f, true))
-            {
-                bomb->CastSpell(bomb, SPELL_KINETIC_BOMB_EXPLOSION, true);
-                bomb->RemoveAurasDueToSpell(SPELL_KINETIC_BOMB_VISUAL);
-                target->RemoveAura(GetAura());
-                bomb->AI()->DoAction(SPELL_KINETIC_BOMB_EXPLOSION);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_valanar_kinetic_bomb_AuraScript::HandleDummyTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_valanar_kinetic_bomb_SpellScript();
+        WorldLocation summonPos = *GetExplTargetDest();
+        Position offset = {0.0f, 0.0f, 20.0f, 0.0f};
+        summonPos.RelocateOffset(offset);
+        SetExplTargetDest(summonPos);
+        GetHitDest()->RelocateOffset(offset);
     }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_valanar_kinetic_bomb_AuraScript();
+        OnEffectHit += SpellEffectFn(spell_valanar_kinetic_bomb::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
+    }
+};
+
+class spell_valanar_kinetic_bomb_aura : public AuraScript
+{
+    PrepareAuraScript(spell_valanar_kinetic_bomb_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_KINETIC_BOMB_EXPLOSION, SPELL_KINETIC_BOMB_VISUAL });
+    }
+
+    void HandleDummyTick(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        if (target->GetTypeId() != TYPEID_UNIT)
+            return;
+
+        if (Creature* bomb = target->FindNearestCreature(NPC_KINETIC_BOMB, 1.0f, true))
+        {
+            bomb->CastSpell(bomb, SPELL_KINETIC_BOMB_EXPLOSION, true);
+            bomb->RemoveAurasDueToSpell(SPELL_KINETIC_BOMB_VISUAL);
+            target->RemoveAura(GetAura());
+            bomb->AI()->DoAction(SPELL_KINETIC_BOMB_EXPLOSION);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_valanar_kinetic_bomb_aura::HandleDummyTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1759,7 +1748,7 @@ void AddSC_boss_blood_prince_council()
     RegisterSpellScript(spell_taldaram_glittering_sparks);
     RegisterSpellScript(spell_taldaram_summon_flame_ball);
     RegisterSpellScript(spell_taldaram_ball_of_inferno_flame);
-    new spell_valanar_kinetic_bomb();
+    RegisterSpellAndAuraScriptPair(spell_valanar_kinetic_bomb, spell_valanar_kinetic_bomb_aura);
     new spell_valanar_kinetic_bomb_absorb();
     new spell_valanar_kinetic_bomb_knockback();
     new spell_valanar_kinetic_bomb_summon();
