@@ -1104,72 +1104,60 @@ class spell_switch_infragreen_bomber_station : public SpellScript
     }
 };
 
-class spell_charge_shield_bomber : public SpellScriptLoader
+class spell_charge_shield_bomber : public SpellScript
 {
-public:
-    spell_charge_shield_bomber() : SpellScriptLoader("spell_charge_shield_bomber") { }
+    PrepareSpellScript(spell_charge_shield_bomber);
 
-    class spell_charge_shield_bomber_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_charge_shield_bomber_SpellScript)
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Unit* ship = GetCaster()->GetVehicleBase();
-            if (!ship)
-                return;
-
-            ship->CastSpell(ship, SPELL_INFRA_GREEN_SHIELD, true);
-            Aura* aura = ship->GetAura(SPELL_INFRA_GREEN_SHIELD);
-            if (!aura)
-                return;
-
-            aura->ModStackAmount(GetEffectValue() - 1);
-        }
-
-        void Register() override
-        {
-            if (m_scriptSpellId == SPELL_CHARGE_SHIELD)
-                OnEffectHitTarget += SpellEffectFn(spell_charge_shield_bomber_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_charge_shield_bomber_SpellScript();
+        return ValidateSpellInfo({ SPELL_INFRA_GREEN_SHIELD });
     }
 
-    class spell_charge_shield_bomber_AuraScript : public AuraScript
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        PrepareAuraScript(spell_charge_shield_bomber_AuraScript);
+        PreventHitDefaultEffect(effIndex);
+        Unit* ship = GetCaster()->GetVehicleBase();
+        if (!ship)
+            return;
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set absorbtion amount to unlimited
-            amount = -1;
-        }
+        ship->CastSpell(ship, SPELL_INFRA_GREEN_SHIELD, true);
+        Aura* aura = ship->GetAura(SPELL_INFRA_GREEN_SHIELD);
+        if (!aura)
+            return;
 
-        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            uint32 absorbPct = GetStackAmount() / 2;
-            absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
-            ModStackAmount(-1);
-        }
+        aura->ModStackAmount(GetEffectValue() - 1);
+    }
 
-        void Register() override
-        {
-            if (m_scriptSpellId == SPELL_INFRA_GREEN_SHIELD)
-            {
-                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_charge_shield_bomber_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-                OnEffectAbsorb += AuraEffectAbsorbFn(spell_charge_shield_bomber_AuraScript::Absorb, EFFECT_0);
-            }
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_charge_shield_bomber_AuraScript();
+        if (m_scriptSpellId == SPELL_CHARGE_SHIELD)
+        OnEffectHitTarget += SpellEffectFn(spell_charge_shield_bomber::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_charge_shield_bomber_aura : public AuraScript
+{
+    PrepareAuraScript(spell_charge_shield_bomber_aura);
+
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        // Set absorbtion amount to unlimited
+        amount = -1;
+    }
+
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        uint32 absorbPct = GetStackAmount() / 2;
+        absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        if (m_scriptSpellId == SPELL_INFRA_GREEN_SHIELD)
+        {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_charge_shield_bomber_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_charge_shield_bomber_aura::Absorb, EFFECT_0);
     }
 };
 
@@ -2182,7 +2170,7 @@ void AddSC_icecrown()
     new npc_boneguard_footman();
     new npc_tirions_gambit_tirion();
     RegisterSpellScript(spell_switch_infragreen_bomber_station);
-    new spell_charge_shield_bomber();
+    RegisterSpellAndAuraScriptPair(spell_charge_shield_bomber, spell_charge_shield_bomber_aura);
     new spell_fight_fire_bomber();
     new spell_anti_air_rocket_bomber();
     new npc_infra_green_bomber_generic();
