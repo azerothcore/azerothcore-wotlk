@@ -2335,32 +2335,26 @@ class spell_stinky_precious_decimate : public SpellScript
     }
 };
 
-class spell_icc_yf_frozen_orb : public SpellScriptLoader
+class spell_icc_yf_frozen_orb_aura : public AuraScript
 {
-public:
-    spell_icc_yf_frozen_orb() : SpellScriptLoader("spell_icc_yf_frozen_orb") { }
+    PrepareAuraScript(spell_icc_yf_frozen_orb_aura);
 
-    class spell_icc_yf_frozen_orb_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_icc_yf_frozen_orb_AuraScript)
+        return ValidateSpellInfo({ 71285 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* c = GetCaster())
-                if (Unit* t = GetTarget())
-                    c->CastSpell(t->GetPositionX(), t->GetPositionY(), t->GetPositionZ(), 71285, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_icc_yf_frozen_orb_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_icc_yf_frozen_orb_AuraScript();
+        PreventDefaultAction();
+        if (Unit* c = GetCaster())
+            if (Unit* t = GetTarget())
+                c->CastSpell(t->GetPositionX(), t->GetPositionY(), t->GetPositionZ(), 71285, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_icc_yf_frozen_orb_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -3702,7 +3696,7 @@ void AddSC_icecrown_citadel()
     RegisterSpellScript(spell_icc_web_wrap_aura);
     RegisterSpellScript(spell_icc_dark_reckoning_aura);
     RegisterSpellScript(spell_stinky_precious_decimate);
-    new spell_icc_yf_frozen_orb();
+    RegisterSpellScript(spell_icc_yf_frozen_orb_aura);
     new spell_icc_yh_volley();
     new spell_icc_yd_summon_undead();
     new spell_icc_shattered_bones();
