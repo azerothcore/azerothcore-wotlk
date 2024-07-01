@@ -1098,51 +1098,45 @@ class spell_deathbringer_blood_link_aura : public AuraScript
     }
 };
 
-class spell_deathbringer_blood_link_blood_beast_aura : public SpellScriptLoader
+class spell_deathbringer_blood_link_blood_beast_aura : public AuraScript
 {
-public:
-    spell_deathbringer_blood_link_blood_beast_aura() : SpellScriptLoader("spell_deathbringer_blood_link_blood_beast_aura") { }
+    PrepareAuraScript(spell_deathbringer_blood_link_blood_beast_aura);
 
-    class spell_deathbringer_blood_link_blood_beast_aura_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_deathbringer_blood_link_blood_beast_aura_AuraScript);
+        return ValidateSpellInfo({ SPELL_BLOOD_LINK_DUMMY });
+    }
 
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
-        }
-
-        void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-
-            /*
-            uint32 markCount = 0;
-            if (Map* map = eventInfo.GetActor()->FindMap())
-                if (InstanceMap* imap = map->ToInstanceMap())
-                    if (InstanceScript* isc = imap->GetInstanceScript())
-                        if (ObjectGuid sguid = isc->GetGuidData(3) //DATA_DEATHBRINGER_SAURFANG
-                            if (Creature* saurfang = ObjectAccessor::GetCreature(*eventInfo.GetActor(), sguid))
-                                markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456) : 0; //FALLEN_CHAMPION_CAST_COUNT
-            */
-            int32 basepoints = int32(3.0f /*+ 0.5f + 0.5f*markCount*/);
-
-            eventInfo.GetActor()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
-            return;
-        }
-
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_blood_beast_aura_AuraScript::CheckProc);
-            OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_blood_beast_aura_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return new spell_deathbringer_blood_link_blood_beast_aura_AuraScript();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
+    }
+
+    void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        /*
+        uint32 markCount = 0;
+        if (Map* map = eventInfo.GetActor()->FindMap())
+            if (InstanceMap* imap = map->ToInstanceMap())
+                if (InstanceScript* isc = imap->GetInstanceScript())
+                    if (ObjectGuid sguid = isc->GetGuidData(3) //DATA_DEATHBRINGER_SAURFANG
+                        if (Creature* saurfang = ObjectAccessor::GetCreature(*eventInfo.GetActor(), sguid))
+                            markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456) : 0; //FALLEN_CHAMPION_CAST_COUNT
+        */
+        int32 basepoints = int32(3.0f /*+ 0.5f + 0.5f*markCount*/);
+
+        eventInfo.GetActor()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
+        return;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_blood_beast_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_blood_beast_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -1407,7 +1401,7 @@ void AddSC_boss_deathbringer_saurfang()
     new npc_muradin_bronzebeard_icc();
     new npc_saurfang_event();
     RegisterSpellScript(spell_deathbringer_blood_link_aura);
-    new spell_deathbringer_blood_link_blood_beast_aura();
+    RegisterSpellScript(spell_deathbringer_blood_link_blood_beast_aura);
     new spell_deathbringer_blood_link();
     new spell_deathbringer_blood_power();
     new spell_deathbringer_blood_nova_targeting();
