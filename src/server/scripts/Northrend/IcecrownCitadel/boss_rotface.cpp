@@ -731,41 +731,30 @@ class spell_rotface_large_ooze_buff_combine : public SpellScript
     }
 };
 
-class spell_rotface_unstable_ooze_explosion_init : public SpellScriptLoader
+class spell_rotface_unstable_ooze_explosion_init : public SpellScript
 {
-public:
-    spell_rotface_unstable_ooze_explosion_init() : SpellScriptLoader("spell_rotface_unstable_ooze_explosion_init") { }
+    PrepareSpellScript(spell_rotface_unstable_ooze_explosion_init);
 
-    class spell_rotface_unstable_ooze_explosion_init_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_rotface_unstable_ooze_explosion_init_SpellScript);
+        return ValidateSpellInfo({ SPELL_UNSTABLE_OOZE_EXPLOSION_TRIGGER });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_UNSTABLE_OOZE_EXPLOSION_TRIGGER });
-        }
-
-        void HandleCast(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (!GetHitUnit())
-                return;
-
-            float x, y, z;
-            GetHitUnit()->GetPosition(x, y, z);
-            Creature* dummy = GetCaster()->SummonCreature(NPC_UNSTABLE_EXPLOSION_STALKER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
-            GetCaster()->CastSpell(dummy, SPELL_UNSTABLE_OOZE_EXPLOSION_TRIGGER, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_rotface_unstable_ooze_explosion_init_SpellScript::HandleCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleCast(SpellEffIndex effIndex)
     {
-        return new spell_rotface_unstable_ooze_explosion_init_SpellScript();
+        PreventHitEffect(effIndex);
+        if (!GetHitUnit())
+            return;
+
+        float x, y, z;
+        GetHitUnit()->GetPosition(x, y, z);
+        Creature* dummy = GetCaster()->SummonCreature(NPC_UNSTABLE_EXPLOSION_STALKER, x, y, z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
+        GetCaster()->CastSpell(dummy, SPELL_UNSTABLE_OOZE_EXPLOSION_TRIGGER, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_rotface_unstable_ooze_explosion_init::HandleCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
@@ -940,7 +929,7 @@ void AddSC_boss_rotface()
     RegisterSpellScript(spell_rotface_little_ooze_combine);
     RegisterSpellScript(spell_rotface_large_ooze_combine);
     RegisterSpellScript(spell_rotface_large_ooze_buff_combine);
-    new spell_rotface_unstable_ooze_explosion_init();
+    RegisterSpellScript(spell_rotface_unstable_ooze_explosion_init);
     new spell_rotface_unstable_ooze_explosion();
     new spell_rotface_unstable_ooze_explosion_suicide();
 
