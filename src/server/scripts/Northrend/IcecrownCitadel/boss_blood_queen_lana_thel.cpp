@@ -615,48 +615,37 @@ class spell_blood_queen_pact_of_the_darkfallen_dmg_aura : public AuraScript
     }
 };
 
-class spell_blood_queen_pact_of_the_darkfallen : public SpellScriptLoader
+class spell_blood_queen_pact_of_the_darkfallen : public SpellScript
 {
-public:
-    spell_blood_queen_pact_of_the_darkfallen() : SpellScriptLoader("spell_blood_queen_pact_of_the_darkfallen") { }
+    PrepareSpellScript(spell_blood_queen_pact_of_the_darkfallen);
 
-    class spell_blood_queen_pact_of_the_darkfallen_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_blood_queen_pact_of_the_darkfallen_SpellScript);
+        targets.remove_if(Acore::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        bool remove = true;
+        std::list<WorldObject*>::const_iterator itr, itr2, itrEnd = targets.end();
+        for (itr = targets.begin(); itr != itrEnd && remove; ++itr)
         {
-            targets.remove_if(Acore::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
+            if (GetCaster()->GetExactDist2d(*itr) > 5.0f)
+                remove = false;
 
-            bool remove = true;
-            std::list<WorldObject*>::const_iterator itr, itr2, itrEnd = targets.end();
-            for (itr = targets.begin(); itr != itrEnd && remove; ++itr)
-            {
-                if (GetCaster()->GetExactDist2d(*itr) > 5.0f)
+            for (itr2 = targets.begin(); itr2 != itrEnd && remove; ++itr2)
+                if (itr != itr2 && (*itr2)->GetExactDist2d(*itr) > 5.0f)
                     remove = false;
+        }
 
-                for (itr2 = targets.begin(); itr2 != itrEnd && remove; ++itr2)
-                    if (itr != itr2 && (*itr2)->GetExactDist2d(*itr) > 5.0f)
-                        remove = false;
+        if (remove)
+            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            {
+                targets.clear();
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PACT_OF_THE_DARKFALLEN);
             }
+    }
 
-            if (remove)
-                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                {
-                    targets.clear();
-                    instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PACT_OF_THE_DARKFALLEN);
-                }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_pact_of_the_darkfallen_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_queen_pact_of_the_darkfallen_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_pact_of_the_darkfallen::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
     }
 };
 
@@ -1004,7 +993,7 @@ void AddSC_boss_blood_queen_lana_thel()
 {
     new boss_blood_queen_lana_thel();
     RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_aura);
-    new spell_blood_queen_pact_of_the_darkfallen();
+    RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen);
     new spell_blood_queen_pact_of_the_darkfallen_dmg_target();
     new spell_blood_queen_bloodbolt();
     new spell_blood_queen_frenzied_bloodthirst();
