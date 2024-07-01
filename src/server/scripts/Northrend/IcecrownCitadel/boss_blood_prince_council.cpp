@@ -1591,31 +1591,20 @@ class spell_valanar_kinetic_bomb_aura : public AuraScript
     }
 };
 
-class spell_valanar_kinetic_bomb_absorb : public SpellScriptLoader
+class spell_valanar_kinetic_bomb_absorb_aura : public AuraScript
 {
-public:
-    spell_valanar_kinetic_bomb_absorb() : SpellScriptLoader("spell_valanar_kinetic_bomb_absorb") { }
+    PrepareAuraScript(spell_valanar_kinetic_bomb_absorb_aura);
 
-    class spell_valanar_kinetic_bomb_absorb_AuraScript : public AuraScript
+    void OnAbsorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
-        PrepareAuraScript(spell_valanar_kinetic_bomb_absorb_AuraScript);
+        absorbAmount = CalculatePct(dmgInfo.GetDamage(), aurEff->GetAmount());
+        RoundToInterval<uint32>(absorbAmount, 0, dmgInfo.GetDamage());
+        dmgInfo.AbsorbDamage(absorbAmount);
+    }
 
-        void OnAbsorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            absorbAmount = CalculatePct(dmgInfo.GetDamage(), aurEff->GetAmount());
-            RoundToInterval<uint32>(absorbAmount, 0, dmgInfo.GetDamage());
-            dmgInfo.AbsorbDamage(absorbAmount);
-        }
-
-        void Register() override
-        {
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_valanar_kinetic_bomb_absorb_AuraScript::OnAbsorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_valanar_kinetic_bomb_absorb_AuraScript();
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_valanar_kinetic_bomb_absorb_aura::OnAbsorb, EFFECT_0);
     }
 };
 
@@ -1749,7 +1738,7 @@ void AddSC_boss_blood_prince_council()
     RegisterSpellScript(spell_taldaram_summon_flame_ball);
     RegisterSpellScript(spell_taldaram_ball_of_inferno_flame);
     RegisterSpellAndAuraScriptPair(spell_valanar_kinetic_bomb, spell_valanar_kinetic_bomb_aura);
-    new spell_valanar_kinetic_bomb_absorb();
+    RegisterSpellScript(spell_valanar_kinetic_bomb_absorb_aura);
     new spell_valanar_kinetic_bomb_knockback();
     new spell_valanar_kinetic_bomb_summon();
     new spell_blood_council_summon_shadow_resonance();
