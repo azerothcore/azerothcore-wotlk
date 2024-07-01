@@ -2068,52 +2068,47 @@ class spell_igb_teleport_to_enemy_ship : public SpellScript
     }
 };
 
-class spell_igb_check_for_players : public SpellScriptLoader
+class spell_igb_check_for_players : public SpellScript
 {
-public:
-    spell_igb_check_for_players() : SpellScriptLoader("spell_igb_check_for_players") { }
+    PrepareSpellScript(spell_igb_check_for_players);
 
-    class spell_igb_check_for_players_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_check_for_players_SpellScript);
-
-        bool Load() override
-        {
-            _playerCount = 0;
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void CountTargets(std::list<WorldObject*>& targets)
-        {
-            _playerCount = targets.size();
-        }
-
-        void TriggerWipe()
-        {
-            if (!_playerCount)
-                GetCaster()->ToCreature()->AI()->JustDied(nullptr);
-        }
-
-        void TeleportPlayer(SpellEffIndex /*effIndex*/)
-        {
-            if (GetHitUnit()->GetPositionZ() < GetCaster()->GetPositionZ() - 10.0f)
-                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_GUNSHIP_FALL_TELEPORT, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_check_for_players_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            AfterCast += SpellCastFn(spell_igb_check_for_players_SpellScript::TriggerWipe);
-            OnEffectHitTarget += SpellEffectFn(spell_igb_check_for_players_SpellScript::TeleportPlayer, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-
-        uint32 _playerCount;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_igb_check_for_players_SpellScript();
+        return ValidateSpellInfo({ SPELL_GUNSHIP_FALL_TELEPORT });
     }
+
+    bool Load() override
+    {
+        _playerCount = 0;
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void CountTargets(std::list<WorldObject*>& targets)
+    {
+        _playerCount = targets.size();
+    }
+
+    void TriggerWipe()
+    {
+        if (!_playerCount)
+            GetCaster()->ToCreature()->AI()->JustDied(nullptr);
+    }
+
+    void TeleportPlayer(SpellEffIndex /*effIndex*/)
+    {
+        if (GetHitUnit()->GetPositionZ() < GetCaster()->GetPositionZ() - 10.0f)
+            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_GUNSHIP_FALL_TELEPORT, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_check_for_players::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        AfterCast += SpellCastFn(spell_igb_check_for_players::TriggerWipe);
+        OnEffectHitTarget += SpellEffectFn(spell_igb_check_for_players::TeleportPlayer, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+
+private:
+    uint32 _playerCount;
 };
 
 class spell_igb_gunship_fall_teleport : public SpellScriptLoader
@@ -2769,7 +2764,7 @@ void AddSC_boss_icecrown_gunship_battle()
     RegisterSpellScript(spell_igb_rocket_pack_aura);
     RegisterSpellScript(spell_igb_rocket_pack_useable_aura);
     RegisterSpellScript(spell_igb_teleport_to_enemy_ship);
-    new spell_igb_check_for_players();
+    RegisterSpellScript(spell_igb_check_for_players);
     new spell_igb_gunship_fall_teleport();
     new spell_igb_explosion_main();
     new spell_igb_explosion();
