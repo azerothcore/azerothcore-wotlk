@@ -1443,30 +1443,19 @@ class spell_putricide_mutated_transformation_dismiss_aura : public AuraScript
     }
 };
 
-class spell_putricide_mutated_transformation_dmg : public SpellScriptLoader
+class spell_putricide_mutated_transformation_dmg : public SpellScript
 {
-public:
-    spell_putricide_mutated_transformation_dmg() : SpellScriptLoader("spell_putricide_mutated_transformation_dmg") { }
+    PrepareSpellScript(spell_putricide_mutated_transformation_dmg);
 
-    class spell_putricide_mutated_transformation_dmg_SpellScript : public SpellScript
+    void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_putricide_mutated_transformation_dmg_SpellScript);
+        if (Unit* owner = ObjectAccessor::GetUnit(*GetCaster(), GetCaster()->GetCreatorGUID()))
+            targets.remove(owner);
+    }
 
-        void FilterTargetsInitial(std::list<WorldObject*>& targets)
-        {
-            if (Unit* owner = ObjectAccessor::GetUnit(*GetCaster(), GetCaster()->GetCreatorGUID()))
-                targets.remove(owner);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_mutated_transformation_dmg_SpellScript::FilterTargetsInitial, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_putricide_mutated_transformation_dmg_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_mutated_transformation_dmg::FilterTargetsInitial, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
     }
 };
 
@@ -1571,7 +1560,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellAndAuraScriptPair(spell_putricide_mutation_init, spell_putricide_mutation_init_aura);
     RegisterSpellScript(spell_putricide_mutated_transformation);
     RegisterSpellScript(spell_putricide_mutated_transformation_dismiss_aura);
-    new spell_putricide_mutated_transformation_dmg();
+    RegisterSpellScript(spell_putricide_mutated_transformation_dmg);
     new spell_putricide_eat_ooze();
     new spell_putricide_regurgitated_ooze();
 }
