@@ -1077,36 +1077,25 @@ class spell_wintergrasp_hide_small_elementals_aura : public AuraScript
 /* 57610, 51422 - Cannon
    50999 - Boulder
    57607 - Plague Slime */
-class spell_wg_reduce_damage_by_distance : public SpellScriptLoader
+class spell_wg_reduce_damage_by_distance : public SpellScript
 {
-public:
-    spell_wg_reduce_damage_by_distance() : SpellScriptLoader("spell_wg_reduce_damage_by_distance") { }
+    PrepareSpellScript(spell_wg_reduce_damage_by_distance);
 
-    class spell_wg_reduce_damage_by_distance_SpellScript : public SpellScript
+    void RecalculateDamage()
     {
-        PrepareSpellScript(spell_wg_reduce_damage_by_distance_SpellScript);
+        if (!GetExplTargetDest() || !GetHitUnit())
+            return;
 
-        void RecalculateDamage()
-        {
-            if (!GetExplTargetDest() || !GetHitUnit())
-                return;
+        float maxDistance = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster()); // Xinef: always stored in EFFECT_0
+        float distance = std::min<float>(GetHitUnit()->GetDistance(*GetExplTargetDest()), maxDistance);
 
-            float maxDistance = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster()); // Xinef: always stored in EFFECT_0
-            float distance = std::min<float>(GetHitUnit()->GetDistance(*GetExplTargetDest()), maxDistance);
+        int32 damage = std::max<int32>(0, int32(GetHitDamage() - floor(GetHitDamage() * (distance / maxDistance))));
+        SetHitDamage(damage);
+    }
 
-            int32 damage = std::max<int32>(0, int32(GetHitDamage() - floor(GetHitDamage() * (distance / maxDistance))));
-            SetHitDamage(damage);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_wg_reduce_damage_by_distance_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_wg_reduce_damage_by_distance_SpellScript();
+        OnHit += SpellHitFn(spell_wg_reduce_damage_by_distance::RecalculateDamage);
     }
 };
 
@@ -1192,7 +1181,7 @@ void AddSC_wintergrasp()
     RegisterSpellScript(spell_wintergrasp_portal);
     RegisterSpellScript(spell_wintergrasp_water);
     RegisterSpellScript(spell_wintergrasp_hide_small_elementals_aura);
-    new spell_wg_reduce_damage_by_distance();
+    RegisterSpellScript(spell_wg_reduce_damage_by_distance);
 
     // ACHIEVEMENTs
     new achievement_wg_didnt_stand_a_chance();
