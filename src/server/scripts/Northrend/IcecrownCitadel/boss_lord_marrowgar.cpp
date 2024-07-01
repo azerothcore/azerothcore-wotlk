@@ -600,32 +600,21 @@ class spell_marrowgar_coldflame_bonestorm : public SpellScript
     }
 };
 
-class spell_marrowgar_bone_storm : public SpellScriptLoader
+class spell_marrowgar_bone_storm : public SpellScript
 {
-public:
-    spell_marrowgar_bone_storm() : SpellScriptLoader("spell_marrowgar_bone_storm") { }
+    PrepareSpellScript(spell_marrowgar_bone_storm);
 
-    class spell_marrowgar_bone_storm_SpellScript : public SpellScript
+    void RecalculateDamage()
     {
-        PrepareSpellScript(spell_marrowgar_bone_storm_SpellScript);
+        float dist = GetHitUnit()->GetExactDist2d(GetCaster());
+        if (dist >= 9.0f) dist -= 9.0f;
+        else dist = 0.0f;
+        SetHitDamage(int32(GetHitDamage() / std::max(sqrtf(dist), 1.0f)));
+    }
 
-        void RecalculateDamage()
-        {
-            float dist = GetHitUnit()->GetExactDist2d(GetCaster());
-            if (dist >= 9.0f) dist -= 9.0f;
-            else dist = 0.0f;
-            SetHitDamage(int32(GetHitDamage() / std::max(sqrtf(dist), 1.0f)));
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_marrowgar_bone_storm_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_marrowgar_bone_storm_SpellScript();
+        OnHit += SpellHitFn(spell_marrowgar_bone_storm::RecalculateDamage);
     }
 };
 
@@ -680,7 +669,7 @@ void AddSC_boss_lord_marrowgar()
     RegisterSpellScript(spell_marrowgar_coldflame);
     RegisterSpellScript(spell_marrowgar_coldflame_bonestorm);
     RegisterSpellScript(spell_marrowgar_bone_spike_graveyard);
-    new spell_marrowgar_bone_storm();
+    RegisterSpellScript(spell_marrowgar_bone_storm);
     new spell_marrowgar_bone_slice();
 }
 
