@@ -2273,31 +2273,25 @@ public:
 
 // pussywizard below:
 
-class spell_icc_web_wrap : public SpellScriptLoader
+class spell_icc_web_wrap_aura : public AuraScript
 {
-public:
-    spell_icc_web_wrap() : SpellScriptLoader("spell_icc_web_wrap") { }
+    PrepareAuraScript(spell_icc_web_wrap_aura);
 
-    class spell_icc_web_wrap_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_icc_web_wrap_AuraScript);
+        return ValidateSpellInfo({ 71010 });
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (!target->HasAura(71010))
-                target->CastSpell(target, 71010, true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_icc_web_wrap_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_ROOT, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_icc_web_wrap_AuraScript();
+        Unit* target = GetTarget();
+        if (!target->HasAura(71010))
+            target->CastSpell(target, 71010, true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_icc_web_wrap_aura::OnRemove, EFFECT_0, SPELL_AURA_MOD_ROOT, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -3722,7 +3716,7 @@ void AddSC_icecrown_citadel()
     new at_icc_start_frostwing_gauntlet();
 
     // pussywizard below:
-    new spell_icc_web_wrap();
+    RegisterSpellScript(spell_icc_web_wrap_aura);
     new spell_icc_dark_reckoning();
     new spell_stinky_precious_decimate();
     new spell_icc_yf_frozen_orb();
