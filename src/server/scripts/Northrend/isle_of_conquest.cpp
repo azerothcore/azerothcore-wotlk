@@ -308,30 +308,24 @@ public:
     }
 };
 
-class spell_ioc_repair_turret : public SpellScriptLoader
+class spell_ioc_repair_turret_aura : public AuraScript
 {
-public:
-    spell_ioc_repair_turret() : SpellScriptLoader("spell_ioc_repair_turret") { }
+    PrepareAuraScript(spell_ioc_repair_turret_aura);
 
-    class spell_ioc_repair_turret_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_ioc_repair_turret_AuraScript);
+        return ValidateSpellInfo({ SPELL_REPAIR_TURRET_DUMMY });
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                GetTarget()->CastSpell(GetTarget(), SPELL_REPAIR_TURRET_DUMMY, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_ioc_repair_turret_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_ioc_repair_turret_AuraScript();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            GetTarget()->CastSpell(GetTarget(), SPELL_REPAIR_TURRET_DUMMY, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_ioc_repair_turret_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -509,7 +503,7 @@ void AddSC_isle_of_conquest()
     new npc_four_car_garage();
     new npc_ioc_gunship_captain();
     new boss_isle_of_conquest();
-    new spell_ioc_repair_turret();
+    RegisterSpellScript(spell_ioc_repair_turret_aura);
     new spell_ioc_bomb_blast_criteria();
     new spell_ioc_gunship_portal();
     new spell_ioc_parachute_ic();
