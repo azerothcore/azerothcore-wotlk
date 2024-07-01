@@ -786,91 +786,80 @@ class spell_blood_queen_essence_of_the_blood_queen_aura : public AuraScript
     }
 };
 
-class spell_blood_queen_vampiric_bite : public SpellScriptLoader
+class spell_blood_queen_vampiric_bite : public SpellScript
 {
-public:
-    spell_blood_queen_vampiric_bite() : SpellScriptLoader("spell_blood_queen_vampiric_bite") { }
+    PrepareSpellScript(spell_blood_queen_vampiric_bite);
 
-    class spell_blood_queen_vampiric_bite_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_blood_queen_vampiric_bite_SpellScript);
-
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo(
-                {
-                    SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR,
-                    SPELL_FRENZIED_BLOODTHIRST,
-                    SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY
-                });
-        }
-
-        SpellCastResult CheckTarget()
-        {
-            if (GetExplTargetUnit()->GetMapId() != 631)
-                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-            if (IsVampire(GetExplTargetUnit()))
+        return ValidateSpellInfo(
             {
-                SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_CANT_TARGET_VAMPIRES);
-                return SPELL_FAILED_CUSTOM_ERROR;
-            }
-            if (InstanceScript* instance = GetExplTargetUnit()->GetInstanceScript())
-                if (instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == IN_PROGRESS)
-                    return SPELL_CAST_OK;
+                SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR,
+                SPELL_FRENZIED_BLOODTHIRST,
+                SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY
+            });
+    }
 
+    SpellCastResult CheckTarget()
+    {
+        if (GetExplTargetUnit()->GetMapId() != 631)
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-        }
-
-        void OnCast(SpellMissInfo missInfo)
+        if (IsVampire(GetExplTargetUnit()))
         {
-            if (missInfo != SPELL_MISS_NONE)
-            {
-                return;
-            }
-
-            if (GetCaster()->GetTypeId() != TYPEID_PLAYER || GetCaster()->GetMapId() != 631)
-                return;
-            InstanceScript* instance = GetCaster()->GetInstanceScript();
-            if (!instance || instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != IN_PROGRESS)
-                return;
-
-            uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
-            GetCaster()->RemoveAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
-            GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, TRIGGERED_FULL_MASK);
-
-            if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))
-            {
-                if (aura->GetStackAmount() == 3)
-                {
-                    GetCaster()->CastSpell(GetCaster(), SPELL_THIRST_QUENCHED, TRIGGERED_FULL_MASK);
-                    GetCaster()->RemoveAura(aura);
-                }
-                else
-                    GetCaster()->CastSpell(GetCaster(), SPELL_GUSHING_WOUND, TRIGGERED_FULL_MASK);
-            }
-
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
-                    bloodQueen->AI()->SetGUID(GetHitUnit()->GetGUID(), GUID_VAMPIRE);
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_CANT_TARGET_VAMPIRES);
+            return SPELL_FAILED_CUSTOM_ERROR;
         }
+        if (InstanceScript* instance = GetExplTargetUnit()->GetInstanceScript())
+            if (instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == IN_PROGRESS)
+                return SPELL_CAST_OK;
 
-        void HandlePresence(SpellEffIndex /*effIndex*/)
-        {
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY, TRIGGERED_FULL_MASK);
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PRESENCE_OF_THE_DARKFALLEN_SE, TRIGGERED_FULL_MASK);
-        }
+        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+    }
 
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_blood_queen_vampiric_bite_SpellScript::CheckTarget);
-            BeforeHit += BeforeSpellHitFn(spell_blood_queen_vampiric_bite_SpellScript::OnCast);
-            OnEffectHitTarget += SpellEffectFn(spell_blood_queen_vampiric_bite_SpellScript::HandlePresence, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void OnCast(SpellMissInfo missInfo)
     {
-        return new spell_blood_queen_vampiric_bite_SpellScript();
+        if (missInfo != SPELL_MISS_NONE)
+        {
+            return;
+        }
+
+        if (GetCaster()->GetTypeId() != TYPEID_PLAYER || GetCaster()->GetMapId() != 631)
+            return;
+        InstanceScript* instance = GetCaster()->GetInstanceScript();
+        if (!instance || instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != IN_PROGRESS)
+            return;
+
+        uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
+        GetCaster()->RemoveAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+        GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, TRIGGERED_FULL_MASK);
+
+        if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))
+        {
+            if (aura->GetStackAmount() == 3)
+            {
+                GetCaster()->CastSpell(GetCaster(), SPELL_THIRST_QUENCHED, TRIGGERED_FULL_MASK);
+                GetCaster()->RemoveAura(aura);
+            }
+            else
+                GetCaster()->CastSpell(GetCaster(), SPELL_GUSHING_WOUND, TRIGGERED_FULL_MASK);
+        }
+
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
+                bloodQueen->AI()->SetGUID(GetHitUnit()->GetGUID(), GUID_VAMPIRE);
+    }
+
+    void HandlePresence(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY, TRIGGERED_FULL_MASK);
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PRESENCE_OF_THE_DARKFALLEN_SE, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_blood_queen_vampiric_bite::CheckTarget);
+        BeforeHit += BeforeSpellHitFn(spell_blood_queen_vampiric_bite::OnCast);
+        OnEffectHitTarget += SpellEffectFn(spell_blood_queen_vampiric_bite::HandlePresence, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
     }
 };
 
@@ -959,7 +948,7 @@ void AddSC_boss_blood_queen_lana_thel()
     RegisterSpellScript(spell_blood_queen_bloodbolt);
     RegisterSpellScript(spell_blood_queen_frenzied_bloodthirst_aura);
     RegisterSpellScript(spell_blood_queen_essence_of_the_blood_queen_aura);
-    new spell_blood_queen_vampiric_bite();
+    RegisterSpellScript(spell_blood_queen_vampiric_bite);
     new spell_blood_queen_swarming_shadows_floor_dmg();
     new spell_blood_queen_presence_of_the_darkfallen();
     new achievement_once_bitten_twice_shy("achievement_once_bitten_twice_shy_n_10", 0, false);
