@@ -961,35 +961,24 @@ enum ShredderDelivery
     NPC_BROKEN_DOWN_SHREDDER               = 27354
 };
 
-class spell_shredder_delivery : public SpellScriptLoader
+class spell_shredder_delivery : public SpellScript
 {
-public:
-    spell_shredder_delivery() : SpellScriptLoader("spell_shredder_delivery") { }
+    PrepareSpellScript(spell_shredder_delivery);
 
-    class spell_shredder_delivery_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_shredder_delivery_SpellScript);
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (GetCaster()->ToCreature()->GetEntry() == NPC_BROKEN_DOWN_SHREDDER)
-                GetCaster()->ToCreature()->DespawnOrUnsummon();
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_shredder_delivery_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_shredder_delivery_SpellScript();
+        if (GetCaster()->ToCreature()->GetEntry() == NPC_BROKEN_DOWN_SHREDDER)
+            GetCaster()->ToCreature()->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_shredder_delivery::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1336,7 +1325,7 @@ void AddSC_grizzly_hills()
     RegisterSpellScript(spell_renew_skirmisher);
     new npc_venture_co_straggler();
     new npc_lake_frog();
-    new spell_shredder_delivery();
+    RegisterSpellScript(spell_shredder_delivery);
     new spell_infected_worgen_bite();
     new npc_rocket_propelled_warhead();
     new spell_z_check();
