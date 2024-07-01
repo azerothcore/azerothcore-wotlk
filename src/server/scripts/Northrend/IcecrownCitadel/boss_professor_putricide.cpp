@@ -986,34 +986,23 @@ class spell_putricide_unstable_experiment : public SpellScript
     }
 };
 
-class spell_putricide_tear_gas_effect : public SpellScriptLoader
+class spell_putricide_tear_gas_effect : public SpellScript
 {
-public:
-    spell_putricide_tear_gas_effect() : SpellScriptLoader("spell_putricide_tear_gas_effect") { }
+    PrepareSpellScript(spell_putricide_tear_gas_effect);
 
-    class spell_putricide_tear_gas_effect_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_putricide_tear_gas_effect_SpellScript);
+        // vanish rank 1-3, mage invisibility
+        targets.remove_if(Acore::UnitAuraCheck(true, 11327));
+        targets.remove_if(Acore::UnitAuraCheck(true, 11329));
+        targets.remove_if(Acore::UnitAuraCheck(true, 26888));
+        targets.remove_if(Acore::UnitAuraCheck(true, 32612));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            // vanish rank 1-3, mage invisibility
-            targets.remove_if(Acore::UnitAuraCheck(true, 11327));
-            targets.remove_if(Acore::UnitAuraCheck(true, 11329));
-            targets.remove_if(Acore::UnitAuraCheck(true, 26888));
-            targets.remove_if(Acore::UnitAuraCheck(true, 32612));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_tear_gas_effect_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_tear_gas_effect_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_putricide_tear_gas_effect_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_tear_gas_effect::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_putricide_tear_gas_effect::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1675,7 +1664,7 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_slime_puddle_spawn);
     RegisterSpellScript(spell_putricide_grow_stacker_aura);
     RegisterSpellScript(spell_putricide_unstable_experiment);
-    new spell_putricide_tear_gas_effect();
+    RegisterSpellScript(spell_putricide_tear_gas_effect);
     new spell_putricide_gaseous_bloat();
     new spell_putricide_ooze_channel();
     new spell_putricide_ooze_eruption_searcher();
