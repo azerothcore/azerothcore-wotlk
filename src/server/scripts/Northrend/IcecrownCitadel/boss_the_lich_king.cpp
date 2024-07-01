@@ -1907,146 +1907,137 @@ class spell_the_lich_king_necrotic_plague_aura : public AuraScript
     }
 };
 
-class spell_the_lich_king_necrotic_plague_jump : public SpellScriptLoader
+class spell_the_lich_king_necrotic_plague_jump : public SpellScript
 {
-public:
-    spell_the_lich_king_necrotic_plague_jump() :  SpellScriptLoader("spell_the_lich_king_necrotic_plague_jump") { }
+    PrepareSpellScript(spell_the_lich_king_necrotic_plague_jump);
 
-    class spell_the_lich_king_necrotic_plague_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_the_lich_king_necrotic_plague_SpellScript);
-
-        bool Load() override
-        {
-            _hadJumpingAura = false;
-            _hadInitialAura = false;
-            return true;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
-            if (targets.size() <= 1)
-                return;
-
-            targets.resize(1);
-        }
-
-        void CheckAura(SpellMissInfo missInfo)
-        {
-            if (missInfo != SPELL_MISS_NONE)
-            {
-                return;
-            }
-
-            if (GetHitUnit()->HasAura(GetSpellInfo()->Id))
-                _hadJumpingAura = true;
-            else if (uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit()))
-                if (GetHitUnit()->HasAura(spellId))
-                    _hadInitialAura = true;
-        }
-
-        void AddMissingStack()
-        {
-            if (GetHitAura() && !_hadJumpingAura)
-            {
-                uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit());
-                if (GetSpellValue()->EffectBasePoints[EFFECT_1] != AURA_REMOVE_BY_ENEMY_SPELL || _hadInitialAura)
-                    GetHitAura()->ModStackAmount(1);
-                if (_hadInitialAura)
-                    if (Aura* a = GetHitUnit()->GetAura(spellId))
-                        a->Remove(AURA_REMOVE_BY_DEFAULT);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_necrotic_plague_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            BeforeHit += BeforeSpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::CheckAura);
-            OnHit += SpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::AddMissingStack);
-        }
-
-        bool _hadJumpingAura;
-        bool _hadInitialAura;
-    };
-
-    class spell_the_lich_king_necrotic_plague_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_the_lich_king_necrotic_plague_AuraScript);
-
-        bool Load() override
-        {
-            _lastAmount = 0;
-            return true;
-        }
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (caster->GetAI())
-                    caster->GetAI()->SetData(DATA_PLAGUE_STACK, GetStackAmount());
-        }
-
-        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            _lastAmount = aurEff->GetAmount();
-            switch (GetTargetApplication()->GetRemoveMode())
-            {
-                case AURA_REMOVE_BY_EXPIRE:
-                case AURA_REMOVE_BY_DEATH:
-                    break;
-                default:
-                    return;
-            }
-
-            CustomSpellValues values;
-            values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
-            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
-        }
-
-        void OnDispel(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            _lastAmount = aurEff->GetAmount();
-        }
-
-        void AfterDispel(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            // this means the stack increased so don't process as if dispelled
-            if (aurEff->GetAmount() > _lastAmount)
-                return;
-
-            CustomSpellValues values;
-            values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
-            values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
-            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
-
-            Remove(AURA_REMOVE_BY_ENEMY_SPELL);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_the_lich_king_necrotic_plague_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_AuraScript::OnDispel, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
-            AfterEffectApply += AuraEffectApplyFn(spell_the_lich_king_necrotic_plague_AuraScript::AfterDispel, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
-        }
-
-        int32 _lastAmount;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_the_lich_king_necrotic_plague_SpellScript();
+        _hadJumpingAura = false;
+        _hadInitialAura = false;
+        return true;
     }
 
-    AuraScript* GetAuraScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_the_lich_king_necrotic_plague_AuraScript();
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        if (targets.size() <= 1)
+            return;
+
+        targets.resize(1);
     }
+
+    void CheckAura(SpellMissInfo missInfo)
+    {
+        if (missInfo != SPELL_MISS_NONE)
+        {
+            return;
+        }
+
+        if (GetHitUnit()->HasAura(GetSpellInfo()->Id))
+            _hadJumpingAura = true;
+        else if (uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit()))
+            if (GetHitUnit()->HasAura(spellId))
+                _hadInitialAura = true;
+    }
+
+    void AddMissingStack()
+    {
+        if (GetHitAura() && !_hadJumpingAura)
+        {
+            uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit());
+            if (GetSpellValue()->EffectBasePoints[EFFECT_1] != AURA_REMOVE_BY_ENEMY_SPELL || _hadInitialAura)
+                GetHitAura()->ModStackAmount(1);
+            if (_hadInitialAura)
+                if (Aura* a = GetHitUnit()->GetAura(spellId))
+                    a->Remove(AURA_REMOVE_BY_DEFAULT);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_necrotic_plague_jump::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        BeforeHit += BeforeSpellHitFn(spell_the_lich_king_necrotic_plague_jump::CheckAura);
+        OnHit += SpellHitFn(spell_the_lich_king_necrotic_plague_jump::AddMissingStack);
+    }
+
+private:
+    bool _hadJumpingAura;
+    bool _hadInitialAura;
+};
+
+class spell_the_lich_king_necrotic_plague_jump_aura : public AuraScript
+{
+    PrepareAuraScript(spell_the_lich_king_necrotic_plague_jump_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_NECROTIC_PLAGUE_JUMP, SPELL_PLAGUE_SIPHON });
+    }
+
+    bool Load() override
+    {
+        _lastAmount = 0;
+        return true;
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (caster->GetAI())
+                caster->GetAI()->SetData(DATA_PLAGUE_STACK, GetStackAmount());
+    }
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        _lastAmount = aurEff->GetAmount();
+        switch (GetTargetApplication()->GetRemoveMode())
+        {
+            case AURA_REMOVE_BY_EXPIRE:
+            case AURA_REMOVE_BY_DEATH:
+                break;
+            default:
+                return;
+        }
+
+        CustomSpellValues values;
+        values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
+        GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
+    }
+
+    void OnDispel(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        _lastAmount = aurEff->GetAmount();
+    }
+
+    void AfterDispel(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        // this means the stack increased so don't process as if dispelled
+        if (aurEff->GetAmount() > _lastAmount)
+            return;
+
+        CustomSpellValues values;
+        values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
+        values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
+        GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
+
+        Remove(AURA_REMOVE_BY_ENEMY_SPELL);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_the_lich_king_necrotic_plague_jump_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_jump_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_jump_aura::OnDispel, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
+        AfterEffectApply += AuraEffectApplyFn(spell_the_lich_king_necrotic_plague_jump_aura::AfterDispel, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
+    }
+
+private:
+    int32 _lastAmount;
 };
 
 class spell_the_lich_king_shadow_trap_visual : public SpellScriptLoader
@@ -3752,7 +3743,7 @@ void AddSC_boss_the_lich_king()
     new npc_shambling_horror_icc();
     RegisterSpellScript(spell_the_lich_king_infest_aura);
     RegisterSpellScript(spell_the_lich_king_necrotic_plague_aura);
-    new spell_the_lich_king_necrotic_plague_jump();
+    RegisterSpellAndAuraScriptPair(spell_the_lich_king_necrotic_plague_jump, spell_the_lich_king_necrotic_plague_jump_aura);
     new spell_the_lich_king_shadow_trap_visual();
     new spell_the_lich_king_shadow_trap_periodic();
     new spell_the_lich_king_ice_burst_target_search();
