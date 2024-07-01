@@ -2161,30 +2161,19 @@ class spell_svalna_remove_spear : public SpellScript
     }
 };
 
-class spell_icc_soul_missile : public SpellScriptLoader
+class spell_icc_soul_missile : public SpellScript
 {
-public:
-    spell_icc_soul_missile() : SpellScriptLoader("spell_icc_soul_missile") { }
+    PrepareSpellScript(spell_icc_soul_missile);
 
-    class spell_icc_soul_missile_SpellScript : public SpellScript
+    void RelocateDest()
     {
-        PrepareSpellScript(spell_icc_soul_missile_SpellScript);
+        static Position const offset = {0.0f, 0.0f, 200.0f, 0.0f};
+        const_cast<WorldLocation*>(GetExplTargetDest())->RelocateOffset(offset);
+    }
 
-        void RelocateDest()
-        {
-            static Position const offset = {0.0f, 0.0f, 200.0f, 0.0f};
-            const_cast<WorldLocation*>(GetExplTargetDest())->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnCast += SpellCastFn(spell_icc_soul_missile_SpellScript::RelocateDest);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_icc_soul_missile_SpellScript();
+        OnCast += SpellCastFn(spell_icc_soul_missile::RelocateDest);
     }
 };
 
@@ -3726,7 +3715,7 @@ void AddSC_icecrown_citadel()
     new spell_trigger_spell_from_caster("spell_svalna_caress_of_death", SPELL_IMPALING_SPEAR_KILL);
     RegisterSpellScript(spell_svalna_revive_champion);
     RegisterSpellScript(spell_svalna_remove_spear);
-    new spell_icc_soul_missile();
+    RegisterSpellScript(spell_icc_soul_missile);
     new at_icc_saurfang_portal();
     new at_icc_shutdown_traps();
     new at_icc_start_blood_quickening();
