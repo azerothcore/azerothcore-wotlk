@@ -1122,29 +1122,18 @@ private:
     Unit* _caster;
 };
 
-class spell_sindragosa_mystic_buffet : public SpellScriptLoader
+class spell_sindragosa_mystic_buffet : public SpellScript
 {
-public:
-    spell_sindragosa_mystic_buffet() : SpellScriptLoader("spell_sindragosa_mystic_buffet") { }
+    PrepareSpellScript(spell_sindragosa_mystic_buffet);
 
-    class spell_sindragosa_mystic_buffet_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_sindragosa_mystic_buffet_SpellScript);
+        targets.remove_if(MysticBuffetTargetFilter(GetCaster()));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(MysticBuffetTargetFilter(GetCaster()));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_mystic_buffet_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_sindragosa_mystic_buffet_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_mystic_buffet::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
