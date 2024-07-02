@@ -143,8 +143,8 @@ struct npc_doomfire_spirit : public ScriptedAI
 {
     npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
-    float const _turnConstant = 0.785402f;
-    float _fAngle = urand(0, M_PI * 2);
+    float const turnConstant = 0.785402f;
+    float fAngle = urand(0, M_PI * 2);
 
     void Reset() override
     {
