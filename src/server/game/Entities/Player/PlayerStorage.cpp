@@ -4913,7 +4913,7 @@ bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, flo
 
 void Player::SetHomebind(WorldLocation const& loc, uint32 areaId)
 {
-    loc.GetPosition(m_homebindX, m_homebindY, m_homebindZ, m_homebindO);
+    loc.GetPosition(m_homebindX, m_homebindY, m_homebindZ);
     m_homebindMapId = loc.GetMapId();
     m_homebindAreaId = areaId;
 
@@ -4921,11 +4921,10 @@ void Player::SetHomebind(WorldLocation const& loc, uint32 areaId)
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_HOMEBIND);
     stmt->SetData(0, m_homebindMapId);
     stmt->SetData(1, m_homebindAreaId);
-    stmt->SetData(2, m_homebindX);
-    stmt->SetData(3, m_homebindY);
-    stmt->SetData(4, m_homebindZ);
-    stmt->SetData(5, m_homebindO);
-    stmt->SetData(6, GetGUID().GetCounter());
+    stmt->SetData (2, m_homebindX);
+    stmt->SetData (3, m_homebindY);
+    stmt->SetData (4, m_homebindZ);
+    stmt->SetData(5, GetGUID().GetCounter());
     CharacterDatabase.Execute(stmt);
 }
 
@@ -5099,7 +5098,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     std::string taxi_nodes = fields[42].Get<std::string>();
 
-    auto RelocateToHomebind = [this, &mapId, &instanceId]() { mapId = m_homebindMapId; instanceId = 0; Relocate(m_homebindX, m_homebindY, m_homebindZ, m_homebindO); };
+    auto RelocateToHomebind = [this, &mapId, &instanceId]() { mapId = m_homebindMapId; instanceId = 0; Relocate(m_homebindX, m_homebindY, m_homebindZ); };
 
     _LoadGroup();
 
@@ -7014,7 +7013,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
     }
 
     bool ok = false;
-    // SELECT mapId, zoneId, posX, posY, posZ, pozO FROM character_homebind WHERE guid = ?
+    // SELECT mapId, zoneId, posX, posY, posZ FROM character_homebind WHERE guid = ?
     if (result)
     {
         Field* fields = result->Fetch();
@@ -7024,12 +7023,11 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         m_homebindX = fields[2].Get<float>();
         m_homebindY = fields[3].Get<float>();
         m_homebindZ = fields[4].Get<float>();
-        m_homebindO = fields[5].Get<float>();
 
         MapEntry const* bindMapEntry = sMapStore.LookupEntry(m_homebindMapId);
 
         // accept saved data only for valid position (and non instanceable), and accessable
-        if (MapMgr::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, m_homebindO) &&
+        if (MapMgr::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ) &&
             !bindMapEntry->Instanceable() && GetSession()->Expansion() >= bindMapEntry->Expansion())
             ok = true;
         else
@@ -7047,20 +7045,19 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         m_homebindX = info->positionX;
         m_homebindY = info->positionY;
         m_homebindZ = info->positionZ;
-        m_homebindO = info->orientation;
+
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_HOMEBIND);
         stmt->SetData(0, GetGUID().GetCounter());
         stmt->SetData(1, m_homebindMapId);
         stmt->SetData(2, m_homebindAreaId);
-        stmt->SetData(3, m_homebindX);
-        stmt->SetData(4, m_homebindY);
-        stmt->SetData(5, m_homebindZ);
-        stmt->SetData(6, m_homebindO);
+        stmt->SetData (3, m_homebindX);
+        stmt->SetData (4, m_homebindY);
+        stmt->SetData (5, m_homebindZ);
         CharacterDatabase.Execute(stmt);
     }
 
-    LOG_DEBUG("entities.player", "Setting player home position - mapid: {}, areaid: {}, X: {}, Y: {}, Z: {}, O: {}",
-              m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ, m_homebindO);
+    LOG_DEBUG("entities.player", "Setting player home position - mapid: {}, areaid: {}, X: {}, Y: {}, Z: {}",
+              m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ);
     return true;
 }
 
