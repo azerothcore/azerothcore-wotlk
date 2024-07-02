@@ -1,3 +1,4 @@
+-- DB update 2024_07_01_01 -> 2024_07_02_00
 -- Anetheron
 UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714 WHERE `entry` = 17808;
 -- Archimonde
