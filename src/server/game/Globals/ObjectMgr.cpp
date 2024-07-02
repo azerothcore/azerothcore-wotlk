@@ -8141,6 +8141,7 @@ void ObjectMgr::LoadReservedPlayerNamesDBC()
 
         Utf8toWStr(reservedStore->Pattern, wstr);
 
+        // DBC has does not have clean entries, remove the junk.
         boost::algorithm::replace_all(wstr, "\\<", "");
         boost::algorithm::replace_all(wstr, "\\>", "");
 
@@ -8243,11 +8244,11 @@ void ObjectMgr::LoadProfanityNamesFromDBC()
 
         Utf8toWStr(profanityStore->Pattern, wstr);
 
+        // DBC has does not have clean entries, remove the junk.
         boost::algorithm::replace_all(wstr, "\\<", "");
         boost::algorithm::replace_all(wstr, "\\>", "");
 
         _profanityNamesStore.insert(wstr);
-
         count++;
     }
 
