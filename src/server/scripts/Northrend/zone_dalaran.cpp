@@ -16,8 +16,8 @@
  */
 
 #include "CreatureScript.h"
-#include "Player.h"
 #include "MoveSplineInit.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "World.h"

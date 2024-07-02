@@ -15,20 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ulduar.h"
 #include "AreaTriggerScript.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "PassiveAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "Vehicle.h"
-#include "ulduar.h"
 
 enum Texts
 {

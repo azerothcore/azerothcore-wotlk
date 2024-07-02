@@ -31,9 +31,9 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "SharedDefines.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "SharedDefines.h"
 
 using namespace Acore::ChatCommands;
 
