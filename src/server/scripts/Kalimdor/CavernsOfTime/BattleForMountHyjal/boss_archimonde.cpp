@@ -150,12 +150,12 @@ struct npc_doomfire_spirit : public ScriptedAI
     {
         scheduler.CancelAll();
         ScheduleTimedEvent(0s, [&] {
-            float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * _turnConstant);
+            float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * turnConstant);
             Position pos = GetFirstRandomAngleCollisionPosition(8.f, nextOrientation); // both orientation and distance verified with sniffs
             me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
             }, 1600ms);
 
-        _fAngle = urand(0, M_PI * 2);
+        fAngle = urand(0, M_PI * 2);
     }
 
     Position GetFirstRandomAngleCollisionPosition(float dist, float angle)
