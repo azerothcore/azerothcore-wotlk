@@ -572,7 +572,7 @@ public: /* AllGameobjectScript */
     void OnGameObjectSaveToDB(GameObject* go);
 
 public: /* AllMapScript */
-    void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript* instanceData, bool load, std::string data, uint32 completedEncounterMask);
+    void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript** instanceData, bool load, std::string data, uint32 completedEncounterMask);
     void OnDestroyInstance(MapInstanced* mapInstanced, Map* map);
 
 public: /* BGScript */

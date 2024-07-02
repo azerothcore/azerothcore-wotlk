@@ -279,7 +279,7 @@ void ScriptMgr::OnMapUpdate(Map* map, uint32 diff)
     });
 }
 
-void ScriptMgr::OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript* instanceData, bool load, std::string data, uint32 completedEncounterMask)
+void ScriptMgr::OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript** instanceData, bool load, std::string data, uint32 completedEncounterMask)
 {
     ExecuteScript<AllMapScript>([&](AllMapScript* script)
     {
