@@ -1201,6 +1201,7 @@ struct SmartAction
             SAIBool transport;
             uint32 controlled;
             uint32 ContactDistance;
+            uint32 combatReach;
         } moveToPos;
 
         struct
