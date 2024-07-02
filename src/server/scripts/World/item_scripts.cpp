@@ -20,18 +20,6 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
-/* ScriptData
-SDName: Item_Scripts
-SD%Complete: 100
-SDComment: Items for a range of different items. See content below (in script)
-SDCategory: Items
-EndScriptData */
-
-/* ContentData
-item_flying_machine(i34060, i34061)  Engineering crafted flying machines
-item_gor_dreks_ointment(i30175)     Protecting Our Own(q10488)
-item_only_for_flight                Items which should only useable while flying
-EndContentData */
 
 /*#####
 # item_only_for_flight
@@ -74,26 +62,6 @@ public:
             return false;
 
         // error
-        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
-        return true;
-    }
-};
-
-/*#####
-# item_gor_dreks_ointment
-#####*/
-
-class item_gor_dreks_ointment : public ItemScript
-{
-public:
-    item_gor_dreks_ointment() : ItemScript("item_gor_dreks_ointment") { }
-
-    bool OnUse(Player* player, Item* item, SpellCastTargets const& targets) override
-    {
-        if (targets.GetUnitTarget() && targets.GetUnitTarget()->GetTypeId() == TYPEID_UNIT &&
-                targets.GetUnitTarget()->GetEntry() == 20748 && !targets.GetUnitTarget()->HasAura(32578))
-            return false;
-
         player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
         return true;
     }
@@ -248,7 +216,6 @@ public:
 void AddSC_item_scripts()
 {
     new item_only_for_flight();
-    new item_gor_dreks_ointment();
     new item_incendiary_explosives();
     new item_mysterious_egg();
     new item_disgusting_jar();
