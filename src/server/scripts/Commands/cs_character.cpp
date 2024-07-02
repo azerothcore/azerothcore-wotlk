@@ -350,7 +350,19 @@ public:
             ResponseCodes res = ResponseCodes(ObjectMgr::CheckPlayerName(newName, true));
             if (res != CHAR_NAME_SUCCESS)
             {
-                handler->SendErrorMessage(res);
+                switch (res)
+                {
+                    case CHAR_NAME_RESERVED:
+                        handler->SendErrorMessage(LANG_RESERVED_NAME);
+                        break;
+                    case CHAR_NAME_PROFANE:
+                        handler->SendErrorMessage(LANG_PROFANITY_NAME);
+                        break;
+                    default:
+                        handler->SendErrorMessage(LANG_BAD_VALUE);
+                        break;
+                }
+
                 return false;
             }
 
