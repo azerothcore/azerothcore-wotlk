@@ -347,7 +347,7 @@ public:
                 return false;
             }
 
-            ResponseCodes res = ObjectMgr::CheckPlayerName(newName, true);
+            ResponseCodes res = ResponseCodes(ObjectMgr::CheckPlayerName(newName, true));
             if (res != CHAR_NAME_SUCCESS)
             {
                 handler->SendErrorMessage(res);
