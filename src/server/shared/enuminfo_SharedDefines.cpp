@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Define.h"
 #include "SharedDefines.h"
+#include "Define.h"
 #include "SmartEnum.h"
 #include <stdexcept>
 
@@ -311,7 +311,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr1>::ToString(SpellAttr1 value)
         case SPELL_ATTR1_FINISHING_MOVE_DURATION: return { "SPELL_ATTR1_FINISHING_MOVE_DURATION", "Requires combo points (type 2)", "" };
         case SPELL_ATTR1_IGNORE_OWNERS_DEATH: return { "SPELL_ATTR1_IGNORE_OWNERS_DEATH", "Unknwon attribute 23@Attr1", "" };
         case SPELL_ATTR1_SPECIAL_SKILLUP: return { "SPELL_ATTR1_SPECIAL_SKILLUP", "Fishing (client only)", "" };
-        case SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT: return { "SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT", "Unknown attribute 25@Attr1", "" };
+        case SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT: return { "SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT", "Aura stays after combat", "Aura will not be removed when the unit leaves combat" };
         case SPELL_ATTR1_REQUIRE_ALL_TARGETS: return { "SPELL_ATTR1_REQUIRE_ALL_TARGETS", "Unknown attribute 26@Attr1", "Related to [target=focus] and [target=mouseover] macros?" };
         case SPELL_ATTR1_DISCOUNT_POWER_ON_MISS: return { "SPELL_ATTR1_DISCOUNT_POWER_ON_MISS", "Unknown attribute 27@Attr1", "Melee spell?" };
         case SPELL_ATTR1_NO_AURA_ICON: return { "SPELL_ATTR1_NO_AURA_ICON", "Hide in aura bar (client only)", "" };

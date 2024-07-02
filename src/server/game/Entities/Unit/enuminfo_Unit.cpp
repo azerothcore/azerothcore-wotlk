@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Unit.h"
 #include "Define.h"
 #include "SmartEnum.h"
-#include "Unit.h"
 #include <stdexcept>
 
 namespace Acore::Impl::EnumUtilsImpl
