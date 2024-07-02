@@ -36,7 +36,6 @@
 #include "LFGMgr.h"
 #include "Log.h"
 #include "MapMgr.h"
-#include <numeric>
 #include "Pet.h"
 #include "PoolMgr.h"
 #include "ReputationMgr.h"
@@ -53,6 +52,7 @@
 #include "Vehicle.h"
 #include "World.h"
 #include <boost/algorithm/string.hpp>
+#include <numeric>
 
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;

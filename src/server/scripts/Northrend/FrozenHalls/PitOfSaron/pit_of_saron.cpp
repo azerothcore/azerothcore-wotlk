@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "pit_of_saron.h"
 #include "AreaTriggerScript.h"
 #include "CreatureGroups.h"
 #include "CreatureScript.h"
@@ -26,7 +27,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "pit_of_saron.h"
 
 class npc_pos_leader : public CreatureScript
 {
