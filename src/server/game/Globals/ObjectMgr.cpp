@@ -8095,7 +8095,7 @@ void ObjectMgr::LoadReservedPlayerNamesDB()
 
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 reserved player names. DB table `reserved_name` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 reserved names. DB table `reserved_name` is empty!");
         return;
     }
 
@@ -8120,7 +8120,7 @@ void ObjectMgr::LoadReservedPlayerNamesDB()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded {} reserved player names from DB in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} reserved names from DB in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadReservedPlayerNamesDBC()
@@ -8198,7 +8198,7 @@ void ObjectMgr::LoadProfanityNamesFromDB()
 
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 profanity player names. DB table `profanity_name` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 profanity names. DB table `profanity_name` is empty!");
         return;
     }
 
@@ -8223,7 +8223,7 @@ void ObjectMgr::LoadProfanityNamesFromDB()
         ++count;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded {} profanity player names from DB in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} profanity names from DB in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
 void ObjectMgr::LoadProfanityNamesFromDBC()
