@@ -5276,9 +5276,9 @@ class spell_gen_steal_weapon : public AuraScript
         if (!caster || !target)
             return;
 
-        if (Player* player = target->ToPlayer())
+        if (Creature* stealer = caster->ToCreature())
         {
-            if (Creature* stealer = caster->ToCreature())
+            if (Player* player = target->ToPlayer())
             {
                 if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
                 {
@@ -5289,6 +5289,16 @@ class spell_gen_steal_weapon : public AuraScript
                     {
                         stealer->AI()->Talk(SAY_GLUMDOR_STEAL, player);
                     }
+                }
+            }
+            // He can steal creature weapons too
+            if (Creature* creature = target->ToCreature())
+            {
+                int8 mainhand = 1;
+                if (EquipmentInfo const* eInfo = sObjectMgr->GetEquipmentInfo(creature->GetEntry(), mainhand))
+                {
+                    stealer->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, eInfo->ItemEntry[0]);
+                    stealer->CastSpell(stealer, SPELL_STEAL_WEAPON, true);
                 }
             }
         }
