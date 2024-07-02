@@ -8393,15 +8393,11 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
 
     // Check Reserved Name
     if (sObjectMgr->IsReservedName(name))
-    {
         return CHAR_NAME_RESERVED;
-    }
 
     // Check Profanity Name
     if (sObjectMgr->IsProfanityName(name))
-    {
         return CHAR_NAME_PROFANE;
-    }
 
     return CHAR_NAME_SUCCESS;
 }
@@ -8421,15 +8417,11 @@ bool ObjectMgr::IsValidCharterName(std::string_view name)
 
     // Check Reserved Name
     if (sObjectMgr->IsReservedName(name))
-    {
         return false;
-    }
 
     // Check Profanity Name
     if (sObjectMgr->IsProfanityName(name))
-    {
         return false;
-    }
 
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_CHARTER_NAMES);
 
