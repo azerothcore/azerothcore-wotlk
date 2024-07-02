@@ -398,7 +398,7 @@ public:
         return (_logoutTime > 0 && currTime >= _logoutTime + 20);
     }
 
-    void LogoutPlayer(bool save);
+    void LogoutPlayer(bool save, bool redirecting = false);
     void KickPlayer(bool setKicked = true) { return this->KickPlayer("Unknown reason", setKicked); }
     void KickPlayer(std::string const& reason, bool setKicked = true);
 
@@ -557,6 +557,8 @@ public:                                                 // opcodes handlers
     void SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo);
     void SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo);
     void SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid);
+
+    void HandleTC9PrepareForRedirect(WorldPacket& recvData);
 
     // played time
     void HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& packet);
