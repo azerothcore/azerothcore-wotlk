@@ -527,7 +527,6 @@ struct npc_minigob_manabonk : public ScriptedAI
 
     void Reset() override
     {
-        playerGUID = ObjectGuid();
         me->SetVisible(false);
         events.ScheduleEvent(EVENT_SELECT_TARGET, 1s);
     }
