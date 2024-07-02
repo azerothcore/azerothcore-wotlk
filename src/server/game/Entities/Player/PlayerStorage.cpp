@@ -4980,8 +4980,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     m_name = fields[2].Get<std::string>();
 
     // check name limitations
-    if (ObjectMgr::CheckPlayerName(m_name) != CHAR_NAME_SUCCESS ||
-        (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()) && (sObjectMgr->IsReservedName(m_name) || sObjectMgr->IsProfanityName(m_name))))
+    if (ObjectMgr::CheckPlayerName(m_name) != CHAR_NAME_SUCCESS || AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->SetData(0, uint16(AT_LOGIN_RENAME));
