@@ -8462,15 +8462,11 @@ PetNameInvalidReason ObjectMgr::CheckPetName(std::string_view name)
 
     // Check Reserved Name
     if (sObjectMgr->IsReservedName(name))
-    {
         return PET_NAME_RESERVED;
-    }
 
     // Check Profanity Name
     if (sObjectMgr->IsProfanityName(name))
-    {
         return PET_NAME_PROFANE;
-    }
 
     return PET_NAME_SUCCESS;
 }
