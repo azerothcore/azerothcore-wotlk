@@ -2606,8 +2606,8 @@ ItemDelete.ItemLevel = 80
 #
 #    ItemDelete.KeepDays
 #        Description: Time (in days)
-#        Default:     30 - (Enabled)
-#                     0  - (Disabled, Don't delete any items)
+#        Default:     0  - (Disabled, Don't delete any it)
+#                     30 - (Enabled)
 
 ItemDelete.KeepDays = 0
 
