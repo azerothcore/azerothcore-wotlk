@@ -2603,7 +2603,6 @@ ItemDelete.Quality = 3
 ItemDelete.ItemLevel = 80
 
 #
-#
 #    ItemDelete.KeepDays
 #        Description: Time (in days)
 #        Default:     0  - (Disabled, Don't delete any it)
