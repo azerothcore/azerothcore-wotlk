@@ -35,6 +35,14 @@ namespace
     std::unordered_map<std::string /*name*/, std::string /*value*/> _envVarCache;
     std::mutex _configLock;
 
+    std::vector<std::string> _fatalConfigOptions =
+    {
+        { "RealmID" },
+        { "LoginDatabaseInfo" },
+        { "WorldDatabaseInfo" },
+        { "CharacterDatabaseInfo" },
+    };
+
     // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
     {
@@ -388,6 +396,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     std::string strValue;
 
     auto const& itr = _configOptions.find(name);
+    bool fatalConfig = false;
     bool notFound = itr == _configOptions.end();
     auto envVarName = GetEnvVarName(name);
     Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
@@ -406,7 +415,18 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+            for (std::string s : _fatalConfigOptions)
+                if (s == name)
+                {
+                    fatalConfig = true;
+                    break;
+                }
+
+            if (fatalConfig)
+                LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable\n\nYour server cannot start without this option!",
+                    name, _filename, name, Acore::ToString(def), envVarName);
+            else
+                LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
                     name, _filename, name, Acore::ToString(def), envVarName);
         }
         return def;
@@ -435,6 +455,7 @@ template<>
 std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std::string const& def, bool showLogs /*= true*/) const
 {
     auto const& itr = _configOptions.find(name);
+    bool fatalConfig = false;
     bool notFound = itr == _configOptions.end();
     auto envVarName = GetEnvVarName(name);
     Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
@@ -453,7 +474,18 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+            for (std::string s : _fatalConfigOptions)
+                if (s == name)
+                {
+                    fatalConfig = true;
+                    break;
+                }
+
+            if (fatalConfig)
+                LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.\n\nYour server cannot start without this option!",
+                    name, _filename, name, def, envVarName);
+            else
+                LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
                     name, _filename, name, def, envVarName);
         }
 
