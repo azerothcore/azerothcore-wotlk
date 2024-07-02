@@ -63,6 +63,9 @@ nbproject/
 .idea
 cmake-build-*/*
 coverage-report/
+# nix build output symlink
+# described at https://nix.dev/manual/nix/2.18/command-ref/nix-build.html?highlight=result#examples 
+result/
 
 #
 # Eclipse
