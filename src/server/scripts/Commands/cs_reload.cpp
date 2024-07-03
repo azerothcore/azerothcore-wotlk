@@ -780,17 +780,19 @@ public:
 
     static bool HandleReloadReservedNameCommand(ChatHandler* handler)
     {
-        LOG_INFO("server.loading", "Re-Loading `reserved_player` Table!");
-        sObjectMgr->LoadReservedPlayersNames();
-        handler->SendGlobalGMSysMessage("DB table `reserved_name` reloaded.");
+        LOG_INFO("server.loading", "Re-Loading Reserved Names!");
+        sObjectMgr->LoadReservedPlayerNamesDB();
+        sObjectMgr->LoadReservedPlayerNamesDBC(); // Needed because we clear the store in LoadReservedPlayerNamesDB()
+        handler->SendGlobalGMSysMessage("Reserved Names reloaded.");
         return true;
     }
 
     static bool HandleReloadProfanityNameCommand(ChatHandler* handler)
     {
-        LOG_INFO("server.loading", "Re-Loading `profanity_player` Table!");
-        sObjectMgr->LoadProfanityPlayersNames();
-        handler->SendGlobalGMSysMessage("DB table `profanity_player` reloaded.");
+        LOG_INFO("server.loading", "Re-Loading Profanity Names!");
+        sObjectMgr->LoadProfanityNamesFromDB();
+        sObjectMgr->LoadProfanityNamesFromDBC(); // Needed because we clear the store in LoadProfanityNamesFromDB()
+        handler->SendGlobalGMSysMessage("Profanity Names reloaded.");
         return true;
     }
 

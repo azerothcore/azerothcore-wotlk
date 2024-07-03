@@ -17,8 +17,8 @@
 
 #include "boss_maexxna.h"
 #include "CreatureScript.h"
-#include "Player.h"
 #include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"

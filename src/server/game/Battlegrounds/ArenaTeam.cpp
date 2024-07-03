@@ -281,7 +281,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
 
 bool ArenaTeam::SetName(std::string const& name)
 {
-    if (TeamName == name || name.empty() || name.length() > 24 || sObjectMgr->IsReservedName(name) || sObjectMgr->IsProfanityName(name) || !ObjectMgr::IsValidCharterName(name))
+    if (TeamName == name || name.empty() || name.length() > 24 || !ObjectMgr::IsValidCharterName(name))
         return false;
 
     TeamName = name;

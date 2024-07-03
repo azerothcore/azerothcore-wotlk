@@ -137,6 +137,7 @@ public:
         GuidList PatchwerkRoomTrash;
         ObjectGuid _patchwerkGUID;
         ObjectGuid _thaddiusGUID;
+        ObjectGuid _gothikGUID;
         ObjectGuid _stalaggGUID;
         ObjectGuid _feugenGUID;
         ObjectGuid _zeliekGUID;
@@ -226,6 +227,9 @@ public:
                     return;
                 case NPC_FEUGEN:
                     _feugenGUID = creature->GetGUID();
+                    return;
+                case NPC_GOTHIK:
+                    _gothikGUID = creature->GetGUID();
                     return;
                 case NPC_LADY_BLAUMEUX:
                     _blaumeuxGUID = creature->GetGUID();
@@ -1092,6 +1096,8 @@ public:
                     return _stalaggGUID;
                 case DATA_FEUGEN_BOSS:
                     return _feugenGUID;
+                case DATA_GOTHIK_BOSS:
+                    return _gothikGUID;
                 case DATA_LICH_KING_BOSS:
                     return _lichkingGUID;
                 default:

@@ -21,8 +21,8 @@
 #include "Log.h"
 #include "MessageBuffer.h"
 #include <atomic>
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <functional>
 #include <memory>
 #include <queue>
