@@ -635,7 +635,7 @@ struct CharTitlesEntry
     char const*   nameMale[16];                             // 2-17
     //uint32 nameLangMask                                   // 18 string flag, unused
     char const*   nameFemale[16];                           // 19-34
-    // 35 string flag, unused
+    //uint32 nameLang1Mask                                  // 35 string flag, unused
     uint32  bit_index;                                      // 36 used in PLAYER_CHOSEN_TITLE and 1<<index in PLAYER__FIELD_KNOWN_TITLES
 };
 
