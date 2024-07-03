@@ -1170,7 +1170,7 @@ class spell_kaelthas_mind_control : public SpellScript
 
         if (Player* player = GetHitPlayer())
         {
-            GetCaster()->GetThreatMgr().ResetThreat(unit);
+            GetCaster()->GetThreatMgr().ResetThreat(player);
         }
     }
 
