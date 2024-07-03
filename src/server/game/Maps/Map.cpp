@@ -3063,7 +3063,7 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
 
     bool isOtherAI = false;
 
-    sScriptMgr->OnBeforeCreateInstanceScript(this, instance_data, load, data, completedEncounterMask);
+    sScriptMgr->OnBeforeCreateInstanceScript(this, &instance_data, load, data, completedEncounterMask);
 
     if (instance_data)
         isOtherAI = true;
