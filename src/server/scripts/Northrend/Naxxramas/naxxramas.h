@@ -58,7 +58,7 @@ enum NXData
     DATA_STALAGG_BOSS               = 108,
     DATA_FEUGEN_BOSS                = 109,
     DATA_THADDIUS_GATE              = 110,
-    DATA_RAZUVIOUS                  = 111,
+    DATA_RAZUVIOUS_BOSS             = 111,
     DATA_GOTHIK_BOSS                = 112,
     DATA_GOTHIK_ENTER_GATE          = 113,
     DATA_GOTHIK_INNER_GATE          = 114,
