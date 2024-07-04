@@ -303,9 +303,6 @@ struct npc_shattrath_daily_quest : public NullCreatureAI
         if (action == ACTION_UPDATE_QUEST_STATUS)
         {
             uint32 creature = me->GetEntry();
-            if (creature != NPC_SHATTRATH_DAILY_H || creature != NPC_SHATTRATH_DAILY_N)
-                return;
-
             QueryResult result = CharacterDatabase.Query("SELECT `quest_id` FROM `pool_quest_save` WHERE `pool_id` = '{}'", creature == NPC_SHATTRATH_DAILY_H ? POOL_SHATTRATH_DAILY_H : POOL_SHATTRATH_DAILY_N);
             if (result)
             {
