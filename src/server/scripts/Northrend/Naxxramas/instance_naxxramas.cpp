@@ -265,6 +265,8 @@ public:
                     _lichkingGUID = creature->GetGUID();
                     return;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* pGo) override
@@ -510,6 +512,8 @@ public:
                     }
                     break;
             }
+
+            InstanceScript::OnGameObjectCreate(pGo);
         }
 
         void OnGameObjectRemove(GameObject* pGo) override
