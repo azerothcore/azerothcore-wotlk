@@ -261,8 +261,7 @@ private:
 
         const uint8 addressFamily = readPointer[13];
         const uint16 len = (readPointer[14] << 8) | readPointer[15];
-        auto requiredLen = len + 16;
-        if (requiredLen > packet.GetActiveSize())
+        if (len+16 > packet.GetActiveSize())
         {
             AsyncReadProxyHeader();
             return;
