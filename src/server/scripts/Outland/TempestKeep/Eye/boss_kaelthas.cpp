@@ -1143,9 +1143,19 @@ class spell_kaelthas_mind_control : public SpellScript
         targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
     }
 
+    void HandleEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster() || !GetHitPlayer())
+            return;
+
+        if (Player* player = GetHitPlayer())
+            GetCaster()->GetThreatMgr().ResetThreat(player);
+    }
+
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kaelthas_mind_control::SelectTarget, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_mind_control::HandleEffect, EFFECT_ALL, SPELL_AURA_ANY);
     }
 };
 
