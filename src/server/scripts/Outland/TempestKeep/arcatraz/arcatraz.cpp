@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "arcatraz.h"
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
-#include "arcatraz.h"
 
 enum MillhouseSays
 {
