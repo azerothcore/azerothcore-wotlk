@@ -302,10 +302,10 @@ struct npc_shattrath_daily_quest : public NullCreatureAI
     {
         if (action == ACTION_UPDATE_QUEST_STATUS)
         {
-            if (!me->GetEntry())
+            uint32 creature = me->GetEntry();
+            if (!creature && (creature != NPC_SHATTRATH_DAILY_H || creature != NPC_SHATTRATH_DAILY_N))
                 return;
 
-            uint32 creature = me->GetEntry();
             QueryResult result = CharacterDatabase.Query("SELECT `quest_id` FROM `pool_quest_save` WHERE `pool_id` = '{}'", creature == NPC_SHATTRATH_DAILY_H ? POOL_SHATTRATH_DAILY_H : POOL_SHATTRATH_DAILY_N);
             if (result)
             {
@@ -313,7 +313,7 @@ struct npc_shattrath_daily_quest : public NullCreatureAI
                 int quest_id = fields[0].Get<int>();
                 uint32 templateID;
 
-                if (me->GetEntry() == NPC_SHATTRATH_DAILY_H)
+                if (creature == NPC_SHATTRATH_DAILY_H)
                 {
                     switch (quest_id)
                     {
@@ -370,7 +370,7 @@ struct npc_shattrath_daily_quest : public NullCreatureAI
                     }
                 }
 
-                if (me->GetEntry() == NPC_SHATTRATH_DAILY_N)
+                if (creature == NPC_SHATTRATH_DAILY_N)
                 {
                     switch (quest_id)
                     {
@@ -411,8 +411,6 @@ struct npc_shattrath_daily_quest : public NullCreatureAI
             }
         }
     }
-
-    void UpdateAI(uint32 /*diff*/) override {}
 };
 
 void AddSC_shattrath_city()
