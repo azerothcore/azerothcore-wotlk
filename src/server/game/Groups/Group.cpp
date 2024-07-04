@@ -1042,7 +1042,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
                         vote = PASS;
                         ++r->totalPass;
                     }
-                    
+
                     r->playerVote[member->GetGUID()] = vote;
                 }
             }
