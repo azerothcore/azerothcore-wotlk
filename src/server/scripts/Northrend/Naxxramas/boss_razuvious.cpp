@@ -335,7 +335,7 @@ public:
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                     if (InstanceScript* instance = me->GetInstanceScript())
                     {
-                        if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAZUVIOUS_BOSS)))
+                        if (Creature* creature = instance->GetCreature(DATA_RAZUVIOUS))
                         {
                             me->SetFacingToObject(creature);
                         }
@@ -370,7 +370,7 @@ public:
             scheduler.CancelGroup(GROUP_OOC_RP);
             if (InstanceScript* instance = me->GetInstanceScript())
             {
-                if (Creature* creature = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAZUVIOUS_BOSS)))
+                if (Creature* creature = instance->GetCreature(DATA_RAZUVIOUS))
                 {
                     creature->SetInCombatWithZone();
                     creature->AI()->AttackStart(who);
