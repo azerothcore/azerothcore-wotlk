@@ -1,3 +1,4 @@
+-- DB update 2024_07_04_04 -> 2024_07_04_05
 -- Shattrath Daily Normal/Heroic holograms
 UPDATE `creature_template` SET `ScriptName` = 'npc_shattrath_daily_quest' WHERE `entry` IN (24410,24854);
 
