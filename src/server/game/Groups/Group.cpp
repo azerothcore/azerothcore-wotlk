@@ -41,6 +41,8 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "ArenaTeam.h"
+#include "ArenaTeamMgr.h"
 
 Roll::Roll(ObjectGuid _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
     itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
@@ -1995,6 +1997,35 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
     // for arenas: check party size is proper
     if (bgTemplate->isArena() && memberscount != MinPlayerCount)
         return ERR_ARENA_TEAM_PARTY_SIZE;
+
+    //check against other arena team members
+    if (isRated)
+    {
+        ArenaTeam* arenaTeam = sArenaTeamMgr->GetArenaTeamById(arenaTeamId);
+        for (auto const& itr : arenaTeam->GetMembers())
+        {
+            Player* teamMember = ObjectAccessor::FindConnectedPlayer(itr.Guid);
+            //are they online and not a member of this current group?
+            if (teamMember && !IsMember(teamMember->GetGUID()))
+            {
+                //are they already in queue for a rated arena?
+                if (teamMember->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId))
+                {
+                    GroupQueueInfo ginfo;
+                    BattlegroundQueue& queue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
+                    if (queue.GetPlayerGroupInfoData(teamMember->GetGUID(), &ginfo))
+                    {
+                        if (ginfo.IsRated)
+                            return ERR_BATTLEGROUND_JOIN_FAILED;
+                    }
+                }
+                //are they currently in an arena match?
+                Battleground* bg = teamMember->GetBattleground(false);
+                if (bg && bg->isRated() && bg->GetMinPlayersPerTeam() == MinPlayerCount)
+                    return ERR_BATTLEGROUND_JOIN_FAILED;
+            }
+        }
+    }
 
     return GroupJoinBattlegroundResult(bgTemplate->GetBgTypeID());
 }
