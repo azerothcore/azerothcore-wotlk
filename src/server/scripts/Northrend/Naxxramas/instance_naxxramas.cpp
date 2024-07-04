@@ -52,6 +52,17 @@ inline uint8 GetEruptionSection(float x, float y)
     return 3;
 }
 
+ObjectData const creatureData[] =
+{
+    { NPC_RAZUVIOUS, DATA_RAZUVIOUS },
+    { 0,             0              }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { 0,             0              }
+};
+
 class instance_naxxramas : public InstanceMapScript
 {
 public:
@@ -68,6 +79,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            LoadObjectData(creatureData, gameObjectData);
             for (auto& i : HeiganEruption)
                 i.clear();
 
@@ -140,7 +152,6 @@ public:
         ObjectGuid _gothikGUID;
         ObjectGuid _stalaggGUID;
         ObjectGuid _feugenGUID;
-        ObjectGuid _razuviousGUID;
         ObjectGuid _zeliekGUID;
         ObjectGuid _rivendareGUID;
         ObjectGuid _blaumeuxGUID;
@@ -229,8 +240,6 @@ public:
                 case NPC_FEUGEN:
                     _feugenGUID = creature->GetGUID();
                     return;
-                case NPC_RAZUVIOUS:
-                    _razuviousGUID = creature->GetGUID();
                 case NPC_GOTHIK:
                     _gothikGUID = creature->GetGUID();
                     return;
@@ -1099,8 +1108,6 @@ public:
                     return _stalaggGUID;
                 case DATA_FEUGEN_BOSS:
                     return _feugenGUID;
-                case DATA_RAZUVIOUS_BOSS:
-                    return _razuviousGUID;
                 case DATA_GOTHIK_BOSS:
                     return _gothikGUID;
                 case DATA_LICH_KING_BOSS:
