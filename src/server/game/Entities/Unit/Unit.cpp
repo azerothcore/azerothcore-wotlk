@@ -3453,7 +3453,8 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, SpellInfo const* spell, bool Ca
         return SPELL_MISS_NONE;
 
     // Return evade for units in evade mode
-    if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks() && !spell->HasAura(SPELL_AURA_CONTROL_VEHICLE) && !spell->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE))
+    if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks() && !spell->HasAura(SPELL_AURA_CONTROL_VEHICLE)
+        && !spell->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE) && !spell->HasAttribute(SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT))
         return SPELL_MISS_EVADE;
 
     // Try victim reflect spell
@@ -3528,7 +3529,7 @@ SpellMissInfo Unit::SpellHitResult(Unit* victim, Spell const* spell, bool CanRef
 
     // Return evade for units in evade mode
     if (victim->GetTypeId() == TYPEID_UNIT && victim->ToCreature()->IsEvadingAttacks() && !spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE) &&
-        !spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE))
+        !spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE) && !spellInfo->HasAttribute(SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT))
     {
         return SPELL_MISS_EVADE;
     }
@@ -5384,7 +5385,8 @@ void Unit::RemoveEvadeAuras()
     {
         Aura const* aura = iter->second->GetBase();
         SpellInfo const* spellInfo = aura->GetSpellInfo();
-        if (spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE) || spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE) || spellInfo->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
+        if (spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE) || spellInfo->HasAttribute(SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT) || spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE)
+            || spellInfo->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
             ++iter;
         else
             _UnapplyAura(iter, AURA_REMOVE_BY_DEFAULT);
@@ -5394,7 +5396,8 @@ void Unit::RemoveEvadeAuras()
     {
         Aura* aura = iter->second;
         SpellInfo const* spellInfo = aura->GetSpellInfo();
-        if (spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE) || spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE) || spellInfo->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
+        if (spellInfo->HasAttribute(SPELL_ATTR0_CU_IGNORE_EVADE) || spellInfo->HasAttribute(SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT) || spellInfo->HasAura(SPELL_AURA_CONTROL_VEHICLE)
+            || spellInfo->HasAura(SPELL_AURA_CLONE_CASTER) || (aura->IsPassive() && GetOwnerGUID().IsPlayer()))
             ++iter;
         else
             RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);

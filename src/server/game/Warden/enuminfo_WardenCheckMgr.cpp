@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "WardenCheckMgr.h"
 #include "Define.h"
 #include "SmartEnum.h"
-#include "WardenCheckMgr.h"
 #include <stdexcept>
 
 namespace Acore::Impl::EnumUtilsImpl
