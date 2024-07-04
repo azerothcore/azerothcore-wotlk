@@ -35,13 +35,6 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket& recvData)
 
     Unit* pEnemy = ObjectAccessor::GetUnit(*_player, guid);
 
-    if (!pEnemy)
-    {
-        // stop attack state at client
-        SendAttackStop(nullptr);
-        return;
-    }
-
     if (!_player->IsValidAttackTarget(pEnemy))
     {
         // stop attack state at client
