@@ -1272,22 +1272,29 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
             {
-                Milliseconds despawnDelay(e.action.forceDespawn.delay);
+                if (e.action.forceDespawn.removeObjectFromWorld)
+                {
+                    if (e.action.forceDespawn.delay || e.action.forceDespawn.forceRespawnTimer)
+                        LOG_ERROR("sql.sql", "SmartScript: SMART_ACTION_FORCE_DESPAWN has removeObjectFromWorld set. delay and forceRespawnTimer ignored.");
 
-                // Wait at least one world update tick before despawn, so it doesn't break linked actions.
-                if (despawnDelay <= 0ms)
-                {
-                    despawnDelay = 1ms;
+                    if (Creature* creature = target->ToCreature())
+                        creature->AddObjectToRemoveList();
+                    else if (GameObject* go = target->ToGameObject())
+                        go->AddObjectToRemoveList();
                 }
+                else
+                {
+                    Milliseconds despawnDelay(e.action.forceDespawn.delay);
 
-                Seconds forceRespawnTimer(e.action.forceDespawn.forceRespawnTimer);
-                if (Creature* creature = target->ToCreature())
-                {
-                    creature->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
-                }
-                else if (GameObject* go = target->ToGameObject())
-                {
-                    go->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
+                    // Wait at least one world update tick before despawn, so it doesn't break linked actions.
+                    if (despawnDelay <= 0ms)
+                        despawnDelay = 1ms;
+
+                    Seconds forceRespawnTimer(e.action.forceDespawn.forceRespawnTimer);
+                    if (Creature* creature = target->ToCreature())
+                        creature->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
+                    else if (GameObject* go = target->ToGameObject())
+                        go->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
                 }
             }
 
