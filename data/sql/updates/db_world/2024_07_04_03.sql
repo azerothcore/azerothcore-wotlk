@@ -1,3 +1,4 @@
+-- DB update 2024_07_04_02 -> 2024_07_04_03
 --
 -- Razuvious
 DELETE FROM `creature_text` WHERE `CreatureID` = 16061 AND `GroupID` IN (4, 5);
