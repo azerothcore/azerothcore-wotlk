@@ -978,6 +978,7 @@ struct SmartAction
         {
             uint32 delay;
             uint32 forceRespawnTimer;
+            SAIBool removeObjectFromWorld;
         } forceDespawn;
 
         struct

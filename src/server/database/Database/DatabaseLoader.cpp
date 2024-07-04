@@ -154,7 +154,7 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 bool DatabaseLoader::Load()
 {
     if (!_updateFlags)
-        LOG_INFO("sql.updates", "Automatic database updates are disabled for all databases!");
+        LOG_WARN("sql.updates", "> AUTOUPDATER: Automatic database updates are disabled for all databases in the config! This is not recommended!");
 
     if (!OpenDatabases())
         return false;
