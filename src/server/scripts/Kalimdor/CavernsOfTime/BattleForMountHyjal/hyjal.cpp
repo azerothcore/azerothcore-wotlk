@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hyjal.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "hyjal.h"
 
 enum Spells
 {

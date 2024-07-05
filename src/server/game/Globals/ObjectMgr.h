@@ -691,8 +691,6 @@ SkillRangeType GetSkillRangeType(SkillRaceClassInfoEntry const* rcEntry);
 #define MAX_CHARTER_NAME         24                         // max allowed by client name length
 #define MAX_CHANNEL_NAME         50                         // pussywizard
 
-bool ReservedNames(std::wstring& name);
-bool ProfanityNames(std::wstring& name);
 bool normalizePlayerName(std::string& name);
 
 struct LanguageDesc
@@ -1334,12 +1332,14 @@ public:
     uint32 AddCreData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
 
     // reserved names
-    void LoadReservedPlayersNames();
+    void LoadReservedPlayerNamesDB();
+    void LoadReservedPlayerNamesDBC();
     [[nodiscard]] bool IsReservedName(std::string_view name) const;
     void AddReservedPlayerName(std::string const& name);
 
     // profanity names
-    void LoadProfanityPlayersNames();
+    void LoadProfanityNamesFromDB();
+    void LoadProfanityNamesFromDBC();
     [[nodiscard]] bool IsProfanityName(std::string_view name) const;
     void AddProfanityPlayerName(std::string const& name);
 
@@ -1508,7 +1508,7 @@ private:
 
     //character profanity names
     typedef std::set<std::wstring> ProfanityNamesContainer;
-    ReservedNamesContainer _profanityNamesStore;
+    ProfanityNamesContainer _profanityNamesStore;
 
     GameTeleContainer _gameTeleStore;
 

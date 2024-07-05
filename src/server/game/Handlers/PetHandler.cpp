@@ -856,18 +856,6 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
         return;
     }
 
-    if (sObjectMgr->IsReservedName(name))
-    {
-        SendPetNameInvalid(PET_NAME_RESERVED, name, nullptr);
-        return;
-    }
-
-    if (sObjectMgr->IsProfanityName(name))
-    {
-        SendPetNameInvalid(PET_NAME_PROFANE, name, nullptr);
-        return;
-    }
-
     pet->SetName(name);
 
     Unit* owner = pet->GetOwner();

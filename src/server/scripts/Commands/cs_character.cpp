@@ -347,21 +347,22 @@ public:
                 return false;
             }
 
-            if (ObjectMgr::CheckPlayerName(newName, true) != CHAR_NAME_SUCCESS)
+            ResponseCodes res = ResponseCodes(ObjectMgr::CheckPlayerName(newName, true));
+            if (res != CHAR_NAME_SUCCESS)
             {
-                handler->SendErrorMessage(LANG_BAD_VALUE);
-                return false;
-            }
+                switch (res)
+                {
+                    case CHAR_NAME_RESERVED:
+                        handler->SendErrorMessage(LANG_RESERVED_NAME);
+                        break;
+                    case CHAR_NAME_PROFANE:
+                        handler->SendErrorMessage(LANG_PROFANITY_NAME);
+                        break;
+                    default:
+                        handler->SendErrorMessage(LANG_BAD_VALUE);
+                        break;
+                }
 
-            if (sObjectMgr->IsReservedName(newName))
-            {
-                handler->SendErrorMessage(LANG_RESERVED_NAME);
-                return false;
-            }
-
-            if (sObjectMgr->IsProfanityName(newName))
-            {
-                handler->SendErrorMessage(LANG_PROFANITY_NAME);
                 return false;
             }
 

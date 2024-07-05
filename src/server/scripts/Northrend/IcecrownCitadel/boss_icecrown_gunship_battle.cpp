@@ -16,9 +16,9 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "Config.h"
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
-#include "Config.h"
 #include "GameTime.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"

@@ -1187,7 +1187,7 @@ void Guild::OnPlayerStatusChange(Player* player, uint32 flag, bool state)
 
 bool Guild::SetName(std::string_view const& name)
 {
-    if (m_name == name || name.empty() || name.length() > 24 || sObjectMgr->IsReservedName(name) || sObjectMgr->IsProfanityName(name) || !ObjectMgr::IsValidCharterName(name))
+    if (m_name == name || name.empty() || name.length() > 24 || !ObjectMgr::IsValidCharterName(name))
     {
         return false;
     }

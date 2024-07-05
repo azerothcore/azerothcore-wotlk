@@ -22,6 +22,7 @@
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameObjectScript.h"
+#include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -30,7 +31,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
-#include "GridNotifiersImpl.h"
 
 // Ours
 /********
