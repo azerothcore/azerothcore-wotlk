@@ -2244,13 +2244,16 @@ struct dragonmaw_race_npc : public ScriptedAI
 
 void AddSC_shadowmoon_valley()
 {
-    new spell_q10612_10613_the_fel_and_the_furious();
-    new spell_q10563_q10596_to_legion_hold();
+    // Ours
+    RegisterSpellScript(spell_q10612_10613_the_fel_and_the_furious);
+    RegisterSpellScript(spell_q10563_q10596_to_legion_hold_aura);
+    RegisterCreatureAI(dragonmaw_race_npc);
+
+    // Theirs
     new npc_invis_infernal_caster();
     new npc_infernal_attacker();
     new npc_mature_netherwing_drake();
     RegisterCreatureAI(npc_enslaved_netherwing_drake);
-    RegisterCreatureAI(dragonmaw_race_npc);
     new npc_dragonmaw_peon();
     new npc_drake_dealer_hurlunk();
     new npcs_flanis_swiftwing_and_kagrosh();
