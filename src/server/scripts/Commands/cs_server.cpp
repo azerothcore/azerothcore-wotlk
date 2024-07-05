@@ -243,9 +243,9 @@ public:
         handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
 
         if (Acore::Module::GetEnableModulesList().empty())
-            handler->SendSysMessage("No modules enabled");
+            handler->SendSysMessage("No modules are enabled");
         else
-            handler->SendSysMessage("List enable modules:");
+            handler->SendSysMessage("List of enabled modules:");
 
         for (auto const& modName : Acore::Module::GetEnableModulesList())
         {
