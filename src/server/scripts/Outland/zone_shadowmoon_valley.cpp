@@ -2247,9 +2247,9 @@ void AddSC_shadowmoon_valley()
     // Ours
     RegisterSpellScript(spell_q10612_10613_the_fel_and_the_furious);
     RegisterSpellScript(spell_q10563_q10596_to_legion_hold_aura);
-    RegisterCreatureAI(dragonmaw_race_npc);
 
     // Theirs
+    RegisterCreatureAI(dragonmaw_race_npc);
     new npc_invis_infernal_caster();
     new npc_infernal_attacker();
     new npc_mature_netherwing_drake();
