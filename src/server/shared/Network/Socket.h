@@ -261,7 +261,7 @@ private:
 
         const uint8 addressFamily = readPointer[13];
         const uint16 len = (readPointer[14] << 8) | readPointer[15];
-        if (static_cast<MessageBuffer::size_type>(len+16) > packet.GetActiveSize())
+        if (static_cast<size_type>(len+16) > packet.GetActiveSize())
         {
             AsyncReadProxyHeader();
             return;
