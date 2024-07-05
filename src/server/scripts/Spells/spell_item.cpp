@@ -3992,7 +3992,6 @@ class spell_item_eye_of_grillok_aura : public AuraScript
 
 enum FelManaPotion
 {
-    SPELL_FEL_MANA_POTION          = 38929,
     SPELL_ALCHEMIST_STONE          = 17619,
     SPELL_ALCHEMIST_STONE_ENERGIZE = 21400
 };
@@ -4006,7 +4005,7 @@ class spell_item_fel_mana_potion : public AuraScript
         return ValidateSpellInfo({ SPELL_ALCHEMIST_STONE, SPELL_ALCHEMIST_STONE_ENERGIZE });
     }
 
-    void OnPeriodic(AuraEffect const* aurEff)
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
             if (caster->HasAura(SPELL_ALCHEMIST_STONE))
