@@ -1,3 +1,4 @@
+-- DB update 2024_07_05_00 -> 2024_07_05_01
 --
 UPDATE `smart_scripts` SET `target_type` = 8 WHERE `entryorguid` = 1367 AND `source_type` = 0 AND `id` = 1;
 UPDATE `smart_scripts` SET `target_type` = 8 WHERE `entryorguid` = 1367 AND `source_type` = 0 AND `id` = 3;
