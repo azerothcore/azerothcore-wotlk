@@ -15,13 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
-#include "GameObjectScript.h"
-#include "ScriptMgr.h"
 #include "Containers.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
@@ -30,6 +29,7 @@
 #include "ObjectAccessor.h"
 #include "PassiveAI.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
@@ -158,7 +158,9 @@ enum Points
 
 enum Misc
 {
-    MAX_FLAMECALLERS = 3
+    MAX_FLAMECALLERS = 3,
+    QUEST_SUMMON_AHUNE = 11691,
+    ITEM_MAGMA_TOTEM = 34953
 };
 
 Position const SummonPositions[] =
@@ -233,10 +235,10 @@ struct boss_ahune : public BossAI
         switch (eventId)
         {
         case EVENT_INITIAL_EMERGE:
-            DoCastSelf(SPELL_BIRTH);
-            DoCastSelf(SPELL_STAND);
-            DoCastSelf(SPELL_AHUNE_SPANKY_HANDS);
-            DoCastSelf(SPELL_AHUNES_SHIELD);
+            DoCastSelf(SPELL_BIRTH, true);
+            DoCastSelf(SPELL_STAND, true);
+            DoCastSelf(SPELL_AHUNE_SPANKY_HANDS, true);
+            DoCastSelf(SPELL_AHUNES_SHIELD, true);
             me->SetStandState(UNIT_STAND_STATE_STAND); // Likely needs to be moved to SPELL_STAND script, forced temporarily
             break;
         case EVENT_EMERGE:
@@ -246,7 +248,7 @@ struct boss_ahune : public BossAI
             if (Creature* frozenCore = instance->GetCreature(DATA_FROZEN_CORE))
                 DoCast(frozenCore, SPELL_SYNCH_HEALTH, true);
             else
-                DoCastSelf(SPELL_SUICIDE);
+                DoCastSelf(SPELL_SUICIDE, true);
             events.Repeat(3s);
             break;
         default:
@@ -259,11 +261,11 @@ struct boss_ahune : public BossAI
         if (Creature* frozenCore = instance->GetCreature(DATA_FROZEN_CORE))
             frozenCore->AI()->DoAction(ACTION_AHUNE_RESURFACE);
 
-        DoCastSelf(SPELL_AHUNES_SHIELD);
+        DoCastSelf(SPELL_AHUNES_SHIELD, true);
         me->RemoveAurasDueToSpell(SPELL_AHUNE_SELF_STUN);
         me->RemoveAurasDueToSpell(SPELL_STAY_SUBMERGED);
-        DoCastSelf(SPELL_BIRTH);
-        DoCastSelf(SPELL_STAND);
+        DoCastSelf(SPELL_BIRTH, true);
+        DoCastSelf(SPELL_STAND, true);
         DoCastSelf(SPELL_RESURFACE, true);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetStandState(UNIT_STAND_STATE_STAND);
@@ -307,8 +309,8 @@ struct npc_frozen_core : public ScriptedAI
         if (Creature* ahune = _instance->GetCreature(DATA_AHUNE))
             Unit::Kill(me, ahune);
 
-        DoCast(SPELL_SUMMON_LOOT_MISSILE);
-        DoCast(SPELL_MINION_DESPAWNER);
+        DoCastSelf(SPELL_SUMMON_LOOT_MISSILE, true);
+        DoCastSelf(SPELL_MINION_DESPAWNER, true);
     }
 
     void DoAction(int32 action) override
@@ -661,6 +663,9 @@ struct go_ahune_ice_stone : public GameObjectAI
     bool GossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
     {
         ClearGossipMenuFor(player);
+
+        player->DestroyItemCount(ITEM_MAGMA_TOTEM, 1, true, false);
+        player->AreaExploredOrEventHappens(QUEST_SUMMON_AHUNE); //auto rewarded
 
         if (Creature* ahuneBunny = _instance->GetCreature(DATA_AHUNE_BUNNY))
             ahuneBunny->AI()->DoAction(ACTION_START_EVENT);

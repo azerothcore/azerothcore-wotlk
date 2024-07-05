@@ -123,8 +123,10 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_SINDRAGOSA, DATA_SINDRAGOSA },
-    { 0,              0               }
+    { NPC_SINDRAGOSA,     DATA_SINDRAGOSA     },
+    { NPC_THE_SKYBREAKER, DATA_THE_SKYBREAKER },
+    { NPC_ORGRIMS_HAMMER, DATA_ORGRIMS_HAMMER },
+    { 0,                  0                   }
 };
 
 // this doesnt have to only store questgivers, also can be used for related quest spawns
@@ -1877,6 +1879,9 @@ public:
                 case EVENT_FESTERGUT_VALVE_USED:
                     if (!(PutricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE))
                     {
+                        if (GameObject* goGas = instance->GetGameObject(GasReleaseValveGUID))
+                            goGas->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
+
                         PutricideEventProgress |= PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE;
                         if (PutricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE)
                         {
@@ -1894,6 +1899,9 @@ public:
                 case EVENT_ROTFACE_VALVE_USED:
                     if (!(PutricideEventProgress & PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE))
                     {
+                        if (GameObject* goOoze = instance->GetGameObject(OozeReleaseValveGUID))
+                            goOoze->SetGameObjectFlag(GO_FLAG_INTERACT_COND | GO_FLAG_NOT_SELECTABLE);
+
                         PutricideEventProgress |= PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE;
                         if (PutricideEventProgress & PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE)
                         {

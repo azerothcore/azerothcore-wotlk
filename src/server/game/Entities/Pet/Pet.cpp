@@ -394,7 +394,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     // Send fake summon spell cast - this is needed for correct cooldown application for spells
     // Example: 46584 - without this cooldown (which should be set always when pet is loaded) isn't set clientside
     /// @todo pets should be summoned from real cast instead of just faking it?
-    if (petInfo->CreatedBySpellId)
+    if (petInfo->CreatedBySpellId && spellInfo && (spellInfo->CategoryRecoveryTime > 0 || spellInfo->RecoveryTime > 0))
     {
         WorldPacket data(SMSG_SPELL_GO, (8 + 8 + 4 + 4 + 2));
         data << owner->GetPackGUID();
@@ -2499,11 +2499,6 @@ float Pet::GetNativeObjectScale() const
 {
     uint8 ctFamily = GetCreatureTemplate()->family;
 
-    // hackfix: Edge case where DBC scale values for DEVILSAUR pets make them too small.
-    // Therefore we take data from spirit beast instead.
-    if (ctFamily && ctFamily == CREATURE_FAMILY_DEVILSAUR)
-        ctFamily = CREATURE_FAMILY_SPIRIT_BEAST;
-
     CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(ctFamily);
     if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() & HUNTER_PET)
     {
@@ -2520,6 +2515,13 @@ float Pet::GetNativeObjectScale() const
 
         float scale = (creatureFamily->maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
 
+        scale = std::min(scale, creatureFamily->maxScale);
+
+        if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
+        {
+            if (scale < 1.f && displayInfo->scale > 1.f)
+                scale *= displayInfo->scale;
+        }
         return scale;
     }
 

@@ -2011,7 +2011,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         if (modelid > 0)
         {
             bool allow = true;
-            if (target->getTransForm())
+            if (target->getTransForm() && !(target->GetMapId() == 560 /*The Escape From Durnholde*/))
                 if (SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm()))
                     if (transformSpellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !transformSpellInfo->IsPositive())
                         allow = false;
@@ -2143,7 +2143,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
 
     if (target->GetTypeId() == TYPEID_PLAYER)
     {
-        SpellShapeshiftEntry const* shapeInfo = sSpellShapeshiftStore.LookupEntry(form);
+        SpellShapeshiftFormEntry const* shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
         // Learn spells for shapeshift form - no need to send action bars or add spells to spellbook
         for (uint8 i = 0; i < MAX_SHAPESHIFT_SPELLS; ++i)
         {
@@ -4106,12 +4106,6 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const* aurApp, uint8
     // Patch 3.0.3 Bladestorm now breaks all snares and roots on the warrior when activated.
     if (GetId() == 46924)
     {
-        if (apply)
-        {
-            target->resetAttackTimer();
-            target->resetAttackTimer(OFF_ATTACK);
-        }
-
         // Knockback and hex
         target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, apply);
     }
@@ -6398,23 +6392,6 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             {
                                 target->CastSpell(target, 31350, true, nullptr, this);
                                 Unit::Kill(target, target);
-                                return;
-                            }
-                        // Eye of Grillok
-                        case 38495:
-                            triggerSpellId = 38530;
-                            break;
-                        // Absorb Eye of Grillok (Zezzak's Shard)
-                        case 38554:
-                            {
-                                if (!caster || target->GetTypeId() != TYPEID_UNIT)
-                                    return;
-
-                                caster->CastSpell(caster, 38495, true, nullptr, this);
-
-                                Creature* creatureTarget = target->ToCreature();
-
-                                creatureTarget->DespawnOrUnsummon();
                                 return;
                             }
                         // Tear of Azzinoth Summon Channel - it's not really supposed to do anything, and this only prevents the console spam
