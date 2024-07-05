@@ -1019,7 +1019,7 @@ struct GemPropertiesEntry
 
 struct GlyphPropertiesEntry
 {
-    //uint32  Id;
+    uint32  Id;
     uint32  SpellId;
     uint32  TypeFlags;
     //uint32  spellIconID;                                       // GlyphIconId (SpellIcon.dbc)
