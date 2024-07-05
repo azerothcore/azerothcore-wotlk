@@ -1744,60 +1744,61 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             WorldObject* target = nullptr;
 
-            if (e.GetTargetType() == SMART_TARGET_RANDOM_POINT)
+            switch (e.GetTargetType())
             {
+                case SMART_TARGET_POSITION:
+                {
+                    G3D::Vector3 dest(e.target.x, e.target.y, e.target.z);
+                    if (e.action.moveToPos.transport)
+                        if (TransportBase* trans = me->GetDirectTransport())
+                            trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
+
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, true, true,
+                        isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE, e.target.o);
+
+                    break;
+                }
+                case SMART_TARGET_RANDOM_POINT:
                 if (me)
                 {
                     float range = (float)e.target.randomPoint.range;
                     Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
                     Position randomPoint = me->GetRandomPoint(srcPos, range);
                     me->GetMotionMaster()->MovePoint(
-                            e.action.moveToPos.pointId,
-                            randomPoint.m_positionX,
-                            randomPoint.m_positionY,
-                            randomPoint.m_positionZ,
-                            true,
-                            true,
-                            isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
+                        e.action.moveToPos.pointId,
+                        randomPoint.m_positionX,
+                        randomPoint.m_positionY,
+                        randomPoint.m_positionZ,
+                        true,
+                        true,
+                        isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
                     );
+
+                    break;
                 }
-
-                break;
-            }
-
-            /*if (e.GetTargetType() == SMART_TARGET_CREATURE_RANGE || e.GetTargetType() == SMART_TARGET_CREATURE_GUID ||
-            e.GetTargetType() == SMART_TARGET_CREATURE_DISTANCE || e.GetTargetType() == SMART_TARGET_GAMEOBJECT_RANGE ||
-            e.GetTargetType() == SMART_TARGET_GAMEOBJECT_GUID || e.GetTargetType() == SMART_TARGET_GAMEOBJECT_DISTANCE ||
-            e.GetTargetType() == SMART_TARGET_CLOSEST_CREATURE || e.GetTargetType() == SMART_TARGET_CLOSEST_GAMEOBJECT ||
-            e.GetTargetType() == SMART_TARGET_OWNER_OR_SUMMONER || e.GetTargetType() == SMART_TARGET_ACTION_INVOKER ||
-            e.GetTargetType() == SMART_TARGET_CLOSEST_ENEMY || e.GetTargetType() == SMART_TARGET_CLOSEST_FRIENDLY ||
-            e.GetTargetType() == SMART_TARGET_SELF || e.GetTargetType() == SMART_TARGET_STORED)) */
-            {
-                // we want to move to random element
-                if (!targets.empty())
-                    target = Acore::Containers::SelectRandomContainerElement(targets);
-            }
-
-            if (!target)
-            {
-                G3D::Vector3 dest(e.target.x, e.target.y, e.target.z);
-                if (e.action.moveToPos.transport)
-                    if (TransportBase* trans = me->GetDirectTransport())
-                        trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
-
-                me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, true, true,
-                                                 isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE, e.target.o);
-            }
-            else // Xinef: we can use dest.x, dest.y, dest.z to make offset
-            {
-                float x, y, z;
-                target->GetPosition(x, y, z);
-                if (e.action.moveToPos.ContactDistance > 0)
+                // Can use target floats as offset
+                default:
                 {
-                    target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
+                    // we want to move to random element
+                    if (targets.empty())
+                        return;
+                    else
+                        target = Acore::Containers::SelectRandomContainerElement(targets);
+
+                    float x, y, z;
+                    target->GetPosition(x, y, z);
+
+                    if (e.action.moveToPos.combatReach)
+                        target->GetNearPoint(me, x, y, z, target->GetCombatReach() + e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
+                    else if (e.action.moveToPos.ContactDistance)
+                        target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
+
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+
+                    break;
                 }
-                me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
             }
+
             break;
         }
         case SMART_ACTION_MOVE_TO_POS_TARGET:
