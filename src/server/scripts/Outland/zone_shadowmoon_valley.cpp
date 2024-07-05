@@ -1929,10 +1929,10 @@ struct dragonmaw_race_npc : public ScriptedAI
         me->SetWalk(false);
         ScheduleTimedEvent(5s, [&]
         {
-                if (!_player)
-                    FailQuest();
-                else if (!me->IsWithinDist(_player, 100.f))
-                    FailQuest();
+            if (!_player)
+                FailQuest();
+            else if (!me->IsWithinDist(_player, 100.f))
+                FailQuest();
         }, 5s);
     }
 
