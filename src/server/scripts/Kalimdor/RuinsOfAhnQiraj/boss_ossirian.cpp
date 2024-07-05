@@ -15,16 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "MiscPackets.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "ruins_of_ahnqiraj.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
+#include "ruins_of_ahnqiraj.h"
 
 enum Texts
 {
@@ -161,9 +163,9 @@ struct boss_ossirian : public BossAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         events.Reset();
         events.ScheduleEvent(EVENT_SPEEDUP, 10s);
         events.ScheduleEvent(EVENT_SILENCE, 30s);
@@ -403,7 +405,7 @@ struct npc_anubisath_guardian : public ScriptedAI
         });
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoCastSelf(_spells[0]);
         DoCastSelf(_spells[1]);

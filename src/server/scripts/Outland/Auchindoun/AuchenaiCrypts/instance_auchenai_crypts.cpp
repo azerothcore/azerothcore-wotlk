@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
 #include "auchenai_crypts.h"
 
 class instance_auchenai_crypts : public InstanceMapScript
@@ -29,12 +29,9 @@ public:
     {
         instance_auchenai_crypts_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
         }
-
-        void Load(char const* data) override { LoadBossState(data); }
-
-        std::string GetSaveData() override { return DataHeader + GetBossSaveData(); }
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

@@ -549,7 +549,8 @@ public:
     void SetAutoRepeat(bool rep) { m_autoRepeat = rep; }
     void ReSetTimer() { m_timer = m_casttime > 0 ? m_casttime : 0; }
     bool IsNextMeleeSwingSpell() const;
-    bool IsTriggered() const { return _triggeredCastFlags & TRIGGERED_FULL_MASK; };
+    bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_FULL_MASK); };
+    bool HasTriggeredCastFlag(TriggerCastFlags flag) const { return _triggeredCastFlags & flag; };
     bool IsChannelActive() const { return m_caster->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0; }
     bool IsAutoActionResetSpell() const;
     bool IsIgnoringCooldowns() const;
@@ -753,7 +754,7 @@ public:
     HitTriggerSpellList m_hitTriggerSpells;
 
     // effect helpers
-    void SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* properties, uint32 numSummons);
+    void SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* properties, uint32 numSummons, bool personalSpawn);
     void CalculateJumpSpeeds(uint8 i, float dist, float& speedxy, float& speedz);
 
     SpellCastResult CanOpenLock(uint32 effIndex, uint32 lockid, SkillType& skillid, int32& reqSkillValue, int32& skillValue);

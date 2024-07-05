@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "culling_of_stratholme.h"
@@ -73,7 +73,7 @@ public:
             warps = 0;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
 

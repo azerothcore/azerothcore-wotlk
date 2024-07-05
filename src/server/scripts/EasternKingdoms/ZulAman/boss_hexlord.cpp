@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "zulaman.h"
 /* ScriptData
 SDName: Boss_Hex_Lord_Malacrass
 SD%Complete:
 SDComment:
 SDCategory: Zul'Aman
 EndScriptData */
-
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
-#include "zulaman.h"
 
 enum Says
 {
@@ -228,7 +228,7 @@ struct boss_hexlord_addAI : public ScriptedAI
 
     void Reset() override { }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
     }
@@ -289,12 +289,9 @@ public:
             ResetTimer = 5000;
 
             SpawnAdds();
-
-            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 46916);
-            me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             instance->SetData(DATA_HEXLORDEVENT, IN_PROGRESS);
 
@@ -363,7 +360,7 @@ public:
                 Creature* creature = (ObjectAccessor::GetCreature((*me), AddGUID[i]));
                 if (!creature || !creature->IsAlive())
                 {
-                    if (creature) creature->setDeathState(DEAD);
+                    if (creature) creature->setDeathState(DeathState::Dead);
                     creature = me->SummonCreature(AddEntry[i], Pos_X[i], POS_Y, POS_Z, ORIENT, TEMPSUMMON_DEAD_DESPAWN, 0);
                     if (creature) AddGUID[i] = creature->GetGUID();
                 }
@@ -450,9 +447,9 @@ public:
                     PlayerAbility_Timer = urand(8000, 10000);
                     PlayerClass = target->getClass() - 1;
 
-                    if (PlayerClass == CLASS_DRUID - 1)
+                    if (target->IsClass(CLASS_DRUID))
                         PlayerClass = CLASS_DRUID;
-                    else if (PlayerClass == CLASS_PRIEST - 1 && target->HasSpell(15473))
+                    else if (target->IsClass(CLASS_PRIEST) && target->HasSpell(15473))
                         PlayerClass = CLASS_PRIEST; // shadow priest
 
                     SiphonSoul_Timer = 99999;   // buff lasts 30 sec
@@ -624,7 +621,12 @@ public:
                         DoCast(target, SPELL_FLASH_HEAL, false);
                     else
                     {
-                        // bugged
+                        /**
+                         * @bug
+                         * Bugged
+                         * //me->GetMotionMaster()->Clear();
+                         * //me->GetMotionMaster()->MoveChase(target, 20);
+                         */
                         //me->GetMotionMaster()->Clear();
                         //me->GetMotionMaster()->MoveChase(target, 20);
                     }
@@ -994,3 +996,4 @@ void AddSC_boss_hex_lord_malacrass()
     new boss_alyson_antille();
     new spell_hexlord_unstable_affliction();
 }
+

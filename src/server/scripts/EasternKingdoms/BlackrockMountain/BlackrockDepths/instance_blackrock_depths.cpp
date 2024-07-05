@@ -16,9 +16,9 @@
  */
 
 #include "GameTime.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "blackrock_depths.h"
 
 constexpr auto MAX_ENCOUNTER = 6;
@@ -107,7 +107,10 @@ public:
 
     struct instance_blackrock_depths_InstanceMapScript : public InstanceScript
     {
-        instance_blackrock_depths_InstanceMapScript(Map* map) : InstanceScript(map) { }
+        instance_blackrock_depths_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders(DataHeader);
+        }
 
         uint32 encounter[MAX_ENCOUNTER];
         std::string str_data;

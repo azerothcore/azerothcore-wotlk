@@ -15,13 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "scholomance.h"
 
 Position KirtonosSpawn = Position(315.028, 70.5385, 102.15, 0.385971);
@@ -63,7 +65,7 @@ public:
                     GateKirtonosGUID = go->GetGUID();
                     break;
                 case GO_DOOR_OPENED_WITH_KEY:
-                    go->UpdateSaveToDb(true);
+                    go->AllowSaveToDB(true);
                     break;
                 case GO_GATE_GANDLING_DOWN_NORTH:
                     GandlingGatesGUID[0] = go->GetGUID();
@@ -131,7 +133,10 @@ public:
                             // summon kirtonos and close door
                             if (_kirtonosState == NOT_STARTED)
                             {
-                                instance->SummonCreature(NPC_KIRTONOS, KirtonosSpawn);
+                                if (Creature* kirtonos = instance->SummonCreature(NPC_KIRTONOS, KirtonosSpawn))
+                                {
+                                    kirtonos->AI()->DoAction(IN_PROGRESS);
+                                }
                                 if (GameObject* gate = instance->GetGameObject(GetGuidData(GO_GATE_KIRTONOS)))
                                 {
                                     gate->SetGoState(GO_STATE_READY);
@@ -211,30 +216,15 @@ public:
             return 0;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            std::ostringstream saveStream;
-            saveStream << "S O " << _kirtonosState << ' ' << _miniBosses;
-            return saveStream.str();
+            data >> _kirtonosState;
+            data >> _miniBosses;
         }
 
-        void Load(const char* str) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!str)
-                return;
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'S' && dataHead2 == 'O')
-            {
-                loadStream >> _kirtonosState;
-                loadStream >> _miniBosses;
-
-                if (_kirtonosState == IN_PROGRESS)
-                    _kirtonosState = NOT_STARTED;
-            }
+            data << _kirtonosState << ' ' << _miniBosses;
         }
 
     protected:
@@ -395,14 +385,14 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             originalDisplayId = me->GetDisplayId();
 
             events.Reset();
-            events.RescheduleEvent(1, urand(1000, 7000));
-            events.RescheduleEvent(2, 400);
-            events.RescheduleEvent(3, urand(6000, 15000));
+            events.RescheduleEvent(1, 1s, 7s);
+            events.RescheduleEvent(2, 400ms);
+            events.RescheduleEvent(3, 6s, 15s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -419,7 +409,7 @@ public:
                 events.Reset();
                 me->InterruptNonMeleeSpells(false);
                 me->UpdateEntry(DARK_SHADE_ENTRY, nullptr, false);
-                events.RescheduleEvent(4, urand(2000, 10000));
+                events.RescheduleEvent(4, 2s, 10s);
             }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -474,3 +464,4 @@ void AddSC_instance_scholomance()
     new spell_scholomance_boon_of_life();
     new npc_scholomance_occultist();
 }
+

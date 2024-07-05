@@ -15,6 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Cell.h"
+#include "CellImpl.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
+#include "GridNotifiers.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /* ScriptData
 SDName: Blades_Edge_Mountains
 SD%Complete: 90
@@ -28,18 +40,7 @@ npc_daranelle
 go_legion_obelisk
 EndContentData */
 
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GridNotifiers.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellAuraEffects.h"
-#include "SpellAuras.h"
-#include "SpellInfo.h"
-#include "SpellScript.h"
-
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -222,31 +223,30 @@ public:
     }
 };
 
-class spell_npc22275_crystal_prison : public SpellScriptLoader
+enum CrystalPrison
 {
-public:
-    spell_npc22275_crystal_prison() : SpellScriptLoader("spell_npc22275_crystal_prison") { }
+    SPELL_CRYSTAL_SHATTER = 40898
+};
 
-    class spell_npc22275_crystal_prison_AuraScript : public AuraScript
+class spell_npc22275_crystal_prison_aura : public AuraScript
+{
+    PrepareAuraScript(spell_npc22275_crystal_prison_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_npc22275_crystal_prison_AuraScript);
+        return ValidateSpellInfo({ SPELL_CRYSTAL_SHATTER });
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            SetDuration(0);
-            GetTarget()->CastSpell(GetTarget(), 40898, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_npc22275_crystal_prison_AuraScript();
+        PreventDefaultAction();
+        SetDuration(0);
+        GetTarget()->CastSpell(GetTarget(), SPELL_CRYSTAL_SHATTER, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -306,7 +306,7 @@ public:
             IntangiblePresence_Timer = 15000;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void MoveInLineOfSight(Unit* who) override
 
@@ -325,7 +325,7 @@ public:
 
             if (id == 0)
             {
-                me->setDeathState(JUST_DIED);
+                me->setDeathState(DeathState::JustDied);
                 me->RemoveCorpse();
                 me->SetHealth(0);
             }
@@ -462,7 +462,7 @@ public:
 
         void Reset() override { }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void MoveInLineOfSight(Unit* who) override
 
@@ -1108,7 +1108,7 @@ public:
             timer = 500;
         }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (summoner && summoner->isType(TYPEMASK_PLAYER))
                 playerGuid = summoner->GetGUID();
@@ -1138,31 +1138,25 @@ public:
     }
 };
 
-class spell_oscillating_field : public SpellScriptLoader
+class spell_oscillating_field : public SpellScript
 {
-public:
-    spell_oscillating_field() : SpellScriptLoader("spell_oscillating_field") { }
+    PrepareSpellScript(spell_oscillating_field);
 
-    class spell_oscillating_field_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_oscillating_field_SpellScript);
+        return ValidateSpellInfo({ SPELL_OSCILLATION_FIELD });
+    }
 
-        void HandleEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Player* player = GetHitPlayer())
-                if (player->GetAuraCount(SPELL_OSCILLATION_FIELD) == 5 && player->GetQuestStatus(QUEST_GAUGING_THE_RESONANT_FREQUENCY) == QUEST_STATUS_INCOMPLETE)
-                    player->CompleteQuest(QUEST_GAUGING_THE_RESONANT_FREQUENCY);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_oscillating_field_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleEffect(SpellEffIndex /*effIndex*/)
     {
-        return new spell_oscillating_field_SpellScript();
+        if (Player* player = GetHitPlayer())
+            if (player->GetAuraCount(SPELL_OSCILLATION_FIELD) == 5 && player->GetQuestStatus(QUEST_GAUGING_THE_RESONANT_FREQUENCY) == QUEST_STATUS_INCOMPLETE)
+                player->CompleteQuest(QUEST_GAUGING_THE_RESONANT_FREQUENCY);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_oscillating_field::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -1171,7 +1165,7 @@ void AddSC_blades_edge_mountains()
     // Ours
     new npc_deaths_door_fell_cannon_target_bunny();
     new npc_deaths_fel_cannon();
-    new spell_npc22275_crystal_prison();
+    RegisterSpellScript(spell_npc22275_crystal_prison_aura);
     // Theirs
     new npc_nether_drake();
     new npc_daranelle();
@@ -1179,5 +1173,5 @@ void AddSC_blades_edge_mountains()
     new go_simon_cluster();
     new go_apexis_relic();
     new npc_oscillating_frequency_scanner_master_bunny();
-    new spell_oscillating_field();
+    RegisterSpellScript(spell_oscillating_field);
 }

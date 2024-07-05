@@ -23,10 +23,26 @@
 */
 
 #include "Creature.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
 #include "the_slave_pens.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_QUAGMIRRAN,               DATA_QUAGMIRRAN        },
+    { NPC_AHUNE,                    DATA_AHUNE             },
+    { NPC_AHUNE_LOC_BUNNY,          DATA_AHUNE_BUNNY       },
+    { NPC_FROZEN_CORE,              DATA_FROZEN_CORE       },
+    { NPC_SHAMAN_BONFIRE_BUNNY_000, DATA_BONFIRE_BUNNY_000 },
+    { NPC_SHAMAN_BONFIRE_BUNNY_001, DATA_BONFIRE_BUNNY_001 },
+    { NPC_SHAMAN_BONFIRE_BUNNY_002, DATA_BONFIRE_BUNNY_002 },
+    { NPC_SHAMAN_BEAM_BUNNY_000,    DATA_BEAM_BUNNY_000    },
+    { NPC_SHAMAN_BEAM_BUNNY_001,    DATA_BEAM_BUNNY_001    },
+    { NPC_SHAMAN_BEAM_BUNNY_002,    DATA_BEAM_BUNNY_002    },
+    { NPC_LUMA_SKYMOTHER,           DATA_LUMA_SKYMOTHER    },
+    { 0,                            0                      }
+};
 
 class instance_the_slave_pens : public InstanceMapScript
 {
@@ -37,10 +53,10 @@ public:
     {
         instance_the_slave_pens_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
+            LoadObjectData(creatureData, nullptr);
             counter = DATA_FLAMECALLER_000;
         }
-
-        void Load(char const* /*data*/) override { LoadBossState(DataHeader); }
 
         void OnCreatureCreate(Creature* creature) override
         {
@@ -83,6 +99,8 @@ public:
                 default:
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void SetGuidData(uint32 data, ObjectGuid guid) override

@@ -29,13 +29,12 @@ npc_darrowshire_spirit
 npc_tirion_fordring
 EndContentData */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
-#include "WorldSession.h"
 
 // Ours
 
@@ -117,9 +116,9 @@ public:
             events.Reset();
             summons.DespawnAll();
 
-            events.ScheduleEvent(EVENT_CHECK_PLAYER, 1000);
-            events.ScheduleEvent(EVENT_SUMMON_ARCHERS, 4000);
-            events.ScheduleEvent(EVENT_SUMMON_PEASANTS, 8000);
+            events.ScheduleEvent(EVENT_CHECK_PLAYER, 1s);
+            events.ScheduleEvent(EVENT_SUMMON_ARCHERS, 4s);
+            events.ScheduleEvent(EVENT_SUMMON_PEASANTS, 8s);
         }
 
         bool CanBeSeen(Player const* player) override

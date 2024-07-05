@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "culling_of_stratholme.h"
 
@@ -63,7 +63,7 @@ public:
         EventMap events;
         void Reset() override { events.Reset(); }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
             events.RescheduleEvent(EVENT_SPELL_CONSTRICTING_CHAINS, 15000);

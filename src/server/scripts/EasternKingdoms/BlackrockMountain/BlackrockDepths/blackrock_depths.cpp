@@ -16,13 +16,14 @@
  */
 
 #include "blackrock_depths.h"
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "GameTime.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "WorldSession.h"
 
 enum IronhandData
 {
@@ -121,13 +122,13 @@ public:
     };
 };
 
-struct Wave
+struct WaveCreature
 {
     uint32 entry;
     uint32 amount;
 };
 
-static Wave RingMobs[] = // different amounts based on the type
+static WaveCreature RingMobs[] = // different amounts based on the type
 {
     {NPC_DREDGE_WORM, 3},
     {NPC_DEEP_STINGER, 3},

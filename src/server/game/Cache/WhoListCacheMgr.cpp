@@ -53,7 +53,7 @@ void WhoListCacheMgr::Update()
 
         wstrToLower(wideGuildName);
 
-        _whoListStorage.emplace_back(player->GetGUID(), player->GetTeamId(), player->GetSession()->GetSecurity(), player->getLevel(),
+        _whoListStorage.emplace_back(player->GetGUID(), player->GetTeamId(), player->GetSession()->GetSecurity(), player->GetLevel(),
             player->getClass(), player->getRace(),
             (player->IsSpectator() ? 4395 /*Dalaran*/ : player->GetZoneId()), player->getGender(), player->IsVisible(),
             widePlayerName, wideGuildName, playerName, guildName);

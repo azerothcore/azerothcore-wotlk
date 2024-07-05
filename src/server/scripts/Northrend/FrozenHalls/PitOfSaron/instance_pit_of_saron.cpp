@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "pit_of_saron.h"
 
@@ -27,7 +28,10 @@ public:
 
     struct instance_pit_of_saron_InstanceScript : public InstanceScript
     {
-        instance_pit_of_saron_InstanceScript(Map* map) : InstanceScript(map) {}
+        instance_pit_of_saron_InstanceScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders(DataHeader);
+        }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         TeamId teamIdInInstance;
@@ -378,48 +382,20 @@ public:
             return false;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "P S " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << InstanceProgress;
-            str_data = saveStream.str();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return str_data;
+            data >> m_auiEncounter[0];
+            data >> m_auiEncounter[1];
+            data >> m_auiEncounter[2];
+            data >> InstanceProgress;
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-            uint32 data0, data1, data2, data3;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2 >> data3;
-
-            if (dataHead1 == 'P' && dataHead2 == 'S')
-            {
-                m_auiEncounter[0] = data0;
-                m_auiEncounter[1] = data1;
-                m_auiEncounter[2] = data2;
-                InstanceProgress = data3;
-
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                    if (m_auiEncounter[i] == IN_PROGRESS)
-                        m_auiEncounter[i] = NOT_STARTED;
-            }
-            else OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << m_auiEncounter[0] << ' '
+                << m_auiEncounter[1] << ' '
+                << m_auiEncounter[2] << ' '
+                << InstanceProgress;
         }
     };
 
@@ -433,3 +409,4 @@ void AddSC_instance_pit_of_saron()
 {
     new instance_pit_of_saron();
 }
+

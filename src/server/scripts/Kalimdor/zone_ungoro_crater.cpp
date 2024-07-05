@@ -27,8 +27,8 @@ npc_a-me
 npc_ringo
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"

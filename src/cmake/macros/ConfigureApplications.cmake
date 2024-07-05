@@ -71,12 +71,12 @@ function(CheckApplicationsBuildList)
   if (APPS_BUILD MATCHES "-only")
     set(BUILD_APPS_USE_WHITELIST ON)
 
-    if (APPS_BUILD STREQUAL "servers-only")
-      list(APPEND BUILD_APPS_WHITELIST authserver worldserver)
+    if (APPS_BUILD STREQUAL "auth-only")
+      list(APPEND BUILD_APPS_WHITELIST authserver)
     endif()
 
-    if (APPS_BUILD STREQUAL "dbimport-only")
-      list(APPEND BUILD_APPS_WHITELIST dbimport)
+    if (APPS_BUILD STREQUAL "world-only")
+      list(APPEND BUILD_APPS_WHITELIST worldserver)
     endif()
   endif()
 

@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "mechanar.h"
 
@@ -37,133 +37,146 @@ enum Spells
     SPELL_ARCANE_TORRENT            = 36022,
     SPELL_MANA_TAP                  = 36021,
     SPELL_DOMINATION                = 35280,
+    SPELL_FRENZY                    = 36992,
+    SPELL_SUICIDE                   = 35301,
+    SPELL_ETHEREAL_TELEPORT         = 34427,
+    SPELL_GREATER_INVISIBILITY      = 34426,
     SPELL_SUMMON_NETHER_WRAITH_1    = 35285,
     SPELL_SUMMON_NETHER_WRAITH_2    = 35286,
     SPELL_SUMMON_NETHER_WRAITH_3    = 35287,
     SPELL_SUMMON_NETHER_WRAITH_4    = 35288,
 };
 
-enum Events
+enum Misc
 {
-    EVENT_SUMMON                    = 1,
-    EVENT_MANA_TAP                  = 2,
-    EVENT_ARCANE_TORRENT            = 3,
-    EVENT_DOMINATION                = 4,
-    EVENT_ARCANE_EXPLOSION          = 5,
-    EVENT_FRENZY                    = 6,
+    ACTION_BRIDGE_MOB_DEATH = 1, // Used by SAI
+    EQUIPMENT_NORMAL        = 1,
+    EQUIPMENT_FRENZY        = 2,
 };
 
-class boss_pathaleon_the_calculator : public CreatureScript
+struct boss_pathaleon_the_calculator : public BossAI
 {
-public:
-    boss_pathaleon_the_calculator(): CreatureScript("boss_pathaleon_the_calculator") { }
+    boss_pathaleon_the_calculator(Creature* creature) : BossAI(creature, DATA_PATHALEON_THE_CALCULATOR) { }
 
-    struct boss_pathaleon_the_calculatorAI : public BossAI
+    bool _isEnraged;
+
+    void Reset() override
     {
-        boss_pathaleon_the_calculatorAI(Creature* creature) : BossAI(creature, DATA_PATHALEON_THE_CALCULATOR) { }
+        _Reset();
+        _isEnraged = false;
+        me->LoadEquipment(EQUIPMENT_NORMAL);
 
-        void InitializeAI() override
+        if (instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) < 4)
         {
-            BossAI::InitializeAI();
-            me->SetVisible(false);
-            me->SetReactState(REACT_PASSIVE);
+            DoCastSelf(SPELL_GREATER_INVISIBILITY);
         }
+    }
 
-        void DoAction(int32  /*param*/) override
+    bool CanAIAttack(Unit const* /*target*/) const override
+    {
+        return instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT) >= 4;
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+
+        ScheduleHealthCheckEvent(20, [&]()
         {
-            me->SetVisible(true);
-            me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-            me->SetReactState(REACT_AGGRESSIVE);
-            Talk(SAY_APPEAR);
-        }
+            DoCastSelf(SPELL_SUICIDE, true);
+            DoCastSelf(SPELL_FRENZY, true);
+            Talk(SAY_ENRAGE);
+            _isEnraged = true;
+            me->LoadEquipment(EQUIPMENT_FRENZY);
+        });
 
-        void EnterCombat(Unit* /*who*/) override
+        scheduler.Schedule(20s, 25s, [this](TaskContext context)
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_SUMMON, 30000);
-            events.ScheduleEvent(EVENT_MANA_TAP, 12000);
-            events.ScheduleEvent(EVENT_ARCANE_TORRENT, 16000);
-            events.ScheduleEvent(EVENT_DOMINATION, 25000);
-            events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 8000);
-            events.ScheduleEvent(EVENT_FRENZY, 1000);
-            Talk(SAY_AGGRO);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            Talk(SAY_DEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+            if (!_isEnraged)
             {
-                case EVENT_ARCANE_EXPLOSION:
-                    me->CastSpell(me, SPELL_ARCANE_EXPLOSION, false);
-                    events.ScheduleEvent(EVENT_ARCANE_EXPLOSION, 12000);
-                    break;
-                case EVENT_ARCANE_TORRENT:
-                    me->RemoveAurasDueToSpell(SPELL_MANA_TAP);
-                    me->ModifyPower(POWER_MANA, 5000);
-                    me->CastSpell(me, SPELL_ARCANE_TORRENT, false);
-                    events.ScheduleEvent(EVENT_ARCANE_TORRENT, 15000);
-                    break;
-                case EVENT_MANA_TAP:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
-                        me->CastSpell(target, SPELL_MANA_TAP, false);
-                    events.ScheduleEvent(EVENT_MANA_TAP, 18000);
-                    break;
-                case EVENT_DOMINATION:
-                    Talk(SAY_DOMINATION);
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 50.0f))
-                        me->CastSpell(target, SPELL_DOMINATION, false);
-                    events.ScheduleEvent(EVENT_DOMINATION, 30000);
-                    break;
-                case EVENT_FRENZY:
-                    if (me->HealthBelowPct(20))
-                    {
-                        summons.DespawnAll();
-                        me->CastSpell(me, SPELL_DISGRUNTLED_ANGER, true);
-                        Talk(SAY_ENRAGE);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_FRENZY, 1000);
-                    break;
-                case EVENT_SUMMON:
-                    for (uint8 i = 0; i < DUNGEON_MODE(3, 4); ++i)
-                        me->CastSpell(me, SPELL_SUMMON_NETHER_WRAITH_1 + i, true);
+                for (uint8 i = 0; i < DUNGEON_MODE(3, 4); ++i)
+                    me->CastSpell(me, SPELL_SUMMON_NETHER_WRAITH_1 + i, true);
 
-                    Talk(SAY_SUMMON);
-                    events.ScheduleEvent(EVENT_SUMMON, urand(30000, 45000));
-                    break;
+                Talk(SAY_SUMMON);
             }
+            context.Repeat(45s, 50s);
+        }).Schedule(12s, [this](TaskContext context)
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+            {
+                DoCast(target, SPELL_MANA_TAP);
+            }
+            context.Repeat(18s);
+        }).Schedule(16s, [this](TaskContext context)
+        {
+            me->RemoveAurasDueToSpell(SPELL_MANA_TAP);
+            me->ModifyPower(POWER_MANA, 5000);
+            DoCastSelf(SPELL_ARCANE_TORRENT);
+            context.Repeat(15s);
+        }).Schedule(10s, 15s, [this](TaskContext context)
+        {
+            if (DoCastRandomTarget(SPELL_DOMINATION, 1, 50.0f) == SPELL_CAST_OK)
+            {
+                Talk(SAY_DOMINATION);
+            }
+            context.Repeat(27s, 40s);
+        }).Schedule(25s, [this](TaskContext context)
+        {
+            DoCast(SPELL_DISGRUNTLED_ANGER);
+            context.Repeat(40s, 90s);
+        });
 
-            DoMeleeAttackIfReady();
+        if (IsHeroic())
+        {
+            scheduler.Schedule(8s, [this](TaskContext context)
+            {
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+                context.Repeat(12s);
+            });
         }
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
+        Talk(SAY_AGGRO);
+    }
+
+    void DoAction(int32 actionId) override
     {
-        return GetMechanarAI<boss_pathaleon_the_calculatorAI>(creature);
+        if (actionId == ACTION_BRIDGE_MOB_DEATH)
+        {
+            uint8 mobCount = instance->GetPersistentData(DATA_BRIDGE_MOB_DEATH_COUNT);
+            instance->StorePersistentData(DATA_BRIDGE_MOB_DEATH_COUNT, ++mobCount);
+
+            if (mobCount >= 4)
+            {
+                DoCastSelf(SPELL_ETHEREAL_TELEPORT);
+                Talk(SAY_APPEAR);
+
+                scheduler.Schedule(2s, [this](TaskContext)
+                {
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+                }).Schedule(25s, [this](TaskContext)
+                {
+                    DoZoneInCombat();
+                });
+            }
+        }
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
+        {
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
     }
 };
 
 void AddSC_boss_pathaleon_the_calculator()
 {
-    new boss_pathaleon_the_calculator();
+    RegisterMechanarCreatureAI(boss_pathaleon_the_calculator);
 }

@@ -19,7 +19,6 @@
 #include "BattlegroundMgr.h"
 #include "GameGraveyard.h"
 #include "GameObject.h"
-#include "Language.h"
 #include "Object.h"
 #include "ObjectMgr.h"
 #include "Player.h"

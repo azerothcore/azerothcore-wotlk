@@ -30,6 +30,8 @@ public:
     KillRewarder(Player* killer, Unit* victim, bool isBattleGround);
 
     void Reward();
+    Unit* GetVictim();
+    Player* GetKiller();
 
 private:
     void _InitXP(Player* player);
@@ -37,7 +39,7 @@ private:
 
     void _RewardHonor(Player* player);
     void _RewardXP(Player* player, float rate);
-    void _RewardReputation(Player* player, float rate);
+    void _RewardReputation(Player* player);
     void _RewardKillCredit(Player* player);
     void _RewardPlayer(Player* player, bool isDungeon);
     void _RewardGroup();

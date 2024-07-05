@@ -22,7 +22,6 @@
 #include "GameGraveyard.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Map.h"
@@ -32,6 +31,12 @@
 #include "ObjectMgr.h"
 #include "Transport.h"
 #include "WorldPacket.h"
+
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 Battlefield::Battlefield()
 {
@@ -87,7 +92,7 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
                 InvitePlayerToWar(player);
             else // No more vacant places
             {
-                // TODO: Send a packet to announce it to player
+                /// @todo: Send a packet to announce it to player
                 m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + (player->IsGameMaster() ? 30 * MINUTE : 10);
                 InvitePlayerToQueue(player);
             }
@@ -273,7 +278,7 @@ void Battlefield::InvitePlayerToWar(Player* player)
     if (!player)
         return;
 
-    // TODO : needed ?
+    /// @todo : needed ?
     if (player->IsInFlight())
         return;
 
@@ -284,7 +289,7 @@ void Battlefield::InvitePlayerToWar(Player* player)
     }
 
     // If the player does not match minimal level requirements for the battlefield, kick him
-    if (player->getLevel() < m_MinLevel)
+    if (player->GetLevel() < m_MinLevel)
     {
         if (m_PlayersWillBeKick[player->GetTeamId()].count(player->GetGUID()) == 0)
             m_PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + 10;
@@ -917,10 +922,13 @@ void BfCapturePoint::SendChangePhase()
             }
 }
 
-bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
+bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint, TeamId team)
 {
     ASSERT(capturePoint);
 
+    //At first call using TEAM_NEUTRAL as a checker but never using it, after first call we reset the capturepoints to the new winner of the last WG war
+    if (team == TEAM_NEUTRAL)
+        team = m_team;
     LOG_DEBUG("bg.battlefield", "Creating capture point {}", capturePoint->GetEntry());
 
     m_capturePoint = capturePoint->GetGUID();
@@ -939,7 +947,7 @@ bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint)
     m_neutralValuePct = goinfo->capturePoint.neutralPercent;
     m_minValue = m_maxValue * goinfo->capturePoint.neutralPercent / 100;
     m_capturePointEntry = capturePoint->GetEntry();
-    if (m_team == TEAM_ALLIANCE)
+    if (team == TEAM_ALLIANCE)
     {
         m_value = m_maxValue;
         m_State = BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE;

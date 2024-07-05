@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "blackrock_spire.h"
 
@@ -67,12 +67,12 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
-            events.ScheduleEvent(SPELL_REND, urand(17000, 20000));
-            events.ScheduleEvent(SPELL_STRIKE, urand(10000, 12000));
-            events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, urand(25000, 30000));
+            _JustEngagedWith();
+            events.ScheduleEvent(SPELL_REND, 17s, 20s);
+            events.ScheduleEvent(SPELL_STRIKE, 10s, 12s);
+            events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, 25s, 30s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -91,15 +91,15 @@ public:
                 {
                     case SPELL_REND:
                         DoCastVictim(SPELL_REND);
-                        events.ScheduleEvent(SPELL_REND, urand(8000, 10000));
+                        events.ScheduleEvent(SPELL_REND, 8s, 10s);
                         break;
                     case SPELL_STRIKE:
                         DoCastVictim(SPELL_STRIKE);
-                        events.ScheduleEvent(SPELL_STRIKE, urand(8000, 10000));
+                        events.ScheduleEvent(SPELL_STRIKE, 8s, 10s);
                         break;
                     case SPELL_INTIMIDATING_ROAR:
                         DoCastVictim(SPELL_INTIMIDATING_ROAR);
-                        events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, urand(40000, 45000));
+                        events.ScheduleEvent(SPELL_INTIMIDATING_ROAR, 40s, 45s);
                         break;
                     default:
                         break;

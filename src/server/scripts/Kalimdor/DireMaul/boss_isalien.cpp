@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "dire_maul.h"
@@ -87,9 +87,9 @@ struct boss_isalien : public BossAI
         summons.Summon(summon);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         _scheduler.Schedule(4s, 5s, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_NET);

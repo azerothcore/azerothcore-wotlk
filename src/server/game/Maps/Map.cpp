@@ -24,7 +24,6 @@
 #include "GameTime.h"
 #include "Geometry.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "LFGMgr.h"
@@ -39,7 +38,6 @@
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "VMapFactory.h"
-#include "VMapMgr2.h"
 #include "Vehicle.h"
 #include "Weather.h"
 
@@ -646,7 +644,7 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
                 UpdateData data;
                 obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
                 WorldPacket packet;
-                data.BuildPacket(&packet);
+                data.BuildPacket(packet);
                 itr->GetSource()->SendDirectMessage(&packet);
             }
         }
@@ -704,9 +702,6 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::Objec
     if (!obj->IsPositionValid())
         return;
 
-    if (obj->GetGridActivationRange() <= 0.0f) // pussywizard: gameobjects for example are on active lists, but range is equal to 0 (they just prevent grid unloading)
-        return;
-
     // Update mobs/objects in ALL visible cells around object!
     CellArea area = Cell::CalculateCellArea(obj->GetPositionX(), obj->GetPositionY(), obj->GetGridActivationRange());
 
@@ -755,6 +750,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
             session->Update(s_diff, updater);
         }
     }
+
+    _creatureRespawnScheduler.Update(t_diff);
 
     if (!t_diff)
     {
@@ -971,7 +968,7 @@ void Map::RemoveFromMap(MotionTransport* obj, bool remove)
         UpdateData data;
         obj->BuildOutOfRangeUpdateBlock(&data);
         WorldPacket packet;
-        data.BuildPacket(&packet);
+        data.BuildPacket(packet);
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (itr->GetSource()->GetTransport() != obj)
                 itr->GetSource()->SendDirectMessage(&packet);
@@ -1269,7 +1266,7 @@ void Map::RemoveAllPlayers()
             {
                 // this is happening for bg
                 LOG_ERROR("maps", "Map::UnloadAll: player {} is still in map {} during unload, this should not happen!", player->GetName(), GetId());
-                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
+                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
             }
         }
     }
@@ -2448,6 +2445,14 @@ bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, floa
         }
     }
 
+    if (!sWorld->getBoolConfig(CONFIG_VMAP_BLIZZLIKE_LOS_OPEN_WORLD))
+    {
+        if (IsWorldMap())
+        {
+            ignoreFlags = VMAP::ModelIgnoreFlags::Nothing;
+        }
+    }
+
     if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, ignoreFlags))
     {
         return false;
@@ -2525,6 +2530,7 @@ void Map::SendInitSelf(Player* player)
 {
     LOG_DEBUG("maps", "Creating player data for himself {}", player->GetGUID().ToString());
 
+    WorldPacket packet;
     UpdateData data;
 
     // attach to player data current transport data
@@ -2534,15 +2540,25 @@ void Map::SendInitSelf(Player* player)
     // build data for self presence in world at own client (one time for map)
     player->BuildCreateUpdateBlockForPlayer(&data, player);
 
+    // build and send self update packet before sending to player his own auras
+    data.BuildPacket(packet);
+    player->SendDirectMessage(&packet);
+
+    // send to player his own auras (this is needed here for timely initialization of some fields on client)
+    player->GetAurasForTarget(player, true);
+
+    // clean buffers for further work
+    packet.clear();
+    data.Clear();
+
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
     if (Transport* transport = player->GetTransport())
         for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
             if (player != (*itr) && player->HaveAtClient(*itr))
                 (*itr)->BuildCreateUpdateBlockForPlayer(&data, player);
 
-    WorldPacket packet;
-    data.BuildPacket(&packet);
-    player->GetSession()->SendPacket(&packet);
+    data.BuildPacket(packet);
+    player->SendDirectMessage(&packet);
 }
 
 void Map::SendInitTransports(Player* player)
@@ -2554,7 +2570,7 @@ void Map::SendInitTransports(Player* player)
             (*itr)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
     WorldPacket packet;
-    transData.BuildPacket(&packet);
+    transData.BuildPacket(packet);
     player->GetSession()->SendPacket(&packet);
 }
 
@@ -2579,7 +2595,7 @@ void Map::SendRemoveTransports(Player* player)
     }
 
     WorldPacket packet;
-    transData.BuildPacket(&packet);
+    transData.BuildPacket(packet);
     player->GetSession()->SendPacket(&packet);
 }
 
@@ -2610,7 +2626,7 @@ void Map::SendObjectUpdates()
     WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
     for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
-        iter->second.BuildPacket(&packet);
+        iter->second.BuildPacket(packet);
         iter->first->GetSession()->SendPacket(&packet);
         packet.clear();                                     // clean the string
     }
@@ -2854,6 +2870,9 @@ void InstanceMap::InitVisibilityDistance()
         case 724: // Ruby Sanctum
             m_VisibleDistance = 200.0f;
             break;
+        case 531: // Ahn'Qiraj Temple
+            m_VisibleDistance = 300.0f;
+            break;
     }
 }
 
@@ -3022,7 +3041,10 @@ void InstanceMap::RemovePlayerFromMap(Player* player, bool remove)
     //if (!m_unloadTimer && m_mapRefMgr.getSize() == 1)
     //    m_unloadTimer = m_unloadWhenEmpty ? MIN_UNLOAD_DELAY : std::max(sWorld->getIntConfig(CONFIG_INSTANCE_UNLOAD_DELAY), (uint32)MIN_UNLOAD_DELAY);
     Map::RemovePlayerFromMap(player, remove);
-    player->SetPendingBind(0, 0);
+
+    // If remove == true - player already deleted.
+    if (!remove)
+        player->SetPendingBind(0, 0);
 }
 
 void InstanceMap::AfterPlayerUnlinkFromMap()
@@ -3041,7 +3063,7 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
 
     bool isOtherAI = false;
 
-    sScriptMgr->OnBeforeCreateInstanceScript(this, instance_data, load, data, completedEncounterMask);
+    sScriptMgr->OnBeforeCreateInstanceScript(this, &instance_data, load, data, completedEncounterMask);
 
     if (instance_data)
         isOtherAI = true;
@@ -3073,6 +3095,8 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
         if (data != "")
             instance_data->Load(data.c_str());
     }
+
+    instance_data->LoadInstanceSavedGameobjectStateData();
 }
 
 /*
@@ -3680,6 +3704,17 @@ void Map::RemoveOldCorpses()
     }
 }
 
+void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer)
+{
+    _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid](TaskContext)
+    {
+        if (Creature* creature = GetCreature(creatureGuid))
+        {
+            creature->Respawn();
+        }
+    });
+}
+
 void Map::SendZoneDynamicInfo(Player* player)
 {
     uint32 zoneId = player->GetZoneId();
@@ -3806,7 +3841,7 @@ void Map::DoForAllPlayers(std::function<void(Player*)> exec)
 bool Map::CanReachPositionAndGetValidCoords(WorldObject const* source, PathGenerator *path, float &destX, float &destY, float &destZ, bool failOnCollision, bool failOnSlopes) const
 {
     G3D::Vector3 prevPath = path->GetStartPosition();
-    for (auto & vector : path->GetPath())
+    for (auto& vector : path->GetPath())
     {
         float x = vector.x;
         float y = vector.y;

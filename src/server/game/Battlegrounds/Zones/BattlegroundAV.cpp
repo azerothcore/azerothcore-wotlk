@@ -26,7 +26,6 @@
 #include "Player.h"
 #include "SpellAuras.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 void BattlegroundAVScore::BuildObjectivesBlock(WorldPacket& data)
 {
@@ -326,7 +325,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
     if (!creature)
         return nullptr;
     if (creature->GetEntry() == BG_AV_CreatureInfo[AV_NPC_A_CAPTAIN] || creature->GetEntry() == BG_AV_CreatureInfo[AV_NPC_H_CAPTAIN])
-        creature->SetRespawnDelay(RESPAWN_ONE_DAY); // TODO: look if this can be done by database + also add this for the wingcommanders
+        creature->SetRespawnDelay(RESPAWN_ONE_DAY); /// @todo: look if this can be done by database + also add this for the wingcommanders
 
     if ((isStatic && cinfoid >= 10 && cinfoid <= 14) || (!isStatic && ((cinfoid >= AV_NPC_A_GRAVEDEFENSE0 && cinfoid <= AV_NPC_A_GRAVEDEFENSE3) ||
             (cinfoid >= AV_NPC_H_GRAVEDEFENSE0 && cinfoid <= AV_NPC_H_GRAVEDEFENSE3))))
@@ -340,7 +339,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
         //else wander_distance will be 15, so creatures move maximum=10
         //creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
         creature->GetMotionMaster()->Initialize();
-        creature->setDeathState(JUST_DIED);
+        creature->setDeathState(DeathState::JustDied);
         creature->Respawn();
         //TODO: find a way to add a motionmaster without killing the creature (i
         //just copied this code from a gm-command
@@ -650,9 +649,9 @@ void BattlegroundAV::EventPlayerDestroyedPoint(BG_AV_Nodes node)
     //send a nice message to all :)
     char buf[256];
     if (IsTower(node))
-        sprintf(buf, GetAcoreString(LANG_BG_AV_TOWER_TAKEN), GetNodeName(node), (ownerId == TEAM_ALLIANCE) ? GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
+        snprintf(buf, sizeof(buf), GetAcoreString(LANG_BG_AV_TOWER_TAKEN), GetNodeName(node), (ownerId == TEAM_ALLIANCE) ? GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
     else
-        sprintf(buf, GetAcoreString(LANG_BG_AV_GRAVE_TAKEN), GetNodeName(node), (ownerId == TEAM_ALLIANCE) ? GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
+        snprintf(buf, sizeof(buf), GetAcoreString(LANG_BG_AV_GRAVE_TAKEN), GetNodeName(node), (ownerId == TEAM_ALLIANCE) ? GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
 
     Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
     if (creature)
@@ -729,7 +728,7 @@ void BattlegroundAV::ChangeMineOwner(uint8 mine, TeamId teamId, bool initial)
     {
         m_Mine_Reclaim_Timer[mine] = AV_MINE_RECLAIM_TIMER;
         char buf[256];
-        sprintf(buf, GetAcoreString(LANG_BG_AV_MINE_TAKEN), (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE),
+        snprintf(buf, sizeof(buf), GetAcoreString(LANG_BG_AV_MINE_TAKEN), (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE),
                 GetAcoreString((mine == AV_NORTH_MINE) ? LANG_BG_AV_MINE_NORTH : LANG_BG_AV_MINE_SOUTH));
         Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
         if (creature)
@@ -983,7 +982,7 @@ void BattlegroundAV::EventPlayerDefendsPoint(Player* player, uint32 object)
     }
     //send a nice message to all :)
     char buf[256];
-    sprintf(buf, GetAcoreString((IsTower(node)) ? LANG_BG_AV_TOWER_DEFENDED : LANG_BG_AV_GRAVE_DEFENDED), GetNodeName(node), (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
+    snprintf(buf, sizeof(buf), GetAcoreString((IsTower(node)) ? LANG_BG_AV_TOWER_DEFENDED : LANG_BG_AV_GRAVE_DEFENDED), GetNodeName(node), (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
     Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
     if (creature)
         YellToAll(creature, buf, LANG_UNIVERSAL);
@@ -1095,7 +1094,7 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
 
     //send a nice message to all :)
     char buf[256];
-    sprintf(buf, (IsTower(node)) ? GetAcoreString(LANG_BG_AV_TOWER_ASSAULTED) : GetAcoreString(LANG_BG_AV_GRAVE_ASSAULTED), GetNodeName(node),  (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
+    snprintf(buf, sizeof(buf), (IsTower(node)) ? GetAcoreString(LANG_BG_AV_TOWER_ASSAULTED) : GetAcoreString(LANG_BG_AV_GRAVE_ASSAULTED), GetNodeName(node),  (teamId == TEAM_ALLIANCE) ?  GetAcoreString(LANG_BG_AV_ALLY) : GetAcoreString(LANG_BG_AV_HORDE));
     Creature* creature = GetBGCreature(AV_CPLACE_HERALD);
     if (creature)
         YellToAll(creature, buf, LANG_UNIVERSAL);
@@ -1350,6 +1349,26 @@ bool BattlegroundAV::SetupBattleground()
                 return false;
         }
 
+    // Generic gameobjects
+    for (uint16 i = 0; i <= (BG_AV_OBJECT_GENERIC_MAX - BG_AV_OBJECT_GENERIC_MIN); i++)
+    {
+        if (!AddObject(BG_AV_OBJECT_GENERIC_MIN + i,
+            std::get<0>(BG_AV_GenericObjectPos[i]),
+            std::get<1>(BG_AV_GenericObjectPos[i]).GetPositionX(),
+            std::get<1>(BG_AV_GenericObjectPos[i]).GetPositionY(),
+            std::get<1>(BG_AV_GenericObjectPos[i]).GetPositionZ(),
+            std::get<1>(BG_AV_GenericObjectPos[i]).GetOrientation(),
+            std::get<2>(BG_AV_GenericObjectPos[i])[0],
+            std::get<2>(BG_AV_GenericObjectPos[i])[1],
+            std::get<2>(BG_AV_GenericObjectPos[i])[2],
+            std::get<2>(BG_AV_GenericObjectPos[i])[3],
+            RESPAWN_ONE_DAY))
+        {
+            LOG_ERROR("bg.battleground", "BatteGroundAV: Failed to spawn some object Battleground not created!10.{}", i);
+            return false;
+        }
+    }
+
     // Quest banners
     if (!AddObject(BG_AV_OBJECT_FROSTWOLF_BANNER, BG_AV_OBJECTID_FROSTWOLF_BANNER, BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][0], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][1], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][2], BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3], 0, 0, std::sin(BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3] / 2), cos(BG_AV_ObjectPos[AV_OPLACE_FROSTWOLF_BANNER][3] / 2), RESPAWN_ONE_DAY))
     {
@@ -1404,6 +1423,10 @@ bool BattlegroundAV::SetupBattleground()
     if (IsHolidayActive(HOLIDAY_FEAST_OF_WINTER_VEIL))
         for (i = BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN ; i <= BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX; i++)
             SpawnBGObject(i, RESPAWN_IMMEDIATELY);
+
+    // Generic gameobjects
+    for (uint16 i = BG_AV_OBJECT_GENERIC_MIN; i <= BG_AV_OBJECT_GENERIC_MAX; i++)
+        SpawnBGObject(i, RESPAWN_IMMEDIATELY);
 
     // Quest banners
     SpawnBGObject(BG_AV_OBJECT_FROSTWOLF_BANNER, RESPAWN_IMMEDIATELY);
@@ -1579,7 +1602,7 @@ void BattlegroundAV::ResetBGSubclass()
 
 bool BattlegroundAV::IsBothMinesControlledByTeam(TeamId teamId) const
 {
-    for (auto mine : m_Mine_Owner)
+    for (auto& mine : m_Mine_Owner)
         if (mine != teamId)
             return false;
 

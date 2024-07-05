@@ -299,11 +299,13 @@ public:
     void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);   // used for quest and scripted timed achievements
 
     void RemoveCriteriaProgress(AchievementCriteriaEntry const* entry);
+    CriteriaProgress* GetCriteriaProgress(AchievementCriteriaEntry const* entry);
+    CompletedAchievementMap const& GetCompletedAchievements();
+
 private:
     enum ProgressType { PROGRESS_SET, PROGRESS_ACCUMULATE, PROGRESS_HIGHEST, PROGRESS_RESET };
     void SendAchievementEarned(AchievementEntry const* achievement) const;
     void SendCriteriaUpdate(AchievementCriteriaEntry const* entry, CriteriaProgress const* progress, uint32 timeElapsed, bool timedCompleted) const;
-    CriteriaProgress* GetCriteriaProgress(AchievementCriteriaEntry const* entry);
     void SetCriteriaProgress(AchievementCriteriaEntry const* entry, uint32 changeValue, ProgressType ptype = PROGRESS_SET);
     void CompletedCriteriaFor(AchievementEntry const* achievement);
     bool IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement);
@@ -328,6 +330,7 @@ public:
 
     bool IsStatisticCriteria(AchievementCriteriaEntry const* achievementCriteria) const;
     bool IsStatisticAchievement(AchievementEntry const* achievement) const;
+    bool IsAverageCriteria(AchievementCriteriaEntry const* criteria) const;
 
     [[nodiscard]] AchievementCriteriaEntryList const* GetAchievementCriteriaByType(AchievementCriteriaTypes type) const
     {

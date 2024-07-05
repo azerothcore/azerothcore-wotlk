@@ -26,8 +26,8 @@ EndScriptData */
 npc_professor_phizzlethorpe
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 
@@ -107,7 +107,7 @@ public:
             summoned->AI()->AttackStart(me);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_AGGRO);
         }

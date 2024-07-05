@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "obsidian_sanctum.h"
 
 enum Says
@@ -81,6 +82,7 @@ enum Spells
     SPELL_SARTHARION_FLAME_BREATH               = 56908,
     SPELL_SARTHARION_TAIL_LASH                  = 56910,
     SPELL_CYCLONE_AURA_PERIODIC                 = 57598,
+    SPELL_LAVA_STRIKE_DUMMY                     = 57578,
     SPELL_LAVA_STRIKE_DUMMY_TRIGGER             = 57697,
     SPELL_LAVA_STRIKE_SUMMON                    = 57572,
     SPELL_SARTHARION_PYROBUFFET                 = 56916,
@@ -101,6 +103,7 @@ enum Spells
     // Misc
     SPELL_FADE_ARMOR                            = 60708,
     SPELL_FLAME_TSUNAMI_DAMAGE_AURA             = 57492,
+    SPELL_FLAME_TSUNAMI_LEAP                    = 60241,
     SPELL_SARTHARION_PYROBUFFET_TRIGGER         = 57557,
 };
 
@@ -278,7 +281,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* pWho) override
+        void JustEngagedWith(Unit* pWho) override
         {
             if (pWho && !IsTargetInBounds(pWho))
             {
@@ -286,20 +289,20 @@ public:
                 return;
             }
 
-            _EnterCombat();
+            _JustEngagedWith();
             DoCastSelf(SPELL_SARTHARION_PYROBUFFET, true);
             Talk(SAY_SARTHARION_AGGRO);
 
             // Combat events
-            events.ScheduleEvent(EVENT_SARTHARION_CAST_CLEAVE, 7000);
-            events.ScheduleEvent(EVENT_SARTHARION_CAST_FLAME_BREATH, 15000);
-            events.ScheduleEvent(EVENT_SARTHARION_CAST_TAIL_LASH, 11000);
+            events.ScheduleEvent(EVENT_SARTHARION_CAST_CLEAVE, 7s);
+            events.ScheduleEvent(EVENT_SARTHARION_CAST_FLAME_BREATH, 15s);
+            events.ScheduleEvent(EVENT_SARTHARION_CAST_TAIL_LASH, 11s);
 
             // Extra events
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_SUMMON_LAVA, 20000);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5000);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 900000);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 250);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_SUMMON_LAVA, 20s);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_LAVA_STRIKE, 5s);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_BERSERK, 15min);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_BOUNDARY, 250ms);
 
             // Store dragons
             for (uint8 i = 0; i < MAX_DRAGONS; ++i)
@@ -321,19 +324,19 @@ public:
                     case DATA_TENEBRON:
                     {
                         dragon->CastSpell(dragon, SPELL_POWER_OF_TENEBRON, true);
-                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_TENEBRON, 10000);
+                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_TENEBRON, 10s);
                         break;
                     }
                     case DATA_SHADRON:
                     {
                         dragon->CastSpell(dragon, SPELL_POWER_OF_SHADRON, true);
-                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_SHADRON, 65000);
+                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_SHADRON, 65s);
                         break;
                     }
                     case DATA_VESPERON:
                     {
                         dragon->CastSpell(dragon, SPELL_POWER_OF_VESPERON, true);
-                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_VESPERON, 115000);
+                        extraEvents.ScheduleEvent(EVENT_SARTHARION_CALL_VESPERON, 115s);
                         break;
                     }
                 }
@@ -469,7 +472,7 @@ public:
                         }
                         else
                         {
-                            extraEvents.RepeatEvent(250);
+                            extraEvents.Repeat(250ms);
                         }
                         break;
                     }
@@ -481,7 +484,7 @@ public:
                         }
 
                         SummonLavaWaves();
-                        extraEvents.RepeatEvent(25000);
+                        extraEvents.Repeat(25s);
                         return;
                     }
                     case EVENT_SARTHARION_START_LAVA:
@@ -542,19 +545,19 @@ public:
                     case EVENT_SARTHARION_CAST_CLEAVE:
                     {
                         DoCastVictim(SPELL_SARTHARION_CLEAVE, false);
-                        events.RepeatEvent(10000);
+                        events.Repeat(10s);
                         break;
                     }
                     case EVENT_SARTHARION_CAST_FLAME_BREATH:
                     {
                         DoCastVictim(SPELL_SARTHARION_FLAME_BREATH, false);
-                        events.RepeatEvent(20000);
+                        events.Repeat(20s);
                         break;
                     }
                     case EVENT_SARTHARION_CAST_TAIL_LASH:
                     {
                         DoCastSelf(SPELL_SARTHARION_TAIL_LASH, false);
-                        events.RepeatEvent(18000);
+                        events.Repeat(18s);
                         break;
                     }
                     case EVENT_SARTHARION_LAVA_STRIKE:
@@ -617,8 +620,8 @@ public:
         {
             summons.RemoveNotExisting();
             Talk(WHISPER_LAVA_CHURN);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 2000);
-            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 9000);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 2s);
+            extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 9s);
 
             // Send wave from left
             if (lastLavaSide == LAVA_RIGHT_SIDE)
@@ -743,7 +746,7 @@ struct boss_sartharion_dragonAI : public BossAI
         if (param == ACTION_CALL_DRAGON && !isCalledBySartharion)
         {
             isCalledBySartharion = true;
-            extraEvents.RescheduleEvent(EVENT_MINIDRAKE_SPEECH, 4000);
+            extraEvents.RescheduleEvent(EVENT_MINIDRAKE_SPEECH, 4s);
         }
     }
 
@@ -808,7 +811,7 @@ struct boss_sartharion_dragonAI : public BossAI
         BossAI::JustSummoned(summon);
     }
 
-    void EnterCombat(Unit* /*who*/) final
+    void JustEngagedWith(Unit* /*who*/) final
     {
         me->setActive(true);
         DoZoneInCombat();
@@ -874,7 +877,7 @@ struct boss_sartharion_dragonAI : public BossAI
                 Talk(SAY_TENEBRON_DEATH);
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
                 {
-                    instance->SetBossState(DATA_SHADRON, DONE);
+                    instance->SetBossState(DATA_TENEBRON, DONE);
                 }
                 break;
             }
@@ -1037,9 +1040,9 @@ public:
                 summons2.DespawnAll();
             }
 
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20000);
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10000);
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15000);
+            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
+            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
+            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15s);
         }
 
         void JustSummoned(Creature* summon) override
@@ -1112,8 +1115,8 @@ public:
                         instance->DoAction(ACTION_ADD_PORTAL);
                     }
 
-                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
-                    events.RepeatEvent(60000);
+                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2s);
+                    events.Repeat(60s);
                     break;
                 }
                 case EVENT_MINIBOSS_SPAWN_HELPERS:
@@ -1135,7 +1138,7 @@ public:
                         }
                     }
 
-                    events.ScheduleEvent(EVENT_MINIBOSS_HATCH_EGGS, 25000);
+                    events.ScheduleEvent(EVENT_MINIBOSS_HATCH_EGGS, 25s);
                     break;
                 }
                 case EVENT_MINIBOSS_HATCH_EGGS:
@@ -1215,9 +1218,9 @@ public:
         void Reset() override
         {
             boss_sartharion_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20000);
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10000);
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15000);
+            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
+            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
+            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 15s);
         }
 
         void SummonedCreatureDies(Creature* /*summon*/, Unit* /*summon*/) override
@@ -1241,7 +1244,7 @@ public:
                 me->RemoveAura(SPELL_GIFT_OF_TWILIGHT_SHADOW);
             }
 
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30000);
+            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
         }
 
         void HandleExtraEvent(uint32 const eventId) override
@@ -1295,7 +1298,7 @@ public:
                         instance->DoAction(ACTION_ADD_PORTAL);
                     }
 
-                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
+                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2s);
                     break;
                 }
                 case EVENT_MINIBOSS_SPAWN_HELPERS:
@@ -1305,7 +1308,7 @@ public:
 
                     if (Creature* acolyte = me->SummonCreature((isCalledBySartharion ? NPC_ACOLYTE_OF_SHADRON : NPC_DISCIPLE_OF_SHADRON), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation()))
                     {
-                        // TODO: inpect JustSummoned
+                        /// @todo: inpect JustSummoned
                         summons.Summon(acolyte);
                         acolyte->SetPhaseMask(16, true);
                     }
@@ -1340,9 +1343,9 @@ public:
         void Reset() override
         {
             boss_sartharion_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20000);
-            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10000);
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30000);
+            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_FISSURE, 20s);
+            events.ScheduleEvent(EVENT_MINIBOSS_SHADOW_BREATH, 10s);
+            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
         }
 
         void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
@@ -1357,7 +1360,7 @@ public:
                 instance->DoAction(ACTION_CLEAR_PORTAL);
             }
 
-            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30000);
+            events.ScheduleEvent(EVENT_MINIBOSS_OPEN_PORTAL, 30s);
         }
 
         void HandleExtraEvent(uint32 const eventId) override
@@ -1383,7 +1386,7 @@ public:
                     }
 
                     DoCastVictim(SPELL_SHADOW_BREATH, false);
-                    events.RepeatEvent(17500);
+                    events.Repeat(17s + 500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_SHADOW_FISSURE:
@@ -1393,7 +1396,7 @@ public:
                         DoCast(target, SPELL_SHADOW_FISSURE, false);
                     }
 
-                    events.RepeatEvent(22500);
+                    events.Repeat(22s + 500ms);
                     break;
                 }
                 case EVENT_MINIBOSS_OPEN_PORTAL:
@@ -1412,7 +1415,7 @@ public:
                         instance->DoAction(ACTION_ADD_PORTAL);
                     }
 
-                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2000);
+                    events.ScheduleEvent(EVENT_MINIBOSS_SPAWN_HELPERS, 2s);
                     break;
                 }
                 case EVENT_MINIBOSS_SPAWN_HELPERS:
@@ -1511,65 +1514,107 @@ public:
     };
 };
 
-class spell_sartharion_lava_strike : public SpellScriptLoader
+class spell_sartharion_lava_strike : public SpellScript
 {
-public:
-    spell_sartharion_lava_strike() : SpellScriptLoader("spell_sartharion_lava_strike") {}
+    PrepareSpellScript(spell_sartharion_lava_strike);
 
-    class spell_sartharion_lava_strike_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_sartharion_lava_strike_SpellScript);
+        return ValidateSpellInfo({ SPELL_LAVA_STRIKE_SUMMON, SPELL_LAVA_STRIKE_DUMMY_TRIGGER });
+    }
 
-        bool spawned;
-
-        bool Load() override
-        {
-            spawned = false;
-            return true;
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (!GetCaster() || !GetHitUnit())
-                return;
-
-            GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ(), SPELL_LAVA_STRIKE_DUMMY_TRIGGER, true);
-        }
-
-        void HandleSchoolDamage(SpellEffIndex /*effIndex*/)
-        {
-            if (!GetCaster() || !GetHitUnit() || spawned)
-            {
-                return;
-            }
-
-            if (InstanceScript* pInstance = GetCaster()->GetInstanceScript())
-            {
-                if (Creature* sarth = ObjectAccessor::GetCreature(*GetHitUnit(), pInstance->GetGuidData(DATA_SARTHARION)))
-                {
-                    sarth->AI()->SetData(DATA_VOLCANO_BLOWS, GetHitUnit()->GetGUID().GetCounter());
-                    sarth->CastSpell(GetHitUnit(), SPELL_LAVA_STRIKE_SUMMON, true);
-                    spawned = true;
-                }
-            }
-        }
-
-        void Register() override
-        {
-            if (m_scriptSpellId == 57578) // Dummy lava strike
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-            }
-            else
-            {
-                OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-            }
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_sartharion_lava_strike_SpellScript();
+        _spawned = false;
+        return true;
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster() || !GetHitUnit())
+        {
+            return;
+        }
+
+        GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ(), SPELL_LAVA_STRIKE_DUMMY_TRIGGER, true);
+    }
+
+    void HandleSchoolDamage(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster() || !GetHitUnit() || _spawned)
+        {
+            return;
+        }
+
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+        {
+            if (Creature* sarth = ObjectAccessor::GetCreature(*GetHitUnit(), instance->GetGuidData(DATA_SARTHARION)))
+            {
+                sarth->AI()->SetData(DATA_VOLCANO_BLOWS, GetHitUnit()->GetGUID().GetCounter());
+                sarth->CastSpell(GetHitUnit(), SPELL_LAVA_STRIKE_SUMMON, true);
+                _spawned = true;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        if (m_scriptSpellId == SPELL_LAVA_STRIKE_DUMMY)
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        }
+        else
+        {
+            OnEffectHitTarget += SpellEffectFn(spell_sartharion_lava_strike::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        }
+    }
+
+private:
+    bool _spawned;
+};
+
+// 57491 - Flame Tsunami
+class spell_obsidian_sanctum_flame_tsunami : public SpellScript
+{
+    PrepareSpellScript(spell_obsidian_sanctum_flame_tsunami);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FLAME_TSUNAMI_LEAP });
+    }
+
+    void HandleHit(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            if (!target->HasAura(SPELL_FLAME_TSUNAMI_LEAP))
+            {
+                target->CastSpell(target, SPELL_FLAME_TSUNAMI_LEAP, true);
+                bool isFacingSouth = std::fabs(GetCaster()->GetOrientation() - M_PI) < M_PI / 4;
+                target->KnockbackFrom(isFacingSouth ? 3283.44f : 3208.44f , target->GetPositionY(), 12.5f, 9.0f);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_obsidian_sanctum_flame_tsunami::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
+// 60241 - Flame Tsunami
+class spell_obsidian_sanctum_flame_tsunami_leap : public SpellScript
+{
+    PrepareSpellScript(spell_obsidian_sanctum_flame_tsunami_leap);
+
+    void HandleLeapBack(SpellEffIndex effIndex)
+    {
+        PreventHitEffect(effIndex);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_obsidian_sanctum_flame_tsunami_leap::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
     }
 };
 
@@ -1580,6 +1625,7 @@ void AddSC_boss_sartharion()
     new boss_sartharion_tenebron();
     new boss_sartharion_vesperon();
     new npc_twilight_summon();
-
-    new spell_sartharion_lava_strike();
+    RegisterSpellScript(spell_sartharion_lava_strike);
+    RegisterSpellScript(spell_obsidian_sanctum_flame_tsunami);
+    RegisterSpellScript(spell_obsidian_sanctum_flame_tsunami_leap);
 }

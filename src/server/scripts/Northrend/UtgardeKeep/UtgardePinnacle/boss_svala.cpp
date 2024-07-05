@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "utgarde_pinnacle.h"
 
 enum Misc
@@ -175,14 +176,14 @@ public:
                 summon->CastSpell(summon, SPELL_TELEPORT_VISUAL, true);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             me->SetInCombatWithZone();
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_SORROWGRAVE_SS, 3000);
-            events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 11000);
-            events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL, 25000);
+            events.ScheduleEvent(EVENT_SORROWGRAVE_SS, 3s);
+            events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 11s);
+            events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL, 25s);
 
             if (instance)
                 instance->SetData(DATA_SVALA_SORROWGRAVE, IN_PROGRESS);
@@ -215,25 +216,25 @@ public:
             {
                 case EVENT_SVALA_START:
                     Talk(TALK_INTRO_S1);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK1, 8000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK1, 8s);
                     break;
                 case EVENT_SVALA_TALK1:
                     if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                         Arthas->AI()->Talk(TALK_INTRO_A1);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK2, 9000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK2, 9s);
                     break;
                 case EVENT_SVALA_TALK2:
                     if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                         Arthas->CastSpell(me, SPELL_ARTHAS_TRANSFORMING_SVALA, false);
                     me->CastSpell(me, SPELL_SVALA_TRANSFORMING2, true);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK3, 3000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
                     me->SetHover(true);
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                    events2.ScheduleEvent(30, 1000);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK4, 9000);
+                    events2.ScheduleEvent(30, 1s);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK4, 9s);
                     break;
                 case 30:
                     {
@@ -253,7 +254,7 @@ public:
                             Arthas->InterruptNonMeleeSpells(false);
                         me->RemoveAllAuras();
                         me->SetWalk(false);
-                        events2.ScheduleEvent(EVENT_SVALA_TALK5, 2000);
+                        events2.ScheduleEvent(EVENT_SVALA_TALK5, 2s);
 
                         std::list<Creature*> creatureList;
                         me->GetCreaturesWithEntryInRange(creatureList, 100.0f, NPC_DRAGONFLAYER_SPECTATOR);
@@ -264,23 +265,23 @@ public:
                     }
                 case EVENT_SVALA_TALK5:
                     Talk(TALK_INTRO_S2);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK6, 12000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK6, 12s);
                     break;
                 case EVENT_SVALA_TALK6:
                     if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                         Arthas->AI()->Talk(TALK_INTRO_A2);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK7, 9000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK7, 9s);
                     break;
                 case EVENT_SVALA_TALK7:
                     me->SetFacingTo(M_PI / 2.0f);
                     Talk(TALK_INTRO_S3);
                     if (GameObject* mirror = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_SVALA_MIRROR)))
                         mirror->SetGoState(GO_STATE_ACTIVE);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK8, 13000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
                     me->GetMotionMaster()->MoveFall(0, true);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK9, 2000);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK9, 2s);
                     break;
                 case EVENT_SVALA_TALK9:
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
@@ -303,14 +304,14 @@ public:
             {
                 case EVENT_SORROWGRAVE_SS:
                     me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SINSTER_STRIKE_H : SPELL_SINSTER_STRIKE_N, false);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_SS, urand(3000, 5000));
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_SS, 3s, 5s);
                     break;
                 case EVENT_SORROWGRAVE_FLAMES:
                     summons.DespawnAll();
                     me->CastSpell(me, SPELL_CALL_FLAMES, false);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 500);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 1000);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, urand(8000, 12000));
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 500ms);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES2, 1s);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FLAMES, 8s, 12s);
                     break;
                 case EVENT_SORROWGRAVE_FLAMES2:
                     {
@@ -342,8 +343,8 @@ public:
                     }
 
                     events.DelayEvents(25001); // +1 just to be sure
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL_SPELLS, 0);
-                    events.ScheduleEvent(EVENT_SORROWGRAVE_FINISH_RITUAL, 25000);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_RITUAL_SPELLS, 0ms);
+                    events.ScheduleEvent(EVENT_SORROWGRAVE_FINISH_RITUAL, 25s);
                     return;
                 case EVENT_SORROWGRAVE_RITUAL_SPELLS:
                     //me->CastSpell(me, SPELL_RITUAL_OF_THE_SWORD, false);
@@ -395,56 +396,40 @@ public:
     };
 };
 
-class spell_svala_ritual_strike : public SpellScriptLoader
+class spell_svala_ritual_strike : public SpellScript
 {
-public:
-    spell_svala_ritual_strike() : SpellScriptLoader("spell_svala_ritual_strike") { }
+    PrepareSpellScript(spell_svala_ritual_strike);
 
-    class spell_svala_ritual_strike_SpellScript : public SpellScript
+    void HandleDummyEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_svala_ritual_strike_SpellScript);
-
-        void HandleDummyEffect(SpellEffIndex /*effIndex*/)
+        if (Unit* unitTarget = GetHitUnit())
         {
-            if (Unit* unitTarget = GetHitUnit())
-            {
-                if (unitTarget->GetTypeId() != TYPEID_UNIT)
-                    return;
+            if (unitTarget->GetTypeId() != TYPEID_UNIT)
+                return;
 
-                Unit::DealDamage(GetCaster(), unitTarget, 7000, nullptr, DIRECT_DAMAGE);
-            }
+            Unit::DealDamage(GetCaster(), unitTarget, 7000, nullptr, DIRECT_DAMAGE);
         }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_svala_ritual_strike_SpellScript::HandleDummyEffect, EFFECT_2, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_svala_ritual_strike_SpellScript();
     }
 
-    class spell_svala_ritual_strike_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_svala_ritual_strike_AuraScript);
+        OnEffectHitTarget += SpellEffectFn(spell_svala_ritual_strike::HandleDummyEffect, EFFECT_2, SPELL_EFFECT_DUMMY);
+    }
+};
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set amount based on difficulty
-            amount = (GetCaster()->GetMap()->IsHeroic() ? 2000 : 1000);
-        }
+class spell_svala_ritual_strike_aura : public AuraScript
+{
+    PrepareAuraScript(spell_svala_ritual_strike_aura);
 
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_svala_ritual_strike_AuraScript::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        return new spell_svala_ritual_strike_AuraScript();
+        // Set amount based on difficulty
+        amount = (GetCaster()->GetMap()->IsHeroic() ? 2000 : 1000);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_svala_ritual_strike_aura::CalculateAmount, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -452,5 +437,6 @@ void AddSC_boss_svala()
 {
     new boss_svala();
     new npc_ritual_channeler();
-    new spell_svala_ritual_strike();
+    RegisterSpellAndAuraScriptPair(spell_svala_ritual_strike, spell_svala_ritual_strike_aura);
 }
+

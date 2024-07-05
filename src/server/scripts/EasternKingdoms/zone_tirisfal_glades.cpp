@@ -28,8 +28,8 @@ go_mausoleum_door
 go_mausoleum_trigger
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
 /*######
@@ -84,7 +84,7 @@ public:
                 me->SetImmuneToPC(true);
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void AttackedBy(Unit* pAttacker) override
         {

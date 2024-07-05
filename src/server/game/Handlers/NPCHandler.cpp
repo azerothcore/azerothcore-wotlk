@@ -215,7 +215,6 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     uint32 spellId = 0;
 
     recvData >> guid >> spellId;
-    LOG_DEBUG("network", "WORLD: Received CMSG_TRAINER_BUY_SPELL Npc {}, learn spell id is: {}", guid.ToString(), spellId);
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
@@ -273,8 +272,6 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 
 void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_GOSSIP_HELLO");
-
     ObjectGuid guid;
     recvData >> guid;
 
@@ -287,10 +284,6 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 
     // xinef: check if we have ANY npc flags
     if (unit->GetNpcFlags() == UNIT_NPC_FLAG_NONE)
-        return;
-
-    // xinef: do not allow to open gossip when npc is in combat
-    if (unit->GetNpcFlags() == UNIT_NPC_FLAG_GOSSIP && unit->IsInCombat()) // should work on all flags?
         return;
 
     // set faction visible if needed

@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 #include "blackrock_spire.h"
@@ -189,9 +189,9 @@ struct boss_mor_grayhoof : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
         _scheduler.Schedule(5s, 10s, PHASE_HUMAN, [this](TaskContext context)
             {

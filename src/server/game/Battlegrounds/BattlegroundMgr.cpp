@@ -43,6 +43,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "World.h"
 #include "WorldPacket.h"
@@ -180,7 +181,7 @@ void BattlegroundMgr::Update(uint32 diff)
             if (GameTime::GetGameTime() > m_NextAutoDistributionTime)
             {
                 sArenaTeamMgr->DistributeArenaPoints();
-                m_NextAutoDistributionTime = m_NextAutoDistributionTime + 1_days * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS);
+                m_NextAutoDistributionTime = GameTime::GetGameTime() + Seconds(DAY * sWorld->getIntConfig(CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS));
                 sWorld->setWorldState(WS_ARENA_DISTRIBUTION_TIME, m_NextAutoDistributionTime.count());
             }
             m_AutoDistributionTimeChecker = 600000; // 10 minutes check
@@ -575,8 +576,8 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid 
     uint32 winner_arena = player->GetRandomWinner() ? sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_ARENA_LAST) : sWorld->getIntConfig(CONFIG_BG_REWARD_WINNER_ARENA_FIRST);
     uint32 loser_kills = player->GetRandomWinner() ? sWorld->getIntConfig(CONFIG_BG_REWARD_LOSER_HONOR_LAST) : sWorld->getIntConfig(CONFIG_BG_REWARD_LOSER_HONOR_FIRST);
 
-    winner_kills = Acore::Honor::hk_honor_at_level(player->getLevel(), float(winner_kills));
-    loser_kills = Acore::Honor::hk_honor_at_level(player->getLevel(), float(loser_kills));
+    winner_kills = Acore::Honor::hk_honor_at_level(player->GetLevel(), float(winner_kills));
+    loser_kills = Acore::Honor::hk_honor_at_level(player->GetLevel(), float(loser_kills));
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
     *data << guid;                                          // battlemaster guid
@@ -614,7 +615,7 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid 
         if (it != bgDataStore.end())
         {
             // expected bracket entry
-            if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(it->second._Battlegrounds.begin()->second->GetMapId(), player->getLevel()))
+            if (PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(it->second._Battlegrounds.begin()->second->GetMapId(), player->GetLevel()))
             {
                 uint32 count = 0;
                 BattlegroundBracketId bracketId = bracketEntry->GetBracketId();

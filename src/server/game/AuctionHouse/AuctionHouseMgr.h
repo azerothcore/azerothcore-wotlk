@@ -130,25 +130,25 @@ class AuctionHouseObject
 {
 public:
     // Initialize storage
-    AuctionHouseObject() { next = AuctionsMap.begin(); }
+    AuctionHouseObject() { _next = _auctionsMap.begin(); }
     ~AuctionHouseObject()
     {
-        for (auto & itr : AuctionsMap)
+        for (auto& itr : _auctionsMap)
             delete itr.second;
     }
 
     typedef std::map<uint32, AuctionEntry*> AuctionEntryMap;
 
-    [[nodiscard]] uint32 Getcount() const { return AuctionsMap.size(); }
+    [[nodiscard]] uint32 Getcount() const { return _auctionsMap.size(); }
 
-    AuctionEntryMap::iterator GetAuctionsBegin() { return AuctionsMap.begin(); }
-    AuctionEntryMap::iterator GetAuctionsEnd() { return AuctionsMap.end(); }
-    AuctionEntryMap const& GetAuctions() { return AuctionsMap; }
+    AuctionEntryMap::iterator GetAuctionsBegin() { return _auctionsMap.begin(); }
+    AuctionEntryMap::iterator GetAuctionsEnd() { return _auctionsMap.end(); }
+    AuctionEntryMap const& GetAuctions() { return _auctionsMap; }
 
     [[nodiscard]] AuctionEntry* GetAuction(uint32 id) const
     {
-        AuctionEntryMap::const_iterator itr = AuctionsMap.find(id);
-        return itr != AuctionsMap.end() ? itr->second : nullptr;
+        AuctionEntryMap::const_iterator itr = _auctionsMap.find(id);
+        return itr != _auctionsMap.end() ? itr->second : nullptr;
     }
 
     void AddAuction(AuctionEntry* auction);
@@ -162,13 +162,13 @@ public:
     bool BuildListAuctionItems(WorldPacket& data, Player* player,
                                std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
                                uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
-                               uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder);
+                               uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder, Milliseconds searchTimeout);
 
 private:
-    AuctionEntryMap AuctionsMap;
+    AuctionEntryMap _auctionsMap;
 
     // storage for "next" auction item for next Update()
-    AuctionEntryMap::const_iterator next;
+    AuctionEntryMap::const_iterator _next;
 };
 
 class AuctionHouseMgr
@@ -184,12 +184,11 @@ public:
 
     AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
     AuctionHouseObject* GetAuctionsMapByHouseId(uint8 auctionHouseId);
-    AuctionHouseObject* GetBidsMap(uint32 factionTemplateId);
 
     Item* GetAItem(ObjectGuid itemGuid)
     {
-        ItemMap::const_iterator itr = mAitems.find(itemGuid);
-        if (itr != mAitems.end())
+        ItemMap::const_iterator itr = _mAitems.find(itemGuid);
+        if (itr != _mAitems.end())
             return itr->second;
 
         return nullptr;
@@ -218,11 +217,11 @@ public:
     void Update();
 
 private:
-    AuctionHouseObject mHordeAuctions;
-    AuctionHouseObject mAllianceAuctions;
-    AuctionHouseObject mNeutralAuctions;
+    AuctionHouseObject _hordeAuctions;
+    AuctionHouseObject _allianceAuctions;
+    AuctionHouseObject _neutralAuctions;
 
-    ItemMap mAitems;
+    ItemMap _mAitems;
 };
 
 #define sAuctionMgr AuctionHouseMgr::instance()

@@ -20,7 +20,6 @@
 #include "Creature.h"
 #include "GameGraveyard.h"
 #include "GameTime.h"
-#include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
@@ -114,6 +113,8 @@ void BattlegroundEY::AddPoints(TeamId teamId, uint32 points)
 {
     uint8 honorRewards = uint8(m_TeamScores[teamId] / _honorTics);
     m_TeamScores[teamId] += points;
+    if (m_TeamScores[teamId] > BG_EY_MAX_TEAM_SCORE)
+        m_TeamScores[teamId] = BG_EY_MAX_TEAM_SCORE;
 
     for (; honorRewards < uint8(m_TeamScores[teamId] / _honorTics); ++honorRewards)
         RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
@@ -472,6 +473,12 @@ void BattlegroundEY::EventTeamLostPoint(Player* player, uint32 point)
     UpdatePointsIcons(point);
     UpdatePointsCount();
     DelCreature(BG_EY_TRIGGER_FEL_REAVER + point);
+
+    _reviveEvents.AddEventAtOffset([this, point]()
+    {
+        RelocateDeadPlayers(BgCreatures[point]);
+        DelCreature(point);
+    }, 500ms);
 }
 
 void BattlegroundEY::EventTeamCapturedPoint(Player* player, TeamId teamId, uint32 point)
@@ -498,8 +505,6 @@ void BattlegroundEY::EventTeamCapturedPoint(Player* player, TeamId teamId, uint3
     }
 
     _capturePointInfo[point]._ownerTeamId = teamId;
-    if (BgCreatures[point])
-        DelCreature(point);
 
     GraveyardStruct const* sg = sGraveyard->GetGraveyard(m_CapturingPointTypes[point].GraveYardId);
     AddSpiritGuide(point, sg->x, sg->y, sg->z, 3.124139f, teamId);

@@ -20,8 +20,8 @@
 
 #include "Battleground.h"
 #include "BattlegroundScore.h"
-#include "Language.h"
 #include "EventMap.h"
+#include "Language.h"
 
 enum BG_EY_Events
 {
@@ -33,10 +33,10 @@ enum BG_EY_Events
 
 enum BG_EY_Timers
 {
-    BG_EY_FLAG_RESPAWN_TIME         = 20 * IN_MILLISECONDS,
+    BG_EY_FLAG_RESPAWN_TIME         = 10 * IN_MILLISECONDS,
     BG_EY_FLAG_ON_GROUND_TIME       = 10 * IN_MILLISECONDS,
     BG_EY_FPOINTS_CHECK_TIME        = 2 * IN_MILLISECONDS,
-    BG_EY_FPOINTS_TICK_TIME         = 1 * IN_MILLISECONDS
+    BG_EY_FPOINTS_TICK_TIME         = 2 * IN_MILLISECONDS
 };
 
 enum BG_EY_WorldStates

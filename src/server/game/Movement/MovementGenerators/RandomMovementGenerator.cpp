@@ -54,7 +54,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         init.SetWalk(true);
         init.Launch();
         if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
-            creature->GetFormation()->LeaderMoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ(), false);
+            creature->GetFormation()->LeaderMoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ(), 0);
         return;
     }
 
@@ -134,6 +134,11 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         }
         else // ground
         {
+            if (!_pathGenerator)
+                _pathGenerator = new PathGenerator(creature);
+            else
+                _pathGenerator->Clear();
+
             bool result = _pathGenerator->CalculatePath(x, y, levelZ, false);
             if (result && !(_pathGenerator->GetPathType() & PATHFIND_NOPATH))
             {
@@ -225,7 +230,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 
     //Call for creature group update
     if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
-        creature->GetFormation()->LeaderMoveTo(finalPoint.x, finalPoint.y, finalPoint.z, false);
+        creature->GetFormation()->LeaderMoveTo(finalPoint.x, finalPoint.y, finalPoint.z, 0);
 }
 
 template<>
@@ -252,8 +257,6 @@ void RandomMovementGenerator<Creature>::DoInitialize(Creature* creature)
         }
     }
 
-    if (!_pathGenerator)
-        _pathGenerator = new PathGenerator(creature);
     creature->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
 }
 

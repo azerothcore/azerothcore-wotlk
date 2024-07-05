@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "azjol_nerub.h"
 
 enum Spells
@@ -30,6 +31,7 @@ enum Spells
     SPELL_EMERGE                        = 53500,
     SPELL_SUBMERGE                      = 53421,
     SPELL_SELF_ROOT                     = 42716,
+    SPELL_CLEAR_ALL_DEBUFFS             = 34098,
 
     SPELL_SUMMON_DARTER                 = 53599,
     SPELL_SUMMON_ASSASSIN               = 53610,
@@ -110,7 +112,7 @@ class boss_anub_arak : public CreatureScript
                 if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
                 {
                     Talk(SAY_SLAY);
-                    events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                    events.ScheduleEvent(EVENT_KILL_TALK, 6s);
                 }
             }
 
@@ -128,18 +130,18 @@ class boss_anub_arak : public CreatureScript
                 instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
             }
 
-            void EnterCombat(Unit* ) override
+            void JustEngagedWith(Unit* ) override
             {
                 Talk(SAY_AGGRO);
                 instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_START_EVENT);
 
-                events.ScheduleEvent(EVENT_CARRION_BEETELS, 6500);
-                events.ScheduleEvent(EVENT_LEECHING_SWARM, 20000);
-                events.ScheduleEvent(EVENT_POUND, 15000);
-                events.ScheduleEvent(EVENT_CHECK_HEALTH_75, 1000);
-                events.ScheduleEvent(EVENT_CHECK_HEALTH_50, 1000);
-                events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 1000);
-                events.ScheduleEvent(EVENT_CLOSE_DOORS, 5000);
+                events.ScheduleEvent(EVENT_CARRION_BEETELS, 6500ms);
+                events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s);
+                events.ScheduleEvent(EVENT_POUND, 15s);
+                events.ScheduleEvent(EVENT_CHECK_HEALTH_75, 1s);
+                events.ScheduleEvent(EVENT_CHECK_HEALTH_50, 1s);
+                events.ScheduleEvent(EVENT_CHECK_HEALTH_25, 1s);
+                events.ScheduleEvent(EVENT_CLOSE_DOORS, 5s);
             }
 
             void SummonHelpers(float x, float y, float z, uint32 spellId)
@@ -160,16 +162,16 @@ class boss_anub_arak : public CreatureScript
                 switch (uint32 eventId = events.ExecuteEvent())
                 {
                     case EVENT_CLOSE_DOORS:
-                        _EnterCombat();
+                        _JustEngagedWith();
                         break;
                     case EVENT_CARRION_BEETELS:
                         me->CastSpell(me, SPELL_CARRION_BEETLES, false);
-                        events.ScheduleEvent(EVENT_CARRION_BEETELS, 25000);
+                        events.ScheduleEvent(EVENT_CARRION_BEETELS, 25s);
                         break;
                     case EVENT_LEECHING_SWARM:
                         Talk(SAY_LOCUST);
                         me->CastSpell(me, SPELL_LEECHING_SWARM, false);
-                        events.ScheduleEvent(EVENT_LEECHING_SWARM, 20000);
+                        events.ScheduleEvent(EVENT_LEECHING_SWARM, 20s);
                         break;
                     case EVENT_POUND:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
@@ -177,10 +179,10 @@ class boss_anub_arak : public CreatureScript
                             me->CastSpell(me, SPELL_SELF_ROOT, true);
                             me->DisableRotate(true);
                             me->SendMovementFlagUpdate();
-                            events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300);
+                            events.ScheduleEvent(EVENT_ENABLE_ROTATE, 3300ms);
                             me->CastSpell(target, SPELL_POUND, false);
                         }
-                        events.ScheduleEvent(EVENT_POUND, 18000);
+                        events.ScheduleEvent(EVENT_POUND, 18s);
                         break;
                     case EVENT_ENABLE_ROTATE:
                         me->RemoveAurasDueToSpell(SPELL_SELF_ROOT);
@@ -192,21 +194,22 @@ class boss_anub_arak : public CreatureScript
                         if (me->HealthBelowPct(eventId*25))
                         {
                             Talk(SAY_SUBMERGE);
+                            DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                             me->CastSpell(me, SPELL_IMPALE_PERIODIC, true);
                             me->CastSpell(me, SPELL_SUBMERGE, false);
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
 
                             events.DelayEvents(46000, 0);
-                            events.ScheduleEvent(EVENT_EMERGE, 45000);
-                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2000);
-                            events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4000);
-                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 15000);
-                            events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 20000);
-                            events.ScheduleEvent(EVENT_SUMMON_DARTER, 30000);
-                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 35000);
+                            events.ScheduleEvent(EVENT_EMERGE, 45s);
+                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 2s);
+                            events.ScheduleEvent(EVENT_SUMMON_GUARDIAN, 4s);
+                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 15s);
+                            events.ScheduleEvent(EVENT_SUMMON_VENOMANCER, 20s);
+                            events.ScheduleEvent(EVENT_SUMMON_DARTER, 30s);
+                            events.ScheduleEvent(EVENT_SUMMON_ASSASSINS, 35s);
                             break;
                         }
-                        events.ScheduleEvent(eventId, 500);
+                        events.ScheduleEvent(eventId, 500ms);
                         break;
                     case EVENT_EMERGE:
                         me->CastSpell(me, SPELL_EMERGE, true);
@@ -299,3 +302,4 @@ void AddSC_boss_anub_arak()
     RegisterSpellScript(spell_azjol_nerub_pound);
     RegisterSpellScript(spell_azjol_nerub_impale_summon);
 }
+

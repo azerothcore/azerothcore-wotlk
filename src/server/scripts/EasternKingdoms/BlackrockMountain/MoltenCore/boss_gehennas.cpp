@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "molten_core.h"
 
@@ -43,12 +43,12 @@ public:
     {
         boss_gehennasAI(Creature* creature) : BossAI(creature, DATA_GEHENNAS) {}
 
-        void EnterCombat(Unit* /*attacker*/) override
+        void JustEngagedWith(Unit* /*attacker*/) override
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_GEHENNAS_CURSE, urand(6000, 9000));
-            events.ScheduleEvent(EVENT_RAIN_OF_FIRE, 10000);
-            events.ScheduleEvent(EVENT_SHADOW_BOLT, urand(3000, 5000));
+            _JustEngagedWith();
+            events.ScheduleEvent(EVENT_GEHENNAS_CURSE, 6s, 9s);
+            events.ScheduleEvent(EVENT_RAIN_OF_FIRE, 10s);
+            events.ScheduleEvent(EVENT_SHADOW_BOLT, 3s, 5s);
         }
 
         void ExecuteEvent(uint32 eventId) override

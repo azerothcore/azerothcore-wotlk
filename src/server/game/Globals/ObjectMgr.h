@@ -25,6 +25,7 @@
 #include "DatabaseEnv.h"
 #include "DynamicObject.h"
 #include "GameObject.h"
+#include "GossipDef.h"
 #include "ItemTemplate.h"
 #include "Log.h"
 #include "Mail.h"
@@ -36,7 +37,6 @@
 #include "QuestDef.h"
 #include "TemporarySummon.h"
 #include "VehicleDefines.h"
-#include "GossipDef.h"
 #include <functional>
 #include <limits>
 #include <map>
@@ -563,9 +563,9 @@ struct ReputationOnKillEntry
     uint32 RepFaction1;
     uint32 RepFaction2;
     uint32 ReputationMaxCap1;
-    int32 RepValue1;
+    float RepValue1;
     uint32 ReputationMaxCap2;
-    int32 RepValue2;
+    float RepValue2;
     bool IsTeamAward1;
     bool IsTeamAward2;
     bool TeamDependent;
@@ -672,6 +672,8 @@ typedef std::unordered_map<uint32, VendorItemData> CacheVendorItemContainer;
 typedef std::unordered_map<uint32, TrainerSpellData> CacheTrainerSpellContainer;
 typedef std::unordered_map<uint32, ServerMail> ServerMailContainer;
 
+typedef std::vector<uint32> CreatureCustomIDsContainer;
+
 enum SkillRangeType
 {
     SKILL_RANGE_LANGUAGE,                                   // 300..300
@@ -766,8 +768,8 @@ public:
     CreatureTemplate const* GetCreatureTemplate(uint32 entry);
     [[nodiscard]] CreatureTemplateContainer const* GetCreatureTemplates() const { return &_creatureTemplateStore; }
     CreatureModelInfo const* GetCreatureModelInfo(uint32 modelId) const;
-    CreatureModelInfo const* GetCreatureModelRandomGender(uint32* displayID);
-    static uint32 ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data = nullptr);
+    CreatureModelInfo const* GetCreatureModelRandomGender(CreatureModel* model, CreatureTemplate const* creatureTemplate) const;
+    static CreatureModel const* ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data = nullptr);
     static void ChooseCreatureFlags(CreatureTemplate const* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, CreatureData const* data = nullptr);
     EquipmentInfo const* GetEquipmentInfo(uint32 entry, int8& id);
     CreatureAddon const* GetCreatureAddon(ObjectGuid::LowType lowguid);
@@ -1016,10 +1018,12 @@ public:
     void LoadCreatureClassLevelStats();
     void LoadCreatureLocales();
     void LoadCreatureTemplates();
-    void LoadCreatureTemplate(Field* fields);
+    void LoadCreatureTemplate(Field* fields, bool triggerHook = false);
+    void LoadCreatureTemplateModels();
     void LoadCreatureTemplateAddons();
     void LoadCreatureTemplateResistances();
     void LoadCreatureTemplateSpells();
+    void LoadCreatureCustomIDs();
     void CheckCreatureTemplate(CreatureTemplate const* cInfo);
     void CheckCreatureMovement(char const* table, uint64 id, CreatureMovementData& creatureMovement);
     void LoadGameObjectQuestItems();
@@ -1072,6 +1076,7 @@ public:
     void LoadPetLevelInfo();
     void LoadExplorationBaseXP();
     void LoadPetNames();
+    void LoadPetNamesLocales();
     void LoadPetNumber();
     void LoadFishingBaseSkillLevel();
     void ChangeFishingBaseSkillLevel(uint32 entry, int32 skill);
@@ -1095,6 +1100,7 @@ public:
     void AddSpellToTrainer(uint32 entry, uint32 spell, uint32 spellCost, uint32 reqSkill, uint32 reqSkillValue, uint32 reqLevel, uint32 reqSpell);
 
     std::string GeneratePetName(uint32 entry);
+    std::string GeneratePetNameLocale(uint32 entry, LocaleConstant locale);
     uint32 GetBaseXP(uint8 level);
     [[nodiscard]] uint32 GetXPForLevel(uint8 level) const;
 
@@ -1207,7 +1213,7 @@ public:
     }
 
     [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
-    [[nodiscard]] GameObjectData const* GetGOData(ObjectGuid::LowType spawnId) const
+    [[nodiscard]] GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;
@@ -1263,7 +1269,21 @@ public:
     }
     [[nodiscard]] QuestGreetingLocale const* GetQuestGreetingLocale(TypeID type, uint32 id) const
     {
-        QuestGreetingLocaleContainer::const_iterator itr = _questGreetingLocaleStore.find(MAKE_PAIR32(type, id));
+        uint32 typeIndex;
+        if (type == TYPEID_UNIT)
+        {
+            typeIndex = 0;
+        }
+        else if (type == TYPEID_GAMEOBJECT)
+        {
+            typeIndex = 1;
+        }
+        else
+        {
+            return nullptr;
+        }
+
+        QuestGreetingLocaleContainer::const_iterator itr = _questGreetingLocaleStore.find(MAKE_PAIR32(typeIndex, id));
         if (itr == _questGreetingLocaleStore.end()) return nullptr;
         return &itr->second;
     }
@@ -1312,9 +1332,16 @@ public:
     uint32 AddCreData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
 
     // reserved names
-    void LoadReservedPlayersNames();
+    void LoadReservedPlayerNamesDB();
+    void LoadReservedPlayerNamesDBC();
     [[nodiscard]] bool IsReservedName(std::string_view name) const;
     void AddReservedPlayerName(std::string const& name);
+
+    // profanity names
+    void LoadProfanityNamesFromDB();
+    void LoadProfanityNamesFromDBC();
+    [[nodiscard]] bool IsProfanityName(std::string_view name) const;
+    void AddProfanityPlayerName(std::string const& name);
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string_view name, bool create = false);
@@ -1418,12 +1445,6 @@ public:
 
     [[nodiscard]] uint32 GetQuestMoneyReward(uint8 level, uint32 questMoneyDifficulty) const;
     void SendServerMail(Player* player, uint32 id, uint32 reqLevel, uint32 reqPlayTime, uint32 rewardMoneyA, uint32 rewardMoneyH, uint32 rewardItemA, uint32 rewardItemCountA, uint32 rewardItemH, uint32 rewardItemCountH, std::string subject, std::string body, uint8 active) const;
-
-    void LoadInstanceSavedGameobjectStateData();
-    bool FindInstanceSavedGameobjectState(uint32 id, uint32 guid);
-    uint8 GetInstanceSavedGameobjectState(uint32 id, uint32 guid);
-    void SetInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
-    void NewInstanceSavedGameobjectState(uint32 id, uint32 guid, uint8 state);
 private:
     // first free id for selected id type
     uint32 _auctionId; // pussywizard: accessed by a single thread
@@ -1485,6 +1506,10 @@ private:
     typedef std::set<std::wstring> ReservedNamesContainer;
     ReservedNamesContainer _reservedNamesStore;
 
+    //character profanity names
+    typedef std::set<std::wstring> ProfanityNamesContainer;
+    ProfanityNamesContainer _profanityNamesStore;
+
     GameTeleContainer _gameTeleStore;
 
     ScriptNameContainer _scriptNamesStore;
@@ -1532,6 +1557,9 @@ private:
     typedef std::map<uint32, std::vector<std::string>> HalfNameContainer;
     HalfNameContainer _petHalfName0;
     HalfNameContainer _petHalfName1;
+    typedef std::map<std::pair<uint32, LocaleConstant>, std::vector<std::string>> HalfNameContainerLocale;
+    HalfNameContainerLocale _petHalfLocaleName0;
+    HalfNameContainerLocale _petHalfLocaleName1;
 
     typedef std::unordered_map<uint32, ItemSetNameEntry> ItemSetNameContainer;
     ItemSetNameContainer _itemSetNameStore;
@@ -1541,6 +1569,7 @@ private:
     CellObjectGuids _emptyCellObjectGuids;
     CreatureDataContainer _creatureDataStore;
     CreatureTemplateContainer _creatureTemplateStore;
+    CreatureCustomIDsContainer _creatureCustomIDsStore;
     std::vector<CreatureTemplate*> _creatureTemplateStoreFast; // pussywizard
     CreatureModelContainer _creatureModelStore;
     CreatureAddonContainer _creatureAddonStore;

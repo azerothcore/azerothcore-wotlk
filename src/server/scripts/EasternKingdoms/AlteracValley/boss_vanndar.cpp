@@ -16,7 +16,7 @@
  */
 
 #include "BattlegroundAV.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 
 enum Yells
@@ -62,7 +62,7 @@ public:
             Attacked = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(YELL_AGGRO);
         }

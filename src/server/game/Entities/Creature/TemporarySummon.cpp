@@ -16,7 +16,8 @@
  */
 
 #include "TemporarySummon.h"
-#include "CreatureAI.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
@@ -25,7 +26,7 @@
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) :
     Creature(isWorldObject), m_Properties(properties), m_type(TEMPSUMMON_MANUAL_DESPAWN),
-    m_timer(0), m_lifetime(0)
+    m_timer(0), m_lifetime(0), _visibleBySummonerOnly(false)
 {
     if (owner)
     {
@@ -66,7 +67,7 @@ void TempSummon::Update(uint32 diff)
 {
     Creature::Update(diff);
 
-    if (m_deathState == DEAD)
+    if (m_deathState == DeathState::Dead)
     {
         UnSummon();
         return;
@@ -106,7 +107,7 @@ void TempSummon::Update(uint32 diff)
             }
         case TEMPSUMMON_TIMED_DESPAWN_OOC_ALIVE:
             {
-                if (!IsInCombat() && m_deathState != CORPSE)
+                if (!IsInCombat() && m_deathState != DeathState::Corpse)
                 {
                     if (m_timer <= diff)
                     {
@@ -123,7 +124,7 @@ void TempSummon::Update(uint32 diff)
             }
         case TEMPSUMMON_CORPSE_TIMED_DESPAWN:
             {
-                if (m_deathState == CORPSE)
+                if (m_deathState == DeathState::Corpse)
                 {
                     if (m_timer <= diff)
                     {
@@ -138,7 +139,7 @@ void TempSummon::Update(uint32 diff)
         case TEMPSUMMON_CORPSE_DESPAWN:
             {
                 // if m_deathState is DEAD, CORPSE was skipped
-                if (m_deathState == CORPSE)
+                if (m_deathState == DeathState::Corpse)
                 {
                     UnSummon();
                     return;
@@ -153,7 +154,7 @@ void TempSummon::Update(uint32 diff)
         case TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN:
             {
                 // if m_deathState is DEAD, CORPSE was skipped
-                if (m_deathState == CORPSE)
+                if (m_deathState == DeathState::Corpse)
                 {
                     UnSummon();
                     return;
@@ -216,7 +217,7 @@ void TempSummon::InitStats(uint32 duration)
         if (IsTrigger() && m_spells[0])
         {
             SetFaction(owner->GetFaction());
-            SetLevel(owner->getLevel());
+            SetLevel(owner->GetLevel());
             if (owner->GetTypeId() == TYPEID_PLAYER)
                 m_ControlledByPlayer = true;
         }
@@ -250,16 +251,27 @@ void TempSummon::InitStats(uint32 duration)
 
 void TempSummon::InitSummon()
 {
-    Unit* owner = GetSummonerUnit();
+    WorldObject* owner = GetSummoner();
     if (owner)
     {
-        if (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled)
-            owner->ToCreature()->AI()->JustSummoned(this);
-    }
+        if (owner->GetTypeId() == TYPEID_UNIT)
+        {
+            if (owner->ToCreature()->IsAIEnabled)
+            {
+                owner->ToCreature()->AI()->JustSummoned(this);
+            }
+        }
+        else if (owner->GetTypeId() == TYPEID_GAMEOBJECT)
+        {
+            if (owner->ToGameObject()->AI())
+            {
+                owner->ToGameObject()->AI()->JustSummoned(this);
+            }
+        }
 
-    // Xinef: Allow to call this hook when npc is summoned by gameobject, in this case pass this as summoner to avoid possible null checks
-    if (IsAIEnabled)
-        AI()->IsSummonedBy(owner);
+        if (IsAIEnabled)
+            AI()->IsSummonedBy(owner);
+    }
 }
 
 void TempSummon::SetTempSummonType(TempSummonType type)
@@ -290,9 +302,17 @@ void TempSummon::UnSummon(uint32 msTime)
         return;
     }
 
-    Unit* owner = GetSummonerUnit();
-    if (owner && owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled)
-        owner->ToCreature()->AI()->SummonedCreatureDespawn(this);
+    if (WorldObject* owner = GetSummoner())
+    {
+        if (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled)
+        {
+            owner->ToCreature()->AI()->SummonedCreatureDespawn(this);
+        }
+        else if (owner->GetTypeId() == TYPEID_GAMEOBJECT && owner->ToGameObject()->AI())
+        {
+            owner->ToGameObject()->AI()->SummonedCreatureDespawn(this);
+        }
+    }
 
     AddObjectToRemoveList();
 }
@@ -375,7 +395,7 @@ bool Minion::IsGuardianPet() const
 void Minion::setDeathState(DeathState s, bool despawn)
 {
     Creature::setDeathState(s, despawn);
-    if (s == JUST_DIED && IsGuardianPet())
+    if (s == DeathState::JustDied && IsGuardianPet())
         if (Unit* owner = GetOwner())
             if (owner->GetTypeId() == TYPEID_PLAYER && owner->GetMinionGUID() == GetGUID())
                 for (Unit::ControlSet::const_iterator itr = owner->m_Controlled.begin(); itr != owner->m_Controlled.end(); ++itr)
@@ -412,7 +432,7 @@ void Guardian::InitStats(uint32 duration)
 
     if (Unit* m_owner = GetOwner())
     {
-        InitStatsForLevel(m_owner->getLevel());
+        InitStatsForLevel(m_owner->GetLevel());
 
         if (m_owner->GetTypeId() == TYPEID_PLAYER && HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
             m_charmInfo->InitCharmCreateSpells();
@@ -450,7 +470,7 @@ Puppet::Puppet(SummonPropertiesEntry const* properties, ObjectGuid owner) : Mini
 void Puppet::InitStats(uint32 duration)
 {
     Minion::InitStats(duration);
-    SetLevel(GetOwner()->getLevel());
+    SetLevel(GetOwner()->GetLevel());
     SetReactState(REACT_PASSIVE);
 }
 
@@ -478,7 +498,7 @@ void Puppet::Update(uint32 time)
         if (!IsAlive())
         {
             UnSummon();
-            // TODO: why long distance .die does not remove it
+            /// @todo: why long distance .die does not remove it
         }
     }
 }

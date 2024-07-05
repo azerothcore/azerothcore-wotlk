@@ -15,13 +15,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DatabaseScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
 void ScriptMgr::OnAfterDatabasesLoaded(uint32 updateFlags)
 {
-    ExecuteScript<DatabaseScript>([&](DatabaseScript* script)
-    {
-        script->OnAfterDatabasesLoaded(updateFlags);
-    });
+    CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_AFTER_DATABASES_LOADED, script->OnAfterDatabasesLoaded(updateFlags));
 }
+
+void ScriptMgr::OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> creatureTemplates)
+{
+    CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_AFTER_DATABASE_LOAD_CREATURETEMPLATES, script->OnAfterDatabaseLoadCreatureTemplates(creatureTemplates));
+}
+
+DatabaseScript::DatabaseScript(const char* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, DATABASEHOOK_END)
+{
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < DATABASEHOOK_END; ++i)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<DatabaseScript>::AddScript(this, std::move(enabledHooks));
+}
+
+template class AC_GAME_API ScriptRegistry<DatabaseScript>;

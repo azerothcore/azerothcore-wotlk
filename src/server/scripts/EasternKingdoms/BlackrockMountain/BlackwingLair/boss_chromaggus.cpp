@@ -15,14 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "blackwing_lair.h"
 
 enum Emotes
@@ -100,15 +103,15 @@ public:
             Initialize();
         }
 
-        void EnterCombat(Unit* victim) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(victim);
+            BossAI::JustEngagedWith(who);
 
-            events.ScheduleEvent(EVENT_SHIMMER, 1000);
-            events.ScheduleEvent(EVENT_BREATH, 30000);
-            events.ScheduleEvent(EVENT_BREATH, 60000);
-            events.ScheduleEvent(EVENT_AFFLICTION, 10000);
-            events.ScheduleEvent(EVENT_FRENZY, 15000);
+            events.ScheduleEvent(EVENT_SHIMMER, 1s);
+            events.ScheduleEvent(EVENT_BREATH, 30s);
+            events.ScheduleEvent(EVENT_BREATH, 60s);
+            events.ScheduleEvent(EVENT_AFFLICTION, 10s);
+            events.ScheduleEvent(EVENT_FRENZY, 15s);
         }
 
         bool CanAIAttack(Unit const* victim) const override
@@ -153,13 +156,13 @@ public:
                             // Cast new random vulnerabilty on self
                             DoCast(me, SPELL_ELEMENTAL_SHIELD);
                             Talk(EMOTE_SHIMMER);
-                            events.ScheduleEvent(EVENT_SHIMMER, urand(17000, 25000));
+                            events.ScheduleEvent(EVENT_SHIMMER, 17s, 25s);
                             break;
                         }
                     case EVENT_BREATH:
                         DoCastVictim(_breathSpells.front());
                         _breathSpells.reverse();
-                        events.ScheduleEvent(EVENT_BREATH, 60000);
+                        events.ScheduleEvent(EVENT_BREATH, 60s);
                         break;
                     case EVENT_AFFLICTION:
                         {
@@ -193,11 +196,11 @@ public:
                                 }
                             }
                         }
-                        events.ScheduleEvent(EVENT_AFFLICTION, 10000);
+                        events.ScheduleEvent(EVENT_AFFLICTION, 10s);
                         break;
                     case EVENT_FRENZY:
                         DoCast(me, SPELL_FRENZY);
-                        events.ScheduleEvent(EVENT_FRENZY, 10000, 15000);
+                        events.ScheduleEvent(EVENT_FRENZY, 10s, 15s);
                         break;
                 }
 
@@ -363,3 +366,4 @@ void AddSC_boss_chromaggus()
     RegisterSpellScript(spell_gen_elemental_shield);
     RegisterSpellScript(spell_gen_brood_power);
 }
+

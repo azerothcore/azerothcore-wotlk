@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "blackrock_depths.h"
 
@@ -41,9 +41,9 @@ struct boss_moira_bronzebeardAI : public BossAI
 {
     // use a default value so we can inherit for priestess
     boss_moira_bronzebeardAI(Creature* creature, uint32 data = DATA_MOIRA) : BossAI(creature, data) {}
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         events.ScheduleEvent(SPELL_MINDBLAST, 0.5 * (int) TIMER_MINDBLAST);
         events.ScheduleEvent(SPELL_HEAL, 0.5 * (int) TIMER_HEAL);
         events.ScheduleEvent(SPELL_RENEW, 0.5 * (int) TIMER_RENEW);
@@ -103,9 +103,9 @@ struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
 {
     boss_high_priestess_thaurissanAI(Creature* creature) : boss_moira_bronzebeardAI(creature, DATA_PRIESTESS) {}
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(0);
         events.ScheduleEvent(SPELL_WORDPAIN, 0.5 * (int)TIMER_WORDPAIN);
         events.ScheduleEvent(SPELL_HEAL, 0.5 * (int) TIMER_HEAL);

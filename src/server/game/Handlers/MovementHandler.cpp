@@ -92,7 +92,7 @@ void WorldSession::HandleMoveWorldportAck()
     if (!newMap || newMap->CannotEnter(GetPlayer(), false))
     {
         LOG_ERROR("network.opcode", "Map {} could not be created for player {}, porting player to homebind", loc.GetMapId(), GetPlayer()->GetGUID().ToString());
-        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->m_homebindO);
+        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
         return;
     }
 
@@ -111,7 +111,7 @@ void WorldSession::HandleMoveWorldportAck()
             GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString(), loc.GetMapId());
         GetPlayer()->ResetMap();
         GetPlayer()->SetMap(oldMap);
-        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->m_homebindO);
+        GetPlayer()->TeleportTo(GetPlayer()->m_homebindMapId, GetPlayer()->m_homebindX, GetPlayer()->m_homebindY, GetPlayer()->m_homebindZ, GetPlayer()->GetOrientation());
         return;
     }
 
@@ -370,11 +370,19 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
+    // Stop emote on move
+    if (Player* plrMover = mover->ToPlayer())
+    {
+        if (plrMover->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_ONESHOT_NONE)
+        {
+            plrMover->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+        }
+    }
+
     if (!movementInfo.pos.IsPositionValid())
     {
         if (plrMover)
         {
-            sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
             sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
         }
 
@@ -396,7 +404,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         {
             if (plrMover)
             {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
             }
             return;
@@ -418,7 +425,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         {
             if (plrMover)
             {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
                 //LOG_INFO("anticheat", "MovementHandler:: 2 We were teleported, skip packets that were broadcast before teleport");
             }
@@ -431,7 +437,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         {
             if (plrMover)
             {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
                 sScriptMgr->AnticheatUpdateMovementInfo(plrMover, movementInfo);
             }
 
@@ -452,8 +457,6 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
             }
             else if (plrMover->GetTransport()->GetGUID() != movementInfo.transport.guid)
             {
-                sScriptMgr->AnticheatSetSkipOnePacketForASH(plrMover, true);
-
                 bool foundNewTransport = false;
                 plrMover->m_transport->RemovePassenger(plrMover);
                 if (Transport* transport = plrMover->GetMap()->GetTransport(movementInfo.transport.guid))

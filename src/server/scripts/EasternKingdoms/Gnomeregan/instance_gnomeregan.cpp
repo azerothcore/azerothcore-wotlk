@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "gnomeregan.h"
 
 class instance_gnomeregan : public InstanceMapScript
@@ -36,6 +38,7 @@ public:
     {
         instance_gnomeregan_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -59,7 +62,7 @@ public:
                 case GO_CAVE_IN_2:
                 case GO_WORKSHOP_DOOR:
                 case GO_FINAL_CHAMBER_DOOR:
-                    gameobject->UpdateSaveToDb(true);
+                    gameobject->AllowSaveToDB(true);
                     break;
             }
         }
@@ -77,30 +80,14 @@ public:
                 SaveToDB();
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            std::ostringstream saveStream;
-            saveStream << "D E " << _encounters[0];
-            return saveStream.str();
+            data >> _encounters[TYPE_GRUBBIS];
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-                return;
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-            if (dataHead1 == 'D' && dataHead2 == 'E')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    loadStream >> _encounters[i];
-                    if (_encounters[i] == IN_PROGRESS)
-                        _encounters[i] = NOT_STARTED;
-                }
-            }
+            data << _encounters[TYPE_GRUBBIS];
         }
 
     private:
@@ -199,3 +186,4 @@ void AddSC_instance_gnomeregan()
     new npc_kernobee();
     new spell_gnomeregan_radiation_bolt();
 }
+

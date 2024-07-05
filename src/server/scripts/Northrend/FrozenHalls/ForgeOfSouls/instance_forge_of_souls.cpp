@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "forge_of_souls.h"
 
@@ -40,6 +41,7 @@ public:
     {
         instance_forge_of_souls_InstanceScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             LoadBossBoundaries(boundaries);
         }
 
@@ -200,46 +202,15 @@ public:
             return false;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "F S " << m_auiEncounter[0] << ' ' << m_auiEncounter[1];
-            str_data = saveStream.str();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return str_data;
+            data >> m_auiEncounter[0];
+            data >> m_auiEncounter[1];
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-            uint32 data0, data1;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1;
-
-            if (dataHead1 == 'F' && dataHead2 == 'S')
-            {
-                m_auiEncounter[0] = data0;
-                m_auiEncounter[1] = data1;
-
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                    if (m_auiEncounter[i] == IN_PROGRESS)
-                        m_auiEncounter[i] = NOT_STARTED;
-            }
-            else OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << m_auiEncounter[0] << ' ' << m_auiEncounter[1];
         }
     };
 };
@@ -248,3 +219,4 @@ void AddSC_instance_forge_of_souls()
 {
     new instance_forge_of_souls();
 }
+

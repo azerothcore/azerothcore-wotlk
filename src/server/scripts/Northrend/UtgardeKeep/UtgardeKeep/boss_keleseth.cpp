@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "utgarde_keep.h"
 
 enum eTexts
@@ -29,6 +30,7 @@ enum eTexts
     SAY_SUMMON_SKELETONS                = 2,
     SAY_FROST_TOMB_EMOTE                = 4,
     SAY_DEATH                           = 5,
+    SAY_KILL                            = 6,
 };
 
 enum eNPCs
@@ -104,10 +106,10 @@ public:
                 if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
                 {
                     if( !p->HasAura(SPELL_FROST_TOMB_AURA) )
-                        Unit::Kill(me, me);
+                        me->KillSelf();
                 }
                 else
-                    Unit::Kill(me, me);
+                    me->KillSelf();
             }
         }
     };
@@ -140,14 +142,13 @@ public:
                 pInstance->SetData(DATA_KELESETH, NOT_STARTED);
         }
 
-        void MoveInLineOfSight(Unit* /*who*/) override {}
-
-        /*void KilledUnit(Unit * victim)
+        void KilledUnit(Unit* victim) override
         {
-            if (victim == me)
-                return;
-            DoScriptText(SAY_KILL, me);
-        }*/
+            if (victim->IsPlayer())
+            {
+                Talk(SAY_KILL);
+            }
+        }
 
         void JustDied(Unit* /*killer*/) override
         {
@@ -156,12 +157,12 @@ public:
                 pInstance->SetData(DATA_KELESETH, DONE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SHADOWBOLT, 0);
-            events.RescheduleEvent(EVENT_FROST_TOMB, 28000);
-            events.RescheduleEvent(EVENT_SUMMON_SKELETONS, 4000);
+            events.RescheduleEvent(EVENT_SPELL_SHADOWBOLT, 0ms);
+            events.RescheduleEvent(EVENT_FROST_TOMB, 28s);
+            events.RescheduleEvent(EVENT_SUMMON_SKELETONS, 4s);
 
             Talk(SAY_START_COMBAT);
             DoZoneInCombat();
@@ -194,7 +195,7 @@ public:
                     break;
                 case EVENT_SPELL_SHADOWBOLT:
                     me->CastSpell(me->GetVictim(), SPELL_SHADOWBOLT, false);
-                    events.RepeatEvent(urand(4000, 5000));
+                    events.Repeat(4s, 5s);
                     break;
                 case EVENT_FROST_TOMB:
                     if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
@@ -203,10 +204,10 @@ public:
                             Talk(SAY_FROST_TOMB_EMOTE, target);
                             Talk(SAY_FROST_TOMB);
                             me->CastSpell(target, SPELL_FROST_TOMB, false);
-                            events.RepeatEvent(15000);
+                            events.Repeat(15s);
                             break;
                         }
-                    events.RepeatEvent(1000);
+                    events.Repeat(1s);
                     break;
                 case EVENT_SUMMON_SKELETONS:
                     Talk(SAY_SUMMON_SKELETONS);
@@ -264,9 +265,9 @@ public:
         void Reset() override
         {
             events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_DECREPIFY, urand(10000, 20000));
+            events.RescheduleEvent(EVENT_SPELL_DECREPIFY, 10s, 20s);
             if( IsHeroic() )
-                events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, urand(25000, 120000));
+                events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, 25s, 120s);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -285,7 +286,7 @@ public:
                 me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                 me->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                 me->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
-                events.RescheduleEvent(EVENT_RESURRECT, 12000);
+                events.RescheduleEvent(EVENT_RESURRECT, 12s);
             }
         }
 
@@ -294,7 +295,7 @@ public:
             if( pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
             {
                 if( me->IsAlive() )
-                    Unit::Kill(me, me);
+                    me->KillSelf();
                 return;
             }
 
@@ -313,21 +314,21 @@ public:
                 case EVENT_SPELL_DECREPIFY:
                     if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
                         me->CastSpell(me->GetVictim(), SPELL_DECREPIFY, false);
-                    events.RepeatEvent(urand(15000, 25000));
+                    events.Repeat(15s, 25s);
                     break;
                 case EVENT_SPELL_BONE_ARMOR:
                     if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
                         me->CastSpell((Unit*)nullptr, SPELL_BONE_ARMOR, false);
-                    events.RepeatEvent(urand(40000, 120000));
+                    events.Repeat(40s, 120s);
                     break;
                 case EVENT_RESURRECT:
-                    events.DelayEvents(3500);
+                    events.DelayEvents(3500ms);
                     DoCast(me, SPELL_SCOURGE_RESURRECTION, true);
                     me->SetStandState(UNIT_STAND_STATE_STAND);
                     me->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
                     me->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
                     me->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
-                    events.RescheduleEvent(EVENT_RESURRECT_2, 3000);
+                    events.RescheduleEvent(EVENT_RESURRECT_2, 3s);
                     break;
                 case EVENT_RESURRECT_2:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -342,32 +343,26 @@ public:
     };
 };
 
-class spell_frost_tomb : public SpellScriptLoader
+class spell_frost_tomb_aura : public AuraScript
 {
-public:
-    spell_frost_tomb() : SpellScriptLoader("spell_frost_tomb") { }
+    PrepareAuraScript(spell_frost_tomb_aura);
 
-    class spell_frost_tombAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_frost_tombAuraScript);
+        return ValidateSpellInfo({ SPELL_FROST_TOMB_SUMMON });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (aurEff->GetTickNumber() == 1)
-                if( Unit* target = GetTarget() )
-                    target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tombAuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_frost_tombAuraScript();
+        PreventDefaultAction();
+        if (aurEff->GetTickNumber() == 1)
+            if( Unit* target = GetTarget() )
+                target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tomb_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -376,5 +371,6 @@ void AddSC_boss_keleseth()
     new boss_keleseth();
     new npc_frost_tomb();
     new npc_vrykul_skeleton();
-    new spell_frost_tomb();
+    RegisterSpellScript(spell_frost_tomb_aura);
 }
+

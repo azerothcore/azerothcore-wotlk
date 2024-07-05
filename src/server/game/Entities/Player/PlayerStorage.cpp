@@ -24,14 +24,12 @@
 #include "Battleground.h"
 #include "BattlegroundAV.h"
 #include "BattlegroundMgr.h"
-#include "CellImpl.h"
 #include "Channel.h"
 #include "CharacterDatabaseCleaner.h"
 #include "Chat.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "Config.h"
-#include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
@@ -43,7 +41,6 @@
 #include "GroupMgr.h"
 #include "Guild.h"
 #include "InstanceSaveMgr.h"
-#include "InstanceScript.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
@@ -65,6 +62,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
+#include "StringConvert.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "UpdateData.h"
 #include "UpdateFieldFlags.h"
@@ -73,10 +72,8 @@
 #include "Weather.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "Tokenize.h"
-#include "StringConvert.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -136,8 +133,6 @@ void Player::SetSheath(SheathState sheathed)
 
 uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const
 {
-    uint8 playerClass = getClass();
-
     uint8 slots[4];
     slots[0] = NULL_SLOT;
     slots[1] = NULL_SLOT;
@@ -249,23 +244,23 @@ uint8 Player::FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) c
             switch (proto->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_LIBRAM:
-                    if (playerClass == CLASS_PALADIN)
+                    if (IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_RELIC))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
                 case ITEM_SUBCLASS_ARMOR_IDOL:
-                    if (playerClass == CLASS_DRUID)
+                    if (IsClass(CLASS_DRUID, CLASS_CONTEXT_EQUIP_RELIC))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
                 case ITEM_SUBCLASS_ARMOR_TOTEM:
-                    if (playerClass == CLASS_SHAMAN)
+                    if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_RELIC))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
                 case ITEM_SUBCLASS_ARMOR_MISC:
-                    if (playerClass == CLASS_WARLOCK)
+                    if (IsClass(CLASS_WARLOCK, CLASS_CONTEXT_EQUIP_RELIC))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
                 case ITEM_SUBCLASS_ARMOR_SIGIL:
-                    if (playerClass == CLASS_DEATH_KNIGHT)
+                    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_RELIC))
                         slots[0] = EQUIPMENT_SLOT_RANGED;
                     break;
             }
@@ -946,9 +941,6 @@ InventoryResult Player::CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemP
         pItem2 = nullptr;
 
     uint32 need_space;
-
-    if (pSrcItem && pSrcItem->IsNotEmptyBag() && !IsBagPos(uint16(bag) << 8 | slot))
-        return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
 
     // empty specific slot - check item fit to slot
     if (!pItem2 || swap)
@@ -1890,7 +1882,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
 
             ScalingStatDistributionEntry const* ssd = pProto->ScalingStatDistribution ? sScalingStatDistributionStore.LookupEntry(pProto->ScalingStatDistribution) : 0;
             // check allowed level (extend range to upper values if MaxLevel more or equal max player level, this let GM set high level with 1...max range items)
-            if (ssd && ssd->MaxLevel < DEFAULT_MAX_LEVEL && ssd->MaxLevel < getLevel())
+            if (ssd && ssd->MaxLevel < DEFAULT_MAX_LEVEL && ssd->MaxLevel < GetLevel())
                 return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
 
             uint8 eslot = FindEquipSlot(pProto, slot, swap);
@@ -2271,21 +2263,18 @@ InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
                 // Armor that is binded to account can "morph" from plate to mail, etc. if skill is not learned yet.
                 if (pProto->Quality == ITEM_QUALITY_HEIRLOOM && pProto->Class == ITEM_CLASS_ARMOR && !HasSkill(itemSkill))
                 {
-                    // TODO: when you right-click already equipped item it throws EQUIP_ERR_NO_REQUIRED_PROFICIENCY.
+                    /// @todo: when you right-click already equipped item it throws EQUIP_ERR_NO_REQUIRED_PROFICIENCY.
 
                     // In fact it's a visual bug, everything works properly... I need sniffs of operations with
                     // binded to account items from off server.
 
-                    switch (getClass())
+                    if (IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
                     {
-                        case CLASS_HUNTER:
-                        case CLASS_SHAMAN:
-                            allowEquip = (itemSkill == SKILL_MAIL);
-                            break;
-                        case CLASS_PALADIN:
-                        case CLASS_WARRIOR:
-                            allowEquip = (itemSkill == SKILL_PLATE_MAIL);
-                            break;
+                        allowEquip = (itemSkill == SKILL_PLATE_MAIL);
+                    }
+                    else if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
+                    {
+                        allowEquip = (itemSkill == SKILL_MAIL);
                     }
                 }
                 if (!allowEquip && GetSkillValue(itemSkill) == 0)
@@ -2342,7 +2331,7 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
     }
 
-    if (getLevel() < proto->RequiredLevel)
+    if (GetLevel() < proto->RequiredLevel)
     {
         return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
     }
@@ -2400,39 +2389,40 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
             return EQUIP_ERR_CANT_EQUIP_SKILL;
     }
 
-    uint8 _class = getClass();
-
     if (proto->Class == ITEM_CLASS_WEAPON && GetSkillValue(item_weapon_skills[proto->SubClass]) == 0)
         return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
 
     if (proto->Class == ITEM_CLASS_ARMOR)
     {
         // Check for shields
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD && !(_class == CLASS_PALADIN || _class == CLASS_WARRIOR || _class == CLASS_SHAMAN))
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SHIELD && !(
+            IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_SHIELDS)
+            || IsClass(CLASS_WARRIOR, CLASS_CONTEXT_EQUIP_SHIELDS)
+            || IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_SHIELDS)))
         {
             return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
         }
 
         // Check for librams.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && _class != CLASS_PALADIN)
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_LIBRAM && !IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_RELIC))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
         // CHeck for idols.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && _class != CLASS_DRUID)
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_IDOL && !IsClass(CLASS_DRUID, CLASS_CONTEXT_EQUIP_RELIC))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
         // Check for totems.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && _class != CLASS_SHAMAN)
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_TOTEM && !IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_RELIC))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
 
         // Check for sigils.
-        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && _class != CLASS_DEATH_KNIGHT)
+        if (proto->SubClass == ITEM_SUBCLASS_ARMOR_SIGIL && !IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_RELIC))
         {
             return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
         }
@@ -2442,33 +2432,33 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         proto->InventoryType != INVTYPE_CLOAK)
     {
         uint32 subclassToCompare = ITEM_SUBCLASS_ARMOR_CLOTH;
-        switch (_class)
+        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_PALADIN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
         {
-            case CLASS_WARRIOR:
-                if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
-                {
-                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
-                }
-                [[fallthrough]];
-            case CLASS_DEATH_KNIGHT:
-            case CLASS_PALADIN:
-                subclassToCompare = ITEM_SUBCLASS_ARMOR_PLATE;
-                break;
-            case CLASS_HUNTER:
-            case CLASS_SHAMAN:
-                subclassToCompare = ITEM_SUBCLASS_ARMOR_MAIL;
-                break;
-            case CLASS_ROGUE:
-                if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
-                {
-                    return EQUIP_ERR_CANT_DO_RIGHT_NOW;
-                }
-                [[fallthrough]];
-            case CLASS_DRUID:
-                subclassToCompare = ITEM_SUBCLASS_ARMOR_LEATHER;
-                break;
-            default:
-                break;
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_PLATE;
+        }
+        else if (IsClass(CLASS_WARRIOR, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
+        {
+            if ((proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat()))
+            {
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+            }
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_PLATE;
+        }
+        else if (IsClass(CLASS_HUNTER, CLASS_CONTEXT_EQUIP_ARMOR_CLASS) || IsClass(CLASS_SHAMAN, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
+        {
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_MAIL;
+        }
+        else if (IsClass(CLASS_DRUID, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
+        {
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_LEATHER;
+        }
+        else if (IsClass(CLASS_ROGUE, CLASS_CONTEXT_EQUIP_ARMOR_CLASS))
+        {
+            if (proto->HasStat(ITEM_MOD_SPELL_POWER) || proto->HasSpellPowerStat())
+            {
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+            }
+            subclassToCompare = ITEM_SUBCLASS_ARMOR_LEATHER;
         }
 
         if (proto->SubClass > subclassToCompare)
@@ -2778,7 +2768,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
             if (pProto && IsInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
             {
-                uint32 cooldownSpell = getClass() == CLASS_ROGUE ? 6123 : 6119;
+                uint32 cooldownSpell = IsClass(CLASS_ROGUE, CLASS_CONTEXT_WEAPON_SWAP) ? 6123 : 6119;
                 SpellInfo const* spellProto = sSpellMgr->GetSpellInfo(cooldownSpell);
 
                 if (!spellProto)
@@ -4348,7 +4338,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
     if (!ignore_condition && pEnchant->EnchantmentCondition && !EnchantmentFitsRequirements(pEnchant->EnchantmentCondition, -1))
         return;
 
-    if (pEnchant->requiredLevel > getLevel())
+    if (pEnchant->requiredLevel > GetLevel())
         return;
 
     if (pEnchant->requiredSkill > 0 && pEnchant->requiredSkillValue > GetSkillValue(pEnchant->requiredSkill))
@@ -4460,6 +4450,8 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                             }
                         }
                     }
+
+                    sScriptMgr->OnApplyEnchantmentItemModsBefore(this, item, slot, apply, enchant_spell_id, enchant_amount);
 
                     LOG_DEBUG("entities.player.items", "Adding {} to stat nb {}", enchant_amount, enchant_spell_id);
                     switch (enchant_spell_id)
@@ -4651,7 +4643,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 }
                 case ITEM_ENCHANTMENT_TYPE_TOTEM:           // Shaman Rockbiter Weapon
                 {
-                    if (getClass() == CLASS_SHAMAN)
+                    if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_ABILITY))
                     {
                         float addValue = 0.0f;
                         if (item->GetSlot() == EQUIPMENT_SLOT_MAINHAND)
@@ -4921,7 +4913,7 @@ bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, flo
 
 void Player::SetHomebind(WorldLocation const& loc, uint32 areaId)
 {
-    loc.GetPosition(m_homebindX, m_homebindY, m_homebindZ, m_homebindO);
+    loc.GetPosition(m_homebindX, m_homebindY, m_homebindZ);
     m_homebindMapId = loc.GetMapId();
     m_homebindAreaId = areaId;
 
@@ -4929,11 +4921,10 @@ void Player::SetHomebind(WorldLocation const& loc, uint32 areaId)
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_PLAYER_HOMEBIND);
     stmt->SetData(0, m_homebindMapId);
     stmt->SetData(1, m_homebindAreaId);
-    stmt->SetData(2, m_homebindX);
-    stmt->SetData(3, m_homebindY);
-    stmt->SetData(4, m_homebindZ);
-    stmt->SetData(5, m_homebindO);
-    stmt->SetData(6, GetGUID().GetCounter());
+    stmt->SetData (2, m_homebindX);
+    stmt->SetData (3, m_homebindY);
+    stmt->SetData (4, m_homebindZ);
+    stmt->SetData(5, GetGUID().GetCounter());
     CharacterDatabase.Execute(stmt);
 }
 
@@ -4954,8 +4945,8 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     //"arenaPoints, totalHonorPoints, todayHonorPoints, yesterdayHonorPoints, totalKills, todayKills, yesterdayKills, chosenTitle, knownCurrencies, watchedFaction, drunk, "
     // 55      56      57      58      59      60      61      62      63           64                 65                 66             67              68      69
     //"health, power1, power2, power3, power4, power5, power6, power7, instance_id, talentGroupsCount, activeTalentGroup, exploredZones, equipmentCache, ammoId, knownTitles,
-    // 70          71               72
-    //"actionBars, grantableLevels, innTriggerId FROM characters WHERE guid = '{}'", guid);
+    // 70          71               72            73                     74
+    //"actionBars, grantableLevels, innTriggerId, extraBonusTalentCount, UNIX_TIMESTAMP(creation_date) FROM characters WHERE guid = '{}'", guid);
     PreparedQueryResult result = holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_FROM);
 
     if (!result)
@@ -4989,8 +4980,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     m_name = fields[2].Get<std::string>();
 
     // check name limitations
-    if (ObjectMgr::CheckPlayerName(m_name) != CHAR_NAME_SUCCESS ||
-        (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()) && sObjectMgr->IsReservedName(m_name)))
+    if (ObjectMgr::CheckPlayerName(m_name) != CHAR_NAME_SUCCESS)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->SetData(0, uint16(AT_LOGIN_RENAME));
@@ -5031,6 +5021,9 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     SetObjectScale(1.0f);
     SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
+
+    // load character creation date, relevant for achievements of type average
+    SetCreationTime(fields[74].Get<Seconds>());
 
     // load achievements before anything else to prevent multiple gains for the same achievement/criteria on every loading (as loading does call UpdateAchievementCriteria)
     m_achievementMgr->LoadFromDB(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS));
@@ -5104,7 +5097,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     std::string taxi_nodes = fields[42].Get<std::string>();
 
-    auto RelocateToHomebind = [this, &mapId, &instanceId]() { mapId = m_homebindMapId; instanceId = 0; Relocate(m_homebindX, m_homebindY, m_homebindZ, m_homebindO); };
+    auto RelocateToHomebind = [this, &mapId, &instanceId]() { mapId = m_homebindMapId; instanceId = 0; Relocate(m_homebindX, m_homebindY, m_homebindZ); };
 
     _LoadGroup();
 
@@ -5284,7 +5277,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         if (at)
             Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
         else
-        RelocateToHomebind();
+            RelocateToHomebind();
     }
 
     // NOW player must have valid map
@@ -5457,7 +5450,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     // add ghost flag (must be after aura load: PLAYER_FLAGS_GHOST set in aura)
     if (HasPlayerFlag(PLAYER_FLAGS_GHOST))
     {
-        m_deathState = DEAD;
+        m_deathState = DeathState::Dead;
         AddUnitState(UNIT_STATE_ISOLATED);
     }
 
@@ -5473,7 +5466,10 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     _LoadMonthlyQuestStatus(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_MONTHLY_QUEST_STATUS));
     _LoadRandomBGStatus(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_RANDOM_BG));
 
-    // after spell and quest load
+    // Extra Bonus Talent Points
+    m_extraBonusTalentCount = fields[73].Get<uint8>();
+
+    // after spell, bonus talents, and quest load
     InitTalentForLevel();
 
     // must be before inventory (some items required reputation check)
@@ -6737,9 +6733,9 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
         if (!sWorld->getBoolConfig(CONFIG_INSTANCE_IGNORE_LEVEL))
         {
-            if (ar->levelMin && getLevel() < ar->levelMin)
+            if (ar->levelMin && GetLevel() < ar->levelMin)
                 LevelMin = ar->levelMin;
-            if (ar->levelMax && getLevel() > ar->levelMax)
+            if (ar->levelMax && GetLevel() > ar->levelMax)
                 LevelMax = ar->levelMax;
         }
 
@@ -6877,7 +6873,13 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     else if (missingPlayerItems.size())
                     {
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), LevelMin, sObjectMgr->GetItemTemplate(missingPlayerItems[0]->id)->Name1.c_str());
+                        LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
+                        std::string name = sObjectMgr->GetItemTemplate(missingPlayerItems[0]->id)->Name1;
+                        if (ItemLocale const* il = sObjectMgr->GetItemLocale(missingPlayerItems[0]->id))
+                        {
+                            ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+                        }
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), ar->levelMin, name.c_str());
                     }
                     else if (LevelMin)
                     {
@@ -6975,7 +6977,7 @@ bool Player::CheckInstanceLoginValid()
     if (GetMap()->IsRaid())
     {
         // cannot be in raid instance without a group
-        if (!GetGroup())
+        if (!GetGroup() && !sWorld->getBoolConfig(CONFIG_INSTANCE_IGNORE_RAID))
             return false;
     }
     else
@@ -7010,7 +7012,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
     }
 
     bool ok = false;
-    // SELECT mapId, zoneId, posX, posY, posZ, pozO FROM character_homebind WHERE guid = ?
+    // SELECT mapId, zoneId, posX, posY, posZ FROM character_homebind WHERE guid = ?
     if (result)
     {
         Field* fields = result->Fetch();
@@ -7020,12 +7022,11 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         m_homebindX = fields[2].Get<float>();
         m_homebindY = fields[3].Get<float>();
         m_homebindZ = fields[4].Get<float>();
-        m_homebindO = fields[5].Get<float>();
 
         MapEntry const* bindMapEntry = sMapStore.LookupEntry(m_homebindMapId);
 
         // accept saved data only for valid position (and non instanceable), and accessable
-        if (MapMgr::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, m_homebindO) &&
+        if (MapMgr::IsValidMapCoord(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ) &&
             !bindMapEntry->Instanceable() && GetSession()->Expansion() >= bindMapEntry->Expansion())
             ok = true;
         else
@@ -7043,20 +7044,19 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         m_homebindX = info->positionX;
         m_homebindY = info->positionY;
         m_homebindZ = info->positionZ;
-        m_homebindO = info->orientation;
+
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_HOMEBIND);
         stmt->SetData(0, GetGUID().GetCounter());
         stmt->SetData(1, m_homebindMapId);
         stmt->SetData(2, m_homebindAreaId);
-        stmt->SetData(3, m_homebindX);
-        stmt->SetData(4, m_homebindY);
-        stmt->SetData(5, m_homebindZ);
-        stmt->SetData(6, m_homebindO);
+        stmt->SetData (3, m_homebindX);
+        stmt->SetData (4, m_homebindY);
+        stmt->SetData (5, m_homebindZ);
         CharacterDatabase.Execute(stmt);
     }
 
-    LOG_DEBUG("entities.player", "Setting player home position - mapid: {}, areaid: {}, X: {}, Y: {}, Z: {}, O: {}",
-              m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ, m_homebindO);
+    LOG_DEBUG("entities.player", "Setting player home position - mapid: {}, areaid: {}, X: {}, Y: {}, Z: {}",
+              m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ);
     return true;
 }
 
@@ -7758,7 +7758,7 @@ void Player::_SaveSpells(CharacterDatabaseTransaction trans)
 void Player::_SaveStats(CharacterDatabaseTransaction trans)
 {
     // check if stat saving is enabled and if char level is high enough
-    if (!sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE) || getLevel() < sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE))
+    if (!sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE) || GetLevel() < sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE))
         return;
 
     CharacterDatabasePreparedStatement* stmt = nullptr;

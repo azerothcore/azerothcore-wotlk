@@ -30,7 +30,6 @@
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "UnitAI.h"
-#include "Util.h"
 #include "World.h"
 #include "WorldStatePackets.h"
 #include <time.h>
@@ -473,7 +472,7 @@ void GameEventMgr::LoadFromDB()
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
-                GameObjectData const* data = sObjectMgr->GetGOData(guid);
+                GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
                 if (!data)
                 {
                     LOG_ERROR("sql.sql", "`game_event_gameobject` contains gameobject (GUID: {}) not found in `gameobject` table.", guid);
@@ -826,7 +825,7 @@ void GameEventMgr::LoadFromDB()
                 Field* fields = result->Fetch();
 
                 uint32 questId  = fields[0].Get<uint32>();
-                uint32 eventEntry = fields[1].Get<uint32>(); // TODO: Change to uint8
+                uint32 eventEntry = fields[1].Get<uint32>(); /// @todo: Change to uint8
 
                 Quest* questTemplate = const_cast<Quest*>(sObjectMgr->GetQuestTemplate(questId));
 
@@ -1357,7 +1356,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
     for (GuidLowList::iterator itr = mGameEventGameobjectGuids[internal_event_id].begin(); itr != mGameEventGameobjectGuids[internal_event_id].end(); ++itr)
     {
         // Add to correct cell
-        if (GameObjectData const* data = sObjectMgr->GetGOData(*itr))
+        if (GameObjectData const* data = sObjectMgr->GetGameObjectData(*itr))
         {
             sObjectMgr->AddGameobjectToGrid(*itr, data);
             // Spawn if necessary (loaded grids only)
@@ -1438,7 +1437,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         if (event_id > 0 && hasGameObjectActiveEventExcept(*itr, event_id))
             continue;
         // Remove the gameobject from grid
-        if (GameObjectData const* data = sObjectMgr->GetGOData(*itr))
+        if (GameObjectData const* data = sObjectMgr->GetGameObjectData(*itr))
         {
             sObjectMgr->RemoveGameobjectFromGrid(*itr, data);
 

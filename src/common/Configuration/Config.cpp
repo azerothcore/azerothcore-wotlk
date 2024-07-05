@@ -21,6 +21,7 @@
 #include "StringFormat.h"
 #include "Tokenize.h"
 #include "Util.h"
+#include <cstdlib>
 #include <fstream>
 #include <mutex>
 #include <unordered_map>
@@ -31,16 +32,25 @@ namespace
     std::vector<std::string> _additonalFiles;
     std::vector<std::string> _args;
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
+    std::unordered_map<std::string /*name*/, std::string /*value*/> _envVarCache;
     std::mutex _configLock;
-    bool _usingDistConfig = false;
+
+    std::vector<std::string> _fatalConfigOptions =
+    {
+        { "RealmID" },
+        { "LoginDatabaseInfo" },
+        { "WorldDatabaseInfo" },
+        { "CharacterDatabaseInfo" },
+    };
 
     // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
     {
         size_t foundAuth = fileName.find("authserver.conf");
         size_t foundWorld = fileName.find("worldserver.conf");
+        size_t foundImport = fileName.find("dbimport.conf");
 
-        return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos;
+        return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos || foundImport != std::string_view::npos;
     }
 
     // Check logging system configs like Appender.* and Logger.*
@@ -119,7 +129,7 @@ namespace
             auto const& itr = fileConfigs.find(confOption);
             if (itr != fileConfigs.end())
             {
-                PrintError(file, "> Config::LoadFile: Dublicate key name '{}' in config file '{}'", confOption, file);
+                PrintError(file, "> Config::LoadFile: Duplicate key name '{}' in config file '{}'", confOption, file);
                 return true;
             }
 
@@ -216,6 +226,86 @@ namespace
 
         return false;
     }
+
+    // Converts ini keys to the environment variable key (upper snake case).
+    // Example of conversions:
+    //   SomeConfig => SOME_CONFIG
+    //   myNestedConfig.opt1 => MY_NESTED_CONFIG_OPT_1
+    //   LogDB.Opt.ClearTime => LOG_DB_OPT_CLEAR_TIME
+    std::string IniKeyToEnvVarKey(std::string const& key)
+    {
+        std::string result;
+
+        const char* str = key.c_str();
+        size_t n = key.length();
+
+        char curr;
+        bool isEnd;
+        bool nextIsUpper;
+        bool currIsNumeric;
+        bool nextIsNumeric;
+
+        for (size_t i = 0; i < n; ++i)
+        {
+            curr = str[i];
+            if (curr == ' ' || curr == '.' || curr == '-')
+            {
+                result += '_';
+                continue;
+            }
+
+            isEnd = i == n - 1;
+            if (!isEnd)
+            {
+                nextIsUpper = isupper(str[i + 1]);
+
+                // handle "aB" to "A_B"
+                if (!isupper(curr) && nextIsUpper)
+                {
+                    result += static_cast<char>(std::toupper(curr));
+                    result += '_';
+                    continue;
+                }
+
+                currIsNumeric = isNumeric(curr);
+                nextIsNumeric = isNumeric(str[i + 1]);
+
+                // handle "a1" to "a_1"
+                if (!currIsNumeric && nextIsNumeric)
+                {
+                    result += static_cast<char>(std::toupper(curr));
+                    result += '_';
+                    continue;
+                }
+
+                // handle "1a" to "1_a"
+                if (currIsNumeric && !nextIsNumeric)
+                {
+                    result += static_cast<char>(std::toupper(curr));
+                    result += '_';
+                    continue;
+                }
+            }
+
+            result += static_cast<char>(std::toupper(curr));
+        }
+        return result;
+    }
+
+    std::string GetEnvVarName(std::string const& configName)
+    {
+        return "AC_" + IniKeyToEnvVarKey(configName);
+    }
+
+    Optional<std::string> EnvVarForIniKey(std::string const& key)
+    {
+        std::string envKey = GetEnvVarName(key);
+        char* val = std::getenv(envKey.c_str());
+        if (!val)
+            return std::nullopt;
+
+        return std::string(val);
+    }
 }
 
 bool ConfigMgr::LoadInitial(std::string const& file, bool isReload /*= false*/)
@@ -244,25 +334,109 @@ bool ConfigMgr::Reload()
         return false;
     }
 
-    return LoadModulesConfigs(true, false);
+    if (!LoadModulesConfigs(true, false))
+    {
+        return false;
+    }
+
+    OverrideWithEnvVariablesIfAny();
+
+    return true;
+}
+
+// Check the _envVarCache if the env var is there
+// if not, check the env for the value
+Optional<std::string> GetEnvFromCache(std::string const& configName, std::string const& envVarName)
+{
+    auto foundInCache = _envVarCache.find(envVarName);
+    Optional<std::string> foundInEnv;
+    // If it's not in the cache
+    if (foundInCache == _envVarCache.end())
+    {
+        // Check the env itself
+        foundInEnv = EnvVarForIniKey(configName);
+        if (foundInEnv)
+        {
+            // If it's found in the env, put it in the cache
+            _envVarCache.emplace(envVarName, *foundInEnv);
+        }
+        // Return the result of checking env
+        return foundInEnv;
+    }
+
+    return foundInCache->second;
+}
+
+std::vector<std::string> ConfigMgr::OverrideWithEnvVariablesIfAny()
+{
+    std::lock_guard<std::mutex> lock(_configLock);
+
+    std::vector<std::string> overriddenKeys;
+
+    for (auto& itr : _configOptions)
+    {
+        if (itr.first.empty())
+            continue;
+
+        Optional<std::string> envVar = EnvVarForIniKey(itr.first);
+        if (!envVar)
+            continue;
+
+        itr.second = *envVar;
+
+        overriddenKeys.push_back(itr.first);
+    }
+
+    return overriddenKeys;
 }
 
 template<class T>
 T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLogs /*= true*/) const
 {
+    std::string strValue;
+
     auto const& itr = _configOptions.find(name);
-    if (itr == _configOptions.end())
+    bool fatalConfig = false;
+    bool notFound = itr == _configOptions.end();
+    auto envVarName = GetEnvVarName(name);
+    Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
+    if (envVar)
+    {
+        // If showLogs and this key/value pair wasn't found in the currently saved config
+        if (showLogs && (notFound || itr->second != envVar->c_str()))
+        {
+            LOG_INFO("server.loading", "> Config: Found config value '{}' from environment variable '{}'.", name, envVarName );
+            AddKey(name, envVar->c_str(), "ENVIRONMENT", false, false);
+        }
+
+        strValue = *envVar;
+    }
+    else if (notFound)
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing property {} in all config files, at least the .dist file must contain: \"{} = {}\"",
-                name, name, Acore::ToString(def));
-        }
+            for (std::string s : _fatalConfigOptions)
+                if (s == name)
+                {
+                    fatalConfig = true;
+                    break;
+                }
 
+            if (fatalConfig)
+                LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable\n\nYour server cannot start without this option!",
+                    name, _filename, name, Acore::ToString(def), envVarName);
+            else
+                LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+                    name, _filename, name, Acore::ToString(def), envVarName);
+        }
         return def;
     }
+    else
+    {
+        strValue = itr->second;
+    }
 
-    auto value = Acore::StringTo<T>(itr->second);
+    auto value = Acore::StringTo<T>(strValue);
     if (!value)
     {
         if (showLogs)
@@ -281,12 +455,38 @@ template<>
 std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std::string const& def, bool showLogs /*= true*/) const
 {
     auto const& itr = _configOptions.find(name);
-    if (itr == _configOptions.end())
+    bool fatalConfig = false;
+    bool notFound = itr == _configOptions.end();
+    auto envVarName = GetEnvVarName(name);
+    Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
+    if (envVar)
+    {
+        // If showLogs and this key/value pair wasn't found in the currently saved config
+        if (showLogs && (notFound || itr->second != envVar->c_str()))
+        {
+            LOG_INFO("server.loading", "> Config: Found config value '{}' from environment variable '{}'.", name, envVarName);
+            AddKey(name, *envVar, "ENVIRONMENT", false, false);
+        }
+
+        return *envVar;
+    }
+    else if (notFound)
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing option {}, add \"{} = {}\"",
-                name, name, def);
+            for (std::string s : _fatalConfigOptions)
+                if (s == name)
+                {
+                    fatalConfig = true;
+                    break;
+                }
+
+            if (fatalConfig)
+                LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.\n\nYour server cannot start without this option!",
+                    name, _filename, name, def, envVarName);
+            else
+                LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+                    name, _filename, name, def, envVarName);
         }
 
         return def;
@@ -341,7 +541,7 @@ std::vector<std::string> ConfigMgr::GetKeysByString(std::string const& name)
 std::string const ConfigMgr::GetFilename()
 {
     std::lock_guard<std::mutex> lock(_configLock);
-    return _usingDistConfig ? _filename + ".dist" : _filename;
+    return _filename;
 }
 
 std::vector<std::string> const& ConfigMgr::GetArguments() const
@@ -377,16 +577,10 @@ void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::stri
 
 bool ConfigMgr::LoadAppConfigs(bool isReload /*= false*/)
 {
-    // #1 - Load init config file .conf.dist
-    if (!LoadInitial(_filename + ".dist", isReload))
+    // #1 - Load init config file .conf
+    if (!LoadInitial(_filename, isReload))
     {
         return false;
-    }
-
-    // #2 - Load .conf file
-    if (!LoadAdditionalFile(_filename, true, isReload))
-    {
-        _usingDistConfig = true;
     }
 
     return true;
@@ -469,25 +663,25 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
     return true;
 }
 
-// @deprecated DO NOT USE - use GetOption<std::string> instead.
+/// @deprecated DO NOT USE - use GetOption<std::string> instead.
 std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def, bool showLogs /*= true*/)
 {
     return GetOption<std::string>(name, def, showLogs);
 }
 
-// @deprecated DO NOT USE - use GetOption<bool> instead.
+/// @deprecated DO NOT USE - use GetOption<bool> instead.
 bool ConfigMgr::GetBoolDefault(std::string const& name, bool def, bool showLogs /*= true*/)
 {
     return GetOption<bool>(name, def, showLogs);
 }
 
-// @deprecated DO NOT USE - use GetOption<int32> instead.
+/// @deprecated DO NOT USE - use GetOption<int32> instead.
 int ConfigMgr::GetIntDefault(std::string const& name, int def, bool showLogs /*= true*/)
 {
     return GetOption<int32>(name, def, showLogs);
 }
 
-// @deprecated DO NOT USE - use GetOption<float> instead.
+/// @deprecated DO NOT USE - use GetOption<float> instead.
 float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool showLogs /*= true*/)
 {
     return GetOption<float>(name, def, showLogs);

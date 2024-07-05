@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "scholomance.h"
 
@@ -72,7 +73,7 @@ struct boss_kormok : public ScriptedAI
         _summons.DespawnAll();
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         Talk(TALK_SUMMON);
 
@@ -83,7 +84,7 @@ struct boss_kormok : public ScriptedAI
         });
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(TALK_AGGRO);
 
@@ -212,3 +213,4 @@ void AddSC_boss_kormok()
     RegisterSpellScript(spell_kormok_summon_bone_mages);
     RegisterSpellScript(spell_kormok_summon_bone_minions);
 }
+

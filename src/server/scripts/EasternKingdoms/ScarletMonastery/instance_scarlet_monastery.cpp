@@ -15,7 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
@@ -66,7 +67,10 @@ public:
 
     struct instance_scarlet_monastery_InstanceMapScript : public InstanceScript
     {
-        instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map) {}
+        instance_scarlet_monastery_InstanceMapScript(Map* map) : InstanceScript(map)
+        {
+            SetHeaders(DataHeader);
+        }
 
         void OnPlayerEnter(Player* player) override
         {
@@ -152,6 +156,9 @@ public:
                     if (data == SPECIAL)
                         encounter = SPECIAL;
                     break;
+                case DATA_HORSEMAN_EVENT:
+                    encounter = data;
+                    break;
             }
         }
 
@@ -174,6 +181,8 @@ public:
         {
             if (type == TYPE_MOGRAINE_AND_WHITE_EVENT)
                 return encounter;
+            else if (type == DATA_HORSEMAN_EVENT)
+                return encounter;
             return 0;
         }
     private:
@@ -193,52 +202,6 @@ enum ScarletMonasteryTrashMisc
     SPELL_COSMETIC_CHAIN = 45537,
     SPELL_COSMETIC_EXPLODE = 45935,
     SPELL_FORGIVENESS = 28697,
-};
-
-class npc_scarlet_guard : public CreatureScript
-{
-public:
-    npc_scarlet_guard() : CreatureScript("npc_scarlet_guard") { }
-
-    struct npc_scarlet_guardAI : public SmartAI
-    {
-        npc_scarlet_guardAI(Creature* creature) : SmartAI(creature) { }
-
-        void Reset() override
-        {
-            SayAshbringer = false;
-        }
-
-        void MoveInLineOfSight(Unit* who) override
-        {
-            if (who && who->GetDistance2d(me) < 12.0f)
-            {
-                if (Player* player = who->ToPlayer())
-                {
-                    if (player->HasAura(AURA_ASHBRINGER) && !SayAshbringer)
-                    {
-                        Talk(SAY_WELCOME);
-                        me->SetFaction(FACTION_FRIENDLY);
-                        me->SetSheath(SHEATH_STATE_UNARMED);
-                        me->SetFacingToObject(player);
-                        me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        me->AddAura(SPELL_AURA_MOD_ROOT, me);
-                        me->CastSpell(me, SPELL_AURA_MOD_ROOT, true);
-                        SayAshbringer = true;
-                    }
-                }
-            }
-
-            SmartAI::MoveInLineOfSight(who);
-        }
-    private:
-        bool SayAshbringer = false;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetScarletMonasteryAI<npc_scarlet_guardAI>(creature);
-    }
 };
 
 enum MograineEvents
@@ -408,13 +371,13 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_MO_AGGRO);
             me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
-            events.ScheduleEvent(EVENT_PULL_CATHEDRAL, 1000); // Has to be done via event, otherwise mob aggroing Mograine DOES NOT aggro the room
-            events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, urand(1000, 5000));
-            events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, urand(6000, 11000));
+            events.ScheduleEvent(EVENT_PULL_CATHEDRAL, 1s); // Has to be done via event, otherwise mob aggroing Mograine DOES NOT aggro the room
+            events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 1s, 5s);
+            events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 6s, 11s);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -487,8 +450,8 @@ public:
                     me->RemoveAurasDueToSpell(SPELL_PERMANENT_FEIGN_DEATH);
                     me->CastSpell(me, SPELL_RETRIBUTION_AURA, true);
                     me->CastSpell(Whitemane, SPELL_LAY_ON_HANDS, true);
-                    events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, urand(1000, 5000));
-                    events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, urand(6000, 11000));
+                    events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 1s, 5s);
+                    events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 6s, 11s);
                     if (me->GetVictim())
                         me->GetMotionMaster()->MoveChase(me->GetVictim());
                     heal = true;
@@ -509,11 +472,11 @@ public:
                 {
                     case EVENT_SPELL_CRUSADER_STRIKE:
                         me->CastSpell(me->GetVictim(), SPELL_CRUSADER_STRIKE, true);
-                        events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 10000);
+                        events.ScheduleEvent(EVENT_SPELL_CRUSADER_STRIKE, 10s);
                         break;
                     case EVENT_SPELL_HAMMER_OF_JUSTICE:
                         me->CastSpell(me->GetVictim(), SPELL_HAMMER_OF_JUSTICE, true);
-                        events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 60000);
+                        events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 60s);
                         break;
                     case EVENT_PULL_CATHEDRAL:
                         PullCathedral();
@@ -565,17 +528,17 @@ public:
             instance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, FAIL);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SAY_WH_INTRO);
-            events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, urand(1000, 3000));
-            events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 6000);
-            events.ScheduleEvent(EVENT_SPELL_HEAL, 9000);
+            events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 1s, 3s);
+            events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 6s);
+            events.ScheduleEvent(EVENT_SPELL_HEAL, 9s);
         }
 
         void DamageTaken(Unit* /*doneBy*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (!canResurrectCheck && damage >= me->GetHealth())
+            if ((!canResurrectCheck || canResurrect) && damage >= me->GetHealth())
                 damage = me->GetHealth() - 1;
         }
 
@@ -652,11 +615,11 @@ public:
                 {
                     case EVENT_SPELL_POWER_WORLD_SHIELD:
                         me->CastSpell(me, SPELL_POWER_WORD_SHIELD, false);
-                        events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15000);
+                        events.ScheduleEvent(EVENT_SPELL_POWER_WORLD_SHIELD, 15s);
                         break;
                     case EVENT_SPELL_HOLY_SMITE:
                         me->CastSpell(me->GetVictim(), SPELL_HOLY_SMITE, false);
-                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6000);
+                        events.ScheduleEvent(EVENT_SPELL_HOLY_SMITE, 6s);
                         break;
                     case EVENT_SPELL_HEAL:
                         me->CastSpell(me, SPELL_HEAL, false);
@@ -687,106 +650,6 @@ class npc_fairbanks : public CreatureScript
 public:
     npc_fairbanks() : CreatureScript("npc_fairbanks") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        AddGossipItemFor(player, 0, "Curse? What's going on here, Fairbanks?", GOSSIP_SENDER_MAIN, 1);
-        SendGossipMenuFor(player, 100100, creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32  /*Sender*/, uint32 uiAction) override
-    {
-        ClearGossipMenuFor(player);
-
-        switch (uiAction)
-        {
-            case 1:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "Mograine?", GOSSIP_SENDER_MAIN, 2);
-                SendGossipMenuFor(player, 100101, creature->GetGUID());
-                return true;
-            case 2:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "What do you mean?", GOSSIP_SENDER_MAIN, 3);
-                SendGossipMenuFor(player, 100102, creature->GetGUID());
-                return true;
-            case 3:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "I still do not fully understand.", GOSSIP_SENDER_MAIN, 4);
-                SendGossipMenuFor(player, 100103, creature->GetGUID());
-                return true;
-            case 4:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "Incredible story. So how did he die?", GOSSIP_SENDER_MAIN, 5);
-                SendGossipMenuFor(player, 100104, creature->GetGUID());
-                return true;
-            case 5:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "You mean...", GOSSIP_SENDER_MAIN, 6);
-                SendGossipMenuFor(player, 100105, creature->GetGUID());
-                return true;
-            case 6:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "How do you know all of this?", GOSSIP_SENDER_MAIN, 7);
-                SendGossipMenuFor(player, 100106, creature->GetGUID());
-                return true;
-            case 7:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "A thousand? For one man?", GOSSIP_SENDER_MAIN, 8);
-                SendGossipMenuFor(player, 100107, creature->GetGUID());
-                return true;
-            case 8:
-                creature->HandleEmoteCommand(5);
-                AddGossipItemFor(player, 0, "Yet? Yet what?", GOSSIP_SENDER_MAIN, 9);
-                SendGossipMenuFor(player, 100108, creature->GetGUID());
-                return true;
-            case 9:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "And did he?", GOSSIP_SENDER_MAIN, 10);
-                SendGossipMenuFor(player, 100109, creature->GetGUID());
-                return true;
-            case 10:
-                creature->HandleEmoteCommand(274);
-                AddGossipItemFor(player, 0, "Continue please, Fairbanks.", GOSSIP_SENDER_MAIN, 11);
-                SendGossipMenuFor(player, 100110, creature->GetGUID());
-                return true;
-            case 11:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "You mean...", GOSSIP_SENDER_MAIN, 12);
-                SendGossipMenuFor(player, 100111, creature->GetGUID());
-                return true;
-            case 12:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "You were right, Fairbanks. That is tragic.", GOSSIP_SENDER_MAIN, 13);
-                SendGossipMenuFor(player, 100112, creature->GetGUID());
-                return true;
-            case 13:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "And you did...", GOSSIP_SENDER_MAIN, 14);
-                SendGossipMenuFor(player, 100113, creature->GetGUID());
-                return true;
-            case 14:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "You tell an incredible tale, Fairbanks. What of the blade? Is it beyond redemption?", GOSSIP_SENDER_MAIN, 15);
-                SendGossipMenuFor(player, 100114, creature->GetGUID());
-                return true;
-            case 15:
-                creature->HandleEmoteCommand(1);
-                AddGossipItemFor(player, 0, "But his son is dead.", GOSSIP_SENDER_MAIN, 16);
-                SendGossipMenuFor(player, 100115, creature->GetGUID());
-                return true;
-            case 16:
-                SendGossipMenuFor(player, 100116, creature->GetGUID());
-                // todo: we need to play these 3 emote in sequence, we play only the last one right now.
-                creature->HandleEmoteCommand(274);
-                creature->HandleEmoteCommand(1);
-                creature->HandleEmoteCommand(397);
-                return true;
-        }
-
-        return true;
-    }
-
     struct npc_fairbanksAI : public SmartAI
     {
         npc_fairbanksAI(Creature* creature) : SmartAI(creature) { }
@@ -804,7 +667,6 @@ public:
                     {
                         me->SetFaction(FACTION_FRIENDLY);
                         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        me->SetSheath(SHEATH_STATE_UNARMED);
                         me->CastSpell(me, 57767, true);
                         me->SetDisplayId(16179);
                         me->SetFacingToObject(player);
@@ -826,7 +688,6 @@ public:
 void AddSC_instance_scarlet_monastery()
 {
     new instance_scarlet_monastery();
-    new npc_scarlet_guard();
     new npc_fairbanks();
     new npc_mograine();
     new boss_high_inquisitor_whitemane();

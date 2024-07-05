@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
 
@@ -83,7 +84,7 @@ struct boss_twilight_corrupter : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(who);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         Talk(SAY_AGGRO);
         _scheduler

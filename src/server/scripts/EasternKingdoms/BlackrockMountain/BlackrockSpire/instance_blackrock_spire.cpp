@@ -15,24 +15,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "blackrock_spire.h"
 
 uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUMMONER, NPC_BLACKHAND_VETERAN };
 
 enum EventIds
 {
-    EVENT_DARGONSPIRE_ROOM_STORE           = 1,
-    EVENT_DARGONSPIRE_ROOM_CHECK           = 2,
+    EVENT_DRAGONSPIRE_ROOM_STORE           = 1,
+    EVENT_DRAGONSPIRE_ROOM_CHECK           = 2,
 
     EVENT_SOLAKAR_WAVE                     = 3
 };
@@ -85,6 +87,7 @@ public:
 
         instance_blackrock_spireMapScript(InstanceMap* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
             LoadMinionData(minionData);
             LoadDoorData(doorData);
@@ -175,7 +178,7 @@ public:
                     creature->AI()->Talk(SAY_FINKLE_GANG);
                     break;
                 case NPC_CHROMATIC_ELITE_GUARD:
-                    AddMinion(creature, true);
+                    AddMinion(creature);
                     break;
             }
         }
@@ -351,7 +354,7 @@ public:
                     if (data == AREATRIGGER_DRAGONSPIRE_HALL)
                     {
                         if (GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE)
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1000);
+                            Events.ScheduleEvent(EVENT_DRAGONSPIRE_ROOM_STORE, 1s);
                     }
                     break;
                 case DATA_SOLAKAR_FLAMEWREATH:
@@ -360,7 +363,7 @@ public:
                         case IN_PROGRESS:
                             if (SolakarState == NOT_STARTED)
                             {
-                                Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500);
+                                Events.ScheduleEvent(EVENT_SOLAKAR_WAVE, 500ms);
                             }
                             break;
                         case FAIL:
@@ -554,14 +557,14 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_DARGONSPIRE_ROOM_STORE:
+                    case EVENT_DRAGONSPIRE_ROOM_STORE:
                         Dragonspireroomstore();
-                        Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
+                        Events.ScheduleEvent(EVENT_DRAGONSPIRE_ROOM_CHECK, 3s);
                         break;
-                    case EVENT_DARGONSPIRE_ROOM_CHECK:
+                    case EVENT_DRAGONSPIRE_ROOM_CHECK:
                         Dragonspireroomcheck();
                         if ((GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE))
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3000);
+                            Events.ScheduleEvent(EVENT_DRAGONSPIRE_ROOM_CHECK, 3s);
                         break;
                     case EVENT_SOLAKAR_WAVE:
                         SummonSolakarWave(CurrentSolakarWave);
@@ -670,50 +673,6 @@ public:
                 if (GameObject* door3 = instance->GetGameObject(go_emberseerin))
                     HandleGameObject(ObjectGuid::Empty, true, door3);
             }
-        }
-
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "B S " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(const char* strIn) override
-        {
-            if (!strIn)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(strIn);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(strIn);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'B' && dataHead2 == 'S')
-            {
-                for (uint8 i = 0; i < EncounterCount; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-
-                    SetBossState(i, EncounterState(tmpState));
-                }
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     protected:
@@ -846,7 +805,7 @@ public:
             if (Creature* creature = player->FindNearestCreature(NPC_SCARSHIELD_INFILTRATOR, 100.0f, true))
             {
                 bool transformHasStarted = creature->AI()->GetData(0) == 1;
-                if ((player->getLevel() < 57 || !player->HasItemCount(ITEM_UNADORNED_SEAL))  && !transformHasStarted)
+                if ((player->GetLevel() < 57 || !player->HasItemCount(ITEM_UNADORNED_SEAL))  && !transformHasStarted)
                 {
                     // Send whisper if not already sent
                     std::list<ObjectGuid>::iterator itr = std::find(whisperedTargets.begin(), whisperedTargets.end(), player->GetGUID());
@@ -876,7 +835,7 @@ public:
         {
             if (Creature* creature = player->FindNearestCreature(NPC_SCARSHIELD_INFILTRATOR, 100.0f, true))
             {
-                if (player->getLevel() >= 57 && player->HasItemCount(ITEM_UNADORNED_SEAL))
+                if (player->GetLevel() >= 57 && player->HasItemCount(ITEM_UNADORNED_SEAL))
                 {
                     creature->AI()->SetData(0, 1); // Start transform into Vaelan
                     return true;
@@ -981,7 +940,7 @@ public:
     {
         npc_vaelastrasz_the_redAI(Creature* creature) : CreatureAI(creature) { }
 
-        void IsSummonedBy(Unit* summoner) override
+        void IsSummonedBy(WorldObject* summoner) override
         {
             if (!summoner)
             {

@@ -20,7 +20,6 @@
 #include "Config.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "InstanceScript.h"
 #include "Log.h"
@@ -82,7 +81,7 @@ InstanceSave* InstanceSaveMgr::AddInstanceSave(uint32 mapId, uint32 instanceId, 
 
     if (difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
     {
-        LOG_ERROR("instance.save", "InstanceSaveMgr::AddInstanceSave: mapid = {}, instanceid = {}, wrong dificalty {}!", mapId, instanceId, difficulty);
+        LOG_ERROR("instance.save", "InstanceSaveMgr::AddInstanceSave: mapid = {}, instanceid = {}, wrong difficulty {}!", mapId, instanceId, difficulty);
         return nullptr;
     }
 
@@ -136,6 +135,8 @@ bool InstanceSaveMgr::DeleteInstanceSaveIfNeeded(InstanceSave* save, bool skipMa
 
         // clear respawn times (if map is loaded do it just to be sure, if already unloaded it won't do it by itself)
         Map::DeleteRespawnTimesInDB(save->GetMapId(), save->GetInstanceId());
+
+        sScriptMgr->OnInstanceIdRemoved(save->GetInstanceId());
 
         if (deleteSave)
         {
@@ -529,6 +530,8 @@ void InstanceSaveMgr::_ResetSave(InstanceSaveHashMap::iterator& itr)
         if (!sMapMgr->FindMap(itr->second->GetMapId(), itr->second->GetInstanceId()))
             Map::DeleteRespawnTimesInDB(itr->second->GetMapId(), itr->second->GetInstanceId());
 
+        sScriptMgr->OnInstanceIdRemoved(itr->second->GetInstanceId());
+
         delete itr->second;
         m_instanceSaveById.erase(itr);
     }
@@ -672,6 +675,9 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
         stmt->SetData(1, save->GetInstanceId());
         stmt->SetData(2, permanent);
         CharacterDatabase.Execute(stmt);
+
+        if (player)
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID, 1);
     }
 
     if (bind.save != save)

@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Texts
@@ -68,9 +69,9 @@ struct boss_moam : public BossAI
         me->SetRegeneratingPower(false);
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
+        BossAI::JustEngagedWith(who);
         Talk(EMOTE_AGGRO);
         events.ScheduleEvent(EVENT_STONE_PHASE, 90s);
         events.ScheduleEvent(EVENT_SPELL_TRAMPLE, 9s);
@@ -203,3 +204,4 @@ void AddSC_boss_moam()
     RegisterSpellScript(spell_moam_mana_drain_filter);
     RegisterSpellScript(spell_moam_summon_mana_fiends);
 }
+

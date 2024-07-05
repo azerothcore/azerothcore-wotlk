@@ -71,7 +71,7 @@ void Metric::LoadFromConfigs()
 {
     bool previousValue = _enabled;
     _enabled = sConfigMgr->GetOption<bool>("Metric.Enable", false);
-    _updateInterval = sConfigMgr->GetOption<int32>("Metric.Interval", 10);
+    _updateInterval = sConfigMgr->GetOption<int32>("Metric.Interval", 1);
 
     if (_updateInterval < 1)
     {
@@ -322,7 +322,7 @@ std::string Metric::FormatInfluxDBValue(float value)
 
 std::string Metric::FormatInfluxDBTagValue(std::string const& value)
 {
-    // ToDo: should handle '=' and ',' characters too
+    /// @todo: should handle '=' and ',' characters too
     return boost::replace_all_copy(value, " ", "\\ ");
 }
 

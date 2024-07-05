@@ -23,6 +23,8 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 
+#define DataHeader "AN"
+
 #define AzjolNerubScriptName "instance_azjol_nerub"
 
 enum ANData

@@ -28,12 +28,12 @@ npc_ranshalla
 go_elune_fire
 EndContentData */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "WorldSession.h"
 
 // Theirs
 /*######
@@ -435,7 +435,7 @@ public:
                     SetEscortPaused(true);
                     DoSummonPriestess();
                     Talk(SAY_RANSHALLA_ALTAR_2);
-                    events.ScheduleEvent(EVENT_RESUME, 2000);
+                    events.ScheduleEvent(EVENT_RESUME, 2s);
                     break;
                 case 44:
                     // Stop the escort and turn towards the altar

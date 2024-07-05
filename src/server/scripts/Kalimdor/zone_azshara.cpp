@@ -23,106 +23,15 @@ SDCategory: Azshara
 EndScriptData */
 
 /* ContentData
-npc_spitelashes
 npc_rizzle_sprysprocket
 npc_depth_charge
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
-
-/*######
-## npc_spitelashes
-######*/
-
-enum Spitelashes
-{
-    SPELL_POLYMORPH_RANK1       = 118,
-    SPELL_POLYMORPH_RANK2       = 12824,
-    SPELL_POLYMORPH_RANK3       = 12825,
-    SPELL_POLYMORPH_RANK4       = 12826,
-    SPELL_POLYMORPH             = 29124,
-    SPELL_POLYMORPH_BACKFIRE    = 28406,
-    SPELL_REMOVE_POLYMORPH      = 6924
-};
-
-class npc_spitelashes : public CreatureScript
-{
-public:
-    npc_spitelashes() : CreatureScript("npc_spitelashes") { }
-
-    struct npc_spitelashesAI : public ScriptedAI
-    {
-        npc_spitelashesAI(Creature* creature) : ScriptedAI(creature) { }
-
-        uint32 morphtimer;
-        bool spellhit;
-
-        void Reset() override
-        {
-            morphtimer = 0;
-            spellhit = false;
-        }
-
-        void EnterCombat(Unit* /*who*/) override { }
-
-        void SpellHit(Unit* unit, SpellInfo const* spell) override
-        {
-            if (spellhit)
-                return;
-
-            switch (spell->Id)
-            {
-                case SPELL_POLYMORPH_RANK1:
-                case SPELL_POLYMORPH_RANK2:
-                case SPELL_POLYMORPH_RANK3:
-                case SPELL_POLYMORPH_RANK4:
-                    if (Player* player = unit->ToPlayer())
-                        if (player->GetQuestStatus(9364) == QUEST_STATUS_INCOMPLETE)
-                        {
-                            spellhit = true;
-                            DoCast(me, SPELL_POLYMORPH);
-                        }
-                    break;
-                default:
-                    break;
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            // we mustn't remove the Creature in the same round in which we cast the summon spell, otherwise there will be no summons
-            if (spellhit && morphtimer >= 5000)
-            {
-                me->DespawnOrUnsummon();
-                return;
-            }
-            // walk 5 seconds before summoning
-            if (spellhit && morphtimer < 5000)
-            {
-                morphtimer += diff;
-                if (morphtimer >= 5000)
-                {
-                    DoCast(me, SPELL_POLYMORPH_BACKFIRE); // summon copies
-                    DoCast(me, SPELL_REMOVE_POLYMORPH);   // visual explosion
-                }
-            }
-            if (!UpdateVictim())
-                return;
-
-            /// @todo add abilities for the different creatures
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_spitelashesAI(creature);
-    }
-};
 
 /*####
 # npc_rizzle_sprysprocket
@@ -144,10 +53,10 @@ enum RizzleSprysprocketData
     SAY_RIZZLE_START                = 0,
     SAY_RIZZLE_GRENADE              = 1,
     SAY_RIZZLE_FINAL                = 2,
-    MSG_ESCAPE_NOTICE               = 3
-};
+    MSG_ESCAPE_NOTICE               = 3,
+    GOSSIP_GET_MOONSTONE            = 21893
 
-#define GOSSIP_GET_MOONSTONE "Hand over the Southfury moonstone and I'll let you go."
+};
 
 Position const WPs[58] =
 {
@@ -237,7 +146,7 @@ public:
             Reached = false;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void AttackStart(Unit* who) override
         {
@@ -386,7 +295,7 @@ public:
         if (player->GetQuestStatus(QUEST_CHASING_THE_MOONSTONE) != QUEST_STATUS_INCOMPLETE)
             return true;
 
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_GET_MOONSTONE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        AddGossipItemFor(player, GOSSIP_GET_MOONSTONE, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
         SendGossipMenuFor(player, 10811, creature->GetGUID());
 
         return true;
@@ -422,7 +331,7 @@ public:
             WeMustDieTimer = 1000;
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void AttackStart(Unit* /*who*/) override { }
 
@@ -460,7 +369,6 @@ public:
 
 void AddSC_azshara()
 {
-    new npc_spitelashes();
     new npc_rizzle_sprysprocket();
     new npc_depth_charge();
 }

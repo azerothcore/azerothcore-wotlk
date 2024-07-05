@@ -32,6 +32,7 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
+#include "TaskScheduler.h"
 #include "Timer.h"
 #include <bitset>
 #include <list>
@@ -302,7 +303,7 @@ typedef std::map<uint32/*leaderDBGUID*/, CreatureGroup*>        CreatureGroupHol
 typedef std::unordered_map<uint32 /*zoneId*/, ZoneDynamicInfo> ZoneDynamicInfoMap;
 typedef std::set<MotionTransport*> TransportsContainer;
 
-enum EncounterCreditType
+enum EncounterCreditType : uint8
 {
     ENCOUNTER_CREDIT_KILL_CREATURE  = 0,
     ENCOUNTER_CREDIT_CAST_SPELL     = 1,
@@ -453,6 +454,7 @@ public:
     [[nodiscard]] bool IsBattleground() const { return i_mapEntry && i_mapEntry->IsBattleground(); }
     [[nodiscard]] bool IsBattleArena() const { return i_mapEntry && i_mapEntry->IsBattleArena(); }
     [[nodiscard]] bool IsBattlegroundOrArena() const { return i_mapEntry && i_mapEntry->IsBattlegroundOrArena(); }
+    [[nodiscard]] bool IsWorldMap() const { return i_mapEntry && i_mapEntry->IsWorldMap(); }
 
     bool GetEntrancePos(int32& mapid, float& x, float& y)
     {
@@ -500,7 +502,7 @@ public:
 
     void UpdateIteratorBack(Player* player);
 
-    TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, WorldObject* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0);
+    TempSummon* SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties = nullptr, uint32 duration = 0, WorldObject* summoner = nullptr, uint32 spellId = 0, uint32 vehId = 0, bool visibleBySummonerOnly = false);
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
     GameObject* SummonGameObject(uint32 entry, Position const& pos, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 100, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
@@ -593,6 +595,10 @@ public:
     void LoadRespawnTimes();
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
+
+    TaskScheduler _creatureRespawnScheduler;
+
+    void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/);
 
     void LoadCorpseData();
     void DeleteCorpseData();

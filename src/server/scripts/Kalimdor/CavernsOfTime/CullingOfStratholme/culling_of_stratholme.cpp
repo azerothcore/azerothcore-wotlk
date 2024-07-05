@@ -16,9 +16,9 @@
  */
 
 #include "culling_of_stratholme.h"
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
@@ -97,13 +97,15 @@ enum Says
 
     //Cityman
     SAY_PHASE202                                = 0,
+    SAY_PHASE204_1                              = 0,
 
     //Crazyman
-    SAY_PHASE204                                = 0,
+    SAY_PHASE204                                = 1,
 
     //Drakonian
     SAY_PHASE302                                = 0,
     SAY_PHASE305                                = 1,
+    SAY_PHASE305_1                              = 39,
 };
 
 enum NPCs
@@ -385,7 +387,7 @@ public:
         void ScheduleNextEvent(uint32 currentEvent, uint32 time);
         void SummonNextWave();
         void ReorderInstance(uint32 data);
-        void EnterCombat(Unit* /*who*/) override ;
+        void JustEngagedWith(Unit* /*who*/) override ;
         void SendNextWave(uint32 entry);
         void SpawnTimeRift();
 
@@ -559,7 +561,7 @@ public:
                 case 11:
                     if (Creature* cityman = GetEventNpc(NPC_CITY_MAN2))
                     {
-                        cityman->Say("Oh no...", LANG_UNIVERSAL); // missing script_text
+                        cityman->AI()->Talk(SAY_PHASE204_1);
                         me->CastSpell(cityman, SPELL_ARTHAS_CRUSADER_STRIKE, true);
                     }
                     me->SetReactState(REACT_DEFENSIVE);
@@ -1019,7 +1021,7 @@ public:
                         }
 
                         summons.DespawnAll();
-                        me->Say("I can't afford to spare you.", LANG_UNIVERSAL);
+                        Talk(SAY_PHASE305_1);
                         me->SetFacingTo(0.0f);
                         ScheduleNextEvent(currentEvent, 5000);
                         break;
@@ -1232,7 +1234,7 @@ void npc_arthas::npc_arthasAI::SummonNextWave()
         me->SummonCreature(/*entry*/(uint32)WavesLocations[tableId][i][0], WavesLocations[tableId][i][1], WavesLocations[tableId][i][2], WavesLocations[tableId][i][3], WavesLocations[tableId][i][4]);
 }
 
-void npc_arthas::npc_arthasAI::EnterCombat(Unit* /*who*/)
+void npc_arthas::npc_arthasAI::JustEngagedWith(Unit* /*who*/)
 {
     DoCast(me, SPELL_ARTHAS_AURA);
 

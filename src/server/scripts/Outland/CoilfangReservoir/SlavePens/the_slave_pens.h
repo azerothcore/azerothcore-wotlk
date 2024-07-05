@@ -27,10 +27,11 @@ uint32 const EncounterCount               = 3;
 
 enum SPDataTypes
 {
-    DATA_MENNU_THE_BETRAYER               = 1,
-    DATA_ROKMAR_THE_CRACKLER              = 2,
-    DATA_QUAGMIRRAN                       = 3,
-    DATA_AHUNE                            = 4,
+    DATA_MENNU_THE_BETRAYER               = 0,
+    DATA_ROKMAR_THE_CRACKLER              = 1,
+    DATA_QUAGMIRRAN                       = 2,
+    DATA_AHUNE                            = 3,
+    MAX_ENCOUNTER                         = 4,
     DATA_AHUNE_BUNNY                      = 5,
     DATA_FROZEN_CORE                      = 6,
     DATA_FLAMECALLER_000                  = 7,
@@ -64,7 +65,10 @@ enum SPCreaturesIds
     NPC_SHAMAN_BEAM_BUNNY_001            = 25965,
     NPC_SHAMAN_BEAM_BUNNY_002            = 25966,
     NPC_WHISP_DEST_BUNNY                 = 26120,
-    NPC_WHISP_SOURCE_BUNNY               = 26121
+    NPC_WHISP_SOURCE_BUNNY               = 26121,
+    NPC_MENNU_THE_BETRAYER               = 17941,
+    NPC_ROKMAR_THE_CRACKLER              = 17991,
+    NPC_QUAGMIRRAN                       = 17942
 };
 
 enum SPGameObjectIds
@@ -78,5 +82,7 @@ inline AI* GetTheSlavePensAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, SPScriptName);
 }
+
+#define RegisterTheSlavePensCreatureAI(ai_name) RegisterCreatureAIWithFactory (ai_name, GetTheSlavePensAI)
 
 #endif // SLAVE_PENS_H

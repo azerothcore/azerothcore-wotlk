@@ -15,19 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Containers.h"
+#include "CreatureScript.h"
+#include "GridNotifiers.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /*
  * Scripts for spells with SPELLFAMILY_DRUID and SPELLFAMILY_GENERIC spells used by druid players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_dru_".
  */
-
-#include "Containers.h"
-#include "GridNotifiers.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
 
 enum DruidSpells
 {
@@ -55,12 +55,16 @@ enum DruidSpells
     SPELL_DRUID_SURVIVAL_INSTINCTS          = 50322,
     SPELL_DRUID_SAVAGE_ROAR                 = 62071,
     SPELL_DRUID_TIGER_S_FURY_ENERGIZE       = 51178,
-    SPELL_DRUID_ITEM_T8_BALANCE_RELIC       = 64950,
     SPELL_DRUID_BEAR_FORM_PASSIVE           = 1178,
     SPELL_DRUID_DIRE_BEAR_FORM_PASSIVE      = 9635,
     SPELL_DRUID_ENRAGE                      = 5229,
     SPELL_DRUID_ENRAGED_DEFENSE             = 70725,
     SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS     = 70726,
+};
+
+enum DruidIcons
+{
+    SPELL_ICON_REVITALIZE                   = 2862
 };
 
 // 1178 - Bear Form (Passive)
@@ -202,6 +206,12 @@ class spell_dru_omen_of_clarity : public AuraScript
             return false;
         }
 
+        // Don't proc on crafting items.
+        if (spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM))
+        {
+            return false;
+        }
+
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
         {
             return spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING) || spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE);
@@ -216,6 +226,12 @@ class spell_dru_omen_of_clarity : public AuraScript
                 return !spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT);
             }
 
+            return false;
+        }
+
+        // Revitalize
+        if (spellInfo->SpellIconID == SPELL_ICON_REVITALIZE)
+        {
             return false;
         }
 
@@ -372,20 +388,45 @@ class spell_dru_treant_scaling : public AuraScript
 };
 
 // -1850 - Dash
-class spell_dru_dash : public AuraScript
+class spell_dru_dash : public SpellScript
 {
-    PrepareAuraScript(spell_dru_dash);
+    PrepareSpellScript(spell_dru_dash);
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+        if (caster->GetShapeshiftForm() != FORM_CAT)
+        {
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_MUST_BE_IN_CAT_FORM);
+            return SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_dru_dash::CheckCast);
+    }
+};
+
+// -1850 - Dash
+class spell_dru_dash_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dru_dash_aura);
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         // do not set speed if not in cat form
         if (GetUnitOwner()->GetShapeshiftForm() != FORM_CAT)
+        {
             amount = 0;
+        }
     }
 
     void Register() override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_dash::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_dash_aura::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED);
     }
 };
 
@@ -484,8 +525,8 @@ class spell_dru_glyph_of_starfire : public SpellScript
     }
 };
 
-/* 34246 - Increased Lifebloom Periodic
-   60779 - Idol of Lush Moss */
+// 34246 - Idol of the Emerald Queen
+// 60779 - Idol of Lush Moss
 class spell_dru_idol_lifebloom : public AuraScript
 {
     PrepareAuraScript(spell_dru_idol_lifebloom);
@@ -498,7 +539,7 @@ class spell_dru_idol_lifebloom : public AuraScript
             spellMod->op = SPELLMOD_DOT;
             spellMod->type = SPELLMOD_FLAT;
             spellMod->spellId = GetId();
-            spellMod->mask = GetSpellInfo()->Effects[aurEff->GetEffIndex()].SpellClassMask;
+            spellMod->mask = aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].SpellClassMask;
         }
         spellMod->value = aurEff->GetAmount() / 7;
     }
@@ -525,24 +566,6 @@ class spell_dru_innervate : public AuraScript
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_innervate::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE);
-    }
-};
-
-// -5570 - Insect Swarm
-class spell_dru_insect_swarm : public AuraScript
-{
-    PrepareAuraScript(spell_dru_insect_swarm);
-
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
-    {
-        if (Unit* caster = GetCaster())
-            if (AuraEffect const* relicAurEff = caster->GetAuraEffect(SPELL_DRUID_ITEM_T8_BALANCE_RELIC, EFFECT_0))
-                amount += relicAurEff->GetAmount() / aurEff->GetTotalTicks();
-    }
-
-    void Register() override
-    {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_insect_swarm::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -1182,12 +1205,11 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_barkskin);
     RegisterSpellScript(spell_dru_treant_scaling);
     RegisterSpellScript(spell_dru_berserk);
-    RegisterSpellScript(spell_dru_dash);
+    RegisterSpellAndAuraScriptPair(spell_dru_dash, spell_dru_dash_aura);
     RegisterSpellScript(spell_dru_enrage);
     RegisterSpellScript(spell_dru_glyph_of_starfire);
     RegisterSpellScript(spell_dru_idol_lifebloom);
     RegisterSpellScript(spell_dru_innervate);
-    RegisterSpellScript(spell_dru_insect_swarm);
     RegisterSpellScript(spell_dru_lifebloom);
     RegisterSpellScript(spell_dru_living_seed);
     RegisterSpellScript(spell_dru_living_seed_proc);
@@ -1208,3 +1230,4 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_wild_growth);
     RegisterSpellScript(spell_dru_moonkin_form_passive_proc);
 }
+

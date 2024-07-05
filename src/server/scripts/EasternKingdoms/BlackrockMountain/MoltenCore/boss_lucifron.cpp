@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "molten_core.h"
 
@@ -42,12 +42,12 @@ public:
     {
         boss_lucifronAI(Creature* creature) : BossAI(creature, DATA_LUCIFRON) {}
 
-        void EnterCombat(Unit* /*victim*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_IMPENDING_DOOM, urand(6000, 11000));
-            events.ScheduleEvent(EVENT_LUCIFRON_CURSE, urand(11000, 14000));
-            events.ScheduleEvent(EVENT_SHADOW_SHOCK, 5000);
+            _JustEngagedWith();
+            events.ScheduleEvent(EVENT_IMPENDING_DOOM, 6s, 11s);
+            events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 11s, 14s);
+            events.ScheduleEvent(EVENT_SHADOW_SHOCK, 5s);
         }
 
         void ExecuteEvent(uint32 eventId) override

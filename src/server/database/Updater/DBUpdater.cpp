@@ -22,7 +22,6 @@
 #include "DatabaseLoader.h"
 #include "GitRevision.h"
 #include "Log.h"
-#include "QueryResult.h"
 #include "StartProcess.h"
 #include "UpdateFetcher.h"
 #include <filesystem>
@@ -229,7 +228,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
 
     if (!is_directory(sourceDirectory))
     {
-        LOG_ERROR("sql.updates", "DBUpdater: The given source directory {} does not exist, change the path to the directory where your sql directory exists (for example c:\\source\\trinitycore). Shutting down.",
+        LOG_ERROR("sql.updates", "DBUpdater: The given source directory {} does not exist, change the path to the directory where your sql directory exists (for example c:\\source\\azerothcore). Shutting down.",
                   sourceDirectory.generic_string());
         return false;
     }

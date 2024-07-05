@@ -111,7 +111,7 @@ void WorldSession::HandlePetAction(WorldPacket& recvData)
             // xinef: allow to dissmis dead pets
             if ((*itr)->GetEntry() == pet->GetEntry() && ((*itr)->IsAlive() || (flag == ACT_COMMAND && spellId == COMMAND_ABANDON)))
                 controlled.push_back(*itr);
-            // xinef: mirror image blizzard crappness
+            // xinef: mirror image blizzard
             else if ((*itr)->GetEntry() == NPC_MIRROR_IMAGE && flag == ACT_COMMAND && spellId == COMMAND_FOLLOW)
             {
                 (*itr)->InterruptNonMeleeSpells(false);
@@ -287,10 +287,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                 case COMMAND_ABANDON:                       // abandon (hunter pet) or dismiss (summoned pet)
                     if (pet->GetCharmerGUID() == GetPlayer()->GetGUID())
                     {
-                        if (pet->IsSummon())
-                            pet->ToTempSummon()->UnSummon();
-                        else
-                            _player->StopCastingCharm();
+                        _player->StopCastingCharm();
                     }
                     else if (pet->GetOwnerGUID() == GetPlayer()->GetGUID())
                     {
@@ -301,7 +298,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 GetPlayer()->RemovePet(pet->ToPet(), PET_SAVE_AS_DELETED);
                             else
                                 //dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
-                                pet->setDeathState(CORPSE);
+                                pet->setDeathState(DeathState::Corpse);
                         }
                         else if (pet->HasUnitTypeMask(UNIT_MASK_MINION | UNIT_MASK_SUMMON | UNIT_MASK_GUARDIAN | UNIT_MASK_CONTROLABLE_GUARDIAN))
                         {
@@ -321,7 +318,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     if (pet->ToPet())
                         pet->ToPet()->ClearCastWhenWillAvailable();
                     pet->ClearInPetCombat();
-                    [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                    [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
 
                 case REACT_DEFENSIVE:                       //recovery
                 case REACT_AGGRESSIVE:                      //activete
@@ -530,7 +527,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 pet->SendPetAIReaction(guid1);
                             }
 
-                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, nullptr, tempspellIsPositive);
+                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, ObjectGuid::Empty, tempspellIsPositive);
                         }
                     }
                     else if (haspositiveeffect)
@@ -566,7 +563,11 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 pet->SendPetAIReaction(guid1);
                             }
 
-                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, victim, tmpSpellIsPositive);
+                            ObjectGuid oldTarget = ObjectGuid::Empty;
+                            if (victim)
+                                oldTarget = victim->GetGUID();
+
+                            pet->ToPet()->CastWhenWillAvailable(spellId, unit_target, oldTarget, tmpSpellIsPositive);
                         }
                     }
                 }
@@ -855,12 +856,6 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
         return;
     }
 
-    if (sObjectMgr->IsReservedName(name))
-    {
-        SendPetNameInvalid(PET_NAME_RESERVED, name, nullptr);
-        return;
-    }
-
     pet->SetName(name);
 
     Unit* owner = pet->GetOwner();
@@ -947,21 +942,21 @@ void WorldSession::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutoc
     Creature* checkPet = ObjectAccessor::GetCreatureOrPetOrVehicle(*_player, packet.PetGUID);
     if (!checkPet)
     {
-        LOG_ERROR("entities.pet", "WorldSession::HandlePetSpellAutocastOpcode: Pet %s not found.", packet.PetGUID.ToString().c_str());
+        LOG_ERROR("entities.pet", "WorldSession::HandlePetSpellAutocastOpcode: Pet {} not found.", packet.PetGUID.ToString());
         return;
     }
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(packet.SpellID);
     if (!spellInfo)
     {
-        LOG_ERROR("spells.pet", "WorldSession::HandlePetSpellAutocastOpcode: Unknown spell id %u used by %s.", packet.SpellID, packet.PetGUID.ToString().c_str());
+        LOG_ERROR("spells.pet", "WorldSession::HandlePetSpellAutocastOpcode: Unknown spell id {} used by {}.", packet.SpellID, packet.PetGUID.ToString());
         return;
     }
 
     if (checkPet != _player->GetGuardianPet() && checkPet != _player->GetCharm())
     {
-        LOG_ERROR("entities.pet", "WorldSession::HandlePetSpellAutocastOpcode: %s isn't pet of player %s (%s).",
-                  packet.PetGUID.ToString().c_str(), GetPlayer()->GetName().c_str(), GetPlayer()->GetGUID().ToString().c_str());
+        LOG_ERROR("entities.pet", "WorldSession::HandlePetSpellAutocastOpcode: {} isn't pet of player {} ({}).",
+                  packet.PetGUID.ToString(), GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
         return;
     }
 

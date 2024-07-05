@@ -20,6 +20,7 @@
 
 #include "CreatureAI.h"
 #include "ObjectMgr.h"
+#include "TaskScheduler.h"
 #include "World.h"
 #include "ZoneScript.h"
 #include <set>
@@ -51,7 +52,7 @@ enum EncounterFrameType
     ENCOUNTER_FRAME_REFRESH_FRAMES      = 7,    // Xinef: can be used to refresh frames after unit was destroyed from client and send back (phase changes)
 };
 
-enum EncounterState
+enum EncounterState : uint8
 {
     NOT_STARTED   = 0,
     IN_PROGRESS   = 1,
@@ -135,6 +136,7 @@ typedef std::pair<DoorInfoMap::const_iterator, DoorInfoMap::const_iterator> Door
 typedef std::map<uint32 /*entry*/, MinionInfo> MinionInfoMap;
 typedef std::map<uint32 /*type*/, ObjectGuid /*guid*/> ObjectGuidMap;
 typedef std::map<uint32 /*entry*/, uint32 /*type*/> ObjectInfoMap;
+typedef std::map<ObjectGuid::LowType /*spawnId*/, uint8 /*state*/> ObjectStateMap;
 
 class InstanceScript : public ZoneScript
 {
@@ -148,18 +150,18 @@ public:
     //On creation, NOT load.
     virtual void Initialize() {}
 
-    //On load
-    virtual void Load(char const* data) { LoadBossState(data); }
+    // On load
+    virtual void Load(char const* data);
 
     //Called when creature is Looted
     virtual void CreatureLooted(Creature* /*creature*/, LootType) {}
 
-    //When save is needed, this function generates the data
-    virtual std::string GetSaveData() { return GetBossSaveData(); }
+    // When save is needed, this function generates the data
+    virtual std::string GetSaveData();
 
     void SaveToDB();
 
-    virtual void Update(uint32 /*diff*/) {}
+    virtual void Update(uint32 /*diff*/);
 
     //Used by the map's CanEnter function.
     //This is to prevent players from entering during boss encounters.
@@ -183,6 +185,9 @@ public:
     virtual void OnPlayerEnter(Player* /*player*/) {}
 
     virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
+
+    //Called when a player enters/leaves water bodies.
+    virtual void OnPlayerInWaterStateUpdate(Player* /*player*/, bool /*inWater*/) {}
 
     //Handle open / close objects
     //use HandleGameObject(ObjectGuid::Empty, boolen, GO); in OnObjectCreate in instance scripts
@@ -220,6 +225,9 @@ public:
     // Cast spell on all players in instance
     void DoCastSpellOnPlayers(uint32 spell);
 
+    // Cast spell on player
+    void DoCastSpellOnPlayer(Player* player, uint32 spell, bool includePets /*= false*/, bool includeControlled /*= false*/);
+
     // Return wether server allow two side groups or not
     bool ServerAllowsTwoSideGroups() { return sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP); }
 
@@ -228,6 +236,9 @@ public:
     static std::string GetBossStateName(uint8 state);
     CreatureBoundary const* GetBossBoundary(uint32 id) const { return id < bosses.size() ? &bosses[id].boundary : nullptr; }
     BossInfo const* GetBossInfo(uint32 id) const { return &bosses[id]; }
+
+    uint32 GetPersistentData(uint32 index) const { return index < persistentData.size() ? persistentData[index] : 0; };
+    void StorePersistentData(uint32 index, uint32 data);
 
     // Achievement criteria additional requirements check
     // NOTE: not use this if same can be checked existed requirement types from AchievementCriteriaRequirementType
@@ -254,34 +265,63 @@ public:
 
     // Allows to perform particular actions
     virtual void DoAction(int32 /*action*/) {}
+
+    // Allows executing code using all creatures registered in the instance script as minions
+    void DoForAllMinions(uint32 id, std::function<void(Creature*)> exec);
+
+    //
+    void StoreGameObjectState(ObjectGuid::LowType spawnId, uint8 state) { _objectStateMap[spawnId] = state; };
+    [[nodiscard]] uint8 GetStoredGameObjectState(ObjectGuid::LowType spawnId) const;
+
+    void LoadInstanceSavedGameobjectStateData();
+
+    TaskScheduler scheduler;
 protected:
+    void SetHeaders(std::string const& dataHeaders);
     void SetBossNumber(uint32 number) { bosses.resize(number); }
+    void SetPersistentDataCount(uint32 number) { persistentData.resize(number); }
     void LoadBossBoundaries(BossBoundaryData const& data);
     void LoadDoorData(DoorData const* data);
     void LoadMinionData(MinionData const* data);
     void LoadObjectData(ObjectData const* creatureData, ObjectData const* gameObjectData);
 
-    void AddObject(Creature* obj, bool add);
-    void AddObject(GameObject* obj, bool add);
-    void AddObject(WorldObject* obj, uint32 type, bool add);
+    void AddObject(Creature* obj, bool add = true);
+    void RemoveObject(Creature* obj);
+    void AddObject(GameObject* obj, bool add = true);
+    void RemoveObject(GameObject* obj);
+    void AddObject(WorldObject* obj, uint32 type, bool add = true);
+    void RemoveObject(WorldObject* obj, uint32 type);
 
-    void AddDoor(GameObject* door, bool add);
-    void AddMinion(Creature* minion, bool add);
+    void AddDoor(GameObject* door, bool add = true);
+    void RemoveDoor(GameObject* door);
+    void AddMinion(Creature* minion, bool add = true);
+    void RemoveMinion(Creature* minion);
 
     void UpdateDoorState(GameObject* door);
     void UpdateMinionState(Creature* minion, EncounterState state);
 
-    std::string LoadBossState(char const* data);
-    std::string GetBossSaveData();
+    // Instance Load and Save
+    bool ReadSaveDataHeaders(std::istringstream& data);
+    void ReadSaveDataBossStates(std::istringstream& data);
+    void ReadSavePersistentData(std::istringstream& data);
+    virtual void ReadSaveDataMore(std::istringstream& /*data*/) { }
+    void WriteSaveDataHeaders(std::ostringstream& data);
+    void WriteSaveDataBossStates(std::ostringstream& data);
+    void WritePersistentData(std::ostringstream& data);
+    virtual void WriteSaveDataMore(std::ostringstream& /*data*/) { }
+
 private:
     static void LoadObjectData(ObjectData const* creatureData, ObjectInfoMap& objectInfo);
 
+    std::vector<char> headers;
     std::vector<BossInfo> bosses;
+    std::vector<uint32> persistentData;
     DoorInfoMap doors;
     MinionInfoMap minions;
     ObjectInfoMap _creatureInfo;
     ObjectInfoMap _gameObjectInfo;
     ObjectGuidMap _objectGuids;
+    ObjectStateMap _objectStateMap;
     uint32 completedEncounters; // completed encounter mask, bit indexes are DungeonEncounter.dbc boss numbers, used for packets
     std::unordered_set<uint32> _activatedAreaTriggers;
 };

@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "blackrock_spire.h"
 
@@ -64,13 +64,13 @@ public:
     {
         boss_warmastervooneAI(Creature* creature) : BossAI(creature, DATA_WARMASTER_VOONE) { }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
 
             events.SetPhase(PHASE_BRAWLER);
-            events.ScheduleEvent(EVENT_THRASH, 3 * IN_MILLISECONDS, GROUP_BRAWLER, PHASE_BRAWLER);
-            events.ScheduleEvent(EVENT_THROW_AXE, 1 * IN_MILLISECONDS, GROUP_BRAWLER, PHASE_BRAWLER);
+            events.ScheduleEvent(EVENT_THRASH, 3s, GROUP_BRAWLER, PHASE_BRAWLER);
+            events.ScheduleEvent(EVENT_THROW_AXE, 1s, GROUP_BRAWLER, PHASE_BRAWLER);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
@@ -79,16 +79,16 @@ public:
             {
                 events.SetPhase(PHASE_THRASHER);
                 events.CancelEventGroup(GROUP_BRAWLER);
-                events.ScheduleEvent(EVENT_CLEAVE, 14 * IN_MILLISECONDS, GROUP_THRASHER, PHASE_THRASHER);
-                events.ScheduleEvent(EVENT_MORTAL_STRIKE, 12 * IN_MILLISECONDS, GROUP_THRASHER, PHASE_THRASHER);
+                events.ScheduleEvent(EVENT_CLEAVE, 14s, GROUP_THRASHER, PHASE_THRASHER);
+                events.ScheduleEvent(EVENT_MORTAL_STRIKE, 12s, GROUP_THRASHER, PHASE_THRASHER);
             }
             else if (me->HealthBelowPctDamaged(40, damage) && events.IsInPhase(PHASE_THRASHER))
             {
                 events.SetPhase(PHASE_WARMASTER);
                 events.CancelEventGroup(GROUP_THRASHER);
-                events.ScheduleEvent(EVENT_SNAP_KICK, 8 * IN_MILLISECONDS, GROUP_WARMASTER, PHASE_WARMASTER);
-                events.ScheduleEvent(EVENT_UPPERCUT, 20 * IN_MILLISECONDS, GROUP_WARMASTER, PHASE_WARMASTER);
-                events.ScheduleEvent(EVENT_PUMMEL, 32 * IN_MILLISECONDS, GROUP_WARMASTER, PHASE_WARMASTER);
+                events.ScheduleEvent(EVENT_SNAP_KICK, 8s, GROUP_WARMASTER, PHASE_WARMASTER);
+                events.ScheduleEvent(EVENT_UPPERCUT, 20s, GROUP_WARMASTER, PHASE_WARMASTER);
+                events.ScheduleEvent(EVENT_PUMMEL, 32s, GROUP_WARMASTER, PHASE_WARMASTER);
             }
         }
 

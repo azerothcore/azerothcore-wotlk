@@ -57,6 +57,7 @@
 #endif
 extern ArchiveSet gOpenArchives;
 
+// cppcheck-suppress ctuOneDefinitionRuleViolation
 typedef struct
 {
     char name[64];

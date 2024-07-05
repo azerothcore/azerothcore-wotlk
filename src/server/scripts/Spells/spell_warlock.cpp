@@ -15,20 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "Pet.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellInfo.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "TemporarySummon.h"
 /*
  * Scripts for spells with SPELLFAMILY_WARLOCK and SPELLFAMILY_GENERIC spells used by warlock players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_warl_".
  */
-
-#include "Pet.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellInfo.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
-#include "TemporarySummon.h"
 
 enum WarlockSpells
 {
@@ -63,7 +63,8 @@ enum WarlockSpells
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1            = 18213,
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371,
-    SPELL_WARLOCK_EYE_OF_KILROGG_FLY                = 58083
+    SPELL_WARLOCK_EYE_OF_KILROGG_FLY                = 58083,
+    SPELL_WARLOCK_PET_VOID_STAR_TALISMAN            = 37386, // Void Star Talisman
 };
 
 enum WarlockSpellIcons
@@ -242,6 +243,7 @@ class spell_warl_demonic_aegis : public AuraScript
     }
 };
 
+// -35696 - Demonic Knowledge
 class spell_warl_demonic_knowledge : public AuraScript
 {
     PrepareAuraScript(spell_warl_demonic_knowledge);
@@ -249,7 +251,10 @@ class spell_warl_demonic_knowledge : public AuraScript
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* caster = GetCaster())
-            amount = CalculatePct(caster->GetStat(STAT_STAMINA) + caster->GetStat(STAT_INTELLECT), aurEff->GetBaseAmount());
+        {
+            uint8 pct = aurEff->GetBaseAmount() + aurEff->GetDieSides();
+            amount = CalculatePct(caster->GetStat(STAT_STAMINA) + caster->GetStat(STAT_INTELLECT), pct);
+        }
     }
 
     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
@@ -284,6 +289,11 @@ class spell_warl_generic_scaling : public AuraScript
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
             int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
+            if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
+            {
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN);
+                amount += spellInfo->Effects[EFFECT_0].CalcValue(); // 130
+            }
         }
     }
 
@@ -390,6 +400,11 @@ class spell_warl_infernal_scaling : public AuraScript
             SpellSchoolMask schoolMask = SpellSchoolMask(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
             int32 modifier = schoolMask == SPELL_SCHOOL_MASK_NORMAL ? 35 : 40;
             amount = CalculatePct(std::max<int32>(0, owner->GetResistance(schoolMask)), modifier);
+            if (owner->HasAura(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN) && schoolMask != SPELL_SCHOOL_MASK_NORMAL)
+            {
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_WARLOCK_PET_VOID_STAR_TALISMAN);
+                amount += spellInfo->Effects[EFFECT_0].CalcValue(); // 130
+            }
         }
     }
 
@@ -753,7 +768,6 @@ class spell_warl_siphon_life : public AuraScript
 };
 
 // -1454 - Life Tap
-#define LIFE_TAP_COEFFICIENT 0.9F
 class spell_warl_life_tap : public SpellScript
 {
     PrepareSpellScript(spell_warl_life_tap);
@@ -773,12 +787,11 @@ class spell_warl_life_tap : public SpellScript
         Player* caster = GetCaster()->ToPlayer();
         if (Unit* target = GetHitUnit())
         {
-            int32 damage = GetEffectValue() + LIFE_TAP_COEFFICIENT;
-            int32 damage2Mana = GetEffectValue();
-            int32 mana = int32(damage2Mana + (caster->GetInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + static_cast<uint8>(SPELL_SCHOOL_SHADOW)) * 0.5f));
+            int32 spellEffect = GetEffectValue();
+            int32 mana = int32(spellEffect + (caster->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_SHADOW) * 0.5f));
 
             // Shouldn't Appear in Combat Log
-            target->ModifyHealth(-damage);
+            target->ModifyHealth(-spellEffect);
 
             // Improved Life Tap mod
             if (AuraEffect const* aurEff = caster->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_IMPROVED_LIFE_TAP, 0))
@@ -801,7 +814,7 @@ class spell_warl_life_tap : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        if ((int32(GetCaster()->GetHealth()) > int32(GetSpellInfo()->Effects[EFFECT_0].CalcValue() + (3.1 * GetSpellInfo()->BaseLevel) + LIFE_TAP_COEFFICIENT )))
+        if ((int32(GetCaster()->GetHealth()) > int32(GetSpellInfo()->Effects[EFFECT_0].CalcValue())))
             return SPELL_CAST_OK;
         return SPELL_FAILED_FIZZLE;
     }
@@ -1269,6 +1282,45 @@ class spell_warl_glyph_of_felguard : public AuraScript
     }
 };
 
+class spell_warl_glyph_of_voidwalker : public AuraScript
+{
+    PrepareAuraScript(spell_warl_glyph_of_voidwalker);
+
+    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_VOIDWALKER)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), true);
+                }
+            }
+        }
+    }
+
+    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            if (Pet* pet = player->GetPet())
+            {
+                if (pet->GetEntry() == NPC_VOIDWALKER)
+                {
+                    pet->HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), false);
+                }
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_warl_glyph_of_voidwalker::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_warl_glyph_of_voidwalker::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     RegisterSpellScript(spell_warl_eye_of_kilrogg);
@@ -1301,4 +1353,6 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_drain_soul);
     RegisterSpellScript(spell_warl_shadowburn);
     RegisterSpellScript(spell_warl_glyph_of_felguard);
+    RegisterSpellScript(spell_warl_glyph_of_voidwalker);
 }
+

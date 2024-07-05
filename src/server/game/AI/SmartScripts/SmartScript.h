@@ -47,8 +47,8 @@ public:
     void GetTargets(ObjectVector& targets, SmartScriptHolder const& e, Unit* invoker = nullptr) const;
     void GetWorldObjectsInDist(ObjectVector& objects, float dist) const;
     void InstallTemplate(SmartScriptHolder const& e);
-    static SmartScriptHolder CreateSmartEvent(SMART_EVENT e, uint32 event_flags, uint32 event_param1, uint32 event_param2, uint32 event_param3, uint32 event_param4, uint32 event_param5, SMART_ACTION action, uint32 action_param1, uint32 action_param2, uint32 action_param3, uint32 action_param4, uint32 action_param5, uint32 action_param6, SMARTAI_TARGETS t, uint32 target_param1, uint32 target_param2, uint32 target_param3, uint32 target_param4, uint32 phaseMask);
-    void AddEvent(SMART_EVENT e, uint32 event_flags, uint32 event_param1, uint32 event_param2, uint32 event_param3, uint32 event_param4, uint32 event_param5, SMART_ACTION action, uint32 action_param1, uint32 action_param2, uint32 action_param3, uint32 action_param4, uint32 action_param5, uint32 action_param6, SMARTAI_TARGETS t, uint32 target_param1, uint32 target_param2, uint32 target_param3, uint32 target_param4, uint32 phaseMask);
+    static SmartScriptHolder CreateSmartEvent(SMART_EVENT e, uint32 event_flags, uint32 event_param1, uint32 event_param2, uint32 event_param3, uint32 event_param4, uint32 event_param5, uint32 event_param6, SMART_ACTION action, uint32 action_param1, uint32 action_param2, uint32 action_param3, uint32 action_param4, uint32 action_param5, uint32 action_param6, SMARTAI_TARGETS t, uint32 target_param1, uint32 target_param2, uint32 target_param3, uint32 target_param4, uint32 phaseMask);
+    void AddEvent(SMART_EVENT e, uint32 event_flags, uint32 event_param1, uint32 event_param2, uint32 event_param3, uint32 event_param4, uint32 event_param5, uint32 event_param6, SMART_ACTION action, uint32 action_param1, uint32 action_param2, uint32 action_param3, uint32 action_param4, uint32 action_param5, uint32 action_param6, SMARTAI_TARGETS t, uint32 target_param1, uint32 target_param2, uint32 target_param3, uint32 target_param4, uint32 phaseMask);
     void SetPathId(uint32 id) { mPathId = id; }
     uint32 GetPathId() const { return mPathId; }
     WorldObject* GetBaseObject() const
@@ -216,19 +216,6 @@ public:
     typedef std::unordered_map<uint32, uint32> CounterMap;
     CounterMap mCounterList;
 
-    // Xinef: Fix Combat Movement
-    void SetActualCombatDist(uint32 dist) { mActualCombatDist = dist; }
-    void RestoreMaxCombatDist() { mActualCombatDist = mMaxCombatDist; }
-    uint32 GetActualCombatDist() const { return mActualCombatDist; }
-    uint32 GetMaxCombatDist() const { return mMaxCombatDist; }
-
-    // Xinef: SmartCasterAI, replace above
-    void SetCasterActualDist(float dist) { smartCasterActualDist = dist; }
-    void RestoreCasterMaxDist() { smartCasterActualDist = smartCasterMaxDist; }
-    Powers GetCasterPowerType() const { return smartCasterPowerType; }
-    float GetCasterActualDist() const { return smartCasterActualDist; }
-    float GetCasterMaxDist() const { return smartCasterMaxDist; }
-
     bool AllowPhaseReset() const { return _allowPhaseReset; }
     void SetPhaseReset(bool allow) { _allowPhaseReset = allow; }
 
@@ -240,6 +227,10 @@ private:
     void DecPhase(uint32 p);
     void SetPhase(uint32 p);
     bool IsInPhase(uint32 p) const;
+
+    void SortEvents(SmartAIEventList& events);
+    void RaisePriority(SmartScriptHolder& e);
+    void RetryLater(SmartScriptHolder& e, bool ignoreChanceRoll = false);
 
     SmartAIEventList mEvents;
     SmartAIEventList mInstallEvents;
@@ -262,15 +253,8 @@ private:
     uint32 mLastTextID;
     uint32 mTalkerEntry;
     bool mUseTextTimer;
-
-    // Xinef: Fix Combat Movement
-    uint32 mActualCombatDist;
-    uint32 mMaxCombatDist;
-
-    // Xinef: SmartCasterAI, replace above in future
-    uint32 smartCasterActualDist;
-    uint32 smartCasterMaxDist;
-    Powers smartCasterPowerType;
+    uint32 mCurrentPriority;
+    bool mEventSortingRequired;
 
     // Xinef: misc
     bool _allowPhaseReset;

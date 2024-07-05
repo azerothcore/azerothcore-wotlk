@@ -1,0 +1,47 @@
+name: nopch-build
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+concurrency:
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            compiler:
+              CC: clang-15
+              CXX: clang++-15
+          - os: ubuntu-22.04
+            compiler:
+              CC: gcc-12
+              CXX: g++-12
+          - os: ubuntu-24.04
+            compiler:
+              CC: clang-18
+              CXX: clang++-18
+          - os: ubuntu-24.04
+            compiler:
+              CC: gcc-14
+              CXX: g++-14
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/linux-build
+        with:
+          CC: ${{ matrix.compiler.CC }}
+          CXX: ${{ matrix.compiler.CXX }}
+          pch: false

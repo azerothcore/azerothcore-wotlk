@@ -17,8 +17,8 @@
 
 #include "AreaBoundary.h"
 #include "CreatureAIImpl.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "obsidian_sanctum.h"
 
@@ -41,19 +41,9 @@ public:
     {
         instance_obsidian_sanctum_InstanceMapScript(Map* pMap) : InstanceScript(pMap), portalCount(0)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadBossBoundaries(boundaries);
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-            {
-                if (GetBossState(i) == IN_PROGRESS)
-                    return true;
-            }
-
-            return false;
         }
 
         void OnCreatureCreate(Creature* pCreature) override
@@ -149,20 +139,6 @@ public:
             return false;
         }
 
-        bool SetBossState(uint32 type, EncounterState state) override
-        {
-            if (InstanceScript::SetBossState(type, state))
-            {
-                return false;
-            }
-
-            if (state == DONE)
-            {
-                SaveToDB();
-            }
-            return true;
-        }
-
         void DoAction(int32 action) override
         {
             switch (action)
@@ -204,48 +180,6 @@ public:
             }
         }
 
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "O S " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(const char* strIn) override
-        {
-            if (!strIn)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(strIn);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(strIn);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'O' && dataHead2 == 'S')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    uint32 temp;
-                    loadStream >> temp;
-                    if (temp == IN_PROGRESS)
-                        temp = NOT_STARTED;
-
-                    SetBossState(i, static_cast<EncounterState>(temp));
-                }
-            }
-
-            OUT_LOAD_INST_DATA_COMPLETE;
-        }
-
     private:
         ObjectGuid m_uiSartharionGUID;
         ObjectGuid m_uiTenebronGUID;
@@ -260,3 +194,4 @@ void AddSC_instance_obsidian_sanctum()
 {
     new instance_obsidian_sanctum();
 }
+

@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ahnkahet.h"
 
 enum Spells
@@ -74,7 +75,7 @@ enum Event
 
 enum Yells
 {
-    SAY_SPHERE_ACTIVATED                    = 0,
+    //SAY_SPHERE_ACTIVATED                    = 0,
     SAY_REMOVE_PRISON                       = 1,
     SAY_AGGRO                               = 2,
     SAY_SLAY                                = 3,
@@ -119,7 +120,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         }
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Replace sphere instantly if sphere is summoned after prince death
         if (instance->GetBossState(DATA_PRINCE_TALDARAM) != IN_PROGRESS)
@@ -131,7 +132,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         DoCastSelf(SPELL_FLAME_SPHERE_SPAWN_EFFECT);
         DoCastSelf(SPELL_FLAME_SPHERE_VISUAL);
 
-        // TODO: replace with DespawnOrUnsummon
+        /// @todo: replace with DespawnOrUnsummon
         uiDespawnTimer = 13000;
     }
 
@@ -212,7 +213,7 @@ struct boss_taldaram : public BossAI
         BossAI::InitializeAI();
 
         // Event not started
-        if (instance->GetData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetData(DATA_TELDRAM_SPHERE2) != DONE)
+        if (instance->GetPersistentData(DATA_TELDRAM_SPHERE1) != DONE || instance->GetPersistentData(DATA_TELDRAM_SPHERE2) != DONE)
         {
             me->SetImmuneToAll(true);
             me->SetDisableGravity(true);
@@ -226,7 +227,7 @@ struct boss_taldaram : public BossAI
             return;
         }
 
-        if (instance->GetData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetData(DATA_TELDRAM_SPHERE2) == DONE)
+        if (instance->GetPersistentData(DATA_TELDRAM_SPHERE1) == DONE && instance->GetPersistentData(DATA_TELDRAM_SPHERE2) == DONE)
         {
             DoAction(ACTION_REMOVE_PRISON_AT_RESET);
         }
@@ -320,9 +321,9 @@ struct boss_taldaram : public BossAI
         }
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         Talk(SAY_AGGRO);
         ScheduleCombatEvents();
 
@@ -383,7 +384,7 @@ struct boss_taldaram : public BossAI
                 case EVENT_PRINCE_BLOODTHIRST:
                 {
                     DoCastSelf(SPELL_BLOODTHIRST);
-                    events.RepeatEvent(10000);
+                    events.Repeat(10s);
                     break;
                 }
                 case EVENT_PRINCE_FLAME_SPHERES:
@@ -396,15 +397,15 @@ struct boss_taldaram : public BossAI
 
                     if (!events.GetNextEventTime(EVENT_PRINCE_VANISH))
                     {
-                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14000);
+                        events.RescheduleEvent(EVENT_PRINCE_VANISH, 14s);
                     }
                     else
                     {
                         // Make sure that Vanish won't get triggered at same time as sphere summon
-                        events.DelayEvents(4000);
+                        events.DelayEvents(4s);
                     }
 
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     break;
                 }
                 case EVENT_PRINCE_VANISH:
@@ -439,7 +440,7 @@ struct boss_taldaram : public BossAI
 
                         events.CancelEvent(EVENT_PRINCE_FLAME_SPHERES);
                         events.CancelEvent(EVENT_PRINCE_BLOODTHIRST);
-                        events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499);
+                        events.ScheduleEvent(EVENT_PRINCE_VANISH_RUN, 2499ms);
                     }
                     break;
                 }
@@ -453,7 +454,7 @@ struct boss_taldaram : public BossAI
                         me->RemoveAura(SPELL_VANISH);
                     }
 
-                    events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20000);
+                    events.ScheduleEvent(EVENT_PRINCE_RESCHEDULE, 20s);
                     break;
                 }
                 case EVENT_PRINCE_RESCHEDULE:
@@ -483,48 +484,10 @@ private:
     void ScheduleCombatEvents()
     {
         events.Reset();
-        events.RescheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10000);
-        events.RescheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10000);
+        events.RescheduleEvent(EVENT_PRINCE_FLAME_SPHERES, 10s);
+        events.RescheduleEvent(EVENT_PRINCE_BLOODTHIRST, 10s);
         vanishTarget_GUID.Clear();
         vanishDamage = 0;
-    }
-};
-
-// TODO: Turn into new script type when Gossips have been updated
-class go_prince_taldaram_sphere : public GameObjectScript
-{
-public:
-    go_prince_taldaram_sphere() : GameObjectScript("go_prince_taldaram_sphere") {}
-
-    bool OnGossipHello(Player* pPlayer, GameObject* go) override
-    {
-        if (pPlayer && pPlayer->IsInCombat())
-        {
-            return true;
-        }
-
-        InstanceScript* pInstance = go->GetInstanceScript();
-        if (!pInstance)
-        {
-            return true;
-        }
-
-        go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-        go->SetGoState(GO_STATE_ACTIVE);
-
-        uint32 const objectIndex = go->GetEntry() == GO_TELDARAM_SPHERE1 ? DATA_TELDRAM_SPHERE1 : DATA_TELDRAM_SPHERE2;
-        if (pInstance->GetData(objectIndex) == NOT_STARTED)
-        {
-            Creature* taldaram = ObjectAccessor::GetCreature(*go, pInstance->GetGuidData(DATA_PRINCE_TALDARAM));
-            if (taldaram && taldaram->IsAlive())
-            {
-                taldaram->AI()->Talk(SAY_SPHERE_ACTIVATED);
-            }
-
-            pInstance->SetData(objectIndex, DONE);
-        }
-
-        return true;
     }
 };
 
@@ -581,9 +544,9 @@ void AddSC_boss_taldaram()
 {
     RegisterAhnKahetCreatureAI(npc_taldaram_flamesphere);
     RegisterAhnKahetCreatureAI(boss_taldaram);
-    new go_prince_taldaram_sphere();
 
     // Spells
     RegisterSpellScript(spell_prince_taldaram_conjure_flame_sphere);
     RegisterSpellScript(spell_prince_taldaram_flame_sphere_summon);
 }
+

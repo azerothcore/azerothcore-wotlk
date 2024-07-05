@@ -20,17 +20,20 @@
 
 #include "Chat.h"
 #include "Creature.h"
+#include "CreatureScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
+
+#define DataHeader "IC"
 
 #define ICCScriptName "instance_icecrown_citadel"
 
@@ -134,6 +137,8 @@ enum DataTypes
     DATA_ARTHAS_PLATFORM            = 38,
     DATA_TERENAS_MENETHIL           = 39,
     DATA_ENEMY_GUNSHIP              = 40,
+    DATA_THE_SKYBREAKER             = 41,
+    DATA_ORGRIMS_HAMMER             = 42,
 
     // pussywizard:
     DATA_BUFF_AVAILABLE             = 251,
@@ -142,8 +147,15 @@ enum DataTypes
     DATA_PUTRICIDE_TRAP_STATE       = 254,
     DATA_HAS_LIMITED_ATTEMPTS       = 255,
     DATA_LK_HC_AVAILABLE            = 256,
+    DATA_SINDRAGOSA_INTRO           = 257,
 
     DATA_BPC_TRASH_DIED             = 300,
+};
+
+enum PersistentData
+{
+    DATA_SPIRE_FROSTWYRM = 0,
+    MAX_DATA_INDEXES
 };
 
 enum CreaturesIds

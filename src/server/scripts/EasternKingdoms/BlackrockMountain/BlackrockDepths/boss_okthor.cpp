@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "blackrock_depths.h"
 
@@ -51,9 +51,9 @@ public:
 
         uint32 nextArcaneExplosionTime;
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(SPELL_ARCANE_BOLT, 0.2 * (int) TIMER_ARCANE_BOLT);
             events.ScheduleEvent(SPELL_ARCANE_EXPLOSION, 0.2 * (int) TIMER_ARCANE_EXPLOSION);
             events.ScheduleEvent(SPELL_POLYMORPH, 0.2 * (int) TIMER_POLYMORPH);

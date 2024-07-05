@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "azjol_nerub.h"
 
 enum Spells
@@ -97,10 +99,10 @@ public:
             {
                 instance->SetBossState(DATA_HADRONOX_EVENT, IN_PROGRESS);
                 me->setActive(true);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE1, 20000);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE2, 40000);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 60000);
-                events.ScheduleEvent(EVENT_HADRONOX_MOVE4, 80000);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE1, 20s);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE2, 40s);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 60s);
+                events.ScheduleEvent(EVENT_HADRONOX_MOVE4, 80s);
             }
         }
 
@@ -137,12 +139,12 @@ public:
             BossAI::JustDied(killer);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
-            events.RescheduleEvent(EVENT_HADRONOX_ACID, 10000);
-            events.RescheduleEvent(EVENT_HADRONOX_LEECH, 4000);
-            events.RescheduleEvent(EVENT_HADRONOX_PIERCE, 1000);
-            events.RescheduleEvent(EVENT_HADRONOX_GRAB, 15000);
+            events.RescheduleEvent(EVENT_HADRONOX_ACID, 10s);
+            events.RescheduleEvent(EVENT_HADRONOX_LEECH, 4s);
+            events.RescheduleEvent(EVENT_HADRONOX_PIERCE, 1s);
+            events.RescheduleEvent(EVENT_HADRONOX_GRAB, 15s);
         }
 
         bool AnyPlayerValid() const
@@ -153,6 +155,21 @@ public:
                     return true;
 
             return false;
+        }
+
+        void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override
+        {
+            if ((!who || !who->IsControlledByPlayer()) && me->HealthBelowPct(70))
+            {
+                if (me->HealthBelowPctDamaged(5, damage))
+                {
+                    damage = 0;
+                }
+                else
+                {
+                    damage *= (me->GetHealthPct() - 5.0f) / 65.0f;
+                }
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -168,24 +185,24 @@ public:
             {
                 case EVENT_HADRONOX_PIERCE:
                     me->CastSpell(me->GetVictim(), SPELL_PIERCE_ARMOR, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_PIERCE, 8000);
+                    events.ScheduleEvent(EVENT_HADRONOX_PIERCE, 8s);
                     break;
                 case EVENT_HADRONOX_ACID:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, false))
                         me->CastSpell(target, SPELL_ACID_CLOUD, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_ACID, 25000);
+                    events.ScheduleEvent(EVENT_HADRONOX_ACID, 25s);
                     break;
                 case EVENT_HADRONOX_LEECH:
                     me->CastSpell(me, SPELL_LEECH_POISON, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_LEECH, 12000);
+                    events.ScheduleEvent(EVENT_HADRONOX_LEECH, 12s);
                     break;
                 case EVENT_HADRONOX_GRAB:
                     me->CastSpell(me, SPELL_WEB_GRAB, false);
-                    events.ScheduleEvent(EVENT_HADRONOX_GRAB, 25000);
+                    events.ScheduleEvent(EVENT_HADRONOX_GRAB, 25s);
                     break;
                 case EVENT_HADRONOX_MOVE4:
                     me->CastSpell(me, SPELL_WEB_FRONT_DOORS, true);
-                    [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+                    [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                 case EVENT_HADRONOX_MOVE1:
                 case EVENT_HADRONOX_MOVE2:
                 case EVENT_HADRONOX_MOVE3:
@@ -254,7 +271,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             if (me->ToTempSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
@@ -266,8 +283,8 @@ public:
                         Talk(SAY_CRUSHER_AGGRO);
                     }
 
-            events.ScheduleEvent(EVENT_CRUSHER_SMASH, 8000, 0, 0);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+            events.ScheduleEvent(EVENT_CRUSHER_SMASH, 8s, 0, 0);
+            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -283,7 +300,7 @@ public:
             {
                 case EVENT_CRUSHER_SMASH:
                     me->CastSpell(me->GetVictim(), SPELL_SMASH, false);
-                    events.ScheduleEvent(EVENT_CRUSHER_SMASH, 15000);
+                    events.ScheduleEvent(EVENT_CRUSHER_SMASH, 15s);
                     break;
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(30))
@@ -292,7 +309,7 @@ public:
                         me->CastSpell(me, SPELL_FRENZY, false);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
+                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
                     break;
             }
 
@@ -306,50 +323,41 @@ public:
     }
 };
 
-class spell_hadronox_summon_periodic : public SpellScriptLoader
+class spell_hadronox_summon_periodic_aura : public AuraScript
 {
+    PrepareAuraScript(spell_hadronox_summon_periodic_aura);
+
 public:
-    spell_hadronox_summon_periodic(const char* name, uint32 delay, uint32 spellEntry) : SpellScriptLoader(name), _delay(delay), _spellEntry(spellEntry) { }
+    spell_hadronox_summon_periodic_aura(uint32 delay, uint32 spellEntry) : _delay(delay), _spellEntry(spellEntry) { }
 
-    class spell_hadronox_summon_periodic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-    public:
-        spell_hadronox_summon_periodic_AuraScript(uint32 delay, uint32 spellEntry) : _delay(delay), _spellEntry(spellEntry) { }
-        PrepareAuraScript(spell_hadronox_summon_periodic_AuraScript);
+        return ValidateSpellInfo({ SPELL_WEB_FRONT_DOORS });
+    }
 
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            Unit* owner = GetUnitOwner();
-            if (InstanceScript* instance = owner->GetInstanceScript())
-                if (instance->GetBossState(DATA_HADRONOX_EVENT) != DONE)
-                {
-                    if (!owner->HasAura(SPELL_WEB_FRONT_DOORS))
-                        owner->CastSpell(owner, _spellEntry, true);
-                    else if (!instance->IsEncounterInProgress())
-                        owner->RemoveAurasDueToSpell(SPELL_WEB_FRONT_DOORS);
-                }
-        }
-
-        void OnApply(AuraEffect const* auraEffect, AuraEffectHandleModes)
-        {
-            GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(_delay);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hadronox_summon_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectApply += AuraEffectApplyFn(spell_hadronox_summon_periodic_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-    private:
-        uint32 _delay;
-        uint32 _spellEntry;
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_hadronox_summon_periodic_AuraScript(_delay, _spellEntry);
+        PreventDefaultAction();
+        Unit* owner = GetUnitOwner();
+        if (InstanceScript* instance = owner->GetInstanceScript())
+            if (instance->GetBossState(DATA_HADRONOX_EVENT) != DONE)
+            {
+                if (!owner->HasAura(SPELL_WEB_FRONT_DOORS))
+                    owner->CastSpell(owner, _spellEntry, true);
+                else if (!instance->IsEncounterInProgress())
+                    owner->RemoveAurasDueToSpell(SPELL_WEB_FRONT_DOORS);
+            }
+    }
+
+    void OnApply(AuraEffect const* auraEffect, AuraEffectHandleModes)
+    {
+        GetAura()->GetEffect(auraEffect->GetEffIndex())->SetPeriodicTimer(_delay);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hadronox_summon_periodic_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectApply += AuraEffectApplyFn(spell_hadronox_summon_periodic_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 
 private:
@@ -357,31 +365,25 @@ private:
     uint32 _spellEntry;
 };
 
-class spell_hadronox_leech_poison : public SpellScriptLoader
+class spell_hadronox_leech_poison_aura : public AuraScript
 {
-public:
-    spell_hadronox_leech_poison() : SpellScriptLoader("spell_hadronox_leech_poison") { }
+    PrepareAuraScript(spell_hadronox_leech_poison_aura);
 
-    class spell_hadronox_leech_poison_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hadronox_leech_poison_AuraScript)
+        return ValidateSpellInfo({ SPELL_LEECH_POISON_HEAL });
+    }
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                if (Unit* caster = GetCaster())
-                    caster->CastSpell(caster, SPELL_LEECH_POISON_HEAL, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_hadronox_leech_poison_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_LEECH, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_hadronox_leech_poison_AuraScript();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(caster, SPELL_LEECH_POISON_HEAL, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_hadronox_leech_poison_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_LEECH, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -405,9 +407,10 @@ void AddSC_boss_hadronox()
 {
     new boss_hadronox();
     new npc_anub_ar_crusher();
-    new spell_hadronox_summon_periodic("spell_hadronox_summon_periodic_champion", 15000, SPELL_SUMMON_ANUBAR_CHAMPION);
-    new spell_hadronox_summon_periodic("spell_hadronox_summon_periodic_necromancer", 10000, SPELL_SUMMON_ANUBAR_NECROMANCER);
-    new spell_hadronox_summon_periodic("spell_hadronox_summon_periodic_crypt_fiend", 5000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
-    new spell_hadronox_leech_poison();
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_champion_aura", 15000, SPELL_SUMMON_ANUBAR_CHAMPION);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_necromancer_aura", 10000, SPELL_SUMMON_ANUBAR_NECROMANCER);
+    RegisterSpellScriptWithArgs(spell_hadronox_summon_periodic_aura, "spell_hadronox_summon_periodic_crypt_fiend_aura", 5000, SPELL_SUMMON_ANUBAR_CRYPT_FIEND);
+    RegisterSpellScript(spell_hadronox_leech_poison_aura);
     new achievement_hadronox_denied();
 }
+

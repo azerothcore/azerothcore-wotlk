@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "drak_tharon_keep.h"
 
 enum Yells
@@ -90,14 +91,14 @@ public:
             me->CastSpell(me, SPELL_CLEAR_GIFT, true);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
-            BossAI::EnterCombat(who);
-            events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 5000);
-            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(14000, 18000));
-            events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, urand(8000, 10000));
-            events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1000);
+            BossAI::JustEngagedWith(who);
+            events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 5s);
+            events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 14s, 18s);
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 8s, 10s);
+            events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1s);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -105,7 +106,7 @@ public:
             if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
             }
         }
 
@@ -115,7 +116,7 @@ public:
             {
                 Talk(SAY_SKELETON);
                 events.Reset();
-                events.ScheduleEvent(EVENT_TURN_BONES_REAL, 3000);
+                events.ScheduleEvent(EVENT_TURN_BONES_REAL, 3s);
             }
         }
 
@@ -146,16 +147,16 @@ public:
                 case EVENT_SPELL_CURSE_OF_LIFE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_CURSE_OF_LIFE, false);
-                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 13000);
+                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 13s);
                     break;
                 case EVENT_SPELL_RAIN_OF_FIRE:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_RAIN_OF_FIRE, false);
-                    events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 16000);
+                    events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 16s);
                     break;
                 case EVENT_SPELL_SHADOW_VOLLEY:
                     me->CastSpell(me, SPELL_SHADOW_VOLLEY, false);
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 9000);
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 9s);
                     break;
                 case EVENT_SPELL_TURN_FLESH:
                     if (me->HealthBelowPct(50))
@@ -165,18 +166,18 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_TURN_FLESH, false);
 
                         events.Reset();
-                        events.ScheduleEvent(EVENT_TURN_FLESH_REAL, 3000);
+                        events.ScheduleEvent(EVENT_TURN_FLESH_REAL, 3s);
                         return;
                     }
-                    events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1000);
+                    events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1s);
                     break;
                 case EVENT_TURN_FLESH_REAL:
                     me->CastSpell(me, SPELL_DUMMY, true);
 
                     me->GetMotionMaster()->MoveChase(me->GetVictim());
-                    events.ScheduleEvent(EVENT_SPELL_EYE_BEAM, 11000);
-                    events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 3000);
-                    events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 6000);
+                    events.ScheduleEvent(EVENT_SPELL_EYE_BEAM, 11s);
+                    events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 3s);
+                    events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 6s);
                     break;
                 case EVENT_SPELL_EYE_BEAM:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
@@ -184,21 +185,21 @@ public:
                     break;
                 case EVENT_SPELL_LIGHTNING_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_LIGHTNING_BREATH, false);
-                    events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 8000);
+                    events.ScheduleEvent(EVENT_SPELL_LIGHTNING_BREATH, 8s);
                     break;
                 case EVENT_SPELL_POISON_CLOUD:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 35.0f, true))
                         me->CastSpell(target, SPELL_POISON_CLOUD, false);
-                    events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 10000);
+                    events.ScheduleEvent(EVENT_SPELL_POISON_CLOUD, 10s);
                     break;
                 case EVENT_TURN_BONES_REAL:
                     me->SetDisplayId(me->GetNativeDisplayId());
                     me->CastSpell(me, SPELL_FLESH_VISUAL, true);
                     me->CastSpell(me, SPELL_CLEAR_GIFT, true);
                     events.Reset();
-                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 1000);
-                    events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, urand(12000, 14000));
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, urand(8000, 10000));
+                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 1s);
+                    events.ScheduleEvent(EVENT_SPELL_RAIN_OF_FIRE, 12s, 14s);
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 8s, 10s);
                     break;
             }
 
@@ -207,106 +208,79 @@ public:
     };
 };
 
-class spell_tharon_ja_curse_of_life : public SpellScriptLoader
+class spell_tharon_ja_curse_of_life_aura : public AuraScript
 {
-public:
-    spell_tharon_ja_curse_of_life() : SpellScriptLoader("spell_tharon_ja_curse_of_life") { }
+    PrepareAuraScript(spell_tharon_ja_curse_of_life_aura);
 
-    class spell_tharon_ja_curse_of_life_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_tharon_ja_curse_of_life_AuraScript);
-
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
+        if (GetUnitOwner()->HealthBelowPct(50))
         {
-            if (GetUnitOwner()->HealthBelowPct(50))
-            {
-                PreventDefaultAction();
-                SetDuration(0);
-            }
+            PreventDefaultAction();
+            SetDuration(0);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_tharon_ja_curse_of_life_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_tharon_ja_curse_of_life_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_tharon_ja_curse_of_life_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
-class spell_tharon_ja_dummy : public SpellScriptLoader
+class spell_tharon_ja_dummy_aura : public AuraScript
 {
-public:
-    spell_tharon_ja_dummy() : SpellScriptLoader("spell_tharon_ja_dummy") { }
+    PrepareAuraScript(spell_tharon_ja_dummy_aura);
 
-    class spell_tharon_ja_dummy_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_tharon_ja_dummy_AuraScript)
+        return ValidateSpellInfo({ SPELL_FLESH_VISUAL, SPELL_GIFT_OF_THARON_JA, SPELL_TURN_BONES });
+    }
 
-        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FLESH_VISUAL, true);
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_GIFT_OF_THARON_JA, true);
-            GetUnitOwner()->SetDisplayId(GetUnitOwner()->GetNativeDisplayId() + 1);
-        }
-
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->GetThreatMgr().ResetAllThreat();
-            GetUnitOwner()->GetMotionMaster()->Clear();
-            GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_TURN_BONES, false);
-            GetUnitOwner()->GetAI()->DoAction(ACTION_TURN_BONES);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_tharon_ja_dummy_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_tharon_ja_dummy_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_tharon_ja_dummy_AuraScript();
+        PreventDefaultAction();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_FLESH_VISUAL, true);
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_GIFT_OF_THARON_JA, true);
+        GetUnitOwner()->SetDisplayId(GetUnitOwner()->GetNativeDisplayId() + 1);
+    }
+
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        PreventDefaultAction();
+        GetUnitOwner()->GetThreatMgr().ResetAllThreat();
+        GetUnitOwner()->GetMotionMaster()->Clear();
+        GetUnitOwner()->CastSpell((Unit*)nullptr, SPELL_TURN_BONES, false);
+        GetUnitOwner()->GetAI()->DoAction(ACTION_TURN_BONES);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_tharon_ja_dummy_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_tharon_ja_dummy_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_tharon_ja_clear_gift_of_tharon_ja : public SpellScriptLoader
+class spell_tharon_ja_clear_gift_of_tharon_ja : public SpellScript
 {
-public:
-    spell_tharon_ja_clear_gift_of_tharon_ja() : SpellScriptLoader("spell_tharon_ja_clear_gift_of_tharon_ja") { }
+    PrepareSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja);
 
-    class spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript);
+        if (Unit* target = GetHitUnit())
+            target->RemoveAura(SPELL_GIFT_OF_THARON_JA);
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->RemoveAura(SPELL_GIFT_OF_THARON_JA);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_tharon_ja_clear_gift_of_tharon_ja_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_tharon_ja_clear_gift_of_tharon_ja::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 void AddSC_boss_tharon_ja()
 {
     new boss_tharon_ja();
-    new spell_tharon_ja_curse_of_life();
-    new spell_tharon_ja_dummy();
-    new spell_tharon_ja_clear_gift_of_tharon_ja();
+    RegisterSpellScript(spell_tharon_ja_curse_of_life_aura);
+    RegisterSpellScript(spell_tharon_ja_dummy_aura);
+    RegisterSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja);
 }
+

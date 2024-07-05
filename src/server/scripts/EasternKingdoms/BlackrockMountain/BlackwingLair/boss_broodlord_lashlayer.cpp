@@ -15,13 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "blackwing_lair.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "blackwing_lair.h"
 
 enum Say
 {
@@ -65,16 +68,16 @@ public:
     {
         boss_broodlordAI(Creature* creature) : BossAI(creature, DATA_BROODLORD_LASHLAYER) { }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
-            events.ScheduleEvent(EVENT_CLEAVE, 8000);
-            events.ScheduleEvent(EVENT_BLASTWAVE, 12000);
-            events.ScheduleEvent(EVENT_MORTALSTRIKE, 20000);
-            events.ScheduleEvent(EVENT_KNOCKBACK, 30000);
-            events.ScheduleEvent(EVENT_CHECK, 1000);
+            events.ScheduleEvent(EVENT_CLEAVE, 8s);
+            events.ScheduleEvent(EVENT_BLASTWAVE, 12s);
+            events.ScheduleEvent(EVENT_MORTALSTRIKE, 20s);
+            events.ScheduleEvent(EVENT_KNOCKBACK, 30s);
+            events.ScheduleEvent(EVENT_CHECK, 1s);
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -102,21 +105,21 @@ public:
                 {
                     case EVENT_CLEAVE:
                         DoCastVictim(SPELL_CLEAVE);
-                        events.ScheduleEvent(EVENT_CLEAVE, 7000);
+                        events.ScheduleEvent(EVENT_CLEAVE, 7s);
                         break;
                     case EVENT_BLASTWAVE:
                         DoCastVictim(SPELL_BLASTWAVE);
-                        events.ScheduleEvent(EVENT_BLASTWAVE, 20000, 35000);
+                        events.ScheduleEvent(EVENT_BLASTWAVE, 20s, 35s);
                         break;
                     case EVENT_MORTALSTRIKE:
                         DoCastVictim(SPELL_MORTALSTRIKE);
-                        events.ScheduleEvent(EVENT_MORTALSTRIKE, 25000, 35000);
+                        events.ScheduleEvent(EVENT_MORTALSTRIKE, 25s, 35s);
                         break;
                     case EVENT_KNOCKBACK:
                         DoCastVictim(SPELL_KNOCKBACK);
                         if (DoGetThreat(me->GetVictim()))
                             DoModifyThreatByPercent(me->GetVictim(), -50);
-                        events.ScheduleEvent(EVENT_KNOCKBACK, 15000, 30000);
+                        events.ScheduleEvent(EVENT_KNOCKBACK, 15s, 30s);
                         break;
                     case EVENT_CHECK:
                         if (me->GetDistance(me->GetHomePosition()) > 150.0f)
@@ -124,7 +127,7 @@ public:
                             Talk(SAY_LEASH);
                             EnterEvadeMode();
                         }
-                        events.ScheduleEvent(EVENT_CHECK, 1000);
+                        events.ScheduleEvent(EVENT_CHECK, 1s);
                         break;
                 }
             }
@@ -169,7 +172,7 @@ class go_suppression_device : public GameObjectScript
                     return;
                 }
 
-                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
+                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5s);
             }
 
             void UpdateAI(uint32 diff) override
@@ -186,7 +189,7 @@ class go_suppression_device : public GameObjectScript
                                 me->CastSpell(nullptr, SPELL_SUPPRESSION_AURA);
                                 me->SendCustomAnim(0);
                             }
-                            _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
+                            _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5s);
                             break;
                         case EVENT_SUPPRESSION_RESET:
                             Activate();
@@ -208,7 +211,7 @@ class go_suppression_device : public GameObjectScript
 
                     if (_instance->GetBossState(DATA_BROODLORD_LASHLAYER) != DONE)
                     {
-                        _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, urand(30000, 120000));
+                        _events.ScheduleEvent(EVENT_SUPPRESSION_RESET, 30s, 120s);
                     }
                 }
             }
@@ -222,7 +225,7 @@ class go_suppression_device : public GameObjectScript
                     me->SetGoState(GO_STATE_READY);
                 me->SetLootState(GO_READY);
                 me->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5000);
+                _events.ScheduleEvent(EVENT_SUPPRESSION_CAST, 5s);
                 me->Respawn();
             }
 
@@ -273,3 +276,4 @@ void AddSC_boss_broodlord()
     new go_suppression_device();
     RegisterSpellScript(spell_suppression_aura);
 }
+

@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "WorldPacket.h"
 #include "ruby_sanctum.h"
@@ -51,6 +53,7 @@ public:
     {
         instance_ruby_sanctum_InstanceMapScript(InstanceMap* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadBossBoundaries(boundaries);
             LoadDoorData(doorData);
@@ -124,7 +127,7 @@ public:
                 case GO_BURNING_TREE_3:
                 case GO_BURNING_TREE_4:
                 case GO_TWILIGHT_FLAME_RING:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_FLAME_RING:
                     FlameRingGUID = go->GetGUID();
@@ -142,7 +145,7 @@ public:
                 case GO_BURNING_TREE_2:
                 case GO_BURNING_TREE_3:
                 case GO_BURNING_TREE_4:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
             }
         }
@@ -183,6 +186,13 @@ public:
 
             switch (type)
             {
+                case DATA_HALION_INTRO_DONE:
+                    if (state != DONE)
+                    {
+                        SetBossState(DATA_HALION_INTRO1, NOT_STARTED);
+                        SetBossState(DATA_HALION_INTRO2, NOT_STARTED);
+                    }
+                    break;
                 case DATA_SAVIANA_RAGEFIRE:
                 case DATA_BALTHARUS_THE_WARBORN:
                     if (GetBossState(DATA_BALTHARUS_THE_WARBORN) == DONE && GetBossState(DATA_SAVIANA_RAGEFIRE) == DONE)
@@ -208,62 +218,11 @@ public:
             return true;
         }
 
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "R S " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
         void FillInitialWorldStates(WorldPacket& data) override
         {
             data << uint32(WORLDSTATE_CORPOREALITY_MATERIAL) << uint32(50);
             data << uint32(WORLDSTATE_CORPOREALITY_TWILIGHT) << uint32(50);
             data << uint32(WORLDSTATE_CORPOREALITY_TOGGLE) << uint32(0);
-        }
-
-        void Load(char const* str) override
-        {
-            if (!str)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(str);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'R' && dataHead2 == 'S')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-
-                    SetBossState(i, EncounterState(tmpState));
-                }
-
-                // Xinef: additional check
-                if (GetBossState(DATA_HALION_INTRO_DONE) != DONE)
-                {
-                    SetBossState(DATA_HALION_INTRO1, NOT_STARTED);
-                    SetBossState(DATA_HALION_INTRO2, NOT_STARTED);
-                }
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
         }
 
     protected:
@@ -322,3 +281,4 @@ void AddSC_instance_ruby_sanctum()
     new instance_ruby_sanctum();
     new spell_ruby_sanctum_rallying_shout();
 }
+

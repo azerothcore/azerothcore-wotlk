@@ -1,0 +1,2 @@
+-- DB update 2022_12_30_00 -> 2022_12_30_01
+DELETE FROM `creature` WHERE `id1` = 21312 AND `GUID` = 85563 ;

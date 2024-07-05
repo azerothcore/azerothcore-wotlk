@@ -26,8 +26,8 @@ EndScriptData */
 npc_aged_dying_ancient_kodo
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
@@ -101,7 +101,7 @@ public:
             _faction = 35;
             headNorth = true;
             me->setActive(true);
-            events.ScheduleEvent(EVENT_RESTART_ESCORT, 0);
+            events.ScheduleEvent(EVENT_RESTART_ESCORT, 0ms);
         }
 
         void JustRespawned() override
@@ -383,7 +383,7 @@ public:
                         break;
                     }
                 case 282:
-                    events.ScheduleEvent(EVENT_RESTART_ESCORT, 1000);
+                    events.ScheduleEvent(EVENT_RESTART_ESCORT, 1s);
                     break;
             }
         }
@@ -426,6 +426,8 @@ enum DyingKodo
     SAY_SMEED_HOME                  = 0,
 
     QUEST_KODO                      = 5561,
+
+    NPC_TEXT_KODO                   = 4449, // MenuID 3650
 
     NPC_SMEED                       = 11596,
     NPC_AGED_KODO                   = 4700,
@@ -498,7 +500,7 @@ public:
             player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
         }
 
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
+        SendGossipMenuFor(player, NPC_TEXT_KODO, creature->GetGUID());
         return true;
     }
 

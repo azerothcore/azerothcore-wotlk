@@ -15,6 +15,7 @@ body:
         Description of the problem or issue here.
         Include entries of affected creatures / items / quests / spells etc.
         If this is a crash, post the crashlog (upload to https://gist.github.com/) and include the link here.
+        Never upload files! Use GIST for text and YouTube for videos!
     validations:
       required: true
   - type: textarea
@@ -68,7 +69,8 @@ body:
     attributes:
       label: Operating system
       description: |
-        Operating System, i.e. Windows 10 x64, Debian 10 x64, etc
+        The Operating System the Server is running on.
+        i.e. Windows 11 x64, Debian 10 x64, macOS 12, Ubuntu 20.04
     validations:
       required: true
   - type: textarea

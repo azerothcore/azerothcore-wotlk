@@ -34,6 +34,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "SpellAuras.h"
@@ -43,9 +44,6 @@ namespace lfg
 {
     LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false)
     {
-        new LFGPlayerScript();
-        new LFGGroupScript();
-
         for (uint8 team = 0; team < 2; ++team)
         {
             m_raidBrowserUpdateTimer[team] = 10000;
@@ -189,7 +187,7 @@ namespace lfg
             if (!dungeon)
                 continue;
 
-            switch (dungeon->type)
+            switch (dungeon->TypeID)
             {
                 case LFG_TYPE_DUNGEON:
                 case LFG_TYPE_HEROIC:
@@ -269,7 +267,7 @@ namespace lfg
             // Recalculate locked dungeons
             for (LfgPlayerDataContainer::const_iterator it = PlayersStore.begin(); it != PlayersStore.end(); ++it)
                 if (Player* player = ObjectAccessor::FindConnectedPlayer(it->first))
-                    InitializeLockedDungeons(player);
+                    InitializeLockedDungeons(player, nullptr);
         }
     }
 
@@ -388,11 +386,11 @@ namespace lfg
 
        @param[in]     player Player we need to initialize the lock status map
     */
-    void LFGMgr::InitializeLockedDungeons(Player* player, uint8 level /* = 0 */)
+    void LFGMgr::InitializeLockedDungeons(Player* player, Group const* group)
     {
         ObjectGuid guid = player->GetGUID();
-        if (!level)
-            level = player->getLevel();
+
+        uint8 level = player->GetLevel();
         uint8 expansion = player->GetSession()->Expansion();
         LfgDungeonSet const& dungeons = GetDungeonsByRandom(0);
         LfgLockMap lock;
@@ -429,12 +427,15 @@ namespace lfg
                 // Check required items
                 for (const ProgressionRequirement* itemRequirement : ar->items)
                 {
-                    if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == player->GetTeamId(true))
+                    if (!itemRequirement->checkLeaderOnly || !group || group->GetLeaderGUID() == player->GetGUID())
                     {
-                        if (!player->HasItemCount(itemRequirement->id, 1))
+                        if (itemRequirement->faction == TEAM_NEUTRAL || itemRequirement->faction == player->GetTeamId(true))
                         {
-                            lockData = LFG_LOCKSTATUS_MISSING_ITEM;
-                            break;
+                            if (!player->HasItemCount(itemRequirement->id, 1))
+                            {
+                                lockData = LFG_LOCKSTATUS_MISSING_ITEM;
+                                break;
+                            }
                         }
                     }
                 }
@@ -442,12 +443,15 @@ namespace lfg
                 //Check for quests
                 for (const ProgressionRequirement* questRequirement : ar->quests)
                 {
-                    if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == player->GetTeamId(true))
+                    if (!questRequirement->checkLeaderOnly || !group || group->GetLeaderGUID() == player->GetGUID())
                     {
-                        if (!player->GetQuestRewardStatus(questRequirement->id))
+                        if (questRequirement->faction == TEAM_NEUTRAL || questRequirement->faction == player->GetTeamId(true))
                         {
-                            lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
-                            break;
+                            if (!player->GetQuestRewardStatus(questRequirement->id))
+                            {
+                                lockData = LFG_LOCKSTATUS_QUEST_NOT_COMPLETED;
+                                break;
+                            }
                         }
                     }
                 }
@@ -461,12 +465,15 @@ namespace lfg
                 //Check if player has the required achievements
                 for (const ProgressionRequirement* achievementRequirement : ar->achievements)
                 {
-                    if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == player->GetTeamId(true))
+                    if (!achievementRequirement->checkLeaderOnly || !group || group->GetLeaderGUID() == player->GetGUID())
                     {
-                        if (!player->HasAchieved(achievementRequirement->id))
+                        if (achievementRequirement->faction == TEAM_NEUTRAL || achievementRequirement->faction == player->GetTeamId(true))
                         {
-                            lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
-                            break;
+                            if (!player->HasAchieved(achievementRequirement->id))
+                            {
+                                lockData = LFG_LOCKSTATUS_MISSING_ACHIEVEMENT;
+                                break;
+                            }
                         }
                     }
                 }
@@ -1048,13 +1055,13 @@ namespace lfg
                     baseAP = p->GetTotalAttackPowerValue(BASE_ATTACK);
                     rangedAP = p->GetTotalAttackPowerValue(RANGED_ATTACK);
                     maxPower = 0;
-                    if (p->getClass() == CLASS_DRUID)
+                    if (p->IsClass(CLASS_DRUID))
                         maxPower = p->GetMaxPower(POWER_MANA);
                     else
                         maxPower = (p->getPowerType() == POWER_RAGE || p->getPowerType() == POWER_RUNIC_POWER) ? p->GetMaxPower(p->getPowerType()) / 10 : p->GetMaxPower(p->getPowerType());
 
                     currInternalInfoMap[sitr->first] = RBInternalInfo(guid, sitr->second.comment, !groupGuid.IsEmpty(), groupGuid, sitr->second.roles, encounterMask, instanceGuid,
-                                                       1, p->getLevel(), p->getClass(), p->getRace(), p->GetAverageItemLevel(),
+                                                       1, p->GetLevel(), p->getClass(), p->getRace(), p->GetAverageItemLevel(),
                                                        talents, p->GetAreaId(), p->GetArmor(), (uint32)std::max<int32>(0, spellDamage), (uint32)std::max<int32>(0, spellHeal),
                                                        p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_MELEE)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_RANGED)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_SPELL)), std::max<float>(0.0f, mp5), std::max<float>(0.0f, mp5combat),
                                                        std::max<uint32>(baseAP, rangedAP), (uint32)p->GetStat(STAT_AGILITY), p->GetMaxHealth(), maxPower, p->GetDefenseSkillValue(),
@@ -2119,14 +2126,6 @@ namespace lfg
             return;
         }
 
-        if (out)
-        {
-            if (player->GetMapId() == uint32(dungeon->map))
-                player->TeleportToEntryPoint();
-
-            return;
-        }
-
         LfgTeleportError error = LFG_TELEPORTERROR_OK;
 
         if (!player->IsAlive())
@@ -2148,6 +2147,13 @@ namespace lfg
         else if (player->GetCharmGUID() || player->IsInCombat())
         {
             error = LFG_TELEPORTERROR_COMBAT;
+        }
+        else if (out && error == LFG_TELEPORTERROR_OK)
+        {
+            if (player->GetMapId() == uint32(dungeon->map))
+                player->TeleportToEntryPoint();
+
+            return;
         }
         else
         {
@@ -2174,11 +2180,18 @@ namespace lfg
         }
 
         if (error != LFG_TELEPORTERROR_OK)
+        {
             player->GetSession()->SendLfgTeleportError(uint8(error));
 
-        //LOG_DEBUG("lfg", "TeleportPlayer: Player {} is being teleported in to map {} "
-        //    "(x: {}, y: {}, z: {}) Result: {}", player->GetName(), dungeon->map,
-        //    dungeon->x, dungeon->y, dungeon->z, error);
+            LOG_DEBUG("lfg", "Player [{}] could NOT be teleported in to map [{}] (x: {}, y: {}, z: {}) Error: {}",
+            player->GetName(), dungeon->map, dungeon->x, dungeon->y, dungeon->z, error);
+        }
+        else
+        {
+            LOG_DEBUG("lfg", "Player [{}] is being teleported in to map [{}] (x: {}, y: {}, z: {})",
+            player->GetName(), dungeon->map, dungeon->x, dungeon->y, dungeon->z);
+        }
+
     }
 
     /**
@@ -2258,7 +2271,7 @@ namespace lfg
                 if (uint8 count = GetRandomPlayersCount(player->GetGUID()))
                     player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS, count);
 
-            LfgReward const* reward = GetRandomDungeonReward(rDungeonId, player->getLevel());
+            LfgReward const* reward = GetRandomDungeonReward(rDungeonId, player->GetLevel());
             if (!reward)
                 continue;
 

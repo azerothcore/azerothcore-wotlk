@@ -15,111 +15,79 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "old_hillsbrad.h"
 
-enum EpochHunter
+enum Text
 {
-    SAY_AGGRO                   = 3,
-    SAY_SLAY                    = 4,
-    SAY_BREATH                  = 5,
-    SAY_DEATH                   = 6,
-
-    SPELL_SAND_BREATH           = 31914,
-    SPELL_IMPENDING_DEATH       = 31916,
-    SPELL_MAGIC_DISRUPTION_AURA = 33834,
-    SPELL_WING_BUFFET           = 31475,
-
-    EVENT_SPELL_SAND_BREATH     = 1,
-    EVENT_SPELL_IMPENDING_DEATH = 2,
-    EVENT_SPELL_DISRUPTION      = 3,
-    EVENT_SPELL_WING_BUFFET     = 4
+    SAY_AGGRO                    = 5,
+    SAY_SLAY                     = 6,
+    SAY_BREATH                   = 7,
+    SAY_DEATH                    = 8
 };
 
-class boss_epoch_hunter : public CreatureScript
+enum Spells
 {
-public:
-    boss_epoch_hunter() : CreatureScript("boss_epoch_hunter") { }
+    SPELL_SAND_BREATH            = 31914,
+    SPELL_IMPENDING_DEATH        = 31916,
+    SPELL_MAGIC_DISRUPTION_AURA  = 33834,
+    SPELL_WING_BUFFET            = 31475
+};
 
-    CreatureAI* GetAI(Creature* creature) const override
+struct boss_epoch_hunter : public BossAI
+{
+    boss_epoch_hunter(Creature* creature) : BossAI(creature, DATA_EPOCH_HUNTER) { }
+
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        return GetOldHillsbradAI<boss_epoch_hunterAI>(creature);
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+        scheduler.Schedule(8s, [this](TaskContext context)
+        {
+            if (roll_chance_i(50))
+            {
+                Talk(SAY_BREATH);
+            }
+            DoCastVictim(SPELL_SAND_BREATH);
+            context.Repeat(20s);
+        }).Schedule(2s, [this](TaskContext context)
+        {
+            DoCastVictim(SPELL_IMPENDING_DEATH);
+            context.Repeat(30s);
+        }).Schedule(20s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_MAGIC_DISRUPTION_AURA);
+            context.Repeat(30s);
+        }).Schedule(14s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_WING_BUFFET);
+            context.Repeat(30s);
+        });
     }
 
-    struct boss_epoch_hunterAI : public ScriptedAI
+    void KilledUnit(Unit* victim) override
     {
-        boss_epoch_hunterAI(Creature* creature) : ScriptedAI(creature) { }
+        if (victim->GetTypeId() == TYPEID_PLAYER)
+            Talk(SAY_SLAY);
+    }
 
-        EventMap events;
+    void JustDied(Unit* killer) override
+    {
+        if (killer && killer == me)
+            return;
 
-        void Reset() override
+        _JustDied();
+        Talk(SAY_DEATH);
+        me->GetInstanceScript()->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_EPOCH_KILLED);
+        if (Creature* taretha = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_TARETHA_GUID)))
         {
+            taretha->AI()->DoAction(me->GetEntry());
         }
-
-        void EnterCombat(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_SPELL_SAND_BREATH, 8000);
-            events.ScheduleEvent(EVENT_SPELL_IMPENDING_DEATH, 2000);
-            events.ScheduleEvent(EVENT_SPELL_DISRUPTION, 20000);
-            events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, 14000);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            if (killer && killer == me)
-                return;
-            Talk(SAY_DEATH);
-            me->GetInstanceScript()->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_EPOCH_KILLED);
-            if (Creature* taretha = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(DATA_TARETHA_GUID)))
-                taretha->AI()->DoAction(me->GetEntry());
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_SAND_BREATH:
-                    if (roll_chance_i(50))
-                        Talk(SAY_BREATH);
-                    me->CastSpell(me->GetVictim(), SPELL_SAND_BREATH, false);
-                    events.ScheduleEvent(EVENT_SPELL_SAND_BREATH, 20000);
-                    break;
-                case EVENT_SPELL_IMPENDING_DEATH:
-                    me->CastSpell(me->GetVictim(), SPELL_IMPENDING_DEATH, false);
-                    events.ScheduleEvent(EVENT_SPELL_IMPENDING_DEATH, 30000);
-                    break;
-                case EVENT_SPELL_WING_BUFFET:
-                    me->CastSpell(me, SPELL_WING_BUFFET, false);
-                    events.ScheduleEvent(EVENT_SPELL_WING_BUFFET, 30000);
-                    break;
-                case EVENT_SPELL_DISRUPTION:
-                    me->CastSpell(me, SPELL_MAGIC_DISRUPTION_AURA, false);
-                    events.ScheduleEvent(EVENT_SPELL_DISRUPTION, 30000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+    }
 };
 
 void AddSC_boss_epoch_hunter()
 {
-    new boss_epoch_hunter();
+    RegisterOldHillsbradCreatureAI(boss_epoch_hunter);
 }

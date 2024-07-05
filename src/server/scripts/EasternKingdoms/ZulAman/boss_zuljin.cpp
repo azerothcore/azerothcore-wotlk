@@ -21,7 +21,7 @@ SD%Complete: 85%
 SDComment:
 EndScriptData */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "zulaman.h"
@@ -201,7 +201,7 @@ public:
             //me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             instance->SetData(DATA_ZULJINEVENT, IN_PROGRESS);
 
@@ -285,7 +285,7 @@ public:
                     if (Unit* temp = ObjectAccessor::GetUnit(*me, SpiritGUID[i]))
                     {
                         temp->SetVisible(false);
-                        temp->setDeathState(DEAD);
+                        temp->setDeathState(DeathState::Dead);
                     }
                 }
                 SpiritGUID[i].Clear();
@@ -580,7 +580,7 @@ public:
 
         void Reset() override { }
 
-        void EnterCombat(Unit* /*target*/) override { }
+        void JustEngagedWith(Unit* /*target*/) override { }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {

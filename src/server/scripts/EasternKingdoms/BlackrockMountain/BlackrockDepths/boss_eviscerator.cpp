@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "blackrock_depths.h"
 
@@ -49,9 +49,9 @@ public:
 
         bool SpellShieldReady = false;
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, 0.2 * (int)TIMER_SHADOWBOLT_VOLLEY);
             events.ScheduleEvent(SPELL_REND, 0.2 * (int) TIMER_REND);
             events.ScheduleEvent(SPELL_SHIELD, 0.2 * (int) TIMER_SHIELD);

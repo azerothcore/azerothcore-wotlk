@@ -16,14 +16,15 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
  // Theirs
 
@@ -158,7 +159,7 @@ public:
                     if (Mrfloppy->isDead())
                     {
                         me->GetMotionMaster()->MovePoint(0, Mrfloppy->GetPositionX(), Mrfloppy->GetPositionY(), Mrfloppy->GetPositionZ());
-                        Mrfloppy->setDeathState(ALIVE);
+                        Mrfloppy->setDeathState(DeathState::Alive);
                         Mrfloppy->GetMotionMaster()->MoveFollow(me, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
                         Talk(SAY_VICTORY3);
                     }
@@ -183,7 +184,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*Who*/) override
+        void JustEngagedWith(Unit* /*Who*/) override
         {
             Talk(SAY_RANDOMAGGRO);
         }
@@ -231,7 +232,7 @@ public:
 
         void Reset() override { }
 
-        void EnterCombat(Unit* Who) override
+        void JustEngagedWith(Unit* Who) override
         {
             if (Creature* Emily = GetClosestCreatureWithEntry(me, NPC_EMILY, 50.0f))
             {
@@ -328,65 +329,69 @@ enum Outhouse
     SOUND_FEMALE                    = 12671,
     SOUND_MALE                      = 12670,
     // Spell
-    SPELL_OUTHOUSE_GROANS           = 48382,
     SPELL_CAMERA_SHAKE              = 47533,
-    SPELL_DUST_FIELD                = 48329
+    SPELL_DUST_FIELD                = 48329,
+    // Item
+    ITEM_ANDERHOLS_SLIDER_CIDER     = 37247,
+    // NPC
+    NPC_OUTHOUSE_BUNNY_GRIZZLY      = 27326,
 };
 
-class npc_outhouse_bunny : public CreatureScript
+class spell_q12227_outhouse_groans : public SpellScript
 {
-public:
-    npc_outhouse_bunny() : CreatureScript("npc_outhouse_bunny") { }
+    PrepareSpellScript(spell_q12227_outhouse_groans);
 
-    struct npc_outhouse_bunnyAI : public ScriptedAI
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        npc_outhouse_bunnyAI(Creature* creature) : ScriptedAI(creature) { }
+        return ValidateSpellInfo({ SPELL_CAMERA_SHAKE, SPELL_DUST_FIELD });
+    }
 
-        void Reset() override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
         {
-            _counter = 0;
-            _gender  = 0;
-        }
+            player->CastSpell(player, SPELL_CAMERA_SHAKE, true);
 
-        void SetData(uint32 Type, uint32 Data) override
-        {
-            if (Type == 1)
-                _gender = Data;
-        }
-
-        void SpellHit(Unit* Caster, SpellInfo const* Spell) override
-        {
-            if (Spell->Id == SPELL_OUTHOUSE_GROANS)
+            switch (GetCaster()->getGender())
             {
-                ++_counter;
-                if (_counter < 5)
-                    DoCast(Caster, SPELL_CAMERA_SHAKE, true);
-                else
-                    _counter = 0;
-                DoCast(me, SPELL_DUST_FIELD, true);
-                switch (_gender)
-                {
-                    case GENDER_FEMALE:
-                        DoPlaySoundToSet(me, SOUND_FEMALE);
-                        break;
-
-                    case GENDER_MALE:
-                        DoPlaySoundToSet(me, SOUND_MALE);
-                        break;
-                }
+            case GENDER_FEMALE:
+                player->PlayDirectSound(SOUND_FEMALE);
+                break;
+            case GENDER_MALE:
+                player->PlayDirectSound(SOUND_MALE);
+                break;
+            default:
+                break;
             }
         }
-    private:
-        uint8 _counter;
-        uint8 _gender;
-    };
+    }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Register() override
     {
-        return new npc_outhouse_bunnyAI(creature);
+        OnEffectHitTarget += SpellEffectFn(spell_q12227_outhouse_groans::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
+class spell_q12227_camera_shake : public SpellScript
+{
+    PrepareSpellScript(spell_q12227_camera_shake);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DUST_FIELD });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* player = GetCaster()->ToPlayer())
+            if (Creature* target = GetClosestCreatureWithEntry(player, NPC_OUTHOUSE_BUNNY_GRIZZLY, 3.0f)) // hackfix: Outhouse bunny doesnt show in any script. But the visual of Dust Field do not show if cast by the player
+                target->CastSpell(target, SPELL_DUST_FIELD, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12227_camera_shake::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
 // Tallhorn Stage
 
 enum TallhornStage
@@ -463,7 +468,7 @@ public:
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             }
             else
-                _events.ScheduleEvent(EVENT_WOODSMAN_1, 0);
+                _events.ScheduleEvent(EVENT_WOODSMAN_1, 0ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -476,11 +481,11 @@ public:
                 {
                     case EVENT_WOODSMAN_1:
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_LOOT);
-                        _events.ScheduleEvent(EVENT_WOODSMAN_2, 3000);
+                        _events.ScheduleEvent(EVENT_WOODSMAN_2, 3s);
                         break;
                     case EVENT_WOODSMAN_2:
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK1H);
-                        _events.ScheduleEvent(EVENT_WOODSMAN_1, 4000);
+                        _events.ScheduleEvent(EVENT_WOODSMAN_1, 4s);
                         break;
                     default:
                         break;
@@ -548,11 +553,11 @@ public:
         me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_CLEAVE, urand(1000, 7000));
-        events.ScheduleEvent(EVENT_HAMSTRING, urand(5000, 12000));
-        events.ScheduleEvent(EVENT_MORTAL_STRIKE, urand(5000, 10000));
+        events.ScheduleEvent(EVENT_CLEAVE, 1s, 7s);
+        events.ScheduleEvent(EVENT_HAMSTRING, 5s, 12s);
+        events.ScheduleEvent(EVENT_MORTAL_STRIKE, 5s, 10s);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -572,7 +577,7 @@ public:
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                events.ScheduleEvent(EVENT_WOUNDED_MOVE, 3000);
+                events.ScheduleEvent(EVENT_WOUNDED_MOVE, 3s);
             }
         }
     }
@@ -662,15 +667,15 @@ public:
                 break;
             case EVENT_CLEAVE:
                 me->CastSpell(me->GetVictim(), SPELL_CLEAVE, false);
-                events.RepeatEvent(urand(7000, 15000));
+                events.Repeat(7s, 15s);
                 break;
             case EVENT_HAMSTRING:
                 me->CastSpell(me->GetVictim(), SPELL_HAMSTRING, false);
-                events.RepeatEvent(urand(9000, 15000));
+                events.Repeat(9s, 15s);
                 break;
             case EVENT_MORTAL_STRIKE:
                 me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
-                events.RepeatEvent(urand(10000, 15000));
+                events.Repeat(10s, 15s);
                 break;
         }
 
@@ -760,16 +765,16 @@ public:
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
                             DoCast(player, SPELL_VENTURE_STRAGGLER_CREDIT);
                         me->GetMotionMaster()->MovePoint(0, me->GetPositionX() - 7, me->GetPositionY() + 7, me->GetPositionZ());
-                        _events.ScheduleEvent(EVENT_STRAGGLER_2, 2500);
+                        _events.ScheduleEvent(EVENT_STRAGGLER_2, 2500ms);
                         break;
                     case EVENT_STRAGGLER_2:
                         Talk(SAY_SEO);
                         me->GetMotionMaster()->MovePoint(0, me->GetPositionX() - 7, me->GetPositionY() - 5, me->GetPositionZ());
-                        _events.ScheduleEvent(EVENT_STRAGGLER_3, 2500);
+                        _events.ScheduleEvent(EVENT_STRAGGLER_3, 2500ms);
                         break;
                     case EVENT_STRAGGLER_3:
                         me->GetMotionMaster()->MovePoint(0, me->GetPositionX() - 5, me->GetPositionY() - 5, me->GetPositionZ());
-                        _events.ScheduleEvent(EVENT_STRAGGLER_4, 2500);
+                        _events.ScheduleEvent(EVENT_STRAGGLER_4, 2500ms);
                         break;
                     case EVENT_STRAGGLER_4:
                         me->DisappearAndDie();
@@ -777,7 +782,7 @@ public:
                     case EVENT_CHOP:
                         if (UpdateVictim())
                             DoCastVictim(SPELL_CHOP);
-                        _events.ScheduleEvent(EVENT_CHOP, 10000, 12000);
+                        _events.ScheduleEvent(EVENT_CHOP, 10s, 12s);
                         break;
                     default:
                         break;
@@ -799,7 +804,7 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->CombatStop(false);
                 _playerGUID = caster->GetGUID();
-                _events.ScheduleEvent(EVENT_STRAGGLER_1, 3500);
+                _events.ScheduleEvent(EVENT_STRAGGLER_1, 3500ms);
             }
         }
 
@@ -879,19 +884,19 @@ public:
                     case EVENT_LAKEFROG_1:
                         DoCast(me, SPELL_MAIDEN_OF_ASHWOOD_LAKE_TRANSFORM);
                         me->SetEntry(NPC_MAIDEN_OF_ASHWOOD_LAKE);
-                        _events.ScheduleEvent(EVENT_LAKEFROG_2, 2000);
+                        _events.ScheduleEvent(EVENT_LAKEFROG_2, 2s);
                         break;
                     case EVENT_LAKEFROG_2:
                         Talk(SAY_MAIDEN_0);
-                        _events.ScheduleEvent(EVENT_LAKEFROG_3, 3000);
+                        _events.ScheduleEvent(EVENT_LAKEFROG_3, 3s);
                         break;
                     case EVENT_LAKEFROG_3:
                         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        _events.ScheduleEvent(EVENT_LAKEFROG_4, 25000);
+                        _events.ScheduleEvent(EVENT_LAKEFROG_4, 25s);
                         break;
                     case EVENT_LAKEFROG_4:
                         me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                        _events.ScheduleEvent(EVENT_LAKEFROG_5, 2000);
+                        _events.ScheduleEvent(EVENT_LAKEFROG_5, 2s);
                         break;
                     case EVENT_LAKEFROG_5:
                         Talk(SAY_MAIDEN_1);
@@ -914,7 +919,8 @@ public:
                     player->AddAura(SPELL_WARTS, player);
                 else
                 {
-                    DoCast(player, SPELL_FROG_KISS); // Removes SPELL_WARTSBGONE_LIP_BALM
+                    // Removes SPELL_WARTSBGONE_LIP_BALM
+                    player->CastSpell(player, SPELL_FROG_KISS, true);
 
                     if (me->GetEntry() == NPC_LAKE_FROG)
                     {
@@ -927,7 +933,7 @@ public:
                         me->GetMotionMaster()->MoveIdle();
                         me->SetFacingToObject(player);
                         _runningScript = true;
-                        _events.ScheduleEvent(EVENT_LAKEFROG_1, 2000);
+                        _events.ScheduleEvent(EVENT_LAKEFROG_1, 2s);
                     }
                 }
             }
@@ -1294,13 +1300,36 @@ public:
     }
 };
 
+// 62536 - Frog Kiss
+class spell_frog_kiss : public SpellScript
+{
+    PrepareSpellScript(spell_frog_kiss);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARTSBGONE_LIP_BALM });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        if (Player* target = GetHitPlayer())
+        {
+            target->RemoveAurasDueToSpell(SPELL_WARTSBGONE_LIP_BALM);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_frog_kiss::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_grizzly_hills()
 {
     // Theirs
     new npc_emily();
     new npc_mrfloppy();
     new npc_ravenous_worg();
-    new npc_outhouse_bunny();
     new npc_tallhorn_stag();
     new npc_amberpine_woodsman();
     RegisterCreatureAI(npc_wounded_skirmisher);
@@ -1314,4 +1343,8 @@ void AddSC_grizzly_hills()
     new spell_warhead_detonate();
     new spell_vehicle_warhead_fuse();
     new spell_warhead_fuse();
+    RegisterSpellScript(spell_q12227_outhouse_groans);
+    RegisterSpellScript(spell_q12227_camera_shake);
+    RegisterSpellScript(spell_frog_kiss);
 }
+

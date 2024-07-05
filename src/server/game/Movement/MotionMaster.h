@@ -197,7 +197,7 @@ public:
     }
 
     void MoveIdle();
-    void MoveTargetedHome();
+    void MoveTargetedHome(bool walk = false);
     void MoveRandom(float wanderDistance = 0.0f);
     void MoveFollow(Unit* target, float dist, float angle, MovementSlot slot = MOTION_SLOT_ACTIVE);
     void MoveChase(Unit* target, std::optional<ChaseRange> dist = {}, std::optional<ChaseAngle> angle = {});
@@ -205,12 +205,14 @@ public:
     void MoveChase(Unit* target, float dist) { MoveChase(target, ChaseRange(dist)); }
     void MoveCircleTarget(Unit* target);
     void MoveBackwards(Unit* target, float dist);
+    void MoveForwards(Unit* target, float dist);
     void MoveConfused();
     void MoveFleeing(Unit* enemy, uint32 time = 0);
     void MovePoint(uint32 id, const Position& pos, bool generatePath = true, bool forceDestination = true)
     { MovePoint(id, pos.m_positionX, pos.m_positionY, pos.m_positionZ, generatePath, forceDestination, MOTION_SLOT_ACTIVE, pos.GetOrientation()); }
     void MovePoint(uint32 id, float x, float y, float z, bool generatePath = true, bool forceDestination = true, MovementSlot slot = MOTION_SLOT_ACTIVE, float orientation = 0.0f);
     void MoveSplinePath(Movement::PointsArray* path);
+    void MoveSplinePath(uint32 path_id);
 
     // These two movement types should only be used with creatures having landing/takeoff animations
     void MoveLand(uint32 id, Position const& pos, float speed = 0.0f);

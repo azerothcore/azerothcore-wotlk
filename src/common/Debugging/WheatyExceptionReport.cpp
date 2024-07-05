@@ -674,8 +674,13 @@ void WheatyExceptionReport::GenerateExceptionReport(
         // Initialize DbgHelp
         if (!SymInitialize(GetCurrentProcess(), 0, TRUE))
         {
-            Log(_T("\n\rCRITICAL ERROR.\n\r Couldn't initialize the symbol handler for process.\n\rError [%s].\n\r\n\r"),
-                ErrorMessage(GetLastError()));
+            Log(_T("\r\n"));
+            Log(_T("----\r\n"));
+            Log(_T("SYMBOL HANDLER ERROR (THIS IS NOT THE CRASH ERROR)\r\n\r\n"));
+            Log(_T("Couldn't initialize symbol handler for process when generating crash report\r\n"));
+            Log(_T("Error: %s\r\n"), ErrorMessage(GetLastError()));
+            Log(_T("THE BELOW CALL STACKS MIGHT HAVE MISSING OR INACCURATE FILE/FUNCTION NAMES\r\n\r\n"));
+            Log(_T("----\r\n"));
         }
 
         CONTEXT trashableContext = *pCtx;

@@ -1,28 +1,29 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.1.0 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.spell_custom_attr
+-- Dumping structure for table acore_world.spell_custom_attr
 DROP TABLE IF EXISTS `spell_custom_attr`;
 CREATE TABLE IF NOT EXISTS `spell_custom_attr` (
-  `spell_id` mediumint unsigned NOT NULL DEFAULT '0' COMMENT 'spell id',
+  `spell_id` int unsigned NOT NULL DEFAULT '0' COMMENT 'spell id',
   `attributes` int unsigned NOT NULL DEFAULT '0' COMMENT 'SpellCustomAttributes',
   PRIMARY KEY (`spell_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4 COMMENT='SpellInfo custom attributes';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='SpellInfo custom attributes';
 
--- Dumpar data för tabell acore_world.spell_custom_attr: 264 rows
+-- Dumping data for table acore_world.spell_custom_attr: ~292 rows (approximately)
 DELETE FROM `spell_custom_attr`;
-/*!40000 ALTER TABLE `spell_custom_attr` DISABLE KEYS */;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(53, 131072),
 	(604, 100663296),
@@ -39,6 +40,8 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(3600, 64),
 	(5171, 100663296),
 	(5221, 131072),
+	(5255, 32768),
+	(5416, 4194304),
 	(5729, 96),
 	(6774, 100663296),
 	(6785, 131072),
@@ -58,14 +61,12 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(8724, 131072),
 	(8725, 131072),
 	(8992, 131072),
-	(59685, 524288),
 	(9829, 131072),
 	(9830, 131072),
 	(9866, 131072),
 	(9867, 131072),
-	(42772, 524288),
 	(10169, 100663296),
-	(43017, 100663296),
+	(10170, 100663296),
 	(10173, 100663296),
 	(10174, 100663296),
 	(10576, 64),
@@ -86,14 +87,30 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(12358, 33554432),
 	(12540, 65536),
 	(13579, 65536),
+	(14120, 4194304),
 	(14323, 64),
 	(14324, 64),
 	(14325, 64),
+	(14517, 4194304),
+	(15572, 4194304),
 	(15582, 131072),
 	(15657, 131072),
+	(16145, 4194304),
+	(16427, 4194304),
+	(16609, 128),
+	(16928, 4194304),
 	(17165, 12288),
+	(17315, 4194304),
 	(18500, 32768),
+	(21909, 100663296),
 	(21987, 131072),
+	(22247, 64),
+	(22282, 2048),
+	(22283, 2048),
+	(22285, 2048),
+	(22286, 2048),
+	(22287, 2048),
+	(22288, 2048),
 	(22416, 131072),
 	(22919, 12288),
 	(23600, 64),
@@ -113,10 +130,10 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(26839, 131072),
 	(26863, 131072),
 	(26884, 131072),
-	(55550, 524288),
 	(27001, 131072),
 	(27002, 131072),
 	(27005, 131072),
+	(27130, 100663296),
 	(27441, 131072),
 	(28310, 12288),
 	(28456, 65536),
@@ -126,31 +143,46 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(29425, 65536),
 	(29570, 12288),
 	(29858, 64),
+	(30285, 4194304),
+	(30494, 4194304),
+	(30639, 4194304),
 	(30708, 4096),
 	(30877, 33554432),
 	(31436, 8),
+	(31961, 2048),
+	(31994, 16384),
 	(32375, 64),
 	(32417, 12288),
 	(32592, 64),
 	(32645, 234881024),
 	(32684, 234881024),
+	(32722, 4194304),
 	(32835, 64),
 	(33086, 32768),
 	(33130, 12288),
+	(33684, 4096),
+	(33783, 4194304),
+	(33911, 4194304),
 	(33944, 100663296),
+	(33946, 100663296),
 	(34074, 234881024),
 	(34700, 28672),
 	(34709, 28672),
+	(34856, 4194304),
 	(34940, 65536),
 	(35009, 64),
+	(35147, 4194304),
 	(35181, 8),
 	(35202, 4096),
+	(35244, 4194304),
 	(35507, 12288),
+	(36796, 4194304),
 	(36837, 8),
 	(36862, 65536),
 	(37276, 12288),
 	(37330, 12288),
 	(37433, 4),
+	(37546, 2147483648),
 	(37621, 12288),
 	(37685, 131072),
 	(38243, 12288),
@@ -159,6 +191,8 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(38764, 65536),
 	(38863, 65536),
 	(38903, 8),
+	(39331, 33554432),
+	(39364, 4194304),
 	(39897, 64),
 	(40268, 234881024),
 	(40810, 8),
@@ -167,8 +201,11 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(41478, 100663296),
 	(42384, 8),
 	(42396, 12288),
+	(42533, 16777216),
 	(42650, 64),
+	(42772, 524288),
 	(43015, 100663296),
+	(43017, 100663296),
 	(43140, 4),
 	(43215, 4),
 	(43263, 64),
@@ -178,9 +215,8 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(43512, 12288),
 	(43530, 64),
 	(45150, 8),
+	(46619, 16777216),
 	(47585, 167772160),
-	(60988, 524288),
-	(21909, 100663296),
 	(48571, 131072),
 	(48572, 131072),
 	(48578, 131072),
@@ -193,6 +229,7 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(48690, 131072),
 	(48691, 131072),
 	(49749, 32768),
+	(50196, 4194304),
 	(50344, 234881024),
 	(52743, 65536),
 	(52744, 64),
@@ -200,7 +237,9 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(53338, 64),
 	(53454, 32768),
 	(54836, 12288),
+	(55550, 524288),
 	(57467, 8),
+	(57874, 12288),
 	(57941, 12288),
 	(57992, 234881024),
 	(57993, 234881024),
@@ -215,8 +254,10 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(59367, 12288),
 	(59446, 32768),
 	(59667, 64),
+	(59685, 524288),
 	(59974, 12288),
 	(60472, 12288),
+	(60988, 524288),
 	(61716, 234881024),
 	(61734, 234881024),
 	(61819, 234881024),
@@ -255,6 +296,7 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(68504, 32768),
 	(68505, 32768),
 	(69293, 32768),
+	(69489, 33554432),
 	(70461, 4),
 	(70492, 8),
 	(71204, 4096),
@@ -274,22 +316,9 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
 	(73788, 4),
 	(73789, 4),
 	(73790, 4),
-	(74439, 32768),
-	(33946, 100663296),
-	(27130, 100663296),
-	(10170, 100663296),
-	(57874, 12288),
-	(46619, 16777216),
-	(22247, 64),
-	(22282, 2048),
-	(22283, 2048),
-	(22285, 2048),
-	(22286, 2048),
-	(22287, 2048),
-	(22288, 2048),
-	(5255, 32768);
-/*!40000 ALTER TABLE `spell_custom_attr` ENABLE KEYS */;
+	(74439, 32768);
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

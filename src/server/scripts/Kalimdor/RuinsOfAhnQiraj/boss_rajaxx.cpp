@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "SmartAI.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
+#include "SmartAI.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ruins_of_ahnqiraj.h"
 
 enum Yells
@@ -86,9 +87,9 @@ struct boss_rajaxx : public BossAI
         });
     }
 
-    void EnterCombat(Unit* /*victim*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        _EnterCombat();
+        _JustEngagedWith();
         events.ScheduleEvent(EVENT_DISARM, 10s);
         events.ScheduleEvent(EVENT_THUNDERCRASH, 12s);
     }
@@ -219,11 +220,11 @@ struct npc_general_andorov : public npc_escortAI
         _summons.Summon(summon);
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        events.ScheduleEvent(EVENT_BASH, urand(8, 11) * IN_MILLISECONDS);
-        events.ScheduleEvent(EVENT_COMMAND_AURA, urand(1, 3)  * IN_MILLISECONDS);
-        events.ScheduleEvent(EVENT_STRIKE, urand(2, 5)  * IN_MILLISECONDS);
+        events.ScheduleEvent(EVENT_BASH, 8s, 11s);
+        events.ScheduleEvent(EVENT_COMMAND_AURA, 1s, 3s);
+        events.ScheduleEvent(EVENT_STRIKE, 2s, 5s);
     }
 
     void WaypointReached(uint32 waypointId) override
@@ -348,15 +349,15 @@ struct npc_general_andorov : public npc_escortAI
             {
                 case EVENT_BASH:
                     DoCastVictim(SPELL_BASH);
-                    events.ScheduleEvent(EVENT_BASH, urand(25, 38) * IN_MILLISECONDS);
+                    events.ScheduleEvent(EVENT_BASH, 25s, 38s);
                     break;
                 case EVENT_COMMAND_AURA:
                     DoCastSelf(SPELL_AURA_OF_COMMAND, true);
-                    events.ScheduleEvent(EVENT_COMMAND_AURA, urand(10, 20) * IN_MILLISECONDS);
+                    events.ScheduleEvent(EVENT_COMMAND_AURA, 10s, 20s);
                     break;
                 case EVENT_STRIKE:
                     DoCastVictim(SPELL_STRIKE);
-                    events.ScheduleEvent(EVENT_STRIKE, urand(4, 6) * IN_MILLISECONDS);
+                    events.ScheduleEvent(EVENT_STRIKE, 4s, 6s);
                     break;
                 default:
                     break;
@@ -381,3 +382,4 @@ void AddSC_boss_rajaxx()
     RegisterSpellScript(spell_rajaxx_thundercrash);
     RegisterRuinsOfAhnQirajCreatureAI(npc_general_andorov);
 }
+

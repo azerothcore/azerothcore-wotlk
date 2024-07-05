@@ -472,7 +472,7 @@ int WMOGroup::ConvertToVMAPGroupWmo(FILE* output, bool preciseVectorData)
             // only need height values, the other values are unknown anyway
             for (uint32 i = 0; i < LiquEx_size / sizeof(WMOLiquidVert); ++i)
                 fwrite(&LiquEx[i].height, sizeof(float), 1, output);
-            // todo: compress to bit field
+            /// @todo: compress to bit field
             fwrite(LiquBytes, 1, hlq->xtiles * hlq->ytiles, output);
         }
     }

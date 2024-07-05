@@ -16,9 +16,9 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Player.h"
 #include "PlayerSettings.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -59,7 +59,7 @@ public:
         }
         else if (type == "autobroadcast")
         {
-            if (player->getLevel() < sWorld->getIntConfig(CONFIG_AUTOBROADCAST_MIN_LEVEL_DISABLE))
+            if (player->GetLevel() < sWorld->getIntConfig(CONFIG_AUTOBROADCAST_MIN_LEVEL_DISABLE))
             {
                 handler->SetSentErrorMessage(true);
                 handler->PSendSysMessage(LANG_CMD_AUTOBROADCAST_LVL_ERROR, sWorld->getIntConfig(CONFIG_AUTOBROADCAST_MIN_LEVEL_DISABLE));

@@ -21,6 +21,8 @@
 #include "CreatureAIImpl.h"
 #include "Object.h"
 
+#define DataHeader "MC"
+
 constexpr auto MCScriptName = "instance_molten_core";
 
 constexpr uint32 MAX_ENCOUNTER = 10;

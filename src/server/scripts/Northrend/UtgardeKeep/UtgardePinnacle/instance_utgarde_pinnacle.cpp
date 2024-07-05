@@ -15,7 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "utgarde_pinnacle.h"
 
@@ -57,6 +58,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             SkadiHits        = 0;
             SkadiInRange     = 0;
 
@@ -192,43 +194,20 @@ public:
             OUT_SAVE_INST_DATA_COMPLETE;
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            std::ostringstream saveStream;
-            saveStream << "U P " << Encounters[0] << ' ' << Encounters[1] << ' ' << Encounters[2] << ' ' << Encounters[3];
-            return saveStream.str();
+            data >> Encounters[0];
+            data >> Encounters[1];
+            data >> Encounters[2];
+            data >> Encounters[3];
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(in);
-
-            char dataHead1, dataHead2;
-            uint16 data0, data1, data2, data3;
-
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2 >> data0 >> data1 >> data2 >> data3;
-
-            if (dataHead1 == 'U' && dataHead2 == 'P')
-            {
-                Encounters[0] = data0;
-                Encounters[1] = data1;
-                Encounters[2] = data2;
-                Encounters[3] = data3;
-
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                    if (Encounters[i] == IN_PROGRESS)
-                        Encounters[i] = NOT_STARTED;
-            }
-            else OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << Encounters[0] << ' '
+                << Encounters[1] << ' '
+                << Encounters[2] << ' '
+                << Encounters[3];
         }
 
         uint32 GetData(uint32 type) const override
@@ -292,3 +271,4 @@ void AddSC_instance_utgarde_pinnacle()
 {
     new instance_utgarde_pinnacle();
 }
+

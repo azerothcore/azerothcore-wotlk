@@ -15,14 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "GameTime.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 #include "ulduar.h"
 
 class instance_ulduar : public InstanceMapScript
@@ -40,6 +40,7 @@ public:
         instance_ulduar_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
             Initialize();
+            SetHeaders(DataHeader);
             // 0: 10 man difficulty
             // 1: 25 man difficulty
             m_difficulty = (pMap->Is25ManRaid() ? 0 : 1);
@@ -99,6 +100,15 @@ public:
         Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
         Position hardChestPosition = { 2035.94600f, -202.084885f, 432.686859f, 3.164077f };
 
+        // Mimiron Tram
+        ObjectGuid m_mimironTramGUID;
+        ObjectGuid m_mimironActivateTramGUID;
+        ObjectGuid m_mimironTramRocketBoosterGUID;
+        ObjectGuid m_mimironTramTurnaround1GUID;
+        ObjectGuid m_mimironTramTurnaround2GUID;
+        ObjectGuid m_mimironCallTramCenterGUID;
+        ObjectGuid m_mimironCallTramMimironGUID;
+
         // Mimiron
         ObjectGuid m_MimironDoor[3];
         ObjectGuid m_MimironLeviathanMKIIguid;
@@ -123,10 +133,12 @@ public:
         ObjectGuid m_brannBronzebeardBaseCamp;
         uint32 m_algalonTimer;
 
+        // Ancient Gate
+        const Position triggerAncientGatePosition = { 1883.65f, 269.272f, 418.406f };
+
         // Shared
         EventMap _events;
         bool m_mimironTramUsed;
-        ObjectGuid m_mimironTramGUID;
         ObjectGuid m_keepersgateGUID;
         ObjectGuid m_keepersGossipGUID[4];
 
@@ -169,7 +181,18 @@ public:
             // mimiron tram:
             instance->LoadGrid(2307.0f, 284.632f);
             if (GameObject* MimironTram = instance->GetGameObject(m_mimironTramGUID))
+            {
                 player->UpdateVisibilityOf(MimironTram);
+                if (StaticTransport* t = MimironTram->ToStaticTransport())
+                {
+                    if (GameObject* go = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                        if (!go->GetTransport())
+                            t->AddPassenger(go, true);
+                    if (GameObject* go = instance->GetGameObject(m_mimironActivateTramGUID))
+                        if (!go->GetTransport())
+                            t->AddPassenger(go, true);
+                }
+            }
 
             if (!m_uiAlgalonGUID && m_algalonTimer && (m_algalonTimer <= 60 || m_algalonTimer == TIMER_ALGALON_TO_SUMMON))
             {
@@ -179,7 +202,7 @@ public:
 
                 if (m_algalonTimer <= 60)
                 {
-                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 60000);
+                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
                     algalon->AI()->DoAction(ACTION_INIT_ALGALON);
                 }
                 else // if (m_algalonTimer = TIMER_ALGALON_TO_SUMMON)
@@ -316,7 +339,7 @@ public:
                     {
                         creature->SetDisableGravity(true);
                         creature->SetPosition(creature->GetHomePosition());
-                        creature->setDeathState(JUST_DIED);
+                        creature->setDeathState(DeathState::JustDied);
                         creature->StopMovingOnCurrentPos();
                     }
                     break;
@@ -369,22 +392,6 @@ public:
                 case NPC_MIMIRON_ACU:
                     m_MimironACUguid = creature->GetGUID();
                     break;
-                case NPC_FREYA_GOSSIP:
-                    m_keepersGossipGUID[TYPE_FREYA - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_FREYA, creature);
-                    break;
-                case NPC_HODIR_GOSSIP:
-                    m_keepersGossipGUID[TYPE_HODIR - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_HODIR, creature);
-                    break;
-                case NPC_THORIM_GOSSIP:
-                    m_keepersGossipGUID[TYPE_THORIM - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_THORIM, creature);
-                    break;
-                case NPC_MIMIRON_GOSSIP:
-                    m_keepersGossipGUID[TYPE_MIMIRON - TYPE_FREYA] = creature->GetGUID();
-                    ShowKeeperGossip(TYPE_MIMIRON, creature);
-                    break;
                 case NPC_ELDER_IRONBRANCH:
                 case NPC_ELDER_STONEBARK:
                 case NPC_ELDER_BRIGHTLEAF:
@@ -430,19 +437,6 @@ public:
         {
             if (GetData(encounter) == DONE)
                 go->SetGoState(state);
-        }
-
-        void ShowKeeperGossip(uint8 type, Creature* cr, ObjectGuid guid = ObjectGuid::Empty)
-        {
-            if (!cr)
-            {
-                cr = instance->GetCreature(guid);
-                if (!cr)
-                    return;
-            }
-
-            bool on = (GetData(type) == DONE && !(GetData(TYPE_WATCHERS) & (1 << (type - TYPE_FREYA))));
-            cr->SetVisible(on);
         }
 
         void OnGameObjectCreate(GameObject* gameObject) override
@@ -581,10 +575,29 @@ public:
                 case GO_SNOW_MOUND:
                     gameObject->EnableCollision(false);
                     break;
+                // Mimiron Tram
                 case GO_MIMIRON_TRAM:
                     if (GetData(TYPE_MIMIRON) == DONE)
                         m_mimironTramUsed = true;
                     m_mimironTramGUID = gameObject->GetGUID();
+                    break;
+                case GO_MIMIRON_TRAM_ROCKET_BOOSTER:
+                    m_mimironTramRocketBoosterGUID = gameObject->GetGUID();
+                    break;
+                case GO_MIMIRON_ACTIVATE_TRAM:
+                    m_mimironActivateTramGUID = gameObject->GetGUID();
+                    break;
+                case GO_MIMIRON_CALL_TRAM_CENTER:
+                    m_mimironCallTramCenterGUID = gameObject->GetGUID();
+                    break;
+                case GO_MIMIRON_CALL_TRAM_MIMIRON:
+                    m_mimironCallTramMimironGUID = gameObject->GetGUID();
+                    break;
+                case GO_DOODAD_UL_TRAIN_TURNAROUND01:
+                    m_mimironTramTurnaround1GUID = gameObject->GetGUID();
+                    break;
+                case GO_DOODAD_UL_TRAIN_TURNAROUND02:
+                    m_mimironTramTurnaround2GUID = gameObject->GetGUID();
                     break;
                 // Algalon the Observer
                 case GO_CELESTIAL_PLANETARIUM_ACCESS_10:
@@ -694,11 +707,19 @@ public:
                 case TYPE_THORIM:
                 case TYPE_FREYA:
                     m_auiEncounter[type] = data;
-                    ShowKeeperGossip(type, nullptr, m_keepersGossipGUID[type - TYPE_FREYA]);
                     if (GetData(TYPE_MIMIRON) == DONE && GetData(TYPE_FREYA) == DONE && GetData(TYPE_HODIR) == DONE && GetData(TYPE_THORIM) == DONE)
                     {
-                        if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
-                            go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                        scheduler.Schedule(45s, [this](TaskContext /*context*/)
+                        {
+                            if (GameObject* go = instance->GetGameObject(m_keepersgateGUID))
+                            {
+                                go->RemoveGameObjectFlag(GO_FLAG_LOCKED);
+                                if (Creature* trigger = instance->SummonCreature(NPC_ANCIENT_GATE_WORLD_TRIGGER, triggerAncientGatePosition, nullptr, 10*IN_MILLISECONDS))
+                                {
+                                    trigger->AI()->Talk(EMOTE_ANCIENT_GATE_UNLOCKED);
+                                }
+                            }
+                        });
                     }
                     if (type == TYPE_MIMIRON && data == IN_PROGRESS) // after reaching him without tram and starting the fight
                         m_mimironTramUsed = true;
@@ -715,8 +736,11 @@ public:
                     break;
                 case TYPE_WATCHERS:
                     m_auiEncounter[type] |= 1 << data;
+                    [[fallthrough]];
+                case EVENT_KEEPER_TELEPORTED:
+                    if (Creature* sara = instance->GetCreature(m_saraGUID))
+                        sara->AI()->DoAction(ACTION_SARA_UPDATE_SUMMON_KEEPERS);
                     break;
-
                 case DATA_MAGE_BARRIER:
                     m_mageBarrier = data;
                     break;
@@ -727,6 +751,7 @@ public:
                 case EVENT_TOWER_OF_FLAMES_DESTROYED:
                     {
                         instance->LoadGrid(364.0f, -16.0f); //make sure leviathan is loaded
+                        instance->LoadGrid(364.0f, 32.0f); //make sure Mimiron's and Thorim's Targetting Crystal are loaded
                         m_leviathanTowers[type - EVENT_TOWER_OF_LIFE_DESTROYED] = data;
                         for (uint8 i = 0; i < 2; ++i)
                         {
@@ -749,7 +774,7 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ALGALON_TIMER_ENABLED, 1);
                     DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, 60);
                     m_algalonTimer = 60;
-                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 60000);
+                    _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
                     SaveToDB();
                     return;
                 case DATA_ALGALON_SUMMON_STATE:
@@ -786,6 +811,18 @@ public:
                         go->SetGoState(data == IN_PROGRESS ? GO_STATE_ACTIVE : GO_STATE_READY);
                         go->EnableCollision(false);
                     }
+
+                    if (data == FAIL)
+                    {
+                        scheduler.Schedule(5s, [this](TaskContext)
+                        {
+                            if (m_algalonTimer && (m_algalonTimer <= 60 || m_algalonTimer == TIMER_ALGALON_TO_SUMMON))
+                            {
+                                instance->SummonCreature(NPC_ALGALON, AlgalonLandPos);
+                            }
+                        });
+                    }
+
                     break;
 
                 // Achievement
@@ -798,9 +835,51 @@ public:
                         if (StaticTransport* t = MimironTram->ToStaticTransport())
                         {
                             if (data == 0 && t->GetGoState() == GO_STATE_ACTIVE && t->GetPathProgress() == t->GetPauseTime())
+                            {
                                 MimironTram->SetGoState(GO_STATE_READY);
+                                if (GameObject* rocketBooster = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                                    rocketBooster->SetGoState(GO_STATE_ACTIVE);
+                                if (GameObject* activateTramButton = instance->GetGameObject(m_mimironActivateTramGUID))
+                                    activateTramButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                if (GameObject* callTramCenterButton = instance->GetGameObject(m_mimironCallTramCenterGUID))
+                                    callTramCenterButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                scheduler.Schedule(30s, [this](TaskContext /*context*/)
+                                {
+                                    if (GameObject* turnaround1 = instance->GetGameObject(m_mimironTramTurnaround1GUID))
+                                        turnaround1->UseDoorOrButton();
+                                    if (GameObject* rocketBooster = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                                        rocketBooster->SetGoState(GO_STATE_READY);
+                                }).Schedule(60s, [this](TaskContext /*context*/)
+                                {
+                                    if (GameObject* activateTramButton = instance->GetGameObject(m_mimironActivateTramGUID))
+                                        activateTramButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                    if (GameObject* callTramMimironButton = instance->GetGameObject(m_mimironCallTramMimironGUID))
+                                        callTramMimironButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                });
+                            }
                             if (data == 1 && t->GetGoState() == GO_STATE_READY && t->GetPathProgress() == 0)
+                            {
                                 MimironTram->SetGoState(GO_STATE_ACTIVE);
+                                if (GameObject* rocketBooster = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                                    rocketBooster->SetGoState(GO_STATE_ACTIVE);
+                                if (GameObject* activateTramButton = instance->GetGameObject(m_mimironActivateTramGUID))
+                                    activateTramButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                if (GameObject* callTramMimironButton = instance->GetGameObject(m_mimironCallTramMimironGUID))
+                                    callTramMimironButton->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                scheduler.Schedule(33s, [this](TaskContext /*context*/)
+                                {
+                                    if (GameObject* turnaround2 = instance->GetGameObject(m_mimironTramTurnaround2GUID))
+                                        turnaround2->UseDoorOrButton();
+                                    if (GameObject* rocketBooster = instance->GetGameObject(m_mimironTramRocketBoosterGUID))
+                                        rocketBooster->SetGoState(GO_STATE_READY);
+                                }).Schedule(63s, [this](TaskContext /*context*/)
+                                {
+                                    if (GameObject* activateTramButton = instance->GetGameObject(m_mimironActivateTramGUID))
+                                        activateTramButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                    if (GameObject* callTramCenterButton = instance->GetGameObject(m_mimironCallTramCenterGUID))
+                                        callTramCenterButton->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                                });
+                            }
                         }
                     break;
                 case DATA_BRANN_MEMOTESAY:
@@ -1056,73 +1135,61 @@ public:
                 }
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            OUT_SAVE_INST_DATA;
+            data >> m_auiEncounter[0];
+            data >> m_auiEncounter[1];
+            data >> m_auiEncounter[2];
+            data >> m_auiEncounter[3];
+            data >> m_auiEncounter[4];
+            data >> m_auiEncounter[5];
+            data >> m_auiEncounter[6];
+            data >> m_auiEncounter[7];
+            data >> m_auiEncounter[8];
+            data >> m_auiEncounter[9];
+            data >> m_auiEncounter[10];
+            data >> m_auiEncounter[11];
+            data >> m_auiEncounter[12];
+            data >> m_auiEncounter[13];
+            data >> m_auiEncounter[14];
+            data >> m_conspeedatoryAttempt;
+            data >> m_unbrokenAchievement;
+            data >> m_algalonTimer;
 
-            std::ostringstream saveStream;
-            saveStream << "U U " << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' '
-                       << m_auiEncounter[4] << ' ' << m_auiEncounter[5] << ' ' << m_auiEncounter[6] << ' ' << m_auiEncounter[7] << ' '
-                       << m_auiEncounter[8] << ' ' << m_auiEncounter[9] << ' ' << m_auiEncounter[10] << ' ' << m_auiEncounter[11] << ' '
-                       << m_auiEncounter[12] << ' ' << m_auiEncounter[13] << ' ' << m_auiEncounter[14] << ' ' << m_conspeedatoryAttempt << ' '
-                       << m_unbrokenAchievement << ' ' << m_algalonTimer << ' ' << C_of_Ulduar_MASK << ' ' << m_mageBarrier;
+            if (m_algalonTimer == TIMER_ALGALON_SUMMONED)
+                m_algalonTimer = TIMER_ALGALON_TO_SUMMON;
 
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
+            if (m_algalonTimer && m_algalonTimer <= 60 && GetData(TYPE_ALGALON) != DONE)
+            {
+                DoUpdateWorldState(WORLD_STATE_ALGALON_TIMER_ENABLED, 1);
+                DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, m_algalonTimer);
+            }
+
+            data >> C_of_Ulduar_MASK;
+            data >> m_mageBarrier;
+
+            for (uint8 i = 0; i < (MAX_ENCOUNTER - 1); ++i)
+            {
+                if (m_auiEncounter[i] == IN_PROGRESS)
+                {
+                    m_auiEncounter[i] = NOT_STARTED;
+                }
+            }
         }
 
-        void Load(const char* strIn) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!strIn)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(strIn);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(strIn);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'U' && dataHead2 == 'U')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                {
-                    loadStream >> m_auiEncounter[i];
-
-                    if (m_auiEncounter[i] == IN_PROGRESS && i != TYPE_WATCHERS)
-                        m_auiEncounter[i] = NOT_STARTED;
-                }
-
-                // Achievements
-                loadStream >> m_conspeedatoryAttempt;
-                loadStream >> m_unbrokenAchievement;
-
-                // Algalon
-                loadStream >> m_algalonTimer;
-                if (m_algalonTimer == TIMER_ALGALON_SUMMONED)
-                    m_algalonTimer = TIMER_ALGALON_TO_SUMMON;
-
-                if (m_algalonTimer && m_algalonTimer <= 60 && GetData(TYPE_ALGALON) != DONE)
-                {
-                    DoUpdateWorldState(WORLD_STATE_ALGALON_TIMER_ENABLED, 1);
-                    DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, m_algalonTimer);
-                }
-
-                // achievement Conqueror/Champion of Ulduar
-                loadStream >> C_of_Ulduar_MASK;
-
-                //Base Camp - Mage Barrier status
-                loadStream >> m_mageBarrier;
-            }
-
-            OUT_LOAD_INST_DATA_COMPLETE;
+            data << m_auiEncounter[0] << ' ' << m_auiEncounter[1] << ' ' << m_auiEncounter[2] << ' ' << m_auiEncounter[3] << ' '
+                << m_auiEncounter[4] << ' ' << m_auiEncounter[5] << ' ' << m_auiEncounter[6] << ' ' << m_auiEncounter[7] << ' '
+                << m_auiEncounter[8] << ' ' << m_auiEncounter[9] << ' ' << m_auiEncounter[10] << ' ' << m_auiEncounter[11] << ' '
+                << m_auiEncounter[12] << ' ' << m_auiEncounter[13] << ' ' << m_auiEncounter[14] << ' ' << m_conspeedatoryAttempt << ' '
+                << m_unbrokenAchievement << ' ' << m_algalonTimer << ' ' << C_of_Ulduar_MASK << ' ' << m_mageBarrier;
         }
 
         void Update(uint32 diff) override
         {
+            InstanceScript::Update(diff);
+
             if (_events.Empty())
                 return;
 
@@ -1139,7 +1206,7 @@ public:
                     DoUpdateWorldState(WORLD_STATE_ALGALON_DESPAWN_TIMER, --m_algalonTimer);
                     if (m_algalonTimer)
                     {
-                        _events.RepeatEvent(60000);
+                        _events.Repeat(1min);
                         return;
                     }
 
@@ -1281,3 +1348,4 @@ void AddSC_instance_ulduar()
 {
     new instance_ulduar();
 }
+

@@ -31,11 +31,10 @@ npc_twiggy_flathead
 npc_wizzlecrank_shredder
 EndContentData */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "SpellInfo.h"
 
 /*######
@@ -118,7 +117,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             //not always use
             if (rand() % 4)
@@ -199,7 +198,7 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void UpdateAI(uint32 diff) override
         {
@@ -304,7 +303,7 @@ public:
             BigWill.Clear();
         }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void EnterEvadeMode(EvadeReason why) override
         {

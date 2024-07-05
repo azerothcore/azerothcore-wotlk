@@ -17,9 +17,9 @@
 
 #include "Common.h"
 #include "CreatureGroups.h"
+#include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "ObjectAccessor.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
 enum COG_Paths
@@ -101,7 +101,7 @@ struct npc_cameron : public ScriptedAI
         Acore::Containers::RandomShuffle(MovePosPositions);
 
         // first we break formation because children will need to move on their own now
-        for (auto guid : _childrenGUIDs)
+        for (auto& guid : _childrenGUIDs)
             if (Creature* child = ObjectAccessor::GetCreature(*me, guid))
                 if (child->GetFormation())
                     child->GetFormation()->RemoveMember(child);
@@ -125,21 +125,21 @@ struct npc_cameron : public ScriptedAI
         {
             case STORMWIND_PATH:
             {
-                _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2000);
-                _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 660000); // 11 minutes
+                _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2s);
+                _events.ScheduleEvent(EVENT_WP_START_GOLDSHIRE, 11min);
                 break;
             }
             case GOLDSHIRE_PATH:
             {
-                _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2000);
-                _events.ScheduleEvent(EVENT_WP_START_WOODS, 900000); // 15 minutes
+                _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2s);
+                _events.ScheduleEvent(EVENT_WP_START_WOODS, 15min);
                 break;
             }
             case WOODS_PATH:
             {
-                _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2000);
-                _events.ScheduleEvent(EVENT_WP_START_HOUSE, 360000); // 6 minutes
-                _events.ScheduleEvent(EVENT_WP_START_LISA, 362000);
+                _events.ScheduleEvent(EVENT_RANDOM_MOVEMENT, 2s);
+                _events.ScheduleEvent(EVENT_WP_START_HOUSE, 6min); // 6 minutes
+                _events.ScheduleEvent(EVENT_WP_START_LISA, 362s);
                 break;
             }
             case HOUSE_PATH:
@@ -147,7 +147,7 @@ struct npc_cameron : public ScriptedAI
                 // Move childeren at last point
                 MoveTheChildren();
                 // After 30 seconds a random sound should play
-                _events.ScheduleEvent(EVENT_PLAY_SOUNDS, 30000);
+                _events.ScheduleEvent(EVENT_PLAY_SOUNDS, 30s);
                 break;
             }
         }
@@ -159,7 +159,7 @@ struct npc_cameron : public ScriptedAI
         {
             // Start event at 7 am
             // Begin pathing
-            _events.ScheduleEvent(EVENT_BEGIN_EVENT, 2000);
+            _events.ScheduleEvent(EVENT_BEGIN_EVENT, 2s);
             _started = true;
         }
         else if (!start && eventId == GAME_EVENT_CHILDREN_OF_GOLDSHIRE)
@@ -228,7 +228,7 @@ struct npc_cameron : public ScriptedAI
 
                 // If Formation was disbanded, remake.
                 if (!me->GetFormation()->IsFormed())
-                    for (auto guid : _childrenGUIDs)
+                    for (auto& guid : _childrenGUIDs)
                         if (Creature* child = ObjectAccessor::GetCreature(*me, guid))
                             child->SearchFormation();
 
@@ -273,7 +273,7 @@ struct npc_supervisor_raelen : public ScriptedAI
     {
         _PeasentId = 0;
         peasentGUIDs.clear();
-        _events.ScheduleEvent(EVENT_FIND_PEASENTS, 4000);
+        _events.ScheduleEvent(EVENT_FIND_PEASENTS, 4s);
     }
 
     void SetData(uint32 /*type*/, uint32 data) override
@@ -282,7 +282,7 @@ struct npc_supervisor_raelen : public ScriptedAI
         {
             ++_PeasentId;
             if (_PeasentId == 5) _PeasentId = 0;
-            _events.ScheduleEvent(EVENT_NEXT_PEASENT, urand(2000, 6000));
+            _events.ScheduleEvent(EVENT_NEXT_PEASENT, 2s, 6s);
         }
     }
 
@@ -314,7 +314,7 @@ struct npc_supervisor_raelen : public ScriptedAI
                     peasentGUIDs.push_back(tempGUIDs[0]);
                     peasentGUIDs.push_back(tempGUIDs[1]);
                     peasentGUIDs.push_back(tempGUIDs[4]);
-                    _events.ScheduleEvent(EVENT_NEXT_PEASENT, 1000);
+                    _events.ScheduleEvent(EVENT_NEXT_PEASENT, 1s);
                     break;
                 }
                 case EVENT_NEXT_PEASENT:
@@ -397,11 +397,11 @@ struct npc_eastvale_peasent : public ScriptedAI
             CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(me->GetEntry());
             me->SetSpeed(MOVE_WALK, cinfo->speed_walk);
             me->RemoveAura(SPELL_TRANSFORM_PEASENT_WITH_WOOD);
-            _events.ScheduleEvent(EVENT_MOVETORAELEN, 3000);
+            _events.ScheduleEvent(EVENT_MOVETORAELEN, 3s);
         }
         else if (pathId == _path + 1)
         {
-            _events.ScheduleEvent(EVENT_TALKTORAELEN1, 1000);
+            _events.ScheduleEvent(EVENT_TALKTORAELEN1, 1s);
         }
         else if (pathId == _path + 2)
         {
@@ -430,35 +430,35 @@ struct npc_eastvale_peasent : public ScriptedAI
                     {
                     case PATH_PEASENT_0:
                         me->PlayDirectSound(SOUND_PEASENT_GREETING_1);
-                        _events.ScheduleEvent(EVENT_TALKTORAELEN2, 2000);
+                        _events.ScheduleEvent(EVENT_TALKTORAELEN2, 2s);
                         break;
                     case PATH_PEASENT_1:
                     case PATH_PEASENT_3:
                         me->PlayDirectSound(SOUND_PEASENT_GREETING_3);
-                        _events.ScheduleEvent(EVENT_RAELENTALK, 2000);
+                        _events.ScheduleEvent(EVENT_RAELENTALK, 2s);
                         break;
                     case PATH_PEASENT_2:
                     case PATH_PEASENT_4:
                         me->PlayDirectSound(SOUND_PEASENT_GREETING_2);
-                        _events.ScheduleEvent(EVENT_RAELENTALK, 2000);
+                        _events.ScheduleEvent(EVENT_RAELENTALK, 2s);
                         break;
                     }
                 }
                 else
                 {
                     // Path back if realen cannot be found alive
-                    _events.ScheduleEvent(EVENT_PATHBACK, 2000);
+                    _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                 }
                 break;
             case EVENT_TALKTORAELEN2:
                 me->PlayDirectSound(SOUND_PEASENT_GREETING_2);
-                _events.ScheduleEvent(EVENT_RAELENTALK, 2000);
+                _events.ScheduleEvent(EVENT_RAELENTALK, 2s);
                 break;
             case EVENT_RAELENTALK:
                 if (Creature* realen = ObjectAccessor::GetCreature(*me, _realenGUID))
                 {
                     realen->AI()->Talk(SAY_RAELEN);
-                    _events.ScheduleEvent(EVENT_TALKTORAELEN3, 5000);
+                    _events.ScheduleEvent(EVENT_TALKTORAELEN3, 5s);
                 }
                 break;
             case EVENT_TALKTORAELEN3:
@@ -467,27 +467,27 @@ struct npc_eastvale_peasent : public ScriptedAI
                     {
                     case PATH_PEASENT_0:
                         me->PlayDirectSound(SOUND_PEASENT_LEAVING_1);
-                        _events.ScheduleEvent(EVENT_PATHBACK, 2000);
+                        _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                         break;
                     case PATH_PEASENT_1:
                     case PATH_PEASENT_3:
                         me->PlayDirectSound(SOUND_PEASENT_LEAVING_4);
-                        _events.ScheduleEvent(EVENT_TALKTORAELEN4, 2000);
+                        _events.ScheduleEvent(EVENT_TALKTORAELEN4, 2s);
                         break;
                     case PATH_PEASENT_2:
                         me->PlayDirectSound(SOUND_PEASENT_LEAVING_3);
-                        _events.ScheduleEvent(EVENT_PATHBACK, 2000);
+                        _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                         break;
                     case PATH_PEASENT_4:
                         me->PlayDirectSound(SOUND_PEASENT_LEAVING_2);
-                        _events.ScheduleEvent(EVENT_PATHBACK, 2000);
+                        _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                         break;
                     }
                 }
                 break;
             case EVENT_TALKTORAELEN4:
                 me->PlayDirectSound(SOUND_PEASENT_LEAVING_5);
-                _events.ScheduleEvent(EVENT_PATHBACK, 2000);
+                _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                 break;
             case EVENT_PATHBACK:
                 if (Creature* realen = ObjectAccessor::GetCreature(*me, _realenGUID))

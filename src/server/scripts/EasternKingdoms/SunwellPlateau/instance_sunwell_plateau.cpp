@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
+#include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 
 DoorData const doorData[] =
@@ -40,6 +41,7 @@ public:
     {
         instance_sunwell_plateau_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
         }
@@ -153,7 +155,7 @@ public:
                 case GO_FIRE_BARRIER:
                 case GO_MURUS_GATE_1:
                 case GO_MURUS_GATE_2:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_ICE_BARRIER:
                     IceBarrierGUID = go->GetGUID();
@@ -186,7 +188,7 @@ public:
                 case GO_BOSS_COLLISION_1:
                 case GO_BOSS_COLLISION_2:
                 case GO_FORCE_FIELD:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
                 default:
                     break;
@@ -233,49 +235,6 @@ public:
             return ObjectGuid::Empty;
         }
 
-        std::string GetSaveData() override
-        {
-            OUT_SAVE_INST_DATA;
-
-            std::ostringstream saveStream;
-            saveStream << "S P " << GetBossSaveData();
-
-            OUT_SAVE_INST_DATA_COMPLETE;
-            return saveStream.str();
-        }
-
-        void Load(char const* str) override
-        {
-            if (!str)
-            {
-                OUT_LOAD_INST_DATA_FAIL;
-                return;
-            }
-
-            OUT_LOAD_INST_DATA(str);
-
-            char dataHead1, dataHead2;
-
-            std::istringstream loadStream(str);
-            loadStream >> dataHead1 >> dataHead2;
-
-            if (dataHead1 == 'S' && dataHead2 == 'P')
-            {
-                for (uint32 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    uint32 tmpState;
-                    loadStream >> tmpState;
-                    if (tmpState == IN_PROGRESS || tmpState > SPECIAL)
-                        tmpState = NOT_STARTED;
-                    SetBossState(i, EncounterState(tmpState));
-                }
-            }
-            else
-                OUT_LOAD_INST_DATA_FAIL;
-
-            OUT_LOAD_INST_DATA_COMPLETE;
-        }
-
     protected:
         ObjectGuid KalecgosDragonGUID;
         ObjectGuid SathrovarrGUID;
@@ -312,36 +271,31 @@ enum cataclysmBreath
     SPELL_WITHERED_TOUCH        = 46300
 };
 
-class spell_cataclysm_breath : public SpellScriptLoader
+class spell_cataclysm_breath : public SpellScript
 {
-public:
-    spell_cataclysm_breath() : SpellScriptLoader("spell_cataclysm_breath") { }
+    PrepareSpellScript(spell_cataclysm_breath);
 
-    class spell_cataclysm_breath_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_cataclysm_breath_SpellScript);
+        return ValidateSpellInfo({ SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH });
+    }
 
-        void HandleAfterCast()
-        {
-            if (Unit* target = GetExplTargetUnit())
-                for (uint8 i = 0; i < 4; ++i)
-                    GetCaster()->CastSpell(target, RAND(SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH), true);
-        }
-
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_cataclysm_breath_SpellScript::HandleAfterCast);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleAfterCast()
     {
-        return new spell_cataclysm_breath_SpellScript();
+        if (Unit* target = GetExplTargetUnit())
+            for (uint8 i = 0; i < 4; ++i)
+                GetCaster()->CastSpell(target, RAND(SPELL_CORROSIVE_POISON, SPELL_FEVERED_FATIGUE, SPELL_HEX, SPELL_NECROTIC_POISON, SPELL_PIERCING_SHADOW, SPELL_SHRINK, SPELL_WAVERING_WILL, SPELL_WITHERED_TOUCH), true);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_cataclysm_breath::HandleAfterCast);
     }
 };
 
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
-    new spell_cataclysm_breath();
+    RegisterSpellScript(spell_cataclysm_breath);
 }
+

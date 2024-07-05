@@ -26,9 +26,9 @@ EndScriptData */
 
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "Weather.h"
 #include "zulaman.h"
@@ -110,7 +110,7 @@ public:
             SetWeather(WEATHER_STATE_FINE, 0.0f);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             events.ScheduleEvent(EVENT_STATIC_DISRUPTION, urand(10000, 20000)); // 10 to 20 seconds (bosskillers)
             events.ScheduleEvent(EVENT_GUST_OF_WIND, urand(20000, 30000));      // 20 to 30 seconds(bosskillers)
@@ -391,7 +391,7 @@ public:
             me->SetDisableGravity(true);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             DoZoneInCombat();
         }

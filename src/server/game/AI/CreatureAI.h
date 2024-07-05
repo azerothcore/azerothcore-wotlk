@@ -21,8 +21,9 @@
 #include "AreaBoundary.h"
 #include "Common.h"
 #include "Creature.h"
-#include "UnitAI.h"
 #include "EventMap.h"
+#include "TaskScheduler.h"
+#include "UnitAI.h"
 
 class WorldObject;
 class Unit;
@@ -72,6 +73,7 @@ protected:
     Creature* const me;
 
     EventMap events;
+    TaskScheduler scheduler;
 
     bool UpdateVictim();
     bool UpdateVictimWithGaze();
@@ -82,7 +84,7 @@ protected:
     Creature* DoSummon(uint32 entry, WorldObject* obj, float radius = 5.0f, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
     Creature* DoSummonFlyer(uint32 entry, WorldObject* obj, float flightZ, float radius = 5.0f, uint32 despawnTime = 30000, TempSummonType summonType = TEMPSUMMON_CORPSE_TIMED_DESPAWN);
 public:
-    // EnumUtils: DESCRIBE THIS
+    // EnumUtils: DESCRIBE THIS (in CreatureAI::)
     enum EvadeReason
     {
         EVADE_REASON_NO_HOSTILES,       // the creature's threat list is empty
@@ -92,7 +94,8 @@ public:
         EVADE_REASON_OTHER
     };
 
-    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr);
+    void Talk(uint8 id, WorldObject const* whisperTarget = nullptr, Milliseconds delay = 0s);
+    void Talk(uint8 id, Milliseconds delay) { Talk(id, nullptr, delay); }
 
     explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), m_MoveInLineOfSight_locked(false) { }
 
@@ -115,8 +118,10 @@ public:
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
-    // Called for reaction when initially engaged
-    virtual void EnterCombat(Unit* /*victim*/) {}
+    /**
+     * @brief Called for reaction when initially engaged
+     */
+    virtual void JustEngagedWith(Unit* /*who*/) {}
 
     // Called when the creature is killed
     virtual void JustDied(Unit* /*killer*/) {}
@@ -126,11 +131,13 @@ public:
 
     // Called when the creature summon successfully other creature
     virtual void JustSummoned(Creature* /*summon*/) {}
-    virtual void IsSummonedBy(Unit* /*summoner*/) {}
+    virtual void IsSummonedBy(WorldObject* /*summoner*/) {}
 
     virtual void SummonedCreatureDespawn(Creature* /*summon*/) {}
     virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) {}
     virtual void SummonedCreatureDespawnAll() {}
+
+    virtual void SummonedCreatureEvade(Creature* /*summon*/) {}
 
     // Called when hit by a spell
     virtual void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/) {}

@@ -1,0 +1,36 @@
+name: pch-build
+on:
+  push:
+    branches:
+      - 'master'
+  pull_request:
+    types: ['opened', 'synchronize', 'reopened']
+
+concurrency:
+  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            compiler:
+              CC: clang-15
+              CXX: clang++-15
+          - os: ubuntu-24.04
+            compiler:
+              CC: clang-18
+              CXX: clang++-18
+    runs-on: ${{ matrix.os }}
+    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-pch
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/linux-build
+        with:
+          CC: ${{ matrix.compiler.CC }}
+          CXX: ${{ matrix.compiler.CXX }}
+          pch: true

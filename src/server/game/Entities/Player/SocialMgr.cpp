@@ -220,7 +220,7 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo&
     friendInfo.Class = 0;
 
     Player* pFriend = ObjectAccessor::FindConnectedPlayer(friendGUID);
-    if (!pFriend || AccountMgr::IsGMAccount(pFriend->GetSession()->GetSecurity()))
+    if (!pFriend || pFriend->GetSession()->IsGMAccount())
         return;
 
     TeamId teamId = player->GetTeamId();
@@ -242,7 +242,7 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo&
         if (pFriend->isDND())
             friendInfo.Status = FRIEND_STATUS_DND;
         friendInfo.Area = pFriend->GetZoneId();
-        friendInfo.Level = pFriend->getLevel();
+        friendInfo.Level = pFriend->GetLevel();
         friendInfo.Class = pFriend->getClass();
     }
 }

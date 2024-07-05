@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ruins_of_ahnqiraj.h"
-#include "TaskScheduler.h"
 
 enum Spells
 {
@@ -57,15 +57,14 @@ enum Misc
     ACTION_SWARMER_SWARM                    = 1,
 };
 
+enum TaskGroups
+{
+    GROUP_AIR                              = 1
+};
+
 enum Emotes
 {
     EMOTE_FRENZY                            =  0
-};
-
-enum Phases
-{
-    PHASE_AIR                               = 0,
-    PHASE_GROUND                            = 1
 };
 
 enum Points
@@ -85,11 +84,23 @@ struct boss_ayamiss : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        _phase = PHASE_AIR;
-        _enraged = false;
-        SetCombatMovement(false);
-        _scheduler.CancelAll();
+        me->SetCombatMovement(false);
         me->SetReactState(REACT_AGGRESSIVE);
+
+        ScheduleHealthCheckEvent(70, [&] {
+            me->ClearUnitState(UNIT_STATE_ROOT);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetCanFly(false);
+            me->SetDisableGravity(false);
+            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+            DoResetThreatList();
+            scheduler.CancelGroup(GROUP_AIR);
+        });
+
+        ScheduleHealthCheckEvent(20, [&] {
+            DoCastSelf(SPELL_FRENZY);
+            Talk(EMOTE_FRENZY);
+        });
     }
 
     void JustSummoned(Creature* who) override
@@ -116,7 +127,7 @@ struct boss_ayamiss : public BossAI
         }
         else if (type == WAYPOINT_MOTION_TYPE && id == POINT_GROUND)
         {
-            SetCombatMovement(true);
+            me->SetCombatMovement(true);
             me->SetDisableGravity(false);
 
             me->m_Events.AddEventAtOffset([this]()
@@ -129,7 +140,7 @@ struct boss_ayamiss : public BossAI
 
             }, 1s);
 
-            _scheduler.Schedule(5s, 8s, [this](TaskContext context) {
+            scheduler.Schedule(5s, 8s, [this](TaskContext context) {
                 DoCastVictim(SPELL_LASH);
                 context.Repeat(8s, 15s);
             }).Schedule(16s, [this](TaskContext context)
@@ -140,15 +151,14 @@ struct boss_ayamiss : public BossAI
         }
     }
 
-    void ScheduleTasks()
+    void ScheduleTasks() override
     {
-        _scheduler.Schedule(20s, 30s, [this](TaskContext context)
+        scheduler.Schedule(20s, 30s, [this](TaskContext context)
         {
             DoCastSelf(SPELL_STINGER_SPRAY);
             context.Repeat(15s, 20s);
-        }).Schedule(5s, [this](TaskContext context) {
+        }).Schedule(5s, GROUP_AIR, [this](TaskContext context) {
             DoCastVictim(SPELL_POISON_STINGER);
-            context.SetGroup(PHASE_AIR);
             context.Repeat(2s, 3s);
         }).Schedule(5s, [this](TaskContext context) {
             DoCastAOE(SPELL_SUMMON_HIVEZARA_SWARMER, true);
@@ -202,50 +212,17 @@ struct boss_ayamiss : public BossAI
         BossAI::EnterEvadeMode(why);
     }
 
-    void EnterCombat(Unit* attacker) override
+    void JustEngagedWith(Unit* attacker) override
     {
-        BossAI::EnterCombat(attacker);
+        BossAI::JustEngagedWith(attacker);
         me->SetCanFly(true);
         me->SetDisableGravity(true);
         me->GetMotionMaster()->MovePoint(POINT_AIR, AyamissAirPos);
         ScheduleTasks();
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (_phase == PHASE_AIR && me->HealthBelowPctDamaged(70, damage))
-        {
-            _phase = PHASE_GROUND;
-            me->ClearUnitState(UNIT_STATE_ROOT);
-            me->SetReactState(REACT_PASSIVE);
-            me->SetCanFly(false);
-            me->SetDisableGravity(false);
-            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
-            DoResetThreatList();
-            _scheduler.CancelGroup(PHASE_AIR);
-        }
-
-        if (!_enraged && me->HealthBelowPctDamaged(20, damage))
-        {
-            DoCastSelf(SPELL_FRENZY);
-            Talk(EMOTE_FRENZY);
-            _enraged = true;
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        _scheduler.Update(diff,
-            std::bind(&BossAI::DoMeleeAttackIfReady, this));
-    }
 private:
     GuidList _swarmers;
-    uint8 _phase;
-    bool _enraged;
-    TaskScheduler _scheduler;
     Position homePos;
 };
 
@@ -451,3 +428,4 @@ void AddSC_boss_ayamiss()
     RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_2", (NPC_HIVEZARA_SWARMER + 6) * 10);
     RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_3", (NPC_HIVEZARA_SWARMER + 7) * 10);
 }
+

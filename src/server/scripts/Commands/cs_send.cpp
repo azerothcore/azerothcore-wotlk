@@ -16,14 +16,13 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
-#include "Language.h"
 #include "Mail.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "Tokenize.h"
 
 using namespace Acore::ChatCommands;
@@ -70,27 +69,32 @@ public:
         {
             auto itemTokens = Acore::Tokenize(itemString, ':', false);
 
-            if (itemTokens.size() != 2)
+            uint32 itemCount;
+            switch (itemTokens.size())
             {
-                handler->SendSysMessage(Acore::StringFormatFmt("> Incorrect item list format for '{}'", itemString));
-                continue;
+                case 1:
+                    itemCount = 1; // Default to sending 1 item
+                    break;
+                case 2:
+                    itemCount = *Acore::StringTo<uint32>(itemTokens.at(1));
+                    break;
+                default:
+                    handler->SendSysMessage(Acore::StringFormatFmt("> Incorrect item list format for '{}'", itemString));
+                    continue;
             }
 
             uint32 itemID = *Acore::StringTo<uint32>(itemTokens.at(0));
-            uint32 itemCount = *Acore::StringTo<uint32>(itemTokens.at(1));
 
             ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(itemID);
             if (!itemTemplate)
             {
-                handler->PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemID);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_ITEMIDINVALID, itemID);
                 return false;
             }
 
             if (!itemCount || (itemTemplate->MaxCount > 0 && itemCount > uint32(itemTemplate->MaxCount)))
             {
-                handler->PSendSysMessage(LANG_COMMAND_INVALID_ITEM_COUNT, itemCount, itemID);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_INVALID_ITEM_COUNT, itemCount, itemID);
                 return false;
             }
 
@@ -104,8 +108,7 @@ public:
 
             if (itemList.size() > MAX_MAIL_ITEMS)
             {
-                handler->PSendSysMessage(LANG_COMMAND_MAIL_ITEMS_LIMIT, MAX_MAIL_ITEMS);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_MAIL_ITEMS_LIMIT, MAX_MAIL_ITEMS);
                 return false;
             }
         }

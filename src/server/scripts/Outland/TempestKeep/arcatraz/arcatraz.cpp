@@ -16,8 +16,9 @@
  */
 
 #include "arcatraz.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 
 enum MillhouseSays
 {
@@ -67,8 +68,7 @@ enum MillhouseEvents
 
     EVENT_MILL_CHECK_HEALTH     = 20,
     EVENT_MILL_PYROBLAST        = 21,
-    EVENT_MILL_BASE_SPELL       = 22,
-    EVENT_MILL_ICEBLOCK         = 23
+    EVENT_MILL_BASE_SPELL       = 22
 };
 
 class npc_millhouse_manastorm : public CreatureScript
@@ -81,6 +81,7 @@ public:
         npc_millhouse_manastormAI(Creature* creature) : ScriptedAI(creature)
         {
             instance = creature->GetInstanceScript();
+            _usedIceblock = false;
         }
 
         InstanceScript* instance;
@@ -101,6 +102,7 @@ public:
         void Reset() override
         {
             events.Reset();
+            _usedIceblock = false;
         }
 
         void AttackStart(Unit* who) override
@@ -119,12 +121,21 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.ScheduleEvent(EVENT_MILL_CHECK_HEALTH, 1000);
             events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
             events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 2000);
-            events.ScheduleEvent(EVENT_MILL_ICEBLOCK, 1000);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        {
+            if (me->HealthBelowPctDamaged(50, damage) && !_usedIceblock)
+            {
+                _usedIceblock = true;
+                Talk(SAY_ICEBLOCK);
+                DoCastSelf(SPELL_ICEBLOCK, true);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -208,15 +219,6 @@ public:
                     me->CastSpell(me->GetVictim(), SPELL_PYROBLAST, false);
                     events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
                     break;
-                case EVENT_MILL_ICEBLOCK:
-                    if (me->GetDistance(me->GetVictim()) < 5.0f)
-                    {
-                        Talk(SAY_ICEBLOCK);
-                        me->CastSpell(me, SPELL_ICEBLOCK, true);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_MILL_ICEBLOCK, 1000);
-                    break;
                 case EVENT_MILL_BASE_SPELL:
                     switch (RAND(SPELL_FIREBALL, SPELL_ARCANE_MISSILES, SPELL_FROSTBOLT))
                     {
@@ -240,6 +242,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+        private:
+            bool _usedIceblock;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -340,12 +345,15 @@ public:
         {
             if (summon->GetEntry() == NPC_HARBINGER_SKYRISS)
             {
-                Unit::Kill(me, me);
+                me->KillSelf();
                 me->setActive(false);
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, DONE);
                 if (Creature* creature = summons.GetCreatureWithEntry(NPC_MILLHOUSE))
                 {
-                    instance->DoCastSpellOnPlayers(SPELL_QID10886);
+                    if (IsHeroic())
+                    {
+                        instance->DoCastSpellOnPlayers(SPELL_QID10886);
+                    }
                     creature->AI()->Talk(SAY_COMPLETE);
                     creature->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
                 }
@@ -354,7 +362,7 @@ public:
 
         void MoveInLineOfSight(Unit*) override { }
         void AttackStart(Unit*) override { }
-        void EnterCombat(Unit*) override { }
+        void JustEngagedWith(Unit*) override { }
 
         void JustDied(Unit*) override
         {
@@ -577,37 +585,31 @@ public:
     }
 };
 
-class spell_arcatraz_soul_steal : public SpellScriptLoader
+class spell_arcatraz_soul_steal_aura : public AuraScript
 {
-public:
-    spell_arcatraz_soul_steal() : SpellScriptLoader("spell_arcatraz_soul_steal") { }
+    PrepareAuraScript(spell_arcatraz_soul_steal_aura);
 
-    class spell_arcatraz_soul_steal_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_arcatraz_soul_steal_AuraScript)
+        return ValidateSpellInfo({ SPELL_SOUL_STEAL });
+    }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_SOUL_STEAL, true);
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->RemoveAurasDueToSpell(SPELL_SOUL_STEAL);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_arcatraz_soul_steal_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_arcatraz_soul_steal_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_arcatraz_soul_steal_AuraScript();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, SPELL_SOUL_STEAL, true);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            caster->RemoveAurasDueToSpell(SPELL_SOUL_STEAL);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_arcatraz_soul_steal_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_arcatraz_soul_steal_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -616,5 +618,6 @@ void AddSC_arcatraz()
     new npc_millhouse_manastorm();
     new npc_warden_mellichar();
 
-    new spell_arcatraz_soul_steal();
+    RegisterSpellScript(spell_arcatraz_soul_steal_aura);
 }
+

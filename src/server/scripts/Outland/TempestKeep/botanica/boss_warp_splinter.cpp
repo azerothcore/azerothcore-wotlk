@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "the_botanica.h"
 
@@ -37,87 +37,51 @@ enum Spells
     SPELL_SUMMON_SAPLINGS_PERIODIC  = 34741
 };
 
-enum Misc
+struct boss_warp_splinter : public BossAI
 {
-    EVENT_ARCANE_VOLLEY     = 1,
-    EVENT_WAR_STOMP         = 2,
-    EVENT_SUMMON_TREANT     = 3
-};
+    boss_warp_splinter(Creature* creature) : BossAI(creature, DATA_WARP_SPLINTER) { }
 
-class boss_warp_splinter : public CreatureScript
-{
-public:
-    boss_warp_splinter() : CreatureScript("boss_warp_splinter") { }
-    struct boss_warp_splinterAI : public BossAI
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        boss_warp_splinterAI(Creature* creature) : BossAI(creature, DATA_WARP_SPLINTER) { }
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
 
-        void Reset() override
+        scheduler.Schedule(8s, [this](TaskContext context)
         {
-            _Reset();
-        }
-
-        void EnterCombat(Unit* /*who*/) override
+            DoCastAOE(SPELL_ARCANE_VOLLEY);
+            context.Repeat(20s);
+        }).Schedule(15s, [this](TaskContext context)
         {
-            _EnterCombat();
-            Talk(SAY_AGGRO);
-
-            events.ScheduleEvent(EVENT_ARCANE_VOLLEY, 8000);
-            events.ScheduleEvent(EVENT_WAR_STOMP, 15000);
-            events.ScheduleEvent(EVENT_SUMMON_TREANT, 20000);
-        }
-
-        void KilledUnit(Unit* victim) override
+            DoCastAOE(SPELL_WAR_STOMP);
+            context.Repeat(30s);
+        }).Schedule(20s, [this](TaskContext context)
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_SLAY);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            Talk(SAY_DEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+            Talk(SAY_SUMMON);
+            DoCastAOE(SPELL_SUMMON_SAPLINGS_PERIODIC, true);
+            for (uint8 i = 0; i < 6; ++i)
             {
-                case EVENT_ARCANE_VOLLEY:
-                    me->CastSpell(me, SPELL_ARCANE_VOLLEY, false);
-                    events.ScheduleEvent(EVENT_ARCANE_VOLLEY, 20000);
-                    break;
-                case EVENT_WAR_STOMP:
-                    me->CastSpell(me, SPELL_WAR_STOMP, false);
-                    events.ScheduleEvent(EVENT_WAR_STOMP, 30000);
-                    break;
-                case EVENT_SUMMON_TREANT:
-                    Talk(SAY_SUMMON);
-                    me->CastSpell(me, SPELL_SUMMON_SAPLINGS_PERIODIC, true);
-                    for (uint8 i = 0; i < 6; ++i)
-                        me->CastSpell(me, SPELL_SUMMON_SAPLINGS_SUMMON + i, true);
-                    events.ScheduleEvent(EVENT_SUMMON_TREANT, 40000);
-                    break;
+                DoCastAOE(SPELL_SUMMON_SAPLINGS_SUMMON + i, true);
             }
+            context.Repeat(40s);
+        });
+    }
 
-            DoMeleeAttackIfReady();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void KilledUnit(Unit* victim) override
     {
-        return GetTheBotanicaAI<boss_warp_splinterAI>(creature);
+        if (victim->IsPlayer())
+        {
+            Talk(SAY_SLAY);
+        }
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
     }
 };
 
 void AddSC_boss_warp_splinter()
 {
-    new boss_warp_splinter();
+    RegisterTheBotanicaCreatureAI(boss_warp_splinter);
 }

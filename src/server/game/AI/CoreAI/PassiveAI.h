@@ -66,23 +66,21 @@ public:
 class CritterAI : public PassiveAI
 {
 public:
-    explicit CritterAI(Creature* c) : PassiveAI(c) { _combatTimer = 0; }
+    explicit CritterAI(Creature* c) : PassiveAI(c) { }
 
-    void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
+    void JustEngagedWith(Unit* /*who*/) override;
     void EnterEvadeMode(EvadeReason why) override;
-    void UpdateAI(uint32) override;
+    void MovementInform(uint32 type, uint32 id) override;
+    void UpdateAI(uint32 /*diff*/) override { }
 
     static int32 Permissible(Creature const* creature);
-    // Xinef: Added
-private:
-    uint32 _combatTimer;
 };
 
 class TriggerAI : public NullCreatureAI
 {
 public:
     explicit TriggerAI(Creature* c) : NullCreatureAI(c) {}
-    void IsSummonedBy(Unit* summoner) override;
+    void IsSummonedBy(WorldObject* summoner) override;
 
     static int32 Permissible(Creature const* creature);
 };

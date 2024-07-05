@@ -15,13 +15,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MailScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
 void ScriptMgr::OnBeforeMailDraftSendMailTo(MailDraft* mailDraft, MailReceiver const& receiver, MailSender const& sender, MailCheckMask& checked, uint32& deliver_delay, uint32& custom_expiration, bool& deleteMailItemsFromDB, bool& sendMail)
 {
-    ExecuteScript<MailScript>([&](MailScript* script)
-    {
-        script->OnBeforeMailDraftSendMailTo(mailDraft, receiver, sender, checked, deliver_delay, custom_expiration, deleteMailItemsFromDB, sendMail);\
-    });
+    CALL_ENABLED_HOOKS(MailScript, MAILHOOK_ON_BEFORE_MAIL_DRAFT_SEND_MAIL_TO, script->OnBeforeMailDraftSendMailTo(mailDraft, receiver, sender, checked, deliver_delay, custom_expiration, deleteMailItemsFromDB, sendMail));
 }
+
+MailScript::MailScript(const char* name, std::vector<uint16> enabledHooks)
+    : ScriptObject(name, MAILHOOK_END)
+{
+    // If empty - enable all available hooks.
+    if (enabledHooks.empty())
+        for (uint16 i = 0; i < MAILHOOK_END; ++i)
+            enabledHooks.emplace_back(i);
+
+    ScriptRegistry<MailScript>::AddScript(this, std::move(enabledHooks));
+}
+
+template class AC_GAME_API ScriptRegistry<MailScript>;

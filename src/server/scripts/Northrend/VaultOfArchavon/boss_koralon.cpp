@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "vault_of_archavon.h"
 
 enum Events
@@ -85,13 +86,13 @@ public:
             ScriptedAI::AttackStart(who);
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->CastSpell(me, SPELL_BURNING_FURY, true);
 
-            events.ScheduleEvent(EVENT_BURNING_BREATH, 10000);
-            events.ScheduleEvent(EVENT_METEOR_FISTS, 30000);
-            events.ScheduleEvent(EVENT_FLAME_CINDER, 20000);
+            events.ScheduleEvent(EVENT_BURNING_BREATH, 10s);
+            events.ScheduleEvent(EVENT_METEOR_FISTS, 30s);
+            events.ScheduleEvent(EVENT_FLAME_CINDER, 20s);
 
             if (pInstance)
                 pInstance->SetData(EVENT_KORALON, IN_PROGRESS);
@@ -140,15 +141,15 @@ public:
                 case EVENT_BURNING_BREATH:
                     rotateTimer = 1500;
                     me->CastSpell(me, SPELL_BURNING_BREATH, false);
-                    events.RepeatEvent(45000);
+                    events.Repeat(45s);
                     break;
                 case EVENT_METEOR_FISTS:
                     me->CastSpell(me, SPELL_METEOR_FISTS, true);
-                    events.RepeatEvent(45000);
+                    events.Repeat(45s);
                     break;
                 case EVENT_FLAME_CINDER:
                     me->CastSpell(me, SPELL_FLAMING_CINDER, true);
-                    events.RepeatEvent(30000);
+                    events.Repeat(30s);
                     break;
                 default:
                     break;
@@ -262,3 +263,4 @@ void AddSC_boss_koralon()
     new spell_koralon_meteor_fists();
     new spell_flame_warder_meteor_fists();
 }
+

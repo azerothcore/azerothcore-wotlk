@@ -122,6 +122,10 @@ enum NPCEntries
     NPC_ARMY_OF_THE_DEAD        = 24207,
     NPC_EBON_GARGOYLE           = 27829,
 
+    // Hunter
+    NPC_VENOMOUS_SNAKE          = 19833,
+    NPC_VIPER                   = 19921,
+
     // Generic
     NPC_GENERIC_IMP             = 12922,
     NPC_GENERIC_VOIDWALKER      = 8996
@@ -143,6 +147,7 @@ enum PetScalingSpells
     SPELL_WARLOCK_PET_SCALING_04        = 34958,
     SPELL_WARLOCK_PET_SCALING_05        = 61013, // Hit / Expertise
     SPELL_GLYPH_OF_FELGUARD             = 56246,
+    SPELL_GLYPH_OF_VOIDWALKER           = 56247,
     SPELL_INFERNAL_SCALING_01           = 36186,
     SPELL_INFERNAL_SCALING_02           = 36188,
     SPELL_INFERNAL_SCALING_03           = 36189,

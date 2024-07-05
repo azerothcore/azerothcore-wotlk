@@ -89,7 +89,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                 }
                 case GOSSIP_OPTION_LEARNDUALSPEC:
                 case GOSSIP_OPTION_DUALSPEC_INFO:
-                    if (!(GetSpecsCount() == 1 && creature->isCanTrainingAndResetTalentsOf(this) && !(getLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))))
+                    if (!(GetSpecsCount() == 1 && creature->isCanTrainingAndResetTalentsOf(this) && !(GetLevel() < sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))))
                         canTalk = false;
                     break;
                 case GOSSIP_OPTION_UNLEARNTALENTS:
@@ -109,7 +109,7 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                         canTalk = false;
                     break;
                 case GOSSIP_OPTION_STABLEPET:
-                    if (getClass() != CLASS_HUNTER)
+                    if (!IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET))
                         canTalk = false;
                     break;
                 case GOSSIP_OPTION_QUESTGIVER:
@@ -164,33 +164,31 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
 
         if (canTalk)
         {
+            // using gossip_menu_option texts by default
+            std::string strOptionText = itr->second.OptionText;
+            std::string strBoxText = itr->second.BoxText;
             // search in broadcast_text and broadcast_text_locale
-            std::string strOptionText, strBoxText;
             BroadcastText const* optionBroadcastText = sObjectMgr->GetBroadcastText(itr->second.OptionBroadcastTextID);
             BroadcastText const* boxBroadcastText = sObjectMgr->GetBroadcastText(itr->second.BoxBroadcastTextID);
             LocaleConstant locale = GetSession()->GetSessionDbLocaleIndex();
 
             if (optionBroadcastText)
                 ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? optionBroadcastText->MaleText : optionBroadcastText->FemaleText, locale, strOptionText);
-            else
-                strOptionText = itr->second.OptionText;
 
             if (boxBroadcastText)
                 ObjectMgr::GetLocaleString(getGender() == GENDER_MALE ? boxBroadcastText->MaleText : boxBroadcastText->FemaleText, locale, strBoxText);
-            else
-                strBoxText = itr->second.BoxText;
 
             // if the language is not default and the texts weren't found, maybe they're in gossip_menu_option_locale table
             if (locale != DEFAULT_LOCALE)
             {
-                if (strOptionText.empty())
+                if (!optionBroadcastText)
                 {
                     /// Find localizations from database.
                     if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
                         ObjectMgr::GetLocaleString(gossipMenuLocale->OptionText, locale, strOptionText);
                 }
 
-                if (strBoxText.empty())
+                if (!boxBroadcastText)
                 {
                     /// Find localizations from database.
                     if (GossipMenuItemsLocale const* gossipMenuLocale = sObjectMgr->GetGossipMenuItemsLocale(MAKE_PAIR32(menuId, itr->second.OptionID)))
@@ -332,7 +330,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             GetSession()->SendTrainerList(guid);
             break;
         case GOSSIP_OPTION_LEARNDUALSPEC:
-            if (GetSpecsCount() == 1 && getLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
+            if (GetSpecsCount() == 1 && GetLevel() >= sWorld->getIntConfig(CONFIG_MIN_DUALSPEC_LEVEL))
             {
                 // Cast spells that teach dual spec
                 // Both are also ImplicitTarget self and must be cast by player

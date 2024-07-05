@@ -24,6 +24,8 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 
+#define DataHeader "TE"
+
 #define TheEyeScriptName "instance_the_eye"
 
 enum EyeData
@@ -34,10 +36,13 @@ enum EyeData
     DATA_KAELTHAS           = 3,
     MAX_ENCOUNTER           = 4,
 
-    DATA_KAEL_ADVISOR1      = 10,
-    DATA_KAEL_ADVISOR2      = 11,
-    DATA_KAEL_ADVISOR3      = 12,
-    DATA_KAEL_ADVISOR4      = 13
+    DATA_THALADRED          = 10,
+    DATA_LORD_SANGUINAR     = 11,
+    DATA_CAPERNIAN          = 12,
+    DATA_TELONICUS          = 13,
+
+    DATA_KAEL_DOOR_1        = 14,
+    DATA_KAEL_DOOR_2        = 15
 };
 
 enum EyeNPCs
@@ -54,7 +59,9 @@ enum EyeGOs
 {
     GO_BRIDGE_WINDOW        = 184069,
     GO_KAEL_STATUE_RIGHT    = 184596,
-    GO_KAEL_STATUE_LEFT     = 184597
+    GO_KAEL_STATUE_LEFT     = 184597,
+    GO_KAEL_DOOR_1          = 184324,
+    GO_KAEL_DOOR_2          = 184325
 };
 
 template <class AI, class T>
@@ -62,5 +69,7 @@ inline AI* GetTheEyeAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, TheEyeScriptName);
 }
+
+#define RegisterTheEyeAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetTheEyeAI)
 
 #endif

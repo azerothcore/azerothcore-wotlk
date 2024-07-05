@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
 #include "deadmines.h"
 
 class instance_deadmines : public InstanceMapScript
@@ -28,6 +28,7 @@ public:
     {
         instance_deadmines_InstanceMapScript(Map* map) : InstanceScript(map)
         {
+            SetHeaders(DataHeader);
         }
 
         void Initialize() override
@@ -45,16 +46,17 @@ public:
                 case GO_DOOR_LEVER_2:
                 case GO_DOOR_LEVER_3:
                 case GO_CANNON:
-                    gameobject->UpdateSaveToDb(true);
+                    gameobject->AllowSaveToDB(true);
                     break;
                 case GO_FACTORY_DOOR:
-                    gameobject->UpdateSaveToDb(true);
+                    gameobject->AllowSaveToDB(true);
+                    // GoState (Door opened) is restored during GO creation, but we need to set LootState to prevent Lever from closing it again
                     if (_encounters[TYPE_RHAHK_ZOR] == DONE)
-                        gameobject->SetGoState(GO_STATE_ACTIVE);
+                        gameobject->SetLootState(GO_ACTIVATED);
                     break;
                 case GO_IRON_CLAD_DOOR:
-                    gameobject->UpdateSaveToDb(true);
-                    if (gameobject->GetStateSavedOnInstance() == GO_STATE_ACTIVE)
+                    gameobject->AllowSaveToDB(true);
+                    if (GetStoredGameObjectState(gameobject->GetSpawnId()) == GO_STATE_ACTIVE)
                     {
                         gameobject->DespawnOrUnsummon();
                     }

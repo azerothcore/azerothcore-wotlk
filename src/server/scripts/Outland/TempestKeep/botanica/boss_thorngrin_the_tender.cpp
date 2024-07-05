@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "the_botanica.h"
 
@@ -39,128 +39,80 @@ enum Spells
     SPELL_ENRAGE                = 34670
 };
 
-enum Events
+struct boss_thorngrin_the_tender : public BossAI
 {
-    EVENT_SACRIFICE             = 1,
-    EVENT_HELLFIRE              = 2,
-    EVENT_ENRAGE                = 3,
-    EVENT_HEALTH_CHECK_50       = 4,
-    EVENT_HEALTH_CHECK_20       = 5
-};
-
-class boss_thorngrin_the_tender : public CreatureScript
-{
-public:
-    boss_thorngrin_the_tender() : CreatureScript("thorngrin_the_tender") { }
-
-    struct boss_thorngrin_the_tenderAI : public BossAI
+    boss_thorngrin_the_tender(Creature* creature) : BossAI(creature, DATA_THORNGRIN_THE_TENDER)
     {
-        boss_thorngrin_the_tenderAI(Creature* creature) : BossAI(creature, DATA_THORNGRIN_THE_TENDER)
-        {
-            me->m_SightDistance = 100.0f;
-            _intro = false;
-        }
+        me->m_SightDistance = 100.0f;
+        _intro = false;
+    }
 
-        void Reset() override
-        {
-            _Reset();
-        }
+    void Reset() override
+    {
+        _Reset();
+        ScheduleHealthCheckEvent(20, [&]() {
+            Talk(SAY_20_PERCENT_HP);
+        });
+        ScheduleHealthCheckEvent(50, [&]() {
+            Talk(SAY_50_PERCENT_HP);
+        });
+    }
 
-        void MoveInLineOfSight(Unit* who) override
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_intro && who->IsPlayer())
         {
-            if (!_intro && who->GetTypeId() == TYPEID_PLAYER)
+            _intro = true;
+            Talk(SAY_INTRO);
+        }
+        BossAI::MoveInLineOfSight(who);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        Talk(SAY_AGGRO);
+
+        scheduler.Schedule(6s, [this](TaskContext context)
+        {
+            if (DoCastRandomTarget(SPELL_SACRIFICE, 1) == SPELL_CAST_OK)
             {
-                _intro = true;
-                Talk(SAY_INTRO);
+                Talk(SAY_CAST_SACRIFICE);
             }
-            BossAI::MoveInLineOfSight(who);
-        }
-
-        void EnterCombat(Unit* /*who*/) override
+            context.Repeat(30s);
+        }).Schedule(18s, [this](TaskContext context)
         {
-            _EnterCombat();
-            Talk(SAY_AGGRO);
-            events.ScheduleEvent(EVENT_SACRIFICE, 6000);
-            events.ScheduleEvent(EVENT_HELLFIRE, 18000);
-            events.ScheduleEvent(EVENT_ENRAGE, 15000);
-            events.ScheduleEvent(EVENT_HEALTH_CHECK_50, 500);
-            events.ScheduleEvent(EVENT_HEALTH_CHECK_20, 500);
-        }
-
-        void KilledUnit(Unit* victim) override
+            if (roll_chance_i(50))
+                Talk(SAY_CAST_HELLFIRE);
+            DoCastAOE(SPELL_HELLFIRE);
+            context.Repeat(22s);
+        }).Schedule(15s, [this](TaskContext context)
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
-                Talk(SAY_KILL);
-        }
+            Talk(EMOTE_ENRAGE);
+            DoCastSelf(SPELL_ENRAGE);
+            context.Repeat(30s);
+        });
+    }
 
-        void JustDied(Unit* /*killer*/) override
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
         {
-            _JustDied();
-            Talk(SAY_DEATH);
+            Talk(SAY_KILL);
         }
+    }
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SACRIFICE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 0.0f, true))
-                    {
-                        Talk(SAY_CAST_SACRIFICE);
-                        me->CastSpell(target, SPELL_SACRIFICE, false);
-                    }
-                    events.ScheduleEvent(EVENT_SACRIFICE, 30000);
-                    break;
-                case EVENT_HELLFIRE:
-                    if (roll_chance_i(50))
-                        Talk(SAY_CAST_HELLFIRE);
-                    me->CastSpell(me, SPELL_HELLFIRE, false);
-                    events.ScheduleEvent(EVENT_HELLFIRE, 22000);
-                    break;
-                case EVENT_ENRAGE:
-                    Talk(EMOTE_ENRAGE);
-                    me->CastSpell(me, SPELL_ENRAGE, false);
-                    events.ScheduleEvent(EVENT_ENRAGE, 30000);
-                    break;
-                case EVENT_HEALTH_CHECK_50:
-                    if (me->HealthBelowPct(50))
-                    {
-                        Talk(SAY_50_PERCENT_HP);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_HEALTH_CHECK_50, 500);
-                    break;
-                case EVENT_HEALTH_CHECK_20:
-                    if (me->HealthBelowPct(20))
-                    {
-                        Talk(SAY_20_PERCENT_HP);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_HEALTH_CHECK_20, 500);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        Talk(SAY_DEATH);
+    }
 
     private:
         bool _intro;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetTheBotanicaAI<boss_thorngrin_the_tenderAI>(creature);
-    }
 };
 
 void AddSC_boss_thorngrin_the_tender()
 {
-    new boss_thorngrin_the_tender();
+    RegisterTheBotanicaCreatureAI(boss_thorngrin_the_tender);
 }

@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -251,7 +252,7 @@ public:
             me->AddAura(id, me);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (gatherOthersWhenAggro)
                 GetOtherSentinels(who);
@@ -356,3 +357,4 @@ void AddSC_npc_anubisath_sentinel()
     RegisterSpellScript(spell_anubisath_mortal_strike);
     RegisterSpellScript(spell_mana_burn_area);
 }
+

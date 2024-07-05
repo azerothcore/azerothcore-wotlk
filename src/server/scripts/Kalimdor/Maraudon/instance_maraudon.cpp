@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
 #include "maraudon.h"
 
 class instance_maraudon : public InstanceMapScript
@@ -32,6 +33,7 @@ public:
 
         void Initialize() override
         {
+            SetHeaders(DataHeader);
             memset(&_encounters, 0, sizeof(_encounters));
         }
 
@@ -59,30 +61,14 @@ public:
                 SaveToDB();
         }
 
-        std::string GetSaveData() override
+        void ReadSaveDataMore(std::istringstream& data) override
         {
-            std::ostringstream saveStream;
-            saveStream << "M A " << _encounters[0];
-            return saveStream.str();
+            data >> _encounters[0];
         }
 
-        void Load(const char* in) override
+        void WriteSaveDataMore(std::ostringstream& data) override
         {
-            if (!in)
-                return;
-
-            char dataHead1, dataHead2;
-            std::istringstream loadStream(in);
-            loadStream >> dataHead1 >> dataHead2;
-            if (dataHead1 == 'M' && dataHead2 == 'A')
-            {
-                for (uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                {
-                    loadStream >> _encounters[i];
-                    if (_encounters[i] == IN_PROGRESS)
-                        _encounters[i] = NOT_STARTED;
-                }
-            }
+            data << _encounters[0];
         }
 
     private:

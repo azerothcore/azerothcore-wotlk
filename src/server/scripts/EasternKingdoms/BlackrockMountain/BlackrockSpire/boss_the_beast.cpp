@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "blackrock_spire.h"
 
@@ -113,15 +114,15 @@ public:
             }
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
-            events.ScheduleEvent(EVENT_FLAME_BREAK, 12 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_IMMOLATE, 3 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_TERRIFYING_ROAR, 23 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_BERSERKER_CHARGE, 2 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_FIREBALL, 8 * IN_MILLISECONDS, 21 * IN_MILLISECONDS);
-            events.ScheduleEvent(EVENT_FIREBLAST, 5 * IN_MILLISECONDS, 8 * IN_MILLISECONDS);
+            _JustEngagedWith();
+            events.ScheduleEvent(EVENT_FLAME_BREAK, 12s);
+            events.ScheduleEvent(EVENT_IMMOLATE, 3s);
+            events.ScheduleEvent(EVENT_TERRIFYING_ROAR, 23s);
+            events.ScheduleEvent(EVENT_BERSERKER_CHARGE, 2s);
+            events.ScheduleEvent(EVENT_FIREBALL, 8s, 21s);
+            events.ScheduleEvent(EVENT_FIREBLAST, 5s, 8s);
         }
 
         void SetData(uint32 type, uint32 /*data*/) override
@@ -206,37 +207,37 @@ public:
                 {
                     case EVENT_FLAME_BREAK:
                         DoCastVictim(SPELL_FLAMEBREAK);
-                        events.ScheduleEvent(EVENT_FLAME_BREAK, 10 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_FLAME_BREAK, 10s);
                         break;
                     case EVENT_IMMOLATE:
                         DoCastRandomTarget(SPELL_IMMOLATE, 0, 100.0f);
-                        events.ScheduleEvent(EVENT_IMMOLATE, 8 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_IMMOLATE, 8s);
                         break;
                     case EVENT_TERRIFYING_ROAR:
                         DoCastVictim(SPELL_TERRIFYINGROAR);
-                        events.ScheduleEvent(EVENT_TERRIFYING_ROAR, 20 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_TERRIFYING_ROAR, 20s);
                         break;
                     case EVENT_BERSERKER_CHARGE:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 38.f, true))
                         {
                             DoCast(target, SPELL_BERSERKER_CHARGE);
                         }
-                        events.ScheduleEvent(EVENT_BERSERKER_CHARGE, 15 * IN_MILLISECONDS, 23 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_BERSERKER_CHARGE, 15s, 23s);
                         break;
                     case EVENT_FIREBALL:
                         DoCastVictim(SPELL_FIREBALL);
-                        events.ScheduleEvent(EVENT_FIREBALL, 8 * IN_MILLISECONDS, 21 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_FIREBALL, 8s, 21s);
                         if (events.GetNextEventTime(EVENT_FIREBLAST) < 3 * IN_MILLISECONDS)
                         {
-                            events.RescheduleEvent(EVENT_FIREBLAST, 3 * IN_MILLISECONDS);
+                            events.RescheduleEvent(EVENT_FIREBLAST, 3s);
                         }
                         break;
                     case EVENT_FIREBLAST:
                         DoCastVictim(SPELL_FIREBLAST);
-                        events.ScheduleEvent(EVENT_FIREBLAST, 5 * IN_MILLISECONDS, 8 * IN_MILLISECONDS);
+                        events.ScheduleEvent(EVENT_FIREBLAST, 5s, 8s);
                         if (events.GetNextEventTime(EVENT_FIREBALL) < 3 * IN_MILLISECONDS)
                         {
-                            events.RescheduleEvent(EVENT_FIREBALL, 3 * IN_MILLISECONDS);
+                            events.RescheduleEvent(EVENT_FIREBALL, 3s);
                         }
                         break;
                 }

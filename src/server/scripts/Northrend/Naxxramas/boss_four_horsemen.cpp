@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
 enum Spells
@@ -56,8 +57,7 @@ enum Events
     EVENT_MARK_CAST                     = 1,
     EVENT_PRIMARY_SPELL                 = 2,
     EVENT_SECONDARY_SPELL               = 3,
-    EVENT_PUNISH                        = 4,
-    EVENT_BERSERK                       = 5
+    EVENT_BERSERK                       = 4
 };
 
 enum Misc
@@ -75,12 +75,12 @@ enum Misc
 
 enum FourHorsemen
 {
-    SAY_AGGRO       = 0,
-    SAY_TAUNT       = 1,
-    SAY_SPECIAL     = 2,
-    SAY_SLAY        = 3,
-    SAY_DEATH       = 4,
-    EMOTE_RAGECAST  = 7
+    SAY_AGGRO                           = 0,
+    SAY_TAUNT                           = 1,
+    SAY_SPECIAL                         = 2,
+    SAY_SLAY                            = 3,
+    SAY_DEATH                           = 4,
+    EMOTE_RAGECAST                      = 7
 };
 
 // MARKS
@@ -193,16 +193,15 @@ public:
             currentWaypoint = 0;
             me->SetReactState(REACT_AGGRESSIVE);
             events.Reset();
-            events.RescheduleEvent(EVENT_MARK_CAST, 24000);
-            events.RescheduleEvent(EVENT_BERSERK, 600000);
+            events.RescheduleEvent(EVENT_MARK_CAST, 24s);
+            events.RescheduleEvent(EVENT_BERSERK, 10min);
             if ((me->GetEntry() != NPC_LADY_BLAUMEUX && me->GetEntry() != NPC_SIR_ZELIEK))
             {
-                events.RescheduleEvent(EVENT_PRIMARY_SPELL, 10000 + rand() % 5000);
+                events.RescheduleEvent(EVENT_PRIMARY_SPELL, 10s, 15s);
             }
             else
             {
-                events.RescheduleEvent(EVENT_PUNISH, 5000);
-                events.RescheduleEvent(EVENT_SECONDARY_SPELL, 15000);
+                events.RescheduleEvent(EVENT_SECONDARY_SPELL, 15s);
             }
             if (pInstance)
             {
@@ -295,9 +294,9 @@ public:
             Talk(SAY_DEATH);
         }
 
-        void EnterCombat(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
-            BossAI::EnterCombat(who);
+            BossAI::JustEngagedWith(who);
             if (movementPhase == MOVE_PHASE_NONE)
             {
                 Talk(SAY_AGGRO);
@@ -337,7 +336,7 @@ public:
             {
                 case EVENT_MARK_CAST:
                     me->CastSpell(me, TABLE_SPELL_MARK[horsemanId], false);
-                    events.RepeatEvent((me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK) ? 15000 : 12000);
+                    events.Repeat((me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK) ? 15s : 12s);
                     return;
                 case EVENT_BERSERK:
                     Talk(SAY_SPECIAL);
@@ -346,27 +345,31 @@ public:
                 case EVENT_PRIMARY_SPELL:
                     Talk(SAY_TAUNT);
                     me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
-                    events.RepeatEvent(15000);
-                    return;
-                case EVENT_PUNISH:
-                    if (!SelectTarget(SelectTargetMethod::MaxDistance, 0, 45.0f, true))
-                    {
-                        me->CastSpell(me, TABLE_SPELL_PUNISH[horsemanId], false);
-                        Talk(EMOTE_RAGECAST);
-                    }
-                    events.RepeatEvent(2010);
+                    events.Repeat(15s);
                     return;
                 case EVENT_SECONDARY_SPELL:
                     me->CastSpell(me->GetVictim(), RAID_MODE(TABLE_SPELL_SECONDARY_10[horsemanId], TABLE_SPELL_SECONDARY_25[horsemanId]), false);
-                    events.RepeatEvent(15000);
+                    events.Repeat(15s);
                     return;
             }
 
-            if ((me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK))
+            if (me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::MaxDistance, 0, 45.0f, true))
+                if (Unit* pTarget = me->SelectNearestPlayer(300.0f))
                 {
-                    me->CastSpell(target, RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]), false);
+                    if (pTarget && me->IsValidAttackTarget(pTarget))
+                    {
+                        AttackStart(pTarget);
+                    }
+                }
+                if (me->IsWithinDistInMap(me->GetVictim(), 45.0f) && me->IsValidAttackTarget(me->GetVictim()))
+                {
+                    DoCastVictim(RAID_MODE(TABLE_SPELL_PRIMARY_10[horsemanId], TABLE_SPELL_PRIMARY_25[horsemanId]));
+                }
+                else if (!me->IsWithinDistInMap(me->GetVictim(), 45.0f) || !me->IsValidAttackTarget(me->GetVictim()))
+                {
+                    DoCastAOE(TABLE_SPELL_PUNISH[horsemanId]);
+                    Talk(EMOTE_RAGECAST);
                 }
             }
             else
@@ -377,82 +380,60 @@ public:
     };
 };
 
-class spell_four_horsemen_mark : public SpellScriptLoader
+class spell_four_horsemen_mark_aura : public AuraScript
 {
-public:
-    spell_four_horsemen_mark() : SpellScriptLoader("spell_four_horsemen_mark") { }
+    PrepareAuraScript(spell_four_horsemen_mark_aura);
 
-    class spell_four_horsemen_mark_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_four_horsemen_mark_AuraScript);
+        return ValidateSpellInfo({ SPELL_MARK_DAMAGE });
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
         {
-            if (Unit* caster = GetCaster())
+            int32 damage;
+            switch (GetStackAmount())
             {
-                int32 damage;
-                switch (GetStackAmount())
-                {
-                    case 1:
-                        damage = 0;
-                        break;
-                    case 2:
-                        damage = 500;
-                        break;
-                    case 3:
-                        damage = 1500;
-                        break;
-                    case 4:
-                        damage = 4000;
-                        break;
-                    case 5:
-                        damage = 12000;
-                        break;
-                    case 6:
-                        damage = 20000;
-                        break;
-                    default:
-                        damage = 20000 + 1000 * (GetStackAmount() - 7);
-                        break;
-                }
-                if (damage)
-                {
-                    caster->CastCustomSpell(SPELL_MARK_DAMAGE, SPELLVALUE_BASE_POINT0, damage, GetTarget());
-                }
+                case 1:
+                    damage = 0;
+                    break;
+                case 2:
+                    damage = 500;
+                    break;
+                case 3:
+                    damage = 1500;
+                    break;
+                case 4:
+                    damage = 4000;
+                    break;
+                case 5:
+                    damage = 12500;
+                    break;
+                case 6:
+                    damage = 20000;
+                    break;
+                default:
+                    damage = 20000 + 1000 * (GetStackAmount() - 7);
+                    break;
+            }
+            if (damage)
+            {
+                caster->CastCustomSpell(SPELL_MARK_DAMAGE, SPELLVALUE_BASE_POINT0, damage, GetTarget());
             }
         }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_four_horsemen_mark_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_four_horsemen_mark_AuraScript();
-    }
-};
-
-class spell_four_horsemen_consumption : public SpellScript
-{
-    PrepareSpellScript(spell_four_horsemen_consumption);
-
-    void HandleDamageCalc(SpellEffIndex /*effIndex*/)
-    {
-        uint32 damage = GetCaster()->GetMap()->ToInstanceMap()->GetDifficulty() == REGULAR_DIFFICULTY ? 2750 : 4250;
-        SetHitDamage(damage);
     }
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_four_horsemen_consumption::HandleDamageCalc, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+        AfterEffectApply += AuraEffectApplyFn(spell_four_horsemen_mark_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
 void AddSC_boss_four_horsemen()
 {
     new boss_four_horsemen();
-    new spell_four_horsemen_mark();
-    RegisterSpellScript(spell_four_horsemen_consumption);
+    RegisterSpellScript(spell_four_horsemen_mark_aura);
 }
+

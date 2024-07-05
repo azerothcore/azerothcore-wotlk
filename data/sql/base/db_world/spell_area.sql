@@ -1,36 +1,37 @@
 -- --------------------------------------------------------
--- Värd:                         127.0.0.1
--- Serverversion:                8.0.28 - MySQL Community Server - GPL
--- Server-OS:                    Win64
--- HeidiSQL Version:             11.3.0.6295
+-- Host:                         127.0.0.1
+-- Server version:               8.1.0 - MySQL Community Server - GPL
+-- Server OS:                    Win64
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET NAMES utf8 */;
 /*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
--- Dumpar struktur för tabell acore_world.spell_area
+-- Dumping structure for table acore_world.spell_area
 DROP TABLE IF EXISTS `spell_area`;
 CREATE TABLE IF NOT EXISTS `spell_area` (
-  `spell` mediumint unsigned NOT NULL DEFAULT '0',
-  `area` mediumint unsigned NOT NULL DEFAULT '0',
-  `quest_start` mediumint unsigned NOT NULL DEFAULT '0',
-  `quest_end` mediumint unsigned NOT NULL DEFAULT '0',
-  `aura_spell` mediumint NOT NULL DEFAULT '0',
-  `racemask` mediumint unsigned NOT NULL DEFAULT '0',
+  `spell` int unsigned NOT NULL DEFAULT '0',
+  `area` int unsigned NOT NULL DEFAULT '0',
+  `quest_start` int unsigned NOT NULL DEFAULT '0',
+  `quest_end` int unsigned NOT NULL DEFAULT '0',
+  `aura_spell` int NOT NULL DEFAULT '0',
+  `racemask` int unsigned NOT NULL DEFAULT '0',
   `gender` tinyint unsigned NOT NULL DEFAULT '2',
   `autocast` tinyint unsigned NOT NULL DEFAULT '0',
   `quest_start_status` int NOT NULL DEFAULT '64',
   `quest_end_status` int NOT NULL DEFAULT '11',
   PRIMARY KEY (`spell`,`area`,`quest_start`,`aura_spell`,`racemask`,`gender`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumpar data för tabell acore_world.spell_area: 697 rows
+-- Dumping data for table acore_world.spell_area: ~696 rows (approximately)
 DELETE FROM `spell_area`;
-/*!40000 ALTER TABLE `spell_area` DISABLE KEYS */;
 INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`) VALUES
 	(27105, 4492, 0, 12951, 0, 0, 2, 1, 64, 11),
 	(27769, 4071, 0, 0, 0, 0, 2, 1, 64, 11),
@@ -329,7 +330,7 @@ INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spe
 	(45614, 4135, 11633, 0, 0, 0, 2, 0, 74, 11),
 	(45614, 4136, 11633, 0, 0, 0, 2, 0, 74, 11),
 	(45614, 4137, 11633, 0, 0, 0, 2, 0, 74, 11),
-	(46234, 3537, 11879, 0, 0, 0, 2, 1, 8, 0),
+	(46234, 3537, 11879, 0, 0, 0, 2, 1, 74, 11),
 	(46424, 4035, 11896, 0, 0, 0, 2, 1, 10, 0),
 	(46424, 4037, 11896, 0, 0, 0, 2, 1, 10, 0),
 	(46424, 4116, 11896, 0, 0, 0, 2, 1, 10, 0),
@@ -479,36 +480,35 @@ INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spe
 	(57674, 4580, 13086, 13141, 0, 0, 2, 1, 64, 11),
 	(57674, 4593, 13086, 13157, 0, 0, 2, 1, 64, 11),
 	(57745, 4591, 13068, 13082, 0, 0, 2, 1, 74, 11),
-	(57940, 65, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 66, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 67, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 206, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 210, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 394, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 395, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 1196, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 2817, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 3456, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 3477, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 3537, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 3711, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4100, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4196, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4228, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4264, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4265, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4272, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4273, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4277, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4395, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4415, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4416, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4436, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4493, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4494, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4603, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4723, 0, 0, 0, 0, 2, 1, 64, 11),
-	(57940, 4813, 0, 0, 0, 0, 2, 1, 64, 11),
+	(57940, 65, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 66, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 67, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 206, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 210, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 394, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 395, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 495, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 1196, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 2817, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 3477, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 3537, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 3711, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4100, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4196, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4228, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4264, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4265, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4272, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4277, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4395, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4415, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4416, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4436, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4494, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4723, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4809, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4813, 0, 0, 0, 0, 2, 1, 0, 0),
+	(57940, 4820, 0, 0, 0, 0, 2, 1, 0, 0),
 	(58045, 4197, 0, 0, 0, 0, 2, 1, 64, 11),
 	(58354, 4281, 13165, 13189, 0, 690, 2, 1, 74, 11),
 	(58354, 4281, 13165, 13188, 0, 1101, 2, 1, 74, 11),
@@ -729,8 +729,8 @@ INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spe
 	(75434, 14, 25444, 25444, 0, 0, 2, 1, 74, 11),
 	(75434, 367, 25444, 25444, 0, 0, 2, 1, 74, 11),
 	(75434, 393, 25444, 25444, 0, 0, 2, 1, 74, 11);
-/*!40000 ALTER TABLE `spell_area` ENABLE KEYS */;
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

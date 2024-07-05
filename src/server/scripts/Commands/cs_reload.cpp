@@ -24,14 +24,17 @@ EndScriptData */
 
 #include "AchievementMgr.h"
 #include "AuctionHouseMgr.h"
+#include "AutobroadcastMgr.h"
 #include "BattlegroundMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "CreatureTextMgr.h"
 #include "DisableMgr.h"
 #include "GameGraveyard.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "MapMgr.h"
+#include "MotdMgr.h"
 #include "ObjectMgr.h"
 #include "ScriptMgr.h"
 #include "SkillDiscovery.h"
@@ -80,6 +83,7 @@ public:
             { "areatrigger_tavern",            HandleReloadAreaTriggerTavernCommand,          SEC_ADMINISTRATOR, Console::Yes },
             { "areatrigger_teleport",          HandleReloadAreaTriggerTeleportCommand,        SEC_ADMINISTRATOR, Console::Yes },
             { "autobroadcast",                 HandleReloadAutobroadcastCommand,              SEC_ADMINISTRATOR, Console::Yes },
+            { "motd",                          HandleReloadMotdCommand,                       SEC_ADMINISTRATOR, Console::Yes },
             { "broadcast_text",                HandleReloadBroadcastTextCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "battleground_template",         HandleReloadBattlegroundTemplate,              SEC_ADMINISTRATOR, Console::Yes },
             { "command",                       HandleReloadCommandCommand,                    SEC_ADMINISTRATOR, Console::Yes },
@@ -140,6 +144,7 @@ public:
             { "quest_template",                HandleReloadQuestTemplateCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "reference_loot_template",       HandleReloadLootTemplatesReferenceCommand,     SEC_ADMINISTRATOR, Console::Yes },
             { "reserved_name",                 HandleReloadReservedNameCommand,               SEC_ADMINISTRATOR, Console::Yes },
+            { "profanity_name",                HandleReloadProfanityNameCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "reputation_reward_rate",        HandleReloadReputationRewardRateCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "reputation_spillover_template", HandleReloadReputationRewardRateCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "skill_discovery_template",      HandleReloadSkillDiscoveryTemplateCommand,     SEC_ADMINISTRATOR, Console::Yes },
@@ -201,6 +206,7 @@ public:
         HandleReloadMailServerTemplateCommand(handler);
         HandleReloadCommandCommand(handler);
         HandleReloadReservedNameCommand(handler);
+        HandleReloadProfanityNameCommand(handler);
         HandleReloadAcoreStringCommand(handler);
         HandleReloadGameTeleCommand(handler);
         HandleReloadCreatureMovementOverrideCommand(handler);
@@ -209,6 +215,7 @@ public:
         HandleReloadVehicleTemplateAccessoryCommand(handler);
 
         HandleReloadAutobroadcastCommand(handler);
+        HandleReloadMotdCommand(handler);
         HandleReloadBroadcastTextCommand(handler);
         HandleReloadBattlegroundTemplate(handler);
         return true;
@@ -274,8 +281,7 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->PSendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
             return false;
         }
 
@@ -398,8 +404,17 @@ public:
     static bool HandleReloadAutobroadcastCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Re-Loading Autobroadcasts...");
-        sWorld->LoadAutobroadcasts();
+        sAutobroadcastMgr->LoadAutobroadcasts();
         handler->SendGlobalGMSysMessage("DB table `autobroadcast` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadMotdCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading Motd...");
+        sMotdMgr->LoadMotd();
+        handler->SendGlobalGMSysMessage("DB table `motd` reloaded.");
+        handler->SendGlobalSysMessage(sMotdMgr->GetMotd());
         return true;
     }
 
@@ -461,7 +476,7 @@ public:
 
             Field* fields = result->Fetch();
 
-            sObjectMgr->LoadCreatureTemplate(fields);
+            sObjectMgr->LoadCreatureTemplate(fields, true);
             sObjectMgr->CheckCreatureTemplate(cInfo);
         }
 
@@ -713,8 +728,7 @@ public:
     {
         if (!sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED))
         {
-            handler->SendSysMessage("Warden system disabled by config - reloading warden_action skipped.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("Warden system disabled by config - reloading warden_action skipped.");
             return false;
         }
 
@@ -766,9 +780,19 @@ public:
 
     static bool HandleReloadReservedNameCommand(ChatHandler* handler)
     {
-        LOG_INFO("server.loading", "Loading ReservedNames... (`reserved_name`)");
-        sObjectMgr->LoadReservedPlayersNames();
-        handler->SendGlobalGMSysMessage("DB table `reserved_name` (player reserved names) reloaded.");
+        LOG_INFO("server.loading", "Re-Loading Reserved Names!");
+        sObjectMgr->LoadReservedPlayerNamesDB();
+        sObjectMgr->LoadReservedPlayerNamesDBC(); // Needed because we clear the store in LoadReservedPlayerNamesDB()
+        handler->SendGlobalGMSysMessage("Reserved Names reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadProfanityNameCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Re-Loading Profanity Names!");
+        sObjectMgr->LoadProfanityNamesFromDB();
+        sObjectMgr->LoadProfanityNamesFromDBC(); // Needed because we clear the store in LoadProfanityNamesFromDB()
+        handler->SendGlobalGMSysMessage("Profanity Names reloaded.");
         return true;
     }
 
@@ -938,8 +962,7 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
             return false;
         }
 
@@ -956,8 +979,7 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
             return false;
         }
 
@@ -983,8 +1005,7 @@ public:
     {
         if (sScriptMgr->IsScriptScheduled())
         {
-            handler->SendSysMessage("DB scripts used currently, please attempt reload later.");
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage("DB scripts used currently, please attempt reload later.");
             return false;
         }
 

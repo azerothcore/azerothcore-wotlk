@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementMgr.h"
 #include "BattlefieldMgr.h"
 #include "CellImpl.h"
 #include "Channel.h"
@@ -35,10 +36,11 @@
 #include "SpellMgr.h"
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
+#include "Weather.h"
 #include "WeatherMgr.h"
 #include "WorldStatePackets.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -164,7 +166,7 @@ void Player::Update(uint32 p_time)
         if (Unit* victim = GetVictim())
         {
             // default combat reach 10
-            // TODO add weapon, skill check
+            /// @todo add weapon, skill check
 
             if (isAttackReady(BASE_ATTACK))
             {
@@ -311,7 +313,7 @@ void Player::Update(uint32 p_time)
         RegenerateAll();
     }
 
-    if (m_deathState == JUST_DIED)
+    if (m_deathState == DeathState::JustDied)
         KillPlayer();
 
     if (m_nextSave)
@@ -433,31 +435,27 @@ void Player::UpdateNextMailTimeAndUnreads()
 {
     // Update the next delivery time and unread mails
     time_t cTime = GameTime::GetGameTime().count();
-    // Get the next delivery time
-    CharacterDatabasePreparedStatement* stmtNextDeliveryTime =
-        CharacterDatabase.GetPreparedStatement(CHAR_SEL_NEXT_MAIL_DELIVERYTIME);
-    stmtNextDeliveryTime->SetData(0, GetGUID().GetCounter());
-    stmtNextDeliveryTime->SetData(1, uint32(cTime));
-    PreparedQueryResult resultNextDeliveryTime =
-        CharacterDatabase.Query(stmtNextDeliveryTime);
-    if (resultNextDeliveryTime)
-    {
-        Field* fields          = resultNextDeliveryTime->Fetch();
-        m_nextMailDelivereTime = time_t(fields[0].Get<uint32>());
-    }
 
-    // Get unread mails count
-    CharacterDatabasePreparedStatement* stmtUnreadAmount =
-        CharacterDatabase.GetPreparedStatement(
-            CHAR_SEL_CHARACTER_MAILCOUNT_UNREAD_SYNCH);
-    stmtUnreadAmount->SetData(0, GetGUID().GetCounter());
-    stmtUnreadAmount->SetData(1, uint32(cTime));
-    PreparedQueryResult resultUnreadAmount =
-        CharacterDatabase.Query(stmtUnreadAmount);
-    if (resultUnreadAmount)
+    m_nextMailDelivereTime = 0;
+    unReadMails = 0;
+
+    for (Mail const* mail : GetMails())
     {
-        Field* fields = resultUnreadAmount->Fetch();
-        unReadMails   = uint8(fields[0].Get<uint64>());
+        if (mail->deliver_time > cTime)
+        {
+            if (!m_nextMailDelivereTime || m_nextMailDelivereTime > mail->deliver_time)
+                m_nextMailDelivereTime = mail->deliver_time;
+        }
+
+        // must be not checked yet
+        if (mail->checked & MAIL_CHECK_MASK_READ)
+            continue;
+
+        // and already delivered or expired
+        if (cTime < mail->deliver_time || cTime > mail->expire_time)
+            continue;
+
+        unReadMails++;
     }
 }
 
@@ -489,12 +487,11 @@ void Player::UpdateLocalChannels(uint32 newZone)
         {
             Channel* usedChannel = nullptr;
 
-            for (JoinedChannelsList::iterator itr = m_channels.begin();
-                 itr != m_channels.end(); ++itr)
+            for (Channel* channel : m_channels)
             {
-                if ((*itr)->GetChannelId() == i)
+                if (channel && channel->GetChannelId() == i)
                 {
-                    usedChannel = *itr;
+                    usedChannel = channel;
                     break;
                 }
             }
@@ -728,6 +725,7 @@ bool Player::UpdateGatherSkill(uint32 SkillId, uint32 SkillValue,
 
     uint32 gathering_skill_gain =
         sWorld->getIntConfig(CONFIG_SKILL_GAIN_GATHERING);
+    sScriptMgr->OnUpdateGatheringSkill(this, SkillId, SkillValue, RedLevel + 100, RedLevel + 50, RedLevel + 25, gathering_skill_gain);
 
     // For skinning and Mining chance decrease with level. 1-74 - no decrease,
     // 75-149 - 2 times, 225-299 - 8 times
@@ -795,8 +793,8 @@ bool Player::UpdateCraftSkill(uint32 spellid)
                 GetPureSkillValue(_spell_idx->second->SkillLine);
 
             // Alchemy Discoveries here
-            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spellid);
-            if (spellEntry && spellEntry->Mechanic == MECHANIC_DISCOVERY)
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellid);
+            if (spellInfo && spellInfo->Mechanic == MECHANIC_DISCOVERY)
             {
                 if (uint32 discoveredSpell = GetSkillDiscoverySpell(
                         _spell_idx->second->SkillLine, spellid, this))
@@ -805,6 +803,7 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 
             uint32 craft_skill_gain =
                 sWorld->getIntConfig(CONFIG_SKILL_GAIN_CRAFTING);
+            sScriptMgr->OnUpdateCraftingSkill(this, _spell_idx->second, SkillValue, craft_skill_gain);
 
             return UpdateSkillPro(
                 _spell_idx->second->SkillLine,
@@ -980,7 +979,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
 
 void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool defence, Item* item /*= nullptr*/)
 {
-    uint8  playerLevel = getLevel();
+    uint8  playerLevel = GetLevel();
     uint16 currentSkillValue = defence ? GetBaseDefenseSkillValue() : GetBaseWeaponSkillValue(attType);
     uint16 currentSkillMax = 5 * playerLevel;
     int32  skillDiff = currentSkillMax - currentSkillValue;
@@ -993,7 +992,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
     }
 
     uint8 greylevel = Acore::XP::GetGrayLevel(playerLevel);
-    uint8 moblevel = defence ? victim->getLevelForTarget(this) : victim->getLevel(); // if defense than victim == attacker
+    uint8 moblevel = defence ? victim->getLevelForTarget(this) : victim->GetLevel(); // if defense than victim == attacker
     /*if (moblevel < greylevel)
         return;*/
     // Patch 3.0.8 (2009-01-20): You can no longer skill up weapons on mobs that are immune to damage.
@@ -1017,7 +1016,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
 
     chance = chance < 1.0f ? 1.0f : chance; // minimum chance to increase skill is 1%
 
-    LOG_DEBUG("entities.player", "Player::UpdateCombatSkills(defence:{}, playerLevel:{}, moblevel:{}) -> ({}/{}) chance to increase skill is {}%", defence, playerLevel, moblevel, currentSkillValue, currentSkillMax, chance);
+    LOG_DEBUG("entities.player", "Player::UpdateCombatSkills(defence:{}, playerLevel:{}, moblevel:{}) -> ({}/{}) chance to increase skill is {}\%", defence, playerLevel, moblevel, currentSkillValue, currentSkillMax, chance);
 
     if (roll_chance_f(chance))
     {
@@ -1407,7 +1406,7 @@ void Player::UpdatePvPState()
 
 void Player::UpdateFFAPvPState(bool reset /*= true*/)
 {
-    // TODO: should we always synchronize UNIT_FIELD_BYTES_2, 1 of controller
+    /// @todo: should we always synchronize UNIT_FIELD_BYTES_2, 1 of controller
     // and controlled? no, we shouldn't, those are checked for affecting player
     // by client
     if (!pvpInfo.IsInNoPvPArea && !IsGameMaster() &&
@@ -1736,7 +1735,7 @@ void Player::UpdateTriggerVisibility()
     if (!udata.HasData())
         return;
 
-    udata.BuildPacket(&packet);
+    udata.BuildPacket(packet);
     GetSession()->SendPacket(&packet);
 }
 
@@ -1788,7 +1787,7 @@ void Player::UpdateForQuestWorldObjects()
         }
     }
 
-    udata.BuildPacket(&packet);
+    udata.BuildPacket(packet);
     GetSession()->SendPacket(&packet);
 }
 
@@ -1978,7 +1977,7 @@ void Player::UpdateCharmedAI()
 
     if (!target || !IsValidAttackTarget(target))
     {
-        target = SelectNearbyTarget(nullptr, 30);
+        target = SelectNearbyTarget(nullptr, GetMap()->IsDungeon() ? 100.f : 30.f);
         if (!target)
         {
             if (!HasUnitState(UNIT_STATE_FOLLOW))

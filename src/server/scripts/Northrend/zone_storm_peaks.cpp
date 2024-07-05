@@ -16,16 +16,16 @@
  */
 
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "WaypointMgr.h"
-#include "WorldSession.h"
 
 // Ours
 enum qSniffing
@@ -44,7 +44,7 @@ public:
         npc_frosthoundAI(Creature* creature) : npc_escortAI(creature) {}
 
         void AttackStart(Unit* /*who*/) override {}
-        void EnterCombat(Unit* /*who*/) override {}
+        void JustEngagedWith(Unit* /*who*/) override {}
         void EnterEvadeMode(EvadeReason /* why */) override {}
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
@@ -251,18 +251,18 @@ public:
 
         void WaypointReached(uint32  /*pointId*/) override { }
 
-        void EnterCombat(Unit*) override
+        void JustEngagedWith(Unit*) override
         {
             events.Reset();
             if (me->GetEntry() == NPC_TIME_LOST_PROTO_DRAKE)
             {
-                events.ScheduleEvent(SPELL_TIME_SHIFT, 10000);
-                events.ScheduleEvent(SPELL_TIME_LAPSE, 5000);
+                events.ScheduleEvent(SPELL_TIME_SHIFT, 10s);
+                events.ScheduleEvent(SPELL_TIME_LAPSE, 5s);
             }
             else
             {
-                events.ScheduleEvent(SPELL_FROST_BREATH, 8000);
-                events.ScheduleEvent(SPELL_FROST_CLEAVE, 5000);
+                events.ScheduleEvent(SPELL_FROST_BREATH, 8s);
+                events.ScheduleEvent(SPELL_FROST_CLEAVE, 5s);
             }
         }
 
@@ -290,19 +290,19 @@ public:
             {
                 case SPELL_TIME_SHIFT:
                     me->CastSpell(me, SPELL_TIME_SHIFT, false);
-                    events.RepeatEvent(18000);
+                    events.Repeat(18s);
                     break;
                 case SPELL_TIME_LAPSE:
                     me->CastSpell(me->GetVictim(), SPELL_TIME_LAPSE, false);
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
                 case SPELL_FROST_BREATH:
                     me->CastSpell(me->GetVictim(), SPELL_FROST_BREATH, false);
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     break;
                 case SPELL_FROST_CLEAVE:
                     me->CastSpell(me->GetVictim(), SPELL_FROST_CLEAVE, false);
-                    events.RepeatEvent(8000);
+                    events.Repeat(8s);
                     break;
             }
 
@@ -391,7 +391,7 @@ public:
             else if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
                 startPath = true;
             else if (type == EFFECT_MOTION_TYPE && pointId == me->GetEntry())
-                Unit::Kill(me, me);
+                me->KillSelf();
         }
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -843,14 +843,14 @@ public:
 
         void Reset() override
         {
-            events.ScheduleEvent(EVENT_CHECK_AREA, 5000);
+            events.ScheduleEvent(EVENT_CHECK_AREA, 5s);
             me->SetSpeed(MOVE_RUN, 2.0f);
         }
 
         void MovementInform(uint32 type, uint32  /*id*/) override
         {
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
-                events.ScheduleEvent(EVENT_REACHED_HOME, 2000);
+                events.ScheduleEvent(EVENT_REACHED_HOME, 2s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -881,7 +881,7 @@ public:
                             }
                     }
                     else
-                        events.ScheduleEvent(EVENT_CHECK_AREA, 5000);
+                        events.ScheduleEvent(EVENT_CHECK_AREA, 5s);
                     break;
                 case EVENT_REACHED_HOME:
                     if (Vehicle* vehicle = me->GetVehicleKit())
@@ -922,7 +922,7 @@ public:
         npc_icefangAI(Creature* creature) : npc_escortAI(creature) { }
 
         void AttackStart(Unit* /*who*/) override { }
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
         void EnterEvadeMode(EvadeReason /*why*/) override { }
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
@@ -1088,6 +1088,116 @@ class spell_q12823_remove_collapsing_cave_aura : public SpellScript
     }
 };
 
+//Generic Fix for Quest WhenAllElseFails ID: 12862
+enum WhenAllElseFailsAlliance
+{
+    // Creature
+    NPC_PROPELLED_DEVICE_1      = 30477,
+    NPC_PROPELLED_DEVICE_2      = 30487,
+
+    // Spell
+    SPELL_EJECT_PLAYER          = 68576,
+    SPELL_KNOCKBACK_PLAYER      = 42895
+};
+
+class npc_vehicle_d16_propelled_delivery : public CreatureScript
+{
+public:
+    npc_vehicle_d16_propelled_delivery() : CreatureScript("npc_vehicle_d16_propelled_delivery") { }
+
+    struct npc_vehicle_d16_propelled_deliveryAI : public VehicleAI
+    {
+        npc_vehicle_d16_propelled_deliveryAI(Creature* creature) : VehicleAI(creature) { }
+
+        void PassengerBoarded(Unit* /*who*/, int8 /*seatId*/, bool apply) override
+        {
+            if (apply)
+            {
+                Movement::PointsArray pathPoints;
+                pathPoints.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                WaypointPath const* i_path = sWaypointMgr->GetPath(me->GetEntry() * 100);
+                for (uint8 i = 0; i < i_path->size(); ++i)
+                {
+                    WaypointData const* node = i_path->at(i);
+                    pathPoints.push_back(G3D::Vector3(node->x, node->y, node->z));
+                }
+                me->GetMotionMaster()->MoveSplinePath(&pathPoints);
+                me->SetCanFly(true);
+                me->SetDisableGravity(true);
+                me->SetSpeed(MOVE_RUN, 6.0f);
+                me->SetSpeedRate(MOVE_FLIGHT, 8.0f);
+                me->setActive(true);
+            }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type != ESCORT_MOTION_TYPE)
+                return;
+
+            switch (id)
+            {
+                case 12:
+                    if (me->GetEntry() == NPC_PROPELLED_DEVICE_2)
+                    {
+                        if (Vehicle* vehicle = me->GetVehicleKit())
+                        {
+                            if (Unit* player = vehicle->GetPassenger(0))
+                            {
+                                if (player->GetTypeId() == TYPEID_PLAYER)
+                                {
+                                    player->m_Events.AddEventAtOffset([player]()
+                                    {
+                                        player->CastSpell(player, SPELL_KNOCKBACK_PLAYER, true);
+                                    }, 1s);
+                                }
+                            }
+                        }
+
+                        DoCastSelf(SPELL_EJECT_PLAYER);
+                    }
+                    break;
+                case 17:
+                    if (me->GetEntry() == NPC_PROPELLED_DEVICE_1)
+                    {
+                        if (Vehicle* vehicle = me->GetVehicleKit())
+                        {
+                            if (Unit* player = vehicle->GetPassenger(0))
+                            {
+                                if (player->GetTypeId() == TYPEID_PLAYER)
+                                {
+                                    player->m_Events.AddEventAtOffset([player]()
+                                    {
+                                        player->CastSpell(player, SPELL_KNOCKBACK_PLAYER, true);
+                                    }, 1s);
+                                }
+                            }
+                        }
+
+                        DoCastSelf(SPELL_EJECT_PLAYER);
+                    }
+                    else
+                    {
+                        me->DespawnOrUnsummon(100);
+                    }
+                    break;
+                case 24:
+                    if (me->GetEntry() == NPC_PROPELLED_DEVICE_1)
+                    {
+                        me->DespawnOrUnsummon(100);
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_vehicle_d16_propelled_deliveryAI(creature);
+    }
+};
 void AddSC_storm_peaks()
 {
     new npc_frosthound();
@@ -1102,5 +1212,7 @@ void AddSC_storm_peaks()
     new npc_icefang();
     new npc_hyldsmeet_protodrake();
     new spell_close_rift();
+    new npc_vehicle_d16_propelled_delivery();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
 }
+

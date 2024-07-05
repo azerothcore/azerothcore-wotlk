@@ -20,6 +20,7 @@
 
 #include "CreatureAIImpl.h"
 
+#define DataHeader "RA"
 #define RuinsOfAhnQirajScriptName "instance_ruins_of_ahnqiraj"
 
 enum DataTypes

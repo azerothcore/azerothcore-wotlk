@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "blackrock_spire.h"
@@ -45,16 +45,16 @@ struct boss_quartermaster_zigris : public BossAI
     void Reset() override
     {
         _Reset();
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         _hasDrunkPotion = false;
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
-        BossAI::EnterCombat(who);
-        events.ScheduleEvent(EVENT_STUN_BOMB, 16000);
-        events.ScheduleEvent(EVENT_HOOKED_NET, 14000);
-        events.ScheduleEvent(EVENT_SHOOT, 1000);
+        BossAI::JustEngagedWith(who);
+        events.ScheduleEvent(EVENT_STUN_BOMB, 16s);
+        events.ScheduleEvent(EVENT_HOOKED_NET, 14s);
+        events.ScheduleEvent(EVENT_SHOOT, 1s);
     }
 
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*effType*/, SpellSchoolMask /*schoolMask*/) override
@@ -102,7 +102,7 @@ struct boss_quartermaster_zigris : public BossAI
             {
                 case EVENT_STUN_BOMB:
                     DoCastVictim(SPELL_STUNBOMB);
-                    events.ScheduleEvent(EVENT_STUN_BOMB, 14000);
+                    events.ScheduleEvent(EVENT_STUN_BOMB, 14s);
                     break;
                 case EVENT_HOOKED_NET:
                     if (me->IsWithinMeleeRange(me->GetVictim()))
@@ -120,11 +120,11 @@ struct boss_quartermaster_zigris : public BossAI
                     {
                         DoCastVictim(SPELL_SHOOT);
                         me->GetMotionMaster()->Clear();
-                        SetCombatMovement(false);
+                        me->SetCombatMovement(false);
                     }
                     else if (!me->IsWithinLOSInMap(me->GetVictim()))
                     {
-                        SetCombatMovement(true);
+                        me->SetCombatMovement(true);
                         me->GetMotionMaster()->Clear();
                         me->GetMotionMaster()->MoveChase(me->GetVictim());
                     }

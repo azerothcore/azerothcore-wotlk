@@ -16,19 +16,21 @@
  */
 
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "PassiveAI.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 
 ///////////////////////////////////////
@@ -328,7 +330,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
 
         summons.DespawnAll();
         events.Reset();
-        events.ScheduleEvent(EVENT_CHECK_HOUR, 2000);
+        events.ScheduleEvent(EVENT_CHECK_HOUR, 2s);
         kegCounter = 0;
         guzzlerCounter = 0;
         thrown = 0;
@@ -336,7 +338,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
 
     // DARK IRON ATTACK EVENT
     void MoveInLineOfSight(Unit*  /*who*/) override {}
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
 
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
@@ -396,13 +398,13 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
             case EVENT_PRE_FINISH_ATTACK:
                 {
                     events.CancelEvent(EVENT_SPAWN_MOLE_MACHINE);
-                    events.ScheduleEvent(EVENT_FINISH_ATTACK, 20000);
+                    events.ScheduleEvent(EVENT_FINISH_ATTACK, 20s);
                     break;
                 }
             case EVENT_FINISH_ATTACK:
                 {
                     FinishAttackDueToWin();
-                    events.RescheduleEvent(EVENT_CHECK_HOUR, 60000);
+                    events.RescheduleEvent(EVENT_CHECK_HOUR, 1min);
                     break;
                 }
             case EVENT_BARTENDER_SAY:
@@ -438,12 +440,12 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         if (Creature* herald = me->FindNearestCreature(NPC_DARK_IRON_HERALD, 100.0f))
         {
             char amount[500];
-            sprintf(amount, "We did it boys! Now back to the Grim Guzzler and we'll drink to the %u that were injured!", guzzlerCounter);
+            snprintf(amount, sizeof(amount), "We did it boys! Now back to the Grim Guzzler and we'll drink to the %u that were injured!", guzzlerCounter);
             herald->Yell(amount, LANG_UNIVERSAL);
         }
 
         Reset();
-        events.RescheduleEvent(EVENT_CHECK_HOUR, 60000);
+        events.RescheduleEvent(EVENT_CHECK_HOUR, 1min);
     }
 
     void FinishAttackDueToWin()
@@ -451,7 +453,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         if (Creature* herald = me->FindNearestCreature(NPC_DARK_IRON_HERALD, 100.0f))
         {
             char amount[500];
-            sprintf(amount, "RETREAT!! We've already lost %u and we can't afford to lose any more!!", guzzlerCounter);
+            snprintf(amount, sizeof(amount), "RETREAT!! We've already lost %u and we can't afford to lose any more!!", guzzlerCounter);
             herald->Yell(amount, LANG_UNIVERSAL);
         }
 
@@ -521,9 +523,9 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         guzzlerCounter = 0;
         thrown = 0;
 
-        events.ScheduleEvent(EVENT_SPAWN_MOLE_MACHINE, 1500);
-        events.ScheduleEvent(EVENT_PRE_FINISH_ATTACK, 280000);
-        events.ScheduleEvent(EVENT_BARTENDER_SAY, 5000);
+        events.ScheduleEvent(EVENT_SPAWN_MOLE_MACHINE, 1500ms);
+        events.ScheduleEvent(EVENT_PRE_FINISH_ATTACK, 280s);
+        events.ScheduleEvent(EVENT_BARTENDER_SAY, 5s);
     }
 
     bool AllowStart()
@@ -560,7 +562,7 @@ struct npc_dark_iron_attack_mole_machine : public ScriptedAI
 {
     npc_dark_iron_attack_mole_machine(Creature* creature) : ScriptedAI(creature) { }
 
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit*) override {}
 
@@ -618,7 +620,7 @@ struct npc_dark_iron_guzzler : public ScriptedAI
     ObjectGuid targetGUID;
     bool attacking;
 
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
     void MoveInLineOfSight(Unit*) override {}
     void AttackStart(Unit*) override {}
 
@@ -733,7 +735,7 @@ struct npc_dark_iron_guzzler : public ScriptedAI
         if (me->IsAlive() && spellInfo->Id == SPELL_PLAYER_MUG)
         {
             me->CastSpell(me, SPELL_MUG_BOUNCE_BACK, true);
-            Unit::Kill(me, me);
+            me->KillSelf();
             me->CastSpell(me, SPELL_REPORT_DEATH, true);
         }
     }
@@ -768,7 +770,7 @@ struct npc_brewfest_super_brew_trigger : public ScriptedAI
     npc_brewfest_super_brew_trigger(Creature* creature) : ScriptedAI(creature) { }
 
     uint32 timer;
-    void EnterCombat(Unit*) override {}
+    void JustEngagedWith(Unit*) override {}
     void MoveInLineOfSight(Unit*  /*who*/) override
     {
     }
@@ -795,7 +797,7 @@ struct npc_brewfest_super_brew_trigger : public ScriptedAI
             {
                 player->CastSpell(player, SPELL_DRUNKEN_MASTER, true);
                 me->RemoveAllGameObjects();
-                Unit::Kill(me, me);
+                me->KillSelf();
             }
         }
     }
@@ -1031,35 +1033,32 @@ class spell_brewfest_apple_trap : public SpellScript
     }
 };
 
-class spell_q11117_catch_the_wild_wolpertinger : public SpellScript
+enum Catch
 {
-    PrepareSpellScript(spell_q11117_catch_the_wild_wolpertinger);
+    NPC_WILD_WOLPERTINGER = 23487,
 
-    SpellCastResult CheckTarget()
+    ITEM_STUNNED_WOLPERTINGER = 32906
+};
+
+class spell_catch_the_wild_wolpertinger : public AuraScript
+{
+    PrepareAuraScript(spell_catch_the_wild_wolpertinger);
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* caster = GetCaster())
-            if (caster->ToPlayer())
-                if (Unit* target = caster->ToPlayer()->GetSelectedUnit())
-                    if (target->GetEntry() == 23487 && target->IsAlive())
-                        return SPELL_CAST_OK;
-
-        return SPELL_FAILED_BAD_TARGETS;
-    }
-
-    void HandleDummyEffect(SpellEffIndex /*effIndex*/)
-    {
-        if (GetCaster() && GetCaster()->ToPlayer())
+        if (Creature* wild = GetTarget()->ToCreature())
         {
-            GetCaster()->ToPlayer()->AddItem(32906, 1);
-            if (Unit* target = GetCaster()->ToPlayer()->GetSelectedUnit())
-                target->ToCreature()->DespawnOrUnsummon(500);
+            if (wild->GetEntry() == NPC_WILD_WOLPERTINGER)
+            {
+                wild->ToCreature()->DespawnOrUnsummon(1s, 0s);
+                GetCaster()->ToPlayer()->AddItem(ITEM_STUNNED_WOLPERTINGER, 1);
+            }
         }
     }
 
     void Register() override
     {
-        OnCheckCast += SpellCheckCastFn(spell_q11117_catch_the_wild_wolpertinger::CheckTarget);
-        OnEffectHitTarget += SpellEffectFn(spell_q11117_catch_the_wild_wolpertinger::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnEffectApply += AuraEffectApplyFn(spell_catch_the_wild_wolpertinger::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1370,13 +1369,15 @@ enum BrewfestRevelerEnum
     FACTION_ALLIANCE    = 1934,
     FACTION_HORDE       = 1935,
 
-    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE    = 44003,
-    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE  = 44004,
-    SPELL_BREWFEST_REVELER_TRANSFORM_BE             = 43907,
-    SPELL_BREWFEST_REVELER_TRANSFORM_ORC            = 43914,
-    SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN         = 43915,
-    SPELL_BREWFEST_REVELER_TRANSFORM_TROLL          = 43916,
-    SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD         = 43917
+    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE          = 44003,
+    SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE        = 44004,
+    SPELL_BREWFEST_REVELER_TRANSFORM_BE                   = 43907,
+    SPELL_BREWFEST_REVELER_TRANSFORM_ORC                  = 43914,
+    SPELL_BREWFEST_REVELER_TRANSFORM_TAUREN               = 43915,
+    SPELL_BREWFEST_REVELER_TRANSFORM_TROLL                = 43916,
+    SPELL_BREWFEST_REVELER_TRANSFORM_UNDEAD               = 43917,
+
+    SPELL_DRUNKEN_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE  = 44096
 };
 
 class spell_brewfest_reveler_transform : public AuraScript
@@ -1397,6 +1398,7 @@ class spell_brewfest_reveler_transform : public AuraScript
                 break;
             case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
             case SPELL_BREWFEST_REVELER_TRANSFORM_GOBLIN_FEMALE:
+            case SPELL_DRUNKEN_BREWFEST_REVELER_TRANSFORM_GOBLIN_MALE:
                 factionId = FACTION_FRIENDLY;
                 break;
             default:
@@ -1588,7 +1590,7 @@ struct npc_coren_direbrew : public ScriptedAI
         }
 
         _events.SetPhase(PHASE_INTRO);
-        _events.ScheduleEvent(EVENT_INTRO_1, 6 * IN_MILLISECONDS, 0, PHASE_INTRO);
+        _events.ScheduleEvent(EVENT_INTRO_1, 6s, 0, PHASE_INTRO);
         Talk(SAY_INTRO);
     }
 
@@ -1609,8 +1611,8 @@ struct npc_coren_direbrew : public ScriptedAI
             EntryCheckPredicate pred(NPC_ANTAGONIST);
             _summons.DoAction(ACTION_ANTAGONIST_HOSTILE, pred);
 
-            _events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINE, 15 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_DIREBREW_DISARM, 20 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_SUMMON_MOLE_MACHINE, 15s);
+            _events.ScheduleEvent(EVENT_DIREBREW_DISARM, 20s);
         }
     }
 
@@ -1632,11 +1634,11 @@ struct npc_coren_direbrew : public ScriptedAI
     {
         if (summon->GetEntry() == NPC_ILSA_DIREBREW)
         {
-            _events.ScheduleEvent(EVENT_RESPAWN_ILSA, 1 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_RESPAWN_ILSA, 1s);
         }
         else if (summon->GetEntry() == NPC_URSULA_DIREBREW)
         {
-            _events.ScheduleEvent(EVENT_RESPAWN_URSULA, 1 * IN_MILLISECONDS);
+            _events.ScheduleEvent(EVENT_RESPAWN_URSULA, 1s);
         }
     }
 
@@ -1686,13 +1688,13 @@ struct npc_coren_direbrew : public ScriptedAI
             {
                 case EVENT_INTRO_1:
                     Talk(SAY_INTRO1);
-                    _events.ScheduleEvent(EVENT_INTRO_2, 4 * IN_MILLISECONDS, 0, PHASE_INTRO);
+                    _events.ScheduleEvent(EVENT_INTRO_2, 4s, 0, PHASE_INTRO);
                     break;
                 case EVENT_INTRO_2:
                 {
                     EntryCheckPredicate pred(NPC_ANTAGONIST);
                     _summons.DoAction(ACTION_ANTAGONIST_SAY_1, pred);
-                    _events.ScheduleEvent(EVENT_INTRO_3, 3 * IN_MILLISECONDS, 0, PHASE_INTRO);
+                    _events.ScheduleEvent(EVENT_INTRO_3, 3s, 0, PHASE_INTRO);
                     break;
                 }
                 case EVENT_INTRO_3:
@@ -1758,7 +1760,7 @@ struct npc_coren_direbrew_sisters : public ScriptedAI
         return ObjectGuid::Empty;
     }
 
-    void EnterCombat(Unit* /*who*/) override
+    void JustEngagedWith(Unit* /*who*/) override
     {
         DoCastSelf(SPELL_PORT_TO_COREN);
 
@@ -1809,7 +1811,7 @@ struct npc_direbrew_minion : public ScriptedAI
         DoZoneInCombat();
     }
 
-    void IsSummonedBy(Unit* /*summoner*/) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         if (Creature* coren = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_COREN)))
         {
@@ -1845,10 +1847,10 @@ struct npc_direbrew_antagonist : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit* who) override
+    void JustEngagedWith(Unit* who) override
     {
         Talk(SAY_ANTAGONIST_COMBAT, who);
-        ScriptedAI::EnterCombat(who);
+        ScriptedAI::JustEngagedWith(who);
     }
 };
 
@@ -2072,7 +2074,7 @@ void AddSC_event_brewfest_scripts()
     RegisterSpellScript(spell_brewfest_ram_fatigue);
     RegisterSpellScript(spell_brewfest_apple_trap);
     // other
-    RegisterSpellScript(spell_q11117_catch_the_wild_wolpertinger);
+    RegisterSpellScript(spell_catch_the_wild_wolpertinger);
     RegisterSpellScript(spell_brewfest_fill_keg);
     RegisterSpellScript(spell_brewfest_unfill_keg);
     RegisterSpellScript(spell_brewfest_toss_mug);

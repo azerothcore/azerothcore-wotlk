@@ -339,10 +339,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         // not accept if spell can't be casted now (cheating)
         if (uint32 my_spell_id = my_trade->GetSpell())
         {
-            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(my_spell_id);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(my_spell_id);
             Item* castItem = my_trade->GetSpellCastItem();
 
-            if (!spellEntry || !his_trade->GetItem(TRADE_SLOT_NONTRADED) ||
+            if (!spellInfo || !his_trade->GetItem(TRADE_SLOT_NONTRADED) ||
                     (my_trade->HasSpellCastItem() && !castItem))
             {
                 clearAcceptTradeMode(my_trade, his_trade);
@@ -352,7 +352,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
                 return;
             }
 
-            my_spell = new Spell(_player, spellEntry, TRIGGERED_FULL_MASK);
+            my_spell = new Spell(_player, spellInfo, TRIGGERED_FULL_MASK);
             my_spell->m_CastItem = castItem;
             my_targets.SetTradeItemTarget(_player);
             my_spell->m_targets = my_targets;
@@ -374,10 +374,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         // not accept if spell can't be casted now (cheating)
         if (uint32 his_spell_id = his_trade->GetSpell())
         {
-            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(his_spell_id);
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(his_spell_id);
             Item* castItem = his_trade->GetSpellCastItem();
 
-            if (!spellEntry || !my_trade->GetItem(TRADE_SLOT_NONTRADED) || (his_trade->HasSpellCastItem() && !castItem))
+            if (!spellInfo || !my_trade->GetItem(TRADE_SLOT_NONTRADED) || (his_trade->HasSpellCastItem() && !castItem))
             {
                 delete my_spell;
                 his_trade->SetSpell(0);
@@ -387,7 +387,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
                 return;
             }
 
-            his_spell = new Spell(trader, spellEntry, TRIGGERED_FULL_MASK);
+            his_spell = new Spell(trader, spellInfo, TRIGGERED_FULL_MASK);
             his_spell->m_CastItem = castItem;
             his_targets.SetTradeItemTarget(trader);
             his_spell->m_targets = his_targets;
@@ -527,7 +527,7 @@ void WorldSession::HandleBeginTradeOpcode(WorldPacket& /*recvPacket*/)
 
 void WorldSession::SendCancelTrade()
 {
-    if (PlayerLogout())
+    if (PlayerRecentlyLoggedOut() || PlayerLogout())
         return;
 
     SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
@@ -535,7 +535,9 @@ void WorldSession::SendCancelTrade()
 
 void WorldSession::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
 {
-    _player->TradeCancel(true);
+    // sended also after LOGOUT COMPLETE
+    if (_player)                                             // needed because STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT
+        _player->TradeCancel(true);
 }
 
 void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
@@ -570,7 +572,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (GetPlayer()->getLevel() < sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ))
+    if (GetPlayer()->GetLevel() < sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ))
     {
         SendNotification(GetAcoreString(LANG_TRADE_REQ), sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
         return;
@@ -635,7 +637,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (pOther->getLevel() < sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ))
+    if (pOther->GetLevel() < sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ))
     {
         SendNotification(GetAcoreString(LANG_TRADE_OTHER_REQ), sWorld->getIntConfig(CONFIG_TRADE_LEVEL_REQ));
         return;
@@ -703,6 +705,15 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     {
         // cheating attempt
         SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
+        return;
+    }
+
+    // PlayerScript Hook for checking traded items if we want to filter them in a custom module
+    if (!sScriptMgr->CanSetTradeItem(_player, item, tradeSlot))
+    {
+        // Do not send TRADE_STATUS_TRADE_CANCELED because it will cause double display of "Transaction canceled" notification
+        // On the trade initiator screen
+        SendTradeStatus(TRADE_STATUS_CLOSE_WINDOW);
         return;
     }
 

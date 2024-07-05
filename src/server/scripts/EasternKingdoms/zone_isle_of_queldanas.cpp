@@ -15,6 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "PassiveAI.h"
+#include "Pet.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /* ScriptData
 SDName: Isle_of_Queldanas
 SD%Complete: 100
@@ -26,14 +34,6 @@ EndScriptData */
 npc_converted_sentry
 npc_greengill_slave
 EndContentData */
-
-#include "PassiveAI.h"
-#include "Pet.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellInfo.h"
-#include "SpellScript.h"
 
 /*###### OUR: ######*/
 
@@ -457,31 +457,20 @@ enum PurificationIds
     NPC_AURIC = 37765,
 };
 
-class spell_bh_cleanse_quel_delar : public SpellScriptLoader
+class spell_bh_cleanse_quel_delar : public SpellScript
 {
-public:
-    spell_bh_cleanse_quel_delar() : SpellScriptLoader("spell_bh_cleanse_quel_delar") { }
+    PrepareSpellScript(spell_bh_cleanse_quel_delar);
 
-    class spell_bh_cleanse_quel_delar_SpellScript : public SpellScript
+    void OnEffect(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_bh_cleanse_quel_delar_SpellScript);
+        if (Unit* caster = GetCaster())
+            if (Creature* c = caster->FindNearestCreature(NPC_ROMMATH, 50.0f, true))
+                c->AI()->DoAction(-1);
+    }
 
-        void OnEffect(SpellEffIndex  /*effIndex*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Creature* c = caster->FindNearestCreature(NPC_ROMMATH, 50.0f, true))
-                    c->AI()->DoAction(-1);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_bh_cleanse_quel_delar_SpellScript::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_bh_cleanse_quel_delar_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_bh_cleanse_quel_delar::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -658,7 +647,7 @@ public:
     {
         npc_greengill_slaveAI(Creature* creature) : ScriptedAI(creature) { }
 
-        void EnterCombat(Unit* /*who*/) override { }
+        void JustEngagedWith(Unit* /*who*/) override { }
 
         void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
         {
@@ -692,9 +681,10 @@ void AddSC_isle_of_queldanas()
 {
     // OUR:
     new npc_bh_thalorien_dawnseeker();
-    new spell_bh_cleanse_quel_delar();
+    RegisterSpellScript(spell_bh_cleanse_quel_delar);
     new npc_grand_magister_rommath();
 
     // THEIR:
     new npc_greengill_slave();
 }
+

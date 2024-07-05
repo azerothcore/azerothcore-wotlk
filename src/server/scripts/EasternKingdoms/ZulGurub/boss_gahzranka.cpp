@@ -15,17 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "zulgurub.h"
 /* ScriptData
 SDName: Boss_Gahz'ranka
 SD%Complete: 85
 SDComment: Massive Geyser with knockback not working. Spell buggy.
 SDCategory: Zul'Gurub
 EndScriptData */
-
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellScript.h"
-#include "zulgurub.h"
 
 enum Spells
 {
@@ -57,7 +57,7 @@ public:
     {
         boss_gahzrankaAI(Creature* creature) : BossAI(creature, DATA_GAHZRANKA) { }
 
-        void IsSummonedBy(Unit* /*summoner*/) override
+        void IsSummonedBy(WorldObject* /*summoner*/) override
         {
             me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
         }
@@ -72,13 +72,13 @@ public:
             _JustDied();
         }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
-            _EnterCombat();
+            _JustEngagedWith();
             me->AddAura(SPELL_THRASH, me);
-            events.ScheduleEvent(EVENT_FROSTBREATH, 8000);
-            events.ScheduleEvent(EVENT_MASSIVEGEYSER, 25000);
-            events.ScheduleEvent(EVENT_SLAM, 15000);
+            events.ScheduleEvent(EVENT_FROSTBREATH, 8s);
+            events.ScheduleEvent(EVENT_MASSIVEGEYSER, 25s);
+            events.ScheduleEvent(EVENT_SLAM, 15s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -97,15 +97,15 @@ public:
                 {
                     case EVENT_FROSTBREATH:
                         DoCastVictim(SPELL_FROSTBREATH);
-                        events.ScheduleEvent(EVENT_FROSTBREATH, urand(8000, 20000));
+                        events.ScheduleEvent(EVENT_FROSTBREATH, 8s, 20s);
                         break;
                     case EVENT_MASSIVEGEYSER:
                         DoCastVictim(SPELL_MASSIVEGEYSER);
-                        events.ScheduleEvent(EVENT_MASSIVEGEYSER, urand(22000, 32000));
+                        events.ScheduleEvent(EVENT_MASSIVEGEYSER, 22s, 32s);
                         break;
                     case EVENT_SLAM:
                         DoCastVictim(SPELL_SLAM, true);
-                        events.ScheduleEvent(EVENT_SLAM, urand(12000, 20000));
+                        events.ScheduleEvent(EVENT_SLAM, 12s, 20s);
                         break;
                     default:
                         break;
@@ -202,3 +202,4 @@ void AddSC_boss_gahzranka()
     RegisterSpellScript(spell_gahzranka_slam);
     RegisterSpellScript(spell_pagles_point_cast);
 }
+

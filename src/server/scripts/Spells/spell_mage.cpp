@@ -15,19 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "Pet.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "TemporarySummon.h"
 /*
  * Scripts for spells with SPELLFAMILY_MAGE and SPELLFAMILY_GENERIC spells used by mage players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_mage_".
  */
-
-#include "Pet.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
-#include "TemporarySummon.h"
 
 enum MageSpells
 {
@@ -591,7 +591,7 @@ class spell_mage_ice_barrier_aura : public spell_mage_incanters_absorbtion_base_
 {
     PrepareAuraScript(spell_mage_ice_barrier_aura);
 
-    // TODO: Rework
+    /// @todo: Rework
     static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus
@@ -627,7 +627,7 @@ class spell_mage_ice_barrier : public SpellScript
 {
     PrepareSpellScript(spell_mage_ice_barrier);
 
-    // TODO: Rework
+    /// @todo: Rework
     static int32 CalculateSpellAmount(Unit* caster, int32 amount, SpellInfo const* spellInfo, const AuraEffect* aurEff)
     {
         // +80.68% from sp bonus
@@ -787,9 +787,9 @@ class spell_mage_master_of_elements : public AuraScript
         return ValidateSpellInfo({ SPELL_MAGE_MASTER_OF_ELEMENTS_ENERGIZE });
     }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
     {
-        if (!eventInfo.GetActor() || !eventInfo.GetActionTarget())
+        if (!isTriggeredAtSpellProcEvent || !eventInfo.GetActor() || !eventInfo.GetActionTarget())
         {
             return false;
         }
@@ -850,7 +850,7 @@ class spell_mage_master_of_elements : public AuraScript
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_mage_master_of_elements::CheckProc);
+        DoAfterCheckProc += AuraAfterCheckProcFn(spell_mage_master_of_elements::AfterCheckProc);
         OnEffectProc += AuraEffectProcFn(spell_mage_master_of_elements::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 
@@ -908,7 +908,7 @@ const uint32 spell_mage_polymorph_cast_visual::spell_mage_polymorph_cast_visual:
 class spell_mage_summon_water_elemental : public SpellScript
 {
     PrepareSpellScript(spell_mage_summon_water_elemental)
-    bool Validate(SpellInfo const* /*spellEntry*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo(
             {
@@ -936,9 +936,9 @@ class spell_mage_summon_water_elemental : public SpellScript
             if (pet->GetCharmInfo() && caster->ToPlayer())
             {
                 pet->m_CreatureSpellCooldowns.clear();
-                SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(31707);
-                pet->GetCharmInfo()->ToggleCreatureAutocast(spellEntry, true);
-                pet->GetCharmInfo()->SetSpellAutocast(spellEntry, true);
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(31707);
+                pet->GetCharmInfo()->ToggleCreatureAutocast(spellInfo, true);
+                pet->GetCharmInfo()->SetSpellAutocast(spellInfo, true);
                 caster->ToPlayer()->CharmSpellInitialize();
             }
     }
@@ -963,14 +963,14 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
         return true;
     }
 
-    bool CheckAfterProc(ProcEventInfo& eventInfo)
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
     {
         if (eventInfo.GetSpellPhaseMask() != PROC_SPELL_PHASE_CAST)
         {
             eventInfo.ResetProcChance();
         }
 
-        return true;
+        return isTriggeredAtSpellProcEvent;
     }
 
     void HandleOnEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
@@ -1013,7 +1013,7 @@ class spell_mage_fingers_of_frost_proc_aura : public AuraScript
     void Register()
     {
         DoCheckProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckProc);
-        DoCheckAfterProc += AuraCheckProcFn(spell_mage_fingers_of_frost_proc_aura::CheckAfterProc);
+        DoAfterCheckProc += AuraAfterCheckProcFn(spell_mage_fingers_of_frost_proc_aura::AfterCheckProc);
         OnEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleOnEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
         AfterEffectProc += AuraEffectProcFn(spell_mage_fingers_of_frost_proc_aura::HandleAfterEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
@@ -1083,3 +1083,4 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_fingers_of_frost_proc_aura);
     RegisterSpellScript(spell_mage_fingers_of_frost_proc);
 }
+

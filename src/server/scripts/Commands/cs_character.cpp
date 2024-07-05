@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "AccountMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
@@ -32,7 +33,6 @@ EndScriptData */
 #include "Player.h"
 #include "PlayerDump.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
 #include "Timer.h"
 #include "World.h"
 #include "WorldSession.h"
@@ -283,8 +283,7 @@ public:
 
         if (!player || !player->IsConnected())
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -344,22 +343,26 @@ public:
             std::string newName{ *newNameV };
             if (!normalizePlayerName(newName))
             {
-                handler->SendSysMessage(LANG_BAD_VALUE);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_BAD_VALUE);
                 return false;
             }
 
-            if (ObjectMgr::CheckPlayerName(newName, true) != CHAR_NAME_SUCCESS)
+            ResponseCodes res = ResponseCodes(ObjectMgr::CheckPlayerName(newName, true));
+            if (res != CHAR_NAME_SUCCESS)
             {
-                handler->SendSysMessage(LANG_BAD_VALUE);
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
+                switch (res)
+                {
+                    case CHAR_NAME_RESERVED:
+                        handler->SendErrorMessage(LANG_RESERVED_NAME);
+                        break;
+                    case CHAR_NAME_PROFANE:
+                        handler->SendErrorMessage(LANG_PROFANITY_NAME);
+                        break;
+                    default:
+                        handler->SendErrorMessage(LANG_BAD_VALUE);
+                        break;
+                }
 
-            if (sObjectMgr->IsReservedName(newName))
-            {
-                handler->SendSysMessage(LANG_RESERVED_NAME);
-                handler->SetSentErrorMessage(true);
                 return false;
             }
 
@@ -368,8 +371,7 @@ public:
             PreparedQueryResult result = CharacterDatabase.Query(stmt);
             if (result)
             {
-                handler->PSendSysMessage(LANG_RENAME_PLAYER_ALREADY_EXISTS, newName.c_str());
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_RENAME_PLAYER_ALREADY_EXISTS, newName.c_str());
                 return false;
             }
 
@@ -437,7 +439,7 @@ public:
         if (!player)
             return false;
 
-        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
+        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->GetLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
 
         if (newlevel < 1)
             return false;                                       // invalid level
@@ -532,8 +534,7 @@ public:
             player = PlayerIdentifier::FromTargetOrSelf(handler);
         if (!player || !player->IsConnected())
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -598,8 +599,7 @@ public:
         // if no characters have been found, output a warning
         if (foundList.empty())
         {
-            handler->SendSysMessage(LANG_CHARACTER_DELETED_LIST_EMPTY);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CHARACTER_DELETED_LIST_EMPTY);
             return false;
         }
 
@@ -627,8 +627,7 @@ public:
 
         if (foundList.empty())
         {
-            handler->SendSysMessage(LANG_CHARACTER_DELETED_LIST_EMPTY);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CHARACTER_DELETED_LIST_EMPTY);
             return false;
         }
 
@@ -662,8 +661,7 @@ public:
             return true;
         }
 
-        handler->SendSysMessage(LANG_CHARACTER_DELETED_ERR_RENAME);
-        handler->SetSentErrorMessage(true);
+        handler->SendErrorMessage(LANG_CHARACTER_DELETED_ERR_RENAME);
         return false;
     }
 
@@ -685,8 +683,7 @@ public:
 
         if (foundList.empty())
         {
-            handler->SendSysMessage(LANG_CHARACTER_DELETED_LIST_EMPTY);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_CHARACTER_DELETED_LIST_EMPTY);
             return false;
         }
 
@@ -762,7 +759,7 @@ public:
         if (!player)
             return false;
 
-        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->getLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
+        uint8 oldlevel = player->IsConnected() ? player->GetConnectedPlayer()->GetLevel() : sCharacterCache->GetCharacterLevelByGuid(player->GetGUID());
         int16 newlevel = static_cast<int16>(oldlevel) + level;
 
         if (newlevel < 1)
@@ -787,15 +784,13 @@ public:
             // normalize the name if specified and check if it exists
             if (!normalizePlayerName(name))
             {
-                handler->PSendSysMessage(LANG_INVALID_CHARACTER_NAME);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_INVALID_CHARACTER_NAME);
                 return false;
             }
 
             if (ObjectMgr::CheckPlayerName(name, true) != CHAR_NAME_SUCCESS)
             {
-                handler->PSendSysMessage(LANG_INVALID_CHARACTER_NAME);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_INVALID_CHARACTER_NAME);
                 return false;
             }
         }
@@ -804,8 +799,7 @@ public:
         {
             if (sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, *characterGUID)))
             {
-                handler->PSendSysMessage(LANG_CHARACTER_GUID_IN_USE, *characterGUID);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_CHARACTER_GUID_IN_USE, *characterGUID);
                 return false;
             }
         }
@@ -825,20 +819,16 @@ public:
             handler->PSendSysMessage(LANG_COMMAND_IMPORT_SUCCESS);
             break;
         case DUMP_FILE_OPEN_ERROR:
-            handler->PSendSysMessage(LANG_FILE_OPEN_FAIL, fileName.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_FILE_OPEN_FAIL, fileName.c_str());
             return false;
         case DUMP_FILE_BROKEN:
-            handler->PSendSysMessage(LANG_DUMP_BROKEN, fileName.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_DUMP_BROKEN, fileName.c_str());
             return false;
         case DUMP_TOO_MANY_CHARS:
-            handler->PSendSysMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, account.GetName().c_str(), account.GetID());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, account.GetName().c_str(), account.GetID());
             return false;
         default:
-            handler->PSendSysMessage(LANG_COMMAND_IMPORT_FAILED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_IMPORT_FAILED);
             return false;
         }
 
@@ -857,13 +847,11 @@ public:
         case DUMP_SUCCESS:
             break;
         case DUMP_CHARACTER_DELETED:
-            handler->PSendSysMessage(LANG_COMMAND_EXPORT_DELETED_CHAR);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_EXPORT_DELETED_CHAR);
             return false;
         case DUMP_FILE_OPEN_ERROR: // this error code should not happen
         default:
-            handler->PSendSysMessage(LANG_COMMAND_EXPORT_FAILED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_EXPORT_FAILED);
             return false;
         }
 
@@ -872,19 +860,17 @@ public:
         case DUMP_SUCCESS:
             break;
         case DUMP_TOO_MANY_CHARS:
-            handler->PSendSysMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, account.GetName().c_str(), account.GetID());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, account.GetName().c_str(), account.GetID());
             return false;
         case DUMP_FILE_OPEN_ERROR: // this error code should not happen
         case DUMP_FILE_BROKEN: // this error code should not happen
         default:
-            handler->PSendSysMessage(LANG_COMMAND_IMPORT_FAILED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_IMPORT_FAILED);
             return false;
         }
 
         // Original TC Notes from Refactor vvv
-        //ToDo: use a new trinity_string for this commands
+        //ToDo: use a new acore_string for this commands
         handler->PSendSysMessage(LANG_COMMAND_IMPORT_SUCCESS);
 
         return true;
@@ -898,16 +884,13 @@ public:
             handler->PSendSysMessage(LANG_COMMAND_EXPORT_SUCCESS);
             break;
         case DUMP_FILE_OPEN_ERROR:
-            handler->PSendSysMessage(LANG_FILE_OPEN_FAIL, fileName.c_str());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_FILE_OPEN_FAIL, fileName.c_str());
             return false;
         case DUMP_CHARACTER_DELETED:
-            handler->PSendSysMessage(LANG_COMMAND_EXPORT_DELETED_CHAR);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_EXPORT_DELETED_CHAR);
             return false;
         default:
-            handler->PSendSysMessage(LANG_COMMAND_EXPORT_FAILED);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_EXPORT_FAILED);
             return false;
         }
 
@@ -1072,8 +1055,7 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -1081,8 +1063,7 @@ public:
         {
             if (AccountMgr::GetCharactersCount(accountId) >= 10)
             {
-                handler->PSendSysMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, accountName, accountId);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_ACCOUNT_CHARACTER_LIST_FULL, accountName, accountId);
                 return true;
             }
 
@@ -1104,8 +1085,7 @@ public:
         }
         else
         {
-            handler->PSendSysMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return true;
         }
 

@@ -73,7 +73,7 @@ function comp_configure() {
     echo "Platform: $OSTYPE"
     case "$OSTYPE" in
       darwin*)
-        OSOPTIONS=" -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@1.1/include -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libssl.dylib -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl@1.1/lib/libcrypto.dylib "
+        OSOPTIONS=" -DMYSQL_ADD_INCLUDE_PATH=/usr/local/include -DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib -DOPENSSL_INCLUDE_DIR=/usr/local/opt/openssl@3/include -DOPENSSL_SSL_LIBRARIES=/usr/local/opt/openssl@3/lib/libssl.dylib -DOPENSSL_CRYPTO_LIBRARIES=/usr/local/opt/openssl@3/lib/libcrypto.dylib "
         ;;
       msys*)
         OSOPTIONS=" -DMYSQL_INCLUDE_DIR=C:\tools\mysql\current\include -DMYSQL_LIBRARY=C:\tools\mysql\current\lib\mysqlclient.lib "
@@ -104,9 +104,7 @@ function comp_compile() {
 
   echo "Using $MTHREADS threads"
 
-  CWD=$(pwd)
-
-  cd $BUILDPATH
+  pushd "$BUILDPATH" >> /dev/null || exit 1
 
   comp_ccacheEnable
 
@@ -121,7 +119,7 @@ function comp_compile() {
     msys*)
       cmake --install . --config $CTYPE
 
-      cd $CWD
+      popd >> /dev/null || exit 1
 
       echo "Done"
       ;;
@@ -138,24 +136,24 @@ function comp_compile() {
       echo "Cmake install..."
       sudo cmake --install . --config $CTYPE
 
-      cd $CWD
+      popd >> /dev/null || exit 1
 
       # set all aplications SUID bit
       echo "Setting permissions on binary files"
       find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec sudo chown root:root -- {} +
       find "$AC_BINPATH_FULL"  -mindepth 1 -maxdepth 1 -type f -exec sudo chmod u+s  -- {} +
 
-      DOCKER_ETC_FOLDER=${DOCKER_ETC_FOLDER:-"env/dist/etc"}
-
-      if [[ $DOCKER = 1 && $DISABLE_DOCKER_CONF != 1 ]]; then
-        echo "Generating confs..."
-        cp -n "$DOCKER_ETC_FOLDER/worldserver.conf.dockerdist" "${confDir}/worldserver.conf"
-        cp -n "$DOCKER_ETC_FOLDER/authserver.conf.dockerdist" "${confDir}/authserver.conf"
-        cp -n "$DOCKER_ETC_FOLDER/dbimport.conf.dockerdist" "${confDir}/dbimport.conf"
+      if [[ -n "$DOCKER" ]]; then
+          [[ -f "$confDir/worldserver.conf.dist" ]] && \
+              cp -nv "$confDir/worldserver.conf.dist" "$confDir/worldserver.conf"
+          [[ -f "$confDir/authserver.conf.dist" ]] && \
+              cp -nv "$confDir/authserver.conf.dist" "$confDir/authserver.conf"
+          [[ -f "$confDir/dbimport.conf.dist" ]] && \
+              cp -nv "$confDir/dbimport.conf.dist" "$confDir/dbimport.conf"
       fi
 
       echo "Done"
-    ;;
+      ;;
   esac
 
   runHooks "ON_AFTER_BUILD"

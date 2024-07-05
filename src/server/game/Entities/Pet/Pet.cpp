@@ -18,7 +18,6 @@
 #include "Pet.h"
 #include "ArenaSpectator.h"
 #include "Common.h"
-#include "CreatureAI.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "Group.h"
@@ -48,7 +47,7 @@ Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID
     m_loading(false),
     m_petRegenTimer(PET_FOCUS_REGEN_INTERVAL),
     m_tempspellTarget(nullptr),
-    m_tempoldTarget(nullptr),
+    m_tempoldTarget(),
     m_tempspellIsPositive(false),
     m_tempspell(0)
 {
@@ -106,6 +105,14 @@ void Pet::AddToWorld()
 
     if (GetOwnerGUID().IsPlayer())
     {
+        if (Player* owner = GetOwner())
+        {
+            if (getPetType() == SUMMON_PET && owner->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_PET))
+            {
+                owner->SetLastPetSpell(GetUInt32Value(UNIT_CREATED_BY_SPELL));
+            }
+        }
+
         sScriptMgr->OnPetAddToWorld(this);
     }
 }
@@ -231,7 +238,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     bool forceLoadFromDB = false;
     sScriptMgr->OnBeforeLoadPetFromDB(owner, petEntry, petnumber, current, forceLoadFromDB);
 
-    if (!forceLoadFromDB && (owner->getClass() == CLASS_DEATH_KNIGHT && !owner->CanSeeDKPet())) // DK Pet exception
+    if (!forceLoadFromDB && (owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET) && !owner->CanSeeDKPet())) // DK Pet exception
         return false;
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(petInfo->CreatedBySpellId);
@@ -249,6 +256,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
     if (current && owner->IsPetNeedBeTemporaryUnsummoned())
     {
+        owner->SetLastPetSpell(petInfo->CreatedBySpellId);
         owner->SetTemporaryUnsummonedPetNumber(petInfo->PetNumber);
         return false;
     }
@@ -296,7 +304,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     switch (getPetType())
     {
         case SUMMON_PET:
-            petlevel = owner->getLevel();
+            petlevel = owner->GetLevel();
 
             if (IsPetGhoul())
                 SetUInt32Value(UNIT_FIELD_BYTES_0, 0x400); // class = rogue
@@ -386,7 +394,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     // Send fake summon spell cast - this is needed for correct cooldown application for spells
     // Example: 46584 - without this cooldown (which should be set always when pet is loaded) isn't set clientside
     /// @todo pets should be summoned from real cast instead of just faking it?
-    if (petInfo->CreatedBySpellId)
+    if (petInfo->CreatedBySpellId && spellInfo && (spellInfo->CategoryRecoveryTime > 0 || spellInfo->RecoveryTime > 0))
     {
         WorldPacket data(SMSG_SPELL_GO, (8 + 8 + 4 + 4 + 2));
         data << owner->GetPackGUID();
@@ -474,7 +482,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         else
         {
             if (!curHealth && getPetType() == HUNTER_PET)
-                setDeathState(JUST_DIED);
+                setDeathState(DeathState::JustDied);
             else
             {
                 SetHealth(curHealth > GetMaxHealth() ? GetMaxHealth() : curHealth);
@@ -565,7 +573,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         stmt->SetData(3, GetNativeDisplayId());
         stmt->SetData(4, GetUInt32Value(UNIT_CREATED_BY_SPELL));
         stmt->SetData(5, uint8(getPetType()));
-        stmt->SetData(6, getLevel());
+        stmt->SetData(6, GetLevel());
         stmt->SetData(7, GetUInt32Value(UNIT_FIELD_PETEXPERIENCE));
         stmt->SetData(8, uint8(GetReactState()));
         stmt->SetData(9, GetName());
@@ -618,7 +626,7 @@ void Pet::DeleteFromDB(ObjectGuid::LowType guidlow)
 void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                       // overwrite virtual Creature::setDeathState and Unit::setDeathState
 {
     Creature::setDeathState(s);
-    if (getDeathState() == CORPSE)
+    if (getDeathState() == DeathState::Corpse)
     {
         if (getPetType() == HUNTER_PET)
         {
@@ -634,7 +642,7 @@ void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                 
             //SetUnitFlag(UNIT_FLAG_STUNNED);
         }
     }
-    else if (getDeathState() == ALIVE)
+    else if (getDeathState() == DeathState::Alive)
     {
         //RemoveUnitFlag(UNIT_FLAG_STUNNED);
         CastPetAuras(true);
@@ -653,7 +661,7 @@ void Pet::Update(uint32 diff)
 
     switch (m_deathState)
     {
-        case CORPSE:
+        case DeathState::Corpse:
             {
                 if (getPetType() != HUNTER_PET || m_corpseRemoveTime <= GameTime::GetGameTime().count())
                 {
@@ -662,7 +670,7 @@ void Pet::Update(uint32 diff)
                 }
                 break;
             }
-        case ALIVE:
+        case DeathState::Alive:
             {
                 // unsummon pet that lost owner
                 Player* owner = GetOwner();
@@ -710,7 +718,11 @@ void Pet::Update(uint32 diff)
                 if (m_tempspell)
                 {
                     Unit* tempspellTarget = m_tempspellTarget;
-                    Unit* tempoldTarget = m_tempoldTarget;
+                    Unit* tempoldTarget = nullptr;
+
+                    if (!m_tempoldTarget.IsEmpty())
+                        tempoldTarget = ObjectAccessor::GetUnit(*this, m_tempoldTarget);
+
                     bool tempspellIsPositive = m_tempspellIsPositive;
                     uint32 tempspell = m_tempspell;
                     Unit* charmer = GetCharmerOrOwner();
@@ -783,7 +795,7 @@ void Pet::Update(uint32 diff)
                                         }
                                     }
 
-                                    m_tempoldTarget = nullptr;
+                                    m_tempoldTarget = ObjectGuid::Empty;
                                     m_tempspellIsPositive = false;
                                 }
                             }
@@ -793,7 +805,7 @@ void Pet::Update(uint32 diff)
                     {
                         m_tempspell = 0;
                         m_tempspellTarget = nullptr;
-                        m_tempoldTarget = nullptr;
+                        m_tempoldTarget = ObjectGuid::Empty;
                         m_tempspellIsPositive = false;
 
                         Unit* victim = charmer->GetVictim();
@@ -887,8 +899,8 @@ void Pet::GivePetXP(uint32 xp)
     if (!IsAlive())
         return;
 
-    uint8 maxlevel = std::min((uint8)sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), GetOwner()->getLevel());
-    uint8 petlevel = getLevel();
+    uint8 maxlevel = std::min((uint8)sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL), GetOwner()->GetLevel());
+    uint8 petlevel = GetLevel();
 
     // If pet is detected to be at, or above(?) the players level, don't hand out XP
     if (petlevel >= maxlevel)
@@ -915,7 +927,7 @@ void Pet::GivePetXP(uint32 xp)
 
 void Pet::GivePetLevel(uint8 level)
 {
-    if (!level || level == getLevel())
+    if (!level || level == GetLevel())
         return;
 
     if (getPetType() == HUNTER_PET)
@@ -992,7 +1004,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     setPowerType(POWER_FOCUS);
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
-    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(getLevel() + 1)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
+    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(GetLevel() + 1)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
     ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
     if (cinfo->type == CREATURE_TYPE_BEAST)
@@ -1005,7 +1017,7 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     return true;
 }
 
-// TODO: Move stat mods code to pet passive auras
+/// @todo: Move stat mods code to pet passive auras
 bool Guardian::InitStatsForLevel(uint8 petlevel)
 {
     CreatureTemplate const* cinfo = GetCreatureTemplate();
@@ -1032,12 +1044,12 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
             if (petType == MAX_PET_TYPE)
             {
                 // The petType was not overwritten by the hook, continue with default initialization
-                if (owner->getClass() == CLASS_WARLOCK ||
-                        owner->getClass() == CLASS_SHAMAN ||          // Fire Elemental
-                        owner->getClass() == CLASS_DEATH_KNIGHT ||    // Risen Ghoul
-                        owner->getClass() == CLASS_MAGE)              // Water Elemental with glyph
+                if (owner->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_PET) ||
+                        owner->IsClass(CLASS_SHAMAN, CLASS_CONTEXT_PET) ||          // Fire Elemental
+                        owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET) ||    // Risen Ghoul
+                        owner->IsClass(CLASS_MAGE, CLASS_CONTEXT_PET))              // Water Elemental with glyph
                     petType = SUMMON_PET;
-                else if (owner->getClass() == CLASS_HUNTER)
+                else if (owner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET))
                 {
                     petType = HUNTER_PET;
                 }
@@ -1047,6 +1059,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                 m_unitTypeMask |= UNIT_MASK_HUNTER_PET;
             else if (petType != SUMMON_PET)
                 LOG_ERROR("entities.pet", "Unknown type pet {} is summoned by player class {}", GetEntry(), owner->getClass());
+        }
+
+        if (petType == HUNTER_PET || petType == SUMMON_PET)
+        {
+            SetSpeed(MOVE_RUN, 1.15f);
         }
     }
 
@@ -1064,7 +1081,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
     uint32 attackTime = BASE_ATTACK_TIME;
-    if (owner->getClass() != CLASS_HUNTER && cinfo->BaseAttackTime >= 1000)
+    if (!owner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET) && cinfo->BaseAttackTime >= 1000)
         attackTime = cinfo->BaseAttackTime;
 
     SetAttackTime(BASE_ATTACK, attackTime);
@@ -1073,20 +1090,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 
-    //scale
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family);
-    if (cFamily && cFamily->minScale > 0.0f && petType == HUNTER_PET)
-    {
-        float scale;
-        if (getLevel() >= cFamily->maxScaleLevel)
-            scale = 1.0f;
-        else if (getLevel() <= cFamily->minScaleLevel)
-            scale = 0.5f;
-        else
-            scale = 0.5f + 0.5f * float(getLevel() - cFamily->minScaleLevel) / float(cFamily->maxScaleLevel  - cFamily->minScaleLevel);
-
-        SetObjectScale(scale);
-    }
+    // scale
+    SetObjectScale(GetNativeObjectScale());
 
     // Resistance
     // xinef: hunter pets should not inherit template resistances
@@ -1098,7 +1103,17 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     PetLevelInfo const* pInfo = sObjectMgr->GetPetLevelInfo(creature_ID, petlevel);
     if (pInfo)                                      // exist in DB
     {
-        SetCreateHealth(pInfo->health);
+        // Default scale value of 1 to use if Pet.RankMod.Health = 0
+        float factorHealth = 1;
+        // If config is set to allow pets to use health modifiers, apply it to creatures with a DB entry
+        // Pet.RankMod.Health = 1 use the factor value based on the rank of the pet, most pets have a rank of 0 and so use
+        // the Elite rank which is set as the default in Creature::_GetHealthMod(int32 Rank)
+        if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
+        {
+            factorHealth *= _GetHealthMod(cinfo->rank);
+        }
+
+        SetCreateHealth(pInfo->health*factorHealth);
         SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, (float)pInfo->health);
         if (petType != HUNTER_PET) //hunter pet use focus
         {
@@ -1120,17 +1135,22 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         float factorHealth = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModHealth) : cinfo->ModHealth;
         float factorMana = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModMana) : cinfo->ModMana;
 
+        if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
+        {
+            factorHealth *= _GetHealthMod(cinfo->rank);
+        }
+
         SetCreateHealth(std::max<uint32>(1, stats->BaseHealth[cinfo->expansion]*factorHealth));
         SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, GetCreateHealth());
         SetCreateMana(stats->BaseMana * factorMana);
         SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, GetCreateMana());
 
         // xinef: added some multipliers so debuffs can affect pets in any way...
-        SetCreateStat(STAT_STRENGTH, 22 + 2 * petlevel);
-        SetCreateStat(STAT_AGILITY, 22 + 1.5f * petlevel);
-        SetCreateStat(STAT_STAMINA, 25 + 2 * petlevel);
-        SetCreateStat(STAT_INTELLECT, 28 + 2 * petlevel);
-        SetCreateStat(STAT_SPIRIT, 27 + 1.5f * petlevel);
+        SetCreateStat(STAT_STRENGTH, 22);
+        SetCreateStat(STAT_AGILITY, 22);
+        SetCreateStat(STAT_STAMINA, 25);
+        SetCreateStat(STAT_INTELLECT, 28);
+        SetCreateStat(STAT_SPIRIT, 27);
     }
 
     switch (petType)
@@ -1165,6 +1185,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                                 HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, aurEff->GetAmount(), true);
                             }
 
+                            break;
+                        }
+                    case NPC_VOIDWALKER:
+                        {
+                            if (AuraEffect* aurEff = owner->GetAuraEffectDummy(SPELL_GLYPH_OF_VOIDWALKER))
+                            {
+                                HandleStatModifier(UNIT_MOD_STAT_STAMINA, TOTAL_PCT, aurEff->GetAmount(), true);
+                            }
                             break;
                         }
                     case NPC_WATER_ELEMENTAL_PERM:
@@ -1210,11 +1238,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         }
                     case NPC_INFERNAL:
                         {
-                            float highAmt = petlevel / 11.0f;
-                            float lowAmt = petlevel / 12.0f;
-                            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, lowAmt * lowAmt * lowAmt);
-                            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, highAmt * highAmt * highAmt);
-
+                            if (pInfo)
+                            {
+                                SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(pInfo->min_dmg));
+                                SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(pInfo->max_dmg));
+                            }
                             AddAura(SPELL_PET_AVOIDANCE, this);
                             AddAura(SPELL_WARLOCK_PET_SCALING_05, this);
                             AddAura(SPELL_INFERNAL_SCALING_01, this);
@@ -1350,6 +1378,14 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                             break;
                         }
+                    case NPC_VENOMOUS_SNAKE:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel * 0.7 - 38));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel * 0.8 - 40));
+                        break;
+                    case NPC_VIPER:
+                        SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(1.3 * petlevel - 64));
+                        SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(1.5 * petlevel - 68));
+                        break;
                     case NPC_GENERIC_IMP:
                     case NPC_GENERIC_VOIDWALKER:
                         {
@@ -1421,13 +1457,13 @@ bool Pet::HaveInDiet(ItemTemplate const* item) const
 uint32 Pet::GetCurrentFoodBenefitLevel(uint32 itemlevel) const
 {
     // -5 or greater food level
-    if (getLevel() <= itemlevel + 5)                         //possible to feed level 60 pet with level 55 level food for full effect
+    if (GetLevel() <= itemlevel + 5)                         //possible to feed level 60 pet with level 55 level food for full effect
         return 35000;
     // -10..-6
-    else if (getLevel() <= itemlevel + 10)                   //pure guess, but sounds good
+    else if (GetLevel() <= itemlevel + 10)                   //pure guess, but sounds good
         return 17000;
     // -14..-11
-    else if (getLevel() <= itemlevel + 14)                   //level 55 food gets green on 70, makes sense to me
+    else if (GetLevel() <= itemlevel + 14)                   //level 55 food gets green on 70, makes sense to me
         return 8000;
     // -15 or less
     else
@@ -1611,7 +1647,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             }
 
             // avoid higher level auras if any, and adjust
-            SpellInfo const* scaledSpellInfo = spellInfo->GetAuraRankForLevel(getLevel());
+            SpellInfo const* scaledSpellInfo = spellInfo->GetAuraRankForLevel(GetLevel());
             if (scaledSpellInfo != spellInfo)
                 spellInfo = scaledSpellInfo;
 
@@ -1864,7 +1900,7 @@ bool Pet::addSpell(uint32 spellId, ActiveStates active /*= ACT_DECIDE*/, PetSpel
     uint32 talentCost = GetTalentSpellCost(spellId);
     if (talentCost)
     {
-        int32 free_points = GetMaxTalentPointsForLevel(getLevel());
+        int32 free_points = GetMaxTalentPointsForLevel(GetLevel());
         m_usedTalentCount += talentCost;
         // update free talent points
         free_points -= m_usedTalentCount;
@@ -1892,7 +1928,7 @@ bool Pet::learnSpell(uint32 spell_id)
 
 void Pet::InitLevelupSpellsForLevel()
 {
-    uint8 level = getLevel();
+    uint8 level = GetLevel();
 
     if (PetLevelupSpellSet const* levelupSpells = GetCreatureTemplate()->family ? sSpellMgr->GetPetLevelupSpellList(GetCreatureTemplate()->family) : nullptr)
     {
@@ -1915,16 +1951,16 @@ void Pet::InitLevelupSpellsForLevel()
     {
         for (uint32 spellId : defSpells->spellid)
         {
-            SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spellId);
-            if (!spellEntry)
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo)
                 continue;
 
             // will called first if level down
-            if (spellEntry->SpellLevel > level && sScriptMgr->CanUnlearnSpellDefault(this, spellEntry))
-                unlearnSpell(spellEntry->Id, true);
+            if (spellInfo->SpellLevel > level && sScriptMgr->CanUnlearnSpellDefault(this, spellInfo))
+                unlearnSpell(spellInfo->Id, true);
             // will called if level up
             else
-                learnSpell(spellEntry->Id);
+                learnSpell(spellInfo->Id);
         }
     }
 }
@@ -1970,7 +2006,7 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
         else
             m_usedTalentCount = 0;
         // update free talent points
-        int32 free_points = GetMaxTalentPointsForLevel(getLevel()) - m_usedTalentCount;
+        int32 free_points = GetMaxTalentPointsForLevel(GetLevel()) - m_usedTalentCount;
         SetFreeTalentPoints(free_points > 0 ? free_points : 0);
     }
 
@@ -2044,7 +2080,7 @@ bool Pet::resetTalents()
 
     Player* player = owner->ToPlayer();
 
-    uint8 level = getLevel();
+    uint8 level = GetLevel();
     uint32 talentPointsForLevel = GetMaxTalentPointsForLevel(level);
 
     if (m_usedTalentCount == 0)
@@ -2103,34 +2139,52 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
 {
     // not need after this call
     if (owner->ToPlayer()->HasAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS))
+    {
         owner->ToPlayer()->RemoveAtLoginFlag(AT_LOGIN_RESET_PET_TALENTS, true);
+    }
 
     // reset for online
     if (onlinePet)
+    {
         onlinePet->resetTalents();
+    }
 
     PetStable* petStable = owner->GetPetStable();
     if (!petStable)
+    {
         return;
+    }
 
     std::unordered_set<uint32> petIds;
     if (petStable->CurrentPet)
+    {
         petIds.insert(petStable->CurrentPet->PetNumber);
+    }
 
     for (Optional<PetStable::PetInfo> const& stabledPet : petStable->StabledPets)
+    {
         if (stabledPet)
+        {
             petIds.insert(stabledPet->PetNumber);
+        }
+    }
 
     for (PetStable::PetInfo const& unslottedPet : petStable->UnslottedPets)
+    {
         petIds.insert(unslottedPet.PetNumber);
+    }
 
     // now need only reset for offline pets (all pets except online case)
     if (onlinePet)
+    {
         petIds.erase(onlinePet->GetCharmInfo()->GetPetNumber());
+    }
 
     // no offline pets
-    if (!petIds.empty())
+    if (petIds.empty())
+    {
         return;
+    }
 
     bool need_comma = false;
     std::ostringstream ss;
@@ -2139,7 +2193,9 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
     for (uint32 id : petIds)
     {
         if (need_comma)
+        {
             ss << ',';
+        }
 
         ss << id;
 
@@ -2152,7 +2208,9 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
     for (uint32 spell : sPetTalentSpells)
     {
         if (need_comma)
+        {
             ss << ',';
+        }
 
         ss << spell;
 
@@ -2166,7 +2224,7 @@ void Pet::resetTalentsForAllPetsOf(Player* owner, Pet* onlinePet /*= nullptr*/)
 
 void Pet::InitTalentForLevel()
 {
-    uint8 level = getLevel();
+    uint8 level = GetLevel();
     uint32 talentPointsForLevel = GetMaxTalentPointsForLevel(level);
 
     Unit* owner = GetOwner();
@@ -2192,7 +2250,7 @@ uint8 Pet::GetMaxTalentPointsForLevel(uint8 level)
 
     sScriptMgr->OnCalculateMaxTalentPointsForLevel(this, level, points);
 
-    return points;
+    return uint8(points * sWorld->getRate(RATE_TALENT_PET));
 }
 
 void Pet::ToggleAutocast(SpellInfo const* spellInfo, bool apply)
@@ -2242,17 +2300,14 @@ bool Pet::IsPermanentPetFor(Player* owner) const
     switch (getPetType())
     {
         case SUMMON_PET:
-            switch (owner->getClass())
-            {
-                case CLASS_WARLOCK:
-                    return GetCreatureTemplate()->type == CREATURE_TYPE_DEMON;
-                case CLASS_DEATH_KNIGHT:
-                    return GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD;
-                case CLASS_MAGE:
-                    return GetEntry() == 37994;
-                default:
-                    return false;
-            }
+            if (owner->IsClass(CLASS_WARLOCK, CLASS_CONTEXT_PET))
+                return GetCreatureTemplate()->type == CREATURE_TYPE_DEMON;
+            else if (owner->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_PET))
+                return GetCreatureTemplate()->type == CREATURE_TYPE_UNDEAD;
+            else if (owner->IsClass(CLASS_MAGE, CLASS_CONTEXT_PET))
+                return GetEntry() == 37994;
+            else
+                return false;
         case HUNTER_PET:
             return true;
         default:
@@ -2349,23 +2404,23 @@ void Pet::SynchronizeLevelWithOwner()
     {
         // always same level
         case SUMMON_PET:
-            GivePetLevel(owner->getLevel());
+            GivePetLevel(owner->GetLevel());
             break;
         // can't be greater owner level
         case HUNTER_PET:
-            if (getLevel() > owner->getLevel())
-                GivePetLevel(owner->getLevel());
-            else if (getLevel() + 5 < owner->getLevel())
-                GivePetLevel(owner->getLevel() - 5);
+            if (GetLevel() > owner->GetLevel())
+                GivePetLevel(owner->GetLevel());
+            else if (GetLevel() + 5 < owner->GetLevel())
+                GivePetLevel(owner->GetLevel() - 5);
             break;
         default:
             break;
     }
 }
 
-void Pet::SetDisplayId(uint32 modelId)
+void Pet::SetDisplayId(uint32 modelId, float displayScale /*= 1.f*/)
 {
-    Guardian::SetDisplayId(modelId);
+    Guardian::SetDisplayId(modelId, displayScale);
 
     if (!isControlled())
         return;
@@ -2376,7 +2431,7 @@ void Pet::SetDisplayId(uint32 modelId)
                 player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MODEL_ID);
 }
 
-void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, Unit* oldTarget, bool spellIsPositive)
+void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, ObjectGuid oldTarget, bool spellIsPositive)
 {
     if (!spellid)
         return;
@@ -2388,7 +2443,7 @@ void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, Unit* oldTarg
     m_tempspell = spellid;
     m_tempspellIsPositive = spellIsPositive;
 
-    if (oldTarget)
+    if (!oldTarget.IsEmpty())
         m_tempoldTarget = oldTarget;
 }
 
@@ -2397,7 +2452,7 @@ void Pet::ClearCastWhenWillAvailable()
     m_tempspellIsPositive = false;
     m_tempspell = 0;
     m_tempspellTarget = nullptr;
-    m_tempoldTarget = nullptr;
+    m_tempoldTarget = ObjectGuid::Empty;
 }
 
 void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
@@ -2421,7 +2476,7 @@ void Pet::FillPetInfo(PetStable::PetInfo* petInfo) const
     petInfo->PetNumber = m_charmInfo->GetPetNumber();
     petInfo->CreatureId = GetEntry();
     petInfo->DisplayId = GetNativeDisplayId();
-    petInfo->Level = getLevel();
+    petInfo->Level = GetLevel();
     petInfo->Experience = GetUInt32Value(UNIT_FIELD_PETEXPERIENCE);
     petInfo->ReactState = GetReactState();
     petInfo->Name = GetName();
@@ -2438,6 +2493,40 @@ void Pet::FillPetInfo(PetStable::PetInfo* petInfo) const
 Player* Pet::GetOwner() const
 {
     return m_owner;
+}
+
+float Pet::GetNativeObjectScale() const
+{
+    uint8 ctFamily = GetCreatureTemplate()->family;
+
+    CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(ctFamily);
+    if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() & HUNTER_PET)
+    {
+        float minScaleLevel = creatureFamily->minScaleLevel;
+        uint8 level = getLevel();
+
+        float minLevelScaleMod = level >= minScaleLevel ? (level / minScaleLevel) : 0.0f;
+        float maxScaleMod = creatureFamily->maxScaleLevel - minScaleLevel;
+
+        if (minLevelScaleMod > maxScaleMod)
+            minLevelScaleMod = maxScaleMod;
+
+        float scaleMod = creatureFamily->maxScaleLevel != minScaleLevel ? minLevelScaleMod / maxScaleMod : 0.f;
+
+        float scale = (creatureFamily->maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
+
+        scale = std::min(scale, creatureFamily->maxScale);
+
+        if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
+        {
+            if (scale < 1.f && displayInfo->scale > 1.f)
+                scale *= displayInfo->scale;
+        }
+        return scale;
+    }
+
+    // take value for non-hunter pets from DB
+    return Guardian::GetNativeObjectScale();
 }
 
 std::string Pet::GenerateActionBarData() const

@@ -1,0 +1,3 @@
+-- DB update 2022_12_30_02 -> 2022_12_30_03
+--
+UPDATE `creature_loot_template` SET `Chance` = 100 WHERE `Entry` IN (18088, 18340, 18044, 18046, 18086, 18087, 18089, 19946, 19947, 20089, 20088) AND `Item` = 24280;

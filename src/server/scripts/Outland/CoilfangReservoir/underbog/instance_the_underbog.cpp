@@ -1,24 +1,31 @@
 /*
- * Copyright (C) 2008-2018 TrinityCore <https://www.trinitycore.org/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
  * option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include "ScriptMgr.h"
 #include "the_underbog.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_HUNGARFEN, DATA_HUNGARFEN },
+    { NPC_GHAZAN,    DATA_GHAZAN    },
+    { 0,             0              }
+};
 
 class instance_the_underbog : public InstanceMapScript
 {
@@ -34,35 +41,11 @@ public:
     {
         instance_the_underbog_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        void OnCreatureCreate(Creature* creature) override
+        void Initialize() override
         {
-            InstanceScript::OnCreatureCreate(creature);
-
-            switch (creature->GetEntry())
-            {
-                case NPC_GHAZAN:
-                    _ghazanGUID = creature->GetGUID();
-                    break;
-                default:
-                    break;
-            }
+            SetBossNumber(MAX_ENCOUNTERS);
+            LoadObjectData(creatureData, nullptr);
         }
-
-        ObjectGuid GetGuidData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case NPC_GHAZAN:
-                    return _ghazanGUID;
-                default:
-                    break;
-            }
-
-            return ObjectGuid::Empty;
-        }
-
-    private:
-        ObjectGuid _ghazanGUID;
     };
 };
 

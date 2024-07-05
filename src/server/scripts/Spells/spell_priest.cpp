@@ -15,19 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GridNotifiers.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "TemporarySummon.h"
 /*
  * Scripts for spells with SPELLFAMILY_PRIEST and SPELLFAMILY_GENERIC spells used by priest players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_pri_".
  */
-
-#include "GridNotifiers.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
-#include "TemporarySummon.h"
 
 enum PriestSpells
 {
@@ -48,6 +48,7 @@ enum PriestSpells
     SPELL_PRIEST_SHADOW_WORD_DEATH                  = 32409,
     SPELL_PRIEST_T9_HEALING_2P                      = 67201,
     SPELL_PRIEST_VAMPIRIC_TOUCH_DISPEL              = 64085,
+    SPELL_PRIEST_T4_4P_FLEXIBILITY                  = 37565,
 
     SPELL_GENERIC_ARENA_DAMPENING                   = 74410,
     SPELL_GENERIC_BATTLEGROUND_DAMPENING            = 74411,
@@ -203,7 +204,7 @@ class spell_pri_divine_aegis : public AuraScript
         if (AuraEffect const* aegis = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_PRIEST_DIVINE_AEGIS, EFFECT_0))
             absorb += aegis->GetAmount();
 
-        absorb = std::min(absorb, eventInfo.GetProcTarget()->getLevel() * 125);
+        absorb = std::min(absorb, eventInfo.GetProcTarget()->GetLevel() * 125);
 
         GetTarget()->CastCustomSpell(SPELL_PRIEST_DIVINE_AEGIS, SPELLVALUE_BASE_POINT0, absorb, eventInfo.GetProcTarget(), true, nullptr, aurEff);
     }
@@ -437,7 +438,7 @@ class spell_pri_lightwell_renew : public AuraScript
                 UpdateData data;
                 WorldPacket packet;
                 caster->BuildValuesUpdateBlockForPlayer(&data, player);
-                data.BuildPacket(&packet);
+                data.BuildPacket(packet);
                 player->SendDirectMessage(&packet);
             }
         }
@@ -926,6 +927,28 @@ class spell_pri_mind_control : public AuraScript
     }
 };
 
+// 37565 - Flexibility | Item - Priest T4 Holy/Discipline 4P Bonus
+class spell_pri_t4_4p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_pri_t4_4p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PRIEST_T4_4P_FLEXIBILITY });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->RemoveAurasDueToSpell(SPELL_PRIEST_T4_4P_FLEXIBILITY);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_pri_t4_4p_bonus::HandleProc, EFFECT_ALL, SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+    }
+};
+
 void AddSC_priest_spell_scripts()
 {
     RegisterSpellScript(spell_pri_shadowfiend_scaling);
@@ -949,4 +972,6 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_shadow_word_death);
     RegisterSpellScript(spell_pri_vampiric_touch);
     RegisterSpellScript(spell_pri_mind_control);
+    RegisterSpellScript(spell_pri_t4_4p_bonus);
 }
+

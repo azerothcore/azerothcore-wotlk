@@ -22,7 +22,6 @@
 #include "CharacterPackets.h"
 #include "Chat.h"
 #include "Common.h"
-#include "CreatureAI.h"
 #include "DBCEnums.h"
 #include "DatabaseEnv.h"
 #include "GameObjectAI.h"
@@ -71,7 +70,7 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& recv_data)
     // creatures can kill players
     // so if the server is lagging enough the player can
     // release spirit after he's killed but before he is updated
-    if (GetPlayer()->getDeathState() == JUST_DIED)
+    if (GetPlayer()->getDeathState() == DeathState::JustDied)
     {
         LOG_DEBUG("network", "HandleRepopRequestOpcode: got request after player {} ({}) was killed and before he was updated",
             GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
@@ -431,7 +430,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     bool preventAfkLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 2
                             && GetPlayer()->isAFK();
 
-    /// TODO: Possibly add RBAC permission to log out in combat
+    /// @todo: Possibly add RBAC permission to log out in combat
     bool canLogoutInCombat = GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING);
 
     uint32 reason = 0;
@@ -481,6 +480,10 @@ void WorldSession::HandlePlayerLogoutOpcode(WorldPackets::Character::PlayerLogou
 
 void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCancel& /*logoutCancel*/)
 {
+    // Player have already logged out serverside, too late to cancel
+    if (!GetPlayer())
+        return;
+
     SetLogoutStartTime(0);
 
     SendPacket(WorldPackets::Character::LogoutCancelAck().Write());
@@ -533,16 +536,6 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     recv_data >> guid;
-
-    if (!guid)
-    {
-        // Clear any active gossip related to current selection if not present at player's client
-        GossipMenu& gossipMenu = _player->PlayerTalkClass->GetGossipMenu();
-        if (gossipMenu.GetSenderGUID() == _player->GetTarget())
-        {
-            _player->PlayerTalkClass->SendCloseGossip();
-        }
-    }
 
     _player->SetSelection(guid);
 
@@ -630,14 +623,6 @@ void WorldSession::HandleBugOpcode(WorldPacket& recv_data)
 
     recv_data >> typelen >> type;
 
-    if (suggestion == 0)
-        LOG_DEBUG("network", "WORLD: Received CMSG_BUG [Bug Report]");
-    else
-        LOG_DEBUG("network", "WORLD: Received CMSG_BUG [Suggestion]");
-
-    LOG_DEBUG("network", "{}", type);
-    LOG_DEBUG("network", "{}", content);
-
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_BUG_REPORT);
 
     stmt->SetData(0, type);
@@ -648,8 +633,6 @@ void WorldSession::HandleBugOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_RECLAIM_CORPSE");
-
     ObjectGuid guid;
     recv_data >> guid;
 
@@ -684,8 +667,6 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleResurrectResponseOpcode(WorldPacket& recv_data)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_RESURRECT_RESPONSE");
-
     ObjectGuid guid;
     uint8 status;
     recv_data >> guid;
@@ -722,6 +703,27 @@ void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
     data << length;
     data << szStr;
     SendPacket(&data);
+}
+
+void WorldSession::SendAreaTriggerMessage(uint32 entry, ...)
+{
+    char const* format = GetAcoreString(entry);
+    if (format)
+    {
+        va_list ap;
+        char szStr[1024];
+        szStr[0] = '\0';
+
+        va_start(ap, entry);
+        vsnprintf(szStr, 1024, format, ap);
+        va_end(ap);
+
+        uint32 length = strlen(szStr) + 1;
+        WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
+        data << length;
+        data << szStr;
+        SendPacket(&data);
+    }
 }
 
 void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
@@ -844,14 +846,12 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
-
     uint32 type, timestamp, decompressedSize;
     recv_data >> type >> timestamp >> decompressedSize;
 
     LOG_DEBUG("network", "UAD: type {}, time {}, decompressedSize {}", type, timestamp, decompressedSize);
 
-    if (type > NUM_ACCOUNT_DATA_TYPES)
+    if (type >= NUM_ACCOUNT_DATA_TYPES)
         return;
 
     if (decompressedSize == 0)                               // erase
@@ -899,8 +899,6 @@ void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
 
 void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_REQUEST_ACCOUNT_DATA");
-
     uint32 type;
     recv_data >> type;
 
@@ -937,7 +935,6 @@ void WorldSession::HandleRequestAccountData(WorldPacket& recv_data)
 
 void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
 {
-    LOG_DEBUG("network", "WORLD: Received CMSG_SET_ACTION_BUTTON");
     uint8 button;
     uint32 packetData;
     recv_data >> button >> packetData;
@@ -979,26 +976,18 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleCompleteCinematic(WorldPacket& /*recv_data*/)
 {
-{
-    LOG_DEBUG("network", "WORLD: Received CMSG_COMPLETE_CINEMATIC");
-}
     // If player has sight bound to visual waypoint NPC we should remove it
     GetPlayer()->GetCinematicMgr()->EndCinematic();
 }
 
 void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recv_data*/)
 {
-{
-    LOG_DEBUG("network", "WORLD: Received CMSG_NEXT_CINEMATIC_CAMERA");
-}
     // Sent by client when cinematic actually begun. So we begin the server side process
     GetPlayer()->GetCinematicMgr()->BeginCinematic();
 }
 
 void WorldSession::HandleFeatherFallAck(WorldPacket& recv_data)
 {
-    LOG_DEBUG("network", "WORLD: CMSG_MOVE_FEATHER_FALL_ACK");
-
     // no used
     recv_data.rfinish();                       // prevent warnings spam
 }
@@ -1033,12 +1022,20 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    LOG_DEBUG("network", "WORLD: Received CMSG_INSPECT");
-
     Player* player = ObjectAccessor::GetPlayer(*_player, guid);
     if (!player)
     {
         LOG_DEBUG("network", "CMSG_INSPECT: No player found from {}", guid.ToString());
+        return;
+    }
+
+    if (!GetPlayer()->IsWithinDistInMap(player, INSPECT_DISTANCE, false))
+    {
+        return;
+    }
+
+    if (GetPlayer()->IsValidAttackTarget(player))
+    {
         return;
     }
 
@@ -1074,6 +1071,16 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
         return;
     }
 
+    if (!GetPlayer()->IsWithinDistInMap(player, INSPECT_DISTANCE, false))
+    {
+        return;
+    }
+
+    if (GetPlayer()->IsValidAttackTarget(player))
+    {
+        return;
+    }
+
     WorldPacket data(MSG_INSPECT_HONOR_STATS, 8 + 1 + 4 * 4);
     data << player->GetGUID();
     data << uint8(player->GetHonorPoints());
@@ -1100,8 +1107,6 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
     recv_data >> PositionZ;
     recv_data >> Orientation;                               // o (3.141593 = 180 degrees)
 
-    LOG_DEBUG("network", "WORLD: Received CMSG_WORLD_TELEPORT");
-
     if (GetPlayer()->IsInFlight())
     {
         LOG_DEBUG("network", "Player '{}' ({}) in flight, ignore worldport command.", GetPlayer()->GetName(), GetPlayer()->GetGUID().ToString());
@@ -1113,7 +1118,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
     if (AccountMgr::IsAdminAccount(GetSecurity()))
         GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
     else
-        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+        SendNotification(LANG_PERMISSION_DENIED);
 }
 
 void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
@@ -1124,7 +1129,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     if (!AccountMgr::IsAdminAccount(GetSecurity()))
     {
-        SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
+        SendNotification(LANG_PERMISSION_DENIED);
         return;
     }
 
@@ -1421,7 +1426,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                     return;
                 }
 
-                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()) && (_player->GetRaidDifficulty() >= 0 && uint32(mode % 2) == uint32(_player->GetRaidDifficulty() % 2)) && group->isRaidGroup())
+                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()) && (uint32(mode % 2) == uint32(_player->GetRaidDifficulty() % 2)) && group->isRaidGroup())
                 {
                     if (!currMap)
                         currMap = groupGuy->GetMap();
@@ -1608,7 +1613,19 @@ void WorldSession::HandleQueryInspectAchievements(WorldPacket& recv_data)
 
     Player* player = ObjectAccessor::GetPlayer(*_player, guid);
     if (!player)
+    {
         return;
+    }
+
+    if (!GetPlayer()->IsWithinDistInMap(player, INSPECT_DISTANCE, false))
+    {
+        return;
+    }
+
+    if (GetPlayer()->IsValidAttackTarget(player))
+    {
+        return;
+    }
 
     player->SendRespondInspectAchievements(_player);
 }
@@ -1703,7 +1720,7 @@ void WorldSession::HandleHearthAndResurrect(WorldPacket& /*recv_data*/)
     _player->BuildPlayerRepop();
     _player->ResurrectPlayer(1.0f);
     _player->SpawnCorpseBones();
-    _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->m_homebindO);
+    _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
 }
 
 void WorldSession::HandleInstanceLockResponse(WorldPacket& recvPacket)

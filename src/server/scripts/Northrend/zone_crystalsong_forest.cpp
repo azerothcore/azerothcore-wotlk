@@ -15,17 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* Script Data Start
-SDName: CrystalSongForest
-SDAuthor: Malcrom
-SD%Complete: 99%
-SDComment:
-SDCategory: CrystalsongForest
-Script Data End */
-
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SmartScriptMgr.h"
 #include "Transport.h"
@@ -155,7 +147,7 @@ struct npc_warmage_violetstand : public ScriptedAI
 {
     npc_warmage_violetstand(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
     }
 
     ObjectGuid targetGUID;

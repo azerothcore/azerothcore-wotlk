@@ -16,21 +16,22 @@
  */
 
 #include "OutdoorPvPSI.h"
+#include "CreatureScript.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
 
 OutdoorPvPSI::OutdoorPvPSI()
 {
-    m_TypeId = OUTDOOR_PVP_SI;
+    _typeId = OUTDOOR_PVP_SI;
     m_Gathered_A = 0;
     m_Gathered_H = 0;
     m_LastController = TEAM_NEUTRAL;
@@ -108,7 +109,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 }
                 UpdateWorldState();
                 // reward player, xinef: has no effect on characters above level 70
-                if (player->getLevel() < 70)
+                if (player->GetLevel() < 70)
                     player->CastSpell(player, SI_TRACES_OF_SILITHYST, true);
                 // add 19 honor
                 player->RewardHonor(nullptr, 1, 19);
@@ -134,7 +135,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 }
                 UpdateWorldState();
                 // reward player, xinef: has no effect on characters above level 70
-                if (player->getLevel() < 70)
+                if (player->GetLevel() < 70)
                     player->CastSpell(player, SI_TRACES_OF_SILITHYST, true);
                 // add 19 honor
                 player->RewardHonor(nullptr, 1, 19);
@@ -263,3 +264,4 @@ void AddSC_outdoorpvp_si()
 {
     new OutdoorPvP_silithus();
 }
+

@@ -38,8 +38,10 @@
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SpellAuraEffects.h"
+#include "StringConvert.h"
 #include "TargetedMovementGenerator.h"
 #include "TemporarySummon.h"
+#include "Tokenize.h"
 #include "Totem.h"
 #include "Transport.h"
 #include "UpdateData.h"
@@ -49,10 +51,8 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "Tokenize.h"
-#include "StringConvert.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -186,7 +186,7 @@ void Object::BuildMovementUpdateBlock(UpdateData* data, uint32 flags) const
     data->AddUpdateBlock(buf);
 }
 
-void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
+void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target)
 {
     if (!target)
         return;
@@ -250,11 +250,11 @@ void Object::SendUpdateToPlayer(Player* player)
     WorldPacket packet;
 
     BuildCreateUpdateBlockForPlayer(&upd, player);
-    upd.BuildPacket(&packet);
+    upd.BuildPacket(packet);
     player->GetSession()->SendPacket(&packet);
 }
 
-void Object::BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const
+void Object::BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target)
 {
     ByteBuffer buf(500);
 
@@ -494,7 +494,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     }
 }
 
-void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
+void Object::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 {
     if (!target)
         return;
@@ -542,7 +542,7 @@ void Object::ClearUpdateMask(bool remove)
     }
 }
 
-void Object::BuildFieldsUpdate(Player* player, UpdateDataMapType& data_map) const
+void Object::BuildFieldsUpdate(Player* player, UpdateDataMapType& data_map)
 {
     UpdateDataMapType::iterator iter = data_map.find(player);
 
@@ -1773,6 +1773,17 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         WorldObject const* viewpoint = this;
         if (Player const* thisPlayer = ToPlayer())
         {
+            if (Creature const* creature = obj->ToCreature())
+            {
+                if (TempSummon const* tempSummon = creature->ToTempSummon())
+                {
+                    if (tempSummon->IsVisibleBySummonerOnly() && GetGUID() != tempSummon->GetSummonerGUID())
+                    {
+                        return false;
+                    }
+                }
+            }
+
             if (thisPlayer->isDead() && thisPlayer->GetHealth() > 0 && // Cheap way to check for ghost state
                     !(obj->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST) & m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GHOST) & GHOST_VISIBILITY_GHOST))
             {
@@ -1852,7 +1863,9 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
             return false;
 
     if (!CanDetect(obj, ignoreStealth, !distanceCheck, checkAlert))
+    {
         return false;
+    }
 
     return true;
 }
@@ -1879,7 +1892,9 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
     if (!ignoreStealth)
     {
         if (!seer->CanDetectInvisibilityOf(obj)) // xinef: added ignoreStealth, allow AoE spells to hit invisible targets!
+        {
             return false;
+        }
 
         if (!seer->CanDetectStealthOf(obj, checkAlert))
         {
@@ -1912,11 +1927,32 @@ bool WorldObject::CanDetectInvisibilityOf(WorldObject const* obj) const
     // It seems like that only Units are affected by this check (couldn't see arena doors with preparation invisibility)
     if (obj->ToUnit())
     {
-        uint32 objMask = m_invisibility.GetFlags() & obj->m_invisibilityDetect.GetFlags();
-        // xinef: include invisible flags of caster in the mask, 2 invisible objects should be able to detect eachother
-        objMask |= m_invisibility.GetFlags() & obj->m_invisibility.GetFlags();
-        if (objMask != m_invisibility.GetFlags())
-            return false;
+        // Permanently invisible creatures should be able to engage non-invisible targets.
+        // ex. Skulking Witch (20882) / Greater Invisibility (16380)
+        bool isPermInvisibleCreature = false;
+        if (Creature const* baseObj = ToCreature())
+        {
+            auto auraEffects = baseObj->GetAuraEffectsByType(SPELL_AURA_MOD_INVISIBILITY);
+            for (auto const effect : auraEffects)
+            {
+                if (SpellInfo const* spell = effect->GetSpellInfo())
+                {
+                    if (spell->GetMaxDuration() == -1)
+                    {
+                        isPermInvisibleCreature = true;
+                    }
+                }
+            }
+        }
+
+        if (!isPermInvisibleCreature)
+        {
+            uint32 objMask = m_invisibility.GetFlags() & obj->m_invisibilityDetect.GetFlags();
+            // xinef: include invisible flags of caster in the mask, 2 invisible objects should be able to detect eachother
+            objMask |= m_invisibility.GetFlags() & obj->m_invisibility.GetFlags();
+            if (objMask != m_invisibility.GetFlags())
+                return false;
+        }
     }
 
     for (uint32 i = 0; i < TOTAL_INVISIBILITY_TYPES; ++i)
@@ -2115,7 +2151,7 @@ void WorldObject::AddObjectToRemoveList()
     map->AddObjectToRemoveList(this);
 }
 
-TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/)
+TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropertiesEntry const* properties /*= nullptr*/, uint32 duration /*= 0*/, WorldObject* summoner /*= nullptr*/, uint32 spellId /*= 0*/, uint32 vehId /*= 0*/, bool visibleBySummonerOnly /*= false*/)
 {
     uint32 mask = UNIT_MASK_SUMMON;
     if (properties)
@@ -2204,6 +2240,9 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     summon->SetHomePosition(pos);
 
     summon->InitStats(duration);
+
+    summon->SetVisibleBySummonerOnly(visibleBySummonerOnly);
+
     if (!AddToMap(summon->ToCreature(), summon->GetOwnerGUID().IsPlayer() || (summoner && summoner->GetTransport())))
     {
         delete summon;
@@ -2236,7 +2275,7 @@ void Map::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= null
                 list->push_back(summon);
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, SummonPropertiesEntry const* properties)
+TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly)
 {
     if (!x && !y && !z)
     {
@@ -2245,7 +2284,7 @@ TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, fl
     }
     Position pos;
     pos.Relocate(x, y, z, ang);
-    return SummonCreature(id, pos, spwtype, despwtime, 0, properties);
+    return SummonCreature(id, pos, spwtype, despwtime, 0, properties, visibleBySummonerOnly);
 }
 
 GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport)
@@ -2301,11 +2340,11 @@ void WorldObject::ClearZoneScript()
     m_zoneScript = nullptr;
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 entry, const Position& pos, TempSummonType spwtype, uint32 duration, uint32  /*vehId*/, SummonPropertiesEntry const* properties) const
+TempSummon* WorldObject::SummonCreature(uint32 entry, const Position& pos, TempSummonType spwtype, uint32 duration, uint32  /*vehId*/, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly /*= false*/) const
 {
     if (Map* map = FindMap())
     {
-        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, (WorldObject*) this))
+        if (TempSummon* summon = map->SummonCreature(entry, pos, properties, duration, (WorldObject*)this, 0, 0, visibleBySummonerOnly))
         {
             summon->SetTempSummonType(spwtype);
             return summon;
@@ -2361,7 +2400,7 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint3
     if (setLevel && (GetTypeId() == TYPEID_PLAYER || GetTypeId() == TYPEID_UNIT))
     {
         summon->SetFaction(((Unit*)this)->GetFaction());
-        summon->SetLevel(((Unit*)this)->getLevel());
+        summon->SetLevel(((Unit*)this)->GetLevel());
     }
 
     // Xinef: correctly set phase mask in case of gameobjects
@@ -2844,6 +2883,22 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= nullptr*/)
         SendMessageToSet(WorldPackets::Misc::Playsound(sound_id).Write(), true);
 }
 
+void WorldObject::PlayRadiusSound(uint32 sound_id, float radius)
+{
+    std::list<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
+    {
+        if (player)
+        {
+            player->SendDirectMessage(WorldPackets::Misc::Playsound(sound_id).Write());
+        }
+    }
+}
+
 void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
 {
     if (target)
@@ -2853,6 +2908,22 @@ void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= nullptr*/)
     else
     {
         SendMessageToSet(WorldPackets::Misc::PlayMusic(music_id).Write(), true);
+    }
+}
+
+void WorldObject::PlayRadiusMusic(uint32 music_id, float radius)
+{
+    std::list<Player*> targets;
+    Acore::AnyPlayerInObjectRangeCheck check(this, radius, false);
+    Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(this, targets, check);
+    Cell::VisitWorldObjects(this, searcher, radius);
+
+    for (Player* player : targets)
+    {
+        if (player)
+        {
+            player->SendDirectMessage(WorldPackets::Misc::PlayMusic(music_id).Write());
+        }
     }
 }
 
@@ -2875,7 +2946,7 @@ void WorldObject::DestroyForNearbyPlayers()
         if (!player->HaveAtClient(this))
             continue;
 
-        if (isType(TYPEMASK_UNIT) && ((Unit*)this)->GetCharmerGUID() == player->GetGUID()) // TODO: this is for puppet
+        if (isType(TYPEMASK_UNIT) && ((Unit*)this)->GetCharmerGUID() == player->GetGUID()) /// @todo: this is for puppet
             continue;
 
         DestroyForPlayer(player);
@@ -3127,4 +3198,9 @@ bool WorldObject::HasAllowedLooter(ObjectGuid guid) const
 GuidUnorderedSet const& WorldObject::GetAllowedLooters() const
 {
     return _allowedLooters;
+}
+
+void WorldObject::RemoveAllowedLooter(ObjectGuid guid)
+{
+    _allowedLooters.erase(guid);
 }

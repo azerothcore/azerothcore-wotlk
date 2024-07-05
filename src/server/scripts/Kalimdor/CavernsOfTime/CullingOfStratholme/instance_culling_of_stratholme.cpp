@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
@@ -38,6 +39,7 @@ public:
         instance_culling_of_stratholme_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
         {
             // Instance
+            SetHeaders(DataHeader);
             _crateCount = 0;
             _showCrateTimer = 0;
             _guardianTimer = 0;
@@ -223,7 +225,7 @@ public:
                     if (!arthas->IsAlive())
                     {
                         EnsureGridLoaded();
-                        arthas->setDeathState(DEAD);
+                        arthas->setDeathState(DeathState::Dead);
                         arthas->Respawn();
                     }
                     else

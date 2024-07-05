@@ -15,17 +15,22 @@ jobs:
       fail-fast: false
       matrix:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
-        os: [ubuntu-20.04]
+        os: [ubuntu-24.04]
         compiler: [clang]
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler }}
     env:
       COMPILER: ${{ matrix.compiler }}
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+    if: |
+      github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
+      && (
+        contains(github.event.pull_request.labels.*.name, 'run-build')
+        || github.event.label.name == 'run-build'
+      )
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         env:
           cache-name: cache-tools
         with:

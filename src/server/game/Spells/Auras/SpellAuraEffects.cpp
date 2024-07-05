@@ -22,7 +22,6 @@
 #include "Common.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
-#include "InstanceScript.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -39,7 +38,7 @@
 #include "Vehicle.h"
 #include "WorldPacket.h"
 
-// TODO: this import is not necessary for compilation and marked as unused by the IDE
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
@@ -55,7 +54,7 @@ class Aura;
 // AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK set - aura is recalculated or is just applied/removed - need to redo all things related to m_amount
 // AURA_EFFECT_HANDLE_CHANGE_AMOUNT_SEND_FOR_CLIENT_MASK - logical or of above conditions
 // AURA_EFFECT_HANDLE_STAT - set when stats are reapplied
-// such checks will Speedup trinity change amount/send for client operations
+// such checks will Speedup azerothcore change amount/send for client operations
 // because for change amount operation packets will not be send
 // aura effect handlers shouldn't contain any AuraEffect or Aura object modifications
 
@@ -365,7 +364,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNoImmediateEffect,                         //301 SPELL_AURA_SCHOOL_HEAL_ABSORB implemented in Unit::CalcHealAbsorb
     &AuraEffect::HandleNULL,                                      //302 0 spells in 3.3.5
     &AuraEffect::HandleNoImmediateEffect,                         //303 SPELL_AURA_MOD_DAMAGE_DONE_VERSUS_AURASTATE implemented in Unit::SpellDamageBonus, Unit::MeleeDamageBonus
-    &AuraEffect::HandleAuraModFakeInebriation,                    //304 SPELL_AURA_MOD_DRUNK
+    &AuraEffect::HandleAuraModFakeInebriation,                    //304 SPELL_AURA_MOD_FAKE_INEBRIATE
     &AuraEffect::HandleAuraModIncreaseSpeed,                      //305 SPELL_AURA_MOD_MINIMUM_SPEED
     &AuraEffect::HandleNULL,                                      //306 0 spells in 3.3.5
     &AuraEffect::HandleNULL,                                      //307 0 spells in 3.3.5
@@ -382,15 +381,15 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
 
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* caster):
     m_base(base), m_spellInfo(base->GetSpellInfo()),
-    m_baseAmount(baseAmount ? * baseAmount : m_spellInfo->Effects[effIndex].BasePoints), m_critChance(0),
-    m_oldAmount(0), m_isAuraEnabled(true), m_channelData(nullptr), m_spellmod(nullptr), m_periodicTimer(0), m_tickNumber(0), m_effIndex(effIndex),
+    m_baseAmount(baseAmount ? * baseAmount : m_spellInfo->Effects[effIndex].BasePoints), m_dieSides(m_spellInfo->Effects[effIndex].DieSides),
+    m_critChance(0), m_oldAmount(0), m_isAuraEnabled(true), m_channelData(nullptr), m_spellmod(nullptr), m_periodicTimer(0), m_tickNumber(0), m_effIndex(effIndex),
     m_canBeRecalculated(true), m_isPeriodic(false)
 {
     CalculatePeriodic(caster, true, false);
     CalculatePeriodicData();
 
     m_amount = CalculateAmount(caster);
-    m_casterLevel = caster ? caster->getLevel() : 0;
+    m_casterLevel = caster ? caster->GetLevel() : 0;
     m_applyResilience = caster && caster->CanApplyResilience();
     m_auraGroup = sSpellMgr->GetSpellGroup(GetId());
 
@@ -529,8 +528,14 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
                 Item* item1 = caster->ToPlayer()->GetWeaponForAttack(BASE_ATTACK);
                 Item* item2 = caster->ToPlayer()->GetWeaponForAttack(OFF_ATTACK);
 
-                if (item1 && item2 && (item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON || item2->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
+                if (!item2)
+                    item2 = caster->ToPlayer()->GetShield();
+
+                if (item1 && item2
+                    && (item1->GetTemplate()->InventoryType == INVTYPE_2HWEAPON || item2->GetTemplate()->InventoryType == INVTYPE_2HWEAPON))
+                {
                     amount = -10;
+                }
                 else
                     amount = 0;
             }
@@ -595,7 +600,7 @@ void AuraEffect::CalculatePeriodic(Unit* caster, bool create, bool load)
             // 3 spells have no amplitude set
             if (!m_amplitude)
                 m_amplitude = 1 * IN_MILLISECONDS;
-            [[fallthrough]]; // TODO: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
+            [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
         case SPELL_AURA_PERIODIC_DAMAGE:
         case SPELL_AURA_PERIODIC_HEAL:
         case SPELL_AURA_OBS_MOD_HEALTH:
@@ -1101,6 +1106,20 @@ void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
 
     Unit* target = aurApp->GetTarget();
 
+    // Update serverside orientation of tracking channeled auras on periodic update ticks
+    // exclude players because can turn during channeling and shouldn't desync orientation client/server
+    if (caster && !caster->IsPlayer() && m_spellInfo->IsChanneled() && m_spellInfo->HasAttribute(SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL))
+    {
+        ObjectGuid const channelGuid = caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT);
+        if (!channelGuid.IsEmpty() && channelGuid != caster->GetGUID())
+        {
+            if (WorldObject const* objectTarget = ObjectAccessor::GetWorldObject(*caster, channelGuid))
+            {
+                caster->SetInFront(objectTarget);
+            }
+        }
+    }
+
     switch (GetAuraType())
     {
         case SPELL_AURA_PERIODIC_DUMMY:
@@ -1190,7 +1209,7 @@ void AuraEffect::CleanupTriggeredSpells(Unit* target)
         return;
 
     // needed for spell 43680, maybe others
-    // TODO: is there a spell flag, which can solve this in a more sophisticated way?
+    /// @todo: is there a spell flag, which can solve this in a more sophisticated way?
     if (m_spellInfo->Effects[GetEffIndex()].ApplyAuraName == SPELL_AURA_PERIODIC_TRIGGER_SPELL &&
             uint32(m_spellInfo->GetDuration()) == m_spellInfo->Effects[GetEffIndex()].Amplitude)
         return;
@@ -1742,7 +1761,7 @@ void AuraEffect::HandleSpiritOfRedemption(AuraApplication const* aurApp, uint8 m
     // die at aura end
     else if (target->IsAlive())
         // call functions which may have additional effects after chainging state of unit
-        target->setDeathState(JUST_DIED);
+        target->setDeathState(DeathState::JustDied);
 
     // xinef: damage immunity spell, not needed because of 93 aura (adds non_attackable state)
     // xinef: probably blizzard added it just in case in wotlk (id > 46000)
@@ -1992,7 +2011,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         if (modelid > 0)
         {
             bool allow = true;
-            if (target->getTransForm())
+            if (target->getTransForm() && !(target->GetMapId() == 560 /*The Escape From Durnholde*/))
                 if (SpellInfo const* transformSpellInfo = sSpellMgr->GetSpellInfo(target->getTransForm()))
                     if (transformSpellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) || !transformSpellInfo->IsPositive())
                         allow = false;
@@ -2008,7 +2027,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         if (!target->HasAuraType(SPELL_AURA_MOD_SHAPESHIFT))
         {
             target->SetShapeshiftForm(FORM_NONE);
-            if (target->getClass() == CLASS_DRUID)
+            if (target->IsClass(CLASS_DRUID, CLASS_CONTEXT_ABILITY))
             {
                 target->setPowerType(POWER_MANA);
                 // Remove movement impairing effects also when shifting out
@@ -2087,7 +2106,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
     if (target->GetTypeId() == TYPEID_PLAYER)
         target->ToPlayer()->InitDataForForm();
 
-    if (target->getClass() == CLASS_DRUID)
+    if (target->IsClass(CLASS_DRUID, CLASS_CONTEXT_ABILITY))
     {
         // Dash
         if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_AURA_MOD_INCREASE_SPEED, SPELLFAMILY_DRUID, 0, 0, 0x8))
@@ -2103,6 +2122,19 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                 target->ToPlayer()->_ApplyWeaponDamage(EQUIPMENT_SLOT_MAINHAND, pItem->GetTemplate(), nullptr, apply);
             }
         }
+
+        // Update crit chance for feral forms
+        switch (form)
+        {
+            case FORM_CAT:
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+            case FORM_GHOSTWOLF:
+                target->ToPlayer()->UpdateAllCritPercentages();
+                break;
+            default:
+                break;
+        }
     }
 
     // stop handling the effect if it was removed by linked event
@@ -2111,7 +2143,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
 
     if (target->GetTypeId() == TYPEID_PLAYER)
     {
-        SpellShapeshiftEntry const* shapeInfo = sSpellShapeshiftStore.LookupEntry(form);
+        SpellShapeshiftFormEntry const* shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
         // Learn spells for shapeshift form - no need to send action bars or add spells to spellbook
         for (uint8 i = 0; i < MAX_SHAPESHIFT_SPELLS; ++i)
         {
@@ -2263,6 +2295,392 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                     case 65495:
                         target->SetDisplayId(target->getGender() == GENDER_MALE ? 29203 : 29204);
                         break;
+                    // Gossip NPC Appearance - Brewfest
+                    case 65511:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21839 : 21838);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21841 : 21840);
+                                    break;
+                                case DisplayRace::Orc:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21867 : 21866);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21869 : 21868);
+                                    break;
+                                case DisplayRace::Troll:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21875 : 21874);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21877 : 21876);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21869 : 21871);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21872 : 21873);
+                                    break;
+                                case DisplayRace::Undead:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21879 : 21878);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21881 : 21880);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21844 : 21842);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21845 : 21843);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21846 : 21848);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21847 : 21849);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21851 : 21850);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21853 : 21852);
+                                    break;
+                                case DisplayRace::Human:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21859 : 21858);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21861 : 21860);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21863 : 21862);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21865 : 21864);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    if (urand(0, 1))
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21854 : 21856);
+                                    else
+                                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 21855 : 21857);
+                                    break;
+                                default:
+                                    break;
+                            }
+
+                            // equip random brewfest mug
+                            uint32 itemIds[5] = {
+                                2703,  // Monster - Item, Tankard Wooden
+                                2704,  // Monster - Item, Tankard Dirty
+                                2705,  // Monster - Item, Tankard Metal
+                                13861, // Monster - Item, Tankard Gold
+                                33963  // NPC Equip 33963
+                            };
+                            if (target->ToCreature())
+                                target->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, itemIds[urand(0, 4)]);
+
+                            break;
+                        }
+                    // Gossip NPC Appearance - Winter Veil
+                    case 65522:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18793 : 18785);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18805 : 18804);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18809 : 18808);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18807 : 18806);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18811 : 18810);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18795 : 18794);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18797 : 18796);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18799 : 18798);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18801 : 18800);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18803 : 18802);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19342 : 19339);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Default
+                    case 65523:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19170 : 19169);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19182 : 19181);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19186 : 19185);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19184 : 19183);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19188 : 19187);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19172 : 19171);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19174 : 19173);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19176 : 19175);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19178 : 19177);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19180 : 19179);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 19343 : 19340);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Lunar Festival
+                    case 65524:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18841 : 18840);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18870 : 18869);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18874 : 18873);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18872 : 18871);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18876 : 18875);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18843 : 18842);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18845 : 18844);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18847 : 18846);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18860 : 18858);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 18868 : 18867);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 21067 : 19341);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Hallow's End
+                    case 65525:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22361 : 22360);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22375 : 22374);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22379 : 22378);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22377 : 22376);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22381 : 22380);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22363 : 22362);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22365 : 22364);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22367 : 22366);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22371 : 22370);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22373 : 22372);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 22369 : 22368);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Midsummer
+                    case 65526:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 21086 : 21085);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16438 : 16436);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16446 : 16445);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16432 : 16442);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16444 : 16443);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 21083 : 21084);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16413 : 16434);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16448 : 16447);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16433 : 16412);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 16435 : 16414);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 29243 : 16431);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Spirit of Competition
+                    case 65527:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24508 : 24519);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24515 : 24526);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24517 : 24528);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24516 : 24527);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24518 : 24529);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24509 : 24520);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24510 : 24521);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24511 : 24522);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24513 : 24524);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24514 : 24525);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 24512 : 24523);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Pirates' Day
+                    case 65528:
+                        {
+                            switch (target->GetDisplayRace())
+                            {
+                                case DisplayRace::BloodElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25032 : 25043);
+                                    break;
+                                case DisplayRace::Orc:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25039 : 25050);
+                                    break;
+                                case DisplayRace::Troll:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25041 : 25052);
+                                    break;
+                                case DisplayRace::Tauren:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25040 : 25051);
+                                    break;
+                                case DisplayRace::Undead:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25042 : 25053);
+                                    break;
+                                case DisplayRace::Draenei:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25033 : 25044);
+                                    break;
+                                case DisplayRace::Dwarf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25034 : 25045);
+                                    break;
+                                case DisplayRace::Gnome:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25035 : 25046);
+                                    break;
+                                case DisplayRace::Human:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25037 : 25048);
+                                    break;
+                                case DisplayRace::NightElf:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25038 : 25049);
+                                    break;
+                                case DisplayRace::Goblin:
+                                    target->SetDisplayId(target->getGender() == GENDER_MALE ? 25036 : 25047);
+                                default:
+                                    break;
+                            }
+                            break;
+                        }
+                    // Gossip NPC Appearance - Day of the Dead(DotD)
+                    case 65529:
+                        target->SetDisplayId(target->getGender() == GENDER_MALE ? 29203 : 29204);
+                        break;
                     // Darkspear Pride
                     case 75532:
                         target->SetDisplayId(target->getGender() == GENDER_MALE ? 31737 : 31738);
@@ -2287,7 +2705,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                 {
                     uint32 model_id = 0;
 
-                    if (uint32 modelid = ci->GetRandomValidModelId())
+                    if (uint32 modelid = ObjectMgr::ChooseDisplayId(ci)->CreatureDisplayID)
                         model_id = modelid;                     // Will use the default model here
 
                     // Polymorph (sheep)
@@ -2339,26 +2757,22 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                 uint32 cr_id = target->GetAuraEffectsByType(SPELL_AURA_MOUNTED).front()->GetMiscValue();
                 if (CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(cr_id))
                 {
-                    uint32 displayID = ObjectMgr::ChooseDisplayId(ci);
-                    sObjectMgr->GetCreatureModelRandomGender(&displayID);
+                    CreatureModel model = *ObjectMgr::ChooseDisplayId(ci);
+                    sObjectMgr->GetCreatureModelRandomGender(&model, ci);
 
-                    target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, displayID);
+                    target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, model.CreatureDisplayID);
                 }
             }
         }
     }
 }
 
-void AuraEffect::HandleAuraModScale(AuraApplication const* aurApp, uint8 mode, bool apply) const
+void AuraEffect::HandleAuraModScale(AuraApplication const* aurApp, uint8 mode, bool /*apply*/) const
 {
     if (!(mode & AURA_EFFECT_HANDLE_CHANGE_AMOUNT_SEND_FOR_CLIENT_MASK))
         return;
 
-    Unit* target = aurApp->GetTarget();
-
-    float scale = target->GetObjectScale();
-    ApplyPercentModFloatVar(scale, float(GetAmount()), apply);
-    target->SetObjectScale(scale);
+    aurApp->GetTarget()->RecalculateObjectScale();
 }
 
 void AuraEffect::HandleAuraCloneCaster(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -2858,15 +3272,9 @@ void AuraEffect::HandleAuraMounted(AuraApplication const* aurApp, uint8 mode, bo
 
         if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
         {
-            if (GetMiscValueB() > 0) // Choose proper modelid
-            {
-                displayId = GetMiscValueB() == 2 && creatureInfo->Modelid2 > 0 ? creatureInfo->Modelid2 : creatureInfo->Modelid1;
-            }
-            else // Should we choose random modelid in this case?
-            {
-                displayId = ObjectMgr::ChooseDisplayId(creatureInfo);
-            }
-            sObjectMgr->GetCreatureModelRandomGender(&displayId);
+            CreatureModel model = *ObjectMgr::ChooseDisplayId(creatureInfo);
+            sObjectMgr->GetCreatureModelRandomGender(&model, creatureInfo);
+            displayId = model.CreatureDisplayID;
 
             vehicleId = creatureInfo->VehicleId;
 
@@ -3087,7 +3495,7 @@ void AuraEffect::HandleModFear(AuraApplication const* aurApp, uint8 mode, bool a
 
     Unit* target = aurApp->GetTarget();
 
-    target->SetControlled(apply, UNIT_STATE_FLEEING);
+    target->SetControlled(apply, UNIT_STATE_FLEEING, GetCaster(), true);
 }
 
 void AuraEffect::HandleAuraModStun(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -3119,7 +3527,7 @@ void AuraEffect::HandlePreventFleeing(AuraApplication const* aurApp, uint8 mode,
     // Since patch 3.0.2 this mechanic no longer affects fear effects. It will ONLY prevent humanoids from fleeing due to low health.
     if (target->GetTypeId() == TYPEID_PLAYER || !apply || target->HasAuraType(SPELL_AURA_MOD_FEAR))
         return;
-    /// TODO: find a way to cancel fleeing for assistance.
+    /// @todo: find a way to cancel fleeing for assistance.
     /// Currently this will only stop creatures fleeing due to low health that could not find nearby allies to flee towards.
     target->SetControlled(false, UNIT_STATE_FLEEING);
 }
@@ -3698,12 +4106,6 @@ void AuraEffect::HandleModStateImmunityMask(AuraApplication const* aurApp, uint8
     // Patch 3.0.3 Bladestorm now breaks all snares and roots on the warrior when activated.
     if (GetId() == 46924)
     {
-        if (apply)
-        {
-            target->resetAttackTimer();
-            target->resetAttackTimer(OFF_ATTACK);
-        }
-
         // Knockback and hex
         target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, apply);
     }
@@ -3731,6 +4133,8 @@ void AuraEffect::HandleModMechanicImmunity(AuraApplication const* aurApp, uint8 
             break;
         case 34471: // The Beast Within
         case 19574: // Bestial Wrath
+        case 38484: // Bestial Wrath
+        case 40081: // Free friend (Black Temple)
             mechanic = IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK;
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_CHARM, apply);
             target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, MECHANIC_DISORIENTED, apply);
@@ -3855,7 +4259,7 @@ void AuraEffect::HandleAuraModSchoolImmunity(AuraApplication const* aurApp, uint
             && GetSpellInfo()->HasAttribute(SPELL_ATTR2_FAIL_ON_ALL_TARGETS_IMMUNE))
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
 
-    // TODO: optimalize this cycle - use RemoveAurasWithInterruptFlags call or something else
+    /// @todo: optimalize this cycle - use RemoveAurasWithInterruptFlags call or something else
     if ((apply)
             && GetSpellInfo()->HasAttribute(SPELL_ATTR1_IMMUNITY_PURGES_EFFECT)
             && GetSpellInfo()->IsPositive())                       //Only positive immunity removes auras
@@ -5034,11 +5438,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     if (caster && target->CanHaveThreatList())
                         target->AddThreat(caster, 10.0f);
                     break;
-                case 13139:                                     // net-o-matic
-                    // root to self part of (root_target->charge->root_self sequence
-                    if (caster)
-                        caster->CastSpell(caster, 13138, true, nullptr, this);
-                    break;
                 case 34026:   // kill command
                     {
                         Unit* pet = target->GetGuardianPet();
@@ -5382,10 +5781,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
 
                             if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
                             {
-                                uint32 displayID = ObjectMgr::ChooseDisplayId(creatureInfo);
-                                sObjectMgr->GetCreatureModelRandomGender(&displayID);
+                                CreatureModel model = *ObjectMgr::ChooseDisplayId(creatureInfo);
+                                sObjectMgr->GetCreatureModelRandomGender(&model, creatureInfo);
 
-                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, displayID);
+                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, model.CreatureDisplayID);
                             }
                         }
                         break;
@@ -5412,10 +5811,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
 
                             if (CreatureTemplate const* creatureInfo = sObjectMgr->GetCreatureTemplate(creatureEntry))
                             {
-                                uint32 displayID = ObjectMgr::ChooseDisplayId(creatureInfo);
-                                sObjectMgr->GetCreatureModelRandomGender(&displayID);
+                                CreatureModel model = *ObjectMgr::ChooseDisplayId(creatureInfo);
+                                sObjectMgr->GetCreatureModelRandomGender(&model, creatureInfo);
 
-                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, displayID);
+                                target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, model.CreatureDisplayID);
                             }
                         }
                         break;
@@ -5628,7 +6027,7 @@ void AuraEffect::HandleAuraConvertRune(AuraApplication const* aurApp, uint8 mode
 
     Player* player = target->ToPlayer();
 
-    if (player->getClass() != CLASS_DEATH_KNIGHT)
+    if (!player->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
         return;
 
     uint32 runes = m_amount;
@@ -5709,40 +6108,12 @@ void AuraEffect::HandleAuraModFakeInebriation(AuraApplication const* aurApp, uin
     if (!(mode & AURA_EFFECT_HANDLE_CHANGE_AMOUNT_MASK))
         return;
 
-    Unit* target = aurApp->GetTarget();
+    Player* target = aurApp->GetTarget()->ToPlayer();
+    if (!target)
+        return;
 
-    if (apply)
-    {
-        target->m_invisibilityDetect.AddFlag(INVISIBILITY_DRUNK);
-        target->m_invisibilityDetect.AddValue(INVISIBILITY_DRUNK, GetAmount());
-
-        if (target->GetTypeId() == TYPEID_PLAYER)
-        {
-            int32 oldval = target->ToPlayer()->GetInt32Value(PLAYER_FAKE_INEBRIATION);
-            target->ToPlayer()->SetInt32Value(PLAYER_FAKE_INEBRIATION, oldval + GetAmount());
-        }
-    }
-    else
-    {
-        bool removeDetect = !target->HasAuraType(SPELL_AURA_MOD_FAKE_INEBRIATE);
-
-        target->m_invisibilityDetect.AddValue(INVISIBILITY_DRUNK, -GetAmount());
-
-        if (target->GetTypeId() == TYPEID_PLAYER)
-        {
-            int32 oldval = target->ToPlayer()->GetInt32Value(PLAYER_FAKE_INEBRIATION);
-            target->ToPlayer()->SetInt32Value(PLAYER_FAKE_INEBRIATION, oldval - GetAmount());
-
-            if (removeDetect)
-                removeDetect = !target->ToPlayer()->GetDrunkValue();
-        }
-
-        if (removeDetect)
-            target->m_invisibilityDetect.DelFlag(INVISIBILITY_DRUNK);
-    }
-
-    // call functions which may have additional effects after chainging state of unit
-    target->UpdateObjectVisibility(false);
+    target->ApplyModInt32Value(PLAYER_FAKE_INEBRIATION, GetAmount(), apply);
+    target->UpdateInvisibilityDrunkDetect();
 }
 
 void AuraEffect::HandleAuraOverrideSpells(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -5834,7 +6205,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                         {
                             // Converts up to 10 rage per second into health for $d.  Each point of rage is converted into ${$m2/10}.1% of max health.
                             // Should be manauser
-                            if (target->getPowerType() != POWER_RAGE)
+                            if (!target->HasActivePowerType(POWER_RAGE))
                                 break;
                             uint32 rage = target->GetPower(POWER_RAGE);
                             // Nothing todo
@@ -5900,7 +6271,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             {
                 if (target->GetTypeId() != TYPEID_PLAYER)
                     return;
-                if (target->ToPlayer()->getClass() != CLASS_DEATH_KNIGHT)
+                if (!target->ToPlayer()->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
                     return;
 
                 // timer expired - remove death runes
@@ -6015,36 +6386,12 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             triggerSpellId = 30571;
                             break;
                         // Doom
-                        // TODO: effect trigger spell may be independant on spell targets, and executed in spell finish phase
+                        /// @todo: effect trigger spell may be independant on spell targets, and executed in spell finish phase
                         // so instakill will be naturally done before trigger spell
                         case 31347:
                             {
                                 target->CastSpell(target, 31350, true, nullptr, this);
                                 Unit::Kill(target, target);
-                                return;
-                            }
-                        // Spellcloth
-                        case 31373:
-                            {
-                                // Summon Elemental after create item
-                                target->SummonCreature(17870, 0, 0, 0, target->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 0);
-                                return;
-                            }
-                        // Eye of Grillok
-                        case 38495:
-                            triggerSpellId = 38530;
-                            break;
-                        // Absorb Eye of Grillok (Zezzak's Shard)
-                        case 38554:
-                            {
-                                if (!caster || target->GetTypeId() != TYPEID_UNIT)
-                                    return;
-
-                                caster->CastSpell(caster, 38495, true, nullptr, this);
-
-                                Creature* creatureTarget = target->ToCreature();
-
-                                creatureTarget->DespawnOrUnsummon();
                                 return;
                             }
                         // Tear of Azzinoth Summon Channel - it's not really supposed to do anything, and this only prevents the console spam
@@ -6125,14 +6472,6 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                     GetBase()->GetUnitOwner()->CastSpell(target, triggeredSpellInfo, true, 0, this, GetBase()->GetUnitOwner()->GetGUID());
                     return;
                 }
-            // Slime Spray - temporary here until preventing default effect works again
-            // added on 9.10.2010
-            case 69508:
-                {
-                    if (caster)
-                        caster->CastSpell(target, triggerSpellId, true, nullptr, nullptr, caster->GetGUID());
-                    return;
-                }
             // Trial of the Crusader, Jaraxxus, Spinning Pain Spike
             case 66283:
                 {
@@ -6181,7 +6520,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             case 56654:
             case 58882:
                 int32 amount = int32(target->GetMaxPower(POWER_MANA) * GetAmount() / 100.0f);
-                target->CastCustomSpell(target, triggerSpellId, &amount, nullptr, nullptr, true);
+                target->CastCustomSpell(target, triggerSpellId, &amount, nullptr, nullptr, true, nullptr, this);
                 return;
         }
     }
@@ -6297,8 +6636,20 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     // ignore non positive values (can be result apply spellmods to aura damage
     uint32 damage = std::max(GetAmount(), 0);
 
+    // If the damage is percent-max-health based, calculate damage before the Modify hook
+    if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE_PERCENT)
+    {
+        // xinef: ceil obtained value, it may happen that 10 ticks for 10% damage may not kill owner
+        damage = uint32(std::ceil(CalculatePct<float, float>(target->GetMaxHealth(), damage)));
+    }
+
     // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
-    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage);
+    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage, GetSpellInfo());
+
+    if (target->GetAI())
+    {
+        target->GetAI()->OnCalculatePeriodicTickReceived(damage, caster);
+    }
 
     if (GetAuraType() == SPELL_AURA_PERIODIC_DAMAGE)
     {
@@ -6328,8 +6679,6 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
             // 5..8 ticks have normal tick damage
         }
     }
-    else // xinef: ceil obtained value, it may happen that 10 ticks for 10% damage may not kill owner
-        damage = uint32(std::ceil(CalculatePct<float, float>(target->GetMaxHealth(), damage)));
 
     // calculate crit chance
     bool crit = false;
@@ -6410,7 +6759,12 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     uint32 damage = std::max(GetAmount(), 0);
 
     // Script Hook For HandlePeriodicHealthLeechAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
-    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage);
+    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, damage, GetSpellInfo());
+
+    if (target->GetAI())
+    {
+        target->GetAI()->OnCalculatePeriodicTickReceived(damage, caster);
+    }
 
     if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
         damage = caster->SpellDamageBonusDone(target, GetSpellInfo(), damage, DOT, GetEffIndex(), 0.0f, GetBase()->GetStackAmount());
@@ -6618,14 +6972,20 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     uint32 heal = uint32(damage);
 
     // Script Hook For HandlePeriodicDamageAurasTick -- Allow scripts to change the Damage pre class mitigation calculations
-    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, heal);
+    sScriptMgr->ModifyPeriodicDamageAurasTick(target, caster, heal, GetSpellInfo());
     sScriptMgr->ModifyHealReceived(target, caster, heal, GetSpellInfo());
+
+    if (target->GetAI())
+    {
+        target->GetAI()->OnCalculatePeriodicTickReceived(heal, caster);
+    }
 
     HealInfo healInfo(caster, target, heal, GetSpellInfo(), GetSpellInfo()->GetSchoolMask());
     Unit::CalcHealAbsorb(healInfo);
     int32 gain = Unit::DealHeal(caster, target, healInfo.GetHeal());
+    healInfo.SetEffectiveHeal(gain);
 
-    SpellPeriodicAuraLogInfo pInfo(this, healInfo.GetHeal(), healInfo.GetHeal() - gain, healInfo.GetAbsorb(), 0, 0.0f, crit);
+    SpellPeriodicAuraLogInfo pInfo(this, healInfo.GetHeal(), healInfo.GetHeal() - healInfo.GetEffectiveHeal(), healInfo.GetAbsorb(), 0, 0.0f, crit);
     target->SendPeriodicAuraLog(&pInfo);
 
     if (caster)
@@ -6666,7 +7026,7 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
 {
     Powers PowerType = Powers(GetMiscValue());
 
-    if (!caster || !caster->IsAlive() || !target->IsAlive() || target->getPowerType() != PowerType)
+    if (!caster || !caster->IsAlive() || !target->IsAlive() || !target->HasActivePowerType(PowerType))
         return;
 
     if (target->HasUnitState(UNIT_STATE_ISOLATED) || target->IsImmunedToDamageOrSchool(GetSpellInfo()))
@@ -6773,7 +7133,7 @@ void AuraEffect::HandlePeriodicEnergizeAuraTick(Unit* target, Unit* caster) cons
 {
     Powers PowerType = Powers(GetMiscValue());
 
-    if (target->GetTypeId() == TYPEID_PLAYER && target->getPowerType() != PowerType && !m_spellInfo->HasAttribute(SPELL_ATTR7_ONLY_IN_SPELLBOOK_UNTIL_LEARNED))
+    if (target->GetTypeId() == TYPEID_PLAYER && !target->HasActivePowerType(PowerType) && !m_spellInfo->HasAttribute(SPELL_ATTR7_ONLY_IN_SPELLBOOK_UNTIL_LEARNED))
         return;
 
     if (!target->IsAlive() || !target->GetMaxPower(PowerType))
@@ -6807,7 +7167,7 @@ void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) con
 {
     Powers PowerType = Powers(GetMiscValue());
 
-    if (!caster || !target->IsAlive() || target->getPowerType() != PowerType)
+    if (!caster || !target->IsAlive() || !target->HasActivePowerType(PowerType))
         return;
 
     if (target->HasUnitState(UNIT_STATE_ISOLATED) || target->IsImmunedToDamageOrSchool(GetSpellInfo()))

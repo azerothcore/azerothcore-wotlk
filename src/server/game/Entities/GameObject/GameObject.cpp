@@ -335,21 +335,22 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
 
     if (IsInstanceGameobject())
     {
-        switch (GetStateSavedOnInstance())
+        if (InstanceScript* instance = GetInstanceScript())
         {
-            case 0:
-                SetGoState(GO_STATE_READY);
-                SwitchDoorOrButton(true);
-                break;
-            case 1:
-                SetGoState(GO_STATE_READY);
-                break;
-            case 2:
-                SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-                break;
-            default:
-                SetGoState(go_state);
-                break;
+            switch (uint8 state = instance->GetStoredGameObjectState(GetSpawnId()))
+            {
+                case 0:
+                    SetGoState(GO_STATE_READY);
+                    SwitchDoorOrButton(true);
+                    break;
+                case 1:
+                case 2:
+                    SetGoState((GOState)state);
+                    break;
+                default:
+                    SetGoState(go_state);
+                    break;
+            }
         }
     }
     else
@@ -405,7 +406,7 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         }
     }
 
-    LastUsedScriptID = GetGOInfo()->ScriptId;
+    LastUsedScriptID = GetScriptId();
     AIM_Initialize();
 
     if (uint32 linkedEntry = GetGOInfo()->GetLinkedGameObjectEntry())
@@ -511,7 +512,7 @@ void GameObject::Update(uint32 diff)
                                     UpdateData udata;
                                     WorldPacket packet;
                                     BuildValuesUpdateBlockForPlayer(&udata, caster->ToPlayer());
-                                    udata.BuildPacket(&packet);
+                                    udata.BuildPacket(packet);
                                     caster->ToPlayer()->GetSession()->SendPacket(&packet);
 
                                     SendCustomAnim(GetGoAnimProgress());
@@ -1040,7 +1041,7 @@ void GameObject::SaveToDB(bool saveAddon /*= false*/)
 {
     // this should only be used when the gameobject has already been loaded
     // preferably after adding to map, because mapid may not be valid otherwise
-    GameObjectData const* data = sObjectMgr->GetGOData(m_spawnId);
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(m_spawnId);
     if (!data)
     {
         LOG_ERROR("entities.gameobject", "GameObject::SaveToDB failed, cannot get gameobject data!");
@@ -1119,7 +1120,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
 
 bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap)
 {
-    GameObjectData const* data = sObjectMgr->GetGOData(spawnId);
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
 
     if (!data)
     {
@@ -1139,6 +1140,7 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
     GOState go_state = data->go_state;
     uint32 artKit = data->artKit;
 
+    m_goData = data;
     m_spawnId = spawnId;
 
     if (!Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
@@ -1173,8 +1175,6 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
         m_respawnDelayTime = -data->spawntimesecs;
         m_respawnTime = 0;
     }
-
-    m_goData = data;
 
     if (addToMap && !GetMap()->AddToMap(this))
         return false;
@@ -1343,7 +1343,7 @@ bool GameObject::ActivateToQuest(Player* target) const
         case GAMEOBJECT_TYPE_CHEST:
             {
                 // scan GO chest with loot including quest items
-                if (LootTemplates_Gameobject.HaveQuestLootForPlayer(GetGOInfo()->GetLootId(), target))
+                if (target->GetQuestStatus(GetGOInfo()->chest.questId) == QUEST_STATUS_INCOMPLETE || LootTemplates_Gameobject.HaveQuestLootForPlayer(GetGOInfo()->GetLootId(), target))
                 {
                     //TODO: fix this hack
                     //look for battlegroundAV for some objects which are only activated after mine gots captured by own team
@@ -1441,7 +1441,7 @@ void GameObject::UseDoorOrButton(uint32 time_to_restore, bool alternative /* = f
 void GameObject::SetGoArtKit(uint8 kit)
 {
     SetByteValue(GAMEOBJECT_BYTES_1, 2, kit);
-    GameObjectData* data = const_cast<GameObjectData*>(sObjectMgr->GetGOData(m_spawnId));
+    GameObjectData* data = const_cast<GameObjectData*>(sObjectMgr->GetGameObjectData(m_spawnId));
     if (data)
         data->artKit = kit;
 }
@@ -1452,10 +1452,10 @@ void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType l
     if (go)
     {
         go->SetGoArtKit(artkit);
-        data = go->GetGOData();
+        data = go->GetGameObjectData();
     }
     else if (lowguid)
-        data = sObjectMgr->GetGOData(lowguid);
+        data = sObjectMgr->GetGameObjectData(lowguid);
 
     if (data)
         const_cast<GameObjectData*>(data)->artKit = artkit;
@@ -1484,7 +1484,6 @@ void GameObject::Use(Unit* user)
     Unit* spellCaster = user;
     uint32 spellId = 0;
     bool triggered = false;
-    bool tmpfish = false;
 
     if (Player* playerUser = user->ToPlayer())
     {
@@ -1707,7 +1706,6 @@ void GameObject::Use(Unit* user)
                 // cast this spell later if provided
                 spellId = info->goober.spellId;
                 spellCaster = user;
-                tmpfish = true;
 
                 break;
             }
@@ -1726,7 +1724,10 @@ void GameObject::Use(Unit* user)
                     player->SendCinematicStart(info->camera.cinematicId);
 
                 if (info->camera.eventID)
+                {
                     GetMap()->ScriptsStart(sEventScripts, info->camera.eventID, player, this);
+                    EventInform(info->camera.eventID);
+                }
 
                 return;
             }
@@ -1796,8 +1797,6 @@ void GameObject::Use(Unit* user)
                             }
                             else // else: junk
                                 player->SendLoot(GetGUID(), LOOT_FISHING_JUNK);
-
-                            tmpfish = true;
                             break;
                         }
                     case GO_JUST_DEACTIVATED:                   // nothing to do, will be deleted at next update
@@ -1811,11 +1810,7 @@ void GameObject::Use(Unit* user)
                             break;
                         }
                 }
-
-                if(tmpfish)
-                    player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
-                else
-                    player->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+                player->FinishSpell(CURRENT_CHANNELED_SPELL, true);
                 return;
             }
 
@@ -1916,10 +1911,10 @@ void GameObject::Use(Unit* user)
                     return;
 
                 //required lvl checks!
-                uint8 level = player->getLevel();
+                uint8 level = player->GetLevel();
                 if (level < info->meetingstone.minLevel)
                     return;
-                level = targetPlayer->getLevel();
+                level = targetPlayer->GetLevel();
                 if (level < info->meetingstone.minLevel)
                     return;
 
@@ -2107,7 +2102,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
 
     if (Unit* owner = GetOwner())
     {
-        trigger->SetLevel(owner->getLevel(), false);
+        trigger->SetLevel(owner->GetLevel(), false);
         trigger->SetFaction(owner->GetFaction());
         // needed for GO casts for proper target validation checks
         trigger->SetOwnerGUID(owner->GetGUID());
@@ -2201,7 +2196,7 @@ void GameObject::EventInform(uint32 eventId)
 
 uint32 GameObject::GetScriptId() const
 {
-    if (GameObjectData const* gameObjectData = GetGOData())
+    if (GameObjectData const* gameObjectData = GetGameObjectData())
         if (uint32 scriptId = gameObjectData->ScriptId)
             return scriptId;
 
@@ -2284,7 +2279,14 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
     if (!IsDestructibleBuilding())
         return;
 
-    if (!m_goValue.Building.MaxHealth || !change)
+    // if this building doesn't have health, return
+    if (!m_goValue.Building.MaxHealth)
+        return;
+
+    sScriptMgr->OnGameObjectModifyHealth(this, attackerOrHealer, change, sSpellMgr->GetSpellInfo(spellId));
+
+    // if the health isn't being changed, return
+    if (!change)
         return;
 
     if (!m_allowModifyDestructibleBuilding)
@@ -2307,7 +2309,7 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
     Player* player = attackerOrHealer->GetCharmerOrOwnerPlayerOrPlayerItself();
 
     // dealing damage, send packet
-    // TODO: is there any packet for healing?
+    /// @todo: is there any packet for healing?
     if (player)
     {
         WorldPacket data(SMSG_DESTRUCTIBLE_BUILDING_DAMAGE, 8 + 8 + 8 + 4 + 4);
@@ -2490,7 +2492,7 @@ void GameObject::SetGoState(GOState state)
         // startOpen determines whether we are going to add or remove the LoS on activation
         /*bool startOpen = (GetGoType() == GAMEOBJECT_TYPE_DOOR || GetGoType() == GAMEOBJECT_TYPE_BUTTON ? GetGOInfo()->door.startOpen : false);
 
-        if (GetGOData() && GetGOData()->go_state == GO_STATE_READY)
+        if (GetGameObjectData() && GetGameObjectData()->go_state == GO_STATE_READY)
             startOpen = !startOpen;
 
         if (state == GO_STATE_ACTIVE || state == GO_STATE_ACTIVE_ALTERNATIVE)
@@ -2502,21 +2504,13 @@ void GameObject::SetGoState(GOState state)
      * save it's state on the database to be loaded properly
      * on server restart or crash.
      */
-    if (IsInstanceGameobject() && IsAbleToSaveOnDb())
+    if (IsInstanceGameobject() && IsAllowedToSaveToDB())
     {
-        // Save the gameobject state on the Database
-        if (!FindStateSavedOnInstance())
-        {
-            SaveInstanceData(GameobjectStateToInt(&state));
-        }
-        else
-        {
-            UpdateInstanceData(GameobjectStateToInt(&state));
-        }
+        SaveStateToDB();
     }
 }
 
-bool GameObject::IsInstanceGameobject()
+bool GameObject::IsInstanceGameobject() const
 {
     // Avoid checking for unecessary gameobjects whose
     // states don't matter for the dungeon progression
@@ -2535,7 +2529,7 @@ bool GameObject::IsInstanceGameobject()
     return false;
 }
 
-bool GameObject::ValidateGameobjectType()
+bool GameObject::ValidateGameobjectType() const
 {
     switch (m_goInfo->type)
     {
@@ -2550,7 +2544,7 @@ bool GameObject::ValidateGameobjectType()
     }
 }
 
-uint8 GameObject::GameobjectStateToInt(GOState* state)
+uint8 GameObject::GameobjectStateToInt(GOState* state) const
 {
     uint8 m_state = 3;
 
@@ -2575,69 +2569,22 @@ uint8 GameObject::GameobjectStateToInt(GOState* state)
     return m_state;
 }
 
-bool GameObject::IsAbleToSaveOnDb()
-{
-    return m_saveStateOnDb;
-}
-
-void GameObject::UpdateSaveToDb(bool enable)
-{
-    m_saveStateOnDb = enable;
-
-    if (enable)
-    {
-        SavingStateOnDB();
-    }
-}
-
-void GameObject::SavingStateOnDB()
+void GameObject::SaveStateToDB()
 {
     if (IsInstanceGameobject())
     {
-        GOState param = GetGoState();
-        if (!FindStateSavedOnInstance())
+        if (InstanceScript* instance = GetInstanceScript())
         {
-            SaveInstanceData(GameobjectStateToInt(&param));
+            GOState param = GetGoState();
+            instance->StoreGameObjectState(GetSpawnId(), GameobjectStateToInt(&param));
+
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
+            stmt->SetData(0, GetInstanceId());
+            stmt->SetData(1, GetSpawnId());
+            stmt->SetData(2, GameobjectStateToInt(&param));
+            CharacterDatabase.Execute(stmt);
         }
     }
-}
-
-void GameObject::SaveInstanceData(uint8 state)
-{
-    uint32 id       = GetInstanceId();
-    uint32 guid     = GetSpawnId();
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INSERT_INSTANCE_SAVED_DATA);
-    stmt->SetData(0, id);
-    stmt->SetData(1, guid);
-    stmt->SetData(2, state);
-    CharacterDatabase.Execute(stmt);
-
-    sObjectMgr->NewInstanceSavedGameobjectState(id, guid, state);
-}
-
-void GameObject::UpdateInstanceData(uint8 state)
-{
-    uint32 id       = GetInstanceId();
-    uint32 guid     = GetSpawnId();
-
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPDATE_INSTANCE_SAVED_DATA);
-    stmt->SetData(0, state);
-    stmt->SetData(1, guid);
-    stmt->SetData(2, id);
-    CharacterDatabase.Execute(stmt);
-
-    sObjectMgr->SetInstanceSavedGameobjectState(id, guid, state);
-}
-
-uint8 GameObject::GetStateSavedOnInstance()
-{
-    return sObjectMgr->GetInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
-}
-
-bool GameObject::FindStateSavedOnInstance()
-{
-    return sObjectMgr->FindInstanceSavedGameobjectState(GetInstanceId(), GetSpawnId());
 }
 
 void GameObject::SetDisplayId(uint32 displayid)
@@ -2790,13 +2737,13 @@ GameObject* GameObject::GetLinkedTrap()
     return ObjectAccessor::GetGameObject(*this, m_linkedTrap);
 }
 
-void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) const
+void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target)
 {
     if (!target)
         return;
 
     bool forcedFlags = GetGoType() == GAMEOBJECT_TYPE_CHEST && GetGOInfo()->chest.groupLootRules && HasLootRecipient();
-    bool targetIsGM = target->IsGameMaster() && AccountMgr::IsGMAccount(target->GetSession()->GetSecurity());
+    bool targetIsGM = target->IsGameMaster() && target->GetSession()->IsGMAccount();
 
     ByteBuffer fieldBuffer;
 
@@ -2894,7 +2841,7 @@ void GameObject::GetRespawnPosition(float& x, float& y, float& z, float* ori /* 
 {
     if (m_spawnId)
     {
-        if (GameObjectData const* data = sObjectMgr->GetGOData(m_spawnId))
+        if (GameObjectData const* data = sObjectMgr->GetGameObjectData(m_spawnId))
         {
             x = data->posX;
             y = data->posY;

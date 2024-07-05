@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "culling_of_stratholme.h"
 
@@ -37,7 +37,8 @@ enum Yells
 {
     SAY_AGGRO                                   = 0,
     SAY_DEATH                                   = 1,
-    SAY_FAIL                                    = 2
+    SAY_FAIL                                    = 2,
+    SAY_THANKS                                  = 0
 };
 
 class boss_infinite_corruptor : public CreatureScript
@@ -75,7 +76,7 @@ public:
 
         void JustSummoned(Creature* cr) override { summons.Summon(cr); }
 
-        void EnterCombat(Unit* /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             me->InterruptNonMeleeSpells(false);
             events.ScheduleEvent(EVENT_SPELL_VOID_STRIKE, 8000);
@@ -98,7 +99,7 @@ public:
                     {
                         cr->DespawnOrUnsummon(5000);
                         cr->RemoveAllAuras();
-                        cr->Say("You have my thanks for saving my existence in this timeline. Now i must report back to my superiors. They must know immediately of what i just experienced.", LANG_UNIVERSAL);
+                        cr->AI()->Talk(SAY_THANKS);
                     }
                 }
             }
