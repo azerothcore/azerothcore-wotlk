@@ -14,6 +14,10 @@ glob = "**/sql/**/*.sql"
 
 repo_folder = Path("/Users/v0/Py/_hobby/wow/server")
 
+
+default_argparsed_args = ["--help"]
+# default_argparsed_args = "-y", ""  # , "--glob", "test"
+
 source_suffix = "modules"
 source_dir = lambda: repo_folder / source_suffix
 target_suffix = "data/sql/custom"
@@ -21,6 +25,7 @@ target_dir = lambda: repo_folder / target_suffix
 report_suffix = "modules_sql_parsed.csv"
 report_path = lambda: repo_folder / report_suffix
 
+modules_to_ignore = ["mod-playerbots"]
 
 counters = dict(
     written=0, skipped=0, total=0, modules=Counter()  # module: counter
@@ -141,12 +146,18 @@ def argparsed():
         ["source_suffix", "location of modules folder, appends to repo_folder"],
         ["target_suffix", "location of target folder, appends to repo_folder"],
         ["report_suffix", "location of module results, appends to repo_folder"],
+        ["modules_to_ignore", "list of modules to ignore"],
     ]
 
-    for e in globals_to_parse:
+    for e in globals_to_parse[:-1]:
         parser.add_argument(f"--{e[0]}", help=e[1])
 
-    args = parser.parse_args(args=None if sys.argv[1:] else default)
+    e = globals_to_parse[-1]
+    parser.add_argument(f"--{e[0]}", help=e[1], nargs="+")
+
+    args = parser.parse_args(
+        args=None if sys.argv[1:] else default_argparsed_args
+    )
 
     if args.option == "run":
         prompt = "This script will copy SQL files. are you sure? [y/N]\n"
