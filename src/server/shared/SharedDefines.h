@@ -527,7 +527,7 @@ enum SpellAttr3 : uint32
 // EnumUtils: DESCRIBE THIS
 enum SpellAttr4 : uint32
 {
-    SPELL_ATTR4_NO_CAST_LOG                        = 0x00000001, // TITLE Cannot be resisted
+    SPELL_ATTR4_IGNORE_ALL_RESISTANCES             = 0x00000001, // TITLE Ignores all resistances
     SPELL_ATTR4_CLASS_TRIGGER_ONLY_ON_TARGET       = 0x00000002, // TITLE Only proc on self-cast
     SPELL_ATTR4_AURA_EXPIRES_OFFLINE               = 0x00000004, // TITLE Buff expires while offline DESCRIPTION Debuffs (except Resurrection Sickness) will automatically do this
     SPELL_ATTR4_NO_HELPFUL_THREAT                  = 0x00000008, // TITLE Unknown attribute 3@Attr4

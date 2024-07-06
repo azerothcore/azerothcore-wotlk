@@ -1967,7 +1967,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 64566 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_ALL_RESISTANCES;
     });
 
     // Ulduar, Hodir, Starlight
@@ -2867,7 +2867,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 69146, 70823, 70824, 70825 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_3_YARDS); // 3yd instead of 5yd
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_ALL_RESISTANCES;
     });
 
     // Dark Martyrdom (Lady Deathwhisper)
@@ -3029,7 +3029,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Mutated Plague (Professor Putricide)
     ApplySpellFix({ 72454, 72464, 72506, 72507 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_ALL_RESISTANCES;
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_50000_YARDS); // 50000yd
     });
 
@@ -3167,7 +3167,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_CANT_CRIT;
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_ALL_RESISTANCES;
     });
 
     // Fury of Frostmourne
@@ -3427,7 +3427,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     //Blazing Aura
     ApplySpellFix({ 75885, 75886 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_ALL_RESISTANCES;
     });
 
     ApplySpellFix({
@@ -3435,7 +3435,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         74629   //Combustion Periodic
         }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_IGNORE_ALL_RESISTANCES;
     });
 
     // Going Bearback

@@ -673,7 +673,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr4>::ToString(SpellAttr4 value)
 {
     switch (value)
     {
-        case SPELL_ATTR4_NO_CAST_LOG: return { "SPELL_ATTR4_NO_CAST_LOG", "Cannot be resisted", "" };
+        case SPELL_ATTR4_IGNORE_ALL_RESISTANCES: return { "SPELL_ATTR4_IGNORE_ALL_RESISTANCES", "Ignores all resistances", "" };
         case SPELL_ATTR4_CLASS_TRIGGER_ONLY_ON_TARGET: return { "SPELL_ATTR4_CLASS_TRIGGER_ONLY_ON_TARGET", "Only proc on self-cast", "" };
         case SPELL_ATTR4_AURA_EXPIRES_OFFLINE: return { "SPELL_ATTR4_AURA_EXPIRES_OFFLINE", "Buff expires while offline", "Debuffs (except Resurrection Sickness) will automatically do this" };
         case SPELL_ATTR4_NO_HELPFUL_THREAT: return { "SPELL_ATTR4_NO_HELPFUL_THREAT", "Unknown attribute 3@Attr4", "" };
@@ -717,7 +717,7 @@ AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(size_t index)
 {
     switch (index)
     {
-        case 0: return SPELL_ATTR4_NO_CAST_LOG;
+        case 0: return SPELL_ATTR4_IGNORE_ALL_RESISTANCES;
         case 1: return SPELL_ATTR4_CLASS_TRIGGER_ONLY_ON_TARGET;
         case 2: return SPELL_ATTR4_AURA_EXPIRES_OFFLINE;
         case 3: return SPELL_ATTR4_NO_HELPFUL_THREAT;
@@ -758,7 +758,7 @@ AC_API_EXPORT size_t EnumUtils<SpellAttr4>::ToIndex(SpellAttr4 value)
 {
     switch (value)
     {
-        case SPELL_ATTR4_NO_CAST_LOG: return 0;
+        case SPELL_ATTR4_IGNORE_ALL_RESISTANCES: return 0;
         case SPELL_ATTR4_CLASS_TRIGGER_ONLY_ON_TARGET: return 1;
         case SPELL_ATTR4_AURA_EXPIRES_OFFLINE: return 2;
         case SPELL_ATTR4_NO_HELPFUL_THREAT: return 3;
