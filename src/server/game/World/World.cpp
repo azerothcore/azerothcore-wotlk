@@ -1916,10 +1916,12 @@ void World::SetInitialWorldSettings()
     sGroupMgr->LoadGroups();
 
     LOG_INFO("server.loading", "Loading Reserved Names...");
-    sObjectMgr->LoadReservedPlayersNames();
+    sObjectMgr->LoadReservedPlayerNamesDB();
+    sObjectMgr->LoadReservedPlayerNamesDBC(); // Needs to be after LoadReservedPlayerNamesDB()
 
     LOG_INFO("server.loading", "Loading Profanity Names...");
-    sObjectMgr->LoadProfanityPlayersNames();
+    sObjectMgr->LoadProfanityNamesFromDB();
+    sObjectMgr->LoadProfanityNamesFromDBC(); // Needs to be after LoadProfanityNamesFromDB()
 
     LOG_INFO("server.loading", "Loading GameObjects for Quests...");
     sObjectMgr->LoadGameObjectForQuests();

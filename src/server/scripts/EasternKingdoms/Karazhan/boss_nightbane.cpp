@@ -17,10 +17,10 @@
 
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
-#include "PassiveAI.h"
 #include "karazhan.h"
 
 enum Spells

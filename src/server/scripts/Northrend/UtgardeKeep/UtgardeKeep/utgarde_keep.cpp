@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "utgarde_keep.h"
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
-#include "utgarde_keep.h"
 
 class npc_dragonflayer_forge_master : public CreatureScript
 {

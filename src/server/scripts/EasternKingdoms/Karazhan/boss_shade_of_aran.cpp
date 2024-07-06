@@ -73,7 +73,11 @@ enum Spells
 
     SPELL_SHADOW_PYRO            = 29978,
 
-    SPELL_ATIESH_VISUAL          = 31796
+    SPELL_ATIESH_VISUAL          = 31796,
+
+    SPELL_CURSE_OF_TONGUE_RANK1  = 1714,
+    SPELL_CURSE_OF_TONGUE_RANK2  = 11719,
+    SPELL_MIND_NUMBING_POISON    = 5760
 };
 
 enum Creatures
@@ -100,6 +104,8 @@ enum Misc
 
 Position const roomCenter = {-11158.f, -1920.f};
 
+std::vector<uint32> immuneSpells = { SPELL_CURSE_OF_TONGUE_RANK1, SPELL_CURSE_OF_TONGUE_RANK2, SPELL_MIND_NUMBING_POISON };
+
 struct boss_shade_of_aran : public BossAI
 {
     boss_shade_of_aran(Creature* creature) : BossAI(creature, DATA_ARAN), _atieshReaction(false) { }
@@ -117,6 +123,9 @@ struct boss_shade_of_aran : public BossAI
 
         _drinking = false;
         _hasDrunk = false;
+
+        for (int i = 0; i < immuneSpells.size(); i++)
+            me->ApplySpellImmune(0, IMMUNITY_ID, immuneSpells[i], true);
 
         if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
         {

@@ -2223,36 +2223,25 @@ public:
 ######*/
 
 // - 61123 - Ingest
-class spell_blight_worm_ingest : public SpellScriptLoader
+class spell_blight_worm_ingest : public SpellScript
 {
-public:
-    spell_blight_worm_ingest() : SpellScriptLoader("spell_blight_worm_ingest") { }
+    PrepareSpellScript(spell_blight_worm_ingest);
 
-    class spell_blight_worm_ingest_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_blight_worm_ingest_SpellScript);
+        return ValidateSpellInfo({ SPELL_INGEST });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_INGEST });
-        }
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                if (Unit* caster = GetCaster())
-                    target->CastSpell(caster, SPELL_INGEST_TRIGGER, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_blight_worm_ingest_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_blight_worm_ingest_SpellScript();
+        if (Unit* target = GetHitUnit())
+            if (Unit* caster = GetCaster())
+                target->CastSpell(caster, SPELL_INGEST_TRIGGER, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_blight_worm_ingest::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -4082,5 +4071,5 @@ void AddSC_undercity()
     new npc_jaina_proudmoore_bfu();
     new npc_lady_sylvanas_windrunner_bfu();
     new boss_blight_worm();
-    new spell_blight_worm_ingest();
+    RegisterSpellScript(spell_blight_worm_ingest);
 }

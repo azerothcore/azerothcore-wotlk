@@ -31,9 +31,9 @@ EndScriptData */
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
+#include "SharedDefines.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "SharedDefines.h"
 
 using namespace Acore::ChatCommands;
 
@@ -812,13 +812,13 @@ public:
                                 switch (status)
                                 {
                                     case QUEST_STATUS_COMPLETE:
-                                        statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_COMPLETE);
+                                        statusStr = handler->GetAcoreString(LANG_COMPLETE);
                                         break;
                                     case QUEST_STATUS_INCOMPLETE:
-                                        statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_ACTIVE);
+                                        statusStr = handler->GetAcoreString(LANG_ACTIVE);
                                         break;
                                     case QUEST_STATUS_REWARDED:
-                                        statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_REWARDED);
+                                        statusStr = handler->GetAcoreString(LANG_REWARDED);
                                         break;
                                     default:
                                         break;
@@ -868,13 +868,13 @@ public:
                     switch (status)
                     {
                         case QUEST_STATUS_COMPLETE:
-                            statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_COMPLETE);
+                            statusStr = handler->GetAcoreString(LANG_COMPLETE);
                             break;
                         case QUEST_STATUS_INCOMPLETE:
-                            statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_ACTIVE);
+                            statusStr = handler->GetAcoreString(LANG_ACTIVE);
                             break;
                         case QUEST_STATUS_REWARDED:
-                            statusStr = handler->GetAcoreString(LANG_COMMAND_QUEST_REWARDED);
+                            statusStr = handler->GetAcoreString(LANG_REWARDED);
                             break;
                         default:
                             break;
