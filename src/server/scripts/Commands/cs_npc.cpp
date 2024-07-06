@@ -705,10 +705,11 @@ public:
                 ObjectGuid::LowType guid = fields[0].Get<uint32>();
                 uint32 entry = fields[1].Get<uint32>();
                 //uint32 entry2 = fields[2].Get<uint32>();
-                float x = fields[3].Get<float>();
-                float y = fields[4].Get<float>();
-                float z = fields[5].Get<float>();
-                uint16 mapId = fields[6].Get<uint16>();
+                //uint32 entry3 = fields[3].Get<uint32>();
+                float x = fields[4].Get<float>();
+                float y = fields[5].Get<float>();
+                float z = fields[6].Get<float>();
+                uint16 mapId = fields[7].Get<uint16>();
 
                 CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(entry);
                 if (!creatureTemplate)

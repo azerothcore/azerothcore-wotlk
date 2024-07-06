@@ -16,10 +16,11 @@
  */
 
 #include "CreatureScript.h"
-#include "Player.h"
 #include "MoveSplineInit.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "TaskScheduler.h"
 #include "World.h"
 
 // Ours
@@ -506,108 +507,113 @@ enum MinigobData
     SPELL_IMPROVED_BLINK    = 61995,
 
     EVENT_SELECT_TARGET     = 1,
-    EVENT_BLINK             = 2,
-    EVENT_DESPAWN_VISUAL    = 3,
-    EVENT_DESPAWN           = 4,
+    EVENT_POLYMORPH         = 2,
+    EVENT_LAUGH             = 3,
+    EVENT_MOVE              = 4,
+    EVENT_DESPAWN_VISUAL    = 5,
+    EVENT_DESPAWN           = 6,
 
     MAIL_MINIGOB_ENTRY      = 264,
     MAIL_DELIVER_DELAY_MIN  = 5 * MINUTE,
     MAIL_DELIVER_DELAY_MAX  = 15 * MINUTE
 };
 
-class npc_minigob_manabonk : public CreatureScript
+struct npc_minigob_manabonk : public ScriptedAI
 {
-public:
-    npc_minigob_manabonk() : CreatureScript("npc_minigob_manabonk") {}
-
-    struct npc_minigob_manabonkAI : public ScriptedAI
+    npc_minigob_manabonk(Creature* creature) : ScriptedAI(creature)
     {
-        npc_minigob_manabonkAI(Creature* creature) : ScriptedAI(creature)
-        {
-            me->setActive(true);
-        }
+        me->setActive(true);
+    }
 
-        void Reset() override
-        {
-            me->SetVisible(false);
-            events.ScheduleEvent(EVENT_SELECT_TARGET, IN_MILLISECONDS);
-        }
+    void Reset() override
+    {
+        me->SetVisible(false);
+        events.ScheduleEvent(EVENT_SELECT_TARGET, 1s);
+    }
 
-        Player* SelectTargetInDalaran()
-        {
-            std::list<Player*> PlayerInDalaranList;
-            PlayerInDalaranList.clear();
+    Player* SelectTargetInDalaran()
+    {
+        std::list<Player*> playerInDalaranList;
+        playerInDalaranList.clear();
 
-            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                if (Player* player = itr->GetSource()->ToPlayer())
-                    if (player->GetZoneId() == ZONE_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
-                        PlayerInDalaranList.push_back(player);
-
-            if (PlayerInDalaranList.empty())
-                return nullptr;
-            return Acore::Containers::SelectRandomContainerElement(PlayerInDalaranList);
-        }
-
-        void SendMailToPlayer(Player* player)
-        {
-            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-            int16 deliverDelay = irand(MAIL_DELIVER_DELAY_MIN, MAIL_DELIVER_DELAY_MAX);
-            MailDraft(MAIL_MINIGOB_ENTRY, true).SendMailTo(trans, MailReceiver(player), MailSender(MAIL_CREATURE, me->GetEntry()), MAIL_CHECK_MASK_NONE, deliverDelay);
-            CharacterDatabase.CommitTransaction(trans);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
-                return;
-
-            events.Update(diff);
-
-            while (uint32 eventId = events.ExecuteEvent())
+        me->GetMap()->DoForAllPlayers([&](Player* player)
             {
-                switch (eventId)
-                {
-                    case EVENT_SELECT_TARGET:
-                        me->SetVisible(true);
-                        DoCast(me, SPELL_TELEPORT_VISUAL);
-                        if (Player* player = SelectTargetInDalaran())
-                        {
-                            me->NearTeleportTo(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0.0f);
-                            DoCast(player, SPELL_MANABONKED);
-                            SendMailToPlayer(player);
-                        }
-                        events.ScheduleEvent(EVENT_BLINK, 3ms);
-                        break;
-                    case EVENT_BLINK:
-                        {
-                            DoCast(me, SPELL_IMPROVED_BLINK);
-                            Position pos = me->GetRandomNearPosition((urand(15, 40)));
-                            me->GetMotionMaster()->MovePoint(0, pos.m_positionX, pos.m_positionY, pos.m_positionZ);
-                            events.ScheduleEvent(EVENT_DESPAWN, 3ms);
-                            events.ScheduleEvent(EVENT_DESPAWN_VISUAL, 3ms);
-                            break;
-                        }
-                    case EVENT_DESPAWN_VISUAL:
-                        DoCast(me, SPELL_TELEPORT_VISUAL);
-                        break;
-                    case EVENT_DESPAWN:
+                if (player->GetZoneId() == ZONE_DALARAN && !player->IsFlying() && !player->IsMounted() && !player->IsGameMaster())
+                    playerInDalaranList.push_back(player);
+            });
+
+        if (playerInDalaranList.empty())
+            return nullptr;
+        return Acore::Containers::SelectRandomContainerElement(playerInDalaranList);
+    }
+
+    void SendMailToPlayer(Player* player)
+    {
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+        int16 deliverDelay = irand(MAIL_DELIVER_DELAY_MIN, MAIL_DELIVER_DELAY_MAX);
+        MailDraft(MAIL_MINIGOB_ENTRY, true).SendMailTo(trans, MailReceiver(player), MailSender(MAIL_CREATURE, me->GetEntry()), MAIL_CHECK_MASK_NONE, deliverDelay);
+        CharacterDatabase.CommitTransaction(trans);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!sWorld->getBoolConfig(CONFIG_MINIGOB_MANABONK))
+            return;
+
+        events.Update(diff);
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_SELECT_TARGET:
+                    me->SetVisible(true);
+                    DoCastSelf(SPELL_TELEPORT_VISUAL);
+                    if (Player* player = SelectTargetInDalaran())
+                    {
+                        playerGUID = player->GetGUID();
+                        Position pos = player->GetPosition();
+                        me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
+                        me->GetMotionMaster()->MoveRandom(10);
+                    }
+                    events.ScheduleEvent(EVENT_POLYMORPH, 30s);
+                    break;
+                case EVENT_POLYMORPH:
+                    if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                    {
+                        DoCast(player, SPELL_MANABONKED);
+                        SendMailToPlayer(player);
+                    }
+                    else
                         me->DespawnOrUnsummon();
-                        break;
-                    default:
-                        break;
-                }
+                    events.ScheduleEvent(EVENT_LAUGH, 2s);
+                    break;
+                case EVENT_LAUGH:
+                    me->GetMotionMaster()->MoveIdle();
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH_NO_SHEATHE);
+                    events.ScheduleEvent(EVENT_MOVE, 4s);
+                    break;
+                case EVENT_MOVE:
+                    {
+                        Position pos = me->GetRandomNearPosition((urand(15, 40)));
+                        me->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true);
+                    }
+                    events.ScheduleEvent(EVENT_DESPAWN_VISUAL, 3s);
+                    events.ScheduleEvent(EVENT_DESPAWN, 4s);
+                    break;
+                case EVENT_DESPAWN_VISUAL:
+                    DoCastSelf(SPELL_IMPROVED_BLINK);
+                    break;
+                case EVENT_DESPAWN:
+                    me->DespawnOrUnsummon();
+                    break;
+                default:
+                    break;
             }
         }
-
-    private:
-        EventMap events;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_minigob_manabonkAI(creature);
     }
+private:
+    ObjectGuid playerGUID;
 };
 
 class npc_dalaran_mage : public CreatureScript
@@ -861,8 +867,6 @@ void AddSC_dalaran()
     new npc_dalaran_mage();
     new npc_dalaran_warrior();
     RegisterCreatureAI(npc_cosmetic_toy_plane);
-
-    // theirs
     new npc_mageguard_dalaran();
-    new npc_minigob_manabonk();
+    RegisterCreatureAI(npc_minigob_manabonk);
 }

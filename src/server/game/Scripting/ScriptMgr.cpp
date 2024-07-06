@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "AllScriptsObjects.h"
-#include "LFGScripts.h"
 #include "InstanceScript.h"
+#include "LFGScripts.h"
 #include "ScriptObject.h"
 #include "ScriptSystem.h"
 #include "SmartAI.h"

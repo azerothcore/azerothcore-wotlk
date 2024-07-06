@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "oculus.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "InstanceScript.h"
@@ -27,7 +28,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
-#include "oculus.h"
 #include <unordered_map>
 
 enum Drakes

@@ -16,6 +16,7 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "Player.h"
@@ -26,7 +27,6 @@
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "shadowfang_keep.h"
-#include "GridNotifiersImpl.h"
 
 enum ApothecarySpells
 {

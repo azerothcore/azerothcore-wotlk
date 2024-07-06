@@ -4338,6 +4338,13 @@ ICC.Buff.Horde    = 73822
 ICC.Buff.Alliance = 73828
 
 #
+#    WipeGunshipBlizzlike.Enable
+#       Description: Wipe the gunship fight if no player is on the deck.
+#       Default:     1 - (Blizzlike)
+
+WipeGunshipBlizzlike.Enable = 1
+
+#
 #     Minigob.Manabonk.Enable
 #        Description: Enable/ Disable Minigob Manabonk
 #        Default:     1
