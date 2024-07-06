@@ -1,3 +1,4 @@
+-- DB update 2024_07_06_10 -> 2024_07_06_11
 DELETE FROM `spell_script_names` WHERE `spell_id` = 31944;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (31944, 'spell_doomfire');
 
