@@ -2525,6 +2525,7 @@ float Pet::GetNativeObjectScale() const
             case CREATURE_FAMILY_NETHER_RAY:
             case CREATURE_FAMILY_RHINO:
             case CREATURE_FAMILY_SPIDER:
+            case CREATURE_FAMILY_TURTLE:
             case CREATURE_FAMILY_WARP_STALKER:
             case CREATURE_FAMILY_WASP:
             case CREATURE_FAMILY_WIND_SERPENT:
