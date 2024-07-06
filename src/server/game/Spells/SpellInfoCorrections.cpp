@@ -1948,6 +1948,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
 
+    // Meeting Stone Summon
+    ApplySpellFix({ 23598 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
+    });
+
     // Ulduar, Mimiron, bomb bot explosion
     ApplySpellFix({ 63801 }, [](SpellInfo* spellInfo)
     {
