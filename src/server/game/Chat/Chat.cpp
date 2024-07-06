@@ -892,7 +892,7 @@ int CliHandler::GetSessionDbLocaleIndex() const
 
 bool AddonChannelCommandHandler::ParseCommands(std::string_view str)
 {
-    if (str.compare("AzerothCore\t"))
+    if (memcmp(str.data(), "AzerothCore\t", 12))
         return false;
     char opcode = str[12];
     if (!opcode) // str[12] is opcode
