@@ -2436,7 +2436,7 @@ void bot_ai::SetStats(bool force)
     if (_botclass == BOT_CLASS_DRUID && RespectEquipsAttackTime())
     {
         uint32 delay;
-        SpellShapeshiftEntry const* ssEntry = sSpellShapeshiftStore.LookupEntry(me->GetShapeshiftForm());
+        SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(me->GetShapeshiftForm());
         if (!ssEntry || !ssEntry->attackSpeed)
             delay = _equips[BOT_SLOT_MAINHAND] ? _equips[BOT_SLOT_MAINHAND]->GetTemplate()->Delay : me->GetCreatureTemplate()->BaseAttackTime;
         else
