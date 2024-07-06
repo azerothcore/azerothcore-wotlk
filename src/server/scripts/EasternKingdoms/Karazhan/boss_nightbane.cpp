@@ -38,8 +38,8 @@ enum Spells
     SPELL_SMOKING_BLAST_T       = 37057,
     SPELL_RAIN_OF_BONES         = 37098,
     SPELL_SUMMON_SKELETON       = 30170,
-    // Both Phases
     SPELL_DISTRACTING_ASH       = 30130,
+    // Both Phases
     SPELL_FIREBALL_BARRAGE      = 30282
 };
 
@@ -191,14 +191,7 @@ struct boss_nightbane : public BossAI
 
     void ScheduleGround()
     {
-        scheduler.Schedule(5s, 10s, GROUP_GROUND, [this](TaskContext context)
-        {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true, false))
-            {
-                DoCast(target, SPELL_DISTRACTING_ASH);
-            }
-            context.Repeat(12s);
-        }).Schedule(18s, 25s, GROUP_GROUND, [this](TaskContext context)
+        scheduler.Schedule(18s, 25s, GROUP_GROUND, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_CHARRED_EARTH, 0, 100.0f, true);
             context.Repeat(20s);
