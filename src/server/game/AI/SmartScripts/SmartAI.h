@@ -159,7 +159,8 @@ public:
     uint32 GetData(uint32 id = 0) const override;
 
     // Used in scripts to share variables
-    void SetData(uint32 id, uint32 value) override;
+    void SetData(uint32 id, uint32 value) override { SetData(id, value, nullptr); }
+    void SetData(uint32 id, uint32 value, Unit* invoker);
 
     // Used in scripts to share variables
     void SetGUID(ObjectGuid guid, int32 id = 0) override;
@@ -272,7 +273,8 @@ public:
     bool QuestAccept(Player* player, Quest const* quest) override;
     bool QuestReward(Player* player, Quest const* quest, uint32 opt) override;
     void Destroyed(Player* player, uint32 eventId) override;
-    void SetData(uint32 id, uint32 value) override;
+    void SetData(uint32 id, uint32 value) override { SetData(id, value, nullptr); }
+    void SetData(uint32 id, uint32 value, Unit* invoker);
     void SetScript9(SmartScriptHolder& e, uint32 entry, Unit* invoker);
     void OnGameEvent(bool start, uint16 eventId) override;
     void OnStateChanged(uint32 state, Unit* unit) override;
