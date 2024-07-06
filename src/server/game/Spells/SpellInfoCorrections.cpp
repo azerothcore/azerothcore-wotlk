@@ -4810,7 +4810,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Greater Fireball
     ApplySpellFix({ 33051 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_IGNORE_ALL_RESISTANCES;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
