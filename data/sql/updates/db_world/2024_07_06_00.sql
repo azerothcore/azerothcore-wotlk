@@ -1,3 +1,4 @@
+-- DB update 2024_07_05_02 -> 2024_07_06_00
 --
 UPDATE `conditions` SET `ConditionTypeOrReference` = 8 WHERE `SourceGroup` = 8234 AND `SourceTypeOrReferenceId` = 15 AND `ConditionTypeOrReference` = 9;
 
