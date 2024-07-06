@@ -1,2 +1,2 @@
 --
-UPDATE `quest_tempalte` SET `AllowableRaces` = 690 WHERE `ID` = 9846;
+UPDATE `quest_template` SET `AllowableRaces` = 690 WHERE `ID` = 9846;
