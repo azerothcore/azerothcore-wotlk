@@ -1943,13 +1943,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Ulduar, Mimiron, Magnetic Core (summon)
-    ApplySpellFix({ 64444 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
-    });
-
     // Meeting Stone Summon
-    ApplySpellFix({ 23598 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 64444, 23598 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
