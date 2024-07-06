@@ -168,4 +168,24 @@ private:
     Print* m_print;
 };
 
+class AC_GAME_API AddonChannelCommandHandler : public ChatHandler
+{
+    public:
+        using ChatHandler::ChatHandler;
+        bool ParseCommands(std::string_view str) override;
+        void SendSysMessage(std::string_view str, bool escapeCharacters) override;
+        using ChatHandler::SendSysMessage;
+        bool IsHumanReadable() const override { return humanReadable; }
+
+    private:
+        void Send(std::string const& msg);
+        void SendAck();
+        void SendOK();
+        void SendFailed();
+
+        std::string_view echo = nullptr;
+        bool hadAck = false;
+        bool humanReadable = false;
+};
+
 #endif
