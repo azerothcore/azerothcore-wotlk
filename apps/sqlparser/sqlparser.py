@@ -16,7 +16,7 @@ repo_folder = Path("/Users/v0/Py/_hobby/wow/server")
 
 source_suffix = "modules"
 source_dir = lambda: repo_folder / source_suffix
-target_suffix = "data/sql/custom/test"
+target_suffix = "data/sql/custom"
 target_dir = lambda: repo_folder / target_suffix
 report_suffix = "modules_sql_parsed.csv"
 report_path = lambda: repo_folder / report_suffix
