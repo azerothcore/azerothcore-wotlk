@@ -183,7 +183,7 @@ class AC_GAME_API AddonChannelCommandHandler : public ChatHandler
         void SendOK();
         void SendFailed();
 
-        std::string_view echo = nullptr;
+        std::string echo;
         bool hadAck = false;
         bool humanReadable = false;
 };

@@ -941,8 +941,9 @@ void AddonChannelCommandHandler::Send(std::string const& msg)
 void AddonChannelCommandHandler::SendAck() // a Command acknowledged, no body
 {
     ASSERT(echo.size());
-    char ack[18] = "AzerothCore\ta";
-    memcpy(ack+13, echo.data(), 4);
+    std::string ack = "AzerothCore\ta";
+    ack.resize(18);
+    memcpy(&ack[13], echo.data(), 4);
     ack[17] = '\0';
     Send(ack);
     hadAck = true;
@@ -951,8 +952,9 @@ void AddonChannelCommandHandler::SendAck() // a Command acknowledged, no body
 void AddonChannelCommandHandler::SendOK() // o Command OK, no body
 {
     ASSERT(echo.size());
-    char ok[18] = "AzerothCore\to";
-    memcpy(ok+13, echo.data(), 4);
+    std::string ok = "AzerothCore\to";
+    ok.resize(18);
+    memcpy(&ok[13], echo.data(), 4);
     ok[17] = '\0';
     Send(ok);
 }
@@ -960,8 +962,9 @@ void AddonChannelCommandHandler::SendOK() // o Command OK, no body
 void AddonChannelCommandHandler::SendFailed() // f Command failed, no body
 {
     ASSERT(echo.size());
-    char fail[18] = "AzerothCore\tf";
-    memcpy(fail + 13, echo.data(), 4);
+    std::string fail = "AzerothCore\tf";
+    fail.resize(18);
+    memcpy(&fail[13], echo.data(), 4);
     fail[17] = '\0';
     Send(fail);
 }
@@ -974,7 +977,7 @@ void AddonChannelCommandHandler::SendSysMessage(std::string_view str, bool escap
         SendAck();
 
     std::string msg = "AzerothCore\tm";
-    msg.append(echo, 4);
+    msg.append(echo.data(), 4);
     std::string body(str);
     if (escapeCharacters)
         boost::replace_all(body, "|", "||");
