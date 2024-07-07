@@ -2698,7 +2698,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(1); // 10 seconds
     });
 
-
     // Severed Essence (Val'kyr Herald)
     ApplySpellFix({ 71906, 71942 }, [](SpellInfo* spellInfo)
     {
