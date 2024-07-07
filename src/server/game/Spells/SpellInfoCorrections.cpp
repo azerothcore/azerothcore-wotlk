@@ -1083,8 +1083,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     ApplySpellFix({
-        18662  // Curse of Doom  // summoned doomguard duration fix
-        4078,  // Compact Harvest Reaper
+        18662,  // Curse of Doom  // summoned doomguard duration fix
+        4078    // Compact Harvest Reaper
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(6); // 10 minutes
