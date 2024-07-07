@@ -1,3 +1,4 @@
+-- DB update 2024_07_07_03 -> 2024_07_07_04
 SET
 @CGUID = 12550; -- First free
 
