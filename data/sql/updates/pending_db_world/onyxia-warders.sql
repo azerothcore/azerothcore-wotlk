@@ -24,6 +24,7 @@ INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
 (@CGUID+2, 47572, 0),
 (@CGUID+3, 47572, 0);
 
+DELETE FROM `waypoint_data` WHERE `id` IN (520480, 520490, 520510);
 DELETE FROM `waypoint_data` WHERE `id` IN (((@CGUID+0)*10), ((@CGUID+1)*10), ((@CGUID+2)*10));
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action_chance`) VALUES 
 ((@CGUID+0)*10, 1, -53.513702, -97.9611, -38.68338, NULL, 0, 100),
