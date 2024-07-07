@@ -2,21 +2,21 @@ SET
 @CGUID = 170000;
 
 DELETE FROM `creature` WHERE `id1` = 12129 AND `guid` IN (52047, 52048, 52049, 52050, 52051, 52052, 52053);
-DELETE FROM `creature` WHERE `id1` = 12129 AND `guid` BETWEEN @CGUID+0 AND @CGUID+4;
+DELETE FROM `creature` WHERE `id1` = 12129 AND `guid` BETWEEN @CGUID+0 AND @CGUID+3;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
 (@CGUID+0, 12129, 0, 0, 249, 0, 0, 3, 1, 1, -49.92992,  -98.07133,  -38.5961,   6.248278617858886718, 6300,  0, 0, 213640, 0, 2, 0, 0, 0, '', 50375, 2, ''),
 (@CGUID+1, 12129, 0, 0, 249, 0, 0, 3, 1, 1, -62.975872, -98.323456, -38.851532, 3.101630926132202148, 6300,  0, 0, 213640, 0, 2, 0, 0, 0, '', 50375, 2, ''),
 (@CGUID+2, 12129, 0, 0, 249, 0, 0, 3, 1, 1, -165.48122, -205.45609, -66.3212,   2.256742238998413085, 6300,  0, 0, 213640, 0, 2, 0, 0, 0, '', 50375, 1, ''),
-(@CGUID+3, 12129, 0, 0, 249, 0, 0, 3, 1, 1, -200.14285, -212.38086, -68.62948,  0.855211317539215087, 6300,  0, 0, 213640, 0, 0, 0, 0, 0, '', 50375, 1, ''),
-(@CGUID+4, 12129, 0, 0, 249, 0, 0, 3, 1, 1, -145.54874, -147.03629, -54.025845, 4.153908729553222656, 6300,  0, 0, 213640, 0, 0, 0, 0, 0, '', 50375, 2, ''); -- spawned during fight
+(@CGUID+3, 12129, 0, 0, 249, 0, 0, 3, 1, 1, -200.14285, -212.38086, -68.62948,  0.855211317539215087, 6300,  0, 0, 213640, 0, 0, 0, 0, 0, '', 50375, 1, '');
+-- (@CGUID+4, 12129, 0, 0, 249, 0, 0, 3, 1, 1, -145.54874, -147.03629, -54.025845, 4.153908729553222656, 6300,  0, 0, 213640, 0, 0, 0, 0, 0, '', 50375, 2, ''); -- spawned during fight
 
 DELETE FROM `creature_addon` WHERE `guid` IN (52047, 52048, 52049, 52050, 52051, 52052, 52053);
-DELETE FROM `creature_addon` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+4;
+DELETE FROM `creature_addon` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+3;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (@CGUID+0, (@CGUID+0)*10, 0, 0, 1, 0, 0, ''),
 (@CGUID+1, (@CGUID+1)*10, 0, 0, 1, 0, 0, ''),
-(@CGUID+2, (@CGUID+2)*10, 0, 0, 1, 0, 0, ''),
-(@CGUID+4, (@CGUID+4)*10, 0, 0, 1, 0, 0, '');
+(@CGUID+2, (@CGUID+2)*10, 0, 0, 1, 0, 0, '');
+-- (@CGUID+4, (@CGUID+4)*10, 0, 0, 1, 0, 0, '');
 
 DELETE FROM `linked_respawn` WHERE `guid` IN (52047, 52048, 52049, 52050, 52051, 52052, 52053) AND `linkedguid` = 47572;
 DELETE FROM `linked_respawn` WHERE `guid` IN (((@CGUID+0)*10), ((@CGUID+1)*10), ((@CGUID+2)*10), ((@CGUID+3)*10)) AND `linkedguid` = 47572;
@@ -26,7 +26,7 @@ INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
 ((@CGUID+2)*10), 47572, 0),
 ((@CGUID+3)*10), 47572, 0);
 
-DELETE FROM `waypoint_data` WHERE `id` IN (((@CGUID+0)*10), ((@CGUID+1)*10), ((@CGUID+2)*10), ((@CGUID+4)*10));
+DELETE FROM `waypoint_data` WHERE `id` IN (((@CGUID+0)*10), ((@CGUID+1)*10), ((@CGUID+2)*10));
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action_chance`) VALUES 
 ((@CGUID+0)*10, 1, -53.513702, -97.9611, -38.68338, NULL, 0, 100),
 ((@CGUID+0)*10, 2, -56.06462, -97.792885, -38.387665, NULL, 0, 100),
@@ -337,7 +337,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ((@CGUID+2)*10, 73, -160.39645, -207.94502, -66.06016, NULL, 0, 100),
 ((@CGUID+2)*10, 74, -161.2214, -207.80463, -66.3057, NULL, 0, 100),
 ((@CGUID+2)*10, 75, -165.18085, -205.67477, -66.078125, NULL, 0, 100);
-
+/*
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action_chance`) VALUES 
 ((@CGUID+4)*10, 1, -174.62589, -193.35197, -66.46243, NULL, 0, 100),
 ((@CGUID+4)*10, 2, -174.62589, -193.85197, -66.46243, NULL, 0, 100),
@@ -481,3 +481,4 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ((@CGUID+4)*10, 140, -166.82361, -178.78366, -64.67999, NULL, 0, 100),
 ((@CGUID+4)*10, 141, -167.82361, -180.78366, -64.92999, NULL, 0, 100),
 ((@CGUID+4)*10, 142, -174.32361, -193.28366, -66.42999, NULL, 0, 100);
+*/
