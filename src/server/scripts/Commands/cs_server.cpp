@@ -29,7 +29,6 @@
 #include "ModuleMgr.h"
 #include "MotdMgr.h"
 #include "MySQLThreading.h"
-#include "Player.h"
 #include "Realm.h"
 #include "StringConvert.h"
 #include "UpdateTime.h"

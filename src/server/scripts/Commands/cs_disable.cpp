@@ -22,7 +22,6 @@ Comment: All disable related commands
 Category: commandscripts
 EndScriptData */
 
-#include "AchievementMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "DisableMgr.h"
