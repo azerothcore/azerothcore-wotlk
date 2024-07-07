@@ -198,7 +198,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         42132,  // Headless Horseman - Start Fire
         }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookpEntry(6); // 100yd
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6); // 100yd
     });
 
     ApplySpellFix({
