@@ -903,7 +903,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         62968,  // Brightleaf Essence trigger - duplicate
         62834,  // Boom (XT-002)
         62490,  // Hurl Pyrite
-        67118., // T9 blood plague crit bonus
+        67118, // T9 blood plague crit bonus
         62056, 63985,  // Stone Grip, remove absorb aura
         70127, 72528, 72529, 72530  // Mystic Buffet (Sindragosa) - remove obsolete spell effect with no targets
         }, [](SpellInfo* spellInfo)
