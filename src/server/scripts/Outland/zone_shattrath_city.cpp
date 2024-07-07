@@ -308,7 +308,7 @@ struct npc_shattrath_daily_quest : public NullCreatureAI
             {
                 Field *fields = result->Fetch();
                 int quest_id = fields[0].Get<int>();
-                uint32 templateID;
+                uint32 templateID = 0;
 
                 if (creature == NPC_SHATTRATH_DAILY_H)
                 {

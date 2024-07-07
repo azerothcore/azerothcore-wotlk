@@ -1810,20 +1810,23 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     break;
                 }
                 case SMART_TARGET_RANDOM_POINT:
-                if (me)
                 {
-                    float range = (float)e.target.randomPoint.range;
-                    Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
-                    Position randomPoint = me->GetRandomPoint(srcPos, range);
-                    me->GetMotionMaster()->MovePoint(
-                        e.action.moveToPos.pointId,
-                        randomPoint.m_positionX,
-                        randomPoint.m_positionY,
-                        randomPoint.m_positionZ,
-                        true,
-                        true,
-                        isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
-                    );
+                    if (me)
+                    {
+                        float range = (float)e.target.randomPoint.range;
+                        Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
+                        Position randomPoint = me->GetRandomPoint(srcPos, range);
+                        me->GetMotionMaster()->MovePoint(
+                            e.action.moveToPos.pointId,
+                            randomPoint.m_positionX,
+                            randomPoint.m_positionY,
+                            randomPoint.m_positionZ,
+                            true,
+                            true,
+                            isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
+                        );
+
+                    }
 
                     break;
                 }
