@@ -124,8 +124,8 @@ struct boss_shade_of_aran : public BossAI
         _drinking = false;
         _hasDrunk = false;
 
-        for (int i = 0; i < immuneSpells.size(); i++)
-            me->ApplySpellImmune(0, IMMUNITY_ID, immuneSpells[i], true);
+        for (auto spell : immuneSpells)
+            me->ApplySpellImmune(0, IMMUNITY_ID, spell, true);
 
         if (GameObject* libraryDoor = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_LIBRARY_DOOR)))
         {
