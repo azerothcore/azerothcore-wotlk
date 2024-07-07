@@ -17,7 +17,7 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 (20044, 55500, 55500, 10, 0, 1, 0, 1, 1, 'Zone Loot - The Eye - Epic Gear'),
 (20045, 55500, 55500, 10, 0, 1, 0, 1, 1, 'Zone Loot - The Eye - Epic Gear'),
 (20046, 55500, 55500, 10, 0, 1, 0, 1, 1, 'Zone Loot - The Eye - Epic Gear'),
-(20047, 55500, 55500, 10, 0, 1, 0, 1, 1, 'Zone Loot - The Eye - Epic Gear'),
+-- (20047, 55500, 55500, 10, 0, 1, 0, 1, 1, 'Zone Loot - The Eye - Epic Gear'), -- It shares lootid with another creature :<
 (20048, 55500, 55500, 10, 0, 1, 0, 1, 1, 'Zone Loot - The Eye - Epic Gear'),
 (20049, 55500, 55500, 10, 0, 1, 0, 1, 1, 'Zone Loot - The Eye - Epic Gear'),
 (20050, 55500, 55500, 10, 0, 1, 0, 1, 1, 'Zone Loot - The Eye - Epic Gear'),
