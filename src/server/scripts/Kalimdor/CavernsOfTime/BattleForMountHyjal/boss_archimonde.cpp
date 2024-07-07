@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -51,6 +52,7 @@ enum ArchiSpells
     SPELL_DOOMFIRE_STRIKE       = 31903,    //summons two creatures
     SPELL_DOOMFIRE_SPAWN        = 32074,
     SPELL_DOOMFIRE              = 31945,
+    SPELL_DOOMFIRE_DOT          = 31969,
     SPELL_SOUL_CHARGE_YELLOW    = 32045,
     SPELL_SOUL_CHARGE_GREEN     = 32051,
     SPELL_SOUL_CHARGE_RED       = 32052,
@@ -484,10 +486,38 @@ class spell_air_burst : public SpellScript
     }
 };
 
+class spell_doomfire : public AuraScript
+{
+    PrepareAuraScript(spell_doomfire);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DOOMFIRE_DOT });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        Unit* target = GetTarget();
+        if (!target)
+            return;
+
+        int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        float tickCoef = (static_cast<float>(aurEff->GetTickNumber() - 1) / aurEff->GetTotalTicks()); // Tick moved back to ensure proper damage on each tick
+        int32 damage = bp - (bp*tickCoef);
+        SpellCastResult result = target->CastCustomSpell(target, SPELL_DOOMFIRE_DOT, &damage, &damage, &damage, true, nullptr, nullptr, target->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_doomfire::PeriodicTick, EFFECT_ALL, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_boss_archimonde()
 {
     RegisterSpellScript(spell_red_sky_effect);
     RegisterSpellScript(spell_air_burst);
+    RegisterSpellScript(spell_doomfire);
     RegisterHyjalAI(boss_archimonde);
     RegisterHyjalAI(npc_ancient_wisp);
     RegisterHyjalAI(npc_doomfire_spirit);
