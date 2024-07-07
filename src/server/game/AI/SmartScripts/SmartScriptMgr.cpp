@@ -346,6 +346,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_TRANSPORT_ADDCREATURE:
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_SUMMONED_UNIT_EVADE:
+        case SMART_EVENT_DATA_SET:
             return true;
         default:
             return false;

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "karazhan.h"
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "Player.h"
@@ -25,7 +26,6 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "karazhan.h"
 /* ScriptData
 SDName: Karazhan
 SD%Complete: 100

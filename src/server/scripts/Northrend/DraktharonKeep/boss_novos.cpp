@@ -268,85 +268,62 @@ public:
     }
 };
 
-class spell_novos_despawn_crystal_handler : public SpellScriptLoader
+class spell_novos_despawn_crystal_handler : public SpellScript
 {
-public:
-    spell_novos_despawn_crystal_handler() : SpellScriptLoader("spell_novos_despawn_crystal_handler") { }
+    PrepareSpellScript(spell_novos_despawn_crystal_handler);
 
-    class spell_novos_despawn_crystal_handler_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_novos_despawn_crystal_handler_SpellScript);
+        return ValidateSpellInfo({ SPELL_BEAM_CHANNEL });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(GetCaster(), SPELL_BEAM_CHANNEL, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_novos_despawn_crystal_handler_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        return new spell_novos_despawn_crystal_handler_SpellScript();
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(GetCaster(), SPELL_BEAM_CHANNEL, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_novos_despawn_crystal_handler::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_novos_crystal_handler_death : public SpellScriptLoader
+class spell_novos_crystal_handler_death_aura : public AuraScript
 {
-public:
-    spell_novos_crystal_handler_death() : SpellScriptLoader("spell_novos_crystal_handler_death") { }
+    PrepareAuraScript(spell_novos_crystal_handler_death_aura);
 
-    class spell_novos_crystal_handler_death_AuraScript : public AuraScript
+    void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_novos_crystal_handler_death_AuraScript)
+        GetUnitOwner()->InterruptNonMeleeSpells(false);
+        if (GameObject* crystal = GetUnitOwner()->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_DOOR, 5.0f))
+            crystal->SetGoState(GO_STATE_READY);
+    }
 
-        void HandleEffectApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->InterruptNonMeleeSpells(false);
-            if (GameObject* crystal = GetUnitOwner()->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_DOOR, 5.0f))
-                crystal->SetGoState(GO_STATE_READY);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_novos_crystal_handler_death_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_novos_crystal_handler_death_AuraScript();
+        OnEffectApply += AuraEffectApplyFn(spell_novos_crystal_handler_death_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_novos_summon_minions : public SpellScriptLoader
+class spell_novos_summon_minions : public SpellScript
 {
-public:
-    spell_novos_summon_minions() : SpellScriptLoader("spell_novos_summon_minions") { }
+    PrepareSpellScript(spell_novos_summon_minions);
 
-    class spell_novos_summon_minions_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_novos_summon_minions_SpellScript);
+        return ValidateSpellInfo({ SPELL_COPY_OF_SUMMON_MINIONS });
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            for (uint8 i = 0; i < 4; ++i)
-                GetCaster()->CastSpell((Unit*)nullptr, SPELL_COPY_OF_SUMMON_MINIONS, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_novos_summon_minions_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_novos_summon_minions_SpellScript();
+        for (uint8 i = 0; i < 4; ++i)
+            GetCaster()->CastSpell((Unit*)nullptr, SPELL_COPY_OF_SUMMON_MINIONS, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_novos_summon_minions::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -364,8 +341,8 @@ public:
 void AddSC_boss_novos()
 {
     new boss_novos();
-    new spell_novos_despawn_crystal_handler();
-    new spell_novos_crystal_handler_death();
-    new spell_novos_summon_minions();
+    RegisterSpellScript(spell_novos_despawn_crystal_handler);
+    RegisterSpellScript(spell_novos_crystal_handler_death_aura);
+    RegisterSpellScript(spell_novos_summon_minions);
     new achievement_oh_novos();
 }

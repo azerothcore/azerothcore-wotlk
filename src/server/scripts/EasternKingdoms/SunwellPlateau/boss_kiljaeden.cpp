@@ -1027,304 +1027,219 @@ public:
     };
 };
 
-class spell_kiljaeden_shadow_spike : public SpellScriptLoader
+class spell_kiljaeden_shadow_spike_aura : public AuraScript
 {
-public:
-    spell_kiljaeden_shadow_spike() : SpellScriptLoader("spell_kiljaeden_shadow_spike") { }
+    PrepareAuraScript(spell_kiljaeden_shadow_spike_aura);
 
-    class spell_kiljaeden_shadow_spike_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_kiljaeden_shadow_spike_AuraScript);
+        PreventDefaultAction();
+        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void HandlePeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_shadow_spike_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_shadow_spike_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_shadow_spike_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_kiljaeden_sinister_reflection : public SpellScriptLoader
+class spell_kiljaeden_sinister_reflection : public SpellScript
 {
-public:
-    spell_kiljaeden_sinister_reflection() : SpellScriptLoader("spell_kiljaeden_sinister_reflection") { }
+    PrepareSpellScript(spell_kiljaeden_sinister_reflection);
 
-    class spell_kiljaeden_sinister_reflection_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_kiljaeden_sinister_reflection_SpellScript);
+        return ValidateSpellInfo({ SPELL_SINISTER_REFLECTION_SUMMON, SPELL_SINISTER_REFLECTION_CLONE });
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
-        }
-
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-            {
-                target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
-                //target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_sinister_reflection_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_kiljaeden_sinister_reflection_SpellScript();
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
+    }
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+        {
+            target->CastSpell(target, SPELL_SINISTER_REFLECTION_SUMMON, true);
+            //target->CastSpell(target, SPELL_SINISTER_REFLECTION_CLONE, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_sinister_reflection::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_kiljaeden_sinister_reflection_clone : public SpellScriptLoader
+class spell_kiljaeden_sinister_reflection_clone : public SpellScript
 {
-public:
-    spell_kiljaeden_sinister_reflection_clone() : SpellScriptLoader("spell_kiljaeden_sinister_reflection_clone") { }
+    PrepareSpellScript(spell_kiljaeden_sinister_reflection_clone);
 
-    class spell_kiljaeden_sinister_reflection_clone_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_kiljaeden_sinister_reflection_clone_SpellScript);
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        WorldObject* target = targets.front();
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        targets.clear();
+        if (target && target->GetTypeId() == TYPEID_UNIT)
         {
-            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
-            WorldObject* target = targets.front();
-
-            targets.clear();
-            if (target && target->GetTypeId() == TYPEID_UNIT)
-            {
-                target->ToCreature()->AI()->SetData(1, GetCaster()->getClass());
-                targets.push_back(target);
-            }
+            target->ToCreature()->AI()->SetData(1, GetCaster()->getClass());
+            targets.push_back(target);
         }
+    }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_clone_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_sinister_reflection_clone_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_sinister_reflection_clone::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_kiljaeden_flame_dart : public SpellScriptLoader
+class spell_kiljaeden_flame_dart : public SpellScript
 {
-public:
-    spell_kiljaeden_flame_dart() : SpellScriptLoader("spell_kiljaeden_flame_dart") { }
+    PrepareSpellScript(spell_kiljaeden_flame_dart);
 
-    class spell_kiljaeden_flame_dart_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_kiljaeden_flame_dart_SpellScript);
+        return ValidateSpellInfo({ SPELL_FLAME_DART_EXPLOSION });
+    }
 
-        void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, SPELL_FLAME_DART_EXPLOSION, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_flame_dart_SpellScript::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleSchoolDamage(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_kiljaeden_flame_dart_SpellScript();
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_FLAME_DART_EXPLOSION, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_flame_dart::HandleSchoolDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
-class spell_kiljaeden_darkness : public SpellScriptLoader
+class spell_kiljaeden_darkness_aura : public AuraScript
 {
-public:
-    spell_kiljaeden_darkness() : SpellScriptLoader("spell_kiljaeden_darkness") { }
+    PrepareAuraScript(spell_kiljaeden_darkness_aura);
 
-    class spell_kiljaeden_darkness_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_kiljaeden_darkness_AuraScript);
+        return ValidateSpellInfo({ SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE });
+    }
 
-        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT)
-                GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
-
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_darkness_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_kiljaeden_darkness_AuraScript();
+        if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT)
+            GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
+
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_darkness_aura::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_kiljaeden_power_of_the_blue_flight : public SpellScriptLoader
+class spell_kiljaeden_power_of_the_blue_flight : public SpellScript
 {
-public:
-    spell_kiljaeden_power_of_the_blue_flight() : SpellScriptLoader("spell_kiljaeden_power_of_the_blue_flight") { }
+    PrepareSpellScript(spell_kiljaeden_power_of_the_blue_flight);
 
-    class spell_kiljaeden_power_of_the_blue_flight_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_kiljaeden_power_of_the_blue_flight_SpellScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_BLUE_DRAKE, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Player* player = GetHitPlayer())
-            {
-                player->CastSpell(player, SPELL_SUMMON_BLUE_DRAKE, true);
-                player->CastSpell(player, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_power_of_the_blue_flight_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_kiljaeden_power_of_the_blue_flight_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Player* player = GetHitPlayer())
+        {
+            player->CastSpell(player, SPELL_SUMMON_BLUE_DRAKE, true);
+            player->CastSpell(player, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kiljaeden_power_of_the_blue_flight::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_kiljaeden_vengeance_of_the_blue_flight : public SpellScriptLoader
+class spell_kiljaeden_vengeance_of_the_blue_flight_aura : public AuraScript
 {
-public:
-    spell_kiljaeden_vengeance_of_the_blue_flight() : SpellScriptLoader("spell_kiljaeden_vengeance_of_the_blue_flight") { }
+    PrepareAuraScript(spell_kiljaeden_vengeance_of_the_blue_flight_aura);
 
-    class spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript);
+        return ValidateSpellInfo({ SPELL_POSSESS_DRAKE_IMMUNITY });
+    }
 
-        void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_POSSESS_DRAKE_IMMUNITY, true);
-        }
-
-        void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->RemoveAurasDueToSpell(SPELL_POSSESS_DRAKE_IMMUNITY);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
-            OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleApply, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript::HandleRemove, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_kiljaeden_vengeance_of_the_blue_flight_AuraScript();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_POSSESS_DRAKE_IMMUNITY, true);
+    }
+
+    void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_POSSESS_DRAKE_IMMUNITY);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_aura::HandleApply, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+        OnEffectApply += AuraEffectApplyFn(spell_kiljaeden_vengeance_of_the_blue_flight_aura::HandleApply, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_aura::HandleRemove, EFFECT_0, SPELL_AURA_MOD_POSSESS, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_kiljaeden_vengeance_of_the_blue_flight_aura::HandleRemove, EFFECT_2, SPELL_AURA_MOD_PACIFY_SILENCE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_kiljaeden_armageddon_periodic : public SpellScriptLoader
+class spell_kiljaeden_armageddon_periodic_aura : public AuraScript
 {
-public:
-    spell_kiljaeden_armageddon_periodic() : SpellScriptLoader("spell_kiljaeden_armageddon_periodic") { }
+    PrepareAuraScript(spell_kiljaeden_armageddon_periodic_aura);
 
-    class spell_kiljaeden_armageddon_periodic_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_kiljaeden_armageddon_periodic_AuraScript);
+        PreventDefaultAction();
+        if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void HandlePeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_armageddon_periodic_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_armageddon_periodic_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_kiljaeden_armageddon_periodic_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_kiljaeden_armageddon_missile : public SpellScriptLoader
+class spell_kiljaeden_armageddon_missile : public SpellScript
 {
-public:
-    spell_kiljaeden_armageddon_missile() : SpellScriptLoader("spell_kiljaeden_armageddon_missile") { }
+    PrepareSpellScript(spell_kiljaeden_armageddon_missile);
 
-    class spell_kiljaeden_armageddon_missile_SpellScript : public SpellScript
+    void SetDest(SpellDestination& dest)
     {
-        PrepareSpellScript(spell_kiljaeden_armageddon_missile_SpellScript);
+        Position const offset = { 0.0f, 0.0f, -20.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
 
-        void SetDest(SpellDestination& dest)
-        {
-            Position const offset = { 0.0f, 0.0f, -20.0f, 0.0f };
-            dest.RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_kiljaeden_armageddon_missile_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_armageddon_missile_SpellScript();
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_kiljaeden_armageddon_missile::SetDest, EFFECT_0, TARGET_DEST_CASTER);
     }
 };
 
-class spell_kiljaeden_dragon_breath : public SpellScriptLoader
+class spell_kiljaeden_dragon_breath : public SpellScript
 {
-public:
-    spell_kiljaeden_dragon_breath() : SpellScriptLoader("spell_kiljaeden_dragon_breath") { }
+    PrepareSpellScript(spell_kiljaeden_dragon_breath);
 
-    class spell_kiljaeden_dragon_breath_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_kiljaeden_dragon_breath_SpellScript);
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_dragon_breath_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ALLY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_kiljaeden_dragon_breath_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kiljaeden_dragon_breath::FilterTargets, EFFECT_ALL, TARGET_UNIT_CONE_ALLY);
     }
 };
 
@@ -1333,15 +1248,15 @@ void AddSC_boss_kiljaeden()
     new npc_kiljaeden_controller();
     new boss_kiljaeden();
     new npc_kalecgos_kj();
-    new spell_kiljaeden_shadow_spike();
-    new spell_kiljaeden_sinister_reflection();
-    new spell_kiljaeden_sinister_reflection_clone();
-    new spell_kiljaeden_flame_dart();
-    new spell_kiljaeden_darkness();
-    new spell_kiljaeden_power_of_the_blue_flight();
-    new spell_kiljaeden_vengeance_of_the_blue_flight();
-    new spell_kiljaeden_armageddon_periodic();
-    new spell_kiljaeden_armageddon_missile();
-    new spell_kiljaeden_dragon_breath();
+    RegisterSpellScript(spell_kiljaeden_shadow_spike_aura);
+    RegisterSpellScript(spell_kiljaeden_sinister_reflection);
+    RegisterSpellScript(spell_kiljaeden_sinister_reflection_clone);
+    RegisterSpellScript(spell_kiljaeden_flame_dart);
+    RegisterSpellScript(spell_kiljaeden_darkness_aura);
+    RegisterSpellScript(spell_kiljaeden_power_of_the_blue_flight);
+    RegisterSpellScript(spell_kiljaeden_vengeance_of_the_blue_flight_aura);
+    RegisterSpellScript(spell_kiljaeden_armageddon_periodic_aura);
+    RegisterSpellScript(spell_kiljaeden_armageddon_missile);
+    RegisterSpellScript(spell_kiljaeden_dragon_breath);
 }
 

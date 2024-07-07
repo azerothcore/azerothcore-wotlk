@@ -17,15 +17,15 @@
 
 #include "OutdoorPvPNA.h"
 #include "CreatureScript.h"
-#include "GridNotifiers.h"
-#include "ScriptedCreature.h"
 #include "GameGraveyard.h"
+#include "GridNotifiers.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
 #include "OutdoorPvPScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
 #include "World.h"
 #include "WorldPacket.h"
 

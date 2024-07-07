@@ -46,6 +46,7 @@ enum Spells
     SPELL_POSSESS_SPIRIT_IMMUNE     = 40282,
     SPELL_SPIRITUAL_VENGEANCE       = 40268,
     SPELL_BRIEF_STUN                = 41421,
+    SPELL_BERSERK                   = 45078,
 
     SPELL_SPIRIT_LANCE              = 40157,
     SPELL_SPIRIT_CHAINS             = 40175,
@@ -54,13 +55,7 @@ enum Spells
 
 enum Misc
 {
-    SET_DATA_INTRO                  = 1,
-
-    EVENT_SPELL_INCINERATE          = 1,
-    EVENT_SPELL_DOOM_BLOSSOM        = 2,
-    EVENT_SPELL_CRUSHING_SHADOWS    = 3,
-    EVENT_SPELL_SHADOW_OF_DEATH     = 4,
-    EVENT_TALK_KILL                 = 10
+    SET_DATA_INTRO                  = 1
 };
 
 struct ShadowOfDeathSelector
@@ -73,9 +68,11 @@ struct ShadowOfDeathSelector
 
 struct boss_teron_gorefiend : public BossAI
 {
-    boss_teron_gorefiend(Creature* creature) : BossAI(creature, DATA_TERON_GOREFIEND), intro(false) { }
-
-    bool intro;
+    boss_teron_gorefiend(Creature* creature) : BossAI(creature, DATA_TERON_GOREFIEND)
+    {
+        _recentlySpoken = false;
+        _intro = false;
+    }
 
     void Reset() override
     {
@@ -83,33 +80,69 @@ struct boss_teron_gorefiend : public BossAI
         me->CastSpell(me, SPELL_SHADOW_OF_DEATH_REMOVE, true);
     }
 
+    void JustEngagedWith(Unit* who) override
+    {
+        ScheduleTimedEvent(20s, 30s, [&]
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+            {
+                if (roll_chance_i(50))
+                    Talk(SAY_INCINERATE);
+                me->CastSpell(target, SPELL_INCINERATE, false);
+            }
+        }, 20s, 50s);
+
+        ScheduleTimedEvent(5s, 10s, [&]
+        {
+            if (roll_chance_i(50))
+                Talk(SAY_BLOSSOM);
+            me->CastSpell(me, SPELL_SUMMON_DOOM_BLOSSOM, false);
+        }, 35s);
+
+        ScheduleTimedEvent(17s, 22s, [&]
+        {
+            if (roll_chance_i(20))
+                Talk(SAY_CRUSHING);
+            me->CastCustomSpell(SPELL_CRUSHING_SHADOWS, SPELLVALUE_MAX_TARGETS, 5, me, false);
+        }, 10s, 26s);
+
+        ScheduleTimedEvent(10s, [&]
+        {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, ShadowOfDeathSelector()))
+                me->CastSpell(target, SPELL_SHADOW_OF_DEATH, false);
+        }, 30s, 50s);
+
+        ScheduleTimedEvent(10min, [&]
+        {
+            DoCastSelf(SPELL_BERSERK);
+        }, 5min);
+
+        BossAI::JustEngagedWith(who);
+    }
+
+    void KilledUnit(Unit*  victim) override
+    {
+        if (!_recentlySpoken && victim->IsPlayer())
+        {
+            Talk(SAY_SLAY);
+            _recentlySpoken = true;
+
+            ScheduleUniqueTimedEvent(6s, [&]
+            {
+                _recentlySpoken = false;
+            }, 1);
+        }
+    }
+
     void SetData(uint32 type, uint32 id) override
     {
         if (type || !me->IsAlive())
             return;
 
-        if (id == SET_DATA_INTRO && !intro)
+        if (id == SET_DATA_INTRO && !_intro)
         {
-            intro = true;
+            _intro = true;
             Talk(SAY_INTRO);
-        }
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        BossAI::JustEngagedWith(who);
-        events.ScheduleEvent(EVENT_SPELL_INCINERATE, 24000);
-        events.ScheduleEvent(EVENT_SPELL_DOOM_BLOSSOM, 10000);
-        events.ScheduleEvent(EVENT_SPELL_CRUSHING_SHADOWS, 17000);
-        events.ScheduleEvent(EVENT_SPELL_SHADOW_OF_DEATH, 20000);
-    }
-
-    void KilledUnit(Unit*  /*victim*/) override
-    {
-        if (events.GetNextEventTime(EVENT_TALK_KILL) == 0)
-        {
-            Talk(SAY_SLAY);
-            events.ScheduleEvent(EVENT_TALK_KILL, 6000);
         }
     }
 
@@ -130,43 +163,13 @@ struct boss_teron_gorefiend : public BossAI
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_INCINERATE:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-            {
-                if (roll_chance_i(50))
-                    Talk(SAY_INCINERATE);
-                me->CastSpell(target, SPELL_INCINERATE, false);
-            }
-            events.ScheduleEvent(EVENT_SPELL_INCINERATE, 25000);
-            break;
-        case EVENT_SPELL_DOOM_BLOSSOM:
-            if (roll_chance_i(50))
-                Talk(SAY_BLOSSOM);
-
-            me->CastSpell(me, SPELL_SUMMON_DOOM_BLOSSOM, false);
-            events.ScheduleEvent(EVENT_SPELL_DOOM_BLOSSOM, 40000);
-            break;
-        case EVENT_SPELL_CRUSHING_SHADOWS:
-            if (roll_chance_i(20))
-                Talk(SAY_CRUSHING);
-            me->CastCustomSpell(SPELL_CRUSHING_SHADOWS, SPELLVALUE_MAX_TARGETS, 5, me, false);
-            events.ScheduleEvent(EVENT_SPELL_CRUSHING_SHADOWS, 15000);
-            break;
-        case EVENT_SPELL_SHADOW_OF_DEATH:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, ShadowOfDeathSelector()))
-                me->CastSpell(target, SPELL_SHADOW_OF_DEATH, false);
-            events.ScheduleEvent(EVENT_SPELL_SHADOW_OF_DEATH, 30000);
-            break;
-        }
-
+        scheduler.Update(diff);
         DoMeleeAttackIfReady();
     }
+
+    private:
+        bool _recentlySpoken;
+        bool _intro;
 };
 
 class spell_teron_gorefiend_shadow_of_death : public AuraScript
