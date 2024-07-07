@@ -17,12 +17,12 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (@CGUID+2, (@CGUID+2)*10, 0, 0, 1, 0, 0, '');
 
 DELETE FROM `linked_respawn` WHERE `guid` IN (52047, 52048, 52049, 52050, 52051, 52052, 52053) AND `linkedguid` = 47572;
-DELETE FROM `linked_respawn` WHERE `guid` IN (((@CGUID+0)*10), ((@CGUID+1)*10), ((@CGUID+2)*10), ((@CGUID+3)*10)) AND `linkedguid` = 47572;
+DELETE FROM `linked_respawn` WHERE `guid` IN (@CGUID+0, @CGUID+1, @CGUID+2, @CGUID+3) AND `linkedguid` = 47572;
 INSERT INTO `linked_respawn` (`guid`, `linkedGuid`, `linkType`) VALUES
-(((@CGUID+0)*10), 47572, 0),
-(((@CGUID+1)*10), 47572, 0),
-(((@CGUID+2)*10), 47572, 0),
-(((@CGUID+3)*10), 47572, 0);
+(@CGUID+0, 47572, 0),
+(@CGUID+1, 47572, 0),
+(@CGUID+2, 47572, 0),
+(@CGUID+3, 47572, 0);
 
 DELETE FROM `waypoint_data` WHERE `id` IN (((@CGUID+0)*10), ((@CGUID+1)*10), ((@CGUID+2)*10));
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `action_chance`) VALUES 
