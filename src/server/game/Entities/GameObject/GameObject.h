@@ -289,8 +289,6 @@ public:
     void SendCustomAnim(uint32 anim);
     [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
 
-    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
-
     void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
     // sets GameObject type 33 destruction flags and optionally default health for that state

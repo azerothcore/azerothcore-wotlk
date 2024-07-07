@@ -33,6 +33,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <boost/algorithm/string/replace.hpp>
 
 Player* ChatHandler::GetPlayer() const
 {
@@ -887,4 +888,106 @@ LocaleConstant CliHandler::GetSessionDbcLocale() const
 int CliHandler::GetSessionDbLocaleIndex() const
 {
     return sObjectMgr->GetDBCLocaleIndex();
+}
+
+bool AddonChannelCommandHandler::ParseCommands(std::string_view str)
+{
+    if (memcmp(str.data(), "AzerothCore\t", 12))
+        return false;
+    char opcode = str[12];
+    if (!opcode) // str[12] is opcode
+        return false;
+    if (!str[13] || !str[14] || !str[15] || !str[16]) // str[13] through str[16] is 4-character command counter
+        return false;
+    echo = str.substr(13);
+
+    switch (opcode)
+    {
+        case 'p': // p Ping
+            SendAck();
+            return true;
+        case 'h': // h Issue human-readable command
+        case 'i': // i Issue command
+            if (!str[17])
+                return false;
+            humanReadable = (opcode == 'h');
+            if (_ParseCommands(str.substr(17))) // actual command starts at str[17]
+            {
+                if (!hadAck)
+                    SendAck();
+                if (HasSentErrorMessage())
+                    SendFailed();
+                else
+                    SendOK();
+            }
+            else
+            {
+                SendSysMessage(LANG_CMD_INVALID);
+                SendFailed();
+            }
+            return true;
+        default:
+            return false;
+    }
+}
+
+void AddonChannelCommandHandler::Send(std::string const& msg)
+{
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_ADDON, GetSession()->GetPlayer(), GetSession()->GetPlayer(), msg);
+    GetSession()->SendPacket(&data);
+}
+
+void AddonChannelCommandHandler::SendAck() // a Command acknowledged, no body
+{
+    ASSERT(echo.size());
+    std::string ack = "AzerothCore\ta";
+    ack.resize(18);
+    memcpy(&ack[13], echo.data(), 4);
+    ack[17] = '\0';
+    Send(ack);
+    hadAck = true;
+}
+
+void AddonChannelCommandHandler::SendOK() // o Command OK, no body
+{
+    ASSERT(echo.size());
+    std::string ok = "AzerothCore\to";
+    ok.resize(18);
+    memcpy(&ok[13], echo.data(), 4);
+    ok[17] = '\0';
+    Send(ok);
+}
+
+void AddonChannelCommandHandler::SendFailed() // f Command failed, no body
+{
+    ASSERT(echo.size());
+    std::string fail = "AzerothCore\tf";
+    fail.resize(18);
+    memcpy(&fail[13], echo.data(), 4);
+    fail[17] = '\0';
+    Send(fail);
+}
+
+// m Command message, message in body
+void AddonChannelCommandHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
+{
+    ASSERT(echo.size());
+    if (!hadAck)
+        SendAck();
+
+    std::string msg = "AzerothCore\tm";
+    msg.append(echo.data(), 4);
+    std::string body(str);
+    if (escapeCharacters)
+        boost::replace_all(body, "|", "||");
+    size_t pos, lastpos;
+    for (lastpos = 0, pos = body.find('\n', lastpos); pos != std::string::npos; lastpos = pos + 1, pos = body.find('\n', lastpos))
+    {
+        std::string line(msg);
+        line.append(body, lastpos, pos - lastpos);
+        Send(line);
+    }
+    msg.append(body, lastpos, pos - lastpos);
+    Send(msg);
 }

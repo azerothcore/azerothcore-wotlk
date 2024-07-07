@@ -283,14 +283,22 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (msg.empty())
             return;
 
-        if (ChatHandler(this).ParseCommands(msg.c_str()))
-            return;
-
-        if (!_player->CanSpeak())
+        if (lang == LANG_ADDON)
         {
-            std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
-            SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
-            return;
+            if (AddonChannelCommandHandler(this).ParseCommands(msg.c_str()))
+                return;
+        }
+        else
+        {
+            if (ChatHandler(this).ParseCommands(msg.c_str()))
+                return;
+
+            if (!_player->CanSpeak())
+            {
+                std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
+                SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+                return;
+            }
         }
     }
 

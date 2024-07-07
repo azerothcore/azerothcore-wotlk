@@ -58,26 +58,27 @@ enum NXData
     DATA_STALAGG_BOSS               = 108,
     DATA_FEUGEN_BOSS                = 109,
     DATA_THADDIUS_GATE              = 110,
-    DATA_GOTHIK_BOSS                = 111,
-    DATA_GOTHIK_ENTER_GATE          = 112,
-    DATA_GOTHIK_INNER_GATE          = 113,
-    DATA_GOTHIK_EXIT_GATE           = 114,
-    DATA_HORSEMEN_GATE              = 115,
-    DATA_LICH_KING_BOSS             = 116,
-    DATA_KELTHUZAD_FLOOR            = 117,
-    DATA_ABOMINATION_KILLED         = 118,
-    DATA_FRENZY_REMOVED             = 119,
-    DATA_CHARGES_CROSSED            = 120,
-    DATA_SPORE_KILLED               = 121,
-    DATA_HUNDRED_CLUB               = 122,
-    DATA_DANCE_FAIL                 = 123,
-    DATA_IMMORTAL_FAIL              = 124,
-    DATA_KELTHUZAD_GATE             = 125,
-    DATA_HAD_THADDIUS_GREET         = 126,
-    DATA_KELTHUZAD_PORTAL_1         = 127,
-    DATA_KELTHUZAD_PORTAL_2         = 128,
-    DATA_KELTHUZAD_PORTAL_3         = 129,
-    DATA_KELTHUZAD_PORTAL_4         = 130
+    DATA_RAZUVIOUS                  = 111,
+    DATA_GOTHIK_BOSS                = 112,
+    DATA_GOTHIK_ENTER_GATE          = 113,
+    DATA_GOTHIK_INNER_GATE          = 114,
+    DATA_GOTHIK_EXIT_GATE           = 115,
+    DATA_HORSEMEN_GATE              = 116,
+    DATA_LICH_KING_BOSS             = 117,
+    DATA_KELTHUZAD_FLOOR            = 118,
+    DATA_ABOMINATION_KILLED         = 119,
+    DATA_FRENZY_REMOVED             = 120,
+    DATA_CHARGES_CROSSED            = 121,
+    DATA_SPORE_KILLED               = 122,
+    DATA_HUNDRED_CLUB               = 123,
+    DATA_DANCE_FAIL                 = 124,
+    DATA_IMMORTAL_FAIL              = 125,
+    DATA_KELTHUZAD_GATE             = 126,
+    DATA_HAD_THADDIUS_GREET         = 127,
+    DATA_KELTHUZAD_PORTAL_1         = 128,
+    DATA_KELTHUZAD_PORTAL_2         = 129,
+    DATA_KELTHUZAD_PORTAL_3         = 130,
+    DATA_KELTHUZAD_PORTAL_4         = 131
 };
 
 enum NXGOs
@@ -136,6 +137,9 @@ enum NXNPCs
     NPC_THADDIUS                    = 15928,
     NPC_STALAGG                     = 15929,
     NPC_FEUGEN                      = 15930,
+
+    // Razuvious
+    NPC_RAZUVIOUS                   = 16061,
 
     // Four horseman
     NPC_BARON_RIVENDARE             = 30549,
