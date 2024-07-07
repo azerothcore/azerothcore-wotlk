@@ -4047,18 +4047,9 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     ApplySpellFix({
         37730, // Tidal Wave
-        469, 47439, 47440, // Commanding Shout
-        2048, 5242, 6192, 6673, 11549, 11550, 11551, 25289, 47436, // Battle Shout
-        19594, 26557, // Plague Effect
-        21562, 21564, 25392, 48162, // Prayer of Fortitude
-        21849, 21850, 26991, 48470, 69381, // Gift of the Wild
-        23028, 27127, 43002, // Arcane Brilliance
-        27681, 32999, 48074, // Prayer of Spirit
-        27683, 39374, 48170, // Prayer of Shadow Protection
         33006, // Nagrand Fort Buff Reward Raid
         48090, // Demonic Pact
         52759, // Ancestral Awakening
-        52910, 52914, 52915, // Turn the Tables
         54180, // Judgements of the Wise
         57669, // Replenishment
         61316, // Dalaran Brilliance
@@ -4072,18 +4063,27 @@ void SpellMgr::LoadSpellInfoCorrections()
         69754, // Purified Shard of the Scale Heal Targeter
         69994, // Brilliance
         57604, // Death Grip Jump Dest
-        69233, 69646, // Icy Blast
-        69246, 69245, 69645, // Hoarfrost
         70461, // Coldflame Jets (Traps after Saurfang)
         71289, // Dominate Mind (Lady Deathwhisper)
-        70541, 73779, 73780, 73781, // Infest (Lich King)
         46260, // Kaw the Mammoth Destroyer
         29831, // Light Bonfire (DND)
         45537, // Cosmetic - Lightning Beam Channel
         8171, // Cleansing Totem Pulse
         52025, // Cleansing Totem Effect
+        39610, 39609, // Mana Tide Totem
+        19594, 26557, // Plague Effect
+        69233, 69646, // Icy Blast
+        469, 47439, 47440, // Commanding Shout
+        23028, 27127, 43002, // Arcane Brilliance
+        27681, 32999, 48074, // Prayer of Spirit
+        27683, 39374, 48170, // Prayer of Shadow Protection
+        52910, 52914, 52915, // Turn the Tables
+        69246, 69245, 69645, // Hoarfrost
+        70541, 73779, 73780, 73781, // Infest (Lich King)
+        21562, 21564, 25392, 48162, // Prayer of Fortitude
+        21849, 21850, 26991, 48470, 69381, // Gift of the Wild
+        2048, 5242, 6192, 6673, 11549, 11550, 11551, 25289, 47436, // Battle Shout
         52041, 52042, 52046, 52047, 52048, 52049, 52050, 58759, 58760, 58761, // Healing Stream Totem
-        39610, 39609 // Mana Tide Totem
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
