@@ -1060,6 +1060,8 @@ public:
 
     void LoadGossipText();
 
+    void LoadDBCDataCorrections();
+
     void LoadAreaTriggers();
     void LoadAreaTriggerTeleports();
     void LoadAccessRequirements();

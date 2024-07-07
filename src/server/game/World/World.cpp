@@ -1607,6 +1607,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading SpellInfo Custom Attributes...");
     sSpellMgr->LoadSpellInfoCustomAttributes();
 
+    LOG_INFO("server.loading", "Loading DBC Data Corrections...");
+    sObjectMgr->LoadDBCDataCorrections();
+
     LOG_INFO("server.loading", "Loading GameObject Models...");
     LoadGameObjectModelList(_dataPath);
 
