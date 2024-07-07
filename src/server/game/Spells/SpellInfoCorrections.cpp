@@ -276,7 +276,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_IGNORE_CASTER_MODIFIERS;
     });
 
-    
     ApplySpellFix({
         38296, // Spitfire Totem
         37135  // Domination
@@ -376,7 +375,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_7_YARDS);
     });
 
-    
     ApplySpellFix({
         42767,  // Sic'em
         42401   // Throw Head Back
@@ -639,7 +637,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         47960,  // Shadowflame - trigger r1
         61291,  // Shadowflame - trigger r2
         74562,  // Fiery Combustion
-        74792   // Soul Consumption       
+        74792   // Soul Consumption
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_REDIRECTION;
@@ -682,7 +680,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->AttributesEx7 |= SPELL_ATTR7_DONT_CAUSE_SPELL_PUSHBACK;
     });
-    
+
     ApplySpellFix({
         20424,  // Seal of Command trigger
         // Patch 3.3.2 (2010-01-02): Deathbringer Saurfang will no longer gain blood power from Mark of the Fallen Champion.
@@ -853,7 +851,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_DEST_DB);
     });
 
-    
     ApplySpellFix({
         57840,  // Killing Spree (teleport)
         45192   // Dragon Kite, Tuskarr Kite - Kite String
@@ -876,7 +873,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RuneCostID = 442;
     });
 
-    
     ApplySpellFix({
         45524,  // Chains of Ice
         43563,  // Dark Iron Attack - spawn mole machine - summon GO's manually
@@ -1116,7 +1112,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].MiscValue = SPELLMOD_EFFECT2;
     });
 
-    
     ApplySpellFix({
         22987,  // Ritual Enslavement
         26740   // Mind Amplification Dish, change charm aura
@@ -1587,7 +1582,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_WHILE_STUNNED;
     });
 
-    
     ApplySpellFix({
         72221,  // Luck of the Draw
         46392,  // Focused Assault
@@ -2087,7 +2081,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_DUMMY;
     });
 
-    
     ApplySpellFix({
         70897,  // Dark Martyrdom (Lady Deathwhisper)
         60531,  // Not a Bug (13342)
