@@ -33,6 +33,8 @@
 #include "Player.h"
 #include "TargetedMovementGenerator.h"
 
+#include "GridNotifiersImpl.h"
+
 using namespace Acore::ChatCommands;
 
 class mmaps_commandscript : public CommandScript

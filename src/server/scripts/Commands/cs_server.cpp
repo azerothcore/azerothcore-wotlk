@@ -26,6 +26,7 @@
 #include "CommandScript.h"
 #include "GameTime.h"
 #include "GitRevision.h"
+#include "Log.h"
 #include "ModuleMgr.h"
 #include "MotdMgr.h"
 #include "MySQLThreading.h"

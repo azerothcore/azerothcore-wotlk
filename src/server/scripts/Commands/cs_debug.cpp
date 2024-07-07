@@ -24,9 +24,12 @@
 
 #include "Bag.h"
 #include "BattlegroundMgr.h"
+#include "CellImpl.h"
 #include "Channel.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "GossipDef.h"
+#include "GridNotifiersImpl.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
@@ -35,8 +38,8 @@
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
+#include "Transport.h"
 #include "Warden.h"
-#include "World.h"
 #include <fstream>
 #include <set>
 

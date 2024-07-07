@@ -18,6 +18,7 @@
 #include "AccountMgr.h"
 #include "ArenaTeamMgr.h"
 #include "BattlegroundMgr.h"
+#include "CellImpl.h"
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "CommandScript.h"
