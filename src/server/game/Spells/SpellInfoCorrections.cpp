@@ -4896,6 +4896,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         }
     }
 
-    LOG_INFO("server.loading", ">> Loading Spell Info Corrections in {} ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded Spell Info Corrections in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
