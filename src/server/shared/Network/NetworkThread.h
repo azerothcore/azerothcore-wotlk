@@ -20,10 +20,10 @@
 
 #include "DeadlineTimer.h"
 #include "Define.h"
-#include "Socket.h"
 #include "Errors.h"
 #include "IoContext.h"
 #include "Log.h"
+#include "Socket.h"
 #include "Timer.h"
 #include <atomic>
 #include <boost/asio/ip/tcp.hpp>

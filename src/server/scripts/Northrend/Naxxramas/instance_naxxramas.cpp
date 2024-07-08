@@ -52,6 +52,17 @@ inline uint8 GetEruptionSection(float x, float y)
     return 3;
 }
 
+ObjectData const creatureData[] =
+{
+    { NPC_RAZUVIOUS, DATA_RAZUVIOUS },
+    { 0,             0              }
+};
+
+ObjectData const gameObjectData[] =
+{
+    { 0,             0              }
+};
+
 class instance_naxxramas : public InstanceMapScript
 {
 public:
@@ -68,6 +79,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTERS);
+            LoadObjectData(creatureData, gameObjectData);
             for (auto& i : HeiganEruption)
                 i.clear();
 
@@ -253,6 +265,8 @@ public:
                     _lichkingGUID = creature->GetGUID();
                     return;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* pGo) override
@@ -498,6 +512,8 @@ public:
                     }
                     break;
             }
+
+            InstanceScript::OnGameObjectCreate(pGo);
         }
 
         void OnGameObjectRemove(GameObject* pGo) override

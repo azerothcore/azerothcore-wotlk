@@ -4,8 +4,8 @@
 UPDATE `creature_template` SET `ScriptName` = 'npc_gothik_trigger' WHERE `entry` = 16137;
 
 -- re-do spawn locations for triggers
-DELETE FROM `creature` WHERE `id1`=16137;
 SET @CGUID = 127514;
+DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+14 AND `id1`=16137;
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
 (@CGUID+0,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2643.73095703125,  -3399.680908203125, 284.18292236328125,  6.091198921203613281, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side soul trigger (south)'),
 (@CGUID+1,  16137, 0, 0, 533, 3456, 3456, 3, 1, 0, 2739.994873046875, -3399.779296875,    284.294647216796875, 6.108652114868164062, 7200, 0, 0, 17010, 0, 0, 0, 0, 0, '', 46248, 0, 'living side soul trigger (north)'),

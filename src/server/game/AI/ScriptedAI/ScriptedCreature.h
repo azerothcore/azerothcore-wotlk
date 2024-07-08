@@ -25,8 +25,6 @@
 #include "InstanceScript.h"
 #include "TaskScheduler.h"
 
-#define CAST_AI(a, b)   (dynamic_cast<a*>(b))
-
 typedef std::list<WorldObject*> ObjectList;
 
 class InstanceScript;

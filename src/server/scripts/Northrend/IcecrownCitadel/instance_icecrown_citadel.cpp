@@ -123,8 +123,10 @@ DoorData const doorData[] =
 
 ObjectData const creatureData[] =
 {
-    { NPC_SINDRAGOSA, DATA_SINDRAGOSA },
-    { 0,              0               }
+    { NPC_SINDRAGOSA,     DATA_SINDRAGOSA     },
+    { NPC_THE_SKYBREAKER, DATA_THE_SKYBREAKER },
+    { NPC_ORGRIMS_HAMMER, DATA_ORGRIMS_HAMMER },
+    { 0,                  0                   }
 };
 
 // this doesnt have to only store questgivers, also can be used for related quest spawns

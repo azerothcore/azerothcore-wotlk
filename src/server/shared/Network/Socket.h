@@ -21,8 +21,8 @@
 #include "Log.h"
 #include "MessageBuffer.h"
 #include <atomic>
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <functional>
 #include <memory>
 #include <queue>
@@ -261,7 +261,7 @@ private:
 
         const uint8 addressFamily = readPointer[13];
         const uint16 len = (readPointer[14] << 8) | readPointer[15];
-        if (len+16 > packet.GetActiveSize())
+        if (static_cast<size_t>(len+16) > packet.GetActiveSize())
         {
             AsyncReadProxyHeader();
             return;
