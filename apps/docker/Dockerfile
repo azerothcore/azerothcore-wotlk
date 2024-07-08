@@ -203,6 +203,10 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER\
      --from=build \
      /azerothcore/env/dist/bin/dbimport /azerothcore/env/dist/bin/dbimport
 
+COPY --chown=$DOCKER_USER:$DOCKER_USER \
+     --from=build \
+     /azerothcore/modules/**/data/sql data/sql/custom
+
 CMD /azerothcore/env/dist/bin/dbimport
 
 ###############
