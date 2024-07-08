@@ -27,13 +27,12 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "MMapFactory.h"
 #include "Map.h"
 #include "PathGenerator.h"
 #include "Player.h"
 #include "TargetedMovementGenerator.h"
-
-#include "GridNotifiersImpl.h"
 
 using namespace Acore::ChatCommands;
 
