@@ -19,7 +19,6 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
-#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "hyjal.h"
@@ -504,7 +503,7 @@ class spell_doomfire : public AuraScript
         int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
         float tickCoef = (static_cast<float>(aurEff->GetTickNumber() - 1) / aurEff->GetTotalTicks()); // Tick moved back to ensure proper damage on each tick
         int32 damage = bp - (bp*tickCoef);
-        SpellCastResult result = target->CastCustomSpell(target, SPELL_DOOMFIRE_DOT, &damage, &damage, &damage, true, nullptr, nullptr, target->GetGUID());
+        target->CastCustomSpell(target, SPELL_DOOMFIRE_DOT, &damage, &damage, &damage, true, nullptr, nullptr, target->GetGUID());
     }
 
     void Register() override
