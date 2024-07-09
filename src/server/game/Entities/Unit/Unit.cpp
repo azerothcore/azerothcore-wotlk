@@ -20427,10 +20427,10 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 
     if (attacker)
     {
-        addRage = (damage / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
-
-        // talent who gave more rage on attack
-        AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
+        float rageFromDamageDealt = damage / rageconversion * 7.5f;
+        AddPct(rageFromDamageDealt, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
+        addRage = (rageFromDamageDealt + weaponSpeedHitFactor) / 2.0f;
+        addRage = std::min(addRage, rageFromDamageDealt * 2.0f);
     }
     else
     {
