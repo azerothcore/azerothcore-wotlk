@@ -1,3 +1,4 @@
+-- DB update 2024_07_09_13 -> 2024_07_09_14
 --
 UPDATE `creature_template_addon` SET `auras` = '18943' WHERE (`entry` = 20040);
 
