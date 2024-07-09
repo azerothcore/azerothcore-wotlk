@@ -47,7 +47,6 @@ enum TotemImmunitySpells
     SPELL_INTERVENE  = 3411
 };
 
-
 class Totem : public Minion
 {
 public:
