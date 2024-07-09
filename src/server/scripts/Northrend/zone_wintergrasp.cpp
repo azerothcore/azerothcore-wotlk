@@ -904,265 +904,198 @@ public:
 /* 56662, 61409 - Build Siege Vehicle (Force)
    56664 - Build Catapult (Force)
    56659 - Build Demolisher (Force) */
-class spell_wintergrasp_force_building : public SpellScriptLoader
+class spell_wintergrasp_force_building : public SpellScript
 {
-public:
-    spell_wintergrasp_force_building() : SpellScriptLoader("spell_wintergrasp_force_building") { }
+    PrepareSpellScript(spell_wintergrasp_force_building);
 
-    class spell_wintergrasp_force_building_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_wintergrasp_force_building_SpellScript);
+        return ValidateSpellInfo(
+            {
+                SPELL_BUILD_CATAPULT_FORCE,
+                SPELL_BUILD_DEMOLISHER_FORCE,
+                SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE,
+                SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE
+            });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo(
-                {
-                    SPELL_BUILD_CATAPULT_FORCE,
-                    SPELL_BUILD_DEMOLISHER_FORCE,
-                    SPELL_BUILD_SIEGE_VEHICLE_FORCE_HORDE,
-                    SPELL_BUILD_SIEGE_VEHICLE_FORCE_ALLIANCE
-                });
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, GetEffectValue(), false, nullptr, nullptr, target->GetGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_force_building_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_wintergrasp_force_building_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, GetEffectValue(), false, nullptr, nullptr, target->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_force_building::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 /* 56661, 61408 - Build Siege Engine
    56663 - Build Catapult
    56575 - Build Demolisher */
-class spell_wintergrasp_create_vehicle : public SpellScriptLoader
+class spell_wintergrasp_create_vehicle : public SpellScript
 {
-public:
-    spell_wintergrasp_create_vehicle() : SpellScriptLoader("spell_wintergrasp_create_vehicle") { }
+    PrepareSpellScript(spell_wintergrasp_create_vehicle);
 
-    class spell_wintergrasp_create_vehicle_SpellScript : public SpellScript
+    void HandleSummon(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_wintergrasp_create_vehicle_SpellScript);
+        PreventHitEffect(effIndex);
 
-        void HandleSummon(SpellEffIndex effIndex)
+        if (Unit* caster = GetCaster())
         {
-            PreventHitEffect(effIndex);
-
-            if (Unit* caster = GetCaster())
+            Unit* originalCaster = GetOriginalCaster();
+            if (!originalCaster)
             {
-                Unit* originalCaster = GetOriginalCaster();
-                if (!originalCaster)
-                {
-                    return;
-                }
+                return;
+            }
 
-                SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
-                if (!properties)
-                {
-                    return;
-                }
+            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(GetSpellInfo()->Effects[effIndex].MiscValueB);
+            if (!properties)
+            {
+                return;
+            }
 
-                uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
-                int32 duration = GetSpellInfo()->GetDuration();
-                if (TempSummon* summon = caster->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, originalCaster, GetSpellInfo()->Id))
+            uint32 entry = GetSpellInfo()->Effects[effIndex].MiscValue;
+            int32 duration = GetSpellInfo()->GetDuration();
+            if (TempSummon* summon = caster->GetMap()->SummonCreature(entry, *GetHitDest(), properties, duration, originalCaster, GetSpellInfo()->Id))
+            {
+                if (summon->IsInMap(caster))
                 {
-                    if (summon->IsInMap(caster))
-                    {
-                        summon->SetCreatorGUID(originalCaster->GetGUID());
-                        summon->HandleSpellClick(caster);
-                    }
+                    summon->SetCreatorGUID(originalCaster->GetGUID());
+                    summon->HandleSpellClick(caster);
                 }
             }
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_wintergrasp_create_vehicle_SpellScript::HandleSummon, EFFECT_1, SPELL_EFFECT_SUMMON);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_wintergrasp_create_vehicle_SpellScript;
+        OnEffectHit += SpellEffectFn(spell_wintergrasp_create_vehicle::HandleSummon, EFFECT_1, SPELL_EFFECT_SUMMON);
     }
 };
 
 // 49761 - Rocket-Propelled Goblin Grenade
-class spell_wintergrasp_rp_gg : public SpellScriptLoader
+class spell_wintergrasp_rp_gg : public SpellScript
 {
-public:
-    spell_wintergrasp_rp_gg() : SpellScriptLoader("spell_wintergrasp_rp_gg") { }
+    PrepareSpellScript(spell_wintergrasp_rp_gg);
 
-    class spell_wintergrasp_rp_gg_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_wintergrasp_rp_gg_SpellScript);
+        return ValidateSpellInfo({ SPELL_RP_GG_TRIGGER_MISSILE });
+    }
 
-        bool handled;
-        bool Load() override
-        {
-            handled = false;
-            return true;
-        }
-
-        void HandleFinish()
-        {
-            if (!GetExplTargetDest())
-                return;
-
-            GetCaster()->CastSpell(GetExplTargetDest()->GetPositionX(), GetExplTargetDest()->GetPositionY(), GetExplTargetDest()->GetPositionZ(), SPELL_RP_GG_TRIGGER_MISSILE, true);
-        }
-
-        void Register() override
-        {
-            AfterCast += SpellCastFn(spell_wintergrasp_rp_gg_SpellScript::HandleFinish);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool handled;
+    bool Load() override
     {
-        return new spell_wintergrasp_rp_gg_SpellScript();
+        handled = false;
+        return true;
+    }
+
+    void HandleFinish()
+    {
+        if (!GetExplTargetDest())
+            return;
+
+        GetCaster()->CastSpell(GetExplTargetDest()->GetPositionX(), GetExplTargetDest()->GetPositionY(), GetExplTargetDest()->GetPositionZ(), SPELL_RP_GG_TRIGGER_MISSILE, true);
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_wintergrasp_rp_gg::HandleFinish);
     }
 };
 
 // 58622 - Teleport to Lake Wintergrasp
-class spell_wintergrasp_portal : public SpellScriptLoader
+class spell_wintergrasp_portal : public SpellScript
 {
-public:
-    spell_wintergrasp_portal() : SpellScriptLoader("spell_wintergrasp_portal") { }
+    PrepareSpellScript(spell_wintergrasp_portal);
 
-    class spell_wintergrasp_portal_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_wintergrasp_portal_SpellScript);
+        return ValidateSpellInfo({ SPELL_TELEPORT_TO_FORTRESS });
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Player* target = GetHitPlayer();
-            Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-            if (!wintergrasp || !target || target->GetLevel() < 75 || (wintergrasp->GetDefenderTeam() != target->GetTeamId()))
-                return;
-
-            target->CastSpell(target, SPELL_TELEPORT_TO_FORTRESS, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_portal_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_wintergrasp_portal_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        Player* target = GetHitPlayer();
+        Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+        if (!wintergrasp || !target || target->GetLevel() < 75 || (wintergrasp->GetDefenderTeam() != target->GetTeamId()))
+            return;
+
+        target->CastSpell(target, SPELL_TELEPORT_TO_FORTRESS, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_wintergrasp_portal::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
 // 36444 - Wintergrasp Water
-class spell_wintergrasp_water : public SpellScriptLoader
+class spell_wintergrasp_water : public SpellScript
 {
-public:
-    spell_wintergrasp_water() : SpellScriptLoader("spell_wintergrasp_water") { }
+    PrepareSpellScript(spell_wintergrasp_water);
 
-    class spell_wintergrasp_water_SpellScript : public SpellScript
+    SpellCastResult CheckCast()
     {
-        PrepareSpellScript(spell_wintergrasp_water_SpellScript);
+        Unit* target = GetCaster();
+        if (!target || !target->IsVehicle())
+            return SPELL_FAILED_DONT_REPORT;
 
-        SpellCastResult CheckCast()
-        {
-            Unit* target = GetCaster();
-            if (!target || !target->IsVehicle())
-                return SPELL_FAILED_DONT_REPORT;
+        return SPELL_CAST_OK;
+    }
 
-            return SPELL_CAST_OK;
-        }
-
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_wintergrasp_water_SpellScript::CheckCast);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_wintergrasp_water_SpellScript();
+        OnCheckCast += SpellCheckCastFn(spell_wintergrasp_water::CheckCast);
     }
 };
 
 // 52107 - (Spell not exist in DBC)
-class spell_wintergrasp_hide_small_elementals : public SpellScriptLoader
+class spell_wintergrasp_hide_small_elementals_aura : public AuraScript
 {
-public:
-    spell_wintergrasp_hide_small_elementals() : SpellScriptLoader("spell_wintergrasp_hide_small_elementals") { }
+    PrepareAuraScript(spell_wintergrasp_hide_small_elementals_aura);
 
-    class spell_wintergrasp_hide_small_elementals_AuraScript : public AuraScript
+    void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_wintergrasp_hide_small_elementals_AuraScript);
+        Unit* target = GetTarget();
+        Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
+        bool enable = !Bf || !Bf->IsWarTime();
+        target->SetPhaseMask(enable ? 1 : 512, true);
+        PreventDefaultAction();
+    }
 
-        void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
-        {
-            Unit* target = GetTarget();
-            Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
-            bool enable = !Bf || !Bf->IsWarTime();
-            target->SetPhaseMask(enable ? 1 : 512, true);
-            PreventDefaultAction();
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_wintergrasp_hide_small_elementals_AuraScript::HandlePeriodicDummy, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_wintergrasp_hide_small_elementals_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_wintergrasp_hide_small_elementals_aura::HandlePeriodicDummy, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
 /* 57610, 51422 - Cannon
    50999 - Boulder
    57607 - Plague Slime */
-class spell_wg_reduce_damage_by_distance : public SpellScriptLoader
+class spell_wg_reduce_damage_by_distance : public SpellScript
 {
-public:
-    spell_wg_reduce_damage_by_distance() : SpellScriptLoader("spell_wg_reduce_damage_by_distance") { }
+    PrepareSpellScript(spell_wg_reduce_damage_by_distance);
 
-    class spell_wg_reduce_damage_by_distance_SpellScript : public SpellScript
+    void RecalculateDamage()
     {
-        PrepareSpellScript(spell_wg_reduce_damage_by_distance_SpellScript);
+        if (!GetExplTargetDest() || !GetHitUnit())
+            return;
 
-        void RecalculateDamage()
-        {
-            if (!GetExplTargetDest() || !GetHitUnit())
-                return;
+        float maxDistance = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster()); // Xinef: always stored in EFFECT_0
+        float distance = std::min<float>(GetHitUnit()->GetDistance(*GetExplTargetDest()), maxDistance);
 
-            float maxDistance = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster()); // Xinef: always stored in EFFECT_0
-            float distance = std::min<float>(GetHitUnit()->GetDistance(*GetExplTargetDest()), maxDistance);
+        int32 damage = std::max<int32>(0, int32(GetHitDamage() - floor(GetHitDamage() * (distance / maxDistance))));
+        SetHitDamage(damage);
+    }
 
-            int32 damage = std::max<int32>(0, int32(GetHitDamage() - floor(GetHitDamage() * (distance / maxDistance))));
-            SetHitDamage(damage);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_wg_reduce_damage_by_distance_SpellScript::RecalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_wg_reduce_damage_by_distance_SpellScript();
+        OnHit += SpellHitFn(spell_wg_reduce_damage_by_distance::RecalculateDamage);
     }
 };
 
@@ -1242,13 +1175,13 @@ void AddSC_wintergrasp()
     new go_wg_vehicle_teleporter();
 
     // SPELLs
-    new spell_wintergrasp_force_building();
-    new spell_wintergrasp_create_vehicle();
-    new spell_wintergrasp_rp_gg();
-    new spell_wintergrasp_portal();
-    new spell_wintergrasp_water();
-    new spell_wintergrasp_hide_small_elementals();
-    new spell_wg_reduce_damage_by_distance();
+    RegisterSpellScript(spell_wintergrasp_force_building);
+    RegisterSpellScript(spell_wintergrasp_create_vehicle);
+    RegisterSpellScript(spell_wintergrasp_rp_gg);
+    RegisterSpellScript(spell_wintergrasp_portal);
+    RegisterSpellScript(spell_wintergrasp_water);
+    RegisterSpellScript(spell_wintergrasp_hide_small_elementals_aura);
+    RegisterSpellScript(spell_wg_reduce_damage_by_distance);
 
     // ACHIEVEMENTs
     new achievement_wg_didnt_stand_a_chance();
