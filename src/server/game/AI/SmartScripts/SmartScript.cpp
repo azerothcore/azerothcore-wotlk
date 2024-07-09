@@ -1392,12 +1392,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         }
         case SMART_ACTION_SET_DATA:
         {
+             // Areatrigger cannot be used as an invoker
             for (WorldObject* target : targets)
             {
                 if (Creature* cTarget = target->ToCreature())
                 {
                     CreatureAI* ai = cTarget->AI();
-                    if (IsSmart(cTarget))
+                    if (e.GetScriptType() != SMART_SCRIPT_TYPE_AREATRIGGER && IsSmart(cTarget))
                         ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
                     else
                         ai->SetData(e.action.setData.field, e.action.setData.data);
@@ -1405,7 +1406,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 else if (GameObject* oTarget = target->ToGameObject())
                 {
                     GameObjectAI* ai = oTarget->AI();
-                    if (IsSmart(oTarget))
+                    if (e.GetScriptType() != SMART_SCRIPT_TYPE_AREATRIGGER && IsSmart(oTarget))
                         ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
                     else
                         ai->SetData(e.action.setData.field, e.action.setData.data);
