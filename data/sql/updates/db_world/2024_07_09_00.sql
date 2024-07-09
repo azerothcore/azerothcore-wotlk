@@ -1,3 +1,4 @@
+-- DB update 2024_07_08_00 -> 2024_07_09_00
 -- Quest: Threat from Above, creatures already have KillCredit for 23450
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 22143) AND (`source_type` = 0) AND (`id` IN (4));
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 22144) AND (`source_type` = 0) AND (`id` IN (4));
