@@ -1,5 +1,5 @@
 -- Disgusting Oozeling
-DELETE FROM `creature_text` WHERE (`CreatureID` = 15429) AND (`ID` IN (0));
+DELETE FROM `creature_text` WHERE (`CreatureID` = 15429);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (15429, 0, 0, '%s guzzles down the ale!', 16, 0, 100, 0, 0, 0, 10167, 0, 'Disgusting Oozeling - Dark Iron Ale');
 
