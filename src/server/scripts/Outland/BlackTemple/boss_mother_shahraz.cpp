@@ -69,6 +69,11 @@ struct boss_mother_shahraz : public BossAI
         _Reset();
         me->m_Events.CancelEventGroup(GROUP_ENRAGE);
         _canTalk = true;
+
+        ScheduleHealthCheckEvent(10, [&] {
+            DoCastSelf(SPELL_FRENZY, true);
+            Talk(SAY_EMOTE_FRENZY);
+        });
     }
 
     void JustEngagedWith(Unit* who) override
@@ -77,11 +82,6 @@ struct boss_mother_shahraz : public BossAI
         Talk(SAY_AGGRO);
         DoCastSelf(SPELL_SABER_LASH_AURA, true);
         DoCastSelf(SPELL_RANDOM_PERIODIC, true);
-
-        ScheduleHealthCheckEvent(10, [&] {
-            DoCastSelf(SPELL_FRENZY, true);
-            Talk(SAY_EMOTE_FRENZY);
-        });
 
         ScheduleTimedEvent(4s, [&] {
             DoCastVictim(SPELL_SABER_LASH);
