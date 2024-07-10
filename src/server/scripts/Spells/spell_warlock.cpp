@@ -65,12 +65,14 @@ enum WarlockSpells
     SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC          = 18371,
     SPELL_WARLOCK_EYE_OF_KILROGG_FLY                = 58083,
     SPELL_WARLOCK_PET_VOID_STAR_TALISMAN            = 37386, // Void Star Talisman
+    SPELL_WARLOCK_DEMONIC_PACT_PROC                 = 48090,
 };
 
 enum WarlockSpellIcons
 {
     WARLOCK_ICON_ID_IMPROVED_LIFE_TAP               = 208,
-    WARLOCK_ICON_ID_MANA_FEED                       = 1982
+    WARLOCK_ICON_ID_MANA_FEED                       = 1982,
+    WARLOCK_ICON_ID_DEMONIC_PACT                    = 3220
 };
 
 class spell_warl_eye_of_kilrogg : public AuraScript
@@ -1321,6 +1323,55 @@ class spell_warl_glyph_of_voidwalker : public AuraScript
     }
 };
 
+// 54909, 53646 - Demonic Pact
+class spell_warl_demonic_pact : public SpellScriptLoader
+{
+    public:
+        spell_warl_demonic_pact() : SpellScriptLoader("spell_warl_demonic_pact") { }
+
+        class spell_warl_demonic_pact_AuraScript : public AuraScript
+        {
+            PrepareAuraScript(spell_warl_demonic_pact_AuraScript);
+
+            bool Validate(SpellInfo const* /*spellInfo*/) override
+            {
+                if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_PACT_PROC))
+                    return false;
+                return true;
+            }
+
+            bool CheckProc(ProcEventInfo& eventInfo)
+            {
+                return eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
+            }
+
+            void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+            {
+                PreventDefaultAction();
+
+                if (Unit* owner = eventInfo.GetActor()->GetOwner())
+                {
+                    if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
+                    {
+                        int32 bp0 = static_cast<int32>((aurEff->GetAmount() * owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) + 100.0f) / 100.0f);
+                        owner->CastCustomSpell(SPELL_WARLOCK_DEMONIC_PACT_PROC, SPELLVALUE_BASE_POINT0, bp0, (Unit*)nullptr, true, nullptr, aurEff);
+                    }
+                }
+            }
+
+            void Register() override
+            {
+                DoCheckProc += AuraCheckProcFn(spell_warl_demonic_pact_AuraScript::CheckProc);
+                OnEffectProc += AuraEffectProcFn(spell_warl_demonic_pact_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+            }
+        };
+
+        AuraScript* GetAuraScript() const override
+        {
+            return new spell_warl_demonic_pact_AuraScript();
+        }
+};
+
 void AddSC_warlock_spell_scripts()
 {
     RegisterSpellScript(spell_warl_eye_of_kilrogg);
@@ -1354,5 +1405,6 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_shadowburn);
     RegisterSpellScript(spell_warl_glyph_of_felguard);
     RegisterSpellScript(spell_warl_glyph_of_voidwalker);
+    new spell_warl_demonic_pact();
 }
 
