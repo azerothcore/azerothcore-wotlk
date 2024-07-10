@@ -1355,9 +1355,8 @@ class spell_warl_demonic_pact_aura : public AuraScript
                     int32 spellDamageMinusBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) - currentBonus;
                     if (spellDamageMinusBonus < 0)
                         return;
-                    int32 bp0 = int32((aurEff->GetAmount() / 100.0f) * spellDamageMinusBonus);
-
-                    owner->CastCustomSpell(SPELL_WARLOCK_DEMONIC_PACT_PROC, SPELLVALUE_BASE_POINT0, bp0, (Unit*)nullptr, true, nullptr, aurEff);
+                    int32 bp = int32((aurEff->GetAmount() / 100.0f) * spellDamageMinusBonus);
+                    owner->CastCustomSpell((Unit*)nullptr, SPELL_WARLOCK_DEMONIC_PACT_PROC, &bp, &bp, 0, true, nullptr, aurEff);
                 }
             }
         }
