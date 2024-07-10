@@ -1344,9 +1344,19 @@ class spell_warl_demonic_pact_aura : public AuraScript
 
             if (Unit* owner = eventInfo.GetActor()->GetOwner())
             {
+                int32 currentBonus = 0;
+                if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_WARLOCK_DEMONIC_PACT_PROC, EFFECT_0))
+                {
+                    currentBonus = aurEff->GetAmount();
+                }
+
                 if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
                 {
-                    int32 bp0 = static_cast<int32>((aurEff->GetAmount() * owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) + 100.0f) / 100.0f);
+                    int32 spellDamageMinusBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) - currentBonus;
+                    if (spellDamageMinusBonus < 0)
+                        return;
+                    int32 bp0 = int32((aurEff->GetAmount() / 100.0f) * spellDamageMinusBonus);
+
                     owner->CastCustomSpell(SPELL_WARLOCK_DEMONIC_PACT_PROC, SPELLVALUE_BASE_POINT0, bp0, (Unit*)nullptr, true, nullptr, aurEff);
                 }
             }
