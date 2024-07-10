@@ -1282,6 +1282,8 @@ void World::LoadConfigSettings(bool reload)
 
     _bool_configs[CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH] = sConfigMgr->GetOption<bool>("Pet.RankMod.Health", true);
 
+    _bool_configs[CONFIG_MUNCHING_BLIZZLIKE] = sConfigMgr->GetOption<bool>("MunchingBlizzlike.Enabled", true);
+
     _int_configs[CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD] = sConfigMgr->GetOption<uint32>("DailyRBGArenaPoints.MinLevel", 71);
 
     _int_configs[CONFIG_AUCTION_HOUSE_SEARCH_TIMEOUT] = sConfigMgr->GetOption<uint32>("AuctionHouse.SearchTimeout", 1000);
