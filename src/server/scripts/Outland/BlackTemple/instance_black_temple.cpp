@@ -36,10 +36,35 @@ DoorData const doorData[] =
     { GO_MOTHER_SHAHRAZ_DOOR,   DATA_MOTHER_SHAHRAZ,        DOOR_TYPE_PASSAGE  },
     { GO_COUNCIL_DOOR_1,        DATA_ILLIDARI_COUNCIL,      DOOR_TYPE_ROOM     },
     { GO_COUNCIL_DOOR_2,        DATA_ILLIDARI_COUNCIL,      DOOR_TYPE_ROOM     },
-    { GO_ILLIDAN_GATE,          DATA_AKAMA_FINISHED,        DOOR_TYPE_PASSAGE  },
+    { GO_ILLIDAN_GATE,          DATA_AKAMA_ILLIDAN,         DOOR_TYPE_PASSAGE  },
     { GO_ILLIDAN_DOOR_L,        DATA_ILLIDAN_STORMRAGE,     DOOR_TYPE_ROOM     },
     { GO_ILLIDAN_DOOR_R,        DATA_ILLIDAN_STORMRAGE,     DOOR_TYPE_ROOM     },
     { 0,                        0,                          DOOR_TYPE_ROOM     }
+};
+
+ObjectData const creatureData[] =
+{
+    { NPC_HIGH_WARLORD_NAJENTUS,     DATA_HIGH_WARLORD_NAJENTUS     },
+    { NPC_SUPREMUS,                  DATA_SUPREMUS                  },
+    { NPC_SHADE_OF_AKAMA,            DATA_SHADE_OF_AKAMA            },
+    { NPC_AKAMA_SHADE,               DATA_AKAMA_SHADE               },
+    { NPC_TERON_GOREFIEND,           DATA_TERON_GOREFIEND           },
+    { NPC_GURTOGG_BLOODBOIL,         DATA_GURTOGG_BLOODBOIL         },
+    { NPC_RELIQUARY_OF_THE_LOST,     DATA_RELIQUARY_OF_SOULS        },
+    { NPC_MOTHER_SHAHRAZ,            DATA_MOTHER_SHAHRAZ            },
+    { NPC_ILLIDARI_COUNCIL,          DATA_ILLIDARI_COUNCIL          },
+    { NPC_GATHIOS_THE_SHATTERER,     DATA_GATHIOS_THE_SHATTERER     },
+    { NPC_HIGH_NETHERMANCER_ZEREVOR, DATA_HIGH_NETHERMANCER_ZEREVOR },
+    { NPC_LADY_MALANDE,              DATA_LADY_MALANDE              },
+    { NPC_VERAS_DARKSHADOW,          DATA_VERAS_DARKSHADOW          },
+    { NPC_AKAMA_ILLIDAN,             DATA_AKAMA_ILLIDAN             },
+    { NPC_ILLIDAN_STORMRAGE,         DATA_ILLIDAN_STORMRAGE         },
+    { 0,                             0                              }
+};
+
+ObjectData const objectData[] =
+{
+    { 0, 0 }
 };
 
 BossBoundaryData const boundaries =
@@ -70,6 +95,7 @@ public:
             SetBossNumber(MAX_ENCOUNTERS);
             LoadDoorData(doorData);
             LoadBossBoundaries(boundaries);
+            LoadObjectData(creatureData, objectData);
 
             ashtongueGUIDs.clear();
         }
@@ -78,52 +104,19 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_SHADE_OF_AKAMA:
-                    ShadeOfAkamaGUID = creature->GetGUID();
-                    break;
-                case NPC_AKAMA_SHADE:
-                    AkamaShadeGUID = creature->GetGUID();
-                    break;
-                case NPC_TERON_GOREFIEND:
-                    TeronGorefiendGUID = creature->GetGUID();
-                    break;
-                case NPC_RELIQUARY_OF_THE_LOST:
-                    ReliquaryGUID = creature->GetGUID();
-                    break;
-                case NPC_GATHIOS_THE_SHATTERER:
-                    GathiosTheShattererGUID = creature->GetGUID();
-                    break;
-                case NPC_HIGH_NETHERMANCER_ZEREVOR:
-                    HighNethermancerZerevorGUID = creature->GetGUID();
-                    break;
-                case NPC_LADY_MALANDE:
-                    LadyMalandeGUID = creature->GetGUID();
-                    break;
-                case NPC_VERAS_DARKSHADOW:
-                    VerasDarkshadowGUID = creature->GetGUID();
-                    break;
-                case NPC_ILLIDARI_COUNCIL:
-                    IllidariCouncilGUID = creature->GetGUID();
-                    break;
-                case NPC_AKAMA:
-                    AkamaGUID = creature->GetGUID();
-                    break;
-                case NPC_ILLIDAN_STORMRAGE:
-                    IllidanStormrageGUID = creature->GetGUID();
-                    break;
                 case NPC_VENGEFUL_SPIRIT:
                 case NPC_SHADOWY_CONSTRUCT:
-                    if (Creature* teron = instance->GetCreature(TeronGorefiendGUID))
+                    if (Creature* teron = GetCreature(DATA_TERON_GOREFIEND))
                         teron->AI()->JustSummoned(creature);
                     break;
                 case NPC_ENSLAVED_SOUL:
-                    if (Creature* reliquary = instance->GetCreature(ReliquaryGUID))
+                    if (Creature* reliquary = GetCreature(DATA_RELIQUARY_OF_SOULS))
                         reliquary->AI()->JustSummoned(creature);
                     break;
                 case NPC_PARASITIC_SHADOWFIEND:
                 case NPC_BLADE_OF_AZZINOTH:
                 case NPC_FLAME_OF_AZZINOTH:
-                    if (Creature* illidan = instance->GetCreature(IllidanStormrageGUID))
+                    if (Creature* illidan = GetCreature(DATA_ILLIDAN_STORMRAGE))
                         illidan->AI()->JustSummoned(creature);
                     break;
                 case NPC_ANGERED_SOUL_FRAGMENT:
@@ -131,85 +124,38 @@ public:
                 case NPC_SUFFERING_SOUL_FRAGMENT:
                     creature->SetCorpseDelay(5);
                     break;
+                case NPC_ASHTONGUE_BATTLELORD:
+                case NPC_ASHTONGUE_MYSTIC:
+                case NPC_ASHTONGUE_STORMCALLER:
+                case NPC_ASHTONGUE_PRIMALIST:
+                case NPC_ASHTONGUE_FERAL_SPIRIT:
+                case NPC_ASHTONGUE_STALKER:
+                case NPC_STORM_FURY:
+                    if (GetBossState(DATA_SHADE_OF_AKAMA) == DONE)
+                        creature->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
+                    else
+                        ashtongueGUIDs.insert(creature->GetGUID());
+                    break;
+                default:
+                    break;
             }
 
-            if (creature->GetName().find("Ashtongue") != std::string::npos || creature->GetEntry() == NPC_STORM_FURY)
-            {
-                ashtongueGUIDs.push_back(creature->GetGUID());
-                if (GetBossState(DATA_SHADE_OF_AKAMA) == DONE)
-                    creature->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
-            }
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch (go->GetEntry())
+            // If created after Illidari Council is done, then skip Akama's event. Used for crashes/reset
+            if (go->GetEntry() == GO_ILLIDAN_GATE)
             {
-                case GO_NAJENTUS_GATE:
-                case GO_SUPREMUS_GATE:
-                case GO_SHADE_OF_AKAMA_DOOR:
-                case GO_TERON_DOOR_1:
-                case GO_TERON_DOOR_2:
-                case GO_GURTOGG_DOOR:
-                case GO_TEMPLE_DOOR:
-                case GO_MOTHER_SHAHRAZ_DOOR:
-                case GO_COUNCIL_DOOR_1:
-                case GO_COUNCIL_DOOR_2:
-                case GO_ILLIDAN_GATE:
-                case GO_ILLIDAN_DOOR_R:
-                case GO_ILLIDAN_DOOR_L:
-                    AddDoor(go);
-                    break;
-            }
-        }
-
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_NAJENTUS_GATE:
-                case GO_SUPREMUS_GATE:
-                case GO_SHADE_OF_AKAMA_DOOR:
-                case GO_TERON_DOOR_1:
-                case GO_TERON_DOOR_2:
-                case GO_GURTOGG_DOOR:
-                case GO_TEMPLE_DOOR:
-                case GO_MOTHER_SHAHRAZ_DOOR:
-                case GO_COUNCIL_DOOR_1:
-                case GO_COUNCIL_DOOR_2:
-                case GO_ILLIDAN_GATE:
-                case GO_ILLIDAN_DOOR_R:
-                case GO_ILLIDAN_DOOR_L:
-                    RemoveDoor(go);
-                    break;
-            }
-        }
-
-        ObjectGuid GetGuidData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case NPC_SHADE_OF_AKAMA:
-                    return ShadeOfAkamaGUID;
-                case NPC_AKAMA_SHADE:
-                    return AkamaShadeGUID;
-                case NPC_GATHIOS_THE_SHATTERER:
-                    return GathiosTheShattererGUID;
-                case NPC_HIGH_NETHERMANCER_ZEREVOR:
-                    return HighNethermancerZerevorGUID;
-                case NPC_LADY_MALANDE:
-                    return LadyMalandeGUID;
-                case NPC_VERAS_DARKSHADOW:
-                    return VerasDarkshadowGUID;
-                case NPC_ILLIDARI_COUNCIL:
-                    return IllidariCouncilGUID;
-                case NPC_AKAMA:
-                    return AkamaGUID;
-                case NPC_ILLIDAN_STORMRAGE:
-                    return IllidanStormrageGUID;
+                if (GetBossState(DATA_ILLIDARI_COUNCIL) == DONE)
+                {
+                    SetBossState(DATA_AKAMA_ILLIDAN, DONE);
+                    HandleGameObject(ObjectGuid::Empty, true, go);
+                }
             }
 
-            return ObjectGuid::Empty;
+            InstanceScript::OnGameObjectCreate(go);
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -225,26 +171,15 @@ public:
             }
             else if (type == DATA_ILLIDARI_COUNCIL && state == DONE)
             {
-                if (Creature* akama = instance->GetCreature(AkamaGUID))
-                    akama->SetVisible(true);
+                if (Creature* akama = GetCreature(DATA_AKAMA_ILLIDAN))
+                    akama->AI()->DoAction(0);
             }
 
             return true;
         }
 
     protected:
-        ObjectGuid ShadeOfAkamaGUID;
-        ObjectGuid AkamaShadeGUID;
-        ObjectGuid TeronGorefiendGUID;
-        ObjectGuid ReliquaryGUID;
-        GuidList ashtongueGUIDs;
-        ObjectGuid GathiosTheShattererGUID;
-        ObjectGuid HighNethermancerZerevorGUID;
-        ObjectGuid LadyMalandeGUID;
-        ObjectGuid VerasDarkshadowGUID;
-        ObjectGuid IllidariCouncilGUID;
-        ObjectGuid AkamaGUID;
-        ObjectGuid IllidanStormrageGUID;
+        GuidSet ashtongueGUIDs;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
@@ -253,410 +188,290 @@ public:
     }
 };
 
-class spell_black_template_harpooners_mark : public SpellScriptLoader
+class spell_black_template_harpooners_mark_aura : public AuraScript
 {
-public:
-    spell_black_template_harpooners_mark() : SpellScriptLoader("spell_black_template_harpooners_mark") { }
+    PrepareAuraScript(spell_black_template_harpooners_mark_aura);
 
-    class spell_black_template_harpooners_mark_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_black_template_harpooners_mark_AuraScript)
+        _turtleSet.clear();
+        return true;
+    }
 
-        bool Load() override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        std::list<Creature*> creatureList;
+        GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_DRAGON_TURTLE);
+        for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
         {
-            _turtleSet.clear();
-            return true;
+            (*itr)->TauntApply(GetUnitOwner());
+            (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+            _turtleSet.insert((*itr)->GetGUID());
         }
+    }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            std::list<Creature*> creatureList;
-            GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_DRAGON_TURTLE);
-            for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        for (ObjectGuid const& guid : _turtleSet)
+            if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
             {
-                (*itr)->TauntApply(GetUnitOwner());
-                (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
-                _turtleSet.insert((*itr)->GetGUID());
+                turtle->TauntFadeOut(GetUnitOwner());
+                turtle->AddThreat(GetUnitOwner(), -10000000.0f);
             }
-        }
+    }
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            for (ObjectGuid const& guid : _turtleSet)
-                if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
-                {
-                    turtle->TauntFadeOut(GetUnitOwner());
-                    turtle->AddThreat(GetUnitOwner(), -10000000.0f);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_black_template_harpooners_mark_AuraScript::HandleEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_black_template_harpooners_mark_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-    private:
-        GuidSet _turtleSet;
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_template_harpooners_mark_AuraScript();
+        OnEffectApply += AuraEffectApplyFn(spell_black_template_harpooners_mark_aura::HandleEffectApply, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_black_template_harpooners_mark_aura::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+
+private:
+    GuidSet _turtleSet;
+};
+
+class spell_black_template_free_friend : public SpellScript
+{
+    PrepareSpellScript(spell_black_template_free_friend);
+
+    void HandleScriptEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->RemoveAurasWithMechanic(IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_black_template_free_friend::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_black_template_free_friend : public SpellScriptLoader
+class spell_black_temple_curse_of_the_bleakheart_aura : public AuraScript
 {
-public:
-    spell_black_template_free_friend() : SpellScriptLoader("spell_black_template_free_friend") { }
+    PrepareAuraScript(spell_black_temple_curse_of_the_bleakheart_aura);
 
-    class spell_black_template_free_friend_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_black_template_free_friend_SpellScript);
+        return ValidateSpellInfo({ SPELL_CHEST_PAINS });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Unit* target = GetHitUnit();
-            if (!target)
-                return;
-
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_CHARM);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_STUN);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_DECREASE_SPEED);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_ROOT);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_CONFUSE);
-            target->RemoveAurasDueToSpell(SPELL_AURA_MOD_FEAR);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_black_template_free_friend_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
     {
-        return new spell_black_template_free_friend_SpellScript();
+        isPeriodic = true;
+        amplitude = 5000;
+    }
+
+    void Update(AuraEffect const*  /*effect*/)
+    {
+        PreventDefaultAction();
+        if (roll_chance_i(20))
+            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_CHEST_PAINS, true);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_black_temple_curse_of_the_bleakheart_aura::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_the_bleakheart_aura::Update, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
-class spell_black_temple_curse_of_the_bleakheart : public SpellScriptLoader
+class spell_black_temple_skeleton_shot_aura : public AuraScript
 {
-public:
-    spell_black_temple_curse_of_the_bleakheart() : SpellScriptLoader("spell_black_temple_curse_of_the_bleakheart") { }
+    PrepareAuraScript(spell_black_temple_skeleton_shot_aura);
 
-    class spell_black_temple_curse_of_the_bleakheart_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_black_temple_curse_of_the_bleakheart_AuraScript);
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+            GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_2].CalcValue(), true);
+    }
 
-        void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = 5000;
-        }
-
-        void Update(AuraEffect const*  /*effect*/)
-        {
-            PreventDefaultAction();
-            if (roll_chance_i(20))
-                GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_CHEST_PAINS, true);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_black_temple_curse_of_the_bleakheart_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_the_bleakheart_AuraScript::Update, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_temple_curse_of_the_bleakheart_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_skeleton_shot_aura::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_black_temple_skeleton_shot : public SpellScriptLoader
+class spell_black_temple_wyvern_sting_aura : public AuraScript
 {
-public:
-    spell_black_temple_skeleton_shot() : SpellScriptLoader("spell_black_temple_skeleton_shot") { }
+    PrepareAuraScript(spell_black_temple_wyvern_sting_aura);
 
-    class spell_black_temple_skeleton_shot_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_black_temple_skeleton_shot_AuraScript)
+        return ValidateSpellInfo({ SPELL_WYVERN_STING });
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_2].CalcValue(), true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_skeleton_shot_AuraScript::HandleEffectRemove, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_black_temple_skeleton_shot_AuraScript();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(GetTarget(), SPELL_WYVERN_STING, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_wyvern_sting_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_black_temple_wyvern_sting : public SpellScriptLoader
+class spell_black_temple_charge_rage_aura : public AuraScript
 {
-public:
-    spell_black_temple_wyvern_sting() : SpellScriptLoader("spell_black_temple_wyvern_sting") { }
+    PrepareAuraScript(spell_black_temple_charge_rage_aura);
 
-    class spell_black_temple_wyvern_sting_AuraScript : public AuraScript
+    void Update(AuraEffect const* effect)
     {
-        PrepareAuraScript(spell_black_temple_wyvern_sting_AuraScript)
+        PreventDefaultAction();
+        if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)nullptr, 50.0f))
+            GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(GetTarget(), SPELL_WYVERN_STING, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_black_temple_wyvern_sting_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_temple_wyvern_sting_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_charge_rage_aura::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_black_temple_charge_rage : public SpellScriptLoader
+class spell_black_temple_shadow_inferno_aura : public AuraScript
 {
-public:
-    spell_black_temple_charge_rage() : SpellScriptLoader("spell_black_temple_charge_rage") { }
+    PrepareAuraScript(spell_black_temple_shadow_inferno_aura);
 
-    class spell_black_temple_charge_rage_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_black_temple_charge_rage_AuraScript);
+        return ValidateSpellInfo({ SPELL_SHADOW_INFERNO_DAMAGE });
+    }
 
-        void Update(AuraEffect const* effect)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetUnitOwner()->SelectNearbyNoTotemTarget((Unit*)nullptr, 50.0f))
-                GetUnitOwner()->CastSpell(target, GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_charge_rage_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Update(AuraEffect const* effect)
     {
-        return new spell_black_temple_charge_rage_AuraScript();
+        PreventDefaultAction();
+        GetUnitOwner()->CastCustomSpell(SPELL_SHADOW_INFERNO_DAMAGE, SPELLVALUE_BASE_POINT0, effect->GetAmount(), GetUnitOwner(), TRIGGERED_FULL_MASK);
+        GetAura()->GetEffect(effect->GetEffIndex())->SetAmount(effect->GetAmount() + 500);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_shadow_inferno_aura::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_black_temple_shadow_inferno : public SpellScriptLoader
+class spell_black_temple_spell_absorption_aura : public AuraScript
 {
-public:
-    spell_black_temple_shadow_inferno() : SpellScriptLoader("spell_black_temple_shadow_inferno") { }
+    PrepareAuraScript(spell_black_temple_spell_absorption_aura);
 
-    class spell_black_temple_shadow_inferno_AuraScript : public AuraScript
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        PrepareAuraScript(spell_black_temple_shadow_inferno_AuraScript);
+        // Set absorbtion amount to unlimited
+        amount = -1;
+    }
 
-        void Update(AuraEffect const* effect)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->CastCustomSpell(SPELL_SHADOW_INFERNO_DAMAGE, SPELLVALUE_BASE_POINT0, effect->GetAmount(), GetUnitOwner(), TRIGGERED_FULL_MASK);
-            GetAura()->GetEffect(effect->GetEffIndex())->SetAmount(effect->GetAmount() + 500);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_shadow_inferno_AuraScript::Update, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
-        return new spell_black_temple_shadow_inferno_AuraScript();
+        absorbAmount = dmgInfo.GetDamage();
+    }
+
+    void Update(AuraEffect const* effect)
+    {
+        PreventDefaultAction();
+        uint32 count = GetUnitOwner()->GetAuraCount(SPELL_CHAOTIC_CHARGE);
+        if (count == 0)
+            return;
+
+        GetUnitOwner()->CastCustomSpell(GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, SPELLVALUE_BASE_POINT0, effect->GetAmount()*count, GetUnitOwner(), TRIGGERED_FULL_MASK);
+        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_CHAOTIC_CHARGE);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_black_temple_spell_absorption_aura::CalculateAmount, EFFECT_2, SPELL_AURA_SCHOOL_ABSORB);
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_black_temple_spell_absorption_aura::Absorb, EFFECT_2);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_spell_absorption_aura::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
     }
 };
 
-class spell_black_temple_spell_absorption : public SpellScriptLoader
+class spell_black_temple_bloodbolt : public SpellScript
 {
-public:
-    spell_black_temple_spell_absorption() : SpellScriptLoader("spell_black_temple_spell_absorption") { }
+    PrepareSpellScript(spell_black_temple_bloodbolt);
 
-    class spell_black_temple_spell_absorption_AuraScript : public AuraScript
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        PrepareAuraScript(spell_black_temple_spell_absorption_AuraScript);
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, GetEffectValue(), true);
+    }
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set absorbtion amount to unlimited
-            amount = -1;
-        }
-
-        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            absorbAmount = dmgInfo.GetDamage();
-        }
-
-        void Update(AuraEffect const* effect)
-        {
-            PreventDefaultAction();
-            uint32 count = GetUnitOwner()->GetAuraCount(SPELL_CHAOTIC_CHARGE);
-            if (count == 0)
-                return;
-
-            GetUnitOwner()->CastCustomSpell(GetSpellInfo()->Effects[effect->GetEffIndex()].TriggerSpell, SPELLVALUE_BASE_POINT0, effect->GetAmount()*count, GetUnitOwner(), TRIGGERED_FULL_MASK);
-            GetUnitOwner()->RemoveAurasDueToSpell(SPELL_CHAOTIC_CHARGE);
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_black_temple_spell_absorption_AuraScript::CalculateAmount, EFFECT_2, SPELL_AURA_SCHOOL_ABSORB);
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_black_temple_spell_absorption_AuraScript::Absorb, EFFECT_2);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_spell_absorption_AuraScript::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_temple_spell_absorption_AuraScript();
+        OnEffectHitTarget += SpellEffectFn(spell_black_temple_bloodbolt::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_black_temple_bloodbolt : public SpellScriptLoader
+class spell_black_temple_consuming_strikes_aura : public AuraScript
 {
-public:
-    spell_black_temple_bloodbolt() : SpellScriptLoader("spell_black_temple_bloodbolt") { }
+    PrepareAuraScript(spell_black_temple_consuming_strikes_aura);
 
-    class spell_black_temple_bloodbolt_SpellScript : public SpellScript
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
-        PrepareSpellScript(spell_black_temple_bloodbolt_SpellScript);
+        PreventDefaultAction();
+        GetTarget()->CastCustomSpell(GetSpellInfo()->Effects[EFFECT_1].CalcValue(), SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage(), GetTarget(), true);
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, GetEffectValue(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_black_temple_bloodbolt_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_black_temple_bloodbolt_SpellScript();
+        OnEffectProc += AuraEffectProcFn(spell_black_temple_consuming_strikes_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
-class spell_black_temple_consuming_strikes : public SpellScriptLoader
+class spell_black_temple_curse_of_vitality_aura : public AuraScript
 {
-public:
-    spell_black_temple_consuming_strikes() : SpellScriptLoader("spell_black_temple_consuming_strikes") { }
+    PrepareAuraScript(spell_black_temple_curse_of_vitality_aura);
 
-    class spell_black_temple_consuming_strikes_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_black_temple_consuming_strikes_AuraScript);
+        if (GetUnitOwner()->HealthBelowPct(50))
+            SetDuration(0);
+    }
 
-        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            GetTarget()->CastCustomSpell(GetSpellInfo()->Effects[EFFECT_1].CalcValue(), SPELLVALUE_BASE_POINT0, eventInfo.GetDamageInfo()->GetDamage(), GetTarget(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_black_temple_consuming_strikes_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_temple_consuming_strikes_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_vitality_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
-class spell_black_temple_curse_of_vitality : public SpellScriptLoader
+class spell_black_temple_dementia_aura : public AuraScript
 {
-public:
-    spell_black_temple_curse_of_vitality() : SpellScriptLoader("spell_black_temple_curse_of_vitality") { }
+    PrepareAuraScript(spell_black_temple_dementia_aura);
 
-    class spell_black_temple_curse_of_vitality_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_black_temple_curse_of_vitality_AuraScript);
-
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            if (GetUnitOwner()->HealthBelowPct(50))
-                SetDuration(0);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_curse_of_vitality_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_black_temple_curse_of_vitality_AuraScript();
+        return ValidateSpellInfo({ SPELL_DEMENTIA1, SPELL_DEMENTIA2 });
     }
-};
 
-class spell_black_temple_dementia : public SpellScriptLoader
-{
-public:
-    spell_black_temple_dementia() : SpellScriptLoader("spell_black_temple_dementia") { }
-
-    class spell_black_temple_dementia_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_black_temple_dementia_AuraScript);
+        if (roll_chance_i(50))
+            GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA1, true);
+        else
+            GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA2, true);
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            if (roll_chance_i(50))
-                GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA1, true);
-            else
-                GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA2, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_dementia_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_black_temple_dementia_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_dementia_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
 void AddSC_instance_black_temple()
 {
     new instance_black_temple();
-    new spell_black_template_harpooners_mark();
-    new spell_black_template_free_friend();
-    new spell_black_temple_curse_of_the_bleakheart();
-    new spell_black_temple_skeleton_shot();
-    new spell_black_temple_wyvern_sting();
-    new spell_black_temple_charge_rage();
-    new spell_black_temple_shadow_inferno();
-    new spell_black_temple_spell_absorption();
-    new spell_black_temple_bloodbolt();
-    new spell_black_temple_consuming_strikes();
-    new spell_black_temple_curse_of_vitality();
-    new spell_black_temple_dementia();
+    RegisterSpellScript(spell_black_template_harpooners_mark_aura);
+    RegisterSpellScript(spell_black_template_free_friend);
+    RegisterSpellScript(spell_black_temple_curse_of_the_bleakheart_aura);
+    RegisterSpellScript(spell_black_temple_skeleton_shot_aura);
+    RegisterSpellScript(spell_black_temple_wyvern_sting_aura);
+    RegisterSpellScript(spell_black_temple_charge_rage_aura);
+    RegisterSpellScript(spell_black_temple_shadow_inferno_aura);
+    RegisterSpellScript(spell_black_temple_spell_absorption_aura);
+    RegisterSpellScript(spell_black_temple_bloodbolt);
+    RegisterSpellScript(spell_black_temple_consuming_strikes_aura);
+    RegisterSpellScript(spell_black_temple_curse_of_vitality_aura);
+    RegisterSpellScript(spell_black_temple_dementia_aura);
 }
 

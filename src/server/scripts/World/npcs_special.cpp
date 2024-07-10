@@ -334,7 +334,7 @@ public:
     {
         npc_training_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
         }
 
@@ -392,7 +392,7 @@ public:
     {
         npc_target_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             deathTimer = 15000;
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
         }
@@ -570,6 +570,10 @@ public:
 
         {
             if (!SpawnAssoc)
+                return;
+
+            // check if they're hostile
+            if (!(me->IsHostileTo(who) || who->IsHostileTo(me)))
                 return;
 
             if (me->IsValidAttackTarget(who))
@@ -2602,6 +2606,17 @@ public:
         events.Reset();
     }
 
+    bool CanAIAttack(Unit const* target) const override
+    {
+        if (Unit* summoner = me->GetCharmerOrOwner())
+        {
+            if (target->IsPlayer() && (!summoner->IsPvP() || !target->IsPvP()))
+                return false;
+        }
+
+        return true;
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         events.ScheduleEvent(EVENT_FLAME_BUFFET, 4s);
@@ -2610,12 +2625,9 @@ public:
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (summoner->GetTypeId() != TYPEID_UNIT)
-        {
-            return;
-        }
+        if (summoner->GetTypeId() == TYPEID_UNIT || summoner->IsPlayer())
+            me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-        me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
     }
 
     void UpdateAI(uint32 diff) override

@@ -147,7 +147,7 @@ struct npc_warmage_violetstand : public ScriptedAI
 {
     npc_warmage_violetstand(Creature* creature) : ScriptedAI(creature)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
     }
 
     ObjectGuid targetGUID;

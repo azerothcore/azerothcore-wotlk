@@ -438,7 +438,7 @@ class spell_pri_lightwell_renew : public AuraScript
                 UpdateData data;
                 WorldPacket packet;
                 caster->BuildValuesUpdateBlockForPlayer(&data, player);
-                data.BuildPacket(&packet);
+                data.BuildPacket(packet);
                 player->SendDirectMessage(&packet);
             }
         }

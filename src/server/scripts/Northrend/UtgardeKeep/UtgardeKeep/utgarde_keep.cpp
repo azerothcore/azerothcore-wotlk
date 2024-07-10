@@ -15,12 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "utgarde_keep.h"
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
-#include "utgarde_keep.h"
 
 class npc_dragonflayer_forge_master : public CreatureScript
 {
@@ -208,37 +208,26 @@ enum TickingTimeBomb
     SPELL_TICKING_TIME_BOMB_EXPLODE = 59687
 };
 
-class spell_ticking_time_bomb : public SpellScriptLoader
+class spell_ticking_time_bomb_aura : public AuraScript
 {
-public:
-    spell_ticking_time_bomb() : SpellScriptLoader("spell_ticking_time_bomb") { }
+    PrepareAuraScript(spell_ticking_time_bomb_aura);
 
-    class spell_ticking_time_bomb_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_ticking_time_bomb_AuraScript);
+        return ValidateSpellInfo({ SPELL_TICKING_TIME_BOMB_EXPLODE });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_TICKING_TIME_BOMB_EXPLODE });
-        }
-
-        void HandleOnEffectRemove(AuraEffect const* /* aurEff */, AuraEffectHandleModes /* mode */)
-        {
-            if (GetCaster() == GetTarget())
-            {
-                GetTarget()->CastSpell(GetTarget(), SPELL_TICKING_TIME_BOMB_EXPLODE, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_ticking_time_bomb_AuraScript::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleOnEffectRemove(AuraEffect const* /* aurEff */, AuraEffectHandleModes /* mode */)
     {
-        return new spell_ticking_time_bomb_AuraScript();
+        if (GetCaster() == GetTarget())
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_TICKING_TIME_BOMB_EXPLODE, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_ticking_time_bomb_aura::HandleOnEffectRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -247,6 +236,6 @@ void AddSC_utgarde_keep()
     new npc_dragonflayer_forge_master();
     new npc_enslaved_proto_drake();
 
-    new spell_ticking_time_bomb();
+    RegisterSpellScript(spell_ticking_time_bomb_aura);
 }
 

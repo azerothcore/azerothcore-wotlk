@@ -212,11 +212,9 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID)
     }
 
     data << uint32(_questMenu.GetMenuItemCount());      // max count 0x20
-    uint32 count = 0;
 
     for (uint32 iI = 0; iI < _questMenu.GetMenuItemCount(); ++iI)
     {
-        ++count;
         QuestMenuItem const& item = _questMenu.GetItem(iI);
         uint32 questID = item.QuestId;
         if (Quest const* quest = sObjectMgr->GetQuestTemplate(questID))
@@ -453,7 +451,6 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
 
         uint32 moneyRew = 0;
         Player* player = _session->GetPlayer();
-        uint8 playerLevel = player ? player->GetLevel() : 0;
         if (player && (player->getLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player)))
         {
             moneyRew = quest->GetRewMoneyMaxLevel();
@@ -463,7 +460,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
         uint32 questXp;
         if (player && !sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player))
         {
-            questXp = uint32(quest->XPValue(playerLevel) * player->GetQuestRate());
+            questXp = player->CalculateQuestRewardXP(quest);
         }
         else
         {
@@ -706,7 +703,6 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
 
     uint32 moneyRew = 0;
     Player* player = _session->GetPlayer();
-    uint8 playerLevel = player ? player->GetLevel() : 0;
     if (player && (player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player)))
     {
         moneyRew = quest->GetRewMoneyMaxLevel();
@@ -716,7 +712,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
     uint32 questXp;
     if (player && !sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player))
     {
-        questXp = uint32(quest->XPValue(playerLevel) * player->GetQuestRate());
+        questXp = player->CalculateQuestRewardXP(quest);
     }
     else
     {

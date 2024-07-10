@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "arcatraz.h"
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
-#include "arcatraz.h"
 
 enum MillhouseSays
 {
@@ -585,37 +585,31 @@ public:
     }
 };
 
-class spell_arcatraz_soul_steal : public SpellScriptLoader
+class spell_arcatraz_soul_steal_aura : public AuraScript
 {
-public:
-    spell_arcatraz_soul_steal() : SpellScriptLoader("spell_arcatraz_soul_steal") { }
+    PrepareAuraScript(spell_arcatraz_soul_steal_aura);
 
-    class spell_arcatraz_soul_steal_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_arcatraz_soul_steal_AuraScript)
+        return ValidateSpellInfo({ SPELL_SOUL_STEAL });
+    }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_SOUL_STEAL, true);
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->RemoveAurasDueToSpell(SPELL_SOUL_STEAL);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_arcatraz_soul_steal_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_arcatraz_soul_steal_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_arcatraz_soul_steal_AuraScript();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, SPELL_SOUL_STEAL, true);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            caster->RemoveAurasDueToSpell(SPELL_SOUL_STEAL);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_arcatraz_soul_steal_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_arcatraz_soul_steal_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -624,6 +618,6 @@ void AddSC_arcatraz()
     new npc_millhouse_manastorm();
     new npc_warden_mellichar();
 
-    new spell_arcatraz_soul_steal();
+    RegisterSpellScript(spell_arcatraz_soul_steal_aura);
 }
 

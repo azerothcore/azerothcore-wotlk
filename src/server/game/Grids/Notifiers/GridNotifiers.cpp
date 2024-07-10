@@ -99,7 +99,7 @@ void VisibleNotifier::SendToSelf()
         return;
 
     WorldPacket packet;
-    i_data.BuildPacket(&packet);
+    i_data.BuildPacket(packet);
     i_player.GetSession()->SendPacket(&packet);
 
     for (std::vector<Unit*>::const_iterator it = i_visibleNow.begin(); it != i_visibleNow.end(); ++it)
@@ -217,8 +217,14 @@ void MessageDistDeliverer::Visit(PlayerMapType& m)
         if (!target->InSamePhase(i_phaseMask))
             continue;
 
-        if (target->GetExactDist2dSq(i_source) > i_distSq)
-            continue;
+        if (required3dDist)
+        {
+            if (target->GetExactDistSq(i_source) > i_distSq)
+                continue;
+        }
+        else
+            if (target->GetExactDist2dSq(i_source) > i_distSq)
+                continue;
 
         // Send packet to all who are sharing the player's vision
         if (target->HasSharedVision())
@@ -242,8 +248,14 @@ void MessageDistDeliverer::Visit(CreatureMapType& m)
         if (!target->HasSharedVision() || !target->InSamePhase(i_phaseMask))
             continue;
 
-        if (target->GetExactDist2dSq(i_source) > i_distSq)
-            continue;
+        if (required3dDist)
+        {
+            if (target->GetExactDistSq(i_source) > i_distSq)
+                continue;
+        }
+        else
+            if (target->GetExactDist2dSq(i_source) > i_distSq)
+                continue;
 
         // Send packet to all who are sharing the creature's vision
         SharedVisionList::const_iterator i = target->GetSharedVisionList().begin();
@@ -265,8 +277,14 @@ void MessageDistDeliverer::Visit(DynamicObjectMapType& m)
         if (!target->IsViewpoint())
             continue;
 
-        if (target->GetExactDist2dSq(i_source) > i_distSq)
-            continue;
+        if (required3dDist)
+        {
+            if (target->GetExactDistSq(i_source) > i_distSq)
+                continue;
+        }
+        else
+            if (target->GetExactDist2dSq(i_source) > i_distSq)
+                continue;
 
         // Send packet back to the caster if the caster has vision of dynamic object
         Player* caster = (Player*)target->GetCaster();

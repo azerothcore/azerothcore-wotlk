@@ -151,8 +151,9 @@ enum Misc
     PHASE_NONE                          = 0,
     PHASE_SINGLE_ADVISOR                = 1,
     PHASE_WEAPONS                       = 2,
-    PHASE_ALL_ADVISORS                  = 3,
-    PHASE_FINAL                         = 4,
+    PHASE_TRANSITION                    = 3,
+    PHASE_ALL_ADVISORS                  = 4,
+    PHASE_FINAL                         = 5,
 
     EVENT_PREFIGHT_PHASE11              = 1,
     EVENT_PREFIGHT_PHASE12              = 2,
@@ -352,6 +353,8 @@ struct boss_kaelthas : public BossAI
         summons.Summon(summon);
         if (summon->GetEntry() == NPC_NETHER_VAPOR)
             summon->GetMotionMaster()->MoveRandom(20.0f);
+        if (summon->GetEntry() >= NPC_NETHERSTRAND_LONGBOW && summon->GetEntry() <= NPC_STAFF_OF_DISINTEGRATION)
+            summon->SetReactState(REACT_PASSIVE);
     }
 
     void DoAction(int32 action) override
@@ -380,7 +383,7 @@ struct boss_kaelthas : public BossAI
                         {
                             if (!summonedCreature->GetSpawnId())
                             {
-                                summonedCreature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                                summonedCreature->SetReactState(REACT_AGGRESSIVE);
                                 summonedCreature->SetInCombatWithZone();
                                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                                 {
@@ -389,34 +392,14 @@ struct boss_kaelthas : public BossAI
                             }
                         }
                     });
-                    scheduler.Schedule(2min, GROUP_PROGRESS_PHASE, [this](TaskContext)
+                    scheduler.Schedule(90s, GROUP_PROGRESS_PHASE, [this](TaskContext)
                     {
                         PhaseAllAdvisorsExecute();
                     });
                 }, EVENT_PREFIGHT_PHASE52);
                 break;
             case ACTION_PROGRESS_PHASE_CHECK:
-                if (_phase == PHASE_WEAPONS)
-                {
-                    bool aliveWeapon = false;
-                    summons.DoForAllSummons([&aliveWeapon](WorldObject* summon)
-                    {
-                        if (Creature* summonedCreature = summon->ToCreature())
-                        {
-                            if (summonedCreature->IsAlive())
-                            {
-                                if (summonedCreature->GetEntry() >= NPC_NETHERSTRAND_LONGBOW && summonedCreature->GetEntry() <= NPC_STAFF_OF_DISINTEGRATION)
-                                {
-                                    aliveWeapon = true;
-                                    return;
-                                }
-                            }
-                        }
-                    });
-                    if (!aliveWeapon)
-                        PhaseAllAdvisorsExecute();
-                }
-                else if (_phase == PHASE_ALL_ADVISORS)
+                if (_phase == PHASE_ALL_ADVISORS)
                 {
                     bool advisorAlive = false;
                     summons.DoForAllSummons([&advisorAlive](WorldObject* summon)
@@ -469,11 +452,11 @@ struct boss_kaelthas : public BossAI
             {
                 DoCastRandomTarget(SPELL_FLAME_STRIKE, 0, 100.0f);
             }, 30250ms, 50650ms);
-            ScheduleTimedEvent(20000ms, [&]
+            ScheduleTimedEvent(50000ms, [&]
             {
                 Talk(SAY_SUMMON_PHOENIX);
                 DoCastSelf(SPELL_PHOENIX);
-            }, 31450ms, 66550ms);
+            }, 61450ms, 96550ms);
             ScheduleTimedEvent(5s, [&]
             {
                 scheduler.DelayAll(30s);
@@ -495,8 +478,12 @@ struct boss_kaelthas : public BossAI
                 {
                     summons.DespawnEntry(NPC_NETHER_VAPOR);
                     scheduler.CancelGroup(GROUP_NETHER_BEAM);
-                    me->SetTarget(me->GetVictim()->GetGUID());
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
+
+                    if (Unit* victim = me->GetVictim())
+                    {
+                        me->SetTarget(victim->GetGUID());
+                        me->GetMotionMaster()->MoveChase(victim);
+                    }
                 });
                 me->SetTarget();
                 me->GetMotionMaster()->Clear();
@@ -678,13 +665,14 @@ struct boss_kaelthas : public BossAI
 
     void PhaseAllAdvisorsExecute()
     {
+        _phase = PHASE_TRANSITION;
         scheduler.CancelGroup(GROUP_PROGRESS_PHASE);
-        _phase = PHASE_ALL_ADVISORS;
         Talk(SAY_PHASE3_ADVANCE);
         ScheduleUniqueTimedEvent(6s, [&]{
             DoCastSelf(SPELL_RESURRECTION);
         }, EVENT_PREFIGHT_PHASE62);
         ScheduleUniqueTimedEvent(12s, [&]{
+            _phase = PHASE_ALL_ADVISORS;
             summons.DoForAllSummons([&](WorldObject* summon)
             {
                 if (Creature* summonedCreature = summon->ToCreature())
@@ -727,13 +715,13 @@ struct boss_kaelthas : public BossAI
         {
             DoCastRandomTarget(SPELL_FLAME_STRIKE, 0, 100.0f);
         }, 30250ms, 50650ms);
-        ScheduleTimedEvent(30000ms, [&]
+        ScheduleTimedEvent(50000ms, [&]
         {
             Talk(SAY_SUMMON_PHOENIX);
             DoCastSelf(SPELL_PHOENIX);
-        }, 31450ms, 66550ms);
+        }, 35450ms, 41550ms);
         //sequence
-        ScheduleTimedEvent(20s, [&]
+        ScheduleTimedEvent(20s, 23s, [&]
         {
             if (roll_chance_i(50))
                 Talk(SAY_MINDCONTROL);
@@ -742,19 +730,7 @@ struct boss_kaelthas : public BossAI
             {
                 DoCastSelf(SPELL_ARCANE_DISRUPTION);
             });
-        }, 50s);
-        ScheduleTimedEvent(40s, [&]
-        {
-            scheduler.Schedule(3s, [this](TaskContext)
-            {
-                if (roll_chance_i(50))
-                    Talk(SAY_MINDCONTROL);
-                me->CastCustomSpell(SPELL_MIND_CONTROL, SPELLVALUE_MAX_TARGETS, 3, me, false);
-            }).Schedule(6s, [this](TaskContext)
-            {
-                DoCastSelf(SPELL_ARCANE_DISRUPTION);
-            });
-        }, 50s);
+        }, 23s, 26s);
         ScheduleTimedEvent(60s, [&]
         {
             Talk(SAY_PYROBLAST);
@@ -811,9 +787,9 @@ struct npc_lord_sanguinar : public ScriptedAI
         {
             Talk(SAY_SANGUINAR_AGGRO);
         }
-        ScheduleTimedEvent(0s, [&]{
+        ScheduleTimedEvent(0s, 2s, [&]{
             DoCastSelf(SPELL_BELLOWING_ROAR);
-        }, 15s);
+        }, 30s, 40s);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -829,6 +805,7 @@ struct npc_lord_sanguinar : public ScriptedAI
                 _hasDied = true;
             }
         }
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
@@ -917,6 +894,7 @@ struct npc_capernian : public ScriptedAI
                 _hasDied = true;
             }
         }
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
@@ -963,7 +941,7 @@ struct npc_telonicus : public ScriptedAI
             DoCastVictim(SPELL_BOMB);
         }, 3600ms, 7100ms);
         ScheduleTimedEvent(13250ms, [&]{
-            DoCastRandomTarget(SPELL_CONFLAGRATION, 0, 100.0f);
+            DoCastRandomTarget(SPELL_REMOTE_TOY, 0, 100.0f);
         }, 15750ms);
     }
 
@@ -980,6 +958,7 @@ struct npc_telonicus : public ScriptedAI
                 _hasDied = true;
             }
         }
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
@@ -1014,7 +993,6 @@ struct npc_thaladred : public ScriptedAI
         scheduler.CancelAll();
         me->SetReactState(REACT_PASSIVE);
         _hasDied = false;
-        me->SetWalk(true);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -1040,13 +1018,13 @@ struct npc_thaladred : public ScriptedAI
         {
             DoCastVictim(SPELL_REND);
         }, 15700ms, 48900ms);
-        ScheduleTimedEvent(3000ms,6050ms, [&]
+        ScheduleTimedEvent(3000ms, 6050ms, [&]
         {
             if (Unit* victim = me->GetVictim())
             {
                 if (victim->IsNonMeleeSpellCast(false, false, true))
                 {
-                    DoCastVictim(SPELL_SILENCE);
+                    DoCastSelf(SPELL_SILENCE);
                 }
             }
         }, 3600ms, 15200ms);
@@ -1065,6 +1043,7 @@ struct npc_thaladred : public ScriptedAI
                 _hasDied = true;
             }
         }
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
@@ -1158,12 +1137,25 @@ class spell_kaelthas_mind_control : public SpellScript
     void SelectTarget(std::list<WorldObject*>& targets)
     {
         if (Unit* victim = GetCaster()->GetVictim())
+        {
             targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+        }
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+    }
+
+    void HandleEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (!GetCaster() || !GetHitPlayer())
+            return;
+
+        if (Player* player = GetHitPlayer())
+            GetCaster()->GetThreatMgr().ResetThreat(player);
     }
 
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kaelthas_mind_control::SelectTarget, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_mind_control::HandleEffect, EFFECT_ALL, SPELL_AURA_ANY);
     }
 };
 
@@ -1302,6 +1294,25 @@ class spell_kaelthas_summon_nether_vapor : public SpellScript
     }
 };
 
+class spell_kael_pyroblast : public SpellScript
+{
+    PrepareSpellScript(spell_kael_pyroblast);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (GetCaster()->GetVictim())
+        {
+            if (Unit* victim = GetCaster()->GetVictim())
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), false));
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_kael_pyroblast::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_kaelthas()
 {
     RegisterTheEyeAI(boss_kaelthas);
@@ -1319,5 +1330,6 @@ void AddSC_boss_kaelthas()
     RegisterSpellScript(spell_kaelthas_gravity_lapse);
     RegisterSpellScript(spell_kaelthas_nether_beam);
     RegisterSpellScript(spell_kaelthas_summon_nether_vapor);
+    RegisterSpellScript(spell_kael_pyroblast);
 }
 

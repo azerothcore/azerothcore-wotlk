@@ -403,7 +403,19 @@ enum AcoreStrings
     LANG_COMMAND_CHEAT_WW               = 362,
     LANG_COMMAND_WHISPEROFFPLAYER       = 363,
     LANG_COMMAND_CHEAT_TAXINODES        = 364,
-    // Room for more level 2              365-399 not used
+
+    // [START] .reset items command strings:
+    LANG_COMMAND_RESET_ITEMS_EQUIPPED   = 365,
+    LANG_COMMAND_RESET_ITEMS_BAGS       = 366,
+    LANG_COMMAND_RESET_ITEMS_BANK       = 367,
+    LANG_COMMAND_RESET_ITEMS_KEYRING    = 368,
+    LANG_COMMAND_RESET_ITEMS_CURRENCY   = 369,
+    LANG_COMMAND_RESET_ITEMS_BUYBACK    = 370,
+    LANG_COMMAND_RESET_ITEMS_ALL        = 371,
+    LANG_COMMAND_RESET_ITEMS_ALL_BAGS   = 372,
+    // [END] reset items command strings
+
+    // Room for more level 2              373-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,
@@ -643,12 +655,12 @@ enum AcoreStrings
     LANG_GMLIST_HEADER                  = 598,
     LANG_GMLIST_EMPTY                   = 599,
 
-    // End Level 3 list, continued at 1100
-
     LANG_EVENT_STARTED                  = 600,
     LANG_EVENT_STOPPED                  = 601,
 
-    // 602-704 - free
+    LANG_REWARDED                       = 602,
+
+    // 603-704 - free
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
     LANG_NOT_EQUIPPED_ITEM              = 706,
@@ -832,6 +844,7 @@ enum AcoreStrings
     LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS = 889,
     LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS = 890,
     LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS = 891,
+    // End Level 3 list, continued at 1100
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,

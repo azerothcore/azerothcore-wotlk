@@ -37,34 +37,32 @@ Versions of CLang:
 
 | CLang Version | Supported          |
 | ------------- | ------------------ |
-| 12            | :white_check_mark: |
-| 11            | :white_check_mark: |
-| 10            | :white_check_mark: |
-| 9 and lower   | :red_circle:       |
+| 18            | :white_check_mark: |
+| 15            | :white_check_mark: |
+| 14 and lower  | :red_circle:       |
 
 Versions of GCC:
 
 | GCC Version | Supported          |
 | ----------- | ------------------ |
-| 10          | :white_check_mark: |
-| 9           | :white_check_mark: |
-| 8           | :white_check_mark: |
-| 7 and lower | :red_circle:       |
+| 14          | :white_check_mark: |
+| 12          | :white_check_mark: |
+| 11 and lower| :red_circle:       |
 
 Versions of Ubuntu:
 
 | Ubuntu version | Supported          |
 | -------------- | ------------------ |
-| 20.04          | :white_check_mark: |
-| 18.04 and lower| :red_circle:       |
+| 24.04          | :white_check_mark: |
+| 22.04          | :white_check_mark: |
+| 20.04 and lower| :red_circle:       |
 
 Versions of macOS:
 
 | macOS Version  | Supported          |
 | -------------- | ------------------ |
 | 12             | :white_check_mark: |
-| 11             | :white_check_mark: |
-| 10.15 and lower| :red_circle:       |
+| 11 and lower   | :red_circle:       |
 
 **Note**: We do NOT support any repacks that may or may not have been made based on AzerothCore. This is because they are usually based on older versions and there is no way to know what is in the precompiled binaries. Instead, you should compile your binaries from the AzerothCore source. To get started, read the [Installation Guide](https://www.azerothcore.org/wiki/installation).
 

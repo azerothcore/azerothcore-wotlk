@@ -51,7 +51,7 @@ public:
      * @param data Contains information about the instance save data
      * @param completedEncounterMask Contains information about the completed encouter mask
      */
-    virtual void OnBeforeCreateInstanceScript(InstanceMap* /*instanceMap*/, InstanceScript* /*instanceData*/, bool /*load*/, std::string /*data*/, uint32 /*completedEncounterMask*/) { }
+    virtual void OnBeforeCreateInstanceScript(InstanceMap* /*instanceMap*/, InstanceScript** /*instanceData*/, bool /*load*/, std::string /*data*/, uint32 /*completedEncounterMask*/) { }
 
     /**
      * @brief This hook called before destroy instance

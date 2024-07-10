@@ -308,30 +308,24 @@ public:
     }
 };
 
-class spell_ioc_repair_turret : public SpellScriptLoader
+class spell_ioc_repair_turret_aura : public AuraScript
 {
-public:
-    spell_ioc_repair_turret() : SpellScriptLoader("spell_ioc_repair_turret") { }
+    PrepareAuraScript(spell_ioc_repair_turret_aura);
 
-    class spell_ioc_repair_turret_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_ioc_repair_turret_AuraScript);
+        return ValidateSpellInfo({ SPELL_REPAIR_TURRET_DUMMY });
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                GetTarget()->CastSpell(GetTarget(), SPELL_REPAIR_TURRET_DUMMY, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_ioc_repair_turret_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_ioc_repair_turret_AuraScript();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            GetTarget()->CastSpell(GetTarget(), SPELL_REPAIR_TURRET_DUMMY, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_ioc_repair_turret_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -344,162 +338,128 @@ enum blastCriteria
     SPELL_BOMB_INATION_CREDIT       = 68367,
 };
 
-class spell_ioc_bomb_blast_criteria : public SpellScriptLoader
+class spell_ioc_bomb_blast_criteria : public SpellScript
 {
-public:
-    spell_ioc_bomb_blast_criteria() : SpellScriptLoader("spell_ioc_bomb_blast_criteria") { }
+    PrepareSpellScript(spell_ioc_bomb_blast_criteria);
 
-    class spell_ioc_bomb_blast_criteria_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_ioc_bomb_blast_criteria_SpellScript);
+        return ValidateSpellInfo({ SPELL_BOMB_INABLE_CREDIT, SPELL_BOMB_INATION_CREDIT });
+    }
 
-        void HandleGameObjectDamage(SpellEffIndex  /*effIndex*/)
-        {
-            Unit* owner = GetCaster()->GetOwner();
-            if (!owner)
-                return;
-
-            if (GetSpellInfo()->Id == SPELL_SEAFORIUM_BLAST)
-                owner->CastSpell(owner, SPELL_BOMB_INABLE_CREDIT, true);
-            else if (GetSpellInfo()->Id == SPELL_HUGE_SEAFORIUM_BLAST)
-                owner->CastSpell(owner, SPELL_BOMB_INATION_CREDIT, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ioc_bomb_blast_criteria_SpellScript::HandleGameObjectDamage, EFFECT_1, SPELL_EFFECT_GAMEOBJECT_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleGameObjectDamage(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_ioc_bomb_blast_criteria_SpellScript();
+        Unit* owner = GetCaster()->GetOwner();
+        if (!owner)
+            return;
+
+        if (GetSpellInfo()->Id == SPELL_SEAFORIUM_BLAST)
+            owner->CastSpell(owner, SPELL_BOMB_INABLE_CREDIT, true);
+        else if (GetSpellInfo()->Id == SPELL_HUGE_SEAFORIUM_BLAST)
+            owner->CastSpell(owner, SPELL_BOMB_INATION_CREDIT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ioc_bomb_blast_criteria::HandleGameObjectDamage, EFFECT_1, SPELL_EFFECT_GAMEOBJECT_DAMAGE);
     }
 };
 
-class spell_ioc_gunship_portal : public SpellScriptLoader
+class spell_ioc_gunship_portal : public SpellScript
 {
-public:
-    spell_ioc_gunship_portal() : SpellScriptLoader("spell_ioc_gunship_portal") { }
+    PrepareSpellScript(spell_ioc_gunship_portal);
 
-    class spell_ioc_gunship_portal_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_ioc_gunship_portal_SpellScript);
+        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_PLAYER;
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            /*Player* caster = GetCaster()->ToPlayer();
-             *
-             * HACK: GetWorldLocation() returns real position and not transportposition.
-             * ServertoClient: SMSG_MOVE_TELEPORT (0x0B39)
-             * counter: 45
-             * Tranpsort Guid: Full: xxxx Type: MOTransport Low: xxx
-             * Transport Position X: 0 Y: 0 Z: 0 O: 0
-             * Position: X: 7.305609 Y: -0.095246 Z: 34.51022 O: 0
-
-            caster->TeleportTo(GetHitCreature()->GetWorldLocation(), TELE_TO_NOT_LEAVE_TRANSPORT);*/
-        }
-
-        void HandleScript2(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Player* caster = GetCaster()->ToPlayer();
-            if (!caster->IsBeingTeleported())
-                if (Battleground* bg = caster->GetBattleground())
-                    bg->DoAction(2 /**/, caster->GetGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-            OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal_SpellScript::HandleScript2, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_ioc_gunship_portal_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        /*Player* caster = GetCaster()->ToPlayer();
+         *
+         * HACK: GetWorldLocation() returns real position and not transportposition.
+         * ServertoClient: SMSG_MOVE_TELEPORT (0x0B39)
+         * counter: 45
+         * Tranpsort Guid: Full: xxxx Type: MOTransport Low: xxx
+         * Transport Position X: 0 Y: 0 Z: 0 O: 0
+         * Position: X: 7.305609 Y: -0.095246 Z: 34.51022 O: 0
+
+        caster->TeleportTo(GetHitCreature()->GetWorldLocation(), TELE_TO_NOT_LEAVE_TRANSPORT);*/
+    }
+
+    void HandleScript2(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Player* caster = GetCaster()->ToPlayer();
+        if (!caster->IsBeingTeleported())
+            if (Battleground* bg = caster->GetBattleground())
+                bg->DoAction(2 /**/, caster->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+        OnEffectHitTarget += SpellEffectFn(spell_ioc_gunship_portal::HandleScript2, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_ioc_parachute_ic : public SpellScriptLoader
+class spell_ioc_parachute_ic_aura : public AuraScript
 {
-public:
-    spell_ioc_parachute_ic() : SpellScriptLoader("spell_ioc_parachute_ic") { }
+    PrepareAuraScript(spell_ioc_parachute_ic_aura);
 
-    class spell_ioc_parachute_ic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_ioc_parachute_ic_AuraScript)
+        return ValidateSpellInfo({ SPELL_PARACHUTE_IC });
+    }
 
-        void HandleTriggerSpell(AuraEffect const* /*aurEff*/)
-        {
-            if (Player* target = GetTarget()->ToPlayer())
-                if (target->m_movementInfo.fallTime > 2500 && !target->GetTransport())
-                    target->CastSpell(target, SPELL_PARACHUTE_IC, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_ioc_parachute_ic_AuraScript::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleTriggerSpell(AuraEffect const* /*aurEff*/)
     {
-        return new spell_ioc_parachute_ic_AuraScript();
+        if (Player* target = GetTarget()->ToPlayer())
+            if (target->m_movementInfo.fallTime > 2500 && !target->GetTransport())
+                target->CastSpell(target, SPELL_PARACHUTE_IC, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_ioc_parachute_ic_aura::HandleTriggerSpell, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_ioc_launch : public SpellScriptLoader
+class spell_ioc_launch : public SpellScript
 {
-public:
-    spell_ioc_launch() : SpellScriptLoader("spell_ioc_launch") { }
+    PrepareSpellScript(spell_ioc_launch);
 
-    class spell_ioc_launch_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_ioc_launch_SpellScript);
+        if (Player* player = GetHitPlayer())
+            player->AddAura(SPELL_LAUNCH_NO_FALLING_DAMAGE, player); // prevents falling damage
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (Player* player = GetHitPlayer())
-                player->AddAura(SPELL_LAUNCH_NO_FALLING_DAMAGE, player); // prevents falling damage
-        }
-
-        void Launch()
-        {
-            WorldLocation const* const position = GetExplTargetDest();
-
-            if (Player* player = GetHitPlayer())
-            {
-                player->ExitVehicle();
-                player->DisableSpline();
-                player->GetMap()->PlayerRelocation(player, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), GetCaster()->GetOrientation());
-
-                float dist = position->GetExactDist2d(player->GetPositionX(), player->GetPositionY());
-                float elevation = GetSpell()->m_targets.GetElevation();
-                float speedZ = std::max(10.0f, float(50.0f * std::sin(elevation)));
-                float speedXY = dist * 10.0f / speedZ;
-
-                player->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), speedXY, speedZ);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_ioc_launch_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_FORCE_CAST);
-            AfterHit += SpellHitFn(spell_ioc_launch_SpellScript::Launch);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Launch()
     {
-        return new spell_ioc_launch_SpellScript();
+        WorldLocation const* const position = GetExplTargetDest();
+
+        if (Player* player = GetHitPlayer())
+        {
+            player->ExitVehicle();
+            player->DisableSpline();
+            player->GetMap()->PlayerRelocation(player, GetCaster()->GetPositionX(), GetCaster()->GetPositionY(), GetCaster()->GetPositionZ(), GetCaster()->GetOrientation());
+
+            float dist = position->GetExactDist2d(player->GetPositionX(), player->GetPositionY());
+            float elevation = GetSpell()->m_targets.GetElevation();
+            float speedZ = std::max(10.0f, float(50.0f * std::sin(elevation)));
+            float speedXY = dist * 10.0f / speedZ;
+
+            player->GetMotionMaster()->MoveJump(position->GetPositionX(), position->GetPositionY(), position->GetPositionZ(), speedXY, speedZ);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_ioc_launch::HandleScript, EFFECT_1, SPELL_EFFECT_FORCE_CAST);
+        AfterHit += SpellHitFn(spell_ioc_launch::Launch);
     }
 };
 
@@ -509,10 +469,10 @@ void AddSC_isle_of_conquest()
     new npc_four_car_garage();
     new npc_ioc_gunship_captain();
     new boss_isle_of_conquest();
-    new spell_ioc_repair_turret();
-    new spell_ioc_bomb_blast_criteria();
-    new spell_ioc_gunship_portal();
-    new spell_ioc_parachute_ic();
-    new spell_ioc_launch();
+    RegisterSpellScript(spell_ioc_repair_turret_aura);
+    RegisterSpellScript(spell_ioc_bomb_blast_criteria);
+    RegisterSpellScript(spell_ioc_gunship_portal);
+    RegisterSpellScript(spell_ioc_parachute_ic_aura);
+    RegisterSpellScript(spell_ioc_launch);
 }
 

@@ -383,7 +383,7 @@ void wstrToLower(std::wstring& str) { std::transform(std::begin(str), std::end(s
 void strToUpper(std::string& str) { std::transform(std::begin(str), std::end(str), std::begin(str), charToUpper); }
 void strToLower(std::string& str) { std::transform(std::begin(str), std::end(str), std::begin(str), charToLower); }
 
-std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
+std::wstring GetMainPartOfName(std::wstring const& wname, uint32_t declension)
 {
     // supported only Cyrillic cases
     if (wname.empty() || !isCyrillicCharacter(wname[0]) || declension > 5)
@@ -392,22 +392,22 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
     }
 
     // Important: end length must be <= MAX_INTERNAL_PLAYER_NAME-MAX_PLAYER_NAME (3 currently)
-    static std::wstring const a_End    = { wchar_t(0x0430), wchar_t(0x0000) };
-    static std::wstring const o_End    = { wchar_t(0x043E), wchar_t(0x0000) };
-    static std::wstring const ya_End   = { wchar_t(0x044F), wchar_t(0x0000) };
-    static std::wstring const ie_End   = { wchar_t(0x0435), wchar_t(0x0000) };
-    static std::wstring const i_End    = { wchar_t(0x0438), wchar_t(0x0000) };
-    static std::wstring const yeru_End = { wchar_t(0x044B), wchar_t(0x0000) };
-    static std::wstring const u_End    = { wchar_t(0x0443), wchar_t(0x0000) };
-    static std::wstring const yu_End   = { wchar_t(0x044E), wchar_t(0x0000) };
-    static std::wstring const oj_End   = { wchar_t(0x043E), wchar_t(0x0439), wchar_t(0x0000) };
-    static std::wstring const ie_j_End = { wchar_t(0x0435), wchar_t(0x0439), wchar_t(0x0000) };
-    static std::wstring const io_j_End = { wchar_t(0x0451), wchar_t(0x0439), wchar_t(0x0000) };
-    static std::wstring const o_m_End  = { wchar_t(0x043E), wchar_t(0x043C), wchar_t(0x0000) };
-    static std::wstring const io_m_End = { wchar_t(0x0451), wchar_t(0x043C), wchar_t(0x0000) };
-    static std::wstring const ie_m_End = { wchar_t(0x0435), wchar_t(0x043C), wchar_t(0x0000) };
-    static std::wstring const soft_End = { wchar_t(0x044C), wchar_t(0x0000) };
-    static std::wstring const j_End    = { wchar_t(0x0439), wchar_t(0x0000) };
+    static std::wstring const a_End    = L"\u0430";
+    static std::wstring const o_End    = L"\u043E";
+    static std::wstring const ya_End   = L"\u044F";
+    static std::wstring const ie_End   = L"\u0435";
+    static std::wstring const i_End    = L"\u0438";
+    static std::wstring const yeru_End = L"\u044B";
+    static std::wstring const u_End    = L"\u0443";
+    static std::wstring const yu_End   = L"\u044E";
+    static std::wstring const oj_End   = L"\u043E\u0439";
+    static std::wstring const ie_j_End = L"\u0435\u0439";
+    static std::wstring const io_j_End = L"\u0451\u0439";
+    static std::wstring const o_m_End  = L"\u043E\u043C";
+    static std::wstring const io_m_End = L"\u0451\u043C";
+    static std::wstring const ie_m_End = L"\u0435\u043C";
+    static std::wstring const soft_End = L"\u044C";
+    static std::wstring const j_End    = L"\u0439";
 
     static std::array<std::array<std::wstring const*, 7>, 6> const dropEnds = {{
             { &a_End,  &o_End,    &ya_End,   &ie_End,  &soft_End, &j_End,    nullptr },
@@ -421,16 +421,21 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension)
 
     std::size_t const thisLen = wname.length();
     std::array<std::wstring const*, 7> const& endings = dropEnds[declension];
-    for (auto itr = endings.begin(), end = endings.end(); (itr != end) && *itr; ++itr)
+    for (const std::wstring* endingPtr : endings)
     {
-        std::wstring const& ending = **itr;
+        if (endingPtr == nullptr)
+        {
+            break;
+        }
+
+        std::wstring const& ending = *endingPtr;
         std::size_t const endLen = ending.length();
         if (endLen > thisLen)
         {
             continue;
         }
 
-        if (wname.substr(thisLen - endLen, thisLen) == ending)
+        if (wname.compare(thisLen - endLen, endLen, ending) == 0)
         {
             return wname.substr(0, thisLen - endLen);
         }

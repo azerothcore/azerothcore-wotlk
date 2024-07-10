@@ -346,6 +346,7 @@ public:
                     {
                         pInstance->SetData(TYPE_HODIR, DONE);
                         me->CastSpell(me, 64899, true); // credit
+                        pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
                     }
 
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -355,7 +356,6 @@ public:
                     me->CombatStop();
                     me->InterruptNonMeleeSpells(true);
                     me->RemoveAllAuras();
-                    pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
 
                     events.Reset();
                     summons.DespawnAll();
@@ -383,13 +383,17 @@ public:
                     }
 
                     Talk(TEXT_DEATH);
-                    me->DespawnOrUnsummon(10000);
+                    scheduler.Schedule(14s, [this](TaskContext /*context*/)
+                    {
+                        DoCastSelf(SPELL_TELEPORT);
+                    });
                 }
             }
         }
 
         void UpdateAI(uint32 diff) override
         {
+            scheduler.Update(diff);
             if (me->GetPositionY() <= ENTRANCE_DOOR.GetPositionY() || me->GetPositionY() >= EXIT_DOOR.GetPositionY())
             {
                 boss_hodirAI::EnterEvadeMode();
@@ -495,6 +499,15 @@ public:
             }
 
             DoMeleeAttackIfReady();
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+            }
         }
 
         Creature* GetHelper(uint8 index)
@@ -1167,159 +1180,133 @@ public:
     };
 };
 
-class spell_hodir_shatter_chest : public SpellScriptLoader
+class spell_hodir_shatter_chest : public SpellScript
 {
-public:
-    spell_hodir_shatter_chest() : SpellScriptLoader("spell_hodir_shatter_chest") { }
+    PrepareSpellScript(spell_hodir_shatter_chest);
 
-    class spell_hodir_shatter_chestSpellScript : public SpellScript
+    void DestroyWinterCache(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_hodir_shatter_chestSpellScript)
+        PreventHitDefaultEffect(effIndex);
 
-        void destroyWinterCache(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-
-            if (Unit* hodir = GetCaster())
-                hodir->GetAI()->DoAction(EVENT_FAIL_HM);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_hodir_shatter_chestSpellScript::destroyWinterCache, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
-        };
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_hodir_shatter_chestSpellScript();
+        if (Unit* hodir = GetCaster())
+            hodir->GetAI()->DoAction(EVENT_FAIL_HM);
     }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_hodir_shatter_chest::DestroyWinterCache, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
+    };
 };
 
-class spell_hodir_biting_cold_main_aura : public SpellScriptLoader
+class spell_hodir_biting_cold_main_aura : public AuraScript
 {
-public:
-    spell_hodir_biting_cold_main_aura() : SpellScriptLoader("spell_hodir_biting_cold_main_aura") { }
+    PrepareAuraScript(spell_hodir_biting_cold_main_aura);
 
-    class spell_hodir_biting_cold_main_aura_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hodir_biting_cold_main_aura_AuraScript)
-
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            if ((aurEff->GetTickNumber() % 4) == 0)
-                if (Unit* target = GetTarget())
-                    if (target->GetTypeId() == TYPEID_PLAYER
-                        && !target->isMoving()
-                        && !target->HasAura(SPELL_BITING_COLD_PLAYER_AURA)
-                        && !target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
-                        target->CastSpell(target, SPELL_BITING_COLD_PLAYER_AURA, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_biting_cold_main_aura_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_hodir_biting_cold_main_aura_AuraScript();
+        return ValidateSpellInfo({ SPELL_BITING_COLD_PLAYER_AURA, SPELL_MAGE_TOASTY_FIRE_AURA });
     }
-};
 
-class spell_hodir_biting_cold_player_aura : public SpellScriptLoader
-{
-public:
-    spell_hodir_biting_cold_player_aura() : SpellScriptLoader("spell_hodir_biting_cold_player_aura") { }
-
-    class spell_hodir_biting_cold_player_aura_AuraScript : public AuraScript
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_hodir_biting_cold_player_aura_AuraScript)
-
-        uint8 counter {0};
-        bool prev {false};
-
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
+        if ((aurEff->GetTickNumber() % 4) == 0)
             if (Unit* target = GetTarget())
-            {
-                if (target->GetMapId() == 603)
-                    SetDuration(GetMaxDuration());
-                if (target->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
-                    return;
-                if (target->isMoving() || target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
-                {
-                    if (prev)
-                    {
-                        ModStackAmount(-1);
-                        prev = false;
-                    }
-                    else
-                        prev = true;
+                if (target->GetTypeId() == TYPEID_PLAYER
+                    && !target->isMoving()
+                    && !target->HasAura(SPELL_BITING_COLD_PLAYER_AURA)
+                    && !target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
+                    target->CastSpell(target, SPELL_BITING_COLD_PLAYER_AURA, true);
+    }
 
-                    if (counter >= 2)
-                        counter -= 2;
-                    else if (counter)
-                        --counter;
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_biting_cold_main_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+class spell_hodir_biting_cold_player_aura : public AuraScript
+{
+    PrepareAuraScript(spell_hodir_biting_cold_player_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FLASH_FREEZE_TRAPPED_PLAYER, SPELL_MAGE_TOASTY_FIRE_AURA, SPELL_BITING_COLD_DAMAGE });
+    }
+
+    bool Load() override
+    {
+        _counter = 0;
+        _prev = false;
+        return true;
+    }
+
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    {
+        if (Unit* target = GetTarget())
+        {
+            if (target->GetMapId() == 603)
+                SetDuration(GetMaxDuration());
+            if (target->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
+                return;
+            if (target->isMoving() || target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
+            {
+                if (_prev)
+                {
+                    ModStackAmount(-1);
+                    _prev = false;
                 }
                 else
-                {
-                    prev = false;
-                    ++counter;
-                    if (counter >= 4)
-                    {
-                        if (GetStackAmount() == 2) // increasing from 2 to 3 (not checking >= to improve performance)
-                            if (InstanceScript* pInstance = target->GetInstanceScript())
-                                if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
-                                    hodir->AI()->SetData(2, 1);
-                        ModStackAmount(1);
-                        counter = 0;
-                    }
-                }
+                    _prev = true;
 
-                const int32 dmg = 200 * pow(2.0f, GetStackAmount());
-                target->CastCustomSpell(target, SPELL_BITING_COLD_DAMAGE, &dmg, 0, 0, true);
+                if (_counter >= 2)
+                    _counter -= 2;
+                else if (_counter)
+                    --_counter;
             }
-        }
+            else
+            {
+                _prev = false;
+                ++_counter;
+                if (_counter >= 4)
+                {
+                    if (GetStackAmount() == 2) // increasing from 2 to 3 (not checking >= to improve performance)
+                        if (InstanceScript* pInstance = target->GetInstanceScript())
+                            if (Creature* hodir = pInstance->instance->GetCreature(pInstance->GetGuidData(TYPE_HODIR)))
+                                hodir->AI()->SetData(2, 1);
+                    ModStackAmount(1);
+                    _counter = 0;
+                }
+            }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_biting_cold_player_aura_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+            const int32 dmg = 200 * pow(2.0f, GetStackAmount());
+            target->CastCustomSpell(target, SPELL_BITING_COLD_DAMAGE, &dmg, 0, 0, true);
         }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_hodir_biting_cold_player_aura_AuraScript();
     }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_biting_cold_player_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+
+private:
+    uint8 _counter;
+    bool _prev;
 };
 
-class spell_hodir_periodic_icicle : public SpellScriptLoader
+class spell_hodir_periodic_icicle : public SpellScript
 {
-public:
-    spell_hodir_periodic_icicle() : SpellScriptLoader("spell_hodir_periodic_icicle") { }
+    PrepareSpellScript(spell_hodir_periodic_icicle);
 
-    class spell_hodir_periodic_icicle_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_hodir_periodic_icicle_SpellScript);
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
+        Acore::Containers::RandomResize(targets, 1);
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_FLASH_FREEZE_TRAPPED_PLAYER));
-            Acore::Containers::RandomResize(targets, 1);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_periodic_icicle_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_hodir_periodic_icicle_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_periodic_icicle::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1336,150 +1323,156 @@ public:
     }
 };
 
-class spell_hodir_flash_freeze : public SpellScriptLoader
+class spell_hodir_flash_freeze : public SpellScript
 {
-public:
-    spell_hodir_flash_freeze() : SpellScriptLoader("spell_hodir_flash_freeze") { }
+    PrepareSpellScript(spell_hodir_flash_freeze);
 
-    class spell_hodir_flash_freeze_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_hodir_flash_freeze_SpellScript);
+        targets.remove_if(FlashFreezeCheck());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(FlashFreezeCheck());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_flash_freeze_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_flash_freeze_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    class spell_hodir_flash_freeze_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_hodir_flash_freeze_AuraScript)
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_flash_freeze::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_flash_freeze::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
+class spell_hodir_flash_freeze_aura : public AuraScript
+{
+    PrepareAuraScript(spell_hodir_flash_freeze_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_FLASH_FREEZE_INSTAKILL, SPELL_FLASH_FREEZE_TRAPPED_PLAYER, SPELL_FLASH_FREEZE_TRAPPED_NPC });
+    }
+
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
+    {
+        if (aurEff->GetTotalTicks() > 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()) - 1)
         {
-            if (aurEff->GetTotalTicks() > 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()) - 1)
+            Unit* target = GetTarget();
+            Unit* caster = GetCaster();
+            if (!target || !caster || caster->GetTypeId() != TYPEID_UNIT)
+                return;
+
+            if (Aura* aur = target->GetAura(target->GetTypeId() == TYPEID_PLAYER ? SPELL_FLASH_FREEZE_TRAPPED_PLAYER : SPELL_FLASH_FREEZE_TRAPPED_NPC))
             {
-                Unit* target = GetTarget();
-                Unit* caster = GetCaster();
-                if (!target || !caster || caster->GetTypeId() != TYPEID_UNIT)
-                    return;
-
-                if (Aura* aur = target->GetAura(target->GetTypeId() == TYPEID_PLAYER ? SPELL_FLASH_FREEZE_TRAPPED_PLAYER : SPELL_FLASH_FREEZE_TRAPPED_NPC))
+                if (Unit* caster2 = aur->GetCaster())
                 {
-                    if (Unit* caster2 = aur->GetCaster())
+                    if (caster2->GetTypeId() == TYPEID_UNIT)
                     {
-                        if (caster2->GetTypeId() == TYPEID_UNIT)
-                        {
-                            caster2->ToCreature()->DespawnOrUnsummon();
-                        }
-                    }
-                    target->CastSpell(target, SPELL_FLASH_FREEZE_INSTAKILL, true);
-                    return;
-                }
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                {
-                    caster->ToCreature()->AI()->SetData(1, 1);
-                    if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_PLR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 5 * 60 * 1000) )
-                    {
-                        c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_PLAYER, true);
-                        caster->ToCreature()->AI()->JustSummoned(c);
+                        caster2->ToCreature()->DespawnOrUnsummon();
                     }
                 }
-                else if (target->GetTypeId() == TYPEID_UNIT)
+                target->CastSpell(target, SPELL_FLASH_FREEZE_INSTAKILL, true);
+                return;
+            }
+            if (target->GetTypeId() == TYPEID_PLAYER)
+            {
+                caster->ToCreature()->AI()->SetData(1, 1);
+                if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_PLR, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 5 * 60 * 1000) )
                 {
-                    if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_NPC, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000) )
-                    {
-                        c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_NPC, true);
-                        caster->ToCreature()->AI()->JustSummoned(c);
-                    }
+                    c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_PLAYER, true);
+                    caster->ToCreature()->AI()->JustSummoned(c);
+                }
+            }
+            else if (target->GetTypeId() == TYPEID_UNIT)
+            {
+                if( Creature* c = target->SummonCreature(NPC_FLASH_FREEZE_NPC, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000) )
+                {
+                    c->CastSpell(target, SPELL_FLASH_FREEZE_TRAPPED_NPC, true);
+                    caster->ToCreature()->AI()->JustSummoned(c);
                 }
             }
         }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_flash_freeze_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_hodir_flash_freeze_SpellScript();
     }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_hodir_flash_freeze_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_flash_freeze_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_hodir_storm_power : public SpellScriptLoader
+class spell_hodir_storm_power_aura : public AuraScript
 {
-public:
-    spell_hodir_storm_power() : SpellScriptLoader("spell_hodir_storm_power") { }
+    PrepareAuraScript(spell_hodir_storm_power_aura);
 
-    class spell_hodir_storm_power_AuraScript : public AuraScript
+    void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_hodir_storm_power_AuraScript)
+        if (Unit* caster = GetCaster())
+            if (Aura* a = caster->GetAura(GetId() == SPELL_SHAMAN_STORM_POWER_10 ? SPELL_SHAMAN_STORM_CLOUD_10 : SPELL_SHAMAN_STORM_CLOUD_25))
+                a->ModStackAmount(-1);
+    }
 
-        void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Aura* a = caster->GetAura(GetId() == SPELL_SHAMAN_STORM_POWER_10 ? SPELL_SHAMAN_STORM_CLOUD_10 : SPELL_SHAMAN_STORM_CLOUD_25))
-                    a->ModStackAmount(-1);
-        }
-
-        void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, GetId(), 0, GetCaster());
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_hodir_storm_power_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectApply += AuraEffectApplyFn(spell_hodir_storm_power_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_hodir_storm_power_AuraScript();
+        if (Unit* target = GetTarget())
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, GetId(), 0, GetCaster());
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_hodir_storm_power_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_hodir_storm_power_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
     }
 };
 
-class spell_hodir_storm_cloud : public SpellScriptLoader
+class spell_hodir_storm_cloud_aura : public AuraScript
 {
-public:
-    spell_hodir_storm_cloud() : SpellScriptLoader("spell_hodir_storm_cloud") { }
+    PrepareAuraScript(spell_hodir_storm_cloud_aura);
 
-    class spell_hodir_storm_cloud_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hodir_storm_cloud_AuraScript)
+        return ValidateSpellInfo({ SPELL_SHAMAN_STORM_CLOUD_10, SPELL_SHAMAN_STORM_POWER_10, SPELL_SHAMAN_STORM_POWER_25 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* target = GetTarget())
-                target->CastSpell((Unit*)nullptr, (GetId() == SPELL_SHAMAN_STORM_CLOUD_10 ? SPELL_SHAMAN_STORM_POWER_10 : SPELL_SHAMAN_STORM_POWER_25), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_storm_cloud_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_hodir_storm_cloud_AuraScript();
+        PreventDefaultAction();
+        if (Unit* target = GetTarget())
+            target->CastSpell((Unit*)nullptr, (GetId() == SPELL_SHAMAN_STORM_CLOUD_10 ? SPELL_SHAMAN_STORM_POWER_10 : SPELL_SHAMAN_STORM_POWER_25), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hodir_storm_cloud_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_hodir_toasty_fire_aura : public AuraScript
+{
+    PrepareAuraScript(spell_hodir_toasty_fire_aura);
+
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_MAGE_TOASTY_FIRE_AURA, 0, GetCaster());
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
+    }
+};
+
+class spell_hodir_starlight_aura : public AuraScript
+{
+    PrepareAuraScript(spell_hodir_starlight_aura);
+
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* target = GetTarget())
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_DRUID_STARLIGHT_AREA_AURA, 0, GetCaster());
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_hodir_starlight_aura::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MELEE_SLOW, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
     }
 };
 
@@ -1549,62 +1542,6 @@ public:
     }
 };
 
-class spell_hodir_toasty_fire : public SpellScriptLoader
-{
-public:
-    spell_hodir_toasty_fire() : SpellScriptLoader("spell_hodir_toasty_fire") { }
-
-    class spell_hodir_toasty_fire_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_hodir_toasty_fire_AuraScript);
-
-        void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_MAGE_TOASTY_FIRE_AURA, 0, GetCaster());
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_hodir_toasty_fire_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MOD_STAT, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_hodir_toasty_fire_AuraScript();
-    }
-};
-
-class spell_hodir_starlight : public SpellScriptLoader
-{
-public:
-    spell_hodir_starlight() : SpellScriptLoader("spell_hodir_starlight") { }
-
-    class spell_hodir_starlight_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_hodir_starlight_AuraScript);
-
-        void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET2, SPELL_DRUID_STARLIGHT_AREA_AURA, 0, GetCaster());
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_hodir_starlight_AuraScript::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_MELEE_SLOW, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT_MASK);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_hodir_starlight_AuraScript();
-    }
-};
-
 void AddSC_boss_hodir()
 {
     new boss_hodir();
@@ -1617,13 +1554,15 @@ void AddSC_boss_hodir()
     new npc_ulduar_hodir_shaman();
     new npc_ulduar_hodir_mage();
 
-    new spell_hodir_biting_cold_main_aura();
-    new spell_hodir_biting_cold_player_aura();
-    new spell_hodir_periodic_icicle();
-    new spell_hodir_flash_freeze();
-    new spell_hodir_storm_power();
-    new spell_hodir_storm_cloud();
-    new spell_hodir_shatter_chest();
+    RegisterSpellScript(spell_hodir_shatter_chest);
+    RegisterSpellScript(spell_hodir_biting_cold_main_aura);
+    RegisterSpellScript(spell_hodir_biting_cold_player_aura);
+    RegisterSpellScript(spell_hodir_periodic_icicle);
+    RegisterSpellAndAuraScriptPair(spell_hodir_flash_freeze, spell_hodir_flash_freeze_aura);
+    RegisterSpellScript(spell_hodir_storm_power_aura);
+    RegisterSpellScript(spell_hodir_storm_cloud_aura);
+    RegisterSpellScript(spell_hodir_toasty_fire_aura);
+    RegisterSpellScript(spell_hodir_starlight_aura);
 
     new achievement_cheese_the_freeze();
     new achievement_getting_cold_in_here();
@@ -1631,6 +1570,4 @@ void AddSC_boss_hodir()
     new achievement_i_have_the_coolest_friends();
     new achievement_staying_buffed_all_winter_10();
     new achievement_staying_buffed_all_winter_25();
-    new spell_hodir_toasty_fire();
-    new spell_hodir_starlight();
 }

@@ -45,93 +45,81 @@ npc_enraged_spirit
 EndContentData */
 
 // Ours
-class spell_q10612_10613_the_fel_and_the_furious : public SpellScriptLoader
+enum TheFelAndTheFurious
 {
-public:
-    spell_q10612_10613_the_fel_and_the_furious() : SpellScriptLoader("spell_q10612_10613_the_fel_and_the_furious") { }
+    SPELL_ROCKET_LAUNCHER = 38083
+};
 
-    class spell_q10612_10613_the_fel_and_the_furious_SpellScript : public SpellScript
+class spell_q10612_10613_the_fel_and_the_furious : public SpellScript
+{
+    PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious_SpellScript);
+        return ValidateSpellInfo({ SPELL_ROCKET_LAUNCHER });
+    }
 
-        void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
+    void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
+    {
+        Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!charmer)
+            return;
+
+        std::list<GameObject*> gList;
+        GetCaster()->GetGameObjectListWithEntryInGrid(gList, 184979, 30.0f);
+        uint8 counter = 0;
+        for (std::list<GameObject*>::const_iterator itr = gList.begin(); itr != gList.end(); ++itr, ++counter)
         {
-            Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
-            if (!charmer)
-                return;
-
-            std::list<GameObject*> gList;
-            GetCaster()->GetGameObjectListWithEntryInGrid(gList, 184979, 30.0f);
-            uint8 counter = 0;
-            for (std::list<GameObject*>::const_iterator itr = gList.begin(); itr != gList.end(); ++itr, ++counter)
+            if (counter >= 10)
+                break;
+            GameObject* go = *itr;
+            if (!go->isSpawned())
+                continue;
+            Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
+            if (cr2)
             {
-                if (counter >= 10)
-                    break;
-                GameObject* go = *itr;
-                if (!go->isSpawned())
-                    continue;
-                Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
-                if (cr2)
-                {
-                    cr2->SetFaction(FACTION_MONSTER);
-                    cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                    GetCaster()->CastSpell(cr2, 38083, true);
-                }
-
-                go->SetLootState(GO_JUST_DEACTIVATED);
-                charmer->KilledMonsterCredit(21959);
+                cr2->SetFaction(FACTION_MONSTER);
+                cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
+                GetCaster()->CastSpell(cr2, SPELL_ROCKET_LAUNCHER, true);
             }
-        }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q10612_10613_the_fel_and_the_furious_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            go->SetLootState(GO_JUST_DEACTIVATED);
+            charmer->KilledMonsterCredit(21959);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q10612_10613_the_fel_and_the_furious_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_q10612_10613_the_fel_and_the_furious::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_q10563_q10596_to_legion_hold : public SpellScriptLoader
+class spell_q10563_q10596_to_legion_hold_aura : public AuraScript
 {
-public:
-    spell_q10563_q10596_to_legion_hold() : SpellScriptLoader("spell_q10563_q10596_to_legion_hold") { }
+    PrepareAuraScript(spell_q10563_q10596_to_legion_hold_aura);
 
-    class spell_q10563_q10596_to_legion_hold_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_q10563_q10596_to_legion_hold_AuraScript)
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        if (Player* player = GetTarget()->ToPlayer())
         {
-            if (Player* player = GetTarget()->ToPlayer())
-            {
-                player->KilledMonsterCredit(21502);
-                player->SetControlled(false, UNIT_STATE_STUNNED);
-            }
+            player->KilledMonsterCredit(21502);
+            player->SetControlled(false, UNIT_STATE_STUNNED);
         }
+    }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Player* player = GetTarget()->ToPlayer())
-            {
-                player->SetControlled(true, UNIT_STATE_STUNNED);
-                player->SummonCreature(21633, -3311.13f, 2946.15f, 171.1f, 4.86f, TEMPSUMMON_TIMED_DESPAWN, 64000);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_q10563_q10596_to_legion_hold_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_q10563_q10596_to_legion_hold_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_q10563_q10596_to_legion_hold_AuraScript();
+        if (Player* player = GetTarget()->ToPlayer())
+        {
+            player->SetControlled(true, UNIT_STATE_STUNNED);
+            player->SummonCreature(21633, -3311.13f, 2946.15f, 171.1f, 4.86f, TEMPSUMMON_TIMED_DESPAWN, 64000);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_q10563_q10596_to_legion_hold_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_q10563_q10596_to_legion_hold_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -439,9 +427,6 @@ enum EnshlavedNetherwingDrake
     NPC_DRAGONMAW_WRANGLER          = 21717,
     NPC_ESCAPE_DUMMY                = 22317,
 
-    EVENT_TAKE_OFF                  = 1,
-    EVENT_CREDIT_PLAYER             = 2,
-
     // Point
     POINT_DESPAWN                   = 1
 };
@@ -451,18 +436,14 @@ struct npc_enslaved_netherwing_drake : public ScriptedAI
 public:
     npc_enslaved_netherwing_drake(Creature* creature) : ScriptedAI(creature)
     {
-        Tapped = false;
+        _tapped = false;
         Reset();
     }
 
-    ObjectGuid PlayerGUID;
-    bool Tapped;
-
-    Player* GetPlayer() { return ObjectAccessor::GetPlayer(*me, PlayerGUID); }
-
     void Reset() override
     {
-        if (!Tapped)
+        scheduler.CancelAll();
+        if (!_tapped)
         {
             me->RestoreFaction();
             me->SetReactState(REACT_AGGRESSIVE);
@@ -474,9 +455,8 @@ public:
 
     void JustDied(Unit* /*killer*/) override
     {
-        Tapped = false;
+        _tapped = false;
         me->RestoreFaction();
-        events.CancelEvent(EVENT_TAKE_OFF);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -485,20 +465,45 @@ public:
         if (!playerCaster)
             return;
 
-        if (spell->Id == SPELL_HIT_FORCE_OF_NELTHARAKU && !Tapped &&
+        if (spell->Id == SPELL_HIT_FORCE_OF_NELTHARAKU && !_tapped &&
             playerCaster->GetQuestStatus(QUEST_THE_FORCE_OF_NELTHARAKU) == QUEST_STATUS_INCOMPLETE)
         {
-            Tapped = true;
-            PlayerGUID = caster->GetGUID();
+            _tapped = true;
+            _playerGUID = caster->GetGUID();
 
-            me->SetFaction(FACTION_FLAYER_HUNTER); // Not sure if this is correct, it was taken off of Mordenai.
+            scheduler.Schedule(2s, [this](TaskContext)
+            {
+                me->SetFaction(FACTION_FLAYER_HUNTER); // Not sure if this is correct, it was taken off of Mordenai.
 
-            if (Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 25.0f))
-                AttackStart(Dragonmaw);
-            else if (Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_WRANGLER, 25.0f))
-                AttackStart(Dragonmaw);
+                if (Unit* dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 25.0f))
+                    AttackStart(dragonmaw);
+                else if (Unit* dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_WRANGLER, 25.0f))
+                    AttackStart(dragonmaw);
+                scheduler.Schedule(2s, [this](TaskContext)
+                {
+                    _tapped = false;
+                    Position pos;
+                    if (Unit* escapeDummy = me->FindNearestCreature(NPC_ESCAPE_DUMMY, 30.0f))
+                        pos = escapeDummy->GetPosition();
+                    else
+                    {
+                        pos = me->GetRandomNearPosition(20.0f);
+                        pos.m_positionZ += 25.0f;
+                    }
 
-            events.ScheduleEvent(EVENT_TAKE_OFF, 2s);
+                    me->SetDisableGravity(true);
+                    me->GetMotionMaster()->MovePoint(POINT_DESPAWN, pos);
+                    me->SetReactState(REACT_PASSIVE);
+                    scheduler.Schedule(100ms, [this](TaskContext)
+                    {
+                        if (Player* player = _GetPlayer())
+                        {
+                            DoCast(player, SPELL_FORCE_OF_NELTHARAKU, true);
+                        }
+                        me->DespawnOrUnsummon(3s, 0s);
+                    });
+                });
+            });
         }
     }
 
@@ -514,40 +519,21 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
-        events.Update(diff);
+        scheduler.Update(diff);
 
         if (!UpdateVictim())
-        {
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_TAKE_OFF:
-                {
-                    Tapped = false;
-                    Position pos;
-                    if (Unit* EscapeDummy = me->FindNearestCreature(NPC_ESCAPE_DUMMY, 30))
-                        pos = EscapeDummy->GetPosition();
-                    else
-                    {
-                        pos = me->GetRandomNearPosition(20);
-                        pos.m_positionZ += 25;
-                    }
-
-                    me->SetDisableGravity(true);
-                    me->GetMotionMaster()->MovePoint(POINT_DESPAWN, pos);
-                    me->SetReactState(REACT_PASSIVE);
-                    events.ScheduleEvent(EVENT_CREDIT_PLAYER, 100ms);
-                    break;
-                }
-                case EVENT_CREDIT_PLAYER:
-                    DoCast(GetPlayer(), SPELL_FORCE_OF_NELTHARAKU, true);
-                    me->DespawnOrUnsummon(3s, 0s);
-                    break;
-            }
             return;
-        }
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
 
         DoMeleeAttackIfReady();
     }
+private:
+    bool _tapped;
+    ObjectGuid _playerGUID;
+
+    Player* _GetPlayer() { return ObjectAccessor::GetPlayer(*me, _playerGUID); }
 };
 
 /*#####
@@ -1835,8 +1821,8 @@ public:
 void AddSC_shadowmoon_valley()
 {
     // Ours
-    new spell_q10612_10613_the_fel_and_the_furious();
-    new spell_q10563_q10596_to_legion_hold();
+    RegisterSpellScript(spell_q10612_10613_the_fel_and_the_furious);
+    RegisterSpellScript(spell_q10563_q10596_to_legion_hold_aura);
 
     // Theirs
     new npc_invis_infernal_caster();

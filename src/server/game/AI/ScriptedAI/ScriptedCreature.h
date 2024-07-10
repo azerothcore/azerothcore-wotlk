@@ -25,8 +25,6 @@
 #include "InstanceScript.h"
 #include "TaskScheduler.h"
 
-#define CAST_AI(a, b)   (dynamic_cast<a*>(b))
-
 typedef std::list<WorldObject*> ObjectList;
 
 class InstanceScript;
@@ -373,14 +371,6 @@ struct ScriptedAI : public CreatureAI
 
     void SetEquipmentSlots(bool loadDefault, int32 mainHand = EQUIP_NO_CHANGE, int32 offHand = EQUIP_NO_CHANGE, int32 ranged = EQUIP_NO_CHANGE);
 
-    // Used to control if MoveChase() is to be used or not in AttackStart(). Some creatures does not chase victims
-    // NOTE: If you use SetCombatMovement while the creature is in combat, it will do NOTHING - This only affects AttackStart
-    //       You should make the necessary to make it happen so.
-    //       Remember that if you modified _isCombatMovementAllowed (e.g: using SetCombatMovement) it will not be reset at Reset().
-    //       It will keep the last value you set.
-    void SetCombatMovement(bool allowMovement);
-    bool IsCombatMovementAllowed() const { return _isCombatMovementAllowed; }
-
     virtual bool CheckEvadeIfOutOfCombatArea() const { return false; }
 
     // return true for heroic mode. i.e.
@@ -452,7 +442,6 @@ struct ScriptedAI : public CreatureAI
 
 private:
     Difficulty _difficulty;
-    bool _isCombatMovementAllowed;
     bool _isHeroic;
     std::unordered_set<uint32> _uniqueTimedEvents;
 };
@@ -470,6 +459,8 @@ class BossAI : public ScriptedAI
 public:
     BossAI(Creature* creature, uint32 bossId);
     ~BossAI() override {}
+
+    float callForHelpRange;
 
     InstanceScript* const instance;
 
@@ -495,6 +486,7 @@ public:
 
     void Reset() override { _Reset(); }
     void JustEngagedWith(Unit* /*who*/) override { _JustEngagedWith(); }
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { _EnterEvadeMode(why); }
     void JustDied(Unit* /*killer*/) override { _JustDied(); }
     void JustReachedHome() override { _JustReachedHome(); }
 
@@ -503,6 +495,7 @@ protected:
     void _JustEngagedWith();
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
+    void _EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
     [[nodiscard]] bool _ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const;
 
     void TeleportCheaters();

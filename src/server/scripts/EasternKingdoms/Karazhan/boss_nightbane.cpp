@@ -17,6 +17,7 @@
 
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "TaskScheduler.h"
@@ -24,18 +25,18 @@
 
 enum Spells
 {
-    // phase 1
+    // Ground Phase
+    SPELL_RAIN_OF_BONES         = 37098,
+    SPELL_SMOKING_BLAST         = 37057,
+    SPELL_FIREBALL_BARRAGE      = 30282,
+    SPELL_SEARING_CINDERS       = 30127,
+    // Air Phase
     SPELL_BELLOWING_ROAR        = 39427,
     SPELL_CLEAVE                = 30131,
     SPELL_CHARRED_EARTH         = 30129,
     SPELL_DISTRACTING_ASH       = 30130,
     SPELL_SMOLDERING_BREATH     = 30210,
     SPELL_TAIL_SWEEP            = 25653,
-    // phase 2
-    SPELL_RAIN_OF_BONES         = 37098,
-    SPELL_SMOKING_BLAST         = 37057,
-    SPELL_FIREBALL_BARRAGE      = 30282,
-    SPELL_SEARING_CINDERS       = 30127,
     SPELL_SUMMON_SKELETON       = 30170
 };
 
@@ -43,20 +44,45 @@ enum Says
 {
     EMOTE_SUMMON                = 0,
     YELL_AGGRO                  = 1,
-    YELL_FLY_PHASE              = 2,
+    YELL_AIR_PHASE              = 2,
     YELL_LAND_PHASE             = 3,
     EMOTE_BREATH                = 4
 };
 
-enum Groups
+enum Actions
+{
+    ACTION_START_INTRO = 0
+};
+
+enum Phases
+{
+    PHASE_INTRO                 = 0,
+    PHASE_GROUND                = 1,
+    PHASE_FLY                   = 2,
+    PHASE_TRANSITION            = 3,
+};
+
+ enum Groups
 {
     GROUP_GROUND                = 0,
-    GROUP_FLYING                = 1
-};
+    GROUP_AIR                   = 1,
+    GROUP_LAND                  = 2
+ };
 
 enum Points
 {
-    POINT_DESPAWN = 10 // Other points used dynamically throughout the script
+    POINT_INTRO_TAKE_OFF        =  11,
+    POINT_INTRO_PRE_LAND        =  8,
+    POINT_INTRO_LAND            =  12,
+    POINT_PRE_FLY_EAST          =  21,
+    POINT_PRE_FLY_SOUTH         =  22,
+    POINT_PRE_FLY_WEST          =  23,
+    POINT_PRE_FLY               =  24,
+    POINT_FLY                   =  31,
+    POINT_LANDING_PRE           =  41,
+    POINT_LANDING_WEST          =  42,
+    POINT_PRE_LAND              =  5,
+    POINT_LAND                  =  51,
 };
 
 float IntroWay[8][3] =
@@ -71,13 +97,20 @@ float IntroWay[8][3] =
     {-11163.00f, -1903.00f, 91.473f}
 }; //TODO: move to table
 
+Position const homePos        =  {-11003.7f,      -1760.19f,     140.253f};
+Position const introLandPos   =  {-11142.712f,    -1891.193f,    92.25038f};
+Position const preFlySouthPos =  {-11193.77f,     -1921.983f,    107.9845f};
+Position const preFlyEastPos  =  {-11167.065f,    -1976.3473f,   109.91183f};
+Position const preFlyWestPos  =  {-11095.48f,     -1866.5396f,   107.868996};
+Position const preFlyPos      =  {-11154.900391f, -1850.670044f, 103.264999f};
+Position const flyPos         =  {-11160.125f,    -1870.683f,    97.73876f};
+Position const landPos        =  {-11162.231f,    -1900.3287f,   91.47627f};
+
 struct boss_nightbane : public BossAI
 {
     boss_nightbane(Creature* creature) : BossAI(creature, DATA_NIGHTBANE)
     {
-        _intro = true;
         _skeletonCount = 5;
-        _movePhase = 0;
     }
 
     void Reset() override
@@ -85,38 +118,73 @@ struct boss_nightbane : public BossAI
         BossAI::Reset();
         _skeletonscheduler.CancelAll();
 
-        me->SetSpeed(MOVE_RUN, 2.0f);
-        me->SetDisableGravity(_intro);
-        me->SetWalk(false);
-        me->setActive(true);
+        _triggerCountTakeOffWhileFlying = 0;
+        _airPhasesCompleted = 0;
 
-        _flying = false;
-        _movement = false;
-        _intro = true;
-        Phase = 1;
-        _movePhase = 0;
+        me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run);
+        me->SetCanFly(true);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetReactState(REACT_PASSIVE);
 
         ScheduleHealthCheckEvent({ 75, 50, 25 }, [&]{
-            TakeOff();
+            TriggerHealthTakeOff();
         });
+    }
+
+    void JustReachedHome() override
+    {
+        BossAI::JustReachedHome();
+        me->DespawnOnEvade();
     }
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        BossAI::EnterEvadeMode(why);
+        me->SetHomePosition(homePos);
+        me->SetCanFly(true);
         me->SetDisableGravity(true);
         me->SendMovementFlagUpdate();
-        me->GetMotionMaster()->MoveTakeoff(POINT_DESPAWN, -11013.246f, -1770.5212f, 166.50139f);
+        BossAI::EnterEvadeMode(why);
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageEffectType, SpellSchoolMask spellSchoolMask) override
+    {
+        if (_airPhasesCompleted < 3)
+        {
+            if (damage >= me->GetHealth())
+            {
+                damage = me->GetHealth() - 1;
+            }
+        }
+        BossAI::DamageTaken(attacker, damage, damageEffectType, spellSchoolMask);
     }
 
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        _intro = false;
-
         Talk(YELL_AGGRO);
         ScheduleGround();
     }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_START_INTRO)
+        {
+            me->GetMap()->LoadGrid(-11260.0f, -1771.0f); // load grid at far end of intro path
+            me->GetMap()->SetVisibilityRange(DEFAULT_VISIBILITY_INSTANCE + 100.0f); // see nightbane
+            me->AddUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+            _phase = PHASE_INTRO;
+            Talk(EMOTE_SUMMON);
+            scheduler.Schedule(2s, [this](TaskContext /*context*/)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->SetDisableGravity(true);
+                me->GetMotionMaster()->MoveTakeoff(POINT_INTRO_TAKE_OFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, 13.99879f);
+            }).Schedule(4s, [this](TaskContext /*context*/)
+            {
+                me->GetMotionMaster()->MovePath(me->GetEntry()*10, false);
+            });
+        }
+     }
 
     void ScheduleGround()
     {
@@ -157,32 +225,42 @@ struct boss_nightbane : public BossAI
     {
         _skeletonSpawnCounter = 0;
 
-        scheduler.Schedule(2s, GROUP_FLYING, [this](TaskContext)
+        scheduler.Schedule(2s, GROUP_AIR, [this](TaskContext)
         {
             DoResetThreatList();
-            DoCastVictim(SPELL_RAIN_OF_BONES);
-            _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
             {
-                //spawns skeletons every second until skeletonCount is reached
-                if(_skeletonSpawnCounter < _skeletonCount)
+                _skeletonSpawnPos = target->GetPosition();
+                me->SetFacingTo(_skeletonSpawnPos.GetOrientation());
+                me->CastSpell(_skeletonSpawnPos.GetPositionX(), _skeletonSpawnPos.GetPositionY(), _skeletonSpawnPos.GetPositionZ(), SPELL_RAIN_OF_BONES, true);
+                _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
                 {
-                    DoCastVictim(SPELL_SUMMON_SKELETON, true);
-                    _skeletonSpawnCounter++;
-                    context.Repeat(2s);
-                }
-            });
-        }).Schedule(20s, GROUP_FLYING, [this](TaskContext context)
+                    //spawns skeletons every 2 seconds until skeletonCount is reached
+                    if(_skeletonSpawnCounter < _skeletonCount)
+                    {
+                        me->CastSpell(_skeletonSpawnPos.GetPositionX(), _skeletonSpawnPos.GetPositionY(), _skeletonSpawnPos.GetPositionZ(), SPELL_SUMMON_SKELETON, true);
+                        _skeletonSpawnCounter++;
+                        context.Repeat(2s);
+                    }
+                });
+            }
+        }).Schedule(20s, GROUP_AIR, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_DISTRACTING_ASH);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random))
+            {
+                me->SetFacingToObject(target);
+                DoCast(target, SPELL_DISTRACTING_ASH);
+            }
             context.Repeat(2s); //timer wrong?
-        }).Schedule(25s, GROUP_FLYING, [this](TaskContext context)
+        }).Schedule(25s, GROUP_AIR, [this](TaskContext context)
         {
             //5 seconds added due to double trigger?
             //trigger for timer in original + in rain of bones
             //timers need some investigation
+            me->SetFacingToObject(me->GetVictim());
             DoCastVictim(SPELL_SMOKING_BLAST);
             context.Repeat(1500ms); //timer wrong?
-        }).Schedule(13s, GROUP_FLYING, [this](TaskContext context)
+        }).Schedule(13s, GROUP_AIR, [this](TaskContext context)
         {
             DoCastOnFarAwayPlayers(SPELL_FIREBALL_BARRAGE, false, 80.0f);
             context.Repeat(20s);
@@ -191,14 +269,69 @@ struct boss_nightbane : public BossAI
 
     void AttackStart(Unit* who) override
     {
-        if (!_intro && !_flying)
+        if (_phase == PHASE_GROUND)
             ScriptedAI::AttackStart(who);
     }
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_intro && !_flying)
+        if (_phase == PHASE_GROUND)
             ScriptedAI::MoveInLineOfSight(who);
+    }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        BossAI::PathEndReached(pathId);
+        if (pathId == me->GetEntry()*10) // intro
+        {
+            me->GetMap()->SetVisibilityRange(DEFAULT_VISIBILITY_INSTANCE); // restore visibility
+            scheduler.Schedule(0s, [this](TaskContext /*context*/)
+            {
+                me->ClearUnitState(UNIT_STATE_IGNORE_PATHFINDING);
+                me->GetMotionMaster()->MovePoint(POINT_INTRO_LAND, introLandPos);
+                me->SetSpeed(MOVE_RUN, 2.0f);
+            }).Schedule(3s, [this](TaskContext /*context*/)
+            {
+                me->SetDisableGravity(false);
+                me->SetCanFly(false);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
+                _phase = PHASE_GROUND;
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->SetInCombatWithZone();
+            }).Schedule(8s, [this](TaskContext /*context*/)
+            {
+                if (!SelectTargetFromPlayerList(45.0f))
+                {
+                    EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+                }
+            });
+        }
+        else if (pathId == me->GetEntry()*10+1) // landing
+        {
+            _airPhasesCompleted++;
+            if (_triggerCountTakeOffWhileFlying > 0)
+            {
+                _triggerCountTakeOffWhileFlying--;
+                scheduler.Schedule(0s, [this](TaskContext /*context*/)
+                {
+                    me->GetMotionMaster()->MovePoint(POINT_PRE_FLY_SOUTH, preFlySouthPos);
+                });
+            }
+            else
+            {
+                scheduler.Schedule(0s, [this](TaskContext /*context*/)
+                {
+                    DoResetThreatList();
+                    me->GetMotionMaster()->MovePoint(POINT_LAND, landPos);
+                    me->SetDisableGravity(false);
+                    me->SetCanFly(false);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
+                    _phase = PHASE_GROUND;
+                    ScheduleGround();
+                });
+            }
+        }
     }
 
     void MovementInform(uint32 type, uint32 id) override
@@ -206,43 +339,65 @@ struct boss_nightbane : public BossAI
         if (type != POINT_MOTION_TYPE)
             return;
 
-        if (id == POINT_DESPAWN)
+        switch (id)
         {
-            me->DespawnOnEvade();
-        }
-
-        if (_intro)
-        {
-            if (id >= 8)
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
-                me->SetInCombatWithZone();
-                return;
-            }
-
-            _movePhase = id + 1;
-            return;
-        }
-
-        if (_flying)
-        {
-            if (id == 0)
-            {
+            case POINT_INTRO_TAKE_OFF:
+                break;
+            case POINT_INTRO_LAND:
+                DoStartMovement(me->GetVictim());
+                break;
+            case POINT_PRE_FLY_EAST:
+                scheduler.Schedule(0s, [this](TaskContext /*context*/)
+                {
+                    me->GetMotionMaster()->MovePoint(POINT_PRE_FLY_SOUTH, preFlySouthPos);
+                });
+                break;
+            case POINT_PRE_FLY_SOUTH:
+            case POINT_PRE_FLY_WEST:
+                scheduler.Schedule(0s, [this](TaskContext /*context*/)
+                {
+                    me->GetMotionMaster()->MovePoint(POINT_PRE_FLY, preFlyPos);
+                });
+                break;
+            case POINT_PRE_FLY:
+                scheduler.Schedule(0s, [this](TaskContext /*context*/)
+                {
+                    me->GetMotionMaster()->MovePoint(POINT_FLY, flyPos);
+                });
+                break;
+            case POINT_FLY:
+                _phase = PHASE_FLY;
                 Talk(EMOTE_BREATH);
-                _flying = false;
-                Phase = 2;
-                return;
-            }
-
-            if (id < 8)
-                _movePhase = id + 1;
-            else
-            {
-                Phase = 1;
-                _flying = false;
-                _movement = true;
-                return;
-            }
+                ScheduleFly();
+                ScheduleLand();
+                break;
+            case POINT_LANDING_PRE:
+                scheduler.Schedule(0s, [this](TaskContext /*context*/)
+                {
+                    me->GetMotionMaster()->MovePoint(POINT_LANDING_WEST, preFlyWestPos);
+                });
+                break;
+            case POINT_LANDING_WEST:
+                if (_triggerCountTakeOffWhileFlying > 0)
+                {
+                    _airPhasesCompleted++;
+                    _triggerCountTakeOffWhileFlying--;
+                    scheduler.Schedule(0s, [this](TaskContext /*context*/)
+                    {
+                        me->GetMotionMaster()->MovePoint(POINT_PRE_FLY, preFlyPos);
+                    });
+                }
+                else
+                {
+                    scheduler.Schedule(0s, [this](TaskContext /*context*/)
+                    {
+                        me->GetMotionMaster()->MovePath(me->GetEntry()*10+1, false);
+                    });
+                }
+                break;
+            case POINT_LAND:
+                DoStartMovement(me->GetVictim());
+                break;
         }
     }
 
@@ -268,109 +423,82 @@ struct boss_nightbane : public BossAI
         }
     }
 
-    void TakeOff()
+    void TriggerHealthTakeOff()
     {
-        Talk(YELL_FLY_PHASE);
+        if (_phase != PHASE_GROUND)
+        {
+            _triggerCountTakeOffWhileFlying++;
+            return;
+        }
+        _phase = PHASE_TRANSITION;
+        Talk(YELL_AIR_PHASE);
         scheduler.CancelGroup(GROUP_GROUND);
-
         me->InterruptSpell(CURRENT_GENERIC_SPELL);
         me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
         me->SetDisableGravity(true);
+        me->SetCanFly(true);
+        me->SendMovementFlagUpdate();
+        me->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
+        FlyToClosestPreFlyWayPoint();
+    }
+
+    void FlyToClosestPreFlyWayPoint()
+    {
+        Position closestWP = preFlyPos;
+        if (me->GetDistance(preFlyEastPos) < me->GetDistance(closestWP))
+            closestWP = preFlyEastPos;
+        if (me->GetDistance(preFlySouthPos) < me->GetDistance(closestWP))
+            closestWP = preFlySouthPos;
+        if (me->GetDistance(preFlyWestPos) < me->GetDistance(closestWP))
+            closestWP = preFlyWestPos;
+
         me->GetMotionMaster()->Clear(false);
-        me->GetMotionMaster()->MovePoint(0, IntroWay[2][0], IntroWay[2][1], IntroWay[2][2]);
+        if (closestWP == preFlyPos)
+            me->GetMotionMaster()->MovePoint(POINT_PRE_FLY, closestWP);
+        else if (closestWP == preFlyEastPos)
+            me->GetMotionMaster()->MovePoint(POINT_PRE_FLY_EAST, closestWP);
+        else if (closestWP == preFlySouthPos)
+            me->GetMotionMaster()->MovePoint(POINT_PRE_FLY_SOUTH, closestWP);
+        else if (closestWP == preFlyWestPos)
+            me->GetMotionMaster()->MovePoint(POINT_PRE_FLY_WEST, closestWP);
+    }
 
-        _flying = true;
-
-        ScheduleFly();
-
-        //handle landing again
-        scheduler.Schedule(45s, 60s, [this](TaskContext)
+    void ScheduleLand()
+    {
+        scheduler.Schedule(30s, GROUP_LAND, [this](TaskContext) /*context*/
         {
             Talk(YELL_LAND_PHASE);
+            scheduler.CancelGroup(GROUP_AIR);
+            _phase = PHASE_TRANSITION;
 
             me->GetMotionMaster()->Clear(false);
-            me->GetMotionMaster()->MovePoint(3, IntroWay[3][0], IntroWay[3][1], IntroWay[3][2]);
-
-            _flying = true;
-            scheduler.CancelGroup(GROUP_FLYING);
-            scheduler.Schedule(2s, [this](TaskContext)
-            {
-                ScheduleGround();
-            });
+            me->GetMotionMaster()->MovePoint(POINT_LANDING_PRE, preFlyPos);
         });
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (_intro)
-        {
-            if (_movePhase)
-            {
-                if (_movePhase >= 7)
-                {
-                    me->SetDisableGravity(false);
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
-                    me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
-                }
-                else
-                {
-                    me->GetMotionMaster()->MovePoint(_movePhase, IntroWay[_movePhase][0], IntroWay[_movePhase][1], IntroWay[_movePhase][2]);
-                }
-                _movePhase = 0;
-            }
-            return;
-        }
-
-        if (_flying && _movePhase)
-        {
-            if (_movePhase >= 7)
-            {
-                me->SetDisableGravity(false);
-                DoResetThreatList();
-                me->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
-                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PC);
-                me->GetMotionMaster()->MovePoint(8, IntroWay[7][0], IntroWay[7][1], IntroWay[7][2]);
-            }
-            else
-                me->GetMotionMaster()->MovePoint(_movePhase, IntroWay[_movePhase][0], IntroWay[_movePhase][1], IntroWay[_movePhase][2]);
-
-            _movePhase = 0;
-        }
+        scheduler.Update(diff);
+        _skeletonscheduler.Update(diff);
 
         if (!UpdateVictim())
             return;
 
-        if (_flying)
-            return;
-
-        scheduler.Update(diff);
-        _skeletonscheduler.Update(diff);
-
-        //  Phase 1 "GROUND FIGHT"
-        if (Phase == 1)
+        if (_phase == PHASE_GROUND)
         {
-            if (_movement)
-            {
-                DoStartMovement(me->GetVictim());
-                _movement = false;
-            }
-
             DoMeleeAttackIfReady();
         }
     }
 
 private:
-    uint32 Phase;
+    uint8 _phase;
+    uint8 _airPhasesCompleted;
+    uint8 _triggerCountTakeOffWhileFlying;
 
     TaskScheduler _skeletonscheduler;
-
-    bool _intro;
-    bool _flying;
-    bool _movement;
-
-    uint32 _movePhase;
     uint8 _skeletonCount;
     uint8 _skeletonSpawnCounter;
+    Position _skeletonSpawnPos;
 };
 
 class go_blackened_urn : public GameObjectScript
@@ -382,22 +510,31 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            if (instance->GetData(DATA_NIGHTBANE) != DONE && !go->FindNearestCreature(NPC_NIGHTBANE, 40.0f))
+            // if (instance->GetBossState(DATA_NIGHTBANE) == NOT_STARTED || instance->GetBossState(DATA_NIGHTBANE) == FAIL)
+            if (instance->GetBossState(DATA_NIGHTBANE) == NOT_STARTED)
             {
                 if (Creature* nightbane = instance->GetCreature(DATA_NIGHTBANE))
                 {
-                    nightbane->GetMotionMaster()->MovePoint(0, IntroWay[0][0], IntroWay[0][1], IntroWay[0][2]);
-                    nightbane->AI()->Talk(EMOTE_SUMMON);
+                    if (nightbane->IsAlive())
+                    {
+                        nightbane->AI()->DoAction(ACTION_START_INTRO);
+                        return true;
+                    }
                 }
             }
         }
-
         return false;
     }
+};
+
+struct npc_nightbane_helper_target : public NullCreatureAI
+{
+    npc_nightbane_helper_target(Creature* creature) : NullCreatureAI(creature) { me->SetDisableGravity(true); }
 };
 
 void AddSC_boss_nightbane()
 {
     RegisterKarazhanCreatureAI(boss_nightbane);
     new go_blackened_urn();
+    RegisterKarazhanCreatureAI(npc_nightbane_helper_target);
 }
