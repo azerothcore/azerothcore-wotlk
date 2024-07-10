@@ -4699,12 +4699,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
-    // Demonic Pact
-    ApplySpellFix({ 48090 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     // Ancestral Awakening
     ApplySpellFix({ 52759 }, [](SpellInfo* spellInfo)
     {
