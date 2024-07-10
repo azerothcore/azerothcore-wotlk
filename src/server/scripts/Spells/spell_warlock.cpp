@@ -1330,9 +1330,7 @@ class spell_warl_demonic_pact_aura : public AuraScript
 
         bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_PACT_PROC))
-                return false;
-            return true;
+            return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_PACT_PROC });
         }
 
         bool CheckProc(ProcEventInfo& eventInfo)
