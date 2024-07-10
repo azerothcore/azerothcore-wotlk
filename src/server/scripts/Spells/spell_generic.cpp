@@ -1702,10 +1702,8 @@ class spell_gen_pet_summoned : public SpellScript
         {
             PetType newPetType = (player->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET)) ? HUNTER_PET : SUMMON_PET;
             Pet* newPet = new Pet(player, newPetType);
-            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true, 100))
+            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true, 100, true))
             {
-                newPet->SetPower(newPet->getPowerType(), newPet->GetMaxPower(newPet->getPowerType()));
-
                 switch (newPet->GetEntry())
                 {
                     case NPC_DOOMGUARD:
