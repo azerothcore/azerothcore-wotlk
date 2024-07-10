@@ -1324,52 +1324,41 @@ class spell_warl_glyph_of_voidwalker : public AuraScript
 };
 
 // 54909, 53646 - Demonic Pact
-class spell_warl_demonic_pact : public SpellScriptLoader
+class spell_warl_demonic_pact_aura : public AuraScript
 {
-    public:
-        spell_warl_demonic_pact() : SpellScriptLoader("spell_warl_demonic_pact") { }
+    PrepareAuraScript(spell_warl_demonic_pact_aura);
 
-        class spell_warl_demonic_pact_AuraScript : public AuraScript
+        bool Validate(SpellInfo const* /*spellInfo*/) override
         {
-            PrepareAuraScript(spell_warl_demonic_pact_AuraScript);
+            if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_PACT_PROC))
+                return false;
+            return true;
+        }
 
-            bool Validate(SpellInfo const* /*spellInfo*/) override
+        bool CheckProc(ProcEventInfo& eventInfo)
+        {
+            return eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
+        }
+
+        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+        {
+            PreventDefaultAction();
+
+            if (Unit* owner = eventInfo.GetActor()->GetOwner())
             {
-                if (!sSpellMgr->GetSpellInfo(SPELL_WARLOCK_DEMONIC_PACT_PROC))
-                    return false;
-                return true;
-            }
-
-            bool CheckProc(ProcEventInfo& eventInfo)
-            {
-                return eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
-            }
-
-            void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-            {
-                PreventDefaultAction();
-
-                if (Unit* owner = eventInfo.GetActor()->GetOwner())
+                if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
                 {
-                    if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
-                    {
-                        int32 bp0 = static_cast<int32>((aurEff->GetAmount() * owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) + 100.0f) / 100.0f);
-                        owner->CastCustomSpell(SPELL_WARLOCK_DEMONIC_PACT_PROC, SPELLVALUE_BASE_POINT0, bp0, (Unit*)nullptr, true, nullptr, aurEff);
-                    }
+                    int32 bp0 = static_cast<int32>((aurEff->GetAmount() * owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) + 100.0f) / 100.0f);
+                    owner->CastCustomSpell(SPELL_WARLOCK_DEMONIC_PACT_PROC, SPELLVALUE_BASE_POINT0, bp0, (Unit*)nullptr, true, nullptr, aurEff);
                 }
             }
-
-            void Register() override
-            {
-                DoCheckProc += AuraCheckProcFn(spell_warl_demonic_pact_AuraScript::CheckProc);
-                OnEffectProc += AuraEffectProcFn(spell_warl_demonic_pact_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-            }
-        };
-
-        AuraScript* GetAuraScript() const override
-        {
-            return new spell_warl_demonic_pact_AuraScript();
         }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warl_demonic_pact_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_warl_demonic_pact_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
 };
 
 void AddSC_warlock_spell_scripts()
@@ -1405,6 +1394,6 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_shadowburn);
     RegisterSpellScript(spell_warl_glyph_of_felguard);
     RegisterSpellScript(spell_warl_glyph_of_voidwalker);
-    new spell_warl_demonic_pact();
+    RegisterSpellScript(spell_warl_demonic_pact_aura);
 }
 
