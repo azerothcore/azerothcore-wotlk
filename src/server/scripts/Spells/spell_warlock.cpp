@@ -1333,37 +1333,40 @@ class spell_warl_demonic_pact_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_PACT_PROC });
     }
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
     {
-        return eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
+        return isTriggeredAtSpellProcEvent && eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
     }
 
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+
+        if (eventInfo.GetActor()->HasSpellCooldown(aurEff->GetId()))
+            return;
 
         if (Unit* owner = eventInfo.GetActor()->GetOwner())
         {
             int32 currentBonus = 0;
-            if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_WARLOCK_DEMONIC_PACT_PROC, EFFECT_0))
+            if (AuraEffect* demonicAurEff = owner->GetAuraEffect(SPELL_WARLOCK_DEMONIC_PACT_PROC, EFFECT_0))
             {
-                currentBonus = aurEff->GetAmount();
+                currentBonus = demonicAurEff->GetAmount();
             }
 
-            if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
+            if (AuraEffect* talentAurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
             {
                 int32 spellDamageMinusBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) - currentBonus;
                 if (spellDamageMinusBonus < 0)
                     return;
-                int32 bp = int32((aurEff->GetAmount() / 100.0f) * spellDamageMinusBonus);
-                owner->CastCustomSpell((Unit*)nullptr, SPELL_WARLOCK_DEMONIC_PACT_PROC, &bp, &bp, 0, true, nullptr, aurEff);
+                int32 bp = int32((talentAurEff->GetAmount() / 100.0f) * spellDamageMinusBonus);
+                owner->CastCustomSpell((Unit*)nullptr, SPELL_WARLOCK_DEMONIC_PACT_PROC, &bp, &bp, 0, true, nullptr, talentAurEff);
+                eventInfo.GetActor()->AddSpellCooldown(aurEff->GetId(), 0, eventInfo.GetProcCooldown());
             }
         }
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_warl_demonic_pact_aura::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_warl_demonic_pact_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
