@@ -1328,38 +1328,38 @@ class spell_warl_demonic_pact_aura : public AuraScript
 {
     PrepareAuraScript(spell_warl_demonic_pact_aura);
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_PACT_PROC });
-        }
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_PACT_PROC });
+    }
 
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            return eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
-        }
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
+    }
 
-        void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
 
-            if (Unit* owner = eventInfo.GetActor()->GetOwner())
+        if (Unit* owner = eventInfo.GetActor()->GetOwner())
+        {
+            int32 currentBonus = 0;
+            if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_WARLOCK_DEMONIC_PACT_PROC, EFFECT_0))
             {
-                int32 currentBonus = 0;
-                if (AuraEffect* aurEff = owner->GetAuraEffect(SPELL_WARLOCK_DEMONIC_PACT_PROC, EFFECT_0))
-                {
-                    currentBonus = aurEff->GetAmount();
-                }
+                currentBonus = aurEff->GetAmount();
+            }
 
-                if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
-                {
-                    int32 spellDamageMinusBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) - currentBonus;
-                    if (spellDamageMinusBonus < 0)
-                        return;
-                    int32 bp = int32((aurEff->GetAmount() / 100.0f) * spellDamageMinusBonus);
-                    owner->CastCustomSpell((Unit*)nullptr, SPELL_WARLOCK_DEMONIC_PACT_PROC, &bp, &bp, 0, true, nullptr, aurEff);
-                }
+            if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
+            {
+                int32 spellDamageMinusBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) - currentBonus;
+                if (spellDamageMinusBonus < 0)
+                    return;
+                int32 bp = int32((aurEff->GetAmount() / 100.0f) * spellDamageMinusBonus);
+                owner->CastCustomSpell((Unit*)nullptr, SPELL_WARLOCK_DEMONIC_PACT_PROC, &bp, &bp, 0, true, nullptr, aurEff);
             }
         }
+    }
 
     void Register() override
     {
