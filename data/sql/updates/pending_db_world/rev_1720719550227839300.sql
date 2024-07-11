@@ -9,3 +9,16 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (21787, 0, 0, 0, 0, 0, 100, 0, 4000, 8000, 7000, 16000, 0, 0, 11, 11639, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Time-Lost Skettis High Priest - In Combat - Cast \'Shadow Word: Pain\''),
 (21787, 0, 1, 0, 0, 0, 100, 0, 2300, 3000, 8000, 12000, 0, 0, 11, 9734, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Time-Lost Skettis High Priest - In Combat - Cast \'Holy Smite\''),
 (21787, 0, 2, 0, 74, 0, 100, 0, 0, 0, 10000, 15000, 40, 40, 11, 42420, 1, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Time-Lost Skettis High Priest - On Friendly Below 40% Health - Cast \'Flash Heal\'');
+
+-- Talonpriest Ishaal (+duplicate)
+UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '11919 37411 37509 37816' WHERE (`entry` = 23066);
+DELETE FROM `creature_addon` WHERE (`guid` = 132571);
+DELETE FROM `creature` WHERE `guid`=132571 AND `id1` = 23066;
+
+-- Talonpriest Skizzik, no sheath state
+UPDATE `creature_template_addon` SET `auras` = '37411 37509 37816' WHERE (`entry` = 23067);
+
+-- Talonpriest Skizzik (+duplicate)
+UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '37411 37509 37816' WHERE (`entry` = 23068);
+DELETE FROM `creature_addon` WHERE (`guid` = 132610);
+DELETE FROM `creature` WHERE `guid` = 132610 AND `id1` = 23068;
