@@ -22,7 +22,6 @@ Comment: All modify related commands
 Category: commandscripts
 EndScriptData */
 
-#include "AccountMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "ObjectMgr.h"

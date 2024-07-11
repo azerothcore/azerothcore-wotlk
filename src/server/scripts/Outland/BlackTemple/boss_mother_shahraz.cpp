@@ -57,118 +57,80 @@ enum Spells
 
 enum Misc
 {
-    EVENT_KILL_TALK                 = 1,
-    EVENT_CHECK_HEALTH              = 2,
-    EVENT_RANDOM_TALK               = 3,
-    EVENT_SPELL_ENRAGE              = 4,
-    EVENT_SPELL_PRISMATIC_AURA      = 5,
-    EVENT_SPELL_SILENCING_SHRIEK    = 6,
-    EVENT_SPELL_FATAL_ATTRACTION    = 7,
-    EVENT_SPELL_SABER_LASH          = 8
+    GROUP_ENRAGE                    = 1
 };
 
-class boss_mother_shahraz : public CreatureScript
+struct boss_mother_shahraz : public BossAI
 {
-public:
-    boss_mother_shahraz() : CreatureScript("boss_mother_shahraz") { }
+    boss_mother_shahraz(Creature* creature) : BossAI(creature, DATA_MOTHER_SHAHRAZ), _canTalk(true) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetBlackTempleAI<boss_shahrazAI>(creature);
+        _Reset();
+        me->m_Events.CancelEventGroup(GROUP_ENRAGE);
+        _canTalk = true;
+
+        ScheduleHealthCheckEvent(10, [&] {
+            DoCastSelf(SPELL_FRENZY, true);
+            Talk(SAY_EMOTE_FRENZY);
+        });
     }
 
-    struct boss_shahrazAI : public BossAI
+    void JustEngagedWith(Unit* who) override
     {
-        boss_shahrazAI(Creature* creature) : BossAI(creature, DATA_MOTHER_SHAHRAZ)
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+        DoCastSelf(SPELL_SABER_LASH_AURA, true);
+        DoCastSelf(SPELL_RANDOM_PERIODIC, true);
+
+        ScheduleTimedEvent(4s, [&] {
+            DoCastVictim(SPELL_SABER_LASH);
+        }, 30s);
+
+        ScheduleTimedEvent(1min, [&] {
+            Talk(SAY_TAUNT);
+        }, 1min, 2min);
+
+        ScheduleTimedEvent(0s, [&] {
+            DoCastSelf(RAND(SPELL_PRISMATIC_AURA_SHADOW, SPELL_PRISMATIC_AURA_FIRE, SPELL_PRISMATIC_AURA_NATURE, SPELL_PRISMATIC_AURA_ARCANE, SPELL_PRISMATIC_AURA_FROST, SPELL_PRISMATIC_AURA_HOLY));
+        }, 15s);
+
+        ScheduleTimedEvent(30s, [&] {
+            DoCastAOE(SPELL_SILENCING_SHRIEK);
+        }, 30s);
+
+        ScheduleTimedEvent(50s, [&] {
+            Talk(SAY_SPELL);
+            me->CastCustomSpell(SPELL_FATAL_ATTRACTION, SPELLVALUE_MAX_TARGETS, 3, me, false);
+        }, 1min);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_ENRAGE, true);
+            Talk(SAY_ENRAGE);
+        }, 10min);
+    }
+
+    void KilledUnit(Unit* /*victim*/) override
+    {
+        if (_canTalk)
         {
+            Talk(SAY_SLAY);
+            _canTalk = false;
+
+            ScheduleUniqueTimedEvent(6s, [&] {
+                _canTalk = true;
+            }, 1);
         }
+    }
 
-        void Reset() override
-        {
-            BossAI::Reset();
-        }
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
+    }
 
-        void JustEngagedWith(Unit* who) override
-        {
-            BossAI::JustEngagedWith(who);
-            Talk(SAY_AGGRO);
-
-            me->CastSpell(me, SPELL_SABER_LASH_AURA, true);
-            me->CastSpell(me, SPELL_RANDOM_PERIODIC, true);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-            events.ScheduleEvent(EVENT_RANDOM_TALK, 60000);
-            events.ScheduleEvent(EVENT_SPELL_PRISMATIC_AURA, 0);
-            events.ScheduleEvent(EVENT_SPELL_ENRAGE, 600000);
-            events.ScheduleEvent(EVENT_SPELL_SILENCING_SHRIEK, 30000);
-            events.ScheduleEvent(EVENT_SPELL_FATAL_ATTRACTION, 50000);
-            events.ScheduleEvent(EVENT_SPELL_SABER_LASH, 4000);
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
-            {
-                Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
-            }
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            BossAI::JustDied(killer);
-            Talk(SAY_DEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_CHECK_HEALTH:
-                    if (HealthBelowPct(10))
-                    {
-                        me->CastSpell(me, SPELL_FRENZY, true);
-                        Talk(SAY_EMOTE_FRENZY);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 1000);
-                    break;
-                case EVENT_SPELL_ENRAGE:
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    Talk(SAY_ENRAGE);
-                    break;
-                case EVENT_RANDOM_TALK:
-                    Talk(SAY_TAUNT);
-                    events.ScheduleEvent(EVENT_RANDOM_TALK, urand(60000, 120000));
-                    break;
-                case EVENT_SPELL_SABER_LASH:
-                    me->CastSpell(me->GetVictim(), SPELL_SABER_LASH, false);
-                    events.ScheduleEvent(EVENT_SPELL_SABER_LASH, 30000);
-                    break;
-                case EVENT_SPELL_PRISMATIC_AURA:
-                    me->CastSpell(me, RAND(SPELL_PRISMATIC_AURA_SHADOW, SPELL_PRISMATIC_AURA_FIRE, SPELL_PRISMATIC_AURA_NATURE, SPELL_PRISMATIC_AURA_ARCANE, SPELL_PRISMATIC_AURA_FROST, SPELL_PRISMATIC_AURA_HOLY), false);
-                    events.ScheduleEvent(EVENT_SPELL_PRISMATIC_AURA, 15000);
-                    break;
-                case EVENT_SPELL_SILENCING_SHRIEK:
-                    me->CastSpell(me, SPELL_SILENCING_SHRIEK, false);
-                    events.ScheduleEvent(EVENT_SPELL_SILENCING_SHRIEK, 30000);
-                    break;
-                case EVENT_SPELL_FATAL_ATTRACTION:
-                    Talk(SAY_SPELL);
-                    me->CastCustomSpell(SPELL_FATAL_ATTRACTION, SPELLVALUE_MAX_TARGETS, 3, me, false);
-                    events.ScheduleEvent(EVENT_SPELL_FATAL_ATTRACTION, 60000);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+    private:
+        bool _canTalk;
 };
 
 class spell_mother_shahraz_random_periodic_aura : public AuraScript
@@ -321,7 +283,7 @@ class spell_mother_shahraz_fatal_attraction_aura : public AuraScript
 
 void AddSC_boss_mother_shahraz()
 {
-    new boss_mother_shahraz();
+    RegisterBlackTempleCreatureAI(boss_mother_shahraz);
     RegisterSpellScript(spell_mother_shahraz_random_periodic_aura);
     RegisterSpellScript(spell_mother_shahraz_beam_periodic_aura);
     RegisterSpellScript(spell_mother_shahraz_saber_lash_aura);

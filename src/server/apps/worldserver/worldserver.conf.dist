@@ -4387,6 +4387,13 @@ TeleportTimeoutFar = 45
 DailyRBGArenaPoints.MinLevel = 71
 
 #
+#    MunchingBlizzlike.Enabled
+#        Description: Enable the Blizzlike implementation of munching with e.g. Warrior's Rend or Mage's Ignite
+#        Default: 1 - (Blizzlike)
+
+MunchingBlizzlike.Enabled = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################

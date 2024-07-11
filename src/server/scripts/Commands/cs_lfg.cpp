@@ -17,7 +17,6 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
-#include "DatabaseEnv.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "Language.h"

@@ -22,7 +22,6 @@ Comment: All lookup related commands
 Category: commandscripts
 EndScriptData */
 
-#include "AccountMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "CommandScript.h"

@@ -2503,7 +2503,7 @@ float Pet::GetNativeObjectScale() const
     if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() & HUNTER_PET)
     {
         float minScaleLevel = creatureFamily->minScaleLevel;
-        uint8 level = getLevel();
+        uint8 level = GetLevel();
 
         float minLevelScaleMod = level >= minScaleLevel ? (level / minScaleLevel) : 0.0f;
         float maxScaleMod = creatureFamily->maxScaleLevel - minScaleLevel;
@@ -2513,15 +2513,32 @@ float Pet::GetNativeObjectScale() const
 
         float scaleMod = creatureFamily->maxScaleLevel != minScaleLevel ? minLevelScaleMod / maxScaleMod : 0.f;
 
-        float scale = (creatureFamily->maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
+        float maxScale = creatureFamily->maxScale;
 
-        scale = std::min(scale, creatureFamily->maxScale);
-
-        if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(GetNativeDisplayId()))
+        // override maxScale
+        switch (ctFamily)
         {
-            if (scale < 1.f && displayInfo->scale > 1.f)
-                scale *= displayInfo->scale;
+            case CREATURE_FAMILY_CHIMAERA:
+            case CREATURE_FAMILY_CORE_HOUND:
+            case CREATURE_FAMILY_CRAB:
+            case CREATURE_FAMILY_DEVILSAUR:
+            case CREATURE_FAMILY_NETHER_RAY:
+            case CREATURE_FAMILY_RHINO:
+            case CREATURE_FAMILY_SPIDER:
+            case CREATURE_FAMILY_TURTLE:
+            case CREATURE_FAMILY_WARP_STALKER:
+            case CREATURE_FAMILY_WASP:
+            case CREATURE_FAMILY_WIND_SERPENT:
+                maxScale = 1.0f;
+                break;
+            default:
+                break;
         }
+
+        float scale = (maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
+
+        scale = std::min(scale, maxScale);
+
         return scale;
     }
 

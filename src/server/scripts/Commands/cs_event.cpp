@@ -27,7 +27,6 @@
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "Language.h"
-#include "Player.h"
 #include "Timer.h"
 
 using namespace Acore::ChatCommands;
