@@ -9692,30 +9692,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     return false;
                 break;
             }
-        // Demonic Pact
-        case 48090:
-            {
-                // Get talent aura from owner
-                if (IsPet())
-                    if (Unit* owner = GetOwner())
-                    {
-                        if (HasSpellCooldown(trigger_spell_id))
-                            return false;
-                        AddSpellCooldown(trigger_spell_id, 0, cooldown);
-
-                        if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 3220, 0))
-                        {
-                            int32 spellPower = owner->SpellBaseDamageBonusDone(SpellSchoolMask(SPELL_SCHOOL_MASK_MAGIC));
-                            if (AuraEffect const* demonicAuraEffect = GetAuraEffect(trigger_spell_id, EFFECT_0))
-                                spellPower -= demonicAuraEffect->GetAmount();
-
-                            basepoints0 = int32((aurEff->GetAmount() * spellPower + 100.0f) / 100.0f);
-                            CastCustomSpell(this, trigger_spell_id, &basepoints0, &basepoints0, nullptr, true, castItem, triggeredByAura);
-                            return true;
-                        }
-                    }
-                break;
-            }
         case 46916:  // Slam! (Bloodsurge proc)
         case 52437:  // Sudden Death
             {
