@@ -4819,6 +4819,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24);
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(0);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
