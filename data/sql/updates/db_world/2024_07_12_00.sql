@@ -1,3 +1,4 @@
+-- DB update 2024_07_09_17 -> 2024_07_12_00
 UPDATE `creature_template`   SET `speed_walk`     = 1.2                                        WHERE `entry`     IN (17895, 17897, 17898, 17899, 17905, 17916); -- Swim speed = 4.72221994400024414, flight speed = 7
 UPDATE `creature_template`   SET `speed_walk`     = 1.6                                        WHERE `entry`     IN (17906, 17907, 17908);
 UPDATE `creature_template`   SET `speed_run`      = 1.428571428571429                          WHERE `entry`     IN (17895, 17897, 17898, 17899, 17905, 17916);
