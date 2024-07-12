@@ -63,7 +63,7 @@ public:
         }).Schedule(20s, 25s, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_RAIN_OF_FIRE, 0, 40.f, false);
-            context.Repeat(10s, 35s);
+            context.Repeat(12s, 35s);
         }).Schedule(30s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_HOWL_OF_AZGALOR);
