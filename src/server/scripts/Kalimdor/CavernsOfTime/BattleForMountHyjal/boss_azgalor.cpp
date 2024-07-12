@@ -60,10 +60,10 @@ public:
         {
             DoCastVictim(SPELL_CLEAVE);
             context.Repeat(8s, 16s);
-        }).Schedule(25s, [this](TaskContext context)
+        }).Schedule(20s, 25s, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_RAIN_OF_FIRE, 0, 40.f, false);
-            context.Repeat(15s);
+            context.Repeat(12s, 35s);
         }).Schedule(30s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_HOWL_OF_AZGALOR);
