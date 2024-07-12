@@ -22,7 +22,6 @@ Comment: All achievement related commands
 Category: commandscripts
 EndScriptData */
 
-#include "AchievementMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"

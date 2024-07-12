@@ -2005,7 +2005,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Ulduar, Mimiron, Magnetic Core (summon)
-    ApplySpellFix({ 64444 }, [](SpellInfo* spellInfo)
+    // Meeting Stone Summon
+    ApplySpellFix({ 64444, 23598 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
@@ -4867,6 +4868,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 38495 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TriggerSpell = 38530; // Quest Credit for Eye of Grillok
+    });
+
+    // Greater Fireball
+    ApplySpellFix({ 33051 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

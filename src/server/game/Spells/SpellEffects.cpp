@@ -1242,7 +1242,7 @@ void Spell::EffectTriggerRitualOfSummoning(SpellEffIndex effIndex)
 
     finish();
 
-    m_caster->CastSpell((Unit*)nullptr, spellInfo, false);
+    m_caster->CastSpell((Unit*)nullptr, spellInfo, true);
 }
 
 void Spell::EffectJump(SpellEffIndex effIndex)

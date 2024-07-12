@@ -76,40 +76,15 @@ public:
     void DoFindFriendlyMissingBuff(std::vector<Creature*>& creatures, float range, uint32 spellid) const;
     Unit* DoFindClosestFriendlyInRange(float range, bool playerOnly) const;
 
+    bool IsSmart(Creature* c, bool silent = false) const;
+    bool IsSmart(GameObject* g, bool silent = false) const;
+    bool IsSmart(bool silent = false) const;
+
     void StoreTargetList(ObjectVector const& targets, uint32 id)
     {
         // insert or replace
         _storedTargets.erase(id);
         _storedTargets.emplace(id, ObjectGuidVector(targets));
-    }
-
-    bool IsSmart(Creature* c = nullptr)
-    {
-        bool smart = true;
-        if (c && c->GetAIName() != "SmartAI")
-            smart = false;
-
-        if (!me || me->GetAIName() != "SmartAI")
-            smart = false;
-
-        if (!smart)
-            LOG_ERROR("sql.sql", "SmartScript: Action target Creature(entry: {}) is not using SmartAI, action skipped to prevent crash.", c ? c->GetEntry() : (me ? me->GetEntry() : 0));
-
-        return smart;
-    }
-
-    bool IsSmartGO(GameObject* g = nullptr)
-    {
-        bool smart = true;
-        if (g && g->GetAIName() != "SmartGameObjectAI")
-            smart = false;
-
-        if (!go || go->GetAIName() != "SmartGameObjectAI")
-            smart = false;
-        if (!smart)
-            LOG_ERROR("sql.sql", "SmartScript: Action target GameObject(entry: {}) is not using SmartGameObjectAI, action skipped to prevent crash.", g ? g->GetEntry() : (go ? go->GetEntry() : 0));
-
-        return smart;
     }
 
     ObjectVector const* GetStoredTargetVector(uint32 id, WorldObject const& ref) const

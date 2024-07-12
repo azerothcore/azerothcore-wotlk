@@ -1980,7 +1980,7 @@ void GameObject::Use(Unit* user)
                 if (info->entry == 194097)
                     spellId = 61994;                            // Ritual of Summoning
                 else
-                    spellId = 59782;                            // Summoning Stone Effect
+                    spellId = 23598;                            // Meeting Stone Summon
 
                 break;
             }
@@ -2276,15 +2276,6 @@ bool GameObject::IsInRange(float x, float y, float z, float radius) const
     return dx < (info->maxX * scale) + radius && dx > (info->minX * scale) - radius
            && dy < (info->maxY * scale) + radius && dy > (info->minY * scale) - radius
            && dz < (info->maxZ * scale) + radius && dz > (info->minZ * scale) - radius;
-}
-
-void GameObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin, Player const* skipped_rcvr) const
-{
-    dist += GetObjectSize();
-    if (includeMargin)
-        dist += VISIBILITY_COMPENSATION * 2.0f; // pussywizard: to ensure everyone receives all important packets
-    Acore::MessageDistDeliverer notifier(this, data, dist, false, skipped_rcvr);
-    Cell::VisitWorldObjects(this, notifier, dist);
 }
 
 void GameObject::EventInform(uint32 eventId)

@@ -102,10 +102,11 @@ namespace Acore
         float i_distSq;
         TeamId teamId;
         Player const* skipped_receiver;
-        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
+        bool required3dDist;
+        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr, bool req3dDist = false)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
             , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
-            , skipped_receiver(skipped)
+            , skipped_receiver(skipped), required3dDist(req3dDist)
         {
         }
         void Visit(PlayerMapType& m);

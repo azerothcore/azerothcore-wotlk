@@ -63,7 +63,46 @@ SmartScript::SmartScript()
 
 SmartScript::~SmartScript()
 {
+}
 
+bool SmartScript::IsSmart(Creature* c, bool silent) const
+{
+    if (!c)
+        return false;
+
+    bool smart = true;
+    if (!dynamic_cast<SmartAI*>(c->AI()))
+        smart = false;
+
+    if (!smart && !silent)
+        LOG_ERROR("sql.sql", "SmartScript: Action target Creature(entry: {}) is not using SmartAI, action skipped to prevent crash.", c ? c->GetEntry() : (me ? me->GetEntry() : 0));
+
+    return smart;
+}
+
+bool SmartScript::IsSmart(GameObject* g, bool silent) const
+{
+    if (!g)
+        return false;
+
+    bool smart = true;
+    if (!dynamic_cast<SmartGameObjectAI*>(g->AI()))
+        smart = false;
+
+    if (!smart && !silent)
+        LOG_ERROR("sql.sql", "SmartScript: Action target GameObject(entry: {}) is not using SmartGameObjectAI, action skipped to prevent crash.", g ? g->GetEntry() : (go ? go->GetEntry() : 0));
+
+    return smart;
+}
+
+bool SmartScript::IsSmart(bool silent) const
+{
+    if (me)
+        return IsSmart(me, silent);
+    if (go)
+        return IsSmart(go, silent);
+
+    return false;
 }
 
 void SmartScript::OnReset()
@@ -1358,10 +1397,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
             {
-                if (IsCreature(target))
-                    target->ToCreature()->AI()->SetData(e.action.setData.field, e.action.setData.data);
-                else if (IsGameObject(target))
-                    target->ToGameObject()->AI()->SetData(e.action.setData.field, e.action.setData.data);
+                if (Creature* cTarget = target->ToCreature())
+                {
+                    CreatureAI* ai = cTarget->AI();
+                    if (IsSmart(cTarget))
+                        ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
+                    else
+                        ai->SetData(e.action.setData.field, e.action.setData.data);
+                }
+                else if (GameObject* oTarget = target->ToGameObject())
+                {
+                    GameObjectAI* ai = oTarget->AI();
+                    if (IsSmart(oTarget))
+                        ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
+                    else
+                        ai->SetData(e.action.setData.field, e.action.setData.data);
+                }
             }
             break;
         }
@@ -1762,20 +1813,23 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     break;
                 }
                 case SMART_TARGET_RANDOM_POINT:
-                if (me)
                 {
-                    float range = (float)e.target.randomPoint.range;
-                    Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
-                    Position randomPoint = me->GetRandomPoint(srcPos, range);
-                    me->GetMotionMaster()->MovePoint(
-                        e.action.moveToPos.pointId,
-                        randomPoint.m_positionX,
-                        randomPoint.m_positionY,
-                        randomPoint.m_positionZ,
-                        true,
-                        true,
-                        isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
-                    );
+                    if (me)
+                    {
+                        float range = (float)e.target.randomPoint.range;
+                        Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
+                        Position randomPoint = me->GetRandomPoint(srcPos, range);
+                        me->GetMotionMaster()->MovePoint(
+                            e.action.moveToPos.pointId,
+                            randomPoint.m_positionX,
+                            randomPoint.m_positionY,
+                            randomPoint.m_positionZ,
+                            true,
+                            true,
+                            isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
+                        );
+
+                    }
 
                     break;
                 }
@@ -1977,7 +2031,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 else if (GameObject* go = target->ToGameObject())
                 {
-                    if (IsSmartGO(go))
+                    if (IsSmart(go))
                         CAST_AI(SmartGameObjectAI, go->AI())->SetScript9(e, e.action.timedActionList.id, GetLastInvoker());
                 }
             }
@@ -2064,7 +2118,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 else if (GameObject* go = target->ToGameObject())
                 {
-                    if (IsSmartGO(go))
+                    if (IsSmart(go))
                         CAST_AI(SmartGameObjectAI, go->AI())->SetScript9(e, id, GetLastInvoker());
                 }
             }
@@ -2088,7 +2142,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 else if (GameObject* go = target->ToGameObject())
                 {
-                    if (IsSmartGO(go))
+                    if (IsSmart(go))
                         CAST_AI(SmartGameObjectAI, go->AI())->SetScript9(e, id, GetLastInvoker());
                 }
             }
