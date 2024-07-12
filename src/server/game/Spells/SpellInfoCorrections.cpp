@@ -4814,6 +4814,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
+    // Summon Shadowfiends
+    ApplySpellFix({ 41159 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = 9;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
