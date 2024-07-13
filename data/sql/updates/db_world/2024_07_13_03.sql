@@ -1,3 +1,4 @@
+-- DB update 2024_07_13_02 -> 2024_07_13_03
 -- Time-Lost Skettis High Priest
 UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '37411 37816 37509 33900' WHERE (`entry` = 21787);
 
