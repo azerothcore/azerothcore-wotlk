@@ -469,7 +469,7 @@ class spell_black_temple_summon_shadowfiends : public SpellScript
         if (!caster)
             return;
 
-        for (uint8 i = 0; i < 10; i++)
+        for (uint8 i = 0; i < 11; i++)
             caster->CastSpell(caster, SPELL_SUMMON_SHADOWFIENDS, true);
     }
 
