@@ -884,7 +884,7 @@ class spell_q10190_battery_recharging_blaster_aura : public AuraScript
 
         if (Creature* phasehunter = GetTarget()->ToCreature())
             if (phasehunter->GetEntry() == NPC_PHASE_HUNTER_ENTRY)
-                phasehunter->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY);
+                phasehunter->UpdateEntry(NPC_DRAINED_PHASE_HUNTER_ENTRY, nullptr, false);
     }
 
     void Register() override
