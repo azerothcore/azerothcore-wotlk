@@ -1,3 +1,4 @@
+-- DB update 2024_07_13_04 -> 2024_07_14_00
 --
 UPDATE`smart_scripts` SET `action_param1` = 39649 WHERE (`entryorguid` = 22855) AND (`source_type` = 0) AND (`id` = 3);
 
