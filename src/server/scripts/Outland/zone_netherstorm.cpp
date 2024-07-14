@@ -601,114 +601,57 @@ enum PhaseHunterData
     SPELL_DE_MATERIALIZE            = 34814,
 };
 
-class npc_phase_hunter : public CreatureScript
+struct npc_phase_hunter : public ScriptedAI
 {
-public:
-    npc_phase_hunter() : CreatureScript("npc_phase_hunter") { }
+    npc_phase_hunter(Creature* creature) : ScriptedAI(creature) {}
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return new npc_phase_hunterAI(creature);
+        scheduler.CancelAll();
+        DoCastSelf(SPELL_MATERIALIZE);
+        ScriptedAI::Reset();
     }
 
-    struct npc_phase_hunterAI : public ScriptedAI
+    void JustEngagedWith(Unit* who) override
     {
-        npc_phase_hunterAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool Weak;
-        bool Materialize;
-        bool Drained;
-        uint8 WeakPercent;
-
-        ObjectGuid PlayerGUID;
-
-        uint32 ManaBurnTimer;
-
-        void Reset() override
+        scheduler.Schedule(1200ms, [this](TaskContext context)
         {
-            Weak = false;
-            Materialize = false;
-            Drained = false;
-            WeakPercent = 25 + (rand() % 16); // 25-40
+            if (me->HealthBelowPct(35))
+                Talk(EMOTE_WEAK);
+            else
+                context.Repeat(1200ms);
+        });
 
-            PlayerGUID.Clear();
-
-            ManaBurnTimer = 5000 + (rand() % 3 * 1000); // 5-8 sec cd
-
-            if (me->GetEntry() == NPC_DRAINED_PHASE_HUNTER_ENTRY)
-                me->UpdateEntry(NPC_PHASE_HUNTER_ENTRY);
-        }
-
-        void JustEngagedWith(Unit* who) override
+        ScheduleTimedEvent(1200ms, [&]
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
-                PlayerGUID = who->GetGUID();
-        }
+            if (me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED) || me->HasUnitState(UNIT_STATE_ROOT))
+                DoCastSelf(SPELL_PHASE_SLIP);
+        }, 1200ms);
 
-        //void SpellHit(Unit* /*caster*/, SpellInfo const* /*spell*/)
-        //{
-        //    DoCast(me, SPELL_DE_MATERIALIZE);
-        //}
-
-        void UpdateAI(uint32 diff) override
+        ScheduleTimedEvent(8s, 16s, [&]
         {
-            if (!Materialize)
-            {
-                DoCast(me, SPELL_MATERIALIZE);
-                Materialize = true;
-            }
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, Powers(POWER_MANA), 10.f, false)))
+                DoCast(target, SPELL_MANA_BURN);
+        }, 20s, 31s);
 
-            if (me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED) || me->HasUnitState(UNIT_STATE_ROOT)) // if the mob is rooted/slowed by spells eg.: Entangling Roots, Frost Nova, Hamstring, Crippling Poison, etc. => remove it
-                DoCast(me, SPELL_PHASE_SLIP);
+        ScriptedAI::JustEngagedWith(who);
+    }
 
-            if (!UpdateVictim())
-                return;
+    // This crashes the server
+    // void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
+    // {
+    //     if (spell->SchoolMask == SPELL_SCHOOL_NORMAL)
+    //         DoCastSelf(SPELL_DE_MATERIALIZE);
+    // }
 
-            // some code to cast spell Mana Burn on random target which has mana
-            if (ManaBurnTimer <= diff)
-            {
-                std::list<HostileReference*> AggroList = me->GetThreatMgr().GetThreatList();
-                std::list<Unit*> UnitsWithMana;
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
 
-                for (std::list<HostileReference*>::const_iterator itr = AggroList.begin(); itr != AggroList.end(); ++itr)
-                {
-                    if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-                    {
-                        if (unit->GetCreateMana() > 0)
-                            UnitsWithMana.push_back(unit);
-                    }
-                }
-                if (!UnitsWithMana.empty())
-                {
-                    DoCast(Acore::Containers::SelectRandomContainerElement(UnitsWithMana), SPELL_MANA_BURN);
-                    ManaBurnTimer = 8000 + (rand() % 10 * 1000); // 8-18 sec cd
-                }
-                else
-                    ManaBurnTimer = 3500;
-            }
-            else ManaBurnTimer -= diff;
-
-            if (Player* player = ObjectAccessor::GetPlayer(*me, PlayerGUID)) // start: support for quest 10190
-            {
-                if (!Weak && HealthBelowPct(WeakPercent)
-                        && player->GetQuestStatus(QUEST_RECHARGING_THE_BATTERIES) == QUEST_STATUS_INCOMPLETE)
-                {
-                    Talk(EMOTE_WEAK);
-                    Weak = true;
-                }
-                if (Weak && !Drained && me->HasAura(SPELL_RECHARGING_BATTERY))
-                {
-                    Drained = true;
-                    int32 uHpPct = int32(me->GetHealthPct());
-                    me->SetHealth(me->CountPctFromMaxHealth(uHpPct));
-                    me->LowerPlayerDamageReq(me->GetMaxHealth() - me->GetHealth());
-                    me->SetInCombatWith(player);
-                }
-            } // end: support for quest 10190
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+        scheduler.Update(diff);
+    }
 };
 
 /*######
@@ -918,7 +861,7 @@ class spell_q10190_battery_recharging_blaster : public SpellScript
     SpellCastResult CheckCast()
     {
         if (Unit* target = GetExplTargetUnit())
-            if (target->GetHealthPct() <= 25.0f)
+            if (target->GetHealthPct() <= 35.0f)
                 return SPELL_CAST_OK;
 
         return SPELL_FAILED_BAD_TARGETS;
@@ -989,7 +932,7 @@ void AddSC_netherstorm()
     // Theirs
     new npc_commander_dawnforge();
     new at_commander_dawnforge();
-    new npc_phase_hunter();
+    RegisterCreatureAI(npc_phase_hunter);
     new npc_bessy();
     new npc_maxx_a_million_escort();
     RegisterSpellAndAuraScriptPair(spell_q10190_battery_recharging_blaster, spell_q10190_battery_recharging_blaster_aura);
