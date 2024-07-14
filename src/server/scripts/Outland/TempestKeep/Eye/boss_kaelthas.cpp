@@ -1140,7 +1140,14 @@ class spell_kaelthas_mind_control : public SpellScript
         {
             targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
-        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+
+        targets.remove_if([&](WorldObject const* target) -> bool
+        {
+            if (!target->ToPlayer())
+                return true;
+
+            return (!GetCaster()->IsWithinLOSInMap(target));
+        });
     }
 
     void HandleEffect(SpellEffIndex /*effIndex*/)
