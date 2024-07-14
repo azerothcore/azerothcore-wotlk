@@ -3051,8 +3051,11 @@ void Unit::SendMeleeAttackStop(Unit* victim)
 
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
     data << GetPackGUID();
-    data << (victim ? victim->GetPackGUID() : PackedGuid());
-    data << uint32(0);                                     //! Can also take the value 0x01, which seems related to updating rotation
+    if (victim)
+    {
+        data << victim->GetPackGUID();
+        data << victim->isDead();
+    }
     SendMessageToSet(&data, true);
     LOG_DEBUG("entities.unit", "WORLD: Sent SMSG_ATTACKSTOP");
 
