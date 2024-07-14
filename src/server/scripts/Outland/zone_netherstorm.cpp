@@ -581,80 +581,6 @@ public:
 };
 
 /*######
-## npc_phase_hunter
-######*/
-
-enum PhaseHunterData
-{
-    QUEST_RECHARGING_THE_BATTERIES  = 10190,
-
-    NPC_PHASE_HUNTER_ENTRY          = 18879,
-    NPC_DRAINED_PHASE_HUNTER_ENTRY  = 19595,
-
-    EMOTE_WEAK                      = 0,
-
-    // Spells
-    SPELL_RECHARGING_BATTERY        = 34219,
-    SPELL_PHASE_SLIP                = 36574,
-    SPELL_MANA_BURN                 = 13321,
-    SPELL_MATERIALIZE               = 34804,
-    SPELL_DE_MATERIALIZE            = 34814,
-};
-
-struct npc_phase_hunter : public ScriptedAI
-{
-    npc_phase_hunter(Creature* creature) : ScriptedAI(creature) {}
-
-    void Reset() override
-    {
-        scheduler.CancelAll();
-        DoCastSelf(SPELL_MATERIALIZE);
-        ScriptedAI::Reset();
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        scheduler.Schedule(1200ms, [this](TaskContext context)
-        {
-            if (me->HealthBelowPct(35))
-                Talk(EMOTE_WEAK);
-            else
-                context.Repeat(1200ms);
-        });
-
-        ScheduleTimedEvent(1200ms, [&]
-        {
-            if (me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED) || me->HasUnitState(UNIT_STATE_ROOT))
-                DoCastSelf(SPELL_PHASE_SLIP);
-        }, 1200ms);
-
-        ScheduleTimedEvent(8s, 16s, [&]
-        {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, Powers(POWER_MANA), 10.f, false)))
-                DoCast(target, SPELL_MANA_BURN);
-        }, 20s, 31s);
-
-        ScriptedAI::JustEngagedWith(who);
-    }
-
-    // This crashes the server
-    // void SpellHit(Unit* /*caster*/, SpellInfo const* spell)
-    // {
-    //     if (spell->SchoolMask == SPELL_SCHOOL_NORMAL)
-    //         DoCastSelf(SPELL_DE_MATERIALIZE);
-    // }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-        scheduler.Update(diff);
-    }
-};
-
-/*######
 ## npc_bessy
 ######*/
 enum BessyData
@@ -854,6 +780,12 @@ public:
     }
 };
 
+enum PhaseHunterData
+{
+    NPC_PHASE_HUNTER_ENTRY         = 18879,
+    NPC_DRAINED_PHASE_HUNTER_ENTRY = 19595
+};
+
 class spell_q10190_battery_recharging_blaster : public SpellScript
 {
     PrepareSpellScript(spell_q10190_battery_recharging_blaster);
@@ -932,7 +864,6 @@ void AddSC_netherstorm()
     // Theirs
     new npc_commander_dawnforge();
     new at_commander_dawnforge();
-    RegisterCreatureAI(npc_phase_hunter);
     new npc_bessy();
     new npc_maxx_a_million_escort();
     RegisterSpellAndAuraScriptPair(spell_q10190_battery_recharging_blaster, spell_q10190_battery_recharging_blaster_aura);
