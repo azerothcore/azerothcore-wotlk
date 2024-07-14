@@ -463,6 +463,11 @@ class spell_black_temple_summon_shadowfiends : public SpellScript
 {
     PrepareSpellScript(spell_black_temple_summon_shadowfiends);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_SHADOWFIENDS });
+    }
+
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
