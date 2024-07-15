@@ -786,7 +786,7 @@ struct npc_corrupted_totem : public ScriptedAI
         }
 
         me->AddAura(AURA_AVOIDANCE, me);
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
     }
 
     void SetAura(bool apply) const
@@ -866,8 +866,7 @@ struct npc_corrupted_totem : public ScriptedAI
     {
         me->SetInCombatWithZone();
 
-        _scheduler
-            .Schedule(1ms, [this](TaskContext context)
+        scheduler.Schedule(1ms, [this](TaskContext context)
             {
                 if (me->GetEntry() == NPC_TOTEM_C_FIRE_NOVA)
                 {
@@ -902,7 +901,7 @@ struct npc_corrupted_totem : public ScriptedAI
             SetAura(false);
         }
 
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
@@ -912,11 +911,10 @@ struct npc_corrupted_totem : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
     }
 
     protected:
-        TaskScheduler _scheduler;
         bool _auraAdded;
 };
 
@@ -929,14 +927,14 @@ struct npc_drakonid_spawner : public ScriptedAI
         if (action == ACTION_SPAWNER_STOP)
         {
             me->RemoveAurasDueToSpell(SPELL_SPAWN_DRAKONID_GEN);
-            _scheduler.CancelAll();
+            scheduler.CancelAll();
         }
     }
 
     void IsSummonedBy(WorldObject* summoner) override
     {
         DoCastSelf(SPELL_SPAWN_DRAKONID_GEN);
-        _scheduler.Schedule(10s, 60s, [this](TaskContext /*context*/)
+        scheduler.Schedule(10s, 60s, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_SPAWN_CHROMATIC_DRAKONID);
         });
@@ -946,7 +944,7 @@ struct npc_drakonid_spawner : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
     }
 
     void SummonedCreatureDies(Creature* summon, Unit* /*unit*/) override
@@ -958,7 +956,7 @@ struct npc_drakonid_spawner : public ScriptedAI
 
         ObjectGuid summonGuid = summon->GetGUID();
 
-        _scheduler.Schedule(1s, [this, summonGuid](TaskContext /*context*/)
+        scheduler.Schedule(1s, [this, summonGuid](TaskContext /*context*/)
         {
             if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
             {
@@ -969,7 +967,6 @@ struct npc_drakonid_spawner : public ScriptedAI
     }
 
 protected:
-    TaskScheduler _scheduler;
     ObjectGuid _owner;
 };
 
