@@ -63,7 +63,46 @@ SmartScript::SmartScript()
 
 SmartScript::~SmartScript()
 {
+}
 
+bool SmartScript::IsSmart(Creature* c, bool silent) const
+{
+    if (!c)
+        return false;
+
+    bool smart = true;
+    if (!dynamic_cast<SmartAI*>(c->AI()))
+        smart = false;
+
+    if (!smart && !silent)
+        LOG_ERROR("sql.sql", "SmartScript: Action target Creature(entry: {}) is not using SmartAI, action skipped to prevent crash.", c ? c->GetEntry() : (me ? me->GetEntry() : 0));
+
+    return smart;
+}
+
+bool SmartScript::IsSmart(GameObject* g, bool silent) const
+{
+    if (!g)
+        return false;
+
+    bool smart = true;
+    if (!dynamic_cast<SmartGameObjectAI*>(g->AI()))
+        smart = false;
+
+    if (!smart && !silent)
+        LOG_ERROR("sql.sql", "SmartScript: Action target GameObject(entry: {}) is not using SmartGameObjectAI, action skipped to prevent crash.", g ? g->GetEntry() : (go ? go->GetEntry() : 0));
+
+    return smart;
+}
+
+bool SmartScript::IsSmart(bool silent) const
+{
+    if (me)
+        return IsSmart(me, silent);
+    if (go)
+        return IsSmart(go, silent);
+
+    return false;
 }
 
 void SmartScript::OnReset()
@@ -424,10 +463,10 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(e.action.morphOrMount.creature))
                         {
-                            uint32 displayId = ObjectMgr::ChooseDisplayId(ci);
-                            target->ToCreature()->SetDisplayId(displayId);
+                            CreatureModel const* model = ObjectMgr::ChooseDisplayId(ci);
+                            target->ToCreature()->SetDisplayId(model->CreatureDisplayID, model->DisplayScale);
                             LOG_DEBUG("scripts.ai", "SmartScript::ProcessAction:: SMART_ACTION_MORPH_TO_ENTRY_OR_MODEL: Creature entry {}, GuidLow {} set displayid to {}",
-                                      target->GetEntry(), target->GetGUID().ToString(), displayId);
+                                      target->GetEntry(), target->GetGUID().ToString(), model->CreatureDisplayID);
                         }
                     }
                         //if no param1, then use value from param2 (modelId)
@@ -1272,22 +1311,29 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
             {
-                Milliseconds despawnDelay(e.action.forceDespawn.delay);
+                if (e.action.forceDespawn.removeObjectFromWorld)
+                {
+                    if (e.action.forceDespawn.delay || e.action.forceDespawn.forceRespawnTimer)
+                        LOG_ERROR("sql.sql", "SmartScript: SMART_ACTION_FORCE_DESPAWN has removeObjectFromWorld set. delay and forceRespawnTimer ignored.");
 
-                // Wait at least one world update tick before despawn, so it doesn't break linked actions.
-                if (despawnDelay <= 0ms)
-                {
-                    despawnDelay = 1ms;
+                    if (Creature* creature = target->ToCreature())
+                        creature->AddObjectToRemoveList();
+                    else if (GameObject* go = target->ToGameObject())
+                        go->AddObjectToRemoveList();
                 }
+                else
+                {
+                    Milliseconds despawnDelay(e.action.forceDespawn.delay);
 
-                Seconds forceRespawnTimer(e.action.forceDespawn.forceRespawnTimer);
-                if (Creature* creature = target->ToCreature())
-                {
-                    creature->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
-                }
-                else if (GameObject* go = target->ToGameObject())
-                {
-                    go->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
+                    // Wait at least one world update tick before despawn, so it doesn't break linked actions.
+                    if (despawnDelay <= 0ms)
+                        despawnDelay = 1ms;
+
+                    Seconds forceRespawnTimer(e.action.forceDespawn.forceRespawnTimer);
+                    if (Creature* creature = target->ToCreature())
+                        creature->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
+                    else if (GameObject* go = target->ToGameObject())
+                        go->DespawnOrUnsummon(despawnDelay, forceRespawnTimer);
                 }
             }
 
@@ -1316,7 +1362,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     if (e.action.morphOrMount.creature > 0)
                     {
                         if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(e.action.morphOrMount.creature))
-                            target->ToUnit()->Mount(ObjectMgr::ChooseDisplayId(cInfo));
+                            target->ToUnit()->Mount(ObjectMgr::ChooseDisplayId(cInfo)->CreatureDisplayID);
                     }
                     else
                         target->ToUnit()->Mount(e.action.morphOrMount.model);
@@ -1348,10 +1394,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
             {
-                if (IsCreature(target))
-                    target->ToCreature()->AI()->SetData(e.action.setData.field, e.action.setData.data);
-                else if (IsGameObject(target))
-                    target->ToGameObject()->AI()->SetData(e.action.setData.field, e.action.setData.data);
+                if (Creature* cTarget = target->ToCreature())
+                {
+                    CreatureAI* ai = cTarget->AI();
+                    if (IsSmart(cTarget))
+                        ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
+                    else
+                        ai->SetData(e.action.setData.field, e.action.setData.data);
+                }
+                else if (GameObject* oTarget = target->ToGameObject())
+                {
+                    GameObjectAI* ai = oTarget->AI();
+                    if (IsSmart(oTarget))
+                        ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
+                    else
+                        ai->SetData(e.action.setData.field, e.action.setData.data);
+                }
             }
             break;
         }
@@ -1737,14 +1795,28 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             WorldObject* target = nullptr;
 
-            if (e.GetTargetType() == SMART_TARGET_RANDOM_POINT)
+            switch (e.GetTargetType())
             {
-                if (me)
+                case SMART_TARGET_POSITION:
                 {
-                    float range = (float)e.target.randomPoint.range;
-                    Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
-                    Position randomPoint = me->GetRandomPoint(srcPos, range);
-                    me->GetMotionMaster()->MovePoint(
+                    G3D::Vector3 dest(e.target.x, e.target.y, e.target.z);
+                    if (e.action.moveToPos.transport)
+                        if (TransportBase* trans = me->GetDirectTransport())
+                            trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
+
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, true, true,
+                        isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE, e.target.o);
+
+                    break;
+                }
+                case SMART_TARGET_RANDOM_POINT:
+                {
+                    if (me)
+                    {
+                        float range = (float)e.target.randomPoint.range;
+                        Position srcPos = { e.target.x, e.target.y, e.target.z, e.target.o };
+                        Position randomPoint = me->GetRandomPoint(srcPos, range);
+                        me->GetMotionMaster()->MovePoint(
                             e.action.moveToPos.pointId,
                             randomPoint.m_positionX,
                             randomPoint.m_positionY,
@@ -1752,45 +1824,35 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             true,
                             true,
                             isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE
-                    );
+                        );
+
+                    }
+
+                    break;
                 }
-
-                break;
-            }
-
-            /*if (e.GetTargetType() == SMART_TARGET_CREATURE_RANGE || e.GetTargetType() == SMART_TARGET_CREATURE_GUID ||
-            e.GetTargetType() == SMART_TARGET_CREATURE_DISTANCE || e.GetTargetType() == SMART_TARGET_GAMEOBJECT_RANGE ||
-            e.GetTargetType() == SMART_TARGET_GAMEOBJECT_GUID || e.GetTargetType() == SMART_TARGET_GAMEOBJECT_DISTANCE ||
-            e.GetTargetType() == SMART_TARGET_CLOSEST_CREATURE || e.GetTargetType() == SMART_TARGET_CLOSEST_GAMEOBJECT ||
-            e.GetTargetType() == SMART_TARGET_OWNER_OR_SUMMONER || e.GetTargetType() == SMART_TARGET_ACTION_INVOKER ||
-            e.GetTargetType() == SMART_TARGET_CLOSEST_ENEMY || e.GetTargetType() == SMART_TARGET_CLOSEST_FRIENDLY ||
-            e.GetTargetType() == SMART_TARGET_SELF || e.GetTargetType() == SMART_TARGET_STORED)) */
-            {
-                // we want to move to random element
-                if (!targets.empty())
-                    target = Acore::Containers::SelectRandomContainerElement(targets);
-            }
-
-            if (!target)
-            {
-                G3D::Vector3 dest(e.target.x, e.target.y, e.target.z);
-                if (e.action.moveToPos.transport)
-                    if (TransportBase* trans = me->GetDirectTransport())
-                        trans->CalculatePassengerPosition(dest.x, dest.y, dest.z);
-
-                me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, dest.x, dest.y, dest.z, true, true,
-                                                 isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE, e.target.o);
-            }
-            else // Xinef: we can use dest.x, dest.y, dest.z to make offset
-            {
-                float x, y, z;
-                target->GetPosition(x, y, z);
-                if (e.action.moveToPos.ContactDistance > 0)
+                // Can use target floats as offset
+                default:
                 {
-                    target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
+                    // we want to move to random element
+                    if (targets.empty())
+                        return;
+                    else
+                        target = Acore::Containers::SelectRandomContainerElement(targets);
+
+                    float x, y, z;
+                    target->GetPosition(x, y, z);
+
+                    if (e.action.moveToPos.combatReach)
+                        target->GetNearPoint(me, x, y, z, target->GetCombatReach() + e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
+                    else if (e.action.moveToPos.ContactDistance)
+                        target->GetNearPoint(me, x, y, z, e.action.moveToPos.ContactDistance, 0, target->GetAngle(me));
+
+                    me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
+
+                    break;
                 }
-                me->GetMotionMaster()->MovePoint(e.action.moveToPos.pointId, x + e.target.x, y + e.target.y, z + e.target.z, true, true, isControlled ? MOTION_SLOT_CONTROLLED : MOTION_SLOT_ACTIVE);
             }
+
             break;
         }
         case SMART_ACTION_MOVE_TO_POS_TARGET:
@@ -1966,7 +2028,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 else if (GameObject* go = target->ToGameObject())
                 {
-                    if (IsSmartGO(go))
+                    if (IsSmart(go))
                         CAST_AI(SmartGameObjectAI, go->AI())->SetScript9(e, e.action.timedActionList.id, GetLastInvoker());
                 }
             }
@@ -2053,7 +2115,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 else if (GameObject* go = target->ToGameObject())
                 {
-                    if (IsSmartGO(go))
+                    if (IsSmart(go))
                         CAST_AI(SmartGameObjectAI, go->AI())->SetScript9(e, id, GetLastInvoker());
                 }
             }
@@ -2077,7 +2139,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 }
                 else if (GameObject* go = target->ToGameObject())
                 {
-                    if (IsSmartGO(go))
+                    if (IsSmart(go))
                         CAST_AI(SmartGameObjectAI, go->AI())->SetScript9(e, id, GetLastInvoker());
                 }
             }

@@ -38,10 +38,8 @@
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
-#include "SpellMgr.h"
 #include "Transport.h"
 #include "Warden.h"
-#include "World.h"
 #include <fstream>
 #include <set>
 

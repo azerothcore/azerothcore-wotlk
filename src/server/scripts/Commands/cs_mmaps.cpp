@@ -30,10 +30,8 @@
 #include "GridNotifiersImpl.h"
 #include "MMapFactory.h"
 #include "Map.h"
-#include "ObjectMgr.h"
 #include "PathGenerator.h"
 #include "Player.h"
-#include "PointMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
 
 using namespace Acore::ChatCommands;

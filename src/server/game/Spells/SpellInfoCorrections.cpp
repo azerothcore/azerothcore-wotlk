@@ -384,12 +384,9 @@ void SpellMgr::LoadSpellInfoCorrections()
         27892,  // To Anchor 1
         27928,  // To Anchor 1
         27935,  // To Anchor 1
-        27915,  // Anchor to Skulls
-        27931,  // Anchor to Skulls
-        27937   // Anchor to Skulls
-        }, [](SpellInfo* spellInfo)
+    }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS);
     });
 
     // Wrath of the Plaguebringer
@@ -1946,7 +1943,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Ulduar, Mimiron, Magnetic Core (summon)
-    ApplySpellFix({ 64444 }, [](SpellInfo* spellInfo)
+    // Meeting Stone Summon
+    ApplySpellFix({ 64444, 23598 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
@@ -4590,7 +4588,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Holiday - Midsummer, Ribbon Pole Periodic Visual
     ApplySpellFix({ 45406 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST );
+        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST | AURA_INTERRUPT_FLAG_TALK );
     });
 
     // Improved Mind Flay and Smite
@@ -4701,12 +4699,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
-    // Demonic Pact
-    ApplySpellFix({ 48090 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     // Ancestral Awakening
     ApplySpellFix({ 52759 }, [](SpellInfo* spellInfo)
     {
@@ -4795,6 +4787,25 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 37135 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 5;
+    });
+
+    // Presence Of Mind
+    ApplySpellFix({ 12043 }, [](SpellInfo* spellInfo)
+    {
+        // It should not share cooldown mods with category[1151] spells (Arcane Power [12042], Decimate [47271])
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
+    });
+
+    // Eye of Grillok
+    ApplySpellFix({ 38495 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 38530; // Quest Credit for Eye of Grillok
+    });
+
+    // Greater Fireball
+    ApplySpellFix({ 33051 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
@@ -4917,6 +4928,14 @@ void SpellMgr::LoadSpellInfoCorrections()
     factionTemplateEntry->hostileMask |= 8;
     factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1921)); // The Taunka
     factionTemplateEntry->hostileMask |= 8;
+
+    // Remove 1 from guards friendly mask, making able to attack players
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1857)); // Area 52 Bruiser
+    factionTemplateEntry->friendlyMask &= ~1;
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1806)); // Netherstorm Agent
+    factionTemplateEntry->friendlyMask &= ~1;
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1812)); // K3 Bruiser
+    factionTemplateEntry->friendlyMask &= ~1;
 
     // Remove vehicles attr, making accessories selectable
     VehicleSeatEntry* vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4689)); // Siege Engine, Accessory

@@ -30,7 +30,6 @@ EndScriptData */
 #include "GameObject.h"
 #include "Language.h"
 #include "MapMgr.h"
-#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Random.h"

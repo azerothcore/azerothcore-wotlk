@@ -3938,6 +3938,89 @@ class spell_item_scroll_of_retribution : public SpellScript
     }
 };
 
+// 38554 - Absorb Eye of Grillok (Zezzak's Shard)
+enum EyeofGrillok
+{
+    SPELL_EYE_OF_GRILLOK = 38495,
+    NPC_EYE_OF_GRILLOK   = 19440
+};
+
+class spell_item_eye_of_grillok : public SpellScript
+{
+    PrepareSpellScript(spell_item_eye_of_grillok)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+            if (target->GetEntry() == NPC_EYE_OF_GRILLOK && !target->isDead())
+                return SPELL_CAST_OK;
+
+        return SPELL_FAILED_BAD_TARGETS;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_eye_of_grillok::CheckCast);
+    }
+};
+
+class spell_item_eye_of_grillok_aura : public AuraScript
+{
+    PrepareAuraScript(spell_item_eye_of_grillok_aura)
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_EYE_OF_GRILLOK });
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !GetTarget())
+            return;
+
+        caster->CastSpell(caster, SPELL_EYE_OF_GRILLOK, true);
+
+        GetTarget()->ToCreature()->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_eye_of_grillok_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+enum FelManaPotion
+{
+    SPELL_ALCHEMIST_STONE          = 17619,
+    SPELL_ALCHEMIST_STONE_ENERGIZE = 21400
+};
+
+class spell_item_fel_mana_potion : public AuraScript
+{
+    PrepareAuraScript(spell_item_fel_mana_potion)
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ALCHEMIST_STONE, SPELL_ALCHEMIST_STONE_ENERGIZE });
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (caster->HasAura(SPELL_ALCHEMIST_STONE))
+            {
+                uint32 val = GetSpellInfo()->Effects[EFFECT_0].BasePoints * 0.4f;
+                caster->CastCustomSpell(SPELL_ALCHEMIST_STONE_ENERGIZE, SPELLVALUE_BASE_POINT0, val, caster, true);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_fel_mana_potion::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4059,5 +4142,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_worn_troll_dice);
     RegisterSpellScript(spell_item_venomhide_feed);
     RegisterSpellScript(spell_item_scroll_of_retribution);
+    RegisterSpellAndAuraScriptPair(spell_item_eye_of_grillok, spell_item_eye_of_grillok_aura);
+    RegisterSpellScript(spell_item_fel_mana_potion);
 }
 

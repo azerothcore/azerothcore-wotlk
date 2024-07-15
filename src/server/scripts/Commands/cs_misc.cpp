@@ -36,7 +36,6 @@
 #include "MiscPackets.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
-#include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
 #include "Realm.h"
@@ -1386,7 +1385,26 @@ public:
 
         if (!target || !target->IsConnected())
         {
-            return false;
+            if (handler->HasLowerSecurity(nullptr, target->GetGUID()))
+                return false;
+
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER_HOMEBIND);
+            stmt->SetData(0, target->GetGUID().GetCounter());
+
+            PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+            if (result)
+            {
+                Field* fieldsDB = result->Fetch();
+                WorldLocation loc(fieldsDB[0].Get<uint16>(), fieldsDB[2].Get<float>(), fieldsDB[3].Get<float>(), fieldsDB[4].Get<float>(), 0.0f);
+                uint32 zoneId = fieldsDB[1].Get<uint16>();
+
+                Player::SavePositionInDB(loc, zoneId, target->GetGUID(), nullptr);
+
+                handler->PSendSysMessage(LANG_SUMMONING, target->GetName(), handler->GetAcoreString(LANG_OFFLINE));
+            }
+
+            return true;
         }
 
         Player* player = target->GetConnectedPlayer();
@@ -1409,7 +1427,7 @@ public:
 
         if (location->empty() || *location == "inn")
         {
-            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
+            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
             return true;
         }
 

@@ -281,135 +281,120 @@ class spell_rog_deadly_poison : public SpellScript
 };
 
 // 51690 - Killing Spree
-#define KillingSpreeScriptName "spell_rog_killing_spree"
-class spell_rog_killing_spree : public SpellScriptLoader
+class spell_rog_killing_spree_aura : public AuraScript
 {
-public:
-    spell_rog_killing_spree() : SpellScriptLoader(KillingSpreeScriptName) { }
+    PrepareAuraScript(spell_rog_killing_spree_aura);
 
-    class spell_rog_killing_spree_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_rog_killing_spree_SpellScript);
-
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ROGUE_KILLING_SPREE });
-        }
-
-        SpellCastResult CheckCast()
-        {
-            // Kologarn area, Killing Spree should not work
-            if (GetCaster()->GetMapId() == 603 /*Ulduar*/ && GetCaster()->GetDistance2d(1766.936f, -24.748f) < 50.0f)
-                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-            return SPELL_CAST_OK;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            if (targets.empty() || GetCaster()->GetVehicleBase() || GetCaster()->HasUnitState(UNIT_STATE_ROOT))
-                FinishCast(SPELL_FAILED_OUT_OF_RANGE);
-            else
+        return ValidateSpellInfo(
             {
-                // Added attribute not breaking stealth, removes auras here
-                GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
-                GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
-            }
-        }
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (Aura* aura = GetCaster()->GetAura(SPELL_ROGUE_KILLING_SPREE))
-            {
-                if (spell_rog_killing_spree_AuraScript* script = dynamic_cast<spell_rog_killing_spree_AuraScript*>(aura->GetScriptByName(KillingSpreeScriptName)))
-                    script->AddTarget(GetHitUnit());
-            }
-        }
-
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_rog_killing_spree_SpellScript::CheckCast);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rog_killing_spree_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_rog_killing_spree_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_rog_killing_spree_SpellScript();
+                SPELL_ROGUE_KILLING_SPREE_TELEPORT,
+                SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG,
+                SPELL_ROGUE_KILLING_SPREE_DMG_BUFF
+            });
     }
 
-    class spell_rog_killing_spree_AuraScript : public AuraScript
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_rog_killing_spree_AuraScript);
+        GetTarget()->CastSpell(GetTarget(), SPELL_ROGUE_KILLING_SPREE_DMG_BUFF, true);
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        while (!_targets.empty())
         {
-            return ValidateSpellInfo(
-                {
-                    SPELL_ROGUE_KILLING_SPREE_TELEPORT,
-                    SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG,
-                    SPELL_ROGUE_KILLING_SPREE_DMG_BUFF
-                });
-        }
-
-        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->CastSpell(GetTarget(), SPELL_ROGUE_KILLING_SPREE_DMG_BUFF, true);
-        }
-
-        void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            while (!_targets.empty())
+            ObjectGuid guid = Acore::Containers::SelectRandomContainerElement(_targets);
+            if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
             {
-                ObjectGuid guid = Acore::Containers::SelectRandomContainerElement(_targets);
-                if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
+                // xinef: target may be no longer valid
+                if (!GetTarget()->IsValidAttackTarget(target) || target->HasStealthAura() || target->HasInvisibilityAura())
                 {
-                    // xinef: target may be no longer valid
-                    if (!GetTarget()->IsValidAttackTarget(target) || target->HasStealthAura() || target->HasInvisibilityAura())
-                    {
-                        _targets.remove(guid);
-                        continue;
-                    }
-
-                    GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_TELEPORT, true);
-
-                    // xinef: ensure fast coordinates switch, dont wait for client to send opcode
-                    WorldLocation const& dest = GetTarget()->ToPlayer()->GetTeleportDest();
-                    GetTarget()->ToPlayer()->UpdatePosition(dest, true);
-
-                    GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_DONT_REPORT_CAST_ERROR));
-                    break;
-                }
-                else
                     _targets.remove(guid);
+                    continue;
+                }
+
+                GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_TELEPORT, true);
+
+                // xinef: ensure fast coordinates switch, dont wait for client to send opcode
+                WorldLocation const& dest = GetTarget()->ToPlayer()->GetTeleportDest();
+                GetTarget()->ToPlayer()->UpdatePosition(dest, true);
+
+                GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_DONT_REPORT_CAST_ERROR));
+                break;
             }
+            else
+                _targets.remove(guid);
         }
+    }
 
-        void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_ROGUE_KILLING_SPREE_DMG_BUFF);
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_rog_killing_spree_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_rog_killing_spree_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_rog_killing_spree_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-    public:
-        void AddTarget(Unit* target)
-        {
-            _targets.push_back(target->GetGUID());
-        }
-
-    private:
-        GuidList _targets;
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_rog_killing_spree_AuraScript();
+        GetTarget()->RemoveAurasDueToSpell(SPELL_ROGUE_KILLING_SPREE_DMG_BUFF);
+    }
+
+public:
+    void AddTarget(Unit* target)
+    {
+        _targets.push_back(target->GetGUID());
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_rog_killing_spree_aura::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_rog_killing_spree_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_rog_killing_spree_aura::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+
+private:
+    GuidList _targets;
+};
+
+#define KillingSpreeScriptName "spell_rog_killing_spree"
+typedef spell_rog_killing_spree_aura spell_rog_killing_spree_aura_script;
+class spell_rog_killing_spree : public SpellScript
+{
+    PrepareSpellScript(spell_rog_killing_spree);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_KILLING_SPREE });
+    }
+
+    SpellCastResult CheckCast()
+    {
+        // Kologarn area, Killing Spree should not work
+        if (GetCaster()->GetMapId() == 603 /*Ulduar*/ && GetCaster()->GetDistance2d(1766.936f, -24.748f) < 50.0f)
+            return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+        return SPELL_CAST_OK;
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty() || GetCaster()->GetVehicleBase() || GetCaster()->HasUnitState(UNIT_STATE_ROOT))
+            FinishCast(SPELL_FAILED_OUT_OF_RANGE);
+        else
+        {
+            // Added attribute not breaking stealth, removes auras here
+            GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CAST);
+            GetCaster()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_SPELL_ATTACK);
+        }
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Aura* aura = GetCaster()->GetAura(SPELL_ROGUE_KILLING_SPREE))
+        {
+            if (spell_rog_killing_spree_aura* script = dynamic_cast<spell_rog_killing_spree_aura_script*>(aura->GetScriptByName(KillingSpreeScriptName)))
+                script->AddTarget(GetHitUnit());
+        }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_rog_killing_spree::CheckCast);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rog_killing_spree::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_rog_killing_spree::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -774,7 +759,7 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_blade_flurry);
     RegisterSpellScript(spell_rog_cheat_death);
     RegisterSpellScript(spell_rog_deadly_poison);
-    new spell_rog_killing_spree();
+    RegisterSpellAndAuraScriptPair(spell_rog_killing_spree, spell_rog_killing_spree_aura);
     RegisterSpellScript(spell_rog_nerves_of_steel);
     RegisterSpellScript(spell_rog_preparation);
     RegisterSpellScript(spell_rog_prey_on_the_weak);

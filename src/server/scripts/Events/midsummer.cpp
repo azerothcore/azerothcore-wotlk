@@ -31,6 +31,7 @@
 
 enum eBonfire
 {
+    GO_MIDSUMMER_BONFIRE_SPELL_FOCUS            = 181371,
     GO_MIDSUMMER_BONFIRE_CAMPFIRE_SPELL_FOCUS   = 181377,
     GO_AHUNE_BONFIRE                            = 188073,
 
@@ -182,6 +183,10 @@ struct npc_midsummer_bonfire : public ScriptedAI
 {
     npc_midsummer_bonfire(Creature* creature) : ScriptedAI(creature)
     {
+        //  Midsummer Bonfire Spawn Trap also spawns this NPC (currently unwanted)
+        if (me->ToTempSummon())
+            me->DespawnOrUnsummon();
+
         _isStampedOut  = nullptr;
         _teamId     = TEAM_NEUTRAL;
         _type       = BONFIRE_TYPE_NONE;
@@ -238,6 +243,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
                 if (_spellFocus)
                 {
                     _spellFocus->DespawnOrUnsummon();
+                    _spellFocus->AddObjectToRemoveList();
                     _spellFocus = nullptr;
                 }
 
@@ -300,6 +306,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
             if ((_bonfire = me->FindNearestGameObject(GoBonfireCity[i], 10.0f)))
             {
                 _type = BONFIRE_TYPE_CITY;
+                Ignite();
                 return true;
             }
         }
@@ -360,6 +367,26 @@ private:
     uint8 _type;
     GameObject* _spellFocus;
     GameObject* _bonfire;
+};
+
+struct npc_midsummer_bonfire_despawner : public ScriptedAI
+{
+    npc_midsummer_bonfire_despawner(Creature* creature) : ScriptedAI(creature)
+    {
+        std::list<GameObject*> gobjList;
+        me->GetGameObjectListWithEntryInGrid(gobjList, GO_MIDSUMMER_BONFIRE_SPELL_FOCUS, 10.0f);
+        for (std::list<GameObject*>::const_iterator itr = gobjList.begin(); itr != gobjList.end(); ++itr)
+        {
+            // spawnID is 0 for temp spawns
+            if (0 == (*itr)->GetSpawnId())
+            {
+                (*itr)->DespawnOrUnsummon();
+                (*itr)->AddObjectToRemoveList();
+            }
+        }
+
+        me->DespawnOrUnsummon();
+    }
 };
 
 enum torchToss
@@ -676,10 +703,10 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
         }
 
         // prevent duplicates
-        if (std::find(_dancerList.begin(), _dancerList.end(), dancer) != _dancerList.end())
+        if (std::find(_dancerList.begin(), _dancerList.end(), dancer->GetGUID()) != _dancerList.end())
             return;
 
-        _dancerList.push_back(dancer);
+        _dancerList.push_back(dancer->GetGUID());
     }
 
     void LocateRibbonPole()
@@ -707,10 +734,11 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
             return;
 
         // remove non-dancing players from list
-        std::erase_if(_dancerList, [](Player* dancer)
-            {
-                return !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
-            });
+        std::erase_if(_dancerList, [this](ObjectGuid dancerGUID)
+        {
+            Player* dancer = ObjectAccessor::GetPlayer(*me, dancerGUID);
+            return !dancer || !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
+        });
     }
 
     void DoFlameCircleChecks()
@@ -788,9 +816,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
 
                 for (uint8 i = 0; (i < MAX_COUNT_SPEW_LAVA_TARGETS) && (i < _dancerList.size()); i++)
                 {
-                    Player* dancerTarget = _dancerList[i];
-
-                    if (dancerTarget)
+                    if (Player* dancerTarget = ObjectAccessor::GetPlayer(*me, _dancerList[i]))
                     {
                         Creature* fireSpiralBunny = dancerTarget->SummonCreature(NPC_RIBBON_POLE_FIRE_SPIRAL_BUNNY, dancerTarget->GetPositionX(), dancerTarget->GetPositionY(), dancerTarget->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
                         if (fireSpiralBunny)
@@ -823,7 +849,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
     }
 
 private:
-    std::vector<Player*> _dancerList;
+    GuidVector _dancerList;
     GameObject* _ribbonPole;
     Creature* _bunny;
 };
@@ -1266,6 +1292,7 @@ void AddSC_event_midsummer_scripts()
 
     // NPCs
     RegisterCreatureAI(npc_midsummer_bonfire);
+    RegisterCreatureAI(npc_midsummer_bonfire_despawner);
     RegisterCreatureAI(npc_midsummer_torch_target);
     RegisterCreatureAI(npc_midsummer_ribbon_pole_target);
 

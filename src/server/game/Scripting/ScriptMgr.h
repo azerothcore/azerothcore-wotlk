@@ -572,7 +572,7 @@ public: /* AllGameobjectScript */
     void OnGameObjectSaveToDB(GameObject* go);
 
 public: /* AllMapScript */
-    void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript* instanceData, bool load, std::string data, uint32 completedEncounterMask);
+    void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript** instanceData, bool load, std::string data, uint32 completedEncounterMask);
     void OnDestroyInstance(MapInstanced* mapInstanced, Map* map);
 
 public: /* BGScript */
@@ -670,7 +670,7 @@ public: /* MiscScript */
 public: /* CommandSC */
 
     void OnHandleDevCommand(Player* player, bool& enable);
-    bool CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
+    bool OnTryExecuteCommand(ChatHandler& handler, std::string_view cmdStr);
 
 public: /* DatabaseScript */
 
