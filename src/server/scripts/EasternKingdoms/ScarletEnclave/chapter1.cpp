@@ -1260,6 +1260,17 @@ class spell_lich_king_vo_blocker : public AuraScript
 {
     PrepareAuraScript(spell_lich_king_vo_blocker);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo
+        ({
+             SPELL_LICHKINGDK001, SPELL_LICHKINGDK002, SPELL_LICHKINGDK003, SPELL_LICHKINGDK004,
+             SPELL_LICHKINGDK005, SPELL_LICHKINGDK006, SPELL_LICHKINGDK007, SPELL_LICHKINGDK008,
+             SPELL_LICHKINGDK009, SPELL_LICHKINGDK010, SPELL_LICHKINGDK011, SPELL_LICHKINGDK012,
+             SPELL_LICHKINGDK013, SPELL_LICHKINGDK014, SPELL_LICHKINGDK015, SPELL_LICHKINGDK016
+        });
+    }
+
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Player* target = GetTarget()->ToPlayer())
