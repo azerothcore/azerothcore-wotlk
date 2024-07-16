@@ -1,14 +1,5 @@
 -- DB update 2024_07_17_00 -> 2024_07_16_00
 --
-UPDATE `spell_script_names` SET `ScriptName`='spell_warl_seed_of_corruption_damage' WHERE `spell_id` = -27285 AND `ScriptName` = 'spell_warl_seed_of_corruption';
-DELETE FROM `spell_script_names` WHERE `spell_id` = 32865 AND `ScriptName` = 'spell_warl_seed_of_corruption_damage';
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES(32865, 'spell_warl_seed_of_corruption_damage');
-DELETE FROM `spell_script_names` WHERE `spell_id` = -27243 AND `ScriptName` = 'spell_warl_seed_of_corruption_aura';
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (-27243, 'spell_warl_seed_of_corruption_aura');
-DELETE FROM `spell_script_names` WHERE `spell_id` IN (32863, 38252, 44141, 70388) AND `ScriptName` = 'spell_warl_seed_of_corruption_generic_aura';
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(32863,  'spell_warl_seed_of_corruption_generic_aura'),
-(38252,  'spell_warl_seed_of_corruption_generic_aura'),
-(44141,  'spell_warl_seed_of_corruption_generic_aura'),
-(70388,  'spell_warl_seed_of_corruption_generic_aura');
-UPDATE `spell_script_names` SET `ScriptName`='spell_warl_seed_of_corruption_generic_aura' WHERE `spell_id` IN (36123, 39367) AND `ScriptName` = 'spell_zereketh_seed_of_corruption';
+DELETE FROM `page_text` WHERE (`ID` = 2447);
+INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
+(2447, 'The corruption and evil that rumor says travels with the arcane is nothing compared to the pain we\'ve already felt. We are no longer victims, $n. We are the ones who control our fate. Sylvanas has paved the way for us--she has proven that our will is our own; that we are no longer thralls to that bastard Arthas.$BSeek me out in the church, I shall instruct you further... if that is your desire.$B$B- Isabella, Mage Trainer', 0, 0);
