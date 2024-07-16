@@ -58,6 +58,12 @@ enum WarlockSpells
     SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R2    = 60956,
     SPELL_WARLOCK_LIFE_TAP_ENERGIZE                 = 31818,
     SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2               = 32553,
+    SPELL_WARLOCK_SEED_OF_CORRUPTION_R1             = 27243,
+    SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1      = 27285,
+    SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R2      = 47833,
+    SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R3      = 47834,
+    SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC = 32865,
+    SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL         = 37826,
     SPELL_WARLOCK_SOULSHATTER                       = 32835,
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 63106,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
@@ -672,9 +678,10 @@ class spell_warl_ritual_of_doom_effect : public SpellScript
 };
 
 // -27285 - Seed of Corruption
-class spell_warl_seed_of_corruption : public SpellScript
+// 32865 - Seed of Corruption
+class spell_warl_seed_of_corruption_damage : public SpellScript
 {
-    PrepareSpellScript(spell_warl_seed_of_corruption);
+    PrepareSpellScript(spell_warl_seed_of_corruption_damage);
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
@@ -697,7 +704,124 @@ class spell_warl_seed_of_corruption : public SpellScript
 
     void Register() override
     {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warl_seed_of_corruption::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_warl_seed_of_corruption_damage::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
+};
+
+// -27243 - Seed of Corruption
+class spell_warl_seed_of_corruption_aura: public AuraScript
+{
+    PrepareAuraScript(spell_warl_seed_of_corruption_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1,
+            SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R2,
+            SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R3,
+            SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL
+        });
+    }
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (!GetCaster())
+            return;
+
+        // effect 1 scales with 14% of caster's SP (DBC data)
+        amount = GetCaster()->SpellDamageBonusDone(GetUnitOwner(), GetSpellInfo(), amount, DOT, aurEff->GetEffIndex(), aurEff->GetPctMods());
+    }
+
+    void Detonate(AuraEffect const* aurEff)
+    {
+        if (!GetCaster() || !GetTarget())
+            return;
+
+        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
+        GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        int32 remainingDamage = aurEff->GetAmount() - damageInfo->GetDamage();
+        if (remainingDamage > 0)
+        {
+            GetAura()->GetEffect(EFFECT_1)->SetAmount(remainingDamage);
+        }
+        else // damage threshold has been reached
+        {
+            Remove(AURA_REMOVE_BY_DEFAULT);
+            Detonate(aurEff);
+        }
+    }
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
+        if (removeMode == AURA_REMOVE_BY_DEATH)
+            Detonate(aurEff);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_seed_of_corruption_aura::CalculateAmount, EFFECT_1, SPELL_AURA_DUMMY);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_warl_seed_of_corruption_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
+// Monster spells, triggered only on detonation threshold reached (not on death)
+// 32863 - Seed of Corruption
+// 36123 - Seed of Corruption
+// 38252 - Seed of Corruption
+// 39367 - Seed of Corruption
+// 44141 - Seed of Corruption
+// 70388 - Seed of Corruption
+class spell_warl_seed_of_corruption_generic_aura: public AuraScript
+{
+    PrepareAuraScript(spell_warl_seed_of_corruption_generic_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL });
+    }
+
+    void Detonate(AuraEffect const* aurEff)
+    {
+        if (!GetCaster() || !GetTarget())
+            return;
+
+        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
+        GetCaster()->CastCustomSpell(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELLVALUE_BASE_POINT0, GetSpellInfo()->GetEffect(EFFECT_1).CalcValue(), GetTarget(), true, nullptr, aurEff);
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        int32 remainingDamage = aurEff->GetAmount() - damageInfo->GetDamage();
+        if (remainingDamage > 0)
+        {
+            GetAura()->GetEffect(EFFECT_1)->SetAmount(remainingDamage);
+        }
+        else // damage threshold has been reached
+        {
+            Remove(AURA_REMOVE_BY_DEFAULT);
+            Detonate(aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_generic_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
 };
 
@@ -1395,7 +1519,9 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_health_funnel);
     RegisterSpellScript(spell_warl_life_tap);
     RegisterSpellScript(spell_warl_ritual_of_doom_effect);
-    RegisterSpellScript(spell_warl_seed_of_corruption);
+    RegisterSpellScript(spell_warl_seed_of_corruption_damage);
+    RegisterSpellScript(spell_warl_seed_of_corruption_aura);
+    RegisterSpellScript(spell_warl_seed_of_corruption_generic_aura);
     RegisterSpellScript(spell_warl_shadow_ward);
     RegisterSpellScript(spell_warl_siphon_life);
     RegisterSpellScript(spell_warl_soulshatter);
