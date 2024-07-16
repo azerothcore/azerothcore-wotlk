@@ -5252,6 +5252,77 @@ class spell_gen_sober_up : public AuraScript
     }
 };
 
+enum StealWeapon
+{
+    SPELL_STEAL_WEAPON = 36207, // in 36208 as script_effect
+    NPC_GLUMDOR        = 20730,
+    SAY_GLUMDOR_STEAL  = 0      // Stupid, squishy $r. That weapon mine now! Give!
+};
+
+ // 36208 - Steal Weapon
+class spell_gen_steal_weapon : public AuraScript
+{
+    PrepareAuraScript(spell_gen_steal_weapon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_STEAL_WEAPON });
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (!caster || !target)
+            return;
+
+        if (Creature* stealer = caster->ToCreature())
+        {
+            if (Player* player = target->ToPlayer())
+            {
+                if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+                {
+                    stealer->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetEntry());
+                    stealer->CastSpell(stealer, SPELL_STEAL_WEAPON, true);
+
+                    if (stealer->GetEntry() == NPC_GLUMDOR)
+                    {
+                        stealer->AI()->Talk(SAY_GLUMDOR_STEAL, player);
+                    }
+                }
+            }
+            // He can steal creature weapons too
+            if (Creature* creature = target->ToCreature())
+            {
+                int8 mainhand = 1;
+                if (EquipmentInfo const* eInfo = sObjectMgr->GetEquipmentInfo(creature->GetEntry(), mainhand))
+                {
+                    stealer->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, eInfo->ItemEntry[0]);
+                    stealer->CastSpell(stealer, SPELL_STEAL_WEAPON, true);
+                }
+            }
+        }
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        if (Creature* stealer = caster->ToCreature())
+        {
+            stealer->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_gen_steal_weapon::OnApply, EFFECT_1, SPELL_AURA_MOD_DISARM, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_gen_steal_weapon::OnRemove, EFFECT_1, SPELL_AURA_MOD_DISARM, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5408,5 +5479,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_choking_vines);
     RegisterSpellScript(spell_gen_consumption);
     RegisterSpellScript(spell_gen_sober_up);
+    RegisterSpellScript(spell_gen_steal_weapon);
 }
 
