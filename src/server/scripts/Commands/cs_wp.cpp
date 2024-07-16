@@ -42,17 +42,17 @@ public:
     {
         static ChatCommandTable wpCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR,     false, &HandleWpAddCommand,                "" },
-            { "event",          SEC_ADMINISTRATOR,     false, &HandleWpEventCommand,              "" },
-            { "load",           SEC_ADMINISTRATOR,     false, &HandleWpLoadCommand,               "" },
-            { "modify",         SEC_ADMINISTRATOR,     false, &HandleWpModifyCommand,             "" },
-            { "unload",         SEC_ADMINISTRATOR,     false, &HandleWpUnLoadCommand,             "" },
-            { "reload",         SEC_ADMINISTRATOR,     false, &HandleWpReloadCommand,             "" },
-            { "show",           SEC_ADMINISTRATOR,     false, &HandleWpShowCommand,               "" }
+            { "add",        HandleWpAddCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "event",      HandleWpEventCommand,    SEC_ADMINISTRATOR, Console::No },
+            { "load",       HandleWpLoadCommand,     SEC_ADMINISTRATOR, Console::No },
+            { "modify",     HandleWpModifyCommand,   SEC_ADMINISTRATOR, Console::No },
+            { "unload",     HandleWpUnLoadCommand,   SEC_ADMINISTRATOR, Console::No },
+            { "reload",     HandleWpReloadCommand,   SEC_ADMINISTRATOR, Console::No },
+            { "show",       HandleWpShowCommand,     SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
-            { "wp",             SEC_ADMINISTRATOR,     false, nullptr,                            "", wpCommandTable }
+            { "wp", wpCommandTable }
         };
         return commandTable;
     }
