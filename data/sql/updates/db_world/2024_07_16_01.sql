@@ -1,3 +1,4 @@
+-- DB update 2024_07_16_00 -> 2024_07_16_01
 UPDATE `creature_template` SET `lootid` = 28194, `mingold` = 350000, `maxgold` = 450000 WHERE `entry` = 28194;
 
 DELETE FROM `creature_loot_template` WHERE `Entry` = 28194;
