@@ -484,45 +484,48 @@ public:
 
     static bool HandleGMTicketResponseDeleteCommand(ChatHandler* handler, uint32 ticketId)
     {
-        if (GmTicket* ticket = sTicketMgr->GetTicket(ticketId))
+        GmTicket* ticket = sTicketMgr->GetTicket(ticketId);
+        // Don't allow deleting response for a closed ticket.
+        if (!ticket || ticket->IsClosed())
         {
-            // Cannot delete response for a ticket that is assigned to someone else.
-            //! Console excluded
-            Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
-            if (player && ticket->IsAssignedNotTo(player->GetGUID()))
-            {
-                handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
-                return true;
-            }
-
-            CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
-            ticket->DeleteResponse();
-            ticket->SaveToDB(trans);
-
-            std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
-            msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEDELETED, player ? player->GetName() : "Console");
-
-            handler->SendGlobalGMSysMessage(msg.c_str());
+            handler->SendSysMessage(LANG_COMMAND_TICKETNOTEXIST);
             return true;
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST);
-        return false;
+        // Cannot delete response for a ticket that is assigned to someone else.
+        //! Console excluded
+        Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
+        if (player && ticket->IsAssignedNotTo(player->GetGUID()))
+        {
+            handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
+            return true;
+        }
+
+        CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
+        ticket->DeleteResponse();
+        ticket->SaveToDB(trans);
+
+        std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
+        msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEDELETED, player ? player->GetName() : "Console");
+
+        handler->SendGlobalGMSysMessage(msg.c_str());
+        return true;
     }
 
     static bool HandleGMTicketResponseShowCommand(ChatHandler* handler, uint32 ticketId)
     {
-        if (GmTicket* ticket = sTicketMgr->GetTicket(ticketId))
+        GmTicket* ticket = sTicketMgr->GetTicket(ticketId);
+        if (!ticket)
         {
-            std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
-            msg += handler->PGetParseString(LANG_COMMAND_TICKETLISTRESPONSE, ticket->GetResponse());
-
-            handler->PSendSysMessage(msg.c_str());
+            handler->SendSysMessage(LANG_COMMAND_TICKETNOTEXIST);
             return true;
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST);
-        return false;
+        std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
+        msg += handler->PGetParseString(LANG_COMMAND_TICKETLISTRESPONSE, ticket->GetResponse());
+
+        handler->PSendSysMessage(msg.c_str());
+        return true;
     }
 };
 
