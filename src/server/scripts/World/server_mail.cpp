@@ -44,9 +44,8 @@ public:
             stmt->SetData(0, playerGUID);
             stmt->SetData(1, mailId);
 
-            session->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
-                .WithPreparedCallback([session, servMail](PreparedQueryResult result)
-                    {
+            auto callback = [session, servMail](PreparedQueryResult result)
+                {
                         if (!result)
                             sObjectMgr->SendServerMail(
                                 session->GetPlayer(),
@@ -63,7 +62,10 @@ public:
                                 servMail.body,
                                 servMail.active
                             );
-                    }));
+                };
+
+            // Execute the query asynchronously and add the callback
+            session->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(callback));
         }
     }
 };
