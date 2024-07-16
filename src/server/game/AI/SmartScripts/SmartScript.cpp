@@ -167,21 +167,28 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
     if (unit)
         mLastInvoker = unit->GetGUID();
+    else if (gob)
+        mLastInvoker = gob->GetGUID();
 
-    if (Unit* tempInvoker = GetLastInvoker())
+    if (WorldObject* tempInvoker = GetLastInvoker())
         LOG_DEBUG("sql.sql", "SmartScript::ProcessAction: Invoker: {} ({})", tempInvoker->GetName(), tempInvoker->GetGUID().ToString());
 
     bool isControlled = e.action.moveToPos.controlled > 0;
 
     ObjectVector targets;
-    GetTargets(targets, e, unit);
+    if (unit)
+        GetTargets(targets, e, unit);
+    else if (gob)
+        GetTargets(targets, e, gob);
+    else
+        GetTargets(targets, e);
 
     switch (e.GetActionType())
     {
         case SMART_ACTION_TALK:
         {
             Creature* talker = e.target.type == 0 ? me : nullptr;
-            Unit* talkTarget = nullptr;
+            WorldObject* talkTarget = nullptr;
 
             for (WorldObject* target : targets)
             {
@@ -232,7 +239,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     sCreatureTextMgr->SendChat(target->ToCreature(), uint8(e.action.simpleTalk.textGroupID), IsPlayer(GetLastInvoker()) ? GetLastInvoker() : 0);
                 else if (IsPlayer(target) && me)
                 {
-                    Unit* templastInvoker = GetLastInvoker();
+                    Unit* templastInvoker = GetLastInvoker()->ToUnit();
                     sCreatureTextMgr->SendChat(me, uint8(e.action.simpleTalk.textGroupID), IsPlayer(templastInvoker) ? templastInvoker : 0, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target->ToPlayer());
                 }
 
@@ -783,7 +790,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         case SMART_ACTION_INVOKER_CAST:
         {
             // Can be used for area trigger cast
-            Unit* tempLastInvoker = GetLastInvoker(unit);
+            Unit* tempLastInvoker = GetLastInvoker(unit)->ToUnit();
             if (!tempLastInvoker)
                 break;
 
@@ -1397,16 +1404,22 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (Creature* cTarget = target->ToCreature())
                 {
                     CreatureAI* ai = cTarget->AI();
-                    if (IsSmart(cTarget))
-                        ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
+                    if (IsSmart(cTarget, true))
+                        if (me)
+                            ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
+                        else if (go)
+                            ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, go);
                     else
                         ai->SetData(e.action.setData.field, e.action.setData.data);
                 }
                 else if (GameObject* oTarget = target->ToGameObject())
                 {
                     GameObjectAI* ai = oTarget->AI();
-                    if (IsSmart(oTarget))
-                        ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
+                    if (IsSmart(oTarget, true))
+                        if (me)
+                            ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
+                        else if (go)
+                            ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, go);
                     else
                         ai->SetData(e.action.setData.field, e.action.setData.data);
                 }
@@ -2900,7 +2913,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                 if (e.action.setGuid.invokerGUID)
                 {
-                    if (Unit* invoker = GetLastInvoker())
+                    if (WorldObject* invoker = GetLastInvoker())
                     {
                         guidToSend = invoker->GetGUID();
                     }
@@ -3318,12 +3331,12 @@ SmartScriptHolder SmartScript::CreateSmartEvent(SMART_EVENT e, uint32 event_flag
     return script;
 }
 
-void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, Unit* invoker /*= nullptr*/) const
+void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, WorldObject* invoker /*= nullptr*/) const
 {
-    Unit* scriptTrigger = nullptr;
+    WorldObject* scriptTrigger = nullptr;
     if (invoker)
         scriptTrigger = invoker;
-    else if (Unit* tempLastInvoker = GetLastInvoker())
+    else if (WorldObject* tempLastInvoker = GetLastInvoker())
         scriptTrigger = tempLastInvoker;
 
     WorldObject* baseObject = GetBaseObject();
@@ -3399,8 +3412,8 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 targets.push_back(scriptTrigger);
             break;
         case SMART_TARGET_ACTION_INVOKER_VEHICLE:
-            if (scriptTrigger && scriptTrigger->GetVehicle() && scriptTrigger->GetVehicle()->GetBase())
-                targets.push_back(scriptTrigger->GetVehicle()->GetBase());
+            if (scriptTrigger && scriptTrigger->ToUnit()->GetVehicle() && scriptTrigger->ToUnit()->GetVehicle()->GetBase())
+                targets.push_back(scriptTrigger->ToUnit()->GetVehicle()->GetBase());
             break;
         case SMART_TARGET_INVOKER_PARTY:
             if (scriptTrigger)
@@ -4323,7 +4336,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 if (e.event.dataSet.id != var0 || e.event.dataSet.value != var1)
                     return;
                 RecalcTimer(e, e.event.dataSet.cooldownMin, e.event.dataSet.cooldownMax);
-                ProcessAction(e, unit, var0, var1);
+                ProcessAction(e, unit, var0, var1, false, nullptr, gob);
                 break;
             }
         case SMART_EVENT_PASSENGER_REMOVED:
@@ -4356,7 +4369,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     return;
                 }
 
-                ProcessAction(e, GetLastInvoker());
+                ProcessAction(e, GetLastInvoker()->ToUnit());
                 break;
             }
         case SMART_EVENT_GAME_EVENT_START:
@@ -5178,14 +5191,14 @@ void SmartScript::SetScript9(SmartScriptHolder& e, uint32 entry)
     }
 }
 
-Unit* SmartScript::GetLastInvoker(Unit* invoker) const
+WorldObject* SmartScript::GetLastInvoker(WorldObject* invoker) const
 {
     // Xinef: Look for invoker only on map of base object... Prevents multithreaded crashes
     if (GetBaseObject())
-        return ObjectAccessor::GetUnit(*GetBaseObject(), mLastInvoker);
+        return ObjectAccessor::GetWorldObject(*GetBaseObject(), mLastInvoker);
     // xinef: used for area triggers invoker cast
     else if (invoker)
-        return ObjectAccessor::GetUnit(*invoker, mLastInvoker);
+        return ObjectAccessor::GetWorldObject(*invoker, mLastInvoker);
     return nullptr;
 }
 
