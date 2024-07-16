@@ -1405,10 +1405,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     CreatureAI* ai = cTarget->AI();
                     if (IsSmart(cTarget, true))
+                    {
                         if (me)
                             ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
                         else if (go)
                             ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, go);
+                    }
                     else
                         ai->SetData(e.action.setData.field, e.action.setData.data);
                 }
@@ -1416,10 +1418,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 {
                     GameObjectAI* ai = oTarget->AI();
                     if (IsSmart(oTarget, true))
+                    {
                         if (me)
                             ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
                         else if (go)
                             ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, go);
+                    }
                     else
                         ai->SetData(e.action.setData.field, e.action.setData.data);
                 }
