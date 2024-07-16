@@ -74,7 +74,6 @@ public:
     {
         //! NOTE:
         //! LANG_ADDON can only be sent by client in "PARTY", "RAID", "GUILD", "BATTLEGROUND", "WHISPER"
-
         std::string logType = (lang != LANG_ADDON) ? "chat." : "chat.addon.";
         std::string msgType = "";
 
@@ -110,6 +109,8 @@ public:
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild) override
     {
+        //! NOTE:
+        //! LANG_ADDON can only be sent by client in "PARTY", "RAID", "GUILD", "BATTLEGROUND", "WHISPER"
         std::string logType = (lang != LANG_ADDON) ? "chat." : "chat.addon.";
         std::string msgType = "";
 
