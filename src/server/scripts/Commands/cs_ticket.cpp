@@ -499,7 +499,6 @@ public:
             ticket->DeleteResponse();
             ticket->SaveToDB(trans);
 
-            Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
             std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
             msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEDELETED, player ? player->GetName() : "Console");
 
@@ -516,7 +515,7 @@ public:
         if (GmTicket* ticket = sTicketMgr->GetTicket(ticketId))
         {
             std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
-            msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSESHOW, ticket->GetResponse());
+            msg += handler->PGetParseString(LANG_COMMAND_TICKETLISTRESPONSE, ticket->GetResponse());
 
             handler->PSendSysMessage(msg.c_str());
             return true;
