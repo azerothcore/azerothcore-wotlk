@@ -464,6 +464,7 @@ public:
             ticket->AppendResponse("\n");
         ticket->AppendResponse(response);
         ticket->SaveToDB(trans);
+        sTicketMgr->UpdateLastChange();
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
         msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEAPPENDED, response);
@@ -504,6 +505,7 @@ public:
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->DeleteResponse();
         ticket->SaveToDB(trans);
+        sTicketMgr->UpdateLastChange();
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
         msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEDELETED, player ? player->GetName() : "Console");
