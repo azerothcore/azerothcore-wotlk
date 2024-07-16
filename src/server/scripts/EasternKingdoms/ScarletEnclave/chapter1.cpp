@@ -1300,7 +1300,7 @@ class spell_lich_king_whisper : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         if (Player* player = GetHitPlayer())
-            GetCaster()->Unit::Whisper(uint32(GetEffectValue()), player, false);
+            GetCaster()->Whisper(uint32(GetEffectValue()), player, false);
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
