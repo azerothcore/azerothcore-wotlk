@@ -44,24 +44,29 @@ public:
             stmt->SetData(0, playerGUID);
             stmt->SetData(1, mailId);
 
-            auto callback = [session, servMail](PreparedQueryResult result)
+            // Capture servMail by value
+            auto callback = [session, servMailWrapper = std::reference_wrapper<ServerMail const>(servMail)](PreparedQueryResult result)
                 {
-                        if (!result)
-                            sObjectMgr->SendServerMail(
-                                session->GetPlayer(),
-                                servMail.id,
-                                servMail.reqLevel,
-                                servMail.reqPlayTime,
-                                servMail.moneyA,
-                                servMail.moneyH,
-                                servMail.itemA,
-                                servMail.itemCountA,
-                                servMail.itemH,
-                                servMail.itemCountH,
-                                servMail.subject,
-                                servMail.body,
-                                servMail.active
-                            );
+                     ServerMail const& servMail = servMailWrapper.get();  // Dereference the wrapper to get the original object
+
+                    if (!result)
+                    {
+                        sObjectMgr->SendServerMail(
+                            session->GetPlayer(),
+                            servMail.id,
+                            servMail.reqLevel,
+                            servMail.reqPlayTime,
+                            servMail.moneyA,
+                            servMail.moneyH,
+                            servMail.itemA,
+                            servMail.itemCountA,
+                            servMail.itemH,
+                            servMail.itemCountH,
+                            servMail.subject,
+                            servMail.body,
+                            servMail.active
+                        );
+                    }
                 };
 
             // Execute the query asynchronously and add the callback
