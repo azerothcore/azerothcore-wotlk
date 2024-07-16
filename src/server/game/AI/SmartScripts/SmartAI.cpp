@@ -964,7 +964,12 @@ uint32 SmartAI::GetData(uint32 /*id*/) const
 
 void SmartAI::SetData(uint32 id, uint32 value, WorldObject* invoker)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, invoker->ToUnit(), id, value, false, nullptr, invoker->ToGameObject());
+    if (Unit* unit = invoker->ToUnit())
+        GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, unit, id, value);
+    else if (GameObject* gob = invoker->ToGameObject())
+        GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, nullptr, id, value, false, nullptr, gob);
+    else
+        GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, nullptr, id, value);
 }
 
 void SmartAI::SetGUID(ObjectGuid /*guid*/, int32 /*id*/)
@@ -1234,7 +1239,12 @@ void SmartGameObjectAI::Destroyed(Player* player, uint32 eventId)
 
 void SmartGameObjectAI::SetData(uint32 id, uint32 value, WorldObject* invoker)
 {
-    GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, invoker->ToUnit(), id, value, false, nullptr, invoker->ToGameObject());
+    if (Unit* unit = invoker->ToUnit())
+        GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, unit, id, value);
+    else if (GameObject* gob = invoker->ToGameObject())
+        GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, nullptr, id, value, false, nullptr, gob);
+    else
+        GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, nullptr, id, value);
 }
 
 void SmartGameObjectAI::SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker)
