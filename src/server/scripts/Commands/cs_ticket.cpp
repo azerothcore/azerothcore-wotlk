@@ -42,7 +42,9 @@ public:
         static ChatCommandTable ticketResponseCommandTable =
         {
             { "append",         HandleGMTicketResponseAppendCommand,    SEC_GAMEMASTER,     Console::Yes },
-            { "appendln",       HandleGMTicketResponseAppendLnCommand,  SEC_GAMEMASTER,     Console::Yes }
+            { "appendln",       HandleGMTicketResponseAppendLnCommand,  SEC_GAMEMASTER,     Console::Yes },
+            { "delete",         HandleGMTicketResponseDeleteCommand,    SEC_GAMEMASTER,     Console::Yes },
+            { "show",           HandleGMTicketResponseShowCommand,      SEC_GAMEMASTER,     Console::Yes }
         };
         static ChatCommandTable ticketCommandTable =
         {
@@ -436,10 +438,9 @@ public:
         return true;
     }
 
-    static bool _HandleGMTicketResponseAppendCommand(uint32 ticketId, bool newLine, ChatHandler* handler)
+    static bool TicketResponseAppend(uint32 ticketId, bool newLine, ChatHandler* handler, std::string response)
     {
-        char* response = strtok(nullptr, "\n");
-        if (!response)
+        if (response.empty())
             return false;
 
         GmTicket* ticket = sTicketMgr->GetTicket(ticketId);
@@ -459,22 +460,70 @@ public:
         }
 
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
-        ticket->AppendResponse(response);
         if (newLine)
             ticket->AppendResponse("\n");
+        ticket->AppendResponse(response);
         ticket->SaveToDB(trans);
 
+        std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
+        msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEAPPENDED, response);
+
+        handler->PSendSysMessage(msg.c_str());
         return true;
     }
 
-    static bool HandleGMTicketResponseAppendCommand(ChatHandler* handler, uint32 ticketId)
+    static bool HandleGMTicketResponseAppendCommand(ChatHandler* handler, uint32 ticketId, Tail res)
     {
-        return _HandleGMTicketResponseAppendCommand(ticketId, false, handler);
+        return TicketResponseAppend(ticketId, false, handler, res.data());
     }
 
-    static bool HandleGMTicketResponseAppendLnCommand(ChatHandler* handler, uint32 ticketId)
+    static bool HandleGMTicketResponseAppendLnCommand(ChatHandler* handler, uint32 ticketId, Tail res)
     {
-        return _HandleGMTicketResponseAppendCommand(ticketId, true, handler);
+        return TicketResponseAppend(ticketId, true, handler, res.data());
+    }
+
+    static bool HandleGMTicketResponseDeleteCommand(ChatHandler* handler, uint32 ticketId)
+    {
+        if (GmTicket* ticket = sTicketMgr->GetTicket(ticketId))
+        {
+            // Cannot delete response for a ticket that is assigned to someone else.
+            //! Console excluded
+            Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
+            if (player && ticket->IsAssignedNotTo(player->GetGUID()))
+            {
+                handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
+                return true;
+            }
+
+            CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
+            ticket->DeleteResponse();
+            ticket->SaveToDB(trans);
+
+            Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
+            std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
+            msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEDELETED, player ? player->GetName() : "Console");
+
+            handler->SendGlobalGMSysMessage(msg.c_str());
+            return true;
+        }
+
+        handler->PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST);
+        return false;
+    }
+
+    static bool HandleGMTicketResponseShowCommand(ChatHandler* handler, uint32 ticketId)
+    {
+        if (GmTicket* ticket = sTicketMgr->GetTicket(ticketId))
+        {
+            std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
+            msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSESHOW, ticket->GetResponse());
+
+            handler->PSendSysMessage(msg.c_str());
+            return true;
+        }
+
+        handler->PSendSysMessage(LANG_COMMAND_TICKETNOTEXIST);
+        return false;
     }
 };
 
