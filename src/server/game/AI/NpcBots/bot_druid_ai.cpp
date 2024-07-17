@@ -2721,6 +2721,7 @@ public:
             InitSpellMap(AQUATIC_FORM_1);
             InitSpellMap(CURE_POISON_1);
             InitSpellMap(ABOLISH_POISON_1);
+            InitSpellMap(REMOVE_CURSE_1);
             InitSpellMap(ENTANGLING_ROOTS_1);
             InitSpellMap(CYCLONE_1);
             InitSpellMap(HIBERNATE_1);
