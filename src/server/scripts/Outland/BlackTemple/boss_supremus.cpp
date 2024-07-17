@@ -93,14 +93,14 @@ struct boss_supremus : public BossAI
         // Hateful Strike Phase
         if (IsSnared)
         {
-            scheduler.Schedule(5s, [this](TaskContext context)
+            scheduler.Schedule(8s, 15s, [this](TaskContext context)
             {
                 context.SetGroup(GROUP_ABILITIES);
 
                 if (Unit* target = FindHatefulStrikeTarget())
                     DoCast(target, SPELL_HATEFUL_STRIKE);
 
-                context.Repeat();
+                context.Repeat(1500ms, 15s);
             });
 
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
@@ -110,7 +110,6 @@ struct boss_supremus : public BossAI
         // Gaze Phase
         else
         {
-            scheduler.DelayGroup(GROUP_MOLTEN_PUNCH, 60s);
             DoCastSelf(SPELL_SNARE_SELF, true);
 
             scheduler.Schedule(5s, [this](TaskContext context)
