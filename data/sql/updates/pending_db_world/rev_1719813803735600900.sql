@@ -11,7 +11,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `spell_custom_attr` WHERE `spell_id`=32578;
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (32578, 2048);
 
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 32578) ;
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 17) AND (`SourceGroup` = 0) AND (`SourceEntry` = 32578);
 
 UPDATE `item_template` SET `ScriptName` = '' WHERE (`entry` = 30175);
 
