@@ -156,9 +156,9 @@ struct boss_supremus : public BossAI
         summons.Summon(summon);
         if (summon->GetEntry() == NPC_SUPREMUS_PUNCH_STALKER)
         {
-            summon->ToTempSummon()->InitStats(20000);
+            summon->SetInCombatWithZone();
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                summon->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f, MOTION_SLOT_CONTROLLED);
+                summon->AddThreat(target, 10000.f);
         }
         else
             summon->CastSpell(summon, SPELL_VOLCANIC_ERUPTION_TRIGGER, true);
