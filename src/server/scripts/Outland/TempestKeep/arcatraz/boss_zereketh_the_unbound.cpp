@@ -79,37 +79,8 @@ struct boss_zereketh_the_unbound : public BossAI
     }
 };
 
-// 36123, 39367 -- Seed of Corruption
-class spell_zereketh_seed_of_corruption: public AuraScript
-{
-    PrepareAuraScript(spell_zereketh_seed_of_corruption);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_CORRUPTION_PROC });
-    }
-
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
-    {
-        PreventDefaultAction();
-        uint32 val = GetSpellInfo()->GetEffect(EFFECT_1).BasePoints;
-        GetTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id);
-
-        if (GetCaster())
-        {
-            GetCaster()->CastCustomSpell(SPELL_CORRUPTION_PROC, SPELLVALUE_BASE_POINT0, val, GetTarget(), true);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_zereketh_seed_of_corruption::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
-    }
-};
-
 void AddSC_boss_zereketh_the_unbound()
 {
     RegisterArcatrazCreatureAI(boss_zereketh_the_unbound);
-    RegisterSpellScript(spell_zereketh_seed_of_corruption);
 }
 

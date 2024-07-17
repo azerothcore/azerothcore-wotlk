@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `spell_linked_spell` (
   UNIQUE KEY `trigger_effect_type` (`spell_trigger`,`spell_effect`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Spell System';
 
--- Dumping data for table acore_world.spell_linked_spell: ~579 rows (approximately)
+-- Dumping data for table acore_world.spell_linked_spell: ~582 rows (approximately)
 DELETE FROM `spell_linked_spell`;
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
 	(-75731, -75055, 0, 'Instant Statue'),
@@ -102,6 +102,7 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(-47122, -47118, 0, 'On Strip Detect Drakuru fade - Remove Envision Drakuru'),
 	(-46637, 46638, 0, 'Break Ice (Madrigosa barrier'),
 	(-46637, 47030, 0, 'Break Ice (Madrigosa barrier'),
+	(-45964, -46333, 0, ''),
 	(-45717, -45726, 0, 'Fog of Corruption - Charm'),
 	(-43883, -43332, 0, 'Rental racing ram removed removes Exhausted'),
 	(-43883, -43310, 0, 'Remove Ram level Neutral when Rental racing ram removed'),
@@ -115,6 +116,7 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(-42846, -36032, 0, 'Arcane Missiles Rank 13'),
 	(-42843, -36032, 0, 'Arcane Missiles Rank 12'),
 	(-42825, 42868, 0, 'Cannon Prep Remove - Link Cannon Fire'),
+	(-42201, 42205, 0, 'Eternal Silence trigger Residue of Eternity on removal'),
 	(-40626, -40628, 0, 'Apexis Enlightenment speed remove'),
 	(-40625, -40627, 0, 'Apexis Emanations speed remove'),
 	(-40623, -40624, 0, 'Apexis Vibrations speed remove'),
@@ -370,6 +372,7 @@ INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comm
 	(45923, 45922, 1, 'Shadow Prison Add'),
 	(45950, -45922, 1, 'Shadow Prison Remove'),
 	(45958, 45956, 1, 'Signal Alliance'),
+	(45964, 46333, 0, ''),
 	(45980, 46022, 0, 'Re-Cursive quest'),
 	(46019, 46021, 1, 'Trigger Spectral Realm'),
 	(46228, -46247, 0, 'Black Hole Visual (Grown)'),

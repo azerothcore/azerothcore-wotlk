@@ -4699,12 +4699,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
-    // Demonic Pact
-    ApplySpellFix({ 48090 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     // Ancestral Awakening
     ApplySpellFix({ 52759 }, [](SpellInfo* spellInfo)
     {
@@ -4814,12 +4808,17 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
-    // Wing Buffet
-    ApplySpellFix({ 37319 }, [](SpellInfo* spellInfo)
+    // Gor'drek's Ointment
+    ApplySpellFix({ 32578 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(0);
-        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS);
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
+    // Shadow Grasp
+    ApplySpellFix({ 30410 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_PUSHBACK;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
