@@ -1,3 +1,4 @@
+-- DB update 2024_07_17_04 -> 2024_07_17_05
 -- Quest: Protecting Our Own
 UPDATE `quest_template` SET `RequiredNpcOrGo1` = 21142 WHERE (`ID` = 10488);
 UPDATE `creature_template_addon` SET `auras` = '37691' WHERE (`entry` = 20748);
