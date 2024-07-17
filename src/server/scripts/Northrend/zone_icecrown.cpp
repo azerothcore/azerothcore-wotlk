@@ -1063,203 +1063,164 @@ enum infraGreenBomberQuests
     SEAT_ENGINEERING            = 2
 };
 
-class spell_switch_infragreen_bomber_station : public SpellScriptLoader
+class spell_switch_infragreen_bomber_station : public SpellScript
 {
-public:
-    spell_switch_infragreen_bomber_station() : SpellScriptLoader("spell_switch_infragreen_bomber_station") { }
+    PrepareSpellScript(spell_switch_infragreen_bomber_station);
 
-    class spell_switch_infragreen_bomber_station_SpellScript : public SpellScript
+    uint8 GetSeatNumber(uint32 spellId)
     {
-        PrepareSpellScript(spell_switch_infragreen_bomber_station_SpellScript)
+        if (spellId == SPELL_ENGINEERING)
+            return 2;
+        else if (spellId == SPELL_ANTI_AIR_TURRET)
+            return 1;
+        else
+            return 0;
+    }
 
-        uint8 GetSeatNumber(uint32 spellId)
-        {
-            if (spellId == SPELL_ENGINEERING)
-                return 2;
-            else if (spellId == SPELL_ANTI_AIR_TURRET)
-                return 1;
-            else
-                return 0;
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Vehicle* kit = GetCaster()->GetVehicle();
-            Unit* charmer = GetCaster()->GetCharmer(); // Player controlling station
-            if (!kit || !charmer)
-                return;
-
-            uint8 seatNumber = GetSeatNumber(GetSpellInfo()->Id);
-            SeatMap::iterator itr = kit->GetSeatIteratorForPassenger(GetCaster());
-            if (itr == kit->Seats.end())
-                return;
-
-            // Xinef: Same seat, no change required
-            if (seatNumber == itr->first)
-                return;
-
-            if (Unit* station = kit->GetPassenger(seatNumber))
-                station->HandleSpellClick(charmer, 0);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_switch_infragreen_bomber_station_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_switch_infragreen_bomber_station_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        Vehicle* kit = GetCaster()->GetVehicle();
+        Unit* charmer = GetCaster()->GetCharmer(); // Player controlling station
+        if (!kit || !charmer)
+            return;
+
+        uint8 seatNumber = GetSeatNumber(GetSpellInfo()->Id);
+        SeatMap::iterator itr = kit->GetSeatIteratorForPassenger(GetCaster());
+        if (itr == kit->Seats.end())
+            return;
+
+        // Xinef: Same seat, no change required
+        if (seatNumber == itr->first)
+            return;
+
+        if (Unit* station = kit->GetPassenger(seatNumber))
+            station->HandleSpellClick(charmer, 0);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_switch_infragreen_bomber_station::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_charge_shield_bomber : public SpellScriptLoader
+class spell_charge_shield_bomber : public SpellScript
 {
-public:
-    spell_charge_shield_bomber() : SpellScriptLoader("spell_charge_shield_bomber") { }
+    PrepareSpellScript(spell_charge_shield_bomber);
 
-    class spell_charge_shield_bomber_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_charge_shield_bomber_SpellScript)
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Unit* ship = GetCaster()->GetVehicleBase();
-            if (!ship)
-                return;
-
-            ship->CastSpell(ship, SPELL_INFRA_GREEN_SHIELD, true);
-            Aura* aura = ship->GetAura(SPELL_INFRA_GREEN_SHIELD);
-            if (!aura)
-                return;
-
-            aura->ModStackAmount(GetEffectValue() - 1);
-        }
-
-        void Register() override
-        {
-            if (m_scriptSpellId == SPELL_CHARGE_SHIELD)
-                OnEffectHitTarget += SpellEffectFn(spell_charge_shield_bomber_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_charge_shield_bomber_SpellScript();
+        return ValidateSpellInfo({ SPELL_INFRA_GREEN_SHIELD });
     }
 
-    class spell_charge_shield_bomber_AuraScript : public AuraScript
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        PrepareAuraScript(spell_charge_shield_bomber_AuraScript);
+        PreventHitDefaultEffect(effIndex);
+        Unit* ship = GetCaster()->GetVehicleBase();
+        if (!ship)
+            return;
 
-        void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
-        {
-            // Set absorbtion amount to unlimited
-            amount = -1;
-        }
+        ship->CastSpell(ship, SPELL_INFRA_GREEN_SHIELD, true);
+        Aura* aura = ship->GetAura(SPELL_INFRA_GREEN_SHIELD);
+        if (!aura)
+            return;
 
-        void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            uint32 absorbPct = GetStackAmount() / 2;
-            absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
-            ModStackAmount(-1);
-        }
+        aura->ModStackAmount(GetEffectValue() - 1);
+    }
 
-        void Register() override
-        {
-            if (m_scriptSpellId == SPELL_INFRA_GREEN_SHIELD)
-            {
-                DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_charge_shield_bomber_AuraScript::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-                OnEffectAbsorb += AuraEffectAbsorbFn(spell_charge_shield_bomber_AuraScript::Absorb, EFFECT_0);
-            }
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_charge_shield_bomber_AuraScript();
+        if (m_scriptSpellId == SPELL_CHARGE_SHIELD)
+        OnEffectHitTarget += SpellEffectFn(spell_charge_shield_bomber::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_fight_fire_bomber : public SpellScriptLoader
+class spell_charge_shield_bomber_aura : public AuraScript
 {
-public:
-    spell_fight_fire_bomber() : SpellScriptLoader("spell_fight_fire_bomber") { }
+    PrepareAuraScript(spell_charge_shield_bomber_aura);
 
-    class spell_fight_fire_bomber_SpellScript : public SpellScript
+    void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        PrepareSpellScript(spell_fight_fire_bomber_SpellScript)
+        // Set absorbtion amount to unlimited
+        amount = -1;
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
+    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        uint32 absorbPct = GetStackAmount() / 2;
+        absorbAmount = CalculatePct(dmgInfo.GetDamage(), absorbPct);
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        if (m_scriptSpellId == SPELL_INFRA_GREEN_SHIELD)
         {
-            PreventHitDefaultEffect(effIndex);
-            Vehicle* kit = GetCaster()->GetVehicle();
-            if (!kit)
-                return;
+            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_charge_shield_bomber_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
+            OnEffectAbsorb += AuraEffectAbsorbFn(spell_charge_shield_bomber_aura::Absorb, EFFECT_0);
+        }
+    }
+};
 
-            bool extinguished = false;
-            uint8 fireCount = 0;
-            for (uint8 seat = 3; seat <= 5; ++seat)
-                if (Unit* banner = kit->GetPassenger(seat))
-                    if (banner->HasAura(SPELL_COSMETIC_FIRE))
+class spell_fight_fire_bomber : public SpellScript
+{
+    PrepareSpellScript(spell_fight_fire_bomber);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_COSMETIC_FIRE, SPELL_EXTINGUISH_FIRE, SPELL_BURNING });
+    }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Vehicle* kit = GetCaster()->GetVehicle();
+        if (!kit)
+            return;
+
+        bool extinguished = false;
+        uint8 fireCount = 0;
+        for (uint8 seat = 3; seat <= 5; ++seat)
+            if (Unit* banner = kit->GetPassenger(seat))
+                if (banner->HasAura(SPELL_COSMETIC_FIRE))
+                {
+                    if (!extinguished)
                     {
-                        if (!extinguished)
+                        GetCaster()->CastSpell(banner, SPELL_EXTINGUISH_FIRE, true);
+                        extinguished = true;
+                        if (urand(0, 2))
                         {
-                            GetCaster()->CastSpell(banner, SPELL_EXTINGUISH_FIRE, true);
-                            extinguished = true;
-                            if (urand(0, 2))
-                            {
-                                banner->RemoveAurasDueToSpell(SPELL_COSMETIC_FIRE);
-                                continue;
-                            }
+                            banner->RemoveAurasDueToSpell(SPELL_COSMETIC_FIRE);
+                            continue;
                         }
-                        fireCount++;
                     }
+                    fireCount++;
+                }
 
-            if (fireCount == 0)
-                GetCaster()->RemoveAurasDueToSpell(SPELL_BURNING);
-        }
+        if (fireCount == 0)
+            GetCaster()->RemoveAurasDueToSpell(SPELL_BURNING);
+    }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_fight_fire_bomber_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_fight_fire_bomber_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_fight_fire_bomber::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_anti_air_rocket_bomber : public SpellScriptLoader
+class spell_anti_air_rocket_bomber : public SpellScript
 {
-public:
-    spell_anti_air_rocket_bomber() : SpellScriptLoader("spell_anti_air_rocket_bomber") { }
+    PrepareSpellScript(spell_anti_air_rocket_bomber);
 
-    class spell_anti_air_rocket_bomber_SpellScript : public SpellScript
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_anti_air_rocket_bomber_SpellScript)
+        PreventHitDefaultEffect(effIndex);
+        const WorldLocation* loc = GetExplTargetDest();
+        GetCaster()->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), GetSpellInfo()->Effects[effIndex].CalcValue(), true);
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            const WorldLocation* loc = GetExplTargetDest();
-            GetCaster()->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), GetSpellInfo()->Effects[effIndex].CalcValue(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_anti_air_rocket_bomber_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_anti_air_rocket_bomber_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_anti_air_rocket_bomber::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1439,33 +1400,22 @@ public:
     }
 };
 
-class spell_onslaught_or_call_bone_gryphon : public SpellScriptLoader
+class spell_onslaught_or_call_bone_gryphon : public SpellScript
 {
-public:
-    spell_onslaught_or_call_bone_gryphon() : SpellScriptLoader("spell_onslaught_or_call_bone_gryphon") { }
+    PrepareSpellScript(spell_onslaught_or_call_bone_gryphon);
 
-    class spell_onslaught_or_call_bone_gryphon_SpellScript : public SpellScript
+    void ChangeSummonPos(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_onslaught_or_call_bone_gryphon_SpellScript);
+        WorldLocation summonPos = *GetExplTargetDest();
+        Position offset = { 0.0f, 0.0f, 3.0f, 0.0f };
+        summonPos.RelocateOffset(offset);
+        SetExplTargetDest(summonPos);
+        GetHitDest()->RelocateOffset(offset);
+    }
 
-        void ChangeSummonPos(SpellEffIndex /*effIndex*/)
-        {
-            WorldLocation summonPos = *GetExplTargetDest();
-            Position offset = { 0.0f, 0.0f, 3.0f, 0.0f };
-            summonPos.RelocateOffset(offset);
-            SetExplTargetDest(summonPos);
-            GetHitDest()->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_onslaught_or_call_bone_gryphon_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_onslaught_or_call_bone_gryphon_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_onslaught_or_call_bone_gryphon::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
     }
 };
 
@@ -2192,12 +2142,12 @@ void AddSC_icecrown()
     new npc_lord_arete();
     new npc_boneguard_footman();
     new npc_tirions_gambit_tirion();
-    new spell_switch_infragreen_bomber_station();
-    new spell_charge_shield_bomber();
-    new spell_fight_fire_bomber();
-    new spell_anti_air_rocket_bomber();
+    RegisterSpellScript(spell_switch_infragreen_bomber_station);
+    RegisterSpellAndAuraScriptPair(spell_charge_shield_bomber, spell_charge_shield_bomber_aura);
+    RegisterSpellScript(spell_fight_fire_bomber);
+    RegisterSpellScript(spell_anti_air_rocket_bomber);
     new npc_infra_green_bomber_generic();
-    new spell_onslaught_or_call_bone_gryphon();
+    RegisterSpellScript(spell_onslaught_or_call_bone_gryphon);
     RegisterSpellScript(spell_deliver_gryphon);
 
     // Theirs
