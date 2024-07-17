@@ -19,10 +19,10 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "serpent_shrine.h"
-#include "ScriptedCreature.h"
 
 DoorData const doorData[] =
 {

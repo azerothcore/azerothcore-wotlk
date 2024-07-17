@@ -211,7 +211,7 @@ std::pair<PetStable::PetInfo const*, PetSaveMode> Pet::GetLoadPetInfo(PetStable 
     return { nullptr, PET_SAVE_AS_DELETED };
 }
 
-bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct /*= 0*/)
+bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct /*= 0*/, bool fullMana /*= false*/)
 {
     m_loading = true;
 
@@ -394,7 +394,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     // Send fake summon spell cast - this is needed for correct cooldown application for spells
     // Example: 46584 - without this cooldown (which should be set always when pet is loaded) isn't set clientside
     /// @todo pets should be summoned from real cast instead of just faking it?
-    if (petInfo->CreatedBySpellId)
+    if (petInfo->CreatedBySpellId && spellInfo && (spellInfo->CategoryRecoveryTime > 0 || spellInfo->RecoveryTime > 0))
     {
         WorldPacket data(SMSG_SPELL_GO, (8 + 8 + 4 + 4 + 2));
         data << owner->GetPackGUID();
@@ -418,7 +418,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         owner->ToPlayer()->SetLastPetNumber(petInfo->PetNumber);
 
     owner->GetSession()->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(std::make_shared<PetLoadQueryHolder>(ownerid, petInfo->PetNumber)))
-        .AfterComplete([this, owner, session = owner->GetSession(), isTemporarySummon, current, lastSaveTime = petInfo->LastSaveTime, savedhealth = petInfo->Health, savedmana = petInfo->Mana, healthPct]
+        .AfterComplete([this, owner, session = owner->GetSession(), isTemporarySummon, current, lastSaveTime = petInfo->LastSaveTime, savedhealth = petInfo->Health, savedmana = petInfo->Mana, healthPct, fullMana]
         (SQLQueryHolderBase const& holder)
     {
         if (session->GetPlayer() != owner || owner->GetPet() != this)
@@ -474,6 +474,10 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
             curHealth = CountPctFromMaxHealth(healthPct);
         }
 
+        uint32 curMana = savedmana;
+        if (fullMana)
+            curMana = GetMaxPower(POWER_MANA);
+
         if (getPetType() == SUMMON_PET && !current) //all (?) summon pets come with full health when called, but not when they are current
         {
             SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
@@ -486,7 +490,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
             else
             {
                 SetHealth(curHealth > GetMaxHealth() ? GetMaxHealth() : curHealth);
-                SetPower(POWER_MANA, savedmana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : savedmana);
+                SetPower(POWER_MANA, curMana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : curMana);
             }
         }
 
@@ -2499,16 +2503,11 @@ float Pet::GetNativeObjectScale() const
 {
     uint8 ctFamily = GetCreatureTemplate()->family;
 
-    // hackfix: Edge case where DBC scale values for DEVILSAUR pets make them too small.
-    // Therefore we take data from spirit beast instead.
-    if (ctFamily && ctFamily == CREATURE_FAMILY_DEVILSAUR)
-        ctFamily = CREATURE_FAMILY_SPIRIT_BEAST;
-
     CreatureFamilyEntry const* creatureFamily = sCreatureFamilyStore.LookupEntry(ctFamily);
     if (creatureFamily && creatureFamily->minScale > 0.0f && getPetType() & HUNTER_PET)
     {
         float minScaleLevel = creatureFamily->minScaleLevel;
-        uint8 level = getLevel();
+        uint8 level = GetLevel();
 
         float minLevelScaleMod = level >= minScaleLevel ? (level / minScaleLevel) : 0.0f;
         float maxScaleMod = creatureFamily->maxScaleLevel - minScaleLevel;
@@ -2518,7 +2517,31 @@ float Pet::GetNativeObjectScale() const
 
         float scaleMod = creatureFamily->maxScaleLevel != minScaleLevel ? minLevelScaleMod / maxScaleMod : 0.f;
 
-        float scale = (creatureFamily->maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
+        float maxScale = creatureFamily->maxScale;
+
+        // override maxScale
+        switch (ctFamily)
+        {
+            case CREATURE_FAMILY_CHIMAERA:
+            case CREATURE_FAMILY_CORE_HOUND:
+            case CREATURE_FAMILY_CRAB:
+            case CREATURE_FAMILY_DEVILSAUR:
+            case CREATURE_FAMILY_NETHER_RAY:
+            case CREATURE_FAMILY_RHINO:
+            case CREATURE_FAMILY_SPIDER:
+            case CREATURE_FAMILY_TURTLE:
+            case CREATURE_FAMILY_WARP_STALKER:
+            case CREATURE_FAMILY_WASP:
+            case CREATURE_FAMILY_WIND_SERPENT:
+                maxScale = 1.0f;
+                break;
+            default:
+                break;
+        }
+
+        float scale = (maxScale - creatureFamily->minScale) * scaleMod + creatureFamily->minScale;
+
+        scale = std::min(scale, maxScale);
 
         return scale;
     }

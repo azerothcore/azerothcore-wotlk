@@ -243,6 +243,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
                 if (_spellFocus)
                 {
                     _spellFocus->DespawnOrUnsummon();
+                    _spellFocus->AddObjectToRemoveList();
                     _spellFocus = nullptr;
                 }
 
@@ -378,7 +379,10 @@ struct npc_midsummer_bonfire_despawner : public ScriptedAI
         {
             // spawnID is 0 for temp spawns
             if (0 == (*itr)->GetSpawnId())
+            {
                 (*itr)->DespawnOrUnsummon();
+                (*itr)->AddObjectToRemoveList();
+            }
         }
 
         me->DespawnOrUnsummon();

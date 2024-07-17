@@ -36,7 +36,6 @@
 #include "MiscPackets.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
-#include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
 #include "Realm.h"
@@ -1428,7 +1427,7 @@ public:
 
         if (location->empty() || *location == "inn")
         {
-            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
+            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
             return true;
         }
 

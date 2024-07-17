@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `gossip_menu` (
   PRIMARY KEY (`MenuID`,`TextID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.gossip_menu: ~5 985 rows (approximately)
+-- Dumping data for table acore_world.gossip_menu: ~5 995 rows (approximately)
 DELETE FROM `gossip_menu`;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(21, 518),
@@ -2289,6 +2289,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7173, 8448),
 	(7174, 8452),
 	(7175, 8454),
+	(7175, 8455),
 	(7176, 8456),
 	(7177, 8457),
 	(7178, 8458),
@@ -2631,7 +2632,9 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7547, 9163),
 	(7550, 9167),
 	(7552, 9168),
+	(7552, 9380),
 	(7552, 9387),
+	(7556, 9169),
 	(7557, 9172),
 	(7558, 9174),
 	(7559, 9176),
@@ -2659,7 +2662,10 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7579, 9221),
 	(7579, 9256),
 	(7579, 9257),
+	(7581, 9224),
 	(7581, 9225),
+	(7581, 9396),
+	(7581, 9398),
 	(7582, 9226),
 	(7583, 9227),
 	(7584, 9228),
@@ -2781,7 +2787,10 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(7704, 9406),
 	(7704, 9425),
 	(7705, 9406),
+	(7706, 9408),
+	(7706, 9409),
 	(7706, 9410),
+	(7706, 9415),
 	(7712, 9414),
 	(7713, 9417),
 	(7714, 9424),
@@ -3846,6 +3855,7 @@ INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES
 	(8863, 10649),
 	(8866, 10651),
 	(8867, 10650),
+	(8868, 10652),
 	(8868, 11551),
 	(8869, 11564),
 	(8870, 11562),

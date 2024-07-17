@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `spell_group` (
   PRIMARY KEY (`id`,`spell_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Spell System';
 
--- Dumping data for table acore_world.spell_group: ~358 rows (approximately)
+-- Dumping data for table acore_world.spell_group: ~362 rows (approximately)
 DELETE FROM `spell_group`;
 INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1, 673, 2),
@@ -84,8 +84,6 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1, 26276, 1),
 	(1, 27652, 2),
 	(1, 27653, 2),
-	(1, 28486, 1),
-	(1, 28488, 1),
 	(1, 28490, 1),
 	(1, 28491, 1),
 	(1, 28493, 1),
@@ -378,6 +376,12 @@ INSERT INTO `spell_group` (`id`, `spell_id`, `special_flag`) VALUES
 	(1033, 7483, 0),
 	(1033, 7484, 0),
 	(1034, 467, 64),
+	(1035, 70233, 16),
+	(1035, 70234, 16),
+	(1035, 70235, 16),
+	(1035, 70242, 16),
+	(1035, 70243, 16),
+	(1035, 70244, 16),
 	(1112, 8219, 0),
 	(1112, 8220, 0),
 	(1112, 8221, 0),

@@ -3973,7 +3973,7 @@ class spell_item_eye_of_grillok_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_EYE_OF_GRILLOK });
     }
 
-    void OnPeriodic(AuraEffect const* aurEff)
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
         Unit* caster = GetCaster();
         if (!caster || !GetTarget())
@@ -3987,6 +3987,67 @@ class spell_item_eye_of_grillok_aura : public AuraScript
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_eye_of_grillok_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+enum FelManaPotion
+{
+    SPELL_ALCHEMIST_STONE          = 17619,
+    SPELL_ALCHEMIST_STONE_ENERGIZE = 21400
+};
+
+class spell_item_fel_mana_potion : public AuraScript
+{
+    PrepareAuraScript(spell_item_fel_mana_potion)
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ALCHEMIST_STONE, SPELL_ALCHEMIST_STONE_ENERGIZE });
+    }
+
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (caster->HasAura(SPELL_ALCHEMIST_STONE))
+            {
+                uint32 val = GetSpellInfo()->Effects[EFFECT_0].BasePoints * 0.4f;
+                caster->CastCustomSpell(SPELL_ALCHEMIST_STONE_ENERGIZE, SPELLVALUE_BASE_POINT0, val, caster, true);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_item_fel_mana_potion::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_ENERGIZE);
+    }
+};
+
+// 32578 - Gor'drek's Ointment
+enum DreksOintment
+{
+    NPC_THUNDERLORD_DIRE_WOLF = 20748,
+    SPELL_GOR_DREKS_OINTMENT  = 32578
+};
+
+class spell_item_gor_dreks_ointment : public SpellScript
+{
+    PrepareSpellScript(spell_item_gor_dreks_ointment)
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* target = GetExplTargetUnit())
+        {
+            if (target->GetEntry() == NPC_THUNDERLORD_DIRE_WOLF && !target->HasAura(SPELL_GOR_DREKS_OINTMENT))
+                return SPELL_CAST_OK;
+            if (target->GetEntry() != NPC_THUNDERLORD_DIRE_WOLF)
+                return SPELL_FAILED_BAD_TARGETS;
+        }
+
+        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_gor_dreks_ointment::CheckCast);
     }
 };
 
@@ -4112,5 +4173,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_venomhide_feed);
     RegisterSpellScript(spell_item_scroll_of_retribution);
     RegisterSpellAndAuraScriptPair(spell_item_eye_of_grillok, spell_item_eye_of_grillok_aura);
+    RegisterSpellScript(spell_item_fel_mana_potion);
+    RegisterSpellScript(spell_item_gor_dreks_ointment);
 }
 

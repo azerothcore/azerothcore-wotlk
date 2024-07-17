@@ -28,13 +28,14 @@ CREATE TABLE IF NOT EXISTS `achievement_reward` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.achievement_reward: ~103 rows (approximately)
+-- Dumping data for table acore_world.achievement_reward: ~104 rows (approximately)
 DELETE FROM `achievement_reward`;
 INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, `Subject`, `Body`, `MailTemplateID`) VALUES
 	(13, 0, 0, 41426, 16128, 'Level 80', 'Congratulations on your conviction to reach the 80th season of adventure. You are undoubtedly dedicated to the cause of ridding Azeroth of the evils which have plagued us.$B$BAnd while the journey thus far has been no minor feat, the true battle lies ahead.$B$BFight on!$B$BRhonin', 0),
 	(45, 0, 0, 43348, 28070, 'You\'ve Been Around!', 'Well, look at ye!$B$BAnd I thought I had seen some things in this icy place! It seems obvious to this dwarf that you have the fire of the explorer burning in your eyes.$B$BWear this tabard with pride. That way your friends will know who to ask for directions when the time comes!$B$BKeep on the move!$B$BBrann Bronzebeard', 0),
 	(46, 78, 78, 0, 0, '', '', 0),
 	(230, 72, 0, 0, 0, '', '', 0),
+	(431, 64, 64, 0, 0, NULL, NULL, 0),
 	(432, 53, 53, 0, 0, NULL, NULL, 0),
 	(456, 139, 139, 0, 0, '', '', 0),
 	(614, 0, 0, 44223, 29611, 'For the Alliance!', 'War rages throughout our lands. Only the bravest heroes dare challenge strike the Horde where it hurts them most. You are among such heroes.$B$BThe blows you have delivered to the leadership of the Horde will open the door for our final assault. The Horde will bow down to the might of the Alliance.$B$BYour deeds will not go unrewarded. Ride on proudly!$B$B--Your King', 0),
@@ -109,14 +110,14 @@ INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, 
 	(2903, 161, 161, 0, 0, '', '', 0),
 	(2904, 160, 160, 0, 0, '', '', 0),
 	(2957, 0, 0, 45802, 28070, 'Glory of the Ulduar Rider', 'Dear $N,$B$BI hope ye\'re doing well and that ye\'ve had time to recover from our shennanigans in Ulduar.$B$BMe lads from the prospecting team happened upon this poor \'alf dead riding-drake hatchling. Must\'ve been an Iron Dwarf experiment of some sort.$B$BWe\'ve patched him back to health and you\'ll find he\'s not so wee anymore! None of us know much about riding anything but rams and pack mules and since we owed ye one for what ye did back there... We thought perhaps you\'d accept him as a gift.$B$BYours,$BBrann Bronzebeard', 0),
-	(2958, 0, 0, 45801, 28070, 'Heroic: Glory of the Ulduar Rider', 'Dear $N,$B$BI hope ye\'re doing well and that ye\'ve had time to recover from our shennanigans in Ulduar.$B$BMe lads from the prospecting team happened upon this poor \'alf dead riding-drake hatchling. Must\'ve been an Iron Dwarf experiment of some sort.$B$BWe\'ve patched him back to health and you\'ll find he\'s not so wee anymore! None of us know much about riding anything but rams and pack mules and since we owed ye one for what ye did back there... We thought perhaps you\'d accept him as a gift.$B$BYours,$BBrann Bronzebeard', 0),
+	(2958, 0, 0, 45801, 28070, 'Heroic: Glory of the Ulduar Raider', 'Dear $N,$B$BI hope ye\'re doing well and that ye\'ve had time to recover from our shennanigans in Ulduar.$B$BMe lads from the prospecting team happened upon this poor \'alf dead riding-drake hatchling. Must\'ve been an Iron Dwarf experiment of some sort.$B$BWe\'ve patched him back to health and you\'ll find he\'s not so wee anymore! None of us know much about riding anything but rams and pack mules and since we owed ye one for what ye did back there... We thought perhaps you\'d accept him as a gift.$B$BYours,$BBrann Bronzebeard', 0),
 	(3036, 164, 164, 0, 0, '', '', 0),
 	(3037, 165, 165, 0, 0, '', '', 0),
 	(3117, 158, 158, 0, 0, '', '', 0),
 	(3259, 159, 159, 0, 0, '', '', 0),
 	(3316, 166, 166, 0, 0, '', '', 0),
 	(3478, 168, 0, 44810, 28951, 'A Gobbler not yet Gobbled', 'Can you believe this Plump Turkey made it through November alive?$N$NSince all his friends have been served up on Bountiful Tables with sides of Cranberry Chutney and Spice Bread and... ooo... I\'m getting hungry. But anyhow! He\'s all alone, now, so I was hoping you might be willing to take care of him. There simply isn\'t enough room left in my shop!$N$NJust keep him away from cooking fires, please. He gets this strange look in his eyes around them...$N$N-Breanni', 0),
-	(3656, 0, 168, 44810, 28951, 'A Gobbler not yet Gobbled', 'Can you believe this Plump Turkey made it through November alive?$N$NSince all his friends have been served up on Bountiful Tables with sides of Cranberry Chutney and Spice Bread and... ooo... I\'m getting hungry. But anyhow! He\'s all alone, now, so I was hoping you might be willing to take care of him. There simply isn\'t enough room left in my shop!$N$NJust keep him away from cooking fires, please. He gets this strange look in his eyes around them...$N$N-Breanni', 0),
+	(3656, 0, 168, 44810, 28951, 'A Gobbler not yet Gobbled', 'Can you believe this Plump Turkey made it through November alive?\r\n\r\nSince all this friends have been served up on Bountiful Tables with sides of Cranberry Chutney and Spice Bread Stuffing and... ooo... I\'m getting hungry. But anyhow! He\'s all alone, now, so I was hoping you might be willing to take care of him. There simply isn\'t enough room left in my shop!\r\n\r\nJust keep him away from cooking fires, please. He gets this strange look in his eyes around them...', 0),
 	(3857, 0, 0, 49052, 34924, 'Master of Isle of Conquest', 'Honorable $N,$B$BFor your deeds upon the Isle of Conquest, it is my honor to present you with this tabard. Wear it proudly.$B$BHigh Commander, 7th Legion', 0),
 	(3957, 0, 0, 49054, 34922, 'Master of Isle of Conquest', 'Honorable $N,$B$BFor your deeds upon the Isle of Conquest, it is my honor to present you with this tabard. Wear it proudly.$B$BOverlord Agmar', 0),
 	(4078, 170, 170, 0, 0, '', '', 0),

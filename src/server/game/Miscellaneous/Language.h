@@ -655,12 +655,12 @@ enum AcoreStrings
     LANG_GMLIST_HEADER                  = 598,
     LANG_GMLIST_EMPTY                   = 599,
 
-    // End Level 3 list, continued at 1100
-
     LANG_EVENT_STARTED                  = 600,
     LANG_EVENT_STOPPED                  = 601,
 
-    // 602-704 - free
+    LANG_REWARDED                       = 602,
+
+    // 603-704 - free
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
     LANG_NOT_EQUIPPED_ITEM              = 706,
@@ -844,6 +844,7 @@ enum AcoreStrings
     LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS = 889,
     LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS = 890,
     LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS = 891,
+    // End Level 3 list, continued at 1100
 
     // Level 4 (CLI only commands)
     LANG_COMMAND_EXIT                   = 1000,
@@ -1069,6 +1070,8 @@ enum AcoreStrings
     LANG_COMMAND_TICKETRESET            = 2028,
     LANG_COMMAND_TICKETLISTRESPONSE     = 2029,
     LANG_COMMAND_TICKETCOMPLETED        = 2030,
+    LANG_COMMAND_TICKETRESPONSEAPPENDED = 2031,
+    LANG_COMMAND_TICKETRESPONSEDELETED  = 2032,
 
     // acore strings                    5000-9999
     LANG_COMMAND_FREEZE                 = 5000,
