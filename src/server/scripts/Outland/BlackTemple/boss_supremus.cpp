@@ -30,56 +30,125 @@ enum Supremus
     SPELL_HATEFUL_STRIKE            = 41926,
     SPELL_VOLCANIC_ERUPTION         = 40276,
     SPELL_VOLCANIC_ERUPTION_TRIGGER = 40117,
+    SPELL_VOLCANIC_GEYSER           = 42055,
     SPELL_BERSERK                   = 45078,
     SPELL_CHARGE                    = 41581,
 
     NPC_SUPREMUS_PUNCH_STALKER      = 23095,
 
-    EVENT_SPELL_BERSERK             = 1,
-    EVENT_SPELL_HATEFUL_STRIKE      = 2,
-    EVENT_SPELL_MOLTEN_FLAMES       = 3,
-    EVENT_SWITCH_PHASE              = 4,
-    EVENT_SPELL_VOLCANIC_ERUPTION   = 5,
-    EVENT_SWITCH_TARGET             = 6,
-    EVENT_CHECK_DIST                = 7,
+    EVENT_BERSERK                   = 1,
+    EVENT_PHASE_CHANGE              = 2,
 
-    EVENT_GROUP_ABILITIES           = 1
+    GROUP_ABILITIES                 = 1,
+    GROUP_MOLTEN_PUNCH              = 2
 };
 
 struct boss_supremus : public BossAI
 {
-    boss_supremus(Creature* creature) : BossAI(creature, DATA_SUPREMUS) { }
+    boss_supremus(Creature* creature) : BossAI(creature, DATA_SUPREMUS)
+    {
+        scheduler.SetValidator([this]
+        {
+            return !me->HasUnitState(UNIT_STATE_CASTING);
+        });
+    }
+
+    void Reset() override
+    {
+        BossAI::Reset();
+        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
+        me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
+    }
 
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
 
-        SchedulePhase(false);
-        events.ScheduleEvent(EVENT_SPELL_BERSERK, 900000);
-        events.ScheduleEvent(EVENT_SPELL_MOLTEN_FLAMES, 4000);
+        SchedulePhase(true);
+
+        ScheduleUniqueTimedEvent(15min, [&]
+        {
+            DoCastSelf(SPELL_BERSERK, true);
+        }, EVENT_BERSERK);
+
+        scheduler.Schedule(20s, [this](TaskContext context)
+        {
+            context.SetGroup(GROUP_MOLTEN_PUNCH);
+            DoCastSelf(SPELL_MOLTEN_PUNCH);
+            context.Repeat(15s, 20s);
+        });
     }
 
-    void SchedulePhase(bool run)
+    void SchedulePhase(bool IsSnared)
     {
-        events.CancelEventGroup(EVENT_GROUP_ABILITIES);
-        events.ScheduleEvent(EVENT_SWITCH_PHASE, 60000);
+        scheduler.CancelGroup(GROUP_ABILITIES);
+
+        ScheduleUniqueTimedEvent(1min, [&]
+        {
+            SchedulePhase(me->HasAura(SPELL_SNARE_SELF));
+        }, EVENT_PHASE_CHANGE);
+
         DoResetThreatList();
 
-        if (!run)
+        // Hateful Strike Phase
+        if (IsSnared)
         {
-            events.ScheduleEvent(EVENT_SPELL_HATEFUL_STRIKE, 5000, EVENT_GROUP_ABILITIES);
+            scheduler.Schedule(5s, [this](TaskContext context)
+            {
+                context.SetGroup(GROUP_ABILITIES);
+
+                if (Unit* target = FindHatefulStrikeTarget())
+                    DoCast(target, SPELL_HATEFUL_STRIKE);
+
+                context.Repeat();
+            });
+
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
             me->RemoveAurasDueToSpell(SPELL_SNARE_SELF);
         }
+        // Gaze Phase
         else
         {
-            events.ScheduleEvent(EVENT_SPELL_VOLCANIC_ERUPTION, 5000, EVENT_GROUP_ABILITIES);
-            events.ScheduleEvent(EVENT_SWITCH_TARGET, 0, EVENT_GROUP_ABILITIES);
-            events.ScheduleEvent(EVENT_CHECK_DIST, 0, EVENT_GROUP_ABILITIES);
+            scheduler.DelayGroup(GROUP_MOLTEN_PUNCH, 60s);
+            DoCastSelf(SPELL_SNARE_SELF, true);
+
+            scheduler.Schedule(5s, [this](TaskContext context)
+            {
+                context.SetGroup(GROUP_ABILITIES);
+
+                if (DoCastRandomTarget(SPELL_VOLCANIC_ERUPTION, 0, 100.f, true) == SPELL_CAST_OK)
+                    Talk(EMOTE_GROUND_CRACK);
+
+                context.Repeat(10s, 18s);
+            }).Schedule(0s, [this](TaskContext context)
+            {
+                context.SetGroup(GROUP_ABILITIES);
+
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
+                {
+                    DoResetThreatList();
+                    me->AddThreat(target, 5000000.0f);
+                    Talk(EMOTE_NEW_TARGET);
+
+                    if (me->GetDistance(me->GetVictim()) < 35.0f)
+                        DoCastVictim(SPELL_CHARGE);
+                }
+
+                context.Repeat(10s);
+            }).Schedule(1s, [this](TaskContext context)
+            {
+                context.SetGroup(GROUP_ABILITIES);
+
+                if (me->GetDistance(me->GetVictim()) > 100.0f)
+                    if (DoCastVictim(SPELL_CHARGE) == SPELL_CAST_OK)
+                        Talk(EMOTE_PUNCH_GROUND);
+
+                context.Repeat(1s);
+            });
+
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, true);
-            me->CastSpell(me, SPELL_SNARE_SELF, true);
         }
     }
 
@@ -114,64 +183,6 @@ struct boss_supremus : public BossAI
         }
 
         return target;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
-
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_BERSERK:
-            me->CastSpell(me, SPELL_BERSERK, true);
-            break;
-        case EVENT_SPELL_HATEFUL_STRIKE:
-            if (Unit* target = FindHatefulStrikeTarget())
-                me->CastSpell(target, SPELL_HATEFUL_STRIKE, false);
-            events.ScheduleEvent(EVENT_SPELL_HATEFUL_STRIKE, urand(1500, 3000), EVENT_GROUP_ABILITIES);
-            break;
-        case EVENT_SPELL_MOLTEN_FLAMES:
-            me->CastSpell(me, SPELL_MOLTEN_PUNCH, false);
-            events.ScheduleEvent(EVENT_SPELL_MOLTEN_FLAMES, 20000, EVENT_GROUP_ABILITIES);
-            break;
-        case EVENT_SWITCH_PHASE:
-            SchedulePhase(!me->HasAura(SPELL_SNARE_SELF));
-            break;
-        case EVENT_SWITCH_TARGET:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-            {
-                DoResetThreatList();
-                me->AddThreat(target, 5000000.0f);
-                Talk(EMOTE_NEW_TARGET);
-            }
-            events.ScheduleEvent(EVENT_SWITCH_TARGET, 10000, EVENT_GROUP_ABILITIES);
-            break;
-        case EVENT_CHECK_DIST:
-            if (me->GetDistance(me->GetVictim()) > 40.0f)
-            {
-                Talk(EMOTE_PUNCH_GROUND);
-                me->CastSpell(me->GetVictim(), SPELL_CHARGE, true);
-                events.ScheduleEvent(EVENT_CHECK_DIST, 5000, EVENT_GROUP_ABILITIES);
-                break;
-            }
-            events.ScheduleEvent(EVENT_CHECK_DIST, 1, EVENT_GROUP_ABILITIES);
-            break;
-        case EVENT_SPELL_VOLCANIC_ERUPTION:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-            {
-                me->CastSpell(target, SPELL_VOLCANIC_ERUPTION, true);
-                Talk(EMOTE_GROUND_CRACK);
-            }
-            events.ScheduleEvent(EVENT_SPELL_VOLCANIC_ERUPTION, urand(10000, 18000), EVENT_GROUP_ABILITIES);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
     }
 
     bool CheckEvadeIfOutOfCombatArea() const override
