@@ -31,7 +31,7 @@ enum Spells
 {
     SPELL_BRAIN_WASH_TOTEM          = 24262,
     SPELL_POWERFULL_HEALING_WARD    = 24309,
-    SPELL_HEX                       = 24053,
+    SPELL_HEX                       = 17172,
     SPELL_DELUSIONS_OF_JINDO        = 24306,
     SPELL_SUMMON_SHADE_OF_JINDO     = 24308,
     SPELL_BANISH                    = 24466,

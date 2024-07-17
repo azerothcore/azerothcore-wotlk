@@ -165,10 +165,11 @@ void WorldUpdateTime::RecordUpdateTime(Milliseconds gameTimeMs, uint32 diff, uin
     {
         if (GetMSTimeDiff(_lastRecordTime, gameTimeMs) > _recordUpdateTimeInverval)
         {
-            LOG_INFO("time.update", "Last {} diffs summary with {} players online:", GetDatasetSize(), sessionCount);
-            LOG_INFO("time.update", " - Mean: {};", GetAverageUpdateTime());
-            LOG_INFO("time.update", " - Median: {};", GetPercentile(50));
-            LOG_INFO("time.update", " - Percentiles (95, 99, max): {}, {}, {}.", GetPercentile(95), GetPercentile(99), GetPercentile(100));
+            LOG_INFO("time.update", "Update time diff: {}ms with {} players online", GetLastUpdateTime(), sessionCount);
+            LOG_INFO("time.update", "Last {} diffs summary:", GetDatasetSize());
+            LOG_INFO("time.update", "|- Mean: {}ms", GetAverageUpdateTime());
+            LOG_INFO("time.update", "|- Median: {}ms", GetPercentile(50));
+            LOG_INFO("time.update", "|- Percentiles (95, 99, max): {}ms, {}ms, {}ms", GetPercentile(95), GetPercentile(99), GetPercentile(100));
             _lastRecordTime = gameTimeMs;
         }
     }

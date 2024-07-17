@@ -586,48 +586,37 @@ public:
     }
 };
 
-class spell_q13003_thursting_hodirs_spear : public SpellScriptLoader
+class spell_q13003_thursting_hodirs_spear_aura : public AuraScript
 {
-public:
-    spell_q13003_thursting_hodirs_spear() : SpellScriptLoader("spell_q13003_thursting_hodirs_spear") { }
+    PrepareAuraScript(spell_q13003_thursting_hodirs_spear_aura);
 
-    class spell_q13003_thursting_hodirs_spear_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_q13003_thursting_hodirs_spear_AuraScript);
+        ModStackAmount(60);
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* creature = GetUnitOwner()->ToCreature())
         {
-            ModStackAmount(60);
-        }
-
-        void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* creature = GetUnitOwner()->ToCreature())
+            if (!creature->IsInEvadeMode())
             {
-                if (!creature->IsInEvadeMode())
-                {
-                    creature->RemoveAllAuras();
-                    creature->AI()->EnterEvadeMode();
-                }
+                creature->RemoveAllAuras();
+                creature->AI()->EnterEvadeMode();
             }
         }
+    }
 
-        void HandlePeriodic(AuraEffect const* /* aurEff */)
-        {
-            ModStackAmount(-1);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13003_thursting_hodirs_spear_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectApply += AuraEffectApplyFn(spell_q13003_thursting_hodirs_spear_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_q13003_thursting_hodirs_spear_AuraScript::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const* /* aurEff */)
     {
-        return new spell_q13003_thursting_hodirs_spear_AuraScript();
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13003_thursting_hodirs_spear_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectApply += AuraEffectApplyFn(spell_q13003_thursting_hodirs_spear_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_q13003_thursting_hodirs_spear_aura::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -639,59 +628,53 @@ enum q13007IronColossus
     SPELL_COLOSSUS_GROUND_SLAM      = 61673
 };
 
-class spell_q13007_iron_colossus : public SpellScriptLoader
+class spell_q13007_iron_colossus : public SpellScript
 {
-public:
-    spell_q13007_iron_colossus() : SpellScriptLoader("spell_q13007_iron_colossus") { }
+    PrepareSpellScript(spell_q13007_iron_colossus);
 
-    class spell_q13007_iron_colossus_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q13007_iron_colossus_SpellScript);
+        return ValidateSpellInfo({ SPELL_JORMUNGAR_SUBMERGE_VISUAL, SPELL_COLOSSUS_GROUND_SLAM });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Creature* caster = GetCaster()->ToCreature();
+        if (!caster)
+            return;
+
+        if (GetSpellInfo()->Id == SPELL_JORMUNGAR_SUBMERGE)
         {
-            PreventHitDefaultEffect(effIndex);
-            Creature* caster = GetCaster()->ToCreature();
-            if (!caster)
-                return;
+            caster->CastSpell(caster, SPELL_JORMUNGAR_SUBMERGE_VISUAL, true);
+            caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, true);
+            caster->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            caster->SetControlled(false, UNIT_STATE_ROOT);
+            for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+                caster->m_spells[i] = 0;
 
-            if (GetSpellInfo()->Id == SPELL_JORMUNGAR_SUBMERGE)
-            {
-                caster->CastSpell(caster, SPELL_JORMUNGAR_SUBMERGE_VISUAL, true);
-                caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, true);
-                caster->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
-                caster->SetControlled(false, UNIT_STATE_ROOT);
+            caster->m_spells[0] = SPELL_JORMUNGAR_EMERGE;
+        }
+        else
+        {
+            caster->RemoveAurasDueToSpell(SPELL_JORMUNGAR_SUBMERGE_VISUAL);
+            caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, false);
+            caster->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            caster->SetControlled(true, UNIT_STATE_ROOT);
+
+            if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(caster->GetEntry()))
                 for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
-                    caster->m_spells[i] = 0;
-
-                caster->m_spells[0] = SPELL_JORMUNGAR_EMERGE;
-            }
-            else
-            {
-                caster->RemoveAurasDueToSpell(SPELL_JORMUNGAR_SUBMERGE_VISUAL);
-                caster->ApplySpellImmune(SPELL_COLOSSUS_GROUND_SLAM, IMMUNITY_ID, SPELL_COLOSSUS_GROUND_SLAM, false);
-                caster->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
-                caster->SetControlled(true, UNIT_STATE_ROOT);
-
-                if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(caster->GetEntry()))
-                    for (uint8 i = 0; i < MAX_CREATURE_SPELLS; ++i)
-                        caster->m_spells[i] = ct->spells[i];
-            }
-
-            if (Player* player = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
-                player->VehicleSpellInitialize();
+                    caster->m_spells[i] = ct->spells[i];
         }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q13007_iron_colossus_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
+        if (Player* player = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
+            player->VehicleSpellInitialize();
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q13007_iron_colossus_SpellScript();
-    };
+        OnEffectHitTarget += SpellEffectFn(spell_q13007_iron_colossus::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
 };
 
 // Theirs
@@ -1026,45 +1009,34 @@ enum CloseRift
     SPELL_DESPAWN_RIFT          = 61665
 };
 
-class spell_close_rift : public SpellScriptLoader
+class spell_close_rift_aura : public AuraScript
 {
-public:
-    spell_close_rift() : SpellScriptLoader("spell_close_rift") { }
+    PrepareAuraScript(spell_close_rift_aura);
 
-    class spell_close_rift_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_close_rift_AuraScript);
-
-        bool Load() override
-        {
-            _counter = 0;
-            return true;
-        }
-
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_DESPAWN_RIFT });
-        }
-
-        void HandlePeriodic(AuraEffect const* /* aurEff */)
-        {
-            if (++_counter == 5)
-                GetTarget()->CastSpell((Unit*)nullptr, SPELL_DESPAWN_RIFT, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_close_rift_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-
-    private:
-        uint8 _counter;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_close_rift_AuraScript();
+        _counter = 0;
+        return true;
     }
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DESPAWN_RIFT });
+    }
+
+    void HandlePeriodic(AuraEffect const* /* aurEff */)
+    {
+        if (++_counter == 5)
+            GetTarget()->CastSpell((Unit*)nullptr, SPELL_DESPAWN_RIFT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_close_rift_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+
+private:
+    uint8 _counter;
 };
 
 enum CollapsingCave
@@ -1204,14 +1176,14 @@ void AddSC_storm_peaks()
     new npc_iron_watcher();
     new npc_time_lost_proto_drake();
     new npc_wild_wyrm();
-    new spell_q13003_thursting_hodirs_spear();
-    new spell_q13007_iron_colossus();
+    RegisterSpellScript(spell_q13003_thursting_hodirs_spear_aura);
+    RegisterSpellScript(spell_q13007_iron_colossus);
     new npc_roxi_ramrocket();
     new npc_brunnhildar_prisoner();
     new npc_freed_protodrake();
     new npc_icefang();
     new npc_hyldsmeet_protodrake();
-    new spell_close_rift();
+    RegisterSpellScript(spell_close_rift_aura);
     new npc_vehicle_d16_propelled_delivery();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
 }

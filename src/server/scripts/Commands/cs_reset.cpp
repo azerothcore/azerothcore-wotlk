@@ -26,7 +26,6 @@ EndScriptData */
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Language.h"
-#include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"

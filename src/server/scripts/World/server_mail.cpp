@@ -29,19 +29,48 @@ public:
     // CHARACTER_LOGIN = 8
     void OnLogin(Player* player) override
     {
-        for (auto const& servMail : sObjectMgr->GetAllServerMailStore())
+        // Retrieve all server mail records and session only once
+        auto const& serverMailStore = sObjectMgr->GetAllServerMailStore();
+        WorldSession* session = player->GetSession();
+        // We should always have a session, just incase
+        if (!session)
+            return;
+
+        uint32 playerGUID = player->GetGUID().GetCounter();
+
+        for (auto const& [mailId, servMail] : serverMailStore)
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL_SERVER_CHARACTER);
-            stmt->SetData(0, player->GetGUID().GetCounter());
-            stmt->SetData(1, servMail.second.id);
+            stmt->SetData(0, playerGUID);
+            stmt->SetData(1, mailId);
 
-            WorldSession* mySess = player->GetSession();
-            mySess->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt)
-                .WithPreparedCallback([mySess, servMail](PreparedQueryResult result)
+            // Capture servMail by value
+            auto callback = [session, servMailWrapper = std::reference_wrapper<ServerMail const>(servMail)](PreparedQueryResult result)
+                {
+                     ServerMail const& servMail = servMailWrapper.get();  // Dereference the wrapper to get the original object
+
+                    if (!result)
                     {
-                        if (!result)
-                            sObjectMgr->SendServerMail(mySess->GetPlayer(), servMail.second.id, servMail.second.reqLevel, servMail.second.reqPlayTime, servMail.second.moneyA, servMail.second.moneyH, servMail.second.itemA, servMail.second.itemCountA, servMail.second.itemH, servMail.second.itemCountH, servMail.second.subject, servMail.second.body, servMail.second.active);
-                    }));
+                        sObjectMgr->SendServerMail(
+                            session->GetPlayer(),
+                            servMail.id,
+                            servMail.reqLevel,
+                            servMail.reqPlayTime,
+                            servMail.moneyA,
+                            servMail.moneyH,
+                            servMail.itemA,
+                            servMail.itemCountA,
+                            servMail.itemH,
+                            servMail.itemCountH,
+                            servMail.subject,
+                            servMail.body,
+                            servMail.active
+                        );
+                    }
+                };
+
+            // Execute the query asynchronously and add the callback
+            session->GetQueryProcessor().AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(callback));
         }
     }
 };
