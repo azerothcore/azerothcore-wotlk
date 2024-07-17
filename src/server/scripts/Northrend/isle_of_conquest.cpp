@@ -335,8 +335,8 @@ enum blastCriteria
     SPELL_SEAFORIUM_BLAST_H       = 67814,
     SPELL_HUGE_SEAFORIUM_BLAST    = 66672,
     SPELL_HUGE_SEAFORIUM_BLAST_H  = 67813,
-    SPELL_A_BOMB_INABLE_CREDIT    = 68366,
-    SPELL_A_BOMB_INATION_CREDIT   = 68367
+    SPELL_BOMB_INABLE_CREDIT      = 68366,
+    SPELL_BOMB_INATION_CREDIT     = 68367
 };
 
 class spell_ioc_bomb_blast_criteria : public SpellScript
