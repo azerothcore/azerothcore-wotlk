@@ -1,3 +1,4 @@
+-- DB update 2024_07_16_02 -> 2024_07_17_00
 --
 -- Glumdor
 DELETE FROM `spell_script_names` WHERE `spell_id`=36208 AND `ScriptName`='spell_gen_steal_weapon';
