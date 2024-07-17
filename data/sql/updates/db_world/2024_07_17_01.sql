@@ -1,3 +1,4 @@
+-- DB update 2024_07_17_00 -> 2024_07_17_01
 -- Ashtongue Feral Spirit can't see through Invisiblity
 UPDATE `creature_template_addon` SET `auras` = '18950' WHERE (`entry` = 22849);
 -- Illidari Defiler missing Interrupt Immunity
