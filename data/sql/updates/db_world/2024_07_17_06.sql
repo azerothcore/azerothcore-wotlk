@@ -1,3 +1,4 @@
+-- DB update 2024_07_17_05 -> 2024_07_17_06
 -- revert squash 11.0.0 changes to `game_event` table
 -- this reverts the dates in the table to COMMIT:
 -- f0e6b0f1abe2ff92d8a48c6c447d2d666051a8a7
