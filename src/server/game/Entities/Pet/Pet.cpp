@@ -476,9 +476,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
         uint32 curMana = savedmana;
         if (fullMana)
-        {
             curMana = GetMaxPower(POWER_MANA);
-        }
 
         if (getPetType() == SUMMON_PET && !current) //all (?) summon pets come with full health when called, but not when they are current
         {
