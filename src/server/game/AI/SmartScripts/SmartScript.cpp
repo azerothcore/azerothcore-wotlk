@@ -176,12 +176,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
     bool isControlled = e.action.moveToPos.controlled > 0;
 
     ObjectVector targets;
+    WorldObject* invoker = nullptr;
     if (unit)
-        GetTargets(targets, e, unit);
+        invoker = unit;
     else if (gob)
-        GetTargets(targets, e, gob);
-    else
-        GetTargets(targets, e);
+        invoker = gob;
+
+    GetTargets(targets, e, invoker);
 
     switch (e.GetActionType())
     {
