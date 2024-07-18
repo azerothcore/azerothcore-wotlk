@@ -1407,7 +1407,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (Creature* cTarget = target->ToCreature())
                 {
                     CreatureAI* ai = cTarget->AI();
-                    if (IsSmart(cTarget, true))
+                    //                            Make sure we check that the sender is either a creature or gameobject
+                    if (IsSmart(cTarget, true) && (me || go))
                     {
                         if (me)
                             ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
@@ -1420,7 +1421,8 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 else if (GameObject* oTarget = target->ToGameObject())
                 {
                     GameObjectAI* ai = oTarget->AI();
-                    if (IsSmart(oTarget, true))
+                    //                            Make sure we check that the sender is either a creature or gameobject
+                    if (IsSmart(oTarget, true) && (me || go))
                     {
                         if (me)
                             ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
