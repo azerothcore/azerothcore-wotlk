@@ -303,11 +303,12 @@ class spell_teron_gorefiend_shadow_of_death_remove : public SpellScript
 
     void HandleOnHit()
     {
-        Unit* target = GetHitUnit();
-
-        target->RemoveAurasDueToSpell(SPELL_POSSESS_SPIRIT_IMMUNE);
-        target->RemoveAurasDueToSpell(SPELL_SPIRITUAL_VENGEANCE);
-        target->RemoveAurasDueToSpell(SPELL_SHADOW_OF_DEATH);
+        if (Unit* target = GetHitUnit())
+        {
+            target->RemoveAurasDueToSpell(SPELL_POSSESS_SPIRIT_IMMUNE);
+            target->RemoveAurasDueToSpell(SPELL_SPIRITUAL_VENGEANCE);
+            target->RemoveAurasDueToSpell(SPELL_SHADOW_OF_DEATH);
+        }
     }
 
     void Register() override
