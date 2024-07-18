@@ -100,7 +100,7 @@ public:
         std::string action = (type == CHAT_MSG_RAID_WARNING) ? "sends raid warning" : "tells";
         std::string targetGroup = group ? group->GetLeaderName() : "<unknown>";
 
-        LOG_INFO(logType += msgType, "{} {} {} {} with leader {}: {}",
+        LOG_INFO(logType + msgType, "{} {} {} {} with leader {}: {}",
             role, player->GetName(), action, msgType, targetGroup, msg);
     }
 
@@ -123,7 +123,7 @@ public:
                 return;
         }
 
-        LOG_INFO(logType += msgType, "Player {} tells {} \"{}\": {}",
+        LOG_INFO(logType + msgType, "Player {} tells {} \"{}\": {}",
             player->GetName(), msgType, guild ? guild->GetName() : "<unknown>", msg);
     }
 
