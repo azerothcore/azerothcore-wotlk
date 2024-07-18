@@ -155,6 +155,8 @@ struct boss_supremus : public BossAI
         summons.Summon(summon);
         if (summon->GetEntry() == NPC_SUPREMUS_VOLCANO)
             summon->CastSpell(summon, SPELL_VOLCANIC_ERUPTION_TRIGGER, true);
+        else
+            summon->ToTempSummon()->InitStats(30000);
     }
 
     void SummonedCreatureDespawn(Creature* summon) override
