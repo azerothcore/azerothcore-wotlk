@@ -3051,10 +3051,12 @@ void Unit::SendMeleeAttackStop(Unit* victim)
 
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
     data << GetPackGUID();
+    uint8 nowDead = victim->isDead();
+
     if (victim)
     {
         data << victim->GetPackGUID();
-        data << victim->isDead();
+        data << nowDead;
     }
     SendMessageToSet(&data, true);
     LOG_DEBUG("entities.unit", "WORLD: Sent SMSG_ATTACKSTOP");
