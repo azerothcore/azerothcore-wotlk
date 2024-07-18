@@ -4821,6 +4821,19 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_PUSHBACK;
     });
 
+    ApplySpellFix({
+        471, // Palamino
+        8980, // Skeletal Horse
+        10788, // Leopard
+        10790, // Tiger
+        10792, // Spotted Panther
+        60136, // Grand Caravan Mammoth
+        60140 // Grand Caravan Mammoth
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
