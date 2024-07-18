@@ -197,7 +197,7 @@ struct npc_supremus_punch_invisible_stalker : public ScriptedAI
 
         DoCastSelf(SPELL_MOLTEN_FLAME, true);
 
-        scheduler.Schedule(6s, 10s, [this](TaskContext context)
+        scheduler.Schedule(6s, 10s, [this](TaskContext /*context*/)
         {
             me->CombatStop();
             me->SetReactState(REACT_PASSIVE);
