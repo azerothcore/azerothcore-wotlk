@@ -3051,10 +3051,10 @@ void Unit::SendMeleeAttackStop(Unit* victim)
 
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
     data << GetPackGUID();
-    uint8 nowDead = victim->isDead();
 
     if (victim)
     {
+        uint8 nowDead = victim->isDead();
         data << victim->GetPackGUID();
         data << nowDead;
     }
