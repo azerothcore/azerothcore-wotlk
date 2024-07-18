@@ -1,5 +1,15 @@
--- DB update 2024_07_17_00 -> 2024_07_16_00
+-- DB update 2024_07_15_00 -> 2024_07_16_00
 --
-DELETE FROM `page_text` WHERE (`ID` = 2447);
-INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
-(2447, 'The corruption and evil that rumor says travels with the arcane is nothing compared to the pain we\'ve already felt. We are no longer victims, $n. We are the ones who control our fate. Sylvanas has paved the way for us--she has proven that our will is our own; that we are no longer thralls to that bastard Arthas.$BSeek me out in the church, I shall instruct you further... if that is your desire.$B$B- Isabella, Mage Trainer', 0, 0);
+DELETE FROM `acore_string` WHERE `entry` IN (2031,2032);
+INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
+(2031, '|cff00ff00Response Appended|r:|cff00ccff [%s]|r'),
+(2032, '|cff00ff00Response deleted by|r:|cff00ccff %s|r');
+
+UPDATE `command` SET `help` = 'Add a response to a new line.\n\nSyntax: ticket response appendln $ticketId $response' WHERE `name` = 'ticket response appendln';
+UPDATE `command` SET `help` = 'Add a response\n\nSyntax: ticket response append $ticketId $response' WHERE `name` = 'ticket response append';
+
+DELETE FROM `command` WHERE `name` = 'ticket response delete';
+DELETE FROM `command` WHERE `name` = 'ticket response show';
+INSERT INTO `command` (`name`, `security`, `help`) VALUES
+('ticket response delete', 2, 'Delete a ticket response\n\nSyntax: ticket response delete $ticketId'),
+('ticket response show', 2, 'Show a ticket response\n\nSyntax: ticket response show $ticketId');
