@@ -1412,7 +1412,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (me)
                             ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
-                        else if (go)
+                        else
                             ENSURE_AI(SmartAI, ai)->SetData(e.action.setData.field, e.action.setData.data, go);
                     }
                     else
@@ -1426,7 +1426,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         if (me)
                             ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, me);
-                        else if (go)
+                        else
                             ENSURE_AI(SmartGameObjectAI, ai)->SetData(e.action.setData.field, e.action.setData.data, go);
                     }
                     else
