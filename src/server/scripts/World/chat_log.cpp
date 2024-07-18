@@ -82,18 +82,15 @@ public:
             case CHAT_MSG_PARTY:
             case CHAT_MSG_PARTY_LEADER:
                 msgType = "party";
-                logType += msgType;
                 break;
             case CHAT_MSG_RAID:
             case CHAT_MSG_RAID_LEADER:
             case CHAT_MSG_RAID_WARNING:
                 msgType = "raid";
-                logType += msgType;
                 break;
             case CHAT_MSG_BATTLEGROUND:
             case CHAT_MSG_BATTLEGROUND_LEADER:
                 msgType = "bg";
-                logType += msgType;
                 break;
             default:
                 return;
@@ -103,7 +100,7 @@ public:
         std::string action = (type == CHAT_MSG_RAID_WARNING) ? "sends raid warning" : "tells";
         std::string targetGroup = group ? group->GetLeaderName() : "<unknown>";
 
-        LOG_INFO(logType, "{} {} {} {} with leader {}: {}",
+        LOG_INFO(logType += msgType, "{} {} {} {} with leader {}: {}",
             role, player->GetName(), action, msgType, targetGroup, msg);
     }
 
@@ -118,17 +115,15 @@ public:
         {
             case CHAT_MSG_GUILD:
                 msgType = "guild";
-                logType += msgType;
                 break;
             case CHAT_MSG_OFFICER:
                 msgType = "guild.officer";
-                logType += msgType;
                 break;
             default:
                 return;
         }
 
-        LOG_INFO(logType, "Player {} tells {} \"{}\": {}",
+        LOG_INFO(logType += msgType, "Player {} tells {} \"{}\": {}",
             player->GetName(), msgType, guild ? guild->GetName() : "<unknown>", msg);
     }
 
