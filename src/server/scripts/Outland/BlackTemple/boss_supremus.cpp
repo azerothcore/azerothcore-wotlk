@@ -80,8 +80,6 @@ struct boss_supremus : public BossAI
         {
             context.SetGroup(GROUP_MOLTEN_PUNCH);
             DoCastSelf(SPELL_MOLTEN_PUNCH);
-            if (roll_chance_i(50))
-                Talk(EMOTE_PUNCH_GROUND);
             context.Repeat(15s, 20s);
         });
     }
@@ -110,6 +108,9 @@ struct boss_supremus : public BossAI
 
                 context.Repeat(1500ms, 15s);
             });
+
+            if (me->HasAura(SPELL_SNARE_SELF))
+                Talk(EMOTE_PUNCH_GROUND);
 
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_ATTACK_ME, false);
@@ -143,14 +144,6 @@ struct boss_supremus : public BossAI
                 }
 
                 context.Repeat(10s);
-            }).Schedule(1s, [this](TaskContext context)
-            {
-                context.SetGroup(GROUP_ABILITIES);
-
-                if (me->GetDistance(me->GetVictim()) > 100.0f)
-                    DoCastVictim(SPELL_CHARGE);
-
-                context.Repeat(1s);
             });
 
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, true);
