@@ -28,6 +28,7 @@ enum Supremus
 
     SPELL_SNARE_SELF                = 41922,
     SPELL_MOLTEN_PUNCH              = 40126,
+    SPELL_MOLTEN_FLAME              = 40980,
     SPELL_HATEFUL_STRIKE            = 41926,
     SPELL_VOLCANIC_ERUPTION         = 40276,
     SPELL_VOLCANIC_ERUPTION_TRIGGER = 40117,
@@ -37,7 +38,7 @@ enum Supremus
 
     SPELL_SERVERSIDE_RANDOM_TARGET  = 41951,  // Found in 55261. Used for Fixate target
 
-    NPC_SUPREMUS_PUNCH_STALKER      = 23095,
+    NPC_SUPREMUS_VOLCANO            = 23085,
 
     GROUP_ABILITIES                 = 1,
     GROUP_MOLTEN_PUNCH              = 2,
@@ -133,14 +134,12 @@ struct boss_supremus : public BossAI
             {
                 context.SetGroup(GROUP_ABILITIES);
 
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 100, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
                 {
                     DoResetThreatList();
                     me->AddThreat(target, 5000000.0f);
                     Talk(EMOTE_NEW_TARGET);
-
-                    if (me->GetDistance(me->GetVictim()) < 35.0f)
-                        DoCastVictim(SPELL_CHARGE);
+                    DoCastVictim(SPELL_CHARGE);
                 }
 
                 context.Repeat(10s);
@@ -154,13 +153,7 @@ struct boss_supremus : public BossAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
-        if (summon->GetEntry() == NPC_SUPREMUS_PUNCH_STALKER)
-        {
-            summon->SetInCombatWithZone();
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                summon->AddThreat(target, 10000.f);
-        }
-        else
+        if (summon->GetEntry() == NPC_SUPREMUS_VOLCANO)
             summon->CastSpell(summon, SPELL_VOLCANIC_ERUPTION_TRIGGER, true);
     }
 
@@ -190,7 +183,36 @@ struct boss_supremus : public BossAI
     }
 };
 
+struct npc_supremus_punch_invisible_stalker : public ScriptedAI
+{
+    npc_supremus_punch_invisible_stalker(Creature* creature) : ScriptedAI(creature) { }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        me->SetInCombatWithZone();
+        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+            me->AddThreat(target, 10000.f);
+
+        DoCastSelf(SPELL_MOLTEN_FLAME, true);
+
+        scheduler.Schedule(6s, 10s, [this](TaskContext context)
+        {
+            me->CombatStop();
+            me->SetReactState(REACT_PASSIVE);
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+    }
+};
+
 void AddSC_boss_supremus()
 {
+    RegisterBlackTempleCreatureAI(npc_supremus_punch_invisible_stalker);
     RegisterBlackTempleCreatureAI(boss_supremus);
 }
