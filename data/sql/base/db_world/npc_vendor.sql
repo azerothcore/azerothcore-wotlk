@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS `npc_vendor` (
   KEY `slot` (`slot`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Npc System';
 
--- Dumping data for table acore_world.npc_vendor: ~37 842 rows (approximately)
+-- Dumping data for table acore_world.npc_vendor: ~37 284 rows (approximately)
 DELETE FROM `npc_vendor`;
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
 	(54, 0, 2488, 0, 0, 0, 0),
@@ -8567,6 +8567,16 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(5565, 0, 14341, 0, 0, 0, 0),
 	(5565, 0, 38426, 0, 0, 0, 0),
 	(5569, 0, 5740, 0, 0, 0, 0),
+	(5569, 0, 8624, 0, 0, 0, 0),
+	(5569, 0, 8625, 0, 0, 0, 0),
+	(5569, 0, 8626, 0, 0, 0, 0),
+	(5569, 0, 9312, 0, 0, 0, 0),
+	(5569, 0, 9313, 0, 0, 0, 0),
+	(5569, 0, 9314, 0, 0, 0, 0),
+	(5569, 0, 9315, 0, 0, 0, 0),
+	(5569, 0, 9317, 0, 0, 0, 0),
+	(5569, 0, 9318, 0, 0, 0, 0),
+	(5569, 0, 34850, 0, 0, 0, 0),
 	(5570, 0, 2593, 0, 0, 0, 0),
 	(5570, 0, 2594, 0, 0, 0, 0),
 	(5570, 0, 2595, 0, 0, 0, 0),
@@ -9813,6 +9823,7 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(8116, 0, 9315, 0, 0, 0, 0),
 	(8116, 0, 9317, 0, 0, 0, 0),
 	(8116, 0, 9318, 0, 0, 0, 0),
+	(8116, 0, 34850, 0, 0, 0, 0),
 	(8117, 0, 5740, 0, 0, 0, 0),
 	(8117, 0, 8624, 0, 0, 0, 0),
 	(8117, 0, 8625, 0, 0, 0, 0),
@@ -9823,6 +9834,7 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(8117, 0, 9315, 0, 0, 0, 0),
 	(8117, 0, 9317, 0, 0, 0, 0),
 	(8117, 0, 9318, 0, 0, 0, 0),
+	(8117, 0, 34850, 0, 0, 0, 0),
 	(8118, 0, 5740, 0, 0, 0, 0),
 	(8118, 0, 8624, 0, 0, 0, 0),
 	(8118, 0, 8625, 0, 0, 0, 0),
@@ -9833,6 +9845,18 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(8118, 0, 9315, 0, 0, 0, 0),
 	(8118, 0, 9317, 0, 0, 0, 0),
 	(8118, 0, 9318, 0, 0, 0, 0),
+	(8118, 0, 34850, 0, 0, 0, 0),
+	(8121, 0, 5740, 0, 0, 0, 0),
+	(8121, 0, 8624, 0, 0, 0, 0),
+	(8121, 0, 8625, 0, 0, 0, 0),
+	(8121, 0, 8626, 0, 0, 0, 0),
+	(8121, 0, 9312, 0, 0, 0, 0),
+	(8121, 0, 9313, 0, 0, 0, 0),
+	(8121, 0, 9314, 0, 0, 0, 0),
+	(8121, 0, 9315, 0, 0, 0, 0),
+	(8121, 0, 9317, 0, 0, 0, 0),
+	(8121, 0, 9318, 0, 0, 0, 0),
+	(8121, 0, 34850, 0, 0, 0, 0),
 	(8122, 0, 5740, 0, 0, 0, 0),
 	(8122, 0, 8624, 0, 0, 0, 0),
 	(8122, 0, 8625, 0, 0, 0, 0),
@@ -9843,6 +9867,7 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(8122, 0, 9315, 0, 0, 0, 0),
 	(8122, 0, 9317, 0, 0, 0, 0),
 	(8122, 0, 9318, 0, 0, 0, 0),
+	(8122, 0, 34850, 0, 0, 0, 0),
 	(8125, 0, 117, 0, 0, 0, 0),
 	(8125, 0, 159, 0, 0, 0, 0),
 	(8125, 0, 1179, 0, 0, 0, 0),
@@ -10005,7 +10030,8 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(8152, 0, 8948, 0, 0, 0, 0),
 	(8157, 0, 3371, 0, 0, 0, 0),
 	(8157, 0, 3372, 0, 0, 0, 0),
-	(8157, 0, 3928, 1, 9000, 0, 0),
+	(8157, 0, 3928, 1, 9000, 0, 0);
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
 	(8157, 0, 6057, 1, 9000, 0, 0),
 	(8157, 0, 6149, 1, 9000, 0, 0),
 	(8157, 0, 8925, 0, 0, 0, 0),
@@ -10030,8 +10056,7 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(8159, 0, 2465, 0, 0, 0, 0),
 	(8159, 0, 2467, 0, 0, 0, 0),
 	(8159, 0, 2468, 0, 0, 0, 0),
-	(8159, 0, 2469, 0, 0, 0, 0);
-INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
+	(8159, 0, 2469, 0, 0, 0, 0),
 	(8159, 0, 3593, 0, 0, 0, 0),
 	(8159, 0, 3594, 0, 0, 0, 0),
 	(8159, 0, 3889, 0, 0, 0, 0),
@@ -20006,7 +20031,8 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(23605, 0, 29451, 0, 0, 0, 0),
 	(23605, 0, 33023, 0, 0, 0, 0),
 	(23605, 0, 33024, 0, 0, 0, 0),
-	(23605, 0, 33025, 0, 0, 0, 0),
+	(23605, 0, 33025, 0, 0, 0, 0);
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
 	(23605, 0, 33026, 0, 0, 0, 0),
 	(23605, 0, 34063, 0, 0, 0, 0),
 	(23605, 0, 34064, 0, 0, 0, 0),
@@ -20031,8 +20057,7 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(23710, 0, 37750, 0, 0, 2398, 0),
 	(23710, 0, 37816, 0, 0, 2399, 0),
 	(23710, 0, 39476, 0, 0, 2424, 0),
-	(23710, 0, 46707, 0, 0, 2275, 0);
-INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
+	(23710, 0, 46707, 0, 0, 2275, 0),
 	(23724, 0, 2880, 0, 0, 0, 0),
 	(23724, 0, 2901, 0, 0, 0, 0),
 	(23724, 0, 3466, 0, 0, 0, 0),
@@ -30007,7 +30032,8 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(33238, 0, 33454, 0, 0, 0, 0),
 	(33238, 0, 35947, 0, 0, 0, 0),
 	(33238, 0, 35948, 0, 0, 0, 0),
-	(33238, 0, 35949, 0, 0, 0, 0),
+	(33238, 0, 35949, 0, 0, 0, 0);
+INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
 	(33238, 0, 35950, 0, 0, 0, 0),
 	(33238, 0, 35951, 0, 0, 0, 0),
 	(33238, 0, 35952, 0, 0, 0, 0),
@@ -30032,8 +30058,7 @@ INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `Exte
 	(33239, 0, 17031, 0, 0, 0, 0),
 	(33239, 0, 17032, 0, 0, 0, 0),
 	(33239, 0, 17033, 0, 0, 0, 0),
-	(33239, 0, 17034, 0, 0, 0, 0);
-INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
+	(33239, 0, 17034, 0, 0, 0, 0),
 	(33239, 0, 17035, 0, 0, 0, 0),
 	(33239, 0, 17036, 0, 0, 0, 0),
 	(33239, 0, 17037, 0, 0, 0, 0),

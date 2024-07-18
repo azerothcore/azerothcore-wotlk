@@ -20,24 +20,27 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "karazhan.h"
 
 enum Spells
 {
     // Ground Phase
-    SPELL_RAIN_OF_BONES         = 37098,
-    SPELL_SMOKING_BLAST         = 37057,
-    SPELL_FIREBALL_BARRAGE      = 30282,
-    SPELL_SEARING_CINDERS       = 30127,
-    // Air Phase
-    SPELL_BELLOWING_ROAR        = 39427,
     SPELL_CLEAVE                = 30131,
-    SPELL_CHARRED_EARTH         = 30129,
-    SPELL_DISTRACTING_ASH       = 30130,
-    SPELL_SMOLDERING_BREATH     = 30210,
     SPELL_TAIL_SWEEP            = 25653,
-    SPELL_SUMMON_SKELETON       = 30170
+    SPELL_SMOLDERING_BREATH     = 30210,
+    SPELL_CHARRED_EARTH         = 30129,
+    SPELL_BELLOWING_ROAR        = 36922,
+    // Air Phase
+    SPELL_SMOKING_BLAST         = 30128,
+    SPELL_SMOKING_BLAST_T       = 37057,
+    SPELL_RAIN_OF_BONES         = 37098,
+    SPELL_SUMMON_SKELETON       = 30170,
+    SPELL_DISTRACTING_ASH       = 30130,
+    // Both Phases
+    SPELL_FIREBALL_BARRAGE      = 30282
 };
 
 enum Says
@@ -188,21 +191,21 @@ struct boss_nightbane : public BossAI
 
     void ScheduleGround()
     {
-        scheduler.Schedule(30s, GROUP_GROUND, [this](TaskContext context)
-        {
-            DoCastAOE(SPELL_BELLOWING_ROAR);
-            context.Repeat(30s, 40s);
-        }).Schedule(15s, GROUP_GROUND, [this](TaskContext context)
+        scheduler.Schedule(18s, 25s, GROUP_GROUND, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_CHARRED_EARTH, 0, 100.0f, true);
             context.Repeat(20s);
-        }).Schedule(10s, GROUP_GROUND, [this](TaskContext context)
+        }).Schedule(25s, 35s, GROUP_GROUND, [this](TaskContext context)
         {
             DoCastVictim(SPELL_SMOLDERING_BREATH);
             context.Repeat(20s);
+        }).Schedule(45s, GROUP_GROUND, [this](TaskContext context)
+        {
+            DoCastAOE(SPELL_BELLOWING_ROAR);
+            context.Repeat(32s, 40s);
         }).Schedule(12s, GROUP_GROUND, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
             {
                 if (!me->HasInArc(M_PI, target))
                 {
@@ -210,14 +213,17 @@ struct boss_nightbane : public BossAI
                 }
             }
             context.Repeat(15s);
-        }).Schedule(14s, GROUP_GROUND, [this](TaskContext context)
-        {
-            DoCastRandomTarget(SPELL_SEARING_CINDERS);
-            context.Repeat(10s);
-        }).Schedule(1500ms, GROUP_GROUND, [this](TaskContext context)
+        }).Schedule(5s, GROUP_GROUND, [this](TaskContext context)
         {
             DoCastVictim(SPELL_CLEAVE);
-            context.Repeat(1500ms, 45s);
+            context.Repeat(6s, 12s);
+        }).Schedule(25s, GROUP_GROUND, [this](TaskContext context)
+        {
+            if (SelectTarget(SelectTargetMethod::MinDistance, 0, -40.0f, true))
+            {
+                DoCastAOE(SPELL_FIREBALL_BARRAGE);
+            }
+            context.Repeat(3s);
         });
     }
 
@@ -225,7 +231,7 @@ struct boss_nightbane : public BossAI
     {
         _skeletonSpawnCounter = 0;
 
-        scheduler.Schedule(2s, GROUP_AIR, [this](TaskContext)
+        scheduler.Schedule(2s, GROUP_AIR, [this](TaskContext /*context*/)
         {
             DoResetThreatList();
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
@@ -244,26 +250,31 @@ struct boss_nightbane : public BossAI
                     }
                 });
             }
-        }).Schedule(20s, GROUP_AIR, [this](TaskContext context)
+        }).Schedule(15s, GROUP_AIR, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random))
             {
-                me->SetFacingToObject(target);
-                DoCast(target, SPELL_DISTRACTING_ASH);
+                DoCast(target, SPELL_SMOKING_BLAST_T);
             }
-            context.Repeat(2s); //timer wrong?
-        }).Schedule(25s, GROUP_AIR, [this](TaskContext context)
+            context.Repeat(6s);
+        }).Schedule(15500ms, GROUP_AIR, [this](TaskContext context)
         {
-            //5 seconds added due to double trigger?
-            //trigger for timer in original + in rain of bones
-            //timers need some investigation
             me->SetFacingToObject(me->GetVictim());
             DoCastVictim(SPELL_SMOKING_BLAST);
-            context.Repeat(1500ms); //timer wrong?
-        }).Schedule(13s, GROUP_AIR, [this](TaskContext context)
+            context.Repeat(1500ms);
+        }).Schedule(20s, GROUP_AIR, [this](TaskContext /*context*/)
         {
-            DoCastOnFarAwayPlayers(SPELL_FIREBALL_BARRAGE, false, 80.0f);
-            context.Repeat(20s);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+            {
+                DoCast(target, SPELL_DISTRACTING_ASH);
+            }
+        }).Schedule(14s, GROUP_AIR, [this](TaskContext context)
+        {
+            if (SelectTarget(SelectTargetMethod::MinDistance, 0, -40.0f, true))
+            {
+                DoCastAOE(SPELL_FIREBALL_BARRAGE);
+            }
+            context.Repeat(3s);
         });
     }
 
@@ -407,22 +418,6 @@ struct boss_nightbane : public BossAI
         summons.Summon(summon);
     }
 
-    void DoCastOnFarAwayPlayers(uint32 spellid, bool triggered, float tresholddistance)
-    {
-        //resembles DoCastToAllHostilePlayers a bit/lot
-        ThreatContainer::StorageType targets = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-        {
-            if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
-            {
-                if (unit->IsPlayer() && !unit->IsWithinDist(me, tresholddistance, false))
-                {
-                    me->CastSpell(unit, spellid, triggered);
-                }
-            }
-        }
-    }
-
     void TriggerHealthTakeOff()
     {
         if (_phase != PHASE_GROUND)
@@ -465,7 +460,7 @@ struct boss_nightbane : public BossAI
 
     void ScheduleLand()
     {
-        scheduler.Schedule(30s, GROUP_LAND, [this](TaskContext) /*context*/
+        scheduler.Schedule(35s, GROUP_LAND, [this](TaskContext) /*context*/
         {
             Talk(YELL_LAND_PHASE);
             scheduler.CancelGroup(GROUP_AIR);
@@ -510,7 +505,6 @@ public:
     {
         if (InstanceScript* instance = go->GetInstanceScript())
         {
-            // if (instance->GetBossState(DATA_NIGHTBANE) == NOT_STARTED || instance->GetBossState(DATA_NIGHTBANE) == FAIL)
             if (instance->GetBossState(DATA_NIGHTBANE) == NOT_STARTED)
             {
                 if (Creature* nightbane = instance->GetCreature(DATA_NIGHTBANE))
@@ -532,9 +526,30 @@ struct npc_nightbane_helper_target : public NullCreatureAI
     npc_nightbane_helper_target(Creature* creature) : NullCreatureAI(creature) { me->SetDisableGravity(true); }
 };
 
+// 30282 - Fireball Barrage
+class spell_nightbane_fireball_barrage : public SpellScript
+{
+    PrepareSpellScript(spell_nightbane_fireball_barrage);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        targets.remove_if([&](WorldObject* target) -> bool
+        {
+            return !target->IsPlayer() || caster->IsWithinCombatRange(target->ToUnit(), 40.0f);
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_nightbane_fireball_barrage::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_nightbane()
 {
     RegisterKarazhanCreatureAI(boss_nightbane);
     new go_blackened_urn();
     RegisterKarazhanCreatureAI(npc_nightbane_helper_target);
+    RegisterSpellScript(spell_nightbane_fireball_barrage);
 }
