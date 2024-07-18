@@ -24,6 +24,7 @@ enum Supremus
     EMOTE_NEW_TARGET                = 0,
     EMOTE_PUNCH_GROUND              = 1,
     EMOTE_GROUND_CRACK              = 2,
+    EMOTE_BERSERK                   = 3,
 
     SPELL_SNARE_SELF                = 41922,
     SPELL_MOLTEN_PUNCH              = 40126,
@@ -31,16 +32,16 @@ enum Supremus
     SPELL_VOLCANIC_ERUPTION         = 40276,
     SPELL_VOLCANIC_ERUPTION_TRIGGER = 40117,
     SPELL_VOLCANIC_GEYSER           = 42055,
-    SPELL_BERSERK                   = 45078,
+    SPELL_BERSERK                   = 26662,
     SPELL_CHARGE                    = 41581,
+
+    SPELL_SERVERSIDE_RANDOM_TARGET  = 41951,  // Found in 55261. Used for Fixate target
 
     NPC_SUPREMUS_PUNCH_STALKER      = 23095,
 
-    EVENT_BERSERK                   = 1,
-    EVENT_PHASE_CHANGE              = 2,
-
     GROUP_ABILITIES                 = 1,
-    GROUP_MOLTEN_PUNCH              = 2
+    GROUP_MOLTEN_PUNCH              = 2,
+    GROUP_PHASE_CHANGE              = 3
 };
 
 struct boss_supremus : public BossAI
@@ -66,32 +67,39 @@ struct boss_supremus : public BossAI
 
         SchedulePhase(true);
 
-        ScheduleUniqueTimedEvent(15min, [&]
+        ScheduleTimedEvent(15min, [&]
         {
             DoCastSelf(SPELL_BERSERK, true);
-        }, EVENT_BERSERK);
+            Talk(EMOTE_BERSERK);
+            scheduler.CancelGroup(GROUP_ABILITIES);  // Supremus stops all other abilities after berserking
+            scheduler.CancelGroup(GROUP_MOLTEN_PUNCH);
+            scheduler.CancelGroup(GROUP_PHASE_CHANGE);
+        }, 5min);
 
         scheduler.Schedule(20s, [this](TaskContext context)
         {
             context.SetGroup(GROUP_MOLTEN_PUNCH);
             DoCastSelf(SPELL_MOLTEN_PUNCH);
+            if (roll_chance_i(50))
+                Talk(EMOTE_PUNCH_GROUND);
             context.Repeat(15s, 20s);
         });
     }
 
-    void SchedulePhase(bool IsSnared)
+    void SchedulePhase(bool isSnared)
     {
         scheduler.CancelGroup(GROUP_ABILITIES);
 
-        ScheduleUniqueTimedEvent(1min, [&]
+        scheduler.Schedule(1min, [this](TaskContext context)
         {
+            context.SetGroup(GROUP_PHASE_CHANGE);
             SchedulePhase(me->HasAura(SPELL_SNARE_SELF));
-        }, EVENT_PHASE_CHANGE);
+        });
 
         DoResetThreatList();
 
         // Hateful Strike Phase
-        if (IsSnared)
+        if (isSnared)
         {
             scheduler.Schedule(8s, 15s, [this](TaskContext context)
             {
@@ -140,8 +148,7 @@ struct boss_supremus : public BossAI
                 context.SetGroup(GROUP_ABILITIES);
 
                 if (me->GetDistance(me->GetVictim()) > 100.0f)
-                    if (DoCastVictim(SPELL_CHARGE) == SPELL_CAST_OK)
-                        Talk(EMOTE_PUNCH_GROUND);
+                    DoCastVictim(SPELL_CHARGE);
 
                 context.Repeat(1s);
             });
