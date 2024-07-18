@@ -172,6 +172,17 @@ struct boss_teron_gorefiend : public BossAI
         bool _intro;
 };
 
+struct npc_vengeful_spirit : public NullCreatureAI
+{
+    npc_vengeful_spirit(Creature* creature) : NullCreatureAI(creature) { }
+
+    void OnCharmed(bool apply)
+    {
+        if (!apply)
+            me->DespawnOnEvade();
+    }
+};
+
 class spell_teron_gorefiend_shadow_of_death : public AuraScript
 {
     PrepareAuraScript(spell_teron_gorefiend_shadow_of_death);
@@ -231,7 +242,7 @@ class spell_teron_gorefiend_spiritual_vengeance : public AuraScript
 {
     PrepareAuraScript(spell_teron_gorefiend_spiritual_vengeance);
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit::Kill(nullptr, GetTarget());
     }
@@ -279,6 +290,7 @@ class spell_teron_gorefiend_shadowy_construct : public AuraScript
 void AddSC_boss_teron_gorefiend()
 {
     RegisterBlackTempleCreatureAI(boss_teron_gorefiend);
+    RegisterBlackTempleCreatureAI(npc_vengeful_spirit);
     RegisterSpellScript(spell_teron_gorefiend_shadow_of_death);
     RegisterSpellScript(spell_teron_gorefiend_spirit_lance);
     RegisterSpellScript(spell_teron_gorefiend_spiritual_vengeance);
