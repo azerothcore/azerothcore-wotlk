@@ -2002,6 +2002,13 @@ SpellCastResult SpellInfo::CheckExplicitTarget(Unit const* caster, WorldObject c
                     return SPELL_CAST_OK;
             return SPELL_FAILED_BAD_TARGETS;
         }
+        //npcbot
+        else if ((neededTargets & TARGET_FLAG_CORPSE_ALLY) && unitTarget->IsNPCBot())
+        {
+            if (!caster->_IsValidAssistTarget(unitTarget, this))
+                return SPELL_FAILED_BAD_TARGETS;
+        }
+        //end npcbot
     }
     return SPELL_CAST_OK;
 }
