@@ -4833,7 +4833,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
     });
-      
+
     // Molten Punch
     ApplySpellFix({ 40126 }, [](SpellInfo* spellInfo)
     {
