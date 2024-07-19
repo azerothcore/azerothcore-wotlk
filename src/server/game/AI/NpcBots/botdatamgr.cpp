@@ -233,13 +233,13 @@ private:
         ASSERT(next_bot_id > BOT_ENTRY_BEGIN);
 
         for (uint8 c = BOT_CLASS_WARRIOR; c < BOT_CLASS_END; ++c)
-            if (BotMgr::IsClassEnabled(c) && _spareBotIdsPerClassMap.find(c) == _spareBotIdsPerClassMap.cend())
+            if (BotMgr::IsWanderingClassEnabled(c) && _spareBotIdsPerClassMap.find(c) == _spareBotIdsPerClassMap.cend())
                 _spareBotIdsPerClassMap.insert({ c, {} });
 
         for (decltype(_botsExtras)::value_type const& vt : _botsExtras)
         {
             uint8 c = vt.second->bclass;
-            if (c != BOT_CLASS_NONE && BotMgr::IsClassEnabled(c))
+            if (c != BOT_CLASS_NONE && BotMgr::IsWanderingClassEnabled(c))
             {
                 ++enabledBotsCount;
                 if (_botsData.find(vt.first) == _botsData.end())

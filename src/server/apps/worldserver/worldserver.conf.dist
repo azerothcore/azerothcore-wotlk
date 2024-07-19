@@ -4949,6 +4949,50 @@ NpcBot.WanderingBots.BG.TargetTeamPlayersCount.SA = 0
 NpcBot.WanderingBots.BG.TargetTeamPlayersCount.IC = 0
 
 #
+#    NpcBot.WanderingBots.Classes.<Class>.Enable
+#        Description: Allow players to hire bots of certain classes.
+#        Note:        Some non-standard class abilities may be unbalanced or game breaking.
+#        Default:     1 - (NpcBot.Classes.Warrior.Enable)
+#                     1 - (NpcBot.Classes.Paladin.Enable)
+#                     1 - (NpcBot.Classes.Hunter.Enable)
+#                     1 - (NpcBot.Classes.Rogue.Enable)
+#                     1 - (NpcBot.Classes.Priest.Enable)
+#                     1 - (NpcBot.Classes.DeathKnight.Enable)
+#                     1 - (NpcBot.Classes.Shaman.Enable)
+#                     1 - (NpcBot.Classes.Mage.Enable)
+#                     1 - (NpcBot.Classes.Warlock.Enable)
+#                     1 - (NpcBot.Classes.Druid.Enable)
+#                     0 - (NpcBot.Classes.Blademaster.Enable)
+#                     1 - (NpcBot.Classes.ObsidianDestroyer.Enable)
+#                     1 - (NpcBot.Classes.Archmage.Enable)
+#                     1 - (NpcBot.Classes.Dreadlord.Enable)
+#                     1 - (NpcBot.Classes.SpellBreaker.Enable)
+#                     1 - (NpcBot.Classes.DarkRanger.Enable)
+#                     1 - (NpcBot.Classes.Necromancer.Enable)
+#                     1 - (NpcBot.Classes.SeaWitch.Enable)
+#                     1 - (NpcBot.Classes.CryptLord.Enable)
+
+NpcBot.WanderingBots.Classes.Warrior.Enable           = 1
+NpcBot.WanderingBots.Classes.Paladin.Enable           = 1
+NpcBot.WanderingBots.Classes.Hunter.Enable            = 1
+NpcBot.WanderingBots.Classes.Rogue.Enable             = 1
+NpcBot.WanderingBots.Classes.Priest.Enable            = 1
+NpcBot.WanderingBots.Classes.DeathKnight.Enable       = 1
+NpcBot.WanderingBots.Classes.Shaman.Enable            = 1
+NpcBot.WanderingBots.Classes.Mage.Enable              = 1
+NpcBot.WanderingBots.Classes.Warlock.Enable           = 1
+NpcBot.WanderingBots.Classes.Druid.Enable             = 1
+NpcBot.WanderingBots.Classes.Blademaster.Enable       = 0
+NpcBot.WanderingBots.Classes.ObsidianDestroyer.Enable = 1
+NpcBot.WanderingBots.Classes.Archmage.Enable          = 1
+NpcBot.WanderingBots.Classes.Dreadlord.Enable         = 1
+NpcBot.WanderingBots.Classes.SpellBreaker.Enable      = 1
+NpcBot.WanderingBots.Classes.DarkRanger.Enable        = 1
+NpcBot.WanderingBots.Classes.Necromancer.Enable       = 1
+NpcBot.WanderingBots.Classes.SeaWitch.Enable          = 1
+NpcBot.WanderingBots.Classes.CryptLord.Enable         = 1
+
+#
 #    NpcBot.HK.Enable
 #        Description: Count NPCBot kill at honor kill.
 #        Default:     1 - (Enabled)

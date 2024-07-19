@@ -7611,7 +7611,7 @@ float bot_ai::CalcSpellMaxRange(uint32 spellId, bool enemy) const
 //GossipHello
 bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
 {
-    if (!BotMgr::IsNpcBotModEnabled() || !BotMgr::IsClassEnabled(_botclass) ||
+    if (!BotMgr::IsNpcBotModEnabled() || !(IsWanderer() ? BotMgr::IsWanderingClassEnabled(_botclass) : BotMgr::IsClassEnabled(_botclass)) ||
         IsTempBot() || me->IsInCombat() || CCed(me) || IsCasting() || IsDuringTeleport() ||
         HasBotCommandState(BOT_COMMAND_ISSUED_ORDER | BOT_COMMAND_NOGOSSIP) ||
         (me->GetVehicle() && me->GetVehicle()->GetBase()->IsInCombat()) ||
