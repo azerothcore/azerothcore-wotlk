@@ -77,7 +77,7 @@ struct boss_teron_gorefiend : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        me->CastSpell(me, SPELL_SHADOW_OF_DEATH_REMOVE, true);
+        DoCastSelf(SPELL_SHADOW_OF_DEATH_REMOVE, true);
     }
 
     void JustEngagedWith(Unit* who) override
@@ -155,7 +155,7 @@ struct boss_teron_gorefiend : public BossAI
     {
         BossAI::JustDied(killer);
         Talk(SAY_DEATH);
-        me->CastSpell(me, SPELL_SHADOW_OF_DEATH_REMOVE, true);
+        DoCastSelf(SPELL_SHADOW_OF_DEATH_REMOVE, true);
     }
 
     void UpdateAI(uint32 diff) override
@@ -170,6 +170,17 @@ struct boss_teron_gorefiend : public BossAI
     private:
         bool _recentlySpoken;
         bool _intro;
+};
+
+struct npc_vengeful_spirit : public NullCreatureAI
+{
+    npc_vengeful_spirit(Creature* creature) : NullCreatureAI(creature) { }
+
+    void OnCharmed(bool apply)
+    {
+        if (!apply)
+            me->DespawnOnEvade();
+    }
 };
 
 class spell_teron_gorefiend_shadow_of_death : public AuraScript
@@ -231,7 +242,7 @@ class spell_teron_gorefiend_spiritual_vengeance : public AuraScript
 {
     PrepareAuraScript(spell_teron_gorefiend_spiritual_vengeance);
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit::Kill(nullptr, GetTarget());
     }
@@ -276,12 +287,44 @@ class spell_teron_gorefiend_shadowy_construct : public AuraScript
     }
 };
 
+class spell_teron_gorefiend_shadow_of_death_remove : public SpellScript
+{
+    PrepareSpellScript(spell_teron_gorefiend_shadow_of_death_remove);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_SHADOW_OF_DEATH,
+            SPELL_POSSESS_SPIRIT_IMMUNE,
+            SPELL_SPIRITUAL_VENGEANCE
+        });
+    }
+
+    void HandleOnHit()
+    {
+        if (Unit* target = GetHitUnit())
+        {
+            target->RemoveAurasDueToSpell(SPELL_POSSESS_SPIRIT_IMMUNE);
+            target->RemoveAurasDueToSpell(SPELL_SPIRITUAL_VENGEANCE);
+            target->RemoveAurasDueToSpell(SPELL_SHADOW_OF_DEATH);
+        }
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_teron_gorefiend_shadow_of_death_remove::HandleOnHit);
+    }
+};
+
 void AddSC_boss_teron_gorefiend()
 {
     RegisterBlackTempleCreatureAI(boss_teron_gorefiend);
+    RegisterBlackTempleCreatureAI(npc_vengeful_spirit);
     RegisterSpellScript(spell_teron_gorefiend_shadow_of_death);
     RegisterSpellScript(spell_teron_gorefiend_spirit_lance);
     RegisterSpellScript(spell_teron_gorefiend_spiritual_vengeance);
     RegisterSpellScript(spell_teron_gorefiend_shadowy_construct);
+    RegisterSpellScript(spell_teron_gorefiend_shadow_of_death_remove);
 }
 
