@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `creature_equip_template` (
   PRIMARY KEY (`CreatureID`,`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_equip_template: ~10 849 rows (approximately)
+-- Dumping data for table acore_world.creature_equip_template: ~10 851 rows (approximately)
 DELETE FROM `creature_equip_template`;
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
 	(6, 1, 5276, 0, 0, 18019),
@@ -3559,7 +3559,7 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(8578, 1, 2177, 0, 0, 18019),
 	(8579, 1, 2705, 0, 0, 18019),
 	(8581, 1, 1899, 1984, 0, 18019),
-	(8582, 1, 34638, 0, 0, 18019),
+	(8582, 1, 12285, 0, 0, 18019),
 	(8586, 1, 0, 0, 5259, 18019),
 	(8587, 1, 10619, 10619, 0, 18019),
 	(8588, 1, 1908, 0, 0, 18019),
@@ -7505,6 +7505,7 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(23715, 1, 0, 0, 30647, 18019),
 	(23716, 1, 12329, 0, 0, 18019),
 	(23717, 1, 7826, 0, 0, 18019),
+	(23718, 1, 2716, 0, 0, 57888),
 	(23721, 1, 5301, 0, 0, 18019),
 	(23722, 1, 13078, 0, 0, 18019),
 	(23723, 1, 5286, 0, 0, 18019),
@@ -7514,13 +7515,14 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(23732, 1, 2705, 0, 0, 18019),
 	(23737, 1, 2704, 0, 0, 18019),
 	(23739, 1, 33295, 143, 11021, 18019),
-	(23745, 1, 6228, 0, 0, NULL),
-	(23745, 2, 2023, 0, 0, NULL),
+	(23745, 1, 2023, 0, 0, 53788),
+	(23745, 2, 6228, 0, 0, 53788),
 	(23748, 1, 12744, 12745, 0, 1),
 	(23749, 1, 14533, 0, 0, 18019),
 	(23760, 1, 9511, 0, 34034, 18019),
-	(23761, 1, 2558, 20417, 0, 18019),
+	(23761, 1, 2558, 0, 0, 53788),
 	(23762, 1, 2717, 0, 0, 18019),
+	(23764, 1, 2717, 0, 0, 53788),
 	(23766, 1, 2717, 0, 0, 1),
 	(23770, 1, 2179, 0, 0, 18019),
 	(23773, 1, 2827, 0, 0, 18019),
@@ -10026,10 +10028,10 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 	(33355, 1, 45081, 0, 0, 18019),
 	(33361, 1, 49020, 46092, 0, 18019),
 	(33372, 1, 45204, 45204, 49022, 18019),
-	(33373, 1, 45222, 45222, 0, 18019),
-	(33379, 1, 34182, 0, 0, 18019),
-	(33380, 1, 2493, 0, 0, 18019);
+	(33373, 1, 45222, 45222, 0, 18019);
 INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`, `ItemID3`, `VerifiedBuild`) VALUES
+	(33379, 1, 34182, 0, 0, 18019),
+	(33380, 1, 2493, 0, 0, 18019),
 	(33382, 1, 46089, 20841, 0, 18019),
 	(33383, 1, 46089, 7120, 0, 18019),
 	(33384, 1, 46089, 25818, 0, 18019),

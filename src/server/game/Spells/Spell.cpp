@@ -3793,7 +3793,6 @@ void Spell::cancel(bool bySelf)
         return;
 
     uint32 oldState = m_spellState;
-    bool autoRepeat = m_autoRepeat;
     m_spellState = SPELL_STATE_FINISHED;
 
     m_autoRepeat = false;
@@ -3801,6 +3800,8 @@ void Spell::cancel(bool bySelf)
     {
         case SPELL_STATE_PREPARING:
             CancelGlobalCooldown();
+            SendCastResult(SPELL_FAILED_INTERRUPTED);
+
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
                 if (m_caster->ToPlayer()->NeedSendSpectatorData())
@@ -3808,10 +3809,7 @@ void Spell::cancel(bool bySelf)
             }
             [[fallthrough]];
         case SPELL_STATE_DELAYED:
-            SendInterrupted(0);
-            // xinef: fixes bugged gcd reset in some cases
-            if (!autoRepeat)
-                SendCastResult(SPELL_FAILED_INTERRUPTED);
+            SendInterrupted(SPELL_FAILED_INTERRUPTED);
             break;
         case SPELL_STATE_CASTING:
             if (!bySelf)
@@ -7955,6 +7953,9 @@ void Spell::Delayed() // only called in DealDamage()
     if (isDelayableNoMore())                                 // Spells may only be delayed twice
         return;
 
+    if (m_spellInfo->HasAttribute(SPELL_ATTR6_NO_PUSHBACK))
+        return;
+
     // spells not loosing casting time (slam, dynamites, bombs..)
     //if (!(m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE))
     //    return;
@@ -7992,6 +7993,9 @@ void Spell::DelayedChannel()
         return;
 
     if (isDelayableNoMore())                                    // Spells may only be delayed twice
+        return;
+
+    if (m_spellInfo->HasAttribute(SPELL_ATTR6_NO_PUSHBACK))
         return;
 
     //check pushback reduce

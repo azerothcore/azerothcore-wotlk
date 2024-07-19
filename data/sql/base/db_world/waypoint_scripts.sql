@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS `waypoint_scripts` (
   PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.waypoint_scripts: ~582 rows (approximately)
+-- Dumping data for table acore_world.waypoint_scripts: ~575 rows (approximately)
 DELETE FROM `waypoint_scripts`;
 INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `dataint`, `x`, `y`, `z`, `o`, `guid`) VALUES
 	(115879, 0, 16, 7274, 0, 0, 0, 0, 0, 0, 0),
@@ -268,13 +268,6 @@ INSERT INTO `waypoint_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2
 	(379, 0, 2, 83, 10, 0, 0, 0, 0, 0, 396),
 	(447, 0, 0, 0, 0, 24425, 0, 0, 0, 0, 491),
 	(449, 0, 0, 0, 0, 24425, 0, 0, 0, 0, 493),
-	(451, 0, 0, 0, 0, 22216, 0, 0, 0, 0, 495),
-	(451, 0, 2, 83, 1, 0, 0, 0, 0, 0, 496),
-	(452, 0, 0, 0, 0, 22211, 0, 0, 0, 0, 497),
-	(452, 0, 2, 83, 1, 0, 0, 0, 0, 0, 498),
-	(453, 0, 0, 0, 0, 22206, 0, 0, 0, 0, 499),
-	(453, 0, 2, 83, 68, 0, 0, 0, 0, 0, 500),
-	(454, 0, 2, 83, 61, 0, 0, 0, 0, 0, 501),
 	(455, 0, 0, 0, 0, 25086, 0, 0, 0, 0, 502),
 	(456, 0, 0, 0, 0, 25073, 0, 0, 0, 0, 503),
 	(457, 0, 0, 0, 0, 25074, 0, 0, 0, 0, 504),

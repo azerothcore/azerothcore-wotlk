@@ -3263,8 +3263,12 @@ void Unit::SendMeleeAttackStop(Unit* victim)
 
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
     data << GetPackGUID();
-    data << (victim ? victim->GetPackGUID() : PackedGuid());
-    data << uint32(0);                                     //! Can also take the value 0x01, which seems related to updating rotation
+
+    if (victim)
+    {
+        data << victim->GetPackGUID();
+        data << (uint32)victim->isDead();
+    }
     SendMessageToSet(&data, true);
     LOG_DEBUG("entities.unit", "WORLD: Sent SMSG_ATTACKSTOP");
 
@@ -4205,6 +4209,16 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
                     if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
                         InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
                     m_AutoRepeatFirstCast = true;
+                }
+
+                // melee spells breaking
+                if (m_currentSpells[CURRENT_MELEE_SPELL])
+                {
+                    // break melee spells if cast time
+                    if (pSpell->GetCastTime() > 0)
+                    {
+                        InterruptSpell(CURRENT_MELEE_SPELL);
+                    }
                 }
                 if (pSpell->GetCastTime() > 0)
                     AddUnitState(UNIT_STATE_CASTING);
@@ -7416,60 +7430,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
             }
         case SPELLFAMILY_WARLOCK:
             {
-                // Seed of Corruption
-                if (dummySpell->SpellFamilyFlags[1] & 0x00000010)
-                {
-                    if (procSpell && procSpell->SpellFamilyFlags[1] & 0x8000)
-                        return false;
-                    // if damage is more than need or target die from damage deal finish spell
-                    if (triggeredByAura->GetAmount() <= int32(damage) || GetHealth() <= damage)
-                    {
-                        // remember guid before aura delete
-                        ObjectGuid casterGuid = triggeredByAura->GetCasterGUID();
-
-                        // Remove aura (before cast for prevent infinite loop handlers)
-                        RemoveAurasDueToSpell(triggeredByAura->GetId());
-
-                        uint32 spell = sSpellMgr->GetSpellWithRank(27285, dummySpell->GetRank());
-
-                        // Cast finish spell (triggeredByAura already not exist!)
-                        if (Unit* caster = ObjectAccessor::GetUnit(*this, casterGuid))
-                        {
-                            this->CastSpell(this, 37826, true); // VISUAL!
-                            caster->CastSpell(this, spell, true, castItem);
-                        }
-
-                        return true;                            // no hidden cooldown
-                    }
-
-                    // Damage counting
-                    triggeredByAura->SetAmount(triggeredByAura->GetAmount() - damage);
-                    return true;
-                }
-                // Seed of Corruption (Mobs cast) - no die req
-                if (dummySpell->SpellFamilyFlags.IsEqual(0, 0, 0) && dummySpell->SpellIconID == 1932)
-                {
-                    // if damage is more than need deal finish spell
-                    if (triggeredByAura->GetAmount() <= int32(damage))
-                    {
-                        // remember guid before aura delete
-                        ObjectGuid casterGuid = triggeredByAura->GetCasterGUID();
-
-                        // Remove aura (before cast for prevent infinite loop handlers)
-                        RemoveAurasDueToSpell(triggeredByAura->GetId());
-
-                        // Cast finish spell (triggeredByAura already not exist!)
-                        if (Unit* caster = ObjectAccessor::GetUnit(*this, casterGuid))
-                        {
-                            this->CastSpell(this, 37826, true); // VISUAL!
-                            caster->CastSpell(this, 32865, true, castItem);
-                        }
-                        return true;                            // no hidden cooldown
-                    }
-                    // Damage counting
-                    triggeredByAura->SetAmount(triggeredByAura->GetAmount() - damage);
-                    return true;
-                }
                 switch (dummySpell->Id)
                 {
                     // Nightfall
@@ -10223,30 +10183,6 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
             {
                 if (!procSpell || procSpell->PowerType != POWER_MANA || (procSpell->ManaCost == 0 && procSpell->ManaCostPercentage == 0 && procSpell->ManaCostPerlevel == 0))
                     return false;
-                break;
-            }
-        // Demonic Pact
-        case 48090:
-            {
-                // Get talent aura from owner
-                if (IsPet())
-                    if (Unit* owner = GetOwner())
-                    {
-                        if (HasSpellCooldown(trigger_spell_id))
-                            return false;
-                        AddSpellCooldown(trigger_spell_id, 0, cooldown);
-
-                        if (AuraEffect* aurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, 3220, 0))
-                        {
-                            int32 spellPower = owner->SpellBaseDamageBonusDone(SpellSchoolMask(SPELL_SCHOOL_MASK_MAGIC));
-                            if (AuraEffect const* demonicAuraEffect = GetAuraEffect(trigger_spell_id, EFFECT_0))
-                                spellPower -= demonicAuraEffect->GetAmount();
-
-                            basepoints0 = int32((aurEff->GetAmount() * spellPower + 100.0f) / 100.0f);
-                            CastCustomSpell(this, trigger_spell_id, &basepoints0, &basepoints0, nullptr, true, castItem, triggeredByAura);
-                            return true;
-                        }
-                    }
                 break;
             }
         case 46916:  // Slam! (Bloodsurge proc)

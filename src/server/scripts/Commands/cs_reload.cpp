@@ -800,7 +800,7 @@ public:
     {
         LOG_INFO("server.loading", "Reloading `reputation_reward_rate` Table!" );
         sObjectMgr->LoadReputationRewardRate();
-        handler->SendGlobalSysMessage("DB table `reputation_reward_rate` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `reputation_reward_rate` reloaded.");
         return true;
     }
 
@@ -808,7 +808,7 @@ public:
     {
         LOG_INFO("server.loading", "Reloading `reputation_spillover_template` Table!" );
         sObjectMgr->LoadReputationSpilloverTemplate();
-        handler->SendGlobalSysMessage("DB table `reputation_spillover_template` reloaded.");
+        handler->SendGlobalGMSysMessage("DB table `reputation_spillover_template` reloaded.");
         return true;
     }
 

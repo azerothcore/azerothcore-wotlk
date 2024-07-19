@@ -946,7 +946,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr6>::ToString(SpellAttr6 value)
         case SPELL_ATTR6_ALLOW_WHILE_RIDING_VEHICLE: return { "SPELL_ATTR6_ALLOW_WHILE_RIDING_VEHICLE", "Castable while caster is on vehicle", "" };
         case SPELL_ATTR6_IGNORE_PHASE_SHIFT: return { "SPELL_ATTR6_IGNORE_PHASE_SHIFT", "Can target invisible units", "" };
         case SPELL_ATTR6_AI_PRIMARY_RANGED_ATTACK: return { "SPELL_ATTR6_AI_PRIMARY_RANGED_ATTACK", "Unknown attribute 14@Attr6", "" };
-        case SPELL_ATTR6_NO_PUSHBACK: return { "SPELL_ATTR6_NO_PUSHBACK", "Unknown attribute 15@Attr6", "only 54368, 67892" };
+        case SPELL_ATTR6_NO_PUSHBACK: return { "SPELL_ATTR6_NO_PUSHBACK", "Not affected by pushback", "Casts/Channels will not affected by pushback" };
         case SPELL_ATTR6_NO_JUMP_PATHING: return { "SPELL_ATTR6_NO_JUMP_PATHING", "Unknown attribute 16@Attr6", "" };
         case SPELL_ATTR6_ALLOW_EQUIP_WHILE_CASTING: return { "SPELL_ATTR6_ALLOW_EQUIP_WHILE_CASTING", "Unknown attribute 17@Attr6", "Mount related?" };
         case SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER: return { "SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER", "Spell is cast by charmer", "Client will prevent casting if not possessed, charmer will be caster for all intents and purposes" };
