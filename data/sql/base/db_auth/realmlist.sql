@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `realmlist` (
 -- Dumping data for table acore_auth.realmlist: ~1 rows (approximately)
 DELETE FROM `realmlist`;
 INSERT INTO `realmlist` (`id`, `name`, `address`, `localAddress`, `localSubnetMask`, `port`, `icon`, `flag`, `timezone`, `allowedSecurityLevel`, `population`, `gamebuild`) VALUES
-	(1, 'AzerothCore', '127.0.0.1', '127.0.0.1', '255.255.255.0', 8085, 0, 0, 1, 0, 0, 12340);
+	(1, 'AzerothCore', '127.0.0.1', '127.0.0.1', '255.255.255.0', 8085, 0, 2, 1, 0, 0, 12340);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

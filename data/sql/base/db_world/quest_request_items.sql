@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `quest_request_items` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.quest_request_items: ~7 450 rows (approximately)
+-- Dumping data for table acore_world.quest_request_items: ~7 200 rows (approximately)
 DELETE FROM `quest_request_items`;
 INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`, `CompletionText`, `VerifiedBuild`) VALUES
 	(2, 1, 0, 'Yes, mighty $C, I sensed your arrival. I trust you have more news to report to me about your hunt?', 12340),
@@ -2660,7 +2660,7 @@ INSERT INTO `quest_request_items` (`ID`, `EmoteOnComplete`, `EmoteOnIncomplete`,
 	(5961, 1, 0, '', 12340),
 	(5981, 1, 1, 'You must continue to prove yourself, $N.', 12340),
 	(6001, 1, 0, '', 12340),
-	(6002, 1, 0, '', 12340),
+	(6002, 1, 0, 'When you have faced the challenge that lies before you, your understanding of strength of body and strength of heart will be fully realized.  Until that time, I cannot help you further.', 52237),
 	(6004, 1, 6, 'How is it going, $N? Are they stronger than you thought? I hope not. If I\'m going to follow through here, then it\'s going to require a heck of a lot more strength than what I\'ve already asked you to do.', 12340),
 	(6021, 5, 0, 'Did you find the hideout, $N?  Did you take care of Zaeldarr?', 12340),
 	(6022, 6, 6, 'Are you crying? If this is too \'tedious\' for you, \'hero,\' I recommend that you head back to the Dark Lady and inform her of the horrible mistreatment you received at my farmstead.$b$bNow get out of my sight!', 12340),

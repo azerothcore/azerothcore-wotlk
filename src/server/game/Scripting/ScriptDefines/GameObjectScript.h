@@ -66,23 +66,21 @@ public:
     virtual GameObjectAI* GetAI(GameObject* /*go*/) const { return nullptr; }
 };
 
-// Cannot be used due gob scripts not working like this
 template <class AI>
 class GenericGameObjectScript : public GameObjectScript
 {
 public:
     GenericGameObjectScript(char const* name) : GameObjectScript(name) { }
-    GameObjectAI* GetAI(GameObject* me) const override { return new AI(me); }
+    GameObjectAI* GetAI(GameObject* go) const override { return new AI(go); }
 };
 
 #define RegisterGameObjectAI(ai_name) new GenericGameObjectScript<ai_name>(#ai_name)
 
-// Cannot be used due gob scripts not working like this
 template <class AI, AI* (*AIFactory)(GameObject*)> class FactoryGameObjectScript : public GameObjectScript
 {
 public:
     FactoryGameObjectScript(char const* name) : GameObjectScript(name) {}
-    GameObjectAI* GetAI(GameObject* me) const override { return AIFactory(me); }
+    GameObjectAI* GetAI(GameObject* go) const override { return AIFactory(go); }
 };
 
 #define RegisterGameObjectAIWithFactory(ai_name, factory_fn) new FactoryGameObjectScript<ai_name, &factory_fn>(#ai_name)
