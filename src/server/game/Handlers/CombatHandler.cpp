@@ -86,10 +86,12 @@ void WorldSession::SendAttackStop(Unit const* enemy)
 {
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4)); // we guess size
     data << GetPlayer()->GetPackGUID();
+
     if (enemy)
     {
+        uint8 nowDead = enemy->isDead();
         data << enemy->GetPackGUID();               // must be packed guid
-        data << enemy->isDead();
+        data << nowDead;
     }
     SendPacket(&data);
 }
