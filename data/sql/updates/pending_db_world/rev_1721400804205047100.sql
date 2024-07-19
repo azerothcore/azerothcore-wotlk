@@ -21,4 +21,4 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (15, 10996, 6, 0, 1, 2, 0, 52570, 1, 1, 1, 0, 0, '', 'Show Gossip Option 6 if player does not have item \'Ashen Band of Greater Might\' AND'),
 (15, 10996, 6, 0, 1, 2, 0, 52571, 1, 1, 1, 0, 0, '', 'Show Gossip Option 6 if player does not have item \'Ashen Band of Unmatched Might\' AND'),
 (15, 10996, 6, 0, 1, 2, 0, 52572, 1, 1, 1, 0, 0, '', 'Show Gossip Option 6 if player does not have item \'Ashen Band of Endless Might\' AND'),
-(15, 10996, 6, 0, 1, 8, 0, 24815, 0, 0, 0, 0, 0, '', 'Show Gossip Option 6 if Quest \'Choose your path\' is completed');
+(15, 10996, 6, 0, 1, 8, 0, 24815, 0, 0, 0, 0, 0, '', 'Show Gossip Option 6 if Quest \'Choose your path\' is rewarded');
