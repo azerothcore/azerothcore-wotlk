@@ -331,11 +331,12 @@ class spell_ioc_repair_turret_aura : public AuraScript
 
 enum blastCriteria
 {
-    SPELL_SEAFORIUM_BLAST           = 66676,
-    SPELL_HUGE_SEAFORIUM_BLAST      = 66672,
-
-    SPELL_BOMB_INABLE_CREDIT        = 68366,
-    SPELL_BOMB_INATION_CREDIT       = 68367,
+    SPELL_SEAFORIUM_BLAST         = 66676,
+    SPELL_SEAFORIUM_BLAST_H       = 67814,
+    SPELL_HUGE_SEAFORIUM_BLAST    = 66672,
+    SPELL_HUGE_SEAFORIUM_BLAST_H  = 67813,
+    SPELL_BOMB_INABLE_CREDIT      = 68366,
+    SPELL_BOMB_INATION_CREDIT     = 68367
 };
 
 class spell_ioc_bomb_blast_criteria : public SpellScript
@@ -347,16 +348,20 @@ class spell_ioc_bomb_blast_criteria : public SpellScript
         return ValidateSpellInfo({ SPELL_BOMB_INABLE_CREDIT, SPELL_BOMB_INATION_CREDIT });
     }
 
-    void HandleGameObjectDamage(SpellEffIndex  /*effIndex*/)
+    void HandleGameObjectDamage(SpellEffIndex /*effIndex*/)
     {
+        uint32 creditSpell = 0;
         Unit* owner = GetCaster()->GetOwner();
         if (!owner)
             return;
 
-        if (GetSpellInfo()->Id == SPELL_SEAFORIUM_BLAST)
-            owner->CastSpell(owner, SPELL_BOMB_INABLE_CREDIT, true);
-        else if (GetSpellInfo()->Id == SPELL_HUGE_SEAFORIUM_BLAST)
-            owner->CastSpell(owner, SPELL_BOMB_INATION_CREDIT, true);
+        uint32 spellId = GetSpellInfo()->Id;
+        if (spellId == SPELL_SEAFORIUM_BLAST || spellId == SPELL_SEAFORIUM_BLAST_H)
+            creditSpell = SPELL_BOMB_INABLE_CREDIT;
+        else if (spellId == SPELL_HUGE_SEAFORIUM_BLAST || spellId == SPELL_HUGE_SEAFORIUM_BLAST_H)
+            creditSpell = SPELL_BOMB_INATION_CREDIT;
+
+        owner->CastSpell(owner, creditSpell, true);
     }
 
     void Register() override

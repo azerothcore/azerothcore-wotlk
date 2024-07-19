@@ -104,7 +104,6 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_VENGEFUL_SPIRIT:
                 case NPC_SHADOWY_CONSTRUCT:
                     if (Creature* teron = GetCreature(DATA_TERON_GOREFIEND))
                         teron->AI()->JustSummoned(creature);
