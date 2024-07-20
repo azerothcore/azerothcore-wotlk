@@ -6741,7 +6741,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
         if (DisableMgr::IsDisabledFor(DISABLE_TYPE_MAP, target_map, this))
         {
-            GetSession()->SendAreaTriggerMessage("{}", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
+            GetSession()->SendAreaTriggerMessage("%s", GetSession()->GetAcoreString(LANG_INSTANCE_CLOSED));
             return false;
         }
 
@@ -6879,7 +6879,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                         {
                             ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
                         }
-                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), ar->levelMin, name);
+                        GetSession()->SendAreaTriggerMessage(GetSession()->GetAcoreString(LANG_LEVEL_MINREQUIRED_AND_ITEM), ar->levelMin, name.c_str());
                     }
                     else if (LevelMin)
                     {
