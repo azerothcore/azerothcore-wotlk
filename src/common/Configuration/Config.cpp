@@ -144,29 +144,17 @@ namespace
 
             // read line error
             if (!in.good() && !in.eof())
-            {
                 throw ConfigException(Acore::StringFormatFmt("> Config::LoadFile: Failure to read line number {} in file '{}'", lineNumber, file));
-            }
 
             // remove whitespace in line
             line = Acore::String::Trim(line, in.getloc());
 
             if (line.empty())
-            {
                 continue;
-            }
 
-            // comments
+            // comments and headers
             if (line[0] == '#' || line[0] == '[')
-            {
                 continue;
-            }
-
-            size_t found = line.find_first_of('#');
-            if (found != std::string::npos)
-            {
-                line = line.substr(0, found);
-            }
 
             auto const equal_pos = line.find('=');
 
@@ -183,9 +171,7 @@ namespace
 
             // Skip if 2+ same options in one config file
             if (IsDuplicateOption(entry))
-            {
                 continue;
-            }
 
             // Add to temp container
             fileConfigs.emplace(entry, value);
