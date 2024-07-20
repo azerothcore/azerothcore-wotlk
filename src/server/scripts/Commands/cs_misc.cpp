@@ -1353,7 +1353,8 @@ public:
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
         {
-            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName() : "Server"), target->GetName(), kickReasonStr);
+            std::string sender = handler->GetSession() ? handler->GetSession()->GetPlayerName() : "Server";
+            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, sender, target->GetName(), kickReasonStr);
         }
         else
         {
