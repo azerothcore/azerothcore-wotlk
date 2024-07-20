@@ -150,6 +150,11 @@ void ChatHandler::SendSysMessage(uint32 entry)
     SendSysMessage(GetAcoreString(entry));
 }
 
+void ChatHandler::PSendSysMessage(std::string_view str, bool escapeCharacters)
+{
+    SendSysMessage(str, escapeCharacters);
+}
+
 void ChatHandler::SendErrorMessage(uint32 entry)
 {
     SendSysMessage(entry);
@@ -172,7 +177,7 @@ bool ChatHandler::_ParseCommands(std::string_view text)
         return false;
 
     // Send error message for GMs
-    SendErrorMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(text));
+    SendErrorMessage(LANG_CMD_INVALID, text);
     return true;
 }
 
