@@ -1916,7 +1916,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             Probability = 40.0f;
 
         // Daze application
-        if (sWorld->getBoolConfig(CONFIG_MUNCHING_BLIZZLIKE))
+        if (sWorld->getBoolConfig(CONFIG_ENABLE_DAZE))
             if (roll_chance_f(std::max(0.0f, Probability)))
                 CastSpell(victim, 1604, true);
     }
