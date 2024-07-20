@@ -16,6 +16,7 @@ Versions of AzerothCore:
 | ------------------ | ------------------ |
 | master             | :white_check_mark: |
 | Any playerbot fork | :red_circle:       |
+| Any NPCBot fork    | :red_circle:       |
 
 Versions of MySQL:
 

@@ -217,7 +217,7 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
 
     uint32 _s = getMSTime();
 
-#if MYSQL_VERSION_ID >= 80400
+#if MYSQL_VERSION_ID >= 80300
     if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetParameterCount(), nullptr))
 #else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
@@ -269,7 +269,7 @@ bool MySQLConnection::_Query(PreparedStatementBase* stmt, MySQLPreparedStatement
 
     uint32 _s = getMSTime();
 
-#if MYSQL_VERSION_ID >= 80400
+#if MYSQL_VERSION_ID >= 80300
     if (mysql_stmt_bind_named_param(msql_STMT, msql_BIND, m_mStmt->GetParameterCount(), nullptr))
 #else
     if (mysql_stmt_bind_param(msql_STMT, msql_BIND))
