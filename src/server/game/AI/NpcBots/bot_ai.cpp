@@ -2216,7 +2216,7 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
         botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_HIT) << ": +" << float(hit) << " " << LocalizedNpcText(player, BOT_TEXT_PCT);
         botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_EXPERTISE) << ": " << int32(expertise) << " (-" << float(float(expertise) * 0.25f) << " " << LocalizedNpcText(player, BOT_TEXT_PCT) << ")";
         botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_ARMOR_PEN) << ": " << float(me->GetCreatureArmorPenetrationCoef()) << " " << LocalizedNpcText(player, BOT_TEXT_PCT);
-        botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_SPELL_PEN) << ": " << uint32(spellpen);
+        botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_SPELL_PEN) << ": " << uint32(spellpen) + uint32(std::abs(me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, SPELL_SCHOOL_MASK_MAGIC)));
 
         for (uint8 i = SPELL_SCHOOL_HOLY; i != MAX_SPELL_SCHOOL; ++i)
         {
