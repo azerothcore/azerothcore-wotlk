@@ -149,10 +149,6 @@ runs:
       shell: bash
       run: sudo systemctl start mysql.service
 
-    - name: run dbimport
-      shell: bash
-      run: env/dist/bin/dbimport
-
     - name: Dry run authserver
       shell: bash
       run: timeout 5m env/dist/bin/authserver --dry-run
