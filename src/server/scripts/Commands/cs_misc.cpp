@@ -2455,7 +2455,7 @@ public:
 
             if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
             {
-                sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy, nameLink, secsToTimeString(muteDuration, true), muteReasonStr);
+                sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
             }
 
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(muteDuration, true), muteBy, muteReasonStr);
@@ -2482,7 +2482,7 @@ public:
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
         {
-            sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy, nameLink, secsToTimeString(muteDuration, true), muteReasonStr);
+            sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
         }
         else
         {
