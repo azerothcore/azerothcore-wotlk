@@ -4395,7 +4395,7 @@ MunchingBlizzlike.Enabled = 1
 
 #
 #    Daze.Enabled
-#        Description: Enable or disable the chance for mobs melee attacks to daze the victim.
+#        Description: Enable or disable the chance for mob melee attacks to daze the victim.
 #        Default: 1 - (Blizzlike)
 
 Daze.Enabled = 1
