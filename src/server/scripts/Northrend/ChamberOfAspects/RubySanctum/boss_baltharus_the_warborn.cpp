@@ -18,10 +18,12 @@
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "ObjectMgr.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScriptLoader.h"
 #include "ruby_sanctum.h"
+#include "SpellScript.h"
 
 enum Texts
 {

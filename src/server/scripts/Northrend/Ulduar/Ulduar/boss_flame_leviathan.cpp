@@ -16,11 +16,11 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "CellImpl.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
 #include "GridNotifiers.h"
-#include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

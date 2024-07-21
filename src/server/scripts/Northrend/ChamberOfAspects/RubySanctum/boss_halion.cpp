@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "MapMgr.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
