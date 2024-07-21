@@ -17094,7 +17094,7 @@ void Unit::SendComboPoints()
         return;
     }
 
-    PackedGuid const packGUID = m_comboTarget ? m_comboTarget->GetPackGUID() : PackedGuid();
+    SmartGUID const packGUID = m_comboTarget ? m_comboTarget->GetPackGUID() : SmartGUID();
     if (Player* playerMe = ToPlayer())
     {
         WorldPacket data(SMSG_UPDATE_COMBO_POINTS, packGUID.size() + 1);

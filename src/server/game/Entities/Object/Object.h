@@ -108,7 +108,7 @@ public:
 
     [[nodiscard]] static ObjectGuid GetGUID(Object const* o) { return o ? o->GetGUID() : ObjectGuid::Empty; }
     [[nodiscard]] ObjectGuid GetGUID() const { return GetGuidValue(OBJECT_FIELD_GUID); }
-    [[nodiscard]] PackedGuid const& GetPackGUID() const { return m_PackGUID; }
+    [[nodiscard]] SmartGUID const& GetPackGUID() const { return m_PackGUID; }
     [[nodiscard]] uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
     void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
 
@@ -255,7 +255,7 @@ protected:
 private:
     bool m_inWorld;
 
-    PackedGuid m_PackGUID;
+    SmartGUID m_PackGUID;
 
     // for output helpfull error messages from asserts
     [[nodiscard]] bool PrintIndexError(uint32 index, bool set) const;

@@ -138,7 +138,7 @@ void Object::_Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhig
     ObjectGuid guid(guidhigh, entry, guidlow);
     SetGuidValue(OBJECT_FIELD_GUID, guid);
     SetUInt32Value(OBJECT_FIELD_TYPE, m_objectType);
-    m_PackGUID.Set(guid);
+    m_PackGUID.Pack(guid);
 }
 
 std::string Object::_ConcatFields(uint16 startIndex, uint16 size) const

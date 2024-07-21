@@ -78,9 +78,9 @@ ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid& guid)
     return buf;
 }
 
-ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid)
+ByteBuffer& operator<<(ByteBuffer& buf, SmartGUID const& guid)
 {
-    buf.append(guid._packedGuid);
+    buf.append(guid.m_packedGUID);
     return buf;
 }
 

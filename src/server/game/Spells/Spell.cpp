@@ -4735,7 +4735,7 @@ void Spell::SendSpellStart()
     if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
 
-    PackedGuid realCasterGUID = m_caster->GetPackGUID();
+    SmartGUID realCasterGUID = m_caster->GetPackGUID();
     if (TempSummon const* tempSummon = m_caster->ToTempSummon())
     {
         if (tempSummon->GetEntry() == WORLD_TRIGGER)
@@ -4833,7 +4833,7 @@ void Spell::SendSpellGo()
     if (!m_spellInfo->StartRecoveryTime)
         castFlags |= CAST_FLAG_NO_GCD;
 
-    PackedGuid realCasterGUID = m_caster->GetPackGUID();
+    SmartGUID realCasterGUID = m_caster->GetPackGUID();
     if (TempSummon const* tempSummon = m_caster->ToTempSummon())
     {
         if (tempSummon->GetEntry() == WORLD_TRIGGER)

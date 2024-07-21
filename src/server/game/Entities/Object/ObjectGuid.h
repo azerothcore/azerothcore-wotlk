@@ -106,7 +106,7 @@ GUID_TRAIT_MAP_SPECIFIC(HighGuid::DynamicObject)
 GUID_TRAIT_MAP_SPECIFIC(HighGuid::Corpse)
 
 class ObjectGuid;
-class PackedGuid;
+class SmartGUID;
 
 struct PackedGuidReader
 {
@@ -137,7 +137,7 @@ class ObjectGuid
         void Set(uint64 guid) { _guid = guid; }
         void Clear() { _guid = 0; }
 
-        [[nodiscard]] PackedGuid WriteAsPacked() const;
+        [[nodiscard]] SmartGUID WriteAsPacked() const;
 
         [[nodiscard]] uint64   GetRawValue() const { return _guid; }
         [[nodiscard]] HighGuid GetHigh() const { return HighGuid((_guid >> 48) & 0x0000FFFF); }
@@ -259,22 +259,22 @@ typedef std::unordered_set<ObjectGuid> GuidUnorderedSet;
 // minimum buffer size for packed guid is 9 bytes
 #define PACKED_GUID_MIN_BUFFER_SIZE 9
 
-class PackedGuid
+class SmartGUID
 {
-    friend ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
+    friend ByteBuffer& operator<<(ByteBuffer& buf, SmartGUID const& guid);
 
     public:
-        explicit PackedGuid() : _packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { _packedGuid.appendPackGUID(0); }
-        explicit PackedGuid(uint64 guid) : _packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { _packedGuid.appendPackGUID(guid); }
-        explicit PackedGuid(ObjectGuid guid) : _packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { _packedGuid.appendPackGUID(guid.GetRawValue()); }
+        explicit SmartGUID() : m_packedGUID(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGUID.appendPackGUID(0); }
+        explicit SmartGUID(uint64 guid) : m_packedGUID(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGUID.appendPackGUID(guid); }
+        explicit SmartGUID(ObjectGuid guid) : m_packedGUID(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGUID.appendPackGUID(guid.GetRawValue()); }
 
-        void Set(uint64 guid) { _packedGuid.wpos(0); _packedGuid.appendPackGUID(guid); }
-        void Set(ObjectGuid guid) { _packedGuid.wpos(0); _packedGuid.appendPackGUID(guid.GetRawValue()); }
+        void Pack(uint64 guid) { m_packedGUID.wpos(0); m_packedGUID.appendPackGUID(guid); }
+        void Pack(ObjectGuid guid) { m_packedGUID.wpos(0); m_packedGUID.appendPackGUID(guid.GetRawValue()); }
 
-        [[nodiscard]] std::size_t size() const { return _packedGuid.size(); }
+        [[nodiscard]] std::size_t size() const { return m_packedGUID.size(); }
 
     private:
-        ByteBuffer _packedGuid;
+        ByteBuffer m_packedGUID;
 };
 
 class ObjectGuidGeneratorBase
@@ -310,10 +310,10 @@ public:
 ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
 ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid&       guid);
 
-ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
+ByteBuffer& operator<<(ByteBuffer& buf, SmartGUID const& guid);
 ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid);
 
-inline PackedGuid ObjectGuid::WriteAsPacked() const { return PackedGuid(*this); }
+inline SmartGUID ObjectGuid::WriteAsPacked() const { return SmartGUID(*this); }
 
 namespace std
 {
