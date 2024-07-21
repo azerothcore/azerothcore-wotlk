@@ -93,6 +93,7 @@ public:
             { "dev",               HandleDevCommand,               SEC_ADMINISTRATOR,      Console::No  },
             { "gps",               HandleGPSCommand,               SEC_MODERATOR,          Console::No  },
             { "aura",              HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  },
+            { "aurastack",         HandleAuraStacksCommand,        SEC_GAMEMASTER,         Console::No  },
             { "unaura",            HandleUnAuraCommand,            SEC_GAMEMASTER,         Console::No  },
             { "appear",            HandleAppearCommand,            SEC_MODERATOR,          Console::No  },
             { "summon",            HandleSummonCommand,            SEC_GAMEMASTER,         Console::No  },
@@ -649,6 +650,45 @@ public:
         }
 
         Aura::TryRefreshStackOrCreate(spell, MAX_EFFECT_MASK, target, target);
+
+        return true;
+    }
+
+    static bool HandleAuraStacksCommand(ChatHandler* handler, SpellInfo const* spell, int32 stacks)
+    {
+        if (!spell)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
+            return false;
+        }
+
+        if (!SpellMgr::IsSpellValid(spell))
+        {
+            handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+            return false;
+        }
+
+        if (!stacks)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_AURASTACK_NO_STACK);
+            return false;
+        }
+
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+        {
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            return false;
+        }
+
+        Aura* aur = target->GetAura(spell->Id);
+        if (!aur)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_AURASTACK_NO_AURA, spell->Id);
+            return false;
+        }
+
+        aur->ModStackAmount(stacks);
 
         return true;
     }
