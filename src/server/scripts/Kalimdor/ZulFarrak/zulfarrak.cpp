@@ -40,8 +40,6 @@ npc_sergeant_bly
 npc_weegli_blastfuse
 EndContentData */
 
-#include "GridNotifiersImpl.h"
-
 /*######
 ## npc_sergeant_bly
 ######*/

@@ -20,7 +20,6 @@
 
 #define DataHeader "WC"
 
-#include "CreatureAI.h"
 
 enum DataTypes
 {
