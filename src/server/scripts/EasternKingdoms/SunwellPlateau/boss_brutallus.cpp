@@ -17,7 +17,11 @@
 
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "MapReference.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "WorldSession.h"
 #include "sunwell_plateau.h"
