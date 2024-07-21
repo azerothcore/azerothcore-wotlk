@@ -20,7 +20,6 @@
 
 #define DataHeader "WC"
 
-
 enum DataTypes
 {
     TYPE_LORD_COBRAHN           = 0,
