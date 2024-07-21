@@ -17,6 +17,7 @@
 
 #include "zulfarrak.h"
 #include "Cell.h"
+#include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
