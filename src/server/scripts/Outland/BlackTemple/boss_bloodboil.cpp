@@ -19,6 +19,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "SpellScript.h"
 
 enum Says
 {

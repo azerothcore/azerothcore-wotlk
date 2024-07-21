@@ -20,6 +20,8 @@
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "serpent_shrine.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Talk
 {

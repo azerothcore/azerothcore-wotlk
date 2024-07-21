@@ -23,6 +23,7 @@
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "magtheridons_lair.h"
+#include "SpellScript.h"
 
 enum Yells
 {

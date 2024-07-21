@@ -19,12 +19,6 @@
 #define BLACK_TEMPLE_H_
 
 #include "CreatureAIImpl.h"
-#include "GridNotifiers.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "ScriptedGossip.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
 
 #define DataHeader "BT"
 

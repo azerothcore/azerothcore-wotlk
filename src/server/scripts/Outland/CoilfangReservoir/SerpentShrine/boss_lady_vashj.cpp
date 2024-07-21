@@ -22,6 +22,7 @@
 #include "SpellScriptLoader.h"
 #include "WorldSession.h"
 #include "serpent_shrine.h"
+#include "SpellScript.h"
 
 enum Says
 {

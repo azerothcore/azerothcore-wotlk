@@ -16,8 +16,9 @@
  */
 
 #include "CreatureScript.h"
-#include "Opcodes.h"
+#include "GridNotifiers.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "WorldPacket.h"
 #include "the_eye.h"
