@@ -87,13 +87,18 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable auraCommandTable =
+        {
+            { "stack",             HandleAuraStacksCommand,        SEC_GAMEMASTER,         Console::No  },
+            { "",                  HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  }
+        };
+
         static ChatCommandTable commandTable =
         {
             { "commentator",       HandleCommentatorCommand,       SEC_MODERATOR,          Console::No  },
             { "dev",               HandleDevCommand,               SEC_ADMINISTRATOR,      Console::No  },
             { "gps",               HandleGPSCommand,               SEC_MODERATOR,          Console::No  },
-            { "aura",              HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  },
-            { "aurastack",         HandleAuraStacksCommand,        SEC_GAMEMASTER,         Console::No  },
+            { "aura",              auraCommandTable                                                     },
             { "unaura",            HandleUnAuraCommand,            SEC_GAMEMASTER,         Console::No  },
             { "appear",            HandleAppearCommand,            SEC_MODERATOR,          Console::No  },
             { "summon",            HandleSummonCommand,            SEC_GAMEMASTER,         Console::No  },
@@ -130,7 +135,7 @@ public:
             { "cometome",          HandleComeToMeCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "damage",            HandleDamageCommand,            SEC_GAMEMASTER,         Console::No  },
             { "combatstop",        HandleCombatStopCommand,        SEC_GAMEMASTER,         Console::Yes },
-            { "flusharenapoints",  HandleFlushArenaPointsCommand,  SEC_ADMINISTRATOR,      Console::Yes  },
+            { "flusharenapoints",  HandleFlushArenaPointsCommand,  SEC_ADMINISTRATOR,      Console::Yes },
             { "freeze",            HandleFreezeCommand,            SEC_GAMEMASTER,         Console::No  },
             { "unfreeze",          HandleUnFreezeCommand,          SEC_GAMEMASTER,         Console::No  },
             { "possess",           HandlePossessCommand,           SEC_GAMEMASTER,         Console::No  },
@@ -654,7 +659,7 @@ public:
         return true;
     }
 
-    static bool HandleAuraStacksCommand(ChatHandler* handler, SpellInfo const* spell, int32 stacks)
+    static bool HandleAuraStacksCommand(ChatHandler* handler, SpellInfo const* spell, int16 stacks)
     {
         if (!spell)
         {
@@ -685,6 +690,12 @@ public:
         if (!aur)
         {
             handler->SendErrorMessage(LANG_COMMAND_AURASTACK_NO_AURA, spell->Id);
+            return false;
+        }
+
+        if (aur && !spell->StackAmount)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_AURASTACK_CANT_STACK, spell->Id);
             return false;
         }
 
