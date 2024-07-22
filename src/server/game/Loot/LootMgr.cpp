@@ -477,9 +477,9 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
         // for items that start quests
         if (pProto->StartQuest)
         {
-            // Don't drop the item if the player has already finished the quest OR player already has the item in their inventory OR the player has not finished a prerequisite quest
+            // Don't drop the item if the player has already finished the quest OR player already has the item in their inventory, and that item is unique OR the player has not finished a prerequisite quest
             uint32 prevQuestId = sObjectMgr->GetQuestTemplate(pProto->StartQuest) ? sObjectMgr->GetQuestTemplate(pProto->StartQuest)->GetPrevQuestId() : 0;
-            if (player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE || player->HasItemCount(itemid) || (prevQuestId && !player->GetQuestRewardStatus(prevQuestId)))
+            if (player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE || (player->HasItemCount(itemid, pProto->MaxCount) && pProto->MaxCount) || (prevQuestId && !player->GetQuestRewardStatus(prevQuestId)))
                 return false;
         }
     }
