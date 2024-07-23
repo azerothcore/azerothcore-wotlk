@@ -62,12 +62,12 @@ namespace Acore::Impl::ChatCommands
             if (Optional<T> v = StringTo<T>(token, 0))
                 val = *v;
             else
-                return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, STRING_VIEW_FMT_ARG(token), GetTypeName<T>().c_str());
+                return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, token, GetTypeName<T>());
 
             if constexpr (std::is_floating_point_v<T>)
             {
                 if (!std::isfinite(val))
-                    return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, STRING_VIEW_FMT_ARG(token), GetTypeName<T>().c_str());
+                    return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, token, GetTypeName<T>());
             }
 
             return tail;
@@ -200,7 +200,7 @@ namespace Acore::Impl::ChatCommands
             }
 
             if (next1)
-                return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, STRING_VIEW_FMT_ARG(strVal), GetTypeName<T>().c_str());
+                return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, strVal, GetTypeName<T>());
             else
                 return next1;
         }

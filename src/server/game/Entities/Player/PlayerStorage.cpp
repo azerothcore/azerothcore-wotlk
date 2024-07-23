@@ -6640,11 +6640,11 @@ void Player::PrettyPrintRequirementsQuestList(const std::vector<const Progressio
 
         if (missingReq->note.empty())
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+            ChatHandler(GetSession()).PSendSysMessage("    - {}", stream.str());
         }
         else
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+            ChatHandler(GetSession()).PSendSysMessage("    - {} {} {}", stream.str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note);
         }
     }
 }
@@ -6673,11 +6673,11 @@ void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const Pro
 
         if (missingReq->note.empty())
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+            ChatHandler(GetSession()).PSendSysMessage("    - {}", stream.str());
         }
         else
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+            ChatHandler(GetSession()).PSendSysMessage("    - {} {} {}", stream.str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note);
         }
     }
 }
@@ -6711,11 +6711,11 @@ void Player::PrettyPrintRequirementsItemsList(const std::vector<const Progressio
 
         if (missingReq->note.empty())
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s", stream.str().c_str());
+            ChatHandler(GetSession()).PSendSysMessage("    - {}", stream.str());
         }
         else
         {
-            ChatHandler(GetSession()).PSendSysMessage("    - %s %s %s", stream.str().c_str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note.c_str());
+            ChatHandler(GetSession()).PSendSysMessage("    - {} {} {}", stream.str(), sObjectMgr->GetAcoreString(LANG_ACCESS_REQUIREMENT_NOTE, loc_idx), missingReq->note);
         }
     }
 }
@@ -6860,11 +6860,11 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     //Blizzlike method of printing out the requirements
                     if (missingPlayerQuests.size() && !missingPlayerQuests[0]->note.empty())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage("%s", missingPlayerQuests[0]->note.c_str());
+                        ChatHandler(GetSession()).PSendSysMessage("{}", missingPlayerQuests[0]->note);
                     }
                     else if (missingLeaderQuests.size() && !missingLeaderQuests[0]->note.empty())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage("%s", missingLeaderQuests[0]->note.c_str());
+                        ChatHandler(GetSession()).PSendSysMessage("{}", missingLeaderQuests[0]->note);
                     }
                     else if (mapDiff->hasErrorMessage)
                     {
@@ -6902,7 +6902,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     if (missingLeaderQuests.size())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS, leaderName.c_str());
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_QUESTS, leaderName);
                         PrettyPrintRequirementsQuestList(missingLeaderQuests);
                         errorAlreadyPrinted = true;
                     }
@@ -6915,7 +6915,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
                     }
                     if (missingLeaderAchievements.size())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS, leaderName.c_str());
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_COMPLETE_ACHIEVEMENTS, leaderName);
                         PrettyPrintRequirementsAchievementsList(missingLeaderAchievements);
                         errorAlreadyPrinted = true;
                     }
@@ -6929,7 +6929,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
 
                     if (missingLeaderItems.size())
                     {
-                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS, leaderName.c_str());
+                        ChatHandler(GetSession()).PSendSysMessage(LANG_ACCESS_REQUIREMENT_LEADER_OBTAIN_ITEMS, leaderName);
                         PrettyPrintRequirementsItemsList(missingLeaderItems);
                         errorAlreadyPrinted = true;
                     }

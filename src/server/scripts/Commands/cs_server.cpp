@@ -123,22 +123,22 @@ public:
             if (dbPort)
                 dbPortOutput = Acore::StringFormatFmt("Realmlist (Realm Id: {}) configured in port {}", realm.Id.Realm, dbPort);
             else
-                dbPortOutput = Acore::StringFormat("Realm Id: %u not found in `realmlist` table. Please check your setup", realm.Id.Realm);
+                dbPortOutput = Acore::StringFormatFmt("Realm Id: {} not found in `realmlist` table. Please check your setup", realm.Id.Realm);
         }
 
         HandleServerInfoCommand(handler);
 
-        handler->PSendSysMessage("Using SSL version: %s (library: %s)", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
-        handler->PSendSysMessage("Using Boost version: %i.%i.%i", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
-        handler->PSendSysMessage("Using CMake version: %s", GitRevision::GetCMakeVersion());
+        handler->PSendSysMessage("Using SSL version: {} (library: {})", OPENSSL_VERSION_TEXT, OpenSSL_version(OPENSSL_VERSION));
+        handler->PSendSysMessage("Using Boost version: {}.{}.{}", BOOST_VERSION / 100000, BOOST_VERSION / 100 % 1000, BOOST_VERSION % 100);
+        handler->PSendSysMessage("Using CMake version: {}", GitRevision::GetCMakeVersion());
 
-        handler->PSendSysMessage("Using MySQL version: %u", MySQL::GetLibraryVersion());
-        handler->PSendSysMessage("Found MySQL Executable: %s", GitRevision::GetMySQLExecutable());
+        handler->PSendSysMessage("Using MySQL version: {}", MySQL::GetLibraryVersion());
+        handler->PSendSysMessage("Found MySQL Executable: {}", GitRevision::GetMySQLExecutable());
 
-        handler->PSendSysMessage("Compiled on: %s", GitRevision::GetHostOSVersion());
+        handler->PSendSysMessage("Compiled on: {}", GitRevision::GetHostOSVersion());
 
         handler->PSendSysMessage("Worldserver listening connections on port %" PRIu16, worldPort);
-        handler->PSendSysMessage("%s", dbPortOutput.c_str());
+        handler->PSendSysMessage("{}", dbPortOutput);
 
         bool vmapIndoorCheck = sWorld->getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
         bool vmapLOSCheck = VMAP::VMapFactory::createOrGetVMapMgr()->isLineOfSightCalcEnabled();
@@ -151,7 +151,7 @@ public:
         subDirs.emplace_back("maps");
         if (vmapIndoorCheck || vmapLOSCheck || vmapHeightCheck)
         {
-            handler->PSendSysMessage("VMAPs status: Enabled. LineOfSight: %i, getHeight: %i, indoorCheck: %i", vmapLOSCheck, vmapHeightCheck, vmapIndoorCheck);
+            handler->PSendSysMessage("VMAPs status: Enabled. LineOfSight: {}, getHeight: {}, indoorCheck: {}", vmapLOSCheck, vmapHeightCheck, vmapIndoorCheck);
             subDirs.emplace_back("vmaps");
         }
         else
@@ -172,7 +172,7 @@ public:
 
             if (!std::filesystem::exists(mapPath))
             {
-                handler->PSendSysMessage("%s directory doesn't exist!. Using path: %s", subDir.c_str(), mapPath.generic_string().c_str());
+                handler->PSendSysMessage("{} directory doesn't exist!. Using path: {}", subDir, mapPath.generic_string());
                 continue;
             }
 
@@ -184,7 +184,7 @@ public:
                 return val;
             });
 
-            handler->PSendSysMessage(Acore::StringFormatFmt("{} directory located in {}. Total size: {} bytes", subDir.c_str(), mapPath.generic_string().c_str(), folderSize).c_str());
+            handler->PSendSysMessage("{} directory located in {}. Total size: {} bytes", subDir, mapPath.generic_string(), folderSize);
         }
 
         LocaleConstant defaultLocale = sWorld->GetDefaultDbcLocale();
@@ -211,9 +211,9 @@ public:
                 availableLocales += " ";
         }
 
-        handler->PSendSysMessage("Default DBC locale: %s.\nAll available DBC locales: %s", localeNames[defaultLocale], availableLocales.c_str());
+        handler->PSendSysMessage("Default DBC locale: {}.\nAll available DBC locales: {}", localeNames[defaultLocale], availableLocales);
 
-        handler->PSendSysMessage("Using World DB: %s", sWorld->GetDBVersion());
+        handler->PSendSysMessage("Using World DB: {}", sWorld->GetDBVersion());
 
         std::string lldb = "No updates found!";
         if (QueryResult resL = LoginDatabase.Query("SELECT name FROM updates ORDER BY name DESC LIMIT 1"))
@@ -234,22 +234,22 @@ public:
             lwdb = fields[0].Get<std::string>();
         }
 
-        handler->PSendSysMessage("Latest LoginDatabase update: %s", lldb.c_str());
-        handler->PSendSysMessage("Latest CharacterDatabase update: %s", lcdb.c_str());
-        handler->PSendSysMessage("Latest WorldDatabase update: %s", lwdb.c_str());
+        handler->PSendSysMessage("Latest LoginDatabase update: {}", lldb);
+        handler->PSendSysMessage("Latest CharacterDatabase update: {}", lcdb);
+        handler->PSendSysMessage("Latest WorldDatabase update: {}", lwdb);
 
-        handler->PSendSysMessage("LoginDatabase queue size: %zu", LoginDatabase.QueueSize());
-        handler->PSendSysMessage("CharacterDatabase queue size: %zu", CharacterDatabase.QueueSize());
-        handler->PSendSysMessage("WorldDatabase queue size: %zu", WorldDatabase.QueueSize());
+        handler->PSendSysMessage("LoginDatabase queue size: {}", LoginDatabase.QueueSize());
+        handler->PSendSysMessage("CharacterDatabase queue size: {}", CharacterDatabase.QueueSize());
+        handler->PSendSysMessage("WorldDatabase queue size: {}", WorldDatabase.QueueSize());
 
         if (Acore::Module::GetEnableModulesList().empty())
-            handler->SendSysMessage("No modules are enabled");
+            handler->PSendSysMessage("No modules are enabled");
         else
-            handler->SendSysMessage("List of enabled modules:");
+            handler->PSendSysMessage("List of enabled modules:");
 
         for (auto const& modName : Acore::Module::GetEnableModulesList())
         {
-            handler->SendSysMessage(Acore::StringFormatFmt("|- {}", modName));
+            handler->PSendSysMessage("|- {}", modName);
         }
 
         return true;
@@ -263,25 +263,25 @@ public:
         uint32 queuedSessionCount = sWorld->GetQueuedSessionCount();
         uint32 connPeak = sWorld->GetMaxActiveSessionCount();
 
-        handler->PSendSysMessage("%s", GitRevision::GetFullVersion());
+        handler->PSendSysMessage("{}", GitRevision::GetFullVersion());
         if (!queuedSessionCount)
-            handler->PSendSysMessage("Connected players: %u. Characters in world: %u.", activeSessionCount, playerCount);
+            handler->PSendSysMessage("Connected players: {}. Characters in world: {}.", activeSessionCount, playerCount);
         else
-            handler->PSendSysMessage("Connected players: %u. Characters in world: %u. Queue: %u.", activeSessionCount, playerCount, queuedSessionCount);
+            handler->PSendSysMessage("Connected players: {}. Characters in world: {}. Queue: {}.", activeSessionCount, playerCount, queuedSessionCount);
 
-        handler->PSendSysMessage("Connection peak: %u.", connPeak);
-        handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(GameTime::GetUptime().count()).c_str());
-        handler->PSendSysMessage("Update time diff: %ums. Last %d diffs summary:", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetDatasetSize());
-        handler->PSendSysMessage("|- Mean: %ums", sWorldUpdateTime.GetAverageUpdateTime());
-        handler->PSendSysMessage("|- Median: %ums", sWorldUpdateTime.GetPercentile(50));
-        handler->PSendSysMessage("|- Percentiles (95, 99, max): %ums, %ums, %ums",
+        handler->PSendSysMessage("Connection peak: {}.", connPeak);
+        handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(GameTime::GetUptime().count()));
+        handler->PSendSysMessage("Update time diff: {}ms. Last %d diffs summary:", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetDatasetSize());
+        handler->PSendSysMessage("|- Mean: {}ms", sWorldUpdateTime.GetAverageUpdateTime());
+        handler->PSendSysMessage("|- Median: {}ms", sWorldUpdateTime.GetPercentile(50));
+        handler->PSendSysMessage("|- Percentiles (95, 99, max): {}ms, {}ms, {}ms",
                                  sWorldUpdateTime.GetPercentile(95),
                                  sWorldUpdateTime.GetPercentile(99),
                                  sWorldUpdateTime.GetPercentile(100));
 
         //! Can't use sWorld->ShutdownMsg here in case of console command
         if (sWorld->IsShuttingDown())
-            handler->PSendSysMessage(LANG_SHUTDOWN_TIMELEFT, secsToTimeString(sWorld->GetShutDownTimeLeft()).append(".").c_str());
+            handler->PSendSysMessage(LANG_SHUTDOWN_TIMELEFT, secsToTimeString(sWorld->GetShutDownTimeLeft()).append("."));
 
         return true;
     }
