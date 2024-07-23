@@ -16,7 +16,6 @@
  */
 
 #include "Channel.h"
-#include "CreatureScript.h"
 #include "Group.h"
 #include "Guild.h"
 #include "Log.h"
@@ -64,10 +63,15 @@ public:
             player->GetName(), chatType, lang, msg);
     }
 
-    void OnChat(Player* player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Player* receiver) override
+    void OnChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) override
     {
-        LOG_INFO("chat.whisper", "Player {} tells {}: {}",
-               player->GetName(), receiver ? receiver->GetName() : "<unknown>", msg);
+        //! NOTE:
+        //! LANG_ADDON can only be sent by client in "PARTY", "RAID", "GUILD", "BATTLEGROUND", "WHISPER"
+        std::string logType = (lang != LANG_ADDON) ? "chat." : "chat.addon.";
+        std::string msgType = "whisper";
+
+        LOG_INFO(logType + msgType, "Player {} {} {}: {}",
+               player->GetName(), msgType, receiver ? receiver->GetName() : "<unknown>", msg);
     }
 
     void OnChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group) override

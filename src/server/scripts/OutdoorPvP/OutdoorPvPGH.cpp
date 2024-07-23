@@ -16,7 +16,6 @@
  */
 
 #include "OutdoorPvPGH.h"
-#include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "MapMgr.h"
 #include "OutdoorPvPMgr.h"

@@ -12,15 +12,15 @@ concurrency:
 jobs:
   build:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
-        os: [ubuntu-24.04]
-        compiler: [clang]
+        include:
+          - os: ubuntu-24.04
+            compiler:
+              CC: clang-18
+              CXX: clang++-18
     runs-on: ${{ matrix.os }}
-    name: ${{ matrix.os }}-${{ matrix.compiler }}
-    env:
-      COMPILER: ${{ matrix.compiler }}
+    name: ${{ matrix.os }}-${{ matrix.compiler.CC }}
     if: |
       github.repository == 'liyunfan1223/azerothcore-wotlk' && !github.event.pull_request.draft
       && (
@@ -29,23 +29,9 @@ jobs:
       )
     steps:
       - uses: actions/checkout@v4
-      - name: Cache
-        uses: actions/cache@v4
-        env:
-          cache-name: cache-tools
+      - uses: ./.github/actions/linux-build
         with:
-          path: var/ccache
-          key: ${{ env.cache-name }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ github.ref }}-${{ github.sha }}
-          restore-keys: |
-            ${{ env.cache-name }}-${{ matrix.os }}-${{ matrix.compiler }}-${{ github.ref }}-
-            ${{ env.cache-name }}-${{ matrix.os }}-${{ matrix.compiler }}-
-            ${{ env.cache-name }}-${{ matrix.os }}-
-      - name: Configure OS
-        run: source ./acore.sh install-deps
-        env:
-          CONTINUOUS_INTEGRATION: true
-      - name: Create conf/config.sh
-        run: source ./apps/ci/ci-conf-tools.sh
-      - name: Build
-        run: source ./apps/ci/ci-compile.sh
-
+          CC: ${{ matrix.compiler.CC }}
+          CXX: ${{ matrix.compiler.CXX }}
+          tools: all
+          pch: false

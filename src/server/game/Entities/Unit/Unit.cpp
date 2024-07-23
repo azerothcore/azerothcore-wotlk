@@ -1915,8 +1915,10 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         if (Probability > 40.0f)
             Probability = 40.0f;
 
-        if (roll_chance_f(std::max(0.0f, Probability)))
-            CastSpell(victim, 1604, true);
+        // Daze application
+        if (sWorld->getBoolConfig(CONFIG_ENABLE_DAZE))
+            if (roll_chance_f(std::max(0.0f, Probability)))
+                CastSpell(victim, 1604, true);
     }
 
     if (GetTypeId() == TYPEID_PLAYER)
@@ -3054,9 +3056,8 @@ void Unit::SendMeleeAttackStop(Unit* victim)
 
     if (victim)
     {
-        uint8 nowDead = victim->isDead();
         data << victim->GetPackGUID();
-        data << nowDead;
+        data << (uint32)victim->isDead();
     }
     SendMessageToSet(&data, true);
     LOG_DEBUG("entities.unit", "WORLD: Sent SMSG_ATTACKSTOP");

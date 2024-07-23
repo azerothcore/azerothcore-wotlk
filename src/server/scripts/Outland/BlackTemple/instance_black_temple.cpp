@@ -20,6 +20,9 @@
 #include "InstanceScript.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 DoorData const doorData[] =
 {
@@ -104,7 +107,6 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_VENGEFUL_SPIRIT:
                 case NPC_SHADOWY_CONSTRUCT:
                     if (Creature* teron = GetCreature(DATA_TERON_GOREFIEND))
                         teron->AI()->JustSummoned(creature);

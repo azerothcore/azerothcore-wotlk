@@ -248,19 +248,6 @@ namespace Acore::ChatCommands
         ChatCommandBuilder(char const* name, std::vector<ChatCommandBuilder> const& subCommands)
             : _name{ ASSERT_NOTNULL(name) }, _data{ std::in_place_type<SubCommandEntry>, subCommands } { }
 
-        [[deprecated("char const* parameters to command handlers are deprecated; convert this to a typed argument handler instead")]]
-        ChatCommandBuilder(char const* name, bool(&handler)(ChatHandler*, char const*), uint32 securityLevel, Acore::ChatCommands::Console allowConsole)
-            : ChatCommandBuilder(name, handler, AcoreStrings(), securityLevel, allowConsole) { }
-
-        template <typename TypedHandler>
-        [[deprecated("you are using the old-style command format; convert this to the new format ({ name, handler (not a pointer!), permission, Console::(Yes/No) })")]]
-        ChatCommandBuilder(char const* name, uint32 securityLevel, bool console, TypedHandler* handler, char const*)
-            : ChatCommandBuilder(name, *handler, AcoreStrings(), securityLevel, static_cast<Acore::ChatCommands::Console>(console)) { }
-
-        [[deprecated("you are using the old-style command format; convert this to the new format ({ name, subCommands })")]]
-        ChatCommandBuilder(char const* name, uint32, bool, std::nullptr_t, char const*, std::vector <ChatCommandBuilder> const& sub)
-            : ChatCommandBuilder(name, sub) { }
-
     private:
         std::string_view _name;
         std::variant<InvokerEntry, SubCommandEntry> _data;

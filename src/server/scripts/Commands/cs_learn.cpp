@@ -50,7 +50,7 @@ public:
 
         static ChatCommandTable learnAllCommandTable =
         {
-            { "my", learnAllMyCommandTable },
+            { "my",        learnAllMyCommandTable },
             { "gm",        HandleLearnAllGMCommand,            SEC_GAMEMASTER, Console::No },
             { "crafts",    HandleLearnAllCraftsCommand,        SEC_GAMEMASTER, Console::No },
             { "default",   HandleLearnAllDefaultCommand,       SEC_GAMEMASTER, Console::No },
@@ -60,14 +60,14 @@ public:
 
         static ChatCommandTable learnCommandTable =
         {
-            { "all", learnAllCommandTable },
+            { "all",  learnAllCommandTable },
             { "",     HandleLearnCommand,                      SEC_GAMEMASTER, Console::No }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "learn", learnCommandTable },
-            { "unlearn",     HandleUnLearnCommand,             SEC_GAMEMASTER, Console::No }
+            { "learn",   learnCommandTable },
+            { "unlearn", HandleUnLearnCommand,             SEC_GAMEMASTER, Console::No }
         };
         return commandTable;
     }
