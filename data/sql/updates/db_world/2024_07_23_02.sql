@@ -1,3 +1,4 @@
+-- DB update 2024_07_23_01 -> 2024_07_23_02
 --
 UPDATE `acore_string` SET `content_default` = REPLACE(content_default, '%s', '{}');
 UPDATE `acore_string` SET `content_default` = REPLACE(content_default, '%u', '{}');
