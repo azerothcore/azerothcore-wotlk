@@ -145,7 +145,7 @@ struct npc_doomfire_spirit : public ScriptedAI
 {
     npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
-    float const turnConstant = 0.785402f;
+    float const turnConstant = 0.785402f; // 45 degree turns, verified with sniffs
     float fAngle = urand(0, M_PI * 2);
 
     void Reset() override
@@ -153,24 +153,22 @@ struct npc_doomfire_spirit : public ScriptedAI
         scheduler.CancelAll();
         ScheduleTimedEvent(0s, [&] {
             float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * turnConstant);
-            Position pos = GetFirstRandomAngleCollisionPosition(8.f, nextOrientation); // both orientation and distance verified with sniffs
-            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
+            Position pos;
+            float dist = 8.f;
+
+            while (dist >= 0)
+            {
+                pos = me->WorldObject::GetFirstCollisionPosition(dist, nextOrientation);
+                if (me->GetDistance(pos) == dist)
+                    break;
+                dist -= 2.0; // Distance drops by two units with each unsuccessful attempt
+            }
+            if (dist > 0)
+                me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
+
             }, 1600ms);
 
         fAngle = urand(0, M_PI * 2);
-    }
-
-    Position GetFirstRandomAngleCollisionPosition(float dist, float angle)
-    {
-        Position pos;
-        for (uint32 i = 0; i < 10; ++i)
-        {
-            pos = me->WorldObject::GetFirstCollisionPosition(dist, angle);
-            if (me->GetDistance(pos) > dist * 0.8f) // if at least 80% distance, good enough
-                break;
-            angle += (M_PI / 5); // else try slightly different angle
-        }
-        return pos;
     }
 
     void UpdateAI(uint32 diff) override
