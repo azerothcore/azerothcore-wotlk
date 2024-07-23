@@ -163,8 +163,10 @@ struct npc_doomfire_spirit : public ScriptedAI
                     break;
                 dist -= 2.0; // Distance drops by two units with each unsuccessful attempt
             }
-            if (dist) // Orientation need not change if not going to move
+            if (dist)
                 me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
+            else // Orientation does not change if not moving, verified with sniffs
+                me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetOrientation());
 
             }, 1600ms);
 
