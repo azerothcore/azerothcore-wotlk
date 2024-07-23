@@ -122,7 +122,7 @@ public:
 
         private:
             float _conflagrateThreat;
-            ObjectGuid _conflagrateTarget;
+            WOWGUID _conflagrateTarget;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

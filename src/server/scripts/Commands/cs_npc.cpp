@@ -30,7 +30,7 @@
 
 using namespace Acore::ChatCommands;
 
-using CreatureSpawnId = Variant<Hyperlink<creature>, ObjectGuid::LowType>;
+using CreatureSpawnId = Variant<Hyperlink<creature>, WOWGUID::LowType>;
 using CreatureEntry = Variant<Hyperlink<creature_entry>, uint32>;
 
 struct NpcFlagText
@@ -216,7 +216,7 @@ public:
         if (Transport* tt = chr->GetTransport())
             if (MotionTransport* trans = tt->ToMotionTransport())
             {
-                ObjectGuid::LowType guid = sObjectMgr->GenerateCreatureSpawnId();
+                WOWGUID::LowType guid = sObjectMgr->GenerateCreatureSpawnId();
                 CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
                 data.id1 = id;
                 data.phaseMask = chr->GetPhaseMaskForSpawn();
@@ -242,7 +242,7 @@ public:
 
         creature->SaveToDB(map->GetId(), (1 << map->GetSpawnMode()), chr->GetPhaseMaskForSpawn());
 
-        ObjectGuid::LowType spawnId = creature->GetSpawnId();
+        WOWGUID::LowType spawnId = creature->GetSpawnId();
 
         // To call _LoadGoods(); _LoadQuests(); CreateTrainerSpells()
         // current "creature" variable is deleted and created fresh new, otherwise old values might trigger asserts or cause undefined behavior
@@ -683,7 +683,7 @@ public:
             do
             {
                 Field* fields = result->Fetch();
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                WOWGUID::LowType guid = fields[0].Get<uint32>();
                 uint32 entry = fields[1].Get<uint32>();
                 //uint32 entry2 = fields[2].Get<uint32>();
                 //uint32 entry3 = fields[3].Get<uint32>();
@@ -715,7 +715,7 @@ public:
         if (!creature)
             return false;
 
-        ObjectGuid::LowType lowguid = creature->GetSpawnId();
+        WOWGUID::LowType lowguid = creature->GetSpawnId();
 
         CreatureData const* data = sObjectMgr->GetCreatureData(lowguid);
         if (!data)
@@ -831,7 +831,7 @@ public:
 
         bool doNotDelete = nodel.has_value();
 
-        ObjectGuid::LowType lowguid = 0;
+        WOWGUID::LowType lowguid = 0;
         Creature* creature = nullptr;
 
         if (!lowGuid)                                           // case .setmovetype $move_type (with selected creature)
@@ -957,7 +957,7 @@ public:
             mtype = RANDOM_MOTION_TYPE;
 
         Creature* creature = handler->getSelectedCreature();
-        ObjectGuid::LowType guidLow = 0;
+        WOWGUID::LowType guidLow = 0;
 
         if (creature)
             guidLow = creature->GetSpawnId();
@@ -1120,7 +1120,7 @@ public:
 
         // check online security
         Player* receiver = ObjectAccessor::FindPlayerByName(recv);
-        if (handler->HasLowerSecurity(receiver, ObjectGuid::Empty))
+        if (handler->HasLowerSecurity(receiver, WOWGUID::Empty))
             return false;
 
         creature->Whisper(text, LANG_UNIVERSAL, receiver);
@@ -1197,7 +1197,7 @@ public:
         return true;
     }
 
-    static bool HandleNpcAddFormationCommand(ChatHandler* handler, ObjectGuid::LowType leaderGUID)
+    static bool HandleNpcAddFormationCommand(ChatHandler* handler, WOWGUID::LowType leaderGUID)
     {
         Creature* creature = handler->getSelectedCreature();
 
@@ -1207,7 +1207,7 @@ public:
             return false;
         }
 
-        ObjectGuid::LowType lowguid = creature->GetSpawnId();
+        WOWGUID::LowType lowguid = creature->GetSpawnId();
         if (creature->GetFormation())
         {
             handler->PSendSysMessage("Selected creature is already member of group %u", creature->GetFormation()->GetId());
@@ -1241,7 +1241,7 @@ public:
         return true;
     }
 
-    static bool HandleNpcSetLinkCommand(ChatHandler* handler, ObjectGuid::LowType linkguid)
+    static bool HandleNpcSetLinkCommand(ChatHandler* handler, WOWGUID::LowType linkguid)
     {
         Creature* creature = handler->getSelectedCreature();
 

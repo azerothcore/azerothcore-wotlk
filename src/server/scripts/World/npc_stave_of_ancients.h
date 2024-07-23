@@ -134,8 +134,8 @@ struct NPCStaveQuestAI : public ScriptedAI
 {
     NPCStaveQuestAI(Creature *creature) : ScriptedAI(creature) { }
 
-    ObjectGuid gossipPlayerGUID;
-    ObjectGuid playerGUID;
+    WOWGUID gossipPlayerGUID;
+    WOWGUID playerGUID;
     bool encounterStarted;
     ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
 

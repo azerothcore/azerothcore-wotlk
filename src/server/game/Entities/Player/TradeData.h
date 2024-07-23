@@ -21,7 +21,7 @@
 #include "Define.h"
 
 class Item;
-class ObjectGuid;
+class WOWGUID;
 class Player;
 
 enum TradeSlots
@@ -42,8 +42,8 @@ public:                                                 // constructors
     [[nodiscard]] TradeData* GetTraderData() const;
 
     [[nodiscard]] Item* GetItem(TradeSlots slot) const;
-    [[nodiscard]] bool HasItem(ObjectGuid itemGuid) const;
-    [[nodiscard]] TradeSlots GetTradeSlotForItem(ObjectGuid itemGuid) const;
+    [[nodiscard]] bool HasItem(WOWGUID itemGuid) const;
+    [[nodiscard]] TradeSlots GetTradeSlotForItem(WOWGUID itemGuid) const;
     void SetItem(TradeSlots slot, Item* item);
 
     [[nodiscard]] uint32 GetSpell() const { return m_spell; }
@@ -74,9 +74,9 @@ private:                                                // fields
     uint32     m_money;                                 // m_player place money to trade
 
     uint32     m_spell;                                 // m_player apply spell to non-traded slot item
-    ObjectGuid m_spellCastItem;                         // applied spell casted by item use
+    WOWGUID m_spellCastItem;                         // applied spell casted by item use
 
-    ObjectGuid m_items[TRADE_SLOT_COUNT];               // traded itmes from m_player side including non-traded slot
+    WOWGUID m_items[TRADE_SLOT_COUNT];               // traded itmes from m_player side including non-traded slot
 };
 
 #endif

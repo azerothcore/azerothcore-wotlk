@@ -397,8 +397,8 @@ public:
         EventMap events;
         uint32 BossOrder;
         bool MountPhase;
-        ObjectGuid NewMountGUID;
-        ObjectGuid UnitTargetGUID;
+        WOWGUID NewMountGUID;
+        WOWGUID UnitTargetGUID;
 
         void Reset() override
         {

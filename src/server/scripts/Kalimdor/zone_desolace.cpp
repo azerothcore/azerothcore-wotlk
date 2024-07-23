@@ -90,10 +90,10 @@ public:
         }
 
         EventMap events;
-        ObjectGuid summons[MAX_CARAVAN_SUMMONS];
+        WOWGUID summons[MAX_CARAVAN_SUMMONS];
         bool headNorth;
 
-        ObjectGuid _playerGUID;
+        WOWGUID _playerGUID;
         uint32 _faction;
 
         void Initialize()
@@ -141,7 +141,7 @@ public:
             ImmuneFlagSet(false, _faction);
         }
 
-        void SetGUID(ObjectGuid playerGUID, int32 faction) override
+        void SetGUID(WOWGUID playerGUID, int32 faction) override
         {
             _playerGUID = playerGUID;
             _faction = faction;
@@ -408,7 +408,7 @@ public:
                 case EVENT_RESTART_ESCORT:
                     CheckCaravan();
                     SetDespawnAtEnd(false);
-                    Start(true, true, ObjectGuid::Empty, 0, false, false, true);
+                    Start(true, true, WOWGUID::Empty, 0, false, false, true);
                     break;
             }
 
@@ -496,7 +496,7 @@ public:
     {
         if (player->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF) && creature->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
         {
-            player->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
+            player->TalkedToCreature(creature->GetEntry(), WOWGUID::Empty);
             player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
         }
 

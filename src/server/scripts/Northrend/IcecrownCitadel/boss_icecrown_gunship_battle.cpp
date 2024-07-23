@@ -480,7 +480,7 @@ private:
         return newPos;
     }
 
-    ObjectGuid _controlledSlots[MAX_SLOTS];
+    WOWGUID _controlledSlots[MAX_SLOTS];
     time_t _respawnCooldowns[MAX_SLOTS];
     MotionTransport* _transport;
     Position const* _spawnPoint;
@@ -512,7 +512,7 @@ private:
 class ResetEncounterEvent : public BasicEvent
 {
 public:
-    ResetEncounterEvent(Unit* caster, uint32 spellId, ObjectGuid otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
+    ResetEncounterEvent(Unit* caster, uint32 spellId, WOWGUID otherTransport) : _caster(caster), _spellId(spellId), _otherTransport(otherTransport) { }
 
     bool Execute(uint64, uint32) override
     {
@@ -532,7 +532,7 @@ public:
 private:
     Unit* _caster;
     uint32 _spellId;
-    ObjectGuid _otherTransport;
+    WOWGUID _otherTransport;
 };
 
 class npc_gunship : public CreatureScript
@@ -700,12 +700,12 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 id/* = 0*/) override
+        void SetGUID(WOWGUID guid, int32 id/* = 0*/) override
         {
             if (id != ACTION_SHIP_VISITS_ENEMY && id != ACTION_SHIP_VISITS_SELF)
                 return;
 
-            std::map<ObjectGuid, uint32>::iterator itr = _shipVisits.find(guid);
+            std::map<WOWGUID, uint32>::iterator itr = _shipVisits.find(guid);
             if (itr == _shipVisits.end())
             {
                 if (id == ACTION_SHIP_VISITS_ENEMY)
@@ -740,7 +740,7 @@ public:
             if (id != ACTION_SHIP_VISITS_ENEMY)
                 return 0;
 
-            for (std::map<ObjectGuid, uint32>::const_iterator itr = _shipVisits.begin(); itr != _shipVisits.end(); ++itr)
+            for (std::map<WOWGUID, uint32>::const_iterator itr = _shipVisits.begin(); itr != _shipVisits.end(); ++itr)
                 if (itr->second == 0)
                     return 0;
 
@@ -750,7 +750,7 @@ public:
     private:
         InstanceScript* _instance;
         TeamId _teamIdInInstance;
-        std::map<ObjectGuid, uint32> _shipVisits;
+        std::map<WOWGUID, uint32> _shipVisits;
         bool _died;
         bool _summonedFirstMage;
     };

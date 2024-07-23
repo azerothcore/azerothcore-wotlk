@@ -166,8 +166,8 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        ObjectGuid ExpeditionEngineerGUIDs[3];
-        ObjectGuid CommanderGUID;
+        WOWGUID ExpeditionEngineerGUIDs[3];
+        WOWGUID CommanderGUID;
         float cords[4][2];
         bool bGroundPhase;
         bool startPath;
@@ -498,7 +498,7 @@ public:
                     me->SetInCombatWithZone(); // just in case
                     if (pInstance)
                         for( int i = 0; i < 4; ++i )
-                            if( ObjectGuid guid = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
+                            if( WOWGUID guid = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
                                 if( Creature* hfs = ObjectAccessor::GetCreature(*me, guid) )
                                 {
                                     me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
@@ -845,7 +845,7 @@ public:
         InstanceScript* pInstance;
         bool working;
         uint16 timer;
-        ObjectGuid fixingGUID;
+        WOWGUID fixingGUID;
 
         void Reset() override
         {
@@ -899,7 +899,7 @@ public:
                     if (!fixingGUID)
                     {
                         Creature* razorscale = nullptr;
-                        if( ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
+                        if( WOWGUID rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
                             razorscale = ObjectAccessor::GetCreature(*me, rsGUID);
 
                         if( !razorscale || !razorscale->IsInCombat() )
@@ -910,7 +910,7 @@ public:
                         }
 
                         for( int i = 0; i < 4; ++i )
-                            if( ObjectGuid fs_GUID = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
+                            if( WOWGUID fs_GUID = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
                                 if( Creature* fs = ObjectAccessor::GetCreature(*me, fs_GUID) )
                                     if (!fs->AI()->GetData(2))
                                     {
@@ -948,7 +948,7 @@ public:
             return true;
 
         Creature* rs = nullptr;
-        if( ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
+        if( WOWGUID rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
             rs = ObjectAccessor::GetCreature(*go, rsGUID);
 
         if( !rs || !rs->IsInCombat() )
@@ -980,7 +980,7 @@ public:
                 break;
         }
 
-        if( ObjectGuid g = pInstance->GetGuidData(npc) )
+        if( WOWGUID g = pInstance->GetGuidData(npc) )
             if( Creature* hfs = ObjectAccessor::GetCreature(*go, g) )
                 hfs->AI()->SetData(3, spell);
 

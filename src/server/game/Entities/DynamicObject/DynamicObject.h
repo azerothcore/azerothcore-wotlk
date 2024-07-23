@@ -42,7 +42,7 @@ public:
 
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
-    bool CreateDynamicObject(ObjectGuid::LowType guidlow, Unit* caster, uint32 spellId, Position const& pos, float radius, DynamicObjectType type);
+    bool CreateDynamicObject(WOWGUID::LowType guidlow, Unit* caster, uint32 spellId, Position const& pos, float radius, DynamicObjectType type);
     void Update(uint32 p_time) override;
     void Remove();
     void SetDuration(int32 newDuration);
@@ -56,11 +56,11 @@ public:
     void BindToCaster();
     void UnbindFromCaster();
     [[nodiscard]] uint32 GetSpellId() const {  return GetUInt32Value(DYNAMICOBJECT_SPELLID); }
-    [[nodiscard]] ObjectGuid GetCasterGUID() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
+    [[nodiscard]] WOWGUID GetCasterGUID() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
     [[nodiscard]] float GetRadius() const { return GetFloatValue(DYNAMICOBJECT_RADIUS); }
     [[nodiscard]] bool IsViewpoint() const { return _isViewpoint; }
 
-    ObjectGuid const& GetOldFarsightGUID() const { return _oldFarsightGUID; }
+    WOWGUID const& GetOldFarsightGUID() const { return _oldFarsightGUID; }
 
 protected:
     Aura* _aura;
@@ -69,6 +69,6 @@ protected:
     int32 _duration; // for non-aura dynobjects
     bool _isViewpoint;
     uint32 _updateViewerVisibilityTimer;
-    ObjectGuid _oldFarsightGUID;
+    WOWGUID _oldFarsightGUID;
 };
 #endif

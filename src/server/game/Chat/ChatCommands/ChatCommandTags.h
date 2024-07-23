@@ -20,7 +20,7 @@
 
 #include "ChatCommandHelpers.h"
 #include "Hyperlinks.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Optional.h"
 #include "Util.h"
 #include <boost/preprocessor/punctuation/comma_if.hpp>
@@ -172,12 +172,12 @@ namespace Acore::ChatCommands
         PlayerIdentifier() : _name(), _guid(), m_player(nullptr) {}
         PlayerIdentifier(Player& player);
 
-        operator ObjectGuid() const { return _guid; }
+        operator WOWGUID() const { return _guid; }
         operator std::string const&() const { return _name; }
         operator std::string_view() const { return _name; }
 
         std::string const& GetName() const { return _name; }
-        ObjectGuid GetGUID() const { return _guid; }
+        WOWGUID GetGUID() const { return _guid; }
         bool IsConnected() const { return (m_player != nullptr); }
         Player* GetConnectedPlayer() const { return m_player; }
 
@@ -195,7 +195,7 @@ namespace Acore::ChatCommands
 
         private:
             std::string _name;
-            ObjectGuid _guid;
+            WOWGUID _guid;
             Player* m_player;
     };
 

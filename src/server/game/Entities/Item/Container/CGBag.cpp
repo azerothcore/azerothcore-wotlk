@@ -66,7 +66,7 @@ void CGBag::RemoveFromWorld()
     Item::RemoveFromWorld();
 }
 
-bool CGBag::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner)
+bool CGBag::Create(WOWGUID::LowType guidlow, uint32 itemid, Player const* owner)
 {
     ItemTemplate const* itemProto = sObjectMgr->GetItemTemplate(itemid);
 
@@ -78,8 +78,8 @@ bool CGBag::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* own
     SetEntry(itemid);
     SetObjectScale(1.0f);
 
-    SetGuidValue(ITEM_FIELD_OWNER, owner ? owner->GetGUID() : ObjectGuid::Empty);
-    SetGuidValue(ITEM_FIELD_CONTAINED, owner ? owner->GetGUID() : ObjectGuid::Empty);
+    SetGuidValue(ITEM_FIELD_OWNER, owner ? owner->GetGUID() : WOWGUID::Empty);
+    SetGuidValue(ITEM_FIELD_CONTAINED, owner ? owner->GetGUID() : WOWGUID::Empty);
 
     SetUInt32Value(ITEM_FIELD_MAXDURABILITY, itemProto->MaxDurability);
     SetUInt32Value(ITEM_FIELD_DURABILITY, itemProto->MaxDurability);
@@ -91,7 +91,7 @@ bool CGBag::Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* own
     // Cleaning 20 slots
     for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
     {
-        SetGuidValue(CONTAINER_FIELD_SLOT_1 + (i * 2), ObjectGuid::Empty);
+        SetGuidValue(CONTAINER_FIELD_SLOT_1 + (i * 2), WOWGUID::Empty);
         m_bagslot[i] = nullptr;
     }
 
@@ -103,7 +103,7 @@ void CGBag::SaveToDB(CharacterDatabaseTransaction trans)
     Item::SaveToDB(trans);
 }
 
-bool CGBag::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry)
+bool CGBag::LoadFromDB(WOWGUID::LowType guid, WOWGUID owner_guid, Field* fields, uint32 entry)
 {
     if (!Item::LoadFromDB(guid, owner_guid, fields, entry))
         return false;
@@ -113,7 +113,7 @@ bool CGBag::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* f
     // cleanup bag content related item value fields (its will be filled correctly from `character_inventory`)
     for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
     {
-        SetGuidValue(CONTAINER_FIELD_SLOT_1 + (i * 2), ObjectGuid::Empty);
+        SetGuidValue(CONTAINER_FIELD_SLOT_1 + (i * 2), WOWGUID::Empty);
         delete m_bagslot[i];
         m_bagslot[i] = nullptr;
     }
@@ -148,7 +148,7 @@ void CGBag::RemoveItem(uint8 slot, bool /*update*/)
         m_bagslot[slot]->SetContainer(nullptr);
 
     m_bagslot[slot] = nullptr;
-    SetGuidValue(CONTAINER_FIELD_SLOT_1 + (slot * 2), ObjectGuid::Empty);
+    SetGuidValue(CONTAINER_FIELD_SLOT_1 + (slot * 2), WOWGUID::Empty);
 }
 
 void CGBag::StoreItem(uint8 slot, Item* pItem, bool /*update*/)
@@ -222,7 +222,7 @@ uint32 CGBag::GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem
     return count;
 }
 
-uint8 CGBag::GetSlotByItemGUID(ObjectGuid guid) const
+uint8 CGBag::GetSlotByItemGUID(WOWGUID guid) const
 {
     for (uint32 i = 0; i < GetBagSize(); ++i)
         if (m_bagslot[i] != 0)

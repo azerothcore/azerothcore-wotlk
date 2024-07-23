@@ -183,7 +183,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 index) override
+        void SetGUID(WOWGUID guid, int32 index) override
         {
             if (index == GO_LAVA_BURST)
             {
@@ -300,7 +300,7 @@ public:
                         {
                             if (!_lavaBurstGUIDS.empty())
                             {
-                                ObjectGuid lavaBurstGUID = Acore::Containers::SelectRandomContainerElement(_lavaBurstGUIDS);
+                                WOWGUID lavaBurstGUID = Acore::Containers::SelectRandomContainerElement(_lavaBurstGUIDS);
 
                                 if (GameObject* go = ObjectAccessor::GetGameObject(*me, lavaBurstGUID))
                                 {

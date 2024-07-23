@@ -314,7 +314,7 @@ public:
         uint32 HealTimer;
         uint32 FrostShockTimer;
 
-        void SetGUID(ObjectGuid guid, int32  /*questId*/) override
+        void SetGUID(WOWGUID guid, int32  /*questId*/) override
         {
             me->SetStandState(UNIT_STANDING);
             Start(true, false, guid);

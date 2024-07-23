@@ -212,7 +212,7 @@ void SpellCastTargets::Write(ByteBuffer& data)
         data << m_strTarget;
 }
 
-ObjectGuid SpellCastTargets::GetUnitTargetGUID() const
+WOWGUID SpellCastTargets::GetUnitTargetGUID() const
 {
     switch (m_objectTargetGUID.GetHigh())
     {
@@ -225,7 +225,7 @@ ObjectGuid SpellCastTargets::GetUnitTargetGUID() const
             break;
     }
 
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
 Unit* SpellCastTargets::GetUnitTarget() const
@@ -245,7 +245,7 @@ void SpellCastTargets::SetUnitTarget(Unit* target)
     m_targetMask |= TARGET_FLAG_UNIT;
 }
 
-ObjectGuid SpellCastTargets::GetGOTargetGUID() const
+WOWGUID SpellCastTargets::GetGOTargetGUID() const
 {
     switch (m_objectTargetGUID.GetHigh())
     {
@@ -257,7 +257,7 @@ ObjectGuid SpellCastTargets::GetGOTargetGUID() const
             break;
     }
 
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
 GameObject* SpellCastTargets::GetGOTarget() const
@@ -277,7 +277,7 @@ void SpellCastTargets::SetGOTarget(GameObject* target)
     m_targetMask |= TARGET_FLAG_GAMEOBJECT;
 }
 
-ObjectGuid SpellCastTargets::GetCorpseTargetGUID() const
+WOWGUID SpellCastTargets::GetCorpseTargetGUID() const
 {
     switch (m_objectTargetGUID.GetHigh())
     {
@@ -287,7 +287,7 @@ ObjectGuid SpellCastTargets::GetCorpseTargetGUID() const
             break;
     }
 
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
 Corpse* SpellCastTargets::GetCorpseTarget() const
@@ -312,7 +312,7 @@ WorldObject* SpellCastTargets::GetObjectTarget() const
     return m_objectTarget;
 }
 
-ObjectGuid SpellCastTargets::GetObjectTargetGUID() const
+WOWGUID SpellCastTargets::GetObjectTargetGUID() const
 {
     return m_objectTargetGUID;
 }
@@ -450,7 +450,7 @@ void SpellCastTargets::RemoveDst()
 }
 
 // Xinef: Channel Data
-void SpellCastTargets::SetObjectTargetChannel(ObjectGuid targetGUID)
+void SpellCastTargets::SetObjectTargetChannel(WOWGUID targetGUID)
 {
     m_objectTargetGUIDChannel = targetGUID;
 }
@@ -563,7 +563,7 @@ SpellValue::SpellValue(SpellInfo const* proto)
     ForcedCritResult = false;
 }
 
-Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, ObjectGuid originalCasterGUID, bool skipCheck) :
+Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, WOWGUID originalCasterGUID, bool skipCheck) :
     m_spellInfo(sSpellMgr->GetSpellForDifficultyFromSpell(info, caster)),
     m_caster((info->HasAttribute(SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER) && caster->GetCharmerOrOwner()) ? caster->GetCharmerOrOwner() : caster)
     , m_spellValue(new SpellValue(m_spellInfo)), _spellEvent(nullptr)
@@ -2398,7 +2398,7 @@ void Spell::AddUnitTarget(Unit* target, uint32 effectMask, bool checkIfValid /*=
         if (target->IsImmunedToSpellEffect(m_spellInfo, effIndex))
             effectMask &= ~(1 << effIndex);
 
-    ObjectGuid targetGUID = target->GetGUID();
+    WOWGUID targetGUID = target->GetGUID();
 
     // Lookup target in already in list
     for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
@@ -2534,7 +2534,7 @@ void Spell::AddGOTarget(GameObject* go, uint32 effectMask)
     if (!effectMask)
         return;
 
-    ObjectGuid targetGUID = go->GetGUID();
+    WOWGUID targetGUID = go->GetGUID();
 
     // Lookup target in already in list
     for (std::list<GOTargetInfo>::iterator ihit = m_UniqueGOTargetInfo.begin(); ihit != m_UniqueGOTargetInfo.end(); ++ihit)
@@ -3149,7 +3149,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             bool refresh = false;
             bool refreshPeriodic = m_spellInfo->StackAmount < 2 && !HasTriggeredCastFlag(TRIGGERED_NO_PERIODIC_RESET);
             m_spellAura = Aura::TryRefreshStackOrCreate(aurSpellInfo, effectMask, unit, m_originalCaster,
-                          (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, ObjectGuid::Empty, &refresh, refreshPeriodic);
+                          (aurSpellInfo == m_spellInfo) ? &m_spellValue->EffectBasePoints[0] : &basePoints[0], m_CastItem, WOWGUID::Empty, &refresh, refreshPeriodic);
 
             // xinef: if aura was not refreshed, add proc ex
             if (!refresh)
@@ -3471,7 +3471,7 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
     }
     else
     {
-        m_castItemGUID = ObjectGuid::Empty;
+        m_castItemGUID = WOWGUID::Empty;
     }
 
     InitExplicitTargets(*targets);
@@ -5177,7 +5177,7 @@ void Spell::SendChannelUpdate(uint32 time)
 {
     if (time == 0)
     {
-        m_caster->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, ObjectGuid::Empty);
+        m_caster->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, WOWGUID::Empty);
         m_caster->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
     }
 
@@ -5190,7 +5190,7 @@ void Spell::SendChannelUpdate(uint32 time)
 
 void Spell::SendChannelStart(uint32 duration)
 {
-    ObjectGuid channelTarget = m_targets.GetObjectTargetGUID();
+    WOWGUID channelTarget = m_targets.GetObjectTargetGUID();
     if (!channelTarget && !m_spellInfo->NeedsExplicitUnitTarget())
         if (m_UniqueTargetInfo.size() + m_UniqueGOTargetInfo.size() == 1)   // this is for TARGET_SELECT_CATEGORY_NEARBY
             channelTarget = !m_UniqueTargetInfo.empty() ? m_UniqueTargetInfo.front().targetGUID : m_UniqueGOTargetInfo.front().targetGUID;
@@ -5312,7 +5312,7 @@ void Spell::TakePower()
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         if (PowerType == POWER_RAGE || PowerType == POWER_ENERGY || PowerType == POWER_RUNE || PowerType == POWER_RUNIC_POWER)
-            if (ObjectGuid targetGUID = m_targets.GetUnitTargetGUID())
+            if (WOWGUID targetGUID = m_targets.GetUnitTargetGUID())
                 for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
                     if (ihit->targetGUID == targetGUID)
                     {
@@ -6991,7 +6991,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
 
 bool Spell::CanAutoCast(Unit* target)
 {
-    ObjectGuid targetguid = target->GetGUID();
+    WOWGUID targetguid = target->GetGUID();
 
     for (uint32 j = 0; j < MAX_SPELL_EFFECTS; ++j)
     {

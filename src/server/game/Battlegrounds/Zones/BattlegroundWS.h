@@ -189,7 +189,7 @@ struct BattlegroundWGScore final : public BattlegroundScore
     friend class BattlegroundWS;
 
 protected:
-    BattlegroundWGScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
+    BattlegroundWGScore(WOWGUID playerGuid) : BattlegroundScore(playerGuid) { }
 
     void UpdateScore(uint32 type, uint32 value) override
     {
@@ -229,8 +229,8 @@ public:
     void StartingEventOpenDoors() override;
 
     /* BG Flags */
-    ObjectGuid GetFlagPickerGUID(TeamId teamId) const override { return _flagKeepers[teamId];  }
-    void SetFlagPicker(ObjectGuid guid, TeamId teamId) { _flagKeepers[teamId] = guid; }
+    WOWGUID GetFlagPickerGUID(TeamId teamId) const override { return _flagKeepers[teamId];  }
+    void SetFlagPicker(WOWGUID guid, TeamId teamId) { _flagKeepers[teamId] = guid; }
     void RespawnFlagAfterDrop(TeamId teamId);
     uint8 GetFlagState(TeamId teamId) const { return _flagState[teamId]; }
     void CheckFlagKeeperInArea(TeamId teamId);
@@ -250,8 +250,8 @@ public:
 
     void UpdateFlagState(TeamId teamId, uint32 value);
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
-    void SetDroppedFlagGUID(ObjectGuid guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }
-    ObjectGuid GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
+    void SetDroppedFlagGUID(WOWGUID guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }
+    WOWGUID GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
     void FillInitialWorldStates(WorldPacket& data) override;
 
     /* Scorekeeping */
@@ -265,8 +265,8 @@ public:
 private:
     EventMap _bgEvents;
 
-    ObjectGuid _flagKeepers[2];
-    ObjectGuid _droppedFlagGUID[2];
+    WOWGUID _flagKeepers[2];
+    WOWGUID _droppedFlagGUID[2];
     uint8  _flagState[2];
     TeamId _lastFlagCaptureTeam;
     uint32 _reputationCapture;

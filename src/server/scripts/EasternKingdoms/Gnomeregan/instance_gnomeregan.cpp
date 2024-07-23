@@ -129,9 +129,9 @@ public:
         }
 
         uint32 checkTimer;
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
 
-        void SetGUID(ObjectGuid guid, int32) override
+        void SetGUID(WOWGUID guid, int32) override
         {
             playerGUID = guid;
         }

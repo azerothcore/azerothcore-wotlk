@@ -19,7 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-bool ScriptMgr::CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid)
+bool ScriptMgr::CanAddMember(ArenaTeam* team, WOWGUID PlayerGuid)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(ArenaScript, ARENAHOOK_CAN_ADD_MEMBER, !script->CanAddMember(team, PlayerGuid));
 }

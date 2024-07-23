@@ -21,7 +21,7 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid)
+void ScriptMgr::OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, WOWGUID::LowType itemGuid)
 {
     ASSERT(trans);
     ASSERT(itemGuid);
@@ -69,7 +69,7 @@ void ScriptMgr::OnAfterInitializeLockedDungeons(Player* player)
     CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_AFTER_INITIALIZE_LOCKED_DUNGEONS, script->OnAfterInitializeLockedDungeons(player));
 }
 
-void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap)
+void ScriptMgr::OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<WOWGUID, uint32>& ap)
 {
     CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_BEFORE_UPDATE_ARENA_POINTS, script->OnBeforeUpdateArenaPoints(at, ap));
 }
@@ -99,12 +99,12 @@ void ScriptMgr::OnLoadSpellCustomAttr(SpellInfo* spell)
     CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_LOAD_SPELL_CUSTOM_ATTR, script->OnLoadSpellCustomAttr(spell));
 }
 
-bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source)
+bool ScriptMgr::OnAllowedForPlayerLootCheck(Player const* player, WOWGUID source)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_ALLOWED_FOR_PLAYER_LOOT_CHECK, script->OnAllowedForPlayerLootCheck(player, source));
 }
 
-bool ScriptMgr::OnAllowedToLootContainerCheck(Player const* player, ObjectGuid source)
+bool ScriptMgr::OnAllowedToLootContainerCheck(Player const* player, WOWGUID source)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(GlobalScript, GLOBALHOOK_ON_ALLOWED_TO_LOOT_CONTAINER_CHECK, script->OnAllowedToLootContainerCheck(player, source));
 }

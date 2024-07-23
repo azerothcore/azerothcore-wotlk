@@ -1301,7 +1301,7 @@ void ObjectMgr::LoadCreatureAddons()
     {
         Field* fields = result->Fetch();
 
-        ObjectGuid::LowType guid = fields[0].Get<uint32>();
+        WOWGUID::LowType guid = fields[0].Get<uint32>();
 
         CreatureData const* creData = GetCreatureData(guid);
         if (!creData)
@@ -1402,7 +1402,7 @@ void ObjectMgr::LoadGameObjectAddons()
     {
         Field* fields = result->Fetch();
 
-        ObjectGuid::LowType guid = fields[0].Get<uint32>();
+        WOWGUID::LowType guid = fields[0].Get<uint32>();
 
         const GameObjectData* goData = GetGameObjectData(guid);
         if (!goData)
@@ -1435,7 +1435,7 @@ void ObjectMgr::LoadGameObjectAddons()
     LOG_INFO("server.loading", " ");
 }
 
-GameObjectAddon const* ObjectMgr::GetGameObjectAddon(ObjectGuid::LowType lowguid)
+GameObjectAddon const* ObjectMgr::GetGameObjectAddon(WOWGUID::LowType lowguid)
 {
     GameObjectAddonContainer::const_iterator itr = _gameObjectAddonStore.find(lowguid);
     if (itr != _gameObjectAddonStore.end())
@@ -1444,7 +1444,7 @@ GameObjectAddon const* ObjectMgr::GetGameObjectAddon(ObjectGuid::LowType lowguid
     return nullptr;
 }
 
-CreatureAddon const* ObjectMgr::GetCreatureAddon(ObjectGuid::LowType lowguid)
+CreatureAddon const* ObjectMgr::GetCreatureAddon(WOWGUID::LowType lowguid)
 {
     CreatureAddonContainer::const_iterator itr = _creatureAddonStore.find(lowguid);
     if (itr != _creatureAddonStore.end())
@@ -1462,7 +1462,7 @@ CreatureAddon const* ObjectMgr::GetCreatureTemplateAddon(uint32 entry)
     return nullptr;
 }
 
-CreatureMovementData const* ObjectMgr::GetCreatureMovementOverride(ObjectGuid::LowType spawnId) const
+CreatureMovementData const* ObjectMgr::GetCreatureMovementOverride(WOWGUID::LowType spawnId) const
 {
     return Acore::Containers::MapGetValuePtr(_creatureMovementOverrides, spawnId);
 }
@@ -1598,7 +1598,7 @@ void ObjectMgr::LoadCreatureMovementOverrides()
     do
     {
         Field*              fields  = result->Fetch();
-        ObjectGuid::LowType spawnId = fields[0].Get<uint32>();
+        WOWGUID::LowType spawnId = fields[0].Get<uint32>();
         if (!GetCreatureData(spawnId))
         {
             LOG_ERROR("sql.sql", "Creature (GUID: {}) does not exist but has a record in `creature_movement_override`", spawnId);
@@ -1817,11 +1817,11 @@ void ObjectMgr::LoadLinkedRespawn()
     {
         Field* fields = result->Fetch();
 
-        ObjectGuid::LowType guidLow = fields[0].Get<uint32>();
-        ObjectGuid::LowType linkedGuidLow = fields[1].Get<uint32>();
+        WOWGUID::LowType guidLow = fields[0].Get<uint32>();
+        WOWGUID::LowType linkedGuidLow = fields[1].Get<uint32>();
         uint8  linkType = fields[2].Get<uint8>();
 
-        ObjectGuid guid, linkedGuid;
+        WOWGUID guid, linkedGuid;
         bool error = false;
         switch (linkType)
         {
@@ -1858,8 +1858,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id1, linkedGuidLow);
+                    guid = WOWGUID::Create<HighGuid::Unit>(slave->id1, guidLow);
+                    linkedGuid = WOWGUID::Create<HighGuid::Unit>(master->id1, linkedGuidLow);
                     break;
                 }
             case CREATURE_TO_GO:
@@ -1895,8 +1895,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
+                    guid = WOWGUID::Create<HighGuid::Unit>(slave->id1, guidLow);
+                    linkedGuid = WOWGUID::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
                     break;
                 }
             case GO_TO_GO:
@@ -1932,8 +1932,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
+                    guid = WOWGUID::Create<HighGuid::GameObject>(slave->id, guidLow);
+                    linkedGuid = WOWGUID::Create<HighGuid::GameObject>(master->id, linkedGuidLow);
                     break;
                 }
             case GO_TO_CREATURE:
@@ -1969,8 +1969,8 @@ void ObjectMgr::LoadLinkedRespawn()
                         break;
                     }
 
-                    guid = ObjectGuid::Create<HighGuid::GameObject>(slave->id, guidLow);
-                    linkedGuid = ObjectGuid::Create<HighGuid::Unit>(master->id1, linkedGuidLow);
+                    guid = WOWGUID::Create<HighGuid::GameObject>(slave->id, guidLow);
+                    linkedGuid = WOWGUID::Create<HighGuid::Unit>(master->id1, linkedGuidLow);
                     break;
                 }
         }
@@ -1983,13 +1983,13 @@ void ObjectMgr::LoadLinkedRespawn()
     LOG_INFO("server.loading", " ");
 }
 
-bool ObjectMgr::SetCreatureLinkedRespawn(ObjectGuid::LowType guidLow, ObjectGuid::LowType linkedGuidLow)
+bool ObjectMgr::SetCreatureLinkedRespawn(WOWGUID::LowType guidLow, WOWGUID::LowType linkedGuidLow)
 {
     if (!guidLow)
         return false;
 
     CreatureData const* master = GetCreatureData(guidLow);
-    ObjectGuid guid = ObjectGuid::Create<HighGuid::Unit>(master->id1, guidLow);
+    WOWGUID guid = WOWGUID::Create<HighGuid::Unit>(master->id1, guidLow);
 
     if (!linkedGuidLow) // we're removing the linking
     {
@@ -2020,7 +2020,7 @@ bool ObjectMgr::SetCreatureLinkedRespawn(ObjectGuid::LowType guidLow, ObjectGuid
         return false;
     }
 
-    ObjectGuid linkedGuid = ObjectGuid::Create<HighGuid::Unit>(slave->id1, linkedGuidLow);
+    WOWGUID linkedGuid = WOWGUID::Create<HighGuid::Unit>(slave->id1, linkedGuidLow);
 
     _linkedRespawnStore[guid] = linkedGuid;
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_REP_CREATURE_LINKED_RESPAWN);
@@ -2151,7 +2151,7 @@ void ObjectMgr::LoadCreatures()
     {
         Field* fields = result->Fetch();
 
-        ObjectGuid::LowType spawnId     = fields[0].Get<uint32>();
+        WOWGUID::LowType spawnId     = fields[0].Get<uint32>();
         uint32 id1                      = fields[1].Get<uint32>();
         uint32 id2                      = fields[2].Get<uint32>();
         uint32 id3                      = fields[3].Get<uint32>();
@@ -2311,7 +2311,7 @@ void ObjectMgr::LoadCreatures()
     LOG_INFO("server.loading", " ");
 }
 
-void ObjectMgr::AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* data)
+void ObjectMgr::AddCreatureToGrid(WOWGUID::LowType guid, CreatureData const* data)
 {
     uint8 mask = data->spawnMask;
     for (uint8 i = 0; mask != 0; i++, mask >>= 1)
@@ -2325,7 +2325,7 @@ void ObjectMgr::AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* 
     }
 }
 
-void ObjectMgr::RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData const* data)
+void ObjectMgr::RemoveCreatureFromGrid(WOWGUID::LowType guid, CreatureData const* data)
 {
     uint8 mask = data->spawnMask;
     for (uint8 i = 0; mask != 0; i++, mask >>= 1)
@@ -2349,7 +2349,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     if (!map)
         return 0;
 
-    ObjectGuid::LowType spawnId = GenerateGameObjectSpawnId();
+    WOWGUID::LowType spawnId = GenerateGameObjectSpawnId();
 
     GameObjectData& data = NewGOData(spawnId);
     data.id             = entry;
@@ -2402,7 +2402,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, float y, float
     if (!map)
         return 0;
 
-    ObjectGuid::LowType spawnId = GenerateCreatureSpawnId();
+    WOWGUID::LowType spawnId = GenerateCreatureSpawnId();
     CreatureData& data = NewOrExistCreatureData(spawnId);
     data.spawnMask = spawnId;
     data.id1 = entry;
@@ -2478,7 +2478,7 @@ void ObjectMgr::LoadGameobjects()
     {
         Field* fields = result->Fetch();
 
-        ObjectGuid::LowType guid    = fields[0].Get<uint32>();
+        WOWGUID::LowType guid    = fields[0].Get<uint32>();
         uint32 entry                = fields[1].Get<uint32>();
 
         GameObjectTemplate const* gInfo = GetGameObjectTemplate(entry);
@@ -2614,7 +2614,7 @@ void ObjectMgr::LoadGameobjects()
     LOG_INFO("server.loading", " ");
 }
 
-void ObjectMgr::AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data)
+void ObjectMgr::AddGameobjectToGrid(WOWGUID::LowType guid, GameObjectData const* data)
 {
     uint8 mask = data->spawnMask;
     for (uint8 i = 0; mask != 0; i++, mask >>= 1)
@@ -2628,7 +2628,7 @@ void ObjectMgr::AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData con
     }
 }
 
-void ObjectMgr::RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectData const* data)
+void ObjectMgr::RemoveGameobjectFromGrid(WOWGUID::LowType guid, GameObjectData const* data)
 {
     uint8 mask = data->spawnMask;
     for (uint8 i = 0; mask != 0; i++, mask >>= 1)
@@ -6145,8 +6145,8 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
                 }
 
                 // xinef: update global data
-                sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->sender));
-                sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
+                sCharacterCache->IncreaseCharacterMailCount(WOWGUID(HighGuid::Player, m->sender));
+                sCharacterCache->DecreaseCharacterMailCount(WOWGUID(HighGuid::Player, m->receiver));
 
                 delete m;
                 ++returnedCount;
@@ -6154,7 +6154,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
             }
         }
 
-        sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, m->receiver));
+        sCharacterCache->DecreaseCharacterMailCount(WOWGUID(HighGuid::Player, m->receiver));
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
         stmt->SetData(0, m->messageID);
@@ -7978,7 +7978,7 @@ void ObjectMgr::LoadNPCSpellClickSpells()
     LOG_INFO("server.loading", " ");
 }
 
-void ObjectMgr::DeleteCreatureData(ObjectGuid::LowType guid)
+void ObjectMgr::DeleteCreatureData(WOWGUID::LowType guid)
 {
     // remove mapid*cellid -> guid_set map
     CreatureData const* data = GetCreatureData(guid);
@@ -7988,7 +7988,7 @@ void ObjectMgr::DeleteCreatureData(ObjectGuid::LowType guid)
     _creatureDataStore.erase(guid);
 }
 
-void ObjectMgr::DeleteGOData(ObjectGuid::LowType guid)
+void ObjectMgr::DeleteGOData(WOWGUID::LowType guid)
 {
     // remove mapid*cellid -> guid_set map
     GameObjectData const* data = GetGameObjectData(guid);

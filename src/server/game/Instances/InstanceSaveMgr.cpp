@@ -214,13 +214,13 @@ MapEntry const* InstanceSave::GetMapEntry()
     return sMapStore.LookupEntry(m_mapid);
 }
 
-void InstanceSave::AddPlayer(ObjectGuid guid)
+void InstanceSave::AddPlayer(WOWGUID guid)
 {
     std::lock_guard<std::mutex> guard(_lock);
     m_playerList.push_back(guid);
 }
 
-bool InstanceSave::RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism)
+bool InstanceSave::RemovePlayer(WOWGUID guid, InstanceSaveMgr* ism)
 {
     bool deleteSave = false;
     {
@@ -412,7 +412,7 @@ void InstanceSaveMgr::LoadCharacterBinds()
         {
             Field* fields = result->Fetch();
 
-            ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>());
+            WOWGUID guid = WOWGUID::Create<HighGuid::Player>(fields[0].Get<uint32>());
             uint32 instanceId = fields[1].Get<uint32>();
             bool perm = fields[2].Get<bool>();
             bool extended = fields[3].Get<bool>();
@@ -631,7 +631,7 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
     }
 }
 
-InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, InstanceSave* save, bool permanent, Player* player /*= nullptr*/)
+InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(WOWGUID guid, InstanceSave* save, bool permanent, Player* player /*= nullptr*/)
 {
     InstancePlayerBind& bind = playerBindStorage[guid]->m[save->GetDifficulty()][save->GetMapId()];
     ASSERT(!bind.perm || permanent); // ensure there's no changing permanent to temporary, this can be done only by unbinding
@@ -703,7 +703,7 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
     return &bind;
 }
 
-void InstanceSaveMgr::PlayerUnbindInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player /*= nullptr*/)
+void InstanceSaveMgr::PlayerUnbindInstance(WOWGUID guid, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player /*= nullptr*/)
 {
     BoundInstancesMapWrapper* w = playerBindStorage[guid];
     BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
@@ -726,7 +726,7 @@ void InstanceSaveMgr::PlayerUnbindInstance(ObjectGuid guid, uint32 mapid, Diffic
     }
 }
 
-void InstanceSaveMgr::PlayerUnbindInstanceNotExtended(ObjectGuid guid, uint32 mapid, Difficulty difficulty, Player* player /*= nullptr*/)
+void InstanceSaveMgr::PlayerUnbindInstanceNotExtended(WOWGUID guid, uint32 mapid, Difficulty difficulty, Player* player /*= nullptr*/)
 {
     BoundInstancesMapWrapper* w = playerBindStorage[guid];
     BoundInstancesMap::iterator itr = w->m[difficulty].find(mapid);
@@ -746,7 +746,7 @@ void InstanceSaveMgr::PlayerUnbindInstanceNotExtended(ObjectGuid guid, uint32 ma
     }
 }
 
-InstancePlayerBind* InstanceSaveMgr::PlayerGetBoundInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty)
+InstancePlayerBind* InstanceSaveMgr::PlayerGetBoundInstance(WOWGUID guid, uint32 mapid, Difficulty difficulty)
 {
     Difficulty difficulty_fixed = ( IsSharedDifficultyMap(mapid) ? Difficulty(difficulty % 2) : difficulty);
 
@@ -768,7 +768,7 @@ InstancePlayerBind* InstanceSaveMgr::PlayerGetBoundInstance(ObjectGuid guid, uin
         return nullptr;
 }
 
-bool InstanceSaveMgr::PlayerIsPermBoundToInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty)
+bool InstanceSaveMgr::PlayerIsPermBoundToInstance(WOWGUID guid, uint32 mapid, Difficulty difficulty)
 {
     if (InstancePlayerBind* bind = PlayerGetBoundInstance(guid, mapid, difficulty))
         if (bind->perm)
@@ -776,7 +776,7 @@ bool InstanceSaveMgr::PlayerIsPermBoundToInstance(ObjectGuid guid, uint32 mapid,
     return false;
 }
 
-BoundInstancesMap const& InstanceSaveMgr::PlayerGetBoundInstances(ObjectGuid guid, Difficulty difficulty)
+BoundInstancesMap const& InstanceSaveMgr::PlayerGetBoundInstances(WOWGUID guid, Difficulty difficulty)
 {
     PlayerBindStorage::iterator itr = playerBindStorage.find(guid);
     if (itr != playerBindStorage.end())
@@ -784,13 +784,13 @@ BoundInstancesMap const& InstanceSaveMgr::PlayerGetBoundInstances(ObjectGuid gui
     return emptyBoundInstancesMap;
 }
 
-void InstanceSaveMgr::PlayerCreateBoundInstancesMaps(ObjectGuid guid)
+void InstanceSaveMgr::PlayerCreateBoundInstancesMaps(WOWGUID guid)
 {
     if (playerBindStorage.find(guid) == playerBindStorage.end())
         playerBindStorage[guid] = new BoundInstancesMapWrapper;
 }
 
-InstanceSave* InstanceSaveMgr::PlayerGetInstanceSave(ObjectGuid guid, uint32 mapid, Difficulty difficulty)
+InstanceSave* InstanceSaveMgr::PlayerGetInstanceSave(WOWGUID guid, uint32 mapid, Difficulty difficulty)
 {
     InstancePlayerBind* pBind = PlayerGetBoundInstance(guid, mapid, difficulty);
     return (pBind ? pBind->save : nullptr);
@@ -813,7 +813,7 @@ uint32 InstanceSaveMgr::PlayerGetDestinationInstanceId(Player* player, uint32 ma
     return ipb ? ipb->save->GetInstanceId() : 0; // 4. self temp
 }
 
-void InstanceSaveMgr::CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPlr)
+void InstanceSaveMgr::CopyBinds(WOWGUID from, WOWGUID to, Player* toPlr)
 {
     if (from == to)
         return;
@@ -833,7 +833,7 @@ void InstanceSaveMgr::UnbindAllFor(InstanceSave* save)
     Difficulty difficulty = save->GetDifficulty();
     GuidList players = save->m_playerList;
 
-    for (ObjectGuid const& guid : players)
+    for (WOWGUID const& guid : players)
     {
         PlayerUnbindInstance(guid, mapId, difficulty, true, ObjectAccessor::FindConnectedPlayer(guid));
     }

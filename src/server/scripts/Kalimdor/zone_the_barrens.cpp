@@ -280,9 +280,9 @@ public:
         uint8 Wave;
         uint32 WaveTimer;
         uint32 ChallengerChecker;
-        ObjectGuid PlayerGUID;
-        ObjectGuid AffrayChallenger[6];
-        ObjectGuid BigWill;
+        WOWGUID PlayerGUID;
+        WOWGUID AffrayChallenger[6];
+        WOWGUID BigWill;
 
         void Reset() override
         {

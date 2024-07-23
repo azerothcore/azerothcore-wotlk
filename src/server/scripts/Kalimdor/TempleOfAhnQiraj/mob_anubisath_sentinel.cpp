@@ -109,7 +109,7 @@ public:
             abselected = 0;                                     // just initialization of variable
         }
 
-        ObjectGuid NearbyGUID[3];
+        WOWGUID NearbyGUID[3];
 
         void ClearBuddyList()
         {
@@ -117,7 +117,7 @@ public:
                 NearbyGUID[i].Clear();
         }
 
-        void AddBuddyToList(ObjectGuid CreatureGUID)
+        void AddBuddyToList(WOWGUID CreatureGUID)
         {
             if (CreatureGUID == me->GetGUID())
                 return;

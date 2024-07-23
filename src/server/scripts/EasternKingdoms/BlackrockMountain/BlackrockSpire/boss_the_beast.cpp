@@ -147,7 +147,7 @@ public:
                         _orcYelled = true;
 
                         bool yelled = false;
-                        for (ObjectGuid guid : _nearbyOrcsGUIDs)
+                        for (WOWGUID guid : _nearbyOrcsGUIDs)
                         {
                             if (Creature* orc = ObjectAccessor::GetCreature(*me, guid))
                             {

@@ -276,7 +276,7 @@ public:
         }
 
     private:
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
         uint32 SpellEscapeTimer;
         uint32 TeleportTimer;
         uint32 CheckTimer;

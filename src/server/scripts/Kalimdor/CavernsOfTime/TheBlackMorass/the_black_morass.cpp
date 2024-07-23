@@ -416,7 +416,7 @@ struct npc_time_rift : public NullCreatureAI
 private:
     EventMap _events;
     InstanceScript* _instance;
-    ObjectGuid _riftKeeperGUID;
+    WOWGUID _riftKeeperGUID;
     std::vector<uint32> waveMobs;
     uint8 waveMobIndex;
 };

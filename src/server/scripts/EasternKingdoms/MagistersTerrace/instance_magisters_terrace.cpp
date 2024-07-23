@@ -59,10 +59,10 @@ public:
             LoadDoorData(doorData);
         }
 
-        ObjectGuid EscapeOrbGUID;
+        WOWGUID EscapeOrbGUID;
 
-        ObjectGuid DelrissaGUID;
-        ObjectGuid KaelGUID;
+        WOWGUID DelrissaGUID;
+        WOWGUID KaelGUID;
 
         void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
@@ -102,14 +102,14 @@ public:
             InstanceScript::OnCreatureCreate(creature);
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        WOWGUID GetGuidData(uint32 identifier) const override
         {
             if (identifier == NPC_DELRISSA)
             {
                 return DelrissaGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
     };
 

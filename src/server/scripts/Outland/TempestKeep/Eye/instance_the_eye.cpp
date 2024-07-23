@@ -67,15 +67,15 @@ public:
             LoadBossBoundaries(boundaries);
         }
 
-        ObjectGuid ThaladredTheDarkenerGUID;
-        ObjectGuid LordSanguinarGUID;
-        ObjectGuid GrandAstromancerCapernianGUID;
-        ObjectGuid MasterEngineerTelonicusGUID;
-        ObjectGuid AlarGUID;
-        ObjectGuid KaelthasGUID;
-        ObjectGuid BridgeWindowGUID;
-        ObjectGuid KaelStateRightGUID;
-        ObjectGuid KaelStateLeftGUID;
+        WOWGUID ThaladredTheDarkenerGUID;
+        WOWGUID LordSanguinarGUID;
+        WOWGUID GrandAstromancerCapernianGUID;
+        WOWGUID MasterEngineerTelonicusGUID;
+        WOWGUID AlarGUID;
+        WOWGUID KaelthasGUID;
+        WOWGUID BridgeWindowGUID;
+        WOWGUID KaelStateRightGUID;
+        WOWGUID KaelStateLeftGUID;
 
         void OnCreatureCreate(Creature* creature) override
         {
@@ -120,7 +120,7 @@ public:
             InstanceScript::OnGameObjectCreate(gobject);
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        WOWGUID GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -136,7 +136,7 @@ public:
                     return KaelthasGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
     };
 

@@ -39,7 +39,7 @@ struct TempSummonData
 class TempSummon : public Creature
 {
 public:
-    explicit TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
+    explicit TempSummon(SummonPropertiesEntry const* properties, WOWGUID owner, bool isWorldObject);
     ~TempSummon() override = default;
     void Update(uint32 time) override;
     virtual void InitStats(uint32 lifetime);
@@ -52,7 +52,7 @@ public:
     [[nodiscard]] Unit* GetSummonerUnit() const;
     [[nodiscard]] Creature* GetSummonerCreatureBase() const;
     [[nodiscard]] GameObject* GetSummonerGameObject() const;
-    ObjectGuid GetSummonerGUID() const { return m_summonerGUID; }
+    WOWGUID GetSummonerGUID() const { return m_summonerGUID; }
     TempSummonType GetSummonType() const { return m_type; }
     uint32 GetTimer() { return m_timer; }
     void SetTimer(uint32 t) { m_timer = t; }
@@ -68,14 +68,14 @@ private:
     TempSummonType m_type;
     uint32 m_timer;
     uint32 m_lifetime;
-    ObjectGuid m_summonerGUID;
+    WOWGUID m_summonerGUID;
     bool _visibleBySummonerOnly;
 };
 
 class Minion : public TempSummon
 {
 public:
-    Minion(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
+    Minion(SummonPropertiesEntry const* properties, WOWGUID owner, bool isWorldObject);
     void InitStats(uint32 duration) override;
     void RemoveFromWorld() override;
     [[nodiscard]] Unit* GetOwner() const;
@@ -87,14 +87,14 @@ public:
 
     std::string GetDebugInfo() const override;
 protected:
-    const ObjectGuid m_owner;
+    const WOWGUID m_owner;
     float m_followAngle;
 };
 
 class Guardian : public Minion
 {
 public:
-    Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject);
+    Guardian(SummonPropertiesEntry const* properties, WOWGUID owner, bool isWorldObject);
     void InitStats(uint32 duration) override;
     bool InitStatsForLevel(uint8 level);
     void InitSummon() override;
@@ -113,14 +113,14 @@ public:
 class Puppet : public Minion
 {
 public:
-    Puppet(SummonPropertiesEntry const* properties, ObjectGuid owner);
+    Puppet(SummonPropertiesEntry const* properties, WOWGUID owner);
     void InitStats(uint32 duration) override;
     void InitSummon() override;
     void Update(uint32 time) override;
     void RemoveFromWorld() override;
 protected:
     [[nodiscard]] Player* GetOwner() const;
-    const ObjectGuid m_owner;
+    const WOWGUID m_owner;
 };
 
 class ForcedUnsummonDelayEvent : public BasicEvent

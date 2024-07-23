@@ -275,7 +275,7 @@ public:
         bool _backToNature;
         uint8 _deforestation;
 
-        ObjectGuid _elderGUID[3];
+        WOWGUID _elderGUID[3];
 
         void Reset() override
         {
@@ -1084,13 +1084,13 @@ public:
     {
         boss_freya_summonsAI(Creature* pCreature) : ScriptedAI(pCreature)
         {
-            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(TYPE_FREYA) : ObjectGuid::Empty;
+            _freyaGUID = me->GetInstanceScript() ? me->GetInstanceScript()->GetGuidData(TYPE_FREYA) : WOWGUID::Empty;
             _isTrio = me->GetEntry() == NPC_ANCIENT_WATER_SPIRIT || me->GetEntry() == NPC_STORM_LASHER || me->GetEntry() == NPC_SNAPLASHER;
             _hasDied = false;
         }
 
         EventMap events;
-        ObjectGuid _freyaGUID;
+        WOWGUID _freyaGUID;
         uint8 _stackCount;
         bool _hasDied;
         bool _isTrio;
@@ -1230,7 +1230,7 @@ public:
             _goGUID.Clear();
         }
 
-        ObjectGuid _goGUID;
+        WOWGUID _goGUID;
         uint32 _explodeTimer;
 
         void Reset() override

@@ -59,12 +59,12 @@ public:
 
     [[nodiscard]] bool isVendorWithIconSpeak() const;
 
-    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
+    bool Create(WOWGUID::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);
     void LoadEquipment(int8 id = 1, bool force = false);
 
-    [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
+    [[nodiscard]] WOWGUID::LowType GetSpawnId() const { return m_spawnId; }
 
     void Update(uint32 time) override;                         // overwrited Unit::Update
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
@@ -148,7 +148,7 @@ public:
     {
         ::Spell const* Spell = nullptr;
         uint32 Delay = 0;         // ms until the creature's target should snap back (0 = no snapback scheduled)
-        ObjectGuid Target;        // the creature's "real" target while casting
+        WOWGUID Target;        // the creature's "real" target while casting
         float Orientation = 0.0f; // the creature's "real" orientation while casting
     } _spellFocusInfo;
 
@@ -210,17 +210,17 @@ public:
 
     void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
 
-    bool LoadFromDB(ObjectGuid::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, allowDuplicate); }
-    bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool allowDuplicate = false);
+    bool LoadFromDB(WOWGUID::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, allowDuplicate); }
+    bool LoadCreatureFromDB(WOWGUID::LowType guid, Map* map, bool addToMap = true, bool allowDuplicate = false);
     void SaveToDB();
     // overriden in Pet
     virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
     virtual void DeleteFromDB();                        // overriden in Pet
 
     Loot loot;
-    [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
+    [[nodiscard]] WOWGUID GetLootRecipientGUID() const { return m_lootRecipient; }
     [[nodiscard]] Player* GetLootRecipient() const;
-    [[nodiscard]] ObjectGuid::LowType GetLootRecipientGroupGUID() const { return m_lootRecipientGroup; }
+    [[nodiscard]] WOWGUID::LowType GetLootRecipientGroupGUID() const { return m_lootRecipientGroup; }
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
     bool isTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
@@ -320,7 +320,7 @@ public:
             return m_charmInfo->GetCharmSpell(pos)->GetAction();
     }
 
-    void SetCannotReachTarget(ObjectGuid const& target = ObjectGuid::Empty);
+    void SetCannotReachTarget(WOWGUID const& target = WOWGUID::Empty);
     [[nodiscard]] bool CanNotReachTarget() const;
     [[nodiscard]] bool IsNotReachableAndNeedRegen() const;
 
@@ -367,7 +367,7 @@ public:
     bool m_isTempWorldObject; //true when possessed
 
     // Handling caster facing during spellcast
-    void SetTarget(ObjectGuid guid = ObjectGuid::Empty) override;
+    void SetTarget(WOWGUID guid = WOWGUID::Empty) override;
     void ClearTarget() { SetTarget(); };
     void FocusTarget(Spell const* focusSpell, WorldObject const* target);
     void ReleaseFocus(Spell const* focusSpell);
@@ -411,7 +411,7 @@ public:
     * @brief Helper to get the creature's summoner GUID, if it is a summon
     *
     * */
-    [[nodiscard]] ObjectGuid GetSummonerGUID() const;
+    [[nodiscard]] WOWGUID GetSummonerGUID() const;
 
     // Used to control if MoveChase() is to be used or not in AttackStart(). Some creatures does not chase victims
     // NOTE: If you use SetCombatMovement while the creature is in combat, it will do NOTHING - This only affects AttackStart
@@ -424,7 +424,7 @@ public:
     std::string GetDebugInfo() const override;
 
 protected:
-    bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
+    bool CreateFromProto(WOWGUID::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
     bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
 
     // vendor items
@@ -432,8 +432,8 @@ protected:
 
     static float _GetHealthMod(int32 Rank);
 
-    ObjectGuid m_lootRecipient;
-    ObjectGuid::LowType m_lootRecipientGroup;
+    WOWGUID m_lootRecipient;
+    WOWGUID::LowType m_lootRecipientGroup;
 
     /// Timers
     time_t m_corpseRemoveTime;                          // (secs) timer for death or corpse disappearance
@@ -452,7 +452,7 @@ protected:
     void RegenerateHealth();
     void Regenerate(Powers power);
     MovementGeneratorType m_defaultMovementType;
-    ObjectGuid::LowType m_spawnId;                      ///< For new or temporary creatures is 0 for saved it is lowguid
+    WOWGUID::LowType m_spawnId;                      ///< For new or temporary creatures is 0 for saved it is lowguid
     uint8 m_equipmentId;
     int8 m_originalEquipmentId; // can be -1
 
@@ -498,7 +498,7 @@ private:
 
     mutable std::shared_ptr<time_t> _lastDamagedTime; // Part of Evade mechanics
 
-    ObjectGuid m_cannotReachTarget;
+    WOWGUID m_cannotReachTarget;
     uint32 m_cannotReachTimer;
 
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
@@ -515,15 +515,15 @@ private:
 class AssistDelayEvent : public BasicEvent
 {
 public:
-    AssistDelayEvent(ObjectGuid victim, Creature* owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
+    AssistDelayEvent(WOWGUID victim, Creature* owner) : BasicEvent(), m_victim(victim), m_owner(owner) { }
 
     bool Execute(uint64 e_time, uint32 p_time) override;
-    void AddAssistant(ObjectGuid guid) { m_assistants.push_back(guid); }
+    void AddAssistant(WOWGUID guid) { m_assistants.push_back(guid); }
 
 private:
     AssistDelayEvent();
 
-    ObjectGuid        m_victim;
+    WOWGUID        m_victim;
     GuidList          m_assistants;
     Creature*         m_owner;
 };
@@ -542,12 +542,12 @@ private:
 class TemporaryThreatModifierEvent : public BasicEvent
 {
 public:
-    TemporaryThreatModifierEvent(Creature& owner, ObjectGuid threatVictimGUID, float threatValue) : BasicEvent(), m_owner(owner), m_threatVictimGUID(threatVictimGUID), m_threatValue(threatValue) { }
+    TemporaryThreatModifierEvent(Creature& owner, WOWGUID threatVictimGUID, float threatValue) : BasicEvent(), m_owner(owner), m_threatVictimGUID(threatVictimGUID), m_threatValue(threatValue) { }
     bool Execute(uint64 e_time, uint32 p_time) override;
 
 private:
     Creature& m_owner;
-    ObjectGuid m_threatVictimGUID;
+    WOWGUID m_threatVictimGUID;
     float m_threatValue;
 };
 

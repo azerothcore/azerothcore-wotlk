@@ -51,12 +51,12 @@ public:
         uint32 ForgeEventMask;
         std::string str_data;
 
-        ObjectGuid GO_ForgeBellowGUID[3];
-        ObjectGuid GO_ForgeFireGUID[3];
-        ObjectGuid GO_ForgeAnvilGUID[3];
-        ObjectGuid GO_PortcullisGUID[2];
+        WOWGUID GO_ForgeBellowGUID[3];
+        WOWGUID GO_ForgeFireGUID[3];
+        WOWGUID GO_ForgeAnvilGUID[3];
+        WOWGUID GO_PortcullisGUID[2];
 
-        ObjectGuid NPC_SpecialDrakeGUID;
+        WOWGUID NPC_SpecialDrakeGUID;
         bool bRocksAchiev;
 
         void Initialize() override
@@ -111,47 +111,47 @@ public:
             {
                 case GO_BELLOW_1:
                     GO_ForgeBellowGUID[0] = go->GetGUID();
-                    if (ForgeEventMask & 1) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (ForgeEventMask & 1) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_BELLOW_2:
                     GO_ForgeBellowGUID[1] = go->GetGUID();
-                    if (ForgeEventMask & 2) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (ForgeEventMask & 2) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_BELLOW_3:
                     GO_ForgeBellowGUID[2] = go->GetGUID();
-                    if (ForgeEventMask & 4) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (ForgeEventMask & 4) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_FORGEFIRE_1:
                     GO_ForgeFireGUID[0] = go->GetGUID();
-                    if (ForgeEventMask & 1) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (ForgeEventMask & 1) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_FORGEFIRE_2:
                     GO_ForgeFireGUID[1] = go->GetGUID();
-                    if (ForgeEventMask & 2) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (ForgeEventMask & 2) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_FORGEFIRE_3:
                     GO_ForgeFireGUID[2] = go->GetGUID();
-                    if (ForgeEventMask & 4) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (ForgeEventMask & 4) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_GLOWING_ANVIL_1:
                     GO_ForgeAnvilGUID[0] = go->GetGUID();
-                    if (ForgeEventMask & 1) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (ForgeEventMask & 1) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_GLOWING_ANVIL_2:
                     GO_ForgeAnvilGUID[1] = go->GetGUID();
-                    if (ForgeEventMask & 2) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (ForgeEventMask & 2) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_GLOWING_ANVIL_3:
                     GO_ForgeAnvilGUID[2] = go->GetGUID();
-                    if (ForgeEventMask & 4) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (ForgeEventMask & 4) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_GIANT_PORTCULLIS_1:
                     GO_PortcullisGUID[0] = go->GetGUID();
-                    if (m_auiEncounter[2] == DONE) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (m_auiEncounter[2] == DONE) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_GIANT_PORTCULLIS_2:
                     GO_PortcullisGUID[1] = go->GetGUID();
-                    if (m_auiEncounter[2] == DONE) HandleGameObject(ObjectGuid::Empty, true, go);
+                    if (m_auiEncounter[2] == DONE) HandleGameObject(WOWGUID::Empty, true, go);
                     break;
             }
         }

@@ -146,13 +146,13 @@ struct BoardCell
 {
     BoardCell() : pieceEntry(0), row(0), col(0) { }
 
-    ObjectGuid triggerGUID;
-    ObjectGuid pieceGUID;
+    WOWGUID triggerGUID;
+    WOWGUID pieceGUID;
     uint32 pieceEntry;
     uint8 row;
     uint8 col;
 
-    void SetData(ObjectGuid _triggerGUID, uint8 _row, uint8 _col)
+    void SetData(WOWGUID _triggerGUID, uint8 _row, uint8 _col)
     {
         triggerGUID = _triggerGUID;
         row = _row;
@@ -225,7 +225,7 @@ struct npc_echo_of_medivh : public ScriptedAI
         {
             for (uint8 col = 0; col < MAX_COL; ++col)
             {
-                if (ObjectGuid guid = _boards[row][col].pieceGUID)
+                if (WOWGUID guid = _boards[row][col].pieceGUID)
                 {
                     if (Creature* piece = ObjectAccessor::GetCreature(*me, guid))
                     {
@@ -724,7 +724,7 @@ struct npc_echo_of_medivh : public ScriptedAI
         }
     }
 
-    int8 HandlePieceRotate(Creature* piece, ObjectGuid const& triggerGUID)
+    int8 HandlePieceRotate(Creature* piece, WOWGUID const& triggerGUID)
     {
         bool foundOld = false;
         bool foundNew = false;
@@ -845,7 +845,7 @@ struct npc_echo_of_medivh : public ScriptedAI
         return -1;
     }
 
-    int8 HandlePieceMove(Creature* piece, ObjectGuid const& triggerGUID, bool moveByAI)
+    int8 HandlePieceMove(Creature* piece, WOWGUID const& triggerGUID, bool moveByAI)
     {
         bool foundProperCell = false;
         bool foundOld = false;
@@ -2031,7 +2031,7 @@ struct npc_chesspiece : public ScriptedAI
 private:
     InstanceScript* _instance;
 
-    ObjectGuid _charmerGUID;
+    WOWGUID _charmerGUID;
 
     uint32 _nextMoveTimer;
     uint32 _combatSpellTimer;

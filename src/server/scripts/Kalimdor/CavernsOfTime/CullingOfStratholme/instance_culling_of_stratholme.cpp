@@ -191,7 +191,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        WOWGUID GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -203,7 +203,7 @@ public:
                     return _exitGateGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void Update(uint32 diff) override
@@ -405,12 +405,12 @@ public:
 
     private:
         // NPCs
-        ObjectGuid _arthasGUID;
-        ObjectGuid _infiniteGUID;
+        WOWGUID _arthasGUID;
+        WOWGUID _infiniteGUID;
 
         // GOs
-        ObjectGuid _shkafGateGUID;
-        ObjectGuid _exitGateGUID;
+        WOWGUID _shkafGateGUID;
+        WOWGUID _exitGateGUID;
         uint32 _encounterState;
         uint32 _crateCount;
         uint32 _showCrateTimer;

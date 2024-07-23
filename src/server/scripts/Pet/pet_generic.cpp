@@ -44,7 +44,7 @@ enum soulTrader
 
 struct npc_pet_gen_soul_trader_beacon : public ScriptedAI
 {
-    ObjectGuid ownerGUID;
+    WOWGUID ownerGUID;
     EventMap events;
     npc_pet_gen_soul_trader_beacon(Creature* c) : ScriptedAI(c)
     {
@@ -519,7 +519,7 @@ struct npc_pet_gen_imp_in_a_bottle : public NullCreatureAI
 
     WorldPacket _data;
     uint32 _talkTimer;
-    ObjectGuid _ownerGUID;
+    WOWGUID _ownerGUID;
     bool _hasParty;
 
     void InitializeAI() override
@@ -631,7 +631,7 @@ struct npc_pet_gen_plump_turkey : public PassiveAI
         jumping = false;
     }
 
-    ObjectGuid goGUID;
+    WOWGUID goGUID;
     uint32 jumpTimer;
     uint32 checkTimer;
     bool jumping;
@@ -729,7 +729,7 @@ struct npc_pet_gen_fetch_ball : public NullCreatureAI
     npc_pet_gen_fetch_ball(Creature* c) : NullCreatureAI(c) { }
 
     uint32 checkTimer;
-    ObjectGuid targetGUID;
+    WOWGUID targetGUID;
 
     void IsSummonedBy(WorldObject* summoner) override
     {

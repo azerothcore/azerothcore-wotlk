@@ -163,10 +163,10 @@ public:
     void SetData(uint32 id, uint32 value, Unit* invoker);
 
     // Used in scripts to share variables
-    void SetGUID(ObjectGuid guid, int32 id = 0) override;
+    void SetGUID(WOWGUID guid, int32 id = 0) override;
 
     // Used in scripts to share variables
-    ObjectGuid GetGUID(int32 id = 0) const override;
+    WOWGUID GetGUID(int32 id = 0) const override;
 
     //core related
     static int32 Permissible(Creature const* /*creature*/) { return PERMIT_BASE_NO; }
@@ -217,7 +217,7 @@ private:
     uint32 mFollowCredit;
     uint32 mFollowArrivedEntry;
     bool   mFollowArrivedAlive;
-    ObjectGuid mFollowGuid;
+    WOWGUID mFollowGuid;
     float mFollowDist;
     float mFollowAngle;
 

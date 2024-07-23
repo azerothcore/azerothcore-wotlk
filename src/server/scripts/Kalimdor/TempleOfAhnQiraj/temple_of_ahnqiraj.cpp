@@ -254,7 +254,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
                 Acore::Containers::RandomResize(_targetGUIDs, 10);
             }
 
-            for (ObjectGuid guid : _targetGUIDs)
+            for (WOWGUID guid : _targetGUIDs)
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, guid))
                 {
@@ -378,7 +378,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
                 Acore::Containers::RandomResize(_targetGUIDs, 11);
             }
 
-            for (ObjectGuid guid : _targetGUIDs)
+            for (WOWGUID guid : _targetGUIDs)
             {
                 if (Unit* target = ObjectAccessor::GetUnit(*me, guid))
                 {
@@ -428,8 +428,8 @@ struct npc_ahnqiraji_critter : public ScriptedAI
         // Don't attack nearby players randomly if they are the Twin's pet bugs.
         if (CreatureData const* crData = me->GetCreatureData())
         {
-            ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(crData->id1, me->GetSpawnId());
-            ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+            WOWGUID dbtableHighGuid = WOWGUID::Create<HighGuid::Unit>(crData->id1, me->GetSpawnId());
+            WOWGUID targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
 
             if (targetGuid.GetEntry() == NPC_VEKLOR)
             {

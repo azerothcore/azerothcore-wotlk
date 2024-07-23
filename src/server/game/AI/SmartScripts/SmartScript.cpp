@@ -1968,9 +1968,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 if (IsCreature(target))
                 {
                     if (!meOrigGUID)
-                        meOrigGUID = me ? me->GetGUID() : ObjectGuid::Empty;
+                        meOrigGUID = me ? me->GetGUID() : WOWGUID::Empty;
                     if (!goOrigGUID)
-                        goOrigGUID = go ? go->GetGUID() : ObjectGuid::Empty;
+                        goOrigGUID = go ? go->GetGUID() : WOWGUID::Empty;
                     go = nullptr;
                     me = target->ToCreature();
                     break;
@@ -1978,9 +1978,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 else if (IsGameObject(target))
                 {
                     if (!meOrigGUID)
-                        meOrigGUID = me ? me->GetGUID() : ObjectGuid::Empty;
+                        meOrigGUID = me ? me->GetGUID() : WOWGUID::Empty;
                     if (!goOrigGUID)
-                        goOrigGUID = go ? go->GetGUID() : ObjectGuid::Empty;
+                        goOrigGUID = go ? go->GetGUID() : WOWGUID::Empty;
                     go = target->ToGameObject();
                     me = nullptr;
                     break;
@@ -2896,7 +2896,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
             {
-                ObjectGuid guidToSend = me ? me->GetGUID() : go->GetGUID();
+                WOWGUID guidToSend = me ? me->GetGUID() : go->GetGUID();
 
                 if (e.action.setGuid.invokerGUID)
                 {
@@ -3839,7 +3839,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         {
             if (me)
             {
-                for (ObjectGuid const& guid : _summonList)
+                for (WOWGUID const& guid : _summonList)
                 {
                     if (!e.target.summonedCreatures.entry || guid.GetEntry() == e.target.summonedCreatures.entry)
                     {
@@ -5057,13 +5057,13 @@ void SmartScript::SetData(uint32 id, uint32 value)
 {
 }
 
-void SmartScript::SetGUID(ObjectGuid guid, int32 id)
+void SmartScript::SetGUID(WOWGUID guid, int32 id)
 {
 }
 
-ObjectGuid SmartScript::GetGUID(int32 id)
+WOWGUID SmartScript::GetGUID(int32 id)
 {
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
 void SmartScript::MovepointStart(uint32 id)
@@ -5078,7 +5078,7 @@ void SmartScript::SetMovePathEndAction(SMART_ACTION action)
 {
 }
 
-uint32 SmartScript::DoChat(int8 id, ObjectGuid whisperGuid)
+uint32 SmartScript::DoChat(int8 id, WOWGUID whisperGuid)
 {
     return 0;
 }*/
@@ -5260,12 +5260,12 @@ bool SmartScript::IsInPhase(uint32 p) const
     return ((1 << (mEventPhase - 1)) & p) != 0;
 }
 
-void SmartScript::AddCreatureSummon(ObjectGuid const& guid)
+void SmartScript::AddCreatureSummon(WOWGUID const& guid)
 {
     _summonList.insert(guid);
 }
 
-void SmartScript::RemoveCreatureSummon(ObjectGuid const& guid)
+void SmartScript::RemoveCreatureSummon(WOWGUID const& guid)
 {
     _summonList.erase(guid);
 }

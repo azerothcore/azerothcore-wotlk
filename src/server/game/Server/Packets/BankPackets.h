@@ -18,7 +18,7 @@
 #ifndef BankPackets_h__
 #define BankPackets_h__
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Packet.h"
 
 namespace WorldPackets
@@ -54,7 +54,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Banker;
+            WOWGUID Banker;
         };
 
         class BuyBankSlotResult final : public ServerPacket
@@ -74,7 +74,7 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            ObjectGuid Banker;
+            WOWGUID Banker;
         };
     }
 }

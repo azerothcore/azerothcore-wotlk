@@ -32,7 +32,7 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            ObjectGuid Victim;
+            WOWGUID Victim;
             EnviromentalDamage Type = DAMAGE_EXHAUSTED;
             uint32 Amount = 0;
             uint32 Resisted = 0;

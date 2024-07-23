@@ -132,7 +132,7 @@ public:
         }
 
         uint32 infectionCooldown;
-        ObjectGuid _oozeFloodDummyGUIDs[4][2];
+        WOWGUID _oozeFloodDummyGUIDs[4][2];
         uint8 _oozeFloodStage;
 
         void Reset() override

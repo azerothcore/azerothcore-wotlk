@@ -148,8 +148,8 @@ public:
 
         bool _creditBloodQuickening;
         bool _killMinchar;
-        ObjectGuid _tankGUID;
-        ObjectGuid _offtankGUID;
+        WOWGUID _tankGUID;
+        WOWGUID _offtankGUID;
         GuidSet _bloodboltedPlayers;
         GuidSet _vampires;
         bool bEnteredCombat; // needed for failing an attempt in JustReachedHome()
@@ -526,17 +526,17 @@ public:
             instance->DoRemoveAurasDueToSpellOnPlayers(PRESENCE_OF_THE_DARKFALLEN);
         }
 
-        bool WasVampire(ObjectGuid guid)
+        bool WasVampire(WOWGUID guid)
         {
             return _vampires.count(guid) != 0;
         }
 
-        bool WasBloodbolted(ObjectGuid guid)
+        bool WasBloodbolted(WOWGUID guid)
         {
             return _bloodboltedPlayers.count(guid) != 0;
         }
 
-        void SetGUID(ObjectGuid guid, int32 type = 0) override
+        void SetGUID(WOWGUID guid, int32 type = 0) override
         {
             switch (type)
             {
@@ -896,7 +896,7 @@ public:
                 return;
 
             uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
-            GetCaster()->RemoveAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+            GetCaster()->RemoveAura(spellId, WOWGUID::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
             GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, TRIGGERED_FULL_MASK);
 
             if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))

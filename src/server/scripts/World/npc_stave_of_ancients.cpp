@@ -529,7 +529,7 @@ public:
         npc_simoneAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
-        ObjectGuid preciousGUID;
+        WOWGUID preciousGUID;
 
         void SetPreciousGUID()
         {
@@ -797,7 +797,7 @@ public:
             }
         }
 
-        void ScheduleEncounterStart(ObjectGuid playerGUID)
+        void ScheduleEncounterStart(WOWGUID playerGUID)
         {
             PrepareForEncounter();
             if (PreciousAI())
@@ -1189,7 +1189,7 @@ public:
             }
         }
 
-        void ScheduleEncounterStart(ObjectGuid playerGUID)
+        void ScheduleEncounterStart(WOWGUID playerGUID)
         {
             PrepareForEncounter();
             gossipPlayerGUID = playerGUID;

@@ -197,7 +197,7 @@ public:
         }
 
         int32 _damageTimer;
-        ObjectGuid _gameObjectGUID;
+        WOWGUID _gameObjectGUID;
 
         void Reset() override
         {

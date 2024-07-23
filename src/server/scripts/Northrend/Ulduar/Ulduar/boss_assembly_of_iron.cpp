@@ -148,7 +148,7 @@ bool IsEncounterComplete(InstanceScript* pInstance, Creature* me)
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        ObjectGuid guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
+        WOWGUID guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
         if (!guid)
             return false;
 
@@ -171,7 +171,7 @@ void RespawnAssemblyOfIron(InstanceScript* pInstance, Creature* me)
 
     for (uint8 i = 0; i < 3; ++i)
     {
-        ObjectGuid guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
+        WOWGUID guid = pInstance->GetGuidData(DATA_STEELBREAKER + i);
         if (!guid)
             return;
 
@@ -182,7 +182,7 @@ void RespawnAssemblyOfIron(InstanceScript* pInstance, Creature* me)
     return;
 }
 
-void RestoreAssemblyHealth(ObjectGuid guid1, ObjectGuid guid2, Creature* me)
+void RestoreAssemblyHealth(WOWGUID guid1, WOWGUID guid2, Creature* me)
 {
     if (Creature* cr = ObjectAccessor::GetCreature(*me, guid1))
         if (cr->IsAlive())
@@ -614,7 +614,7 @@ public:
         EventMap events;
         InstanceScript* pInstance;
         uint32 _phase;
-        ObjectGuid _flyTargetGUID;
+        WOWGUID _flyTargetGUID;
         uint32 _channelTimer;
 
         bool _stunnedAchievement;
@@ -793,7 +793,7 @@ public:
                         me->CombatStop();
                         me->StopMoving();
                         me->SetReactState(REACT_PASSIVE);
-                        me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
+                        me->SetGuidValue(UNIT_FIELD_TARGET, WOWGUID::Empty);
                         me->SetUnitFlag(UNIT_FLAG_STUNNED);
 
                         me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
@@ -896,7 +896,7 @@ class spell_assembly_rune_of_summoning_aura : public AuraScript
     {
         PreventDefaultAction();
         if (aurEff->GetTickNumber() % 2 == 0)
-            GetTarget()->CastSpell(GetTarget(), SPELL_RUNE_OF_SUMMONING_SUMMON, true, nullptr, aurEff, GetTarget()->IsSummon() ? GetTarget()->ToTempSummon()->GetSummonerGUID() : ObjectGuid::Empty);
+            GetTarget()->CastSpell(GetTarget(), SPELL_RUNE_OF_SUMMONING_SUMMON, true, nullptr, aurEff, GetTarget()->IsSummon() ? GetTarget()->ToTempSummon()->GetSummonerGUID() : WOWGUID::Empty);
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

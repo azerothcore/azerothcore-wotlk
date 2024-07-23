@@ -53,7 +53,7 @@ bool GmTicket::LoadFromDB(Field* fields)
     uint8 index = 0;
     _id                 = fields[  index].Get<uint32>();
     _type               = TicketType(fields[++index].Get<uint8>());
-    _playerGuid         = ObjectGuid::Create<HighGuid::Player>(fields[++index].Get<uint32>());
+    _playerGuid         = WOWGUID::Create<HighGuid::Player>(fields[++index].Get<uint32>());
     _playerName         = fields[++index].Get<std::string>();
     _message            = fields[++index].Get<std::string>();
     _createTime         = fields[++index].Get<uint32>();
@@ -62,15 +62,15 @@ bool GmTicket::LoadFromDB(Field* fields)
     _posY               = fields[++index].Get<float>();
     _posZ               = fields[++index].Get<float>();
     _lastModifiedTime   = fields[++index].Get<uint32>();
-    _closedBy           = ObjectGuid::Create<HighGuid::Player>(fields[++index].Get<int32>());
-    _assignedTo         = ObjectGuid::Create<HighGuid::Player>(fields[++index].Get<uint32>());
+    _closedBy           = WOWGUID::Create<HighGuid::Player>(fields[++index].Get<int32>());
+    _assignedTo         = WOWGUID::Create<HighGuid::Player>(fields[++index].Get<uint32>());
     _comment            = fields[++index].Get<std::string>();
     _response           = fields[++index].Get<std::string>();
     _completed          = fields[++index].Get<bool>();
     _escalatedStatus    = GMTicketEscalationStatus(fields[++index].Get<uint8>());
     _viewed             = fields[++index].Get<bool>();
     _needMoreHelp       = fields[++index].Get<bool>();
-    _resolvedBy         = ObjectGuid::Create<HighGuid::Player>(fields[++index].Get<int32>());
+    _resolvedBy         = WOWGUID::Create<HighGuid::Player>(fields[++index].Get<int32>());
 
     return true;
 }
@@ -366,7 +366,7 @@ void TicketMgr::AddTicket(GmTicket* ticket)
     ticket->SaveToDB(trans);
 }
 
-void TicketMgr::CloseTicket(uint32 ticketId, ObjectGuid source)
+void TicketMgr::CloseTicket(uint32 ticketId, WOWGUID source)
 {
     if (GmTicket* ticket = GetTicket(ticketId))
     {
@@ -388,7 +388,7 @@ void TicketMgr::RemoveTicket(uint32 ticketId)
     }
 }
 
-void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, ObjectGuid source)
+void TicketMgr::ResolveAndCloseTicket(uint32 ticketId, WOWGUID source)
 {
     if (GmTicket* ticket = GetTicket(ticketId))
     {

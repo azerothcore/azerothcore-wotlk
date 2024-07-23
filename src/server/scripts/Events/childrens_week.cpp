@@ -132,13 +132,13 @@ enum Misc
     DISPLAY_INVISIBLE                       = 11686,
 };
 
-ObjectGuid getOrphanGUID(Player* player, uint32 orphan)
+WOWGUID getOrphanGUID(Player* player, uint32 orphan)
 {
     if (Aura* orphanOut = player->GetAura(SPELL_ORPHAN_OUT))
         if (orphanOut->GetCaster() && orphanOut->GetCaster()->GetEntry() == orphan)
             return orphanOut->GetCaster()->GetGUID();
 
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
 /*######
@@ -223,8 +223,8 @@ struct npc_winterfin_playmate : public ScriptedAI
 private:
     uint32 timer;
     int8 phase;
-    ObjectGuid playerGUID;
-    ObjectGuid orphanGUID;
+    WOWGUID playerGUID;
+    WOWGUID orphanGUID;
 };
 
 /*######
@@ -309,8 +309,8 @@ struct npc_snowfall_glade_playmate : public ScriptedAI
 private:
     uint32 timer;
     int8 phase;
-    ObjectGuid playerGUID;
-    ObjectGuid orphanGUID;
+    WOWGUID playerGUID;
+    WOWGUID orphanGUID;
 };
 
 /*######
@@ -386,8 +386,8 @@ struct npc_the_biggest_tree : public ScriptedAI
 private:
     uint32 timer;
     uint8 phase;
-    ObjectGuid playerGUID;
-    ObjectGuid orphanGUID;
+    WOWGUID playerGUID;
+    WOWGUID orphanGUID;
 };
 
 /*######
@@ -462,8 +462,8 @@ struct npc_high_oracle_soo_roo : public ScriptedAI
 private:
     uint32 timer;
     int8 phase;
-    ObjectGuid playerGUID;
-    ObjectGuid orphanGUID;
+    WOWGUID playerGUID;
+    WOWGUID orphanGUID;
 };
 
 /*######
@@ -537,8 +537,8 @@ struct npc_elder_kekek : public ScriptedAI
 private:
     uint32 timer;
     int8 phase;
-    ObjectGuid playerGUID;
-    ObjectGuid orphanGUID;
+    WOWGUID playerGUID;
+    WOWGUID orphanGUID;
 };
 
 /*######
@@ -621,8 +621,8 @@ struct npc_the_etymidian : public ScriptedAI
 private:
     uint32 timer;
     int8 phase;
-    ObjectGuid playerGUID;
-    ObjectGuid orphanGUID;
+    WOWGUID playerGUID;
+    WOWGUID orphanGUID;
 };
 
 /*######
@@ -769,8 +769,8 @@ struct npc_alexstraza_the_lifebinder : public ScriptedAI
 private:
     int8 phase;
     uint32 timer;
-    ObjectGuid playerGUID;
-    ObjectGuid orphanGUID;
+    WOWGUID playerGUID;
+    WOWGUID orphanGUID;
 };
 
 /*######

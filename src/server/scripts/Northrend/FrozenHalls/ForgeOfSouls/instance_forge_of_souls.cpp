@@ -48,13 +48,13 @@ public:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         TeamId teamIdInInstance;
         std::string str_data;
-        ObjectGuid NPC_BronjahmGUID;
-        ObjectGuid NPC_DevourerGUID;
+        WOWGUID NPC_BronjahmGUID;
+        WOWGUID NPC_DevourerGUID;
 
-        ObjectGuid NPC_LeaderFirstGUID;
-        ObjectGuid NPC_LeaderSecondGUID;
-        ObjectGuid NPC_GuardFirstGUID;
-        ObjectGuid NPC_GuardSecondGUID;
+        WOWGUID NPC_LeaderFirstGUID;
+        WOWGUID NPC_LeaderSecondGUID;
+        WOWGUID NPC_GuardFirstGUID;
+        WOWGUID NPC_GuardSecondGUID;
 
         void Initialize() override
         {
@@ -167,7 +167,7 @@ public:
                 SaveToDB();
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -175,7 +175,7 @@ public:
                     return NPC_BronjahmGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override

@@ -123,12 +123,12 @@ Position const RagnarosSummonPos = { 838.3082f, -831.4665f, -232.1853f, 2.199115
 
 struct MajordomoAddData
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 creatureEntry;
     Position spawnPos;
 
     MajordomoAddData() { }
-    MajordomoAddData(ObjectGuid _guid, uint32 _creatureEntry, Position _spawnPos) : guid(_guid), creatureEntry(_creatureEntry), spawnPos(_spawnPos) { }
+    MajordomoAddData(WOWGUID _guid, uint32 _creatureEntry, Position _spawnPos) : guid(_guid), creatureEntry(_creatureEntry), spawnPos(_spawnPos) { }
 };
 
 class boss_majordomo : public CreatureScript
@@ -263,7 +263,7 @@ public:
             aliveMinionsGUIDS.erase(summon->GetGUID());
             if (summon->GetEntry() == NPC_FLAMEWAKER_HEALER || summon->GetEntry() == NPC_FLAMEWAKER_ELITE)
             {
-                uint32 const remainingAdds = std::count_if(aliveMinionsGUIDS.begin(), aliveMinionsGUIDS.end(), [](ObjectGuid const& summonGuid)
+                uint32 const remainingAdds = std::count_if(aliveMinionsGUIDS.begin(), aliveMinionsGUIDS.end(), [](WOWGUID const& summonGuid)
                 {
                     return summonGuid.GetEntry() == NPC_FLAMEWAKER_HEALER || summonGuid.GetEntry() == NPC_FLAMEWAKER_ELITE;
                 });

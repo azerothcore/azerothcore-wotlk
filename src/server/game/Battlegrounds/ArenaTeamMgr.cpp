@@ -90,7 +90,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByName(std::string const& arenaTeamName, co
     return nullptr;
 }
 
-ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(ObjectGuid guid) const
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(WOWGUID guid) const
 {
     for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
     {
@@ -102,7 +102,7 @@ ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(ObjectGuid guid) const
     return nullptr;
 }
 
-ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(ObjectGuid guid, const uint32 type) const
+ArenaTeam* ArenaTeamMgr::GetArenaTeamByCaptain(WOWGUID guid, const uint32 type) const
 {
     for (ArenaTeamContainer::const_iterator itr = ArenaTeamStore.begin(); itr != ArenaTeamStore.end(); ++itr)
     {
@@ -199,7 +199,7 @@ void ArenaTeamMgr::DistributeArenaPoints()
     sWorld->SendWorldText(LANG_DIST_ARENA_POINTS_ONLINE_START);
 
     // Temporary structure for storing maximum points to add values for all players
-    std::map<ObjectGuid, uint32> PlayerPoints;
+    std::map<WOWGUID, uint32> PlayerPoints;
 
     // At first update all points for all team members
     for (ArenaTeamContainer::iterator teamItr = GetArenaTeamMapBegin(); teamItr != GetArenaTeamMapEnd(); ++teamItr)
@@ -214,7 +214,7 @@ void ArenaTeamMgr::DistributeArenaPoints()
     CharacterDatabasePreparedStatement* stmt;
 
     // Cycle that gives points to all players
-    for (std::map<ObjectGuid, uint32>::iterator playerItr = PlayerPoints.begin(); playerItr != PlayerPoints.end(); ++playerItr)
+    for (std::map<WOWGUID, uint32>::iterator playerItr = PlayerPoints.begin(); playerItr != PlayerPoints.end(); ++playerItr)
     {
         // Add points to player if online
         if (Player* player = ObjectAccessor::FindPlayer(playerItr->first))

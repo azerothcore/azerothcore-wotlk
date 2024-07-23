@@ -24,7 +24,7 @@ void User::HandleGrantLevel(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_GRANT_LEVEL");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     Player* target = ObjectAccessor::GetPlayer(*m_player, guid);
@@ -67,7 +67,7 @@ void User::HandleAcceptGrantLevel(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     Player* other = ObjectAccessor::GetPlayer(*m_player, guid);

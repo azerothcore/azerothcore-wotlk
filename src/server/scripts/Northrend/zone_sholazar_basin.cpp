@@ -177,7 +177,7 @@ public:
                 if (action == ACTION_BIND_MINIONS)
                     me->CastSpell(me, SPELL_ARTRUIS_BINDING, true);
 
-                for (ObjectGuid const& guid : summons)
+                for (WOWGUID const& guid : summons)
                 {
                     Creature* minion = ObjectAccessor::GetCreature(*me, guid);
                     if (minion && minion->IsAlive())
@@ -298,8 +298,8 @@ public:
     {
         bool running;
         bool success;
-        ObjectGuid playerGUID;
-        ObjectGuid thunderbrewGUID;
+        WOWGUID playerGUID;
+        WOWGUID thunderbrewGUID;
         int32 tensecstimer;
         int32 timer;
         uint8 stepcount;
@@ -338,7 +338,7 @@ public:
             GetManus()->AI()->Talk(SAY_MANUS_START);
         }
 
-        void CheckAction(uint8 a, ObjectGuid guid)
+        void CheckAction(uint8 a, WOWGUID guid)
         {
             if (guid != playerGUID)
                 return;
@@ -1011,8 +1011,8 @@ public:
         uint8 sayStep;
         uint32 timer;
         int8 phase;
-        ObjectGuid playerGUID;
-        ObjectGuid orphanGUID;
+        WOWGUID playerGUID;
+        WOWGUID orphanGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

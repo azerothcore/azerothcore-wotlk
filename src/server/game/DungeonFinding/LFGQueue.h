@@ -65,7 +65,7 @@ namespace lfg
     };
 
     typedef std::map<uint32, LfgWaitTime> LfgWaitTimesContainer;
-    typedef std::map<ObjectGuid, LfgQueueData> LfgQueueDataContainer;
+    typedef std::map<WOWGUID, LfgQueueData> LfgQueueDataContainer;
     typedef std::list<Lfg5Guids> LfgCompatibleContainer;
 
     /**
@@ -75,10 +75,10 @@ namespace lfg
     {
     public:
         // Add/Remove from queue
-        void AddToQueue(ObjectGuid guid, bool failedProposal = false);
-        void RemoveFromQueue(ObjectGuid guid, bool partial = false); // xinef: partial remove, dont delete data from list!
-        void AddQueueData(ObjectGuid guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap);
-        void RemoveQueueData(ObjectGuid guid);
+        void AddToQueue(WOWGUID guid, bool failedProposal = false);
+        void RemoveFromQueue(WOWGUID guid, bool partial = false); // xinef: partial remove, dont delete data from list!
+        void AddQueueData(WOWGUID guid, time_t joinTime, LfgDungeonSet const& dungeons, LfgRolesMap const& rolesMap);
+        void RemoveQueueData(WOWGUID guid);
 
         // Update Timers (when proposal success)
         void UpdateWaitTimeAvg(int32 waitTime, uint32 dungeonId);
@@ -88,7 +88,7 @@ namespace lfg
 
         // Update Queue timers
         void UpdateQueueTimers(uint32 diff);
-        time_t GetJoinTime(ObjectGuid guid);
+        time_t GetJoinTime(WOWGUID guid);
 
         // Find new group
         uint8 FindGroups();
@@ -96,17 +96,17 @@ namespace lfg
     private:
         void SetQueueUpdateData(std::string const& strGuids, LfgRolesMap const& proposalRoles);
 
-        void AddToNewQueue(ObjectGuid guid, bool front);
-        void RemoveFromNewQueue(ObjectGuid guid);
+        void AddToNewQueue(WOWGUID guid, bool front);
+        void RemoveFromNewQueue(WOWGUID guid);
 
-        void RemoveFromCompatibles(ObjectGuid guid);
+        void RemoveFromCompatibles(WOWGUID guid);
         void AddToCompatibles(Lfg5Guids const& key);
 
         uint32 FindBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue);
         void UpdateBestCompatibleInQueue(LfgQueueDataContainer::iterator itrQueue, Lfg5Guids const& key);
 
-        LfgCompatibility FindNewGroups(const ObjectGuid& newGuid);
-        LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, const ObjectGuid& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles);
+        LfgCompatibility FindNewGroups(const WOWGUID& newGuid);
+        LfgCompatibility CheckCompatibility(Lfg5Guids const& checkWith, const WOWGUID& newGuid, uint64& foundMask, uint32& foundCount, const std::set<Lfg5Guids>& currentCompatibles);
 
         // Queue
         uint32 m_QueueStatusTimer;                         // used to check interval of sending queue status

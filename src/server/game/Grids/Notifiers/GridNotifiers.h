@@ -1611,21 +1611,21 @@ namespace Acore
     class ObjectGUIDCheck
     {
     public:
-        ObjectGUIDCheck(ObjectGuid GUID, bool equals) : _GUID(GUID), _equals(equals) {}
+        ObjectGUIDCheck(WOWGUID GUID, bool equals) : _GUID(GUID), _equals(equals) {}
         bool operator()(WorldObject const* object)
         {
             return (object->GetGUID() == _GUID) == _equals;
         }
 
     private:
-        ObjectGuid _GUID;
+        WOWGUID _GUID;
         bool _equals;
     };
 
     class UnitAuraCheck
     {
     public:
-        UnitAuraCheck(bool present, uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty) : _present(present), _spellId(spellId), _casterGUID(casterGUID) {}
+        UnitAuraCheck(bool present, uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty) : _present(present), _spellId(spellId), _casterGUID(casterGUID) {}
         bool operator()(Unit const* unit) const
         {
             return unit->HasAura(_spellId, _casterGUID) == _present;
@@ -1639,7 +1639,7 @@ namespace Acore
     private:
         bool _present;
         uint32 _spellId;
-        ObjectGuid _casterGUID;
+        WOWGUID _casterGUID;
     };
 
     class AllWorldObjectsInExactRange

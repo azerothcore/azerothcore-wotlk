@@ -537,7 +537,7 @@ public:
         }
 
         SpawnAssociation* SpawnAssoc;
-        ObjectGuid SpawnedGUID;
+        WOWGUID SpawnedGUID;
 
         void Reset() override {}
 
@@ -915,7 +915,7 @@ public:
     {
         npc_doctorAI(Creature* creature) : ScriptedAI(creature) { }
 
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         uint32 SummonPatientTimer;
         uint32 SummonPatientCount;
@@ -1006,7 +1006,7 @@ public:
                     {
                         if (!Patients.empty())
                         {
-                            for (ObjectGuid const& guid : Patients)
+                            for (WOWGUID const& guid : Patients)
                             {
                                 if (guid != savedPatient->GetGUID()) // Don't kill the last guy we just saved
                                     if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
@@ -1060,7 +1060,7 @@ public:
     {
         npc_injured_patientAI(Creature* creature) : ScriptedAI(creature) { }
 
-        ObjectGuid DoctorGUID;
+        WOWGUID DoctorGUID;
         Location* Coord;
 
         void Reset() override
@@ -1273,7 +1273,7 @@ public:
             Reset();
         }
 
-        ObjectGuid CasterGUID;
+        WOWGUID CasterGUID;
 
         bool IsHealed;
         bool CanRun;
@@ -2375,7 +2375,7 @@ public:
         uint32 jumpTimer;
         uint32 bunnyTimer;
         uint32 searchTimer;
-        ObjectGuid rabbitGUID;
+        WOWGUID rabbitGUID;
 
         void Reset() override
         {

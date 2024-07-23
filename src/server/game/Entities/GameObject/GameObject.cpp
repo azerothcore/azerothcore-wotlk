@@ -120,7 +120,7 @@ void GameObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
 
 void GameObject::RemoveFromOwner()
 {
-    ObjectGuid ownerGUID = GetOwnerGUID();
+    WOWGUID ownerGUID = GetOwnerGUID();
     if (!ownerGUID)
         return;
 
@@ -134,7 +134,7 @@ void GameObject::RemoveFromOwner()
     LOG_DEBUG("entities.gameobject", "Delete GameObject ({} Entry: {} SpellId {} LinkedGO {}) that lost references to owner {} GO list.",
         GetGUID().ToString(), GetGOInfo()->entry, m_spellId, GetGOInfo()->GetLinkedGameObjectEntry(), ownerGUID.ToString());
 
-    SetOwnerGUID(ObjectGuid::Empty);
+    SetOwnerGUID(WOWGUID::Empty);
 }
 
 void GameObject::AddToWorld()
@@ -237,7 +237,7 @@ void GameObject::ClearRitualList()
     if (!animSpell)
         animSpell = GetSpellId();
 
-    for (ObjectGuid const& guid : m_unique_users)
+    for (WOWGUID const& guid : m_unique_users)
     {
         if (Player* channeler = ObjectAccessor::GetPlayer(*this, guid))
             if (Spell* spell = channeler->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
@@ -251,7 +251,7 @@ void GameObject::ClearRitualList()
     m_unique_users.clear();
 }
 
-bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
+bool GameObject::Create(WOWGUID::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
 {
     ASSERT(map);
     SetMap(map);
@@ -464,7 +464,7 @@ void GameObject::Update(uint32 diff)
         }
     }
 
-    for (std::unordered_map<ObjectGuid, int32>::iterator itr = m_SkillupList.begin(); itr != m_SkillupList.end();)
+    for (std::unordered_map<WOWGUID, int32>::iterator itr = m_SkillupList.begin(); itr != m_SkillupList.end();)
     {
         if (itr->second > 0)
         {
@@ -612,11 +612,11 @@ void GameObject::Update(uint32 diff)
                     time_t now = GameTime::GetGameTime().count();
                     if (m_respawnTime <= now)            // timer expired
                     {
-                        ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::GameObject>(GetEntry(), m_spawnId);
+                        WOWGUID dbtableHighGuid = WOWGUID::Create<HighGuid::GameObject>(GetEntry(), m_spawnId);
                         time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
                         if (linkedRespawntime)             // Can't respawn, the master is dead
                         {
-                            ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+                            WOWGUID targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
                             if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
                                 SetRespawnTime(DAY);
                             else
@@ -1120,7 +1120,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     sScriptMgr->OnGameObjectSaveToDB(this);
 }
 
-bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap)
+bool GameObject::LoadGameObjectFromDB(WOWGUID::LowType spawnId, Map* map, bool addToMap)
 {
     GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
 
@@ -1272,7 +1272,7 @@ bool GameObject::IsAlwaysVisibleFor(WorldObject const* seer) const
         return false;
 
     // Always seen by owner and friendly units
-    if (ObjectGuid guid = GetOwnerGUID())
+    if (WOWGUID guid = GetOwnerGUID())
     {
         if (seer->GetGUID() == guid)
             return true;
@@ -1448,7 +1448,7 @@ void GameObject::SetGoArtKit(uint8 kit)
         data->artKit = kit;
 }
 
-void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType lowguid)
+void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, WOWGUID::LowType lowguid)
 {
     const GameObjectData* data = nullptr;
     if (go)
@@ -2134,7 +2134,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
         // xinef: set proper orientation, fixes cast against stealthed targets
         if (target)
             trigger->SetInFront(target);
-        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, target ? target->GetGUID() : ObjectGuid::Empty);
+        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, target ? target->GetGUID() : WOWGUID::Empty);
     }
 }
 
@@ -3056,13 +3056,13 @@ SpellInfo const* GameObject::GetSpellForLock(Player const* player) const
     return nullptr;
 }
 
-void GameObject::AddToSkillupList(ObjectGuid playerGuid)
+void GameObject::AddToSkillupList(WOWGUID playerGuid)
 {
     int32 timer = GetMap()->IsDungeon() ? -1 : 10 * MINUTE * IN_MILLISECONDS;
     m_SkillupList[playerGuid] = timer;
 }
 
-bool GameObject::IsInSkillupList(ObjectGuid playerGuid) const
+bool GameObject::IsInSkillupList(WOWGUID playerGuid) const
 {
     for (auto const& itr : m_SkillupList)
     {

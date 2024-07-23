@@ -115,7 +115,7 @@ public:
             ArthasGUID.Clear();
         }
 
-        ObjectGuid ArthasGUID;
+        WOWGUID ArthasGUID;
         bool Started;
         InstanceScript* instance;
         EventMap events;

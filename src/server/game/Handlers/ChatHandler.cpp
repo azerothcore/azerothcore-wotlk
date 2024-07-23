@@ -743,7 +743,7 @@ void User::HandleTextEmoteOpcode(WorldPacket& recvData)
         return;
 
     uint32 text_emote, emoteNum;
-    ObjectGuid guid;
+    WOWGUID guid;
 
     recvData >> text_emote;
     recvData >> emoteNum;
@@ -797,7 +797,7 @@ void User::HandleTextEmoteOpcode(WorldPacket& recvData)
 
 void User::HandleChatIgnoredOpcode(WorldPacket& recvData)
 {
-    ObjectGuid iguid;
+    WOWGUID iguid;
     uint8 unk;
 
     recvData >> iguid;

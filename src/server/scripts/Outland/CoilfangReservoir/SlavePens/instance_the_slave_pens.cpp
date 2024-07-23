@@ -103,7 +103,7 @@ public:
             InstanceScript::OnCreatureCreate(creature);
         }
 
-        void SetGuidData(uint32 data, ObjectGuid guid) override
+        void SetGuidData(uint32 data, WOWGUID guid) override
         {
             switch (data)
             {
@@ -121,7 +121,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -155,17 +155,17 @@ public:
                     break;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
     protected:
-        ObjectGuid AhuneGUID;
-        ObjectGuid AhuneBunnyGUID;
-        ObjectGuid FrozenCoreGUID;
-        ObjectGuid LumaGUID;
-        ObjectGuid FlameCallerGUIDs[3];
-        ObjectGuid BonfireBunnyGUIDs[3];
-        ObjectGuid BeamBunnyGUIDs[3];
+        WOWGUID AhuneGUID;
+        WOWGUID AhuneBunnyGUID;
+        WOWGUID FrozenCoreGUID;
+        WOWGUID LumaGUID;
+        WOWGUID FlameCallerGUIDs[3];
+        WOWGUID BonfireBunnyGUIDs[3];
+        WOWGUID BeamBunnyGUIDs[3];
         uint8 counter;
     };
 

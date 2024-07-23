@@ -310,7 +310,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
 
     void Reset() override
     {
-        for (ObjectGuid const& guid : revelerGUIDs)
+        for (WOWGUID const& guid : revelerGUIDs)
         {
             if (Creature* reveler = ObjectAccessor::GetCreature(*me, guid))
             {
@@ -617,7 +617,7 @@ struct npc_dark_iron_guzzler : public ScriptedAI
     }
 
     uint32 timer;
-    ObjectGuid targetGUID;
+    WOWGUID targetGUID;
     bool attacking;
 
     void JustEngagedWith(Unit*) override {}
@@ -1742,7 +1742,7 @@ struct npc_coren_direbrew_sisters : public ScriptedAI
 {
     npc_coren_direbrew_sisters(Creature* creature) : ScriptedAI(creature) { }
 
-    void SetGUID(ObjectGuid guid, int32 id) override
+    void SetGUID(WOWGUID guid, int32 id) override
     {
         if (id == DATA_TARGET_GUID)
         {
@@ -1750,14 +1750,14 @@ struct npc_coren_direbrew_sisters : public ScriptedAI
         }
     }
 
-    ObjectGuid GetGUID(int32 data) const override
+    WOWGUID GetGUID(int32 data) const override
     {
         if (data == DATA_TARGET_GUID)
         {
             return _targetGUID;
         }
 
-        return ObjectGuid::Empty;
+        return WOWGUID::Empty;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -1797,7 +1797,7 @@ struct npc_coren_direbrew_sisters : public ScriptedAI
     }
 
 private:
-    ObjectGuid _targetGUID;
+    WOWGUID _targetGUID;
     TaskScheduler _scheduler;
 };
 

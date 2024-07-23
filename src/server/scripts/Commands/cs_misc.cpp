@@ -1161,7 +1161,7 @@ public:
 
     static bool HandleGUIDCommand(ChatHandler* handler)
     {
-        ObjectGuid guid = handler->GetSession()->GetPlayer()->GetTarget();
+        WOWGUID guid = handler->GetSession()->GetPlayer()->GetTarget();
 
         if (!guid)
         {
@@ -1907,7 +1907,7 @@ public:
 
         // Account data print variables
         std::string userName          = handler->GetAcoreString(LANG_ERROR);
-        ObjectGuid::LowType lowguid   = target->GetGUID().GetCounter();
+        WOWGUID::LowType lowguid   = target->GetGUID().GetCounter();
         uint32 accId                  = 0;
         std::string eMail             = handler->GetAcoreString(LANG_ERROR);
         std::string regMail           = handler->GetAcoreString(LANG_ERROR);
@@ -2109,7 +2109,7 @@ public:
         {
             Field* fields = charXpResult->Fetch();
             xp = fields[0].Get<uint32>();
-            ObjectGuid::LowType gguid = fields[1].Get<uint32>();
+            WOWGUID::LowType gguid = fields[1].Get<uint32>();
 
             if (gguid != 0)
             {

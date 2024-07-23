@@ -180,14 +180,14 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 data) const override
+        WOWGUID GetGuidData(uint32 data) const override
         {
             if (data == DATA_THRALL_GUID)
                 return _thrallGUID;
             else if (data == DATA_TARETHA_GUID)
                 return _tarethaGUID;
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void Update(uint32 diff) override
@@ -200,7 +200,7 @@ public:
                         instance->LoadGrid(instancePositions[0].GetPositionX(), instancePositions[0].GetPositionY());
                         instance->LoadGrid(instancePositions[1].GetPositionX(), instancePositions[1].GetPositionY());
 
-                        for (ObjectGuid const& guid : _prisonersSet)
+                        for (WOWGUID const& guid : _prisonersSet)
                             if (Creature* orc = instance->GetCreature(guid))
                             {
                                 uint8 index = orc->GetDistance(instancePositions[0]) < 80.0f ? 0 : 1;
@@ -210,7 +210,7 @@ public:
                                 orc->SetStandState(UNIT_STANDING);
                             }
 
-                        for (ObjectGuid const& guid : _initalFlamesSet)
+                        for (WOWGUID const& guid : _initalFlamesSet)
                             if (GameObject* gobject = instance->GetGameObject(guid))
                             {
                                 gobject->SetRespawnTime(0);
@@ -232,14 +232,14 @@ public:
                                         player->KilledMonsterCredit(NPC_LODGE_QUEST_TRIGGER);
                         }
 
-                        for (ObjectGuid const& guid : _finalFlamesSet)
+                        for (WOWGUID const& guid : _finalFlamesSet)
                             if (GameObject* gobject = instance->GetGameObject(guid))
                             {
                                 gobject->SetRespawnTime(0);
                                 gobject->UpdateObjectVisibility(true);
                             }
 
-                        for (ObjectGuid const& guid : _prisonersSet)
+                        for (WOWGUID const& guid : _prisonersSet)
                             if (Creature* orc = instance->GetCreature(guid))
                                 if (roll_chance_i(25))
                                     orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
@@ -315,8 +315,8 @@ public:
         uint32 _barrelCount;
         uint32 _attemptsCount;
 
-        ObjectGuid _thrallGUID;
-        ObjectGuid _tarethaGUID;
+        WOWGUID _thrallGUID;
+        WOWGUID _tarethaGUID;
         GuidSet _initalFlamesSet;
         GuidSet _finalFlamesSet;
         GuidSet _prisonersSet;

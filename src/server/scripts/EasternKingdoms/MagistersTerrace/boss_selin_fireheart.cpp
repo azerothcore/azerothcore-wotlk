@@ -62,7 +62,7 @@ struct boss_selin_fireheart : public ScriptedAI
     InstanceScript* instance;
     EventMap events;
     SummonList summons;
-    ObjectGuid CrystalGUID;
+    WOWGUID CrystalGUID;
 
     bool CanAIAttack(Unit const* who) const override
     {

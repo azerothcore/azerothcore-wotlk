@@ -541,7 +541,7 @@ void User::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
 
 void User::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
 {
-    ObjectGuid ID;
+    WOWGUID ID;
     recvPacket >> ID;
 
     if (GetPlayer()->m_trade)
@@ -697,7 +697,7 @@ void User::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    ObjectGuid iGUID = item->GetGUID();
+    WOWGUID iGUID = item->GetGUID();
 
     // prevent place single item into many trade slots using cheating and client bugs
     if (my_trade->HasItem(iGUID))

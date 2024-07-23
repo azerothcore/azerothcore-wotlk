@@ -190,7 +190,7 @@ private:
 class FrostBombExplosion : public BasicEvent
 {
 public:
-    FrostBombExplosion(Creature* owner, ObjectGuid sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
+    FrostBombExplosion(Creature* owner, WOWGUID sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -201,13 +201,13 @@ public:
 
 private:
     Creature* _owner;
-    ObjectGuid _sindragosaGUID;
+    WOWGUID _sindragosaGUID;
 };
 
 class IceTombSummonEvent : public BasicEvent
 {
 public:
-    IceTombSummonEvent(Unit* owner, ObjectGuid sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
+    IceTombSummonEvent(Unit* owner, WOWGUID sindragosaGUID) : _owner(owner), _sindragosaGUID(sindragosaGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -237,7 +237,7 @@ public:
 
 private:
     Unit* _owner;
-    ObjectGuid _sindragosaGUID;
+    WOWGUID _sindragosaGUID;
 };
 
 struct LastPhaseIceTombTargetSelector
@@ -694,11 +694,11 @@ public:
             _asphyxiationTimer = 22500;
         }
 
-        ObjectGuid _trappedPlayerGUID;
+        WOWGUID _trappedPlayerGUID;
         uint32 _existenceCheckTimer;
         uint16 _asphyxiationTimer;
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(WOWGUID guid, int32 type) override
         {
             if (type == DATA_TRAPPED_PLAYER)
                 _trappedPlayerGUID = guid;

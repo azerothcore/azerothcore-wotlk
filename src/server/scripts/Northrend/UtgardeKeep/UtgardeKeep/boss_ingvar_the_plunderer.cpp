@@ -119,8 +119,8 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        ObjectGuid ValkyrGUID;
-        ObjectGuid ThrowGUID;
+        WOWGUID ValkyrGUID;
+        WOWGUID ThrowGUID;
 
         void Reset() override
         {

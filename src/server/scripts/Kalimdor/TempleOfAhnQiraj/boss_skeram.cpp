@@ -190,7 +190,7 @@ struct boss_skeram : public BossAI
                     me->SetReactState(REACT_AGGRESSIVE);
                     me->SetImmuneToAll(false);
                     me->SetControlled(false, UNIT_STATE_ROOT);
-                    for (ObjectGuid const& guid : _copiesGUIDs)
+                    for (WOWGUID const& guid : _copiesGUIDs)
                     {
                         if (Creature* image = ObjectAccessor::GetCreature(*me, guid))
                         {

@@ -256,7 +256,7 @@ uint32 BattlegroundQueue::GetAverageQueueWaitTime(GroupQueueInfo* ginfo) const
 }
 
 //remove player from queue and from group info, if group info is empty then remove it too
-void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
+void BattlegroundQueue::RemovePlayer(WOWGUID guid, bool decreaseInvitedCount)
 {
     //remove player from map, if he's there
     auto const& itr = m_QueuedPlayers.find(guid);
@@ -367,20 +367,20 @@ void BattlegroundQueue::AddEvent(BasicEvent* Event, uint64 e_time)
     m_events.AddEvent(Event, m_events.CalculateTime(e_time));
 }
 
-bool BattlegroundQueue::IsPlayerInvitedToRatedArena(ObjectGuid pl_guid)
+bool BattlegroundQueue::IsPlayerInvitedToRatedArena(WOWGUID pl_guid)
 {
     auto qItr = m_QueuedPlayers.find(pl_guid);
     return qItr != m_QueuedPlayers.end() && qItr->second->IsRated && qItr->second->IsInvitedToBGInstanceGUID;
 }
 
 //returns true when player pl_guid is in queue and is invited to bgInstanceGuid
-bool BattlegroundQueue::IsPlayerInvited(ObjectGuid pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime)
+bool BattlegroundQueue::IsPlayerInvited(WOWGUID pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime)
 {
     auto qItr = m_QueuedPlayers.find(pl_guid);
     return qItr != m_QueuedPlayers.end() && qItr->second->IsInvitedToBGInstanceGUID == bgInstanceGuid && qItr->second->RemoveInviteTime == removeTime;
 }
 
-bool BattlegroundQueue::GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo)
+bool BattlegroundQueue::GetPlayerGroupInfoData(WOWGUID guid, GroupQueueInfo* ginfo)
 {
     auto qItr = m_QueuedPlayers.find(guid);
     if (qItr == m_QueuedPlayers.end())

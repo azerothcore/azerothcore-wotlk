@@ -78,19 +78,19 @@ public:
     {
         instance_zulaman_InstanceMapScript(Map* map) : InstanceScript(map) {}
 
-        ObjectGuid HarkorsSatchelGUID;
-        ObjectGuid TanzarsTrunkGUID;
-        ObjectGuid AshlisBagGUID;
-        ObjectGuid KrazsPackageGUID;
-        ObjectGuid StrangeGongGUID;
-        ObjectGuid HarrisonJonesGUID;
+        WOWGUID HarkorsSatchelGUID;
+        WOWGUID TanzarsTrunkGUID;
+        WOWGUID AshlisBagGUID;
+        WOWGUID KrazsPackageGUID;
+        WOWGUID StrangeGongGUID;
+        WOWGUID HarrisonJonesGUID;
 
-        ObjectGuid HexLordGateGUID;
-        ObjectGuid ZulJinGateGUID;
-        ObjectGuid MassiveGateGUID;
-        ObjectGuid AkilzonDoorGUID;
-        ObjectGuid ZulJinDoorGUID;
-        ObjectGuid HalazziDoorGUID;
+        WOWGUID HexLordGateGUID;
+        WOWGUID ZulJinGateGUID;
+        WOWGUID MassiveGateGUID;
+        WOWGUID AkilzonDoorGUID;
+        WOWGUID ZulJinDoorGUID;
+        WOWGUID HalazziDoorGUID;
 
         uint32 QuestTimer;
         uint16 BossKilled;
@@ -393,7 +393,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -403,7 +403,7 @@ public:
                     return MassiveGateGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
     };
 

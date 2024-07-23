@@ -205,7 +205,7 @@ public:
         uint32 EndEventProgress;
         uint32 EndEventTimer;
 
-        ObjectGuid SpraggleGUID;
+        WOWGUID SpraggleGUID;
 
         void Reset() override
         {

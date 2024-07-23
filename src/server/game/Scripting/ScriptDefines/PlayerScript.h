@@ -302,7 +302,7 @@ public:
     // Both of the below are called on emote opcodes.
     virtual void OnEmote(Player* /*player*/, uint32 /*emote*/) { }
 
-    virtual void OnTextEmote(Player* /*player*/, uint32 /*textEmote*/, uint32 /*emoteNum*/, ObjectGuid /*guid*/) { }
+    virtual void OnTextEmote(Player* /*player*/, uint32 /*textEmote*/, uint32 /*emoteNum*/, WOWGUID /*guid*/) { }
 
     // Called in Spell::Cast.
     virtual void OnSpellCast(Player* /*player*/, Spell* /*spell*/, bool /*skipCheck*/) { }
@@ -323,10 +323,10 @@ public:
     virtual void OnCreate(Player* /*player*/) { }
 
     // Called when a player is deleted.
-    virtual void OnDelete(ObjectGuid /*guid*/, uint32 /*accountId*/) { }
+    virtual void OnDelete(WOWGUID /*guid*/, uint32 /*accountId*/) { }
 
     // Called when a player delete failed.
-    virtual void OnFailedDelete(ObjectGuid /*guid*/, uint32 /*accountId*/) { }
+    virtual void OnFailedDelete(WOWGUID /*guid*/, uint32 /*accountId*/) { }
 
     // Called when a player is about to be saved.
     virtual void OnSave(Player* /*player*/) { }
@@ -410,7 +410,7 @@ public:
     virtual void OnGetMaxPersonalArenaRatingRequirement(Player const* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
 
     //After looting item
-    virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, ObjectGuid /*lootguid*/) { }
+    virtual void OnLootItem(Player* /*player*/, Item* /*item*/, uint32 /*count*/, WOWGUID /*lootguid*/) { }
 
     //Before looting item
     virtual void OnBeforeFillQuestLootItem(Player* /*player*/, LootItem& /*item*/) { }
@@ -440,10 +440,10 @@ public:
     virtual void OnQuestComputeXP(Player* /*player*/, Quest const* /*quest*/, uint32& /*xpValue*/) { }
 
     // Before durability repair action, you can even modify the discount value
-    virtual void OnBeforeDurabilityRepair(Player* /*player*/, ObjectGuid /*npcGUID*/, ObjectGuid /*itemGUID*/, float&/*discountMod*/, uint8 /*guildBank*/) { }
+    virtual void OnBeforeDurabilityRepair(Player* /*player*/, WOWGUID /*npcGUID*/, WOWGUID /*itemGUID*/, float&/*discountMod*/, uint8 /*guildBank*/) { }
 
     //Before buying something from any vendor
-    virtual void OnBeforeBuyItemFromVendor(Player* /*player*/, ObjectGuid /*vendorguid*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) { };
+    virtual void OnBeforeBuyItemFromVendor(Player* /*player*/, WOWGUID /*vendorguid*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) { };
 
     //Before buying something from any vendor
     virtual void OnBeforeStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, uint32& /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
@@ -464,7 +464,7 @@ public:
 
     virtual void OnSetMaxLevel(Player* /*player*/, uint32& /*maxPlayerLevel*/) { }
 
-    [[nodiscard]] virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, ObjectGuid /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
+    [[nodiscard]] virtual bool CanJoinInBattlegroundQueue(Player* /*player*/, WOWGUID /*BattlemasterGuid*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
     virtual bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* /*player*/) { return false; }
 
     // Called before the player's temporary summoned creature has initialized it's stats
@@ -479,7 +479,7 @@ public:
     // Called before loading a player's pet from the DB
     virtual void OnBeforeLoadPetFromDB(Player* /*player*/, uint32& /*petentry*/, uint32& /*petnumber*/, bool& /*current*/, bool& /*forceLoadFromDB*/) { }
 
-    [[nodiscard]] virtual bool CanJoinInArenaQueue(Player* /*player*/, ObjectGuid /*BattlemasterGuid*/, uint8 /*arenaslot*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, uint8 /*IsRated*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
+    [[nodiscard]] virtual bool CanJoinInArenaQueue(Player* /*player*/, WOWGUID /*BattlemasterGuid*/, uint8 /*arenaslot*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/, uint8 /*IsRated*/, GroupJoinBattlegroundResult& /*err*/) { return true; }
 
     [[nodiscard]] virtual bool CanBattleFieldPort(Player* /*player*/, uint8 /*arenaType*/, BattlegroundTypeId /*BGTypeID*/, uint8 /*action*/) { return true; }
 
@@ -489,7 +489,7 @@ public:
 
     [[nodiscard]] virtual bool CanSellItem(Player* /*player*/, Item* /*item*/, Creature* /*creature*/) { return true; }
 
-    [[nodiscard]] virtual bool CanSendMail(Player* /*player*/, ObjectGuid /*receiverGuid*/, ObjectGuid /*mailbox*/, std::string& /*subject*/, std::string& /*body*/, uint32 /*money*/, uint32 /*COD*/, Item* /*item*/) { return true; }
+    [[nodiscard]] virtual bool CanSendMail(Player* /*player*/, WOWGUID /*receiverGuid*/, WOWGUID /*mailbox*/, std::string& /*subject*/, std::string& /*body*/, uint32 /*money*/, uint32 /*COD*/, Item* /*item*/) { return true; }
 
     virtual void PetitionBuy(Player* /*player*/, Creature* /*creature*/, uint32& /*charterid*/, uint32& /*cost*/, uint32& /*type*/) { }
 
@@ -576,7 +576,7 @@ public:
 
     virtual void OnGetQuestRate(Player* /*player*/, float& /*result*/) { }
 
-    [[nodiscard]] virtual bool PassedQuestKilledMonsterCredit(Player* /*player*/, Quest const* /*qinfo*/, uint32 /*entry*/, uint32 /*real_entry*/, ObjectGuid /*guid*/) { return true; }
+    [[nodiscard]] virtual bool PassedQuestKilledMonsterCredit(Player* /*player*/, Quest const* /*qinfo*/, uint32 /*entry*/, uint32 /*real_entry*/, WOWGUID /*guid*/) { return true; }
 
     [[nodiscard]] virtual bool CheckItemInSlotAtLoadInventory(Player* /*player*/, Item* /*item*/, uint8 /*slot*/, uint8& /*err*/, uint16& /*dest*/) { return true; }
 

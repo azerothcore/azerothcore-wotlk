@@ -87,7 +87,7 @@ public:
                 case NPC_CTHUN:
                     if (!creature->IsAlive())
                     {
-                        for (ObjectGuid const& guid : CThunGraspGUIDs)
+                        for (WOWGUID const& guid : CThunGraspGUIDs)
                         {
                             if (GameObject* cthunGrasp = instance->GetGameObject(guid))
                             {
@@ -151,7 +151,7 @@ public:
                     }
                     break;
                 case NPC_CTHUN:
-                    for (ObjectGuid const& guid : CThunGraspGUIDs)
+                    for (WOWGUID const& guid : CThunGraspGUIDs)
                     {
                         if (GameObject* cthunGrasp = instance->GetGameObject(guid))
                         {

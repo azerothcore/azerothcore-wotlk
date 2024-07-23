@@ -473,7 +473,7 @@ struct BroadcastText
 
 typedef std::unordered_map<uint32, BroadcastText> BroadcastTextContainer;
 
-typedef std::set<ObjectGuid::LowType> CellGuidSet;
+typedef std::set<WOWGUID::LowType> CellGuidSet;
 
 struct CellObjectGuids
 {
@@ -498,9 +498,9 @@ struct AcoreString
     std::vector<std::string> Content;
 };
 
-typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
-typedef std::unordered_map<ObjectGuid::LowType, CreatureData> CreatureDataContainer;
-typedef std::unordered_map<ObjectGuid::LowType, GameObjectData> GameObjectDataContainer;
+typedef std::map<WOWGUID, WOWGUID> LinkedRespawnContainer;
+typedef std::unordered_map<WOWGUID::LowType, CreatureData> CreatureDataContainer;
+typedef std::unordered_map<WOWGUID::LowType, GameObjectData> GameObjectDataContainer;
 typedef std::map<TempSummonGroupKey, std::vector<TempSummonData> > TempSummonDataContainer;
 typedef std::unordered_map<uint32, CreatureLocale> CreatureLocaleContainer;
 typedef std::unordered_map<uint32, GameObjectLocale> GameObjectLocaleContainer;
@@ -774,11 +774,11 @@ public:
     static CreatureModel const* ChooseDisplayId(CreatureTemplate const* cinfo, CreatureData const* data = nullptr);
     static void ChooseCreatureFlags(CreatureTemplate const* cinfo, uint32& npcflag, uint32& unit_flags, uint32& dynamicflags, CreatureData const* data = nullptr);
     EquipmentInfo const* GetEquipmentInfo(uint32 entry, int8& id);
-    CreatureAddon const* GetCreatureAddon(ObjectGuid::LowType lowguid);
-    GameObjectAddon const* GetGameObjectAddon(ObjectGuid::LowType lowguid);
+    CreatureAddon const* GetCreatureAddon(WOWGUID::LowType lowguid);
+    GameObjectAddon const* GetGameObjectAddon(WOWGUID::LowType lowguid);
     [[nodiscard]] GameObjectTemplateAddon const* GetGameObjectTemplateAddon(uint32 entry) const;
     CreatureAddon const* GetCreatureTemplateAddon(uint32 entry);
-    CreatureMovementData const* GetCreatureMovementOverride(ObjectGuid::LowType spawnId) const;
+    CreatureMovementData const* GetCreatureMovementOverride(WOWGUID::LowType spawnId) const;
     ItemTemplate const* GetItemTemplate(uint32 entry);
     [[nodiscard]] ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
     [[nodiscard]] std::vector<ItemTemplate*> const* GetItemTemplateStoreFast() const { return &_itemTemplateStoreFast; }
@@ -1033,7 +1033,7 @@ public:
     void LoadTempSummons();
     void LoadCreatures();
     void LoadLinkedRespawn();
-    bool SetCreatureLinkedRespawn(ObjectGuid::LowType guid, ObjectGuid::LowType linkedGuid);
+    bool SetCreatureLinkedRespawn(WOWGUID::LowType guid, WOWGUID::LowType linkedGuid);
     void LoadCreatureAddons();
     void LoadGameObjectAddons();
     void LoadCreatureModelInfo();
@@ -1129,8 +1129,8 @@ public:
     uint64 GenerateEquipmentSetGuid();
     uint32 GenerateMailID();
     uint32 GeneratePetNumber();
-    ObjectGuid::LowType GenerateCreatureSpawnId();
-    ObjectGuid::LowType GenerateGameObjectSpawnId();
+    WOWGUID::LowType GenerateCreatureSpawnId();
+    WOWGUID::LowType GenerateGameObjectSpawnId();
 
     typedef std::multimap<int32, uint32> ExclusiveQuestGroups;
     typedef std::pair<ExclusiveQuestGroups::const_iterator, ExclusiveQuestGroups::const_iterator> ExclusiveQuestGroupsBounds;
@@ -1198,24 +1198,24 @@ public:
         return nullptr;
     }
     [[nodiscard]] CreatureDataContainer const& GetAllCreatureData() const { return _creatureDataStore; }
-    [[nodiscard]] CreatureData const* GetCreatureData(ObjectGuid::LowType spawnId) const
+    [[nodiscard]] CreatureData const* GetCreatureData(WOWGUID::LowType spawnId) const
     {
         CreatureDataContainer::const_iterator itr = _creatureDataStore.find(spawnId);
         if (itr == _creatureDataStore.end()) return nullptr;
         return &itr->second;
     }
-    CreatureData& NewOrExistCreatureData(ObjectGuid::LowType spawnId) { return _creatureDataStore[spawnId]; }
-    void DeleteCreatureData(ObjectGuid::LowType spawnId);
-    [[nodiscard]] ObjectGuid GetLinkedRespawnGuid(ObjectGuid guid) const
+    CreatureData& NewOrExistCreatureData(WOWGUID::LowType spawnId) { return _creatureDataStore[spawnId]; }
+    void DeleteCreatureData(WOWGUID::LowType spawnId);
+    [[nodiscard]] WOWGUID GetLinkedRespawnGuid(WOWGUID guid) const
     {
         LinkedRespawnContainer::const_iterator itr = _linkedRespawnStore.find(guid);
         if (itr == _linkedRespawnStore.end())
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         return itr->second;
     }
 
     [[nodiscard]] GameObjectDataContainer const& GetAllGOData() const { return _gameObjectDataStore; }
-    [[nodiscard]] GameObjectData const* GetGameObjectData(ObjectGuid::LowType spawnId) const
+    [[nodiscard]] GameObjectData const* GetGameObjectData(WOWGUID::LowType spawnId) const
     {
         GameObjectDataContainer::const_iterator itr = _gameObjectDataStore.find(spawnId);
         if (itr == _gameObjectDataStore.end()) return nullptr;
@@ -1309,8 +1309,8 @@ public:
     }
     QuestGreeting const* GetQuestGreeting(TypeID type, uint32 id) const;
 
-    GameObjectData& NewGOData(ObjectGuid::LowType guid) { return _gameObjectDataStore[guid]; }
-    void DeleteGOData(ObjectGuid::LowType guid);
+    GameObjectData& NewGOData(WOWGUID::LowType guid) { return _gameObjectDataStore[guid]; }
+    void DeleteGOData(WOWGUID::LowType guid);
 
     [[nodiscard]] AcoreString const* GetAcoreString(uint32 entry) const
     {
@@ -1326,10 +1326,10 @@ public:
     void SetDBCLocaleIndex(LocaleConstant locale) { DBCLocaleIndex = locale; }
 
     // grid objects
-    void AddCreatureToGrid(ObjectGuid::LowType guid, CreatureData const* data);
-    void RemoveCreatureFromGrid(ObjectGuid::LowType guid, CreatureData const* data);
-    void AddGameobjectToGrid(ObjectGuid::LowType guid, GameObjectData const* data);
-    void RemoveGameobjectFromGrid(ObjectGuid::LowType guid, GameObjectData const* data);
+    void AddCreatureToGrid(WOWGUID::LowType guid, CreatureData const* data);
+    void RemoveCreatureFromGrid(WOWGUID::LowType guid, CreatureData const* data);
+    void AddGameobjectToGrid(WOWGUID::LowType guid, GameObjectData const* data);
+    void RemoveGameobjectFromGrid(WOWGUID::LowType guid, GameObjectData const* data);
     uint32 AddGOData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0, float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
     uint32 AddCreData(uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimedelay = 0);
 
@@ -1456,8 +1456,8 @@ private:
     uint32 _hiPetNumber;
     std::mutex _hiPetNumberMutex;
 
-    ObjectGuid::LowType _creatureSpawnId;
-    ObjectGuid::LowType _gameObjectSpawnId;
+    WOWGUID::LowType _creatureSpawnId;
+    WOWGUID::LowType _gameObjectSpawnId;
 
     // first free low guid for selected guid type
     template<HighGuid high>
@@ -1576,7 +1576,7 @@ private:
     CreatureModelContainer _creatureModelStore;
     CreatureAddonContainer _creatureAddonStore;
     CreatureAddonContainer _creatureTemplateAddonStore;
-    std::unordered_map<ObjectGuid::LowType, CreatureMovementData> _creatureMovementOverrides;
+    std::unordered_map<WOWGUID::LowType, CreatureMovementData> _creatureMovementOverrides;
     GameObjectAddonContainer _gameObjectAddonStore;
     GameObjectQuestItemMap _gameObjectQuestItemStore;
     CreatureQuestItemMap _creatureQuestItemStore;

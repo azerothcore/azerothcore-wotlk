@@ -163,7 +163,7 @@ public:
         InstanceScript* m_pInstance;
 
         Vehicle* vehicle;
-        ObjectGuid _left, _right;
+        WOWGUID _left, _right;
         EventMap events;
         SummonList summons;
 

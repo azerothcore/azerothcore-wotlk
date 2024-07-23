@@ -53,7 +53,7 @@ void LootItemStorage::LoadStorageFromDB()
     {
         Field* fields = result->Fetch();
 
-        StoredLootItemList& itemList = lootItemStore[ObjectGuid::Create<HighGuid::Item>(fields[0].Get<uint32>())];
+        StoredLootItemList& itemList = lootItemStore[WOWGUID::Create<HighGuid::Item>(fields[0].Get<uint32>())];
         itemList.push_back(StoredLootItem(fields[1].Get<uint32>(), fields[2].Get<uint32>(), fields[3].Get<uint32>(), fields[4].Get<int32>(), fields[5].Get<uint32>(), fields[6].Get<bool>(),
             fields[7].Get<bool>(), fields[8].Get<bool>(), fields[9].Get<bool>(), fields[10].Get<bool>(), fields[11].Get<bool>(), fields[12].Get<uint32>()));
 
@@ -64,7 +64,7 @@ void LootItemStorage::LoadStorageFromDB()
     LOG_INFO("server.loading", " ");
 }
 
-void LootItemStorage::RemoveEntryFromDB(ObjectGuid containerGUID, uint32 itemid, uint32 count, uint32 itemIndex)
+void LootItemStorage::RemoveEntryFromDB(WOWGUID containerGUID, uint32 itemid, uint32 count, uint32 itemIndex)
 {
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -196,7 +196,7 @@ bool LootItemStorage::LoadStoredLoot(Item* item, Player* player)
             li.needs_quest = it2->needs_quest;
             li.randomPropertyId = it2->randomPropertyId;
             li.randomSuffix = it2->randomSuffix;
-            li.rollWinnerGUID = ObjectGuid::Empty;
+            li.rollWinnerGUID = WOWGUID::Empty;
             li.groupid = 0;
 
             // Copy the extra loot conditions from the item in the loot template
@@ -231,7 +231,7 @@ bool LootItemStorage::LoadStoredLoot(Item* item, Player* player)
     return true;
 }
 
-void LootItemStorage::RemoveStoredLootItem(ObjectGuid containerGUID, uint32 itemid, uint32 count, Loot* loot, uint32 itemIndex)
+void LootItemStorage::RemoveStoredLootItem(WOWGUID containerGUID, uint32 itemid, uint32 count, Loot* loot, uint32 itemIndex)
 {
     LootItemContainer::iterator itr = lootItemStore.find(containerGUID);
     if (itr == lootItemStore.end())
@@ -252,7 +252,7 @@ void LootItemStorage::RemoveStoredLootItem(ObjectGuid containerGUID, uint32 item
         lootItemStore.erase(itr);
 }
 
-void LootItemStorage::RemoveStoredLootMoney(ObjectGuid containerGUID, Loot* loot)
+void LootItemStorage::RemoveStoredLootMoney(WOWGUID containerGUID, Loot* loot)
 {
     LootItemContainer::iterator itr = lootItemStore.find(containerGUID);
     if (itr == lootItemStore.end())
@@ -273,7 +273,7 @@ void LootItemStorage::RemoveStoredLootMoney(ObjectGuid containerGUID, Loot* loot
         lootItemStore.erase(itr);
 }
 
-void LootItemStorage::RemoveStoredLoot(ObjectGuid containerGUID)
+void LootItemStorage::RemoveStoredLoot(WOWGUID containerGUID)
 {
     lootItemStore.erase(containerGUID);
 

@@ -921,7 +921,7 @@ struct BattlegroundICScore final : public BattlegroundScore
     friend class BattlegroundIC;
 
 protected:
-    BattlegroundICScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
+    BattlegroundICScore(WOWGUID playerGuid) : BattlegroundScore(playerGuid) { }
 
     void UpdateScore(uint32 type, uint32 value) override
     {
@@ -982,7 +982,7 @@ public:
 
     bool AllNodesConrolledByTeam(TeamId teamId) const override;  // overwrited
     bool IsResourceGlutAllowed(TeamId teamId) const;
-    void DoAction(uint32 action, ObjectGuid guid) override;
+    void DoAction(uint32 action, WOWGUID guid) override;
 private:
     uint32 closeFortressDoorsTimer;
     bool doorsClosed;
@@ -993,7 +993,7 @@ private:
     BG_IC_GateState GateStatus[6];
     ICNodePoint nodePoint[7];
 
-    typedef std::map<ObjectGuid, uint32> RespawnMap;
+    typedef std::map<WOWGUID, uint32> RespawnMap;
     RespawnMap respawnMap;
 
     MotionTransport* gunshipAlliance;

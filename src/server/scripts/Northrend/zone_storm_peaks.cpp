@@ -244,7 +244,7 @@ public:
         void RollPath()
         {
             me->SetEntry(NPC_TIME_LOST_PROTO_DRAKE);
-            Start(true, true, ObjectGuid::Empty, 0, false, true, true);
+            Start(true, true, WOWGUID::Empty, 0, false, true, true);
             SetNextWaypoint(urand(0, 250), true);
             me->UpdateEntry(roll_chance_i(25) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false);
         }
@@ -340,7 +340,7 @@ public:
     {
         npc_wild_wyrmAI(Creature* creature) : ScriptedAI(creature) {}
 
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
         uint32 checkTimer;
         uint32 announceAttackTimer;
         uint32 attackTimer;

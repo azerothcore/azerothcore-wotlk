@@ -58,7 +58,7 @@ namespace lfg
         {
             player->User()->SendLfgLfrList(false);
             sLFGMgr->LeaveLfg(player->GetGUID());
-            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true, player->GetGroup() ? player->GetGroup()->GetGUID() : ObjectGuid::Empty);
+            sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), true, player->GetGroup() ? player->GetGroup()->GetGUID() : WOWGUID::Empty);
 
             // pussywizard: after all necessary actions handle raid browser
             // pussywizard: already done above
@@ -75,13 +75,13 @@ namespace lfg
             return;
 
         // Temporal: Trying to determine when group data and LFG data gets desynched
-        ObjectGuid guid = player->GetGUID();
-        ObjectGuid gguid = sLFGMgr->GetGroup(guid);
+        WOWGUID guid = player->GetGUID();
+        WOWGUID gguid = sLFGMgr->GetGroup(guid);
 
         Group const* group = player->GetGroup();
         if (group)
         {
-            ObjectGuid gguid2 = group->GetGUID();
+            WOWGUID gguid2 = group->GetGUID();
             if (gguid != gguid2)
             {
                 sLFGMgr->SetupGroupMember(guid, group->GetGUID());
@@ -152,13 +152,13 @@ namespace lfg
     {
     }
 
-    void LFGGroupScript::OnAddMember(Group* group, ObjectGuid guid)
+    void LFGGroupScript::OnAddMember(Group* group, WOWGUID guid)
     {
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
 
-        ObjectGuid gguid = group->GetGUID();
-        ObjectGuid leader = group->GetLeaderGUID();
+        WOWGUID gguid = group->GetGUID();
+        WOWGUID leader = group->GetLeaderGUID();
 
         if (leader == guid)
         {
@@ -193,7 +193,7 @@ namespace lfg
             sLFGMgr->LeaveLfg(guid);
     }
 
-    void LFGGroupScript::OnRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, char const* reason)
+    void LFGGroupScript::OnRemoveMember(Group* group, WOWGUID guid, RemoveMethod method, WOWGUID kicker, char const* reason)
     {
         // used only with EXTRA_LOGS
         (void)kicker;
@@ -202,7 +202,7 @@ namespace lfg
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
 
-        ObjectGuid gguid = group->GetGUID();
+        WOWGUID gguid = group->GetGUID();
         LOG_DEBUG("lfg", "LFGScripts::OnRemoveMember [{}]: remove [{}] Method: {} Kicker: [{}] Reason: {}",
             gguid.ToString(), guid.ToString(), method, kicker.ToString(), (reason ? reason : ""));
 
@@ -214,14 +214,14 @@ namespace lfg
         if (state == LFG_STATE_PROPOSAL && method == GROUP_REMOVEMETHOD_DEFAULT)
         {
             // LfgData: Remove player from group
-            sLFGMgr->SetGroup(guid, ObjectGuid::Empty);
+            sLFGMgr->SetGroup(guid, WOWGUID::Empty);
             sLFGMgr->RemovePlayerFromGroup(gguid, guid);
             return;
         }
 
         sLFGMgr->LeaveLfg(guid);
         sLFGMgr->LeaveAllLfgQueues(guid, true, gguid);
-        sLFGMgr->SetGroup(guid, ObjectGuid::Empty);
+        sLFGMgr->SetGroup(guid, WOWGUID::Empty);
         uint8 players = sLFGMgr->RemovePlayerFromGroup(gguid, guid);
 
         // pussywizard: after all necessary actions handle raid browser
@@ -268,7 +268,7 @@ namespace lfg
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
 
-        ObjectGuid gguid = group->GetGUID();
+        WOWGUID gguid = group->GetGUID();
         LOG_DEBUG("lfg", "LFGScripts::OnDisband [{}]", gguid.ToString());
 
         // pussywizard: after all necessary actions handle raid browser
@@ -278,12 +278,12 @@ namespace lfg
         sLFGMgr->RemoveGroupData(gguid);
     }
 
-    void LFGGroupScript::OnChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid)
+    void LFGGroupScript::OnChangeLeader(Group* group, WOWGUID newLeaderGuid, WOWGUID oldLeaderGuid)
     {
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
 
-        ObjectGuid gguid = group->GetGUID();
+        WOWGUID gguid = group->GetGUID();
 
         LOG_DEBUG("lfg", "LFGScripts::OnChangeLeader [{}]: old [{}] new [{}]",
             gguid.ToString(), newLeaderGuid.ToString(), oldLeaderGuid.ToString());
@@ -294,7 +294,7 @@ namespace lfg
             sLFGMgr->LeaveLfg(oldLeaderGuid);
     }
 
-    void LFGGroupScript::OnInviteMember(Group* group, ObjectGuid guid)
+    void LFGGroupScript::OnInviteMember(Group* group, WOWGUID guid)
     {
         // used only with EXTRA_LOGS
         (void)guid;
@@ -302,8 +302,8 @@ namespace lfg
         if (!sLFGMgr->isOptionEnabled(LFG_OPTION_ENABLE_DUNGEON_FINDER | LFG_OPTION_ENABLE_RAID_BROWSER | LFG_OPTION_ENABLE_SEASONAL_BOSSES))
             return;
 
-        ObjectGuid gguid = group->GetGUID();
-        ObjectGuid leader = group->GetLeaderGUID();
+        WOWGUID gguid = group->GetGUID();
+        WOWGUID leader = group->GetLeaderGUID();
         LOG_DEBUG("lfg", "LFGScripts::OnInviteMember [{}]: invite [{}] leader [{}]", gguid.ToString(), guid.ToString(), leader.ToString());
         // No gguid ==  new group being formed
         // No leader == after group creation first invite is new leader

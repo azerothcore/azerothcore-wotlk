@@ -101,7 +101,7 @@ struct SpellDestination
     void RelocateOffset(Position const& offset);
 
     WorldLocation _position;
-    ObjectGuid _transportGUID;
+    WOWGUID _transportGUID;
     Position _transportOffset;
 };
 
@@ -119,23 +119,23 @@ public:
 
     void SetTargetFlag(SpellCastTargetFlags flag) { m_targetMask |= flag; }
 
-    ObjectGuid GetUnitTargetGUID() const;
+    WOWGUID GetUnitTargetGUID() const;
     Unit* GetUnitTarget() const;
     void SetUnitTarget(Unit* target);
 
-    ObjectGuid GetGOTargetGUID() const;
+    WOWGUID GetGOTargetGUID() const;
     GameObject* GetGOTarget() const;
     void SetGOTarget(GameObject* target);
 
-    ObjectGuid GetCorpseTargetGUID() const;
+    WOWGUID GetCorpseTargetGUID() const;
     Corpse* GetCorpseTarget() const;
     void SetCorpseTarget(Corpse* target);
 
     WorldObject* GetObjectTarget() const;
-    ObjectGuid GetObjectTargetGUID() const;
+    WOWGUID GetObjectTargetGUID() const;
     void RemoveObjectTarget();
 
-    ObjectGuid GetItemTargetGUID() const { return m_itemTargetGUID; }
+    WOWGUID GetItemTargetGUID() const { return m_itemTargetGUID; }
     Item* GetItemTarget() const { return m_itemTarget; }
     uint32 GetItemTargetEntry() const { return m_itemTargetEntry; }
     void SetItemTarget(Item* item);
@@ -178,7 +178,7 @@ public:
     void OutDebug() const;
 
     // Xinef: Channel data
-    void SetObjectTargetChannel(ObjectGuid targetGUID);
+    void SetObjectTargetChannel(WOWGUID targetGUID);
     void SetDstChannel(SpellDestination const& spellDest);
     WorldObject* GetObjectTargetChannel(Unit* caster) const;
     bool HasDstChannel() const;
@@ -192,8 +192,8 @@ private:
     Item* m_itemTarget;
 
     // object GUID/etc, can be used always
-    ObjectGuid m_objectTargetGUID;
-    ObjectGuid m_itemTargetGUID;
+    WOWGUID m_objectTargetGUID;
+    WOWGUID m_itemTargetGUID;
     uint32 m_itemTargetEntry;
 
     SpellDestination m_src;
@@ -204,7 +204,7 @@ private:
 
     // Xinef: Save channel data
     SpellDestination m_dstChannel;
-    ObjectGuid m_objectTargetGUIDChannel;
+    WOWGUID m_objectTargetGUIDChannel;
 };
 
 struct SpellValue
@@ -239,20 +239,20 @@ enum SpellEffectHandleMode
 // Xinef: special structure containing data for channel target spells
 struct ChannelTargetData
 {
-    ChannelTargetData(ObjectGuid cguid, const SpellDestination* dst) : channelGUID(cguid)
+    ChannelTargetData(WOWGUID cguid, const SpellDestination* dst) : channelGUID(cguid)
     {
         if (dst)
             spellDst = *dst;
     }
 
-    ObjectGuid channelGUID;
+    WOWGUID channelGUID;
     SpellDestination spellDst;
 };
 
  // Targets store structures and data
 struct TargetInfo
 {
-    ObjectGuid targetGUID;
+    WOWGUID targetGUID;
     uint64 timeDelay;
     SpellMissInfo missCondition:8;
     SpellMissInfo reflectResult:8;
@@ -285,7 +285,7 @@ class Spell
     friend void Unit::SetCurrentCastedSpell(Spell* pSpell);
     friend class SpellScript;
 public:
-    Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, ObjectGuid originalCasterGUID = ObjectGuid::Empty, bool skipCheck = false);
+    Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, WOWGUID originalCasterGUID = WOWGUID::Empty, bool skipCheck = false);
     ~Spell();
 
     void EffectNULL(SpellEffIndex effIndex);
@@ -520,7 +520,7 @@ public:
     SpellInfo const* const m_spellInfo;
     Item* m_CastItem;
     Item* m_weaponItem;
-    ObjectGuid m_castItemGUID;
+    WOWGUID m_castItemGUID;
     uint8 m_cast_count;
     uint32 m_glyphIndex;
     uint32 m_preCastSpell;
@@ -597,13 +597,13 @@ public:
     void TriggerGlobalCooldown();
     void CancelGlobalCooldown();
 
-    void SendLoot(ObjectGuid guid, LootType loottype);
+    void SendLoot(WOWGUID guid, LootType loottype);
 
     Unit* const m_caster;
 
     SpellValue* const m_spellValue;
 
-    ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
+    WOWGUID m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
     // e.g. damage around area spell trigered by victim aura and damage enemies of aura caster
     Unit* m_originalCaster;                             // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
 
@@ -684,7 +684,7 @@ public:
 
     struct GOTargetInfo
     {
-        ObjectGuid targetGUID;
+        WOWGUID targetGUID;
         uint64 timeDelay;
         uint8  effectMask: 8;
         bool   processed: 1;
@@ -845,12 +845,12 @@ typedef void(Spell::*pEffect)(SpellEffIndex effIndex);
 class ReflectEvent : public BasicEvent
 {
     public:
-        ReflectEvent(Unit* caster, ObjectGuid targetGUID, SpellInfo const* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
+        ReflectEvent(Unit* caster, WOWGUID targetGUID, SpellInfo const* spellInfo) : _caster(caster), _targetGUID(targetGUID), _spellInfo(spellInfo) { }
         bool Execute(uint64 e_time, uint32 p_time) override;
 
     protected:
         Unit* _caster;
-        ObjectGuid _targetGUID;
+        WOWGUID _targetGUID;
         SpellInfo const* _spellInfo;
 };
 

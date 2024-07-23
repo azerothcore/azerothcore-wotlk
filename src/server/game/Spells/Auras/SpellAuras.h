@@ -85,24 +85,24 @@ public:
 
 class Aura
 {
-    friend Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, bool noPeriodicReset);
+    friend Aura* Unit::_TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount, Item* castItem, WOWGUID casterGUID, bool noPeriodicReset);
 public:
-    typedef std::map<ObjectGuid, AuraApplication*> ApplicationMap;
+    typedef std::map<WOWGUID, AuraApplication*> ApplicationMap;
 
     static uint8 BuildEffectMaskForOwner(SpellInfo const* spellProto, uint8 avalibleEffectMask, WorldObject* owner);
-    static Aura* TryRefreshStackOrCreate(SpellInfo const* spellproto, uint8 tryEffMask, WorldObject* owner, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, ObjectGuid casterGUID = ObjectGuid::Empty, bool* refresh = nullptr, bool periodicReset = false);
-    static Aura* TryCreate(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemGUID = ObjectGuid::Empty);
-    static Aura* Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID = ObjectGuid::Empty);
-    explicit Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID = ObjectGuid::Empty);
+    static Aura* TryRefreshStackOrCreate(SpellInfo const* spellproto, uint8 tryEffMask, WorldObject* owner, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, WOWGUID casterGUID = WOWGUID::Empty, bool* refresh = nullptr, bool periodicReset = false);
+    static Aura* TryCreate(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, WOWGUID casterGUID = WOWGUID::Empty, WOWGUID itemGUID = WOWGUID::Empty);
+    static Aura* Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, WOWGUID casterGUID, WOWGUID itemGUID = WOWGUID::Empty);
+    explicit Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, WOWGUID casterGUID, WOWGUID itemGUID = WOWGUID::Empty);
     void _InitEffects(uint8 effMask, Unit* caster, int32* baseAmount);
     virtual ~Aura();
 
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
     uint32 GetId() const;
 
-    ObjectGuid GetCastItemGUID() const { return m_castItemGuid; }
+    WOWGUID GetCastItemGUID() const { return m_castItemGuid; }
     uint32 GetCastItemEntry() const { return m_castItemEntry; }
-    ObjectGuid GetCasterGUID() const { return m_casterGuid; }
+    WOWGUID GetCasterGUID() const { return m_casterGuid; }
     Unit* GetCaster() const;
     WorldObject* GetOwner() const { return m_owner; }
     Unit* GetUnitOwner() const { ASSERT(GetType() == UNIT_AURA_TYPE); return (Unit*)m_owner; }
@@ -180,9 +180,9 @@ public:
     // Helpers for targets
     ApplicationMap const& GetApplicationMap() {return m_applications;}
     void GetApplicationList(std::list<AuraApplication*>& applicationList) const;
-    const AuraApplication* GetApplicationOfTarget (ObjectGuid guid) const { ApplicationMap::const_iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
-    AuraApplication* GetApplicationOfTarget (ObjectGuid guid) { ApplicationMap::iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
-    bool IsAppliedOnTarget(ObjectGuid guid) const { return m_applications.find(guid) != m_applications.end(); }
+    const AuraApplication* GetApplicationOfTarget (WOWGUID guid) const { ApplicationMap::const_iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
+    AuraApplication* GetApplicationOfTarget (WOWGUID guid) { ApplicationMap::iterator itr = m_applications.find(guid); if (itr != m_applications.end()) return itr->second; return nullptr; }
+    bool IsAppliedOnTarget(WOWGUID guid) const { return m_applications.find(guid) != m_applications.end(); }
 
     void SetNeedClientUpdateForTargets() const;
     void HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, bool apply, bool onReapply);
@@ -247,8 +247,8 @@ private:
 
 protected:
     SpellInfo const* const m_spellInfo;
-    ObjectGuid const m_casterGuid;
-    ObjectGuid const m_castItemGuid;                    // it is NOT safe to keep a pointer to the item because it may get deleted
+    WOWGUID const m_casterGuid;
+    WOWGUID const m_castItemGuid;                    // it is NOT safe to keep a pointer to the item because it may get deleted
     uint32 const m_castItemEntry;                       // when deleted, we could retrieve some information from template instead
     time_t const m_applyTime;
     WorldObject* const m_owner;
@@ -277,10 +277,10 @@ private:
 
 class UnitAura : public Aura
 {
-    friend Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID);
+    friend Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, WOWGUID casterGUID, WOWGUID itemGUID);
 
 protected:
-    explicit UnitAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID = ObjectGuid::Empty);
+    explicit UnitAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, WOWGUID casterGUID, WOWGUID itemGUID = WOWGUID::Empty);
 
 public:
     void _ApplyForTarget(Unit* target, Unit* caster, AuraApplication* aurApp) override;
@@ -300,10 +300,10 @@ private:
 
 class DynObjAura : public Aura
 {
-    friend Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID);
+    friend Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, WOWGUID casterGUID, WOWGUID itemGUID);
 
 protected:
-    explicit DynObjAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID = ObjectGuid::Empty);
+    explicit DynObjAura(SpellInfo const* spellproto, uint8 effMask, WorldObject* owner, Unit* caster, int32* baseAmount, Item* castItem, WOWGUID casterGUID, WOWGUID itemGUID = WOWGUID::Empty);
 
 public:
     void Remove(AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT) override;

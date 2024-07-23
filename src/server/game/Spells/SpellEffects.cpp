@@ -1992,7 +1992,7 @@ void Spell::EffectEnergizePct(SpellEffIndex effIndex)
     m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, gain, power);
 }
 
-void Spell::SendLoot(ObjectGuid guid, LootType loottype)
+void Spell::SendLoot(WOWGUID guid, LootType loottype)
 {
     Player* player = m_caster->ToPlayer();
     if (!player)
@@ -2072,7 +2072,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
     Player* player = m_caster->ToPlayer();
 
     uint32 lockId = 0;
-    ObjectGuid guid;
+    WOWGUID guid;
 
     // Get lockId
     if (gameObjTarget)
@@ -2538,7 +2538,7 @@ void Spell::EffectLearnSpell(SpellEffIndex effIndex)
         player->GetGUID().ToString(), spellToLearn, m_caster->GetGUID().ToString());
 }
 
-typedef std::list<std::pair<uint32, ObjectGuid>> DispelList;
+typedef std::list<std::pair<uint32, WOWGUID>> DispelList;
 void Spell::EffectDispel(SpellEffIndex effIndex)
 {
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
@@ -2726,7 +2726,7 @@ void Spell::EffectUntrainTalents(SpellEffIndex /*effIndex*/)
     if (!unitTarget || m_caster->GetTypeId() == TYPEID_PLAYER)
         return;
 
-    if (ObjectGuid guid = m_caster->GetGUID()) // the trainer is the caster
+    if (WOWGUID guid = m_caster->GetGUID()) // the trainer is the caster
         unitTarget->ToPlayer()->SendTalentWipeConfirm(guid);
 }
 
@@ -4569,7 +4569,7 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
 
     if (m_caster)
     {
-        ObjectGuid guid = m_caster->m_ObjectSlot[slot];
+        WOWGUID guid = m_caster->m_ObjectSlot[slot];
         if (guid)
         {
             if (GameObject* gameObject = m_caster->GetMap()->GetGameObject(guid))
@@ -4897,7 +4897,7 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         if (!unitTarget)
             return;
 
-        ObjectGuid targetGUID = ObjectGuid::Empty;
+        WOWGUID targetGUID = WOWGUID::Empty;
         Player* player = m_caster->ToPlayer();
         if (player)
         {
@@ -5139,7 +5139,7 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
 
     uint32 mechanic = m_spellInfo->Effects[effIndex].MiscValue;
 
-    std::queue<std::pair<uint32, ObjectGuid>> dispel_list;
+    std::queue<std::pair<uint32, WOWGUID>> dispel_list;
 
     Unit::AuraMap const& auras = unitTarget->GetOwnedAuras();
     for (Unit::AuraMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)

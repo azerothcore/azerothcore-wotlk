@@ -110,11 +110,11 @@ const uint32 MalygosIntroIntervals[] = {18000, 19000, 21000, 18000, 15000};
 class EoEDrakeEnterVehicleEvent : public BasicEvent
 {
 public:
-    EoEDrakeEnterVehicleEvent(Creature& owner, ObjectGuid playerGUID) : _owner(owner), _playerGUID(playerGUID) { }
+    EoEDrakeEnterVehicleEvent(Creature& owner, WOWGUID playerGUID) : _owner(owner), _playerGUID(playerGUID) { }
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override;
 private:
     Creature& _owner;
-    ObjectGuid _playerGUID;
+    WOWGUID _playerGUID;
 };
 
 template <class AI, class T>

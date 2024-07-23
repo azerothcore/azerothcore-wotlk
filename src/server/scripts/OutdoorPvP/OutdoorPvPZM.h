@@ -225,7 +225,7 @@ private:
 
 protected:
     TeamId m_BothControllingFactionId;
-    ObjectGuid m_FlagCarrierGUID;
+    WOWGUID m_FlagCarrierGUID;
 };
 
 class OutdoorPvPZM : public OutdoorPvP

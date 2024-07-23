@@ -505,7 +505,7 @@ struct npc_eastvale_peasent : public ScriptedAI
 
 private:
     EventMap _events;
-    ObjectGuid _realenGUID;
+    WOWGUID _realenGUID;
     uint32 _path;
 };
 

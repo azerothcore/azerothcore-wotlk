@@ -260,7 +260,7 @@ struct BattlegroundABScore final : public BattlegroundScore
 
 protected:
 
-    explicit BattlegroundABScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
+    explicit BattlegroundABScore(WOWGUID playerGuid) : BattlegroundScore(playerGuid) { }
 
     void UpdateScore(uint32 type, uint32 value) override
     {

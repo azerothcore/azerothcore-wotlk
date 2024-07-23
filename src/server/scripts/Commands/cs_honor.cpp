@@ -66,7 +66,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+        if (handler->HasLowerSecurity(target, WOWGUID::Empty))
             return false;
 
         target->RewardHonor(nullptr, 1, amount);
@@ -84,7 +84,7 @@ public:
 
         // check online security
         if (Player* player = target->ToPlayer())
-            if (handler->HasLowerSecurity(player, ObjectGuid::Empty))
+            if (handler->HasLowerSecurity(player, WOWGUID::Empty))
                 return false;
 
         handler->GetSession()->GetPlayer()->RewardHonor(target, 1);
@@ -101,7 +101,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+        if (handler->HasLowerSecurity(target, WOWGUID::Empty))
             return false;
 
         target->UpdateHonorFields();

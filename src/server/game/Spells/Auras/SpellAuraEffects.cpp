@@ -456,7 +456,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
 
     // check item enchant aura cast
     if (!amount && caster)
-        if (ObjectGuid itemGUID = GetBase()->GetCastItemGUID())
+        if (WOWGUID itemGUID = GetBase()->GetCastItemGUID())
             if (Player* playerCaster = caster->ToPlayer())
                 if (Item* castItem = playerCaster->GetItemByGuid(itemGUID))
                     if (castItem->GetItemSuffixFactor())
@@ -814,7 +814,7 @@ void AuraEffect::ApplySpellMod(Unit* target, bool apply)
         case SPELLMOD_EFFECT2:
         case SPELLMOD_EFFECT3:
             {
-                ObjectGuid guid = target->GetGUID();
+                WOWGUID guid = target->GetGUID();
                 Unit::AuraApplicationMap& auras = target->GetAppliedAuras();
                 for (Unit::AuraApplicationMap::iterator iter = auras.begin(); iter != auras.end(); ++iter)
                 {
@@ -853,7 +853,7 @@ void AuraEffect::ApplySpellMod(Unit* target, bool apply)
                 if (!pet)
                     break;
 
-                ObjectGuid petguid = pet->GetGUID();
+                WOWGUID petguid = pet->GetGUID();
                 Unit::AuraApplicationMap& petauras = pet->GetAppliedAuras();
                 for (Unit::AuraApplicationMap::iterator iter = petauras.begin(); iter != petauras.end(); ++iter)
                 {
@@ -1110,7 +1110,7 @@ void AuraEffect::PeriodicTick(AuraApplication* aurApp, Unit* caster) const
     // exclude players because can turn during channeling and shouldn't desync orientation client/server
     if (caster && !caster->IsPlayer() && m_spellInfo->IsChanneled() && m_spellInfo->HasAttribute(SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL))
     {
-        ObjectGuid const channelGuid = caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT);
+        WOWGUID const channelGuid = caster->GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT);
         if (!channelGuid.IsEmpty() && channelGuid != caster->GetGUID())
         {
             if (WorldObject const* objectTarget = ObjectAccessor::GetWorldObject(*caster, channelGuid))
@@ -1951,7 +1951,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         // remove other shapeshift before applying a new one
         // xinef: rogue shouldnt be wrapped by this check (shadow dance vs stealth)
         if (GetSpellInfo()->SpellFamilyName != SPELLFAMILY_ROGUE)
-            target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT, ObjectGuid::Empty, GetBase());
+            target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT, WOWGUID::Empty, GetBase());
 
         // stop handling the effect if it was removed by linked event
         if (aurApp->GetRemoveMode())
@@ -4220,7 +4220,7 @@ void AuraEffect::HandleAuraModStateImmunity(AuraApplication const* aurApp, uint8
     target->ApplySpellImmune(GetId(), IMMUNITY_STATE, GetMiscValue(), apply);
 
     if (apply && GetSpellInfo()->HasAttribute(SPELL_ATTR1_IMMUNITY_PURGES_EFFECT))
-        target->RemoveAurasByType(AuraType(GetMiscValue()), ObjectGuid::Empty, GetBase());
+        target->RemoveAurasByType(AuraType(GetMiscValue()), WOWGUID::Empty, GetBase());
 }
 
 void AuraEffect::HandleAuraModSchoolImmunity(AuraApplication const* aurApp, uint8 mode, bool apply) const
@@ -6074,13 +6074,13 @@ void AuraEffect::HandleAuraLinked(AuraApplication const* aurApp, uint8 mode, boo
         }
         else
         {
-            ObjectGuid casterGUID = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? GetCasterGUID() : target->GetGUID();
+            WOWGUID casterGUID = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? GetCasterGUID() : target->GetGUID();
             target->RemoveAura(triggeredSpellId, casterGUID, 0, aurApp->GetRemoveMode());
         }
     }
     else if (mode & AURA_EFFECT_HANDLE_REAPPLY && apply)
     {
-        ObjectGuid casterGUID = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? GetCasterGUID() : target->GetGUID();
+        WOWGUID casterGUID = triggeredSpellInfo->NeedsToBeTriggeredByCaster(m_spellInfo, GetEffIndex()) ? GetCasterGUID() : target->GetGUID();
         // change the stack amount to be equal to stack amount of our aura
         if (Aura* triggeredAura = target->GetAura(triggeredSpellId, casterGUID))
             triggeredAura->ModStackAmount(GetBase()->GetStackAmount() - triggeredAura->GetStackAmount());

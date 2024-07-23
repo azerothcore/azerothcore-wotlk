@@ -29,7 +29,7 @@ void User::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     if (!player->duel || player == player->duel->Initiator || player->duel->State != DUEL_STATE_CHALLENGED)
         return;
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvPacket >> guid;
 
     Player* target = player->duel->Opponent;
@@ -54,7 +54,7 @@ void User::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
     Player* player = GetPlayer();
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvPacket >> guid;
 
     // no duel requested

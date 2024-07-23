@@ -128,7 +128,7 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
-        ObjectGuid GraufGUID;
+        WOWGUID GraufGUID;
         bool SecondPhase, EventStarted;
 
         void Reset() override

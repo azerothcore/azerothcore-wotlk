@@ -98,7 +98,7 @@ public:
     static bool HandleDeserterAdd(ChatHandler* handler, Optional<std::string> playerName, Optional<std::string> time, bool isInstance)
     {
         Player* target = handler->getSelectedPlayerOrSelf();
-        ObjectGuid guid;
+        WOWGUID guid;
 
         if (playerName)
         {

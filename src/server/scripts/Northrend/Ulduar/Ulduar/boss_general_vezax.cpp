@@ -303,7 +303,7 @@ public:
                             events.Repeat(30s);
                         else
                         {
-                            for (ObjectGuid const& guid : summons)
+                            for (WOWGUID const& guid : summons)
                                 if (Creature* sv = ObjectAccessor::GetCreature(*me, guid))
                                 {
                                     sv->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);

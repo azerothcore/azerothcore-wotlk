@@ -97,7 +97,7 @@ void ChannelMgr::LoadChannels()
                 Field* banFields = banResult->Fetch();
                 if (!banFields)
                     break;
-                newChannel->AddBan(ObjectGuid::Create<HighGuid::Player>(banFields[0].Get<uint32>()), banFields[1].Get<uint32>());
+                newChannel->AddBan(WOWGUID::Create<HighGuid::Player>(banFields[0].Get<uint32>()), banFields[1].Get<uint32>());
             } while (banResult->NextRow());
         }
 

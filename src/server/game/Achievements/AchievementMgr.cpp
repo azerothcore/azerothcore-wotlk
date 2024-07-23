@@ -538,7 +538,7 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condi
     }
 }
 
-void AchievementMgr::DeleteFromDB(ObjectGuid::LowType lowguid)
+void AchievementMgr::DeleteFromDB(WOWGUID::LowType lowguid)
 {
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 

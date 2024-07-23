@@ -28,7 +28,7 @@ UpdateData::UpdateData() : m_blockCount(0)
     m_outOfRangeGUIDs.reserve(15);
 }
 
-void UpdateData::AddOutOfRangeGUID(ObjectGuid guid)
+void UpdateData::AddOutOfRangeGUID(WOWGUID guid)
 {
     m_outOfRangeGUIDs.push_back(guid);
 }
@@ -58,7 +58,7 @@ bool UpdateData::BuildPacket(WorldPacket& packet)
         packet << (uint8) UPDATETYPE_OUT_OF_RANGE_OBJECTS;
         packet << (uint32) m_outOfRangeGUIDs.size();
 
-        for (ObjectGuid const& guid : m_outOfRangeGUIDs)
+        for (WOWGUID const& guid : m_outOfRangeGUIDs)
             packet << guid.WriteAsPacked();
     }
 

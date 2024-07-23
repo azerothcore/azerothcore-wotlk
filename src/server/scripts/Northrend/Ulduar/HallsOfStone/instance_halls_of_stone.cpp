@@ -36,19 +36,19 @@ public:
 
         uint32 Encounter[MAX_ENCOUNTER];
 
-        ObjectGuid goKaddrakGUID;
-        ObjectGuid goMarnakGUID;
-        ObjectGuid goAbedneumGUID;
-        ObjectGuid goTribunalConsoleGUID;
-        ObjectGuid goSkyRoomFloorGUID;
-        ObjectGuid goSjonnirConsoleGUID;
-        ObjectGuid goSjonnirDoorGUID;
-        ObjectGuid goLeftPipeGUID;
-        ObjectGuid goRightPipeGUID;
-        ObjectGuid goTribunalDoorGUID;
+        WOWGUID goKaddrakGUID;
+        WOWGUID goMarnakGUID;
+        WOWGUID goAbedneumGUID;
+        WOWGUID goTribunalConsoleGUID;
+        WOWGUID goSkyRoomFloorGUID;
+        WOWGUID goSjonnirConsoleGUID;
+        WOWGUID goSjonnirDoorGUID;
+        WOWGUID goLeftPipeGUID;
+        WOWGUID goRightPipeGUID;
+        WOWGUID goTribunalDoorGUID;
 
-        ObjectGuid SjonnirGUID;
-        ObjectGuid BrannGUID;
+        WOWGUID SjonnirGUID;
+        WOWGUID BrannGUID;
 
         bool brannAchievement;
         bool sjonnirAchievement;
@@ -135,7 +135,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 id) const override
+        WOWGUID GetGuidData(uint32 id) const override
         {
             switch (id)
             {
@@ -164,7 +164,7 @@ public:
                     return BrannGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         uint32 GetData(uint32 id) const override

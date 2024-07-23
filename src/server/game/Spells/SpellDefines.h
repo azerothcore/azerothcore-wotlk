@@ -19,7 +19,7 @@
 #define SPELLDEFINES_H
 
 #include "Define.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include <vector>
 
 enum SpellInterruptFlags

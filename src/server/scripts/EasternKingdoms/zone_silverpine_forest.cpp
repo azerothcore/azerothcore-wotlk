@@ -196,7 +196,7 @@ public:
         uint32 Phase;
         int8 KillCount;
         uint32 WaitTimer;
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
         SummonList Summons;
 
         bool QuestInProgress;

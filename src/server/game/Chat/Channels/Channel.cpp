@@ -92,7 +92,7 @@ Channel::Channel(std::string const& name, uint32 channelId, uint32 channelDBId, 
     }
 }
 
-bool Channel::IsBanned(ObjectGuid guid) const
+bool Channel::IsBanned(WOWGUID guid) const
 {
     BannedContainer::const_iterator itr = bannedStore.find(guid);
     return itr != bannedStore.end() && itr->second > GameTime::GetGameTime().count();
@@ -119,7 +119,7 @@ void Channel::UpdateChannelUseageInDB() const
     CharacterDatabase.Execute(stmt);
 }
 
-void Channel::AddChannelBanToDB(ObjectGuid guid, uint32 time) const
+void Channel::AddChannelBanToDB(WOWGUID guid, uint32 time) const
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHANNEL_BAN);
     stmt->SetData(0, _channelDBId);
@@ -128,7 +128,7 @@ void Channel::AddChannelBanToDB(ObjectGuid guid, uint32 time) const
     CharacterDatabase.Execute(stmt);
 }
 
-void Channel::RemoveChannelBanFromDB(ObjectGuid guid) const
+void Channel::RemoveChannelBanFromDB(WOWGUID guid) const
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHANNEL_BAN);
     stmt->SetData(0, _channelDBId);
@@ -155,7 +155,7 @@ void Channel::CleanOldChannelsInDB()
 
 void Channel::JoinChannel(Player* player, std::string const& pass)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
     if (IsOn(guid))
     {
         // Do not send error message for built-in channels
@@ -250,7 +250,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
 
 void Channel::LeaveChannel(Player* player, bool send)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
     if (!IsOn(guid))
     {
         if (send)
@@ -294,7 +294,7 @@ void Channel::LeaveChannel(Player* player, bool send)
         {
             if (!playersStore.empty())
             {
-                ObjectGuid newowner;
+                WOWGUID newowner;
                 for (Channel::PlayerContainer::const_iterator itr = playersStore.begin(); itr != playersStore.end(); ++itr)
                 {
                     newowner = itr->second.player;
@@ -309,14 +309,14 @@ void Channel::LeaveChannel(Player* player, bool send)
                 // if the new owner is invisible gm, set flag to automatically choose a new owner
             }
             else
-                SetOwner(ObjectGuid::Empty);
+                SetOwner(WOWGUID::Empty);
         }
     }
 }
 
 void Channel::KickOrBan(Player const* player, std::string const& badname, bool ban)
 {
-    ObjectGuid good = player->GetGUID();
+    WOWGUID good = player->GetGUID();
 
     if (!IsOn(good))
     {
@@ -337,7 +337,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     bool banOffline = false; // pussywizard
     bool isGoodConstantModerator = _channelRights.moderators.find(player->User()->GetAccountId()) != _channelRights.moderators.end();
 
-    ObjectGuid victim;
+    WOWGUID victim;
     uint32 badAccId = 0;
     Player* bad = ObjectAccessor::FindPlayerByName(badname, false);
     if (bad)
@@ -351,7 +351,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
     {
         if (ban && (player->User()->IsGMAccount() || isGoodConstantModerator))
         {
-            if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(badname))
+            if (WOWGUID guid = sCharacterCache->GetCharacterGuidByName(badname))
             {
                 if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(guid))
                 {
@@ -452,7 +452,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
             SetOwner(good);
         else if (!playersStore.empty())
         {
-            ObjectGuid newowner;
+            WOWGUID newowner;
             for (Channel::PlayerContainer::const_iterator itr = playersStore.begin(); itr != playersStore.end(); ++itr)
             {
                 newowner = itr->second.player;
@@ -462,13 +462,13 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
             SetOwner(newowner);
         }
         else
-            SetOwner(ObjectGuid::Empty);
+            SetOwner(WOWGUID::Empty);
     }
 }
 
 void Channel::UnBan(Player const* player, std::string const& badname)
 {
-    ObjectGuid good = player->GetGUID();
+    WOWGUID good = player->GetGUID();
 
     if (!IsOn(good))
     {
@@ -486,8 +486,8 @@ void Channel::UnBan(Player const* player, std::string const& badname)
         return;
     }
 
-    ObjectGuid victim;
-    if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(badname))
+    WOWGUID victim;
+    if (WOWGUID guid = sCharacterCache->GetCharacterGuidByName(badname))
     {
         victim = guid;
     }
@@ -525,7 +525,7 @@ void Channel::UnBan(Player const* player, std::string const& badname)
     SendToAll(&data);
 }
 
-void Channel::UnBan(ObjectGuid guid)
+void Channel::UnBan(WOWGUID guid)
 {
     if (!IsBanned(guid))
         return;
@@ -535,7 +535,7 @@ void Channel::UnBan(ObjectGuid guid)
 
 void Channel::Password(Player const* player, std::string const& pass)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
 
     ChatHandler chat(player->User());
     if (!IsOn(guid))
@@ -573,7 +573,7 @@ void Channel::Password(Player const* player, std::string const& pass)
 
 void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bool set)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
 
     if (!IsOn(guid))
     {
@@ -595,7 +595,7 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
         return;
 
     Player* newp = ObjectAccessor::FindPlayerByName(p2n, false);
-    ObjectGuid victim = newp ? newp->GetGUID() : ObjectGuid::Empty;
+    WOWGUID victim = newp ? newp->GetGUID() : WOWGUID::Empty;
 
     if (!victim || !IsOn(victim) ||
             // allow make moderator from another team only if both is GMs
@@ -643,7 +643,7 @@ void Channel::SetMode(Player const* player, std::string const& p2n, bool mod, bo
 
 void Channel::SetOwner(Player const* player, std::string const& newname)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
 
     if (!IsOn(guid))
     {
@@ -663,7 +663,7 @@ void Channel::SetOwner(Player const* player, std::string const& newname)
     }
 
     Player* newp = ObjectAccessor::FindPlayerByName(newname, false);
-    ObjectGuid victim = newp ? newp->GetGUID() : ObjectGuid::Empty;
+    WOWGUID victim = newp ? newp->GetGUID() : WOWGUID::Empty;
 
     if (!victim || !IsOn(victim) || (newp->GetTeamId() != player->GetTeamId() &&
                                      !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHANNEL)))
@@ -677,7 +677,7 @@ void Channel::SetOwner(Player const* player, std::string const& newname)
     SetOwner(victim);
 }
 
-void Channel::SendWhoOwner(ObjectGuid guid)
+void Channel::SendWhoOwner(WOWGUID guid)
 {
     WorldPacket data;
     if (IsOn(guid))
@@ -689,7 +689,7 @@ void Channel::SendWhoOwner(ObjectGuid guid)
 
 void Channel::List(Player const* player)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
 
     if (!IsOn(guid))
     {
@@ -725,7 +725,7 @@ void Channel::List(Player const* player)
 
 void Channel::Announce(Player const* player)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
 
     if (!IsOn(guid))
     {
@@ -763,7 +763,7 @@ void Channel::Announce(Player const* player)
     UpdateChannelInDB();
 }
 
-void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
+void Channel::Say(WOWGUID guid, std::string const& what, uint32 lang)
 {
     if (what.empty())
         return;
@@ -801,12 +801,12 @@ void Channel::Say(ObjectGuid guid, std::string const& what, uint32 lang)
         ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, Language(lang), guid, guid, what, 0, "", "", 0, false, _name);
     }
 
-    SendToAll(&data, pinfo.IsModerator() ? ObjectGuid::Empty : guid);
+    SendToAll(&data, pinfo.IsModerator() ? WOWGUID::Empty : guid);
 }
 
 void Channel::Invite(Player const* player, std::string const& newname)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
 
     if (!IsOn(guid))
     {
@@ -862,7 +862,7 @@ void Channel::Invite(Player const* player, std::string const& newname)
     SendToOne(&data, guid);
 }
 
-void Channel::SetOwner(ObjectGuid guid, bool exclaim)
+void Channel::SetOwner(WOWGUID guid, bool exclaim)
 {
     if (_ownerGUID)
     {
@@ -906,21 +906,21 @@ void Channel::SetOwner(ObjectGuid guid, bool exclaim)
     }
 }
 
-void Channel::SendToAll(WorldPacket* data, ObjectGuid guid)
+void Channel::SendToAll(WorldPacket* data, WOWGUID guid)
 {
     for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
         if (!guid || !i->second.plrPtr->FriendListPtr()->IsIgnored(guid))
             i->second.plrPtr->User()->Send(data);
 }
 
-void Channel::SendToAllButOne(WorldPacket* data, ObjectGuid who)
+void Channel::SendToAllButOne(WorldPacket* data, WOWGUID who)
 {
     for (PlayerContainer::const_iterator i = playersStore.begin(); i != playersStore.end(); ++i)
         if (i->first != who)
             i->second.plrPtr->User()->Send(data);
 }
 
-void Channel::SendToOne(WorldPacket* data, ObjectGuid who)
+void Channel::SendToOne(WorldPacket* data, WOWGUID who)
 {
     if (Player* player = ObjectAccessor::FindConnectedPlayer(who))
         player->User()->Send(data);
@@ -937,11 +937,11 @@ bool Channel::ShouldAnnouncePlayer(Player const* player) const
     return !(player->User()->IsGMAccount() && sWorld->getBoolConfig(CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL));
 }
 
-void Channel::Voice(ObjectGuid /*guid1*/, ObjectGuid /*guid2*/)
+void Channel::Voice(WOWGUID /*guid1*/, WOWGUID /*guid2*/)
 {
 }
 
-void Channel::DeVoice(ObjectGuid /*guid1*/, ObjectGuid /*guid2*/)
+void Channel::DeVoice(WOWGUID /*guid1*/, WOWGUID /*guid2*/)
 {
 }
 
@@ -952,13 +952,13 @@ void Channel::MakeNotifyPacket(WorldPacket* data, uint8 notify_type)
     *data << _name;
 }
 
-void Channel::MakeJoined(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeJoined(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_JOINED_NOTICE);
     *data << guid;
 }
 
-void Channel::MakeLeft(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeLeft(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_LEFT_NOTICE);
     *data << guid;
@@ -994,13 +994,13 @@ void Channel::MakeNotModerator(WorldPacket* data)
     MakeNotifyPacket(data, CHAT_NOT_MODERATOR_NOTICE);
 }
 
-void Channel::MakePasswordChanged(WorldPacket* data, ObjectGuid guid)
+void Channel::MakePasswordChanged(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_PASSWORD_CHANGED_NOTICE);
     *data << guid;
 }
 
-void Channel::MakeOwnerChanged(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeOwnerChanged(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_OWNER_CHANGED_NOTICE);
     *data << guid;
@@ -1028,7 +1028,7 @@ void Channel::MakeChannelOwner(WorldPacket* data)
     *data << ((IsConstant() || !_ownerGUID) ? "Nobody" : name);
 }
 
-void Channel::MakeModeChange(WorldPacket* data, ObjectGuid guid, uint8 oldflags)
+void Channel::MakeModeChange(WorldPacket* data, WOWGUID guid, uint8 oldflags)
 {
     MakeNotifyPacket(data, CHAT_MODE_CHANGE_NOTICE);
     *data << guid;
@@ -1036,13 +1036,13 @@ void Channel::MakeModeChange(WorldPacket* data, ObjectGuid guid, uint8 oldflags)
     *data << uint8(GetPlayerFlags(guid));
 }
 
-void Channel::MakeAnnouncementsOn(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeAnnouncementsOn(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_ANNOUNCEMENTS_ON_NOTICE);
     *data << guid;
 }
 
-void Channel::MakeAnnouncementsOff(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeAnnouncementsOff(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_ANNOUNCEMENTS_OFF_NOTICE);
     *data << guid;
@@ -1053,7 +1053,7 @@ void Channel::MakeMuted(WorldPacket* data)
     MakeNotifyPacket(data, CHAT_MUTED_NOTICE);
 }
 
-void Channel::MakePlayerKicked(WorldPacket* data, ObjectGuid bad, ObjectGuid good)
+void Channel::MakePlayerKicked(WorldPacket* data, WOWGUID bad, WOWGUID good)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_KICKED_NOTICE);
     *data << bad;
@@ -1065,14 +1065,14 @@ void Channel::MakeBanned(WorldPacket* data)
     MakeNotifyPacket(data, CHAT_BANNED_NOTICE);
 }
 
-void Channel::MakePlayerBanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good)
+void Channel::MakePlayerBanned(WorldPacket* data, WOWGUID bad, WOWGUID good)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_BANNED_NOTICE);
     *data << bad;
     *data << good;
 }
 
-void Channel::MakePlayerUnbanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good)
+void Channel::MakePlayerUnbanned(WorldPacket* data, WOWGUID bad, WOWGUID good)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_UNBANNED_NOTICE);
     *data << bad;
@@ -1085,13 +1085,13 @@ void Channel::MakePlayerNotBanned(WorldPacket* data, const std::string& name)
     *data << name;
 }
 
-void Channel::MakePlayerAlreadyMember(WorldPacket* data, ObjectGuid guid)
+void Channel::MakePlayerAlreadyMember(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_PLAYER_ALREADY_MEMBER_NOTICE);
     *data << guid;
 }
 
-void Channel::MakeInvite(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeInvite(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_INVITE_NOTICE);
     *data << guid;
@@ -1144,13 +1144,13 @@ void Channel::MakeNotInLfg(WorldPacket* data)
     MakeNotifyPacket(data, CHAT_NOT_IN_LFG_NOTICE);
 }
 
-void Channel::MakeVoiceOn(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeVoiceOn(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_VOICE_ON_NOTICE);
     *data << guid;
 }
 
-void Channel::MakeVoiceOff(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeVoiceOff(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_VOICE_OFF_NOTICE);
     *data << guid;
@@ -1222,7 +1222,7 @@ void Channel::RemoveWatching(Player* p)
 
 void Channel::ToggleModeration(Player* player)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
 
     if (!IsOn(guid))
     {
@@ -1259,13 +1259,13 @@ void Channel::ToggleModeration(Player* player)
     SendToAll(&data);
 }
 
-void Channel::MakeModerationOn(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeModerationOn(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_MODERATION_ON_NOTICE);
     *data << guid;
 }
 
-void Channel::MakeModerationOff(WorldPacket* data, ObjectGuid guid)
+void Channel::MakeModerationOff(WorldPacket* data, WOWGUID guid)
 {
     MakeNotifyPacket(data, CHAT_MODERATION_OFF_NOTICE);
     *data << guid;

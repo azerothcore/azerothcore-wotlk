@@ -593,7 +593,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         uint32 killsLeft;
-        ObjectGuid deathbringerGUID[2];
+        WOWGUID deathbringerGUID[2];
 
         void MovementInform(uint32 type, uint32 id) override
         {
@@ -973,7 +973,7 @@ public:
 
                 TSSpawnPos.GetAngle(&TSMidPos);
 
-                for (ObjectGuid const& guid : summons)
+                for (WOWGUID const& guid : summons)
                     if (Creature* c = pInstance->instance->GetCreature(guid))
                     {
                         float hx, hy, hz, ho;
@@ -989,7 +989,7 @@ public:
                 if (pInstance)
                     if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_SINDRAGOSA_GUID)))
                     {
-                        for (ObjectGuid const& guid : summons)
+                        for (WOWGUID const& guid : summons)
                             if (Creature* s = pInstance->instance->GetCreature(guid))
                                 if (s->IsAlive())
                                     Unit::Kill(c, s);
@@ -1041,7 +1041,7 @@ public:
                     me->SetFacingTo(5.26f);
                     me->SetOrientation(5.26f);
                     me->SetHomePosition(*me);
-                    for (ObjectGuid const& guid : summons)
+                    for (WOWGUID const& guid : summons)
                         if (Creature* c = pInstance->instance->GetCreature(guid))
                         {
                             c->SetFacingTo(5.26f);
@@ -1071,7 +1071,7 @@ public:
                             float offset = frand(0.0f, 10.0f);
                             c->GetMotionMaster()->MovePoint(0, 1047.0f + offset, 118.0f + offset, 628.2f);
                             c->SetHomePosition(*me);
-                            for (ObjectGuid const& guid : summons)
+                            for (WOWGUID const& guid : summons)
                                 if (Creature* s = pInstance->instance->GetCreature(guid))
                                 {
                                     if (s->GetEntry() == NPC_FALLEN_WARRIOR)
@@ -1172,7 +1172,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        ObjectGuid barrierGUID;
+        WOWGUID barrierGUID;
 
         void DoAction(int32 p) override
         {

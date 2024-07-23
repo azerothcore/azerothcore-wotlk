@@ -86,7 +86,7 @@ MailReceiver::MailReceiver(Player* receiver) : m_receiver(receiver), m_receiver_
 {
 }
 
-MailReceiver::MailReceiver(Player* receiver, ObjectGuid::LowType receiver_lowguid) : m_receiver(receiver), m_receiver_lowguid(receiver_lowguid)
+MailReceiver::MailReceiver(Player* receiver, WOWGUID::LowType receiver_lowguid) : m_receiver(receiver), m_receiver_lowguid(receiver_lowguid)
 {
     ASSERT(!receiver || receiver->GetGUID().GetCounter() == receiver_lowguid);
 }
@@ -149,11 +149,11 @@ void MailDraft::deleteIncludedItems(CharacterDatabaseTransaction trans, bool inD
     m_items.clear();
 }
 
-void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, ObjectGuid::LowType sender_guid, ObjectGuid::LowType receiver_guid, CharacterDatabaseTransaction trans)
+void MailDraft::SendReturnToSender(uint32 /*sender_acc*/, WOWGUID::LowType sender_guid, WOWGUID::LowType receiver_guid, CharacterDatabaseTransaction trans)
 {
     Player* receiver = ObjectAccessor::FindPlayerByLowGUID(receiver_guid);
 
-    if (!receiver && !sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, receiver_guid)))
+    if (!receiver && !sCharacterCache->GetCharacterAccountIdByGuid(WOWGUID(HighGuid::Player, receiver_guid)))
     {
         deleteIncludedItems(trans, true);
         return;
@@ -252,7 +252,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
         trans->Append(stmt);
     }
 
-    sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, receiver.GetPlayerGUIDLow()));
+    sCharacterCache->IncreaseCharacterMailCount(WOWGUID(HighGuid::Player, receiver.GetPlayerGUIDLow()));
 
     // For online receiver update in game mail status and data
     if (pReceiver)

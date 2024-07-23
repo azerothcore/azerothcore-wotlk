@@ -51,7 +51,7 @@ bool ChatHandler::IsAvailable(uint32 securityLevel) const
     return IsConsole() ? true : m_session->GetSecurity() >= AccountTypes(securityLevel);
 }
 
-bool ChatHandler::HasLowerSecurity(Player* target, ObjectGuid guid, bool strong)
+bool ChatHandler::HasLowerSecurity(Player* target, WOWGUID guid, bool strong)
 {
     User* target_session = nullptr;
     uint32 target_account = 0;
@@ -199,7 +199,7 @@ bool ChatHandler::ParseCommands(std::string_view text)
     return _ParseCommands(text.substr(1));
 }
 
-std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
+std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WOWGUID senderGUID, WOWGUID receiverGUID, std::string_view message, uint8 chatTag,
                                     std::string const& senderName /*= ""*/, std::string const& receiverName /*= ""*/,
                                     uint32 achievementId /*= 0*/, bool gmMessage /*= false*/, std::string const& channelName /*= ""*/)
 {
@@ -282,11 +282,11 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, La
 std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message,
                                     uint32 achievementId /*= 0*/, std::string const& channelName /*= ""*/, LocaleConstant locale /*= DEFAULT_LOCALE*/)
 {
-    ObjectGuid senderGUID;
+    WOWGUID senderGUID;
     std::string senderName = "";
     uint8 chatTag = 0;
     bool gmMessage = false;
-    ObjectGuid receiverGUID;
+    WOWGUID receiverGUID;
     std::string receiverName = "";
     if (sender)
     {
@@ -313,7 +313,7 @@ Player* ChatHandler::getSelectedPlayer() const
     if (!m_session)
         return nullptr;
 
-    ObjectGuid selected = m_session->GetPlayer()->GetTarget();
+    WOWGUID selected = m_session->GetPlayer()->GetTarget();
     if (!selected)
         return m_session->GetPlayer();
 
@@ -336,7 +336,7 @@ WorldObject* ChatHandler::getSelectedObject() const
     if (!m_session)
         return nullptr;
 
-    ObjectGuid guid = m_session->GetPlayer()->GetTarget();
+    WOWGUID guid = m_session->GetPlayer()->GetTarget();
 
     if (!guid)
         return GetNearbyGameObject();
@@ -357,7 +357,7 @@ Player* ChatHandler::getSelectedPlayerOrSelf() const
     if (!m_session)
         return nullptr;
 
-    ObjectGuid selected = m_session->GetPlayer()->GetTarget();
+    WOWGUID selected = m_session->GetPlayer()->GetTarget();
     if (!selected)
         return m_session->GetPlayer();
 
@@ -495,7 +495,7 @@ GameObject* ChatHandler::GetNearbyGameObject() const
     return obj;
 }
 
-Creature* ChatHandler::GetCreatureFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid)
+Creature* ChatHandler::GetCreatureFromPlayerMapByDbGuid(WOWGUID::LowType lowguid)
 {
     if (!m_session)
         return nullptr;
@@ -514,7 +514,7 @@ Creature* ChatHandler::GetCreatureFromPlayerMapByDbGuid(ObjectGuid::LowType lowg
     return creature;
 }
 
-GameObject* ChatHandler::GetObjectFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid)
+GameObject* ChatHandler::GetObjectFromPlayerMapByDbGuid(WOWGUID::LowType lowguid)
 {
     if (!m_session)
         return nullptr;
@@ -614,7 +614,7 @@ static char const* const guidKeys[] =
     0
 };
 
-ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& guidHigh)
+WOWGUID::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& guidHigh)
 {
     int type = 0;
 
@@ -638,7 +638,7 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& gu
                 if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
                     return player->GetGUID().GetCounter();
 
-                if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(name))
+                if (WOWGUID guid = sCharacterCache->GetCharacterGuidByName(name))
                     return guid.GetCounter();
 
                 return 0;
@@ -647,7 +647,7 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& gu
             {
                 guidHigh = HighGuid::Unit;
 
-                ObjectGuid::LowType lowguid = (uint32)atol(idS);
+                WOWGUID::LowType lowguid = (uint32)atol(idS);
 
                 if (sObjectMgr->GetCreatureData(lowguid))
                     return lowguid;
@@ -658,7 +658,7 @@ ObjectGuid::LowType ChatHandler::extractLowGuidFromLink(char* text, HighGuid& gu
             {
                 guidHigh = HighGuid::GameObject;
 
-                ObjectGuid::LowType lowguid = (uint32)atol(idS);
+                WOWGUID::LowType lowguid = (uint32)atol(idS);
 
                 if (sObjectMgr->GetGameObjectData(lowguid))
                     return lowguid;
@@ -685,7 +685,7 @@ std::string ChatHandler::extractPlayerNameFromLink(char* text)
     return name;
 }
 
-bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* player_guid /*=nullptr*/, std::string* player_name /*= nullptr*/)
+bool ChatHandler::extractPlayerTarget(char* args, Player** player, WOWGUID* player_guid /*=nullptr*/, std::string* player_name /*= nullptr*/)
 {
     if (args && *args)
     {
@@ -703,7 +703,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
             *player = pl;
 
         // if need guid value from DB (in name case for check player existence)
-        ObjectGuid guid = !pl && (player_guid || player_name) ? sCharacterCache->GetCharacterGuidByName(name) : ObjectGuid::Empty;
+        WOWGUID guid = !pl && (player_guid || player_name) ? sCharacterCache->GetCharacterGuidByName(name) : WOWGUID::Empty;
 
         // if allowed player guid (if no then only online players allowed)
         if (player_guid)
@@ -725,7 +725,7 @@ bool ChatHandler::extractPlayerTarget(char* args, Player** player, ObjectGuid* p
 
         // if allowed player guid (if no then only online players allowed)
         if (player_guid)
-            *player_guid = pl ? pl->GetGUID() : ObjectGuid::Empty;
+            *player_guid = pl ? pl->GetGUID() : WOWGUID::Empty;
 
         if (player_name)
             *player_name = pl ? pl->GetName() : "";
@@ -835,10 +835,10 @@ bool CliHandler::needReportToTarget(Player* /*chr*/) const
     return true;
 }
 
-bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline)
+bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, WOWGUID& guid, bool offline)
 {
     player = nullptr;
-    guid = ObjectGuid::Empty;
+    guid = WOWGUID::Empty;
 
     if (cname)
     {

@@ -151,7 +151,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -177,7 +177,7 @@ public:
                     return FlameRingGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -227,16 +227,16 @@ public:
         }
 
     protected:
-        ObjectGuid BaltharusTheWarbornGUID;
-        ObjectGuid XerestraszaGUID;
-        ObjectGuid GeneralZarithrianGUID;
-        ObjectGuid ZarithrianSpawnStalkerGUID[2];
+        WOWGUID BaltharusTheWarbornGUID;
+        WOWGUID XerestraszaGUID;
+        WOWGUID GeneralZarithrianGUID;
+        WOWGUID ZarithrianSpawnStalkerGUID[2];
 
-        ObjectGuid HalionGUID;
-        ObjectGuid TwilightHalionGUID;
-        ObjectGuid HalionControllerGUID;
-        ObjectGuid OrbCarrierGUID;
-        ObjectGuid FlameRingGUID;
+        WOWGUID HalionGUID;
+        WOWGUID TwilightHalionGUID;
+        WOWGUID HalionControllerGUID;
+        WOWGUID OrbCarrierGUID;
+        WOWGUID FlameRingGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

@@ -405,7 +405,7 @@ public:
                                 Player* player = me->SelectNearestPlayer(100.0f);
                                 if (GameObject* go = player->SummonGameObject(GO_ARENA_SPOILS, 596.48f, -187.91f, -54.14f, 4.9f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
                                 {
-                                    go->SetOwnerGUID(ObjectGuid::Empty);
+                                    go->SetOwnerGUID(WOWGUID::Empty);
                                 }
 
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();

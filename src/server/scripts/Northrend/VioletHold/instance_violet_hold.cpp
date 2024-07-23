@@ -56,31 +56,31 @@ public:
         bool bDefensesUsed;
 
         GuidVector GO_ActivationCrystalGUID;
-        ObjectGuid GO_MainGateGUID;
+        WOWGUID GO_MainGateGUID;
 
-        ObjectGuid GO_MoraggCellGUID;
-        ObjectGuid GO_ErekemCellGUID;
-        ObjectGuid GO_ErekemRightGuardCellGUID;
-        ObjectGuid GO_ErekemLeftGuardCellGUID;
-        ObjectGuid GO_IchoronCellGUID;
-        ObjectGuid GO_LavanthorCellGUID;
-        ObjectGuid GO_XevozzCellGUID;
-        ObjectGuid GO_ZuramatCellGUID;
+        WOWGUID GO_MoraggCellGUID;
+        WOWGUID GO_ErekemCellGUID;
+        WOWGUID GO_ErekemRightGuardCellGUID;
+        WOWGUID GO_ErekemLeftGuardCellGUID;
+        WOWGUID GO_IchoronCellGUID;
+        WOWGUID GO_LavanthorCellGUID;
+        WOWGUID GO_XevozzCellGUID;
+        WOWGUID GO_ZuramatCellGUID;
 
         GuidSet trashMobs;
-        ObjectGuid NPC_SinclariGUID;
-        ObjectGuid NPC_GuardGUID[4];
-        ObjectGuid NPC_PortalGUID;
-        ObjectGuid NPC_DoorSealGUID;
+        WOWGUID NPC_SinclariGUID;
+        WOWGUID NPC_GuardGUID[4];
+        WOWGUID NPC_PortalGUID;
+        WOWGUID NPC_DoorSealGUID;
 
-        ObjectGuid NPC_MoraggGUID;
-        ObjectGuid NPC_ErekemGUID;
-        ObjectGuid NPC_ErekemGuardGUID[2];
-        ObjectGuid NPC_IchoronGUID;
-        ObjectGuid NPC_LavanthorGUID;
-        ObjectGuid NPC_XevozzGUID;
-        ObjectGuid NPC_ZuramatGUID;
-        ObjectGuid NPC_CyanigosaGUID;
+        WOWGUID NPC_MoraggGUID;
+        WOWGUID NPC_ErekemGUID;
+        WOWGUID NPC_ErekemGuardGUID[2];
+        WOWGUID NPC_IchoronGUID;
+        WOWGUID NPC_LavanthorGUID;
+        WOWGUID NPC_XevozzGUID;
+        WOWGUID NPC_ZuramatGUID;
+        WOWGUID NPC_CyanigosaGUID;
 
         void Initialize() override
         {
@@ -165,7 +165,7 @@ public:
             switch(go->GetEntry())
             {
                 case GO_ACTIVATION_CRYSTAL:
-                    HandleGameObject(ObjectGuid::Empty, false, go); // make go not used yet
+                    HandleGameObject(WOWGUID::Empty, false, go); // make go not used yet
                     go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                     GO_ActivationCrystalGUID.push_back(go->GetGUID());
                     break;
@@ -275,7 +275,7 @@ public:
             }
         }
 
-        void SetGuidData(uint32 type, ObjectGuid data) override
+        void SetGuidData(uint32 type, WOWGUID data) override
         {
             switch(type)
             {
@@ -308,7 +308,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        WOWGUID GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -326,7 +326,7 @@ public:
                     return NPC_IchoronGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void StartBossEncounter(uint8 uiBoss)
@@ -462,10 +462,10 @@ public:
                         DoUpdateWorldState(WORLD_STATE_VH_PRISON_STATE, (uint32)GateHealth);
                         DoUpdateWorldState(WORLD_STATE_VH_WAVE_COUNT, (uint32)WaveCount);
 
-                        for (ObjectGuid const& guid : GO_ActivationCrystalGUID)
+                        for (WOWGUID const& guid : GO_ActivationCrystalGUID)
                             if (GameObject* go = instance->GetGameObject(guid))
                             {
-                                HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
+                                HandleGameObject(WOWGUID::Empty, false, go); // not used yet
                                 go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // make it useable
                             }
                         events.RescheduleEvent(EVENT_SUMMON_PORTAL, 4s);
@@ -559,10 +559,10 @@ public:
             CLEANED = true;
 
             // reset defense crystals
-            for (ObjectGuid const& guid : GO_ActivationCrystalGUID)
+            for (WOWGUID const& guid : GO_ActivationCrystalGUID)
                 if (GameObject* go = instance->GetGameObject(guid))
                 {
-                    HandleGameObject(ObjectGuid::Empty, false, go); // not used yet
+                    HandleGameObject(WOWGUID::Empty, false, go); // not used yet
                     go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE); // not useable at the beginning
                 }
 
@@ -586,7 +586,7 @@ public:
             NPC_PortalGUID.Clear();
 
             // remove trash
-            for (ObjectGuid const& guid : trashMobs)
+            for (WOWGUID const& guid : trashMobs)
                 if (Creature* c = instance->GetCreature(guid))
                     c->DespawnOrUnsummon();
 

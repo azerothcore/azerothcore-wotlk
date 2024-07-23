@@ -424,7 +424,7 @@ struct BattlegroundSAScore final : public BattlegroundScore
     friend class BattlegroundSA;
 
 protected:
-    BattlegroundSAScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
+    BattlegroundSAScore(WOWGUID playerGuid) : BattlegroundScore(playerGuid) { }
 
     void UpdateScore(uint32 type, uint32 value) override
     {

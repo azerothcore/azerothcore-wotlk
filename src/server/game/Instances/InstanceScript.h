@@ -134,9 +134,9 @@ typedef std::multimap<uint32 /*entry*/, DoorInfo> DoorInfoMap;
 typedef std::pair<DoorInfoMap::const_iterator, DoorInfoMap::const_iterator> DoorInfoMapBounds;
 
 typedef std::map<uint32 /*entry*/, MinionInfo> MinionInfoMap;
-typedef std::map<uint32 /*type*/, ObjectGuid /*guid*/> ObjectGuidMap;
+typedef std::map<uint32 /*type*/, WOWGUID /*guid*/> ObjectGuidMap;
 typedef std::map<uint32 /*entry*/, uint32 /*type*/> ObjectInfoMap;
-typedef std::map<ObjectGuid::LowType /*spawnId*/, uint8 /*state*/> ObjectStateMap;
+typedef std::map<WOWGUID::LowType /*spawnId*/, uint8 /*state*/> ObjectStateMap;
 
 class InstanceScript : public ZoneScript
 {
@@ -175,8 +175,8 @@ public:
     void OnGameObjectCreate(GameObject* go) override;
     void OnGameObjectRemove(GameObject* go) override;
 
-    ObjectGuid GetObjectGuid(uint32 type) const;
-    ObjectGuid GetGuidData(uint32 type) const override;
+    WOWGUID GetObjectGuid(uint32 type) const;
+    WOWGUID GetGuidData(uint32 type) const override;
 
     Creature* GetCreature(uint32 type);
     GameObject* GetGameObject(uint32 type);
@@ -190,18 +190,18 @@ public:
     virtual void OnPlayerInWaterStateUpdate(Player* /*player*/, bool /*inWater*/) {}
 
     //Handle open / close objects
-    //use HandleGameObject(ObjectGuid::Empty, boolen, GO); in OnObjectCreate in instance scripts
+    //use HandleGameObject(WOWGUID::Empty, boolen, GO); in OnObjectCreate in instance scripts
     //use HandleGameObject(GUID, boolen, nullptr); in any other script
-    void HandleGameObject(ObjectGuid guid, bool open, GameObject* go = nullptr);
+    void HandleGameObject(WOWGUID guid, bool open, GameObject* go = nullptr);
 
     //change active state of doors or buttons
-    void DoUseDoorOrButton(ObjectGuid guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);
+    void DoUseDoorOrButton(WOWGUID guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);
 
     //Respawns a GO having negative spawntimesecs in gameobject-table
-    void DoRespawnGameObject(ObjectGuid guid, uint32 timeToDespawn = MINUTE);
+    void DoRespawnGameObject(WOWGUID guid, uint32 timeToDespawn = MINUTE);
 
     // Respawns a creature.
-    void DoRespawnCreature(ObjectGuid guid, bool force = false);
+    void DoRespawnCreature(WOWGUID guid, bool force = false);
 
     // Respawns a creature from the creature object storage.
     void DoRespawnCreature(uint32 type, bool force = false);
@@ -270,8 +270,8 @@ public:
     void DoForAllMinions(uint32 id, std::function<void(Creature*)> exec);
 
     //
-    void StoreGameObjectState(ObjectGuid::LowType spawnId, uint8 state) { _objectStateMap[spawnId] = state; };
-    [[nodiscard]] uint8 GetStoredGameObjectState(ObjectGuid::LowType spawnId) const;
+    void StoreGameObjectState(WOWGUID::LowType spawnId, uint8 state) { _objectStateMap[spawnId] = state; };
+    [[nodiscard]] uint8 GetStoredGameObjectState(WOWGUID::LowType spawnId) const;
 
     void LoadInstanceSavedGameobjectStateData();
 

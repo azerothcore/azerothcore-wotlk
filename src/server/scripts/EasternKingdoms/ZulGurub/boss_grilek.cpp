@@ -131,7 +131,7 @@ public:
         }
 
     private:
-        ObjectGuid _pursuitTargetGUID;
+        WOWGUID _pursuitTargetGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

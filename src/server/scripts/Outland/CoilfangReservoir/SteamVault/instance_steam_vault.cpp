@@ -79,13 +79,13 @@ public:
                     {
                         if (GameObject* mainGate = instance->GetGameObject(DATA_MAIN_CHAMBERS_DOOR))
                         {
-                            instance->HandleGameObject(ObjectGuid::Empty, true, mainGate);
+                            instance->HandleGameObject(WOWGUID::Empty, true, mainGate);
                         }
                     }, 4s);
                 }
                 else if (GameObject* mainGate = instance->GetGameObject(DATA_MAIN_CHAMBERS_DOOR))
                 {
-                    instance->HandleGameObject(ObjectGuid::Empty, true, mainGate);
+                    instance->HandleGameObject(WOWGUID::Empty, true, mainGate);
                 }
             }
 
@@ -132,19 +132,19 @@ public:
             {
                 case GO_MAIN_CHAMBERS_DOOR:
                     if (GetBossState(DATA_HYDROMANCER_THESPIA) == DONE && GetBossState(DATA_MEKGINEER_STEAMRIGGER) == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
+                        HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_ACCESS_PANEL_HYDRO:
                     if (GetBossState(DATA_HYDROMANCER_THESPIA) == DONE)
                         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else if (GetBossState(DATA_HYDROMANCER_THESPIA) == SPECIAL)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
+                        HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_ACCESS_PANEL_MEK:
                     if (GetBossState(DATA_MEKGINEER_STEAMRIGGER) == DONE)
                         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     else if (GetBossState(DATA_MEKGINEER_STEAMRIGGER) == SPECIAL)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
+                        HandleGameObject(WOWGUID::Empty, true, go);
                     break;
             }
 

@@ -71,7 +71,7 @@ private:
 
     bool AssistPlayerInCombatAgainst(Unit* who);
 
-    ObjectGuid m_uiLeaderGUID;
+    WOWGUID m_uiLeaderGUID;
     uint32 m_uiUpdateFollowTimer;
     uint32 m_uiFollowState;
 

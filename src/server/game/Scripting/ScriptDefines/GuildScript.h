@@ -18,7 +18,7 @@
 #ifndef SCRIPT_OBJECT_GUILD_SCRIPT_H_
 #define SCRIPT_OBJECT_GUILD_SCRIPT_H_
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "ScriptObject.h"
 #include <vector>
 
@@ -74,9 +74,9 @@ public:
     // Called when a guild member moves an item in a guild bank.
     virtual void OnItemMove(Guild* /*guild*/, Player* /*player*/, Item* /*pItem*/, bool /*isSrcBank*/, uint8 /*srcContainer*/, uint8 /*srcSlotId*/, bool /*isDestBank*/, uint8 /*destContainer*/, uint8 /*destSlotId*/) { }
 
-    virtual void OnEvent(Guild* /*guild*/, uint8 /*eventType*/, ObjectGuid::LowType /*playerGuid1*/, ObjectGuid::LowType /*playerGuid2*/, uint8 /*newRank*/) { }
+    virtual void OnEvent(Guild* /*guild*/, uint8 /*eventType*/, WOWGUID::LowType /*playerGuid1*/, WOWGUID::LowType /*playerGuid2*/, uint8 /*newRank*/) { }
 
-    virtual void OnBankEvent(Guild* /*guild*/, uint8 /*eventType*/, uint8 /*tabId*/, ObjectGuid::LowType /*playerGuid*/, uint32 /*itemOrMoney*/, uint16 /*itemStackCount*/, uint8 /*destTabId*/) { }
+    virtual void OnBankEvent(Guild* /*guild*/, uint8 /*eventType*/, uint8 /*tabId*/, WOWGUID::LowType /*playerGuid*/, uint32 /*itemOrMoney*/, uint16 /*itemStackCount*/, uint8 /*destTabId*/) { }
 
     [[nodiscard]] virtual bool CanGuildSendBankList(Guild const* /*guild*/, User* /*session*/, uint8 /*tabId*/, bool /*sendAllSlots*/) { return true; }
 };

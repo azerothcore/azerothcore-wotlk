@@ -18,7 +18,7 @@
 #ifndef TotemPackets_h__
 #define TotemPackets_h__
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Packet.h"
 
 namespace WorldPackets
@@ -43,7 +43,7 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             uint8 Slot = 0;
-            ObjectGuid Totem;
+            WOWGUID Totem;
             uint32 Duration = 0;
             uint32 SpellID = 0;
 

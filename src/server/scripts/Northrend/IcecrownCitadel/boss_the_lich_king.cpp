@@ -2219,7 +2219,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
         }
 
-        ObjectGuid targetGUID;
+        WOWGUID targetGUID;
         uint16 timer;
 
         void DoAction(int32 a) override
@@ -2535,7 +2535,7 @@ public:
 
         EventMap _events;
         Position _destPoint;
-        ObjectGuid _grabbedPlayer;
+        WOWGUID _grabbedPlayer;
         bool didbelow50pct;
         bool dropped;
         InstanceScript* _instance;
@@ -2656,7 +2656,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 /* = 0*/) override
+        void SetGUID(WOWGUID guid, int32 /* = 0*/) override
         {
             _grabbedPlayer = guid;
         }
@@ -3142,8 +3142,8 @@ public:
                 path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), 843.0f));
                 me->GetMotionMaster()->MoveSplinePath(&path);
 
-                ObjectGuid petGUID = summoner->ToUnit()->GetPetGUID();
-                summoner->ToUnit()->SetPetGUID(ObjectGuid::Empty);
+                WOWGUID petGUID = summoner->ToUnit()->GetPetGUID();
+                summoner->ToUnit()->SetPetGUID(WOWGUID::Empty);
                 summoner->ToUnit()->StopMoving();
                 me->CastSpell(summoner->ToUnit(), SPELL_HARVEST_SOUL_VEHICLE, true);
                 //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);

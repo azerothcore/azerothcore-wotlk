@@ -98,7 +98,7 @@ public:
         uint32 ShieldBash_Timer;
         uint32 Revenge_Timer; //this is wrong, spell should never be used unless me->GetVictim() dodge, parry or block attack. Trinity support required.
         uint32 Porthome_Timer;
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         void Reset() override
         {

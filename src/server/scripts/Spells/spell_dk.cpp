@@ -1084,7 +1084,7 @@ private:
 class CorpseExplosionCheck
 {
 public:
-    explicit CorpseExplosionCheck(ObjectGuid casterGUID, bool allowGhoul) : _casterGUID(casterGUID), _allowGhoul(allowGhoul) { }
+    explicit CorpseExplosionCheck(WOWGUID casterGUID, bool allowGhoul) : _casterGUID(casterGUID), _allowGhoul(allowGhoul) { }
 
     bool operator()(WorldObject* obj) const
     {
@@ -1100,7 +1100,7 @@ public:
     }
 
 private:
-    ObjectGuid _casterGUID;
+    WOWGUID _casterGUID;
     bool _allowGhoul;
 };
 
@@ -2029,7 +2029,7 @@ class spell_dk_scourge_strike : public SpellScript
 {
     PrepareSpellScript(spell_dk_scourge_strike);
     float multiplier;
-    ObjectGuid guid;
+    WOWGUID guid;
 
     bool Load() override
     {

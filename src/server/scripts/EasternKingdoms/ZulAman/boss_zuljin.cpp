@@ -138,9 +138,9 @@ public:
         }
         InstanceScript* instance;
 
-        ObjectGuid SpiritGUID[4];
-        ObjectGuid ClawTargetGUID;
-        ObjectGuid TankGUID;
+        WOWGUID SpiritGUID[4];
+        WOWGUID ClawTargetGUID;
+        WOWGUID TankGUID;
 
         uint32 Phase;
         uint32 health_20;

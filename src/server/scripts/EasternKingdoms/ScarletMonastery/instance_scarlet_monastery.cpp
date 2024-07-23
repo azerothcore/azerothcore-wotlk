@@ -162,7 +162,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -174,7 +174,7 @@ public:
                     return DoorHighInquisitorGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         uint32 GetData(uint32 type) const override
@@ -186,9 +186,9 @@ public:
             return 0;
         }
     private:
-        ObjectGuid DoorHighInquisitorGUID;
-        ObjectGuid MograineGUID;
-        ObjectGuid WhitemaneGUID;
+        WOWGUID DoorHighInquisitorGUID;
+        WOWGUID MograineGUID;
+        WOWGUID WhitemaneGUID;
         uint32 encounter;
     };
 };

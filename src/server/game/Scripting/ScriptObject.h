@@ -24,7 +24,7 @@
 
 //#include "Duration.h"
 //#include "LFG.h"
-//#include "ObjectGuid.h"
+//#include "GUID.h"
 //#include "SharedDefines.h"
 //#include "Tuples.h"
 //#include "Types.h"

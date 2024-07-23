@@ -267,7 +267,7 @@ void User::HandleMoveTeleportAck(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "MSG_MOVE_TELEPORT_ACK");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     uint32 flags, time;
@@ -349,7 +349,7 @@ void User::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     /* extract packet */
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     // prevent tampered movement data
@@ -614,7 +614,7 @@ void User::HandleForceSpeedChangeAck(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Recvd {} ({}, 0x{:X}) opcode", GetOpcodeNameForLogging(static_cast<OpcodeClient>(opcode)), opcode, opcode);
 
     /* extract packet */
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 unk1;
     float  newspeed;
 
@@ -718,7 +718,7 @@ void User::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     if (GetPlayer()->IsInWorld() && m_player->m_mover && m_player->m_mover->IsInWorld())
@@ -733,7 +733,7 @@ void User::HandleMoveNotActiveMover(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
 
-    ObjectGuid old_mover_guid;
+    WOWGUID old_mover_guid;
     recvData >> old_mover_guid.ReadAsPacked();
 
     // pussywizard: typical check for incomming movement packets
@@ -762,7 +762,7 @@ void User::HandleMoveKnockBackAck(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_MOVE_KNOCK_BACK_ACK");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     // pussywizard: typical check for incomming movement packets
@@ -797,7 +797,7 @@ void User::HandleMoveHoverAck(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_MOVE_HOVER_ACK");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     recvData.read_skip<uint32>();                          // unk
@@ -813,7 +813,7 @@ void User::HandleMoveWaterWalkAck(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "CMSG_MOVE_WATER_WALK_ACK");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     recvData.read_skip<uint32>();                          // unk
@@ -830,7 +830,7 @@ void User::HandleSummonResponseOpcode(WorldPacket& recvData)
     if (!m_player->IsAlive() || m_player->IsInCombat())
         return;
 
-    ObjectGuid summoner_guid;
+    WOWGUID summoner_guid;
     bool agree;
     recvData >> summoner_guid;
     recvData >> agree;
@@ -853,7 +853,7 @@ void User::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 timeSkipped;
     recvData >> guid.ReadAsPacked();
     recvData >> timeSkipped;
@@ -953,7 +953,7 @@ void User::ComputeNewClockDelta()
 
 void User::HandleMoveRootAck(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     Unit* mover = m_player->m_mover;
@@ -993,7 +993,7 @@ void User::HandleMoveRootAck(WorldPacket& recvData)
 
 void User::HandleMoveUnRootAck(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     Unit* mover = m_player->m_mover;

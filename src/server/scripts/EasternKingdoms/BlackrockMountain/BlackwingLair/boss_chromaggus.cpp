@@ -118,7 +118,7 @@ public:
             return !victim->HasAura(SPELL_TIMELAPSE);
         }
 
-        void SetGUID(ObjectGuid guid, int32 id) override
+        void SetGUID(WOWGUID guid, int32 id) override
         {
             if (id == GUID_LEVER_USER)
             {
@@ -220,7 +220,7 @@ public:
     private:
         std::list<uint32> _breathSpells;
         bool Enraged;
-        ObjectGuid _playerGUID;
+        WOWGUID _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -252,7 +252,7 @@ class go_chromaggus_lever : public GameObjectScript
                         }
 
                         if (GameObject* go = _instance->GetGameObject(DATA_GO_CHROMAGGUS_DOOR))
-                            _instance->HandleGameObject(ObjectGuid::Empty, true, go);
+                            _instance->HandleGameObject(WOWGUID::Empty, true, go);
                     }
 
                     me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);

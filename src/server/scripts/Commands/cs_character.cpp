@@ -95,7 +95,7 @@ public:
     // Stores informations about a deleted character
     struct DeletedInfo
     {
-        ObjectGuid::LowType lowGuid;                    ///< the low GUID from the character
+        WOWGUID::LowType lowGuid;                    ///< the low GUID from the character
         std::string name;                               ///< the character name
         uint32      accountId;                          ///< the account id
         std::string accountName;                        ///< the account name
@@ -242,11 +242,11 @@ public:
         stmt->SetData(0, delInfo.lowGuid);
         if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
         {
-            sCharacterCache->AddCharacterCacheEntry(ObjectGuid(HighGuid::Player, delInfo.lowGuid), delInfo.accountId, delInfo.name, (*result)[2].Get<uint8>(), (*result)[0].Get<uint8>(), (*result)[1].Get<uint8>(), (*result)[3].Get<uint8>());
+            sCharacterCache->AddCharacterCacheEntry(WOWGUID(HighGuid::Player, delInfo.lowGuid), delInfo.accountId, delInfo.name, (*result)[2].Get<uint8>(), (*result)[0].Get<uint8>(), (*result)[1].Get<uint8>(), (*result)[3].Get<uint8>());
         }
     }
 
-    static void HandleCharacterLevel(Player* player, ObjectGuid playerGuid, uint32 oldLevel, uint32 newLevel, ChatHandler* handler)
+    static void HandleCharacterLevel(Player* player, WOWGUID playerGuid, uint32 oldLevel, uint32 newLevel, ChatHandler* handler)
     {
         if (player)
         {
@@ -776,7 +776,7 @@ public:
         return true;
     }
 
-    static bool ValidatePDumpTarget(ChatHandler* handler, std::string& name, Optional<std::string_view> characterName, Optional<ObjectGuid::LowType> characterGUID)
+    static bool ValidatePDumpTarget(ChatHandler* handler, std::string& name, Optional<std::string_view> characterName, Optional<WOWGUID::LowType> characterGUID)
     {
         if (characterName)
         {
@@ -797,7 +797,7 @@ public:
 
         if (characterGUID)
         {
-            if (sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, *characterGUID)))
+            if (sCharacterCache->GetCharacterAccountIdByGuid(WOWGUID(HighGuid::Player, *characterGUID)))
             {
                 handler->SendErrorMessage(LANG_CHARACTER_GUID_IN_USE, *characterGUID);
                 return false;
@@ -807,7 +807,7 @@ public:
         return true;
     }
 
-    static bool HandlePDumpLoadCommand(ChatHandler* handler, std::string fileName, AccountIdentifier account, Optional<std::string_view> characterName, Optional<ObjectGuid::LowType> characterGUID)
+    static bool HandlePDumpLoadCommand(ChatHandler* handler, std::string fileName, AccountIdentifier account, Optional<std::string_view> characterName, Optional<WOWGUID::LowType> characterGUID)
     {
         std::string name;
         if (!ValidatePDumpTarget(handler, name, characterName, characterGUID))
@@ -835,7 +835,7 @@ public:
         return true;
     }
 
-    static bool HandlePDumpCopyCommand(ChatHandler* handler, PlayerIdentifier player, AccountIdentifier account, Optional<std::string_view> characterName, Optional<ObjectGuid::LowType> characterGUID)
+    static bool HandlePDumpCopyCommand(ChatHandler* handler, PlayerIdentifier player, AccountIdentifier account, Optional<std::string_view> characterName, Optional<WOWGUID::LowType> characterGUID)
     {
         std::string name;
         if (!ValidatePDumpTarget(handler, name, characterName, characterGUID))

@@ -77,15 +77,15 @@ public:
             {
                 case GO_COURTYARD_DOOR:
                     if (_encounters[TYPE_COURTYARD] == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
+                        HandleGameObject(WOWGUID::Empty, true, gameobject);
                     break;
                 case GO_SORCERER_DOOR:
                     if (_encounters[TYPE_FENRUS_THE_DEVOURER] == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
+                        HandleGameObject(WOWGUID::Empty, true, gameobject);
                     break;
                 case GO_ARUGAL_DOOR:
                     if (_encounters[TYPE_WOLF_MASTER_NANDOS] == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
+                        HandleGameObject(WOWGUID::Empty, true, gameobject);
                     break;
                 default:
                     break;
@@ -102,7 +102,7 @@ public:
                     _encounters[type] = data;
                     break;
                 case DATA_SPAWN_VALENTINE_ADDS:
-                    for (ObjectGuid guid : _crazedApothecaryGeneratorGUIDs)
+                    for (WOWGUID guid : _crazedApothecaryGeneratorGUIDs)
                     {
                         if (Creature* generator = instance->GetCreature(guid))
                         {
@@ -133,7 +133,7 @@ public:
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
         GuidVector _crazedApothecaryGeneratorGUIDs;
-        ObjectGuid _apothecaryHummel;
+        WOWGUID _apothecaryHummel;
     };
 };
 

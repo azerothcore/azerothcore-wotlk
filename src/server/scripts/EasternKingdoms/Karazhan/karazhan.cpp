@@ -144,7 +144,7 @@ public:
 
         InstanceScript* instance;
 
-        ObjectGuid m_uiSpotlightGUID;
+        WOWGUID m_uiSpotlightGUID;
 
         uint32 TalkCount;
         uint32 TalkTimer;
@@ -415,7 +415,7 @@ public:
 
         InstanceScript* instance;
 
-        ObjectGuid ArcanagosGUID;
+        WOWGUID ArcanagosGUID;
 
         uint32 YellTimer;
         uint8 Step;
@@ -578,7 +578,7 @@ public:
             {
                 if (GameObject* door = instance->GetGameObject(DATA_GO_SIDE_ENTRANCE_DOOR))
                 {
-                    instance->HandleGameObject(ObjectGuid::Empty, true, door);
+                    instance->HandleGameObject(WOWGUID::Empty, true, door);
                     door->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                 }
             }

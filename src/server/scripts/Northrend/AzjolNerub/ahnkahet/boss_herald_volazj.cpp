@@ -320,7 +320,7 @@ private:
         }
 
         uint32 phase = 1;
-        for (ObjectGuid const& summonGUID : summons)
+        for (WOWGUID const& summonGUID : summons)
         {
             if (Creature* summon = ObjectAccessor::GetCreature(*me, summonGUID))
             {

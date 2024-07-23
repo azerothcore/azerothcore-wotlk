@@ -969,13 +969,13 @@ uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missC
 struct RedirectThreatInfo
 {
     RedirectThreatInfo()  = default;
-    ObjectGuid _targetGUID;
+    WOWGUID _targetGUID;
     uint32 _threatPct{0};
 
-    [[nodiscard]] ObjectGuid GetTargetGUID() const { return _targetGUID; }
+    [[nodiscard]] WOWGUID GetTargetGUID() const { return _targetGUID; }
     [[nodiscard]] uint32 GetThreatPct() const { return _threatPct; }
 
-    void Set(ObjectGuid guid, uint32 pct)
+    void Set(WOWGUID guid, uint32 pct)
     {
         _targetGUID = guid;
         _threatPct = pct;
@@ -1165,8 +1165,8 @@ public:
 
     void SetForcedSpell(uint32 id) { _forcedSpellId = id; }
     int32 GetForcedSpell() { return _forcedSpellId; }
-    void SetForcedTargetGUID(ObjectGuid guid = ObjectGuid::Empty) { _forcedTargetGUID = guid; }
-    ObjectGuid GetForcedTarget() { return _forcedTargetGUID; }
+    void SetForcedTargetGUID(WOWGUID guid = WOWGUID::Empty) { _forcedTargetGUID = guid; }
+    WOWGUID GetForcedTarget() { return _forcedTargetGUID; }
 
     // Player react states
     void SetPlayerReactState(ReactStates s) { _oldReactState = s; }
@@ -1188,7 +1188,7 @@ private:
     bool _isFollowing;
     bool _isReturning;
     int32 _forcedSpellId;
-    ObjectGuid _forcedTargetGUID;
+    WOWGUID _forcedTargetGUID;
     float _stayX;
     float _stayY;
     float _stayZ;
@@ -1651,8 +1651,8 @@ public:
     void SetLastExtraAttackSpell(uint32 spellId) { _lastExtraAttackSpell = spellId; }
     [[nodiscard]] uint32 GetLastExtraAttackSpell() const { return _lastExtraAttackSpell; }
     void AddExtraAttacks(uint32 count);
-    void SetLastDamagedTargetGuid(ObjectGuid const& guid) { _lastDamagedTargetGuid = guid; }
-    [[nodiscard]] ObjectGuid const& GetLastDamagedTargetGuid() const { return _lastDamagedTargetGuid; }
+    void SetLastDamagedTargetGuid(WOWGUID const& guid) { _lastDamagedTargetGuid = guid; }
+    [[nodiscard]] WOWGUID const& GetLastDamagedTargetGuid() const { return _lastDamagedTargetGuid; }
 
     void CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 damage, SpellInfo const* spellInfo, WeaponAttackType attackType = BASE_ATTACK, bool crit = false);
     void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss, Spell const* spell = nullptr);
@@ -1810,22 +1810,22 @@ public:
     void SendEnergizeSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
     void EnergizeBySpell(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
 
-    SpellCastResult CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastSpell(Unit* victim, SpellInfo const* spellInfo, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastSpell(Unit* victim, SpellInfo const* spellInfo, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastCustomSpell(Unit* victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
-    SpellCastResult CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
+    SpellCastResult CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastSpell(Unit* victim, uint32 spellId, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastSpell(Unit* victim, SpellInfo const* spellInfo, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastSpell(Unit* victim, SpellInfo const* spellInfo, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastSpell(GameObject* go, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastCustomSpell(Unit* victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastCustomSpell(uint32 spellId, SpellValueMod mod, int32 value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
+    SpellCastResult CastCustomSpell(uint32 spellId, CustomSpellValues const& value, Unit* victim = nullptr, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
     Aura* AddAura(uint32 spellId, Unit* target);
     Aura* AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target);
     void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
     void SendPlaySpellVisual(uint32 id);
-    void SendPlaySpellImpact(ObjectGuid guid, uint32 id);
+    void SendPlaySpellImpact(WOWGUID guid, uint32 id);
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown);
     void BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns const& cooldowns);
 
@@ -1893,26 +1893,26 @@ public:
     DeathState getDeathState() { return m_deathState; };
     virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
 
-    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
-    void SetOwnerGUID(ObjectGuid owner);
-    [[nodiscard]] ObjectGuid GetCreatorGUID() const { return GetGuidValue(UNIT_FIELD_CREATEDBY); }
-    void SetCreatorGUID(ObjectGuid creator) { SetGuidValue(UNIT_FIELD_CREATEDBY, creator); }
-    [[nodiscard]] ObjectGuid GetMinionGUID() const { return GetGuidValue(UNIT_FIELD_SUMMON); }
-    void SetMinionGUID(ObjectGuid guid) { SetGuidValue(UNIT_FIELD_SUMMON, guid); }
-    [[nodiscard]] ObjectGuid GetCharmerGUID() const { return GetGuidValue(UNIT_FIELD_CHARMEDBY); }
-    void SetCharmerGUID(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_CHARMEDBY, owner); }
-    [[nodiscard]] ObjectGuid GetCharmGUID() const { return  GetGuidValue(UNIT_FIELD_CHARM); }
-    void SetPetGUID(ObjectGuid guid) { m_SummonSlot[SUMMON_SLOT_PET] = guid; }
-    [[nodiscard]] ObjectGuid GetPetGUID() const { return m_SummonSlot[SUMMON_SLOT_PET]; }
-    void SetCritterGUID(ObjectGuid guid) { SetGuidValue(UNIT_FIELD_CRITTER, guid); }
-    [[nodiscard]] ObjectGuid GetCritterGUID() const { return GetGuidValue(UNIT_FIELD_CRITTER); }
+    [[nodiscard]] WOWGUID GetOwnerGUID() const { return GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
+    void SetOwnerGUID(WOWGUID owner);
+    [[nodiscard]] WOWGUID GetCreatorGUID() const { return GetGuidValue(UNIT_FIELD_CREATEDBY); }
+    void SetCreatorGUID(WOWGUID creator) { SetGuidValue(UNIT_FIELD_CREATEDBY, creator); }
+    [[nodiscard]] WOWGUID GetMinionGUID() const { return GetGuidValue(UNIT_FIELD_SUMMON); }
+    void SetMinionGUID(WOWGUID guid) { SetGuidValue(UNIT_FIELD_SUMMON, guid); }
+    [[nodiscard]] WOWGUID GetCharmerGUID() const { return GetGuidValue(UNIT_FIELD_CHARMEDBY); }
+    void SetCharmerGUID(WOWGUID owner) { SetGuidValue(UNIT_FIELD_CHARMEDBY, owner); }
+    [[nodiscard]] WOWGUID GetCharmGUID() const { return  GetGuidValue(UNIT_FIELD_CHARM); }
+    void SetPetGUID(WOWGUID guid) { m_SummonSlot[SUMMON_SLOT_PET] = guid; }
+    [[nodiscard]] WOWGUID GetPetGUID() const { return m_SummonSlot[SUMMON_SLOT_PET]; }
+    void SetCritterGUID(WOWGUID guid) { SetGuidValue(UNIT_FIELD_CRITTER, guid); }
+    [[nodiscard]] WOWGUID GetCritterGUID() const { return GetGuidValue(UNIT_FIELD_CRITTER); }
 
     [[nodiscard]] bool IsControlledByPlayer() const { return m_ControlledByPlayer; }
     [[nodiscard]] bool IsCreatedByPlayer() const { return m_CreatedByPlayer; }
-    [[nodiscard]] ObjectGuid GetCharmerOrOwnerGUID() const { return GetCharmerGUID() ? GetCharmerGUID() : GetOwnerGUID(); }
-    [[nodiscard]] ObjectGuid GetCharmerOrOwnerOrOwnGUID() const
+    [[nodiscard]] WOWGUID GetCharmerOrOwnerGUID() const { return GetCharmerGUID() ? GetCharmerGUID() : GetOwnerGUID(); }
+    [[nodiscard]] WOWGUID GetCharmerOrOwnerOrOwnGUID() const
     {
-        if (ObjectGuid guid = GetCharmerOrOwnerGUID())
+        if (WOWGUID guid = GetCharmerOrOwnerGUID())
             return guid;
 
         return GetGUID();
@@ -1980,7 +1980,7 @@ public:
     bool InitTamedPet(Pet* pet, uint8 level, uint32 spell_id);
 
     // aura apply/remove helpers - you should better not use these
-    Aura* _TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, ObjectGuid casterGUID = ObjectGuid::Empty, bool periodicReset = false);
+    Aura* _TryStackingOrRefreshingExistingAura(SpellInfo const* newAura, uint8 effMask, Unit* caster, int32* baseAmount = nullptr, Item* castItem = nullptr, WOWGUID casterGUID = WOWGUID::Empty, bool periodicReset = false);
     void _AddAura(UnitAura* aura, Unit* caster);
     AuraApplication* _CreateAuraApplication(Aura* aura, uint8 effMask);
     void _ApplyAuraEffect(Aura* aura, uint8 effIndex);
@@ -1997,17 +1997,17 @@ public:
     [[nodiscard]] AuraMap const& GetOwnedAuras() const { return m_ownedAuras; }
 
     void RemoveOwnedAura(AuraMap::iterator& i, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
-    void RemoveOwnedAura(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
+    void RemoveOwnedAura(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, uint8 reqEffMask = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
     void RemoveOwnedAura(Aura* aura, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
 
-    Aura* GetOwnedAura(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, Aura* except = nullptr) const;
+    Aura* GetOwnedAura(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, WOWGUID itemCasterGUID = WOWGUID::Empty, uint8 reqEffMask = 0, Aura* except = nullptr) const;
 
     // m_appliedAuras container management
     AuraApplicationMap&       GetAppliedAuras()       { return m_appliedAuras; }
     [[nodiscard]] AuraApplicationMap const& GetAppliedAuras() const { return m_appliedAuras; }
 
     void RemoveAura(AuraApplicationMap::iterator& i, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
-    void RemoveAura(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
+    void RemoveAura(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, uint8 reqEffMask = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
     void RemoveAura(AuraApplication* aurApp, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
     void RemoveAura(Aura* aur, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
 
@@ -2019,16 +2019,16 @@ public:
     void RemoveAppliedAuras(uint32 spellId, std::function<bool(AuraApplication const*)> const& check);
     void RemoveOwnedAuras(uint32 spellId, std::function<bool(Aura const*)> const& check);
 
-    void RemoveAurasDueToSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
-    void RemoveAuraFromStack(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
-    void RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId, ObjectGuid casterGUID, Unit* dispeller, uint8 chargesRemoved = 1);
-    void RemoveAurasDueToSpellBySteal(uint32 spellId, ObjectGuid casterGUID, Unit* stealer);
-    void RemoveAurasDueToItemSpell(uint32 spellId, ObjectGuid castItemGuid);
-    void RemoveAurasByType(AuraType auraType, ObjectGuid casterGUID = ObjectGuid::Empty, Aura* except = nullptr, bool negative = true, bool positive = true);
+    void RemoveAurasDueToSpell(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, uint8 reqEffMask = 0, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
+    void RemoveAuraFromStack(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, AuraRemoveMode removeMode = AURA_REMOVE_BY_DEFAULT);
+    void RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId, WOWGUID casterGUID, Unit* dispeller, uint8 chargesRemoved = 1);
+    void RemoveAurasDueToSpellBySteal(uint32 spellId, WOWGUID casterGUID, Unit* stealer);
+    void RemoveAurasDueToItemSpell(uint32 spellId, WOWGUID castItemGuid);
+    void RemoveAurasByType(AuraType auraType, WOWGUID casterGUID = WOWGUID::Empty, Aura* except = nullptr, bool negative = true, bool positive = true);
     void RemoveNotOwnSingleTargetAuras();
     void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0, bool isAutoshot = false);
     void RemoveAurasWithAttribute(uint32 flags);
-    void RemoveAurasWithFamily(SpellFamilyNames family, uint32 familyFlag1, uint32 familyFlag2, uint32 familyFlag3, ObjectGuid casterGUID);
+    void RemoveAurasWithFamily(SpellFamilyNames family, uint32 familyFlag1, uint32 familyFlag2, uint32 familyFlag3, WOWGUID casterGUID);
     void RemoveAurasWithMechanic(uint32 mechanic_mask, AuraRemoveMode removemode = AURA_REMOVE_BY_DEFAULT, uint32 except = 0);
     void RemoveMovementImpairingAuras(bool withRoot);
     void RemoveAurasByShapeShift();
@@ -2041,7 +2041,7 @@ public:
     void RemoveAllAurasExceptType(AuraType type);
     //void RemoveAllAurasExceptType(AuraType type1, AuraType type2); // pussywizard: replaced with RemoveEvadeAuras()
     void RemoveEvadeAuras();
-    void DelayOwnedAuras(uint32 spellId, ObjectGuid caster, int32 delaytime);
+    void DelayOwnedAuras(uint32 spellId, WOWGUID caster, int32 delaytime);
 
     void _RemoveAllAuraStatMods();
     void _ApplyAllAuraStatMods();
@@ -2050,38 +2050,38 @@ public:
     AuraList&       GetSingleCastAuras()       { return m_scAuras; }
     [[nodiscard]] AuraList const& GetSingleCastAuras() const { return m_scAuras; }
 
-    [[nodiscard]] AuraEffect* GetAuraEffect(uint32 spellId, uint8 effIndex, ObjectGuid casterGUID = ObjectGuid::Empty) const;
-    [[nodiscard]] AuraEffect* GetAuraEffectOfRankedSpell(uint32 spellId, uint8 effIndex, ObjectGuid casterGUID = ObjectGuid::Empty) const;
+    [[nodiscard]] AuraEffect* GetAuraEffect(uint32 spellId, uint8 effIndex, WOWGUID casterGUID = WOWGUID::Empty) const;
+    [[nodiscard]] AuraEffect* GetAuraEffectOfRankedSpell(uint32 spellId, uint8 effIndex, WOWGUID casterGUID = WOWGUID::Empty) const;
     [[nodiscard]] AuraEffect* GetAuraEffect(AuraType type, SpellFamilyNames name, uint32 iconId, uint8 effIndex) const; // spell mustn't have familyflags
-    [[nodiscard]] AuraEffect* GetAuraEffect(AuraType type, SpellFamilyNames family, uint32 familyFlag1, uint32 familyFlag2, uint32 familyFlag3, ObjectGuid casterGUID = ObjectGuid::Empty) const;
+    [[nodiscard]] AuraEffect* GetAuraEffect(AuraType type, SpellFamilyNames family, uint32 familyFlag1, uint32 familyFlag2, uint32 familyFlag3, WOWGUID casterGUID = WOWGUID::Empty) const;
     [[nodiscard]] AuraEffect* GetAuraEffectDummy(uint32 spellid) const;
     [[nodiscard]] inline AuraEffect* GetDummyAuraEffect(SpellFamilyNames name, uint32 iconId, uint8 effIndex) const { return GetAuraEffect(SPELL_AURA_DUMMY, name, iconId, effIndex);}
 
-    AuraApplication* GetAuraApplication(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraApplication* except = nullptr) const;
-    [[nodiscard]] Aura* GetAura(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
+    AuraApplication* GetAuraApplication(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, WOWGUID itemCasterGUID = WOWGUID::Empty, uint8 reqEffMask = 0, AuraApplication* except = nullptr) const;
+    [[nodiscard]] Aura* GetAura(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, WOWGUID itemCasterGUID = WOWGUID::Empty, uint8 reqEffMask = 0) const;
 
-    AuraApplication* GetAuraApplicationOfRankedSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0, AuraApplication* except = nullptr) const;
-    [[nodiscard]] Aura* GetAuraOfRankedSpell(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
+    AuraApplication* GetAuraApplicationOfRankedSpell(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, WOWGUID itemCasterGUID = WOWGUID::Empty, uint8 reqEffMask = 0, AuraApplication* except = nullptr) const;
+    [[nodiscard]] Aura* GetAuraOfRankedSpell(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, WOWGUID itemCasterGUID = WOWGUID::Empty, uint8 reqEffMask = 0) const;
 
     void GetDispellableAuraList(Unit* caster, uint32 dispelMask, DispelChargesList& dispelList, SpellInfo const* dispelSpell);
 
-    [[nodiscard]] bool HasAuraEffect(uint32 spellId, uint8 effIndex, ObjectGuid caster = ObjectGuid::Empty) const;
+    [[nodiscard]] bool HasAuraEffect(uint32 spellId, uint8 effIndex, WOWGUID caster = WOWGUID::Empty) const;
     [[nodiscard]] uint32 GetAuraCount(uint32 spellId) const;
-    [[nodiscard]] bool HasAura(uint32 spellId, ObjectGuid casterGUID = ObjectGuid::Empty, ObjectGuid itemCasterGUID = ObjectGuid::Empty, uint8 reqEffMask = 0) const;
+    [[nodiscard]] bool HasAura(uint32 spellId, WOWGUID casterGUID = WOWGUID::Empty, WOWGUID itemCasterGUID = WOWGUID::Empty, uint8 reqEffMask = 0) const;
     [[nodiscard]] bool HasAuraType(AuraType auraType) const;
-    [[nodiscard]] bool HasAuraTypeWithCaster(AuraType auratype, ObjectGuid caster) const;
+    [[nodiscard]] bool HasAuraTypeWithCaster(AuraType auratype, WOWGUID caster) const;
     [[nodiscard]] bool HasAuraTypeWithMiscvalue(AuraType auratype, int32 miscvalue) const;
     bool HasAuraTypeWithAffectMask(AuraType auratype, SpellInfo const* affectedSpell) const;
     [[nodiscard]] bool HasAuraTypeWithValue(AuraType auratype, int32 value) const;
     [[nodiscard]] bool HasAuraTypeWithTriggerSpell(AuraType auratype, uint32 triggerSpell) const;
-    bool HasNegativeAuraWithInterruptFlag(uint32 flag, ObjectGuid guid = ObjectGuid::Empty);
+    bool HasNegativeAuraWithInterruptFlag(uint32 flag, WOWGUID guid = WOWGUID::Empty);
     [[nodiscard]] bool HasVisibleAuraType(AuraType auraType) const;
-    bool HasNegativeAuraWithAttribute(uint32 flag, ObjectGuid guid = ObjectGuid::Empty);
+    bool HasNegativeAuraWithAttribute(uint32 flag, WOWGUID guid = WOWGUID::Empty);
     [[nodiscard]] bool HasAuraWithMechanic(uint32 mechanicMask) const;
 
     AuraEffect* IsScriptOverriden(SpellInfo const* spell, int32 script) const;
-    uint32 GetDiseasesByCaster(ObjectGuid casterGUID, uint8 mode = 0);
-    [[nodiscard]] uint32 GetDoTsByCaster(ObjectGuid casterGUID) const;
+    uint32 GetDiseasesByCaster(WOWGUID casterGUID, uint8 mode = 0);
+    [[nodiscard]] uint32 GetDoTsByCaster(WOWGUID casterGUID) const;
 
     [[nodiscard]] int32 GetTotalAuraModifierAreaExclusive(AuraType auratype) const;
     [[nodiscard]] int32 GetTotalAuraModifier(AuraType auratype) const;
@@ -2147,8 +2147,8 @@ public:
 
     [[nodiscard]] virtual bool IsMovementPreventedByCasting() const;
 
-    ObjectGuid m_SummonSlot[MAX_SUMMON_SLOT];
-    ObjectGuid m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
+    WOWGUID m_SummonSlot[MAX_SUMMON_SLOT];
+    WOWGUID m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
 
     [[nodiscard]] ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_2, 3)); }
     void SetShapeshiftForm(ShapeshiftForm form)
@@ -2370,9 +2370,9 @@ public:
     ///-----------Combo point system-------------------
        // This unit having CP on other units
     [[nodiscard]] uint8 GetComboPoints(Unit const* who = nullptr) const { return (who && m_comboTarget != who) ? 0 : m_comboPoints; }
-    [[nodiscard]] uint8 GetComboPoints(ObjectGuid const& guid) const { return (m_comboTarget && m_comboTarget->GetGUID() == guid) ? m_comboPoints : 0; }
+    [[nodiscard]] uint8 GetComboPoints(WOWGUID const& guid) const { return (m_comboTarget && m_comboTarget->GetGUID() == guid) ? m_comboPoints : 0; }
     [[nodiscard]] Unit* GetComboTarget() const { return m_comboTarget; }
-    [[nodiscard]] ObjectGuid const GetComboTargetGUID() const { return m_comboTarget ? m_comboTarget->GetGUID() : ObjectGuid::Empty; }
+    [[nodiscard]] WOWGUID const GetComboTargetGUID() const { return m_comboTarget ? m_comboTarget->GetGUID() : WOWGUID::Empty; }
     void AddComboPoints(Unit* target, int8 count);
     void AddComboPoints(int8 count) { AddComboPoints(nullptr, count); }
     void ClearComboPoints();
@@ -2385,7 +2385,7 @@ public:
     ///----------Pet responses methods-----------------
     void SendPetActionFeedback (uint8 msg);
     void SendPetTalk (uint32 pettalk);
-    void SendPetAIReaction(ObjectGuid guid);
+    void SendPetAIReaction(WOWGUID guid);
     ///----------End of Pet responses methods----------
 
     void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
@@ -2423,8 +2423,8 @@ public:
     uint32 GetModelForTotem(PlayerTotemType totemType);
 
     // Redirect Threat
-    void SetRedirectThreat(ObjectGuid guid, uint32 pct) { _redirectThreatInfo.Set(guid, pct); }
-    void ResetRedirectThreat() { SetRedirectThreat(ObjectGuid::Empty, 0); }
+    void SetRedirectThreat(WOWGUID guid, uint32 pct) { _redirectThreatInfo.Set(guid, pct); }
+    void ResetRedirectThreat() { SetRedirectThreat(WOWGUID::Empty, 0); }
     void ModifyRedirectThreat(int32 amount) { _redirectThreatInfo.ModifyThreatPct(amount); }
     uint32 GetRedirectThreatPercent() { return _redirectThreatInfo.GetThreatPct(); }
     [[nodiscard]] Unit* GetRedirectThreatTarget() const;
@@ -2437,7 +2437,7 @@ public:
     bool IsOnVehicle(Unit const* vehicle) const { return m_vehicle && m_vehicle == vehicle->GetVehicleKit(); }
     [[nodiscard]] Unit* GetVehicleBase()  const;
     [[nodiscard]] Creature* GetVehicleCreatureBase() const;
-    [[nodiscard]] ObjectGuid GetTransGUID() const override;
+    [[nodiscard]] WOWGUID GetTransGUID() const override;
     /// Returns the transport this unit is on directly (if on vehicle and transport, return vehicle)
     [[nodiscard]] TransportBase* GetDirectTransport() const;
 
@@ -2512,8 +2512,8 @@ public:
 
     int32 CalculateAOEDamageReduction(int32 damage, uint32 schoolMask, Unit* caster) const;
 
-    [[nodiscard]] ObjectGuid GetTarget() const { return GetGuidValue(UNIT_FIELD_TARGET); }
-    virtual void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) = 0;
+    [[nodiscard]] WOWGUID GetTarget() const { return GetGuidValue(UNIT_FIELD_TARGET); }
+    virtual void SetTarget(WOWGUID /*guid*/ = WOWGUID::Empty) = 0;
 
     void SetInstantCast(bool set) { _instantCast = set; }
     [[nodiscard]] bool CanInstantCast() const { return _instantCast; }
@@ -2610,7 +2610,7 @@ protected:
     int32 m_regenTimer;
 
     ThreatMgr m_ThreatMgr;
-    typedef std::map<ObjectGuid, float> CharmThreatMap;
+    typedef std::map<WOWGUID, float> CharmThreatMap;
     CharmThreatMap _charmThreatInfo;
 
     Vehicle* m_vehicle;
@@ -2679,8 +2679,8 @@ private:
     [[nodiscard]] float processDummyAuras(float TakenTotalMod) const;
 
     uint32 _lastExtraAttackSpell;
-    std::unordered_map<ObjectGuid /*guid*/, uint32 /*count*/> extraAttacksTargets;
-    ObjectGuid _lastDamagedTargetGuid;
+    std::unordered_map<WOWGUID /*guid*/, uint32 /*count*/> extraAttacksTargets;
+    WOWGUID _lastDamagedTargetGuid;
 
     typedef std::unordered_map<uint64 /*visibleFlag(uint32) + updateType(uint8)*/, BuildValuesCachedBuffer>  ValuesUpdateCache;
     ValuesUpdateCache _valuesUpdateCache;
@@ -2745,12 +2745,12 @@ namespace Acore
 class RedirectSpellEvent : public BasicEvent
 {
 public:
-    RedirectSpellEvent(Unit& self, ObjectGuid auraOwnerGUID, AuraEffect* auraEffect) : _self(self), _auraOwnerGUID(auraOwnerGUID), _auraEffect(auraEffect) { }
+    RedirectSpellEvent(Unit& self, WOWGUID auraOwnerGUID, AuraEffect* auraEffect) : _self(self), _auraOwnerGUID(auraOwnerGUID), _auraEffect(auraEffect) { }
     bool Execute(uint64 e_time, uint32 p_time) override;
 
 protected:
     Unit& _self;
-    ObjectGuid _auraOwnerGUID;
+    WOWGUID _auraOwnerGUID;
     AuraEffect* _auraEffect;
 };
 

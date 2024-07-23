@@ -62,7 +62,7 @@ namespace lfg
         return &instance;
     }
 
-    void LFGMgr::_LoadFromDB(Field* fields, ObjectGuid guid)
+    void LFGMgr::_LoadFromDB(Field* fields, WOWGUID guid)
     {
         if (!fields)
             return;
@@ -70,7 +70,7 @@ namespace lfg
         if (!guid.IsGroup())
             return;
 
-        SetLeader(guid, ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>()));
+        SetLeader(guid, WOWGUID::Create<HighGuid::Player>(fields[0].Get<uint32>()));
 
         uint32 dungeon = fields[17].Get<uint32>();
         uint8 state = fields[18].Get<uint8>();
@@ -91,7 +91,7 @@ namespace lfg
         }
     }
 
-    void LFGMgr::_SaveToDB(ObjectGuid guid)
+    void LFGMgr::_SaveToDB(WOWGUID guid)
     {
         if (!guid.IsGroup())
             return;
@@ -290,7 +290,7 @@ namespace lfg
 
                 for (LfgRolesMap::const_iterator itRoles = roleCheck.roles.begin(); itRoles != roleCheck.roles.end(); ++itRoles)
                 {
-                    ObjectGuid guid = itRoles->first;
+                    WOWGUID guid = itRoles->first;
                     RestoreState(guid, "Remove Obsolete RoleCheck");
                     SendLfgRoleCheckUpdate(guid, roleCheck);
                     if (guid == roleCheck.leader)
@@ -319,7 +319,7 @@ namespace lfg
                     boot.inProgress = false;
                     for (LfgAnswerContainer::const_iterator itVotes = boot.votes.begin(); itVotes != boot.votes.end(); ++itVotes)
                     {
-                        ObjectGuid pguid = itVotes->first;
+                        WOWGUID pguid = itVotes->first;
                         if (pguid != boot.victim)
                             SendLfgBootProposalUpdate(pguid, boot);
                         SetState(pguid, LFG_STATE_DUNGEON);
@@ -356,12 +356,12 @@ namespace lfg
                     uint32 proposalId = itProposal->first;
                     LfgProposal& proposal = ProposalsStore[proposalId];
 
-                    ObjectGuid guid;
+                    WOWGUID guid;
                     for (LfgProposalPlayerContainer::const_iterator itPlayers = proposal.players.begin(); itPlayers != proposal.players.end(); ++itPlayers)
                     {
                         guid = itPlayers->first;
                         SetState(guid, LFG_STATE_PROPOSAL);
-                        if (ObjectGuid gguid = GetGroup(guid))
+                        if (WOWGUID gguid = GetGroup(guid))
                         {
                             SetState(gguid, LFG_STATE_PROPOSAL);
                             SendLfgUpdateParty(guid, LfgUpdateData(LFG_UPDATETYPE_PROPOSAL_BEGIN, GetSelectedDungeons(guid), GetComment(guid)));
@@ -387,7 +387,7 @@ namespace lfg
     */
     void LFGMgr::InitializeLockedDungeons(Player* player, Group const* group)
     {
-        ObjectGuid guid = player->GetGUID();
+        WOWGUID guid = player->GetGUID();
 
         uint8 level = player->GetLevel();
         uint8 expansion = player->User()->Expansion();
@@ -512,8 +512,8 @@ namespace lfg
             return;
 
         Group* grp = player->GetGroup();
-        ObjectGuid guid = player->GetGUID();
-        ObjectGuid gguid = grp ? grp->GetGUID() : guid;
+        WOWGUID guid = player->GetGUID();
+        WOWGUID gguid = grp ? grp->GetGUID() : guid;
         LfgJoinResultData joinData;
         LfgGuidSet players;
         uint32 rDungeonId = 0;
@@ -754,7 +754,7 @@ namespace lfg
             {
                 if (Player* plrg = itr->GetSource())
                 {
-                    ObjectGuid pguid = plrg->GetGUID();
+                    WOWGUID pguid = plrg->GetGUID();
                     plrg->User()->SendLfgUpdateParty(updateData);
                     SetState(pguid, LFG_STATE_ROLECHECK);
                     if (!isContinue)
@@ -813,10 +813,10 @@ namespace lfg
 
        @param[in]     guid Player or group guid
     */
-    void LFGMgr::LeaveLfg(ObjectGuid guid)
+    void LFGMgr::LeaveLfg(WOWGUID guid)
     {
         LOG_DEBUG("lfg", "LFGMgr::Leave: [{}]", guid.ToString());
-        ObjectGuid gguid = guid.IsGroup() ? guid : GetGroup(guid);
+        WOWGUID gguid = guid.IsGroup() ? guid : GetGroup(guid);
         LfgState state = GetState(guid);
         switch (state)
         {
@@ -857,7 +857,7 @@ namespace lfg
                 {
                     // Remove from Proposals
                     LfgProposalContainer::iterator it = ProposalsStore.begin();
-                    ObjectGuid pguid = gguid == guid ? GetLeader(gguid) : guid;
+                    WOWGUID pguid = gguid == guid ? GetLeader(gguid) : guid;
                     while (it != ProposalsStore.end())
                     {
                         LfgProposalPlayerContainer::iterator itPlayer = it->second.players.find(pguid);
@@ -909,7 +909,7 @@ namespace lfg
             }
     }
 
-    void LFGMgr::LeaveRaidBrowser(ObjectGuid guid)
+    void LFGMgr::LeaveRaidBrowser(WOWGUID guid)
     {
         for (uint8 team = 0; team < 2; ++team)
             for (RBStoreMap::iterator itr = RaidBrowserStore[team].begin(); itr != RaidBrowserStore[team].end(); ++itr)
@@ -988,7 +988,7 @@ namespace lfg
             return;
         }
 
-        ObjectGuid guid, groupGuid, instanceGuid;
+        WOWGUID guid, groupGuid, instanceGuid;
         uint8 level, Class, race, talents[3];
         float iLevel, mp5, mp5combat, baseAP, rangedAP;
         int32 spellDamage, spellHeal;
@@ -1039,7 +1039,7 @@ namespace lfg
                     if (InstancePlayerBind* bind = sInstanceSaveMgr->PlayerGetBoundInstance(guid, dungeonData->map, dungeonData->difficulty))
                         if (bind->perm)
                         {
-                            instanceGuid = ObjectGuid::Create<HighGuid::Instance>(bind->save->GetInstanceId());
+                            instanceGuid = WOWGUID::Create<HighGuid::Instance>(bind->save->GetInstanceId());
                             encounterMask = bind->save->GetCompletedEncounterMask();
                         }
 
@@ -1093,7 +1093,7 @@ namespace lfg
                             iLevel = mplr->GetAverageItemLevel();
                             mplr->GetTalentTreePoints(talents);
                         }
-                        currInternalInfoMap[mitr->guid] = RBInternalInfo(guid, emptyComment, false, groupGuid, 0, 0, ObjectGuid::Empty,
+                        currInternalInfoMap[mitr->guid] = RBInternalInfo(guid, emptyComment, false, groupGuid, 0, 0, WOWGUID::Empty,
                                                           (mplr ? 1 : 0), level, Class, race, iLevel,
                                                           talents, 0, 0, 0, 0,
                                                           0, 0, 0, 0, 0,
@@ -1186,7 +1186,7 @@ namespace lfg
 
                 if (!deletedGroupsToErase.empty())
                 {
-                    for (ObjectGuid const& toErase : deletedGroupsToErase)
+                    for (WOWGUID const& toErase : deletedGroupsToErase)
                     {
                         deletedGroups.erase(toErase);
                     }
@@ -1194,7 +1194,7 @@ namespace lfg
 
                 if (!deletedGroups.empty())
                 {
-                    for (ObjectGuid const& deletedGroup : deletedGroups)
+                    for (WOWGUID const& deletedGroup : deletedGroups)
                     {
                         ++deletedCounter;
                         buffer_deleted << deletedGroup;
@@ -1339,9 +1339,9 @@ namespace lfg
     }
 
     // pussywizard:
-    void LFGMgr::LeaveAllLfgQueues(ObjectGuid guid, bool allowgroup, ObjectGuid groupguid)
+    void LFGMgr::LeaveAllLfgQueues(WOWGUID guid, bool allowgroup, WOWGUID groupguid)
     {
-        ObjectGuid pguid, gguid;
+        WOWGUID pguid, gguid;
         if (guid.IsGroup())
             gguid = guid;
         else if (groupguid && groupguid.IsGroup())
@@ -1394,7 +1394,7 @@ namespace lfg
        @param[in]     guid Player guid (0 = rolecheck failed)
        @param[in]     roles Player selected roles
     */
-    void LFGMgr::UpdateRoleCheck(ObjectGuid gguid, ObjectGuid guid /* = 0 */, uint8 roles /* = PLAYER_ROLE_NONE */)
+    void LFGMgr::UpdateRoleCheck(WOWGUID gguid, WOWGUID guid /* = 0 */, uint8 roles /* = PLAYER_ROLE_NONE */)
     {
         if (!gguid)
             return;
@@ -1437,7 +1437,7 @@ namespace lfg
         LfgJoinResultData joinData = LfgJoinResultData(LFG_JOIN_FAILED, roleCheck.state);
         for (LfgRolesMap::const_iterator it = roleCheck.roles.begin(); it != roleCheck.roles.end(); ++it)
         {
-            ObjectGuid pguid = it->first;
+            WOWGUID pguid = it->first;
 
             if (sendRoleChosen)
                 SendLfgRoleChosen(pguid, guid, roles);
@@ -1487,7 +1487,7 @@ namespace lfg
         lockMap.clear();
         for (LfgGuidSet::const_iterator it = players.begin(); it != players.end() && !dungeons.empty(); ++it)
         {
-            ObjectGuid guid = (*it);
+            WOWGUID guid = (*it);
             LfgLockMap const& cachedLockMap = GetLockedDungeons(guid);
             for (LfgLockMap::const_iterator it2 = cachedLockMap.begin(); it2 != cachedLockMap.end() && !dungeons.empty(); ++it2)
             {
@@ -1583,7 +1583,7 @@ namespace lfg
 
         for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
         {
-            ObjectGuid guid = it->first;
+            WOWGUID guid = it->first;
             if (guid == proposal.leader)
                 players.push_front(guid);
             else
@@ -1601,8 +1601,8 @@ namespace lfg
         Group* grp = proposal.group ? sGroupMgr->GetGroupByGUID(proposal.group.GetCounter()) : nullptr;
         if (!grp)
         {
-            ObjectGuid groupGUID;
-            for (ObjectGuid const& guid : players)
+            WOWGUID groupGUID;
+            for (WOWGUID const& guid : players)
             {
                 if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
                 {
@@ -1619,10 +1619,10 @@ namespace lfg
             }
         }
 
-        ObjectGuid oldGroupGUID;
+        WOWGUID oldGroupGUID;
         for (LfgGuidList::const_iterator it = players.begin(); it != players.end(); ++it)
         {
-            ObjectGuid pguid = (*it);
+            WOWGUID pguid = (*it);
             Player* player = ObjectAccessor::FindConnectedPlayer(pguid);
             if (!player)
                 continue;
@@ -1661,7 +1661,7 @@ namespace lfg
                 grp = new Group();
                 grp->ConvertToLFG();
                 grp->Create(player);
-                ObjectGuid gguid = grp->GetGUID();
+                WOWGUID gguid = grp->GetGUID();
                 SetState(gguid, LFG_STATE_PROPOSAL);
                 sGroupMgr->AddGroup(grp);
             }
@@ -1682,7 +1682,7 @@ namespace lfg
             return;
 
         grp->SetDungeonDifficulty(Difficulty(dungeon->difficulty));
-        ObjectGuid gguid = grp->GetGUID();
+        WOWGUID gguid = grp->GetGUID();
         SetDungeon(gguid, dungeon->Entry());
         SetState(gguid, LFG_STATE_DUNGEON);
 
@@ -1802,7 +1802,7 @@ namespace lfg
        @param[in]     guid Player guid to update answer
        @param[in]     accept Player answer
     */
-    void LFGMgr::UpdateProposal(uint32 proposalId, ObjectGuid guid, bool accept)
+    void LFGMgr::UpdateProposal(uint32 proposalId, WOWGUID guid, bool accept)
     {
         // Check if the proposal exists
         LfgProposalContainer::iterator itProposal = ProposalsStore.find(proposalId);
@@ -1848,8 +1848,8 @@ namespace lfg
         LfgUpdateData updateData = LfgUpdateData(LFG_UPDATETYPE_GROUP_FOUND);
         for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
         {
-            ObjectGuid pguid = it->first;
-            ObjectGuid gguid = it->second.group;
+            WOWGUID pguid = it->first;
+            WOWGUID gguid = it->second.group;
             uint32 dungeonId = (*GetSelectedDungeons(pguid).begin());
             int32 waitTime = -1;
             if (sendUpdate)
@@ -1931,7 +1931,7 @@ namespace lfg
             if (it->second.accept == LFG_ANSWER_AGREE)
                 continue;
 
-            ObjectGuid guid = it->second.group ? it->second.group : it->first;
+            WOWGUID guid = it->second.group ? it->second.group : it->first;
             // Player didn't accept or still pending when no secs left
             if (it->second.accept == LFG_ANSWER_DENY || type == LFG_UPDATETYPE_PROPOSAL_FAILED)
             {
@@ -1943,8 +1943,8 @@ namespace lfg
         // Notify players
         for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
         {
-            ObjectGuid guid = it->first;
-            ObjectGuid gguid = it->second.group ? it->second.group : guid;
+            WOWGUID guid = it->first;
+            WOWGUID gguid = it->second.group ? it->second.group : guid;
 
             SendLfgUpdateProposal(guid, proposal);
 
@@ -1989,7 +1989,7 @@ namespace lfg
         // Remove players/groups from queue
         for (LfgGuidSet::const_iterator it = toRemove.begin(); it != toRemove.end(); ++it)
         {
-            ObjectGuid guid = *it;
+            WOWGUID guid = *it;
             queue.RemoveFromQueue(guid);
             proposal.queues.remove(guid);
         }
@@ -2014,7 +2014,7 @@ namespace lfg
        @param[in]     victim Victim guid
        @param[in]     reason Kick reason
     */
-    void LFGMgr::InitBoot(ObjectGuid gguid, ObjectGuid kicker, ObjectGuid victim, std::string const& reason)
+    void LFGMgr::InitBoot(WOWGUID gguid, WOWGUID kicker, WOWGUID victim, std::string const& reason)
     {
         SetState(gguid, LFG_STATE_BOOT);
 
@@ -2029,7 +2029,7 @@ namespace lfg
         // Set votes
         for (LfgGuidSet::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
-            ObjectGuid guid = (*itr);
+            WOWGUID guid = (*itr);
             SetState(guid, LFG_STATE_BOOT);
             boot.votes[guid] = LFG_ANSWER_PENDING;
         }
@@ -2048,9 +2048,9 @@ namespace lfg
        @param[in]     guid Player who has answered
        @param[in]     player answer
     */
-    void LFGMgr::UpdateBoot(ObjectGuid guid, bool accept)
+    void LFGMgr::UpdateBoot(WOWGUID guid, bool accept)
     {
-        ObjectGuid gguid = GetGroup(guid);
+        WOWGUID gguid = GetGroup(guid);
         if (!gguid)
             return;
 
@@ -2085,7 +2085,7 @@ namespace lfg
         boot.inProgress = false;
         for (LfgAnswerContainer::const_iterator itVotes = boot.votes.begin(); itVotes != boot.votes.end(); ++itVotes)
         {
-            ObjectGuid pguid = itVotes->first;
+            WOWGUID pguid = itVotes->first;
             if (pguid != boot.victim)
             {
                 SetState(pguid, LFG_STATE_DUNGEON);
@@ -2199,7 +2199,7 @@ namespace lfg
        @param[in]     guid Group guid
        @param[in]     dungeonId Dungeonid
     */
-    void LFGMgr::FinishDungeon(ObjectGuid gguid, const uint32 dungeonId, const Map* currMap)
+    void LFGMgr::FinishDungeon(WOWGUID gguid, const uint32 dungeonId, const Map* currMap)
     {
         uint32 gDungeonId = GetDungeon(gguid);
         if (gDungeonId != dungeonId)
@@ -2220,7 +2220,7 @@ namespace lfg
         const LfgGuidSet& players = GetPlayers(gguid);
         for (LfgGuidSet::const_iterator it = players.begin(); it != players.end(); ++it)
         {
-            ObjectGuid guid = (*it);
+            WOWGUID guid = (*it);
             if (GetState(guid) == LFG_STATE_FINISHED_DUNGEON)
             {
                 LOG_DEBUG("lfg", "LFGMgr::FinishDungeon: [{}] Already rewarded player. Ignoring", guid.ToString());
@@ -2353,7 +2353,7 @@ namespace lfg
         return LfgType(dungeon->type);
     }
 
-    LfgState LFGMgr::GetState(ObjectGuid guid)
+    LfgState LFGMgr::GetState(WOWGUID guid)
     {
         LfgState state;
         if (guid.IsGroup())
@@ -2365,7 +2365,7 @@ namespace lfg
         return state;
     }
 
-    LfgState LFGMgr::GetOldState(ObjectGuid guid)
+    LfgState LFGMgr::GetOldState(WOWGUID guid)
     {
         LfgState state;
         if (guid.IsGroup())
@@ -2377,14 +2377,14 @@ namespace lfg
         return state;
     }
 
-    uint32 LFGMgr::GetDungeon(ObjectGuid guid, bool asId /*= true */)
+    uint32 LFGMgr::GetDungeon(WOWGUID guid, bool asId /*= true */)
     {
         uint32 dungeon = GroupsStore[guid].GetDungeon(asId);
         LOG_DEBUG("lfg", "LFGMgr::GetDungeon: [{}] asId: {} = {}", guid.ToString(), asId, dungeon);
         return dungeon;
     }
 
-    uint32 LFGMgr::GetDungeonMapId(ObjectGuid guid)
+    uint32 LFGMgr::GetDungeonMapId(WOWGUID guid)
     {
         uint32 dungeonId = GroupsStore[guid].GetDungeon(true);
         uint32 mapId = 0;
@@ -2396,39 +2396,39 @@ namespace lfg
         return mapId;
     }
 
-    uint8 LFGMgr::GetRoles(ObjectGuid guid)
+    uint8 LFGMgr::GetRoles(WOWGUID guid)
     {
         uint8 roles = PlayersStore[guid].GetRoles();
         LOG_DEBUG("lfg", "LFGMgr::GetRoles: [{}] = {}", guid.ToString(), roles);
         return roles;
     }
 
-    const std::string& LFGMgr::GetComment(ObjectGuid guid)
+    const std::string& LFGMgr::GetComment(WOWGUID guid)
     {
         LOG_DEBUG("lfg", "LFGMgr::GetComment: [{}] = {}", guid.ToString(), PlayersStore[guid].GetComment());
         return PlayersStore[guid].GetComment();
     }
 
-    LfgDungeonSet const& LFGMgr::GetSelectedDungeons(ObjectGuid guid)
+    LfgDungeonSet const& LFGMgr::GetSelectedDungeons(WOWGUID guid)
     {
         LOG_DEBUG("lfg", "LFGMgr::GetSelectedDungeons: [{}]", guid.ToString());
         return PlayersStore[guid].GetSelectedDungeons();
     }
 
-    LfgLockMap const& LFGMgr::GetLockedDungeons(ObjectGuid guid)
+    LfgLockMap const& LFGMgr::GetLockedDungeons(WOWGUID guid)
     {
         LOG_DEBUG("lfg", "LFGMgr::GetLockedDungeons: [{}]", guid.ToString());
         return PlayersStore[guid].GetLockedDungeons();
     }
 
-    uint8 LFGMgr::GetKicksLeft(ObjectGuid guid)
+    uint8 LFGMgr::GetKicksLeft(WOWGUID guid)
     {
         uint8 kicks = GroupsStore[guid].GetKicksLeft();
         LOG_DEBUG("lfg", "LFGMgr::GetKicksLeft: [{}] = {}", guid.ToString(), kicks);
         return kicks;
     }
 
-    void LFGMgr::RestoreState(ObjectGuid guid, char const*  /*debugMsg*/)
+    void LFGMgr::RestoreState(WOWGUID guid, char const*  /*debugMsg*/)
     {
         if (guid.IsGroup())
         {
@@ -2457,7 +2457,7 @@ namespace lfg
         }
     }
 
-    void LFGMgr::SetState(ObjectGuid guid, LfgState state)
+    void LFGMgr::SetState(WOWGUID guid, LfgState state)
     {
         if (guid.IsGroup())
         {
@@ -2479,24 +2479,24 @@ namespace lfg
         }
     }
 
-    void LFGMgr::SetCanOverrideRBState(ObjectGuid guid, bool val)
+    void LFGMgr::SetCanOverrideRBState(WOWGUID guid, bool val)
     {
         PlayersStore[guid].SetCanOverrideRBState(val);
     }
 
-    void LFGMgr::SetDungeon(ObjectGuid guid, uint32 dungeon)
+    void LFGMgr::SetDungeon(WOWGUID guid, uint32 dungeon)
     {
         LOG_DEBUG("lfg", "LFGMgr::SetDungeon: [{}] dungeon {}", guid.ToString(), dungeon);
         GroupsStore[guid].SetDungeon(dungeon);
     }
 
-    void LFGMgr::SetRoles(ObjectGuid guid, uint8 roles)
+    void LFGMgr::SetRoles(WOWGUID guid, uint8 roles)
     {
         LOG_DEBUG("lfg", "LFGMgr::SetRoles: [{}] roles: {}", guid.ToString(), roles);
         PlayersStore[guid].SetRoles(roles);
     }
 
-    void LFGMgr::SetComment(ObjectGuid guid, std::string const& comment)
+    void LFGMgr::SetComment(WOWGUID guid, std::string const& comment)
     {
         LOG_DEBUG("lfg", "LFGMgr::SetComment: [{}] comment: {}", guid.ToString(), comment);
         PlayersStore[guid].SetComment(comment);
@@ -2515,25 +2515,25 @@ namespace lfg
                 iter->second.comment = comment;
     }
 
-    void LFGMgr::SetSelectedDungeons(ObjectGuid guid, LfgDungeonSet const& dungeons)
+    void LFGMgr::SetSelectedDungeons(WOWGUID guid, LfgDungeonSet const& dungeons)
     {
         LOG_DEBUG("lfg", "LFGMgr::SetLockedDungeons: [{}]", guid.ToString());
         PlayersStore[guid].SetSelectedDungeons(dungeons);
     }
 
-    void LFGMgr::SetLockedDungeons(ObjectGuid guid, LfgLockMap const& lock)
+    void LFGMgr::SetLockedDungeons(WOWGUID guid, LfgLockMap const& lock)
     {
         LOG_DEBUG("lfg", "LFGMgr::SetLockedDungeons: [{}]", guid.ToString());
         PlayersStore[guid].SetLockedDungeons(lock);
     }
 
-    void LFGMgr::DecreaseKicksLeft(ObjectGuid guid)
+    void LFGMgr::DecreaseKicksLeft(WOWGUID guid)
     {
         LOG_DEBUG("lfg", "LFGMgr::DecreaseKicksLeft: [{}]", guid.ToString());
         GroupsStore[guid].DecreaseKicksLeft();
     }
 
-    void LFGMgr::RemoveGroupData(ObjectGuid guid)
+    void LFGMgr::RemoveGroupData(WOWGUID guid)
     {
         LOG_DEBUG("lfg", "LFGMgr::RemoveGroupData: [{}]", guid.ToString());
         LfgGroupDataContainer::iterator it = GroupsStore.find(guid);
@@ -2545,8 +2545,8 @@ namespace lfg
         LfgGuidSet const& players = it->second.GetPlayers();
         for (auto iterator = players.begin(); iterator != players.end(); ++iterator)
         {
-            ObjectGuid objectGuid = (*iterator);
-            SetGroup(*iterator, ObjectGuid::Empty);
+            WOWGUID objectGuid = (*iterator);
+            SetGroup(*iterator, WOWGUID::Empty);
             if (state != LFG_STATE_PROPOSAL)
             {
                 SetState(*iterator, LFG_STATE_NONE);
@@ -2556,27 +2556,27 @@ namespace lfg
         GroupsStore.erase(it);
     }
 
-    TeamId LFGMgr::GetTeam(ObjectGuid guid)
+    TeamId LFGMgr::GetTeam(WOWGUID guid)
     {
         return PlayersStore[guid].GetTeam();
     }
 
-    uint8 LFGMgr::RemovePlayerFromGroup(ObjectGuid gguid, ObjectGuid guid)
+    uint8 LFGMgr::RemovePlayerFromGroup(WOWGUID gguid, WOWGUID guid)
     {
         return GroupsStore[gguid].RemovePlayer(guid);
     }
 
-    void LFGMgr::AddPlayerToGroup(ObjectGuid gguid, ObjectGuid guid)
+    void LFGMgr::AddPlayerToGroup(WOWGUID gguid, WOWGUID guid)
     {
         GroupsStore[gguid].AddPlayer(guid);
     }
 
-    void LFGMgr::SetLeader(ObjectGuid gguid, ObjectGuid leader)
+    void LFGMgr::SetLeader(WOWGUID gguid, WOWGUID leader)
     {
         GroupsStore[gguid].SetLeader(leader);
     }
 
-    void LFGMgr::SetTeam(ObjectGuid guid, TeamId teamId)
+    void LFGMgr::SetTeam(WOWGUID guid, TeamId teamId)
     {
         if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
             teamId = TEAM_ALLIANCE; // @Not Sure About That TeamId is supposed to be uint8 Team = 0(@TrinityCore)
@@ -2584,108 +2584,108 @@ namespace lfg
         PlayersStore[guid].SetTeam(teamId);
     }
 
-    ObjectGuid LFGMgr::GetGroup(ObjectGuid guid)
+    WOWGUID LFGMgr::GetGroup(WOWGUID guid)
     {
         return PlayersStore[guid].GetGroup();
     }
 
-    void LFGMgr::SetGroup(ObjectGuid guid, ObjectGuid group)
+    void LFGMgr::SetGroup(WOWGUID guid, WOWGUID group)
     {
         PlayersStore[guid].SetGroup(group);
     }
 
-    LfgGuidSet const& LFGMgr::GetPlayers(ObjectGuid guid)
+    LfgGuidSet const& LFGMgr::GetPlayers(WOWGUID guid)
     {
         return GroupsStore[guid].GetPlayers();
     }
 
-    uint8 LFGMgr::GetPlayerCount(ObjectGuid guid)
+    uint8 LFGMgr::GetPlayerCount(WOWGUID guid)
     {
         return GroupsStore[guid].GetPlayerCount();
     }
 
-    ObjectGuid LFGMgr::GetLeader(ObjectGuid guid)
+    WOWGUID LFGMgr::GetLeader(WOWGUID guid)
     {
         return GroupsStore[guid].GetLeader();
     }
 
-    void LFGMgr::SetRandomPlayersCount(ObjectGuid guid, uint8 count)
+    void LFGMgr::SetRandomPlayersCount(WOWGUID guid, uint8 count)
     {
         PlayersStore[guid].SetRandomPlayersCount(count);
     }
 
-    uint8 LFGMgr::GetRandomPlayersCount(ObjectGuid guid)
+    uint8 LFGMgr::GetRandomPlayersCount(WOWGUID guid)
     {
         return PlayersStore[guid].GetRandomPlayersCount();
     }
 
-    bool LFGMgr::HasIgnore(ObjectGuid guid1, ObjectGuid guid2)
+    bool LFGMgr::HasIgnore(WOWGUID guid1, WOWGUID guid2)
     {
         Player* plr1 = ObjectAccessor::FindConnectedPlayer(guid1);
         Player* plr2 = ObjectAccessor::FindConnectedPlayer(guid2);
         return plr1 && plr2 && (plr1->FriendListPtr()->IsIgnored(guid2) || plr2->FriendListPtr()->IsIgnored(guid1));
     }
 
-    void LFGMgr::SendLfgRoleChosen(ObjectGuid guid, ObjectGuid pguid, uint8 roles)
+    void LFGMgr::SendLfgRoleChosen(WOWGUID guid, WOWGUID pguid, uint8 roles)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->User()->SendLfgRoleChosen(pguid, roles);
     }
 
-    void LFGMgr::SendLfgRoleCheckUpdate(ObjectGuid guid, LfgRoleCheck const& roleCheck)
+    void LFGMgr::SendLfgRoleCheckUpdate(WOWGUID guid, LfgRoleCheck const& roleCheck)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->User()->SendLfgRoleCheckUpdate(roleCheck);
     }
 
-    void LFGMgr::SendLfgUpdatePlayer(ObjectGuid guid, LfgUpdateData const& data)
+    void LFGMgr::SendLfgUpdatePlayer(WOWGUID guid, LfgUpdateData const& data)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->User()->SendLfgUpdatePlayer(data);
     }
 
-    void LFGMgr::SendLfgUpdateParty(ObjectGuid guid, LfgUpdateData const& data)
+    void LFGMgr::SendLfgUpdateParty(WOWGUID guid, LfgUpdateData const& data)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->User()->SendLfgUpdateParty(data);
     }
 
-    void LFGMgr::SendLfgJoinResult(ObjectGuid guid, LfgJoinResultData const& data)
+    void LFGMgr::SendLfgJoinResult(WOWGUID guid, LfgJoinResultData const& data)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->User()->SendLfgJoinResult(data);
     }
 
-    void LFGMgr::SendLfgBootProposalUpdate(ObjectGuid guid, LfgPlayerBoot const& boot)
+    void LFGMgr::SendLfgBootProposalUpdate(WOWGUID guid, LfgPlayerBoot const& boot)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->User()->SendLfgBootProposalUpdate(boot);
     }
 
-    void LFGMgr::SendLfgUpdateProposal(ObjectGuid guid, LfgProposal const& proposal)
+    void LFGMgr::SendLfgUpdateProposal(WOWGUID guid, LfgProposal const& proposal)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->User()->SendLfgUpdateProposal(proposal);
     }
 
-    void LFGMgr::SendLfgQueueStatus(ObjectGuid guid, LfgQueueStatusData const& data)
+    void LFGMgr::SendLfgQueueStatus(WOWGUID guid, LfgQueueStatusData const& data)
     {
         if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
             player->User()->SendLfgQueueStatus(data);
     }
 
-    bool LFGMgr::IsLfgGroup(ObjectGuid guid)
+    bool LFGMgr::IsLfgGroup(WOWGUID guid)
     {
         return guid && guid.IsGroup() && GroupsStore[guid].IsLfgGroup();
     }
 
-    LFGQueue& LFGMgr::GetQueue(ObjectGuid guid)
+    LFGQueue& LFGMgr::GetQueue(WOWGUID guid)
     {
         uint8 queueId = 0;
         if (guid.IsGroup())
         {
             LfgGuidSet const& players = GetPlayers(guid);
-            ObjectGuid pguid = players.empty() ? ObjectGuid::Empty : (*players.begin());
+            WOWGUID pguid = players.empty() ? WOWGUID::Empty : (*players.begin());
             if (pguid)
                 queueId = GetTeam(pguid);
             else
@@ -2705,7 +2705,7 @@ namespace lfg
 
         for (uint8 i = 0; i < 5 && check.guids[i]; ++i)
         {
-            ObjectGuid guid = check.guids[i];
+            WOWGUID guid = check.guids[i];
             if (GetState(guid) != LFG_STATE_QUEUED)
             {
                 LFGQueue& queue = GetQueue(guid);
@@ -2738,7 +2738,7 @@ namespace lfg
         m_options = options;
     }
 
-    LfgUpdateData LFGMgr::GetLfgStatus(ObjectGuid guid)
+    LfgUpdateData LFGMgr::GetLfgStatus(WOWGUID guid)
     {
         LfgPlayerData& playerData = PlayersStore[guid];
         return LfgUpdateData(LFG_UPDATETYPE_UPDATE_STATUS, playerData.GetState(), playerData.GetSelectedDungeons());
@@ -2760,7 +2760,7 @@ namespace lfg
         return false;
     }
 
-    void LFGMgr::SetupGroupMember(ObjectGuid guid, ObjectGuid gguid)
+    void LFGMgr::SetupGroupMember(WOWGUID guid, WOWGUID gguid)
     {
         LfgDungeonSet dungeons;
         dungeons.insert(GetDungeon(gguid));
@@ -2770,7 +2770,7 @@ namespace lfg
         AddPlayerToGroup(gguid, guid);
     }
 
-    bool LFGMgr::selectedRandomLfgDungeon(ObjectGuid guid)
+    bool LFGMgr::selectedRandomLfgDungeon(WOWGUID guid)
     {
         if (GetState(guid) != LFG_STATE_NONE)
         {
@@ -2786,7 +2786,7 @@ namespace lfg
         return false;
     }
 
-    bool LFGMgr::inLfgDungeonMap(ObjectGuid guid, uint32 map, Difficulty difficulty)
+    bool LFGMgr::inLfgDungeonMap(WOWGUID guid, uint32 map, Difficulty difficulty)
     {
         if (!guid.IsGroup())
             guid = GetGroup(guid);

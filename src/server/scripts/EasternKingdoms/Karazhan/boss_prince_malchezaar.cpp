@@ -267,7 +267,7 @@ struct boss_malchezaar : public BossAI
 
     private:
         uint32 _phase;
-        std::map<ObjectGuid, uint32> _enfeebleTargets;
+        std::map<WOWGUID, uint32> _enfeebleTargets;
 };
 
 struct npc_netherspite_infernal : public ScriptedAI

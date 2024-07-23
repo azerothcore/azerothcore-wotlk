@@ -70,7 +70,7 @@ public:
 
         uint32 m_uiPhase;
         uint32 m_uiPhaseTimer;
-        ObjectGuid m_uiPlayerGUID;
+        WOWGUID m_uiPlayerGUID;
 
         void Reset() override
         {

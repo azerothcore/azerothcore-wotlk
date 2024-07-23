@@ -248,7 +248,7 @@ struct npc_general_andorov : public npc_escortAI
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
 
-                    for (ObjectGuid const& guid : _summons)
+                    for (WOWGUID const& guid : _summons)
                     {
                         if (Creature* kaldoreielitist = ObjectAccessor::GetCreature(*me, guid))
                         {

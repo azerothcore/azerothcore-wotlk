@@ -491,7 +491,7 @@ FriendList* Player::FriendListPtr()
     return m_friendListPtr;
 }
 
-bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo)
+bool Player::Create(WOWGUID::LowType guidlow, CharacterCreateInfo* createInfo)
 {
     // FIXME: outfitId not used in player creating
     /// @todo: need more checks against packet modifications
@@ -1125,12 +1125,12 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
 
     Field* fields = result->Fetch();
 
-    ObjectGuid::LowType guidLow = fields[0].Get<uint32>();
+    WOWGUID::LowType guidLow = fields[0].Get<uint32>();
     uint8 plrRace = fields[2].Get<uint8>();
     uint8 plrClass = fields[3].Get<uint8>();
     uint8 gender = fields[4].Get<uint8>();
 
-    ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(guidLow);
+    WOWGUID guid = WOWGUID::Create<HighGuid::Player>(guidLow);
 
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(plrRace, plrClass);
     if (!info)
@@ -1545,7 +1545,7 @@ bool Player::Teleport(uint32 mapid, float x, float y, float z, float orientation
                 return true;
             }
 
-            SetSelection(ObjectGuid::Empty);
+            SetSelection(WOWGUID::Empty);
 
             CombatStop();
 
@@ -1755,7 +1755,7 @@ void Player::RemoveFromWorld()
         UnsummonPetTemporaryIfAny();
         ClearComboPoints(); // pussywizard: crashfix
         ClearComboPointHolders(); // pussywizard: crashfix
-        if (ObjectGuid lguid = GetLootGUID()) // pussywizard: crashfix
+        if (WOWGUID lguid = GetLootGUID()) // pussywizard: crashfix
             m_user->DoLootRelease(lguid);
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
@@ -2109,7 +2109,7 @@ bool Player::CanInteractWithQuestGiver(Object* questGiver)
     return false;
 }
 
-Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
+Creature* Player::GetNPCIfCanInteractWith(WOWGUID guid, uint32 npcflagmask)
 {
     // unit checks
     if (!guid)
@@ -2166,7 +2166,7 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
     return creature;
 }
 
-GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTypes type) const
+GameObject* Player::GetGameObjectIfCanInteractWith(WOWGUID guid, GameobjectTypes type) const
 {
     if (GameObject* go = GetMap()->GetGameObject(guid))
     {
@@ -2371,7 +2371,7 @@ void Player::UninviteFromGroup()
     }
 }
 
-void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method /* = GROUP_REMOVEMETHOD_DEFAULT*/, ObjectGuid kicker /* = ObjectGuid::Empty */, const char* reason /* = nullptr */)
+void Player::RemoveFromGroup(Group* group, WOWGUID guid, RemoveMethod method /* = GROUP_REMOVEMETHOD_DEFAULT*/, WOWGUID kicker /* = WOWGUID::Empty */, const char* reason /* = nullptr */)
 {
     if (group)
     {
@@ -2383,7 +2383,7 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method 
 void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool recruitAFriend, float /*group_rate*/)
 {
     WorldPacket data(SMSG_LOG_XPGAIN, 22); // guess size?
-    data << (victim ? victim->GetGUID() : ObjectGuid::Empty);   // guid
+    data << (victim ? victim->GetGUID() : WOWGUID::Empty);   // guid
     data << uint32(GivenXP + BonusXP);                          // given experience
     data << uint8(victim ? 0 : 1);                              // 00-kill_xp type, 01-non_kill_xp type
 
@@ -2881,7 +2881,7 @@ void Player::RemoveMail(uint32 id)
     }
 }
 
-void Player::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, ObjectGuid::LowType item_guid, uint32 item_count)
+void Player::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError, WOWGUID::LowType item_guid, uint32 item_count)
 {
     WorldPacket data(SMSG_SEND_MAIL_RESULT, (4 + 4 + 4 + (mailError == MAIL_ERR_EQUIP_ERROR ? 4 : (mailAction == MAIL_ITEM_TAKEN ? 4 + 4 : 0))));
     data << (uint32) mailId;
@@ -3983,13 +3983,13 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
  * @param updateRealmChars when this flag is set, the amount of characters on that realm will be updated in the realmlist
  * @param deleteFinally    if this flag is set, the config option will be ignored and the character will be permanently removed from the database
  */
-void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally)
+void Player::DeleteFromDB(WOWGUID::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally)
 {
     // for not existed account avoid update realm
     if (!accountId)
         updateRealmChars = false;
 
-    ObjectGuid playerGuid = ObjectGuid::Create<HighGuid::Player>(lowGuid);
+    WOWGUID playerGuid = WOWGUID::Create<HighGuid::Player>(lowGuid);
 
     uint32 charDelete_method = sWorld->getIntConfig(CONFIG_CHARDELETE_METHOD);
     uint32 charDelete_minLvl = sWorld->getIntConfig(CONFIG_CHARDELETE_MIN_LEVEL);
@@ -4012,7 +4012,7 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
         sTicketMgr->CloseTicket(ticket->GetId(), playerGuid);
 
     // remove from group
-    if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(playerGuid))
+    if (WOWGUID groupId = sCharacterCache->GetCharacterGroupGuidByGuid(playerGuid))
         if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
             RemoveFromGroup(group, playerGuid);
 
@@ -4104,7 +4104,7 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                         stmt->SetData(0, mail_id);
                         trans->Append(stmt);
 
-                        uint32 pl_account = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, lowGuid));
+                        uint32 pl_account = sCharacterCache->GetCharacterAccountIdByGuid(WOWGUID(HighGuid::Player, lowGuid));
 
                         draft.AddMoney(money).SendReturnToSender(pl_account, lowGuid, sender, trans);
                     } while (resultMail->NextRow());
@@ -4120,7 +4120,7 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 {
                     do
                     {
-                        ObjectGuid::LowType petguidlow = (*resultPets)[0].Get<uint32>();
+                        WOWGUID::LowType petguidlow = (*resultPets)[0].Get<uint32>();
                         Pet::DeleteFromDB(petguidlow);
                     } while (resultPets->NextRow());
                 }
@@ -4536,7 +4536,7 @@ void Player::KillPlayer()
     //UpdateObjectVisibility(); // pussywizard: not needed
 }
 
-void Player::OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans)
+void Player::OfflineResurrect(WOWGUID const guid, CharacterDatabaseTransaction trans)
 {
     Corpse::DeleteFromDB(guid, trans);
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
@@ -6072,7 +6072,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
     }
     */
 
-    ObjectGuid victim_guid;
+    WOWGUID victim_guid;
     uint32 victim_rank = 0;
 
     // need call before fields update to have chance move yesterday data to appropriate fields before today data change.
@@ -6285,7 +6285,7 @@ void Player::ModifyArenaPoints(int32 value, CharacterDatabaseTransaction trans)
     }
 }
 
-uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)
+uint32 Player::GetArenaTeamIdFromDB(WOWGUID guid, uint8 type)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ARENA_TEAM_ID_BY_PLAYER_GUID);
     stmt->SetData(0, guid.GetCounter());
@@ -6299,9 +6299,9 @@ uint32 Player::GetArenaTeamIdFromDB(ObjectGuid guid, uint8 type)
     return id;
 }
 
-uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
+uint32 Player::GetZoneIdFromDB(WOWGUID guid)
 {
-    ObjectGuid::LowType guidLow = guid.GetCounter();
+    WOWGUID::LowType guidLow = guid.GetCounter();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ZONE);
     stmt->SetData(0, guidLow);
@@ -6358,7 +6358,7 @@ void Player::CheckDuelDistance(time_t currTime)
         return;
     }
 
-    ObjectGuid duelFlagGUID = GetGuidValue(PLAYER_DUEL_ARBITER);
+    WOWGUID duelFlagGUID = GetGuidValue(PLAYER_DUEL_ARBITER);
     GameObject* obj = GetMap()->GetGameObject(duelFlagGUID);
     if (!obj)
         return;
@@ -6528,9 +6528,9 @@ void Player::DuelComplete(DuelCompleteType type)
     }
 
     //cleanups
-    SetGuidValue(PLAYER_DUEL_ARBITER, ObjectGuid::Empty);
+    SetGuidValue(PLAYER_DUEL_ARBITER, WOWGUID::Empty);
     SetUInt32Value(PLAYER_DUEL_TEAM, 0);
-    opponent->SetGuidValue(PLAYER_DUEL_ARBITER, ObjectGuid::Empty);
+    opponent->SetGuidValue(PLAYER_DUEL_ARBITER, WOWGUID::Empty);
     opponent->SetUInt32Value(PLAYER_DUEL_TEAM, 0);
 
     opponent->duel.reset(nullptr);
@@ -7748,16 +7748,16 @@ void Player::RemovedInsignia(Player* looterPlr)
     looterPlr->SendLoot(bones->GetGUID(), LOOT_INSIGNIA);
 }
 
-void Player::SendLootRelease(ObjectGuid guid)
+void Player::SendLootRelease(WOWGUID guid)
 {
     WorldPacket data(SMSG_LOOT_RELEASE_RESPONSE, (8 + 1));
     data << guid << uint8(1);
     SendDirectMessage(&data);
 }
 
-void Player::SendLoot(ObjectGuid guid, LootType loot_type)
+void Player::SendLoot(WOWGUID guid, LootType loot_type)
 {
-    if (ObjectGuid lguid = GetLootGUID())
+    if (WOWGUID lguid = GetLootGUID())
         m_user->DoLootRelease(lguid);
 
     Loot* loot = 0;
@@ -8146,7 +8146,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
 }
 
-void Player::SendLootError(ObjectGuid guid, LootError error)
+void Player::SendLootError(WOWGUID guid, LootError error)
 {
     WorldPacket data(SMSG_LOOT_RESPONSE, 10);
     data << guid;
@@ -8791,7 +8791,7 @@ void Player::SendInitWorldStates(uint32 zoneid, uint32 areaid)
             // Scarlet Enclave (DK starting zone)
             case 4298:
                 // Get Mograine, GUID and ENTRY should NEVER change
-                if (Creature* mograine = ObjectAccessor::GetCreature(*this, ObjectGuid::Create<HighGuid::Unit>(29173, 130956)))
+                if (Creature* mograine = ObjectAccessor::GetCreature(*this, WOWGUID::Create<HighGuid::Unit>(29173, 130956)))
                 {
                     if (CreatureAI* mograineAI = mograine->AI())
                     {
@@ -8875,14 +8875,14 @@ uint32 Player::GetXPRestBonus(uint32 xp)
     return rested_bonus;
 }
 
-void Player::SetBindPoint(ObjectGuid guid)
+void Player::SetBindPoint(WOWGUID guid)
 {
     WorldPacket data(SMSG_BINDER_CONFIRM, 8);
     data << guid;
     User()->Send(&data);
 }
 
-void Player::SendTalentWipeConfirm(ObjectGuid guid)
+void Player::SendTalentWipeConfirm(WOWGUID guid)
 {
     WorldPacket data(MSG_TALENT_WIPE_CONFIRM, (8 + 4));
     data << guid;
@@ -8912,7 +8912,7 @@ void Player::ResetPetTalents()
 
 Pet* Player::GetPet() const
 {
-    if (ObjectGuid pet_guid = GetPetGUID())
+    if (WOWGUID pet_guid = GetPetGUID())
     {
         if (!pet_guid.IsPet())
             return nullptr;
@@ -9320,10 +9320,10 @@ void Player::StopCastingCharm(Aura* except /*= nullptr*/)
 
     if (GetCharmGUID())
     {
-        charm->RemoveAurasByType(SPELL_AURA_MOD_CHARM, ObjectGuid::Empty, except);
-        charm->RemoveAurasByType(SPELL_AURA_MOD_POSSESS_PET, ObjectGuid::Empty, except);
-        charm->RemoveAurasByType(SPELL_AURA_MOD_POSSESS, ObjectGuid::Empty, except);
-        charm->RemoveAurasByType(SPELL_AURA_AOE_CHARM, ObjectGuid::Empty, except);
+        charm->RemoveAurasByType(SPELL_AURA_MOD_CHARM, WOWGUID::Empty, except);
+        charm->RemoveAurasByType(SPELL_AURA_MOD_POSSESS_PET, WOWGUID::Empty, except);
+        charm->RemoveAurasByType(SPELL_AURA_MOD_POSSESS, WOWGUID::Empty, except);
+        charm->RemoveAurasByType(SPELL_AURA_AOE_CHARM, WOWGUID::Empty, except);
     }
 
     if (GetCharmGUID())
@@ -10112,7 +10112,7 @@ void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask)
     User()->Send(&data);
 }
 
-void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
+void Player::RemovePetitionsAndSigns(WOWGUID guid, uint32 type)
 {
     SignatureContainer* signatureStore = sPetitionMgr->GetSignatureStore();
     for (SignatureContainer::iterator itr = signatureStore->begin(); itr != signatureStore->end(); ++itr)
@@ -10180,7 +10180,7 @@ void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
     CharacterDatabase.CommitTransaction(trans);
 }
 
-void Player::LeaveAllArenaTeams(ObjectGuid guid)
+void Player::LeaveAllArenaTeams(WOWGUID guid)
 {
     // xinef: sync query
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PLAYER_ARENA_TEAMS);
@@ -10712,7 +10712,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
 }
 
 // Return true is the bought item has a max count to force refresh of window by caller
-bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
+bool Player::BuyItemFromVendorSlot(WOWGUID vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot)
 {
     sScriptMgr->OnBeforeBuyItemFromVendor(this, vendorguid, vendorslot, item, count, bag, slot);
 
@@ -11431,7 +11431,7 @@ bool Player::HaveAtClient(WorldObject const* u) const
     return m_clientGUIDs.find(u->GetGUID()) != m_clientGUIDs.end();
 }
 
-bool Player::HaveAtClient(ObjectGuid guid) const
+bool Player::HaveAtClient(WOWGUID guid) const
 {
     if (guid == GetGUID())
     {
@@ -11458,7 +11458,7 @@ bool Player::CanAlwaysSee(WorldObject const* obj) const
     if (m_mover == obj)
         return true;
 
-    if (ObjectGuid guid = GetGuidValue(PLAYER_FARSIGHT))
+    if (WOWGUID guid = GetGuidValue(PLAYER_FARSIGHT))
         if (obj->GetGUID() == guid)
             return true;
 
@@ -11541,7 +11541,7 @@ bool Player::ModifyMoney(int32 amount, bool sendError /*= true*/)
 
 Unit* Player::GetSelectedUnit() const
 {
-    if (ObjectGuid selectionGUID = GetGuidValue(UNIT_FIELD_TARGET))
+    if (WOWGUID selectionGUID = GetGuidValue(UNIT_FIELD_TARGET))
         return ObjectAccessor::GetUnit(*this, selectionGUID);
 
     return nullptr;
@@ -11549,13 +11549,13 @@ Unit* Player::GetSelectedUnit() const
 
 Player* Player::GetSelectedPlayer() const
 {
-    if (ObjectGuid selectionGUID = GetGuidValue(UNIT_FIELD_TARGET))
+    if (WOWGUID selectionGUID = GetGuidValue(UNIT_FIELD_TARGET))
         return ObjectAccessor::GetPlayer(*this, selectionGUID);
 
     return nullptr;
 }
 
-void Player::SetSelection(ObjectGuid guid)
+void Player::SetSelection(WOWGUID guid)
 {
     SetGuidValue(UNIT_FIELD_TARGET, guid);
 
@@ -12415,7 +12415,7 @@ bool Player::HasQuestForGO(int32 GOId) const
     return false;
 }
 
-void Player::SummonIfPossible(bool agree, ObjectGuid summoner_guid)
+void Player::SummonIfPossible(bool agree, WOWGUID summoner_guid)
 {
     if (!agree)
     {
@@ -12731,7 +12731,7 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
     if (!pRewardSource)
         return;
 
-    ObjectGuid creature_guid = (pRewardSource->GetTypeId() == TYPEID_UNIT) ? pRewardSource->GetGUID() : ObjectGuid::Empty;
+    WOWGUID creature_guid = (pRewardSource->GetTypeId() == TYPEID_UNIT) ? pRewardSource->GetGUID() : WOWGUID::Empty;
 
     // prepare data for near group iteration
     if (Group* group = GetGroup())
@@ -13002,7 +13002,7 @@ Player* Player::GetNextRandomRaidMember(float radius)
     return nearMembers[randTarget];
 }
 
-PartyResult Player::CanUninviteFromGroup(ObjectGuid targetPlayerGUID) const
+PartyResult Player::CanUninviteFromGroup(WOWGUID targetPlayerGUID) const
 {
     Group const* grp = GetGroup();
     if (!grp)
@@ -13010,7 +13010,7 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid targetPlayerGUID) const
 
     if (grp->isLFGGroup(true))
     {
-        ObjectGuid gguid = grp->GetGUID();
+        WOWGUID gguid = grp->GetGUID();
         if (!sLFGMgr->GetKicksLeft(gguid))
             return ERR_PARTY_LFG_BOOT_LIMIT;
 
@@ -13206,7 +13206,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
 
 WorldObject* Player::GetViewpoint() const
 {
-    if (ObjectGuid guid = GetGuidValue(PLAYER_FARSIGHT))
+    if (WOWGUID guid = GetGuidValue(PLAYER_FARSIGHT))
         return static_cast<WorldObject*>(ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER));
     return nullptr;
 }
@@ -14074,7 +14074,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= fa
     sScriptMgr->OnPlayerLearnTalents(this, talentId, talentRank, spellId);
 }
 
-void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank)
+void Player::LearnPetTalent(WOWGUID petGuid, uint32 talentId, uint32 talentRank)
 {
     Pet* pet = GetPet();
 
@@ -15507,12 +15507,12 @@ void Player::PrepareCharmAISpells()
     }
 }
 
-void Player::AddRefundReference(ObjectGuid itemGUID)
+void Player::AddRefundReference(WOWGUID itemGUID)
 {
     m_refundableItems.insert(itemGUID);
 }
 
-void Player::DeleteRefundReference(ObjectGuid itemGUID)
+void Player::DeleteRefundReference(WOWGUID itemGUID)
 {
     RefundableItemsSet::iterator itr = m_refundableItems.find(itemGUID);
     if (itr != m_refundableItems.end())
@@ -15875,7 +15875,7 @@ void Player::_SaveInstanceTimeRestrictions(CharacterDatabaseTransaction trans)
     }
 }
 
-bool Player::IsInWhisperWhiteList(ObjectGuid guid)
+bool Player::IsInWhisperWhiteList(WOWGUID guid)
 {
     for (auto const& itr : WhisperList)
     {

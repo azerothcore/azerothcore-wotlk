@@ -24,7 +24,7 @@
 #include "QuestDef.h"
 
 class User;
-class ObjectGuid;
+class WOWGUID;
 
 #define GOSSIP_MAX_MENU_ITEMS               32
 #define DEFAULT_GOSSIP_MESSAGE              0xffffff
@@ -213,15 +213,15 @@ public:
         return _menuItems;
     }
 
-    void SetSenderGUID(ObjectGuid guid) { _senderGUID = guid; }
-    [[nodiscard]] ObjectGuid GetSenderGUID() const { return _senderGUID; }
+    void SetSenderGUID(WOWGUID guid) { _senderGUID = guid; }
+    [[nodiscard]] WOWGUID GetSenderGUID() const { return _senderGUID; }
 
 private:
     GossipMenuItemContainer _menuItems;
     GossipMenuItemDataContainer _menuItemData;
     uint32 _menuId;
     LocaleConstant _locale;
-    ObjectGuid _senderGUID;
+    WOWGUID _senderGUID;
 };
 
 class QuestMenu
@@ -270,22 +270,22 @@ public:
     [[nodiscard]] uint32 GetGossipOptionAction(uint32 selection) const { return _gossipMenu.GetMenuItemAction(selection); }
     [[nodiscard]] bool IsGossipOptionCoded(uint32 selection) const { return _gossipMenu.IsMenuItemCoded(selection); }
 
-    void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID);
+    void SendGossipMenu(uint32 titleTextId, WOWGUID objectGUID);
     void SendCloseGossip();
     void SendPointOfInterest(uint32 poiId) const;
 
     /*********************************************************/
     /***                    QUEST SYSTEM                   ***/
     /*********************************************************/
-    void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) const;
+    void SendQuestGiverStatus(uint8 questStatus, WOWGUID npcGUID) const;
 
-    void SendQuestGiverQuestList(QEmote const& eEmote, std::string const& Title, ObjectGuid guid);
+    void SendQuestGiverQuestList(QEmote const& eEmote, std::string const& Title, WOWGUID guid);
 
     void SendQuestQueryResponse(Quest const* quest) const;
-    void SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGUID, bool activateAccept) const;
+    void SendQuestGiverQuestDetails(Quest const* quest, WOWGUID npcGUID, bool activateAccept) const;
 
-    void SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUID, bool enableNext) const;
-    void SendQuestGiverRequestItems(Quest const* quest, ObjectGuid npcGUID, bool canComplete, bool closeOnCancel) const;
+    void SendQuestGiverOfferReward(Quest const* quest, WOWGUID npcGUID, bool enableNext) const;
+    void SendQuestGiverRequestItems(Quest const* quest, WOWGUID npcGUID, bool canComplete, bool closeOnCancel) const;
 
 private:
     GossipMenu _gossipMenu;

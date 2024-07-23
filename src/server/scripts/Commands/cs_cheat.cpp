@@ -175,7 +175,7 @@ public:
 
         if (!chr)
             chr = handler->GetSession()->GetPlayer();
-        else if (handler->HasLowerSecurity(chr, ObjectGuid::Empty)) // check online security
+        else if (handler->HasLowerSecurity(chr, WOWGUID::Empty)) // check online security
             return false;
 
         bool enable = !chr->isTaxiCheater();

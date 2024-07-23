@@ -418,7 +418,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
             owner->User()->SendAuctionOwnerNotification(auction);
 
         if (sendMail) // can be changed in the hook
-            MailDraft(auction->BuildAuctionMailSubject(AUCTION_EXPIRED), AuctionEntry::BuildAuctionMailBody(ObjectGuid::Empty, 0, auction->buyout, auction->deposit))
+            MailDraft(auction->BuildAuctionMailSubject(AUCTION_EXPIRED), AuctionEntry::BuildAuctionMailBody(WOWGUID::Empty, 0, auction->buyout, auction->deposit))
             .AddItem(pItem)
             .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, 0);
     }
@@ -502,7 +502,7 @@ void AuctionHouseMgr::LoadAuctionItems()
     {
         Field* fields = result->Fetch();
 
-        ObjectGuid::LowType item_guid = fields[11].Get<uint32>();
+        WOWGUID::LowType item_guid = fields[11].Get<uint32>();
         uint32 item_template = fields[12].Get<uint32>();
 
         ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item_template);
@@ -513,7 +513,7 @@ void AuctionHouseMgr::LoadAuctionItems()
         }
 
         Item* item = NewItemOrBag(proto);
-        if (!item->LoadFromDB(item_guid, ObjectGuid::Empty, fields, item_template))
+        if (!item->LoadFromDB(item_guid, WOWGUID::Empty, fields, item_template))
         {
             delete item;
             continue;
@@ -573,7 +573,7 @@ void AuctionHouseMgr::AddAItem(Item* it)
     _mAitems[it->GetGUID()] = it;
 }
 
-bool AuctionHouseMgr::RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB, CharacterDatabaseTransaction* trans /*= nullptr*/)
+bool AuctionHouseMgr::RemoveAItem(WOWGUID itemGuid, bool deleteFromDB, CharacterDatabaseTransaction* trans /*= nullptr*/)
 {
     ItemMap::iterator i = _mAitems.find(itemGuid);
     if (i == _mAitems.end())
@@ -1001,13 +1001,13 @@ bool AuctionEntry::LoadFromDB(Field* fields)
 {
     Id = fields[0].Get<uint32>();
     houseId = fields[1].Get<uint8>();
-    item_guid = ObjectGuid::Create<HighGuid::Item>(fields[2].Get<uint32>());
+    item_guid = WOWGUID::Create<HighGuid::Item>(fields[2].Get<uint32>());
     item_template = fields[3].Get<uint32>();
     itemCount = fields[4].Get<uint32>();
-    owner = ObjectGuid::Create<HighGuid::Player>(fields[5].Get<uint32>());
+    owner = WOWGUID::Create<HighGuid::Player>(fields[5].Get<uint32>());
     buyout = fields[6].Get<uint32>();
     expire_time = fields[7].Get<uint32>();
-    bidder = ObjectGuid::Create<HighGuid::Player>(fields[8].Get<uint32>());
+    bidder = WOWGUID::Create<HighGuid::Player>(fields[8].Get<uint32>());
     bid = fields[9].Get<uint32>();
     startbid = fields[10].Get<uint32>();
     deposit = fields[11].Get<uint32>();
@@ -1036,7 +1036,7 @@ std::string AuctionEntry::BuildAuctionMailSubject(MailAuctionAnswers response) c
     return strm.str();
 }
 
-std::string AuctionEntry::BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit /*= 0*/, uint32 cut /*= 0*/, uint32 moneyDelay /*= 0*/, uint32 eta /*= 0*/)
+std::string AuctionEntry::BuildAuctionMailBody(WOWGUID guid, uint32 bid, uint32 buyout, uint32 deposit /*= 0*/, uint32 cut /*= 0*/, uint32 moneyDelay /*= 0*/, uint32 eta /*= 0*/)
 {
     std::ostringstream strm;
     strm.width(16);

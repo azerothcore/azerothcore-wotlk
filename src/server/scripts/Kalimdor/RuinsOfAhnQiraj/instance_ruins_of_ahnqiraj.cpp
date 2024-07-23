@@ -221,13 +221,13 @@ public:
             }
         }
 
-        void SetGuidData(uint32 type, ObjectGuid data) override
+        void SetGuidData(uint32 type, WOWGUID data) override
         {
             if (type == DATA_PARALYZED)
                 _paralyzedGUID = data;
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -247,7 +247,7 @@ public:
                     return _andorovGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void CallNextRajaxxLeader(bool announce = false)
@@ -303,13 +303,13 @@ public:
         }
 
     private:
-        ObjectGuid _kurinnaxxGUID;
-        ObjectGuid _rajaxxGUID;
-        ObjectGuid _moamGUID;
-        ObjectGuid _buruGUID;
-        ObjectGuid _ossirianGUID;
-        ObjectGuid _paralyzedGUID;
-        ObjectGuid _andorovGUID;
+        WOWGUID _kurinnaxxGUID;
+        WOWGUID _rajaxxGUID;
+        WOWGUID _moamGUID;
+        WOWGUID _buruGUID;
+        WOWGUID _ossirianGUID;
+        WOWGUID _paralyzedGUID;
+        WOWGUID _andorovGUID;
         uint32 _rajaxWaveCounter;
         uint8 _buruPhase;
     };

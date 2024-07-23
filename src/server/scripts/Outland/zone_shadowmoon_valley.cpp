@@ -194,7 +194,7 @@ public:
 
     private:
         EventMap events;
-        ObjectGuid infernalGUID;
+        WOWGUID infernalGUID;
         float ground;
     };
 
@@ -257,7 +257,7 @@ public:
         }
 
     private:
-        ObjectGuid casterGUID;
+        WOWGUID casterGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -299,7 +299,7 @@ public:
     {
         npc_mature_netherwing_drakeAI(Creature* creature) : ScriptedAI(creature) { }
 
-        ObjectGuid uiPlayerGUID;
+        WOWGUID uiPlayerGUID;
 
         bool bCanEat;
         bool bIsEating;
@@ -531,7 +531,7 @@ public:
     }
 private:
     bool _tapped;
-    ObjectGuid _playerGUID;
+    WOWGUID _playerGUID;
 
     Player* _GetPlayer() { return ObjectAccessor::GetPlayer(*me, _playerGUID); }
 };
@@ -576,7 +576,7 @@ public:
         npc_dragonmaw_peonAI(Creature* creature) : ScriptedAI(creature) { }
 
         EventMap events;
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
         bool Tapped;
 
         void Reset() override
@@ -916,8 +916,8 @@ public:
 
         uint8 AnimationCount;
 
-        ObjectGuid LordIllidanGUID;
-        ObjectGuid AggroTargetGUID;
+        WOWGUID LordIllidanGUID;
+        WOWGUID AggroTargetGUID;
 
         bool Timers;
 
@@ -1072,7 +1072,7 @@ public:
     {
         npc_lord_illidan_stormrageAI(Creature* creature) : ScriptedAI(creature) { }
 
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         uint32 WaveTimer;
         uint32 AnnounceTimer;
@@ -1217,7 +1217,7 @@ public:
     {
         npc_illidari_spawnAI(Creature* creature) : ScriptedAI(creature) { }
 
-        ObjectGuid LordIllidanGUID;
+        WOWGUID LordIllidanGUID;
         uint32 SpellTimer1, SpellTimer2, SpellTimer3;
         bool Timers;
 
@@ -1717,7 +1717,7 @@ public:
         }
     private:
         bool tapped;
-        ObjectGuid tuberGUID;
+        WOWGUID tuberGUID;
         uint32 resetTimer;
     };
 
@@ -1772,7 +1772,7 @@ public:
         }
     }
 private:
-    ObjectGuid _playerGUID;
+    WOWGUID _playerGUID;
 };
 
 class spell_calling_korkron_or_wildhammer : public SpellScript

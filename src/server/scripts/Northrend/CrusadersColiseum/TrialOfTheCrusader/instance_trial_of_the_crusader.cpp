@@ -51,30 +51,30 @@ public:
         std::string str_data;
         EventMap events;
 
-        ObjectGuid NPC_BarrettGUID;
-        ObjectGuid NPC_TirionGUID;
-        ObjectGuid NPC_FizzlebangGUID;
-        ObjectGuid NPC_GarroshGUID;
-        ObjectGuid NPC_VarianGUID;
+        WOWGUID NPC_BarrettGUID;
+        WOWGUID NPC_TirionGUID;
+        WOWGUID NPC_FizzlebangGUID;
+        WOWGUID NPC_GarroshGUID;
+        WOWGUID NPC_VarianGUID;
 
-        ObjectGuid NPC_GormokGUID;
-        ObjectGuid NPC_DreadscaleGUID;
-        ObjectGuid NPC_AcidmawGUID;
-        ObjectGuid NPC_IcehowlGUID;
-        ObjectGuid NPC_JaraxxusGUID;
+        WOWGUID NPC_GormokGUID;
+        WOWGUID NPC_DreadscaleGUID;
+        WOWGUID NPC_AcidmawGUID;
+        WOWGUID NPC_IcehowlGUID;
+        WOWGUID NPC_JaraxxusGUID;
         GuidVector NPC_ChampionGUIDs;
-        ObjectGuid NPC_LightbaneGUID;
-        ObjectGuid NPC_DarkbaneGUID;
-        ObjectGuid NPC_LichKingGUID;
-        ObjectGuid NPC_AnubarakGUID;
+        WOWGUID NPC_LightbaneGUID;
+        WOWGUID NPC_DarkbaneGUID;
+        WOWGUID NPC_LichKingGUID;
+        WOWGUID NPC_AnubarakGUID;
 
-        ObjectGuid NPC_PurpleGroundGUID;
-        ObjectGuid NPC_PortalGUID;
+        WOWGUID NPC_PurpleGroundGUID;
+        WOWGUID NPC_PortalGUID;
 
-        ObjectGuid GO_MainGateGUID;
-        ObjectGuid GO_EnterGateGUID;
-        ObjectGuid GO_WebDoorGUID;
-        ObjectGuid GO_FloorGUID;
+        WOWGUID GO_MainGateGUID;
+        WOWGUID GO_EnterGateGUID;
+        WOWGUID GO_WebDoorGUID;
+        WOWGUID GO_FloorGUID;
 
         void SpawnAnubArak()
         {
@@ -89,8 +89,8 @@ public:
                 }
 
                 // move corpses
-                const ObjectGuid npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
-                for (ObjectGuid const& i : npcs)
+                const WOWGUID npcs[4] = { NPC_IcehowlGUID, NPC_JaraxxusGUID, NPC_LightbaneGUID, NPC_DarkbaneGUID };
+                for (WOWGUID const& i : npcs)
                 {
                     if (Creature* c = instance->GetCreature(i))
                     {
@@ -419,7 +419,7 @@ public:
                             InstanceProgress = INSTANCE_PROGRESS_FACTION_CHAMPIONS_DEAD;
                             events.RescheduleEvent(EVENT_SCENE_FACTION_CHAMPIONS_DEAD, 2500);
 
-                            for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                            for (WOWGUID const& guid : NPC_ChampionGUIDs)
                                 if (Creature* c = instance->GetCreature(guid))
                                     c->DespawnOrUnsummon(15000);
                             NPC_ChampionGUIDs.clear();
@@ -465,7 +465,7 @@ public:
                     {
                         EncounterStatus = IN_PROGRESS;
                         AchievementTimer = 0;
-                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                        for (WOWGUID const& guid : NPC_ChampionGUIDs)
                             if (Creature* c = instance->GetCreature(guid))
                                 if (!c->IsInCombat())
                                     if (Unit* target = c->SelectNearestTarget(200.0f))
@@ -536,7 +536,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch( type )
             {
@@ -554,7 +554,7 @@ public:
                     return NPC_AnubarakGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void Update(uint32 diff) override
@@ -1104,7 +1104,7 @@ public:
                     }
                 case EVENT_CHAMPIONS_ATTACK:
                     {
-                        for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                        for (WOWGUID const& guid : NPC_ChampionGUIDs)
                             if (Creature* c = instance->GetCreature(guid))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
@@ -1505,7 +1505,7 @@ public:
                 case INSTANCE_PROGRESS_JARAXXUS_DEAD:
                     if( Creature* c = instance->GetCreature(NPC_BarrettGUID) )
                         c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                    for (ObjectGuid const& guid : NPC_ChampionGUIDs)
+                    for (WOWGUID const& guid : NPC_ChampionGUIDs)
                         if (Creature* c = instance->GetCreature(guid))
                             c->DespawnOrUnsummon();
                     NPC_ChampionGUIDs.clear();

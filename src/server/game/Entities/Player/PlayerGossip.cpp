@@ -253,7 +253,7 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
         return;
 
     uint32 gossipOptionId = item->OptionType;
-    ObjectGuid guid = source->GetGUID();
+    WOWGUID guid = source->GetGUID();
 
     if (sWorld->getIntConfig(CONFIG_INSTANT_TAXI) == 2 && source->GetTypeId() == TYPEID_UNIT)
     {

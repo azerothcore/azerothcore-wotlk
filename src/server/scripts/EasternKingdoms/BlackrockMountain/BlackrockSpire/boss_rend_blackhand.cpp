@@ -428,8 +428,8 @@ public:
     private:
         bool   gythEvent;
         uint8 _currentWave;
-        ObjectGuid victorGUID;
-        ObjectGuid waveDoorGUID;
+        WOWGUID victorGUID;
+        WOWGUID waveDoorGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

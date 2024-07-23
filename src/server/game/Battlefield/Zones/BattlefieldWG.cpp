@@ -1116,7 +1116,7 @@ void BattlefieldWG::AddUpdateTenacity(Player* player)
 void BattlefieldWG::RemoveUpdateTenacity(Player* player)
 {
     m_updateTenacityList.erase(player->GetGUID());
-    m_updateTenacityList.insert(ObjectGuid::Empty);
+    m_updateTenacityList.insert(WOWGUID::Empty);
 }
 
 void BattlefieldWG::UpdateTenacity()

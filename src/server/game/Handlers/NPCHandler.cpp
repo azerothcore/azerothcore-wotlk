@@ -45,7 +45,7 @@ enum StableResultCode
 
 void User::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TABARDDESIGNER);
@@ -62,14 +62,14 @@ void User::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
     SendTabardVendorActivate(guid);
 }
 
-void User::SendTabardVendorActivate(ObjectGuid guid)
+void User::SendTabardVendorActivate(WOWGUID guid)
 {
     WorldPacket data(MSG_TABARDVENDOR_ACTIVATE, 8);
     data << guid;
     Send(&data);
 }
 
-void User::SendShowMailBox(ObjectGuid guid)
+void User::SendShowMailBox(WOWGUID guid)
 {
     WorldPacket data(SMSG_SHOW_MAILBOX, 8);
     data << guid;
@@ -78,19 +78,19 @@ void User::SendShowMailBox(ObjectGuid guid)
 
 void User::HandleTrainerListOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
 
     recvData >> guid;
     SendTrainerList(guid);
 }
 
-void User::SendTrainerList(ObjectGuid guid)
+void User::SendTrainerList(WOWGUID guid)
 {
     std::string str = GetAcoreString(LANG_NPC_TAINER_HELLO);
     SendTrainerList(guid, str);
 }
 
-void User::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
+void User::SendTrainerList(WOWGUID guid, const std::string& strTitle)
 {
     LOG_DEBUG("network", "WORLD: SendTrainerList");
 
@@ -211,7 +211,7 @@ void User::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
 
 void User::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 spellId = 0;
 
     recvData >> guid >> spellId;
@@ -272,7 +272,7 @@ void User::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
 
 void User::HandleGossipHelloOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE);
@@ -327,7 +327,7 @@ void User::HandleGossipHelloOpcode(WorldPacket& recvData)
 
     uint32 option;
     uint32 unk;
-    ObjectGuid guid;
+    WOWGUID guid;
     std::string code = "";
 
     recvData >> guid >> unk >> option;
@@ -366,7 +366,7 @@ void User::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SPIRIT_HEALER_ACTIVATE");
 
-    ObjectGuid guid;
+    WOWGUID guid;
 
     recvData >> guid;
 
@@ -417,7 +417,7 @@ void User::SendSpiritResurrect()
 
 void User::HandleBinderActivateOpcode(WorldPacket& recvData)
 {
-    ObjectGuid npcGUID;
+    WOWGUID npcGUID;
     recvData >> npcGUID;
 
     if (!GetPlayer()->IsInWorld() || !GetPlayer()->IsAlive())
@@ -459,7 +459,7 @@ void User::SendBindPoint(Creature* npc)
 void User::HandleListStabledPetsOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv MSG_LIST_STABLED_PETS");
-    ObjectGuid npcGUID;
+    WOWGUID npcGUID;
 
     recvData >> npcGUID;
 
@@ -477,7 +477,7 @@ void User::HandleListStabledPetsOpcode(WorldPacket& recvData)
     SendStablePet(npcGUID);
 }
 
-void User::SendStablePet(ObjectGuid guid)
+void User::SendStablePet(WOWGUID guid)
 {
     LOG_DEBUG("network", "WORLD: Recv MSG_LIST_STABLED_PETS Send.");
 
@@ -550,7 +550,7 @@ void User::SendStableResult(uint8 res)
 void User::HandleStablePet(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_STABLE_PET");
-    ObjectGuid npcGUID;
+    WOWGUID npcGUID;
 
     recvData >> npcGUID;
 
@@ -618,7 +618,7 @@ void User::HandleStablePet(WorldPacket& recvData)
 void User::HandleUnstablePet(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_UNSTABLE_PET.");
-    ObjectGuid npcGUID;
+    WOWGUID npcGUID;
     uint32 petnumber;
 
     recvData >> npcGUID >> petnumber;
@@ -732,7 +732,7 @@ void User::HandleUnstablePet(WorldPacket& recvData)
 void User::HandleBuyStableSlot(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_BUY_STABLE_SLOT.");
-    ObjectGuid npcGUID;
+    WOWGUID npcGUID;
 
     recvData >> npcGUID;
 
@@ -771,7 +771,7 @@ void User::HandleStableRevivePet(WorldPacket& /* recvData */)
 void User::HandleStableSwapPet(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_STABLE_SWAP_PET.");
-    ObjectGuid npcGUID;
+    WOWGUID npcGUID;
     uint32 petId;
 
     recvData >> npcGUID >> petId;
@@ -885,7 +885,7 @@ void User::HandleRepairItemOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_REPAIR_ITEM");
 
-    ObjectGuid npcGUID, itemGUID;
+    WOWGUID npcGUID, itemGUID;
     uint8 guildBank;                                        // new in 2.3.2, bool that means from guild bank money
 
     recvData >> npcGUID >> itemGUID >> guildBank;

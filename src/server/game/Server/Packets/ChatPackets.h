@@ -18,7 +18,7 @@
 #ifndef ChatPackets_h__
 #define ChatPackets_h__
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Packet.h"
 
 namespace WorldPackets
@@ -33,7 +33,7 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             uint32 EmoteID = 0;
-            ObjectGuid Guid;
+            WOWGUID Guid;
         };
 
         class EmoteClient final : public ClientPacket

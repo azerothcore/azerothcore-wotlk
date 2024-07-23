@@ -20,7 +20,7 @@
 
 #include "Common.h"
 #include "IteratorPair.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Reference.h"
 #include "SharedDefines.h"
 #include "UnitEvents.h"
@@ -104,7 +104,7 @@ public:
 
     //=================================================
 
-    [[nodiscard]] ObjectGuid getUnitGuid() const { return iUnitGuid; }
+    [[nodiscard]] WOWGUID getUnitGuid() const { return iUnitGuid; }
 
     //=================================================
     // reference is not needed anymore. realy delete it !
@@ -133,7 +133,7 @@ private:
 private:
     float iThreat;
     float iTempThreatModifier;                          // used for taunt
-    ObjectGuid iUnitGuid;
+    WOWGUID iUnitGuid;
     bool iOnline;
 };
 
@@ -172,7 +172,7 @@ public:
     }
 
     HostileReference* getReferenceByTarget(Unit const* victim) const;
-    HostileReference* getReferenceByTarget(ObjectGuid const& guid) const;
+    HostileReference* getReferenceByTarget(WOWGUID const& guid) const;
 
     [[nodiscard]] StorageType const& GetThreatList() const { return iThreatList; }
 

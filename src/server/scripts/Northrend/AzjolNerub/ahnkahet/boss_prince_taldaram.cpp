@@ -478,7 +478,7 @@ struct boss_taldaram : public BossAI
 
 private:
     Position victimSperePos;
-    ObjectGuid vanishTarget_GUID;
+    WOWGUID vanishTarget_GUID;
     uint32 vanishDamage;
 
     void ScheduleCombatEvents()

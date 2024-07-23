@@ -140,7 +140,7 @@ public:
         InstanceScript* instance;
         EventMap events;
         uint8 eventTimer;
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         void Reset() override { }
 
@@ -465,7 +465,7 @@ public:
         }
 
         bool IsLoot;
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         void Reset() override { }
 
@@ -609,7 +609,7 @@ public:
 
         uint8 _gongEvent;
         uint32 _gongTimer;
-        ObjectGuid uiTargetGUID;
+        WOWGUID uiTargetGUID;
 
         void Reset() override
         {

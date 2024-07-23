@@ -216,7 +216,7 @@ public:
                     break;
                 case DATA_SPAWN_OPERA_DECORATIONS:
                 {
-                    for (ObjectGuid const& guid : _operaDecorations[data - 1])
+                    for (WOWGUID const& guid : _operaDecorations[data - 1])
                     {
                         DoRespawnGameObject(guid, DAY);
                     }
@@ -233,7 +233,7 @@ public:
                         case SPECIAL:
                         {
                             DoCastSpellOnPlayers(SPELL_GAME_IN_SESSION);
-                            for (ObjectGuid const& chessPieceGUID : _chessPiecesGUID)
+                            for (WOWGUID const& chessPieceGUID : _chessPiecesGUID)
                             {
                                 if (Creature* piece = instance->GetCreature(chessPieceGUID))
                                 {
@@ -273,7 +273,7 @@ public:
                     _chessTeam = data;
                     break;
                 case DATA_CHESS_REINIT_PIECES:
-                    for (ObjectGuid const& chessPieceGUID : _chessPiecesGUID)
+                    for (WOWGUID const& chessPieceGUID : _chessPiecesGUID)
                     {
                         if (Creature* piece = instance->GetCreature(chessPieceGUID))
                         {
@@ -289,7 +289,7 @@ public:
                         }
                     }
 
-                    for (ObjectGuid const& medivhCheatFireGUID : _medivhCheatFiresGUID)
+                    for (WOWGUID const& medivhCheatFireGUID : _medivhCheatFiresGUID)
                     {
                         if (Creature* fire = instance->GetCreature(medivhCheatFireGUID))
                         {
@@ -336,7 +336,7 @@ public:
             return true;
         }
 
-        void SetGuidData(uint32 type, ObjectGuid data) override
+        void SetGuidData(uint32 type, WOWGUID data) override
         {
             if (type == DATA_IMAGE_OF_MEDIVH)
                 ImageGUID = data;
@@ -460,7 +460,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 data) const override
+        WOWGUID GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -494,7 +494,7 @@ public:
                     return DustCoveredChest;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
     private:
@@ -505,22 +505,22 @@ public:
         uint32 _chessGamePhase;
         uint32 _chessEvent;
 
-        ObjectGuid m_uiCurtainGUID;
-        ObjectGuid m_uiStageDoorLeftGUID;
-        ObjectGuid m_uiStageDoorRightGUID;
-        ObjectGuid m_uiKilrekGUID;
-        ObjectGuid m_uiTerestianGUID;
-        ObjectGuid m_uiMoroesGUID;
-        ObjectGuid m_uiNightBaneGUID;
-        ObjectGuid m_uiLibraryDoor;                                 // Door at Shade of Aran
-        ObjectGuid m_uiMassiveDoor;                                 // Door at Netherspite
-        ObjectGuid m_uiGamesmansDoor;                               // Door before Chess
-        ObjectGuid m_uiGamesmansExitDoor;                           // Door after Chess
-        ObjectGuid ImageGUID;
-        ObjectGuid DustCoveredChest;
-        ObjectGuid m_uiRelayGUID;
-        ObjectGuid _barnesGUID;
-        ObjectGuid _echoOfMedivhGUID;
+        WOWGUID m_uiCurtainGUID;
+        WOWGUID m_uiStageDoorLeftGUID;
+        WOWGUID m_uiStageDoorRightGUID;
+        WOWGUID m_uiKilrekGUID;
+        WOWGUID m_uiTerestianGUID;
+        WOWGUID m_uiMoroesGUID;
+        WOWGUID m_uiNightBaneGUID;
+        WOWGUID m_uiLibraryDoor;                                 // Door at Shade of Aran
+        WOWGUID m_uiMassiveDoor;                                 // Door at Netherspite
+        WOWGUID m_uiGamesmansDoor;                               // Door before Chess
+        WOWGUID m_uiGamesmansExitDoor;                           // Door after Chess
+        WOWGUID ImageGUID;
+        WOWGUID DustCoveredChest;
+        WOWGUID m_uiRelayGUID;
+        WOWGUID _barnesGUID;
+        WOWGUID _echoOfMedivhGUID;
 
         GuidVector _operaDecorations[EVENT_RAJ];
         GuidSet _chessPiecesGUID;

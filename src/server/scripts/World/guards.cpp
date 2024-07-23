@@ -98,7 +98,7 @@ public:
     private:
         uint32 exileTimer;
         uint32 banishTimer;
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
         bool canTeleport;
     };
 
@@ -164,7 +164,7 @@ public:
     private:
         uint32 exileTimer;
         uint32 banishTimer;
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
         bool canTeleport;
     };
 

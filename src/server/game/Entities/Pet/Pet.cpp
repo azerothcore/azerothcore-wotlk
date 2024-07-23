@@ -36,7 +36,7 @@
 #include "WorldPacket.h"
 #include "User.h"
 
-Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : ObjectGuid::Empty, true),
+Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : WOWGUID::Empty, true),
                                         m_usedTalentCount(0),
                                         m_removed(false),
                                         m_owner(owner),
@@ -141,7 +141,7 @@ public:
         MAX
     };
 
-    PetLoadQueryHolder(ObjectGuid::LowType ownerGuid, uint32 petNumber)
+    PetLoadQueryHolder(WOWGUID::LowType ownerGuid, uint32 petNumber)
     {
         SetSize(MAX);
 
@@ -217,7 +217,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
     PetStable* petStable = ASSERT_NOTNULL(owner->GetPetStable());
 
-    ObjectGuid::LowType ownerid = owner->GetGUID().GetCounter();
+    WOWGUID::LowType ownerid = owner->GetGUID().GetCounter();
     std::pair<PetStable::PetInfo const*, PetSaveMode> info = GetLoadPetInfo(*petStable, petEntry, petnumber, current);
     PetStable::PetInfo const* petInfo = info.first;
     PetSaveMode slot = info.second;
@@ -262,7 +262,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     }
 
     Map* map = owner->GetMap();
-    ObjectGuid::LowType guid = map->GenerateLowGuid<HighGuid::Pet>();
+    WOWGUID::LowType guid = map->GenerateLowGuid<HighGuid::Pet>();
 
     if (!Create(guid, map, owner->GetPhaseMask(), petInfo->CreatureId, petInfo->PetNumber))
         return false;
@@ -544,7 +544,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
     // current/stable/not_in_slot
     if (mode >= PET_SAVE_AS_CURRENT)
     {
-        ObjectGuid::LowType ownerLowGUID = GetOwnerGUID().GetCounter();
+        WOWGUID::LowType ownerLowGUID = GetOwnerGUID().GetCounter();
         trans = CharacterDatabase.BeginTransaction();
         // remove current data
 
@@ -600,7 +600,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
     }
 }
 
-void Pet::DeleteFromDB(ObjectGuid::LowType guidlow)
+void Pet::DeleteFromDB(WOWGUID::LowType guidlow)
 {
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -794,7 +794,7 @@ void Pet::Update(uint32 diff)
                                         }
                                     }
 
-                                    m_tempoldTarget = ObjectGuid::Empty;
+                                    m_tempoldTarget = WOWGUID::Empty;
                                     m_tempspellIsPositive = false;
                                 }
                             }
@@ -804,7 +804,7 @@ void Pet::Update(uint32 diff)
                     {
                         m_tempspell = 0;
                         m_tempspellTarget = nullptr;
-                        m_tempoldTarget = ObjectGuid::Empty;
+                        m_tempoldTarget = WOWGUID::Empty;
                         m_tempspellIsPositive = false;
 
                         Unit* victim = charmer->GetVictim();
@@ -993,7 +993,7 @@ bool Pet::CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner)
 bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask)
 {
     LOG_DEBUG("entities.pet", "Pet::CreateBaseForTamed");
-    ObjectGuid::LowType guid = map->GenerateLowGuid<HighGuid::Pet>();
+    WOWGUID::LowType guid = map->GenerateLowGuid<HighGuid::Pet>();
     uint32 pet_number = sObjectMgr->GeneratePetNumber();
     if (!Create(guid, map, phaseMask, cinfo->Entry, pet_number))
         return false;
@@ -1620,7 +1620,7 @@ void Pet::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             int32 damage[3];
             int32 baseDamage[3];
             Field* fields = result->Fetch();
-            ObjectGuid caster_guid = ObjectGuid(fields[0].Get<uint64>());
+            WOWGUID caster_guid = WOWGUID(fields[0].Get<uint64>());
             // nullptr guid stored - pet is the caster of the spell - see Pet::_SaveAuras
             if (!caster_guid)
                 caster_guid = GetGUID();
@@ -1747,7 +1747,7 @@ void Pet::_SaveAuras(CharacterDatabaseTransaction trans)
         }
 
         // don't save guid of caster in case we are caster of the spell - guid for pet is generated every pet load, so it won't match saved guid anyways
-        ObjectGuid casterGUID = (itr->second->GetCasterGUID() == GetGUID()) ? ObjectGuid::Empty : itr->second->GetCasterGUID();
+        WOWGUID casterGUID = (itr->second->GetCasterGUID() == GetGUID()) ? WOWGUID::Empty : itr->second->GetCasterGUID();
 
         uint8 index = 0;
 
@@ -2314,7 +2314,7 @@ bool Pet::IsPermanentPetFor(Player* owner) const
     }
 }
 
-bool Pet::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 pet_number)
+bool Pet::Create(WOWGUID::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 pet_number)
 {
     ASSERT(map);
     SetMap(map);
@@ -2430,7 +2430,7 @@ void Pet::SetDisplayId(uint32 modelId, float displayScale /*= 1.f*/)
                 player->SetGroupUpdateFlag(GROUP_UPDATE_FLAG_PET_MODEL_ID);
 }
 
-void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, ObjectGuid oldTarget, bool spellIsPositive)
+void Pet::CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, WOWGUID oldTarget, bool spellIsPositive)
 {
     if (!spellid)
         return;
@@ -2451,7 +2451,7 @@ void Pet::ClearCastWhenWillAvailable()
     m_tempspellIsPositive = false;
     m_tempspell = 0;
     m_tempspellTarget = nullptr;
-    m_tempoldTarget = ObjectGuid::Empty;
+    m_tempoldTarget = WOWGUID::Empty;
 }
 
 void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)

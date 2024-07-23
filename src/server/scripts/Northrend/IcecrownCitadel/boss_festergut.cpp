@@ -92,7 +92,7 @@ public:
             _gasDummyGUID.Clear();
         }
 
-        ObjectGuid _gasDummyGUID;
+        WOWGUID _gasDummyGUID;
         uint32 _maxInoculatedStack;
         uint32 _inhaleCounter;
 

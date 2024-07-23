@@ -258,7 +258,7 @@ public:
         npc_death_knight_initiateAI(Creature* creature) : CombatAI(creature) { }
 
         bool _duelInProgress;
-        ObjectGuid _duelGUID;
+        WOWGUID _duelGUID;
         EventMap events;
         std::set<uint32> playerGUIDs;
         uint32 timer = 0;
@@ -485,7 +485,7 @@ public:
         }
 
         EventMap events;
-        ObjectGuid gothikGUID;
+        WOWGUID gothikGUID;
 
         void InitializeAI() override
         {
@@ -503,7 +503,7 @@ public:
                 AttackStart(attacker);
         }
 
-        void SetGUID(ObjectGuid guid, int32) override
+        void SetGUID(WOWGUID guid, int32) override
         {
             gothikGUID = guid;
             events.ScheduleEvent(EVENT_GHOUL_MOVE_TO_PIT, 3s);
@@ -731,11 +731,11 @@ public:
                 me->SetCurrentEquipmentId(me->GetOriginalEquipmentId());
         }
 
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
         UnworthyInitiatePhase phase;
         uint32 wait_timer;
         float anchorX, anchorY;
-        ObjectGuid anchorGUID;
+        WOWGUID anchorGUID;
 
         EventMap events;
 
@@ -911,15 +911,15 @@ public:
     {
         npc_unworthy_initiate_anchorAI(Creature* creature) : PassiveAI(creature) {}
 
-        ObjectGuid prisonerGUID;
+        WOWGUID prisonerGUID;
 
-        void SetGUID(ObjectGuid guid, int32 /*id*/) override
+        void SetGUID(WOWGUID guid, int32 /*id*/) override
         {
             if (!prisonerGUID)
                 prisonerGUID = guid;
         }
 
-        ObjectGuid GetGUID(int32 /*id*/) const override
+        WOWGUID GetGUID(int32 /*id*/) const override
         {
             return prisonerGUID;
         }
@@ -934,7 +934,7 @@ public:
     bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (Creature* anchor = go->FindNearestCreature(29521, 15))
-            if (ObjectGuid prisonerGUID = anchor->AI()->GetGUID())
+            if (WOWGUID prisonerGUID = anchor->AI()->GetGUID())
                 if (Creature* prisoner = ObjectAccessor::GetCreature(*player, prisonerGUID))
                     CAST_AI(npc_unworthy_initiate::npc_unworthy_initiateAI, prisoner->AI())->EventStart(anchor, player);
 
@@ -971,9 +971,9 @@ public:
             me->SetDisplayFromModel(0); // Modelid2 is a horse.
         }
 
-        ObjectGuid minerGUID;
+        WOWGUID minerGUID;
 
-        void SetGUID(ObjectGuid guid, int32 /*id*/) override
+        void SetGUID(WOWGUID guid, int32 /*id*/) override
         {
             minerGUID = guid;
         }
@@ -1034,7 +1034,7 @@ public:
 
         uint32 IntroTimer;
         uint32 IntroPhase;
-        ObjectGuid carGUID;
+        WOWGUID carGUID;
 
         void Reset() override
         {

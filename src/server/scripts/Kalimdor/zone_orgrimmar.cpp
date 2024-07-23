@@ -70,7 +70,7 @@ public:
         bool CanEmote;
         uint32 SaluteTimer;
         uint32 ResetTimer;
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         void Reset() override
         {

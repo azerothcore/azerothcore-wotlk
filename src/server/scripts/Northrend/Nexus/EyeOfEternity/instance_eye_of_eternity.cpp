@@ -50,10 +50,10 @@ public:
         uint32 EncounterStatus;
         std::string str_data;
 
-        ObjectGuid NPC_MalygosGUID;
-        ObjectGuid GO_IrisGUID;
-        ObjectGuid GO_ExitPortalGUID;
-        ObjectGuid GO_PlatformGUID;
+        WOWGUID NPC_MalygosGUID;
+        WOWGUID GO_IrisGUID;
+        WOWGUID GO_ExitPortalGUID;
+        WOWGUID GO_PlatformGUID;
         bool bPokeAchiev;
 
         void Initialize() override
@@ -182,7 +182,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch(type)
             {
@@ -190,7 +190,7 @@ public:
                     return NPC_MalygosGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override

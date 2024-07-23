@@ -86,7 +86,7 @@ public:
         }
 
         // Get target information
-        ObjectGuid targetGuid = sCharacterCache->GetCharacterGuidByName(target);
+        WOWGUID targetGuid = sCharacterCache->GetCharacterGuidByName(target);
         uint32 targetAccountId = sCharacterCache->GetCharacterAccountIdByGuid(targetGuid);
         uint32 targetGmLevel = AccountMgr::GetSecurity(targetAccountId, realm.Id.Realm);
 
@@ -142,7 +142,7 @@ public:
             return true;
         }
 
-        sTicketMgr->ResolveAndCloseTicket(ticket->GetId(), player ? player->GetGUID() : ObjectGuid::Empty);
+        sTicketMgr->ResolveAndCloseTicket(ticket->GetId(), player ? player->GetGUID() : WOWGUID::Empty);
         sTicketMgr->UpdateLastChange();
 
         std::string msg = ticket->FormatMessageString(*handler, player ? player->GetName().c_str() : "Console", nullptr, nullptr, nullptr);
@@ -231,7 +231,7 @@ public:
 
         CharacterDatabaseTransaction trans = CharacterDatabaseTransaction(nullptr);
         ticket->SetCompleted();
-        ticket->SetResolvedBy(gm ? gm->GetGUID() : ObjectGuid::Empty);
+        ticket->SetResolvedBy(gm ? gm->GetGUID() : WOWGUID::Empty);
         ticket->SaveToDB(trans);
 
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
@@ -355,7 +355,7 @@ public:
             security = assignedPlayer->User()->GetSecurity();
         else
         {
-            ObjectGuid guid = ticket->GetAssignedToGUID();
+            WOWGUID guid = ticket->GetAssignedToGUID();
             uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(guid);
             security = AccountMgr::GetSecurity(accountId, realm.Id.Realm);
         }
@@ -405,7 +405,7 @@ public:
             return false;
 
         // Detect target's GUID
-        ObjectGuid guid;
+        WOWGUID guid;
         if (Player* player = ObjectAccessor::FindPlayerByName(name, false))
         {
             guid = player->GetGUID();

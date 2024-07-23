@@ -154,7 +154,7 @@ public:
                 me->SetOrientation(me->GetAngle(target));
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->DisableRotate(true);
-                me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
+                me->SetGuidValue(UNIT_FIELD_TARGET, WOWGUID::Empty);
                 me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MoveIdle();

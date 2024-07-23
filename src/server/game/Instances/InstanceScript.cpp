@@ -79,7 +79,7 @@ void InstanceScript::OnGameObjectRemove(GameObject* go)
     RemoveDoor(go);
 }
 
-ObjectGuid InstanceScript::GetObjectGuid(uint32 type) const
+WOWGUID InstanceScript::GetObjectGuid(uint32 type) const
 {
     ObjectGuidMap::const_iterator i = _objectGuids.find(type);
 
@@ -88,10 +88,10 @@ ObjectGuid InstanceScript::GetObjectGuid(uint32 type) const
         return i->second;
     }
 
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
-ObjectGuid InstanceScript::GetGuidData(uint32 type) const
+WOWGUID InstanceScript::GetGuidData(uint32 type) const
 {
     return GetObjectGuid(type);
 }
@@ -106,7 +106,7 @@ GameObject* InstanceScript::GetGameObject(uint32 type)
     return instance->GetGameObject(GetObjectGuid(type));
 }
 
-void InstanceScript::HandleGameObject(ObjectGuid GUID, bool open, GameObject* go)
+void InstanceScript::HandleGameObject(WOWGUID GUID, bool open, GameObject* go)
 {
     if (!go)
         go = instance->GetGameObject(GUID);
@@ -510,7 +510,7 @@ void InstanceScript::WritePersistentData(std::ostringstream& data)
     }
 }
 
-void InstanceScript::DoUseDoorOrButton(ObjectGuid uiGuid, uint32 uiWithRestoreTime, bool bUseAlternativeState)
+void InstanceScript::DoUseDoorOrButton(WOWGUID uiGuid, uint32 uiWithRestoreTime, bool bUseAlternativeState)
 {
     if (!uiGuid)
         return;
@@ -531,7 +531,7 @@ void InstanceScript::DoUseDoorOrButton(ObjectGuid uiGuid, uint32 uiWithRestoreTi
     }
 }
 
-void InstanceScript::DoRespawnGameObject(ObjectGuid uiGuid, uint32 uiTimeToDespawn)
+void InstanceScript::DoRespawnGameObject(WOWGUID uiGuid, uint32 uiTimeToDespawn)
 {
     if (GameObject* go = instance->GetGameObject(uiGuid))
     {
@@ -557,7 +557,7 @@ void InstanceScript::DoRespawnGameObject(ObjectGuid uiGuid, uint32 uiTimeToDespa
         LOG_DEBUG("scripts", "InstanceScript: DoRespawnGameObject failed");
 }
 
-void InstanceScript::DoRespawnCreature(ObjectGuid guid, bool force)
+void InstanceScript::DoRespawnCreature(WOWGUID guid, bool force)
 {
     if (Creature* creature = instance->GetCreature(guid))
     {
@@ -666,7 +666,7 @@ void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool incl
 
     for (uint8 itr2 = 0; itr2 < MAX_SUMMON_SLOT; ++itr2)
     {
-        ObjectGuid summonGUID = player->m_SummonSlot[itr2];
+        WOWGUID summonGUID = player->m_SummonSlot[itr2];
         if (!summonGUID.IsEmpty())
             if (Creature* summon = instance->GetCreature(summonGUID))
                 summon->CastSpell(player, spell, true);
@@ -782,7 +782,7 @@ std::string InstanceScript::GetBossStateName(uint8 state)
     }
 }
 
-uint8 InstanceScript::GetStoredGameObjectState(ObjectGuid::LowType spawnId) const
+uint8 InstanceScript::GetStoredGameObjectState(WOWGUID::LowType spawnId) const
 {
     auto i = _objectStateMap.find(spawnId);
 

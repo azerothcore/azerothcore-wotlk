@@ -81,7 +81,7 @@ public:
             {
                 medivh->Respawn();
             }
-            for (ObjectGuid const& guid : _encounterNPCs)
+            for (WOWGUID const& guid : _encounterNPCs)
             {
                 if (guid.GetEntry() == NPC_DP_BEAM_STALKER)
                 {
@@ -125,7 +125,7 @@ public:
                             }
                         });
 
-                        for (ObjectGuid const& guid : _encounterNPCs)
+                        for (WOWGUID const& guid : _encounterNPCs)
                         {
                             if (Creature* creature = instance->GetCreature(guid))
                             {
@@ -353,7 +353,7 @@ public:
                                 medivh->SetImmuneToNPC(true);
                                 medivh->AI()->Talk(SAY_MEDIVH_DEATH);
 
-                                for (ObjectGuid const& guid : _encounterNPCs)
+                                for (WOWGUID const& guid : _encounterNPCs)
                                 {
                                     if (Creature* creature = instance->GetCreature(guid))
                                     {
@@ -377,7 +377,7 @@ public:
                                             medivh->KillSelf(false);
 
                                             GuidSet encounterNPCSCopy = _encounterNPCs;
-                                            for (ObjectGuid const& guid : encounterNPCSCopy)
+                                            for (WOWGUID const& guid : encounterNPCSCopy)
                                             {
                                                 switch (guid.GetEntry())
                                                 {
@@ -400,7 +400,7 @@ public:
                                         _scheduler.Schedule(2s, [this](TaskContext)
                                         {
                                             GuidSet encounterNPCSCopy = _encounterNPCs;
-                                            for (ObjectGuid const& guid : encounterNPCSCopy)
+                                            for (WOWGUID const& guid : encounterNPCSCopy)
                                             {
                                                 // Don't despawn permanent visual effect NPC twice or it won't respawn correctly
                                                 if (guid.GetEntry() == NPC_DP_BEAM_STALKER)

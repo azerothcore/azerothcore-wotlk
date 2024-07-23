@@ -33,7 +33,7 @@
 
 void User::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
     uint32 questStatus = DIALOG_STATUS_NONE;
 
@@ -80,7 +80,7 @@ void User::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
 
 void User::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_HELLO npc {}", guid.ToString());
@@ -112,7 +112,7 @@ void User::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
 
 void User::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 questId;
     uint32 unk1;
     recvData >> guid >> questId >> unk1;
@@ -202,7 +202,7 @@ void User::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
 
 void User::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 questId;
     uint8 unk1;
     recvData >> guid >> questId >> unk1;
@@ -250,7 +250,7 @@ void User::HandleQuestQueryOpcode(WorldPacket& recvData)
 void User::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 {
     uint32 questId, reward;
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid >> questId >> reward;
 
     if (reward >= QUEST_REWARD_CHOICES_COUNT)
@@ -355,7 +355,7 @@ void User::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
 void User::HandleQuestgiverRequestRewardOpcode(WorldPacket& recvData)
 {
     uint32 questId;
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid >> questId;
 
     LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_REQUEST_REWARD npc {}, quest = {}", guid.ToString(), questId);
@@ -487,7 +487,7 @@ void User::HandleQuestConfirmAccept(WorldPacket& recvData)
 void User::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
 {
     uint32 questId;
-    ObjectGuid guid;
+    WOWGUID guid;
 
     recvData >> guid >> questId;
 
@@ -616,7 +616,7 @@ void User::HandlePushQuestToParty(WorldPacket& recvPacket)
 
 void User::HandleQuestPushResult(WorldPacket& recvPacket)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 questId;
     uint8 msg;
     recvPacket >> guid >> questId >> msg;

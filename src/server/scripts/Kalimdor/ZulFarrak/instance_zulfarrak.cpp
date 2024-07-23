@@ -117,13 +117,13 @@ public:
     {
         instance_zulfarrak_InstanceMapScript(Map* map) : InstanceScript(map) { }
 
-        ObjectGuid EndDoorGUID;
-        ObjectGuid BlyGUID;
-        ObjectGuid WeegliGUID;
-        ObjectGuid OroGUID;
-        ObjectGuid RavenGUID;
-        ObjectGuid MurtaGUID;
-        ObjectGuid ShadowpriestGUID;
+        WOWGUID EndDoorGUID;
+        WOWGUID BlyGUID;
+        WOWGUID WeegliGUID;
+        WOWGUID OroGUID;
+        WOWGUID RavenGUID;
+        WOWGUID MurtaGUID;
+        WOWGUID ShadowpriestGUID;
 
         GuidList addsAtBase;
         GuidList movedadds;
@@ -234,7 +234,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 data) const override
+        WOWGUID GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -254,7 +254,7 @@ public:
                     return EndDoorGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void Update(uint32 diff) override

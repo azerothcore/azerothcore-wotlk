@@ -18,7 +18,7 @@
 #define GuildPackets_h__
 
 #include "Guild.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Packet.h"
 #include "PacketUtilities.h"
 #include <array>
@@ -104,7 +104,7 @@ namespace WorldPackets
 
         struct GuildRosterMemberData
         {
-            ObjectGuid Guid;
+            WOWGUID Guid;
             int64 WeeklyXP = 0;
             int64 TotalXP = 0;
             int32 RankID = 0;
@@ -208,13 +208,13 @@ namespace WorldPackets
 
             uint8 Type = 0;
             boost::container::static_vector<std::string_view, 3> Params;
-            ObjectGuid Guid;
+            WOWGUID Guid;
         };
 
         struct GuildEventEntry
         {
-            ObjectGuid PlayerGUID;
-            ObjectGuid OtherGUID;
+            WOWGUID PlayerGUID;
+            WOWGUID OtherGUID;
             uint8 TransactionType = 0;
             uint8 RankID = 0;
             uint32 TransactionDate = 0;
@@ -373,7 +373,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Banker;
+            WOWGUID Banker;
             bool FullUpdate = false;
         };
 
@@ -384,7 +384,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Banker;
+            WOWGUID Banker;
             uint8 BankTab = 0;
         };
 
@@ -395,7 +395,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Banker;
+            WOWGUID Banker;
             uint8 BankTab = 0;
             String<16, Strings::NoHyperlinks> Name;
             String<100> Icon;
@@ -408,7 +408,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Banker;
+            WOWGUID Banker;
             uint32 Money = 0;
         };
 
@@ -419,7 +419,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Banker;
+            WOWGUID Banker;
             uint8 Tab = 0;
             bool FullUpdate = false;
         };
@@ -449,7 +449,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Banker;
+            WOWGUID Banker;
             uint32 Money = 0;
         };
 
@@ -505,7 +505,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Banker;
+            WOWGUID Banker;
             int32 StackCount = 0;
             int32 BankItemCount = 0;
             uint32 ItemID = 0;
@@ -533,7 +533,7 @@ namespace WorldPackets
 
         struct GuildBankLogEntry
         {
-            ObjectGuid PlayerGUID;
+            WOWGUID PlayerGUID;
             uint32 TimeOffset = 0;
             int8 EntryType = 0;
             uint32 Money = 0;
@@ -602,7 +602,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid Vendor;
+            WOWGUID Vendor;
             int32 BStyle = 0;
             int32 EStyle = 0;
             int32 BColor = 0;

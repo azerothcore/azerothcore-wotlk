@@ -254,7 +254,7 @@ public:
 
     private:
         EventMap _events;
-        ObjectGuid _tigerGuid;
+        WOWGUID _tigerGuid;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

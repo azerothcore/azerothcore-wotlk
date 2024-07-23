@@ -94,7 +94,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -119,7 +119,7 @@ public:
                 case NPC_DARKMASTER_GANDLING:
                     return GandlingGUID;
             }
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void SetData(uint32 type, uint32 data) override
@@ -228,17 +228,17 @@ public:
         }
 
     protected:
-        ObjectGuid GateKirtonosGUID;
-        ObjectGuid GateMiliciaGUID;
-        ObjectGuid GateTheolenGUID;
-        ObjectGuid GatePolkeltGUID;
-        ObjectGuid GateRavenianGUID;
-        ObjectGuid GateBarovGUID;
-        ObjectGuid GateIlluciaGUID;
-        ObjectGuid BrazierKirtonosGUID;
+        WOWGUID GateKirtonosGUID;
+        WOWGUID GateMiliciaGUID;
+        WOWGUID GateTheolenGUID;
+        WOWGUID GatePolkeltGUID;
+        WOWGUID GateRavenianGUID;
+        WOWGUID GateBarovGUID;
+        WOWGUID GateIlluciaGUID;
+        WOWGUID BrazierKirtonosGUID;
 
-        ObjectGuid GandlingGatesGUID[7]; // 6 is the entrance
-        ObjectGuid GandlingGUID; // boss
+        WOWGUID GandlingGatesGUID[7]; // 6 is the entrance
+        WOWGUID GandlingGUID; // boss
 
         uint32 _kirtonosState;
         uint32 _miniBosses;

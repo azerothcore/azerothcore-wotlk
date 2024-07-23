@@ -44,7 +44,7 @@ ArenaTeam::~ArenaTeam()
 {
 }
 
-bool ArenaTeam::Create(ObjectGuid captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor)
+bool ArenaTeam::Create(WOWGUID captainGuid, uint8 type, std::string const& teamName, uint32 backgroundColor, uint8 emblemStyle, uint32 emblemColor, uint8 borderStyle, uint32 borderColor)
 {
     // Check if captain is present
     if (!ObjectAccessor::FindConnectedPlayer(captainGuid))
@@ -86,7 +86,7 @@ bool ArenaTeam::Create(ObjectGuid captainGuid, uint8 type, std::string const& te
     return true;
 }
 
-bool ArenaTeam::AddMember(ObjectGuid playerGuid)
+bool ArenaTeam::AddMember(WOWGUID playerGuid)
 {
     std::string playerName;
     uint8 playerClass;
@@ -202,7 +202,7 @@ bool ArenaTeam::LoadArenaTeamFromDB(QueryResult result)
 
     TeamId            = fields[0].Get<uint32>();
     TeamName          = fields[1].Get<std::string>();
-    CaptainGuid       = ObjectGuid::Create<HighGuid::Player>(fields[2].Get<uint32>());
+    CaptainGuid       = WOWGUID::Create<HighGuid::Player>(fields[2].Get<uint32>());
     Type              = fields[3].Get<uint8>();
     BackgroundColor   = fields[4].Get<uint32>();
     EmblemStyle       = fields[5].Get<uint8>();
@@ -241,7 +241,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
             break;
 
         ArenaTeamMember newMember;
-        newMember.Guid             = ObjectGuid::Create<HighGuid::Player>(fields[1].Get<uint32>());
+        newMember.Guid             = WOWGUID::Create<HighGuid::Player>(fields[1].Get<uint32>());
         newMember.WeekGames        = fields[2].Get<uint16>();
         newMember.WeekWins         = fields[3].Get<uint16>();
         newMember.SeasonGames      = fields[4].Get<uint16>();
@@ -292,7 +292,7 @@ bool ArenaTeam::SetName(std::string const& name)
     return true;
 }
 
-void ArenaTeam::SetCaptain(ObjectGuid guid)
+void ArenaTeam::SetCaptain(WOWGUID guid)
 {
     // Disable remove/promote buttons
     Player* oldCaptain = ObjectAccessor::FindConnectedPlayer(GetCaptain());
@@ -321,7 +321,7 @@ void ArenaTeam::SetCaptain(ObjectGuid guid)
     }
 }
 
-void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
+void ArenaTeam::DelMember(WOWGUID guid, bool cleanDb)
 {
     Player* player = ObjectAccessor::FindConnectedPlayer(guid);
     Group* group = (player && player->GetGroup()) ? player->GetGroup() : nullptr;
@@ -389,7 +389,7 @@ void ArenaTeam::Disband(User* session)
     // Broadcast update
     if (session)
     {
-        BroadcastEvent(ERR_ARENA_TEAM_DISBANDED_S, ObjectGuid::Empty, 2, session->GetPlayerName(), GetName(), "");
+        BroadcastEvent(ERR_ARENA_TEAM_DISBANDED_S, WOWGUID::Empty, 2, session->GetPlayerName(), GetName(), "");
     }
 
     // Update database
@@ -510,7 +510,7 @@ void ArenaTeam::NotifyStatsChanged()
             SendStats(player->User());
 }
 
-void ArenaTeam::Inspect(User* session, ObjectGuid guid)
+void ArenaTeam::Inspect(User* session, WOWGUID guid)
 {
     ArenaTeamMember* member = GetMember(guid);
     if (!member || GetSlot() >= MAX_ARENA_SLOT)
@@ -567,7 +567,7 @@ void ArenaTeam::BroadcastPacket(WorldPacket* packet)
             player->User()->Send(packet);
 }
 
-void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
+void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, WOWGUID guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
 {
     WorldPacket data(SMSG_ARENA_TEAM_EVENT, 1 + 1 + 1);
     data << uint8(event);
@@ -640,7 +640,7 @@ uint8 ArenaTeam::GetSlotByType(uint32 type)
     return 0xFF;
 }
 
-bool ArenaTeam::IsMember(ObjectGuid guid) const
+bool ArenaTeam::IsMember(WOWGUID guid) const
 {
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (itr->Guid == guid)
@@ -897,7 +897,7 @@ void ArenaTeam::MemberWon(Player* player, uint32 againstMatchmakerRating, int32 
     }
 }
 
-void ArenaTeam::UpdateArenaPointsHelper(std::map<ObjectGuid, uint32>& playerPoints)
+void ArenaTeam::UpdateArenaPointsHelper(std::map<WOWGUID, uint32>& playerPoints)
 {
     // Called after a match has ended and the stats are already modified
     // Helper function for arena point distribution (this way, when distributing, no actual calculation is required, just a few comparisons)
@@ -915,7 +915,7 @@ void ArenaTeam::UpdateArenaPointsHelper(std::map<ObjectGuid, uint32>& playerPoin
         if (itr->WeekGames >= requiredGames)
             pointsToAdd = GetPoints(itr->PersonalRating);
 
-        std::map<ObjectGuid, uint32>::iterator plr_itr = playerPoints.find(itr->Guid);
+        std::map<WOWGUID, uint32>::iterator plr_itr = playerPoints.find(itr->Guid);
         if (plr_itr != playerPoints.end())
         {
             // Check if there is already more points
@@ -1009,7 +1009,7 @@ ArenaTeamMember* ArenaTeam::GetMember(const std::string& name)
     return GetMember(sCharacterCache->GetCharacterGuidByName(name));
 }
 
-ArenaTeamMember* ArenaTeam::GetMember(ObjectGuid guid)
+ArenaTeamMember* ArenaTeam::GetMember(WOWGUID guid)
 {
     for (MemberList::iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (itr->Guid == guid)

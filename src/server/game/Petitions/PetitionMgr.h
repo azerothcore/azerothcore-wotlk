@@ -19,7 +19,7 @@
 #define _PETITIONMGR_H
 
 #include "Common.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 
 #include <map>
 
@@ -34,24 +34,24 @@ enum CharterItemIDs
     ARENA_TEAM_CHARTER_5v5  = 23562
 };
 
-typedef std::map<ObjectGuid, uint32> SignatureMap;
+typedef std::map<WOWGUID, uint32> SignatureMap;
 
 struct Petition
 {
-    ObjectGuid petitionGuid;
-    ObjectGuid ownerGuid;
+    WOWGUID petitionGuid;
+    WOWGUID ownerGuid;
     uint8  petitionType;
     std::string petitionName;
 };
 
 struct Signatures
 {
-    ObjectGuid petitionGuid;
+    WOWGUID petitionGuid;
     SignatureMap signatureMap;
 };
 
-typedef std::map<ObjectGuid, Signatures> SignatureContainer;
-typedef std::map<ObjectGuid, Petition> PetitionContainer;
+typedef std::map<WOWGUID, Signatures> SignatureContainer;
+typedef std::map<WOWGUID, Petition> PetitionContainer;
 
 class PetitionMgr
 {
@@ -66,18 +66,18 @@ public:
     void LoadSignatures();
 
     // Petitions
-    void AddPetition(ObjectGuid petitionGUID, ObjectGuid ownerGuid, std::string const& name, uint8 type);
-    void RemovePetition(ObjectGuid petitionGUID);
-    void RemovePetitionByOwnerAndType(ObjectGuid ownerGuid, uint8 type);
-    Petition const* GetPetition(ObjectGuid petitionGUID) const;
-    Petition const* GetPetitionByOwnerWithType(ObjectGuid ownerGuid, uint8 type) const;
+    void AddPetition(WOWGUID petitionGUID, WOWGUID ownerGuid, std::string const& name, uint8 type);
+    void RemovePetition(WOWGUID petitionGUID);
+    void RemovePetitionByOwnerAndType(WOWGUID ownerGuid, uint8 type);
+    Petition const* GetPetition(WOWGUID petitionGUID) const;
+    Petition const* GetPetitionByOwnerWithType(WOWGUID ownerGuid, uint8 type) const;
     PetitionContainer* GetPetitionStore() { return &PetitionStore; }
 
     // Signatures
-    void AddSignature(ObjectGuid petitionGUID, uint32 accountId, ObjectGuid playerGuid);
-    void RemoveSignaturesByPlayer(ObjectGuid playerGuid);
-    void RemoveSignaturesByPlayerAndType(ObjectGuid playerGuid, uint8 type);
-    Signatures const* GetSignature(ObjectGuid petitionGUID) const;
+    void AddSignature(WOWGUID petitionGUID, uint32 accountId, WOWGUID playerGuid);
+    void RemoveSignaturesByPlayer(WOWGUID playerGuid);
+    void RemoveSignaturesByPlayerAndType(WOWGUID playerGuid, uint8 type);
+    Signatures const* GetSignature(WOWGUID petitionGUID) const;
     SignatureContainer* GetSignatureStore() { return &SignatureStore; }
 
 protected:

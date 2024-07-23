@@ -538,7 +538,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+        if (handler->HasLowerSecurity(target, WOWGUID::Empty))
         {
             return false;
         }

@@ -50,7 +50,7 @@ enum TotemImmunitySpells
 class Totem : public Minion
 {
 public:
-    explicit Totem(SummonPropertiesEntry const* properties, ObjectGuid owner);
+    explicit Totem(SummonPropertiesEntry const* properties, WOWGUID owner);
     ~Totem() override {};
     void Update(uint32 time) override;
     void InitStats(uint32 duration) override;

@@ -216,7 +216,7 @@ public:
 
         // We declare all the required variables
         uint32 playerGuid = player->User()->GetAccountId();
-        ObjectGuid::LowType characterGuid = player->GetGUID().GetCounter();
+        WOWGUID::LowType characterGuid = player->GetGUID().GetCounter();
         const std::string currentIp = player->User()->GetRemoteAddress();
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it...
 
@@ -274,18 +274,18 @@ public:
     }
 
     // CHARACTER_DELETE = 10
-    void OnDelete(ObjectGuid guid, uint32 accountId) override
+    void OnDelete(WOWGUID guid, uint32 accountId) override
     {
         DeleteIPLogAction(guid, accountId, CHARACTER_DELETE);
     }
 
     // CHARACTER_FAILED_DELETE = 11
-    void OnFailedDelete(ObjectGuid guid, uint32 accountId) override
+    void OnFailedDelete(WOWGUID guid, uint32 accountId) override
     {
         DeleteIPLogAction(guid, accountId, CHARACTER_FAILED_DELETE);
     }
 
-    void DeleteIPLogAction(ObjectGuid guid, ObjectGuid::LowType playerGuid, IPLoggingTypes aType)
+    void DeleteIPLogAction(WOWGUID guid, WOWGUID::LowType playerGuid, IPLoggingTypes aType)
     {
         if (!sWorld->getBoolConfig(CONFIG_IP_BASED_ACTION_LOGGING))
             return;
@@ -294,7 +294,7 @@ public:
         // Else, this script isn't loaded in the first place: We require no config check.
 
         // We declare all the required variables
-        ObjectGuid::LowType characterGuid = guid.GetCounter(); // We have no access to any member function of Player* or User*. So use old-fashioned way.
+        WOWGUID::LowType characterGuid = guid.GetCounter(); // We have no access to any member function of Player* or User*. So use old-fashioned way.
         // Query playerGuid/accountId, as we only have characterGuid
         std::string systemNote = "ERROR"; // "ERROR" is a placeholder here. We change it later.
 

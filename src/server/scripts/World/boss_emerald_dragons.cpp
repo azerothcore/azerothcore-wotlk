@@ -219,7 +219,7 @@ public:
             });
         }
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(WOWGUID guid, int32 type) override
         {
             if (type == GUID_DRAGON)
             {
@@ -256,8 +256,8 @@ public:
         }
 
     private:
-        ObjectGuid _targetGUID;
-        ObjectGuid _dragonGUID;
+        WOWGUID _targetGUID;
+        WOWGUID _dragonGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -483,7 +483,7 @@ public:
         }
 
     private:
-        ObjectGuid _summonerGuid;
+        WOWGUID _summonerGuid;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

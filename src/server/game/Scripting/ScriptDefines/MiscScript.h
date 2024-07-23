@@ -18,7 +18,7 @@
 #ifndef SCRIPT_OBJECT_MISC_SCRIPT_H_
 #define SCRIPT_OBJECT_MISC_SCRIPT_H_
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "ScriptObject.h"
 #include <vector>
 
@@ -75,7 +75,7 @@ public:
 
     [[nodiscard]] virtual bool CanItemApplyEquipSpell(Player* /*player*/, Item* /*item*/) { return true; }
 
-    [[nodiscard]] virtual bool CanSendAuctionHello(User const* /*session*/, ObjectGuid /*guid*/, Creature* /*creature*/) { return true; }
+    [[nodiscard]] virtual bool CanSendAuctionHello(User const* /*session*/, WOWGUID /*guid*/, Creature* /*creature*/) { return true; }
 
     virtual void ValidateSpellAtCastSpell(Player* /*player*/, uint32& /*oldSpellId*/, uint32& /*spellId*/, uint8& /*castCount*/, uint8& /*castFlags*/) { }
 

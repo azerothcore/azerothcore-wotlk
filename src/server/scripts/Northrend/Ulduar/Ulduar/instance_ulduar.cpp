@@ -52,85 +52,85 @@ public:
         int m_difficulty;
 
         // Bosses
-        ObjectGuid m_uiLeviathanGUID;
-        ObjectGuid m_uiIgnisGUID;
-        ObjectGuid m_uiRazorscaleGUID;
-        ObjectGuid m_uiXT002GUID;
-        ObjectGuid m_auiAssemblyGUIDs[3];
-        ObjectGuid m_uiKologarnGUID;
-        ObjectGuid m_uiAuriayaGUID;
-        ObjectGuid m_uiMimironGUID;
-        ObjectGuid m_uiHodirGUID;
-        ObjectGuid m_uiThorimGUID;
-        ObjectGuid m_uiFreyaGUID;
-        ObjectGuid m_uiVezaxGUID;
-        ObjectGuid m_uiYoggSaronGUID;
-        ObjectGuid m_uiAlgalonGUID;
+        WOWGUID m_uiLeviathanGUID;
+        WOWGUID m_uiIgnisGUID;
+        WOWGUID m_uiRazorscaleGUID;
+        WOWGUID m_uiXT002GUID;
+        WOWGUID m_auiAssemblyGUIDs[3];
+        WOWGUID m_uiKologarnGUID;
+        WOWGUID m_uiAuriayaGUID;
+        WOWGUID m_uiMimironGUID;
+        WOWGUID m_uiHodirGUID;
+        WOWGUID m_uiThorimGUID;
+        WOWGUID m_uiFreyaGUID;
+        WOWGUID m_uiVezaxGUID;
+        WOWGUID m_uiYoggSaronGUID;
+        WOWGUID m_uiAlgalonGUID;
 
         // Flame Leviathan
-        ObjectGuid m_leviathanDoorsGUID;
-        ObjectGuid m_leviathanVisualTowers[4][2];
-        ObjectGuid m_RepairSGUID[2];
-        ObjectGuid m_lightningWalls[2];
+        WOWGUID m_leviathanDoorsGUID;
+        WOWGUID m_leviathanVisualTowers[4][2];
+        WOWGUID m_RepairSGUID[2];
+        WOWGUID m_lightningWalls[2];
         bool m_leviathanTowers[4];
         GuidList _leviathanVehicles;
         uint32 m_unbrokenAchievement;
         uint32 m_mageBarrier;
 
         // Razorscale
-        ObjectGuid m_RazorscaleHarpoonFireStateGUID[4];
+        WOWGUID m_RazorscaleHarpoonFireStateGUID[4];
 
         // XT-002
-        ObjectGuid m_xt002DoorsGUID;
+        WOWGUID m_xt002DoorsGUID;
 
         // Kologarn
-        ObjectGuid KologarnDoorGUID;
+        WOWGUID KologarnDoorGUID;
 
         // Assembly of Iron
-        ObjectGuid m_assemblyDoorsGUID;
-        ObjectGuid m_archivumDoorsGUID;
+        WOWGUID m_assemblyDoorsGUID;
+        WOWGUID m_archivumDoorsGUID;
 
         // Thorim
-        ObjectGuid m_thorimGameobjectsGUID[5];
+        WOWGUID m_thorimGameobjectsGUID[5];
 
         // Hodir's chests
         bool hmHodir;
-        ObjectGuid m_hodirNormalChest;
-        ObjectGuid m_hodirHardmodeChest;
+        WOWGUID m_hodirNormalChest;
+        WOWGUID m_hodirHardmodeChest;
         Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
         Position hardChestPosition = { 2035.94600f, -202.084885f, 432.686859f, 3.164077f };
 
         // Mimiron Tram
-        ObjectGuid m_mimironTramGUID;
-        ObjectGuid m_mimironActivateTramGUID;
-        ObjectGuid m_mimironTramRocketBoosterGUID;
-        ObjectGuid m_mimironTramTurnaround1GUID;
-        ObjectGuid m_mimironTramTurnaround2GUID;
-        ObjectGuid m_mimironCallTramCenterGUID;
-        ObjectGuid m_mimironCallTramMimironGUID;
+        WOWGUID m_mimironTramGUID;
+        WOWGUID m_mimironActivateTramGUID;
+        WOWGUID m_mimironTramRocketBoosterGUID;
+        WOWGUID m_mimironTramTurnaround1GUID;
+        WOWGUID m_mimironTramTurnaround2GUID;
+        WOWGUID m_mimironCallTramCenterGUID;
+        WOWGUID m_mimironCallTramMimironGUID;
 
         // Mimiron
-        ObjectGuid m_MimironDoor[3];
-        ObjectGuid m_MimironLeviathanMKIIguid;
-        ObjectGuid m_MimironVX001guid;
-        ObjectGuid m_MimironACUguid;
+        WOWGUID m_MimironDoor[3];
+        WOWGUID m_MimironLeviathanMKIIguid;
+        WOWGUID m_MimironVX001guid;
+        WOWGUID m_MimironACUguid;
 
         // Freya
-        ObjectGuid m_FreyaElder[3];
+        WOWGUID m_FreyaElder[3];
         uint32 m_conspeedatoryAttempt;
 
         // Yogg-Saron
-        ObjectGuid m_saraGUID;
-        ObjectGuid m_yoggsaronBrainGUID;
-        ObjectGuid m_yoggsaronDoorsGUID;
+        WOWGUID m_saraGUID;
+        WOWGUID m_yoggsaronBrainGUID;
+        WOWGUID m_yoggsaronDoorsGUID;
 
         // Algalon
-        ObjectGuid m_algalonSigilDoorGUID[3];
-        ObjectGuid m_algalonFloorGUID[2];
-        ObjectGuid m_algalonUniverseGUID;
-        ObjectGuid m_algalonTrapdoorGUID;
-        ObjectGuid m_brannBronzebeardAlgGUID;
-        ObjectGuid m_brannBronzebeardBaseCamp;
+        WOWGUID m_algalonSigilDoorGUID[3];
+        WOWGUID m_algalonFloorGUID[2];
+        WOWGUID m_algalonUniverseGUID;
+        WOWGUID m_algalonTrapdoorGUID;
+        WOWGUID m_brannBronzebeardAlgGUID;
+        WOWGUID m_brannBronzebeardBaseCamp;
         uint32 m_algalonTimer;
 
         // Ancient Gate
@@ -139,8 +139,8 @@ public:
         // Shared
         EventMap _events;
         bool m_mimironTramUsed;
-        ObjectGuid m_keepersgateGUID;
-        ObjectGuid m_keepersGossipGUID[4];
+        WOWGUID m_keepersgateGUID;
+        WOWGUID m_keepersGossipGUID[4];
 
         void Initialize() override
         {
@@ -929,7 +929,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 data) const override
+        WOWGUID GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -1051,7 +1051,7 @@ public:
                     return m_brannBronzebeardAlgGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         uint32 GetData(uint32 type) const override
@@ -1313,7 +1313,7 @@ void instance_ulduar::instance_ulduar_InstanceMapScript::SpawnLeviathanEncounter
 {
     if (!_leviathanVehicles.empty())
     {
-        for (ObjectGuid const& guid : _leviathanVehicles)
+        for (WOWGUID const& guid : _leviathanVehicles)
         {
             if (Creature* cr = instance->GetCreature(guid))
             {

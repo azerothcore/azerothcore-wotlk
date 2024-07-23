@@ -327,7 +327,7 @@ public:
         uint32 EventTimer;
         uint32 checkPlayerTimer;
 
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         bool EventOnWait;
 

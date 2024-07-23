@@ -53,7 +53,7 @@ void HashMapHolder<T>::Remove(T* o)
 }
 
 template<class T>
-T* HashMapHolder<T>::Find(ObjectGuid guid)
+T* HashMapHolder<T>::Find(WOWGUID guid)
 {
     std::shared_lock<std::shared_mutex> lock(*GetLock());
 
@@ -115,7 +115,7 @@ namespace PlayerNameMapHolder
 
 } // namespace PlayerNameMapHolder
 
-WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, ObjectGuid const guid)
+WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, WOWGUID const guid)
 {
     switch (guid.GetHigh())
     {
@@ -141,7 +141,7 @@ WorldObject* ObjectAccessor::GetWorldObject(WorldObject const& p, ObjectGuid con
     return nullptr;
 }
 
-Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, ObjectGuid const guid, uint32 typemask)
+Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, WOWGUID const guid, uint32 typemask)
 {
     switch (guid.GetHigh())
     {
@@ -179,27 +179,27 @@ Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, ObjectGuid con
     return nullptr;
 }
 
-Corpse* ObjectAccessor::GetCorpse(WorldObject const& u, ObjectGuid const guid)
+Corpse* ObjectAccessor::GetCorpse(WorldObject const& u, WOWGUID const guid)
 {
     return u.GetMap()->GetCorpse(guid);
 }
 
-GameObject* ObjectAccessor::GetGameObject(WorldObject const& u, ObjectGuid const guid)
+GameObject* ObjectAccessor::GetGameObject(WorldObject const& u, WOWGUID const guid)
 {
     return u.GetMap()->GetGameObject(guid);
 }
 
-Transport* ObjectAccessor::GetTransport(WorldObject const& u, ObjectGuid const guid)
+Transport* ObjectAccessor::GetTransport(WorldObject const& u, WOWGUID const guid)
 {
     return u.GetMap()->GetTransport(guid);
 }
 
-DynamicObject* ObjectAccessor::GetDynamicObject(WorldObject const& u, ObjectGuid const guid)
+DynamicObject* ObjectAccessor::GetDynamicObject(WorldObject const& u, WOWGUID const guid)
 {
     return u.GetMap()->GetDynamicObject(guid);
 }
 
-Unit* ObjectAccessor::GetUnit(WorldObject const& u, ObjectGuid const guid)
+Unit* ObjectAccessor::GetUnit(WorldObject const& u, WOWGUID const guid)
 {
     if (guid.IsPlayer())
         return GetPlayer(u, guid);
@@ -210,17 +210,17 @@ Unit* ObjectAccessor::GetUnit(WorldObject const& u, ObjectGuid const guid)
     return GetCreature(u, guid);
 }
 
-Creature* ObjectAccessor::GetCreature(WorldObject const& u, ObjectGuid const guid)
+Creature* ObjectAccessor::GetCreature(WorldObject const& u, WOWGUID const guid)
 {
     return u.GetMap()->GetCreature(guid);
 }
 
-Pet* ObjectAccessor::GetPet(WorldObject const& u, ObjectGuid const guid)
+Pet* ObjectAccessor::GetPet(WorldObject const& u, WOWGUID const guid)
 {
     return u.GetMap()->GetPet(guid);
 }
 
-Player* ObjectAccessor::GetPlayer(Map const* m, ObjectGuid const guid)
+Player* ObjectAccessor::GetPlayer(Map const* m, WOWGUID const guid)
 {
     if (Player * player = HashMapHolder<Player>::Find(guid))
         if (player->IsInWorld() && player->GetMap() == m)
@@ -229,12 +229,12 @@ Player* ObjectAccessor::GetPlayer(Map const* m, ObjectGuid const guid)
     return nullptr;
 }
 
-Player* ObjectAccessor::GetPlayer(WorldObject const& u, ObjectGuid const guid)
+Player* ObjectAccessor::GetPlayer(WorldObject const& u, WOWGUID const guid)
 {
     return GetPlayer(u.GetMap(), guid);
 }
 
-Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, ObjectGuid const guid)
+Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, WOWGUID const guid)
 {
     if (guid.IsPet())
         return GetPet(u, guid);
@@ -245,19 +245,19 @@ Creature* ObjectAccessor::GetCreatureOrPetOrVehicle(WorldObject const& u, Object
     return nullptr;
 }
 
-Player* ObjectAccessor::FindPlayer(ObjectGuid const guid)
+Player* ObjectAccessor::FindPlayer(WOWGUID const guid)
 {
     Player* player = HashMapHolder<Player>::Find(guid);
     return player && player->IsInWorld() ? player : nullptr;
 }
 
-Player* ObjectAccessor::FindPlayerByLowGUID(ObjectGuid::LowType lowguid)
+Player* ObjectAccessor::FindPlayerByLowGUID(WOWGUID::LowType lowguid)
 {
-    ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>(lowguid);
+    WOWGUID guid = WOWGUID::Create<HighGuid::Player>(lowguid);
     return ObjectAccessor::FindPlayer(guid);
 }
 
-Player* ObjectAccessor::FindConnectedPlayer(ObjectGuid const guid)
+Player* ObjectAccessor::FindConnectedPlayer(WOWGUID const guid)
 {
     return HashMapHolder<Player>::Find(guid);
 }

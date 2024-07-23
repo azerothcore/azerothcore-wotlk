@@ -1994,7 +1994,7 @@ bool SmartAIMgr::IsTextValid(SmartScriptHolder const& e, uint32 id)
             default:
                 if (e.entryOrGuid < 0)
                 {
-                    ObjectGuid::LowType guid = ObjectGuid::LowType(-e.entryOrGuid);
+                    WOWGUID::LowType guid = WOWGUID::LowType(-e.entryOrGuid);
                     CreatureData const* data = sObjectMgr->GetCreatureData(guid);
                     if (!data)
                     {

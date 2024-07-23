@@ -465,7 +465,7 @@ public:
 
         EventMap events;
         bool _isActive;
-        ObjectGuid _attackGUID;
+        WOWGUID _attackGUID;
 
         void Reset() override
         {

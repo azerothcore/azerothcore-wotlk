@@ -22,7 +22,7 @@
 #include "DBCStructure.h"
 #include "DatabaseEnv.h"
 #include "EventProcessor.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "WorldPacket.h"
 #include <unordered_map>
 
@@ -101,15 +101,15 @@ struct AuctionEntry
 {
     uint32 Id;
     uint8 houseId;
-    ObjectGuid item_guid;
+    WOWGUID item_guid;
     uint32 item_template;
     uint32 itemCount;
-    ObjectGuid owner;
+    WOWGUID owner;
     uint32 startbid;                                        //maybe useless
     uint32 bid;
     uint32 buyout;
     time_t expire_time;
-    ObjectGuid bidder;
+    WOWGUID bidder;
     uint32 deposit;                                         //deposit can be calculated only when creating auction
     AuctionHouseEntry const* auctionHouseEntry;             // in AuctionHouse.dbc
 
@@ -122,7 +122,7 @@ struct AuctionEntry
     void SaveToDB(CharacterDatabaseTransaction trans) const;
     bool LoadFromDB(Field* fields);
     [[nodiscard]] std::string BuildAuctionMailSubject(MailAuctionAnswers response) const;
-    static std::string BuildAuctionMailBody(ObjectGuid guid, uint32 bid, uint32 buyout, uint32 deposit = 0, uint32 cut = 0, uint32 moneyDelay = 0, uint32 eta = 0);
+    static std::string BuildAuctionMailBody(WOWGUID guid, uint32 bid, uint32 buyout, uint32 deposit = 0, uint32 cut = 0, uint32 moneyDelay = 0, uint32 eta = 0);
 };
 
 //this class is used as auctionhouse instance
@@ -178,14 +178,14 @@ private:
     ~AuctionHouseMgr();
 
 public:
-    typedef std::unordered_map<ObjectGuid, Item*> ItemMap;
+    typedef std::unordered_map<WOWGUID, Item*> ItemMap;
 
     static AuctionHouseMgr* instance();
 
     AuctionHouseObject* GetAuctionsMap(uint32 factionTemplateId);
     AuctionHouseObject* GetAuctionsMapByHouseId(uint8 auctionHouseId);
 
-    Item* GetAItem(ObjectGuid itemGuid)
+    Item* GetAItem(WOWGUID itemGuid)
     {
         ItemMap::const_iterator itr = _mAitems.find(itemGuid);
         if (itr != _mAitems.end())
@@ -212,7 +212,7 @@ public:
     void LoadAuctions();
 
     void AddAItem(Item* it);
-    bool RemoveAItem(ObjectGuid itemGuid, bool deleteFromDB = false, CharacterDatabaseTransaction* trans = nullptr);
+    bool RemoveAItem(WOWGUID itemGuid, bool deleteFromDB = false, CharacterDatabaseTransaction* trans = nullptr);
 
     void Update();
 

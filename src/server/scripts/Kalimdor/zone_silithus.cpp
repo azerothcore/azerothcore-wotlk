@@ -312,12 +312,12 @@ public:
         uint32 AnimationTimer;
         uint8 AnimationCount;
 
-        ObjectGuid AnachronosQuestTriggerGUID;
-        ObjectGuid MerithraGUID;
-        ObjectGuid ArygosGUID;
-        ObjectGuid CaelestraszGUID;
-        ObjectGuid FandralGUID;
-        ObjectGuid PlayerGUID;
+        WOWGUID AnachronosQuestTriggerGUID;
+        WOWGUID MerithraGUID;
+        WOWGUID ArygosGUID;
+        WOWGUID CaelestraszGUID;
+        WOWGUID FandralGUID;
+        WOWGUID PlayerGUID;
         bool eventEnd;
 
         void Reset() override
@@ -643,8 +643,8 @@ public:
     {
         npc_qiraj_war_spawnAI(Creature* creature) : ScriptedAI(creature) { }
 
-        ObjectGuid MobGUID;
-        ObjectGuid PlayerGUID;
+        WOWGUID MobGUID;
+        WOWGUID PlayerGUID;
         uint32 SpellTimer1, SpellTimer2, SpellTimer3, SpellTimer4;
         bool Timers;
         bool hasTarget;
@@ -759,7 +759,7 @@ public:
     {
         npc_anachronos_quest_triggerAI(Creature* creature) : ScriptedAI(creature) { }
 
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         uint32 WaveTimer;
         uint32 AnnounceTimer;
@@ -1006,7 +1006,7 @@ enum WindStone
 class DelayedWindstoneSummonEvent : public BasicEvent
 {
 public:
-    DelayedWindstoneSummonEvent(TempSummon* summon, ObjectGuid playerGUID) : _summon(summon), _playerGUID(playerGUID) { }
+    DelayedWindstoneSummonEvent(TempSummon* summon, WOWGUID playerGUID) : _summon(summon), _playerGUID(playerGUID) { }
 
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
@@ -1020,7 +1020,7 @@ public:
 
 private:
     TempSummon* _summon;
-    ObjectGuid _playerGUID;
+    WOWGUID _playerGUID;
 };
 
 class go_wind_stone : public GameObjectScript
@@ -1201,7 +1201,7 @@ public:
         }
 
         private:
-            ObjectGuid _creatureGuid;
+            WOWGUID _creatureGuid;
     };
 
     GameObjectAI* GetAI(GameObject* go) const

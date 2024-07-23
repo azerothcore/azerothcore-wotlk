@@ -18,20 +18,20 @@
 #include "BattlegroundSpamProtect.h"
 #include "Battleground.h"
 #include "GameTime.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Player.h"
 #include "World.h"
 
 namespace
 {
-    std::unordered_map<ObjectGuid /*player guid*/, uint32 /*time*/> _players;
+    std::unordered_map<WOWGUID /*player guid*/, uint32 /*time*/> _players;
 
-    void AddTime(ObjectGuid guid)
+    void AddTime(WOWGUID guid)
     {
         _players.insert_or_assign(guid, GameTime::GetGameTime().count());
     }
 
-    uint32 GetTime(ObjectGuid guid)
+    uint32 GetTime(WOWGUID guid)
     {
         auto const& itr = _players.find(guid);
         if (itr != _players.end())
@@ -42,7 +42,7 @@ namespace
         return 0;
     }
 
-    bool IsCorrectDelay(ObjectGuid guid)
+    bool IsCorrectDelay(WOWGUID guid)
     {
         // Skip if spam time < 30 secs (default)
         return GameTime::GetGameTime().count() - GetTime(guid) >= sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY);
@@ -57,7 +57,7 @@ BGSpamProtect* BGSpamProtect::instance()
 
 bool BGSpamProtect::CanAnnounce(Player* player, Battleground* bg, uint32 minLevel, uint32 queueTotal)
 {
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
 
     // Check prev time
     if (!IsCorrectDelay(guid))

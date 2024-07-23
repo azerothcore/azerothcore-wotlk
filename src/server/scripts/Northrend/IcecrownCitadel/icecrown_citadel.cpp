@@ -575,9 +575,9 @@ public:
     private:
         EventMap _events;
         InstanceScript* const _instance;
-        ObjectGuid _theLichKing;
-        ObjectGuid _bolvarFordragon;
-        ObjectGuid _factionNPC;
+        WOWGUID _theLichKing;
+        WOWGUID _bolvarFordragon;
+        WOWGUID _factionNPC;
         uint16 _damnedKills;
     };
 
@@ -772,7 +772,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 type/* = 0*/) override
+        void SetGUID(WOWGUID guid, int32 type/* = 0*/) override
         {
             if (type == ACTION_VRYKUL_DEATH)
             {

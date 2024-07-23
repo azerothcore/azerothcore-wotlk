@@ -154,7 +154,7 @@ class AbominationDespawner
 public:
     explicit AbominationDespawner(Unit* owner) : _owner(owner) { }
 
-    bool operator()(ObjectGuid guid)
+    bool operator()(WOWGUID guid)
     {
         if (Unit* summon = ObjectAccessor::GetUnit(*_owner, guid))
         {
@@ -743,9 +743,9 @@ public:
         me->SetReactState(REACT_PASSIVE);
     }
 
-    ObjectGuid targetGUID;
+    WOWGUID targetGUID;
 
-    void SetGUID(ObjectGuid guid, int32 type) override
+    void SetGUID(WOWGUID guid, int32 type) override
     {
         if (type == -1)
             targetGUID = guid;

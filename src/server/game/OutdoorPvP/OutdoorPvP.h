@@ -99,7 +99,7 @@ public:
     void SendUpdateWorldState(uint32 field, uint32 value);
 
     // send kill notify to players in the controlling faction
-    void SendObjectiveComplete(uint32 id, ObjectGuid guid = ObjectGuid::Empty);
+    void SendObjectiveComplete(uint32 id, WOWGUID guid = WOWGUID::Empty);
 
     // used when player is activated/inactivated in the area
     virtual bool HandlePlayerEnter(Player* player);
@@ -122,11 +122,11 @@ public:
     virtual bool HandleDropFlag(Player* player, uint32 spellId);
     virtual void DeleteSpawns();
 
-    ObjectGuid::LowType m_capturePointSpawnId{};
+    WOWGUID::LowType m_capturePointSpawnId{};
     GameObject* _capturePoint{};
 
-    void AddGO(uint32 type, ObjectGuid::LowType guid, uint32 entry = 0);
-    void AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entry = 0);
+    void AddGO(uint32 type, WOWGUID::LowType guid, uint32 entry = 0);
+    void AddCre(uint32 type, WOWGUID::LowType guid, uint32 entry = 0);
 
     bool SetCapturePointData(uint32 entry, uint32 map, float x, float y, float z, float o = 0,
                              float rotation0 = 0, float rotation1 = 0, float rotation2 = 0, float rotation3 = 0);
@@ -175,10 +175,10 @@ protected:
     // map to store the various game objects and creatures
     // spawned by the objective
     //        type, guid
-    std::unordered_map<uint32, ObjectGuid::LowType> _objects;
-    std::unordered_map<uint32, ObjectGuid::LowType> _creatures;
-    std::unordered_map<ObjectGuid::LowType, uint32> _objectTypes;
-    std::unordered_map<ObjectGuid::LowType, uint32> _creatureTypes;
+    std::unordered_map<uint32, WOWGUID::LowType> _objects;
+    std::unordered_map<uint32, WOWGUID::LowType> _creatures;
+    std::unordered_map<WOWGUID::LowType, uint32> _objectTypes;
+    std::unordered_map<WOWGUID::LowType, uint32> _creatureTypes;
 };
 
 // base class for specific outdoor pvp handlers
@@ -196,9 +196,9 @@ public:
     // deletes all gos/creatures spawned by the pvp
     void DeleteSpawns();
 
-    typedef std::map<ObjectGuid::LowType/*lowguid*/, OPvPCapturePoint*> OPvPCapturePointMap;
-    typedef std::pair<ObjectGuid::LowType, GameObject*> GoScriptPair;
-    typedef std::pair<ObjectGuid::LowType, Creature*> CreatureScriptPair;
+    typedef std::map<WOWGUID::LowType/*lowguid*/, OPvPCapturePoint*> OPvPCapturePointMap;
+    typedef std::pair<WOWGUID::LowType, GameObject*> GoScriptPair;
+    typedef std::pair<WOWGUID::LowType, Creature*> CreatureScriptPair;
 
     virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
 
@@ -256,7 +256,7 @@ protected:
         _capturePoints[cp->m_capturePointSpawnId] = cp;
     }
 
-    OPvPCapturePoint* GetCapturePoint(ObjectGuid::LowType spawnId) const;
+    OPvPCapturePoint* GetCapturePoint(WOWGUID::LowType spawnId) const;
     void RegisterZone(uint32 zoneid);
     bool HasPlayer(Player const* player) const;
     void TeamCastSpell(TeamId team, int32 spellId, Player* sameMapPlr = nullptr);
@@ -270,8 +270,8 @@ protected:
     uint32 _typeId{};
     bool _sendUpdate{ true };
     Map* _map{};
-    std::unordered_map<ObjectGuid::LowType, GameObject*> _goScriptStore;
-    std::unordered_map<ObjectGuid::LowType, Creature*> _creatureScriptStore;
+    std::unordered_map<WOWGUID::LowType, GameObject*> _goScriptStore;
+    std::unordered_map<WOWGUID::LowType, Creature*> _creatureScriptStore;
 };
 
 #endif /*OUTDOOR_PVP_H_*/

@@ -937,7 +937,7 @@ public:
         {
             InitWaypoint();
             Reset();
-            Start(false, true, ObjectGuid::Empty, nullptr, false, true);
+            Start(false, true, WOWGUID::Empty, nullptr, false, true);
         }
 
         uint32 _checkTimer;
@@ -1665,7 +1665,7 @@ public:
         }
 
         uint32 _checkTimer;
-        ObjectGuid _playerGUID;
+        WOWGUID _playerGUID;
 
         Unit* SelectConstrictTarget()
         {
@@ -2253,7 +2253,7 @@ public:
             {
                 case 40:
                     {
-                        ObjectGuid _guid = _targets.at(_current);
+                        WOWGUID _guid = _targets.at(_current);
                         ++_current;
 
                         if (Player* player = ObjectAccessor::GetPlayer(*me, _guid))
@@ -2383,7 +2383,7 @@ class spell_yogg_saron_brain_link_aura : public AuraScript
     }
 
 protected:
-    ObjectGuid _targetGUID;
+    WOWGUID _targetGUID;
 };
 
 // 64465 - Shadow Beacon

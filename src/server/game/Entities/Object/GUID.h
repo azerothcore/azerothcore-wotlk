@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ObjectGuid_h__
-#define ObjectGuid_h__
+#ifndef _GUID_H_
+#define _GUID_H_
 
 #include "ByteBuffer.h"
 #include "Define.h"
@@ -105,32 +105,32 @@ GUID_TRAIT_MAP_SPECIFIC(HighGuid::GameObject)
 GUID_TRAIT_MAP_SPECIFIC(HighGuid::DynamicObject)
 GUID_TRAIT_MAP_SPECIFIC(HighGuid::Corpse)
 
-class ObjectGuid;
+class WOWGUID;
 class SmartGUID;
 
 struct PackedGuidReader
 {
-    explicit PackedGuidReader(ObjectGuid& guid) : Guid(guid) { }
-    ObjectGuid& Guid;
+    explicit PackedGuidReader(WOWGUID& guid) : Guid(guid) { }
+    WOWGUID& Guid;
 };
 
-class ObjectGuid
+class WOWGUID
 {
     public:
-        static ObjectGuid const Empty;
+        static WOWGUID const Empty;
 
         typedef uint32 LowType;
 
         template<HighGuid type>
-        static typename std::enable_if<ObjectGuidTraits<type>::Global, ObjectGuid>::type Create(LowType counter) { return Global(type, counter); }
+        static typename std::enable_if<ObjectGuidTraits<type>::Global, WOWGUID>::type Create(LowType counter) { return Global(type, counter); }
 
         template<HighGuid type>
-        static typename std::enable_if<ObjectGuidTraits<type>::MapSpecific, ObjectGuid>::type Create(uint32 entry, LowType counter) { return MapSpecific(type, entry, counter); }
+        static typename std::enable_if<ObjectGuidTraits<type>::MapSpecific, WOWGUID>::type Create(uint32 entry, LowType counter) { return MapSpecific(type, entry, counter); }
 
-        ObjectGuid()  = default;
-        explicit ObjectGuid(uint64 guid) : _guid(guid) { }
-        ObjectGuid(HighGuid hi, uint32 entry, LowType counter) : _guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) { }
-        ObjectGuid(HighGuid hi, LowType counter) : _guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) { }
+        WOWGUID()  = default;
+        explicit WOWGUID(uint64 guid) : _guid(guid) { }
+        WOWGUID(HighGuid hi, uint32 entry, LowType counter) : _guid(counter ? uint64(counter) | (uint64(entry) << 24) | (uint64(hi) << 48) : 0) { }
+        WOWGUID(HighGuid hi, LowType counter) : _guid(counter ? uint64(counter) | (uint64(hi) << 48) : 0) { }
 
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
 
@@ -156,7 +156,7 @@ class ObjectGuid
                    : LowType(0xFFFFFFFF);
         }
 
-        [[nodiscard]] ObjectGuid::LowType GetMaxCounter() const { return GetMaxCounter(GetHigh()); }
+        [[nodiscard]] WOWGUID::LowType GetMaxCounter() const { return GetMaxCounter(GetHigh()); }
 
         [[nodiscard]] bool IsEmpty()             const { return _guid == 0; }
         [[nodiscard]] bool IsCreature()          const { return GetHigh() == HighGuid::Unit; }
@@ -202,10 +202,10 @@ class ObjectGuid
 
         operator bool() const { return !IsEmpty(); }
         bool operator!() const { return !(bool(*this)); }
-        bool operator==(ObjectGuid const& guid) const { return GetRawValue() == guid.GetRawValue(); }
-        bool operator!=(ObjectGuid const& guid) const { return GetRawValue() != guid.GetRawValue(); }
-        bool operator< (ObjectGuid const& guid) const { return GetRawValue() < guid.GetRawValue(); }
-        bool operator<= (ObjectGuid const& guid) const { return GetRawValue() <= guid.GetRawValue(); }
+        bool operator==(WOWGUID const& guid) const { return GetRawValue() == guid.GetRawValue(); }
+        bool operator!=(WOWGUID const& guid) const { return GetRawValue() != guid.GetRawValue(); }
+        bool operator< (WOWGUID const& guid) const { return GetRawValue() < guid.GetRawValue(); }
+        bool operator<= (WOWGUID const& guid) const { return GetRawValue() <= guid.GetRawValue(); }
 
         static char const* GetTypeName(HighGuid high);
         [[nodiscard]] char const* GetTypeName() const { return !IsEmpty() ? GetTypeName(GetHigh()) : "None"; }
@@ -236,12 +236,12 @@ class ObjectGuid
 
         [[nodiscard]] bool HasEntry() const { return HasEntry(GetHigh()); }
 
-        static ObjectGuid Global(HighGuid type, LowType counter);
-        static ObjectGuid MapSpecific(HighGuid type, uint32 entry, LowType counter);
+        static WOWGUID Global(HighGuid type, LowType counter);
+        static WOWGUID MapSpecific(HighGuid type, uint32 entry, LowType counter);
 
-        explicit ObjectGuid(uint32 const&) = delete;                // no implementation, used to catch wrong type assignment
-        ObjectGuid(HighGuid, uint32, uint64 counter) = delete;      // no implementation, used to catch wrong type assignment
-        ObjectGuid(HighGuid, uint64 counter) = delete;              // no implementation, used to catch wrong type assignment
+        explicit WOWGUID(uint32 const&) = delete;                // no implementation, used to catch wrong type assignment
+        WOWGUID(HighGuid, uint32, uint64 counter) = delete;      // no implementation, used to catch wrong type assignment
+        WOWGUID(HighGuid, uint64 counter) = delete;              // no implementation, used to catch wrong type assignment
 
         // used to catch wrong type assignment
         operator int64() const = delete;
@@ -250,11 +250,11 @@ class ObjectGuid
 };
 
 // Some Shared defines
-typedef std::set<ObjectGuid> GuidSet;
-typedef std::list<ObjectGuid> GuidList;
-typedef std::deque<ObjectGuid> GuidDeque;
-typedef std::vector<ObjectGuid> GuidVector;
-typedef std::unordered_set<ObjectGuid> GuidUnorderedSet;
+typedef std::set<WOWGUID> GuidSet;
+typedef std::list<WOWGUID> GuidList;
+typedef std::deque<WOWGUID> GuidDeque;
+typedef std::vector<WOWGUID> GuidVector;
+typedef std::unordered_set<WOWGUID> GuidUnorderedSet;
 
 // minimum buffer size for packed guid is 9 bytes
 #define PACKED_GUID_MIN_BUFFER_SIZE 9
@@ -266,10 +266,10 @@ class SmartGUID
     public:
         explicit SmartGUID() : m_packedGUID(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGUID.appendPackGUID(0); }
         explicit SmartGUID(uint64 guid) : m_packedGUID(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGUID.appendPackGUID(guid); }
-        explicit SmartGUID(ObjectGuid guid) : m_packedGUID(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGUID.appendPackGUID(guid.GetRawValue()); }
+        explicit SmartGUID(WOWGUID guid) : m_packedGUID(PACKED_GUID_MIN_BUFFER_SIZE) { m_packedGUID.appendPackGUID(guid.GetRawValue()); }
 
         void Pack(uint64 guid) { m_packedGUID.wpos(0); m_packedGUID.appendPackGUID(guid); }
-        void Pack(ObjectGuid guid) { m_packedGUID.wpos(0); m_packedGUID.appendPackGUID(guid.GetRawValue()); }
+        void Pack(WOWGUID guid) { m_packedGUID.wpos(0); m_packedGUID.appendPackGUID(guid.GetRawValue()); }
 
         [[nodiscard]] std::size_t size() const { return m_packedGUID.size(); }
 
@@ -280,52 +280,52 @@ class SmartGUID
 class ObjectGuidGeneratorBase
 {
 public:
-    ObjectGuidGeneratorBase(ObjectGuid::LowType start = 1) : _nextGuid(start) { }
+    ObjectGuidGeneratorBase(WOWGUID::LowType start = 1) : _nextGuid(start) { }
 
-    virtual void Set(ObjectGuid::LowType val) { _nextGuid = val; }
-    virtual ObjectGuid::LowType Generate() = 0;
-    [[nodiscard]] ObjectGuid::LowType GetNextAfterMaxUsed() const { return _nextGuid; }
+    virtual void Set(WOWGUID::LowType val) { _nextGuid = val; }
+    virtual WOWGUID::LowType Generate() = 0;
+    [[nodiscard]] WOWGUID::LowType GetNextAfterMaxUsed() const { return _nextGuid; }
     virtual ~ObjectGuidGeneratorBase() = default;
 
 protected:
     static void HandleCounterOverflow(HighGuid high);
-    ObjectGuid::LowType _nextGuid;
+    WOWGUID::LowType _nextGuid;
 };
 
 template<HighGuid high>
 class ObjectGuidGenerator : public ObjectGuidGeneratorBase
 {
 public:
-    explicit ObjectGuidGenerator(ObjectGuid::LowType start = 1) : ObjectGuidGeneratorBase(start) { }
+    explicit ObjectGuidGenerator(WOWGUID::LowType start = 1) : ObjectGuidGeneratorBase(start) { }
 
-    ObjectGuid::LowType Generate() override
+    WOWGUID::LowType Generate() override
     {
-        if (_nextGuid >= ObjectGuid::GetMaxCounter(high) - 1)
+        if (_nextGuid >= WOWGUID::GetMaxCounter(high) - 1)
             HandleCounterOverflow(high);
 
         return _nextGuid++;
     }
 };
 
-ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
-ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid&       guid);
+ByteBuffer& operator<<(ByteBuffer& buf, WOWGUID const& guid);
+ByteBuffer& operator>>(ByteBuffer& buf, WOWGUID&       guid);
 
 ByteBuffer& operator<<(ByteBuffer& buf, SmartGUID const& guid);
 ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid);
 
-inline SmartGUID ObjectGuid::WriteAsPacked() const { return SmartGUID(*this); }
+inline SmartGUID WOWGUID::WriteAsPacked() const { return SmartGUID(*this); }
 
 namespace std
 {
     template<>
-    struct hash<ObjectGuid>
+    struct hash<WOWGUID>
     {
         public:
-            std::size_t operator()(ObjectGuid const& key) const
+            std::size_t operator()(WOWGUID const& key) const
             {
                 return std::hash<uint64>()(key.GetRawValue());
             }
     };
 }
 
-#endif // ObjectGuid_h__
+#endif // _GUID_H_

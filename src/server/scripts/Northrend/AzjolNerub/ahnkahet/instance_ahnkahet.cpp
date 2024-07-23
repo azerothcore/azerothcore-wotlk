@@ -61,7 +61,7 @@ public:
                 case GO_TELDARAM_PLATFORM:
                 {
                     taldaramPlatform_GUID = go->GetGUID();
-                    HandleGameObject(ObjectGuid::Empty, IsAllSpheresActivated(), go);
+                    HandleGameObject(WOWGUID::Empty, IsAllSpheresActivated(), go);
                     break;
                 }
                 case GO_TELDARAM_SPHERE1:
@@ -111,7 +111,7 @@ public:
 
     private:
         // Teldaram related
-        ObjectGuid taldaramPlatform_GUID;
+        WOWGUID taldaramPlatform_GUID;
 
         bool IsAllSpheresActivated() const
         {

@@ -95,7 +95,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        ObjectGuid TargetGUID;
+        WOWGUID TargetGUID;
 
         void Reset() override
         {
@@ -247,7 +247,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         void Reset() override
         {
@@ -789,7 +789,7 @@ public:
 
         InstanceScript* pInstance;
         EventMap events;
-        ObjectGuid TargetGUID;
+        WOWGUID TargetGUID;
         float destX, destY, destZ;
 
         void AttackStart(Unit* who) override
@@ -895,7 +895,7 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->AttackStop();
                     me->GetMotionMaster()->MoveJump(Locs[LOC_CENTER].GetPositionX(), Locs[LOC_CENTER].GetPositionY(), Locs[LOC_CENTER].GetPositionZ(), 40.0f, 12.0f);
-                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, WOWGUID::Empty);
                     events.Reset();
                     events.RescheduleEvent(EVENT_SPELL_MASSIVE_CRASH, 2s);
                     break;
@@ -971,7 +971,7 @@ public:
                     me->DisableSpline();
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveCharge(destX, destY, destZ + 1.0f, 65.0f);
-                    me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
+                    me->SetGuidValue(UNIT_FIELD_TARGET, WOWGUID::Empty);
                     events.RescheduleEvent(EVENT_CHECK_TRAMPLE_PLAYERS, 100ms);
 
                     break;

@@ -85,7 +85,7 @@ public:
                         c->CastSpell(s, SPELL_FROST_TOMB_AURA, true);
                 }
         }
-        ObjectGuid PrisonerGUID;
+        WOWGUID PrisonerGUID;
 
         void JustDied(Unit* killer) override
         {

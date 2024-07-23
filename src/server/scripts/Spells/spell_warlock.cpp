@@ -152,7 +152,7 @@ class spell_warl_seduction : public AuraScript
                 if (owner->GetAuraEffectDummy(56250))
                 {
                     Unit* target = GetTarget();
-                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, target->GetAura(32409)); // SW:D shall not be removed.
+                    target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, WOWGUID::Empty, target->GetAura(32409)); // SW:D shall not be removed.
                     target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
                     target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH);
                 }
@@ -242,7 +242,7 @@ class spell_warl_demonic_aegis : public AuraScript
     void HandleAuraApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         // Remove Fel Armor and Demon Armor
-        GetTarget()->RemoveAurasWithFamily(SPELLFAMILY_WARLOCK, 0, 0x20000020, 0, ObjectGuid::Empty);
+        GetTarget()->RemoveAurasWithFamily(SPELLFAMILY_WARLOCK, 0, 0x20000020, 0, WOWGUID::Empty);
     }
 
     void Register() override

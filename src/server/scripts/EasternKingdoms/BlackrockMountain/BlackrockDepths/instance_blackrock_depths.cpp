@@ -115,39 +115,39 @@ public:
         uint32 encounter[MAX_ENCOUNTER];
         std::string str_data;
 
-        ObjectGuid EmperorGUID;
-        ObjectGuid PhalanxGUID;
-        ObjectGuid MagmusGUID;
-        ObjectGuid MoiraGUID;
-        ObjectGuid PriestessGUID;
-        ObjectGuid IronhandGUID[6];
-        ObjectGuid CorenGUID;
+        WOWGUID EmperorGUID;
+        WOWGUID PhalanxGUID;
+        WOWGUID MagmusGUID;
+        WOWGUID MoiraGUID;
+        WOWGUID PriestessGUID;
+        WOWGUID IronhandGUID[6];
+        WOWGUID CorenGUID;
 
-        ObjectGuid GoArena1GUID;
-        ObjectGuid GoArena2GUID;
-        ObjectGuid GoArena3GUID;
-        ObjectGuid GoArena4GUID;
-        ObjectGuid GoShadowLockGUID;
-        ObjectGuid GoShadowMechGUID;
-        ObjectGuid GoShadowGiantGUID;
-        ObjectGuid GoShadowDummyGUID;
-        ObjectGuid GoBarKegGUID;
-        ObjectGuid GoBarKegTrapGUID;
-        ObjectGuid GoBarDoorGUID;
-        ObjectGuid GoTombEnterGUID;
-        ObjectGuid GoTombExitGUID;
-        ObjectGuid GoLyceumGUID;
-        ObjectGuid GoSFSGUID;
-        ObjectGuid GoSFNGUID;
-        ObjectGuid GoGolemNGUID;
-        ObjectGuid GoGolemSGUID;
-        ObjectGuid GoThroneGUID;
-        ObjectGuid GoChestGUID;
-        ObjectGuid GoSpectralChaliceGUID;
+        WOWGUID GoArena1GUID;
+        WOWGUID GoArena2GUID;
+        WOWGUID GoArena3GUID;
+        WOWGUID GoArena4GUID;
+        WOWGUID GoShadowLockGUID;
+        WOWGUID GoShadowMechGUID;
+        WOWGUID GoShadowGiantGUID;
+        WOWGUID GoShadowDummyGUID;
+        WOWGUID GoBarKegGUID;
+        WOWGUID GoBarKegTrapGUID;
+        WOWGUID GoBarDoorGUID;
+        WOWGUID GoTombEnterGUID;
+        WOWGUID GoTombExitGUID;
+        WOWGUID GoLyceumGUID;
+        WOWGUID GoSFSGUID;
+        WOWGUID GoSFNGUID;
+        WOWGUID GoGolemNGUID;
+        WOWGUID GoGolemSGUID;
+        WOWGUID GoThroneGUID;
+        WOWGUID GoChestGUID;
+        WOWGUID GoSpectralChaliceGUID;
 
         uint32 BarAleCount;
         uint32 GhostKillCount;
-        ObjectGuid TombBossGUIDs[7];
+        WOWGUID TombBossGUIDs[7];
         uint32 tombResetTimer;
         uint32 TombTimer;
         uint32 TombEventCounter;
@@ -155,7 +155,7 @@ public:
         uint32 IronhandCounter;
 
         GuidList ArgelmachAdds;
-        ObjectGuid ArgelmachGUID;
+        WOWGUID ArgelmachGUID;
 
         TempSummon* TempSummonGrimstone = nullptr;
         Position GrimstonePositon = Position(625.559f, -205.618f, -52.735f, 2.609f);
@@ -163,11 +163,11 @@ public:
         uint8 arenaMobsToSpawn;
         uint8 arenaBossToSpawn;
 
-        std::vector<ObjectGuid> ArenaSpectators;
+        std::vector<WOWGUID> ArenaSpectators;
         Position CenterOfRingOfLaw = Position(595.289, -186.56);
 
-        ObjectGuid EmperorSenators[5];
-        std::vector<ObjectGuid> EmperorSenatorsVector;
+        WOWGUID EmperorSenators[5];
+        std::vector<WOWGUID> EmperorSenatorsVector;
         Position EmperorSpawnPos = Position(1380.52, -831, 115);
 
         void OnPlayerEnter(Player* /* player */) override
@@ -178,8 +178,8 @@ public:
 
         void ReplaceMoiraIfSaved()
         {
-            ObjectGuid* GUIDToReplace = &PriestessGUID; // default to having Moira
-            ObjectGuid* GUIDToSpawn   = &MoiraGUID;
+            WOWGUID* GUIDToReplace = &PriestessGUID; // default to having Moira
+            WOWGUID* GUIDToSpawn   = &MoiraGUID;
             uint32      NPCEntry      = NPC_MOIRA;
             bool        MoiraSaved    = true;
 
@@ -366,9 +366,9 @@ public:
                 case GO_TOMB_EXIT:
                     GoTombExitGUID = go->GetGUID();
                     if (GhostKillCount >= 7)
-                        HandleGameObject(ObjectGuid::Empty, true, go);
+                        HandleGameObject(WOWGUID::Empty, true, go);
                     else
-                        HandleGameObject(ObjectGuid::Empty, false, go);
+                        HandleGameObject(WOWGUID::Empty, false, go);
                     break;
                 case GO_LYCEUM:
                     GoLyceumGUID = go->GetGUID();
@@ -608,7 +608,7 @@ public:
                         argelmach->HandleEmoteCommand(EMOTE_ONESHOT_SHOUT);
                         argelmach->m_Events.AddEvent(new RestoreAttack(argelmach), argelmach->m_Events.CalculateTime(3000));
 
-                        for (ObjectGuid const& argelmachAddGUID : ArgelmachAdds)
+                        for (WOWGUID const& argelmachAddGUID : ArgelmachAdds)
                         {
                             if (Creature* argelmachAdd = instance->GetCreature(argelmachAddGUID))
                             {
@@ -670,7 +670,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 data) const override
+        WOWGUID GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -714,7 +714,7 @@ public:
                 }
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         std::string GetSaveData() override

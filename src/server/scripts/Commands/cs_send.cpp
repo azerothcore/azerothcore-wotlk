@@ -114,7 +114,7 @@ public:
         }
 
         // If the message is sent from console, set it as sent by the target itself, like the other Customer Support mails.
-        ObjectGuid::LowType senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : target->GetGUID().GetCounter();
+        WOWGUID::LowType senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : target->GetGUID().GetCounter();
 
         // fill mail
         MailDraft draft(subject, text);
@@ -149,7 +149,7 @@ public:
             return false;
         }
 
-        ObjectGuid::LowType senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : target->GetGUID().GetCounter();
+        WOWGUID::LowType senderGuid = handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : target->GetGUID().GetCounter();
 
         // If the message is sent from console, set it as sent by the target itself, like the other Customer Support mails.
         MailSender sender(MAIL_NORMAL, senderGuid, MAIL_STATIONERY_GM);

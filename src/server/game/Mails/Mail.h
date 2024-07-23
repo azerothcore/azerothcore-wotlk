@@ -20,7 +20,7 @@
 
 #include "Common.h"
 #include "DatabaseEnvFwd.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include <map>
 #include <utility>
 
@@ -105,20 +105,20 @@ private:
 class MailReceiver
 {
 public:                                                 // Constructors
-    explicit MailReceiver(ObjectGuid::LowType receiver_lowguid) : m_receiver(nullptr), m_receiver_lowguid(receiver_lowguid) {}
+    explicit MailReceiver(WOWGUID::LowType receiver_lowguid) : m_receiver(nullptr), m_receiver_lowguid(receiver_lowguid) {}
     MailReceiver(Player* receiver);
-    MailReceiver(Player* receiver, ObjectGuid::LowType receiver_lowguid);
+    MailReceiver(Player* receiver, WOWGUID::LowType receiver_lowguid);
 public:                                                 // Accessors
     [[nodiscard]] Player* GetPlayer() const { return m_receiver; }
-    [[nodiscard]] ObjectGuid::LowType  GetPlayerGUIDLow() const { return m_receiver_lowguid; }
+    [[nodiscard]] WOWGUID::LowType  GetPlayerGUIDLow() const { return m_receiver_lowguid; }
 private:
     Player* m_receiver;
-    ObjectGuid::LowType  m_receiver_lowguid;
+    WOWGUID::LowType  m_receiver_lowguid;
 };
 
 class MailDraft
 {
-    typedef std::map<ObjectGuid, Item*> MailItemMap;
+    typedef std::map<WOWGUID, Item*> MailItemMap;
 
 public:                                                 // Constructors
     explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
@@ -139,7 +139,7 @@ public:                                                 // modifiers
     MailDraft& AddCOD(uint32 COD) { m_COD = COD; return *this; }
 
 public:                                                 // finishers
-    void SendReturnToSender(uint32 sender_acc, ObjectGuid::LowType sender_guid, ObjectGuid::LowType receiver_guid, CharacterDatabaseTransaction trans);
+    void SendReturnToSender(uint32 sender_acc, WOWGUID::LowType sender_guid, WOWGUID::LowType receiver_guid, CharacterDatabaseTransaction trans);
     void SendMailTo(CharacterDatabaseTransaction trans, MailReceiver const& receiver, MailSender const& sender, MailCheckMask checked = MAIL_CHECK_MASK_NONE, uint32 deliver_delay = 0, uint32 custom_expiration = 0, bool deleteMailItemsFromDB = false, bool sendMail = true);
 
 private:
@@ -159,7 +159,7 @@ private:
 
 struct MailItemInfo
 {
-    ObjectGuid::LowType item_guid;
+    WOWGUID::LowType item_guid;
     uint32 item_template;
 };
 typedef std::vector<MailItemInfo> MailItemInfoVec;
@@ -171,7 +171,7 @@ struct Mail
     uint8 stationery;
     uint16 mailTemplateId;
     uint32 sender;
-    ObjectGuid::LowType receiver;
+    WOWGUID::LowType receiver;
     std::string subject;
     std::string body;
     std::vector<MailItemInfo> items;
@@ -183,7 +183,7 @@ struct Mail
     uint32 checked;
     MailState state;
 
-    void AddItem(ObjectGuid::LowType itemGuidLow, uint32 item_template)
+    void AddItem(WOWGUID::LowType itemGuidLow, uint32 item_template)
     {
         MailItemInfo mii;
         mii.item_guid = itemGuidLow;
@@ -191,7 +191,7 @@ struct Mail
         items.push_back(mii);
     }
 
-    bool RemoveItem(ObjectGuid::LowType item_guid)
+    bool RemoveItem(WOWGUID::LowType item_guid)
     {
         for (MailItemInfoVec::iterator itr = items.begin(); itr != items.end(); ++itr)
         {

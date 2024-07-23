@@ -222,7 +222,7 @@ struct boss_mor_grayhoof : public BossAI
 protected:
     TaskScheduler _scheduler;
     uint8 _phase;
-    ObjectGuid _sleepTargetGUID;
+    WOWGUID _sleepTargetGUID;
     float _sleepTargetThreat;
 };
 

@@ -71,7 +71,7 @@ void CalendarMgr::LoadFromDB()
             Field* fields = result->Fetch();
 
             uint64 eventId          = fields[0].Get<uint64>();
-            ObjectGuid creatorGUID  = ObjectGuid::Create<HighGuid::Player>(fields[1].Get<uint32>());
+            WOWGUID creatorGUID  = WOWGUID::Create<HighGuid::Player>(fields[1].Get<uint32>());
             std::string title       = fields[2].Get<std::string>();
             std::string description = fields[3].Get<std::string>();
             CalendarEventType type  = CalendarEventType(fields[4].Get<uint8>());
@@ -105,8 +105,8 @@ void CalendarMgr::LoadFromDB()
 
             uint64 inviteId             = fields[0].Get<uint64>();
             uint64 eventId              = fields[1].Get<uint64>();
-            ObjectGuid invitee          = ObjectGuid::Create<HighGuid::Player>(fields[2].Get<uint32>());
-            ObjectGuid senderGUID       = ObjectGuid::Create<HighGuid::Player>(fields[3].Get<uint32>());
+            WOWGUID invitee          = WOWGUID::Create<HighGuid::Player>(fields[2].Get<uint32>());
+            WOWGUID senderGUID       = WOWGUID::Create<HighGuid::Player>(fields[3].Get<uint32>());
             CalendarInviteStatus status = CalendarInviteStatus(fields[4].Get<uint8>());
             uint32 statusTime           = fields[5].Get<uint32>();
             CalendarModerationRank rank = CalendarModerationRank(fields[6].Get<uint8>());
@@ -154,7 +154,7 @@ void CalendarMgr::AddInvite(CalendarEvent* calendarEvent, CalendarInvite* invite
     }
 }
 
-void CalendarMgr::RemoveEvent(uint64 eventId, ObjectGuid remover)
+void CalendarMgr::RemoveEvent(uint64 eventId, WOWGUID remover)
 {
     CalendarEvent* calendarEvent = GetEvent(eventId);
 
@@ -167,7 +167,7 @@ void CalendarMgr::RemoveEvent(uint64 eventId, ObjectGuid remover)
     RemoveEvent(calendarEvent, remover);
 }
 
-void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover)
+void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, WOWGUID remover)
 {
     if (!calendarEvent)
     {
@@ -209,7 +209,7 @@ void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover)
     return;
 }
 
-void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, ObjectGuid /*remover*/)
+void CalendarMgr::RemoveInvite(uint64 inviteId, uint64 eventId, WOWGUID /*remover*/)
 {
     CalendarEvent* calendarEvent = GetEvent(eventId);
 
@@ -273,7 +273,7 @@ void CalendarMgr::UpdateInvite(CalendarInvite* invite, CharacterDatabaseTransact
     CharacterDatabase.ExecuteOrAppend(trans, stmt);
 }
 
-void CalendarMgr::RemoveAllPlayerEventsAndInvites(ObjectGuid guid)
+void CalendarMgr::RemoveAllPlayerEventsAndInvites(WOWGUID guid)
 {
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end();)
     {
@@ -281,7 +281,7 @@ void CalendarMgr::RemoveAllPlayerEventsAndInvites(ObjectGuid guid)
         ++itr;
         if (event->GetCreatorGUID() == guid)
         {
-            RemoveEvent(event, ObjectGuid::Empty);
+            RemoveEvent(event, WOWGUID::Empty);
             continue;
         }
     }
@@ -291,7 +291,7 @@ void CalendarMgr::RemoveAllPlayerEventsAndInvites(ObjectGuid guid)
         RemoveInvite((*itr)->GetInviteId(), (*itr)->GetEventId(), guid);
 }
 
-void CalendarMgr::RemovePlayerGuildEventsAndSignups(ObjectGuid guid, uint32 guildId)
+void CalendarMgr::RemovePlayerGuildEventsAndSignups(WOWGUID guid, uint32 guildId)
 {
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
         if ((*itr)->GetCreatorGUID() == guid && ((*itr)->IsGuildEvent() || (*itr)->IsGuildAnnouncement()))
@@ -369,11 +369,11 @@ void CalendarMgr::DeleteOldEvents()
         CalendarEvent* event = *itr;
         ++itr;
         if (event->GetEventTime() < oldEventsTime)
-            RemoveEvent(event, ObjectGuid::Empty);
+            RemoveEvent(event, WOWGUID::Empty);
     }
 }
 
-CalendarEventStore CalendarMgr::GetEventsCreatedBy(ObjectGuid guid, bool includeGuildEvents)
+CalendarEventStore CalendarMgr::GetEventsCreatedBy(WOWGUID guid, bool includeGuildEvents)
 {
     CalendarEventStore result;
     for (CalendarEventStore::const_iterator itr = _events.begin(); itr != _events.end(); ++itr)
@@ -398,7 +398,7 @@ CalendarEventStore CalendarMgr::GetGuildEvents(uint32 guildId)
     return result;
 }
 
-CalendarEventStore CalendarMgr::GetPlayerEvents(ObjectGuid guid)
+CalendarEventStore CalendarMgr::GetPlayerEvents(WOWGUID guid)
 {
     CalendarEventStore events;
 
@@ -422,7 +422,7 @@ CalendarInviteStore const& CalendarMgr::GetEventInvites(uint64 eventId)
     return _invites[eventId];
 }
 
-CalendarInviteStore CalendarMgr::GetPlayerInvites(ObjectGuid guid)
+CalendarInviteStore CalendarMgr::GetPlayerInvites(WOWGUID guid)
 {
     CalendarInviteStore invites;
 
@@ -434,7 +434,7 @@ CalendarInviteStore CalendarMgr::GetPlayerInvites(ObjectGuid guid)
     return invites;
 }
 
-uint32 CalendarMgr::GetPlayerNumPending(ObjectGuid guid)
+uint32 CalendarMgr::GetPlayerNumPending(WOWGUID guid)
 {
     CalendarInviteStore const& invites = GetPlayerInvites(guid);
 
@@ -456,7 +456,7 @@ uint32 CalendarMgr::GetPlayerNumPending(ObjectGuid guid)
     return pendingNum;
 }
 
-std::string CalendarEvent::BuildCalendarMailSubject(ObjectGuid remover) const
+std::string CalendarEvent::BuildCalendarMailSubject(WOWGUID remover) const
 {
     std::ostringstream strm;
     strm << remover.ToString() << ':' << _title;
@@ -482,7 +482,7 @@ void CalendarMgr::SendCalendarEventInvite(CalendarInvite const& invite)
     time_t statusTime = invite.GetStatusTime();
     bool hasStatusTime = statusTime != 946684800;   // 01/01/2000 00:00:00
 
-    ObjectGuid invitee = invite.GetInviteeGUID();
+    WOWGUID invitee = invite.GetInviteeGUID();
     Player* player = ObjectAccessor::FindConnectedPlayer(invitee);
 
     uint8 level = player ? player->GetLevel() : sCharacterCache->GetCharacterLevelByGuid(invitee);
@@ -600,7 +600,7 @@ void CalendarMgr::SendCalendarEventInviteAlert(CalendarEvent const& calendarEven
         player->SendDirectMessage(&data);
 }
 
-void CalendarMgr::SendCalendarEvent(ObjectGuid guid, CalendarEvent const& calendarEvent, CalendarSendEventType sendType)
+void CalendarMgr::SendCalendarEvent(WOWGUID guid, CalendarEvent const& calendarEvent, CalendarSendEventType sendType)
 {
     Player* player = ObjectAccessor::FindConnectedPlayer(guid);
     if (!player)
@@ -627,7 +627,7 @@ void CalendarMgr::SendCalendarEvent(ObjectGuid guid, CalendarEvent const& calend
     for (CalendarInviteStore::const_iterator itr = eventInviteeList.begin(); itr != eventInviteeList.end(); ++itr)
     {
         CalendarInvite const* calendarInvite = (*itr);
-        ObjectGuid inviteeGuid = calendarInvite->GetInviteeGUID();
+        WOWGUID inviteeGuid = calendarInvite->GetInviteeGUID();
         Player* invitee = ObjectAccessor::FindConnectedPlayer(inviteeGuid);
 
         uint8 inviteeLevel = invitee ? invitee->GetLevel() : sCharacterCache->GetCharacterLevelByGuid(inviteeGuid);
@@ -646,7 +646,7 @@ void CalendarMgr::SendCalendarEvent(ObjectGuid guid, CalendarEvent const& calend
     player->SendDirectMessage(&data);
 }
 
-void CalendarMgr::SendCalendarEventInviteRemoveAlert(ObjectGuid guid, CalendarEvent const& calendarEvent, CalendarInviteStatus status)
+void CalendarMgr::SendCalendarEventInviteRemoveAlert(WOWGUID guid, CalendarEvent const& calendarEvent, CalendarInviteStatus status)
 {
     if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
     {
@@ -660,7 +660,7 @@ void CalendarMgr::SendCalendarEventInviteRemoveAlert(ObjectGuid guid, CalendarEv
     }
 }
 
-void CalendarMgr::SendCalendarClearPendingAction(ObjectGuid guid)
+void CalendarMgr::SendCalendarClearPendingAction(WOWGUID guid)
 {
     if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
     {
@@ -669,7 +669,7 @@ void CalendarMgr::SendCalendarClearPendingAction(ObjectGuid guid)
     }
 }
 
-void CalendarMgr::SendCalendarCommandResult(ObjectGuid guid, CalendarError err, char const* param /*= nullptr*/)
+void CalendarMgr::SendCalendarCommandResult(WOWGUID guid, CalendarError err, char const* param /*= nullptr*/)
 {
     if (Player* player = ObjectAccessor::FindConnectedPlayer(guid))
     {

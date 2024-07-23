@@ -30,7 +30,7 @@ class DynamicObject;
 class GameObject;
 class Pet;
 class Player;
-class ObjectGuid;
+class WOWGUID;
 
 #define MAX_NUMBER_OF_CELLS     8
 
@@ -79,7 +79,7 @@ typedef NGrid<MAX_NUMBER_OF_CELLS, Player, AllWorldObjectTypes, AllGridObjectTyp
 
 typedef TypeMapContainer<AllGridObjectTypes> GridTypeMapContainer;
 typedef TypeMapContainer<AllWorldObjectTypes> WorldTypeMapContainer;
-typedef TypeUnorderedMapContainer<AllMapStoredObjectTypes, ObjectGuid> MapStoredObjectTypesContainer;
+typedef TypeUnorderedMapContainer<AllMapStoredObjectTypes, WOWGUID> MapStoredObjectTypesContainer;
 
 template<uint32 LIMIT>
 struct CoordPair

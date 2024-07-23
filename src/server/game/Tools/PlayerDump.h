@@ -18,7 +18,7 @@
 #ifndef _PLAYER_DUMP_H
 #define _PLAYER_DUMP_H
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include <iosfwd>
 #include <map>
 #include <set>
@@ -79,17 +79,17 @@ class PlayerDumpWriter : public PlayerDump
 public:
     PlayerDumpWriter() { }
 
-    bool GetDump(ObjectGuid::LowType guid, std::string& dump);
-    DumpReturn WriteDumpToFile(std::string const& file, ObjectGuid::LowType guid);
-    DumpReturn WriteDumpToString(std::string& dump, ObjectGuid::LowType guid);
+    bool GetDump(WOWGUID::LowType guid, std::string& dump);
+    DumpReturn WriteDumpToFile(std::string const& file, WOWGUID::LowType guid);
+    DumpReturn WriteDumpToString(std::string& dump, WOWGUID::LowType guid);
 
 private:
-    bool AppendTable(StringTransaction& trans, ObjectGuid::LowType guid, TableStruct const& tableStruct, DumpTable const& dumpTable);
-    void PopulateGuids(ObjectGuid::LowType guid);
+    bool AppendTable(StringTransaction& trans, WOWGUID::LowType guid, TableStruct const& tableStruct, DumpTable const& dumpTable);
+    void PopulateGuids(WOWGUID::LowType guid);
 
-    std::set<ObjectGuid::LowType> _pets;
-    std::set<ObjectGuid::LowType> _mails;
-    std::set<ObjectGuid::LowType> _items;
+    std::set<WOWGUID::LowType> _pets;
+    std::set<WOWGUID::LowType> _mails;
+    std::set<WOWGUID::LowType> _items;
 
     std::set<uint64> _itemSets;
 };
@@ -99,11 +99,11 @@ class PlayerDumpReader : public PlayerDump
 public:
     PlayerDumpReader() { }
 
-    DumpReturn LoadDumpFromFile(std::string const& file, uint32 account, std::string name, ObjectGuid::LowType guid);
-    DumpReturn LoadDumpFromString(std::string const& dump, uint32 account, std::string name, ObjectGuid::LowType guid);
+    DumpReturn LoadDumpFromFile(std::string const& file, uint32 account, std::string name, WOWGUID::LowType guid);
+    DumpReturn LoadDumpFromString(std::string const& dump, uint32 account, std::string name, WOWGUID::LowType guid);
 
 private:
-    DumpReturn LoadDump(std::istream& input, uint32 account, std::string name, ObjectGuid::LowType guid);
+    DumpReturn LoadDump(std::istream& input, uint32 account, std::string name, WOWGUID::LowType guid);
 };
 
 #endif

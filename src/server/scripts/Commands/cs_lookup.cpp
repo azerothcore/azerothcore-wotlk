@@ -1680,7 +1680,7 @@ public:
                 do
                 {
                     Field* characterFields   = result2->Fetch();
-                    ObjectGuid::LowType guid = characterFields[0].Get<uint32>();
+                    WOWGUID::LowType guid = characterFields[0].Get<uint32>();
                     std::string name         = characterFields[1].Get<std::string>();
                     uint8 plevel = 0, prace = 0, pclass = 0;
                     bool online = ObjectAccessor::FindPlayerByLowGUID(guid) != nullptr;

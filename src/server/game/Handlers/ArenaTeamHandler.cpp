@@ -29,7 +29,7 @@ void User::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "MSG_INSPECT_ARENA_TEAMS");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
     LOG_DEBUG("network", "Inspect Arena stats ({})", guid.ToString());
 
@@ -356,7 +356,7 @@ void User::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
     arenaTeam->DelMember(member->Guid, true);
 
     // Broadcast event
-    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_REMOVE_SSS, ObjectGuid::Empty, 3, name, arenaTeam->GetName(), m_player->GetName());
+    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_REMOVE_SSS, WOWGUID::Empty, 3, name, arenaTeam->GetName(), m_player->GetName());
 }
 
 void User::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
@@ -399,7 +399,7 @@ void User::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
     arenaTeam->SetCaptain(member->Guid);
 
     // Broadcast event
-    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_LEADER_CHANGED_SSS, ObjectGuid::Empty, 3, m_player->GetName().c_str(), name, arenaTeam->GetName());
+    arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_LEADER_CHANGED_SSS, WOWGUID::Empty, 3, m_player->GetName().c_str(), name, arenaTeam->GetName());
 }
 
 void User::SendArenaTeamCommandResult(uint32 teamAction, const std::string& team, const std::string& player, uint32 errorId)

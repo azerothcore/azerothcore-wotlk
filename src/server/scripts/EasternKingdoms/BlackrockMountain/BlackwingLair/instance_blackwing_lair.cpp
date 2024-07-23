@@ -228,7 +228,7 @@ public:
                 case DATA_RAZORGORE_THE_UNTAMED:
                     if (state == DONE)
                     {
-                        for (ObjectGuid const& guid : EggList)
+                        for (WOWGUID const& guid : EggList)
                         {
                             // Eggs should be destroyed instead
                            /// @todo: after dynamic spawns
@@ -283,14 +283,14 @@ public:
                         EggCount = 0;
                         addsCount.fill(0);
 
-                        for (ObjectGuid const& guid : EggList)
+                        for (WOWGUID const& guid : EggList)
                         {
                             DoRespawnGameObject(guid, 0);
                         }
 
                         DoRespawnCreature(DATA_GRETHOK);
 
-                        for (ObjectGuid const& guid : guardList)
+                        for (WOWGUID const& guid : guardList)
                         {
                             DoRespawnCreature(guid);
                         }
@@ -325,7 +325,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -335,7 +335,7 @@ public:
                     break;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void OnUnitDeath(Unit* unit) override
@@ -446,9 +446,9 @@ public:
         }
 
     protected:
-        ObjectGuid razorgoreGUID;
-        ObjectGuid nefarianGUID;
-        ObjectGuid nefarianDoorGUID;
+        WOWGUID razorgoreGUID;
+        WOWGUID nefarianGUID;
+        WOWGUID nefarianDoorGUID;
 
         // Razorgore
         uint8 EggCount;

@@ -416,7 +416,7 @@ struct boss_jedoga_shadowseeker : public BossAI
                 DoCastSelf(SPELL_LIGHTNING_BOLTS, true);
                 if (!oocTriggers.empty())
                 {
-                    for (ObjectGuid const& guid : oocTriggers)
+                    for (WOWGUID const& guid : oocTriggers)
                     {
                         if (Creature* trigger = ObjectAccessor::GetCreature(*me, guid))
                         {
@@ -537,7 +537,7 @@ struct boss_jedoga_shadowseeker : public BossAI
 private:
     GuidList oocSummons;
     GuidList oocTriggers;
-    ObjectGuid sacraficeTarget_GUID;
+    WOWGUID sacraficeTarget_GUID;
     uint32 sayPreachTimer;
     bool combatSummonsSummoned;
     bool ritualTriggered;
@@ -555,7 +555,7 @@ private:
     {
         if (!oocTriggers.empty())
         {
-            for (ObjectGuid const& guid : oocTriggers)
+            for (WOWGUID const& guid : oocTriggers)
             {
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                 {
@@ -567,7 +567,7 @@ private:
 
         if (!oocSummons.empty())
         {
-            for (ObjectGuid const& guid : oocSummons)
+            for (WOWGUID const& guid : oocSummons)
             {
                 if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                 {

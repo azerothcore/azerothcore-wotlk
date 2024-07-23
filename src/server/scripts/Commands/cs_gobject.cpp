@@ -29,7 +29,7 @@
 
 using namespace Acore::ChatCommands;
 
-using GameObjectSpawnId = Variant<Hyperlink<gameobject>, ObjectGuid::LowType>;
+using GameObjectSpawnId = Variant<Hyperlink<gameobject>, WOWGUID::LowType>;
 using GameObjectEntry = Variant<Hyperlink<gameobject_entry>, uint32>;
 
 class gobject_commandscript : public CommandScript
@@ -110,7 +110,7 @@ public:
         Map* map = player->GetMap();
 
         GameObject* object = sObjectMgr->IsGameObjectStaticTransport(objectInfo->entry) ? new StaticTransport() : new GameObject();
-        ObjectGuid::LowType guidLow = map->GenerateLowGuid<HighGuid::GameObject>();
+        WOWGUID::LowType guidLow = map->GenerateLowGuid<HighGuid::GameObject>();
 
         if (!object->Create(guidLow, objectInfo->entry, map, player->GetPhaseMaskForSpawn(), x, y, z, o, G3D::Quat(), 0, GO_STATE_READY))
         {
@@ -229,7 +229,7 @@ public:
 
         bool found = false;
         float x, y, z, o;
-        ObjectGuid::LowType guidLow;
+        WOWGUID::LowType guidLow;
         uint32 id, phase;
         uint16 mapId;
         uint32 poolId;
@@ -292,7 +292,7 @@ public:
             return false;
         }
 
-        ObjectGuid ownerGuid = object->GetOwnerGUID();
+        WOWGUID ownerGuid = object->GetOwnerGUID();
         if (ownerGuid)
         {
             Unit* owner = ObjectAccessor::GetUnit(*handler->GetSession()->GetPlayer(), ownerGuid);
@@ -455,7 +455,7 @@ public:
             do
             {
                 Field* fields = result->Fetch();
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                WOWGUID::LowType guid = fields[0].Get<uint32>();
                 uint32 entry = fields[1].Get<uint32>();
                 float x = fields[2].Get<float>();
                 float y = fields[3].Get<float>();
@@ -487,7 +487,7 @@ public:
         uint32 lootId = 0;
         GameObject* gameObject = nullptr;
 
-        ObjectGuid::LowType spawnId = 0;
+        WOWGUID::LowType spawnId = 0;
         if (isGuid || data.holds_alternative<Hyperlink<gameobject>>())
         {
             spawnId = *data;

@@ -38,9 +38,9 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
         return;
 
     // prepare static data
-    ObjectGuid sourceGUID = source ? source->GetGUID() : ObjectGuid::Empty; //some script commands doesn't have source
-    ObjectGuid targetGUID = target ? target->GetGUID() : ObjectGuid::Empty;
-    ObjectGuid ownerGUID  = (source && source->GetTypeId() == TYPEID_ITEM) ? ((Item*)source)->GetOwnerGUID() : ObjectGuid::Empty;
+    WOWGUID sourceGUID = source ? source->GetGUID() : WOWGUID::Empty; //some script commands doesn't have source
+    WOWGUID targetGUID = target ? target->GetGUID() : WOWGUID::Empty;
+    WOWGUID ownerGUID  = (source && source->GetTypeId() == TYPEID_ITEM) ? ((Item*)source)->GetOwnerGUID() : WOWGUID::Empty;
 
     ///- Schedule script execution for all scripts in the script map
     ScriptMap const* s2 = &(s->second);
@@ -73,9 +73,9 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     // NOTE: script record _must_ exist until command executed
 
     // prepare static data
-    ObjectGuid sourceGUID = source ? source->GetGUID() : ObjectGuid::Empty;
-    ObjectGuid targetGUID = target ? target->GetGUID() : ObjectGuid::Empty;
-    ObjectGuid ownerGUID  = (source && source->GetTypeId() == TYPEID_ITEM) ? ((Item*)source)->GetOwnerGUID() : ObjectGuid::Empty;
+    WOWGUID sourceGUID = source ? source->GetGUID() : WOWGUID::Empty;
+    WOWGUID targetGUID = target ? target->GetGUID() : WOWGUID::Empty;
+    WOWGUID ownerGUID  = (source && source->GetTypeId() == TYPEID_ITEM) ? ((Item*)source)->GetOwnerGUID() : WOWGUID::Empty;
 
     ScriptAction sa;
     sa.sourceGUID = sourceGUID;
@@ -219,7 +219,7 @@ inline WorldObject* Map::_GetScriptWorldObject(Object* obj, bool isSource, const
 inline void Map::_ScriptProcessDoor(Object* source, Object* target, const ScriptInfo* scriptInfo) const
 {
     bool bOpen = false;
-    ObjectGuid::LowType guid = scriptInfo->ToggleDoor.GOGuid;
+    WOWGUID::LowType guid = scriptInfo->ToggleDoor.GOGuid;
     int32 nTimeToToggle = std::max(15, int32(scriptInfo->ToggleDoor.ResetDelay));
     switch (scriptInfo->command)
     {
@@ -266,7 +266,7 @@ inline void Map::_ScriptProcessDoor(Object* source, Object* target, const Script
     }
 }
 
-inline GameObject* Map::_FindGameObject(WorldObject* searchObject, ObjectGuid::LowType guid) const
+inline GameObject* Map::_FindGameObject(WorldObject* searchObject, WOWGUID::LowType guid) const
 {
     auto bounds = searchObject->GetMap()->GetGameObjectBySpawnIdStore().equal_range(guid);
     if (bounds.first == bounds.second)

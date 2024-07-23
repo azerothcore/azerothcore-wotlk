@@ -152,7 +152,7 @@ public:
             path_number = strtok((char*)args, " ");
 
         uint32 pathid = 0;
-        ObjectGuid::LowType guidLow = 0;
+        WOWGUID::LowType guidLow = 0;
         Creature* target = handler->getSelectedCreature();
 
         // Did player provide a path_id?
@@ -586,7 +586,7 @@ public:
         }
 
         // The visual waypoint
-        ObjectGuid::LowType wpSpawnId = target->GetSpawnId();
+        WOWGUID::LowType wpSpawnId = target->GetSpawnId();
 
         // User did select a visual waypoint?
 
@@ -862,7 +862,7 @@ public:
                 {
                     Field* fields = result2->Fetch();
                     uint32 wpguid = fields[0].Get<uint32>();
-                    Creature* creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(ObjectGuid::Create<HighGuid::Unit>(VISUAL_WAYPOINT, wpguid));
+                    Creature* creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(WOWGUID::Create<HighGuid::Unit>(VISUAL_WAYPOINT, wpguid));
 
                     if (!creature)
                     {
@@ -1056,8 +1056,8 @@ public:
             do
             {
                 Field* fields = result->Fetch();
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
-                Creature* creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(ObjectGuid::Create<HighGuid::Unit>(VISUAL_WAYPOINT, guid));
+                WOWGUID::LowType guid = fields[0].Get<uint32>();
+                Creature* creature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(WOWGUID::Create<HighGuid::Unit>(VISUAL_WAYPOINT, guid));
                 if (!creature)
                 {
                     handler->PSendSysMessage(LANG_WAYPOINT_NOTREMOVED, guid);

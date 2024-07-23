@@ -294,7 +294,7 @@ void User::HandleGroupDeclineOpcode(WorldPacket& /*recvData*/)
 
 void User::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     std::string reason, name;
     recvData >> guid;
     recvData >> reason;
@@ -395,7 +395,7 @@ void User::HandleGroupUninviteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (ObjectGuid guid = grp->GetMemberGUID(membername))
+    if (WOWGUID guid = grp->GetMemberGUID(membername))
     {
         Player::RemoveFromGroup(grp, guid, GROUP_REMOVEMETHOD_KICK, GetPlayer()->GetGUID());
         return;
@@ -412,7 +412,7 @@ void User::HandleGroupUninviteOpcode(WorldPacket& recvData)
 
 void User::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     Player* player = ObjectAccessor::FindConnectedPlayer(guid);
@@ -461,7 +461,7 @@ void User::HandleGroupDisbandOpcode(WorldPacket& /*recvData*/)
 void User::HandleLootMethodOpcode(WorldPacket& recvData)
 {
     uint32 lootMethod;
-    ObjectGuid lootMaster;
+    WOWGUID lootMaster;
     uint32 lootThreshold;
     recvData >> lootMethod >> lootMaster >> lootThreshold;
 
@@ -493,7 +493,7 @@ void User::HandleLootMethodOpcode(WorldPacket& recvData)
 
 void User::HandleLootRoll(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 itemSlot;
     uint8  rollType;
     recvData >> guid;                  // guid of the item rolled
@@ -577,7 +577,7 @@ void User::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
         if (group->isRaidGroup() && !group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
             return;
 
-        ObjectGuid guid;
+        WOWGUID guid;
         recvData >> guid;
 
         if (guid.IsPlayer())
@@ -632,7 +632,7 @@ void User::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
     if (groupNr >= MAX_RAID_SUBGROUPS)
         return;
 
-    ObjectGuid senderGuid = GetPlayer()->GetGUID();
+    WOWGUID senderGuid = GetPlayer()->GetGUID();
     if (!group->IsLeader(senderGuid) && !group->IsAssistant(senderGuid))
         return;
 
@@ -640,7 +640,7 @@ void User::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
         return;
 
     Player* movedPlayer = ObjectAccessor::FindPlayerByName(name, false);
-    ObjectGuid guid;
+    WOWGUID guid;
     if (movedPlayer)
     {
         guid = movedPlayer->GetGUID();
@@ -663,7 +663,7 @@ void User::HandleGroupAssistantLeaderOpcode(WorldPacket& recvData)
     if (!group->IsLeader(GetPlayer()->GetGUID()))
         return;
 
-    ObjectGuid guid;
+    WOWGUID guid;
     bool apply;
     recvData >> guid;
     recvData >> apply;
@@ -679,13 +679,13 @@ void User::HandlePartyAssignmentOpcode(WorldPacket& recvData)
     if (!group)
         return;
 
-    ObjectGuid senderGuid = GetPlayer()->GetGUID();
+    WOWGUID senderGuid = GetPlayer()->GetGUID();
     if (!group->IsLeader(senderGuid) && !group->IsAssistant(senderGuid))
         return;
 
     uint8 assignment;
     bool apply;
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> assignment >> apply;
     recvData >> guid;
 
@@ -950,7 +950,7 @@ void User::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data)
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/
 void User::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
 {
-    ObjectGuid Guid;
+    WOWGUID Guid;
     recvData >> Guid;
 
     Player* player = HashMapHolder<Player>::Find(Guid);
@@ -1135,7 +1135,7 @@ void User::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
         // no player, cheating?
         if (!group->GetMemberGUID(playerName))
         {
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         if (Player* player = ObjectAccessor::FindPlayerByName(playerName.c_str()))
@@ -1144,19 +1144,19 @@ void User::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
         }
         else
         {
-            if (ObjectGuid guid = sCharacterCache->GetCharacterGuidByName(playerName))
+            if (WOWGUID guid = sCharacterCache->GetCharacterGuidByName(playerName))
             {
                 return guid;
             }
             else
             {
-                return ObjectGuid::Empty; // no player - again, cheating?
+                return WOWGUID::Empty; // no player - again, cheating?
             }
         }
     };
 
-    ObjectGuid guid1 = getGuid(playerName1);
-    ObjectGuid guid2 = getGuid(playerName2);
+    WOWGUID guid1 = getGuid(playerName1);
+    WOWGUID guid2 = getGuid(playerName2);
 
     if(!guid1 || !guid2)
     {

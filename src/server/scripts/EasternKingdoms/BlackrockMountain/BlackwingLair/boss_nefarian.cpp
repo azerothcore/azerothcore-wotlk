@@ -954,7 +954,7 @@ struct npc_drakonid_spawner : public ScriptedAI
             victor->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
         }
 
-        ObjectGuid summonGuid = summon->GetGUID();
+        WOWGUID summonGuid = summon->GetGUID();
 
         scheduler.Schedule(1s, [this, summonGuid](TaskContext /*context*/)
         {
@@ -967,7 +967,7 @@ struct npc_drakonid_spawner : public ScriptedAI
     }
 
 protected:
-    ObjectGuid _owner;
+    WOWGUID _owner;
 };
 
 std::unordered_map<uint32, uint8> const classCallSpells =

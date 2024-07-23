@@ -46,10 +46,10 @@ public:
             SetHeaders(DataHeader);
         }
 
-        ObjectGuid _sladRanAltarGUID;
-        ObjectGuid _moorabiAltarGUID;
-        ObjectGuid _drakkariAltarGUID;
-        ObjectGuid _bridgeGUIDs[6];
+        WOWGUID _sladRanAltarGUID;
+        WOWGUID _moorabiAltarGUID;
+        WOWGUID _drakkariAltarGUID;
+        WOWGUID _bridgeGUIDs[6];
         uint32 _keysInCount;
         uint32 _activateTimer;
 

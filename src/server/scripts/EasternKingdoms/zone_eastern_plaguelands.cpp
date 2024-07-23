@@ -84,7 +84,7 @@ public:
 
         SummonList summons;
         EventMap events;
-        ObjectGuid _playerGUID;
+        WOWGUID _playerGUID;
         uint8 _counter;
         uint8 _savedCount;
         uint8 _deathCount;
@@ -109,7 +109,7 @@ public:
             _faction = faction;
         }
 
-        void SetGUID(ObjectGuid guid, int32) override
+        void SetGUID(WOWGUID guid, int32) override
         {
             _playerGUID = guid;
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
@@ -261,7 +261,7 @@ public:
         }
 
         uint32 timer;
-        ObjectGuid _targetGUID;
+        WOWGUID _targetGUID;
 
         void SpellHit(Unit*, SpellInfo const* spellInfo) override
         {

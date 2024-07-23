@@ -148,7 +148,7 @@ class Channel
 {
     struct PlayerInfo
     {
-        ObjectGuid player;
+        WOWGUID player;
         uint8 flags;
         Player* plrPtr; // pussywizard
 
@@ -197,24 +197,24 @@ public:
     void KickOrBan(Player const* player, std::string const& badname, bool ban);
     void Kick(Player const* player, std::string const& badname) { KickOrBan(player, badname, false); }
     void Ban(Player const* player, std::string const& badname) { KickOrBan(player, badname, true); }
-    void AddBan(ObjectGuid guid, uint32 time) { bannedStore[guid] = time; }
+    void AddBan(WOWGUID guid, uint32 time) { bannedStore[guid] = time; }
     void UnBan(Player const* player, std::string const& badname);
-    void UnBan(ObjectGuid guid);
+    void UnBan(WOWGUID guid);
     void Password(Player const* player, std::string const& pass);
     void SetMode(Player const* player, std::string const& p2n, bool mod, bool set);
-    void SetOwner(ObjectGuid guid, bool exclaim = true);
+    void SetOwner(WOWGUID guid, bool exclaim = true);
     void SetOwner(Player const* player, std::string const& name);
-    void SendWhoOwner(ObjectGuid guid);
+    void SendWhoOwner(WOWGUID guid);
     void SetModerator(Player const* player, std::string const& newname) { SetMode(player, newname, true, true); }
     void UnsetModerator(Player const* player, std::string const& newname) { SetMode(player, newname, true, false); }
     void SetMute(Player const* player, std::string const& newname) { SetMode(player, newname, false, true); }
     void UnsetMute(Player const* player, std::string const& newname) { SetMode(player, newname, false, false); }
     void List(Player const* player);
     void Announce(Player const* player);
-    void Say(ObjectGuid guid, std::string const& what, uint32 lang);
+    void Say(WOWGUID guid, std::string const& what, uint32 lang);
     void Invite(Player const* player, std::string const& newp);
-    void Voice(ObjectGuid guid1, ObjectGuid guid2);
-    void DeVoice(ObjectGuid guid1, ObjectGuid guid2);
+    void Voice(WOWGUID guid1, WOWGUID guid2);
+    void DeVoice(WOWGUID guid1, WOWGUID guid2);
     void JoinNotify(Player* p);
     void LeaveNotify(Player* p);
     void FlagsNotify(Player* p);
@@ -229,29 +229,29 @@ private:
     // initial packet data (notify type and channel name)
     void MakeNotifyPacket(WorldPacket* data, uint8 notify_type);
     // type specific packet data
-    void MakeJoined(WorldPacket* data, ObjectGuid guid);                        //+ 0x00
-    void MakeLeft(WorldPacket* data, ObjectGuid guid);                          //+ 0x01
+    void MakeJoined(WorldPacket* data, WOWGUID guid);                        //+ 0x00
+    void MakeLeft(WorldPacket* data, WOWGUID guid);                          //+ 0x01
     void MakeYouJoined(WorldPacket* data);                                      //+ 0x02
     void MakeYouLeft(WorldPacket* data);                                        //+ 0x03
     void MakeWrongPassword(WorldPacket* data);                                  //? 0x04
     void MakeNotMember(WorldPacket* data);                                      //? 0x05
     void MakeNotModerator(WorldPacket* data);                                   //? 0x06
-    void MakePasswordChanged(WorldPacket* data, ObjectGuid guid);               //+ 0x07
-    void MakeOwnerChanged(WorldPacket* data, ObjectGuid guid);                  //? 0x08
+    void MakePasswordChanged(WorldPacket* data, WOWGUID guid);               //+ 0x07
+    void MakeOwnerChanged(WorldPacket* data, WOWGUID guid);                  //? 0x08
     void MakePlayerNotFound(WorldPacket* data, std::string const& name);        //+ 0x09
     void MakeNotOwner(WorldPacket* data);                                       //? 0x0A
     void MakeChannelOwner(WorldPacket* data);                                   //? 0x0B
-    void MakeModeChange(WorldPacket* data, ObjectGuid guid, uint8 oldflags);    //+ 0x0C
-    void MakeAnnouncementsOn(WorldPacket* data, ObjectGuid guid);               //+ 0x0D
-    void MakeAnnouncementsOff(WorldPacket* data, ObjectGuid guid);              //+ 0x0E
+    void MakeModeChange(WorldPacket* data, WOWGUID guid, uint8 oldflags);    //+ 0x0C
+    void MakeAnnouncementsOn(WorldPacket* data, WOWGUID guid);               //+ 0x0D
+    void MakeAnnouncementsOff(WorldPacket* data, WOWGUID guid);              //+ 0x0E
     void MakeMuted(WorldPacket* data);                                          //? 0x11
-    void MakePlayerKicked(WorldPacket* data, ObjectGuid bad, ObjectGuid good);  //? 0x12
+    void MakePlayerKicked(WorldPacket* data, WOWGUID bad, WOWGUID good);  //? 0x12
     void MakeBanned(WorldPacket* data);                                         //? 0x13
-    void MakePlayerBanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good);  //? 0x14
-    void MakePlayerUnbanned(WorldPacket* data, ObjectGuid bad, ObjectGuid good);//? 0x15
+    void MakePlayerBanned(WorldPacket* data, WOWGUID bad, WOWGUID good);  //? 0x14
+    void MakePlayerUnbanned(WorldPacket* data, WOWGUID bad, WOWGUID good);//? 0x15
     void MakePlayerNotBanned(WorldPacket* data, std::string const& name);       //? 0x16
-    void MakePlayerAlreadyMember(WorldPacket* data, ObjectGuid guid);           //+ 0x17
-    void MakeInvite(WorldPacket* data, ObjectGuid guid);                        //? 0x18
+    void MakePlayerAlreadyMember(WorldPacket* data, WOWGUID guid);           //+ 0x17
+    void MakeInvite(WorldPacket* data, WOWGUID guid);                        //? 0x18
     void MakeInviteWrongFaction(WorldPacket* data);                             //? 0x19
     void MakeWrongFaction(WorldPacket* data);                                   //? 0x1A
     void MakeInvalidName(WorldPacket* data);                                    //? 0x1B
@@ -261,33 +261,33 @@ private:
     void MakeThrottled(WorldPacket* data);                                      //? 0x1F
     void MakeNotInArea(WorldPacket* data);                                      //? 0x20
     void MakeNotInLfg(WorldPacket* data);                                       //? 0x21
-    void MakeVoiceOn(WorldPacket* data, ObjectGuid guid);                       //+ 0x22
-    void MakeVoiceOff(WorldPacket* data, ObjectGuid guid);                      //+ 0x23
-    void MakeModerationOn(WorldPacket* data, ObjectGuid guid);
-    void MakeModerationOff(WorldPacket* data, ObjectGuid guid);
+    void MakeVoiceOn(WorldPacket* data, WOWGUID guid);                       //+ 0x22
+    void MakeVoiceOff(WorldPacket* data, WOWGUID guid);                      //+ 0x23
+    void MakeModerationOn(WorldPacket* data, WOWGUID guid);
+    void MakeModerationOff(WorldPacket* data, WOWGUID guid);
 
-    void SendToAll(WorldPacket* data, ObjectGuid guid = ObjectGuid::Empty);
-    void SendToAllButOne(WorldPacket* data, ObjectGuid who);
-    void SendToOne(WorldPacket* data, ObjectGuid who);
+    void SendToAll(WorldPacket* data, WOWGUID guid = WOWGUID::Empty);
+    void SendToAllButOne(WorldPacket* data, WOWGUID who);
+    void SendToOne(WorldPacket* data, WOWGUID who);
     void SendToAllWatching(WorldPacket* data);
 
     bool ShouldAnnouncePlayer(Player const* player) const;
 
-    [[nodiscard]] bool IsOn(ObjectGuid who) const { return playersStore.find(who) != playersStore.end(); }
-    [[nodiscard]] bool IsBanned(ObjectGuid guid) const;
+    [[nodiscard]] bool IsOn(WOWGUID who) const { return playersStore.find(who) != playersStore.end(); }
+    [[nodiscard]] bool IsBanned(WOWGUID guid) const;
 
     void UpdateChannelInDB() const;
     void UpdateChannelUseageInDB() const;
-    void AddChannelBanToDB(ObjectGuid guid, uint32 time) const;
-    void RemoveChannelBanFromDB(ObjectGuid guid) const;
+    void AddChannelBanToDB(WOWGUID guid, uint32 time) const;
+    void RemoveChannelBanFromDB(WOWGUID guid) const;
 
-    [[nodiscard]] uint8 GetPlayerFlags(ObjectGuid guid) const
+    [[nodiscard]] uint8 GetPlayerFlags(WOWGUID guid) const
     {
         PlayerContainer::const_iterator itr = playersStore.find(guid);
         return itr != playersStore.end() ? itr->second.flags : 0;
     }
 
-    void SetModerator(ObjectGuid guid, bool set)
+    void SetModerator(WOWGUID guid, bool set)
     {
         PlayerInfo& pinfo = playersStore[guid];
         if (pinfo.IsModerator() != set)
@@ -303,7 +303,7 @@ private:
         }
     }
 
-    void SetMute(ObjectGuid guid, bool set)
+    void SetMute(WOWGUID guid, bool set)
     {
         PlayerInfo& pinfo = playersStore[guid];
         if (pinfo.IsMuted() != set)
@@ -317,8 +317,8 @@ private:
         }
     }
 
-    typedef std::unordered_map<ObjectGuid, PlayerInfo> PlayerContainer;
-    typedef std::unordered_map<ObjectGuid, uint32> BannedContainer;
+    typedef std::unordered_map<WOWGUID, PlayerInfo> PlayerContainer;
+    typedef std::unordered_map<WOWGUID, uint32> BannedContainer;
     typedef std::unordered_set<Player*> PlayersWatchingContainer;
 
     bool _announce;
@@ -330,7 +330,7 @@ private:
     uint32 _channelId;
     uint32 _channelDBId;
     TeamId _teamId;
-    ObjectGuid _ownerGUID;
+    WOWGUID _ownerGUID;
     std::string _name;
     std::string _password;
     ChannelRights _channelRights;

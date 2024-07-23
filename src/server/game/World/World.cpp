@@ -226,7 +226,7 @@ User* World::FindOfflineUser(uint32 id) const
         return nullptr;
 }
 
-User* World::FindOfflineUserForCharacter(ObjectGuid::LowType guidLow) const
+User* World::FindOfflineUserForCharacter(WOWGUID::LowType guidLow) const
 {
     if (m_offlineUsers.empty())
         return nullptr;

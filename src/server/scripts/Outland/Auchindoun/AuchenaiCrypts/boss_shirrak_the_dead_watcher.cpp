@@ -53,7 +53,7 @@ struct boss_shirrak_the_dead_watcher : public BossAI
         });
     }
 
-    ObjectGuid focusGUID;
+    WOWGUID focusGUID;
 
     void EnterEvadeMode(EvadeReason why) override
     {

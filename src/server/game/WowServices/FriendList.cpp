@@ -11,7 +11,7 @@
 #define MAX_NAME_SIZE   305
 #define MAX_NOTES_SIZE  512
 
-typedef std::map<ObjectGuid, FriendList*> FRIENDLISTMAP_T;
+typedef std::map<WOWGUID, FriendList*> FRIENDLISTMAP_T;
 
 
 static BOOL AddFriendHandler (User*         user,
@@ -58,7 +58,7 @@ FriendList::FriendList (Player* plr) {
   ASSERT(plr);
 
   m_playerPtr = plr;
-  ObjectGuid guid = plr->GetGUID();
+  WOWGUID guid = plr->GetGUID();
 
   s_friendListMap[guid] = this;
 
@@ -117,7 +117,7 @@ void FriendList::AddFriend (char* name, char* notes) {
 
   FormatCharacterName(name);
 
-  ObjectGuid guid = ObjectGuid();
+  WOWGUID guid = WOWGUID();
   FRIEND_RESULT res = FRIEND_NOT_FOUND;
 
   auto charInfo = sCharacterCache->GetCharacterCacheByName(name);
@@ -183,7 +183,7 @@ void FriendList::AddFriend (char* name, char* notes) {
 }
 
 //===========================================================================
-void FriendList::AddIgnore (ObjectGuid const& guid) {
+void FriendList::AddIgnore (WOWGUID const& guid) {
   FRIEND_RESULT res = FRIEND_IGNORE_FULL;
   for (uint32_t i = 0; i < NUM_MAX_IGNORE; i++) {
     if (m_ignore[i]) {
@@ -238,7 +238,7 @@ void FriendList::AddContacts () {
   // Add each contact to the user's friends list
   // and send a contact list packet to the active player
   for (uint32_t i = 0; i < numRows; i++) {
-    ObjectGuid guid = ObjectGuid(HighGuid::Player, fields[0].Get<uint32_t>());
+    WOWGUID guid = WOWGUID(HighGuid::Player, fields[0].Get<uint32_t>());
     uint32_t flags = fields[1].Get<uint8_t>();
 
     msg << guid;
@@ -299,12 +299,12 @@ void FriendList::AddContacts () {
 }
 
 //===========================================================================
-void FriendList::DelIgnore (ObjectGuid const& guid) {
+void FriendList::DelIgnore (WOWGUID const& guid) {
   FRIEND_RESULT res = FRIEND_IGNORE_NOT_FOUND;
   for (uint32_t i = 0; i < GetNumIgnores(); i++) {
     if (m_ignore[i] == guid) {
       res = FRIEND_IGNORE_REMOVED;
-      m_ignore[i] = ObjectGuid();
+      m_ignore[i] = WOWGUID();
       break;
     }
   }
@@ -315,7 +315,7 @@ void FriendList::DelIgnore (ObjectGuid const& guid) {
 }
 
 //===========================================================================
-FriendList::Friend const* FriendList::GetFriend (ObjectGuid const& guid) {
+FriendList::Friend const* FriendList::GetFriend (WOWGUID const& guid) {
   for (auto i = m_friends.begin(); i != m_friends.end(); i++) {
     if (i->m_GUID == guid) {
       return &*i;
@@ -356,10 +356,10 @@ uint32_t FriendList::GetNumMutes () {
 }
 
 //===========================================================================
-bool FriendList::IsFriend (ObjectGuid const& guid) { return GetFriend(guid); }
+bool FriendList::IsFriend (WOWGUID const& guid) { return GetFriend(guid); }
 
 //===========================================================================
-bool FriendList::IsIgnored (ObjectGuid const& guid) {
+bool FriendList::IsIgnored (WOWGUID const& guid) {
   for (uint32_t i = 0; i < GetNumIgnores(); i++) {
     if (m_ignore[i] == guid) {
       return true;
@@ -369,7 +369,7 @@ bool FriendList::IsIgnored (ObjectGuid const& guid) {
 }
 
 //===========================================================================
-void FriendList::RemoveFriend (ObjectGuid const& guid) {
+void FriendList::RemoveFriend (WOWGUID const& guid) {
   for (auto pFriend = m_friends.begin(); pFriend != m_friends.end(); pFriend++) {
     if (pFriend->m_GUID == guid) {
       CharacterDatabase.Execute("DELETE FROM character_social "
@@ -382,11 +382,11 @@ void FriendList::RemoveFriend (ObjectGuid const& guid) {
     }
   }
 
-  SendFriendStatus(FRIEND_NOT_FOUND, ObjectGuid());
+  SendFriendStatus(FRIEND_NOT_FOUND, WOWGUID());
 }
 
 //===========================================================================
-void FriendList::SaveContact (ObjectGuid const& guid, uint32_t flags, const char* notes) {
+void FriendList::SaveContact (WOWGUID const& guid, uint32_t flags, const char* notes) {
   uint32_t loFriend = guid.GetCounter();
   uint32_t loGuid = m_playerPtr->GetGUID().GetCounter();
 
@@ -451,7 +451,7 @@ void FriendList::SendContactList (uint32_t flags) {
 }
 
 //===========================================================================
-void FriendList::SendFriendStatus (FRIEND_RESULT res, ObjectGuid guid) {
+void FriendList::SendFriendStatus (FRIEND_RESULT res, WOWGUID guid) {
   WorldPacket msg(SMSG_FRIEND_STATUS);
   msg << (unsigned char)res;
   msg << guid;
@@ -473,7 +473,7 @@ void FriendList::SendFriendStatus (FRIEND_RESULT res, ObjectGuid guid) {
 }
 
 //===========================================================================
-void FriendList::SetFriendNotes (ObjectGuid const& guid, char const* notes) {
+void FriendList::SetFriendNotes (WOWGUID const& guid, char const* notes) {
   for (auto pFriend = m_friends.begin(); pFriend != m_friends.end(); pFriend++) {
     if (pFriend->m_GUID == guid) {
       if (notes && *notes) {
@@ -541,7 +541,7 @@ static BOOL AddIgnoreHandler (User*         user,
     friendList->AddIgnore(charInfo->Guid);
   }
   else {
-    friendList->SendFriendStatus(FRIEND_IGNORE_NOT_FOUND, ObjectGuid());
+    friendList->SendFriendStatus(FRIEND_IGNORE_NOT_FOUND, WOWGUID());
   }
 
   return TRUE;
@@ -577,7 +577,7 @@ static BOOL DeleteFriendHandler (User*        user,
   }
 
   // Read the message data
-  auto guid = msg->read<ObjectGuid>();
+  auto guid = msg->read<WOWGUID>();
 
   FriendList* friendList = plr->FriendListPtr();
   if (friendList->GetFriend(guid)) {
@@ -602,7 +602,7 @@ static BOOL DelIgnoreHandler (User*         user,
   }
 
   // Read the message data
-  auto guid = msg->read<ObjectGuid>();
+  auto guid = msg->read<WOWGUID>();
 
   plr->FriendListPtr()->DelIgnore(guid);
 
@@ -621,7 +621,7 @@ static BOOL SetFriendNotesHandler (User*        user,
   }
 
   // Read the message data
-  auto guid = msg->read<ObjectGuid>();
+  auto guid = msg->read<WOWGUID>();
 
   char notes[MAX_NOTES_SIZE];
   msg->GetString(notes, sizeof(notes));

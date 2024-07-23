@@ -130,7 +130,7 @@ struct boss_ossirian : public BossAI
                     0, 0, 0, 0, 0, uint32(-1)))
                 {
                     _firstCrystalGUID = crystal->GetGUID();
-                    crystal->SetOwnerGUID(ObjectGuid::Empty);
+                    crystal->SetOwnerGUID(WOWGUID::Empty);
                     crystal->RemoveGameObjectFlag(GO_FLAG_IN_USE);
                     crystal->AI()->SetGUID(trigger->GetGUID(), GUID_TRIGGER_PAIR);
                 }
@@ -154,7 +154,7 @@ struct boss_ossirian : public BossAI
         }
     }
 
-    void SetGUID(ObjectGuid guid, int32 action) override
+    void SetGUID(WOWGUID guid, int32 action) override
     {
         if (action == ACTION_TRIGGER_WEAKNESS && guid != _firstCrystalGUID)
         {
@@ -228,7 +228,7 @@ struct boss_ossirian : public BossAI
                     0, 0, 0, 0, 0, uint32(-1)))
                 {
                     ++_crystalIterator;
-                    crystal->SetOwnerGUID(ObjectGuid::Empty);
+                    crystal->SetOwnerGUID(WOWGUID::Empty);
                     crystal->RemoveGameObjectFlag(GO_FLAG_IN_USE);
                     crystal->AI()->SetGUID(trigger->GetGUID(), GUID_TRIGGER_PAIR);
                 }
@@ -304,7 +304,7 @@ struct boss_ossirian : public BossAI
 
 protected:
     uint8 _crystalIterator;
-    ObjectGuid _firstCrystalGUID;
+    WOWGUID _firstCrystalGUID;
     bool _saidIntro;
 };
 
@@ -317,7 +317,7 @@ public:
     {
         go_ossirian_crystalAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()) { }
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(WOWGUID guid, int32 type) override
         {
             if (type == GUID_TRIGGER_PAIR)
             {
@@ -362,7 +362,7 @@ public:
 
         private:
             InstanceScript* _instance;
-            ObjectGuid _triggerGUID;
+            WOWGUID _triggerGUID;
     };
 
     GameObjectAI* GetAI(GameObject* go) const override

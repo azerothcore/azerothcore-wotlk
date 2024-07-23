@@ -355,10 +355,10 @@ public:
         }
 
     private:
-        ObjectGuid BirdGUIDs[8];
-        ObjectGuid TargetGUID;
-        ObjectGuid CycloneGUID;
-        ObjectGuid CloudGUID;
+        WOWGUID BirdGUIDs[8];
+        WOWGUID TargetGUID;
+        WOWGUID CycloneGUID;
+        WOWGUID CloudGUID;
         uint8  StormCount;
         bool   isRaining;
     };
@@ -380,7 +380,7 @@ public:
 
         uint32 EagleSwoop_Timer;
         bool arrived;
-        ObjectGuid TargetGUID;
+        WOWGUID TargetGUID;
 
         void Reset() override
         {

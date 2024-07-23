@@ -243,9 +243,9 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        ObjectGuid AbedneumGUID;
-        ObjectGuid MarnakGUID;
-        ObjectGuid KaddrakGUID;
+        WOWGUID AbedneumGUID;
+        WOWGUID MarnakGUID;
+        WOWGUID KaddrakGUID;
         uint8 WaveNum;
 
         bool TalkEvent;
@@ -334,7 +334,7 @@ public:
             switch (action)
             {
                 case ACTION_START_EVENT:
-                    Start(false, true, ObjectGuid::Empty, 0, true, false);
+                    Start(false, true, WOWGUID::Empty, 0, true, false);
                     break;
                 case ACTION_START_TRIBUNAL:
                     {
@@ -375,7 +375,7 @@ public:
                     Reset();
                     break;
                 case ACTION_WIPE_START:
-                    Start(false, true, ObjectGuid::Empty, 0, true, false);
+                    Start(false, true, WOWGUID::Empty, 0, true, false);
                     SetNextWaypoint(20, false);
                     ResetEvent();
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);

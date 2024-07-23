@@ -48,13 +48,13 @@ class HashMapHolder
 
 public:
 
-    typedef std::unordered_map<ObjectGuid, T*> MapType;
+    typedef std::unordered_map<WOWGUID, T*> MapType;
 
     static void Insert(T* o);
 
     static void Remove(T* o);
 
-    static T* Find(ObjectGuid guid);
+    static T* Find(WOWGUID guid);
 
     static MapType& GetContainer();
 
@@ -64,24 +64,24 @@ public:
 namespace ObjectAccessor
 {
     // these functions return objects only if in map of specified object
-    WorldObject* GetWorldObject(WorldObject const&, ObjectGuid const guid);
-    Object* GetObjectByTypeMask(WorldObject const&, ObjectGuid const guid, uint32 typemask);
-    Corpse* GetCorpse(WorldObject const& u, ObjectGuid const guid);
-    GameObject* GetGameObject(WorldObject const& u, ObjectGuid const guid);
-    Transport* GetTransport(WorldObject const& u, ObjectGuid const guid);
-    DynamicObject* GetDynamicObject(WorldObject const& u, ObjectGuid const guid);
-    Unit* GetUnit(WorldObject const&, ObjectGuid const guid);
-    Creature* GetCreature(WorldObject const& u, ObjectGuid const guid);
-    Pet* GetPet(WorldObject const&, ObjectGuid const guid);
-    Player* GetPlayer(Map const*, ObjectGuid const guid);
-    Player* GetPlayer(WorldObject const&, ObjectGuid const guid);
-    Creature* GetCreatureOrPetOrVehicle(WorldObject const&, ObjectGuid const);
+    WorldObject* GetWorldObject(WorldObject const&, WOWGUID const guid);
+    Object* GetObjectByTypeMask(WorldObject const&, WOWGUID const guid, uint32 typemask);
+    Corpse* GetCorpse(WorldObject const& u, WOWGUID const guid);
+    GameObject* GetGameObject(WorldObject const& u, WOWGUID const guid);
+    Transport* GetTransport(WorldObject const& u, WOWGUID const guid);
+    DynamicObject* GetDynamicObject(WorldObject const& u, WOWGUID const guid);
+    Unit* GetUnit(WorldObject const&, WOWGUID const guid);
+    Creature* GetCreature(WorldObject const& u, WOWGUID const guid);
+    Pet* GetPet(WorldObject const&, WOWGUID const guid);
+    Player* GetPlayer(Map const*, WOWGUID const guid);
+    Player* GetPlayer(WorldObject const&, WOWGUID const guid);
+    Creature* GetCreatureOrPetOrVehicle(WorldObject const&, WOWGUID const);
 
     // these functions return objects if found in whole world
     // ACCESS LIKE THAT IS NOT THREAD SAFE
-    Player* FindPlayer(ObjectGuid const guid);
-    Player* FindPlayerByLowGUID(ObjectGuid::LowType lowguid);
-    Player* FindConnectedPlayer(ObjectGuid const guid);
+    Player* FindPlayer(WOWGUID const guid);
+    Player* FindPlayerByLowGUID(WOWGUID::LowType lowguid);
+    Player* FindConnectedPlayer(WOWGUID const guid);
     Player* FindPlayerByName(std::string const& name, bool checkInWorld = true);
     Creature* GetSpawnedCreatureByDBGUID(uint32 mapId, uint64 guid);
     GameObject* GetSpawnedGameObjectByDBGUID(uint32 mapId, uint64 guid);

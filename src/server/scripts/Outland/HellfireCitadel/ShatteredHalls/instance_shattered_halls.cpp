@@ -119,7 +119,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 data) const override
+        WOWGUID GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -131,7 +131,7 @@ public:
                     return executionerGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void Update(uint32 diff) override
@@ -176,8 +176,8 @@ public:
         }
 
     protected:
-        ObjectGuid executionerGUID;
-        ObjectGuid prisonerGUID[3];
+        WOWGUID executionerGUID;
+        WOWGUID prisonerGUID[3];
         uint32 RescueTimer;
         TeamId TeamIdInInstance;
     };

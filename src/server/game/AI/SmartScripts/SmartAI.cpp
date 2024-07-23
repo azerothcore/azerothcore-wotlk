@@ -967,13 +967,13 @@ void SmartAI::SetData(uint32 id, uint32 value, Unit* invoker)
     GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, invoker, id, value);
 }
 
-void SmartAI::SetGUID(ObjectGuid /*guid*/, int32 /*id*/)
+void SmartAI::SetGUID(WOWGUID /*guid*/, int32 /*id*/)
 {
 }
 
-ObjectGuid SmartAI::GetGUID(int32 /*id*/) const
+WOWGUID SmartAI::GetGUID(int32 /*id*/) const
 {
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
 void SmartAI::SetRun(bool run)

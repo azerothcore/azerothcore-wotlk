@@ -59,7 +59,7 @@ struct FormationInfo
     {
     }
 
-    ObjectGuid::LowType leaderGUID;
+    WOWGUID::LowType leaderGUID;
     float follow_dist;
     float follow_angle;
     uint16 groupAI;
@@ -69,7 +69,7 @@ struct FormationInfo
     bool HasGroupFlag(uint16 flag) const { return !!(groupAI & flag); }
 };
 
-typedef std::unordered_map<ObjectGuid::LowType/*memberDBGUID*/, FormationInfo /*formationInfo*/>   CreatureGroupInfoType;
+typedef std::unordered_map<WOWGUID::LowType/*memberDBGUID*/, FormationInfo /*formationInfo*/>   CreatureGroupInfoType;
 
 class FormationMgr
 {

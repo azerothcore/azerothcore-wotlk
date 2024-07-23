@@ -131,11 +131,11 @@ void Object::_InitValues()
     m_objectUpdated = false;
 }
 
-void Object::_Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhigh)
+void Object::_Create(WOWGUID::LowType guidlow, uint32 entry, HighGuid guidhigh)
 {
     if (!m_uint32Values) _InitValues();
 
-    ObjectGuid guid(guidhigh, entry, guidlow);
+    WOWGUID guid(guidhigh, entry, guidlow);
     SetGuidValue(OBJECT_FIELD_GUID, guid);
     SetUInt32Value(OBJECT_FIELD_TYPE, m_objectType);
     m_PackGUID.Pack(guid);
@@ -334,10 +334,10 @@ void Object::DestroyForPlayer(Player* target, bool onDeath) const
     return *(((uint16*) &m_uint32Values[index]) + offset);
 }
 
-[[nodiscard]] ObjectGuid Object::GetGuidValue(uint16 index) const
+[[nodiscard]] WOWGUID Object::GetGuidValue(uint16 index) const
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, false));
-    return *((ObjectGuid*) &(m_uint32Values[index]));
+    return *((WOWGUID*) &(m_uint32Values[index]));
 }
 
 void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
@@ -683,13 +683,13 @@ void Object::SetUInt64Value(uint16 index, uint64 value)
     }
 }
 
-bool Object::AddGuidValue(uint16 index, ObjectGuid value)
+bool Object::AddGuidValue(uint16 index, WOWGUID value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
 
-    if (value && !*((ObjectGuid*)&(m_uint32Values[index])))
+    if (value && !*((WOWGUID*)&(m_uint32Values[index])))
     {
-        *((ObjectGuid*)&(m_uint32Values[index])) = value;
+        *((WOWGUID*)&(m_uint32Values[index])) = value;
         _changesMask.SetBit(index);
         _changesMask.SetBit(index + 1);
 
@@ -701,11 +701,11 @@ bool Object::AddGuidValue(uint16 index, ObjectGuid value)
     return false;
 }
 
-bool Object::RemoveGuidValue(uint16 index, ObjectGuid value)
+bool Object::RemoveGuidValue(uint16 index, WOWGUID value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
 
-    if (value && *((ObjectGuid*)&(m_uint32Values[index])) == value)
+    if (value && *((WOWGUID*)&(m_uint32Values[index])) == value)
     {
         m_uint32Values[index] = 0;
         m_uint32Values[index + 1] = 0;
@@ -720,13 +720,13 @@ bool Object::RemoveGuidValue(uint16 index, ObjectGuid value)
     return false;
 }
 
-void Object::SetGuidValue(uint16 index, ObjectGuid value)
+void Object::SetGuidValue(uint16 index, WOWGUID value)
 {
     ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
 
-    if (*((ObjectGuid*)&(m_uint32Values[index])) != value)
+    if (*((WOWGUID*)&(m_uint32Values[index])) != value)
     {
-        *((ObjectGuid*)&(m_uint32Values[index])) = value;
+        *((WOWGUID*)&(m_uint32Values[index])) = value;
         _changesMask.SetBit(index);
         _changesMask.SetBit(index + 1);
 
@@ -1136,7 +1136,7 @@ void WorldObject::CleanupsBeforeDelete(bool /*finalCleanup*/)
         RemoveFromWorld();
 }
 
-void WorldObject::_Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask)
+void WorldObject::_Create(WOWGUID::LowType guidlow, HighGuid guidhigh, uint32 phaseMask)
 {
     Object::_Create(guidlow, 0, guidhigh);
     SetPhaseMask(phaseMask, false);
@@ -2095,7 +2095,7 @@ void WorldObject::SendMessageToSet(WorldPacket const* data, Player const* skippe
     Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
 }
 
-void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
+void WorldObject::SendObjectDeSpawnAnim(WOWGUID guid)
 {
     WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
     data << guid;
@@ -2219,19 +2219,19 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     switch (mask)
     {
         case UNIT_MASK_SUMMON:
-            summon = new TempSummon(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty, false);
+            summon = new TempSummon(properties, summoner ? summoner->GetGUID() : WOWGUID::Empty, false);
             break;
         case UNIT_MASK_GUARDIAN:
-            summon = new Guardian(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty, false);
+            summon = new Guardian(properties, summoner ? summoner->GetGUID() : WOWGUID::Empty, false);
             break;
         case UNIT_MASK_PUPPET:
-            summon = new Puppet(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty);
+            summon = new Puppet(properties, summoner ? summoner->GetGUID() : WOWGUID::Empty);
             break;
         case UNIT_MASK_TOTEM:
-            summon = new Totem(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty);
+            summon = new Totem(properties, summoner ? summoner->GetGUID() : WOWGUID::Empty);
             break;
         case UNIT_MASK_MINION:
-            summon = new Minion(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty, false);
+            summon = new Minion(properties, summoner ? summoner->GetGUID() : WOWGUID::Empty, false);
             break;
         default:
             return nullptr;
@@ -3044,7 +3044,7 @@ struct WorldObjectChangeAccumulator
         for (DynamicObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         {
             source = iter->GetSource();
-            ObjectGuid guid = source->GetCasterGUID();
+            WOWGUID guid = source->GetCasterGUID();
 
             if (guid)
             {
@@ -3104,12 +3104,12 @@ void WorldObject::RemoveFromObjectUpdate()
     GetMap()->RemoveUpdateObject(this);
 }
 
-ObjectGuid WorldObject::GetTransGUID() const
+WOWGUID WorldObject::GetTransGUID() const
 {
     if (GetTransport())
         return GetTransport()->GetGUID();
 
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
 float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/, float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/) const
@@ -3179,7 +3179,7 @@ LiquidData const& WorldObject::GetLiquidData() const
     return _liquidData;
 }
 
-void WorldObject::AddAllowedLooter(ObjectGuid guid)
+void WorldObject::AddAllowedLooter(WOWGUID guid)
 {
     _allowedLooters.insert(guid);
 }
@@ -3194,7 +3194,7 @@ void WorldObject::ResetAllowedLooters()
     _allowedLooters.clear();
 }
 
-bool WorldObject::HasAllowedLooter(ObjectGuid guid) const
+bool WorldObject::HasAllowedLooter(WOWGUID guid) const
 {
     if (_allowedLooters.empty())
     {
@@ -3209,7 +3209,7 @@ GuidUnorderedSet const& WorldObject::GetAllowedLooters() const
     return _allowedLooters;
 }
 
-void WorldObject::RemoveAllowedLooter(ObjectGuid guid)
+void WorldObject::RemoveAllowedLooter(WOWGUID guid)
 {
     _allowedLooters.erase(guid);
 }

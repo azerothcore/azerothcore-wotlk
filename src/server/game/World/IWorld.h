@@ -21,7 +21,7 @@
 #include "AsyncCallbackProcessor.h"
 #include "Common.h"
 #include "Duration.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
 #include <atomic>
@@ -527,7 +527,7 @@ public:
     virtual ~IWorld() = default;
     [[nodiscard]] virtual User* FindUser(uint32 id) const = 0;
     [[nodiscard]] virtual User* FindOfflineUser(uint32 id) const = 0;
-    [[nodiscard]] virtual User* FindOfflineUserForCharacter(ObjectGuid::LowType guidLow) const = 0;
+    [[nodiscard]] virtual User* FindOfflineUserForCharacter(WOWGUID::LowType guidLow) const = 0;
     virtual void AddUser(User* s) = 0;
     virtual bool KickUser(uint32 id) = 0;
     virtual void UpdateMaxSessionCounters() = 0;

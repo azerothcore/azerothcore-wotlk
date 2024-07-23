@@ -20,7 +20,7 @@
 
 #include "Common.h"
 #include "ObjectDefines.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
 #include <array>
@@ -108,26 +108,26 @@ namespace lfg
     typedef std::list<Lfg5Guids> Lfg5GuidsList;
     typedef std::set<uint32> LfgDungeonSet;
     typedef std::map<uint32, uint32> LfgLockMap;
-    typedef std::map<ObjectGuid, LfgLockMap> LfgLockPartyMap;
+    typedef std::map<WOWGUID, LfgLockMap> LfgLockPartyMap;
     typedef GuidSet LfgGuidSet;
     typedef GuidList LfgGuidList;
-    typedef std::map<ObjectGuid, uint8> LfgRolesMap;
-    typedef std::map<ObjectGuid, ObjectGuid> LfgGroupsMap;
+    typedef std::map<WOWGUID, uint8> LfgRolesMap;
+    typedef std::map<WOWGUID, WOWGUID> LfgGroupsMap;
 
     class Lfg5Guids
     {
     public:
-        std::array<ObjectGuid, 5> guids = { };
+        std::array<WOWGUID, 5> guids = { };
         LfgRolesMap* roles;
         Lfg5Guids()
         {
-            guids.fill(ObjectGuid::Empty);
+            guids.fill(WOWGUID::Empty);
             roles = nullptr;
         }
 
-        Lfg5Guids(ObjectGuid g)
+        Lfg5Guids(WOWGUID g)
         {
-            guids.fill(ObjectGuid::Empty);
+            guids.fill(WOWGUID::Empty);
             guids[0] = g;
             roles = nullptr;
         }
@@ -146,9 +146,9 @@ namespace lfg
 
         ~Lfg5Guids() { delete roles; }
         void addRoles(LfgRolesMap const& r) { roles = new LfgRolesMap(r); }
-        void clear() { guids.fill(ObjectGuid::Empty); }
-        [[nodiscard]] bool empty() const { return guids[0] == ObjectGuid::Empty; }
-        [[nodiscard]] ObjectGuid front() const { return guids[0]; }
+        void clear() { guids.fill(WOWGUID::Empty); }
+        [[nodiscard]] bool empty() const { return guids[0] == WOWGUID::Empty; }
+        [[nodiscard]] WOWGUID front() const { return guids[0]; }
 
         [[nodiscard]] uint8 size() const
         {
@@ -177,7 +177,7 @@ namespace lfg
             return 0;
         }
 
-        void insert(const ObjectGuid& g)
+        void insert(const WOWGUID& g)
         {
             // avoid loops for performance
             if (!guids[0])
@@ -268,7 +268,7 @@ namespace lfg
             guids[4] = g;
         }
 
-        void force_insert_front(const ObjectGuid& g)
+        void force_insert_front(const WOWGUID& g)
         {
             if (guids[3])
             {
@@ -289,7 +289,7 @@ namespace lfg
             guids[0] = g;
         }
 
-        void remove(const ObjectGuid& g)
+        void remove(const WOWGUID& g)
         {
             // avoid loops for performance
             if (guids[0] == g)
@@ -422,7 +422,7 @@ namespace lfg
             }
         }
 
-        [[nodiscard]] bool hasGuid(const ObjectGuid& g) const
+        [[nodiscard]] bool hasGuid(const WOWGUID& g) const
         {
             return g && (guids[0] == g || guids[1] == g || guids[2] == g || guids[3] == g || guids[4] == g);
         }

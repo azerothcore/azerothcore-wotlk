@@ -18,7 +18,7 @@
 #ifndef SCRIPT_OBJECT_ARENA_SCRIPT_H_
 #define SCRIPT_OBJECT_ARENA_SCRIPT_H_
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "ScriptObject.h"
 #include <vector>
 
@@ -40,7 +40,7 @@ public:
 
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
-    [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, ObjectGuid /*PlayerGuid*/) { return true; }
+    [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, WOWGUID /*PlayerGuid*/) { return true; }
 
     virtual void OnGetPoints(ArenaTeam* /*team*/, uint32 /*memberRating*/, float& /*points*/) { }
 

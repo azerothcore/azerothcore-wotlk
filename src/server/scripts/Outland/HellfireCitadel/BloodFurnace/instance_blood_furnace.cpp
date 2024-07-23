@@ -57,8 +57,8 @@ public:
         }
 
         uint32 _auiEncounter[MAX_ENCOUNTER];
-        ObjectGuid _doorGUIDs[6];
-        ObjectGuid _prisonGUIDs[4];
+        WOWGUID _doorGUIDs[6];
+        WOWGUID _prisonGUIDs[4];
 
         GuidSet _prisonersCell[4];
 
@@ -114,7 +114,7 @@ public:
             InstanceScript::OnGameObjectCreate(go);
         }
 
-        ObjectGuid GetGuidData(uint32 data) const override
+        WOWGUID GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -131,7 +131,7 @@ public:
                     return _prisonGUIDs[data - DATA_PRISON_CELL1];
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -198,7 +198,7 @@ public:
 
         void ResetPrisoners(GuidSet prisoners)
         {
-            for (ObjectGuid const& guid : prisoners)
+            for (WOWGUID const& guid : prisoners)
                 if (Creature* prisoner = instance->GetCreature(guid))
                     ResetPrisoner(prisoner);
         }
@@ -248,7 +248,7 @@ public:
             }
         }
 
-        void PrisonerDied(ObjectGuid guid)
+        void PrisonerDied(WOWGUID guid)
         {
             if (_prisonersCell[0].find(guid) != _prisonersCell[0].end() && --_prisonerCounter[0] <= 0)
                 ActivateCell(DATA_PRISON_CELL2);
@@ -274,7 +274,7 @@ public:
                 case DATA_BROGGOK_REAR_DOOR:
                     if (GameObject* go = GetGameObject(DATA_BROGGOK_REAR_DOOR))
                     {
-                        HandleGameObject(ObjectGuid::Empty, true, go);
+                        HandleGameObject(WOWGUID::Empty, true, go);
                     }
                     if (Creature* broggok = GetCreature(DATA_BROGGOK))
                     {
@@ -286,7 +286,7 @@ public:
 
         void ActivatePrisoners(GuidSet prisoners)
         {
-            for (ObjectGuid const& guid : prisoners)
+            for (WOWGUID const& guid : prisoners)
                 if (Creature* prisoner = instance->GetCreature(guid))
                 {
                     prisoner->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);

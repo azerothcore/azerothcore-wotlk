@@ -37,14 +37,14 @@ public:
         instance_oculus_InstanceMapScript(Map* pMap) : InstanceScript(pMap) { Initialize(); }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        ObjectGuid DragonCageDoorGUID[3];
-        ObjectGuid EregosCacheGUID;
+        WOWGUID DragonCageDoorGUID[3];
+        WOWGUID EregosCacheGUID;
         uint32 CentrifugeCount;
 
-        ObjectGuid uiDrakosGUID;
-        ObjectGuid uiVarosGUID;
-        ObjectGuid uiUromGUID;
-        ObjectGuid uiEregosGUID;
+        WOWGUID uiDrakosGUID;
+        WOWGUID uiVarosGUID;
+        WOWGUID uiUromGUID;
+        WOWGUID uiEregosGUID;
 
         bool bAmberVoid;
         bool bEmeraldVoid;
@@ -218,7 +218,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        WOWGUID GetGuidData(uint32 identifier) const override
         {
             switch( identifier )
             {
@@ -236,7 +236,7 @@ public:
                     return DragonCageDoorGUID[identifier - 100];
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void ReadSaveDataMore(std::istringstream& data) override

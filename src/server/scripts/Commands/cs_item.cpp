@@ -253,7 +253,7 @@ public:
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             CharacterDatabasePreparedStatement* stmt;
 
-            ObjectGuid::LowType guid = player.GetGUID().GetCounter();
+            WOWGUID::LowType guid = player.GetGUID().GetCounter();
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_ITEM_BY_ENTRY_AND_OWNER);
             stmt->SetData(0, itemId);

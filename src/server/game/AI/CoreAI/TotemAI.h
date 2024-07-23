@@ -41,7 +41,7 @@ public:
     static int32 Permissible(Creature const* creature);
 
 private:
-    ObjectGuid i_victimGuid;
+    WOWGUID i_victimGuid;
 };
 
 class KillMagnetEvent : public BasicEvent

@@ -115,7 +115,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 uiData) const override
+        WOWGUID GetGuidData(uint32 uiData) const override
         {
             switch (uiData)
             {
@@ -131,7 +131,7 @@ public:
                     return _edgeOfMadnessGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         uint32 GetData(uint32 type) const override
@@ -178,13 +178,13 @@ public:
         // If all High Priest bosses were killed. Ohgan is added too.
         // Jindo is needed for healfunction.
 
-        ObjectGuid _jindoTheHexxerGUID;
-        ObjectGuid _vilebranchSpeakerGUID;
-        ObjectGuid _arlokkGUID;
-        ObjectGuid _goGongOfBethekkGUID;
-        ObjectGuid _hakkarGUID;
-        ObjectGuid _gahzrankaGUID;
-        ObjectGuid _edgeOfMadnessGUID;
+        WOWGUID _jindoTheHexxerGUID;
+        WOWGUID _vilebranchSpeakerGUID;
+        WOWGUID _arlokkGUID;
+        WOWGUID _goGongOfBethekkGUID;
+        WOWGUID _hakkarGUID;
+        WOWGUID _gahzrankaGUID;
+        WOWGUID _edgeOfMadnessGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

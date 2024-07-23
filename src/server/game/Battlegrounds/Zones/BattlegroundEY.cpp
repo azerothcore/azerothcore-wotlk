@@ -388,7 +388,7 @@ void BattlegroundEY::RespawnFlagAfterDrop()
     RespawnFlag();
     if (GameObject* flag = FindBgMap()->GetGameObject(GetDroppedFlagGUID()))
         flag->Delete();
-    SetDroppedFlagGUID(ObjectGuid::Empty);
+    SetDroppedFlagGUID(WOWGUID::Empty);
 }
 
 void BattlegroundEY::HandleKillPlayer(Player* player, Player* killer)
@@ -405,7 +405,7 @@ void BattlegroundEY::EventPlayerDroppedFlag(Player* player)
     if (GetFlagPickerGUID() != player->GetGUID())
         return;
 
-    SetFlagPicker(ObjectGuid::Empty);
+    SetFlagPicker(WOWGUID::Empty);
     player->RemoveAurasDueToSpell(BG_EY_NETHERSTORM_FLAG_SPELL);
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -430,7 +430,7 @@ void BattlegroundEY::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     _flagState = BG_EY_FLAG_STATE_ON_PLAYER;
     SpawnBGObject(BG_EY_OBJECT_FLAG_NETHERSTORM, RESPAWN_ONE_DAY);
     SetFlagPicker(player->GetGUID());
-    SetDroppedFlagGUID(ObjectGuid::Empty);
+    SetDroppedFlagGUID(WOWGUID::Empty);
 
     player->CastSpell(player, BG_EY_NETHERSTORM_FLAG_SPELL, true);
     player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -526,7 +526,7 @@ void BattlegroundEY::EventTeamCapturedPoint(Player* player, TeamId teamId, uint3
 
 void BattlegroundEY::EventPlayerCapturedFlag(Player* player, uint32 BgObjectType)
 {
-    SetFlagPicker(ObjectGuid::Empty);
+    SetFlagPicker(WOWGUID::Empty);
     _flagState = BG_EY_FLAG_STATE_ON_BASE;
     player->RemoveAurasDueToSpell(BG_EY_NETHERSTORM_FLAG_SPELL);
     player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);

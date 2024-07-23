@@ -311,9 +311,9 @@ struct boss_netherspite : public BossAI
 
 private:
     bool berserk;
-    ObjectGuid PortalGUID[3]; // guid's of portals
-    ObjectGuid BeamerGUID[3]; // guid's of auxiliary beaming portals
-    ObjectGuid BeamTarget[3]; // guid's of portals' current targets
+    WOWGUID PortalGUID[3]; // guid's of portals
+    WOWGUID BeamerGUID[3]; // guid's of auxiliary beaming portals
+    WOWGUID BeamTarget[3]; // guid's of portals' current targets
 };
 
 class spell_nether_portal_perseverence : public AuraScript

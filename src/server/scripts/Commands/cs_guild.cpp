@@ -221,13 +221,13 @@ public:
         return true;
     }
 
-    static bool HandleGuildInfoCommand(ChatHandler* handler, Optional<Variant<ObjectGuid::LowType, QuotedString>> const& guildIdentifier)
+    static bool HandleGuildInfoCommand(ChatHandler* handler, Optional<Variant<WOWGUID::LowType, QuotedString>> const& guildIdentifier)
     {
         Guild* guild = nullptr;
 
         if (guildIdentifier)
         {
-            if (ObjectGuid::LowType const* guid = std::get_if<ObjectGuid::LowType>(&*guildIdentifier))
+            if (WOWGUID::LowType const* guid = std::get_if<WOWGUID::LowType>(&*guildIdentifier))
                 guild = sGuildMgr->GetGuildById(*guid);
             else
                 guild = sGuildMgr->GetGuildByName(guildIdentifier->get<QuotedString>());

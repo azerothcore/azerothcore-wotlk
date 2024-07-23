@@ -19,7 +19,7 @@
 #define __UPDATEDATA_H
 
 #include "ByteBuffer.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 
 class WorldPacket;
 
@@ -53,7 +53,7 @@ class UpdateData
 public:
     UpdateData();
 
-    void AddOutOfRangeGUID(ObjectGuid guid);
+    void AddOutOfRangeGUID(WOWGUID guid);
     void AddUpdateBlock(const ByteBuffer& block);
     void AddUpdateBlock(const UpdateData& block);
     bool BuildPacket(WorldPacket& packet);

@@ -153,7 +153,7 @@ public:
                 if (GetBossState(DATA_ILLIDARI_COUNCIL) == DONE)
                 {
                     SetBossState(DATA_AKAMA_ILLIDAN, DONE);
-                    HandleGameObject(ObjectGuid::Empty, true, go);
+                    HandleGameObject(WOWGUID::Empty, true, go);
                 }
             }
 
@@ -167,7 +167,7 @@ public:
 
             if (type == DATA_SHADE_OF_AKAMA && state == DONE)
             {
-                for (ObjectGuid const& guid : ashtongueGUIDs)
+                for (WOWGUID const& guid : ashtongueGUIDs)
                     if (Creature* ashtongue = instance->GetCreature(guid))
                         ashtongue->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
             }
@@ -214,7 +214,7 @@ class spell_black_template_harpooners_mark_aura : public AuraScript
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        for (ObjectGuid const& guid : _turtleSet)
+        for (WOWGUID const& guid : _turtleSet)
             if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
             {
                 turtle->TauntFadeOut(GetUnitOwner());

@@ -426,7 +426,7 @@ uint32 Player::GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipIte
     return count;
 }
 
-Item* Player::GetItemByGuid(ObjectGuid guid) const
+Item* Player::GetItemByGuid(WOWGUID guid) const
 {
     for (uint8 i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
         if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -2972,7 +2972,7 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
                 }
             }
 
-            SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), ObjectGuid::Empty);
+            SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), WOWGUID::Empty);
 
             if (slot < EQUIPMENT_SLOT_END)
                 SetVisibleItemSlot(slot, nullptr);
@@ -2980,8 +2980,8 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update, bool swap)
         else if (CGBag* pBag = GetBagByPos(bag))
             pBag->RemoveItem(slot, update);
 
-        pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid::Empty);
-        // pItem->SetGuidValue(ITEM_FIELD_OWNER, ObjectGuid::Empty); not clear owner at remove (it will be set at store). This used in mail and auction code
+        pItem->SetGuidValue(ITEM_FIELD_CONTAINED, WOWGUID::Empty);
+        // pItem->SetGuidValue(ITEM_FIELD_OWNER, WOWGUID::Empty); not clear owner at remove (it will be set at store). This used in mail and auction code
         pItem->SetSlot(NULL_SLOT);
         if (IsInWorld() && update)
             pItem->SendUpdateToPlayer(this);
@@ -3071,7 +3071,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
 
         if (bag == INVENTORY_SLOT_BAG_0)
         {
-            SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), ObjectGuid::Empty);
+            SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), WOWGUID::Empty);
 
             // equipment and equipped bags can have applied bonuses
             if (slot < INVENTORY_SLOT_BAG_END)
@@ -3126,7 +3126,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
         }
 
         //pItem->SetOwnerGUID(0);
-        pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid::Empty);
+        pItem->SetGuidValue(ITEM_FIELD_CONTAINED, WOWGUID::Empty);
         pItem->SetSlot(NULL_SLOT);
         pItem->SetState(ITEM_REMOVED, this);
     }
@@ -4022,7 +4022,7 @@ void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
         m_items[slot] = nullptr;
 
         uint32 eslot = slot - BUYBACK_SLOT_START;
-        SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (eslot * 2), ObjectGuid::Empty);
+        SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (eslot * 2), WOWGUID::Empty);
         SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + eslot, 0);
         SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + eslot, 0);
 
@@ -4040,8 +4040,8 @@ void Player::SendInventoryChangeFailure(BAG_RESULT msg, Item* pItem /*= nullptr*
 
     if (msg != BAG_OK)
     {
-        data << (pItem ? pItem->GetGUID() : ObjectGuid::Empty);
-        data << (pItem2 ? pItem2->GetGUID() : ObjectGuid::Empty);
+        data << (pItem ? pItem->GetGUID() : WOWGUID::Empty);
+        data << (pItem2 ? pItem2->GetGUID() : WOWGUID::Empty);
         data << uint8(0);                                   // bag type subclass, used with EQUIP_ERR_EVENT_AUTOEQUIP_BIND_CONFIRM and EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG2
 
         switch (msg)
@@ -4055,9 +4055,9 @@ void Player::SendInventoryChangeFailure(BAG_RESULT msg, Item* pItem /*= nullptr*
             }
             case EQUIP_ERR_EVENT_AUTOEQUIP_BIND_CONFIRM:    // no idea about this one...
             {
-                data << ObjectGuid::Empty;  // item guid
+                data << WOWGUID::Empty;  // item guid
                 data << uint32(0);          // slot
-                data << ObjectGuid::Empty;  // container
+                data << WOWGUID::Empty;  // container
                 break;
             }
             case EQUIP_ERR_ITEM_MAX_LIMIT_CATEGORY_COUNT_EXCEEDED:
@@ -4079,7 +4079,7 @@ void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32
 {
     LOG_DEBUG("network", "WORLD: Sent SMSG_BUY_FAILED");
     WorldPacket data(SMSG_BUY_FAILED, (8 + 4 + 4 + 1));
-    data << (creature ? creature->GetGUID() : ObjectGuid::Empty);
+    data << (creature ? creature->GetGUID() : WOWGUID::Empty);
     data << uint32(item);
     if (param > 0)
         data << uint32(param);
@@ -4087,11 +4087,11 @@ void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32
     User()->Send(&data);
 }
 
-void Player::SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, uint32 param)
+void Player::SendSellError(SellResult msg, Creature* creature, WOWGUID guid, uint32 param)
 {
     LOG_DEBUG("network", "WORLD: Sent SMSG_SELL_ITEM");
     WorldPacket data(SMSG_SELL_ITEM, (8 + 8 + (param ? 4 : 0) + 1)); // last check 2.0.10
-    data << (creature ? creature->GetGUID() : ObjectGuid::Empty);
+    data << (creature ? creature->GetGUID() : WOWGUID::Empty);
     data << guid;
     if (param > 0)
         data << uint32(param);
@@ -4789,7 +4789,7 @@ void Player::SendItemPush(Item* item, uint32 count, bool received, bool created,
 /***                   LOAD SYSTEM                     ***/
 /*********************************************************/
 
-void Player::Initialize(ObjectGuid::LowType guid)
+void Player::Initialize(WOWGUID::LowType guid)
 {
     Object::_Create(guid, 0, HighGuid::Player);
 }
@@ -4856,7 +4856,7 @@ void Player::_LoadEquipmentSets(PreparedQueryResult result)
         eqSet.state     = EQUIPMENT_SET_UNCHANGED;
 
         for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
-            eqSet.Items[i] = ObjectGuid::Create<HighGuid::Item>(fields[5 + i].Get<uint32>());
+            eqSet.Items[i] = WOWGUID::Create<HighGuid::Item>(fields[5 + i].Get<uint32>());
 
         m_EquipmentSets[index] = eqSet;
 
@@ -4884,7 +4884,7 @@ void Player::_LoadEntryPointData(PreparedQueryResult result)
     m_entryPointData.mountSpell = fields[7].Get<uint32>();
 }
 
-bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid)
+bool Player::LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, WOWGUID::LowType guid)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_POSITION);
     stmt->SetData(0, guid);
@@ -4927,7 +4927,7 @@ bool Player::isBeingLoaded() const
     return User()->PlayerLoading();
 }
 
-bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder const& holder)
+bool Player::LoadFromDB(WOWGUID playerGuid, CharacterDatabaseQueryHolder const& holder)
 {
     ////                                                     0     1        2     3     4        5      6    7      8     9    10    11         12         13           14         15         16
     //QueryResult* result = CharacterDatabase.Query("SELECT guid, account, name, race, class, gender, level, xp, money, skin, face, hairStyle, hairColor, facialStyle, bankSlots, restState, playerFlags, "
@@ -4967,7 +4967,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         return false;
     }
 
-    ObjectGuid::LowType guid = playerGuid.GetCounter();
+    WOWGUID::LowType guid = playerGuid.GetCounter();
 
     Object::_Create(guid, 0, HighGuid::Player);
 
@@ -5051,7 +5051,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     // cleanup inventory related item value fields (its will be filled correctly in _LoadInventory)
     for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
     {
-        SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), ObjectGuid::Empty);
+        SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), WOWGUID::Empty);
         SetVisibleItemSlot(slot, nullptr);
 
         delete m_items[slot];
@@ -5179,7 +5179,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         Transport* transGO = nullptr;
         if (transLowGUID > 0)
         {
-            ObjectGuid transGUID = ObjectGuid::Create<HighGuid::Mo_Transport>(transLowGUID);
+            WOWGUID transGUID = WOWGUID::Create<HighGuid::Mo_Transport>(transLowGUID);
             transGO = HashMapHolder<MotionTransport>::Find(transGUID);
         }
         else
@@ -5368,16 +5368,16 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         m_deathExpireTime = now + MAX_DEATH_COUNT * DEATH_EXPIRE_STEP - 1;
 
     // clear channel spell data (if saved at channel spell casting)
-    SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, ObjectGuid::Empty);
+    SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, WOWGUID::Empty);
     SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
 
     // clear charm/summon related fields
-    SetOwnerGUID(ObjectGuid::Empty);
-    SetGuidValue(UNIT_FIELD_CHARMEDBY, ObjectGuid::Empty);
-    SetGuidValue(UNIT_FIELD_CHARM, ObjectGuid::Empty);
-    SetGuidValue(UNIT_FIELD_SUMMON, ObjectGuid::Empty);
-    SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
-    SetCreatorGUID(ObjectGuid::Empty);
+    SetOwnerGUID(WOWGUID::Empty);
+    SetGuidValue(UNIT_FIELD_CHARMEDBY, WOWGUID::Empty);
+    SetGuidValue(UNIT_FIELD_CHARM, WOWGUID::Empty);
+    SetGuidValue(UNIT_FIELD_SUMMON, WOWGUID::Empty);
+    SetGuidValue(PLAYER_FARSIGHT, WOWGUID::Empty);
+    SetCreatorGUID(WOWGUID::Empty);
 
     RemoveUnitFlag2(UNIT_FLAG2_FORCE_MOVEMENT);
 
@@ -5386,7 +5386,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetUInt32Value(PLAYER_TRACK_RESOURCES, 0);
 
     // make sure the unit is considered not in duel for proper loading
-    SetGuidValue(PLAYER_DUEL_ARBITER, ObjectGuid::Empty);
+    SetGuidValue(PLAYER_DUEL_ARBITER, WOWGUID::Empty);
     SetUInt32Value(PLAYER_DUEL_TEAM, 0);
 
     // reset stats before loading any modifiers
@@ -5723,8 +5723,8 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
             Field* fields = result->Fetch();
             int32 damage[3];
             int32 baseDamage[3];
-            ObjectGuid caster_guid = ObjectGuid(fields[0].Get<uint64>());
-            ObjectGuid itemGuid = ObjectGuid(fields[1].Get<uint64>());
+            WOWGUID caster_guid = WOWGUID(fields[0].Get<uint64>());
+            WOWGUID itemGuid = WOWGUID(fields[1].Get<uint64>());
             uint32 spellid = fields[2].Get<uint32>();
             uint8 effmask = fields[3].Get<uint8>();
             uint8 recalculatemask = fields[4].Get<uint8>();
@@ -5853,8 +5853,8 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
     {
         uint32 zoneId = GetZoneId();
 
-        std::map<ObjectGuid::LowType, CGBag*> bagMap;                 // fast guid lookup for bags
-        std::map<ObjectGuid::LowType, Item*> invalidBagMap;         // fast guid lookup for bags
+        std::map<WOWGUID::LowType, CGBag*> bagMap;                 // fast guid lookup for bags
+        std::map<WOWGUID::LowType, Item*> invalidBagMap;         // fast guid lookup for bags
         std::list<Item*> problematicItems;
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
@@ -5865,7 +5865,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
             Field* fields = result->Fetch();
             if (Item* item = _LoadItem(trans, zoneId, timeDiff, fields))
             {
-                ObjectGuid::LowType bagGuid  = fields[11].Get<uint32>();
+                WOWGUID::LowType bagGuid  = fields[11].Get<uint32>();
                 uint8  slot     = fields[12].Get<uint8>();
 
                 uint8 err = BAG_OK;
@@ -5913,7 +5913,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                 {
                     item->SetSlot(NULL_SLOT);
                     // Item is in the bag, find the bag
-                    std::map<ObjectGuid::LowType, CGBag*>::iterator itr = bagMap.find(bagGuid);
+                    std::map<WOWGUID::LowType, CGBag*>::iterator itr = bagMap.find(bagGuid);
                     if (itr != bagMap.end())
                     {
                         ItemPosCountVec dest;
@@ -5923,7 +5923,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
                     }
                     else if (invalidBagMap.find(bagGuid) != invalidBagMap.end())
                     {
-                        std::map<ObjectGuid::LowType, Item*>::iterator iterator = invalidBagMap.find(bagGuid);
+                        std::map<WOWGUID::LowType, Item*>::iterator iterator = invalidBagMap.find(bagGuid);
                         if (std::find(problematicItems.begin(), problematicItems.end(), iterator->second) != problematicItems.end())
                         {
                             err = EQUIP_ERR_INT_BAG_ERROR;
@@ -5976,7 +5976,7 @@ void Player::_LoadInventory(PreparedQueryResult result, uint32 timeDiff)
 Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields)
 {
     Item* item = nullptr;
-    ObjectGuid::LowType itemGuid  = fields[13].Get<uint32>();
+    WOWGUID::LowType itemGuid  = fields[13].Get<uint32>();
     uint32 itemEntry = fields[14].Get<uint32>();
     if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry))
     {
@@ -6043,9 +6043,9 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                     AllowedLooterSet looters;
                     for (std::string_view guidStr : Acore::Tokenize((*result)[0].Get<std::string_view>(), ' ', false))
                     {
-                        if (Optional<ObjectGuid::LowType> guid = Acore::StringTo<ObjectGuid::LowType>(guidStr))
+                        if (Optional<WOWGUID::LowType> guid = Acore::StringTo<WOWGUID::LowType>(guidStr))
                         {
-                            looters.insert(ObjectGuid::Create<HighGuid::Player>(*guid));
+                            looters.insert(WOWGUID::Create<HighGuid::Player>(*guid));
                         }
                         else
                         {
@@ -6109,9 +6109,9 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
 }
 
 // load mailed item which should receive current player
-Item* Player::_LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint32 mailId, Mail* mail, Field* fields)
+Item* Player::_LoadMailedItem(WOWGUID const& playerGuid, Player* player, uint32 mailId, Mail* mail, Field* fields)
 {
-    ObjectGuid::LowType itemGuid = fields[11].Get<uint32>();
+    WOWGUID::LowType itemGuid = fields[11].Get<uint32>();
     uint32 itemEntry = fields[12].Get<uint32>();
 
     ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry);
@@ -6132,7 +6132,7 @@ Item* Player::_LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint
 
     Item* item = NewItemOrBag(proto);
 
-    ObjectGuid ownerGuid = fields[13].Get<uint32>() ? ObjectGuid::Create<HighGuid::Player>(fields[13].Get<uint32>()) : ObjectGuid::Empty;
+    WOWGUID ownerGuid = fields[13].Get<uint32>() ? WOWGUID::Create<HighGuid::Player>(fields[13].Get<uint32>()) : WOWGUID::Empty;
     if (!item->LoadFromDB(itemGuid, ownerGuid, fields, itemEntry))
     {
         LOG_ERROR("entities.player", "Player::_LoadMailedItems: Item (GUID: {}) in mail ({}) doesn't exist, deleted from mail.", itemGuid, mailId);
@@ -6489,7 +6489,7 @@ void Player::_LoadSpells(PreparedQueryResult result)
 
 void Player::_LoadGroup()
 {
-    if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(GetGUID()))
+    if (WOWGUID groupId = sCharacterCache->GetCharacterGroupGuidByGuid(GetGUID()))
     {
         if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
         {
@@ -6548,7 +6548,7 @@ void Player::SendRaidInfo()
                 time_t resetTime = itr->second.extended ? save->GetExtendedResetTime() : save->GetResetTime();
                 data << uint32(save->GetMapId());           // map id
                 data << uint32(save->GetDifficulty());      // difficulty
-                data << ObjectGuid::Create<HighGuid::Instance>(save->GetInstanceId()); // instance id
+                data << WOWGUID::Create<HighGuid::Instance>(save->GetInstanceId()); // instance id
                 data << uint8(1);                           // expired = 0
                 data << uint8(itr->second.extended ? 1 : 0);// extended = 1
                 data << uint32(resetTime >= now ? resetTime - now : 0); // reset time
@@ -6740,7 +6740,7 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         Player* partyLeader = this;
         std::string leaderName = m_user->GetAcoreString(LANG_YOU);
         {
-            ObjectGuid leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
+            WOWGUID leaderGuid = GetGroup() ? GetGroup()->GetLeaderGUID() : GetGUID();
             Player* tempLeader = HashMapHolder<Player>::Find(leaderGuid);
             if (leaderGuid != GetGUID())
             {
@@ -7312,7 +7312,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
     if (m_itemUpdateQueue.empty())
         return;
 
-    ObjectGuid::LowType lowGuid = GetGUID().GetCounter();
+    WOWGUID::LowType lowGuid = GetGUID().GetCounter();
     for (std::size_t i = 0; i < m_itemUpdateQueue.size(); ++i)
     {
         Item* item = m_itemUpdateQueue[i];
@@ -7320,14 +7320,14 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
             continue;
 
         CGBag* container = item->GetContainer();
-        ObjectGuid::LowType bag_guid = container ? container->GetGUID().GetCounter() : 0;
+        WOWGUID::LowType bag_guid = container ? container->GetGUID().GetCounter() : 0;
 
         if (item->GetState() != ITEM_REMOVED)
         {
             Item* test = GetItemByPos(item->GetBagSlot(), item->GetSlot());
             if (!test)
             {
-                ObjectGuid::LowType bagTestGUID = 0;
+                WOWGUID::LowType bagTestGUID = 0;
                 if (Item* test2 = GetItemByPos(INVENTORY_SLOT_BAG_0, item->GetBagSlot()))
                     bagTestGUID = test2->GetGUID().GetCounter();
                 LOG_ERROR("entities.player", "Player(GUID: {} Name: {})::_SaveInventory - the bag({}) and slot({}) values for the item {} (state {}) are incorrect, the player doesn't have an item at that position!",

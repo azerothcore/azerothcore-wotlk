@@ -1265,7 +1265,7 @@ public:
         }
 
         InstanceScript* _instance;
-        ObjectGuid _chaseGUID;
+        WOWGUID _chaseGUID;
         bool _exploded;
         bool _started;
 
@@ -1292,7 +1292,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*type*/) override
+        void SetGUID(WOWGUID guid, int32 /*type*/) override
         {
             _chaseGUID = guid;
         }

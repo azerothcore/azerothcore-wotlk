@@ -108,7 +108,7 @@ public:
 
     bool _introDone;
     bool _boneSlice;
-    ObjectGuid _lastBoneSliceTargets[3];
+    WOWGUID _lastBoneSliceTargets[3];
 
     void Reset() override
     {
@@ -147,12 +147,12 @@ public:
                 }
     }
 
-    ObjectGuid GetGUID(int32 id) const override
+    WOWGUID GetGUID(int32 id) const override
     {
         if (id >= 0 && id <= 2)
             return _lastBoneSliceTargets[id];
 
-        return ObjectGuid::Empty;
+        return WOWGUID::Empty;
     }
 
     void UpdateAI(uint32 diff) override
@@ -421,8 +421,8 @@ public:
                         }
                     }
                 }
-                ObjectGuid petGUID = summonerUnit->GetPetGUID();
-                summonerUnit->SetPetGUID(ObjectGuid::Empty);
+                WOWGUID petGUID = summonerUnit->GetPetGUID();
+                summonerUnit->SetPetGUID(WOWGUID::Empty);
                 me->CastSpell(summonerUnit, SPELL_IMPALED, true);
                 summonerUnit->CastSpell(me, SPELL_RIDE_VEHICLE, true);
                 //summoner->ClearUnitState(UNIT_STATE_ONVEHICLE);

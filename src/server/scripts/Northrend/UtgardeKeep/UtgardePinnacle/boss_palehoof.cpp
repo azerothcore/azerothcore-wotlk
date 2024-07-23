@@ -128,7 +128,7 @@ public:
         InstanceScript* m_pInstance;
         EventMap events;
         SummonList summons;
-        ObjectGuid OrbGUID;
+        WOWGUID OrbGUID;
         uint8 Counter;
         uint8 RandomUnfreeze[4];
 
@@ -799,7 +799,7 @@ public:
     {
         InstanceScript* pInstance = go->GetInstanceScript();
 
-        Creature* pPalehoof = ObjectAccessor::GetCreature(*go, pInstance ? pInstance->GetGuidData(DATA_GORTOK_PALEHOOF) : ObjectGuid::Empty);
+        Creature* pPalehoof = ObjectAccessor::GetCreature(*go, pInstance ? pInstance->GetGuidData(DATA_GORTOK_PALEHOOF) : WOWGUID::Empty);
         if (pPalehoof && pPalehoof->IsAlive())
         {
             // maybe these are hacks :(

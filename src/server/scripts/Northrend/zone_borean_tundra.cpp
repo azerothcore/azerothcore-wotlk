@@ -99,7 +99,7 @@ public:
 
         uint32 phaseTimer;
         uint8  phase;
-        ObjectGuid casterGuid;
+        WOWGUID casterGuid;
 
         void Reset() override
         {
@@ -575,7 +575,7 @@ struct npc_beryl_sorcererAI : public CreatureAI
 
     private:
         EventMap   _events;
-        ObjectGuid _playerGUID;
+        WOWGUID _playerGUID;
         bool       _chainsCast;
     };
 
@@ -755,7 +755,7 @@ public:
             }
         }
 
-        void GotStinged(ObjectGuid casterGUID)
+        void GotStinged(WOWGUID casterGUID)
         {
             if (Player* caster = ObjectAccessor::GetPlayer(*me, casterGUID))
             {
@@ -1280,7 +1280,7 @@ public:
             EventMap   _events;
             uint32     _emoteState;
             NPCFlags   _npcFlags;
-            ObjectGuid _playerGUID;
+            WOWGUID _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1329,7 +1329,7 @@ public:
             _playerGUID.Clear();
         }
 
-        void SetGUID(ObjectGuid guid, int32 /*action*/) override
+        void SetGUID(WOWGUID guid, int32 /*action*/) override
         {
             if (_playerGUID)
                 return;
@@ -1371,7 +1371,7 @@ public:
 
     private:
         EventMap _events;
-        ObjectGuid _playerGUID;
+        WOWGUID _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -1903,11 +1903,11 @@ public:
 
     private:
         EventMap   _events;
-        ObjectGuid _playerGUID;
-        ObjectGuid _arthasGUID;
-        ObjectGuid _talbotGUID;
-        ObjectGuid _leryssaGUID;
-        ObjectGuid _arlosGUID;
+        WOWGUID _playerGUID;
+        WOWGUID _arthasGUID;
+        WOWGUID _talbotGUID;
+        WOWGUID _leryssaGUID;
+        WOWGUID _arlosGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

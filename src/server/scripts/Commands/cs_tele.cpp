@@ -123,7 +123,7 @@ public:
         if (Player* target = player.GetConnectedPlayer())
         {
             // check online security
-            if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+            if (handler->HasLowerSecurity(target, WOWGUID::Empty))
                 return false;
 
             std::string chrNameLink = handler->playerLink(target->GetName());
@@ -218,7 +218,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+        if (handler->HasLowerSecurity(target, WOWGUID::Empty))
             return false;
 
         MapEntry const* map = sMapStore.LookupEntry(tele->mapId);
@@ -245,7 +245,7 @@ public:
                 continue;
 
             // check online security
-            if (handler->HasLowerSecurity(player, ObjectGuid::Empty))
+            if (handler->HasLowerSecurity(player, WOWGUID::Empty))
                 return false;
 
             std::string plNameLink = handler->GetNameLink(player);
@@ -338,7 +338,7 @@ public:
         return DoNameTeleport(handler, player, spawnpoint->mapid, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, creatureTemplate->Name);
     }
 
-    static bool HandleTeleNameNpcSpawnIdCommand(ChatHandler* handler, PlayerIdentifier player, Variant<Hyperlink<creature>, ObjectGuid::LowType> spawnId)
+    static bool HandleTeleNameNpcSpawnIdCommand(ChatHandler* handler, PlayerIdentifier player, Variant<Hyperlink<creature>, WOWGUID::LowType> spawnId)
     {
         CreatureData const* spawnpoint = sObjectMgr->GetCreatureData(spawnId);
         if (!spawnpoint)

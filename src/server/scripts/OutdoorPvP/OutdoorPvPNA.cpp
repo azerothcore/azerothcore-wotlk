@@ -81,7 +81,7 @@ void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
     }
 }
 
-void UpdateCreatureHalaa(ObjectGuid::LowType spawnId, Map* map, float x, float y)
+void UpdateCreatureHalaa(WOWGUID::LowType spawnId, Map* map, float x, float y)
 {
     CreatureData& data = sObjectMgr->NewOrExistCreatureData(spawnId);
 
@@ -122,7 +122,7 @@ void OPvPCapturePointNA::DespawnCreatures(HalaaNPCS teamNPC)
 {
     for (int i = 0; i < NA_HALAA_CREATURE_TEAM_SPAWN; i++)
     {
-        ObjectGuid::LowType spawnId = teamNPC[i];
+        WOWGUID::LowType spawnId = teamNPC[i];
         auto bounds = _pvp->GetMap()->GetCreatureBySpawnIdStore().equal_range(spawnId);
         CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
         for (auto itr = bounds.first; itr != bounds.second;)
@@ -145,7 +145,7 @@ void OPvPCapturePointNA::SpawnNPCsForTeam(HalaaNPCS teamNPC)
 {
     for (int i = 0; i < NA_HALAA_CREATURE_TEAM_SPAWN; i++)
     {
-        ObjectGuid::LowType spawnId = teamNPC[i];
+        WOWGUID::LowType spawnId = teamNPC[i];
         const CreatureData* data = sObjectMgr->GetCreatureData(spawnId);
         if (data) {
             UpdateCreatureHalaa(spawnId, _pvp->GetMap(), data->posX, data->posY);
@@ -607,7 +607,7 @@ bool OPvPCapturePointNA::Update(uint32 diff)
 
     for (PlayerSet playerSet : _activePlayers)
     {
-        for (ObjectGuid playerGuid : playerSet)
+        for (WOWGUID playerGuid : playerSet)
         {
             if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
                 if (!_capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())

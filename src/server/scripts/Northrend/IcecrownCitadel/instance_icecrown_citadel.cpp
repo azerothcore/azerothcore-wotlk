@@ -547,7 +547,7 @@ public:
             InstanceScript::OnCreatureRemove(creature);
         }
 
-        uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
+        uint32 GetCreatureEntry(WOWGUID::LowType /*guidLow*/, CreatureData const* data) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -592,7 +592,7 @@ public:
             return entry;
         }
 
-        uint32 GetGameObjectEntry(ObjectGuid::LowType /*guidLow*/, uint32 entry) override
+        uint32 GetGameObjectEntry(WOWGUID::LowType /*guidLow*/, uint32 entry) override
         {
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
@@ -975,7 +975,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -1048,7 +1048,7 @@ public:
                     break;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void HandleDropAttempt(bool drop = true)
@@ -1948,69 +1948,69 @@ public:
         // pussywizard:
         bool IsBuffAvailable;
         uint32 WeeklyQuestId10; // contains id from 10man for any difficulty (for simplicity)
-        ObjectGuid WeeklyQuestNpcGUID[WeeklyNPCs];
-        ObjectGuid PutricideEnteranceDoorGUID;
+        WOWGUID WeeklyQuestNpcGUID[WeeklyNPCs];
+        WOWGUID PutricideEnteranceDoorGUID;
         uint32 PutricideEventProgress;
-        ObjectGuid GasReleaseValveGUID;
-        ObjectGuid OozeReleaseValveGUID;
+        WOWGUID GasReleaseValveGUID;
+        WOWGUID OozeReleaseValveGUID;
         bool LichKingHeroicAvailable;
         uint32 LichKingRandomWhisperTimer;
         uint32 DarkwhisperElevatorTimer;
-        ObjectGuid ScourgeTransporterFirstGUID;
+        WOWGUID ScourgeTransporterFirstGUID;
 
         EventMap Events;
-        ObjectGuid LadyDeathwhisperGUID;
-        ObjectGuid LadyDeathwisperElevatorGUID;
-        ObjectGuid GunshipGUID;
-        ObjectGuid EnemyGunshipGUID;
-        ObjectGuid GunshipArmoryGUID;
-        ObjectGuid DeathbringerSaurfangGUID;
-        ObjectGuid DeathbringerSaurfangDoorGUID;
-        ObjectGuid DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
-        ObjectGuid DeathbringersCacheGUID;
-        ObjectGuid SaurfangTeleportGUID;
-        ObjectGuid PlagueSigilGUID;
-        ObjectGuid BloodwingSigilGUID;
-        ObjectGuid FrostwingSigilGUID;
-        ObjectGuid PutricidePipeGUIDs[2];
-        ObjectGuid PutricideGateGUIDs[2];
-        ObjectGuid PutricideCollisionGUID;
-        ObjectGuid FestergutGUID;
-        ObjectGuid RotfaceGUID;
-        ObjectGuid ProfessorPutricideGUID;
-        ObjectGuid PutricideTableGUID;
-        ObjectGuid BloodCouncilGUIDs[3];
-        ObjectGuid BloodCouncilControllerGUID;
-        ObjectGuid BloodQueenLanaThelGUID;
-        ObjectGuid CrokScourgebaneGUID;
-        ObjectGuid CrokCaptainGUIDs[4];
-        ObjectGuid SisterSvalnaGUID;
-        ObjectGuid ValithriaDreamwalkerGUID;
-        ObjectGuid ValithriaLichKingGUID;
-        ObjectGuid ValithriaTriggerGUID;
-        ObjectGuid PutricadeTrapGUID;
-        ObjectGuid SindragosaGauntletGUID;
-        ObjectGuid SindragosaGUID;
-        ObjectGuid SpinestalkerGUID;
-        ObjectGuid RimefangGUID;
-        ObjectGuid TheLichKingTeleportGUID;
-        ObjectGuid TheLichKingGUID;
-        ObjectGuid TheLichKingLhGUID;
-        ObjectGuid HighlordTirionFordringGUID;
-        ObjectGuid TerenasMenethilGUID;
-        ObjectGuid ArthasPlatformGUID;
-        ObjectGuid ArthasPrecipiceGUID;
-        ObjectGuid FrozenThroneEdgeGUID;
-        ObjectGuid FrozenThroneWindGUID;
-        ObjectGuid FrozenThroneWarningGUID;
-        ObjectGuid FrozenBolvarGUID;
-        ObjectGuid PillarsChainedGUID;
-        ObjectGuid PillarsUnchainedGUID;
+        WOWGUID LadyDeathwhisperGUID;
+        WOWGUID LadyDeathwisperElevatorGUID;
+        WOWGUID GunshipGUID;
+        WOWGUID EnemyGunshipGUID;
+        WOWGUID GunshipArmoryGUID;
+        WOWGUID DeathbringerSaurfangGUID;
+        WOWGUID DeathbringerSaurfangDoorGUID;
+        WOWGUID DeathbringerSaurfangEventGUID;   // Muradin Bronzebeard or High Overlord Saurfang
+        WOWGUID DeathbringersCacheGUID;
+        WOWGUID SaurfangTeleportGUID;
+        WOWGUID PlagueSigilGUID;
+        WOWGUID BloodwingSigilGUID;
+        WOWGUID FrostwingSigilGUID;
+        WOWGUID PutricidePipeGUIDs[2];
+        WOWGUID PutricideGateGUIDs[2];
+        WOWGUID PutricideCollisionGUID;
+        WOWGUID FestergutGUID;
+        WOWGUID RotfaceGUID;
+        WOWGUID ProfessorPutricideGUID;
+        WOWGUID PutricideTableGUID;
+        WOWGUID BloodCouncilGUIDs[3];
+        WOWGUID BloodCouncilControllerGUID;
+        WOWGUID BloodQueenLanaThelGUID;
+        WOWGUID CrokScourgebaneGUID;
+        WOWGUID CrokCaptainGUIDs[4];
+        WOWGUID SisterSvalnaGUID;
+        WOWGUID ValithriaDreamwalkerGUID;
+        WOWGUID ValithriaLichKingGUID;
+        WOWGUID ValithriaTriggerGUID;
+        WOWGUID PutricadeTrapGUID;
+        WOWGUID SindragosaGauntletGUID;
+        WOWGUID SindragosaGUID;
+        WOWGUID SpinestalkerGUID;
+        WOWGUID RimefangGUID;
+        WOWGUID TheLichKingTeleportGUID;
+        WOWGUID TheLichKingGUID;
+        WOWGUID TheLichKingLhGUID;
+        WOWGUID HighlordTirionFordringGUID;
+        WOWGUID TerenasMenethilGUID;
+        WOWGUID ArthasPlatformGUID;
+        WOWGUID ArthasPrecipiceGUID;
+        WOWGUID FrozenThroneEdgeGUID;
+        WOWGUID FrozenThroneWindGUID;
+        WOWGUID FrozenThroneWarningGUID;
+        WOWGUID FrozenBolvarGUID;
+        WOWGUID PillarsChainedGUID;
+        WOWGUID PillarsUnchainedGUID;
         TeamId TeamIdInInstance;
         uint32 ColdflameJetsState;
-        std::set<ObjectGuid::LowType> FrostwyrmGUIDs;
-        std::set<ObjectGuid::LowType> SpinestalkerTrash;
-        std::set<ObjectGuid::LowType> RimefangTrash;
+        std::set<WOWGUID::LowType> FrostwyrmGUIDs;
+        std::set<WOWGUID::LowType> SpinestalkerTrash;
+        std::set<WOWGUID::LowType> RimefangTrash;
         uint32 BloodQuickeningState;
         uint32 HeroicAttempts;
         uint16 BloodQuickeningMinutes;

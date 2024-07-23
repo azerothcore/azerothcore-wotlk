@@ -50,7 +50,7 @@ namespace ArenaSpectator
     }
 
     template<class T>
-    inline void SendCommand_String(T* o, ObjectGuid targetGUID, const char* prefix, const char* c)
+    inline void SendCommand_String(T* o, WOWGUID targetGUID, const char* prefix, const char* c)
     {
         if (!targetGUID.IsPlayer())
             return;
@@ -59,7 +59,7 @@ namespace ArenaSpectator
     }
 
     template<class T>
-    inline void SendCommand_UInt32Value(T* o, ObjectGuid targetGUID, const char* prefix, uint32 t)
+    inline void SendCommand_UInt32Value(T* o, WOWGUID targetGUID, const char* prefix, uint32 t)
     {
         if (!targetGUID.IsPlayer())
             return;
@@ -68,7 +68,7 @@ namespace ArenaSpectator
     }
 
     template<class T>
-    inline void SendCommand_GUID(T* o, ObjectGuid targetGUID, const char* prefix, ObjectGuid t)
+    inline void SendCommand_GUID(T* o, WOWGUID targetGUID, const char* prefix, WOWGUID t)
     {
         if (!targetGUID.IsPlayer())
             return;
@@ -77,7 +77,7 @@ namespace ArenaSpectator
     }
 
     template<class T>
-    inline void SendCommand_Spell(T* o, ObjectGuid targetGUID, const char* prefix, uint32 id, int32 casttime)
+    inline void SendCommand_Spell(T* o, WOWGUID targetGUID, const char* prefix, uint32 id, int32 casttime)
     {
         if (!targetGUID.IsPlayer())
             return;
@@ -86,7 +86,7 @@ namespace ArenaSpectator
     }
 
     template<class T>
-    inline void SendCommand_Cooldown(T* o, ObjectGuid targetGUID, const char* prefix, uint32 id, uint32 dur, uint32 maxdur)
+    inline void SendCommand_Cooldown(T* o, WOWGUID targetGUID, const char* prefix, uint32 id, uint32 dur, uint32 maxdur)
     {
         if (!targetGUID.IsPlayer())
             return;
@@ -99,7 +99,7 @@ namespace ArenaSpectator
     }
 
     template<class T>
-    inline void SendCommand_Aura(T* o, ObjectGuid targetGUID, const char* prefix, ObjectGuid caster, uint32 id, bool isDebuff, uint32 dispel, int32 dur, int32 maxdur, uint32 stack, bool remove)
+    inline void SendCommand_Aura(T* o, WOWGUID targetGUID, const char* prefix, WOWGUID caster, uint32 id, bool isDebuff, uint32 dispel, int32 dur, int32 maxdur, uint32 stack, bool remove)
     {
         if (!targetGUID.IsPlayer())
             return;
@@ -111,7 +111,7 @@ namespace ArenaSpectator
     AC_GAME_API bool HandleSpectatorWatchCommand(ChatHandler* handler, std::string const& name);
     AC_GAME_API void CreatePacket(WorldPacket& data, std::string const& message);
     AC_GAME_API void HandleResetCommand(Player* player);
-    AC_GAME_API bool ShouldSendAura(Aura* aura, uint8 effMask, ObjectGuid targetGUID, bool remove);
+    AC_GAME_API bool ShouldSendAura(Aura* aura, uint8 effMask, WOWGUID targetGUID, bool remove);
 }
 
 #endif

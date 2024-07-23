@@ -101,7 +101,7 @@ public:
         uint8 iceboltCount{};
         uint32 spawnTimer{};
         GuidList blockList;
-        ObjectGuid currentTarget;
+        WOWGUID currentTarget;
 
         void InitializeAI() override
         {
@@ -205,7 +205,7 @@ public:
 
         bool IsValidExplosionTarget(WorldObject* target)
         {
-            for (ObjectGuid const& guid : blockList)
+            for (WOWGUID const& guid : blockList)
             {
                 if (target->GetGUID() == guid)
                     return false;

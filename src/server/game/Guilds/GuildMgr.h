@@ -29,7 +29,7 @@ private:
 public:
     static GuildMgr* instance();
 
-    Guild* GetGuildByLeader(ObjectGuid guid) const;
+    Guild* GetGuildByLeader(WOWGUID guid) const;
     Guild* GetGuildById(uint32 guildId) const;
     Guild* GetGuildByName(std::string_view guildName) const;
     std::string GetGuildNameById(uint32 guildId) const;

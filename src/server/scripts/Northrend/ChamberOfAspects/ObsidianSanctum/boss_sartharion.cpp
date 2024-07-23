@@ -436,7 +436,7 @@ public:
                 summons.RemoveNotExisting();
                 if (!summons.empty())
                 {
-                    for (ObjectGuid const& summonGuid : summons)
+                    for (WOWGUID const& summonGuid : summons)
                     {
                         Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
                         if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE)
@@ -572,7 +572,7 @@ public:
                         uint8 iter = 0;
                         if (!summons.empty())
                         {
-                            for (ObjectGuid const& summonGuid : summons)
+                            for (WOWGUID const& summonGuid : summons)
                             {
                                 Creature* summon = ObjectAccessor::GetCreature(*me, summonGuid);
                                 if (summon && summon->GetEntry() == NPC_FIRE_CYCLONE && iter == rand)
@@ -652,7 +652,7 @@ public:
                 return;
             }
 
-            for (ObjectGuid const& guid : summons)
+            for (WOWGUID const& guid : summons)
             {
                 Creature* tsunami = ObjectAccessor::GetCreature(*me, guid);
                 if (!tsunami || tsunami->GetEntry() != NPC_FLAME_TSUNAMI)
@@ -1008,7 +1008,7 @@ protected:
     }
 
     EventMap extraEvents;
-    ObjectGuid portalGUID;
+    WOWGUID portalGUID;
     bool isCalledBySartharion;
 };
 
@@ -1145,7 +1145,7 @@ public:
                 {
                     summons.RemoveNotExisting();
                     summons.DespawnEntry(NPC_TWILIGHT_WHELP);
-                    for (ObjectGuid const& summonGuid : summons)
+                    for (WOWGUID const& summonGuid : summons)
                     {
                         Creature const* summon = ObjectAccessor::GetCreature(*me, summonGuid);
                         if (!summon || !summon->IsAlive() || summon->GetEntry() != NPC_TWILIGHT_EGG)

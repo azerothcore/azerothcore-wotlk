@@ -228,7 +228,7 @@ public:
 
     private:
         EventMap _events;
-        ObjectGuid _aquanosGUID;
+        WOWGUID _aquanosGUID;
         uint8 _lCount;
         uint32 _lSource;
 
@@ -394,7 +394,7 @@ public:
         }
     private:
         uint32 _switchImageTimer;
-        ObjectGuid _summonGUID;
+        WOWGUID _summonGUID;
     };
 };
 
@@ -613,7 +613,7 @@ struct npc_minigob_manabonk : public ScriptedAI
         }
     }
 private:
-    ObjectGuid playerGUID;
+    WOWGUID playerGUID;
 };
 
 class npc_dalaran_mage : public CreatureScript

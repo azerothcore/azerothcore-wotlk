@@ -18,7 +18,7 @@
 #ifndef SCRIPT_OBJECT_GROUP_SCRIPT_H_
 #define SCRIPT_OBJECT_GROUP_SCRIPT_H_
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "ScriptObject.h"
 #include <vector>
 
@@ -45,16 +45,16 @@ public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
 
     // Called when a member is added to a group.
-    virtual void OnAddMember(Group* /*group*/, ObjectGuid /*guid*/) { }
+    virtual void OnAddMember(Group* /*group*/, WOWGUID /*guid*/) { }
 
     // Called when a member is invited to join a group.
-    virtual void OnInviteMember(Group* /*group*/, ObjectGuid /*guid*/) { }
+    virtual void OnInviteMember(Group* /*group*/, WOWGUID /*guid*/) { }
 
     // Called when a member is removed from a group.
-    virtual void OnRemoveMember(Group* /*group*/, ObjectGuid /*guid*/, RemoveMethod /*method*/, ObjectGuid /*kicker*/, const char* /*reason*/) { }
+    virtual void OnRemoveMember(Group* /*group*/, WOWGUID /*guid*/, RemoveMethod /*method*/, WOWGUID /*kicker*/, const char* /*reason*/) { }
 
     // Called when the leader of a group is changed.
-    virtual void OnChangeLeader(Group* /*group*/, ObjectGuid /*newLeaderGuid*/, ObjectGuid /*oldLeaderGuid*/) { }
+    virtual void OnChangeLeader(Group* /*group*/, WOWGUID /*newLeaderGuid*/, WOWGUID /*oldLeaderGuid*/) { }
 
     // Called when a group is disbanded.
     virtual void OnDisband(Group* /*group*/) { }

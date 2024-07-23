@@ -23,7 +23,7 @@
 #include "Define.h"
 #include "Errors.h"
 #include "Language.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Optional.h"
 #include "StringFormat.h"
 #include "Util.h"

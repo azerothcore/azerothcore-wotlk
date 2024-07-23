@@ -18,7 +18,7 @@
 #ifndef MiscPackets_h__
 #define MiscPackets_h__
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Packet.h"
 #include "Weather.h"
 
@@ -71,12 +71,12 @@ namespace WorldPackets
         public:
             // cppcheck-suppress missingReturn
             PlayObjectSound() : ServerPacket(SMSG_PLAY_OBJECT_SOUND, 4 + 8) { }
-            PlayObjectSound(ObjectGuid const& sourceObjectGUID, uint32 soundKitID)
+            PlayObjectSound(WOWGUID const& sourceObjectGUID, uint32 soundKitID)
                 : ServerPacket(SMSG_PLAY_OBJECT_SOUND, 4 + 8), SourceObjectGUID(sourceObjectGUID), SoundKitID(soundKitID) { }
 
             WorldPacket const* Write() override;
 
-            ObjectGuid SourceObjectGUID;
+            WOWGUID SourceObjectGUID;
             uint32 SoundKitID = 0;
 
         };
@@ -114,7 +114,7 @@ namespace WorldPackets
             uint32 Min = 0;
             uint32 Max = 0;
             uint32 Result = 0;
-            ObjectGuid Roller;
+            WOWGUID Roller;
         };
 
         class StartMirrorTimer final : public ServerPacket
@@ -172,7 +172,7 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            ObjectGuid Guid;
+            WOWGUID Guid;
             uint32 Threshold = 0;
             uint32 ItemID = 0;
 

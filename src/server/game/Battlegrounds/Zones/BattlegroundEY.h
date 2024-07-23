@@ -354,7 +354,7 @@ struct BattlegroundEYScore final : public BattlegroundScore
     friend class BattlegroundEY;
 
 protected:
-    BattlegroundEYScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
+    BattlegroundEYScore(WOWGUID playerGuid) : BattlegroundScore(playerGuid) { }
 
     void UpdateScore(uint32 type, uint32 value) override
     {
@@ -388,14 +388,14 @@ public:
     void StartingEventOpenDoors() override;
 
     /* BG Flags */
-    ObjectGuid GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const override    { return _flagKeeperGUID; }
-    void SetFlagPicker(ObjectGuid guid)     { _flagKeeperGUID = guid; }
+    WOWGUID GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const override    { return _flagKeeperGUID; }
+    void SetFlagPicker(WOWGUID guid)     { _flagKeeperGUID = guid; }
     uint8 GetFlagState() const          { return _flagState; }
     void RespawnFlag();
     void RespawnFlagAfterDrop();
 
     void RemovePlayer(Player* player) override;
-    void HandleBuffUse(ObjectGuid buff_guid);
+    void HandleBuffUse(WOWGUID buff_guid);
     void HandleAreaTrigger(Player* player, uint32 trigger) override;
     void HandleKillPlayer(Player* player, Player* killer) override;
     GraveyardStruct const* GetClosestGraveyard(Player* player) override;
@@ -404,8 +404,8 @@ public:
     void EndBattleground(TeamId winnerTeamId) override;
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
     void FillInitialWorldStates(WorldPacket& data) override;
-    void SetDroppedFlagGUID(ObjectGuid guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
-    ObjectGuid GetDroppedFlagGUID() const { return _droppedFlagGUID; }
+    void SetDroppedFlagGUID(WOWGUID guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
+    WOWGUID GetDroppedFlagGUID() const { return _droppedFlagGUID; }
 
     /* Battleground Events */
     void EventPlayerClickedOnFlag(Player* player, GameObject* gameObject) override;
@@ -453,8 +453,8 @@ private:
     EventMap _bgEvents;
     uint32 _honorTics;
     uint8 _ownedPointsCount[PVP_TEAMS_COUNT];
-    ObjectGuid _flagKeeperGUID;
-    ObjectGuid _droppedFlagGUID;
+    WOWGUID _flagKeeperGUID;
+    WOWGUID _droppedFlagGUID;
     uint8 _flagState;
     uint32 _flagCapturedObject;
 };

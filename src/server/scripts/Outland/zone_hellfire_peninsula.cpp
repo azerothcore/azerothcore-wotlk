@@ -430,7 +430,7 @@ public:
 
     private:
         uint32 checkTimer;
-        ObjectGuid helboarGUID;
+        WOWGUID helboarGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -543,7 +543,7 @@ struct npc_magister_aledis : public ScriptedAI
 
 private:
     EventMap _events;
-    ObjectGuid _playerGUID;
+    WOWGUID _playerGUID;
 };
 
 enum Beacon

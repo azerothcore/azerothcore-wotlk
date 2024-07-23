@@ -796,7 +796,7 @@ class spell_gen_proc_not_self : public AuraScript
         if (Unit* caster = GetCaster())
             if (Unit* target = eventInfo.GetActionTarget())
             {
-                ObjectGuid targetGUID = target->GetGUID();
+                WOWGUID targetGUID = target->GetGUID();
                 uint32 spellID = aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
                 caster->m_Events.AddEventAtOffset([caster, targetGUID, spellID]()
                 {
@@ -2045,7 +2045,7 @@ class spell_gen_animal_blood : public AuraScript
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         // Remove all auras with spell id 46221, except the one currently being applied
-        while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, ObjectGuid::Empty, ObjectGuid::Empty, 0, GetAura()))
+        while (Aura* aur = GetUnitOwner()->GetOwnedAura(SPELL_ANIMAL_BLOOD, WOWGUID::Empty, WOWGUID::Empty, 0, GetAura()))
             GetUnitOwner()->RemoveOwnedAura(aur);
     }
 
@@ -4068,7 +4068,7 @@ public:
             target->SetTemporaryUnsummonedPetNumber(0);
 
             // Prevent stacking of mounts and client crashes upon dismounting
-            target->RemoveAurasByType(SPELL_AURA_MOUNTED, ObjectGuid::Empty, GetHitAura());
+            target->RemoveAurasByType(SPELL_AURA_MOUNTED, WOWGUID::Empty, GetHitAura());
 
             // Triggered spell id dependent on riding skill and zone
             bool canFly = false;
@@ -4530,12 +4530,12 @@ class spell_contagion_of_rot : public AuraScript
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         // 7103 => triggered spell that spreads to others
-        while (Aura* aur = GetUnitOwner()->GetOwnedAura(7103, ObjectGuid::Empty, ObjectGuid::Empty, 0, GetAura()))
+        while (Aura* aur = GetUnitOwner()->GetOwnedAura(7103, WOWGUID::Empty, WOWGUID::Empty, 0, GetAura()))
         {
             GetUnitOwner()->RemoveOwnedAura(aur);
         }
         // 7102 => contagion of rot casted by mobs
-        while (Aura* aur = GetUnitOwner()->GetOwnedAura(7102, ObjectGuid::Empty, ObjectGuid::Empty, 0, GetAura()))
+        while (Aura* aur = GetUnitOwner()->GetOwnedAura(7102, WOWGUID::Empty, WOWGUID::Empty, 0, GetAura()))
         {
             GetUnitOwner()->RemoveOwnedAura(aur);
         }

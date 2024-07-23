@@ -57,7 +57,7 @@ public:
         }
 
     protected:
-        ObjectGuid felIronChestGUID;
+        WOWGUID felIronChestGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

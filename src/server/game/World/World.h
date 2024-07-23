@@ -24,7 +24,7 @@
 
 #include "IWorld.h"
 #include "LockedQueue.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "QueryResult.h"
 #include "SharedDefines.h"
 #include "Timer.h"
@@ -159,7 +159,7 @@ public:
 
     [[nodiscard]] User* FindUser(uint32 id) const override;
     [[nodiscard]] User* FindOfflineUser(uint32 id) const override;
-    [[nodiscard]] User* FindOfflineUserForCharacter(ObjectGuid::LowType guidLow) const override;
+    [[nodiscard]] User* FindOfflineUserForCharacter(WOWGUID::LowType guidLow) const override;
     void AddUser(User* user) override;
     bool KickUser(uint32 id) override;
     /// Get the number of current active sessions

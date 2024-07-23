@@ -25,21 +25,21 @@
 class AuctionListOwnerItemsDelayEvent : public BasicEvent
 {
 public:
-    AuctionListOwnerItemsDelayEvent(ObjectGuid _creatureGuid, ObjectGuid guid) : creatureGuid(_creatureGuid), playerguid(guid) {}
+    AuctionListOwnerItemsDelayEvent(WOWGUID _creatureGuid, WOWGUID guid) : creatureGuid(_creatureGuid), playerguid(guid) {}
     ~AuctionListOwnerItemsDelayEvent() override {}
 
     bool Execute(uint64 e_time, uint32 p_time) override;
     void Abort(uint64 /*e_time*/) override {}
 
 private:
-    ObjectGuid creatureGuid;
-    ObjectGuid playerguid;
+    WOWGUID creatureGuid;
+    WOWGUID playerguid;
 };
 
 class AuctionListItemsDelayEvent
 {
 public:
-    AuctionListItemsDelayEvent(Milliseconds pickupTimer, ObjectGuid playerguid, ObjectGuid creatureguid, std::string searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax,
+    AuctionListItemsDelayEvent(Milliseconds pickupTimer, WOWGUID playerguid, WOWGUID creatureguid, std::string searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax,
         uint8 usable, uint32 auctionSlotID, uint32 auctionMainCategory, uint32 auctionSubCategory, uint32 quality, uint8 getAll, AuctionSortOrderVector sortOrder) :
         _pickupTimer(pickupTimer), _playerguid(playerguid), _creatureguid(creatureguid), _searchedname(searchedname), _listfrom(listfrom), _levelmin(levelmin), _levelmax(levelmax),_usable(usable),
         _auctionSlotID(auctionSlotID), _auctionMainCategory(auctionMainCategory), _auctionSubCategory(auctionSubCategory), _quality(quality), _getAll(getAll), _sortOrder(sortOrder) { }
@@ -47,8 +47,8 @@ public:
     bool Execute();
 
     Milliseconds _pickupTimer;
-    ObjectGuid _playerguid;
-    ObjectGuid _creatureguid;
+    WOWGUID _playerguid;
+    WOWGUID _creatureguid;
     std::string _searchedname;
     uint32 _listfrom;
     uint8 _levelmin;

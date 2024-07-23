@@ -358,7 +358,7 @@ struct npc_costumed_orphan_matron : public ScriptedAI
 
     uint32 eventStarted;
     bool allowQuest;
-    ObjectGuid horseGUID;
+    WOWGUID horseGUID;
 
     void Reset() override
     {
@@ -723,7 +723,7 @@ struct npc_hallows_end_soh : public ScriptedAI
             case 3:
                 {
                     bool checkBurningTriggers = false;
-                    for (ObjectGuid const& guid : unitList)
+                    for (WOWGUID const& guid : unitList)
                         if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                             if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                             {
@@ -741,7 +741,7 @@ struct npc_hallows_end_soh : public ScriptedAI
                     if (counter > 21)
                     {
                         bool failed = false;
-                        for (ObjectGuid const& guid : unitList)
+                        for (WOWGUID const& guid : unitList)
                             if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                                 if (c->HasAuraType(SPELL_AURA_PERIODIC_DUMMY))
                                 {
@@ -787,7 +787,7 @@ struct npc_hallows_end_soh : public ScriptedAI
     void CastFires(bool intial)
     {
         std::vector<Unit*> tmpList;
-        for (ObjectGuid const& guid : unitList)
+        for (WOWGUID const& guid : unitList)
         {
             if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
             {
@@ -843,7 +843,7 @@ struct npc_hallows_end_soh : public ScriptedAI
         if (failed)
         {
             Talk(TALK_SHADE_FAILED);
-            for (ObjectGuid const& guid : unitList)
+            for (WOWGUID const& guid : unitList)
                 if (Unit* c = ObjectAccessor::GetUnit(*me, guid))
                     c->RemoveAllAuras();
 
@@ -1015,7 +1015,7 @@ struct boss_headless_horseman : public ScriptedAI
 
     EventMap events;
     SummonList summons;
-    ObjectGuid playerGUID;
+    WOWGUID playerGUID;
     uint8 talkCount;
     bool inFight;
     uint8 phase;

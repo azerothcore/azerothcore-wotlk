@@ -280,7 +280,7 @@ void ArenaSpectator::HandleResetCommand(Player* player)
     }
 }
 
-bool ArenaSpectator::ShouldSendAura(Aura* aura, uint8 effMask, ObjectGuid targetGUID, bool remove)
+bool ArenaSpectator::ShouldSendAura(Aura* aura, uint8 effMask, WOWGUID targetGUID, bool remove)
 {
     if (aura->GetSpellInfo()->SpellIconID == 1 || aura->GetSpellInfo()->HasAttribute(SPELL_ATTR1_NO_AURA_ICON))
         return false;

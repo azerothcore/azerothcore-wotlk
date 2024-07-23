@@ -393,7 +393,7 @@ public:
         uint32 pullTimer{};
         uint32 visualTimer{};
         bool overload;
-        ObjectGuid myCoil;
+        WOWGUID myCoil;
 
         void Reset() override
         {

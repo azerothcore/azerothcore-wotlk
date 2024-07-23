@@ -190,7 +190,7 @@ void PlayerMenu::ClearMenus()
     _questMenu.ClearMenu();
 }
 
-void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID)
+void PlayerMenu::SendGossipMenu(uint32 titleTextId, WOWGUID objectGUID)
 {
     _gossipMenu.SetSenderGUID(objectGUID);
 
@@ -238,7 +238,7 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, ObjectGuid objectGUID)
 
 void PlayerMenu::SendCloseGossip()
 {
-    _gossipMenu.SetSenderGUID(ObjectGuid::Empty);
+    _gossipMenu.SetSenderGUID(WOWGUID::Empty);
 
     WorldPacket data(SMSG_GOSSIP_COMPLETE, 0);
     _session->Send(&data);
@@ -312,7 +312,7 @@ void QuestMenu::ClearMenu()
     _questMenuItems.clear();
 }
 
-void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const& Title, ObjectGuid guid)
+void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const& Title, WOWGUID guid)
 {
     WorldPacket data(SMSG_QUESTGIVER_QUEST_LIST, 100);  // guess size
     data << guid;
@@ -371,7 +371,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST (QuestGiver: {})", guid.ToString());
 }
 
-void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) const
+void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, WOWGUID npcGUID) const
 {
     WorldPacket data(SMSG_QUESTGIVER_STATUS, 9);
     data << npcGUID;
@@ -381,7 +381,7 @@ void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID) con
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_STATUS NPC {}, status={}", npcGUID.ToString(), questStatus);
 }
 
-void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGUID, bool activateAccept) const
+void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, WOWGUID npcGUID, bool activateAccept) const
 {
     std::string questTitle           = quest->GetTitle();
     std::string questDetails         = quest->GetDetails();
@@ -640,7 +640,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUEST_QUERY_RESPONSE questid={}", quest->GetQuestId());
 }
 
-void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUID, bool enableNext) const
+void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, WOWGUID npcGUID, bool enableNext) const
 {
     std::string questTitle = quest->GetTitle();
     std::string RewardText = quest->GetOfferRewardText();
@@ -745,7 +745,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, ObjectGuid npcGUI
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_OFFER_REWARD {}, questid={}", npcGUID.ToString(), quest->GetQuestId());
 }
 
-void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, ObjectGuid npcGUID, bool canComplete, bool closeOnCancel) const
+void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, WOWGUID npcGUID, bool canComplete, bool closeOnCancel) const
 {
     // We can always call to RequestItems, but this packet only goes out if there are actually
     // items.  Otherwise, we'll skip straight to the OfferReward

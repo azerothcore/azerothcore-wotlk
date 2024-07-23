@@ -901,7 +901,7 @@ public:
                 plr->MonsterMoveWithSpeed(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
                 plr->RemoveAura(SPELL_FREEZE_ANIM);
                 plr->SetDisableGravity(false, true);
-                plr->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
+                plr->SetGuidValue(PLAYER_FARSIGHT, WOWGUID::Empty);
 
                 sScriptMgr->AnticheatSetCanFlybyServer(plr, false);
                 sScriptMgr->AnticheatSetUnderACKmount(plr);
@@ -1492,7 +1492,7 @@ class spell_eoe_ph3_surge_of_power : public SpellScript
 {
     PrepareSpellScript(spell_eoe_ph3_surge_of_power);
 
-    ObjectGuid DrakeGUID[3];
+    WOWGUID DrakeGUID[3];
 
     bool Load() override
     {

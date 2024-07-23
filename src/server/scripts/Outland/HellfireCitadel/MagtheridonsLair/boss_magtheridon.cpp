@@ -177,7 +177,7 @@ struct boss_magtheridon : public BossAI
             me->GetMotionMaster()->Clear();
             me->SetReactState(REACT_PASSIVE);
             me->SetOrientation(me->GetAngle(me->GetVictim()));
-            me->SetTarget(ObjectGuid::Empty);
+            me->SetTarget(WOWGUID::Empty);
             scheduler.DelayAll(6999ms);
             scheduler.Schedule(7s, [this](TaskContext)
             {

@@ -159,12 +159,12 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        WOWGUID GetGuidData(uint32 identifier) const override
         {
             if (identifier < MAX_ENCOUNTER)
                 return bossGUIDs[identifier];
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         uint32 GetData(uint32 identifier) const override
@@ -255,7 +255,7 @@ public:
         bool stoned;
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
-        ObjectGuid bossGUIDs[MAX_ENCOUNTER];
+        WOWGUID bossGUIDs[MAX_ENCOUNTER];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

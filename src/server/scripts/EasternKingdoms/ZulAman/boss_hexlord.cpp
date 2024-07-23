@@ -263,10 +263,10 @@ public:
 
         InstanceScript* instance;
 
-        ObjectGuid AddGUID[4];
+        WOWGUID AddGUID[4];
         uint32 AddEntry[4];
 
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         uint32 SpiritBolts_Timer;
         uint32 DrainPower_Timer;

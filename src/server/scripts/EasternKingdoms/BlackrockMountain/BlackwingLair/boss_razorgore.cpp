@@ -156,7 +156,7 @@ public:
                 troops->AI()->Talk(EMOTE_TROOPS_RETREAT);
             }
 
-            for (ObjectGuid const& guid : _summonGUIDS)
+            for (WOWGUID const& guid : _summonGUIDS)
             {
                 if (Creature* creature = ObjectAccessor::GetCreature(*me, guid))
                 {
@@ -170,7 +170,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid const guid, int32 /*id*/) override
+        void SetGUID(WOWGUID const guid, int32 /*id*/) override
         {
             _charmerGUID = guid;
         }
@@ -274,7 +274,7 @@ public:
 
     private:
         bool secondPhase;
-        ObjectGuid _charmerGUID;
+        WOWGUID _charmerGUID;
         GuidVector _summonGUIDS;
     };
 

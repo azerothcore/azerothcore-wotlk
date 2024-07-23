@@ -280,7 +280,7 @@ struct boss_eye_of_cthun : public BossAI
                 me->StopMoving();
                 me->SetReactState(REACT_PASSIVE);
                 me->InterruptNonMeleeSpells(false);
-                me->SetTarget(ObjectGuid::Empty);
+                me->SetTarget(WOWGUID::Empty);
 
                 //Freeze animation
                 DoCast(me, SPELL_FREEZE_ANIM, true);
@@ -302,7 +302,7 @@ struct boss_eye_of_cthun : public BossAI
 
                     scheduler.Schedule(3s, [this](TaskContext tasker)
                     {
-                        me->SetTarget(ObjectGuid::Empty);
+                        me->SetTarget(WOWGUID::Empty);
                         me->StopMoving();
 
                         float angle = ClockWise ? DarkGlareAngle + DarkGlareTick * float(M_PI) / 35 : DarkGlareAngle - DarkGlareTick * float(M_PI) / 35;
@@ -370,7 +370,7 @@ private:
     bool ClockWise;
 
     uint32 _eyeTentacleCounter;
-    ObjectGuid _beamTarget;
+    WOWGUID _beamTarget;
 };
 
 struct boss_cthun : public BossAI
@@ -644,7 +644,7 @@ struct npc_eye_tentacle : public ScriptedAI
     }
 
 private:
-    ObjectGuid _portalGUID;
+    WOWGUID _portalGUID;
 };
 
 struct npc_claw_tentacle : public ScriptedAI
@@ -713,7 +713,7 @@ struct npc_claw_tentacle : public ScriptedAI
     }
 
 private:
-    ObjectGuid _portalGUID;
+    WOWGUID _portalGUID;
 };
 
 struct npc_giant_claw_tentacle : public ScriptedAI
@@ -862,7 +862,7 @@ struct npc_giant_claw_tentacle : public ScriptedAI
     }
 
 private:
-    ObjectGuid _portalGUID;
+    WOWGUID _portalGUID;
     bool _canAttack;
 };
 
@@ -929,7 +929,7 @@ struct npc_giant_eye_tentacle : public ScriptedAI
     }
 
 private:
-    ObjectGuid _portalGUID;
+    WOWGUID _portalGUID;
 };
 
 class spell_cthun_dark_glare : public SpellScript

@@ -56,16 +56,16 @@ public:
 
     void BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) override;
 
-    bool Create(ObjectGuid::LowType guidlow);
-    bool Create(ObjectGuid::LowType guidlow, Player* owner);
+    bool Create(WOWGUID::LowType guidlow);
+    bool Create(WOWGUID::LowType guidlow, Player* owner);
 
     void SaveToDB();
-    bool LoadCorpseFromDB(ObjectGuid::LowType guid, Field* fields);
+    bool LoadCorpseFromDB(WOWGUID::LowType guid, Field* fields);
 
     void DeleteFromDB(CharacterDatabaseTransaction trans);
-    static void DeleteFromDB(ObjectGuid const ownerGuid, CharacterDatabaseTransaction trans);
+    static void DeleteFromDB(WOWGUID const ownerGuid, CharacterDatabaseTransaction trans);
 
-    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(CORPSE_FIELD_OWNER); }
+    [[nodiscard]] WOWGUID GetOwnerGUID() const { return GetGuidValue(CORPSE_FIELD_OWNER); }
 
     [[nodiscard]] time_t const& GetGhostTime() const { return m_time; }
     void ResetGhostTime();

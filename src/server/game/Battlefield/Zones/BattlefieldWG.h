@@ -474,7 +474,7 @@ protected:
     uint32 m_tenacityUpdateTimer;
     uint32 m_saveTimer;
 
-    ObjectGuid m_titansRelic;
+    WOWGUID m_titansRelic;
 };
 
 const uint8 WG_MAX_OBJ = 32;
@@ -1111,7 +1111,7 @@ struct BfWGGameObjectBuilding
     BattlefieldWG* m_WG;
 
     // Linked gameobject
-    ObjectGuid m_Build;
+    WOWGUID m_Build;
 
     // eWGGameObjectBuildingType
     uint32 m_Type;

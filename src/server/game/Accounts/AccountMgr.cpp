@@ -80,7 +80,7 @@ namespace AccountMgr
         {
             do
             {
-                ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].Get<uint32>());
+                WOWGUID guid = WOWGUID::Create<HighGuid::Player>((*result)[0].Get<uint32>());
 
                 // Kick if player is online
                 if (Player* p = ObjectAccessor::FindPlayer(guid))

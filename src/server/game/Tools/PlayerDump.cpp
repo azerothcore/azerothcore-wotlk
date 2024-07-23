@@ -561,7 +561,7 @@ inline void AppendTableDump(StringTransaction& trans, TableStruct const& tableSt
     } while (result->NextRow());
 }
 
-inline std::string GenerateWhereStr(std::string const& field, ObjectGuid::LowType guid)
+inline std::string GenerateWhereStr(std::string const& field, WOWGUID::LowType guid)
 {
     std::ostringstream whereStr;
     whereStr << field << " = '" << guid << '\'';
@@ -589,7 +589,7 @@ inline std::string GenerateWhereStr(std::string const& field, SetType<T, Rest...
 }
 
 // Writing - High-level functions
-void PlayerDumpWriter::PopulateGuids(ObjectGuid::LowType guid)
+void PlayerDumpWriter::PopulateGuids(WOWGUID::LowType guid)
 {
     for (BaseTable const& baseTable : BaseTables)
     {
@@ -614,15 +614,15 @@ void PlayerDumpWriter::PopulateGuids(ObjectGuid::LowType guid)
             switch (baseTable.StoredType)
             {
             case GUID_TYPE_ITEM:
-                if (ObjectGuid::LowType itemLowGuid = (*result)[0].Get<uint32>())
+                if (WOWGUID::LowType itemLowGuid = (*result)[0].Get<uint32>())
                     _items.insert(itemLowGuid);
                 break;
             case GUID_TYPE_MAIL:
-                if (ObjectGuid::LowType mailLowGuid = (*result)[0].Get<uint32>())
+                if (WOWGUID::LowType mailLowGuid = (*result)[0].Get<uint32>())
                     _mails.insert(mailLowGuid);
                 break;
             case GUID_TYPE_PET:
-                if (ObjectGuid::LowType petLowGuid = (*result)[0].Get<uint32>())
+                if (WOWGUID::LowType petLowGuid = (*result)[0].Get<uint32>())
                     _pets.insert(petLowGuid);
                 break;
             case GUID_TYPE_EQUIPMENT_SET:
@@ -636,7 +636,7 @@ void PlayerDumpWriter::PopulateGuids(ObjectGuid::LowType guid)
     }
 }
 
-bool PlayerDumpWriter::AppendTable(StringTransaction& trans, ObjectGuid::LowType guid, TableStruct const& tableStruct, DumpTable const& dumpTable)
+bool PlayerDumpWriter::AppendTable(StringTransaction& trans, WOWGUID::LowType guid, TableStruct const& tableStruct, DumpTable const& dumpTable)
 {
     std::string whereStr;
     switch (dumpTable.Type)
@@ -694,7 +694,7 @@ bool PlayerDumpWriter::AppendTable(StringTransaction& trans, ObjectGuid::LowType
     return true;
 }
 
-bool PlayerDumpWriter::GetDump(ObjectGuid::LowType guid, std::string& dump)
+bool PlayerDumpWriter::GetDump(WOWGUID::LowType guid, std::string& dump)
 {
     dump = "IMPORTANT NOTE: THIS DUMPFILE IS MADE FOR USE WITH THE 'PDUMP' COMMAND ONLY - EITHER THROUGH INGAME CHAT OR ON CONSOLE!\n";
     dump += "IMPORTANT NOTE: DO NOT apply it directly - it will irreversibly DAMAGE and CORRUPT your database! You have been warned!\n\n";
@@ -715,7 +715,7 @@ bool PlayerDumpWriter::GetDump(ObjectGuid::LowType guid, std::string& dump)
     return true;
 }
 
-DumpReturn PlayerDumpWriter::WriteDumpToFile(std::string const& file, ObjectGuid::LowType guid)
+DumpReturn PlayerDumpWriter::WriteDumpToFile(std::string const& file, WOWGUID::LowType guid)
 {
     if (sWorld->getBoolConfig(CONFIG_PDUMP_NO_PATHS))
         if (strchr(file.c_str(), '\\') || strchr(file.c_str(), '/'))
@@ -741,7 +741,7 @@ DumpReturn PlayerDumpWriter::WriteDumpToFile(std::string const& file, ObjectGuid
     return ret;
 }
 
-DumpReturn PlayerDumpWriter::WriteDumpToString(std::string& dump, ObjectGuid::LowType guid)
+DumpReturn PlayerDumpWriter::WriteDumpToString(std::string& dump, WOWGUID::LowType guid)
 {
     DumpReturn ret = DUMP_SUCCESS;
     if (!GetDump(guid, dump))
@@ -761,7 +761,7 @@ inline void FixNULLfields(std::string& line)
     }
 }
 
-DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::string name, ObjectGuid::LowType guid)
+DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::string name, WOWGUID::LowType guid)
 {
     uint32 charcount = AccountMgr::GetCharactersCount(account);
     if (charcount >= 10)
@@ -803,14 +803,14 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
     newguid = std::to_string(guid);
     chraccount = std::to_string(account);
 
-    std::map<ObjectGuid::LowType, ObjectGuid::LowType> items;
-    ObjectGuid::LowType itemLowGuidOffset = sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed();
+    std::map<WOWGUID::LowType, WOWGUID::LowType> items;
+    WOWGUID::LowType itemLowGuidOffset = sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed();
 
-    std::map<ObjectGuid::LowType, ObjectGuid::LowType> mails;
-    ObjectGuid::LowType mailLowGuidOffset = sObjectMgr->_mailId;
+    std::map<WOWGUID::LowType, WOWGUID::LowType> mails;
+    WOWGUID::LowType mailLowGuidOffset = sObjectMgr->_mailId;
 
-    std::map<ObjectGuid::LowType, ObjectGuid::LowType> petIds;
-    ObjectGuid::LowType petLowGuidOffset = sObjectMgr->_hiPetNumber;
+    std::map<WOWGUID::LowType, WOWGUID::LowType> petIds;
+    WOWGUID::LowType petLowGuidOffset = sObjectMgr->_hiPetNumber;
 
     std::map<uint64, uint64> equipmentSetIds;
     uint64 equipmentSetGuidOffset = sObjectMgr->_equipmentSetGuid;
@@ -953,7 +953,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
     CharacterDatabase.CommitTransaction(trans);
 
     // in case of name conflict player has to rename at login anyway
-    sCharacterCache->AddCharacterCacheEntry(ObjectGuid(HighGuid::Player, guid), account, name, gender, race, playerClass, level);
+    sCharacterCache->AddCharacterCacheEntry(WOWGUID(HighGuid::Player, guid), account, name, gender, race, playerClass, level);
 
     sObjectMgr->GetGenerator<HighGuid::Item>().Set(sObjectMgr->GetGenerator<HighGuid::Item>().GetNextAfterMaxUsed() + items.size());
     sObjectMgr->_mailId += mails.size();
@@ -968,13 +968,13 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
     return DUMP_SUCCESS;
 }
 
-DumpReturn PlayerDumpReader::LoadDumpFromString(std::string const& dump, uint32 account, std::string name, ObjectGuid::LowType guid)
+DumpReturn PlayerDumpReader::LoadDumpFromString(std::string const& dump, uint32 account, std::string name, WOWGUID::LowType guid)
 {
     std::istringstream input(dump);
     return LoadDump(input, account, name, guid);
 }
 
-DumpReturn PlayerDumpReader::LoadDumpFromFile(std::string const& file, uint32 account, std::string name, ObjectGuid::LowType guid)
+DumpReturn PlayerDumpReader::LoadDumpFromFile(std::string const& file, uint32 account, std::string name, WOWGUID::LowType guid)
 {
     std::ifstream input(file);
     if (!input)

@@ -217,12 +217,12 @@ public:
 
     Item();
 
-    virtual bool Create(ObjectGuid::LowType guidlow, uint32 itemid, Player const* owner);
+    virtual bool Create(WOWGUID::LowType guidlow, uint32 itemid, Player const* owner);
 
     [[nodiscard]] ItemTemplate const* GetTemplate() const;
 
-    [[nodiscard]] ObjectGuid GetOwnerGUID() const { return GetGuidValue(ITEM_FIELD_OWNER); }
-    void SetOwnerGUID(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
+    [[nodiscard]] WOWGUID GetOwnerGUID() const { return GetGuidValue(ITEM_FIELD_OWNER); }
+    void SetOwnerGUID(WOWGUID guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
     [[nodiscard]] Player* GetOwner() const;
 
     void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val); }
@@ -232,10 +232,10 @@ public:
     [[nodiscard]] bool IsBoundByEnchant() const;
     [[nodiscard]] bool IsBoundByTempEnchant() const;
     virtual void SaveToDB(CharacterDatabaseTransaction trans);
-    virtual bool LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fields, uint32 entry);
-    static void DeleteFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
+    virtual bool LoadFromDB(WOWGUID::LowType guid, WOWGUID owner_guid, Field* fields, uint32 entry);
+    static void DeleteFromDB(CharacterDatabaseTransaction trans, WOWGUID::LowType itemGuid);
     virtual void DeleteFromDB(CharacterDatabaseTransaction trans);
-    static void DeleteFromInventoryDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
+    static void DeleteFromInventoryDB(CharacterDatabaseTransaction trans, WOWGUID::LowType itemGuid);
     void DeleteFromInventoryDB(CharacterDatabaseTransaction trans);
     void SaveRefundDataToDB();
     void DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans);
@@ -287,7 +287,7 @@ public:
     void SetItemRandomProperties(int32 randomPropId);
     void UpdateItemSuffixFactor();
     static int32 GenerateItemRandomPropertyId(uint32 item_id);
-    void SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges, ObjectGuid caster = ObjectGuid::Empty);
+    void SetEnchantment(EnchantmentSlot slot, uint32 id, uint32 duration, uint32 charges, WOWGUID caster = WOWGUID::Empty);
     void SetEnchantmentDuration(EnchantmentSlot slot, uint32 duration, Player* owner);
     void SetEnchantmentCharges(EnchantmentSlot slot, uint32 charges);
     void ClearEnchantment(EnchantmentSlot slot);
@@ -331,10 +331,10 @@ public:
 
     // Item Refund system
     void SetNotRefundable(Player* owner, bool changestate = true, CharacterDatabaseTransaction* trans = nullptr);
-    void SetRefundRecipient(ObjectGuid::LowType pGuidLow) { m_refundRecipient = pGuidLow; }
+    void SetRefundRecipient(WOWGUID::LowType pGuidLow) { m_refundRecipient = pGuidLow; }
     void SetPaidMoney(uint32 money) { m_paidMoney = money; }
     void SetPaidExtendedCost(uint32 iece) { m_paidExtendedCost = iece; }
-    ObjectGuid::LowType GetRefundRecipient() { return m_refundRecipient; }
+    WOWGUID::LowType GetRefundRecipient() { return m_refundRecipient; }
     uint32 GetPaidMoney() { return m_paidMoney; }
     uint32 GetPaidExtendedCost() { return m_paidExtendedCost; }
 

@@ -19,7 +19,7 @@
 #define TRANSPORTMGR_H
 
 #include "DBCStores.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Spline.h"
 #include <G3D/Quat.h>
 
@@ -110,7 +110,7 @@ public:
     void LoadTransportTemplates();
 
     // Creates a transport using given GameObject template entry
-    MotionTransport* CreateTransport(uint32 entry, ObjectGuid::LowType guid = 0, Map* map = nullptr);
+    MotionTransport* CreateTransport(uint32 entry, WOWGUID::LowType guid = 0, Map* map = nullptr);
 
     // Spawns all continent transports, used at core startup
     void SpawnContinentTransports();

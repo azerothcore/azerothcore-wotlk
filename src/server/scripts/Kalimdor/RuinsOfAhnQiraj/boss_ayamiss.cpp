@@ -184,7 +184,7 @@ struct boss_ayamiss : public BossAI
     {
         if (action == ACTION_SWARMER_SWARM)
         {
-            for (ObjectGuid const& guid : _swarmers)
+            for (WOWGUID const& guid : _swarmers)
             {
                 if (Creature* swarmer = me->GetMap()->GetCreature(guid))
                 {

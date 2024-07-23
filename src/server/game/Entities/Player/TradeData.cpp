@@ -28,7 +28,7 @@ Item* TradeData::GetItem(TradeSlots slot) const
     return m_items[slot] ? m_player->GetItemByGuid(m_items[slot]) : nullptr;
 }
 
-bool TradeData::HasItem(ObjectGuid itemGuid) const
+bool TradeData::HasItem(WOWGUID itemGuid) const
 {
     for (uint8 i = 0; i < TRADE_SLOT_COUNT; ++i)
         if (m_items[i] == itemGuid)
@@ -37,7 +37,7 @@ bool TradeData::HasItem(ObjectGuid itemGuid) const
     return false;
 }
 
-TradeSlots TradeData::GetTradeSlotForItem(ObjectGuid itemGuid) const
+TradeSlots TradeData::GetTradeSlotForItem(WOWGUID itemGuid) const
 {
     for (uint8 i = 0; i < TRADE_SLOT_COUNT; ++i)
         if (m_items[i] == itemGuid)
@@ -53,7 +53,7 @@ Item* TradeData::GetSpellCastItem() const
 
 void TradeData::SetItem(TradeSlots slot, Item* item)
 {
-    ObjectGuid itemGuid = item ? item->GetGUID() : ObjectGuid::Empty;
+    WOWGUID itemGuid = item ? item->GetGUID() : WOWGUID::Empty;
 
     if (m_items[slot] == itemGuid)
         return;
@@ -75,7 +75,7 @@ void TradeData::SetItem(TradeSlots slot, Item* item)
 
 void TradeData::SetSpell(uint32 spell_id, Item* castItem /*= nullptr*/)
 {
-    ObjectGuid itemGuid = castItem ? castItem->GetGUID() : ObjectGuid::Empty;
+    WOWGUID itemGuid = castItem ? castItem->GetGUID() : WOWGUID::Empty;
 
     if (m_spell == spell_id && m_spellCastItem == itemGuid)
         return;

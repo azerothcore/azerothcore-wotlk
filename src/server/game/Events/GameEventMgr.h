@@ -19,7 +19,7 @@
 #define ACORE_GAMEEVENT_MGR_H
 
 #include "Common.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "SharedDefines.h"
 #include <map>
 #include <unordered_map>
@@ -141,15 +141,15 @@ private:
     void SaveWorldEventStateToDB(uint16 event_id);
     bool hasCreatureQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
     bool hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 event_id);
-    bool hasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 event_id);
-    bool hasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 event_id);
+    bool hasCreatureActiveEventExcept(WOWGUID::LowType creature_guid, uint16 event_id);
+    bool hasGameObjectActiveEventExcept(WOWGUID::LowType go_guid, uint16 event_id);
     void SetHolidayEventTime(GameEventData& event);
 
-    typedef std::list<ObjectGuid::LowType> GuidLowList;
+    typedef std::list<WOWGUID::LowType> GuidLowList;
     typedef std::list<uint32> IdList;
     typedef std::vector<GuidLowList> GameEventGuidMap;
     typedef std::vector<IdList> GameEventIdMap;
-    typedef std::pair<ObjectGuid::LowType, ModelEquip> ModelEquipPair;
+    typedef std::pair<WOWGUID::LowType, ModelEquip> ModelEquipPair;
     typedef std::list<ModelEquipPair> ModelEquipList;
     typedef std::vector<ModelEquipList> GameEventModelEquipMap;
     typedef std::pair<uint32, uint32> QuestRelation;
@@ -158,7 +158,7 @@ private:
     typedef std::list<NPCVendorEntry> NPCVendorList;
     typedef std::vector<NPCVendorList> GameEventNPCVendorMap;
     typedef std::map<uint32 /*quest id*/, GameEventQuestToEventConditionNum> QuestIdToEventConditionMap;
-    typedef std::pair<ObjectGuid::LowType /*guid*/, uint32 /*npcflag*/> GuidNPCFlagPair;
+    typedef std::pair<WOWGUID::LowType /*guid*/, uint32 /*npcflag*/> GuidNPCFlagPair;
     typedef std::list<GuidNPCFlagPair> NPCFlagList;
     typedef std::vector<NPCFlagList> GameEventNPCFlagMap;
     typedef std::vector<uint32> GameEventBitmask;

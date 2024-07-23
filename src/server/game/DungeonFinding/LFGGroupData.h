@@ -36,10 +36,10 @@ namespace lfg
         // General
         void SetState(LfgState state);
         void RestoreState();
-        void AddPlayer(ObjectGuid guid);
-        uint8 RemovePlayer(ObjectGuid guid);
+        void AddPlayer(WOWGUID guid);
+        uint8 RemovePlayer(WOWGUID guid);
         void RemoveAllPlayers();
-        void SetLeader(ObjectGuid guid);
+        void SetLeader(WOWGUID guid);
 
         // Dungeon
         void SetDungeon(uint32 dungeon);
@@ -52,7 +52,7 @@ namespace lfg
         [[nodiscard]] LfgState GetOldState() const;
         [[nodiscard]] LfgGuidSet const& GetPlayers() const;
         [[nodiscard]] uint8 GetPlayerCount() const;
-        [[nodiscard]] ObjectGuid GetLeader() const;
+        [[nodiscard]] WOWGUID GetLeader() const;
 
         // Dungeon
         [[nodiscard]] uint32 GetDungeon(bool asId = true) const;
@@ -64,7 +64,7 @@ namespace lfg
         // General
         LfgState m_State;                   ///< State if group in LFG
         LfgState m_OldState;                ///< Old State
-        ObjectGuid m_Leader;                ///< Leader GUID
+        WOWGUID m_Leader;                ///< Leader GUID
         LfgGuidSet m_Players;               ///< Players in group
         // Dungeon
         uint32 m_Dungeon;                   ///< Dungeon entry

@@ -288,7 +288,7 @@ public:
         }
 
     private:
-        ObjectGuid _rpBuddyGUID;
+        WOWGUID _rpBuddyGUID;
     };
 };
 

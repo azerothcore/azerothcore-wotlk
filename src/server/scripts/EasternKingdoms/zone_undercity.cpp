@@ -130,7 +130,7 @@ public:
             _events.ScheduleEvent(EVENT_MULTI_SHOT, 10s);
         }
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(WOWGUID guid, int32 type) override
         {
             if (type == GUID_EVENT_INVOKER)
             {
@@ -233,7 +233,7 @@ public:
     private:
         EventMap _events;
         bool LamentEvent;
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -996,16 +996,16 @@ public:
 
         uint32 whirlwindTimer;
 
-        ObjectGuid jainaGUID;
-        ObjectGuid putressGUID;
-        ObjectGuid blightWormGUID;
-        ObjectGuid khanokGUID;
-        ObjectGuid thrallGUID;
-        ObjectGuid sylvanasGUID;
+        WOWGUID jainaGUID;
+        WOWGUID putressGUID;
+        WOWGUID blightWormGUID;
+        WOWGUID khanokGUID;
+        WOWGUID thrallGUID;
+        WOWGUID sylvanasGUID;
 
-        ObjectGuid generatorGUID[GENERATOR_MAXCOUNT];
-        ObjectGuid allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
-        ObjectGuid hordeForcesGUID[HORDE_FORCE_MAXCOUNT];
+        WOWGUID generatorGUID[GENERATOR_MAXCOUNT];
+        WOWGUID allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
+        WOWGUID hordeForcesGUID[HORDE_FORCE_MAXCOUNT];
         GuidVector allianceGuardsGUID;
 
         EventMap _events;
@@ -1094,7 +1094,7 @@ public:
                     }
                 }
 
-                for (ObjectGuid const& guid : allianceGuardsGUID)
+                for (WOWGUID const& guid : allianceGuardsGUID)
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon();
 
@@ -2324,13 +2324,13 @@ public:
         uint32 step;
         uint32 phaseTimer;
 
-        ObjectGuid sylvanasfollowGUID;
-        ObjectGuid allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
-        ObjectGuid ValimathrasGUID;
-        ObjectGuid ValimathrasPortalGUID;
-        ObjectGuid WrynnGUID;
-        ObjectGuid JainaGUID;
-        ObjectGuid SaurfangGUID;
+        WOWGUID sylvanasfollowGUID;
+        WOWGUID allianceForcesGUID[ALLIANCE_FORCE_MAXCOUNT];
+        WOWGUID ValimathrasGUID;
+        WOWGUID ValimathrasPortalGUID;
+        WOWGUID WrynnGUID;
+        WOWGUID JainaGUID;
+        WOWGUID SaurfangGUID;
         GuidVector hordeGuardsGUID;
 
         EventMap _events;
@@ -2406,7 +2406,7 @@ public:
                     SaurfangGUID.Clear();
                 }
 
-                for (ObjectGuid const& guid : hordeGuardsGUID)
+                for (WOWGUID const& guid : hordeGuardsGUID)
                     if (Creature* temp = ObjectAccessor::GetCreature(*me, guid))
                         temp->DespawnOrUnsummon();
 

@@ -187,7 +187,7 @@ public:
         }
 
     private:
-        ObjectGuid _shieldGeneratorGUID[4];
+        WOWGUID _shieldGeneratorGUID[4];
         int32 _aliveKeepersCount;
     };
 

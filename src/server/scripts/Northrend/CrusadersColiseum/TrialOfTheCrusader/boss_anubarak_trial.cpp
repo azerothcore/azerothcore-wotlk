@@ -170,8 +170,8 @@ public:
         EventMap events;
         bool bIntro;
         bool bPhase3;
-        ObjectGuid SphereGUID[6];
-        ObjectGuid BurrowGUID[4];
+        WOWGUID SphereGUID[6];
+        WOWGUID BurrowGUID[4];
 
         void Reset() override
         {
@@ -213,7 +213,7 @@ public:
             if( !IsHeroic() )
                 events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4s);
 
-            for (ObjectGuid const& guid : summons)
+            for (WOWGUID const& guid : summons)
                 if (pInstance)
                     if (Creature* c = pInstance->instance->GetCreature(guid))
                     {
@@ -617,7 +617,7 @@ public:
         {
             // I am summoned by another npc (SPELL_EFFECT_FORCE_CAST), inform Anub'arak
             if (InstanceScript* pInstance = me->GetInstanceScript())
-                if (ObjectGuid guid = pInstance->GetGuidData(TYPE_ANUBARAK))
+                if (WOWGUID guid = pInstance->GetGuidData(TYPE_ANUBARAK))
                     if (Creature* anub = pInstance->instance->GetCreature(guid))
                         CAST_AI(boss_anubarak_trial::boss_anubarak_trialAI, anub->AI())->JustSummoned(me);
         }
@@ -739,7 +739,7 @@ public:
         }
 
         EventMap events;
-        ObjectGuid TargetGUID;
+        WOWGUID TargetGUID;
 
         void DoAction(int32 param) override
         {

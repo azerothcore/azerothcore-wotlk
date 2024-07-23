@@ -31,11 +31,11 @@ public:
 
     typedef std::map<uint32, Group*> GroupContainer;
 
-    Group* GetGroupByGUID(ObjectGuid::LowType guid) const;
+    Group* GetGroupByGUID(WOWGUID::LowType guid) const;
 
     void InitGroupIds();
-    void RegisterGroupId(ObjectGuid::LowType groupId);
-    ObjectGuid::LowType GenerateGroupId();
+    void RegisterGroupId(WOWGUID::LowType groupId);
+    WOWGUID::LowType GenerateGroupId();
 
     void LoadGroups();
     void AddGroup(Group* group);
@@ -44,7 +44,7 @@ public:
 protected:
     typedef std::vector<bool> GroupIds;
     GroupIds            _groupIds;
-    ObjectGuid::LowType _nextGroupId;
+    WOWGUID::LowType _nextGroupId;
     GroupContainer      GroupStore;
 };
 

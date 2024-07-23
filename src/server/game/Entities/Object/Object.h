@@ -26,7 +26,7 @@
 #include "Map.h"
 #include "ModelIgnoreFlags.h"
 #include "ObjectDefines.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Optional.h"
 #include "Position.h"
 #include "UpdateData.h"
@@ -106,8 +106,8 @@ public:
     virtual void AddToWorld();
     virtual void RemoveFromWorld();
 
-    [[nodiscard]] static ObjectGuid GetGUID(Object const* o) { return o ? o->GetGUID() : ObjectGuid::Empty; }
-    [[nodiscard]] ObjectGuid GetGUID() const { return GetGuidValue(OBJECT_FIELD_GUID); }
+    [[nodiscard]] static WOWGUID GetGUID(Object const* o) { return o ? o->GetGUID() : WOWGUID::Empty; }
+    [[nodiscard]] WOWGUID GetGUID() const { return GetGuidValue(OBJECT_FIELD_GUID); }
     [[nodiscard]] SmartGUID const& GetPackGUID() const { return m_PackGUID; }
     [[nodiscard]] uint32 GetEntry() const { return GetUInt32Value(OBJECT_FIELD_ENTRY); }
     void SetEntry(uint32 entry) { SetUInt32Value(OBJECT_FIELD_ENTRY, entry); }
@@ -139,7 +139,7 @@ public:
     [[nodiscard]] float GetFloatValue(uint16 index) const;
     [[nodiscard]] uint8 GetByteValue(uint16 index, uint8 offset) const;
     [[nodiscard]] uint16 GetUInt16Value(uint16 index, uint8 offset) const;
-    [[nodiscard]] ObjectGuid GetGuidValue(uint16 index) const;
+    [[nodiscard]] WOWGUID GetGuidValue(uint16 index) const;
 
     void SetInt32Value(uint16 index, int32 value);
     void SetUInt32Value(uint16 index, uint32 value);
@@ -149,12 +149,12 @@ public:
     void SetByteValue(uint16 index, uint8 offset, uint8 value);
     void SetUInt16Value(uint16 index, uint8 offset, uint16 value);
     void SetInt16Value(uint16 index, uint8 offset, int16 value) { SetUInt16Value(index, offset, (uint16)value); }
-    void SetGuidValue(uint16 index, ObjectGuid value);
+    void SetGuidValue(uint16 index, WOWGUID value);
     void SetStatFloatValue(uint16 index, float value);
     void SetStatInt32Value(uint16 index, int32 value);
 
-    bool AddGuidValue(uint16 index, ObjectGuid value);
-    bool RemoveGuidValue(uint16 index, ObjectGuid value);
+    bool AddGuidValue(uint16 index, WOWGUID value);
+    bool RemoveGuidValue(uint16 index, WOWGUID value);
 
     void ApplyModUInt32Value(uint16 index, int32 val, bool apply);
     void ApplyModInt32Value(uint16 index, int32 val, bool apply);
@@ -219,7 +219,7 @@ protected:
     Object();
 
     void _InitValues();
-    void _Create(ObjectGuid::LowType guidlow, uint32 entry, HighGuid guidhigh);
+    void _Create(WOWGUID::LowType guidlow, uint32 entry, HighGuid guidhigh);
     [[nodiscard]] std::string _ConcatFields(uint16 startIndex, uint16 size) const;
     bool _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
@@ -267,7 +267,7 @@ class CMovement
 {
 public:
     // common
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 m_moveFlags{0};
     uint16 m_moveFlags2{0};
     Position pos;
@@ -285,7 +285,7 @@ public:
             time2 = 0;
         }
 
-        ObjectGuid guid;
+        WOWGUID guid;
         Position pos;
         int8 seat;
         uint32 time;
@@ -392,7 +392,7 @@ public:
 
     virtual void Update(uint32 /*time_diff*/);
 
-    void _Create(ObjectGuid::LowType guidlow, HighGuid guidhigh, uint32 phaseMask);
+    void _Create(WOWGUID::LowType guidlow, HighGuid guidhigh, uint32 phaseMask);
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -485,7 +485,7 @@ public:
     void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
     void PlayRadiusMusic(uint32 music_id, float radius);
 
-    void SendObjectDeSpawnAnim(ObjectGuid guid);
+    void SendObjectDeSpawnAnim(WOWGUID guid);
 
     virtual void SaveRespawnTime() {}
     void AddObjectToRemoveList();
@@ -585,7 +585,7 @@ public:
     [[nodiscard]] float GetTransOffsetO() const { return m_movement.transport.pos.GetOrientation(); }
     [[nodiscard]] uint32 GetTransTime()   const { return m_movement.transport.time; }
     [[nodiscard]] int8 GetTransSeat()     const { return m_movement.transport.seat; }
-    [[nodiscard]] virtual ObjectGuid GetTransGUID()   const;
+    [[nodiscard]] virtual WOWGUID GetTransGUID()   const;
     void SetTransport(Transport* t) { m_transport = t; }
 
     CMovement m_movement;
@@ -605,12 +605,12 @@ public:
     [[nodiscard]] virtual float GetCollisionWidth() const { return GetObjectSize(); }
     [[nodiscard]] virtual float GetCollisionRadius() const { return GetObjectSize() / 2; }
 
-    void AddAllowedLooter(ObjectGuid guid);
+    void AddAllowedLooter(WOWGUID guid);
     void ResetAllowedLooters();
     void SetAllowedLooters(GuidUnorderedSet const looters);
-    [[nodiscard]] bool HasAllowedLooter(ObjectGuid guid) const;
+    [[nodiscard]] bool HasAllowedLooter(WOWGUID guid) const;
     [[nodiscard]] GuidUnorderedSet const& GetAllowedLooters() const;
-    void RemoveAllowedLooter(ObjectGuid guid);
+    void RemoveAllowedLooter(WOWGUID guid);
 
     std::string GetDebugInfo() const override;
 

@@ -144,28 +144,28 @@ public:
 
         uint32 EncounterMask;
         TeamId TeamIdInInstance;
-        ObjectGuid NPC_FalricGUID;
-        ObjectGuid NPC_MarwynGUID;
-        ObjectGuid NPC_LichKingIntroGUID;
-        ObjectGuid NPC_LeaderIntroGUID;
-        ObjectGuid NPC_GuardGUID;
-        ObjectGuid NPC_UtherGUID;
-        ObjectGuid NPC_LichKingGUID;
-        ObjectGuid NPC_LeaderGUID;
-        ObjectGuid NPC_IceWallTargetGUID[4];
-        ObjectGuid NPC_AltarBunnyGUID;
-        ObjectGuid NPC_QuelDelarGUID;
-        ObjectGuid NPC_ShipCaptainGUID;
-        ObjectGuid GO_FrostmourneGUID;
-        ObjectGuid GO_FrostmourneAltarGUID;
-        ObjectGuid GO_FrontDoorGUID;
-        ObjectGuid GO_ArthasDoorGUID;
-        ObjectGuid GO_CaveInGUID;
-        ObjectGuid GO_DoorBeforeThroneGUID;
-        ObjectGuid GO_DoorAfterThroneGUID;
-        ObjectGuid GO_IceWallGUID;
+        WOWGUID NPC_FalricGUID;
+        WOWGUID NPC_MarwynGUID;
+        WOWGUID NPC_LichKingIntroGUID;
+        WOWGUID NPC_LeaderIntroGUID;
+        WOWGUID NPC_GuardGUID;
+        WOWGUID NPC_UtherGUID;
+        WOWGUID NPC_LichKingGUID;
+        WOWGUID NPC_LeaderGUID;
+        WOWGUID NPC_IceWallTargetGUID[4];
+        WOWGUID NPC_AltarBunnyGUID;
+        WOWGUID NPC_QuelDelarGUID;
+        WOWGUID NPC_ShipCaptainGUID;
+        WOWGUID GO_FrostmourneGUID;
+        WOWGUID GO_FrostmourneAltarGUID;
+        WOWGUID GO_FrontDoorGUID;
+        WOWGUID GO_ArthasDoorGUID;
+        WOWGUID GO_CaveInGUID;
+        WOWGUID GO_DoorBeforeThroneGUID;
+        WOWGUID GO_DoorAfterThroneGUID;
+        WOWGUID GO_IceWallGUID;
 
-        ObjectGuid NPC_TrashGUID[NUM_OF_TRASH];
+        WOWGUID NPC_TrashGUID[NUM_OF_TRASH];
         bool TrashActive[NUM_OF_TRASH];
         uint8 TrashCounter;
         uint32 chosenComposition[8][5];
@@ -179,8 +179,8 @@ public:
         bool IsDuringLKFight;
         uint32 BatteredHiltStatus;
 
-        ObjectGuid NPC_FrostswornGeneralGUID;
-        ObjectGuid NPC_SpiritualReflectionGUID[5];
+        WOWGUID NPC_FrostswornGeneralGUID;
+        WOWGUID NPC_SpiritualReflectionGUID[5];
 
         uint32 outroTimer;
         uint8 outroStep;
@@ -376,7 +376,7 @@ public:
             {
                 case GO_FROSTMOURNE:
                     GO_FrostmourneGUID = go->GetGUID();
-                    HandleGameObject(ObjectGuid::Empty, false, go);
+                    HandleGameObject(WOWGUID::Empty, false, go);
                     if (EncounterMask & (1 << DATA_INTRO))
                         go->SetPhaseMask(2, true);
                     break;
@@ -385,11 +385,11 @@ public:
                     break;
                 case GO_FRONT_DOOR:
                     GO_FrontDoorGUID = go->GetGUID();
-                    HandleGameObject(ObjectGuid::Empty, true, go);
+                    HandleGameObject(WOWGUID::Empty, true, go);
                     break;
                 case GO_ARTHAS_DOOR:
                     GO_ArthasDoorGUID = go->GetGUID();
-                    HandleGameObject(ObjectGuid::Empty, (EncounterMask & (1 << DATA_MARWYN)), go);
+                    HandleGameObject(WOWGUID::Empty, (EncounterMask & (1 << DATA_MARWYN)), go);
                     break;
                 case GO_CAVE_IN:
                     GO_CaveInGUID = go->GetGUID();
@@ -685,7 +685,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch(type)
             {
@@ -715,7 +715,7 @@ public:
                 case GO_FRONT_DOOR:
                     return GO_FrontDoorGUID;
             }
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void ReadSaveDataMore(std::istringstream& data) override

@@ -138,7 +138,7 @@ class spell_rog_blade_flurry : public AuraScript
     }
 
 private:
-    ObjectGuid _procTargetGUID;
+    WOWGUID _procTargetGUID;
 };
 
 // -31228 - Cheat Death
@@ -304,7 +304,7 @@ class spell_rog_killing_spree_aura : public AuraScript
     {
         while (!_targets.empty())
         {
-            ObjectGuid guid = Acore::Containers::SelectRandomContainerElement(_targets);
+            WOWGUID guid = Acore::Containers::SelectRandomContainerElement(_targets);
             if (Unit* target = ObjectAccessor::GetUnit(*GetTarget(), guid))
             {
                 // xinef: target may be no longer valid

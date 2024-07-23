@@ -60,7 +60,7 @@ BattlegroundIC::BattlegroundIC()
     respawnMap.clear();
 }
 
-void BattlegroundIC::DoAction(uint32 action, ObjectGuid guid)
+void BattlegroundIC::DoAction(uint32 action, WOWGUID guid)
 {
     if (action != ACTION_TELEPORT_PLAYER_TO_TRANSPORT)
         return;

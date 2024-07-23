@@ -75,7 +75,7 @@ enum DrakeGiverTexts
 class npc_oculus_drakegiver : public CreatureScript
 {
 public:
-    std::unordered_map<ObjectGuid, bool>openedMenu;
+    std::unordered_map<WOWGUID, bool>openedMenu;
 
     npc_oculus_drakegiver() : CreatureScript("npc_oculus_drakegiver") { }
 
@@ -813,7 +813,7 @@ class spell_oculus_rider_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_SOAR_TRIGGER, SPELL_RUBY_EVASIVE_AURA, SPELL_DRAKE_FLAG_VISUAL });
     }
 
-    ObjectGuid _drakeGUID;
+    WOWGUID _drakeGUID;
 
     void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {

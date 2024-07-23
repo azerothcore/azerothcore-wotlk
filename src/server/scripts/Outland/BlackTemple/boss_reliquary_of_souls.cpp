@@ -484,7 +484,7 @@ public:
     {
         boss_essence_of_angerAI(Creature* creature) : ScriptedAI(creature), _recentlySpoken(false) { }
 
-        ObjectGuid targetGUID;
+        WOWGUID targetGUID;
 
         void Reset() override
         {
@@ -540,7 +540,7 @@ public:
             ScheduleTimedEvent(1s, [&] {
                 if (Unit* victim = me->GetVictim())
                 {
-                    ObjectGuid victimGUID = victim->GetGUID();
+                    WOWGUID victimGUID = victim->GetGUID();
                     if (targetGUID && targetGUID != victimGUID)
                         DoCastSelf(SPELL_SEETHE);
                     // victim can be lost

@@ -20,7 +20,7 @@
  */
 
 #include "GroupScript.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "PlayerScript.h"
 
 class Player;
@@ -47,11 +47,11 @@ namespace lfg
         LFGGroupScript();
 
         // Group Hooks
-        void OnAddMember(Group* group, ObjectGuid guid) override;
-        void OnRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, char const* reason) override;
+        void OnAddMember(Group* group, WOWGUID guid) override;
+        void OnRemoveMember(Group* group, WOWGUID guid, RemoveMethod method, WOWGUID kicker, char const* reason) override;
         void OnDisband(Group* group) override;
-        void OnChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid) override;
-        void OnInviteMember(Group* group, ObjectGuid guid) override;
+        void OnChangeLeader(Group* group, WOWGUID newLeaderGuid, WOWGUID oldLeaderGuid) override;
+        void OnInviteMember(Group* group, WOWGUID guid) override;
     };
 
     void AddSC_LFGScripts();

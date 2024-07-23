@@ -208,7 +208,7 @@ public:
         }
 
         InstanceScript* pInstance;
-        ObjectGuid SummonedGUID;
+        WOWGUID SummonedGUID;
         uint16 checkTimer;
 
         void DoAction(int32 a) override

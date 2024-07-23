@@ -27,13 +27,13 @@
 
 void User::HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
 
     recvData >> guid;
     SendTaxiStatus(guid);
 }
 
-void User::SendTaxiStatus(ObjectGuid guid)
+void User::SendTaxiStatus(WOWGUID guid)
 {
     Player* const player = GetPlayer();
     Creature* unit = ObjectAccessor::GetCreature(*player, guid);
@@ -59,7 +59,7 @@ void User::SendTaxiStatus(ObjectGuid guid)
 
 void User::HandleTaxiQueryAvailableNodes(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     // cheating checks
@@ -160,7 +160,7 @@ void User::SendDiscoverNewTaxiNode(uint32 nodeid)
 
 void User::HandleActivateTaxiExpressOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 node_count;
 
     recvData >> guid >> node_count;
@@ -199,7 +199,7 @@ void User::HandleActivateTaxiExpressOpcode(WorldPacket& recvData)
 
 void User::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid; // used only for proper packet read
+    WOWGUID guid; // used only for proper packet read
     recvData >> guid.ReadAsPacked();
 
     CMovement movementInfo;                              // used only for proper packet read
@@ -251,7 +251,7 @@ void User::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
 
 void User::HandleActivateTaxiOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     std::vector<uint32> nodes;
     nodes.resize(2);
     GetPlayer()->SetCanTeleport(true);

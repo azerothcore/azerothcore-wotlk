@@ -605,19 +605,19 @@ public:
         uint32 _postboxesOpened;
         EventMap events;
 
-        ObjectGuid _zigguratDoorsGUID1;
-        ObjectGuid _zigguratDoorsGUID2;
-        ObjectGuid _zigguratDoorsGUID3;
-        ObjectGuid _zigguratDoorsGUID4;
-        ObjectGuid _zigguratDoorsGUID5;
-        ObjectGuid _slaughterGateGUID;
-        ObjectGuid _gauntletGateGUID;
-        ObjectGuid _baronRivendareGUID;
-        ObjectGuid _barthilasGUID;
+        WOWGUID _zigguratDoorsGUID1;
+        WOWGUID _zigguratDoorsGUID2;
+        WOWGUID _zigguratDoorsGUID3;
+        WOWGUID _zigguratDoorsGUID4;
+        WOWGUID _zigguratDoorsGUID5;
+        WOWGUID _slaughterGateGUID;
+        WOWGUID _gauntletGateGUID;
+        WOWGUID _baronRivendareGUID;
+        WOWGUID _barthilasGUID;
 
         bool _gateTrapsCooldown[2];
-        ObjectGuid _trappedPlayerGUID;
-        ObjectGuid _trapGatesGUIDs[4];
+        WOWGUID _trappedPlayerGUID;
+        WOWGUID _trapGatesGUIDs[4];
 
         void gate_delay(int gate)
         {

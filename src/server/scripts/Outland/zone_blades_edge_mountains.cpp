@@ -80,8 +80,8 @@ public:
 
         EventMap events;
         bool PartyTime;
-        ObjectGuid PlayerGUID;
-        ObjectGuid CannonGUID;
+        WOWGUID PlayerGUID;
+        WOWGUID CannonGUID;
         uint8 count;
 
         void Reset() override
@@ -575,7 +575,7 @@ public:
         uint8 gameLevel;
         uint8 fails;
         uint8 gameTicks;
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
         uint32 clusterIds[SIMON_MAX_COLORS];
         float zCoordCorrection;
         float searchDistance;
@@ -685,7 +685,7 @@ public:
         }
 
         // Used for getting involved player guid. Parameter id is used for defining if is a large(Monument) or small(Relic) node
-        void SetGUID(ObjectGuid guid, int32 id) override
+        void SetGUID(WOWGUID guid, int32 id) override
         {
             me->SetCanFly(true);
 
@@ -1127,7 +1127,7 @@ public:
         }
 
     private:
-        ObjectGuid playerGuid;
+        WOWGUID playerGuid;
         uint32 timer;
     };
 

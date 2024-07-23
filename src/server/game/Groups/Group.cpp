@@ -43,7 +43,7 @@
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 
-Roll::Roll(ObjectGuid _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
+Roll::Roll(WOWGUID _guid, LootItem const& li) : itemGUID(_guid), itemid(li.itemid),
                                                    itemRandomPropId(li.randomPropertyId), itemRandomSuffix(li.randomSuffix), itemCount(li.count),
                                                    totalPlayersRolling(0), totalNeed(0), totalGreed(0), totalPass(0), itemSlot(0),
                                                    rollVoteMask(ROLL_ALL_TYPE_NO_DISENCHANT)
@@ -108,10 +108,10 @@ Group::~Group()
 
 bool Group::Create(Player* leader)
 {
-    ObjectGuid leaderGuid = leader->GetGUID();
-    ObjectGuid::LowType lowguid = sGroupMgr->GenerateGroupId();
+    WOWGUID leaderGuid = leader->GetGUID();
+    WOWGUID::LowType lowguid = sGroupMgr->GenerateGroupId();
 
-    m_guid = ObjectGuid::Create<HighGuid::Group>(lowguid);
+    m_guid = WOWGUID::Create<HighGuid::Group>(lowguid);
     m_leaderGuid = leaderGuid;
     m_leaderName = leader->GetName();
     leader->SetPlayerFlag(PLAYER_FLAGS_GROUP_LEADER);
@@ -174,10 +174,10 @@ bool Group::Create(Player* leader)
 
 bool Group::LoadGroupFromDB(Field* fields)
 {
-    ObjectGuid::LowType groupLowGuid = fields[16].Get<uint32>();
-    m_guid = ObjectGuid::Create<HighGuid::Group>(groupLowGuid);
+    WOWGUID::LowType groupLowGuid = fields[16].Get<uint32>();
+    m_guid = WOWGUID::Create<HighGuid::Group>(groupLowGuid);
 
-    m_leaderGuid = ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>());
+    m_leaderGuid = WOWGUID::Create<HighGuid::Player>(fields[0].Get<uint32>());
 
     // group leader not exist
     if (!sCharacterCache->GetCharacterNameByGuid(m_leaderGuid, m_leaderName))
@@ -197,7 +197,7 @@ bool Group::LoadGroupFromDB(Field* fields)
     }
 
     m_lootMethod = LootMethod(fields[1].Get<uint8>());
-    m_looterGuid = ObjectGuid::Create<HighGuid::Player>(fields[2].Get<uint32>());
+    m_looterGuid = WOWGUID::Create<HighGuid::Player>(fields[2].Get<uint32>());
     m_lootThreshold = ItemQualities(fields[3].Get<uint8>());
 
     for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
@@ -219,7 +219,7 @@ bool Group::LoadGroupFromDB(Field* fields)
     else
         m_raidDifficulty = Difficulty(r_diff);
 
-    m_masterLooterGuid = ObjectGuid::Create<HighGuid::Player>(fields[15].Get<uint32>());
+    m_masterLooterGuid = WOWGUID::Create<HighGuid::Player>(fields[15].Get<uint32>());
 
     if (m_groupType & GROUPTYPE_LFG)
         sLFGMgr->_LoadFromDB(fields, GetGUID());
@@ -227,10 +227,10 @@ bool Group::LoadGroupFromDB(Field* fields)
     return true;
 }
 
-void Group::LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles)
+void Group::LoadMemberFromDB(WOWGUID::LowType guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles)
 {
     MemberSlot member;
-    member.guid = ObjectGuid::Create<HighGuid::Player>(guidLow);
+    member.guid = WOWGUID::Create<HighGuid::Player>(guidLow);
 
     // skip non-existed member
     if (!sCharacterCache->GetCharacterNameByGuid(member.guid, member.name))
@@ -250,7 +250,7 @@ void Group::LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uin
 
     if (!isBGGroup() && !isBFGroup())
     {
-        sCharacterCache->UpdateCharacterGroup(ObjectGuid(HighGuid::Player, guidLow), GetGUID());
+        sCharacterCache->UpdateCharacterGroup(WOWGUID(HighGuid::Player, guidLow), GetGUID());
     }
 
     SubGroupCounterIncrease(subgroup);
@@ -368,7 +368,7 @@ void Group::RemoveAllInvites()
     m_invitees.clear();
 }
 
-Player* Group::GetInvited(ObjectGuid guid) const
+Player* Group::GetInvited(WOWGUID guid) const
 {
     for (InvitesList::const_iterator itr = m_invitees.begin(); itr != m_invitees.end(); ++itr)
     {
@@ -544,7 +544,7 @@ bool Group::AddMember(Player* player)
     return true;
 }
 
-bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_REMOVEMETHOD_DEFAULT*/, ObjectGuid kicker /*= ObjectGuid::Empty*/, const char* reason /*= nullptr*/)
+bool Group::RemoveMember(WOWGUID guid, const RemoveMethod& method /*= GROUP_REMOVEMETHOD_DEFAULT*/, WOWGUID kicker /*= WOWGUID::Empty*/, const char* reason /*= nullptr*/)
 {
     BroadcastGroupUpdate();
 
@@ -710,7 +710,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
     }
 }
 
-void Group::ChangeLeader(ObjectGuid newLeaderGuid)
+void Group::ChangeLeader(WOWGUID newLeaderGuid)
 {
     member_witerator slot = _getMemberWSlot(newLeaderGuid);
 
@@ -897,7 +897,7 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p,
     p->User()->Send(&data);
 }
 
-void Group::SendLootRoll(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll, bool autoPass)
+void Group::SendLootRoll(WOWGUID sourceGuid, WOWGUID targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll, bool autoPass)
 {
     WorldPacket data(SMSG_LOOT_ROLL, (8 + 4 + 8 + 4 + 4 + 4 + 1 + 1 + 1));
     data << sourceGuid;                                     // guid of the item rolled
@@ -921,7 +921,7 @@ void Group::SendLootRoll(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 rol
     }
 }
 
-void Group::SendLootRollWon(ObjectGuid sourceGuid, ObjectGuid targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll)
+void Group::SendLootRollWon(WOWGUID sourceGuid, WOWGUID targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll)
 {
     WorldPacket data(SMSG_LOOT_ROLL_WON, (8 + 4 + 4 + 4 + 4 + 8 + 1 + 1));
     data << sourceGuid;                                     // guid of the item rolled
@@ -1022,7 +1022,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
         // roll for over-threshold item if it's one-player loot
         if (item->Quality >= uint32(m_lootThreshold))
         {
-            ObjectGuid newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
+            WOWGUID newitemGUID = WOWGUID::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
             Roll* r = new Roll(newitemGUID, *i);
 
             //a vector is filled with only near party members
@@ -1107,7 +1107,7 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
             continue;
         }
 
-        ObjectGuid newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
+        WOWGUID newitemGUID = WOWGUID::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
         Roll* r = new Roll(newitemGUID, *i);
 
         //a vector is filled with only near party members
@@ -1170,7 +1170,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
         //roll for over-threshold item if it's one-player loot
         if (item->Quality >= uint32(m_lootThreshold))
         {
-            ObjectGuid newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
+            WOWGUID newitemGUID = WOWGUID::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
             Roll* r = new Roll(newitemGUID, *i);
 
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -1245,7 +1245,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
             continue;
 
         item = sObjectMgr->GetItemTemplate(i->itemid);
-        ObjectGuid newitemGUID = ObjectGuid::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
+        WOWGUID newitemGUID = WOWGUID::Create<HighGuid::Item>(sObjectMgr->GetGenerator<HighGuid::Item>().Generate());
         Roll* r = new Roll(newitemGUID, *i);
 
         for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -1356,7 +1356,7 @@ void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
     }
 }
 
-bool Group::CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choice)
+bool Group::CountRollVote(WOWGUID playerGUID, WOWGUID Guid, uint8 Choice)
 {
     Rolls::iterator rollI = GetRoll(Guid);
     if (rollI == RollId.end())
@@ -1377,22 +1377,22 @@ bool Group::CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choice)
     switch (Choice)
     {
         case ROLL_PASS:                                     // Player choose pass
-            SendLootRoll(ObjectGuid::Empty, playerGUID, 128, ROLL_PASS, *roll);
+            SendLootRoll(WOWGUID::Empty, playerGUID, 128, ROLL_PASS, *roll);
             ++roll->totalPass;
             itr->second = PASS;
             break;
         case ROLL_NEED:                                     // player choose Need
-            SendLootRoll(ObjectGuid::Empty, playerGUID, 0, 0, *roll);
+            SendLootRoll(WOWGUID::Empty, playerGUID, 0, 0, *roll);
             ++roll->totalNeed;
             itr->second = NEED;
             break;
         case ROLL_GREED:                                    // player choose Greed
-            SendLootRoll(ObjectGuid::Empty, playerGUID, 128, ROLL_GREED, *roll);
+            SendLootRoll(WOWGUID::Empty, playerGUID, 128, ROLL_GREED, *roll);
             ++roll->totalGreed;
             itr->second = GREED;
             break;
         case ROLL_DISENCHANT:                               // player choose Disenchant
-            SendLootRoll(ObjectGuid::Empty, playerGUID, 128, ROLL_DISENCHANT, *roll);
+            SendLootRoll(WOWGUID::Empty, playerGUID, 128, ROLL_DISENCHANT, *roll);
             ++roll->totalGreed;
             itr->second = DISENCHANT;
             break;
@@ -1437,7 +1437,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
         if (!roll->playerVote.empty())
         {
             uint8 maxresul = 0;
-            ObjectGuid maxguid; // pussywizard: start with 0 >_>
+            WOWGUID maxguid; // pussywizard: start with 0 >_>
             Player* player = nullptr;
 
             for (Roll::PlayerVote::const_iterator itr = roll->playerVote.begin(); itr != roll->playerVote.end(); ++itr)
@@ -1453,7 +1453,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                 }
 
                 uint8 randomN = urand(1, 100);
-                SendLootRoll(ObjectGuid::Empty, itr->first, randomN, ROLL_NEED, *roll);
+                SendLootRoll(WOWGUID::Empty, itr->first, randomN, ROLL_NEED, *roll);
                 if (maxresul < randomN)
                 {
                     maxguid  = itr->first;
@@ -1463,7 +1463,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
 
             if (maxguid) // pussywizard: added condition
             {
-                SendLootRollWon(ObjectGuid::Empty, maxguid, maxresul, ROLL_NEED, *roll);
+                SendLootRollWon(WOWGUID::Empty, maxguid, maxresul, ROLL_NEED, *roll);
                 player = ObjectAccessor::FindPlayer(maxguid);
 
                 if (player)
@@ -1501,7 +1501,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
         if (!roll->playerVote.empty())
         {
             uint8 maxresul = 0;
-            ObjectGuid maxguid; // pussywizard: start with 0
+            WOWGUID maxguid; // pussywizard: start with 0
             Player* player = nullptr;
             RollVote rollvote = NOT_VALID;
 
@@ -1519,7 +1519,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                 }
 
                 uint8 randomN = urand(1, 100);
-                SendLootRoll(ObjectGuid::Empty, itr->first, randomN, itr->second, *roll);
+                SendLootRoll(WOWGUID::Empty, itr->first, randomN, itr->second, *roll);
                 if (maxresul < randomN)
                 {
                     maxguid  = itr->first;
@@ -1530,7 +1530,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
 
             if (maxguid) // pussywizard: added condition
             {
-                SendLootRollWon(ObjectGuid::Empty, maxguid, maxresul, rollvote, *roll);
+                SendLootRollWon(WOWGUID::Empty, maxguid, maxresul, rollvote, *roll);
                 player = ObjectAccessor::FindPlayer(maxguid);
 
                 if (player)
@@ -1620,7 +1620,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
     delete roll;
 }
 
-void Group::SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid)
+void Group::SetTargetIcon(uint8 id, WOWGUID whoGuid, WOWGUID targetGuid)
 {
     if (id >= TARGETICONCOUNT)
         return;
@@ -1629,7 +1629,7 @@ void Group::SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid)
     if (targetGuid)
         for (int i = 0; i < TARGETICONCOUNT; ++i)
             if (m_targetIcons[i] == targetGuid)
-                SetTargetIcon(i, ObjectGuid::Empty, ObjectGuid::Empty);
+                SetTargetIcon(i, WOWGUID::Empty, WOWGUID::Empty);
 
     m_targetIcons[id] = targetGuid;
 
@@ -1667,7 +1667,7 @@ void Group::SendUpdate()
         SendUpdateToPlayer(witr->guid, &(*witr));
 }
 
-void Group::SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot)
+void Group::SendUpdateToPlayer(WOWGUID playerGUID, MemberSlot* slot)
 {
     Player* player = ObjectAccessor::FindConnectedPlayer(playerGUID);
 
@@ -1753,7 +1753,7 @@ void Group::UpdatePlayerOutOfRange(Player* player)
     }
 }
 
-void Group::BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group, ObjectGuid ignore)
+void Group::BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group, WOWGUID ignore)
 {
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -1804,7 +1804,7 @@ bool Group::SameSubGroup(Player const* member1, Player const* member2) const
 }
 
 // Allows setting sub groups both for online or offline members
-void Group::ChangeMembersGroup(ObjectGuid guid, uint8 group)
+void Group::ChangeMembersGroup(WOWGUID guid, uint8 group)
 {
     // Only raid groups have sub groups
     if (!isRaidGroup())
@@ -1871,7 +1871,7 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
     if (GetLootMethod() == FREE_FOR_ALL)
         return;
 
-    ObjectGuid oldLooterGUID = GetLooterGuid();
+    WOWGUID oldLooterGUID = GetLooterGuid();
     member_citerator guid_itr = _getMemberCSlot(oldLooterGUID);
     if (guid_itr != m_memberSlots.end())
     {
@@ -1921,7 +1921,7 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
     }
     else
     {
-        SetLooterGuid(ObjectGuid::Empty);
+        SetLooterGuid(WOWGUID::Empty);
         SendUpdate();
     }
 }
@@ -2231,12 +2231,12 @@ void Group::SetLootMethod(LootMethod method)
     m_lootMethod = method;
 }
 
-void Group::SetLooterGuid(ObjectGuid guid)
+void Group::SetLooterGuid(WOWGUID guid)
 {
     m_looterGuid = guid;
 }
 
-void Group::SetMasterLooterGuid(ObjectGuid guid)
+void Group::SetMasterLooterGuid(WOWGUID guid)
 {
     m_masterLooterGuid = guid;
 }
@@ -2246,7 +2246,7 @@ void Group::SetLootThreshold(ItemQualities threshold)
     m_lootThreshold = threshold;
 }
 
-void Group::SetLfgRoles(ObjectGuid guid, const uint8 roles)
+void Group::SetLfgRoles(WOWGUID guid, const uint8 roles)
 {
     member_witerator slot = _getMemberWSlot(guid);
     if (slot == m_memberSlots.end())
@@ -2292,7 +2292,7 @@ GroupType Group::GetGroupType() const
     return m_groupType;
 }
 
-ObjectGuid Group::GetLeaderGUID() const
+WOWGUID Group::GetLeaderGUID() const
 {
     return m_leaderGuid;
 }
@@ -2302,7 +2302,7 @@ Player* Group::GetLeader()
     return ObjectAccessor::FindConnectedPlayer(m_leaderGuid);
 }
 
-ObjectGuid Group::GetGUID() const
+WOWGUID Group::GetGUID() const
 {
     return m_guid;
 }
@@ -2317,12 +2317,12 @@ LootMethod Group::GetLootMethod() const
     return m_lootMethod;
 }
 
-ObjectGuid Group::GetLooterGuid() const
+WOWGUID Group::GetLooterGuid() const
 {
     return m_looterGuid;
 }
 
-ObjectGuid Group::GetMasterLooterGuid() const
+WOWGUID Group::GetMasterLooterGuid() const
 {
     return m_masterLooterGuid;
 }
@@ -2332,26 +2332,26 @@ ItemQualities Group::GetLootThreshold() const
     return m_lootThreshold;
 }
 
-bool Group::IsMember(ObjectGuid guid) const
+bool Group::IsMember(WOWGUID guid) const
 {
     return _getMemberCSlot(guid) != m_memberSlots.end();
 }
 
-bool Group::IsLeader(ObjectGuid guid) const
+bool Group::IsLeader(WOWGUID guid) const
 {
     return (GetLeaderGUID() == guid);
 }
 
-ObjectGuid Group::GetMemberGUID(const std::string& name)
+WOWGUID Group::GetMemberGUID(const std::string& name)
 {
     for (member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
         if (itr->name == name)
             return itr->guid;
 
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
-bool Group::IsAssistant(ObjectGuid guid) const
+bool Group::IsAssistant(WOWGUID guid) const
 {
     member_citerator mslot = _getMemberCSlot(guid);
     if (mslot == m_memberSlots.end())
@@ -2359,7 +2359,7 @@ bool Group::IsAssistant(ObjectGuid guid) const
     return mslot->flags & MEMBER_FLAG_ASSISTANT;
 }
 
-bool Group::SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const
+bool Group::SameSubGroup(WOWGUID guid1, WOWGUID guid2) const
 {
     member_citerator mslot2 = _getMemberCSlot(guid2);
     if (mslot2 == m_memberSlots.end())
@@ -2367,7 +2367,7 @@ bool Group::SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const
     return SameSubGroup(guid1, &*mslot2);
 }
 
-bool Group::SameSubGroup(ObjectGuid guid1, MemberSlot const* slot2) const
+bool Group::SameSubGroup(WOWGUID guid1, MemberSlot const* slot2) const
 {
     member_citerator mslot1 = _getMemberCSlot(guid1);
     if (mslot1 == m_memberSlots.end() || !slot2)
@@ -2380,7 +2380,7 @@ bool Group::HasFreeSlotSubGroup(uint8 subgroup) const
     return (m_subGroupsCounts && m_subGroupsCounts[subgroup] < MAXGROUPSIZE);
 }
 
-uint8 Group::GetMemberGroup(ObjectGuid guid) const
+uint8 Group::GetMemberGroup(WOWGUID guid) const
 {
     member_citerator mslot = _getMemberCSlot(guid);
     if (mslot == m_memberSlots.end())
@@ -2398,7 +2398,7 @@ void Group::SetBattlefieldGroup(Battlefield* bg)
     m_bfGroup = bg;
 }
 
-void Group::SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag)
+void Group::SetGroupMemberFlag(WOWGUID guid, bool apply, GroupMemberFlags flag)
 {
     // Assistants, main assistants and main tanks are only available in raid groups
     if (!isRaidGroup())
@@ -2459,7 +2459,7 @@ bool Group::isRollLootActive() const
     return !RollId.empty();
 }
 
-Group::Rolls::iterator Group::GetRoll(ObjectGuid Guid)
+Group::Rolls::iterator Group::GetRoll(WOWGUID Guid)
 {
     Rolls::iterator iter;
     for (iter = RollId.begin(); iter != RollId.end(); ++iter)
@@ -2485,7 +2485,7 @@ void Group::_initRaidSubGroupsCounter()
         ++m_subGroupsCounts[itr->group];
 }
 
-Group::member_citerator Group::_getMemberCSlot(ObjectGuid Guid) const
+Group::member_citerator Group::_getMemberCSlot(WOWGUID Guid) const
 {
     for (member_citerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
         if (itr->guid == Guid)
@@ -2493,7 +2493,7 @@ Group::member_citerator Group::_getMemberCSlot(ObjectGuid Guid) const
     return m_memberSlots.end();
 }
 
-Group::member_witerator Group::_getMemberWSlot(ObjectGuid Guid)
+Group::member_witerator Group::_getMemberWSlot(WOWGUID Guid)
 {
     for (member_witerator itr = m_memberSlots.begin(); itr != m_memberSlots.end(); ++itr)
         if (itr->guid == Guid)

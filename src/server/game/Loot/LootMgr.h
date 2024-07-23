@@ -21,7 +21,7 @@
 #include "ByteBuffer.h"
 #include "ConditionMgr.h"
 #include "ItemEnchantmentMgr.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "RefMgr.h"
 #include "SharedDefines.h"
 #include <list>
@@ -159,7 +159,7 @@ struct LootItem
     int32   randomPropertyId;
     ConditionList conditions;                               // additional loot condition
     AllowedLooterSet allowedGUIDs;
-    ObjectGuid rollWinnerGUID;                              // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
+    WOWGUID rollWinnerGUID;                              // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
     uint8   count             : 8;
     bool    is_looted         : 1;
     bool    is_blocked        : 1;
@@ -177,7 +177,7 @@ struct LootItem
     LootItem() = default;
 
     // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-    bool AllowedForPlayer(Player const* player, ObjectGuid source) const;
+    bool AllowedForPlayer(Player const* player, WOWGUID source) const;
     void AddAllowedLooter(Player const* player);
     [[nodiscard]] const AllowedLooterSet& GetAllowedLooters() const { return allowedGUIDs; }
 };
@@ -198,7 +198,7 @@ class LootTemplate;
 
 typedef std::vector<QuestItem> QuestItemList;
 typedef std::vector<LootItem> LootItemList;
-typedef std::map<ObjectGuid, QuestItemList*> QuestItemMap;
+typedef std::map<WOWGUID, QuestItemList*> QuestItemMap;
 typedef std::list<LootStoreItem*> LootStoreItemList;
 typedef std::unordered_map<uint32, LootTemplate*> LootTemplateMap;
 
@@ -321,13 +321,13 @@ struct Loot
     std::vector<LootItem> quest_items;
     uint32 gold;
     uint8 unlootedCount{0};
-    ObjectGuid roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
-    ObjectGuid lootOwnerGUID;
+    WOWGUID roundRobinPlayer;        // GUID of the player having the Round-Robin ownership for the loot. If 0, round robin owner has released.
+    WOWGUID lootOwnerGUID;
     LootType loot_type{LOOT_NONE};      // required for achievement system
 
     // GUID of container that holds this loot (item_instance.entry), set for items that can be looted
-    ObjectGuid containerGUID;
-    ObjectGuid sourceWorldObjectGUID;
+    WOWGUID containerGUID;
+    WOWGUID sourceWorldObjectGUID;
     GameObject* sourceGameObject{nullptr};
 
     Loot(uint32 _gold = 0) : gold(_gold) { }
@@ -370,8 +370,8 @@ struct Loot
     void NotifyItemRemoved(uint8 lootIndex);
     void NotifyQuestItemRemoved(uint8 questIndex);
     void NotifyMoneyRemoved();
-    void AddLooter(ObjectGuid GUID) { PlayersLooting.insert(GUID); }
-    void RemoveLooter(ObjectGuid GUID) { PlayersLooting.erase(GUID); }
+    void AddLooter(WOWGUID GUID) { PlayersLooting.insert(GUID); }
+    void RemoveLooter(WOWGUID GUID) { PlayersLooting.erase(GUID); }
 
     void generateMoneyLoot(uint32 minAmount, uint32 maxAmount);
     bool FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bool personal, bool noEmptyError = false, uint16 lootMode = LOOT_MODE_DEFAULT, WorldObject* lootSource = nullptr);

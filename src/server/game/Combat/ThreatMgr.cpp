@@ -266,7 +266,7 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit const* victim) cons
     return getReferenceByTarget(victim->GetGUID());
 }
 
-HostileReference* ThreatContainer::getReferenceByTarget(ObjectGuid const& guid) const
+HostileReference* ThreatContainer::getReferenceByTarget(WOWGUID const& guid) const
 {
     for (ThreatContainer::StorageType::const_iterator i = iThreatList.begin(); i != iThreatList.end(); ++i)
     {

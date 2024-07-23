@@ -270,14 +270,14 @@ public:
                     _bossWave = TO_BE_DECIDED;
                     _retreat = DATA_ALLIANCE_RETREAT;
                     // Spawn Ancient Gems
-                    for (ObjectGuid const& guid : _ancientGemAlliance)
+                    for (WOWGUID const& guid : _ancientGemAlliance)
                         if (GameObject* gem = instance->GetGameObject(guid))
                             gem->Respawn();
 
                     // Move all alliance NPCs near Jaina (only happens in this base, not Horde's)
                     if (Creature* jaina = GetCreature(DATA_JAINA))
                     {
-                        for (ObjectGuid const& guid : _baseAlliance)
+                        for (WOWGUID const& guid : _baseAlliance)
                         {
                             if (Creature* creature = instance->GetCreature(guid))
                             {
@@ -295,14 +295,14 @@ public:
                     // Despawn all alliance NPCs
                     scheduler.Schedule(21000ms, [this](TaskContext)
                         {
-                            for (ObjectGuid const& guid : _baseAlliance)
+                            for (WOWGUID const& guid : _baseAlliance)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->DespawnOrUnsummon();
 
                             // Spawn Roaring Flame after a delay
                             scheduler.Schedule(30s, [this](TaskContext)
                                 {
-                                    for (ObjectGuid const& guid : _roaringFlameAlliance)
+                                    for (WOWGUID const& guid : _roaringFlameAlliance)
                                     {
                                         if (GameObject* flame = instance->GetGameObject(guid))
                                             flame->Respawn();
@@ -318,7 +318,7 @@ public:
                 case DATA_HORDE_RETREAT:
                     _bossWave = TO_BE_DECIDED;
                     _retreat = DATA_HORDE_RETREAT;
-                    for (ObjectGuid const& guid : _ancientGemHorde)
+                    for (WOWGUID const& guid : _ancientGemHorde)
                     {
                         if (GameObject* gem = instance->GetGameObject(guid))
                             gem->Respawn();
@@ -326,7 +326,7 @@ public:
 
                     if (Creature* jaina = GetCreature(DATA_JAINA))
                     {
-                        for (ObjectGuid const& guid : _baseHorde)
+                        for (WOWGUID const& guid : _baseHorde)
                         {
                             if (Creature* creature = instance->GetCreature(guid))
                             {
@@ -343,13 +343,13 @@ public:
 
                     scheduler.Schedule(21000ms, [this](TaskContext)
                         {
-                            for (ObjectGuid const& guid : _baseHorde)
+                            for (WOWGUID const& guid : _baseHorde)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->DespawnOrUnsummon();
 
                             scheduler.Schedule(30s, [this](TaskContext)
                                 {
-                                    for (ObjectGuid const& guid : _roaringFlameHorde)
+                                    for (WOWGUID const& guid : _roaringFlameHorde)
                                         if (GameObject* flame = instance->GetGameObject(guid))
                                             flame->Respawn();
                                 });
@@ -364,7 +364,7 @@ public:
                     if (GetBossState(DATA_WINTERCHILL) != DONE)
                     {
                         if (_bossWave == TO_BE_DECIDED)
-                            for (ObjectGuid const& guid : _baseAlliance)
+                            for (WOWGUID const& guid : _baseAlliance)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
                         _bossWave = DATA_WINTERCHILL;
@@ -373,7 +373,7 @@ public:
                     else if (GetBossState(DATA_ANETHERON) != DONE)
                     {
                         if (_bossWave == TO_BE_DECIDED)
-                            for (ObjectGuid const& guid : _baseAlliance)
+                            for (WOWGUID const& guid : _baseAlliance)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
                         _bossWave = DATA_ANETHERON;
@@ -382,7 +382,7 @@ public:
                     else if (GetBossState(DATA_KAZROGAL) != DONE)
                     {
                         if (_bossWave == TO_BE_DECIDED)
-                            for (ObjectGuid const& guid : _baseHorde)
+                            for (WOWGUID const& guid : _baseHorde)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
                         _bossWave = DATA_KAZROGAL;
@@ -391,7 +391,7 @@ public:
                     else if (GetBossState(DATA_AZGALOR) != DONE)
                     {
                         if (_bossWave == TO_BE_DECIDED)
-                            for (ObjectGuid const& guid : _baseHorde)
+                            for (WOWGUID const& guid : _baseHorde)
                                 if (Creature* creature = instance->GetCreature(guid))
                                     creature->Respawn();
                         _bossWave = DATA_AZGALOR;
@@ -426,7 +426,7 @@ public:
                 {
                     uint8 doubleInfernalCount = 2;
                     // Uses SmartAI
-                    for (ObjectGuid const& guid : _infernalTargets)
+                    for (WOWGUID const& guid : _infernalTargets)
                     {
                         if (Creature* target = instance->GetCreature(guid))
                         {
@@ -449,28 +449,28 @@ public:
                 case DATA_RESET_HORDE:
                     if (GetBossState(DATA_ANETHERON) != DONE)
                     {
-                        for (ObjectGuid const& guid : _baseAlliance)
+                        for (WOWGUID const& guid : _baseAlliance)
                             if (Creature* creature = instance->GetCreature(guid))
                                 creature->DespawnOrUnsummon(0s, 300s);
                     }
 
                     if (GetBossState(DATA_AZGALOR) != DONE)
                     {
-                        for (ObjectGuid const& guid : _baseHorde)
+                        for (WOWGUID const& guid : _baseHorde)
                             if (Creature* creature = instance->GetCreature(guid))
                                 creature->DespawnOrUnsummon(0s, 300s);
                     }
 
-                    for (ObjectGuid const& guid : _baseNightElf)
+                    for (WOWGUID const& guid : _baseNightElf)
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon(0s, 300s);
 
-                    for (ObjectGuid const& guid : _encounterNPCs)
+                    for (WOWGUID const& guid : _encounterNPCs)
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon();
 
                     // also force despawn boss summons
-                    for (ObjectGuid const& guid : _summonedNPCs)
+                    for (WOWGUID const& guid : _summonedNPCs)
                         if (Creature* creature = instance->GetCreature(guid))
                             creature->DespawnOrUnsummon();
 

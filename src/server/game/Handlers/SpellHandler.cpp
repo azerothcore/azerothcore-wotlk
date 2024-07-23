@@ -67,7 +67,7 @@ void User::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     uint8 bagIndex, slot, castFlags;
     uint8 castCount;                                       // next cast if exists (single or not)
-    ObjectGuid itemGUID;
+    WOWGUID itemGUID;
     uint32 glyphIndex;                                      // something to do with glyphs?
     uint32 spellId;                                         // casted spell id
 
@@ -249,7 +249,7 @@ void User::HandleOpenItemOpcode(WorldPacket& recvPacket)
     }
 }
 
-void User::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result)
+void User::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, WOWGUID::LowType itemLowGUID, PreparedQueryResult result)
 {
     if (!GetPlayer())
         return;
@@ -274,7 +274,7 @@ void User::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid:
     uint32 entry = fields[0].Get<uint32>();
     uint32 flags = fields[1].Get<uint32>();
 
-    item->SetGuidValue(ITEM_FIELD_GIFTCREATOR, ObjectGuid::Empty);
+    item->SetGuidValue(ITEM_FIELD_GIFTCREATOR, WOWGUID::Empty);
     item->SetEntry(entry);
     item->SetUInt32Value(ITEM_FIELD_FLAGS, flags);
     item->SetUInt32Value(ITEM_FIELD_MAXDURABILITY, item->GetTemplate()->MaxDurability);
@@ -291,7 +291,7 @@ void User::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid:
 
 void User::HandleGameObjectUseOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     LOG_DEBUG("network", "WORLD: Recvd CMSG_GAMEOBJ_USE Message [{}]", guid.ToString());
@@ -312,7 +312,7 @@ void User::HandleGameObjectUseOpcode(WorldPacket& recvData)
 
 void User::HandleGameobjectReportUse(WorldPacket& recvPacket)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvPacket >> guid;
 
     LOG_DEBUG("network", "WORLD: Recvd CMSG_GAMEOBJ_REPORT_USE Message [{}]", guid.ToString());
@@ -469,7 +469,7 @@ void User::HandleCastSpellOpcode(WorldPacket& recvPacket)
             spellInfo = actualSpellInfo;
     }
 
-    Spell* spell = new Spell(mover, spellInfo, triggerFlag, ObjectGuid::Empty, false);
+    Spell* spell = new Spell(mover, spellInfo, triggerFlag, WOWGUID::Empty, false);
 
     sScriptMgr->ValidateSpellAtCastSpellResult(m_player, mover, spell, oldSpellId, spellId);
 
@@ -522,12 +522,12 @@ void User::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     }
 
     // maybe should only remove one buff when there are multiple?
-    m_player->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
+    m_player->RemoveOwnedAura(spellId, WOWGUID::Empty, 0, AURA_REMOVE_BY_CANCEL);
 }
 
 void User::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 spellId;
 
     recvPacket >> guid;
@@ -560,7 +560,7 @@ void User::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    pet->RemoveOwnedAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_CANCEL);
+    pet->RemoveOwnedAura(spellId, WOWGUID::Empty, 0, AURA_REMOVE_BY_CANCEL);
 }
 
 void User::HandleCancelGrowthAuraOpcode(WorldPacket& /*recvPacket*/)
@@ -646,7 +646,7 @@ void User::HandleSelfResOpcode(WorldPacket& /*recvData*/)
 
 void User::HandleSpellClick(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     // this will get something not in world. crash
@@ -665,7 +665,7 @@ void User::HandleSpellClick(WorldPacket& recvData)
 void User::HandleMirrorImageDataRequest(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_GET_MIRRORIMAGE_DATA");
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     // Get unit for which data is needed by client
@@ -759,7 +759,7 @@ void User::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
 {
     LOG_DEBUG("network", "WORLD: CMSG_UPDATE_PROJECTILE_POSITION");
 
-    ObjectGuid casterGuid;
+    WOWGUID casterGuid;
     uint32 spellId;
     uint8 castCount;
     float x, y, z;    // Position of missile hit

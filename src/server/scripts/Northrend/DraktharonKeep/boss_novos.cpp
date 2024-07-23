@@ -152,7 +152,7 @@ public:
                     }
             }
 
-            me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
+            me->SetGuidValue(UNIT_FIELD_TARGET, WOWGUID::Empty);
             me->RemoveAllAuras();
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -257,8 +257,8 @@ public:
     private:
         uint8 _crystalCounter;
         uint8 _stage;
-        ObjectGuid _summonTargetRightGUID;
-        ObjectGuid _summonTargetLeftGUID;
+        WOWGUID _summonTargetRightGUID;
+        WOWGUID _summonTargetLeftGUID;
 
         bool _achievement;
     };

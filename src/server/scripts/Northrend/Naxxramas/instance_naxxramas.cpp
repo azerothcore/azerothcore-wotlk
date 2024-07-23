@@ -108,57 +108,57 @@ public:
         std::set<GameObject*> HeiganEruption[4];
 
         // GOs
-        ObjectGuid _patchwerkGateGUID;
-        ObjectGuid _gluthGateGUID;
-        ObjectGuid _nothEntryGateGUID;
-        ObjectGuid _nothExitGateGUID;
-        ObjectGuid _heiganGateGUID;
-        ObjectGuid _heiganGateExitGUID;
-        ObjectGuid _loathebGateGUID;
-        ObjectGuid _anubGateGUID;
-        ObjectGuid _anubNextGateGUID;
-        ObjectGuid _faerlinaWebGUID;
-        ObjectGuid _faerlinaGateGUID;
-        ObjectGuid _maexxnaGateGUID;
-        ObjectGuid _thaddiusGateGUID;
-        ObjectGuid _gothikEnterGateGUID;
-        ObjectGuid _gothikInnerGateGUID;
-        ObjectGuid _gothikExitGateGUID{};
-        ObjectGuid _horsemanGateGUID;
-        ObjectGuid _kelthuzadFloorGUID;
-        ObjectGuid _kelthuzadGateGUID;
-        ObjectGuid _kelthuzadPortal1GUID;
-        ObjectGuid _kelthuzadPortal2GUID;
-        ObjectGuid _kelthuzadPortal3GUID;
-        ObjectGuid _kelthuzadPortal4GUID;
-        ObjectGuid _sapphironGateGUID;
-        ObjectGuid _horsemanPortalGUID;
-        ObjectGuid _loathebPortalGUID;
-        ObjectGuid _maexxnaPortalGUID;
-        ObjectGuid _thaddiusPortalGUID;
-        ObjectGuid _deathknightEyePortalGUID;
-        ObjectGuid _plagueEyePortalGUID;
-        ObjectGuid _spiderEyePortalGUID;
-        ObjectGuid _abomEyePortalGUID;
-        ObjectGuid _deathknightGlowEyePortalGUID;
-        ObjectGuid _plagueGlowEyePortalGUID;
-        ObjectGuid _spiderGlowEyePortalGUID;
-        ObjectGuid _abomGlowEyePortalGUID;
+        WOWGUID _patchwerkGateGUID;
+        WOWGUID _gluthGateGUID;
+        WOWGUID _nothEntryGateGUID;
+        WOWGUID _nothExitGateGUID;
+        WOWGUID _heiganGateGUID;
+        WOWGUID _heiganGateExitGUID;
+        WOWGUID _loathebGateGUID;
+        WOWGUID _anubGateGUID;
+        WOWGUID _anubNextGateGUID;
+        WOWGUID _faerlinaWebGUID;
+        WOWGUID _faerlinaGateGUID;
+        WOWGUID _maexxnaGateGUID;
+        WOWGUID _thaddiusGateGUID;
+        WOWGUID _gothikEnterGateGUID;
+        WOWGUID _gothikInnerGateGUID;
+        WOWGUID _gothikExitGateGUID{};
+        WOWGUID _horsemanGateGUID;
+        WOWGUID _kelthuzadFloorGUID;
+        WOWGUID _kelthuzadGateGUID;
+        WOWGUID _kelthuzadPortal1GUID;
+        WOWGUID _kelthuzadPortal2GUID;
+        WOWGUID _kelthuzadPortal3GUID;
+        WOWGUID _kelthuzadPortal4GUID;
+        WOWGUID _sapphironGateGUID;
+        WOWGUID _horsemanPortalGUID;
+        WOWGUID _loathebPortalGUID;
+        WOWGUID _maexxnaPortalGUID;
+        WOWGUID _thaddiusPortalGUID;
+        WOWGUID _deathknightEyePortalGUID;
+        WOWGUID _plagueEyePortalGUID;
+        WOWGUID _spiderEyePortalGUID;
+        WOWGUID _abomEyePortalGUID;
+        WOWGUID _deathknightGlowEyePortalGUID;
+        WOWGUID _plagueGlowEyePortalGUID;
+        WOWGUID _spiderGlowEyePortalGUID;
+        WOWGUID _abomGlowEyePortalGUID;
 
         // NPCs
         GuidList PatchwerkRoomTrash;
-        ObjectGuid _patchwerkGUID;
-        ObjectGuid _thaddiusGUID;
-        ObjectGuid _gothikGUID;
-        ObjectGuid _stalaggGUID;
-        ObjectGuid _feugenGUID;
-        ObjectGuid _zeliekGUID;
-        ObjectGuid _rivendareGUID;
-        ObjectGuid _blaumeuxGUID;
-        ObjectGuid _korthazzGUID;
-        ObjectGuid _sapphironGUID;
-        ObjectGuid _kelthuzadGUID;
-        ObjectGuid _lichkingGUID;
+        WOWGUID _patchwerkGUID;
+        WOWGUID _thaddiusGUID;
+        WOWGUID _gothikGUID;
+        WOWGUID _stalaggGUID;
+        WOWGUID _feugenGUID;
+        WOWGUID _zeliekGUID;
+        WOWGUID _rivendareGUID;
+        WOWGUID _blaumeuxGUID;
+        WOWGUID _korthazzGUID;
+        WOWGUID _sapphironGUID;
+        WOWGUID _kelthuzadGUID;
+        WOWGUID _lichkingGUID;
 
         // Controls
         uint8 _horsemanKilled;
@@ -1065,7 +1065,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 id) const override
+        WOWGUID GetGuidData(uint32 id) const override
         {
             switch (id)
             {
@@ -1120,7 +1120,7 @@ public:
                     break;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void ReadSaveDataMore(std::istringstream& data) override

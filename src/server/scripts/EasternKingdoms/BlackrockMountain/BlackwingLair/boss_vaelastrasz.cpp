@@ -281,8 +281,8 @@ public:
         }
 
         private:
-            ObjectGuid PlayerGUID;
-            ObjectGuid m_nefariusGuid;
+            WOWGUID PlayerGUID;
+            WOWGUID m_nefariusGuid;
             bool HasYelled;
             bool _introDone;
             EventMap _eventsIntro;

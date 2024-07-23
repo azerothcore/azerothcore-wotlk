@@ -34,7 +34,7 @@ void User::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
     Player* player = GetPlayer();
-    ObjectGuid lguid = player->GetLootGUID();
+    WOWGUID lguid = player->GetLootGUID();
     Loot* loot = nullptr;
     uint8 lootSlot = 0;
 
@@ -116,7 +116,7 @@ void User::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
     LOG_DEBUG("network", "WORLD: CMSG_LOOT_MONEY");
 
     Player* player = GetPlayer();
-    ObjectGuid guid = player->GetLootGUID();
+    WOWGUID guid = player->GetLootGUID();
     if (!guid)
         return;
 
@@ -239,7 +239,7 @@ void User::HandleLootOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_LOOT");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     // Check possible cheat
@@ -259,20 +259,20 @@ void User::HandleLootReleaseOpcode(WorldPacket& recvData)
 
     // cheaters can modify lguid to prevent correct apply loot release code and re-loot
     // use internal stored guid
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
-    if (ObjectGuid lguid = GetPlayer()->GetLootGUID())
+    if (WOWGUID lguid = GetPlayer()->GetLootGUID())
         if (lguid == guid)
             DoLootRelease(lguid);
 }
 
-void User::DoLootRelease(ObjectGuid lguid)
+void User::DoLootRelease(WOWGUID lguid)
 {
     Player*  player = GetPlayer();
     Loot*    loot;
 
-    player->SetLootGUID(ObjectGuid::Empty);
+    player->SetLootGUID(WOWGUID::Empty);
     player->SendLootRelease(lguid);
 
     player->RemoveUnitFlag(UNIT_FLAG_LOOTING);
@@ -421,7 +421,7 @@ void User::DoLootRelease(ObjectGuid lguid)
 void User::HandleLootMasterGiveOpcode(WorldPacket& recvData)
 {
     uint8 slotid;
-    ObjectGuid lootguid, target_playerguid;
+    WOWGUID lootguid, target_playerguid;
 
     recvData >> lootguid >> slotid >> target_playerguid;
 

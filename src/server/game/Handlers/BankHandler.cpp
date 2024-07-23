@@ -24,7 +24,7 @@
 #include "WorldPacket.h"
 #include "User.h"
 
-bool User::CanUseBank(ObjectGuid bankerGUID) const
+bool User::CanUseBank(WOWGUID bankerGUID) const
 {
     // bankerGUID parameter is optional, set to 0 by default.
     if (!bankerGUID)
@@ -44,7 +44,7 @@ bool User::CanUseBank(ObjectGuid bankerGUID) const
 
 void User::HandleBankerActivateOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
 
     recvData >> guid;
 
@@ -186,7 +186,7 @@ void User::HandleBuyBankSlotOpcode(WorldPackets::Bank::BuyBankSlot& buyBankSlot)
     m_player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BUY_BANK_SLOT);
 }
 
-void User::SendShowBank(ObjectGuid guid)
+void User::SendShowBank(WOWGUID guid)
 {
     m_currentBankerGUID = guid;
     WorldPackets::Bank::ShowBank packet;

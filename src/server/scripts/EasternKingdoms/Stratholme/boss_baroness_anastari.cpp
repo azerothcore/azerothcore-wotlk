@@ -133,7 +133,7 @@ public:
         }
 
     private:
-        ObjectGuid _possessedTargetGuid;
+        WOWGUID _possessedTargetGuid;
         TaskScheduler _scheduler;
     };
 

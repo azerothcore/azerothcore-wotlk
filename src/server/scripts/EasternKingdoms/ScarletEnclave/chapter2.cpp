@@ -58,7 +58,7 @@ public:
 
         uint32 speechTimer;
         uint32 speechCounter;
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
 
         void Reset() override
         {
@@ -223,7 +223,7 @@ public:
 
         uint32 m_uiWave;
         uint32 m_uiWave_Timer;
-        ObjectGuid m_uiValrothGUID;
+        WOWGUID m_uiValrothGUID;
         SummonList summons;
 
         void Reset() override
@@ -615,7 +615,7 @@ public:
 
         uint32 ExecuteSpeech_Timer;
         uint32 ExecuteSpeech_Counter;
-        ObjectGuid PlayerGUID;
+        WOWGUID PlayerGUID;
 
         void Reset() override
         {

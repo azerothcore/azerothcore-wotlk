@@ -383,7 +383,7 @@ void Creature::SearchFormation()
         return;
     }
 
-    ObjectGuid::LowType spawnId = GetSpawnId();
+    WOWGUID::LowType spawnId = GetSpawnId();
     if (!spawnId)
     {
         return;
@@ -1117,7 +1117,7 @@ void Creature::Motion_Initialize()
         GetMotionMaster()->Initialize();
 }
 
-bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data)
+bool Creature::Create(WOWGUID::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data)
 {
     ASSERT(map);
     SetMap(map);
@@ -1619,7 +1619,7 @@ float Creature::GetSpellDamageMod(int32 Rank)
     }
 }
 
-bool Creature::CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data)
+bool Creature::CreateFromProto(WOWGUID::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data)
 {
     SetZoneScript();
     if (GetZoneScript() && data)
@@ -1681,7 +1681,7 @@ bool Creature::isVendorWithIconSpeak() const
     return m_creatureInfo->IconName == "Speak" && m_creatureData->npcflag & UNIT_NPC_FLAG_VENDOR;
 }
 
-bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap, bool allowDuplicate /*= false*/)
+bool Creature::LoadCreatureFromDB(WOWGUID::LowType spawnId, Map* map, bool addToMap, bool allowDuplicate /*= false*/)
 {
     if (!allowDuplicate)
     {
@@ -2042,7 +2042,7 @@ void Creature::Respawn(bool force)
     if (!allowed && !force)                                               // Will be rechecked on next Update call
         return;
 
-    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
+    WOWGUID dbtableHighGuid = WOWGUID::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
     time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
 
     CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(GetEntry());
@@ -2121,7 +2121,7 @@ void Creature::Respawn(bool force)
     }
     else                                // the master is dead
     {
-        ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
+        WOWGUID targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
         if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
         {
             SetRespawnTime(DAY);
@@ -3496,7 +3496,7 @@ void Creature::SetDisplayFromModel(uint32 modelIdx)
         SetDisplayId(model->CreatureDisplayID, model->DisplayScale);
 }
 
-void Creature::SetTarget(ObjectGuid guid)
+void Creature::SetTarget(WOWGUID guid)
 {
     if (!_focusSpell)
         SetGuidValue(UNIT_FIELD_TARGET, guid);
@@ -3510,7 +3510,7 @@ void Creature::FocusTarget(Spell const* focusSpell, WorldObject const* target)
 
     _focusSpell = focusSpell;
 
-    SetGuidValue(UNIT_FIELD_TARGET, this == target ? ObjectGuid::Empty : target->GetGUID());
+    SetGuidValue(UNIT_FIELD_TARGET, this == target ? WOWGUID::Empty : target->GetGUID());
     if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AI_DOESNT_FACE_TARGET))
         AddUnitState(UNIT_STATE_ROTATING);
 
@@ -3541,7 +3541,7 @@ void Creature::ReleaseFocus(Spell const* focusSpell)
     if (Unit* victim = GetVictim())
         SetGuidValue(UNIT_FIELD_TARGET, victim->GetGUID());
     else
-        SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
+        SetGuidValue(UNIT_FIELD_TARGET, WOWGUID::Empty);
 
     if (focusSpell->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AI_DOESNT_FACE_TARGET))
         ClearUnitState(UNIT_STATE_ROTATING);
@@ -3611,7 +3611,7 @@ bool Creature::IsMovementPreventedByCasting() const
     return false;
 }
 
-void Creature::SetCannotReachTarget(ObjectGuid const& cannotReach)
+void Creature::SetCannotReachTarget(WOWGUID const& cannotReach)
 {
     if (cannotReach == m_cannotReachTarget)
     {
@@ -3806,13 +3806,13 @@ void Creature::SetCombatMovement(bool allowMovement)
     _isCombatMovementAllowed = allowMovement;
 }
 
-ObjectGuid Creature::GetSummonerGUID() const
+WOWGUID Creature::GetSummonerGUID() const
 {
     if (TempSummon const* temp = ToTempSummon())
         return temp->GetSummonerGUID();
 
     LOG_DEBUG("entities.unit", "Creature::GetSummonerGUID() called by creature that is not a summon. Creature: {} ({})", GetEntry(), GetName());
-    return ObjectGuid::Empty;
+    return WOWGUID::Empty;
 }
 
 std::string Creature::GetDebugInfo() const

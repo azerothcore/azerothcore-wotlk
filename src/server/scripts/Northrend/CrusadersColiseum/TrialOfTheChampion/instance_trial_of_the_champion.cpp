@@ -69,17 +69,17 @@ public:
         bool shortver;
         bool bAchievIveHadWorse;
 
-        ObjectGuid NPC_AnnouncerGUID;
-        ObjectGuid NPC_TirionGUID;
-        ObjectGuid NPC_GrandChampionGUID[3];
-        ObjectGuid NPC_GrandChampionMinionsGUID[3][3];
-        ObjectGuid NPC_ArgentChampionGUID;
-        ObjectGuid NPC_ArgentSoldierGUID[3][3];
+        WOWGUID NPC_AnnouncerGUID;
+        WOWGUID NPC_TirionGUID;
+        WOWGUID NPC_GrandChampionGUID[3];
+        WOWGUID NPC_GrandChampionMinionsGUID[3][3];
+        WOWGUID NPC_ArgentChampionGUID;
+        WOWGUID NPC_ArgentSoldierGUID[3][3];
         uint32 NPC_MemoryEntry;
-        ObjectGuid NPC_BlackKnightVehicleGUID;
-        ObjectGuid NPC_BlackKnightGUID;
-        ObjectGuid GO_MainGateGUID;
-        ObjectGuid GO_EnterGateGUID;
+        WOWGUID NPC_BlackKnightVehicleGUID;
+        WOWGUID NPC_BlackKnightGUID;
+        WOWGUID GO_MainGateGUID;
+        WOWGUID GO_EnterGateGUID;
 
         void Initialize() override
         {
@@ -318,7 +318,7 @@ public:
                 case INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_3:
                     // revert to INSTANCE_PROGRESS_INITIAL
                     {
-                        for (ObjectGuid const& guid : VehicleList)
+                        for (WOWGUID const& guid : VehicleList)
                             if (Creature* veh = instance->GetCreature(guid))
                             {
                                 veh->DespawnOrUnsummon();
@@ -471,7 +471,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 uiData) const override
+        WOWGUID GetGuidData(uint32 uiData) const override
         {
             switch( uiData )
             {
@@ -481,7 +481,7 @@ public:
                     return NPC_ArgentChampionGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         void SetData(uint32 uiType, uint32 uiData) override
@@ -606,7 +606,7 @@ public:
                             {
                                 Counter = 0;
                                 InstanceProgress = INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED;
-                                for (ObjectGuid const& guid : VehicleList)
+                                for (WOWGUID const& guid : VehicleList)
                                     if (Creature* veh = instance->GetCreature(guid))
                                         veh->DespawnOrUnsummon();
                                 events.ScheduleEvent(EVENT_GRAND_CHAMPIONS_MOVE_SIDE, 0ms);

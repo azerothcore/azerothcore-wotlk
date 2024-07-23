@@ -58,7 +58,7 @@ struct npc_pet_mage_mirror_image : CasterAI
     npc_pet_mage_mirror_image(Creature* creature) : CasterAI(creature) { }
 
     uint32 selectionTimer;
-    ObjectGuid _ebonGargoyleGUID;
+    WOWGUID _ebonGargoyleGUID;
     uint32 checktarget;
     uint32 dist = urand(1, 5);
 

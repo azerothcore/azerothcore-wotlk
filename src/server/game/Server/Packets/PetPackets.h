@@ -18,7 +18,7 @@
 #ifndef PetPackets_h__
 #define PetPackets_h__
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Packet.h"
 
 namespace WorldPackets
@@ -32,7 +32,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid CritterGUID;
+            WOWGUID CritterGUID;
         };
 
         class PetAbandon final : public ClientPacket
@@ -42,7 +42,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid PetGUID;
+            WOWGUID PetGUID;
         };
 
         class PetStopAttack final : public ClientPacket
@@ -52,7 +52,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid PetGUID;
+            WOWGUID PetGUID;
         };
 
         class PetSpellAutocast final : public ClientPacket
@@ -62,7 +62,7 @@ namespace WorldPackets
 
             void Read() override;
 
-            ObjectGuid PetGUID;
+            WOWGUID PetGUID;
             uint32 SpellID = 0;
             bool AutocastEnabled = false;
         };

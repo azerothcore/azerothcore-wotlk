@@ -314,7 +314,7 @@ public:
         }
 
         EventMap events;
-        ObjectGuid otherGUID;
+        WOWGUID otherGUID;
 
         void Reset() override
         {

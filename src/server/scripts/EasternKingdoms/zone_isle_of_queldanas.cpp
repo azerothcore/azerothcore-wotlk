@@ -133,8 +133,8 @@ public:
 
         EventMap events;
         SummonList summons;
-        ObjectGuid playerGUID;
-        ObjectGuid morlenGUID;
+        WOWGUID playerGUID;
+        WOWGUID morlenGUID;
 
         void Reset() override
         {
@@ -495,7 +495,7 @@ public:
 
         EventMap events;
         bool announced;
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
 
         void MoveInLineOfSight(Unit* who) override
         {

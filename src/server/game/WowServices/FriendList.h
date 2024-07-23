@@ -72,7 +72,7 @@ class FriendList {
 private:
 
   struct Friend {
-    ObjectGuid  m_GUID    = ObjectGuid();
+    WOWGUID  m_GUID    = WOWGUID();
     char*       m_name    = nullptr;
     char*       m_notes   = nullptr;
     char        m_status  = FRIEND_STATUS_OFFLINE;
@@ -83,8 +83,8 @@ private:
   };
 
   list<Friend>  m_friends                 = {};
-  ObjectGuid    m_ignore[NUM_MAX_IGNORE]  = {};
-  ObjectGuid    m_mute[NUM_MAX_MUTE]      = {};
+  WOWGUID    m_ignore[NUM_MAX_IGNORE]  = {};
+  WOWGUID    m_mute[NUM_MAX_MUTE]      = {};
   Player*       m_playerPtr               = nullptr;
 
 public:
@@ -92,20 +92,20 @@ public:
   FriendList (Player* plr);
   ~FriendList ();
   void AddFriend (char* name, char* notes);
-  void AddIgnore (ObjectGuid const& guid);
+  void AddIgnore (WOWGUID const& guid);
   void AddContacts ();
-  void DelIgnore (ObjectGuid const& guid);
-  Friend const* GetFriend (ObjectGuid const& guid);
+  void DelIgnore (WOWGUID const& guid);
+  Friend const* GetFriend (WOWGUID const& guid);
   uint32_t GetNumFriends ();
   uint32_t GetNumIgnores ();
   uint32_t GetNumMutes ();
-  bool IsFriend (ObjectGuid const& guid);
-  bool IsIgnored (ObjectGuid const& guid);
-  void RemoveFriend (ObjectGuid const& guid);
-  void SaveContact (ObjectGuid const& guid, uint32_t flags, char const* notes);
+  bool IsFriend (WOWGUID const& guid);
+  bool IsIgnored (WOWGUID const& guid);
+  void RemoveFriend (WOWGUID const& guid);
+  void SaveContact (WOWGUID const& guid, uint32_t flags, char const* notes);
   void SendContactList (uint32_t flags);
-  void SendFriendStatus (FRIEND_RESULT res, ObjectGuid guid);
-  void SetFriendNotes (ObjectGuid const& guid, char const* notes);
+  void SendFriendStatus (FRIEND_RESULT res, WOWGUID guid);
+  void SetFriendNotes (WOWGUID const& guid, char const* notes);
 
 };
 

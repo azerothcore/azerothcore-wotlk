@@ -22,7 +22,7 @@
 #include "DatabaseEnv.h"
 #include "Define.h"
 #include "ObjectDefines.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include <list>
 #include <map>
 #include <mutex>
@@ -50,7 +50,7 @@ struct BoundInstancesMapWrapper
     BoundInstancesMap m[MAX_DIFFICULTY];
 };
 
-typedef std::unordered_map<ObjectGuid /*guid*/, BoundInstancesMapWrapper* > PlayerBindStorage;
+typedef std::unordered_map<WOWGUID /*guid*/, BoundInstancesMapWrapper* > PlayerBindStorage;
 
 class InstanceSave
 {
@@ -84,8 +84,8 @@ public:
     InstanceTemplate const* GetTemplate();
     MapEntry const* GetMapEntry();
 
-    void AddPlayer(ObjectGuid guid);
-    bool RemovePlayer(ObjectGuid guid, InstanceSaveMgr* ism);
+    void AddPlayer(WOWGUID guid);
+    bool RemovePlayer(WOWGUID guid, InstanceSaveMgr* ism);
 
 private:
     GuidList m_playerList;
@@ -170,16 +170,16 @@ public:
 
     InstanceSave* GetInstanceSave(uint32 InstanceId);
 
-    InstancePlayerBind* PlayerBindToInstance(ObjectGuid guid, InstanceSave* save, bool permanent, Player* player = nullptr);
-    void PlayerUnbindInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player = nullptr);
-    void PlayerUnbindInstanceNotExtended(ObjectGuid guid, uint32 mapid, Difficulty difficulty, Player* player = nullptr);
-    InstancePlayerBind* PlayerGetBoundInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty);
-    bool PlayerIsPermBoundToInstance(ObjectGuid guid, uint32 mapid, Difficulty difficulty);
-    BoundInstancesMap const& PlayerGetBoundInstances(ObjectGuid guid, Difficulty difficulty);
-    void PlayerCreateBoundInstancesMaps(ObjectGuid guid);
-    InstanceSave* PlayerGetInstanceSave(ObjectGuid guid, uint32 mapid, Difficulty difficulty);
+    InstancePlayerBind* PlayerBindToInstance(WOWGUID guid, InstanceSave* save, bool permanent, Player* player = nullptr);
+    void PlayerUnbindInstance(WOWGUID guid, uint32 mapid, Difficulty difficulty, bool deleteFromDB, Player* player = nullptr);
+    void PlayerUnbindInstanceNotExtended(WOWGUID guid, uint32 mapid, Difficulty difficulty, Player* player = nullptr);
+    InstancePlayerBind* PlayerGetBoundInstance(WOWGUID guid, uint32 mapid, Difficulty difficulty);
+    bool PlayerIsPermBoundToInstance(WOWGUID guid, uint32 mapid, Difficulty difficulty);
+    BoundInstancesMap const& PlayerGetBoundInstances(WOWGUID guid, Difficulty difficulty);
+    void PlayerCreateBoundInstancesMaps(WOWGUID guid);
+    InstanceSave* PlayerGetInstanceSave(WOWGUID guid, uint32 mapid, Difficulty difficulty);
     uint32 PlayerGetDestinationInstanceId(Player* player, uint32 mapid, Difficulty difficulty);
-    void CopyBinds(ObjectGuid from, ObjectGuid to, Player* toPlr = nullptr);
+    void CopyBinds(WOWGUID from, WOWGUID to, Player* toPlr = nullptr);
     void UnbindAllFor(InstanceSave* save);
 
     void SanitizeInstanceSavedData();

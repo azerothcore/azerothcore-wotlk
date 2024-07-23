@@ -56,18 +56,18 @@ public:
                 case GO_KEYSTONE:
                     if (_encounters[DATA_IRONAYA_DOORS] == DONE)
                     {
-                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
+                        HandleGameObject(WOWGUID::Empty, true, gameobject);
                         gameobject->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     }
                     break;
                 case GO_TEMPLE_DOOR:
                     if (_encounters[DATA_STONE_KEEPERS] == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
+                        HandleGameObject(WOWGUID::Empty, true, gameobject);
                     break;
                 case GO_ANCIENT_VAULT_DOOR:
                     ancientVaultDoorGUID = gameobject->GetGUID();
                     if (_encounters[DATA_ARCHAEDAS] == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
+                        HandleGameObject(WOWGUID::Empty, true, gameobject);
                     break;
                 case GO_ARCHAEDAS_TEMPLE_DOOR:
                     archaedasTempleDoorGUID = gameobject->GetGUID();
@@ -130,8 +130,8 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-        ObjectGuid archaedasTempleDoorGUID;
-        ObjectGuid ancientVaultDoorGUID;
+        WOWGUID archaedasTempleDoorGUID;
+        WOWGUID ancientVaultDoorGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

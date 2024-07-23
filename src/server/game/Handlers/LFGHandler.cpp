@@ -76,8 +76,8 @@ void User::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
 void User::HandleLfgLeaveOpcode(WorldPackets::LFG::LFGLeave& /*packet*/)
 {
     Group* group = GetPlayer()->GetGroup();
-    ObjectGuid guid = GetPlayer()->GetGUID();
-    ObjectGuid gguid = group ? group->GetGUID() : guid;
+    WOWGUID guid = GetPlayer()->GetGUID();
+    WOWGUID gguid = group ? group->GetGUID() : guid;
 
     LOG_DEBUG("network", "CMSG_LFG_LEAVE [{}] in group: {}", guid.ToString(), group ? 1 : 0);
 
@@ -85,7 +85,7 @@ void User::HandleLfgLeaveOpcode(WorldPackets::LFG::LFGLeave& /*packet*/)
     if (!group || group->GetLeaderGUID() == guid)
     {
         sLFGMgr->LeaveLfg(sLFGMgr->GetState(guid) == lfg::LFG_STATE_RAIDBROWSER ? guid : gguid);
-        sLFGMgr->LeaveAllLfgQueues(guid, true, group ? group->GetGUID() : ObjectGuid::Empty);
+        sLFGMgr->LeaveAllLfgQueues(guid, true, group ? group->GetGUID() : WOWGUID::Empty);
     }
 }
 
@@ -104,14 +104,14 @@ void User::HandleLfgSetRolesOpcode(WorldPacket& recvData)
 {
     uint8 roles;
     recvData >> roles;                                    // Player Group Roles
-    ObjectGuid guid = GetPlayer()->GetGUID();
+    WOWGUID guid = GetPlayer()->GetGUID();
     Group* group = GetPlayer()->GetGroup();
     if (!group)
     {
         LOG_DEBUG("network", "CMSG_LFG_SET_ROLES [{}] Not in group", guid.ToString());
         return;
     }
-    ObjectGuid gguid = group->GetGUID();
+    WOWGUID gguid = group->GetGUID();
     LOG_DEBUG("network", "CMSG_LFG_SET_ROLES: Group [{}], Player [{}], Roles: {}", gguid.ToString(), guid.ToString(), roles);
     sLFGMgr->UpdateRoleCheck(gguid, guid, roles);
 }
@@ -120,7 +120,7 @@ void User::HandleLfgSetCommentOpcode(WorldPacket&  recvData)
 {
     std::string comment;
     recvData >> comment;
-    ObjectGuid guid = GetPlayer()->GetGUID();
+    WOWGUID guid = GetPlayer()->GetGUID();
     LOG_DEBUG("network", "CMSG_LFG_SET_COMMENT [{}] comment: {}", guid.ToString(), comment);
 
     sLFGMgr->SetComment(GetPlayer()->GetGUID(), comment);
@@ -132,7 +132,7 @@ void User::HandleLfgSetBootVoteOpcode(WorldPacket& recvData)
     bool agree;                                            // Agree to kick player
     recvData >> agree;
 
-    ObjectGuid guid = GetPlayer()->GetGUID();
+    WOWGUID guid = GetPlayer()->GetGUID();
     LOG_DEBUG("network", "CMSG_LFG_SET_BOOT_VOTE [{}] agree: {}", guid.ToString(), agree ? 1 : 0);
     sLFGMgr->UpdateBoot(guid, agree);
 }
@@ -148,7 +148,7 @@ void User::HandleLfgTeleportOpcode(WorldPacket& recvData)
 
 void User::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*/)
 {
-    ObjectGuid guid = GetPlayer()->GetGUID();
+    WOWGUID guid = GetPlayer()->GetGUID();
     LOG_DEBUG("network", "CMSG_LFG_PLAYER_LOCK_INFO_REQUEST [{}]", guid.ToString());
 
     // Get Random dungeons that can be done at a certain level and expansion
@@ -223,7 +223,7 @@ void User::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*/)
 
 void User::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*/)
 {
-    ObjectGuid guid = GetPlayer()->GetGUID();
+    WOWGUID guid = GetPlayer()->GetGUID();
     LOG_DEBUG("network", "CMSG_LFG_PARTY_LOCK_INFO_REQUEST [{}]", guid.ToString());
 
     Group* group = GetPlayer()->GetGroup();
@@ -238,7 +238,7 @@ void User::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*/)
         if (!plrg)
             continue;
 
-        ObjectGuid pguid = plrg->GetGUID();
+        WOWGUID pguid = plrg->GetGUID();
         if (pguid == guid)
             continue;
 
@@ -276,7 +276,7 @@ void User::HandleLfgGetStatus(WorldPacket& /*recvData*/)
 {
     LOG_DEBUG("lfg", "CMSG_LFG_GET_STATUS {}", GetPlayerInfo());
 
-    ObjectGuid guid = GetPlayer()->GetGUID();
+    WOWGUID guid = GetPlayer()->GetGUID();
     lfg::LfgUpdateData updateData = sLFGMgr->GetLfgStatus(guid);
 
     if (GetPlayer()->GetGroup())
@@ -374,7 +374,7 @@ void User::SendLfgUpdateParty(lfg::LfgUpdateData const& updateData)
     Send(&data);
 }
 
-void User::SendLfgRoleChosen(ObjectGuid guid, uint8 roles)
+void User::SendLfgRoleChosen(WOWGUID guid, uint8 roles)
 {
     LOG_DEBUG("network", "SMSG_LFG_ROLE_CHOSEN [{}] guid: [{}] roles: {}", GetPlayer()->GetGUID().ToString(), guid.ToString(), roles);
 
@@ -407,7 +407,7 @@ void User::SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& roleCheck)
     if (!roleCheck.roles.empty())
     {
         // Leader info MUST be sent 1st :S
-        ObjectGuid guid = roleCheck.leader;
+        WOWGUID guid = roleCheck.leader;
         uint8 roles = roleCheck.roles.find(guid)->second;
         data << guid;                                      // Guid
         data << uint8(roles > 0);                          // Ready
@@ -504,7 +504,7 @@ void User::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardData)
 
 void User::SendLfgBootProposalUpdate(lfg::LfgPlayerBoot const& boot)
 {
-    ObjectGuid guid = GetPlayer()->GetGUID();
+    WOWGUID guid = GetPlayer()->GetGUID();
     lfg::LfgAnswer playerVote = boot.votes.find(guid)->second;
     uint8 votesNum = 0;
     uint8 agreeNum = 0;
@@ -536,8 +536,8 @@ void User::SendLfgBootProposalUpdate(lfg::LfgPlayerBoot const& boot)
 
 void User::SendLfgUpdateProposal(lfg::LfgProposal const& proposal)
 {
-    ObjectGuid guid = GetPlayer()->GetGUID();
-    ObjectGuid gguid = proposal.players.find(guid)->second.group;
+    WOWGUID guid = GetPlayer()->GetGUID();
+    WOWGUID gguid = proposal.players.find(guid)->second.group;
     bool silent = !proposal.isNew && gguid == proposal.group;
     uint32 dungeonEntry = proposal.dungeonId;
 

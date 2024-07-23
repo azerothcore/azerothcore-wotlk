@@ -78,7 +78,7 @@ public:
         }
 
     private:
-        ObjectGuid _pathaleonGUID;
+        WOWGUID _pathaleonGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

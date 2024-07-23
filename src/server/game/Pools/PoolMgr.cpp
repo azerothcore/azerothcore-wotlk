@@ -156,7 +156,7 @@ bool PoolGroup<T>::CheckPool() const
 // If no guid is passed, the pool is just removed (event end case)
 // If guid is filled, cache will be used and no removal will occur, it just fill the cache
 template<class T>
-void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, ObjectGuid::LowType guid)
+void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, WOWGUID::LowType guid)
 {
     for (std::size_t i = 0; i < EqualChanced.size(); ++i)
     {
@@ -187,7 +187,7 @@ void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, ObjectGuid::LowType gui
 
 // Method that is actualy doing the removal job on one creature
 template<>
-void PoolGroup<Creature>::Despawn1Object(ObjectGuid::LowType guid)
+void PoolGroup<Creature>::Despawn1Object(WOWGUID::LowType guid)
 {
     if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
     {
@@ -209,7 +209,7 @@ void PoolGroup<Creature>::Despawn1Object(ObjectGuid::LowType guid)
 
 // Same on one gameobject
 template<>
-void PoolGroup<GameObject>::Despawn1Object(ObjectGuid::LowType guid)
+void PoolGroup<GameObject>::Despawn1Object(WOWGUID::LowType guid)
 {
     if (GameObjectData const* data = sObjectMgr->GetGameObjectData(guid))
     {
@@ -624,7 +624,7 @@ void PoolMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                WOWGUID::LowType guid = fields[0].Get<uint32>();
                 uint32 pool_id = fields[1].Get<uint32>();
                 float chance = fields[2].Get<float>();
 
@@ -682,7 +682,7 @@ void PoolMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                WOWGUID::LowType guid = fields[0].Get<uint32>();
                 uint32 pool_id = fields[1].Get<uint32>();
                 float chance = fields[2].Get<float>();
 

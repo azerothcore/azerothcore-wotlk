@@ -224,7 +224,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         SummonList summons;
-        ObjectGuid Helpers[8];
+        WOWGUID Helpers[8];
         bool berserk{ false };
         bool bAchievCheese{ true };
         bool bAchievGettingCold{ true };
@@ -747,7 +747,7 @@ public:
             {
                 if( GameObject* fire = me->FindNearestGameObject(194300, 1.0f) )
                 {
-                    fire->SetOwnerGUID(ObjectGuid::Empty);
+                    fire->SetOwnerGUID(WOWGUID::Empty);
                     fire->Delete();
                 }
                 me->DespawnOrUnsummon(); // this will remove DynObjects
@@ -825,7 +825,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
+                                if( WOWGUID g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -922,7 +922,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
+                                if( WOWGUID g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -1027,7 +1027,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
+                                if( WOWGUID g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);
@@ -1122,7 +1122,7 @@ public:
                     {
                         if( !me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC) )
                             if( pInstance )
-                                if( ObjectGuid g = pInstance->GetGuidData(TYPE_HODIR) )
+                                if( WOWGUID g = pInstance->GetGuidData(TYPE_HODIR) )
                                     if( Creature* hodir = ObjectAccessor::GetCreature(*me, g) )
                                     {
                                         AttackStart(hodir);

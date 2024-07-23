@@ -252,7 +252,7 @@ public:
 
     private:
         EventMap   _events;
-        ObjectGuid _flamelasherGUID;
+        WOWGUID _flamelasherGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

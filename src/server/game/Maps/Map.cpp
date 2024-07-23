@@ -3306,27 +3306,27 @@ void BattlegroundMap::RemoveAllPlayers()
                     player->Teleport(player->GetEntryPoint());
 }
 
-Corpse* Map::GetCorpse(ObjectGuid const guid)
+Corpse* Map::GetCorpse(WOWGUID const guid)
 {
     return _objectsStore.Find<Corpse>(guid);
 }
 
-Creature* Map::GetCreature(ObjectGuid const guid)
+Creature* Map::GetCreature(WOWGUID const guid)
 {
     return _objectsStore.Find<Creature>(guid);
 }
 
-GameObject* Map::GetGameObject(ObjectGuid const guid)
+GameObject* Map::GetGameObject(WOWGUID const guid)
 {
     return _objectsStore.Find<GameObject>(guid);
 }
 
-Pet* Map::GetPet(ObjectGuid const guid)
+Pet* Map::GetPet(WOWGUID const guid)
 {
     return _objectsStore.Find<Pet>(guid);
 }
 
-Transport* Map::GetTransport(ObjectGuid guid)
+Transport* Map::GetTransport(WOWGUID guid)
 {
     if (guid.GetHigh() != HighGuid::Mo_Transport && guid.GetHigh() != HighGuid::Transport)
         return nullptr;
@@ -3335,7 +3335,7 @@ Transport* Map::GetTransport(ObjectGuid guid)
     return go ? go->ToTransport() : nullptr;
 }
 
-DynamicObject* Map::GetDynamicObject(ObjectGuid guid)
+DynamicObject* Map::GetDynamicObject(WOWGUID guid)
 {
     return _objectsStore.Find<DynamicObject>(guid);
 }
@@ -3346,7 +3346,7 @@ void Map::UpdateIteratorBack(Player* player)
         m_mapRefIter = m_mapRefIter->nocheck_prev();
 }
 
-void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
+void Map::SaveCreatureRespawnTime(WOWGUID::LowType spawnId, time_t& respawnTime)
 {
     if (!respawnTime)
     {
@@ -3369,7 +3369,7 @@ void Map::SaveCreatureRespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTi
     CharacterDatabase.Execute(stmt);
 }
 
-void Map::RemoveCreatureRespawnTime(ObjectGuid::LowType spawnId)
+void Map::RemoveCreatureRespawnTime(WOWGUID::LowType spawnId)
 {
     _creatureRespawnTimes.erase(spawnId);
 
@@ -3380,7 +3380,7 @@ void Map::RemoveCreatureRespawnTime(ObjectGuid::LowType spawnId)
     CharacterDatabase.Execute(stmt);
 }
 
-void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
+void Map::SaveGORespawnTime(WOWGUID::LowType spawnId, time_t& respawnTime)
 {
     if (!respawnTime)
     {
@@ -3403,7 +3403,7 @@ void Map::SaveGORespawnTime(ObjectGuid::LowType spawnId, time_t& respawnTime)
     CharacterDatabase.Execute(stmt);
 }
 
-void Map::RemoveGORespawnTime(ObjectGuid::LowType spawnId)
+void Map::RemoveGORespawnTime(WOWGUID::LowType spawnId)
 {
     _goRespawnTimes.erase(spawnId);
 
@@ -3424,7 +3424,7 @@ void Map::LoadRespawnTimes()
         do
         {
             Field* fields = result->Fetch();
-            ObjectGuid::LowType lowguid = fields[0].Get<uint32>();
+            WOWGUID::LowType lowguid = fields[0].Get<uint32>();
             uint32 respawnTime = fields[1].Get<uint32>();
 
             _creatureRespawnTimes[lowguid] = time_t(respawnTime);
@@ -3439,7 +3439,7 @@ void Map::LoadRespawnTimes()
         do
         {
             Field* fields = result->Fetch();
-            ObjectGuid::LowType lowguid = fields[0].Get<uint32>();
+            WOWGUID::LowType lowguid = fields[0].Get<uint32>();
             uint32 respawnTime = fields[1].Get<uint32>();
 
             _goRespawnTimes[lowguid] = time_t(respawnTime);
@@ -3578,9 +3578,9 @@ void Map::AllTransportsRemovePassengers()
             (*itr)->RemovePassenger(*((*itr)->GetPassengers().begin()), true);
 }
 
-time_t Map::GetLinkedRespawnTime(ObjectGuid guid) const
+time_t Map::GetLinkedRespawnTime(WOWGUID guid) const
 {
-    ObjectGuid linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
+    WOWGUID linkedGuid = sObjectMgr->GetLinkedRespawnGuid(guid);
     switch (linkedGuid.GetHigh())
     {
         case HighGuid::Unit:
@@ -3625,7 +3625,7 @@ void Map::RemoveCorpse(Corpse* corpse)
         _corpseBones.erase(corpse);
 }
 
-Corpse* Map::ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia /*= false*/)
+Corpse* Map::ConvertCorpseToBones(WOWGUID const ownerGuid, bool insignia /*= false*/)
 {
     Corpse* corpse = GetCorpseByPlayer(ownerGuid);
     if (!corpse)
@@ -3682,14 +3682,14 @@ void Map::RemoveOldCorpses()
 {
     time_t now = GameTime::GetGameTime().count();
 
-    std::vector<ObjectGuid> corpses;
+    std::vector<WOWGUID> corpses;
     corpses.reserve(_corpsesByPlayer.size());
 
     for (auto const& p : _corpsesByPlayer)
         if (p.second->IsExpired(now))
             corpses.push_back(p.first);
 
-    for (ObjectGuid const& ownerGuid : corpses)
+    for (WOWGUID const& ownerGuid : corpses)
         ConvertCorpseToBones(ownerGuid);
 
     std::vector<Corpse*> expiredBones;
@@ -3704,7 +3704,7 @@ void Map::RemoveOldCorpses()
     }
 }
 
-void Map::ScheduleCreatureRespawn(ObjectGuid creatureGuid, Milliseconds respawnTimer)
+void Map::ScheduleCreatureRespawn(WOWGUID creatureGuid, Milliseconds respawnTimer)
 {
     _creatureRespawnScheduler.Schedule(respawnTimer, [this, creatureGuid](TaskContext)
     {

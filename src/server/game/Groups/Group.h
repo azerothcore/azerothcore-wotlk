@@ -142,18 +142,18 @@ static const uint8 GroupUpdateLength[GROUP_UPDATE_FLAGS_COUNT] = { 0, 2, 2, 2, 1
 class Roll : public LootValidatorRef
 {
 public:
-    Roll(ObjectGuid _guid, LootItem const& li);
+    Roll(WOWGUID _guid, LootItem const& li);
     ~Roll();
     void setLoot(Loot* pLoot);
     Loot* getLoot();
     void targetObjectBuildLink();
 
-    ObjectGuid itemGUID;
+    WOWGUID itemGUID;
     uint32 itemid;
     int32  itemRandomPropId;
     uint32 itemRandomSuffix;
     uint8 itemCount;
-    typedef std::map<ObjectGuid, RollVote> PlayerVote;
+    typedef std::map<WOWGUID, RollVote> PlayerVote;
     PlayerVote playerVote;                              //vote position correspond with player position (in group)
     uint8 totalPlayersRolling;
     uint8 totalNeed;
@@ -170,7 +170,7 @@ class Group
 public:
     struct MemberSlot
     {
-        ObjectGuid  guid;
+        WOWGUID  guid;
         std::string name;
         uint8       group;
         uint8       flags;
@@ -192,21 +192,21 @@ public:
     // group manipulation methods
     bool   Create(Player* leader);
     bool   LoadGroupFromDB(Field* field);
-    void   LoadMemberFromDB(ObjectGuid::LowType guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles);
+    void   LoadMemberFromDB(WOWGUID::LowType guidLow, uint8 memberFlags, uint8 subgroup, uint8 roles);
     bool   AddInvite(Player* player);
     void   RemoveInvite(Player* player);
     void   RemoveAllInvites();
     bool   AddLeaderInvite(Player* player);
     bool   AddMember(Player* player);
-    bool   RemoveMember(ObjectGuid guid, const RemoveMethod& method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, const char* reason = nullptr);
-    void   ChangeLeader(ObjectGuid guid);
+    bool   RemoveMember(WOWGUID guid, const RemoveMethod& method = GROUP_REMOVEMETHOD_DEFAULT, WOWGUID kicker = WOWGUID::Empty, const char* reason = nullptr);
+    void   ChangeLeader(WOWGUID guid);
     void   SetLootMethod(LootMethod method);
-    void   SetLooterGuid(ObjectGuid guid);
-    void   SetMasterLooterGuid(ObjectGuid guid);
+    void   SetLooterGuid(WOWGUID guid);
+    void   SetMasterLooterGuid(WOWGUID guid);
     void   UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed = false);
     void   SetLootThreshold(ItemQualities threshold);
     void   Disband(bool hideDestroy = false);
-    void   SetLfgRoles(ObjectGuid guid, const uint8 roles);
+    void   SetLfgRoles(WOWGUID guid, const uint8 roles);
 
     // properties accessories
     bool IsFull() const;
@@ -216,26 +216,26 @@ public:
     bool isBGGroup()   const;
     bool IsCreated()   const;
     GroupType GetGroupType() const;
-    ObjectGuid GetLeaderGUID() const;
+    WOWGUID GetLeaderGUID() const;
     Player* GetLeader();
-    ObjectGuid GetGUID() const;
+    WOWGUID GetGUID() const;
     const char* GetLeaderName() const;
     LootMethod GetLootMethod() const;
-    ObjectGuid GetLooterGuid() const;
-    ObjectGuid GetMasterLooterGuid() const;
+    WOWGUID GetLooterGuid() const;
+    WOWGUID GetMasterLooterGuid() const;
     ItemQualities GetLootThreshold() const;
 
     // member manipulation methods
-    bool IsMember(ObjectGuid guid) const;
-    bool IsLeader(ObjectGuid guid) const;
-    ObjectGuid GetMemberGUID(const std::string& name);
-    bool IsAssistant(ObjectGuid guid) const;
+    bool IsMember(WOWGUID guid) const;
+    bool IsLeader(WOWGUID guid) const;
+    WOWGUID GetMemberGUID(const std::string& name);
+    bool IsAssistant(WOWGUID guid) const;
 
-    Player* GetInvited(ObjectGuid guid) const;
+    Player* GetInvited(WOWGUID guid) const;
     Player* GetInvited(const std::string& name) const;
 
-    bool SameSubGroup(ObjectGuid guid1, ObjectGuid guid2) const;
-    bool SameSubGroup(ObjectGuid guid1, MemberSlot const* slot2) const;
+    bool SameSubGroup(WOWGUID guid1, WOWGUID guid2) const;
+    bool SameSubGroup(WOWGUID guid1, MemberSlot const* slot2) const;
     bool SameSubGroup(Player const* member1, Player const* member2) const;
     bool HasFreeSlotSubGroup(uint8 subgroup) const;
 
@@ -245,7 +245,7 @@ public:
     uint32 GetMembersCount() const { return m_memberSlots.size(); }
     uint32 GetInviteeCount() const { return m_invitees.size(); }
 
-    uint8 GetMemberGroup(ObjectGuid guid) const;
+    uint8 GetMemberGroup(WOWGUID guid) const;
 
     void ConvertToLFG(bool restricted = true);
     bool CheckLevelForRaid();
@@ -255,9 +255,9 @@ public:
     void SetBattlefieldGroup(Battlefield* bf);
     GroupJoinBattlegroundResult CanJoinBattlegroundQueue(Battleground const* bgTemplate, BattlegroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, bool isRated, uint32 arenaSlot);
 
-    void ChangeMembersGroup(ObjectGuid guid, uint8 group);
-    void SetTargetIcon(uint8 id, ObjectGuid whoGuid, ObjectGuid targetGuid);
-    void SetGroupMemberFlag(ObjectGuid guid, bool apply, GroupMemberFlags flag);
+    void ChangeMembersGroup(WOWGUID guid, uint8 group);
+    void SetTargetIcon(uint8 id, WOWGUID whoGuid, WOWGUID targetGuid);
+    void SetGroupMemberFlag(WOWGUID guid, bool apply, GroupMemberFlags flag);
     void RemoveUniqueGroupMemberFlag(GroupMemberFlags flag);
 
     Difficulty GetDifficulty(bool isRaid) const;
@@ -272,10 +272,10 @@ public:
     //void SendInit(User* session);
     void SendTargetIconList(User* session);
     void SendUpdate();
-    void SendUpdateToPlayer(ObjectGuid playerGUID, MemberSlot* slot = nullptr);
+    void SendUpdateToPlayer(WOWGUID playerGUID, MemberSlot* slot = nullptr);
     void UpdatePlayerOutOfRange(Player* player);
     // ignore: GUID of player that will be ignored
-    void BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group = -1, ObjectGuid ignore = ObjectGuid::Empty);
+    void BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group = -1, WOWGUID ignore = WOWGUID::Empty);
     void BroadcastReadyCheck(WorldPacket const* packet);
     void OfflineReadyCheck();
 
@@ -286,16 +286,16 @@ public:
     bool isRollLootActive() const;
     void SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r);
     void SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p, bool canNeed, Roll const& r);
-    void SendLootRoll(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r, bool autoPass = false);
-    void SendLootRollWon(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r);
+    void SendLootRoll(WOWGUID SourceGuid, WOWGUID TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r, bool autoPass = false);
+    void SendLootRollWon(WOWGUID SourceGuid, WOWGUID TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r);
     void SendLootAllPassed(Roll const& roll);
     void SendLooter(Creature* creature, Player* pLooter);
     void GroupLoot(Loot* loot, WorldObject* pLootedObject);
     void NeedBeforeGreed(Loot* loot, WorldObject* pLootedObject);
     void MasterLoot(Loot* loot, WorldObject* pLootedObject);
-    Rolls::iterator GetRoll(ObjectGuid Guid);
+    Rolls::iterator GetRoll(WOWGUID Guid);
     void CountTheRoll(Rolls::iterator roll, Map* allowedMap);
-    bool CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choise);
+    bool CountRollVote(WOWGUID playerGUID, WOWGUID Guid, uint8 Choise);
     void EndRoll(Loot* loot, Map* allowedMap);
 
     // related to disenchant rolls
@@ -327,8 +327,8 @@ protected:
     void _cancelHomebindIfInstance(Player* player);
 
     void _initRaidSubGroupsCounter();
-    member_citerator _getMemberCSlot(ObjectGuid Guid) const;
-    member_witerator _getMemberWSlot(ObjectGuid Guid);
+    member_citerator _getMemberCSlot(WOWGUID Guid) const;
+    member_witerator _getMemberWSlot(WOWGUID Guid);
     void SubGroupCounterIncrease(uint8 subgroup);
     void SubGroupCounterDecrease(uint8 subgroup);
     void ToggleGroupMemberFlag(member_witerator slot, uint8 flag, bool apply);
@@ -336,21 +336,21 @@ protected:
     MemberSlotList      m_memberSlots;
     GroupRefMgr     m_memberMgr;
     InvitesList         m_invitees;
-    ObjectGuid          m_leaderGuid;
+    WOWGUID          m_leaderGuid;
     std::string         m_leaderName;
     GroupType           m_groupType;
     Difficulty          m_dungeonDifficulty;
     Difficulty          m_raidDifficulty;
     Battlefield*        m_bfGroup;
     Battleground*       m_bgGroup;
-    ObjectGuid          m_targetIcons[TARGETICONCOUNT];
+    WOWGUID          m_targetIcons[TARGETICONCOUNT];
     LootMethod          m_lootMethod;
     ItemQualities       m_lootThreshold;
-    ObjectGuid          m_looterGuid;
-    ObjectGuid          m_masterLooterGuid;
+    WOWGUID          m_looterGuid;
+    WOWGUID          m_masterLooterGuid;
     Rolls               RollId;
     uint8*              m_subGroupsCounts;
-    ObjectGuid          m_guid;
+    WOWGUID          m_guid;
     uint32              m_counter;                      // used only in SMSG_GROUP_LIST
     uint32              m_maxEnchantingLevel;
     uint8               m_lfgGroupFlags;

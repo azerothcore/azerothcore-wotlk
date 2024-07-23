@@ -28,7 +28,7 @@
 #include "WorldPacket.h"
 #include "User.h"
 
-void User::SendNameQueryOpcode(ObjectGuid guid)
+void User::SendNameQueryOpcode(WOWGUID guid)
 {
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
 
@@ -66,7 +66,7 @@ void User::SendNameQueryOpcode(ObjectGuid guid)
 
 void User::HandleNameQueryOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     // This is disable by default to prevent lots of console spam
@@ -95,7 +95,7 @@ void User::HandleCreatureQueryOpcode(WorldPacket& recvData)
 {
     uint32 entry;
     recvData >> entry;
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(entry);
@@ -173,7 +173,7 @@ void User::HandleGameObjectQueryOpcode(WorldPacket& recvData)
 {
     uint32 entry;
     recvData >> entry;
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     const GameObjectTemplate* info = sObjectMgr->GetGameObjectTemplate(entry);
@@ -280,7 +280,7 @@ void User::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
 void User::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 {
     uint32 textID;
-    ObjectGuid guid;
+    WOWGUID guid;
 
     recvData >> textID;
     LOG_DEBUG("network", "WORLD: CMSG_NPC_TEXT_QUERY TextId: {}", textID);

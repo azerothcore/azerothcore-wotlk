@@ -59,7 +59,7 @@ void User::HandleLearnPreviewTalents(WorldPacket& recvPacket)
 void User::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "MSG_TALENT_WIPE_CONFIRM");
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);

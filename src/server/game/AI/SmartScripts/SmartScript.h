@@ -129,7 +129,7 @@ public:
         return 0;
     }
 
-    GameObject* FindGameObjectNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
+    GameObject* FindGameObjectNear(WorldObject* searchObject, WOWGUID::LowType guid) const
     {
         auto bounds = searchObject->GetMap()->GetGameObjectBySpawnIdStore().equal_range(guid);
         if (bounds.first == bounds.second)
@@ -138,7 +138,7 @@ public:
         return bounds.first->second;
     }
 
-    Creature* FindCreatureNear(WorldObject* searchObject, ObjectGuid::LowType guid) const
+    Creature* FindCreatureNear(WorldObject* searchObject, WOWGUID::LowType guid) const
     {
         auto bounds = searchObject->GetMap()->GetCreatureBySpawnIdStore().equal_range(guid);
         if (bounds.first == bounds.second)
@@ -187,15 +187,15 @@ public:
     //TIMED_ACTIONLIST (script type 9 aka script9)
     void SetScript9(SmartScriptHolder& e, uint32 entry);
     Unit* GetLastInvoker(Unit* invoker = nullptr) const;
-    ObjectGuid mLastInvoker;
+    WOWGUID mLastInvoker;
     typedef std::unordered_map<uint32, uint32> CounterMap;
     CounterMap mCounterList;
 
     bool AllowPhaseReset() const { return _allowPhaseReset; }
     void SetPhaseReset(bool allow) { _allowPhaseReset = allow; }
 
-    void AddCreatureSummon(ObjectGuid const& guid);
-    void RemoveCreatureSummon(ObjectGuid const& guid);
+    void AddCreatureSummon(WOWGUID const& guid);
+    void RemoveCreatureSummon(WOWGUID const& guid);
 
 private:
     void IncPhase(uint32 p);
@@ -212,9 +212,9 @@ private:
     SmartAIEventList mTimedActionList;
     bool isProcessingTimedActionList;
     Creature* me;
-    ObjectGuid meOrigGUID;
+    WOWGUID meOrigGUID;
     GameObject* go;
-    ObjectGuid goOrigGUID;
+    WOWGUID goOrigGUID;
     AreaTrigger const* trigger;
     SmartScriptType mScriptType;
     uint32 mEventPhase;

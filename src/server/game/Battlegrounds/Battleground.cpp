@@ -355,10 +355,10 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
     {
         if (GetReviveQueueSize())
         {
-            for (std::map<ObjectGuid, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
+            for (std::map<WOWGUID, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
             {
                 Creature* sh = nullptr;
-                for (ObjectGuid const& guid : itr->second)
+                for (WOWGUID const& guid : itr->second)
                 {
                     Player* player = ObjectAccessor::FindPlayer(guid);
                     if (!player)
@@ -390,7 +390,7 @@ inline void Battleground::_ProcessResurrect(uint32 diff)
     }
     else if (m_LastResurrectTime > 500)    // Resurrect players only half a second later, to see spirit heal effect on NPC
     {
-        for (ObjectGuid const& guid : m_ResurrectQueue)
+        for (WOWGUID const& guid : m_ResurrectQueue)
         {
             Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)
@@ -1124,7 +1124,7 @@ void Battleground::AddPlayer(Player* player)
 
     // score struct must be created in inherited class
 
-    ObjectGuid guid = player->GetGUID();
+    WOWGUID guid = player->GetGUID();
     TeamId teamId = player->GetBgTeamId();
 
     // Add to list/maps
@@ -1184,7 +1184,7 @@ void Battleground::AddOrSetPlayerToCorrectBgGroup(Player* player, TeamId teamId)
         return;
     }
 
-    ObjectGuid playerGuid = player->GetGUID();
+    WOWGUID playerGuid = player->GetGUID();
     Group* group = GetBgRaid(teamId);
     if (!group)                                      // first player joined
     {
@@ -1359,7 +1359,7 @@ bool Battleground::UpdatePlayerScore(Player* player, uint32 type, uint32 value, 
     return true;
 }
 
-void Battleground::AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid player_guid)
+void Battleground::AddPlayerToResurrectQueue(WOWGUID npc_guid, WOWGUID player_guid)
 {
     m_ReviveQueue[npc_guid].push_back(player_guid);
 
@@ -1372,7 +1372,7 @@ void Battleground::AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid pla
 
 void Battleground::RemovePlayerFromResurrectQueue(Player* player)
 {
-    for (std::map<ObjectGuid, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
+    for (std::map<WOWGUID, GuidVector>::iterator itr = m_ReviveQueue.begin(); itr != m_ReviveQueue.end(); ++itr)
         for (GuidVector::iterator itr2 = itr->second.begin(); itr2 != itr->second.end(); ++itr2)
             if (*itr2 == player->GetGUID())
             {
@@ -1382,14 +1382,14 @@ void Battleground::RemovePlayerFromResurrectQueue(Player* player)
             }
 }
 
-void Battleground::RelocateDeadPlayers(ObjectGuid queueIndex)
+void Battleground::RelocateDeadPlayers(WOWGUID queueIndex)
 {
     // Those who are waiting to resurrect at this node are taken to the closest own node's graveyard
     GuidVector& ghostList = m_ReviveQueue[queueIndex];
     if (!ghostList.empty())
     {
         GraveyardStruct const* closestGrave = nullptr;
-        for (ObjectGuid const& guid : ghostList)
+        for (WOWGUID const& guid : ghostList)
         {
             Player* player = ObjectAccessor::FindPlayer(guid);
             if (!player)
@@ -1429,7 +1429,7 @@ bool Battleground::AddObject(uint32 type, uint32 entry, float x, float y, float 
         return false;
     }
     /*
-        ObjectGuid::LowType spawnId = go->GetSpawnId();
+        WOWGUID::LowType spawnId = go->GetSpawnId();
 
         // without this, UseButtonOrDoor caused the crash, since it tried to get go info from godata
         // iirc that was changed, so adding to go data map is no longer required if that was the only function using godata from GameObject without checking if it existed
@@ -1815,7 +1815,7 @@ TeamId Battleground::GetOtherTeamId(TeamId teamId)
     return teamId != TEAM_NEUTRAL ? (teamId == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE) : TEAM_NEUTRAL;
 }
 
-bool Battleground::IsPlayerInBattleground(ObjectGuid guid) const
+bool Battleground::IsPlayerInBattleground(WOWGUID guid) const
 {
     BattlegroundPlayerMap::const_iterator itr = m_Players.find(guid);
     if (itr != m_Players.end())
@@ -1853,7 +1853,7 @@ void Battleground::SetHoliday(bool is_holiday)
     m_HonorMode = is_holiday ? BG_HOLIDAY : BG_NORMAL;
 }
 
-int32 Battleground::GetObjectType(ObjectGuid guid)
+int32 Battleground::GetObjectType(WOWGUID guid)
 {
     for (uint32 i = 0; i < BgObjects.size(); ++i)
         if (BgObjects[i] == guid)

@@ -129,7 +129,7 @@ public:
                     events.Repeat(16s, 22s);
                     break;
                 case EVENT_SPELL_CHAIN_HEAL:
-                    if (ObjectGuid TargetGUID = GetChainHealTargetGUID())
+                    if (WOWGUID TargetGUID = GetChainHealTargetGUID())
                         if (pInstance)
                         {
                             if (Creature* target = pInstance->instance->GetCreature(TargetGUID))
@@ -197,7 +197,7 @@ public:
                 pInstance->SetData(DATA_FAILED, 1);
         }
 
-        ObjectGuid GetChainHealTargetGUID()
+        WOWGUID GetChainHealTargetGUID()
         {
             if (HealthBelowPct(85))
                 return me->GetGUID();

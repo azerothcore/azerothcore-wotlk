@@ -111,8 +111,8 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-        ObjectGuid DiscipleOfNaralexGUID;
-        ObjectGuid SerpentisGUID;
+        WOWGUID DiscipleOfNaralexGUID;
+        WOWGUID SerpentisGUID;
     };
 };
 

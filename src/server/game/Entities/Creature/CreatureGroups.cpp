@@ -100,7 +100,7 @@ void FormationMgr::LoadCreatureFormations()
         //Load group member data
         FormationInfo group_member;
         group_member.leaderGUID            = fields[0].Get<uint32>();
-        ObjectGuid::LowType const memberGUID = fields[1].Get<uint32>();
+        WOWGUID::LowType const memberGUID = fields[1].Get<uint32>();
         float const follow_dist             = fields[2].Get<float>();
         float const follow_angle            = fields[3].Get<float>() * (static_cast<float>(M_PI) / 180);
         group_member.groupAI               = fields[4].Get<uint16>();

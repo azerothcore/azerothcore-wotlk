@@ -19,28 +19,28 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-void ScriptMgr::OnGroupAddMember(Group* group, ObjectGuid guid)
+void ScriptMgr::OnGroupAddMember(Group* group, WOWGUID guid)
 {
     ASSERT(group);
 
     CALL_ENABLED_HOOKS(GroupScript, GROUPHOOK_ON_ADD_MEMBER, script->OnAddMember(group, guid));
 }
 
-void ScriptMgr::OnGroupInviteMember(Group* group, ObjectGuid guid)
+void ScriptMgr::OnGroupInviteMember(Group* group, WOWGUID guid)
 {
     ASSERT(group);
 
     CALL_ENABLED_HOOKS(GroupScript, GROUPHOOK_ON_INVITE_MEMBER, script->OnInviteMember(group, guid));
 }
 
-void ScriptMgr::OnGroupRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, const char* reason)
+void ScriptMgr::OnGroupRemoveMember(Group* group, WOWGUID guid, RemoveMethod method, WOWGUID kicker, const char* reason)
 {
     ASSERT(group);
 
     CALL_ENABLED_HOOKS(GroupScript, GROUPHOOK_ON_REMOVE_MEMBER, script->OnRemoveMember(group, guid, method, kicker, reason));
 }
 
-void ScriptMgr::OnGroupChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid)
+void ScriptMgr::OnGroupChangeLeader(Group* group, WOWGUID newLeaderGuid, WOWGUID oldLeaderGuid)
 {
     ASSERT(group);
 

@@ -93,7 +93,7 @@ public:
         }
         else
         {
-            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
+            WOWGUID::LowType guid = playerTarget->GetGUID().GetCounter();
             QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
 
             if (result)
@@ -178,7 +178,7 @@ public:
         }
         else
         {
-            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
+            WOWGUID::LowType guid = playerTarget->GetGUID().GetCounter();
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
@@ -278,7 +278,7 @@ public:
                     {
                         for (uint16 z = 0; z < creatureCount; ++z)
                         {
-                            player->KilledMonster(creatureInfo, ObjectGuid::Empty);
+                            player->KilledMonster(creatureInfo, WOWGUID::Empty);
                         }
                     }
                 }
@@ -339,7 +339,7 @@ public:
         }
         else
         {
-            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
+            WOWGUID::LowType guid = playerTarget->GetGUID().GetCounter();
             QueryResult result = CharacterDatabase.Query("SELECT 1 FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
 
             if (!result)
@@ -520,8 +520,8 @@ public:
             // Rewarded talent points (Death Knights) and spells (e.g Druid forms) are also granted on login.
             // No reputation gains - too troublesome to calculate them when the player is offline.
 
-            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
-            uint8 charLevel = sCharacterCache->GetCharacterLevelByGuid(ObjectGuid(HighGuid::Player, guid));
+            WOWGUID::LowType guid = playerTarget->GetGUID().GetCounter();
+            uint8 charLevel = sCharacterCache->GetCharacterLevelByGuid(WOWGUID(HighGuid::Player, guid));
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             CharacterDatabasePreparedStatement* stmt;
 

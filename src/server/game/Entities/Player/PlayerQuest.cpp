@@ -36,7 +36,7 @@
 /***                    QUEST SYSTEM                   ***/
 /*********************************************************/
 
-void Player::PrepareQuestMenu(ObjectGuid guid)
+void Player::PrepareQuestMenu(WOWGUID guid)
 {
     QuestRelationBounds objectQR;
     QuestRelationBounds objectQIR;
@@ -112,7 +112,7 @@ bool Player::HasQuest(uint32 questId) const
     return false;
 }
 
-void Player::SendPreparedQuest(ObjectGuid guid)
+void Player::SendPreparedQuest(WOWGUID guid)
 {
     QuestMenu& questMenu = PlayerTalkClass->GetQuestMenu();
     if (questMenu.Empty())
@@ -204,7 +204,7 @@ bool Player::IsActiveQuest(uint32 quest_id) const
     return m_QuestStatus.find(quest_id) != m_QuestStatus.end();
 }
 
-Quest const* Player::GetNextQuest(ObjectGuid guid, Quest const* quest)
+Quest const* Player::GetNextQuest(WOWGUID guid, Quest const* quest)
 {
     QuestRelationBounds objectQR;
 
@@ -1906,7 +1906,7 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
     UpdateForQuestWorldObjects();
 }
 
-void Player::KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid)
+void Player::KilledMonster(CreatureTemplate const* cInfo, WOWGUID guid)
 {
     ASSERT(cInfo);
 
@@ -1918,7 +1918,7 @@ void Player::KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid)
             KilledMonsterCredit(cInfo->KillCredit[i]);
 }
 
-void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid)
+void Player::KilledMonsterCredit(uint32 entry, WOWGUID guid)
 {
     uint16 addkillcount = 1;
     uint32 real_entry = entry;
@@ -2047,7 +2047,7 @@ void Player::KilledPlayerCreditForQuest(uint16 count, Quest const* quest)
     }
 }
 
-void Player::KillCreditGO(uint32 entry, ObjectGuid guid)
+void Player::KillCreditGO(uint32 entry, WOWGUID guid)
 {
     uint16 addCastCount = 1;
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
@@ -2103,7 +2103,7 @@ void Player::KillCreditGO(uint32 entry, ObjectGuid guid)
     }
 }
 
-void Player::TalkedToCreature(uint32 entry, ObjectGuid guid)
+void Player::TalkedToCreature(uint32 entry, WOWGUID guid)
 {
     uint16 addTalkCount = 1;
     for (uint8 i = 0; i < MAX_QUEST_LOG_SIZE; ++i)
@@ -2447,7 +2447,7 @@ void Player::SendQuestUpdateAddItem(Quest const* /*quest*/, uint32 /*item_idx*/,
     User()->Send(&data);
 }
 
-void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, ObjectGuid guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count)
+void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, WOWGUID guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count)
 {
     ASSERT(old_count + add_count < 65536 && "mob/GO count store in 16 bits 2^16 = 65536 (0..65536)");
 

@@ -72,7 +72,7 @@ namespace lfg
         m_TeamId = teamId;
     }
 
-    void LfgPlayerData::SetGroup(ObjectGuid group)
+    void LfgPlayerData::SetGroup(WOWGUID group)
     {
         m_Group = group;
     }
@@ -122,7 +122,7 @@ namespace lfg
         return m_TeamId;
     }
 
-    ObjectGuid LfgPlayerData::GetGroup() const
+    WOWGUID LfgPlayerData::GetGroup() const
     {
         return m_Group;
     }

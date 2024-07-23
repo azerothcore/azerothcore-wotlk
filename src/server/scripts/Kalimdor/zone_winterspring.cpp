@@ -322,11 +322,11 @@ public:
 
         uint32 _delayTimer;
 
-        ObjectGuid _firstPriestessGUID;
-        ObjectGuid _secondPriestessGUID;
-        ObjectGuid _guardEluneGUID;
-        ObjectGuid _voiceEluneGUID;
-        ObjectGuid _altarGUID;
+        WOWGUID _firstPriestessGUID;
+        WOWGUID _secondPriestessGUID;
+        WOWGUID _guardEluneGUID;
+        WOWGUID _voiceEluneGUID;
+        WOWGUID _altarGUID;
 
         void Reset() override
         {

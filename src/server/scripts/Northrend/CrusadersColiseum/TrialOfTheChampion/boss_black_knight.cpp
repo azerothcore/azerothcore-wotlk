@@ -339,7 +339,7 @@ public:
 
         void Reset() override
         {
-            Start(false, true, ObjectGuid::Empty, nullptr);
+            Start(false, true, WOWGUID::Empty, nullptr);
             SetDespawnAtEnd(true);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetImmuneToAll(true);

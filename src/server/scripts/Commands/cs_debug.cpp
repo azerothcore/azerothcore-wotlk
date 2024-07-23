@@ -248,7 +248,7 @@ public:
 
     static bool HandleDebugSendSellErrorCommand(ChatHandler* handler, SellResult error)
     {
-        handler->GetPlayer()->SendSellError(SellResult(error), nullptr, ObjectGuid::Empty, 0);
+        handler->GetPlayer()->SendSellError(SellResult(error), nullptr, WOWGUID::Empty, 0);
         return true;
     }
 
@@ -951,9 +951,9 @@ public:
         return true;
     }
 
-    static bool HandleDebugGetItemValueCommand(ChatHandler* handler, ObjectGuid::LowType guid, uint32 index)
+    static bool HandleDebugGetItemValueCommand(ChatHandler* handler, WOWGUID::LowType guid, uint32 index)
     {
-        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, 0, guid));
+        Item* i = handler->GetPlayer()->GetItemByGuid(WOWGUID(HighGuid::Item, 0, guid));
 
         if (!i)
             return false;
@@ -968,9 +968,9 @@ public:
         return true;
     }
 
-    static bool HandleDebugSetItemValueCommand(ChatHandler* handler, ObjectGuid::LowType guid, uint32 index, uint32 value)
+    static bool HandleDebugSetItemValueCommand(ChatHandler* handler, WOWGUID::LowType guid, uint32 index, uint32 value)
     {
-        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, 0, guid));
+        Item* i = handler->GetPlayer()->GetItemByGuid(WOWGUID(HighGuid::Item, 0, guid));
 
         if (!i)
             return false;
@@ -983,9 +983,9 @@ public:
         return true;
     }
 
-    static bool HandleDebugItemExpireCommand(ChatHandler* handler, ObjectGuid::LowType guid)
+    static bool HandleDebugItemExpireCommand(ChatHandler* handler, WOWGUID::LowType guid)
     {
-        Item* i = handler->GetPlayer()->GetItemByGuid(ObjectGuid(HighGuid::Item, guid));
+        Item* i = handler->GetPlayer()->GetItemByGuid(WOWGUID(HighGuid::Item, guid));
 
         if (!i)
             return false;
@@ -1081,7 +1081,7 @@ public:
             return false;
         }
 
-        ObjectGuid guid = target->GetGUID();
+        WOWGUID guid = target->GetGUID();
 
         if (index >= target->GetValuesCount())
         {
@@ -1298,7 +1298,7 @@ public:
     public:
         CreatureCountWorker() { }
 
-        void Visit(std::unordered_map<ObjectGuid, Creature*>& creatureMap)
+        void Visit(std::unordered_map<WOWGUID, Creature*>& creatureMap)
         {
             for (auto const& p : creatureMap)
             {
@@ -1308,7 +1308,7 @@ public:
         }
 
         template<class T>
-        void Visit(std::unordered_map<ObjectGuid, T*>&) { }
+        void Visit(std::unordered_map<WOWGUID, T*>&) { }
 
         std::vector<std::pair<uint32, uint32>> GetTopCreatureCount(uint32 count)
         {

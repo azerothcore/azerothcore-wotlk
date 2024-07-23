@@ -317,7 +317,7 @@ public:
             return false;
 
         Player* target = ObjectAccessor::FindPlayerByName(args, false);
-        ObjectGuid targetGuid;
+        WOWGUID targetGuid;
         std::string name(args);
 
         if (!target)

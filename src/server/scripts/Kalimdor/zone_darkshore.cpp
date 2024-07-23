@@ -515,7 +515,7 @@ public:
 
     private:
         EventMap _events;
-        ObjectGuid _playerGUID;
+        WOWGUID _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -566,7 +566,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid /*guid*/, int32 type) override
+        void SetGUID(WOWGUID /*guid*/, int32 type) override
         {
             if (type == GUID_SCRIPT_INVOKER && _scriptRunning == false)
             {
@@ -621,7 +621,7 @@ public:
 
     private:
         EventMap   _events;
-        ObjectGuid _bearGUID;
+        WOWGUID _bearGUID;
         bool       _scriptRunning;
         float      _facing;
     };

@@ -97,7 +97,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 data) const override
+        WOWGUID GetGuidData(uint32 data) const override
         {
             switch (data)
             {
@@ -105,7 +105,7 @@ public:
                     return WardensShieldGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         bool SetBossState(uint32 type, EncounterState state) override
@@ -127,8 +127,8 @@ public:
         }
 
     protected:
-        ObjectGuid StasisPodGUIDs[5];
-        ObjectGuid WardensShieldGUID;
+        WOWGUID StasisPodGUIDs[5];
+        WOWGUID WardensShieldGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

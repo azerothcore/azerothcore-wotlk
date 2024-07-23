@@ -323,7 +323,7 @@ void Battlefield::KickAfkPlayers()
                     player->Teleport(KickPosition);
 }
 
-void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
+void Battlefield::KickPlayerFromBattlefield(WOWGUID guid)
 {
     if (Player* player = ObjectAccessor::FindPlayer(guid))
     {
@@ -528,7 +528,7 @@ Group* Battlefield::GetFreeBfRaid(TeamId TeamId)
     return nullptr;
 }
 
-Group* Battlefield::GetGroupPlayer(ObjectGuid guid, TeamId TeamId)
+Group* Battlefield::GetGroupPlayer(WOWGUID guid, TeamId TeamId)
 {
     for (GuidUnorderedSet::const_iterator itr = m_Groups[TeamId].begin(); itr != m_Groups[TeamId].end(); ++itr)
         if (Group* group = sGroupMgr->GetGroupByGUID(itr->GetCounter()))
@@ -619,7 +619,7 @@ GraveyardStruct const* Battlefield::GetClosestGraveyard(Player* player)
     return nullptr;
 }
 
-void Battlefield::AddPlayerToResurrectQueue(ObjectGuid npcGuid, ObjectGuid playerGuid)
+void Battlefield::AddPlayerToResurrectQueue(WOWGUID npcGuid, WOWGUID playerGuid)
 {
     for (uint8 i = 0; i < m_GraveyardList.size(); i++)
     {
@@ -634,7 +634,7 @@ void Battlefield::AddPlayerToResurrectQueue(ObjectGuid npcGuid, ObjectGuid playe
     }
 }
 
-void Battlefield::RemovePlayerFromResurrectQueue(ObjectGuid playerGuid)
+void Battlefield::RemovePlayerFromResurrectQueue(WOWGUID playerGuid)
 {
     for (uint8 i = 0; i < m_GraveyardList.size(); i++)
     {
@@ -649,7 +649,7 @@ void Battlefield::RemovePlayerFromResurrectQueue(ObjectGuid playerGuid)
     }
 }
 
-void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const ObjectGuid& guid)
+void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const WOWGUID& guid)
 {
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
     uint32 time = m_LastResurectTimer;  // resurrect every 30 seconds
@@ -694,7 +694,7 @@ float BfGraveyard::GetDistance(Player* player)
     return player->GetDistance2d(safeLoc->x, safeLoc->y);
 }
 
-void BfGraveyard::AddPlayer(ObjectGuid playerGuid)
+void BfGraveyard::AddPlayer(WOWGUID playerGuid)
 {
     if (!m_ResurrectQueue.count(playerGuid))
     {
@@ -705,7 +705,7 @@ void BfGraveyard::AddPlayer(ObjectGuid playerGuid)
     }
 }
 
-void BfGraveyard::RemovePlayer(ObjectGuid playerGuid)
+void BfGraveyard::RemovePlayer(WOWGUID playerGuid)
 {
     m_ResurrectQueue.erase(m_ResurrectQueue.find(playerGuid));
 
@@ -845,7 +845,7 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
     return go;
 }
 
-Creature* Battlefield::GetCreature(ObjectGuid const guid)
+Creature* Battlefield::GetCreature(WOWGUID const guid)
 {
     if (!m_Map)
         return nullptr;
@@ -853,7 +853,7 @@ Creature* Battlefield::GetCreature(ObjectGuid const guid)
     return m_Map->GetCreature(guid);
 }
 
-GameObject* Battlefield::GetGameObject(ObjectGuid const guid)
+GameObject* Battlefield::GetGameObject(WOWGUID const guid)
 {
     if (!m_Map)
         return nullptr;
@@ -1110,7 +1110,7 @@ void BfCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
                 player->SendUpdateWorldState(field, value);
 }
 
-void BfCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
+void BfCapturePoint::SendObjectiveComplete(uint32 id, WOWGUID guid)
 {
     uint8 team;
     switch (m_State)

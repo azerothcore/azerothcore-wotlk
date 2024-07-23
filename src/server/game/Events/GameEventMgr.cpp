@@ -419,7 +419,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                WOWGUID::LowType guid = fields[0].Get<uint32>();
                 int16 event_id = fields[1].Get<int8>();
 
                 CreatureData const* data = sObjectMgr->GetCreatureData(guid);
@@ -467,7 +467,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                WOWGUID::LowType guid = fields[0].Get<uint32>();
                 int16 event_id = fields[1].Get<int8>();
 
                 int32 internal_event_id = mGameEvent.size() + event_id - 1;
@@ -516,7 +516,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                WOWGUID::LowType guid = fields[0].Get<uint32>();
                 uint32 entry = fields[1].Get<uint32>();
                 uint32 entry2 = fields[2].Get<uint32>();
                 uint32 entry3 = fields[3].Get<uint32>();
@@ -546,7 +546,7 @@ void GameEventMgr::LoadFromDB()
                     }
                 }
 
-                equiplist.push_back(std::pair<ObjectGuid::LowType, ModelEquip>(guid, newModelEquipSet));
+                equiplist.push_back(std::pair<WOWGUID::LowType, ModelEquip>(guid, newModelEquipSet));
 
                 ++count;
             } while (result->NextRow());
@@ -785,7 +785,7 @@ void GameEventMgr::LoadFromDB()
             {
                 Field* fields = result->Fetch();
 
-                ObjectGuid::LowType guid = fields[0].Get<uint32>();
+                WOWGUID::LowType guid = fields[0].Get<uint32>();
                 uint16 event_id = fields[1].Get<uint8>();
                 uint32 npcflag = fields[2].Get<uint32>();
 
@@ -880,7 +880,7 @@ void GameEventMgr::LoadFromDB()
 
                 NPCVendorList& vendors = mGameEventVendors[event_id];
                 NPCVendorEntry newEntry;
-                ObjectGuid::LowType guid = fields[1].Get<uint32>();
+                WOWGUID::LowType guid = fields[1].Get<uint32>();
                 newEntry.item = fields[2].Get<uint32>();
                 newEntry.maxcount = fields[3].Get<uint32>();
                 newEntry.incrtime = fields[4].Get<uint32>();
@@ -1054,7 +1054,7 @@ void GameEventMgr::LoadHolidayDates()
 uint32 GameEventMgr::GetNPCFlag(Creature* cr)
 {
     uint32 mask = 0;
-    ObjectGuid::LowType spawnId = cr->GetSpawnId();
+    WOWGUID::LowType spawnId = cr->GetSpawnId();
 
     for (ActiveEvents::iterator e_itr = m_ActiveEvents.begin(); e_itr != m_ActiveEvents.end(); ++e_itr)
     {
@@ -1264,7 +1264,7 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id)
 
 void GameEventMgr::UpdateEventNPCFlags(uint16 event_id)
 {
-    std::unordered_map<uint32, std::unordered_set<ObjectGuid::LowType>> creaturesByMap;
+    std::unordered_map<uint32, std::unordered_set<WOWGUID::LowType>> creaturesByMap;
 
     // go through the creatures whose npcflags are changed in the event
     for (NPCFlagList::iterator itr = mGameEventNPCFlags[event_id].begin(); itr != mGameEventNPCFlags[event_id].end(); ++itr)
@@ -1549,7 +1549,7 @@ bool GameEventMgr::hasGameObjectQuestActiveEventExcept(uint32 quest_id, uint16 e
     }
     return false;
 }
-bool GameEventMgr::hasCreatureActiveEventExcept(ObjectGuid::LowType creature_guid, uint16 event_id)
+bool GameEventMgr::hasCreatureActiveEventExcept(WOWGUID::LowType creature_guid, uint16 event_id)
 {
     for (ActiveEvents::iterator e_itr = m_ActiveEvents.begin(); e_itr != m_ActiveEvents.end(); ++e_itr)
     {
@@ -1563,7 +1563,7 @@ bool GameEventMgr::hasCreatureActiveEventExcept(ObjectGuid::LowType creature_gui
     }
     return false;
 }
-bool GameEventMgr::hasGameObjectActiveEventExcept(ObjectGuid::LowType go_guid, uint16 event_id)
+bool GameEventMgr::hasGameObjectActiveEventExcept(WOWGUID::LowType go_guid, uint16 event_id)
 {
     for (ActiveEvents::iterator e_itr = m_ActiveEvents.begin(); e_itr != m_ActiveEvents.end(); ++e_itr)
     {
@@ -1762,14 +1762,14 @@ class GameEventAIHookWorker
 public:
     GameEventAIHookWorker(uint16 eventId, bool activate) : _eventId(eventId), _activate(activate) { }
 
-    void Visit(std::unordered_map<ObjectGuid, Creature*>& creatureMap)
+    void Visit(std::unordered_map<WOWGUID, Creature*>& creatureMap)
     {
         for (auto const& p : creatureMap)
             if (p.second->IsInWorld() && !p.second->IsDuringRemoveFromWorld() && p.second->FindMap() && p.second->IsAIEnabled && p.second->AI())
                 p.second->AI()->sOnGameEvent(_activate, _eventId);
     }
 
-    void Visit(std::unordered_map<ObjectGuid, GameObject*>& gameObjectMap)
+    void Visit(std::unordered_map<WOWGUID, GameObject*>& gameObjectMap)
     {
         for (auto const& p : gameObjectMap)
             if (p.second->IsInWorld() && p.second->FindMap() && p.second->AI())
@@ -1777,7 +1777,7 @@ public:
     }
 
     template<class T>
-    void Visit(std::unordered_map<ObjectGuid, T*>&) { }
+    void Visit(std::unordered_map<WOWGUID, T*>&) { }
 
 private:
     uint16 _eventId;

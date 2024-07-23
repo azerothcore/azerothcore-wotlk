@@ -38,21 +38,21 @@ public:
         uint32 InstanceProgress;
         std::string str_data;
 
-        ObjectGuid NPC_LeaderFirstGUID;
-        ObjectGuid NPC_LeaderSecondGUID;
-        ObjectGuid NPC_TyrannusEventGUID;
-        ObjectGuid NPC_Necrolyte1GUID;
-        ObjectGuid NPC_Necrolyte2GUID;
-        ObjectGuid NPC_GuardFirstGUID;
-        ObjectGuid NPC_GuardSecondGUID;
-        ObjectGuid NPC_SindragosaGUID;
+        WOWGUID NPC_LeaderFirstGUID;
+        WOWGUID NPC_LeaderSecondGUID;
+        WOWGUID NPC_TyrannusEventGUID;
+        WOWGUID NPC_Necrolyte1GUID;
+        WOWGUID NPC_Necrolyte2GUID;
+        WOWGUID NPC_GuardFirstGUID;
+        WOWGUID NPC_GuardSecondGUID;
+        WOWGUID NPC_SindragosaGUID;
 
-        ObjectGuid NPC_GarfrostGUID;
-        ObjectGuid NPC_MartinOrGorkunGUID;
-        ObjectGuid NPC_RimefangGUID;
-        ObjectGuid NPC_TyrannusGUID;
+        WOWGUID NPC_GarfrostGUID;
+        WOWGUID NPC_MartinOrGorkunGUID;
+        WOWGUID NPC_RimefangGUID;
+        WOWGUID NPC_TyrannusGUID;
 
-        ObjectGuid GO_IceWallGUID;
+        WOWGUID GO_IceWallGUID;
 
         bool bAchievEleven;
         bool bAchievDontLookUp;
@@ -82,7 +82,7 @@ public:
                 c->AI()->SetData(DATA_START_INTRO, 0);
         }
 
-        uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
+        uint32 GetCreatureEntry(WOWGUID::LowType /*guidLow*/, CreatureData const* data) override
         {
             if (teamIdInInstance == TEAM_NEUTRAL)
             {
@@ -304,7 +304,7 @@ public:
                 SaveToDB();
         }
 
-        void SetGuidData(uint32 type, ObjectGuid data) override
+        void SetGuidData(uint32 type, WOWGUID data) override
         {
             switch(type)
             {
@@ -339,7 +339,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -369,7 +369,7 @@ public:
                     return NPC_SindragosaGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override

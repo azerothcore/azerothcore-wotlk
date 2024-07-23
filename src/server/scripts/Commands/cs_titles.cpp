@@ -64,7 +64,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+        if (handler->HasLowerSecurity(target, WOWGUID::Empty))
             return false;
 
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
@@ -95,7 +95,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+        if (handler->HasLowerSecurity(target, WOWGUID::Empty))
             return false;
 
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
@@ -124,7 +124,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+        if (handler->HasLowerSecurity(target, WOWGUID::Empty))
             return false;
 
         CharTitlesEntry const* titleInfo = sCharTitlesStore.LookupEntry(titleId);
@@ -161,7 +161,7 @@ public:
         }
 
         // check online security
-        if (handler->HasLowerSecurity(target, ObjectGuid::Empty))
+        if (handler->HasLowerSecurity(target, WOWGUID::Empty))
             return false;
 
         uint64 titles2 = mask;

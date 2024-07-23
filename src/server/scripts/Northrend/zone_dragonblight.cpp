@@ -83,8 +83,8 @@ public:
         bool canjump;
         int32 timer;
         uint8 step;
-        ObjectGuid pGUID;
-        ObjectGuid oachanoaGUID;
+        WOWGUID pGUID;
+        WOWGUID oachanoaGUID;
 
         Creature* GetOachanoa() {return ObjectAccessor::GetCreature(*me, oachanoaGUID);}
         Player* GetPlayer() {return ObjectAccessor::GetPlayer(*me, pGUID);}
@@ -268,7 +268,7 @@ public:
             }
         }
 
-        void Start(ObjectGuid g)
+        void Start(WOWGUID g)
         {
             running = true;
             pGUID = g;
@@ -359,8 +359,8 @@ public:
     {
         npc_hourglass_of_eternityAI(Creature* c) : ScriptedAI(c) {}
 
-        ObjectGuid pGUID;
-        ObjectGuid copyGUID;
+        WOWGUID pGUID;
+        WOWGUID copyGUID;
         EventMap events;
         uint8 count[3];
         uint8 phase;
@@ -767,7 +767,7 @@ public:
             }
     }
 private:
-    ObjectGuid villagerGUID;
+    WOWGUID villagerGUID;
 };
 
 class spell_q12237_rescue_villager : public SpellScript
@@ -1047,7 +1047,7 @@ public:
 
         EventMap events;
         SummonList summons;
-        ObjectGuid playerGUID;
+        WOWGUID playerGUID;
 
         void CleanAll(bool fromReset = true)
         {
@@ -1094,7 +1094,7 @@ public:
             me->GetMotionMaster()->Clear();
         }
 
-        void SetGUID(ObjectGuid guid, int32  /*id*/) override
+        void SetGUID(WOWGUID guid, int32  /*id*/) override
         {
             if (playerGUID || events.GetNextEventTime(998) || events.GetNextEventTime(2))
                 return;
@@ -2017,8 +2017,8 @@ public:
         }
     private:
         EventMap _events;
-        ObjectGuid audienceList[10];
-        ObjectGuid imageList[5];
+        WOWGUID audienceList[10];
+        WOWGUID imageList[5];
         uint8 talkWing;
     };
 
@@ -2201,7 +2201,7 @@ public:
     private:
         EventMap _events;
         uint8    _textCounter;
-        ObjectGuid   _playerGUID;
+        WOWGUID   _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override

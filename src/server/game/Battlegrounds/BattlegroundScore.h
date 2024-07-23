@@ -19,7 +19,7 @@
 #define _BATTLEGROUND_SCORE_H
 
 #include "Errors.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "SharedDefines.h"
 
 class WorldPacket;
@@ -61,7 +61,7 @@ struct AC_GAME_API BattlegroundScore
     friend class Battleground;
 
 protected:
-    BattlegroundScore(ObjectGuid playerGuid) : PlayerGuid(playerGuid) { }
+    BattlegroundScore(WOWGUID playerGuid) : PlayerGuid(playerGuid) { }
     virtual ~BattlegroundScore() = default;
 
     virtual void UpdateScore(uint32 type, uint32 value)
@@ -111,7 +111,7 @@ protected:
     [[nodiscard]] virtual uint32 GetAttr4() const { return 0; }
     [[nodiscard]] virtual uint32 GetAttr5() const { return 0; }
 
-    ObjectGuid PlayerGuid;
+    WOWGUID PlayerGuid;
 
     // Default score, present in every type
     uint32 KillingBlows = 0;

@@ -72,7 +72,7 @@ public:
         {
             if (!summons.empty())
             {
-                for (ObjectGuid const& guid : summons)
+                for (WOWGUID const& guid : summons)
                     if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     {
                         float x, y, z, o;
@@ -100,7 +100,7 @@ public:
             npc_escortAI::MoveInLineOfSight(who);
         }
 
-        void SetGUID(ObjectGuid playerGUID, int32 type) override
+        void SetGUID(WOWGUID playerGUID, int32 type) override
         {
             if (type == DATA_START_ENCOUNTER)
             {
@@ -337,9 +337,9 @@ public:
     {
         npc_commander_dawnforgeAI(Creature* creature) : ScriptedAI(creature) { }
 
-        ObjectGuid PlayerGUID;
-        ObjectGuid ardonisGUID;
-        ObjectGuid pathaleonGUID;
+        WOWGUID PlayerGUID;
+        WOWGUID ardonisGUID;
+        WOWGUID pathaleonGUID;
 
         uint32 Phase;
         uint32 PhaseSubphase;

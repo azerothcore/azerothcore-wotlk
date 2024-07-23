@@ -27,7 +27,7 @@ void User::HandleDismissControlledVehicle(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_DISMISS_CONTROLLED_VEHICLE");
 
-    ObjectGuid vehicleGUID = m_player->GetCharmGUID();
+    WOWGUID vehicleGUID = m_player->GetCharmGUID();
 
     if (!vehicleGUID)                                       // something wrong here...
     {
@@ -35,7 +35,7 @@ void User::HandleDismissControlledVehicle(WorldPacket& recvData)
         return;
     }
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid.ReadAsPacked();
 
     // pussywizard: typical check for incomming movement packets
@@ -85,7 +85,7 @@ void User::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
             break;
         case CMSG_CHANGE_SEATS_ON_CONTROLLED_VEHICLE:
             {
-                ObjectGuid guid;        // current vehicle guid
+                WOWGUID guid;        // current vehicle guid
                 recvData >> guid.ReadAsPacked();
 
                 // pussywizard:
@@ -100,7 +100,7 @@ void User::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
                 ReadMovementInfo(recvData, &movementInfo);
                 vehicle_base->m_movement = movementInfo;
 
-                ObjectGuid accessory;        //  accessory guid
+                WOWGUID accessory;        //  accessory guid
                 recvData >> accessory.ReadAsPacked();
 
                 int8 seatId;
@@ -118,7 +118,7 @@ void User::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
             }
         case CMSG_REQUEST_VEHICLE_SWITCH_SEAT:
             {
-                ObjectGuid guid;        // current vehicle guid
+                WOWGUID guid;        // current vehicle guid
                 recvData >> guid.ReadAsPacked();
 
                 int8 seatId;
@@ -140,7 +140,7 @@ void User::HandleChangeSeatsOnControlledVehicle(WorldPacket& recvData)
 void User::HandleEnterPlayerVehicle(WorldPacket& data)
 {
     // Read guid
-    ObjectGuid guid;
+    WOWGUID guid;
     data >> guid;
 
     if (Player* player = ObjectAccessor::GetPlayer(*m_player, guid))
@@ -169,7 +169,7 @@ void User::HandleEjectPassenger(WorldPacket& data)
         return;
     }
 
-    ObjectGuid guid;
+    WOWGUID guid;
     data >> guid;
 
     if (guid.IsPlayer())

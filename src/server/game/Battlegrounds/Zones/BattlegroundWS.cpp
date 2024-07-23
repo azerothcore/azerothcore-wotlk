@@ -160,7 +160,7 @@ void BattlegroundWS::RespawnFlagAfterDrop(TeamId teamId)
     if (GameObject* flag = GetBgMap()->GetGameObject(GetDroppedFlagGUID(teamId)))
         flag->Delete();
 
-    SetDroppedFlagGUID(ObjectGuid::Empty, teamId);
+    SetDroppedFlagGUID(WOWGUID::Empty, teamId);
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT10);
     _bgEvents.CancelEvent(BG_WS_EVENT_BOTH_FLAGS_KEPT15);
     RemoveAssaultAuras();
@@ -195,7 +195,7 @@ void BattlegroundWS::EventPlayerCapturedFlag(Player* player)
     RemoveAssaultAuras();
 
     AddPoints(player->GetTeamId(), 1);
-    SetFlagPicker(ObjectGuid::Empty, GetOtherTeamId(player->GetTeamId()));
+    SetFlagPicker(WOWGUID::Empty, GetOtherTeamId(player->GetTeamId()));
     UpdateFlagState(GetOtherTeamId(player->GetTeamId()), BG_WS_FLAG_STATE_ON_BASE);
 
     if (player->GetTeamId() == TEAM_ALLIANCE)
@@ -239,7 +239,7 @@ void BattlegroundWS::EventPlayerDroppedFlag(Player* player)
     if (GetFlagPickerGUID(TEAM_HORDE) != player->GetGUID() && GetFlagPickerGUID(TEAM_ALLIANCE) != player->GetGUID())
         return;
 
-    SetFlagPicker(ObjectGuid::Empty, GetOtherTeamId(player->GetTeamId()));
+    SetFlagPicker(WOWGUID::Empty, GetOtherTeamId(player->GetTeamId()));
     player->RemoveAurasDueToSpell(BG_WS_SPELL_WARSONG_FLAG);
     player->RemoveAurasDueToSpell(BG_WS_SPELL_FOCUSED_ASSAULT);
     player->RemoveAurasDueToSpell(BG_WS_SPELL_BRUTAL_ASSAULT);
@@ -318,7 +318,7 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     // Alliance Flag on ground
     if (GetFlagState(TEAM_ALLIANCE) == BG_WS_FLAG_STATE_ON_GROUND && player->IsWithinDistInMap(gameObject, 10.0f) && gameObject->GetEntry() == BG_OBJECT_A_FLAG_GROUND_WS_ENTRY)
     {
-        SetDroppedFlagGUID(ObjectGuid::Empty, TEAM_ALLIANCE);
+        SetDroppedFlagGUID(WOWGUID::Empty, TEAM_ALLIANCE);
         if (player->GetTeamId() == TEAM_ALLIANCE)
         {
             UpdateFlagState(TEAM_ALLIANCE, BG_WS_FLAG_STATE_ON_BASE);
@@ -351,7 +351,7 @@ void BattlegroundWS::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
     // Horde Flag on ground
     if (GetFlagState(TEAM_HORDE) == BG_WS_FLAG_STATE_ON_GROUND && player->IsWithinDistInMap(gameObject, 10.0f) && gameObject->GetEntry() == BG_OBJECT_H_FLAG_GROUND_WS_ENTRY)
     {
-        SetDroppedFlagGUID(ObjectGuid::Empty, TEAM_HORDE);
+        SetDroppedFlagGUID(WOWGUID::Empty, TEAM_HORDE);
         if (player->GetTeamId() == TEAM_HORDE)
         {
             UpdateFlagState(TEAM_HORDE, BG_WS_FLAG_STATE_ON_BASE);

@@ -1360,7 +1360,7 @@ public:
         bool _leftHand;
         bool _checkTarget;
         float _nextTriggerPos;
-        ObjectGuid _triggerLeftGUID[2], _triggerRightGUID[2];
+        WOWGUID _triggerLeftGUID[2], _triggerRightGUID[2];
 
         void Reset() override
         {

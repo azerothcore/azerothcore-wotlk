@@ -34,7 +34,7 @@
 
 void User::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
     LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from ({})", guid.ToString());
 
@@ -62,7 +62,7 @@ void User::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
     SendBattleGroundList(guid, bgTypeId);
 }
 
-void User::SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId)
+void User::SendBattleGroundList(WOWGUID guid, BattlegroundTypeId bgTypeId)
 {
     WorldPacket data;
     sBattlegroundMgr->BuildBattlegroundListPacket(&data, guid, m_player, bgTypeId, 0);
@@ -71,7 +71,7 @@ void User::SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId)
 
 void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 bgTypeId_;
     uint32 instanceId;
     uint8 joinAsGroup;
@@ -305,14 +305,14 @@ void User::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvData*/)
     Player* allianceFlagCarrier = nullptr;
     Player* hordeFlagCarrier = nullptr;
 
-    if (ObjectGuid guid = bg->GetFlagPickerGUID(TEAM_ALLIANCE))
+    if (WOWGUID guid = bg->GetFlagPickerGUID(TEAM_ALLIANCE))
     {
         allianceFlagCarrier = ObjectAccessor::FindPlayer(guid);
         if (allianceFlagCarrier)
             ++flagCarrierCount;
     }
 
-    if (ObjectGuid guid = bg->GetFlagPickerGUID(TEAM_HORDE))
+    if (WOWGUID guid = bg->GetFlagPickerGUID(TEAM_HORDE))
     {
         hordeFlagCarrier = ObjectAccessor::FindPlayer(guid);
         if (hordeFlagCarrier)
@@ -384,7 +384,7 @@ void User::HandleBattlefieldListOpcode(WorldPacket& recvData)
     }
 
     WorldPacket data;
-    sBattlegroundMgr->BuildBattlegroundListPacket(&data, ObjectGuid::Empty, m_player, BattlegroundTypeId(bgTypeId), fromWhere);
+    sBattlegroundMgr->BuildBattlegroundListPacket(&data, WOWGUID::Empty, m_player, BattlegroundTypeId(bgTypeId), fromWhere);
     Send(&data);
 }
 
@@ -666,7 +666,7 @@ void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_BATTLEMASTER_JOIN_ARENA");
 
-    ObjectGuid guid; // arena Battlemaster guid
+    WOWGUID guid; // arena Battlemaster guid
     uint8 arenaslot; // 2v2, 3v3 or 5v5
     uint8 asGroup;   // asGroup
     uint8 isRated;   // isRated
@@ -898,7 +898,7 @@ void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
 void User::HandleReportPvPAFK(WorldPacket& recvData)
 {
-    ObjectGuid playerGuid;
+    WOWGUID playerGuid;
     recvData >> playerGuid;
     Player* reportedPlayer = ObjectAccessor::FindPlayer(playerGuid);
 

@@ -124,7 +124,7 @@ public:
                     }
                     break;
                 case DATA_ERANIKUS_FIGHT:
-                    for (ObjectGuid const& guid : _dragonkinList)
+                    for (WOWGUID const& guid : _dragonkinList)
                     {
                         if (Creature* creature = instance->GetCreature(guid))
                             if (instance->IsGridLoaded(creature->GetPositionX(), creature->GetPositionY()))
@@ -194,9 +194,9 @@ public:
         uint32 _defendersKilled;
         uint32 _encounters[MAX_ENCOUNTERS];
 
-        ObjectGuid _forcefieldGUID;
-        ObjectGuid _jammalanGUID;
-        ObjectGuid _shadeOfEranikusGUID;
+        WOWGUID _forcefieldGUID;
+        WOWGUID _jammalanGUID;
+        WOWGUID _shadeOfEranikusGUID;
         GuidList _dragonkinList;
         EventMap _events;
     };

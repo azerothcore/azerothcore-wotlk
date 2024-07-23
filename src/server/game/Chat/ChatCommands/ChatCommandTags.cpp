@@ -89,14 +89,14 @@ ChatCommandResult Acore::ChatCommands::AccountIdentifier::TryConsume(ChatHandler
 
 ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler const* handler, std::string_view args)
 {
-    Variant<Hyperlink<player>, ObjectGuid::LowType, std::string_view> val;
+    Variant<Hyperlink<player>, WOWGUID::LowType, std::string_view> val;
     ChatCommandResult next = ArgInfo<decltype(val)>::TryConsume(val, handler, args);
     if (!next)
         return next;
 
-    if (val.holds_alternative<ObjectGuid::LowType>())
+    if (val.holds_alternative<WOWGUID::LowType>())
     {
-        _guid = ObjectGuid::Create<HighGuid::Player>(val.get<ObjectGuid::LowType>());
+        _guid = WOWGUID::Create<HighGuid::Player>(val.get<WOWGUID::LowType>());
 
         if ((m_player = ObjectAccessor::FindPlayerByLowGUID(_guid.GetCounter())))
         {

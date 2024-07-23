@@ -18,7 +18,7 @@
 #ifndef _HYPERLINKS_H_
 #define _HYPERLINKS_H_
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "StringConvert.h"
 #include <array>
 #include <string>
@@ -41,7 +41,7 @@ namespace Acore::Hyperlinks
     struct AchievementLinkData
     {
         AchievementEntry const* Achievement;
-        ObjectGuid CharacterId;
+        WOWGUID CharacterId;
         bool IsFinished;
         uint8 Year;
         uint8 Month;
@@ -85,7 +85,7 @@ namespace Acore::Hyperlinks
         SpellInfo const* Spell;
         uint16 CurValue;
         uint16 MaxValue;
-        ObjectGuid Owner;
+        WOWGUID Owner;
         std::string KnownRecipes;
     };
 
@@ -130,7 +130,7 @@ namespace Acore::Hyperlinks
                     return false;
             }
 
-            static bool StoreTo(ObjectGuid& val, std::string_view data)
+            static bool StoreTo(WOWGUID& val, std::string_view data)
             {
                 if (Optional<uint64> res = Acore::StringTo<uint64>(data, 16))
                 {
@@ -145,10 +145,10 @@ namespace Acore::Hyperlinks
     #define make_base_tag(ltag, type) struct ltag : public base_tag { using value_type = type; static constexpr std::string_view tag() { return #ltag; } }
         make_base_tag(area, uint32);
         make_base_tag(areatrigger, uint32);
-        make_base_tag(creature, ObjectGuid::LowType);
+        make_base_tag(creature, WOWGUID::LowType);
         make_base_tag(creature_entry, uint32);
         make_base_tag(gameevent, uint16);
-        make_base_tag(gameobject, ObjectGuid::LowType);
+        make_base_tag(gameobject, WOWGUID::LowType);
         make_base_tag(gameobject_entry, uint32);
         make_base_tag(itemset, uint32);
         make_base_tag(player, std::string_view);

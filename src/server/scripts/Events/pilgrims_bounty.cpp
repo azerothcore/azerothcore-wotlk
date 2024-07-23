@@ -122,7 +122,7 @@ struct npc_pilgrims_bounty_chair : public VehicleAI
             who->ToPlayer()->SetClientControl(me, 0, true);
     }
 
-    ObjectGuid plateGUID;
+    WOWGUID plateGUID;
     uint32 timerSpawnPlate;
     uint32 timerRotateChair;
 

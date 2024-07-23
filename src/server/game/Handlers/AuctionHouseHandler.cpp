@@ -33,7 +33,7 @@
 //void called when player click on auctioneer npc
 void User::HandleAuctionHelloOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;                                            //NPC guid
+    WOWGUID guid;                                            //NPC guid
     recvData >> guid;
 
     Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_AUCTIONEER);
@@ -51,7 +51,7 @@ void User::HandleAuctionHelloOpcode(WorldPacket& recvData)
 }
 
 //this void causes that auction window is opened
-void User::SendAuctionHello(ObjectGuid guid, Creature* unit)
+void User::SendAuctionHello(WOWGUID guid, Creature* unit)
 {
     if (GetPlayer()->GetLevel() < sWorld->getIntConfig(CONFIG_AUCTION_LEVEL_REQ))
     {
@@ -86,7 +86,7 @@ void User::SendAuctionCommandResult(uint32 auctionId, uint32 Action, uint32 Erro
 }
 
 //this function sends notification, if bidder is online
-void User::SendAuctionBidderNotification(uint32 location, uint32 auctionId, ObjectGuid bidder, uint32 bidSum, uint32 diff, uint32 item_template)
+void User::SendAuctionBidderNotification(uint32 location, uint32 auctionId, WOWGUID bidder, uint32 bidSum, uint32 diff, uint32 item_template)
 {
     WorldPacket data(SMSG_AUCTION_BIDDER_NOTIFICATION, (8 * 4));
     data << uint32(location);
@@ -116,12 +116,12 @@ void User::SendAuctionOwnerNotification(AuctionEntry* auction)
 //this void creates new auction and adds auction to some auctionhouse
 void User::HandleAuctionSellItem(WorldPacket& recvData)
 {
-    ObjectGuid auctioneer;
+    WOWGUID auctioneer;
     uint32 itemsCount, etime, bid, buyout;
     recvData >> auctioneer;
     recvData >> itemsCount;
 
-    ObjectGuid itemGUIDs[MAX_AUCTION_ITEMS]; // 160 slot = 4x 36 slot bag + backpack 16 slot
+    WOWGUID itemGUIDs[MAX_AUCTION_ITEMS]; // 160 slot = 4x 36 slot bag + backpack 16 slot
     uint32 count[MAX_AUCTION_ITEMS];
     memset(count, 0, sizeof(count));
 
@@ -297,7 +297,7 @@ void User::HandleAuctionSellItem(WorldPacket& recvData)
             AH->itemCount = item->GetCount();
             AH->owner = m_player->GetGUID();
             AH->startbid = bid;
-            AH->bidder = ObjectGuid::Empty;
+            AH->bidder = WOWGUID::Empty;
             AH->bid = 0;
             AH->buyout = buyout;
             AH->expire_time = GameTime::GetGameTime().count() + auctionTime;
@@ -338,7 +338,7 @@ void User::HandleAuctionSellItem(WorldPacket& recvData)
             AH->itemCount = newItem->GetCount();
             AH->owner = m_player->GetGUID();
             AH->startbid = bid;
-            AH->bidder = ObjectGuid::Empty;
+            AH->bidder = WOWGUID::Empty;
             AH->bid = 0;
             AH->buyout = buyout;
             AH->expire_time = GameTime::GetGameTime().count() + auctionTime;
@@ -391,7 +391,7 @@ void User::HandleAuctionSellItem(WorldPacket& recvData)
 //this function is called when client bids or buys out auction
 void User::HandleAuctionPlaceBid(WorldPacket& recvData)
 {
-    ObjectGuid auctioneer;
+    WOWGUID auctioneer;
     uint32 auctionId;
     uint32 price;
     recvData >> auctioneer;
@@ -522,7 +522,7 @@ void User::HandleAuctionPlaceBid(WorldPacket& recvData)
 //this void is called when auction_owner cancels his auction
 void User::HandleAuctionRemoveItem(WorldPacket& recvData)
 {
-    ObjectGuid auctioneer;
+    WOWGUID auctioneer;
     uint32 auctionId;
     recvData >> auctioneer;
     recvData >> auctionId;
@@ -560,7 +560,7 @@ void User::HandleAuctionRemoveItem(WorldPacket& recvData)
             }
 
             // item will deleted or added to received mail list
-            MailDraft(auction->BuildAuctionMailSubject(AUCTION_CANCELED), AuctionEntry::BuildAuctionMailBody(ObjectGuid::Empty, 0, auction->buyout, auction->deposit))
+            MailDraft(auction->BuildAuctionMailSubject(AUCTION_CANCELED), AuctionEntry::BuildAuctionMailBody(WOWGUID::Empty, 0, auction->buyout, auction->deposit))
             .AddItem(pItem)
             .SendMailTo(trans, player, auction, MAIL_CHECK_MASK_COPIED);
         }
@@ -595,7 +595,7 @@ void User::HandleAuctionRemoveItem(WorldPacket& recvData)
 //called when player lists his bids
 void User::HandleAuctionListBidderItems(WorldPacket& recvData)
 {
-    ObjectGuid guid;                                            //NPC guid
+    WOWGUID guid;                                            //NPC guid
     uint32 listfrom;                                        //page of auctions
     uint32 outbiddedCount;                                  //count of outbidded auctions
 
@@ -651,7 +651,7 @@ void User::HandleAuctionListBidderItems(WorldPacket& recvData)
 void User::HandleAuctionListOwnerItems(WorldPacket& recvData)
 {
     // prevent crash caused by malformed packet
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 listfrom;
 
     recvData >> guid;
@@ -671,7 +671,7 @@ void User::HandleAuctionListOwnerItems(WorldPacket& recvData)
     m_player->m_Events.AddEvent(new AuctionListOwnerItemsDelayEvent(guid, m_player->GetGUID()), m_player->m_Events.CalculateTime(delay.count() - diff.count()));
 }
 
-void User::HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid)
+void User::HandleAuctionListOwnerItemsEvent(WOWGUID creatureGuid)
 {
     _lastAuctionListOwnerItemsMSTime = GameTime::GetGameTimeMS(); // pussywizard
 
@@ -707,7 +707,7 @@ void User::HandleAuctionListItems(WorldPacket& recvData)
     std::string searchedname;
     uint8 levelmin, levelmax, usable;
     uint32 listfrom, auctionSlotID, auctionMainCategory, auctionSubCategory, quality;
-    ObjectGuid guid;
+    WOWGUID guid;
 
     recvData >> guid;
     recvData >> listfrom;                                  // start, used for page control listing by 50 elements

@@ -16,7 +16,7 @@
  */
 
 #include "CreatureScript.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"

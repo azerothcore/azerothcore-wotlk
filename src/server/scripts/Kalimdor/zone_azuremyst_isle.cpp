@@ -64,7 +64,7 @@ public:
     {
         npc_draenei_survivorAI(Creature* creature) : ScriptedAI(creature) { }
 
-        ObjectGuid pCaster;
+        WOWGUID pCaster;
 
         uint32 SayThanksTimer;
         uint32 RunAwayTimer;
@@ -331,7 +331,7 @@ public:
         }
     private:
         EventMap _events;
-        ObjectGuid m_player;
+        WOWGUID m_player;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -493,7 +493,7 @@ public:
         }
 
     private:
-        ObjectGuid _playerGUID;
+        WOWGUID _playerGUID;
         EventMap _events;
         bool _movementComplete;
     };

@@ -55,7 +55,7 @@ public:
 
     bool IsPermanentPetFor(Player* owner) const;              // pet have tab in character windows and set UNIT_FIELD_PETNUMBER
 
-    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 pet_number);
+    bool Create(WOWGUID::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 pet_number);
     bool CreateBaseAtCreature(Creature* creature);
     bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
     bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
@@ -65,7 +65,7 @@ public:
     void SavePetToDB(PetSaveMode mode);
     void FillPetInfo(PetStable::PetInfo* petInfo) const;
     void Remove(PetSaveMode mode, bool returnreagent = false);
-    static void DeleteFromDB(ObjectGuid::LowType guidlow);
+    static void DeleteFromDB(WOWGUID::LowType guidlow);
 
     void setDeathState(DeathState s, bool despawn = false) override;                   // overwrite virtual Creature::setDeathState and Unit::setDeathState
     void Update(uint32 diff) override;                           // overwrite virtual Creature::Update and Unit::Update
@@ -96,7 +96,7 @@ public:
     void LearnPetPassives();
     void CastPetAuras(bool current);
 
-    void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, ObjectGuid oldTarget, bool spellIsPositive = false);
+    void CastWhenWillAvailable(uint32 spellid, Unit* spellTarget, WOWGUID oldTarget, bool spellIsPositive = false);
     void ClearCastWhenWillAvailable();
     void RemoveSpellCooldown(uint32 spell_id, bool update /* = false */);
 
@@ -158,7 +158,7 @@ protected:
     std::unique_ptr<DeclinedName> m_declinedname;
 
     Unit*      m_tempspellTarget;
-    ObjectGuid m_tempoldTarget;
+    WOWGUID m_tempoldTarget;
     bool       m_tempspellIsPositive;
     uint32     m_tempspell;
 

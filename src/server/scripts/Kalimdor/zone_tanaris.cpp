@@ -438,7 +438,7 @@ public:
         uint32 PostEventTimer;
         uint32 PhasePostEvent;
 
-        ObjectGuid TortaGUID;
+        WOWGUID TortaGUID;
 
         void Reset() override
         {

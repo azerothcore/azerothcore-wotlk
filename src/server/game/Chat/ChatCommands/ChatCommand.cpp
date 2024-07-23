@@ -158,7 +158,7 @@ static void LogCommandUsage(User const& session, std::string_view cmdStr)
         return;
 
     Player* player = session.GetPlayer();
-    ObjectGuid targetGuid = player->GetTarget();
+    WOWGUID targetGuid = player->GetTarget();
     uint32 areaId = player->GetAreaId();
     uint32 zoneId = player->GetZoneId();
     std::string areaName = "Unknown";

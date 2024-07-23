@@ -62,12 +62,12 @@ class LoginQueryHolder : public CharacterDatabaseQueryHolder
 {
 private:
     uint32 m_accountId;
-    ObjectGuid m_guid;
+    WOWGUID m_guid;
 public:
-    LoginQueryHolder(uint32 accountId, ObjectGuid guid)
+    LoginQueryHolder(uint32 accountId, WOWGUID guid)
         : m_accountId(accountId), m_guid(guid) { }
 
-    ObjectGuid GetGuid() const { return m_guid; }
+    WOWGUID GetGuid() const { return m_guid; }
     uint32 GetAccountId() const { return m_accountId; }
     bool Initialize();
 };
@@ -77,7 +77,7 @@ bool LoginQueryHolder::Initialize()
     SetSize(MAX_PLAYER_LOGIN_QUERY);
 
     bool res = true;
-    ObjectGuid::LowType lowGuid = m_guid.GetCounter();
+    WOWGUID::LowType lowGuid = m_guid.GetCounter();
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTER);
     stmt->SetData(0, lowGuid);
@@ -227,7 +227,7 @@ void User::HandleCharEnum(PreparedQueryResult result)
     {
         do
         {
-            ObjectGuid guid = ObjectGuid::Create<HighGuid::Player>((*result)[0].Get<uint32>());
+            WOWGUID guid = WOWGUID::Create<HighGuid::Player>((*result)[0].Get<uint32>());
             LOG_DEBUG("network.opcode", "Loading char {} from account {}.", guid.ToString(), GetAccountId());
             if (Player::BuildEnumData(result, &data))
             {
@@ -597,7 +597,7 @@ void User::HandleCharCreateOpcode(WorldPacket& recvData)
 
 void User::HandleCharDeleteOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     // Initiating
@@ -659,7 +659,7 @@ void User::HandleCharDeleteOpcode(WorldPacket& recvData)
 void User::HandlePlayerLoginOpcode(WorldPacket& recvData)
 {
     m_playerLoading = true;
-    ObjectGuid playerGuid;
+    WOWGUID playerGuid;
     recvData >> playerGuid;
 
     if (PlayerLoading() || GetPlayer() != nullptr || !playerGuid.IsPlayer())
@@ -784,7 +784,7 @@ void User::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
 void User::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 {
-    ObjectGuid playerGuid = holder.GetGuid();
+    WOWGUID playerGuid = holder.GetGuid();
 
     Player* pCurrChar = new Player(this);
     // for send server info and strings (config)
@@ -1362,7 +1362,7 @@ void User::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameI
 
     Field* fields = result->Fetch();
 
-    ObjectGuid::LowType guidLow = fields[0].Get<uint32>();
+    WOWGUID::LowType guidLow = fields[0].Get<uint32>();
     std::string oldName = fields[1].Get<std::string>();
     uint16 atLoginFlags = fields[2].Get<uint16>();
 
@@ -1375,7 +1375,7 @@ void User::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameI
     atLoginFlags &= ~AT_LOGIN_RENAME;
 
     // pussywizard:
-    if (ObjectAccessor::FindConnectedPlayer(ObjectGuid::Create<HighGuid::Player>(guidLow)) || sWorld->FindOfflineUserForCharacter(guidLow))
+    if (ObjectAccessor::FindConnectedPlayer(WOWGUID::Create<HighGuid::Player>(guidLow)) || sWorld->FindOfflineUserForCharacter(guidLow))
     {
         SendCharRename(CHAR_CREATE_ERROR, renameInfo.get());
         return;
@@ -1410,7 +1410,7 @@ void User::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     if (!sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))
         return;
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     // not accept declined names for unsupported languages
@@ -1681,7 +1681,7 @@ void User::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomizeInfo> c
     }
 
     // character with this name already exist
-    if (ObjectGuid newguid = sCharacterCache->GetCharacterGuidByName(customizeInfo->Name))
+    if (WOWGUID newguid = sCharacterCache->GetCharacterGuidByName(customizeInfo->Name))
     {
         if (newguid != customizeInfo->Guid)
         {
@@ -1693,7 +1693,7 @@ void User::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomizeInfo> c
     CharacterDatabasePreparedStatement* stmt = nullptr;
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    ObjectGuid::LowType lowGuid = customizeInfo->Guid.GetCounter();
+    WOWGUID::LowType lowGuid = customizeInfo->Guid.GetCounter();
 
     /// Customize
     Player::Customize(customizeInfo.get(), trans);
@@ -1753,7 +1753,7 @@ void User::HandleEquipmentSetSave(WorldPacket& recvData)
 
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
-        ObjectGuid itemGuid;
+        WOWGUID itemGuid;
         recvData >> itemGuid.ReadAsPacked();
 
         // xinef: if client sends 0, it means empty slot
@@ -1803,7 +1803,7 @@ void User::HandleEquipmentSetUse(WorldPacket& recvData)
     uint8 errorId = 0;
     for (uint32 i = 0; i < EQUIPMENT_SLOT_END; ++i)
     {
-        ObjectGuid itemGuid;
+        WOWGUID itemGuid;
         recvData >> itemGuid.ReadAsPacked();
 
         uint8 srcbag, srcslot;
@@ -1936,7 +1936,7 @@ void User::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<CharacterFactio
         return;
     }
 
-    ObjectGuid::LowType lowGuid = factionChangeInfo->Guid.GetCounter();
+    WOWGUID::LowType lowGuid = factionChangeInfo->Guid.GetCounter();
 
     // get the players old (at this moment current) race
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(factionChangeInfo->Guid);
@@ -2068,7 +2068,7 @@ void User::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<CharacterFactio
     }
 
     // character with this name already exist
-    if (ObjectGuid newguid = sCharacterCache->GetCharacterGuidByName(factionChangeInfo->Name))
+    if (WOWGUID newguid = sCharacterCache->GetCharacterGuidByName(factionChangeInfo->Name))
     {
         if (newguid != factionChangeInfo->Guid)
         {
@@ -2604,7 +2604,7 @@ void User::SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const*
     Send(&data);
 }
 
-void User::SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid)
+void User::SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, WOWGUID guid)
 {
     WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
     data << uint32(result);

@@ -138,7 +138,7 @@ public:
 
         bool isFlameBreathing;
 
-        ObjectGuid FireBombGUIDs[40];
+        WOWGUID FireBombGUIDs[40];
 
         void Reset() override
         {

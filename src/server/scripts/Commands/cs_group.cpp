@@ -61,7 +61,7 @@ public:
 
         Player* player = nullptr;
         Group* group = nullptr;
-        ObjectGuid guid;
+        WOWGUID guid;
 
         if (handler->GetPlayerGroupAndGUIDByName(target->GetName().c_str(), player, group, guid))
         {
@@ -89,7 +89,7 @@ public:
 
         Player* player = nullptr;
         Group* group = nullptr;
-        ObjectGuid guid;
+        WOWGUID guid;
 
         if (handler->GetPlayerGroupAndGUIDByName(target->GetName().c_str(), player, group, guid))
         {
@@ -116,7 +116,7 @@ public:
 
         Player* player = nullptr;
         Group* group = nullptr;
-        ObjectGuid guid;
+        WOWGUID guid;
 
         if (handler->GetPlayerGroupAndGUIDByName(target->GetName().c_str(), player, group, guid, true))
         {
@@ -138,8 +138,8 @@ public:
 
         Player* playerSource = nullptr;
         Group* groupSource = nullptr;
-        ObjectGuid guidSource;
-        ObjectGuid guidTarget;
+        WOWGUID guidSource;
+        WOWGUID guidTarget;
 
         if (handler->GetPlayerGroupAndGUIDByName(playerInGroup.c_str(), playerSource, groupSource, guidSource, true))
         {
@@ -206,7 +206,7 @@ public:
 
         if (!groupTarget)
         {
-            if (ObjectGuid groupGUID = sCharacterCache->GetCharacterGroupGuidByGuid(target->GetGUID()))
+            if (WOWGUID groupGUID = sCharacterCache->GetCharacterGroupGuidByGuid(target->GetGUID()))
             {
                 groupTarget = sGroupMgr->GetGroupByGUID(groupGUID.GetCounter());
             }

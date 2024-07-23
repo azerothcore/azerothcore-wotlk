@@ -41,7 +41,7 @@ public:
     virtual ~ChatHandler() { }
 
     // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
-    static std::size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
+    static std::size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WOWGUID senderGUID, WOWGUID receiverGUID, std::string_view message, uint8 chatTag,
                                   std::string const& senderName = "", std::string const& receiverName = "",
                                   uint32 achievementId = 0, bool gmMessage = false, std::string const& channelName = "");
 
@@ -103,7 +103,7 @@ public:
     virtual LocaleConstant GetSessionDbcLocale() const;
     virtual int GetSessionDbLocaleIndex() const;
 
-    bool HasLowerSecurity(Player* target, ObjectGuid guid = ObjectGuid::Empty, bool strong = false);
+    bool HasLowerSecurity(Player* target, WOWGUID guid = WOWGUID::Empty, bool strong = false);
     bool HasLowerSecurityAccount(User* target, uint32 account, bool strong = false);
 
     void SendGlobalGMSysMessage(const char* str);
@@ -119,18 +119,18 @@ public:
     char* extractQuotedArg(char* args);
 
     uint32    extractSpellIdFromLink(char* text);
-    ObjectGuid::LowType extractLowGuidFromLink(char* text, HighGuid& guidHigh);
-    bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline = false);
+    WOWGUID::LowType extractLowGuidFromLink(char* text, HighGuid& guidHigh);
+    bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, WOWGUID& guid, bool offline = false);
     std::string extractPlayerNameFromLink(char* text);
     // select by arg (name/link) or in-game selection online/offline player
-    bool extractPlayerTarget(char* args, Player** player, ObjectGuid* player_guid = nullptr, std::string* player_name = nullptr);
+    bool extractPlayerTarget(char* args, Player** player, WOWGUID* player_guid = nullptr, std::string* player_name = nullptr);
 
     std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:" + name + "|h[" + name + "]|h|r" : name; }
     std::string GetNameLink(Player* chr) const;
 
     GameObject* GetNearbyGameObject() const;
-    GameObject* GetObjectFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid);
-    Creature* GetCreatureFromPlayerMapByDbGuid(ObjectGuid::LowType lowguid);
+    GameObject* GetObjectFromPlayerMapByDbGuid(WOWGUID::LowType lowguid);
+    Creature* GetCreatureFromPlayerMapByDbGuid(WOWGUID::LowType lowguid);
     bool HasSentErrorMessage() const { return sentErrorMessage; }
     void SetSentErrorMessage(bool val) { sentErrorMessage = val; }
 

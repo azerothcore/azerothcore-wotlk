@@ -15,15 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "Log.h"
 #include "World.h"
 #include <iomanip>
 #include <sstream>
 
-ObjectGuid const ObjectGuid::Empty = ObjectGuid();
+WOWGUID const WOWGUID::Empty = WOWGUID();
 
-char const* ObjectGuid::GetTypeName(HighGuid high)
+char const* WOWGUID::GetTypeName(HighGuid high)
 {
     switch (high)
     {
@@ -44,7 +44,7 @@ char const* ObjectGuid::GetTypeName(HighGuid high)
     }
 }
 
-std::string ObjectGuid::ToString() const
+std::string WOWGUID::ToString() const
 {
     std::ostringstream str;
     str << "GUID Full: 0x" << std::hex << std::setw(16) << std::setfill('0') << _guid << std::dec;
@@ -56,23 +56,23 @@ std::string ObjectGuid::ToString() const
     return str.str();
 }
 
-ObjectGuid ObjectGuid::Global(HighGuid type, LowType counter)
+WOWGUID WOWGUID::Global(HighGuid type, LowType counter)
 {
-    return ObjectGuid(type, counter);
+    return WOWGUID(type, counter);
 }
 
-ObjectGuid ObjectGuid::MapSpecific(HighGuid type, uint32 entry, LowType counter)
+WOWGUID WOWGUID::MapSpecific(HighGuid type, uint32 entry, LowType counter)
 {
-    return ObjectGuid(type, entry, counter);
+    return WOWGUID(type, entry, counter);
 }
 
-ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid)
+ByteBuffer& operator<<(ByteBuffer& buf, WOWGUID const& guid)
 {
     buf << uint64(guid.GetRawValue());
     return buf;
 }
 
-ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid& guid)
+ByteBuffer& operator>>(ByteBuffer& buf, WOWGUID& guid)
 {
     guid.Set(buf.read<uint64>());
     return buf;
@@ -92,7 +92,7 @@ ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid)
 
 void ObjectGuidGeneratorBase::HandleCounterOverflow(HighGuid high)
 {
-    LOG_ERROR("entities.object", "{} guid overflow!! Can't continue, shutting down server. ", ObjectGuid::GetTypeName(high));
+    LOG_ERROR("entities.object", "{} guid overflow!! Can't continue, shutting down server. ", WOWGUID::GetTypeName(high));
     World::StopNow(ERROR_EXIT_CODE);
 }
 

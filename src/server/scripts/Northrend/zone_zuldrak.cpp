@@ -50,27 +50,27 @@ public:
     {
         npc_finklesteinAI(Creature* creature) : ScriptedAI(creature) {}
 
-        std::map<ObjectGuid, uint32> questList;
+        std::map<WOWGUID, uint32> questList;
 
-        void ClearPlayerOnTask(ObjectGuid guid)
+        void ClearPlayerOnTask(WOWGUID guid)
         {
-            std::map<ObjectGuid, uint32>::iterator itr = questList.find(guid);
+            std::map<WOWGUID, uint32>::iterator itr = questList.find(guid);
             if (itr != questList.end())
                 questList.erase(itr);
         }
 
-        bool IsPlayerOnTask(ObjectGuid guid)
+        bool IsPlayerOnTask(WOWGUID guid)
         {
-            std::map<ObjectGuid, uint32>::const_iterator itr = questList.find(guid);
+            std::map<WOWGUID, uint32>::const_iterator itr = questList.find(guid);
             return itr != questList.end();
         }
 
-        void RightClickCauldron(ObjectGuid guid)
+        void RightClickCauldron(WOWGUID guid)
         {
             if (questList.empty())
                 return;
 
-            std::map<ObjectGuid, uint32>::iterator itr = questList.find(guid);
+            std::map<WOWGUID, uint32>::iterator itr = questList.find(guid);
             if (itr == questList.end())
                 return;
 
@@ -110,7 +110,7 @@ public:
         }
 
         // Generate a Task and announce it to the player
-        void StartNextTask(ObjectGuid playerGUID, uint32 counter)
+        void StartNextTask(WOWGUID playerGUID, uint32 counter)
         {
             if (counter > 6)
                 return;
@@ -255,7 +255,7 @@ public:
 
         uint32 findTimer;
         uint32 checkTimer;
-        ObjectGuid ghoulFed;
+        WOWGUID ghoulFed;
 
         void UpdateAI(uint32 diff) override
         {
@@ -386,8 +386,8 @@ public:
 
         EventMap events;
         SummonList summons;
-        ObjectGuid playerGUID;
-        ObjectGuid lichGUID;
+        WOWGUID playerGUID;
+        WOWGUID lichGUID;
 
         void EnterEvadeMode(EvadeReason why) override
         {
@@ -693,7 +693,7 @@ public:
         }
 
     private:
-        ObjectGuid _rageclawGUID;
+        WOWGUID _rageclawGUID;
         uint32 timer;
     };
 

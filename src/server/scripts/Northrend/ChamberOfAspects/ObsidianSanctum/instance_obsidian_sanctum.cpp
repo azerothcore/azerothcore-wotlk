@@ -65,7 +65,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 uiData) const override
+        WOWGUID GetGuidData(uint32 uiData) const override
         {
             switch(uiData)
             {
@@ -79,7 +79,7 @@ public:
                     return m_uiVesperonGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
@@ -181,11 +181,11 @@ public:
         }
 
     private:
-        ObjectGuid m_uiSartharionGUID;
-        ObjectGuid m_uiTenebronGUID;
-        ObjectGuid m_uiShadronGUID;
-        ObjectGuid m_uiVesperonGUID;
-        ObjectGuid m_uiPortalGUID;
+        WOWGUID m_uiSartharionGUID;
+        WOWGUID m_uiTenebronGUID;
+        WOWGUID m_uiShadronGUID;
+        WOWGUID m_uiVesperonGUID;
+        WOWGUID m_uiPortalGUID;
         uint8 portalCount;
     };
 };

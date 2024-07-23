@@ -335,7 +335,7 @@ void OPvPCapturePointZM_GraveYard::SetBeaconState(TeamId controlling_factionId)
 
 bool OPvPCapturePointZM_GraveYard::CanTalkTo(Player* player, Creature* c, GossipMenuItems const& /*gso*/)
 {
-    ObjectGuid guid = c->GetGUID();
+    WOWGUID guid = c->GetGUID();
     auto itr = _creatureTypes.find(guid.GetCounter());
     if (itr != _creatureTypes.end())
     {

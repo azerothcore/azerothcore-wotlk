@@ -88,7 +88,7 @@ void User::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
 
     uint32 gossipListId;
     uint32 menuId;
-    ObjectGuid guid;
+    WOWGUID guid;
     std::string code = "";
 
     recv_data >> guid >> menuId >> gossipListId;
@@ -459,7 +459,7 @@ void User::HandleZoneUpdateOpcode(WorldPacket& recv_data)
 
 void User::HandleSetSelectionOpcode(WorldPacket& recv_data)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recv_data >> guid;
 
     m_player->SetSelection(guid);
@@ -558,7 +558,7 @@ void User::HandleBugOpcode(WorldPacket& recv_data)
 
 void User::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
 {
-    ObjectGuid corpseGUID;
+    WOWGUID corpseGUID;
     recv_data >> corpseGUID;
 
     if (m_player->IsAlive())
@@ -592,7 +592,7 @@ void User::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
 
 void User::HandleResurrectResponseOpcode(WorldPacket& recv_data)
 {
-    ObjectGuid resurrectOfferer;
+    WOWGUID resurrectOfferer;
     bool accept;
     recv_data >> resurrectOfferer;
     recv_data >> accept;
@@ -850,7 +850,7 @@ void User::HandleRequestAccountData(WorldPacket& recv_data)
     dest.resize(destSize);
 
     WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 8 + 4 + 4 + 4 + destSize);
-    data << (m_player ? m_player->GetGUID() : ObjectGuid::Empty); // player guid
+    data << (m_player ? m_player->GetGUID() : WOWGUID::Empty); // player guid
     data << uint32(type);                                       // type (0-7)
     data << uint32(adata->Time);                                // unix time
     data << uint32(size);                                       // decompressed length
@@ -944,7 +944,7 @@ void User::HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& packet)
 
 void User::HandleInspectOpcode(WorldPacket& recv_data)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recv_data >> guid;
 
     Player* player = ObjectAccessor::GetPlayer(*m_player, guid);
@@ -986,7 +986,7 @@ void User::HandleInspectOpcode(WorldPacket& recv_data)
 
 void User::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recv_data >> guid;
 
     Player* player = ObjectAccessor::GetPlayer(*m_player, guid);
@@ -1021,7 +1021,7 @@ void User::HandleComplainOpcode(WorldPacket& recv_data)
     LOG_DEBUG("network", "WORLD: CMSG_COMPLAIN");
 
     uint8 spam_type;                                        // 0 - mail, 1 - chat
-    ObjectGuid spammer_guid;
+    WOWGUID spammer_guid;
     uint32 unk1 = 0;
     uint32 unk2 = 0;
     uint32 unk3 = 0;
@@ -1396,7 +1396,7 @@ void User::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
     // fly mode on/off
     LOG_DEBUG("network", "WORLD: CMSG_MOVE_SET_CAN_FLY_ACK");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recv_data >> guid.ReadAsPacked();
 
     if (!m_player)
@@ -1443,7 +1443,7 @@ void User::HandleSetTaxiBenchmarkOpcode(WorldPacket& recv_data)
 
 void User::HandleQueryInspectAchievements(WorldPacket& recv_data)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
     recv_data >> guid.ReadAsPacked();
 
     Player* player = ObjectAccessor::GetPlayer(*m_player, guid);
@@ -1497,7 +1497,7 @@ void User::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
 
     Battleground* bg = m_player->GetBattleground();
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recv_data >> guid;
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -1520,7 +1520,7 @@ void User::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data)
 
     Battleground* bg = m_player->GetBattleground();
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recv_data >> guid;
 
     Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
@@ -1582,7 +1582,7 @@ void User::HandleUpdateMissileTrajectory(WorldPacket& recvPacket)
 {
     LOG_DEBUG("network", "WORLD: CMSG_UPDATE_MISSILE_TRAJECTORY");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     uint32 spellId;
     float elevation, speed;
     float curX, curY, curZ;

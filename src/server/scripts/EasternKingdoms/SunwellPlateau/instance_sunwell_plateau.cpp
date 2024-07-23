@@ -196,7 +196,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 id) const override
+        WOWGUID GetGuidData(uint32 id) const override
         {
             switch (id)
             {
@@ -233,25 +233,25 @@ public:
                     return blueFlightOrbGUID[id - DATA_ORB_OF_THE_BLUE_DRAGONFLIGHT_1];
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
     protected:
-        ObjectGuid KalecgosDragonGUID;
-        ObjectGuid SathrovarrGUID;
-        ObjectGuid BrutallusGUID;
-        ObjectGuid MadrigosaGUID;
-        ObjectGuid FelmystGUID;
-        ObjectGuid AlythessGUID;
-        ObjectGuid SacrolashGUID;
-        ObjectGuid MuruGUID;
-        ObjectGuid KilJaedenGUID;
-        ObjectGuid KilJaedenControllerGUID;
-        ObjectGuid AnveenaGUID;
-        ObjectGuid KalecgosKjGUID;
+        WOWGUID KalecgosDragonGUID;
+        WOWGUID SathrovarrGUID;
+        WOWGUID BrutallusGUID;
+        WOWGUID MadrigosaGUID;
+        WOWGUID FelmystGUID;
+        WOWGUID AlythessGUID;
+        WOWGUID SacrolashGUID;
+        WOWGUID MuruGUID;
+        WOWGUID KilJaedenGUID;
+        WOWGUID KilJaedenControllerGUID;
+        WOWGUID AnveenaGUID;
+        WOWGUID KalecgosKjGUID;
 
-        ObjectGuid IceBarrierGUID;
-        ObjectGuid blueFlightOrbGUID[4];
+        WOWGUID IceBarrierGUID;
+        WOWGUID blueFlightOrbGUID[4];
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

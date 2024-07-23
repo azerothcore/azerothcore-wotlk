@@ -32,7 +32,7 @@ void User::HandlePetitionBuyOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_BUY");
 
-    ObjectGuid guidNPC;
+    WOWGUID guidNPC;
     uint32 clientIndex;                                     // 1 for guild and arenaslot+1 for arenas in client
     std::string name;
 
@@ -226,7 +226,7 @@ void User::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
 
-    ObjectGuid petitionguid;
+    WOWGUID petitionguid;
     recvData >> petitionguid;                              // petition guid
 
     // solve (possible) some strange compile problems with explicit use petition low guid at some GCC versions (wrong code optimization in compiler?)
@@ -265,8 +265,8 @@ void User::HandlePetitionQueryOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_QUERY");   // ok
 
-    ObjectGuid::LowType guildguid;
-    ObjectGuid petitionguid;
+    WOWGUID::LowType guildguid;
+    WOWGUID petitionguid;
     recvData >> guildguid;                                 // in Trinity always same as petition low guid
     recvData >> petitionguid;                              // petition guid
     LOG_DEBUG("network", "CMSG_PETITION_QUERY Petition ({}) Guild GUID {}", petitionguid.ToString(), guildguid);
@@ -274,7 +274,7 @@ void User::HandlePetitionQueryOpcode(WorldPacket& recvData)
     SendPetitionQueryOpcode(petitionguid);
 }
 
-void User::SendPetitionQueryOpcode(ObjectGuid petitionguid)
+void User::SendPetitionQueryOpcode(WOWGUID petitionguid)
 {
     Petition const* petition = sPetitionMgr->GetPetition(petitionguid);
     if (!petition)
@@ -325,7 +325,7 @@ void User::HandlePetitionRenameOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode MSG_PETITION_RENAME");   // ok
 
-    ObjectGuid petitionGuid;
+    WOWGUID petitionGuid;
     std::string newName;
 
     recvData >> petitionGuid;                              // guid
@@ -390,7 +390,7 @@ void User::HandlePetitionSignOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_SIGN");    // ok
 
-    ObjectGuid petitionGuid;
+    WOWGUID petitionGuid;
     uint8 unk;
     recvData >> petitionGuid;                              // petition guid
     recvData >> unk;
@@ -404,7 +404,7 @@ void User::HandlePetitionSignOpcode(WorldPacket& recvData)
 
     uint8 type = petition->petitionType;
 
-    ObjectGuid playerGuid = m_player->GetGUID();
+    WOWGUID playerGuid = m_player->GetGUID();
     if (petition->ownerGuid == playerGuid)
         return;
 
@@ -529,8 +529,8 @@ void User::HandlePetitionDeclineOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode MSG_PETITION_DECLINE");  // ok
 
-    ObjectGuid petitionguid;
-    ObjectGuid ownerguid;
+    WOWGUID petitionguid;
+    WOWGUID ownerguid;
     recvData >> petitionguid;                              // petition guid
     LOG_DEBUG("network", "Petition {} declined by {}", petitionguid.ToString(), m_player->GetGUID().ToString());
 
@@ -550,7 +550,7 @@ void User::HandleOfferPetitionOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_OFFER_PETITION");   // ok
 
-    ObjectGuid petitionguid, plguid;
+    WOWGUID petitionguid, plguid;
     uint32 junk;
     Player* player;
     recvData >> junk;                                      // this is not petition type!
@@ -643,7 +643,7 @@ void User::HandleTurnInPetitionOpcode(WorldPacket& recvData)
 
     // Get petition guid from packet
     WorldPacket data;
-    ObjectGuid petitionGuid;
+    WOWGUID petitionGuid;
 
     recvData >> petitionGuid;
 
@@ -662,7 +662,7 @@ void User::HandleTurnInPetitionOpcode(WorldPacket& recvData)
         return;
     }
 
-    ObjectGuid ownerGuid = petition->ownerGuid;
+    WOWGUID ownerGuid = petition->ownerGuid;
     uint8 type = petition->petitionType;
     std::string name = petition->petitionName;
 
@@ -814,13 +814,13 @@ void User::HandlePetitionShowListOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "Received CMSG_PETITION_SHOWLIST");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;
 
     SendPetitionShowList(guid);
 }
 
-void User::SendPetitionShowList(ObjectGuid guid)
+void User::SendPetitionShowList(WOWGUID guid)
 {
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_PETITIONER);
     if (!creature)

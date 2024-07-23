@@ -101,7 +101,7 @@ public:
             do
             {
                 Field* fields               = result->Fetch();
-                ObjectGuid::LowType guid    = fields[0].Get<uint32>();
+                WOWGUID::LowType guid    = fields[0].Get<uint32>();
                 float x                     = fields[1].Get<float>();
                 float y                     = fields[2].Get<float>();
                 float z                     = fields[3].Get<float>();
@@ -242,8 +242,8 @@ public:
             do
             {
                 Field* fields                   = result->Fetch();
-                ObjectGuid::LowType itemGuid    = fields[0].Get<uint32>();
-                ObjectGuid::LowType itemSender  = fields[1].Get<uint32>();
+                WOWGUID::LowType itemGuid    = fields[0].Get<uint32>();
+                WOWGUID::LowType itemSender  = fields[1].Get<uint32>();
                 uint32 itemReceiver             = fields[2].Get<uint32>();
                 uint32 itemSenderAccountId      = fields[3].Get<uint32>();
                 std::string itemSenderName      = fields[4].Get<std::string>();
@@ -386,7 +386,7 @@ public:
             do
             {
                 Field* fields               = result->Fetch();
-                ObjectGuid::LowType guid    = fields[0].Get<uint32>();
+                WOWGUID::LowType guid    = fields[0].Get<uint32>();
                 float x                     = fields[1].Get<float>();
                 float y                     = fields[2].Get<float>();
                 float z                     = fields[3].Get<float>();

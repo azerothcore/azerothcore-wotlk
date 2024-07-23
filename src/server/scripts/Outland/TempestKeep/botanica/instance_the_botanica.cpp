@@ -67,7 +67,7 @@ class spell_botanica_call_of_the_falcon_aura : public AuraScript
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        for (ObjectGuid const& guid : _falconSet)
+        for (WOWGUID const& guid : _falconSet)
             if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
             {
                 falcon->TauntFadeOut(GetUnitOwner());

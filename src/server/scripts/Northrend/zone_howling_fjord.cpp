@@ -300,7 +300,7 @@ public:
 
         void Reset() override
         {
-            ObjectGuid summonerGUID;
+            WOWGUID summonerGUID;
             if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                     if (summoner->GetTypeId() == TYPEID_PLAYER)

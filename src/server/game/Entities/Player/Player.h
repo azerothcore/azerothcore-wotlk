@@ -761,7 +761,7 @@ struct EquipmentSet
     std::string Name;
     std::string IconName;
     uint32 IgnoreMask{0};
-    ObjectGuid Items[EQUIPMENT_SLOT_END];
+    WOWGUID Items[EQUIPMENT_SLOT_END];
     EquipmentSetUpdateState state{EQUIPMENT_SET_NEW};
 };
 
@@ -1110,10 +1110,10 @@ public:
     void SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay = 0, bool asSpectator = false);
     [[nodiscard]] bool IsSummonAsSpectator() const;
     void SetSummonAsSpectator(bool on) { m_summon_asSpectator = on; }
-    void SummonIfPossible(bool agree, ObjectGuid summoner_guid);
+    void SummonIfPossible(bool agree, WOWGUID summoner_guid);
     [[nodiscard]] time_t GetSummonExpireTimer() const { return m_summon_expire; }
 
-    bool Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo);
+    bool Create(WOWGUID::LowType guidlow, CharacterCreateInfo* createInfo);
 
     void Update(uint32 time) override;
 
@@ -1138,8 +1138,8 @@ public:
     void SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint32 time, bool onEnterMap);
 
     bool CanInteractWithQuestGiver(Object* questGiver);
-    Creature* GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask);
-    [[nodiscard]] GameObject* GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTypes type) const;
+    Creature* GetNPCIfCanInteractWith(WOWGUID guid, uint32 npcflagmask);
+    [[nodiscard]] GameObject* GetGameObjectIfCanInteractWith(WOWGUID guid, GameobjectTypes type) const;
 
     void ToggleAFK();
     void ToggleDND();
@@ -1247,7 +1247,7 @@ public:
     uint8 FindEquipSlot(ItemTemplate const* proto, uint32 slot, bool swap) const;
     uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item* skipItem = nullptr) const;
     uint32 GetItemCountWithLimitCategory(uint32 limitCategory, Item* skipItem = nullptr) const;
-    [[nodiscard]] Item* GetItemByGuid(ObjectGuid guid) const;
+    [[nodiscard]] Item* GetItemByGuid(WOWGUID guid) const;
     [[nodiscard]] Item* GetItemByEntry(uint32 entry) const;
     [[nodiscard]] Item* GetItemByPos(uint16 pos) const;
     [[nodiscard]] Item* GetItemByPos(uint8 bag, uint8 slot) const;
@@ -1323,8 +1323,8 @@ public:
     BAG_RESULT CanTakeMoreSimilarItems(uint32 entry, uint32 count, Item* pItem, uint32* no_space_count = nullptr) const;
     BAG_RESULT CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& dest, uint32 entry, uint32 count, Item* pItem = nullptr, bool swap = false, uint32* no_space_count = nullptr) const;
 
-    void AddRefundReference(ObjectGuid itemGUID);
-    void DeleteRefundReference(ObjectGuid itemGUID);
+    void AddRefundReference(WOWGUID itemGUID);
+    void DeleteRefundReference(WOWGUID itemGUID);
 
     void ApplyEquipCooldown(Item* pItem);
     void SetAmmo(uint32 item);
@@ -1358,7 +1358,7 @@ public:
     [[nodiscard]] uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END - KEYRING_SLOT_START; }
     void SendInventoryChangeFailure(BAG_RESULT msg, Item* pItem = nullptr, Item* pItem2 = nullptr, uint32 itemid = 0);
     void SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param);
-    void SendSellError(SellResult msg, Creature* creature, ObjectGuid guid, uint32 param);
+    void SendSellError(SellResult msg, Creature* creature, WOWGUID guid, uint32 param);
     void AddWeaponProficiency(uint32 newflag) { m_WeaponProficiency |= newflag; }
     void AddArmorProficiency(uint32 newflag) { m_ArmorProficiency |= newflag; }
     [[nodiscard]] uint32 GetWeaponProficiency() const { return m_WeaponProficiency; }
@@ -1370,7 +1370,7 @@ public:
         return mainItem && mainItem->GetTemplate()->InventoryType == INVTYPE_2HWEAPON && !CanTitanGrip();
     }
     void SendItemPush(Item* item, uint32 count, bool received, bool created, bool broadcast = false, bool sendChatMessage = true);
-    bool BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot);
+    bool BuyItemFromVendorSlot(WOWGUID vendorguid, uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot);
     bool _StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 count, uint8 bag, uint8 slot, int32 price, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
 
     [[nodiscard]] float GetReputationPriceDiscount(Creature const* creature) const;
@@ -1426,10 +1426,10 @@ public:
 
     int32 GetQuestLevel(Quest const* quest) const { return quest && (quest->GetQuestLevel() > 0) ? quest->GetQuestLevel() : GetLevel(); }
 
-    void PrepareQuestMenu(ObjectGuid guid);
-    void SendPreparedQuest(ObjectGuid guid);
+    void PrepareQuestMenu(WOWGUID guid);
+    void SendPreparedQuest(WOWGUID guid);
     [[nodiscard]] bool IsActiveQuest(uint32 quest_id) const;
-    Quest const* GetNextQuest(ObjectGuid guid, Quest const* quest);
+    Quest const* GetNextQuest(WOWGUID guid, Quest const* quest);
     bool CanSeeStartQuest(Quest const* quest);
     bool CanTakeQuest(Quest const* quest, bool msg);
     bool CanAddQuest(Quest const* quest, bool msg);
@@ -1521,12 +1521,12 @@ public:
     void GroupEventHappens(uint32 questId, WorldObject const* pEventObject);
     void ItemAddedQuestCheck(uint32 entry, uint32 count);
     void ItemRemovedQuestCheck(uint32 entry, uint32 count);
-    void KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid);
-    void KilledMonsterCredit(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
+    void KilledMonster(CreatureTemplate const* cInfo, WOWGUID guid);
+    void KilledMonsterCredit(uint32 entry, WOWGUID guid = WOWGUID::Empty);
     void KilledPlayerCredit(uint16 count = 1);
     void KilledPlayerCreditForQuest(uint16 count, Quest const* quest);
-    void KillCreditGO(uint32 entry, ObjectGuid guid = ObjectGuid::Empty);
-    void TalkedToCreature(uint32 entry, ObjectGuid guid);
+    void KillCreditGO(uint32 entry, WOWGUID guid = WOWGUID::Empty);
+    void TalkedToCreature(uint32 entry, WOWGUID guid);
     void MoneyChanged(uint32 value);
     void ReputationChanged(FactionEntry const* factionEntry);
     void ReputationChanged2(FactionEntry const* factionEntry);
@@ -1544,11 +1544,11 @@ public:
     void SendQuestConfirmAccept(Quest const* quest, Player* pReceiver);
     void SendPushToPartyResponse(Player const* player, uint8 msg) const;
     void SendQuestUpdateAddItem(Quest const* quest, uint32 item_idx, uint16 count);
-    void SendQuestUpdateAddCreatureOrGo(Quest const* quest, ObjectGuid guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count);
+    void SendQuestUpdateAddCreatureOrGo(Quest const* quest, WOWGUID guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count);
     void SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint16 add_count);
 
-    ObjectGuid GetDivider() { return m_divider; }
-    void SetDivider(ObjectGuid guid = ObjectGuid::Empty) { m_divider = guid; }
+    WOWGUID GetDivider() { return m_divider; }
+    void SetDivider(WOWGUID guid = WOWGUID::Empty) { m_divider = guid; }
 
     uint32 GetInGameTime() { return m_ingametime; }
 
@@ -1563,12 +1563,12 @@ public:
     /***                   LOAD SYSTEM                     ***/
     /*********************************************************/
 
-    bool LoadFromDB(ObjectGuid guid, CharacterDatabaseQueryHolder const& holder);
+    bool LoadFromDB(WOWGUID guid, CharacterDatabaseQueryHolder const& holder);
     [[nodiscard]] bool isBeingLoaded() const override;
 
-    void Initialize(ObjectGuid::LowType guid);
-    static uint32 GetZoneIdFromDB(ObjectGuid guid);
-    static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, ObjectGuid::LowType guid);
+    void Initialize(WOWGUID::LowType guid);
+    static uint32 GetZoneIdFromDB(WOWGUID guid);
+    static bool   LoadPositionFromDB(uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight, WOWGUID::LowType guid);
 
     static bool IsValidGender(uint8 Gender) { return Gender <= GENDER_FEMALE; }
 
@@ -1583,17 +1583,17 @@ public:
     void _SaveSkills(CharacterDatabaseTransaction trans);
 
     static void Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDatabaseTransaction trans);
-    static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid);
-    static void SavePositionInDB(WorldLocation const& loc, uint16 zoneId, ObjectGuid guid, CharacterDatabaseTransaction trans);
+    static void SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, WOWGUID guid);
+    static void SavePositionInDB(WorldLocation const& loc, uint16 zoneId, WOWGUID guid, CharacterDatabaseTransaction trans);
 
-    static void DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally);
+    static void DeleteFromDB(WOWGUID::LowType lowGuid, uint32 accountId, bool updateRealmChars, bool deleteFinally);
     static void DeleteOldCharacters();
     static void DeleteOldCharacters(uint32 keepDays);
 
     bool m_mailsUpdated;
 
-    void SetBindPoint(ObjectGuid guid);
-    void SendTalentWipeConfirm(ObjectGuid guid);
+    void SetBindPoint(WOWGUID guid);
+    void SendTalentWipeConfirm(WOWGUID guid);
     void ResetPetTalents();
     void CalcRage(uint32 damage, bool attacker);
     void RegenerateAll();
@@ -1632,10 +1632,10 @@ public:
     [[nodiscard]] Unit* GetSelectedUnit() const;
     [[nodiscard]] Player* GetSelectedPlayer() const;
 
-    void SetTarget(ObjectGuid /*guid*/ = ObjectGuid::Empty) override { } /// Used for serverside target changes, does not apply to players
-    void SetSelection(ObjectGuid guid);
+    void SetTarget(WOWGUID /*guid*/ = WOWGUID::Empty) override { } /// Used for serverside target changes, does not apply to players
+    void SetSelection(WOWGUID guid);
 
-    void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, ObjectGuid::LowType item_guid = 0, uint32 item_count = 0);
+    void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, WOWGUID::LowType item_guid = 0, uint32 item_count = 0);
     void SendNewMail();
     void UpdateNextMailTimeAndUnreads();
     void AddNewMailDeliverTime(time_t deliver_time);
@@ -1657,11 +1657,11 @@ public:
     uint8 unReadMails;
     time_t m_nextMailDelivereTime;
 
-    typedef std::unordered_map<ObjectGuid::LowType, Item*> ItemMap;
+    typedef std::unordered_map<WOWGUID::LowType, Item*> ItemMap;
 
     ItemMap mMitems;                                    //template defined in objectmgr.cpp
 
-    Item* GetMItem(ObjectGuid::LowType itemLowGuid)
+    Item* GetMItem(WOWGUID::LowType itemLowGuid)
     {
         ItemMap::const_iterator itr = mMitems.find(itemLowGuid);
         return itr != mMitems.end() ? itr->second : nullptr;
@@ -1674,7 +1674,7 @@ public:
         mMitems[it->GetGUID().GetCounter()] = it;
     }
 
-    bool RemoveMItem(ObjectGuid::LowType itemLowGuid)
+    bool RemoveMItem(WOWGUID::LowType itemLowGuid)
     {
         return !!mMitems.erase(itemLowGuid);
     }
@@ -1717,7 +1717,7 @@ public:
     void BuildPetTalentsInfoData(WorldPacket* data);
     void SendTalentsInfoData(bool pet);
     void LearnTalent(uint32 talentId, uint32 talentRank, bool command = false);
-    void LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRank);
+    void LearnPetTalent(WOWGUID petGuid, uint32 talentId, uint32 talentRank);
 
     bool addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank);
     void _removeTalent(PlayerTalentMap::iterator& itr, uint8 specMask);
@@ -1802,7 +1802,7 @@ public:
     void SetLastPotionId(uint32 item_id) { m_lastPotionId = item_id; }
     void UpdatePotionCooldown(Spell* spell = nullptr);
 
-    void setResurrectRequestData(ObjectGuid guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
+    void setResurrectRequestData(WOWGUID guid, uint32 mapId, float X, float Y, float Z, uint32 health, uint32 mana)
     {
         m_resurrectGUID = guid;
         m_resurrectMap = mapId;
@@ -1812,8 +1812,8 @@ public:
         m_resurrectHealth = health;
         m_resurrectMana = mana;
     }
-    void clearResurrectRequestData() { setResurrectRequestData(ObjectGuid::Empty, 0, 0.0f, 0.0f, 0.0f, 0, 0); }
-    [[nodiscard]] bool isResurrectRequestedBy(ObjectGuid guid) const { return m_resurrectGUID && m_resurrectGUID == guid; }
+    void clearResurrectRequestData() { setResurrectRequestData(WOWGUID::Empty, 0, 0.0f, 0.0f, 0.0f, 0, 0); }
+    [[nodiscard]] bool isResurrectRequestedBy(WOWGUID guid) const { return m_resurrectGUID && m_resurrectGUID == guid; }
     [[nodiscard]] bool isResurrectRequested() const { return m_resurrectGUID; }
     void ResurectUsingRequestData();
 
@@ -1874,7 +1874,7 @@ public:
     bool IsInSameGroupWith(Player const* p) const;
     bool IsInSameRaidWith(Player const* p) const { return p == this || (GetGroup() != nullptr && GetGroup() == p->GetGroup()); }
     void UninviteFromGroup();
-    static void RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, const char* reason = nullptr);
+    static void RemoveFromGroup(Group* group, WOWGUID guid, RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT, WOWGUID kicker = WOWGUID::Empty, const char* reason = nullptr);
     void RemoveFromGroup(RemoveMethod method = GROUP_REMOVEMETHOD_DEFAULT) { RemoveFromGroup(GetGroup(), GetGUID(), method); }
     void SendUpdateToOutOfRangeGroupMembers();
 
@@ -1890,7 +1890,7 @@ public:
     [[nodiscard]] uint32 GetGuildId() const { return GetUInt32Value(PLAYER_GUILDID);  }
     [[nodiscard]] Guild* GetGuild() const;
     uint32 GetGuildIdInvited() { return m_GuildIdInvited; }
-    static void RemovePetitionsAndSigns(ObjectGuid guid, uint32 type);
+    static void RemovePetitionsAndSigns(WOWGUID guid, uint32 type);
 
     // Arena Team
     void SetInArenaTeam(uint32 ArenaTeamId, uint8 slot, uint8 type)
@@ -1900,8 +1900,8 @@ public:
     }
     void SetArenaTeamInfoField(uint8 slot, ArenaTeamInfoType type, uint32 value);
     [[nodiscard]] uint32 GetArenaPersonalRating(uint8 slot) const;
-    static uint32 GetArenaTeamIdFromDB(ObjectGuid guid, uint8 slot);
-    static void LeaveAllArenaTeams(ObjectGuid guid);
+    static uint32 GetArenaTeamIdFromDB(WOWGUID guid, uint8 slot);
+    static void LeaveAllArenaTeams(WOWGUID guid);
     [[nodiscard]] uint32 GetArenaTeamId(uint8 slot) const;
     void SetArenaTeamIdInvited(uint32 ArenaTeamId) { m_ArenaTeamIdInvited = ArenaTeamId; }
     uint32 GetArenaTeamIdInvited() { return m_ArenaTeamIdInvited; }
@@ -1979,8 +1979,8 @@ public:
     void UpdateManaRegen();
     void UpdateRuneRegen(RuneType rune);
 
-    [[nodiscard]] ObjectGuid GetLootGUID() const { return m_lootGuid; }
-    void SetLootGUID(ObjectGuid guid) { m_lootGuid = guid; }
+    [[nodiscard]] WOWGUID GetLootGUID() const { return m_lootGuid; }
+    void SetLootGUID(WOWGUID guid) { m_lootGuid = guid; }
 
     void RemovedInsignia(Player* looterPlr);
 
@@ -2002,7 +2002,7 @@ public:
 
     void SendDungeonDifficulty(bool IsInGroup);
     void SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty = -1);
-    static void ResetInstances(ObjectGuid guid, uint8 method, bool isRaid);
+    static void ResetInstances(WOWGUID guid, uint8 method, bool isRaid);
     void SendResetInstanceSuccess(uint32 MapId);
     void SendResetInstanceFailed(uint32 reason, uint32 MapId);
     void SendResetFailedNotify(uint32 mapid);
@@ -2023,7 +2023,7 @@ public:
     Corpse* CreateCorpse();
     void RemoveCorpse();
     void KillPlayer();
-    static void OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans);
+    static void OfflineResurrect(WOWGUID const guid, CharacterDatabaseTransaction trans);
     [[nodiscard]] bool HasCorpse() const { return _corpseLocation.GetMapId() != MAPID_INVALID; }
     [[nodiscard]] WorldLocation GetCorpseLocation() const { return _corpseLocation; }
     uint32 GetResurrectionSpellId();
@@ -2228,9 +2228,9 @@ public:
     PlayerMenu* PlayerTalkClass;
     std::vector<ItemSetEffect*> ItemSetEff;
 
-    void SendLoot(ObjectGuid guid, LootType loot_type);
-    void SendLootError(ObjectGuid guid, LootError error);
-    void SendLootRelease(ObjectGuid guid);
+    void SendLoot(WOWGUID guid, LootType loot_type);
+    void SendLootError(WOWGUID guid, LootError error);
+    void SendLootRelease(WOWGUID guid);
     void SendNotifyLootItemRemoved(uint8 lootSlot);
     void SendNotifyLootMoneyRemoved();
 
@@ -2377,7 +2377,7 @@ public:
     std::vector<Unit*> m_newVisible; // pussywizard
 
     [[nodiscard]] bool HaveAtClient(WorldObject const* u) const;
-    [[nodiscard]] bool HaveAtClient(ObjectGuid guid) const;
+    [[nodiscard]] bool HaveAtClient(WOWGUID guid) const;
 
     [[nodiscard]] bool IsNeverVisible() const override;
 
@@ -2470,7 +2470,7 @@ public:
     [[nodiscard]] uint64 GetAuraUpdateMaskForRaid() const { return m_auraRaidUpdateMask; }
     void SetAuraUpdateMaskForRaid(uint8 slot) { m_auraRaidUpdateMask |= (uint64(1) << slot); }
     Player* GetNextRandomRaidMember(float radius);
-    [[nodiscard]] PartyResult CanUninviteFromGroup(ObjectGuid targetPlayerGUID = ObjectGuid::Empty) const;
+    [[nodiscard]] PartyResult CanUninviteFromGroup(WOWGUID targetPlayerGUID = WOWGUID::Empty) const;
 
     // Battleground Group System
     void SetBattlegroundOrBattlefieldRaid(Group* group, int8 subgroup = -1);
@@ -2551,9 +2551,9 @@ public:
     bool isDebugAreaTriggers;
 
     void ClearWhisperWhiteList() { WhisperList.clear(); }
-    void AddWhisperWhiteList(ObjectGuid guid) { WhisperList.push_back(guid); }
-    bool IsInWhisperWhiteList(ObjectGuid guid);
-    void RemoveFromWhisperWhiteList(ObjectGuid guid) { WhisperList.remove(guid); }
+    void AddWhisperWhiteList(WOWGUID guid) { WhisperList.push_back(guid); }
+    bool IsInWhisperWhiteList(WOWGUID guid);
+    void RemoveFromWhisperWhiteList(WOWGUID guid) { WhisperList.remove(guid); }
 
     bool SetDisableGravity(bool disable, bool packetOnly = false, bool updateAnimationTier = true) override;
     bool SetCanFly(bool apply, bool packetOnly = false) override;
@@ -2575,18 +2575,18 @@ public:
     [[nodiscard]] bool HasPendingSpectatorForBG(uint32 bgInstanceId) const { return m_pendingSpectatorForBG == bgInstanceId; }
     void SetPendingSpectatorInviteInstanceId(uint32 bgInstanceId) { m_pendingSpectatorInviteInstanceId = bgInstanceId; }
     [[nodiscard]] uint32 GetPendingSpectatorInviteInstanceId() const { return m_pendingSpectatorInviteInstanceId; }
-    bool HasReceivedSpectatorResetFor(ObjectGuid guid) { return m_receivedSpectatorResetFor.find(guid) != m_receivedSpectatorResetFor.end(); }
+    bool HasReceivedSpectatorResetFor(WOWGUID guid) { return m_receivedSpectatorResetFor.find(guid) != m_receivedSpectatorResetFor.end(); }
     void ClearReceivedSpectatorResetFor() { m_receivedSpectatorResetFor.clear(); }
-    void AddReceivedSpectatorResetFor(ObjectGuid guid) { m_receivedSpectatorResetFor.insert(guid); }
-    void RemoveReceivedSpectatorResetFor(ObjectGuid guid) { m_receivedSpectatorResetFor.erase(guid); }
+    void AddReceivedSpectatorResetFor(WOWGUID guid) { m_receivedSpectatorResetFor.insert(guid); }
+    void RemoveReceivedSpectatorResetFor(WOWGUID guid) { m_receivedSpectatorResetFor.erase(guid); }
     uint32 m_pendingSpectatorForBG;
     uint32 m_pendingSpectatorInviteInstanceId;
     GuidSet m_receivedSpectatorResetFor;
 
     // Dancing Rune weapon
-    void setRuneWeaponGUID(ObjectGuid guid) { m_drwGUID = guid; };
-    ObjectGuid getRuneWeaponGUID() { return m_drwGUID; };
-    ObjectGuid m_drwGUID;
+    void setRuneWeaponGUID(WOWGUID guid) { m_drwGUID = guid; };
+    WOWGUID getRuneWeaponGUID() { return m_drwGUID; };
+    WOWGUID m_drwGUID;
 
     [[nodiscard]] bool CanSeeDKPet() const    { return m_ExtraFlags & PLAYER_EXTRA_SHOW_DK_PET; }
     void SetShowDKPet(bool on)  { if (on) m_ExtraFlags |= PLAYER_EXTRA_SHOW_DK_PET; else m_ExtraFlags &= ~PLAYER_EXTRA_SHOW_DK_PET; };
@@ -2680,7 +2680,7 @@ public:
     QuestSet m_monthlyquests;
     SeasonalEventQuestMap m_seasonalquests;
 
-    ObjectGuid m_divider;
+    WOWGUID m_divider;
     uint32 m_ingametime;
 
     /*********************************************************/
@@ -2692,7 +2692,7 @@ public:
     void _LoadGlyphAuras();
     void _LoadInventory(PreparedQueryResult result, uint32 timeDiff);
     void _LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mailItemsResult);
-    static Item* _LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint32 mailId, Mail* mail, Field* fields);
+    static Item* _LoadMailedItem(WOWGUID const& playerGuid, Player* player, uint32 mailId, Mail* mail, Field* fields);
     void _LoadQuestStatus(PreparedQueryResult result);
     void _LoadQuestStatusRewarded(PreparedQueryResult result);
     void _LoadDailyQuestStatus(PreparedQueryResult result);
@@ -2754,7 +2754,7 @@ public:
     time_t m_lastHonorUpdateTime;
 
     void outDebugValues() const;
-    ObjectGuid m_lootGuid;
+    WOWGUID m_lootGuid;
 
     TeamId m_team;
     uint32 m_nextSave; // pussywizard
@@ -2819,7 +2819,7 @@ public:
     ItemDurationList m_itemSoulboundTradeable;
     std::mutex m_soulboundTradableLock;
 
-    ObjectGuid m_resurrectGUID;
+    WOWGUID m_resurrectGUID;
     uint32 m_resurrectMap;
     float m_resurrectX, m_resurrectY, m_resurrectZ;
     uint32 m_resurrectHealth, m_resurrectMana;

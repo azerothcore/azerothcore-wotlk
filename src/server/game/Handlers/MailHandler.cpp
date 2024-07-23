@@ -33,7 +33,7 @@
 
 #define MAX_INBOX_CLIENT_CAPACITY 50
 
-bool User::CanOpenMailBox(ObjectGuid guid)
+bool User::CanOpenMailBox(WOWGUID guid)
 {
     if (guid == m_player->GetGUID())
     {
@@ -61,7 +61,7 @@ bool User::CanOpenMailBox(ObjectGuid guid)
 
 void User::HandleSendMail(WorldPacket& recvData)
 {
-    ObjectGuid mailbox;
+    WOWGUID mailbox;
     uint64 unk3;
     std::string receiver, subject, body;
     uint32 unk1, unk2, money, COD;
@@ -93,7 +93,7 @@ void User::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    ObjectGuid itemGUIDs[MAX_MAIL_ITEMS];
+    WOWGUID itemGUIDs[MAX_MAIL_ITEMS];
 
     for (uint8 i = 0; i < items_count; ++i)
     {
@@ -121,7 +121,7 @@ void User::HandleSendMail(WorldPacket& recvData)
         return;
     }
 
-    ObjectGuid receiverGuid;
+    WOWGUID receiverGuid;
     if (normalizePlayerName(receiver))
     {
         receiverGuid = sCharacterCache->GetCharacterGuidByName(receiver);
@@ -346,7 +346,7 @@ void User::HandleSendMail(WorldPacket& recvData)
 //called when mail is read
 void User::HandleMailMarkAsRead(WorldPacket& recvData)
 {
-    ObjectGuid mailbox;
+    WOWGUID mailbox;
     uint32 mailId;
     recvData >> mailbox;
     recvData >> mailId;
@@ -369,7 +369,7 @@ void User::HandleMailMarkAsRead(WorldPacket& recvData)
 //called when client deletes mail
 void User::HandleMailDelete(WorldPacket& recvData)
 {
-    ObjectGuid mailbox;
+    WOWGUID mailbox;
     uint32 mailId;
     recvData >> mailbox;
     recvData >> mailId;
@@ -399,7 +399,7 @@ void User::HandleMailDelete(WorldPacket& recvData)
 
 void User::HandleMailReturnToSender(WorldPacket& recvData)
 {
-    ObjectGuid mailbox;
+    WOWGUID mailbox;
     uint32 mailId;
     recvData >> mailbox;
     recvData >> mailId;
@@ -421,14 +421,14 @@ void User::HandleMailReturnToSender(WorldPacket& recvData)
         for (MailItemInfoVec::iterator itr = m->items.begin(); itr != m->items.end(); ++itr)
         {
             Item* item = player->GetMItem(itr->item_guid);
-            if (item && !sScriptMgr->CanSendMail(player, ObjectGuid(HighGuid::Player, m->sender), mailbox, m->subject, m->body, m->money, m->COD, item))
+            if (item && !sScriptMgr->CanSendMail(player, WOWGUID(HighGuid::Player, m->sender), mailbox, m->subject, m->body, m->money, m->COD, item))
             {
                 player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
                 return;
             }
         }
     }
-    else if (!sScriptMgr->CanSendMail(player, ObjectGuid(HighGuid::Player, m->sender), mailbox, m->subject, m->body, m->money, m->COD, nullptr))
+    else if (!sScriptMgr->CanSendMail(player, WOWGUID(HighGuid::Player, m->sender), mailbox, m->subject, m->body, m->money, m->COD, nullptr))
     {
         player->SendMailResult(mailId, MAIL_RETURNED_TO_SENDER, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -480,7 +480,7 @@ void User::HandleMailReturnToSender(WorldPacket& recvData)
 //called when player takes item attached in mail
 void User::HandleMailTakeItem(WorldPacket& recvData)
 {
-    ObjectGuid mailbox;
+    WOWGUID mailbox;
     uint32 mailId;
     uint32 itemLowGuid;
     recvData >> mailbox;
@@ -540,7 +540,7 @@ void User::HandleMailTakeItem(WorldPacket& recvData)
             }
             else
             {
-                sender_accId = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, m->sender));
+                sender_accId = sCharacterCache->GetCharacterAccountIdByGuid(WOWGUID(HighGuid::Player, m->sender));
             }
 
             // check player existence
@@ -553,7 +553,7 @@ void User::HandleMailTakeItem(WorldPacket& recvData)
                 if( m->COD >= 10 * GOLD )
                 {
                     std::string senderName;
-                    if (!sCharacterCache->GetCharacterNameByGuid(ObjectGuid(HighGuid::Player, m->sender), senderName))
+                    if (!sCharacterCache->GetCharacterNameByGuid(WOWGUID(HighGuid::Player, m->sender), senderName))
                     {
                         senderName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_UNKNOWN);
                     }
@@ -588,7 +588,7 @@ void User::HandleMailTakeItem(WorldPacket& recvData)
 
 void User::HandleMailTakeMoney(WorldPacket& recvData)
 {
-    ObjectGuid mailbox;
+    WOWGUID mailbox;
     uint32 mailId;
     recvData >> mailbox;
     recvData >> mailId;
@@ -627,7 +627,7 @@ void User::HandleMailTakeMoney(WorldPacket& recvData)
 //called when player lists his received mails
 void User::HandleGetMailList(WorldPacket& recvData)
 {
-    ObjectGuid mailbox;
+    WOWGUID mailbox;
     recvData >> mailbox;
 
     if (!CanOpenMailBox(mailbox))
@@ -675,7 +675,7 @@ void User::HandleGetMailList(WorldPacket& recvData)
         switch (mail->messageType)
         {
             case MAIL_NORMAL:                               // sender guid
-                data << ObjectGuid::Create<HighGuid::Player>(mail->sender);
+                data << WOWGUID::Create<HighGuid::Player>(mail->sender);
                 break;
             case MAIL_CREATURE:
             case MAIL_GAMEOBJECT:
@@ -755,7 +755,7 @@ void User::HandleGetMailList(WorldPacket& recvData)
 //used when player copies mail body to his inventory
 void User::HandleMailCreateTextItem(WorldPacket& recvData)
 {
-    ObjectGuid mailbox;
+    WOWGUID mailbox;
     uint32 mailId;
 
     recvData >> mailbox;
@@ -846,7 +846,7 @@ void User::HandleQueryNextMailTime(WorldPacket& /*recvData*/)
             if (sentSenders.count(mail->sender))
                 continue;
 
-            data << (mail->messageType == MAIL_NORMAL ? ObjectGuid::Create<HighGuid::Player>(mail->sender) : ObjectGuid::Empty);  // player guid
+            data << (mail->messageType == MAIL_NORMAL ? WOWGUID::Create<HighGuid::Player>(mail->sender) : WOWGUID::Empty);  // player guid
             data << uint32(mail->messageType != MAIL_NORMAL ? mail->sender : 0);  // non-player entries
             data << uint32(mail->messageType);
             data << uint32(mail->stationery);

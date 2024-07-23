@@ -414,14 +414,14 @@ struct npc_midsummer_torch_target : public ScriptedAI
         maxCount = 0;
     }
 
-    ObjectGuid playerGUID;
+    WOWGUID playerGUID;
     uint32 startTimer;
     uint32 teleTimer;
     std::vector<Position> posVec;
     uint8 counter;
     uint8 maxCount;
 
-    void SetPlayerGUID(ObjectGuid guid, uint8 cnt)
+    void SetPlayerGUID(WOWGUID guid, uint8 cnt)
     {
         playerGUID = guid;
         maxCount = cnt;
@@ -733,7 +733,7 @@ struct npc_midsummer_ribbon_pole_target : public ScriptedAI
             return;
 
         // remove non-dancing players from list
-        std::erase_if(_dancerList, [this](ObjectGuid dancerGUID)
+        std::erase_if(_dancerList, [this](WOWGUID dancerGUID)
         {
             Player* dancer = ObjectAccessor::GetPlayer(*me, dancerGUID);
             return !dancer || !dancer->HasAura(SPELL_RIBBON_POLE_PERIODIC_VISUAL);
@@ -984,7 +984,7 @@ class spell_midsummer_torch_quest : public AuraScript
         return true;
     }
 
-    ObjectGuid torchGUID;
+    WOWGUID torchGUID;
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {

@@ -74,7 +74,7 @@ class Battlefield;
 class BfGraveyard;
 
 typedef std::vector<BfGraveyard*> GraveyardVect;
-typedef std::map<ObjectGuid, time_t> PlayerTimerMap;
+typedef std::map<WOWGUID, time_t> PlayerTimerMap;
 
 class BfCapturePoint
 {
@@ -89,7 +89,7 @@ public:
     void SendUpdateWorldState(uint32 field, uint32 value);
 
     // Send kill notify to players in the controlling faction
-    void SendObjectiveComplete(uint32 id, ObjectGuid guid);
+    void SendObjectiveComplete(uint32 id, WOWGUID guid);
 
     // Used when player is activated/inactivated in the area
     virtual bool HandlePlayerEnter(Player* player);
@@ -141,7 +141,7 @@ protected:
     uint32 m_capturePointEntry;
 
     // Gameobject related to that capture point
-    ObjectGuid m_capturePoint;
+    WOWGUID m_capturePoint;
 };
 
 class BfGraveyard
@@ -163,10 +163,10 @@ public:
     void SetSpirit(Creature* spirit, TeamId team);
 
     // Add a player to the graveyard
-    void AddPlayer(ObjectGuid player_guid);
+    void AddPlayer(WOWGUID player_guid);
 
     // Remove a player from the graveyard
-    void RemovePlayer(ObjectGuid player_guid);
+    void RemovePlayer(WOWGUID player_guid);
 
     // Resurrect players
     void Resurrect();
@@ -175,7 +175,7 @@ public:
     void RelocateDeadPlayers();
 
     // Check if this graveyard has a spirit guide
-    bool HasNpc(ObjectGuid guid)
+    bool HasNpc(WOWGUID guid)
     {
         if (!m_SpiritGuide[0] && !m_SpiritGuide[1])
             return false;
@@ -189,7 +189,7 @@ public:
     }
 
     // Check if a player is in this graveyard's resurrect queue
-    bool HasPlayer(ObjectGuid guid) const { return m_ResurrectQueue.find(guid) != m_ResurrectQueue.end(); }
+    bool HasPlayer(WOWGUID guid) const { return m_ResurrectQueue.find(guid) != m_ResurrectQueue.end(); }
 
     // Get the graveyard's ID.
     uint32 GetGraveyardId() const { return m_GraveyardId; }
@@ -197,7 +197,7 @@ public:
 protected:
     TeamId m_ControlTeam;
     uint32 m_GraveyardId;
-    ObjectGuid m_SpiritGuide[2];
+    WOWGUID m_SpiritGuide[2];
     GuidUnorderedSet m_ResurrectQueue;
     Battlefield* m_Bf;
 };
@@ -257,7 +257,7 @@ public:
      * \brief Kick player from battlefield and teleport him to kick-point location
      * \param guid : guid of player who must be kick
      */
-    void KickPlayerFromBattlefield(ObjectGuid guid);
+    void KickPlayerFromBattlefield(WOWGUID guid);
 
     /// Called when player (player) enter in zone
     void HandlePlayerEnterZone(Player* player, uint32 zone);
@@ -286,7 +286,7 @@ public:
      */
     Group* GetFreeBfRaid(TeamId TeamId);
     /// Return battlefield group where player is.
-    Group* GetGroupPlayer(ObjectGuid guid, TeamId TeamId);
+    Group* GetGroupPlayer(WOWGUID guid, TeamId TeamId);
     /// Force player to join a battlefield group
     bool AddOrSetPlayerToCorrectBfGroup(Player* player);
 
@@ -294,8 +294,8 @@ public:
     // Find which graveyard the player must be teleported to to be resurrected by spiritguide
     GraveyardStruct const* GetClosestGraveyard(Player* player);
 
-    virtual void AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid player_guid);
-    void RemovePlayerFromResurrectQueue(ObjectGuid player_guid);
+    virtual void AddPlayerToResurrectQueue(WOWGUID npc_guid, WOWGUID player_guid);
+    void RemovePlayerFromResurrectQueue(WOWGUID player_guid);
     void SetGraveyardNumber(uint32 number) { m_GraveyardList.resize(number); }
     BfGraveyard* GetGraveyardById(uint32 id) const;
 
@@ -304,8 +304,8 @@ public:
     Creature* SpawnCreature(uint32 entry, Position pos, TeamId teamId);
     GameObject* SpawnGameObject(uint32 entry, float x, float y, float z, float o);
 
-    Creature* GetCreature(ObjectGuid const guid);
-    GameObject* GetGameObject(ObjectGuid const guid);
+    Creature* GetCreature(WOWGUID const guid);
+    GameObject* GetGameObject(WOWGUID const guid);
 
     // Script-methods
 
@@ -341,7 +341,7 @@ public:
     /// Return if we can use mount in battlefield
     bool CanFlyIn() { return !m_isActive; }
 
-    void SendAreaSpiritHealerQueryOpcode(Player* player, const ObjectGuid& guid);
+    void SendAreaSpiritHealerQueryOpcode(Player* player, const WOWGUID& guid);
 
     void StartBattle();
     void EndBattle(bool endByTimer);
@@ -362,7 +362,7 @@ public:
     void InitStalker(uint32 entry, float x, float y, float z, float o);
 
 protected:
-    ObjectGuid StalkerGuid;
+    WOWGUID StalkerGuid;
     uint32 m_Timer;                                         // Global timer for event
     bool m_IsEnabled;
     bool m_isActive;

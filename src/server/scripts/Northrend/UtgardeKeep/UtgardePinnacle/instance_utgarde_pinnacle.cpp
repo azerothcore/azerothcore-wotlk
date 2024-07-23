@@ -34,20 +34,20 @@ public:
     {
         instance_utgarde_pinnacle_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {Initialize();};
 
-        ObjectGuid SvalaSorrowgrave;
-        ObjectGuid GortokPalehoof;
-        ObjectGuid SkadiRuthless;
-        ObjectGuid KingYmiron;
-        ObjectGuid FrenziedWorgen;
-        ObjectGuid RavenousFurbolg;
-        ObjectGuid MassiveJormungar;
-        ObjectGuid FerociousRhino;
-        ObjectGuid Grauf;
+        WOWGUID SvalaSorrowgrave;
+        WOWGUID GortokPalehoof;
+        WOWGUID SkadiRuthless;
+        WOWGUID KingYmiron;
+        WOWGUID FrenziedWorgen;
+        WOWGUID RavenousFurbolg;
+        WOWGUID MassiveJormungar;
+        WOWGUID FerociousRhino;
+        WOWGUID Grauf;
 
-        ObjectGuid SvalaMirrorGUID;
-        ObjectGuid SkadiRuthlessDoor;
-        ObjectGuid YmironDoor;
-        ObjectGuid StatisGenerator;
+        WOWGUID SvalaMirrorGUID;
+        WOWGUID SkadiRuthlessDoor;
+        WOWGUID YmironDoor;
+        WOWGUID StatisGenerator;
         uint32 Encounters[MAX_ENCOUNTERS];
         uint8 SkadiHits;
         uint8 SkadiInRange;
@@ -119,12 +119,12 @@ public:
                 case GO_SKADI_THE_RUTHLESS_DOOR:
                     SkadiRuthlessDoor = pGo->GetGUID();
                     if (Encounters[DATA_SKADI_THE_RUTHLESS] == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, pGo);
+                        HandleGameObject(WOWGUID::Empty, true, pGo);
                     break;
                 case GO_KING_YMIRON_DOOR:
                     YmironDoor = pGo->GetGUID();
                     if (Encounters[DATA_KING_YMIRON] == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, pGo);
+                        HandleGameObject(WOWGUID::Empty, true, pGo);
                     break;
                 case GO_GORK_PALEHOOF_SPHERE:
                     StatisGenerator = pGo->GetGUID();
@@ -230,7 +230,7 @@ public:
             return 0;
         }
 
-        ObjectGuid GetGuidData(uint32 identifier) const override
+        WOWGUID GetGuidData(uint32 identifier) const override
         {
             switch (identifier)
             {
@@ -262,7 +262,7 @@ public:
                     return SvalaMirrorGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
     };
 };

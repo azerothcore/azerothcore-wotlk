@@ -19,7 +19,7 @@
 #define SCRIPT_OBJECT_GLOBAL_SCRIPT_H_
 
 #include "DBCEnums.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "ScriptObject.h"
 #include <map>
 #include <vector>
@@ -57,7 +57,7 @@ protected:
 
 public:
     // items
-    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, ObjectGuid::LowType /*itemGuid*/) { }
+    virtual void OnItemDelFromDB(CharacterDatabaseTransaction /*trans*/, WOWGUID::LowType /*itemGuid*/) { }
     virtual void OnMirrorImageDisplayItem(Item const* /*item*/, uint32& /*display*/) { }
 
     // loot
@@ -70,7 +70,7 @@ public:
     virtual void OnAfterInitializeLockedDungeons(Player* /*player*/) { }
 
     // On Before arena points distribution
-    virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<ObjectGuid, uint32>& /*ap*/) { }
+    virtual void OnBeforeUpdateArenaPoints(ArenaTeam* /*at*/, std::map<WOWGUID, uint32>& /*ap*/) { }
 
     // Called when a dungeon encounter is updated.
     virtual void OnAfterUpdateEncounterState(Map* /*map*/, EncounterCreditType /*type*/,  uint32 /*creditEntry*/, Unit* /*source*/, Difficulty /*difficulty_fixed*/, std::list<DungeonEncounter const*> const* /*encounters*/, uint32 /*dungeonCompleted*/, bool /*updated*/) { }
@@ -88,10 +88,10 @@ public:
     virtual void OnLoadSpellCustomAttr(SpellInfo* /*spell*/) { }
 
     // Called when checking if a player can see the creature loot item
-    virtual bool OnAllowedForPlayerLootCheck(Player const* /*player*/, ObjectGuid /*source*/) { return false; };
+    virtual bool OnAllowedForPlayerLootCheck(Player const* /*player*/, WOWGUID /*source*/) { return false; };
 
     // Called when checking if a player can see the creature loot (if it can click the corpse f.e)
-    virtual bool OnAllowedToLootContainerCheck(Player const* /*player*/, ObjectGuid /*source*/) { return false; };
+    virtual bool OnAllowedToLootContainerCheck(Player const* /*player*/, WOWGUID /*source*/) { return false; };
 
     // Called when instance id is removed from database (e.g. instance reset)
     virtual void OnInstanceIdRemoved(uint32 /*instanceId*/) { }

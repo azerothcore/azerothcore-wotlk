@@ -67,12 +67,12 @@ namespace lfg
         m_State = m_OldState;
     }
 
-    void LfgGroupData::AddPlayer(ObjectGuid guid)
+    void LfgGroupData::AddPlayer(WOWGUID guid)
     {
         m_Players.insert(guid);
     }
 
-    uint8 LfgGroupData::RemovePlayer(ObjectGuid guid)
+    uint8 LfgGroupData::RemovePlayer(WOWGUID guid)
     {
         LfgGuidSet::iterator it = m_Players.find(guid);
         if (it != m_Players.end())
@@ -85,7 +85,7 @@ namespace lfg
         m_Players.clear();
     }
 
-    void LfgGroupData::SetLeader(ObjectGuid guid)
+    void LfgGroupData::SetLeader(WOWGUID guid)
     {
         m_Leader = guid;
     }
@@ -121,7 +121,7 @@ namespace lfg
         return m_Players.size();
     }
 
-    ObjectGuid LfgGroupData::GetLeader() const
+    WOWGUID LfgGroupData::GetLeader() const
     {
         return m_Leader;
     }

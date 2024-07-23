@@ -68,7 +68,7 @@ void OPvPCapturePoint::SendChangePhase()
     SendUpdateWorldState(_capturePoint->GetGOInfo()->capturePoint.worldstate3, _neutralValuePct);
 }
 
-void OPvPCapturePoint::AddGO(uint32 type, ObjectGuid::LowType guid, uint32 entry)
+void OPvPCapturePoint::AddGO(uint32 type, WOWGUID::LowType guid, uint32 entry)
 {
     if (!entry)
     {
@@ -85,7 +85,7 @@ void OPvPCapturePoint::AddGO(uint32 type, ObjectGuid::LowType guid, uint32 entry
     _objectTypes[_objects[type]] = type;
 }
 
-void OPvPCapturePoint::AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entry)
+void OPvPCapturePoint::AddCre(uint32 type, WOWGUID::LowType guid, uint32 entry)
 {
     if (!entry)
     {
@@ -104,7 +104,7 @@ void OPvPCapturePoint::AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entr
 
 bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o, float rotation0, float rotation1, float rotation2, float rotation3)
 {
-    if (ObjectGuid::LowType guid = sObjectMgr->AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3))
+    if (WOWGUID::LowType guid = sObjectMgr->AddGOData(entry, map, x, y, z, o, 0, rotation0, rotation1, rotation2, rotation3))
     {
         AddGO(type, guid, entry);
         return true;
@@ -115,7 +115,7 @@ bool OPvPCapturePoint::AddObject(uint32 type, uint32 entry, uint32 map, float x,
 
 bool OPvPCapturePoint::AddCreature(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o, uint32 spawntimeDelay)
 {
-    if (ObjectGuid::LowType guid = sObjectMgr->AddCreData(entry, map, x, y, z, o, spawntimeDelay))
+    if (WOWGUID::LowType guid = sObjectMgr->AddCreData(entry, map, x, y, z, o, spawntimeDelay))
     {
         AddCre(type, guid, entry);
         return true;
@@ -150,7 +150,7 @@ bool OPvPCapturePoint::SetCapturePointData(uint32 entry, uint32 map, float x, fl
 
 bool OPvPCapturePoint::DelCreature(uint32 type)
 {
-    ObjectGuid::LowType spawnId = _creatures[type];
+    WOWGUID::LowType spawnId = _creatures[type];
     if (!spawnId)
     {
         LOG_DEBUG("outdoorpvp", "OutdoorPvP: Creature type {} was already deleted", type);
@@ -192,7 +192,7 @@ bool OPvPCapturePoint::DelCreature(uint32 type)
 
 bool OPvPCapturePoint::DelObject(uint32 type)
 {
-    ObjectGuid::LowType spawnId = _objects[type];
+    WOWGUID::LowType spawnId = _objects[type];
     if (!spawnId)
         return false;
 
@@ -325,7 +325,7 @@ bool OPvPCapturePoint::Update(uint32 diff)
     {
         for (auto itr = activePlayer.begin(); itr != activePlayer.end();)
         {
-            ObjectGuid playerGuid = *itr;
+            WOWGUID playerGuid = *itr;
             ++itr;
 
             if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
@@ -474,7 +474,7 @@ void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
     }
 }
 
-void OPvPCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
+void OPvPCapturePoint::SendObjectiveComplete(uint32 id, WOWGUID guid)
 {
     uint32 team;
     switch (_state)
@@ -726,7 +726,7 @@ void OutdoorPvP::SetMapFromZone(uint32 zone)
     _map = map;
 }
 
-OPvPCapturePoint* OutdoorPvP::GetCapturePoint(ObjectGuid::LowType spawnId) const
+OPvPCapturePoint* OutdoorPvP::GetCapturePoint(WOWGUID::LowType spawnId) const
 {
     auto const itr = _capturePoints.find(spawnId);
     if (itr != _capturePoints.end())

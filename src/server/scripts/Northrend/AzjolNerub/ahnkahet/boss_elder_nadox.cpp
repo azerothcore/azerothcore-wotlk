@@ -232,7 +232,7 @@ struct boss_elder_nadox : public BossAI
 private:
     GuidList swarmEggs;
     GuidList guardianEggs;
-    ObjectGuid previousSwarmEgg_GUID;   // This will prevent casting summoning spells on same egg twice
+    WOWGUID previousSwarmEgg_GUID;   // This will prevent casting summoning spells on same egg twice
     bool guardianSummoned;
     bool respectYourElders;
 
@@ -251,7 +251,7 @@ private:
             // Remove previous egg
             if (previousSwarmEgg_GUID)
             {
-                std::list<ObjectGuid>::iterator itr = std::find(swarmEggs2.begin(), swarmEggs2.end(), previousSwarmEgg_GUID);
+                std::list<WOWGUID>::iterator itr = std::find(swarmEggs2.begin(), swarmEggs2.end(), previousSwarmEgg_GUID);
                 if (itr != swarmEggs2.end())
                 {
                     swarmEggs2.erase(itr);
@@ -282,7 +282,7 @@ private:
                 return;
             }
 
-            ObjectGuid const& guardianEggGUID = Acore::Containers::SelectRandomContainerElement(guardianEggs);
+            WOWGUID const& guardianEggGUID = Acore::Containers::SelectRandomContainerElement(guardianEggs);
             if (Creature* egg = ObjectAccessor::GetCreature(*me, guardianEggGUID))
             {
                 egg->CastSpell(egg, SPELL_SUMMON_SWARM_GUARD, true, nullptr, nullptr, me->GetGUID());

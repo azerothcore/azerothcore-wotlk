@@ -36,16 +36,16 @@ public:
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-        ObjectGuid m_uiGeneralBjarngrimGUID;
-        ObjectGuid m_uiIonarGUID;
-        ObjectGuid m_uiLokenGUID;
-        ObjectGuid m_uiVolkhanGUID;
+        WOWGUID m_uiGeneralBjarngrimGUID;
+        WOWGUID m_uiIonarGUID;
+        WOWGUID m_uiLokenGUID;
+        WOWGUID m_uiVolkhanGUID;
 
-        ObjectGuid m_uiBjarngrimDoorGUID;
-        ObjectGuid m_uiVolkhanDoorGUID;
-        ObjectGuid m_uiIonarDoorGUID;
-        ObjectGuid m_uiLokenDoorGUID;
-        ObjectGuid m_uiLokenGlobeGUID;
+        WOWGUID m_uiBjarngrimDoorGUID;
+        WOWGUID m_uiVolkhanDoorGUID;
+        WOWGUID m_uiIonarDoorGUID;
+        WOWGUID m_uiLokenDoorGUID;
+        WOWGUID m_uiLokenGlobeGUID;
 
         bool volkhanAchievement;
         bool bjarngrimAchievement;
@@ -195,7 +195,7 @@ public:
             return m_auiEncounter[uiType];
         }
 
-        ObjectGuid GetGuidData(uint32 uiData) const override
+        WOWGUID GetGuidData(uint32 uiData) const override
         {
             switch(uiData)
             {
@@ -209,7 +209,7 @@ public:
                     return m_uiLokenGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
     };
 };

@@ -402,12 +402,12 @@ LootItem::LootItem(LootStoreItem const& li)
     is_blocked = 0;
     is_underthreshold = 0;
     is_counted = 0;
-    rollWinnerGUID = ObjectGuid::Empty;
+    rollWinnerGUID = WOWGUID::Empty;
     groupid = li.groupid;
 }
 
 // Basic checks for player/item compatibility - if false no chance to see the item in the loot
-bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
+bool LootItem::AllowedForPlayer(Player const* player, WOWGUID source) const
 {
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
     if (!pProto)
@@ -619,7 +619,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
 void Loot::FillNotNormalLootFor(Player* player)
 {
-    ObjectGuid playerGuid = player->GetGUID();
+    WOWGUID playerGuid = player->GetGUID();
 
     QuestItemMap::const_iterator qmapitr = PlayerQuestItems.find(playerGuid);
     if (qmapitr == PlayerQuestItems.end())

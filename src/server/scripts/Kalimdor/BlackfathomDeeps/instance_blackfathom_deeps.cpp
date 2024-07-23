@@ -87,7 +87,7 @@ public:
                     break;
                 case GO_AKU_MAI_DOOR:
                     if (IsFireEventDone() && _encounters[TYPE_AKU_MAI_EVENT] == DONE)
-                        HandleGameObject(ObjectGuid::Empty, true, gameobject);
+                        HandleGameObject(WOWGUID::Empty, true, gameobject);
                     _akumaiPortalGUID = gameobject->GetGUID();
                     break;
             }
@@ -139,7 +139,7 @@ public:
 
     private:
         uint32 _encounters[MAX_ENCOUNTERS];
-        ObjectGuid _akumaiPortalGUID;
+        WOWGUID _akumaiPortalGUID;
         uint8 _requiredDeaths;
     };
 };

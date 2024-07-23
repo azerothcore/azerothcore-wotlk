@@ -253,7 +253,7 @@ class ArenaLogEntryData
 public:
     ArenaLogEntryData() = default;
 
-    void Fill(std::string_view name, ObjectGuid::LowType guid, uint32 acc, uint32 arenaTeamId, std::string ip)
+    void Fill(std::string_view name, WOWGUID::LowType guid, uint32 acc, uint32 arenaTeamId, std::string ip)
     {
         Name = std::string(name);
         Guid = guid;
@@ -263,7 +263,7 @@ public:
     }
 
     std::string Name{};
-    ObjectGuid::LowType Guid{0};
+    WOWGUID::LowType Guid{0};
     uint32 Acc{0};
     uint32 ArenaTeamId{0};
     std::string IP{};
@@ -384,39 +384,39 @@ public:
     [[nodiscard]] uint32 GetMaxFreeSlots() const;
 
     typedef std::set<Player*> SpectatorList;
-    typedef std::map<ObjectGuid, ObjectGuid> ToBeTeleportedMap;
+    typedef std::map<WOWGUID, WOWGUID> ToBeTeleportedMap;
     void AddSpectator(Player* p) { m_Spectators.insert(p); }
     void RemoveSpectator(Player* p) { m_Spectators.erase(p); }
     bool HaveSpectators() { return !m_Spectators.empty(); }
     [[nodiscard]] const SpectatorList& GetSpectators() const { return m_Spectators; }
-    void AddToBeTeleported(ObjectGuid spectator, ObjectGuid participant) { m_ToBeTeleported[spectator] = participant; }
-    void RemoveToBeTeleported(ObjectGuid spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
+    void AddToBeTeleported(WOWGUID spectator, WOWGUID participant) { m_ToBeTeleported[spectator] = participant; }
+    void RemoveToBeTeleported(WOWGUID spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
     void SpectatorsSendPacket(WorldPacket& data);
 
     [[nodiscard]] bool isArena() const        { return m_IsArena; }
     [[nodiscard]] bool isBattleground() const { return !m_IsArena; }
     [[nodiscard]] bool isRated() const        { return m_IsRated; }
 
-    typedef std::map<ObjectGuid, Player*> BattlegroundPlayerMap;
+    typedef std::map<WOWGUID, Player*> BattlegroundPlayerMap;
     [[nodiscard]] BattlegroundPlayerMap const& GetPlayers() const { return m_Players; }
     [[nodiscard]] uint32 GetPlayersSize() const { return m_Players.size(); }
 
     void ReadyMarkerClicked(Player* p); // pussywizard
     GuidSet readyMarkerClickedSet; // pussywizard
 
-    typedef std::unordered_map<ObjectGuid::LowType, BattlegroundScore*> BattlegroundScoreMap;
-    typedef std::unordered_map<ObjectGuid, ArenaLogEntryData> ArenaLogEntryDataMap; // pussywizard
+    typedef std::unordered_map<WOWGUID::LowType, BattlegroundScore*> BattlegroundScoreMap;
+    typedef std::unordered_map<WOWGUID, ArenaLogEntryData> ArenaLogEntryDataMap; // pussywizard
     ArenaLogEntryDataMap ArenaLogEntries; // pussywizard
     [[nodiscard]] BattlegroundScoreMap const* GetPlayerScores() const { return &PlayerScores; }
     [[nodiscard]] std::size_t GetPlayerScoresSize() const { return PlayerScores.size(); }
 
     [[nodiscard]] uint32 GetReviveQueueSize() const { return m_ReviveQueue.size(); }
 
-    void AddPlayerToResurrectQueue(ObjectGuid npc_guid, ObjectGuid player_guid);
+    void AddPlayerToResurrectQueue(WOWGUID npc_guid, WOWGUID player_guid);
     void RemovePlayerFromResurrectQueue(Player* player);
 
     /// Relocate all players in ReviveQueue to the closest graveyard
-    void RelocateDeadPlayers(ObjectGuid queueIndex);
+    void RelocateDeadPlayers(WOWGUID queueIndex);
 
     void StartBattleground();
 
@@ -516,7 +516,7 @@ public:
     virtual void EventPlayerUsedGO(Player* /*player*/, GameObject* /*go*/) {}
 
     // this function can be used by spell to interact with the BG map
-    virtual void DoAction(uint32 /*action*/, ObjectGuid /*var*/) {}
+    virtual void DoAction(uint32 /*action*/, WOWGUID /*var*/) {}
 
     virtual void HandlePlayerResurrect(Player* /*player*/) {}
 
@@ -544,7 +544,7 @@ public:
     bool DelCreature(uint32 type);
     bool DelObject(uint32 type);
     bool AddSpiritGuide(uint32 type, float x, float y, float z, float o, TeamId teamId);
-    int32 GetObjectType(ObjectGuid guid);
+    int32 GetObjectType(WOWGUID guid);
 
     void DoorOpen(uint32 type);
     void DoorClose(uint32 type);
@@ -555,15 +555,15 @@ public:
 
     // since arenas can be AvA or Hvh, we have to get the "temporary" team of a player
     static TeamId GetOtherTeamId(TeamId teamId);
-    [[nodiscard]] bool IsPlayerInBattleground(ObjectGuid guid) const;
+    [[nodiscard]] bool IsPlayerInBattleground(WOWGUID guid) const;
 
     [[nodiscard]] bool ToBeDeleted() const { return m_SetDeleteThis; }
     //void SetDeleteThis() { m_SetDeleteThis = true; }
 
     void RewardXPAtKill(Player* killer, Player* victim);
 
-    [[nodiscard]] virtual ObjectGuid GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return ObjectGuid::Empty; }
-    virtual void SetDroppedFlagGUID(ObjectGuid /*guid*/, TeamId /*teamId*/ = TEAM_NEUTRAL) {}
+    [[nodiscard]] virtual WOWGUID GetFlagPickerGUID(TeamId /*teamId*/ = TEAM_NEUTRAL) const { return WOWGUID::Empty; }
+    virtual void SetDroppedFlagGUID(WOWGUID /*guid*/, TeamId /*teamId*/ = TEAM_NEUTRAL) {}
     [[nodiscard]] uint32 GetTeamScore(TeamId teamId) const;
 
     virtual TeamId GetPrematureWinner();
@@ -623,7 +623,7 @@ protected:
     // Player lists, those need to be accessible by inherited classes
     BattlegroundPlayerMap m_Players;
     // Spirit Guide guid + Player list GUIDS
-    std::map<ObjectGuid, GuidVector> m_ReviveQueue;
+    std::map<WOWGUID, GuidVector> m_ReviveQueue;
 
     // these are important variables used for starting messages
     uint8 m_Events;

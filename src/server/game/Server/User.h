@@ -295,7 +295,7 @@ struct CharacterRenameInfo
     friend class User;
 
 protected:
-    ObjectGuid Guid;
+    WOWGUID Guid;
     std::string Name;
 };
 
@@ -387,7 +387,7 @@ public:
     uint32 GetCurrentVendor() const { return m_currentVendorEntry; }
     void SetCurrentVendor(uint32 vendorEntry) { m_currentVendorEntry = vendorEntry; }
 
-    ObjectGuid::LowType GetGuidLow() const;
+    WOWGUID::LowType GetGuidLow() const;
     void SetSecurity(AccountTypes security) { _security = security; }
     std::string const& GetRemoteAddress() { return m_Address; }
     void SetPlayer(Player* player);
@@ -418,38 +418,38 @@ public:
     /// Handle the authentication waiting queue (to be completed)
     void SendAuthWaitQueue(uint32 position);
 
-    //void SendTestCreatureQueryOpcode(uint32 entry, ObjectGuid guid, uint32 testvalue);
-    void SendNameQueryOpcode(ObjectGuid guid);
+    //void SendTestCreatureQueryOpcode(uint32 entry, WOWGUID guid, uint32 testvalue);
+    void SendNameQueryOpcode(WOWGUID guid);
 
-    void SendTrainerList(ObjectGuid guid);
-    void SendTrainerList(ObjectGuid guid, std::string const& strTitle);
-    void SendListInventory(ObjectGuid guid, uint32 vendorEntry = 0);
-    void SendShowBank(ObjectGuid guid);
-    bool CanOpenMailBox(ObjectGuid guid);
-    void SendShowMailBox(ObjectGuid guid);
-    void SendTabardVendorActivate(ObjectGuid guid);
+    void SendTrainerList(WOWGUID guid);
+    void SendTrainerList(WOWGUID guid, std::string const& strTitle);
+    void SendListInventory(WOWGUID guid, uint32 vendorEntry = 0);
+    void SendShowBank(WOWGUID guid);
+    bool CanOpenMailBox(WOWGUID guid);
+    void SendShowMailBox(WOWGUID guid);
+    void SendTabardVendorActivate(WOWGUID guid);
     void SendSpiritResurrect();
     void SendBindPoint(Creature* npc);
 
     void SendAttackStop(Unit const* enemy);
 
-    void SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId = BATTLEGROUND_RB);
+    void SendBattleGroundList(WOWGUID guid, BattlegroundTypeId bgTypeId = BATTLEGROUND_RB);
 
     void SendTradeStatus(TradeStatus status);
     void SendUpdateTrade(bool trader_data = true);
     void SendCancelTrade();
 
-    void SendPetitionQueryOpcode(ObjectGuid petitionguid);
+    void SendPetitionQueryOpcode(WOWGUID petitionguid);
 
     // Spell
     void HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets& targets);
 
     // Pet
-    void SendPetNameQuery(ObjectGuid guid, uint32 petnumber);
-    void SendStablePet(ObjectGuid guid);
-    void SendStablePetCallback(ObjectGuid guid, PreparedQueryResult result);
+    void SendPetNameQuery(WOWGUID guid, uint32 petnumber);
+    void SendStablePet(WOWGUID guid);
+    void SendStablePetCallback(WOWGUID guid, PreparedQueryResult result);
     void SendStableResult(uint8 guid);
-    bool CheckStableMaster(ObjectGuid guid);
+    bool CheckStableMaster(WOWGUID guid);
 
     // Account Data
     AccountData* GetAccountData(AccountDataType type) { return &m_accountData[type]; }
@@ -470,17 +470,17 @@ public:
         }
     }
     //auction
-    void SendAuctionHello(ObjectGuid guid, Creature* unit);
+    void SendAuctionHello(WOWGUID guid, Creature* unit);
     void SendAuctionCommandResult(uint32 auctionId, uint32 Action, uint32 ErrorCode, uint32 bidError = 0);
-    void SendAuctionBidderNotification(uint32 location, uint32 auctionId, ObjectGuid bidder, uint32 bidSum, uint32 diff, uint32 item_template);
+    void SendAuctionBidderNotification(uint32 location, uint32 auctionId, WOWGUID bidder, uint32 bidSum, uint32 diff, uint32 item_template);
     void SendAuctionOwnerNotification(AuctionEntry* auction);
 
     //Item Enchantment
-    void SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint32 itemId, uint32 enchantId);
-    void SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid Itemguid, uint32 slot, uint32 Duration);
+    void SendEnchantmentLog(WOWGUID target, WOWGUID caster, uint32 itemId, uint32 enchantId);
+    void SendItemEnchantTimeUpdate(WOWGUID Playerguid, WOWGUID Itemguid, uint32 slot, uint32 Duration);
 
     //Taxi
-    void SendTaxiStatus(ObjectGuid guid);
+    void SendTaxiStatus(WOWGUID guid);
     void SendTaxiMenu(Creature* unit);
     void SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathNode = 0);
     bool SendLearnNewTaxiNode(Creature* unit);
@@ -489,11 +489,11 @@ public:
     // Guild/Arena Team
     void SendArenaTeamCommandResult(uint32 team_action, std::string const& team, std::string const& player, uint32 error_id = 0);
     void SendNotInArenaTeamPacket(uint8 type);
-    void SendPetitionShowList(ObjectGuid guid);
+    void SendPetitionShowList(WOWGUID guid);
 
     void BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data);
 
-    void DoLootRelease(ObjectGuid lguid);
+    void DoLootRelease(WOWGUID lguid);
 
     // Account mute time
     time_t m_muteTime;
@@ -559,7 +559,7 @@ public:                                                 // opcodes handlers
     void SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo);
     void SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo);
     void SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo);
-    void SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, ObjectGuid guid);
+    void SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, WOWGUID guid);
 
     // played time
     void HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& packet);
@@ -734,7 +734,7 @@ public:                                                 // opcodes handlers
     void HandleBuyStableSlot(WorldPacket& recvPacket);
     void HandleStableRevivePet(WorldPacket& recvPacket);
     void HandleStableSwapPet(WorldPacket& recvPacket);
-    void HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, ObjectGuid::LowType itemLowGUID, PreparedQueryResult result);
+    void HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, WOWGUID::LowType itemLowGUID, PreparedQueryResult result);
     void HandleLoadActionsSwitchSpec(PreparedQueryResult result);
     void HandleCharacterAuraFrozen(PreparedQueryResult result);
 
@@ -758,7 +758,7 @@ public:                                                 // opcodes handlers
     void HandleAuctionSellItem(WorldPacket& recvData);
     void HandleAuctionRemoveItem(WorldPacket& recvData);
     void HandleAuctionListOwnerItems(WorldPacket& recvData);
-    void HandleAuctionListOwnerItemsEvent(ObjectGuid creatureGuid);
+    void HandleAuctionListOwnerItemsEvent(WOWGUID creatureGuid);
     void HandleAuctionPlaceBid(WorldPacket& recvData);
     void HandleAuctionListPendingSales(WorldPacket& recvData);
 
@@ -878,7 +878,7 @@ public:                                                 // opcodes handlers
     //Pet
     void HandlePetAction(WorldPacket& recvData);
     void HandlePetStopAttack(WorldPackets::Pet::PetStopAttack& packet);
-    void HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spellid, uint16 flag, ObjectGuid guid2);
+    void HandlePetActionHelper(Unit* pet, WOWGUID guid1, uint32 spellid, uint16 flag, WOWGUID guid2);
     void HandlePetNameQuery(WorldPacket& recvData);
     void HandlePetSetAction(WorldPacket& recvData);
     void HandlePetAbandon(WorldPackets::Pet::PetAbandon& packet);
@@ -950,7 +950,7 @@ public:                                                 // opcodes handlers
 
     void SendLfgUpdatePlayer(lfg::LfgUpdateData const& updateData);
     void SendLfgUpdateParty(lfg::LfgUpdateData const& updateData);
-    void SendLfgRoleChosen(ObjectGuid guid, uint8 roles);
+    void SendLfgRoleChosen(WOWGUID guid, uint8 roles);
     void SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& pRoleCheck);
     void SendLfgLfrList(bool update);
     void SendLfgJoinResult(lfg::LfgJoinResultData const& joinData);
@@ -1122,7 +1122,7 @@ private:
     // private trade methods
     void moveItems(Item* myItems[], Item* hisItems[]);
 
-    bool CanUseBank(ObjectGuid bankerGUID = ObjectGuid::Empty) const;
+    bool CanUseBank(WOWGUID bankerGUID = WOWGUID::Empty) const;
 
     bool recoveryItem(Item* pItem);
 
@@ -1131,7 +1131,7 @@ private:
     void LogUnprocessedTail(WorldPacket* packet);
 
     // EnumData helpers
-    bool IsLegitCharacterForAccount(ObjectGuid guid)
+    bool IsLegitCharacterForAccount(WOWGUID guid)
     {
         return _legitCharacters.find(guid) != _legitCharacters.end();
     }
@@ -1140,7 +1140,7 @@ private:
     // characters who failed on Player::BuildEnumData shouldn't login
     GuidSet _legitCharacters;
 
-    ObjectGuid::LowType m_GUIDLow;                     // set logined or recently logout player (while m_playerRecentlyLogout set)
+    WOWGUID::LowType m_GUIDLow;                     // set logined or recently logout player (while m_playerRecentlyLogout set)
     Player* m_player;
     std::shared_ptr<WorldSocket> m_sock;
     std::string m_Address;
@@ -1175,7 +1175,7 @@ private:
     bool isRecruiter;
     LockedQueue<WorldPacket*> _recvQueue;
     uint32 m_currentVendorEntry;
-    ObjectGuid m_currentBankerGUID;
+    WOWGUID m_currentBankerGUID;
     uint32 _offlineTime;
     bool _kicked;
     // Packets cooldown

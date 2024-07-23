@@ -73,7 +73,7 @@ public:
         uint32 uiTimer;
         uint32 uiPhase;
 
-        ObjectGuid MarzonGUID;
+        WOWGUID MarzonGUID;
 
         void Reset() override
         {

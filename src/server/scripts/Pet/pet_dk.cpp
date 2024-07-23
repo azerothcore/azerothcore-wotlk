@@ -222,7 +222,7 @@ public:
         }
 
     private:
-        ObjectGuid _targetGUID;
+        WOWGUID _targetGUID;
         uint32 _despawnTimer;
         uint32 _selectionTimer;
         uint32 _initialCastTimer;

@@ -104,7 +104,7 @@ void User::HandleSwapInvItemOpcode(WorldPacket& recvData)
 
 void User::HandleAutoEquipItemSlotOpcode(WorldPacket& recvData)
 {
-    ObjectGuid itemguid;
+    WOWGUID itemguid;
     uint8 dstslot;
     recvData >> itemguid >> dstslot;
 
@@ -727,7 +727,7 @@ void User::HandleReadItem(WorldPacket& recvData)
 
 void User::HandleSellItemOpcode(WorldPacket& recvData)
 {
-    ObjectGuid vendorguid, itemguid;
+    WOWGUID vendorguid, itemguid;
     uint32 count;
 
     recvData >> vendorguid >> itemguid >> count;
@@ -907,7 +907,7 @@ void User::HandleSellItemOpcode(WorldPacket& recvData)
 
 void User::HandleBuybackItem(WorldPacket& recvData)
 {
-    ObjectGuid vendorguid;
+    WOWGUID vendorguid;
     uint32 slot;
 
     recvData >> vendorguid >> slot;
@@ -916,7 +916,7 @@ void User::HandleBuybackItem(WorldPacket& recvData)
     if (!creature)
     {
         LOG_DEBUG("network", "WORLD: HandleBuybackItem - Unit ({}) not found or you can not interact with him.", vendorguid.ToString());
-        m_player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid::Empty, 0);
+        m_player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, WOWGUID::Empty, 0);
         return;
     }
 
@@ -962,7 +962,7 @@ void User::HandleBuybackItem(WorldPacket& recvData)
 
 void User::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
 {
-    ObjectGuid vendorguid, bagguid;
+    WOWGUID vendorguid, bagguid;
     uint32 item, slot, count;
     uint8 bagslot;
 
@@ -1003,7 +1003,7 @@ void User::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
 
 void User::HandleBuyItemOpcode(WorldPacket& recvData)
 {
-    ObjectGuid vendorguid;
+    WOWGUID vendorguid;
     uint32 item, slot, count;
     uint8 unk1;
 
@@ -1020,7 +1020,7 @@ void User::HandleBuyItemOpcode(WorldPacket& recvData)
 
 void User::HandleListInventoryOpcode(WorldPacket& recvData)
 {
-    ObjectGuid guid;
+    WOWGUID guid;
 
     recvData >> guid;
 
@@ -1032,7 +1032,7 @@ void User::HandleListInventoryOpcode(WorldPacket& recvData)
     SendListInventory(guid);
 }
 
-void User::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
+void User::SendListInventory(WOWGUID vendorGuid, uint32 vendorEntry)
 {
     LOG_DEBUG("network", "WORLD: Sent SMSG_LIST_INVENTORY");
 
@@ -1040,7 +1040,7 @@ void User::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     if (!vendor)
     {
         LOG_DEBUG("network", "WORLD: SendListInventory - Unit ({}) not found or you can not interact with him.", vendorGuid.ToString());
-        m_player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, ObjectGuid::Empty, 0);
+        m_player->SendSellError(SELL_ERR_CANT_FIND_VENDOR, nullptr, WOWGUID::Empty, 0);
         return;
     }
 
@@ -1219,7 +1219,7 @@ void User::HandleSetAmmoOpcode(WorldPacket& recvData)
         m_player->RemoveAmmo();
 }
 
-void User::SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint32 itemId, uint32 enchantId)
+void User::SendEnchantmentLog(WOWGUID target, WOWGUID caster, uint32 itemId, uint32 enchantId)
 {
     WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4)); // last check 2.0.10
     data << target.WriteAsPacked();
@@ -1229,7 +1229,7 @@ void User::SendEnchantmentLog(ObjectGuid target, ObjectGuid caster, uint32 itemI
     GetPlayer()->SendMessageToSet(&data, true);
 }
 
-void User::SendItemEnchantTimeUpdate(ObjectGuid Playerguid, ObjectGuid Itemguid, uint32 slot, uint32 Duration)
+void User::SendItemEnchantTimeUpdate(WOWGUID Playerguid, WOWGUID Itemguid, uint32 slot, uint32 Duration)
 {
     // last check 2.0.10
     WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8 + 4 + 4 + 8));
@@ -1401,8 +1401,8 @@ void User::HandleSocketOpcode(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SOCKET_GEMS");
 
-    ObjectGuid item_guid;
-    ObjectGuid gem_guids[MAX_GEM_SOCKETS];
+    WOWGUID item_guid;
+    WOWGUID gem_guids[MAX_GEM_SOCKETS];
 
     recvData >> item_guid;
     if (!item_guid)
@@ -1623,7 +1623,7 @@ void User::HandleItemRefundInfoRequest(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_ITEM_REFUND_INFO");
 
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;                                      // item guid
 
     Item* item = m_player->GetItemByGuid(guid);
@@ -1639,7 +1639,7 @@ void User::HandleItemRefundInfoRequest(WorldPacket& recvData)
 void User::HandleItemRefund(WorldPacket& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_ITEM_REFUND");
-    ObjectGuid guid;
+    WOWGUID guid;
     recvData >> guid;                                      // item guid
 
     Item* item = m_player->GetItemByGuid(guid);
@@ -1663,7 +1663,7 @@ void User::HandleItemRefund(WorldPacket& recvData)
  */
 void User::HandleItemTextQuery(WorldPacket& recvData )
 {
-    ObjectGuid itemGuid;
+    WOWGUID itemGuid;
     recvData >> itemGuid;
 
     LOG_DEBUG("network", "CMSG_ITEM_TEXT_QUERY item: {}", itemGuid.ToString());

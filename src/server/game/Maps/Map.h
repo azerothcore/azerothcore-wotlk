@@ -28,7 +28,7 @@
 #include "GridRefMgr.h"
 #include "MapRefMgr.h"
 #include "ObjectDefines.h"
-#include "ObjectGuid.h"
+#include "GUID.h"
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
@@ -77,9 +77,9 @@ namespace Acore
 
 struct ScriptAction
 {
-    ObjectGuid sourceGUID;
-    ObjectGuid targetGUID;
-    ObjectGuid ownerGUID;                                   // owner of source if source is item
+    WOWGUID sourceGUID;
+    WOWGUID targetGUID;
+    WOWGUID ownerGUID;                                   // owner of source if source is item
     ScriptInfo const* script;                               // pointer to static script data
 };
 
@@ -507,19 +507,19 @@ public:
     GameObject* SummonGameObject(uint32 entry, Position const& pos, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 100, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
 
-    Corpse* GetCorpse(ObjectGuid const guid);
-    Creature* GetCreature(ObjectGuid const guid);
-    GameObject* GetGameObject(ObjectGuid const guid);
-    Transport* GetTransport(ObjectGuid const guid);
-    DynamicObject* GetDynamicObject(ObjectGuid const guid);
-    Pet* GetPet(ObjectGuid const guid);
+    Corpse* GetCorpse(WOWGUID const guid);
+    Creature* GetCreature(WOWGUID const guid);
+    GameObject* GetGameObject(WOWGUID const guid);
+    Transport* GetTransport(WOWGUID const guid);
+    DynamicObject* GetDynamicObject(WOWGUID const guid);
+    Pet* GetPet(WOWGUID const guid);
 
     MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
 
-    typedef std::unordered_multimap<ObjectGuid::LowType, Creature*> CreatureBySpawnIdContainer;
+    typedef std::unordered_multimap<WOWGUID::LowType, Creature*> CreatureBySpawnIdContainer;
     CreatureBySpawnIdContainer& GetCreatureBySpawnIdStore() { return _creatureBySpawnIdStore; }
 
-    typedef std::unordered_multimap<ObjectGuid::LowType, GameObject*> GameObjectBySpawnIdContainer;
+    typedef std::unordered_multimap<WOWGUID::LowType, GameObject*> GameObjectBySpawnIdContainer;
     GameObjectBySpawnIdContainer& GetGameObjectBySpawnIdStore() { return _gameobjectBySpawnIdStore; }
 
     [[nodiscard]] std::unordered_set<Corpse*> const* GetCorpsesInCell(uint32 cellId) const
@@ -531,7 +531,7 @@ public:
         return nullptr;
     }
 
-    [[nodiscard]] Corpse* GetCorpseByPlayer(ObjectGuid const& ownerGuid) const
+    [[nodiscard]] Corpse* GetCorpseByPlayer(WOWGUID const& ownerGuid) const
     {
         auto itr = _corpsesByPlayer.find(ownerGuid);
         if (itr != _corpsesByPlayer.end())
@@ -569,42 +569,42 @@ public:
     /*
         RESPAWN TIMES
     */
-    [[nodiscard]] time_t GetLinkedRespawnTime(ObjectGuid guid) const;
-    [[nodiscard]] time_t GetCreatureRespawnTime(ObjectGuid::LowType dbGuid) const
+    [[nodiscard]] time_t GetLinkedRespawnTime(WOWGUID guid) const;
+    [[nodiscard]] time_t GetCreatureRespawnTime(WOWGUID::LowType dbGuid) const
     {
-        std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
+        std::unordered_map<WOWGUID::LowType /*dbGUID*/, time_t>::const_iterator itr = _creatureRespawnTimes.find(dbGuid);
         if (itr != _creatureRespawnTimes.end())
             return itr->second;
 
         return time_t(0);
     }
 
-    [[nodiscard]] time_t GetGORespawnTime(ObjectGuid::LowType dbGuid) const
+    [[nodiscard]] time_t GetGORespawnTime(WOWGUID::LowType dbGuid) const
     {
-        std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
+        std::unordered_map<WOWGUID::LowType /*dbGUID*/, time_t>::const_iterator itr = _goRespawnTimes.find(dbGuid);
         if (itr != _goRespawnTimes.end())
             return itr->second;
 
         return time_t(0);
     }
 
-    void SaveCreatureRespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
-    void RemoveCreatureRespawnTime(ObjectGuid::LowType dbGuid);
-    void SaveGORespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
-    void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
+    void SaveCreatureRespawnTime(WOWGUID::LowType dbGuid, time_t& respawnTime);
+    void RemoveCreatureRespawnTime(WOWGUID::LowType dbGuid);
+    void SaveGORespawnTime(WOWGUID::LowType dbGuid, time_t& respawnTime);
+    void RemoveGORespawnTime(WOWGUID::LowType dbGuid);
     void LoadRespawnTimes();
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
 
     TaskScheduler _creatureRespawnScheduler;
 
-    void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/);
+    void ScheduleCreatureRespawn(WOWGUID /*creatureGuid*/, Milliseconds /*respawnTimer*/);
 
     void LoadCorpseData();
     void DeleteCorpseData();
     void AddCorpse(Corpse* corpse);
     void RemoveCorpse(Corpse* corpse);
-    Corpse* ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia = false);
+    Corpse* ConvertCorpseToBones(WOWGUID const ownerGuid, bool insignia = false);
     void RemoveOldCorpses();
 
     static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);
@@ -635,7 +635,7 @@ public:
     DataMap CustomData;
 
     template<HighGuid high>
-    inline ObjectGuid::LowType GenerateLowGuid()
+    inline WOWGUID::LowType GenerateLowGuid()
     {
         static_assert(ObjectGuidTraits<high>::MapSpecific, "Only map specific guid can be generated in Map context");
         return GetGuidSequenceGenerator<high>().Generate();
@@ -732,7 +732,7 @@ private:
     Creature* _GetScriptCreature(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
     WorldObject* _GetScriptWorldObject(Object* obj, bool isSource, const ScriptInfo* scriptInfo) const;
     void _ScriptProcessDoor(Object* source, Object* target, const ScriptInfo* scriptInfo) const;
-    GameObject* _FindGameObject(WorldObject* pWorldObject, ObjectGuid::LowType guid) const;
+    GameObject* _FindGameObject(WorldObject* pWorldObject, WOWGUID::LowType guid) const;
 
     //used for fast base_map (e.g. MapInstanced class object) search for
     //InstanceMaps and BattlegroundMaps...
@@ -779,8 +779,8 @@ private:
             m_activeNonPlayers.erase(obj);
     }
 
-    std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
-    std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
+    std::unordered_map<WOWGUID::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
+    std::unordered_map<WOWGUID::LowType /*dbGUID*/, time_t> _goRespawnTimes;
 
     ZoneDynamicInfoMap _zoneDynamicInfo;
     uint32 _defaultLight;
@@ -800,7 +800,7 @@ private:
     CreatureBySpawnIdContainer _creatureBySpawnIdStore;
     GameObjectBySpawnIdContainer _gameobjectBySpawnIdStore;
     std::unordered_map<uint32/*cellId*/, std::unordered_set<Corpse*>> _corpsesByCell;
-    std::unordered_map<ObjectGuid, Corpse*> _corpsesByPlayer;
+    std::unordered_map<WOWGUID, Corpse*> _corpsesByPlayer;
     std::unordered_set<Corpse*> _corpseBones;
 
     std::unordered_set<Object*> _updateObjects;

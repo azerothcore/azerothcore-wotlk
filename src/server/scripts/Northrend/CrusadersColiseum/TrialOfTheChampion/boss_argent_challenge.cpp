@@ -218,7 +218,7 @@ public:
         InstanceScript* pInstance;
         EventMap events;
         bool summoned;
-        ObjectGuid MemoryGUID;
+        WOWGUID MemoryGUID;
 
         void Reset() override
         {

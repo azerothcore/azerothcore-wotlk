@@ -79,7 +79,7 @@ struct npc_kilrek : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        ObjectGuid TerestianGuid = instance->GetGuidData(DATA_TERESTIAN);
+        WOWGUID TerestianGuid = instance->GetGuidData(DATA_TERESTIAN);
         if (TerestianGuid)
         {
             Unit* Terestian = ObjectAccessor::GetUnit(*me, TerestianGuid);
@@ -106,7 +106,7 @@ struct npc_kilrek : public ScriptedAI
 private:
     TaskScheduler _scheduler;
     InstanceScript* instance;
-    ObjectGuid TerestianGUID;
+    WOWGUID TerestianGUID;
 };
 
 struct npc_demon_chain : public ScriptedAI
@@ -141,7 +141,7 @@ struct npc_demon_chain : public ScriptedAI
     }
 
 private:
-    ObjectGuid sacrificeGUID;
+    WOWGUID sacrificeGUID;
 };
 
 struct boss_terestian_illhoof : public BossAI

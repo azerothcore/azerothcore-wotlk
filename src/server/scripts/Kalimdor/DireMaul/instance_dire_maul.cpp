@@ -171,8 +171,8 @@ public:
         uint32 _northWingProgress;
         uint32 _northWingBosses;
 
-        ObjectGuid _immoltharGUID;
-        std::vector<ObjectGuid> HighborneSummoners;
+        WOWGUID _immoltharGUID;
+        std::vector<WOWGUID> HighborneSummoners;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

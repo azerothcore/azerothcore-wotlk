@@ -29,8 +29,8 @@ public:
     ZoneScript() {}
     virtual ~ZoneScript() {}
 
-    virtual uint32 GetCreatureEntry(ObjectGuid::LowType /*guidlow*/, CreatureData const* data) { return data->id1; }
-    virtual uint32 GetGameObjectEntry(ObjectGuid::LowType /*guidlow*/, uint32 entry) { return entry; }
+    virtual uint32 GetCreatureEntry(WOWGUID::LowType /*guidlow*/, CreatureData const* data) { return data->id1; }
+    virtual uint32 GetGameObjectEntry(WOWGUID::LowType /*guidlow*/, uint32 entry) { return entry; }
 
     virtual void OnCreatureCreate(Creature*) { }
     virtual void OnCreatureRemove(Creature*) { }
@@ -42,8 +42,8 @@ public:
     virtual void OnCreatureEvade(Creature*) { }
 
     //All-purpose data storage 64 bit
-    virtual ObjectGuid GetGuidData(uint32 /*DataId*/) const { return ObjectGuid::Empty; }
-    virtual void SetGuidData(uint32 /*DataId*/, ObjectGuid /*Value*/) {}
+    virtual WOWGUID GetGuidData(uint32 /*DataId*/) const { return WOWGUID::Empty; }
+    virtual void SetGuidData(uint32 /*DataId*/, WOWGUID /*Value*/) {}
 
     virtual uint64 GetData64(uint32 /*DataId*/) const { return 0; }
     virtual void SetData64(uint32 /*DataId*/, uint64 /*Value*/) {}

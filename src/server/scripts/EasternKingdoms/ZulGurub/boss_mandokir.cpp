@@ -115,7 +115,7 @@ Position const PosMandokir[2] =
     { -12197.86f, -1949.392f, 130.2745f, 0.0f }
 };
 
-void RevivePlayer(Unit* victim, ObjectGuid& reviveGUID)
+void RevivePlayer(Unit* victim, WOWGUID& reviveGUID)
 {
     std::list<Creature*> chainedSpirits;
     GetCreatureListWithEntryInGrid(chainedSpirits, victim, NPC_CHAINED_SPIRIT, 200.f);
@@ -250,7 +250,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid const guid, int32 type) override
+        void SetGUID(WOWGUID const guid, int32 type) override
         {
             if (type == ACTION_CHARGE)
             {
@@ -500,9 +500,9 @@ public:
 
     private:
         uint8 killCount;
-        ObjectGuid reviveGUID;
+        WOWGUID reviveGUID;
         bool _useExecute;
-        std::pair<ObjectGuid, float> _chargeTarget;
+        std::pair<WOWGUID, float> _chargeTarget;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -564,7 +564,7 @@ public:
             RevivePlayer(victim, reviveGUID);
         }
 
-        void SetGUID(ObjectGuid const guid, int32 /*type = 0 */) override
+        void SetGUID(WOWGUID const guid, int32 /*type = 0 */) override
         {
             reviveGUID = guid;
         }
@@ -588,7 +588,7 @@ public:
 
     private:
         InstanceScript* instance;
-        ObjectGuid reviveGUID;
+        WOWGUID reviveGUID;
         TaskScheduler _scheduler;
     };
 
@@ -612,7 +612,7 @@ public:
         revivePlayerGUID.Clear();
     }
 
-    void SetGUID(ObjectGuid const guid, int32 /*id*/) override
+    void SetGUID(WOWGUID const guid, int32 /*id*/) override
     {
         revivePlayerGUID = guid;
     }
@@ -654,7 +654,7 @@ public:
 
 private:
     InstanceScript* instance;
-    ObjectGuid revivePlayerGUID;
+    WOWGUID revivePlayerGUID;
 
 };
 

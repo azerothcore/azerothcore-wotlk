@@ -325,7 +325,7 @@ public: /* PlayerScript */
     void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild);
     void OnPlayerChat(Player* player, uint32 type, uint32 lang, std::string& msg, Channel* channel);
     void OnPlayerEmote(Player* player, uint32 emote);
-    void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, ObjectGuid guid);
+    void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, WOWGUID guid);
     void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck);
     void OnPlayerLogin(Player* player);
     void OnPlayerLoadFromDB(Player* player);
@@ -333,8 +333,8 @@ public: /* PlayerScript */
     void OnPlayerLogout(Player* player);
     void OnPlayerCreate(Player* player);
     void OnPlayerSave(Player* player);
-    void OnPlayerDelete(ObjectGuid guid, uint32 accountId);
-    void OnPlayerFailedDelete(ObjectGuid guid, uint32 accountId);
+    void OnPlayerDelete(WOWGUID guid, uint32 accountId);
+    void OnPlayerFailedDelete(WOWGUID guid, uint32 accountId);
     void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent);
     void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea);
     void OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea);
@@ -360,7 +360,7 @@ public: /* PlayerScript */
     void GetCustomGetArenaTeamId(Player const* player, uint8 slot, uint32& teamID) const;
     void GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const;
     void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
-    void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
+    void OnLootItem(Player* player, Item* item, uint32 count, WOWGUID lootguid);
     void OnBeforeFillQuestLootItem(Player* player, LootItem& item);
     void OnStoreNewItem(Player* player, Item* item, uint32 count);
     void OnCreateItem(Player* player, Item* item, uint32 count);
@@ -370,8 +370,8 @@ public: /* PlayerScript */
     bool OnBeforeOpenItem(Player* player, Item* item);
     bool OnBeforePlayerQuestComplete(Player* player, uint32 quest_id);
     void OnQuestComputeXP(Player* player, Quest const* quest, uint32& xpValue);
-    void OnBeforePlayerDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank);
-    void OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot);
+    void OnBeforePlayerDurabilityRepair(Player* player, WOWGUID npcGUID, WOWGUID itemGUID, float& discountMod, uint8 guildBank);
+    void OnBeforeBuyItemFromVendor(Player* player, WOWGUID vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot);
     void OnBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
     void OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, Item* item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
     void OnAfterUpdateMaxPower(Player* player, Powers& power, float& value);
@@ -383,18 +383,18 @@ public: /* PlayerScript */
     void OnSetMaxLevel(Player* player, uint32& maxPlayerLevel);
     void OnPlayerCompleteQuest(Player* player, Quest const* quest);
     void OnBattlegroundDesertion(Player* player, BattlegroundDesertionType const desertionType);
-    bool CanJoinInBattlegroundQueue(Player* player, ObjectGuid BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
+    bool CanJoinInBattlegroundQueue(Player* player, WOWGUID BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err);
     bool ShouldBeRewardedWithMoneyInsteadOfExp(Player* player);
     void OnBeforeTempSummonInitStats(Player* player, TempSummon* tempSummon, uint32& duration);
     void OnBeforeGuardianInitStatsForLevel(Player* player, Guardian* guardian, CreatureTemplate const* cinfo, PetType& petType);
     void OnAfterGuardianInitStatsForLevel(Player* player, Guardian* guardian);
     void OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& petnumber, bool& current, bool& forceLoadFromDB);
-    bool CanJoinInArenaQueue(Player* player, ObjectGuid BattlemasterGuid, uint8 arenaslot, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, uint8 IsRated, GroupJoinBattlegroundResult& err);
+    bool CanJoinInArenaQueue(Player* player, WOWGUID BattlemasterGuid, uint8 arenaslot, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, uint8 IsRated, GroupJoinBattlegroundResult& err);
     bool CanBattleFieldPort(Player* player, uint8 arenaType, BattlegroundTypeId BGTypeID, uint8 action);
     bool CanGroupInvite(Player* player, std::string& membername);
     bool CanGroupAccept(Player* player, Group* group);
     bool CanSellItem(Player* player, Item* item, Creature* creature);
-    bool CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item);
+    bool CanSendMail(Player* player, WOWGUID receiverGuid, WOWGUID mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item);
     void PetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type);
     void PetitionShowList(Player* player, Creature* creature, uint32& CharterEntry, uint32& CharterDispayID, uint32& CharterCost);
     void OnRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate);
@@ -428,7 +428,7 @@ public: /* PlayerScript */
     bool CanSaveEquipNewItem(Player* player, Item* item, uint16 pos, bool update);
     bool CanApplyEnchantment(Player* player, Item* item, EnchantmentSlot slot, bool apply, bool apply_dur, bool ignore_condition);
     void OnGetQuestRate(Player* player, float& result);
-    bool PassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, ObjectGuid guid);
+    bool PassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, WOWGUID guid);
     bool CheckItemInSlotAtLoadInventory(Player* player, Item* item, uint8 slot, uint8& err, uint16& dest);
     bool NotAvoidSatisfy(Player* player, DungeonProgressionRequirements const* ar, uint32 target_map, bool report);
     bool NotVisibleGloballyFor(Player* player, Player const* u);
@@ -492,23 +492,23 @@ public: /* GuildScript */
     void OnGuildMemberDepositMoney(Guild* guild, Player* player, uint32& amount);
     void OnGuildItemMove(Guild* guild, Player* player, Item* pItem, bool isSrcBank, uint8 srcContainer, uint8 srcSlotId,
                          bool isDestBank, uint8 destContainer, uint8 destSlotId);
-    void OnGuildEvent(Guild* guild, uint8 eventType, ObjectGuid::LowType playerGuid1, ObjectGuid::LowType playerGuid2, uint8 newRank);
-    void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, ObjectGuid::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
+    void OnGuildEvent(Guild* guild, uint8 eventType, WOWGUID::LowType playerGuid1, WOWGUID::LowType playerGuid2, uint8 newRank);
+    void OnGuildBankEvent(Guild* guild, uint8 eventType, uint8 tabId, WOWGUID::LowType playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId);
     bool CanGuildSendBankList(Guild const* guild, User* session, uint8 tabId, bool sendAllSlots);
 
 public: /* GroupScript */
-    void OnGroupAddMember(Group* group, ObjectGuid guid);
-    void OnGroupInviteMember(Group* group, ObjectGuid guid);
-    void OnGroupRemoveMember(Group* group, ObjectGuid guid, RemoveMethod method, ObjectGuid kicker, const char* reason);
-    void OnGroupChangeLeader(Group* group, ObjectGuid newLeaderGuid, ObjectGuid oldLeaderGuid);
+    void OnGroupAddMember(Group* group, WOWGUID guid);
+    void OnGroupInviteMember(Group* group, WOWGUID guid);
+    void OnGroupRemoveMember(Group* group, WOWGUID guid, RemoveMethod method, WOWGUID kicker, const char* reason);
+    void OnGroupChangeLeader(Group* group, WOWGUID newLeaderGuid, WOWGUID oldLeaderGuid);
     void OnGroupDisband(Group* group);
     bool CanGroupJoinBattlegroundQueue(Group const* group, Player* member, Battleground const* bgTemplate, uint32 MinPlayerCount, bool isRated, uint32 arenaSlot);
     void OnCreate(Group* group, Player* leader);
 
 public: /* GlobalScript */
-    void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, ObjectGuid::LowType itemGuid);
+    void OnGlobalItemDelFromDB(CharacterDatabaseTransaction trans, WOWGUID::LowType itemGuid);
     void OnGlobalMirrorImageDisplayItem(Item const* item, uint32& display);
-    void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<ObjectGuid, uint32>& ap);
+    void OnBeforeUpdateArenaPoints(ArenaTeam* at, std::map<WOWGUID, uint32>& ap);
     void OnAfterRefCount(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, uint32& maxcount, LootStore const& store);
     void OnAfterCalculateLootGroupAmount(Player const* player, Loot& loot, uint16 lootMode, uint32& groupAmount, LootStore const& store);
     void OnBeforeDropAddItem(Player const* player, Loot& loot, bool canRate, uint16 lootMode, LootStoreItem* LootStoreItem, LootStore const& store);
@@ -521,8 +521,8 @@ public: /* GlobalScript */
     bool OnIsAffectedBySpellModCheck(SpellInfo const* affectSpell, SpellInfo const* checkSpell, SpellModifier const* mod);
     bool OnSpellHealingBonusTakenNegativeModifiers(Unit const* target, Unit const* caster, SpellInfo const* spellInfo, float& val);
     void OnLoadSpellCustomAttr(SpellInfo* spell);
-    bool OnAllowedForPlayerLootCheck(Player const* player, ObjectGuid source);
-    bool OnAllowedToLootContainerCheck(Player const* player, ObjectGuid source);
+    bool OnAllowedForPlayerLootCheck(Player const* player, WOWGUID source);
+    bool OnAllowedToLootContainerCheck(Player const* player, WOWGUID source);
     void OnInstanceIdRemoved(uint32 instanceId);
     void OnBeforeSetBossState(uint32 id, EncounterState newState, EncounterState oldState, Map* instance);
     void AfterInstanceGameObjectCreate(Map* instance, GameObject* go);
@@ -642,7 +642,7 @@ public: /* PetScript */
 
 public: /* ArenaScript */
 
-    bool CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid);
+    bool CanAddMember(ArenaTeam* team, WOWGUID PlayerGuid);
     void OnGetPoints(ArenaTeam* team, uint32 memberRating, float& points);
     bool CanSaveToDB(ArenaTeam* team);
 
@@ -659,7 +659,7 @@ public: /* MiscScript */
     void OnItemCreate(Item* item, ItemTemplate const* itemProto, Player const* owner);
     bool CanApplySoulboundFlag(Item* item, ItemTemplate const* proto);
     bool CanItemApplyEquipSpell(Player* player, Item* item);
-    bool CanSendAuctionHello(User const* session, ObjectGuid guid, Creature* creature);
+    bool CanSendAuctionHello(User const* session, WOWGUID guid, Creature* creature);
     void ValidateSpellAtCastSpell(Player* player, uint32& oldSpellId, uint32& spellId, uint8& castCount, uint8& castFlags);
     void OnPlayerSetPhase(const AuraEffect* auraEff, AuraApplication const* aurApp, uint8 mode, bool apply, uint32& newPhase);
     void ValidateSpellAtCastSpellResult(Player* player, Unit* mover, Spell* spell, uint32 oldSpellId, uint32 spellId);

@@ -569,7 +569,7 @@ public:
 
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                         {
-                            _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
+                            _instance->HandleGameObject(WOWGUID::Empty, false, teleporter);
                             teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
 
@@ -831,7 +831,7 @@ public:
 
                         if (GameObject* teleporter = ObjectAccessor::GetGameObject(*me, _instance->GetGuidData(GO_SCOURGE_TRANSPORTER_SAURFANG)))
                         {
-                            _instance->HandleGameObject(ObjectGuid::Empty, false, teleporter);
+                            _instance->HandleGameObject(WOWGUID::Empty, false, teleporter);
                             teleporter->SetGameObjectFlag(GO_FLAG_IN_USE);
                         }
 
@@ -1129,7 +1129,7 @@ public:
             if (Map* map = eventInfo.GetActor()->FindMap())
                 if (InstanceMap* imap = map->ToInstanceMap())
                     if (InstanceScript* isc = imap->GetInstanceScript())
-                        if (ObjectGuid sguid = isc->GetGuidData(3) //DATA_DEATHBRINGER_SAURFANG
+                        if (WOWGUID sguid = isc->GetGuidData(3) //DATA_DEATHBRINGER_SAURFANG
                             if (Creature* saurfang = ObjectAccessor::GetCreature(*eventInfo.GetActor(), sguid))
                                 markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456) : 0; //FALLEN_CHAMPION_CAST_COUNT
             */

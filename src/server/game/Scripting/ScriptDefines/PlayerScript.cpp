@@ -19,7 +19,7 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-void ScriptMgr::OnBeforePlayerDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank)
+void ScriptMgr::OnBeforePlayerDurabilityRepair(Player* player, WOWGUID npcGUID, WOWGUID itemGUID, float& discountMod, uint8 guildBank)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_DURABILITY_REPAIR, script->OnBeforeDurabilityRepair(player, npcGUID, itemGUID, discountMod, guildBank));
 }
@@ -194,7 +194,7 @@ void ScriptMgr::OnPlayerEmote(Player* player, uint32 emote)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_EMOTE, script->OnEmote(player, emote));
 }
 
-void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, ObjectGuid guid)
+void ScriptMgr::OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, WOWGUID guid)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_TEXT_EMOTE, script->OnTextEmote(player, textEmote, emoteNum, guid));
 }
@@ -244,12 +244,12 @@ void ScriptMgr::OnPlayerSave(Player* player)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SAVE, script->OnSave(player));
 }
 
-void ScriptMgr::OnPlayerDelete(ObjectGuid guid, uint32 accountId)
+void ScriptMgr::OnPlayerDelete(WOWGUID guid, uint32 accountId)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_DELETE, script->OnDelete(guid, accountId));
 }
 
-void ScriptMgr::OnPlayerFailedDelete(ObjectGuid guid, uint32 accountId)
+void ScriptMgr::OnPlayerFailedDelete(WOWGUID guid, uint32 accountId)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_FAILED_DELETE, script->OnFailedDelete(guid, accountId));
 }
@@ -369,7 +369,7 @@ void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(Player const* player, uin
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_MAX_PERSONAL_ARENA_RATING_REQUIREMENT, script->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating));
 }
 
-void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid)
+void ScriptMgr::OnLootItem(Player* player, Item* item, uint32 count, WOWGUID lootguid)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LOOT_ITEM, script->OnLootItem(player, item, count, lootguid));
 }
@@ -419,7 +419,7 @@ void ScriptMgr::OnSetMaxLevel(Player* player, uint32& maxPlayerLevel)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SET_MAX_LEVEL, script->OnSetMaxLevel(player, maxPlayerLevel));
 }
 
-bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, ObjectGuid BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err)
+bool ScriptMgr::CanJoinInBattlegroundQueue(Player* player, WOWGUID BattlemasterGuid, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, GroupJoinBattlegroundResult& err)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_JOIN_IN_BATTLEGROUND_QUEUE, !script->CanJoinInBattlegroundQueue(player, BattlemasterGuid, BGTypeID, joinAsGroup, err));
 }
@@ -449,7 +449,7 @@ void ScriptMgr::OnBeforeLoadPetFromDB(Player* player, uint32& petentry, uint32& 
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_LOAD_PET_FROM_DB, script->OnBeforeLoadPetFromDB(player, petentry, petnumber, current, forceLoadFromDB));
 }
 
-void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, ObjectGuid vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot)
+void ScriptMgr::OnBeforeBuyItemFromVendor(Player* player, WOWGUID vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_BUY_ITEM_FROM_VENDOR, script->OnBeforeBuyItemFromVendor(player, vendorguid, vendorslot, item, count, bag, slot));
 }
@@ -499,7 +499,7 @@ void ScriptMgr::OnBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, u
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_STORE_OR_EQUIP_NEW_ITEM, script->OnBeforeStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore));
 }
 
-bool ScriptMgr::CanJoinInArenaQueue(Player* player, ObjectGuid BattlemasterGuid, uint8 arenaslot, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, uint8 IsRated, GroupJoinBattlegroundResult& err)
+bool ScriptMgr::CanJoinInArenaQueue(Player* player, WOWGUID BattlemasterGuid, uint8 arenaslot, BattlegroundTypeId BGTypeID, uint8 joinAsGroup, uint8 IsRated, GroupJoinBattlegroundResult& err)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_JOIN_IN_ARENA_QUEUE, !script->CanJoinInArenaQueue(player, BattlemasterGuid, arenaslot, BGTypeID, joinAsGroup, IsRated, err));
 }
@@ -524,7 +524,7 @@ bool ScriptMgr::CanSellItem(Player* player, Item* item, Creature* creature)
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_SELL_ITEM, !script->CanSellItem(player, item, creature));
 }
 
-bool ScriptMgr::CanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item)
+bool ScriptMgr::CanSendMail(Player* player, WOWGUID receiverGuid, WOWGUID mailbox, std::string& subject, std::string& body, uint32 money, uint32 COD, Item* item)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_SEND_MAIL, !script->CanSendMail(player, receiverGuid, mailbox, subject, body, money, COD, item));
 }
@@ -719,7 +719,7 @@ void ScriptMgr::OnGetQuestRate(Player* player, float& result)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_QUEST_RATE, script->OnGetQuestRate(player, result));
 }
 
-bool ScriptMgr::PassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, ObjectGuid guid)
+bool ScriptMgr::PassedQuestKilledMonsterCredit(Player* player, Quest const* qinfo, uint32 entry, uint32 real_entry, WOWGUID guid)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_PASSED_QUEST_KILLED_MONSTER_CREDIT, !script->PassedQuestKilledMonsterCredit(player, qinfo, entry, real_entry, guid));
 }

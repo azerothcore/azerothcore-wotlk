@@ -298,7 +298,7 @@ public: // pussywizard: public class Member
     class Member
     {
     public:
-        Member(uint32 guildId, ObjectGuid guid, uint8 rankId):
+        Member(uint32 guildId, WOWGUID guid, uint8 rankId):
             m_guildId(guildId),
             m_guid(guid),
             m_zoneId(0),
@@ -327,7 +327,7 @@ public: // pussywizard: public class Member
         bool LoadFromDB(Field* fields);
         void SaveToDB(CharacterDatabaseTransaction trans) const;
 
-        ObjectGuid GetGUID() const { return m_guid; }
+        WOWGUID GetGUID() const { return m_guid; }
         std::string const& GetName() const { return m_name; }
         uint32 GetAccountId() const { return m_accountId; }
         uint8 GetRankId() const { return m_rankId; }
@@ -346,7 +346,7 @@ public: // pussywizard: public class Member
         void UpdateLogoutTime();
         inline bool IsRank(uint8 rankId) const { return m_rankId == rankId; }
         inline bool IsRankNotLower(uint8 rankId) const { return m_rankId <= rankId; }
-        inline bool IsSamePlayer(ObjectGuid guid) const { return m_guid == guid; }
+        inline bool IsSamePlayer(WOWGUID guid) const { return m_guid == guid; }
 
         void UpdateBankWithdrawValue(CharacterDatabaseTransaction trans, uint8 tabId, uint32 amount);
         int32 GetBankWithdrawValue(uint8 tabId) const;
@@ -361,7 +361,7 @@ public: // pussywizard: public class Member
     private:
         uint32 m_guildId;
         // Fields from characters table
-        ObjectGuid m_guid;
+        WOWGUID m_guid;
         std::string m_name;
         uint32 m_zoneId;
         uint8 m_level;
@@ -381,12 +381,12 @@ public: // pussywizard: public class Member
     };
 
     // pussywizard: public GetMember
-    inline const Member* GetMember(ObjectGuid guid) const
+    inline const Member* GetMember(WOWGUID guid) const
     {
         auto itr = m_members.find(guid.GetCounter());
         return (itr != m_members.end()) ? &itr->second : nullptr;
     }
-    inline Member* GetMember(ObjectGuid guid)
+    inline Member* GetMember(WOWGUID guid)
     {
         auto itr = m_members.find(guid.GetCounter());
         return (itr != m_members.end()) ? &itr->second : nullptr;
@@ -405,18 +405,18 @@ private:
     class LogEntry
     {
     public:
-        LogEntry(uint32 guildId, ObjectGuid::LowType guid);
-        LogEntry(uint32 guildId, ObjectGuid::LowType guid, time_t timestamp) : m_guildId(guildId), m_guid(guid), m_timestamp(timestamp) { }
+        LogEntry(uint32 guildId, WOWGUID::LowType guid);
+        LogEntry(uint32 guildId, WOWGUID::LowType guid, time_t timestamp) : m_guildId(guildId), m_guid(guid), m_timestamp(timestamp) { }
         virtual ~LogEntry() { }
 
-        ObjectGuid::LowType GetGUID() const { return m_guid; }
+        WOWGUID::LowType GetGUID() const { return m_guid; }
         uint64 GetTimestamp() const { return m_timestamp; }
 
         virtual void SaveToDB(CharacterDatabaseTransaction trans) const = 0;
 
     protected:
         uint32 m_guildId;
-        ObjectGuid::LowType m_guid;
+        WOWGUID::LowType m_guid;
         uint64 m_timestamp;
     };
 
@@ -424,10 +424,10 @@ private:
     class EventLogEntry : public LogEntry
     {
     public:
-        EventLogEntry(uint32 guildId, ObjectGuid::LowType guid, GuildEventLogTypes eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2, uint8 newRank) :
+        EventLogEntry(uint32 guildId, WOWGUID::LowType guid, GuildEventLogTypes eventType, WOWGUID playerGuid1, WOWGUID playerGuid2, uint8 newRank) :
             LogEntry(guildId, guid), m_eventType(eventType), m_playerGuid1(playerGuid1), m_playerGuid2(playerGuid2), m_newRank(newRank) { }
 
-        EventLogEntry(uint32 guildId, ObjectGuid::LowType guid, time_t timestamp, GuildEventLogTypes eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2, uint8 newRank) :
+        EventLogEntry(uint32 guildId, WOWGUID::LowType guid, time_t timestamp, GuildEventLogTypes eventType, WOWGUID playerGuid1, WOWGUID playerGuid2, uint8 newRank) :
             LogEntry(guildId, guid, timestamp), m_eventType(eventType), m_playerGuid1(playerGuid1), m_playerGuid2(playerGuid2), m_newRank(newRank) { }
 
         ~EventLogEntry() override { }
@@ -437,8 +437,8 @@ private:
 
     private:
         GuildEventLogTypes m_eventType;
-        ObjectGuid m_playerGuid1;
-        ObjectGuid m_playerGuid2;
+        WOWGUID m_playerGuid1;
+        WOWGUID m_playerGuid2;
         uint8  m_newRank;
     };
 
@@ -459,11 +459,11 @@ private:
             return IsMoneyEvent(m_eventType);
         }
 
-        BankEventLogEntry(uint32 guildId, ObjectGuid::LowType guid, GuildBankEventLogTypes eventType, uint8 tabId, ObjectGuid playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId) :
+        BankEventLogEntry(uint32 guildId, WOWGUID::LowType guid, GuildBankEventLogTypes eventType, uint8 tabId, WOWGUID playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId) :
             LogEntry(guildId, guid), m_eventType(eventType), m_bankTabId(tabId), m_playerGuid(playerGuid),
             m_itemOrMoney(itemOrMoney), m_itemStackCount(itemStackCount), m_destTabId(destTabId) { }
 
-        BankEventLogEntry(uint32 guildId, ObjectGuid::LowType guid, time_t timestamp, uint8 tabId, GuildBankEventLogTypes eventType, ObjectGuid playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId) :
+        BankEventLogEntry(uint32 guildId, WOWGUID::LowType guid, time_t timestamp, uint8 tabId, GuildBankEventLogTypes eventType, WOWGUID playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId) :
             LogEntry(guildId, guid, timestamp), m_eventType(eventType), m_bankTabId(tabId), m_playerGuid(playerGuid),
             m_itemOrMoney(itemOrMoney), m_itemStackCount(itemStackCount), m_destTabId(destTabId) { }
 
@@ -475,7 +475,7 @@ private:
     private:
         GuildBankEventLogTypes m_eventType;
         uint8  m_bankTabId;
-        ObjectGuid m_playerGuid;
+        WOWGUID m_playerGuid;
         uint32 m_itemOrMoney;
         uint16 m_itemStackCount;
         uint8  m_destTabId;
@@ -687,7 +687,7 @@ public:
 
     // Getters
     uint32 GetId() const { return m_id; }
-    ObjectGuid GetLeaderGUID() const { return m_leaderGuid; }
+    WOWGUID GetLeaderGUID() const { return m_leaderGuid; }
     std::string const& GetName() const { return m_name; }
     std::string const& GetMOTD() const { return m_motd; }
     std::string const& GetInfo() const { return m_info; }
@@ -761,9 +761,9 @@ public:
 
     // Members
     // Adds member to guild. If rankId == GUILD_RANK_NONE, lowest rank is assigned.
-    bool AddMember(ObjectGuid guid, uint8 rankId = GUILD_RANK_NONE);
-    void DeleteMember(ObjectGuid guid, bool isDisbanding = false, bool isKicked = false, bool canDeleteGuild = false);
-    bool ChangeMemberRank(ObjectGuid guid, uint8 newRank);
+    bool AddMember(WOWGUID guid, uint8 rankId = GUILD_RANK_NONE);
+    void DeleteMember(WOWGUID guid, bool isDisbanding = false, bool isKicked = false, bool canDeleteGuild = false);
+    bool ChangeMemberRank(WOWGUID guid, uint8 newRank);
 
     // Bank
     void SwapItems(Player* player, uint8 tabId, uint8 slotId, uint8 destTabId, uint8 destSlotId, uint32 splitedAmount);
@@ -785,7 +785,7 @@ public:
 protected:
     uint32 m_id;
     std::string m_name;
-    ObjectGuid m_leaderGuid;
+    WOWGUID m_leaderGuid;
     std::string m_motd;
     std::string m_info;
     time_t m_createdDate;
@@ -820,7 +820,7 @@ private:
     inline BankTab* GetBankTab(uint8 tabId) { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
     inline BankTab const* GetBankTab(uint8 tabId) const { return tabId < m_bankTabs.size() ? &m_bankTabs[tabId] : nullptr; }
 
-    inline void _DeleteMemberFromDB(ObjectGuid::LowType lowguid) const
+    inline void _DeleteMemberFromDB(WOWGUID::LowType lowguid) const
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GUILD_MEMBER);
         stmt->SetData(0, lowguid);
@@ -850,11 +850,11 @@ private:
 
     int32 _GetMemberRemainingSlots(Member const& member, uint8 tabId) const;
     int32 _GetMemberRemainingMoney(Member const& member) const;
-    void _UpdateMemberWithdrawSlots(CharacterDatabaseTransaction trans, ObjectGuid guid, uint8 tabId);
-    bool _MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 rights) const;
+    void _UpdateMemberWithdrawSlots(CharacterDatabaseTransaction trans, WOWGUID guid, uint8 tabId);
+    bool _MemberHasTabRights(WOWGUID guid, uint8 tabId, uint32 rights) const;
 
-    void _LogEvent(GuildEventLogTypes eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid::Empty, uint8 newRank = 0);
-    void _LogBankEvent(CharacterDatabaseTransaction trans, GuildBankEventLogTypes eventType, uint8 tabId, ObjectGuid playerGuid, uint32 itemOrMoney, uint16 itemStackCount = 0, uint8 destTabId = 0);
+    void _LogEvent(GuildEventLogTypes eventType, WOWGUID playerGuid1, WOWGUID playerGuid2 = WOWGUID::Empty, uint8 newRank = 0);
+    void _LogBankEvent(CharacterDatabaseTransaction trans, GuildBankEventLogTypes eventType, uint8 tabId, WOWGUID playerGuid, uint32 itemOrMoney, uint16 itemStackCount = 0, uint8 destTabId = 0);
 
     Item* _GetItem(uint8 tabId, uint8 slotId) const;
     void _RemoveItem(CharacterDatabaseTransaction trans, uint8 tabId, uint8 slotId);
@@ -867,6 +867,6 @@ private:
     void _SendBankContentUpdate(uint8 tabId, SlotIds slots) const;
     void _SendBankList(User* session = nullptr, uint8 tabId = 0, bool sendFullSlots = false, SlotIds* slots = nullptr) const;
 
-    void _BroadcastEvent(GuildEvents guildEvent, ObjectGuid guid = ObjectGuid::Empty, Optional<std::string_view> param1 = {}, Optional<std::string_view> param2 = {}, Optional<std::string_view> param3 = {}) const;
+    void _BroadcastEvent(GuildEvents guildEvent, WOWGUID guid = WOWGUID::Empty, Optional<std::string_view> param1 = {}, Optional<std::string_view> param2 = {}, Optional<std::string_view> param3 = {}) const;
 };
 #endif

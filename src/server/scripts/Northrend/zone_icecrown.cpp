@@ -110,8 +110,8 @@ public:
 
         EventMap events;
         SummonList summons;
-        ObjectGuid playerGUID;
-        ObjectGuid playerGUID2;
+        WOWGUID playerGUID;
+        WOWGUID playerGUID2;
         uint32 currentQuest;
 
         void Reset() override
@@ -166,7 +166,7 @@ public:
             }
         }
 
-        void StartBattle(ObjectGuid guid, uint32 questId)
+        void StartBattle(WOWGUID guid, uint32 questId)
         {
             events.ScheduleEvent(EVENT_VALHALAS_FIRST, 6s);
             events.ScheduleEvent(EVENT_VALHALAS_CHECK_PLAYER, 30s);
@@ -177,7 +177,7 @@ public:
         void CheckSummons()
         {
             bool allow = true;
-            for (ObjectGuid const& guid : summons)
+            for (WOWGUID const& guid : summons)
                 if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
                     if (cr->IsAlive())
                         allow = false;
@@ -467,8 +467,8 @@ public:
         npc_lord_areteAI(Creature* creature) : ScriptedAI(creature) {}
 
         EventMap events;
-        ObjectGuid _landgrenGUID;
-        ObjectGuid _landgrenSoulGUID;
+        WOWGUID _landgrenGUID;
+        WOWGUID _landgrenSoulGUID;
 
         void InitializeAI() override
         {
@@ -1779,10 +1779,10 @@ public:
 
         SummonList Summons;
 
-        ObjectGuid guidDalfors;
-        ObjectGuid guidPriest[3];
-        ObjectGuid guidMason[3];
-        ObjectGuid guidHalof;
+        WOWGUID guidDalfors;
+        WOWGUID guidPriest[3];
+        WOWGUID guidMason[3];
+        WOWGUID guidHalof;
 
         void Reset() override
         {

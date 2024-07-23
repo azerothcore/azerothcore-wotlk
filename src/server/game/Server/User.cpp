@@ -275,7 +275,7 @@ std::string User::GetPlayerInfo() const
 }
 
 /// Get player guid if available. Use for logging purposes only
-ObjectGuid::LowType User::GetGuidLow() const
+WOWGUID::LowType User::GetGuidLow() const
 {
     return GetPlayer() ? GetPlayer()->GetGUID().GetCounter() : 0;
 }
@@ -680,7 +680,7 @@ void User::CharacterRemoveFromGame(bool save)
         //! Call script hook before other logout events
         sScriptMgr->OnBeforePlayerLogout(m_player);
 
-        if (ObjectGuid lguid = m_player->GetLootGUID())
+        if (WOWGUID lguid = m_player->GetLootGUID())
             DoLootRelease(lguid);
 
         ///- If the player just died before logging out, make him appear as a ghost
@@ -774,7 +774,7 @@ void User::CharacterRemoveFromGame(bool save)
             for (int j = BUYBACK_SLOT_START; j < BUYBACK_SLOT_END; ++j)
             {
                 eslot = j - BUYBACK_SLOT_START;
-                m_player->SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (eslot * 2), ObjectGuid::Empty);
+                m_player->SetGuidValue(PLAYER_FIELD_VENDORBUYBACK_SLOT_1 + (eslot * 2), WOWGUID::Empty);
                 m_player->SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + eslot, 0);
                 m_player->SetUInt32Value(PLAYER_FIELD_BUYBACK_TIMESTAMP_1 + eslot, 0);
             }
@@ -1869,7 +1869,7 @@ static BOOL UserWorldTeleportHandler (User        *user,
   // READ THE MESSAGE DATA
   auto requestTime  = msg->read<uint32>();
   auto continentID  = msg->read<uint32>();
-  auto player       = msg->read<ObjectGuid>();
+  auto player       = msg->read<WOWGUID>();
   auto position     = msg->read<G3D::Vector3>();
   auto facing       = msg->read<float>();
 

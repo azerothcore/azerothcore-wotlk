@@ -180,7 +180,7 @@ struct boss_swamplord_muselek : public BossAI
     }
 
 private:
-    ObjectGuid _markTarget;
+    WOWGUID _markTarget;
     bool _canChase;
 };
 

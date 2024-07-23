@@ -223,7 +223,7 @@ BanReturn BanMgr::BanCharacter(std::string const& CharacterName, std::string con
 {
     Player* target = ObjectAccessor::FindPlayerByName(CharacterName, false);
     uint32 DurationSecs = TimeStringToSecs(Duration);
-    ObjectGuid TargetGUID;
+    WOWGUID TargetGUID;
 
     /// Pick a player to ban if not online
     if (!target)
@@ -310,7 +310,7 @@ bool BanMgr::RemoveBanIP(std::string const& IP)
 bool BanMgr::RemoveBanCharacter(std::string const& CharacterName)
 {
     Player* pBanned = ObjectAccessor::FindPlayerByName(CharacterName, false);
-    ObjectGuid guid;
+    WOWGUID guid;
 
     /// Pick a player to ban if not online
     if (!pBanned)

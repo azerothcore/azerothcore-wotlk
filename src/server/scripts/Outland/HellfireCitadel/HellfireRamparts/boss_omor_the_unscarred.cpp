@@ -137,7 +137,7 @@ struct boss_omor_the_unscarred : public BossAI
     }
 
 private:
-    ObjectGuid _targetGUID;
+    WOWGUID _targetGUID;
     bool _hasSpoken;
 };
 

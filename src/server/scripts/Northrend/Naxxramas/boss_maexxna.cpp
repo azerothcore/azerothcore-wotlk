@@ -314,7 +314,7 @@ public:
     {
         explicit boss_maexxna_webwrapAI(Creature* c) : NullCreatureAI(c) { }
 
-        ObjectGuid victimGUID;
+        WOWGUID victimGUID;
 
         void IsSummonedBy(WorldObject* summoner) override
         {

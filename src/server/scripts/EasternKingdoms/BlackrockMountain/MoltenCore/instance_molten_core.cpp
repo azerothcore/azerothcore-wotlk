@@ -221,7 +221,7 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 type) const override
+        WOWGUID GetGuidData(uint32 type) const override
         {
             switch (type)
             {
@@ -239,7 +239,7 @@ public:
                     return _ragnarosGUID;
             }
 
-            return ObjectGuid::Empty;
+            return WOWGUID::Empty;
         }
 
         bool SetBossState(uint32 bossId, EncounterState state) override
@@ -266,7 +266,7 @@ public:
                     {
                         if (!_golemaggMinionsGUIDS.empty())
                         {
-                            for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
+                            for (WOWGUID const& minionGuid : _golemaggMinionsGUIDS)
                             {
                                 Creature* minion = instance->GetCreature(minionGuid);
                                 if (minion && minion->isDead())
@@ -281,7 +281,7 @@ public:
                     {
                         if (!_golemaggMinionsGUIDS.empty())
                         {
-                            for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
+                            for (WOWGUID const& minionGuid : _golemaggMinionsGUIDS)
                             {
                                 if (Creature* minion = instance->GetCreature(minionGuid))
                                 {
@@ -295,7 +295,7 @@ public:
                     {
                         if (!_golemaggMinionsGUIDS.empty())
                         {
-                            for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
+                            for (WOWGUID const& minionGuid : _golemaggMinionsGUIDS)
                             {
                                 if (Creature* minion = instance->GetCreature(minionGuid))
                                 {
@@ -345,7 +345,7 @@ public:
 
                 if (!_golemaggMinionsGUIDS.empty())
                 {
-                    for (ObjectGuid const& minionGuid : _golemaggMinionsGUIDS)
+                    for (WOWGUID const& minionGuid : _golemaggMinionsGUIDS)
                     {
                         if (Creature* minion = instance->GetCreature(minionGuid))
                         {
@@ -406,22 +406,22 @@ public:
         }
 
     private:
-        std::unordered_map<uint32/*bossid*/, ObjectGuid/*circleGUID*/> _circlesGUIDs;
-        std::unordered_map<uint32/*bossid*/, ObjectGuid/*runeGUID*/> _runesGUIDs;
+        std::unordered_map<uint32/*bossid*/, WOWGUID/*circleGUID*/> _circlesGUIDs;
+        std::unordered_map<uint32/*bossid*/, WOWGUID/*runeGUID*/> _runesGUIDs;
 
         // Golemagg encounter related
-        ObjectGuid _golemaggGUID;
+        WOWGUID _golemaggGUID;
         GuidSet _golemaggMinionsGUIDS;
 
         // Ragnaros encounter related
-        ObjectGuid _ragnarosGUID;
-        ObjectGuid _lavaSteamGUID;
-        ObjectGuid _lavaSplashGUID;
+        WOWGUID _ragnarosGUID;
+        WOWGUID _lavaSteamGUID;
+        WOWGUID _lavaSplashGUID;
 
-        ObjectGuid _majordomoExecutusGUID;
-        ObjectGuid _cacheOfTheFirelordGUID;
-        ObjectGuid _garrGUID;
-        ObjectGuid _magmadarGUID;
+        WOWGUID _majordomoExecutusGUID;
+        WOWGUID _cacheOfTheFirelordGUID;
+        WOWGUID _garrGUID;
+        WOWGUID _magmadarGUID;
     };
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override

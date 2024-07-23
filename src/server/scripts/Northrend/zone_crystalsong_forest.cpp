@@ -150,7 +150,7 @@ struct npc_warmage_violetstand : public ScriptedAI
         me->SetCombatMovement(false);
     }
 
-    ObjectGuid targetGUID;
+    WOWGUID targetGUID;
 
     void Reset() override
     {

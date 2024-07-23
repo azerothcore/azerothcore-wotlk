@@ -196,8 +196,8 @@ public:
         }
 
     private:
-        ObjectGuid   _RavenousworgGUID;
-        ObjectGuid   _mrfloppyGUID;
+        WOWGUID   _RavenousworgGUID;
+        WOWGUID   _mrfloppyGUID;
     };
 
     bool OnQuestAccept(Player* player, Creature* creature, Quest const* quest) override
@@ -810,7 +810,7 @@ public:
 
     private:
         EventMap _events;
-        ObjectGuid _playerGUID;
+        WOWGUID _playerGUID;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
