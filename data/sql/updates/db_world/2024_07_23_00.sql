@@ -1,3 +1,4 @@
+-- DB update 2024_07_21_00 -> 2024_07_23_00
 UPDATE `creature` SET `MovementType` = 2 WHERE `id1` = 23600 AND `guid` = 18604;
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (18604));
