@@ -158,7 +158,7 @@ struct npc_doomfire_spirit : public ScriptedAI
             while (dist >= 0)
             {
                 pos = me->WorldObject::GetFirstCollisionPosition(dist, nextOrientation);
-                if (me->GetDistance(pos) == dist)
+                if (fabsf(dist - me->GetExactDist2d(pos)) < 0.001) // Account for small deviation
                     break;
                 dist -= 2.0; // Distance drops by two units with each unsuccessful attempt
             }
