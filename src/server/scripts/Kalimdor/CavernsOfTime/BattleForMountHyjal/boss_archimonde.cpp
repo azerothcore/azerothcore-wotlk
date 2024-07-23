@@ -146,7 +146,6 @@ struct npc_doomfire_spirit : public ScriptedAI
     npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
     float const turnConstant = 0.785402f; // 45 degree turns, verified with sniffs
-    float fAngle = urand(0, M_PI * 2);
 
     void Reset() override
     {
@@ -169,8 +168,6 @@ struct npc_doomfire_spirit : public ScriptedAI
                 me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetOrientation());
 
             }, 1600ms);
-
-        fAngle = urand(0, M_PI * 2);
     }
 
     void UpdateAI(uint32 diff) override
