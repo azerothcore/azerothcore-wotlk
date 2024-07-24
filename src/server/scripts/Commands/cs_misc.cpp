@@ -693,7 +693,7 @@ public:
             return false;
         }
 
-        if (aur && !spell->StackAmount)
+        if (!spell->StackAmount)
         {
             handler->SendErrorMessage(LANG_COMMAND_AURASTACK_CANT_STACK, spell->Id);
             return false;
