@@ -20,6 +20,8 @@
 #include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "shadowfang_keep.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Spells
 {

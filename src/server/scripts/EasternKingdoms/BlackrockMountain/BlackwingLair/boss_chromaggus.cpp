@@ -19,7 +19,6 @@
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
 #include "Player.h"
