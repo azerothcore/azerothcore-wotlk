@@ -1343,9 +1343,7 @@ public:
 
     static bool HandleDebugDummyCommand(ChatHandler* handler)
     {
-        handler->PSendModuleSysMessage("module", 1);
-        handler->PSendModuleSysMessage("mod-azerothcore", 10);
-        handler->PSendModuleSysMessage("mod-with-args", 4, handler->GetPlayer()->GetPlayerName());
+        handler->SendSysMessage("This command does nothing right now. Edit your local core (cs_debug.cpp) to make it do whatever you need for testing.");
         return true;
     }
 };
