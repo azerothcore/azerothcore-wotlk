@@ -4,6 +4,6 @@ INSERT INTO `command` VALUES ('aura stack', 2, 'Syntax: .aurastack #spellid #sta
 
 DELETE FROM `acore_string` WHERE `entry` IN (373,374,375);
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
-(373, 'Target unit does not have aura %u!'),
+(373, 'Target unit does not have aura {}!'),
 (374, 'No stack amount specified!'),
-(375, 'Spell %u cannot have stacks!');
+(375, 'Spell {} cannot have stacks!');
