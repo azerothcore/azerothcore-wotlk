@@ -8544,6 +8544,58 @@ void ObjectMgr::LoadGameObjectForQuests()
     LOG_INFO("server.loading", " ");
 }
 
+bool ObjectMgr::LoadModuleStrings()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _moduleStringStore.clear(); // for reload case
+    QueryResult result = WorldDatabase.Query("SELECT module, id, content_default, locale_koKR, locale_frFR, locale_deDE, locale_zhCN, locale_zhTW, locale_esES, locale_esMX, locale_ruRU FROM module_string");
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 module strings. DB table `module_strings` is empty.");
+        LOG_INFO("server.loading", " ");
+        return false;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        std::string module = fields[0].Get<std::string>();
+        uint32 id          = fields[1].Get<uint32>();
+
+        std::pair<std::string, int> pairKey = std::make_pair(module, id);
+
+        ModuleString& data = _moduleStringStore[pairKey];
+
+        data.Content.resize(DEFAULT_LOCALE + 1);
+
+        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
+            AddLocaleString(fields[i + 2].Get<std::string>(), LocaleConstant(i), data.Content);
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Module Strings in {} ms", _moduleStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+
+    return true;
+}
+
+std::string const* ObjectMgr::GetModuleString(std::string module, uint32 id, LocaleConstant locale) const
+{
+    ModuleString const* ts = GetModuleString(module, id);
+    if (ts->Content.size())
+    {
+        if (ts->Content.size() > size_t(locale) && !ts->Content[locale].empty())
+            return &ts->Content[locale];
+
+        return &ts->Content[DEFAULT_LOCALE];
+    }
+
+    LOG_ERROR("sql.sql", "Module string module {} id {} not found in DB.", module, id);
+
+    return (std::string*)"error";
+}
+
 bool ObjectMgr::LoadAcoreStrings()
 {
     uint32 oldMSTime = getMSTime();
