@@ -131,7 +131,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 break;
             default:
             {
-                if (sWorld->getBoolConfig(CONFIG_CHAT_MUTE_FIRST_LOGIN))
+                if (sWorld->getBoolConfig(CONFIG_CHAT_MUTE_FIRST_LOGIN) && lang != LANG_ADDON)
                 {
                     uint32 minutes = sWorld->getIntConfig(CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN);
 
