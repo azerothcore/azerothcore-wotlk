@@ -8564,7 +8564,7 @@ bool ObjectMgr::LoadModuleStrings()
         std::string module = fields[0].Get<std::string>();
         uint32 id          = fields[1].Get<uint32>();
 
-        std::pair<std::string, int> pairKey = std::make_pair(module, id);
+        std::pair<std::string, uint32> pairKey = std::make_pair(module, id);
 
         ModuleString& data = _moduleStringStore[pairKey];
 

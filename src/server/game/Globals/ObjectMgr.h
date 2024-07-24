@@ -1319,7 +1319,7 @@ public:
 
     [[nodiscard]] ModuleString const* GetModuleString(std::string module, uint32 id) const
     {
-        std::pair<std::string, int> pairKey = std::make_pair(module, id);
+        std::pair<std::string, uint32> pairKey = std::make_pair(module, id);
         ModuleStringContainer::const_iterator itr = _moduleStringStore.find(pairKey);
         if (itr == _moduleStringStore.end())
             return nullptr;
