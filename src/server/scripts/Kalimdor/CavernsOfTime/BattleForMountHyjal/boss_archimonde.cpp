@@ -159,7 +159,7 @@ struct npc_doomfire_spirit : public ScriptedAI
         },1);
     }
 
-    Position TryTeleportInDirection(float dist, float angle, float step, bool alwaysturn)
+    void TryTeleportInDirection(float dist, float angle, float step, bool alwaysturn)
     {
         Position pos;
         while (dist >= 0)
