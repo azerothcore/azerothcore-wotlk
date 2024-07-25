@@ -149,25 +149,33 @@ struct npc_doomfire_spirit : public ScriptedAI
 
     void Reset() override
     {
-        scheduler.CancelAll();
-        ScheduleTimedEvent(0s, [&] {
-            float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * turnConstant);
-            Position pos;
-            float dist = 8.f;
+        ScheduleUniqueTimedEvent(10ms, [&] {
+            TryTeleportInDirection(1.f, M_PI, 1.f, true); //turns around and teleports 1 unit on spawn, assuming same logic as later teleports applies
 
-            while (dist >= 0)
-            {
-                pos = me->WorldObject::GetFirstCollisionPosition(dist, nextOrientation);
-                if (fabsf(dist - me->GetExactDist2d(pos)) < 0.001) // Account for small deviation
-                    break;
-                dist -= 2.0f; // Distance drops by two units with each unsuccessful attempt
-            }
-            if (dist)
-                me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
-            else // Orientation does not change if not moving, verified with sniffs
-                me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetOrientation());
 
+            ScheduleTimedEvent(10ms, [&] {
+                float angle = irand(-1, 1) * turnConstant;
+                TryTeleportInDirection(8.f, angle, 2.f, false);
             }, 1600ms);
+        },1);
+
+    }
+
+    Position TryTeleportInDirection(float dist, float angle, float step, bool alwaysturn)
+    {
+        Position pos;
+        while (dist >= 0)
+        {
+            pos = me->WorldObject::GetFirstCollisionPosition(dist, angle);
+            if (fabsf(dist - me->GetExactDist2d(pos)) < 0.001) // Account for small deviation
+                break;
+            dist -= step; // Distance drops with each unsuccessful attempt
+        }
+
+        if (dist || alwaysturn)
+            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), Position::NormalizeOrientation(me->GetOrientation() + angle));
+        else // Orientation does not change if not moving, verified with sniffs
+            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetOrientation());
     }
 
     void UpdateAI(uint32 diff) override
@@ -397,7 +405,7 @@ struct boss_archimonde : public BossAI
         float angle = 2 * M_PI * rand() / RAND_MAX;
         float x = me->GetPositionX() + DOOMFIRE_OFFSET * cos(angle);
         float y = me->GetPositionY() + DOOMFIRE_OFFSET * sin(angle);
-        Position spiritPosition = Position(x, y, me->GetPositionZ(), angle);
+        Position spiritPosition = Position(x, y, me->GetPositionZ(), Position::NormalizeOrientation(angle + M_PI)); //spirit faces archimonde on spawn
         Position doomfirePosition = Position(x, y, me->GetPositionZ());
         if (Creature* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
         {
