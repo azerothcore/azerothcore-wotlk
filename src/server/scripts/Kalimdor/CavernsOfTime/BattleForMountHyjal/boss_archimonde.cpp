@@ -152,13 +152,11 @@ struct npc_doomfire_spirit : public ScriptedAI
         ScheduleUniqueTimedEvent(10ms, [&] {
             TryTeleportInDirection(1.f, M_PI, 1.f, true); //turns around and teleports 1 unit on spawn, assuming same logic as later teleports applies
 
-
             ScheduleTimedEvent(10ms, [&] {
                 float angle = irand(-1, 1) * turnConstant;
                 TryTeleportInDirection(8.f, angle, 2.f, false);
             }, 1600ms);
         },1);
-
     }
 
     Position TryTeleportInDirection(float dist, float angle, float step, bool alwaysturn)
