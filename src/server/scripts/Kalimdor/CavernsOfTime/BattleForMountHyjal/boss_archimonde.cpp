@@ -271,10 +271,10 @@ struct boss_archimonde : public BossAI
             Talk(SAY_AIR_BURST);
             DoCastRandomTarget(SPELL_AIR_BURST);
         }, 25s, 40s);
-        ScheduleTimedEvent(25s, 35s, [&]
+        ScheduleTimedEvent(8s, [&]
         {
             DoCastDoomFire();
-        }, 20s);
+        }, 8s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
             DoCastRandomTarget(SPELL_GRIP_OF_THE_LEGION);
