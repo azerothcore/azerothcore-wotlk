@@ -1019,6 +1019,7 @@ public:
     void InitializeSpellInfoPrecomputedData();
 
     bool LoadModuleStrings();
+    bool LoadModuleStringsLocale();
     bool LoadAcoreStrings();
     void LoadBroadcastTexts();
     void LoadBroadcastTextLocales();

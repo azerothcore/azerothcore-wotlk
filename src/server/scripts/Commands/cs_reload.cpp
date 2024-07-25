@@ -722,6 +722,9 @@ public:
         LOG_INFO("server.loading", "Reloading module_string Table!");
         sObjectMgr->LoadModuleStrings();
         handler->SendGlobalGMSysMessage("DB table `module_string` reloaded.");
+        LOG_INFO("server.loading", "Reloading module_string_locale Table!");
+        sObjectMgr->LoadModuleStringsLocale();
+        handler->SendGlobalGMSysMessage("DB table `module_string_locale` reloaded.");
         return true;
     }
 

@@ -8549,10 +8549,10 @@ bool ObjectMgr::LoadModuleStrings()
     uint32 oldMSTime = getMSTime();
 
     _moduleStringStore.clear(); // for reload case
-    QueryResult result = WorldDatabase.Query("SELECT module, id, content_default, locale_koKR, locale_frFR, locale_deDE, locale_zhCN, locale_zhTW, locale_esES, locale_esMX, locale_ruRU FROM module_string");
+    QueryResult result = WorldDatabase.Query("SELECT module, id, string FROM module_string");
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 module strings. DB table `module_strings` is empty.");
+        LOG_WARN("server.loading", ">> Loaded 0 module strings. DB table `module_string` is empty.");
         LOG_INFO("server.loading", " ");
         return false;
     }
@@ -8565,16 +8565,56 @@ bool ObjectMgr::LoadModuleStrings()
         uint32 id          = fields[1].Get<uint32>();
 
         std::pair<std::string, uint32> pairKey = std::make_pair(module, id);
-
         ModuleString& data = _moduleStringStore[pairKey];
 
-        data.Content.resize(DEFAULT_LOCALE + 1);
-
-        for (uint8 i = 0; i < TOTAL_LOCALES; ++i)
-            AddLocaleString(fields[i + 2].Get<std::string>(), LocaleConstant(i), data.Content);
+        AddLocaleString(fields[2].Get<std::string>(), LOCALE_enUS, data.Content);
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} Module Strings in {} ms", _moduleStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+
+    return true;
+}
+
+bool ObjectMgr::LoadModuleStringsLocale()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT module, id, locale, string FROM module_string_locale");
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 module strings locale. DB table `module_string_locale` is empty.");
+        LOG_INFO("server.loading", " ");
+        return false;
+    }
+
+    uint32 localeCount = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        std::string module = fields[0].Get<std::string>();
+        uint32 id          = fields[1].Get<uint32>();
+
+        std::pair<std::string, uint32> pairKey = std::make_pair(module, id);
+        ModuleString& data = _moduleStringStore[pairKey];
+
+        ModuleStringContainer::iterator ms = _moduleStringStore.find(pairKey);
+        if (ms == _moduleStringStore.end())
+        {
+            LOG_ERROR("sql.sql", "ModuleString (Id: {}) found in table `module_string_locale` but does not exist in `module_string`. Skipped!", id);
+            continue;
+        }
+
+        LocaleConstant locale = GetLocaleByName(fields[2].Get<std::string>());
+        if (locale == LOCALE_enUS)
+            continue;
+
+        AddLocaleString(fields[3].Get<std::string>(), locale, data.Content);
+        localeCount++;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Module Strings Locales in {} ms", localeCount, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 
     return true;

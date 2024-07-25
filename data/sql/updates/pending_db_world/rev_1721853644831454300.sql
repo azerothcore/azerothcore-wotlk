@@ -1,18 +1,19 @@
 --
 DROP TABLE IF EXISTS `module_string`;
 CREATE TABLE IF NOT EXISTS `module_string` (
-  `module` varchar(255) NOT NULL COMMENT 'module dir name, eg mod-cfbg',
+  `module` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'module dir name, eg mod-cfbg',
   `id` int unsigned NOT NULL,
-  `content_default` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  `locale_koKR` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `locale_frFR` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `locale_deDE` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `locale_zhCN` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `locale_zhTW` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `locale_esES` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `locale_esMX` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  `locale_ruRU` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `string` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`module`, `id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+DROP TABLE IF EXISTS `module_string_locale`;
+CREATE TABLE IF NOT EXISTS `module_string_locale` (
+  `module` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT 'Corresponds to an existing entry in module_string',
+  `id` int unsigned NOT NULL COMMENT 'Corresponds to an existing entry in module_string',
+  `locale` varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `string` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`module`, `id`, `locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 DELETE FROM `command` WHERE `name` = 'reload module_string';

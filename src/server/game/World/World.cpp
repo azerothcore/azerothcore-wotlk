@@ -1542,9 +1542,10 @@ void World::SetInitialWorldSettings()
     if (!sObjectMgr->LoadAcoreStrings())
         exit(1);                                            // Error message displayed in function already
 
-    LOG_INFO("server.loading", " ");
     LOG_INFO("server.loading", "Loading Module Strings...");
     sObjectMgr->LoadModuleStrings();
+    LOG_INFO("server.loading", "Loading Module Strings Locale...");
+    sObjectMgr->LoadModuleStringsLocale();
 
     ///- Update the realm entry in the database with the realm type from the config file
     //No SQL injection as values are treated as integers
