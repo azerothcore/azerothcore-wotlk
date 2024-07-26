@@ -19,6 +19,7 @@
 #include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "nexus.h"
+#include "Player.h"
 
 DoorData const doorData[] =
 {

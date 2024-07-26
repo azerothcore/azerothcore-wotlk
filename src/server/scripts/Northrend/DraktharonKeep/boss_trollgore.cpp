@@ -21,6 +21,8 @@
 #include "SpellAuras.h"
 #include "SpellScriptLoader.h"
 #include "drak_tharon_keep.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Yells
 {

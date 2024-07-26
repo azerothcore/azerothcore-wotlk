@@ -19,6 +19,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "ruby_sanctum.h"
+#include "SpellScript.h"
 
 enum Texts
 {

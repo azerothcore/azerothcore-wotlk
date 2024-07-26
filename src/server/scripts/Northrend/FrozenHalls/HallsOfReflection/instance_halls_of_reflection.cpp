@@ -19,6 +19,7 @@
 #include "MapMgr.h"
 #include "Transport.h"
 #include "halls_of_reflection.h"
+#include "InstanceScript.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {

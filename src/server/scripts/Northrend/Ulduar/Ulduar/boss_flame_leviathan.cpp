@@ -16,11 +16,11 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "CellImpl.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
 #include "GridNotifiers.h"
-#include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -32,6 +32,12 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "ulduar.h"
+
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 enum LeviathanSpells
 {
