@@ -39,6 +39,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 	('account password', 0, 'Syntax: .account password $old_password $new_password $new_password [$email]\r\n\r\nChange your account password. You may need to check the actual security mode to see if email input is necessary.'),
 	('account set', 2, 'Syntax: .account set $subcommand\nType .account set to see the list of possible subcommands or .help account set $subcommand to see info on subcommands'),
 	('account set 2fa', 0, 'Syntax: .account set 2fa <account> <secret/off>\nProvide a base32 encoded secret to setup two-factor authentication for the account.\nSpecify \'off\' to disable two-factor authentication for the account.'),
+	('account set email', 4, 'Syntax: .account set email <account> <email> <email confirmation>\nAdds an email to the account.'),
 	('account set addon', 2, 'Syntax: .account set addon [$account] #addon\r\n\r\nSet user (possible targeted) expansion addon level allowed. Addon values: 0 - normal, 1 - tbc, 2 - wotlk.'),
 	('account set gmlevel', 4, 'Syntax: .account set gmlevel [$account] #level [#realmid]\r\n\r\nSet the security level for targeted player (can\'t be used at self) or for account $name to a level of #level on the realm #realmID.\r\n\r\n#level may range from 0 to 3.\r\n\r\n#reamID may be -1 for all realms.'),
 	('account set password', 4, 'Syntax: .account set password $account $password $password\r\n\r\nSet password for account.'),

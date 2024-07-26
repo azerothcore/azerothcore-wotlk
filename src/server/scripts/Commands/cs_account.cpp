@@ -55,7 +55,8 @@ public:
             { "addon",      HandleAccountSetAddonCommand,     SEC_GAMEMASTER, Console::Yes },
             { "gmlevel",    HandleAccountSetGmLevelCommand,   SEC_ADMINISTRATOR, Console::Yes },
             { "password",   HandleAccountSetPasswordCommand,  SEC_ADMINISTRATOR, Console::Yes },
-            { "2fa",        HandleAccountSet2FACommand,       SEC_PLAYER,    Console::Yes  }
+            { "2fa",        HandleAccountSet2FACommand,       SEC_PLAYER,    Console::Yes  },
+            { "email",      HandleAccountSetEmailCommand,     SEC_ADMINISTRATOR, Console::Yes }
         };
 
         static ChatCommandTable accountLockCommandTable
@@ -896,6 +897,60 @@ public:
                 return false;
             default:
                 handler->SendErrorMessage(LANG_COMMAND_NOTCHANGEPASSWORD);
+                return false;
+        }
+        return true;
+    }
+
+    /// Set email for account
+    static bool HandleAccountSetEmailCommand(ChatHandler* handler, char const* args)
+    {
+        if (!*args)
+            return false;
+
+        ///- Get the command line arguments
+        char* account = strtok((char*)args, " ");
+        char* email = strtok(nullptr, " ");
+        char* emailConfirmation = strtok(nullptr, " ");
+
+        if (!account || !email || !emailConfirmation)
+            return false;
+
+        std::string accountName = account;
+        if (!Utf8ToUpperOnlyLatin(accountName))
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+            return false;
+        }
+
+        uint32 targetAccountId = AccountMgr::GetId(accountName);
+        if (!targetAccountId)
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+            return false;
+        }
+
+        if (strcmp(email, emailConfirmation))
+        {
+            handler->SendErrorMessage(LANG_NEW_EMAILS_NOT_MATCH);
+            return false;
+        }
+
+        AccountOpResult result = AccountMgr::ChangeEmail(targetAccountId, email);
+
+        switch (result)
+        {
+            case AOR_OK:
+                handler->SendSysMessage(LANG_COMMAND_EMAIL);
+                break;
+            case AOR_NAME_NOT_EXIST:
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
+                return false;
+            case AOR_EMAIL_TOO_LONG:
+                handler->SendErrorMessage(LANG_EMAIL_TOO_LONG);
+                return false;
+            default:
+                handler->SendErrorMessage(LANG_COMMAND_NOTCHANGEEMAIL);
                 return false;
         }
         return true;
