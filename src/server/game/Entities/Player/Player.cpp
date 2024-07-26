@@ -4955,6 +4955,15 @@ void Player::CleanupChannels()
     }
 }
 
+// Playerbot helper if bot talks in a different locale
+bool Player::IsInChannel(const Channel* c)
+{
+    return std::any_of(m_channels.begin(), m_channels.end(), [c](const Channel* chan)
+    {
+        return c->GetChannelId() == chan->GetChannelId();
+    });
+}
+
 void Player::ClearChannelWatch()
 {
     for (JoinedChannelsList::iterator itr = m_channels.begin(); itr != m_channels.end(); ++itr)
