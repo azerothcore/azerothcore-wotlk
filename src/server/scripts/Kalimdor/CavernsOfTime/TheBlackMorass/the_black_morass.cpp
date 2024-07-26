@@ -18,8 +18,10 @@
 #include "the_black_morass.h"
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SmartAI.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
 enum medivhMisc
