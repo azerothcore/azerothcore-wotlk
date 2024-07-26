@@ -1,3 +1,4 @@
+-- DB update 2024_07_25_00 -> 2024_07_26_00
 --
 DELETE FROM `command` WHERE `name`='aura stack';
 INSERT INTO `command` VALUES ('aura stack', 2, 'Syntax: .aurastack #spellid #stacks\r\n\r\nModify #stacks of an already applied #spellid to the selected Unit.');
