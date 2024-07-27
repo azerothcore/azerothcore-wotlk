@@ -798,30 +798,24 @@ public:
     }
 };
 
-class spell_halion_meteor_strike_targeting : public SpellScriptLoader
+class spell_halion_meteor_strike_targeting : public SpellScript
 {
-public:
-    spell_halion_meteor_strike_targeting() : SpellScriptLoader("spell_halion_meteor_strike_targeting") { }
+    PrepareSpellScript(spell_halion_meteor_strike_targeting);
 
-    class spell_halion_meteor_strike_targeting_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_halion_meteor_strike_targeting_SpellScript);
+        return ValidateSpellInfo({ SPELL_METEOR_STRIKE });
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target, SPELL_METEOR_STRIKE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_halion_meteor_strike_targeting_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_halion_meteor_strike_targeting_SpellScript();
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target, SPELL_METEOR_STRIKE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_halion_meteor_strike_targeting::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1482,7 +1476,7 @@ void AddSC_boss_halion()
     new npc_orb_carrier();
     new npc_living_inferno();
 
-    new spell_halion_meteor_strike_targeting();
+    RegisterSpellScript(spell_halion_meteor_strike_targeting);
     new spell_halion_meteor_strike_marker();
     new spell_halion_meteor_strike_spread();
     new spell_halion_blazing_aura();
