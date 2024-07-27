@@ -1206,40 +1206,29 @@ class spell_halion_twilight_cutter : public SpellScript
     }
 };
 
-class spell_halion_summon_exit_portals : public SpellScriptLoader
+class spell_halion_summon_exit_portals : public SpellScript
 {
-public:
-    spell_halion_summon_exit_portals() : SpellScriptLoader("spell_halion_summon_exit_portals") { }
+    PrepareSpellScript(spell_halion_summon_exit_portals);
 
-    class spell_halion_summon_exit_portals_SpellScript : public SpellScript
+    void OnSummon(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_halion_summon_exit_portals_SpellScript);
+        WorldLocation summonPos = *GetExplTargetDest();
+        Position offset = {0.0f, 0.0f, 0.0f, 0.0f};
+        if (GetSpellInfo()->Id == SPELL_SUMMON_EXIT_PORTALS)
+            offset.m_positionY = effIndex == EFFECT_1 ? -35.0f : 35.0f;
+        else
+            offset.m_positionX = effIndex == EFFECT_1 ? -35.0f : 35.0f;
 
-        void OnSummon(SpellEffIndex effIndex)
-        {
-            WorldLocation summonPos = *GetExplTargetDest();
-            Position offset = {0.0f, 0.0f, 0.0f, 0.0f};
-            if (GetSpellInfo()->Id == SPELL_SUMMON_EXIT_PORTALS)
-                offset.m_positionY = effIndex == EFFECT_1 ? -35.0f : 35.0f;
-            else
-                offset.m_positionX = effIndex == EFFECT_1 ? -35.0f : 35.0f;
+        summonPos.RelocateOffset(offset);
 
-            summonPos.RelocateOffset(offset);
+        SetExplTargetDest(summonPos);
+        GetHitDest()->RelocateOffset(offset);
+    }
 
-            SetExplTargetDest(summonPos);
-            GetHitDest()->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_halion_summon_exit_portals_SpellScript::OnSummon, EFFECT_0, SPELL_EFFECT_SUMMON_OBJECT_WILD);
-            OnEffectLaunch += SpellEffectFn(spell_halion_summon_exit_portals_SpellScript::OnSummon, EFFECT_1, SPELL_EFFECT_SUMMON_OBJECT_WILD);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_halion_summon_exit_portals_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_halion_summon_exit_portals::OnSummon, EFFECT_0, SPELL_EFFECT_SUMMON_OBJECT_WILD);
+        OnEffectLaunch += SpellEffectFn(spell_halion_summon_exit_portals::OnSummon, EFFECT_1, SPELL_EFFECT_SUMMON_OBJECT_WILD);
     }
 };
 
@@ -1371,7 +1360,7 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_leave_twilight_realm_aura);
     RegisterSpellScript(spell_halion_twilight_cutter_periodic_aura);
     RegisterSpellScript(spell_halion_twilight_cutter);
-    new spell_halion_summon_exit_portals();
+    RegisterSpellScript(spell_halion_summon_exit_portals);
     new spell_halion_twilight_division();
     new spell_halion_twilight_mending();
 }
