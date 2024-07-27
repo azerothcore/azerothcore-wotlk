@@ -905,7 +905,7 @@ public:
     /// Set email for account
     static bool HandleAccountSetEmailCommand(ChatHandler* handler, Tail args)
     {
-        if (!*args)
+        if (!args.Data())
             return false;
 
         ///- Get the command line arguments
