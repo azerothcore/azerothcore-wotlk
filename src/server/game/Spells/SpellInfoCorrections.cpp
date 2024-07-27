@@ -3607,62 +3607,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS); // 10yd
     });
 
-    // Dragonmaw Race: All parts
-    ApplySpellFix({
-        40890   // Oldie's Rotten Pumpkin
-        }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40905;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Trope's Slime Cannon
-    ApplySpellFix({ 40909 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40905;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Corlok's Skull Barrage
-    ApplySpellFix({ 40894 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40900;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Ichman's Blazing Fireball
-    ApplySpellFix({ 40928 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40929;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Mulverick's Great Balls of Lightning
-    ApplySpellFix({ 40930 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40931;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Sky Shatter
-    ApplySpellFix({ 40945 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 41064;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
     // Gauging the Resonant Frequency (10594)
     ApplySpellFix({ 37390 }, [](SpellInfo* spellInfo)
     {
