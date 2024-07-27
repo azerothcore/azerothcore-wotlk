@@ -1660,7 +1660,6 @@ uint8 GetMineString(uint8 mineId, TeamId teamId)
         break;
     default:
         break;
-
     }
 
     return strId;
