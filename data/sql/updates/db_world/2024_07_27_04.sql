@@ -1,3 +1,4 @@
+-- DB update 2024_07_27_03 -> 2024_07_27_04
 -- Disgusting Oozeling
 DELETE FROM `creature_text` WHERE (`CreatureID` = 15429);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
