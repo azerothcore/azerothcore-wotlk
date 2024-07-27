@@ -117,7 +117,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     if (player->GetLevel() < sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ))
     {
-        SendNotification(GetAcoreString(LANG_MAIL_SENDER_REQ), sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
+        SendNotification(LANG_MAIL_SENDER_REQ, sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
         return;
     }
 
