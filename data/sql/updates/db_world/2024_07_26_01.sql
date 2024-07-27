@@ -2,7 +2,7 @@
 DELETE FROM `command` WHERE `name`='account set email';
 
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
-('account set email', 4, 'Syntax: .account set email <account> <email> <email confirmation>\nAdds an email to the account.');
+('account set email', 4, 'Syntax: .account set email $account $email $email_confirmation\nAdd or change an email to the account.');
 
 DELETE FROM `acore_string` WHERE `entry` IN (875);
 INSERT INTO `acore_string` (`entry`, `content_default`,`locale_zhCN`) VALUES
