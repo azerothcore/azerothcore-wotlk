@@ -1646,20 +1646,20 @@ uint8 GetMineString(uint8 mineId, TeamId teamId)
     uint8 strId = 0;
     switch (mineId)
     {
-        case AV_NORTH_MINE:
-            if (teamId == TEAM_ALLIANCE)
-                strId = AV_TEXT_A_HERALD_IRONDEEP_MINE_TAKEN;
-            else
-                strId = AV_TEXT_H_HERALD_IRONDEEP_MINE_TAKEN;
-            break;
-        case AV_SOUTH_MINE:
-            if (teamId == TEAM_ALLIANCE)
-                strId = AV_TEXT_A_HERALD_COLDTOOTH_MINE_TAKEN;
-            else
-                strId = AV_TEXT_H_HERALD_COLDTOOTH_MINE_TAKEN;
-            break;
-        default:
-            break;
+    case AV_NORTH_MINE:
+        if (teamId == TEAM_ALLIANCE)
+            strId = AV_TEXT_A_HERALD_IRONDEEP_MINE_TAKEN;
+        else
+            strId = AV_TEXT_H_HERALD_IRONDEEP_MINE_TAKEN;
+        break;
+    case AV_SOUTH_MINE:
+        if (teamId == TEAM_ALLIANCE)
+            strId = AV_TEXT_A_HERALD_COLDTOOTH_MINE_TAKEN;
+        else
+            strId = AV_TEXT_H_HERALD_COLDTOOTH_MINE_TAKEN;
+        break;
+    default:
+        break;
 
     }
 
