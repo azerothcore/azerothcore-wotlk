@@ -899,7 +899,7 @@ class spell_halion_combustion_consumption_aura : public AuraScript
 {
     PrepareAuraScript(spell_halion_combustion_consumption_aura);
 
-    public:
+public:
     spell_halion_combustion_consumption_aura(uint32 spellID) : AuraScript(), _markSpell(spellID) { }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -923,6 +923,9 @@ class spell_halion_combustion_consumption_aura : public AuraScript
         AfterEffectApply += AuraEffectApplyFn(spell_halion_combustion_consumption_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
         AfterEffectRemove += AuraEffectRemoveFn(spell_halion_combustion_consumption_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
+
+private:
+    uint32 _markSpell;
 };
 
 class spell_halion_marks_aura : public AuraScript
