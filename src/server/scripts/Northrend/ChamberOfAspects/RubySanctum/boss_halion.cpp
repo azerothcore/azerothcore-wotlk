@@ -819,44 +819,38 @@ class spell_halion_meteor_strike_targeting : public SpellScript
     }
 };
 
-class spell_halion_meteor_strike_marker : public SpellScriptLoader
+class spell_halion_meteor_strike_marker_aura : public AuraScript
 {
-public:
-    spell_halion_meteor_strike_marker() : SpellScriptLoader("spell_halion_meteor_strike_marker") { }
+    PrepareAuraScript(spell_halion_meteor_strike_marker_aura);
 
-    class spell_halion_meteor_strike_marker_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_halion_meteor_strike_marker_AuraScript);
+        return ValidateSpellInfo({ SPELL_METEOR_STRIKE_AOE_DAMAGE, SPELL_METEOR_STRIKE_FIRE_AURA_1 });
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            SetDuration(6500);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-            {
-                if (!caster->GetInstanceScript() || !caster->GetInstanceScript()->IsEncounterInProgress())
-                    return;
-
-                caster->CastSpell(caster, SPELL_METEOR_STRIKE_AOE_DAMAGE, true);
-                caster->CastSpell(caster, SPELL_METEOR_STRIKE_FIRE_AURA_1, true);
-                for (uint32 spellId = SPELL_SUMMON_METEOR_STRIKE1; spellId <= SPELL_SUMMON_METEOR_STRIKE4; ++spellId)
-                    caster->CastSpell(caster, spellId, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_halion_meteor_strike_marker_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_halion_meteor_strike_marker_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_halion_meteor_strike_marker_AuraScript();
+        SetDuration(6500);
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (!caster->GetInstanceScript() || !caster->GetInstanceScript()->IsEncounterInProgress())
+                return;
+
+            caster->CastSpell(caster, SPELL_METEOR_STRIKE_AOE_DAMAGE, true);
+            caster->CastSpell(caster, SPELL_METEOR_STRIKE_FIRE_AURA_1, true);
+            for (uint32 spellId = SPELL_SUMMON_METEOR_STRIKE1; spellId <= SPELL_SUMMON_METEOR_STRIKE4; ++spellId)
+                caster->CastSpell(caster, spellId, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_halion_meteor_strike_marker_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_halion_meteor_strike_marker_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1477,7 +1471,7 @@ void AddSC_boss_halion()
     new npc_living_inferno();
 
     RegisterSpellScript(spell_halion_meteor_strike_targeting);
-    new spell_halion_meteor_strike_marker();
+    RegisterSpellScript(spell_halion_meteor_strike_marker_aura);
     new spell_halion_meteor_strike_spread();
     new spell_halion_blazing_aura();
     new spell_halion_combustion_consumption("spell_halion_soul_consumption", SPELL_MARK_OF_CONSUMPTION);
