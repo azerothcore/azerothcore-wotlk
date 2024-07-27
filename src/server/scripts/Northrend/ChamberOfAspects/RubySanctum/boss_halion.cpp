@@ -925,56 +925,38 @@ class spell_halion_combustion_consumption_aura : public AuraScript
     }
 };
 
-class spell_halion_marks : public SpellScriptLoader
+class spell_halion_marks_aura : public AuraScript
 {
-public:
-    spell_halion_marks(char const* scriptName, uint32 summonSpell, uint32 removeSpell) : SpellScriptLoader(scriptName), _summonSpell(summonSpell), _removeSpell(removeSpell) { }
-
-    class spell_halion_marks_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_halion_marks_AuraScript);
+    PrepareAuraScript(spell_halion_marks_aura);
 
     public:
-        spell_halion_marks_AuraScript(uint32 summonSpell, uint32 removeSpell) : AuraScript(), _summonSpellId(summonSpell), _removeSpellId(removeSpell) { }
+    spell_halion_marks_aura(uint32 summonSpell, uint32 removeSpell) : AuraScript(), _summonSpellId(summonSpell), _removeSpellId(removeSpell) { }
 
-        void BeforeDispel(DispelInfo* dispelData)
-        {
-            dispelData->SetRemovedCharges(0);
-
-            if (Unit* dispelledUnit = GetUnitOwner())
-                if (dispelledUnit->HasAura(_removeSpellId))
-                    dispelledUnit->RemoveAurasDueToSpell(_removeSpellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
-        }
-
-        void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
-                return;
-
-            if (!GetTarget()->GetInstanceScript() || !GetTarget()->GetInstanceScript()->IsEncounterInProgress() || GetTarget()->GetMapId() != 724)
-                return;
-
-            GetTarget()->CastCustomSpell(_summonSpellId, SPELLVALUE_BASE_POINT1, GetAura()->GetStackAmount(), GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
-        }
-
-        void Register() override
-        {
-            OnDispel += AuraDispelFn(spell_halion_marks_AuraScript::BeforeDispel);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_halion_marks_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-        uint32 _summonSpellId;
-        uint32 _removeSpellId;
-    };
-
-    AuraScript* GetAuraScript() const override
+    void BeforeDispel(DispelInfo* dispelData)
     {
-        return new spell_halion_marks_AuraScript(_summonSpell, _removeSpell);
+        dispelData->SetRemovedCharges(0);
+
+        if (Unit* dispelledUnit = GetUnitOwner())
+            if (dispelledUnit->HasAura(_removeSpellId))
+                dispelledUnit->RemoveAurasDueToSpell(_removeSpellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
     }
 
-private:
-    uint32 _summonSpell;
-    uint32 _removeSpell;
+    void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+            return;
+
+        if (!GetTarget()->GetInstanceScript() || !GetTarget()->GetInstanceScript()->IsEncounterInProgress() || GetTarget()->GetMapId() != 724)
+            return;
+
+        GetTarget()->CastCustomSpell(_summonSpellId, SPELLVALUE_BASE_POINT1, GetAura()->GetStackAmount(), GetTarget(), TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        OnDispel += AuraDispelFn(spell_halion_marks_aura::BeforeDispel);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_halion_marks_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 class spell_halion_damage_aoe_summon : public SpellScriptLoader
@@ -1443,8 +1425,8 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_blazing_aura);
     RegisterSpellScriptWithArgs(spell_halion_combustion_consumption_aura, "spell_halion_soul_consumption_aura", SPELL_MARK_OF_CONSUMPTION);
     RegisterSpellScriptWithArgs(spell_halion_combustion_consumption_aura, "spell_halion_fiery_combustion_aura", SPELL_MARK_OF_COMBUSTION);
-    new spell_halion_marks("spell_halion_mark_of_combustion", SPELL_FIERY_COMBUSTION_SUMMON, SPELL_FIERY_COMBUSTION);
-    new spell_halion_marks("spell_halion_mark_of_consumption", SPELL_SOUL_CONSUMPTION_SUMMON, SPELL_SOUL_CONSUMPTION);
+    RegisterSpellScriptWithArgs(spell_halion_marks_aura, "spell_halion_mark_of_combustion_aura", SPELL_FIERY_COMBUSTION_SUMMON, SPELL_FIERY_COMBUSTION);
+    RegisterSpellScriptWithArgs(spell_halion_marks_aura, "spell_halion_mark_of_consumption_aura", SPELL_SOUL_CONSUMPTION_SUMMON, SPELL_SOUL_CONSUMPTION);
     new spell_halion_damage_aoe_summon("spell_halion_combustion_summon", SPELL_FIERY_COMBUSTION_EXPLOSION, SPELL_COMBUSTION_DAMAGE_AURA);
     new spell_halion_damage_aoe_summon("spell_halion_consumption_summon", SPELL_SOUL_CONSUMPTION_EXPLOSION, SPELL_CONSUMPTION_DAMAGE_AURA);
     new spell_halion_clear_debuffs();
