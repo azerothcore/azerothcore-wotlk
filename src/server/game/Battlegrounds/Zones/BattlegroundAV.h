@@ -1715,7 +1715,6 @@ enum BG_AV_HERALD
     AV_TEXT_HERALD_STORMPIKE_GENERAL_DEAD         = 66,
     AV_TEXT_A_HERALD_WIN                          = 67,
     AV_TEXT_H_HERALD_WIN                          = 68
-
 };
 
 struct BG_AV_NodeInfo
