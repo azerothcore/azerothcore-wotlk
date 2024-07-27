@@ -22,6 +22,7 @@
 #include "WorldSession.h"
 #include "AccountMgr.h"
 #include "BattlegroundMgr.h"
+#include "Chat.h"
 #include "CharacterPackets.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -43,6 +44,7 @@
 #include "QueryHolder.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WardenMac.h"
@@ -817,6 +819,29 @@ void WorldSession::SendNotification(uint32 string_id, ...)
         WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
         data << szStr;
         SendPacket(&data);
+    }
+}
+
+void WorldSession::SendGMText(std::string_view str)
+{
+    WorldPacket data;
+    for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+    {
+        // Session should have permissions to receive global gm messages
+        WorldSession* session = itr->second;
+        if (!session || AccountMgr::IsPlayerAccount(session->GetSecurity()))
+            continue;
+
+        // Player should be in world
+        Player* player = session->GetPlayer();
+        if (!player || !player->IsInWorld())
+            continue;
+
+        for (std::string_view line : Acore::Tokenize(str, '\n', true))
+        {
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+            player->SendDirectMessage(&data);
+        }
     }
 }
 

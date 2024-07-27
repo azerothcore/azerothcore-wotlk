@@ -345,6 +345,18 @@ public:
     void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
     void WriteMovementInfo(WorldPacket* data, MovementInfo* mi);
 
+    void SendGMText(std::string_view str);
+    template<typename... Args>
+    void SendGMText(uint32 strId, Args&&... args)
+    {
+        SendGMText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+    }
+    template<typename... Args>
+    void SendGMText(char const* fmt, Args&&... args)
+    {
+        SendGMText(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+    }
+
     void SendPacket(WorldPacket const* packet);
     void SendNotification(const char* format, ...) ATTR_PRINTF(2, 3);
     void SendNotification(uint32 string_id, ...);

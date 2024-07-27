@@ -239,7 +239,6 @@ public:
     void LoadConfigSettings(bool reload = false) override;
 
     void SendWorldText(uint32 string_id, ...) override;
-    void SendGMText(uint32 string_id, ...) override;
     void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
