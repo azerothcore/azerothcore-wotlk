@@ -35,6 +35,13 @@ TalentSpellPos const* GetTalentSpellPos(uint32 spellId);
 
 WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid, int32 groupid);
 
+
+// -1 if not found
+int32 GetAreaFlagByAreaID(uint32 area_id);
+uint32 GetAreaFlagByMapId(uint32 mapid);
+AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id);
+AreaTableEntry const* GetAreaEntryByAreaFlagAndMap(uint32 area_flag, uint32 map_id);
+
 uint32 GetVirtualMapForMapAndZone(uint32 mapid, uint32 zoneId);
 
 enum ContentLevels : uint8
