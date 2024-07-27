@@ -1116,43 +1116,37 @@ class spell_halion_twilight_realm_aura : public AuraScript
     }
 };
 
-class spell_halion_leave_twilight_realm : public SpellScriptLoader
+class spell_halion_leave_twilight_realm_aura : public AuraScript
 {
-public:
-    spell_halion_leave_twilight_realm() : SpellScriptLoader("spell_halion_leave_twilight_realm") { }
+    PrepareAuraScript(spell_halion_leave_twilight_realm_aura);
 
-    class spell_halion_leave_twilight_realm_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_halion_leave_twilight_realm_AuraScript);
+        return ValidateSpellInfo({ SPELL_SOUL_CONSUMPTION, SPELL_TWILIGHT_REALM });
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
-        {
-            Unit* target = GetTarget();
-            if (!target)
-                return;
-
-            target->RemoveAurasDueToSpell(SPELL_SOUL_CONSUMPTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
-        {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_TWILIGHT_REALM);
-
-            if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
-                return;
-            GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_halion_leave_twilight_realm_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_halion_leave_twilight_realm_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
     {
-        return new spell_halion_leave_twilight_realm_AuraScript();
+        Unit* target = GetTarget();
+        if (!target)
+            return;
+
+        target->RemoveAurasDueToSpell(SPELL_SOUL_CONSUMPTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_TWILIGHT_REALM);
+
+        if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
+            return;
+        GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_halion_leave_twilight_realm_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_halion_leave_twilight_realm_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1396,7 +1390,7 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_clear_debuffs);
     RegisterSpellAndAuraScriptPair(spell_halion_twilight_phasing, spell_halion_twilight_phasing_aura);
     RegisterSpellScript(spell_halion_twilight_realm_aura);
-    new spell_halion_leave_twilight_realm();
+    RegisterSpellScript(spell_halion_leave_twilight_realm_aura);
     new spell_halion_twilight_cutter_periodic();
     new spell_halion_twilight_cutter();
     new spell_halion_summon_exit_portals();
