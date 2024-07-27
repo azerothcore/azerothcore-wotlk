@@ -185,31 +185,25 @@ public:
     }
 };
 
-class spell_saviana_conflagration_init : public SpellScriptLoader
+class spell_saviana_conflagration_init : public SpellScript
 {
-public:
-    spell_saviana_conflagration_init() : SpellScriptLoader("spell_saviana_conflagration_init") { }
+    PrepareSpellScript(spell_saviana_conflagration_init);
 
-    class spell_saviana_conflagration_init_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_saviana_conflagration_init_SpellScript);
+        return ValidateSpellInfo({ SPELL_FLAME_BEACON, SPELL_CONFLAGRATION_MISSLE });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetHitUnit(), SPELL_FLAME_BEACON, true);
-            GetCaster()->CastSpell(GetHitUnit(), SPELL_CONFLAGRATION_MISSLE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_saviana_conflagration_init_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_saviana_conflagration_init_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_FLAME_BEACON, true);
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_CONFLAGRATION_MISSLE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_saviana_conflagration_init::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -243,7 +237,7 @@ public:
 void AddSC_boss_saviana_ragefire()
 {
     new boss_saviana_ragefire();
-    new spell_saviana_conflagration_init();
+    RegisterSpellScript(spell_saviana_conflagration_init);
     new spell_saviana_conflagration_throwback();
 }
 
