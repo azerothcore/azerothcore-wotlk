@@ -207,30 +207,19 @@ class spell_saviana_conflagration_init : public SpellScript
     }
 };
 
-class spell_saviana_conflagration_throwback : public SpellScriptLoader
+class spell_saviana_conflagration_throwback : public SpellScript
 {
-public:
-    spell_saviana_conflagration_throwback() : SpellScriptLoader("spell_saviana_conflagration_throwback") { }
+    PrepareSpellScript(spell_saviana_conflagration_throwback);
 
-    class spell_saviana_conflagration_throwback_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_saviana_conflagration_throwback_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_saviana_conflagration_throwback_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_saviana_conflagration_throwback_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_saviana_conflagration_throwback::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -238,6 +227,6 @@ void AddSC_boss_saviana_ragefire()
 {
     new boss_saviana_ragefire();
     RegisterSpellScript(spell_saviana_conflagration_init);
-    new spell_saviana_conflagration_throwback();
+    RegisterSpellScript(spell_saviana_conflagration_throwback);
 }
 
