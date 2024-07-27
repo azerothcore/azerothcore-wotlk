@@ -975,7 +975,7 @@ class spell_halion_damage_aoe_summon : public SpellScript
         return ValidateSpellInfo({ SPELL_SCALE_AURA });
     }
 
-    public:
+public:
     spell_halion_damage_aoe_summon(uint32 explosionSpell, uint32 auraSpell) : SpellScript(), _explosionSpell(explosionSpell), _auraSpell(auraSpell) { }
 
     void HandleSummon(SpellEffIndex effIndex)
@@ -1011,6 +1011,10 @@ class spell_halion_damage_aoe_summon : public SpellScript
     {
         OnEffectHit += SpellEffectFn(spell_halion_damage_aoe_summon::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
     }
+
+private:
+    uint32 _explosionSpell;
+    uint32 _auraSpell;
 };
 
 class spell_halion_clear_debuffs : public SpellScript
