@@ -878,31 +878,20 @@ class spell_halion_meteor_strike_spread_aura : public AuraScript
     }
 };
 
-class spell_halion_blazing_aura : public SpellScriptLoader
+class spell_halion_blazing_aura : public SpellScript
 {
-public:
-    spell_halion_blazing_aura() : SpellScriptLoader("spell_halion_blazing_aura") { }
+    PrepareSpellScript(spell_halion_blazing_aura);
 
-    class spell_halion_blazing_aura_SpellScript : public SpellScript
+    void HandleForceCast(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_halion_blazing_aura_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, GetSpellInfo()->Effects[effIndex].TriggerSpell, true);
+    }
 
-        void HandleForceCast(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, GetSpellInfo()->Effects[effIndex].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_halion_blazing_aura_SpellScript::HandleForceCast, EFFECT_1, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_halion_blazing_aura_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_halion_blazing_aura::HandleForceCast, EFFECT_1, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
@@ -1467,7 +1456,7 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_meteor_strike_targeting);
     RegisterSpellScript(spell_halion_meteor_strike_marker_aura);
     RegisterSpellScript(spell_halion_meteor_strike_spread_aura);
-    new spell_halion_blazing_aura();
+    RegisterSpellScript(spell_halion_blazing_aura);
     new spell_halion_combustion_consumption("spell_halion_soul_consumption", SPELL_MARK_OF_CONSUMPTION);
     new spell_halion_combustion_consumption("spell_halion_fiery_combustion", SPELL_MARK_OF_COMBUSTION);
     new spell_halion_marks("spell_halion_mark_of_combustion", SPELL_FIERY_COMBUSTION_SUMMON, SPELL_FIERY_COMBUSTION);
