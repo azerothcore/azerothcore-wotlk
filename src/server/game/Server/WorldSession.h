@@ -345,9 +345,19 @@ public:
     void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
     void WriteMovementInfo(WorldPacket* data, MovementInfo* mi);
 
+    void SendNotification(std::string_view str);
+    template<typename... Args>
+    void SendNotification(uint32 strId, Args&&... args)
+    {
+        SendNotification(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+    }
+    template<typename... Args>
+    void SendNotification(char const* fmt, Args&&... args)
+    {
+        SendNotification(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+    }
+
     void SendPacket(WorldPacket const* packet);
-    void SendNotification(const char* format, ...) ATTR_PRINTF(2, 3);
-    void SendNotification(uint32 string_id, ...);
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
     void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res, uint32 val = 0);
     void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2, 3);
