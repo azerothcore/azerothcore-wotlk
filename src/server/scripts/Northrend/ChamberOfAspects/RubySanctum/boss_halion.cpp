@@ -895,50 +895,34 @@ class spell_halion_blazing_aura : public SpellScript
     }
 };
 
-class spell_halion_combustion_consumption : public SpellScriptLoader
+class spell_halion_combustion_consumption_aura : public AuraScript
 {
-public:
-    spell_halion_combustion_consumption(char const* scriptName, uint32 spell) : SpellScriptLoader(scriptName), _spellID(spell) { }
-
-    class spell_halion_combustion_consumption_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_halion_combustion_consumption_AuraScript);
+    PrepareAuraScript(spell_halion_combustion_consumption_aura);
 
     public:
-        spell_halion_combustion_consumption_AuraScript(uint32 spellID) : AuraScript(), _markSpell(spellID) { }
+    spell_halion_combustion_consumption_aura(uint32 spellID) : AuraScript(), _markSpell(spellID) { }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->RemoveAurasDueToSpell(_markSpell, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
-        }
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->CastSpell(GetTarget(), _markSpell, true);
-        }
-
-        void AddMarkStack(AuraEffect const* /*aurEff*/)
-        {
-            GetTarget()->CastSpell(GetTarget(), _markSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_halion_combustion_consumption_AuraScript::AddMarkStack, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-            AfterEffectApply += AuraEffectApplyFn(spell_halion_combustion_consumption_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_halion_combustion_consumption_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-
-        uint32 _markSpell;
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_halion_combustion_consumption_AuraScript(_spellID);
+        GetTarget()->RemoveAurasDueToSpell(_markSpell, ObjectGuid::Empty, 0, AURA_REMOVE_BY_EXPIRE);
     }
 
-private:
-    uint32 _spellID;
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->CastSpell(GetTarget(), _markSpell, true);
+    }
+
+    void AddMarkStack(AuraEffect const* /*aurEff*/)
+    {
+        GetTarget()->CastSpell(GetTarget(), _markSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_halion_combustion_consumption_aura::AddMarkStack, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        AfterEffectApply += AuraEffectApplyFn(spell_halion_combustion_consumption_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_halion_combustion_consumption_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 class spell_halion_marks : public SpellScriptLoader
@@ -1457,8 +1441,8 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_meteor_strike_marker_aura);
     RegisterSpellScript(spell_halion_meteor_strike_spread_aura);
     RegisterSpellScript(spell_halion_blazing_aura);
-    new spell_halion_combustion_consumption("spell_halion_soul_consumption", SPELL_MARK_OF_CONSUMPTION);
-    new spell_halion_combustion_consumption("spell_halion_fiery_combustion", SPELL_MARK_OF_COMBUSTION);
+    RegisterSpellScriptWithArgs(spell_halion_combustion_consumption_aura, "spell_halion_soul_consumption_aura", SPELL_MARK_OF_CONSUMPTION);
+    RegisterSpellScriptWithArgs(spell_halion_combustion_consumption_aura, "spell_halion_fiery_combustion_aura", SPELL_MARK_OF_COMBUSTION);
     new spell_halion_marks("spell_halion_mark_of_combustion", SPELL_FIERY_COMBUSTION_SUMMON, SPELL_FIERY_COMBUSTION);
     new spell_halion_marks("spell_halion_mark_of_consumption", SPELL_SOUL_CONSUMPTION_SUMMON, SPELL_SOUL_CONSUMPTION);
     new spell_halion_damage_aoe_summon("spell_halion_combustion_summon", SPELL_FIERY_COMBUSTION_EXPLOSION, SPELL_COMBUSTION_DAMAGE_AURA);
