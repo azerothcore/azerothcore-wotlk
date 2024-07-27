@@ -959,64 +959,51 @@ class spell_halion_marks_aura : public AuraScript
     }
 };
 
-class spell_halion_damage_aoe_summon : public SpellScriptLoader
+class spell_halion_damage_aoe_summon : public SpellScript
 {
-public:
-    spell_halion_damage_aoe_summon(char const* scriptName, uint32 explosionSpell, uint32 auraSpell) : SpellScriptLoader(scriptName), _explosionSpell(explosionSpell), _auraSpell(auraSpell) { }
+    PrepareSpellScript(spell_halion_damage_aoe_summon);
 
-    class spell_halion_damage_aoe_summon_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_halion_damage_aoe_summon_SpellScript);
-
-    public:
-        spell_halion_damage_aoe_summon_SpellScript(uint32 explosionSpell, uint32 auraSpell) : SpellScript(), _explosionSpell(explosionSpell), _auraSpell(auraSpell) { }
-
-        void HandleSummon(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Unit* caster = GetCaster();
-            uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
-            SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
-            uint32 duration = uint32(GetSpellInfo()->GetDuration());
-
-            Position pos = caster->GetPosition();
-            if (Creature* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id))
-            {
-                bool heroic = summon->GetMap()->IsHeroic();
-                bool raid = summon->GetMap()->Is25ManRaid();
-
-                if (heroic)
-                    summon->SetPhaseMask(0x01 | 0x20, true);
-                else if (summon->GetEntry() == NPC_COMBUSTION)
-                    summon->SetPhaseMask(0x01, true);
-                else
-                    summon->SetPhaseMask(0x20, true);
-
-                summon->CastCustomSpell(SPELL_SCALE_AURA, SPELLVALUE_AURA_STACK, GetSpellValue()->EffectBasePoints[EFFECT_1], summon);
-                summon->CastSpell(summon, _auraSpell, true);
-
-                int32 damage = int32((1500 + (GetSpellValue()->EffectBasePoints[EFFECT_1] * 1250)) * (heroic ? 1.25f : 1.0f) * (raid ? 1.5f : 1.0f));
-                caster->CastCustomSpell(_explosionSpell, SPELLVALUE_BASE_POINT0, damage, caster);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_halion_damage_aoe_summon_SpellScript::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
-        }
-
-        uint32 _explosionSpell;
-        uint32 _auraSpell;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_halion_damage_aoe_summon_SpellScript(_explosionSpell, _auraSpell);
+        return ValidateSpellInfo({ SPELL_SCALE_AURA });
     }
 
-private:
-    uint32 _explosionSpell;
-    uint32 _auraSpell;
+    public:
+    spell_halion_damage_aoe_summon(uint32 explosionSpell, uint32 auraSpell) : SpellScript(), _explosionSpell(explosionSpell), _auraSpell(auraSpell) { }
+
+    void HandleSummon(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        Unit* caster = GetCaster();
+        uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
+        SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
+        uint32 duration = uint32(GetSpellInfo()->GetDuration());
+
+        Position pos = caster->GetPosition();
+        if (Creature* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id))
+        {
+            bool heroic = summon->GetMap()->IsHeroic();
+            bool raid = summon->GetMap()->Is25ManRaid();
+
+            if (heroic)
+                summon->SetPhaseMask(0x01 | 0x20, true);
+            else if (summon->GetEntry() == NPC_COMBUSTION)
+                summon->SetPhaseMask(0x01, true);
+            else
+                summon->SetPhaseMask(0x20, true);
+
+            summon->CastCustomSpell(SPELL_SCALE_AURA, SPELLVALUE_AURA_STACK, GetSpellValue()->EffectBasePoints[EFFECT_1], summon);
+            summon->CastSpell(summon, _auraSpell, true);
+
+            int32 damage = int32((1500 + (GetSpellValue()->EffectBasePoints[EFFECT_1] * 1250)) * (heroic ? 1.25f : 1.0f) * (raid ? 1.5f : 1.0f));
+            caster->CastCustomSpell(_explosionSpell, SPELLVALUE_BASE_POINT0, damage, caster);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_halion_damage_aoe_summon::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
+    }
 };
 
 class spell_halion_clear_debuffs : public SpellScriptLoader
@@ -1427,8 +1414,8 @@ void AddSC_boss_halion()
     RegisterSpellScriptWithArgs(spell_halion_combustion_consumption_aura, "spell_halion_fiery_combustion_aura", SPELL_MARK_OF_COMBUSTION);
     RegisterSpellScriptWithArgs(spell_halion_marks_aura, "spell_halion_mark_of_combustion_aura", SPELL_FIERY_COMBUSTION_SUMMON, SPELL_FIERY_COMBUSTION);
     RegisterSpellScriptWithArgs(spell_halion_marks_aura, "spell_halion_mark_of_consumption_aura", SPELL_SOUL_CONSUMPTION_SUMMON, SPELL_SOUL_CONSUMPTION);
-    new spell_halion_damage_aoe_summon("spell_halion_combustion_summon", SPELL_FIERY_COMBUSTION_EXPLOSION, SPELL_COMBUSTION_DAMAGE_AURA);
-    new spell_halion_damage_aoe_summon("spell_halion_consumption_summon", SPELL_SOUL_CONSUMPTION_EXPLOSION, SPELL_CONSUMPTION_DAMAGE_AURA);
+    RegisterSpellScriptWithArgs(spell_halion_damage_aoe_summon, "spell_halion_combustion_summon", SPELL_FIERY_COMBUSTION_EXPLOSION, SPELL_COMBUSTION_DAMAGE_AURA);
+    RegisterSpellScriptWithArgs(spell_halion_damage_aoe_summon, "spell_halion_consumption_summon", SPELL_SOUL_CONSUMPTION_EXPLOSION, SPELL_CONSUMPTION_DAMAGE_AURA);
     new spell_halion_clear_debuffs();
     new spell_halion_twilight_phasing();
     new spell_halion_twilight_realm();
