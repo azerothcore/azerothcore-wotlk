@@ -1150,30 +1150,19 @@ class spell_halion_leave_twilight_realm_aura : public AuraScript
     }
 };
 
-class spell_halion_twilight_cutter_periodic : public SpellScriptLoader
+class spell_halion_twilight_cutter_periodic_aura : public AuraScript
 {
-public:
-    spell_halion_twilight_cutter_periodic() : SpellScriptLoader("spell_halion_twilight_cutter_periodic") { }
+    PrepareAuraScript(spell_halion_twilight_cutter_periodic_aura);
 
-    class spell_halion_twilight_cutter_periodic_AuraScript : public AuraScript
+    void HandlePeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_halion_twilight_cutter_periodic_AuraScript);
+        PreventDefaultAction();
+        GetUnitOwner()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void HandlePeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_halion_twilight_cutter_periodic_AuraScript::HandlePeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_halion_twilight_cutter_periodic_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_halion_twilight_cutter_periodic_aura::HandlePeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1391,7 +1380,7 @@ void AddSC_boss_halion()
     RegisterSpellAndAuraScriptPair(spell_halion_twilight_phasing, spell_halion_twilight_phasing_aura);
     RegisterSpellScript(spell_halion_twilight_realm_aura);
     RegisterSpellScript(spell_halion_leave_twilight_realm_aura);
-    new spell_halion_twilight_cutter_periodic();
+    RegisterSpellScript(spell_halion_twilight_cutter_periodic_aura);
     new spell_halion_twilight_cutter();
     new spell_halion_summon_exit_portals();
     new spell_halion_twilight_division();
