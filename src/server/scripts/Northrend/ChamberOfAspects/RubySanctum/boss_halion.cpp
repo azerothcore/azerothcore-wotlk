@@ -932,7 +932,7 @@ class spell_halion_marks_aura : public AuraScript
 {
     PrepareAuraScript(spell_halion_marks_aura);
 
-    public:
+public:
     spell_halion_marks_aura(uint32 summonSpell, uint32 removeSpell) : AuraScript(), _summonSpellId(summonSpell), _removeSpellId(removeSpell) { }
 
     void BeforeDispel(DispelInfo* dispelData)
@@ -960,6 +960,10 @@ class spell_halion_marks_aura : public AuraScript
         OnDispel += AuraDispelFn(spell_halion_marks_aura::BeforeDispel);
         AfterEffectRemove += AuraEffectRemoveFn(spell_halion_marks_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
+
+private:
+    uint32 _summonSpellId;
+    uint32 _removeSpellId;
 };
 
 class spell_halion_damage_aoe_summon : public SpellScript
