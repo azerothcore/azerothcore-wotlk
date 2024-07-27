@@ -20,6 +20,7 @@
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "hellfire_ramparts.h"
+#include "SpellScript.h"
 
 enum Says
 {

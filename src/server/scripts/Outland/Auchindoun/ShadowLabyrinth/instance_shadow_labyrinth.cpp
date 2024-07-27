@@ -19,6 +19,7 @@
 #include "InstanceScript.h"
 #include "SpellScriptLoader.h"
 #include "shadow_labyrinth.h"
+#include "SpellScript.h"
 
 DoorData const doorData[] =
 {

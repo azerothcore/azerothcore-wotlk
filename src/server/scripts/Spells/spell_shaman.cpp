@@ -21,7 +21,6 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "TemporarySummon.h"
 #include "Unit.h"
 /*
  * Scripts for spells with SPELLFAMILY_SHAMAN and SPELLFAMILY_GENERIC spells used by shaman players.

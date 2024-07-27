@@ -32,7 +32,6 @@ EndContentData */
 #include "GuardAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "SpellInfo.h"
 
 enum GuardShattrath
 {
