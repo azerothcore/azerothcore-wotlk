@@ -1272,30 +1272,19 @@ class spell_halion_twilight_division : public SpellScript
     }
 };
 
-class spell_halion_twilight_mending : public SpellScriptLoader
+class spell_halion_twilight_mending : public SpellScript
 {
-public:
-    spell_halion_twilight_mending() : SpellScriptLoader("spell_halion_twilight_mending") { }
+    PrepareSpellScript(spell_halion_twilight_mending);
 
-    class spell_halion_twilight_mending_SpellScript : public SpellScript
+    void HandleHealPct(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_halion_twilight_mending_SpellScript);
+        if (Creature* target = GetHitCreature())
+            target->AI()->Talk(SAY_REGENERATE);
+    }
 
-        void HandleHealPct(SpellEffIndex  /*effIndex*/)
-        {
-            if (Creature* target = GetHitCreature())
-                target->AI()->Talk(SAY_REGENERATE);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_halion_twilight_mending_SpellScript::HandleHealPct, EFFECT_ALL, SPELL_EFFECT_HEAL_PCT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_halion_twilight_mending_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_halion_twilight_mending::HandleHealPct, EFFECT_ALL, SPELL_EFFECT_HEAL_PCT);
     }
 };
 
@@ -1356,6 +1345,6 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_twilight_cutter);
     RegisterSpellScript(spell_halion_summon_exit_portals);
     RegisterSpellScript(spell_halion_twilight_division);
-    new spell_halion_twilight_mending();
+    RegisterSpellScript(spell_halion_twilight_mending);
 }
 
