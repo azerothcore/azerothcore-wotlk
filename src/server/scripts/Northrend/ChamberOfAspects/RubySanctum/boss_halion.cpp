@@ -1232,49 +1232,43 @@ class spell_halion_summon_exit_portals : public SpellScript
     }
 };
 
-class spell_halion_twilight_division : public SpellScriptLoader
+class spell_halion_twilight_division : public SpellScript
 {
-public:
-    spell_halion_twilight_division() : SpellScriptLoader("spell_halion_twilight_division") { }
+    PrepareSpellScript(spell_halion_twilight_division);
 
-    class spell_halion_twilight_division_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_halion_twilight_division_SpellScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_EXIT_PORTALS_NORMAL, SPELL_SUMMON_EXIT_PORTALS, SPELL_TWILIGHT_PHASING });
+    }
 
-        void HandleDummy(SpellEffIndex  /*effIndex*/)
-        {
-            InstanceScript* instance = GetCaster()->GetInstanceScript();
-            Creature* controller = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_HALION_CONTROLLER));
-            Creature* halion = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_HALION));
-
-            if (!controller || !halion)
-                return;
-
-            GetCaster()->CastSpell(GetCaster(), _corporealityReference[5], true);
-            halion->CastSpell(halion, _corporealityReference[5], true);
-
-            controller->CastSpell(controller, SPELL_SUMMON_EXIT_PORTALS_NORMAL, true);
-            controller->CastSpell(controller, SPELL_SUMMON_EXIT_PORTALS, true);
-            controller->AI()->DoAction(ACTION_CHECK_CORPOREALITY);
-
-            halion->RemoveAurasDueToSpell(SPELL_TWILIGHT_PHASING);
-            if (GameObject* gobject = halion->FindNearestGameObject(GO_HALION_PORTAL_1, 100.0f))
-                gobject->Delete();
-
-            instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TOGGLE, 1);
-            instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, 50);
-            instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 50);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_halion_twilight_division_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex  /*effIndex*/)
     {
-        return new spell_halion_twilight_division_SpellScript();
+        InstanceScript* instance = GetCaster()->GetInstanceScript();
+        Creature* controller = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_HALION_CONTROLLER));
+        Creature* halion = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(NPC_HALION));
+
+        if (!controller || !halion)
+            return;
+
+        GetCaster()->CastSpell(GetCaster(), _corporealityReference[5], true);
+        halion->CastSpell(halion, _corporealityReference[5], true);
+
+        controller->CastSpell(controller, SPELL_SUMMON_EXIT_PORTALS_NORMAL, true);
+        controller->CastSpell(controller, SPELL_SUMMON_EXIT_PORTALS, true);
+        controller->AI()->DoAction(ACTION_CHECK_CORPOREALITY);
+
+        halion->RemoveAurasDueToSpell(SPELL_TWILIGHT_PHASING);
+        if (GameObject* gobject = halion->FindNearestGameObject(GO_HALION_PORTAL_1, 100.0f))
+            gobject->Delete();
+
+        instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TOGGLE, 1);
+        instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_MATERIAL, 50);
+        instance->DoUpdateWorldState(WORLDSTATE_CORPOREALITY_TWILIGHT, 50);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_halion_twilight_division::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -1361,7 +1355,7 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_twilight_cutter_periodic_aura);
     RegisterSpellScript(spell_halion_twilight_cutter);
     RegisterSpellScript(spell_halion_summon_exit_portals);
-    new spell_halion_twilight_division();
+    RegisterSpellScript(spell_halion_twilight_division);
     new spell_halion_twilight_mending();
 }
 
