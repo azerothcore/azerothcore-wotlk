@@ -1,3 +1,4 @@
+-- DB update 2024_07_26_00 -> 2024_07_27_00
 --
 DELETE FROM `waypoints` where `entry` = 2195800;
 
