@@ -415,7 +415,12 @@ enum AcoreStrings
     LANG_COMMAND_RESET_ITEMS_ALL_BAGS   = 372,
     // [END] reset items command strings
 
-    // Room for more level 2              373-399 not used
+    // .aura stack
+    LANG_COMMAND_AURASTACK_NO_AURA      = 373,
+    LANG_COMMAND_AURASTACK_NO_STACK     = 374,
+    LANG_COMMAND_AURASTACK_CANT_STACK   = 375,
+
+    // Room for more level 2              376-399 not used
 
     // level 3 chat
     LANG_SCRIPTS_RELOADED               = 400,

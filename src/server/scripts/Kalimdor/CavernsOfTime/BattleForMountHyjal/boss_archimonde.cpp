@@ -16,10 +16,10 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
-#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "hyjal.h"

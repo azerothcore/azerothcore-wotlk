@@ -17,9 +17,13 @@
 
 #include "AchievementCriteriaScript.h"
 #include "CreatureScript.h"
+#include "GameEventMgr.h"
+#include "GridNotifiers.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "nexus.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
 
 enum Spells
 {

@@ -21,6 +21,8 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "azjol_nerub.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Spells
 {

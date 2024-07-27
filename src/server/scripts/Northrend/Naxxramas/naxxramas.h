@@ -19,7 +19,6 @@
 #define DEF_NAXXRAMAS_H
 
 #include "CreatureAIImpl.h"
-#include "SpellScript.h"
 
 #define DataHeader "NAX"
 

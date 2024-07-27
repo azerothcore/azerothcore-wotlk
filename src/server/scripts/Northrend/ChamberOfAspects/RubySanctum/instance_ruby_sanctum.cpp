@@ -23,6 +23,7 @@
 #include "TemporarySummon.h"
 #include "WorldPacket.h"
 #include "ruby_sanctum.h"
+#include "SpellScript.h"
 
 BossBoundaryData const boundaries =
 {
