@@ -903,7 +903,7 @@ public:
     }
 
     /// Set email for account
-    static bool HandleAccountSetEmailCommand(ChatHandler* handler, Tail args)
+    static bool HandleAccountSetEmailCommand(ChatHandler* handler, char const* args)
     {
         if (!*args)
             return false;
