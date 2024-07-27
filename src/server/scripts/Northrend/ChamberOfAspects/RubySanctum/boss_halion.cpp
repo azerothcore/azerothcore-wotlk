@@ -854,33 +854,27 @@ class spell_halion_meteor_strike_marker_aura : public AuraScript
     }
 };
 
-class spell_halion_meteor_strike_spread : public SpellScriptLoader
+class spell_halion_meteor_strike_spread_aura : public AuraScript
 {
-public:
-    spell_halion_meteor_strike_spread() : SpellScriptLoader("spell_halion_meteor_strike_spread") { }
+    PrepareAuraScript(spell_halion_meteor_strike_spread_aura);
 
-    class spell_halion_meteor_strike_spread_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_halion_meteor_strike_spread_AuraScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_METEOR_FLAME1, SPELL_SUMMON_METEOR_FLAME2, SPELL_SUMMON_METEOR_FLAME3 });
+    }
 
-        void HandlePeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction(); // xinef: 3/5 straight, 2/5 turn
-            if (!GetUnitOwner()->GetInstanceScript() || !GetUnitOwner()->GetInstanceScript()->IsEncounterInProgress())
-                return;
-
-            GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_METEOR_FLAME1, SPELL_SUMMON_METEOR_FLAME2, SPELL_SUMMON_METEOR_FLAME2, SPELL_SUMMON_METEOR_FLAME2, SPELL_SUMMON_METEOR_FLAME3), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_halion_meteor_strike_spread_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_halion_meteor_strike_spread_AuraScript();
+        PreventDefaultAction(); // xinef: 3/5 straight, 2/5 turn
+        if (!GetUnitOwner()->GetInstanceScript() || !GetUnitOwner()->GetInstanceScript()->IsEncounterInProgress())
+            return;
+
+        GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SUMMON_METEOR_FLAME1, SPELL_SUMMON_METEOR_FLAME2, SPELL_SUMMON_METEOR_FLAME2, SPELL_SUMMON_METEOR_FLAME2, SPELL_SUMMON_METEOR_FLAME3), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_halion_meteor_strike_spread_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1472,7 +1466,7 @@ void AddSC_boss_halion()
 
     RegisterSpellScript(spell_halion_meteor_strike_targeting);
     RegisterSpellScript(spell_halion_meteor_strike_marker_aura);
-    new spell_halion_meteor_strike_spread();
+    RegisterSpellScript(spell_halion_meteor_strike_spread_aura);
     new spell_halion_blazing_aura();
     new spell_halion_combustion_consumption("spell_halion_soul_consumption", SPELL_MARK_OF_CONSUMPTION);
     new spell_halion_combustion_consumption("spell_halion_fiery_combustion", SPELL_MARK_OF_COMBUSTION);
