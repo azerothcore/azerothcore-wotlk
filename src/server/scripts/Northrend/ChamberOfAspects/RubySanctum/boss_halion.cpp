@@ -1181,39 +1181,28 @@ private:
     WorldObject* _cutterCaster;
 };
 
-class spell_halion_twilight_cutter : public SpellScriptLoader
+class spell_halion_twilight_cutter : public SpellScript
 {
-public:
-    spell_halion_twilight_cutter() : SpellScriptLoader("spell_halion_twilight_cutter") { }
+    PrepareSpellScript(spell_halion_twilight_cutter);
 
-    class spell_halion_twilight_cutter_SpellScript : public SpellScript
+    void RemoveNotBetween(std::list<WorldObject*>& unitList)
     {
-        PrepareSpellScript(spell_halion_twilight_cutter_SpellScript);
+        if (unitList.empty())
+            return;
 
-        void RemoveNotBetween(std::list<WorldObject*>& unitList)
-        {
-            if (unitList.empty())
+        if (Aura* cutter = GetCaster()->GetAura(SPELL_TWILIGHT_CUTTER))
+            if (Unit* cutterCaster = cutter->GetCaster())
+            {
+                unitList.remove_if(TwilightCutterSelector(GetCaster(), cutterCaster));
                 return;
+            }
 
-            if (Aura* cutter = GetCaster()->GetAura(SPELL_TWILIGHT_CUTTER))
-                if (Unit* cutterCaster = cutter->GetCaster())
-                {
-                    unitList.remove_if(TwilightCutterSelector(GetCaster(), cutterCaster));
-                    return;
-                }
+        unitList.clear();
+    }
 
-            unitList.clear();
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_halion_twilight_cutter_SpellScript::RemoveNotBetween, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_halion_twilight_cutter_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_halion_twilight_cutter::RemoveNotBetween, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1381,7 +1370,7 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_twilight_realm_aura);
     RegisterSpellScript(spell_halion_leave_twilight_realm_aura);
     RegisterSpellScript(spell_halion_twilight_cutter_periodic_aura);
-    new spell_halion_twilight_cutter();
+    RegisterSpellScript(spell_halion_twilight_cutter);
     new spell_halion_summon_exit_portals();
     new spell_halion_twilight_division();
     new spell_halion_twilight_mending();
