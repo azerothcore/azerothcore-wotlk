@@ -334,34 +334,28 @@ public:
     }
 };
 
-class spell_baltharus_enervating_brand_trigger : public SpellScriptLoader
+class spell_baltharus_enervating_brand_trigger : public SpellScript
 {
-public:
-    spell_baltharus_enervating_brand_trigger() : SpellScriptLoader("spell_baltharus_enervating_brand_trigger") { }
+    PrepareSpellScript(spell_baltharus_enervating_brand_trigger);
 
-    class spell_baltharus_enervating_brand_trigger_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_baltharus_enervating_brand_trigger_SpellScript);
+        return ValidateSpellInfo({ SPELL_SIPHONED_MIGHT });
+    }
 
-        void CheckDistance()
-        {
-            if (Unit* caster = GetOriginalCaster())
-                if (Unit* target = GetHitUnit())
-                    if (target == GetCaster()
-                            // the spell has an unlimited range, so we need this check
-                            && target->GetDistance2d(caster) <= 12.0f)
-                        target->CastSpell(caster, SPELL_SIPHONED_MIGHT, true);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_baltharus_enervating_brand_trigger_SpellScript::CheckDistance);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CheckDistance()
     {
-        return new spell_baltharus_enervating_brand_trigger_SpellScript();
+        if (Unit* caster = GetOriginalCaster())
+            if (Unit* target = GetHitUnit())
+                if (target == GetCaster()
+                        // the spell has an unlimited range, so we need this check
+                        && target->GetDistance2d(caster) <= 12.0f)
+                    target->CastSpell(caster, SPELL_SIPHONED_MIGHT, true);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_baltharus_enervating_brand_trigger::CheckDistance);
     }
 };
 
@@ -486,7 +480,7 @@ void AddSC_boss_baltharus_the_warborn()
 {
     new boss_baltharus_the_warborn();
     new npc_baltharus_the_warborn_clone();
-    new spell_baltharus_enervating_brand_trigger();
+    RegisterSpellScript(spell_baltharus_enervating_brand_trigger);
     new npc_xerestrasza();
     new at_baltharus_plateau();
 }
