@@ -1641,7 +1641,7 @@ uint8 BattlegroundAV::GetDefendString(BG_AV_Nodes node, TeamId teamId)
     return strId;
 }
 
-uint8 GetMineString(uint8 mineId, TeamId teamId)
+uint8 BattlegroundAV::GetMineString(uint8 mineId, TeamId teamId)
 {
     uint8 strId = 0;
     switch (mineId)
