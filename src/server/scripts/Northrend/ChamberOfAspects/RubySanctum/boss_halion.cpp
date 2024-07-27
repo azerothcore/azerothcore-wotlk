@@ -1031,72 +1031,61 @@ class spell_halion_clear_debuffs : public SpellScript
     }
 };
 
-class spell_halion_twilight_phasing : public SpellScriptLoader
+class spell_halion_twilight_phasing : public SpellScript
 {
-public:
-    spell_halion_twilight_phasing() : SpellScriptLoader("spell_halion_twilight_phasing") { }
+    PrepareSpellScript(spell_halion_twilight_phasing);
 
-    class spell_halion_twilight_phasing_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_halion_twilight_phasing_SpellScript);
-
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void Phase()
-        {
-            Unit* caster = GetCaster();
-            caster->CastSpell(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), SPELL_SUMMON_TWILIGHT_PORTAL, true);
-            caster->GetMap()->SummonCreature(NPC_TWILIGHT_HALION, caster->ToCreature()->GetHomePosition(), nullptr, 0, caster);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_halion_twilight_phasing_SpellScript::Phase);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_halion_twilight_phasing_SpellScript();
+        return ValidateSpellInfo({ SPELL_SUMMON_TWILIGHT_PORTAL });
     }
 
-    class spell_halion_twilight_phasing_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_halion_twilight_phasing_AuraScript);
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
-        {
-            GetTarget()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
-            GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->GetThreatMgr().clearReferences();
-            GetTarget()->RemoveAllAttackers();
-            GetTarget()->AttackStop();
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
-        {
-            GetTarget()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
-            GetTarget()->GetMotionMaster()->Clear();
-            GetTarget()->GetThreatMgr().clearReferences();
-            GetTarget()->RemoveAllAttackers();
-            GetTarget()->AttackStop();
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_halion_twilight_phasing_AuraScript::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_halion_twilight_phasing_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Phase()
     {
-        return new spell_halion_twilight_phasing_AuraScript();
+        Unit* caster = GetCaster();
+        caster->CastSpell(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ(), SPELL_SUMMON_TWILIGHT_PORTAL, true);
+        caster->GetMap()->SummonCreature(NPC_TWILIGHT_HALION, caster->ToCreature()->GetHomePosition(), nullptr, 0, caster);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_halion_twilight_phasing::Phase);
+    }
+};
+
+class spell_halion_twilight_phasing_aura : public AuraScript
+{
+    PrepareAuraScript(spell_halion_twilight_phasing_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
+    {
+        GetTarget()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
+        GetTarget()->GetMotionMaster()->Clear();
+        GetTarget()->GetThreatMgr().clearReferences();
+        GetTarget()->RemoveAllAttackers();
+        GetTarget()->AttackStop();
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*handle*/)
+    {
+        GetTarget()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
+        GetTarget()->GetMotionMaster()->Clear();
+        GetTarget()->GetThreatMgr().clearReferences();
+        GetTarget()->RemoveAllAttackers();
+        GetTarget()->AttackStop();
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_halion_twilight_phasing_aura::OnApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_halion_twilight_phasing_aura::OnRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1411,7 +1400,7 @@ void AddSC_boss_halion()
     RegisterSpellScriptWithArgs(spell_halion_damage_aoe_summon, "spell_halion_combustion_summon", SPELL_FIERY_COMBUSTION_EXPLOSION, SPELL_COMBUSTION_DAMAGE_AURA);
     RegisterSpellScriptWithArgs(spell_halion_damage_aoe_summon, "spell_halion_consumption_summon", SPELL_SOUL_CONSUMPTION_EXPLOSION, SPELL_CONSUMPTION_DAMAGE_AURA);
     RegisterSpellScript(spell_halion_clear_debuffs);
-    new spell_halion_twilight_phasing();
+    RegisterSpellAndAuraScriptPair(spell_halion_twilight_phasing, spell_halion_twilight_phasing_aura);
     new spell_halion_twilight_realm();
     new spell_halion_leave_twilight_realm();
     new spell_halion_twilight_cutter_periodic();
