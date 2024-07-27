@@ -788,13 +788,9 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
 
 void WorldSession::SendNotification(std::string_view str)
 {
-    WorldPacket data(SMSG_NOTIFICATION, str.size() + 1);
-    for (std::string_view line : Acore::Tokenize(str, '\n', true))
+    if (str.data())
     {
-        data << line.data();
-        SendPacket(&data);
-    }
-}
+        WorldPacket data(SMSG_NOTIFICATION, str.size() + 1);
         for (std::string_view line : Acore::Tokenize(str, '\n', true))
         {
             data << line.data();
