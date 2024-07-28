@@ -20,12 +20,12 @@
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
-#include "GridNotifiersImpl.h"
 
 enum Texts
 {
@@ -553,6 +553,11 @@ public:
         {
             if (target->GetTypeId() == TYPEID_PLAYER)
                 BossAI::AttackStart(target);
+        }
+
+        void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override
+        {
+            CreatureAI::EnterEvadeMode(why);
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override {}

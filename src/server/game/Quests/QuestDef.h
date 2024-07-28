@@ -157,23 +157,25 @@ enum QuestSpecialFlags
 {
     QUEST_SPECIAL_FLAGS_NONE                    = 0x000,
     // Trinity flags for set SpecialFlags in DB if required but used only at server
-    QUEST_SPECIAL_FLAGS_REPEATABLE              = 0x001,    // Set by 1 in SpecialFlags from DB
-    QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT    = 0x002,    // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `FECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script)
-    QUEST_SPECIAL_FLAGS_AUTO_ACCEPT             = 0x004,    // Set by 4 in SpecialFlags in DB if the quest is to be auto-accepted.
-    QUEST_SPECIAL_FLAGS_DF_QUEST                = 0x008,    // Set by 8 in SpecialFlags in DB if the quest is used by Dungeon Finder.
-    QUEST_SPECIAL_FLAGS_MONTHLY                 = 0x010,    // Set by 16 in SpecialFlags in DB if the quest is reset at the begining of the month
-    QUEST_SPECIAL_FLAGS_CAST                    = 0x020,    // Set by 32 in SpecialFlags in DB if the quest requires RequiredOrNpcGo killcredit but NOT kill (a spell cast)
-    QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER        = 0x040,    // Set by 64 in SpecialFlags in DB if the quest does not share rewarded reputation with other allied factions
+    QUEST_SPECIAL_FLAGS_REPEATABLE              = 0x0001,    // Set by 1 in SpecialFlags from DB
+    QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT    = 0x0002,    // Set by 2 in SpecialFlags from DB (if required area explore, spell SPELL_EFFECT_QUEST_COMPLETE casting, table `FECT_QUEST_COMPLETE casting, table `*_script` command SCRIPT_COMMAND_QUEST_EXPLORED use, set from script)
+    QUEST_SPECIAL_FLAGS_AUTO_ACCEPT             = 0x0004,    // Set by 4 in SpecialFlags in DB if the quest is to be auto-accepted.
+    QUEST_SPECIAL_FLAGS_DF_QUEST                = 0x0008,    // Set by 8 in SpecialFlags in DB if the quest is used by Dungeon Finder.
+    QUEST_SPECIAL_FLAGS_MONTHLY                 = 0x0010,    // Set by 16 in SpecialFlags in DB if the quest is reset at the begining of the month
+    QUEST_SPECIAL_FLAGS_CAST                    = 0x0020,    // Set by 32 in SpecialFlags in DB if the quest requires RequiredOrNpcGo killcredit but NOT kill (a spell cast)
+    QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER        = 0x0040,    // Set by 64 in SpecialFlags in DB if the quest does not share rewarded reputation with other allied factions
+    QUEST_SPECIAL_FLAGS_CAN_FAIL_IN_ANY_STATE   = 0x0080,    // Set by 128 in SpecialFlags in DB if the quest is allowed to fail in Player::FailQuest() independant of its current state
     // room for more custom flags
 
     QUEST_SPECIAL_FLAGS_DB_ALLOWED              = QUEST_SPECIAL_FLAGS_REPEATABLE | QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT | QUEST_SPECIAL_FLAGS_AUTO_ACCEPT |
-                                                  QUEST_SPECIAL_FLAGS_DF_QUEST | QUEST_SPECIAL_FLAGS_MONTHLY | QUEST_SPECIAL_FLAGS_CAST | QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER,
+                                                  QUEST_SPECIAL_FLAGS_DF_QUEST | QUEST_SPECIAL_FLAGS_MONTHLY | QUEST_SPECIAL_FLAGS_CAST | QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER |
+                                                  QUEST_SPECIAL_FLAGS_CAN_FAIL_IN_ANY_STATE,
 
-    QUEST_SPECIAL_FLAGS_DELIVER                 = 0x080,   // Internal flag computed only
-    QUEST_SPECIAL_FLAGS_SPEAKTO                 = 0x100,   // Internal flag computed only
-    QUEST_SPECIAL_FLAGS_KILL                    = 0x200,   // Internal flag computed only
-    QUEST_SPECIAL_FLAGS_TIMED                   = 0x400,   // Internal flag computed only
-    QUEST_SPECIAL_FLAGS_PLAYER_KILL             = 0x800    // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_DELIVER                 = 0x0100,   // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_SPEAKTO                 = 0x0200,   // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_KILL                    = 0x0400,   // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_TIMED                   = 0x0800,   // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_PLAYER_KILL             = 0x1000    // Internal flag computed only
 };
 
 struct QuestLocale

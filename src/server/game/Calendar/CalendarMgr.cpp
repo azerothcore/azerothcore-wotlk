@@ -204,8 +204,8 @@ void CalendarMgr::RemoveEvent(CalendarEvent* calendarEvent, ObjectGuid remover)
     trans->Append(stmt);
     CharacterDatabase.CommitTransaction(trans);
 
-    delete calendarEvent;
     _events.erase(calendarEvent);
+    delete calendarEvent;
     return;
 }
 

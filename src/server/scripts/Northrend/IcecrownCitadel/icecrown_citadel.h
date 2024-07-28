@@ -28,8 +28,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
-#include "SpellAuras.h"
-#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
@@ -137,6 +135,8 @@ enum DataTypes
     DATA_ARTHAS_PLATFORM            = 38,
     DATA_TERENAS_MENETHIL           = 39,
     DATA_ENEMY_GUNSHIP              = 40,
+    DATA_THE_SKYBREAKER             = 41,
+    DATA_ORGRIMS_HAMMER             = 42,
 
     // pussywizard:
     DATA_BUFF_AVAILABLE             = 251,

@@ -43,6 +43,7 @@
 #include "QueryHolder.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
+#include "Tokenize.h"
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WardenMac.h"
@@ -785,37 +786,12 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
     return false;
 }
 
-void WorldSession::SendNotification(const char* format, ...)
+void WorldSession::SendNotification(std::string_view str)
 {
-    if (format)
+    WorldPacket data(SMSG_NOTIFICATION, str.size() + 1);
+    for (std::string_view line : Acore::Tokenize(str, '\n', true))
     {
-        va_list ap;
-        char szStr[1024];
-        szStr[0] = '\0';
-        va_start(ap, format);
-        vsnprintf(szStr, 1024, format, ap);
-        va_end(ap);
-
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
-        data << szStr;
-        SendPacket(&data);
-    }
-}
-
-void WorldSession::SendNotification(uint32 string_id, ...)
-{
-    char const* format = GetAcoreString(string_id);
-    if (format)
-    {
-        va_list ap;
-        char szStr[1024];
-        szStr[0] = '\0';
-        va_start(ap, string_id);
-        vsnprintf(szStr, 1024, format, ap);
-        va_end(ap);
-
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
-        data << szStr;
+        data << line.data();
         SendPacket(&data);
     }
 }

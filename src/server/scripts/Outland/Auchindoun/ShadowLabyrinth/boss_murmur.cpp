@@ -20,6 +20,7 @@
 #include "SpellInfo.h"
 #include "SpellScriptLoader.h"
 #include "shadow_labyrinth.h"
+#include "SpellScript.h"
 
 enum Spells
 {

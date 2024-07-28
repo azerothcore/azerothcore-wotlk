@@ -15,13 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmath>
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "WaypointMgr.h"
 #include "the_eye.h"
+#include <cmath>
+
+#include "Player.h"
+#include "SpellScript.h"
 
 enum Spells
 {

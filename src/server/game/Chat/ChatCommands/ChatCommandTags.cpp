@@ -77,7 +77,7 @@ ChatCommandResult Acore::ChatCommands::AccountIdentifier::TryConsume(ChatHandler
     // try parsing as account id instead
     Optional<uint32> id = Acore::StringTo<uint32>(text, 10);
     if (!id)
-        return FormatAcoreString(handler, LANG_CMDPARSER_ACCOUNT_NAME_NO_EXIST, STRING_VIEW_FMT_ARG(_name));
+        return FormatAcoreString(handler, LANG_CMDPARSER_ACCOUNT_NAME_NO_EXIST, _name);
 
     _id = *id;
 
@@ -104,7 +104,7 @@ ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler 
         }
         else if (!sCharacterCache->GetCharacterNameByGuid(_guid, _name))
         {
-            return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_GUID_NO_EXIST, _guid.ToString().c_str());
+            return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_GUID_NO_EXIST, _guid.ToString());
         }
 
         return next;
@@ -117,7 +117,7 @@ ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler 
             _name.assign(val.get<std::string_view>());
 
         if (!normalizePlayerName(_name))
-            return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_NAME_INVALID, STRING_VIEW_FMT_ARG(_name));
+            return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_NAME_INVALID, _name);
 
         if ((_player = ObjectAccessor::FindPlayerByName(_name)))
         {
@@ -125,7 +125,7 @@ ChatCommandResult Acore::ChatCommands::PlayerIdentifier::TryConsume(ChatHandler 
         }
         else if (!(_guid = sCharacterCache->GetCharacterGuidByName(_name)))
         {
-            return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_NAME_NO_EXIST, STRING_VIEW_FMT_ARG(_name));
+            return FormatAcoreString(handler, LANG_CMDPARSER_CHAR_NAME_NO_EXIST, _name);
         }
 
         return next;

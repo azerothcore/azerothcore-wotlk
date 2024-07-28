@@ -46,7 +46,7 @@ public:
     void RemoveFromWorld() override;
 
     float GetNativeObjectScale() const override;
-    void SetDisplayId(uint32 modelId) override;
+    void SetDisplayId(uint32 modelId, float displayScale = 1.f) override;
 
     PetType getPetType() const { return m_petType; }
     void setPetType(PetType type) { m_petType = type; }
@@ -60,7 +60,7 @@ public:
     bool CreateBaseAtCreatureInfo(CreatureTemplate const* cinfo, Unit* owner);
     bool CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phaseMask);
     static std::pair<PetStable::PetInfo const*, PetSaveMode> GetLoadPetInfo(PetStable const& stable, uint32 petEntry, uint32 petnumber, bool current);
-    bool LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct = 0);
+    bool LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool current, uint32 healthPct = 0, bool fullMana = false);
     bool isBeingLoaded() const override { return m_loading; }
     void SavePetToDB(PetSaveMode mode);
     void FillPetInfo(PetStable::PetInfo* petInfo) const;

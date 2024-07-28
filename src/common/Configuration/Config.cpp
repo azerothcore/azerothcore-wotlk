@@ -35,6 +35,14 @@ namespace
     std::unordered_map<std::string /*name*/, std::string /*value*/> _envVarCache;
     std::mutex _configLock;
 
+    std::vector<std::string> _fatalConfigOptions =
+    {
+        { "RealmID" },
+        { "LoginDatabaseInfo" },
+        { "WorldDatabaseInfo" },
+        { "CharacterDatabaseInfo" },
+    };
+
     // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
     {
@@ -136,29 +144,17 @@ namespace
 
             // read line error
             if (!in.good() && !in.eof())
-            {
                 throw ConfigException(Acore::StringFormatFmt("> Config::LoadFile: Failure to read line number {} in file '{}'", lineNumber, file));
-            }
 
             // remove whitespace in line
             line = Acore::String::Trim(line, in.getloc());
 
             if (line.empty())
-            {
                 continue;
-            }
 
-            // comments
+            // comments and headers
             if (line[0] == '#' || line[0] == '[')
-            {
                 continue;
-            }
-
-            size_t found = line.find_first_of('#');
-            if (found != std::string::npos)
-            {
-                line = line.substr(0, found);
-            }
 
             auto const equal_pos = line.find('=');
 
@@ -175,9 +171,7 @@ namespace
 
             // Skip if 2+ same options in one config file
             if (IsDuplicateOption(entry))
-            {
                 continue;
-            }
 
             // Add to temp container
             fileConfigs.emplace(entry, value);
@@ -388,6 +382,7 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     std::string strValue;
 
     auto const& itr = _configOptions.find(name);
+    bool fatalConfig = false;
     bool notFound = itr == _configOptions.end();
     auto envVarName = GetEnvVarName(name);
     Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
@@ -406,7 +401,18 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+            for (std::string s : _fatalConfigOptions)
+                if (s == name)
+                {
+                    fatalConfig = true;
+                    break;
+                }
+
+            if (fatalConfig)
+                LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable\n\nYour server cannot start without this option!",
+                    name, _filename, name, Acore::ToString(def), envVarName);
+            else
+                LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
                     name, _filename, name, Acore::ToString(def), envVarName);
         }
         return def;
@@ -435,6 +441,7 @@ template<>
 std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std::string const& def, bool showLogs /*= true*/) const
 {
     auto const& itr = _configOptions.find(name);
+    bool fatalConfig = false;
     bool notFound = itr == _configOptions.end();
     auto envVarName = GetEnvVarName(name);
     Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
@@ -453,7 +460,18 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+            for (std::string s : _fatalConfigOptions)
+                if (s == name)
+                {
+                    fatalConfig = true;
+                    break;
+                }
+
+            if (fatalConfig)
+                LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.\n\nYour server cannot start without this option!",
+                    name, _filename, name, def, envVarName);
+            else
+                LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
                     name, _filename, name, def, envVarName);
         }
 
@@ -629,30 +647,6 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
     }
 
     return true;
-}
-
-/// @deprecated DO NOT USE - use GetOption<std::string> instead.
-std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def, bool showLogs /*= true*/)
-{
-    return GetOption<std::string>(name, def, showLogs);
-}
-
-/// @deprecated DO NOT USE - use GetOption<bool> instead.
-bool ConfigMgr::GetBoolDefault(std::string const& name, bool def, bool showLogs /*= true*/)
-{
-    return GetOption<bool>(name, def, showLogs);
-}
-
-/// @deprecated DO NOT USE - use GetOption<int32> instead.
-int ConfigMgr::GetIntDefault(std::string const& name, int def, bool showLogs /*= true*/)
-{
-    return GetOption<int32>(name, def, showLogs);
-}
-
-/// @deprecated DO NOT USE - use GetOption<float> instead.
-float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool showLogs /*= true*/)
-{
-    return GetOption<float>(name, def, showLogs);
 }
 
 #define TEMPLATE_CONFIG_OPTION(__typename) \

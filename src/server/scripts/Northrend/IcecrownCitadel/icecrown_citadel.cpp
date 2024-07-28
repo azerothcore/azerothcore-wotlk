@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "AccountMgr.h"
+#include "icecrown_citadel.h"
 #include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
@@ -29,8 +30,6 @@
 #include "SmartAI.h"
 #include "SpellAuraEffects.h"
 #include "SpellScriptLoader.h"
-#include "icecrown_citadel.h"
-#include "GridNotifiersImpl.h"
 
 enum Texts
 {

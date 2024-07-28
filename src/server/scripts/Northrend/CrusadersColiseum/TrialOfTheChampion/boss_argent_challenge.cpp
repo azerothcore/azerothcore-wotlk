@@ -734,104 +734,81 @@ public:
     }
 };
 
-class spell_eadric_radiance : public SpellScriptLoader
+class spell_eadric_radiance : public SpellScript
 {
-public:
-    spell_eadric_radiance() : SpellScriptLoader("spell_eadric_radiance") { }
+    PrepareSpellScript(spell_eadric_radiance);
 
-    class spell_eadric_radiance_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_eadric_radiance_SpellScript);
+        std::list<WorldObject*> tmplist;
+        for( std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            if( (*itr)->ToUnit()->HasInArc(M_PI, GetCaster()) )
+                tmplist.push_back(*itr);
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            std::list<WorldObject*> tmplist;
-            for( std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                if( (*itr)->ToUnit()->HasInArc(M_PI, GetCaster()) )
-                    tmplist.push_back(*itr);
+        targets.clear();
+        for( std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr )
+            targets.push_back(*itr);
+    }
 
-            targets.clear();
-            for( std::list<WorldObject*>::iterator itr = tmplist.begin(); itr != tmplist.end(); ++itr )
-                targets.push_back(*itr);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_eadric_radiance_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eadric_radiance::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_toc5_light_rain : public SpellScriptLoader
+class spell_toc5_light_rain : public SpellScript
 {
-public:
-    spell_toc5_light_rain() : SpellScriptLoader("spell_toc5_light_rain") { }
+    PrepareSpellScript(spell_toc5_light_rain);
 
-    class spell_toc5_light_rain_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_toc5_light_rain_SpellScript);
-
-        void FilterTargets(std::list<WorldObject*>& targets)
+        for( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
         {
-            for( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
-            {
-                if ((*itr)->GetTypeId() == TYPEID_UNIT)
-                    if ((*itr)->ToCreature()->GetEntry() == NPC_FOUNTAIN_OF_LIGHT)
-                    {
-                        targets.erase(itr);
-                        itr = targets.begin();
-                        continue;
-                    }
-                ++itr;
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_toc5_light_rain_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_toc5_light_rain_SpellScript();
-    }
-};
-
-class spell_reflective_shield : public SpellScriptLoader
-{
-public:
-    spell_reflective_shield() : SpellScriptLoader("spell_reflective_shield") { }
-
-    class spell_reflective_shield_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_reflective_shield_AuraScript)
-
-        void HandleAfterEffectAbsorb(AuraEffect*   /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            if( Unit* attacker = dmgInfo.GetAttacker() )
-                if( GetOwner() && attacker->GetGUID() != GetOwner()->GetGUID() )
+            if ((*itr)->GetTypeId() == TYPEID_UNIT)
+                if ((*itr)->ToCreature()->GetEntry() == NPC_FOUNTAIN_OF_LIGHT)
                 {
-                    int32 damage = (int32)(absorbAmount * 0.25f);
-                    GetOwner()->ToUnit()->CastCustomSpell(attacker, 33619, &damage, nullptr, nullptr, true);
+                    targets.erase(itr);
+                    itr = targets.begin();
+                    continue;
                 }
+            ++itr;
         }
+    }
 
-        void Register() override
-        {
-            AfterEffectAbsorb += AuraEffectAbsorbFn(spell_reflective_shield_AuraScript::HandleAfterEffectAbsorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_reflective_shield_AuraScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_toc5_light_rain::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
+    }
+};
+
+enum ReflectiveShield
+{
+    SPELL_REFLECTIVE_SHIELD_DAMAGE = 33619
+};
+
+class spell_reflective_shield_aura : public AuraScript
+{
+    PrepareAuraScript(spell_reflective_shield_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_REFLECTIVE_SHIELD_DAMAGE });
+    }
+
+    void HandleAfterEffectAbsorb(AuraEffect*   /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        if( Unit* attacker = dmgInfo.GetAttacker() )
+            if( GetOwner() && attacker->GetGUID() != GetOwner()->GetGUID() )
+            {
+                int32 damage = (int32)(absorbAmount * 0.25f);
+                GetOwner()->ToUnit()->CastCustomSpell(attacker, SPELL_REFLECTIVE_SHIELD_DAMAGE, &damage, nullptr, nullptr, true);
+            }
+    }
+
+    void Register() override
+    {
+        AfterEffectAbsorb += AuraEffectAbsorbFn(spell_reflective_shield_aura::HandleAfterEffectAbsorb, EFFECT_0);
     }
 };
 
@@ -841,8 +818,8 @@ void AddSC_boss_argent_challenge()
     new boss_paletress();
     new npc_memory();
     new npc_argent_soldier();
-    new spell_eadric_radiance();
-    new spell_toc5_light_rain();
-    new spell_reflective_shield();
+    RegisterSpellScript(spell_eadric_radiance);
+    RegisterSpellScript(spell_toc5_light_rain);
+    RegisterSpellScript(spell_reflective_shield_aura);
 }
 

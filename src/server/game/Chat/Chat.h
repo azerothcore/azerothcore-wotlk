@@ -55,23 +55,24 @@ public:
     virtual void SendSysMessage(std::string_view str, bool escapeCharacters = false);
 
     void SendSysMessage(uint32 entry);
+    void PSendSysMessage(std::string_view str, bool escapeCharacters = false);
 
     template<typename... Args>
     void PSendSysMessage(char const* fmt, Args&&... args)
     {
-        SendSysMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...).c_str());
+        SendSysMessage(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     void PSendSysMessage(uint32 entry, Args&&... args)
     {
-        SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...).c_str());
+        SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     std::string PGetParseString(uint32 entry, Args&&... args) const
     {
-        return Acore::StringFormat(GetAcoreString(entry), std::forward<Args>(args)...);
+        return Acore::StringFormatFmt(GetAcoreString(entry), std::forward<Args>(args)...);
     }
 
     void SendErrorMessage(uint32 entry);
@@ -166,6 +167,26 @@ public:
 private:
     void* m_callbackArg;
     Print* m_print;
+};
+
+class AC_GAME_API AddonChannelCommandHandler : public ChatHandler
+{
+    public:
+        using ChatHandler::ChatHandler;
+        bool ParseCommands(std::string_view str) override;
+        void SendSysMessage(std::string_view str, bool escapeCharacters) override;
+        using ChatHandler::SendSysMessage;
+        bool IsHumanReadable() const override { return humanReadable; }
+
+    private:
+        void Send(std::string const& msg);
+        void SendAck();
+        void SendOK();
+        void SendFailed();
+
+        std::string echo;
+        bool hadAck = false;
+        bool humanReadable = false;
 };
 
 #endif

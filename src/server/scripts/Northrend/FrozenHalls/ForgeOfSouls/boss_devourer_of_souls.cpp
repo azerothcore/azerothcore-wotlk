@@ -308,73 +308,67 @@ public:
     }
 };
 
-class spell_wailing_souls_periodic : public SpellScriptLoader
+class spell_wailing_souls_periodic_aura : public AuraScript
 {
-public:
-    spell_wailing_souls_periodic() : SpellScriptLoader("spell_wailing_souls_periodic") { }
+    PrepareAuraScript(spell_wailing_souls_periodic_aura);
 
-    class spell_wailing_souls_periodic_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_wailing_souls_periodic_AuraScript);
+        return ValidateSpellInfo({ SPELL_WAILING_SOULS_DMG_N });
+    }
 
-        int8 dir;
+    int8 dir;
 
-        bool Load() override
+    bool Load() override
+    {
+        dir = urand(0, 1) ? 1 : -1;
+        return true;
+    }
+
+    void HandlePeriodicTick(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (Unit* t = GetTarget())
         {
-            dir = urand(0, 1) ? 1 : -1;
-            return true;
-        }
-
-        void HandlePeriodicTick(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* t = GetTarget())
+            if (aurEff->GetTickNumber() < 30)
             {
-                if (aurEff->GetTickNumber() < 30)
-                {
-                    // spinning, casting, etc.
-                    float diff = (2 * M_PI) / (4 * 30);
-                    float new_o = t->GetOrientation() + diff * dir;
-                    if (new_o >= 2 * M_PI)
-                        new_o -= 2 * M_PI;
-                    else if (new_o < 0)
-                        new_o += 2 * M_PI;
-                    t->UpdateOrientation(new_o);
-                    t->SetFacingTo(new_o);
-                    t->CastSpell(t, SPELL_WAILING_SOULS_DMG_N, true);
-                }
-                else if (aurEff->GetTickNumber() == 33)
-                {
-                    t->SetControlled(false, UNIT_STATE_ROOT);
-                    t->DisableRotate(false);
-                    if (t->GetTypeId() == TYPEID_UNIT)
-                        t->ToCreature()->SetReactState(REACT_AGGRESSIVE);
-                    if (t->GetVictim())
-                    {
-                        t->SetGuidValue(UNIT_FIELD_TARGET, t->GetVictim()->GetGUID());
-                        t->GetMotionMaster()->MoveChase(t->GetVictim());
-                    }
-                }
-                else if (aurEff->GetTickNumber() >= 34)
-                    Remove(AURA_REMOVE_BY_EXPIRE);
+                // spinning, casting, etc.
+                float diff = (2 * M_PI) / (4 * 30);
+                float new_o = t->GetOrientation() + diff * dir;
+                if (new_o >= 2 * M_PI)
+                    new_o -= 2 * M_PI;
+                else if (new_o < 0)
+                    new_o += 2 * M_PI;
+                t->UpdateOrientation(new_o);
+                t->SetFacingTo(new_o);
+                t->CastSpell(t, SPELL_WAILING_SOULS_DMG_N, true);
             }
+            else if (aurEff->GetTickNumber() == 33)
+            {
+                t->SetControlled(false, UNIT_STATE_ROOT);
+                t->DisableRotate(false);
+                if (t->GetTypeId() == TYPEID_UNIT)
+                    t->ToCreature()->SetReactState(REACT_AGGRESSIVE);
+                if (t->GetVictim())
+                {
+                    t->SetGuidValue(UNIT_FIELD_TARGET, t->GetVictim()->GetGUID());
+                    t->GetMotionMaster()->MoveChase(t->GetVictim());
+                }
+            }
+            else if (aurEff->GetTickNumber() >= 34)
+                Remove(AURA_REMOVE_BY_EXPIRE);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_wailing_souls_periodic_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_wailing_souls_periodic_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_wailing_souls_periodic_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
 void AddSC_boss_devourer_of_souls()
 {
     new boss_devourer_of_souls();
-    new spell_wailing_souls_periodic();
+    RegisterSpellScript(spell_wailing_souls_periodic_aura);
 }
 
