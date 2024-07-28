@@ -22,7 +22,6 @@
 #include "WorldSession.h"
 #include "AccountMgr.h"
 #include "BattlegroundMgr.h"
-#include "Chat.h"
 #include "CharacterPackets.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
@@ -789,10 +788,9 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
 
 void WorldSession::SendNotification(std::string_view str)
 {
-    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
-    for (std::string_view line : lines)
+    WorldPacket data(SMSG_NOTIFICATION, str.size() + 1);
+    for (std::string_view line : Acore::Tokenize(str, '\n', true))
     {
-        WorldPacket data(SMSG_NOTIFICATION, line.size() + 1);
         data << line.data();
         SendPacket(&data);
     }
