@@ -191,7 +191,7 @@ BanReturn BanMgr::BanIP(std::string const& IP, std::string const& Duration, std:
         if (IsPermanetly)
             ChatHandler(nullptr).SendWorldText(LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD, Author, IP, Reason);
         else
-            ChatHandler(nullptr).SendWorldText(LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD, Author.c_str(), IP.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
+            ChatHandler(nullptr).SendWorldText(LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD, Author, IP, secsToTimeString(TimeStringToSecs(Duration), true), Reason);
     }
 
     if (!resultAccounts)
