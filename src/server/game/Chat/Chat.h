@@ -50,6 +50,30 @@ public:
 
     static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
+    void SendWorldText(std::string_view str);
+    template<typename... Args>
+    void SendWorldText(uint32 strId, Args&&... args)
+    {
+        SendWorldText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+    }
+    template<typename... Args>
+    void SendWorldText(char const* fmt, Args&&... args)
+    {
+        SendWorldText(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+    }
+
+    void SendWorldTextOptional(std::string_view str, uint32 flag);
+    template<typename... Args>
+    void SendWorldTextOptional(uint32 strId, uint32 flag, Args&&... args)
+    {
+        SendWorldTextOptional(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...), flag);
+    }
+    template<typename... Args>
+    void SendWorldTextOptional(char const* fmt, uint32 flag, Args&&... args)
+    {
+        SendWorldTextOptional(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...), flag);
+    }
+
     // function with different implementation for chat/console
     virtual char const* GetAcoreString(uint32 entry) const;
     virtual void SendSysMessage(std::string_view str, bool escapeCharacters = false);
