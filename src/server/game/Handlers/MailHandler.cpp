@@ -16,6 +16,7 @@
  */
 
 #include "AccountMgr.h"
+#include "Chat.h"
 #include "CharacterCache.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
@@ -117,7 +118,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     if (player->GetLevel() < sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ))
     {
-        SendNotification(LANG_MAIL_SENDER_REQ, sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
+        ChatHandler(this).SendNotification(LANG_MAIL_SENDER_REQ, sWorld->getIntConfig(CONFIG_MAIL_LEVEL_REQ));
         return;
     }
 
