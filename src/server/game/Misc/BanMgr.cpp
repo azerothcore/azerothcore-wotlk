@@ -89,7 +89,7 @@ BanReturn BanMgr::BanAccount(std::string const& AccountName, std::string const& 
         if (!IsPermanetly)
             ChatHandler(nullptr).SendWorldText(LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD, Author, AccountName, secsToTimeString(TimeStringToSecs(Duration), true), Reason);
         else
-            ChatHandler(nullptr).SendWorldText(LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), Reason.c_str());
+            ChatHandler(nullptr).SendWorldText(LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD, Author, AccountName, Reason);
     }
 
     return BAN_SUCCESS;
