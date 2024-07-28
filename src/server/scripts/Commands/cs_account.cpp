@@ -903,40 +903,33 @@ public:
     }
 
     /// Set email for account
-    static bool HandleAccountSetEmailCommand(ChatHandler* handler, char const* args)
+    static bool HandleAccountSetEmailCommand(ChatHandler* handler, AccountIdentifier account, std::string email, std::string emailConfirmation)
+
     {
-        if (!*args)
+        if (!account || !email.data() || !emailConfirmation.data())
             return false;
 
-        ///- Get the command line arguments
-        char* account = strtok((char*)args, " ");
-        char* email = strtok(nullptr, " ");
-        char* emailConfirmation = strtok(nullptr, " ");
-
-        if (!account || !email || !emailConfirmation)
-            return false;
-
-        std::string accountName = account;
+        std::string accountName = account.GetName();
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
             handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
-        uint32 targetAccountId = AccountMgr::GetId(accountName);
+        uint32 targetAccountId = account.GetID();
         if (!targetAccountId)
         {
             handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
-        if (strcmp(email, emailConfirmation))
+        if (email != emailConfirmation)
         {
             handler->SendErrorMessage(LANG_NEW_EMAILS_NOT_MATCH);
             return false;
         }
 
-        AccountOpResult result = AccountMgr::ChangeEmail(targetAccountId, email);
+        AccountOpResult result = AccountMgr::ChangeEmail(targetAccountId, email.data())
 
         switch (result)
         {
