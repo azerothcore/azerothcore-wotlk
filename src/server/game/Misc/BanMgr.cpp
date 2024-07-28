@@ -153,7 +153,7 @@ BanReturn BanMgr::BanAccountByPlayerName(std::string const& CharacterName, std::
         AccountMgr::GetName(AccountID, AccountName);
 
         if (!IsPermanetly)
-            ChatHandler(nullptr).SendWorldText(LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), secsToTimeString(TimeStringToSecs(Duration), true).c_str(), Reason.c_str());
+            ChatHandler(nullptr).SendWorldText(LANG_BAN_ACCOUNT_YOUBANNEDMESSAGE_WORLD, Author, AccountName, secsToTimeString(TimeStringToSecs(Duration), true), Reason);
         else
             ChatHandler(nullptr).SendWorldText(LANG_BAN_ACCOUNT_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), AccountName.c_str(), Reason.c_str());
     }
