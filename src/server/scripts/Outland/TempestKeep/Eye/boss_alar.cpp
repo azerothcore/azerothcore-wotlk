@@ -23,6 +23,9 @@
 #include "the_eye.h"
 #include <cmath>
 
+#include "Player.h"
+#include "SpellScript.h"
+
 enum Spells
 {
     SPELL_BERSERK                   = 45078,

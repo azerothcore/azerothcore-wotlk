@@ -16,7 +16,6 @@
  */
 
 #include "CreatureScript.h"
-#include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "karazhan.h"

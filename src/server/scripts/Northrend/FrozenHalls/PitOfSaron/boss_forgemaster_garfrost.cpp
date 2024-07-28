@@ -17,7 +17,6 @@
 
 #include "CreatureGroups.h"
 #include "CreatureScript.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"

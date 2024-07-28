@@ -19,6 +19,7 @@
 #include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "the_botanica.h"
 

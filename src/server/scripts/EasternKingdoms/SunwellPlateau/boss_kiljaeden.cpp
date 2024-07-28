@@ -18,7 +18,10 @@
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "MoveSplineInit.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 

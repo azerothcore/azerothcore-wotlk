@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "oculus.h"
+#include "SpellAuras.h"
 
 enum Spells
 {

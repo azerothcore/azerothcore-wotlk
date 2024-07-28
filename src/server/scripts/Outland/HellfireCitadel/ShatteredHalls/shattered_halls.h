@@ -19,8 +19,6 @@
 #define DEF_SHATTERED_H
 
 #include "CreatureAIImpl.h"
-#include "PassiveAI.h"
-#include "SpellScript.h"
 
 #define ShatteredHallsLairScriptName "instance_shattered_halls"
 

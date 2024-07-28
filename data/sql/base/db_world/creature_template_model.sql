@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_model` (
   `VerifiedBuild` smallint unsigned DEFAULT NULL,
   PRIMARY KEY (`CreatureID`,`Idx`),
   CONSTRAINT `creature_template_model_chk_1` CHECK ((`Idx` <= 3))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Dumping data for table acore_world.creature_template_model: ~38 915 rows (approximately)
 DELETE FROM `creature_template_model`;

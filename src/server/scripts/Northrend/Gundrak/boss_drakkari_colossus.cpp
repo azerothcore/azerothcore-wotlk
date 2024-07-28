@@ -19,6 +19,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "gundrak.h"
+#include "SpellScript.h"
 
 enum Spells
 {

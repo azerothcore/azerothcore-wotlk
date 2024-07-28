@@ -19,6 +19,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "serpent_shrine.h"
+#include "SpellScript.h"
 
 enum Talk
 {

@@ -16,10 +16,12 @@
  */
 
 #include "CreatureScript.h"
-#include "Opcodes.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "magisters_terrace.h"
+#include "MapReference.h"
+#include "Player.h"
+#include "SpellScript.h"
 
 enum Says
 {
