@@ -208,7 +208,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
                                     std::string const& senderName /*= ""*/, std::string const& receiverName /*= ""*/,
                                     uint32 achievementId /*= 0*/, bool gmMessage /*= false*/, std::string const& channelName /*= ""*/)
 {
-    size_t receiverGUIDPos = 0;
+    std::size_t receiverGUIDPos = 0;
     data.Initialize(!gmMessage ? SMSG_MESSAGECHAT : SMSG_GM_MESSAGECHAT);
     data << uint8(chatType);
     data << int32(language);
@@ -986,7 +986,7 @@ void AddonChannelCommandHandler::SendSysMessage(std::string_view str, bool escap
     std::string body(str);
     if (escapeCharacters)
         boost::replace_all(body, "|", "||");
-    size_t pos, lastpos;
+    std::size_t pos, lastpos;
     for (lastpos = 0, pos = body.find('\n', lastpos); pos != std::string::npos; lastpos = pos + 1, pos = body.find('\n', lastpos))
     {
         std::string line(msg);

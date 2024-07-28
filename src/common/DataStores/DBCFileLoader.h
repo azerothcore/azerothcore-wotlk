@@ -71,7 +71,7 @@ public:
         [[nodiscard]] const char* getString(size_t field) const
         {
             ASSERT(field < file.fieldCount);
-            size_t stringOffset = getUInt(field);
+            std::size_t stringOffset = getUInt(field);
             ASSERT(stringOffset < file.stringSize);
             return reinterpret_cast<char*>(file.stringTable + stringOffset);
         }

@@ -190,7 +190,7 @@ std::string MySQLPreparedStatement::getQueryString() const
 {
     std::string queryString(m_queryString);
 
-    size_t pos = 0;
+    std::size_t pos = 0;
 
     for (PreparedStatementData const& data : m_stmt->GetParameters())
     {

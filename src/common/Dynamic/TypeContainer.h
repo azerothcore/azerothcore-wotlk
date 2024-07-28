@@ -100,7 +100,7 @@ template<class OBJECT_TYPES>
 class TypeMapContainer
 {
 public:
-    template<class SPECIFIC_TYPE> [[nodiscard]] size_t Count() const { return Acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
+    template<class SPECIFIC_TYPE> [[nodiscard]] std::size_t Count() const { return Acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
 
     /// inserts a specific object into the container
     template<class SPECIFIC_TYPE>

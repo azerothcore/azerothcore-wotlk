@@ -6540,7 +6540,7 @@ void Player::SendRaidInfo()
 
     WorldPacket data(SMSG_RAID_INSTANCE_INFO, 4);
 
-    size_t p_counter = data.wpos();
+    std::size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
 
     time_t now = GameTime::GetGameTime().count();

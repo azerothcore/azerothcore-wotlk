@@ -116,7 +116,7 @@ public:
 
     [[nodiscard]] uint32 AsDword() const;
 
-    void GetBytes(uint8* buf, size_t bufsize, bool littleEndian = true) const;
+    void GetBytes(uint8* buf, std::size_t bufsize, bool littleEndian = true) const;
     [[nodiscard]] std::vector<uint8> ToByteVector(int32 minSize = 0, bool littleEndian = true) const;
 
     template <std::size_t Size>

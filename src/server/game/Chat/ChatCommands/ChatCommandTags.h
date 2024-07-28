@@ -52,7 +52,7 @@ namespace Acore::Impl::ChatCommands
     };
 
     template <size_t N>
-    inline constexpr char GetChar(char const (&s)[N], size_t i)
+    inline constexpr char GetChar(char const (&s)[N], std::size_t i)
     {
         static_assert(N <= 25, "The EXACT_SEQUENCE macro can only be used with up to 25 character long literals. Specify them char-by-char (null terminated) as parameters to ExactSequence<> instead.");
         return i >= N ? '\0' : s[i];
@@ -273,7 +273,7 @@ namespace Acore::ChatCommands
         }
 
         template<bool C = have_operators>
-        operator std::enable_if_t<C && !std::is_same_v<first_type, size_t> && std::is_convertible_v<first_type, size_t>, size_t>() const
+        operator std::enable_if_t<C && !std::is_same_v<first_type, std::size_t> && std::is_convertible_v<first_type, std::size_t>, std::size_t>() const
         {
             return operator*();
         }

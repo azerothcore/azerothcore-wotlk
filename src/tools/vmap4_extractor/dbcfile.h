@@ -87,7 +87,7 @@ public:
         [[nodiscard]] const char* getString(size_t field) const
         {
             assert(field < file.fieldCount);
-            size_t stringOffset = getUInt(field);
+            std::size_t stringOffset = getUInt(field);
             assert(stringOffset < file.stringSize);
             //char * tmp = (char*)file.stringTable + stringOffset;
             //unsigned char * tmp2 = file.stringTable + stringOffset;
@@ -140,15 +140,15 @@ public:
     /// Get begin iterator over records
     Iterator end();
     /// Trivial
-    [[nodiscard]] size_t getRecordCount() const { return recordCount;}
-    [[nodiscard]] size_t getFieldCount() const { return fieldCount; }
+    [[nodiscard]] std::size_t getRecordCount() const { return recordCount;}
+    [[nodiscard]] std::size_t getFieldCount() const { return fieldCount; }
 
 private:
     std::string filename;
-    size_t recordSize;
-    size_t recordCount;
-    size_t fieldCount;
-    size_t stringSize;
+    std::size_t recordSize;
+    std::size_t recordCount;
+    std::size_t fieldCount;
+    std::size_t stringSize;
     unsigned char* data;
     unsigned char* stringTable;
 };

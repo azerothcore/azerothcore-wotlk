@@ -124,7 +124,7 @@ AC_API_EXPORT EnumText EnumUtils<InventoryResult>::ToString(InventoryResult valu
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<InventoryResult>::Count() { return 88; }
+AC_API_EXPORT std::size_t EnumUtils<InventoryResult>::Count() { return 88; }
 
 template <>
 AC_API_EXPORT InventoryResult EnumUtils<InventoryResult>::FromIndex(size_t index)
@@ -224,7 +224,7 @@ AC_API_EXPORT InventoryResult EnumUtils<InventoryResult>::FromIndex(size_t index
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<InventoryResult>::ToIndex(InventoryResult value)
+AC_API_EXPORT std::size_t EnumUtils<InventoryResult>::ToIndex(InventoryResult value)
 {
     switch (value)
     {
@@ -342,7 +342,7 @@ AC_API_EXPORT EnumText EnumUtils<BuyResult>::ToString(BuyResult value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<BuyResult>::Count() { return 9; }
+AC_API_EXPORT std::size_t EnumUtils<BuyResult>::Count() { return 9; }
 
 template <>
 AC_API_EXPORT BuyResult EnumUtils<BuyResult>::FromIndex(size_t index)
@@ -363,7 +363,7 @@ AC_API_EXPORT BuyResult EnumUtils<BuyResult>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<BuyResult>::ToIndex(BuyResult value)
+AC_API_EXPORT std::size_t EnumUtils<BuyResult>::ToIndex(BuyResult value)
 {
     switch (value)
     {
@@ -402,7 +402,7 @@ AC_API_EXPORT EnumText EnumUtils<SellResult>::ToString(SellResult value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SellResult>::Count() { return 9; }
+AC_API_EXPORT std::size_t EnumUtils<SellResult>::Count() { return 9; }
 
 template <>
 AC_API_EXPORT SellResult EnumUtils<SellResult>::FromIndex(size_t index)
@@ -423,7 +423,7 @@ AC_API_EXPORT SellResult EnumUtils<SellResult>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SellResult>::ToIndex(SellResult value)
+AC_API_EXPORT std::size_t EnumUtils<SellResult>::ToIndex(SellResult value)
 {
     switch (value)
     {

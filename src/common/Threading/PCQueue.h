@@ -48,7 +48,7 @@ public:
         return _queue.empty();
     }
 
-    [[nodiscard]] size_t Size() const
+    [[nodiscard]] std::size_t Size() const
     {
         return _queue.size();
     }

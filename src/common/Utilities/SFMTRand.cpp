@@ -26,7 +26,7 @@
     #include <mm_malloc.h>
 #elif defined(__GNUC__)
     static __inline__ void *__attribute__((__always_inline__, __nodebug__, __malloc__))
-    _mm_malloc(size_t __size, size_t __align)
+    _mm_malloc(size_t __size, std::size_t __align)
     {
         if (__align == 1)
         {

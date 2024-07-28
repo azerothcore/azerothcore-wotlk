@@ -480,9 +480,9 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
 
 bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
 {
-    size_t paramsStructSize = [&]() -> size_t
+    std::size_t paramsStructSize = [&]() -> std::size_t
     {
-        constexpr size_t NO_PARAMS = size_t(0);
+        constexpr std::size_t NO_PARAMS = std::size_t(0);
         switch (e.event.type)
         {
             case SMART_EVENT_UPDATE_IC: return sizeof(SmartEvent::minMaxRepeat);
@@ -584,8 +584,8 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
         }
     }();
 
-    static size_t rawCount = sizeof(SmartEvent::raw) / sizeof(uint32);
-    size_t paramsCount = paramsStructSize / sizeof(uint32);
+    static std::size_t rawCount = sizeof(SmartEvent::raw) / sizeof(uint32);
+    std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
     for (size_t index = paramsCount; index < rawCount; index++)
@@ -604,9 +604,9 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
 
 bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
 {
-    size_t paramsStructSize = [&]() -> size_t
+    std::size_t paramsStructSize = [&]() -> std::size_t
     {
-        constexpr size_t NO_PARAMS = size_t(0);
+        constexpr std::size_t NO_PARAMS = std::size_t(0);
         switch (e.action.type)
         {
             case SMART_ACTION_NONE: return NO_PARAMS;
@@ -784,8 +784,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
         }
     }();
 
-    static size_t rawCount = sizeof(SmartAction::raw) / sizeof(uint32);
-    size_t paramsCount = paramsStructSize / sizeof(uint32);
+    static std::size_t rawCount = sizeof(SmartAction::raw) / sizeof(uint32);
+    std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
     for (size_t index = paramsCount; index < rawCount; index++)
@@ -804,9 +804,9 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
 
 bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
 {
-    size_t paramsStructSize = [&]() -> size_t
+    std::size_t paramsStructSize = [&]() -> std::size_t
     {
-        constexpr size_t NO_PARAMS = size_t(0);
+        constexpr std::size_t NO_PARAMS = std::size_t(0);
         switch (e.target.type)
         {
             case SMART_TARGET_NONE: return NO_PARAMS;
@@ -848,8 +848,8 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
         }
     }();
 
-    static size_t rawCount = sizeof(SmartTarget::raw) / sizeof(uint32);
-    size_t paramsCount = paramsStructSize / sizeof(uint32);
+    static std::size_t rawCount = sizeof(SmartTarget::raw) / sizeof(uint32);
+    std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
     for (size_t index = paramsCount; index < rawCount; index++)

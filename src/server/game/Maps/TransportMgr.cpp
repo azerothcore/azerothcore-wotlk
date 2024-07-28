@@ -208,12 +208,12 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
 
     // find the rest of the distances between key points
     // Every path segment has its own spline
-    size_t start = 0;
+    std::size_t start = 0;
     for (size_t i = 1; i < keyFrames.size(); ++i)
     {
         if (keyFrames[i - 1].Teleport || i + 1 == keyFrames.size())
         {
-            size_t extra = !keyFrames[i - 1].Teleport ? 1 : 0;
+            std::size_t extra = !keyFrames[i - 1].Teleport ? 1 : 0;
             TransportSpline* spline = new TransportSpline();
             spline->init_spline(&splinePath[start], i - start + extra, Movement::SplineBase::ModeCatmullrom);
             spline->initLengths();

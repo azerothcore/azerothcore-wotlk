@@ -51,7 +51,7 @@ private:
 
     std::mutex _lock;
     std::condition_variable _condition;
-    size_t pending_requests;
+    std::size_t pending_requests;
 };
 
 #endif //_MAP_UPDATER_H_INCLUDED

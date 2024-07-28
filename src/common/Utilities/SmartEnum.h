@@ -36,10 +36,10 @@ namespace Acore::Impl::EnumUtilsImpl
     template <typename Enum>
     struct EnumUtils
     {
-        static size_t Count();
+        static std::size_t Count();
         static EnumText ToString(Enum value);
         static Enum FromIndex(size_t index);
-        static size_t ToIndex(Enum index);
+        static std::size_t ToIndex(Enum index);
     };
 }
 
@@ -47,7 +47,7 @@ class EnumUtils
 {
 public:
     template <typename Enum>
-    static size_t Count() { return Acore::Impl::EnumUtilsImpl::EnumUtils<Enum>::Count(); }
+    static std::size_t Count() { return Acore::Impl::EnumUtilsImpl::EnumUtils<Enum>::Count(); }
     template <typename Enum>
     static EnumText ToString(Enum value) { return Acore::Impl::EnumUtilsImpl::EnumUtils<Enum>::ToString(value); }
     template <typename Enum>

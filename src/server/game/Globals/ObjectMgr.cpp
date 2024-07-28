@@ -381,7 +381,7 @@ void ObjectMgr::AddLocaleString(std::string&& s, LocaleConstant locale, std::vec
 {
     if (!s.empty())
     {
-        if (data.size() <= size_t(locale))
+        if (data.size() <= std::size_t(locale))
             data.resize(locale + 1);
 
         data[locale] = std::move(s);
@@ -8581,7 +8581,7 @@ char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 {
     if (AcoreString const* ts = GetAcoreString(entry))
     {
-        if (ts->Content.size() > size_t(locale) && !ts->Content[locale].empty())
+        if (ts->Content.size() > std::size_t(locale) && !ts->Content[locale].empty())
             return ts->Content[locale].c_str();
 
         return ts->Content[DEFAULT_LOCALE].c_str();

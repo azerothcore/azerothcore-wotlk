@@ -151,7 +151,7 @@ bool DatabaseWorkerPool<T>::PrepareStatements()
             else
                 connection->Unlock();
 
-            size_t const preparedSize = connection->m_stmts.size();
+            std::size_t const preparedSize = connection->m_stmts.size();
             if (_preparedStatementSize.size() < preparedSize)
                 _preparedStatementSize.resize(preparedSize);
 

@@ -35,7 +35,7 @@ public:
     typedef GuidList StorageType;
     typedef StorageType::iterator iterator;
     typedef StorageType::const_iterator const_iterator;
-    typedef StorageType::size_type size_type;
+    typedef StorageType::size_type std::size_type;
     typedef StorageType::value_type value_type;
 
     explicit SummonList(Creature* creature)
@@ -75,7 +75,7 @@ public:
         return storage_.empty();
     }
 
-    size_type size() const
+    std::size_type size() const
     {
         return storage_.size();
     }

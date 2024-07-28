@@ -72,7 +72,7 @@ AC_API_EXPORT EnumText EnumUtils<ChatNotify>::ToString(ChatNotify value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ChatNotify>::Count() { return 36; }
+AC_API_EXPORT std::size_t EnumUtils<ChatNotify>::Count() { return 36; }
 
 template <>
 AC_API_EXPORT ChatNotify EnumUtils<ChatNotify>::FromIndex(size_t index)
@@ -120,7 +120,7 @@ AC_API_EXPORT ChatNotify EnumUtils<ChatNotify>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ChatNotify>::ToIndex(ChatNotify value)
+AC_API_EXPORT std::size_t EnumUtils<ChatNotify>::ToIndex(ChatNotify value)
 {
     switch (value)
     {

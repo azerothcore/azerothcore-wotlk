@@ -27,8 +27,8 @@ public:
         o0it(o0.begin())
     {
         uint8 const* data = std::data(buf);
-        size_t const len = std::size(buf);
-        size_t const halflen = (len / 2);
+        std::size_t const len = std::size(buf);
+        std::size_t const halflen = (len / 2);
 
         o1 = Hash::GetDigestOf(data, halflen);
         o2 = Hash::GetDigestOf(data + halflen, len - halflen);

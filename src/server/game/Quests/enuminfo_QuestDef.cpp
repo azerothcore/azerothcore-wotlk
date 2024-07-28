@@ -49,7 +49,7 @@ AC_API_EXPORT EnumText EnumUtils<QuestFailedReason>::ToString(QuestFailedReason 
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<QuestFailedReason>::Count() { return 13; }
+AC_API_EXPORT std::size_t EnumUtils<QuestFailedReason>::Count() { return 13; }
 
 template <>
 AC_API_EXPORT QuestFailedReason EnumUtils<QuestFailedReason>::FromIndex(size_t index)
@@ -74,7 +74,7 @@ AC_API_EXPORT QuestFailedReason EnumUtils<QuestFailedReason>::FromIndex(size_t i
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<QuestFailedReason>::ToIndex(QuestFailedReason value)
+AC_API_EXPORT std::size_t EnumUtils<QuestFailedReason>::ToIndex(QuestFailedReason value)
 {
     switch (value)
     {
@@ -119,7 +119,7 @@ AC_API_EXPORT EnumText EnumUtils<QuestShareMessages>::ToString(QuestShareMessage
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<QuestShareMessages>::Count() { return 11; }
+AC_API_EXPORT std::size_t EnumUtils<QuestShareMessages>::Count() { return 11; }
 
 template <>
 AC_API_EXPORT QuestShareMessages EnumUtils<QuestShareMessages>::FromIndex(size_t index)
@@ -142,7 +142,7 @@ AC_API_EXPORT QuestShareMessages EnumUtils<QuestShareMessages>::FromIndex(size_t
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<QuestShareMessages>::ToIndex(QuestShareMessages value)
+AC_API_EXPORT std::size_t EnumUtils<QuestShareMessages>::ToIndex(QuestShareMessages value)
 {
     switch (value)
     {

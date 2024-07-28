@@ -1455,8 +1455,8 @@ void WheatyExceptionReport::FormatOutputValue(char* pszCurrBuffer,
         BasicType basicType,
         DWORD64 length,
         PVOID pAddress,
-        size_t bufferSize,
-        size_t countOverride)
+        std::size_t bufferSize,
+        std::size_t countOverride)
 {
     __try
     {

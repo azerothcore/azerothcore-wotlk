@@ -39,7 +39,7 @@ AC_API_EXPORT EnumText EnumUtils<ArenaTeamTypes>::ToString(ArenaTeamTypes value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ArenaTeamTypes>::Count() { return 3; }
+AC_API_EXPORT std::size_t EnumUtils<ArenaTeamTypes>::Count() { return 3; }
 
 template <>
 AC_API_EXPORT ArenaTeamTypes EnumUtils<ArenaTeamTypes>::FromIndex(size_t index)
@@ -54,7 +54,7 @@ AC_API_EXPORT ArenaTeamTypes EnumUtils<ArenaTeamTypes>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ArenaTeamTypes>::ToIndex(ArenaTeamTypes value)
+AC_API_EXPORT std::size_t EnumUtils<ArenaTeamTypes>::ToIndex(ArenaTeamTypes value)
 {
     switch (value)
     {

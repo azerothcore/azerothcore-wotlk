@@ -58,7 +58,7 @@ bool DBCFile::open()
     data = new unsigned char[recordSize * recordCount + stringSize];
     stringTable = data + recordSize * recordCount;
 
-    size_t data_size = recordSize * recordCount + stringSize;
+    std::size_t data_size = recordSize * recordCount + stringSize;
     if (f.read(data, data_size) != data_size)
         return false;
     f.close();
@@ -79,7 +79,7 @@ size_t DBCFile::getMaxId()
 {
     assert(data);
 
-    size_t maxId = 0;
+    std::size_t maxId = 0;
     for (size_t i = 0; i < getRecordCount(); ++i)
     {
         if (maxId < getRecord(i).getUInt(0))

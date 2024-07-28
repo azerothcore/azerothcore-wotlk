@@ -47,7 +47,7 @@ void Acore::AcoreStringChatBuilder::operator()(WorldPacket& data, LocaleConstant
         va_list ap;
         va_copy(ap, *_args);
 
-        static size_t const BufferSize = 2048;
+        static std::size_t const BufferSize = 2048;
         char strBuffer[BufferSize];
         vsnprintf(strBuffer, BufferSize, text, ap);
         va_end(ap);
