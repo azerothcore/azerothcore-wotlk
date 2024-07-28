@@ -232,7 +232,8 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (player->GetQuestStatus(QUEST_DEATH_CHALLENGE) == QUEST_STATUS_INCOMPLETE && creature->IsFullHealth())
+        if (player->GetQuestStatus(QUEST_DEATH_CHALLENGE) == QUEST_STATUS_INCOMPLETE &&
+            creature->GetHealth() == creature->GetMaxHealth())
         {
             if (player->HealthBelowPct(10))
                 return true;

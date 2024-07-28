@@ -354,7 +354,7 @@ class spell_pri_item_greater_heal_refund : public AuraScript
     {
         if (HealInfo* healInfo = eventInfo.GetHealInfo())
             if (Unit* healTarget = healInfo->GetTarget())
-                if (eventInfo.GetHitMask() & PROC_EX_NO_OVERHEAL && healTarget->IsFullHealth())
+                if (eventInfo.GetHitMask() & PROC_EX_NO_OVERHEAL && healTarget->GetHealth() == healTarget->GetMaxHealth())
                     return true;
         return false;
     }

@@ -6612,7 +6612,7 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
             case 35321:
             case 38363:
             case 39215:  // Gushing Wound
-                if (target->IsFullHealth())
+                if (target->GetHealth() == target->GetMaxHealth())
                 {
                     target->RemoveAurasDueToSpell(GetSpellInfo()->Id);
                     return;
@@ -6890,7 +6890,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
         return;
 
     // don't regen when permanent aura target has full power
-    if (GetBase()->IsPermanent() && target->IsFullHealth())
+    if (GetBase()->IsPermanent() && target->GetHealth() == target->GetMaxHealth())
         return;
 
     // ignore negative values (can be result apply spellmods to aura damage

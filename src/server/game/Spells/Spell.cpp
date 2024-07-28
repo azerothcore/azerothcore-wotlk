@@ -7207,7 +7207,7 @@ SpellCastResult Spell::CheckItems()
 
                 if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_HEAL)
                 {
-                    if (m_targets.GetUnitTarget()->IsFullHealth())
+                    if (m_targets.GetUnitTarget()->GetHealth() == m_targets.GetUnitTarget()->GetMaxHealth())
                     {
                         failReason = SPELL_FAILED_ALREADY_AT_FULL_HEALTH;
                         continue;
