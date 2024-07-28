@@ -20,9 +20,7 @@
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
 #include "Battlefield.h"
-#include "BattlefieldMgr.h"
 #include "Battleground.h"
-#include "BattlegroundAV.h"
 #include "BattlegroundMgr.h"
 #include "Channel.h"
 #include "CharacterDatabaseCleaner.h"
@@ -69,7 +67,6 @@
 #include "UpdateFieldFlags.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "Weather.h"
 #include "World.h"
 #include "WorldPacket.h"
 

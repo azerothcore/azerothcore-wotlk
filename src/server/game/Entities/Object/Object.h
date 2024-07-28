@@ -35,6 +35,8 @@
 #include <sstream>
 #include <string>
 
+#include "UpdateFields.h"
+
 class ElunaEventProcessor;
 
 enum TempSummonType
