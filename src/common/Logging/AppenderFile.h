@@ -19,6 +19,7 @@
 #define APPENDERFILE_H
 
 #include "Appender.h"
+#include <atomic>
 #include <vector>
 
 class AppenderFile : public Appender
