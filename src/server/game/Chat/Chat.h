@@ -50,6 +50,18 @@ public:
 
     static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
+    void SendGMText(std::string_view str);
+    template<typename... Args>
+    void SendGMText(uint32 strId, Args&&... args)
+    {
+        SendGMText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+    }
+    template<typename... Args>
+    void SendGMText(char const* fmt, Args&&... args)
+    {
+        SendGMText(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+    }
+
     // function with different implementation for chat/console
     virtual char const* GetAcoreString(uint32 entry) const;
     virtual void SendSysMessage(std::string_view str, bool escapeCharacters = false);

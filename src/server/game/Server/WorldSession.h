@@ -357,18 +357,6 @@ public:
         SendNotification(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
     }
 
-    void SendGMText(std::string_view str);
-    template<typename... Args>
-    void SendGMText(uint32 strId, Args&&... args)
-    {
-        SendGMText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
-    }
-    template<typename... Args>
-    void SendGMText(char const* fmt, Args&&... args)
-    {
-        SendGMText(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
-    }
-
     void SendPacket(WorldPacket const* packet);
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
     void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res, uint32 val = 0);
