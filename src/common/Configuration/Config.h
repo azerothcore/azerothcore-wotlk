@@ -50,26 +50,6 @@ public:
     template<class T>
     T GetOption(std::string const& name, T const& def, bool showLogs = true) const;
 
-    /*
-     * Deprecated geters. This geters will be deleted
-     */
-
-    [[deprecated("Use GetOption<std::string> instead")]]
-    std::string GetStringDefault(std::string const& name, const std::string& def, bool showLogs = true);
-
-    [[deprecated("Use GetOption<bool> instead")]]
-    bool GetBoolDefault(std::string const& name, bool def, bool showLogs = true);
-
-    [[deprecated("Use GetOption<int32> instead")]]
-    int GetIntDefault(std::string const& name, int def, bool showLogs = true);
-
-    [[deprecated("Use GetOption<float> instead")]]
-    float GetFloatDefault(std::string const& name, float def, bool showLogs = true);
-
-    /*
-     * End deprecated geters
-     */
-
     bool isDryRun() { return dryRun; }
     void setDryRun(bool mode) { dryRun = mode; }
 

@@ -20,6 +20,9 @@
 #include "Spell.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Says
 {

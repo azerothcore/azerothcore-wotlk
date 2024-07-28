@@ -34,7 +34,6 @@ EndContentData */
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 
 /*######
 ## npc_lord_gregor_lescovar

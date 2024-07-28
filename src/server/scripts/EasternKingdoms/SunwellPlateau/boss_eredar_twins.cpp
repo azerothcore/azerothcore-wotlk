@@ -17,8 +17,10 @@
 
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 

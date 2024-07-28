@@ -17,7 +17,6 @@
 
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "Player.h"

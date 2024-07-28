@@ -19,7 +19,6 @@
 #include "AreaTriggerScript.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
-#include "GameObjectScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

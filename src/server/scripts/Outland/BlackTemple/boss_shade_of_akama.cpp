@@ -19,6 +19,11 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "PassiveAI.h"
+#include "ScriptedGossip.h"
+#include "SpellAuras.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
 
 enum Says
 {
@@ -81,7 +86,8 @@ enum Misc
     ACTION_AKAMA_START_OUTRO        = 1,
 
     FACTION_DEFAULT                 = 1820,
-    FACTION_ENGAGE                  = 1868
+    FACTION_ENGAGE                  = 1868,
+    FACTION_DEFENDER                = 1847
 };
 
 Position AkamaEngage = { 517.4877f, 400.79926f, 112.77704f };
@@ -364,10 +370,13 @@ struct npc_creature_generator_akama : public ScriptedAI
                 summon->GetMotionMaster()->MovePoint(POINT_ENGAGE, x, y, z);
             }
             break;
-        default:
-            summon->SetInCombatWithZone();
+        case NPC_ASHTONGUE_DEFENDER:
+            summon->SetFaction(FACTION_DEFENDER);
             if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
                 summon->AI()->AttackStart(akama);
+            break;
+        default:
+            summon->SetInCombatWithZone();
             break;
         }
     }

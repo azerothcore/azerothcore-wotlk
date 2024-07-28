@@ -31,7 +31,6 @@ EndContentData */
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "SpellInfo.h"
 
 /*####
 # npc_rizzle_sprysprocket

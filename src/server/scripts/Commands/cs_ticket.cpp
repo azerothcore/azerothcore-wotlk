@@ -109,7 +109,7 @@ public:
         Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
         if (player && ticket->IsAssignedNotTo(player->GetGUID()))
         {
-            handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId(), target.c_str());
+            handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId(), target);
             return true;
         }
 
@@ -469,7 +469,7 @@ public:
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
         msg += handler->PGetParseString(LANG_COMMAND_TICKETRESPONSEAPPENDED, response);
 
-        handler->PSendSysMessage(msg.c_str());
+        handler->PSendSysMessage(msg);
         return true;
     }
 
@@ -526,7 +526,7 @@ public:
         std::string msg = ticket->FormatMessageString(*handler, nullptr, nullptr, nullptr, nullptr);
         msg += handler->PGetParseString(LANG_COMMAND_TICKETLISTRESPONSE, ticket->GetResponse());
 
-        handler->PSendSysMessage(msg.c_str());
+        handler->PSendSysMessage(msg);
         return true;
     }
 };
