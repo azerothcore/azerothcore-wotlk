@@ -2473,6 +2473,9 @@ bool AchievementGlobalMgr::IsStatisticAchievement(AchievementEntry const* achiev
 
 bool AchievementGlobalMgr::IsAverageCriteria(AchievementCriteriaEntry const* criteria) const
 {
+    if (!sAchievementStore.LookupEntry(criteria->referredAchievement))
+        return false;
+
     if ((sAchievementStore.LookupEntry(criteria->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
         return true;
 
