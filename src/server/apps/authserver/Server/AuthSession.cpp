@@ -23,7 +23,6 @@
 #include "CryptoHash.h"
 #include "CryptoRandom.h"
 #include "DatabaseEnv.h"
-#include "Errors.h"
 #include "IPLocation.h"
 #include "Log.h"
 #include "RealmList.h"

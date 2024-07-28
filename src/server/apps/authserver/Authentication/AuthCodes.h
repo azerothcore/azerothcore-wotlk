@@ -19,7 +19,6 @@
 #define _AUTHCODES_H
 
 #include "Define.h"
-#include <array>
 
 enum AuthResult
 {

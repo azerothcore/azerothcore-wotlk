@@ -20,7 +20,6 @@
 #include "Log.h"
 #include "MySQLHacks.h"
 #include "MySQLPreparedStatement.h"
-#include "MySQLWorkaround.h"
 #include "PreparedStatement.h"
 #include "QueryResult.h"
 #include "StringConvert.h"
