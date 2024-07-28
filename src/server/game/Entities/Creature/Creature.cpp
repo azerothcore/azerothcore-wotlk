@@ -622,10 +622,7 @@ void Creature::Update(uint32 diff)
             time_t now = GameTime::GetGameTime().count();
             if (m_respawnTime <= now)
             {
-                if (!IsAIEnabled || AI()->CanRespawn())
-                    return;
-                else
-                    Respawn();
+                Respawn();
             }
             break;
         }
@@ -1986,6 +1983,10 @@ void Creature::Respawn(bool force)
         m_respawnTime = GameTime::GetGameTime().count() + m_respawnDelay;
         return;
     }
+
+    bool allowed = !IsAIEnabled || AI()->CanRespawn(); // First check if there are any scripts that prevent us respawning
+    if (!allowed && !force)                                               // Will be rechecked on next Update call
+        return;
 
     ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
     time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
