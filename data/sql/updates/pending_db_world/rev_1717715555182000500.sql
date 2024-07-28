@@ -1,5 +1,5 @@
 --
-SET @CGUID := 12529;
+SET @CGUID := 12556;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+18 AND `id1` IN (23435, 23440);
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
@@ -23,16 +23,11 @@ INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `
 (@CGUID+17, 23440, 530, 3520, 3938, 1, 1, 1, -4074.8384, 962.56665, 54.436428, 1.432607769966125488, 0 /* spawntimesecs */, 0, 0, 0, 0, 0, 0, 0, 0, 52237),
 (@CGUID+18, 23440, 530, 3520, 3938, 1, 1, 1, -4100.3086, 965.0279, 64.35575, 1.525284409523010253, 0 /* spawntimesecs */, 0, 0, 0, 0, 0, 0, 0, 0, 52237);
 
--- DELETE FROM `waypoint_data` WHERE `id` = 234341;
--- INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `move_type`, `delay`) VALUES
--- (234341, 1, -4075.5479, 1081.4083, 33.318653, NULL, 1, 0),
--- (234341, 2, -4066.6372, 1067.3375, 30.281086, NULL, 1, 0),
--- (234341, 3, -4066.6372, 1067.3375, 30.281086, 2.234021425247192382, 0, 2400);
-
-DELETE FROM `waypoints` WHERE `entry` = 2343400;
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
-(2343400, 1, -4075.5479, 1081.4083, 33.318653, 'Commander Hobb'),
-(2343400, 2, -4066.6372, 1067.3375, 30.281086, 'Commander Hobb');
+DELETE FROM `waypoint_data` WHERE `id` = 234341;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `move_type`, `delay`) VALUES
+(234341, 1, -4075.5479, 1081.4083, 33.318653, NULL, 1, 0),
+(234341, 2, -4066.6372, 1067.3375, 30.281086, NULL, 1, 0),
+(234341, 3, -4066.6372, 1067.3375, 30.281086, 2.234021425247192382, 0, 2400);
 
 DELETE FROM `creature_text` WHERE (`CreatureID` = 23434);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -63,8 +58,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2343400, 9, 2 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Store Targetlist Party'),
 (2343400, 9, 3 , 0, 0, 0, 100, 0, 2200, 2200, 0, 0, 0, 0, 226, 1, 0, 0, 0, 0, 0, 9, 23435, 0, 100, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Spawn In Sanctum Defenders'),
 (2343400, 9, 4 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Say Line 0'),
--- (2343400, 9, 5 , 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 232, 234341, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Start Path 234341'),
-(2343400, 9, 5 , 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 53, 1, 2343400, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Start Path 234341'),
+(2343400, 9, 5 , 0, 0, 0, 100, 0, 3200, 3200, 0, 0, 0, 0, 232, 234341, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Start Path 234341'),
 (2343400, 9, 6 , 0, 0, 0, 100, 0, 11400, 11400, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Say Line 1'),
 (2343400, 9, 7 , 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.340707302093506, 'Commander Hobb - Actionlist - Set Orientation'),
 (2343400, 9, 8 , 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 40, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Set Sheath Ranged'),
@@ -105,7 +99,6 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (23440, 1, 1, 'Long live the Dragonmaw! Die you worthless $N!', 12, 0, 100, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker'),
 (23440, 1, 2, 'Your bones will break under my boot, $N', 12, 0, 100, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker');
 
-/*
 DELETE FROM `waypoint_data` WHERE `id` BETWEEN 234401 AND 234409;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `move_type`) VALUES
 -- [1] Position: X: -4063.1006 Y: 963.11896 Z: 61.477966
@@ -194,100 +187,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (234409, 3, -4094.4888, 1028.0123, 51.118576, NULL, 2),
 (234409, 4, -4088.3276, 1055.0275, 41.36858, NULL, 2),
 (234409, 5, -4088.3276, 1055.0275, 41.36858, NULL, 2);
-*/
-
-DELETE FROM `waypoints` WHERE `entry` BETWEEN 2344001 AND 2344009;
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `point_comment`) VALUES
--- [1] Position: X: -4063.1006 Y: 963.11896 Z: 61.477966
--- [1] Orientation: 1.549625277519226074
--- (234401, 1, -4063.3423, 928.9622, 82.92392, NULL, 2),
-(2344001, 1,  -4063.14, 960.33984, 63.31019, 'Dragonmaw Skybreaker (Scryer) - Path 1'),
-(2344001, 2,  -4062.9375, 991.71747, 43.696457, 'Dragonmaw Skybreaker (Scryer) - Path 1'),
-(2344001, 3,  -4068.4714, 1033.1897, 43.69646, 'Dragonmaw Skybreaker (Scryer) - Path 1'),
-(2344001, 4,  -4063.366, 1066.3694, 36.36312, 'Dragonmaw Skybreaker (Scryer) - Path 1'),
-(2344001, 5,  -4063.366, 1066.3694, 36.36312, 'Dragonmaw Skybreaker (Scryer) - Path 1'),
-
--- [2] Position: X: -4050.1597 Y: 963.0414 Z: 53.95147
--- [2] Orientation: 1.311231613159179687
--- (234402, 1, -4059.524, 924.002, 65.44735, 'Dragonmaw Skybreaker (Scryer) - Path 2'),
-(2344002, 1, -4050.9375, 959.96356, 54.90167, 'Dragonmaw Skybreaker (Scryer) - Path 2'),
-(2344002, 2, -4042.351, 995.9251, 44.355988, 'Dragonmaw Skybreaker (Scryer) - Path 2'),
-(2344002, 3, -4043.5217, 1043.2762, 44.355988, 'Dragonmaw Skybreaker (Scryer) - Path 2'),
-(2344002, 4, -4053.7783, 1066.186, 35.717106, 'Dragonmaw Skybreaker (Scryer) - Path 2'),
-(2344002, 5, -4053.7783, 1066.186, 35.717106, 'Dragonmaw Skybreaker (Scryer) - Path 2'),
-
--- [3] Position: X: -4020.2585 Y: 970.38385 Z: 60.901543
--- [3] Orientation: 0.900896310806274414
--- (234403, 1, -4037.4287, 946.79236, 83.177536, 'Dragonmaw Skybreaker (Scryer) - Path 3'),
-(2344003, 1, -4021.8472, 968.2917, 63.01559, 'Dragonmaw Skybreaker (Scryer) - Path 3'),
-(2344003, 2, -4006.2656, 989.791, 42.853645, 'Dragonmaw Skybreaker (Scryer) - Path 3'),
-(2344003, 3, -3996.3499, 1025.583, 42.853645, 'Dragonmaw Skybreaker (Scryer) - Path 3'),
-(2344003, 4, -4003.674, 1055.279, 42.853645, 'Dragonmaw Skybreaker (Scryer) - Path 3'),
-(2344003, 5, -4028.947, 1082.6088, 42.853645, 'Dragonmaw Skybreaker (Scryer) - Path 3'),
-(2344003, 6, -4045.464, 1078.8114, 39.575867, 'Dragonmaw Skybreaker (Scryer) - Path 3'),
-(2344003, 7, -4045.464, 1078.8114, 39.575867, 'Dragonmaw Skybreaker (Scryer) - Path 3'),
-
--- [4] Position: X: -3999.5762 Y: 981.1174 Z: 50.560707
--- [4] Orientation: 4.405356407165527343
--- (234404, 1, -3996.5837, 984.6102, 39.35212, NULL, 2),
-(2344004, 1, -3998.6301, 983.61804, 49.09008, 'Dragonmaw Skybreaker (Scryer) - Path 4'),
-(2344004, 2, -3999.1016, 983.38947, 51.333473, 'Dragonmaw Skybreaker (Scryer) - Path 4'),
-(2344004, 3, -3990.658, 1017.7838, 56.139027, 'Dragonmaw Skybreaker (Scryer) - Path 4'),
-(2344004, 4, -4006.1025, 1049.133, 55.555695, 'Dragonmaw Skybreaker (Scryer) - Path 4'),
-(2344004, 5, -4019.0344, 1080.7048, 35.305683, 'Dragonmaw Skybreaker (Scryer) - Path 4'),
-(2344004, 6, -4053.2844, 1074.483, 33.611267, 'Dragonmaw Skybreaker (Scryer) - Path 4'),
-(2344004, 7, -4053.2844, 1074.483, 33.611267, 'Dragonmaw Skybreaker (Scryer) - Path 4'),
-
--- [5] Position: X: -4038.3103 Y: 965.81195 Z: 56.55157
--- [5] Orientation: 1.584519624710083007
--- (234405, 1, -4037.4302, 934.6457, 40.033707, NULL, 2),
-(2344005, 1, -4038.25, 962.934, 54.8684, 'Dragonmaw Skybreaker (Scryer) - Path 5'),
-(2344005, 2, -4039.0698, 991.22235, 69.703094, 'Dragonmaw Skybreaker (Scryer) - Path 5'),
-(2344005, 3, -4044.9453, 1026.4785, 51.564217, 'Dragonmaw Skybreaker (Scryer) - Path 5'),
-(2344005, 4, -4046.6675, 1054.0055, 34.70309, 'Dragonmaw Skybreaker (Scryer) - Path 5'),
-(2344005, 5, -4054.3298, 1074.1635, 32.84199, 'Dragonmaw Skybreaker (Scryer) - Path 5'),
-(2344005, 6, -4054.3298, 1074.1635, 32.84199, 'Dragonmaw Skybreaker (Scryer) - Path 5'),
-
--- [6] Position: X: -4088.2646 Y: 962.83264 Z: 60.189224
--- [6] Orientation: 1.564426898956298828
--- (234406, 1, -4088.8037, 925.66644, 67.038666, NULL, 2),
-(2344006, 1, -4088.2986, 959.6094, 60.73994, 'Dragonmaw Skybreaker (Scryer) - Path 6'),
-(2344006, 2, -4087.7935, 993.5523, 54.441216, 'Dragonmaw Skybreaker (Scryer) - Path 6'),
-(2344006, 3, -4083.7122, 1036.6643, 35.0801, 'Dragonmaw Skybreaker (Scryer) - Path 6'),
-(2344006, 4, -4081.1072, 1055.6353, 31.913435, 'Dragonmaw Skybreaker (Scryer) - Path 6'),
-(2344006, 5, -4081.1072, 1055.6353, 31.913435, 'Dragonmaw Skybreaker (Scryer) - Path 6'),
-
--- [7] Position: X: -4114.435 Y: 973.54456 Z: 70.249596
--- [7] Orientation: 1.752815127372741699
--- (234407, 1, -4108.9116, 938.1812, 94.50812, NULL, 2),
-(2344007, 1, -4113.9756, 970.84375, 72.16011, 'Dragonmaw Skybreaker (Scryer) - Path 7'),
-(2344007, 2, -4119.0396, 1003.5063, 49.8121, 'Dragonmaw Skybreaker (Scryer) - Path 7'),
-(2344007, 3, -4113.9204, 1050.867, 36.728764, 'Dragonmaw Skybreaker (Scryer) - Path 7'),
-(2344007, 4, -4099.3726, 1059.4963, 33.645435, 'Dragonmaw Skybreaker (Scryer) - Path 7'),
-(2344007, 5, -4093.058, 1059.0251, 31.534332, 'Dragonmaw Skybreaker (Scryer) - Path 7'),
-(2344007, 6, -4093.058, 1059.0251, 31.534332, 'Dragonmaw Skybreaker (Scryer) - Path 7'),
-
--- [8] Position: X: -4074.8384 Y: 962.56665 Z: 54.436428
--- [8] Orientation: 1.432607769966125488
--- (234408, 1, -4079.2244, 931.53033, 76.49546, NULL, 2),
-(2344008, 1, -4075.2153, 959.8802, 56.398266, 'Dragonmaw Skybreaker (Scryer) - Path 8'),
-(2344008, 2, -4071.2063, 988.23004, 36.30107, 'Dragonmaw Skybreaker (Scryer) - Path 8'),
-(2344008, 3, -4066.255, 1017.4882, 29.634405, 'Dragonmaw Skybreaker (Scryer) - Path 8'),
-(2344008, 4, -4060.89, 1066.7999, 31.106628, 'Dragonmaw Skybreaker (Scryer) - Path 8'),
-(2344008, 5, -4060.89, 1066.7999, 31.106628, 'Dragonmaw Skybreaker (Scryer) - Path 8'),
-
--- [9] Position: X: -4100.3086 Y: 965.0279 Z: 64.35575
--- [9] Orientation: 1.525284409523010253
--- (234409, 1, -4101.632, 942.9062, 58.775528, NULL, 2),
-(2344009, 1, -4100.46, 962.17706, 63.36372, 'Dragonmaw Skybreaker (Scryer) - Path 9'),
-(2344009, 2, -4099.288, 981.44794, 67.95191, 'Dragonmaw Skybreaker (Scryer) - Path 9'),
-(2344009, 3, -4094.4888, 1028.0123, 51.118576, 'Dragonmaw Skybreaker (Scryer) - Path 9'),
-(2344009, 4, -4088.3276, 1055.0275, 41.36858, 'Dragonmaw Skybreaker (Scryer) - Path 9'),
-(2344009, 5, -4088.3276, 1055.0275, 41.36858, 'Dragonmaw Skybreaker (Scryer) - Path 9');
 
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|134217728 WHERE (`entry` = 23440);
 
-/*
 DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (-(@CGUID+10),-(@CGUID+11),-(@CGUID+12),-(@CGUID+13),-(@CGUID+14),-(@CGUID+15),-(@CGUID+16),-(@CGUID+17),-(@CGUID+18))) AND (`source_type` = 0) AND (`id` IN (1000));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-(@CGUID+10), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234401, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234401'),
@@ -299,16 +201,3 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+16), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234407'),
 (-(@CGUID+17), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234408, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234408'),
 (-(@CGUID+18), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234409, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234409');
-*/
-
-DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (-(@CGUID+10),-(@CGUID+11),-(@CGUID+12),-(@CGUID+13),-(@CGUID+14),-(@CGUID+15),-(@CGUID+16),-(@CGUID+17),-(@CGUID+18))) AND (`source_type` = 0) AND (`id` IN (1000));
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-(@CGUID+10), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 2344001, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234401'),
-(-(@CGUID+11), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 2344002, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234402'),
-(-(@CGUID+12), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 2344003, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234403'),
-(-(@CGUID+13), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 2344004, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234404'),
-(-(@CGUID+14), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 2344005, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234405'),
-(-(@CGUID+15), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 2344006, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234406'),
-(-(@CGUID+16), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 2344007, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234407'),
-(-(@CGUID+17), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 2344008, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234408'),
-(-(@CGUID+18), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 2344009, 0, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234409');
