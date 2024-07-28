@@ -929,7 +929,7 @@ public:
             return false;
         }
 
-        AccountOpResult result = AccountMgr::ChangeEmail(targetAccountId, email.data())
+        AccountOpResult result = AccountMgr::ChangeEmail(targetAccountId, email.data());
 
         switch (result)
         {
