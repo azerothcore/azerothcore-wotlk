@@ -109,7 +109,7 @@ void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
         std::vector<std::string_view> tokens = Acore::Tokenize(msg, '|', true);
         std::ostringstream stream;
 
-        for (size_t i = 0; i < tokens.size() - 1; ++i)
+        for (std::size_t i = 0; i < tokens.size() - 1; ++i)
             stream << tokens[i] << "||";
 
         stream << tokens[tokens.size() - 1];

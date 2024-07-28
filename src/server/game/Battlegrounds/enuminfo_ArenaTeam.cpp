@@ -42,7 +42,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<ArenaTeamTypes>::Count() { return 3; }
 
 template <>
-AC_API_EXPORT ArenaTeamTypes EnumUtils<ArenaTeamTypes>::FromIndex(size_t index)
+AC_API_EXPORT ArenaTeamTypes EnumUtils<ArenaTeamTypes>::FromIndex(std::size_t index)
 {
     switch (index)
     {

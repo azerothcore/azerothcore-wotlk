@@ -16,7 +16,7 @@ template <typename T>
 class CircularBuffer
 {
 public:
-    explicit CircularBuffer(size_t size) :
+    explicit CircularBuffer(std::size_t size) :
         buf_(std::unique_ptr<T[]>(new T[size])),
         max_size_(size)
     {

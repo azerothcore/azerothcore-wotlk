@@ -1546,7 +1546,7 @@ LootTemplate::~LootTemplate()
         Entries.pop_back();
     }
 
-    for (size_t i = 0; i < Groups.size(); ++i)
+    for (std::size_t i = 0; i < Groups.size(); ++i)
         delete Groups[i];
     Groups.clear();
 }

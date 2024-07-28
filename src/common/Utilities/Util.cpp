@@ -36,7 +36,7 @@ void stripLineInvisibleChars(std::string& str)
     std::size_t wpos = 0;
 
     bool space = false;
-    for (size_t pos = 0; pos < str.size(); ++pos)
+    for (std::size_t pos = 0; pos < str.size(); ++pos)
     {
         if (invChars.find(str[pos]) != std::string::npos)
         {

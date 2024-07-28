@@ -72,7 +72,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<UnitFlags>::Count() { return 33; }
 
 template <>
-AC_API_EXPORT UnitFlags EnumUtils<UnitFlags>::FromIndex(size_t index)
+AC_API_EXPORT UnitFlags EnumUtils<UnitFlags>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -199,7 +199,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<NPCFlags>::Count() { return 28; }
 
 template <>
-AC_API_EXPORT NPCFlags EnumUtils<NPCFlags>::FromIndex(size_t index)
+AC_API_EXPORT NPCFlags EnumUtils<NPCFlags>::FromIndex(std::size_t index)
 {
     switch (index)
     {

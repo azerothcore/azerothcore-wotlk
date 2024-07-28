@@ -26,7 +26,7 @@
 #include <vector>
 
 //  memory management
-inline void* dtCustomAlloc(size_t size, dtAllocHint /*hint*/)
+inline void* dtCustomAlloc(std::size_t size, dtAllocHint /*hint*/)
 {
     return (void*)new unsigned char[size];
 }

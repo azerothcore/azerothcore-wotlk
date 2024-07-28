@@ -22,7 +22,7 @@ std::vector<std::string_view> Acore::Tokenize(std::string_view str, char sep, bo
     std::vector<std::string_view> tokens;
 
     std::size_t start = 0;
-    for (size_t end = str.find(sep); end != std::string_view::npos; end = str.find(sep, start))
+    for (std::size_t end = str.find(sep); end != std::string_view::npos; end = str.find(sep, start))
     {
         if (keepEmpty || (start < end))
         {

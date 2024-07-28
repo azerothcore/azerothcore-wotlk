@@ -1096,7 +1096,7 @@ void ExtractCameraFiles(int locale, bool basicLocale)
     std::vector<std::string> camerafiles;
     std::size_t cam_count = camdbc.getRecordCount();
 
-    for (size_t i = 0; i < cam_count; ++i)
+    for (std::size_t i = 0; i < cam_count; ++i)
     {
         std::string camFile(camdbc.getRecord(i).getString(1));
         std::size_t loc = camFile.find(".mdx");

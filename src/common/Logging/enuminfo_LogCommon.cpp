@@ -46,7 +46,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<LogLevel>::Count() { return 7; }
 
 template <>
-AC_API_EXPORT LogLevel EnumUtils<LogLevel>::FromIndex(size_t index)
+AC_API_EXPORT LogLevel EnumUtils<LogLevel>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -97,7 +97,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<AppenderType>::Count() { return 4; }
 
 template <>
-AC_API_EXPORT AppenderType EnumUtils<AppenderType>::FromIndex(size_t index)
+AC_API_EXPORT AppenderType EnumUtils<AppenderType>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -144,7 +144,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<AppenderFlags>::Count() { return 6; }
 
 template <>
-AC_API_EXPORT AppenderFlags EnumUtils<AppenderFlags>::FromIndex(size_t index)
+AC_API_EXPORT AppenderFlags EnumUtils<AppenderFlags>::FromIndex(std::size_t index)
 {
     switch (index)
     {

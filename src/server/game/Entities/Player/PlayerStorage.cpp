@@ -7321,7 +7321,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
         return;
 
     ObjectGuid::LowType lowGuid = GetGUID().GetCounter();
-    for (size_t i = 0; i < m_itemUpdateQueue.size(); ++i)
+    for (std::size_t i = 0; i < m_itemUpdateQueue.size(); ++i)
     {
         Item* item = m_itemUpdateQueue[i];
         if (!item)

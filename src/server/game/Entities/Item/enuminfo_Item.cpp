@@ -127,7 +127,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<InventoryResult>::Count() { return 88; }
 
 template <>
-AC_API_EXPORT InventoryResult EnumUtils<InventoryResult>::FromIndex(size_t index)
+AC_API_EXPORT InventoryResult EnumUtils<InventoryResult>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -345,7 +345,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<BuyResult>::Count() { return 9; }
 
 template <>
-AC_API_EXPORT BuyResult EnumUtils<BuyResult>::FromIndex(size_t index)
+AC_API_EXPORT BuyResult EnumUtils<BuyResult>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -405,7 +405,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<SellResult>::Count() { return 9; }
 
 template <>
-AC_API_EXPORT SellResult EnumUtils<SellResult>::FromIndex(size_t index)
+AC_API_EXPORT SellResult EnumUtils<SellResult>::FromIndex(std::size_t index)
 {
     switch (index)
     {

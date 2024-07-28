@@ -71,7 +71,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<CreatureFlagsExtra>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT CreatureFlagsExtra EnumUtils<CreatureFlagsExtra>::FromIndex(size_t index)
+AC_API_EXPORT CreatureFlagsExtra EnumUtils<CreatureFlagsExtra>::FromIndex(std::size_t index)
 {
     switch (index)
     {

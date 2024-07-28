@@ -43,7 +43,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<CreatureAI::EvadeReason>::Count() { return 4; }
 
 template <>
-AC_API_EXPORT CreatureAI::EvadeReason EnumUtils<CreatureAI::EvadeReason>::FromIndex(size_t index)
+AC_API_EXPORT CreatureAI::EvadeReason EnumUtils<CreatureAI::EvadeReason>::FromIndex(std::size_t index)
 {
     switch (index)
     {

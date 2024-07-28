@@ -31,7 +31,7 @@ struct AC_DATABASE_API UpdateResult
     UpdateResult()
         : updated(0), recent(0), archived(0) { }
 
-    UpdateResult(size_t const updated_, std::size_t const recent_, std::size_t const archived_)
+    UpdateResult(std::size_t const updated_, std::size_t const recent_, std::size_t const archived_)
         : updated(updated_), recent(recent_), archived(archived_) { }
 
     std::size_t updated;

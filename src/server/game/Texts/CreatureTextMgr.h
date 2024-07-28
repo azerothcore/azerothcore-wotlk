@@ -129,7 +129,7 @@ public:
 
     ~CreatureTextLocalizer()
     {
-        for (size_t i = 0; i < _packetCache.size(); ++i)
+        for (std::size_t i = 0; i < _packetCache.size(); ++i)
         {
             if (_packetCache[i])
                 delete _packetCache[i]->first;

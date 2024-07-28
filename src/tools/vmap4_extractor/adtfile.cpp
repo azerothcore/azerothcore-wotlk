@@ -47,7 +47,7 @@ void fixnamen(char* name, std::size_t len)
     if (len < 3)
         return;
 
-    for (size_t i = 0; i < len - 3; i++)
+    for (std::size_t i = 0; i < len - 3; i++)
     {
         if (i > 0 && name[i] >= 'A' && name[i] <= 'Z' && isalpha(name[i - 1]))
             name[i] |= 0x20;
@@ -56,7 +56,7 @@ void fixnamen(char* name, std::size_t len)
     }
 
     //extension in lowercase
-    for (size_t i = len - 3; i < len; i++)
+    for (std::size_t i = len - 3; i < len; i++)
         name[i] |= 0x20;
 }
 
@@ -65,7 +65,7 @@ void fixname2(char* name, std::size_t len)
     if (len < 3)
         return;
 
-    for (size_t i = 0; i < len - 3; i++)
+    for (std::size_t i = 0; i < len - 3; i++)
         if (name[i] == ' ')
             name[i] = '_';
 }

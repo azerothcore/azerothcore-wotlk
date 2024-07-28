@@ -588,7 +588,7 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
     std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
-    for (size_t index = paramsCount; index < rawCount; index++)
+    for (std::size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.event.raw)[index];
         if (value != 0)
@@ -788,7 +788,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
     std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
-    for (size_t index = paramsCount; index < rawCount; index++)
+    for (std::size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.action.raw)[index];
         if (value != 0)
@@ -852,7 +852,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
     std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
-    for (size_t index = paramsCount; index < rawCount; index++)
+    for (std::size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.target.raw)[index];
         if (value != 0)

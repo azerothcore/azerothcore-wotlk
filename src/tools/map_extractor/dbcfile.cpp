@@ -69,7 +69,7 @@ DBCFile::~DBCFile()
     delete [] data;
 }
 
-DBCFile::Record DBCFile::getRecord(size_t id)
+DBCFile::Record DBCFile::getRecord(std::size_t id)
 {
     assert(data);
     return Record(*this, data + id * recordSize);
@@ -80,7 +80,7 @@ size_t DBCFile::getMaxId()
     assert(data);
 
     std::size_t maxId = 0;
-    for (size_t i = 0; i < getRecordCount(); ++i)
+    for (std::size_t i = 0; i < getRecordCount(); ++i)
     {
         if (maxId < getRecord(i).getUInt(0))
             maxId = getRecord(i).getUInt(0);

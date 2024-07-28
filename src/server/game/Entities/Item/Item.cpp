@@ -48,7 +48,7 @@ void AddItemsSetItem(Player* player, Item* item)
 
     ItemSetEffect* eff = nullptr;
 
-    for (size_t x = 0; x < player->ItemSetEff.size(); ++x)
+    for (std::size_t x = 0; x < player->ItemSetEff.size(); ++x)
     {
         if (player->ItemSetEff[x] && player->ItemSetEff[x]->setid == setid)
         {

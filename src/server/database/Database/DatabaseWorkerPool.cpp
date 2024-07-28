@@ -155,7 +155,7 @@ bool DatabaseWorkerPool<T>::PrepareStatements()
             if (_preparedStatementSize.size() < preparedSize)
                 _preparedStatementSize.resize(preparedSize);
 
-            for (size_t i = 0; i < preparedSize; ++i)
+            for (std::size_t i = 0; i < preparedSize; ++i)
             {
                 // already set by another connection
                 // (each connection only has prepared statements of it's own type sync/async)

@@ -231,7 +231,7 @@ namespace
         bool currIsNumeric;
         bool nextIsNumeric;
 
-        for (size_t i = 0; i < n; ++i)
+        for (std::size_t i = 0; i < n; ++i)
         {
             curr = str[i];
             if (curr == ' ' || curr == '.' || curr == '-')

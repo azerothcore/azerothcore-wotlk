@@ -908,7 +908,7 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
         if (itr->second.uState != SKILL_NEW)
             itr->second.uState = SKILL_CHANGED;
 
-        for (size_t i = 0; i < bonusSkillLevelsSize; ++i)
+        for (std::size_t i = 0; i < bonusSkillLevelsSize; ++i)
         {
             uint32 bsl = bonusSkillLevels[i];
             if (SkillValue < bsl && new_value >= bsl)
@@ -1322,7 +1322,7 @@ void Player::UpdateEquipSpellsAtFormChange()
     }
 
     // item set bonuses not dependent from item broken state
-    for (size_t setindex = 0; setindex < ItemSetEff.size(); ++setindex)
+    for (std::size_t setindex = 0; setindex < ItemSetEff.size(); ++setindex)
     {
         ItemSetEffect* eff = ItemSetEff[setindex];
         if (!eff)

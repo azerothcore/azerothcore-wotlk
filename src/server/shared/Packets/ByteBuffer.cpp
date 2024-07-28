@@ -38,7 +38,7 @@ ByteBufferPositionException::ByteBufferPositionException(bool add, std::size_t p
     message().assign(ss.str());
 }
 
-ByteBufferSourceException::ByteBufferSourceException(size_t pos, std::size_t size, std::size_t valueSize)
+ByteBufferSourceException::ByteBufferSourceException(std::size_t pos, std::size_t size, std::size_t valueSize)
 {
     std::ostringstream ss;
 
@@ -140,7 +140,7 @@ void ByteBuffer::AppendPackedTime(time_t time)
     append<uint32>((lt.tm_year - 100) << 24 | lt.tm_mon << 20 | (lt.tm_mday - 1) << 14 | lt.tm_wday << 11 | lt.tm_hour << 6 | lt.tm_min);
 }
 
-void ByteBuffer::put(size_t pos, uint8 const* src, std::size_t cnt)
+void ByteBuffer::put(std::size_t pos, uint8 const* src, std::size_t cnt)
 {
     ASSERT(pos + cnt <= size(), "Attempted to put value with size: {} in ByteBuffer (pos: {} size: {})", cnt, pos, size());
     ASSERT(src, "Attempted to put a NULL-pointer in ByteBuffer (pos: {} size: {})", pos, size());

@@ -5514,9 +5514,9 @@ void ObjectMgr::LoadEventScripts()
                     if (spell->Effects[j].MiscValue)
                         evt_scripts.insert(spell->Effects[j].MiscValue);
 
-    for (size_t path_idx = 0; path_idx < sTaxiPathNodesByPath.size(); ++path_idx)
+    for (std::size_t path_idx = 0; path_idx < sTaxiPathNodesByPath.size(); ++path_idx)
     {
-        for (size_t node_idx = 0; node_idx < sTaxiPathNodesByPath[path_idx].size(); ++node_idx)
+        for (std::size_t node_idx = 0; node_idx < sTaxiPathNodesByPath[path_idx].size(); ++node_idx)
         {
             TaxiPathNodeEntry const* node = sTaxiPathNodesByPath[path_idx][node_idx];
 
@@ -8388,7 +8388,7 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
 
     // Check for three consecutive letters
     wstrToLower(wname);
-    for (size_t i = 2; i < wname.size(); ++i)
+    for (std::size_t i = 2; i < wname.size(); ++i)
         if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
             return CHAR_NAME_THREE_CONSECUTIVE;
 

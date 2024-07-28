@@ -1677,7 +1677,7 @@ void WheatyExceptionReport::PrintSymbolDetail()
     }
 
     // Add appropriate indentation level (since this routine is recursive)
-    for (size_t i = 0; i < symbolDetails.size(); i++)
+    for (std::size_t i = 0; i < symbolDetails.size(); i++)
     {
         Log(_T("\t"));
     }

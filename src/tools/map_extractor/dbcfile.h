@@ -53,22 +53,22 @@ public:
     class Record // cppcheck-suppress ctuOneDefinitionRuleViolation
     {
     public:
-        [[nodiscard]] float getFloat(size_t field) const
+        [[nodiscard]] float getFloat(std::size_t field) const
         {
             assert(field < file.fieldCount);
             return *reinterpret_cast<float*>(offset + field * 4);
         }
-        [[nodiscard]] unsigned int getUInt(size_t field) const
+        [[nodiscard]] unsigned int getUInt(std::size_t field) const
         {
             assert(field < file.fieldCount);
             return *reinterpret_cast<unsigned int*>(offset + field * 4);
         }
-        [[nodiscard]] int getInt(size_t field) const
+        [[nodiscard]] int getInt(std::size_t field) const
         {
             assert(field < file.fieldCount);
             return *reinterpret_cast<int*>(offset + field * 4);
         }
-        [[nodiscard]] const char* getString(size_t field) const
+        [[nodiscard]] const char* getString(std::size_t field) const
         {
             assert(field < file.fieldCount);
             std::size_t stringOffset = getUInt(field);
@@ -116,7 +116,7 @@ public:
     };
 
     // Get record by id
-    Record getRecord(size_t id);
+    Record getRecord(std::size_t id);
     /// Get begin iterator over records
     Iterator begin();
     /// Get begin iterator over records

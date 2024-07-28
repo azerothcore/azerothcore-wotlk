@@ -436,7 +436,7 @@ Player::~Player()
 
     delete PlayerTalkClass;
 
-    for (size_t x = 0; x < ItemSetEff.size(); x++)
+    for (std::size_t x = 0; x < ItemSetEff.size(); x++)
         delete ItemSetEff[x];
 
     delete m_declinedname;

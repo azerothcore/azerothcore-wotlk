@@ -52,7 +52,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<QuestFailedReason>::Count() { return 13; }
 
 template <>
-AC_API_EXPORT QuestFailedReason EnumUtils<QuestFailedReason>::FromIndex(size_t index)
+AC_API_EXPORT QuestFailedReason EnumUtils<QuestFailedReason>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -122,7 +122,7 @@ template <>
 AC_API_EXPORT std::size_t EnumUtils<QuestShareMessages>::Count() { return 11; }
 
 template <>
-AC_API_EXPORT QuestShareMessages EnumUtils<QuestShareMessages>::FromIndex(size_t index)
+AC_API_EXPORT QuestShareMessages EnumUtils<QuestShareMessages>::FromIndex(std::size_t index)
 {
     switch (index)
     {
