@@ -22,7 +22,6 @@
 #include "GameTime.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "UpdateMask.h"
 #include "World.h"

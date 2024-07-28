@@ -26,7 +26,6 @@
 #include "ItemTemplate.h"
 #include "MotionMaster.h"
 #include "Object.h"
-#include "Optional.h"
 #include "SpellAuraDefines.h"
 #include "SpellDefines.h"
 #include "ThreatMgr.h"

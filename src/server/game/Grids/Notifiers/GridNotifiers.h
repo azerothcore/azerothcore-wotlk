@@ -33,6 +33,8 @@
 #include "WorldSession.h"
 #include <iostream>
 
+#include "SpellMgr.h"
+
 class Player;
 //class Map;
 
