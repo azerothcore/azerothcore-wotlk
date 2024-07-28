@@ -142,7 +142,9 @@ struct boss_lady_vashj : public BossAI
         }
         else if (summon->GetEntry() == NPC_ENCHANTED_ELEMENTAL)
         {
-            summon->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
+            summon->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false);
+            summon->SetWalk(true);
+            summon->SetReactState(REACT_PASSIVE);
         }
         else if (summon->GetEntry() != NPC_TAINTED_ELEMENTAL)
         {
