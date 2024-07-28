@@ -24,10 +24,7 @@
  * to access or mutate the container.
  */
 
-#include "Define.h"
 #include "Dynamic/TypeList.h"
-#include <map>
-#include <unordered_map>
 
 namespace Acore
 {

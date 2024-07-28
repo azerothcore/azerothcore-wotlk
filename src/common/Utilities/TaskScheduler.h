@@ -19,14 +19,11 @@
 #define _TASK_SCHEDULER_H_
 
 #include "Util.h"
-#include <algorithm>
 #include <chrono>
 #include <functional>
-#include <memory>
 #include <optional>
 #include <queue>
 #include <set>
-#include <utility>
 #include <vector>
 
 class TaskContext;

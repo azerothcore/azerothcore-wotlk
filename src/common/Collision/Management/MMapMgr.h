@@ -22,7 +22,6 @@
 #include "DetourAlloc.h"
 #include "DetourExtended.h"
 #include "DetourNavMesh.h"
-#include <shared_mutex>
 #include <unordered_map>
 #include <vector>
 

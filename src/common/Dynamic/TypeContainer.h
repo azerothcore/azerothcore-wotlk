@@ -23,12 +23,10 @@
  * types of object at the same time.
  */
 
-#include "Define.h"
 #include "Dynamic/TypeList.h"
 #include "GridRefMgr.h"
 #include <map>
 #include <unordered_map>
-#include <vector>
 
 /*
  * @class ContainerMapList is a mulit-type container for map elements

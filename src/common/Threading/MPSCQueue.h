@@ -18,10 +18,6 @@
 #ifndef MPSCQueue_h__
 #define MPSCQueue_h__
 
-#include <atomic>
-#include <memory>
-#include <utility>
-
 namespace Acore::Impl
 {
     // C++ implementation of Dmitry Vyukov's lock free MPSC queue

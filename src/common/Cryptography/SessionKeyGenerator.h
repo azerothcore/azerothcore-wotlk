@@ -18,9 +18,6 @@
 #ifndef AZEROTHCORE_SESSIONKEYGENERATOR_HPP
 #define AZEROTHCORE_SESSIONKEYGENERATOR_HPP
 
-#include "CryptoHash.h"
-#include <cstring>
-
 template <typename Hash>
 class SessionKeyGenerator
 {

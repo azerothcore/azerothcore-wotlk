@@ -18,8 +18,6 @@
 #ifndef AZEROTHCORE_CRYPTO_CONSTANTS_H
 #define AZEROTHCORE_CRYPTO_CONSTANTS_H
 
-#include "Define.h"
-
 namespace Acore::Crypto
 {
     struct Constants

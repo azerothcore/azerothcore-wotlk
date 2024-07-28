@@ -9,7 +9,6 @@
 #ifndef AZEROTHCORE_CIRCULAR_BUFFER_H
 #define AZEROTHCORE_CIRCULAR_BUFFER_H
 
-#include <memory>
 #include <mutex>
 #include <vector>
 

@@ -19,7 +19,6 @@
 #define APPENDERFILE_H
 
 #include "Appender.h"
-#include <atomic>
 
 class AppenderFile : public Appender
 {
