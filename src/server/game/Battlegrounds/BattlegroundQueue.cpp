@@ -1190,7 +1190,7 @@ void BattlegroundQueue::SendExitMessageArenaQueue(GroupQueueInfo* ginfo)
             ChatHandler(nullptr).SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_NAME_RATING, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
             break;
         case 2:
-            ChatHandler(nullptr).SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_NAME, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType);
+            ChatHandler(nullptr).SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_NAME, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName, ArenaType, ArenaType);
             break;
         case 1:
             ChatHandler(nullptr).SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_EXIT_RATING, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, ArenaType, ArenaType, ArenaTeamRating);
