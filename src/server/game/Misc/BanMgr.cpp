@@ -261,7 +261,7 @@ BanReturn BanMgr::BanCharacter(std::string const& CharacterName, std::string con
         if (!IsPermanetly)
             ChatHandler(nullptr).SendWorldText(LANG_BAN_CHARACTER_YOUBANNEDMESSAGE_WORLD, Author, CharacterName, secsToTimeString(TimeStringToSecs(Duration), true), Reason);
         else
-            ChatHandler(nullptr).SendWorldText(LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD, Author.c_str(), CharacterName.c_str(), Reason.c_str());
+            ChatHandler(nullptr).SendWorldText(LANG_BAN_CHARACTER_YOUPERMBANNEDMESSAGE_WORLD, Author, CharacterName, Reason);
     }
 
     return BAN_SUCCESS;
