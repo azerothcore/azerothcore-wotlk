@@ -75,7 +75,7 @@ DBCFile::Record DBCFile::getRecord(std::size_t id)
     return Record(*this, data + id * recordSize);
 }
 
-size_t DBCFile::getMaxId()
+std::size_t DBCFile::getMaxId()
 {
     assert(data);
 

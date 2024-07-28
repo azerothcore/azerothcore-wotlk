@@ -26,7 +26,7 @@ void Acore::BroadcastTextBuilder::operator()(WorldPacket& data, LocaleConstant l
     ChatHandler::BuildChatPacket(data, _msgType, bct ? Language(bct->LanguageID) : LANG_UNIVERSAL, _source, _target, bct ? bct->GetText(locale, _gender) : "", _achievementId, "", locale);
 }
 
-size_t Acore::BroadcastTextBuilder::operator()(WorldPacket* data, LocaleConstant locale) const
+std::size_t Acore::BroadcastTextBuilder::operator()(WorldPacket* data, LocaleConstant locale) const
 {
     BroadcastText const* bct = sObjectMgr->GetBroadcastText(_textId);
     return ChatHandler::BuildChatPacket(*data, _msgType, bct ? Language(bct->LanguageID) : LANG_UNIVERSAL, _source, _target, bct ? bct->GetText(locale, _gender) : "", _achievementId, "", locale);

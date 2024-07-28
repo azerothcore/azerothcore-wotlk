@@ -98,7 +98,7 @@ AC_COMMON_API bool WStrToUtf8(std::wstring_view wstr, std::string& utf8str);
 AC_COMMON_API bool WStrToUtf8(wchar_t const* wstr, std::size_t size, std::string& utf8str);
 
 // set string to "" if invalid utf8 sequence
-size_t utf8length(std::string& utf8str);
+std::size_t utf8length(std::string& utf8str);
 void utf8truncate(std::string& utf8str, std::size_t len);
 
 inline bool isBasicLatinCharacter(wchar_t wchar)
@@ -383,13 +383,13 @@ std::string ByteArrayToHexStr(Container const& c, bool reverse = false)
     return Acore::Impl::ByteArrayToHexStr(std::data(c), std::size(c), reverse);
 }
 
-template<size_t Size>
+template<std::size_t Size>
 void HexStrToByteArray(std::string_view str, std::array<uint8, Size>& buf, bool reverse = false)
 {
     Acore::Impl::HexStrToByteArray(str, buf.data(), Size, reverse);
 }
 
-template<size_t Size>
+template<std::size_t Size>
 std::array<uint8, Size> HexStrToByteArray(std::string_view str, bool reverse = false)
 {
     std::array<uint8, Size> arr;

@@ -242,7 +242,7 @@ uint32 GetPID()
     return uint32(pid);
 }
 
-size_t utf8length(std::string& utf8str)
+std::size_t utf8length(std::string& utf8str)
 {
     try
     {

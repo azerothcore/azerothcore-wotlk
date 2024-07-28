@@ -257,7 +257,7 @@ namespace Acore::Impl::ChatCommands
         using V = std::variant<Ts...>;
         static constexpr std::size_t N = std::variant_size_v<V>;
 
-        template <size_t I>
+        template <std::size_t I>
         static ChatCommandResult TryAtIndex([[maybe_unused]] Acore::ChatCommands::Variant<Ts...>& val, [[maybe_unused]] ChatHandler const* handler, [[maybe_unused]] std::string_view args)
         {
             if constexpr (I < N)

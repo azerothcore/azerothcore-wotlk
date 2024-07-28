@@ -378,7 +378,7 @@ public:
         _rpos += len;
     }
 
-    template <size_t Size>
+    template <std::size_t Size>
     void read(std::array<uint8, Size>& arr)
     {
         read(arr.data(), Size);
@@ -484,7 +484,7 @@ public:
         }
     }
 
-    template <size_t Size>
+    template <std::size_t Size>
     void append(std::array<uint8, Size> const& arr)
     {
         append(arr.data(), Size);

@@ -485,7 +485,7 @@ void DatabaseWorkerPool<T>::Enqueue(SQLOperation* op)
 }
 
 template <class T>
-size_t DatabaseWorkerPool<T>::QueueSize() const
+std::size_t DatabaseWorkerPool<T>::QueueSize() const
 {
     return _queue->Size();
 }

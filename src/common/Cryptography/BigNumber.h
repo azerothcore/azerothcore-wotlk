@@ -34,7 +34,7 @@ public:
     BigNumber(int32 v) : BigNumber() { SetDword(v); }
     BigNumber(std::string const& v) : BigNumber() { SetHexStr(v); }
 
-    template <size_t Size>
+    template <std::size_t Size>
     BigNumber(std::array<uint8, Size> const& v, bool littleEndian = true) : BigNumber() { SetBinary(v.data(), Size, littleEndian); }
 
     ~BigNumber();

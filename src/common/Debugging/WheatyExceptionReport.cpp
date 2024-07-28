@@ -260,13 +260,13 @@ BOOL WheatyExceptionReport::_GetProcessorName(TCHAR* sProcessorName, DWORD maxco
     return TRUE;
 }
 
-template<size_t size>
+template<std::size_t size>
 void ToTchar(wchar_t const* src, TCHAR (&dst)[size], std::true_type)
 {
     wcstombs_s(nullptr, dst, src, size);
 }
 
-template<size_t size>
+template<std::size_t size>
 void ToTchar(wchar_t const* src, TCHAR (&dst)[size], std::false_type)
 {
     wcscpy_s(dst, src);
