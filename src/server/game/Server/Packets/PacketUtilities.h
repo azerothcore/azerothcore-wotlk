@@ -121,7 +121,7 @@ namespace WorldPackets
         typedef std::vector<T> storage_type;
 
         typedef typename storage_type::value_type value_type;
-        typedef typename storage_type::size_type std::size_type;
+        typedef typename storage_type::size_type size_type;
         typedef typename storage_type::reference reference;
         typedef typename storage_type::const_reference const_reference;
         typedef typename storage_type::iterator iterator;
@@ -137,7 +137,7 @@ namespace WorldPackets
         iterator end() { return _storage.end(); }
         const_iterator end() const { return _storage.end(); }
 
-        std::size_type size() const { return _storage.size(); }
+        size_type size() const { return _storage.size(); }
         bool empty() const { return _storage.empty(); }
 
         reference operator[](size_type i) { return _storage[i]; }
@@ -185,7 +185,7 @@ namespace WorldPackets
 
     private:
         storage_type _storage;
-        std::size_type _limit;
+        size_type _limit;
     };
 
     void CheckCompactArrayMaskOverflow(std::size_t index, std::size_t limit);
