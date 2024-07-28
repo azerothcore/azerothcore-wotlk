@@ -1150,7 +1150,7 @@ void BattlegroundQueue::SendJoinMessageArenaQueue(Player* leader, GroupQueueInfo
             ChatHandler(nullptr).SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_NAME_RATING, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType, ArenaTeamRating);
             break;
         case 2:
-            ChatHandler(nullptr).SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_NAME, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName.c_str(), ArenaType, ArenaType);
+            ChatHandler(nullptr).SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_NAME, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, TeamName, ArenaType, ArenaType);
             break;
         case 1:
             ChatHandler(nullptr).SendWorldTextOptional(LANG_ARENA_QUEUE_ANNOUNCE_WORLD_JOIN_RATING, ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE, ArenaType, ArenaType, ArenaTeamRating);
