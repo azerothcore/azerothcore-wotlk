@@ -19,6 +19,7 @@
 #define AC_SMARTENUM_H
 
 #include "IteratorPair.h"
+#include <iterator>
 
 struct EnumText
 {
