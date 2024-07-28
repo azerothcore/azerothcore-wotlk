@@ -56,3 +56,6 @@ UPDATE `creature_model_info` SET `BoundingRadius` = 1.148999929428100585, `Comba
 UPDATE `creature_model_info` SET `BoundingRadius` = 1.148999929428100585, `CombatReach` = 4.5                  WHERE `DisplayID` = 20237;
 UPDATE `creature_model_info` SET `BoundingRadius` = 1.148999929428100585, `CombatReach` = 4.5                  WHERE `DisplayID` = 20177;
 UPDATE `creature_model_info` SET `BoundingRadius` = 1.148999929428100585, `CombatReach` = 4.5                  WHERE `DisplayID` = 20236;
+
+-- Thaladred needs correcting.
+UPDATE `creature_template_movement` SET `Chase` = 0 WHERE `CreatureId` = 20064;
