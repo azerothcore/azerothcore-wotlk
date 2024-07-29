@@ -110,7 +110,7 @@ struct boss_mother_shahraz : public BossAI
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_ENRAGE, true);
             Talk(SAY_ENRAGE);
-        }, 10min);
+        }, 10min, GROUP_ENRAGE);
     }
 
     void KilledUnit(Unit* /*victim*/) override
