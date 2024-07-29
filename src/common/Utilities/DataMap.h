@@ -5,6 +5,7 @@
 #ifndef _DATA_MAP_H_
 #define _DATA_MAP_H_
 
+#include <memory>
 #include <string>
 #include <type_traits>
 #include <unordered_map>
