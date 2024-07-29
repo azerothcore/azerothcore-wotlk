@@ -64,7 +64,7 @@ public:
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
-        sWorld->SendWorldText(LANG_ANNOUNCE_COLOR, name.c_str(), message.data());
+        handler->SendWorldText(LANG_ANNOUNCE_COLOR, name, message.data());
         return true;
     }
 

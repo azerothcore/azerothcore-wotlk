@@ -591,39 +591,26 @@ enum ItemIds
     ITEM_GOBLIN_ROCKET_PACK = 49278
 };
 
-class spell_trigger_spell_from_caster : public SpellScriptLoader
+class spell_trigger_spell_from_caster : public SpellScript
 {
+    PrepareSpellScript(spell_trigger_spell_from_caster);
+
 public:
-    spell_trigger_spell_from_caster(char const* scriptName, uint32 triggerId) : SpellScriptLoader(scriptName), _triggerId(triggerId) { }
+    spell_trigger_spell_from_caster(uint32 triggerId) : SpellScript(), _triggerId(triggerId) { }
 
-    class spell_trigger_spell_from_caster_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_trigger_spell_from_caster_SpellScript);
+        return ValidateSpellInfo({ _triggerId });
+    }
 
-    public:
-        spell_trigger_spell_from_caster_SpellScript(uint32 triggerId) : SpellScript(), _triggerId(triggerId) { }
-
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ _triggerId });
-        }
-
-        void HandleTrigger()
-        {
-            GetCaster()->CastSpell(GetHitUnit(), _triggerId, true);
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_trigger_spell_from_caster_SpellScript::HandleTrigger);
-        }
-
-        uint32 _triggerId;
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleTrigger()
     {
-        return new spell_trigger_spell_from_caster_SpellScript(_triggerId);
+        GetCaster()->CastSpell(GetHitUnit(), _triggerId, true);
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_trigger_spell_from_caster::HandleTrigger);
     }
 
 private:

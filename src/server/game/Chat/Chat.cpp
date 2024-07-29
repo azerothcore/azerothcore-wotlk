@@ -105,7 +105,6 @@ void ChatHandler::SendGMText(std::string_view str)
     for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
     {
         WorldSession* session = itr->second;
-
         // Session should have permissions to receive global gm messages
         if (!session || AccountMgr::IsPlayerAccount(session->GetSecurity()))
             continue;
@@ -114,6 +113,56 @@ void ChatHandler::SendGMText(std::string_view str)
         Player* player = session->GetPlayer();
         if (!player || !player->IsInWorld())
             continue;
+
+        for (std::string_view line : lines)
+        {
+            WorldPacket data;
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+            player->SendDirectMessage(&data);
+        }
+    }
+}
+
+void ChatHandler::SendWorldText(std::string_view str)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+    for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+    {
+        WorldSession* session = itr->second;
+        if (!session)
+            continue;
+
+        // Player should be in world
+        Player* player = session->GetPlayer();
+        if (!player || !player->IsInWorld())
+            continue;
+
+        for (std::string_view line : lines)
+        {
+            WorldPacket data;
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+            player->SendDirectMessage(&data);
+        }
+    }
+}
+
+void ChatHandler::SendWorldTextOptional(std::string_view str, uint32 flag)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+    for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+    {
+        WorldSession* session = itr->second;
+        if (!session)
+            continue;
+
+        // Player should be in world
+        Player* player = session->GetPlayer();
+        if (!player || !player->IsInWorld())
+            continue;
+
+        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
+            if (player->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
+                continue;
 
         for (std::string_view line : lines)
         {

@@ -1113,35 +1113,24 @@ public:
     }
 };
 
-class spell_deathwhisper_mana_barrier : public SpellScriptLoader
+class spell_deathwhisper_mana_barrier_aura : public AuraScript
 {
-public:
-    spell_deathwhisper_mana_barrier() : SpellScriptLoader("spell_deathwhisper_mana_barrier") { }
+    PrepareAuraScript(spell_deathwhisper_mana_barrier_aura);
 
-    class spell_deathwhisper_mana_barrier_AuraScript : public AuraScript
+    void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_deathwhisper_mana_barrier_AuraScript);
-
-        void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
         {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-            {
-                int32 missingHealth = int32(caster->GetMaxHealth() - caster->GetHealth());
-                caster->ModifyHealth(missingHealth);
-                caster->ModifyPower(POWER_MANA, -missingHealth);
-            }
+            int32 missingHealth = int32(caster->GetMaxHealth() - caster->GetHealth());
+            caster->ModifyHealth(missingHealth);
+            caster->ModifyPower(POWER_MANA, -missingHealth);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathwhisper_mana_barrier_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_deathwhisper_mana_barrier_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathwhisper_mana_barrier_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1197,7 +1186,7 @@ void AddSC_boss_lady_deathwhisper()
     new npc_darnavan();
 
     // Spells
-    new spell_deathwhisper_mana_barrier();
+    RegisterSpellScript(spell_deathwhisper_mana_barrier_aura);
     RegisterSpellScript(spell_deathwhisper_dark_reckoning);
 
     // AreaTriggers

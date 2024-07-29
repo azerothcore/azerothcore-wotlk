@@ -1440,358 +1440,253 @@ public:
     }
 };
 
-class spell_blood_council_shadow_prison : public SpellScriptLoader
+class spell_blood_council_shadow_prison_aura : public AuraScript
 {
-public:
-    spell_blood_council_shadow_prison() : SpellScriptLoader("spell_blood_council_shadow_prison") { }
+    PrepareAuraScript(spell_blood_council_shadow_prison_aura);
 
-    class spell_blood_council_shadow_prison_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_blood_council_shadow_prison_AuraScript);
+        return ValidateSpellInfo({ SPELL_SHADOW_PRISON_DAMAGE });
+    }
 
-        void HandleDummyTick(AuraEffect const* aurEff)
-        {
-            if (GetTarget()->GetTypeId() == TYPEID_PLAYER && GetTarget()->isMoving())
-            {
-                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, nullptr, aurEff);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_council_shadow_prison_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleDummyTick(AuraEffect const* aurEff)
     {
-        return new spell_blood_council_shadow_prison_AuraScript();
+        if (GetTarget()->GetTypeId() == TYPEID_PLAYER && GetTarget()->isMoving())
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, nullptr, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_council_shadow_prison_aura::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_blood_council_shadow_prison_damage : public SpellScriptLoader
+class spell_blood_council_shadow_prison_damage : public SpellScript
 {
-public:
-    spell_blood_council_shadow_prison_damage() : SpellScriptLoader("spell_blood_council_shadow_prison_damage") { }
+    PrepareSpellScript(spell_blood_council_shadow_prison_damage);
 
-    class spell_blood_council_shadow_prison_SpellScript : public SpellScript
+    void AddExtraDamage()
     {
-        PrepareSpellScript(spell_blood_council_shadow_prison_SpellScript);
-
-        void AddExtraDamage()
+        if (Aura* aur = GetHitUnit()->GetAura(GetSpellInfo()->Id))
         {
-            if (Aura* aur = GetHitUnit()->GetAura(GetSpellInfo()->Id))
+            if (AuraEffect const* eff = aur->GetEffect(EFFECT_1))
             {
-                if (AuraEffect const* eff = aur->GetEffect(EFFECT_1))
+                SetHitDamage(GetHitDamage() + eff->GetAmount());
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_blood_council_shadow_prison_damage::AddExtraDamage);
+    }
+};
+
+class spell_taldaram_glittering_sparks : public SpellScript
+{
+    PrepareSpellScript(spell_taldaram_glittering_sparks);
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_taldaram_glittering_sparks::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_taldaram_summon_flame_ball : public SpellScript
+{
+    PrepareSpellScript(spell_taldaram_summon_flame_ball);
+
+    bool Load() override
+    {
+        if (GetCaster()->GetTypeId() != TYPEID_UNIT)
+        {
+            return false;
+        }
+        GetCaster()->CastSpell(GetCaster(), uint32(GetSpellInfo()->Effects[0].CalcValue()), true);
+        return true;
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->ToCreature()->AI()->DoAction(ACTION_FLAME_BALL_CHASE);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_taldaram_summon_flame_ball::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_taldaram_ball_of_inferno_flame : public SpellScript
+{
+    PrepareSpellScript(spell_taldaram_ball_of_inferno_flame);
+
+    void ModAuraStack()
+    {
+        if (Aura* aur = GetHitAura())
+            aur->SetStackAmount(uint8(GetSpellInfo()->StackAmount));
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_taldaram_ball_of_inferno_flame::ModAuraStack);
+    }
+};
+
+class spell_valanar_kinetic_bomb : public SpellScript
+{
+    PrepareSpellScript(spell_valanar_kinetic_bomb);
+
+    void ChangeSummonPos(SpellEffIndex /*effIndex*/)
+    {
+        WorldLocation summonPos = *GetExplTargetDest();
+        Position offset = {0.0f, 0.0f, 20.0f, 0.0f};
+        summonPos.RelocateOffset(offset);
+        SetExplTargetDest(summonPos);
+        GetHitDest()->RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_valanar_kinetic_bomb::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
+    }
+};
+
+class spell_valanar_kinetic_bomb_aura : public AuraScript
+{
+    PrepareAuraScript(spell_valanar_kinetic_bomb_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_KINETIC_BOMB_EXPLOSION, SPELL_KINETIC_BOMB_VISUAL });
+    }
+
+    void HandleDummyTick(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        if (target->GetTypeId() != TYPEID_UNIT)
+            return;
+
+        if (Creature* bomb = target->FindNearestCreature(NPC_KINETIC_BOMB, 1.0f, true))
+        {
+            bomb->CastSpell(bomb, SPELL_KINETIC_BOMB_EXPLOSION, true);
+            bomb->RemoveAurasDueToSpell(SPELL_KINETIC_BOMB_VISUAL);
+            target->RemoveAura(GetAura());
+            bomb->AI()->DoAction(SPELL_KINETIC_BOMB_EXPLOSION);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_valanar_kinetic_bomb_aura::HandleDummyTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+class spell_valanar_kinetic_bomb_absorb_aura : public AuraScript
+{
+    PrepareAuraScript(spell_valanar_kinetic_bomb_absorb_aura);
+
+    void OnAbsorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
+    {
+        absorbAmount = CalculatePct(dmgInfo.GetDamage(), aurEff->GetAmount());
+        RoundToInterval<uint32>(absorbAmount, 0, dmgInfo.GetDamage());
+        dmgInfo.AbsorbDamage(absorbAmount);
+    }
+
+    void Register() override
+    {
+        OnEffectAbsorb += AuraEffectAbsorbFn(spell_valanar_kinetic_bomb_absorb_aura::OnAbsorb, EFFECT_0);
+    }
+};
+
+class spell_valanar_kinetic_bomb_knockback : public SpellScript
+{
+    PrepareSpellScript(spell_valanar_kinetic_bomb_knockback);
+
+    void KnockIntoAir(SpellMissInfo missInfo)
+    {
+        if (missInfo != SPELL_MISS_NONE)
+        {
+            return;
+        }
+
+        if (Creature* target = GetHitCreature())
+            target->AI()->DoAction(ACTION_KINETIC_BOMB_JUMP);
+    }
+
+    void Register() override
+    {
+        BeforeHit += BeforeSpellHitFn(spell_valanar_kinetic_bomb_knockback::KnockIntoAir);
+    }
+};
+
+class spell_valanar_kinetic_bomb_summon : public SpellScript
+{
+    PrepareSpellScript(spell_valanar_kinetic_bomb_summon);
+
+    void SelectDest()
+    {
+        if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
+        {
+            float angle = dest->GetAngle(GetCaster());
+            Position offset = {6.0f * cos(angle), 6.0f * std::sin(angle), 10.0f, 0.0f};
+            dest->RelocateOffset(offset);
+            GetCaster()->UpdateAllowedPositionZ(dest->GetPositionX(), dest->GetPositionY(), dest->m_positionZ);
+        }
+    }
+
+    void Register() override
+    {
+        BeforeCast += SpellCastFn(spell_valanar_kinetic_bomb_summon::SelectDest);
+    }
+};
+
+class spell_blood_council_summon_shadow_resonance : public SpellScript
+{
+    PrepareSpellScript(spell_blood_council_summon_shadow_resonance);
+
+    void SetDest(SpellDestination& dest)
+    {
+        Unit* summoner = GetCaster();
+        float x = dest._position.GetPositionX();
+        float y = dest._position.GetPositionY();
+        float angle = summoner->GetAngle(x, y);
+        if (dest._position.GetExactDist2d(summoner) > 35.0f && x > 4585.0f && y > 2716.0f && y < 2822.0f)
+            return;
+
+        for (uint8 a = 0; a < 2; ++a)
+            for (uint8 i = 6; i > 0; --i)
+            {
+                float destX = summoner->GetPositionX() + cos(angle + a * M_PI) * i * 10.0f;
+                float destY = summoner->GetPositionY() + std::sin(angle + a * M_PI) * i * 10.0f;
+                if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY,
+                    summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) &&
+                    destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
                 {
-                    SetHitDamage(GetHitDamage() + eff->GetAmount());
-                }
-            }
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_blood_council_shadow_prison_SpellScript::AddExtraDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_blood_council_shadow_prison_SpellScript();
-    }
-};
-
-class spell_taldaram_glittering_sparks : public SpellScriptLoader
-{
-public:
-    spell_taldaram_glittering_sparks() : SpellScriptLoader("spell_taldaram_glittering_sparks") { }
-
-    class spell_taldaram_glittering_sparks_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_taldaram_glittering_sparks_SpellScript);
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_taldaram_glittering_sparks_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_taldaram_glittering_sparks_SpellScript();
-    }
-};
-
-class spell_taldaram_summon_flame_ball : public SpellScriptLoader
-{
-public:
-    spell_taldaram_summon_flame_ball() : SpellScriptLoader("spell_taldaram_summon_flame_ball") { }
-
-    class spell_taldaram_summon_flame_ball_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_taldaram_summon_flame_ball_SpellScript);
-
-        bool Load() override
-        {
-            if (GetCaster()->GetTypeId() != TYPEID_UNIT)
-            {
-                return false;
-            }
-            GetCaster()->CastSpell(GetCaster(), uint32(GetSpellInfo()->Effects[0].CalcValue()), true);
-            return true;
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->ToCreature()->AI()->DoAction(ACTION_FLAME_BALL_CHASE);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_taldaram_summon_flame_ball_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_taldaram_summon_flame_ball_SpellScript();
-    }
-};
-
-class spell_taldaram_ball_of_inferno_flame : public SpellScriptLoader
-{
-public:
-    spell_taldaram_ball_of_inferno_flame() : SpellScriptLoader("spell_taldaram_ball_of_inferno_flame") { }
-
-    class spell_taldaram_ball_of_inferno_flame_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_taldaram_ball_of_inferno_flame_SpellScript);
-
-        void ModAuraStack()
-        {
-            if (Aura* aur = GetHitAura())
-                aur->SetStackAmount(uint8(GetSpellInfo()->StackAmount));
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_taldaram_ball_of_inferno_flame_SpellScript::ModAuraStack);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_taldaram_ball_of_inferno_flame_SpellScript();
-    }
-};
-
-class spell_valanar_kinetic_bomb : public SpellScriptLoader
-{
-public:
-    spell_valanar_kinetic_bomb() : SpellScriptLoader("spell_valanar_kinetic_bomb") { }
-
-    class spell_valanar_kinetic_bomb_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_valanar_kinetic_bomb_SpellScript);
-
-        void ChangeSummonPos(SpellEffIndex /*effIndex*/)
-        {
-            WorldLocation summonPos = *GetExplTargetDest();
-            Position offset = {0.0f, 0.0f, 20.0f, 0.0f};
-            summonPos.RelocateOffset(offset);
-            SetExplTargetDest(summonPos);
-            GetHitDest()->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_valanar_kinetic_bomb_SpellScript::ChangeSummonPos, EFFECT_0, SPELL_EFFECT_SUMMON);
-        }
-    };
-
-    class spell_valanar_kinetic_bomb_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_valanar_kinetic_bomb_AuraScript);
-
-        void HandleDummyTick(AuraEffect const* /*aurEff*/)
-        {
-            Unit* target = GetTarget();
-            if (target->GetTypeId() != TYPEID_UNIT)
-                return;
-
-            if (Creature* bomb = target->FindNearestCreature(NPC_KINETIC_BOMB, 1.0f, true))
-            {
-                bomb->CastSpell(bomb, SPELL_KINETIC_BOMB_EXPLOSION, true);
-                bomb->RemoveAurasDueToSpell(SPELL_KINETIC_BOMB_VISUAL);
-                target->RemoveAura(GetAura());
-                bomb->AI()->DoAction(SPELL_KINETIC_BOMB_EXPLOSION);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_valanar_kinetic_bomb_AuraScript::HandleDummyTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_valanar_kinetic_bomb_SpellScript();
-    }
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_valanar_kinetic_bomb_AuraScript();
-    }
-};
-
-class spell_valanar_kinetic_bomb_absorb : public SpellScriptLoader
-{
-public:
-    spell_valanar_kinetic_bomb_absorb() : SpellScriptLoader("spell_valanar_kinetic_bomb_absorb") { }
-
-    class spell_valanar_kinetic_bomb_absorb_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_valanar_kinetic_bomb_absorb_AuraScript);
-
-        void OnAbsorb(AuraEffect* aurEff, DamageInfo& dmgInfo, uint32& absorbAmount)
-        {
-            absorbAmount = CalculatePct(dmgInfo.GetDamage(), aurEff->GetAmount());
-            RoundToInterval<uint32>(absorbAmount, 0, dmgInfo.GetDamage());
-            dmgInfo.AbsorbDamage(absorbAmount);
-        }
-
-        void Register() override
-        {
-            OnEffectAbsorb += AuraEffectAbsorbFn(spell_valanar_kinetic_bomb_absorb_AuraScript::OnAbsorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_valanar_kinetic_bomb_absorb_AuraScript();
-    }
-};
-
-class spell_valanar_kinetic_bomb_knockback : public SpellScriptLoader
-{
-public:
-    spell_valanar_kinetic_bomb_knockback() : SpellScriptLoader("spell_valanar_kinetic_bomb_knockback") { }
-
-    class spell_valanar_kinetic_bomb_knockback_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_valanar_kinetic_bomb_knockback_SpellScript);
-
-        void KnockIntoAir(SpellMissInfo missInfo)
-        {
-            if (missInfo != SPELL_MISS_NONE)
-            {
-                return;
-            }
-
-            if (Creature* target = GetHitCreature())
-                target->AI()->DoAction(ACTION_KINETIC_BOMB_JUMP);
-        }
-
-        void Register() override
-        {
-            BeforeHit += BeforeSpellHitFn(spell_valanar_kinetic_bomb_knockback_SpellScript::KnockIntoAir);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_valanar_kinetic_bomb_knockback_SpellScript();
-    }
-};
-
-class spell_valanar_kinetic_bomb_summon : public SpellScriptLoader
-{
-public:
-    spell_valanar_kinetic_bomb_summon() : SpellScriptLoader("spell_valanar_kinetic_bomb_summon") { }
-
-    class spell_valanar_kinetic_bomb_summon_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_valanar_kinetic_bomb_summon_SpellScript);
-
-        void SelectDest()
-        {
-            if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
-            {
-                float angle = dest->GetAngle(GetCaster());
-                Position offset = {6.0f * cos(angle), 6.0f * std::sin(angle), 10.0f, 0.0f};
-                dest->RelocateOffset(offset);
-                GetCaster()->UpdateAllowedPositionZ(dest->GetPositionX(), dest->GetPositionY(), dest->m_positionZ);
-            }
-        }
-
-        void Register() override
-        {
-            BeforeCast += SpellCastFn(spell_valanar_kinetic_bomb_summon_SpellScript::SelectDest);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_valanar_kinetic_bomb_summon_SpellScript();
-    }
-};
-
-class spell_blood_council_summon_shadow_resonance : public SpellScriptLoader
-{
-public:
-    spell_blood_council_summon_shadow_resonance() : SpellScriptLoader("spell_blood_council_summon_shadow_resonance") { }
-
-    class spell_blood_council_summon_shadow_resonance_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_blood_council_summon_shadow_resonance_SpellScript);
-
-        void SetDest(SpellDestination& dest)
-        {
-            Unit* summoner = GetCaster();
-            float x = dest._position.GetPositionX();
-            float y = dest._position.GetPositionY();
-            float angle = summoner->GetAngle(x, y);
-            if (dest._position.GetExactDist2d(summoner) > 35.0f && x > 4585.0f && y > 2716.0f && y < 2822.0f)
-                return;
-
-            for (uint8 a = 0; a < 2; ++a)
-                for (uint8 i = 6; i > 0; --i)
-                {
-                    float destX = summoner->GetPositionX() + cos(angle + a * M_PI) * i * 10.0f;
-                    float destY = summoner->GetPositionY() + std::sin(angle + a * M_PI) * i * 10.0f;
-                    if (summoner->GetMap()->isInLineOfSight(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ() + 10.0f, destX, destY,
-                        summoner->GetPositionZ() + 10.0f, summoner->GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing) &&
-                        destX > 4585.0f && destY > 2716.0f && destY < 2822.0f)
+                    float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());
+                    if (std::fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
                     {
-                        float destZ = summoner->GetMapHeight(summoner->GetPhaseMask(), destX, destY, summoner->GetPositionZ());
-                        if (std::fabs(destZ - summoner->GetPositionZ()) < 10.0f) // valid z found
-                        {
-                            dest._position.Relocate(destX, destY, destZ);
-                            return;
-                        }
+                        dest._position.Relocate(destX, destY, destZ);
+                        return;
                     }
                 }
+            }
 
-            dest._position.Relocate(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ());
-        }
+        dest._position.Relocate(summoner->GetPositionX(), summoner->GetPositionY(), summoner->GetPositionZ());
+    }
 
-        void Register() override
-        {
-            OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_blood_council_summon_shadow_resonance_SpellScript::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_council_summon_shadow_resonance_SpellScript();
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_blood_council_summon_shadow_resonance::SetDest, EFFECT_0, TARGET_DEST_CASTER_RANDOM);
     }
 };
 
@@ -1804,15 +1699,15 @@ void AddSC_boss_blood_prince_council()
     new npc_dark_nucleus();
     new npc_ball_of_flame();
     new npc_kinetic_bomb();
-    new spell_blood_council_shadow_prison();
-    new spell_blood_council_shadow_prison_damage();
-    new spell_taldaram_glittering_sparks();
-    new spell_taldaram_summon_flame_ball();
-    new spell_taldaram_ball_of_inferno_flame();
-    new spell_valanar_kinetic_bomb();
-    new spell_valanar_kinetic_bomb_absorb();
-    new spell_valanar_kinetic_bomb_knockback();
-    new spell_valanar_kinetic_bomb_summon();
-    new spell_blood_council_summon_shadow_resonance();
+    RegisterSpellScript(spell_blood_council_shadow_prison_aura);
+    RegisterSpellScript(spell_blood_council_shadow_prison_damage);
+    RegisterSpellScript(spell_taldaram_glittering_sparks);
+    RegisterSpellScript(spell_taldaram_summon_flame_ball);
+    RegisterSpellScript(spell_taldaram_ball_of_inferno_flame);
+    RegisterSpellAndAuraScriptPair(spell_valanar_kinetic_bomb, spell_valanar_kinetic_bomb_aura);
+    RegisterSpellScript(spell_valanar_kinetic_bomb_absorb_aura);
+    RegisterSpellScript(spell_valanar_kinetic_bomb_knockback);
+    RegisterSpellScript(spell_valanar_kinetic_bomb_summon);
+    RegisterSpellScript(spell_blood_council_summon_shadow_resonance);
 }
 
