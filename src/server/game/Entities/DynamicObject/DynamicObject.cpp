@@ -18,7 +18,6 @@
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectAccessor.h"
-#include "Opcodes.h"
 #include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "Transport.h"

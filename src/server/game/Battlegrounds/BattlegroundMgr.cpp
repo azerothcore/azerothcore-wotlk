@@ -722,12 +722,12 @@ void BattlegroundMgr::ToggleTesting()
     if (sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND))
     {
         m_Testing = true;
-        sWorld->SendWorldText(LANG_DEBUG_BG_CONF);
+        ChatHandler(nullptr).SendWorldText(LANG_DEBUG_BG_CONF);
     }
     else
     {
         m_Testing = !m_Testing;
-        sWorld->SendWorldText(m_Testing ? LANG_DEBUG_BG_ON : LANG_DEBUG_BG_OFF);
+        ChatHandler(nullptr).SendWorldText(m_Testing ? LANG_DEBUG_BG_ON : LANG_DEBUG_BG_OFF);
     }
 }
 
@@ -736,12 +736,12 @@ void BattlegroundMgr::ToggleArenaTesting()
     if (sWorld->getBoolConfig(CONFIG_DEBUG_ARENA))
     {
         m_ArenaTesting = true;
-        sWorld->SendWorldText(LANG_DEBUG_ARENA_CONF);
+        ChatHandler(nullptr).SendWorldText(LANG_DEBUG_ARENA_CONF);
     }
     else
     {
         m_ArenaTesting = !m_ArenaTesting;
-        sWorld->SendWorldText(m_ArenaTesting ? LANG_DEBUG_ARENA_ON : LANG_DEBUG_ARENA_OFF);
+        ChatHandler(nullptr).SendWorldText(m_ArenaTesting ? LANG_DEBUG_ARENA_ON : LANG_DEBUG_ARENA_OFF);
     }
 }
 

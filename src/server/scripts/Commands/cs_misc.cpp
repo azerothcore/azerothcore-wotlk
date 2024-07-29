@@ -1404,7 +1404,7 @@ public:
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
         {
-            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"), target->GetName().c_str(), kickReasonStr.c_str());
+            handler->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName() : "Server"), target->GetName(), kickReasonStr);
         }
         else
         {
@@ -2506,7 +2506,7 @@ public:
 
             if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
             {
-                sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
+                handler->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy, nameLink, secsToTimeString(muteDuration, true), muteReasonStr);
             }
 
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(muteDuration, true), muteBy, muteReasonStr);
@@ -2533,7 +2533,7 @@ public:
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
         {
-            sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
+            handler->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy, nameLink, secsToTimeString(muteDuration, true), muteReasonStr);
         }
         else
         {
