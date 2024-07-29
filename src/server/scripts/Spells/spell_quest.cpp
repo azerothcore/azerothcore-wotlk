@@ -436,68 +436,24 @@ enum q11520Roots
     SPELL_SUMMON_RAZORTHORN_ROOT        = 44941,
 };
 
-    class spell_q11520_discovering_your_roots : public SpellScript
-    {
-        PrepareSpellScript(spell_q11520_discovering_your_roots);
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (GameObject* go = GetCaster()->FindNearestGameObject(GO_RAZORTHORN_DIRT_MOUNT, 20.0f))
-            {
-                GetCaster()->GetMotionMaster()->MovePoint(0, *go);
-                go->SetLootState(GO_JUST_DEACTIVATED);
-                GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_RAZORTHORN_ROOT, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q11520_discovering_your_roots::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-class spell_quest_dragonmaw_race_generic : public SpellScript
+class spell_q11520_discovering_your_roots : public SpellScript
 {
-    PrepareSpellScript(spell_quest_dragonmaw_race_generic);
+    PrepareSpellScript(spell_q11520_discovering_your_roots);
 
-    bool Load() override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        _x = _y = _z = 0.0f;
-        return true;
-    }
-
-    SpellCastResult RelocateDest()
-    {
-        Unit* caster = GetCaster();
-        float o = Position::NormalizeOrientation(caster->GetOrientation() + frand(0.0f, 2 * M_PI));
-        float dist = frand(5.0f, 30.0f);
-        _x = caster->GetPositionX() + dist * cos(o);
-        _y = caster->GetPositionY() + dist * std::sin(o);
-        _z = caster->GetPositionZ() + frand(-10.0f, 15.0f);
-        GetSpell()->m_targets.SetDst(_x, _y, _z, 0.0f, caster->GetMapId());
-        return SPELL_CAST_OK;
-    }
-
-    void ChangeDest(SpellEffIndex effIndex)
-    {
-        PreventHitDefaultEffect(effIndex);
-        Unit* caster = GetCaster();
-        if (Creature* trigger = caster->SummonCreature(23356, _x, _y, _z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1500))
+        if (GameObject* go = GetCaster()->FindNearestGameObject(GO_RAZORTHORN_DIRT_MOUNT, 20.0f))
         {
-            trigger->CastSpell(trigger, GetSpellInfo()->Effects[effIndex].TriggerSpell, true);
-            if (GetSpellInfo()->Effects[effIndex].TriggerSpell == 41064)
-                trigger->CastSpell(trigger, 41284, true);
+            GetCaster()->GetMotionMaster()->MovePoint(0, *go);
+            go->SetLootState(GO_JUST_DEACTIVATED);
+            GetCaster()->CastSpell(GetCaster(), SPELL_SUMMON_RAZORTHORN_ROOT, true);
         }
     }
 
     void Register() override
     {
-        OnCheckCast += SpellCheckCastFn(spell_quest_dragonmaw_race_generic::RelocateDest);
-        OnEffectHit += SpellEffectFn(spell_quest_dragonmaw_race_generic::ChangeDest, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
+        OnEffectHitTarget += SpellEffectFn(spell_q11520_discovering_your_roots::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
-
-private:
-    float _x, _y, _z;
 };
 
 class spell_q11670_it_was_the_orcs_honest : public SpellScript
@@ -2508,7 +2464,6 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q12943_shadow_vault_decree);
     RegisterSpellAndAuraScriptPair(spell_q10769_dissension_amongst_the_ranks, spell_q10769_dissension_amongst_the_ranks_aura);
     RegisterSpellScript(spell_q11520_discovering_your_roots);
-    RegisterSpellScript(spell_quest_dragonmaw_race_generic);
     RegisterSpellScript(spell_q11670_it_was_the_orcs_honest);
     RegisterSpellScript(spell_quest_test_flight_charging);
     RegisterSpellScript(spell_q12274_a_fall_from_grace_costume);

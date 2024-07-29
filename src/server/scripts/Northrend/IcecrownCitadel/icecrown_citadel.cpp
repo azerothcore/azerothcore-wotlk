@@ -16,7 +16,6 @@
  */
 
 #include "icecrown_citadel.h"
-#include "AccountMgr.h"
 #include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"

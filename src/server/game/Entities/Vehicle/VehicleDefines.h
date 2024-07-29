@@ -20,7 +20,6 @@
 
 #include "Define.h"
 #include "Map.h"
-#include "Object.h"
 #include <map>
 #include <vector>
 

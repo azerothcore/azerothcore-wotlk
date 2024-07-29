@@ -26,7 +26,6 @@
 #include "Object.h"
 #include "SharedDefines.h"
 #include "Unit.h"
-#include <array>
 
 class GameObjectAI;
 class Transport;

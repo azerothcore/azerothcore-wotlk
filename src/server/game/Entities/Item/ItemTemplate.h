@@ -18,7 +18,6 @@
 #ifndef _ITEMPROTOTYPE_H
 #define _ITEMPROTOTYPE_H
 
-#include "Common.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
 #include <unordered_map>
