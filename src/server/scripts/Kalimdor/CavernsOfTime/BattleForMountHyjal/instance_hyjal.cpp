@@ -18,7 +18,6 @@
 #include "Chat.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "WorldPacket.h"
 #include "hyjal.h"

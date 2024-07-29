@@ -1675,135 +1675,96 @@ public:
     }
 };
 
-class spell_the_lich_king_quake : public SpellScriptLoader
+class spell_the_lich_king_quake : public SpellScript
 {
-public:
-    spell_the_lich_king_quake() : SpellScriptLoader("spell_the_lich_king_quake") { }
+    PrepareSpellScript(spell_the_lich_king_quake);
 
-    class spell_the_lich_king_quake_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_the_lich_king_quake_SpellScript);
+        return GetCaster()->GetInstanceScript() != nullptr;
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetInstanceScript() != nullptr;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            if (GameObject* platform = ObjectAccessor::GetGameObject(*GetCaster(), GetCaster()->GetInstanceScript()->GetGuidData(DATA_ARTHAS_PLATFORM)))
-                targets.remove_if(HeightDifferenceCheck(platform, 5.0f, false));
-        }
-
-        void HandleSendEvent(SpellEffIndex /*effIndex*/)
-        {
-            if (GetCaster()->IsAIEnabled)
-                GetCaster()->GetAI()->DoAction(ACTION_START_ATTACK);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_quake_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHit += SpellEffectFn(spell_the_lich_king_quake_SpellScript::HandleSendEvent, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_the_lich_king_quake_SpellScript();
+        if (GameObject* platform = ObjectAccessor::GetGameObject(*GetCaster(), GetCaster()->GetInstanceScript()->GetGuidData(DATA_ARTHAS_PLATFORM)))
+            targets.remove_if(HeightDifferenceCheck(platform, 5.0f, false));
+    }
+
+    void HandleSendEvent(SpellEffIndex /*effIndex*/)
+    {
+        if (GetCaster()->IsAIEnabled)
+            GetCaster()->GetAI()->DoAction(ACTION_START_ATTACK);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_quake::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHit += SpellEffectFn(spell_the_lich_king_quake::HandleSendEvent, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
-class spell_the_lich_king_jump : public SpellScriptLoader
+class spell_the_lich_king_jump : public SpellScript
 {
-public:
-    spell_the_lich_king_jump() : SpellScriptLoader("spell_the_lich_king_jump") { }
+    PrepareSpellScript(spell_the_lich_king_jump);
 
-    class spell_the_lich_king_jump_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_jump_SpellScript);
+        return ValidateSpellInfo({ SPELL_RAISE_DEAD, SPELL_JUMP_2 });
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->RemoveAurasDueToSpell(SPELL_RAISE_DEAD);
-            GetHitUnit()->InterruptNonMeleeSpells(true);
-            GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_JUMP_2, true);
-            if (Creature* creature = GetHitCreature())
-                creature->AI()->DoAction(ACTION_BREAK_FROSTMOURNE);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_jump_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_the_lich_king_jump_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->RemoveAurasDueToSpell(SPELL_RAISE_DEAD);
+        GetHitUnit()->InterruptNonMeleeSpells(true);
+        GetHitUnit()->CastSpell((Unit*)nullptr, SPELL_JUMP_2, true);
+        if (Creature* creature = GetHitCreature())
+            creature->AI()->DoAction(ACTION_BREAK_FROSTMOURNE);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_jump::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_the_lich_king_jump_remove_aura : public SpellScriptLoader
+class spell_the_lich_king_jump_remove_aura : public SpellScript
 {
-public:
-    spell_the_lich_king_jump_remove_aura() : SpellScriptLoader("spell_the_lich_king_jump_remove_aura") { }
+    PrepareSpellScript(spell_the_lich_king_jump_remove_aura);
 
-    class spell_the_lich_king_jump_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_the_lich_king_jump_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->RemoveAurasDueToSpell(uint32(GetEffectValue()));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_jump_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_jump_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_jump_remove_aura::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_the_lich_king_play_movie : public SpellScriptLoader
+class spell_the_lich_king_play_movie : public SpellScript
 {
-public:
-    spell_the_lich_king_play_movie() : SpellScriptLoader("spell_the_lich_king_play_movie") { }
+    PrepareSpellScript(spell_the_lich_king_play_movie);
 
-    class spell_the_lich_king_play_movie_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_play_movie_SpellScript);
+        if (!sMovieStore.LookupEntry(MOVIE_FALL_OF_THE_LICH_KING))
+            return false;
+        return true;
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            if (!sMovieStore.LookupEntry(MOVIE_FALL_OF_THE_LICH_KING))
-                return false;
-            return true;
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Player* player = GetHitPlayer())
-                player->SendMovieStart(MOVIE_FALL_OF_THE_LICH_KING);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_play_movie_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_the_lich_king_play_movie_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Player* player = GetHitPlayer())
+            player->SendMovieStart(MOVIE_FALL_OF_THE_LICH_KING);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_play_movie::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1879,329 +1840,275 @@ public:
     }
 };
 
-class spell_the_lich_king_infest : public SpellScriptLoader
+class spell_the_lich_king_infest_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_infest() :  SpellScriptLoader("spell_the_lich_king_infest") { }
+    PrepareAuraScript(spell_the_lich_king_infest_aura);
 
-    class spell_the_lich_king_infest_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_the_lich_king_infest_AuraScript);
-
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
+        if (GetUnitOwner()->HealthAbovePct(90))
         {
-            if (GetUnitOwner()->HealthAbovePct(90))
-            {
-                PreventDefaultAction();
-                Remove(AURA_REMOVE_BY_ENEMY_SPELL);
-            }
-        }
-
-        void OnUpdate(AuraEffect* aurEff)
-        {
-            // multiply, starting from 2nd tick
-            if (aurEff->GetTickNumber() == 1)
-                return;
-
-            aurEff->SetAmount(int32(aurEff->GetAmount() * 1.15f));
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_infest_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_the_lich_king_infest_AuraScript::OnUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_the_lich_king_infest_AuraScript();
-    }
-};
-
-class spell_the_lich_king_necrotic_plague : public SpellScriptLoader
-{
-public:
-    spell_the_lich_king_necrotic_plague() :  SpellScriptLoader("spell_the_lich_king_necrotic_plague") { }
-
-    class spell_the_lich_king_necrotic_plague_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_the_lich_king_necrotic_plague_AuraScript);
-
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_NECROTIC_PLAGUE_JUMP });
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            bool dispel = false;
-            switch (GetTargetApplication()->GetRemoveMode())
-            {
-                case AURA_REMOVE_BY_ENEMY_SPELL:
-                    dispel = true;
-                case AURA_REMOVE_BY_EXPIRE:
-                case AURA_REMOVE_BY_DEATH:
-                    break;
-                default:
-                    return;
-            }
-
-            CustomSpellValues values;
-            if (dispel)
-                values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
-            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
-
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_the_lich_king_necrotic_plague_AuraScript();
-    }
-};
-
-class spell_the_lich_king_necrotic_plague_jump : public SpellScriptLoader
-{
-public:
-    spell_the_lich_king_necrotic_plague_jump() :  SpellScriptLoader("spell_the_lich_king_necrotic_plague_jump") { }
-
-    class spell_the_lich_king_necrotic_plague_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_the_lich_king_necrotic_plague_SpellScript);
-
-        bool Load() override
-        {
-            _hadJumpingAura = false;
-            _hadInitialAura = false;
-            return true;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
-            if (targets.size() <= 1)
-                return;
-
-            targets.resize(1);
-        }
-
-        void CheckAura(SpellMissInfo missInfo)
-        {
-            if (missInfo != SPELL_MISS_NONE)
-            {
-                return;
-            }
-
-            if (GetHitUnit()->HasAura(GetSpellInfo()->Id))
-                _hadJumpingAura = true;
-            else if (uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit()))
-                if (GetHitUnit()->HasAura(spellId))
-                    _hadInitialAura = true;
-        }
-
-        void AddMissingStack()
-        {
-            if (GetHitAura() && !_hadJumpingAura)
-            {
-                uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit());
-                if (GetSpellValue()->EffectBasePoints[EFFECT_1] != AURA_REMOVE_BY_ENEMY_SPELL || _hadInitialAura)
-                    GetHitAura()->ModStackAmount(1);
-                if (_hadInitialAura)
-                    if (Aura* a = GetHitUnit()->GetAura(spellId))
-                        a->Remove(AURA_REMOVE_BY_DEFAULT);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_necrotic_plague_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            BeforeHit += BeforeSpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::CheckAura);
-            OnHit += SpellHitFn(spell_the_lich_king_necrotic_plague_SpellScript::AddMissingStack);
-        }
-
-        bool _hadJumpingAura;
-        bool _hadInitialAura;
-    };
-
-    class spell_the_lich_king_necrotic_plague_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_the_lich_king_necrotic_plague_AuraScript);
-
-        bool Load() override
-        {
-            _lastAmount = 0;
-            return true;
-        }
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (caster->GetAI())
-                    caster->GetAI()->SetData(DATA_PLAGUE_STACK, GetStackAmount());
-        }
-
-        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            _lastAmount = aurEff->GetAmount();
-            switch (GetTargetApplication()->GetRemoveMode())
-            {
-                case AURA_REMOVE_BY_EXPIRE:
-                case AURA_REMOVE_BY_DEATH:
-                    break;
-                default:
-                    return;
-            }
-
-            CustomSpellValues values;
-            values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
-            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
-        }
-
-        void OnDispel(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            _lastAmount = aurEff->GetAmount();
-        }
-
-        void AfterDispel(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            // this means the stack increased so don't process as if dispelled
-            if (aurEff->GetAmount() > _lastAmount)
-                return;
-
-            CustomSpellValues values;
-            values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
-            values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
-            GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
-
+            PreventDefaultAction();
             Remove(AURA_REMOVE_BY_ENEMY_SPELL);
         }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_the_lich_king_necrotic_plague_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_AuraScript::OnDispel, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
-            AfterEffectApply += AuraEffectApplyFn(spell_the_lich_king_necrotic_plague_AuraScript::AfterDispel, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
-        }
-
-        int32 _lastAmount;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_the_lich_king_necrotic_plague_SpellScript();
     }
 
-    AuraScript* GetAuraScript() const override
+    void OnUpdate(AuraEffect* aurEff)
     {
-        return new spell_the_lich_king_necrotic_plague_AuraScript();
+        // multiply, starting from 2nd tick
+        if (aurEff->GetTickNumber() == 1)
+            return;
+
+        aurEff->SetAmount(int32(aurEff->GetAmount() * 1.15f));
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_infest_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_the_lich_king_infest_aura::OnUpdate, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
-class spell_the_lich_king_shadow_trap_visual : public SpellScriptLoader
+class spell_the_lich_king_necrotic_plague_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_shadow_trap_visual() : SpellScriptLoader("spell_the_lich_king_shadow_trap_visual") { }
+    PrepareAuraScript(spell_the_lich_king_necrotic_plague_aura);
 
-    class spell_the_lich_king_shadow_trap_visual_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_shadow_trap_visual_AuraScript);
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_TRAP_AURA, TRIGGERED_NONE);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_shadow_trap_visual_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_the_lich_king_shadow_trap_visual_AuraScript();
+        return ValidateSpellInfo({ SPELL_NECROTIC_PLAGUE_JUMP });
     }
-};
 
-class spell_the_lich_king_shadow_trap_periodic : public SpellScriptLoader
-{
-public:
-    spell_the_lich_king_shadow_trap_periodic() : SpellScriptLoader("spell_the_lich_king_shadow_trap_periodic") { }
-
-    class spell_the_lich_king_shadow_trap_periodic_SpellScript : public SpellScript
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareSpellScript(spell_the_lich_king_shadow_trap_periodic_SpellScript);
-
-        void CheckTargetCount(std::list<WorldObject*>& targets)
+        bool dispel = false;
+        switch (GetTargetApplication()->GetRemoveMode())
         {
-            if (targets.empty())
+            case AURA_REMOVE_BY_ENEMY_SPELL:
+                dispel = true;
+            case AURA_REMOVE_BY_EXPIRE:
+            case AURA_REMOVE_BY_DEATH:
+                break;
+            default:
                 return;
-
-            GetCaster()->CastSpell((Unit*)nullptr, SPELL_SHADOW_TRAP_KNOCKBACK, true);
-            if (Aura* a = GetCaster()->GetAura(SPELL_SHADOW_TRAP_AURA))
-                a->SetDuration(0);
-            if (GetCaster()->GetTypeId() == TYPEID_UNIT)
-                GetCaster()->ToCreature()->DespawnOrUnsummon(3000);
         }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_shadow_trap_periodic_SpellScript::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
+        CustomSpellValues values;
+        if (dispel)
+            values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
+        GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
 
-    SpellScript* GetSpellScript() const override
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
+    }
+
+    void Register() override
     {
-        return new spell_the_lich_king_shadow_trap_periodic_SpellScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_the_lich_king_ice_burst_target_search : public SpellScriptLoader
+class spell_the_lich_king_necrotic_plague_jump : public SpellScript
 {
-public:
-    spell_the_lich_king_ice_burst_target_search() : SpellScriptLoader("spell_the_lich_king_ice_burst_target_search") { }
+    PrepareSpellScript(spell_the_lich_king_necrotic_plague_jump);
 
-    class spell_the_lich_king_ice_burst_target_search_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_the_lich_king_ice_burst_target_search_SpellScript);
+        _hadJumpingAura = false;
+        _hadInitialAura = false;
+        return true;
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster()));
+        if (targets.size() <= 1)
+            return;
+
+        targets.resize(1);
+    }
+
+    void CheckAura(SpellMissInfo missInfo)
+    {
+        if (missInfo != SPELL_MISS_NONE)
         {
-            return ValidateSpellInfo({ SPELL_ICE_BURST });
+            return;
         }
 
-        void CheckTargetCount(std::list<WorldObject*>& unitList)
+        if (GetHitUnit()->HasAura(GetSpellInfo()->Id))
+            _hadJumpingAura = true;
+        else if (uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit()))
+            if (GetHitUnit()->HasAura(spellId))
+                _hadInitialAura = true;
+    }
+
+    void AddMissingStack()
+    {
+        if (GetHitAura() && !_hadJumpingAura)
         {
-            if (unitList.empty())
+            uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_NECROTIC_PLAGUE, GetHitUnit());
+            if (GetSpellValue()->EffectBasePoints[EFFECT_1] != AURA_REMOVE_BY_ENEMY_SPELL || _hadInitialAura)
+                GetHitAura()->ModStackAmount(1);
+            if (_hadInitialAura)
+                if (Aura* a = GetHitUnit()->GetAura(spellId))
+                    a->Remove(AURA_REMOVE_BY_DEFAULT);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_necrotic_plague_jump::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        BeforeHit += BeforeSpellHitFn(spell_the_lich_king_necrotic_plague_jump::CheckAura);
+        OnHit += SpellHitFn(spell_the_lich_king_necrotic_plague_jump::AddMissingStack);
+    }
+
+private:
+    bool _hadJumpingAura;
+    bool _hadInitialAura;
+};
+
+class spell_the_lich_king_necrotic_plague_jump_aura : public AuraScript
+{
+    PrepareAuraScript(spell_the_lich_king_necrotic_plague_jump_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_NECROTIC_PLAGUE_JUMP, SPELL_PLAGUE_SIPHON });
+    }
+
+    bool Load() override
+    {
+        _lastAmount = 0;
+        return true;
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (caster->GetAI())
+                caster->GetAI()->SetData(DATA_PLAGUE_STACK, GetStackAmount());
+    }
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        _lastAmount = aurEff->GetAmount();
+        switch (GetTargetApplication()->GetRemoveMode())
+        {
+            case AURA_REMOVE_BY_EXPIRE:
+            case AURA_REMOVE_BY_DEATH:
+                break;
+            default:
                 return;
-
-            if (GetCaster()->GetTypeId() == TYPEID_UNIT)
-                GetCaster()->ToCreature()->AI()->DoAction(-1);
         }
 
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_ice_burst_target_search_SpellScript::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
+        CustomSpellValues values;
+        values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
+        GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
+    }
 
-    SpellScript* GetSpellScript() const override
+    void OnDispel(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_the_lich_king_ice_burst_target_search_SpellScript();
+        _lastAmount = aurEff->GetAmount();
+    }
+
+    void AfterDispel(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        // this means the stack increased so don't process as if dispelled
+        if (aurEff->GetAmount() > _lastAmount)
+            return;
+
+        CustomSpellValues values;
+        values.AddSpellMod(SPELLVALUE_AURA_STACK, GetStackAmount());
+        values.AddSpellMod(SPELLVALUE_BASE_POINT1, AURA_REMOVE_BY_ENEMY_SPELL); // add as marker (spell has no effect 1)
+        GetTarget()->CastCustomSpell(SPELL_NECROTIC_PLAGUE_JUMP, values, nullptr, TRIGGERED_FULL_MASK, nullptr, nullptr, GetCasterGUID());
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, SPELL_PLAGUE_SIPHON, true);
+
+        Remove(AURA_REMOVE_BY_ENEMY_SPELL);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_the_lich_king_necrotic_plague_jump_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_jump_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_necrotic_plague_jump_aura::OnDispel, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
+        AfterEffectApply += AuraEffectApplyFn(spell_the_lich_king_necrotic_plague_jump_aura::AfterDispel, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAPPLY);
+    }
+
+private:
+    int32 _lastAmount;
+};
+
+class spell_the_lich_king_shadow_trap_visual_aura : public AuraScript
+{
+    PrepareAuraScript(spell_the_lich_king_shadow_trap_visual_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHADOW_TRAP_AURA });
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_TRAP_AURA, TRIGGERED_NONE);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_shadow_trap_visual_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+class spell_the_lich_king_shadow_trap_periodic : public SpellScript
+{
+    PrepareSpellScript(spell_the_lich_king_shadow_trap_periodic);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHADOW_TRAP_KNOCKBACK });
+    }
+
+    void CheckTargetCount(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            return;
+
+        GetCaster()->CastSpell((Unit*)nullptr, SPELL_SHADOW_TRAP_KNOCKBACK, true);
+        if (Aura* a = GetCaster()->GetAura(SPELL_SHADOW_TRAP_AURA))
+            a->SetDuration(0);
+        if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+            GetCaster()->ToCreature()->DespawnOrUnsummon(3000);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_shadow_trap_periodic::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
+class spell_the_lich_king_ice_burst_target_search : public SpellScript
+{
+    PrepareSpellScript(spell_the_lich_king_ice_burst_target_search);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ICE_BURST });
+    }
+
+    void CheckTargetCount(std::list<WorldObject*>& unitList)
+    {
+        if (unitList.empty())
+            return;
+
+        if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+            GetCaster()->ToCreature()->AI()->DoAction(-1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_ice_burst_target_search::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -2283,31 +2190,20 @@ public:
     }
 };
 
-class spell_the_lich_king_raging_spirit : public SpellScriptLoader
+class spell_the_lich_king_raging_spirit : public SpellScript
 {
-public:
-    spell_the_lich_king_raging_spirit() : SpellScriptLoader("spell_the_lich_king_raging_spirit") { }
+    PrepareSpellScript(spell_the_lich_king_raging_spirit);
 
-    class spell_the_lich_king_raging_spirit_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_the_lich_king_raging_spirit_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, uint32(GetEffectValue()), true, 0, 0, target->GetGUID());
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                target->CastSpell(target, uint32(GetEffectValue()), true, 0, 0, target->GetGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_raging_spirit_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_raging_spirit_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_raging_spirit::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -2444,75 +2340,58 @@ public:
     }
 };
 
-class spell_the_lich_king_defile : public SpellScriptLoader
+class spell_the_lich_king_defile : public SpellScript
 {
-public:
-    spell_the_lich_king_defile() : SpellScriptLoader("spell_the_lich_king_defile") { }
+    PrepareSpellScript(spell_the_lich_king_defile);
 
-    class spell_the_lich_king_defile_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_defile_SpellScript);
+        return ValidateSpellInfo({ SPELL_DEFILE_GROW });
+    }
 
-        void CorrectRange(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(VehicleCheck());
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
-            uint32 strangulatedAura[4] = {68980, 74325, 74296, 74297};
-            targets.remove_if(Acore::UnitAuraCheck(true, strangulatedAura[GetCaster()->GetMap()->GetDifficulty()]));
-        }
-
-        void ChangeDamageAndGrow()
-        {
-            SetHitDamage(int32(GetHitDamage() * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X)));
-            // HACK: target player should cast this spell on defile
-            // however with current aura handling auras cast by different units
-            // cannot stack on the same aura object increasing the stack count
-            GetCaster()->CastSpell(GetCaster(), SPELL_DEFILE_GROW, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_defile_SpellScript::CorrectRange, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_defile_SpellScript::CorrectRange, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnHit += SpellHitFn(spell_the_lich_king_defile_SpellScript::ChangeDamageAndGrow);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CorrectRange(std::list<WorldObject*>& targets)
     {
-        return new spell_the_lich_king_defile_SpellScript();
+        targets.remove_if(VehicleCheck());
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 10.0f * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X), true));
+        uint32 strangulatedAura[4] = {68980, 74325, 74296, 74297};
+        targets.remove_if(Acore::UnitAuraCheck(true, strangulatedAura[GetCaster()->GetMap()->GetDifficulty()]));
+    }
+
+    void ChangeDamageAndGrow()
+    {
+        SetHitDamage(int32(GetHitDamage() * GetCaster()->GetFloatValue(OBJECT_FIELD_SCALE_X)));
+        // HACK: target player should cast this spell on defile
+        // however with current aura handling auras cast by different units
+        // cannot stack on the same aura object increasing the stack count
+        GetCaster()->CastSpell(GetCaster(), SPELL_DEFILE_GROW, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_defile::CorrectRange, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_defile::CorrectRange, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnHit += SpellHitFn(spell_the_lich_king_defile::ChangeDamageAndGrow);
     }
 };
 
-class spell_the_lich_king_soul_reaper : public SpellScriptLoader
+class spell_the_lich_king_soul_reaper_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_soul_reaper() :  SpellScriptLoader("spell_the_lich_king_soul_reaper") { }
+    PrepareAuraScript(spell_the_lich_king_soul_reaper_aura);
 
-    class spell_the_lich_king_soul_reaper_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_soul_reaper_AuraScript);
+        return ValidateSpellInfo({ SPELL_SOUL_REAPER_BUFF });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_SOUL_REAPER_BUFF });
-        }
-
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            if (Unit* caster = GetCaster())
-                GetTarget()->CastSpell(caster, SPELL_SOUL_REAPER_BUFF, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_soul_reaper_AuraScript::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_the_lich_king_soul_reaper_AuraScript();
+        if (Unit* caster = GetCaster())
+            GetTarget()->CastSpell(caster, SPELL_SOUL_REAPER_BUFF, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_soul_reaper_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -2725,395 +2604,297 @@ public:
     }
 };
 
-class spell_the_lich_king_summon_into_air : public SpellScriptLoader
+class spell_the_lich_king_summon_into_air : public SpellScript
 {
-public:
-    spell_the_lich_king_summon_into_air() : SpellScriptLoader("spell_the_lich_king_summon_into_air") { }
+    PrepareSpellScript(spell_the_lich_king_summon_into_air);
 
-    class spell_the_lich_king_summon_into_air_SpellScript : public SpellScript
+    void ModDestHeight(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_the_lich_king_summon_into_air_SpellScript);
-
-        void ModDestHeight(SpellEffIndex effIndex)
+        float addZ;
+        switch (GetSpellInfo()->Effects[effIndex].MiscValue)
         {
-            float addZ;
-            switch (GetSpellInfo()->Effects[effIndex].MiscValue)
-            {
-                case NPC_SPIRIT_BOMB:
-                    addZ = 30.0f;
-                    break;
-                case NPC_VILE_SPIRIT:
-                    addZ = 13.0f;
-                    break;
-                default:
-                    addZ = 15.0f;
-                    break;
-            }
-            Position const offset = {0.0f, 0.0f, addZ, 0.0f};
-            WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
-            dest->RelocateOffset(offset);
-            GetHitDest()->RelocateOffset(offset);
+            case NPC_SPIRIT_BOMB:
+                addZ = 30.0f;
+                break;
+            case NPC_VILE_SPIRIT:
+                addZ = 13.0f;
+                break;
+            default:
+                addZ = 15.0f;
+                break;
         }
+        Position const offset = {0.0f, 0.0f, addZ, 0.0f};
+        WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
+        dest->RelocateOffset(offset);
+        GetHitDest()->RelocateOffset(offset);
+    }
 
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_the_lich_king_summon_into_air_SpellScript::ModDestHeight, EFFECT_0, SPELL_EFFECT_SUMMON);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_summon_into_air_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_the_lich_king_summon_into_air::ModDestHeight, EFFECT_0, SPELL_EFFECT_SUMMON);
     }
 };
 
-class spell_the_lich_king_teleport_to_frostmourne_hc : public SpellScriptLoader
+class spell_the_lich_king_teleport_to_frostmourne_hc : public SpellScript
 {
-public:
-    spell_the_lich_king_teleport_to_frostmourne_hc() : SpellScriptLoader("spell_the_lich_king_teleport_to_frostmourne_hc") { }
+    PrepareSpellScript(spell_the_lich_king_teleport_to_frostmourne_hc);
 
-    class spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript : public SpellScript
+    void ModDest(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript);
+        float dist = 2.0f + rand_norm() * 18.0f;
+        float angle = rand_norm() * 2 * M_PI;
+        Position const offset = {dist * cos(angle), dist * std::sin(angle), 0.0f, 0.0f};
+        WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
+        dest->RelocateOffset(offset);
+        GetHitDest()->RelocateOffset(offset);
+    }
 
-        void ModDest(SpellEffIndex  /*effIndex*/)
-        {
-            float dist = 2.0f + rand_norm() * 18.0f;
-            float angle = rand_norm() * 2 * M_PI;
-            Position const offset = {dist * cos(angle), dist * std::sin(angle), 0.0f, 0.0f};
-            WorldLocation* dest = const_cast<WorldLocation*>(GetExplTargetDest());
-            dest->RelocateOffset(offset);
-            GetHitDest()->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript::ModDest, EFFECT_1, SPELL_EFFECT_TELEPORT_UNITS);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_teleport_to_frostmourne_hc_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_the_lich_king_teleport_to_frostmourne_hc::ModDest, EFFECT_1, SPELL_EFFECT_TELEPORT_UNITS);
     }
 };
 
-class spell_the_lich_king_valkyr_target_search : public SpellScriptLoader
+class spell_the_lich_king_valkyr_target_search : public SpellScript
 {
-public:
-    spell_the_lich_king_valkyr_target_search() : SpellScriptLoader("spell_the_lich_king_valkyr_target_search") { }
+    PrepareSpellScript(spell_the_lich_king_valkyr_target_search);
 
-    class spell_the_lich_king_valkyr_target_search_SpellScript : public SpellScript
+    WorldObject* _target;
+
+    bool Load() override
     {
-        PrepareSpellScript(spell_the_lich_king_valkyr_target_search_SpellScript);
+        _target = nullptr;
+        return true;
+    }
 
-        WorldObject* _target;
-
-        bool Load() override
+    void SelectTarget(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            return;
+        Creature* caster = GetCaster()->ToCreature();
+        if (!caster)
         {
-            _target = nullptr;
-            return true;
-        }
-
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            if (targets.empty())
-                return;
-            Creature* caster = GetCaster()->ToCreature();
-            if (!caster)
-            {
-                targets.clear();
-                return;
-            }
-            targets.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_BOSS_HITTIN_YA_AURA)); // done in dbc, but just to be sure xd
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_HARVEST_SOUL_VALKYR));
-            if (InstanceScript* _instance = caster->GetInstanceScript())
-                if (Creature* lichKing = ObjectAccessor::GetCreature(*caster, _instance->GetGuidData(DATA_THE_LICH_KING)))
-                    if (Spell* s = lichKing->GetCurrentSpell(CURRENT_GENERIC_SPELL))
-                        if (s->GetSpellInfo()->Id == SPELL_DEFILE && s->m_targets.GetUnitTarget())
-                            targets.remove(s->m_targets.GetUnitTarget());
-
-            if (targets.empty())
-                return;
-
-            _target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
+            return;
+        }
+        targets.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_BOSS_HITTIN_YA_AURA)); // done in dbc, but just to be sure xd
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_HARVEST_SOUL_VALKYR));
+        if (InstanceScript* _instance = caster->GetInstanceScript())
+            if (Creature* lichKing = ObjectAccessor::GetCreature(*caster, _instance->GetGuidData(DATA_THE_LICH_KING)))
+                if (Spell* s = lichKing->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                    if (s->GetSpellInfo()->Id == SPELL_DEFILE && s->m_targets.GetUnitTarget())
+                        targets.remove(s->m_targets.GetUnitTarget());
+
+        if (targets.empty())
+            return;
+
+        _target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(_target);
+        if (Creature* caster = GetCaster()->ToCreature())
+            caster->AI()->SetGUID(_target->GetGUID());
+    }
+
+    void ReplaceTarget(std::list<WorldObject*>& targets)
+    {
+        targets.clear();
+        if (_target)
             targets.push_back(_target);
-            if (Creature* caster = GetCaster()->ToCreature())
-                caster->AI()->SetGUID(_target->GetGUID());
-        }
+    }
 
-        void ReplaceTarget(std::list<WorldObject*>& targets)
-        {
-            targets.clear();
-            if (_target)
-                targets.push_back(_target);
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-            {
-                GetCaster()->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 4.0f, 42.0f, EVENT_CHARGE);
-                GetCaster()->SetDisableGravity(true, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_valkyr_target_search_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_valkyr_target_search_SpellScript::ReplaceTarget, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_valkyr_target_search_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_the_lich_king_valkyr_target_search_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+        {
+            GetCaster()->GetMotionMaster()->MoveCharge(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 4.0f, 42.0f, EVENT_CHARGE);
+            GetCaster()->SetDisableGravity(true, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_valkyr_target_search::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_valkyr_target_search::ReplaceTarget, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_valkyr_target_search::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_the_lich_king_cast_back_to_caster : public SpellScriptLoader
+class spell_the_lich_king_cast_back_to_caster : public SpellScript
 {
-public:
-    spell_the_lich_king_cast_back_to_caster() :  SpellScriptLoader("spell_the_lich_king_cast_back_to_caster") { }
+    PrepareSpellScript(spell_the_lich_king_cast_back_to_caster);
 
-    class spell_the_lich_king_cast_back_to_caster_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_the_lich_king_cast_back_to_caster_SpellScript);
+        GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            GetHitUnit()->CastSpell(GetCaster(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_cast_back_to_caster_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_cast_back_to_caster_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_cast_back_to_caster::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_the_lich_king_life_siphon : public SpellScriptLoader
+class spell_the_lich_king_life_siphon : public SpellScript
 {
-public:
-    spell_the_lich_king_life_siphon() : SpellScriptLoader("spell_the_lich_king_life_siphon") { }
+    PrepareSpellScript(spell_the_lich_king_life_siphon);
 
-    class spell_the_lich_king_life_siphon_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_life_siphon_SpellScript);
+        return ValidateSpellInfo({ SPELL_LIFE_SIPHON_HEAL });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_LIFE_SIPHON_HEAL });
-        }
-
-        void TriggerHeal()
-        {
-            GetHitUnit()->CastCustomSpell(SPELL_LIFE_SIPHON_HEAL, SPELLVALUE_BASE_POINT0, GetHitDamage() * 10, GetCaster(), true);
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_the_lich_king_life_siphon_SpellScript::TriggerHeal);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void TriggerHeal()
     {
-        return new spell_the_lich_king_life_siphon_SpellScript();
+        GetHitUnit()->CastCustomSpell(SPELL_LIFE_SIPHON_HEAL, SPELLVALUE_BASE_POINT0, GetHitDamage() * 10, GetCaster(), true);
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_the_lich_king_life_siphon::TriggerHeal);
     }
 };
 
-class spell_the_lich_king_vile_spirits : public SpellScriptLoader
+class spell_the_lich_king_vile_spirits_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_vile_spirits() : SpellScriptLoader("spell_the_lich_king_vile_spirits") { }
+    PrepareAuraScript(spell_the_lich_king_vile_spirits_aura);
 
-    class spell_the_lich_king_vile_spirits_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_the_lich_king_vile_spirits_AuraScript);
+        _is25Man = GetUnitOwner()->GetMap()->Is25ManRaid();
+        return true;
+    }
 
-        bool Load() override
-        {
-            _is25Man = GetUnitOwner()->GetMap()->Is25ManRaid();
-            return true;
-        }
-
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            if (_is25Man || ((aurEff->GetTickNumber() - 1) % 5))
-                GetTarget()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff, GetCasterGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_vile_spirits_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-
-        bool _is25Man;
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_the_lich_king_vile_spirits_AuraScript();
+        if (_is25Man || ((aurEff->GetTickNumber() - 1) % 5))
+            GetTarget()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_vile_spirits_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+
+private:
+    bool _is25Man;
+};
+
+class spell_the_lich_king_vile_spirits_visual : public SpellScript
+{
+    PrepareSpellScript(spell_the_lich_king_vile_spirits_visual);
+
+    void ModDestHeight(SpellEffIndex /*effIndex*/)
+    {
+        Position offset = {0.0f, 0.0f, 15.0f, 0.0f};
+        const_cast<WorldLocation*>(GetExplTargetDest())->RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnEffectLaunch += SpellEffectFn(spell_the_lich_king_vile_spirits_visual::ModDestHeight, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_the_lich_king_vile_spirits_visual : public SpellScriptLoader
+class spell_the_lich_king_vile_spirit_move_target_search : public SpellScript
 {
-public:
-    spell_the_lich_king_vile_spirits_visual() : SpellScriptLoader("spell_the_lich_king_vile_spirits_visual") { }
+    PrepareSpellScript(spell_the_lich_king_vile_spirit_move_target_search);
 
-    class spell_the_lich_king_vile_spirits_visual_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_the_lich_king_vile_spirits_visual_SpellScript);
+        _target = nullptr;
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
 
-        void ModDestHeight(SpellEffIndex /*effIndex*/)
-        {
-            Position offset = {0.0f, 0.0f, 15.0f, 0.0f};
-            const_cast<WorldLocation*>(GetExplTargetDest())->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_the_lich_king_vile_spirits_visual_SpellScript::ModDestHeight, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void SelectTarget(std::list<WorldObject*>& targets)
     {
-        return new spell_the_lich_king_vile_spirits_visual_SpellScript();
+        if (targets.empty())
+            return;
+
+        _target = Acore::Containers::SelectRandomContainerElement(targets);
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (GetHitUnit() != _target)
+            return;
+
+        GetCaster()->ToCreature()->SetInCombatWithZone();
+        GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
+        GetCaster()->AddThreat(GetHitUnit(), GetCaster()->GetMaxHealth() * 0.2f);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_vile_spirit_move_target_search::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_vile_spirit_move_target_search::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+
+private:
+    WorldObject* _target;
+};
+
+class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScript
+{
+    PrepareSpellScript(spell_the_lich_king_vile_spirit_damage_target_search);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_VILE_SPIRIT_DAMAGE_SEARCH, SPELL_SPIRIT_BURST });
+    }
+
+    void CheckTargetCount(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            return;
+
+        if (TempSummon* summon = GetCaster()->ToTempSummon())
+            if (Unit* summoner = summon->GetSummonerUnit())
+                summoner->GetAI()->SetData(DATA_VILE, 1);
+
+        if (Creature* c = GetCaster()->ToCreature())
+        {
+            c->RemoveAurasDueToSpell(SPELL_VILE_SPIRIT_DAMAGE_SEARCH);
+            c->GetMotionMaster()->Clear(true);
+            c->StopMoving();
+            c->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, true);
+            c->DespawnOrUnsummon(3000);
+            c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_vile_spirit_damage_target_search::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_the_lich_king_vile_spirit_move_target_search : public SpellScriptLoader
+class spell_the_lich_king_harvest_soul_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_vile_spirit_move_target_search() : SpellScriptLoader("spell_the_lich_king_vile_spirit_move_target_search") { }
+    PrepareAuraScript(spell_the_lich_king_harvest_soul_aura);
 
-    class spell_the_lich_king_vile_spirit_move_target_search_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_vile_spirit_move_target_search_SpellScript);
-
-        bool Load() override
-        {
-            _target = nullptr;
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            if (targets.empty())
-                return;
-
-            _target = Acore::Containers::SelectRandomContainerElement(targets);
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (GetHitUnit() != _target)
-                return;
-
-            GetCaster()->ToCreature()->SetInCombatWithZone();
-            GetCaster()->ToCreature()->AI()->AttackStart(GetHitUnit());
-            GetCaster()->AddThreat(GetHitUnit(), GetCaster()->GetMaxHealth() * 0.2f);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_vile_spirit_move_target_search_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_vile_spirit_move_target_search_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-
-        WorldObject* _target;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_the_lich_king_vile_spirit_move_target_search_SpellScript();
+        return ValidateSpellInfo({ SPELL_HARVESTED_SOUL_LK_BUFF });
     }
-};
 
-class spell_the_lich_king_vile_spirit_damage_target_search : public SpellScriptLoader
-{
-public:
-    spell_the_lich_king_vile_spirit_damage_target_search() : SpellScriptLoader("spell_the_lich_king_vile_spirit_damage_target_search") { }
-
-    class spell_the_lich_king_vile_spirit_damage_target_search_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_the_lich_king_vile_spirit_damage_target_search_SpellScript);
-
-        void CheckTargetCount(std::list<WorldObject*>& targets)
-        {
-            if (targets.empty())
-                return;
-
-            if (TempSummon* summon = GetCaster()->ToTempSummon())
-                if (Unit* summoner = summon->GetSummonerUnit())
-                    summoner->GetAI()->SetData(DATA_VILE, 1);
-
-            if (Creature* c = GetCaster()->ToCreature())
-            {
-                c->RemoveAurasDueToSpell(SPELL_VILE_SPIRIT_DAMAGE_SEARCH);
-                c->GetMotionMaster()->Clear(true);
-                c->StopMoving();
-                c->CastSpell((Unit*)nullptr, SPELL_SPIRIT_BURST, true);
-                c->DespawnOrUnsummon(3000);
-                c->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_vile_spirit_damage_target_search_SpellScript::CheckTargetCount, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_the_lich_king_vile_spirit_damage_target_search_SpellScript();
+        return GetOwner()->GetInstanceScript() != nullptr;
     }
-};
 
-class spell_the_lich_king_harvest_soul : public SpellScriptLoader
-{
-public:
-    spell_the_lich_king_harvest_soul() : SpellScriptLoader("spell_the_lich_king_harvest_soul") { }
-
-    class spell_the_lich_king_harvest_soul_AuraScript : public AuraScript
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_the_lich_king_harvest_soul_AuraScript);
+        // m_originalCaster to allow stacking from different casters, meh
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
+            GetTarget()->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetGuidData(DATA_THE_LICH_KING));
+    }
 
-        bool Load() override
-        {
-            return GetOwner()->GetInstanceScript() != nullptr;
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            // m_originalCaster to allow stacking from different casters, meh
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH)
-                GetTarget()->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, GetTarget()->GetInstanceScript()->GetGuidData(DATA_THE_LICH_KING));
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_harvest_soul_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_harvest_soul_AuraScript();
+        AfterEffectRemove += AuraEffectRemoveFn(spell_the_lich_king_harvest_soul_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -3389,94 +3170,78 @@ public:
     }
 };
 
-class spell_the_lich_king_lights_favor : public SpellScriptLoader
+class spell_the_lich_king_lights_favor_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_lights_favor() : SpellScriptLoader("spell_the_lich_king_lights_favor") { }
+    PrepareAuraScript(spell_the_lich_king_lights_favor_aura);
 
-    class spell_the_lich_king_lights_favor_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_the_lich_king_lights_favor_AuraScript);
+        if (Unit* caster = GetCaster())
+            if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
+                effect->RecalculateAmount(caster);
+    }
 
-        void OnPeriodic(AuraEffect const* /*aurEff*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (AuraEffect* effect = GetAura()->GetEffect(EFFECT_1))
-                    effect->RecalculateAmount(caster);
-        }
-
-        void CalculateBonus(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
-        {
-            canBeRecalculated = true;
-            amount = 0;
-            if (Unit* caster = GetCaster())
-                amount = int32(caster->GetHealthPct());
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_lights_favor_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_the_lich_king_lights_favor_AuraScript::CalculateBonus, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void CalculateBonus(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
     {
-        return new spell_the_lich_king_lights_favor_AuraScript();
+        canBeRecalculated = true;
+        amount = 0;
+        if (Unit* caster = GetCaster())
+            amount = int32(caster->GetHealthPct());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_lights_favor_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_the_lich_king_lights_favor_aura::CalculateBonus, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
     }
 };
 
-class spell_the_lich_king_restore_soul : public SpellScriptLoader
+class spell_the_lich_king_restore_soul : public SpellScript
 {
-public:
-    spell_the_lich_king_restore_soul() : SpellScriptLoader("spell_the_lich_king_restore_soul") { }
+    PrepareSpellScript(spell_the_lich_king_restore_soul);
 
-    class spell_the_lich_king_restore_soul_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_the_lich_king_restore_soul_SpellScript);
-
-        bool Load() override
-        {
-            _instance = GetCaster()->GetInstanceScript();
-            return _instance != nullptr;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            for (std::list<WorldObject*>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
-                if (Unit* target = (*itr)->ToUnit())
-                    target->RemoveAurasDueToSpell(target->GetMap()->IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
-            if (Creature* lichKing = ObjectAccessor::GetCreature(*GetCaster(), _instance->GetGuidData(DATA_THE_LICH_KING)))
-                lichKing->AI()->DoAction(ACTION_TELEPORT_BACK);
-            if (Creature* spawner = GetCaster()->FindNearestCreature(NPC_WORLD_TRIGGER_INFINITE_AOI, 50.0f, true))
-            {
-                spawner->RemoveAllAuras();
-                spawner->m_Events.KillAllEvents(true);
-            }
-
-            std::list<Creature*> spirits;
-            GetCaster()->GetCreatureListWithEntryInGrid(spirits, NPC_WICKED_SPIRIT, 200.0f);
-            for (std::list<Creature*>::iterator itr = spirits.begin(); itr != spirits.end(); ++itr)
-            {
-                (*itr)->m_Events.KillAllEvents(true);
-                (*itr)->RemoveAllAuras();
-                (*itr)->AI()->EnterEvadeMode();
-                (*itr)->SetReactState(REACT_PASSIVE);
-            }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_restore_soul_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-        }
-
-        InstanceScript* _instance;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_the_lich_king_restore_soul_SpellScript();
+        return ValidateSpellInfo({ SPELL_HARVEST_SOULS_TELEPORT, SPELL_HARVEST_SOUL_TELEPORT });
     }
+
+    bool Load() override
+    {
+        _instance = GetCaster()->GetInstanceScript();
+        return _instance != nullptr;
+    }
+
+    void FilterTargets(std::list<WorldObject*>& unitList)
+    {
+        for (std::list<WorldObject*>::const_iterator itr = unitList.begin(); itr != unitList.end(); ++itr)
+            if (Unit* target = (*itr)->ToUnit())
+                target->RemoveAurasDueToSpell(target->GetMap()->IsHeroic() ? SPELL_HARVEST_SOULS_TELEPORT : SPELL_HARVEST_SOUL_TELEPORT);
+        if (Creature* lichKing = ObjectAccessor::GetCreature(*GetCaster(), _instance->GetGuidData(DATA_THE_LICH_KING)))
+            lichKing->AI()->DoAction(ACTION_TELEPORT_BACK);
+        if (Creature* spawner = GetCaster()->FindNearestCreature(NPC_WORLD_TRIGGER_INFINITE_AOI, 50.0f, true))
+        {
+            spawner->RemoveAllAuras();
+            spawner->m_Events.KillAllEvents(true);
+        }
+
+        std::list<Creature*> spirits;
+        GetCaster()->GetCreatureListWithEntryInGrid(spirits, NPC_WICKED_SPIRIT, 200.0f);
+        for (std::list<Creature*>::iterator itr = spirits.begin(); itr != spirits.end(); ++itr)
+        {
+            (*itr)->m_Events.KillAllEvents(true);
+            (*itr)->RemoveAllAuras();
+            (*itr)->AI()->EnterEvadeMode();
+            (*itr)->SetReactState(REACT_PASSIVE);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_the_lich_king_restore_soul::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+    }
+
+private:
+    InstanceScript* _instance;
 };
 
 class npc_spirit_warden : public CreatureScript
@@ -3526,73 +3291,56 @@ public:
     }
 };
 
-class spell_the_lich_king_dark_hunger : public SpellScriptLoader
+class spell_the_lich_king_dark_hunger_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_dark_hunger() : SpellScriptLoader("spell_the_lich_king_dark_hunger") { }
+    PrepareAuraScript(spell_the_lich_king_dark_hunger_aura);
 
-    class spell_the_lich_king_dark_hunger_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_dark_hunger_AuraScript);
+        return ValidateSpellInfo({ SPELL_DARK_HUNGER_HEAL });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_DARK_HUNGER_HEAL });
-        }
-
-        void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-
-            if (!damageInfo || !damageInfo->GetDamage())
-            {
-                return;
-            }
-
-            int32 heal = static_cast<int32>(damageInfo->GetDamage() / 2);
-            GetTarget()->CastCustomSpell(SPELL_DARK_HUNGER_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), true, nullptr, aurEff);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_the_lich_king_dark_hunger_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
-        return new spell_the_lich_king_dark_hunger_AuraScript();
+        PreventDefaultAction();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+        if (!damageInfo || !damageInfo->GetDamage())
+        {
+            return;
+        }
+
+        int32 heal = static_cast<int32>(damageInfo->GetDamage() / 2);
+        GetTarget()->CastCustomSpell(SPELL_DARK_HUNGER_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_the_lich_king_dark_hunger_aura::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
-class spell_the_lich_king_soul_rip : public SpellScriptLoader
+class spell_the_lich_king_soul_rip_aura : public AuraScript
 {
-public:
-    spell_the_lich_king_soul_rip() : SpellScriptLoader("spell_the_lich_king_soul_rip") { }
+    PrepareAuraScript(spell_the_lich_king_soul_rip_aura);
 
-    class spell_the_lich_king_soul_rip_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_the_lich_king_soul_rip_AuraScript);
+        return ValidateSpellInfo({ SPELL_SOUL_RIP_DAMAGE, 5000 });
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            // shouldn't be needed, this is channeled
-            if (Unit* caster = GetCaster())
-                caster->CastCustomSpell(SPELL_SOUL_RIP_DAMAGE, SPELLVALUE_BASE_POINT0, 5000 * aurEff->GetTickNumber(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_soul_rip_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_the_lich_king_soul_rip_AuraScript();
+        PreventDefaultAction();
+        // shouldn't be needed, this is channeled
+        if (Unit* caster = GetCaster())
+            caster->CastCustomSpell(SPELL_SOUL_RIP_DAMAGE, SPELLVALUE_BASE_POINT0, 5000 * aurEff->GetTickNumber(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_the_lich_king_soul_rip_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -3617,30 +3365,19 @@ public:
     }
 };
 
-class spell_the_lich_king_summon_spirit_bomb : public SpellScriptLoader
+class spell_the_lich_king_summon_spirit_bomb : public SpellScript
 {
-public:
-    spell_the_lich_king_summon_spirit_bomb() : SpellScriptLoader("spell_the_lich_king_summon_spirit_bomb") { }
+    PrepareSpellScript(spell_the_lich_king_summon_spirit_bomb);
 
-    class spell_the_lich_king_summon_spirit_bomb_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_the_lich_king_summon_spirit_bomb_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetHitUnit()->CastSpell((Unit*)nullptr, uint32(GetEffectValue()), true);
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetHitUnit()->CastSpell((Unit*)nullptr, uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_summon_spirit_bomb_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_summon_spirit_bomb_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_the_lich_king_summon_spirit_bomb::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -3701,36 +3438,25 @@ public:
     }
 };
 
-class spell_the_lich_king_trigger_vile_spirit : public SpellScriptLoader
+class spell_the_lich_king_trigger_vile_spirit : public SpellScript
 {
-public:
-    spell_the_lich_king_trigger_vile_spirit() : SpellScriptLoader("spell_the_lich_king_trigger_vile_spirit") { }
+    PrepareSpellScript(spell_the_lich_king_trigger_vile_spirit);
 
-    class spell_the_lich_king_trigger_vile_spirit_SpellScript : public SpellScript
+    void ActivateSpirit()
     {
-        PrepareSpellScript(spell_the_lich_king_trigger_vile_spirit_SpellScript);
+        Creature* target = GetHitCreature();
+        if (!target)
+            return;
 
-        void ActivateSpirit()
-        {
-            Creature* target = GetHitCreature();
-            if (!target)
-                return;
+        target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
+        target->SetImmuneToAll(false);
+        target->ForceValuesUpdateAtIndex(UNIT_FIELD_FLAGS);
+        VileSpiritActivateEvent(target).Execute(0, 0);
+    }
 
-            target->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
-            target->SetImmuneToAll(false);
-            target->ForceValuesUpdateAtIndex(UNIT_FIELD_FLAGS);
-            VileSpiritActivateEvent(target).Execute(0, 0);
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_the_lich_king_trigger_vile_spirit_SpellScript::ActivateSpirit);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_the_lich_king_trigger_vile_spirit_SpellScript();
+        OnHit += SpellHitFn(spell_the_lich_king_trigger_vile_spirit::ActivateSpirit);
     }
 };
 
@@ -3803,47 +3529,47 @@ void AddSC_boss_the_lich_king()
 {
     new boss_the_lich_king();
     new npc_tirion_fordring_tft();
-    new spell_the_lich_king_quake();
-    new spell_the_lich_king_jump();
-    new spell_the_lich_king_jump_remove_aura();
-    new spell_trigger_spell_from_caster("spell_the_lich_king_mass_resurrection", SPELL_MASS_RESURRECTION_REAL);
-    new spell_the_lich_king_play_movie();
+    RegisterSpellScript(spell_the_lich_king_quake);
+    RegisterSpellScript(spell_the_lich_king_jump);
+    RegisterSpellScript(spell_the_lich_king_jump_remove_aura);
+    RegisterSpellScriptWithArgs(spell_trigger_spell_from_caster, "spell_the_lich_king_mass_resurrection", SPELL_MASS_RESURRECTION_REAL);
+    RegisterSpellScript(spell_the_lich_king_play_movie);
 
     // fight stuff below
     new npc_shambling_horror_icc();
-    new spell_the_lich_king_infest();
-    new spell_the_lich_king_necrotic_plague();
-    new spell_the_lich_king_necrotic_plague_jump();
-    new spell_the_lich_king_shadow_trap_visual();
-    new spell_the_lich_king_shadow_trap_periodic();
-    new spell_the_lich_king_ice_burst_target_search();
+    RegisterSpellScript(spell_the_lich_king_infest_aura);
+    RegisterSpellScript(spell_the_lich_king_necrotic_plague_aura);
+    RegisterSpellAndAuraScriptPair(spell_the_lich_king_necrotic_plague_jump, spell_the_lich_king_necrotic_plague_jump_aura);
+    RegisterSpellScript(spell_the_lich_king_shadow_trap_visual_aura);
+    RegisterSpellScript(spell_the_lich_king_shadow_trap_periodic);
+    RegisterSpellScript(spell_the_lich_king_ice_burst_target_search);
     new npc_icc_ice_sphere();
-    new spell_the_lich_king_raging_spirit();
+    RegisterSpellScript(spell_the_lich_king_raging_spirit);
     new npc_raging_spirit();
-    new spell_the_lich_king_defile();
-    new spell_the_lich_king_soul_reaper();
+    RegisterSpellScript(spell_the_lich_king_defile);
+    RegisterSpellScript(spell_the_lich_king_soul_reaper_aura);
     new npc_valkyr_shadowguard();
-    new spell_the_lich_king_summon_into_air();
-    new spell_the_lich_king_teleport_to_frostmourne_hc();
-    new spell_the_lich_king_valkyr_target_search();
-    new spell_the_lich_king_cast_back_to_caster();
-    new spell_the_lich_king_life_siphon();
-    new spell_the_lich_king_vile_spirits();
-    new spell_the_lich_king_vile_spirits_visual();
-    new spell_the_lich_king_vile_spirit_move_target_search();
-    new spell_the_lich_king_vile_spirit_damage_target_search();
-    new spell_the_lich_king_harvest_soul();
+    RegisterSpellScript(spell_the_lich_king_summon_into_air);
+    RegisterSpellScript(spell_the_lich_king_teleport_to_frostmourne_hc);
+    RegisterSpellScript(spell_the_lich_king_valkyr_target_search);
+    RegisterSpellScript(spell_the_lich_king_cast_back_to_caster);
+    RegisterSpellScript(spell_the_lich_king_life_siphon);
+    RegisterSpellScript(spell_the_lich_king_vile_spirits_aura);
+    RegisterSpellScript(spell_the_lich_king_vile_spirits_visual);
+    RegisterSpellScript(spell_the_lich_king_vile_spirit_move_target_search);
+    RegisterSpellScript(spell_the_lich_king_vile_spirit_damage_target_search);
+    RegisterSpellScript(spell_the_lich_king_harvest_soul_aura);
     new npc_strangulate_vehicle();
     new npc_terenas_menethil();
-    new spell_the_lich_king_lights_favor();
-    new spell_the_lich_king_restore_soul();
+    RegisterSpellScript(spell_the_lich_king_lights_favor_aura);
+    RegisterSpellScript(spell_the_lich_king_restore_soul);
     new npc_spirit_warden();
-    new spell_the_lich_king_dark_hunger();
-    new spell_the_lich_king_soul_rip();
+    RegisterSpellScript(spell_the_lich_king_dark_hunger_aura);
+    RegisterSpellScript(spell_the_lich_king_soul_rip_aura);
     new npc_icc_lk_checktarget();
-    new spell_the_lich_king_summon_spirit_bomb();
+    RegisterSpellScript(spell_the_lich_king_summon_spirit_bomb);
     new npc_lk_spirit_bomb();
-    new spell_the_lich_king_trigger_vile_spirit();
+    RegisterSpellScript(spell_the_lich_king_trigger_vile_spirit);
     new npc_lk_wicked_spirit();
     new achievement_been_waiting_long_time();
     new achievement_neck_deep_in_vile();

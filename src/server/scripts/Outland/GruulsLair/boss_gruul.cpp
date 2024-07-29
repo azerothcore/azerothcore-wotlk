@@ -21,6 +21,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "gruuls_lair.h"
+#include "SpellAuraEffects.h"
 
 enum Yells
 {

@@ -26,9 +26,12 @@ CREATE TABLE IF NOT EXISTS `spell_cooldown_overrides` (
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.spell_cooldown_overrides: ~8 rows (approximately)
+-- Dumping data for table acore_world.spell_cooldown_overrides: ~11 rows (approximately)
 DELETE FROM `spell_cooldown_overrides`;
 INSERT INTO `spell_cooldown_overrides` (`Id`, `RecoveryTime`, `CategoryRecoveryTime`, `StartRecoveryTime`, `StartRecoveryCategory`, `Comment`) VALUES
+	(31626, 5000, 5000, 0, 0, 'Shadowy Necromancer - Unholy Frenzy'),
+	(34019, 60000, 60000, 0, 0, 'Bleeding Hollow Necrolyte - Raise Dead'),
+	(37118, 8000, 8000, 0, 0, 'Tempest-Smith - Shell Shock'),
 	(37455, 20000, 20000, 0, 0, NULL),
 	(37456, 20000, 20000, 0, 0, NULL),
 	(37471, 15000, 15000, 0, 0, 'Karazhan Chest - Heroism'),

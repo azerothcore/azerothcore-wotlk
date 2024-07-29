@@ -20,8 +20,6 @@
 
 #define DataHeader "WC"
 
-#include "CreatureAI.h"
-
 enum DataTypes
 {
     TYPE_LORD_COBRAHN           = 0,

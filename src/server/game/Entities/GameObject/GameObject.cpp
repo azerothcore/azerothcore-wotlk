@@ -20,7 +20,6 @@
 #include "CellImpl.h"
 #include "CreatureAISelector.h"
 #include "DisableMgr.h"
-#include "DynamicTree.h"
 #include "GameObjectAI.h"
 #include "GameObjectModel.h"
 #include "GameTime.h"
@@ -1921,7 +1920,7 @@ void GameObject::Use(Unit* user)
                 if (info->entry == 194097)
                     spellId = 61994;                            // Ritual of Summoning
                 else
-                    spellId = 59782;                            // Summoning Stone Effect
+                    spellId = 23598;                            // Meeting Stone Summon
 
                 break;
             }

@@ -19,7 +19,6 @@
 #define DEF_UTGARDE_KEEP_H
 
 #include "CreatureAIImpl.h"
-#include "SpellScript.h"
 
 #define UtgardeKeepScriptName "instance_utgarde_keep"
 

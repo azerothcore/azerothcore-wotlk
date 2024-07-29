@@ -616,7 +616,7 @@ enum SpellAttr6 : uint32
     SPELL_ATTR6_ALLOW_WHILE_RIDING_VEHICLE                 = 0x00001000, // TITLE Castable while caster is on vehicle
     SPELL_ATTR6_IGNORE_PHASE_SHIFT                         = 0x00002000, // TITLE Can target invisible units
     SPELL_ATTR6_AI_PRIMARY_RANGED_ATTACK                   = 0x00004000, // TITLE Unknown attribute 14@Attr6
-    SPELL_ATTR6_NO_PUSHBACK                                = 0x00008000, // TITLE Unknown attribute 15@Attr6 DESCRIPTION only 54368, 67892
+    SPELL_ATTR6_NO_PUSHBACK                                = 0x00008000, // TITLE Not affected by pushback DESCRIPTION Casts/Channels will not affected by pushback
     SPELL_ATTR6_NO_JUMP_PATHING                            = 0x00010000, // TITLE Unknown attribute 16@Attr6
     SPELL_ATTR6_ALLOW_EQUIP_WHILE_CASTING                  = 0x00020000, // TITLE Unknown attribute 17@Attr6 DESCRIPTION Mount related?
     SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER                  = 0x00040000, // TITLE Spell is cast by charmer DESCRIPTION Client will prevent casting if not possessed, charmer will be caster for all intents and purposes

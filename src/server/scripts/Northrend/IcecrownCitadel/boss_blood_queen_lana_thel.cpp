@@ -587,114 +587,81 @@ public:
 // shortened version for clear code
 typedef boss_blood_queen_lana_thel::boss_blood_queen_lana_thelAI LanaThelAI;
 
-class spell_blood_queen_pact_of_the_darkfallen_dmg : public SpellScriptLoader
+class spell_blood_queen_pact_of_the_darkfallen_dmg_aura : public AuraScript
 {
-public:
-    spell_blood_queen_pact_of_the_darkfallen_dmg() : SpellScriptLoader("spell_blood_queen_pact_of_the_darkfallen_dmg") { }
+    PrepareAuraScript(spell_blood_queen_pact_of_the_darkfallen_dmg_aura);
 
-    class spell_blood_queen_pact_of_the_darkfallen_dmg_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_blood_queen_pact_of_the_darkfallen_dmg_AuraScript);
+        return ValidateSpellInfo({ SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE });
-        }
-
-        // this is an additional effect to be executed
-        void PeriodicTick(AuraEffect const* aurEff)
-        {
-            if ((aurEff->GetTickNumber() % 2) == 0)
-                return;
-            SpellInfo const* damageSpell = sSpellMgr->AssertSpellInfo(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE);
-            int32 damage = damageSpell->Effects[EFFECT_0].CalcValue();
-            float herobonus = ((GetTarget()->FindMap() && GetTarget()->FindMap()->IsHeroic()) ? 0.2f : 0.0f);
-            float multiplier = 0.5f + herobonus + 0.1f * uint32(aurEff->GetTickNumber() / 10); // do not convert to 0.01f - we need tick number/10 as INT (damage increases every 10 ticks)
-            damage = int32(damage * multiplier);
-            GetTarget()->CastCustomSpell(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_queen_pact_of_the_darkfallen_dmg_AuraScript::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    // this is an additional effect to be executed
+    void PeriodicTick(AuraEffect const* aurEff)
     {
-        return new spell_blood_queen_pact_of_the_darkfallen_dmg_AuraScript();
+        if ((aurEff->GetTickNumber() % 2) == 0)
+            return;
+        SpellInfo const* damageSpell = sSpellMgr->AssertSpellInfo(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE);
+        int32 damage = damageSpell->Effects[EFFECT_0].CalcValue();
+        float herobonus = ((GetTarget()->FindMap() && GetTarget()->FindMap()->IsHeroic()) ? 0.2f : 0.0f);
+        float multiplier = 0.5f + herobonus + 0.1f * uint32(aurEff->GetTickNumber() / 10); // do not convert to 0.01f - we need tick number/10 as INT (damage increases every 10 ticks)
+        damage = int32(damage * multiplier);
+        GetTarget()->CastCustomSpell(SPELL_PACT_OF_THE_DARKFALLEN_DAMAGE, SPELLVALUE_BASE_POINT0, damage, GetTarget(), true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_blood_queen_pact_of_the_darkfallen_dmg_aura::PeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_blood_queen_pact_of_the_darkfallen : public SpellScriptLoader
+class spell_blood_queen_pact_of_the_darkfallen : public SpellScript
 {
-public:
-    spell_blood_queen_pact_of_the_darkfallen() : SpellScriptLoader("spell_blood_queen_pact_of_the_darkfallen") { }
+    PrepareSpellScript(spell_blood_queen_pact_of_the_darkfallen);
 
-    class spell_blood_queen_pact_of_the_darkfallen_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_blood_queen_pact_of_the_darkfallen_SpellScript);
+        targets.remove_if(Acore::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        bool remove = true;
+        std::list<WorldObject*>::const_iterator itr, itr2, itrEnd = targets.end();
+        for (itr = targets.begin(); itr != itrEnd && remove; ++itr)
         {
-            targets.remove_if(Acore::UnitAuraCheck(false, SPELL_PACT_OF_THE_DARKFALLEN));
+            if (GetCaster()->GetExactDist2d(*itr) > 5.0f)
+                remove = false;
 
-            bool remove = true;
-            std::list<WorldObject*>::const_iterator itr, itr2, itrEnd = targets.end();
-            for (itr = targets.begin(); itr != itrEnd && remove; ++itr)
-            {
-                if (GetCaster()->GetExactDist2d(*itr) > 5.0f)
+            for (itr2 = targets.begin(); itr2 != itrEnd && remove; ++itr2)
+                if (itr != itr2 && (*itr2)->GetExactDist2d(*itr) > 5.0f)
                     remove = false;
+        }
 
-                for (itr2 = targets.begin(); itr2 != itrEnd && remove; ++itr2)
-                    if (itr != itr2 && (*itr2)->GetExactDist2d(*itr) > 5.0f)
-                        remove = false;
+        if (remove)
+            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            {
+                targets.clear();
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PACT_OF_THE_DARKFALLEN);
             }
+    }
 
-            if (remove)
-                if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                {
-                    targets.clear();
-                    instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PACT_OF_THE_DARKFALLEN);
-                }
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_pact_of_the_darkfallen_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_queen_pact_of_the_darkfallen_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_pact_of_the_darkfallen::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
     }
 };
 
-class spell_blood_queen_pact_of_the_darkfallen_dmg_target : public SpellScriptLoader
+class spell_blood_queen_pact_of_the_darkfallen_dmg_target : public SpellScript
 {
-public:
-    spell_blood_queen_pact_of_the_darkfallen_dmg_target() : SpellScriptLoader("spell_blood_queen_pact_of_the_darkfallen_dmg_target") { }
+    PrepareSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_target);
 
-    class spell_blood_queen_pact_of_the_darkfallen_dmg_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        PrepareSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_SpellScript);
+        unitList.remove_if(Acore::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
+        unitList.push_back(GetCaster());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            unitList.remove_if(Acore::UnitAuraCheck(true, SPELL_PACT_OF_THE_DARKFALLEN));
-            unitList.push_back(GetCaster());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_pact_of_the_darkfallen_dmg_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_queen_pact_of_the_darkfallen_dmg_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_pact_of_the_darkfallen_dmg_target::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ALLY);
     }
 };
 
@@ -712,283 +679,222 @@ private:
     LanaThelAI* _ai;
 };
 
-class spell_blood_queen_bloodbolt : public SpellScriptLoader
+class spell_blood_queen_bloodbolt : public SpellScript
 {
-public:
-    spell_blood_queen_bloodbolt() : SpellScriptLoader("spell_blood_queen_bloodbolt") { }
+    PrepareSpellScript(spell_blood_queen_bloodbolt);
 
-    class spell_blood_queen_bloodbolt_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_blood_queen_bloodbolt_SpellScript);
+        return ValidateSpellInfo({ SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL });
-        }
-
-        bool Load() override
-        {
-            return GetCaster()->GetEntry() == NPC_BLOOD_QUEEN_LANA_THEL;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            uint32 targetCount = (targets.size() + 2) / 3;
-            targets.remove_if(BloodboltHitCheck(static_cast<LanaThelAI*>(GetCaster()->GetAI())));
-            Acore::Containers::RandomResize(targets, targetCount);
-            // mark targets now, effect hook has missile travel time delay (might cast next in that time)
-            for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
-                GetCaster()->GetAI()->SetGUID((*itr)->GetGUID(), GUID_BLOODBOLT);
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetHitUnit(), SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_bloodbolt_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_blood_queen_bloodbolt_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_blood_queen_bloodbolt_SpellScript();
+        return GetCaster()->GetEntry() == NPC_BLOOD_QUEEN_LANA_THEL;
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        uint32 targetCount = (targets.size() + 2) / 3;
+        targets.remove_if(BloodboltHitCheck(static_cast<LanaThelAI*>(GetCaster()->GetAI())));
+        Acore::Containers::RandomResize(targets, targetCount);
+        // mark targets now, effect hook has missile travel time delay (might cast next in that time)
+        for (std::list<WorldObject*>::const_iterator itr = targets.begin(); itr != targets.end(); ++itr)
+            GetCaster()->GetAI()->SetGUID((*itr)->GetGUID(), GUID_BLOODBOLT);
+    }
+
+    void HandleScript(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_TWILIGHT_BLOODBOLT_FROM_WHIRL, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_bloodbolt::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_blood_queen_bloodbolt::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_blood_queen_frenzied_bloodthirst : public SpellScriptLoader
+class spell_blood_queen_frenzied_bloodthirst_aura : public AuraScript
 {
-public:
-    spell_blood_queen_frenzied_bloodthirst() : SpellScriptLoader("spell_blood_queen_frenzied_bloodthirst") { }
+    PrepareAuraScript(spell_blood_queen_frenzied_bloodthirst_aura);
 
-    class spell_blood_queen_frenzied_bloodthirst_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_blood_queen_frenzied_bloodthirst_AuraScript);
+        return ValidateSpellInfo({ SPELL_UNCONTROLLABLE_FRENZY });
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
-                    bloodQueen->AI()->Talk(EMOTE_BLOODTHIRST, GetTarget());
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                if (InstanceScript* instance = target->GetInstanceScript())
-                    if (Creature* bloodQueen = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
-                        if (bloodQueen->IsAlive() && bloodQueen->IsInCombat())
-                        {
-                            // this needs to be done BEFORE charm aura or we hit an assert in Unit::SetCharmedBy
-                            if (target->GetVehicleKit())
-                                target->RemoveVehicleKit();
-
-                            bloodQueen->AI()->Talk(SAY_MIND_CONTROL);
-                            bloodQueen->CastSpell(target, SPELL_UNCONTROLLABLE_FRENZY, true);
-                        }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_blood_queen_frenzied_bloodthirst_AuraScript::OnApply, EFFECT_0, SPELL_AURA_OVERRIDE_SPELLS, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_blood_queen_frenzied_bloodthirst_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_OVERRIDE_SPELLS, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_blood_queen_frenzied_bloodthirst_AuraScript();
+        if (InstanceScript* instance = GetTarget()->GetInstanceScript())
+            if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetTarget(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
+                bloodQueen->AI()->Talk(EMOTE_BLOODTHIRST, GetTarget());
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            if (InstanceScript* instance = target->GetInstanceScript())
+                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*target, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
+                    if (bloodQueen->IsAlive() && bloodQueen->IsInCombat())
+                    {
+                        // this needs to be done BEFORE charm aura or we hit an assert in Unit::SetCharmedBy
+                        if (target->GetVehicleKit())
+                            target->RemoveVehicleKit();
+
+                        bloodQueen->AI()->Talk(SAY_MIND_CONTROL);
+                        bloodQueen->CastSpell(target, SPELL_UNCONTROLLABLE_FRENZY, true);
+                    }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_blood_queen_frenzied_bloodthirst_aura::OnApply, EFFECT_0, SPELL_AURA_OVERRIDE_SPELLS, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_blood_queen_frenzied_bloodthirst_aura::OnRemove, EFFECT_0, SPELL_AURA_OVERRIDE_SPELLS, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_blood_queen_essence_of_the_blood_queen : public SpellScriptLoader
+class spell_blood_queen_essence_of_the_blood_queen_aura : public AuraScript
 {
-public:
-    spell_blood_queen_essence_of_the_blood_queen() : SpellScriptLoader("spell_blood_queen_essence_of_the_blood_queen") { }
+    PrepareAuraScript(spell_blood_queen_essence_of_the_blood_queen_aura);
 
-    class spell_blood_queen_essence_of_the_blood_queen_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_blood_queen_essence_of_the_blood_queen_AuraScript);
+        return ValidateSpellInfo({ SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
+    void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+
+        if (!damageInfo || !damageInfo->GetDamage())
         {
-            return ValidateSpellInfo({ SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL });
+            return;
         }
 
-        void OnProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
+        int32 heal = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
+        GetTarget()->CastCustomSpell(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), TRIGGERED_FULL_MASK, nullptr, aurEff);
+    }
 
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_blood_queen_essence_of_the_blood_queen_aura::OnProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
 
-            if (!damageInfo || !damageInfo->GetDamage())
+class spell_blood_queen_vampiric_bite : public SpellScript
+{
+    PrepareSpellScript(spell_blood_queen_vampiric_bite);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo(
             {
-                return;
-            }
-
-            int32 heal = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
-            GetTarget()->CastCustomSpell(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_HEAL, SPELLVALUE_BASE_POINT0, heal, GetTarget(), TRIGGERED_FULL_MASK, nullptr, aurEff);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_blood_queen_essence_of_the_blood_queen_AuraScript::OnProc, EFFECT_1, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_blood_queen_essence_of_the_blood_queen_AuraScript();
+                SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR,
+                SPELL_FRENZIED_BLOODTHIRST,
+                SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY
+            });
     }
-};
 
-class spell_blood_queen_vampiric_bite : public SpellScriptLoader
-{
-public:
-    spell_blood_queen_vampiric_bite() : SpellScriptLoader("spell_blood_queen_vampiric_bite") { }
-
-    class spell_blood_queen_vampiric_bite_SpellScript : public SpellScript
+    SpellCastResult CheckTarget()
     {
-        PrepareSpellScript(spell_blood_queen_vampiric_bite_SpellScript);
-
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo(
-                {
-                    SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR,
-                    SPELL_FRENZIED_BLOODTHIRST,
-                    SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY
-                });
-        }
-
-        SpellCastResult CheckTarget()
-        {
-            if (GetExplTargetUnit()->GetMapId() != 631)
-                return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-            if (IsVampire(GetExplTargetUnit()))
-            {
-                SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_CANT_TARGET_VAMPIRES);
-                return SPELL_FAILED_CUSTOM_ERROR;
-            }
-            if (InstanceScript* instance = GetExplTargetUnit()->GetInstanceScript())
-                if (instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == IN_PROGRESS)
-                    return SPELL_CAST_OK;
-
+        if (GetExplTargetUnit()->GetMapId() != 631)
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
-        }
-
-        void OnCast(SpellMissInfo missInfo)
+        if (IsVampire(GetExplTargetUnit()))
         {
-            if (missInfo != SPELL_MISS_NONE)
-            {
-                return;
-            }
-
-            if (GetCaster()->GetTypeId() != TYPEID_PLAYER || GetCaster()->GetMapId() != 631)
-                return;
-            InstanceScript* instance = GetCaster()->GetInstanceScript();
-            if (!instance || instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != IN_PROGRESS)
-                return;
-
-            uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
-            GetCaster()->RemoveAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
-            GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, TRIGGERED_FULL_MASK);
-
-            if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))
-            {
-                if (aura->GetStackAmount() == 3)
-                {
-                    GetCaster()->CastSpell(GetCaster(), SPELL_THIRST_QUENCHED, TRIGGERED_FULL_MASK);
-                    GetCaster()->RemoveAura(aura);
-                }
-                else
-                    GetCaster()->CastSpell(GetCaster(), SPELL_GUSHING_WOUND, TRIGGERED_FULL_MASK);
-            }
-
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
-                    bloodQueen->AI()->SetGUID(GetHitUnit()->GetGUID(), GUID_VAMPIRE);
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_CANT_TARGET_VAMPIRES);
+            return SPELL_FAILED_CUSTOM_ERROR;
         }
+        if (InstanceScript* instance = GetExplTargetUnit()->GetInstanceScript())
+            if (instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) == IN_PROGRESS)
+                return SPELL_CAST_OK;
 
-        void HandlePresence(SpellEffIndex /*effIndex*/)
-        {
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY, TRIGGERED_FULL_MASK);
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PRESENCE_OF_THE_DARKFALLEN_SE, TRIGGERED_FULL_MASK);
-        }
+        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+    }
 
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_blood_queen_vampiric_bite_SpellScript::CheckTarget);
-            BeforeHit += BeforeSpellHitFn(spell_blood_queen_vampiric_bite_SpellScript::OnCast);
-            OnEffectHitTarget += SpellEffectFn(spell_blood_queen_vampiric_bite_SpellScript::HandlePresence, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void OnCast(SpellMissInfo missInfo)
     {
-        return new spell_blood_queen_vampiric_bite_SpellScript();
+        if (missInfo != SPELL_MISS_NONE)
+        {
+            return;
+        }
+
+        if (GetCaster()->GetTypeId() != TYPEID_PLAYER || GetCaster()->GetMapId() != 631)
+            return;
+        InstanceScript* instance = GetCaster()->GetInstanceScript();
+        if (!instance || instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != IN_PROGRESS)
+            return;
+
+        uint32 spellId = sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, GetCaster());
+        GetCaster()->RemoveAura(spellId, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
+        GetCaster()->CastSpell(GetCaster(), SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, TRIGGERED_FULL_MASK);
+
+        if (Aura* aura = GetCaster()->GetAura(SPELL_GUSHING_WOUND))
+        {
+            if (aura->GetStackAmount() == 3)
+            {
+                GetCaster()->CastSpell(GetCaster(), SPELL_THIRST_QUENCHED, TRIGGERED_FULL_MASK);
+                GetCaster()->RemoveAura(aura);
+            }
+            else
+                GetCaster()->CastSpell(GetCaster(), SPELL_GUSHING_WOUND, TRIGGERED_FULL_MASK);
+        }
+
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            if (Creature* bloodQueen = ObjectAccessor::GetCreature(*GetCaster(), instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL)))
+                bloodQueen->AI()->SetGUID(GetHitUnit()->GetGUID(), GUID_VAMPIRE);
+    }
+
+    void HandlePresence(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PRESENCE_OF_THE_DARKFALLEN_DUMMY, TRIGGERED_FULL_MASK);
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_PRESENCE_OF_THE_DARKFALLEN_SE, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_blood_queen_vampiric_bite::CheckTarget);
+        BeforeHit += BeforeSpellHitFn(spell_blood_queen_vampiric_bite::OnCast);
+        OnEffectHitTarget += SpellEffectFn(spell_blood_queen_vampiric_bite::HandlePresence, EFFECT_1, SPELL_EFFECT_TRIGGER_SPELL);
     }
 };
 
-class spell_blood_queen_swarming_shadows_floor_dmg : public SpellScriptLoader
+class spell_blood_queen_swarming_shadows_floor_dmg : public SpellScript
 {
-public:
-    spell_blood_queen_swarming_shadows_floor_dmg() : SpellScriptLoader("spell_blood_queen_swarming_shadows_floor_dmg") { }
+    PrepareSpellScript(spell_blood_queen_swarming_shadows_floor_dmg);
 
-    class spell_blood_queen_swarming_shadows_floor_dmg_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_blood_queen_swarming_shadows_floor_dmg_SpellScript);
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), GetSpellInfo()->Effects[0].CalcRadius(), true));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_swarming_shadows_floor_dmg_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_queen_swarming_shadows_floor_dmg_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_blood_queen_swarming_shadows_floor_dmg::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_blood_queen_presence_of_the_darkfallen : public SpellScriptLoader
+class spell_blood_queen_presence_of_the_darkfallen : public SpellScript
 {
-public:
-    spell_blood_queen_presence_of_the_darkfallen() : SpellScriptLoader("spell_blood_queen_presence_of_the_darkfallen") { }
+    PrepareSpellScript(spell_blood_queen_presence_of_the_darkfallen);
 
-    class spell_blood_queen_presence_of_the_darkfallen_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_blood_queen_presence_of_the_darkfallen_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit())
+            return;
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit())
-                return;
+        if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
+            GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL));
+    }
 
-            if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_BLOOD_QUEEN_LANA_THEL));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_blood_queen_presence_of_the_darkfallen_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_blood_queen_presence_of_the_darkfallen_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_blood_queen_presence_of_the_darkfallen::HandleScript, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
@@ -1014,15 +920,15 @@ public:
 void AddSC_boss_blood_queen_lana_thel()
 {
     new boss_blood_queen_lana_thel();
-    new spell_blood_queen_pact_of_the_darkfallen_dmg();
-    new spell_blood_queen_pact_of_the_darkfallen();
-    new spell_blood_queen_pact_of_the_darkfallen_dmg_target();
-    new spell_blood_queen_bloodbolt();
-    new spell_blood_queen_frenzied_bloodthirst();
-    new spell_blood_queen_essence_of_the_blood_queen();
-    new spell_blood_queen_vampiric_bite();
-    new spell_blood_queen_swarming_shadows_floor_dmg();
-    new spell_blood_queen_presence_of_the_darkfallen();
+    RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_aura);
+    RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen);
+    RegisterSpellScript(spell_blood_queen_pact_of_the_darkfallen_dmg_target);
+    RegisterSpellScript(spell_blood_queen_bloodbolt);
+    RegisterSpellScript(spell_blood_queen_frenzied_bloodthirst_aura);
+    RegisterSpellScript(spell_blood_queen_essence_of_the_blood_queen_aura);
+    RegisterSpellScript(spell_blood_queen_vampiric_bite);
+    RegisterSpellScript(spell_blood_queen_swarming_shadows_floor_dmg);
+    RegisterSpellScript(spell_blood_queen_presence_of_the_darkfallen);
     new achievement_once_bitten_twice_shy("achievement_once_bitten_twice_shy_n_10", 0, false);
     new achievement_once_bitten_twice_shy("achievement_once_bitten_twice_shy_v_10", 0, true);
     new achievement_once_bitten_twice_shy("achievement_once_bitten_twice_shy_n_25", 1, false);
