@@ -767,79 +767,69 @@ public:
     }
 };
 
-class spell_sindragosa_s_fury : public SpellScriptLoader
+class spell_sindragosa_s_fury : public SpellScript
 {
-public:
-    spell_sindragosa_s_fury() : SpellScriptLoader("spell_sindragosa_s_fury") { }
+    PrepareSpellScript(spell_sindragosa_s_fury);
 
-    class spell_sindragosa_s_fury_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_sindragosa_s_fury_SpellScript);
+        _targetCount = 0;
 
-        bool Load() override
-        {
-            _targetCount = 0;
+        // This script should execute only in Icecrown Citadel
+        if (InstanceMap* instance = GetCaster()->GetMap()->ToInstanceMap())
+            if (instance->GetInstanceScript())
+                if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
+                    return true;
 
-            // This script should execute only in Icecrown Citadel
-            if (InstanceMap* instance = GetCaster()->GetMap()->ToInstanceMap())
-                if (instance->GetInstanceScript())
-                    if (instance->GetScriptId() == sObjectMgr->GetScriptId(ICCScriptName))
-                        return true;
-
-            return false;
-        }
-
-        void SelectDest()
-        {
-            if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
-            {
-                float destX = float(rand_norm()) * 75.0f + 4350.0f;
-                float destY = float(rand_norm()) * 75.0f + 2450.0f;
-                float destZ = 205.0f; // random number close to ground, get exact in next call
-                GetCaster()->UpdateGroundPositionZ(destX, destY, destZ);
-                dest->Relocate(destX, destY, destZ);
-            }
-        }
-
-        void CountTargets(std::list<WorldObject*>& targets)
-        {
-            _targetCount = targets.size();
-        }
-
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-
-            if (!GetHitUnit()->IsAlive() || (GetHitUnit()->GetTypeId() == TYPEID_PLAYER && GetHitUnit()->ToPlayer()->IsGameMaster()) || !_targetCount)
-                return;
-
-            float resistance = float(GetHitUnit()->GetResistance(SpellSchoolMask(GetSpellInfo()->SchoolMask)));
-            float ResistFactor = ((resistance * 2.0f) / (resistance + 510.0f));
-            if (ResistFactor > 0.9f)
-                ResistFactor = 0.9f;
-
-            uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
-
-            SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
-            damageInfo.damage = damage;
-            GetCaster()->SendSpellNonMeleeDamageLog(&damageInfo);
-            GetCaster()->DealSpellDamage(&damageInfo, false);
-        }
-
-        void Register() override
-        {
-            BeforeCast += SpellCastFn(spell_sindragosa_s_fury_SpellScript::SelectDest);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_s_fury_SpellScript::CountTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_sindragosa_s_fury_SpellScript::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
-        }
-
-        uint32 _targetCount;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_sindragosa_s_fury_SpellScript();
+        return false;
     }
+
+    void SelectDest()
+    {
+        if (Position* dest = const_cast<WorldLocation*>(GetExplTargetDest()))
+        {
+            float destX = float(rand_norm()) * 75.0f + 4350.0f;
+            float destY = float(rand_norm()) * 75.0f + 2450.0f;
+            float destZ = 205.0f; // random number close to ground, get exact in next call
+            GetCaster()->UpdateGroundPositionZ(destX, destY, destZ);
+            dest->Relocate(destX, destY, destZ);
+        }
+    }
+
+    void CountTargets(std::list<WorldObject*>& targets)
+    {
+        _targetCount = targets.size();
+    }
+
+    void HandleDummy(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        if (!GetHitUnit()->IsAlive() || (GetHitUnit()->GetTypeId() == TYPEID_PLAYER && GetHitUnit()->ToPlayer()->IsGameMaster()) || !_targetCount)
+            return;
+
+        float resistance = float(GetHitUnit()->GetResistance(SpellSchoolMask(GetSpellInfo()->SchoolMask)));
+        float ResistFactor = ((resistance * 2.0f) / (resistance + 510.0f));
+        if (ResistFactor > 0.9f)
+            ResistFactor = 0.9f;
+
+        uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
+
+        SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
+        damageInfo.damage = damage;
+        GetCaster()->SendSpellNonMeleeDamageLog(&damageInfo);
+        GetCaster()->DealSpellDamage(&damageInfo, false);
+    }
+
+    void Register() override
+    {
+        BeforeCast += SpellCastFn(spell_sindragosa_s_fury::SelectDest);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_s_fury::CountTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_sindragosa_s_fury::HandleDummy, EFFECT_1, SPELL_EFFECT_DUMMY);
+    }
+
+private:
+    uint32 _targetCount;
 };
 
 class UnchainedMagicTargetSelector
@@ -895,170 +885,115 @@ class spell_sindragosa_unchained_magic : public SpellScript
     }
 };
 
-class spell_sindragosa_permeating_chill : public SpellScriptLoader
+class spell_sindragosa_permeating_chill_aura : public AuraScript
 {
-public:
-    spell_sindragosa_permeating_chill() : SpellScriptLoader("spell_sindragosa_permeating_chill") { }
+    PrepareAuraScript(spell_sindragosa_permeating_chill_aura);
 
-    class spell_sindragosa_permeating_chill_AuraScript : public AuraScript
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        PrepareAuraScript(spell_sindragosa_permeating_chill_AuraScript);
+        return eventInfo.GetProcTarget() && eventInfo.GetProcTarget()->GetEntry() == NPC_SINDRAGOSA;
+    }
 
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            return eventInfo.GetProcTarget() && eventInfo.GetProcTarget()->GetEntry() == NPC_SINDRAGOSA;
-        }
-
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_sindragosa_permeating_chill_AuraScript::CheckProc);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_sindragosa_permeating_chill_AuraScript();
+        DoCheckProc += AuraCheckProcFn(spell_sindragosa_permeating_chill_aura::CheckProc);
     }
 };
 
-class spell_sindragosa_instability : public SpellScriptLoader
+class spell_sindragosa_instability_aura : public AuraScript
 {
-public:
-    spell_sindragosa_instability() : SpellScriptLoader("spell_sindragosa_instability") { }
+    PrepareAuraScript(spell_sindragosa_instability_aura);
 
-    class spell_sindragosa_instability_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_sindragosa_instability_AuraScript);
+        return ValidateSpellInfo({ SPELL_BACKLASH });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_BACKLASH });
-        }
-
-        void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
-                GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_sindragosa_instability_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_sindragosa_instability_AuraScript();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE)
+            GetTarget()->CastCustomSpell(SPELL_BACKLASH, SPELLVALUE_BASE_POINT0, aurEff->GetAmount(), GetTarget(), true, nullptr, aurEff, GetCasterGUID());
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_sindragosa_instability_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_sindragosa_icy_grip : public SpellScriptLoader
+class spell_sindragosa_icy_grip : public SpellScript
 {
-public:
-    spell_sindragosa_icy_grip() : SpellScriptLoader("spell_sindragosa_icy_grip") { }
+    PrepareSpellScript(spell_sindragosa_icy_grip);
 
-    class spell_sindragosa_icy_grip_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_sindragosa_icy_grip_SpellScript);
+        return ValidateSpellInfo({ SPELL_ICY_GRIP_JUMP });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ICY_GRIP_JUMP });
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit()->IsWithinLOSInMap(GetCaster()) || GetHitUnit()->HasAura(SPELL_TANK_MARKER_AURA))
-                return;
-
-            GetHitUnit()->CastSpell(GetCaster(), SPELL_ICY_GRIP_JUMP, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_sindragosa_icy_grip_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_sindragosa_icy_grip_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit()->IsWithinLOSInMap(GetCaster()) || GetHitUnit()->HasAura(SPELL_TANK_MARKER_AURA))
+            return;
+
+        GetHitUnit()->CastSpell(GetCaster(), SPELL_ICY_GRIP_JUMP, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_sindragosa_icy_grip::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_sindragosa_icy_grip_jump : public SpellScriptLoader
+class spell_sindragosa_icy_grip_jump : public SpellScript
 {
-public:
-    spell_sindragosa_icy_grip_jump() : SpellScriptLoader("spell_sindragosa_icy_grip_jump") { }
+    PrepareSpellScript(spell_sindragosa_icy_grip_jump);
 
-    class spell_sindragosa_icy_grip_jump_SpellScript : public SpellScript
+    void HandleSpecial(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_sindragosa_icy_grip_jump_SpellScript);
+        PreventHitDefaultEffect(effIndex);
 
-        void HandleSpecial(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
+        float x = GetHitUnit()->GetPositionX();
+        float y = GetHitUnit()->GetPositionY();
+        float z = GetHitUnit()->GetPositionZ() + 0.1f;
+        float speedXY, speedZ;
 
-            float x = GetHitUnit()->GetPositionX();
-            float y = GetHitUnit()->GetPositionY();
-            float z = GetHitUnit()->GetPositionZ() + 0.1f;
-            float speedXY, speedZ;
+        if (GetSpellInfo()->Effects[effIndex].MiscValue)
+            speedZ = float(GetSpellInfo()->Effects[effIndex].MiscValue) / 10;
+        else if (GetSpellInfo()->Effects[effIndex].MiscValueB)
+            speedZ = float(GetSpellInfo()->Effects[effIndex].MiscValueB) / 10;
+        else
+            speedZ = 10.0f;
+        speedXY = GetCaster()->GetExactDist2d(x, y) * 10.0f / speedZ;
 
-            if (GetSpellInfo()->Effects[effIndex].MiscValue)
-                speedZ = float(GetSpellInfo()->Effects[effIndex].MiscValue) / 10;
-            else if (GetSpellInfo()->Effects[effIndex].MiscValueB)
-                speedZ = float(GetSpellInfo()->Effects[effIndex].MiscValueB) / 10;
-            else
-                speedZ = 10.0f;
-            speedXY = GetCaster()->GetExactDist2d(x, y) * 10.0f / speedZ;
+        GetCaster()->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
+    }
 
-            GetCaster()->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunchTarget += SpellEffectFn(spell_sindragosa_icy_grip_jump_SpellScript::HandleSpecial, EFFECT_0, SPELL_EFFECT_JUMP);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_sindragosa_icy_grip_jump_SpellScript();
+        OnEffectLaunchTarget += SpellEffectFn(spell_sindragosa_icy_grip_jump::HandleSpecial, EFFECT_0, SPELL_EFFECT_JUMP);
     }
 };
 
-class spell_sindragosa_frost_beacon : public SpellScriptLoader
+class spell_sindragosa_frost_beacon_aura : public AuraScript
 {
-public:
-    spell_sindragosa_frost_beacon() : SpellScriptLoader("spell_sindragosa_frost_beacon") { }
+    PrepareAuraScript(spell_sindragosa_frost_beacon_aura);
 
-    class spell_sindragosa_frost_beacon_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareAuraScript(spell_sindragosa_frost_beacon_AuraScript);
+        return ValidateSpellInfo({ SPELL_ICE_TOMB_DAMAGE });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ICE_TOMB_DAMAGE });
-        }
-
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(GetTarget(), SPELL_ICE_TOMB_DAMAGE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_frost_beacon_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
     {
-        return new spell_sindragosa_frost_beacon_AuraScript();
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(GetTarget(), SPELL_ICE_TOMB_DAMAGE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_frost_beacon_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1076,109 +1011,88 @@ public:
     }
 };
 
-class spell_sindragosa_ice_tomb_filter : public SpellScriptLoader
+class spell_sindragosa_ice_tomb_filter : public SpellScript
 {
-public:
-    spell_sindragosa_ice_tomb_filter() : SpellScriptLoader("spell_sindragosa_ice_tomb_filter") { }
+    PrepareSpellScript(spell_sindragosa_ice_tomb_filter);
 
-    class spell_sindragosa_ice_tomb_filter_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        PrepareSpellScript(spell_sindragosa_ice_tomb_filter_SpellScript);
+        unitList.remove_if(SindragosaIceTombCheck());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            unitList.remove_if(SindragosaIceTombCheck());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_filter_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_sindragosa_ice_tomb_filter_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_filter::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_sindragosa_ice_tomb : public SpellScriptLoader
+class spell_sindragosa_ice_tomb_trap : public SpellScript
 {
-public:
-    spell_sindragosa_ice_tomb() : SpellScriptLoader("spell_sindragosa_ice_tomb_trap") { }
+    PrepareSpellScript(spell_sindragosa_ice_tomb_trap);
 
-    class spell_sindragosa_ice_tomb_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_sindragosa_ice_tomb_SpellScript);
-
-        std::list<WorldObject*> targetList;
-
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            if (!sObjectMgr->GetCreatureTemplate(NPC_ICE_TOMB))
-                return false;
-            if (!sObjectMgr->GetGameObjectTemplate(GO_ICE_BLOCK))
-                return false;
-            return true;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            unitList.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
-            targetList.clear();
-            targetList = unitList;
-        }
-
-        void FilterTargetsSubseq(std::list<WorldObject*>& unitList)
-        {
-            unitList.clear();
-            unitList = targetList;
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_SpellScript::FilterTargetsSubseq, EFFECT_2, TARGET_UNIT_DEST_AREA_ENEMY);
-        }
-    };
-
-    class spell_sindragosa_ice_tomb_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_sindragosa_ice_tomb_AuraScript);
-
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-        }
-
-        void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* c = GetCaster())
-                GetTarget()->m_Events.AddEvent(new IceTombSummonEvent(GetTarget(), c->GetGUID()), GetTarget()->m_Events.CalculateTime(500));
-        }
-
-        void ExtraRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetTarget()->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
-            GetTarget()->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_ice_tomb_AuraScript::PeriodicTick, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_sindragosa_ice_tomb_AuraScript::ExtraRemoveEffect, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectApply += AuraEffectApplyFn(spell_sindragosa_ice_tomb_AuraScript::AfterApply, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_sindragosa_ice_tomb_SpellScript();
+        if (!sObjectMgr->GetCreatureTemplate(NPC_ICE_TOMB))
+            return false;
+        if (!sObjectMgr->GetGameObjectTemplate(GO_ICE_BLOCK))
+            return false;
+        return true;
     }
 
-    AuraScript* GetAuraScript() const override
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        return new spell_sindragosa_ice_tomb_AuraScript();
+        unitList.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
+        _targetList.clear();
+        _targetList = unitList;
+    }
+
+    void FilterTargetsSubseq(std::list<WorldObject*>& unitList)
+    {
+        unitList.clear();
+        unitList = _targetList;
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_trap::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_ice_tomb_trap::FilterTargetsSubseq, EFFECT_2, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
+
+private:
+    std::list<WorldObject*> _targetList;
+};
+
+class spell_sindragosa_ice_tomb_trap_aura : public AuraScript
+{
+    PrepareAuraScript(spell_sindragosa_ice_tomb_trap_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ASPHYXIATION, SPELL_ICE_TOMB_UNTARGETABLE });
+    }
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+    }
+
+    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* c = GetCaster())
+            GetTarget()->m_Events.AddEvent(new IceTombSummonEvent(GetTarget(), c->GetGUID()), GetTarget()->m_Events.CalculateTime(500));
+    }
+
+    void ExtraRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
+        GetTarget()->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_ice_tomb_trap_aura::PeriodicTick, EFFECT_2, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_sindragosa_ice_tomb_trap_aura::ExtraRemoveEffect, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_sindragosa_ice_tomb_trap_aura::AfterApply, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1208,63 +1122,46 @@ private:
     Unit* _caster;
 };
 
-class spell_sindragosa_mystic_buffet : public SpellScriptLoader
+class spell_sindragosa_mystic_buffet : public SpellScript
 {
-public:
-    spell_sindragosa_mystic_buffet() : SpellScriptLoader("spell_sindragosa_mystic_buffet") { }
+    PrepareSpellScript(spell_sindragosa_mystic_buffet);
 
-    class spell_sindragosa_mystic_buffet_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_sindragosa_mystic_buffet_SpellScript);
+        targets.remove_if(MysticBuffetTargetFilter(GetCaster()));
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(MysticBuffetTargetFilter(GetCaster()));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_mystic_buffet_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_sindragosa_mystic_buffet_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sindragosa_mystic_buffet::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
-class spell_sindragosa_soul_preservation : public SpellScriptLoader
+class spell_sindragosa_soul_preservation_aura : public AuraScript
 {
-public:
-    spell_sindragosa_soul_preservation() : SpellScriptLoader("spell_sindragosa_soul_preservation") { }
+    PrepareAuraScript(spell_sindragosa_soul_preservation_aura);
 
-    class spell_sindragosa_soul_preservation_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_sindragosa_soul_preservation_AuraScript);
+        return ValidateSpellInfo({ 72466, 72424 });
+    }
 
-        void PeriodicTick(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* s = GetTarget())
-                if (GetStackAmount() >= (s->GetMap()->Is25ManRaid() ? 75 : 30))
-                {
-                    s->CastSpell(s, 72466, true);
-                    s->RemoveAurasDueToSpell(72424);
-                    if (s->GetTypeId() == TYPEID_UNIT) s->ToCreature()->SetLootMode(3);
-                    SetDuration(1);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_soul_preservation_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void PeriodicTick(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_sindragosa_soul_preservation_AuraScript();
+        PreventDefaultAction();
+        if (Unit* s = GetTarget())
+            if (GetStackAmount() >= (s->GetMap()->Is25ManRaid() ? 75 : 30))
+            {
+                s->CastSpell(s, 72466, true);
+                s->RemoveAurasDueToSpell(72424);
+                if (s->GetTypeId() == TYPEID_UNIT) s->ToCreature()->SetLootMode(3);
+                SetDuration(1);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_sindragosa_soul_preservation_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1597,37 +1494,26 @@ public:
     }
 };
 
-class spell_rimefang_icy_blast : public SpellScriptLoader
+class spell_rimefang_icy_blast : public SpellScript
 {
-public:
-    spell_rimefang_icy_blast() : SpellScriptLoader("spell_rimefang_icy_blast") { }
+    PrepareSpellScript(spell_rimefang_icy_blast);
 
-    class spell_rimefang_icy_blast_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_rimefang_icy_blast_SpellScript);
+        return ValidateSpellInfo({ SPELL_ICY_BLAST_AREA });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_ICY_BLAST_AREA });
-        }
-
-        void HandleTriggerMissile(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Position const* pos = GetExplTargetDest())
-                if (TempSummon* summon = GetCaster()->SummonCreature(NPC_ICY_BLAST, *pos, TEMPSUMMON_TIMED_DESPAWN, 40000))
-                    summon->CastSpell(summon, SPELL_ICY_BLAST_AREA, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_rimefang_icy_blast_SpellScript::HandleTriggerMissile, EFFECT_1, SPELL_EFFECT_TRIGGER_MISSILE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleTriggerMissile(SpellEffIndex effIndex)
     {
-        return new spell_rimefang_icy_blast_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Position const* pos = GetExplTargetDest())
+            if (TempSummon* summon = GetCaster()->SummonCreature(NPC_ICY_BLAST, *pos, TEMPSUMMON_TIMED_DESPAWN, 40000))
+                summon->CastSpell(summon, SPELL_ICY_BLAST_AREA, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_rimefang_icy_blast::HandleTriggerMissile, EFFECT_1, SPELL_EFFECT_TRIGGER_MISSILE);
     }
 };
 
@@ -1800,154 +1686,121 @@ private:
     Creature* _owner;
 };
 
-class spell_frostwarden_handler_order_whelp : public SpellScriptLoader
+class spell_frostwarden_handler_order_whelp : public SpellScript
 {
-public:
-    spell_frostwarden_handler_order_whelp() : SpellScriptLoader("spell_frostwarden_handler_order_whelp") { }
+    PrepareSpellScript(spell_frostwarden_handler_order_whelp);
 
-    class spell_frostwarden_handler_order_whelp_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        PrepareSpellScript(spell_frostwarden_handler_order_whelp_SpellScript);
+        return ValidateSpellInfo({ SPELL_FOCUS_FIRE });
+    }
 
-        bool Validate(SpellInfo const* /*spell*/) override
-        {
-            return ValidateSpellInfo({ SPELL_FOCUS_FIRE });
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            if (targets.empty())
-                return;
-
-            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void HandleForcedCast(SpellEffIndex effIndex)
-        {
-            // caster is Frostwarden Handler, target is player, caster of triggered is whelp
-            PreventHitDefaultEffect(effIndex);
-            std::list<Creature*> unitList;
-            GetCreatureListWithEntryInGrid(unitList, GetCaster(), NPC_FROSTWING_WHELP, 150.0f);
-            if (Creature* creature = GetCaster()->ToCreature())
-                unitList.remove_if(OrderWhelpTargetSelector(creature));
-
-            if (unitList.empty())
-                return;
-
-            Acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_frostwarden_handler_order_whelp_SpellScript::HandleForcedCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_frostwarden_handler_order_whelp_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_frostwarden_handler_order_whelp_SpellScript();
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        if (targets.empty())
+            return;
+
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(target);
+    }
+
+    void HandleForcedCast(SpellEffIndex effIndex)
+    {
+        // caster is Frostwarden Handler, target is player, caster of triggered is whelp
+        PreventHitDefaultEffect(effIndex);
+        std::list<Creature*> unitList;
+        GetCreatureListWithEntryInGrid(unitList, GetCaster(), NPC_FROSTWING_WHELP, 150.0f);
+        if (Creature* creature = GetCaster()->ToCreature())
+            unitList.remove_if(OrderWhelpTargetSelector(creature));
+
+        if (unitList.empty())
+            return;
+
+        Acore::Containers::SelectRandomContainerElement(unitList)->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_frostwarden_handler_order_whelp::HandleForcedCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_frostwarden_handler_order_whelp::FilterTargets, EFFECT_0, TARGET_UNIT_DEST_AREA_ENEMY);
     }
 };
 
-class spell_frostwarden_handler_focus_fire : public SpellScriptLoader
+class spell_frostwarden_handler_focus_fire : public SpellScript
 {
-public:
-    spell_frostwarden_handler_focus_fire() : SpellScriptLoader("spell_frostwarden_handler_focus_fire") { }
+    PrepareSpellScript(spell_frostwarden_handler_focus_fire);
 
-    class spell_frostwarden_handler_focus_fire_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_frostwarden_handler_focus_fire_SpellScript);
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->AddThreat(GetHitUnit(), float(GetEffectValue()));
-            GetCaster()->GetAI()->SetData(DATA_WHELP_MARKER, 1);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_frostwarden_handler_focus_fire_SpellScript::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    class spell_frostwarden_handler_focus_fire_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_frostwarden_handler_focus_fire_AuraScript);
-
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-            {
-                caster->AddThreat(GetTarget(), -float(GetSpellInfo()->Effects[EFFECT_1].CalcValue()));
-                caster->GetAI()->SetData(DATA_WHELP_MARKER, 0);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_frostwarden_handler_focus_fire_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_frostwarden_handler_focus_fire_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->AddThreat(GetHitUnit(), float(GetEffectValue()));
+        GetCaster()->GetAI()->SetData(DATA_WHELP_MARKER, 1);
     }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_frostwarden_handler_focus_fire_AuraScript();
+        OnEffectHitTarget += SpellEffectFn(spell_frostwarden_handler_focus_fire::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_sindragosa_frost_breath : public SpellScriptLoader
+class spell_frostwarden_handler_focus_fire_aura : public AuraScript
 {
-public:
-    spell_sindragosa_frost_breath() : SpellScriptLoader("spell_sindragosa_frost_breath") { }
+    PrepareAuraScript(spell_frostwarden_handler_focus_fire_aura);
 
-    class spell_sindragosa_frost_breath_SpellScript : public SpellScript
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
     {
-        PrepareSpellScript(spell_sindragosa_frost_breath_SpellScript);
-
-        void HandleInfusion()
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
         {
-            Player* target = GetHitPlayer();
-            if (!target)
-                return;
-
-            // Check difficulty and quest status
-            if (!(target->GetRaidDifficulty() & RAID_DIFFICULTY_MASK_25MAN) || target->GetQuestStatus(QUEST_FROST_INFUSION) != QUEST_STATUS_INCOMPLETE)
-                return;
-
-            // Check if player has Shadow's Edge equipped and not ready for infusion
-            if (!target->HasAura(SPELL_UNSATED_CRAVING) || target->HasAura(SPELL_FROST_IMBUED_BLADE))
-                return;
-
-            Aura* infusion = target->GetAura(SPELL_FROST_INFUSION, target->GetGUID());
-            if (infusion && infusion->GetStackAmount() >= 3)
-            {
-                target->RemoveAura(infusion);
-                target->CastSpell(target, SPELL_FROST_IMBUED_BLADE, TRIGGERED_FULL_MASK);
-            }
-            else
-                target->CastSpell(target, SPELL_FROST_INFUSION, TRIGGERED_FULL_MASK);
+            caster->AddThreat(GetTarget(), -float(GetSpellInfo()->Effects[EFFECT_1].CalcValue()));
+            caster->GetAI()->SetData(DATA_WHELP_MARKER, 0);
         }
+    }
 
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_sindragosa_frost_breath_SpellScript::HandleInfusion);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_sindragosa_frost_breath_SpellScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_frostwarden_handler_focus_fire_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+class spell_sindragosa_frost_breath : public SpellScript
+{
+    PrepareSpellScript(spell_sindragosa_frost_breath);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_UNSATED_CRAVING, SPELL_FROST_IMBUED_BLADE, SPELL_FROST_INFUSION });
+    }
+
+    void HandleInfusion()
+    {
+        Player* target = GetHitPlayer();
+        if (!target)
+            return;
+
+        // Check difficulty and quest status
+        if (!(target->GetRaidDifficulty() & RAID_DIFFICULTY_MASK_25MAN) || target->GetQuestStatus(QUEST_FROST_INFUSION) != QUEST_STATUS_INCOMPLETE)
+            return;
+
+        // Check if player has Shadow's Edge equipped and not ready for infusion
+        if (!target->HasAura(SPELL_UNSATED_CRAVING) || target->HasAura(SPELL_FROST_IMBUED_BLADE))
+            return;
+
+        Aura* infusion = target->GetAura(SPELL_FROST_INFUSION, target->GetGUID());
+        if (infusion && infusion->GetStackAmount() >= 3)
+        {
+            target->RemoveAura(infusion);
+            target->CastSpell(target, SPELL_FROST_IMBUED_BLADE, TRIGGERED_FULL_MASK);
+        }
+        else
+            target->CastSpell(target, SPELL_FROST_INFUSION, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_sindragosa_frost_breath::HandleInfusion);
     }
 };
 
@@ -1955,29 +1808,29 @@ void AddSC_boss_sindragosa()
 {
     new boss_sindragosa();
     new npc_ice_tomb();
-    new spell_sindragosa_s_fury();
+    RegisterSpellScript(spell_sindragosa_s_fury);
     RegisterSpellScript(spell_sindragosa_unchained_magic);
-    new spell_sindragosa_permeating_chill();
-    new spell_sindragosa_instability();
-    new spell_sindragosa_icy_grip();
-    new spell_sindragosa_icy_grip_jump();
-    new spell_sindragosa_ice_tomb_filter();
-    new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb", SPELL_ICE_TOMB_DUMMY);
-    new spell_trigger_spell_from_caster("spell_sindragosa_ice_tomb_dummy", SPELL_FROST_BEACON);
-    new spell_sindragosa_frost_beacon();
-    new spell_sindragosa_ice_tomb();
-    new spell_sindragosa_mystic_buffet();
-    new spell_sindragosa_soul_preservation();
+    RegisterSpellScript(spell_sindragosa_permeating_chill_aura);
+    RegisterSpellScript(spell_sindragosa_instability_aura);
+    RegisterSpellScript(spell_sindragosa_icy_grip);
+    RegisterSpellScript(spell_sindragosa_icy_grip_jump);
+    RegisterSpellScript(spell_sindragosa_ice_tomb_filter);
+    RegisterSpellScriptWithArgs(spell_trigger_spell_from_caster, "spell_sindragosa_ice_tomb", SPELL_ICE_TOMB_DUMMY);
+    RegisterSpellScriptWithArgs(spell_trigger_spell_from_caster, "spell_sindragosa_ice_tomb_dummy", SPELL_FROST_BEACON);
+    RegisterSpellScript(spell_sindragosa_frost_beacon_aura);
+    RegisterSpellAndAuraScriptPair(spell_sindragosa_ice_tomb_trap, spell_sindragosa_ice_tomb_trap_aura);
+    RegisterSpellScript(spell_sindragosa_mystic_buffet);
+    RegisterSpellScript(spell_sindragosa_soul_preservation_aura);
     new achievement_all_you_can_eat();
 
     new npc_spinestalker();
     new npc_rimefang();
-    new spell_rimefang_icy_blast();
+    RegisterSpellScript(spell_rimefang_icy_blast);
     new at_sindragosa_lair();
 
     new npc_sindragosa_trash();
-    new spell_frostwarden_handler_order_whelp();
-    new spell_frostwarden_handler_focus_fire();
+    RegisterSpellScript(spell_frostwarden_handler_order_whelp);
+    RegisterSpellAndAuraScriptPair(spell_frostwarden_handler_focus_fire, spell_frostwarden_handler_focus_fire_aura);
 
-    new spell_sindragosa_frost_breath();
+    RegisterSpellScript(spell_sindragosa_frost_breath);
 }
