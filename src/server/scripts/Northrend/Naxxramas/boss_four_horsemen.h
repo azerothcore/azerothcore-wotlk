@@ -7,6 +7,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
+#include "SpellInfo.h"
 #include "naxxramas.h"
 
 namespace FourHorsemen {

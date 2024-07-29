@@ -7,6 +7,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellInfo.h"
 #include "naxxramas.h"
 
 namespace Grobbulus {
