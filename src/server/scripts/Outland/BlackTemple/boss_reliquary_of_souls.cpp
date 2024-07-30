@@ -91,9 +91,6 @@ enum Misc
     EVENT_ESSENCE_OF_SUFFERING      = 1,
     EVENT_ESSENCE_OF_DESIRE         = 2,
     EVENT_ESSENCE_OF_ANGER          = 3,
-    EVENT_ENGAGE_ESSENCE            = 4,
-    EVENT_SPAWN_ENSLAVED_SOULS      = 5,
-    EVENT_SUCK_ESSENCE              = 6,
 
     POINT_GO_BACK                   = 1
 };
@@ -186,12 +183,11 @@ public:
         void PhaseTransitionSpawns()
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
-
-            ScheduleUniqueTimedEvent(1s, [&]{
+            me->m_Events.AddEventAtOffset([&] {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
-            }, EVENT_SUCK_ESSENCE);
+            }, 1s);
 
-            ScheduleUniqueTimedEvent(8s, [&] {
+            me->m_Events.AddEventAtOffset([&] {
                 me->CastCustomSpell(SPELL_SUMMON_ENSLAVED_SOUL, SPELLVALUE_MAX_TARGETS, 1, me, false);
                 me->CastCustomSpell(SPELL_SUMMON_ENSLAVED_SOUL, SPELLVALUE_MAX_TARGETS, 1, me, false);
 
@@ -199,9 +195,9 @@ public:
                 {
                     me->m_Events.AddEventAtOffset([&] {
                         me->CastCustomSpell(SPELL_SUMMON_ENSLAVED_SOUL, SPELLVALUE_MAX_TARGETS, 1, me, false);
-                        }, i*1200ms);
+                        }, i * 1200ms);
                 }
-            }, EVENT_SPAWN_ENSLAVED_SOULS);
+            }, 8s);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -217,9 +213,9 @@ public:
 
             summon->SetReactState(REACT_PASSIVE);
             summon->CastSpell(summon, SPELL_EMERGE_VISUAL, true);
-            ScheduleUniqueTimedEvent(4s, [&] {
+            me->m_Events.AddEventAtOffset([&] {
                 summons.DoAction(ACTION_ENGAGE_ESSENCE);
-            }, EVENT_ENGAGE_ESSENCE);
+            }, 4s);
         }
 
         void SummonedCreatureDies(Creature* summon, Unit*) override
