@@ -111,12 +111,6 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_TARGET_NOT_IN_INSTANCE_S);
         return;
     }
-    // just ignore us
-    if (invitedPlayer->GetInstanceId() != 0 && invitedPlayer->GetDungeonDifficulty() != invitingPlayer->GetDungeonDifficulty())
-    {
-        SendPartyResult(PARTY_OP_INVITE, membername, ERR_IGNORING_YOU_S);
-        return;
-    }
 
     if (invitedPlayer->GetSocial()->HasIgnore(invitingPlayer->GetGUID()))
     {
