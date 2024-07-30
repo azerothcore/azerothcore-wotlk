@@ -87,7 +87,6 @@ public:
     {
         boss_gurtogg_bloodboilAI(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL)
         {
-            bool _recentlySpoken = false;
         }
 
         void Reset() override
@@ -136,7 +135,7 @@ public:
             if (!UpdateVictim())
                 return;
 
-            scheduler.Update(diff);
+            events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
