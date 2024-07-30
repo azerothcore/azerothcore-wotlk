@@ -45,12 +45,13 @@
 #include "SocialMgr.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "WardenMac.h"
 #include "WardenWin.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSocket.h"
 #include <zlib.h>
+
+#include "BanMgr.h"
 
 namespace
 {

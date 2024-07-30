@@ -34,7 +34,7 @@ ChatCommandResult Acore::ChatCommands::QuotedString::TryConsume(ChatHandler cons
         return ArgInfo<std::string>::TryConsume(*this, handler, args);
 
     char const QUOTE = args[0];
-    for (size_t i = 1; i < args.length(); ++i)
+    for (std::size_t i = 1; i < args.length(); ++i)
     {
         if (args[i] == QUOTE)
         {

@@ -33,10 +33,10 @@ void stripLineInvisibleChars(std::string& str)
 {
     static std::string const invChars = " \t\7\n";
 
-    size_t wpos = 0;
+    std::size_t wpos = 0;
 
     bool space = false;
-    for (size_t pos = 0; pos < str.size(); ++pos)
+    for (std::size_t pos = 0; pos < str.size(); ++pos)
     {
         if (invChars.find(str[pos]) != std::string::npos)
         {
@@ -242,7 +242,7 @@ uint32 GetPID()
     return uint32(pid);
 }
 
-size_t utf8length(std::string& utf8str)
+std::size_t utf8length(std::string& utf8str)
 {
     try
     {
@@ -255,11 +255,11 @@ size_t utf8length(std::string& utf8str)
     }
 }
 
-void utf8truncate(std::string& utf8str, size_t len)
+void utf8truncate(std::string& utf8str, std::size_t len)
 {
     try
     {
-        size_t wlen = utf8::distance(utf8str.c_str(), utf8str.c_str() + utf8str.size());
+        std::size_t wlen = utf8::distance(utf8str.c_str(), utf8str.c_str() + utf8str.size());
         if (wlen <= len)
         {
             return;
@@ -278,7 +278,7 @@ void utf8truncate(std::string& utf8str, size_t len)
     }
 }
 
-bool Utf8toWStr(char const* utf8str, size_t csize, wchar_t* wstr, size_t& wsize)
+bool Utf8toWStr(char const* utf8str, std::size_t csize, wchar_t* wstr, std::size_t& wsize)
 {
     try
     {
@@ -330,7 +330,7 @@ bool Utf8toWStr(std::string_view utf8str, std::wstring& wstr)
     return true;
 }
 
-bool WStrToUtf8(wchar_t const* wstr, size_t size, std::string& utf8str)
+bool WStrToUtf8(wchar_t const* wstr, std::size_t size, std::string& utf8str)
 {
     try
     {
@@ -512,14 +512,14 @@ void vutf8printf(FILE* out, const char* str, va_list* ap)
     char temp_buf[32 * 1024];
     wchar_t wtemp_buf[32 * 1024];
 
-    size_t temp_len = vsnprintf(temp_buf, 32 * 1024, str, *ap);
+    std::size_t temp_len = vsnprintf(temp_buf, 32 * 1024, str, *ap);
     //vsnprintf returns -1 if the buffer is too small
-    if (temp_len == size_t(-1))
+    if (temp_len == std::size_t(-1))
     {
         temp_len = 32 * 1024 - 1;
     }
 
-    size_t wtemp_len = 32 * 1024 - 1;
+    std::size_t wtemp_len = 32 * 1024 - 1;
     Utf8toWStr(temp_buf, temp_len, wtemp_buf, wtemp_len);
 
     CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], uint32(wtemp_len + 1));
@@ -542,7 +542,7 @@ bool Utf8ToUpperOnlyLatin(std::string& utf8String)
     return WStrToUtf8(wstr, utf8String);
 }
 
-std::string Acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, bool reverse /* = false */)
+std::string Acore::Impl::ByteArrayToHexStr(uint8 const* bytes, std::size_t arrayLen, bool reverse /* = false */)
 {
     int32 init = 0;
     int32 end = arrayLen;
@@ -566,7 +566,7 @@ std::string Acore::Impl::ByteArrayToHexStr(uint8 const* bytes, size_t arrayLen, 
     return ss.str();
 }
 
-void Acore::Impl::HexStrToByteArray(std::string_view str, uint8* out, size_t outlen, bool reverse /*= false*/)
+void Acore::Impl::HexStrToByteArray(std::string_view str, uint8* out, std::size_t outlen, bool reverse /*= false*/)
 {
     ASSERT(str.size() == (2 * outlen));
 

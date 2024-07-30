@@ -1007,7 +1007,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 
     b << uint32(l.gold);                                    //gold
 
-    size_t count_pos = b.wpos();                            // pos of item count byte
+    std::size_t count_pos = b.wpos();                            // pos of item count byte
     b << uint8(0);                                          // item count placeholder
 
     switch (lv.permission)
@@ -1546,7 +1546,7 @@ LootTemplate::~LootTemplate()
         Entries.pop_back();
     }
 
-    for (size_t i = 0; i < Groups.size(); ++i)
+    for (std::size_t i = 0; i < Groups.size(); ++i)
         delete Groups[i];
     Groups.clear();
 }

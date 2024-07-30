@@ -55,10 +55,10 @@ namespace Acore::Impl::ChatCommands
     // ConsumeFromOffset contains the bounds check for offset, then hands off to MultiConsumer
     // the call stack is MultiConsumer -> ConsumeFromOffset -> MultiConsumer -> ConsumeFromOffset etc
     // MultiConsumer goes into ArgInfo for parsing on each iteration
-    template <typename Tuple, size_t offset>
+    template <typename Tuple, std::size_t offset>
     ChatCommandResult ConsumeFromOffset(Tuple&, ChatHandler const* handler, std::string_view args);
 
-    template <typename Tuple, typename NextType, size_t offset>
+    template <typename Tuple, typename NextType, std::size_t offset>
     struct MultiConsumer
     {
         static ChatCommandResult TryConsumeTo(Tuple& tuple, ChatHandler const* handler, std::string_view args)
@@ -71,7 +71,7 @@ namespace Acore::Impl::ChatCommands
         }
     };
 
-    template <typename Tuple, typename NestedNextType, size_t offset>
+    template <typename Tuple, typename NestedNextType, std::size_t offset>
     struct MultiConsumer<Tuple, Optional<NestedNextType>, offset>
     {
         static ChatCommandResult TryConsumeTo(Tuple& tuple, ChatHandler const* handler, std::string_view args)
@@ -102,7 +102,7 @@ namespace Acore::Impl::ChatCommands
         }
     };
 
-    template <typename Tuple, size_t offset>
+    template <typename Tuple, std::size_t offset>
     ChatCommandResult ConsumeFromOffset([[maybe_unused]] Tuple& tuple, [[maybe_unused]] ChatHandler const* handler, std::string_view args)
     {
         if constexpr (offset < std::tuple_size_v<Tuple>)

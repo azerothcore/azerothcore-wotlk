@@ -321,7 +321,7 @@ namespace std
     struct hash<ObjectGuid>
     {
         public:
-            size_t operator()(ObjectGuid const& key) const
+            std::size_t operator()(ObjectGuid const& key) const
             {
                 return std::hash<uint64>()(key.GetRawValue());
             }

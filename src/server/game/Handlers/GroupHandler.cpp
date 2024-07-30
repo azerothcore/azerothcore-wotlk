@@ -1024,7 +1024,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     data << uint16(player->GetPositionY());                 // GROUP_UPDATE_FLAG_POSITION
 
     uint64 auraMask = 0;
-    size_t maskPos = data.wpos();
+    std::size_t maskPos = data.wpos();
     data << uint64(auraMask);                               // placeholder
     for (uint8 i = 0; i < MAX_AURAS_GROUP_UPDATE; ++i)
     {
