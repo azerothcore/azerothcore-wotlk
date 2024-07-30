@@ -261,9 +261,7 @@ public:
 
     struct boss_essence_of_sufferingAI : public ScriptedAI
     {
-        boss_essence_of_sufferingAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool _recentlySpoken = false;
+        boss_essence_of_sufferingAI(Creature* creature) : ScriptedAI(creature), _recentlySpoken(false) { }
 
         void Reset() override
         {
@@ -353,6 +351,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        bool _recentlySpoken;
     };
 };
 
@@ -368,9 +369,7 @@ public:
 
     struct boss_essence_of_desireAI : public ScriptedAI
     {
-        boss_essence_of_desireAI(Creature* creature) : ScriptedAI(creature) { }
-
-        bool _recentlySpoken = false;
+        boss_essence_of_desireAI(Creature* creature) : ScriptedAI(creature), _recentlySpoken(false) { }
 
         void Reset() override
         {
@@ -438,10 +437,15 @@ public:
             }, 31s);
 
             scheduler.Schedule(8s, 12s, [this](TaskContext context) {
-                if (DoCastVictim(SPELL_SPIRIT_SHOCK) == SPELL_CAST_OK)
-                    context.Repeat(8s, 12s);
+                if (!me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    if (DoCastVictim(SPELL_SPIRIT_SHOCK) == SPELL_CAST_OK)
+                        context.Repeat(1200ms);
+                    else
+                        context.Repeat(3s, 8s);
+                }
                 else
-                    context.Repeat(3s, 8s);
+                    context.Repeat(1200ms);
             });
 
             ScheduleTimedEvent(13s, [&] {
@@ -460,6 +464,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        bool _recentlySpoken;
     };
 };
 
@@ -475,9 +482,8 @@ public:
 
     struct boss_essence_of_angerAI : public ScriptedAI
     {
-        boss_essence_of_angerAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_essence_of_angerAI(Creature* creature) : ScriptedAI(creature), _recentlySpoken(false) { }
 
-        bool _recentlySpoken = false;
         ObjectGuid targetGUID;
 
         void Reset() override
@@ -554,6 +560,9 @@ public:
 
             DoMeleeAttackIfReady();
         }
+
+    private:
+        bool _recentlySpoken;
     };
 };
 
