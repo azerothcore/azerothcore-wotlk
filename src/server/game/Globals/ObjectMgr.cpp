@@ -381,7 +381,7 @@ void ObjectMgr::AddLocaleString(std::string&& s, LocaleConstant locale, std::vec
 {
     if (!s.empty())
     {
-        if (data.size() <= size_t(locale))
+        if (data.size() <= std::size_t(locale))
             data.resize(locale + 1);
 
         data[locale] = std::move(s);
@@ -5514,9 +5514,9 @@ void ObjectMgr::LoadEventScripts()
                     if (spell->Effects[j].MiscValue)
                         evt_scripts.insert(spell->Effects[j].MiscValue);
 
-    for (size_t path_idx = 0; path_idx < sTaxiPathNodesByPath.size(); ++path_idx)
+    for (std::size_t path_idx = 0; path_idx < sTaxiPathNodesByPath.size(); ++path_idx)
     {
-        for (size_t node_idx = 0; node_idx < sTaxiPathNodesByPath[path_idx].size(); ++node_idx)
+        for (std::size_t node_idx = 0; node_idx < sTaxiPathNodesByPath[path_idx].size(); ++node_idx)
         {
             TaxiPathNodeEntry const* node = sTaxiPathNodesByPath[path_idx][node_idx];
 
@@ -8388,7 +8388,7 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
 
     // Check for three consecutive letters
     wstrToLower(wname);
-    for (size_t i = 2; i < wname.size(); ++i)
+    for (std::size_t i = 2; i < wname.size(); ++i)
         if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
             return CHAR_NAME_THREE_CONSECUTIVE;
 
@@ -8581,7 +8581,7 @@ char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 {
     if (AcoreString const* ts = GetAcoreString(entry))
     {
-        if (ts->Content.size() > size_t(locale) && !ts->Content[locale].empty())
+        if (ts->Content.size() > std::size_t(locale) && !ts->Content[locale].empty())
             return ts->Content[locale].c_str();
 
         return ts->Content[DEFAULT_LOCALE].c_str();

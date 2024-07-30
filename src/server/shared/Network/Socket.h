@@ -205,7 +205,7 @@ protected:
     }
 
 private:
-    void ReadHandlerInternal(boost::system::error_code error, size_t transferredBytes)
+    void ReadHandlerInternal(boost::system::error_code error, std::size_t transferredBytes)
     {
         if (error)
         {
@@ -219,7 +219,7 @@ private:
 
     // ProxyReadHeaderHandler reads Proxy Protocol v2 header (v1 is not supported).
     // See https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt (2.2. Binary header format (version 2)) for more details.
-    void ProxyReadHeaderHandler(boost::system::error_code error, size_t transferredBytes)
+    void ProxyReadHeaderHandler(boost::system::error_code error, std::size_t transferredBytes)
     {
         if (error)
         {

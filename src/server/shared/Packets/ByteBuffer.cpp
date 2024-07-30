@@ -27,7 +27,7 @@
 ByteBuffer::ByteBuffer(MessageBuffer&& buffer) :
     _rpos(0), _wpos(0), _storage(buffer.Move()) { }
 
-ByteBufferPositionException::ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize)
+ByteBufferPositionException::ByteBufferPositionException(bool add, std::size_t pos, std::size_t size, std::size_t valueSize)
 {
     std::ostringstream ss;
 
@@ -38,7 +38,7 @@ ByteBufferPositionException::ByteBufferPositionException(bool add, size_t pos, s
     message().assign(ss.str());
 }
 
-ByteBufferSourceException::ByteBufferSourceException(size_t pos, size_t size, size_t valueSize)
+ByteBufferSourceException::ByteBufferSourceException(std::size_t pos, std::size_t size, std::size_t valueSize)
 {
     std::ostringstream ss;
 
@@ -107,13 +107,13 @@ uint32 ByteBuffer::ReadPackedTime()
     return uint32(mktime(&lt));
 }
 
-void ByteBuffer::append(uint8 const* src, size_t cnt)
+void ByteBuffer::append(uint8 const* src, std::size_t cnt)
 {
     ASSERT(src, "Attempted to put a NULL-pointer in ByteBuffer (pos: {} size: {})", _wpos, size());
     ASSERT(cnt, "Attempted to put a zero-sized value in ByteBuffer (pos: {} size: {})", _wpos, size());
     ASSERT(size() < 10000000);
 
-    size_t const newSize = _wpos + cnt;
+    std::size_t const newSize = _wpos + cnt;
 
     if (_storage.capacity() < newSize) // custom memory allocation rules
     {
@@ -140,7 +140,7 @@ void ByteBuffer::AppendPackedTime(time_t time)
     append<uint32>((lt.tm_year - 100) << 24 | lt.tm_mon << 20 | (lt.tm_mday - 1) << 14 | lt.tm_wday << 11 | lt.tm_hour << 6 | lt.tm_min);
 }
 
-void ByteBuffer::put(size_t pos, uint8 const* src, size_t cnt)
+void ByteBuffer::put(std::size_t pos, uint8 const* src, std::size_t cnt)
 {
     ASSERT(pos + cnt <= size(), "Attempted to put value with size: {} in ByteBuffer (pos: {} size: {})", cnt, pos, size());
     ASSERT(src, "Attempted to put a NULL-pointer in ByteBuffer (pos: {} size: {})", pos, size());

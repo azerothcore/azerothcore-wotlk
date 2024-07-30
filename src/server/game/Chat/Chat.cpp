@@ -145,7 +145,7 @@ void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
         std::vector<std::string_view> tokens = Acore::Tokenize(msg, '|', true);
         std::ostringstream stream;
 
-        for (size_t i = 0; i < tokens.size() - 1; ++i)
+        for (std::size_t i = 0; i < tokens.size() - 1; ++i)
             stream << tokens[i] << "||";
 
         stream << tokens[tokens.size() - 1];
@@ -240,11 +240,11 @@ bool ChatHandler::ParseCommands(std::string_view text)
     return _ParseCommands(text.substr(1));
 }
 
-size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
+std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
                                     std::string const& senderName /*= ""*/, std::string const& receiverName /*= ""*/,
                                     uint32 achievementId /*= 0*/, bool gmMessage /*= false*/, std::string const& channelName /*= ""*/)
 {
-    size_t receiverGUIDPos = 0;
+    std::size_t receiverGUIDPos = 0;
     data.Initialize(!gmMessage ? SMSG_MESSAGECHAT : SMSG_GM_MESSAGECHAT);
     data << uint8(chatType);
     data << int32(language);
@@ -320,7 +320,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
     return receiverGUIDPos;
 }
 
-size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message,
+std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message,
                                     uint32 achievementId /*= 0*/, std::string const& channelName /*= ""*/, LocaleConstant locale /*= DEFAULT_LOCALE*/)
 {
     ObjectGuid senderGUID;
@@ -1022,7 +1022,7 @@ void AddonChannelCommandHandler::SendSysMessage(std::string_view str, bool escap
     std::string body(str);
     if (escapeCharacters)
         boost::replace_all(body, "|", "||");
-    size_t pos, lastpos;
+    std::size_t pos, lastpos;
     for (lastpos = 0, pos = body.find('\n', lastpos); pos != std::string::npos; lastpos = pos + 1, pos = body.find('\n', lastpos))
     {
         std::string line(msg);

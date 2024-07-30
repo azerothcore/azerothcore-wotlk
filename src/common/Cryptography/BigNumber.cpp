@@ -195,7 +195,7 @@ bool BigNumber::IsNegative() const
     return BN_is_negative(_bn);
 }
 
-void BigNumber::GetBytes(uint8* buf, size_t bufsize, bool littleEndian) const
+void BigNumber::GetBytes(uint8* buf, std::size_t bufsize, bool littleEndian) const
 {
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER < 0x10100000L
     int nBytes = GetNumBytes();

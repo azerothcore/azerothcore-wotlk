@@ -51,8 +51,8 @@ namespace Acore::Impl::ChatCommands
         using type = typename T::value_type;
     };
 
-    template <size_t N>
-    inline constexpr char GetChar(char const (&s)[N], size_t i)
+    template <std::size_t N>
+    inline constexpr char GetChar(char const (&s)[N], std::size_t i)
     {
         static_assert(N <= 25, "The EXACT_SEQUENCE macro can only be used with up to 25 character long literals. Specify them char-by-char (null terminated) as parameters to ExactSequence<> instead.");
         return i >= N ? '\0' : s[i];
@@ -273,7 +273,7 @@ namespace Acore::ChatCommands
         }
 
         template<bool C = have_operators>
-        operator std::enable_if_t<C && !std::is_same_v<first_type, size_t> && std::is_convertible_v<first_type, size_t>, size_t>() const
+        operator std::enable_if_t<C && !std::is_same_v<first_type, std::size_t> && std::is_convertible_v<first_type, std::size_t>, std::size_t>() const
         {
             return operator*();
         }
@@ -284,9 +284,9 @@ namespace Acore::ChatCommands
         template <typename T>
         Variant& operator=(T&& arg) { base::operator=(std::forward<T>(arg)); return *this; }
 
-        template <size_t index>
+        template <std::size_t index>
         constexpr decltype(auto) get() { return std::get<index>(static_cast<base&>(*this)); }
-        template <size_t index>
+        template <std::size_t index>
         constexpr decltype(auto) get() const { return std::get<index>(static_cast<base const&>(*this)); }
         template <typename type>
         constexpr decltype(auto) get() { return std::get<type>(static_cast<base&>(*this)); }

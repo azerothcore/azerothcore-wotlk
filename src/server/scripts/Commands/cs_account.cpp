@@ -138,7 +138,7 @@ public:
 
         // store random suggested secrets
         static std::unordered_map<uint32, Acore::Crypto::TOTP::Secret> suggestions;
-        auto pair = suggestions.emplace(std::piecewise_construct, std::make_tuple(accountId), std::make_tuple(Acore::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH)); // std::vector 1-argument size_t constructor invokes resize
+        auto pair = suggestions.emplace(std::piecewise_construct, std::make_tuple(accountId), std::make_tuple(Acore::Crypto::TOTP::RECOMMENDED_SECRET_LENGTH)); // std::vector 1-argument std::size_t constructor invokes resize
 
         if (pair.second) // no suggestion yet, generate random secret
             Acore::Crypto::GetRandomBytes(pair.first->second);
