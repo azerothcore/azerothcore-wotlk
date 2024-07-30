@@ -54,7 +54,13 @@ public:
     template<typename... Args>
     void SendWorldText(uint32 strId, Args&&... args)
     {
-        SendWorldText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+        // WorldText should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            if (m_session = itr->second->GetPlayer()->GetSession())
+                SendWorldText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+        }
     }
     template<typename... Args>
     void SendWorldText(char const* fmt, Args&&... args)
@@ -66,7 +72,13 @@ public:
     template<typename... Args>
     void SendWorldTextOptional(uint32 strId, uint32 flag, Args&&... args)
     {
-        SendWorldTextOptional(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...), flag);
+        // WorldTextOptional should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            if (m_session = itr->second->GetPlayer()->GetSession())
+                SendWorldTextOptional(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...), flag);
+        }
     }
     template<typename... Args>
     void SendWorldTextOptional(char const* fmt, uint32 flag, Args&&... args)
