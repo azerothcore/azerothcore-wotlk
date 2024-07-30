@@ -294,25 +294,25 @@ enum InventoryType
 
 #define MAX_INVTYPE                               29
 
-enum ItemClass
-{
-    ITEM_CLASS_CONSUMABLE                       = 0,
-    ITEM_CLASS_CONTAINER                        = 1,
-    ITEM_CLASS_WEAPON                           = 2,
-    ITEM_CLASS_GEM                              = 3,
-    ITEM_CLASS_ARMOR                            = 4,
-    ITEM_CLASS_REAGENT                          = 5,
-    ITEM_CLASS_PROJECTILE                       = 6,
-    ITEM_CLASS_TRADE_GOODS                      = 7,
-    ITEM_CLASS_GENERIC                          = 8,
-    ITEM_CLASS_RECIPE                           = 9,
-    ITEM_CLASS_MONEY                            = 10,
-    ITEM_CLASS_QUIVER                           = 11,
-    ITEM_CLASS_QUEST                            = 12,
-    ITEM_CLASS_KEY                              = 13,
-    ITEM_CLASS_PERMANENT                        = 14,
-    ITEM_CLASS_MISC                             = 15,
-    ITEM_CLASS_GLYPH                            = 16
+enum ITEMCLASS {
+  ITEM_CONSUMABLE   = 0,
+  ITEM_CONTAINER    = 1,
+  ITEM_WEAPON       = 2,
+  ITEM_GEM          = 3,
+  ITEM_ARMOR        = 4,
+  ITEM_REAGENT      = 5,
+  ITEM_PROJECTILE   = 6,
+  ITEM_TRADE_GOODS  = 7,
+  ITEM_GENERIC      = 8,
+  ITEM_RECIPE       = 9,
+  ITEM_MONEY        = 10,
+  ITEM_QUIVER       = 11,
+  ITEM_QUEST        = 12,
+  ITEM_KEY          = 13,
+  ITEM_PERMANENT    = 14,
+  ITEM_MISC         = 15,
+  ITEM_GLYPH        = 16,
+  NUM_ITEMCLASSES
 };
 
 #define MAX_ITEM_CLASS                            17
@@ -566,9 +566,9 @@ inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemS
 {
     switch (ItemClass)
     {
-        case ITEM_CLASS_WEAPON:
+        case ITEM_WEAPON:
             return ItemSubClass;
-        case ITEM_CLASS_ARMOR:
+        case ITEM_ARMOR:
             return ItemSubClass + 21;
         default:
             return 0;
@@ -706,8 +706,8 @@ struct ItemTemplate
     [[nodiscard]] bool HasSignature() const
     {
         return GetMaxStackSize() == 1 &&
-               Class != ITEM_CLASS_CONSUMABLE &&
-               Class != ITEM_CLASS_QUEST &&
+               Class != ITEM_CONSUMABLE &&
+               Class != ITEM_QUEST &&
                (Flags & ITEM_FLAG_NO_CREATOR) == 0 &&
                ItemId != 6948; /*Hearthstone*/
     }
@@ -724,8 +724,8 @@ struct ItemTemplate
 
         switch (Class)
         {
-            case ITEM_CLASS_WEAPON:
-            case ITEM_CLASS_PROJECTILE:
+            case ITEM_WEAPON:
+            case ITEM_PROJECTILE:
                 return true;
         }
 
@@ -754,7 +754,7 @@ struct ItemTemplate
         constexpr uint32 feralApEnabledInventoryTypeMaks = 1 << INVTYPE_WEAPON | 1 << INVTYPE_2HWEAPON | 1 << INVTYPE_WEAPONMAINHAND | 1 << INVTYPE_WEAPONOFFHAND;
 
         // 0x02A5F3 - is mask for Melee weapon from ItemSubClassMask.dbc
-        if (Class == ITEM_CLASS_WEAPON && (1 << InventoryType) & feralApEnabledInventoryTypeMaks)
+        if (Class == ITEM_WEAPON && (1 << InventoryType) & feralApEnabledInventoryTypeMaks)
         {
             int32 bonus = int32((extraDPS + getDPS()) * 14.0f) - 767;
             if (bonus < 0)
@@ -807,13 +807,13 @@ struct ItemTemplate
 
         switch (Class)
         {
-            case ITEM_CLASS_WEAPON:
+            case ITEM_WEAPON:
                 if (SubClass >= MAX_ITEM_SUBCLASS_WEAPON)
                     return 0;
                 else
                     return item_weapon_skills[SubClass];
 
-            case ITEM_CLASS_ARMOR:
+            case ITEM_ARMOR:
                 if (SubClass >= MAX_ITEM_SUBCLASS_ARMOR)
                     return 0;
                 else
@@ -824,10 +824,10 @@ struct ItemTemplate
         }
     }
 
-    [[nodiscard]] bool IsPotion() const { return Class == ITEM_CLASS_CONSUMABLE && SubClass == ITEM_SUBCLASS_POTION; }
-    [[nodiscard]] bool IsWeaponVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_WEAPON_ENCHANTMENT; }
-    [[nodiscard]] bool IsArmorVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT; }
-    [[nodiscard]] bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
+    [[nodiscard]] bool IsPotion() const { return Class == ITEM_CONSUMABLE && SubClass == ITEM_SUBCLASS_POTION; }
+    [[nodiscard]] bool IsWeaponVellum() const { return Class == ITEM_TRADE_GOODS && SubClass == ITEM_SUBCLASS_WEAPON_ENCHANTMENT; }
+    [[nodiscard]] bool IsArmorVellum() const { return Class == ITEM_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT; }
+    [[nodiscard]] bool IsConjuredConsumable() const { return Class == ITEM_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
 
     [[nodiscard]] bool HasStat(ItemModType stat) const;
     [[nodiscard]] bool HasSpellPowerStat() const;

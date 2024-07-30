@@ -429,7 +429,7 @@ bool LootItem::AllowedForPlayer(Player const* player, WOWGUID source) const
         // Master Looter can see conditioned recipes
         if (isMasterLooter && itemVisibleForMasterLooter)
         {
-            if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) || (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0))
+            if ((pProto->Flags & ITEM_FLAG_HIDE_UNUSABLE_RECIPE) || (pProto->Class == ITEM_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0))
             {
                 return true;
             }
@@ -462,7 +462,7 @@ bool LootItem::AllowedForPlayer(Player const* player, WOWGUID source) const
     }
 
     // Don't allow to loot soulbound recipes that the player has already learned
-    if (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0 && player->HasSpell(pProto->Spells[1].SpellId))
+    if (pProto->Class == ITEM_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0 && player->HasSpell(pProto->Spells[1].SpellId))
     {
         return false;
     }

@@ -16178,7 +16178,7 @@ void createProcFlags(SpellInfo const* spellInfo, WeaponAttackType attackType, bo
                 }
                 break;
             default:
-                if (spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON &&
+                if (spellInfo->EquippedItemClass == ITEM_WEAPON &&
                         spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND)
                         && spellInfo->HasAttribute(SPELL_ATTR2_AUTO_REPEAT)) // Wands auto attack
                 {
@@ -17688,7 +17688,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
     if (!isVictim && GetTypeId() == TYPEID_PLAYER && !spellProto->HasAttribute(SPELL_ATTR3_NO_PROC_EQUIP_REQUIREMENT))
     {
         Player* player = ToPlayer();
-        if (spellProto->EquippedItemClass == ITEM_CLASS_WEAPON)
+        if (spellProto->EquippedItemClass == ITEM_WEAPON)
         {
             Item* item = nullptr;
             if (attType == BASE_ATTACK)
@@ -17701,14 +17701,14 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackTyp
             if (player->IsInFeralForm())
                 return false;
 
-            if (!item || item->IsBroken() || item->GetTemplate()->Class != ITEM_CLASS_WEAPON || !((1 << item->GetTemplate()->SubClass) & spellProto->EquippedItemSubClassMask))
+            if (!item || item->IsBroken() || item->GetTemplate()->Class != ITEM_WEAPON || !((1 << item->GetTemplate()->SubClass) & spellProto->EquippedItemSubClassMask))
                 return false;
         }
-        else if (spellProto->EquippedItemClass == ITEM_CLASS_ARMOR)
+        else if (spellProto->EquippedItemClass == ITEM_ARMOR)
         {
             // Check if player is wearing shield
             Item* item = player->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-            if (!item || item->IsBroken() || item->GetTemplate()->Class != ITEM_CLASS_ARMOR || !((1 << item->GetTemplate()->SubClass) & spellProto->EquippedItemSubClassMask))
+            if (!item || item->IsBroken() || item->GetTemplate()->Class != ITEM_ARMOR || !((1 << item->GetTemplate()->SubClass) & spellProto->EquippedItemSubClassMask))
                 return false;
         }
     }

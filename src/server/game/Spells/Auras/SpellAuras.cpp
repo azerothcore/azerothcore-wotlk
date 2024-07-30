@@ -2271,7 +2271,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
         if (!GetSpellInfo()->HasAttribute(SPELL_ATTR3_NO_PROC_EQUIP_REQUIREMENT))
         {
             Item* item = nullptr;
-            if (GetSpellInfo()->EquippedItemClass == ITEM_CLASS_WEAPON)
+            if (GetSpellInfo()->EquippedItemClass == ITEM_WEAPON)
             {
                 if (target->ToPlayer()->IsInFeralForm())
                     return false;
@@ -2292,7 +2292,7 @@ bool Aura::IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventI
                     }
                 }
             }
-            else if (GetSpellInfo()->EquippedItemClass == ITEM_CLASS_ARMOR)
+            else if (GetSpellInfo()->EquippedItemClass == ITEM_ARMOR)
             {
                 // Check if player is wearing shield
                 item = target->ToPlayer()->GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);

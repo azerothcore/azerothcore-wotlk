@@ -123,7 +123,7 @@ public:
             {
                 if (ItemTemplate const* bagTemplate = bag->GetTemplate())
                 {
-                    if (bagTemplate->Class == ITEM_CLASS_CONTAINER || bagTemplate->Class == ITEM_CLASS_QUIVER)
+                    if (bagTemplate->Class == ITEM_CONTAINER || bagTemplate->Class == ITEM_QUIVER)
                     {
                         haveFreeSlot = true;
                         freeSlotsInBags[bagTemplate->SubClass] += bag->GetFreeSlots();

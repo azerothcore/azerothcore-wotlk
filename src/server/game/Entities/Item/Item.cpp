@@ -181,7 +181,7 @@ bool ItemCanGoIntoBag(ItemTemplate const* pProto, ItemTemplate const* pBagProto)
 
     switch (pBagProto->Class)
     {
-        case ITEM_CLASS_CONTAINER:
+        case ITEM_CONTAINER:
         {
             if (pBagProto->SubClass == ITEM_SUBCLASS_CONTAINER)
             {
@@ -189,7 +189,7 @@ bool ItemCanGoIntoBag(ItemTemplate const* pProto, ItemTemplate const* pBagProto)
             }
             else
             {
-                if (pProto->Class == ITEM_CLASS_CONTAINER)
+                if (pProto->Class == ITEM_CONTAINER)
                 {
                     return false;
                 }
@@ -233,9 +233,9 @@ bool ItemCanGoIntoBag(ItemTemplate const* pProto, ItemTemplate const* pBagProto)
                 }
             }
         }
-        case ITEM_CLASS_QUIVER:
+        case ITEM_QUIVER:
         {
-            if (pProto->Class == ITEM_CLASS_QUIVER)
+            if (pProto->Class == ITEM_QUIVER)
             {
                 return false;
             }
@@ -564,7 +564,7 @@ uint32 Item::GetSpell()
 
     switch (proto->Class)
     {
-        case ITEM_CLASS_WEAPON:
+        case ITEM_WEAPON:
             switch (proto->SubClass)
             {
                 case ITEM_SUBCLASS_WEAPON_AXE:
@@ -600,7 +600,7 @@ uint32 Item::GetSpell()
                 default:
                     return 0;
             }
-        case ITEM_CLASS_ARMOR:
+        case ITEM_ARMOR:
             switch (proto->SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_CLOTH:
@@ -889,8 +889,8 @@ bool Item::IsFitToSpellRequirements(SpellInfo const* spellInfo) const
     if (spellInfo->EquippedItemClass != -1)                 // -1 == any item class
     {
         // Special case - accept vellum for armor/weapon requirements
-        if ((spellInfo->EquippedItemClass == ITEM_CLASS_ARMOR && proto->IsArmorVellum())
-                || (spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON && proto->IsWeaponVellum()))
+        if ((spellInfo->EquippedItemClass == ITEM_ARMOR && proto->IsArmorVellum())
+                || (spellInfo->EquippedItemClass == ITEM_WEAPON && proto->IsWeaponVellum()))
             if (spellInfo->IsAbilityOfSkillType(SKILL_ENCHANTING)) // only for enchanting spells
                 return true;
 

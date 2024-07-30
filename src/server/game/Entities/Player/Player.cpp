@@ -654,7 +654,7 @@ bool Player::Create(WOWGUID::LowType guidlow, CharacterCreateInfo* createInfo)
             uint32 count = iProto->BuyCount;
 
             // special amount for food/drink
-            if (iProto->Class == ITEM_CLASS_CONSUMABLE && iProto->SubClass == ITEM_SUBCLASS_FOOD)
+            if (iProto->Class == ITEM_CONSUMABLE && iProto->SubClass == ITEM_SUBCLASS_FOOD)
             {
                 switch (iProto->Spells[0].SpellCategory)
                 {
@@ -6804,7 +6804,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
     if (armor)
     {
         UnitModifierType modType = TOTAL_VALUE;
-        if (proto->Class == ITEM_CLASS_ARMOR)
+        if (proto->Class == ITEM_ARMOR)
         {
             switch (proto->SubClass)
             {
@@ -7199,7 +7199,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
                 if (ItemTemplate const* proto = item->GetTemplate())
                 {
                     // Additional check for weapons
-                    if (proto->Class == ITEM_CLASS_WEAPON)
+                    if (proto->Class == ITEM_WEAPON)
                     {
                         // offhand item cannot proc from main hand hit etc
                         EquipmentSlots slot;
@@ -7621,7 +7621,7 @@ void Player::_ApplyAmmoBonuses()
     float currentAmmoDPS;
 
     ItemTemplate const* ammo_proto = sObjectMgr->GetItemTemplate(ammo_id);
-    if (!ammo_proto || ammo_proto->Class != ITEM_CLASS_PROJECTILE || !CheckAmmoCompatibility(ammo_proto))
+    if (!ammo_proto || ammo_proto->Class != ITEM_PROJECTILE || !CheckAmmoCompatibility(ammo_proto))
         currentAmmoDPS = 0.0f;
     else
         currentAmmoDPS = (ammo_proto->Damage[0].DamageMin + ammo_proto->Damage[0].DamageMax) / 2;
@@ -7648,7 +7648,7 @@ bool Player::CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const
         return false;
 
     ItemTemplate const* weapon_proto = weapon->GetTemplate();
-    if (!weapon_proto || weapon_proto->Class != ITEM_CLASS_WEAPON)
+    if (!weapon_proto || weapon_proto->Class != ITEM_WEAPON)
         return false;
 
     // check ammo ws. weapon compatibility
@@ -10105,7 +10105,7 @@ void Player::SetSpellModTakingSpell(Spell* spell, bool apply)
 }
 
 // send Proficiency
-void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask)
+void Player::SendProficiency(ITEMCLASS itemClass, uint32 itemSubclassMask)
 {
     WorldPacket data(SMSG_SET_PROFICIENCY, 1 + 4);
     data << uint8(itemClass) << uint32(itemSubclassMask);
@@ -12516,7 +12516,7 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
     // for optimize check 2 used cases only
     switch (spellInfo->EquippedItemClass)
     {
-        case ITEM_CLASS_WEAPON:
+        case ITEM_WEAPON:
             {
                 for (uint8 i = EQUIPMENT_SLOT_MAINHAND; i < EQUIPMENT_SLOT_TABARD; ++i)
                     if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, i))
@@ -12524,7 +12524,7 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
                             return true;
                 break;
             }
-        case ITEM_CLASS_ARMOR:
+        case ITEM_ARMOR:
             {
                 // tabard not have dependent spells
                 for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_MAINHAND; ++i)

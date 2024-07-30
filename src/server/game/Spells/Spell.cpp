@@ -2321,7 +2321,7 @@ void Spell::prepareDataForTriggerSystem(AuraEffect const* /*triggeredByAura*/)
             }
             break;
         default:
-            if (m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON &&
+            if (m_spellInfo->EquippedItemClass == ITEM_WEAPON &&
                     m_spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_WEAPON_WAND)
                     && m_spellInfo->HasAttribute(SPELL_ATTR2_AUTO_REPEAT)) // Wands auto attack
             {
@@ -4953,7 +4953,7 @@ void Spell::WriteAmmoToPacket(WorldPacket* data)
             {
                 if (ItemEntry const* itemEntry = sItemStore.LookupEntry(item_id))
                 {
-                    if (itemEntry->ClassID == ITEM_CLASS_WEAPON)
+                    if (itemEntry->ClassID == ITEM_WEAPON)
                     {
                         switch (itemEntry->SubclassID)
                         {
@@ -7195,7 +7195,7 @@ SpellCastResult Spell::CheckItems()
                     return SPELL_FAILED_NO_CHARGES_REMAIN;
 
         // consumable cast item checks
-        if (proto->Class == ITEM_CLASS_CONSUMABLE && m_targets.GetUnitTarget())
+        if (proto->Class == ITEM_CONSUMABLE && m_targets.GetUnitTarget())
         {
             // such items should only fail if there is no suitable effect at all - see Rejuvenation Potions for example
             SpellCastResult failReason = SPELL_CAST_OK;
@@ -7545,7 +7545,7 @@ SpellCastResult Spell::CheckItems()
                         return SPELL_FAILED_LOW_CASTLEVEL;
                     if (item_quality > 4 || item_quality < 2)
                         return SPELL_FAILED_CANT_BE_DISENCHANTED;
-                    if (itemProto->Class != ITEM_CLASS_WEAPON && itemProto->Class != ITEM_CLASS_ARMOR)
+                    if (itemProto->Class != ITEM_WEAPON && itemProto->Class != ITEM_ARMOR)
                         return SPELL_FAILED_CANT_BE_DISENCHANTED;
                     if (!itemProto->DisenchantID)
                         return SPELL_FAILED_CANT_BE_DISENCHANTED;
@@ -7637,7 +7637,7 @@ SpellCastResult Spell::CheckItems()
                                 if (!ammoProto)
                                     return SPELL_FAILED_NO_AMMO;
 
-                                if (ammoProto->Class != ITEM_CLASS_PROJECTILE)
+                                if (ammoProto->Class != ITEM_PROJECTILE)
                                     return SPELL_FAILED_NO_AMMO;
 
                                 // check ammo ws. weapon compatibility
