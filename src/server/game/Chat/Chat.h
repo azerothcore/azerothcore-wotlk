@@ -54,7 +54,17 @@ public:
     template<typename... Args>
     void SendGMText(uint32 strId, Args&&... args)
     {
-        SendGMText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+        // WorldText should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
+                SendGMText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+            }
+        }
     }
     template<typename... Args>
     void SendGMText(char const* fmt, Args&&... args)
