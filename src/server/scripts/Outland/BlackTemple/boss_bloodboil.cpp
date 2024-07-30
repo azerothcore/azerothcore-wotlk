@@ -60,15 +60,7 @@ enum Spells
 
 enum Misc
 {
-    EVENT_SPELL_BLOOD_BOIL          = 1,
-    EVENT_SPELL_BEWILDERING_STRIKE  = 2,
-    EVENT_SPELL_FEL_ACID_BREATH     = 3,
-    EVENT_SPELL_EJECT               = 4,
-    EVENT_SPELL_ARCING_SMASH        = 5,
-    EVENT_SPELL_CHARGE              = 6,
-    EVENT_SPELL_BERSERK             = 7,
-    EVENT_SPELL_FEL_GEYSER          = 8,
-    EVENT_KILL_TALK                 = 9,
+    EVENT_SPELL_BERSERK             = 1,
 
     GROUP_DELAY                     = 1
 };
@@ -85,13 +77,12 @@ public:
 
     struct boss_gurtogg_bloodboilAI : public BossAI
     {
-        boss_gurtogg_bloodboilAI(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL)
-        {
-        }
+        boss_gurtogg_bloodboilAI(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL), _recentlySpoken(false) { }
 
         void Reset() override
         {
             BossAI::Reset();
+            _recentlySpoken = false;
         }
 
         void JustEngagedWith(Unit* who) override
@@ -99,22 +90,67 @@ public:
             BossAI::JustEngagedWith(who);
             Talk(SAY_AGGRO);
 
-            me->CastSpell(me, SPELL_ACIDIC_WOUND, true);
-            events.ScheduleEvent(EVENT_SPELL_BLOOD_BOIL, 10000);
-            events.ScheduleEvent(EVENT_SPELL_BEWILDERING_STRIKE, 28000, GROUP_DELAY);
-            events.ScheduleEvent(EVENT_SPELL_FEL_ACID_BREATH, 38000);
-            events.ScheduleEvent(EVENT_SPELL_EJECT, 14000);
-            events.ScheduleEvent(EVENT_SPELL_ARCING_SMASH, 5000);
-            events.ScheduleEvent(EVENT_SPELL_FEL_GEYSER, 60000);
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
+            DoCastSelf(SPELL_ACIDIC_WOUND, true);
+
+            ScheduleTimedEvent(10s, [&] {
+                me->CastCustomSpell(SPELL_BLOODBOIL, SPELLVALUE_MAX_TARGETS, 5, me, false);
+            }, 10s);
+
+            ScheduleTimedEvent(38s, [&] {
+                DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_FEL_ACID_BREATH2 : SPELL_FEL_ACID_BREATH1);
+            }, 30s);
+
+            ScheduleTimedEvent(14s, [&] {
+                DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_EJECT2 : SPELL_EJECT1);
+            }, 20s);
+
+            ScheduleTimedEvent(5s, [&] {
+                DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_ARCING_SMASH2 : SPELL_ARCING_SMASH1);
+            }, 15s);
+
+            ScheduleTimedEvent(1min, [&] {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
+                {
+                    me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
+                    DoCastSelf(SPELL_FEL_RAGE_SELF, true);
+                    DoCast(target, SPELL_FEL_RAGE_TARGET, true);
+                    DoCast(target, SPELL_FEL_RAGE_2, true);
+                    DoCast(target, SPELL_FEL_RAGE_3, true);
+                    DoCast(target, SPELL_FEL_RAGE_SIZE, true);
+                    target->CastSpell(me, SPELL_TAUNT_GURTOGG, true);
+
+                    DoCast(target, SPELL_FEL_GEYSER_SUMMON, true);
+                    DoCastSelf(SPELL_FEL_GEYSER_STUN, true);
+                    DoCastSelf(SPELL_INSIGNIFICANCE, true);
+
+                    me->m_Events.AddEventAtOffset([&] {
+                        DoCastVictim(SPELL_CHARGE);
+                    }, 2s);
+
+                    scheduler.DelayGroup(GROUP_DELAY, 30s);
+                }
+            }, 90s);
+
+            ScheduleUniqueTimedEvent(10min, [&] {
+                Talk(SAY_ENRAGE);
+                DoCastSelf(SPELL_BERSERK, true);
+            }, EVENT_SPELL_BERSERK);
+
+            scheduler.Schedule(28s, [this](TaskContext context) {
+                context.SetGroup(GROUP_DELAY);
+                DoCastVictim(SPELL_BEWILDERING_STRIKE);
+                context.Repeat(30s);
+            });
         }
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!_recentlySpoken)
             {
                 Talk(SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                me->m_Events.AddEventAtOffset([&] {
+                    _recentlySpoken = false;
+                }, 6s);
             }
         }
 
@@ -135,59 +171,9 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
+            scheduler.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPELL_BERSERK:
-                    Talk(SAY_ENRAGE);
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    break;
-                case EVENT_SPELL_BLOOD_BOIL:
-                    me->CastCustomSpell(SPELL_BLOODBOIL, SPELLVALUE_MAX_TARGETS, 5, me, false);
-                    events.ScheduleEvent(EVENT_SPELL_BLOOD_BOIL, 10000);
-                    break;
-                case EVENT_SPELL_BEWILDERING_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_BEWILDERING_STRIKE, false);
-                    events.ScheduleEvent(EVENT_SPELL_BEWILDERING_STRIKE, 30000, GROUP_DELAY);
-                    break;
-                case EVENT_SPELL_FEL_ACID_BREATH:
-                    me->CastSpell(me->GetVictim(), me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_FEL_ACID_BREATH2 : SPELL_FEL_ACID_BREATH1, false);
-                    events.ScheduleEvent(EVENT_SPELL_FEL_ACID_BREATH, 30000);
-                    break;
-                case EVENT_SPELL_EJECT:
-                    me->CastSpell(me->GetVictim(), me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_EJECT2 : SPELL_EJECT1, false);
-                    events.ScheduleEvent(EVENT_SPELL_EJECT, 20000);
-                    break;
-                case EVENT_SPELL_ARCING_SMASH:
-                    me->CastSpell(me->GetVictim(), me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_ARCING_SMASH2 : SPELL_ARCING_SMASH1, false);
-                    events.ScheduleEvent(EVENT_SPELL_ARCING_SMASH, 15000);
-                    break;
-                case EVENT_SPELL_FEL_GEYSER:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
-                    {
-                        me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
-                        me->CastSpell(me, SPELL_FEL_RAGE_SELF, true);
-                        me->CastSpell(target, SPELL_FEL_RAGE_TARGET, true);
-                        me->CastSpell(target, SPELL_FEL_RAGE_2, true);
-                        me->CastSpell(target, SPELL_FEL_RAGE_3, true);
-                        me->CastSpell(target, SPELL_FEL_RAGE_SIZE, true);
-                        target->CastSpell(me, SPELL_TAUNT_GURTOGG, true);
-
-                        me->CastSpell(target, SPELL_FEL_GEYSER_SUMMON, true);
-                        me->CastSpell(me, SPELL_FEL_GEYSER_STUN, true);
-                        me->CastSpell(me, SPELL_INSIGNIFICANCE, true);
-                        events.ScheduleEvent(EVENT_SPELL_CHARGE, 2000);
-                        events.DelayEvents(30000, GROUP_DELAY);
-                    }
-                    events.ScheduleEvent(EVENT_SPELL_FEL_GEYSER, 90000);
-                    break;
-                case EVENT_SPELL_CHARGE:
-                    me->CastSpell(me->GetVictim(), SPELL_CHARGE, true);
-                    break;
-            }
 
             DoMeleeAttackIfReady();
         }
@@ -196,6 +182,9 @@ public:
         {
             return me->GetHomePosition().GetExactDist2d(me) > 105.0f;
         }
+
+        private:
+            bool _recentlySpoken;
     };
 };
 
