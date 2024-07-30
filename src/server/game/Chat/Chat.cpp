@@ -102,50 +102,36 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
 void ChatHandler::SendWorldText(std::string_view str)
 {
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
-    for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+
+    Player* player = m_session->GetPlayer();
+    if (!player || !player->IsInWorld())
+        return;
+
+    for (std::string_view line : lines)
     {
-        WorldSession* session = itr->second;
-        if (!session)
-            continue;
-
-        // Player should be in world
-        Player* player = session->GetPlayer();
-        if (!player || !player->IsInWorld())
-            continue;
-
-        for (std::string_view line : lines)
-        {
-            WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
-            player->SendDirectMessage(&data);
-        }
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+        player->SendDirectMessage(&data);
     }
 }
 
 void ChatHandler::SendWorldTextOptional(std::string_view str, uint32 flag)
 {
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
-    for (SessionMap::const_iterator itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+
+    Player* player = m_session->GetPlayer();
+    if (!player || !player->IsInWorld())
+        return;
+
+    if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
+        if (player->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
+            return;
+
+    for (std::string_view line : lines)
     {
-        WorldSession* session = itr->second;
-        if (!session)
-            continue;
-
-        // Player should be in world
-        Player* player = session->GetPlayer();
-        if (!player || !player->IsInWorld())
-            continue;
-
-        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
-            if (player->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
-                continue;
-
-        for (std::string_view line : lines)
-        {
-            WorldPacket data;
-            ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
-            player->SendDirectMessage(&data);
-        }
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+        player->SendDirectMessage(&data);
     }
 }
 

@@ -20,6 +20,7 @@
 
 #include "ChatCommand.h"
 #include "Errors.h"
+#include "Player.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
 #include <vector>
@@ -58,14 +59,28 @@ public:
         SessionMap::const_iterator itr;
         for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
         {
-            if (m_session = itr->second->GetPlayer()->GetSession())
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
                 SendWorldText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+            }
         }
     }
     template<typename... Args>
     void SendWorldText(char const* fmt, Args&&... args)
     {
-        SendWorldText(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+        // WorldTextOptional should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
+                SendWorldText(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+            }
+        }
     }
 
     void SendWorldTextOptional(std::string_view str, uint32 flag);
@@ -76,14 +91,28 @@ public:
         SessionMap::const_iterator itr;
         for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
         {
-            if (m_session = itr->second->GetPlayer()->GetSession())
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
                 SendWorldTextOptional(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...), flag);
+            }
         }
     }
     template<typename... Args>
     void SendWorldTextOptional(char const* fmt, uint32 flag, Args&&... args)
     {
-        SendWorldTextOptional(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...), flag);
+        // WorldTextOptional should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
+                SendWorldTextOptional(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...), flag);
+            }
+        }
     }
 
     // function with different implementation for chat/console
