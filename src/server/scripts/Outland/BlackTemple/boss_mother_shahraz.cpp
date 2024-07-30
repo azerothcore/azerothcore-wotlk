@@ -148,7 +148,7 @@ class spell_mother_shahraz_random_periodic_aura : public AuraScript
     void Update(AuraEffect const* effect)
     {
         PreventDefaultAction();
-        if (effect->GetTickNumber() % 5 == 1)
+        if (GetUnitOwner())
             GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC), true);
     }
 
