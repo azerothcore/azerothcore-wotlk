@@ -60,15 +60,7 @@ enum Spells
 
 enum Misc
 {
-    EVENT_SPELL_BLOOD_BOIL          = 1,
-    EVENT_SPELL_BEWILDERING_STRIKE  = 2,
-    EVENT_SPELL_FEL_ACID_BREATH     = 3,
-    EVENT_SPELL_EJECT               = 4,
-    EVENT_SPELL_ARCING_SMASH        = 5,
-    EVENT_SPELL_CHARGE              = 6,
-    EVENT_SPELL_BERSERK             = 7,
-    EVENT_SPELL_FEL_GEYSER          = 8,
-    EVENT_KILL_TALK                 = 9,
+    EVENT_SPELL_BERSERK             = 1,
 
     GROUP_DELAY                     = 1
 };
@@ -99,9 +91,6 @@ public:
             Talk(SAY_AGGRO);
 
             DoCastSelf(SPELL_ACIDIC_WOUND, true);
-            events.ScheduleEvent(EVENT_SPELL_BEWILDERING_STRIKE, 28000, GROUP_DELAY);
-
-            events.ScheduleEvent(EVENT_SPELL_BERSERK, 600000);
 
             ScheduleTimedEvent(10s, [&] {
                 me->CastCustomSpell(SPELL_BLOODBOIL, SPELLVALUE_MAX_TARGETS, 5, me, false);
