@@ -61,7 +61,7 @@ public:
     {
         SendNotification(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
     }
-  
+
     void SendWorldText(std::string_view str);
     template<typename... Args>
     void SendWorldText(uint32 strId, Args&&... args)
