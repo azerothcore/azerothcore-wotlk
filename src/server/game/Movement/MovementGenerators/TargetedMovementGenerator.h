@@ -74,8 +74,8 @@ template<class T>
 class FollowMovementGenerator : public MovementGeneratorMedium<T, FollowMovementGenerator<T>>, public TargetedMovementGeneratorBase
 {
 public:
-    FollowMovementGenerator(Unit* target, float range, ChaseAngle angle)
-        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckPredictedDistanceTimer(0), i_recheckPredictedDistance(false), _range(range), _angle(angle) {}
+    FollowMovementGenerator(Unit* target, float range, ChaseAngle angle, bool inheritWalkState)
+        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckPredictedDistanceTimer(0), i_recheckPredictedDistance(false), _range(range), _angle(angle),_inheritWalkState(inheritWalkState) {}
     ~FollowMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
@@ -106,6 +106,7 @@ private:
     Optional<Position> _lastPredictedPosition;
     float _range;
     ChaseAngle _angle;
+    bool _inheritWalkState;
 };
 
 #endif

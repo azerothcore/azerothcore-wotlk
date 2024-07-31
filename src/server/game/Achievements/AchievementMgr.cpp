@@ -2473,10 +2473,15 @@ bool AchievementGlobalMgr::IsStatisticAchievement(AchievementEntry const* achiev
 
 bool AchievementGlobalMgr::IsAverageCriteria(AchievementCriteriaEntry const* criteria) const
 {
-    if ((sAchievementStore.LookupEntry(criteria->referredAchievement))->flags & ACHIEVEMENT_FLAG_AVERAGE)
+    auto referencedAchievement = sAchievementStore.LookupEntry(criteria->referredAchievement);
+
+    if (!referencedAchievement)
+        return false;
+
+    if (referencedAchievement->flags & ACHIEVEMENT_FLAG_AVERAGE)
         return true;
 
-    if (AchievementEntryList const* achRefList = GetAchievementByReferencedId(criteria->referredAchievement))
+    if (AchievementEntryList const* achRefList = GetAchievementByReferencedId(referencedAchievement->ID))
         for (AchievementEntryList::const_iterator itr = achRefList->begin(); itr != achRefList->end(); ++itr)
             if ((*itr)->flags & ACHIEVEMENT_FLAG_AVERAGE)
                 return true;

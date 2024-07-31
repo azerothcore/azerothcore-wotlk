@@ -76,7 +76,7 @@ DBCFile::~DBCFile()
     delete [] data;
 }
 
-DBCFile::Record DBCFile::getRecord(size_t id)
+DBCFile::Record DBCFile::getRecord(std::std::size_t id)
 {
     assert(data);
     return Record(*this, data + id * recordSize);

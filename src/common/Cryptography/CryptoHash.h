@@ -43,14 +43,14 @@ namespace Acore::Impl
 #endif
     };
 
-    template <GenericHashImpl::HashCreator HashCreator, size_t DigestLength>
+    template <GenericHashImpl::HashCreator HashCreator, std::size_t DigestLength>
     class GenericHash
     {
         public:
-            static constexpr size_t DIGEST_LENGTH = DigestLength;
+            static constexpr std::size_t DIGEST_LENGTH = DigestLength;
             using Digest = std::array<uint8, DIGEST_LENGTH>;
 
-            static Digest GetDigestOf(uint8 const* data, size_t len)
+            static Digest GetDigestOf(uint8 const* data, std::size_t len)
             {
                 GenericHash hash;
                 hash.UpdateData(data, len);
@@ -112,7 +112,7 @@ namespace Acore::Impl
                 return *this;
             }
 
-            void UpdateData(uint8 const* data, size_t len)
+            void UpdateData(uint8 const* data, std::size_t len)
             {
                 int result = EVP_DigestUpdate(_ctx, data, len);
                 ASSERT(result == 1);

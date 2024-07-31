@@ -20,6 +20,7 @@
 
 #include "ChatCommand.h"
 #include "Errors.h"
+#include "Player.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
 #include <vector>
@@ -41,14 +42,78 @@ public:
     virtual ~ChatHandler() { }
 
     // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
-    static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
+    static std::size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
                                   std::string const& senderName = "", std::string const& receiverName = "",
                                   uint32 achievementId = 0, bool gmMessage = false, std::string const& channelName = "");
 
     // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
-    static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message, uint32 achievementId = 0, std::string const& channelName = "", LocaleConstant locale = DEFAULT_LOCALE);
+    static std::size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message, uint32 achievementId = 0, std::string const& channelName = "", LocaleConstant locale = DEFAULT_LOCALE);
 
     static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
+
+    void SendWorldText(std::string_view str);
+    template<typename... Args>
+    void SendWorldText(uint32 strId, Args&&... args)
+    {
+        // WorldText should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
+                SendWorldText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+            }
+        }
+    }
+    template<typename... Args>
+    void SendWorldText(char const* fmt, Args&&... args)
+    {
+        // WorldTextOptional should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
+                SendWorldText(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+            }
+        }
+    }
+
+    void SendWorldTextOptional(std::string_view str, uint32 flag);
+    template<typename... Args>
+    void SendWorldTextOptional(uint32 strId, uint32 flag, Args&&... args)
+    {
+        // WorldTextOptional should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
+                SendWorldTextOptional(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...), flag);
+            }
+        }
+    }
+    template<typename... Args>
+    void SendWorldTextOptional(char const* fmt, uint32 flag, Args&&... args)
+    {
+        // WorldTextOptional should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
+                SendWorldTextOptional(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...), flag);
+            }
+        }
+    }
 
     // function with different implementation for chat/console
     virtual char const* GetAcoreString(uint32 entry) const;

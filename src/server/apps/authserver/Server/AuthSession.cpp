@@ -751,7 +751,7 @@ void AuthSession::RealmListCallback(PreparedQueryResult result)
     // Circle through realms in the RealmList and construct the return packet (including # of user characters in each realm)
     ByteBuffer pkt;
 
-    size_t RealmListSize = 0;
+    std::size_t RealmListSize = 0;
     for (auto const& [realmHandle, realm] : sRealmList->GetRealms())
     {
         // don't work with realms which not compatible with the client

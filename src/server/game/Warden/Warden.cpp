@@ -168,7 +168,7 @@ union keyData
 uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
 {
     keyData hash{};
-    hash.bytes = Acore::Crypto::SHA1::GetDigestOf(data, size_t(length));
+    hash.bytes = Acore::Crypto::SHA1::GetDigestOf(data, std::size_t(length));
     uint32 checkSum = 0;
 
     for (uint8 i = 0; i < 5; ++i)
