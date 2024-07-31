@@ -1,4 +1,4 @@
---
+-- Scryers
 SET @CGUID := 12556;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+18 AND `id1` IN (23435, 23440);
@@ -406,3 +406,84 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 23441);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (23441, 1, 0, 1, 0, 0, 0, 0);
+
+-- Converting the older systems
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` IN (10, 11));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(10, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Actionlist - Set Visibility Off'),
+(10, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Actionlist - Set Flags Immune To Players & Immune To NPC\'s'),
+(11, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Actionlist - Set Visibility On'),
+(11, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Generic - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s');
+
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151291 AND `source_type`=0 AND `id`=1000;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151290 AND `source_type`=0 AND `id`=1000;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151289 AND `source_type`=0 AND `id`=1000;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151288 AND `source_type`=0 AND `id`=1000;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151287 AND `source_type`=0 AND `id`=1000;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151286 AND `source_type`=0 AND `id`=1000;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151285 AND `source_type`=0 AND `id`=1000;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151284 AND `source_type`=0 AND `id`=1000;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151034 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151033 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151032 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151031 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151030 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151029 AND `source_type`=0 AND `id`=1006;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151028 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151027 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151026 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151025 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151023 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151022 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151021 AND `source_type`=0 AND `id`=1001;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=10 WHERE `entryorguid`=-151020 AND `source_type`=0 AND `id`=1001;
+
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151291 AND `source_type`=0 AND `id`=1001 AND `link`=1002;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151290 AND `source_type`=0 AND `id`=1001 AND `link`=1002;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151289 AND `source_type`=0 AND `id`=1001 AND `link`=1002;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151288 AND `source_type`=0 AND `id`=1001 AND `link`=1002;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151287 AND `source_type`=0 AND `id`=1001 AND `link`=1002;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151286 AND `source_type`=0 AND `id`=1001 AND `link`=1002;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151285 AND `source_type`=0 AND `id`=1001 AND `link`=1002;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151284 AND `source_type`=0 AND `id`=1001 AND `link`=1002;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151034 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151033 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151032 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151031 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151030 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151029 AND `source_type`=0 AND `id`=1008 AND `link`=1009;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151028 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151027 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151026 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151025 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151023 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151022 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151021 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+UPDATE `smart_scripts` SET `action_type`=80, `action_param1`=11 WHERE `entryorguid`=-151020 AND `source_type`=0 AND `id`=1002 AND `link`=1003;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -151019);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-151019, 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Reset - Set Event Phase 1 (Allow Add to Spawn)'),
+(-151019, 0, 1002, 0, 82, 0, 100, 0, 17083, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Summoned Add Dies - Set Event Phase 1 (Allow Add to Spawn)'),
+(-151019, 0, 1003, 1004, 38, 1, 100, 0, 1, 1, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Say Line 6 (Phase 1)'),
+(-151019, 0, 1004, 1005, 61, 1, 100, 0, 0, 0, 0, 0, 0, 0, 12, 17083, 4, 300000, 0, 0, 0, 8, 0, 0, 0, 0, 89.4649, 187.334, -13.1455, 3.39256, 'Shattered Hand Legionnaire - On Data Set 1 1 - Summon Creature \'Fel Orc Convert\' (Phase 1)'),
+(-151019, 0, 1005, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Set Event Phase 2 (Do Not Allow Adds to Spawn)'),
+(-151019, 0, 1006, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Respawn - Disable'),
+(-151019, 0, 1007, 1008, 77, 0, 100, 0, 1, 2, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 2/2 - Enable'),
+(-151019, 0, 1008, 1009, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Counter 2/2 - Enable'),
+(-151019, 0, 1009, 1010, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 3, 1, 0, 0, 0, 0, 9, 0, 0, 60, 1, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Set Data 3 1 to Start Group 1 Spawn'),
+(-151019, 0, 1010, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 1670011, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Run Script'),
+(-151019, 0, 1011, 0, 58, 0, 100, 0, 0, 1670002, 0, 0, 0, 0, 80, 1670013, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Waypoint Finished - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -151024);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-151024, 0, 1001, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Reset - Set Event Phase 1 (Allow Add to Spawn)'),
+(-151024, 0, 1002, 0, 82, 0, 100, 0, 17083, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Summoned Add Dies - Set Event Phase 1 (Allow Add to Spawn)'),
+(-151024, 0, 1003, 1004, 38, 1, 100, 0, 1, 1, 0, 0, 0, 0, 1, 9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Say Line 9 (Phase 1)'),
+(-151024, 0, 1004, 1005, 61, 1, 100, 0, 0, 0, 0, 0, 0, 0, 12, 17083, 4, 300000, 0, 0, 0, 8, 0, 0, 0, 0, 79.7924, 218.84, -13.1506, 3.98455, 'Shattered Hand Legionnaire - On Data Set 1 1 - Summon Creature \'Fel Orc Convert\' (Phase 1)'),
+(-151024, 0, 1005, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 1 1 - Set Event Phase 2 (Do Not Allow Adds to Spawn)'),
+(-151024, 0, 1006, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Respawn - Disable'),
+(-151024, 0, 1007, 1008, 38, 0, 100, 0, 3, 2, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 3 2 - Enable'),
+(-151024, 0, 1008, 1009, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Data Set 3 2 - Enable'),
+(-151024, 0, 1009, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 1670012, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - Linked - Run Script'),
+(-151024, 0, 1010, 0, 40, 0, 100, 0, 4, 1670004, 0, 0, 0, 0, 80, 1670014, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Shattered Hand Legionnaire - On Waypoint Finished - Run Script');
