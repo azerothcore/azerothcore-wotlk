@@ -88,7 +88,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (23440, 0, 1, 0, 0, 0, 100, 0, 6000, 6000, 12000, 12000, 0, 0, 11, 38370, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - In Combat - Cast Aimed Shot'),
 (23440, 0, 2, 0, 0, 0, 100, 0, 8000, 8000, 15000, 15000, 0, 0, 11, 41448, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - In Combat - Cast Multi-Shot'),
 (23440, 0, 3, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 10, 1011, 23434, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Just Died - Add 1 to Commander Hobb Kill Counter'),
-(23440, 0, 4, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Aggro - Say Line 1'),
+(23440, 0, 4, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Aggro - Say Line 1'),
 (23440, 0, 5, 0, 37, 0, 100, 257, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Initialize - Disable Respawn');
 
 DELETE FROM `creature_text` WHERE (`CreatureID` = 23440);
@@ -272,7 +272,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (23441, 0, 1, 0, 0, 0, 100, 0, 6000, 6000, 12000, 12000, 0, 0, 11, 38370, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - In Combat - Cast Aimed Shot'),
 (23441, 0, 2, 0, 0, 0, 100, 0, 8000, 8000, 15000, 15000, 0, 0, 11, 41448, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - In Combat - Cast Multi-Shot'),
 (23441, 0, 3, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 10, 13564, 23452, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Just Died - Add 1 to Commander Arcus Kill Counter'),
-(23441, 0, 4, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Aggro - Say Line 1'),
+(23441, 0, 4, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Aggro - Say Line 1'),
 (23441, 0, 5, 0, 37, 0, 100, 257, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Initialize - Disable Respawn');
 
 UPDATE `creature_template_addon` SET `emote` = 376 WHERE (`entry` = 23453);
