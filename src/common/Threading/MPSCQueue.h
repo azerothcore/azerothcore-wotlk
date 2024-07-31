@@ -19,6 +19,7 @@
 #define MPSCQueue_h__
 
 #include <atomic>
+#include <memory>
 
 namespace Acore::Impl
 {
