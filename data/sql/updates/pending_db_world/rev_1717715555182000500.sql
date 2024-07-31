@@ -402,5 +402,3 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (234419, 6, -3132.411, 658.95215, 3.419254, NULL, 2),
 (234419, 7, -3111.927, 665.25214, -7.941859, NULL, 2),
 (234419, 8, -3101.4766, 664.6626, -10.552968, NULL, 2);
-
-UPDATE `creature_template` SET `npcflag` = 0 WHERE (`entry` IN (23434, 23452));
