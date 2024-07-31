@@ -74,7 +74,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2343402, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Say Line 2'),
 (2343402, 9, 4, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 0, 101, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Reset Home Position'),
 (2343402, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - Actionlist - Evade'),
-(2343402, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - On Just Died - Despawn Self Instant (I\'m having issues with Home Pos and Evade)');
+(2343402, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Hobb - On Just Died - Despawn Self Instant');
 
 UPDATE `creature_template_addon` SET `emote` = 376 WHERE (`entry` = 23435);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23435);
@@ -201,3 +201,206 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-(@CGUID+16), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234407, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234407'),
 (-(@CGUID+17), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234408, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234408'),
 (-(@CGUID+18), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234409, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234409');
+
+-- Aldor
+DELETE FROM `creature_text` WHERE (`CreatureID` = 23441);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(23441, 0, 0, 'BURN IT DOWN!', 14, 0, 100, 0, 0, 0, 21656, 0, 'Dragonmaw Skybreaker'),
+(23441, 0, 1, 'KILL THEM ALL!', 14, 0, 100, 0, 0, 0, 1690, 0, 'Dragonmaw Skybreaker'),
+(23441, 1, 0, 'For the Dragonmaw!', 12, 0, 100, 0, 0, 0, 1937, 0, 'Dragonmaw Skybreaker'),
+(23441, 1, 1, 'Long live the Dragonmaw! Die you worthless $N!', 12, 0, 100, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker'),
+(23441, 1, 2, 'Your bones will break under my boot, $N', 12, 0, 100, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker');
+
+DELETE FROM `creature_text` WHERE (`CreatureID` = 23452);
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(23452, 0, 0, 'The Dragonmaw must be stopped...', 14, 0, 100, 22, 0, 0, 21685, 0, 'Commander Arcus to Player'),
+(23452, 1, 0, 'Stand tall, soldiers. Show them no quarter!', 12, 0, 100, 5, 0, 0, 21633, 0, 'Commander Arcus to Player'),
+(23452, 2, 0, 'Victory to the Aldor! The Dragonmaw have been defeated!', 14, 0, 100, 0, 0, 0, 21728, 0, 'Commander Arcus to Commander Arcus');
+
+SET @CGUID := 12720;
+
+DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+18 AND `id1` IN (23453, 23441);
+INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
+(@CGUID+0, 23453, 530, 3520, 3754, 1, -3083.6, 687.388, -17.0363, 3.08923, 0, 55639, 2, NULL),
+(@CGUID+1, 23453, 530, 3520, 3754, 1, -3085.62, 692.253, -17.6563, 3.08923, 0, 55639, 2, NULL),
+(@CGUID+2, 23453, 530, 3520, 3754, 1, -3088.42, 684.481, -17.5697, 3.14159, 0, 55639, 2, NULL),
+(@CGUID+3, 23453, 530, 3520, 3754, 1, -3086.17, 680.568, -15.9425, 2.98451, 0, 55639, 2, NULL),
+(@CGUID+4, 23453, 530, 3520, 3754, 1, -3096.63, 667.763, -13.7902, 2.77507, 0, 55639, 2, NULL),
+(@CGUID+5, 23453, 530, 3520, 3754, 1, -3093.32, 673.408, -15.203, 2.87979, 0, 55639, 2, NULL),
+(@CGUID+6, 23453, 530, 3520, 3754, 1, -3091.12, 678.402, -16.3597, 3.03687, 0, 55639, 2, NULL),
+(@CGUID+7, 23453, 530, 3520, 3754, 1, -3094.99, 662.722, -12.762, 2.58309, 0, 55639, 2, NULL),
+(@CGUID+8, 23453, 530, 3520, 3754, 1, -3091.11, 668.166, -14.1371, 2.74017, 0, 55639, 2, NULL),
+(@CGUID+9, 23453, 530, 3520, 3754, 1, -3088.57, 674.317, -14.8953, 2.75762, 0, 55639, 2, NULL),
+
+(@CGUID+10, 23441, 530, 3520, 3754, 1, -3259.4226, 708.5354, 38.91116, 6.233379364013671875, 0, 55639, 2, NULL),
+(@CGUID+11, 23441, 530, 3520, 3754, 1, -3006.4463, 564.1875, 48.472195, 2.211099624633789062, 0, 55639, 2, NULL),
+(@CGUID+12, 23441, 530, 3520, 3754, 1, -3247.2795, 681.7934, 46.758705, 6.047158718109130859, 0, 55639, 2, NULL),
+(@CGUID+13, 23441, 530, 3520, 3754, 1, -3271.6199, 722.7448, 48.811226, 6.087714672088623046, 0, 55639, 2, NULL),
+(@CGUID+14, 23441, 530, 3520, 3754, 1, -3030.6301, 557.1302, 34.245502, 2.113452434539794921, 0, 55639, 2, NULL),
+(@CGUID+15, 23441, 530, 3520, 3754, 1, -3268.5156, 750.7678, 33.435238, 5.964546680450439453, 0, 55639, 2, NULL),
+(@CGUID+16, 23441, 530, 3520, 3754, 1, -3268.2517, 731.8698, 32.24829, 6.274892807006835937, 0, 55639, 2, NULL),
+(@CGUID+17, 23441, 530, 3520, 3754, 1, -2987.5417, 575.9792, 58.821465, 2.240255117416381835, 0, 55639, 2, NULL),
+(@CGUID+18, 23441, 530, 3520, 3754, 1, -3260.4463, 692.08856, 43.37934, 6.01873016357421875, 0, 55639, 2, NULL);
+
+DELETE FROM `waypoint_data` WHERE `id` = 234521;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`) VALUES
+(234521, 1, -3043.0544, 759.7127, -10.093901, NULL, 0, 1),
+(234521, 2, -3048.7854, 739.1032, -9.660838, NULL, 0, 1),
+(234521, 3, -3047.9675, 718.32794, -10.502778, NULL, 0, 1),
+(234521, 4, -3060.013, 682.91296, -13.024189, NULL, 0, 1),
+(234521, 5, -3080.6594, 675.9093, -13.976298, NULL, 0, 1),
+(234521, 6, -3096.214, 680.7059, -17.963423, NULL, 4200, 1),
+(234521, 7, -3096.214, 680.7059, -17.963423, 5.969026088714599609, 4800, 0),
+(234521, 8, -3096.214, 680.7059, -17.963423, 2.94960641860961914, 0, 0);
+
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|134217728 WHERE (`entry` = 23441);
+DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (-(@CGUID+10),-(@CGUID+11),-(@CGUID+12),-(@CGUID+13),-(@CGUID+14),-(@CGUID+15),-(@CGUID+16),-(@CGUID+17),-(@CGUID+18))) AND (`source_type` = 0) AND (`id` IN (1000));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(-(@CGUID+10), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234411, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234411'),
+(-(@CGUID+11), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234412, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234412'),
+(-(@CGUID+12), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234413, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234413'),
+(-(@CGUID+13), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234414, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234414'),
+(-(@CGUID+14), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234415, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234415'),
+(-(@CGUID+15), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234416, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234416'),
+(-(@CGUID+16), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234417, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234417'),
+(-(@CGUID+17), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234418, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234418'),
+(-(@CGUID+18), 0, 1000, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, 234419, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Respawn - Start Path 234419');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23441);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(23441, 0, 0, 0, 0, 0, 100, 0, 1000, 1000, 3500, 3500, 0, 0, 11, 41440, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - In Combat - Cast Shoot'),
+(23441, 0, 1, 0, 0, 0, 100, 0, 6000, 6000, 12000, 12000, 0, 0, 11, 38370, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - In Combat - Cast Aimed Shot'),
+(23441, 0, 2, 0, 0, 0, 100, 0, 8000, 8000, 15000, 15000, 0, 0, 11, 41448, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - In Combat - Cast Multi-Shot'),
+(23441, 0, 3, 0, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 63, 1, 1, 0, 0, 0, 0, 10, 13564, 23452, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Just Died - Add 1 to Commander Arcus Kill Counter'),
+(23441, 0, 4, 0, 4, 0, 15, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Aggro - Say Line 1'),
+(23441, 0, 5, 0, 37, 0, 100, 257, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dragonmaw Skybreaker - On Initialize - Disable Respawn');
+
+UPDATE `creature_template_addon` SET `emote` = 376 WHERE (`entry` = 23453);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23453);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(23453, 0, 0, 0, 0, 0, 100, 0, 1000, 1000, 3500, 3500, 0, 0, 11, 41440, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Altar Defender - In Combat - Cast Shoot'),
+(23453, 0, 1, 0, 37, 0, 100, 257, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Altar Defender - On Initialize - Disable Respawn');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23452);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(23452, 0, 0 , 0, 19, 0, 100, 512, 11101, 0, 0, 0, 0, 0, 80, 2345200, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Quest \'The Deadliest Trap Ever Laid\' Taken - Run Script (Start Quest Event)'),
+(23452, 0, 1 , 0, 11, 0, 100, 512, 0, 0, 0, 0, 0, 0, 81, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Respawn - Set Npc Flags Questgiver'),
+(23452, 0, 2 , 0, 0, 0, 100, 0, 1000, 1000, 2000, 2000, 0, 0, 11, 41440, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - In Combat - Cast \'Shoot\''),
+(23452, 0, 3 , 0, 0, 0, 100, 0, 6000, 6000, 12000, 12000, 0, 0, 11, 38370, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - In Combat - Cast \'Aimed Shot\''),
+(23452, 0, 4 , 0, 0, 0, 100, 0, 8000, 8000, 15000, 15000, 0, 0, 11, 41448, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - In Combat - Cast \'Multi-Shot\''),
+(23452, 0, 5 , 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Aggro - Call For Help'),
+(23452, 0, 6 , 7, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2345201, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Run Script (Fail Quest)'),
+(23452, 0, 7 , 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23453, 0, 100, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Disable Quest Creatures'),
+(23452, 0, 8 , 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23441, 0, 150, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Disable Quest Creatures'),
+(23452, 0, 9 , 10, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 6, 11101, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Fail Quest \'The Deadliest Trap Ever Laid\''),
+(23452, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Despawn Self Instant'),
+(23452, 0, 11, 0, 77, 0, 100, 0, 1, 20, 0, 0, 0, 0, 80, 2345202, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On 20 Enemies Killed - Run Script (Complete Quest)'),
+(23452, 0, 12, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 40, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Respawn - Set Sheath Melee'),
+(23452, 0, 13, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 17, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Respawn - Set Emote State 0');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2345200);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2345200, 9, 0 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Remove Npc Flags Questgiver'),
+(2345200, 9, 1 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 63, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Reset Counter'),
+(2345200, 9, 2 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Store Targetlist Party'),
+(2345200, 9, 4 , 0, 0, 0, 100, 0, 2900, 2900, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 0'),
+(2345200, 9, 5 , 0, 0, 0, 100, 0, 3100, 3100, 0, 0, 0, 0, 232, 234521, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Start Path 234521'),
+(2345200, 9, 3 , 0, 0, 0, 100, 0, 26000, 26000, 0, 0, 0, 0, 226, 1, 0, 0, 0, 0, 0, 9, 23453, 0, 100, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Spawn In Altar Defenders'),
+(2345200, 9, 6 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 1'),
+(2345200, 9, 8 , 0, 0, 0, 100, 0, 3100, 3100, 0, 0, 0, 0, 40, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Set Sheath Ranged'),
+(2345200, 9, 9 , 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 17, 214, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Set EmoteState 214'),
+(2345200, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 2, 1, 1, 5, 5, 0, 9, 23441, 0, 150, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Start Spawning Dragonmaw Skybreakers'),
+(2345200, 9, 11, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 23441, 150, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 0 (Dragonmaw Skybreaker)');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2345202);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2345202, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23453, 0, 100, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Disable Quest Creatures'),
+(2345202, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23441, 0, 150, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Disable Quest Creatures'),
+(2345202, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 26, 11101, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Quest Credit \'The Deadliest Trap Ever Laid\''),
+(2345202, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 2'),
+(2345202, 9, 4, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 0, 101, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Reset Home Position'),
+(2345202, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Evade'),
+(2345202, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Despawn Self Instant');
+
+DELETE FROM `waypoint_data` WHERE `id` BETWEEN 234411 AND 234419;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `move_type`) VALUES
+-- [0] Position: X: -3259.4226, 708.5354, 38.91116
+-- [0] Orientation: 6.233379364013671875
+(234411, 1, -3242.5364, 707.69366, 52.700848, NULL, 2),
+(234411, 2, -3219.2295, 703.29517, 52.700848, NULL, 2),
+(234411, 3, -3185.632, 695.4233, 37.25641, NULL, 2),
+(234411, 4, -3147.6853, 685.7768, 19.589731, NULL, 2),
+(234411, 5, -3107.8901, 674.2289, 6.561962, NULL, 2),
+-- [1] Position: X: -3006.4463, 564.1875, 48.472195
+-- [1] Orientation: 2.211099624633789062
+(234412, 1, -3006.4463, 564.1875, 48.472195, NULL, 2),
+(234412, 2, -3020.0957, 582.5085, 26.582497, NULL, 2),
+(234412, 3, -3037.433, 610.57153, 8.026941, NULL, 2),
+(234412, 4, -3054.981, 636.631, 1.888052, NULL, 2),
+(234412, 5, -3081.3538, 670.811, -6.723061, NULL, 2),
+-- [2] Position: X: -3247.2795, 681.7934, 46.758705
+-- [2] Orientation: 6.047158718109130859
+(234413, 1, -3247.2795, 681.7934, 46.758705, NULL, 2),
+(234413, 2, -3224.905, 676.4121, 60.397457, NULL, 2),
+(234413, 3, -3197.4385, 662.9752, 60.397453, NULL, 2),
+(234413, 4, -3175.9648, 654.6516, 60.397453, NULL, 2),
+(234413, 5, -3159.4307, 646.17004, 60.397453, NULL, 2),
+(234413, 6, -3121.3748, 624.6077, 37.00856, NULL, 2),
+(234413, 7, -3101.5295, 653.33734, 2.008561, NULL, 2),
+-- [3] Position: X: -3271.6199, 722.7448, 48.811226
+-- [3] Orientation: 6.087714672088623046
+(234414, 1, -3271.6199, 722.7448, 48.811226, NULL, 2),
+(234414, 2, -3255.2827, 719.5101, 46.016747, NULL, 2),
+(234414, 3, -3222.5205, 717.1377, 45.511993, NULL, 2),
+(234414, 4, -3198.0264, 711.52374, 35.567757, NULL, 2),
+(234414, 5, -3167.2495, 706.08527, 16.984415, NULL, 2),
+(234414, 6, -3126.632, 691.3753, -8.571138, NULL, 2),
+(234414, 7, -3099.939, 682.7796, -15.793356, NULL, 2),
+-- [4] Position: X: -3030.6301, 557.1302, 34.245502
+-- [4] Orientation: 2.113452434539794921
+(234415, 1, -3030.6301, 557.1302, 34.245502, NULL, 2),
+(234415, 2, -3044.279, 579.7635, 47.477497, NULL, 2),
+(234415, 3, -3056.1836, 615.40344, 25.783052, NULL, 2),
+(234415, 4, -3071.745, 646.99536, 5.366384, NULL, 2),
+(234415, 5, -3085.0522, 661.14874, -9.10583, NULL, 2),
+(234415, 6, -3085.0522, 661.14874, -9.10583, NULL, 2),
+-- [5] Position: X: -3268.5156, 750.7678, 33.435238
+-- [5] Orientation: 5.964546680450439453
+(234416, 1 , -3268.5156, 750.7678, 33.435238, NULL, 2),
+(234416, 2 , -3243.4297, 742.4925, 22.651155, NULL, 2),
+(234416, 3 , -3213.966, 746.05066, 22.651155, NULL, 2),
+(234416, 4 , -3189.9797, 744.0554, 26.484491, NULL, 2),
+(234416, 5 , -3150.6821, 757.67755, 29.956709, NULL, 2),
+(234416, 6 , -3120.7246, 761.84796, 35.484493, NULL, 2),
+(234416, 7 , -3104.629, 754.38446, 29.567825, NULL, 2),
+(234416, 8 , -3082.1396, 720.24805, 3.762264, NULL, 2),
+(234416, 9 , -3085.2312, 701.88586, -12.293289, NULL, 2),
+(234416, 10, -3089.7302, 692.963, -16.515514, NULL, 2),
+-- [6] Position: X: -3268.2517, 731.8698, 32.24829
+-- [6] Orientation: 6.274892807006835937
+(234417, 1, -3268.2517, 731.8698, 32.24829, NULL, 2),
+(234417, 2, -3249.601, 731.71515, 36.61551, NULL, 2),
+(234417, 3, -3226.119, 729.245, 36.61551, NULL, 2),
+(234417, 4, -3200.4783, 728.32074, 36.61551, NULL, 2),
+(234417, 5, -3154.492, 724.6342, 28.42106, NULL, 2),
+(234417, 6, -3122.896, 709.35486, 13.365505, NULL, 2),
+(234417, 7, -3108.9421, 698.5323, 0.143284, NULL, 2),
+-- [7] Position: X: -2987.5417, 575.9792, 58.821465
+-- [7] Orientation: 2.240255117416381835
+(234418, 1, -2987.5417, 575.9792, 58.821465, NULL, 2),
+(234418, 2, -3021.1553, 618.4541, 25.290438, NULL, 2),
+(234418, 3, -3036.0618, 656.704, 4.762658, NULL, 2),
+(234418, 4, -3075.4192, 678.96826, -13.154009, NULL, 2),
+(234418, 5, -3083.369, 683.91406, -15.12623, NULL, 2),
+-- [8] Position: X: -3260.4463, 692.08856, 43.37934
+-- [8] Orientation: 6.01873016357421875
+(234419, 1, -3260.4463, 692.08856, 43.37934, NULL, 2),
+(234419, 2, -3243.889, 687.60486, 51.14147, NULL, 2),
+(234419, 3, -3202.3489, 669.66095, 51.14147, NULL, 2),
+(234419, 4, -3183.1746, 660.77405, 51.14147, NULL, 2),
+(234419, 5, -3155.9106, 659.907, 33.113697, NULL, 2),
+(234419, 6, -3132.411, 658.95215, 3.419254, NULL, 2),
+(234419, 7, -3111.927, 665.25214, -7.941859, NULL, 2),
+(234419, 8, -3101.4766, 664.6626, -10.552968, NULL, 2);
+
+UPDATE `creature_template` SET `npcflag` = 0 WHERE (`entry` IN (23434, 23452));
