@@ -458,13 +458,13 @@ struct BroadcastText
     {
         if (gender == GENDER_FEMALE && (forceGender || !FemaleText[DEFAULT_LOCALE].empty()))
         {
-            if (FemaleText.size() > size_t(locale) && !FemaleText[locale].empty())
+            if (FemaleText.size() > std::size_t(locale) && !FemaleText[locale].empty())
                 return FemaleText[locale];
             return FemaleText[DEFAULT_LOCALE];
         }
         // else if (gender == GENDER_MALE)
         {
-            if (MaleText.size() > size_t(locale) && !MaleText[locale].empty())
+            if (MaleText.size() > std::size_t(locale) && !MaleText[locale].empty())
                 return MaleText[locale];
             return MaleText[DEFAULT_LOCALE];
         }
@@ -1414,7 +1414,7 @@ public:
     }
 
     static void AddLocaleString(std::string&& s, LocaleConstant locale, std::vector<std::string>& data);
-    static std::string_view GetLocaleString(std::vector<std::string> const& data, size_t locale)
+    static std::string_view GetLocaleString(std::vector<std::string> const& data, std::size_t locale)
     {
         if (locale < data.size())
             return data[locale];
@@ -1423,7 +1423,7 @@ public:
     }
     static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
     {
-        if (data.size() > size_t(loc_idx) && !data[loc_idx].empty())
+        if (data.size() > std::size_t(loc_idx) && !data[loc_idx].empty())
             value = data[loc_idx];
     }
 

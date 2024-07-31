@@ -694,7 +694,7 @@ public:
                             if (!p->IsGameMaster())
                                 targetList.push_back(p);
 
-                    size_t half = targetList.size() / 2;
+                    std::size_t half = targetList.size() / 2;
                     // half gets ooze variable
                     while (half < targetList.size())
                     {

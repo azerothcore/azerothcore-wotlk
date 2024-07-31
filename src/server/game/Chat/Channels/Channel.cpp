@@ -706,7 +706,7 @@ void Channel::List(Player const* player)
     data << GetName();                                  // channel name
     data << uint8(GetFlags());                          // channel flags?
 
-    size_t pos = data.wpos();
+    std::size_t pos = data.wpos();
     data << uint32(0);                                  // size of list, placeholder
 
     uint32 count  = 0;
