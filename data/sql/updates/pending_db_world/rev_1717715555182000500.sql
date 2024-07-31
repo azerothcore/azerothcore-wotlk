@@ -291,7 +291,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (23452, 0, 5 , 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Aggro - Call For Help'),
 (23452, 0, 6 , 7, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2345201, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Run Script (Fail Quest)'),
 (23452, 0, 7 , 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23453, 0, 100, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Disable Quest Creatures'),
-(23452, 0, 8 , 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23441, 0, 150, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Disable Quest Creatures'),
+(23452, 0, 8 , 9, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23441, 0, 200, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Disable Quest Creatures'),
 (23452, 0, 9 , 10, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 6, 11101, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Fail Quest \'The Deadliest Trap Ever Laid\''),
 (23452, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On Just Died - Despawn Self Instant'),
 (23452, 0, 11, 0, 77, 0, 100, 0, 1, 20, 0, 0, 0, 0, 80, 2345202, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - On 20 Enemies Killed - Run Script (Complete Quest)'),
@@ -303,19 +303,19 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2345200, 9, 0 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 83, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Remove Npc Flags Questgiver'),
 (2345200, 9, 1 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 63, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Reset Counter'),
 (2345200, 9, 2 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Store Targetlist Party'),
-(2345200, 9, 4 , 0, 0, 0, 100, 0, 2900, 2900, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 0'),
-(2345200, 9, 5 , 0, 0, 0, 100, 0, 3100, 3100, 0, 0, 0, 0, 232, 234521, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Start Path 234521'),
-(2345200, 9, 3 , 0, 0, 0, 100, 0, 26000, 26000, 0, 0, 0, 0, 226, 1, 0, 0, 0, 0, 0, 9, 23453, 0, 100, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Spawn In Altar Defenders'),
+(2345200, 9, 3 , 0, 0, 0, 100, 0, 2900, 2900, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 0'),
+(2345200, 9, 4 , 0, 0, 0, 100, 0, 3100, 3100, 0, 0, 0, 0, 232, 234521, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Start Path 234521'),
+(2345200, 9, 5 , 0, 0, 0, 100, 0, 26000, 26000, 0, 0, 0, 0, 226, 1, 0, 0, 0, 0, 0, 9, 23453, 0, 100, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Spawn In Altar Defenders'),
 (2345200, 9, 6 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 1'),
-(2345200, 9, 8 , 0, 0, 0, 100, 0, 3100, 3100, 0, 0, 0, 0, 40, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Set Sheath Ranged'),
-(2345200, 9, 9 , 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 17, 214, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Set EmoteState 214'),
-(2345200, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 2, 1, 1, 5, 5, 0, 9, 23441, 0, 150, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Start Spawning Dragonmaw Skybreakers'),
-(2345200, 9, 11, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 23441, 150, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 0 (Dragonmaw Skybreaker)');
+(2345200, 9, 7 , 0, 0, 0, 100, 0, 3100, 3100, 0, 0, 0, 0, 40, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Set Sheath Ranged'),
+(2345200, 9, 8 , 0, 0, 0, 100, 0, 1600, 1600, 0, 0, 0, 0, 17, 214, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Set EmoteState 214'),
+(2345200, 9, 9 , 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 2, 1, 1, 5, 5, 0, 9, 23441, 0, 200, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Start Spawning Dragonmaw Skybreakers'),
+(2345200, 9, 10, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 23441, 200, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 0 (Dragonmaw Skybreaker)');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2345202);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2345202, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23453, 0, 100, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Disable Quest Creatures'),
-(2345202, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23441, 0, 150, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Disable Quest Creatures'),
+(2345202, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 226, 0, 0, 0, 0, 0, 0, 9, 23441, 0, 200, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Disable Quest Creatures'),
 (2345202, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 26, 11101, 0, 0, 0, 0, 0, 12, 1, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Quest Credit \'The Deadliest Trap Ever Laid\''),
 (2345202, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Say Line 2'),
 (2345202, 9, 4, 0, 0, 0, 100, 0, 2400, 2400, 0, 0, 0, 0, 101, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Commander Arcus - Actionlist - Reset Home Position'),
@@ -402,3 +402,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (234419, 6, -3132.411, 658.95215, 3.419254, NULL, 2),
 (234419, 7, -3111.927, 665.25214, -7.941859, NULL, 2),
 (234419, 8, -3101.4766, 664.6626, -10.552968, NULL, 2);
+
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 23441);
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(23441, 1, 0, 1, 0, 0, 0, 0);
