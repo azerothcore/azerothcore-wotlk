@@ -241,7 +241,7 @@ enum GuildMemberFlags
 class EmblemInfo
 {
 public:
-    EmblemInfo(uint32 style = 0, uint32 color = 0, uint32 borderStyle = 0, uint32 borderColor = 0, uint32 backgroundColor = 0) :
+    EmblemInfo(uint32 /*style*/ = 0, uint32 /*color*/ = 0, uint32 /*borderStyle*/ = 0, uint32 /*borderColor*/ = 0, uint32 /*backgroundColor*/ = 0) :
         m_style(0), m_color(0), m_borderStyle(0), m_borderColor(0), m_backgroundColor(0) { }
 
     void LoadFromDB(Field* fields);
