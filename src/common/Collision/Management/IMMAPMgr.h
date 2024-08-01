@@ -18,9 +18,6 @@
 #ifndef _IMMAPMANAGER_H
 #define _IMMAPMANAGER_H
 
-#include "Define.h"
-#include <string>
-
 // Interface for IMMapManger
 namespace MMAP
 {

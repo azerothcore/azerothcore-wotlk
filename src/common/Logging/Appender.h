@@ -22,7 +22,6 @@
 #include "LogCommon.h"
 #include <stdexcept>
 #include <string>
-#include <vector>
 
 struct LogMessage;
 
