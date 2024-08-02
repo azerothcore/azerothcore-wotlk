@@ -132,21 +132,22 @@ struct boss_lady_vashj : public BossAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
-        if (summon->GetEntry() == WORLD_TRIGGER)
-        {
-            summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
-        }
-        else if (summon->GetEntry() == NPC_TOXIC_SPOREBAT)
-        {
-            summon->GetMotionMaster()->MoveRandom(30.0f);
-        }
-        else if (summon->GetEntry() == NPC_ENCHANTED_ELEMENTAL)
-        {
-            summon->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
-        }
-        else if (summon->GetEntry() != NPC_TAINTED_ELEMENTAL)
-        {
-            summon->GetMotionMaster()->MovePoint(POINT_HOME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, true);
+        switch(summon->GetEntry()) {
+            case(WORLD_TRIGGER):
+                summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
+                break;
+            case(NPC_ENCHANTED_ELEMENTAL):
+                summon->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false);
+                summon->SetWalk(true);
+                summon->SetReactState(REACT_PASSIVE);
+                break;
+            case(NPC_TAINTED_ELEMENTAL):
+                break;
+            case(NPC_TOXIC_SPOREBAT):
+                summon->GetMotionMaster()->MoveRandom(30.0f);
+                break;
+              default:
+                summon->GetMotionMaster()->MovePoint(POINT_HOME, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true, true);
         }
     }
 

@@ -2578,53 +2578,6 @@ namespace Acore
     };
 }                                                           // namespace Acore
 
-/// Send a System Message to all players (except self if mentioned)
-void World::SendWorldText(uint32 string_id, ...)
-{
-    va_list ap;
-    va_start(ap, string_id);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-    {
-        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
-            continue;
-
-        wt_do(itr->second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
-void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
-{
-    va_list ap;
-    va_start(ap, flag);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (auto const& itr : _sessions)
-    {
-        if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
-        {
-            continue;
-        }
-
-        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
-        {
-            if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
-            {
-                continue;
-            }
-        }
-
-        wt_do(itr.second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
 /// Send a System Message to all GMs (except self if mentioned)
 void World::SendGMText(uint32 string_id, ...)
 {

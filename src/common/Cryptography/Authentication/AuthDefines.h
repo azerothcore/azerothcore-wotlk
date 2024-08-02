@@ -21,7 +21,7 @@
 #include "Define.h"
 #include <array>
 
-constexpr size_t SESSION_KEY_LENGTH = 40;
+constexpr std::size_t SESSION_KEY_LENGTH = 40;
 using SessionKey = std::array<uint8, SESSION_KEY_LENGTH>;
 
 #endif

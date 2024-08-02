@@ -18,8 +18,6 @@
 #ifndef AsioHacksFwd_h__
 #define AsioHacksFwd_h__
 
-#include <boost/version.hpp>
-
 /**
   Collection of forward declarations to improve compile time
  */

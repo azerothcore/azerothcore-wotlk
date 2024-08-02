@@ -33,12 +33,10 @@
 #include "CreatureGroups.h"
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
-#include "Formulas.h"
 #include "GameObjectAI.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
-#include "InstanceSaveMgr.h"
 #include "Log.h"
 #include "MapMgr.h"
 #include "MoveSpline.h"
@@ -6469,7 +6467,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo* damageInfo)
         ++count;
     }
 
-    size_t const maxsize = 4 + 5 + 5 + 4 + 4 + 1 + count * (4 + 4 + 4 + 4 + 4) + 1 + 4 + 4 + 4 + 4 + 4 * 12;
+    std::size_t const maxsize = 4 + 5 + 5 + 4 + 4 + 1 + count * (4 + 4 + 4 + 4 + 4) + 1 + 4 + 4 + 4 + 4 + 4 * 12;
     WorldPacket data(SMSG_ATTACKERSTATEUPDATE, maxsize);            // we guess size
     data << uint32(damageInfo->HitInfo);
     data << damageInfo->attacker->GetPackGUID();

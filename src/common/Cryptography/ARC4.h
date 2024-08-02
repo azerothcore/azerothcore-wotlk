@@ -30,12 +30,12 @@ namespace Acore::Crypto
         ARC4();
         ~ARC4();
 
-        void Init(uint8 const* seed, size_t len);
+        void Init(uint8 const* seed, std::size_t len);
 
         template <typename Container>
         void Init(Container const& c) { Init(std::data(c), std::size(c)); }
 
-        void UpdateData(uint8* data, size_t len);
+        void UpdateData(uint8* data, std::size_t len);
 
         template <typename Container>
         void UpdateData(Container& c) { UpdateData(std::data(c), std::size(c)); }

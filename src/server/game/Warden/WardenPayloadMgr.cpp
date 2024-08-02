@@ -128,7 +128,7 @@ void WardenPayloadMgr::QueuePayload(uint16 payloadId, bool pushToFront)
 
 bool WardenPayloadMgr::DequeuePayload(uint16 payloadId)
 {
-    size_t const queueSize = QueuedPayloads.size();
+    std::size_t const queueSize = QueuedPayloads.size();
     QueuedPayloads.remove(payloadId);
 
     return queueSize != QueuedPayloads.size();

@@ -58,6 +58,33 @@ namespace AccountMgr
         return AOR_OK;                                          // everything's fine
     }
 
+    AccountOpResult ChangeEmail(uint32 accountId, std::string newEmail)
+    {
+        std::string username;
+
+        if (!GetName(accountId, username))
+        {
+            sScriptMgr->OnFailedEmailChange(accountId);
+            return AOR_NAME_NOT_EXIST;                          // account doesn't exist
+        }
+
+        if (utf8length(newEmail) > MAX_EMAIL_STR)
+        {
+            sScriptMgr->OnFailedEmailChange(accountId);
+            return AOR_EMAIL_TOO_LONG;                           // email's too long
+        }
+
+        Utf8ToUpperOnlyLatin(newEmail);
+
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EMAIL);
+        stmt->SetData(0, newEmail);
+        stmt->SetData(1, accountId);
+        LoginDatabase.Execute(stmt);
+
+        sScriptMgr->OnEmailChange(accountId);
+        return AOR_OK;
+    }
+
     AccountOpResult DeleteAccount(uint32 accountId)
     {
         // Check if accounts exists
