@@ -144,7 +144,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2362600, 9, 2, 0, 0, 0, 100, 0, 10000, 25000, 0, 0, 0, 5, 404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Actionlist - Play Emote 404'),
 (2362600, 9, 3, 0, 0, 0, 100, 0, 10000, 25000, 0, 0, 0, 5, 405, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Actionlist - Play Emote 405');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (23850, 2385000, 2385001)) AND (`source_type` IN (0, 9)) AND (`id` IN (0, 1, 2, 3, 4, 5, 6, 7, 8));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (23850, 2385000, 2385001)) AND (`source_type` IN (0, 9)) AND (`id` IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (23850,   0, 0, 0, 68, 0, 100, 0, @ETCDMF,  0,      0, 0, 0, 80, 2385000, 0, 1, 0, 0, 0, 1,  0,      0,     0, 0, 0,          0,        0,          0,                    '[DNT] L70ETC Concert Controller - On Game Event 32 Started - Run Script'),
 (23850,   0, 1, 0, 68, 0, 100, 0, @ETCGRIM, 0,      0, 0, 0, 80, 2385000, 0, 1, 0, 0, 0, 1,  0,      0,     0, 0, 0,          0,        0,          0,                    '[DNT] L70ETC Concert Controller - On Game Event 81 Started - Run Script'),
@@ -157,6 +157,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2385000, 9, 6, 0, 0,  0, 100, 0, 3241,     3241,   0, 0, 0, 80, 2384500, 0, 1, 0, 0, 0, 11, 23845,  21,    0, 0, 0,          0,        0,          0,                    '[DNT] L70ETC Concert Controller - Actionlist - Run Script'),
 (2385000, 9, 7, 0, 0,  0, 100, 0, 0,        0,      0, 0, 0, 41, 0,       0, 0, 0, 0, 0, 11, 28206,  10,    0, 0, 0,          0,        0,          0,                    '[DNT] L70ETC Concert Controller - Actionlist - Despawn Instant'),
 (2385000, 9, 8, 0, 0,  0, 100, 0, 253803,   253803, 0, 0, 0, 80, 2385001, 0, 1, 0, 0, 0, 1,  0,      0,     0, 0, 0,          0,        0,          0,                    '[DNT] L70ETC Concert Controller - Actionlist - Run Script'),
+(2385000, 9, 9, 0, 0,  0, 100, 0, 2000,     2000,   0, 0, 0, 41, 0,       0, 0, 0, 0, 0, 15, 186312, 10,    0, 0, 0,          0,        0,          0,                    '[DNT] L70ETC Concert Controller - Actionlist - Despawn Instant'),
 (2385001, 9, 0, 0, 0,  0, 100, 0, 0,        0,      0, 0, 0, 12, 28206,   7, 0, 0, 0, 0, 8,  0,      0,     0, 0, -1749.8168, 5134.219, -36.177956, 1.884955525398254394, '[DNT] L70ETC Concert Controller - Actionlist - Summon Creature'), -- Ran by Shattrath Saul
 (2385001, 9, 1, 0, 0,  0, 100, 0, 0,        0,      0, 0, 0, 70, 0,       0, 0, 0, 0, 0, 10, 12563,  28206, 0, 0, 0,          0,        0,          0,                    '[DNT] L70ETC Concert Controller - Actionlist - Respawn Closest Creature \'[DND] L70ETC Drums\'');
 
