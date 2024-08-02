@@ -489,7 +489,7 @@ public:
     {
         go_l70_etc_musicAI(GameObject* go) : GameObjectAI(go)
         {
-            _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 0);
+            _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600);
         }
 
         void UpdateAI(uint32 diff) override
@@ -501,7 +501,7 @@ public:
                 {
                 case EVENT_ETC_START_MUSIC:
                     me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC);
-                    _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 5000);  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600);  // Every 1.6 seconds SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
                     break;
                 default:
                     break;
