@@ -225,3 +225,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 9666 AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (15, 9666, 0, 0, 0, 2, 0, 37863, 1, 0, 0, 0, 0, '', 'If player does not have \'Direbrew Remote\'s\' in inventory');
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (1, 2)) AND (`SourceEntry` = 23850) AND (`SourceId` = 0) AND (`ElseGroup` IN (1, 2)) AND (`ConditionTypeOrReference` = 23) AND (`ConditionTarget` = 1) AND (`ConditionValue1` IN (1584, 3519)) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, 23850, 0, 1, 23, 1, 3519, 0, 0, 0, 0, 0, '', 'Object must be in \'Terokkar Forest\''),
+(22, 2, 23850, 0, 2, 23, 1, 1584, 0, 0, 0, 0, 0, '', 'Object must be in \'Blackrock Depths\'');
