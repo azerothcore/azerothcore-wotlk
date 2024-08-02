@@ -181,12 +181,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2384500) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3, 4, 5));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2384500, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2384500, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
 (2384500, 9, 1, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 12, 23619, 1, 300000, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Summon Creature \'Bergrisst\''),
-(2384500, 9, 2, 0, 0, 0, 100, 0, 124000, 124000, 0, 0, 0, 11, 25824, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Cast \'Spotlight\''),
-(2384500, 9, 3, 0, 0, 0, 100, 0, 64000,  64000,  0, 0, 0, 28, 25824, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Remove Aura \'Spotlight\''),
-(2384500, 9, 4, 0, 0, 0, 100, 0, 64000,  64000,  0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
-(2384500, 9, 5, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0, 0, 0, 0, 11, 23619, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Despawn Instant');
+(2384500, 9, 2, 0, 0, 0, 100, 0, 124000, 124000, 0, 0, 0, 11, 25824, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Cast \'Spotlight\''),
+(2384500, 9, 3, 0, 0, 0, 100, 0, 64000,  64000,  0, 0, 0, 28, 25824, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Remove Aura \'Spotlight\''),
+(2384500, 9, 4, 0, 0, 0, 100, 0, 64000,  64000,  0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2384500, 9, 5, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0,      0, 0, 0, 11, 23619, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Bergrisst Controller - Actionlist - Despawn Instant');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2385200) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -226,7 +226,9 @@ DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` 
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (15, 9666, 0, 0, 0, 2, 0, 37863, 1, 0, 0, 0, 0, '', 'If player does not have \'Direbrew Remote\'s\' in inventory');
 
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (1, 2)) AND (`SourceEntry` = 23850) AND (`SourceId` = 0) AND (`ElseGroup` IN (1, 2)) AND (`ConditionTypeOrReference` = 23) AND (`ConditionTarget` = 1) AND (`ConditionValue1` IN (1584, 3519)) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (1, 2)) AND (`SourceEntry` = 23850) AND (`SourceId` = 0) AND (`ElseGroup` IN (1, 2)) AND (`ConditionTypeOrReference` IN (23, 29)) AND (`ConditionTarget` = 1) AND (`ConditionValue1` IN (1584, 3519, 23625)) AND (`ConditionValue2` IN (0, 10)) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 1, 23850, 0, 1, 23, 1, 3519, 0, 0, 0, 0, 0, '', 'Object must be in \'Terokkar Forest\''),
-(22, 2, 23850, 0, 2, 23, 1, 1584, 0, 0, 0, 0, 0, '', 'Object must be in \'Blackrock Depths\'');
+(22, 1, 23850, 0, 1, 23, 1, 3519,  0,  0, 0, 0, 0, '', 'Object must be in \'Terokkar Forest\''),
+(22, 2, 23850, 0, 2, 23, 1, 1584,  0,  0, 0, 0, 0, '', 'Object must be in \'Blackrock Depths\''),
+(22, 2, 23850, 0, 2, 29, 1, 23625, 10, 0, 1, 0, 0, '', 'Object must not have creature \'Samuro\' within 10 yards');
+
