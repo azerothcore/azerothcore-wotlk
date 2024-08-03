@@ -273,4 +273,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25152, 0, 4, 0, 22, 0, 100, 0, 78,  0, 0, 0, 0, 5, 66, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 78 - Play Emote 66'),
 (25152, 0, 5, 0, 22, 0, 100, 0, 101, 0, 0, 0, 0, 5, 3,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 101 - Play Emote 3'),
 (25152, 0, 6, 0, 22, 0, 100, 0, 104, 0, 0, 0, 0, 5, 23, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 104 - Play Emote 23'),
-(25152, 0, 7, 0, 22, 0, 100, 0, 328, 0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 328 - Play Emote 11'),
+(25152, 0, 7, 0, 22, 0, 100, 0, 328, 0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 328 - Play Emote 11');
