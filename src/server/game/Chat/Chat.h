@@ -63,9 +63,9 @@ public:
     // All in one chat message builder
     static void BuildChatPacket(
             WorldPacket& data, ChatMsg msgtype, std::string_view message, Language language = LANG_UNIVERSAL, PlayerChatTag chatTag = CHAT_TAG_NONE,
-            ObjectGuid const& senderGuid = ObjectGuid(), std::string_view senderName = nullptr,
-            ObjectGuid const& targetGuid = ObjectGuid(), std::string_view targetName = nullptr,
-            std::string_view channelName = nullptr, uint32 achievementId = 0);
+            ObjectGuid const& senderGuid = ObjectGuid(), std::string_view senderName = {},
+            ObjectGuid const& targetGuid = ObjectGuid(), std::string_view targetName = {},
+            std::string_view channelName = {}, uint32 achievementId = 0);
 
     static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
