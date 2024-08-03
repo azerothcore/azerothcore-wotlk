@@ -63,7 +63,7 @@ INSERT INTO `game_event_gameobject` (`eventEntry`, `guid`) VALUES
 (@BLIZZCON, 29801), -- Bleachers
 (@BLIZZCON, 29806); -- Bleachers
 
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (23845, 23850, 23852, 23853, 23854, 23855, 28206, 28209, 28210);
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (23845, 23850, 23852, 23853, 23854, 23855, 25148, 25149, 25150, 25151, 25152, 28206, 28209, 28210);
 UPDATE `gameobject_template` SET `ScriptName` = 'go_l70_etc_music' WHERE `entry` = 186312;
 
 DELETE FROM `creature_template_addon` WHERE `entry` = 28206;
@@ -232,3 +232,45 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 2, 23850, 0, 2, 23, 1, 1584,  0,  0, 0, 0, 0, '', 'Object must be in \'Blackrock Depths\''),
 (22, 2, 23850, 0, 2, 29, 1, 23625, 10, 0, 1, 0, 0, '', 'Object must not have creature \'Samuro\' within 10 yards');
 
+DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (25148, 25149, 25150, 25151, 25152)) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3, 4, 5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(25148, 0, 0, 0, 22, 0, 100, 0, 21,  0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 21 - Play Emote 14'),
+(25148, 0, 1, 0, 22, 0, 100, 0, 34,  0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 34 - Play Emote 14'),
+(25148, 0, 2, 0, 22, 0, 100, 0, 58,  0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 58 - Play Emote 14'),
+(25148, 0, 3, 0, 22, 0, 100, 0, 77,  0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 77 - Play Emote 11'),
+(25148, 0, 4, 0, 22, 0, 100, 0, 78,  0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 78 - Play Emote 14'),
+(25148, 0, 5, 0, 22, 0, 100, 0, 101, 0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 101 - Play Emote 14'),
+(25148, 0, 6, 0, 22, 0, 100, 0, 104, 0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 104 - Play Emote 14'),
+(25148, 0, 7, 0, 22, 0, 100, 0, 328, 0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 328 - Play Emote 14'),
+(25149, 0, 0, 0, 22, 0, 100, 0, 21,  0, 0, 0, 0, 5, 4,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 21 - Play Emote 4'),
+(25149, 0, 1, 0, 22, 0, 100, 0, 34,  0, 0, 0, 0, 5, 10, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 34 - Play Emote 10'),
+(25149, 0, 2, 0, 22, 0, 100, 0, 58,  0, 0, 0, 0, 5, 23, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 58 - Play Emote 23'),
+(25149, 0, 3, 0, 22, 0, 100, 0, 77,  0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 77 - Play Emote 14'),
+(25149, 0, 4, 0, 22, 0, 100, 0, 78,  0, 0, 0, 0, 5, 66, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 78 - Play Emote 66'),
+(25149, 0, 5, 0, 22, 0, 100, 0, 101, 0, 0, 0, 0, 5, 3,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 101 - Play Emote 3'),
+(25149, 0, 6, 0, 22, 0, 100, 0, 104, 0, 0, 0, 0, 5, 23, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 104 - Play Emote 23'),
+(25149, 0, 7, 0, 22, 0, 100, 0, 328, 0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 328 - Play Emote 11'),
+(25150, 0, 0, 0, 22, 0, 100, 0, 21,  0, 0, 0, 0, 5, 4,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Kyl - Received Emote 21 - Play Emote 4'),
+(25150, 0, 1, 0, 22, 0, 100, 0, 34,  0, 0, 0, 0, 5, 10, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Kyl - Received Emote 34 - Play Emote 10'),
+(25150, 0, 2, 0, 22, 0, 100, 0, 58,  0, 0, 0, 0, 5, 23, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Kyl - Received Emote 58 - Play Emote 23'),
+(25150, 0, 3, 0, 22, 0, 100, 0, 77,  0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Kyl - Received Emote 77 - Play Emote 14'),
+(25150, 0, 4, 0, 22, 0, 100, 0, 78,  0, 0, 0, 0, 5, 66, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Kyl - Received Emote 78 - Play Emote 66'),
+(25150, 0, 5, 0, 22, 0, 100, 0, 101, 0, 0, 0, 0, 5, 3,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Kyl - Received Emote 101 - Play Emote 3'),
+(25150, 0, 6, 0, 22, 0, 100, 0, 104, 0, 0, 0, 0, 5, 23, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Kyl - Received Emote 104 - Play Emote 23'),
+(25150, 0, 7, 0, 22, 0, 100, 0, 328, 0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai\'Kyl - Received Emote 328 - Play Emote 11'),
+(25151, 0, 0, 0, 22, 0, 100, 0, 21,  0, 0, 0, 0, 5, 4,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 21 - Play Emote 4'),
+(25151, 0, 1, 0, 22, 0, 100, 0, 34,  0, 0, 0, 0, 5, 10, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 34 - Play Emote 10'),
+(25151, 0, 2, 0, 22, 0, 100, 0, 58,  0, 0, 0, 0, 5, 23, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 58 - Play Emote 23'),
+(25151, 0, 3, 0, 22, 0, 100, 0, 77,  0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 77 - Play Emote 14'),
+(25151, 0, 4, 0, 22, 0, 100, 0, 78,  0, 0, 0, 0, 5, 66, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 78 - Play Emote 66'),
+(25151, 0, 5, 0, 22, 0, 100, 0, 101, 0, 0, 0, 0, 5, 3,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 101 - Play Emote 3'),
+(25151, 0, 6, 0, 22, 0, 100, 0, 104, 0, 0, 0, 0, 5, 23, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 104 - Play Emote 23'),
+(25151, 0, 7, 0, 22, 0, 100, 0, 328, 0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 328 - Play Emote 11'),
+(25152, 0, 0, 0, 22, 0, 100, 0, 21,  0, 0, 0, 0, 5, 4,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 21 - Play Emote 4'),
+(25152, 0, 1, 0, 22, 0, 100, 0, 34,  0, 0, 0, 0, 5, 10, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 34 - Play Emote 10'),
+(25152, 0, 2, 0, 22, 0, 100, 0, 58,  0, 0, 0, 0, 5, 23, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 58 - Play Emote 23'),
+(25152, 0, 3, 0, 22, 0, 100, 0, 77,  0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 77 - Play Emote 14'),
+(25152, 0, 4, 0, 22, 0, 100, 0, 78,  0, 0, 0, 0, 5, 66, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 78 - Play Emote 66'),
+(25152, 0, 5, 0, 22, 0, 100, 0, 101, 0, 0, 0, 0, 5, 3,  0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 101 - Play Emote 3'),
+(25152, 0, 6, 0, 22, 0, 100, 0, 104, 0, 0, 0, 0, 5, 23, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 104 - Play Emote 23'),
+(25152, 0, 7, 0, 22, 0, 100, 0, 328, 0, 0, 0, 0, 5, 11, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 328 - Play Emote 11'),
