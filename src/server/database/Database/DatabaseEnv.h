@@ -25,7 +25,6 @@
 #include "Implementation/LoginDatabase.h"
 #include "Implementation/WorldDatabase.h"
 
-#include "Field.h"
 #include "PreparedStatement.h"
 #include "QueryCallback.h"
 #include "QueryResult.h"

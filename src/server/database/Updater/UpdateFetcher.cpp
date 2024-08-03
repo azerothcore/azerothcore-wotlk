@@ -25,6 +25,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "QueryResult.h"
+
 using namespace std::filesystem;
 
 struct UpdateFetcher::DirectoryEntry

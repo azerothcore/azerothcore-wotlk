@@ -19,7 +19,6 @@
 #define __ACORE_SECRETMGR_H__
 
 #include "BigNumber.h"
-#include "Common.h"
 #include "Log.h"
 #include "Optional.h"
 #include <array>

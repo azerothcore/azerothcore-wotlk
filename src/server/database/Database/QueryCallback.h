@@ -24,7 +24,6 @@
 #include <future>
 #include <list>
 #include <queue>
-#include <utility>
 
 class AC_DATABASE_API QueryCallback
 {

@@ -19,7 +19,6 @@
 #define DBCStorageIterator_h__
 
 #include "Define.h"
-#include <iterator>
 
 template <class T>
 class DBCStorageIterator

@@ -24,7 +24,6 @@
 #include "StringFormat.h"
 #include <functional>
 #include <mutex>
-#include <utility>
 #include <vector>
 
 /*! Transactions, high level class. */

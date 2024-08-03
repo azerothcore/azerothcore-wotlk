@@ -23,6 +23,7 @@
 #include "DatabaseEnv.h"
 #include "Errors.h"
 #include "Log.h"
+#include "QueryResult.h"
 #include "SharedDefines.h"
 
 #define SECRET_FLAG_FOR(key, val, server) server ## _ ## key = (val ## ull << (16*SERVER_PROCESS_ ## server))
