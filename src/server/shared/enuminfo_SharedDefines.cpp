@@ -46,10 +46,10 @@ AC_API_EXPORT EnumText EnumUtils<Races>::ToString(Races value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Races>::Count() { return 10; }
+AC_API_EXPORT std::size_t EnumUtils<Races>::Count() { return 10; }
 
 template <>
-AC_API_EXPORT Races EnumUtils<Races>::FromIndex(size_t index)
+AC_API_EXPORT Races EnumUtils<Races>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -68,7 +68,7 @@ AC_API_EXPORT Races EnumUtils<Races>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Races>::ToIndex(Races value)
+AC_API_EXPORT std::size_t EnumUtils<Races>::ToIndex(Races value)
 {
     switch (value)
     {
@@ -109,10 +109,10 @@ AC_API_EXPORT EnumText EnumUtils<Classes>::ToString(Classes value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Classes>::Count() { return 10; }
+AC_API_EXPORT std::size_t EnumUtils<Classes>::Count() { return 10; }
 
 template <>
-AC_API_EXPORT Classes EnumUtils<Classes>::FromIndex(size_t index)
+AC_API_EXPORT Classes EnumUtils<Classes>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -131,7 +131,7 @@ AC_API_EXPORT Classes EnumUtils<Classes>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Classes>::ToIndex(Classes value)
+AC_API_EXPORT std::size_t EnumUtils<Classes>::ToIndex(Classes value)
 {
     switch (value)
     {
@@ -194,10 +194,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr0>::ToString(SpellAttr0 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr0>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr0>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr0 EnumUtils<SpellAttr0>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr0 EnumUtils<SpellAttr0>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -238,7 +238,7 @@ AC_API_EXPORT SpellAttr0 EnumUtils<SpellAttr0>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr0>::ToIndex(SpellAttr0 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr0>::ToIndex(SpellAttr0 value)
 {
     switch (value)
     {
@@ -323,10 +323,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr1>::ToString(SpellAttr1 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr1>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr1>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr1 EnumUtils<SpellAttr1>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr1 EnumUtils<SpellAttr1>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -367,7 +367,7 @@ AC_API_EXPORT SpellAttr1 EnumUtils<SpellAttr1>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr1>::ToIndex(SpellAttr1 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr1>::ToIndex(SpellAttr1 value)
 {
     switch (value)
     {
@@ -452,10 +452,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr2>::ToString(SpellAttr2 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr2>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr2>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr2 EnumUtils<SpellAttr2>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr2 EnumUtils<SpellAttr2>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -496,7 +496,7 @@ AC_API_EXPORT SpellAttr2 EnumUtils<SpellAttr2>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr2>::ToIndex(SpellAttr2 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr2>::ToIndex(SpellAttr2 value)
 {
     switch (value)
     {
@@ -581,10 +581,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr3>::ToString(SpellAttr3 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr3>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr3>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -625,7 +625,7 @@ AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr3>::ToIndex(SpellAttr3 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr3>::ToIndex(SpellAttr3 value)
 {
     switch (value)
     {
@@ -710,10 +710,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr4>::ToString(SpellAttr4 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr4>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr4>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -754,7 +754,7 @@ AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr4>::ToIndex(SpellAttr4 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr4>::ToIndex(SpellAttr4 value)
 {
     switch (value)
     {
@@ -839,10 +839,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr5>::ToString(SpellAttr5 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr5>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr5>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr5 EnumUtils<SpellAttr5>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr5 EnumUtils<SpellAttr5>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -883,7 +883,7 @@ AC_API_EXPORT SpellAttr5 EnumUtils<SpellAttr5>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr5>::ToIndex(SpellAttr5 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr5>::ToIndex(SpellAttr5 value)
 {
     switch (value)
     {
@@ -968,10 +968,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr6>::ToString(SpellAttr6 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr6>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr6>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr6 EnumUtils<SpellAttr6>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr6 EnumUtils<SpellAttr6>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1012,7 +1012,7 @@ AC_API_EXPORT SpellAttr6 EnumUtils<SpellAttr6>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr6>::ToIndex(SpellAttr6 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr6>::ToIndex(SpellAttr6 value)
 {
     switch (value)
     {
@@ -1097,10 +1097,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr7>::ToString(SpellAttr7 value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr7>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr7>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT SpellAttr7 EnumUtils<SpellAttr7>::FromIndex(size_t index)
+AC_API_EXPORT SpellAttr7 EnumUtils<SpellAttr7>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1141,7 +1141,7 @@ AC_API_EXPORT SpellAttr7 EnumUtils<SpellAttr7>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellAttr7>::ToIndex(SpellAttr7 value)
+AC_API_EXPORT std::size_t EnumUtils<SpellAttr7>::ToIndex(SpellAttr7 value)
 {
     switch (value)
     {
@@ -1383,10 +1383,10 @@ AC_API_EXPORT EnumText EnumUtils<SpellCastResult>::ToString(SpellCastResult valu
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellCastResult>::Count() { return 189; }
+AC_API_EXPORT std::size_t EnumUtils<SpellCastResult>::Count() { return 189; }
 
 template <>
-AC_API_EXPORT SpellCastResult EnumUtils<SpellCastResult>::FromIndex(size_t index)
+AC_API_EXPORT SpellCastResult EnumUtils<SpellCastResult>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1584,7 +1584,7 @@ AC_API_EXPORT SpellCastResult EnumUtils<SpellCastResult>::FromIndex(size_t index
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<SpellCastResult>::ToIndex(SpellCastResult value)
+AC_API_EXPORT std::size_t EnumUtils<SpellCastResult>::ToIndex(SpellCastResult value)
 {
     switch (value)
     {
@@ -1812,10 +1812,10 @@ AC_API_EXPORT EnumText EnumUtils<AuraStateType>::ToString(AuraStateType value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<AuraStateType>::Count() { return 18; }
+AC_API_EXPORT std::size_t EnumUtils<AuraStateType>::Count() { return 18; }
 
 template <>
-AC_API_EXPORT AuraStateType EnumUtils<AuraStateType>::FromIndex(size_t index)
+AC_API_EXPORT AuraStateType EnumUtils<AuraStateType>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1842,7 +1842,7 @@ AC_API_EXPORT AuraStateType EnumUtils<AuraStateType>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<AuraStateType>::ToIndex(AuraStateType value)
+AC_API_EXPORT std::size_t EnumUtils<AuraStateType>::ToIndex(AuraStateType value)
 {
     switch (value)
     {
@@ -1913,10 +1913,10 @@ AC_API_EXPORT EnumText EnumUtils<Mechanics>::ToString(Mechanics value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Mechanics>::Count() { return 32; }
+AC_API_EXPORT std::size_t EnumUtils<Mechanics>::Count() { return 32; }
 
 template <>
-AC_API_EXPORT Mechanics EnumUtils<Mechanics>::FromIndex(size_t index)
+AC_API_EXPORT Mechanics EnumUtils<Mechanics>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -1957,7 +1957,7 @@ AC_API_EXPORT Mechanics EnumUtils<Mechanics>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Mechanics>::ToIndex(Mechanics value)
+AC_API_EXPORT std::size_t EnumUtils<Mechanics>::ToIndex(Mechanics value)
 {
     switch (value)
     {
@@ -2184,10 +2184,10 @@ AC_API_EXPORT EnumText EnumUtils<Emote>::ToString(Emote value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Emote>::Count() { return 174; }
+AC_API_EXPORT std::size_t EnumUtils<Emote>::Count() { return 174; }
 
 template <>
-AC_API_EXPORT Emote EnumUtils<Emote>::FromIndex(size_t index)
+AC_API_EXPORT Emote EnumUtils<Emote>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -2370,7 +2370,7 @@ AC_API_EXPORT Emote EnumUtils<Emote>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<Emote>::ToIndex(Emote value)
+AC_API_EXPORT std::size_t EnumUtils<Emote>::ToIndex(Emote value)
 {
     switch (value)
     {
@@ -2618,10 +2618,10 @@ AC_API_EXPORT EnumText EnumUtils<ChatMsg>::ToString(ChatMsg value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ChatMsg>::Count() { return 53; }
+AC_API_EXPORT std::size_t EnumUtils<ChatMsg>::Count() { return 53; }
 
 template <>
-AC_API_EXPORT ChatMsg EnumUtils<ChatMsg>::FromIndex(size_t index)
+AC_API_EXPORT ChatMsg EnumUtils<ChatMsg>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -2683,7 +2683,7 @@ AC_API_EXPORT ChatMsg EnumUtils<ChatMsg>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<ChatMsg>::ToIndex(ChatMsg value)
+AC_API_EXPORT std::size_t EnumUtils<ChatMsg>::ToIndex(ChatMsg value)
 {
     switch (value)
     {

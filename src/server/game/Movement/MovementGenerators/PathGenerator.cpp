@@ -1038,7 +1038,7 @@ void PathGenerator::ShortenPathUntilDist(G3D::Vector3 const& target, float dist)
     if ((*_pathPoints.rbegin() - target).squaredLength() >= distSq)
         return;
 
-    size_t i = _pathPoints.size() - 1;
+    std::size_t i = _pathPoints.size() - 1;
     float x, y, z, collisionHeight = _source->GetCollisionHeight();
     // find the first i s.t.:
     //  - _pathPoints[i] is still too close

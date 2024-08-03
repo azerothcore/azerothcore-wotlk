@@ -3,7 +3,7 @@ ARG TZ=Etc/UTC
 
 # This target lays out the general directory skeleton for AzerothCore,
 # This target isn't intended to be directly used
-FROM ubuntu:$UBUNTU_VERSION as skeleton
+FROM ubuntu:$UBUNTU_VERSION AS skeleton
 
 ARG DOCKER=1
 ARG DEBIAN_FRONTEND=noninteractive
@@ -39,7 +39,7 @@ WORKDIR /azerothcore
 
 # This target builds the docker image
 # This target can be useful to inspect the explicit outputs from the build,
-FROM skeleton as build
+FROM skeleton AS build
 
 ARG CTOOLS_BUILD="all"
 ARG CTYPE="RelWithDebInfo"
@@ -106,7 +106,7 @@ RUN --mount=type=cache,target=/ccache,sharing=locked \
 # Base runtime for services #
 #############################
 
-FROM skeleton as runtime
+FROM skeleton AS runtime
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -144,7 +144,7 @@ ENTRYPOINT ["/usr/bin/env", "bash", "/azerothcore/entrypoint.sh"]
 # Auth Server #
 ###############
 
-FROM runtime as authserver
+FROM runtime AS authserver
 LABEL description "AzerothCore Auth Server"
 
 ENV ACORE_COMPONENT=authserver
@@ -165,7 +165,7 @@ CMD ["authserver"]
 # World Server #
 ################
 
-FROM runtime as worldserver
+FROM runtime AS worldserver
 
 LABEL description "AzerothCore World Server"
 
@@ -188,7 +188,7 @@ CMD ["worldserver"]
 # DB Import #
 #############
 
-FROM runtime as db-import
+FROM runtime AS db-import
 
 LABEL description "AzerothCore Database Import tool"
 
@@ -209,7 +209,7 @@ CMD /azerothcore/env/dist/bin/dbimport
 # Client Data #
 ###############
 
-FROM skeleton as client-data
+FROM skeleton AS client-data
 
 LABEL description="AzerothCore client-data"
 
@@ -231,7 +231,7 @@ CMD bash -c "source /azerothcore/apps/installer/includes/functions.sh && inst_do
 # Map Extractors #
 ##################
 
-FROM runtime as tools
+FROM runtime AS tools
 
 LABEL description "AzerothCore Tools"
 

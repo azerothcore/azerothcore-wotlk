@@ -48,7 +48,7 @@ void AddItemsSetItem(Player* player, Item* item)
 
     ItemSetEffect* eff = nullptr;
 
-    for (size_t x = 0; x < player->ItemSetEff.size(); ++x)
+    for (std::size_t x = 0; x < player->ItemSetEff.size(); ++x)
     {
         if (player->ItemSetEff[x] && player->ItemSetEff[x]->setid == setid)
         {
@@ -62,7 +62,7 @@ void AddItemsSetItem(Player* player, Item* item)
         eff = new ItemSetEffect();
         eff->setid = setid;
 
-        size_t x = 0;
+        std::size_t x = 0;
         for (; x < player->ItemSetEff.size(); ++x)
             if (!player->ItemSetEff[x])
                 break;
@@ -129,7 +129,7 @@ void RemoveItemsSetItem(Player* player, ItemTemplate const* proto)
     }
 
     ItemSetEffect* eff = nullptr;
-    size_t setindex = 0;
+    std::size_t setindex = 0;
     for (; setindex < player->ItemSetEff.size(); setindex++)
     {
         if (player->ItemSetEff[setindex] && player->ItemSetEff[setindex]->setid == setid)

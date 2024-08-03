@@ -199,7 +199,7 @@ public:
     void MoveIdle();
     void MoveTargetedHome(bool walk = false);
     void MoveRandom(float wanderDistance = 0.0f);
-    void MoveFollow(Unit* target, float dist, float angle, MovementSlot slot = MOTION_SLOT_ACTIVE);
+    void MoveFollow(Unit* target, float dist, float angle, MovementSlot slot = MOTION_SLOT_ACTIVE, bool inheritWalkState = true);
     void MoveChase(Unit* target, std::optional<ChaseRange> dist = {}, std::optional<ChaseAngle> angle = {});
     void MoveChase(Unit* target, float dist, float angle) { MoveChase(target, ChaseRange(dist), ChaseAngle(angle)); }
     void MoveChase(Unit* target, float dist) { MoveChase(target, ChaseRange(dist)); }
@@ -235,7 +235,9 @@ public:
     void MoveDistract(uint32 time);
     void MovePath(uint32 path_id, bool repeatable);
     void MoveRotate(uint32 time, RotateDirection direction);
-
+#ifdef MOD_PLAYERBOTS
+    void MoveKnockbackFromForPlayer(float srcX, float srcY, float speedXY, float speedZ);
+#endif
     [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
     [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
     [[nodiscard]] uint32 GetCurrentSplineId() const; // Xinef: Escort system

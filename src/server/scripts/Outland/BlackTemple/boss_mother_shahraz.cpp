@@ -110,7 +110,7 @@ struct boss_mother_shahraz : public BossAI
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_ENRAGE, true);
             Talk(SAY_ENRAGE);
-        }, 10min);
+        }, 10min, GROUP_ENRAGE);
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -145,10 +145,10 @@ class spell_mother_shahraz_random_periodic_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC });
     }
 
-    void Update(AuraEffect const* effect)
+    void Update(AuraEffect const* /*effect*/)
     {
         PreventDefaultAction();
-        if (effect->GetTickNumber() % 5 == 1)
+        if (GetUnitOwner())
             GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC), true);
     }
 

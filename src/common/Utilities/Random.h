@@ -47,7 +47,7 @@ AC_COMMON_API double rand_norm();
 AC_COMMON_API double rand_chance();
 
 /* Return a random number in the range 0..count (exclusive) with each value having a different chance of happening */
-AC_COMMON_API uint32 urandweighted(size_t count, double const* chances);
+AC_COMMON_API uint32 urandweighted(std::size_t count, double const* chances);
 
 /* Return true if a random roll fits in the specified chance (range 0-100). */
 inline bool roll_chance_f(float chance)

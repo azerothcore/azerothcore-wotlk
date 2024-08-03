@@ -63,7 +63,7 @@ bool WDTFile::init(uint32 mapId)
         flipcc(fourcc);
         fourcc[4] = 0;
 
-        size_t nextpos = _file.getPos() + size;
+        std::size_t nextpos = _file.getPos() + size;
 
         if (!strcmp(fourcc, "MAIN"))
         {

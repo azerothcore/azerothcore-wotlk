@@ -1042,307 +1042,245 @@ public:
     }
 };
 
-class spell_deathbringer_blood_link_aura : public SpellScriptLoader
+class spell_deathbringer_blood_link_aura : public AuraScript
 {
-public:
-    spell_deathbringer_blood_link_aura() : SpellScriptLoader("spell_deathbringer_blood_link_aura") { }
+    PrepareAuraScript(spell_deathbringer_blood_link_aura);
 
-    class spell_deathbringer_blood_link_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_deathbringer_blood_link_AuraScript);
+        return ValidateSpellInfo({ SPELL_BLOOD_LINK_DUMMY });
+    }
 
-        void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
+    void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+        if (GetUnitOwner()->getPowerType() == POWER_ENERGY && GetUnitOwner()->GetPower(POWER_ENERGY) == GetUnitOwner()->GetMaxPower(POWER_ENERGY))
+            if (Creature* saurfang = GetUnitOwner()->ToCreature())
+                saurfang->AI()->DoAction(ACTION_MARK_OF_THE_FALLEN_CHAMPION);
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
+    }
+
+    void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* victim = eventInfo.GetActionTarget();
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+
+        //uint32 markCount = 0;
+        //if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
+        //markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
+        int32 basepoints = int32(1.0f /*+ 0.5f + 0.5f*markCount*/);
+        switch (procSpell->Id) // some spells give more Blood Power
         {
-            PreventDefaultAction();
-            if (GetUnitOwner()->getPowerType() == POWER_ENERGY && GetUnitOwner()->GetPower(POWER_ENERGY) == GetUnitOwner()->GetMaxPower(POWER_ENERGY))
-                if (Creature* saurfang = GetUnitOwner()->ToCreature())
-                    saurfang->AI()->DoAction(ACTION_MARK_OF_THE_FALLEN_CHAMPION);
+            case 72380:
+            case 72438:
+            case 72439:
+            case 72440: // Blood Nova
+                basepoints = int32(2.0f /*+ 0.5f + 0.75f*markCount*/);
+                break;
         }
 
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && procSpell && procSpell->SpellIconID != 2731; // Xinef: Mark of the Fallen Champion
-        }
+        victim->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
+        return;
+    }
 
-        void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            Unit* victim = eventInfo.GetActionTarget();
-            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathbringer_blood_link_aura::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
 
-            //uint32 markCount = 0;
-            //if (Creature* saurfang = eventInfo.GetActor()->ToCreature())
-            //markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456 /*FALLEN_CHAMPION_CAST_COUNT*/) : 0;
-            int32 basepoints = int32(1.0f /*+ 0.5f + 0.5f*markCount*/);
-            switch (procSpell->Id) // some spells give more Blood Power
-            {
-                case 72380:
-                case 72438:
-                case 72439:
-                case 72440: // Blood Nova
-                    basepoints = int32(2.0f /*+ 0.5f + 0.75f*markCount*/);
-                    break;
-            }
+class spell_deathbringer_blood_link_blood_beast_aura : public AuraScript
+{
+    PrepareAuraScript(spell_deathbringer_blood_link_blood_beast_aura);
 
-            victim->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActor(), true);
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLOOD_LINK_DUMMY });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
+    }
+
+    void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        /*
+        uint32 markCount = 0;
+        if (Map* map = eventInfo.GetActor()->FindMap())
+            if (InstanceMap* imap = map->ToInstanceMap())
+                if (InstanceScript* isc = imap->GetInstanceScript())
+                    if (ObjectGuid sguid = isc->GetGuidData(3) //DATA_DEATHBRINGER_SAURFANG
+                        if (Creature* saurfang = ObjectAccessor::GetCreature(*eventInfo.GetActor(), sguid))
+                            markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456) : 0; //FALLEN_CHAMPION_CAST_COUNT
+        */
+        int32 basepoints = int32(3.0f /*+ 0.5f + 0.5f*markCount*/);
+
+        eventInfo.GetActor()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
+        return;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_blood_beast_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_blood_beast_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+class spell_deathbringer_blood_link : public SpellScript
+{
+    PrepareSpellScript(spell_deathbringer_blood_link);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLOOD_LINK_POWER });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastCustomSpell(SPELL_BLOOD_LINK_POWER, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetHitUnit(), true);
+        if (Aura* bloodPower = GetHitUnit()->GetAura(SPELL_BLOOD_POWER))
+            bloodPower->RecalculateAmountOfEffects();
+        PreventHitDefaultEffect(EFFECT_0);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_deathbringer_blood_link::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+class spell_deathbringer_blood_power : public SpellScript
+{
+    PrepareSpellScript(spell_deathbringer_blood_power);
+
+    void ModAuraValue()
+    {
+        if (Aura* aura = GetHitAura())
+            aura->RecalculateAmountOfEffects();
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_deathbringer_blood_power::ModAuraValue);
+    }
+};
+
+class spell_deathbringer_blood_power_aura : public AuraScript
+{
+    PrepareAuraScript(spell_deathbringer_blood_power_aura);
+
+    void RecalculateHook(AuraEffect const* /*aurEffect*/, int32& amount, bool& canBeRecalculated)
+    {
+        amount = int32(GetUnitOwner()->GetPower(POWER_ENERGY));
+        canBeRecalculated = true;
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_deathbringer_blood_power_aura::RecalculateHook, EFFECT_0, SPELL_AURA_MOD_SCALE);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_deathbringer_blood_power_aura::RecalculateHook, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+    }
+};
+
+class spell_deathbringer_blood_nova_targeting : public SpellScript
+{
+    PrepareSpellScript(spell_deathbringer_blood_nova_targeting);
+
+    bool Load() override
+    {
+        // initialize variable
+        _target = nullptr;
+        return true;
+    }
+
+    void FilterTargetsInitial(std::list<WorldObject*>& targets)
+    {
+        // select one random target, with preference of ranged targets
+        uint32 targetsAtRange = 0;
+        uint32 const minTargets = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 10 : 4);
+        targets.sort(Acore::ObjectDistanceOrderPred(GetCaster(), false));
+
+        // get target count at range
+        for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr, ++targetsAtRange)
+            if ((*itr)->GetDistance(GetCaster()) < 12.0f)
+                break;
+
+        // set the upper cap
+        if (targetsAtRange < minTargets)
+            targetsAtRange = std::min<uint32>(targets.size(), minTargets);
+
+        if (!targetsAtRange)
             return;
-        }
 
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_AuraScript::CheckProc);
-            OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_deathbringer_blood_link_AuraScript::HandlePeriodicTick, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_deathbringer_blood_link_AuraScript();
+        std::list<WorldObject*>::iterator itrTarget = targets.begin();
+        std::advance(itrTarget, urand(0, targetsAtRange - 1));
+        _target = *itrTarget;
+        targets.clear();
+        targets.push_back(_target);
     }
-};
 
-class spell_deathbringer_blood_link_blood_beast_aura : public SpellScriptLoader
-{
-public:
-    spell_deathbringer_blood_link_blood_beast_aura() : SpellScriptLoader("spell_deathbringer_blood_link_blood_beast_aura") { }
-
-    class spell_deathbringer_blood_link_blood_beast_aura_AuraScript : public AuraScript
+    // use the same target for first and second effect
+    void FilterTargetsSubsequent(std::list<WorldObject*>& targets)
     {
-        PrepareAuraScript(spell_deathbringer_blood_link_blood_beast_aura_AuraScript);
-
-        bool CheckProc(ProcEventInfo& eventInfo)
-        {
-            DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-            SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-            return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
-        }
-
-        void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-
-            /*
-            uint32 markCount = 0;
-            if (Map* map = eventInfo.GetActor()->FindMap())
-                if (InstanceMap* imap = map->ToInstanceMap())
-                    if (InstanceScript* isc = imap->GetInstanceScript())
-                        if (ObjectGuid sguid = isc->GetGuidData(3) //DATA_DEATHBRINGER_SAURFANG
-                            if (Creature* saurfang = ObjectAccessor::GetCreature(*eventInfo.GetActor(), sguid))
-                                markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456) : 0; //FALLEN_CHAMPION_CAST_COUNT
-            */
-            int32 basepoints = int32(3.0f /*+ 0.5f + 0.5f*markCount*/);
-
-            eventInfo.GetActor()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
+        if (!_target)
             return;
-        }
 
-        void Register() override
-        {
-            DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_blood_beast_aura_AuraScript::CheckProc);
-            OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_blood_beast_aura_AuraScript::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_deathbringer_blood_link_blood_beast_aura_AuraScript();
+        targets.clear();
+        targets.push_back(_target);
     }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_deathbringer_blood_nova_targeting::FilterTargetsInitial, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_deathbringer_blood_nova_targeting::FilterTargetsSubsequent, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+
+private:
+    WorldObject* _target;
 };
 
-class spell_deathbringer_blood_link : public SpellScriptLoader
+class spell_deathbringer_boiling_blood : public SpellScript
 {
-public:
-    spell_deathbringer_blood_link() : SpellScriptLoader("spell_deathbringer_blood_link") { }
+    PrepareSpellScript(spell_deathbringer_boiling_blood);
 
-    class spell_deathbringer_blood_link_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_deathbringer_blood_link_SpellScript);
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            GetHitUnit()->CastCustomSpell(SPELL_BLOOD_LINK_POWER, SPELLVALUE_BASE_POINT0, GetEffectValue(), GetHitUnit(), true);
-            if (Aura* bloodPower = GetHitUnit()->GetAura(SPELL_BLOOD_POWER))
-                bloodPower->RecalculateAmountOfEffects();
-            PreventHitDefaultEffect(EFFECT_0);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_deathbringer_blood_link_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_deathbringer_blood_link_SpellScript();
-    }
-};
-
-class spell_deathbringer_blood_power : public SpellScriptLoader
-{
-public:
-    spell_deathbringer_blood_power() : SpellScriptLoader("spell_deathbringer_blood_power") { }
-
-    class spell_deathbringer_blood_power_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_deathbringer_blood_power_SpellScript);
-
-        void ModAuraValue()
-        {
-            if (Aura* aura = GetHitAura())
-                aura->RecalculateAmountOfEffects();
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_deathbringer_blood_power_SpellScript::ModAuraValue);
-        }
-    };
-
-    class spell_deathbringer_blood_power_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_deathbringer_blood_power_AuraScript);
-
-        void RecalculateHook(AuraEffect const* /*aurEffect*/, int32& amount, bool& canBeRecalculated)
-        {
-            amount = int32(GetUnitOwner()->GetPower(POWER_ENERGY));
-            canBeRecalculated = true;
-        }
-
-        void Register() override
-        {
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_deathbringer_blood_power_AuraScript::RecalculateHook, EFFECT_0, SPELL_AURA_MOD_SCALE);
-            DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_deathbringer_blood_power_AuraScript::RecalculateHook, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        }
-
-        bool Load() override
-        {
-            if (GetUnitOwner()->getPowerType() != POWER_ENERGY)
-                return false;
-            return true;
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_deathbringer_blood_power_SpellScript();
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
     }
 
-    AuraScript* GetAuraScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_deathbringer_blood_power_AuraScript();
-    }
-};
+        targets.remove(GetCaster()->GetVictim());
+        if (targets.empty())
+            return;
 
-class spell_deathbringer_blood_nova_targeting : public SpellScriptLoader
-{
-public:
-    spell_deathbringer_blood_nova_targeting() : SpellScriptLoader("spell_deathbringer_blood_nova_targeting") { }
-
-    class spell_deathbringer_blood_nova_targeting_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_deathbringer_blood_nova_targeting_SpellScript);
-
-        bool Load() override
+        if (GetSpellInfo()->Id == 72385 || GetSpellInfo()->Id == 72442) // 10n, 10h
         {
-            // initialize variable
-            target = nullptr;
-            return true;
-        }
-
-        void FilterTargetsInitial(std::list<WorldObject*>& targets)
-        {
-            // select one random target, with preference of ranged targets
-            uint32 targetsAtRange = 0;
-            uint32 const minTargets = uint32(GetCaster()->GetMap()->GetSpawnMode() & 1 ? 10 : 4);
-            targets.sort(Acore::ObjectDistanceOrderPred(GetCaster(), false));
-
-            // get target count at range
-            for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); ++itr, ++targetsAtRange)
-                if ((*itr)->GetDistance(GetCaster()) < 12.0f)
-                    break;
-
-            // set the upper cap
-            if (targetsAtRange < minTargets)
-                targetsAtRange = std::min<uint32>(targets.size(), minTargets);
-
-            if (!targetsAtRange)
-                return;
-
-            std::list<WorldObject*>::iterator itrTarget = targets.begin();
-            std::advance(itrTarget, urand(0, targetsAtRange - 1));
-            target = *itrTarget;
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
             targets.clear();
             targets.push_back(target);
         }
-
-        // use the same target for first and second effect
-        void FilterTargetsSubsequent(std::list<WorldObject*>& targets)
-        {
-            if (!target)
-                return;
-
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_deathbringer_blood_nova_targeting_SpellScript::FilterTargetsInitial, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_deathbringer_blood_nova_targeting_SpellScript::FilterTargetsSubsequent, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-
-        WorldObject* target;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_deathbringer_blood_nova_targeting_SpellScript();
+        else
+            Acore::Containers::RandomResize(targets, 3);
     }
-};
 
-class spell_deathbringer_boiling_blood : public SpellScriptLoader
-{
-public:
-    spell_deathbringer_boiling_blood() : SpellScriptLoader("spell_deathbringer_boiling_blood") { }
-
-    class spell_deathbringer_boiling_blood_SpellScript : public SpellScript
+    void Register() override
     {
-        PrepareSpellScript(spell_deathbringer_boiling_blood_SpellScript);
-
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove(GetCaster()->GetVictim());
-            if (targets.empty())
-                return;
-
-            if (GetSpellInfo()->Id == 72385 || GetSpellInfo()->Id == 72442) // 10n, 10h
-            {
-                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-                targets.clear();
-                targets.push_back(target);
-            }
-            else
-                Acore::Containers::RandomResize(targets, 3);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_deathbringer_boiling_blood_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_deathbringer_boiling_blood_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_deathbringer_boiling_blood::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1412,12 +1350,12 @@ void AddSC_boss_deathbringer_saurfang()
     new npc_high_overlord_saurfang_icc();
     new npc_muradin_bronzebeard_icc();
     new npc_saurfang_event();
-    new spell_deathbringer_blood_link_aura();
-    new spell_deathbringer_blood_link_blood_beast_aura();
-    new spell_deathbringer_blood_link();
-    new spell_deathbringer_blood_power();
-    new spell_deathbringer_blood_nova_targeting();
-    new spell_deathbringer_boiling_blood();
+    RegisterSpellScript(spell_deathbringer_blood_link_aura);
+    RegisterSpellScript(spell_deathbringer_blood_link_blood_beast_aura);
+    RegisterSpellScript(spell_deathbringer_blood_link);
+    RegisterSpellAndAuraScriptPair(spell_deathbringer_blood_power, spell_deathbringer_blood_power_aura);
+    RegisterSpellScript(spell_deathbringer_blood_nova_targeting);
+    RegisterSpellScript(spell_deathbringer_boiling_blood);
     new achievement_ive_gone_and_made_a_mess();
     new npc_icc_blood_beast();
 }
