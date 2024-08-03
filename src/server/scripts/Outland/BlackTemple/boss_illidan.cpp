@@ -46,12 +46,14 @@ enum Says
     SAY_UDALO                           = 0,
     SAY_OLUM                            = 0,
     SAY_AKAMA_DOORS                     = 0,
-    SAY_AKAMA_FAIL                      = 1,
-    SAY_AKAMA_BEWARE                    = 2,
-    SAY_AKAMA_LEAVE                     = 3,
-    SAY_AKAMA_ILLIDAN1                  = 4,
-    SAY_AKAMA_ILLIDAN2                  = 5,
-    SAY_AKAMA_ILLIDAN3                  = 6,
+    SAY_AKAMA_ALONE                     = 1,
+    SAY_AKAMA_SALUTE                    = 2,
+    SAY_AKAMA_BETRAYER                  = 3,
+    SAY_AKAMA_FREE                      = 4,
+    SAY_AKAMA_TIME_HAS_COME             = 5,
+    SAY_AKAMA_MINIONS                   = 6,
+    SAY_AKAMA_LIGHT                     = 7,
+    SAY_AKAMA_FINISH                    = 8,
     SAY_AKAMA_COUNCIL_1                 = 9,
     SAY_AKAMA_COUNCIL_2                 = 10,
 
@@ -792,7 +794,7 @@ public:
                 events.ScheduleEvent(EVENT_AKAMA_SPELL_CHAIN, 7000);
                 events.ScheduleEvent(EVENT_AKAMA_HEALTH, 1000);
                 me->GetMotionMaster()->MoveCharge(741.97f, 358.74f, 353.0f, 10.0f, POINT_FIGHT_MINIONS);
-                Talk(SAY_AKAMA_LEAVE);
+                Talk(SAY_AKAMA_MINIONS);
             }
             else if (param == ACTION_ILLIDAN_DEAD)
             {
@@ -924,7 +926,7 @@ public:
                     me->CastSpell(me, SPELL_AKAMA_DOOR_FAIL, false);
                     break;
                 case EVENT_AKAMA_SCENE_4:
-                    Talk(SAY_AKAMA_FAIL);
+                    Talk(SAY_AKAMA_ALONE);
                     break;
                 case EVENT_AKAMA_SCENE_5:
                     me->SummonCreature(NPC_SPIRIT_OF_UDALO, me->GetPositionX() - 5.0f, me->GetPositionY() + 8.0f, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
@@ -950,7 +952,7 @@ public:
                     instance->SetBossState(DATA_AKAMA_ILLIDAN, DONE);
                     break;
                 case EVENT_AKAMA_SCENE_10:
-                    Talk(SAY_AKAMA_BEWARE);
+                    Talk(SAY_AKAMA_SALUTE);
                     break;
                 case EVENT_AKAMA_SCENE_11:
                     SetEscortPaused(false);
@@ -967,14 +969,14 @@ public:
                         illidan->AI()->Talk(SAY_ILLIDAN_AKAMA1);
                     break;
                 case EVENT_AKAMA_SCENE_23:
-                    Talk(SAY_AKAMA_ILLIDAN1);
+                    Talk(SAY_AKAMA_FREE);
                     break;
                 case EVENT_AKAMA_SCENE_24:
                     if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                         illidan->AI()->Talk(SAY_ILLIDAN_AKAMA2);
                     break;
                 case EVENT_AKAMA_SCENE_25:
-                    Talk(SAY_AKAMA_ILLIDAN2);
+                    Talk(SAY_AKAMA_TIME_HAS_COME);
                     break;
                 case EVENT_AKAMA_SCENE_26:
                     if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
