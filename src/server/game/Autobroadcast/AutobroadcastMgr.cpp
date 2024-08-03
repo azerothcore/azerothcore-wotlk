@@ -131,7 +131,7 @@ void AutobroadcastMgr::SendAutobroadcasts()
 
 void AutobroadcastMgr::SendWorldAnnouncement(std::string msg)
 {
-    sWorld->SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.data());
+    ChatHandler(nullptr).SendWorldTextOptional(LANG_AUTO_BROADCAST, ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST, msg.data());
 }
 
 void AutobroadcastMgr::SendNotificationAnnouncement(std::string msg)

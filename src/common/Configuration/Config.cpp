@@ -46,9 +46,9 @@ namespace
     // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
     {
-        size_t foundAuth = fileName.find("authserver.conf");
-        size_t foundWorld = fileName.find("worldserver.conf");
-        size_t foundImport = fileName.find("dbimport.conf");
+        std::size_t foundAuth = fileName.find("authserver.conf");
+        std::size_t foundWorld = fileName.find("worldserver.conf");
+        std::size_t foundImport = fileName.find("dbimport.conf");
 
         return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos || foundImport != std::string_view::npos;
     }
@@ -56,8 +56,8 @@ namespace
     // Check logging system configs like Appender.* and Logger.*
     bool IsLoggingSystemOptions(std::string_view optionName)
     {
-        size_t foundAppender = optionName.find("Appender.");
-        size_t foundLogger = optionName.find("Logger.");
+        std::size_t foundAppender = optionName.find("Appender.");
+        std::size_t foundLogger = optionName.find("Logger.");
 
         return foundAppender != std::string_view::npos || foundLogger != std::string_view::npos;
     }
@@ -223,7 +223,7 @@ namespace
         std::string result;
 
         const char* str = key.c_str();
-        size_t n = key.length();
+        std::size_t n = key.length();
 
         char curr;
         bool isEnd;
@@ -231,7 +231,7 @@ namespace
         bool currIsNumeric;
         bool nextIsNumeric;
 
-        for (size_t i = 0; i < n; ++i)
+        for (std::size_t i = 0; i < n; ++i)
         {
             curr = str[i];
             if (curr == ' ' || curr == '.' || curr == '-')

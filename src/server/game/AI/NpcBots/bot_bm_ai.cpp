@@ -7,6 +7,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "SpellMgr.h"
 #include "TemporarySummon.h"
 /*
 Blademaster NpcBot (by Trickerer onlysuffering@gmail.com)

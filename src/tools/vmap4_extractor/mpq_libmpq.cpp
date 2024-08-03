@@ -99,12 +99,12 @@ MPQFile::MPQFile(const char* filename):
     buffer = nullptr;
 }
 
-size_t MPQFile::read(void* dest, size_t bytes)
+std::size_t MPQFile::read(void* dest, std::size_t bytes)
 {
     if (eof) return 0;
 
-    size_t rpos = pointer + bytes;
-    if (rpos > size_t(size))
+    std::size_t rpos = pointer + bytes;
+    if (rpos > std::size_t(size))
     {
         bytes = size - pointer;
         eof = true;

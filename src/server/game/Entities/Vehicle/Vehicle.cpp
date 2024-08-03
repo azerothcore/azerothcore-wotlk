@@ -22,7 +22,6 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SpellInfo.h"
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"

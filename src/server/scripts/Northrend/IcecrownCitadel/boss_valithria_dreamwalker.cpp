@@ -1138,372 +1138,280 @@ public:
     }
 };
 
-class spell_dreamwalker_summon_portal : public SpellScriptLoader
+class spell_dreamwalker_summon_portal : public SpellScript
 {
-public:
-    spell_dreamwalker_summon_portal() : SpellScriptLoader("spell_dreamwalker_summon_portal") { }
+    PrepareSpellScript(spell_dreamwalker_summon_portal);
 
-    class spell_dreamwalker_summon_portal_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_dreamwalker_summon_portal_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            Unit* target = GetHitUnit();
-            if (!target)
-                return;
+        uint32 spellId = (GetSpellInfo()->Id == 72224 ? 71301 : 71977); // spell implicit target replaced to TARGET_DEST_DEST
+        float minDist = 20.0f;
+        float maxDist = 30.0f;
+        float dist = (maxDist - minDist) * rand_norm() + minDist;
+        float startAngle = 3 * M_PI / 2;
+        float maxAddAngle = ((target->GetMap()->GetSpawnMode() % 2) == 0 ? M_PI : 2 * M_PI);
+        float angle = startAngle + rand_norm() * maxAddAngle;
+        target->CastSpell(target->GetPositionX() + cos(angle)*dist, target->GetPositionY() + std::sin(angle)*dist, target->GetPositionZ(), spellId, true);
+    }
 
-            uint32 spellId = (GetSpellInfo()->Id == 72224 ? 71301 : 71977); // spell implicit target replaced to TARGET_DEST_DEST
-            float minDist = 20.0f;
-            float maxDist = 30.0f;
-            float dist = (maxDist - minDist) * rand_norm() + minDist;
-            float startAngle = 3 * M_PI / 2;
-            float maxAddAngle = ((target->GetMap()->GetSpawnMode() % 2) == 0 ? M_PI : 2 * M_PI);
-            float angle = startAngle + rand_norm() * maxAddAngle;
-            target->CastSpell(target->GetPositionX() + cos(angle)*dist, target->GetPositionY() + std::sin(angle)*dist, target->GetPositionZ(), spellId, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summon_portal_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_dreamwalker_summon_portal_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summon_portal::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_dreamwalker_twisted_nightmares : public SpellScriptLoader
+class spell_dreamwalker_twisted_nightmares : public SpellScript
 {
-public:
-    spell_dreamwalker_twisted_nightmares() : SpellScriptLoader("spell_dreamwalker_twisted_nightmares") { }
+    PrepareSpellScript(spell_dreamwalker_twisted_nightmares);
 
-    class spell_dreamwalker_twisted_nightmares_SpellScript : public SpellScript
+    void HandleScript(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_dreamwalker_twisted_nightmares_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit())
+            return;
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit())
-                return;
+        if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
+            GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
+    }
 
-            if (InstanceScript* instance = GetHitUnit()->GetInstanceScript())
-                GetHitUnit()->CastSpell((Unit*)nullptr, GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, instance->GetGuidData(DATA_VALITHRIA_DREAMWALKER));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_twisted_nightmares_SpellScript::HandleScript, EFFECT_2, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_dreamwalker_twisted_nightmares_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_twisted_nightmares::HandleScript, EFFECT_2, SPELL_EFFECT_FORCE_CAST);
     }
 };
 
-class spell_dreamwalker_nightmare_cloud : public SpellScriptLoader
+class spell_dreamwalker_nightmare_cloud_aura : public AuraScript
 {
-public:
-    spell_dreamwalker_nightmare_cloud() : SpellScriptLoader("spell_dreamwalker_nightmare_cloud") { }
+    PrepareAuraScript(spell_dreamwalker_nightmare_cloud_aura);
 
-    class spell_dreamwalker_nightmare_cloud_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_dreamwalker_nightmare_cloud_AuraScript);
-
-        bool Load() override
-        {
-            _instance = GetOwner()->GetInstanceScript();
-            return _instance != nullptr;
-        }
-
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) != IN_PROGRESS)
-                PreventDefaultAction();
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_nightmare_cloud_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-
-        InstanceScript* _instance;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dreamwalker_nightmare_cloud_AuraScript();
+        _instance = GetOwner()->GetInstanceScript();
+        return _instance != nullptr;
     }
-};
 
-class spell_dreamwalker_mana_void : public SpellScriptLoader
-{
-public:
-    spell_dreamwalker_mana_void() : SpellScriptLoader("spell_dreamwalker_mana_void") { }
-
-    class spell_dreamwalker_mana_void_AuraScript : public AuraScript
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_dreamwalker_mana_void_AuraScript);
-
-        void PeriodicTick(AuraEffect const* aurEff)
-        {
-            // first 3 ticks have amplitude 1 second
-            // remaining tick every 500ms
-            if (aurEff->GetTickNumber() <= 5)
-                if (!(aurEff->GetTickNumber() & 1))
-                    PreventDefaultAction();
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_mana_void_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dreamwalker_mana_void_AuraScript();
-    }
-};
-
-class spell_dreamwalker_decay_periodic_timer : public SpellScriptLoader
-{
-public:
-    spell_dreamwalker_decay_periodic_timer() : SpellScriptLoader("spell_dreamwalker_decay_periodic_timer") { }
-
-    class spell_dreamwalker_decay_periodic_timer_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_dreamwalker_decay_periodic_timer_AuraScript);
-
-        bool Load() override
-        {
-            _decayRate = GetId() != SPELL_TIMER_BLAZING_SKELETON ? 1000 : 5000;
-            return true;
-        }
-
-        void DecayPeriodicTimer(AuraEffect* aurEff)
-        {
-            int32 timer = aurEff->GetPeriodicTimer();
-            if (timer <= 5000)
-                return;
-
-            aurEff->SetPeriodicTimer(timer - _decayRate);
-        }
-
-        void Register() override
-        {
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_dreamwalker_decay_periodic_timer_AuraScript::DecayPeriodicTimer, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-
-        int32 _decayRate;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dreamwalker_decay_periodic_timer_AuraScript();
-    }
-};
-
-class spell_dreamwalker_summoner : public SpellScriptLoader
-{
-public:
-    spell_dreamwalker_summoner() : SpellScriptLoader("spell_dreamwalker_summoner") { }
-
-    class spell_dreamwalker_summoner_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_dreamwalker_summoner_SpellScript);
-
-        bool Load() override
-        {
-            if (!GetCaster()->GetInstanceScript())
-                return false;
-            return true;
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
-            std::list<WorldObject*> list_copy = targets;
-            targets.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
-            if (targets.empty())
-            {
-                if (list_copy.empty())
-                    return;
-                targets = list_copy;
-            }
-
-            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void HandleForceCast(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit())
-                return;
-
-            GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dreamwalker_summoner_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summoner_SpellScript::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_dreamwalker_summoner_SpellScript();
-    }
-};
-
-class spell_dreamwalker_summon_suppresser : public SpellScriptLoader
-{
-public:
-    spell_dreamwalker_summon_suppresser() : SpellScriptLoader("spell_dreamwalker_summon_suppresser") { }
-
-    class spell_dreamwalker_summon_suppresser_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_dreamwalker_summon_suppresser_AuraScript);
-
-        void PeriodicTick(AuraEffect const* /*aurEff*/)
-        {
+        if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) != IN_PROGRESS)
             PreventDefaultAction();
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
+    }
 
-            std::list<Creature*> summoners;
-            caster->GetCreaturesWithEntryInRange(summoners, 200.0f, NPC_WORLD_TRIGGER);
-            std::list<Creature*> list_copy = summoners;
-            summoners.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
-            if (summoners.empty())
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_nightmare_cloud_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+
+private:
+    InstanceScript* _instance;
+};
+
+class spell_dreamwalker_mana_void_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dreamwalker_mana_void_aura);
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        // first 3 ticks have amplitude 1 second
+        // remaining tick every 500ms
+        if (aurEff->GetTickNumber() <= 5)
+            if (!(aurEff->GetTickNumber() & 1))
+                PreventDefaultAction();
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_mana_void_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_dreamwalker_decay_periodic_timer_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dreamwalker_decay_periodic_timer_aura);
+
+    bool Load() override
+    {
+        _decayRate = GetId() != SPELL_TIMER_BLAZING_SKELETON ? 1000 : 5000;
+        return true;
+    }
+
+    void DecayPeriodicTimer(AuraEffect* aurEff)
+    {
+        int32 timer = aurEff->GetPeriodicTimer();
+        if (timer <= 5000)
+            return;
+
+        aurEff->SetPeriodicTimer(timer - _decayRate);
+    }
+
+    void Register() override
+    {
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_dreamwalker_decay_periodic_timer_aura::DecayPeriodicTimer, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+
+private:
+    int32 _decayRate;
+};
+
+class spell_dreamwalker_summoner : public SpellScript
+{
+    PrepareSpellScript(spell_dreamwalker_summoner);
+
+    bool Load() override
+    {
+        if (!GetCaster()->GetInstanceScript())
+            return false;
+        return true;
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::AllWorldObjectsInExactRange(GetCaster(), 250.0f, true));
+        std::list<WorldObject*> list_copy = targets;
+        targets.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+        if (targets.empty())
+        {
+            if (list_copy.empty())
+                return;
+            targets = list_copy;
+        }
+
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(target);
+    }
+
+    void HandleForceCast(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit())
+            return;
+
+        GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dreamwalker_summoner::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summoner::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
+    }
+};
+
+class spell_dreamwalker_summon_suppresser_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dreamwalker_summon_suppresser_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_SUPPRESSER });
+    }
+
+    void PeriodicTick(AuraEffect const* /*aurEff*/)
+    {
+        PreventDefaultAction();
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        std::list<Creature*> summoners;
+        caster->GetCreaturesWithEntryInRange(summoners, 200.0f, NPC_WORLD_TRIGGER);
+        std::list<Creature*> list_copy = summoners;
+        summoners.remove_if(Acore::UnitAuraCheck(true, SPELL_RECENTLY_SPAWNED));
+        if (summoners.empty())
+        {
+            if (list_copy.empty())
+                return;
+            summoners = list_copy;
+        }
+        Acore::Containers::RandomResize(summoners, 2);
+
+        for (uint32 i = 0; i < 3; ++i)
+            caster->CastSpell(summoners.front(), SPELL_SUMMON_SUPPRESSER, true);
+        for (uint32 i = 0; i < 3; ++i)
+            caster->CastSpell(summoners.back(), SPELL_SUMMON_SUPPRESSER, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_summon_suppresser_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+class spell_dreamwalker_summon_suppresser_effect : public SpellScript
+{
+    PrepareSpellScript(spell_dreamwalker_summon_suppresser_effect);
+
+    bool Load() override
+    {
+        if (!GetCaster()->GetInstanceScript())
+            return false;
+        return true;
+    }
+
+    void HandleForceCast(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (!GetHitUnit())
+            return;
+
+        GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summon_suppresser_effect::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
+    }
+};
+
+class spell_valithria_suppression_aura : public AuraScript
+{
+    PrepareAuraScript(spell_valithria_suppression_aura);
+
+    void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        const_cast<AuraEffect*>(aurEff)->SetAmount(0);
+
+        Unit* target = GetTarget();
+        Unit::AuraApplicationMap& aam = target->GetAppliedAuras();
+        Unit::AuraApplicationMapBounds range = aam.equal_range(GetSpellInfo()->Id);
+        uint32 count = target->GetAuraCount(GetSpellInfo()->Id);
+
+        if (range.first == range.second)
+            return;
+
+        for (Unit::AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
+            if (count == 1 || itr->second->GetBase()->GetEffect(EFFECT_0)->GetAmount())
             {
-                if (list_copy.empty())
-                    return;
-                summoners = list_copy;
+                itr->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(count * GetSpellInfo()->Effects[0].CalcValue());
+                break;
             }
-            Acore::Containers::RandomResize(summoners, 2);
-
-            for (uint32 i = 0; i < 3; ++i)
-                caster->CastSpell(summoners.front(), SPELL_SUMMON_SUPPRESSER, true);
-            for (uint32 i = 0; i < 3; ++i)
-                caster->CastSpell(summoners.back(), SPELL_SUMMON_SUPPRESSER, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_dreamwalker_summon_suppresser_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_dreamwalker_summon_suppresser_AuraScript();
     }
-};
 
-class spell_dreamwalker_summon_suppresser_effect : public SpellScriptLoader
-{
-public:
-    spell_dreamwalker_summon_suppresser_effect() : SpellScriptLoader("spell_dreamwalker_summon_suppresser_effect") { }
-
-    class spell_dreamwalker_summon_suppresser_effect_SpellScript : public SpellScript
+    void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
     {
-        PrepareSpellScript(spell_dreamwalker_summon_suppresser_effect_SpellScript);
+        Unit* target = GetTarget();
+        Unit::AuraApplicationMap& aam = target->GetAppliedAuras();
+        Unit::AuraApplicationMapBounds range = aam.equal_range(GetSpellInfo()->Id);
+        uint32 count = target->GetAuraCount(GetSpellInfo()->Id);
 
-        bool Load() override
-        {
-            if (!GetCaster()->GetInstanceScript())
-                return false;
-            return true;
-        }
+        if (range.first == range.second)
+            return;
 
-        void HandleForceCast(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (!GetHitUnit())
-                return;
+        for (Unit::AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
+            if (itr->second->GetBase()->GetEffect(EFFECT_0)->GetAmount())
+                itr->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(0);
 
-            GetHitUnit()->CastSpell(GetCaster(), GetSpellInfo()->Effects[effIndex].TriggerSpell, true, nullptr, nullptr, GetCaster()->GetInstanceScript()->GetGuidData(DATA_VALITHRIA_LICH_KING));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_dreamwalker_summon_suppresser_effect_SpellScript::HandleForceCast, EFFECT_0, SPELL_EFFECT_FORCE_CAST);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_dreamwalker_summon_suppresser_effect_SpellScript();
+        range.first->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(count * GetSpellInfo()->Effects[0].CalcValue());
     }
-};
 
-class spell_valithria_suppression : public SpellScriptLoader
-{
-public:
-    spell_valithria_suppression() : SpellScriptLoader("spell_valithria_suppression") { }
-
-    class spell_valithria_suppression_AuraScript : public AuraScript
+    void Register() override
     {
-        PrepareAuraScript(spell_valithria_suppression_AuraScript);
-
-        void OnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            const_cast<AuraEffect*>(aurEff)->SetAmount(0);
-
-            Unit* target = GetTarget();
-            Unit::AuraApplicationMap& aam = target->GetAppliedAuras();
-            Unit::AuraApplicationMapBounds range = aam.equal_range(GetSpellInfo()->Id);
-            uint32 count = target->GetAuraCount(GetSpellInfo()->Id);
-
-            if (range.first == range.second)
-                return;
-
-            for (Unit::AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
-                if (count == 1 || itr->second->GetBase()->GetEffect(EFFECT_0)->GetAmount())
-                {
-                    itr->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(count * GetSpellInfo()->Effects[0].CalcValue());
-                    break;
-                }
-        }
-
-        void OnRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
-        {
-            Unit* target = GetTarget();
-            Unit::AuraApplicationMap& aam = target->GetAppliedAuras();
-            Unit::AuraApplicationMapBounds range = aam.equal_range(GetSpellInfo()->Id);
-            uint32 count = target->GetAuraCount(GetSpellInfo()->Id);
-
-            if (range.first == range.second)
-                return;
-
-            for (Unit::AuraApplicationMap::const_iterator itr = range.first; itr != range.second; ++itr)
-                if (itr->second->GetBase()->GetEffect(EFFECT_0)->GetAmount())
-                    itr->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(0);
-
-            range.first->second->GetBase()->GetEffect(EFFECT_0)->SetAmount(count * GetSpellInfo()->Effects[0].CalcValue());
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_valithria_suppression_AuraScript::OnApply, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_valithria_suppression_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_valithria_suppression_AuraScript();
+        AfterEffectApply += AuraEffectApplyFn(spell_valithria_suppression_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_valithria_suppression_aura::OnRemove, EFFECT_0, SPELL_AURA_MOD_HEALING_PCT, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1531,15 +1439,15 @@ void AddSC_boss_valithria_dreamwalker()
     new npc_blistering_zombie();
     new npc_gluttonous_abomination();
 
-    new spell_dreamwalker_summon_portal();
-    new spell_dreamwalker_twisted_nightmares();
-    new spell_dreamwalker_nightmare_cloud();
-    new spell_dreamwalker_mana_void();
-    new spell_dreamwalker_decay_periodic_timer();
-    new spell_dreamwalker_summoner();
-    new spell_dreamwalker_summon_suppresser();
-    new spell_dreamwalker_summon_suppresser_effect();
-    new spell_valithria_suppression();
+    RegisterSpellScript(spell_dreamwalker_summon_portal);
+    RegisterSpellScript(spell_dreamwalker_twisted_nightmares);
+    RegisterSpellScript(spell_dreamwalker_nightmare_cloud_aura);
+    RegisterSpellScript(spell_dreamwalker_mana_void_aura);
+    RegisterSpellScript(spell_dreamwalker_decay_periodic_timer_aura);
+    RegisterSpellScript(spell_dreamwalker_summoner);
+    RegisterSpellScript(spell_dreamwalker_summon_suppresser_aura);
+    RegisterSpellScript(spell_dreamwalker_summon_suppresser_effect);
+    RegisterSpellScript(spell_valithria_suppression_aura);
 
     new achievement_portal_jockey();
 }

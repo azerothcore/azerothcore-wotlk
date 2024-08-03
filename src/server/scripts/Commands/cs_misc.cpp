@@ -87,12 +87,18 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable auraCommandTable =
+        {
+            { "stack",             HandleAuraStacksCommand,        SEC_GAMEMASTER,         Console::No  },
+            { "",                  HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  }
+        };
+
         static ChatCommandTable commandTable =
         {
             { "commentator",       HandleCommentatorCommand,       SEC_MODERATOR,          Console::No  },
             { "dev",               HandleDevCommand,               SEC_ADMINISTRATOR,      Console::No  },
             { "gps",               HandleGPSCommand,               SEC_MODERATOR,          Console::No  },
-            { "aura",              HandleAuraCommand,              SEC_GAMEMASTER,         Console::No  },
+            { "aura",              auraCommandTable                                                     },
             { "unaura",            HandleUnAuraCommand,            SEC_GAMEMASTER,         Console::No  },
             { "appear",            HandleAppearCommand,            SEC_MODERATOR,          Console::No  },
             { "summon",            HandleSummonCommand,            SEC_GAMEMASTER,         Console::No  },
@@ -129,7 +135,7 @@ public:
             { "cometome",          HandleComeToMeCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "damage",            HandleDamageCommand,            SEC_GAMEMASTER,         Console::No  },
             { "combatstop",        HandleCombatStopCommand,        SEC_GAMEMASTER,         Console::Yes },
-            { "flusharenapoints",  HandleFlushArenaPointsCommand,  SEC_ADMINISTRATOR,      Console::Yes  },
+            { "flusharenapoints",  HandleFlushArenaPointsCommand,  SEC_ADMINISTRATOR,      Console::Yes },
             { "freeze",            HandleFreezeCommand,            SEC_GAMEMASTER,         Console::No  },
             { "unfreeze",          HandleUnFreezeCommand,          SEC_GAMEMASTER,         Console::No  },
             { "possess",           HandlePossessCommand,           SEC_GAMEMASTER,         Console::No  },
@@ -649,6 +655,51 @@ public:
         }
 
         Aura::TryRefreshStackOrCreate(spell, MAX_EFFECT_MASK, target, target);
+
+        return true;
+    }
+
+    static bool HandleAuraStacksCommand(ChatHandler* handler, SpellInfo const* spell, int16 stacks)
+    {
+        if (!spell)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
+            return false;
+        }
+
+        if (!SpellMgr::IsSpellValid(spell))
+        {
+            handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+            return false;
+        }
+
+        if (!stacks)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_AURASTACK_NO_STACK);
+            return false;
+        }
+
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+        {
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            return false;
+        }
+
+        Aura* aur = target->GetAura(spell->Id);
+        if (!aur)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_AURASTACK_NO_AURA, spell->Id);
+            return false;
+        }
+
+        if (!spell->StackAmount)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_AURASTACK_CANT_STACK, spell->Id);
+            return false;
+        }
+
+        aur->ModStackAmount(stacks);
 
         return true;
     }
@@ -1353,7 +1404,7 @@ public:
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_KICK_IN_WORLD))
         {
-            sWorld->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName().c_str() : "Server"), target->GetName().c_str(), kickReasonStr.c_str());
+            handler->SendWorldText(LANG_COMMAND_KICKMESSAGE_WORLD, (handler->GetSession() ? handler->GetSession()->GetPlayerName() : "Server"), target->GetName(), kickReasonStr);
         }
         else
         {
@@ -2455,7 +2506,7 @@ public:
 
             if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD))
             {
-                sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
+                handler->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy, nameLink, secsToTimeString(muteDuration, true), muteReasonStr);
             }
 
             ChatHandler(target->GetSession()).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, secsToTimeString(muteDuration, true), muteBy, muteReasonStr);
@@ -2482,7 +2533,7 @@ public:
 
         if (sWorld->getBoolConfig(CONFIG_SHOW_MUTE_IN_WORLD) && !target)
         {
-            sWorld->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy.c_str(), nameLink.c_str(), secsToTimeString(muteDuration, true).c_str(), muteReasonStr.c_str());
+            handler->SendWorldText(LANG_COMMAND_MUTEMESSAGE_WORLD, muteBy, nameLink, secsToTimeString(muteDuration, true), muteReasonStr);
         }
         else
         {

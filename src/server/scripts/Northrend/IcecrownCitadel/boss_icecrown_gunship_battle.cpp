@@ -2023,254 +2023,195 @@ public:
     }
 };
 
-class spell_igb_rocket_pack : public SpellScriptLoader
+class spell_igb_rocket_pack_aura : public AuraScript
 {
-public:
-    spell_igb_rocket_pack() : SpellScriptLoader("spell_igb_rocket_pack") { }
+    PrepareAuraScript(spell_igb_rocket_pack_aura);
 
-    class spell_igb_rocket_pack_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_igb_rocket_pack_AuraScript);
+        return ValidateSpellInfo(
+            {
+                SPELL_ROCKET_PACK_DAMAGE,
+                SPELL_ROCKET_BURST
+            });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo(
-                {
-                    SPELL_ROCKET_PACK_DAMAGE,
-                    SPELL_ROCKET_BURST
-                });
-        }
-
-        void HandlePeriodic(AuraEffect const* /*aurEff*/)
-        {
-            if (GetTarget()->movespline->Finalized())
-                Remove(AURA_REMOVE_BY_EXPIRE);
-        }
-
-        void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-        {
-            SpellInfo const* damageInfo = sSpellMgr->AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
-            GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), nullptr, true);
-            GetTarget()->CastSpell((Unit*)nullptr, SPELL_ROCKET_BURST, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_rocket_pack_AuraScript::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-            OnEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandlePeriodic(AuraEffect const* /*aurEff*/)
     {
-        return new spell_igb_rocket_pack_AuraScript();
+        if (GetTarget()->movespline->Finalized())
+            Remove(AURA_REMOVE_BY_EXPIRE);
+    }
+
+    void HandleRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        SpellInfo const* damageInfo = sSpellMgr->AssertSpellInfo(SPELL_ROCKET_PACK_DAMAGE);
+        GetTarget()->CastCustomSpell(SPELL_ROCKET_PACK_DAMAGE, SPELLVALUE_BASE_POINT0, 2 * (damageInfo->Effects[EFFECT_0].CalcValue() + aurEff->GetTickNumber() * aurEff->GetAmplitude()), nullptr, true);
+        GetTarget()->CastSpell((Unit*)nullptr, SPELL_ROCKET_BURST, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_rocket_pack_aura::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_aura::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_igb_rocket_pack_useable : public SpellScriptLoader
+class spell_igb_rocket_pack_useable_aura : public AuraScript
 {
-public:
-    spell_igb_rocket_pack_useable() : SpellScriptLoader("spell_igb_rocket_pack_useable") { }
+    PrepareAuraScript(spell_igb_rocket_pack_useable_aura);
 
-    class spell_igb_rocket_pack_useable_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_igb_rocket_pack_useable_AuraScript);
+        return GetOwner()->GetInstanceScript();
+    }
 
-        bool Load() override
-        {
-            return GetOwner()->GetInstanceScript();
-        }
-
-        bool CheckAreaTarget(Unit* target)
-        {
-            return target->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetInstanceScript()->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE;
-        }
-
-        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* owner = GetOwner()->ToCreature())
-                if (Player* target = GetTarget()->ToPlayer())
-                    if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
-                        sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_ACTIVE, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
-        }
-
-        void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Creature* owner = GetOwner()->ToCreature())
-                if (Player* target = GetTarget()->ToPlayer())
-                    if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
-                        sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_DISABLED, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
-        }
-
-        void Register() override
-        {
-            DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_rocket_pack_useable_AuraScript::CheckAreaTarget);
-            AfterEffectApply += AuraEffectApplyFn(spell_igb_rocket_pack_useable_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_useable_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool CheckAreaTarget(Unit* target)
     {
-        return new spell_igb_rocket_pack_useable_AuraScript();
+        return target->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetInstanceScript()->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != DONE;
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* owner = GetOwner()->ToCreature())
+            if (Player* target = GetTarget()->ToPlayer())
+                if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
+                    sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_ACTIVE, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* owner = GetOwner()->ToCreature())
+            if (Player* target = GetTarget()->ToPlayer())
+                if (target->HasItemCount(ITEM_GOBLIN_ROCKET_PACK, 1))
+                    sCreatureTextMgr->SendChat(owner, SAY_ZAFOD_ROCKET_PACK_DISABLED, target, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, target);
+    }
+
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_rocket_pack_useable_aura::CheckAreaTarget);
+        AfterEffectApply += AuraEffectApplyFn(spell_igb_rocket_pack_useable_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_igb_rocket_pack_useable_aura::HandleRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_igb_teleport_to_enemy_ship : public SpellScriptLoader
+class spell_igb_teleport_to_enemy_ship : public SpellScript
 {
-public:
-    spell_igb_teleport_to_enemy_ship() : SpellScriptLoader("spell_igb_teleport_to_enemy_ship") { }
+    PrepareSpellScript(spell_igb_teleport_to_enemy_ship);
 
-    class spell_igb_teleport_to_enemy_ship_SpellScript : public SpellScript
+    void RelocateTransportOffset(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_igb_teleport_to_enemy_ship_SpellScript);
+        WorldLocation const* dest = GetHitDest();
+        Unit* target = GetHitUnit();
+        if (!dest || !target || !target->GetTransport())
+            return;
 
-        void RelocateTransportOffset(SpellEffIndex /*effIndex*/)
-        {
-            WorldLocation const* dest = GetHitDest();
-            Unit* target = GetHitUnit();
-            if (!dest || !target || !target->GetTransport())
-                return;
+        float x, y, z, o;
+        dest->GetPosition(x, y, z, o);
+        target->GetTransport()->CalculatePassengerOffset(x, y, z, &o);
+        target->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+    }
 
-            float x, y, z, o;
-            dest->GetPosition(x, y, z, o);
-            target->GetTransport()->CalculatePassengerOffset(x, y, z, &o);
-            target->m_movementInfo.transport.pos.Relocate(x, y, z, o);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_igb_teleport_to_enemy_ship_SpellScript::RelocateTransportOffset, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_igb_teleport_to_enemy_ship_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_igb_teleport_to_enemy_ship::RelocateTransportOffset, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
     }
 };
 
-class spell_igb_check_for_players : public SpellScriptLoader
+class spell_igb_check_for_players : public SpellScript
 {
-public:
-    spell_igb_check_for_players() : SpellScriptLoader("spell_igb_check_for_players") { }
+    PrepareSpellScript(spell_igb_check_for_players);
 
-    class spell_igb_check_for_players_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_check_for_players_SpellScript);
+        return ValidateSpellInfo({ SPELL_GUNSHIP_FALL_TELEPORT });
+    }
 
-        bool Load() override
-        {
-            _playerCount = 0;
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void CountTargets(std::list<WorldObject*>& targets)
-        {
-            _playerCount = targets.size();
-        }
-
-        void TriggerWipe()
-        {
-            if (!_playerCount)
-                GetCaster()->ToCreature()->AI()->JustDied(nullptr);
-        }
-
-        void TeleportPlayer(SpellEffIndex /*effIndex*/)
-        {
-            if (GetHitUnit()->GetPositionZ() < GetCaster()->GetPositionZ() - 10.0f)
-                GetHitUnit()->CastSpell(GetHitUnit(), SPELL_GUNSHIP_FALL_TELEPORT, true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_check_for_players_SpellScript::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            AfterCast += SpellCastFn(spell_igb_check_for_players_SpellScript::TriggerWipe);
-            OnEffectHitTarget += SpellEffectFn(spell_igb_check_for_players_SpellScript::TeleportPlayer, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-
-        uint32 _playerCount;
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_igb_check_for_players_SpellScript();
+        _playerCount = 0;
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void CountTargets(std::list<WorldObject*>& targets)
+    {
+        _playerCount = targets.size();
+    }
+
+    void TriggerWipe()
+    {
+        if (!_playerCount)
+            GetCaster()->ToCreature()->AI()->JustDied(nullptr);
+    }
+
+    void TeleportPlayer(SpellEffIndex /*effIndex*/)
+    {
+        if (GetHitUnit()->GetPositionZ() < GetCaster()->GetPositionZ() - 10.0f)
+            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_GUNSHIP_FALL_TELEPORT, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_check_for_players::CountTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        AfterCast += SpellCastFn(spell_igb_check_for_players::TriggerWipe);
+        OnEffectHitTarget += SpellEffectFn(spell_igb_check_for_players::TeleportPlayer, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+
+private:
+    uint32 _playerCount;
+};
+
+class spell_igb_gunship_fall_teleport : public SpellScript
+{
+    PrepareSpellScript(spell_igb_gunship_fall_teleport);
+
+    bool Load() override
+    {
+        return GetCaster()->GetInstanceScript();
+    }
+
+    void SelectTransport(WorldObject*& target)
+    {
+        if (InstanceScript* instance = target->GetInstanceScript())
+            target = instance->instance->GetTransport(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE));
+    }
+
+    void RelocateDest(SpellEffIndex /*effIndex*/)
+    {
+        Position offset = {0.0f, 0.0f, 0.0f, 0.0f};
+        offset.m_positionZ = GetCaster()->GetInstanceScript()->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? 36.0f : 21.0f;
+        GetHitDest()->RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_igb_gunship_fall_teleport::SelectTransport, EFFECT_0, TARGET_DEST_NEARBY_ENTRY);
+        OnEffectLaunch += SpellEffectFn(spell_igb_gunship_fall_teleport::RelocateDest, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
     }
 };
 
-class spell_igb_gunship_fall_teleport : public SpellScriptLoader
+class spell_igb_explosion_main_aura : public AuraScript
 {
-public:
-    spell_igb_gunship_fall_teleport() : SpellScriptLoader("spell_igb_gunship_fall_teleport") { }
+    PrepareAuraScript(spell_igb_explosion_main_aura);
 
-    class spell_igb_gunship_fall_teleport_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_igb_gunship_fall_teleport_SpellScript);
-
-        bool Load() override
-        {
-            return GetCaster()->GetInstanceScript();
-        }
-
-        void SelectTransport(WorldObject*& target)
-        {
-            if (InstanceScript* instance = target->GetInstanceScript())
-                target = instance->instance->GetTransport(instance->GetGuidData(DATA_ICECROWN_GUNSHIP_BATTLE));
-        }
-
-        void RelocateDest(SpellEffIndex /*effIndex*/)
-        {
-            Position offset = {0.0f, 0.0f, 0.0f, 0.0f};
-            offset.m_positionZ = GetCaster()->GetInstanceScript()->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? 36.0f : 21.0f;
-            GetHitDest()->RelocateOffset(offset);
-        }
-
-        void Register() override
-        {
-            OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_igb_gunship_fall_teleport_SpellScript::SelectTransport, EFFECT_0, TARGET_DEST_NEARBY_ENTRY);
-            OnEffectLaunch += SpellEffectFn(spell_igb_gunship_fall_teleport_SpellScript::RelocateDest, EFFECT_0, SPELL_EFFECT_TELEPORT_UNITS);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_igb_gunship_fall_teleport_SpellScript();
+        _tickNo = urand(0, 3);
+        return true;
     }
-};
 
-class spell_igb_explosion_main : public SpellScriptLoader
-{
-public:
-    spell_igb_explosion_main() : SpellScriptLoader("spell_igb_explosion_main") { }
-
-    class spell_igb_explosion_main_AuraScript : public AuraScript
+    void PeriodicTick(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_igb_explosion_main_AuraScript);
-
-        bool Load() override
-        {
-            tickNo = urand(0, 3);
-            return true;
-        }
-
-        void PeriodicTick(AuraEffect const* aurEff)
-        {
-            if ((aurEff->GetTickNumber() % 4) != tickNo)
-                PreventDefaultAction();
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_explosion_main_AuraScript::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-
-        uint32 tickNo;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_igb_explosion_main_AuraScript();
+        if ((aurEff->GetTickNumber() % 4) != _tickNo)
+            PreventDefaultAction();
     }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_explosion_main_aura::PeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+
+private:
+    uint32 _tickNo;
 };
 
 class IgbExplosionCheck
@@ -2287,30 +2228,19 @@ private:
     Unit* _source;
 };
 
-class spell_igb_explosion : public SpellScriptLoader
+class spell_igb_explosion : public SpellScript
 {
-public:
-    spell_igb_explosion() : SpellScriptLoader("spell_igb_explosion") { }
+    PrepareSpellScript(spell_igb_explosion);
 
-    class spell_igb_explosion_SpellScript : public SpellScript
+    void SelectTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_igb_explosion_SpellScript);
+        targets.remove_if(IgbExplosionCheck(GetCaster()));
+        Acore::Containers::RandomResize(targets, 1);
+    }
 
-        void SelectTarget(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(IgbExplosionCheck(GetCaster()));
-            Acore::Containers::RandomResize(targets, 1);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_explosion_SpellScript::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_igb_explosion_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_explosion::SelectTarget, EFFECT_0, TARGET_UNIT_DEST_AREA_ENTRY);
     }
 };
 
@@ -2328,234 +2258,185 @@ private:
     InstanceScript* _inst;
 };
 
-class spell_igb_teleport_players_on_victory : public SpellScriptLoader
+class spell_igb_teleport_players_on_victory : public SpellScript
 {
-public:
-    spell_igb_teleport_players_on_victory() : SpellScriptLoader("spell_igb_teleport_players_on_victory") { }
+    PrepareSpellScript(spell_igb_teleport_players_on_victory);
 
-    class spell_igb_teleport_players_on_victory_SpellScript : public SpellScript
+    bool Load() override
     {
-        PrepareSpellScript(spell_igb_teleport_players_on_victory_SpellScript);
+        return GetCaster()->GetInstanceScript();
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetInstanceScript();
-        }
-
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            InstanceScript* instance = GetCaster()->GetInstanceScript();
-            targets.remove_if(IgbTeleportOnVictoryCheck(instance));
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_teleport_players_on_victory_SpellScript::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        return new spell_igb_teleport_players_on_victory_SpellScript();
+        InstanceScript* instance = GetCaster()->GetInstanceScript();
+        targets.remove_if(IgbTeleportOnVictoryCheck(instance));
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_teleport_players_on_victory::FilterTargets, EFFECT_1, TARGET_UNIT_DEST_AREA_ENTRY);
     }
 };
 
-class spell_igb_periodic_trigger_with_power_cost : public SpellScriptLoader
+class spell_igb_periodic_trigger_with_power_cost_aura : public AuraScript
 {
-public:
-    spell_igb_periodic_trigger_with_power_cost() : SpellScriptLoader("spell_igb_periodic_trigger_with_power_cost") { }
+    PrepareAuraScript(spell_igb_periodic_trigger_with_power_cost_aura);
 
-    class spell_igb_periodic_trigger_with_power_cost_AuraScript : public AuraScript
+    void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
     {
-        PrepareAuraScript(spell_igb_periodic_trigger_with_power_cost_AuraScript);
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
+    }
 
-        void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
-        {
-            PreventDefaultAction();
-            GetTarget()->CastSpell(GetTarget(), GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST));
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_periodic_trigger_with_power_cost_AuraScript::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_igb_periodic_trigger_with_power_cost_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_igb_periodic_trigger_with_power_cost_aura::HandlePeriodicTick, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_igb_overheat : public SpellScriptLoader
+class spell_igb_overheat_aura : public AuraScript
 {
-public:
-    spell_igb_overheat() : SpellScriptLoader("spell_igb_overheat") { }
+    PrepareAuraScript(spell_igb_overheat_aura);
 
-    class spell_igb_overheat_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_igb_overheat_AuraScript);
+        if (GetAura()->GetType() != UNIT_AURA_TYPE)
+            return false;
+        return GetUnitOwner()->IsVehicle();
+    }
 
-        bool Load() override
+    void SendClientControl(uint8 value)
+    {
+        if (Vehicle* vehicle = GetUnitOwner()->GetVehicleKit())
         {
-            if (GetAura()->GetType() != UNIT_AURA_TYPE)
-                return false;
-            return GetUnitOwner()->IsVehicle();
-        }
-
-        void SendClientControl(uint8 value)
-        {
-            if (Vehicle* vehicle = GetUnitOwner()->GetVehicleKit())
+            if (Unit* passenger = vehicle->GetPassenger(0))
             {
-                if (Unit* passenger = vehicle->GetPassenger(0))
+                if (Player* player = passenger->ToPlayer())
                 {
-                    if (Player* player = passenger->ToPlayer())
-                    {
-                        WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
-                        data << GetUnitOwner()->GetPackGUID();
-                        data << uint8(value);
-                        player->GetSession()->SendPacket(&data);
-                    }
+                    WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
+                    data << GetUnitOwner()->GetPackGUID();
+                    data << uint8(value);
+                    player->GetSession()->SendPacket(&data);
                 }
             }
         }
+    }
 
-        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            SendClientControl(0);
-        }
-
-        void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            SendClientControl(1);
-        }
-
-        void Register() override
-        {
-            AfterEffectApply += AuraEffectApplyFn(spell_igb_overheat_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectRemove += AuraEffectRemoveFn(spell_igb_overheat_AuraScript::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_igb_overheat_AuraScript();
+        SendClientControl(0);
+    }
+
+    void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        SendClientControl(1);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_igb_overheat_aura::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_igb_overheat_aura::HandleRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
-class spell_igb_cannon_blast : public SpellScriptLoader
+class spell_igb_cannon_blast : public SpellScript
 {
-public:
-    spell_igb_cannon_blast() : SpellScriptLoader("spell_igb_cannon_blast") { }
+    PrepareSpellScript(spell_igb_cannon_blast);
 
-    class spell_igb_cannon_blast_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_cannon_blast_SpellScript);
+        return ValidateSpellInfo({ SPELL_OVERHEAT });
+    }
 
-        bool Load() override
-        {
-            return GetCaster()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void CalculatePower()
-        {
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-
-            SpellInfo const* spellInfo = GetSpellInfo();
-            if (!spellInfo)
-                return;
-
-            // Check if the effect is energize
-            if (spellInfo->Effects[EFFECT_1].Effect == SPELL_EFFECT_ENERGIZE)
-            {
-                int32 energizeAmount = spellInfo->Effects[EFFECT_1].CalcValue(caster);
-
-                // Apply the power gain directly to the caster
-                caster->ModifyPower(POWER_ENERGY, energizeAmount);
-            }
-
-            if (caster->GetPower(POWER_ENERGY) >= 100)
-            {
-                caster->CastSpell(caster, SPELL_OVERHEAT, true);
-                if (Vehicle* vehicle = caster->GetVehicleKit())
-                    if (Unit* passenger = vehicle->GetPassenger(0))
-                        sCreatureTextMgr->SendChat(caster->ToCreature(), SAY_OVERHEAT, passenger);
-            }
-
-        }
-
-        void PreventPowerGainOnHit(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-        }
-
-        void Register() override
-        {
-            OnCast += SpellCastFn(spell_igb_cannon_blast_SpellScript::CalculatePower);
-            OnEffectHitTarget += SpellEffectFn(spell_igb_cannon_blast_SpellScript::PreventPowerGainOnHit, EFFECT_1, SPELL_EFFECT_ENERGIZE);
-
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    bool Load() override
     {
-        return new spell_igb_cannon_blast_SpellScript();
+        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+    }
+
+    void CalculatePower()
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        SpellInfo const* spellInfo = GetSpellInfo();
+        if (!spellInfo)
+            return;
+
+        // Check if the effect is energize
+        if (spellInfo->Effects[EFFECT_1].Effect == SPELL_EFFECT_ENERGIZE)
+        {
+            int32 energizeAmount = spellInfo->Effects[EFFECT_1].CalcValue(caster);
+
+            // Apply the power gain directly to the caster
+            caster->ModifyPower(POWER_ENERGY, energizeAmount);
+        }
+
+        if (caster->GetPower(POWER_ENERGY) >= 100)
+        {
+            caster->CastSpell(caster, SPELL_OVERHEAT, true);
+            if (Vehicle* vehicle = caster->GetVehicleKit())
+                if (Unit* passenger = vehicle->GetPassenger(0))
+                    sCreatureTextMgr->SendChat(caster->ToCreature(), SAY_OVERHEAT, passenger);
+        }
+
+    }
+
+    void PreventPowerGainOnHit(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_igb_cannon_blast::CalculatePower);
+        OnEffectHitTarget += SpellEffectFn(spell_igb_cannon_blast::PreventPowerGainOnHit, EFFECT_1, SPELL_EFFECT_ENERGIZE);
+
     }
 };
 
-class spell_igb_incinerating_blast : public SpellScriptLoader
+class spell_igb_incinerating_blast : public SpellScript
 {
-public:
-    spell_igb_incinerating_blast() : SpellScriptLoader("spell_igb_incinerating_blast") { }
+    PrepareSpellScript(spell_igb_incinerating_blast);
 
-    class spell_igb_incinerating_blast_SpellScript : public SpellScript
+    void StoreEnergy()
     {
-        PrepareSpellScript(spell_igb_incinerating_blast_SpellScript);
-
-        void StoreEnergy()
-        {
-            _energyLeft = GetCaster()->GetPower(POWER_ENERGY) - 10;
-        }
-
-        void RemoveEnergy()
-        {
-            GetCaster()->SetPower(POWER_ENERGY, 0);
-        }
-
-        void CalculateDamage(SpellEffIndex /*effIndex*/)
-        {
-            PreventHitEffect(EFFECT_0);
-            SpellInfo const* si = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
-            if (!si)
-                return;
-            SpellCastTargets targets;
-            Position dest = GetExplTargetDest()->GetPosition();
-            targets.SetDst(dest);
-            CustomSpellValues values;
-            int32 damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8;
-            values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
-            values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage);
-            values.AddSpellMod(SPELLVALUE_BASE_POINT2, damage);
-            GetCaster()->CastSpell(targets, si, &values, TRIGGERED_FULL_MASK);
-            //SetEffectValue(GetEffectValue() + _energyLeft * _energyLeft * 8);
-        }
-
-        void Register() override
-        {
-            OnCast += SpellCastFn(spell_igb_incinerating_blast_SpellScript::StoreEnergy);
-            AfterCast += SpellCastFn(spell_igb_incinerating_blast_SpellScript::RemoveEnergy);
-            OnEffectHit += SpellEffectFn(spell_igb_incinerating_blast_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
-        }
-
-        uint32 _energyLeft;
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_igb_incinerating_blast_SpellScript();
+        _energyLeft = GetCaster()->GetPower(POWER_ENERGY) - 10;
     }
+
+    void RemoveEnergy()
+    {
+        GetCaster()->SetPower(POWER_ENERGY, 0);
+    }
+
+    void CalculateDamage(SpellEffIndex /*effIndex*/)
+    {
+        PreventHitEffect(EFFECT_0);
+        SpellInfo const* si = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[0].TriggerSpell);
+        if (!si)
+            return;
+        SpellCastTargets targets;
+        Position dest = GetExplTargetDest()->GetPosition();
+        targets.SetDst(dest);
+        CustomSpellValues values;
+        int32 damage = si->Effects[0].CalcValue() + _energyLeft * _energyLeft * 8;
+        values.AddSpellMod(SPELLVALUE_BASE_POINT0, damage);
+        values.AddSpellMod(SPELLVALUE_BASE_POINT1, damage);
+        values.AddSpellMod(SPELLVALUE_BASE_POINT2, damage);
+        GetCaster()->CastSpell(targets, si, &values, TRIGGERED_FULL_MASK);
+        //SetEffectValue(GetEffectValue() + _energyLeft * _energyLeft * 8);
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_igb_incinerating_blast::StoreEnergy);
+        AfterCast += SpellCastFn(spell_igb_incinerating_blast::RemoveEnergy);
+        OnEffectHit += SpellEffectFn(spell_igb_incinerating_blast::CalculateDamage, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
+    }
+
+private:
+    uint32 _energyLeft;
 };
 
 class BurningPitchFilterCheck
@@ -2574,74 +2455,57 @@ private:
     uint32 _entry;
 };
 
-class spell_igb_burning_pitch_selector : public SpellScriptLoader
+class spell_igb_burning_pitch_selector : public SpellScript
 {
-public:
-    spell_igb_burning_pitch_selector() : SpellScriptLoader("spell_igb_burning_pitch_selector") { }
+    PrepareSpellScript(spell_igb_burning_pitch_selector);
 
-    class spell_igb_burning_pitch_selector_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_igb_burning_pitch_selector_SpellScript);
+        TeamId teamId = TEAM_HORDE;
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            teamId = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
 
-        void FilterTargets(std::list<WorldObject*>& targets)
+        targets.remove_if(BurningPitchFilterCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
+        if (!targets.empty())
         {
-            TeamId teamId = TEAM_HORDE;
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                teamId = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
-
-            targets.remove_if(BurningPitchFilterCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
-            if (!targets.empty())
-            {
-                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-                targets.clear();
-                targets.push_back(target);
-            }
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+            targets.clear();
+            targets.push_back(target);
         }
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), TRIGGERED_NONE);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_burning_pitch_selector_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch_selector_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_igb_burning_pitch_selector_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), TRIGGERED_NONE);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_burning_pitch_selector::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch_selector::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_igb_burning_pitch : public SpellScriptLoader
+class spell_igb_burning_pitch : public SpellScript
 {
-public:
-    spell_igb_burning_pitch() : SpellScriptLoader("spell_igb_burning_pitch") { }
+    PrepareSpellScript(spell_igb_burning_pitch);
 
-    class spell_igb_burning_pitch_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_burning_pitch_SpellScript);
+        return ValidateSpellInfo({ 8000, SPELL_BURNING_PITCH });
+    }
 
-        void HandleDummy(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastCustomSpell(uint32(GetEffectValue()), SPELLVALUE_BASE_POINT0, 8000, nullptr, TRIGGERED_FULL_MASK);
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BURNING_PITCH, TRIGGERED_FULL_MASK);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex effIndex)
     {
-        return new spell_igb_burning_pitch_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastCustomSpell(uint32(GetEffectValue()), SPELLVALUE_BASE_POINT0, 8000, nullptr, TRIGGERED_FULL_MASK);
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_BURNING_PITCH, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_igb_burning_pitch::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2660,153 +2524,120 @@ private:
     uint32 _entry;
 };
 
-class spell_igb_rocket_artillery : public SpellScriptLoader
+class spell_igb_rocket_artillery : public SpellScript
 {
-public:
-    spell_igb_rocket_artillery() : SpellScriptLoader("spell_igb_rocket_artillery") { }
+    PrepareSpellScript(spell_igb_rocket_artillery);
 
-    class spell_igb_rocket_artillery_SpellScript : public SpellScript
+    void SelectRandomTarget(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_igb_rocket_artillery_SpellScript);
+        TeamId teamId = TEAM_HORDE;
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            teamId = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
+        targets.remove_if(IgbArtilleryCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
 
-        void SelectRandomTarget(std::list<WorldObject*>& targets)
+        if (!targets.empty())
         {
-            TeamId teamId = TEAM_HORDE;
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                teamId = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
-            targets.remove_if(IgbArtilleryCheck(teamId == TEAM_HORDE ? GO_ORGRIMS_HAMMER_H : GO_THE_SKYBREAKER_A));
-
-            if (!targets.empty())
-            {
-                WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-                targets.clear();
-                targets.push_back(target);
-            }
+            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+            targets.clear();
+            targets.push_back(target);
         }
+    }
 
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(),
-                GetHitUnit()->GetMapHeight(GetCaster()->GetPhaseMask(), GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ()),
-                uint32(GetEffectValue()), TRIGGERED_NONE);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_rocket_artillery_SpellScript::SelectRandomTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_igb_rocket_artillery_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_igb_rocket_artillery_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->CastSpell(GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(),
+            GetHitUnit()->GetMapHeight(GetCaster()->GetPhaseMask(), GetHitUnit()->GetPositionX(), GetHitUnit()->GetPositionY(), GetHitUnit()->GetPositionZ()),
+            uint32(GetEffectValue()), TRIGGERED_NONE);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_igb_rocket_artillery::SelectRandomTarget, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_igb_rocket_artillery::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_igb_rocket_artillery_explosion : public SpellScriptLoader
+class spell_igb_rocket_artillery_explosion : public SpellScript
 {
-public:
-    spell_igb_rocket_artillery_explosion() : SpellScriptLoader("spell_igb_rocket_artillery_explosion") { }
+    PrepareSpellScript(spell_igb_rocket_artillery_explosion);
 
-    class spell_igb_rocket_artillery_explosion_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_rocket_artillery_explosion_SpellScript);
+        return ValidateSpellInfo({ SPELL_BURNING_PITCH_DAMAGE_A, SPELL_BURNING_PITCH_DAMAGE_H, 5000 });
+    }
 
-        void DamageGunship(SpellEffIndex /*effIndex*/)
-        {
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-                GetCaster()->CastCustomSpell(instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_DAMAGE_A : SPELL_BURNING_PITCH_DAMAGE_H, SPELLVALUE_BASE_POINT0, 5000, nullptr, TRIGGERED_FULL_MASK);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_igb_rocket_artillery_explosion_SpellScript::DamageGunship, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void DamageGunship(SpellEffIndex /*effIndex*/)
     {
-        return new spell_igb_rocket_artillery_explosion_SpellScript();
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+            GetCaster()->CastCustomSpell(instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_BURNING_PITCH_DAMAGE_A : SPELL_BURNING_PITCH_DAMAGE_H, SPELLVALUE_BASE_POINT0, 5000, nullptr, TRIGGERED_FULL_MASK);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_igb_rocket_artillery_explosion::DamageGunship, EFFECT_0, SPELL_EFFECT_TRIGGER_MISSILE);
     }
 };
 
-class spell_igb_below_zero : public SpellScriptLoader
+class spell_igb_below_zero : public SpellScript
 {
-public:
-    spell_igb_below_zero() : SpellScriptLoader("spell_igb_below_zero") { }
+    PrepareSpellScript(spell_igb_below_zero);
 
-    class spell_igb_below_zero_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_igb_below_zero_SpellScript);
+        return ValidateSpellInfo({ SPELL_EJECT_ALL_PASSENGERS });
+    }
 
-        void RemovePassengers(SpellMissInfo missInfo)
+    void RemovePassengers(SpellMissInfo missInfo)
+    {
+        if (missInfo != SPELL_MISS_NONE)
         {
-            if (missInfo != SPELL_MISS_NONE)
-            {
-                return;
-            }
-
-            GetHitUnit()->SetPower(POWER_ENERGY, 0);
-            GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
+            return;
         }
 
-        void Register() override
-        {
-            BeforeHit += BeforeSpellHitFn(spell_igb_below_zero_SpellScript::RemovePassengers);
-        }
-    };
+        GetHitUnit()->SetPower(POWER_ENERGY, 0);
+        GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_igb_below_zero_SpellScript();
+        BeforeHit += BeforeSpellHitFn(spell_igb_below_zero::RemovePassengers);
     }
 };
 
-class spell_igb_on_gunship_deck : public SpellScriptLoader
+class spell_igb_on_gunship_deck_aura : public AuraScript
 {
-public:
-    spell_igb_on_gunship_deck() : SpellScriptLoader("spell_igb_on_gunship_deck") { }
+    PrepareAuraScript(spell_igb_on_gunship_deck_aura);
 
-    class spell_igb_on_gunship_deck_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_igb_on_gunship_deck_AuraScript);
-
-        bool Load() override
-        {
-            if (InstanceScript* instance = GetOwner()->GetInstanceScript())
-                _teamIdInInstance = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
-            else
-                _teamIdInInstance = TEAM_ALLIANCE;
-            return true;
-        }
-
-        bool CheckAreaTarget(Unit* unit)
-        {
-            return unit->GetTypeId() == TYPEID_PLAYER;
-        }
-
-        void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            bool enemy = GetSpellInfo()->Id == uint32(_teamIdInInstance == TEAM_HORDE ? SPELL_ON_SKYBREAKER_DECK : SPELL_ON_ORGRIMS_HAMMER_DECK);
-            if (Creature* gunship = GetOwner()->FindNearestCreature(_teamIdInInstance == TEAM_HORDE ? NPC_ORGRIMS_HAMMER : NPC_THE_SKYBREAKER, 200.0f))
-                gunship->AI()->SetGUID(GetTarget()->GetGUID(), enemy ? ACTION_SHIP_VISITS_ENEMY : ACTION_SHIP_VISITS_SELF);
-        }
-
-        void Register() override
-        {
-            DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_on_gunship_deck_AuraScript::CheckAreaTarget);
-            AfterEffectApply += AuraEffectApplyFn(spell_igb_on_gunship_deck_AuraScript::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-
-        TeamId _teamIdInInstance;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_igb_on_gunship_deck_AuraScript();
+        if (InstanceScript* instance = GetOwner()->GetInstanceScript())
+            _teamIdInInstance = TeamId(instance->GetData(DATA_TEAMID_IN_INSTANCE));
+        else
+            _teamIdInInstance = TEAM_ALLIANCE;
+        return true;
     }
+
+    bool CheckAreaTarget(Unit* unit)
+    {
+        return unit->GetTypeId() == TYPEID_PLAYER;
+    }
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        bool enemy = GetSpellInfo()->Id == uint32(_teamIdInInstance == TEAM_HORDE ? SPELL_ON_SKYBREAKER_DECK : SPELL_ON_ORGRIMS_HAMMER_DECK);
+        if (Creature* gunship = GetOwner()->FindNearestCreature(_teamIdInInstance == TEAM_HORDE ? NPC_ORGRIMS_HAMMER : NPC_THE_SKYBREAKER, 200.0f))
+            gunship->AI()->SetGUID(GetTarget()->GetGUID(), enemy ? ACTION_SHIP_VISITS_ENEMY : ACTION_SHIP_VISITS_SELF);
+    }
+
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_igb_on_gunship_deck_aura::CheckAreaTarget);
+        AfterEffectApply += AuraEffectApplyFn(spell_igb_on_gunship_deck_aura::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+
+private:
+    TeamId _teamIdInInstance;
 };
 
 class achievement_im_on_a_boat : public AchievementCriteriaScript
@@ -2848,24 +2679,24 @@ void AddSC_boss_icecrown_gunship_battle()
     new npc_gunship_mage();
     new npc_gunship_gunner();
     new npc_gunship_rocketeer();
-    new spell_igb_rocket_pack();
-    new spell_igb_rocket_pack_useable();
-    new spell_igb_teleport_to_enemy_ship();
-    new spell_igb_check_for_players();
-    new spell_igb_gunship_fall_teleport();
-    new spell_igb_explosion_main();
-    new spell_igb_explosion();
-    new spell_igb_teleport_players_on_victory();
-    new spell_igb_periodic_trigger_with_power_cost();
-    new spell_igb_overheat();
-    new spell_igb_cannon_blast();
-    new spell_igb_incinerating_blast();
-    new spell_igb_burning_pitch_selector();
-    new spell_igb_burning_pitch();
-    new spell_igb_rocket_artillery();
-    new spell_igb_rocket_artillery_explosion();
-    new spell_igb_below_zero();
-    new spell_igb_on_gunship_deck();
+    RegisterSpellScript(spell_igb_rocket_pack_aura);
+    RegisterSpellScript(spell_igb_rocket_pack_useable_aura);
+    RegisterSpellScript(spell_igb_teleport_to_enemy_ship);
+    RegisterSpellScript(spell_igb_check_for_players);
+    RegisterSpellScript(spell_igb_gunship_fall_teleport);
+    RegisterSpellScript(spell_igb_explosion_main_aura);
+    RegisterSpellScript(spell_igb_explosion);
+    RegisterSpellScript(spell_igb_teleport_players_on_victory);
+    RegisterSpellScript(spell_igb_periodic_trigger_with_power_cost_aura);
+    RegisterSpellScript(spell_igb_overheat_aura);
+    RegisterSpellScript(spell_igb_cannon_blast);
+    RegisterSpellScript(spell_igb_incinerating_blast);
+    RegisterSpellScript(spell_igb_burning_pitch_selector);
+    RegisterSpellScript(spell_igb_burning_pitch);
+    RegisterSpellScript(spell_igb_rocket_artillery);
+    RegisterSpellScript(spell_igb_rocket_artillery_explosion);
+    RegisterSpellScript(spell_igb_below_zero);
+    RegisterSpellScript(spell_igb_on_gunship_deck_aura);
     new achievement_im_on_a_boat();
     RegisterSpellScript(spell_igb_battle_experience_check);
 }

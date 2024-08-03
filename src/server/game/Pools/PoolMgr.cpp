@@ -158,7 +158,7 @@ bool PoolGroup<T>::CheckPool() const
 template<class T>
 void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, ObjectGuid::LowType guid)
 {
-    for (size_t i = 0; i < EqualChanced.size(); ++i)
+    for (std::size_t i = 0; i < EqualChanced.size(); ++i)
     {
         // if spawned
         if (spawns.IsActiveObject<T>(EqualChanced[i].guid))
@@ -171,7 +171,7 @@ void PoolGroup<T>::DespawnObject(ActivePoolData& spawns, ObjectGuid::LowType gui
         }
     }
 
-    for (size_t i = 0; i < ExplicitlyChanced.size(); ++i)
+    for (std::size_t i = 0; i < ExplicitlyChanced.size(); ++i)
     {
         // spawned
         if (spawns.IsActiveObject<T>(ExplicitlyChanced[i].guid))

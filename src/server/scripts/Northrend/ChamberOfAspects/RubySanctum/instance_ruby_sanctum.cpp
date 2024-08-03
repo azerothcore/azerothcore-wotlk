@@ -23,6 +23,7 @@
 #include "TemporarySummon.h"
 #include "WorldPacket.h"
 #include "ruby_sanctum.h"
+#include "SpellScript.h"
 
 BossBoundaryData const boundaries =
 {
@@ -244,41 +245,35 @@ public:
     }
 };
 
-class spell_ruby_sanctum_rallying_shout : public SpellScriptLoader
+class spell_ruby_sanctum_rallying_shout : public SpellScript
 {
-public:
-    spell_ruby_sanctum_rallying_shout() : SpellScriptLoader("spell_ruby_sanctum_rallying_shout") { }
+    PrepareSpellScript(spell_ruby_sanctum_rallying_shout);
 
-    class spell_ruby_sanctum_rallying_shout_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_ruby_sanctum_rallying_shout_SpellScript);
+        return ValidateSpellInfo({ SPELL_RALLY });
+    }
 
-        void CountAllies()
-        {
-            uint32 count = GetSpell()->GetUniqueTargetInfo()->size();
-            if (count == GetCaster()->GetAuraCount(SPELL_RALLY))
-                return;
-
-            GetCaster()->RemoveAurasDueToSpell(SPELL_RALLY);
-            if (count > 0)
-                GetCaster()->CastCustomSpell(SPELL_RALLY, SPELLVALUE_AURA_STACK, count, GetCaster(), true);
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_ruby_sanctum_rallying_shout_SpellScript::CountAllies);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void CountAllies()
     {
-        return new spell_ruby_sanctum_rallying_shout_SpellScript();
+        uint32 count = GetSpell()->GetUniqueTargetInfo()->size();
+        if (count == GetCaster()->GetAuraCount(SPELL_RALLY))
+            return;
+
+        GetCaster()->RemoveAurasDueToSpell(SPELL_RALLY);
+        if (count > 0)
+            GetCaster()->CastCustomSpell(SPELL_RALLY, SPELLVALUE_AURA_STACK, count, GetCaster(), true);
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_ruby_sanctum_rallying_shout::CountAllies);
     }
 };
 
 void AddSC_instance_ruby_sanctum()
 {
     new instance_ruby_sanctum();
-    new spell_ruby_sanctum_rallying_shout();
+    RegisterSpellScript(spell_ruby_sanctum_rallying_shout);
 }
 

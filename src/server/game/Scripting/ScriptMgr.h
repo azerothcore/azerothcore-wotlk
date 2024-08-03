@@ -532,7 +532,7 @@ public: /* GlobalScript */
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
     uint32 DecreaseScheduledScriptCount() { return --_scheduledScripts; }
-    uint32 DecreaseScheduledScriptCount(size_t count) { return _scheduledScripts -= count; }
+    uint32 DecreaseScheduledScriptCount(std::size_t count) { return _scheduledScripts -= count; }
     bool IsScriptScheduled() const { return _scheduledScripts > 0; }
 
 public: /* UnitScript */
@@ -798,7 +798,7 @@ public:
                     if (oldScript)
                     {
                         for (auto& vIt : EnabledHooks)
-                            for (size_t i = 0; i < vIt.size(); ++i)
+                            for (std::size_t i = 0; i < vIt.size(); ++i)
                                 if (vIt[i] == oldScript)
                                 {
                                     vIt.erase(vIt.begin() + i);

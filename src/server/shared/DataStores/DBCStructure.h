@@ -2247,7 +2247,7 @@ typedef std::map<uint32, TaxiPathSetForSource> TaxiPathSetBySource;
 typedef std::vector<TaxiPathNodeEntry const*> TaxiPathNodeList;
 typedef std::vector<TaxiPathNodeList> TaxiPathNodesByPath;
 
-static constexpr size_t TaxiMaskSize = 14;
+static constexpr std::size_t TaxiMaskSize = 14;
 typedef std::array<uint32, TaxiMaskSize> TaxiMask;
 
 #endif

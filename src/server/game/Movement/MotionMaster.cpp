@@ -121,7 +121,7 @@ void MotionMaster::UpdateMotion(uint32 diff)
 
     if (_expList)
     {
-        for (size_t i = 0; i < _expList->size(); ++i)
+        for (std::size_t i = 0; i < _expList->size(); ++i)
         {
             MovementGenerator* mg = (*_expList)[i];
             DirectDelete(mg);
@@ -270,7 +270,7 @@ void MotionMaster::MoveTargetedHome(bool walk /*= false*/)
         if (target)
         {
             LOG_DEBUG("movement.motionmaster", "Following {} ({})", target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString());
-            Mutate(new FollowMovementGenerator<Creature>(target, PET_FOLLOW_DIST, _owner->GetFollowAngle()), MOTION_SLOT_ACTIVE);
+            Mutate(new FollowMovementGenerator<Creature>(target, PET_FOLLOW_DIST, _owner->GetFollowAngle(),true), MOTION_SLOT_ACTIVE);
         }
     }
     else
@@ -391,7 +391,7 @@ void MotionMaster::MoveCircleTarget(Unit* target)
     init.Launch();
 }
 
-void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlot slot)
+void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlot slot, bool inheritWalkState)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     // ignore movement request if target not exist
@@ -405,13 +405,13 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) follow to {} ({})",
             _owner->GetGUID().ToString(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString());
-        Mutate(new FollowMovementGenerator<Player>(target, dist, angle), slot);
+        Mutate(new FollowMovementGenerator<Player>(target, dist, angle, inheritWalkState), slot);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) follow to {} ({})",
             _owner->GetGUID().ToString(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString());
-        Mutate(new FollowMovementGenerator<Creature>(target, dist, angle), slot);
+        Mutate(new FollowMovementGenerator<Creature>(target, dist, angle, inheritWalkState), slot);
     }
 }
 

@@ -23,9 +23,7 @@
 #include <deque>
 #include <functional>
 #include <list>
-#include <memory>
 #include <set>
-#include <type_traits>
 #include <unordered_set>
 #include <vector>
 
@@ -323,7 +321,7 @@ namespace std
     struct hash<ObjectGuid>
     {
         public:
-            size_t operator()(ObjectGuid const& key) const
+            std::size_t operator()(ObjectGuid const& key) const
             {
                 return std::hash<uint64>()(key.GetRawValue());
             }

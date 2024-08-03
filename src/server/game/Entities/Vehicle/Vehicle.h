@@ -18,8 +18,6 @@
 #ifndef __ACORE_VEHICLE_H
 #define __ACORE_VEHICLE_H
 
-#include "EventProcessor.h"
-#include "ObjectDefines.h"
 #include "Unit.h"
 #include "VehicleDefines.h"
 

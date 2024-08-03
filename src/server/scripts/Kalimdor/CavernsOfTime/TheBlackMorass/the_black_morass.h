@@ -19,8 +19,6 @@
 #define DEF_THEBLACKMORASS_H
 
 #include "CreatureAIImpl.h"
-#include "PassiveAI.h"
-#include "SpellScript.h"
 
 #define DataHeader "TBM"
 
