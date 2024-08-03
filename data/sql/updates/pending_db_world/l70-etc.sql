@@ -75,6 +75,10 @@ INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionTex
 (9666, 0, 0, 'But I drove my mole machine all the way down here...', 27600, 1, 1, 9667, 0, 0, 0, '', 0, 50664),
 (9667, 0, 0, 'I\'m ready.',                                          27602, 1, 1, 0,    0, 0, 0, '', 0, 50664);
 
+DELETE FROM `creature_text` WHERE `CreatureID` = 28210;
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
+(28210, 0, 0, 'Let\'s wrap it up, Miz. They\'ll be here in a second.', 12, 0, 100, 0, 0, 0, 27603, 0, 'Ognip Blastbolt');
+
 /*
 sai design doc
 on event start concert controller calls domino action list (blizzcon/brd)
@@ -97,16 +101,16 @@ crew mates play emote 133 and stop at a range of (maybe) 5-15s repeatedly while 
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (23619, 23623, 23624, 23625, 23626)) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(23619, 0, 0, 0, 1, 0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2361900, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Out of Combat - Run Script'),
-(23619, 0, 1, 0, 22, 0, 100, 0, 21, 0, 0, 0, 0, 11, 42741, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 21 - Cast \'Pumped Up!\''),
-(23623, 0, 0, 0, 1, 0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2362300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Out of Combat - Run Script'),
-(23623, 0, 1, 0, 22, 0, 100, 0, 21, 0, 0, 0, 0, 11, 42741, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 21 - Cast \'Pumped Up!\''),
-(23624, 0, 0, 0, 1, 0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2362400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai''Kyl - Out of Combat - Run Script'),
-(23624, 0, 1, 0, 22, 0, 100, 0, 21, 0, 0, 0, 0, 11, 42741, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai''Kyl - Received Emote 21 - Cast \'Pumped Up!\''),
-(23625, 0, 0, 0, 1, 0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2362500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Out of Combat - Run Script'),
-(23625, 0, 1, 0, 22, 0, 100, 0, 21, 0, 0, 0, 0, 11, 42741, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 21 - Cast \'Pumped Up!\''),
-(23626, 0, 0, 0, 1, 0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2362600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Out of Combat - Run Script'),
-(23626, 0, 1, 0, 22, 0, 100, 0, 21, 0, 0, 0, 0, 11, 42741, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 21 - Cast \'Pumped Up!\'');
+(23619, 0, 0, 0, 1,  0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2361900, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Out of Combat - Run Script'),
+(23619, 0, 1, 0, 22, 0, 100, 0, 21,    0,     0,     0,     0, 11, 42741,   0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Bergrisst - Received Emote 21 - Cast \'Pumped Up!\''),
+(23623, 0, 0, 0, 1,  0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2362300, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Out of Combat - Run Script'),
+(23623, 0, 1, 0, 22, 0, 100, 0, 21,    0,     0,     0,     0, 11, 42741,   0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Chief Thunder-Skins - Received Emote 21 - Cast \'Pumped Up!\''),
+(23624, 0, 0, 0, 1,  0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2362400, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai''Kyl - Out of Combat - Run Script'),
+(23624, 0, 1, 0, 22, 0, 100, 0, 21,    0,     0,     0,     0, 11, 42741,   0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Mai''Kyl - Received Emote 21 - Cast \'Pumped Up!\''),
+(23625, 0, 0, 0, 1,  0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2362500, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Out of Combat - Run Script'),
+(23625, 0, 1, 0, 22, 0, 100, 0, 21,    0,     0,     0,     0, 11, 42741,   0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Samuro - Received Emote 21 - Cast \'Pumped Up!\''),
+(23626, 0, 0, 0, 1,  0, 100, 0, 10000, 25000, 10000, 25000, 0, 80, 2362600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Out of Combat - Run Script'),
+(23626, 0, 1, 0, 22, 0, 100, 0, 21,    0,     0,     0,     0, 11, 42741,   0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Sig Nicious - Received Emote 21 - Cast \'Pumped Up!\'');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2361900) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -190,37 +194,46 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2385200) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2385200, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Mai\'Kyl Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2385200, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Mai\'Kyl Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
 (2385200, 9, 1, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 12, 23624, 1, 300000, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Mai\'Kyl Controller - Actionlist - Summon Creature \'Mai\'Kyl\''),
-(2385200, 9, 2, 0, 0, 0, 100, 0, 268387, 268387, 0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Mai\'Kyl Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
-(2385200, 9, 3, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0, 0, 0, 0, 11, 23624, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Mai\'Kyl Controller - Actionlist - Despawn Instant');
+(2385200, 9, 2, 0, 0, 0, 100, 0, 268387, 268387, 0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Mai\'Kyl Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2385200, 9, 3, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0,      0, 0, 0, 11, 23624, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Mai\'Kyl Controller - Actionlist - Despawn Instant');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2385300) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3, 4));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2385300, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Samuro Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2385300, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Samuro Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
 (2385300, 9, 1, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 12, 23625, 1, 300000, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Samuro Controller - Actionlist - Summon Creature \'Samuro\''),
-(2385300, 9, 2, 0, 0, 0, 100, 0, 114783, 114783, 0, 0, 0, 11, 42510, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Samuro Controller - Actionlist - Cast \'L70ETC Call Lightning\''),
-(2385300, 9, 3, 0, 0, 0, 100, 0, 156825, 156825, 0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Samuro Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
-(2385300, 9, 4, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0, 0, 0, 0, 11, 23625, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Samuro Controller - Actionlist - Despawn Instant');
+(2385300, 9, 2, 0, 0, 0, 100, 0, 114783, 114783, 0, 0, 0, 11, 42510, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Samuro Controller - Actionlist - Cast \'L70ETC Call Lightning\''),
+(2385300, 9, 3, 0, 0, 0, 100, 0, 156825, 156825, 0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Samuro Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2385300, 9, 4, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0,      0, 0, 0, 11, 23625, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Samuro Controller - Actionlist - Despawn Instant');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2385400) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2385400, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Sig Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2385400, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Sig Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
 (2385400, 9, 1, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 12, 23626, 1, 300000, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Sig Controller - Actionlist - Summon Creature \'Sig Nicious\''),
-(2385400, 9, 2, 0, 0, 0, 100, 0, 268387, 268387, 0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Sig Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
-(2385400, 9, 3, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0, 0, 0, 0, 11, 23626, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Sig Controller - Actionlist - Despawn Instant');
+(2385400, 9, 2, 0, 0, 0, 100, 0, 268387, 268387, 0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Sig Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2385400, 9, 3, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0,      0, 0, 0, 11, 23626, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Sig Controller - Actionlist - Despawn Instant');
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2385500) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2385500, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Chief Thunder-Skins Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2385500, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Chief Thunder-Skins Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
 (2385500, 9, 1, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 12, 23623, 1, 300000, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Chief Thunder-Skins Controller - Actionlist - Summon Creature \'Chief Thunder-Skins\''),
-(2385500, 9, 2, 0, 0, 0, 100, 0, 257044, 257044, 0, 0, 0, 11, 42505, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Chief Thunder-Skins Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
-(2385500, 9, 3, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0, 0, 0, 0, 11, 23623, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Chief Thunder-Skins Controller - Actionlist - Despawn Instant');
+(2385500, 9, 2, 0, 0, 0, 100, 0, 257044, 257044, 0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Chief Thunder-Skins Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
+(2385500, 9, 3, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0,      0, 0, 0, 11, 23623, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Chief Thunder-Skins Controller - Actionlist - Despawn Instant');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28210) AND (`source_type` = 0) AND (`id` IN (0, 1));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28210) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3, 4));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(28210, 0, 0, 1, 62, 0, 100, 0, 9667, 0, 0, 0, 0, 72, 0,                 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Close Gossip'),
-(28210, 0, 1, 0, 61, 0, 100, 0, 0,    0, 0, 0, 0, 80, 2385000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Run Script');
+(28210, 0, 0, 1, 62, 0, 100, 0, 9667, 0, 0, 0, 0, 72, 0,       0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Close Gossip'),
+(28210, 0, 1, 2, 61, 0, 100, 0, 0,    0, 0, 0, 0, 80, 2385000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Run Script');
+(28210, 0, 2, 3, 61, 0, 100, 0, 9667, 0, 0, 0, 0, 1,  0,       0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Say Line 0'),
+(28210, 0, 3, 0, 61, 0, 100, 0, 0,    0, 0, 0, 0, 80, 2821000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Run Script'),
+(28210, 0, 4, 0, 68, 0, 100, 0, 81,   0, 0, 0, 0, 80, 2821000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Game Event 81 Started - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2821000) AND (`source_type` = 9) AND (`id` IN (0, 1, 2));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2821000, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 846.874, -186.739, -49.754395, 0, 'Ognip Blastbolt - Actionlist - Move To Position'),
+(2821000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - Actionlist - Remove Npc Flags Gossip'),
+(2821000, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2.077, 'Ognip Blastbolt - Actionlist - Set Orientation 2.077');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 9666 AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
