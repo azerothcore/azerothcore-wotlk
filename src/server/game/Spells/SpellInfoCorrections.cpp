@@ -3957,6 +3957,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Ritual of Summoning
     ApplySpellFix({ 61994 }, [](SpellInfo* spellInfo)
     {
+        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); // 0s
         spellInfo->ManaCostPercentage = 0; // Clicking on Warlock Summoning portal should not require mana
     });
 
