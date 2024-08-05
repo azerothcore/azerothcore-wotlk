@@ -871,11 +871,9 @@ public:
 
     static bool HandleMorphMountCommand(ChatHandler* handler, uint32 displayID)
     {
-        Unit* target = handler->getSelectedUnit();
+        Player* target = handler->getSelectedPlayerOrSelf();
 
-        if (!target)
-            target = handler->GetSession()->GetPlayer();
-        else if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer())) // check online security
+        if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer())) // check online security
             return false;
 
         if (!target->GetAuraEffectsByType(SPELL_AURA_MOUNTED).empty())
