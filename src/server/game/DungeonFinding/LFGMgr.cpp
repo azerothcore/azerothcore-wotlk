@@ -1057,7 +1057,7 @@ namespace lfg
                     if (p->IsClass(CLASS_DRUID))
                         maxPower = p->GetMaxPower(POWER_MANA);
                     else
-                        maxPower = (p->getPowerType() == POWER_RAGE || p->getPowerType() == POWER_RUNIC_POWER) ? p->GetMaxPower(p->getPowerType()) / 10 : p->GetMaxPower(p->getPowerType());
+                        maxPower = (p->GetPowerType() == POWER_RAGE || p->GetPowerType() == POWER_RUNIC_POWER) ? p->GetMaxPower(p->GetPowerType()) / 10 : p->GetMaxPower(p->GetPowerType());
 
                     currInternalInfoMap[sitr->first] = RBInternalInfo(guid, sitr->second.comment, !groupGuid.IsEmpty(), groupGuid, sitr->second.roles, encounterMask, instanceGuid,
                                                        1, p->GetLevel(), p->getClass(), p->getRace(), p->GetAverageItemLevel(),

@@ -847,7 +847,7 @@ void Creature::Update(uint32 diff)
                     }
                 }
 
-                if (getPowerType() == POWER_ENERGY)
+                if (GetPowerType() == POWER_ENERGY)
                     Regenerate(POWER_ENERGY);
                 else
                     Regenerate(POWER_MANA);
@@ -3786,7 +3786,7 @@ uint32 Creature::GetPlayerDamageReq() const
 bool Creature::CanCastSpell(uint32 spellID) const
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID);
-    int32 currentPower = GetPower(getPowerType());
+    int32 currentPower = GetPower(GetPowerType());
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || IsSpellProhibited(spellInfo->GetSchoolMask()))
     {

@@ -1961,7 +1961,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         {
             uint32 oldPower = target->GetPower(PowerType);
             // reset power to default values only at power change
-            if (target->getPowerType() != PowerType)
+            if (target->GetPowerType() != PowerType)
                 target->setPowerType(PowerType);
 
             switch (form)
@@ -7099,7 +7099,7 @@ void AuraEffect::HandleObsModPowerAuraTick(Unit* target, Unit* caster) const
 {
     Powers PowerType;
     if (GetMiscValue() == POWER_ALL)
-        PowerType = target->getPowerType();
+        PowerType = target->GetPowerType();
     else
         PowerType = Powers(GetMiscValue());
 

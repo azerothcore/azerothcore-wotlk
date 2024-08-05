@@ -851,7 +851,7 @@ public:
     {
         if (Player* p = object->ToPlayer())
         {
-            if (p->getPowerType() != POWER_MANA)
+            if (p->GetPowerType() != POWER_MANA)
                 return true;
             if (p->IsClass(CLASS_HUNTER))
                 return true;

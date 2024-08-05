@@ -709,7 +709,7 @@ void Pet::Update(uint32 diff)
 
                 // xinef: m_regenTimer is decrased in Creature::Update()
                 // xinef: just check if we can update focus in current period
-                if (getPowerType() == POWER_FOCUS)
+                if (GetPowerType() == POWER_FOCUS)
                 {
                     m_petRegenTimer -= _diff;
                     if (m_petRegenTimer <= 0s)

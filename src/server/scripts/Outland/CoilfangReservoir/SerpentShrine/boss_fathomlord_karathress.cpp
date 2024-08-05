@@ -193,7 +193,7 @@ public:
 
     bool operator() (Unit* unit) const
     {
-        return unit->getPowerType() == POWER_MANA && _source->GetDistance(unit) < 50.0f;
+        return unit->GetPowerType() == POWER_MANA && _source->GetDistance(unit) < 50.0f;
     }
 private:
     WorldObject const* _source;

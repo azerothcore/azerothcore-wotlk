@@ -270,7 +270,7 @@ class spell_bronjahm_magic_bane : public SpellScript
 
     void RecalculateDamage()
     {
-        if (GetHitUnit()->getPowerType() != POWER_MANA)
+        if (GetHitUnit()->GetPowerType() != POWER_MANA)
             return;
 
         if (Unit* caster = GetCaster())

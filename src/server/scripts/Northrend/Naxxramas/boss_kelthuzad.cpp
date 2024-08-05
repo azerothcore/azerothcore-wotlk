@@ -443,7 +443,7 @@ public:
                         for (auto itr : threatList)
                         {
                             if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
-                                    && itr->getTarget()->getPowerType() == POWER_MANA
+                                    && itr->getTarget()->GetPowerType() == POWER_MANA
                                     && itr->getTarget()->GetPower(POWER_MANA))
                                     {
                                         unitList.push_back(itr->getTarget());

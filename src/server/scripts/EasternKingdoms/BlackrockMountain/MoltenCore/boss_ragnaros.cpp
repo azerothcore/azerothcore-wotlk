@@ -391,7 +391,7 @@ public:
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [](Unit const* target)
                         {
-                            return target->IsPlayer() && target->getPowerType() == POWER_MANA;
+                            return target->IsPlayer() && target->GetPowerType() == POWER_MANA;
                         }))
                         {
                             if (me->CastSpell(target, SPELL_MIGHT_OF_RAGNAROS) == SPELL_CAST_OK && _isKnockbackEmoteAllowed)

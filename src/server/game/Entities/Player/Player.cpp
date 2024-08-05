@@ -2769,7 +2769,7 @@ bool Player::HasActivePowerType(Powers power)
     if (sScriptMgr->OnPlayerHasActivePowerType(this, power))
         return true;
     else
-        return (getPowerType() == power);
+        return (GetPowerType() == power);
 }
 
 void Player::SendInitialSpells()
@@ -10592,21 +10592,21 @@ void Player::InitDataForForm(bool reapplyMods)
         case FORM_GHOUL:
         case FORM_CAT:
             {
-                if (getPowerType() != POWER_ENERGY)
+                if (GetPowerType() != POWER_ENERGY)
                     setPowerType(POWER_ENERGY);
                 break;
             }
         case FORM_BEAR:
         case FORM_DIREBEAR:
             {
-                if (getPowerType() != POWER_RAGE)
+                if (GetPowerType() != POWER_RAGE)
                     setPowerType(POWER_RAGE);
                 break;
             }
         default:                                            // 0, for example
             {
                 ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(getClass());
-                if (cEntry && cEntry->powerType < MAX_POWERS && uint32(getPowerType()) != cEntry->powerType)
+                if (cEntry && cEntry->powerType < MAX_POWERS && uint32(GetPowerType()) != cEntry->powerType)
                     setPowerType(Powers(cEntry->powerType));
                 break;
             }
@@ -15238,7 +15238,7 @@ void Player::ActivateSpec(uint8 spec)
     }
 
     // xinef: reset power
-    Powers pw = getPowerType();
+    Powers pw = GetPowerType();
     if (pw != POWER_MANA)
         SetPower(POWER_MANA, 0); // Mana must be 0 even if it isn't the active power type.
     SetPower(pw, 0);

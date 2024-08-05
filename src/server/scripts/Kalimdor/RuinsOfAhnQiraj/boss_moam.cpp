@@ -153,7 +153,7 @@ class spell_moam_mana_drain_filter : public SpellScript
     {
         targets.remove_if([&](WorldObject* target) -> bool
         {
-            return !target->IsPlayer() || target->ToPlayer()->getPowerType() != POWER_MANA;
+            return !target->IsPlayer() || target->ToPlayer()->GetPowerType() != POWER_MANA;
         });
 
         if (!targets.empty())

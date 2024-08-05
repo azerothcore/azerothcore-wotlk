@@ -198,7 +198,7 @@ struct boss_faction_championsAI : public ScriptedAI
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
         {
             target = ObjectAccessor::GetUnit((*me), (*iter)->getUnitGuid());
-            if( target && target->getPowerType() == POWER_MANA && (!casting || target->HasUnitState(UNIT_STATE_CASTING)) && me->GetExactDist(target) <= range )
+            if( target && target->GetPowerType() == POWER_MANA && (!casting || target->HasUnitState(UNIT_STATE_CASTING)) && me->GetExactDist(target) <= range )
                 return target;
         }
         return nullptr;
@@ -217,7 +217,7 @@ struct boss_faction_championsAI : public ScriptedAI
         else
             threatTimer -= diff;
 
-        if( me->getPowerType() == POWER_MANA )
+        if( me->GetPowerType() == POWER_MANA )
         {
             if( powerTimer <= diff )
             {
@@ -227,7 +227,7 @@ struct boss_faction_championsAI : public ScriptedAI
             else
                 powerTimer -= diff;
         }
-        else if( me->getPowerType() == POWER_ENERGY )
+        else if( me->GetPowerType() == POWER_ENERGY )
         {
             if( powerTimer <= diff )
             {

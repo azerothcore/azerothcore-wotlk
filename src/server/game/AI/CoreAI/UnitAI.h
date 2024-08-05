@@ -145,7 +145,7 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
         if (!_me || !target)
             return false;
 
-        if (target->getPowerType() != _power)
+        if (target->GetPowerType() != _power)
             return false;
 
         if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)

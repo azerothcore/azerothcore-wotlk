@@ -3166,7 +3166,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
             OldSummon->UpdateObjectVisibility();
 
             OldSummon->SetHealth(OldSummon->GetMaxHealth());
-            OldSummon->SetPower(OldSummon->getPowerType(), OldSummon->GetMaxPower(OldSummon->getPowerType()));
+            OldSummon->SetPower(OldSummon->GetPowerType(), OldSummon->GetMaxPower(OldSummon->GetPowerType()));
             // notify player
             for (CreatureSpellCooldowns::const_iterator itr = OldSummon->m_CreatureSpellCooldowns.begin(); itr != OldSummon->m_CreatureSpellCooldowns.end(); ++itr)
                 owner->SendClearCooldown(itr->first, OldSummon);

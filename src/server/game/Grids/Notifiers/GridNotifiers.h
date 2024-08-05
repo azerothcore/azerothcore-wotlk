@@ -1676,7 +1676,7 @@ namespace Acore
         explicit PowerCheck(Powers const power, bool equals) : _power(power), _equals(equals) { }
         bool operator()(WorldObject const* object) const
         {
-            return object->ToUnit() && (object->ToUnit()->getPowerType() == _power) == _equals;
+            return object->ToUnit() && (object->ToUnit()->GetPowerType() == _power) == _equals;
         }
 
     private:

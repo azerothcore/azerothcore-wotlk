@@ -553,7 +553,7 @@ class spell_item_crazy_alchemists_potion : public SpellScript
     {
         // Xinef: 20% to get additional effect, guessed
         if (roll_chance_i(20))
-            GetCaster()->CastSpell(GetCaster(), crazyAlchemistTable[urand(0, (GetCaster()->getPowerType() == POWER_MANA ? 4 : 3))], true);
+            GetCaster()->CastSpell(GetCaster(), crazyAlchemistTable[urand(0, (GetCaster()->GetPowerType() == POWER_MANA ? 4 : 3))], true);
     }
 
     void Register() override
@@ -946,7 +946,7 @@ class spell_item_oracle_ablutions : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         Unit* caster = GetCaster();
-        switch (caster->getPowerType())
+        switch (caster->GetPowerType())
         {
             case POWER_RUNIC_POWER:
                 caster->CastSpell(caster, SPELL_ABLUTION_RUNIC, true);

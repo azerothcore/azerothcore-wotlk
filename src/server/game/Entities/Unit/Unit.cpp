@@ -7937,7 +7937,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Item - Icecrown 25 Normal Dagger Proc
                     case 71880:
                         {
-                            switch (getPowerType())
+                            switch (GetPowerType())
                             {
                                 case POWER_MANA:
                                     triggered_spell_id = 71881;
@@ -7959,7 +7959,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     // Item - Icecrown 25 Heroic Dagger Proc
                     case 71892:
                         {
-                            switch (getPowerType())
+                            switch (GetPowerType())
                             {
                                 case POWER_MANA:
                                     triggered_spell_id = 71888;
@@ -9848,7 +9848,7 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
                 if (!roll_chance_i(50))
                     return false;
 
-                switch (victim->getPowerType())
+                switch (victim->GetPowerType())
                 {
                     case POWER_MANA:
                         triggered_spell_id = 28722;
@@ -9876,7 +9876,7 @@ bool Unit::HandleOverrideClassScriptAuraProc(Unit* victim, uint32 /*damage*/, Au
             {
                 if (!roll_chance_i(triggeredByAura->GetAmount()))
                     return false;
-                switch (victim->getPowerType())
+                switch (victim->GetPowerType())
                 {
                     case POWER_MANA:
                         triggered_spell_id = 48542;
@@ -14516,7 +14516,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         // without this when removing IncreaseMaxHealth aura player may stuck with 1 hp
         // do not why since in IncreaseMaxHealth currenthealth is checked
         SetHealth(0);
-        SetPower(getPowerType(), 0);
+        SetPower(GetPowerType(), 0);
 
         // Stop emote on death
         SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
@@ -15526,7 +15526,7 @@ void Unit::SetPower(Powers power, uint32 val, bool withPowerUpdate /*= true*/, b
     if (GetTypeId() == TYPEID_PLAYER)
     {
         Player* player = ToPlayer();
-        if (getPowerType() == power && player->NeedSendSpectatorData())
+        if (GetPowerType() == power && player->NeedSendSpectatorData())
         {
             ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "CPW", power == POWER_RAGE || power == POWER_RUNIC_POWER ? val / 10 : val);
         }
@@ -15564,7 +15564,7 @@ void Unit::SetMaxPower(Powers power, uint32 val)
     if (GetTypeId() == TYPEID_PLAYER)
     {
         Player* player = ToPlayer();
-        if (getPowerType() == power && player->NeedSendSpectatorData())
+        if (GetPowerType() == power && player->NeedSendSpectatorData())
             ArenaSpectator::SendCommand_UInt32Value(FindMap(), GetGUID(), "MPW", power == POWER_RAGE || power == POWER_RUNIC_POWER ? val / 10 : val);
 
         if (player->GetGroup())

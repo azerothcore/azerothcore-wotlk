@@ -249,7 +249,7 @@ void ArenaSpectator::HandleResetCommand(Player* player)
         SendCommand_UInt32Value(player, itr->first, "MHP", plr->GetMaxHealth());
         SendCommand_UInt32Value(player, itr->first, "CHP", plr->GetHealth());
         SendCommand_UInt32Value(player, itr->first, "STA", plr->IsAlive() ? 1 : 0);
-        Powers ptype = plr->getPowerType();
+        Powers ptype = plr->GetPowerType();
         SendCommand_UInt32Value(player, itr->first, "PWT", ptype);
         SendCommand_UInt32Value(player, itr->first, "MPW", ptype == POWER_RAGE || ptype == POWER_RUNIC_POWER ? plr->GetMaxPower(ptype) / 10 : plr->GetMaxPower(ptype));
         SendCommand_UInt32Value(player, itr->first, "CPW", ptype == POWER_RAGE || ptype == POWER_RUNIC_POWER ? plr->GetPower(ptype) / 10 : plr->GetPower(ptype));
