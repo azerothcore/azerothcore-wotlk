@@ -1,20 +1,52 @@
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 19270) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 19270) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(19270, 0, 0,  1, 68, 0, 100, 512, 86,  0, 0, 0, 0, 0, 80, 1927000, 2,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 86 Started - Run Script'),
-(19270, 0, 1,  0, 61, 0, 100, 512, 0,   0, 0, 0, 0, 0, 48, 1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 86 Started - Set Active On'),
-(19270, 0, 2,  0, 69, 0, 100, 512, 86,  0, 0, 0, 0, 0, 48, 0,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 86 Ended - Set Active Off'),
+(19270, 0, 0,  2, 68, 0, 100, 0,   86,  0, 0, 0, 0, 0, 48, 1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 86 Started - Set Active On'),
+(19270, 0, 1,  0, 69, 0, 100, 0,   86,  0, 0, 0, 0, 0, 48, 0,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 86 Ended - Set Active Off'),
+(19270, 0, 2,  0, 61, 0, 100, 0,   0,   0, 0, 0, 0, 0, 53, 0,       19270, 0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 86 Started - Start Waypoint'),
 (19270, 0, 3,  4, 68, 0, 100, 0,   82,  0, 0, 0, 0, 0, 80, 2385001, 0,     0, 0, 0, 0, 11, 23850, 31, 0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 82 Started - Run Script'),
-(19270, 0, 4,  0, 61, 0, 100, 0,   0,   0, 0, 0, 0, 0, 53, 0,       19270, 0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 82 Started - Start Waypoint'),
-(19270, 0, 5,  0, 40, 0, 100, 0,   9,   0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 9 Reached - Say Line 1'),
-(19270, 0, 6,  0, 40, 0, 100, 0,   46,  0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 46 Reached - Say Line 1'),
-(19270, 0, 7,  0, 40, 0, 100, 0,   66,  0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 66 Reached - Say Line 1'),
-(19270, 0, 8,  0, 40, 0, 100, 0,   130, 0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 130 Reached - Say Line 1'),
-(19270, 0, 9,  0, 40, 0, 100, 0,   202, 0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 202 Reached - Say Line 1'),
-(19270, 0, 10, 0, 40, 0, 100, 0,   232, 0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 232 Reached - Say Line 1'),
-(19270, 0, 11, 0, 40, 0, 100, 0,   297, 0, 0, 0, 0, 0, 80, 2385000, 0,     0, 0, 0, 0, 11, 23850, 31, 0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 297 Reached - Run Script');
+(19270, 0, 4,  6, 61, 0, 100, 0,   0,   0, 0, 0, 0, 0, 48, 1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 82 Started - Set Active On'),
+(19270, 0, 5,  0, 69, 0, 100, 0,   82,  0, 0, 0, 0, 0, 48, 0,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 82 Ended - Set Active Off'),
+(19270, 0, 6,  0, 61, 0, 100, 0,   0,   0, 0, 0, 0, 0, 53, 0,       19270, 0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Game Event 82 Started - Start Waypoint'),
+(19270, 0, 7,  0, 40, 0, 100, 0,   9,   0, 0, 0, 0, 0, 1,  0,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 9 Reached - Say Line 0'),
+(19270, 0, 8,  0, 40, 0, 100, 0,   46,  0, 0, 0, 0, 0, 1,  0,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 46 Reached - Say Line 0'),
+(19270, 0, 9,  0, 40, 0, 100, 0,   66,  0, 0, 0, 0, 0, 1,  0,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 66 Reached - Say Line 0'),
+(19270, 0, 10, 0, 40, 0, 100, 0,   130, 0, 0, 0, 0, 0, 1,  0,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 130 Reached - Say Line 0'),
+(19270, 0, 11, 0, 40, 0, 100, 0,   202, 0, 0, 0, 0, 0, 1,  0,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 202 Reached - Say Line 0'),
+(19270, 0, 12, 0, 40, 0, 100, 0,   232, 0, 0, 0, 0, 0, 1,  0,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 232 Reached - Say Line 0'),
+(19270, 0, 13, 0, 40, 0, 100, 0,   297, 0, 0, 0, 0, 0, 80, 1927000, 2,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 297 Started - Run Script'),
+(19270, 0, 14, 0, 40, 0, 100, 0,   9,   0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 9 Reached - Say Line 1'),
+(19270, 0, 15, 0, 40, 0, 100, 0,   46,  0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 46 Reached - Say Line 1'),
+(19270, 0, 16, 0, 40, 0, 100, 0,   66,  0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 66 Reached - Say Line 1'),
+(19270, 0, 17, 0, 40, 0, 100, 0,   130, 0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 130 Reached - Say Line 1'),
+(19270, 0, 18, 0, 40, 0, 100, 0,   202, 0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 202 Reached - Say Line 1'),
+(19270, 0, 19, 0, 40, 0, 100, 0,   232, 0, 0, 0, 0, 0, 1,  1,       0,     0, 0, 0, 0, 1,  0,     0,  0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 232 Reached - Say Line 1'),
+(19270, 0, 20, 0, 40, 0, 100, 0,   297, 0, 0, 0, 0, 0, 80, 2385000, 0,     0, 0, 0, 0, 11, 23850, 31, 0, 0, 0, 0, 0, 0, 'Shattrath Saul - On Waypoint 297 Reached - Run Script');
 
-DELETE FROM `creature_text` WHERE `CreatureID` = 19270 AND `GroupID` = 1 AND `ID` IN (0, 1, 2, 3);
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 1927000 AND `source_type` = 9 AND `id` IN (0, 1) AND `action_type` = 1;
+UPDATE `smart_scripts` SET `id` = 0 WHERE `entryorguid` = 1927000 AND `source_type` = 9 AND `id` = 2 AND `action_type` = 12;
+UPDATE `smart_scripts` SET `id` = 1, `event_param1` = 0, `event_param2` = 0 WHERE `entryorguid` = 1927000 AND `source_type` = 9 AND `id` = 3 AND `action_type` = 45;
+
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21)) AND (`SourceEntry` = 19270) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 12) AND (`ConditionTarget` = 1) AND (`ConditionValue1` IN (82, 86)) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 8,  19270, 0, 0, 12, 1, 86, 0, 0, 0, 0, 0, '', 'Object must have event \'Perry Gatner\' active'),
+(22, 9,  19270, 0, 0, 12, 1, 86, 0, 0, 0, 0, 0, '', 'Object must have event \'Perry Gatner\' active'),
+(22, 10, 19270, 0, 0, 12, 1, 86, 0, 0, 0, 0, 0, '', 'Object must have event \'Perry Gatner\' active'),
+(22, 11, 19270, 0, 0, 12, 1, 86, 0, 0, 0, 0, 0, '', 'Object must have event \'Perry Gatner\' active'),
+(22, 12, 19270, 0, 0, 12, 1, 86, 0, 0, 0, 0, 0, '', 'Object must have event \'Perry Gatner\' active'),
+(22, 13, 19270, 0, 0, 12, 1, 86, 0, 0, 0, 0, 0, '', 'Object must have event \'Perry Gatner\' active'),
+(22, 14, 19270, 0, 0, 12, 1, 86, 0, 0, 0, 0, 0, '', 'Object must have event \'Perry Gatner\' active'),
+(22, 15, 19270, 0, 0, 12, 1, 82, 0, 0, 0, 0, 0, '', 'Object must have event \'L70ETC World\'s End Tavern Concert\' active'),
+(22, 16, 19270, 0, 0, 12, 1, 82, 0, 0, 0, 0, 0, '', 'Object must have event \'L70ETC World\'s End Tavern Concert\' active'),
+(22, 17, 19270, 0, 0, 12, 1, 82, 0, 0, 0, 0, 0, '', 'Object must have event \'L70ETC World\'s End Tavern Concert\' active'),
+(22, 18, 19270, 0, 0, 12, 1, 82, 0, 0, 0, 0, 0, '', 'Object must have event \'L70ETC World\'s End Tavern Concert\' active'),
+(22, 19, 19270, 0, 0, 12, 1, 82, 0, 0, 0, 0, 0, '', 'Object must have event \'L70ETC World\'s End Tavern Concert\' active'),
+(22, 20, 19270, 0, 0, 12, 1, 82, 0, 0, 0, 0, 0, '', 'Object must have event \'L70ETC World\'s End Tavern Concert\' active'),
+(22, 21, 19270, 0, 0, 12, 1, 82, 0, 0, 0, 0, 0, '', 'Object must have event \'L70ETC World\'s End Tavern Concert\' active');
+
+DELETE FROM `creature_text` WHERE `CreatureID` = 19270 AND `GroupID` IN (0, 1) AND `ID` IN (0, 1, 2, 3);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES 
+(19270, 0, 0, 'If you are ready to laugh, head over to the World\'s End Tavern!',                                                                      14, 0, 100, 0, 0, 0, 16380, 0, 'Shattrath Saul - Perry Gatner'),
+(19270, 0, 1, 'Check out the comedy stylings of Perry Gatner in just a few minutes!',                                                                  14, 0, 100, 0, 0, 0, 16377, 0, 'Shattrath Saul - Perry Gatner'),
 (19270, 1, 0, "TAUREN CHIEFTAINS! Playing LIVE, in the WORLD'S END TAVERN! Be there, at the top of the hour! Banished from Shattrath? SNEAK BACK IN!", 14, 0, 100, 0, 0, 0, 28504, 1, 'Shattrath Saul - L70ETC'),
 (19270, 1, 1, "Are you ready to rock? Then head over to the World's End Tavern! The Tauren Chieftains start their show at the top of the hour.",       14, 0, 100, 0, 0, 0, 28496, 1, 'Shattrath Saul - L70ETC'),
 (19270, 1, 2, "Who? The Tauren Chieftains! What? A live performance! Where? The World's End Tavern! When? The top of the hour! BE THERE!",             14, 0, 100, 0, 0, 0, 28502, 1, 'Shattrath Saul - L70ETC'),
