@@ -1112,7 +1112,7 @@ bool SpellInfo::ComputeIsStackableWithRanks() const
 {
     if (IsPassive())
         return false;
-    if (PowerType != POWER_MANA && PowerType != POWER_HEALTH)
+    if (PowerType != POWER_TYPE_MANA && PowerType != POWER_HEALTH)
         return false;
     if (IsProfessionOrRiding())
         return false;
@@ -2405,8 +2405,8 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
         if (PowerType == POWER_HEALTH)
             return caster->GetHealth();
         // Else drain all power
-        if (PowerType < MAX_POWERS)
-            return caster->GetPower(Powers(PowerType));
+        if (PowerType < NUM_POWER_TYPES)
+            return caster->GetPower(POWER_TYPE(PowerType));
         LOG_ERROR("spells", "SpellInfo::CalcPowerCost: Unknown power type '{}' in spell {}", PowerType, Id);
         return 0;
     }
@@ -2422,17 +2422,17 @@ int32 SpellInfo::CalcPowerCost(Unit const* caster, SpellSchoolMask schoolMask, S
             case POWER_HEALTH:
                 powerCost += int32(CalculatePct(caster->GetCreateHealth(), ManaCostPercentage));
                 break;
-            case POWER_MANA:
+            case POWER_TYPE_MANA:
                 powerCost += int32(CalculatePct(caster->GetCreateMana(), ManaCostPercentage));
                 break;
-            case POWER_RAGE:
-            case POWER_FOCUS:
-            case POWER_ENERGY:
-            case POWER_HAPPINESS:
-                powerCost += int32(CalculatePct(caster->GetMaxPower(Powers(PowerType)), ManaCostPercentage));
+            case POWER_TYPE_RAGE:
+            case POWER_TYPE_FOCUS:
+            case POWER_TYPE_ENERGY:
+            case POWER_TYPE_HAPPINESS:
+                powerCost += int32(CalculatePct(caster->GetMaxPower(POWER_TYPE(PowerType)), ManaCostPercentage));
                 break;
-            case POWER_RUNE:
-            case POWER_RUNIC_POWER:
+            case POWER_TYPE_RUNE:
+            case POWER_TYPE_RUNIC_POWER:
                 LOG_DEBUG("spells.aura", "CalculateManaCost: Not implemented yet!");
                 break;
             default:

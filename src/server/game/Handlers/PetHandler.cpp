@@ -919,8 +919,8 @@ void User::HandlePetAbandon(WorldPackets::Pet::PetAbandon& packet)
         {
             if (pet->GetGUID() == m_player->GetPetGUID())
             {
-                uint32 feelty = pet->GetPower(POWER_HAPPINESS);
-                pet->SetPower(POWER_HAPPINESS, feelty > 50000 ? (feelty - 50000) : 0);
+                uint32 feelty = pet->GetPower(POWER_TYPE_HAPPINESS);
+                pet->SetPower(POWER_TYPE_HAPPINESS, feelty > 50000 ? (feelty - 50000) : 0);
             }
 
             m_player->RemovePet(pet->ToPet(), PET_SAVE_AS_DELETED);

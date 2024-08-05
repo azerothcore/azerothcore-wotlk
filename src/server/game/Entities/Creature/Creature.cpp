@@ -847,10 +847,10 @@ void Creature::Update(uint32 diff)
                     }
                 }
 
-                if (GetPowerType() == POWER_ENERGY)
-                    Regenerate(POWER_ENERGY);
+                if (GetPowerType() == POWER_TYPE_ENERGY)
+                    Regenerate(POWER_TYPE_ENERGY);
                 else
-                    Regenerate(POWER_MANA);
+                    Regenerate(POWER_TYPE_MANA);
 
                 m_regenTimer += CREATURE_REGEN_INTERVAL;
             }
@@ -940,7 +940,7 @@ bool Creature::IsFreeToMove()
     return true;
 }
 
-void Creature::Regenerate(Powers power)
+void Creature::Regenerate(POWER_TYPE power)
 {
     uint32 curValue = GetPower(power);
     uint32 maxValue = GetMaxPower(power);
@@ -961,19 +961,19 @@ void Creature::Regenerate(Powers power)
 
     switch (power)
     {
-        case POWER_FOCUS:
+        case POWER_TYPE_FOCUS:
             {
                 // For hunter pets.
                 addvalue = 24 * sWorld->getRate(RATE_POWER_FOCUS);
                 break;
             }
-        case POWER_ENERGY:
+        case POWER_TYPE_ENERGY:
             {
                 // For deathknight's ghoul.
                 addvalue = 20;
                 break;
             }
-        case POWER_MANA:
+        case POWER_TYPE_MANA:
             {
                 // Combat and any controlled creature
                 if (IsInCombat() || GetCharmerOrOwnerGUID())
@@ -1001,10 +1001,10 @@ void Creature::Regenerate(Powers power)
     // Apply modifiers (if any).
     AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-        if (Powers((*i)->GetMiscValue()) == power)
+        if (POWER_TYPE((*i)->GetMiscValue()) == power)
             AddPct(addvalue, (*i)->GetAmount());
 
-    addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * (power == POWER_FOCUS ? PET_FOCUS_REGEN_INTERVAL.count() : CREATURE_REGEN_INTERVAL) / (5 * IN_MILLISECONDS);
+    addvalue += GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * (power == POWER_TYPE_FOCUS ? PET_FOCUS_REGEN_INTERVAL.count() : CREATURE_REGEN_INTERVAL) / (5 * IN_MILLISECONDS);
 
     ModifyPower(power, int32(addvalue));
 }
@@ -1031,7 +1031,7 @@ void Creature::RegenerateHealth()
         float HealthIncreaseRate = sWorld->getRate(RATE_HEALTH);
         float Spirit = GetStat(STAT_SPIRIT);
 
-        if (GetPower(POWER_MANA) > 0)
+        if (GetPower(POWER_TYPE_MANA) > 0)
             addvalue = uint32(Spirit * 0.25 * HealthIncreaseRate);
         else
             addvalue = uint32(Spirit * 0.80 * HealthIncreaseRate);
@@ -1453,7 +1453,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     data.wander_distance = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0.0f : m_wanderDistance;
     data.currentwaypoint = 0;
     data.curhealth = GetHealth();
-    data.curmana = GetPower(POWER_MANA);
+    data.curmana = GetPower(POWER_TYPE_MANA);
     // prevent add data integrity problems
     data.movementType = !m_wanderDistance && GetDefaultMovementType() == RANDOM_MOTION_TYPE
                         ? IDLE_MOTION_TYPE : GetDefaultMovementType();
@@ -1488,7 +1488,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->SetData(index++, m_wanderDistance);
     stmt->SetData(index++, 0);
     stmt->SetData(index++, GetHealth());
-    stmt->SetData(index++, GetPower(POWER_MANA));
+    stmt->SetData(index++, GetPower(POWER_TYPE_MANA));
     stmt->SetData(index++, uint8(GetDefaultMovementType()));
     stmt->SetData(index++, npcflag);
     stmt->SetData(index++, unit_flags);
@@ -1532,8 +1532,8 @@ void Creature::SelectLevel(bool changelevel)
     uint32 mana = stats->GenerateMana(cInfo);
 
     SetCreateMana(mana);
-    SetMaxPower(POWER_MANA, mana);                          //MAX Mana
-    SetPower(POWER_MANA, mana);
+    SetMaxPower(POWER_TYPE_MANA, mana);                          //MAX Mana
+    SetPower(POWER_TYPE_MANA, mana);
 
     /// @todo: set UNIT_FIELD_POWER*, for some creature class case (energy, etc)
 
@@ -1763,12 +1763,12 @@ bool Creature::LoadCreatureFromDB(WOWGUID::LowType spawnId, Map* map, bool addTo
             if (curhealth < 1)
                 curhealth = 1;
         }
-        SetPower(POWER_MANA, data->curmana);
+        SetPower(POWER_TYPE_MANA, data->curmana);
     }
     else
     {
         curhealth = GetMaxHealth();
-        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+        SetPower(POWER_TYPE_MANA, GetMaxPower(POWER_TYPE_MANA));
     }
 
     SetHealth(m_deathState == DeathState::Alive ? curhealth : 0);
@@ -2306,7 +2306,7 @@ SpellInfo const* Creature::reachWithSpellAttack(Unit* victim)
         if (bcontinue)
             continue;
 
-        if (spellInfo->ManaCost > GetPower(POWER_MANA))
+        if (spellInfo->ManaCost > GetPower(POWER_TYPE_MANA))
             continue;
         float range = spellInfo->GetMaxRange(false);
         float minrange = spellInfo->GetMinRange(false);
@@ -2350,7 +2350,7 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
         if (bcontinue)
             continue;
 
-        if (spellInfo->ManaCost > GetPower(POWER_MANA))
+        if (spellInfo->ManaCost > GetPower(POWER_TYPE_MANA))
             continue;
 
         float range = spellInfo->GetMaxRange(true);

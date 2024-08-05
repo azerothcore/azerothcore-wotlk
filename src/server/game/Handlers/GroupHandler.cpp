@@ -816,7 +816,7 @@ void User::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data)
     if (mask & GROUP_UPDATE_FLAG_MAX_HP)
         *data << uint32(player->GetMaxHealth());
 
-    Powers powerType = player->GetPowerType();
+    POWER_TYPE powerType = player->GetPowerType();
     if (mask & GROUP_UPDATE_FLAG_POWER_TYPE)
         *data << uint8(powerType);
 
@@ -966,7 +966,7 @@ void User::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     }
 
     Pet* pet = player->GetPet();
-    Powers powerType = player->GetPowerType();
+    POWER_TYPE powerType = player->GetPowerType();
 
     WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 4 + 2 + 2 + 2 + 1 + 2 * 6 + 8 + 1 + 8);
     data << uint8(0);                                       // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
@@ -977,7 +977,7 @@ void User::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
                          | GROUP_UPDATE_FLAG_ZONE | GROUP_UPDATE_FLAG_POSITION | GROUP_UPDATE_FLAG_AURAS
                          | GROUP_UPDATE_FLAG_PET_NAME | GROUP_UPDATE_FLAG_PET_MODEL_ID | GROUP_UPDATE_FLAG_PET_AURAS;
 
-    if (powerType != POWER_MANA)
+    if (powerType != POWER_TYPE_MANA)
         updateFlags |= GROUP_UPDATE_FLAG_POWER_TYPE;
 
     if (pet)

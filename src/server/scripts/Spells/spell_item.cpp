@@ -553,7 +553,7 @@ class spell_item_crazy_alchemists_potion : public SpellScript
     {
         // Xinef: 20% to get additional effect, guessed
         if (roll_chance_i(20))
-            GetCaster()->CastSpell(GetCaster(), crazyAlchemistTable[urand(0, (GetCaster()->GetPowerType() == POWER_MANA ? 4 : 3))], true);
+            GetCaster()->CastSpell(GetCaster(), crazyAlchemistTable[urand(0, (GetCaster()->GetPowerType() == POWER_TYPE_MANA ? 4 : 3))], true);
     }
 
     void Register() override
@@ -576,10 +576,10 @@ class spell_item_skull_of_impeding_doom : public AuraScript
 
     void CalculateManaLeechAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        if (!GetCaster() || !GetCaster()->HasActivePowerType(POWER_MANA))
+        if (!GetCaster() || !GetCaster()->HasActivePowerType(POWER_TYPE_MANA))
             return;
 
-        amount = GetCaster()->GetMaxPower(POWER_MANA) * 0.12f; // 5 ticks which reduce health by 60%
+        amount = GetCaster()->GetMaxPower(POWER_TYPE_MANA) * 0.12f; // 5 ticks which reduce health by 60%
     }
 
     void Register() override
@@ -948,19 +948,19 @@ class spell_item_oracle_ablutions : public SpellScript
         Unit* caster = GetCaster();
         switch (caster->GetPowerType())
         {
-            case POWER_RUNIC_POWER:
+            case POWER_TYPE_RUNIC_POWER:
                 caster->CastSpell(caster, SPELL_ABLUTION_RUNIC, true);
                 break;
-            case POWER_MANA:
+            case POWER_TYPE_MANA:
                 {
-                    int32 mana = CalculatePct(caster->GetMaxPower(POWER_MANA), 5.0f);
+                    int32 mana = CalculatePct(caster->GetMaxPower(POWER_TYPE_MANA), 5.0f);
                     caster->CastCustomSpell(SPELL_ABLUTION_MANA, SPELLVALUE_BASE_POINT0, mana, caster, true);
                     break;
                 }
-            case POWER_RAGE:
+            case POWER_TYPE_RAGE:
                 caster->CastSpell(caster, SPELL_ABLUTION_RAGE, true);
                 break;
-            case POWER_ENERGY:
+            case POWER_TYPE_ENERGY:
                 caster->CastSpell(caster, SPELL_ABLUTION_ENERGY, true);
                 break;
             default:

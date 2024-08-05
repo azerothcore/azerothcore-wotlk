@@ -79,7 +79,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Elixir of Detect Undead
     ApplySpellFix({ 11389 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->PowerType = POWER_MANA;
+        spellInfo->PowerType = POWER_TYPE_MANA;
         spellInfo->ManaCost = 0;
         spellInfo->ManaPerSecond = 0;
     });

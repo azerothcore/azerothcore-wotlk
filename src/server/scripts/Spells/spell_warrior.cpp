@@ -404,8 +404,8 @@ class spell_warr_execute : public SpellScript
         if (Unit* target = GetHitUnit())
         {
             SpellInfo const* spellInfo = GetSpellInfo();
-            int32 rageUsed = std::min<int32>(300 - spellInfo->CalcPowerCost(caster, SpellSchoolMask(spellInfo->SchoolMask)), caster->GetPower(POWER_RAGE));
-            int32 newRage = std::max<int32>(0, caster->GetPower(POWER_RAGE) - rageUsed);
+            int32 rageUsed = std::min<int32>(300 - spellInfo->CalcPowerCost(caster, SpellSchoolMask(spellInfo->SchoolMask)), caster->GetPower(POWER_TYPE_RAGE));
+            int32 newRage = std::max<int32>(0, caster->GetPower(POWER_TYPE_RAGE) - rageUsed);
 
             // Sudden Death rage save
             if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_GENERIC, WARRIOR_ICON_ID_SUDDEN_DEATH, EFFECT_0))
@@ -414,7 +414,7 @@ class spell_warr_execute : public SpellScript
                 newRage = std::max(newRage, ragesave);
             }
 
-            caster->SetPower(POWER_RAGE, uint32(newRage));
+            caster->SetPower(POWER_TYPE_RAGE, uint32(newRage));
             // Glyph of Execution bonus
             if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_WARRIOR_GLYPH_OF_EXECUTION, EFFECT_0))
                 rageUsed += aurEff->GetAmount() * 10;

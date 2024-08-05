@@ -233,7 +233,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        me->SetPower(POWER_MANA, 0);
+        me->SetPower(POWER_TYPE_MANA, 0);
         _targetGUIDs.clear();
     }
 
@@ -245,7 +245,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
             {
                 me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
+                    if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_TYPE_MANA) > 0)
                     {
                         _targetGUIDs.push_back(player->GetGUID());
                     }
@@ -262,7 +262,7 @@ struct npc_obsidian_eradicator : public ScriptedAI
                 }
             }
 
-            if (me->GetPowerPct(POWER_MANA) >= 100.f)
+            if (me->GetPowerPct(POWER_TYPE_MANA) >= 100.f)
             {
                 DoCastAOE(SPELL_SHOCK_BLAST);
             }
@@ -357,7 +357,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        me->SetPower(POWER_MANA, 0);
+        me->SetPower(POWER_TYPE_MANA, 0);
         _targetGUIDs.clear();
     }
 
@@ -369,7 +369,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
             {
                 me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
+                    if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_TYPE_MANA) > 0)
                     {
                         _targetGUIDs.push_back(player->GetGUID());
                     }
@@ -386,7 +386,7 @@ struct npc_obsidian_nullifier : public ScriptedAI
                 }
             }
 
-            if (me->GetPowerPct(POWER_MANA) >= 100.f)
+            if (me->GetPowerPct(POWER_TYPE_MANA) >= 100.f)
             {
                 DoCastAOE(SPELL_NULLIFY);
             }

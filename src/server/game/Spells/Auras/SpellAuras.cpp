@@ -814,7 +814,7 @@ void Aura::Update(uint32 diff, Unit* caster)
                 {
                     m_timeCla += 1000 - diff;
 
-                    Powers powertype = Powers(m_spellInfo->PowerType);
+                    POWER_TYPE powertype = POWER_TYPE(m_spellInfo->PowerType);
                     if (powertype == POWER_HEALTH)
                     {
                         if (int32(caster->GetHealth()) > ManaPerSecond)
@@ -1748,7 +1748,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             else if (aurEff->GetId() == 47537)
                                 multiplier += 0.5f;
 
-                            int32 basepoints0 = int32(CalculatePct(caster->GetMaxPower(POWER_MANA), multiplier));
+                            int32 basepoints0 = int32(CalculatePct(caster->GetMaxPower(POWER_TYPE_MANA), multiplier));
                             caster->CastCustomSpell(caster, 47755, &basepoints0, nullptr, nullptr, true);
                         }
                         // effect on aura target
@@ -1760,19 +1760,19 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                             int32 triggeredSpellId = 0;
                             switch (target->GetPowerType())
                             {
-                                case POWER_MANA:
+                                case POWER_TYPE_MANA:
                                     {
-                                        int32 basepoints0 = int32(CalculatePct(target->GetMaxPower(POWER_MANA), 2));
+                                        int32 basepoints0 = int32(CalculatePct(target->GetMaxPower(POWER_TYPE_MANA), 2));
                                         caster->CastCustomSpell(target, 63654, &basepoints0, nullptr, nullptr, true);
                                         break;
                                     }
-                                case POWER_RAGE:
+                                case POWER_TYPE_RAGE:
                                     triggeredSpellId = 63653;
                                     break;
-                                case POWER_ENERGY:
+                                case POWER_TYPE_ENERGY:
                                     triggeredSpellId = (!target->HasAura(70405) ? 63655 : 0);
                                     break;
-                                case POWER_RUNIC_POWER:
+                                case POWER_TYPE_RUNIC_POWER:
                                     triggeredSpellId = 63652;
                                     break;
                                 default:

@@ -1673,14 +1673,14 @@ namespace Acore
     class PowerCheck
     {
     public:
-        explicit PowerCheck(Powers const power, bool equals) : _power(power), _equals(equals) { }
+        explicit PowerCheck(POWER_TYPE const power, bool equals) : _power(power), _equals(equals) { }
         bool operator()(WorldObject const* object) const
         {
             return object->ToUnit() && (object->ToUnit()->GetPowerType() == _power) == _equals;
         }
 
     private:
-        Powers const _power;
+        POWER_TYPE const _power;
         bool const _equals;
     };
 

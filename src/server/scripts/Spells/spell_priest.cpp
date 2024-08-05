@@ -322,14 +322,14 @@ class spell_pri_hymn_of_hope : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
+        targets.remove_if(Acore::PowerCheck(POWER_TYPE_MANA, false));
         targets.remove_if(Acore::RaidCheck(GetCaster(), false));
 
         uint32 const maxTargets = 3;
 
         if (targets.size() > maxTargets)
         {
-            targets.sort(Acore::PowerPctOrderPred(POWER_MANA));
+            targets.sort(Acore::PowerPctOrderPred(POWER_TYPE_MANA));
             targets.resize(maxTargets);
         }
     }

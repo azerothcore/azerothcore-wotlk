@@ -66,7 +66,7 @@ public:
     void UpdateResistances(uint32 /*school*/) override {}
     void UpdateArmor() override {}
     void UpdateMaxHealth() override {}
-    void UpdateMaxPower(Powers /*power*/) override {}
+    void UpdateMaxPower(POWER_TYPE /*power*/) override {}
     void UpdateAttackPowerAndDamage(bool /*ranged*/) override {}
     void UpdateDamagePhysical(WeaponAttackType /*attType*/) override {}
 

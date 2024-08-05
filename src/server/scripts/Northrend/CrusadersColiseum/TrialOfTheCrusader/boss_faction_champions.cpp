@@ -198,7 +198,7 @@ struct boss_faction_championsAI : public ScriptedAI
         for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
         {
             target = ObjectAccessor::GetUnit((*me), (*iter)->getUnitGuid());
-            if( target && target->GetPowerType() == POWER_MANA && (!casting || target->HasUnitState(UNIT_STATE_CASTING)) && me->GetExactDist(target) <= range )
+            if( target && target->GetPowerType() == POWER_TYPE_MANA && (!casting || target->HasUnitState(UNIT_STATE_CASTING)) && me->GetExactDist(target) <= range )
                 return target;
         }
         return nullptr;
@@ -217,21 +217,21 @@ struct boss_faction_championsAI : public ScriptedAI
         else
             threatTimer -= diff;
 
-        if( me->GetPowerType() == POWER_MANA )
+        if( me->GetPowerType() == POWER_TYPE_MANA )
         {
             if( powerTimer <= diff )
             {
-                me->ModifyPower(POWER_MANA, me->GetMaxPower(POWER_MANA) / 3);
+                me->ModifyPower(POWER_TYPE_MANA, me->GetMaxPower(POWER_TYPE_MANA) / 3);
                 powerTimer = 4000;
             }
             else
                 powerTimer -= diff;
         }
-        else if( me->GetPowerType() == POWER_ENERGY )
+        else if( me->GetPowerType() == POWER_TYPE_ENERGY )
         {
             if( powerTimer <= diff )
             {
-                me->ModifyPower(POWER_ENERGY, me->GetMaxPower(POWER_ENERGY) / 3);
+                me->ModifyPower(POWER_TYPE_ENERGY, me->GetMaxPower(POWER_TYPE_ENERGY) / 3);
                 powerTimer = 1000;
             }
             else
@@ -1879,7 +1879,7 @@ public:
         npc_toc_rogueAI(Creature* pCreature) : boss_faction_championsAI(pCreature, AI_MELEE)
         {
             SetEquipmentSlots(false, 47422, 49982, EQUIP_NO_CHANGE);
-            me->setPowerType(POWER_ENERGY);
+            me->setPowerType(POWER_TYPE_ENERGY);
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_FAN_OF_KNIVES, 10s);
             events.RescheduleEvent(EVENT_SPELL_BLIND, 10s, 15s);

@@ -459,7 +459,7 @@ void ScriptMgr::OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, It
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_STORE_OR_EQUIP_NEW_ITEM, script->OnAfterStoreOrEquipNewItem(player, vendorslot, item, count, bag, slot, pProto, pVendor, crItem, bStore));
 }
 
-void ScriptMgr::OnAfterUpdateMaxPower(Player* player, Powers& power, float& value)
+void ScriptMgr::OnAfterUpdateMaxPower(Player* player, POWER_TYPE& power, float& value)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_UPDATE_MAX_POWER, script->OnAfterUpdateMaxPower(player, power, value));
 }
@@ -594,7 +594,7 @@ void ScriptMgr::OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, 
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_MAX_SKILL_VALUE, script->OnGetMaxSkillValue(player, skill, result, IsPure));
 }
 
-bool ScriptMgr::OnPlayerHasActivePowerType(Player const* player, Powers power)
+bool ScriptMgr::OnPlayerHasActivePowerType(Player const* player, POWER_TYPE power)
 {
     CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(PlayerScript, PLAYERHOOK_ON_PLAYER_HAS_ACTIVE_POWER_TYPE, script->OnPlayerHasActivePowerType(player, power));
 }

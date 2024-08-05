@@ -98,7 +98,7 @@ struct boss_selin_fireheart : public ScriptedAI
         SpawnCrystals();
         instance->SetBossState(DATA_SELIN_FIREHEART, NOT_STARTED);
         CrystalGUID.Clear();
-        me->SetPower(POWER_MANA, 0);
+        me->SetPower(POWER_TYPE_MANA, 0);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -185,7 +185,7 @@ struct boss_selin_fireheart : public ScriptedAI
             events.ScheduleEvent(EVENT_SPELL_DRAIN_LIFE, 10000, 1);
             return;
         case EVENT_SPELL_DRAIN_MANA:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_TYPE_MANA, 40.0f, false)))
                 me->CastSpell(target, SPELL_DRAIN_MANA, false);
             events.ScheduleEvent(EVENT_SPELL_DRAIN_MANA, 10000, 1);
             return;
@@ -201,7 +201,7 @@ struct boss_selin_fireheart : public ScriptedAI
             SelectNearestCrystal();
             break;
         case EVENT_EMPOWER:
-            if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
+            if (me->GetPower(POWER_TYPE_MANA) == me->GetMaxPower(POWER_TYPE_MANA))
             {
                 Talk(SAY_EMPOWERED);
                 if (Unit* crystal = ObjectAccessor::GetUnit(*me, CrystalGUID))

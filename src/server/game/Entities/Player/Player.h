@@ -1184,7 +1184,7 @@ public:
 
     void InitStatsForLevel(bool reapplyMods = false);
 
-    [[nodiscard]] bool HasActivePowerType(Powers power) override;
+    [[nodiscard]] bool HasActivePowerType(POWER_TYPE power) override;
 
     // .cheat command related
     [[nodiscard]] bool GetCommandStatus(uint32 command) const { return _activeCheats & command; }
@@ -1597,7 +1597,7 @@ public:
     void ResetPetTalents();
     void CalcRage(uint32 damage, bool attacker);
     void RegenerateAll();
-    void Regenerate(Powers power);
+    void Regenerate(POWER_TYPE power);
     void RegenerateHealth();
     void setRegenTimerCount(uint32 time) {m_regenTimerCount = time;}
     void setWeaponChangeTimer(uint32 time) {m_weaponChangeTimer = time;}
@@ -1935,7 +1935,7 @@ public:
     void UpdateResistances(uint32 school) override;
     void UpdateArmor() override;
     void UpdateMaxHealth() override;
-    void UpdateMaxPower(Powers power) override;
+    void UpdateMaxPower(POWER_TYPE power) override;
     void ApplyFeralAPBonus(int32 amount, bool apply);
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void UpdateShieldBlockValue();
@@ -2148,9 +2148,9 @@ public:
 
     // duel health and mana reset methods
     void SaveHealthBeforeDuel()     { healthBeforeDuel = GetHealth(); }
-    void SaveManaBeforeDuel()       { manaBeforeDuel = GetPower(POWER_MANA); }
+    void SaveManaBeforeDuel()       { manaBeforeDuel = GetPower(POWER_TYPE_MANA); }
     void RestoreHealthAfterDuel()   { SetHealth(healthBeforeDuel); }
-    void RestoreManaAfterDuel()     { SetPower(POWER_MANA, manaBeforeDuel); }
+    void RestoreManaAfterDuel()     { SetPower(POWER_TYPE_MANA, manaBeforeDuel); }
 
     //End of PvP System
 
@@ -2644,7 +2644,7 @@ public:
     uint32 m_AreaID;
     uint32 m_regenTimerCount;
     uint32 m_foodEmoteTimerCount;
-    float m_powerFraction[MAX_POWERS];
+    float m_powerFraction[NUM_POWER_TYPES];
     uint32 m_contestedPvPTimer;
 
     /*********************************************************/

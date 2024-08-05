@@ -103,7 +103,7 @@ struct boss_harbinger_skyriss : public BossAI
         {
             scheduler.Schedule(25s, [this](TaskContext context)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_TYPE_MANA, 40.0f, false)))
                 {
                     DoCast(target, SPELL_MANA_BURN);
                 }

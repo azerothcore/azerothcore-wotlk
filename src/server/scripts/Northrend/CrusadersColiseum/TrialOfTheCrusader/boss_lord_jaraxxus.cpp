@@ -489,7 +489,7 @@ public:
         {
             // get a list of players with mana
             targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
+            targets.remove_if(Acore::PowerCheck(POWER_TYPE_MANA, false));
             if (targets.empty())
                 return;
 

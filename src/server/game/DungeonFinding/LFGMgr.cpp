@@ -1055,9 +1055,9 @@ namespace lfg
                     rangedAP = p->GetTotalAttackPowerValue(RANGED_ATTACK);
                     maxPower = 0;
                     if (p->IsClass(CLASS_DRUID))
-                        maxPower = p->GetMaxPower(POWER_MANA);
+                        maxPower = p->GetMaxPower(POWER_TYPE_MANA);
                     else
-                        maxPower = (p->GetPowerType() == POWER_RAGE || p->GetPowerType() == POWER_RUNIC_POWER) ? p->GetMaxPower(p->GetPowerType()) / 10 : p->GetMaxPower(p->GetPowerType());
+                        maxPower = (p->GetPowerType() == POWER_TYPE_RAGE || p->GetPowerType() == POWER_TYPE_RUNIC_POWER) ? p->GetMaxPower(p->GetPowerType()) / 10 : p->GetMaxPower(p->GetPowerType());
 
                     currInternalInfoMap[sitr->first] = RBInternalInfo(guid, sitr->second.comment, !groupGuid.IsEmpty(), groupGuid, sitr->second.roles, encounterMask, instanceGuid,
                                                        1, p->GetLevel(), p->getClass(), p->getRace(), p->GetAverageItemLevel(),

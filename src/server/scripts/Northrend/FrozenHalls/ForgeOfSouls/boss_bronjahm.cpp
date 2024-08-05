@@ -270,14 +270,14 @@ class spell_bronjahm_magic_bane : public SpellScript
 
     void RecalculateDamage()
     {
-        if (GetHitUnit()->GetPowerType() != POWER_MANA)
+        if (GetHitUnit()->GetPowerType() != POWER_TYPE_MANA)
             return;
 
         if (Unit* caster = GetCaster())
         {
             const int32 maxDamage = caster->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
             int32 newDamage = GetHitDamage();
-            newDamage += GetHitUnit()->GetMaxPower(POWER_MANA) / 2;
+            newDamage += GetHitUnit()->GetMaxPower(POWER_TYPE_MANA) / 2;
             newDamage = std::min<int32>(maxDamage, newDamage);
 
             SetHitDamage(newDamage);

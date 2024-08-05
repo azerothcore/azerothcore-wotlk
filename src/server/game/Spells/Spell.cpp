@@ -3933,7 +3933,7 @@ void Spell::_cast(bool skipCheck)
 
     if (!HasTriggeredCastFlag(TRIGGERED_IGNORE_POWER_AND_REAGENT_COST))
     {
-        // Powers have to be taken before SendSpellGo
+        // POWER_TYPE have to be taken before SendSpellGo
         TakePower();
         TakeReagents();                                         // we must remove reagents before HandleEffects to allow place crafted item in same slot
     }
@@ -4720,7 +4720,7 @@ void Spell::SendSpellStart()
         {
             case POWER_HEALTH:
                 break;
-            case POWER_RUNE:
+            case POWER_TYPE_RUNE:
                 castFlags |= CAST_FLAG_POWER_LEFT_SELF;
                 break;
             default:
@@ -4732,7 +4732,7 @@ void Spell::SendSpellStart()
         }
     }
 
-    if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_RUNE)
+    if (m_spellInfo->RuneCostID && m_spellInfo->PowerType == POWER_TYPE_RUNE)
         castFlags |= CAST_FLAG_NO_GCD; // not needed, but Blizzard sends it
 
     SmartGUID realCasterGUID = m_caster->GetPackGUID();
@@ -4762,7 +4762,7 @@ void Spell::SendSpellStart()
     m_targets.Write(data);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
-        data << uint32(m_caster->GetPower((Powers)m_spellInfo->PowerType));
+        data << uint32(m_caster->GetPower((POWER_TYPE)m_spellInfo->PowerType));
 
     if (castFlags & CAST_FLAG_PROJECTILE)
         WriteAmmoToPacket(&data);
@@ -4803,7 +4803,7 @@ void Spell::SendSpellGo()
         {
             case POWER_HEALTH:
                 break;
-            case POWER_RUNE:
+            case POWER_TYPE_RUNE:
                 castFlags |= CAST_FLAG_POWER_LEFT_SELF;
                 break;
             default:
@@ -4818,7 +4818,7 @@ void Spell::SendSpellGo()
     if ((m_caster->GetTypeId() == TYPEID_PLAYER)
             && (m_caster->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
             && m_spellInfo->RuneCostID
-            && m_spellInfo->PowerType == POWER_RUNE)
+            && m_spellInfo->PowerType == POWER_TYPE_RUNE)
     {
         castFlags |= CAST_FLAG_NO_GCD;                       // not needed, but Blizzard sends it
         castFlags |= CAST_FLAG_RUNE_LIST;                    // rune cooldowns list
@@ -4863,7 +4863,7 @@ void Spell::SendSpellGo()
     m_targets.Write(data);
 
     if (castFlags & CAST_FLAG_POWER_LEFT_SELF)
-        data << uint32(m_caster->GetPower((Powers)m_spellInfo->PowerType));
+        data << uint32(m_caster->GetPower((POWER_TYPE)m_spellInfo->PowerType));
 
     if (castFlags & CAST_FLAG_RUNE_LIST)                   // rune cooldowns list
     {
@@ -5307,11 +5307,11 @@ void Spell::TakePower()
         if (m_caster->ToPlayer()->GetCommandStatus(CHEAT_POWER))
             return;
 
-    Powers PowerType = Powers(m_spellInfo->PowerType);
+    POWER_TYPE PowerType = POWER_TYPE(m_spellInfo->PowerType);
     bool hit = true;
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
     {
-        if (PowerType == POWER_RAGE || PowerType == POWER_ENERGY || PowerType == POWER_RUNE || PowerType == POWER_RUNIC_POWER)
+        if (PowerType == POWER_TYPE_RAGE || PowerType == POWER_TYPE_ENERGY || PowerType == POWER_TYPE_RUNE || PowerType == POWER_TYPE_RUNIC_POWER)
             if (WOWGUID targetGUID = m_targets.GetUnitTargetGUID())
                 for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
                     if (ihit->targetGUID == targetGUID)
@@ -5327,7 +5327,7 @@ void Spell::TakePower()
                     }
     }
 
-    if (PowerType == POWER_RUNE)
+    if (PowerType == POWER_TYPE_RUNE)
     {
         TakeRunePower(hit);
         return;
@@ -5343,7 +5343,7 @@ void Spell::TakePower()
         return;
     }
 
-    if (PowerType >= MAX_POWERS)
+    if (PowerType >= NUM_POWER_TYPES)
     {
         LOG_ERROR("spells", "Spell::TakePower: Unknown power type '{}'", PowerType);
         return;
@@ -5355,7 +5355,7 @@ void Spell::TakePower()
         m_caster->ModifyPower(PowerType, -irand(0, m_powerCost / 4));
 
     // Set the five second timer
-    if (PowerType == POWER_MANA && m_powerCost > 0)
+    if (PowerType == POWER_TYPE_MANA && m_powerCost > 0)
     {
         m_caster->SetLastManaUse(GameTime::GetGameTimeMS().count());
     }
@@ -5392,7 +5392,7 @@ void Spell::TakeAmmo()
 
 SpellCastResult Spell::CheckRuneCost(uint32 RuneCostID)
 {
-    if (m_spellInfo->PowerType != POWER_RUNE || !RuneCostID)
+    if (m_spellInfo->PowerType != POWER_TYPE_RUNE || !RuneCostID)
         return SPELL_CAST_OK;
 
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -5510,7 +5510,7 @@ void Spell::TakeRunePower(bool didHit)
     // you can gain some runic power when use runes
     if (didHit)
         if (int32 rp = int32(runeCostData->runePowerGain * sWorld->getRate(RATE_POWER_RUNICPOWER_INCOME)))
-            player->ModifyPower(POWER_RUNIC_POWER, int32(rp));
+            player->ModifyPower(POWER_TYPE_RUNIC_POWER, int32(rp));
 }
 
 void Spell::TakeReagents()
@@ -6190,7 +6190,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     // Can be area effect, Check only for players and not check if target - caster (spell can have multiply drain/burn effects)
                     if (m_caster->GetTypeId() == TYPEID_PLAYER)
                         if (Unit* target = m_targets.GetUnitTarget())
-                            if (target != m_caster && !target->HasActivePowerType(Powers(m_spellInfo->Effects[i].MiscValue)))
+                            if (target != m_caster && !target->HasActivePowerType(POWER_TYPE(m_spellInfo->Effects[i].MiscValue)))
                                 return SPELL_FAILED_BAD_TARGETS;
                     break;
                 }
@@ -6719,7 +6719,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!m_targets.GetUnitTarget())
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
-                    if (!m_targets.GetUnitTarget()->HasActivePowerType(POWER_MANA))
+                    if (!m_targets.GetUnitTarget()->HasActivePowerType(POWER_TYPE_MANA))
                         return SPELL_FAILED_BAD_TARGETS;
 
                     break;
@@ -7138,14 +7138,14 @@ SpellCastResult Spell::CheckPower()
         return SPELL_CAST_OK;
     }
     // Check valid power type
-    if (m_spellInfo->PowerType >= MAX_POWERS)
+    if (m_spellInfo->PowerType >= NUM_POWER_TYPES)
     {
         LOG_ERROR("spells", "Spell::CheckPower: Unknown power type '{}'", m_spellInfo->PowerType);
         return SPELL_FAILED_UNKNOWN;
     }
 
-    //check rune cost only if a spell has PowerType == POWER_RUNE
-    if (m_spellInfo->PowerType == POWER_RUNE)
+    //check rune cost only if a spell has PowerType == POWER_TYPE_RUNE
+    if (m_spellInfo->PowerType == POWER_TYPE_RUNE)
     {
         SpellCastResult failReason = CheckRuneCost(m_spellInfo->RuneCostID);
         if (failReason != SPELL_CAST_OK)
@@ -7153,7 +7153,7 @@ SpellCastResult Spell::CheckPower()
     }
 
     // Check power amount
-    Powers PowerType = Powers(m_spellInfo->PowerType);
+    POWER_TYPE PowerType = POWER_TYPE(m_spellInfo->PowerType);
     if (int32(m_caster->GetPower(PowerType)) < m_powerCost)
         return SPELL_FAILED_NO_POWER;
     else
@@ -7222,13 +7222,13 @@ SpellCastResult Spell::CheckItems()
                 // Mana Potion, Rage Potion, Thistle Tea(Rogue), ...
                 if (m_spellInfo->Effects[i].Effect == SPELL_EFFECT_ENERGIZE)
                 {
-                    if (m_spellInfo->Effects[i].MiscValue < 0 || m_spellInfo->Effects[i].MiscValue >= int8(MAX_POWERS))
+                    if (m_spellInfo->Effects[i].MiscValue < 0 || m_spellInfo->Effects[i].MiscValue >= int8(NUM_POWER_TYPES))
                     {
                         failReason = SPELL_FAILED_ALREADY_AT_FULL_POWER;
                         continue;
                     }
 
-                    Powers power = Powers(m_spellInfo->Effects[i].MiscValue);
+                    POWER_TYPE power = POWER_TYPE(m_spellInfo->Effects[i].MiscValue);
                     if (m_targets.GetUnitTarget()->GetPower(power) == m_targets.GetUnitTarget()->GetMaxPower(power))
                     {
                         failReason = SPELL_FAILED_ALREADY_AT_FULL_POWER;

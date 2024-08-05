@@ -65,7 +65,7 @@ struct boss_moam : public BossAI
     void Reset() override
     {
         _Reset();
-        me->SetPower(POWER_MANA, 0);
+        me->SetPower(POWER_TYPE_MANA, 0);
         me->SetRegeneratingPower(false);
     }
 
@@ -99,7 +99,7 @@ struct boss_moam : public BossAI
 
         events.Update(diff);
 
-        if (me->GetPower(POWER_MANA) == me->GetMaxPower(POWER_MANA))
+        if (me->GetPower(POWER_TYPE_MANA) == me->GetMaxPower(POWER_TYPE_MANA))
         {
             if (me->HasAura(SPELL_ENERGIZE))
             {
@@ -153,7 +153,7 @@ class spell_moam_mana_drain_filter : public SpellScript
     {
         targets.remove_if([&](WorldObject* target) -> bool
         {
-            return !target->IsPlayer() || target->ToPlayer()->GetPowerType() != POWER_MANA;
+            return !target->IsPlayer() || target->ToPlayer()->GetPowerType() != POWER_TYPE_MANA;
         });
 
         if (!targets.empty())

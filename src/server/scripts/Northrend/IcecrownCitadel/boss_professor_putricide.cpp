@@ -1552,9 +1552,9 @@ public:
             summon->SetCreatorGUID(caster->GetGUID());
             putricide->AI()->JustSummoned(summon);
 
-            summon->setPowerType(POWER_ENERGY);
-            summon->SetMaxPower(POWER_ENERGY, 100);
-            summon->SetPower(POWER_ENERGY, 0);
+            summon->setPowerType(POWER_TYPE_ENERGY);
+            summon->SetMaxPower(POWER_TYPE_ENERGY, 100);
+            summon->SetPower(POWER_TYPE_ENERGY, 0);
             summon->SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER, 0);
             summon->SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 0);
         }

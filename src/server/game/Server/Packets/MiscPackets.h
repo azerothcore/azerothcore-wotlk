@@ -50,7 +50,7 @@ namespace WorldPackets
 
             uint32 Level = 0;
             uint32 HealthDelta = 0;
-            std::array<uint32, MAX_POWERS> PowerDelta = { };
+            std::array<uint32, NUM_POWER_TYPES> PowerDelta = { };
             std::array<uint32, MAX_STATS> StatDelta = { };
         };
 

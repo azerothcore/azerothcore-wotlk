@@ -475,7 +475,7 @@ struct npc_hyjal_ground_trash : public ScriptedAI
         {
             scheduler.Schedule(3s, 6s, [this](TaskContext context)
                 {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, Powers(POWER_MANA), 30.f, true)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_TYPE(POWER_TYPE_MANA), 30.f, true)))
                         DoCast(target, SPELL_MANA_BURN);
                     context.Repeat(6s, 9s);
                 });

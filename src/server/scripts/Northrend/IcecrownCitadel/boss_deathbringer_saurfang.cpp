@@ -260,7 +260,7 @@ public:
             _frenzied = false;
             _fallenChampionCastCount = 0;
             _transportCheckTimer = 1000;
-            me->SetPower(POWER_ENERGY, 0);
+            me->SetPower(POWER_TYPE_ENERGY, 0);
             DoCast(me, SPELL_ZERO_POWER, true);
             DoCast(me, SPELL_BLOOD_LINK, true);
             DoCast(me, SPELL_BLOOD_POWER, true);
@@ -471,7 +471,7 @@ public:
                     {
                         ++_fallenChampionCastCount;
                         me->CastSpell(target, SPELL_MARK_OF_THE_FALLEN_CHAMPION, false);
-                        me->SetPower(POWER_ENERGY, 0);
+                        me->SetPower(POWER_TYPE_ENERGY, 0);
                         if (Aura* bloodPower = me->GetAura(SPELL_BLOOD_POWER))
                             bloodPower->RecalculateAmountOfEffects();
                     }
@@ -1054,7 +1054,7 @@ public:
         void HandlePeriodicTick(AuraEffect const* /*aurEff*/)
         {
             PreventDefaultAction();
-            if (GetUnitOwner()->GetPowerType() == POWER_ENERGY && GetUnitOwner()->GetPower(POWER_ENERGY) == GetUnitOwner()->GetMaxPower(POWER_ENERGY))
+            if (GetUnitOwner()->GetPowerType() == POWER_TYPE_ENERGY && GetUnitOwner()->GetPower(POWER_TYPE_ENERGY) == GetUnitOwner()->GetMaxPower(POWER_TYPE_ENERGY))
                 if (Creature* saurfang = GetUnitOwner()->ToCreature())
                     saurfang->AI()->DoAction(ACTION_MARK_OF_THE_FALLEN_CHAMPION);
         }
@@ -1208,7 +1208,7 @@ public:
 
         void RecalculateHook(AuraEffect const* /*aurEffect*/, int32& amount, bool& canBeRecalculated)
         {
-            amount = int32(GetUnitOwner()->GetPower(POWER_ENERGY));
+            amount = int32(GetUnitOwner()->GetPower(POWER_TYPE_ENERGY));
             canBeRecalculated = true;
         }
 
@@ -1220,7 +1220,7 @@ public:
 
         bool Load() override
         {
-            if (GetUnitOwner()->GetPowerType() != POWER_ENERGY)
+            if (GetUnitOwner()->GetPowerType() != POWER_TYPE_ENERGY)
                 return false;
             return true;
         }

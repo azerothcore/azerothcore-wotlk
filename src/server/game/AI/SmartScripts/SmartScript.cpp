@@ -654,7 +654,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                             break;
 
                     // If target does not use mana, skip
-                    if ((e.action.cast.castFlags & SMARTCAST_TARGET_POWER_MANA) && !target->ToUnit()->GetPower(POWER_MANA))
+                    if ((e.action.cast.castFlags & SMARTCAST_TARGET_POWER_MANA) && !target->ToUnit()->GetPower(POWER_TYPE_MANA))
                         continue;
 
                     // Interrupts current spellcast
@@ -672,7 +672,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     bool isRangedAttack = spellMaxRange > NOMINAL_MELEE_RANGE;
                     bool isTargetRooted = target->ToUnit()->HasUnitState(UNIT_STATE_ROOT);
                     // To prevent running back and forth when OOM, we must have more than 10% mana.
-                    bool canCastSpell = me->GetPowerPct(POWER_MANA) > 10.0f && spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) < (int32)me->GetPower(POWER_MANA) && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
+                    bool canCastSpell = me->GetPowerPct(POWER_TYPE_MANA) > 10.0f && spellInfo->CalcPowerCost(me, spellInfo->GetSchoolMask()) < (int32)me->GetPower(POWER_TYPE_MANA) && !me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED);
                     bool isSpellIgnoreLOS = spellInfo->HasAttribute(SPELL_ATTR2_IGNORE_LINE_OF_SIGHT);
 
                     // If target is rooted we move out of melee range before casting, but not further than spell max range.
@@ -2417,21 +2417,21 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetPower(Powers(e.action.power.powerType), e.action.power.newPower);
+                    target->ToUnit()->SetPower(POWER_TYPE(e.action.power.powerType), e.action.power.newPower);
             break;
         }
         case SMART_ACTION_ADD_POWER:
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetPower(Powers(e.action.power.powerType), target->ToUnit()->GetPower(Powers(e.action.power.powerType)) + e.action.power.newPower);
+                    target->ToUnit()->SetPower(POWER_TYPE(e.action.power.powerType), target->ToUnit()->GetPower(POWER_TYPE(e.action.power.powerType)) + e.action.power.newPower);
             break;
         }
         case SMART_ACTION_REMOVE_POWER:
         {
             for (WorldObject* target : targets)
                 if (IsUnit(target))
-                    target->ToUnit()->SetPower(Powers(e.action.power.powerType), target->ToUnit()->GetPower(Powers(e.action.power.powerType)) - e.action.power.newPower);
+                    target->ToUnit()->SetPower(POWER_TYPE(e.action.power.powerType), target->ToUnit()->GetPower(POWER_TYPE(e.action.power.powerType)) - e.action.power.newPower);
             break;
         }
         case SMART_ACTION_GAME_EVENT_STOP:
@@ -2674,7 +2674,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                         bool _allowMove = false;
                         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(e.action.castCustom.spell); // AssertSpellInfo?
-                        int32 mana = me->GetPower(POWER_MANA);
+                        int32 mana = me->GetPower(POWER_TYPE_MANA);
 
                         if (me->GetDistance(target->ToUnit()) > spellInfo->GetMaxRange(true) ||
                             me->GetDistance(target->ToUnit()) < spellInfo->GetMinRange(true) ||
@@ -3344,7 +3344,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             {
                 if (e.target.hostileRandom.powerType)
                 {
-                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MaxThreat, 1, PowerUsersSelector(me, Powers(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
+                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MaxThreat, 1, PowerUsersSelector(me, POWER_TYPE(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
                         targets.push_back(u);
                 }
                 else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MaxThreat, 1, (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly, true, -e.target.hostileRandom.aura))
@@ -3356,7 +3356,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             {
                 if (e.target.hostileRandom.powerType)
                 {
-                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinThreat, 0, PowerUsersSelector(me, Powers(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
+                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinThreat, 0, PowerUsersSelector(me, POWER_TYPE(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
                         targets.push_back(u);
                 }
                 else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::MinThreat, 0, (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly, true, -e.target.hostileRandom.aura))
@@ -3368,7 +3368,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             {
                 if (e.target.hostileRandom.powerType)
                 {
-                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, Powers(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
+                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_TYPE(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
                         targets.push_back(u);
                 }
                 else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 0, (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly, true, -e.target.hostileRandom.aura))
@@ -3380,7 +3380,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             {
                 if (e.target.hostileRandom.powerType)
                 {
-                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 1, PowerUsersSelector(me, Powers(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
+                    if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 1, PowerUsersSelector(me, POWER_TYPE(e.target.hostileRandom.powerType - 1), (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly)))
                         targets.push_back(u);
                 }
                 else if (Unit* u = me->AI()->SelectTarget(SelectTargetMethod::Random, 1, (float)e.target.hostileRandom.maxDist, e.target.hostileRandom.playerOnly, true, -e.target.hostileRandom.aura))
@@ -3949,9 +3949,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_MANA_PCT:
             {
-                if (!me || !me->IsEngaged() || !me->GetMaxPower(POWER_MANA))
+                if (!me || !me->IsEngaged() || !me->GetMaxPower(POWER_TYPE_MANA))
                     return;
-                uint32 perc = uint32(me->GetPowerPct(POWER_MANA));
+                uint32 perc = uint32(me->GetPowerPct(POWER_TYPE_MANA));
                 if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
                     return;
                 ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
@@ -3959,9 +3959,9 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
             }
         case SMART_EVENT_TARGET_MANA_PCT:
             {
-                if (!me || !me->IsEngaged() || !me->GetVictim() || !me->GetVictim()->GetMaxPower(POWER_MANA))
+                if (!me || !me->IsEngaged() || !me->GetVictim() || !me->GetVictim()->GetMaxPower(POWER_TYPE_MANA))
                     return;
-                uint32 perc = uint32(me->GetVictim()->GetPowerPct(POWER_MANA));
+                uint32 perc = uint32(me->GetVictim()->GetPowerPct(POWER_TYPE_MANA));
                 if (perc > e.event.minMaxRepeat.max || perc < e.event.minMaxRepeat.min)
                     return;
                 ProcessTimedAction(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax, me->GetVictim());

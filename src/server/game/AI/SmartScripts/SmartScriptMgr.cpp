@@ -1667,7 +1667,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_POWER:
         case SMART_ACTION_ADD_POWER:
         case SMART_ACTION_REMOVE_POWER:
-            if (e.action.power.powerType > MAX_POWERS)
+            if (e.action.power.powerType > NUM_POWER_TYPES)
             {
                 LOG_ERROR("scripts.ai.sai", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} uses non-existent Power {}, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.action.power.powerType);
                 return false;

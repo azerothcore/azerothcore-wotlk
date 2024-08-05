@@ -103,7 +103,7 @@ public:
     bool UpdateAllStats() override;
     void UpdateArmor() override;
     void UpdateMaxHealth() override;
-    void UpdateMaxPower(Powers power) override;
+    void UpdateMaxPower(POWER_TYPE power) override;
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void UpdateDamagePhysical(WeaponAttackType attType) override;
 

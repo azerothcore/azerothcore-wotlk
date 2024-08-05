@@ -382,7 +382,7 @@ Player::Player(class User* user): Unit(true), m_mover(this)
 
     m_ChampioningFaction = 0;
 
-    for (uint8 i = 0; i < MAX_POWERS; ++i)
+    for (uint8 i = 0; i < NUM_POWER_TYPES; ++i)
         m_powerFraction[i] = 0;
 
     isDebugAreaTriggers = false;
@@ -613,18 +613,18 @@ bool Player::Create(WOWGUID::LowType guidlow, CharacterCreateInfo* createInfo)
     InitPrimaryProfessions();                               // to max set before any spell added
 
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
-    if (HasActivePowerType(POWER_MANA))
+    if (HasActivePowerType(POWER_TYPE_MANA))
     {
-        UpdateMaxPower(POWER_MANA);                         // Update max Mana (for add bonus from intellect)
-        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+        UpdateMaxPower(POWER_TYPE_MANA);                         // Update max Mana (for add bonus from intellect)
+        SetPower(POWER_TYPE_MANA, GetMaxPower(POWER_TYPE_MANA));
     }
 
-    if (HasActivePowerType(POWER_RUNIC_POWER))
+    if (HasActivePowerType(POWER_TYPE_RUNIC_POWER))
     {
-        SetPower(POWER_RUNE, 8);
-        SetMaxPower(POWER_RUNE, 8);
-        SetPower(POWER_RUNIC_POWER, 0);
-        SetMaxPower(POWER_RUNIC_POWER, 1000);
+        SetPower(POWER_TYPE_RUNE, 8);
+        SetMaxPower(POWER_TYPE_RUNE, 8);
+        SetPower(POWER_TYPE_RUNIC_POWER, 0);
+        SetMaxPower(POWER_TYPE_RUNIC_POWER, 1000);
     }
 
     // original spells
@@ -1660,13 +1660,13 @@ void Player::ProcessDelayedOperations()
         else
             SetFullHealth();
 
-        if (GetMaxPower(POWER_MANA) > m_resurrectMana)
-            SetPower(POWER_MANA, m_resurrectMana);
+        if (GetMaxPower(POWER_TYPE_MANA) > m_resurrectMana)
+            SetPower(POWER_TYPE_MANA, m_resurrectMana);
         else
-            SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+            SetPower(POWER_TYPE_MANA, GetMaxPower(POWER_TYPE_MANA));
 
-        SetPower(POWER_RAGE, 0);
-        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+        SetPower(POWER_TYPE_RAGE, 0);
+        SetPower(POWER_TYPE_ENERGY, GetMaxPower(POWER_TYPE_ENERGY));
 
         SpawnCorpseBones();
     }
@@ -1794,9 +1794,9 @@ void Player::RegenerateAll()
     m_regenTimerCount += m_regenTimer;
     m_foodEmoteTimerCount += m_regenTimer;
 
-    Regenerate(POWER_ENERGY);
+    Regenerate(POWER_TYPE_ENERGY);
 
-    Regenerate(POWER_MANA);
+    Regenerate(POWER_TYPE_MANA);
 
     // Runes act as cooldowns, and they don't need to send any data
     if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
@@ -1828,9 +1828,9 @@ void Player::RegenerateAll()
             RegenerateHealth();
         }
 
-        Regenerate(POWER_RAGE);
+        Regenerate(POWER_TYPE_RAGE);
         if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
-            Regenerate(POWER_RUNIC_POWER);
+            Regenerate(POWER_TYPE_RUNIC_POWER);
 
         m_regenTimerCount -= 2000;
     }
@@ -1869,7 +1869,7 @@ void Player::RegenerateAll()
     }
 }
 
-void Player::Regenerate(Powers power)
+void Player::Regenerate(POWER_TYPE power)
 {
     uint32 maxValue = GetMaxPower(power);
     if (!maxValue)
@@ -1881,7 +1881,7 @@ void Player::Regenerate(Powers power)
         if (m_regenTimerCount >= 2000)
         {
             //Set the value to 0 first then set it to max to force resend of packet as for range clients keeps removing rage
-            if (power == POWER_RAGE || power == POWER_RUNIC_POWER)
+            if (power == POWER_TYPE_RAGE || power == POWER_TYPE_RUNIC_POWER)
             {
                 UpdateUInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power, 0);
             }
@@ -1901,7 +1901,7 @@ void Player::Regenerate(Powers power)
 
     switch (power)
     {
-        case POWER_MANA:
+        case POWER_TYPE_MANA:
             {
                 bool recentCast = IsUnderLastManaUseEffect();
                 float ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA);
@@ -1915,7 +1915,7 @@ void Player::Regenerate(Powers power)
                     addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * ManaIncreaseRate * 0.001f * m_regenTimer;
             }
             break;
-        case POWER_RAGE:                                    // Regenerate rage
+        case POWER_TYPE_RAGE:                                    // Regenerate rage
             {
                 if (!IsInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
                 {
@@ -1924,10 +1924,10 @@ void Player::Regenerate(Powers power)
                 }
             }
             break;
-        case POWER_ENERGY:                                  // Regenerate energy (rogue)
+        case POWER_TYPE_ENERGY:                                  // Regenerate energy (rogue)
             addvalue += 0.01f * m_regenTimer * sWorld->getRate(RATE_POWER_ENERGY);
             break;
-        case POWER_RUNIC_POWER:
+        case POWER_TYPE_RUNIC_POWER:
             {
                 if (!IsInCombat() && !HasAuraType(SPELL_AURA_INTERRUPT_REGEN))
                 {
@@ -1936,9 +1936,9 @@ void Player::Regenerate(Powers power)
                 }
             }
             break;
-        case POWER_RUNE:
-        case POWER_FOCUS:
-        case POWER_HAPPINESS:
+        case POWER_TYPE_RUNE:
+        case POWER_TYPE_FOCUS:
+        case POWER_TYPE_HAPPINESS:
             break;
         case POWER_HEALTH:
             return;
@@ -1947,16 +1947,16 @@ void Player::Regenerate(Powers power)
     }
 
     // Mana regen calculated in Player::UpdateManaRegen()
-    if (power != POWER_MANA)
+    if (power != POWER_TYPE_MANA)
     {
         AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
         for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-            if (Powers((*i)->GetMiscValue()) == power)
+            if (POWER_TYPE((*i)->GetMiscValue()) == power)
                 AddPct(addvalue, (*i)->GetAmount());
 
         // Butchery requires combat for this effect
-        if (power != POWER_RUNIC_POWER || IsInCombat())
-            addvalue += float(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * ((power != POWER_ENERGY) ? m_regenTimerCount : m_regenTimer)) / (5.0f * IN_MILLISECONDS);
+        if (power != POWER_TYPE_RUNIC_POWER || IsInCombat())
+            addvalue += float(GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, power) * ((power != POWER_TYPE_ENERGY) ? m_regenTimerCount : m_regenTimer)) / (5.0f * IN_MILLISECONDS);
     }
 
     if (addvalue < 0.0f)
@@ -2073,21 +2073,21 @@ void Player::RegenerateHealth()
 void Player::ResetAllPowers()
 {
     SetHealth(GetMaxHealth());
-    if (HasActivePowerType(POWER_MANA))
+    if (HasActivePowerType(POWER_TYPE_MANA))
     {
-        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+        SetPower(POWER_TYPE_MANA, GetMaxPower(POWER_TYPE_MANA));
     }
-    if (HasActivePowerType(POWER_RAGE))
+    if (HasActivePowerType(POWER_TYPE_RAGE))
     {
-        SetPower(POWER_RAGE, 0);
+        SetPower(POWER_TYPE_RAGE, 0);
     }
-    if (HasActivePowerType(POWER_ENERGY))
+    if (HasActivePowerType(POWER_TYPE_ENERGY))
     {
-        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+        SetPower(POWER_TYPE_ENERGY, GetMaxPower(POWER_TYPE_ENERGY));
     }
-    if (HasActivePowerType(POWER_RUNIC_POWER))
+    if (HasActivePowerType(POWER_TYPE_RUNIC_POWER))
     {
-        SetPower(POWER_RUNIC_POWER, 0);
+        SetPower(POWER_TYPE_RUNIC_POWER, 0);
     }
 }
 
@@ -2494,7 +2494,7 @@ void Player::GiveLevel(uint8 level)
     packet.HealthDelta = int32(classInfo.basehealth) - int32(GetCreateHealth());
 
     /// @todo find some better solution
-    // for (int i = 0; i < MAX_POWERS; ++i)
+    // for (int i = 0; i < NUM_POWER_TYPES; ++i)
     packet.PowerDelta[0] = int32(classInfo.basemana) - int32(GetCreateMana());
     packet.PowerDelta[1] = 0;
     packet.PowerDelta[2] = 0;
@@ -2538,12 +2538,12 @@ void Player::GiveLevel(uint8 level)
 
     // set current level health and mana/energy to maximum after applying all mods.
     SetFullHealth();
-    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-    SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-    if (GetPower(POWER_RAGE) > GetMaxPower(POWER_RAGE))
-        SetPower(POWER_RAGE, GetMaxPower(POWER_RAGE));
-    SetPower(POWER_FOCUS, 0);
-    SetPower(POWER_HAPPINESS, 0);
+    SetPower(POWER_TYPE_MANA, GetMaxPower(POWER_TYPE_MANA));
+    SetPower(POWER_TYPE_ENERGY, GetMaxPower(POWER_TYPE_ENERGY));
+    if (GetPower(POWER_TYPE_RAGE) > GetMaxPower(POWER_TYPE_RAGE))
+        SetPower(POWER_TYPE_RAGE, GetMaxPower(POWER_TYPE_RAGE));
+    SetPower(POWER_TYPE_FOCUS, 0);
+    SetPower(POWER_TYPE_HAPPINESS, 0);
 
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
@@ -2712,8 +2712,8 @@ void Player::InitStatsForLevel(bool reapplyMods)
     InitDataForForm(reapplyMods);
 
     // save new stats
-    for (uint8 i = POWER_MANA; i < MAX_POWERS; ++i)
-        SetMaxPower(Powers(i),  uint32(GetCreatePowers(Powers(i))));
+    for (uint8 i = POWER_TYPE_MANA; i < NUM_POWER_TYPES; ++i)
+        SetMaxPower(POWER_TYPE(i),  uint32(GetCreatePowers(POWER_TYPE(i))));
 
     SetMaxHealth(classInfo.basehealth);                     // stamina bonus will applied later
 
@@ -2751,20 +2751,20 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // set current level health and mana/energy to maximum after applying all mods.
     SetFullHealth();
-    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
-    SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
-    if (GetPower(POWER_RAGE) > GetMaxPower(POWER_RAGE))
-        SetPower(POWER_RAGE, GetMaxPower(POWER_RAGE));
-    SetPower(POWER_FOCUS, 0);
-    SetPower(POWER_HAPPINESS, 0);
-    SetPower(POWER_RUNIC_POWER, 0);
+    SetPower(POWER_TYPE_MANA, GetMaxPower(POWER_TYPE_MANA));
+    SetPower(POWER_TYPE_ENERGY, GetMaxPower(POWER_TYPE_ENERGY));
+    if (GetPower(POWER_TYPE_RAGE) > GetMaxPower(POWER_TYPE_RAGE))
+        SetPower(POWER_TYPE_RAGE, GetMaxPower(POWER_TYPE_RAGE));
+    SetPower(POWER_TYPE_FOCUS, 0);
+    SetPower(POWER_TYPE_HAPPINESS, 0);
+    SetPower(POWER_TYPE_RUNIC_POWER, 0);
 
     // update level to hunter/summon pet
     if (Pet* pet = GetPet())
         pet->SynchronizeLevelWithOwner();
 }
 
-bool Player::HasActivePowerType(Powers power)
+bool Player::HasActivePowerType(POWER_TYPE power)
 {
     if (sScriptMgr->OnPlayerHasActivePowerType(this, power))
         return true;
@@ -4456,9 +4456,9 @@ void Player::Resurrect(float restore_percent, bool applySickness)
     if (restore_percent > 0.0f)
     {
         SetHealth(uint32(GetMaxHealth()*restore_percent));
-        SetPower(POWER_MANA, uint32(GetMaxPower(POWER_MANA)*restore_percent));
-        SetPower(POWER_RAGE, 0);
-        SetPower(POWER_ENERGY, uint32(GetMaxPower(POWER_ENERGY)*restore_percent));
+        SetPower(POWER_TYPE_MANA, uint32(GetMaxPower(POWER_TYPE_MANA)*restore_percent));
+        SetPower(POWER_TYPE_RAGE, 0);
+        SetPower(POWER_TYPE_ENERGY, uint32(GetMaxPower(POWER_TYPE_ENERGY)*restore_percent));
     }
 
     // trigger update zone for alive state zone updates
@@ -8997,7 +8997,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
 
     pet->SetCreatorGUID(GetGUID());
     pet->SetFaction(GetFaction());
-    pet->setPowerType(POWER_MANA);
+    pet->setPowerType(POWER_TYPE_MANA);
     pet->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
     pet->SetUInt32Value(UNIT_FIELD_BYTES_1, 0);
     pet->InitStatsForLevel(GetLevel());
@@ -9019,7 +9019,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
         pet->SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
         pet->SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, 1000);
         pet->SetFullHealth();
-        pet->SetPower(POWER_MANA, pet->GetMaxPower(POWER_MANA));
+        pet->SetPower(POWER_TYPE_MANA, pet->GetMaxPower(POWER_TYPE_MANA));
         pet->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, uint32(GameTime::GetGameTime().count())); // cast can't be helped in this case
     }
 
@@ -10592,22 +10592,22 @@ void Player::InitDataForForm(bool reapplyMods)
         case FORM_GHOUL:
         case FORM_CAT:
             {
-                if (GetPowerType() != POWER_ENERGY)
-                    setPowerType(POWER_ENERGY);
+                if (GetPowerType() != POWER_TYPE_ENERGY)
+                    setPowerType(POWER_TYPE_ENERGY);
                 break;
             }
         case FORM_BEAR:
         case FORM_DIREBEAR:
             {
-                if (GetPowerType() != POWER_RAGE)
-                    setPowerType(POWER_RAGE);
+                if (GetPowerType() != POWER_TYPE_RAGE)
+                    setPowerType(POWER_TYPE_RAGE);
                 break;
             }
         default:                                            // 0, for example
             {
                 ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(getClass());
-                if (cEntry && cEntry->powerType < MAX_POWERS && uint32(GetPowerType()) != cEntry->powerType)
-                    setPowerType(Powers(cEntry->powerType));
+                if (cEntry && cEntry->powerType < NUM_POWER_TYPES && uint32(GetPowerType()) != cEntry->powerType)
+                    setPowerType(POWER_TYPE(cEntry->powerType));
                 break;
             }
     }
@@ -12835,14 +12835,14 @@ void Player::ResurectUsingRequestData()
     else
         SetFullHealth();
 
-    if (GetMaxPower(POWER_MANA) > m_resurrectMana)
-        SetPower(POWER_MANA, m_resurrectMana);
+    if (GetMaxPower(POWER_TYPE_MANA) > m_resurrectMana)
+        SetPower(POWER_TYPE_MANA, m_resurrectMana);
     else
-        SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+        SetPower(POWER_TYPE_MANA, GetMaxPower(POWER_TYPE_MANA));
 
-    SetPower(POWER_RAGE, 0);
+    SetPower(POWER_TYPE_RAGE, 0);
 
-    SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+    SetPower(POWER_TYPE_ENERGY, GetMaxPower(POWER_TYPE_ENERGY));
 
     SpawnCorpseBones();
 }
@@ -13371,7 +13371,7 @@ uint32 Player::GetRuneBaseCooldown(uint8 index, bool skipGrace)
     AuraEffectList const& regenAura = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraEffectList::const_iterator i = regenAura.begin(); i != regenAura.end(); ++i)
     {
-        if ((*i)->GetMiscValue() == POWER_RUNE && (*i)->GetMiscValueB() == rune)
+        if ((*i)->GetMiscValue() == POWER_TYPE_RUNE && (*i)->GetMiscValueB() == rune)
             cooldown = cooldown * (100 - (*i)->GetAmount()) / 100;
     }
 
@@ -14765,8 +14765,8 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, GetDrunkValue());
         stmt->SetData(index++, GetHealth());
 
-        for (uint32 i = 0; i < MAX_POWERS; ++i)
-            stmt->SetData(index++, GetPower(Powers(i)));
+        for (uint32 i = 0; i < NUM_POWER_TYPES; ++i)
+            stmt->SetData(index++, GetPower(POWER_TYPE(i)));
 
         stmt->SetData(index++, User()->GetLatency());
 
@@ -14905,8 +14905,8 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, GetDrunkValue());
         stmt->SetData(index++, GetHealth());
 
-        for (uint32 i = 0; i < MAX_POWERS; ++i)
-            stmt->SetData(index++, GetPower(Powers(i)));
+        for (uint32 i = 0; i < NUM_POWER_TYPES; ++i)
+            stmt->SetData(index++, GetPower(POWER_TYPE(i)));
 
         stmt->SetData(index++, User()->GetLatency());
 
@@ -15238,9 +15238,9 @@ void Player::ActivateSpec(uint8 spec)
     }
 
     // xinef: reset power
-    Powers pw = GetPowerType();
-    if (pw != POWER_MANA)
-        SetPower(POWER_MANA, 0); // Mana must be 0 even if it isn't the active power type.
+    POWER_TYPE pw = GetPowerType();
+    if (pw != POWER_TYPE_MANA)
+        SetPower(POWER_TYPE_MANA, 0); // Mana must be 0 even if it isn't the active power type.
     SetPower(pw, 0);
 
     // xinef: remove titan grip if player had it set and does not have appropriate talent

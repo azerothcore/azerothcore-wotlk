@@ -118,7 +118,7 @@ bool Player::UpdateStats(Stats stat)
             UpdateMaxHealth();
             break;
         case STAT_INTELLECT:
-            UpdateMaxPower(POWER_MANA);
+            UpdateMaxPower(POWER_TYPE_MANA);
             UpdateAllSpellCritChances();
             UpdateArmor();                                  //SPELL_AURA_MOD_RESISTANCE_OF_INTELLECT_PERCENT, only armor currently
             break;
@@ -198,8 +198,8 @@ bool Player::UpdateAllStats()
     UpdateAttackPowerAndDamage(true);
     UpdateMaxHealth();
 
-    for (uint8 i = POWER_MANA; i < MAX_POWERS; ++i)
-        UpdateMaxPower(Powers(i));
+    for (uint8 i = POWER_TYPE_MANA; i < NUM_POWER_TYPES; ++i)
+        UpdateMaxPower(POWER_TYPE(i));
 
     UpdateAllRatings();
     UpdateAllCritPercentages();
@@ -306,11 +306,11 @@ void Player::UpdateMaxHealth()
     SetMaxHealth((uint32)value);
 }
 
-void Player::UpdateMaxPower(Powers power)
+void Player::UpdateMaxPower(POWER_TYPE power)
 {
     UnitMods unitMod = UnitMods(static_cast<uint16>(UNIT_MOD_POWER_START) + power);
 
-    float bonusPower = (power == POWER_MANA && GetCreatePowers(power) > 0) ? GetManaBonusFromIntellect() : 0;
+    float bonusPower = (power == POWER_TYPE_MANA && GetCreatePowers(power) > 0) ? GetManaBonusFromIntellect() : 0;
 
     float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreatePowers(power);
     value *= GetModifierValue(unitMod, BASE_PCT);
@@ -923,7 +923,7 @@ void Player::ApplyHealthRegenBonus(int32 amount, bool apply)
 
 void Player::UpdateManaRegen()
 {
-    if( HasAuraTypeWithMiscvalue(SPELL_AURA_PREVENT_REGENERATE_POWER, POWER_MANA + 1) )
+    if( HasAuraTypeWithMiscvalue(SPELL_AURA_PREVENT_REGENERATE_POWER, POWER_TYPE_MANA + 1) )
     {
         SetStatFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER, 0);
         SetStatFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER, 0);
@@ -934,10 +934,10 @@ void Player::UpdateManaRegen()
     // Mana regen from spirit and intellect
     float power_regen = std::sqrt(Intellect) * OCTRegenMPPerSpirit();
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
-    power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
+    power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_TYPE_MANA);
 
     // Mana regen from SPELL_AURA_MOD_POWER_REGEN aura
-    float power_regen_mp5 = (GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) + m_baseManaRegen) / 5.0f;
+    float power_regen_mp5 = (GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_TYPE_MANA) + m_baseManaRegen) / 5.0f;
 
     // Get bonus from SPELL_AURA_MOD_MANA_REGEN_FROM_STAT aura
     AuraEffectList const& regenAura = GetAuraEffectsByType(SPELL_AURA_MOD_MANA_REGEN_FROM_STAT);
@@ -1017,8 +1017,8 @@ bool Creature::UpdateAllStats()
     UpdateAttackPowerAndDamage();
     UpdateAttackPowerAndDamage(true);
 
-    for (uint8 i = POWER_MANA; i < MAX_POWERS; ++i)
-        UpdateMaxPower(Powers(i));
+    for (uint8 i = POWER_TYPE_MANA; i < NUM_POWER_TYPES; ++i)
+        UpdateMaxPower(POWER_TYPE(i));
 
     UpdateAllResistances();
 
@@ -1048,7 +1048,7 @@ void Creature::UpdateMaxHealth()
     SetMaxHealth(uint32(value));
 }
 
-void Creature::UpdateMaxPower(Powers power)
+void Creature::UpdateMaxPower(POWER_TYPE power)
 {
     UnitMods unitMod = UnitMods(static_cast<uint16>(UNIT_MOD_POWER_START) + power);
 
@@ -1180,7 +1180,7 @@ bool Guardian::UpdateStats(Stats stat)
             UpdateMaxHealth();
             break;
         case STAT_INTELLECT:
-            UpdateMaxPower(POWER_MANA);
+            UpdateMaxPower(POWER_TYPE_MANA);
             break;
         case STAT_SPIRIT:
             break;
@@ -1194,8 +1194,8 @@ bool Guardian::UpdateAllStats()
     for (uint8 i = STAT_STRENGTH; i < MAX_STATS; ++i)
         UpdateStats(Stats(i));
 
-    for (uint8 i = POWER_MANA; i < MAX_POWERS; ++i)
-        UpdateMaxPower(Powers(i));
+    for (uint8 i = POWER_TYPE_MANA; i < NUM_POWER_TYPES; ++i)
+        UpdateMaxPower(POWER_TYPE(i));
 
     UpdateAllResistances();
     return true;
@@ -1256,11 +1256,11 @@ void Guardian::UpdateMaxHealth()
     SetMaxHealth((uint32)value);
 }
 
-void Guardian::UpdateMaxPower(Powers power)
+void Guardian::UpdateMaxPower(POWER_TYPE power)
 {
     UnitMods unitMod = UnitMods(static_cast<uint16>(UNIT_MOD_POWER_START) + power);
 
-    float addValue = (power == POWER_MANA) ? std::max<float>(GetStat(STAT_INTELLECT) - GetCreateStat(STAT_INTELLECT), 0.0f) : 0.0f;
+    float addValue = (power == POWER_TYPE_MANA) ? std::max<float>(GetStat(STAT_INTELLECT) - GetCreateStat(STAT_INTELLECT), 0.0f) : 0.0f;
     float multiplicator = 15.0f;
 
     switch (GetEntry())
@@ -1282,7 +1282,7 @@ void Guardian::UpdateMaxPower(Powers power)
     }
 
     // xinef: Do NOT add base mana TWICE
-    float value = GetModifierValue(unitMod, BASE_VALUE) + (power != POWER_MANA ? GetCreatePowers(power) : 0);
+    float value = GetModifierValue(unitMod, BASE_VALUE) + (power != POWER_TYPE_MANA ? GetCreatePowers(power) : 0);
     value *= GetModifierValue(unitMod, BASE_PCT);
     value += GetModifierValue(unitMod, TOTAL_VALUE) + addValue * multiplicator;
     value *= GetModifierValue(unitMod, TOTAL_PCT);

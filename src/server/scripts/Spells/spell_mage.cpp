@@ -217,8 +217,8 @@ class spell_mage_burnout_trigger : public SpellScript
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
         {
-            int32 newDamage = -(target->ModifyPower(POWER_MANA, -GetEffectValue()));
-            GetSpell()->ExecuteLogEffectTakeTargetPower(effIndex, target, POWER_MANA, newDamage, 0.0f);
+            int32 newDamage = -(target->ModifyPower(POWER_TYPE_MANA, -GetEffectValue()));
+            GetSpell()->ExecuteLogEffectTakeTargetPower(effIndex, target, POWER_TYPE_MANA, newDamage, 0.0f);
         }
     }
 
@@ -310,9 +310,9 @@ class spell_mage_pet_scaling : public AuraScript
                 }
                 else
                 {
-                    uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                    uint32 actStat = GetUnitOwner()->GetPower(POWER_TYPE_MANA);
                     GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                    GetUnitOwner()->SetPower(POWER_TYPE_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_TYPE_MANA), actStat));
                 }
             }
         }

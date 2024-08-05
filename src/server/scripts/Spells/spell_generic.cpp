@@ -457,7 +457,7 @@ class spell_pet_hit_expertise_scalling : public AuraScript
         {
             if (modOwner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
                 amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 8.0f);
-            else if (modOwner->GetPowerType() == POWER_MANA)
+            else if (modOwner->GetPowerType() == POWER_TYPE_MANA)
                 amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 8.0f);
             else
                 amount = CalculatePercent(modOwner->m_modMeleeHitChance, 8.0f, 8.0f);
@@ -470,7 +470,7 @@ class spell_pet_hit_expertise_scalling : public AuraScript
         {
             if (modOwner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
                 amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 17.0f);
-            else if (modOwner->GetPowerType() == POWER_MANA)
+            else if (modOwner->GetPowerType() == POWER_TYPE_MANA)
                 amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 17.0f);
             else
                 amount = CalculatePercent(modOwner->m_modMeleeHitChance, 8.0f, 17.0f);
@@ -483,7 +483,7 @@ class spell_pet_hit_expertise_scalling : public AuraScript
         {
             if (modOwner->IsClass(CLASS_HUNTER, CLASS_CONTEXT_STATS))
                 amount = CalculatePercent(modOwner->m_modRangedHitChance, 8.0f, 26.0f);
-            else if (modOwner->GetPowerType() == POWER_MANA)
+            else if (modOwner->GetPowerType() == POWER_TYPE_MANA)
                 amount = CalculatePercent(modOwner->m_modSpellHitChance, 17.0f, 26.0f);
             else
                 amount = CalculatePercent(modOwner->m_modMeleeHitChance, 8.0f, 26.0f);
@@ -4294,13 +4294,13 @@ class spell_gen_replenishment : public SpellScript
             }
         }
 
-        targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
+        targets.remove_if(Acore::PowerCheck(POWER_TYPE_MANA, false));
 
         uint8 const maxTargets = 10;
 
         if (targets.size() > maxTargets)
         {
-            targets.sort(Acore::PowerPctOrderPred(POWER_MANA));
+            targets.sort(Acore::PowerPctOrderPred(POWER_TYPE_MANA));
             targets.resize(maxTargets);
         }
     }
@@ -4317,7 +4317,7 @@ class spell_gen_replenishment_aura : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->GetPower(POWER_MANA);
+        return GetUnitOwner()->GetPower(POWER_TYPE_MANA);
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
@@ -4325,10 +4325,10 @@ class spell_gen_replenishment_aura : public AuraScript
         switch (GetSpellInfo()->Id)
         {
             case SPELL_REPLENISHMENT:
-                amount = GetUnitOwner()->GetMaxPower(POWER_MANA) * 0.002f;
+                amount = GetUnitOwner()->GetMaxPower(POWER_TYPE_MANA) * 0.002f;
                 break;
             case SPELL_INFINITE_REPLENISHMENT:
-                amount = GetUnitOwner()->GetMaxPower(POWER_MANA) * 0.0025f;
+                amount = GetUnitOwner()->GetMaxPower(POWER_TYPE_MANA) * 0.0025f;
                 break;
             default:
                 break;

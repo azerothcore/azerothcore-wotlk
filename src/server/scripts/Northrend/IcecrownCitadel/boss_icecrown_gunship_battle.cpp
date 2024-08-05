@@ -2424,10 +2424,10 @@ public:
                 int32 energizeAmount = spellInfo->Effects[EFFECT_1].CalcValue(caster);
 
                 // Apply the power gain directly to the caster
-                caster->ModifyPower(POWER_ENERGY, energizeAmount);
+                caster->ModifyPower(POWER_TYPE_ENERGY, energizeAmount);
             }
 
-            if (caster->GetPower(POWER_ENERGY) >= 100)
+            if (caster->GetPower(POWER_TYPE_ENERGY) >= 100)
             {
                 caster->CastSpell(caster, SPELL_OVERHEAT, true);
                 if (Vehicle* vehicle = caster->GetVehicleKit())
@@ -2467,12 +2467,12 @@ public:
 
         void StoreEnergy()
         {
-            _energyLeft = GetCaster()->GetPower(POWER_ENERGY) - 10;
+            _energyLeft = GetCaster()->GetPower(POWER_TYPE_ENERGY) - 10;
         }
 
         void RemoveEnergy()
         {
-            GetCaster()->SetPower(POWER_ENERGY, 0);
+            GetCaster()->SetPower(POWER_TYPE_ENERGY, 0);
         }
 
         void CalculateDamage(SpellEffIndex /*effIndex*/)
@@ -2699,7 +2699,7 @@ public:
                 return;
             }
 
-            GetHitUnit()->SetPower(POWER_ENERGY, 0);
+            GetHitUnit()->SetPower(POWER_TYPE_ENERGY, 0);
             GetHitUnit()->CastSpell(GetHitUnit(), SPELL_EJECT_ALL_PASSENGERS, TRIGGERED_FULL_MASK);
         }
 

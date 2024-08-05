@@ -254,7 +254,7 @@ public:
             _darnavanGUID.Clear();
             _waveCounter = 0;
             _Reset();
-            me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+            me->SetPower(POWER_TYPE_MANA, me->GetMaxPower(POWER_TYPE_MANA));
             events.SetPhase(PHASE_ONE);
             me->CastSpell(me, SPELL_SHADOW_CHANNELING, false);
             me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TAUNT, false);
@@ -298,7 +298,7 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_MANA))
+            if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_TYPE_MANA))
             {
                 // reset threat
                 ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
@@ -313,8 +313,8 @@ public:
                 Talk(SAY_PHASE_2);
                 Talk(EMOTE_PHASE_2);
                 DoStartMovement(me->GetVictim());
-                damage -= me->GetPower(POWER_MANA);
-                me->SetPower(POWER_MANA, 0);
+                damage -= me->GetPower(POWER_TYPE_MANA);
+                me->SetPower(POWER_TYPE_MANA, 0);
                 me->RemoveAurasDueToSpell(SPELL_MANA_BARRIER);
                 events.SetPhase(PHASE_TWO);
                 events.ScheduleEvent(EVENT_SPELL_FROSTBOLT, 10s, 12s, 0, PHASE_TWO);
@@ -1129,7 +1129,7 @@ public:
             {
                 int32 missingHealth = int32(caster->GetMaxHealth() - caster->GetHealth());
                 caster->ModifyHealth(missingHealth);
-                caster->ModifyPower(POWER_MANA, -missingHealth);
+                caster->ModifyPower(POWER_TYPE_MANA, -missingHealth);
             }
         }
 

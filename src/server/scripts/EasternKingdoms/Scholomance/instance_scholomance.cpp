@@ -435,7 +435,7 @@ public:
                     }
                     break;
                 case 3:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 20.0f, false)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_TYPE_MANA, 20.0f, false)))
                     {
                         me->CastSpell(target, DRAIN_MANA_SPELL, false);
                     }

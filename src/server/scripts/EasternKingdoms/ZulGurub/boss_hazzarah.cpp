@@ -120,9 +120,9 @@ struct boss_hazzarah : public BossAI
                     events.ScheduleEvent(EVENT_EARTH_SHOCK, 8s, 18s);
                     break;
                 case EVENT_CHAIN_BURN:
-                    if (me->GetPowerPct(POWER_MANA) > 5.f) // totally guessed
+                    if (me->GetPowerPct(POWER_TYPE_MANA) > 5.f) // totally guessed
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u) { return u && !u->IsPet() && u->GetPowerType() == POWER_MANA; }))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, [&](Unit* u) { return u && !u->IsPet() && u->GetPowerType() == POWER_TYPE_MANA; }))
                         {
                             DoCast(target, SPELL_CHAIN_BURN);
                         }
@@ -154,7 +154,7 @@ class spell_chain_burn : public SpellScript
         targets.remove_if([caster](WorldObject* target) -> bool
         {
             Unit* unit = target->ToUnit();
-            return !unit || unit->GetPowerType() != POWER_MANA || caster->GetVictim() == unit;
+            return !unit || unit->GetPowerType() != POWER_TYPE_MANA || caster->GetVictim() == unit;
         });
     }
 

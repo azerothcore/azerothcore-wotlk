@@ -140,7 +140,7 @@ class spell_mark_of_kazrogal : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
+        targets.remove_if(Acore::PowerCheck(POWER_TYPE_MANA, false));
     }
 
     void Register() override
@@ -162,7 +162,7 @@ class spell_mark_of_kazrogal_aura : public AuraScript
     {
         Unit* target = GetTarget();
 
-        if ((int32)target->GetPower(POWER_MANA) < aurEff->GetBaseAmount())
+        if ((int32)target->GetPower(POWER_TYPE_MANA) < aurEff->GetBaseAmount())
         {
             target->CastSpell(target, SPELL_MARK_DAMAGE, true, nullptr, aurEff);
             // Remove aura

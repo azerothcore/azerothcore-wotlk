@@ -558,7 +558,7 @@ class spell_dru_innervate : public AuraScript
     void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
         if (Unit* caster = GetCaster())
-            amount = int32(CalculatePct(caster->GetCreatePowers(POWER_MANA), amount) / aurEff->GetTotalTicks());
+            amount = int32(CalculatePct(caster->GetCreatePowers(POWER_TYPE_MANA), amount) / aurEff->GetTotalTicks());
         else
             amount = 0;
     }
@@ -723,7 +723,7 @@ class spell_dru_owlkin_frenzy : public AuraScript
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        amount = CalculatePct(GetUnitOwner()->GetCreatePowers(POWER_MANA), amount);
+        amount = CalculatePct(GetUnitOwner()->GetCreatePowers(POWER_TYPE_MANA), amount);
     }
 
     void Register() override

@@ -90,7 +90,7 @@ struct npc_obsidian_destroyer : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        me->SetPower(POWER_MANA, 0);
+        me->SetPower(POWER_TYPE_MANA, 0);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -100,7 +100,7 @@ struct npc_obsidian_destroyer : public ScriptedAI
             std::list<Unit*> targets;
             SelectTargetList(targets, 6, SelectTargetMethod::Random, 1, [&](Unit* target)
             {
-                return target && target->IsPlayer() && target->GetPower(POWER_MANA) > 0;
+                return target && target->IsPlayer() && target->GetPower(POWER_TYPE_MANA) > 0;
             });
 
             for (Unit* target : targets)
@@ -108,7 +108,7 @@ struct npc_obsidian_destroyer : public ScriptedAI
                 DoCast(target, SPELL_DRAIN_MANA, true);
             }
 
-            if (me->GetPowerPct(POWER_MANA) >= 100.f)
+            if (me->GetPowerPct(POWER_TYPE_MANA) >= 100.f)
             {
                 DoCastAOE(SPELL_PURGE, true);
             }

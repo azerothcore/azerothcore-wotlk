@@ -5506,10 +5506,10 @@ bool Player::LoadFromDB(WOWGUID playerGuid, CharacterDatabaseQueryHolder const& 
     // restore remembered power/health values (but not more max values)
     uint32 savedHealth = fields[55].Get<uint32>();
     SetHealth(savedHealth > GetMaxHealth() ? GetMaxHealth() : savedHealth);
-    for (uint8 i = 0; i < MAX_POWERS; ++i)
+    for (uint8 i = 0; i < NUM_POWER_TYPES; ++i)
     {
         uint32 savedPower = fields[56 + i].Get<uint32>();
-        SetPower(Powers(i), savedPower > GetMaxPower(Powers(i)) ? GetMaxPower(Powers(i)) : savedPower);
+        SetPower(POWER_TYPE(i), savedPower > GetMaxPower(POWER_TYPE(i)) ? GetMaxPower(POWER_TYPE(i)) : savedPower);
     }
 
     LOG_DEBUG("entities.player.loading", "The value of player {} after load item and aura is: ", m_name);
@@ -7765,8 +7765,8 @@ void Player::_SaveStats(CharacterDatabaseTransaction trans)
     stmt->SetData(index++, GetGUID().GetCounter());
     stmt->SetData(index++, GetMaxHealth());
 
-    for (uint8 i = 0; i < MAX_POWERS; ++i)
-        stmt->SetData(index++, GetMaxPower(Powers(i)));
+    for (uint8 i = 0; i < NUM_POWER_TYPES; ++i)
+        stmt->SetData(index++, GetMaxPower(POWER_TYPE(i)));
 
     for (uint8 i = 0; i < MAX_STATS; ++i)
         stmt->SetData(index++, GetStat(Stats(i)));
@@ -7793,7 +7793,7 @@ void Player::outDebugValues() const
     if (!sLog->ShouldLog("entities.player", LogLevel::LOG_LEVEL_DEBUG))                                  // optimize disabled debug output
         return;
 
-    LOG_DEBUG("entities.player", "HP is: \t\t\t{}\t\tMP is: \t\t\t{}", GetMaxHealth(), GetMaxPower(POWER_MANA));
+    LOG_DEBUG("entities.player", "HP is: \t\t\t{}\t\tMP is: \t\t\t{}", GetMaxHealth(), GetMaxPower(POWER_TYPE_MANA));
     LOG_DEBUG("entities.player", "AGILITY is: \t\t{}\t\tSTRENGTH is: \t\t{}", GetStat(STAT_AGILITY), GetStat(STAT_STRENGTH));
     LOG_DEBUG("entities.player", "INTELLECT is: \t\t{}\t\tSPIRIT is: \t\t{}", GetStat(STAT_INTELLECT), GetStat(STAT_SPIRIT));
     LOG_DEBUG("entities.player", "STAMINA is: \t\t{}", GetStat(STAT_STAMINA));

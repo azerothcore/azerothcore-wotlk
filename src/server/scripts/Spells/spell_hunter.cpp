@@ -259,9 +259,9 @@ class spell_hun_generic_scaling : public AuraScript
                 }
                 else
                 {
-                    uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                    uint32 actStat = GetUnitOwner()->GetPower(POWER_TYPE_MANA);
                     GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                    GetUnitOwner()->SetPower(POWER_TYPE_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_TYPE_MANA), actStat));
                 }
             }
         }
@@ -397,7 +397,7 @@ class spell_hun_ascpect_of_the_viper : public AuraScript
     {
         PreventDefaultAction();
 
-        uint32 maxMana = GetTarget()->GetMaxPower(POWER_MANA);
+        uint32 maxMana = GetTarget()->GetMaxPower(POWER_TYPE_MANA);
         int32 mana = CalculatePct(maxMana, GetTarget()->GetAttackTime(RANGED_ATTACK) / 1000.0f);
 
         if (AuraEffect const* glyph = GetTarget()->GetAuraEffect(SPELL_HUNTER_GLYPH_OF_ASPECT_OF_THE_VIPER, EFFECT_0))
@@ -475,8 +475,8 @@ class spell_hun_chimera_shot : public SpellScript
                         spellId = SPELL_HUNTER_CHIMERA_SHOT_VIPER;
 
                         // Amount of one aura tick
-                        basePoint = int32(CalculatePct(unitTarget->GetMaxPower(POWER_MANA), aurEff->GetAmount()));
-                        int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; /// @todo: Caster uses unitTarget?
+                        basePoint = int32(CalculatePct(unitTarget->GetMaxPower(POWER_TYPE_MANA), aurEff->GetAmount()));
+                        int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_TYPE_MANA) / 50; /// @todo: Caster uses unitTarget?
                         if (basePoint > casterBasePoint)
                             basePoint = casterBasePoint;
                         ApplyPct(basePoint, TickCount * 60);

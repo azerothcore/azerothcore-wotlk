@@ -156,7 +156,7 @@ struct boss_fathomlord_karathress : public BossAI
 
         scheduler.Schedule(10s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 50.0f, true)))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_TYPE_MANA, 50.0f, true)))
             {
                 me->CastSpell(target, SPELL_CATACLYSMIC_BOLT);
             }
@@ -193,7 +193,7 @@ public:
 
     bool operator() (Unit* unit) const
     {
-        return unit->GetPowerType() == POWER_MANA && _source->GetDistance(unit) < 50.0f;
+        return unit->GetPowerType() == POWER_TYPE_MANA && _source->GetDistance(unit) < 50.0f;
     }
 private:
     WorldObject const* _source;

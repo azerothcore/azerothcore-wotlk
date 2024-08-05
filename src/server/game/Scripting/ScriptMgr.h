@@ -374,7 +374,7 @@ public: /* PlayerScript */
     void OnBeforeBuyItemFromVendor(Player* player, WOWGUID vendorguid, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot);
     void OnBeforeStoreOrEquipNewItem(Player* player, uint32 vendorslot, uint32& item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
     void OnAfterStoreOrEquipNewItem(Player* player, uint32 vendorslot, Item* item, uint8 count, uint8 bag, uint8 slot, ItemTemplate const* pProto, Creature* pVendor, VendorItem const* crItem, bool bStore);
-    void OnAfterUpdateMaxPower(Player* player, Powers& power, float& value);
+    void OnAfterUpdateMaxPower(Player* player, POWER_TYPE& power, float& value);
     void OnAfterUpdateMaxHealth(Player* player, float& value);
     void OnBeforeUpdateAttackPowerAndDamage(Player* player, float& level, float& val2, bool ranged);
     void OnAfterUpdateAttackPowerAndDamage(Player* player, float& level, float& base_attPower, float& attPowerMod, float& attPowerMultiplier, bool ranged);
@@ -403,7 +403,7 @@ public: /* PlayerScript */
     bool CanRepopAtGraveyard(Player* player);
     std::optional<bool> OnPlayerIsClass(Player const* player, Classes playerClass, ClassContext context);
     void OnGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);
-    bool OnPlayerHasActivePowerType(Player const* player, Powers power);
+    bool OnPlayerHasActivePowerType(Player const* player, POWER_TYPE power);
     void OnUpdateGatheringSkill(Player* player, uint32 skillId, uint32 currentLevel, uint32 gray, uint32 green, uint32 yellow, uint32& gain);
     void OnUpdateCraftingSkill(Player* player, SkillLineAbilityEntry const* skill, uint32 currentLevel, uint32& gain);
     bool OnUpdateFishingSkill(Player* player, int32 skill, int32 zone_skill, int32 chance, int32 roll);

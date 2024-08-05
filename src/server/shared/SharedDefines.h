@@ -264,18 +264,18 @@ enum Stats
 
 #define MAX_STATS                        5
 
-enum Powers
-{
-    POWER_MANA                          = 0,
-    POWER_RAGE                          = 1,
-    POWER_FOCUS                         = 2,
-    POWER_ENERGY                        = 3,
-    POWER_HAPPINESS                     = 4,
-    POWER_RUNE                          = 5,
-    POWER_RUNIC_POWER                   = 6,
-    MAX_POWERS                          = 7,
-    POWER_ALL                           = 127,    // default for class?
-    POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
+enum POWER_TYPE {
+  POWER_TYPE_MANA         = 0x0,
+  POWER_TYPE_RAGE         = 0x1,
+  POWER_TYPE_FOCUS        = 0x2,
+  POWER_TYPE_ENERGY       = 0x3,
+  POWER_TYPE_HAPPINESS    = 0x4,
+  POWER_TYPE_RUNE         = 0x5,
+  POWER_TYPE_RUNIC_POWER  = 0x6,
+  NUM_POWER_TYPES         = 0x7,
+  //TODO: Remove below members
+  POWER_ALL       = 127,
+  POWER_HEALTH    = 0xFFFFFFFE
 };
 
 enum SpellSchools

@@ -1997,7 +1997,7 @@ void Player::UpdateCharmedAI()
 
         if (Mages)
         {
-            if ((GetPower(POWER_MANA) * 100 / GetMaxPower(POWER_MANA)) < 10)
+            if ((GetPower(POWER_TYPE_MANA) * 100 / GetMaxPower(POWER_TYPE_MANA)) < 10)
             {
                 GetMotionMaster()->MoveChase(target, 4);
                 return;

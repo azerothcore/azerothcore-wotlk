@@ -476,7 +476,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                         // converts each extra point of energy into ($f1+$AP/410) additional damage
                         float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
                         float multiple = ap / 410 + m_spellInfo->Effects[effIndex].DamageMultiplier;
-                        int32 energy = -(m_caster->ModifyPower(POWER_ENERGY, -30));
+                        int32 energy = -(m_caster->ModifyPower(POWER_TYPE_ENERGY, -30));
                         damage += int32(energy * multiple);
                         damage += int32(CalculatePct(m_caster->GetComboPoints() * ap, 7));
                     }
@@ -1339,10 +1339,10 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(MAX_POWERS))
+    if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(NUM_POWER_TYPES))
         return;
 
-    Powers PowerType = Powers(m_spellInfo->Effects[effIndex].MiscValue);
+    POWER_TYPE PowerType = POWER_TYPE(m_spellInfo->Effects[effIndex].MiscValue);
 
     if (!unitTarget || !unitTarget->IsAlive() || !unitTarget->HasActivePowerType(PowerType) || damage < 0)
         return;
@@ -1353,7 +1353,7 @@ void Spell::EffectPowerDrain(SpellEffIndex effIndex)
 
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
     int32 power = damage;
-    if (PowerType == POWER_MANA)
+    if (PowerType == POWER_TYPE_MANA)
         power -= unitTarget->GetSpellCritDamageReduction(power);
 
     int32 newDamage = -(unitTarget->ModifyPower(PowerType, -int32(power)));
@@ -1418,10 +1418,10 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(MAX_POWERS))
+    if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(NUM_POWER_TYPES))
         return;
 
-    Powers PowerType = Powers(m_spellInfo->Effects[effIndex].MiscValue);
+    POWER_TYPE PowerType = POWER_TYPE(m_spellInfo->Effects[effIndex].MiscValue);
 
     if (!unitTarget || !unitTarget->IsAlive() || !unitTarget->HasActivePowerType(PowerType) || damage < 0)
         return;
@@ -1439,7 +1439,7 @@ void Spell::EffectPowerBurn(SpellEffIndex effIndex)
 
     int32 power = damage;
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
-    if (PowerType == POWER_MANA)
+    if (PowerType == POWER_TYPE_MANA)
         power -= unitTarget->GetSpellCritDamageReduction(power);
 
     int32 newDamage = -(unitTarget->ModifyPower(PowerType, -power));
@@ -1871,10 +1871,10 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
     if (!unitTarget->IsAlive())
         return;
 
-    if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(MAX_POWERS))
+    if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(NUM_POWER_TYPES))
         return;
 
-    Powers power = Powers(m_spellInfo->Effects[effIndex].MiscValue);
+    POWER_TYPE power = POWER_TYPE(m_spellInfo->Effects[effIndex].MiscValue);
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER && !unitTarget->HasActivePowerType(power) && m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION
             && !m_spellInfo->HasAttribute(SPELL_ATTR7_ONLY_IN_SPELLBOOK_UNTIL_LEARNED))
@@ -1976,10 +1976,10 @@ void Spell::EffectEnergizePct(SpellEffIndex effIndex)
     if (!unitTarget->IsAlive())
         return;
 
-    if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(MAX_POWERS))
+    if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(NUM_POWER_TYPES))
         return;
 
-    Powers power = Powers(m_spellInfo->Effects[effIndex].MiscValue);
+    POWER_TYPE power = POWER_TYPE(m_spellInfo->Effects[effIndex].MiscValue);
 
     if (unitTarget->GetTypeId() == TYPEID_PLAYER && !unitTarget->HasActivePowerType(power) && !m_spellInfo->HasAttribute(SPELL_ATTR7_ONLY_IN_SPELLBOOK_UNTIL_LEARNED))
         return;
@@ -3483,7 +3483,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 {
                     // Glyph of Death Strike
                     if (AuraEffect const* aurEff = m_caster->GetAuraEffect(59336, EFFECT_0))
-                        if (uint32 runic = std::min<uint32>(m_caster->GetPower(POWER_RUNIC_POWER), aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
+                        if (uint32 runic = std::min<uint32>(m_caster->GetPower(POWER_TYPE_RUNIC_POWER), aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue()))
                             AddPct(totalDamagePercentMod, runic);
                     break;
                 }
@@ -4637,7 +4637,7 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
         return;
 
     uint32 health = target->CountPctFromMaxHealth(damage);
-    uint32 mana   = CalculatePct(target->GetMaxPower(POWER_MANA), damage);
+    uint32 mana   = CalculatePct(target->GetMaxPower(POWER_TYPE_MANA), damage);
 
     ExecuteLogEffectResurrect(effIndex, target);
 
@@ -4848,17 +4848,17 @@ void Spell::EffectSelfResurrect(SpellEffIndex effIndex)
     else
     {
         health = m_caster->CountPctFromMaxHealth(damage);
-        if (m_caster->GetMaxPower(POWER_MANA) > 0)
-            mana = CalculatePct(m_caster->GetMaxPower(POWER_MANA), damage);
+        if (m_caster->GetMaxPower(POWER_TYPE_MANA) > 0)
+            mana = CalculatePct(m_caster->GetMaxPower(POWER_TYPE_MANA), damage);
     }
 
     Player* player = m_caster->ToPlayer();
     player->Resurrect(0.0f);
 
     player->SetHealth(health);
-    player->SetPower(POWER_MANA, mana);
-    player->SetPower(POWER_RAGE, 0);
-    player->SetPower(POWER_ENERGY, player->GetMaxPower(POWER_ENERGY));
+    player->SetPower(POWER_TYPE_MANA, mana);
+    player->SetPower(POWER_TYPE_RAGE, 0);
+    player->SetPower(POWER_TYPE_ENERGY, player->GetMaxPower(POWER_TYPE_ENERGY));
 
     player->SpawnCorpseBones();
 }
@@ -5539,7 +5539,7 @@ void Spell::EffectSpiritHeal(SpellEffIndex /*effIndex*/)
         return;
 
     //m_spellInfo->Effects[i].BasePoints; == 99 (percent?)
-    //unitTarget->ToPlayer()->setResurrect(m_caster->GetGUID(), unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), unitTarget->GetMaxHealth(), unitTarget->GetMaxPower(POWER_MANA));
+    //unitTarget->ToPlayer()->setResurrect(m_caster->GetGUID(), unitTarget->GetPositionX(), unitTarget->GetPositionY(), unitTarget->GetPositionZ(), unitTarget->GetMaxHealth(), unitTarget->GetMaxPower(POWER_TYPE_MANA));
     unitTarget->ToPlayer()->Resurrect(1.0f);
     unitTarget->ToPlayer()->SpawnCorpseBones();
     */
@@ -6227,7 +6227,7 @@ void Spell::EffectCastButtons(SpellEffIndex effIndex)
             continue;
 
         uint32 cost = spellInfo->CalcPowerCost(m_caster, spellInfo->GetSchoolMask(), this);
-        if (m_caster->GetPower(POWER_MANA) < cost)
+        if (m_caster->GetPower(POWER_TYPE_MANA) < cost)
             continue;
 
         TriggerCastFlags triggerFlags = TriggerCastFlags(TRIGGERED_IGNORE_GCD | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_CAST_DIRECTLY);

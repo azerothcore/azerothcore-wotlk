@@ -179,7 +179,7 @@ public:
     void UpdateResistances(uint32 school) override;
     void UpdateArmor() override;
     void UpdateMaxHealth() override;
-    void UpdateMaxPower(Powers power) override;
+    void UpdateMaxPower(POWER_TYPE power) override;
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) override;
 
@@ -450,7 +450,7 @@ protected:
 
     ReactStates m_reactState;                           // for AI, not charmInfo
     void RegenerateHealth();
-    void Regenerate(Powers power);
+    void Regenerate(POWER_TYPE power);
     MovementGeneratorType m_defaultMovementType;
     WOWGUID::LowType m_spawnId;                      ///< For new or temporary creatures is 0 for saved it is lowguid
     uint8 m_equipmentId;

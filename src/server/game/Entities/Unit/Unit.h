@@ -267,7 +267,7 @@ enum UnitMods
     UNIT_MOD_STAT_INTELLECT,
     UNIT_MOD_STAT_SPIRIT,
     UNIT_MOD_HEALTH,
-    UNIT_MOD_MANA,                                          // UNIT_MOD_MANA..UNIT_MOD_RUNIC_POWER must be in existed order, it's accessed by index values of Powers enum.
+    UNIT_MOD_MANA,                                          // UNIT_MOD_MANA..UNIT_MOD_RUNIC_POWER must be in existed order, it's accessed by index values of POWER_TYPE enum.
     UNIT_MOD_RAGE,
     UNIT_MOD_FOCUS,
     UNIT_MOD_ENERGY,
@@ -1526,7 +1526,7 @@ public:
     [[nodiscard]] float GetHealthPct() const { return GetMaxHealth() ? 100.f * GetHealth() / GetMaxHealth() : 0.0f; }
     [[nodiscard]] uint32 CountPctFromMaxHealth(int32 pct) const { return CalculatePct(GetMaxHealth(), pct); }
     [[nodiscard]] uint32 CountPctFromCurHealth(int32 pct) const { return CalculatePct(GetHealth(), pct); }
-    [[nodiscard]] float GetPowerPct(Powers power) const { return GetMaxPower(power) ? 100.f * GetPower(power) / GetMaxPower(power) : 0.0f; }
+    [[nodiscard]] float GetPowerPct(POWER_TYPE power) const { return GetMaxPower(power) ? 100.f * GetPower(power) / GetMaxPower(power) : 0.0f; }
 
     void SetHealth(uint32 val);
     void SetMaxHealth(uint32 val);
@@ -1534,16 +1534,16 @@ public:
     int32 ModifyHealth(int32 val);
     int32 GetHealthGain(int32 dVal);
 
-    Powers GetPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, 3)); }
-    void setPowerType(Powers power);
-    [[nodiscard]] virtual bool HasActivePowerType(Powers power) { return GetPowerType() == power; }
-    [[nodiscard]] uint32 GetPower(Powers power) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power); }
-    [[nodiscard]] uint32 GetMaxPower(Powers power) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_MAXPOWER1) + power); }
-    void SetPower(Powers power, uint32 val, bool withPowerUpdate = true, bool fromRegenerate = false);
-    void SetMaxPower(Powers power, uint32 val);
+    POWER_TYPE GetPowerType() const { return POWER_TYPE(GetByteValue(UNIT_FIELD_BYTES_0, 3)); }
+    void setPowerType(POWER_TYPE power);
+    [[nodiscard]] virtual bool HasActivePowerType(POWER_TYPE power) { return GetPowerType() == power; }
+    [[nodiscard]] uint32 GetPower(POWER_TYPE power) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power); }
+    [[nodiscard]] uint32 GetMaxPower(POWER_TYPE power) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_MAXPOWER1) + power); }
+    void SetPower(POWER_TYPE power, uint32 val, bool withPowerUpdate = true, bool fromRegenerate = false);
+    void SetMaxPower(POWER_TYPE power, uint32 val);
     // returns the change in power
-    int32 ModifyPower(Powers power, int32 val, bool withPowerUpdate = true);
-    int32 ModifyPowerPct(Powers power, float pct, bool apply = true);
+    int32 ModifyPower(POWER_TYPE power, int32 val, bool withPowerUpdate = true);
+    int32 ModifyPowerPct(POWER_TYPE power, float pct, bool apply = true);
 
     [[nodiscard]] uint32 GetAttackTime(WeaponAttackType att) const
     {
@@ -1806,8 +1806,8 @@ public:
 
     void SendHealSpellLog(HealInfo const& healInfo, bool critical = false);
     int32 HealBySpell(HealInfo& healInfo, bool critical = false);
-    void SendEnergizeSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
-    void EnergizeBySpell(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
+    void SendEnergizeSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, POWER_TYPE powertype);
+    void EnergizeBySpell(Unit* victim, uint32 SpellID, uint32 Damage, POWER_TYPE powertype);
 
     SpellCastResult CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
     SpellCastResult CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, WOWGUID originalCaster = WOWGUID::Empty);
@@ -2120,7 +2120,7 @@ public:
     [[nodiscard]] uint32 GetCreateHealth() const { return GetUInt32Value(UNIT_FIELD_BASE_HEALTH); }
     void SetCreateMana(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_MANA, val); }
     [[nodiscard]] uint32 GetCreateMana() const { return GetUInt32Value(UNIT_FIELD_BASE_MANA); }
-    [[nodiscard]] uint32 GetCreatePowers(Powers power) const;
+    [[nodiscard]] uint32 GetCreatePowers(POWER_TYPE power) const;
     [[nodiscard]] float GetPosStat(Stats stat) const { return GetFloatValue(static_cast<uint16>(UNIT_FIELD_POSSTAT0) +  stat); }
     [[nodiscard]] float GetNegStat(Stats stat) const { return GetFloatValue(static_cast<uint16>(UNIT_FIELD_NEGSTAT0) +  stat); }
     [[nodiscard]] float GetCreateStat(Stats stat) const { return m_createStats[stat]; }
@@ -2182,7 +2182,7 @@ public:
     [[nodiscard]] float GetTotalAuraModValue(UnitMods unitMod) const;
     [[nodiscard]] SpellSchools GetSpellSchoolByAuraGroup(UnitMods unitMod) const;
     [[nodiscard]] Stats GetStatByAuraGroup(UnitMods unitMod) const;
-    [[nodiscard]] Powers GetPowerTypeByAuraGroup(UnitMods unitMod) const;
+    [[nodiscard]] POWER_TYPE GetPowerTypeByAuraGroup(UnitMods unitMod) const;
     [[nodiscard]] bool CanModifyStats() const { return m_canModifyStats; }
     void SetCanModifyStats(bool modifyStats) { m_canModifyStats = modifyStats; }
     virtual bool UpdateStats(Stats stat) = 0;
@@ -2191,7 +2191,7 @@ public:
     virtual void UpdateAllResistances();
     virtual void UpdateArmor() = 0;
     virtual void UpdateMaxHealth() = 0;
-    virtual void UpdateMaxPower(Powers power) = 0;
+    virtual void UpdateMaxPower(POWER_TYPE power) = 0;
     virtual void UpdateAttackPowerAndDamage(bool ranged = false) = 0;
     virtual void UpdateDamagePhysical(WeaponAttackType attType);
     float GetTotalAttackPowerValue(WeaponAttackType attType, Unit* pVictim = nullptr) const;
@@ -2691,7 +2691,7 @@ namespace Acore
     class PowerPctOrderPred
     {
     public:
-        PowerPctOrderPred(Powers power, bool ascending = true) : _power(power), _ascending(ascending) { }
+        PowerPctOrderPred(POWER_TYPE power, bool ascending = true) : _power(power), _ascending(ascending) { }
 
         bool operator()(WorldObject const* objA, WorldObject const* objB) const
         {
@@ -2710,7 +2710,7 @@ namespace Acore
         }
 
     private:
-        Powers const _power;
+        POWER_TYPE const _power;
         bool const _ascending;
     };
 

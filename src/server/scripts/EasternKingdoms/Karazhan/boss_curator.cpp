@@ -64,7 +64,7 @@ struct boss_curator : public BossAI
             DoCastSelf(SPELL_ARCANE_INFUSION, true);
             Talk(SAY_ENRAGE);
         });
-        me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
+        me->SetPower(POWER_TYPE_MANA, me->GetMaxPower(POWER_TYPE_MANA));
     }
 
     void KilledUnit(Unit* victim) override
@@ -111,9 +111,9 @@ struct boss_curator : public BossAI
                     Talk(SAY_SUMMON);
                 }
                 DoCastSelf(RAND(SPELL_SUMMON_ASTRAL_FLARE1, SPELL_SUMMON_ASTRAL_FLARE2, SPELL_SUMMON_ASTRAL_FLARE3, SPELL_SUMMON_ASTRAL_FLARE4));
-                int32 mana = CalculatePct(me->GetMaxPower(POWER_MANA), 10);
-                me->ModifyPower(POWER_MANA, -mana);
-                if (me->GetPowerPct(POWER_MANA) < 10.0f)
+                int32 mana = CalculatePct(me->GetMaxPower(POWER_TYPE_MANA), 10);
+                me->ModifyPower(POWER_TYPE_MANA, -mana);
+                if (me->GetPowerPct(POWER_TYPE_MANA) < 10.0f)
                 {
                     Talk(SAY_EVOCATE);
                     DoCastSelf(SPELL_EVOCATION);

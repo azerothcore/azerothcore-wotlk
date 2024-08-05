@@ -443,8 +443,8 @@ public:
                         for (auto itr : threatList)
                         {
                             if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
-                                    && itr->getTarget()->GetPowerType() == POWER_MANA
-                                    && itr->getTarget()->GetPower(POWER_MANA))
+                                    && itr->getTarget()->GetPowerType() == POWER_TYPE_MANA
+                                    && itr->getTarget()->GetPower(POWER_TYPE_MANA))
                                     {
                                         unitList.push_back(itr->getTarget());
                                     }
@@ -714,9 +714,9 @@ class spell_kelthuzad_detonate_mana_aura : public AuraScript
     {
         PreventDefaultAction();
         Unit* target = GetTarget();
-        if (auto mana = int32(target->GetMaxPower(POWER_MANA) / 10))
+        if (auto mana = int32(target->GetMaxPower(POWER_TYPE_MANA) / 10))
         {
-            mana = target->ModifyPower(POWER_MANA, -mana);
+            mana = target->ModifyPower(POWER_TYPE_MANA, -mana);
             target->CastCustomSpell(SPELL_MANA_DETONATION_DAMAGE, SPELLVALUE_BASE_POINT0, -mana * 10, target, true, nullptr, aurEff);
         }
     }

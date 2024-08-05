@@ -354,7 +354,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
     &AuraEffect::HandleNoImmediateEffect,                         //291 SPELL_AURA_MOD_XP_QUEST_PCT  implemented in Player::RewardQuest
     &AuraEffect::HandleAuraOpenStable,                            //292 SPELL_AURA_OPEN_STABLE
     &AuraEffect::HandleAuraOverrideSpells,                        //293 auras which probably add set of abilities to their target based on it's miscvalue
-    &AuraEffect::HandleModManaRegen,                              //294 SPELL_AURA_PREVENT_REGENERATE_POWER implemented in Player::Regenerate(Powers power), HandleModManaRegen to refresh regeneration clientside
+    &AuraEffect::HandleModManaRegen,                              //294 SPELL_AURA_PREVENT_REGENERATE_POWER implemented in Player::Regenerate(POWER_TYPE power), HandleModManaRegen to refresh regeneration clientside
     &AuraEffect::HandleNULL,                                      //295 0 spells in 3.3.5
     &AuraEffect::HandleAuraSetVehicle,                            //296 SPELL_AURA_SET_VEHICLE_ID sets vehicle on target
     &AuraEffect::HandleNULL,                                      //297 Spirit Burst spells
@@ -1866,14 +1866,14 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
     Unit* target = aurApp->GetTarget();
 
     uint32 modelid = 0;
-    Powers PowerType = POWER_MANA;
+    POWER_TYPE PowerType = POWER_TYPE_MANA;
     ShapeshiftForm form = ShapeshiftForm(GetMiscValue());
 
     switch (form)
     {
         case FORM_CAT:                                      // 0x01
         case FORM_GHOUL:                                    // 0x07
-            PowerType = POWER_ENERGY;
+            PowerType = POWER_TYPE_ENERGY;
             break;
 
         case FORM_BEAR:                                     // 0x05
@@ -1882,7 +1882,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         case FORM_BATTLESTANCE:                             // 0x11
         case FORM_DEFENSIVESTANCE:                          // 0x12
         case FORM_BERSERKERSTANCE:                          // 0x13
-            PowerType = POWER_RAGE;
+            PowerType = POWER_TYPE_RAGE;
             break;
 
         case FORM_TREE:                                     // 0x02
@@ -1957,7 +1957,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         if (aurApp->GetRemoveMode())
             return;
 
-        if (PowerType != POWER_MANA)
+        if (PowerType != POWER_TYPE_MANA)
         {
             uint32 oldPower = target->GetPower(PowerType);
             // reset power to default values only at power change
@@ -1980,7 +1980,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                             case FORM_CAT:
                                 {
                                     int32 basePoints = int32(std::min(oldPower, FurorChance));
-                                    target->SetPower(POWER_ENERGY, 0);
+                                    target->SetPower(POWER_TYPE_ENERGY, 0);
                                     target->CastCustomSpell(target, 17099, &basePoints, nullptr, nullptr, true, nullptr, this);
                                     break;
                                 }
@@ -1991,8 +1991,8 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                                 break;
                             default:
                                 {
-                                    uint32 newEnergy = std::min(target->GetPower(POWER_ENERGY), FurorChance);
-                                    target->SetPower(POWER_ENERGY, newEnergy);
+                                    uint32 newEnergy = std::min(target->GetPower(POWER_TYPE_ENERGY), FurorChance);
+                                    target->SetPower(POWER_TYPE_ENERGY, newEnergy);
                                     break;
                                 }
                         }
@@ -2029,7 +2029,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
             target->SetShapeshiftForm(FORM_NONE);
             if (target->IsClass(CLASS_DRUID, CLASS_CONTEXT_ABILITY))
             {
-                target->setPowerType(POWER_MANA);
+                target->setPowerType(POWER_TYPE_MANA);
                 // Remove movement impairing effects also when shifting out
                 target->RemoveAurasByShapeShift();
             }
@@ -2090,8 +2090,8 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
                                 Rage_val += target->CalculateSpellDamage(target, spellInfo, 0) * 10;
                         }
                     }
-                    if (target->GetPower(POWER_RAGE) > Rage_val)
-                        target->SetPower(POWER_RAGE, Rage_val);
+                    if (target->GetPower(POWER_TYPE_RAGE) > Rage_val)
+                        target->SetPower(POWER_TYPE_RAGE, Rage_val);
                     break;
                 }
             default:
@@ -4655,9 +4655,9 @@ void AuraEffect::HandleModPowerRegen(AuraApplication const* aurApp, uint8 mode, 
         return;
 
     // Update manaregen value
-    if (GetMiscValue() == POWER_MANA)
+    if (GetMiscValue() == POWER_TYPE_MANA)
         target->ToPlayer()->UpdateManaRegen();
-    else if (GetMiscValue() == POWER_RUNE)
+    else if (GetMiscValue() == POWER_TYPE_RUNE)
         target->ToPlayer()->UpdateRuneRegen(RuneType(GetMiscValueB()));
     // other powers are not immediate effects - implemented in Player::Regenerate, Creature::Regenerate
 }
@@ -4733,7 +4733,7 @@ void AuraEffect::HandleAuraModIncreaseEnergy(AuraApplication const* aurApp, uint
 
     Unit* target = aurApp->GetTarget();
 
-    Powers PowerType = Powers(GetMiscValue());
+    POWER_TYPE PowerType = POWER_TYPE(GetMiscValue());
     // do not check power type, we can always modify the maximum
     // as the client will not see any difference
     // also, placing conditions that may change during the aura duration
@@ -4753,7 +4753,7 @@ void AuraEffect::HandleAuraModIncreaseEnergyPercent(AuraApplication const* aurAp
 
     Unit* target = aurApp->GetTarget();
 
-    Powers PowerType = Powers(GetMiscValue());
+    POWER_TYPE PowerType = POWER_TYPE(GetMiscValue());
     // do not check power type, we can always modify the maximum
     // as the client will not see any difference
     // also, placing conditions that may change during the aura duration
@@ -6205,9 +6205,9 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                         {
                             // Converts up to 10 rage per second into health for $d.  Each point of rage is converted into ${$m2/10}.1% of max health.
                             // Should be manauser
-                            if (!target->HasActivePowerType(POWER_RAGE))
+                            if (!target->HasActivePowerType(POWER_TYPE_RAGE))
                                 break;
-                            uint32 rage = target->GetPower(POWER_RAGE);
+                            uint32 rage = target->GetPower(POWER_TYPE_RAGE);
                             // Nothing todo
                             if (rage == 0)
                                 break;
@@ -6215,7 +6215,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
                             int32 points = target->CalculateSpellDamage(target, GetSpellInfo(), 1);
                             int32 regen = target->GetMaxHealth() * (mod * points / 10) / 1000;
                             target->CastCustomSpell(target, 22845, &regen, 0, 0, true, 0, this);
-                            target->SetPower(POWER_RAGE, rage - mod);
+                            target->SetPower(POWER_TYPE_RAGE, rage - mod);
                             break;
                         }
                 }
@@ -6325,20 +6325,20 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                                     HealInfo healInfo(caster, target, heal, auraSpellInfo, auraSpellInfo->GetSchoolMask());
                                     caster->HealBySpell(healInfo);
 
-                                    if (int32 mana = caster->GetMaxPower(POWER_MANA))
+                                    if (int32 mana = caster->GetMaxPower(POWER_TYPE_MANA))
                                     {
                                         mana /= 10;
-                                        caster->EnergizeBySpell(caster, 23493, mana, POWER_MANA);
+                                        caster->EnergizeBySpell(caster, 23493, mana, POWER_TYPE_MANA);
                                     }
                                 }
                                 return;
                             }
                         // Nitrous Boost
                         case 27746:
-                            if (caster && target->GetPower(POWER_MANA) >= 10)
+                            if (caster && target->GetPower(POWER_TYPE_MANA) >= 10)
                             {
-                                target->ModifyPower(POWER_MANA, -10);
-                                target->SendEnergizeSpellLog(caster, 27746, 10, POWER_MANA);
+                                target->ModifyPower(POWER_TYPE_MANA, -10);
+                                target->SendEnergizeSpellLog(caster, 27746, 10, POWER_TYPE_MANA);
                             }
                             else
                                 target->RemoveAurasDueToSpell(27746);
@@ -6519,7 +6519,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
             // Hunter - Rapid Recuperation
             case 56654:
             case 58882:
-                int32 amount = int32(target->GetMaxPower(POWER_MANA) * GetAmount() / 100.0f);
+                int32 amount = int32(target->GetMaxPower(POWER_TYPE_MANA) * GetAmount() / 100.0f);
                 target->CastCustomSpell(target, triggerSpellId, &amount, nullptr, nullptr, true, nullptr, this);
                 return;
         }
@@ -7024,7 +7024,7 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
 
 void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) const
 {
-    Powers PowerType = Powers(GetMiscValue());
+    POWER_TYPE PowerType = POWER_TYPE(GetMiscValue());
 
     if (!caster || !caster->IsAlive() || !target->IsAlive() || !target->HasActivePowerType(PowerType))
         return;
@@ -7056,7 +7056,7 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
     LOG_DEBUG("spells.aura.effect", "PeriodicTick: {} power leech of {} for {} dmg inflicted by {}",
                     GetCasterGUID().ToString(), target->GetGUID().ToString(), drainAmount, GetId());
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
-    if (PowerType == POWER_MANA)
+    if (PowerType == POWER_TYPE_MANA)
         drainAmount -= target->GetSpellCritDamageReduction(drainAmount);
 
     int32 drainedAmount = -target->ModifyPower(PowerType, -drainAmount);
@@ -7097,11 +7097,11 @@ void AuraEffect::HandlePeriodicManaLeechAuraTick(Unit* target, Unit* caster) con
 
 void AuraEffect::HandleObsModPowerAuraTick(Unit* target, Unit* caster) const
 {
-    Powers PowerType;
+    POWER_TYPE PowerType;
     if (GetMiscValue() == POWER_ALL)
         PowerType = target->GetPowerType();
     else
-        PowerType = Powers(GetMiscValue());
+        PowerType = POWER_TYPE(GetMiscValue());
 
     if (!target->IsAlive() || !target->GetMaxPower(PowerType))
         return;
@@ -7131,7 +7131,7 @@ void AuraEffect::HandleObsModPowerAuraTick(Unit* target, Unit* caster) const
 
 void AuraEffect::HandlePeriodicEnergizeAuraTick(Unit* target, Unit* caster) const
 {
-    Powers PowerType = Powers(GetMiscValue());
+    POWER_TYPE PowerType = POWER_TYPE(GetMiscValue());
 
     if (target->GetTypeId() == TYPEID_PLAYER && !target->HasActivePowerType(PowerType) && !m_spellInfo->HasAttribute(SPELL_ATTR7_ONLY_IN_SPELLBOOK_UNTIL_LEARNED))
         return;
@@ -7165,7 +7165,7 @@ void AuraEffect::HandlePeriodicEnergizeAuraTick(Unit* target, Unit* caster) cons
 
 void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) const
 {
-    Powers PowerType = Powers(GetMiscValue());
+    POWER_TYPE PowerType = POWER_TYPE(GetMiscValue());
 
     if (!caster || !target->IsAlive() || !target->HasActivePowerType(PowerType))
         return;
@@ -7180,7 +7180,7 @@ void AuraEffect::HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) con
     int32 damage = std::max(m_amount, 0);
 
     // resilience reduce mana draining effect at spell crit damage reduction (added in 2.4)
-    if (PowerType == POWER_MANA)
+    if (PowerType == POWER_TYPE_MANA)
         damage -= target->GetSpellCritDamageReduction(damage);
 
     uint32 gain = uint32(-target->ModifyPower(PowerType, -damage));

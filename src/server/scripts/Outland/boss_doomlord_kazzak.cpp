@@ -87,7 +87,7 @@ public:
                 context.Repeat(15s, 18s);
             }).Schedule(25s, [this](TaskContext context)
             {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 100.0f, true)))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_TYPE_MANA, 100.0f, true)))
                 {
                     DoCast(target, SPELL_MARK_OF_KAZZAK);
                 }
@@ -163,14 +163,14 @@ class spell_mark_of_kazzak_aura : public AuraScript
     {
         if (Unit* owner = GetUnitOwner())
         {
-            amount = CalculatePct(owner->GetPower(POWER_MANA), 5);
+            amount = CalculatePct(owner->GetPower(POWER_TYPE_MANA), 5);
         }
     }
 
     void OnPeriodic(AuraEffect const* aurEff)
     {
         Unit* target = GetTarget();
-        if (target->GetPower(POWER_MANA) == 0)
+        if (target->GetPower(POWER_TYPE_MANA) == 0)
         {
             target->CastSpell(target, SPELL_MARK_OF_KAZZAK_DAMAGE, true, nullptr, aurEff);
             SetDuration(0); // Remove aura

@@ -134,11 +134,11 @@ private:
 struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
 {
     Unit const* _me;
-    Powers const _power;
+    POWER_TYPE const _power;
     float const _dist;
     bool const _playerOnly;
 
-    PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
+    PowerUsersSelector(Unit const* unit, POWER_TYPE power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
 
     bool operator()(Unit const* target) const
     {
@@ -370,7 +370,7 @@ public:
     virtual void HealReceived(Unit* /*done_by*/, uint32& /*addhealth*/) {}
 
     // Called when the creature power updates
-    virtual void OnPowerUpdate(Powers /*power*/, int32 /*updateVal*/, int32 /*gain*/, uint32 /*currPower*/) {}
+    virtual void OnPowerUpdate(POWER_TYPE /*power*/, int32 /*updateVal*/, int32 /*gain*/, uint32 /*currPower*/) {}
 
     // Called when the unit heals
     virtual void HealDone(Unit* /*done_to*/, uint32& /*addhealth*/) {}

@@ -590,7 +590,7 @@ class spell_pilgrims_bounty_food_aura : public AuraScript
         if (GetCaster())
         {
             if (GetId() == 66041)
-                amount = CalculatePct(GetCaster()->GetMaxPower(POWER_MANA), 20);
+                amount = CalculatePct(GetCaster()->GetMaxPower(POWER_TYPE_MANA), 20);
             else
                 amount = CalculatePct(GetCaster()->GetMaxHealth(), 15);
         }

@@ -451,7 +451,7 @@ public:
     //After buying something from any vendor
     virtual void OnAfterStoreOrEquipNewItem(Player* /*player*/, uint32 /*vendorslot*/, Item* /*item*/, uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/, ItemTemplate const* /*pProto*/, Creature* /*pVendor*/, VendorItem const* /*crItem*/, bool /*bStore*/) { };
 
-    virtual void OnAfterUpdateMaxPower(Player* /*player*/, Powers& /*power*/, float& /*value*/) { }
+    virtual void OnAfterUpdateMaxPower(Player* /*player*/, POWER_TYPE& /*power*/, float& /*value*/) { }
 
     virtual void OnAfterUpdateMaxHealth(Player* /*player*/, float& /*value*/) { }
 
@@ -507,7 +507,7 @@ public:
 
     virtual void OnGetMaxSkillValue(Player* /*player*/, uint32 /*skill*/, int32& /*result*/, bool /*IsPure*/) { }
 
-    [[nodiscard]] virtual bool OnPlayerHasActivePowerType(Player const* /*player*/, Powers /*power*/) { return false; }
+    [[nodiscard]] virtual bool OnPlayerHasActivePowerType(Player const* /*player*/, POWER_TYPE /*power*/) { return false; }
 
     /**
      * @brief This hook called before gathering skill gain is applied to the character.

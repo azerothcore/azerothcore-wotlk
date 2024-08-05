@@ -488,7 +488,7 @@ class spell_pal_blessing_of_sanctuary : public AuraScript
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
     {
-        return GetTarget()->HasActivePowerType(POWER_MANA);
+        return GetTarget()->HasActivePowerType(POWER_TYPE_MANA);
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
@@ -974,8 +974,8 @@ class spell_pal_lay_on_hands : public SpellScript
 
         // Xinef: Glyph of Divinity
         if (Unit* target = GetExplTargetUnit())
-            if (target->HasActivePowerType(POWER_MANA))
-                _manaAmount = target->GetPower(POWER_MANA);
+            if (target->HasActivePowerType(POWER_TYPE_MANA))
+                _manaAmount = target->GetPower(POWER_TYPE_MANA);
 
         return SPELL_CAST_OK;
     }
@@ -993,7 +993,7 @@ class spell_pal_lay_on_hands : public SpellScript
         // Xinef: Glyph of Divinity
         else if (target && caster->HasAura(54939) && GetSpellInfo()->Id != 633 && _manaAmount > 0) // excluding first rank
         {
-            _manaAmount = target->GetPower(POWER_MANA) - _manaAmount;
+            _manaAmount = target->GetPower(POWER_TYPE_MANA) - _manaAmount;
             if (_manaAmount > 0)
                 caster->CastCustomSpell(54986 /*Energize*/, SPELLVALUE_BASE_POINT1, _manaAmount, caster, true);
         }

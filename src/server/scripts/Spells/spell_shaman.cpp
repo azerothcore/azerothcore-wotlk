@@ -252,9 +252,9 @@ class spell_sha_feral_spirit_scaling : public AuraScript
                 }
                 else
                 {
-                    uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                    uint32 actStat = GetUnitOwner()->GetPower(POWER_TYPE_MANA);
                     GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                    GetUnitOwner()->SetPower(POWER_TYPE_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_TYPE_MANA), actStat));
                 }
             }
         }
@@ -991,7 +991,7 @@ class spell_sha_mana_spring_totem : public SpellScript
         int32 damage = GetEffectValue();
         if (Unit* target = GetHitUnit())
             if (Unit* caster = GetCaster())
-                if (target->HasActivePowerType(POWER_MANA))
+                if (target->HasActivePowerType(POWER_TYPE_MANA))
                     caster->CastCustomSpell(target, SPELL_SHAMAN_MANA_SPRING_TOTEM_ENERGIZE, &damage, 0, 0, true, 0, 0, GetOriginalCaster()->GetGUID());
     }
 
@@ -1016,7 +1016,7 @@ class spell_sha_mana_tide_totem : public SpellScript
         if (Unit* caster = GetCaster())
             if (Unit* unitTarget = GetHitUnit())
             {
-                if (unitTarget->HasActivePowerType(POWER_MANA))
+                if (unitTarget->HasActivePowerType(POWER_TYPE_MANA))
                 {
                     int32 effValue = GetEffectValue();
                     // Glyph of Mana Tide
@@ -1024,7 +1024,7 @@ class spell_sha_mana_tide_totem : public SpellScript
                         if (AuraEffect* dummy = owner->GetAuraEffect(SPELL_SHAMAN_GLYPH_OF_MANA_TIDE, 0))
                             effValue += dummy->GetAmount();
                     // Regenerate 6% of Total Mana Every 3 secs
-                    int32 effBasePoints0 = int32(CalculatePct(unitTarget->GetMaxPower(POWER_MANA), effValue));
+                    int32 effBasePoints0 = int32(CalculatePct(unitTarget->GetMaxPower(POWER_TYPE_MANA), effValue));
                     caster->CastCustomSpell(unitTarget, SPELL_SHAMAN_MANA_TIDE_TOTEM, &effBasePoints0, nullptr, nullptr, true, nullptr, nullptr, GetOriginalCaster()->GetGUID());
                 }
             }

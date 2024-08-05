@@ -367,9 +367,9 @@ class spell_warl_generic_scaling : public AuraScript
                 }
                 else
                 {
-                    uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                    uint32 actStat = GetUnitOwner()->GetPower(POWER_TYPE_MANA);
                     GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                    GetUnitOwner()->SetPower(POWER_TYPE_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_TYPE_MANA), actStat));
                 }
             }
         }
@@ -1311,7 +1311,7 @@ class spell_warl_drain_soul : public AuraScript
             // Improved Drain Soul.
             if (Aura const* impDrainSoul = caster->GetAuraOfRankedSpell(SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_R1, caster->GetGUID()))
             {
-                int32 amount = CalculatePct(caster->GetMaxPower(POWER_MANA), impDrainSoul->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
+                int32 amount = CalculatePct(caster->GetMaxPower(POWER_TYPE_MANA), impDrainSoul->GetSpellInfo()->Effects[EFFECT_2].CalcValue());
                 caster->CastCustomSpell(SPELL_WARLOCK_IMPROVED_DRAIN_SOUL_PROC, SPELLVALUE_BASE_POINT0, amount, caster, true, nullptr, aurEff, caster->GetGUID());
             }
         }

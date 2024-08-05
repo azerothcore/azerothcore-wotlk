@@ -232,7 +232,7 @@ class spell_dk_raise_ally : public SpellScript
                 ghoul->SetModifierValue(UNIT_MOD_HEALTH, TOTAL_VALUE, (ghoul->GetStat(STAT_STAMINA) - ghoul->GetCreateStat(STAT_STAMINA)) * 10.0f);
 
                 // Power Energy
-                ghoul->SetModifierValue(UnitMods(UNIT_MOD_POWER_START + static_cast<uint8>(POWER_ENERGY)), BASE_VALUE, ghoul->GetCreatePowers(POWER_ENERGY));
+                ghoul->SetModifierValue(UnitMods(UNIT_MOD_POWER_START + static_cast<uint8>(POWER_TYPE_ENERGY)), BASE_VALUE, ghoul->GetCreatePowers(POWER_TYPE_ENERGY));
                 ghoul->UpdateAllStats();
                 ghoul->SetFullHealth();
 
@@ -837,9 +837,9 @@ class spell_dk_pet_scaling : public AuraScript
                 }
                 else
                 {
-                    uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                    uint32 actStat = GetUnitOwner()->GetPower(POWER_TYPE_MANA);
                     GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                    GetUnitOwner()->SetPower(POWER_TYPE_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_TYPE_MANA), actStat));
                 }
             }
         }

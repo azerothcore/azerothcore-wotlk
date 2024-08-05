@@ -102,7 +102,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             context.Repeat(45s, 50s);
         }).Schedule(12s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_MANA, 40.0f, false)))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, PowerUsersSelector(me, POWER_TYPE_MANA, 40.0f, false)))
             {
                 DoCast(target, SPELL_MANA_TAP);
             }
@@ -110,7 +110,7 @@ struct boss_pathaleon_the_calculator : public BossAI
         }).Schedule(16s, [this](TaskContext context)
         {
             me->RemoveAurasDueToSpell(SPELL_MANA_TAP);
-            me->ModifyPower(POWER_MANA, 5000);
+            me->ModifyPower(POWER_TYPE_MANA, 5000);
             DoCastSelf(SPELL_ARCANE_TORRENT);
             context.Repeat(15s);
         }).Schedule(10s, 15s, [this](TaskContext context)

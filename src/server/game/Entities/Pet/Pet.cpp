@@ -320,9 +320,9 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
             ReplaceAllUnitFlags(UNIT_FLAG_PLAYER_CONTROLLED);
                                                             // this enables popup window (pet abandon, cancel)
-            SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
-            SetPower(POWER_HAPPINESS, petInfo->Happiness);
-            setPowerType(POWER_FOCUS);
+            SetMaxPower(POWER_TYPE_HAPPINESS, GetCreatePowers(POWER_TYPE_HAPPINESS));
+            SetPower(POWER_TYPE_HAPPINESS, petInfo->Happiness);
+            setPowerType(POWER_TYPE_FOCUS);
             break;
         default:
             if (!IsPetGhoul())
@@ -476,11 +476,11 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
 
         uint32 curMana = savedmana;
         if (fullMana)
-            curMana = GetMaxPower(POWER_MANA);
+            curMana = GetMaxPower(POWER_TYPE_MANA);
 
         if (getPetType() == SUMMON_PET && !current) //all (?) summon pets come with full health when called, but not when they are current
         {
-            SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+            SetPower(POWER_TYPE_MANA, GetMaxPower(POWER_TYPE_MANA));
             SetFullHealth();
         }
         else
@@ -490,7 +490,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
             else
             {
                 SetHealth(curHealth > GetMaxHealth() ? GetMaxHealth() : curHealth);
-                SetPower(POWER_MANA, curMana > GetMaxPower(POWER_MANA) ? GetMaxPower(POWER_MANA) : curMana);
+                SetPower(POWER_TYPE_MANA, curMana > GetMaxPower(POWER_TYPE_MANA) ? GetMaxPower(POWER_TYPE_MANA) : curMana);
             }
         }
 
@@ -527,7 +527,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
     }
 
     uint32 curhealth = GetHealth();
-    uint32 curmana = GetPower(POWER_MANA);
+    uint32 curmana = GetPower(POWER_TYPE_MANA);
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     // save auras before possibly removing them
@@ -585,7 +585,7 @@ void Pet::SavePetToDB(PetSaveMode mode)
         stmt->SetData(11, uint8(mode));
         stmt->SetData(12, curhealth);
         stmt->SetData(13, curmana);
-        stmt->SetData(14, GetPower(POWER_HAPPINESS));
+        stmt->SetData(14, GetPower(POWER_TYPE_HAPPINESS));
         stmt->SetData(15, GameTime::GetGameTime().count());
         stmt->SetData(16, actionBar);
 
@@ -641,7 +641,7 @@ void Pet::setDeathState(DeathState s, bool /*despawn = false*/)                 
             //lose happiness when died and not in BG/Arena
             MapEntry const* mapEntry = sMapStore.LookupEntry(GetMapId());
             if (!mapEntry || (mapEntry->map_type != MAP_ARENA && mapEntry->map_type != MAP_BATTLEGROUND))
-                ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
+                ModifyPower(POWER_TYPE_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
             //SetUnitFlag(UNIT_FLAG_STUNNED);
         }
@@ -709,13 +709,13 @@ void Pet::Update(uint32 diff)
 
                 // xinef: m_regenTimer is decrased in Creature::Update()
                 // xinef: just check if we can update focus in current period
-                if (GetPowerType() == POWER_FOCUS)
+                if (GetPowerType() == POWER_TYPE_FOCUS)
                 {
                     m_petRegenTimer -= _diff;
                     if (m_petRegenTimer <= 0s)
                     {
                         m_petRegenTimer += PET_FOCUS_REGEN_INTERVAL;
-                        Regenerate(POWER_FOCUS);
+                        Regenerate(POWER_TYPE_FOCUS);
                     }
                 }
 
@@ -861,20 +861,20 @@ void Pet::Update(uint32 diff)
 
 void Pet::LoseHappiness()
 {
-    uint32 curValue = GetPower(POWER_HAPPINESS);
+    uint32 curValue = GetPower(POWER_TYPE_HAPPINESS);
     if (curValue <= 0)
         return;
     int32 addvalue = 670;                                   //value is 70/35/17/8/4 (per min) * 1000 / 8 (timer 7.5 secs)
     if (IsInCombat())                                        //we know in combat happiness fades faster, multiplier guess
         addvalue = int32(addvalue * 1.5f);
-    ModifyPower(POWER_HAPPINESS, -addvalue);
+    ModifyPower(POWER_TYPE_HAPPINESS, -addvalue);
 }
 
 HappinessState Pet::GetHappinessState()
 {
-    if (GetPower(POWER_HAPPINESS) < HAPPINESS_LEVEL_SIZE)
+    if (GetPower(POWER_TYPE_HAPPINESS) < HAPPINESS_LEVEL_SIZE)
         return UNHAPPY;
-    else if (GetPower(POWER_HAPPINESS) >= HAPPINESS_LEVEL_SIZE * 2)
+    else if (GetPower(POWER_TYPE_HAPPINESS) >= HAPPINESS_LEVEL_SIZE * 2)
         return HAPPY;
     else
         return CONTENT;
@@ -998,9 +998,9 @@ bool Pet::CreateBaseAtTamed(CreatureTemplate const* cinfo, Map* map, uint32 phas
     if (!Create(guid, map, phaseMask, cinfo->Entry, pet_number))
         return false;
 
-    SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
-    SetPower(POWER_HAPPINESS, 166500);
-    setPowerType(POWER_FOCUS);
+    SetMaxPower(POWER_TYPE_HAPPINESS, GetCreatePowers(POWER_TYPE_HAPPINESS));
+    SetPower(POWER_TYPE_HAPPINESS, 166500);
+    setPowerType(POWER_TYPE_FOCUS);
     SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
     SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
     SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, uint32(sObjectMgr->GetXPForLevel(GetLevel() + 1)* sWorld->getRate(RATE_XP_PET_NEXT_LEVEL)));
@@ -1401,7 +1401,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     if (GetEntry() == NPC_RISEN_GHOUL)
     {
         // 100% energy after summon
-        SetPower(POWER_ENERGY, GetMaxPower(POWER_ENERGY));
+        SetPower(POWER_TYPE_ENERGY, GetMaxPower(POWER_TYPE_ENERGY));
 
         // xinef: fixes orc death knight command racial
         if (owner->getRace() == RACE_ORC)
@@ -1427,7 +1427,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     UpdateAllStats();
 
     SetFullHealth();
-    SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
+    SetPower(POWER_TYPE_MANA, GetMaxPower(POWER_TYPE_MANA));
 
     if (owner->GetTypeId() == TYPEID_PLAYER)
         sScriptMgr->OnAfterGuardianInitStatsForLevel(owner->ToPlayer(), this);
@@ -2481,8 +2481,8 @@ void Pet::FillPetInfo(PetStable::PetInfo* petInfo) const
     petInfo->Name = GetName();
     petInfo->WasRenamed = !HasByteFlag(UNIT_FIELD_BYTES_2, 2, UNIT_CAN_BE_RENAMED);
     petInfo->Health = GetHealth();
-    petInfo->Mana = GetPower(POWER_MANA);
-    petInfo->Happiness = GetPower(POWER_HAPPINESS);
+    petInfo->Mana = GetPower(POWER_TYPE_MANA);
+    petInfo->Happiness = GetPower(POWER_TYPE_HAPPINESS);
     petInfo->ActionBar = GenerateActionBarData();
     petInfo->LastSaveTime = GameTime::GetGameTime().count();
     petInfo->CreatedBySpellId = GetUInt32Value(UNIT_CREATED_BY_SPELL);
