@@ -142,7 +142,7 @@ void OpcodeTable::Initialize()
     /*0x00C*/ DEFINE_HANDLER(CMSG_DEBUG_CHANGECELLZONE,                                             STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
     /*0x00D*/ DEFINE_HANDLER(CMSG_MOVE_CHARACTER_CHEAT,                                             STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
     /*0x00E*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_MOVE_CHARACTER_CHEAT,                               STATUS_NEVER);
-    /*0x00F*/ DEFINE_HANDLER(CMSG_RECHARGE,                                                         STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
+    /*0x00F*/ DEFINE_HANDLER(CMSG_RECHARGE, STATUS_LOGGEDIN, PROCESS_INPLACE, &User::Handle_NULL);
     /*0x011*/ DEFINE_HANDLER(CMSG_CREATEMONSTER,                                                    STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
     /*0x012*/ DEFINE_HANDLER(CMSG_DESTROYMONSTER,                                                   STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
     /*0x014*/ DEFINE_HANDLER(CMSG_CREATEGAMEOBJECT,                                                 STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );

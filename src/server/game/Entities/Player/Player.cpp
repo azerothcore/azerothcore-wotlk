@@ -106,6 +106,10 @@ static BOOL PlayerLogoutCancelHandler (User*        user,
                                        Opcodes      msgId,
                                        uint32_t     eventTime,
                                        WorldPacket* msg);
+static BOOL PlayerRechargeCheat (User*        user,
+                                 Opcodes      msgId,
+                                 uint         eventTime,
+                                 WorldPacket* msg);
 
 
 enum CharacterFlags
@@ -16486,6 +16490,24 @@ static BOOL PlayerLogoutRequestHandler (User*         user,
   return FALSE;
 }
 
+//===========================================================================
+static BOOL PlayerRechargeCheat (User*        user,
+                                 Opcodes      msgId,
+                                 uint         eventTime,
+                                 WorldPacket* msg) {
+
+  if (Player* plr = user->ActivePlayer()) {
+    // RECHARGE THE PLAYER'S HEALTH BAR
+    uint maxHealth = plr->GetMaxHealth();
+    plr->SetHealth(maxHealth);
+    // RECHARGER THE PLAYER'S POWER BAR
+    POWER_TYPE power = plr->GetPowerType();
+    uint val = plr->GetMaxPower(power);
+    plr->SetPower(power, val);
+  }
+  return TRUE;
+}
+
 
 /****************************************************************************
 *
@@ -16497,6 +16519,7 @@ static BOOL PlayerLogoutRequestHandler (User*         user,
 void PlayerInitialize () {
   if (s_initialized) return;
 
+  WorldSocket::SetMessageHandler(CMSG_RECHARGE, PlayerRechargeCheat);
   WorldSocket::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
   WorldSocket::SetMessageHandler(CMSG_GODMODE, OnGodMode);
   WorldSocket::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler);
@@ -16510,6 +16533,7 @@ void PlayerInitialize () {
 void PlayerDestroy () {
   if (!s_initialized) return;
 
+  WorldSocket::ClearMessageHandler(CMSG_RECHARGE);
   WorldSocket::ClearMessageHandler(CMSG_CREATEITEM);
   WorldSocket::ClearMessageHandler(CMSG_GODMODE);
   WorldSocket::ClearMessageHandler(CMSG_LEARN_SPELL);
