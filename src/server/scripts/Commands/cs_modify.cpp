@@ -78,7 +78,7 @@ public:
         {
             { "reset",          HandleMorphResetCommand,          SEC_MODERATOR,        Console::No },
             { "target",         HandleMorphTargetCommand,         SEC_MODERATOR,        Console::No },
-            { "mount",          HandleMorphMountCommand,          SEC_MODERATOR,        Console::No },
+            { "mount",          HandleMorphMountCommand,          SEC_MODERATOR,        Console::No }
         };
 
         static ChatCommandTable commandTable =
