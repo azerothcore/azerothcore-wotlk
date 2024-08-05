@@ -267,9 +267,11 @@ struct boss_archimonde : public BossAI
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(25s, 35s, [&]
         {
-            scheduler.DelayGroup(GROUP_FEAR, 5s);
-            Talk(SAY_AIR_BURST);
-            DoCastRandomTarget(SPELL_AIR_BURST);
+            if (DoCastRandomTarget(SPELL_AIR_BURST, 1) == SPELL_CAST_OK)
+            {
+                scheduler.DelayGroup(GROUP_FEAR, 5s);
+                Talk(SAY_AIR_BURST);
+            }
         }, 25s, 40s);
         ScheduleTimedEvent(8s, [&]
         {
@@ -471,24 +473,6 @@ class spell_red_sky_effect : public SpellScript
     }
 };
 
-class spell_air_burst : public SpellScript
-{
-    PrepareSpellScript(spell_air_burst);
-
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        if (Unit* victim = GetCaster()->GetVictim())
-        {
-            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
-        }
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_air_burst::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
-    }
-};
-
 class spell_doomfire : public AuraScript
 {
     PrepareAuraScript(spell_doomfire);
@@ -519,7 +503,6 @@ class spell_doomfire : public AuraScript
 void AddSC_boss_archimonde()
 {
     RegisterSpellScript(spell_red_sky_effect);
-    RegisterSpellScript(spell_air_burst);
     RegisterSpellScript(spell_doomfire);
     RegisterHyjalAI(boss_archimonde);
     RegisterHyjalAI(npc_ancient_wisp);
