@@ -220,19 +220,41 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2385500, 9, 2, 0, 0, 0, 100, 0, 257044, 257044, 0, 0, 0, 11, 42505, 0, 0,      0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Chief Thunder-Skins Controller - Actionlist - Cast \'L70ETC Flare Effect\''),
 (2385500, 9, 3, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 41, 0,     0, 0,      0, 0, 0, 11, 23623, 3, 0, 0, 0, 0, 0, 0, '[DNT] L70ETC Chief Thunder-Skins Controller - Actionlist - Despawn Instant');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28210) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3, 4));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28210) AND (`source_type` = 0) AND (`id` IN (0, 1, 2, 3, 4, 5));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(28210, 0, 0, 1, 62, 0, 100, 0, 9667, 0, 0, 0, 0, 72, 0,       0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Close Gossip'),
-(28210, 0, 1, 2, 61, 0, 100, 0, 0,    0, 0, 0, 0, 80, 2385000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Run Script'),
-(28210, 0, 2, 3, 61, 0, 100, 0, 0,    0, 0, 0, 0, 1,  0,       0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Say Line 0'),
-(28210, 0, 3, 0, 61, 0, 100, 0, 0,    0, 0, 0, 0, 80, 2821000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Run Script'),
-(28210, 0, 4, 0, 68, 0, 100, 0, 81,   0, 0, 0, 0, 80, 2821000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Game Event 81 Started - Run Script');
+(28210, 0, 0, 0, 25, 0, 100, 0, 0,    0, 0, 0, 0, 17, 133,     0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Reset - Set Emote State 133'),
+(28210, 0, 1, 2, 62, 0, 100, 0, 9667, 0, 0, 0, 0, 72, 0,       0, 0, 0, 0, 0, 7,  0,     0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Close Gossip'),
+(28210, 0, 2, 3, 61, 0, 100, 0, 0,    0, 0, 0, 0, 80, 2385000, 0, 0, 0, 0, 0, 11, 23850, 5, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Run Script'),
+(28210, 0, 3, 4, 61, 0, 100, 0, 0,    0, 0, 0, 0, 1,  0,       0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Say Line 0'),
+(28210, 0, 4, 0, 61, 0, 100, 0, 0,    0, 0, 0, 0, 80, 2821000, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Gossip Option 0 Selected - Run Script'),
+(28210, 0, 5, 0, 68, 0, 100, 0, 81,   0, 0, 0, 0, 80, 2821000, 0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - On Game Event 81 Started - Run Script');
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2821000) AND (`source_type` = 9) AND (`id` IN (0, 1, 2));
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2821000) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3, 4, 5, 6, 7, 8));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2821000, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 846.874, -186.739, -49.754395, 0, 'Ognip Blastbolt - Actionlist - Move To Position'),
-(2821000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ognip Blastbolt - Actionlist - Remove Npc Flags Gossip'),
-(2821000, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2.077, 'Ognip Blastbolt - Actionlist - Set Orientation 2.077');
+(2821000, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 80, 2820900, 0, 0, 0, 0, 0, 11, 28209, 5, 0, 0, 0,         0,          0,          0,     'Ognip Blastbolt - Actionlist - Run Script'),
+(2821000, 9, 1, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 69, 0,       0, 0, 0, 0, 0, 8,  0,     0, 0, 0, 846.874,   -186.739,   -49.754395, 0,     'Ognip Blastbolt - Actionlist - Move To Position'),
+(2821000, 9, 2, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 83, 1,       0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0,         0,          0,          0,     'Ognip Blastbolt - Actionlist - Remove Npc Flags Gossip'),
+(2821000, 9, 3, 0, 0, 0, 100, 0, 2500,   2500,   0, 0, 0, 66, 0,       0, 0, 0, 0, 0, 8,  0,     0, 0, 0, 0,         0,          0,          2.077, 'Ognip Blastbolt - Actionlist - Set Orientation 2.077'),
+(2821000, 9, 4, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 17, 423,     0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0,         0,          0,          0,     'Ognip Blastbolt - Actionlist - Set Emote State 423'),
+(2821000, 9, 5, 0, 0, 0, 100, 0, 270000, 270000, 0, 0, 0, 69, 0,       0, 0, 0, 0, 0, 8,  0,     0, 0, 0, 845.88074, -182.20273, -49.75489,  0,     'Ognip Blastbolt - Actionlist - Move To Position'),
+(2821000, 9, 6, 0, 0, 0, 100, 0, 2500,   2500,   0, 0, 0, 66, 0,       0, 0, 0, 0, 0, 8,  0,     0, 0, 0, 0,         0,          0,          1.187, 'Ognip Blastbolt - Actionlist - Set Orientation 1.187'),
+(2821000, 9, 7, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 82, 1,       0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0,         0,          0,          0,     'Ognip Blastbolt - Actionlist - Add Npc Flags Gossip'),
+(2821000, 9, 8, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 17, 133,     0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0,         0,          0,          0,     'Ognip Blastbolt - Actionlist - Set Emote State 133');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28209) AND (`source_type` = 0) AND (`id` = 0);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(28209, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 17, 133, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mizli Crankwheel - On Reset - Set Emote State 133');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2820900) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3, 4, 5, 6, 7));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2820900, 9, 0, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 69, 0,       0, 0, 0, 0, 0, 8,  0,     0, 0, 0, 853.608,   -182.679,   -49.755253, 0,     'Mizli Crankwheel - Actionlist - Move To Position'),
+(2820900, 9, 1, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 83, 1,       0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0,         0,          0,          0,     'Mizli Crankwheel - Actionlist - Remove Npc Flags Gossip'),
+(2820900, 9, 2, 0, 0, 0, 100, 0, 2500,   2500,   0, 0, 0, 66, 0,       0, 0, 0, 0, 0, 8,  0,     0, 0, 0, 0,         0,          0,          2.094, 'Mizli Crankwheel - Actionlist - Set Orientation 2.094'),
+(2820900, 9, 3, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 17, 423,     0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0,         0,          0,          0,     'Mizli Crankwheel - Actionlist - Set Emote State 423'),
+(2820900, 9, 4, 0, 0, 0, 100, 0, 270000, 270000, 0, 0, 0, 69, 0,       0, 0, 0, 0, 0, 8,  0,     0, 0, 0, 849.4901, -179.31683, -49.755436,  0,     'Mizli Crankwheel - Actionlist - Move To Position'),
+(2820900, 9, 5, 0, 0, 0, 100, 0, 2500,   2500,   0, 0, 0, 66, 0,       0, 0, 0, 0, 0, 8,  0,     0, 0, 0, 0,         0,          0,          4.102, 'Mizli Crankwheel - Actionlist - Set Orientation 4.102'),
+(2820900, 9, 6, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 82, 1,       0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0,         0,          0,          0,     'Mizli Crankwheel - Actionlist - Add Npc Flags Gossip'),
+(2820900, 9, 7, 0, 0, 0, 100, 0, 0,      0,      0, 0, 0, 17, 133,     0, 0, 0, 0, 0, 1,  0,     0, 0, 0, 0,         0,          0,          0,     'Mizli Crankwheel - Actionlist - Set Emote State 133');
 
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 9666 AND `SourceId` = 0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
