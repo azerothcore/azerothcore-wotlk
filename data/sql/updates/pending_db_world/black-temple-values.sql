@@ -1,920 +1,307 @@
-1420
-speed_walk 2.5
-speed_run 6
-display 901
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.200000002980232238
-combatreach 1
-
-2914
-speed_walk 2.5
-speed_run 6
-display 6303
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.349999994039535522
-combatreach 0.5
-
-14881
-speed_walk 2.5
-speed_run 6
-display 9829
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.187000006437301635
-combatreach 0.150000005960464477
-
-22515
-speed_walk 2.5
-speed_run 6.944439888000488281
-display 16925
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.5
-combatreach 1
-
-22517
-speed_walk 2.5
-speed_run 6.944439888000488281
-display 16925
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.5
-combatreach 1
-
-22841
-speed_walk 2
-speed_run 0.039999999105930328
-display 21357
-baseattacktime 1.8k
-rangeattacktime 1.8k
-boundingradius 5
-combatreach 5
-
-22844
-speed_walk 2.5
-speed_run 10
-display 21115
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 2
-combatreach 0
-
-22845
-speed_walk 2.5
-speed_run 7
-display 21116
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.799999952316284179
-combatreach 0
-
-22846
-speed_walk 2.5
-speed_run 7
-display 21118
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.799999952316284179
-combatreach 0
-
-22847
-speed_walk 2.5
-speed_run 7
-display 21117
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 2
-combatreach 0
-
-22848
-speed_walk 2.5
-speed_run 8
-display 5187
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1
-combatreach 1.25
-
-22849
-speed_walk 5
-speed_run 8
-display 21114
-baseattacktime 1k
-rangeattacktime 1k
-boundingradius 0.521999955177307128
-combatreach 1.5
-
-22853
-speed_walk 5
-speed_run 10
-display 11335
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.899999976158142089
-combatreach 2.5
-
-22855
-speed_walk 5
-speed_run 12
-display 19991
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 4
-combatreach 6
-
-22856
-speed_walk 4
-speed_run 12
-display 21146
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.300000011920928955
-combatreach 1
-
-22869
-speed_walk 5
-speed_run 10
-display 21120
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.899999976158142089
-combatreach 2.5
-
-22871
-speed_walk 4
-speed_run 12
-display 21262
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 2.5
-combatreach 3.75
-
-22873
-speed_walk 4
-speed_run 12
-display 21159
-baseattacktime 3k
-rangeattacktime 3k
-boundingradius 0.868054986000061035
-combatreach 3.75
-
-22874
-speed_walk 4
-speed_run 12
-display 21161
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.781249523162841796
-combatreach 3.375
-
-22875
-speed_walk 4
-speed_run 12
-display 21162
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 2
-combatreach 2
-
-22876
-speed_walk 4
-speed_run 12
-display 21164
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.799999952316284179
-combatreach 1.799999952316284179
-
-22877
-speed_walk 4
-speed_run 12
-display 21164
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.799999952316284179
-combatreach 1.799999952316284179
-
-22878
-speed_walk 4
-speed_run 12
-display 20609
-baseattacktime 1.5k
-rangeattacktime 1.5k
-boundingradius 1.527799963951110839
-combatreach 5
-
-22879
-speed_walk 2.5
-speed_run 8
-display 21370
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.520833015441894531
-combatreach 2.25
-
-22880
-speed_walk 2.5
-speed_run 8
-display 21367
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.607638478279113769
-combatreach 2.625
-
--- 22881
-
-22882
-speed_walk 2.5
-speed_run 8
-display 21373
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.502200007438659667
-combatreach 2.02500009536743164
-
-22883
-speed_walk 4
-speed_run 12
-display 5492
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.213891997933387756
-combatreach 0.699999988079071044
-
-22884
-speed_walk 4
-speed_run 12
-display 17528
-baseattacktime 1.2k
-rangeattacktime 1.2k
-boundingradius 3
-combatreach 4.199999809265136718
-
-22885
-speed_walk 4
-speed_run 7
-display 21457
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.699999988079071044
-combatreach 1.60000002384185791
-
-22886
-speed_walk 2.5
-speed_run 8
-display 18790
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.347000002861022949
-combatreach 1.5
-
-22887
-speed_walk 4
-speed_run 12
-display 21174
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 2.10000014305114746
-combatreach 10.5
-
-22898
-speed_walk 6
-speed_run 15
-display 21145
-baseattacktime 1.5k
-rangeattacktime 1.5k
-boundingradius 80
-combatreach 24
-
-22917
-speed_walk 4
-speed_run 15
-display 21135
-baseattacktime 1.5k
-rangeattacktime 1.5k
-boundingradius 0.458999991416931152
-combatreach 7.5
-
-22939
-speed_walk 2.5
-speed_run 10
-display 21449
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.517049968242645263
-combatreach 2.02500009536743164
-
-22945
-speed_walk 2.5
-speed_run 8
-display 21372
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.502200007438659667
-combatreach 2.02500009536743164
-
-22946
-speed_walk 2.5
-speed_run 9.699999809265136718
-display 14334
-baseattacktime 1.5k
-rangeattacktime 1.5k
-boundingradius 0.420000016689300537
-combatreach 1.80000007152557373
-
-22947
-speed_walk 4
-speed_run 12
-display 21252
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.75
-combatreach 3.75
-
-22948
-speed_walk 4
-speed_run 15
-display 21443
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 2.75
-combatreach 5.774999618530273437
-
-22949
-speed_walk 4
-speed_run 12
-display 21416
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.842599987983703613
-combatreach 3.300000190734863281
-
-22950
-speed_walk 4
-speed_run 12
-display 21417
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.80429995059967041
-combatreach 3.149999856948852539
-
-22951
-speed_walk 4
-speed_run 12
-display 21419
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.80429995059967041
-combatreach 3.149999856948852539
-
-22952
-speed_walk 4
-speed_run 12
-display 21418
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.861749947071075439
-combatreach 3.375
-
-22953
-speed_walk 2.5
-speed_run 8
-display 21151
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.041666030883789062
-combatreach 4.5
-
-22954
-speed_walk 4
-speed_run 10
-display 18753
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 4
-combatreach 4.800000190734863281
-
-22955
-speed_walk 2.5
-speed_run 10
-display 21454
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.270399987697601318
-combatreach 1.949999928474426269
-
-22956
-speed_walk 4
-speed_run 10
-display 21456
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.805999994277954101
-combatreach 3
-
-22957
-speed_walk 5
-speed_run 10
-display 21503
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.75
-combatreach 2.5
-
-22959
-speed_walk 2.5
-speed_run 8
-display 105279
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.574499964714050292
-combatreach 2.25
-
-22960
-speed_walk 2.5
-speed_run 8
-display 21216
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.472000002861022949
-combatreach 3
-
-22962
-speed_walk 5
-speed_run 10
-display 21502
-baseattacktime 1.8k
-rangeattacktime 1.8k
-boundingradius 0.75
-combatreach 2.5
-
-22963
-speed_walk 2.5
-speed_run 8
-display 21537
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.468749701976776123
-combatreach 2.02500009536743164
-
-22964
-speed_walk 4
-speed_run 10
-display 19199
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.805999994277954101
-combatreach 3
-
-22965
-speed_walk 2.5
-speed_run 8
-display 21196
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.428399980068206787
-combatreach 2.099999904632568359
-
-22984
-speed_walk 2.5
-speed_run 6.944439888000488281
-display 16925
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.5
-combatreach 1
-
-23018
-speed_walk 2.5
-speed_run 9.699999809265136718
-display 21379
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.651000022888183593
-combatreach 2.625
-
-23028
-speed_walk 2.5
-speed_run 8
-display 21539
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.694444000720977783
-combatreach 3
-
-23030
-speed_walk 2.5
-speed_run 14
-display 21543
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.744000017642974853
-combatreach 3
-
-23033
-speed_walk 2.5
-speed_run 8
-display 11686
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.5
-combatreach 1
-
-23047
-speed_walk 2.5
-speed_run 8
-display 21384
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.468749701976776123
-combatreach 2.02500009536743164
-
-23049
-speed_walk 2.5
-speed_run 8
-display 21380
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.744000017642974853
-combatreach 3
-
-23084
-speed_walk 2.5
-speed_run 8
-display 11686
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.5
-combatreach 1
-
-23086
-speed_walk 2.5
-speed_run 6
-display 1141
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1
-combatreach 1
-
-23087
-speed_walk 2.5
-speed_run 6
-display 21242
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.138900011777877807
-combatreach 0.25
-
-23089
-speed_walk 2.5
-speed_run 10
-display 21112
-baseattacktime 1.3k
-rangeattacktime 1.3k
-boundingradius 2.599999904632568359
-combatreach 2.599999904632568359
-
-23147
-speed_walk 2.5
-speed_run 8
-display 21375
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.468749701976776123
-combatreach 2.02500009536743164
-
-23157
-speed_walk 2.5
-speed_run 7
-display 21344
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.60000002384185791
-combatreach 0
-
-23158
-speed_walk 2.5
-speed_run 7
-display 21346
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.60000002384185791
-combatreach 0
-
-23159
-speed_walk 2.5
-speed_run 7
-display 21345
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.60000002384185791
-combatreach 0
-
-23172
-speed_walk 2.5
-speed_run 8
-display 20381
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.607638478279113769
-combatreach 2.625
-
-23191
-speed_walk 4
-speed_run 6.944439888000488281
-display 21318
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 3
-combatreach 3
-
-23196
-speed_walk 5
-speed_run 12
-display 21490
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.20000004768371582
-combatreach 4
-
-23210
-speed_walk 2.5
-speed_run 8
-display 20577
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.75
-combatreach 1.5
-
-23222
-speed_walk 2.5
-speed_run 14
-display 21549
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.1284714937210083
-combatreach 4.875
-
-23223
-speed_walk 2.5
-speed_run 8
-display 21284
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.434027493000030517
-combatreach 1.875
-
-23232
-speed_walk 2.5
-speed_run 10
-display 21355
-baseattacktime 1.5k
-rangeattacktime 1.5k
-boundingradius 3.75
-combatreach 3.125
-
-23235
-speed_walk 2.5
-speed_run 10
-display 21555
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.694444000720977783
-combatreach 3
-
-23236
-speed_walk 2.5
-speed_run 8
-display 21553
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.642360687255859375
-combatreach 2.77500009536743164
-
-23237
-speed_walk 2.5
-speed_run 8
-display 21552
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.642360687255859375
-combatreach 2.77500009536743164
-
-23239
-speed_walk 2.5
-speed_run 14
-display 21550
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.1284714937210083
-combatreach 4.875
-
-23288
-speed_walk 2.5
-speed_run 8
-display 20577
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.75
-combatreach 1.5
-
-23330
-speed_walk 2.5
-speed_run 14
-display 21546
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.744000017642974853
-combatreach 3
-
-23337
-speed_walk 5
-speed_run 12
-display 18251
-baseattacktime 2.4k
-rangeattacktime 2.4k
-boundingradius 2.5
-combatreach 5
-
-23339
-speed_walk 5
-speed_run 10
-display 11342
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.899999976158142089
-combatreach 2.5
-
-23374
-speed_walk 2.5
-speed_run 10
-display 21442
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.799999952316284179
-combatreach 0
-
-23394
-speed_walk 5
-speed_run 12
-display 21460
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.5
-combatreach 3
-
-23397
-speed_walk 4
-speed_run 10
-display 21562
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.689399957656860351
-combatreach 2.699999809265136718
-
-23398
-speed_walk 2.5
-speed_run 8
-display 11686
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.5
-combatreach 1
-
-23399
-speed_walk 2.777780055999755859
-speed_run 10
-display 16255
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 2.5
-combatreach 3.75
-
-23400
-speed_walk 4
-speed_run 10
-display 21567
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.689399957656860351
-combatreach 2.699999809265136718
-
-23401
-speed_walk 2.777780055999755859
-speed_run 10
-display 21587
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 2
-combatreach 3
-
-23402
-speed_walk 4
-speed_run 10
-display 21468
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.689399957656860351
-combatreach 2.699999809265136718
-
-23403
-speed_walk 4
-speed_run 10
-display 21569
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.689399957656860351
-combatreach 2.699999809265136718
-
-23410
-speed_walk 2.5
-speed_run 7
-display 21476
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.60000002384185791
-combatreach 0
-
-23411
-speed_walk 2.5
-speed_run 7
-display 21475
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.5
-combatreach 0
-
-23412
-speed_walk 2.5
-speed_run 8
-display 15880
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 1.5
-combatreach 3
-
-23417
-speed_walk 2.5
-speed_run 6.944439888000488281
-display 15435
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.389999985694885253
-combatreach 1
-
-23421
-speed_walk 2.5
-speed_run 12
-display 21594
-baseattacktime 1.6k
-rangeattacktime 1.6k
-boundingradius 1.25
-combatreach 0
-
-23426
-speed_walk 2.5
-speed_run 8
-display 11686
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.5
-combatreach 1
-
-23448
-speed_walk 2.5
-speed_run 6.944439888000488281
-display 15435
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.389999985694885253
-combatreach 1
-
-23472
-speed_walk 2.5
-speed_run 6.944439888000488281
-display 16925
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.5
-combatreach 1
-
-23499
-speed_walk 2.5
-speed_run 8
-display 11686
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.5
-combatreach 1
-
-23502
-speed_walk 2.5
-speed_run 6.944439888000488281
-display 15435
-baseattacktime 2k
-rangeattacktime 2k
-boundingradius 0.389999985694885253
-combatreach 1
+UPDATE `creature_template` SET `speed_walk` = , `speed_run` = , `BaseAttackTime` = , `RangeAttackTime` =  WHERE `entry` = ;
+UPDATE `creature_model_info` SET `BoundingRadius` = , `CombatReach` =  WHERE `DisplayID` = ;
 
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.8571428571428571, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 1420;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.200000002980232238, `CombatReach` = 1 WHERE `DisplayID` = 901;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.8571428571428571, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 2914;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.349999994039535522, `CombatReach` = 0.5 WHERE `DisplayID` = 6303;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.8571428571428571, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 14881;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.187000006437301635, `CombatReach` = 0.150000005960464477 WHERE `DisplayID` = 9829;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.99206284114, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22515;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.5, `CombatReach` = 1 WHERE `DisplayID` = 16925;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.99206284114, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22517;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.5, `CombatReach` = 1 WHERE `DisplayID` = 16925;
+
+UPDATE `creature_template` SET `speed_walk` = 0.8, `speed_run` = 0.00571428558, `BaseAttackTime` = 1800, `RangeAttackTime` = 1800 WHERE `entry` = 22841;
+UPDATE `creature_model_info` SET `BoundingRadius` = 5, `CombatReach` = 5 WHERE `DisplayID` = 21357;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22844;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2, `CombatReach` = 0 WHERE `DisplayID` = 21115;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22845;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.799999952316284179, `CombatReach` = 0 WHERE `DisplayID` = 21116;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22846;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.799999952316284179, `CombatReach` = 0 WHERE `DisplayID` = 21118;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22847;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2, `CombatReach` = 0 WHERE `DisplayID` = 21117;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22848;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1, `CombatReach` = 1.25 WHERE `DisplayID` = 5187;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.142857142857143, `BaseAttackTime` = 1000, `RangeAttackTime` = 1000 WHERE `entry` = 22849;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.521999955177307128, `CombatReach` = 1.5 WHERE `DisplayID` = 21114;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22853;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.899999976158142089, `CombatReach` = 2.5 WHERE `DisplayID` = 11335;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22855;
+UPDATE `creature_model_info` SET `BoundingRadius` = 4, `CombatReach` = 6 WHERE `DisplayID` = 19991;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22856;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.300000011920928955, `CombatReach` = 1 WHERE `DisplayID` = 21146;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22869;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.899999976158142089, `CombatReach` = 2.5 WHERE `DisplayID` = 21120;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22871;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2.5, `CombatReach` = 3.75 WHERE `DisplayID` = 21262;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 3000, `RangeAttackTime` = 3000 WHERE `entry` = 22873;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.868054986000061035, `CombatReach` = 3.75 WHERE `DisplayID` = 21159;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22874;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.781249523162841796, `CombatReach` = 3.375 WHERE `DisplayID` = 21161;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22875;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2, `CombatReach` = 2 WHERE `DisplayID` = 21162;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22876;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.799999952316284179, `CombatReach` = 1.799999952316284179 WHERE `DisplayID` = 21164;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22877;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.799999952316284179, `CombatReach` = 1.799999952316284179 WHERE `DisplayID` = 21164;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 1500, `RangeAttackTime` = 1500 WHERE `entry` = 22878;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.527799963951110839, `CombatReach` = 5 WHERE `DisplayID` = 20609;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22879;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.520833015441894531, `CombatReach` = 2.25 WHERE `DisplayID` = 21370;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22880;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.607638478279113769, `CombatReach` = 2.625 WHERE `DisplayID` = 21367;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22882;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.502200007438659667, `CombatReach` = 2.02500009536743164 WHERE `DisplayID` = 21373;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22883;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.213891997933387756, `CombatReach` = 0.699999988079071044 WHERE `DisplayID` = 5492;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 1200, `RangeAttackTime` = 1200 WHERE `entry` = 22884;
+UPDATE `creature_model_info` SET `BoundingRadius` = 3, `CombatReach` = 4.199999809265136718 WHERE `DisplayID` = 17528;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22885;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.699999988079071044, `CombatReach` = 1.60000002384185791 WHERE `DisplayID` = 21457;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22886;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.347000002861022949, `CombatReach` = 1.5 WHERE `DisplayID` = 18790;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22887;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2.10000014305114746, `CombatReach` = 10.5 WHERE `DisplayID` = 21174;
+
+UPDATE `creature_template` SET `speed_walk` = 2.4, `speed_run` = 2.14285714286, `BaseAttackTime` = 1500, `RangeAttackTime` = 1500 WHERE `entry` = 22898;
+UPDATE `creature_model_info` SET `BoundingRadius` = 80, `CombatReach` = 24 WHERE `DisplayID` = 21145;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 2.14285714286, `BaseAttackTime` = 1500, `RangeAttackTime` = 1500 WHERE `entry` = 22917;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.458999991416931152, `CombatReach` = 7.5 WHERE `DisplayID` = 21135;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22939;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.517049968242645263, `CombatReach` = 2.02500009536743164 WHERE `DisplayID` = 21449;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22945;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.502200007438659667, `CombatReach` = 2.02500009536743164 WHERE `DisplayID` = 21372;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.38571425847, `BaseAttackTime` = 1500, `RangeAttackTime` = 1500 WHERE `entry` = 22946;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.420000016689300537, `CombatReach` = 1.80000007152557373 WHERE `DisplayID` = 14334;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22947;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.75, `CombatReach` = 3.75 WHERE `DisplayID` = 21252;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 2.14285714286, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22948;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2.75, `CombatReach` = 5.774999618530273437 WHERE `DisplayID` = 21443;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22949;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.842599987983703613, `CombatReach` = 3.300000190734863281 WHERE `DisplayID` = 21416;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22950;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.80429995059967041, `CombatReach` = 3.149999856948852539 WHERE `DisplayID` = 21417;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22951;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.80429995059967041, `CombatReach` = 3.149999856948852539 WHERE `DisplayID` = 21419;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22952;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.861749947071075439, `CombatReach` = 3.375 WHERE `DisplayID` = 21418;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22953;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.041666030883789062, `CombatReach` = 4.5 WHERE `DisplayID` = 21151;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22954;
+UPDATE `creature_model_info` SET `BoundingRadius` = 4, `CombatReach` = 4.800000190734863281 WHERE `DisplayID` = 18753;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22955;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.270399987697601318, `CombatReach` = 1.949999928474426269 WHERE `DisplayID` = 21454;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22956;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.805999994277954101, `CombatReach` = 3 WHERE `DisplayID` = 21456;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22957;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.75, `CombatReach` = 2.5 WHERE `DisplayID` = 21503;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22959;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22960;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.472000002861022949, `CombatReach` = 3 WHERE `DisplayID` = 21216;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.428571428571429, `BaseAttackTime` = 1800, `RangeAttackTime` = 1800 WHERE `entry` = 22962;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.75, `CombatReach` = 2.5 WHERE `DisplayID` = 21502;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22963;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.468749701976776123, `CombatReach` = 2.02500009536743164 WHERE `DisplayID` = 21537;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22964;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.805999994277954101, `CombatReach` = 3 WHERE `DisplayID` = 19199;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22965;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.428399980068206787, `CombatReach` = 2.099999904632568359 WHERE `DisplayID` = 21196;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.99206284114, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 22984;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.5, `CombatReach` = 1 WHERE `DisplayID` = 16925;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.38571425847, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23018;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.651000022888183593, `CombatReach` = 2.625 WHERE `DisplayID` = 21379;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23028;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.694444000720977783, `CombatReach` = 3 WHERE `DisplayID` = 21539;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 2, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23030;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.744000017642974853, `CombatReach` = 3 WHERE `DisplayID` = 21543;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23033;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.5, `CombatReach` = 1 WHERE `DisplayID` = 11686;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23047;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.468749701976776123, `CombatReach` = 2.02500009536743164 WHERE `DisplayID` = 21384;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23049;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.744000017642974853, `CombatReach` = 3 WHERE `DisplayID` = 21380;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23084;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.5, `CombatReach` = 1 WHERE `DisplayID` = 11686;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.8571428571428571, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23086;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1, `CombatReach` = 1 WHERE `DisplayID` = 1141;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.8571428571428571, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23087;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.138900011777877807, `CombatReach` = 0.25 WHERE `DisplayID` = 21242;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.428571428571429, `BaseAttackTime` = 1300, `RangeAttackTime` = 1300 WHERE `entry` = 23089;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2.599999904632568359, `CombatReach` = 2.599999904632568359 WHERE `DisplayID` = 21112;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23147;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.468749701976776123, `CombatReach` = 2.02500009536743164 WHERE `DisplayID` = 21375;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23157;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.60000002384185791, `CombatReach` = 0 WHERE `DisplayID` = 21344;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23158;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.60000002384185791, `CombatReach` = 0 WHERE `DisplayID` = 21346;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23159;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.60000002384185791, `CombatReach` = 0 WHERE `DisplayID` = 21345;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23172;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.607638478279113769, `CombatReach` = 2.625 WHERE `DisplayID` = 20381;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 0.99206284114, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23191;
+UPDATE `creature_model_info` SET `BoundingRadius` = 3, `CombatReach` = 3 WHERE `DisplayID` = 21318;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23196;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.20000004768371582, `CombatReach` = 4 WHERE `DisplayID` = 21490;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23210;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.75, `CombatReach` = 1.5 WHERE `DisplayID` = 20577;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 2, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23222;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.1284714937210083, `CombatReach` = 4.875 WHERE `DisplayID` = 21549;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23223;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.434027493000030517, `CombatReach` = 1.875 WHERE `DisplayID` = 21284;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.428571428571429, `BaseAttackTime` = 1500, `RangeAttackTime` = 1500 WHERE `entry` = 23232;
+UPDATE `creature_model_info` SET `BoundingRadius` = 3.75, `CombatReach` = 3.125 WHERE `DisplayID` = 21355;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23235;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.694444000720977783, `CombatReach` = 3 WHERE `DisplayID` = 21555;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23236;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.642360687255859375, `CombatReach` = 2.77500009536743164 WHERE `DisplayID` = 21553;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23237;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.642360687255859375, `CombatReach` = 2.77500009536743164 WHERE `DisplayID` = 21552;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 2, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23239;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.1284714937210083, `CombatReach` = 4.875 WHERE `DisplayID` = 21550;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23288;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.75, `CombatReach` = 1.5 WHERE `DisplayID` = 20577;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 2, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23330;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.744000017642974853, `CombatReach` = 3 WHERE `DisplayID` = 21546;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2400, `RangeAttackTime` = 2400 WHERE `entry` = 23337;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2.5, `CombatReach` = 5 WHERE `DisplayID` = 18251;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23339;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.899999976158142089, `CombatReach` = 2.5 WHERE `DisplayID` = 11342;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23374;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.799999952316284179, `CombatReach` = 0 WHERE `DisplayID` = 21442;
+
+UPDATE `creature_template` SET `speed_walk` = 2, `speed_run` = 1.714285714285714, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23394;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.5, `CombatReach` = 3 WHERE `DisplayID` = 21460;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23397;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.689399957656860351, `CombatReach` = 2.699999809265136718 WHERE `DisplayID` = 21562;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23398;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.5, `CombatReach` = 1 WHERE `DisplayID` = 11686;
+
+UPDATE `creature_template` SET `speed_walk` = 1.1111120224, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23399;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2.5, `CombatReach` = 3.75 WHERE `DisplayID` = 16255;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23400;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.689399957656860351, `CombatReach` = 2.699999809265136718 WHERE `DisplayID` = 21567;
+
+UPDATE `creature_template` SET `speed_walk` = 1.1111120224, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23401;
+UPDATE `creature_model_info` SET `BoundingRadius` = 2, `CombatReach` = 3 WHERE `DisplayID` = 21587;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23402;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.689399957656860351, `CombatReach` = 2.699999809265136718 WHERE `DisplayID` = 21468;
+
+UPDATE `creature_template` SET `speed_walk` = 1.6, `speed_run` = 1.428571428571429, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23403;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.689399957656860351, `CombatReach` = 2.699999809265136718 WHERE `DisplayID` = 21569;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23410;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.60000002384185791, `CombatReach` = 0 WHERE `DisplayID` = 21476;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23411;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.5, `CombatReach` = 0 WHERE `DisplayID` = 21475;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23412;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.5, `CombatReach` = 3 WHERE `DisplayID` = 15880;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.99206284114, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23417;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.389999985694885253, `CombatReach` = 1 WHERE `DisplayID` = 15435;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.714285714285714, `BaseAttackTime` = 1600, `RangeAttackTime` = 1600 WHERE `entry` = 23421;
+UPDATE `creature_model_info` SET `BoundingRadius` = 1.25, `CombatReach` = 0 WHERE `DisplayID` = 21594;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23426;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.5, `CombatReach` = 1 WHERE `DisplayID` = 11686;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.99206284114, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23448;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.389999985694885253, `CombatReach` = 1 WHERE `DisplayID` = 15435;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.99206284114, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23472;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.5, `CombatReach` = 1 WHERE `DisplayID` = 16925;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.142857142857143, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23499;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.5, `CombatReach` = 1 WHERE `DisplayID` = 11686;
+
+UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.99206284114, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23502;
+UPDATE `creature_model_info` SET `BoundingRadius` = 0.389999985694885253, `CombatReach` = 1 WHERE `DisplayID` = 15435;
