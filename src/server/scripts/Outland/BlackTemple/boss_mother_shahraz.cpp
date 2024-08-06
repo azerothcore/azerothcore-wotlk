@@ -59,7 +59,6 @@ enum Spells
 
 enum Misc
 {
-    DATA_SHAHRAZ_BEAM               = 1,
     GROUP_ENRAGE                    = 1
 };
 
