@@ -131,21 +131,6 @@ struct boss_mother_shahraz : public BossAI
         Talk(SAY_DEATH);
     }
 
-    void SetData(uint32 id, uint32 value)
-    {
-        me->m_Events.AddEventAtOffset([&] {
-            DoCastSelf(value, true);
-        }, 3s);
-
-        me->m_Events.AddEventAtOffset([&] {
-            DoCastSelf(value, true);
-        }, 12s);
-
-        me->m_Events.AddEventAtOffset([&] {
-            DoCastSelf(value, true);
-        }, 21s);
-    }
-
     private:
         bool _canTalk;
 };
@@ -162,8 +147,8 @@ class spell_mother_shahraz_random_periodic_aura : public AuraScript
     void Update(AuraEffect const* effect)
     {
         PreventDefaultAction();
-        if (GetUnitOwner() && effect->GetTickNumber() % 6 == 1 || effect->GetTickNumber() == 1) // New beam is chosen and 3 casts are scheduled
-            GetUnitOwner()->ToCreature()->AI()->SetData(DATA_SHAHRAZ_BEAM, RAND(SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC));
+        if (GetUnitOwner() && effect->GetTickNumber() % 6 == 1 || effect->GetTickNumber() == 1) // New beam type is chosen
+            GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC), true);
     }
 
     void Register() override
