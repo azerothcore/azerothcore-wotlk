@@ -519,7 +519,8 @@ class bot_ai : public CreatureAI
 
         void ReportSpellCast(uint32 spellId, const std::string& followedByString, Player const* target) const;
 
-        void ApplyItemBonuses(uint8 slot);
+        void ApplyItemEnchantment(Item* item, EnchantmentSlot eslot, uint8 slot);
+        void RemoveItemClassEnchantment(uint8 slot);
 
         bool HasAuraTypeWithValueAtLeast(AuraType auratype, int32 minvalue, Unit const* unit = nullptr) const;
 
@@ -579,9 +580,9 @@ class bot_ai : public CreatureAI
         void RemoveItemBonuses(uint8 slot);
         void RemoveItemEnchantments(Item const* item);
         void RemoveItemEnchantment(Item const* item, EnchantmentSlot eslot);
-        void RemoveItemClassEnchants();
+        void RemoveItemClassEnchantments();
+        void ApplyItemBonuses(uint8 slot);
         void ApplyItemEnchantments(Item* item, uint8 slot);
-        void ApplyItemEnchantment(Item* item, EnchantmentSlot eslot, uint8 slot);
         void ApplyItemEquipSpells(Item* item, bool apply);
         void ApplyItemEquipEnchantmentSpells(Item* item);
         void ApplyItemSetBonuses(Item* item, bool apply);

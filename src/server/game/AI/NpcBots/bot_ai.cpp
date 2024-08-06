@@ -8168,7 +8168,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     else if (action == 2)
                     {
                         //Clear poisons (autorefresh is in class ai DoNonCombatActions
-                        RemoveItemClassEnchants();
+                        RemoveItemClassEnchantments();
                     }
                     else if (action == 3)
                     {
@@ -8222,7 +8222,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     if (action == 2)
                     {
                         //Clear enchants (autorefresh is in class ai DoNonCombatActions
-                        RemoveItemClassEnchants();
+                        RemoveItemClassEnchantments();
                     }
                     else if (action == 3)
                     {
@@ -13031,23 +13031,27 @@ void bot_ai::RemoveItemEnchantment(Item const* item, EnchantmentSlot eslot)
     }
 }
 
-void bot_ai::RemoveItemClassEnchants()
+void bot_ai::RemoveItemClassEnchantment(uint8 slot)
 {
     uint8 eslot = TEMP_ENCHANTMENT_SLOT;
+
+    if (!GetAIMiscValue(slot == BOT_SLOT_MAINHAND ? BOTAI_MISC_ENCHANT_CAN_EXPIRE_MH : BOTAI_MISC_ENCHANT_CAN_EXPIRE_OH))
+        return;
+
+    Item* weap = _equips[slot];
+    if (!weap || !weap->GetEnchantmentId(EnchantmentSlot(eslot)))
+        return;
+
+    RemoveItemEnchantment(weap, EnchantmentSlot(eslot));
+
+    for (uint8 i = 0; i != MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++i)
+        weap->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + eslot*MAX_ENCHANTMENT_OFFSET + i, 0);
+}
+
+void bot_ai::RemoveItemClassEnchantments()
+{
     for (uint8 k = BOT_SLOT_MAINHAND; k != BOT_SLOT_RANGED; ++k)
-    {
-        if (!GetAIMiscValue(k == BOT_SLOT_MAINHAND ? BOTAI_MISC_ENCHANT_CAN_EXPIRE_MH : BOTAI_MISC_ENCHANT_CAN_EXPIRE_OH))
-            continue;
-
-        Item* weap = _equips[k];
-        if (!weap || !weap->GetEnchantmentId(EnchantmentSlot(eslot)))
-            continue;
-
-        RemoveItemEnchantment(weap, EnchantmentSlot(eslot));
-
-        for (uint8 i = 0; i != MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++i)
-            weap->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + eslot*MAX_ENCHANTMENT_OFFSET + i, 0);
-    }
+        RemoveItemClassEnchantment(k);
 }
 
 void bot_ai::ApplyItemEquipSpells(Item* item, bool apply)
@@ -14184,7 +14188,7 @@ void bot_ai::DefaultInit()
     if (!firstspawn)
     {
         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
-        RemoveItemClassEnchants(); //clear rogue poisons / shaman ecnhants
+        RemoveItemClassEnchantments(); //clear rogue poisons / shaman ecnhants
         ApplyItemsSpells(); //restore item equip spells
     }
     else

@@ -1174,21 +1174,9 @@ public:
             ResurrectGroup(GetSpell(ANCESTRAL_SPIRIT_1));
 
             if (mhEnchantExpireTimer > 0 && mhEnchantExpireTimer <= diff)
-            {
-                uint8 slot = TEMP_ENCHANTMENT_SLOT;
-                if (Item* mh = GetEquips(BOT_SLOT_MAINHAND))
-                    if (mh->GetEnchantmentId(EnchantmentSlot(slot)))
-                        for (uint8 i = 0; i != MAX_ITEM_ENCHANTMENT_EFFECTS; ++i)
-                            mh->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + i, 0);
-            }
+                RemoveItemClassEnchantment(BOT_SLOT_MAINHAND);
             if (ohEnchantExpireTimer > 0 && ohEnchantExpireTimer <= diff)
-            {
-                uint8 slot = TEMP_ENCHANTMENT_SLOT;
-                if (Item* oh = GetEquips(BOT_SLOT_OFFHAND))
-                    if (oh->GetEnchantmentId(EnchantmentSlot(slot)))
-                        for (uint8 i = 0; i != MAX_ITEM_ENCHANTMENT_EFFECTS; ++i)
-                            oh->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + i, 0);
-            }
+                RemoveItemClassEnchantment(BOT_SLOT_OFFHAND);
 
             // Weapon Enchants
             if (me->isMoving())
@@ -1950,7 +1938,7 @@ public:
                 item->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_ID_OFFSET, enchant_id);
                 item->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET, duration);
                 item->SetUInt32Value(ITEM_FIELD_ENCHANTMENT_1_1 + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET, charges);
-                ApplyItemBonuses(itemSlot); //RemoveItemBonuses inside
+                ApplyItemEnchantment(item, TEMP_ENCHANTMENT_SLOT, itemSlot);
                 if (itemSlot == BOT_SLOT_MAINHAND)
                     mhEnchantExpireTimer = ITEM_ENCHANTMENT_EXPIRE_TIMER;
                 else if (itemSlot == BOT_SLOT_OFFHAND)
