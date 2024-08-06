@@ -1,3 +1,4 @@
+-- DB update 2024_08_06_02 -> 2024_08_06_03
 UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.8571428571428571, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 1420;
 UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.8571428571428571, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 2914;
 UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 0.8571428571428571, `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 14881;
