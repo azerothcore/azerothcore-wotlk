@@ -673,8 +673,7 @@ namespace lfg
 
                                     if (plrg->GetGUID() != grp->GetLeaderGUID())
                                         if (Player* leader = ObjectAccessor::FindPlayer(grp->GetLeaderGUID()))
-                                            (ChatHandler(leader->GetSession())).PSendSysMessage("There is a npcbot in your group (owner: %s). Using npcbots in Dungeon Finder is restricted. Contact your administration.",
-                                                plrg->GetName().c_str());
+                                            (ChatHandler(leader->GetSession())).PSendSysMessage("There is a npcbot in your group (owner: {}). Using npcbots in Dungeon Finder is restricted. Contact your administration.", plrg->GetName());
 
                                     joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
                                     break;
@@ -685,7 +684,7 @@ namespace lfg
                                     //if (!(bot->GetBotRoles() & ( 1 | 2 | 4 ))) //(BOT_ROLE_TANK | BOT_ROLE_DPS | BOT_ROLE_HEAL)
                                     //{
                                     //    //no valid roles - reqs are not met
-                                    //    (ChatHandler(plrg->GetSession())).PSendSysMessage("Your bot %s does not have any viable roles assigned.", bot->GetName().c_str());
+                                    //    (ChatHandler(plrg->GetSession())).PSendSysMessage("Your bot {} does not have any viable roles assigned.", bot->GetName());
                                     //    joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
                                     //    continue;
                                     //}

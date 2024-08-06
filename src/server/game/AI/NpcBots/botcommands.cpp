@@ -707,7 +707,7 @@ public:
     {
         if (!log_type || !entry)
         {
-            handler->PSendSysMessage(".npcbot log testwrite #log_type #entry #[owner] #[mapid] #[inmap] #[inworld] #[params[1-%u]]", MAX_BOT_LOG_PARAMS);
+            handler->PSendSysMessage(".npcbot log testwrite #log_type #entry #[owner] #[mapid] #[inmap] #[inworld] #[params[1-{}]]", MAX_BOT_LOG_PARAMS);
             handler->SendSysMessage("Test `characters_npcbot_logs` table write 2");
             handler->SetSentErrorMessage(true);
             return false;
@@ -797,7 +797,7 @@ public:
             handler->SendSysMessage(wp->ToString().c_str());
         }
 
-        handler->PSendSysMessage("Generating wander nodes completed with %u nodes", uint32(WanderNode::GetAllWPsCount()));
+        handler->PSendSysMessage("Generating wander nodes completed with {} nodes", uint32(WanderNode::GetAllWPsCount()));
 
         if (!(save && *save))
             return true;
@@ -895,7 +895,7 @@ public:
         WanderNode::DoForContainerWPs(links, [wp = wp, wpc = wpc, handler = handler](WanderNode const* lwp) {
             if (!lwp->GetCreature())
             {
-                handler->PSendSysMessage("Can't visualise link %u-%u, no creature...", wp->GetWPId(), lwp->GetWPId());
+                handler->PSendSysMessage("Can't visualise link {}-{}, no creature...", wp->GetWPId(), lwp->GetWPId());
                 return;
             }
             wpc->CastSpell(lwp->GetCreature(), 2400, true);
@@ -916,11 +916,11 @@ public:
         wps_updates.insert(wp);
 
         if (linksCopy.empty())
-            handler->PSendSysMessage("WP %u had no links...", wp->GetWPId());
+            handler->PSendSysMessage("WP {} had no links...", wp->GetWPId());
         else
         {
             WanderNode::DoForContainerWPs(linksCopy, [wp = wp, handler = handler](WanderNode* lwp) {
-                handler->PSendSysMessage("Removing link %u<->%u...", wp->GetWPId(), lwp->GetWPId());
+                handler->PSendSysMessage("Removing link {}<->{}...", wp->GetWPId(), lwp->GetWPId());
                 wp->UnLink(lwp);
             });
         }
@@ -929,23 +929,23 @@ public:
         {
             if (lid == wp->GetWPId())
             {
-                handler->PSendSysMessage("Trying to add WP %u to its own links! Are you dumb?", lid);
+                handler->PSendSysMessage("Trying to add WP {} to its own links! Are you dumb?", lid);
                 continue;
             }
 
             WanderNode* lwp = WanderNode::FindInMapWPs(wp->GetMapId(), lid);
             if (!lwp)
             {
-                handler->PSendSysMessage("WP %u is not found in map %u!", lid, wp->GetMapId());
+                handler->PSendSysMessage("WP {} is not found in map {}!", lid, wp->GetMapId());
                 continue;
             }
 
             if (wps_relinks.contains(lwp))
                 wps_relinks.erase(lwp);
 
-            handler->PSendSysMessage("Adding link %u%s%u...", wp->GetWPId(), oneway ? "->" : "<->", lid);
+            handler->PSendSysMessage("Adding link {}{}{}...", wp->GetWPId(), oneway ? "->" : "<->", lid);
             if (wp->GetExactDist2d(lwp) > MAX_VISIBILITY_DISTANCE)
-                handler->PSendSysMessage("Warning! Link distance is too great (%.2f)", wp->GetExactDist2d(lwp));
+                handler->PSendSysMessage("Warning! Link distance is too great ({:.2f})", wp->GetExactDist2d(lwp));
 
             wp->Link(lwp, oneway);
             wps_updates.insert(lwp);
@@ -960,9 +960,9 @@ public:
             std::sort(wps_relinks_vec.begin(), wps_relinks_vec.end());
             for (WanderNode* rlwp : wps_relinks_vec)
             {
-                handler->PSendSysMessage("Adding link %u<->%u...", wp->GetWPId(), rlwp->GetWPId());
+                handler->PSendSysMessage("Adding link {}<->{}...", wp->GetWPId(), rlwp->GetWPId());
                 if (wp->GetExactDist2d(rlwp) > MAX_VISIBILITY_DISTANCE)
-                    handler->PSendSysMessage("Warning! Link distance is too great (%.2f)", wp->GetExactDist2d(rlwp));
+                    handler->PSendSysMessage("Warning! Link distance is too great ({:.2f})", wp->GetExactDist2d(rlwp));
                 wp->Link(rlwp);
             }
         }
@@ -1037,17 +1037,17 @@ public:
 
         if (!*minlevel || !*maxlevel || *minlevel > DEFAULT_MAX_LEVEL || *maxlevel > DEFAULT_MAX_LEVEL || *minlevel > *maxlevel)
         {
-            handler->PSendSysMessage("WP levels must be within bounds 1-%u, min <= max", uint32(DEFAULT_MAX_LEVEL));
+            handler->PSendSysMessage("WP levels must be within bounds 1-{}, min <= max", uint32(DEFAULT_MAX_LEVEL));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         uint32 zoneId, areaId;
         player->GetZoneAndAreaId(zoneId, areaId);
-        handler->PSendSysMessage("Setting levels min=%u max=%u for zone %u", uint32(*minlevel), uint32(*maxlevel), zoneId);
+        handler->PSendSysMessage("Setting levels min={} max={} for zone {}", uint32(*minlevel), uint32(*maxlevel), zoneId);
         WanderNode::DoForAllZoneWPs(zoneId, [handler = handler, minl = *minlevel, maxl = *maxlevel](WanderNode const* wp) {
-            handler->PSendSysMessage("Setting levels min=%u max=%u for node %u '%s'",
-                uint32(minl), uint32(maxl), wp->GetWPId(), wp->GetName().c_str());
+            handler->PSendSysMessage("Setting levels min={} max={} for node {} '{}'",
+                uint32(minl), uint32(maxl), wp->GetWPId(), wp->GetName());
             const_cast<WanderNode*>(wp)->SetLevels(minl, maxl);
             if (Creature* creature = wp->GetCreature())
                 if (creature->GetLevel() != minl)
@@ -1080,7 +1080,7 @@ public:
 
         if (!*minlevel || !*maxlevel || *minlevel > DEFAULT_MAX_LEVEL || *maxlevel > DEFAULT_MAX_LEVEL || *minlevel > *maxlevel)
         {
-            handler->PSendSysMessage("WP levels must be within bounds 1-%u, min <= max", uint32(DEFAULT_MAX_LEVEL));
+            handler->PSendSysMessage("WP levels must be within bounds 1-{}, min <= max", uint32(DEFAULT_MAX_LEVEL));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1088,7 +1088,7 @@ public:
         uint32 wpId = wp->GetWPId();
         auto [minlevel_cur, maxlevel_cur] = wp->GetLevels();
 
-        handler->PSendSysMessage("Changing WP %u '%s' levels from %u-%u to %u-%u",
+        handler->PSendSysMessage("Changing WP {} '{}' levels from {}-{} to {}-{}",
             wpId, wp->GetName().c_str(), uint32(minlevel_cur), uint32(maxlevel_cur), uint32(*minlevel), uint32(*maxlevel));
         wp->SetLevels(*minlevel, *maxlevel);
         if (Creature* creature = wp->GetCreature())
@@ -1118,12 +1118,12 @@ public:
             uint32 wpId = wp->GetWPId();
             if (flags < 0)
             {
-                handler->PSendSysMessage("Removing WP %u '%s' flag %u", wpId, wp->GetName().c_str(), uint32(-flags));
+                handler->PSendSysMessage("Removing WP {} '{}' flag {}", wpId, wp->GetName(), uint32(-flags));
                 const_cast<WanderNode*>(wp)->RemoveFlags(BotWPFlags(-flags));
             }
             else
             {
-                handler->PSendSysMessage("Adding WP %u '%s' flag %u", wpId, wp->GetName().c_str(), uint32(flags));
+                handler->PSendSysMessage("Adding WP {} '{}' flag {}", wpId, wp->GetName(), uint32(flags));
                 const_cast<WanderNode*>(wp)->SetFlags(BotWPFlags(flags));
             }
             WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET flags={} WHERE id={}", wp->GetFlags(), wpId);
@@ -1155,12 +1155,12 @@ public:
 
         if (*flags < 0)
         {
-            handler->PSendSysMessage("Removing WP %u '%s' flag %u", wpId, wp->GetName().c_str(), uint32(-*flags));
+            handler->PSendSysMessage("Removing WP {} '{}' flag {}", wpId, wp->GetName(), uint32(-*flags));
             wp->RemoveFlags(BotWPFlags(-*flags));
         }
         else
         {
-            handler->PSendSysMessage("Adding WP %u '%s' flag %u", wpId, wp->GetName().c_str(), uint32(*flags));
+            handler->PSendSysMessage("Adding WP {} '{}' flag {}", wpId, wp->GetName(), uint32(*flags));
             wp->SetFlags(BotWPFlags(*flags));
         }
 
@@ -1190,10 +1190,10 @@ public:
 
         uint32 wpId = wp->GetWPId();
 
-        handler->PSendSysMessage("Changing WP %u '%s' name to '%s'", wpId, wp->GetName().c_str(), newname->c_str());
+        handler->PSendSysMessage("Changing WP {} '{}' name to '{}'", wpId, wp->GetName(), *newname);
         wp->SetName(*newname);
 
-        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET name='{}' WHERE id={}", wp->GetName().c_str(), wpId);
+        WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET name='{}' WHERE id={}", wp->GetName(), wpId);
 
         return true;
     }
@@ -1226,7 +1226,7 @@ public:
         WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET x={},y={},z={},o={} WHERE id={}",
             wp->m_positionX, wp->m_positionY, wp->m_positionZ, wp->GetOrientation(), wp->GetWPId());
 
-        handler->PSendSysMessage("WP %u '%s' was successfully moved.", wp->GetWPId(), wp->GetName().c_str());
+        handler->PSendSysMessage("WP {} '{}' was successfully moved.", wp->GetWPId(), wp->GetName());
 
         return true;
     }
@@ -1247,7 +1247,7 @@ public:
         {
             if (!*minlevel || *minlevel > DEFAULT_MAX_LEVEL)
             {
-                handler->PSendSysMessage("Minlevel must be between 1 and %u!", uint32(DEFAULT_MAX_LEVEL));
+                handler->PSendSysMessage("Minlevel must be between 1 and {}!", uint32(DEFAULT_MAX_LEVEL));
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -1255,7 +1255,7 @@ public:
             {
                 if (!*maxlevel || *maxlevel > DEFAULT_MAX_LEVEL)
                 {
-                    handler->PSendSysMessage("Maxlevel must be between 1 and %u!", uint32(DEFAULT_MAX_LEVEL));
+                    handler->PSendSysMessage("Maxlevel must be between 1 and {}!", uint32(DEFAULT_MAX_LEVEL));
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
@@ -1270,7 +1270,7 @@ public:
 
         if (*flags >= AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END))
         {
-            handler->PSendSysMessage("Flags must below %u!", AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END));
+            handler->PSendSysMessage("Flags must below {}!", AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1320,7 +1320,7 @@ public:
 
         WorldDatabase.Execute(ss.str().c_str());
 
-        handler->PSendSysMessage("Created WP %u '%s' levels %u-%u flags %u", wpId, wpName.c_str(), uint32(minl), uint32(maxl), wpFlags);
+        handler->PSendSysMessage("Created WP {} '{}' levels {}-{} flags {}", wpId, wpName, uint32(minl), uint32(maxl), wpFlags);
 
         return true;
     }
@@ -1348,7 +1348,7 @@ public:
 
         WorldDatabase.Execute("DELETE FROM creature_template_npcbot_wander_nodes WHERE id={}", wpId);
 
-        handler->PSendSysMessage("WP %u '%s' was successfully deleted.", wpId, wpName.c_str());
+        handler->PSendSysMessage("WP {} '{}' was successfully deleted.", wpId, wpName);
 
         return true;
     }
@@ -1400,7 +1400,7 @@ public:
         WanderNode const* wp = WanderNode::FindInAllWPs(wpId);
         if (!wp)
         {
-            handler->PSendSysMessage("WP %u not found", wpId);
+            handler->PSendSysMessage("WP {} not found", wpId);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1472,7 +1472,7 @@ public:
                             }
                         }
                     }
-                    handler->PSendSysMessage("%s", ss.str().c_str());
+                    handler->PSendSysMessage("{}", ss.str());
                     ss.str("");
                 }
             }
@@ -1617,7 +1617,7 @@ public:
         if (setId)
             last_model_id = *setId;
 
-        handler->PSendSysMessage("Setting model %u...", last_model_id);
+        handler->PSendSysMessage("Setting model {}...", last_model_id);
         target->SetDisplayId(last_model_id++);
 
         return true;
@@ -1667,7 +1667,7 @@ public:
                 sWorld->ShutdownServ(4, SHUTDOWN_MASK_RESTART, 70);
                 break;
             case BOT_DUMP_FAIL_FILE_NOT_EXIST:
-                handler->PSendSysMessage("Can't open %s or the file doesn't exist!", file_str->c_str());
+                handler->PSendSysMessage("Can't open {} or the file doesn't exist!", *file_str);
                 handler->SetSentErrorMessage(true);
                 return false;
             case BOT_DUMP_FAIL_FILE_CORRUPTED:
@@ -1675,7 +1675,7 @@ public:
                 handler->SetSentErrorMessage(true);
                 return false;
             case BOT_DUMP_FAIL_DATA_OCCUPIED:
-                handler->PSendSysMessage("Table data contained in %s overlaps with existing table entries!", file_str->c_str());
+                handler->PSendSysMessage("Table data contained in {} overlaps with existing table entries!", *file_str);
                 handler->SetSentErrorMessage(true);
                 return false;
             default:
@@ -1706,7 +1706,7 @@ public:
                 handler->SendSysMessage("Export successful.");
                 break;
             case BOT_DUMP_FAIL_FILE_ALREADY_EXISTS:
-                handler->PSendSysMessage("File %s already exists!", file_str->c_str());
+                handler->PSendSysMessage("File {} already exists!", *file_str);
                 handler->SetSentErrorMessage(true);
                 return false;
             case BOT_DUMP_FAIL_CANT_WRITE_TO_FILE:
@@ -1755,24 +1755,24 @@ public:
         {
             if (!bot->IsInWorld())
             {
-                handler->PSendSysMessage("Bot %s is not found!", bot_name->c_str());
+                handler->PSendSysMessage("Bot {} is not found!", *bot_name);
                 return true;
             }
             if (!bot->IsAlive())
             {
-                handler->PSendSysMessage("%s is dead!", bot->GetName().c_str());
+                handler->PSendSysMessage("{} is dead!", bot->GetName());
                 return true;
             }
 
             base_spell = bot->GetBotAI()->GetBaseSpell(*spell_name, handler->GetSessionDbcLocale());
             if (!base_spell)
             {
-                handler->PSendSysMessage("%s doesn't have spell named '%s'!", bot->GetName().c_str(), spell_name->c_str());
+                handler->PSendSysMessage("{} doesn't have spell named '{}'!", bot->GetName(), *spell_name);
                 return true;
             }
             if (!canBotUseSpell(bot, base_spell))
             {
-                handler->PSendSysMessage("%s's %s is not ready yet!", bot->GetName().c_str(), sSpellMgr->GetSpellInfo(base_spell)->SpellName[handler->GetSessionDbcLocale()]);
+                handler->PSendSysMessage("{}'s {} is not ready yet!", bot->GetName(), sSpellMgr->GetSpellInfo(base_spell)->SpellName[handler->GetSessionDbcLocale()]);
                 return true;
             }
         }
@@ -1791,7 +1791,7 @@ public:
             uint8 bot_class = BotMgr::BotClassByClassName(class_name);
             if (bot_class == BOT_CLASS_NONE)
             {
-                handler->PSendSysMessage("Unknown bot name or class %s!", class_name.c_str());
+                handler->PSendSysMessage("Unknown bot name or class {}!", class_name);
                 return true;
             }
 
@@ -1799,7 +1799,7 @@ public:
 
             if (cBots.empty())
             {
-                handler->PSendSysMessage("No bots of class %u found!", bot_class);
+                handler->PSendSysMessage("No bots of class {} found!", bot_class);
                 return true;
             }
 
@@ -1812,7 +1812,7 @@ public:
 
             if (!base_spell)
             {
-                handler->PSendSysMessage("None of %u found bots have spell named '%s'!", cBots.size(), spell_name->c_str());
+                handler->PSendSysMessage("None of {} found bots have spell named '{}'!", cBots.size(), *spell_name);
                 return true;
             }
 
@@ -1842,7 +1842,7 @@ public:
 
             if (!bot)
             {
-                handler->PSendSysMessage("None of %u found bots can use %s yet!", cBots.size(), spell_name->c_str());
+                handler->PSendSysMessage("None of {} found bots can use {} yet!", cBots.size(), *spell_name);
                 return true;
             }
         }
@@ -1900,7 +1900,7 @@ public:
 
         if (!token_valid)
         {
-            handler->PSendSysMessage("Invalid target token '%s'!", *target_token);
+            handler->PSendSysMessage("Invalid target token '{}'!", *target_token);
             handler->SendSysMessage("Valid target tokens:\n    '','bot','self', 'me','master', 'mypet', 'myvehicle', 'target', 'mytarget', "
                 "'star','1', 'circle','2', 'diamond','3', 'triangle','4', 'moon','5', 'square','6', 'cross','7', 'skull','8'"
                 "\nNote that target icons tokens are only available while in group");
@@ -1910,7 +1910,7 @@ public:
         Unit* target = target_guid ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
         if (!target || !bot->FindMap() || target->FindMap() != bot->FindMap())
         {
-            handler->PSendSysMessage("Invalid target '%s'!", target ? target->GetName().c_str() : "unknown");
+            handler->PSendSysMessage("Invalid target '{}'!", target ? target->GetName().c_str() : "unknown");
             return true;
         }
 
@@ -1921,13 +1921,13 @@ public:
         if (bot->GetBotAI()->AddOrder(std::move(order)))
         {
             if (DEBUG_BOT_ORDERS)
-                handler->PSendSysMessage("Order given: %s: %s on %s", bot->GetName().c_str(),
+                handler->PSendSysMessage("Order given: {}: {} on {}", bot->GetName(),
                     sSpellMgr->GetSpellInfo(base_spell)->SpellName[handler->GetSessionDbcLocale()], target ? target->GetName().c_str() : "unknown");
         }
         else
         {
             if (DEBUG_BOT_ORDERS)
-                handler->PSendSysMessage("Order failed: %s: %s on %s", bot->GetName().c_str(),
+                handler->PSendSysMessage("Order failed: {}: {} on {}", bot->GetName(),
                     sSpellMgr->GetSpellInfo(base_spell)->SpellName[handler->GetSessionDbcLocale()], target ? target->GetName().c_str() : "unknown");
         }
 
@@ -1977,7 +1977,7 @@ public:
                     if (doeject)
                     {
                         bot->GetVehicle()->GetBase()->StopMoving();
-                        //handler->PSendSysMessage("Removing %s from %s", bot->GetName().c_str(), bot->GetVehicle()->GetBase()->GetName().c_str());
+                        //handler->PSendSysMessage("Removing {} from {}", bot->GetName(), bot->GetVehicle()->GetBase()->GetName());
                         bot->ExitVehicle();
                         //bot->BotStopMovement();
                     }
@@ -2006,7 +2006,7 @@ public:
         uint8 newdist = uint8(std::min<int32>(std::max<int32>(*dist, 0), 100));
         owner->GetBotMgr()->SetBotFollowDist(newdist);
 
-        handler->PSendSysMessage("Bots' follow distance is set to %u", uint32(newdist));
+        handler->PSendSysMessage("Bots' follow distance is set to {}", uint32(newdist));
         return true;
     }
 
@@ -2056,7 +2056,7 @@ public:
         uint8 newdist = uint8(std::min<int32>(std::max<int32>(*dist, 0), 50));
         owner->GetBotMgr()->SetBotAttackRangeMode(BOT_ATTACK_RANGE_EXACT, newdist);
 
-        handler->PSendSysMessage("Bots' attack distance is set to %u", uint32(newdist));
+        handler->PSendSysMessage("Bots' attack distance is set to {}", uint32(newdist));
         return true;
     }
 
@@ -2165,7 +2165,7 @@ public:
         Creature const* bot = BotDataMgr::FindBot(*creatureId);
         if (!bot)
         {
-            handler->PSendSysMessage("NpcBot %u is not found!", *creatureId);
+            handler->PSendSysMessage("NpcBot {} is not found!", *creatureId);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2199,9 +2199,9 @@ public:
 
         static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
-                chandler->PSendSysMessage("Your next dest spell will send %u bot(s) to position...", name_or_count.get<uint32>());
+                chandler->PSendSysMessage("Your next dest spell will send {} bot(s) to position...", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Your next dest spell will send %s to position...", name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Your next dest spell will send {} to position...", name_or_count.get<std::string>());
             return true;
         };
 
@@ -2239,7 +2239,7 @@ public:
 
         if (count == 0)
         {
-            handler->PSendSysMessage("Unable to send any of %u bots!", uint32(names->size()));
+            handler->PSendSysMessage("Unable to send any of {} bots!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2260,9 +2260,9 @@ public:
 
         static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
-                chandler->PSendSysMessage("Moving %u bot(s) to previous position...", name_or_count.get<uint32>());
+                chandler->PSendSysMessage("Moving {} bot(s) to previous position...", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Moving %s to previous position...", name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Moving {} to previous position...", name_or_count.get<std::string>());
             return true;
         };
 
@@ -2300,7 +2300,7 @@ public:
 
         if (count == 0)
         {
-            handler->PSendSysMessage("Unable to send any of %u bots!", uint32(names->size()));
+            handler->PSendSysMessage("Unable to send any of {}u bots!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2313,16 +2313,16 @@ public:
         static auto return_syntax = [](ChatHandler* chandler) -> bool {
             chandler->SendSysMessage("Syntax: .npcbot sendto point set #number #names...");
             chandler->SendSysMessage("Marks selected/named bots' current position as send point by #number");
-            chandler->PSendSysMessage("Point number must be in range 1 ... %u", uint32(MAX_SEND_POINTS));
+            chandler->PSendSysMessage("Point number must be in range 1 ... {}", uint32(MAX_SEND_POINTS));
             chandler->SetSentErrorMessage(true);
             return false;
         };
 
         static auto return_success = [&](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
-                chandler->PSendSysMessage("Marked send point %u for %u bot(s)", *point_id, name_or_count.get<uint32>());
+                chandler->PSendSysMessage("Marked send point {} for {} bot(s)", *point_id, name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Marked send point %u for %s", *point_id, name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Marked send point {} for {}", *point_id, name_or_count.get<std::string>());
             return true;
         };
 
@@ -2360,7 +2360,7 @@ public:
 
         if (count == 0)
         {
-            handler->PSendSysMessage("Unable to mark send point for any of %u bots!", uint32(names->size()));
+            handler->PSendSysMessage("Unable to mark send point for any of {} bots!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2381,9 +2381,9 @@ public:
 
         static auto return_success = [&](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
-                chandler->PSendSysMessage("Moving %u bot(s) to point %u...", name_or_count.get<uint32>(), *point_id);
+                chandler->PSendSysMessage("Moving {} bot(s) to point {}...", name_or_count.get<uint32>(), *point_id);
             else
-                chandler->PSendSysMessage("Moving %s to point %u...", name_or_count.get<std::string>().c_str(), *point_id);
+                chandler->PSendSysMessage("Moving {} to point {}...", name_or_count.get<std::string>(), *point_id);
             return true;
         };
 
@@ -2421,7 +2421,7 @@ public:
 
         if (count == 0)
         {
-            handler->PSendSysMessage("Unable to send any of %u bots!", uint32(names->size()));
+            handler->PSendSysMessage("Unable to send any of {} bots!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2556,7 +2556,7 @@ public:
         if (!setFlags)
             return false;
 
-        handler->PSendSysMessage("Toggling flag %u on %s", setFlags, unit->GetName().c_str());
+        handler->PSendSysMessage("Toggling flag {} on {}", setFlags, unit->GetName());
         unit->ToggleFlag(UNIT_FIELD_FLAGS, setFlags);
         return true;
     }
@@ -2609,7 +2609,7 @@ public:
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_FACTION, &factionId);
         bot->GetBotAI()->ReInitFaction();
 
-        handler->PSendSysMessage("%s's faction set to %u", bot->GetName().c_str(), factionId);
+        handler->PSendSysMessage("{}'s faction set to {}", bot->GetName(), factionId);
         return true;
     }
 
@@ -2664,7 +2664,7 @@ public:
         bot->GetBotAI()->ReinitOwner();
         //bot->GetBotAI()->Reset();
 
-        handler->PSendSysMessage("%s's new owner is %s (guidlow: %u)", bot->GetName().c_str(), characterName.c_str(), guidlow);
+        handler->PSendSysMessage("{}'s new owner is {} (guidlow: {})", bot->GetName(), characterName, guidlow);
         return true;
     }
 
@@ -2690,7 +2690,7 @@ public:
 
         if (!bot_ai::IsValidSpecForClass(bot->GetBotClass(), *spec))
         {
-            handler->PSendSysMessage("%s is not a valid spec for bot class %u!",
+            handler->PSendSysMessage("{} is not a valid spec for bot class {}!",
                 bot_ai::LocalizedNpcText(chr, bot_ai::TextForSpec(*spec)), uint32(bot->GetBotClass()));
             handler->SetSentErrorMessage(true);
             return false;
@@ -2698,7 +2698,7 @@ public:
 
         bot->GetBotAI()->SetSpec(*spec);
 
-        handler->PSendSysMessage("%s's new spec is %u", bot->GetName().c_str(), uint32(*spec));
+        handler->PSendSysMessage("{}'s new spec is {}", bot->GetName(), uint32(*spec));
         return true;
     }
 
@@ -2711,44 +2711,44 @@ public:
             handler->SendSysMessage("Looks up npcbots by #class, and returns all matches with their creature ID's");
             handler->SendSysMessage("If #not_spawned_only is set to 1 shows only bots which don't exist in world");
             handler->SendSysMessage("If #team_id is provided, will also filter by team: Alliance = 0, Horde = 1, Neutral = 2");
-            handler->PSendSysMessage("BOT_CLASS_WARRIOR = %u", uint32(BOT_CLASS_WARRIOR));
-            handler->PSendSysMessage("BOT_CLASS_PALADIN = %u", uint32(BOT_CLASS_PALADIN));
-            handler->PSendSysMessage("BOT_CLASS_HUNTER = %u", uint32(BOT_CLASS_HUNTER));
-            handler->PSendSysMessage("BOT_CLASS_ROGUE = %u", uint32(BOT_CLASS_ROGUE));
-            handler->PSendSysMessage("BOT_CLASS_PRIEST = %u", uint32(BOT_CLASS_PRIEST));
-            handler->PSendSysMessage("BOT_CLASS_DEATH_KNIGHT = %u", uint32(BOT_CLASS_DEATH_KNIGHT));
-            handler->PSendSysMessage("BOT_CLASS_SHAMAN = %u", uint32(BOT_CLASS_SHAMAN));
-            handler->PSendSysMessage("BOT_CLASS_MAGE = %u", uint32(BOT_CLASS_MAGE));
-            handler->PSendSysMessage("BOT_CLASS_WARLOCK = %u", uint32(BOT_CLASS_WARLOCK));
-            handler->PSendSysMessage("BOT_CLASS_DRUID = %u", uint32(BOT_CLASS_DRUID));
-            handler->PSendSysMessage("BOT_CLASS_BLADEMASTER = %u", uint32(BOT_CLASS_BM));
-            handler->PSendSysMessage("BOT_CLASS_SPHYNX = %u", uint32(BOT_CLASS_SPHYNX));
-            handler->PSendSysMessage("BOT_CLASS_ARCHMAGE = %u", uint32(BOT_CLASS_ARCHMAGE));
-            handler->PSendSysMessage("BOT_CLASS_DREADLORD = %u", uint32(BOT_CLASS_DREADLORD));
-            handler->PSendSysMessage("BOT_CLASS_SPELLBREAKER = %u", uint32(BOT_CLASS_SPELLBREAKER));
-            handler->PSendSysMessage("BOT_CLASS_DARK_RANGER = %u", uint32(BOT_CLASS_DARK_RANGER));
-            handler->PSendSysMessage("BOT_CLASS_NECROMANCER = %u", uint32(BOT_CLASS_NECROMANCER));
-            handler->PSendSysMessage("BOT_CLASS_SEA_WITCH = %u", uint32(BOT_CLASS_SEA_WITCH));
-            handler->PSendSysMessage("BOT_CLASS_CRYPT_LORD = %u", uint32(BOT_CLASS_CRYPT_LORD));
+            handler->PSendSysMessage("BOT_CLASS_WARRIOR = {}", uint32(BOT_CLASS_WARRIOR));
+            handler->PSendSysMessage("BOT_CLASS_PALADIN = {}", uint32(BOT_CLASS_PALADIN));
+            handler->PSendSysMessage("BOT_CLASS_HUNTER = {}", uint32(BOT_CLASS_HUNTER));
+            handler->PSendSysMessage("BOT_CLASS_ROGUE = {}", uint32(BOT_CLASS_ROGUE));
+            handler->PSendSysMessage("BOT_CLASS_PRIEST = {}", uint32(BOT_CLASS_PRIEST));
+            handler->PSendSysMessage("BOT_CLASS_DEATH_KNIGHT = {}", uint32(BOT_CLASS_DEATH_KNIGHT));
+            handler->PSendSysMessage("BOT_CLASS_SHAMAN = {}", uint32(BOT_CLASS_SHAMAN));
+            handler->PSendSysMessage("BOT_CLASS_MAGE = {}", uint32(BOT_CLASS_MAGE));
+            handler->PSendSysMessage("BOT_CLASS_WARLOCK = {}", uint32(BOT_CLASS_WARLOCK));
+            handler->PSendSysMessage("BOT_CLASS_DRUID = {}", uint32(BOT_CLASS_DRUID));
+            handler->PSendSysMessage("BOT_CLASS_BLADEMASTER = {}", uint32(BOT_CLASS_BM));
+            handler->PSendSysMessage("BOT_CLASS_SPHYNX = {}", uint32(BOT_CLASS_SPHYNX));
+            handler->PSendSysMessage("BOT_CLASS_ARCHMAGE = {}", uint32(BOT_CLASS_ARCHMAGE));
+            handler->PSendSysMessage("BOT_CLASS_DREADLORD = {}", uint32(BOT_CLASS_DREADLORD));
+            handler->PSendSysMessage("BOT_CLASS_SPELLBREAKER = {}", uint32(BOT_CLASS_SPELLBREAKER));
+            handler->PSendSysMessage("BOT_CLASS_DARK_RANGER = {}", uint32(BOT_CLASS_DARK_RANGER));
+            handler->PSendSysMessage("BOT_CLASS_NECROMANCER = {}", uint32(BOT_CLASS_NECROMANCER));
+            handler->PSendSysMessage("BOT_CLASS_SEA_WITCH = {}", uint32(BOT_CLASS_SEA_WITCH));
+            handler->PSendSysMessage("BOT_CLASS_CRYPT_LORD = {}", uint32(BOT_CLASS_CRYPT_LORD));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (botclass == BOT_CLASS_NONE || botclass >= BOT_CLASS_END)
         {
-            handler->PSendSysMessage("Unknown bot class %u", uint32(*botclass));
+            handler->PSendSysMessage("Unknown bot class {}", uint32(*botclass));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (teamid && *teamid > uint8(TEAM_NEUTRAL))
         {
-            handler->PSendSysMessage("Unknown team %u", uint32(*teamid));
+            handler->PSendSysMessage("Unknown team {}", uint32(*teamid));
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        handler->PSendSysMessage("Looking for bots of class %u...", uint32(*botclass));
+        handler->PSendSysMessage("Looking for bots of class {}...", uint32(*botclass));
 
         uint8 localeIndex = handler->GetSessionDbLocaleIndex();
         CreatureTemplateContainer const* ctc = sObjectMgr->GetCreatureTemplates();
@@ -2831,7 +2831,7 @@ public:
                 default:                raceName = "Unknown";   break;
             }
 
-            handler->PSendSysMessage("%d - |cffffffff|Hcreature_entry:%d|h[%s]|h|r %s", itr->id, itr->id, itr->name.c_str(), raceName);
+            handler->PSendSysMessage("{} - |cffffffff|Hcreature_entry:{}|h[{}]|h|r {}", itr->id, itr->id, itr->name, raceName);
         }
 
         return true;
@@ -2860,7 +2860,7 @@ public:
         if (bot->GetBotAI()->IsWanderer())
         {
             BotDataMgr::DespawnWandererBot(bot->GetEntry());
-            handler->PSendSysMessage("Wandering bot %u '%s' successfully deleted", bot->GetEntry(), bot->GetName().c_str());
+            handler->PSendSysMessage("Wandering bot {} '{}' successfully deleted", bot->GetEntry(), bot->GetName());
             return true;
         }
 
@@ -2872,7 +2872,7 @@ public:
             chr->GetGUID();
         if (!bot->GetBotAI()->UnEquipAll(receiver))
         {
-            handler->PSendSysMessage("%s is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName().c_str());
+            handler->PSendSysMessage("{} is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2888,7 +2888,7 @@ public:
 
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ERASE);
 
-        handler->PSendSysMessage("Npcbot %s successfully deleted", bot->GetName().c_str());
+        handler->PSendSysMessage("Npcbot {} successfully deleted", bot->GetName());
         return true;
     }
 
@@ -2905,7 +2905,7 @@ public:
         Creature const* bot = BotDataMgr::FindBot(*creature_id);
         if (!bot)
         {
-            handler->PSendSysMessage("npcbot %u not found!", *creature_id);
+            handler->PSendSysMessage("npcbot {} not found!", *creature_id);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2928,13 +2928,13 @@ public:
                 chr ? chr->GetGUID() : ObjectGuid::Empty;
             if (receiver == ObjectGuid::Empty)
             {
-                handler->PSendSysMessage("Cannot delete bot %s from console: has gear but no player to give it back to! Can only delete this bot in-game.", bot->GetName().c_str());
+                handler->PSendSysMessage("Cannot delete bot {} from console: has gear but no player to give it back to! Can only delete this bot in-game.", bot->GetName());
                 handler->SetSentErrorMessage(true);
                 return false;
             }
             if (!bot->GetBotAI()->UnEquipAll(receiver))
             {
-                handler->PSendSysMessage("%s is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName().c_str());
+                handler->PSendSysMessage("{} is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName());
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -2951,7 +2951,7 @@ public:
 
         BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ERASE);
 
-        handler->PSendSysMessage("Npcbot %s successfully deleted", bot->GetName().c_str());
+        handler->PSendSysMessage("Npcbot {} successfully deleted", bot->GetName());
         return true;
     }
 
@@ -2964,7 +2964,7 @@ public:
                     if (HandleNpcBotDeleteByIdCommand(handler, creature_id))
                         ++count;
 
-        handler->PSendSysMessage("%u free npcbots deleted", count);
+        handler->PSendSysMessage("{} free npcbots deleted", count);
         return true;
     }
 
@@ -2991,21 +2991,21 @@ public:
         CreatureTemplate const* creInfo = sObjectMgr->GetCreatureTemplate(id);
         if (!creInfo)
         {
-            handler->PSendSysMessage("creature id %u does not exist!", id);
+            handler->PSendSysMessage("creature id {} does not exist!", id);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!creInfo->IsNPCBot())
         {
-            handler->PSendSysMessage("creature id %u is not a npcbot!", id);
+            handler->PSendSysMessage("creature id {} is not a npcbot!", id);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!BotDataMgr::SelectNpcBotData(id))
         {
-            handler->PSendSysMessage("NpcBot %u is not spawned!", id);
+            handler->PSendSysMessage("NpcBot {} is not spawned!", id);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -3037,7 +3037,7 @@ public:
         if (bot->GetBotAI()->IAmFree() && bot->IsInWorld() && !bot->IsInCombat() && bot->IsAlive())
             BotMgr::TeleportBot(const_cast<Creature*>(bot), player->GetMap(), player);
 
-        handler->PSendSysMessage("NpcBot %u (guid %u) was moved", id, lowguid);
+        handler->PSendSysMessage("NpcBot {} (guid {}) was moved", id, lowguid);
         return true;
     }
 
@@ -3058,12 +3058,12 @@ public:
             return false;
         };
         static auto const ret_err_invalid_arg = [](ChatHandler* handler, char const* argname, Optional<uint8> argval = {}) {
-            handler->PSendSysMessage("Invalid %s%s!", argname, argval ?  (" " + std::to_string(*argval)).c_str() : "");
+            handler->PSendSysMessage("Invalid {}{}!", argname, argval ?  (" " + std::to_string(*argval)).c_str() : "");
             handler->SetSentErrorMessage(true);
             return false;
         };
         static auto const ret_err_invalid_args_for = [](ChatHandler* handler, char const* argname1, char const* argname2) {
-            handler->PSendSysMessage("Invalid arguments for %s '%s'!", argname1, argname2);
+            handler->PSendSysMessage("Invalid arguments for {} '{}'!", argname1, argname2);
             handler->SetSentErrorMessage(true);
             return false;
         };
@@ -3164,7 +3164,7 @@ public:
                 newentry, namestr.c_str(), uint32(*gender), uint32(*skin), uint32(*face), uint32(*hairstyle), uint32(*haircolor), uint32(*features));
         WorldDatabase.DirectCommitTransaction(trans);
 
-        handler->PSendSysMessage("New NPCBot %s (class %u) is created with entry %u and will be available for spawning after server restart.", namestr.c_str(), uint32(*bclass), newentry);
+        handler->PSendSysMessage("New NPCBot {} (class {}) is created with entry {} and will be available for spawning after server restart.", namestr, uint32(*bclass), newentry);
         return true;
     }
 
@@ -3189,28 +3189,28 @@ public:
 
         if (!creInfo)
         {
-            handler->PSendSysMessage("creature %u does not exist!", id);
+            handler->PSendSysMessage("creature {} does not exist!", id);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (!creInfo->IsNPCBot())
         {
-            handler->PSendSysMessage("creature %u is not a npcbot!", id);
+            handler->PSendSysMessage("creature {} is not a npcbot!", id);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (id == BOT_ENTRY_MIRROR_IMAGE_BM)
         {
-            handler->PSendSysMessage("creature %u is a mirror image and cannot be spawned!", id);
+            handler->PSendSysMessage("creature {} is a mirror image and cannot be spawned!", id);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         if (BotDataMgr::SelectNpcBotData(id))
         {
-            handler->PSendSysMessage("Npcbot %u already exists in `characters_npcbot` table!", id);
+            handler->PSendSysMessage("Npcbot {} already exists in `characters_npcbot` table!", id);
             handler->SendSysMessage("If you want to move this bot to a new location use '.npcbot move' command");
             handler->SetSentErrorMessage(true);
             return false;
@@ -3223,7 +3223,7 @@ public:
         PreparedQueryResult res2 = WorldDatabase.Query(stmt);
         if (res2)
         {
-            handler->PSendSysMessage("Npcbot %u already exists in `creature` table!", id);
+            handler->PSendSysMessage("Npcbot {} already exists in `creature` table!", id);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -3263,7 +3263,7 @@ public:
         if (!_botExtras)
         {
             delete creature;
-            handler->PSendSysMessage("No class/race data found for bot %u!", id);
+            handler->PSendSysMessage("No class/race data found for bot {}!", id);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -3387,14 +3387,14 @@ public:
             uint8 bot_class = BotMgr::BotClassByClassName(cname);
             if (bot_class == BOT_CLASS_NONE)
             {
-                handler->PSendSysMessage("Unknown bot name or class %s!", cname.c_str());
+                handler->PSendSysMessage("Unknown bot name or class {}!", cname);
                 return true;
             }
 
             bots = owner->GetBotMgr()->GetAllBotsByClass(bot_class);
             if (bots.empty())
             {
-                handler->PSendSysMessage("No bots of class %u found!", uint32(bot_class));
+                handler->PSendSysMessage("No bots of class {} found!", uint32(bot_class));
                 return true;
             }
         }
@@ -3404,7 +3404,7 @@ public:
         for (Creature const* bot : bots)
         {
             auto scores = bot->GetBotAI()->GetBotGearScores();
-            handler->PSendSysMessage("%s's GearScore total: %u, average: %u", bot->GetName().c_str(), uint32(scores.first), uint32(scores.second));
+            handler->PSendSysMessage("{}'s GearScore total: {}, average: {}", bot->GetName(), uint32(scores.first), uint32(scores.second));
         }
 
         return true;
@@ -3651,7 +3651,7 @@ public:
         {
             if (!master_name.empty())
             {
-                handler->PSendSysMessage("Player '%s' is not found!", master_name.c_str());
+                handler->PSendSysMessage("Player '{}' is not found!", master_name);
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -3663,13 +3663,13 @@ public:
         }
         if (master_name.empty() && !sCharacterCache->GetCharacterNameByGuid(master_guid, master_name))
         {
-            handler->PSendSysMessage("Player %u is not found!", master_guid.GetCounter());
+            handler->PSendSysMessage("Player {} is not found!", master_guid.GetCounter());
             handler->SetSentErrorMessage(true);
             return false;
         }
         if (BotDataMgr::GetOwnedBotsCount(master_guid) == 0)
         {
-            handler->PSendSysMessage("%s (%u) has no NpcBots!", master_name.c_str(), master_guid.GetCounter());
+            handler->PSendSysMessage("{} ({}) has no NpcBots!", master_name, master_guid.GetCounter());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -3686,8 +3686,8 @@ public:
             ), std::end(guidvec));
         }
 
-        handler->PSendSysMessage("Listing NpcBots for %s, guid %u%s:", master_name.c_str(), master_guid.GetCounter(), !master ? " (offline)" : "");
-        handler->PSendSysMessage("Owned NpcBots: %u (active: %u)", uint32(guidvec.size()) + map_size, map_size);
+        handler->PSendSysMessage("Listing NpcBots for {}, guid {}{}:", master_name, master_guid.GetCounter(), !master ? " (offline)" : "");
+        handler->PSendSysMessage("Owned NpcBots: {} (active: {})", uint32(guidvec.size()) + map_size, map_size);
         if (map)
         {
             for (uint8 i = BOT_CLASS_WARRIOR; i != BOT_CLASS_END; ++i)
@@ -3733,17 +3733,17 @@ public:
                     case BOT_CLASS_CRYPT_LORD:      bclass = "Crypt Lords";     break;
                     default:                        bclass = "Unknown Class";   break;
                 }
-                handler->PSendSysMessage("%s: %u (alive: %u)", bclass, count, alivecount);
+                handler->PSendSysMessage("{}: {} (alive: {})", bclass, count, alivecount);
             }
         }
 
-        handler->PSendSysMessage("%u inactive bots:", uint32(guidvec.size()));
+        handler->PSendSysMessage("{} inactive bots:", uint32(guidvec.size()));
         for (ObjectGuid guid : guidvec)
         {
             Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
             std::string ccolor, cname;
             GetBotClassNameAndColor(bot ? bot->GetBotClass() : uint8(BOT_CLASS_NONE), ccolor, cname);
-            handler->PSendSysMessage("%s (%s)", bot ? bot->GetName().c_str() : "Unknown", "|c" + ccolor + cname + "|r");
+            handler->PSendSysMessage("{} ({})", bot ? bot->GetName().c_str() : "Unknown", "|c" + ccolor + cname + "|r");
         }
 
         return true;
@@ -3989,9 +3989,9 @@ public:
 
         static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
-                chandler->PSendSysMessage("Successfully re-bound %u bot(s)", name_or_count.get<uint32>());
+                chandler->PSendSysMessage("Successfully re-bound {} bot(s)", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Successfully re-bound %s", name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Successfully re-bound {}", name_or_count.get<std::string>());
             return true;
         };
 
@@ -4010,7 +4010,7 @@ public:
             {
                 if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)
                 {
-                    handler->PSendSysMessage("Failed to re-bind %s for some reason!", bot->GetName().c_str());
+                    handler->PSendSysMessage("Failed to re-bind {} for some reason!", bot->GetName());
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
@@ -4037,7 +4037,7 @@ public:
             {
                 if (mgr->RebindBot(const_cast<Creature*>(bot)) != BOT_ADD_SUCCESS)
                 {
-                    handler->PSendSysMessage("Failed to re-bind %s for some reason!", name.c_str());
+                    handler->PSendSysMessage("Failed to re-bind {} for some reason!", name);
                     handler->SetSentErrorMessage(true);
                     continue;
                 }
@@ -4047,7 +4047,7 @@ public:
 
         if (count == 0)
         {
-            handler->PSendSysMessage("Unable to re-bind any of %u bots!", uint32(names->size()));
+            handler->PSendSysMessage("Unable to re-bind any of {} bots!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -4066,9 +4066,9 @@ public:
 
         static auto return_success = [](ChatHandler* chandler, Variant<std::string, uint32> name_or_count) -> bool {
             if (name_or_count.holds_alternative<uint32>())
-                chandler->PSendSysMessage("Successfully unbound %u bot(s)", name_or_count.get<uint32>());
+                chandler->PSendSysMessage("Successfully unbound {} bot(s)", name_or_count.get<uint32>());
             else
-                chandler->PSendSysMessage("Successfully unbound %s", name_or_count.get<std::string>().c_str());
+                chandler->PSendSysMessage("Successfully unbound {}", name_or_count.get<std::string>());
             return true;
         };
 
@@ -4106,7 +4106,7 @@ public:
 
         if (count == 0)
         {
-            handler->PSendSysMessage("Unable to unbind any of %u bots!", uint32(names->size()));
+            handler->PSendSysMessage("Unable to unbind any of {} bots!", uint32(names->size()));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -4185,7 +4185,7 @@ public:
         {
             if (!master->HaveBot())
             {
-                handler->PSendSysMessage("%s has no npcbots!", master->GetName().c_str());
+                handler->PSendSysMessage("{} has no npcbots!", master->GetName());
                 handler->SetSentErrorMessage(true);
                 return false;
             }
@@ -4200,13 +4200,13 @@ public:
             {
                 if (bot->IsAlive())
                 {
-                    handler->PSendSysMessage("%s is not dead", bot->GetName().c_str());
+                    handler->PSendSysMessage("{} is not dead", bot->GetName());
                     handler->SetSentErrorMessage(true);
                     return false;
                 }
 
                 BotMgr::ReviveBot(bot, (bot->GetBotOwner() == owner) ? owner->ToUnit() : bot->ToUnit());
-                handler->PSendSysMessage("%s revived", bot->GetName().c_str());
+                handler->PSendSysMessage("{} revived", bot->GetName());
                 return true;
             }
         }
@@ -4243,7 +4243,7 @@ public:
 
         if (owner->GetBotMgr()->AddBot(bot) == BOT_ADD_SUCCESS)
         {
-            handler->PSendSysMessage("%s is now your npcbot", bot->GetName().c_str());
+            handler->PSendSysMessage("{} is now your npcbot", bot->GetName());
             return true;
         }
 

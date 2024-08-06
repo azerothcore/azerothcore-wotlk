@@ -1772,7 +1772,7 @@ BotAddResult BotMgr::AddBot(Creature* bot)
     //    if (count >= map->GetMaxPlayers())
     //    {
     //        ChatHandler ch(_owner->GetSession());
-    //        ch.PSendSysMessage("Instance players limit exceed (%u of %u)", count, map->GetMaxPlayers());
+    //        ch.PSendSysMessage("Instance players limit exceed ({} of {})", count, map->GetMaxPlayers());
     //        return BOT_ADD_INSTANCE_LIMIT;
     //    }
     //}
