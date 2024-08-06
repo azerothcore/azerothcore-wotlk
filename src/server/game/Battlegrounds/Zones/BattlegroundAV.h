@@ -1118,21 +1118,21 @@ const float BG_AV_CreaturePos[AV_CPLACE_MAX][4] =
 
 enum BG_AV_CreatureIds
 {
-    AV_NPC_A_TOWERDEFENSE  = 0,     // stormpike bowman
-    AV_NPC_A_GRAVEDEFENSE0 = 1,     // stormpike Defender
-    AV_NPC_A_GRAVEDEFENSE1 = 2,     // seasoned defender
-    AV_NPC_A_GRAVEDEFENSE2 = 3,     // veteran defender
-    AV_NPC_A_GRAVEDEFENSE3 = 4,     // champion defender
-    AV_NPC_A_CAPTAIN       = 5,     // balinda
-    AV_NPC_A_BOSS          = 6,     // vanndar
+    AV_NPC_A_GRAVEDEFENSE0 = 0,     // Stormpike defender
+    AV_NPC_A_GRAVEDEFENSE1 = 1,     // Seasoned defender
+    AV_NPC_A_GRAVEDEFENSE2 = 2,     // Veteran defender
+    AV_NPC_A_GRAVEDEFENSE3 = 3,     // Champion defender
+    AV_NPC_A_TOWERDEFENSE  = 4,     // Stormpike bowman
+    AV_NPC_A_CAPTAIN       = 5,     // Balinda
+    AV_NPC_A_BOSS          = 6,     // Vanndar
 
-    AV_NPC_H_TOWERDEFENSE  = 7,     // frostwolf bowman
-    AV_NPC_H_GRAVEDEFENSE0 = 8,     // frostwolf guardian
-    AV_NPC_H_GRAVEDEFENSE1 = 9,     // seasoned guardian
-    AV_NPC_H_GRAVEDEFENSE2 = 10,    // veteran guardian
-    AV_NPC_H_GRAVEDEFENSE3 = 11,    // champion guardian
-    AV_NPC_H_CAPTAIN       = 12,    // galvangar
-    AV_NPC_H_BOSS          = 13,    // drek thar
+    AV_NPC_H_GRAVEDEFENSE0 = 7,     // Frostwolf guardian
+    AV_NPC_H_GRAVEDEFENSE1 = 8,     // Seasoned guardian
+    AV_NPC_H_GRAVEDEFENSE2 = 9,     // Veteran guardian
+    AV_NPC_H_GRAVEDEFENSE3 = 10,    // Champion guardian
+    AV_NPC_H_TOWERDEFENSE  = 11,    // Frostwolf bowman
+    AV_NPC_H_CAPTAIN       = 12,    // Galvangar
+    AV_NPC_H_BOSS          = 13,    // Drek thar
 
     AV_NPC_A_MARSHAL_SOUTH = 14,
     AV_NPC_MARSHAL_NORTH   = 15,
