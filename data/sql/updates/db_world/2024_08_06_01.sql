@@ -1,3 +1,4 @@
+-- DB update 2024_08_06_00 -> 2024_08_06_01
 UPDATE `creature_loot_template` SET `Chance` = 50, `GroupId` = 2 WHERE `Entry` = 20783 AND `Reference` IN (14501, 24013);
 UPDATE `creature_loot_template` SET `Chance` = 50, `GroupId` = 1 WHERE `Entry` IN (20785, 20786, 20788, 20789, 20790) AND `Reference` IN (14501, 24013);
 UPDATE `creature_loot_template` SET `Chance` = 50, `GroupId` = 1 WHERE `Entry` = 20784 AND `Reference` = 14501;
