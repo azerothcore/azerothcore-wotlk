@@ -407,6 +407,7 @@ protected:
     ObjectGuid _lootStateUnitGUID;
 
 private:
+    [[nodiscard]] SummoningRitual GetSummoningRitualInfo();
     void CheckRitualList();
     void ClearRitualList();
     void RemoveFromOwner();

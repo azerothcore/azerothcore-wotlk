@@ -27,6 +27,18 @@
 #define MAX_GAMEOBJECT_QUEST_ITEMS 6
 #define MAX_GO_STATE               3
 
+struct SummoningRitual
+{
+    uint32 reqParticipants;                         //0
+    uint32 spellId;                                 //1
+    uint32 animSpell;                               //2
+    uint32 ritualPersistent;                        //3
+    uint32 casterTargetSpell;                       //4
+    uint32 casterTargetSpellTargets;                //5
+    uint32 castersGrouped;                          //6
+    uint32 ritualNoTargetCheck;                     //7
+};
+
  // from `gameobject_template`
 struct GameObjectTemplate
 {
@@ -227,17 +239,7 @@ struct GameObjectTemplate
         //16 GAMEOBJECT_TYPE_DUELFLAG - empty
         //17 GAMEOBJECT_TYPE_FISHINGNODE - empty
         //18 GAMEOBJECT_TYPE_SUMMONING_RITUAL
-        struct
-        {
-            uint32 reqParticipants;                         //0
-            uint32 spellId;                                 //1
-            uint32 animSpell;                               //2
-            uint32 ritualPersistent;                        //3
-            uint32 casterTargetSpell;                       //4
-            uint32 casterTargetSpellTargets;                //5
-            uint32 castersGrouped;                          //6
-            uint32 ritualNoTargetCheck;                     //7
-        } summoningRitual;
+        SummoningRitual summoningRitual;
         //19 GAMEOBJECT_TYPE_MAILBOX - empty
         //20 GAMEOBJECT_TYPE_DONOTUSE - empty
         //21 GAMEOBJECT_TYPE_GUARDPOST
