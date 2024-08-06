@@ -51,6 +51,18 @@ public:
 
     static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
+    void SendNotification(std::string_view str);
+    template<typename... Args>
+    void SendNotification(uint32 strId, Args&&... args)
+    {
+        SendNotification(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+    }
+    template<typename... Args>
+    void SendNotification(char const* fmt, Args&&... args)
+    {
+        SendNotification(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+    }
+
     void SendWorldText(std::string_view str);
     template<typename... Args>
     void SendWorldText(uint32 strId, Args&&... args)

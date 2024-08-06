@@ -55,7 +55,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
     if (!_player->GetBGAccessByLevel(bgTypeId))
     {
         // temp, must be gossip message...
-        SendNotification(LANG_YOUR_BG_LEVEL_REQ_ERROR);
+        ChatHandler(this).SendNotification(LANG_YOUR_BG_LEVEL_REQ_ERROR);
         return;
     }
 
@@ -414,7 +414,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
 
     if (_player->GetCharmGUID() || _player->IsInCombat())
     {
-        _player->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
+        ChatHandler(_player->GetSession()).SendNotification(LANG_YOU_IN_COMBAT);
         return;
     }
 

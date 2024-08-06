@@ -16,6 +16,7 @@
  */
 
 #include "BattlegroundMgr.h"
+#include "Chat.h"
 #include "GossipDef.h"
 #include "Language.h"
 #include "ObjectMgr.h"
@@ -262,9 +263,9 @@ void Player::OnGossipSelect(WorldObject* source, uint32 gossipListId, uint32 men
             ToggleInstantFlight();
 
             if (m_isInstantFlightOn)
-                GetSession()->SendNotification(LANG_INSTANT_FLIGHT_ON);
+                ChatHandler(GetSession()).SendNotification(LANG_INSTANT_FLIGHT_ON);
             else
-                GetSession()->SendNotification(LANG_INSTANT_FLIGHT_OFF);
+                ChatHandler(GetSession()).SendNotification(LANG_INSTANT_FLIGHT_OFF);
 
             PlayerTalkClass->SendCloseGossip();
             return;

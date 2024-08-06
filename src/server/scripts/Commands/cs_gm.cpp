@@ -68,22 +68,22 @@ public:
             if (!enableArg)
             {
                 if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->isGMChat())
-                    session->SendNotification(LANG_GM_CHAT_ON);
+                    handler->SendNotification(LANG_GM_CHAT_ON);
                 else
-                    session->SendNotification(LANG_GM_CHAT_OFF);
+                    handler->SendNotification(LANG_GM_CHAT_OFF);
                 return true;
             }
 
             if (*enableArg)
             {
                 session->GetPlayer()->SetGMChat(true);
-                session->SendNotification(LANG_GM_CHAT_ON);
+                handler->SendNotification(LANG_GM_CHAT_ON);
                 return true;
             }
             else
             {
                 session->GetPlayer()->SetGMChat(false);
-                session->SendNotification(LANG_GM_CHAT_OFF);
+                handler->SendNotification(LANG_GM_CHAT_OFF);
                 return true;
             }
         }
@@ -206,14 +206,14 @@ public:
 
             _player->SetGMVisible(true);
             _player->UpdateObjectVisibility();
-            handler->GetSession()->SendNotification(LANG_INVISIBLE_VISIBLE);
+            handler->SendNotification(LANG_INVISIBLE_VISIBLE);
         }
         else
         {
             _player->AddAura(VISUAL_AURA, _player);
             _player->SetGMVisible(false);
             _player->UpdateObjectVisibility();
-            handler->GetSession()->SendNotification(LANG_INVISIBLE_INVISIBLE);
+            handler->SendNotification(LANG_INVISIBLE_INVISIBLE);
         }
 
         return true;
@@ -223,7 +223,7 @@ public:
     {
         handler->GetPlayer()->SetGameMaster(true);
         handler->GetPlayer()->UpdateTriggerVisibility();
-        handler->GetSession()->SendNotification(LANG_GM_ON);
+        handler->SendNotification(LANG_GM_ON);
         return true;
     }
 
@@ -231,7 +231,7 @@ public:
     {
         handler->GetPlayer()->SetGameMaster(false);
         handler->GetPlayer()->UpdateTriggerVisibility();
-        handler->GetSession()->SendNotification(LANG_GM_OFF);
+        handler->SendNotification(LANG_GM_OFF);
         return true;
     }
 };
