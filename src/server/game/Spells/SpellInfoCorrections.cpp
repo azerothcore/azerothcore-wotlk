@@ -4792,12 +4792,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS);
     });
 
-    // Random Periodic
-    ApplySpellFix({ 40867 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Amplitude = 9000;
-    });
-
     // Flame Wave
     ApplySpellFix({ 33800 }, [](SpellInfo* spellInfo)
     {
