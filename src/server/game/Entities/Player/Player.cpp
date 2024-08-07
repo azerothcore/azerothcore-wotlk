@@ -16519,12 +16519,12 @@ static BOOL PlayerRechargeCheat (User*        user,
 void PlayerInitialize () {
   if (s_initialized) return;
 
-  WorldSocket::SetMessageHandler(CMSG_RECHARGE, PlayerRechargeCheat);
-  WorldSocket::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
-  WorldSocket::SetMessageHandler(CMSG_GODMODE, OnGodMode);
-  WorldSocket::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler);
-  WorldSocket::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
-  WorldSocket::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
+  WowConnection::SetMessageHandler(CMSG_RECHARGE, PlayerRechargeCheat);
+  WowConnection::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
+  WowConnection::SetMessageHandler(CMSG_GODMODE, OnGodMode);
+  WowConnection::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler);
+  WowConnection::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
+  WowConnection::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
 
   s_initialized = true;
 }
@@ -16533,12 +16533,12 @@ void PlayerInitialize () {
 void PlayerDestroy () {
   if (!s_initialized) return;
 
-  WorldSocket::ClearMessageHandler(CMSG_RECHARGE);
-  WorldSocket::ClearMessageHandler(CMSG_CREATEITEM);
-  WorldSocket::ClearMessageHandler(CMSG_GODMODE);
-  WorldSocket::ClearMessageHandler(CMSG_LEARN_SPELL);
-  WorldSocket::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
-  WorldSocket::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
+  WowConnection::ClearMessageHandler(CMSG_RECHARGE);
+  WowConnection::ClearMessageHandler(CMSG_CREATEITEM);
+  WowConnection::ClearMessageHandler(CMSG_GODMODE);
+  WowConnection::ClearMessageHandler(CMSG_LEARN_SPELL);
+  WowConnection::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
+  WowConnection::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
 
   s_initialized = false;
 }

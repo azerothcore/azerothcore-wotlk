@@ -21,4 +21,4 @@
 #include "Log.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldSocket.h"
+#include "WowConnection.h"

@@ -19,19 +19,19 @@
 #include "Config.h"
 #include "NetworkThread.h"
 #include "ScriptMgr.h"
-#include "WorldSocket.h"
+#include "WowConnection.h"
 #include <boost/system/error_code.hpp>
 
-class WorldSocketThread : public NetworkThread<WorldSocket>
+class WorldSocketThread : public NetworkThread<WowConnection>
 {
 public:
-    void SocketAdded(std::shared_ptr<WorldSocket> sock) override
+    void SocketAdded(std::shared_ptr<WowConnection> sock) override
     {
         sock->SetSendBufferSize(sWorldSocketMgr.GetApplicationSendBufferSize());
         sScriptMgr->OnSocketOpen(sock);
     }
 
-    void SocketRemoved(std::shared_ptr<WorldSocket> sock) override
+    void SocketRemoved(std::shared_ptr<WowConnection> sock) override
     {
         sScriptMgr->OnSocketClose(sock);
     }
@@ -112,10 +112,10 @@ void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
     BaseSocketMgr::OnSocketOpen(std::forward<tcp::socket>(sock), threadIndex);
 }
 
-NetworkThread<WorldSocket>* WorldSocketMgr::CreateThreads() const
+NetworkThread<WowConnection>* WorldSocketMgr::CreateThreads() const
 {
 
-    NetworkThread<WorldSocket>* threads = new WorldSocketThread[GetNetworkThreadCount()];
+    NetworkThread<WowConnection>* threads = new WorldSocketThread[GetNetworkThreadCount()];
 
     bool proxyProtocolEnabled = sConfigMgr->GetOption<bool>("Network.EnableProxyProtocol", false, true);
     if (proxyProtocolEnabled)

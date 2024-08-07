@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "WorldSocket.h"
+#include "WowConnection.h"
 #include "AccountMgr.h"
 #include "Config.h"
 #include "CryptoHash.h"
@@ -113,26 +113,26 @@ void EncryptableAndCompressiblePacket::CompressIfNeeded()
     SetOpcode(SMSG_COMPRESSED_UPDATE_OBJECT);
 }
 
-WorldSocket::WorldSocket(tcp::socket&& socket)
+WowConnection::WowConnection(tcp::socket&& socket)
     : Socket(std::move(socket)), _OverSpeedPings(0), _worldSession(nullptr), _authed(false), _sendBufferSize(4096)
 {
     Acore::Crypto::GetRandomBytes(_authSeed);
     _headerBuffer.Resize(sizeof(ClientPktHeader));
 }
 
-WorldSocket::~WorldSocket() = default;
+WowConnection::~WowConnection() = default;
 
-void WorldSocket::Start()
+void WowConnection::Start()
 {
     std::string ip_address = GetRemoteIpAddress().to_string();
 
     LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_INFO);
     stmt->SetData(0, ip_address);
 
-    _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSocket::CheckIpCallback, this, std::placeholders::_1)));
+    _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WowConnection::CheckIpCallback, this, std::placeholders::_1)));
 }
 
-void WorldSocket::CheckIpCallback(PreparedQueryResult result)
+void WowConnection::CheckIpCallback(PreparedQueryResult result)
 {
     if (result)
     {
@@ -148,7 +148,7 @@ void WorldSocket::CheckIpCallback(PreparedQueryResult result)
         if (banned)
         {
             SendAuthResponseError(AUTH_REJECT);
-            LOG_ERROR("network", "WorldSocket::CheckIpCallback: Sent Auth Response (IP {} banned).", GetRemoteIpAddress().to_string());
+            LOG_ERROR("network", "WowConnection::CheckIpCallback: Sent Auth Response (IP {} banned).", GetRemoteIpAddress().to_string());
             DelayedCloseSocket();
             return;
         }
@@ -158,7 +158,7 @@ void WorldSocket::CheckIpCallback(PreparedQueryResult result)
     HandleSendAuthSession();
 }
 
-bool WorldSocket::Update()
+bool WowConnection::Update()
 {
     EncryptableAndCompressiblePacket* queued;
     if (_bufferQueue.Dequeue(queued))
@@ -216,7 +216,7 @@ bool WorldSocket::Update()
     return true;
 }
 
-void WorldSocket::HandleSendAuthSession()
+void WowConnection::HandleSendAuthSession()
 {
     WorldPacket packet(SMSG_AUTH_CHALLENGE, 40);
     packet << uint32(1);                                    // 1...31
@@ -227,7 +227,7 @@ void WorldSocket::HandleSendAuthSession()
     SendPacketAndLogOpcode(packet);
 }
 
-void WorldSocket::OnClose()
+void WowConnection::OnClose()
 {
     {
         std::lock_guard<std::mutex> sessionGuard(_worldSessionLock);
@@ -235,7 +235,7 @@ void WorldSocket::OnClose()
     }
 }
 
-void WorldSocket::ReadHandler()
+void WowConnection::ReadHandler()
 {
     if (!IsOpen())
         return;
@@ -299,7 +299,7 @@ void WorldSocket::ReadHandler()
     AsyncRead();
 }
 
-bool WorldSocket::ReadHeaderHandler()
+bool WowConnection::ReadHeaderHandler()
 {
     ASSERT(_headerBuffer.GetActiveSize() == sizeof(ClientPktHeader));
 
@@ -314,7 +314,7 @@ bool WorldSocket::ReadHeaderHandler()
 
     if (!header->IsValidSize() || !header->IsValidOpcode())
     {
-        LOG_ERROR("network", "WorldSocket::ReadHeaderHandler(): client {} sent malformed packet (size: {}, cmd: {})",
+        LOG_ERROR("network", "WowConnection::ReadHeaderHandler(): client {} sent malformed packet (size: {}, cmd: {})",
             GetRemoteIpAddress().to_string(), header->size, header->cmd);
 
         return false;
@@ -397,7 +397,7 @@ struct AccountInfo
     }
 };
 
-WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
+WowConnection::ReadDataHandlerResult WowConnection::ReadDataHandler()
 {
     ClientPktHeader* header = reinterpret_cast<ClientPktHeader*>(_headerBuffer.GetReadPointer());
     OpcodeClient opcode = static_cast<OpcodeClient>(header->cmd);
@@ -422,7 +422,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             catch (ByteBufferException const&)
             {
             }
-            LOG_ERROR("network", "WorldSocket::ReadDataHandler(): client {} sent malformed CMSG_PING", GetRemoteIpAddress().to_string());
+            LOG_ERROR("network", "WowConnection::ReadDataHandler(): client {} sent malformed CMSG_PING", GetRemoteIpAddress().to_string());
             return ReadDataHandlerResult::Error;
         }
         case CMSG_AUTH_SESSION:
@@ -432,7 +432,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             {
                 // locking just to safely log offending user is probably overkill but we are disconnecting him anyway
                 if (sessionGuard.try_lock())
-                    LOG_ERROR("network", "WorldSocket::ProcessIncoming: received duplicate CMSG_AUTH_SESSION from {}", _worldSession->GetPlayerInfo());
+                    LOG_ERROR("network", "WowConnection::ProcessIncoming: received duplicate CMSG_AUTH_SESSION from {}", _worldSession->GetPlayerInfo());
                 return ReadDataHandlerResult::Error;
             }
 
@@ -443,7 +443,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             }
             catch (ByteBufferException const&) { }
 
-            LOG_ERROR("network", "WorldSocket::ReadDataHandler(): client {} sent malformed CMSG_AUTH_SESSION", GetRemoteIpAddress().to_string());
+            LOG_ERROR("network", "WowConnection::ReadDataHandler(): client {} sent malformed CMSG_AUTH_SESSION", GetRemoteIpAddress().to_string());
             return ReadDataHandlerResult::Error;
         }
         case CMSG_KEEP_ALIVE: /// @todo: handle this packet in the same way of CMSG_TIME_SYNC_RESP
@@ -454,7 +454,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
                 _worldSession->ResetTimeOutTime(true);
                 return ReadDataHandlerResult::Ok;
             }
-            LOG_ERROR("network", "WorldSocket::ReadDataHandler: client {} sent CMSG_KEEP_ALIVE without being authenticated", GetRemoteIpAddress().to_string());
+            LOG_ERROR("network", "WowConnection::ReadDataHandler: client {} sent CMSG_KEEP_ALIVE without being authenticated", GetRemoteIpAddress().to_string());
             return ReadDataHandlerResult::Error;
         case CMSG_TIME_SYNC_RESP:
             packetToQueue = new WorldPacket(std::move(packet), GameTime::Now());
@@ -487,7 +487,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
     return ReadDataHandlerResult::Ok;
 }
 
-void WorldSocket::LogOpcodeText(OpcodeClient opcode, std::unique_lock<std::mutex> const& guard) const
+void WowConnection::LogOpcodeText(OpcodeClient opcode, std::unique_lock<std::mutex> const& guard) const
 {
     if (!guard)
     {
@@ -500,13 +500,13 @@ void WorldSocket::LogOpcodeText(OpcodeClient opcode, std::unique_lock<std::mutex
     }
 }
 
-void WorldSocket::SendPacketAndLogOpcode(WorldPacket const& packet)
+void WowConnection::SendPacketAndLogOpcode(WorldPacket const& packet)
 {
     LOG_TRACE("network.opcode", "S->C: {} {}", GetRemoteIpAddress().to_string(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet.GetOpcode())));
     SendPacket(packet);
 }
 
-void WorldSocket::SendPacket(WorldPacket const& packet)
+void WowConnection::SendPacket(WorldPacket const& packet)
 {
     if (!IsOpen())
         return;
@@ -517,7 +517,7 @@ void WorldSocket::SendPacket(WorldPacket const& packet)
     _bufferQueue.Enqueue(new EncryptableAndCompressiblePacket(packet, _authCrypt.IsInitialized()));
 }
 
-void WorldSocket::HandleAuthSession(WorldPacket & recvPacket)
+void WowConnection::HandleAuthSession(WorldPacket & recvPacket)
 {
     std::shared_ptr<AuthSession> authSession = std::make_shared<AuthSession>();
 
@@ -540,17 +540,17 @@ void WorldSocket::HandleAuthSession(WorldPacket & recvPacket)
     stmt->SetData(0, int32(realm.Id.Realm));
     stmt->SetData(1, authSession->Account);
 
-    _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSocket::HandleAuthSessionCallback, this, authSession, std::placeholders::_1)));
+    _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WowConnection::HandleAuthSessionCallback, this, authSession, std::placeholders::_1)));
 }
 
-void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSession, PreparedQueryResult result)
+void WowConnection::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSession, PreparedQueryResult result)
 {
     // Stop if the account is not found
     if (!result)
     {
         // We can not log here, as we do not know the account. Thus, no accountId.
         SendAuthResponseError(AUTH_UNKNOWN_ACCOUNT);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Sent Auth Response (unknown account).");
+        LOG_ERROR("network", "WowConnection::HandleAuthSession: Sent Auth Response (unknown account).");
         DelayedCloseSocket();
         return;
     }
@@ -576,7 +576,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (sWorld->IsClosed())
     {
         SendAuthResponseError(AUTH_REJECT);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: World closed, denying client ({}).", GetRemoteIpAddress().to_string());
+        LOG_ERROR("network", "WowConnection::HandleAuthSession: World closed, denying client ({}).", GetRemoteIpAddress().to_string());
         DelayedCloseSocket();
         return;
     }
@@ -584,7 +584,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (authSession->RealmID != realm.Id.Realm)
     {
         SendAuthResponseError(REALM_LIST_REALM_NOT_FOUND);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client {} requested connecting with realm id {} but this realm has id {} set in config.",
+        LOG_ERROR("network", "WowConnection::HandleAuthSession: Client {} requested connecting with realm id {} but this realm has id {} set in config.",
             GetRemoteIpAddress().to_string(), authSession->RealmID, realm.Id.Realm);
         DelayedCloseSocket();
         return;
@@ -595,7 +595,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (wardenActive && account.OS != "Win" && account.OS != "OSX")
     {
         SendAuthResponseError(AUTH_REJECT);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client {} attempted to log in using invalid client OS ({}).", address, account.OS);
+        LOG_ERROR("network", "WowConnection::HandleAuthSession: Client {} attempted to log in using invalid client OS ({}).", address, account.OS);
         DelayedCloseSocket();
         return;
     }
@@ -614,7 +614,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (sha.GetDigest() != authSession->Digest)
     {
         SendAuthResponseError(AUTH_FAILED);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Authentication failed for account: {} ('{}') address: {}", account.m_accountId, authSession->Account, address);
+        LOG_ERROR("network", "WowConnection::HandleAuthSession: Authentication failed for account: {} ('{}') address: {}", account.m_accountId, authSession->Account, address);
         DelayedCloseSocket();
         return;
     }
@@ -628,7 +628,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         if (account.LastIP != address)
         {
             SendAuthResponseError(AUTH_FAILED);
-            LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account IP differs. Original IP: {}, new IP: {}).", account.LastIP, address);
+            LOG_DEBUG("network", "WowConnection::HandleAuthSession: Sent Auth Response (Account IP differs. Original IP: {}, new IP: {}).", account.LastIP, address);
             // We could log on hook only instead of an additional db log, however action logger is config based. Better keep DB logging as well
             sScriptMgr->OnFailedAccountLogin(account.m_accountId);
             DelayedCloseSocket();
@@ -640,7 +640,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         if (account.LockCountry != _ipCountry)
         {
             SendAuthResponseError(AUTH_FAILED);
-            LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account country differs. Original country: {}, new country: {}).", account.LockCountry, _ipCountry);
+            LOG_DEBUG("network", "WowConnection::HandleAuthSession: Sent Auth Response (Account country differs. Original country: {}, new country: {}).", account.LockCountry, _ipCountry);
             // We could log on hook only instead of an additional db log, however action logger is config based. Better keep DB logging as well
             sScriptMgr->OnFailedAccountLogin(account.m_accountId);
             DelayedCloseSocket();
@@ -662,7 +662,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (account.IsBanned)
     {
         SendAuthResponseError(AUTH_BANNED);
-        LOG_ERROR("network", "WorldSocket::HandleAuthSession: Sent Auth Response (Account banned).");
+        LOG_ERROR("network", "WowConnection::HandleAuthSession: Sent Auth Response (Account banned).");
         sScriptMgr->OnFailedAccountLogin(account.m_accountId);
         DelayedCloseSocket();
         return;
@@ -674,13 +674,13 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     if (allowedAccountType > SEC_PLAYER && account.Security < allowedAccountType)
     {
         SendAuthResponseError(AUTH_UNAVAILABLE);
-        LOG_DEBUG("network", "WorldSocket::HandleAuthSession: User tries to login but his security level is not enough");
+        LOG_DEBUG("network", "WowConnection::HandleAuthSession: User tries to login but his security level is not enough");
         sScriptMgr->OnFailedAccountLogin(account.m_accountId);
         DelayedCloseSocket();
         return;
     }
 
-    LOG_DEBUG("network", "WorldSocket::HandleAuthSession: Client '{}' authenticated successfully from {}.", authSession->Account, address);
+    LOG_DEBUG("network", "WowConnection::HandleAuthSession: Client '{}' authenticated successfully from {}.", authSession->Account, address);
 
     // Update the last_ip in the database as it was successful for login
     stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_LAST_IP);
@@ -712,7 +712,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
     AsyncRead();
 }
 
-void WorldSocket::SendAuthResponseError(uint8 code)
+void WowConnection::SendAuthResponseError(uint8 code)
 {
     WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
     packet << uint8(code);
@@ -720,7 +720,7 @@ void WorldSocket::SendAuthResponseError(uint8 code)
     SendPacketAndLogOpcode(packet);
 }
 
-bool WorldSocket::HandlePing(WorldPacket& recvPacket)
+bool WowConnection::HandlePing(WorldPacket& recvPacket)
 {
     using namespace std::chrono;
 
@@ -754,7 +754,7 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
 
                 if (_worldSession && AccountMgr::IsPlayerAccount(_worldSession->GetSecurity()))
                 {
-                    LOG_ERROR("network", "WorldSocket::HandlePing: {} kicked for over-speed pings (address: {})",
+                    LOG_ERROR("network", "WowConnection::HandlePing: {} kicked for over-speed pings (address: {})",
                         _worldSession->GetPlayerInfo(), GetRemoteIpAddress().to_string());
 
                     return false;
@@ -774,7 +774,7 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
             _worldSession->SetLatency(latency);
         else
         {
-            LOG_ERROR("network", "WorldSocket::HandlePing: peer sent CMSG_PING, but is not authenticated or got recently kicked, address = {}", GetRemoteIpAddress().to_string());
+            LOG_ERROR("network", "WowConnection::HandlePing: peer sent CMSG_PING, but is not authenticated or got recently kicked, address = {}", GetRemoteIpAddress().to_string());
             return false;
         }
     }
@@ -786,9 +786,9 @@ bool WorldSocket::HandlePing(WorldPacket& recvPacket)
     return true;
 }
 
-std::map<Opcodes, MSGHANDLER> WorldSocket::m_handlers;
+std::map<Opcodes, MSGHANDLER> WowConnection::m_handlers;
 
-int WorldSocket::SetMessageHandler(Opcodes msgId, MSGHANDLER handler) {
+int WowConnection::SetMessageHandler(Opcodes msgId, MSGHANDLER handler) {
     if (msgId >= NUM_MSG_TYPES) {
         // TODO: handle error
         return 0;
@@ -805,7 +805,7 @@ int WorldSocket::SetMessageHandler(Opcodes msgId, MSGHANDLER handler) {
     return 1;
 }
 
-int WorldSocket::ClearMessageHandler(Opcodes msgId) {
+int WowConnection::ClearMessageHandler(Opcodes msgId) {
     if (msgId >= NUM_MSG_TYPES) {
         // TODO: handle error
         return 0;

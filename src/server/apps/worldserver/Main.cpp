@@ -50,7 +50,7 @@
 #include "SecretMgr.h"
 #include "SharedDefines.h"
 #include "World.h"
-#include "WorldSocket.h"
+#include "WowConnection.h"
 #include "WorldSocketMgr.h"
 #include <boost/asio/signal_set.hpp>
 #include <boost/program_options.hpp>

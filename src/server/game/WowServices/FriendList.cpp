@@ -4,7 +4,7 @@
 #include "Language.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "WorldSocket.h"
+#include "WowConnection.h"
 
 #include <map>
 
@@ -684,13 +684,13 @@ void FriendListInitialize () {
     return;
   }
 
-  WorldSocket::SetMessageHandler(CMSG_WHOIS, WhoIsHandler);
-  WorldSocket::SetMessageHandler(CMSG_CONTACT_LIST, ContactListHandler);
-  WorldSocket::SetMessageHandler(CMSG_ADD_FRIEND, AddFriendHandler);
-  WorldSocket::SetMessageHandler(CMSG_DEL_FRIEND, DeleteFriendHandler);
-  WorldSocket::SetMessageHandler(CMSG_SET_CONTACT_NOTES, SetFriendNotesHandler);
-  WorldSocket::SetMessageHandler(CMSG_ADD_IGNORE, AddIgnoreHandler);
-  WorldSocket::SetMessageHandler(CMSG_DEL_IGNORE, DelIgnoreHandler);
+  WowConnection::SetMessageHandler(CMSG_WHOIS, WhoIsHandler);
+  WowConnection::SetMessageHandler(CMSG_CONTACT_LIST, ContactListHandler);
+  WowConnection::SetMessageHandler(CMSG_ADD_FRIEND, AddFriendHandler);
+  WowConnection::SetMessageHandler(CMSG_DEL_FRIEND, DeleteFriendHandler);
+  WowConnection::SetMessageHandler(CMSG_SET_CONTACT_NOTES, SetFriendNotesHandler);
+  WowConnection::SetMessageHandler(CMSG_ADD_IGNORE, AddIgnoreHandler);
+  WowConnection::SetMessageHandler(CMSG_DEL_IGNORE, DelIgnoreHandler);
 
   s_initialized = true;
 }

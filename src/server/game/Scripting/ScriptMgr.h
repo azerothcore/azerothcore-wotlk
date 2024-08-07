@@ -76,7 +76,7 @@ class Unit;
 class Vehicle;
 class WorldObject;
 class WorldPacket;
-class WorldSocket;
+class WowConnection;
 class CharacterCreateInfo;
 class SpellScriptLoader;
 
@@ -156,8 +156,8 @@ public: /* SpellScriptLoader */
 public: /* ServerScript */
     void OnNetworkStart();
     void OnNetworkStop();
-    void OnSocketOpen(std::shared_ptr<WorldSocket> socket);
-    void OnSocketClose(std::shared_ptr<WorldSocket> socket);
+    void OnSocketOpen(std::shared_ptr<WowConnection> socket);
+    void OnSocketClose(std::shared_ptr<WowConnection> socket);
     bool CanPacketReceive(User* session, WorldPacket const& packet);
     bool CanPacketSend(User* session, WorldPacket const& packet);
 

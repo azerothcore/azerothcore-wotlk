@@ -74,7 +74,7 @@ class Weather;
 class WorldObject;
 class WorldPacket;
 class User;
-class WorldSocket;
+class WowConnection;
 
 enum ArenaTeamInfoType : uint8;
 enum AuraRemoveMode : uint8;

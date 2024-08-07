@@ -50,7 +50,7 @@ class SpellCastTargets;
 class Unit;
 class Warden;
 class WorldPacket;
-class WorldSocket;
+class WowConnection;
 class AsynchPetSummon;
 struct AreaTableEntry;
 struct AuctionEntry;
@@ -338,7 +338,7 @@ class User
 public:
     Player* ActivePlayer() const;
 
-    User(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    User(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WowConnection> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~User();
 
     void CharacterAbortLogout ();
@@ -539,7 +539,7 @@ public:
     void SendTimeSync();
 public:                                                 // opcodes handlers
     void Handle_NULL(WorldPacket& null);                // not used
-    void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WorldSocket::OnRead
+    void Handle_EarlyProccess(WorldPacket& recvPacket); // just mark packets processed in WowConnection::OnRead
     void Handle_ServerSide(WorldPacket& recvPacket);    // sever side only, can't be accepted from client
     void Handle_Deprecated(WorldPacket& recvPacket);    // never used anymore by client
 
@@ -1142,7 +1142,7 @@ private:
 
     WOWGUID::LowType m_GUIDLow;                     // set logined or recently logout player (while m_playerRecentlyLogout set)
     Player* m_player;
-    std::shared_ptr<WorldSocket> m_sock;
+    std::shared_ptr<WowConnection> m_sock;
     std::string m_Address;
 
     AccountTypes _security;

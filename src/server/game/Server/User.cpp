@@ -50,7 +50,7 @@
 #include "WardenWin.h"
 #include "World.h"
 #include "WorldPacket.h"
-#include "WorldSocket.h"
+#include "WowConnection.h"
 #include <zlib.h>
 
 #include "BanMgr.h"
@@ -131,7 +131,7 @@ Player* User::ActivePlayer() const
 }
 
 /// User constructor
-User::User(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion,
+User::User(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WowConnection> sock, AccountTypes sec, uint8 expansion,
     time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime) :
     m_muteTime(mute_time),
     m_timeOutTime(0),
@@ -405,8 +405,8 @@ bool User::Update(uint32 diff, PacketFilter& updater)
     while (m_sock && _recvQueue.next(packet, updater))
     {
         // New msg system:
-        if (WorldSocket::m_handlers.contains(static_cast<Opcodes>(packet->GetOpcode()))) {
-            WorldSocket::m_handlers[static_cast<Opcodes>(packet->GetOpcode())](this, static_cast<Opcodes>(packet->GetOpcode()), currentTime, packet);
+        if (WowConnection::m_handlers.contains(static_cast<Opcodes>(packet->GetOpcode()))) {
+            WowConnection::m_handlers[static_cast<Opcodes>(packet->GetOpcode())](this, static_cast<Opcodes>(packet->GetOpcode()), currentTime, packet);
         }
         else {  // TODO: NUKE ALL THIS GARBAGE
             OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
@@ -926,7 +926,7 @@ void User::Handle_NULL(WorldPacket& null)
 
 void User::Handle_EarlyProccess(WorldPacket& recvPacket)
 {
-    LOG_ERROR("network.opcode", "Received opcode {} that must be processed in WorldSocket::ReadDataHandler from {}",
+    LOG_ERROR("network.opcode", "Received opcode {} that must be processed in WowConnection::ReadDataHandler from {}",
         GetOpcodeNameForLogging(static_cast<OpcodeClient>(recvPacket.GetOpcode())), GetPlayerInfo());
 }
 
@@ -1895,7 +1895,7 @@ static BOOL UserWorldTeleportHandler (User        *user,
 void UserInitialize () {
   if (s_initialized) return;
 
-  WorldSocket::SetMessageHandler(CMSG_WORLD_TELEPORT, UserWorldTeleportHandler);
+  WowConnection::SetMessageHandler(CMSG_WORLD_TELEPORT, UserWorldTeleportHandler);
 
   s_initialized = true;
 }
@@ -1904,7 +1904,7 @@ void UserInitialize () {
 void UserDestroy () {
   if (!s_initialized) return;
 
-  WorldSocket::ClearMessageHandler(CMSG_WORLD_TELEPORT);
+  WowConnection::ClearMessageHandler(CMSG_WORLD_TELEPORT);
 
   s_initialized = false;
 }

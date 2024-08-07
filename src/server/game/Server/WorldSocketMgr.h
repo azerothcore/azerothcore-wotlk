@@ -25,12 +25,12 @@
 
 #include "SocketMgr.h"
 
-class WorldSocket;
+class WowConnection;
 
 /// Manages all sockets connected to peers and network threads
-class AC_GAME_API WorldSocketMgr : public SocketMgr<WorldSocket>
+class AC_GAME_API WorldSocketMgr : public SocketMgr<WowConnection>
 {
-    typedef SocketMgr<WorldSocket> BaseSocketMgr;
+    typedef SocketMgr<WowConnection> BaseSocketMgr;
 
 public:
     static WorldSocketMgr& Instance();
@@ -48,7 +48,7 @@ public:
 protected:
     WorldSocketMgr();
 
-    NetworkThread<WorldSocket>* CreateThreads() const override;
+    NetworkThread<WowConnection>* CreateThreads() const override;
 
     static void OnSocketAccept(tcp::socket&& sock, uint32 threadIndex)
     {

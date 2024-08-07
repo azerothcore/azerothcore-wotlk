@@ -25,4 +25,4 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "SharedDefines.h"
-#include "WorldSocket.h"
+#include "WowConnection.h"

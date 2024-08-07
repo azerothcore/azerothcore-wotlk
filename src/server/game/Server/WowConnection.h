@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __WORLDSOCKET_H__
-#define __WORLDSOCKET_H__
+#ifndef _WOWCONNECTION_H_
+#define _WOWCONNECTION_H_
 
 #include "AuthCrypt.h"
 #include "Common.h"
@@ -73,16 +73,16 @@ struct ClientPktHeader
 
 struct AuthSession;
 
-class AC_GAME_API WorldSocket : public Socket<WorldSocket>
+class AC_GAME_API WowConnection : public Socket<WowConnection>
 {
-    typedef Socket<WorldSocket> BaseSocket;
+    typedef Socket<WowConnection> BaseSocket;
 
 public:
-    WorldSocket(tcp::socket&& socket);
-    ~WorldSocket();
+    WowConnection(tcp::socket&& socket);
+    ~WowConnection();
 
-    WorldSocket(WorldSocket const& right) = delete;
-    WorldSocket& operator=(WorldSocket const& right) = delete;
+    WowConnection(WowConnection const& right) = delete;
+    WowConnection& operator=(WowConnection const& right) = delete;
 
     void Start() override;
     bool Update() override;

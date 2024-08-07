@@ -36,7 +36,7 @@
 
 class Object;
 class WorldPacket;
-class WorldSocket;
+class WowConnection;
 class SystemMgr;
 
 struct Realm;
