@@ -43,18 +43,6 @@ enum Says
     SAY_ILLIDAN_MAIEV3                  = 13,
     SAY_ILLIDAN_FRENZY                  = 14,
 
-    SAY_UDALO                           = 0,
-    SAY_OLUM                            = 0,
-    SAY_AKAMA_DOORS                     = 0,
-    SAY_AKAMA_FAIL                      = 1,
-    SAY_AKAMA_BEWARE                    = 2,
-    SAY_AKAMA_LEAVE                     = 3,
-    SAY_AKAMA_ILLIDAN1                  = 4,
-    SAY_AKAMA_ILLIDAN2                  = 5,
-    SAY_AKAMA_ILLIDAN3                  = 6,
-    SAY_AKAMA_COUNCIL_1                 = 9,
-    SAY_AKAMA_COUNCIL_2                 = 10,
-
     SAY_MAIEV_SHADOWSONG_TAUNT          = 0,
     SAY_MAIEV_SHADOWSONG_ILLIDAN1       = 1,
     SAY_MAIEV_SHADOWSONG_ILLIDAN2       = 2,
@@ -141,8 +129,6 @@ enum Misc
     NPC_MAIEV_SHADOWSONG            = 23197,
 
     GO_CAGE_TRAP                    = 185916,
-
-    PATH_AKAMA_ILLIDARI_COUNCIL_1   = 230891
 };
 
 enum Events
@@ -722,309 +708,326 @@ public:
 
 enum Akama
 {
-    POINT_DOORS                 = 20,
-    POINT_ILLIDAN               = 32,
-    POINT_FIGHT_MINIONS         = 40,
+    POINT_FACE_ILLIDAN          = 1,
+    POINT_ILLIDAN_DEFEATED_1    = 2,
+    POINT_ILLIDAN_DEFEATED_2    = 3,
 
     SPELL_AKAMA_DOOR_OPEN       = 41268,
     SPELL_AKAMA_DOOR_FAIL       = 41271,
     SPELL_DEATHSWORN_DOOR_OPEN  = 41269,
     SPELL_HEALING_POTION        = 40535,
     SPELL_CHAIN_LIGHTNING       = 40536,
+    SPELL_REDUCED_THREAT        = 41000,
+    SPELL_AKAMA_TELEPORT        = 41077,
+    SPELL_AKAMA_DESPAWN         = 41242,
 
     NPC_SPIRIT_OF_OLUM          = 23411,
     NPC_SPIRIT_OF_UDALO         = 23410,
     NPC_ILLIDARI_ELITE          = 23226,
 
-    EVENT_AKAMA_SCENE_1         = 1,
-    EVENT_AKAMA_SCENE_2         = 2,
-    EVENT_AKAMA_SCENE_3         = 3,
-    EVENT_AKAMA_SCENE_4         = 4,
-    EVENT_AKAMA_SCENE_5         = 5,
-    EVENT_AKAMA_SCENE_6         = 6,
-    EVENT_AKAMA_SCENE_7         = 7,
-    EVENT_AKAMA_SCENE_8         = 8,
-    EVENT_AKAMA_SCENE_9         = 9,
-    EVENT_AKAMA_SCENE_10        = 10,
-    EVENT_AKAMA_SCENE_11        = 11,
-    EVENT_AKAMA_SCENE_20        = 20,
-    EVENT_AKAMA_SCENE_21        = 21,
-    EVENT_AKAMA_SCENE_22        = 22,
-    EVENT_AKAMA_SCENE_23        = 23,
-    EVENT_AKAMA_SCENE_24        = 24,
-    EVENT_AKAMA_SCENE_25        = 25,
-    EVENT_AKAMA_SCENE_26        = 26,
-    EVENT_AKAMA_SCENE_27        = 27,
-    EVENT_AKAMA_SCENE_28        = 28,
-    EVENT_AKAMA_SCENE_29        = 29,
+    PATH_AKAMA_ILLIDARI_COUNCIL_1 = 230891,
+    PATH_AKAMA_ILLIDARI_COUNCIL_2 = 230892,
+    PATH_AKAMA_ILLIDARI_COUNCIL_3 = 230893,
+    PATH_AKAMA_MINIONS            = 230894,
 
-    EVENT_AKAMA_SUMMON_ILLIDARI = 100,
-    EVENT_AKAMA_SPELL_CHAIN     = 101,
-    EVENT_AKAMA_HEALTH          = 102
+    SAY_UDALO = 0,
+    SAY_OLUM = 0,
+
+    SAY_AKAMA_DOOR = 0,
+    SAY_AKAMA_ALONE = 1,
+    SAY_AKAMA_SALUTE = 2,
+    SAY_AKAMA_BETRAYER = 3,
+    SAY_AKAMA_FREE = 4,
+    SAY_AKAMA_TIME_HAS_COME = 5,
+    SAY_AKAMA_MINIONS = 6,
+    SAY_AKAMA_LIGHT = 7,
+    SAY_AKAMA_COUNCIL_1 = 8,
+    SAY_AKAMA_COUNCIL_2 = 9,
+
+    ACTION_ILLIDARI_COUNCIL_DONE = 0,
+    ACTION_AKAMA_MINIONS         = 1,
+    ACTION_AKAMA_ENDING          = 2,
+    ACTION_AKAMA_MAIEV_DESPAWN   = 3
 };
 
-Position AkamaTeleport = { 609.772f, 308.456f, 271.826f, 6.1972566f };
-
-class npc_akama_illidan : public CreatureScript
+Position AkamaIllidariCouncilTeleport = { 609.772f, 308.456f, 271.826f, 6.1972566f };
+Position SpiritUdaloPos = { 203.4694f, 998.52563f, -64.33898f, 5.934119224548339843f };
+Position SpiritOlumPos = { 698.1477f, 191.44293f, 125.090294f, 1.099557399749755859f };
+Position FaceIllidan = { 745.225f, 304.946f, 352.98593f };
+Position IllidanDefeated = { 753.04553f, 369.30273f, 353.1165f };
+Position IllidariMinionPos[10] =
 {
-public:
-    npc_akama_illidan() : CreatureScript("npc_akama_illidan") { }
+{ 750.0472f , 282.32742f, 309.4353f , 3.071779489517211914f },
+{ 747.0576f , 326.42682f, 309.06885f, 0.0f                  },
+{ 754.0332f , 325.81363f, 310.31952f, 2.914699792861938476f },
+{ 745.25525f, 322.15738f, 310.45963f, 6.038839340209960937f },
+{ 748.8422f , 288.06195f, 310.9782f , 1.884955525398254394f },
+{ 745.3237f , 283.986f  , 309.2765f , 0.628318548202514648f },
+{ 743.9686f , 289.64468f, 311.18066f, 6.056292533874511718f },
+{ 751.08777f, 327.6505f , 309.45758f, 6.17846536636352539f  },
+{ 750.03217f, 323.60635f, 310.27567f, 5.497786998748779296f },
+{ 753.8425f , 286.56195f, 310.9353f , 1.029744267463684082f }
+};
 
-    struct npc_akama_illidanAI : public npc_escortAI
+struct npc_akama_illidan : public ScriptedAI
+{
+    npc_akama_illidan(Creature* creature) : ScriptedAI(creature), summons(me)
     {
-        npc_akama_illidanAI(Creature* creature) : npc_escortAI(creature), summons(me)
-        {
-            instance = creature->GetInstanceScript();
-            if (instance->GetBossState(DATA_AKAMA_ILLIDAN) == DONE)
-            {
-                me->GetMap()->LoadGrid(751.664f, 238.933f);
-                me->SetHomePosition(751.664f, 238.933f, 353.106f, 2.18f);
-                me->NearTeleportTo(751.664f, 238.933f, 353.106f, 2.18f);
-            }
-        }
+        instance = creature->GetInstanceScript();
+    }
 
-        void DoAction(int32 param) override
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        me->setActive(false);
+        summons.DespawnAll();
+        DoCastSelf(SPELL_REDUCED_THREAT, true);
+    }
+
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
+    {
+        CloseGossipMenuFor(player);
+        me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+        me->setActive(true);
+
+        if (instance->GetBossState(DATA_AKAMA_ILLIDAN) != DONE)
         {
-            if (param == ACTION_FIGHT_MINIONS)
+            me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_2, false);
+        }
+        else
+        {
+            me->SetSheath(SHEATH_STATE_UNARMED);
+            me->GetMotionMaster()->MovePoint(POINT_FACE_ILLIDAN, FaceIllidan);
+        }
+    }
+
+    void DoAction(int32 param) override
+    {
+        switch (param)
+        {
+            case ACTION_ILLIDARI_COUNCIL_DONE:
             {
-                me->CombatStop(true);
-                events.ScheduleEvent(EVENT_AKAMA_SUMMON_ILLIDARI, 8000);
-                events.ScheduleEvent(EVENT_AKAMA_SPELL_CHAIN, 7000);
-                events.ScheduleEvent(EVENT_AKAMA_HEALTH, 1000);
-                me->GetMotionMaster()->MoveCharge(741.97f, 358.74f, 353.0f, 10.0f, POINT_FIGHT_MINIONS);
-                Talk(SAY_AKAMA_LEAVE);
-            }
-            else if (param == ACTION_ILLIDAN_DEAD)
-            {
-                events.Reset();
-                summons.DespawnAll();
-                me->CombatStop(true);
-            }
-            else if (param == ACTION_ILLIDARI_COUNCIL_DONE)
-            {
-                me->NearTeleportTo(AkamaTeleport);
+                me->NearTeleportTo(AkamaIllidariCouncilTeleport);
                 me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_1, false);
             }
-        }
-
-        void Reset() override
-        {
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-            me->setActive(false);
-            events.Reset();
-            summons.DespawnAll();
-        }
-
-        void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
-        {
-            CloseGossipMenuFor(player);
-            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-            me->setActive(true);
-
-            if (instance->GetBossState(DATA_AKAMA_ILLIDAN) != DONE)
+            case ACTION_AKAMA_MINIONS:
             {
                 me->SetReactState(REACT_PASSIVE);
-                Start(false, true);
-                SetDespawnAtEnd(false);
+                me->CombatStop(true);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    Talk(SAY_AKAMA_MINIONS);
+                }, 6700ms);
+                me->m_Events.AddEventAtOffset([&] {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                }, 9530ms); // 2830ms
+                me->m_Events.AddEventAtOffset([&] {
+                    me->GetMotionMaster()->MovePath(PATH_AKAMA_MINIONS, false);
+                }, 14400ms); // 4870ms
             }
-            else
+            case ACTION_AKAMA_ENDING:
             {
-                me->GetMotionMaster()->MovePoint(POINT_ILLIDAN, 744.45f, 304.84f, 353.0f);
-                events.Reset();
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_20, 5000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_21, 8000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_22, 10000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_23, 23000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_24, 34000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_25, 41000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_26, 46000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_27, 49000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_28, 49200);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_29, 52000);
+                summons.DespawnAll();
+                me->SetControlled(false, UNIT_STATE_ROOT);
+                me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_1, IllidanDefeated);
+            }
+            case ACTION_AKAMA_MAIEV_DESPAWN:
+            {
+                Talk(SAY_AKAMA_LIGHT);
+                me->m_Events.AddEventAtOffset([&] {
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                }, 3490ms);
+                me->m_Events.AddEventAtOffset([&] {
+                    DoCastSelf(SPELL_AKAMA_DESPAWN);
+                }, 8340ms); // 4850ms
             }
         }
+    }
 
-        void PathEndReached(uint32 pathId) override
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE)
         {
-            if (pathId == PATH_AKAMA_ILLIDARI_COUNCIL_1)
+            switch (id)
             {
-                ScheduleUniqueTimedEvent(200ms, [&]
+                case POINT_FACE_ILLIDAN:
                 {
-                    Talk(SAY_AKAMA_COUNCIL_1);
-                }, 1);
-                ScheduleUniqueTimedEvent(7800ms, [&]
-                {
-                    Talk(SAY_AKAMA_COUNCIL_2);
-                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                }, 2);
-            }
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            summon->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-            if (summon->GetEntry() == NPC_ILLIDARI_ELITE)
-            {
-                me->AddThreat(summon, 1000000.0f);
-                summon->AddThreat(me, 1000000.0f);
-                summon->AI()->AttackStart(me);
-                AttackStart(summon);
-            }
-        }
-
-        void WaypointReached(uint32 pointId) override
-        {
-            if (pointId == POINT_DOORS)
-            {
-                SetEscortPaused(true);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_1, 0);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_2, 4000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_3, 7000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_4, 17000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_5, 23000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_6, 25000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_7, 31000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_8, 40000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_9, 54000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_10, 57000);
-                events.ScheduleEvent(EVENT_AKAMA_SCENE_11, 62000);
-            }
-            else if (pointId == POINT_ILLIDAN)
-            {
-                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
-                me->setActive(false);
-                me->SetReactState(REACT_AGGRESSIVE);
-            }
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) override { }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth())
-                damage = 0;
-        }
-
-        void UpdateEscortAI(uint32 diff) override
-        {
-            scheduler.Update(diff);
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_AKAMA_SCENE_1:
-                    me->SetFacingTo(0.0f);
-                    break;
-                case EVENT_AKAMA_SCENE_2:
-                    Talk(SAY_AKAMA_DOORS);
-                    break;
-                case EVENT_AKAMA_SCENE_3:
-                    me->CastSpell(me, SPELL_AKAMA_DOOR_FAIL, false);
-                    break;
-                case EVENT_AKAMA_SCENE_4:
-                    Talk(SAY_AKAMA_FAIL);
-                    break;
-                case EVENT_AKAMA_SCENE_5:
-                    me->SummonCreature(NPC_SPIRIT_OF_UDALO, me->GetPositionX() - 5.0f, me->GetPositionY() + 8.0f, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
-                    me->SummonCreature(NPC_SPIRIT_OF_OLUM, me->GetPositionX() - 5.0f, me->GetPositionY() - 8.0f, me->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
-                    break;
-                case EVENT_AKAMA_SCENE_6:
-                    if (Creature* udalo = me->FindNearestCreature(NPC_SPIRIT_OF_UDALO, 15.0f))
-                        udalo->AI()->Talk(SAY_UDALO);
-                    break;
-                case EVENT_AKAMA_SCENE_7:
-                    if (Creature* olum = me->FindNearestCreature(NPC_SPIRIT_OF_OLUM, 15.0f))
-                        olum->AI()->Talk(SAY_OLUM);
-                    break;
-                case EVENT_AKAMA_SCENE_8:
-                    me->CastSpell(me, SPELL_AKAMA_DOOR_OPEN, false);
-                    if (Creature* olum = me->FindNearestCreature(NPC_SPIRIT_OF_OLUM, 15.0f))
-                        olum->CastSpell(olum, SPELL_AKAMA_DOOR_OPEN, false);
-                    if (Creature* udalo = me->FindNearestCreature(NPC_SPIRIT_OF_UDALO, 15.0f))
-                        udalo->CastSpell(udalo, SPELL_AKAMA_DOOR_OPEN, false);
-                    break;
-                case EVENT_AKAMA_SCENE_9:
-                    instance->SetBossState(DATA_AKAMA_ILLIDAN, NOT_STARTED);
-                    instance->SetBossState(DATA_AKAMA_ILLIDAN, DONE);
-                    break;
-                case EVENT_AKAMA_SCENE_10:
-                    Talk(SAY_AKAMA_BEWARE);
-                    break;
-                case EVENT_AKAMA_SCENE_11:
-                    SetEscortPaused(false);
-                    break;
-                case EVENT_AKAMA_SCENE_20:
-                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
-                        illidan->SetStandState(UNIT_STAND_STATE_STAND);
-                    break;
-                case EVENT_AKAMA_SCENE_21:
-                    me->SetFacingTo(M_PI);
-                    break;
-                case EVENT_AKAMA_SCENE_22:
-                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
-                        illidan->AI()->Talk(SAY_ILLIDAN_AKAMA1);
-                    break;
-                case EVENT_AKAMA_SCENE_23:
-                    Talk(SAY_AKAMA_ILLIDAN1);
-                    break;
-                case EVENT_AKAMA_SCENE_24:
-                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
-                        illidan->AI()->Talk(SAY_ILLIDAN_AKAMA2);
-                    break;
-                case EVENT_AKAMA_SCENE_25:
-                    Talk(SAY_AKAMA_ILLIDAN2);
-                    break;
-                case EVENT_AKAMA_SCENE_26:
-                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
-                        illidan->AI()->Talk(SAY_ILLIDAN_AKAMA3);
-                    break;
-                case EVENT_AKAMA_SCENE_27:
-                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
-                        illidan->LoadEquipment(1, true);
-                    break;
-                case EVENT_AKAMA_SCENE_28:
-                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
-                        illidan->HandleEmoteCommand(EMOTE_ONESHOT_TALK_NO_SHEATHE);
-                    break;
-                case EVENT_AKAMA_SCENE_29:
                     if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                     {
-                        illidan->SetImmuneToAll(false);
-                        illidan->SetInCombatWithZone();
-                        AttackStart(illidan);
+                        me->SetFacingToObject(instance->GetCreature(DATA_ILLIDAN_STORMRAGE));
+                        illidan->AI()->DoAction(ACTION_START_EVENT);
+                        me->SetHomePosition(me->GetPosition());
+
+                        me->m_Events.AddEventAtOffset([&] {
+                            Talk(SAY_AKAMA_FREE);
+                        }, 15400ms);
+                        me->m_Events.AddEventAtOffset([&] {
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                        }, 19440ms); // 4040ms
+                        me->m_Events.AddEventAtOffset([&] {
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                        }, 23080ms); // 3640ms
+                        me->m_Events.AddEventAtOffset([&] {
+                            Talk(SAY_AKAMA_TIME_HAS_COME);
+                        }, 33840ms); // 10760ms
+                        me->m_Events.AddEventAtOffset([&] {
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                            me->SetSheath(SHEATH_STATE_MELEE);
+                        }, 35210ms); // 1370ms
+                        me->m_Events.AddEventAtOffset([&] {
+                            me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+                        }, 37640ms); // 2430ms
+                        me->m_Events.AddEventAtOffset([&] {
+                            AttackStart(illidan);
+                        }, 43310ms); // 5670ms
                     }
-                    break;
-                case EVENT_AKAMA_SUMMON_ILLIDARI:
-                    me->SummonCreature(NPC_ILLIDARI_ELITE, 742.55f, 359.12f, 353.0f, 4.35f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-                    events.ScheduleEvent(EVENT_AKAMA_SUMMON_ILLIDARI, urand(2000, 6000));
-                    break;
-                case EVENT_AKAMA_SPELL_CHAIN:
-                    if (me->GetVictim())
-                        me->CastSpell(me->GetVictim(), SPELL_CHAIN_LIGHTNING, false);
-                    events.ScheduleEvent(EVENT_AKAMA_SPELL_CHAIN, 20000);
-                    break;
-                case EVENT_AKAMA_HEALTH:
-                    if (me->HealthBelowPct(20))
-                        me->CastSpell(me, SPELL_HEALING_POTION, false);
-                    events.ScheduleEvent(EVENT_AKAMA_HEALTH, 1000);
-                    break;
+                }
+                case POINT_ILLIDAN_DEFEATED_1:
+                {
+                    me->SetWalk(true);
+                    if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
+                    {
+                        float x, y, z;
+                        me->GetNearPoint(illidan, x, y, z, 25.f, 0, me->GetAngle(illidan));
+                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_2, x, y, z);
+                    }
+                }
             }
-
-            DoMeleeAttackIfReady();
         }
-
-    private:
-        EventMap events;
-        SummonList summons;
-        InstanceScript* instance;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackTempleAI<npc_akama_illidanAI>(creature);
+        else if (type == WAYPOINT_MOTION_TYPE)
+        {
+            if (me->GetWaypointPath() == PATH_AKAMA_MINIONS)
+                if (id == 2)
+                    DoCastSelf(SPELL_AKAMA_TELEPORT);
+        }
     }
+
+    void PathEndReached(uint32 pathId) override
+    {
+        switch (pathId)
+        {
+            // Talk to Open Door
+            case PATH_AKAMA_ILLIDARI_COUNCIL_1:
+            {
+                me->m_Events.AddEventAtOffset([&] {
+                    Talk(SAY_AKAMA_COUNCIL_1);
+                }, 200ms);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    Talk(SAY_AKAMA_COUNCIL_2);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                }, 8000ms); // 7800ms
+            }
+            // Reached Door
+            case PATH_AKAMA_ILLIDARI_COUNCIL_2:
+            {
+                me->m_Events.AddEventAtOffset([&] {
+                    Talk(SAY_AKAMA_DOOR);
+                }, 4600ms);
+                me->m_Events.AddEventAtOffset([&] {
+                    DoCastSelf(SPELL_AKAMA_DOOR_FAIL);
+                }, 8120ms); // 3520ms
+                me->m_Events.AddEventAtOffset([&] {
+                    Talk(SAY_AKAMA_ALONE);
+                }, 17860ms); // 9740ms
+                me->m_Events.AddEventAtOffset([&] {
+                    me->SummonCreature(NPC_SPIRIT_OF_UDALO, SpiritUdaloPos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                    me->SummonCreature(NPC_SPIRIT_OF_OLUM, SpiritOlumPos, TEMPSUMMON_TIMED_DESPAWN, 60000);
+                }, 23930ms); // 6070ms
+                me->m_Events.AddEventAtOffset([&] {
+                    if (Creature* udalo = me->FindNearestCreature(NPC_SPIRIT_OF_UDALO, 15.0f))
+                        udalo->AI()->Talk(SAY_UDALO);
+                }, 25190ms); // 1260ms
+                me->m_Events.AddEventAtOffset([&] {
+                    if (Creature* olum = me->FindNearestCreature(NPC_SPIRIT_OF_OLUM, 15.0f))
+                        olum->AI()->Talk(SAY_OLUM);
+                }, 31370ms); // 6180ms
+                me->m_Events.AddEventAtOffset([&] {
+                    DoCastSelf(SPELL_AKAMA_DOOR_OPEN);
+                    if (Creature* udalo = me->FindNearestCreature(NPC_SPIRIT_OF_UDALO, 15.0f))
+                        udalo->AI()->DoCastSelf(SPELL_AKAMA_DOOR_OPEN);
+                    if (Creature* olum = me->FindNearestCreature(NPC_SPIRIT_OF_OLUM, 15.0f))
+                        olum->AI()->DoCastSelf(SPELL_AKAMA_DOOR_OPEN);
+                }, 39710ms); // 8340ms
+                me->m_Events.AddEventAtOffset([&] {
+                    Talk(SAY_AKAMA_SALUTE);
+                }, 56960ms); // 17250ms
+                me->m_Events.AddEventAtOffset([&] {
+                    me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_3, false);
+                }, 64030ms); // 7070ms
+            }
+            // Talk to Initiate Fight
+            case PATH_AKAMA_ILLIDARI_COUNCIL_3:
+            {
+                Talk(SAY_AKAMA_BETRAYER);
+                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                instance->SetBossState(DATA_AKAMA_ILLIDAN, NOT_STARTED);
+                instance->SetBossState(DATA_AKAMA_ILLIDAN, DONE);
+            }
+            case PATH_AKAMA_MINIONS:
+            {
+                me->SetControlled(true, UNIT_STATE_ROOT);
+
+                for (int i = 0; i < 10; ++i)
+                    me->SummonCreature(NPC_ILLIDARI_ELITE, IllidariMinionPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+            }
+        }
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        summon->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+        if (summon->GetEntry() == NPC_ILLIDARI_ELITE)
+        {
+            me->AddThreat(summon, 1000000.0f);
+            summon->AddThreat(me, 1000000.0f);
+            summon->AI()->AttackStart(me);
+            AttackStart(summon);
+        }
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->GetEntry() == NPC_ILLIDARI_ELITE)
+            me->SummonCreature(NPC_ILLIDARI_ELITE, IllidariMinionPos[urand(0, 9)], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        ScheduleTimedEvent(12s, 18s, [&] {
+            DoCastVictim(SPELL_CHAIN_LIGHTNING);
+        }, 16s, 24s);
+
+        ScheduleTimedEvent(5s, 10s, [&] {
+            if (me->HealthBelowPct(20))
+                DoCastSelf(SPELL_HEALING_POTION);
+        }, 5s, 10s);
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (damage >= me->GetHealth())
+            damage = me->GetHealth() - 1;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    InstanceScript* instance;
+    SummonList summons;
 };
 
 class spell_illidan_draw_soul : public SpellScript
@@ -1364,7 +1367,7 @@ class spell_illidan_cage_trap_stun_aura : public AuraScript
 void AddSC_boss_illidan()
 {
     new boss_illidan_stormrage();
-    new npc_akama_illidan();
+    RegisterBlackTempleCreatureAI(npc_akama_illidan);
     RegisterSpellScript(spell_illidan_draw_soul);
     RegisterSpellScript(spell_illidan_parasitic_shadowfiend_aura);
     RegisterSpellAndAuraScriptPair(spell_illidan_parasitic_shadowfiend_trigger, spell_illidan_parasitic_shadowfiend_trigger_aura);

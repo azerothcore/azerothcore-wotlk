@@ -91,12 +91,12 @@ Disable Gravity & Hover
 FaceDirection: 2.837961435317993164
 Flags: 34080768
 Wait 3640
-SoundKitID: 11479 (11479)
+Text: I Will Not...
 Wait 3650
 Fly Point 727.6356 Y: 305.62753 Z: 359.1486
 */
 /* Illidan Fly Phase Reached Fly Point
-SoundKitID: 11480 (11480)
+Text: Behold the Flames...
 Face Entry: 22515
 Wait 1210
 SpellID: 39849
@@ -209,9 +209,8 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (23089, 5, 0, 'The time has come! The moment is at hand!', 14, 0, 100, 22, 0, 11380, 20894, 0, 'SAY_AKAMA_TIME_HAS_COME'),
 (23089, 6, 0, 'I will deal with these mongrels! Strike now, friends! Strike at the Betrayer!', 14, 0, 100, 22, 0, 11390, 21250, 0, 'SAY_AKAMA_MINIONS'),
 (23089, 7, 0, 'The Light will bless these dismal halls once again.... I swear it.', 14, 0, 100, 1, 0, 11387, 21514, 0, 'SAY_AKAMA_LIGHT'),
-(23089, 8, 0, 'Let us finish what we\'ve started.  I will lead you to Illidan\'s abode once you\'ve recovered your strength.', 12, 0, 100, 1, 0, 0, 21520, 0, 'SAY_AKAMA_FINISH'),
-(23089, 9, 0, 'Those who\'ve defiled this temple have all been defeated.  All but one!', 12, 0, 100, 1, 0, 0, 21518, 0, 'SAY_AKAMA_COUNCIL_1'),
-(23089, 10, 0, 'Let us finish what we\'ve started.  I will lead you to Illidan\'s abode once you\'ve recovered your strength.', 12, 0, 100, 1, 0, 0, 21520, 0, 'SAY_AKAMA_COUNCIL_2');
+(23089, 8, 0, 'Those who\'ve defiled this temple have all been defeated.  All but one!', 12, 0, 100, 1, 0, 0, 21518, 0, 'SAY_AKAMA_COUNCIL_1'),
+(23089, 9, 0, 'Let us finish what we\'ve started.  I will lead you to Illidan\'s abode once you\'ve recovered your strength.', 12, 0, 100, 1, 0, 0, 21520, 0, 'SAY_AKAMA_COUNCIL_2');
 
 DELETE FROM `creature_text` WHERE (`CreatureID` = 22917);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -249,3 +248,28 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (23197, 6, 0, 'He\'s right. I feel nothing... I am... nothing.', 14, 0, 100, 0, 0, 11497, 21508, 0, 'Maiev Shadowsong SAY_MAIEV_SHADOWSONG_OUTRO'),
 (23197, 7, 0, 'Farewell, champions.', 14, 0, 100, 0, 0, 11498, 21509, 0, 'Maiev Shadowsong SAY_MAIEV_SHADOWSONG_FAREWELL');
 
+DELETE FROM `waypoint_data` WHERE `id` = @PATH;
+INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
+-- Path Illidari Council 2
+(230892,1,673.1424,354.9833,271.6953,NULL,0,1,0,100,0),
+(230892,2,696.67883,380.00977,271.8905,NULL,0,1,0,100,0),
+(230892,3,721.36926,374.37347,280.9863,NULL,0,1,0,100,0),
+(230892,4,736.7919,352.50674,296.42725,NULL,0,1,0,100,0),
+(230892,5,745.5639,336.74622,306.2915,NULL,0,1,0,100,0),
+(230892,6,749.1409,319.2256,311.6832,NULL,0,1,0,100,0),
+(230892,7,751.4883,308.6376,312.07648,NULL,0,1,0,100,0),
+(230892,8,755.7801,304.4006,312.1663,NULL,0,1,0,100,0),
+(230892,9,755.7801,304.4006,312.1663,6.2657318115234375,0,0,0,100,0),
+-- Path Illidari Council 3
+(230893,1,798.9379,294.3112,319.75885,NULL,0,1,0,100,0),
+(230893,2,797.5406,276.17447,330.36548,NULL,0,1,0,100,0),
+(230893,3,793.6441,254.72418,341.4547,NULL,0,1,0,100,0),
+(230893,4,764.82074,238.01302,353.61133,NULL,0,1,0,100,0),
+(230893,5,748.4362,235.80513,352.99878,NULL,0,1,0,100,0),
+(230893,6,748.4362,235.80513,352.99878,2.129301786422729492,0,0,0,100,0),
+-- Face Minions
+(230894,1,745.225,304.946,352.98593,3.140537023544311523,0,1,0,100,0),
+(230894,2,743.76953,363.82217,352.98837,NULL,2600,1,0,100,0),
+(230894,3,752.2771,369.94006,353.15842,NULL,0,1,0,100,0),
+(230894,4,799.1155,304.4322,319.75153,NULL,0,1,0,100,0),
+(230894,5,799.1155,304.4322,319.75153,3.071779489517211914,0,1,0,100,0);
