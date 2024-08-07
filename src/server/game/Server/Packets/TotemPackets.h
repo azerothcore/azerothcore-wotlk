@@ -28,7 +28,7 @@ namespace WorldPackets
         class TotemDestroyed final : public ClientPacket
         {
         public:
-            TotemDestroyed(WorldPacket&& packet) : ClientPacket(CMSG_TOTEM_DESTROYED, std::move(packet)) { }
+            TotemDestroyed(WDataStore&& packet) : ClientPacket(CMSG_TOTEM_DESTROYED, std::move(packet)) { }
 
             void Read() override;
 
@@ -40,7 +40,7 @@ namespace WorldPackets
         public:
             TotemCreated() : ServerPacket(SMSG_TOTEM_CREATED, 1 + 8 + 4 + 4) { }
 
-            WorldPacket const* Write() override;
+            WDataStore const* Write() override;
 
             uint8 Slot = 0;
             WOWGUID Totem;

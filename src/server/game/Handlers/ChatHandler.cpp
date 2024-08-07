@@ -38,7 +38,7 @@
 #include "Util.h"
 #include "Warden.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 inline bool isNasty(uint8 c)
@@ -56,7 +56,7 @@ inline bool isNasty(uint8 c)
     return false;
 }
 
-void User::HandleMessagechatOpcode(WorldPacket& recvData)
+void User::HandleMessagechatOpcode(WDataStore& recvData)
 {
     uint32 type;
     uint32 lang;
@@ -440,7 +440,7 @@ void User::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
-                WorldPacket data;
+                WDataStore data;
                 ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetGUID()));
             }
@@ -499,7 +499,7 @@ void User::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
-                WorldPacket data;
+                WDataStore data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
@@ -522,7 +522,7 @@ void User::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
-                WorldPacket data;
+                WDataStore data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
@@ -541,7 +541,7 @@ void User::HandleMessagechatOpcode(WorldPacket& recvData)
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 // In battleground, raid warning is sent only to players in battleground - code is ok
-                WorldPacket data;
+                WDataStore data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_WARNING, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
@@ -560,7 +560,7 @@ void User::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
-                WorldPacket data;
+                WDataStore data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
@@ -579,7 +579,7 @@ void User::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
-                WorldPacket data;
+                WDataStore data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND_LEADER, Language(lang), sender, nullptr, msg);
                 group->BroadcastPacket(&data, false);
             }
@@ -701,7 +701,7 @@ namespace Acore
         EmoteChatBuilder(Player const& player, uint32 text_emote, uint32 emote_num, Unit const* target)
             : i_player(player), i_text_emote(text_emote), i_emote_num(emote_num), i_target(target) {}
 
-        void operator()(WorldPacket& data, LocaleConstant loc_idx)
+        void operator()(WDataStore& data, LocaleConstant loc_idx)
         {
             std::string const name(i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
             uint32 namlen = name.size();
@@ -725,7 +725,7 @@ namespace Acore
     };
 }                                                           // namespace Acore
 
-void User::HandleTextEmoteOpcode(WorldPacket& recvData)
+void User::HandleTextEmoteOpcode(WDataStore& recvData)
 {
     if (!GetPlayer()->IsAlive())
         return;
@@ -795,7 +795,7 @@ void User::HandleTextEmoteOpcode(WorldPacket& recvData)
         ((Creature*)unit)->AI()->ReceiveEmote(GetPlayer(), text_emote);
 }
 
-void User::HandleChatIgnoredOpcode(WorldPacket& recvData)
+void User::HandleChatIgnoredOpcode(WDataStore& recvData)
 {
     WOWGUID iguid;
     uint8 unk;
@@ -807,12 +807,12 @@ void User::HandleChatIgnoredOpcode(WorldPacket& recvData)
     if (!player)
         return;
 
-    WorldPacket data;
+    WDataStore data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_IGNORED, LANG_UNIVERSAL, m_player, m_player, GetPlayer()->GetName());
     player->User()->Send(&data);
 }
 
-void User::HandleChannelDeclineInvite(WorldPacket& recvPacket)
+void User::HandleChannelDeclineInvite(WDataStore& recvPacket)
 {
     // used only with EXTRA_LOGS
     (void)recvPacket;
@@ -822,27 +822,27 @@ void User::HandleChannelDeclineInvite(WorldPacket& recvPacket)
 
 void User::SendPlayerNotFoundNotice(std::string const& name)
 {
-    WorldPacket data(SMSG_CHAT_PLAYER_NOT_FOUND, name.size() + 1);
+    WDataStore data(SMSG_CHAT_PLAYER_NOT_FOUND, name.size() + 1);
     data << name;
     Send(&data);
 }
 
 void User::SendPlayerAmbiguousNotice(std::string const& name)
 {
-    WorldPacket data(SMSG_CHAT_PLAYER_AMBIGUOUS, name.size() + 1);
+    WDataStore data(SMSG_CHAT_PLAYER_AMBIGUOUS, name.size() + 1);
     data << name;
     Send(&data);
 }
 
 void User::SendWrongFactionNotice()
 {
-    WorldPacket data(SMSG_CHAT_WRONG_FACTION, 0);
+    WDataStore data(SMSG_CHAT_WRONG_FACTION, 0);
     Send(&data);
 }
 
 void User::SendChatRestrictedNotice(ChatRestrictionType restriction)
 {
-    WorldPacket data(SMSG_CHAT_RESTRICTED, 1);
+    WDataStore data(SMSG_CHAT_RESTRICTED, 1);
     data << uint8(restriction);
     Send(&data);
 }

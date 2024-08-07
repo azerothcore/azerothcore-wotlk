@@ -69,7 +69,7 @@ class SpellCastTargets;
 class UpdateMask;
 
 typedef std::deque<Mail*> PlayerMails;
-typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
+typedef void(*bgZoneRef)(Battleground*, WDataStore&);
 
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_MAX_DAILY_QUESTS     25
@@ -1123,7 +1123,7 @@ public:
     void RemovePlayerFlag(PlayerFlags flags) { RemoveFlag(PLAYER_FLAGS, flags); }
     void ReplaceAllPlayerFlags(PlayerFlags flags) { SetUInt32Value(PLAYER_FLAGS, flags); }
 
-    static bool BuildEnumData(PreparedQueryResult result, WorldPacket* data);
+    static bool BuildEnumData(PreparedQueryResult result, WDataStore* data);
 
     [[nodiscard]] bool IsClass(Classes playerClass, ClassContext context = CLASS_CONTEXT_NONE) const override;
 
@@ -1397,7 +1397,7 @@ public:
     void UpdateSkillEnchantments(uint16 skill_id, uint16 curr_value, uint16 new_value);
     void SendEnchantmentDurations();
     void UpdateEnchantmentDurations();
-    void BuildEnchantmentsInfoData(WorldPacket* data);
+    void BuildEnchantmentsInfoData(WDataStore* data);
     void AddItemDurations(Item* item);
     void RemoveItemDurations(Item* item);
     void SendItemDurations();
@@ -1713,8 +1713,8 @@ public:
     [[nodiscard]] uint32 resetTalentsCost() const;
     bool IsMaxLevel() const;
     void InitTalentForLevel();
-    void BuildPlayerTalentsInfoData(WorldPacket* data);
-    void BuildPetTalentsInfoData(WorldPacket* data);
+    void BuildPlayerTalentsInfoData(WDataStore* data);
+    void BuildPetTalentsInfoData(WDataStore* data);
     void SendTalentsInfoData(bool pet);
     void LearnTalent(uint32 talentId, uint32 talentRank, bool command = false);
     void LearnPetTalent(WOWGUID petGuid, uint32 talentId, uint32 talentRank);
@@ -2012,10 +2012,10 @@ public:
 
     void ProcessTerrainStatusUpdate() override;
 
-    void SendMessageToSet(WorldPacket const* data, bool self) const override;
-    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self) const override;
-    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin, bool ownTeamOnly, bool required3dDist = false) const;
-    void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const override;
+    void SendMessageToSet(WDataStore const* data, bool self) const override;
+    void SendMessageToSetInRange(WDataStore const* data, float dist, bool self) const override;
+    void SendMessageToSetInRange(WDataStore const* data, float dist, bool self, bool includeMargin, bool ownTeamOnly, bool required3dDist = false) const;
+    void SendMessageToSet(WDataStore const* data, Player const* skipped_rcvr) const override;
     void SendTeleportAckPacket();
 
     [[nodiscard]] Corpse* GetCorpse() const;
@@ -2219,7 +2219,7 @@ public:
 
     void SendInitWorldStates(uint32 zone, uint32 area);
     void SendUpdateWorldState(uint32 variable, uint32 value) const;
-    void SendDirectMessage(WorldPacket const* data) const;
+    void SendDirectMessage(WDataStore const* data) const;
     void SendBGWeekendWorldStates();
     void SendBattlefieldWorldStates();
 

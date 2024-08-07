@@ -17,7 +17,7 @@
 
 #include "ChatPackets.h"
 
-WorldPacket const* WorldPackets::Chat::Emote::Write()
+WDataStore const* WorldPackets::Chat::Emote::Write()
 {
     _worldPacket << EmoteID;
     _worldPacket << Guid;
@@ -30,7 +30,7 @@ void WorldPackets::Chat::EmoteClient::Read()
     _worldPacket >> EmoteID;
 }
 
-WorldPacket const* WorldPackets::Chat::ChatServerMessage::Write()
+WDataStore const* WorldPackets::Chat::ChatServerMessage::Write()
 {
     _worldPacket << int32(MessageID);
     _worldPacket << StringParam;

@@ -28,7 +28,7 @@
 class Aura;
 class Player;
 class Map;
-class WorldPacket;
+class WDataStore;
 
 #define SPECTATOR_ADDON_VERSION 27
 #define SPECTATOR_BUFFER_LEN 150
@@ -109,7 +109,7 @@ namespace ArenaSpectator
 
     AC_GAME_API bool HandleSpectatorSpectateCommand(ChatHandler* handler, std::string const& name);
     AC_GAME_API bool HandleSpectatorWatchCommand(ChatHandler* handler, std::string const& name);
-    AC_GAME_API void CreatePacket(WorldPacket& data, std::string const& message);
+    AC_GAME_API void CreatePacket(WDataStore& data, std::string const& message);
     AC_GAME_API void HandleResetCommand(Player* player);
     AC_GAME_API bool ShouldSendAura(Aura* aura, uint8 effMask, WOWGUID targetGUID, bool remove);
 }

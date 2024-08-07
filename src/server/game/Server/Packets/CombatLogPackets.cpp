@@ -17,7 +17,7 @@
 
 #include "CombatLogPackets.h"
 
-WorldPacket const* WorldPackets::CombatLog::EnvironmentalDamageLog::Write()
+WDataStore const* WorldPackets::CombatLog::EnvironmentalDamageLog::Write()
 {
     _worldPacket << Victim;
     _worldPacket << uint8(Type);

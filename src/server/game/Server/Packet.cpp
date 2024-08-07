@@ -18,11 +18,11 @@
 #include "Packet.h"
 #include "Errors.h"
 
-WorldPackets::Packet::Packet(WorldPacket&& worldPacket) : _worldPacket(std::move(worldPacket))
+WorldPackets::Packet::Packet(WDataStore&& worldPacket) : _worldPacket(std::move(worldPacket))
 {
 }
 
-WorldPackets::ServerPacket::ServerPacket(OpcodeServer opcode, std::size_t initialSize /*= 200*/) : Packet(WorldPacket(opcode, initialSize))
+WorldPackets::ServerPacket::ServerPacket(OpcodeServer opcode, std::size_t initialSize /*= 200*/) : Packet(WDataStore(opcode, initialSize))
 {
 }
 
@@ -31,17 +31,17 @@ void WorldPackets::ServerPacket::Read()
     ASSERT(!"Read not implemented for server packets.");
 }
 
-WorldPackets::ClientPacket::ClientPacket(OpcodeClient expectedOpcode, WorldPacket&& packet) : Packet(std::move(packet))
+WorldPackets::ClientPacket::ClientPacket(OpcodeClient expectedOpcode, WDataStore&& packet) : Packet(std::move(packet))
 {
     ASSERT(GetOpcode() == expectedOpcode);
 }
 
-WorldPackets::ClientPacket::ClientPacket(WorldPacket&& packet)
+WorldPackets::ClientPacket::ClientPacket(WDataStore&& packet)
     : Packet(std::move(packet))
 {
 }
 
-WorldPacket const* WorldPackets::ClientPacket::Write()
+WDataStore const* WorldPackets::ClientPacket::Write()
 {
     ASSERT(!"Write not allowed for client packets.");
     // Shut up some compilers

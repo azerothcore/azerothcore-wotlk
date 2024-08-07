@@ -24,7 +24,7 @@
 #include "SessionKeyGenerator.h"
 #include "Util.h"
 #include "WardenModuleMac.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 WardenMac::WardenMac() : Warden()
@@ -97,7 +97,7 @@ void WardenMac::RequestHash()
     // Encrypt with warden RC4 key.
     EncryptData((uint8*)&Request, sizeof(WardenHashRequest));
 
-    WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenHashRequest));
+    WDataStore pkt(SMSG_WARDEN_DATA, sizeof(WardenHashRequest));
     pkt.append((uint8*)&Request, sizeof(WardenHashRequest));
     _session->Send(&pkt);
 }
@@ -195,7 +195,7 @@ void WardenMac::RequestChecks()
     // Encrypt with warden RC4 key.
     EncryptData(buff.contents(), buff.size());
 
-    WorldPacket pkt(SMSG_WARDEN_DATA, buff.size());
+    WDataStore pkt(SMSG_WARDEN_DATA, buff.size());
     pkt.append(buff);
     _session->Send(&pkt);
 

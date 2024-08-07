@@ -30,10 +30,10 @@
 #include "Totem.h"
 #include "TotemPackets.h"
 #include "Vehicle.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, SpellCastTargets& targets)
+void User::HandleClientCastFlags(WDataStore& recvPacket, uint8 castFlags, SpellCastTargets& targets)
 {
     // some spell cast packet including more data (for projectiles?)
     if (castFlags & 0x02)
@@ -56,7 +56,7 @@ void User::HandleClientCastFlags(WorldPacket& recvPacket, uint8 castFlags, Spell
     }
 }
 
-void User::HandleUseItemOpcode(WorldPacket& recvPacket)
+void User::HandleUseItemOpcode(WDataStore& recvPacket)
 {
     /// @todo: add targets.read() check
     Player* pUser = m_player;
@@ -166,7 +166,7 @@ void User::HandleUseItemOpcode(WorldPacket& recvPacket)
     }
 }
 
-void User::HandleOpenItemOpcode(WorldPacket& recvPacket)
+void User::HandleOpenItemOpcode(WDataStore& recvPacket)
 {
     LOG_DEBUG("network", "WORLD: CMSG_OPEN_ITEM packet, data length = {}", (uint32)recvPacket.size());
 
@@ -289,7 +289,7 @@ void User::HandleOpenWrappedItemCallback(uint8 bagIndex, uint8 slot, WOWGUID::Lo
     CharacterDatabase.CommitTransaction(trans);
 }
 
-void User::HandleGameObjectUseOpcode(WorldPacket& recvData)
+void User::HandleGameObjectUseOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -310,7 +310,7 @@ void User::HandleGameObjectUseOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleGameobjectReportUse(WorldPacket& recvPacket)
+void User::HandleGameobjectReportUse(WDataStore& recvPacket)
 {
     WOWGUID guid;
     recvPacket >> guid;
@@ -338,7 +338,7 @@ void User::HandleGameobjectReportUse(WorldPacket& recvPacket)
     m_player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_USE_GAMEOBJECT, go->GetEntry());
 }
 
-void User::HandleCastSpellOpcode(WorldPacket& recvPacket)
+void User::HandleCastSpellOpcode(WDataStore& recvPacket)
 {
     uint32 spellId;
     uint8  castCount, castFlags;
@@ -477,7 +477,7 @@ void User::HandleCastSpellOpcode(WorldPacket& recvPacket)
     spell->prepare(&targets);
 }
 
-void User::HandleCancelCastOpcode(WorldPacket& recvPacket)
+void User::HandleCancelCastOpcode(WDataStore& recvPacket)
 {
     uint32 spellId;
 
@@ -489,7 +489,7 @@ void User::HandleCancelCastOpcode(WorldPacket& recvPacket)
         m_player->InterruptNonMeleeSpells(false, spellId, false, true);
 }
 
-void User::HandleCancelAuraOpcode(WorldPacket& recvPacket)
+void User::HandleCancelAuraOpcode(WDataStore& recvPacket)
 {
     uint32 spellId;
     recvPacket >> spellId;
@@ -525,7 +525,7 @@ void User::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     m_player->RemoveOwnedAura(spellId, WOWGUID::Empty, 0, AURA_REMOVE_BY_CANCEL);
 }
 
-void User::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
+void User::HandlePetCancelAuraOpcode(WDataStore& recvPacket)
 {
     WOWGUID guid;
     uint32 spellId;
@@ -563,18 +563,18 @@ void User::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
     pet->RemoveOwnedAura(spellId, WOWGUID::Empty, 0, AURA_REMOVE_BY_CANCEL);
 }
 
-void User::HandleCancelGrowthAuraOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleCancelGrowthAuraOpcode(WDataStore& /*recvPacket*/)
 {
 }
 
-void User::HandleCancelAutoRepeatSpellOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleCancelAutoRepeatSpellOpcode(WDataStore& /*recvPacket*/)
 {
     // may be better send SMSG_CANCEL_AUTO_REPEAT?
     // cancel and prepare for deleting
     m_player->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 }
 
-void User::HandleCancelChanneling(WorldPacket& recvData)
+void User::HandleCancelChanneling(WDataStore& recvData)
 {
     uint32 spellID = 0;
     recvData >> spellID;
@@ -628,7 +628,7 @@ void User::HandleTotemDestroyed(WorldPackets::Totem::TotemDestroyed& totemDestro
         totem->ToTotem()->UnSummon();
 }
 
-void User::HandleSelfResOpcode(WorldPacket& /*recvData*/)
+void User::HandleSelfResOpcode(WDataStore& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SELF_RES");                  // empty opcode
 
@@ -644,7 +644,7 @@ void User::HandleSelfResOpcode(WorldPacket& /*recvData*/)
     }
 }
 
-void User::HandleSpellClick(WorldPacket& recvData)
+void User::HandleSpellClick(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -662,7 +662,7 @@ void User::HandleSpellClick(WorldPacket& recvData)
     unit->HandleSpellClick(m_player);
 }
 
-void User::HandleMirrorImageDataRequest(WorldPacket& recvData)
+void User::HandleMirrorImageDataRequest(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_GET_MIRRORIMAGE_DATA");
     WOWGUID guid;
@@ -681,7 +681,7 @@ void User::HandleMirrorImageDataRequest(WorldPacket& recvData)
     if (!creator)
         return;
 
-    WorldPacket data(SMSG_MIRRORIMAGE_DATA, 68);
+    WDataStore data(SMSG_MIRRORIMAGE_DATA, 68);
     data << guid;
     data << uint32(creator->GetDisplayId());
     data << uint8(creator->getRace());
@@ -755,7 +755,7 @@ void User::HandleMirrorImageDataRequest(WorldPacket& recvData)
     Send(&data);
 }
 
-void User::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
+void User::HandleUpdateProjectilePosition(WDataStore& recvPacket)
 {
     LOG_DEBUG("network", "WORLD: CMSG_UPDATE_PROJECTILE_POSITION");
 
@@ -783,7 +783,7 @@ void User::HandleUpdateProjectilePosition(WorldPacket& recvPacket)
     pos.Relocate(x, y, z);
     spell->m_targets.ModDst(pos);
 
-    WorldPacket data(SMSG_SET_PROJECTILE_POSITION, 21);
+    WDataStore data(SMSG_SET_PROJECTILE_POSITION, 21);
     data << casterGuid;
     data << uint8(castCount);
     data << float(x);

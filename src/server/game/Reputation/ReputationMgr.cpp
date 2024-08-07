@@ -22,7 +22,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 const int32 ReputationMgr::PointsInRank[MAX_REPUTATION_RANK] = {36000, 3000, 3000, 3000, 6000, 12000, 21000, 1000};
@@ -164,7 +164,7 @@ uint32 ReputationMgr::GetDefaultStateFlags(FactionEntry const* factionEntry) con
 
 void ReputationMgr::SendForceReactions()
 {
-    WorldPacket data;
+    WDataStore data;
     data.Initialize(SMSG_SET_FORCED_REACTIONS, 4 + _forcedReactions.size() * (4 + 4));
     data << uint32(_forcedReactions.size());
     for (ForcedReactions::const_iterator itr = _forcedReactions.begin(); itr != _forcedReactions.end(); ++itr)
@@ -179,7 +179,7 @@ void ReputationMgr::SendState(FactionState const* faction)
 {
     uint32 count = 1;
 
-    WorldPacket data(SMSG_SET_FACTION_STANDING, 17);
+    WDataStore data(SMSG_SET_FACTION_STANDING, 17);
     data << float(0);
     data << uint8(_sendFactionIncreased);
     _sendFactionIncreased = false; // Reset
@@ -210,7 +210,7 @@ void ReputationMgr::SendState(FactionState const* faction)
 
 void ReputationMgr::SendInitialReputations()
 {
-    WorldPacket data(SMSG_INITIALIZE_FACTIONS, (4 + 128 * 5));
+    WDataStore data(SMSG_INITIALIZE_FACTIONS, (4 + 128 * 5));
     data << uint32 (0x00000080);
 
     RepListID a = 0;
@@ -255,7 +255,7 @@ void ReputationMgr::SendVisible(FactionState const* faction) const
         return;
 
     // make faction visible in reputation list at client
-    WorldPacket data(SMSG_SET_FACTION_VISIBLE, 4);
+    WDataStore data(SMSG_SET_FACTION_VISIBLE, 4);
     data << faction->ReputationListID;
     m_player->SendDirectMessage(&data);
 }

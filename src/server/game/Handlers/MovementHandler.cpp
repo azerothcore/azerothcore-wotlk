@@ -36,12 +36,12 @@
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 #define MOVEMENT_PACKET_TIME_DELAY 0
 
-void User::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
+void User::HandleMoveWorldportAckOpcode(WDataStore& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: got MSG_MOVE_WORLDPORT_ACK.");
     HandleMoveWorldportAck();
@@ -263,7 +263,7 @@ void User::HandleMoveWorldportAck()
     GetPlayer()->ProcessDelayedOperations();
 }
 
-void User::HandleMoveTeleportAck(WorldPacket& recvData)
+void User::HandleMoveTeleportAck(WDataStore& recvData)
 {
     LOG_DEBUG("network", "MSG_MOVE_TELEPORT_ACK");
 
@@ -331,7 +331,7 @@ void User::HandleMoveTeleportAck(WorldPacket& recvData)
         plMover->SetClientControl(plMover, false, true);
 }
 
-void User::HandleMovementOpcodes(WorldPacket& recvData)
+void User::HandleMovementOpcodes(WDataStore& recvData)
 {
     uint16 opcode = recvData.GetOpcode();
 
@@ -542,7 +542,7 @@ void User::HandleMovementOpcodes(WorldPacket& recvData)
     }
 
     /* process position-change */
-    WorldPacket data(opcode, recvData.size());
+    WDataStore data(opcode, recvData.size());
     int64 movementTime = (int64)movementInfo.time + _timeSyncClockDelta;
     if (_timeSyncClockDelta == 0 || movementTime < 0 || movementTime > 0xFFFFFFFF)
     {
@@ -608,7 +608,7 @@ void User::HandleMovementOpcodes(WorldPacket& recvData)
     }
 }
 
-void User::HandleForceSpeedChangeAck(WorldPacket& recvData)
+void User::HandleForceSpeedChangeAck(WDataStore& recvData)
 {
     uint32 opcode = recvData.GetOpcode();
     LOG_DEBUG("network", "WORLD: Recvd {} ({}, 0x{:X}) opcode", GetOpcodeNameForLogging(static_cast<OpcodeClient>(opcode)), opcode, opcode);
@@ -714,7 +714,7 @@ void User::HandleForceSpeedChangeAck(WorldPacket& recvData)
     }
 }
 
-void User::HandleSetActiveMoverOpcode(WorldPacket& recvData)
+void User::HandleSetActiveMoverOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
 
@@ -729,7 +729,7 @@ void User::HandleSetActiveMoverOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleMoveNotActiveMover(WorldPacket& recvData)
+void User::HandleMoveNotActiveMover(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
 
@@ -750,15 +750,15 @@ void User::HandleMoveNotActiveMover(WorldPacket& recvData)
     m_player->m_mover->m_movement = mi;
 }
 
-void User::HandleMountSpecialAnimOpcode(WorldPacket& /*recvData*/)
+void User::HandleMountSpecialAnimOpcode(WDataStore& /*recvData*/)
 {
-    WorldPacket data(SMSG_MOUNTSPECIAL_ANIM, 8);
+    WDataStore data(SMSG_MOUNTSPECIAL_ANIM, 8);
     data << GetPlayer()->GetGUID();
 
     GetPlayer()->SendMessageToSet(&data, false);
 }
 
-void User::HandleMoveKnockBackAck(WorldPacket& recvData)
+void User::HandleMoveKnockBackAck(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_MOVE_KNOCK_BACK_ACK");
 
@@ -780,7 +780,7 @@ void User::HandleMoveKnockBackAck(WorldPacket& recvData)
 
     m_player->m_mover->m_movement = movementInfo;
 
-    WorldPacket data(MSG_MOVE_KNOCK_BACK, 66);
+    WDataStore data(MSG_MOVE_KNOCK_BACK, 66);
     data << guid.WriteAsPacked();
     m_player->m_mover->BuildMovementPacket(&data);
     m_player->SetCanTeleport(true);
@@ -793,7 +793,7 @@ void User::HandleMoveKnockBackAck(WorldPacket& recvData)
     m_player->SendMessageToSet(&data, false);
 }
 
-void User::HandleMoveHoverAck(WorldPacket& recvData)
+void User::HandleMoveHoverAck(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_MOVE_HOVER_ACK");
 
@@ -809,7 +809,7 @@ void User::HandleMoveHoverAck(WorldPacket& recvData)
     recvData.read_skip<uint32>();                          // unk2
 }
 
-void User::HandleMoveWaterWalkAck(WorldPacket& recvData)
+void User::HandleMoveWaterWalkAck(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_MOVE_WATER_WALK_ACK");
 
@@ -825,7 +825,7 @@ void User::HandleMoveWaterWalkAck(WorldPacket& recvData)
     recvData.read_skip<uint32>();                          // unk2
 }
 
-void User::HandleSummonResponseOpcode(WorldPacket& recvData)
+void User::HandleSummonResponseOpcode(WDataStore& recvData)
 {
     if (!m_player->IsAlive() || m_player->IsInCombat())
         return;
@@ -849,7 +849,7 @@ void User::HandleSummonResponseOpcode(WorldPacket& recvData)
     m_player->SummonIfPossible(agree, summoner_guid);
 }
 
-void User::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
+void User::HandleMoveTimeSkippedOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_MOVE_TIME_SKIPPED");
 
@@ -875,13 +875,13 @@ void User::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 
     mover->m_movement.time += timeSkipped;
 
-    WorldPacket data(MSG_MOVE_TIME_SKIPPED, recvData.size());
+    WDataStore data(MSG_MOVE_TIME_SKIPPED, recvData.size());
     data << guid.WriteAsPacked();
     data << timeSkipped;
     GetPlayer()->SendMessageToSet(&data, false);
 }
 
-void User::HandleTimeSyncResp(WorldPacket& recvData)
+void User::HandleTimeSyncResp(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_TIME_SYNC_RESP");
 
@@ -951,7 +951,7 @@ void User::ComputeNewClockDelta()
     }
 }
 
-void User::HandleMoveRootAck(WorldPacket& recvData)
+void User::HandleMoveRootAck(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid.ReadAsPacked();
@@ -986,12 +986,12 @@ void User::HandleMoveRootAck(WorldPacket& recvData)
     mover->m_movement = movementInfo;
     mover->UpdatePosition(movementInfo.pos);
 
-    WorldPacket data(MSG_MOVE_ROOT, 64);
+    WDataStore data(MSG_MOVE_ROOT, 64);
     WriteMovementInfo(&data, &movementInfo);
     mover->SendMessageToSet(&data, m_player);
 }
 
-void User::HandleMoveUnRootAck(WorldPacket& recvData)
+void User::HandleMoveUnRootAck(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid.ReadAsPacked();
@@ -1031,7 +1031,7 @@ void User::HandleMoveUnRootAck(WorldPacket& recvData)
     mover->m_movement = movementInfo;
     mover->UpdatePosition(movementInfo.pos);
 
-    WorldPacket data(MSG_MOVE_UNROOT, 64);
+    WDataStore data(MSG_MOVE_UNROOT, 64);
     WriteMovementInfo(&data, &movementInfo);
     mover->SendMessageToSet(&data, m_player);
 }

@@ -99,13 +99,13 @@ namespace Acore
     struct MessageDistDeliverer
     {
         WorldObject const* i_source;
-        WorldPacket const* i_message;
+        WDataStore const* i_message;
         uint32 i_phaseMask;
         float i_distSq;
         TeamId teamId;
         Player const* skipped_receiver;
         bool required3dDist;
-        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr, bool req3dDist = false)
+        MessageDistDeliverer(WorldObject const* src, WDataStore const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr, bool req3dDist = false)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
             , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
             , skipped_receiver(skipped), required3dDist(req3dDist)
@@ -132,10 +132,10 @@ namespace Acore
     struct MessageDistDelivererToHostile
     {
         Unit* i_source;
-        WorldPacket* i_message;
+        WDataStore* i_message;
         uint32 i_phaseMask;
         float i_distSq;
-        MessageDistDelivererToHostile(Unit* src, WorldPacket* msg, float dist)
+        MessageDistDelivererToHostile(Unit* src, WDataStore* msg, float dist)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
         {
         }
@@ -1716,7 +1716,7 @@ namespace Acore
 
     private:
         Builder& i_builder;
-        std::vector<WorldPacket*> i_data_cache;         // 0 = default, i => i-1 locale index
+        std::vector<WDataStore*> i_data_cache;         // 0 = default, i => i-1 locale index
     };
 
     // Prepare using Builder localized packets with caching and send to player
@@ -1724,7 +1724,7 @@ namespace Acore
     class LocalizedPacketListDo
     {
     public:
-        typedef std::vector<WorldPacket*> WorldPacketList;
+        typedef std::vector<WDataStore*> WorldPacketList;
         explicit LocalizedPacketListDo(Builder& builder) : i_builder(builder) {}
 
         ~LocalizedPacketListDo()

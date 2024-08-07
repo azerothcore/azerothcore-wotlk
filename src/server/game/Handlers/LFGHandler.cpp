@@ -23,10 +23,10 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void BuildPlayerLockDungeonBlock(WorldPacket& data, lfg::LfgLockMap const& lock)
+void BuildPlayerLockDungeonBlock(WDataStore& data, lfg::LfgLockMap const& lock)
 {
     data << uint32(lock.size());                           // Size of lock dungeons
     for (lfg::LfgLockMap::const_iterator it = lock.begin(); it != lock.end(); ++it)
@@ -36,7 +36,7 @@ void BuildPlayerLockDungeonBlock(WorldPacket& data, lfg::LfgLockMap const& lock)
     }
 }
 
-void BuildPartyLockDungeonBlock(WorldPacket& data, const lfg::LfgLockPartyMap& lockMap)
+void BuildPartyLockDungeonBlock(WDataStore& data, const lfg::LfgLockPartyMap& lockMap)
 {
     data << uint8(lockMap.size());
     for (lfg::LfgLockPartyMap::const_iterator it = lockMap.begin(); it != lockMap.end(); ++it)
@@ -89,7 +89,7 @@ void User::HandleLfgLeaveOpcode(WorldPackets::LFG::LFGLeave& /*packet*/)
     }
 }
 
-void User::HandleLfgProposalResultOpcode(WorldPacket& recvData)
+void User::HandleLfgProposalResultOpcode(WDataStore& recvData)
 {
     uint32 proposalID;                                      // Internal lfgGroupID
     bool accept;                                           // Accept to join?
@@ -100,7 +100,7 @@ void User::HandleLfgProposalResultOpcode(WorldPacket& recvData)
     sLFGMgr->UpdateProposal(proposalID, GetPlayer()->GetGUID(), accept);
 }
 
-void User::HandleLfgSetRolesOpcode(WorldPacket& recvData)
+void User::HandleLfgSetRolesOpcode(WDataStore& recvData)
 {
     uint8 roles;
     recvData >> roles;                                    // Player Group Roles
@@ -116,7 +116,7 @@ void User::HandleLfgSetRolesOpcode(WorldPacket& recvData)
     sLFGMgr->UpdateRoleCheck(gguid, guid, roles);
 }
 
-void User::HandleLfgSetCommentOpcode(WorldPacket&  recvData)
+void User::HandleLfgSetCommentOpcode(WDataStore&  recvData)
 {
     std::string comment;
     recvData >> comment;
@@ -127,7 +127,7 @@ void User::HandleLfgSetCommentOpcode(WorldPacket&  recvData)
     sLFGMgr->LfrSetComment(GetPlayer(), comment);
 }
 
-void User::HandleLfgSetBootVoteOpcode(WorldPacket& recvData)
+void User::HandleLfgSetBootVoteOpcode(WDataStore& recvData)
 {
     bool agree;                                            // Agree to kick player
     recvData >> agree;
@@ -137,7 +137,7 @@ void User::HandleLfgSetBootVoteOpcode(WorldPacket& recvData)
     sLFGMgr->UpdateBoot(guid, agree);
 }
 
-void User::HandleLfgTeleportOpcode(WorldPacket& recvData)
+void User::HandleLfgTeleportOpcode(WDataStore& recvData)
 {
     bool out;
     recvData >> out;
@@ -146,7 +146,7 @@ void User::HandleLfgTeleportOpcode(WorldPacket& recvData)
     sLFGMgr->TeleportPlayer(GetPlayer(), out);
 }
 
-void User::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*/)
+void User::HandleLfgPlayerLockInfoRequestOpcode(WDataStore& /*recvData*/)
 {
     WOWGUID guid = GetPlayer()->GetGUID();
     LOG_DEBUG("network", "CMSG_LFG_PLAYER_LOCK_INFO_REQUEST [{}]", guid.ToString());
@@ -163,7 +163,7 @@ void User::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*/)
     uint32 lsize = uint32(lock.size());
 
     LOG_DEBUG("network", "SMSG_LFG_PLAYER_INFO [{}]", guid.ToString());
-    WorldPacket data(SMSG_LFG_PLAYER_INFO, 1 + rsize * (4 + 1 + 4 + 4 + 4 + 4 + 1 + 4 + 4 + 4) + 4 + lsize * (1 + 4 + 4 + 4 + 4 + 1 + 4 + 4 + 4));
+    WDataStore data(SMSG_LFG_PLAYER_INFO, 1 + rsize * (4 + 1 + 4 + 4 + 4 + 4 + 1 + 4 + 4 + 4) + 4 + lsize * (1 + 4 + 4 + 4 + 4 + 1 + 4 + 4 + 4));
 
     data << uint8(randomDungeons.size());                  // Random Dungeon count
     for (lfg::LfgDungeonSet::const_iterator it = randomDungeons.begin(); it != randomDungeons.end(); ++it)
@@ -221,7 +221,7 @@ void User::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*/)
     Send(&data);
 }
 
-void User::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*/)
+void User::HandleLfgPartyLockInfoRequestOpcode(WDataStore&  /*recvData*/)
 {
     WOWGUID guid = GetPlayer()->GetGUID();
     LOG_DEBUG("network", "CMSG_LFG_PARTY_LOCK_INFO_REQUEST [{}]", guid.ToString());
@@ -251,12 +251,12 @@ void User::HandleLfgPartyLockInfoRequestOpcode(WorldPacket&  /*recvData*/)
         size += 8 + 4 + uint32(it->second.size()) * (4 + 4);
 
     LOG_DEBUG("network", "SMSG_LFG_PARTY_INFO [{}]", guid.ToString());
-    WorldPacket data(SMSG_LFG_PARTY_INFO, 1 + size);
+    WDataStore data(SMSG_LFG_PARTY_INFO, 1 + size);
     BuildPartyLockDungeonBlock(data, lockMap);
     Send(&data);
 }
 
-void User::HandleLfrSearchJoinOpcode(WorldPacket& recvData)
+void User::HandleLfrSearchJoinOpcode(WDataStore& recvData)
 {
     uint32 dungeonId;
     recvData >> dungeonId;
@@ -265,14 +265,14 @@ void User::HandleLfrSearchJoinOpcode(WorldPacket& recvData)
     sLFGMgr->SendRaidBrowserCachedList(GetPlayer(), dungeonId);
 }
 
-void User::HandleLfrSearchLeaveOpcode(WorldPacket& recvData)
+void User::HandleLfrSearchLeaveOpcode(WDataStore& recvData)
 {
     uint32 dungeonId;
     recvData >> dungeonId;
     sLFGMgr->LfrSearchRemove(GetPlayer());
 }
 
-void User::HandleLfgGetStatus(WorldPacket& /*recvData*/)
+void User::HandleLfgGetStatus(WDataStore& /*recvData*/)
 {
     LOG_DEBUG("lfg", "CMSG_LFG_GET_STATUS {}", GetPlayerInfo());
 
@@ -313,7 +313,7 @@ void User::SendLfgUpdatePlayer(lfg::LfgUpdateData const& updateData)
 
     LOG_DEBUG("lfg", "SMSG_LFG_UPDATE_PLAYER {} updatetype: {}",
                    GetPlayerInfo(), updateData.updateType);
-    WorldPacket data(SMSG_LFG_UPDATE_PLAYER, 1 + 1 + (size > 0 ? 1 : 0) * (1 + 1 + 1 + 1 + size * 4 + updateData.comment.length()));
+    WDataStore data(SMSG_LFG_UPDATE_PLAYER, 1 + 1 + (size > 0 ? 1 : 0) * (1 + 1 + 1 + 1 + size * 4 + updateData.comment.length()));
     data << uint8(updateData.updateType);                  // Lfg Update type
     data << uint8(size > 0);                               // Extra info
     if (size)
@@ -354,7 +354,7 @@ void User::SendLfgUpdateParty(lfg::LfgUpdateData const& updateData)
 
     LOG_DEBUG("lfg", "SMSG_LFG_UPDATE_PARTY {} updatetype: {}",
                    GetPlayerInfo(), updateData.updateType);
-    WorldPacket data(SMSG_LFG_UPDATE_PARTY, 1 + 1 + (size > 0 ? 1 : 0) * (1 + 1 + 1 + 1 + 1 + size * 4 + updateData.comment.length()));
+    WDataStore data(SMSG_LFG_UPDATE_PARTY, 1 + 1 + (size > 0 ? 1 : 0) * (1 + 1 + 1 + 1 + 1 + size * 4 + updateData.comment.length()));
     data << uint8(updateData.updateType);                  // Lfg Update type
     data << uint8(size > 0);                               // Extra info
     if (size)
@@ -378,7 +378,7 @@ void User::SendLfgRoleChosen(WOWGUID guid, uint8 roles)
 {
     LOG_DEBUG("network", "SMSG_LFG_ROLE_CHOSEN [{}] guid: [{}] roles: {}", GetPlayer()->GetGUID().ToString(), guid.ToString(), roles);
 
-    WorldPacket data(SMSG_LFG_ROLE_CHOSEN, 8 + 1 + 4);
+    WDataStore data(SMSG_LFG_ROLE_CHOSEN, 8 + 1 + 4);
     data << guid;                                          // Guid
     data << uint8(roles > 0);                              // Ready
     data << uint32(roles);                                 // Roles
@@ -394,7 +394,7 @@ void User::SendLfgRoleCheckUpdate(lfg::LfgRoleCheck const& roleCheck)
         dungeons = roleCheck.dungeons;
 
     LOG_DEBUG("network", "SMSG_LFG_ROLE_CHECK_UPDATE [{}]", GetPlayer()->GetGUID().ToString());
-    WorldPacket data(SMSG_LFG_ROLE_CHECK_UPDATE, 4 + 1 + 1 + dungeons.size() * 4 + 1 + roleCheck.roles.size() * (8 + 1 + 4 + 1));
+    WDataStore data(SMSG_LFG_ROLE_CHECK_UPDATE, 4 + 1 + 1 + dungeons.size() * 4 + 1 + roleCheck.roles.size() * (8 + 1 + 4 + 1));
 
     data << uint32(roleCheck.state);                       // Check result
     data << uint8(roleCheck.state == lfg::LFG_ROLECHECK_INITIALITING);
@@ -439,7 +439,7 @@ void User::SendLfgJoinResult(lfg::LfgJoinResultData const& joinData)
         size += 8 + 4 + uint32(it->second.size()) * (4 + 4);
 
     LOG_DEBUG("network", "SMSG_LFG_JOIN_RESULT [{}] checkResult: {} checkValue: {}", GetPlayer()->GetGUID().ToString(), joinData.result, joinData.state);
-    WorldPacket data(SMSG_LFG_JOIN_RESULT, 4 + 4 + size);
+    WDataStore data(SMSG_LFG_JOIN_RESULT, 4 + 4 + size);
     data << uint32(joinData.result);                       // Check Result
     data << uint32(joinData.state);                        // Check Value
     if (!joinData.lockmap.empty())
@@ -452,7 +452,7 @@ void User::SendLfgQueueStatus(lfg::LfgQueueStatusData const& queueData)
     LOG_DEBUG("network", "SMSG_LFG_QUEUE_STATUS [{}] dungeon: {} - waitTime: {} - avgWaitTime: {} - waitTimeTanks: {} - waitTimeHealer: {} - waitTimeDps: {} - queuedTime: {} - tanks: {} - healers: {} - dps: {}",
                    GetPlayer()->GetGUID().ToString(), queueData.dungeonId, queueData.waitTime, queueData.waitTimeAvg, queueData.waitTimeTank,
                    queueData.waitTimeHealer, queueData.waitTimeDps, queueData.queuedTime, queueData.tanks, queueData.healers, queueData.dps);
-    WorldPacket data(SMSG_LFG_QUEUE_STATUS, 4 + 4 + 4 + 4 + 4 + 4 + 1 + 1 + 1 + 4);
+    WDataStore data(SMSG_LFG_QUEUE_STATUS, 4 + 4 + 4 + 4 + 4 + 4 + 1 + 1 + 1 + 4);
     data << uint32(queueData.dungeonId);                   // Dungeon
     data << int32(queueData.waitTimeAvg);                  // Average Wait time
     data << int32(queueData.waitTime);                     // Wait Time
@@ -478,7 +478,7 @@ void User::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardData)
 
     uint8 playerLevel = GetPlayer() ? GetPlayer()->GetLevel() : 0;
 
-    WorldPacket data(SMSG_LFG_PLAYER_REWARD, 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4 + 1 + itemNum * (4 + 4 + 4));
+    WDataStore data(SMSG_LFG_PLAYER_REWARD, 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4 + 1 + itemNum * (4 + 4 + 4));
     data << uint32(rewardData.rdungeonEntry);              // Random Dungeon Finished
     data << uint32(rewardData.sdungeonEntry);              // Dungeon Finished
     data << uint8(rewardData.done);
@@ -521,7 +521,7 @@ void User::SendLfgBootProposalUpdate(lfg::LfgPlayerBoot const& boot)
     LOG_DEBUG("network", "SMSG_LFG_BOOT_PROPOSAL_UPDATE [{}] inProgress: {} - didVote: {} - agree: {} - victim: [{}] votes: {} - agrees: {} - left: {} - needed: {} - reason {}",
                    guid.ToString(), uint8(boot.inProgress), uint8(playerVote != lfg::LFG_ANSWER_PENDING), uint8(playerVote == lfg::LFG_ANSWER_AGREE),
                    boot.victim.ToString(), votesNum, agreeNum, secsleft, lfg::LFG_GROUP_KICK_VOTES_NEEDED, boot.reason);
-    WorldPacket data(SMSG_LFG_BOOT_PROPOSAL_UPDATE, 1 + 1 + 1 + 8 + 4 + 4 + 4 + 4 + boot.reason.length());
+    WDataStore data(SMSG_LFG_BOOT_PROPOSAL_UPDATE, 1 + 1 + 1 + 8 + 4 + 4 + 4 + 4 + boot.reason.length());
     data << uint8(boot.inProgress);                        // Vote in progress
     data << uint8(playerVote != lfg::LFG_ANSWER_PENDING);  // Did Vote
     data << uint8(playerVote == lfg::LFG_ANSWER_AGREE);    // Agree
@@ -553,7 +553,7 @@ void User::SendLfgUpdateProposal(lfg::LfgProposal const& proposal)
 
     dungeonEntry = sLFGMgr->GetLFGDungeonEntry(dungeonEntry);
 
-    WorldPacket data(SMSG_LFG_PROPOSAL_UPDATE, 4 + 1 + 4 + 4 + 1 + 1 + proposal.players.size() * (4 + 1 + 1 + 1 + 1 + 1));
+    WDataStore data(SMSG_LFG_PROPOSAL_UPDATE, 4 + 1 + 4 + 4 + 1 + 1 + proposal.players.size() * (4 + 1 + 1 + 1 + 1 + 1));
     data << uint32(dungeonEntry);                          // Dungeon
     data << uint8(proposal.state);                         // Proposal state
     data << uint32(proposal.id);                           // Proposal ID
@@ -585,7 +585,7 @@ void User::SendLfgUpdateProposal(lfg::LfgProposal const& proposal)
 void User::SendLfgLfrList(bool update)
 {
     LOG_DEBUG("network", "SMSG_LFG_LFR_LIST [{}] update: {}", GetPlayer()->GetGUID().ToString(), update ? 1 : 0);
-    WorldPacket data(SMSG_LFG_UPDATE_SEARCH, 1);
+    WDataStore data(SMSG_LFG_UPDATE_SEARCH, 1);
     data << uint8(update);                                 // In Lfg Queue?
     Send(&data);
 }
@@ -593,14 +593,14 @@ void User::SendLfgLfrList(bool update)
 void User::SendLfgDisabled()
 {
     LOG_DEBUG("network", "SMSG_LFG_DISABLED [{}]", GetPlayer()->GetGUID().ToString());
-    WorldPacket data(SMSG_LFG_DISABLED, 0);
+    WDataStore data(SMSG_LFG_DISABLED, 0);
     Send(&data);
 }
 
 void User::SendLfgOfferContinue(uint32 dungeonEntry)
 {
     LOG_DEBUG("network", "SMSG_LFG_OFFER_CONTINUE [{}] dungeon entry: {}", GetPlayer()->GetGUID().ToString(), dungeonEntry);
-    WorldPacket data(SMSG_LFG_OFFER_CONTINUE, 4);
+    WDataStore data(SMSG_LFG_OFFER_CONTINUE, 4);
     data << uint32(dungeonEntry);
     Send(&data);
 }
@@ -608,7 +608,7 @@ void User::SendLfgOfferContinue(uint32 dungeonEntry)
 void User::SendLfgTeleportError(uint8 err)
 {
     LOG_DEBUG("network", "SMSG_LFG_TELEPORT_DENIED [{}] reason: {}", GetPlayer()->GetGUID().ToString(), err);
-    WorldPacket data(SMSG_LFG_TELEPORT_DENIED, 4);
+    WDataStore data(SMSG_LFG_TELEPORT_DENIED, 4);
     data << uint32(err);                                   // Error
     Send(&data);
 }

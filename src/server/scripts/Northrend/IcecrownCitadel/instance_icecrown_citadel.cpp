@@ -25,7 +25,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 #include "icecrown_citadel.h"
 
@@ -231,7 +231,7 @@ public:
             IsSindragosaIntroDone = false;
         }
 
-        void FillInitialWorldStates(WorldPacket& data) override
+        void FillInitialWorldStates(WDataStore& data) override
         {
             if (instance->IsHeroic())
             {

@@ -21,10 +21,10 @@
 #include "GameGraveyard.h"
 #include "Player.h"
 #include "Util.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void BattlegroundABScore::BuildObjectivesBlock(WorldPacket& data)
+void BattlegroundABScore::BuildObjectivesBlock(WDataStore& data)
 {
     data << uint32(2);
     data << uint32(BasesAssaulted);
@@ -234,7 +234,7 @@ void BattlegroundAB::DeleteBanner(uint8 node)
     SpawnBGObject(node * BG_AB_OBJECTS_PER_NODE + BG_AB_OBJECT_AURA_ALLY + _capturePointInfo[node]._ownerTeamId, RESPAWN_ONE_DAY);
 }
 
-void BattlegroundAB::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundAB::FillInitialWorldStates(WDataStore& data)
 {
     for (auto& node : _capturePointInfo)
     {

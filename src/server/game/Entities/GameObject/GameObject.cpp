@@ -516,7 +516,7 @@ void GameObject::Update(uint32 diff)
                                     ReplaceAllGameObjectFlags(GO_FLAG_NODESPAWN);
 
                                     UpdateData udata;
-                                    WorldPacket packet;
+                                    WDataStore packet;
                                     BuildValuesUpdateBlockForPlayer(&udata, caster->ToPlayer());
                                     udata.BuildPacket(packet);
                                     caster->ToPlayer()->User()->Send(&packet);
@@ -638,7 +638,7 @@ void GameObject::Update(uint32 diff)
                                     {
                                         caster->ToPlayer()->RemoveGameObject(this, false);
 
-                                        WorldPacket data(SMSG_FISH_ESCAPED, 0);
+                                        WDataStore data(SMSG_FISH_ESCAPED, 0);
                                         caster->ToPlayer()->User()->Send(&data);
                                     }
                                     // can be delete
@@ -1641,7 +1641,7 @@ void GameObject::Use(Unit* user)
 
                     if (info->goober.pageId)                    // show page...
                     {
-                        WorldPacket data(SMSG_GAMEOBJECT_PAGETEXT, 8);
+                        WDataStore data(SMSG_GAMEOBJECT_PAGETEXT, 8);
                         data << GetGUID();
                         player->User()->Send(&data);
                     }
@@ -1807,7 +1807,7 @@ void GameObject::Use(Unit* user)
                         {
                             SetLootState(GO_JUST_DEACTIVATED);
 
-                            WorldPacket data(SMSG_FISH_NOT_HOOKED, 0);
+                            WDataStore data(SMSG_FISH_NOT_HOOKED, 0);
                             player->User()->Send(&data);
                             break;
                         }
@@ -2035,7 +2035,7 @@ void GameObject::Use(Unit* user)
                 // fallback, will always work
                 player->Teleport(GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation(), TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
 
-                WorldPacket data(SMSG_ENABLE_BARBER_SHOP, 0);
+                WDataStore data(SMSG_ENABLE_BARBER_SHOP, 0);
                 player->User()->Send(&data);
 
                 player->SetStandState(UNIT_SITTINGCHAIRLOW + info->barberChair.chairheight);
@@ -2140,7 +2140,7 @@ void GameObject::CastSpell(Unit* target, uint32 spellId)
 
 void GameObject::SendCustomAnim(uint32 anim)
 {
-    WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM, 8 + 4);
+    WDataStore data(SMSG_GAMEOBJECT_CUSTOM_ANIM, 8 + 4);
     data << GetGUID();
     data << uint32(anim);
     SendMessageToSet(&data, true);
@@ -2303,7 +2303,7 @@ void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/
     /// @todo: is there any packet for healing?
     if (player)
     {
-        WorldPacket data(SMSG_DESTRUCTIBLE_BUILDING_DAMAGE, 8 + 8 + 8 + 4 + 4);
+        WDataStore data(SMSG_DESTRUCTIBLE_BUILDING_DAMAGE, 8 + 8 + 8 + 4 + 4);
         data << GetPackGUID();
         data << attackerOrHealer->GetPackGUID();
         data << player->GetPackGUID();

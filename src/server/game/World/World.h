@@ -35,7 +35,7 @@
 #include <unordered_map>
 
 class Object;
-class WorldPacket;
+class WDataStore;
 class WowConnection;
 class SystemMgr;
 
@@ -240,9 +240,9 @@ public:
 
     void SendWorldText(uint32 string_id, ...) override;
     void SendGMText(uint32 string_id, ...) override;
-    void SendGlobalMessage(WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
-    void SendGlobalGMMessage(WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
-    bool SendZoneMessage(uint32 zone, WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
+    void SendGlobalMessage(WDataStore const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
+    void SendGlobalGMMessage(WDataStore const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
+    bool SendZoneMessage(uint32 zone, WDataStore const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     void SendZoneText(uint32 zone, const char* text, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) override;
     void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr) override;
 

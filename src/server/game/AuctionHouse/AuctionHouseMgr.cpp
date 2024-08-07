@@ -27,7 +27,7 @@
 #include "ScriptMgr.h"
 #include "UpdateTime.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include <vector>
 
 constexpr auto AH_MINIMUM_DEPOSIT = 100;
@@ -692,7 +692,7 @@ void AuctionHouseObject::Update()
     CharacterDatabase.CommitTransaction(trans);
 }
 
-void AuctionHouseObject::BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount)
+void AuctionHouseObject::BuildListBidderItems(WDataStore& data, Player* player, uint32& count, uint32& totalcount)
 {
     for (AuctionEntryMap::const_iterator itr = _auctionsMap.begin(); itr != _auctionsMap.end(); ++itr)
     {
@@ -707,7 +707,7 @@ void AuctionHouseObject::BuildListBidderItems(WorldPacket& data, Player* player,
     }
 }
 
-void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount)
+void AuctionHouseObject::BuildListOwnerItems(WDataStore& data, Player* player, uint32& count, uint32& totalcount)
 {
     for (AuctionEntryMap::const_iterator itr = _auctionsMap.begin(); itr != _auctionsMap.end(); ++itr)
     {
@@ -722,7 +722,7 @@ void AuctionHouseObject::BuildListOwnerItems(WorldPacket& data, Player* player, 
     }
 }
 
-bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player,
+bool AuctionHouseObject::BuildListAuctionItems(WDataStore& data, Player* player,
         std::wstring const& wsearchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
         uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
         uint32& count, uint32& totalcount, uint8 /*getAll*/, AuctionSortOrderVector const& sortOrder, Milliseconds searchTimeout)
@@ -926,8 +926,8 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
     return true;
 }
 
-//this function inserts to WorldPacket auction's data
-bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
+//this function inserts to WDataStore auction's data
+bool AuctionEntry::BuildAuctionInfo(WDataStore& data) const
 {
     Item* item = sAuctionMgr->GetAItem(item_guid);
     if (!item)

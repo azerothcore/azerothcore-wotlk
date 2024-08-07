@@ -145,7 +145,7 @@ public:
             if (!map->IsDungeon())
                 return;
 
-            WorldPacket data(SMSG_WEATHER, (4 + 4 + 4));
+            WDataStore data(SMSG_WEATHER, (4 + 4 + 4));
             data << uint32(weather) << float(grade) << uint8(0);
 
             map->SendToPlayers(&data);

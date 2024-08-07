@@ -54,7 +54,7 @@ private:
     static ChannelRightsMap channels_rights;
     static ChannelRights channelRightsEmpty; // when not found in the map, reference to this is returned
 
-    void MakeNotOnPacket(WorldPacket* data, std::string const& name);
+    void MakeNotOnPacket(WDataStore* data, std::string const& name);
 };
 
 class AllianceChannelMgr : public ChannelMgr { public: AllianceChannelMgr() : ChannelMgr(TEAM_ALLIANCE) {} };

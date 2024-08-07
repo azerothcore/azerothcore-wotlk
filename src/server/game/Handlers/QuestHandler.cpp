@@ -28,10 +28,10 @@
 #include "QuestDef.h"
 #include "ScriptMgr.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
+void User::HandleQuestgiverStatusQueryOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -78,7 +78,7 @@ void User::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
     m_player->PlayerTalkClass->SendQuestGiverStatus(uint8(questStatus), guid);
 }
 
-void User::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
+void User::HandleQuestgiverHelloOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -110,7 +110,7 @@ void User::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
     creature->AI()->sGossipHello(m_player);
 }
 
-void User::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
+void User::HandleQuestgiverAcceptQuestOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     uint32 questId;
@@ -200,7 +200,7 @@ void User::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recvData)
     m_player->PlayerTalkClass->SendCloseGossip();
 }
 
-void User::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
+void User::HandleQuestgiverQueryQuestOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     uint32 questId;
@@ -234,7 +234,7 @@ void User::HandleQuestgiverQueryQuestOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleQuestQueryOpcode(WorldPacket& recvData)
+void User::HandleQuestQueryOpcode(WDataStore& recvData)
 {
     if (!m_player)
         return;
@@ -247,7 +247,7 @@ void User::HandleQuestQueryOpcode(WorldPacket& recvData)
         m_player->PlayerTalkClass->SendQuestQueryResponse(quest);
 }
 
-void User::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
+void User::HandleQuestgiverChooseRewardOpcode(WDataStore& recvData)
 {
     uint32 questId, reward;
     WOWGUID guid;
@@ -352,7 +352,7 @@ void User::HandleQuestgiverChooseRewardOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleQuestgiverRequestRewardOpcode(WorldPacket& recvData)
+void User::HandleQuestgiverRequestRewardOpcode(WDataStore& recvData)
 {
     uint32 questId;
     WOWGUID guid;
@@ -378,12 +378,12 @@ void User::HandleQuestgiverRequestRewardOpcode(WorldPacket& recvData)
         m_player->PlayerTalkClass->SendQuestGiverOfferReward(quest, guid, true);
 }
 
-void User::HandleQuestgiverCancel(WorldPacket& /*recvData*/)
+void User::HandleQuestgiverCancel(WDataStore& /*recvData*/)
 {
     m_player->PlayerTalkClass->SendCloseGossip();
 }
 
-void User::HandleQuestLogSwapQuest(WorldPacket& recvData)
+void User::HandleQuestLogSwapQuest(WDataStore& recvData)
 {
     uint8 slot1, slot2;
     recvData >> slot1 >> slot2;
@@ -396,7 +396,7 @@ void User::HandleQuestLogSwapQuest(WorldPacket& recvData)
     GetPlayer()->SwapQuestSlot(slot1, slot2);
 }
 
-void User::HandleQuestLogRemoveQuest(WorldPacket& recvData)
+void User::HandleQuestLogRemoveQuest(WDataStore& recvData)
 {
     uint8 slot;
     recvData >> slot;
@@ -449,7 +449,7 @@ void User::HandleQuestLogRemoveQuest(WorldPacket& recvData)
     }
 }
 
-void User::HandleQuestConfirmAccept(WorldPacket& recvData)
+void User::HandleQuestConfirmAccept(WDataStore& recvData)
 {
     uint32 questId;
     recvData >> questId;
@@ -484,7 +484,7 @@ void User::HandleQuestConfirmAccept(WorldPacket& recvData)
     }
 }
 
-void User::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
+void User::HandleQuestgiverCompleteQuest(WDataStore& recvData)
 {
     uint32 questId;
     WOWGUID guid;
@@ -531,11 +531,11 @@ void User::HandleQuestgiverCompleteQuest(WorldPacket& recvData)
     }
 }
 
-void User::HandleQuestgiverQuestAutoLaunch(WorldPacket& /*recvPacket*/)
+void User::HandleQuestgiverQuestAutoLaunch(WDataStore& /*recvPacket*/)
 {
 }
 
-void User::HandlePushQuestToParty(WorldPacket& recvPacket)
+void User::HandlePushQuestToParty(WDataStore& recvPacket)
 {
     uint32 questId;
     recvPacket >> questId;
@@ -614,7 +614,7 @@ void User::HandlePushQuestToParty(WorldPacket& recvPacket)
     }
 }
 
-void User::HandleQuestPushResult(WorldPacket& recvPacket)
+void User::HandleQuestPushResult(WDataStore& recvPacket)
 {
     WOWGUID guid;
     uint32 questId;
@@ -625,7 +625,7 @@ void User::HandleQuestPushResult(WorldPacket& recvPacket)
     {
         if (Player* player = ObjectAccessor::GetPlayer(*m_player, m_player->GetDivider()))
         {
-            WorldPacket data(MSG_QUEST_PUSH_RESULT, 8 + 4 + 1);
+            WDataStore data(MSG_QUEST_PUSH_RESULT, 8 + 4 + 1);
             data << m_player->GetGUID();
             data << uint8(msg);                             // valid values: 0-8
             player->User()->Send(&data);
@@ -634,16 +634,16 @@ void User::HandleQuestPushResult(WorldPacket& recvPacket)
     }
 }
 
-void User::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket*/)
+void User::HandleQuestgiverStatusMultipleQuery(WDataStore& /*recvPacket*/)
 {
     m_player->SendQuestGiverStatusMultiple();
 }
 
-void User::HandleQueryQuestsCompleted(WorldPacket& /*recvData*/)
+void User::HandleQueryQuestsCompleted(WDataStore& /*recvData*/)
 {
     size_t rew_count = m_player->GetRewardedQuestCount();
 
-    WorldPacket data(SMSG_QUERY_QUESTS_COMPLETED_RESPONSE, 4 + 4 * rew_count);
+    WDataStore data(SMSG_QUERY_QUESTS_COMPLETED_RESPONSE, 4 + 4 * rew_count);
     data << uint32(rew_count);
 
     const RewardedQuestSet& rewQuests = m_player->getRewardedQuests();

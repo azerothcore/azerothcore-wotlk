@@ -27,7 +27,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 OutdoorPvPNA::OutdoorPvPNA()
 {
@@ -298,12 +298,12 @@ void OutdoorPvPNA::HandlePlayerLeaveZone(Player* player, uint32 zone)
     OutdoorPvP::HandlePlayerLeaveZone(player, zone);
 }
 
-void OutdoorPvPNA::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPNA::FillInitialWorldStates(WDataStore& data)
 {
     m_obj->FillInitialWorldStates(data);
 }
 
-void OPvPCapturePointNA::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointNA::FillInitialWorldStates(WDataStore& data)
 {
     if (m_ControllingFaction == TEAM_ALLIANCE)
     {

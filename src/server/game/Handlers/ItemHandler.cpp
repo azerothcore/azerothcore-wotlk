@@ -26,10 +26,10 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "UpdateData.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleSplitItemOpcode(WorldPacket& recvData)
+void User::HandleSplitItemOpcode(WDataStore& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_SPLIT_ITEM");
     uint8 srcbag, srcslot, dstbag, dstslot;
@@ -61,7 +61,7 @@ void User::HandleSplitItemOpcode(WorldPacket& recvData)
     m_player->SplitItem(src, dst, count);
 }
 
-void User::HandleSwapInvItemOpcode(WorldPacket& recvData)
+void User::HandleSwapInvItemOpcode(WDataStore& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_SWAP_INV_ITEM");
     uint8 srcslot, dstslot;
@@ -102,7 +102,7 @@ void User::HandleSwapInvItemOpcode(WorldPacket& recvData)
     m_player->SwapItem(src, dst);
 }
 
-void User::HandleAutoEquipItemSlotOpcode(WorldPacket& recvData)
+void User::HandleAutoEquipItemSlotOpcode(WDataStore& recvData)
 {
     WOWGUID itemguid;
     uint8 dstslot;
@@ -121,7 +121,7 @@ void User::HandleAutoEquipItemSlotOpcode(WorldPacket& recvData)
     m_player->SwapItem(item->GetPos(), dstpos);
 }
 
-void User::HandleSwapItem(WorldPacket& recvData)
+void User::HandleSwapItem(WDataStore& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_SWAP_ITEM");
     uint8 dstbag, dstslot, srcbag, srcslot;
@@ -162,7 +162,7 @@ void User::HandleSwapItem(WorldPacket& recvData)
     m_player->SwapItem(src, dst);
 }
 
-void User::HandleAutoEquipItemOpcode(WorldPacket& recvData)
+void User::HandleAutoEquipItemOpcode(WDataStore& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_AUTOEQUIP_ITEM");
     uint8 srcbag, srcslot;
@@ -292,7 +292,7 @@ void User::HandleAutoEquipItemOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleDestroyItemOpcode(WorldPacket& recvData)
+void User::HandleDestroyItemOpcode(WDataStore& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_DESTROYITEM");
     uint8 bag, slot, count, data1, data2, data3;
@@ -533,7 +533,7 @@ void ItemTemplate::InitializeQueryData()
 }
 
 // Only _static_ data send in this packet !!!
-void User::HandleItemQuerySingleOpcode(WorldPacket& recvData)
+void User::HandleItemQuerySingleOpcode(WDataStore& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_ITEM_QUERY_SINGLE");
     uint32 item;
@@ -557,7 +557,7 @@ void User::HandleItemQuerySingleOpcode(WorldPacket& recvData)
             }
         }
         // guess size
-        WorldPacket queryData(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 600);
+        WDataStore queryData(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 600);
         queryData << pProto->ItemId;
         queryData << pProto->Class;
         queryData << pProto->SubClass;
@@ -686,13 +686,13 @@ void User::HandleItemQuerySingleOpcode(WorldPacket& recvData)
     else
     {
         LOG_DEBUG("network", "WORLD: CMSG_ITEM_QUERY_SINGLE - NO item INFO! (ENTRY: {})", item);
-        WorldPacket queryData(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 4);
+        WDataStore queryData(SMSG_ITEM_QUERY_SINGLE_RESPONSE, 4);
         queryData << uint32(item | 0x80000000);
         Send(&queryData);
     }
 }
 
-void User::HandleReadItem(WorldPacket& recvData)
+void User::HandleReadItem(WDataStore& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_READ_ITEM");
 
@@ -704,7 +704,7 @@ void User::HandleReadItem(WorldPacket& recvData)
 
     if (pItem && pItem->GetTemplate()->PageText)
     {
-        WorldPacket data;
+        WDataStore data;
 
         BAG_RESULT msg = m_player->CanUseItem(pItem);
         if (msg == BAG_OK)
@@ -725,7 +725,7 @@ void User::HandleReadItem(WorldPacket& recvData)
         m_player->SendInventoryChangeFailure(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
 }
 
-void User::HandleSellItemOpcode(WorldPacket& recvData)
+void User::HandleSellItemOpcode(WDataStore& recvData)
 {
     WOWGUID vendorguid, itemguid;
     uint32 count;
@@ -905,7 +905,7 @@ void User::HandleSellItemOpcode(WorldPacket& recvData)
     return;
 }
 
-void User::HandleBuybackItem(WorldPacket& recvData)
+void User::HandleBuybackItem(WDataStore& recvData)
 {
     WOWGUID vendorguid;
     uint32 slot;
@@ -960,7 +960,7 @@ void User::HandleBuybackItem(WorldPacket& recvData)
         m_player->SendBuyError(BUY_ERR_CANT_FIND_ITEM, creature, 0, 0);
 }
 
-void User::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
+void User::HandleBuyItemInSlotOpcode(WDataStore& recvData)
 {
     WOWGUID vendorguid, bagguid;
     uint32 item, slot, count;
@@ -1001,7 +1001,7 @@ void User::HandleBuyItemInSlotOpcode(WorldPacket& recvData)
     GetPlayer()->BuyItemFromVendorSlot(vendorguid, slot, item, count, bag, bagslot);
 }
 
-void User::HandleBuyItemOpcode(WorldPacket& recvData)
+void User::HandleBuyItemOpcode(WDataStore& recvData)
 {
     WOWGUID vendorguid;
     uint32 item, slot, count;
@@ -1018,7 +1018,7 @@ void User::HandleBuyItemOpcode(WorldPacket& recvData)
     GetPlayer()->BuyItemFromVendorSlot(vendorguid, slot, item, count, NULL_BAG, NULL_SLOT);
 }
 
-void User::HandleListInventoryOpcode(WorldPacket& recvData)
+void User::HandleListInventoryOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
 
@@ -1060,7 +1060,7 @@ void User::SendListInventory(WOWGUID vendorGuid, uint32 vendorEntry)
     VendorItemData const* items = vendorEntry ? sObjectMgr->GetNpcVendorItemList(vendorEntry) : vendor->GetVendorItems();
     if (!items)
     {
-        WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + 1);
+        WDataStore data(SMSG_LIST_INVENTORY, 8 + 1 + 1);
         data << vendorGuid;
         data << uint8(0);                                   // count == 0, next will be error code
         data << uint8(0);                                   // "Vendor has no inventory"
@@ -1071,7 +1071,7 @@ void User::SendListInventory(WOWGUID vendorGuid, uint32 vendorEntry)
     uint8 itemCount = items->GetItemCount();
     uint8 count = 0;
 
-    WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
+    WDataStore data(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
     data << vendorGuid;
 
     std::size_t countPos = data.wpos();
@@ -1141,7 +1141,7 @@ void User::SendListInventory(WOWGUID vendorGuid, uint32 vendorEntry)
     Send(&data);
 }
 
-void User::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
+void User::HandleAutoStoreBagItemOpcode(WDataStore& recvData)
 {
     //LOG_DEBUG("network.opcode", "WORLD: CMSG_AUTOSTORE_BAG_ITEM");
     uint8 srcbag, srcslot, dstbag;
@@ -1192,7 +1192,7 @@ void User::HandleAutoStoreBagItemOpcode(WorldPacket& recvData)
     m_player->UpdateTitansGrip();
 }
 
-void User::HandleSetAmmoOpcode(WorldPacket& recvData)
+void User::HandleSetAmmoOpcode(WDataStore& recvData)
 {
     if (!m_player->IsAlive())
     {
@@ -1221,7 +1221,7 @@ void User::HandleSetAmmoOpcode(WorldPacket& recvData)
 
 void User::SendEnchantmentLog(WOWGUID target, WOWGUID caster, uint32 itemId, uint32 enchantId)
 {
-    WorldPacket data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4)); // last check 2.0.10
+    WDataStore data(SMSG_ENCHANTMENTLOG, (8 + 8 + 4 + 4)); // last check 2.0.10
     data << target.WriteAsPacked();
     data << caster.WriteAsPacked();
     data << uint32(itemId);
@@ -1232,7 +1232,7 @@ void User::SendEnchantmentLog(WOWGUID target, WOWGUID caster, uint32 itemId, uin
 void User::SendItemEnchantTimeUpdate(WOWGUID Playerguid, WOWGUID Itemguid, uint32 slot, uint32 Duration)
 {
     // last check 2.0.10
-    WorldPacket data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8 + 4 + 4 + 8));
+    WDataStore data(SMSG_ITEM_ENCHANT_TIME_UPDATE, (8 + 4 + 4 + 8));
     data << Itemguid;
     data << uint32(slot);
     data << uint32(Duration);
@@ -1240,7 +1240,7 @@ void User::SendItemEnchantTimeUpdate(WOWGUID Playerguid, WOWGUID Itemguid, uint3
     Send(&data);
 }
 
-void User::HandleItemNameQueryOpcode(WorldPacket& recvData)
+void User::HandleItemNameQueryOpcode(WDataStore& recvData)
 {
     uint32 itemid;
     recvData >> itemid;
@@ -1256,7 +1256,7 @@ void User::HandleItemNameQueryOpcode(WorldPacket& recvData)
             if (ItemSetNameLocale const* isnl = sObjectMgr->GetItemSetNameLocale(itemid))
                 ObjectMgr::GetLocaleString(isnl->Name, loc_idx, Name);
 
-        WorldPacket data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4 + Name.size() + 1 + 4));
+        WDataStore data(SMSG_ITEM_NAME_QUERY_RESPONSE, (4 + Name.size() + 1 + 4));
         data << uint32(itemid);
         data << Name;
         data << uint32(pName->InventoryType);
@@ -1264,7 +1264,7 @@ void User::HandleItemNameQueryOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleWrapItemOpcode(WorldPacket& recvData)
+void User::HandleWrapItemOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_WRAP_ITEM");
 
@@ -1397,7 +1397,7 @@ void User::HandleWrapItemOpcode(WorldPacket& recvData)
     m_player->DestroyItemCount(gift, count, true);
 }
 
-void User::HandleSocketOpcode(WorldPacket& recvData)
+void User::HandleSocketOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SOCKET_GEMS");
 
@@ -1595,7 +1595,7 @@ void User::HandleSocketOpcode(WorldPacket& recvData)
     itemTarget->SendUpdateSockets();
 }
 
-void User::HandleCancelTempEnchantmentOpcode(WorldPacket& recvData)
+void User::HandleCancelTempEnchantmentOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_CANCEL_TEMP_ENCHANTMENT");
 
@@ -1619,7 +1619,7 @@ void User::HandleCancelTempEnchantmentOpcode(WorldPacket& recvData)
     item->ClearEnchantment(TEMP_ENCHANTMENT_SLOT);
 }
 
-void User::HandleItemRefundInfoRequest(WorldPacket& recvData)
+void User::HandleItemRefundInfoRequest(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_ITEM_REFUND_INFO");
 
@@ -1636,7 +1636,7 @@ void User::HandleItemRefundInfoRequest(WorldPacket& recvData)
     GetPlayer()->SendRefundInfo(item);
 }
 
-void User::HandleItemRefund(WorldPacket& recvData)
+void User::HandleItemRefund(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_ITEM_REFUND");
     WOWGUID guid;
@@ -1661,14 +1661,14 @@ void User::HandleItemRefund(WorldPacket& recvData)
  *
  * This function is called when player clicks on item which has some flag set
  */
-void User::HandleItemTextQuery(WorldPacket& recvData )
+void User::HandleItemTextQuery(WDataStore& recvData )
 {
     WOWGUID itemGuid;
     recvData >> itemGuid;
 
     LOG_DEBUG("network", "CMSG_ITEM_TEXT_QUERY item: {}", itemGuid.ToString());
 
-    WorldPacket data(SMSG_ITEM_TEXT_QUERY_RESPONSE, 50);        // guess size
+    WDataStore data(SMSG_ITEM_TEXT_QUERY_RESPONSE, 50);        // guess size
 
     if (Item* item = m_player->GetItemByGuid(itemGuid))
     {

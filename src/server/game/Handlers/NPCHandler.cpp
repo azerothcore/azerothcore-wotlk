@@ -30,7 +30,7 @@
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 #include "UpdateMask.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 enum StableResultCode
@@ -43,7 +43,7 @@ enum StableResultCode
     STABLE_ERR_EXOTIC       = 0x0C,                         // "you are unable to control exotic creatures"
 };
 
-void User::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
+void User::HandleTabardVendorActivateOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -64,19 +64,19 @@ void User::HandleTabardVendorActivateOpcode(WorldPacket& recvData)
 
 void User::SendTabardVendorActivate(WOWGUID guid)
 {
-    WorldPacket data(MSG_TABARDVENDOR_ACTIVATE, 8);
+    WDataStore data(MSG_TABARDVENDOR_ACTIVATE, 8);
     data << guid;
     Send(&data);
 }
 
 void User::SendShowMailBox(WOWGUID guid)
 {
-    WorldPacket data(SMSG_SHOW_MAILBOX, 8);
+    WDataStore data(SMSG_SHOW_MAILBOX, 8);
     data << guid;
     Send(&data);
 }
 
-void User::HandleTrainerListOpcode(WorldPacket& recvData)
+void User::HandleTrainerListOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
 
@@ -120,7 +120,7 @@ void User::SendTrainerList(WOWGUID guid, const std::string& strTitle)
         return;
     }
 
-    WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + trainer_spells->spellList.size() * 38 + strTitle.size() + 1);
+    WDataStore data(SMSG_TRAINER_LIST, 8 + 4 + 4 + trainer_spells->spellList.size() * 38 + strTitle.size() + 1);
     data << guid;
     data << uint32(trainer_spells->trainerType);
 
@@ -209,7 +209,7 @@ void User::SendTrainerList(WOWGUID guid, const std::string& strTitle)
     Send(&data);
 }
 
-void User::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
+void User::HandleTrainerBuySpellOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     uint32 spellId = 0;
@@ -264,13 +264,13 @@ void User::HandleTrainerBuySpellOpcode(WorldPacket& recvData)
     else
         m_player->LearnSpell(spellId);
 
-    WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, 12);
+    WDataStore data(SMSG_TRAINER_BUY_SUCCEEDED, 12);
     data << guid;
     data << uint32(spellId);                                // should be same as in packet from client
     Send(&data);
 }
 
-void User::HandleGossipHelloOpcode(WorldPacket& recvData)
+void User::HandleGossipHelloOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -321,7 +321,7 @@ void User::HandleGossipHelloOpcode(WorldPacket& recvData)
     unit->AI()->sGossipHello(m_player);
 }
 
-/*void User::HandleGossipSelectOptionOpcode(WorldPacket & recvData)
+/*void User::HandleGossipSelectOptionOpcode(WDataStore & recvData)
 {
     LOG_DEBUG("network.opcode", "WORLD: CMSG_GOSSIP_SELECT_OPTION");
 
@@ -362,7 +362,7 @@ void User::HandleGossipHelloOpcode(WorldPacket& recvData)
     }
 }*/
 
-void User::HandleSpiritHealerActivateOpcode(WorldPacket& recvData)
+void User::HandleSpiritHealerActivateOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SPIRIT_HEALER_ACTIVATE");
 
@@ -415,7 +415,7 @@ void User::SendSpiritResurrect()
     //    m_player->UpdateObjectVisibility(); // xinef: not needed, called in Resurrect
 }
 
-void User::HandleBinderActivateOpcode(WorldPacket& recvData)
+void User::HandleBinderActivateOpcode(WDataStore& recvData)
 {
     WOWGUID npcGUID;
     recvData >> npcGUID;
@@ -448,7 +448,7 @@ void User::SendBindPoint(Creature* npc)
     // send spell for homebinding (3286)
     npc->CastSpell(m_player, bindspell, true);
 
-    WorldPacket data(SMSG_TRAINER_BUY_SUCCEEDED, (8 + 4));
+    WDataStore data(SMSG_TRAINER_BUY_SUCCEEDED, (8 + 4));
     data << npc->GetGUID();
     data << uint32(bindspell);
     Send(&data);
@@ -456,7 +456,7 @@ void User::SendBindPoint(Creature* npc)
     m_player->PlayerTalkClass->SendCloseGossip();
 }
 
-void User::HandleListStabledPetsOpcode(WorldPacket& recvData)
+void User::HandleListStabledPetsOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv MSG_LIST_STABLED_PETS");
     WOWGUID npcGUID;
@@ -481,7 +481,7 @@ void User::SendStablePet(WOWGUID guid)
 {
     LOG_DEBUG("network", "WORLD: Recv MSG_LIST_STABLED_PETS Send.");
 
-    WorldPacket data(MSG_LIST_STABLED_PETS, 200);           // guess size
+    WDataStore data(MSG_LIST_STABLED_PETS, 200);           // guess size
     data << guid;
     std::size_t wpos = data.wpos();
     data << uint8(0);                                       // place holder for slot show number
@@ -542,12 +542,12 @@ void User::SendStablePet(WOWGUID guid)
 
 void User::SendStableResult(uint8 res)
 {
-    WorldPacket data(SMSG_STABLE_RESULT, 1);
+    WDataStore data(SMSG_STABLE_RESULT, 1);
     data << uint8(res);
     Send(&data);
 }
 
-void User::HandleStablePet(WorldPacket& recvData)
+void User::HandleStablePet(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_STABLE_PET");
     WOWGUID npcGUID;
@@ -615,7 +615,7 @@ void User::HandleStablePet(WorldPacket& recvData)
     SendStableResult(STABLE_ERR_STABLE);
 }
 
-void User::HandleUnstablePet(WorldPacket& recvData)
+void User::HandleUnstablePet(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_UNSTABLE_PET.");
     WOWGUID npcGUID;
@@ -729,7 +729,7 @@ void User::HandleUnstablePet(WorldPacket& recvData)
     }
 }
 
-void User::HandleBuyStableSlot(WorldPacket& recvData)
+void User::HandleBuyStableSlot(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_BUY_STABLE_SLOT.");
     WOWGUID npcGUID;
@@ -763,12 +763,12 @@ void User::HandleBuyStableSlot(WorldPacket& recvData)
         SendStableResult(STABLE_ERR_STABLE);
 }
 
-void User::HandleStableRevivePet(WorldPacket& /* recvData */)
+void User::HandleStableRevivePet(WDataStore& /* recvData */)
 {
     LOG_DEBUG("network", "HandleStableRevivePet: Not implemented");
 }
 
-void User::HandleStableSwapPet(WorldPacket& recvData)
+void User::HandleStableSwapPet(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_STABLE_SWAP_PET.");
     WOWGUID npcGUID;
@@ -881,7 +881,7 @@ void User::HandleStableSwapPet(WorldPacket& recvData)
     }
 }
 
-void User::HandleRepairItemOpcode(WorldPacket& recvData)
+void User::HandleRepairItemOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_REPAIR_ITEM");
 

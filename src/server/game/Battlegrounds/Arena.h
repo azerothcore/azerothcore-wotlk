@@ -52,7 +52,7 @@ protected:
     void AddPlayer(Player* player) override;
     void RemovePlayer(Player* /*player*/) override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WDataStore& data) override;
     void UpdateArenaWorldState();
 
     void HandleKillPlayer(Player* player, Player* killer) override;

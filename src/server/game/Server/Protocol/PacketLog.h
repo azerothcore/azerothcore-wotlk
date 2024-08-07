@@ -28,7 +28,7 @@ enum Direction
     SERVER_TO_CLIENT
 };
 
-class WorldPacket;
+class WDataStore;
 
 class AC_GAME_API PacketLog
 {
@@ -43,7 +43,7 @@ public:
 
     void Initialize();
     bool CanLogPacket() const { return (_file != nullptr); }
-    void LogPacket(WorldPacket const& packet, Direction direction, boost::asio::ip::address const& addr, uint16 port);
+    void LogPacket(WDataStore const& packet, Direction direction, boost::asio::ip::address const& addr, uint16 port);
 
 private:
     FILE* _file;

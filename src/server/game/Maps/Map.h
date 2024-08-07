@@ -41,7 +41,7 @@
 #include <shared_mutex>
 
 class Unit;
-class WorldPacket;
+class WDataStore;
 class InstanceScript;
 class Group;
 class InstanceSave;
@@ -480,7 +480,7 @@ public:
     void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
     void RemoveWorldObject(WorldObject* obj) { i_worldObjects.erase(obj); }
 
-    void SendToPlayers(WorldPacket const* data) const;
+    void SendToPlayers(WDataStore const* data) const;
 
     typedef MapRefMgr PlayerList;
     [[nodiscard]] PlayerList const& GetPlayers() const { return m_mapRefMgr; }

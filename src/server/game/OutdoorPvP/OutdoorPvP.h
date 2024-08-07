@@ -78,7 +78,7 @@ struct creature_type
 // some class predefs
 class Player;
 class GameObject;
-class WorldPacket;
+class WDataStore;
 class Creature;
 class Unit;
 class OutdoorPvP;
@@ -93,7 +93,7 @@ public:
     explicit OPvPCapturePoint(OutdoorPvP* pvp);
     virtual ~OPvPCapturePoint() = default;
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WDataStore& /*data*/) {}
 
     // send world state update to all players present
     void SendUpdateWorldState(uint32 field, uint32 value);
@@ -200,7 +200,7 @@ public:
     typedef std::pair<WOWGUID::LowType, GameObject*> GoScriptPair;
     typedef std::pair<WOWGUID::LowType, Creature*> CreatureScriptPair;
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WDataStore& /*data*/) {}
 
     // called when a player triggers an area trigger
     virtual bool HandleAreaTrigger(Player* player, uint32 trigger);
@@ -244,7 +244,7 @@ public:
     Map* GetMap() const { return _map; }
 
 protected:
-    void BroadcastPacket(WorldPacket& data) const;
+    void BroadcastPacket(WDataStore& data) const;
 
     virtual void SendRemoveWorldStates(Player* /*player*/) {} // world state stuff
     virtual void HandlePlayerEnterZone(Player* player, uint32 zone);

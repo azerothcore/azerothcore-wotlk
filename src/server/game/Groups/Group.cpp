@@ -38,7 +38,7 @@
 #include "Util.h"
 #include "Vehicle.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
@@ -495,7 +495,7 @@ bool Group::AddMember(Player* player)
             player->SetFieldNotifyFlag(UF_FLAG_PARTY_MEMBER);
 
             UpdateData groupData;
-            WorldPacket groupDataPacket;
+            WDataStore groupDataPacket;
 
             // Broadcast group members' fields to player
             for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -517,7 +517,7 @@ bool Group::AddMember(Player* player)
                     if (itrMember->HaveAtClient(player))
                     {
                         UpdateData newData;
-                        WorldPacket newDataPacket;
+                        WDataStore newDataPacket;
                         player->BuildValuesUpdateBlockForPlayer(&newData, itrMember);
                         if (newData.HasData())
                         {
@@ -576,7 +576,7 @@ bool Group::RemoveMember(WOWGUID guid, const RemoveMethod& method /*= GROUP_REMO
                 player->UpdateForQuestWorldObjects();
             }
 
-            WorldPacket data;
+            WDataStore data;
 
             if (method == GROUP_REMOVEMETHOD_KICK || method == GROUP_REMOVEMETHOD_KICK_LFG)
             {
@@ -744,7 +744,7 @@ void Group::ChangeLeader(WOWGUID newLeaderGuid)
     m_leaderName = newLeader->GetName();
     ToggleGroupMemberFlag(slot, MEMBER_FLAG_ASSISTANT, false);
 
-    WorldPacket data(SMSG_GROUP_SET_LEADER, m_leaderName.size() + 1);
+    WDataStore data(SMSG_GROUP_SET_LEADER, m_leaderName.size() + 1);
     data << slot->name;
     BroadcastPacket(&data, true);
 
@@ -796,7 +796,7 @@ void Group::Disband(bool hideDestroy /* = false */)
         if (isRaidGroup())
             player->UpdateForQuestWorldObjects();
 
-        WorldPacket data;
+        WDataStore data;
         if (!hideDestroy)
         {
             data.Initialize(SMSG_GROUP_DESTROYED, 0);
@@ -853,7 +853,7 @@ void Group::Disband(bool hideDestroy /* = false */)
 
 void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r)
 {
-    WorldPacket data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
+    WDataStore data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
     data << r.itemGUID;                                     // guid of rolled item
     data << uint32(mapid);                                  // 3.3.3 mapid
     data << uint32(r.itemSlot);                             // itemslot
@@ -880,7 +880,7 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p,
     if (!p)
         return;
 
-    WorldPacket data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
+    WDataStore data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
     data << r.itemGUID;                                     // guid of rolled item
     data << uint32(mapId);                                  // 3.3.3 mapid
     data << uint32(r.itemSlot);                             // itemslot
@@ -899,7 +899,7 @@ void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p,
 
 void Group::SendLootRoll(WOWGUID sourceGuid, WOWGUID targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll, bool autoPass)
 {
-    WorldPacket data(SMSG_LOOT_ROLL, (8 + 4 + 8 + 4 + 4 + 4 + 1 + 1 + 1));
+    WDataStore data(SMSG_LOOT_ROLL, (8 + 4 + 8 + 4 + 4 + 4 + 1 + 1 + 1));
     data << sourceGuid;                                     // guid of the item rolled
     data << uint32(roll.itemSlot);                          // slot
     data << targetGuid;
@@ -923,7 +923,7 @@ void Group::SendLootRoll(WOWGUID sourceGuid, WOWGUID targetGuid, uint8 rollNumbe
 
 void Group::SendLootRollWon(WOWGUID sourceGuid, WOWGUID targetGuid, uint8 rollNumber, uint8 rollType, Roll const& roll)
 {
-    WorldPacket data(SMSG_LOOT_ROLL_WON, (8 + 4 + 4 + 4 + 4 + 8 + 1 + 1));
+    WDataStore data(SMSG_LOOT_ROLL_WON, (8 + 4 + 4 + 4 + 4 + 8 + 1 + 1));
     data << sourceGuid;                                     // guid of the item rolled
     data << uint32(roll.itemSlot);                          // slot
     data << uint32(roll.itemid);                            // the itemEntryId for the item that shall be rolled for
@@ -946,7 +946,7 @@ void Group::SendLootRollWon(WOWGUID sourceGuid, WOWGUID targetGuid, uint8 rollNu
 
 void Group::SendLootAllPassed(Roll const& roll)
 {
-    WorldPacket data(SMSG_LOOT_ALL_PASSED, (8 + 4 + 4 + 4 + 4));
+    WDataStore data(SMSG_LOOT_ALL_PASSED, (8 + 4 + 4 + 4 + 4));
     data << roll.itemGUID;                                     // Guid of the item rolled
     data << uint32(roll.itemSlot);                             // Item loot slot
     data << uint32(roll.itemid);                               // The itemEntryId for the item that shall be rolled for
@@ -969,7 +969,7 @@ void Group::SendLooter(Creature* creature, Player* groupLooter)
 {
     ASSERT(creature);
 
-    WorldPacket data(SMSG_LOOT_LIST, (8 + 8));
+    WDataStore data(SMSG_LOOT_LIST, (8 + 8));
     data << creature->GetGUID();
 
     if (GetLootMethod() == MASTER_LOOT && creature->loot.hasOverThresholdItem())
@@ -1342,7 +1342,7 @@ void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
         }
     }
 
-    WorldPacket data(SMSG_LOOT_MASTER_LIST, 1 + looters.size() * (1 + 8));
+    WDataStore data(SMSG_LOOT_MASTER_LIST, 1 + looters.size() * (1 + 8));
     data << uint8(looters.size());
 
     for (Player* looter : looters)
@@ -1633,7 +1633,7 @@ void Group::SetTargetIcon(uint8 id, WOWGUID whoGuid, WOWGUID targetGuid)
 
     m_targetIcons[id] = targetGuid;
 
-    WorldPacket data(MSG_RAID_TARGET_UPDATE, (1 + 8 + 1 + 8));
+    WDataStore data(MSG_RAID_TARGET_UPDATE, (1 + 8 + 1 + 8));
     data << uint8(0);                                       // set targets
     data << whoGuid;
     data << uint8(id);
@@ -1646,7 +1646,7 @@ void Group::SendTargetIconList(User* session)
     if (!session)
         return;
 
-    WorldPacket data(MSG_RAID_TARGET_UPDATE, (1 + TARGETICONCOUNT * 9));
+    WDataStore data(MSG_RAID_TARGET_UPDATE, (1 + TARGETICONCOUNT * 9));
     data << uint8(1);                                       // list targets
 
     for (uint8 i = 0; i < TARGETICONCOUNT; ++i)
@@ -1685,7 +1685,7 @@ void Group::SendUpdateToPlayer(WOWGUID playerGUID, MemberSlot* slot)
         slot = &(*witr);
     }
 
-    WorldPacket data(SMSG_GROUP_LIST, (1 + 1 + 1 + 1 + 1 + 4 + 8 + 4 + 4 + (GetMembersCount() - 1) * (13 + 8 + 1 + 1 + 1 + 1) + 8 + 1 + 8 + 1 + 1 + 1 + 1));
+    WDataStore data(SMSG_GROUP_LIST, (1 + 1 + 1 + 1 + 1 + 4 + 8 + 4 + 4 + (GetMembersCount() - 1) * (13 + 8 + 1 + 1 + 1 + 1) + 8 + 1 + 8 + 1 + 1 + 1 + 1));
     data << uint8(m_groupType);                         // group type (flags in 3.3)
     data << uint8(slot->group);
     data << uint8(slot->flags);
@@ -1742,7 +1742,7 @@ void Group::UpdatePlayerOutOfRange(Player* player)
     if (!player || !player->IsInWorld())
         return;
 
-    WorldPacket data;
+    WDataStore data;
     player->User()->BuildPartyMemberStatsChangedPacket(player, &data);
 
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -1753,7 +1753,7 @@ void Group::UpdatePlayerOutOfRange(Player* player)
     }
 }
 
-void Group::BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group, WOWGUID ignore)
+void Group::BroadcastPacket(WDataStore const* packet, bool ignorePlayersInBGRaid, int group, WOWGUID ignore)
 {
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -1766,7 +1766,7 @@ void Group::BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRai
     }
 }
 
-void Group::BroadcastReadyCheck(WorldPacket const* packet)
+void Group::BroadcastReadyCheck(WDataStore const* packet)
 {
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -1784,7 +1784,7 @@ void Group::OfflineReadyCheck()
         Player* player = ObjectAccessor::FindConnectedPlayer(citr->guid);
         if (!player)
         {
-            WorldPacket data(MSG_RAID_READY_CHECK_CONFIRM, 9);
+            WDataStore data(MSG_RAID_READY_CHECK_CONFIRM, 9);
             data << citr->guid;
             data << uint8(0);
             BroadcastReadyCheck(&data);

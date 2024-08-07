@@ -63,7 +63,7 @@ public:
 
     bool Update(uint32 diff) override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WDataStore& data) override;
 
     void SendRemoveWorldStates(Player* player) override;
 

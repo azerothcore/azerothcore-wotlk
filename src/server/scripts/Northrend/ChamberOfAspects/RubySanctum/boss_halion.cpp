@@ -195,7 +195,7 @@ public:
             return true;
         }
 
-        WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 4);
+        WDataStore data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 4);
         data << uint32(ENCOUNTER_FRAME_REFRESH_FRAMES);
         _owner->User()->Send(&data);
         return true;

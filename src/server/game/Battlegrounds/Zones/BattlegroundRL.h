@@ -45,7 +45,7 @@ public:
     BattlegroundRL();
 
     /* inherited from BattlegroundClass */
-    void FillInitialWorldStates(WorldPacket& d) override;
+    void FillInitialWorldStates(WDataStore& d) override;
     void StartingEventCloseDoors() override;
     void StartingEventOpenDoors() override;
 

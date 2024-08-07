@@ -23,11 +23,11 @@
 #include "TicketMgr.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 #include <zlib.h>
 
-void User::HandleGMTicketCreateOpcode(WorldPacket& recvData)
+void User::HandleGMTicketCreateOpcode(WDataStore& recvData)
 {
     // Don't accept tickets if the ticket queue is disabled. (Ticket UI is greyed out but not fully dependable)
     if (sTicketMgr->GetStatus() == GMTICKET_QUEUE_STATUS_DISABLED)
@@ -123,12 +123,12 @@ void User::HandleGMTicketCreateOpcode(WorldPacket& recvData)
         response = GMTICKET_RESPONSE_CREATE_SUCCESS;
     }
 
-    WorldPacket data(SMSG_GMTICKET_CREATE, 4);
+    WDataStore data(SMSG_GMTICKET_CREATE, 4);
     data << uint32(response);
     Send(&data);
 }
 
-void User::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
+void User::HandleGMTicketUpdateOpcode(WDataStore& recv_data)
 {
     std::string message;
     recv_data >> message;
@@ -150,16 +150,16 @@ void User::HandleGMTicketUpdateOpcode(WorldPacket& recv_data)
         response = GMTICKET_RESPONSE_UPDATE_SUCCESS;
     }
 
-    WorldPacket data(SMSG_GMTICKET_UPDATETEXT, 4);
+    WDataStore data(SMSG_GMTICKET_UPDATETEXT, 4);
     data << uint32(response);
     Send(&data);
 }
 
-void User::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
+void User::HandleGMTicketDeleteOpcode(WDataStore& /*recv_data*/)
 {
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
-        WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
+        WDataStore data(SMSG_GMTICKET_DELETETICKET, 4);
         data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
         Send(&data);
 
@@ -170,7 +170,7 @@ void User::HandleGMTicketDeleteOpcode(WorldPacket& /*recv_data*/)
     }
 }
 
-void User::HandleGMTicketGetTicketOpcode(WorldPacket& /*recv_data*/)
+void User::HandleGMTicketGetTicketOpcode(WDataStore& /*recv_data*/)
 {
     SendQueryTimeResponse();
 
@@ -185,16 +185,16 @@ void User::HandleGMTicketGetTicketOpcode(WorldPacket& /*recv_data*/)
         sTicketMgr->SendTicket(this, nullptr);
 }
 
-void User::HandleGMTicketSystemStatusOpcode(WorldPacket& /*recv_data*/)
+void User::HandleGMTicketSystemStatusOpcode(WDataStore& /*recv_data*/)
 {
     // Note: This only disables the ticket UI at client side and is not fully reliable
     // are we sure this is a uint32? Should ask Zor
-    WorldPacket data(SMSG_GMTICKET_SYSTEMSTATUS, 4);
+    WDataStore data(SMSG_GMTICKET_SYSTEMSTATUS, 4);
     data << uint32(sTicketMgr->GetStatus() ? GMTICKET_QUEUE_STATUS_ENABLED : GMTICKET_QUEUE_STATUS_DISABLED);
     Send(&data);
 }
 
-void User::HandleGMSurveySubmit(WorldPacket& recv_data)
+void User::HandleGMSurveySubmit(WDataStore& recv_data)
 {
     uint32 nextSurveyID = sTicketMgr->GetNextSurveyID();
     // just put the survey into the database
@@ -253,7 +253,7 @@ void User::HandleGMSurveySubmit(WorldPacket& recv_data)
     CharacterDatabase.CommitTransaction(trans);
 }
 
-void User::HandleReportLag(WorldPacket& recv_data)
+void User::HandleReportLag(WDataStore& recv_data)
 {
     // just put the lag report into the database...
     // can't think of anything else to do with it
@@ -277,7 +277,7 @@ void User::HandleReportLag(WorldPacket& recv_data)
     CharacterDatabase.Execute(stmt);
 }
 
-void User::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
+void User::HandleGMResponseResolve(WDataStore& /*recvPacket*/)
 {
     // empty packet
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
@@ -286,11 +286,11 @@ void User::HandleGMResponseResolve(WorldPacket& /*recvPacket*/)
         if (float(rand_chance()) < sWorld->getFloatConfig(CONFIG_CHANCE_OF_GM_SURVEY))
             getSurvey = 1;
 
-        WorldPacket data(SMSG_GMRESPONSE_STATUS_UPDATE, 4);
+        WDataStore data(SMSG_GMRESPONSE_STATUS_UPDATE, 4);
         data << uint8(getSurvey);
         Send(&data);
 
-        WorldPacket data2(SMSG_GMTICKET_DELETETICKET, 4);
+        WDataStore data2(SMSG_GMTICKET_DELETETICKET, 4);
         data2 << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
         Send(&data2);
 

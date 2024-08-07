@@ -1690,7 +1690,7 @@ protected:
         }
     }
 
-    void BuildObjectivesBlock(WorldPacket& data) final;
+    void BuildObjectivesBlock(WDataStore& data) final;
 
     uint32 GraveyardsAssaulted = 0;
     uint32 GraveyardsDefended = 0;
@@ -1769,7 +1769,7 @@ private:
     void ChangeMineOwner(uint8 mine, TeamId teamId, bool initial = false);
 
     /*worldstates*/
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WDataStore& data) override;
     uint8 GetWorldStateType(uint8 state, TeamId teamId);
     void SendMineWorldStates(uint32 mine);
     void UpdateNodeWorldState(BG_AV_Nodes node);

@@ -21,7 +21,7 @@
 #include "Define.h"
 #include <string>
 
-class WorldPacket;
+class WDataStore;
 
 class AC_GAME_API MotdMgr
 {
@@ -38,7 +38,7 @@ public:
     char const* GetMotd();
 
     /// Get the motd packet to send at login
-    WorldPacket const* GetMotdPacket();
+    WDataStore const* GetMotdPacket();
 };
 
 #define sMotdMgr MotdMgr::instance()

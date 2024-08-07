@@ -1523,7 +1523,7 @@ struct npc_chesspiece : public ScriptedAI
             // Build new action bar
             if (Player* playerCharmer = charmer->ToPlayer())
             {
-                WorldPacket data(SMSG_PET_SPELLS, 1 + 8 + 2 + 4 + 1 + 1 + 2 + MAX_SPELL_CONTROL_BAR * 4 + 1 + 1);
+                WDataStore data(SMSG_PET_SPELLS, 1 + 8 + 2 + 4 + 1 + 1 + 2 + MAX_SPELL_CONTROL_BAR * 4 + 1 + 1);
                 data << me->GetGUID();
                 data << uint16(0);
                 data << uint32(0);

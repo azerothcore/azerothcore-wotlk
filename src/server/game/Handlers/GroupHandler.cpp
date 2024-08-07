@@ -31,7 +31,7 @@
 #include "Util.h"
 #include "Vehicle.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 class Aura;
@@ -49,7 +49,7 @@ class Aura;
 
 void User::SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res, uint32 val /* = 0 */)
 {
-    WorldPacket data(SMSG_PARTY_COMMAND_RESULT, 4 + member.size() + 1 + 4 + 4);
+    WDataStore data(SMSG_PARTY_COMMAND_RESULT, 4 + member.size() + 1 + 4 + 4);
     data << uint32(operation);
     data << member;
     data << uint32(res);
@@ -58,7 +58,7 @@ void User::SendPartyResult(PartyOperation operation, const std::string& member, 
     Send(&data);
 }
 
-void User::HandleGroupInviteOpcode(WorldPacket& recvData)
+void User::HandleGroupInviteOpcode(WDataStore& recvData)
 {
     std::string membername;
     recvData >> membername;
@@ -140,7 +140,7 @@ void User::HandleGroupInviteOpcode(WorldPacket& recvData)
         if (group2)
         {
             // tell the player that they were invited but it failed as they were already in a group
-            WorldPacket data(SMSG_GROUP_INVITE, 25);                // guess size
+            WDataStore data(SMSG_GROUP_INVITE, 25);                // guess size
             data << uint8(0);                                       // invited/already in group flag
             data << invitingPlayer->GetName();                         // max len 48
             data << uint32(0);                                      // unk
@@ -200,7 +200,7 @@ void User::HandleGroupInviteOpcode(WorldPacket& recvData)
     }
 
     // ok, we do it
-    WorldPacket data(SMSG_GROUP_INVITE, 10);                // guess size
+    WDataStore data(SMSG_GROUP_INVITE, 10);                // guess size
     data << uint8(1);                                       // invited/already in group flag
     data << invitingPlayer->GetName();                         // max len 48
     data << uint32(0);                                      // unk
@@ -211,7 +211,7 @@ void User::HandleGroupInviteOpcode(WorldPacket& recvData)
     SendPartyResult(PARTY_OP_INVITE, membername, ERR_PARTY_RESULT_OK);
 }
 
-void User::HandleGroupAcceptOpcode(WorldPacket& recvData)
+void User::HandleGroupAcceptOpcode(WDataStore& recvData)
 {
     recvData.read_skip<uint32>();
     Group* group = GetPlayer()->GetGroupInvite();
@@ -271,7 +271,7 @@ void User::HandleGroupAcceptOpcode(WorldPacket& recvData)
     group->BroadcastGroupUpdate();
 }
 
-void User::HandleGroupDeclineOpcode(WorldPacket& /*recvData*/)
+void User::HandleGroupDeclineOpcode(WDataStore& /*recvData*/)
 {
     Group* group = GetPlayer()->GetGroupInvite();
     if (!group)
@@ -287,12 +287,12 @@ void User::HandleGroupDeclineOpcode(WorldPacket& /*recvData*/)
         return;
 
     // report
-    WorldPacket data(SMSG_GROUP_DECLINE, GetPlayer()->GetName().length());
+    WDataStore data(SMSG_GROUP_DECLINE, GetPlayer()->GetName().length());
     data << GetPlayer()->GetName();
     leader->User()->Send(&data);
 }
 
-void User::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
+void User::HandleGroupUninviteGuidOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     std::string reason, name;
@@ -365,7 +365,7 @@ void User::HandleGroupUninviteGuidOpcode(WorldPacket& recvData)
     SendPartyResult(PARTY_OP_UNINVITE, name, ERR_TARGET_NOT_IN_GROUP_S);
 }
 
-void User::HandleGroupUninviteOpcode(WorldPacket& recvData)
+void User::HandleGroupUninviteOpcode(WDataStore& recvData)
 {
     std::string membername;
     recvData >> membername;
@@ -410,7 +410,7 @@ void User::HandleGroupUninviteOpcode(WorldPacket& recvData)
     SendPartyResult(PARTY_OP_UNINVITE, membername, ERR_TARGET_NOT_IN_GROUP_S);
 }
 
-void User::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
+void User::HandleGroupSetLeaderOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -429,7 +429,7 @@ void User::HandleGroupSetLeaderOpcode(WorldPacket& recvData)
     group->SendUpdate();
 }
 
-void User::HandleGroupDisbandOpcode(WorldPacket& /*recvData*/)
+void User::HandleGroupDisbandOpcode(WDataStore& /*recvData*/)
 {
     Group* grp = GetPlayer()->GetGroup();
     Group* grpInvite = GetPlayer()->GetGroupInvite();
@@ -458,7 +458,7 @@ void User::HandleGroupDisbandOpcode(WorldPacket& /*recvData*/)
     }
 }
 
-void User::HandleLootMethodOpcode(WorldPacket& recvData)
+void User::HandleLootMethodOpcode(WDataStore& recvData)
 {
     uint32 lootMethod;
     WOWGUID lootMaster;
@@ -491,7 +491,7 @@ void User::HandleLootMethodOpcode(WorldPacket& recvData)
     group->SendUpdate();
 }
 
-void User::HandleLootRoll(WorldPacket& recvData)
+void User::HandleLootRoll(WDataStore& recvData)
 {
     WOWGUID guid;
     uint32 itemSlot;
@@ -520,7 +520,7 @@ void User::HandleLootRoll(WorldPacket& recvData)
     }
 }
 
-void User::HandleMinimapPingOpcode(WorldPacket& recvData)
+void User::HandleMinimapPingOpcode(WDataStore& recvData)
 {
     if (!GetPlayer()->GetGroup())
         return;
@@ -533,7 +533,7 @@ void User::HandleMinimapPingOpcode(WorldPacket& recvData)
     /********************/
 
     // everything's fine, do it
-    WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
+    WDataStore data(MSG_MINIMAP_PING, (8 + 4 + 4));
     data << GetPlayer()->GetGUID();
     data << float(x);
     data << float(y);
@@ -555,7 +555,7 @@ void User::HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet)
     GetPlayer()->DoRandomRoll(minimum, maximum);
 }
 
-void User::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
+void User::HandleRaidTargetUpdateOpcode(WDataStore& recvData)
 {
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -592,7 +592,7 @@ void User::HandleRaidTargetUpdateOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleGroupRaidConvertOpcode(WorldPacket& /*recvData*/)
+void User::HandleGroupRaidConvertOpcode(WDataStore& /*recvData*/)
 {
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -617,7 +617,7 @@ void User::HandleGroupRaidConvertOpcode(WorldPacket& /*recvData*/)
     group->ConvertToRaid();
 }
 
-void User::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
+void User::HandleGroupChangeSubGroupOpcode(WDataStore& recvData)
 {
     // we will get correct pointer for group here, so we don't have to check if group is BG raid
     Group* group = GetPlayer()->GetGroup();
@@ -654,7 +654,7 @@ void User::HandleGroupChangeSubGroupOpcode(WorldPacket& recvData)
     group->ChangeMembersGroup(guid, groupNr);
 }
 
-void User::HandleGroupAssistantLeaderOpcode(WorldPacket& recvData)
+void User::HandleGroupAssistantLeaderOpcode(WDataStore& recvData)
 {
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -673,7 +673,7 @@ void User::HandleGroupAssistantLeaderOpcode(WorldPacket& recvData)
     group->SendUpdate();
 }
 
-void User::HandlePartyAssignmentOpcode(WorldPacket& recvData)
+void User::HandlePartyAssignmentOpcode(WDataStore& recvData)
 {
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -705,7 +705,7 @@ void User::HandlePartyAssignmentOpcode(WorldPacket& recvData)
     group->SendUpdate();
 }
 
-void User::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
+void User::HandleRaidReadyCheckOpcode(WDataStore& recvData)
 {
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -730,7 +730,7 @@ void User::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
         }
 
         // everything's fine, do it
-        WorldPacket data(MSG_RAID_READY_CHECK, 8);
+        WDataStore data(MSG_RAID_READY_CHECK, 8);
         data << GetPlayer()->GetGUID();
         group->BroadcastPacket(&data, false, -1);
 
@@ -742,14 +742,14 @@ void User::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
         recvData >> state;
 
         // everything's fine, do it
-        WorldPacket data(MSG_RAID_READY_CHECK_CONFIRM, 9);
+        WDataStore data(MSG_RAID_READY_CHECK_CONFIRM, 9);
         data << GetPlayer()->GetGUID();
         data << uint8(state);
         group->BroadcastReadyCheck(&data);
     }
 }
 
-void User::HandleRaidReadyCheckFinishedOpcode(WorldPacket& /*recvData*/)
+void User::HandleRaidReadyCheckFinishedOpcode(WDataStore& /*recvData*/)
 {
     Group* group = GetPlayer()->GetGroup();
     if (!group)
@@ -758,11 +758,11 @@ void User::HandleRaidReadyCheckFinishedOpcode(WorldPacket& /*recvData*/)
     if (!group->IsLeader(GetPlayer()->GetGUID()) && !group->IsAssistant(GetPlayer()->GetGUID()))
         return;
 
-    WorldPacket data(MSG_RAID_READY_CHECK_FINISHED);
+    WDataStore data(MSG_RAID_READY_CHECK_FINISHED);
     group->BroadcastPacket(&data, true, -1);
 }
 
-void User::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data)
+void User::BuildPartyMemberStatsChangedPacket(Player* player, WDataStore* data)
 {
     uint32 mask = player->GetGroupUpdateFlag();
 
@@ -948,7 +948,7 @@ void User::BuildPartyMemberStatsChangedPacket(Player* player, WorldPacket* data)
 }
 
 /*this procedure handles clients CMSG_REQUEST_PARTY_MEMBER_STATS request*/
-void User::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
+void User::HandleRequestPartyMemberStatsOpcode(WDataStore& recvData)
 {
     WOWGUID Guid;
     recvData >> Guid;
@@ -956,7 +956,7 @@ void User::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     Player* player = HashMapHolder<Player>::Find(Guid);
     if (!player)
     {
-        WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 3 + 4 + 2);
+        WDataStore data(SMSG_PARTY_MEMBER_STATS_FULL, 3 + 4 + 2);
         data << uint8(0);                                   // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
         data << Guid.WriteAsPacked();
         data << uint32(GROUP_UPDATE_FLAG_STATUS);
@@ -968,7 +968,7 @@ void User::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     Pet* pet = player->GetPet();
     POWER_TYPE powerType = player->GetPowerType();
 
-    WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 4 + 2 + 2 + 2 + 1 + 2 * 6 + 8 + 1 + 8);
+    WDataStore data(SMSG_PARTY_MEMBER_STATS_FULL, 4 + 2 + 2 + 2 + 1 + 2 * 6 + 8 + 1 + 8);
     data << uint8(0);                                       // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
     data << player->GetPackGUID();
 
@@ -1082,13 +1082,13 @@ void User::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     Send(&data);
 }
 
-void User::HandleRequestRaidInfoOpcode(WorldPacket& /*recvData*/)
+void User::HandleRequestRaidInfoOpcode(WDataStore& /*recvData*/)
 {
     // every time the player checks the character screen
     m_player->SendRaidInfo();
 }
 
-void User::HandleOptOutOfLootOpcode(WorldPacket& recvData)
+void User::HandleOptOutOfLootOpcode(WDataStore& recvData)
 {
     uint32 passOnLoot;
     recvData >> passOnLoot; // 1 always pass, 0 do not pass
@@ -1099,7 +1099,7 @@ void User::HandleOptOutOfLootOpcode(WorldPacket& recvData)
     GetPlayer()->SetPassOnGroupLoot(passOnLoot);
 }
 
-void User::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
+void User::HandleGroupSwapSubGroupOpcode(WDataStore& recv_data)
 {
     std::string playerName1, playerName2;
 

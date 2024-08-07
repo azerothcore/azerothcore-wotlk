@@ -27,7 +27,7 @@
 #include "User.h"
 //#include "WorldStatePackets.h"
 
-void ArenaScore::AppendToPacket(WorldPacket& data)
+void ArenaScore::AppendToPacket(WDataStore& data)
 {
     data << PlayerGuid;
 
@@ -39,12 +39,12 @@ void ArenaScore::AppendToPacket(WorldPacket& data)
     BuildObjectivesBlock(data);
 }
 
-void ArenaScore::BuildObjectivesBlock(WorldPacket& data)
+void ArenaScore::BuildObjectivesBlock(WDataStore& data)
 {
     data << uint32(0); // Objectives Count
 }
 
-void ArenaTeamScore::BuildRatingInfoBlock(WorldPacket& data)
+void ArenaTeamScore::BuildRatingInfoBlock(WDataStore& data)
 {
     uint32 ratingLost = std::abs(std::min(RatingChange, 0));
     uint32 ratingWon = std::max(RatingChange, 0);
@@ -55,7 +55,7 @@ void ArenaTeamScore::BuildRatingInfoBlock(WorldPacket& data)
     data << uint32(MatchmakerRating);
 }
 
-void ArenaTeamScore::BuildTeamInfoBlock(WorldPacket& data)
+void ArenaTeamScore::BuildTeamInfoBlock(WDataStore& data)
 {
     data << TeamName;
 }
@@ -146,7 +146,7 @@ void Arena::RemovePlayer(Player* /*player*/)
     CheckWinConditions();
 }
 
-void Arena::FillInitialWorldStates(WorldPacket& data)
+void Arena::FillInitialWorldStates(WDataStore& data)
 {
     data << uint32(ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN) << uint32(GetAlivePlayersCountByTeam(TEAM_HORDE));
     data << uint32(ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD) << uint32(GetAlivePlayersCountByTeam(TEAM_ALLIANCE));

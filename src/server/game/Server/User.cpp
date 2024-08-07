@@ -49,7 +49,7 @@
 #include "Vehicle.h"
 #include "WardenWin.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "WowConnection.h"
 #include <zlib.h>
 
@@ -61,14 +61,14 @@ static bool s_initialized;
 static BOOL UserWorldTeleportHandler (User*         user,
                                       Opcodes       msgId,
                                       uint          eventTime,
-                                      WorldPacket*  msg);
+                                      WDataStore*  msg);
 
 namespace
 {
     std::string const DefaultPlayerName = "<none>";
 }
 
-bool MapSessionFilter::Process(WorldPacket* packet)
+bool MapSessionFilter::Process(WDataStore* packet)
 {
     ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
     if (!opHandle) {
@@ -95,7 +95,7 @@ bool MapSessionFilter::Process(WorldPacket* packet)
 
 //we should process ALL packets when player is not in world/logged in
 //OR packet handler is not thread-safe!
-bool WorldSessionFilter::Process(WorldPacket* packet)
+bool WorldSessionFilter::Process(WDataStore* packet)
 {
     ClientOpcodeHandler const* opHandle = opcodeTable[static_cast<OpcodeClient>(packet->GetOpcode())];
     if (!opHandle) {
@@ -200,7 +200,7 @@ User::~User()
     }
 
     ///- empty incoming packet queue
-    WorldPacket* packet = nullptr;
+    WDataStore* packet = nullptr;
     while (_recvQueue.next(packet))
         delete packet;
 
@@ -282,19 +282,19 @@ WOWGUID::LowType User::GetGuidLow() const
 
 //===========================================================================
 void User::SendLogoutCancelAckMessage () {
-  WorldPacket msg(SMSG_LOGOUT_CANCEL_ACK, 0);
+  WDataStore msg(SMSG_LOGOUT_CANCEL_ACK, 0);
   Send(&msg);
 }
 
 //===========================================================================
 void User::SendLogoutCompleteMessage () {
-  WorldPacket msg(SMSG_LOGOUT_COMPLETE, 0);
+  WDataStore msg(SMSG_LOGOUT_COMPLETE, 0);
   Send(&msg);
 }
 
 //===========================================================================
 void User::SendLogoutResponse (LogoutResponse& res) {
-  WorldPacket msg(SMSG_LOGOUT_RESPONSE, sizeof(res));
+  WDataStore msg(SMSG_LOGOUT_RESPONSE, sizeof(res));
   msg << res.logoutFailed;
   msg << res.instantLogout;
   Send(&msg);
@@ -302,7 +302,7 @@ void User::SendLogoutResponse (LogoutResponse& res) {
 
 
 /// Send a packet to the client
-void User::Send(WorldPacket const* packet)
+void User::Send(WDataStore const* packet)
 {
     if (!m_sock)
         return;
@@ -352,20 +352,20 @@ void User::Send(WorldPacket const* packet)
 }
 
 /// Add an incoming packet to the queue
-void User::QueuePacket(WorldPacket* new_packet)
+void User::QueuePacket(WDataStore* new_packet)
 {
     _recvQueue.add(new_packet);
 }
 
 /// Logging helper for unexpected opcodes
-void User::LogUnexpectedOpcode(WorldPacket* packet, char const* status, const char* reason)
+void User::LogUnexpectedOpcode(WDataStore* packet, char const* status, const char* reason)
 {
     LOG_ERROR("network.opcode", "Received unexpected opcode {} Status: {} Reason: {} from {}",
         GetOpcodeNameForLogging(static_cast<OpcodeClient>(packet->GetOpcode())), status, reason, GetPlayerInfo());
 }
 
 /// Logging helper for unexpected opcodes
-void User::LogUnprocessedTail(WorldPacket* packet)
+void User::LogUnprocessedTail(WDataStore* packet)
 {
     if (!sLog->ShouldLog("network.opcode", LogLevel::LOG_LEVEL_TRACE) || packet->rpos() >= packet->wpos())
         return;
@@ -392,11 +392,11 @@ bool User::Update(uint32 diff, PacketFilter& updater)
 
     ///- Retrieve packets from the receive queue and call the appropriate handlers
     /// not process packets if socket already closed
-    WorldPacket* packet = nullptr;
+    WDataStore* packet = nullptr;
 
     //! Delete packet after processing by default
     bool deletePacket = true;
-    std::vector<WorldPacket*> requeuePackets;
+    std::vector<WDataStore*> requeuePackets;
     uint32 processedPackets = 0;
     time_t currentTime = GameTime::GetGameTime().count();
 
@@ -656,7 +656,7 @@ void User::HandleTeleportTimeout(bool updateInSessions)
                     Player* plMover = GetPlayer()->m_mover->ToPlayer();
                     if (!plMover)
                         break;
-                    WorldPacket pkt(MSG_MOVE_TELEPORT_ACK, 20);
+                    WDataStore pkt(MSG_MOVE_TELEPORT_ACK, 20);
                     pkt << plMover->GetPackGUID();
                     pkt << uint32(0); // flags
                     pkt << uint32(0); // time
@@ -889,7 +889,7 @@ void User::SendNotification(const char* format, ...)
         vsnprintf(szStr, 1024, format, ap);
         va_end(ap);
 
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
+        WDataStore data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
         data << szStr;
         Send(&data);
     }
@@ -907,7 +907,7 @@ void User::SendNotification(uint32 string_id, ...)
         vsnprintf(szStr, 1024, format, ap);
         va_end(ap);
 
-        WorldPacket data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
+        WDataStore data(SMSG_NOTIFICATION, (strlen(szStr) + 1));
         data << szStr;
         Send(&data);
     }
@@ -918,25 +918,25 @@ char const* User::GetAcoreString(uint32 entry) const
     return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
 }
 
-void User::Handle_NULL(WorldPacket& null)
+void User::Handle_NULL(WDataStore& null)
 {
     LOG_ERROR("network.opcode", "Received unhandled opcode {} from {}",
         GetOpcodeNameForLogging(static_cast<OpcodeClient>(null.GetOpcode())), GetPlayerInfo());
 }
 
-void User::Handle_EarlyProccess(WorldPacket& recvPacket)
+void User::Handle_EarlyProccess(WDataStore& recvPacket)
 {
     LOG_ERROR("network.opcode", "Received opcode {} that must be processed in WowConnection::ReadDataHandler from {}",
         GetOpcodeNameForLogging(static_cast<OpcodeClient>(recvPacket.GetOpcode())), GetPlayerInfo());
 }
 
-void User::Handle_ServerSide(WorldPacket& recvPacket)
+void User::Handle_ServerSide(WDataStore& recvPacket)
 {
     LOG_ERROR("network.opcode", "Received server-side opcode {} from {}",
         GetOpcodeNameForLogging(static_cast<OpcodeServer>(recvPacket.GetOpcode())), GetPlayerInfo());
 }
 
-void User::Handle_Deprecated(WorldPacket& recvPacket)
+void User::Handle_Deprecated(WDataStore& recvPacket)
 {
     LOG_ERROR("network.opcode", "Received deprecated opcode {} from {}",
         GetOpcodeNameForLogging(static_cast<OpcodeClient>(recvPacket.GetOpcode())), GetPlayerInfo());
@@ -946,13 +946,13 @@ void User::SendAuthWaitQueue(uint32 position)
 {
     if (position == 0)
     {
-        WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
+        WDataStore packet(SMSG_AUTH_RESPONSE, 1);
         packet << uint8(AUTH_OK);
         Send(&packet);
     }
     else
     {
-        WorldPacket packet(SMSG_AUTH_RESPONSE, 6);
+        WDataStore packet(SMSG_AUTH_RESPONSE, 6);
         packet << uint8(AUTH_WAIT_QUEUE);
         packet << uint32(position);
         packet << uint8(0);                                 // unk
@@ -1022,7 +1022,7 @@ void User::SetAccountData(AccountDataType type, time_t tm, std::string const& da
 
 void User::SendAccountDataTimes(uint32 mask)
 {
-    WorldPacket data(SMSG_ACCOUNT_DATA_TIMES, 4 + 1 + 4 + 8 * 4); // changed in WotLK
+    WDataStore data(SMSG_ACCOUNT_DATA_TIMES, 4 + 1 + 4 + 8 * 4); // changed in WotLK
     data << uint32(GameTime::GetGameTime().count());                             // unix time of something
     data << uint8(1);
     data << uint32(mask);                                   // type mask
@@ -1049,7 +1049,7 @@ void User::LoadTutorialsData(PreparedQueryResult result)
 
 void User::SendTutorialsData()
 {
-    WorldPacket data(SMSG_TUTORIAL_FLAGS, 4 * MAX_ACCOUNT_TUTORIAL_VALUES);
+    WDataStore data(SMSG_TUTORIAL_FLAGS, 4 * MAX_ACCOUNT_TUTORIAL_VALUES);
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
         data << m_Tutorials[i];
     Send(&data);
@@ -1074,7 +1074,7 @@ void User::SaveTutorialsData(CharacterDatabaseTransaction trans)
     m_TutorialsChanged = false;
 }
 
-void User::ReadMovementInfo(WorldPacket& data, CMovement* mi)
+void User::ReadMovementInfo(WDataStore& data, CMovement* mi)
 {
     Unit* mover = ActivePlayer()->m_mover;
 
@@ -1197,7 +1197,7 @@ void User::ReadMovementInfo(WorldPacket& data, CMovement* mi)
     }
 }
 
-void User::WriteMovementInfo(WorldPacket* data, CMovement* mi)
+void User::WriteMovementInfo(WDataStore* data, CMovement* mi)
 {
     *data << mi->guid.WriteAsPacked();
 
@@ -1340,7 +1340,7 @@ void User::SendAddonsInfo()
         0x0D, 0x36, 0xEA, 0x01, 0xE0, 0xAA, 0x91, 0x20, 0x54, 0xF0, 0x72, 0xD8, 0x1E, 0xC7, 0x89, 0xD2
     };
 
-    WorldPacket data(SMSG_ADDON_INFO, 4);
+    WDataStore data(SMSG_ADDON_INFO, 4);
 
     for (AddonsList::iterator itr = m_addonsList.begin(); itr != m_addonsList.end(); ++itr)
     {
@@ -1432,7 +1432,7 @@ Warden* User::GetWarden()
     return &(*_warden);
 }
 
-bool User::DosProtection::EvaluateOpcode(WorldPacket& p, time_t time) const
+bool User::DosProtection::EvaluateOpcode(WDataStore& p, time_t time) const
 {
     uint32 maxPacketCounterAllowed = GetMaxPacketCounterAllowed(p.GetOpcode());
 
@@ -1747,7 +1747,7 @@ void User::ResetTimeSync()
 
 void User::SendTimeSync()
 {
-    WorldPacket data(SMSG_TIME_SYNC_REQ, 4);
+    WDataStore data(SMSG_TIME_SYNC_REQ, 4);
     data << uint32(_timeSyncNextCounter);
     Send(&data);
 
@@ -1830,7 +1830,7 @@ void User::InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHo
 //===========================================================================
 void User::SendGmResurrectFailure()
 {
-    WorldPacket msg(SMSG_RESURRECT_FAILED, sizeof(uint32_t));
+    WDataStore msg(SMSG_RESURRECT_FAILED, sizeof(uint32_t));
     msg << 1u;
     Send(&msg);
 }
@@ -1838,7 +1838,7 @@ void User::SendGmResurrectFailure()
 //===========================================================================
 void User::SendGmResurrectSuccess()
 {
-    WorldPacket msg(SMSG_RESURRECT_FAILED, sizeof(uint32_t));
+    WDataStore msg(SMSG_RESURRECT_FAILED, sizeof(uint32_t));
     msg << 0u;
     Send(&msg);
 }
@@ -1859,7 +1859,7 @@ void User::SendPlayerNotFoundFailure()
 static BOOL UserWorldTeleportHandler (User        *user,
                                       Opcodes     msgId,
                                       uint        eventTime,
-                                      WorldPacket *msg) {
+                                      WDataStore *msg) {
 
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);

@@ -1995,13 +1995,13 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
         {
             if (GetSpellInfo()->Id == SPELL_WILL_OF_THE_FORSAKEN_COOLDOWN_TRIGGER)
             {
-                WorldPacket data;
+                WDataStore data;
                 player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, 7744, GetSpellInfo()->CategoryRecoveryTime); // Will of the forsaken
                 player->User()->Send(&data);
             }
             else
             {
-                WorldPacket data(SMSG_INITIAL_SPELLS, (1 + 2 + 2 + 4 + 2 + 2 + 4 + 4));
+                WDataStore data(SMSG_INITIAL_SPELLS, (1 + 2 + 2 + 4 + 2 + 2 + 4 + 4));
                 data << uint8(0);
                 data << uint16(0);
                 data << uint16(1);
@@ -2012,7 +2012,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
                 data << uint32(GetSpellInfo()->CategoryRecoveryTime);
                 player->User()->Send(&data);
 
-                WorldPacket data2;
+                WDataStore data2;
                 player->BuildCooldownPacket(data2, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, SPELL_PVP_TRINKET, GetSpellInfo()->CategoryRecoveryTime); // PvP Trinket spell
                 player->User()->Send(&data2);
             }
@@ -2675,7 +2675,7 @@ class spell_gen_spirit_healer_res : public SpellScript
         Player* originalCaster = GetOriginalCaster()->ToPlayer();
         if (Unit* target = GetHitUnit())
         {
-            WorldPacket data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
+            WDataStore data(SMSG_SPIRIT_HEALER_CONFIRM, 8);
             data << target->GetGUID();
             originalCaster->User()->Send(&data);
         }
@@ -4510,7 +4510,7 @@ class spell_gen_charmed_unit_spell_cooldown : public SpellScript
         Unit* caster = GetCaster();
         if (Player* owner = caster->GetCharmerOrOwnerPlayerOrPlayerItself())
         {
-            WorldPacket data;
+            WDataStore data;
             caster->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, GetSpellInfo()->Id, GetSpellInfo()->RecoveryTime);
             owner->SendDirectMessage(&data);
         }

@@ -54,7 +54,7 @@ public:
             player->SaveToDB(false, false);
 
             // Send packet with money
-            WorldPacket data(SMSG_QUESTGIVER_QUEST_COMPLETE, (4 + 4 + 4 + 4 + 4));
+            WDataStore data(SMSG_QUESTGIVER_QUEST_COMPLETE, (4 + 4 + 4 + 4 + 4));
             data << uint32(quest->GetQuestId());
             data << uint32(0);
             data << uint32(moneyRew);

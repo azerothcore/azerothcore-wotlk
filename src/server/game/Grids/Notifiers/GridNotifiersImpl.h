@@ -26,7 +26,7 @@
 #include "Player.h"
 #include "SpellAuras.h"
 #include "UpdateData.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 template<class T>
@@ -540,7 +540,7 @@ void Acore::LocalizedPacketDo<Builder>::operator()(Player* p)
 {
     LocaleConstant loc_idx = p->User()->GetSessionDbLocaleIndex();
     uint32 cache_idx = loc_idx + 1;
-    WorldPacket* data;
+    WDataStore* data;
 
     // create if not cached yet
     if (i_data_cache.size() < cache_idx + 1 || !i_data_cache[cache_idx])
@@ -548,7 +548,7 @@ void Acore::LocalizedPacketDo<Builder>::operator()(Player* p)
         if (i_data_cache.size() < cache_idx + 1)
             i_data_cache.resize(cache_idx + 1);
 
-        data = new WorldPacket();
+        data = new WDataStore();
 
         i_builder(*data, loc_idx);
 

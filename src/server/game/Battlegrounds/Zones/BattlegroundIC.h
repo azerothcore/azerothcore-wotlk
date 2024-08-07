@@ -939,7 +939,7 @@ protected:
         }
     }
 
-    void BuildObjectivesBlock(WorldPacket& data) final;
+    void BuildObjectivesBlock(WDataStore& data) final;
 
     uint32 GetAttr1() const override { return BasesAssaulted; }
     uint32 GetAttr2() const override { return BasesDefended; }
@@ -974,7 +974,7 @@ public:
     /* Scorekeeping */
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WDataStore& data) override;
 
     void HandlePlayerResurrect(Player* player) override;
 

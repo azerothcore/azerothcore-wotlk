@@ -20,24 +20,24 @@
 #include "ObjectMgr.h"
 #include <cstdarg>
 
-void Acore::BroadcastTextBuilder::operator()(WorldPacket& data, LocaleConstant locale) const
+void Acore::BroadcastTextBuilder::operator()(WDataStore& data, LocaleConstant locale) const
 {
     BroadcastText const* bct = sObjectMgr->GetBroadcastText(_textId);
     ChatHandler::BuildChatPacket(data, _msgType, bct ? Language(bct->LanguageID) : LANG_UNIVERSAL, _source, _target, bct ? bct->GetText(locale, _gender) : "", _achievementId, "", locale);
 }
 
-std::size_t Acore::BroadcastTextBuilder::operator()(WorldPacket* data, LocaleConstant locale) const
+std::size_t Acore::BroadcastTextBuilder::operator()(WDataStore* data, LocaleConstant locale) const
 {
     BroadcastText const* bct = sObjectMgr->GetBroadcastText(_textId);
     return ChatHandler::BuildChatPacket(*data, _msgType, bct ? Language(bct->LanguageID) : LANG_UNIVERSAL, _source, _target, bct ? bct->GetText(locale, _gender) : "", _achievementId, "", locale);
 }
 
-void Acore::CustomChatTextBuilder::operator()(WorldPacket& data, LocaleConstant locale) const
+void Acore::CustomChatTextBuilder::operator()(WDataStore& data, LocaleConstant locale) const
 {
     ChatHandler::BuildChatPacket(data, _msgType, _language, _source, _target, _text, 0, "", locale);
 }
 
-void Acore::AcoreStringChatBuilder::operator()(WorldPacket& data, LocaleConstant locale) const
+void Acore::AcoreStringChatBuilder::operator()(WDataStore& data, LocaleConstant locale) const
 {
     char const* text = sObjectMgr->GetAcoreString(_textId, locale);
 

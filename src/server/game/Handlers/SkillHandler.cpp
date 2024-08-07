@@ -20,10 +20,10 @@
 #include "Pet.h"
 #include "Player.h"
 #include "SpellMgr.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleLearnTalentOpcode(WorldPacket& recvData)
+void User::HandleLearnTalentOpcode(WDataStore& recvData)
 {
     uint32 talent_id, requested_rank;
     recvData >> talent_id >> requested_rank;
@@ -32,7 +32,7 @@ void User::HandleLearnTalentOpcode(WorldPacket& recvData)
     m_player->SendTalentsInfoData(false);
 }
 
-void User::HandleLearnPreviewTalents(WorldPacket& recvPacket)
+void User::HandleLearnPreviewTalents(WDataStore& recvPacket)
 {
     LOG_DEBUG("network", "CMSG_LEARN_PREVIEW_TALENTS");
 
@@ -56,7 +56,7 @@ void User::HandleLearnPreviewTalents(WorldPacket& recvPacket)
     recvPacket.rfinish();
 }
 
-void User::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
+void User::HandleTalentWipeConfirmOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "MSG_TALENT_WIPE_CONFIRM");
     WOWGUID guid;
@@ -78,7 +78,7 @@ void User::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
 
     if (!(m_player->resetTalents()))
     {
-        WorldPacket data(MSG_TALENT_WIPE_CONFIRM, 8 + 4);  //you have not any talent
+        WDataStore data(MSG_TALENT_WIPE_CONFIRM, 8 + 4);  //you have not any talent
         data << uint64(0);
         data << uint32(0);
         Send(&data);
@@ -89,7 +89,7 @@ void User::HandleTalentWipeConfirmOpcode(WorldPacket& recvData)
     unit->CastSpell(m_player, 14867, true);                  //spell: "Untalent Visual Effect"
 }
 
-void User::HandleUnlearnSkillOpcode(WorldPacket& recvData)
+void User::HandleUnlearnSkillOpcode(WDataStore& recvData)
 {
     uint32 skillId;
     recvData >> skillId;

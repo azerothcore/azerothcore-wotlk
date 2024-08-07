@@ -22,7 +22,7 @@
 #include "DatabaseEnv.h"
 #include "Define.h"
 #include "SharedDefines.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include <string>
 #include <vector>
 
@@ -324,7 +324,7 @@ public:
     typedef std::vector<uint32> PrevChainQuests;
     PrevChainQuests prevChainQuests;
 
-    WorldPacket queryData; // pussywizard
+    WDataStore queryData; // pussywizard
     void InitializeQueryData(); // pussywizard
 
     void SetEventIdForQuest(uint16 eventId) { _eventIdForQuest = eventId; }

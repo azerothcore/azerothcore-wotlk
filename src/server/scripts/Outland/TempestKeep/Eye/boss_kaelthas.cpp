@@ -20,7 +20,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "the_eye.h"
 
 enum Yells

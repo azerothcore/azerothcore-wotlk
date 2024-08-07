@@ -21,7 +21,7 @@
 #include "OutdoorPvPMgr.h"
 #include "OutdoorPvPScript.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 OutdoorPvPGH::OutdoorPvPGH()
 {
@@ -49,7 +49,7 @@ OPvPCapturePointGH::OPvPCapturePointGH(OutdoorPvP* pvp) : OPvPCapturePoint(pvp)
     SetCapturePointData(189310, 571, 2483.68f, -1873.6f, 10.6877f, -0.104719f, 0.0f, 0.0f, 0.0f, 1.0f);
 }
 
-void OPvPCapturePointGH::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointGH::FillInitialWorldStates(WDataStore& data)
 {
     data << GH_UI_SLIDER_DISPLAY << uint32(0);
     data << GH_UI_SLIDER_POS << uint32(50);

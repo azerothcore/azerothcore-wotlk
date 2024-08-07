@@ -24,7 +24,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp) :
     _pvp(pvp)
@@ -630,7 +630,7 @@ bool OutdoorPvP::HandleAreaTrigger(Player* /*player*/, uint32 /*trigger*/)
     return false;
 }
 
-void OutdoorPvP::BroadcastPacket(WorldPacket& data) const
+void OutdoorPvP::BroadcastPacket(WDataStore& data) const
 {
     // This is faster than sWorld->SendZoneMessage
     for (auto const& playerSet : _players)

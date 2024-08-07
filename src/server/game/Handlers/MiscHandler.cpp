@@ -48,11 +48,11 @@
 #include "Vehicle.h"
 #include "WhoListCacheMgr.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 #include <zlib.h>
 
-void User::HandleRepopRequestOpcode(WorldPacket& recv_data)
+void User::HandleRepopRequestOpcode(WDataStore& recv_data)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_REPOP_REQUEST Message");
 
@@ -82,7 +82,7 @@ void User::HandleRepopRequestOpcode(WorldPacket& recv_data)
     GetPlayer()->RepopAtGraveyard();
 }
 
-void User::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
+void User::HandleGossipSelectOptionOpcode(WDataStore& recv_data)
 {
     LOG_DEBUG("network", "WORLD: CMSG_GOSSIP_SELECT_OPTION");
 
@@ -207,7 +207,7 @@ void User::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
     }
 }
 
-void User::HandleWhoOpcode(WorldPacket& recvData)
+void User::HandleWhoOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_WHO Message");
 
@@ -279,7 +279,7 @@ void User::HandleWhoOpcode(WorldPacket& recvData)
     uint32 gmLevelInWhoList = sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST);
     uint32 displaycount = 0;
 
-    WorldPacket data(SMSG_WHO, 50);     // guess size
+    WDataStore data(SMSG_WHO, 50);     // guess size
     data << uint32(matchCount);         // placeholder, count of players matching criteria
     data << uint32(displaycount);       // placeholder, count of players displayed
 
@@ -414,7 +414,7 @@ void User::HandleWhoOpcode(WorldPacket& recvData)
 }
 
 //===========================================================================
-void User::HandlePlayerLogout(WorldPacket &msg)
+void User::HandlePlayerLogout(WDataStore &msg)
 {
     if (!IsGMAccount()) {
         SendNotification(LANG_PERMISSION_DENIED);
@@ -423,7 +423,7 @@ void User::HandlePlayerLogout(WorldPacket &msg)
     CharacterRemoveFromGame(true);
 }
 
-void User::HandleTogglePvP(WorldPacket& recv_data)
+void User::HandleTogglePvP(WDataStore& recv_data)
 {
     // this opcode can be used in two ways: Either set explicit new status or toggle old status
     if (recv_data.size() == 1)
@@ -444,7 +444,7 @@ void User::HandleTogglePvP(WorldPacket& recv_data)
     //    pvp->HandlePlayerActivityChanged(m_player);
 }
 
-void User::HandleZoneUpdateOpcode(WorldPacket& recv_data)
+void User::HandleZoneUpdateOpcode(WDataStore& recv_data)
 {
     uint32 newZone;
     recv_data >> newZone;
@@ -457,7 +457,7 @@ void User::HandleZoneUpdateOpcode(WorldPacket& recv_data)
     //GetPlayer()->SendInitWorldStates(true, newZone);
 }
 
-void User::HandleSetSelectionOpcode(WorldPacket& recv_data)
+void User::HandleSetSelectionOpcode(WDataStore& recv_data)
 {
     WOWGUID guid;
     recv_data >> guid;
@@ -483,7 +483,7 @@ void User::HandleSetSelectionOpcode(WorldPacket& recv_data)
     }
 }
 
-void User::HandleStandStateChangeOpcode(WorldPacket& recv_data)
+void User::HandleStandStateChangeOpcode(WDataStore& recv_data)
 {
     uint32 animstate;
     recv_data >> animstate;
@@ -539,7 +539,7 @@ void User::HandleCharacterAuraFrozen(PreparedQueryResult result)
     } while (result->NextRow());
 }
 
-void User::HandleBugOpcode(WorldPacket& recv_data)
+void User::HandleBugOpcode(WDataStore& recv_data)
 {
     uint32 suggestion, contentlen, typelen;
     std::string content, type;
@@ -556,7 +556,7 @@ void User::HandleBugOpcode(WorldPacket& recv_data)
     CharacterDatabase.Execute(stmt);
 }
 
-void User::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
+void User::HandleReclaimCorpseOpcode(WDataStore& recv_data)
 {
     WOWGUID corpseGUID;
     recv_data >> corpseGUID;
@@ -590,7 +590,7 @@ void User::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
     m_player->SpawnCorpseBones();
 }
 
-void User::HandleResurrectResponseOpcode(WorldPacket& recv_data)
+void User::HandleResurrectResponseOpcode(WDataStore& recv_data)
 {
     WOWGUID resurrectOfferer;
     bool accept;
@@ -624,7 +624,7 @@ void User::SendAreaTriggerMessage(const char* Text, ...)
     va_end(ap);
 
     uint32 length = strlen(szStr) + 1;
-    WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
+    WDataStore data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
     data << length;
     data << szStr;
     Send(&data);
@@ -644,14 +644,14 @@ void User::SendAreaTriggerMessage(uint32 entry, ...)
         va_end(ap);
 
         uint32 length = strlen(szStr) + 1;
-        WorldPacket data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
+        WDataStore data(SMSG_AREA_TRIGGER_MESSAGE, 4 + length);
         data << length;
         data << szStr;
         Send(&data);
     }
 }
 
-void User::HandleAreaTriggerOpcode(WorldPacket& recv_data)
+void User::HandleAreaTriggerOpcode(WDataStore& recv_data)
 {
     uint32 triggerId;
     recv_data >> triggerId;
@@ -769,7 +769,7 @@ void User::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         player->Teleport(at->target_mapId, at->target_X, at->target_Y, at->target_Z, at->target_Orientation, TELE_TO_NOT_LEAVE_TRANSPORT);
 }
 
-void User::HandleUpdateAccountData(WorldPacket& recv_data)
+void User::HandleUpdateAccountData(WDataStore& recv_data)
 {
     uint32 type, timestamp, decompressedSize;
     recv_data >> type >> timestamp >> decompressedSize;
@@ -783,7 +783,7 @@ void User::HandleUpdateAccountData(WorldPacket& recv_data)
     {
         SetAccountData(AccountDataType(type), 0, "");
 
-        WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4 + 4);
+        WDataStore data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4 + 4);
         data << uint32(type);
         data << uint32(0);
         Send(&data);
@@ -816,13 +816,13 @@ void User::HandleUpdateAccountData(WorldPacket& recv_data)
 
     SetAccountData(AccountDataType(type), timestamp, adata);
 
-    WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4 + 4);
+    WDataStore data(SMSG_UPDATE_ACCOUNT_DATA_COMPLETE, 4 + 4);
     data << uint32(type);
     data << uint32(0);
     Send(&data);
 }
 
-void User::HandleRequestAccountData(WorldPacket& recv_data)
+void User::HandleRequestAccountData(WDataStore& recv_data)
 {
     uint32 type;
     recv_data >> type;
@@ -849,7 +849,7 @@ void User::HandleRequestAccountData(WorldPacket& recv_data)
 
     dest.resize(destSize);
 
-    WorldPacket data(SMSG_UPDATE_ACCOUNT_DATA, 8 + 4 + 4 + 4 + destSize);
+    WDataStore data(SMSG_UPDATE_ACCOUNT_DATA, 8 + 4 + 4 + 4 + destSize);
     data << (m_player ? m_player->GetGUID() : WOWGUID::Empty); // player guid
     data << uint32(type);                                       // type (0-7)
     data << uint32(adata->Time);                                // unix time
@@ -858,7 +858,7 @@ void User::HandleRequestAccountData(WorldPacket& recv_data)
     Send(&data);
 }
 
-void User::HandleSetActionButtonOpcode(WorldPacket& recv_data)
+void User::HandleSetActionButtonOpcode(WDataStore& recv_data)
 {
     uint8 button;
     uint32 packetData;
@@ -899,25 +899,25 @@ void User::HandleSetActionButtonOpcode(WorldPacket& recv_data)
     }
 }
 
-void User::HandleCompleteCinematic(WorldPacket& /*recv_data*/)
+void User::HandleCompleteCinematic(WDataStore& /*recv_data*/)
 {
     // If player has sight bound to visual waypoint NPC we should remove it
     GetPlayer()->GetCinematicMgr()->EndCinematic();
 }
 
-void User::HandleNextCinematicCamera(WorldPacket& /*recv_data*/)
+void User::HandleNextCinematicCamera(WDataStore& /*recv_data*/)
 {
     // Sent by client when cinematic actually begun. So we begin the server side process
     GetPlayer()->GetCinematicMgr()->BeginCinematic();
 }
 
-void User::HandleFeatherFallAck(WorldPacket& recv_data)
+void User::HandleFeatherFallAck(WDataStore& recv_data)
 {
     // no used
     recv_data.rfinish();                       // prevent warnings spam
 }
 
-void User::HandleSetActionBarToggles(WorldPacket& recv_data)
+void User::HandleSetActionBarToggles(WDataStore& recv_data)
 {
     uint8 ActionBar;
 
@@ -942,7 +942,7 @@ void User::HandlePlayedTime(WorldPackets::Character::PlayedTimeClient& packet)
     Send(playedTime.Write());
 }
 
-void User::HandleInspectOpcode(WorldPacket& recv_data)
+void User::HandleInspectOpcode(WDataStore& recv_data)
 {
     WOWGUID guid;
     recv_data >> guid;
@@ -966,7 +966,7 @@ void User::HandleInspectOpcode(WorldPacket& recv_data)
 
     uint32 talent_points = 0x47;
     uint32 guid_size = player->GetPackGUID().size();
-    WorldPacket data(SMSG_INSPECT_TALENT, guid_size + 4 + talent_points);
+    WDataStore data(SMSG_INSPECT_TALENT, guid_size + 4 + talent_points);
     data << player->GetPackGUID();
 
     if (sWorld->getBoolConfig(CONFIG_TALENTS_INSPECTING) || m_player->IsGameMaster())
@@ -984,7 +984,7 @@ void User::HandleInspectOpcode(WorldPacket& recv_data)
     Send(&data);
 }
 
-void User::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
+void User::HandleInspectHonorStatsOpcode(WDataStore& recv_data)
 {
     WOWGUID guid;
     recv_data >> guid;
@@ -1006,7 +1006,7 @@ void User::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
         return;
     }
 
-    WorldPacket data(MSG_INSPECT_HONOR_STATS, 8 + 1 + 4 * 4);
+    WDataStore data(MSG_INSPECT_HONOR_STATS, 8 + 1 + 4 * 4);
     data << player->GetGUID();
     data << uint8(player->GetHonorPoints());
     data << uint32(player->GetUInt32Value(PLAYER_FIELD_KILLS));
@@ -1016,7 +1016,7 @@ void User::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
     Send(&data);
 }
 
-void User::HandleComplainOpcode(WorldPacket& recv_data)
+void User::HandleComplainOpcode(WDataStore& recv_data)
 {
     LOG_DEBUG("network", "WORLD: CMSG_COMPLAIN");
 
@@ -1049,7 +1049,7 @@ void User::HandleComplainOpcode(WorldPacket& recv_data)
     // if it's mail spam - ALL mails from this spammer automatically removed by client
 
     // Complaint Received message
-    WorldPacket data(SMSG_COMPLAIN_RESULT, 1);
+    WDataStore data(SMSG_COMPLAIN_RESULT, 1);
     data << uint8(0);
     Send(&data);
 
@@ -1057,7 +1057,7 @@ void User::HandleComplainOpcode(WorldPacket& recv_data)
         spam_type, spammer_guid.ToString(), unk1, unk2, unk3, unk4, description);
 }
 
-void User::HandleRealmSplitOpcode(WorldPacket& recv_data)
+void User::HandleRealmSplitOpcode(WDataStore& recv_data)
 {
     LOG_DEBUG("network", "CMSG_REALM_SPLIT");
 
@@ -1065,7 +1065,7 @@ void User::HandleRealmSplitOpcode(WorldPacket& recv_data)
     std::string split_date = "01/01/01";
     recv_data >> unk;
 
-    WorldPacket data(SMSG_REALM_SPLIT, 4 + 4 + split_date.size() + 1);
+    WDataStore data(SMSG_REALM_SPLIT, 4 + 4 + split_date.size() + 1);
     data << unk;
     data << uint32(0x00000000);                             // realm split state
     // split states:
@@ -1076,7 +1076,7 @@ void User::HandleRealmSplitOpcode(WorldPacket& recv_data)
     Send(&data);
 }
 
-void User::HandleFarSightOpcode(WorldPacket& recvData)
+void User::HandleFarSightOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_FAR_SIGHT");
 
@@ -1125,7 +1125,7 @@ void User::HandleFarSightOpcode(WorldPacket& recvData)
     GetPlayer()->UpdateVisibilityForPlayer();
 }
 
-void User::HandleSetTitleOpcode(WorldPacket& recv_data)
+void User::HandleSetTitleOpcode(WDataStore& recv_data)
 {
     LOG_DEBUG("network", "CMSG_SET_TITLE");
 
@@ -1144,7 +1144,7 @@ void User::HandleSetTitleOpcode(WorldPacket& recv_data)
     GetPlayer()->SetUInt32Value(PLAYER_CHOSEN_TITLE, title);
 }
 
-void User::HandleResetInstancesOpcode(WorldPacket& /*recv_data*/)
+void User::HandleResetInstancesOpcode(WDataStore& /*recv_data*/)
 {
     LOG_DEBUG("network", "WORLD: CMSG_RESET_INSTANCES");
 
@@ -1157,7 +1157,7 @@ void User::HandleResetInstancesOpcode(WorldPacket& /*recv_data*/)
         Player::ResetInstances(m_player->GetGUID(), INSTANCE_RESET_ALL, false);
 }
 
-void User::HandleSetDungeonDifficultyOpcode(WorldPacket& recv_data)
+void User::HandleSetDungeonDifficultyOpcode(WDataStore& recv_data)
 {
     LOG_DEBUG("network", "MSG_SET_DUNGEON_DIFFICULTY");
 
@@ -1210,7 +1210,7 @@ void User::HandleSetDungeonDifficultyOpcode(WorldPacket& recv_data)
     }
 }
 
-void User::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
+void User::HandleSetRaidDifficultyOpcode(WDataStore& recv_data)
 {
     LOG_DEBUG("network", "MSG_SET_RAID_DIFFICULTY");
 
@@ -1370,7 +1370,7 @@ void User::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
     }
 }
 
-void User::HandleCancelMountAuraOpcode(WorldPacket& /*recv_data*/)
+void User::HandleCancelMountAuraOpcode(WDataStore& /*recv_data*/)
 {
     LOG_DEBUG("network", "WORLD: CMSG_CANCEL_MOUNT_AURA");
 
@@ -1391,7 +1391,7 @@ void User::HandleCancelMountAuraOpcode(WorldPacket& /*recv_data*/)
     m_player->RemoveAurasByType(SPELL_AURA_MOUNTED);
 }
 
-void User::HandleMoveSetCanFlyAckOpcode(WorldPacket& recv_data)
+void User::HandleMoveSetCanFlyAckOpcode(WDataStore& recv_data)
 {
     // fly mode on/off
     LOG_DEBUG("network", "WORLD: CMSG_MOVE_SET_CAN_FLY_ACK");
@@ -1431,7 +1431,7 @@ void User::HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& /*packet*/)
         m_player->CharmSpellInitialize();
 }
 
-void User::HandleSetTaxiBenchmarkOpcode(WorldPacket& recv_data)
+void User::HandleSetTaxiBenchmarkOpcode(WDataStore& recv_data)
 {
     uint8 mode;
     recv_data >> mode;
@@ -1441,7 +1441,7 @@ void User::HandleSetTaxiBenchmarkOpcode(WorldPacket& recv_data)
     LOG_DEBUG("network", "Client used \"/timetest {}\" command", mode);
 }
 
-void User::HandleQueryInspectAchievements(WorldPacket& recv_data)
+void User::HandleQueryInspectAchievements(WDataStore& recv_data)
 {
     WOWGUID guid;
     recv_data >> guid.ReadAsPacked();
@@ -1465,7 +1465,7 @@ void User::HandleQueryInspectAchievements(WorldPacket& recv_data)
     player->SendRespondInspectAchievements(m_player);
 }
 
-void User::HandleWorldStateUITimerUpdate(WorldPacket& /*recv_data*/)
+void User::HandleWorldStateUITimerUpdate(WDataStore& /*recv_data*/)
 {
     // empty opcode
     LOG_DEBUG("network", "WORLD: CMSG_WORLD_STATE_UI_TIMER_UPDATE");
@@ -1475,7 +1475,7 @@ void User::HandleWorldStateUITimerUpdate(WorldPacket& /*recv_data*/)
     Send(response.Write());
 }
 
-void User::HandleReadyForAccountDataTimes(WorldPacket& /*recv_data*/)
+void User::HandleReadyForAccountDataTimes(WDataStore& /*recv_data*/)
 {
     // empty opcode
     LOG_DEBUG("network", "WORLD: CMSG_READY_FOR_ACCOUNT_DATA_TIMES");
@@ -1485,13 +1485,13 @@ void User::HandleReadyForAccountDataTimes(WorldPacket& /*recv_data*/)
 
 void User::SendSetPhaseShift(uint32 PhaseShift)
 {
-    WorldPacket data(SMSG_SET_PHASE_SHIFT, 4);
+    WDataStore data(SMSG_SET_PHASE_SHIFT, 4);
     data << uint32(PhaseShift);
     Send(&data);
 }
 
 //Battlefield and Battleground
-void User::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
+void User::HandleAreaSpiritHealerQueryOpcode(WDataStore& recv_data)
 {
     LOG_DEBUG("network", "WORLD: CMSG_AREA_SPIRIT_HEALER_QUERY");
 
@@ -1514,7 +1514,7 @@ void User::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
         bf->SendAreaSpiritHealerQueryOpcode(m_player, guid);
 }
 
-void User::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data)
+void User::HandleAreaSpiritHealerQueueOpcode(WDataStore& recv_data)
 {
     LOG_DEBUG("network", "WORLD: CMSG_AREA_SPIRIT_HEALER_QUEUE");
 
@@ -1537,7 +1537,7 @@ void User::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data)
         bf->AddPlayerToResurrectQueue(guid, m_player->GetGUID());
 }
 
-void User::HandleHearthAndResurrect(WorldPacket& /*recv_data*/)
+void User::HandleHearthAndResurrect(WDataStore& /*recv_data*/)
 {
     if (m_player->IsOnTaxi())
         return;
@@ -1558,7 +1558,7 @@ void User::HandleHearthAndResurrect(WorldPacket& /*recv_data*/)
     m_player->Teleport(m_player->m_homebindMapId, m_player->m_homebindX, m_player->m_homebindY, m_player->m_homebindZ, m_player->GetOrientation());
 }
 
-void User::HandleInstanceLockResponse(WorldPacket& recvPacket)
+void User::HandleInstanceLockResponse(WDataStore& recvPacket)
 {
     uint8 accept;
     recvPacket >> accept;
@@ -1578,7 +1578,7 @@ void User::HandleInstanceLockResponse(WorldPacket& recvPacket)
     m_player->SetPendingBind(0, 0);
 }
 
-void User::HandleUpdateMissileTrajectory(WorldPacket& recvPacket)
+void User::HandleUpdateMissileTrajectory(WDataStore& recvPacket)
 {
     LOG_DEBUG("network", "WORLD: CMSG_UPDATE_MISSILE_TRAJECTORY");
 
@@ -1623,7 +1623,7 @@ void User::HandleUpdateMissileTrajectory(WorldPacket& recvPacket)
 }
 
 //===========================================================================
-void User::BootMeHandler(WorldPacket& msg)
+void User::BootMeHandler(WDataStore& msg)
 {
     if (!IsGMAccount()) {
         SendNotification(LANG_PERMISSION_DENIED);
@@ -1633,7 +1633,7 @@ void User::BootMeHandler(WorldPacket& msg)
 }
 
 //===========================================================================
-void User::GmResurrectHandler(WorldPacket& msg)
+void User::GmResurrectHandler(WDataStore& msg)
 {
     if (!IsGMAccount()) {
         SendNotification(LANG_PERMISSION_DENIED);

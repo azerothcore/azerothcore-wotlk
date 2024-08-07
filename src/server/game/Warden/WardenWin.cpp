@@ -29,7 +29,7 @@
 #include "WardenCheckMgr.h"
 #include "WardenModuleWin.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 // GUILD is the shortest string that has no client validation (RAID only sends if in a raid group)
@@ -204,7 +204,7 @@ void WardenWin::InitializeModule()
     // Encrypt with warden RC4 key.
     EncryptData(reinterpret_cast<uint8*>(&Request), sizeof(WardenInitModuleRequest));
 
-    WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenInitModuleRequest));
+    WDataStore pkt(SMSG_WARDEN_DATA, sizeof(WardenInitModuleRequest));
     pkt.append(reinterpret_cast<uint8*>(&Request), sizeof(WardenInitModuleRequest));
     _session->Send(&pkt);
 }
@@ -221,7 +221,7 @@ void WardenWin::RequestHash()
     // Encrypt with warden RC4 key.
     EncryptData(reinterpret_cast<uint8*>(&Request), sizeof(WardenHashRequest));
 
-    WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenHashRequest));
+    WDataStore pkt(SMSG_WARDEN_DATA, sizeof(WardenHashRequest));
     pkt.append(reinterpret_cast<uint8*>(&Request), sizeof(WardenHashRequest));
     _session->Send(&pkt);
 }
@@ -543,7 +543,7 @@ void WardenWin::RequestChecks()
     // Encrypt with warden RC4 key
     EncryptData(buff.contents(), buff.size());
 
-    WorldPacket pkt(SMSG_WARDEN_DATA, buff.size());
+    WDataStore pkt(SMSG_WARDEN_DATA, buff.size());
     pkt.append(buff);
     _session->Send(&pkt);
 

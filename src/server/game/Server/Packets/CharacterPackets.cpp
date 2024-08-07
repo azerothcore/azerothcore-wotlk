@@ -32,7 +32,7 @@ void WorldPackets::Character::PlayedTimeClient::Read()
     _worldPacket >> TriggerScriptEvent;
 }
 
-WorldPacket const* WorldPackets::Character::PlayedTime::Write()
+WDataStore const* WorldPackets::Character::PlayedTime::Write()
 {
     _worldPacket << uint32(TotalTime);
     _worldPacket << uint32(LevelTime);

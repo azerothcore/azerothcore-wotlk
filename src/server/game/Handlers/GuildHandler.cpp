@@ -22,7 +22,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 void User::HandleGuildQueryOpcode(WorldPackets::Guild::QueryGuildInfo& query)

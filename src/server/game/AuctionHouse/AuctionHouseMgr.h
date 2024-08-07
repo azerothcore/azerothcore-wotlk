@@ -23,7 +23,7 @@
 #include "DatabaseEnv.h"
 #include "EventProcessor.h"
 #include "GUID.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include <unordered_map>
 
 class Item;
@@ -117,7 +117,7 @@ struct AuctionEntry
     [[nodiscard]] uint8 GetHouseId() const { return houseId; }
     [[nodiscard]] uint32 GetAuctionCut() const;
     [[nodiscard]] uint32 GetAuctionOutBid() const;
-    bool BuildAuctionInfo(WorldPacket& data) const;
+    bool BuildAuctionInfo(WDataStore& data) const;
     void DeleteFromDB(CharacterDatabaseTransaction trans) const;
     void SaveToDB(CharacterDatabaseTransaction trans) const;
     bool LoadFromDB(Field* fields);
@@ -157,9 +157,9 @@ public:
 
     void Update();
 
-    void BuildListBidderItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
-    void BuildListOwnerItems(WorldPacket& data, Player* player, uint32& count, uint32& totalcount);
-    bool BuildListAuctionItems(WorldPacket& data, Player* player,
+    void BuildListBidderItems(WDataStore& data, Player* player, uint32& count, uint32& totalcount);
+    void BuildListOwnerItems(WDataStore& data, Player* player, uint32& count, uint32& totalcount);
+    bool BuildListAuctionItems(WDataStore& data, Player* player,
                                std::wstring const& searchedname, uint32 listfrom, uint8 levelmin, uint8 levelmax, uint8 usable,
                                uint32 inventoryType, uint32 itemClass, uint32 itemSubClass, uint32 quality,
                                uint32& count, uint32& totalcount, uint8 getAll, AuctionSortOrderVector const& sortOrder, Milliseconds searchTimeout);

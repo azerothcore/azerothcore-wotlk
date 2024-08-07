@@ -28,7 +28,7 @@ namespace WorldPackets
         class DismissCritter final : public ClientPacket
         {
         public:
-            DismissCritter(WorldPacket&& packet) : ClientPacket(CMSG_DISMISS_CRITTER, std::move(packet)) { }
+            DismissCritter(WDataStore&& packet) : ClientPacket(CMSG_DISMISS_CRITTER, std::move(packet)) { }
 
             void Read() override;
 
@@ -38,7 +38,7 @@ namespace WorldPackets
         class PetAbandon final : public ClientPacket
         {
         public:
-            PetAbandon(WorldPacket&& packet) : ClientPacket(CMSG_PET_ABANDON, std::move(packet)) { }
+            PetAbandon(WDataStore&& packet) : ClientPacket(CMSG_PET_ABANDON, std::move(packet)) { }
 
             void Read() override;
 
@@ -48,7 +48,7 @@ namespace WorldPackets
         class PetStopAttack final : public ClientPacket
         {
         public:
-            PetStopAttack(WorldPacket&& packet) : ClientPacket(CMSG_PET_STOP_ATTACK, std::move(packet)) { }
+            PetStopAttack(WDataStore&& packet) : ClientPacket(CMSG_PET_STOP_ATTACK, std::move(packet)) { }
 
             void Read() override;
 
@@ -58,7 +58,7 @@ namespace WorldPackets
         class PetSpellAutocast final : public ClientPacket
         {
         public:
-            PetSpellAutocast(WorldPacket&& packet) : ClientPacket(CMSG_PET_SPELL_AUTOCAST, std::move(packet)) { }
+            PetSpellAutocast(WDataStore&& packet) : ClientPacket(CMSG_PET_SPELL_AUTOCAST, std::move(packet)) { }
 
             void Read() override;
 
@@ -72,7 +72,7 @@ namespace WorldPackets
         public:
             PetLearnedSpell() : ServerPacket(SMSG_PET_LEARNED_SPELL, 4) { }
 
-            WorldPacket const* Write() override;
+            WDataStore const* Write() override;
 
             uint32 SpellID = 0;
         };
@@ -82,7 +82,7 @@ namespace WorldPackets
         public:
             PetUnlearnedSpell() : ServerPacket(SMSG_PET_UNLEARNED_SPELL, 4) { }
 
-            WorldPacket const* Write() override;
+            WDataStore const* Write() override;
 
             uint32 SpellID = 0;
         };
@@ -90,7 +90,7 @@ namespace WorldPackets
         class RequestPetInfo final : public ClientPacket
         {
         public:
-            RequestPetInfo(WorldPacket&& packet) : ClientPacket(CMSG_REQUEST_PET_INFO, std::move(packet)) { }
+            RequestPetInfo(WDataStore&& packet) : ClientPacket(CMSG_REQUEST_PET_INFO, std::move(packet)) { }
 
             void Read() override { }
         };

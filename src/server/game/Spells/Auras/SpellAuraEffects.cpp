@@ -36,7 +36,7 @@
 #include "Unit.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2821,7 +2821,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
     if (apply)
     {
         /*
-        WorldPacket data(SMSG_FEIGN_DEATH_RESISTED, 9);
+        WDataStore data(SMSG_FEIGN_DEATH_RESISTED, 9);
         data<<target->GetGUID();
         data<<uint8(0);
         target->SendMessageToSet(&data, true);
@@ -2908,7 +2908,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
     else
     {
         /*
-        WorldPacket data(SMSG_FEIGN_DEATH_RESISTED, 9);
+        WDataStore data(SMSG_FEIGN_DEATH_RESISTED, 9);
         data<<target->GetGUID();
         data<<uint8(1);
         target->SendMessageToSet(&data, true);
@@ -6166,7 +6166,7 @@ void AuraEffect::HandleAuraSetVehicle(AuraApplication const* aurApp, uint8 mode,
     else if (target->GetVehicleKit())
         target->RemoveVehicleKit();
 
-    WorldPacket data(SMSG_PLAYER_VEHICLE_DATA, target->GetPackGUID().size() + 4);
+    WDataStore data(SMSG_PLAYER_VEHICLE_DATA, target->GetPackGUID().size() + 4);
     data << target->GetPackGUID();
     data << uint32(apply ? vehicleId : 0);
     target->SendMessageToSet(&data, true);

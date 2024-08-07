@@ -517,7 +517,7 @@ struct npc_pet_gen_imp_in_a_bottle : public NullCreatureAI
         _hasParty = false;
     }
 
-    WorldPacket _data;
+    WDataStore _data;
     uint32 _talkTimer;
     WOWGUID _ownerGUID;
     bool _hasParty;

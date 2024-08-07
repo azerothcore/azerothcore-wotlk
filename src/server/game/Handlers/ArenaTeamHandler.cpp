@@ -22,10 +22,10 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
+void User::HandleInspectArenaTeamsOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "MSG_INSPECT_ARENA_TEAMS");
 
@@ -59,7 +59,7 @@ void User::HandleInspectArenaTeamsOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleArenaTeamQueryOpcode(WorldPacket& recvData)
+void User::HandleArenaTeamQueryOpcode(WDataStore& recvData)
 {
     uint32 arenaTeamId;
     recvData >> arenaTeamId;
@@ -71,7 +71,7 @@ void User::HandleArenaTeamQueryOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleArenaTeamRosterOpcode(WorldPacket& recvData)
+void User::HandleArenaTeamRosterOpcode(WDataStore& recvData)
 {
     uint32 arenaTeamId;                                     // arena team id
     recvData >> arenaTeamId;
@@ -80,7 +80,7 @@ void User::HandleArenaTeamRosterOpcode(WorldPacket& recvData)
         arenaTeam->Roster(this);
 }
 
-void User::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
+void User::HandleArenaTeamInviteOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_INVITE");
 
@@ -156,7 +156,7 @@ void User::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
 
     player->SetArenaTeamIdInvited(arenaTeam->GetId());
 
-    WorldPacket data(SMSG_ARENA_TEAM_INVITE, (8 + 10));
+    WDataStore data(SMSG_ARENA_TEAM_INVITE, (8 + 10));
     data << GetPlayer()->GetName();
     data << arenaTeam->GetName();
     player->User()->Send(&data);
@@ -164,7 +164,7 @@ void User::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
     LOG_DEBUG("network", "WORLD: Sent SMSG_ARENA_TEAM_INVITE");
 }
 
-void User::HandleArenaTeamAcceptOpcode(WorldPacket& /*recvData*/)
+void User::HandleArenaTeamAcceptOpcode(WDataStore& /*recvData*/)
 {
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_ACCEPT");                // empty opcode
 
@@ -197,7 +197,7 @@ void User::HandleArenaTeamAcceptOpcode(WorldPacket& /*recvData*/)
     arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_JOIN_SS, m_player->GetGUID(), 2, m_player->GetName().c_str(), arenaTeam->GetName(), "");
 }
 
-void User::HandleArenaTeamDeclineOpcode(WorldPacket& /*recvData*/)
+void User::HandleArenaTeamDeclineOpcode(WDataStore& /*recvData*/)
 {
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_DECLINE");               // empty opcode
 
@@ -205,7 +205,7 @@ void User::HandleArenaTeamDeclineOpcode(WorldPacket& /*recvData*/)
     m_player->SetArenaTeamIdInvited(0);
 }
 
-void User::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
+void User::HandleArenaTeamLeaveOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_LEAVE");
 
@@ -262,7 +262,7 @@ void User::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
     SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, arenaTeam->GetName(), "", 0);
 }
 
-void User::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
+void User::HandleArenaTeamDisbandOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_DISBAND");
 
@@ -294,7 +294,7 @@ void User::HandleArenaTeamDisbandOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
+void User::HandleArenaTeamRemoveOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_REMOVE");
 
@@ -359,7 +359,7 @@ void User::HandleArenaTeamRemoveOpcode(WorldPacket& recvData)
     arenaTeam->BroadcastEvent(ERR_ARENA_TEAM_REMOVE_SSS, WOWGUID::Empty, 3, name, arenaTeam->GetName(), m_player->GetName());
 }
 
-void User::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
+void User::HandleArenaTeamLeaderOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_ARENA_TEAM_LEADER");
 
@@ -404,7 +404,7 @@ void User::HandleArenaTeamLeaderOpcode(WorldPacket& recvData)
 
 void User::SendArenaTeamCommandResult(uint32 teamAction, const std::string& team, const std::string& player, uint32 errorId)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_COMMAND_RESULT, 4 + team.length() + 1 + player.length() + 1 + 4);
+    WDataStore data(SMSG_ARENA_TEAM_COMMAND_RESULT, 4 + team.length() + 1 + player.length() + 1 + 4);
     data << uint32(teamAction);
     data << team;
     data << player;
@@ -414,7 +414,7 @@ void User::SendArenaTeamCommandResult(uint32 teamAction, const std::string& team
 
 void User::SendNotInArenaTeamPacket(uint8 type)
 {
-    WorldPacket data(SMSG_ARENA_ERROR, 4 + 1);              // 886 - You are not in a %uv%u arena team
+    WDataStore data(SMSG_ARENA_ERROR, 4 + 1);              // 886 - You are not in a %uv%u arena team
     uint32 unk = 0;
     data << uint32(unk);                                    // unk(0)
     if (!unk)

@@ -22,10 +22,10 @@
 #include "ScriptMgr.h"
 #include "UpdateMask.h"
 #include "WaypointMovementGenerator.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleTaxiNodeStatusQueryOpcode(WorldPacket& recvData)
+void User::HandleTaxiNodeStatusQueryOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
 
@@ -50,14 +50,14 @@ void User::SendTaxiStatus(WOWGUID guid)
         return;
     }
 
-    WorldPacket data(SMSG_TAXINODE_STATUS, 9);
+    WDataStore data(SMSG_TAXINODE_STATUS, 9);
     data << guid;
     data << uint8(player->m_taxi.IsTaximaskNodeKnown(nearest) ? 1 : 0);
     Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_TAXINODE_STATUS");
 }
 
-void User::HandleTaxiQueryAvailableNodes(WorldPacket& recvData)
+void User::HandleTaxiQueryAvailableNodes(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -95,7 +95,7 @@ void User::SendTaxiMenu(Creature* unit)
 
     LOG_DEBUG("network", "WORLD: CMSG_TAXINODE_STATUS_QUERY {} ", curloc);
 
-    WorldPacket data(SMSG_SHOWTAXINODES, (4 + 8 + 4 + 8 * 4));
+    WDataStore data(SMSG_SHOWTAXINODES, (4 + 8 + 4 + 8 * 4));
     data << uint32(1);
     data << unit->GetGUID();
     data << uint32(curloc);
@@ -135,10 +135,10 @@ bool User::SendLearnNewTaxiNode(Creature* unit)
 
     if (GetPlayer()->m_taxi.SetTaximaskNode(curloc))
     {
-        WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
+        WDataStore msg(SMSG_NEW_TAXI_PATH, 0);
         Send(&msg);
 
-        WorldPacket update(SMSG_TAXINODE_STATUS, 9);
+        WDataStore update(SMSG_TAXINODE_STATUS, 9);
         update << unit->GetGUID();
         update << uint8(1);
         Send(&update);
@@ -153,12 +153,12 @@ void User::SendDiscoverNewTaxiNode(uint32 nodeid)
 {
     if (GetPlayer()->m_taxi.SetTaximaskNode(nodeid))
     {
-        WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
+        WDataStore msg(SMSG_NEW_TAXI_PATH, 0);
         Send(&msg);
     }
 }
 
-void User::HandleActivateTaxiExpressOpcode(WorldPacket& recvData)
+void User::HandleActivateTaxiExpressOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     uint32 node_count;
@@ -197,7 +197,7 @@ void User::HandleActivateTaxiExpressOpcode(WorldPacket& recvData)
     GetPlayer()->ActivateTaxiPathTo(nodes, npc, 0);
 }
 
-void User::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
+void User::HandleMoveSplineDoneOpcode(WDataStore& recvData)
 {
     WOWGUID guid; // used only for proper packet read
     recvData >> guid.ReadAsPacked();
@@ -249,7 +249,7 @@ void User::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleActivateTaxiOpcode(WorldPacket& recvData)
+void User::HandleActivateTaxiOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     std::vector<uint32> nodes;
@@ -280,7 +280,7 @@ void User::HandleActivateTaxiOpcode(WorldPacket& recvData)
 void User::SendActivateTaxiReply(ActivateTaxiReply reply)
 {
     GetPlayer()->SetCanTeleport(true);
-    WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
+    WDataStore data(SMSG_ACTIVATETAXIREPLY, 4);
     data << uint32(reply);
     Send(&data);
 

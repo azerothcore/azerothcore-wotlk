@@ -20,7 +20,7 @@
 #include "GameTime.h"
 #include "IpAddress.h"
 #include "Timer.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 #pragma pack(push, 1)
 
@@ -111,7 +111,7 @@ void PacketLog::Initialize()
     }
 }
 
-void PacketLog::LogPacket(WorldPacket const& packet, Direction direction, boost::asio::ip::address const& addr, uint16 port)
+void PacketLog::LogPacket(WDataStore const& packet, Direction direction, boost::asio::ip::address const& addr, uint16 port)
 {
     std::lock_guard<std::mutex> lock(_logPacketLock);
 

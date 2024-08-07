@@ -19,7 +19,7 @@
 #define _ITEMPROTOTYPE_H
 
 #include "SharedDefines.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include <unordered_map>
 
 enum ItemModType
@@ -700,7 +700,7 @@ struct ItemTemplate
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
     uint32 FlagsCu;
-    WorldPacket queryData;                                  // pussywizard
+    WDataStore queryData;                                  // pussywizard
 
     // helpers
     [[nodiscard]] bool HasSignature() const

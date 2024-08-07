@@ -74,7 +74,7 @@ enum GOSummonType
     GO_SUMMON_TIMED_DESPAWN = 1                 // despawns after a specified time
 };
 
-class WorldPacket;
+class WDataStore;
 class UpdateData;
 class ByteBuffer;
 class User;
@@ -473,9 +473,9 @@ public:
 
     virtual void CleanupsBeforeDelete(bool finalCleanup = true);  // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
-    virtual void SendMessageToSet(WorldPacket const* data, bool self) const;
-    virtual void SendMessageToSetInRange(WorldPacket const* data, float dist, bool self) const;
-    virtual void SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const;
+    virtual void SendMessageToSet(WDataStore const* data, bool self) const;
+    virtual void SendMessageToSetInRange(WDataStore const* data, float dist, bool self) const;
+    virtual void SendMessageToSet(WDataStore const* data, Player const* skipped_rcvr) const;
 
     virtual uint8 getLevelForTarget(WorldObject const* /*target*/) const { return 1; }
 

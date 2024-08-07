@@ -19,7 +19,7 @@
 
 WorldPackets::WorldState::InitWorldStates::InitWorldStates() : ServerPacket(SMSG_INIT_WORLD_STATES, 4 + 4 + 4 + 2) { }
 
-WorldPacket const* WorldPackets::WorldState::InitWorldStates::Write()
+WDataStore const* WorldPackets::WorldState::InitWorldStates::Write()
 {
     _worldPacket.reserve(4 + 4 + 4 + 2 + Worldstates.size() * 8);
 
@@ -37,7 +37,7 @@ WorldPacket const* WorldPackets::WorldState::InitWorldStates::Write()
     return &_worldPacket;
 }
 
-WorldPacket const* WorldPackets::WorldState::UpdateWorldState::Write()
+WDataStore const* WorldPackets::WorldState::UpdateWorldState::Write()
 {
     _worldPacket << int32(VariableID);
     _worldPacket << int32(Value);

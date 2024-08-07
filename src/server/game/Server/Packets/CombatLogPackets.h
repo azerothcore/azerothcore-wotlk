@@ -30,7 +30,7 @@ namespace WorldPackets
         public:
             EnvironmentalDamageLog() : ServerPacket(SMSG_ENVIRONMENTAL_DAMAGE_LOG, 21) { }
 
-            WorldPacket const* Write() override;
+            WDataStore const* Write() override;
 
             WOWGUID Victim;
             EnviromentalDamage Type = DAMAGE_EXHAUSTED;

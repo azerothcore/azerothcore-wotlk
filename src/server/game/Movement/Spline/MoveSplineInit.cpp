@@ -22,7 +22,7 @@
 #include "Transport.h"
 #include "Unit.h"
 #include "Vehicle.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 namespace Movement
 {
@@ -126,7 +126,7 @@ namespace Movement
         unit->m_movement.m_moveFlags |= moveFlags;
         move_spline.Initialize(args);
 
-        WorldPacket data(SMSG_MONSTER_MOVE, 64);
+        WDataStore data(SMSG_MONSTER_MOVE, 64);
         data << unit->GetPackGUID();
         if (transport)
         {
@@ -172,7 +172,7 @@ namespace Movement
         move_spline.onTransport = transport;
         move_spline.Initialize(args);
 
-        WorldPacket data(SMSG_MONSTER_MOVE, 64);
+        WDataStore data(SMSG_MONSTER_MOVE, 64);
         data << unit->GetPackGUID();
         if (transport)
         {

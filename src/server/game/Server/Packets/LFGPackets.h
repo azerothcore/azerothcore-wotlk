@@ -26,7 +26,7 @@ namespace WorldPackets::LFG
     class LFGJoin final : public ClientPacket
     {
     public:
-        LFGJoin(WorldPacket&& packet) : ClientPacket(CMSG_LFG_JOIN, std::move(packet)) { }
+        LFGJoin(WDataStore&& packet) : ClientPacket(CMSG_LFG_JOIN, std::move(packet)) { }
 
         void Read() override;
 
@@ -41,7 +41,7 @@ namespace WorldPackets::LFG
     class LFGLeave final : public ClientPacket
     {
     public:
-        LFGLeave(WorldPacket&& packet) : ClientPacket(CMSG_LFG_LEAVE, std::move(packet)) { }
+        LFGLeave(WDataStore&& packet) : ClientPacket(CMSG_LFG_LEAVE, std::move(packet)) { }
 
         void Read() override { };
     };

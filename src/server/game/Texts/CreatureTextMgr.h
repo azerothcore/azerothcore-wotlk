@@ -108,7 +108,7 @@ private:
     CreatureTextRepeatIds GetRepeatGroup(Creature* source, uint8 textGroup);
     void SetRepeatId(Creature* source, uint8 textGroup, uint8 id);
 
-    void SendNonChatPacket(WorldObject* source, WorldPacket const* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const;
+    void SendNonChatPacket(WorldObject* source, WDataStore const* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const;
     float GetRangeForChatType(ChatMsg msgType) const;
 
     CreatureTextMap mTextMap;
@@ -140,15 +140,15 @@ public:
     void operator()(Player* player)
     {
         LocaleConstant loc_idx = player->User()->GetSessionDbLocaleIndex();
-        WorldPacket* messageTemplate;
+        WDataStore* messageTemplate;
         std::size_t whisperGUIDpos;
 
         // create if not cached yet
         if (!_packetCache[loc_idx])
         {
-            messageTemplate = new WorldPacket();
+            messageTemplate = new WDataStore();
             whisperGUIDpos = _builder(messageTemplate, loc_idx);
-            _packetCache[loc_idx] = new std::pair<WorldPacket*, std::size_t>(messageTemplate, whisperGUIDpos);
+            _packetCache[loc_idx] = new std::pair<WDataStore*, std::size_t>(messageTemplate, whisperGUIDpos);
         }
         else
         {
@@ -156,7 +156,7 @@ public:
             whisperGUIDpos = _packetCache[loc_idx]->second;
         }
 
-        WorldPacket data(*messageTemplate);
+        WDataStore data(*messageTemplate);
         switch (_msgType)
         {
             case CHAT_MSG_MONSTER_WHISPER:
@@ -171,7 +171,7 @@ public:
     }
 
 private:
-    std::vector<std::pair<WorldPacket*, std::size_t>* > _packetCache;
+    std::vector<std::pair<WDataStore*, std::size_t>* > _packetCache;
     Builder const& _builder;
     ChatMsg _msgType;
 };

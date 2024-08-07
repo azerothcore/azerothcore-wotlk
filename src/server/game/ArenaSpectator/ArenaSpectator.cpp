@@ -210,7 +210,7 @@ bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, std::stri
     return true;
 }
 
-void ArenaSpectator::CreatePacket(WorldPacket& data, std::string const& message)
+void ArenaSpectator::CreatePacket(WDataStore& data, std::string const& message)
 {
     std::size_t len = message.length();
     data.Initialize(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + 8 + 4 + 1 + len + 1);
@@ -304,7 +304,7 @@ bool ArenaSpectator::ShouldSendAura(Aura* aura, uint8 effMask, WOWGUID targetGUI
 template<>
 AC_GAME_API void ArenaSpectator::SendPacketTo(Player const* player, std::string&& message)
 {
-    WorldPacket data;
+    WDataStore data;
     CreatePacket(data, message);
     player->User()->Send(&data);
 }
@@ -319,7 +319,7 @@ AC_GAME_API void ArenaSpectator::SendPacketTo(const Map* map, std::string&& mess
     if (!bg || bg->GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    WorldPacket data;
+    WDataStore data;
     CreatePacket(data, message);
     bg->SpectatorsSendPacket(data);
 }

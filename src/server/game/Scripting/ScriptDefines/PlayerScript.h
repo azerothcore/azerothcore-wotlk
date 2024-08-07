@@ -217,7 +217,7 @@ public:
     virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
 
     // Called on Send Initial Packets Before Add To Map
-    virtual void OnSendInitialPacketsBeforeAddToMap(Player* /*player*/, WorldPacket& /*data*/) {}
+    virtual void OnSendInitialPacketsBeforeAddToMap(Player* /*player*/, WDataStore& /*data*/) {}
 
     // Called when a player does a desertion action (see BattlegroundDesertionType)
     virtual void OnBattlegroundDesertion(Player* /*player*/, BattlegroundDesertionType const /*desertionType*/) { }

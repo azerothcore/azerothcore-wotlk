@@ -28,7 +28,7 @@ class PacketHandler : public ClientOpcodeHandler
 public:
     PacketHandler(char const* name, SessionStatus status, PacketProcessing processing) : ClientOpcodeHandler(name, status, processing) { }
 
-    void Call(User* session, WorldPacket& packet) const override
+    void Call(User* session, WDataStore& packet) const override
     {
         PacketClass nicePacket(std::move(packet));
         nicePacket.Read();
@@ -36,13 +36,13 @@ public:
     }
 };
 
-template<void(User::* HandlerFunction)(WorldPacket&)>
-class PacketHandler<WorldPacket, HandlerFunction> : public ClientOpcodeHandler
+template<void(User::* HandlerFunction)(WDataStore&)>
+class PacketHandler<WDataStore, HandlerFunction> : public ClientOpcodeHandler
 {
 public:
     PacketHandler(char const* name, SessionStatus status, PacketProcessing processing) : ClientOpcodeHandler(name, status, processing) { }
 
-    void Call(User* session, WorldPacket& packet) const override
+    void Call(User* session, WDataStore& packet) const override
     {
         (session->*HandlerFunction)(packet);
     }
@@ -116,7 +116,7 @@ void OpcodeTable::ValidateAndSetServerOpcode(OpcodeServer opcode, char const* na
         return;
     }
 
-    _internalTableClient[opcode] = new PacketHandler<WorldPacket, &User::Handle_ServerSide>(name, status, PROCESS_INPLACE);
+    _internalTableClient[opcode] = new PacketHandler<WDataStore, &User::Handle_ServerSide>(name, status, PROCESS_INPLACE);
 }
 
 /// Correspondence between opcodes and their names

@@ -1370,7 +1370,7 @@ enum PacketProcessing
 };
 
 class User;
-class WorldPacket;
+class WDataStore;
 
 class OpcodeHandler
 {
@@ -1388,7 +1388,7 @@ public:
     ClientOpcodeHandler(char const* name, SessionStatus status, PacketProcessing processing)
         : OpcodeHandler(name, status), ProcessingPlace(processing) { }
 
-    virtual void Call(User* session, WorldPacket& packet) const = 0;
+    virtual void Call(User* session, WDataStore& packet) const = 0;
 
     PacketProcessing ProcessingPlace;
 };

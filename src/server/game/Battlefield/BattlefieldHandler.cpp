@@ -21,7 +21,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 //This send to player windows for invite player to join the war
@@ -31,7 +31,7 @@
 void User::SendBfInvitePlayerToWar(uint32 BattleId, uint32 ZoneId, uint32 p_time)
 {
     //Send packet
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 12);
+    WDataStore data(SMSG_BATTLEFIELD_MGR_ENTRY_INVITE, 12);
     data << uint32(BattleId);
     data << uint32(ZoneId);
     data << uint32((GameTime::GetGameTime().count() + p_time));
@@ -44,7 +44,7 @@ void User::SendBfInvitePlayerToWar(uint32 BattleId, uint32 ZoneId, uint32 p_time
 //Param1:(BattleId) the BattleId of Bf
 void User::SendBfInvitePlayerToQueue(uint32 BattleId)
 {
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_INVITE, 5);
+    WDataStore data(SMSG_BATTLEFIELD_MGR_QUEUE_INVITE, 5);
 
     data << uint32(BattleId);
     data << uint8(1);                                       //warmup ? used ?
@@ -60,7 +60,7 @@ void User::SendBfInvitePlayerToQueue(uint32 BattleId)
 //Param4:(Full) on log in is full
 void User::SendBfQueueInviteResponse(uint32 BattleId, uint32 ZoneId, bool CanQueue, bool Full)
 {
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_QUEUE_REQUEST_RESPONSE, 11);
+    WDataStore data(SMSG_BATTLEFIELD_MGR_QUEUE_REQUEST_RESPONSE, 11);
     data << uint32(BattleId);
     data << uint32(ZoneId);
     data << uint8((CanQueue ? 1 : 0));  //Accepted          //0 you cannot queue wg     //1 you are queued
@@ -74,7 +74,7 @@ void User::SendBfQueueInviteResponse(uint32 BattleId, uint32 ZoneId, bool CanQue
 void User::SendBfEntered(uint32 BattleId)
 {
     //    m_PlayerInWar[player->GetTeamId()].insert(player->GetGUID());
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_ENTERED, 7);
+    WDataStore data(SMSG_BATTLEFIELD_MGR_ENTERED, 7);
     data << uint32(BattleId);
     data << uint8(1);                                       //unk
     data << uint8(1);                                       //unk
@@ -84,7 +84,7 @@ void User::SendBfEntered(uint32 BattleId)
 
 void User::SendBfLeaveMessage(uint32 BattleId, BFLeaveReason reason)
 {
-    WorldPacket data(SMSG_BATTLEFIELD_MGR_EJECTED, 7);
+    WDataStore data(SMSG_BATTLEFIELD_MGR_EJECTED, 7);
     data << uint32(BattleId);
     data << uint8(reason);//byte Reason
     data << uint8(2);//byte BattleStatus
@@ -93,7 +93,7 @@ void User::SendBfLeaveMessage(uint32 BattleId, BFLeaveReason reason)
 }
 
 //Send by client when he click on accept for queue
-void User::HandleBfQueueInviteResponse(WorldPacket& recvData)
+void User::HandleBfQueueInviteResponse(WDataStore& recvData)
 {
     uint32 BattleId;
     uint8 Accepted;
@@ -111,7 +111,7 @@ void User::HandleBfQueueInviteResponse(WorldPacket& recvData)
 }
 
 //Send by client on clicking in accept or refuse of invitation windows for join game
-void User::HandleBfEntryInviteResponse(WorldPacket& recvData)
+void User::HandleBfEntryInviteResponse(WDataStore& recvData)
 {
     uint32 BattleId;
     uint8 Accepted;
@@ -134,7 +134,7 @@ void User::HandleBfEntryInviteResponse(WorldPacket& recvData)
     }
 }
 
-void User::HandleBfExitRequest(WorldPacket& recvData)
+void User::HandleBfExitRequest(WDataStore& recvData)
 {
     uint32 BattleId;
 

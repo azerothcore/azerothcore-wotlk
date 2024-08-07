@@ -55,7 +55,7 @@
 #include "UpdateMask.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 class LoginQueryHolder : public CharacterDatabaseQueryHolder
@@ -216,7 +216,7 @@ bool LoginQueryHolder::Initialize()
 
 void User::HandleCharEnum(PreparedQueryResult result)
 {
-    WorldPacket data(SMSG_CHAR_ENUM, 100);                  // we guess size
+    WDataStore data(SMSG_CHAR_ENUM, 100);                  // we guess size
 
     uint8 num = 0;
 
@@ -242,7 +242,7 @@ void User::HandleCharEnum(PreparedQueryResult result)
     Send(&data);
 }
 
-void User::HandleCharEnumOpcode(WorldPacket& /*recvData*/)
+void User::HandleCharEnumOpcode(WDataStore& /*recvData*/)
 {
     CharacterDatabasePreparedStatement* stmt = nullptr;
 
@@ -259,7 +259,7 @@ void User::HandleCharEnumOpcode(WorldPacket& /*recvData*/)
     _queryProcessor.AddCallback(CharacterDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&User::HandleCharEnum, this, std::placeholders::_1)));
 }
 
-void User::HandleCharCreateOpcode(WorldPacket& recvData)
+void User::HandleCharCreateOpcode(WDataStore& recvData)
 {
     std::shared_ptr<CharacterCreateInfo> createInfo = std::make_shared<CharacterCreateInfo>();
 
@@ -595,7 +595,7 @@ void User::HandleCharCreateOpcode(WorldPacket& recvData)
     }));
 }
 
-void User::HandleCharDeleteOpcode(WorldPacket& recvData)
+void User::HandleCharDeleteOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -656,7 +656,7 @@ void User::HandleCharDeleteOpcode(WorldPacket& recvData)
     SendCharDelete(CHAR_DELETE_SUCCESS);
 }
 
-void User::HandlePlayerLoginOpcode(WorldPacket& recvData)
+void User::HandlePlayerLoginOpcode(WDataStore& recvData)
 {
     m_playerLoading = true;
     WOWGUID playerGuid;
@@ -667,7 +667,7 @@ void User::HandlePlayerLoginOpcode(WorldPacket& recvData)
         // limit player interaction with the world
         if (!sWorld->getBoolConfig(CONFIG_REALM_LOGIN_ENABLED))
         {
-            WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
+            WDataStore data(SMSG_CHARACTER_LOGIN_FAILED, 1);
             // see LoginFailureReason enum for more reasons
             data << uint8(LoginFailureReason::NoWorld);
             Send(&data);
@@ -684,7 +684,7 @@ void User::HandlePlayerLoginOpcode(WorldPacket& recvData)
 
     auto SendCharLogin = [&](ResponseCodes result)
     {
-        WorldPacket data(SMSG_CHARACTER_LOGIN_FAILED, 1);
+        WDataStore data(SMSG_CHARACTER_LOGIN_FAILED, 1);
         data << uint8(result);
         Send(&data);
     };
@@ -746,7 +746,7 @@ void User::HandlePlayerLoginOpcode(WorldPacket& recvData)
                     if (!plMover)
                         break;
 
-                    WorldPacket pkt(MSG_MOVE_TELEPORT_ACK, 20);
+                    WDataStore pkt(MSG_MOVE_TELEPORT_ACK, 20);
                     pkt << plMover->GetPackGUID();
                     pkt << uint32(0); // flags
                     pkt << uint32(0); // time
@@ -803,7 +803,7 @@ void User::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     pCurrChar->GetMotionMaster()->Initialize();
     pCurrChar->SendDungeonDifficulty(false);
 
-    WorldPacket data(SMSG_LOGIN_VERIFY_WORLD, 20);
+    WDataStore data(SMSG_LOGIN_VERIFY_WORLD, 20);
     data << pCurrChar->GetMapId();
     data << pCurrChar->GetPositionX();
     data << pCurrChar->GetPositionY();
@@ -1121,7 +1121,7 @@ void User::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
 
     pCurrChar->SendDungeonDifficulty(false);
 
-    WorldPacket data(SMSG_LOGIN_VERIFY_WORLD, 20);
+    WDataStore data(SMSG_LOGIN_VERIFY_WORLD, 20);
     data << pCurrChar->GetMapId();
     data << pCurrChar->GetPositionX();
     data << pCurrChar->GetPositionY();
@@ -1198,7 +1198,7 @@ void User::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
                 if (val == 0)
                     continue;
 
-                WorldPacket data(Opcode, (1 + 1 + 4));
+                WDataStore data(Opcode, (1 + 1 + 4));
                 data << uint8(eff);
                 data << uint8(opType);
                 data << int32(val);
@@ -1241,7 +1241,7 @@ void User::HandlePlayerLoginToCharOutOfWorld(Player* /*pCurrChar*/)
     ABORT();
 }
 
-void User::HandleSetFactionAtWar(WorldPacket& recvData)
+void User::HandleSetFactionAtWar(WDataStore& recvData)
 {
     uint32 repListID;
     uint8  flag;
@@ -1253,13 +1253,13 @@ void User::HandleSetFactionAtWar(WorldPacket& recvData)
 }
 
 //I think this function is never used :/ I dunno, but i guess this opcode not exists
-void User::HandleSetFactionCheat(WorldPacket& /*recvData*/)
+void User::HandleSetFactionCheat(WDataStore& /*recvData*/)
 {
     LOG_ERROR("network.opcode", "WORLD SESSION: HandleSetFactionCheat, not expected call, please report.");
     GetPlayer()->GetReputationMgr().SendStates();
 }
 
-void User::HandleTutorialFlag(WorldPacket& recvData)
+void User::HandleTutorialFlag(WDataStore& recvData)
 {
     uint32 data;
     recvData >> data;
@@ -1275,26 +1275,26 @@ void User::HandleTutorialFlag(WorldPacket& recvData)
     SetTutorialInt(index, flag);
 }
 
-void User::HandleTutorialClear(WorldPacket& /*recvData*/)
+void User::HandleTutorialClear(WDataStore& /*recvData*/)
 {
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
         SetTutorialInt(i, 0xFFFFFFFF);
 }
 
-void User::HandleTutorialReset(WorldPacket& /*recvData*/)
+void User::HandleTutorialReset(WDataStore& /*recvData*/)
 {
     for (uint8 i = 0; i < MAX_ACCOUNT_TUTORIAL_VALUES; ++i)
         SetTutorialInt(i, 0x00000000);
 }
 
-void User::HandleSetWatchedFactionOpcode(WorldPacket& recvData)
+void User::HandleSetWatchedFactionOpcode(WDataStore& recvData)
 {
     uint32 fact;
     recvData >> fact;
     GetPlayer()->SetUInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fact);
 }
 
-void User::HandleSetFactionInactiveOpcode(WorldPacket& recvData)
+void User::HandleSetFactionInactiveOpcode(WDataStore& recvData)
 {
     uint32 replistid;
     uint8 inactive;
@@ -1319,7 +1319,7 @@ void User::HandleShowingCloakOpcode(WorldPackets::Character::ShowingCloak& packe
         m_player->SetPlayerFlag(PLAYER_FLAGS_HIDE_CLOAK);
 }
 
-void User::HandleCharRenameOpcode(WorldPacket& recvData)
+void User::HandleCharRenameOpcode(WDataStore& recvData)
 {
     std::shared_ptr<CharacterRenameInfo> renameInfo = std::make_shared<CharacterRenameInfo>();
 
@@ -1404,7 +1404,7 @@ void User::HandleCharRenameCallBack(std::shared_ptr<CharacterRenameInfo> renameI
     sCharacterCache->UpdateCharacterData(renameInfo->Guid, renameInfo->Name);
 }
 
-void User::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
+void User::HandleSetPlayerDeclinedNames(WDataStore& recvData)
 {
     // pussywizard:
     if (!sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))
@@ -1483,7 +1483,7 @@ void User::HandleSetPlayerDeclinedNames(WorldPacket& recvData)
     SendSetPlayerDeclinedNamesResult(DECLINED_NAMES_RESULT_SUCCESS, guid);
 }
 
-void User::HandleAlterAppearance(WorldPacket& recvData)
+void User::HandleAlterAppearance(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_ALTER_APPEARANCE");
 
@@ -1508,7 +1508,7 @@ void User::HandleAlterAppearance(WorldPacket& recvData)
     GameObject* go = m_player->FindNearestGameObjectOfType(GAMEOBJECT_TYPE_BARBER_CHAIR, 5.0f);
     if (!go)
     {
-        WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
+        WDataStore data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(2);
         Send(&data);
         return;
@@ -1516,7 +1516,7 @@ void User::HandleAlterAppearance(WorldPacket& recvData)
 
     if (m_player->GetStandState() != UNIT_SITTINGCHAIRLOW + go->GetGOInfo()->barberChair.chairheight)
     {
-        WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
+        WDataStore data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(2);
         Send(&data);
         return;
@@ -1529,14 +1529,14 @@ void User::HandleAlterAppearance(WorldPacket& recvData)
     // 2 - you have to seat on barber chair
     if (!m_player->HasEnoughMoney(cost))
     {
-        WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
+        WDataStore data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(1);                                  // no money
         Send(&data);
         return;
     }
     else
     {
-        WorldPacket data(SMSG_BARBER_SHOP_RESULT, 4);
+        WDataStore data(SMSG_BARBER_SHOP_RESULT, 4);
         data << uint32(0);                                  // ok
         Send(&data);
     }
@@ -1555,7 +1555,7 @@ void User::HandleAlterAppearance(WorldPacket& recvData)
     m_player->SetStandState(0);                              // stand up
 }
 
-void User::HandleRemoveGlyph(WorldPacket& recvData)
+void User::HandleRemoveGlyph(WDataStore& recvData)
 {
     uint32 slot;
     recvData >> slot;
@@ -1595,7 +1595,7 @@ void User::HandleRemoveGlyph(WorldPacket& recvData)
     }
 }
 
-void User::HandleCharCustomize(WorldPacket& recvData)
+void User::HandleCharCustomize(WDataStore& recvData)
 {
     std::shared_ptr<CharacterCustomizeInfo> customizeInfo = std::make_shared<CharacterCustomizeInfo>();
 
@@ -1614,7 +1614,7 @@ void User::HandleCharCustomize(WorldPacket& recvData)
     if (ObjectAccessor::FindConnectedPlayer(customizeInfo->Guid) || sWorld->FindOfflineUserForCharacter(customizeInfo->Guid.GetCounter()))
     {
         recvData.rfinish();
-        WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1);
+        WDataStore data(SMSG_CHAR_CUSTOMIZE, 1);
         data << uint8(CHAR_CREATE_ERROR);
         Send(&data);
         return;
@@ -1726,7 +1726,7 @@ void User::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomizeInfo> c
         GetAccountId(), GetRemoteAddress(), oldName, customizeInfo->Guid.ToString(), customizeInfo->Name);
 }
 
-void User::HandleEquipmentSetSave(WorldPacket& recvData)
+void User::HandleEquipmentSetSave(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_SAVE");
 
@@ -1785,7 +1785,7 @@ void User::HandleEquipmentSetSave(WorldPacket& recvData)
     m_player->SetEquipmentSet(index, eqSet);
 }
 
-void User::HandleEquipmentSetDelete(WorldPacket& recvData)
+void User::HandleEquipmentSetDelete(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_DELETE");
 
@@ -1795,7 +1795,7 @@ void User::HandleEquipmentSetDelete(WorldPacket& recvData)
     m_player->DeleteEquipmentSet(setGuid);
 }
 
-void User::HandleEquipmentSetUse(WorldPacket& recvData)
+void User::HandleEquipmentSetUse(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_EQUIPMENT_SET_USE");
 
@@ -1883,12 +1883,12 @@ void User::HandleEquipmentSetUse(WorldPacket& recvData)
         }
     }
 
-    WorldPacket data(SMSG_EQUIPMENT_SET_USE_RESULT, 1);
+    WDataStore data(SMSG_EQUIPMENT_SET_USE_RESULT, 1);
     data << uint8(errorId);                                       // 4 - equipment swap failed - inventory is full
     Send(&data);
 }
 
-void User::HandleCharFactionOrRaceChange(WorldPacket& recvData)
+void User::HandleCharFactionOrRaceChange(WDataStore& recvData)
 {
     std::shared_ptr<CharacterFactionChangeInfo> factionChangeInfo = std::make_shared<CharacterFactionChangeInfo>();
 
@@ -2543,21 +2543,21 @@ void User::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<CharacterFactio
 
 void User::SendCharCreate(ResponseCodes result)
 {
-    WorldPacket data(SMSG_CHAR_CREATE, 1);
+    WDataStore data(SMSG_CHAR_CREATE, 1);
     data << uint8(result);
     Send(&data);
 }
 
 void User::SendCharDelete(ResponseCodes result)
 {
-    WorldPacket data(SMSG_CHAR_DELETE, 1);
+    WDataStore data(SMSG_CHAR_DELETE, 1);
     data << uint8(result);
     Send(&data);
 }
 
 void User::SendCharRename(ResponseCodes result, CharacterRenameInfo const* renameInfo)
 {
-    WorldPacket data(SMSG_CHAR_RENAME, 1 + 8 + renameInfo->Name.size() + 1);
+    WDataStore data(SMSG_CHAR_RENAME, 1 + 8 + renameInfo->Name.size() + 1);
     data << uint8(result);
     if (result == RESPONSE_SUCCESS)
     {
@@ -2569,7 +2569,7 @@ void User::SendCharRename(ResponseCodes result, CharacterRenameInfo const* renam
 
 void User::SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInfo const* factionChangeInfo)
 {
-    WorldPacket data(SMSG_CHAR_FACTION_CHANGE, 1 + 8 + factionChangeInfo->Name.size() + 1 + 7);
+    WDataStore data(SMSG_CHAR_FACTION_CHANGE, 1 + 8 + factionChangeInfo->Name.size() + 1 + 7);
     data << uint8(result);
     if (result == RESPONSE_SUCCESS)
     {
@@ -2588,7 +2588,7 @@ void User::SendCharFactionChange(ResponseCodes result, CharacterFactionChangeInf
 
 void User::SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const* customizeInfo)
 {
-    WorldPacket data(SMSG_CHAR_CUSTOMIZE, 1 + 8 + customizeInfo->Name.size() + 1 + 6);
+    WDataStore data(SMSG_CHAR_CUSTOMIZE, 1 + 8 + customizeInfo->Name.size() + 1 + 6);
     data << uint8(result);
     if (result == RESPONSE_SUCCESS)
     {
@@ -2606,7 +2606,7 @@ void User::SendCharCustomize(ResponseCodes result, CharacterCustomizeInfo const*
 
 void User::SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, WOWGUID guid)
 {
-    WorldPacket data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
+    WDataStore data(SMSG_SET_PLAYER_DECLINED_NAMES_RESULT, 4 + 8);
     data << uint32(result);
     data << guid;
     Send(&data);

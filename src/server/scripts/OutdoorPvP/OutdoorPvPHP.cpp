@@ -25,7 +25,7 @@
 #include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 const uint32 HP_LANG_LOSE_A[HP_TOWER_NUM] = {LANG_OPVP_HP_LOSE_BROKENHILL_A, LANG_OPVP_HP_LOSE_OVERLOOK_A, LANG_OPVP_HP_LOSE_STADIUM_A};
 
@@ -154,7 +154,7 @@ void OutdoorPvPHP::SendRemoveWorldStates(Player* player)
     }
 }
 
-void OutdoorPvPHP::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPHP::FillInitialWorldStates(WDataStore& data)
 {
     data << uint32(HP_UI_TOWER_DISPLAY_A) << uint32(1);
     data << uint32(HP_UI_TOWER_DISPLAY_H) << uint32(1);
@@ -274,7 +274,7 @@ void OPvPCapturePointHP::SendChangePhase()
     SendUpdateWorldState(HP_UI_TOWER_SLIDER_DISPLAY, 1);
 }
 
-void OPvPCapturePointHP::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointHP::FillInitialWorldStates(WDataStore& data)
 {
     switch (_state)
     {

@@ -2111,7 +2111,7 @@ void Guild::BroadcastToGuild(User* session, bool officerOnly, std::string_view m
 {
     if (session && session->GetPlayer() && _HasRankRight(session->GetPlayer(), officerOnly ? GR_RIGHT_OFFCHATSPEAK : GR_RIGHT_GCHATSPEAK))
     {
-        WorldPacket data;
+        WDataStore data;
         ChatHandler::BuildChatPacket(data, officerOnly ? CHAT_MSG_OFFICER : CHAT_MSG_GUILD, Language(language), session->GetPlayer(), nullptr, msg);
         for (auto const& [guid, member] : m_members)
             if (Player* player = member.FindPlayer())
@@ -2120,7 +2120,7 @@ void Guild::BroadcastToGuild(User* session, bool officerOnly, std::string_view m
     }
 }
 
-void Guild::BroadcastPacketToRank(WorldPacket const* packet, uint8 rankId) const
+void Guild::BroadcastPacketToRank(WDataStore const* packet, uint8 rankId) const
 {
     for (auto const& [guid, member] : m_members)
         if (member.IsRank(rankId))
@@ -2128,7 +2128,7 @@ void Guild::BroadcastPacketToRank(WorldPacket const* packet, uint8 rankId) const
                 player->User()->Send(packet);
 }
 
-void Guild::BroadcastPacket(WorldPacket const* packet) const
+void Guild::BroadcastPacket(WDataStore const* packet) const
 {
     for (auto const& [guid, member] : m_members)
         if (Player* player = member.FindPlayer())
@@ -2139,7 +2139,7 @@ void Guild::MassInviteToEvent(User* session, uint32 minLevel, uint32 maxLevel, u
 {
     uint32 count = 0;
 
-    WorldPacket data(SMSG_CALENDAR_FILTER_GUILD);
+    WDataStore data(SMSG_CALENDAR_FILTER_GUILD);
     data << uint32(count); // count placeholder
 
     for (auto const& [guid, member] : m_members)

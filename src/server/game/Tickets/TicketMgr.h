@@ -145,7 +145,7 @@ public:
     void SaveToDB(CharacterDatabaseTransaction trans) const;
     void DeleteFromDB();
 
-    void WritePacket(WorldPacket& data) const;
+    void WritePacket(WDataStore& data) const;
     void SendResponse(User* session) const;
 
     void TeleportTo(Player* player) const;

@@ -98,7 +98,7 @@ public:
         if (!target)
             target = handler->GetSession()->GetPlayer();
 
-        WorldPacket data(12);
+        WDataStore data(12);
         if (enable)
             data.SetOpcode(SMSG_MOVE_SET_CAN_FLY);
         else

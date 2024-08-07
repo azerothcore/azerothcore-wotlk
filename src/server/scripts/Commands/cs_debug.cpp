@@ -221,7 +221,7 @@ public:
 
     static bool HandleDebugSendSpellFailCommand(ChatHandler* handler, SpellCastResult result, Optional<uint32> failArg1, Optional<uint32> failArg2)
     {
-        WorldPacket data(SMSG_CAST_FAILED, 5);
+        WDataStore data(SMSG_CAST_FAILED, 5);
         data << uint8(0);
         data << uint32(133); // Spell "Fireball"
         data << uint8(result);
@@ -332,7 +332,7 @@ public:
         uint32 opcode;
         parsedStream >> opcode;
 
-        WorldPacket data(opcode, 0);
+        WDataStore data(opcode, 0);
 
         while (!parsedStream.eof())
         {
@@ -466,7 +466,7 @@ public:
 
     static bool HandleDebugSendChannelNotifyCommand(ChatHandler* handler, ChatNotify type)
     {
-        WorldPacket data(SMSG_CHANNEL_NOTIFY, (1 + 10));
+        WDataStore data(SMSG_CHANNEL_NOTIFY, (1 + 10));
         data << type;
         data << "test";
         data << uint32(0);
@@ -477,7 +477,7 @@ public:
 
     static bool HandleDebugSendChatMsgCommand(ChatHandler* handler, ChatMsg type)
     {
-        WorldPacket data;
+        WDataStore data;
         ChatHandler::BuildChatPacket(data, type, LANG_UNIVERSAL, handler->GetPlayer(), handler->GetPlayer(), "testtest", 0, "chan");
         handler->GetSession()->Send(&data);
         return true;

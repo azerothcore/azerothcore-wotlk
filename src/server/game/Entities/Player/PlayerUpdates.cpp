@@ -1352,7 +1352,7 @@ void Player::UpdateHomebindTime(uint32 time)
         if (m_HomebindTimer) // instance valid, but timer not reset
         {
             // hide reminder
-            WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
+            WDataStore data(SMSG_RAID_GROUP_ONLY, 4 + 4);
             data << uint32(0);
             data << uint32(0);
             User()->Send(&data);
@@ -1375,7 +1375,7 @@ void Player::UpdateHomebindTime(uint32 time)
         // instance is invalid, start homebind timer
         m_HomebindTimer = 60000;
         // send message to player
-        WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
+        WDataStore data(SMSG_RAID_GROUP_ONLY, 4 + 4);
         data << uint32(m_HomebindTimer);
         data << uint32(1);
         User()->Send(&data);
@@ -1702,7 +1702,7 @@ void Player::UpdateTriggerVisibility()
         return;
 
     UpdateData  udata;
-    WorldPacket packet;
+    WDataStore packet;
     for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin();
          itr != m_clientGUIDs.end(); ++itr)
     {
@@ -1745,7 +1745,7 @@ void Player::UpdateForQuestWorldObjects()
         return;
 
     UpdateData  udata;
-    WorldPacket packet;
+    WDataStore packet;
     for (GuidUnorderedSet::iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
     {
         if ((*itr).IsGameObject())

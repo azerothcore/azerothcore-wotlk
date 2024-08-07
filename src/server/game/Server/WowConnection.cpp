@@ -218,7 +218,7 @@ bool WowConnection::Update()
 
 void WowConnection::HandleSendAuthSession()
 {
-    WorldPacket packet(SMSG_AUTH_CHALLENGE, 40);
+    WDataStore packet(SMSG_AUTH_CHALLENGE, 40);
     packet << uint32(1);                                    // 1...31
     packet.append(_authSeed);
 
@@ -402,8 +402,8 @@ WowConnection::ReadDataHandlerResult WowConnection::ReadDataHandler()
     ClientPktHeader* header = reinterpret_cast<ClientPktHeader*>(_headerBuffer.GetReadPointer());
     OpcodeClient opcode = static_cast<OpcodeClient>(header->cmd);
 
-    WorldPacket packet(opcode, std::move(_packetBuffer));
-    WorldPacket* packetToQueue;
+    WDataStore packet(opcode, std::move(_packetBuffer));
+    WDataStore* packetToQueue;
 
     if (sPacketLog->CanLogPacket())
         sPacketLog->LogPacket(packet, CLIENT_TO_SERVER, GetRemoteIpAddress(), GetRemotePort());
@@ -457,10 +457,10 @@ WowConnection::ReadDataHandlerResult WowConnection::ReadDataHandler()
             LOG_ERROR("network", "WowConnection::ReadDataHandler: client {} sent CMSG_KEEP_ALIVE without being authenticated", GetRemoteIpAddress().to_string());
             return ReadDataHandlerResult::Error;
         case CMSG_TIME_SYNC_RESP:
-            packetToQueue = new WorldPacket(std::move(packet), GameTime::Now());
+            packetToQueue = new WDataStore(std::move(packet), GameTime::Now());
             break;
         default:
-            packetToQueue = new WorldPacket(std::move(packet));
+            packetToQueue = new WDataStore(std::move(packet));
             break;
     }
 
@@ -500,13 +500,13 @@ void WowConnection::LogOpcodeText(OpcodeClient opcode, std::unique_lock<std::mut
     }
 }
 
-void WowConnection::SendPacketAndLogOpcode(WorldPacket const& packet)
+void WowConnection::SendPacketAndLogOpcode(WDataStore const& packet)
 {
     LOG_TRACE("network.opcode", "S->C: {} {}", GetRemoteIpAddress().to_string(), GetOpcodeNameForLogging(static_cast<OpcodeServer>(packet.GetOpcode())));
     SendPacket(packet);
 }
 
-void WowConnection::SendPacket(WorldPacket const& packet)
+void WowConnection::SendPacket(WDataStore const& packet)
 {
     if (!IsOpen())
         return;
@@ -517,7 +517,7 @@ void WowConnection::SendPacket(WorldPacket const& packet)
     _bufferQueue.Enqueue(new EncryptableAndCompressiblePacket(packet, _authCrypt.IsInitialized()));
 }
 
-void WowConnection::HandleAuthSession(WorldPacket & recvPacket)
+void WowConnection::HandleAuthSession(WDataStore & recvPacket)
 {
     std::shared_ptr<AuthSession> authSession = std::make_shared<AuthSession>();
 
@@ -714,13 +714,13 @@ void WowConnection::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authS
 
 void WowConnection::SendAuthResponseError(uint8 code)
 {
-    WorldPacket packet(SMSG_AUTH_RESPONSE, 1);
+    WDataStore packet(SMSG_AUTH_RESPONSE, 1);
     packet << uint8(code);
 
     SendPacketAndLogOpcode(packet);
 }
 
-bool WowConnection::HandlePing(WorldPacket& recvPacket)
+bool WowConnection::HandlePing(WDataStore& recvPacket)
 {
     using namespace std::chrono;
 
@@ -779,7 +779,7 @@ bool WowConnection::HandlePing(WorldPacket& recvPacket)
         }
     }
 
-    WorldPacket packet(SMSG_PONG, 4);
+    WDataStore packet(SMSG_PONG, 4);
     packet << ping;
     SendPacketAndLogOpcode(packet);
 

@@ -53,7 +53,7 @@ public:
             return false;
         }
 
-        void FillInitialWorldStates(WorldPacket& data) override
+        void FillInitialWorldStates(WDataStore& data) override
         {
             data << uint32(WORLDSTATE_SHOW_CRATES) << uint32(0);
             data << uint32(WORLDSTATE_CRATES_REVEALED) << uint32(_crateCount);

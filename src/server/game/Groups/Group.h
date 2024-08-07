@@ -35,7 +35,7 @@ class Map;
 class Player;
 class Unit;
 class WorldObject;
-class WorldPacket;
+class WDataStore;
 class User;
 
 struct MapEntry;
@@ -275,8 +275,8 @@ public:
     void SendUpdateToPlayer(WOWGUID playerGUID, MemberSlot* slot = nullptr);
     void UpdatePlayerOutOfRange(Player* player);
     // ignore: GUID of player that will be ignored
-    void BroadcastPacket(WorldPacket const* packet, bool ignorePlayersInBGRaid, int group = -1, WOWGUID ignore = WOWGUID::Empty);
-    void BroadcastReadyCheck(WorldPacket const* packet);
+    void BroadcastPacket(WDataStore const* packet, bool ignorePlayersInBGRaid, int group = -1, WOWGUID ignore = WOWGUID::Empty);
+    void BroadcastReadyCheck(WDataStore const* packet);
     void OfflineReadyCheck();
 
     /*********************************************************/

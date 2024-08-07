@@ -29,8 +29,8 @@ protected:
     ArenaScore(WOWGUID playerGuid, TeamId team) :
         BattlegroundScore(playerGuid), PvPTeamId(team == TEAM_ALLIANCE ? PVP_TEAM_ALLIANCE : PVP_TEAM_HORDE) { }
 
-    void AppendToPacket(WorldPacket& data) final;
-    void BuildObjectivesBlock(WorldPacket& data) final;
+    void AppendToPacket(WDataStore& data) final;
+    void BuildObjectivesBlock(WDataStore& data) final;
 
     // For Logging purpose
     std::string ToString() const override
@@ -64,8 +64,8 @@ protected:
         TeamName = std::string(teamName);
     }
 
-    void BuildRatingInfoBlock(WorldPacket& data);
-    void BuildTeamInfoBlock(WorldPacket& data);
+    void BuildRatingInfoBlock(WDataStore& data);
+    void BuildTeamInfoBlock(WDataStore& data);
 
     int32 RatingChange = 0;
     uint32 MatchmakerRating = 0;

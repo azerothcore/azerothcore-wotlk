@@ -207,7 +207,7 @@ protected:
         }
     }
 
-    void BuildObjectivesBlock(WorldPacket& data) final;
+    void BuildObjectivesBlock(WDataStore& data) final;
 
     uint32 GetAttr1() const override { return FlagCaptures; }
     uint32 GetAttr2() const override { return FlagReturns; }
@@ -252,7 +252,7 @@ public:
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
     void SetDroppedFlagGUID(WOWGUID guid, TeamId teamId) override { _droppedFlagGUID[teamId] = guid; }
     WOWGUID GetDroppedFlagGUID(TeamId teamId) const { return _droppedFlagGUID[teamId];}
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WDataStore& data) override;
 
     /* Scorekeeping */
     void AddPoints(TeamId teamId, uint32 points) { m_TeamScores[teamId] += points; }

@@ -72,7 +72,7 @@ class Unit;
 class Vehicle;
 class Weather;
 class WorldObject;
-class WorldPacket;
+class WDataStore;
 class User;
 class WowConnection;
 

@@ -274,7 +274,7 @@ typedef std::unordered_map<uint32, CompletedAchievementData> CompletedAchievemen
 
 class Unit;
 class Player;
-class WorldPacket;
+class WDataStore;
 
 class AchievementMgr
 {
@@ -311,7 +311,7 @@ private:
     bool IsCompletedCriteria(AchievementCriteriaEntry const* achievementCriteria, AchievementEntry const* achievement);
     bool IsCompletedAchievement(AchievementEntry const* entry);
     bool CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement);
-    void BuildAllDataPacket(WorldPacket* data) const;
+    void BuildAllDataPacket(WDataStore* data) const;
 
     Player* m_player;
     CriteriaProgressMap _criteriaProgress;

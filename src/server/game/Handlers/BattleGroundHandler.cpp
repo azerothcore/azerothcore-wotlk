@@ -29,10 +29,10 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
+void User::HandleBattlemasterHelloOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -64,12 +64,12 @@ void User::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
 
 void User::SendBattleGroundList(WOWGUID guid, BattlegroundTypeId bgTypeId)
 {
-    WorldPacket data;
+    WDataStore data;
     sBattlegroundMgr->BuildBattlegroundListPacket(&data, guid, m_player, bgTypeId, 0);
     Send(&data);
 }
 
-void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
+void User::HandleBattlemasterJoinOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     uint32 bgTypeId_;
@@ -130,7 +130,7 @@ void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     // must have free queue slot
     if (!m_player->HasFreeBattlegroundQueueId())
     {
-        WorldPacket data;
+        WDataStore data;
         sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, ERR_BATTLEGROUND_TOO_MANY_QUEUES);
         Send(&data);
         return;
@@ -141,7 +141,7 @@ void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 
     if (!sScriptMgr->CanJoinInBattlegroundQueue(m_player, guid, bgTypeId, joinAsGroup, err) && err <= 0)
     {
-        WorldPacket data;
+        WDataStore data;
         sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
         Send(&data);
         return;
@@ -195,7 +195,7 @@ void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 
         if (err <= 0)
         {
-            WorldPacket data;
+            WDataStore data;
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
             Send(&data);
             return;
@@ -206,7 +206,7 @@ void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         uint32 queueSlot = m_player->AddBattlegroundQueueId(bgQueueTypeId);
 
         // send status packet
-        WorldPacket data;
+        WDataStore data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_QUEUE, avgWaitTime, 0, 0, TEAM_NEUTRAL);
         Send(&data);
 
@@ -261,7 +261,7 @@ void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         {
             grp->DoForAllMembers([err](Player* member)
             {
-                WorldPacket data;
+                WDataStore data;
                 sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
                 member->User()->Send(&data);
             });
@@ -277,7 +277,7 @@ void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
 
         grp->DoForAllMembers([bg, err, bgQueueTypeId, avgWaitTime](Player* member)
         {
-            WorldPacket data;
+            WDataStore data;
 
             // send status packet
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, member->AddBattlegroundQueueId(bgQueueTypeId), STATUS_WAIT_QUEUE, avgWaitTime, 0, 0, TEAM_NEUTRAL);
@@ -293,7 +293,7 @@ void User::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     sBattlegroundMgr->ScheduleQueueUpdate(0, 0, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
 }
 
-void User::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvData*/)
+void User::HandleBattlegroundPlayerPositionsOpcode(WDataStore& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: Recvd MSG_BATTLEGROUND_PLAYER_POSITIONS Message");
 
@@ -319,7 +319,7 @@ void User::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvData*/)
             ++flagCarrierCount;
     }
 
-    WorldPacket data(MSG_BATTLEGROUND_PLAYER_POSITIONS, 4 + 4 + 16 * flagCarrierCount);
+    WDataStore data(MSG_BATTLEGROUND_PLAYER_POSITIONS, 4 + 4 + 16 * flagCarrierCount);
     // Used to send several player positions (found used in AV)
     data << 0;  // CGBattlefieldInfo__m_numPlayerPositions
     /*
@@ -344,7 +344,7 @@ void User::HandleBattlegroundPlayerPositionsOpcode(WorldPacket& /*recvData*/)
     Send(&data);
 }
 
-void User::HandlePVPLogDataOpcode(WorldPacket& /*recvData*/)
+void User::HandlePVPLogDataOpcode(WDataStore& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: Recvd MSG_PVP_LOG_DATA Message");
 
@@ -356,14 +356,14 @@ void User::HandlePVPLogDataOpcode(WorldPacket& /*recvData*/)
     if (bg->isArena())
         return;
 
-    WorldPacket data;
+    WDataStore data;
     bg->BuildPvPLogDataPacket(data);
     Send(&data);
 
     LOG_DEBUG("network", "WORLD: Sent MSG_PVP_LOG_DATA Message");
 }
 
-void User::HandleBattlefieldListOpcode(WorldPacket& recvData)
+void User::HandleBattlefieldListOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
 
@@ -383,12 +383,12 @@ void User::HandleBattlefieldListOpcode(WorldPacket& recvData)
         return;
     }
 
-    WorldPacket data;
+    WDataStore data;
     sBattlegroundMgr->BuildBattlegroundListPacket(&data, WOWGUID::Empty, m_player, BattlegroundTypeId(bgTypeId), fromWhere);
     Send(&data);
 }
 
-void User::HandleBattleFieldPortOpcode(WorldPacket& recvData)
+void User::HandleBattleFieldPortOpcode(WDataStore& recvData)
 {
     uint8 arenaType;    // arenatype if arena
     uint8 unk2;         // unk, can be 0x0 (may be if was invited?) and 0x1
@@ -475,7 +475,7 @@ void User::HandleBattleFieldPortOpcode(WorldPacket& recvData)
         // can't join with deserter, check it here right before joining to be sure
         if (!m_player->CanJoinToBattleground())
         {
-            WorldPacket data;
+            WDataStore data;
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS);
             Send(&data);
             action = 0;
@@ -492,7 +492,7 @@ void User::HandleBattleFieldPortOpcode(WorldPacket& recvData)
 
     // get player queue slot index for this bg (can be in up to 2 queues at the same time)
     uint32 queueSlot = m_player->GetBattlegroundQueueIndex(bgQueueTypeId);
-    WorldPacket data;
+    WDataStore data;
 
     if (action) // accept
     {
@@ -583,7 +583,7 @@ void User::HandleBattleFieldPortOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
+void User::HandleBattlefieldLeaveOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_LEAVE_BATTLEFIELD Message");
 
@@ -601,12 +601,12 @@ void User::HandleBattlefieldLeaveOpcode(WorldPacket& recvData)
     m_player->LeaveBattleground();
 }
 
-void User::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
+void User::HandleBattlefieldStatusOpcode(WDataStore& /*recvData*/)
 {
     // requested at login and on map change
     // send status for current queues and current bg
 
-    WorldPacket data;
+    WDataStore data;
 
     // for current bg send STATUS_IN_PROGRESS
     if (Battleground* bg = m_player->GetBattleground())
@@ -662,7 +662,7 @@ void User::HandleBattlefieldStatusOpcode(WorldPacket& /*recvData*/)
     }
 }
 
-void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
+void User::HandleBattlemasterJoinArena(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_BATTLEMASTER_JOIN_ARENA");
 
@@ -735,7 +735,7 @@ void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
     // pussywizard: allow being queued only in one arena queue, and it even cannot be together with bg queues
     if (m_player->InBattlegroundQueue())
     {
-        WorldPacket data;
+        WDataStore data;
         sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, ERR_BATTLEGROUND_CANNOT_QUEUE_FOR_RATED);
         Send(&data);
         return;
@@ -746,7 +746,7 @@ void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
     if (!sScriptMgr->CanJoinInArenaQueue(m_player, guid, arenaslot, bgTypeId, asGroup, isRated, err) && err <= 0)
     {
-        WorldPacket data;
+        WDataStore data;
         sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
         Send(&data);
         return;
@@ -770,7 +770,7 @@ void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
 
         if (err <= 0)
         {
-            WorldPacket data;
+            WDataStore data;
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, err);
             Send(&data);
             return;
@@ -789,7 +789,7 @@ void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
         uint32 avgWaitTime = bgQueue.GetAverageQueueWaitTime(ginfo);
         uint32 queueSlot = m_player->AddBattlegroundQueueId(bgQueueTypeId);
 
-        WorldPacket data;
+        WDataStore data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bgt, queueSlot, STATUS_WAIT_QUEUE, avgWaitTime, 0, arenatype, TEAM_NEUTRAL);
         Send(&data);
 
@@ -864,7 +864,7 @@ void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
             avgWaitTime = bgQueue.GetAverageQueueWaitTime(ginfo);
         }
 
-        WorldPacket data;
+        WDataStore data;
         for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* member = itr->GetSource();
@@ -896,7 +896,7 @@ void User::HandleBattlemasterJoinArena(WorldPacket& recvData)
     sBattlegroundMgr->ScheduleQueueUpdate(matchmakerRating, arenatype, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
 }
 
-void User::HandleReportPvPAFK(WorldPacket& recvData)
+void User::HandleReportPvPAFK(WDataStore& recvData)
 {
     WOWGUID playerGuid;
     recvData >> playerGuid;

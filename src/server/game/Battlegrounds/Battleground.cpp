@@ -45,7 +45,7 @@
 #include "Transport.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "WorldStatePackets.h"
 
 namespace Acore
@@ -56,7 +56,7 @@ namespace Acore
         BattlegroundChatBuilder(ChatMsg msgtype, uint32 textId, Player const* source, va_list* args = nullptr)
             : _msgtype(msgtype), _textId(textId), _source(source), _args(args) { }
 
-        void operator()(WorldPacket& data, LocaleConstant loc_idx)
+        void operator()(WDataStore& data, LocaleConstant loc_idx)
         {
             char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
             if (_args)
@@ -76,7 +76,7 @@ namespace Acore
         }
 
     private:
-        void do_helper(WorldPacket& data, char const* text)
+        void do_helper(WDataStore& data, char const* text)
         {
             ChatHandler::BuildChatPacket(data, _msgtype, LANG_UNIVERSAL, _source, _source, text);
         }
@@ -93,7 +93,7 @@ namespace Acore
         Battleground2ChatBuilder(ChatMsg msgtype, uint32 textId, Player const* source, int32 arg1, int32 arg2)
             : _msgtype(msgtype), _textId(textId), _source(source), _arg1(arg1), _arg2(arg2) {}
 
-        void operator()(WorldPacket& data, LocaleConstant loc_idx)
+        void operator()(WDataStore& data, LocaleConstant loc_idx)
         {
             char const* text = sObjectMgr->GetAcoreString(_textId, loc_idx);
             char const* arg1str = _arg1 ? sObjectMgr->GetAcoreString(_arg1, loc_idx) : "";
@@ -121,7 +121,7 @@ void Battleground::BroadcastWorker(Do& _do)
         _do(itr->second);
 }
 
-void BattlegroundScore::AppendToPacket(WorldPacket& data)
+void BattlegroundScore::AppendToPacket(WDataStore& data)
 {
     data << PlayerGuid;
 
@@ -555,7 +555,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
                 if (Player* player = itr->second)
                 {
-                    WorldPacket status;
+                    WDataStore status;
                     sBattlegroundMgr->BuildBattlegroundStatusPacket(&status, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, 0, GetStartTime(), GetArenaType(), player->GetBgTeamId());
                     player->User()->Send(&status);
 
@@ -597,7 +597,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
                             p->SetSummonPoint(t->GetMapId(), t->GetPositionX(), t->GetPositionY(), t->GetPositionZ(), 15, true);
 
-                            WorldPacket data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
+                            WDataStore data(SMSG_SUMMON_REQUEST, 8 + 4 + 4);
                             data << t->GetGUID();
                             data << uint32(t->GetZoneId());
                             data << uint32(15 * IN_MILLISECONDS);
@@ -657,13 +657,13 @@ Position const* Battleground::GetTeamStartPosition(TeamId teamId) const
     return &_startPosition[teamId];
 }
 
-void Battleground::SendPacketToAll(WorldPacket const* packet)
+void Battleground::SendPacketToAll(WDataStore const* packet)
 {
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         itr->second->User()->Send(packet);
 }
 
-void Battleground::SendPacketToTeam(TeamId teamId, WorldPacket const* packet, Player* sender, bool self)
+void Battleground::SendPacketToTeam(TeamId teamId, WDataStore const* packet, Player* sender, bool self)
 {
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
         if (itr->second->GetBgTeamId() == teamId && (self || sender != itr->second))
@@ -711,7 +711,7 @@ void Battleground::YellToAll(Creature* creature, char const* text, uint32 langua
 {
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
-        WorldPacket data;
+        WDataStore data;
         ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_YELL, Language(language), creature, itr->second, text);
         itr->second->SendDirectMessage(&data);
     }
@@ -827,7 +827,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
     //we must set it this way, because end time is sent in packet!
     m_EndTime = TIME_TO_AUTOREMOVE;
 
-    WorldPacket pvpLogData;
+    WDataStore pvpLogData;
     BuildPvPLogDataPacket(pvpLogData);
 
     for (auto const& [playerGuid, player] : m_Players)
@@ -909,7 +909,7 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
             CharacterDatabase.Execute(stmt);
         }
 
-        WorldPacket data;
+        WDataStore data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, TIME_TO_AUTOREMOVE, GetStartTime(), GetArenaType(), player->GetBgTeamId());
         player->User()->Send(&data);
 
@@ -1015,7 +1015,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     {
         player->ClearAfkReports();
 
-        WorldPacket data;
+        WDataStore data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
         player->User()->Send(&data);
 
@@ -1132,7 +1132,7 @@ void Battleground::AddPlayer(Player* player)
 
     UpdatePlayersCountByTeam(teamId, false);                  // +1 player
 
-    WorldPacket data;
+    WDataStore data;
     sBattlegroundMgr->BuildPlayerJoinedBattlegroundPacket(&data, player);
     SendPacketToTeam(teamId, &data, player, false);
 
@@ -1293,7 +1293,7 @@ bool Battleground::HasFreeSlots() const
     return false;
 }
 
-void Battleground::SpectatorsSendPacket(WorldPacket& data)
+void Battleground::SpectatorsSendPacket(WDataStore& data)
 {
     for (SpectatorList::const_iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
         (*itr)->User()->Send(&data);
@@ -1315,7 +1315,7 @@ void Battleground::ReadyMarkerClicked(Player* p)
     }
 }
 
-void Battleground::BuildPvPLogDataPacket(WorldPacket& data)
+void Battleground::BuildPvPLogDataPacket(WDataStore& data)
 {
     uint8 type = (isArena() ? 1 : 0);
 
@@ -1684,7 +1684,7 @@ void Battleground::SendWarningToAll(uint32 entry, ...)
     if (!entry)
         return;
 
-    std::map<uint32, WorldPacket> localizedPackets;
+    std::map<uint32, WDataStore> localizedPackets;
     for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
         if (localizedPackets.find(itr->second->User()->GetSessionDbLocaleIndex()) == localizedPackets.end())
@@ -1828,7 +1828,7 @@ void Battleground::PlayerAddedToBGCheckIfBGIsRunning(Player* player)
     if (GetStatus() != STATUS_WAIT_LEAVE)
         return;
 
-    WorldPacket data;
+    WDataStore data;
     BlockMovement(player);
 
     BuildPvPLogDataPacket(data);

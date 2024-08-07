@@ -22,7 +22,7 @@
 #include "ObjectDefines.h"
 #include "GUID.h"
 #include "SharedDefines.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include <array>
 #include <map>
 #include <sstream>

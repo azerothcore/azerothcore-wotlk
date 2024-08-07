@@ -983,7 +983,7 @@ bool Player::SatisfyQuestLog(bool msg)
 
     if (msg)
     {
-        WorldPacket data(SMSG_QUESTLOG_FULL, 0);
+        WDataStore data(SMSG_QUESTLOG_FULL, 0);
         User()->Send(&data);
         LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTLOG_FULL");
     }
@@ -2341,7 +2341,7 @@ void Player::SendQuestComplete(uint32 quest_id)
 {
     if (quest_id)
     {
-        WorldPacket data(SMSG_QUESTUPDATE_COMPLETE, 4);
+        WDataStore data(SMSG_QUESTUPDATE_COMPLETE, 4);
         data << uint32(quest_id);
         User()->Send(&data);
         LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_COMPLETE quest = {}", quest_id);
@@ -2353,7 +2353,7 @@ void Player::SendQuestReward(Quest const* quest, uint32 XP)
     uint32 questid = quest->GetQuestId();
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_COMPLETE quest = {}", questid);
     sGameEventMgr->HandleQuestComplete(questid);
-    WorldPacket data(SMSG_QUESTGIVER_QUEST_COMPLETE, (4 + 4 + 4 + 4 + 4));
+    WDataStore data(SMSG_QUESTGIVER_QUEST_COMPLETE, (4 + 4 + 4 + 4 + 4));
     data << uint32(questid);
 
     if (!IsMaxLevel())
@@ -2377,7 +2377,7 @@ void Player::SendQuestFailed(uint32 questId, BAG_RESULT reason)
 {
     if (questId)
     {
-        WorldPacket data(SMSG_QUESTGIVER_QUEST_FAILED, 4 + 4);
+        WDataStore data(SMSG_QUESTGIVER_QUEST_FAILED, 4 + 4);
         data << uint32(questId);
         data << uint32(reason);                             // failed reason (valid reasons: 4, 16, 50, 17, 74, other values show default message)
         User()->Send(&data);
@@ -2389,7 +2389,7 @@ void Player::SendQuestTimerFailed(uint32 quest_id)
 {
     if (quest_id)
     {
-        WorldPacket data(SMSG_QUESTUPDATE_FAILEDTIMER, 4);
+        WDataStore data(SMSG_QUESTUPDATE_FAILEDTIMER, 4);
         data << uint32(quest_id);
         User()->Send(&data);
         LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_FAILEDTIMER");
@@ -2398,7 +2398,7 @@ void Player::SendQuestTimerFailed(uint32 quest_id)
 
 void Player::SendCanTakeQuestResponse(uint32 msg) const
 {
-    WorldPacket data(SMSG_QUESTGIVER_QUEST_INVALID, 4);
+    WDataStore data(SMSG_QUESTGIVER_QUEST_INVALID, 4);
     data << uint32(msg);
     User()->Send(&data);
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_INVALID");
@@ -2416,7 +2416,7 @@ void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
             if (const QuestLocale* pLocale = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
                 ObjectMgr::GetLocaleString(pLocale->Title, loc_idx, strTitle);
 
-        WorldPacket data(SMSG_QUEST_CONFIRM_ACCEPT, (4 + quest->GetTitle().size() + 8));
+        WDataStore data(SMSG_QUEST_CONFIRM_ACCEPT, (4 + quest->GetTitle().size() + 8));
         data << uint32(quest->GetQuestId());
         data << quest->GetTitle();
         data << GetGUID();
@@ -2430,7 +2430,7 @@ void Player::SendPushToPartyResponse(Player const* player, uint8 msg) const
 {
     if (player)
     {
-        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
+        WDataStore data(MSG_QUEST_PUSH_RESULT, (8 + 1));
         data << player->GetGUID();
         data << uint8(msg);                                 // valid values: 0-8
         User()->Send(&data);
@@ -2440,7 +2440,7 @@ void Player::SendPushToPartyResponse(Player const* player, uint8 msg) const
 
 void Player::SendQuestUpdateAddItem(Quest const* /*quest*/, uint32 /*item_idx*/, uint16 /*count*/)
 {
-    WorldPacket data(SMSG_QUESTUPDATE_ADD_ITEM, 0);
+    WDataStore data(SMSG_QUESTUPDATE_ADD_ITEM, 0);
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_ADD_ITEM");
     //data << quest->RequiredItemId[item_idx];
     //data << count;
@@ -2456,7 +2456,7 @@ void Player::SendQuestUpdateAddCreatureOrGo(Quest const* quest, WOWGUID guid, ui
         // client expected gameobject template id in form (id|0x80000000)
         entry = (-entry) | 0x80000000;
 
-    WorldPacket data(SMSG_QUESTUPDATE_ADD_KILL, (4 * 4 + 8));
+    WDataStore data(SMSG_QUESTUPDATE_ADD_KILL, (4 * 4 + 8));
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_ADD_KILL");
     data << uint32(quest->GetQuestId());
     data << uint32(entry);
@@ -2474,7 +2474,7 @@ void Player::SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint
 {
     ASSERT(old_count + add_count < 65536 && "player count store in 16 bits");
 
-    WorldPacket data(SMSG_QUESTUPDATE_ADD_PVP_KILL, (3 * 4));
+    WDataStore data(SMSG_QUESTUPDATE_ADD_PVP_KILL, (3 * 4));
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_ADD_PVP_KILL");
     data << uint32(quest->GetQuestId());
     data << uint32(old_count + add_count);

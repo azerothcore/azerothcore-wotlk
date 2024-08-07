@@ -483,15 +483,15 @@ public:
     void setState(uint32 state) { m_spellState = state; }
 
     void DoCreateItem(uint8 effIndex, uint32 itemId);
-    void WriteSpellGoTargets(WorldPacket* data);
-    void WriteAmmoToPacket(WorldPacket* data);
+    void WriteSpellGoTargets(WDataStore* data);
+    void WriteAmmoToPacket(WDataStore* data);
 
     bool CheckEffectTarget(Unit const* target, uint32 eff) const;
     bool CanAutoCast(Unit* target);
     void CheckSrc() { if (!m_targets.HasSrc()) m_targets.SetSrc(*m_caster); }
     void CheckDst() { if (!m_targets.HasDst()) m_targets.SetDst(*m_caster); }
 
-    static void WriteCastResultInfo(WorldPacket& data, Player* caster, SpellInfo const* spellInfo, uint8 castCount, SpellCastResult result, SpellCustomErrors customError);
+    static void WriteCastResultInfo(WDataStore& data, Player* caster, SpellInfo const* spellInfo, uint8 castCount, SpellCastResult result, SpellCustomErrors customError);
     static void SendCastResult(Player* caster, SpellInfo const* spellInfo, uint8 castCount, SpellCastResult result, SpellCustomErrors customError = SPELL_CUSTOM_ERROR_NONE);
     void SendCastResult(SpellCastResult result);
     void SendPetCastResult(SpellCastResult result);

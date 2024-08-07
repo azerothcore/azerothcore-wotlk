@@ -31,8 +31,8 @@ typedef std::set<uint32> BattlegroundClientIdsContainer;
 typedef std::unordered_map<uint32, BattlegroundTypeId> BattleMastersMap;
 typedef Battleground* (*bgRef)(Battleground*);
 
-typedef void(*bgMapRef)(WorldPacket*, Battleground::BattlegroundScoreMap::const_iterator);
-typedef void(*bgTypeRef)(WorldPacket*, Battleground::BattlegroundScoreMap::const_iterator, Battleground*);
+typedef void(*bgMapRef)(WDataStore*, Battleground::BattlegroundScoreMap::const_iterator);
+typedef void(*bgTypeRef)(WDataStore*, Battleground::BattlegroundScoreMap::const_iterator, Battleground*);
 
 // this container can't be deque, because deque doesn't like removing the last element - if you remove it, it invalidates next iterator and crash appears
 using BGFreeSlotQueueContainer = std::list<Battleground*>;
@@ -72,11 +72,11 @@ public:
     void Update(uint32 diff);
 
     /* Packet Building */
-    void BuildPlayerJoinedBattlegroundPacket(WorldPacket* data, Player* player);
-    void BuildPlayerLeftBattlegroundPacket(WorldPacket* data, WOWGUID guid);
-    void BuildBattlegroundListPacket(WorldPacket* data, WOWGUID guid, Player* player, BattlegroundTypeId bgTypeId, uint8 fromWhere);
-    void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, GroupJoinBattlegroundResult result);
-    void BuildBattlegroundStatusPacket(WorldPacket* data, Battleground* bg, uint8 queueSlot, uint8 statusId, uint32 time1, uint32 time2, uint8 arenaType, TeamId teamId, bool isRated = false, BattlegroundTypeId forceBgTypeId = BATTLEGROUND_TYPE_NONE);
+    void BuildPlayerJoinedBattlegroundPacket(WDataStore* data, Player* player);
+    void BuildPlayerLeftBattlegroundPacket(WDataStore* data, WOWGUID guid);
+    void BuildBattlegroundListPacket(WDataStore* data, WOWGUID guid, Player* player, BattlegroundTypeId bgTypeId, uint8 fromWhere);
+    void BuildGroupJoinedBattlegroundPacket(WDataStore* data, GroupJoinBattlegroundResult result);
+    void BuildBattlegroundStatusPacket(WDataStore* data, Battleground* bg, uint8 queueSlot, uint8 statusId, uint32 time1, uint32 time2, uint8 arenaType, TeamId teamId, bool isRated = false, BattlegroundTypeId forceBgTypeId = BATTLEGROUND_TYPE_NONE);
     void SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, WOWGUID guid);
 
     /* Battlegrounds */

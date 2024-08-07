@@ -50,7 +50,7 @@
 #include "Util.h"
 #include "Vehicle.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -247,7 +247,7 @@ void Object::SendUpdateToPlayer(Player* player)
 {
     // send create update to player
     UpdateData upd;
-    WorldPacket packet;
+    WDataStore packet;
 
     BuildCreateUpdateBlockForPlayer(&upd, player);
     upd.BuildPacket(packet);
@@ -281,14 +281,14 @@ void Object::DestroyForPlayer(Player* target, bool onDeath) const
         {
             if (bg->isArena())
             {
-                WorldPacket data(SMSG_ARENA_UNIT_DESTROYED, 8);
+                WDataStore data(SMSG_ARENA_UNIT_DESTROYED, 8);
                 data << GetGUID();
                 target->User()->Send(&data);
             }
         }
     }
 
-    WorldPacket data(SMSG_DESTROY_OBJECT, 8 + 1);
+    WDataStore data(SMSG_DESTROY_OBJECT, 8 + 1);
     data << GetGUID();
     //! If the following bool is true, the client will call "void CGUnit_C::OnDeath()" for this object.
     //! OnDeath() does for eg trigger death animation and interrupts certain spells/missiles/auras/sounds...
@@ -2056,7 +2056,7 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj, bool checkAlert) co
 
 void WorldObject::SendPlayMusic(uint32 Music, bool OnlySelf)
 {
-    WorldPacket data(SMSG_PLAY_MUSIC, 4);
+    WDataStore data(SMSG_PLAY_MUSIC, 4);
     data << Music;
     if (OnlySelf && GetTypeId() == TYPEID_PLAYER)
         this->ToPlayer()->User()->Send(&data);
@@ -2070,26 +2070,26 @@ void Object::ForceValuesUpdateAtIndex(uint32 i)
     AddToObjectUpdateIfNeeded();
 }
 
-void Unit::BuildHeartBeatMsg(WorldPacket* data) const
+void Unit::BuildHeartBeatMsg(WDataStore* data) const
 {
     data->Initialize(MSG_MOVE_HEARTBEAT, 32);
     *data << GetPackGUID();
     BuildMovementPacket(data);
 }
 
-void WorldObject::SendMessageToSet(WorldPacket const* data, bool self) const
+void WorldObject::SendMessageToSet(WDataStore const* data, bool self) const
 {
     if (IsInWorld())
         SendMessageToSetInRange(data, GetVisibilityRange(), self);
 }
 
-void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/) const
+void WorldObject::SendMessageToSetInRange(WDataStore const* data, float dist, bool /*self*/) const
 {
     Acore::MessageDistDeliverer notifier(this, data, dist);
     Cell::VisitWorldObjects(this, notifier, dist);
 }
 
-void WorldObject::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
+void WorldObject::SendMessageToSet(WDataStore const* data, Player const* skipped_rcvr) const
 {
     Acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
     Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
@@ -2097,7 +2097,7 @@ void WorldObject::SendMessageToSet(WorldPacket const* data, Player const* skippe
 
 void WorldObject::SendObjectDeSpawnAnim(WOWGUID guid)
 {
-    WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
+    WDataStore data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
     data << guid;
     SendMessageToSet(&data, true);
 }

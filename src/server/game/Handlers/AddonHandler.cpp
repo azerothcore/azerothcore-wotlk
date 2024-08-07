@@ -34,7 +34,7 @@ AddonHandler* AddonHandler::instance()
     return &instance;
 }
 
-bool AddonHandler::BuildAddonPacket(WorldPacket* Source, WorldPacket* Target)
+bool AddonHandler::BuildAddonPacket(WDataStore* Source, WDataStore* Target)
 {
     ByteBuffer AddOnPacked;
     uLongf AddonRealSize;

@@ -23,7 +23,7 @@
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 static constexpr Milliseconds BG_RV_PILLAR_SWITCH_TIMER  = 25s;
 static constexpr Milliseconds BG_RV_FIRE_TO_PILLAR_TIMER = 20s;
@@ -206,7 +206,7 @@ void BattlegroundRV::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundRV::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundRV::FillInitialWorldStates(WDataStore& data)
 {
     data << uint32(BG_RV_WORLD_STATE) << uint32(1);
     Arena::FillInitialWorldStates(data);

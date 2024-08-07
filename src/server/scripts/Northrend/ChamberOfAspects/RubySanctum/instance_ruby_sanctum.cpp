@@ -21,7 +21,7 @@
 #include "Player.h"
 #include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "ruby_sanctum.h"
 #include "SpellScript.h"
 
@@ -219,7 +219,7 @@ public:
             return true;
         }
 
-        void FillInitialWorldStates(WorldPacket& data) override
+        void FillInitialWorldStates(WDataStore& data) override
         {
             data << uint32(WORLDSTATE_CORPOREALITY_MATERIAL) << uint32(50);
             data << uint32(WORLDSTATE_CORPOREALITY_TWILIGHT) << uint32(50);

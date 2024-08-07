@@ -33,7 +33,7 @@
 #include "Unit.h"
 #include "Util.h"
 #include "Vehicle.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -282,7 +282,7 @@ void AuraApplication::ClientUpdate(bool remove)
 {
     _needClientUpdate = false;
 
-    WorldPacket data(SMSG_AURA_UPDATE);
+    WDataStore data(SMSG_AURA_UPDATE);
     data << GetTarget()->GetPackGUID();
     BuildUpdatePacket(data, remove);
 
@@ -550,7 +550,7 @@ void Aura::_UnapplyForTarget(Unit* target, Unit* caster, AuraApplication* auraAp
             {
                 if (Player* playerOwner = owner->ToPlayer())
                 {
-                    WorldPacket data(SMSG_COOLDOWN_EVENT, 4 + 8);
+                    WDataStore data(SMSG_COOLDOWN_EVENT, 4 + 8);
                     data << uint32(m_spellInfo->Id);
                     data << caster->GetGUID();
                     playerOwner->SendDirectMessage(&data);
@@ -1801,7 +1801,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
 
                             player->AddSpellCooldown(GetSpellInfo()->Id, 0, aurEff->GetAmount()*IN_MILLISECONDS);
 
-                            WorldPacket data(SMSG_MODIFY_COOLDOWN, 4 + 8 + 4);
+                            WDataStore data(SMSG_MODIFY_COOLDOWN, 4 + 8 + 4);
                             data << uint32(GetId());                  // Spell ID
                             data << player->GetGUID();                // Player GUID
                             data << int32(-110000);                   // Cooldown mod in milliseconds

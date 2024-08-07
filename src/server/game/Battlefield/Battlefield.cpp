@@ -30,7 +30,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -446,7 +446,7 @@ void Battlefield::TeamCastSpell(TeamId team, int32 spellId)
     }
 }
 
-void Battlefield::BroadcastPacketToZone(WorldPacket const* data) const
+void Battlefield::BroadcastPacketToZone(WDataStore const* data) const
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
@@ -454,7 +454,7 @@ void Battlefield::BroadcastPacketToZone(WorldPacket const* data) const
                 player->User()->Send(data);
 }
 
-void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
+void Battlefield::BroadcastPacketToQueue(WDataStore const* data) const
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInQueue[team].begin(); itr != m_PlayersInQueue[team].end(); ++itr)
@@ -462,7 +462,7 @@ void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
                 player->User()->Send(data);
 }
 
-void Battlefield::BroadcastPacketToWar(WorldPacket const* data) const
+void Battlefield::BroadcastPacketToWar(WDataStore const* data) const
 {
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
@@ -651,7 +651,7 @@ void Battlefield::RemovePlayerFromResurrectQueue(WOWGUID playerGuid)
 
 void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const WOWGUID& guid)
 {
-    WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
+    WDataStore data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
     uint32 time = m_LastResurectTimer;  // resurrect every 30 seconds
 
     data << guid << time;

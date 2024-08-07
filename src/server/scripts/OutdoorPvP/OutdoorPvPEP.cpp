@@ -26,7 +26,7 @@
 #include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP* pvp)
     : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_UnitsSummonedSideId(TEAM_NEUTRAL)
@@ -107,7 +107,7 @@ void OPvPCapturePointEP_EWT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
 }
 
-void OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointEP_EWT::FillInitialWorldStates(WDataStore& data)
 {
     data << EP_EWT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_EWT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -249,7 +249,7 @@ void OPvPCapturePointEP_NPT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
 }
 
-void OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointEP_NPT::FillInitialWorldStates(WDataStore& data)
 {
     data << EP_NPT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_NPT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -381,7 +381,7 @@ void OPvPCapturePointEP_CGT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
 }
 
-void OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointEP_CGT::FillInitialWorldStates(WDataStore& data)
 {
     data << EP_CGT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_CGT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -518,7 +518,7 @@ void OPvPCapturePointEP_PWT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, _neutralValuePct);
 }
 
-void OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointEP_PWT::FillInitialWorldStates(WDataStore& data)
 {
     data << EP_PWT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_PWT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -711,7 +711,7 @@ void OutdoorPvPEP::SetControlledState(uint32 index, TeamId teamId)
     EP_ControlsId[index] = teamId;
 }
 
-void OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPEP::FillInitialWorldStates(WDataStore& data)
 {
     data << EP_UI_TOWER_COUNT_A << m_AllianceTowersControlled;
     data << EP_UI_TOWER_COUNT_H << m_HordeTowersControlled;

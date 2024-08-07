@@ -369,7 +369,7 @@ protected:
         }
     }
 
-    void BuildObjectivesBlock(WorldPacket& data) final;
+    void BuildObjectivesBlock(WDataStore& data) final;
 
     uint32 GetAttr1() const override { return FlagCaptures; }
 
@@ -403,7 +403,7 @@ public:
     void Init() override;
     void EndBattleground(TeamId winnerTeamId) override;
     bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true) override;
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WDataStore& data) override;
     void SetDroppedFlagGUID(WOWGUID guid, TeamId /*teamId*/ = TEAM_NEUTRAL) override  { _droppedFlagGUID = guid; }
     WOWGUID GetDroppedFlagGUID() const { return _droppedFlagGUID; }
 

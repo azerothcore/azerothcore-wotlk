@@ -75,7 +75,7 @@ class Transport;
 class Unit;
 class Vehicle;
 class WorldObject;
-class WorldPacket;
+class WDataStore;
 class WowConnection;
 class CharacterCreateInfo;
 class SpellScriptLoader;
@@ -158,8 +158,8 @@ public: /* ServerScript */
     void OnNetworkStop();
     void OnSocketOpen(std::shared_ptr<WowConnection> socket);
     void OnSocketClose(std::shared_ptr<WowConnection> socket);
-    bool CanPacketReceive(User* session, WorldPacket const& packet);
-    bool CanPacketSend(User* session, WorldPacket const& packet);
+    bool CanPacketReceive(User* session, WDataStore const& packet);
+    bool CanPacketSend(User* session, WDataStore const& packet);
 
 public: /* WorldScript */
     void OnLoadCustomDatabaseTable();
@@ -296,7 +296,7 @@ public: /* AchievementCriteriaScript */
 public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
     void OnPlayerUpdate(Player* player, uint32 p_time);
-    void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
+    void OnSendInitialPacketsBeforeAddToMap(Player* player, WDataStore& data);
     void OnPlayerJustDied(Player* player);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);

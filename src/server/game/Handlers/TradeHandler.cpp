@@ -25,12 +25,12 @@
 #include "Spell.h"
 #include "SpellMgr.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 void User::SendTradeStatus(TradeStatus status)
 {
-    WorldPacket data;
+    WDataStore data;
 
     switch (status)
     {
@@ -66,13 +66,13 @@ void User::SendTradeStatus(TradeStatus status)
     Send(&data);
 }
 
-void User::HandleIgnoreTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleIgnoreTradeOpcode(WDataStore& /*recvPacket*/)
 {
     LOG_DEBUG("network", "WORLD: Ignore Trade {}", m_player->GetGUID().ToString());
     // recvPacket.print_storage();
 }
 
-void User::HandleBusyTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleBusyTradeOpcode(WDataStore& /*recvPacket*/)
 {
     LOG_DEBUG("network", "WORLD: Busy Trade {}", m_player->GetGUID().ToString());
     // recvPacket.print_storage();
@@ -82,7 +82,7 @@ void User::SendUpdateTrade(bool trader_data /*= true*/)
 {
     TradeData* view_trade = trader_data ? m_player->GetTradeData()->GetTraderData() : m_player->GetTradeData();
 
-    WorldPacket data(SMSG_TRADE_STATUS_EXTENDED, 1 + 4 + 4 + 4 + 4 + 4 + 7 * (1 + 4 + 4 + 4 + 4 + 8 + 4 + 4 + 4 + 4 + 8 + 4 + 4 + 4 + 4 + 4 + 4));
+    WDataStore data(SMSG_TRADE_STATUS_EXTENDED, 1 + 4 + 4 + 4 + 4 + 4 + 7 * (1 + 4 + 4 + 4 + 4 + 8 + 4 + 4 + 4 + 4 + 8 + 4 + 4 + 4 + 4 + 4 + 4));
     data << uint8(trader_data);                             // 1 means traders data, 0 means own
     data << uint32(0);                                      // added in 2.4.0, this value must be equal to value from TRADE_STATUS_OPEN_WINDOW status packet (different value for different players to block multiple trades?)
     data << uint32(TRADE_SLOT_COUNT);                       // trade slots count/number?, = next field in most cases
@@ -241,7 +241,7 @@ static void clearAcceptTradeMode(Item * *myItems, Item * *hisItems)
     }
 }
 
-void User::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleAcceptTradeOpcode(WDataStore& /*recvPacket*/)
 {
     TradeData* my_trade = m_player->m_trade;
     if (!my_trade)
@@ -505,7 +505,7 @@ void User::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
     }
 }
 
-void User::HandleUnacceptTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleUnacceptTradeOpcode(WDataStore& /*recvPacket*/)
 {
     TradeData* my_trade = m_player->GetTradeData();
     if (!my_trade)
@@ -514,7 +514,7 @@ void User::HandleUnacceptTradeOpcode(WorldPacket& /*recvPacket*/)
     my_trade->SetAccepted(false, true);
 }
 
-void User::HandleBeginTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleBeginTradeOpcode(WDataStore& /*recvPacket*/)
 {
     TradeData* my_trade = m_player->m_trade;
     if (!my_trade)
@@ -532,14 +532,14 @@ void User::SendCancelTrade()
     SendTradeStatus(TRADE_STATUS_TRADE_CANCELED);
 }
 
-void User::HandleCancelTradeOpcode(WorldPacket& /*recvPacket*/)
+void User::HandleCancelTradeOpcode(WDataStore& /*recvPacket*/)
 {
     // sended also after LOGOUT COMPLETE
     if (m_player)                                             // needed because STATUS_LOGGEDIN_OR_RECENTLY_LOGGOUT
         m_player->TradeCancel(true);
 }
 
-void User::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
+void User::HandleInitiateTradeOpcode(WDataStore& recvPacket)
 {
     WOWGUID ID;
     recvPacket >> ID;
@@ -649,13 +649,13 @@ void User::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     m_player->m_trade = new TradeData(m_player, pOther);
     pOther->m_trade = new TradeData(pOther, m_player);
 
-    WorldPacket data(SMSG_TRADE_STATUS, 12);
+    WDataStore data(SMSG_TRADE_STATUS, 12);
     data << uint32(TRADE_STATUS_BEGIN_TRADE);
     data << m_player->GetGUID();
     pOther->User()->Send(&data);
 }
 
-void User::HandleSetTradeGoldOpcode(WorldPacket& recvPacket)
+void User::HandleSetTradeGoldOpcode(WDataStore& recvPacket)
 {
     uint32 gold;
     recvPacket >> gold;
@@ -667,7 +667,7 @@ void User::HandleSetTradeGoldOpcode(WorldPacket& recvPacket)
     my_trade->SetMoney(gold);
 }
 
-void User::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
+void User::HandleSetTradeItemOpcode(WDataStore& recvPacket)
 {
     // send update
     uint8 tradeSlot;
@@ -719,7 +719,7 @@ void User::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     my_trade->SetItem(TradeSlots(tradeSlot), item);
 }
 
-void User::HandleClearTradeItemOpcode(WorldPacket& recvPacket)
+void User::HandleClearTradeItemOpcode(WDataStore& recvPacket)
 {
     uint8 tradeSlot;
     recvPacket >> tradeSlot;

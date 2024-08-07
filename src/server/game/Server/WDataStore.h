@@ -15,33 +15,33 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _WORLDPACKET_H_
-#define _WORLDPACKET_H_
+#ifndef _WDATASTORE_H_
+#define _WDATASTORE_H_
 
 #include "ByteBuffer.h"
 #include "Common.h"
 #include "Duration.h"
 #include "Opcodes.h"
 
-class WorldPacket : public ByteBuffer
+class WDataStore : public ByteBuffer
 {
 public:
     // just container for later use
-    WorldPacket() : ByteBuffer(0) { }
+    WDataStore() : ByteBuffer(0) { }
 
-    explicit WorldPacket(uint16 opcode, std::size_t res = 200) :
+    explicit WDataStore(uint16 opcode, std::size_t res = 200) :
         ByteBuffer(res), m_opcode(opcode) { }
 
-    WorldPacket(WorldPacket&& packet) noexcept :
+    WDataStore(WDataStore&& packet) noexcept :
         ByteBuffer(std::move(packet)), m_opcode(packet.m_opcode) { }
 
-    WorldPacket(WorldPacket&& packet, TimePoint receivedTime) :
+    WDataStore(WDataStore&& packet, TimePoint receivedTime) :
         ByteBuffer(std::move(packet)), m_opcode(packet.m_opcode), m_receivedTime(receivedTime) { }
 
-    WorldPacket(WorldPacket const& right) :
+    WDataStore(WDataStore const& right) :
         ByteBuffer(right), m_opcode(right.m_opcode) { }
 
-    WorldPacket& operator=(WorldPacket const& right)
+    WDataStore& operator=(WDataStore const& right)
     {
         if (this != &right)
         {
@@ -52,7 +52,7 @@ public:
         return *this;
     }
 
-    WorldPacket& operator=(WorldPacket&& right) noexcept
+    WDataStore& operator=(WDataStore&& right) noexcept
     {
         if (this != &right)
         {
@@ -63,7 +63,7 @@ public:
         return *this;
     }
 
-    WorldPacket(uint16 opcode, MessageBuffer&& buffer) :
+    WDataStore(uint16 opcode, MessageBuffer&& buffer) :
         ByteBuffer(std::move(buffer)), m_opcode(opcode) { }
 
     void Initialize(uint16 opcode, std::size_t newres = 200)

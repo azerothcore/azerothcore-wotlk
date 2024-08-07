@@ -48,14 +48,14 @@ Copied events should probably have a new owner
 #include "User.h"
 #include <utf8.h>
 
-void User::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
+void User::HandleCalendarGetCalendar(WDataStore& /*recvData*/)
 {
     WOWGUID guid = m_player->GetGUID();
     LOG_DEBUG("network", "CMSG_CALENDAR_GET_CALENDAR [{}]", guid.ToString());
 
     time_t currTime = GameTime::GetGameTime().count();
 
-    WorldPacket data(SMSG_CALENDAR_SEND_CALENDAR, 1000); // Average size if no instance
+    WDataStore data(SMSG_CALENDAR_SEND_CALENDAR, 1000); // Average size if no instance
 
     CalendarInviteStore invites = sCalendarMgr->GetPlayerInvites(guid);
     data << uint32(invites.size());
@@ -183,7 +183,7 @@ void User::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     Send(&data);
 }
 
-void User::HandleCalendarGetEvent(WorldPacket& recvData)
+void User::HandleCalendarGetEvent(WDataStore& recvData)
 {
     uint64 eventId;
     recvData >> eventId;
@@ -196,7 +196,7 @@ void User::HandleCalendarGetEvent(WorldPacket& recvData)
         sCalendarMgr->SendCalendarCommandResult(m_player->GetGUID(), CALENDAR_ERROR_EVENT_INVALID);
 }
 
-void User::HandleCalendarGuildFilter(WorldPacket& recvData)
+void User::HandleCalendarGuildFilter(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_CALENDAR_GUILD_FILTER [{}]", m_player->GetGUID().ToString());
 
@@ -212,7 +212,7 @@ void User::HandleCalendarGuildFilter(WorldPacket& recvData)
     LOG_DEBUG("network", "CMSG_CALENDAR_GUILD_FILTER: Min level [{}], Max level [{}], Min rank [{}]", minLevel, maxLevel, minRank);
 }
 
-void User::HandleCalendarArenaTeam(WorldPacket& recvData)
+void User::HandleCalendarArenaTeam(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_CALENDAR_ARENA_TEAM [{}]", m_player->GetGUID().ToString());
 
@@ -223,7 +223,7 @@ void User::HandleCalendarArenaTeam(WorldPacket& recvData)
         team->MassInviteToEvent(this);
 }
 
-bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, WOWGUID playerGUID)
+bool validUtf8String(WDataStore& recvData, std::string& s, std::string action, WOWGUID playerGUID)
 {
     if (!utf8::is_valid(s.begin(), s.end()))
     {
@@ -235,7 +235,7 @@ bool validUtf8String(WorldPacket& recvData, std::string& s, std::string action, 
     return true;
 }
 
-void User::HandleCalendarAddEvent(WorldPacket& recvData)
+void User::HandleCalendarAddEvent(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
 
@@ -364,7 +364,7 @@ void User::HandleCalendarAddEvent(WorldPacket& recvData)
     sCalendarMgr->AddEvent(calendarEvent, CALENDAR_SENDTYPE_ADD);
 }
 
-void User::HandleCalendarUpdateEvent(WorldPacket& recvData)
+void User::HandleCalendarUpdateEvent(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
     time_t oldEventTime;
@@ -421,7 +421,7 @@ void User::HandleCalendarUpdateEvent(WorldPacket& recvData)
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
 }
 
-void User::HandleCalendarRemoveEvent(WorldPacket& recvData)
+void User::HandleCalendarRemoveEvent(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
     uint64 eventId;
@@ -432,7 +432,7 @@ void User::HandleCalendarRemoveEvent(WorldPacket& recvData)
     sCalendarMgr->RemoveEvent(eventId, guid);
 }
 
-void User::HandleCalendarCopyEvent(WorldPacket& recvData)
+void User::HandleCalendarCopyEvent(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
     uint64 eventId;
@@ -517,7 +517,7 @@ void User::HandleCalendarCopyEvent(WorldPacket& recvData)
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
 }
 
-void User::HandleCalendarEventInvite(WorldPacket& recvData)
+void User::HandleCalendarEventInvite(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_CALENDAR_EVENT_INVITE");
 
@@ -605,7 +605,7 @@ void User::HandleCalendarEventInvite(WorldPacket& recvData)
     }
 }
 
-void User::HandleCalendarEventSignup(WorldPacket& recvData)
+void User::HandleCalendarEventSignup(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
     uint64 eventId;
@@ -631,7 +631,7 @@ void User::HandleCalendarEventSignup(WorldPacket& recvData)
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
 }
 
-void User::HandleCalendarEventRsvp(WorldPacket& recvData)
+void User::HandleCalendarEventRsvp(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
     uint64 eventId;
@@ -667,7 +667,7 @@ void User::HandleCalendarEventRsvp(WorldPacket& recvData)
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
 }
 
-void User::HandleCalendarEventRemoveInvite(WorldPacket& recvData)
+void User::HandleCalendarEventRemoveInvite(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
     WOWGUID invitee;
@@ -695,7 +695,7 @@ void User::HandleCalendarEventRemoveInvite(WorldPacket& recvData)
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_NO_INVITE);
 }
 
-void User::HandleCalendarEventStatus(WorldPacket& recvData)
+void User::HandleCalendarEventStatus(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
     WOWGUID invitee;
@@ -727,7 +727,7 @@ void User::HandleCalendarEventStatus(WorldPacket& recvData)
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
 }
 
-void User::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
+void User::HandleCalendarEventModeratorStatus(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
     WOWGUID invitee;
@@ -756,7 +756,7 @@ void User::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
 }
 
-void User::HandleCalendarComplain(WorldPacket& recvData)
+void User::HandleCalendarComplain(WDataStore& recvData)
 {
     WOWGUID guid = m_player->GetGUID();
     uint64 eventId;
@@ -768,19 +768,19 @@ void User::HandleCalendarComplain(WorldPacket& recvData)
     // what to do with complains?
 }
 
-void User::HandleCalendarGetNumPending(WorldPacket& /*recvData*/)
+void User::HandleCalendarGetNumPending(WDataStore& /*recvData*/)
 {
     WOWGUID guid = m_player->GetGUID();
     uint32 pending = sCalendarMgr->GetPlayerNumPending(guid);
 
     LOG_DEBUG("network", "CMSG_CALENDAR_GET_NUM_PENDING: [{}] Pending: {}", guid.ToString(), pending);
 
-    WorldPacket data(SMSG_CALENDAR_SEND_NUM_PENDING, 4);
+    WDataStore data(SMSG_CALENDAR_SEND_NUM_PENDING, 4);
     data << uint32(pending);
     Send(&data);
 }
 
-void User::HandleSetSavedInstanceExtend(WorldPacket& recvData)
+void User::HandleSetSavedInstanceExtend(WDataStore& recvData)
 {
     uint32 mapId, difficulty;
     uint8 toggleExtendOn;
@@ -813,7 +813,7 @@ void User::SendCalendarRaidLockout(InstanceSave const* save, bool add)
     LOG_DEBUG("network", "{}", add ? "SMSG_CALENDAR_RAID_LOCKOUT_ADDED" : "SMSG_CALENDAR_RAID_LOCKOUT_REMOVED");
     time_t currTime = GameTime::GetGameTime().count();
 
-    WorldPacket data(SMSG_CALENDAR_RAID_LOCKOUT_REMOVED, (add ? 4 : 0) + 4 + 4 + 4 + 8);
+    WDataStore data(SMSG_CALENDAR_RAID_LOCKOUT_REMOVED, (add ? 4 : 0) + 4 + 4 + 4 + 8);
     if (add)
     {
         data.SetOpcode(SMSG_CALENDAR_RAID_LOCKOUT_ADDED);
@@ -832,7 +832,7 @@ void User::SendCalendarRaidLockoutUpdated(InstanceSave const* save, bool isExten
     time_t currTime = GameTime::GetGameTime().count();
     time_t resetTime = isExtended ? save->GetExtendedResetTime() : save->GetResetTime();
     time_t resetTimeOp = isExtended ? save->GetResetTime() : save->GetExtendedResetTime();
-    WorldPacket data(SMSG_CALENDAR_RAID_LOCKOUT_UPDATED, 4 + 4 + 4 + 4 + 8);
+    WDataStore data(SMSG_CALENDAR_RAID_LOCKOUT_UPDATED, 4 + 4 + 4 + 4 + 8);
     data.AppendPackedTime(currTime);
     data << uint32(save->GetMapId());
     data << uint32(save->GetDifficulty());

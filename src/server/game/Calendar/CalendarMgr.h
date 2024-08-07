@@ -21,7 +21,7 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GUID.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include <unordered_map>
 
 enum CalendarMailAnswers
@@ -338,7 +338,7 @@ public:
     void SendCalendarClearPendingAction(WOWGUID guid);
     void SendCalendarCommandResult(WOWGUID guid, CalendarError err, char const* param = nullptr);
 
-    void SendPacketToAllEventRelatives(WorldPacket packet, CalendarEvent const& calendarEvent);
+    void SendPacketToAllEventRelatives(WDataStore packet, CalendarEvent const& calendarEvent);
 };
 
 #define sCalendarMgr CalendarMgr::instance()

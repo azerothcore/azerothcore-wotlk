@@ -28,7 +28,7 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 #define MAX_INBOX_CLIENT_CAPACITY 50
@@ -59,7 +59,7 @@ bool User::CanOpenMailBox(WOWGUID guid)
     return true;
 }
 
-void User::HandleSendMail(WorldPacket& recvData)
+void User::HandleSendMail(WDataStore& recvData)
 {
     WOWGUID mailbox;
     uint64 unk3;
@@ -344,7 +344,7 @@ void User::HandleSendMail(WorldPacket& recvData)
 }
 
 //called when mail is read
-void User::HandleMailMarkAsRead(WorldPacket& recvData)
+void User::HandleMailMarkAsRead(WDataStore& recvData)
 {
     WOWGUID mailbox;
     uint32 mailId;
@@ -367,7 +367,7 @@ void User::HandleMailMarkAsRead(WorldPacket& recvData)
 }
 
 //called when client deletes mail
-void User::HandleMailDelete(WorldPacket& recvData)
+void User::HandleMailDelete(WDataStore& recvData)
 {
     WOWGUID mailbox;
     uint32 mailId;
@@ -397,7 +397,7 @@ void User::HandleMailDelete(WorldPacket& recvData)
     player->SendMailResult(mailId, MAIL_DELETED, MAIL_OK);
 }
 
-void User::HandleMailReturnToSender(WorldPacket& recvData)
+void User::HandleMailReturnToSender(WDataStore& recvData)
 {
     WOWGUID mailbox;
     uint32 mailId;
@@ -478,7 +478,7 @@ void User::HandleMailReturnToSender(WorldPacket& recvData)
 }
 
 //called when player takes item attached in mail
-void User::HandleMailTakeItem(WorldPacket& recvData)
+void User::HandleMailTakeItem(WDataStore& recvData)
 {
     WOWGUID mailbox;
     uint32 mailId;
@@ -586,7 +586,7 @@ void User::HandleMailTakeItem(WorldPacket& recvData)
         player->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_EQUIP_ERROR, msg);
 }
 
-void User::HandleMailTakeMoney(WorldPacket& recvData)
+void User::HandleMailTakeMoney(WDataStore& recvData)
 {
     WOWGUID mailbox;
     uint32 mailId;
@@ -625,7 +625,7 @@ void User::HandleMailTakeMoney(WorldPacket& recvData)
 }
 
 //called when player lists his received mails
-void User::HandleGetMailList(WorldPacket& recvData)
+void User::HandleGetMailList(WDataStore& recvData)
 {
     WOWGUID mailbox;
     recvData >> mailbox;
@@ -638,7 +638,7 @@ void User::HandleGetMailList(WorldPacket& recvData)
     uint8 mailsCount = 0;
     uint32 realCount = 0;
 
-    WorldPacket data(SMSG_MAIL_LIST_RESULT, (200));         // guess size
+    WDataStore data(SMSG_MAIL_LIST_RESULT, (200));         // guess size
     data << uint32(0);                                      // real mail's count
     data << uint8(0);                                       // mail's count
     time_t cur_time = GameTime::GetGameTime().count();
@@ -753,7 +753,7 @@ void User::HandleGetMailList(WorldPacket& recvData)
 }
 
 //used when player copies mail body to his inventory
-void User::HandleMailCreateTextItem(WorldPacket& recvData)
+void User::HandleMailCreateTextItem(WDataStore& recvData)
 {
     WOWGUID mailbox;
     uint32 mailId;
@@ -820,9 +820,9 @@ void User::HandleMailCreateTextItem(WorldPacket& recvData)
 }
 
 //TODO Fix me! ... this void has probably bad condition, but good data are sent
-void User::HandleQueryNextMailTime(WorldPacket& /*recvData*/)
+void User::HandleQueryNextMailTime(WDataStore& /*recvData*/)
 {
-    WorldPacket data(MSG_QUERY_NEXT_MAIL_TIME, 8);
+    WDataStore data(MSG_QUERY_NEXT_MAIL_TIME, 8);
 
     if (m_player->unReadMails > 0)
     {

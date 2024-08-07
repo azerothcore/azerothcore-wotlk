@@ -23,7 +23,7 @@
 #include "Optional.h"
 #include "Player.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
@@ -745,8 +745,8 @@ public:
 
     // Broadcasts
     void BroadcastToGuild(User* session, bool officerOnly, std::string_view msg, uint32 language = LANG_UNIVERSAL) const;
-    void BroadcastPacketToRank(WorldPacket const* packet, uint8 rankId) const;
-    void BroadcastPacket(WorldPacket const* packet) const;
+    void BroadcastPacketToRank(WDataStore const* packet, uint8 rankId) const;
+    void BroadcastPacket(WDataStore const* packet) const;
 
     void MassInviteToEvent(User* session, uint32 minLevel, uint32 maxLevel, uint32 minRank);
 

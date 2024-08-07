@@ -24,7 +24,7 @@
 #include <map>
 
 class User;
-class WorldPacket;
+class WDataStore;
 class Player;
 class Group;
 
@@ -184,7 +184,7 @@ public:
     void LoadStatsFromDB(uint32 ArenaTeamId);
     void SaveToDB(bool forceMemberSave = false);
 
-    void BroadcastPacket(WorldPacket* packet);
+    void BroadcastPacket(WDataStore* packet);
     void BroadcastEvent(ArenaTeamEvents event, WOWGUID guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3);
     void NotifyStatsChanged();
 

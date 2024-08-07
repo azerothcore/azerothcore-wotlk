@@ -1134,7 +1134,7 @@ public:
     bool AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates newstate = ACT_DECIDE);
     bool RemoveSpellFromActionBar(uint32 spell_id);
     void LoadPetActionBar(const std::string& data);
-    void BuildActionBar(WorldPacket* data);
+    void BuildActionBar(WDataStore* data);
     void SetSpellAutocast(SpellInfo const* spellInfo, bool state);
     void SetActionBar(uint8 index, uint32 spellOrAction, ActiveStates type)
     {
@@ -1825,8 +1825,8 @@ public:
     void SetAuraStack(uint32 spellId, Unit* target, uint32 stack);
     void SendPlaySpellVisual(uint32 id);
     void SendPlaySpellImpact(WOWGUID guid, uint32 id);
-    void BuildCooldownPacket(WorldPacket& data, uint8 flags, uint32 spellId, uint32 cooldown);
-    void BuildCooldownPacket(WorldPacket& data, uint8 flags, PacketCooldowns const& cooldowns);
+    void BuildCooldownPacket(WDataStore& data, uint8 flags, uint32 spellId, uint32 cooldown);
+    void BuildCooldownPacket(WDataStore& data, uint8 flags, PacketCooldowns const& cooldowns);
 
     void DeMorph();
 
@@ -1884,7 +1884,7 @@ public:
 
     void SendClearTarget();
 
-    void BuildHeartBeatMsg(WorldPacket* data) const;
+    void BuildHeartBeatMsg(WDataStore* data) const;
 
     [[nodiscard]] bool IsAlive() const { return (m_deathState == DeathState::Alive); };
     [[nodiscard]] bool isDying() const { return (m_deathState == DeathState::JustDied); };

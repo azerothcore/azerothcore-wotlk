@@ -148,7 +148,7 @@ Channel* ChannelMgr::GetChannel(std::string const& name, Player* player, bool pk
     {
         if (pkt)
         {
-            WorldPacket data;
+            WDataStore data;
             MakeNotOnPacket(&data, name);
             player->User()->Send(&data);
         }
@@ -222,7 +222,7 @@ void ChannelMgr::SetChannelRightsFor(const std::string& name, const uint32& flag
     channels_rights[nameStr] = ChannelRights(flags, speakDelay, joinmessage, speakmessage, moderators);
 }
 
-void ChannelMgr::MakeNotOnPacket(WorldPacket* data, std::string const& name)
+void ChannelMgr::MakeNotOnPacket(WDataStore* data, std::string const& name)
 {
     data->Initialize(SMSG_CHANNEL_NOTIFY, 1 + name.size());
     (*data) << uint8(5) << name;

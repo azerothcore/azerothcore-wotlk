@@ -430,7 +430,7 @@ class spell_madrigosa_activate_barrier : public SpellScript
                         if (i->GetSource())
                         {
                             UpdateData data;
-                            WorldPacket pkt;
+                            WDataStore pkt;
                             go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
                             data.BuildPacket(pkt);
                             i->GetSource()->User()->Send(&pkt);
@@ -466,7 +466,7 @@ class spell_madrigosa_deactivate_barrier : public SpellScript
                         if (i->GetSource())
                         {
                             UpdateData data;
-                            WorldPacket pkt;
+                            WDataStore pkt;
                             go->BuildValuesUpdateBlockForPlayer(&data, i->GetSource());
                             data.BuildPacket(pkt);
                             i->GetSource()->User()->Send(&pkt);

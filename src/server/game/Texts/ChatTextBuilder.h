@@ -23,7 +23,7 @@
 #include <string>
 
 class WorldObject;
-class WorldPacket;
+class WDataStore;
 
 namespace Acore
 {
@@ -33,8 +33,8 @@ namespace Acore
             BroadcastTextBuilder(WorldObject const* obj, ChatMsg msgType, uint32 textId, uint8 gender, WorldObject const* target = nullptr, uint32 achievementId = 0)
                 : _source(obj), _msgType(msgType), _textId(textId), _gender(gender), _target(target), _achievementId(achievementId) { }
 
-            void operator()(WorldPacket& data, LocaleConstant locale) const;
-            std::size_t operator()(WorldPacket* data, LocaleConstant locale) const;
+            void operator()(WDataStore& data, LocaleConstant locale) const;
+            std::size_t operator()(WDataStore* data, LocaleConstant locale) const;
 
         private:
             WorldObject const* _source;
@@ -51,7 +51,7 @@ namespace Acore
             CustomChatTextBuilder(WorldObject const* obj, ChatMsg msgType, std::string_view text, Language language = LANG_UNIVERSAL, WorldObject const* target = nullptr)
                 : _source(obj), _msgType(msgType), _text(text), _language(language), _target(target) { }
 
-            void operator()(WorldPacket& data, LocaleConstant locale) const;
+            void operator()(WDataStore& data, LocaleConstant locale) const;
 
         private:
             WorldObject const* _source;
@@ -67,7 +67,7 @@ namespace Acore
             AcoreStringChatBuilder(WorldObject const* obj, ChatMsg msgType, uint32 textId, WorldObject const* target = nullptr, va_list* args = nullptr)
                 : _source(obj), _msgType(msgType), _textId(textId), _target(target), _args(args) { }
 
-            void operator()(WorldPacket& data, LocaleConstant locale) const;
+            void operator()(WDataStore& data, LocaleConstant locale) const;
 
         private:
             WorldObject const* _source;

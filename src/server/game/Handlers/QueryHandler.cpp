@@ -25,14 +25,14 @@
 #include "Pet.h"
 #include "Player.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 void User::SendNameQueryOpcode(WOWGUID guid)
 {
     CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
 
-    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
+    WDataStore data(SMSG_NAME_QUERY_RESPONSE, (8 + 1 + 1 + 1 + 1 + 1 + 10));
     data << guid.WriteAsPacked();
     if (!playerData)
     {
@@ -64,7 +64,7 @@ void User::SendNameQueryOpcode(WOWGUID guid)
     Send(&data);
 }
 
-void User::HandleNameQueryOpcode(WorldPacket& recvData)
+void User::HandleNameQueryOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -75,7 +75,7 @@ void User::HandleNameQueryOpcode(WorldPacket& recvData)
     SendNameQueryOpcode(guid);
 }
 
-void User::HandleQueryTimeOpcode(WorldPacket& /*recvData*/)
+void User::HandleQueryTimeOpcode(WDataStore& /*recvData*/)
 {
     SendQueryTimeResponse();
 }
@@ -84,14 +84,14 @@ void User::SendQueryTimeResponse()
 {
     auto timeResponse = sWorld->GetNextDailyQuestsResetTime() - GameTime::GetGameTime();
 
-    WorldPacket data(SMSG_QUERY_TIME_RESPONSE, 4 + 4);
+    WDataStore data(SMSG_QUERY_TIME_RESPONSE, 4 + 4);
     data << uint32(GameTime::GetGameTime().count());
     data << uint32(timeResponse.count());
     Send(&data);
 }
 
 /// Only _static_ data is sent in this packet !!!
-void User::HandleCreatureQueryOpcode(WorldPacket& recvData)
+void User::HandleCreatureQueryOpcode(WDataStore& recvData)
 {
     uint32 entry;
     recvData >> entry;
@@ -115,7 +115,7 @@ void User::HandleCreatureQueryOpcode(WorldPacket& recvData)
             }
         }
         // guess size
-        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
+        WDataStore data(SMSG_CREATURE_QUERY_RESPONSE, 100);
         data << uint32(entry);                                       // creature entry
         data << Name;
         data << uint8(0) << uint8(0) << uint8(0);                    // name2, name3, name4, always empty
@@ -161,7 +161,7 @@ void User::HandleCreatureQueryOpcode(WorldPacket& recvData)
     else
     {
         LOG_DEBUG("network", "WORLD: CMSG_CREATURE_QUERY - NO CREATURE INFO! ({})", guid.ToString());
-        WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 4);
+        WDataStore data(SMSG_CREATURE_QUERY_RESPONSE, 4);
         data << uint32(entry | 0x80000000);
         Send(&data);
         LOG_DEBUG("network", "WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
@@ -169,7 +169,7 @@ void User::HandleCreatureQueryOpcode(WorldPacket& recvData)
 }
 
 /// Only _static_ data is sent in this packet !!!
-void User::HandleGameObjectQueryOpcode(WorldPacket& recvData)
+void User::HandleGameObjectQueryOpcode(WDataStore& recvData)
 {
     uint32 entry;
     recvData >> entry;
@@ -196,7 +196,7 @@ void User::HandleGameObjectQueryOpcode(WorldPacket& recvData)
             }
 
         LOG_DEBUG("network", "WORLD: CMSG_GAMEOBJECT_QUERY '{}' - Entry: {}. ", info->name, entry);
-        WorldPacket data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 150);
+        WDataStore data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 150);
         data << uint32(entry);
         data << uint32(info->type);
         data << uint32(info->displayId);
@@ -222,18 +222,18 @@ void User::HandleGameObjectQueryOpcode(WorldPacket& recvData)
     else
     {
         LOG_DEBUG("network", "WORLD: CMSG_GAMEOBJECT_QUERY - Missing gameobject info for ({})", guid.ToString());
-        WorldPacket data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 4);
+        WDataStore data (SMSG_GAMEOBJECT_QUERY_RESPONSE, 4);
         data << uint32(entry | 0x80000000);
         Send(&data);
         LOG_DEBUG("network", "WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");
     }
 }
 
-void User::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
+void User::HandleCorpseQueryOpcode(WDataStore& /*recvData*/)
 {
     if (!m_player->HasCorpse())
     {
-        WorldPacket data(MSG_CORPSE_QUERY, 1);
+        WDataStore data(MSG_CORPSE_QUERY, 1);
         data << uint8(0);                                   // corpse not found
         Send(&data);
         return;
@@ -266,7 +266,7 @@ void User::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
         }
     }
 
-    WorldPacket data(MSG_CORPSE_QUERY, 1 + (6 * 4));
+    WDataStore data(MSG_CORPSE_QUERY, 1 + (6 * 4));
     data << uint8(1);                                       // corpse found
     data << int32(mapID);
     data << float(x);
@@ -277,7 +277,7 @@ void User::HandleCorpseQueryOpcode(WorldPacket& /*recvData*/)
     Send(&data);
 }
 
-void User::HandleNpcTextQueryOpcode(WorldPacket& recvData)
+void User::HandleNpcTextQueryOpcode(WDataStore& recvData)
 {
     uint32 textID;
     WOWGUID guid;
@@ -289,7 +289,7 @@ void User::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 
     GossipText const* gossip = sObjectMgr->GetGossipText(textID);
 
-    WorldPacket data(SMSG_NPC_TEXT_UPDATE, 100);          // guess size
+    WDataStore data(SMSG_NPC_TEXT_UPDATE, 100);          // guess size
     data << textID;
 
     if (!gossip)
@@ -364,7 +364,7 @@ void User::HandleNpcTextQueryOpcode(WorldPacket& recvData)
 }
 
 /// Only _static_ data is sent in this packet !!!
-void User::HandlePageTextQueryOpcode(WorldPacket& recvData)
+void User::HandlePageTextQueryOpcode(WDataStore& recvData)
 {
     uint32 pageID;
     recvData >> pageID;
@@ -374,7 +374,7 @@ void User::HandlePageTextQueryOpcode(WorldPacket& recvData)
     {
         PageText const* pageText = sObjectMgr->GetPageText(pageID);
         // guess size
-        WorldPacket data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 50);
+        WDataStore data(SMSG_PAGE_TEXT_QUERY_RESPONSE, 50);
         data << pageID;
 
         if (!pageText)
@@ -402,14 +402,14 @@ void User::HandlePageTextQueryOpcode(WorldPacket& recvData)
     }
 }
 
-void User::HandleCorpseMapPositionQuery(WorldPacket& recvData)
+void User::HandleCorpseMapPositionQuery(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: Recv CMSG_CORPSE_MAP_POSITION_QUERY");
 
     uint32 corpseTransportGUID;
     recvData >> corpseTransportGUID;
 
-    WorldPacket data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4 + 4 + 4 + 4);
+    WDataStore data(SMSG_CORPSE_MAP_POSITION_QUERY_RESPONSE, 4 + 4 + 4 + 4);
     data << float(0);
     data << float(0);
     data << float(0);
@@ -417,7 +417,7 @@ void User::HandleCorpseMapPositionQuery(WorldPacket& recvData)
     Send(&data);
 }
 
-void User::HandleQuestPOIQuery(WorldPacket& recvData)
+void User::HandleQuestPOIQuery(WDataStore& recvData)
 {
     uint32 count;
     recvData >> count; // quest count, max=25
@@ -433,7 +433,7 @@ void User::HandleQuestPOIQuery(WorldPacket& recvData)
     for (uint32 i = 0; i < count; ++i)
         questIds.insert(recvData.read<uint32>()); // quest id
 
-    WorldPacket data(SMSG_QUEST_POI_QUERY_RESPONSE, 4 + (4 + 4)*questIds.size());
+    WDataStore data(SMSG_QUEST_POI_QUERY_RESPONSE, 4 + (4 + 4)*questIds.size());
     data << uint32(questIds.size()); // count
 
     for (std::unordered_set<uint32>::const_iterator itr = questIds.begin(); itr != questIds.end(); ++itr)

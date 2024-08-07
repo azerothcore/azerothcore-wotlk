@@ -21,7 +21,7 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 bool User::CanUseBank(WOWGUID bankerGUID) const
@@ -42,7 +42,7 @@ bool User::CanUseBank(WOWGUID bankerGUID) const
     return true;
 }
 
-void User::HandleBankerActivateOpcode(WorldPacket& recvData)
+void User::HandleBankerActivateOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
 

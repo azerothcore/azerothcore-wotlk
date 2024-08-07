@@ -962,7 +962,7 @@ namespace lfg
             return;
         }
         // send empty packet if cache not found
-        WorldPacket data(SMSG_UPDATE_LFG_LIST, 1000);
+        WDataStore data(SMSG_UPDATE_LFG_LIST, 1000);
         data << (uint32)LFG_TYPE_RAID;
         data << (uint32)dungeonId;
         data << (uint8)0;
@@ -1201,9 +1201,9 @@ namespace lfg
                     }
                 }
 
-                WorldPacket differencePacket(SMSG_UPDATE_LFG_LIST, 1000);
+                WDataStore differencePacket(SMSG_UPDATE_LFG_LIST, 1000);
                 RBPacketBuildDifference(differencePacket, dungeonId, deletedCounter, buffer_deleted, groupCounter, buffer_groups, playerCounter, buffer_players);
-                WorldPacket fullPacket(SMSG_UPDATE_LFG_LIST, 1000);
+                WDataStore fullPacket(SMSG_UPDATE_LFG_LIST, 1000);
                 RBPacketBuildFull(fullPacket, dungeonId, copy);
 
                 RBCacheStore[team][dungeonId] = fullPacket;
@@ -1298,7 +1298,7 @@ namespace lfg
         buffer << (uint32)info.encounterMask;
     }
 
-    void LFGMgr::RBPacketBuildDifference(WorldPacket& differencePacket, uint32 dungeonId, uint32 deletedCounter, ByteBuffer& buffer_deleted, uint32 groupCounter, ByteBuffer& buffer_groups, uint32 playerCounter, ByteBuffer& buffer_players)
+    void LFGMgr::RBPacketBuildDifference(WDataStore& differencePacket, uint32 dungeonId, uint32 deletedCounter, ByteBuffer& buffer_deleted, uint32 groupCounter, ByteBuffer& buffer_groups, uint32 playerCounter, ByteBuffer& buffer_players)
     {
         differencePacket << (uint32)LFG_TYPE_RAID;
         differencePacket << (uint32)dungeonId;
@@ -1313,7 +1313,7 @@ namespace lfg
         differencePacket.append(buffer_players);
     }
 
-    void LFGMgr::RBPacketBuildFull(WorldPacket& fullPacket, uint32 dungeonId, RBInternalInfoMap& infoMap)
+    void LFGMgr::RBPacketBuildFull(WDataStore& fullPacket, uint32 dungeonId, RBInternalInfoMap& infoMap)
     {
         fullPacket << (uint32)LFG_TYPE_RAID;
         fullPacket << (uint32)dungeonId;

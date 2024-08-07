@@ -22,7 +22,7 @@ void WorldPackets::Totem::TotemDestroyed::Read()
     _worldPacket >> Slot;
 }
 
-WorldPacket const* WorldPackets::Totem::TotemCreated::Write()
+WDataStore const* WorldPackets::Totem::TotemCreated::Write()
 {
     _worldPacket << Slot;
     _worldPacket << Totem;

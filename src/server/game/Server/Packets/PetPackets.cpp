@@ -39,13 +39,13 @@ void WorldPackets::Pet::PetSpellAutocast::Read()
     _worldPacket >> AutocastEnabled;
 }
 
-WorldPacket const* WorldPackets::Pet::PetLearnedSpell::Write()
+WDataStore const* WorldPackets::Pet::PetLearnedSpell::Write()
 {
     _worldPacket << uint32(SpellID);
     return &_worldPacket;
 }
 
-WorldPacket const* WorldPackets::Pet::PetUnlearnedSpell::Write()
+WDataStore const* WorldPackets::Pet::PetUnlearnedSpell::Write()
 {
     _worldPacket << uint32(SpellID);
     return &_worldPacket;

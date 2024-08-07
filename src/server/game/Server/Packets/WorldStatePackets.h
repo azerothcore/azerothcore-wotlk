@@ -37,7 +37,7 @@ namespace WorldPackets
 
             InitWorldStates();
 
-            WorldPacket const* Write() override;
+            WDataStore const* Write() override;
 
             int32 MapID = 0;
             int32 ZoneID = 0;
@@ -51,7 +51,7 @@ namespace WorldPackets
         public:
             UpdateWorldState() : ServerPacket(SMSG_UPDATE_WORLD_STATE, 4 + 4) { }
 
-            WorldPacket const* Write() override;
+            WDataStore const* Write() override;
 
             int32 VariableID = 0;
             int32 Value = 0;

@@ -27,11 +27,11 @@
 #include "ScriptMgr.h"
 #include "UpdateMask.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 //void called when player click on auctioneer npc
-void User::HandleAuctionHelloOpcode(WorldPacket& recvData)
+void User::HandleAuctionHelloOpcode(WDataStore& recvData)
 {
     WOWGUID guid;                                            //NPC guid
     recvData >> guid;
@@ -66,7 +66,7 @@ void User::SendAuctionHello(WOWGUID guid, Creature* unit)
     if (!ahEntry)
         return;
 
-    WorldPacket data(MSG_AUCTION_HELLO, 12);
+    WDataStore data(MSG_AUCTION_HELLO, 12);
     data << guid;
     data << uint32(ahEntry->houseId);
     data << uint8(1);                                       // 3.3.3: 1 - AH enabled, 0 - AH disabled
@@ -76,7 +76,7 @@ void User::SendAuctionHello(WOWGUID guid, Creature* unit)
 //call this method when player bids, creates, or deletes auction
 void User::SendAuctionCommandResult(uint32 auctionId, uint32 Action, uint32 ErrorCode, uint32 bidError)
 {
-    WorldPacket data(SMSG_AUCTION_COMMAND_RESULT, 16);
+    WDataStore data(SMSG_AUCTION_COMMAND_RESULT, 16);
     data << auctionId;
     data << Action;
     data << ErrorCode;
@@ -88,7 +88,7 @@ void User::SendAuctionCommandResult(uint32 auctionId, uint32 Action, uint32 Erro
 //this function sends notification, if bidder is online
 void User::SendAuctionBidderNotification(uint32 location, uint32 auctionId, WOWGUID bidder, uint32 bidSum, uint32 diff, uint32 item_template)
 {
-    WorldPacket data(SMSG_AUCTION_BIDDER_NOTIFICATION, (8 * 4));
+    WDataStore data(SMSG_AUCTION_BIDDER_NOTIFICATION, (8 * 4));
     data << uint32(location);
     data << uint32(auctionId);
     data << bidder;
@@ -102,7 +102,7 @@ void User::SendAuctionBidderNotification(uint32 location, uint32 auctionId, WOWG
 //this void causes on client to display: "Your auction sold"
 void User::SendAuctionOwnerNotification(AuctionEntry* auction)
 {
-    WorldPacket data(SMSG_AUCTION_OWNER_NOTIFICATION, (8 * 4));
+    WDataStore data(SMSG_AUCTION_OWNER_NOTIFICATION, (8 * 4));
     data << uint32(auction->Id);
     data << uint32(auction->bid);
     data << uint32(0);                                      //unk
@@ -114,7 +114,7 @@ void User::SendAuctionOwnerNotification(AuctionEntry* auction)
 }
 
 //this void creates new auction and adds auction to some auctionhouse
-void User::HandleAuctionSellItem(WorldPacket& recvData)
+void User::HandleAuctionSellItem(WDataStore& recvData)
 {
     WOWGUID auctioneer;
     uint32 itemsCount, etime, bid, buyout;
@@ -389,7 +389,7 @@ void User::HandleAuctionSellItem(WorldPacket& recvData)
 }
 
 //this function is called when client bids or buys out auction
-void User::HandleAuctionPlaceBid(WorldPacket& recvData)
+void User::HandleAuctionPlaceBid(WDataStore& recvData)
 {
     WOWGUID auctioneer;
     uint32 auctionId;
@@ -520,7 +520,7 @@ void User::HandleAuctionPlaceBid(WorldPacket& recvData)
 }
 
 //this void is called when auction_owner cancels his auction
-void User::HandleAuctionRemoveItem(WorldPacket& recvData)
+void User::HandleAuctionRemoveItem(WDataStore& recvData)
 {
     WOWGUID auctioneer;
     uint32 auctionId;
@@ -593,7 +593,7 @@ void User::HandleAuctionRemoveItem(WorldPacket& recvData)
 }
 
 //called when player lists his bids
-void User::HandleAuctionListBidderItems(WorldPacket& recvData)
+void User::HandleAuctionListBidderItems(WDataStore& recvData)
 {
     WOWGUID guid;                                            //NPC guid
     uint32 listfrom;                                        //page of auctions
@@ -622,7 +622,7 @@ void User::HandleAuctionListBidderItems(WorldPacket& recvData)
 
     AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
-    WorldPacket data(SMSG_AUCTION_BIDDER_LIST_RESULT, (4 + 4 + 4) + 30000); // pussywizard: ensure there is enough memory
+    WDataStore data(SMSG_AUCTION_BIDDER_LIST_RESULT, (4 + 4 + 4) + 30000); // pussywizard: ensure there is enough memory
     Player* player = GetPlayer();
     data << (uint32) 0;                                     //add 0 as count
     uint32 count = 0;
@@ -648,7 +648,7 @@ void User::HandleAuctionListBidderItems(WorldPacket& recvData)
 }
 
 //this void sends player info about his auctions
-void User::HandleAuctionListOwnerItems(WorldPacket& recvData)
+void User::HandleAuctionListOwnerItems(WDataStore& recvData)
 {
     // prevent crash caused by malformed packet
     WOWGUID guid;
@@ -688,7 +688,7 @@ void User::HandleAuctionListOwnerItemsEvent(WOWGUID creatureGuid)
 
     AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(creature->GetFaction());
 
-    WorldPacket data(SMSG_AUCTION_OWNER_LIST_RESULT, (4 + 4 + 4) + 60000); // pussywizard: ensure there is enough memory
+    WDataStore data(SMSG_AUCTION_OWNER_LIST_RESULT, (4 + 4 + 4) + 60000); // pussywizard: ensure there is enough memory
     data << (uint32) 0;                                     // amount place holder
 
     uint32 count = 0;
@@ -702,7 +702,7 @@ void User::HandleAuctionListOwnerItemsEvent(WOWGUID creatureGuid)
 }
 
 //this void is called when player clicks on search button
-void User::HandleAuctionListItems(WorldPacket& recvData)
+void User::HandleAuctionListItems(WDataStore& recvData)
 {
     std::string searchedname;
     uint8 levelmin, levelmax, usable;
@@ -757,13 +757,13 @@ void User::HandleAuctionListItems(WorldPacket& recvData)
         auctionMainCategory, auctionSubCategory, quality, getAll, sortOrder);
 }
 
-void User::HandleAuctionListPendingSales(WorldPacket& recvData)
+void User::HandleAuctionListPendingSales(WDataStore& recvData)
 {
     recvData.read_skip<uint64>();
 
     uint32 count = 0;
 
-    WorldPacket data(SMSG_AUCTION_LIST_PENDING_SALES, 4);
+    WDataStore data(SMSG_AUCTION_LIST_PENDING_SALES, 4);
     data << uint32(count);                                  // count
     /*for (uint32 i = 0; i < count; ++i)
     {

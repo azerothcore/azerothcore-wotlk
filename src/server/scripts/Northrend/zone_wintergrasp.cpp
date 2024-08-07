@@ -178,7 +178,7 @@ public:
         }
         else
         {
-            WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1 + 4);
+            WDataStore data(SMSG_CAST_FAILED, 1 + 4 + 1 + 4);
             data << uint8(0);
             data << spellId;
             data << uint8(SPELL_FAILED_CUSTOM_ERROR);

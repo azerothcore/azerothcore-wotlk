@@ -237,7 +237,7 @@ public:
                 me->SetOrientation(2.19f);
 
                 // and client
-                WorldPacket data;
+                WDataStore data;
                 me->BuildHeartBeatMsg(&data);
                 me->SendMessageToSet(&data, false);
                 me->SetControlled(true, UNIT_STATE_ROOT);

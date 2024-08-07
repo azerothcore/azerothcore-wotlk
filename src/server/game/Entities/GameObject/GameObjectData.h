@@ -20,7 +20,7 @@
 
 #include "Common.h"
 #include "SharedDefines.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include <string>
 #include <vector>
 

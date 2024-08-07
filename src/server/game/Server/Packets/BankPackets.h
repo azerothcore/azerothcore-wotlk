@@ -28,7 +28,7 @@ namespace WorldPackets
         class AutoBankItem final : public ClientPacket
         {
         public:
-            AutoBankItem(WorldPacket&& packet) : ClientPacket(CMSG_AUTOBANK_ITEM, std::move(packet)) { }
+            AutoBankItem(WDataStore&& packet) : ClientPacket(CMSG_AUTOBANK_ITEM, std::move(packet)) { }
 
             void Read() override;
 
@@ -39,7 +39,7 @@ namespace WorldPackets
         class AutoStoreBankItem final : public ClientPacket
         {
         public:
-            AutoStoreBankItem(WorldPacket&& packet) : ClientPacket(CMSG_AUTOSTORE_BANK_ITEM, std::move(packet)) { }
+            AutoStoreBankItem(WDataStore&& packet) : ClientPacket(CMSG_AUTOSTORE_BANK_ITEM, std::move(packet)) { }
 
             void Read() override;
 
@@ -50,7 +50,7 @@ namespace WorldPackets
         class BuyBankSlot final : public ClientPacket
         {
         public:
-            BuyBankSlot(WorldPacket&& packet) : ClientPacket(CMSG_BUY_BANK_SLOT, std::move(packet)) { }
+            BuyBankSlot(WDataStore&& packet) : ClientPacket(CMSG_BUY_BANK_SLOT, std::move(packet)) { }
 
             void Read() override;
 
@@ -62,7 +62,7 @@ namespace WorldPackets
         public:
             BuyBankSlotResult() : ServerPacket(SMSG_BUY_BANK_SLOT_RESULT, 4) { }
 
-            WorldPacket const* Write() override;
+            WDataStore const* Write() override;
 
             uint32 Result = 0;
         };
@@ -72,7 +72,7 @@ namespace WorldPackets
         public:
             ShowBank() : ServerPacket(SMSG_SHOW_BANK, 8) { }
 
-            WorldPacket const* Write() override;
+            WDataStore const* Write() override;
 
             WOWGUID Banker;
         };

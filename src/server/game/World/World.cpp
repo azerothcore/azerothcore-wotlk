@@ -91,7 +91,7 @@
 #include "WaypointMovementGenerator.h"
 #include "WeatherMgr.h"
 #include "WhoListCacheMgr.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
@@ -2498,7 +2498,7 @@ void World::ForceGameEventUpdate()
 }
 
 /// Send a packet to all players (except self if mentioned)
-void World::SendGlobalMessage(WorldPacket const* packet, User* self, TeamId teamId)
+void World::SendGlobalMessage(WDataStore const* packet, User* self, TeamId teamId)
 {
     UserMap::const_iterator itr;
     for (itr = m_users.begin(); itr != m_users.end(); ++itr)
@@ -2515,7 +2515,7 @@ void World::SendGlobalMessage(WorldPacket const* packet, User* self, TeamId team
 }
 
 /// Send a packet to all GMs (except self if mentioned)
-void World::SendGlobalGMMessage(WorldPacket const* packet, User* self, TeamId teamId)
+void World::SendGlobalGMMessage(WDataStore const* packet, User* self, TeamId teamId)
 {
     UserMap::iterator itr;
     for (itr = m_users.begin(); itr != m_users.end(); ++itr)
@@ -2537,7 +2537,7 @@ namespace Acore
     class WorldWorldTextBuilder
     {
     public:
-        typedef std::vector<WorldPacket*> WorldPacketList;
+        typedef std::vector<WDataStore*> WorldPacketList;
         explicit WorldWorldTextBuilder(uint32 textId, va_list* args = nullptr) : i_textId(textId), i_args(args) {}
         void operator()(WorldPacketList& data_list, LocaleConstant loc_idx)
         {
@@ -2565,7 +2565,7 @@ namespace Acore
             char* pos = text;
             while (char* line = lineFromMessage(pos))
             {
-                WorldPacket* data = new WorldPacket();
+                WDataStore* data = new WDataStore();
                 ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
                 data_list.push_back(data);
             }
@@ -2650,7 +2650,7 @@ void World::SendGMText(uint32 string_id, ...)
 }
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
-bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, User* self, TeamId teamId)
+bool World::SendZoneMessage(uint32 zone, WDataStore const* packet, User* self, TeamId teamId)
 {
     bool foundPlayerToSend = false;
     UserMap::const_iterator itr;
@@ -2675,7 +2675,7 @@ bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, User* self, 
 /// Send a System Message to all players in the zone (except self if mentioned)
 void World::SendZoneText(uint32 zone, const char* text, User* self, TeamId teamId)
 {
-    WorldPacket data;
+    WDataStore data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, text);
     SendZoneMessage(zone, &data, self, teamId);
 }

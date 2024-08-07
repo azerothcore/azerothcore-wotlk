@@ -17,10 +17,10 @@
 
 #include "Log.h"
 #include "Opcodes.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
+void User::HandleVoiceSessionEnableOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_VOICE_SESSION_ENABLE");
     // uint8 isVoiceEnabled, uint8 isMicrophoneEnabled
@@ -28,13 +28,13 @@ void User::HandleVoiceSessionEnableOpcode(WorldPacket& recvData)
     recvData.read_skip<uint8>();
 }
 
-void User::HandleChannelVoiceOnOpcode(WorldPacket& /*recvData*/)
+void User::HandleChannelVoiceOnOpcode(WDataStore& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: CMSG_CHANNEL_VOICE_ON");
     // Enable Voice button in channel context menu
 }
 
-void User::HandleSetActiveVoiceChannel(WorldPacket& recvData)
+void User::HandleSetActiveVoiceChannel(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_SET_ACTIVE_VOICE_CHANNEL");
     recvData.read_skip<uint32>();

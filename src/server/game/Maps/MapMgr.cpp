@@ -32,7 +32,7 @@
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 MapMgr::MapMgr()
 {
@@ -199,7 +199,7 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
 
             if (!corpseMap)
             {
-                WorldPacket data(SMSG_CORPSE_NOT_IN_INSTANCE, 0);
+                WDataStore data(SMSG_CORPSE_NOT_IN_INSTANCE, 0);
                 player->User()->Send(&data);
                 LOG_DEBUG("maps", "MAP: Player '{}' does not have a corpse in instance '{}' and cannot enter.", player->GetName(), mapName);
                 return Map::CANNOT_ENTER_CORPSE_IN_DIFFERENT_INSTANCE;

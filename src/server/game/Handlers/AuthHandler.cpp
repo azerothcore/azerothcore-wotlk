@@ -16,12 +16,12 @@
  */
 
 #include "Opcodes.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 void User::SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos)
 {
-    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + (shortForm ? 0 : (4 + 1)));
+    WDataStore packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4 + 1 + (shortForm ? 0 : (4 + 1)));
     packet << uint8(code);
     packet << uint32(0);                                   // BillingTimeRemaining
     packet << uint8(0);                                    // BillingPlanFlags
@@ -39,7 +39,7 @@ void User::SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos)
 
 void User::SendClientCacheVersion(uint32 version)
 {
-    WorldPacket data(SMSG_CLIENTCACHE_VERSION, 4);
+    WDataStore data(SMSG_CLIENTCACHE_VERSION, 4);
     data << uint32(version);
     Send(&data);
 }

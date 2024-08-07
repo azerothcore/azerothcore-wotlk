@@ -20,10 +20,10 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "UpdateData.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
+void User::HandleDuelAcceptedOpcode(WDataStore& recvPacket)
 {
     Player* player = GetPlayer();
     if (!player->duel || player == player->duel->Initiator || player->duel->State != DUEL_STATE_CHALLENGED)
@@ -50,7 +50,7 @@ void User::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     target->SendDuelCountdown(3000);
 }
 
-void User::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
+void User::HandleDuelCancelledOpcode(WDataStore& recvPacket)
 {
     Player* player = GetPlayer();
 

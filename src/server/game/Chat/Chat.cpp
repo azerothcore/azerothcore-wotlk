@@ -31,7 +31,7 @@
 #include "Tokenize.h"
 #include "UpdateMask.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 #include <boost/algorithm/string/replace.hpp>
 
@@ -117,7 +117,7 @@ void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
         msg = stream.str();
     }
 
-    WorldPacket data;
+    WDataStore data;
     for (std::string_view line : Acore::Tokenize(str, '\n', true))
     {
         BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
@@ -127,7 +127,7 @@ void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
 
 void ChatHandler::SendGlobalSysMessage(const char* str)
 {
-    WorldPacket data;
+    WDataStore data;
     for (std::string_view line : Acore::Tokenize(str, '\n', true))
     {
         BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
@@ -137,7 +137,7 @@ void ChatHandler::SendGlobalSysMessage(const char* str)
 
 void ChatHandler::SendGlobalGMSysMessage(const char* str)
 {
-    WorldPacket data;
+    WDataStore data;
     for (std::string_view line : Acore::Tokenize(str, '\n', true))
     {
         BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
@@ -199,7 +199,7 @@ bool ChatHandler::ParseCommands(std::string_view text)
     return _ParseCommands(text.substr(1));
 }
 
-std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WOWGUID senderGUID, WOWGUID receiverGUID, std::string_view message, uint8 chatTag,
+std::size_t ChatHandler::BuildChatPacket(WDataStore& data, ChatMsg chatType, Language language, WOWGUID senderGUID, WOWGUID receiverGUID, std::string_view message, uint8 chatTag,
                                     std::string const& senderName /*= ""*/, std::string const& receiverName /*= ""*/,
                                     uint32 achievementId /*= 0*/, bool gmMessage /*= false*/, std::string const& channelName /*= ""*/)
 {
@@ -279,7 +279,7 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, La
     return receiverGUIDPos;
 }
 
-std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message,
+std::size_t ChatHandler::BuildChatPacket(WDataStore& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message,
                                     uint32 achievementId /*= 0*/, std::string const& channelName /*= ""*/, LocaleConstant locale /*= DEFAULT_LOCALE*/)
 {
     WOWGUID senderGUID;
@@ -933,7 +933,7 @@ bool AddonChannelCommandHandler::ParseCommands(std::string_view str)
 
 void AddonChannelCommandHandler::Send(std::string const& msg)
 {
-    WorldPacket data;
+    WDataStore data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_ADDON, GetSession()->GetPlayer(), GetSession()->GetPlayer(), msg);
     GetSession()->Send(&data);
 }

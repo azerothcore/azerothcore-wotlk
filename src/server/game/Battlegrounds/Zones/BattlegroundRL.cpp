@@ -18,7 +18,7 @@
 #include "BattlegroundRL.h"
 #include "Log.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 BattlegroundRL::BattlegroundRL()
 {
@@ -91,7 +91,7 @@ void BattlegroundRL::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundRL::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundRL::FillInitialWorldStates(WDataStore& data)
 {
     data << uint32(0xbba) << uint32(1);           // 9
     Arena::FillInitialWorldStates(data);

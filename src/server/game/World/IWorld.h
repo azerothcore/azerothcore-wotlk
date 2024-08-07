@@ -30,7 +30,7 @@
 #include <set>
 #include <unordered_map>
 
-class WorldPacket;
+class WDataStore;
 class User;
 class Player;
 
@@ -568,9 +568,9 @@ public:
     virtual void SendWorldText(uint32 string_id, ...) = 0;
     virtual void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) = 0;
     virtual void SendGMText(uint32 string_id, ...) = 0;
-    virtual void SendGlobalMessage(WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual void SendGlobalGMMessage(WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
-    virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalMessage(WDataStore const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual void SendGlobalGMMessage(WDataStore const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
+    virtual bool SendZoneMessage(uint32 zone, WDataStore const* packet, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendZoneText(uint32 zone, const char* text, User* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendServerMessage(ServerMessageType messageID, std::string stringParam = "", Player* player = nullptr) = 0;
     [[nodiscard]] virtual bool IsShuttingDown() const = 0;

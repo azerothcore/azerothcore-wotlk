@@ -21,7 +21,7 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 UpdateData::UpdateData() : m_blockCount(0)
 {
@@ -45,7 +45,7 @@ void UpdateData::AddUpdateBlock(const UpdateData& block)
     m_blockCount += block.m_blockCount;
 }
 
-bool UpdateData::BuildPacket(WorldPacket& packet)
+bool UpdateData::BuildPacket(WDataStore& packet)
 {
     ASSERT(packet.empty());
 

@@ -23,10 +23,10 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "Vehicle.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleAttackSwingOpcode(WorldPacket& recvData)
+void User::HandleAttackSwingOpcode(WDataStore& recvData)
 {
     WOWGUID guid;
     recvData >> guid;
@@ -66,7 +66,7 @@ void User::HandleAttackSwingOpcode(WorldPacket& recvData)
     m_player->Attack(pEnemy, true);
 }
 
-void User::HandleAttackStopOpcode(WorldPacket& /*recvData*/)
+void User::HandleAttackStopOpcode(WDataStore& /*recvData*/)
 {
     GetPlayer()->AttackStop();
 }
@@ -84,7 +84,7 @@ void User::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& packet)
 
 void User::SendAttackStop(Unit const* enemy)
 {
-    WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4)); // we guess size
+    WDataStore data(SMSG_ATTACKSTOP, (8 + 8 + 4)); // we guess size
     data << GetPlayer()->GetPackGUID();
 
     if (enemy)

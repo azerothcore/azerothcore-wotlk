@@ -24,7 +24,7 @@
 #include "ServerPktHeader.h"
 #include "Socket.h"
 #include "Util.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 #include <boost/asio/ip/tcp.hpp>
 
@@ -33,12 +33,12 @@ using boost::asio::ip::tcp;
 typedef int(*MSGHANDLER)(User*        user,
                          Opcodes      msgId,
                          uint32_t     eventTime,
-                         WorldPacket* msg);
+                         WDataStore* msg);
 
-class EncryptableAndCompressiblePacket : public WorldPacket
+class EncryptableAndCompressiblePacket : public WDataStore
 {
 public:
-    EncryptableAndCompressiblePacket(WorldPacket const& packet, bool encrypt) : WorldPacket(packet), _encrypt(encrypt)
+    EncryptableAndCompressiblePacket(WDataStore const& packet, bool encrypt) : WDataStore(packet), _encrypt(encrypt)
     {
         SocketQueueLink.store(nullptr, std::memory_order_relaxed);
     }
@@ -87,7 +87,7 @@ public:
     void Start() override;
     bool Update() override;
 
-    void SendPacket(WorldPacket const& packet);
+    void SendPacket(WDataStore const& packet);
 
     void SetSendBufferSize(std::size_t sendBufferSize) { _sendBufferSize = sendBufferSize; }
 
@@ -118,14 +118,14 @@ private:
     void LogOpcodeText(OpcodeClient opcode, std::unique_lock<std::mutex> const& guard) const;
 
     /// sends and logs network.opcode without accessing User
-    void SendPacketAndLogOpcode(WorldPacket const& packet);
+    void SendPacketAndLogOpcode(WDataStore const& packet);
     void HandleSendAuthSession();
-    void HandleAuthSession(WorldPacket& recvPacket);
+    void HandleAuthSession(WDataStore& recvPacket);
     void HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSession, PreparedQueryResult result);
     void LoadSessionPermissionsCallback(PreparedQueryResult result);
     void SendAuthResponseError(uint8 code);
 
-    bool HandlePing(WorldPacket& recvPacket);
+    bool HandlePing(WDataStore& recvPacket);
 
     std::array<uint8, 4> _authSeed;
     AuthCrypt _authCrypt;

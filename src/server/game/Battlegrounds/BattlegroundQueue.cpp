@@ -352,7 +352,7 @@ void BattlegroundQueue::RemovePlayer(WOWGUID guid, bool decreaseInvitedCount)
             uint32 queueSlot = plr->GetBattlegroundQueueIndex(bgQueueTypeId);
             plr->RemoveBattlegroundQueueId(bgQueueTypeId);
 
-            WorldPacket data;
+            WDataStore data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
             plr->SendDirectMessage(&data);
         }
@@ -1267,7 +1267,7 @@ void BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg,
             player->GetName(), player->GetGUID().ToString(), bg->GetInstanceID(), queueSlot, bgTypeId);
 
         // send status packet
-        WorldPacket data;
+        WDataStore data;
         sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_JOIN, INVITE_ACCEPT_WAIT_TIME, 0, ginfo->ArenaType, TEAM_NEUTRAL, bg->isRated());
         player->User()->Send(&data);
 
@@ -1305,7 +1305,7 @@ bool BGQueueInviteEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
         if (bgQueue.IsPlayerInvited(m_PlayerGuid, m_BgInstanceGUID, m_RemoveTime))
         {
             // send remaining time in queue
-            WorldPacket data;
+            WDataStore data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_JOIN, INVITE_ACCEPT_WAIT_TIME - INVITATION_REMIND_TIME, 0, m_ArenaType, TEAM_NEUTRAL, bg->isRated(), m_BgTypeId);
             player->User()->Send(&data);
         }
@@ -1362,7 +1362,7 @@ bool BGQueueRemoveEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
             if (bg && bg->isBattleground() && bg->GetStatus() != STATUS_WAIT_LEAVE)
                 sBattlegroundMgr->ScheduleQueueUpdate(0, 0, m_BgQueueTypeId, m_BgTypeId, bg->GetBracketId());
 
-            WorldPacket data;
+            WDataStore data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
             player->SendDirectMessage(&data);
         }

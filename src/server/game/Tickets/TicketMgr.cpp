@@ -26,7 +26,7 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 inline float GetAge(uint64 t) { return float(GameTime::GetGameTime().count() - t) / DAY; }
@@ -112,7 +112,7 @@ void GmTicket::DeleteFromDB()
     CharacterDatabase.Execute(stmt);
 }
 
-void GmTicket::WritePacket(WorldPacket& data) const
+void GmTicket::WritePacket(WDataStore& data) const
 {
     data << uint32(GMTICKET_STATUS_HASTEXT);
     data << uint32(_id);
@@ -133,7 +133,7 @@ void GmTicket::WritePacket(WorldPacket& data) const
 
 void GmTicket::SendResponse(User* session) const
 {
-    WorldPacket data(SMSG_GMRESPONSE_RECEIVED);
+    WDataStore data(SMSG_GMRESPONSE_RECEIVED);
     data << uint32(1);          // responseID
     data << uint32(_id);        // ticketID
     data << _message.c_str();
@@ -428,7 +428,7 @@ void TicketMgr::ShowEscalatedList(ChatHandler& handler) const
 
 void TicketMgr::SendTicket(User* session, GmTicket* ticket) const
 {
-    WorldPacket data(SMSG_GMTICKET_GETTICKET, (ticket ? (4 + 4 + 1 + 4 + 4 + 4 + 1 + 1) : 4));
+    WDataStore data(SMSG_GMTICKET_GETTICKET, (ticket ? (4 + 4 + 1 + 4 + 4 + 4 + 1 + 1) : 4));
 
     if (ticket)
         ticket->WritePacket(data);

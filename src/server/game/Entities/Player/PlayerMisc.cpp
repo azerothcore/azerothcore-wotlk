@@ -77,7 +77,7 @@ bool Player::CanSpeak() const
 
 void Player::SendAttackSwingNotInRange()
 {
-    WorldPacket data(SMSG_ATTACKSWING_NOTINRANGE, 0);
+    WDataStore data(SMSG_ATTACKSWING_NOTINRANGE, 0);
     User()->Send(&data);
 }
 
@@ -127,38 +127,38 @@ void Player::Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDat
 
 void Player::SendAttackSwingDeadTarget()
 {
-    WorldPacket data(SMSG_ATTACKSWING_DEADTARGET, 0);
+    WDataStore data(SMSG_ATTACKSWING_DEADTARGET, 0);
     User()->Send(&data);
 }
 
 void Player::SendAttackSwingCantAttack()
 {
-    WorldPacket data(SMSG_ATTACKSWING_CANT_ATTACK, 0);
+    WDataStore data(SMSG_ATTACKSWING_CANT_ATTACK, 0);
     User()->Send(&data);
 }
 
 void Player::SendAttackSwingCancelAttack()
 {
-    WorldPacket data(SMSG_CANCEL_COMBAT, 0);
+    WDataStore data(SMSG_CANCEL_COMBAT, 0);
     User()->Send(&data);
 }
 
 void Player::SendAttackSwingBadFacingAttack()
 {
-    WorldPacket data(SMSG_ATTACKSWING_BADFACING, 0);
+    WDataStore data(SMSG_ATTACKSWING_BADFACING, 0);
     User()->Send(&data);
 }
 
 void Player::SendAutoRepeatCancel(Unit* target)
 {
-    WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, target->GetPackGUID().size());
+    WDataStore data(SMSG_CANCEL_AUTO_REPEAT, target->GetPackGUID().size());
     data << target->GetPackGUID();                  // may be it's target guid
     SendMessageToSet(&data, true);
 }
 
 void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
 {
-    WorldPacket data(SMSG_EXPLORATION_EXPERIENCE, 8);
+    WDataStore data(SMSG_EXPLORATION_EXPERIENCE, 8);
     data << uint32(Area);
     data << uint32(Experience);
     User()->Send(&data);
@@ -167,7 +167,7 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
 void Player::SendDungeonDifficulty(bool IsInGroup)
 {
     uint8 val = 0x00000001;
-    WorldPacket data(MSG_SET_DUNGEON_DIFFICULTY, 12);
+    WDataStore data(MSG_SET_DUNGEON_DIFFICULTY, 12);
     data << (uint32)GetDungeonDifficulty();
     data << uint32(val);
     data << uint32(IsInGroup);
@@ -177,7 +177,7 @@ void Player::SendDungeonDifficulty(bool IsInGroup)
 void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
 {
     uint8 val = 0x00000001;
-    WorldPacket data(MSG_SET_RAID_DIFFICULTY, 12);
+    WDataStore data(MSG_SET_RAID_DIFFICULTY, 12);
     data << uint32(forcedDifficulty == -1 ? GetRaidDifficulty() : forcedDifficulty);
     data << uint32(val);
     data << uint32(IsInGroup);
@@ -186,7 +186,7 @@ void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
 
 void Player::SendResetFailedNotify(uint32 mapid)
 {
-    WorldPacket data(SMSG_RESET_FAILED_NOTIFY, 4);
+    WDataStore data(SMSG_RESET_FAILED_NOTIFY, 4);
     data << uint32(mapid);
     User()->Send(&data);
 }
@@ -325,7 +325,7 @@ void Player::ResetInstances(WOWGUID guid, uint8 method, bool isRaid)
 
 void Player::SendResetInstanceSuccess(uint32 MapId)
 {
-    WorldPacket data(SMSG_INSTANCE_RESET, 4);
+    WDataStore data(SMSG_INSTANCE_RESET, 4);
     data << uint32(MapId);
     User()->Send(&data);
 }
@@ -337,7 +337,7 @@ void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
     // 1: There are players offline in your party.
     // 2>: There are players in your party attempting to zone into an instance.
     */
-    WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 4);
+    WDataStore data(SMSG_INSTANCE_RESET_FAILED, 4);
     data << uint32(reason);
     data << uint32(MapId);
     User()->Send(&data);

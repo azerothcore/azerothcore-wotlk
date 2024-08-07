@@ -23,7 +23,7 @@
 #include "Player.h"
 #include "QuestDef.h"
 #include "ScriptMgr.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 GossipMenu::GossipMenu()
@@ -194,7 +194,7 @@ void PlayerMenu::SendGossipMenu(uint32 titleTextId, WOWGUID objectGUID)
 {
     _gossipMenu.SetSenderGUID(objectGUID);
 
-    WorldPacket data(SMSG_GOSSIP_MESSAGE, 24 + _gossipMenu.GetMenuItemCount() * 100 + _questMenu.GetMenuItemCount() * 75);     // guess size
+    WDataStore data(SMSG_GOSSIP_MESSAGE, 24 + _gossipMenu.GetMenuItemCount() * 100 + _questMenu.GetMenuItemCount() * 75);     // guess size
     data << objectGUID;
     data << uint32(_gossipMenu.GetMenuId());            // new 2.4.0
     data << uint32(titleTextId);
@@ -240,7 +240,7 @@ void PlayerMenu::SendCloseGossip()
 {
     _gossipMenu.SetSenderGUID(WOWGUID::Empty);
 
-    WorldPacket data(SMSG_GOSSIP_COMPLETE, 0);
+    WDataStore data(SMSG_GOSSIP_COMPLETE, 0);
     _session->Send(&data);
 }
 
@@ -258,7 +258,7 @@ void PlayerMenu::SendPointOfInterest(uint32 poiId) const
     if (PointOfInterestLocale const* localeData = sObjectMgr->GetPointOfInterestLocale(poiId))
         ObjectMgr::GetLocaleString(localeData->Name, locale, name);
 
-    WorldPacket data(SMSG_GOSSIP_POI, 4 + 4 + 4 + 4 + 4 + 20);  // guess size
+    WDataStore data(SMSG_GOSSIP_POI, 4 + 4 + 4 + 4 + 4 + 20);  // guess size
     data << uint32(poi->Flags);
     data << float(poi->PositionX);
     data << float(poi->PositionY);
@@ -314,7 +314,7 @@ void QuestMenu::ClearMenu()
 
 void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const& Title, WOWGUID guid)
 {
-    WorldPacket data(SMSG_QUESTGIVER_QUEST_LIST, 100);  // guess size
+    WDataStore data(SMSG_QUESTGIVER_QUEST_LIST, 100);  // guess size
     data << guid;
 
     if (QuestGreeting const* questGreeting = sObjectMgr->GetQuestGreeting(guid.GetTypeId(), guid.GetEntry()))
@@ -373,7 +373,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const
 
 void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, WOWGUID npcGUID) const
 {
-    WorldPacket data(SMSG_QUESTGIVER_STATUS, 9);
+    WDataStore data(SMSG_QUESTGIVER_STATUS, 9);
     data << npcGUID;
     data << uint8(questStatus);
 
@@ -397,7 +397,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, WOWGUID npcGUID,
         ObjectMgr::GetLocaleString(localeData->AreaDescription, locale, questAreaDescription);
     }
 
-    WorldPacket data(SMSG_QUESTGIVER_QUEST_DETAILS, 500);   // guess size
+    WDataStore data(SMSG_QUESTGIVER_QUEST_DETAILS, 500);   // guess size
     data << npcGUID;
     data << _session->GetPlayer()->GetDivider();
     data << uint32(quest->GetQuestId());
@@ -525,7 +525,7 @@ void PlayerMenu::SendQuestQueryResponse(Quest const* quest) const
             ObjectMgr::GetLocaleString(localeData->ObjectiveText[i], locale, questObjectiveText[i]);
     }
 
-    WorldPacket data(SMSG_QUEST_QUERY_RESPONSE, 100);       // guess size
+    WDataStore data(SMSG_QUEST_QUERY_RESPONSE, 100);       // guess size
 
     data << uint32(quest->GetQuestId());                    // quest id
     data << uint32(quest->GetQuestMethod());                // Accepted values: 0, 1 or 2. 0 == IsAutoComplete() (skip objectives/details)
@@ -652,7 +652,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* quest, WOWGUID npcGUID, 
     if (QuestOfferRewardLocale const* questOfferRewardLocale = sObjectMgr->GetQuestOfferRewardLocale(quest->GetQuestId()))
         ObjectMgr::GetLocaleString(questOfferRewardLocale->RewardText, locale, RewardText);
 
-    WorldPacket data(SMSG_QUESTGIVER_OFFER_REWARD, 400);    // guess size
+    WDataStore data(SMSG_QUESTGIVER_OFFER_REWARD, 400);    // guess size
     data << npcGUID;
     data << uint32(quest->GetQuestId());
     data << questTitle;
@@ -783,7 +783,7 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* quest, WOWGUID npcGUID,
         }
     }
 
-    WorldPacket data(SMSG_QUESTGIVER_REQUEST_ITEMS, 300);   // guess size
+    WDataStore data(SMSG_QUESTGIVER_REQUEST_ITEMS, 300);   // guess size
     data << npcGUID;
     data << uint32(quest->GetQuestId());
     data << questTitle;

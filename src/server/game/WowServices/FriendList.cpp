@@ -17,31 +17,31 @@ typedef std::map<WOWGUID, FriendList*> FRIENDLISTMAP_T;
 static BOOL AddFriendHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
-                              WorldPacket*  msg);
+                              WDataStore*  msg);
 static BOOL AddIgnoreHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
-                              WorldPacket*  msg);
+                              WDataStore*  msg);
 static BOOL ContactListHandler (User*         user,
                                 Opcodes       msgId,
                                 uint32_t      eventTime,
-                                WorldPacket*  msg);
+                                WDataStore*  msg);
 static BOOL DeleteFriendHandler (User*        user,
                                  Opcodes      msgId,
                                  uint32_t     eventTime,
-                                 WorldPacket* msg);
+                                 WDataStore* msg);
 static BOOL DelIgnoreHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
-                              WorldPacket*  msg);
+                              WDataStore*  msg);
 static BOOL SetFriendNotesHandler (User*        user,
                                    Opcodes      msgId,
                                    uint32_t     eventTime,
-                                   WorldPacket* msg);
+                                   WDataStore* msg);
 static BOOL WhoIsHandler (User*         user,
                           Opcodes       msgId,
                           uint32_t      eventTime,
-                          WorldPacket*  msg);
+                          WDataStore*  msg);
 
 
 /****************************************************************************
@@ -68,7 +68,7 @@ FriendList::FriendList (Player* plr) {
   // to all users that have this player on their friends list
   for (auto it = s_friendListMap.begin(); it != s_friendListMap.end(); it++) {
     if (it->second != this && it->second->GetFriend(guid)) {
-      WorldPacket msg(SMSG_FRIEND_STATUS);
+      WDataStore msg(SMSG_FRIEND_STATUS);
       msg << (unsigned char)FRIEND_ONLINE;
       msg << guid;
       msg << (unsigned char)FRIEND_STATUS_ONLINE;
@@ -231,7 +231,7 @@ void FriendList::AddContacts () {
   uint32_t iIgnore = 0;
   uint32_t iMute = 0;
 
-  WorldPacket msg(SMSG_CONTACT_LIST);
+  WDataStore msg(SMSG_CONTACT_LIST);
   msg << uint32_t(CONTACT_FRIEND | CONTACT_IGNORED | CONTACT_MUTED);
   msg << numRows; // Total number of contacts
 
@@ -398,7 +398,7 @@ void FriendList::SaveContact (WOWGUID const& guid, uint32_t flags, const char* n
 
 //===========================================================================
 void FriendList::SendContactList (uint32_t flags) {
-  WorldPacket msg(SMSG_CONTACT_LIST);
+  WDataStore msg(SMSG_CONTACT_LIST);
   msg << flags;
 
   uint32_t iFriend = GetNumFriends();
@@ -452,7 +452,7 @@ void FriendList::SendContactList (uint32_t flags) {
 
 //===========================================================================
 void FriendList::SendFriendStatus (FRIEND_RESULT res, WOWGUID guid) {
-  WorldPacket msg(SMSG_FRIEND_STATUS);
+  WDataStore msg(SMSG_FRIEND_STATUS);
   msg << (unsigned char)res;
   msg << guid;
 
@@ -504,7 +504,7 @@ void FriendList::SetFriendNotes (WOWGUID const& guid, char const* notes) {
 static BOOL AddFriendHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
-                              WorldPacket*  msg) {
+                              WDataStore*  msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -526,7 +526,7 @@ static BOOL AddFriendHandler (User*         user,
 static BOOL AddIgnoreHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
-                              WorldPacket*  msg) {
+                              WDataStore*  msg) {
 
   FriendList* friendList = user->ActivePlayer()->FriendListPtr();
 
@@ -551,7 +551,7 @@ static BOOL AddIgnoreHandler (User*         user,
 static BOOL ContactListHandler (User*         user,
                                 Opcodes       msgId,
                                 uint32_t      eventTime,
-                                WorldPacket*  msg) {
+                                WDataStore*  msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -569,7 +569,7 @@ static BOOL ContactListHandler (User*         user,
 static BOOL DeleteFriendHandler (User*        user,
                                  Opcodes      msgId,
                                  uint32_t     eventTime,
-                                 WorldPacket* msg) {
+                                 WDataStore* msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -594,7 +594,7 @@ static BOOL DeleteFriendHandler (User*        user,
 static BOOL DelIgnoreHandler (User*         user,
                               Opcodes       msgId,
                               uint32_t      eventTime,
-                              WorldPacket*  msg) {
+                              WDataStore*  msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -613,7 +613,7 @@ static BOOL DelIgnoreHandler (User*         user,
 static BOOL SetFriendNotesHandler (User*        user,
                                    Opcodes      msgId,
                                    uint32_t     eventTime,
-                                   WorldPacket* msg) {
+                                   WDataStore* msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -641,7 +641,7 @@ static BOOL SetFriendNotesHandler (User*        user,
 static BOOL WhoIsHandler (User*         user,
                           Opcodes       msgId,
                           uint32_t      eventTime,
-                          WorldPacket*  msg) {
+                          WDataStore*  msg) {
 
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
@@ -664,7 +664,7 @@ static BOOL WhoIsHandler (User*         user,
   }
 
   // Send the response
-  WorldPacket outbound(SMSG_WHOIS, strlen(szResponse) + 1);
+  WDataStore outbound(SMSG_WHOIS, strlen(szResponse) + 1);
   outbound << szResponse;
   user->Send(&outbound);
 

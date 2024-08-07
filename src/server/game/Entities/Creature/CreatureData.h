@@ -248,7 +248,7 @@ struct CreatureTemplate
     uint8   SpellSchoolImmuneMask;
     uint32  flags_extra;
     uint32  ScriptID;
-    WorldPacket queryData; // pussywizard
+    WDataStore queryData; // pussywizard
     CreatureModel const* GetModelByIdx(uint32 idx) const;
     CreatureModel const* GetRandomValidModel() const;
     CreatureModel const* GetFirstValidModel() const;

@@ -26,7 +26,7 @@
 #include "SharedDefines.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
@@ -65,7 +65,7 @@ void Warden::SendModuleToClient()
         pos += burstSize;
 
         EncryptData((uint8*)&packet, burstSize + 3);
-        WorldPacket pkt1(SMSG_WARDEN_DATA, burstSize + 3);
+        WDataStore pkt1(SMSG_WARDEN_DATA, burstSize + 3);
         pkt1.append((uint8*)&packet, burstSize + 3);
         _session->Send(&pkt1);
     }
@@ -88,7 +88,7 @@ void Warden::RequestModule()
     // Encrypt with warden RC4 key.
     EncryptData((uint8*)&request, sizeof(WardenModuleUse));
 
-    WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenModuleUse));
+    WDataStore pkt(SMSG_WARDEN_DATA, sizeof(WardenModuleUse));
     pkt.append((uint8*)&request, sizeof(WardenModuleUse));
     _session->Send(&pkt);
 }
@@ -315,7 +315,7 @@ WardenPayloadMgr* Warden::GetPayloadMgr()
     return &_payloadMgr;
 }
 
-void User::HandleWardenDataOpcode(WorldPacket& recvData)
+void User::HandleWardenDataOpcode(WDataStore& recvData)
 {
     if (!_warden || recvData.empty())
         return;

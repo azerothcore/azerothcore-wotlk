@@ -136,7 +136,7 @@ void AutobroadcastMgr::SendWorldAnnouncement(std::string msg)
 
 void AutobroadcastMgr::SendNotificationAnnouncement(std::string msg)
 {
-    WorldPacket data(SMSG_NOTIFICATION, (msg.size() + 1));
+    WDataStore data(SMSG_NOTIFICATION, (msg.size() + 1));
     data << msg.data();
     sWorld->SendGlobalMessage(&data);
 }

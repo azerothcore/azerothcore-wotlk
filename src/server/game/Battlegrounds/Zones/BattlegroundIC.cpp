@@ -25,9 +25,9 @@
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
-void BattlegroundICScore::BuildObjectivesBlock(WorldPacket& data)
+void BattlegroundICScore::BuildObjectivesBlock(WDataStore& data)
 {
     data << uint32(2); // Objectives Count
     data << uint32(BasesAssaulted);
@@ -381,7 +381,7 @@ bool BattlegroundIC::UpdatePlayerScore(Player* player, uint32 type, uint32 value
     return true;
 }
 
-void BattlegroundIC::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundIC::FillInitialWorldStates(WDataStore& data)
 {
     data << uint32(BG_IC_ALLIANCE_RENFORT_SET) << uint32(1);
     data << uint32(BG_IC_HORDE_RENFORT_SET) << uint32(1);

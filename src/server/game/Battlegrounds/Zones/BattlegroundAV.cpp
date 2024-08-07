@@ -25,9 +25,9 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SpellAuras.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
-void BattlegroundAVScore::BuildObjectivesBlock(WorldPacket& data)
+void BattlegroundAVScore::BuildObjectivesBlock(WDataStore& data)
 {
     data << uint32(5); // Objectives Count
     data << uint32(GraveyardsAssaulted);
@@ -1105,7 +1105,7 @@ void BattlegroundAV::EventPlayerAssaultsPoint(Player* player, uint32 object)
     player->KilledMonsterCredit((IsTower(node)) ? BG_AV_QUEST_CREDIT_TOWER : BG_AV_QUEST_CREDIT_GRAVEYARD);
 }
 
-void BattlegroundAV::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundAV::FillInitialWorldStates(WDataStore& data)
 {
     bool stateok;
     //graveyards

@@ -27,10 +27,10 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
+void User::HandleAutostoreLootItemOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
     Player* player = GetPlayer();
@@ -111,7 +111,7 @@ void User::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
         DoLootRelease(lguid);
 }
 
-void User::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
+void User::HandleLootMoneyOpcode(WDataStore& /*recvData*/)
 {
     LOG_DEBUG("network", "WORLD: CMSG_LOOT_MONEY");
 
@@ -203,7 +203,7 @@ void User::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
                 (*i)->ModifyMoney(goldPerPlayer);
                 (*i)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, goldPerPlayer);
 
-                WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
+                WDataStore data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
                 data << uint32(goldPerPlayer);
                 data << uint8(playersNear.size() > 1 ? 0 : 1);     // Controls the text displayed in chat. 0 is "Your share is..." and 1 is "You loot..."
                 (*i)->User()->Send(&data);
@@ -215,7 +215,7 @@ void User::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
             player->ModifyMoney(loot->gold);
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, loot->gold);
 
-            WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
+            WDataStore data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
             data << uint32(loot->gold);
             data << uint8(1);   // "You loot..."
             Send(&data);
@@ -235,7 +235,7 @@ void User::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
     }
 }
 
-void User::HandleLootOpcode(WorldPacket& recvData)
+void User::HandleLootOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_LOOT");
 
@@ -253,7 +253,7 @@ void User::HandleLootOpcode(WorldPacket& recvData)
     GetPlayer()->SendLoot(guid, LOOT_CORPSE);
 }
 
-void User::HandleLootReleaseOpcode(WorldPacket& recvData)
+void User::HandleLootReleaseOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_LOOT_RELEASE");
 
@@ -418,7 +418,7 @@ void User::DoLootRelease(WOWGUID lguid)
     }
 }
 
-void User::HandleLootMasterGiveOpcode(WorldPacket& recvData)
+void User::HandleLootMasterGiveOpcode(WDataStore& recvData)
 {
     uint8 slotid;
     WOWGUID lootguid, target_playerguid;

@@ -19,7 +19,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "hyjal.h"
 
 /* Battle of Mount Hyjal encounters:

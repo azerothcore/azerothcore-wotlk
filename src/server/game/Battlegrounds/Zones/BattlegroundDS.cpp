@@ -21,7 +21,7 @@
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 BattlegroundDS::BattlegroundDS()
 {
@@ -173,7 +173,7 @@ bool BattlegroundDS::HandlePlayerUnderMap(Player* player)
     return true;
 }
 
-void BattlegroundDS::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundDS::FillInitialWorldStates(WDataStore& data)
 {
     data << uint32(3610) << uint32(1);                                              // 9 show
     Arena::FillInitialWorldStates(data);

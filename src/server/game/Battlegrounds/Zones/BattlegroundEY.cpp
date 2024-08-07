@@ -24,10 +24,10 @@
 #include "Player.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void BattlegroundEYScore::BuildObjectivesBlock(WorldPacket& data)
+void BattlegroundEYScore::BuildObjectivesBlock(WDataStore& data)
 {
     data << uint32(1); // Objectives Count
     data << uint32(FlagCaptures);
@@ -568,7 +568,7 @@ bool BattlegroundEY::UpdatePlayerScore(Player* player, uint32 type, uint32 value
     return true;
 }
 
-void BattlegroundEY::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundEY::FillInitialWorldStates(WDataStore& data)
 {
     data << uint32(EY_HORDE_BASE)                   << uint32(_ownedPointsCount[TEAM_HORDE]);
     data << uint32(EY_ALLIANCE_BASE)                << uint32(_ownedPointsCount[TEAM_ALLIANCE]);

@@ -643,7 +643,7 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
             {
                 UpdateData data;
                 obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
-                WorldPacket packet;
+                WDataStore packet;
                 data.BuildPacket(packet);
                 itr->GetSource()->SendDirectMessage(&packet);
             }
@@ -967,7 +967,7 @@ void Map::RemoveFromMap(MotionTransport* obj, bool remove)
     {
         UpdateData data;
         obj->BuildOutOfRangeUpdateBlock(&data);
-        WorldPacket packet;
+        WDataStore packet;
         data.BuildPacket(packet);
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (itr->GetSource()->GetTransport() != obj)
@@ -2530,7 +2530,7 @@ void Map::SendInitSelf(Player* player)
 {
     LOG_DEBUG("maps", "Creating player data for himself {}", player->GetGUID().ToString());
 
-    WorldPacket packet;
+    WDataStore packet;
     UpdateData data;
 
     // attach to player data current transport data
@@ -2569,7 +2569,7 @@ void Map::SendInitTransports(Player* player)
         if (*itr != player->GetTransport())
             (*itr)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
-    WorldPacket packet;
+    WDataStore packet;
     transData.BuildPacket(packet);
     player->User()->Send(&packet);
 }
@@ -2594,7 +2594,7 @@ void Map::SendRemoveTransports(Player* player)
             ++it;
     }
 
-    WorldPacket packet;
+    WDataStore packet;
     transData.BuildPacket(packet);
     player->User()->Send(&packet);
 }
@@ -2623,7 +2623,7 @@ void Map::SendObjectUpdates()
         obj->BuildUpdate(update_players, player_set);
     }
 
-    WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
+    WDataStore packet;                                     // here we allocate a std::vector with a size of 0x10000
     for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
         iter->second.BuildPacket(packet);
@@ -2751,7 +2751,7 @@ uint32 Map::GetPlayersCountExceptGMs() const
     return count;
 }
 
-void Map::SendToPlayers(WorldPacket const* data) const
+void Map::SendToPlayers(WDataStore const* data) const
 {
     for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
         itr->GetSource()->User()->Send(data);
@@ -3003,7 +3003,7 @@ bool InstanceMap::AddPlayerToMap(Player* player)
 
         if (!playerBind->perm && !mapSave->CanReset() && group && !group->isLFGGroup() && !group->IsLfgRandomInstance())
         {
-            WorldPacket data(SMSG_INSTANCE_LOCK_WARNING_QUERY, 9);
+            WDataStore data(SMSG_INSTANCE_LOCK_WARNING_QUERY, 9);
             data << uint32(60000);
             data << uint32(instance_data ? instance_data->GetCompletedEncounterMask() : 0);
             data << uint8(0);
@@ -3175,7 +3175,7 @@ void InstanceMap::PermBindAllPlayers()
 
         if (!bind || !bind->perm)
         {
-            WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
+            WDataStore data(SMSG_INSTANCE_SAVE_CREATED, 4);
             data << uint32(0);
             player->User()->Send(&data);
             sInstanceSaveMgr->PlayerBindToInstance(player->GetGUID(), save, true, player);
@@ -3733,7 +3733,7 @@ void Map::SendZoneDynamicInfo(Player* player)
 
     if (uint32 overrideLight = itr->second.OverrideLightId)
     {
-        WorldPacket data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 1);
+        WDataStore data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 1);
         data << uint32(_defaultLight);
         data << uint32(overrideLight);
         data << uint32(itr->second.LightFadeInTime);
@@ -3746,7 +3746,7 @@ void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId)
     Map::PlayerList const& players = GetPlayers();
     if (!players.IsEmpty())
     {
-        WorldPacket data(SMSG_PLAY_SOUND, 4);
+        WDataStore data(SMSG_PLAY_SOUND, 4);
         data << uint32(soundId);
 
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -3809,7 +3809,7 @@ void Map::SetZoneOverrideLight(uint32 zoneId, uint32 lightId, Milliseconds fadeI
 
     if (!players.IsEmpty())
     {
-        WorldPacket data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 4);
+        WDataStore data(SMSG_OVERRIDE_LIGHT, 4 + 4 + 4);
         data << uint32(_defaultLight);
         data << uint32(lightId);
         data << uint32(static_cast<uint32>(fadeInTime.count()));

@@ -28,7 +28,7 @@ class Creature;
 class GameObject;
 class Group;
 class Player;
-class WorldPacket;
+class WDataStore;
 class BattlegroundMap;
 class BattlegroundAV;
 class BattlegroundWS;
@@ -391,7 +391,7 @@ public:
     [[nodiscard]] const SpectatorList& GetSpectators() const { return m_Spectators; }
     void AddToBeTeleported(WOWGUID spectator, WOWGUID participant) { m_ToBeTeleported[spectator] = participant; }
     void RemoveToBeTeleported(WOWGUID spectator) { ToBeTeleportedMap::iterator itr = m_ToBeTeleported.find(spectator); if (itr != m_ToBeTeleported.end()) m_ToBeTeleported.erase(itr); }
-    void SpectatorsSendPacket(WorldPacket& data);
+    void SpectatorsSendPacket(WDataStore& data);
 
     [[nodiscard]] bool isArena() const        { return m_IsArena; }
     [[nodiscard]] bool isBattleground() const { return !m_IsArena; }
@@ -440,9 +440,9 @@ public:
 
     // Packet Transfer
     // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) { }
-    void SendPacketToTeam(TeamId teamId, WorldPacket const* packet, Player* sender = nullptr, bool self = true);
-    void SendPacketToAll(WorldPacket const* packet);
+    virtual void FillInitialWorldStates(WDataStore& /*data*/) { }
+    void SendPacketToTeam(TeamId teamId, WDataStore const* packet, Player* sender = nullptr, bool self = true);
+    void SendPacketToAll(WDataStore const* packet);
     void YellToAll(Creature* creature, const char* text, uint32 language);
 
     void SendChatMessage(Creature* source, uint8 textId, WorldObject* target = nullptr);
@@ -481,7 +481,7 @@ public:
     [[nodiscard]] Group* GetBgRaid(TeamId teamId) const { return m_BgRaids[teamId]; }
     void SetBgRaid(TeamId teamId, Group* bg_raid);
 
-    void BuildPvPLogDataPacket(WorldPacket& data);
+    void BuildPvPLogDataPacket(WDataStore& data);
     virtual bool UpdatePlayerScore(Player* player, uint32 type, uint32 value, bool doAddHonor = true);
 
     [[nodiscard]] uint32 GetPlayersCountByTeam(TeamId teamId) const { return m_PlayersCount[teamId]; }

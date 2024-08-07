@@ -25,10 +25,10 @@
 #include "PetitionMgr.h"
 #include "ScriptMgr.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
-void User::HandlePetitionBuyOpcode(WorldPacket& recvData)
+void User::HandlePetitionBuyOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_BUY");
 
@@ -222,7 +222,7 @@ void User::HandlePetitionBuyOpcode(WorldPacket& recvData)
     sPetitionMgr->AddPetition(charter->GetGUID(), m_player->GetGUID(), name, uint8(type));
 }
 
-void User::HandlePetitionShowSignOpcode(WorldPacket& recvData)
+void User::HandlePetitionShowSignOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_SHOW_SIGNATURES");
 
@@ -245,7 +245,7 @@ void User::HandlePetitionShowSignOpcode(WorldPacket& recvData)
 
     LOG_DEBUG("network", "CMSG_PETITION_SHOW_SIGNATURES petition {}", petitionguid.ToString());
 
-    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
+    WDataStore data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + 1 + signs * 12));
     data << petitionguid;                                   // petition guid
     data << m_player->GetGUID();                             // owner guid
     data << uint32(petitionguid.GetCounter());              // guild guid
@@ -261,7 +261,7 @@ void User::HandlePetitionShowSignOpcode(WorldPacket& recvData)
     Send(&data);
 }
 
-void User::HandlePetitionQueryOpcode(WorldPacket& recvData)
+void User::HandlePetitionQueryOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_QUERY");   // ok
 
@@ -284,7 +284,7 @@ void User::SendPetitionQueryOpcode(WOWGUID petitionguid)
     }
 
     uint8 type = petition->petitionType;
-    WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + petition->petitionName.size() + 1 + 1 + 4 * 12 + 2 + 10));
+    WDataStore data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + petition->petitionName.size() + 1 + 1 + 4 * 12 + 2 + 10));
     data << uint32(petitionguid.GetCounter());              // guild/team guid (in Trinity always same as petition low guid
     data << petition->ownerGuid;                            // charter owner guid
     data << petition->petitionName;                         // name (guild/arena team)
@@ -321,7 +321,7 @@ void User::SendPetitionQueryOpcode(WOWGUID petitionguid)
     Send(&data);
 }
 
-void User::HandlePetitionRenameOpcode(WorldPacket& recvData)
+void User::HandlePetitionRenameOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received opcode MSG_PETITION_RENAME");   // ok
 
@@ -380,13 +380,13 @@ void User::HandlePetitionRenameOpcode(WorldPacket& recvData)
     const_cast<Petition*>(petition)->petitionName = newName;
 
     LOG_DEBUG("network", "Petition ({}) renamed to {}", petitionGuid.ToString(), newName);
-    WorldPacket data(MSG_PETITION_RENAME, (8 + newName.size() + 1));
+    WDataStore data(MSG_PETITION_RENAME, (8 + newName.size() + 1));
     data << petitionGuid;
     data << newName;
     Send(&data);
 }
 
-void User::HandlePetitionSignOpcode(WorldPacket& recvData)
+void User::HandlePetitionSignOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_PETITION_SIGN");    // ok
 
@@ -479,7 +479,7 @@ void User::HandlePetitionSignOpcode(WorldPacket& recvData)
 
     if (found)
     {
-        WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
+        WDataStore data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
         data << petitionGuid;
         data << playerGuid;
         data << (uint32)PETITION_SIGN_ALREADY_SIGNED;
@@ -507,7 +507,7 @@ void User::HandlePetitionSignOpcode(WorldPacket& recvData)
 
     LOG_DEBUG("network", "PETITION SIGN: {} by player: {} ({}, Account: {})", petitionGuid.ToString(), m_player->GetName(), playerGuid.ToString(), GetAccountId());
 
-    WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
+    WDataStore data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
     data << petitionGuid;
     data << playerGuid;
     data << uint32(PETITION_SIGN_OK);
@@ -525,7 +525,7 @@ void User::HandlePetitionSignOpcode(WorldPacket& recvData)
         owner->User()->Send(&data);
 }
 
-void User::HandlePetitionDeclineOpcode(WorldPacket& recvData)
+void User::HandlePetitionDeclineOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received opcode MSG_PETITION_DECLINE");  // ok
 
@@ -540,13 +540,13 @@ void User::HandlePetitionDeclineOpcode(WorldPacket& recvData)
 
     if (Player* owner = ObjectAccessor::FindConnectedPlayer(ownerguid))                 // petition owner online
     {
-        WorldPacket data(MSG_PETITION_DECLINE, 8);
+        WDataStore data(MSG_PETITION_DECLINE, 8);
         data << m_player->GetGUID();
         owner->User()->Send(&data);
     }
 }
 
-void User::HandleOfferPetitionOpcode(WorldPacket& recvData)
+void User::HandleOfferPetitionOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_OFFER_PETITION");   // ok
 
@@ -621,7 +621,7 @@ void User::HandleOfferPetitionOpcode(WorldPacket& recvData)
     Signatures const* signatures = sPetitionMgr->GetSignature(petitionguid);
     uint8 signs = signatures ? signatures->signatureMap.size() : 0;
 
-    WorldPacket data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + signs + signs * 12));
+    WDataStore data(SMSG_PETITION_SHOW_SIGNATURES, (8 + 8 + 4 + signs + signs * 12));
     data << petitionguid;                                   // petition guid
     data << m_player->GetGUID();                             // owner guid
     data << uint32(petitionguid.GetCounter());              // guild guid
@@ -637,12 +637,12 @@ void User::HandleOfferPetitionOpcode(WorldPacket& recvData)
     player->User()->Send(&data);
 }
 
-void User::HandleTurnInPetitionOpcode(WorldPacket& recvData)
+void User::HandleTurnInPetitionOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received opcode CMSG_TURN_IN_PETITION");
 
     // Get petition guid from packet
-    WorldPacket data;
+    WDataStore data;
     WOWGUID petitionGuid;
 
     recvData >> petitionGuid;
@@ -810,7 +810,7 @@ void User::HandleTurnInPetitionOpcode(WorldPacket& recvData)
     Send(&data);
 }
 
-void User::HandlePetitionShowListOpcode(WorldPacket& recvData)
+void User::HandlePetitionShowListOpcode(WDataStore& recvData)
 {
     LOG_DEBUG("network", "Received CMSG_PETITION_SHOWLIST");
 
@@ -829,7 +829,7 @@ void User::SendPetitionShowList(WOWGUID guid)
         return;
     }
 
-    WorldPacket data(SMSG_PETITION_SHOWLIST, 8 + 1 + 4 * 6);
+    WDataStore data(SMSG_PETITION_SHOWLIST, 8 + 1 + 4 * 6);
     data << guid;                                           // npc guid
 
     // For guild default

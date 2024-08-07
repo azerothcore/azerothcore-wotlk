@@ -20,7 +20,7 @@
 #include "Player.h"
 #include <cctype>
 
-void User::HandleJoinChannel(WorldPacket& recvPacket)
+void User::HandleJoinChannel(WDataStore& recvPacket)
 {
     uint32 channelId;
     uint8 unknown1, unknown2;
@@ -58,7 +58,7 @@ void User::HandleJoinChannel(WorldPacket& recvPacket)
     }
 }
 
-void User::HandleLeaveChannel(WorldPacket& recvPacket)
+void User::HandleLeaveChannel(WDataStore& recvPacket)
 {
     uint32 unk;
     std::string channelName;
@@ -76,7 +76,7 @@ void User::HandleLeaveChannel(WorldPacket& recvPacket)
     }
 }
 
-void User::HandleChannelList(WorldPacket& recvPacket)
+void User::HandleChannelList(WDataStore& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -89,7 +89,7 @@ void User::HandleChannelList(WorldPacket& recvPacket)
             channel->List(GetPlayer());
 }
 
-void User::HandleChannelPassword(WorldPacket& recvPacket)
+void User::HandleChannelPassword(WDataStore& recvPacket)
 {
     std::string channelName, password;
     recvPacket >> channelName >> password;
@@ -104,7 +104,7 @@ void User::HandleChannelPassword(WorldPacket& recvPacket)
             channel->Password(GetPlayer(), password);
 }
 
-void User::HandleChannelSetOwner(WorldPacket& recvPacket)
+void User::HandleChannelSetOwner(WDataStore& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -119,7 +119,7 @@ void User::HandleChannelSetOwner(WorldPacket& recvPacket)
             channel->SetOwner(GetPlayer(), targetName);
 }
 
-void User::HandleChannelOwner(WorldPacket& recvPacket)
+void User::HandleChannelOwner(WDataStore& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -131,7 +131,7 @@ void User::HandleChannelOwner(WorldPacket& recvPacket)
             channel->SendWhoOwner(GetPlayer()->GetGUID());
 }
 
-void User::HandleChannelModerator(WorldPacket& recvPacket)
+void User::HandleChannelModerator(WDataStore& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -146,7 +146,7 @@ void User::HandleChannelModerator(WorldPacket& recvPacket)
             channel->SetModerator(GetPlayer(), targetName);
 }
 
-void User::HandleChannelUnmoderator(WorldPacket& recvPacket)
+void User::HandleChannelUnmoderator(WDataStore& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -161,7 +161,7 @@ void User::HandleChannelUnmoderator(WorldPacket& recvPacket)
             channel->UnsetModerator(GetPlayer(), targetName);
 }
 
-void User::HandleChannelMute(WorldPacket& recvPacket)
+void User::HandleChannelMute(WDataStore& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -176,7 +176,7 @@ void User::HandleChannelMute(WorldPacket& recvPacket)
             channel->SetMute(GetPlayer(), targetName);
 }
 
-void User::HandleChannelUnmute(WorldPacket& recvPacket)
+void User::HandleChannelUnmute(WDataStore& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -191,7 +191,7 @@ void User::HandleChannelUnmute(WorldPacket& recvPacket)
             channel->UnsetMute(GetPlayer(), targetName);
 }
 
-void User::HandleChannelInvite(WorldPacket& recvPacket)
+void User::HandleChannelInvite(WDataStore& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -206,7 +206,7 @@ void User::HandleChannelInvite(WorldPacket& recvPacket)
             channel->Invite(GetPlayer(), targetName);
 }
 
-void User::HandleChannelKick(WorldPacket& recvPacket)
+void User::HandleChannelKick(WDataStore& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -221,7 +221,7 @@ void User::HandleChannelKick(WorldPacket& recvPacket)
             channel->Kick(GetPlayer(), targetName);
 }
 
-void User::HandleChannelBan(WorldPacket& recvPacket)
+void User::HandleChannelBan(WDataStore& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -236,7 +236,7 @@ void User::HandleChannelBan(WorldPacket& recvPacket)
             channel->Ban(GetPlayer(), targetName);
 }
 
-void User::HandleChannelUnban(WorldPacket& recvPacket)
+void User::HandleChannelUnban(WDataStore& recvPacket)
 {
     std::string channelName, targetName;
     recvPacket >> channelName >> targetName;
@@ -251,7 +251,7 @@ void User::HandleChannelUnban(WorldPacket& recvPacket)
             channel->UnBan(GetPlayer(), targetName);
 }
 
-void User::HandleChannelAnnouncements(WorldPacket& recvPacket)
+void User::HandleChannelAnnouncements(WDataStore& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -263,7 +263,7 @@ void User::HandleChannelAnnouncements(WorldPacket& recvPacket)
             channel->Announce(GetPlayer());
 }
 
-void User::HandleChannelModerateOpcode(WorldPacket& recvPacket)
+void User::HandleChannelModerateOpcode(WDataStore& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -276,13 +276,13 @@ void User::HandleChannelModerateOpcode(WorldPacket& recvPacket)
             chn->ToggleModeration(GetPlayer());
 }
 
-void User::HandleChannelDisplayListQuery(WorldPacket& recvPacket)
+void User::HandleChannelDisplayListQuery(WDataStore& recvPacket)
 {
     // this should be OK because the 2 function _were_ the same
     HandleChannelList(recvPacket);
 }
 
-void User::HandleGetChannelMemberCount(WorldPacket& recvPacket)
+void User::HandleGetChannelMemberCount(WDataStore& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -296,7 +296,7 @@ void User::HandleGetChannelMemberCount(WorldPacket& recvPacket)
             LOG_DEBUG("chat.system", "SMSG_CHANNEL_MEMBER_COUNT {} Channel: {} Count: {}",
                            GetPlayerInfo(), channelName, channel->GetNumPlayers());
 
-            WorldPacket data(SMSG_CHANNEL_MEMBER_COUNT, channel->GetName().size() + 1 + 4);
+            WDataStore data(SMSG_CHANNEL_MEMBER_COUNT, channel->GetName().size() + 1 + 4);
             data << channel->GetName();
             data << uint8(channel->GetFlags());
             data << uint32(channel->GetNumPlayers());
@@ -305,7 +305,7 @@ void User::HandleGetChannelMemberCount(WorldPacket& recvPacket)
     }
 }
 
-void User::HandleSetChannelWatch(WorldPacket& recvPacket)
+void User::HandleSetChannelWatch(WDataStore& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;
@@ -320,7 +320,7 @@ void User::HandleSetChannelWatch(WorldPacket& recvPacket)
             channel->AddWatching(GetPlayer());
 }
 
-void User::HandleClearChannelWatch(WorldPacket& recvPacket)
+void User::HandleClearChannelWatch(WDataStore& recvPacket)
 {
     std::string channelName;
     recvPacket >> channelName;

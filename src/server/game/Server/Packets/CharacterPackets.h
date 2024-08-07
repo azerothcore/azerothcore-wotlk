@@ -27,7 +27,7 @@ namespace WorldPackets
         class ShowingCloak final : public ClientPacket
         {
         public:
-            ShowingCloak(WorldPacket&& packet) : ClientPacket(CMSG_SHOWING_CLOAK, std::move(packet)) { }
+            ShowingCloak(WDataStore&& packet) : ClientPacket(CMSG_SHOWING_CLOAK, std::move(packet)) { }
 
             void Read() override;
 
@@ -37,7 +37,7 @@ namespace WorldPackets
         class ShowingHelm final : public ClientPacket
         {
         public:
-            ShowingHelm(WorldPacket&& packet) : ClientPacket(CMSG_SHOWING_HELM, std::move(packet)) { }
+            ShowingHelm(WDataStore&& packet) : ClientPacket(CMSG_SHOWING_HELM, std::move(packet)) { }
 
             void Read() override;
 
@@ -47,7 +47,7 @@ namespace WorldPackets
         class PlayedTimeClient final : public ClientPacket
         {
         public:
-            PlayedTimeClient(WorldPacket&& packet) : ClientPacket(CMSG_PLAYED_TIME, std::move(packet)) { }
+            PlayedTimeClient(WDataStore&& packet) : ClientPacket(CMSG_PLAYED_TIME, std::move(packet)) { }
 
             void Read() override;
 
@@ -59,7 +59,7 @@ namespace WorldPackets
         public:
             PlayedTime() : ServerPacket(SMSG_PLAYED_TIME, 9) { }
 
-            WorldPacket const* Write() override;
+            WDataStore const* Write() override;
 
             uint32 TotalTime = 0;
             uint32 LevelTime = 0;

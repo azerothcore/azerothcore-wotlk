@@ -34,14 +34,14 @@ void WorldPackets::Bank::BuyBankSlot::Read()
     _worldPacket >> Banker;
 }
 
-WorldPacket const* WorldPackets::Bank::BuyBankSlotResult::Write()
+WDataStore const* WorldPackets::Bank::BuyBankSlotResult::Write()
 {
     _worldPacket << uint32(Result);
 
     return &_worldPacket;
 }
 
-WorldPacket const* WorldPackets::Bank::ShowBank::Write()
+WDataStore const* WorldPackets::Bank::ShowBank::Write()
 {
     _worldPacket << Banker;
 

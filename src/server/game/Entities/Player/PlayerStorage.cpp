@@ -67,7 +67,7 @@
 #include "Util.h"
 #include "Vehicle.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2775,7 +2775,7 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 
                     GetGlobalCooldownMgr().AddGlobalCooldown(spellProto, m_weaponChangeTimer);
 
-                    WorldPacket data;
+                    WDataStore data;
                     BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_INCLUDE_GCD, cooldownSpell, 0);
                     User()->Send(&data);
                 }
@@ -4035,7 +4035,7 @@ void Player::RemoveItemFromBuyBackSlot(uint32 slot, bool del)
 void Player::SendInventoryChangeFailure(BAG_RESULT msg, Item* pItem /*= nullptr*/, Item* pItem2 /*= nullptr*/, uint32 itemid /*= 0*/)
 {
     LOG_DEBUG("network", "WORLD: Sent SMSG_INVENTORY_CHANGE_FAILURE ({})", msg);
-    WorldPacket data(SMSG_INVENTORY_CHANGE_FAILURE, (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I ? 22 : 18));
+    WDataStore data(SMSG_INVENTORY_CHANGE_FAILURE, (msg == EQUIP_ERR_CANT_EQUIP_LEVEL_I ? 22 : 18));
     data << uint8(msg);
 
     if (msg != BAG_OK)
@@ -4078,7 +4078,7 @@ void Player::SendInventoryChangeFailure(BAG_RESULT msg, Item* pItem /*= nullptr*
 void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32 param)
 {
     LOG_DEBUG("network", "WORLD: Sent SMSG_BUY_FAILED");
-    WorldPacket data(SMSG_BUY_FAILED, (8 + 4 + 4 + 1));
+    WDataStore data(SMSG_BUY_FAILED, (8 + 4 + 4 + 1));
     data << (creature ? creature->GetGUID() : WOWGUID::Empty);
     data << uint32(item);
     if (param > 0)
@@ -4090,7 +4090,7 @@ void Player::SendBuyError(BuyResult msg, Creature* creature, uint32 item, uint32
 void Player::SendSellError(SellResult msg, Creature* creature, WOWGUID guid, uint32 param)
 {
     LOG_DEBUG("network", "WORLD: Sent SMSG_SELL_ITEM");
-    WorldPacket data(SMSG_SELL_ITEM, (8 + 8 + (param ? 4 : 0) + 1)); // last check 2.0.10
+    WDataStore data(SMSG_SELL_ITEM, (8 + 8 + (param ? 4 : 0) + 1)); // last check 2.0.10
     data << (creature ? creature->GetGUID() : WOWGUID::Empty);
     data << guid;
     if (param > 0)
@@ -4765,7 +4765,7 @@ void Player::SendItemPush(Item* item, uint32 count, bool received, bool created,
 {
     ASSERT(item);
 
-    WorldPacket data(SMSG_ITEM_PUSH_RESULT, (8 + 4 + 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4));
+    WDataStore data(SMSG_ITEM_PUSH_RESULT, (8 + 4 + 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4));
     data << GetGUID();                                      // player GUID
     data << uint32(received);                               // 0=looted, 1=from npc
     data << uint32(created);                                // 0=received, 1=created
@@ -6520,7 +6520,7 @@ void Player::BindToInstance()
     if (!mapSave) //it seems sometimes mapSave is nullptr, but I did not check why
         return;
 
-    WorldPacket data(SMSG_INSTANCE_SAVE_CREATED, 4);
+    WDataStore data(SMSG_INSTANCE_SAVE_CREATED, 4);
     data << uint32(0);
     User()->Send(&data);
     sInstanceSaveMgr->PlayerBindToInstance(this->GetGUID(), mapSave, true, this);
@@ -6530,7 +6530,7 @@ void Player::SendRaidInfo()
 {
     uint32 counter = 0;
 
-    WorldPacket data(SMSG_RAID_INSTANCE_INFO, 4);
+    WDataStore data(SMSG_RAID_INSTANCE_INFO, 4);
 
     std::size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
@@ -6566,7 +6566,7 @@ void Player::SendRaidInfo()
 void Player::SendSavedInstances()
 {
     bool hasBeenSaved = false;
-    WorldPacket data;
+    WDataStore data;
 
     for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
     {

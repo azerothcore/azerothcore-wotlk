@@ -33,7 +33,7 @@
 #include "SpellMgr.h"
 #include "Unit.h"
 #include "Util.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID() : WOWGUID::Empty, true),
@@ -396,7 +396,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     /// @todo pets should be summoned from real cast instead of just faking it?
     if (petInfo->CreatedBySpellId && spellInfo && (spellInfo->CategoryRecoveryTime > 0 || spellInfo->RecoveryTime > 0))
     {
-        WorldPacket data(SMSG_SPELL_GO, (8 + 8 + 4 + 4 + 2));
+        WDataStore data(SMSG_SPELL_GO, (8 + 8 + 4 + 4 + 2));
         data << owner->GetPackGUID();
         data << owner->GetPackGUID();
         data << uint8(0);
@@ -1478,7 +1478,7 @@ void Pet::_LoadSpellCooldowns(PreparedQueryResult result)
         time_t curTime = GameTime::GetGameTime().count();
 
         PacketCooldowns cooldowns;
-        WorldPacket data;
+        WDataStore data;
 
         do
         {
@@ -2462,7 +2462,7 @@ void Pet::RemoveSpellCooldown(uint32 spell_id, bool update /* = false */)
     {
         if (Player* playerOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
         {
-            WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
+            WDataStore data(SMSG_CLEAR_COOLDOWN, 4 + 8);
             data << uint32(spell_id);
             data << GetGUID();
             playerOwner->SendDirectMessage(&data);

@@ -21,7 +21,7 @@
 #include "ByteBuffer.h"
 #include "GUID.h"
 
-class WorldPacket;
+class WDataStore;
 
 enum OBJECT_UPDATE_TYPE
 {
@@ -56,7 +56,7 @@ public:
     void AddOutOfRangeGUID(WOWGUID guid);
     void AddUpdateBlock(const ByteBuffer& block);
     void AddUpdateBlock(const UpdateData& block);
-    bool BuildPacket(WorldPacket& packet);
+    bool BuildPacket(WDataStore& packet);
     [[nodiscard]] bool HasData() const { return m_blockCount > 0 || !m_outOfRangeGUIDs.empty(); }
     void Clear();
 

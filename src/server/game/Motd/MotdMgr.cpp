@@ -22,12 +22,12 @@
 #include "ScriptMgr.h"
 #include "Timer.h"
 #include "Tokenize.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include <iterator>
 
 namespace
 {
-    WorldPacket MotdPacket;
+    WDataStore MotdPacket;
     std::string FormattedMotd;
 }
 
@@ -42,7 +42,7 @@ void MotdMgr::SetMotd(std::string motd)
     // scripts may change motd
     sScriptMgr->OnMotdChange(motd);
 
-    WorldPacket data(SMSG_MOTD);                     // new in 2.0.1
+    WDataStore data(SMSG_MOTD);                     // new in 2.0.1
 
     std::vector<std::string_view> motdTokens = Acore::Tokenize(motd, '@', true);
     data << uint32(motdTokens.size()); // line count
@@ -93,7 +93,7 @@ char const* MotdMgr::GetMotd()
     return FormattedMotd.c_str();
 }
 
-WorldPacket const* MotdMgr::GetMotdPacket()
+WDataStore const* MotdMgr::GetMotdPacket()
 {
     return &MotdPacket;
 }

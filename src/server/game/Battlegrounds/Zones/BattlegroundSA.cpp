@@ -22,14 +22,14 @@
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 constexpr Milliseconds BG_SA_BOAT_START    = 1min;
 constexpr Milliseconds BG_SA_WARMUPLENGTH  = 2min;
 constexpr Milliseconds BG_SA_ROUNDLENGTH   = 10min;
 
-void BattlegroundSAScore::BuildObjectivesBlock(WorldPacket& data)
+void BattlegroundSAScore::BuildObjectivesBlock(WDataStore& data)
 {
     data << uint32(2); // Objectives Count
     data << uint32(DemolishersDestroyed);
@@ -303,7 +303,7 @@ void BattlegroundSA::StartShips()
         for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
         {
             UpdateData data;
-            WorldPacket pkt;
+            WDataStore pkt;
             GetBGObject(i)->BuildValuesUpdateBlockForPlayer(&data, itr->second);
             data.BuildPacket(pkt);
             itr->second->User()->Send(&pkt);
@@ -457,7 +457,7 @@ void BattlegroundSA::StartingEventOpenDoors()
 {
 }
 
-void BattlegroundSA::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundSA::FillInitialWorldStates(WDataStore& data)
 {
     uint32 ally_attacks = uint32(Attackers == TEAM_ALLIANCE ? 1 : 0);
     uint32 horde_attacks = uint32(Attackers == TEAM_HORDE ? 1 : 0);
@@ -1105,7 +1105,7 @@ void BattlegroundSA::SendTransportInit(Player* player)
             GetBGObject(BG_SA_BOAT_ONE)->BuildCreateUpdateBlockForPlayer(&transData, player);
         if (BgObjects[BG_SA_BOAT_TWO])
             GetBGObject(BG_SA_BOAT_TWO)->BuildCreateUpdateBlockForPlayer(&transData, player);
-        WorldPacket packet;
+        WDataStore packet;
         transData.BuildPacket(packet);
         player->User()->Send(&packet);
     }
@@ -1120,7 +1120,7 @@ void BattlegroundSA::SendTransportsRemove(Player* player)
             GetBGObject(BG_SA_BOAT_ONE)->BuildOutOfRangeUpdateBlock(&transData);
         if (BgObjects[BG_SA_BOAT_TWO])
             GetBGObject(BG_SA_BOAT_TWO)->BuildOutOfRangeUpdateBlock(&transData);
-        WorldPacket packet;
+        WDataStore packet;
         transData.BuildPacket(packet);
         player->User()->Send(&packet);
     }

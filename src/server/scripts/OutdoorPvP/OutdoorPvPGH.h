@@ -52,7 +52,7 @@ public:
     void ChangeState() override;
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WDataStore& data) override;
 
     bool HandlePlayerEnter(Player* player) override;
     void HandlePlayerLeave(Player* player) override;

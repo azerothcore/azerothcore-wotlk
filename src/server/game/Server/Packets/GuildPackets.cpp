@@ -25,7 +25,7 @@ void WorldPackets::Guild::QueryGuildInfo::Read()
 WorldPackets::Guild::QueryGuildInfoResponse::QueryGuildInfoResponse()
         : ServerPacket(SMSG_GUILD_QUERY_RESPONSE) { }
 
-WorldPacket const* WorldPackets::Guild::QueryGuildInfoResponse::Write()
+WDataStore const* WorldPackets::Guild::QueryGuildInfoResponse::Write()
 {
     _worldPacket << GuildId;
     _worldPacket << Info.GuildName;
@@ -47,7 +47,7 @@ void WorldPackets::Guild::GuildCreate::Read()
     _worldPacket >> GuildName;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildInfoResponse::Write()
+WDataStore const* WorldPackets::Guild::GuildInfoResponse::Write()
 {
     _worldPacket << GuildName;
     _worldPacket.AppendPackedTime(CreateDate);
@@ -57,7 +57,7 @@ WorldPacket const* WorldPackets::Guild::GuildInfoResponse::Write()
     return &_worldPacket;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildRoster::Write()
+WDataStore const* WorldPackets::Guild::GuildRoster::Write()
 {
     _worldPacket << uint32(MemberData.size());
     _worldPacket << WelcomeText;
@@ -78,7 +78,7 @@ void WorldPackets::Guild::GuildUpdateMotdText::Read()
     _worldPacket >> MotdText;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildCommandResult::Write()
+WDataStore const* WorldPackets::Guild::GuildCommandResult::Write()
 {
     _worldPacket << int32(Command);
     _worldPacket << Name;
@@ -92,7 +92,7 @@ void WorldPackets::Guild::GuildInviteByName::Read()
     _worldPacket >> Name;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildInvite::Write()
+WDataStore const* WorldPackets::Guild::GuildInvite::Write()
 {
     _worldPacket << InviterName;
     _worldPacket << GuildName;
@@ -119,7 +119,7 @@ ByteBuffer& operator<<(ByteBuffer& data, WorldPackets::Guild::GuildRosterMemberD
     return data;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildEvent::Write()
+WDataStore const* WorldPackets::Guild::GuildEvent::Write()
 {
     _worldPacket << uint8(Type);
     _worldPacket << uint8(Params.size());
@@ -141,7 +141,7 @@ WorldPacket const* WorldPackets::Guild::GuildEvent::Write()
     return &_worldPacket;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildEventLogQueryResults::Write()
+WDataStore const* WorldPackets::Guild::GuildEventLogQueryResults::Write()
 {
     _worldPacket.reserve(1 + Entry.size() * sizeof(GuildEventEntry));
 
@@ -161,7 +161,7 @@ WorldPacket const* WorldPackets::Guild::GuildEventLogQueryResults::Write()
     return &_worldPacket;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildPermissionsQueryResults::Write()
+WDataStore const* WorldPackets::Guild::GuildPermissionsQueryResults::Write()
 {
     _worldPacket << uint32(RankID);
     _worldPacket << int32(Flags);
@@ -269,7 +269,7 @@ void WorldPackets::Guild::GuildBankQueryTab::Read()
     _worldPacket >> FullUpdate;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildBankRemainingWithdrawMoney::Write()
+WDataStore const* WorldPackets::Guild::GuildBankRemainingWithdrawMoney::Write()
 {
     _worldPacket << RemainingWithdrawMoney;
 
@@ -282,7 +282,7 @@ void WorldPackets::Guild::GuildBankWithdrawMoney::Read()
     _worldPacket >> Money;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildBankQueryResults::Write()
+WDataStore const* WorldPackets::Guild::GuildBankQueryResults::Write()
 {
     _worldPacket << uint64(Money);
     _worldPacket << uint8(Tab);
@@ -382,7 +382,7 @@ void WorldPackets::Guild::GuildBankLogQuery::Read()
     _worldPacket >> Tab;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildBankLogQueryResults::Write()
+WDataStore const* WorldPackets::Guild::GuildBankLogQueryResults::Write()
 {
     _worldPacket << uint8(Tab);
     _worldPacket << uint8(Entry.size());
@@ -421,7 +421,7 @@ void WorldPackets::Guild::GuildBankTextQuery::Read()
     _worldPacket >> Tab;
 }
 
-WorldPacket const* WorldPackets::Guild::GuildBankTextQueryResult::Write()
+WDataStore const* WorldPackets::Guild::GuildBankTextQueryResult::Write()
 {
     _worldPacket << uint8(Tab);
     _worldPacket << Text;
@@ -450,7 +450,7 @@ void WorldPackets::Guild::SaveGuildEmblem::Read()
     _worldPacket >> Bg;
 }
 
-WorldPacket const* WorldPackets::Guild::PlayerSaveGuildEmblem::Write()
+WDataStore const* WorldPackets::Guild::PlayerSaveGuildEmblem::Write()
 {
     _worldPacket << int32(Error);
 

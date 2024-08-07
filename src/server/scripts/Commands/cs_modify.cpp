@@ -329,7 +329,7 @@ public:
             ChatHandler(target->User()).PSendSysMessage(LANG_YOURS_SPELLFLATID_CHANGED, handler->GetNameLink().c_str(), spellFlatID, val, mark ? *mark : 65535);
         }
 
-        WorldPacket data(SMSG_SET_FLAT_SPELL_MODIFIER, (1 + 1 + 2 + 2));
+        WDataStore data(SMSG_SET_FLAT_SPELL_MODIFIER, (1 + 1 + 2 + 2));
         data << uint8(spellFlatID);
         data << uint8(op);
         data << uint16(val);

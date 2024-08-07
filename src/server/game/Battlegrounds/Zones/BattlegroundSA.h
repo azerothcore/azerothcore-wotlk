@@ -442,7 +442,7 @@ protected:
         }
     }
 
-    void BuildObjectivesBlock(WorldPacket& data) final;
+    void BuildObjectivesBlock(WDataStore& data) final;
 
     uint32 GetAttr1() const override { return DemolishersDestroyed; }
     uint32 GetAttr2() const override { return GatesDestroyed; }
@@ -475,7 +475,7 @@ public:
     bool SetupBattleground() override;
     void Init() override;
     /// Called for generate packet contain worldstate data
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WDataStore& data) override;
     /// Called when a player deal damage to building (door)
     void EventPlayerDamagedGO(Player* player, GameObject* go, uint32 eventType) override;
     /// Called when a player kill a unit in bg

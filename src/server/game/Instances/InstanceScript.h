@@ -254,7 +254,7 @@ public:
 
     void SendEncounterUnit(uint32 type, Unit* unit = nullptr, uint8 param1 = 0, uint8 param2 = 0);
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WDataStore& /*data*/) {}
 
     uint32 GetEncounterCount() const { return bosses.size(); }
 

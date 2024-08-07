@@ -493,7 +493,7 @@ void InstanceSaveMgr::Update()
     if (resetOccurred)
     {
         LOG_INFO("instance.save", "Instance ID reset occurred, sending updated calendar and raid info to all players!");
-        WorldPacket dummy;
+        WDataStore dummy;
         for (UserMap::const_iterator itr = sWorld->GetAllUsers().begin(); itr != sWorld->GetAllUsers().end(); ++itr)
             if (Player* plr = itr->second->GetPlayer())
             {

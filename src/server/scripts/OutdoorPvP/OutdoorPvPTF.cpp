@@ -25,7 +25,7 @@
 #include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 OutdoorPvPTF::OutdoorPvPTF()
 {
@@ -50,14 +50,14 @@ OPvPCapturePointTF::OPvPCapturePointTF(OutdoorPvP* pvp, OutdoorPvPTF_TowerType t
     SetCapturePointData(TFCapturePoints[type].entry, TFCapturePoints[type].map, TFCapturePoints[type].x, TFCapturePoints[type].y, TFCapturePoints[type].z, TFCapturePoints[type].o, TFCapturePoints[type].rot0, TFCapturePoints[type].rot1, TFCapturePoints[type].rot2, TFCapturePoints[type].rot3);
 }
 
-void OPvPCapturePointTF::FillInitialWorldStates(WorldPacket& data)
+void OPvPCapturePointTF::FillInitialWorldStates(WDataStore& data)
 {
     data << uint32(TFTowerWorldStates[m_TowerType].n) << uint32(bool(m_TowerState & TF_TOWERSTATE_N));
     data << uint32(TFTowerWorldStates[m_TowerType].h) << uint32(bool(m_TowerState & TF_TOWERSTATE_H));
     data << uint32(TFTowerWorldStates[m_TowerType].a) << uint32(bool(m_TowerState & TF_TOWERSTATE_A));
 }
 
-void OutdoorPvPTF::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPTF::FillInitialWorldStates(WDataStore& data)
 {
     data << TF_UI_TOWER_SLIDER_POS << uint32(50);
     data << TF_UI_TOWER_SLIDER_N << uint32(100);

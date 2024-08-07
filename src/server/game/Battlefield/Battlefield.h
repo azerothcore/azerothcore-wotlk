@@ -23,7 +23,7 @@
 #include "ObjectAccessor.h"
 #include "SharedDefines.h"
 #include "Utilities/Util.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "ZoneScript.h"
 
 enum BattlefieldTypes
@@ -66,7 +66,7 @@ const uint32 BattlefieldFactions[PVP_TEAMS_COUNT] =
 // some class predefs
 class Player;
 class GameObject;
-class WorldPacket;
+class WDataStore;
 class Creature;
 class Unit;
 
@@ -83,7 +83,7 @@ public:
 
     virtual ~BfCapturePoint() { }
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WDataStore& /*data*/) {}
 
     // Send world state update to all players present
     void SendUpdateWorldState(uint32 field, uint32 value);
@@ -336,7 +336,7 @@ public:
 
     /// Send all worldstate data to all player in zone.
     virtual void SendInitWorldStatesToAll() = 0;
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) = 0;
+    virtual void FillInitialWorldStates(WDataStore& /*data*/) = 0;
 
     /// Return if we can use mount in battlefield
     bool CanFlyIn() { return !m_isActive; }
@@ -414,9 +414,9 @@ protected:
     virtual void SendRemoveWorldStates(Player* /*player*/) {}
 
     // use for send a packet for all player list
-    void BroadcastPacketToZone(WorldPacket const* data) const;
-    void BroadcastPacketToQueue(WorldPacket const* data) const;
-    void BroadcastPacketToWar(WorldPacket const* data) const;
+    void BroadcastPacketToZone(WDataStore const* data) const;
+    void BroadcastPacketToQueue(WDataStore const* data) const;
+    void BroadcastPacketToWar(WDataStore const* data) const;
 
     // CapturePoint system
     void AddCapturePoint(BfCapturePoint* cp) { m_capturePoints.push_back(cp); }

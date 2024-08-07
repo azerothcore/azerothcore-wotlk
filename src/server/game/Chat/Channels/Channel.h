@@ -19,7 +19,7 @@
 #define _CHANNEL_H
 
 #include "Common.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 #include <list>
 #include <map>
@@ -227,49 +227,49 @@ public:
 
 private:
     // initial packet data (notify type and channel name)
-    void MakeNotifyPacket(WorldPacket* data, uint8 notify_type);
+    void MakeNotifyPacket(WDataStore* data, uint8 notify_type);
     // type specific packet data
-    void MakeJoined(WorldPacket* data, WOWGUID guid);                        //+ 0x00
-    void MakeLeft(WorldPacket* data, WOWGUID guid);                          //+ 0x01
-    void MakeYouJoined(WorldPacket* data);                                      //+ 0x02
-    void MakeYouLeft(WorldPacket* data);                                        //+ 0x03
-    void MakeWrongPassword(WorldPacket* data);                                  //? 0x04
-    void MakeNotMember(WorldPacket* data);                                      //? 0x05
-    void MakeNotModerator(WorldPacket* data);                                   //? 0x06
-    void MakePasswordChanged(WorldPacket* data, WOWGUID guid);               //+ 0x07
-    void MakeOwnerChanged(WorldPacket* data, WOWGUID guid);                  //? 0x08
-    void MakePlayerNotFound(WorldPacket* data, std::string const& name);        //+ 0x09
-    void MakeNotOwner(WorldPacket* data);                                       //? 0x0A
-    void MakeChannelOwner(WorldPacket* data);                                   //? 0x0B
-    void MakeModeChange(WorldPacket* data, WOWGUID guid, uint8 oldflags);    //+ 0x0C
-    void MakeAnnouncementsOn(WorldPacket* data, WOWGUID guid);               //+ 0x0D
-    void MakeAnnouncementsOff(WorldPacket* data, WOWGUID guid);              //+ 0x0E
-    void MakeMuted(WorldPacket* data);                                          //? 0x11
-    void MakePlayerKicked(WorldPacket* data, WOWGUID bad, WOWGUID good);  //? 0x12
-    void MakeBanned(WorldPacket* data);                                         //? 0x13
-    void MakePlayerBanned(WorldPacket* data, WOWGUID bad, WOWGUID good);  //? 0x14
-    void MakePlayerUnbanned(WorldPacket* data, WOWGUID bad, WOWGUID good);//? 0x15
-    void MakePlayerNotBanned(WorldPacket* data, std::string const& name);       //? 0x16
-    void MakePlayerAlreadyMember(WorldPacket* data, WOWGUID guid);           //+ 0x17
-    void MakeInvite(WorldPacket* data, WOWGUID guid);                        //? 0x18
-    void MakeInviteWrongFaction(WorldPacket* data);                             //? 0x19
-    void MakeWrongFaction(WorldPacket* data);                                   //? 0x1A
-    void MakeInvalidName(WorldPacket* data);                                    //? 0x1B
-    void MakeNotModerated(WorldPacket* data);                                   //? 0x1C
-    void MakePlayerInvited(WorldPacket* data, std::string const& name);         //+ 0x1D
-    void MakePlayerInviteBanned(WorldPacket* data, std::string const& name);    //? 0x1E
-    void MakeThrottled(WorldPacket* data);                                      //? 0x1F
-    void MakeNotInArea(WorldPacket* data);                                      //? 0x20
-    void MakeNotInLfg(WorldPacket* data);                                       //? 0x21
-    void MakeVoiceOn(WorldPacket* data, WOWGUID guid);                       //+ 0x22
-    void MakeVoiceOff(WorldPacket* data, WOWGUID guid);                      //+ 0x23
-    void MakeModerationOn(WorldPacket* data, WOWGUID guid);
-    void MakeModerationOff(WorldPacket* data, WOWGUID guid);
+    void MakeJoined(WDataStore* data, WOWGUID guid);                        //+ 0x00
+    void MakeLeft(WDataStore* data, WOWGUID guid);                          //+ 0x01
+    void MakeYouJoined(WDataStore* data);                                      //+ 0x02
+    void MakeYouLeft(WDataStore* data);                                        //+ 0x03
+    void MakeWrongPassword(WDataStore* data);                                  //? 0x04
+    void MakeNotMember(WDataStore* data);                                      //? 0x05
+    void MakeNotModerator(WDataStore* data);                                   //? 0x06
+    void MakePasswordChanged(WDataStore* data, WOWGUID guid);               //+ 0x07
+    void MakeOwnerChanged(WDataStore* data, WOWGUID guid);                  //? 0x08
+    void MakePlayerNotFound(WDataStore* data, std::string const& name);        //+ 0x09
+    void MakeNotOwner(WDataStore* data);                                       //? 0x0A
+    void MakeChannelOwner(WDataStore* data);                                   //? 0x0B
+    void MakeModeChange(WDataStore* data, WOWGUID guid, uint8 oldflags);    //+ 0x0C
+    void MakeAnnouncementsOn(WDataStore* data, WOWGUID guid);               //+ 0x0D
+    void MakeAnnouncementsOff(WDataStore* data, WOWGUID guid);              //+ 0x0E
+    void MakeMuted(WDataStore* data);                                          //? 0x11
+    void MakePlayerKicked(WDataStore* data, WOWGUID bad, WOWGUID good);  //? 0x12
+    void MakeBanned(WDataStore* data);                                         //? 0x13
+    void MakePlayerBanned(WDataStore* data, WOWGUID bad, WOWGUID good);  //? 0x14
+    void MakePlayerUnbanned(WDataStore* data, WOWGUID bad, WOWGUID good);//? 0x15
+    void MakePlayerNotBanned(WDataStore* data, std::string const& name);       //? 0x16
+    void MakePlayerAlreadyMember(WDataStore* data, WOWGUID guid);           //+ 0x17
+    void MakeInvite(WDataStore* data, WOWGUID guid);                        //? 0x18
+    void MakeInviteWrongFaction(WDataStore* data);                             //? 0x19
+    void MakeWrongFaction(WDataStore* data);                                   //? 0x1A
+    void MakeInvalidName(WDataStore* data);                                    //? 0x1B
+    void MakeNotModerated(WDataStore* data);                                   //? 0x1C
+    void MakePlayerInvited(WDataStore* data, std::string const& name);         //+ 0x1D
+    void MakePlayerInviteBanned(WDataStore* data, std::string const& name);    //? 0x1E
+    void MakeThrottled(WDataStore* data);                                      //? 0x1F
+    void MakeNotInArea(WDataStore* data);                                      //? 0x20
+    void MakeNotInLfg(WDataStore* data);                                       //? 0x21
+    void MakeVoiceOn(WDataStore* data, WOWGUID guid);                       //+ 0x22
+    void MakeVoiceOff(WDataStore* data, WOWGUID guid);                      //+ 0x23
+    void MakeModerationOn(WDataStore* data, WOWGUID guid);
+    void MakeModerationOff(WDataStore* data, WOWGUID guid);
 
-    void SendToAll(WorldPacket* data, WOWGUID guid = WOWGUID::Empty);
-    void SendToAllButOne(WorldPacket* data, WOWGUID who);
-    void SendToOne(WorldPacket* data, WOWGUID who);
-    void SendToAllWatching(WorldPacket* data);
+    void SendToAll(WDataStore* data, WOWGUID guid = WOWGUID::Empty);
+    void SendToAllButOne(WDataStore* data, WOWGUID who);
+    void SendToOne(WDataStore* data, WOWGUID who);
+    void SendToAllWatching(WDataStore* data);
 
     bool ShouldAnnouncePlayer(Player const* player) const;
 
@@ -295,7 +295,7 @@ private:
             uint8 oldFlag = pinfo.flags;
             pinfo.SetModerator(set);
 
-            WorldPacket data;
+            WDataStore data;
             MakeModeChange(&data, guid, oldFlag);
             SendToAll(&data);
 
@@ -311,7 +311,7 @@ private:
             uint8 oldFlag = pinfo.flags;
             pinfo.SetMuted(set);
 
-            WorldPacket data;
+            WDataStore data;
             MakeModeChange(&data, guid, oldFlag);
             SendToAll(&data);
         }

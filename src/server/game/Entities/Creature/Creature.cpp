@@ -47,7 +47,7 @@
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2403,7 +2403,7 @@ Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 
 void Creature::SendAIReaction(AiReaction reactionType)
 {
-    WorldPacket data(SMSG_AI_REACTION, 12);
+    WDataStore data(SMSG_AI_REACTION, 12);
 
     data << GetGUID();
     data << uint32(reactionType);
@@ -2774,7 +2774,7 @@ bool Creature::LoadCreaturesAddon(bool reload)
 /// Send a message to LocalDefense channel for players opposition team in the zone
 void Creature::SendZoneUnderAttackMessage(Player* attacker)
 {
-    WorldPacket data(SMSG_ZONE_UNDER_ATTACK, 4);
+    WDataStore data(SMSG_ZONE_UNDER_ATTACK, 4);
     data << (uint32)GetAreaId();
     sWorld->SendGlobalMessage(&data, nullptr, (attacker->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE));
 }
@@ -2867,7 +2867,7 @@ void Creature::AddSpellCooldown(uint32 spell_id, uint32 /*itemid*/, uint32 end_t
     {
         if (IsCharmed() && GetCharmer()->IsPlayer())
         {
-            WorldPacket data;
+            WDataStore data;
             BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spellInfo->Id, spellcooldown);
             GetCharmer()->ToPlayer()->SendDirectMessage(&data);
         }
@@ -3150,7 +3150,7 @@ bool Creature::SetWalk(bool enable)
     if (!Unit::SetWalk(enable))
         return false;
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, 9);
+    WDataStore data(enable ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, 9);
     data << GetPackGUID();
     SendMessageToSet(&data, false);
     return true;
@@ -3165,7 +3165,7 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool
 
     if (m_movedByPlayer)
     {
-        WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
+        WDataStore data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
         data << GetPackGUID();
         data << uint32(0); //! movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
@@ -3187,7 +3187,7 @@ bool Creature::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
     }
 
-    WorldPacket data(disable ? SMSG_SPLINE_MOVE_GRAVITY_DISABLE : SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
+    WDataStore data(disable ? SMSG_SPLINE_MOVE_GRAVITY_DISABLE : SMSG_SPLINE_MOVE_GRAVITY_ENABLE, 9);
     data << GetPackGUID();
     SendMessageToSet(&data, false);
     return true;
@@ -3198,7 +3198,7 @@ bool Creature::SetSwim(bool enable)
     if (!Unit::SetSwim(enable))
         return false;
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_START_SWIM : SMSG_SPLINE_MOVE_STOP_SWIM);
+    WDataStore data(enable ? SMSG_SPLINE_MOVE_START_SWIM : SMSG_SPLINE_MOVE_STOP_SWIM);
     data << GetPackGUID();
     SendMessageToSet(&data, true);
     return true;
@@ -3253,7 +3253,7 @@ bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
         if (!enable)
             m_movedByPlayer->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), m_movedByPlayer->ToPlayer()->GetPositionZ());
 
-        WorldPacket data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
+        WDataStore data(enable ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
         data << GetPackGUID();
         data << uint32(0); //! movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
@@ -3265,7 +3265,7 @@ bool Creature::SetCanFly(bool enable, bool  /*packetOnly*/ /* = false */)
         return true;
     }
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_FLYING : SMSG_SPLINE_MOVE_UNSET_FLYING, 9);
+    WDataStore data(enable ? SMSG_SPLINE_MOVE_SET_FLYING : SMSG_SPLINE_MOVE_UNSET_FLYING, 9);
     data << GetPackGUID();
     SendMessageToSet(&data, false);
     return true;
@@ -3278,7 +3278,7 @@ bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
 
     if (m_movedByPlayer)
     {
-        WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
+        WDataStore data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
         data << GetPackGUID();
         data << uint32(0); //! movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
@@ -3290,7 +3290,7 @@ bool Creature::SetWaterWalking(bool enable, bool packetOnly /* = false */)
         return true;
     }
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
+    WDataStore data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
     data << GetPackGUID();
     SendMessageToSet(&data, true);
     return true;
@@ -3303,7 +3303,7 @@ bool Creature::SetFeatherFall(bool enable, bool packetOnly /* = false */)
 
     if (m_movedByPlayer)
     {
-        WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
+        WDataStore data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
         data << GetPackGUID();
         data << uint32(0); //! movement counter
         m_movedByPlayer->ToPlayer()->SendDirectMessage(&data);
@@ -3315,7 +3315,7 @@ bool Creature::SetFeatherFall(bool enable, bool packetOnly /* = false */)
         return true;
     }
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_FEATHER_FALL : SMSG_SPLINE_MOVE_NORMAL_FALL, 9);
+    WDataStore data(enable ? SMSG_SPLINE_MOVE_FEATHER_FALL : SMSG_SPLINE_MOVE_NORMAL_FALL, 9);
     data << GetPackGUID();
     SendMessageToSet(&data, true);
     return true;
@@ -3336,7 +3336,7 @@ bool Creature::SetHover(bool enable, bool packetOnly /*= false*/, bool updateAni
             SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_ANIM_TIER, UNIT_BYTE1_FLAG_GROUND);
     }
 
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
+    WDataStore data(enable ? SMSG_SPLINE_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
     data << GetPackGUID();
     SendMessageToSet(&data, false);
     return true;

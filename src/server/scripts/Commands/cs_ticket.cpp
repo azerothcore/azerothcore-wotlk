@@ -151,7 +151,7 @@ public:
         // Inform player, who submitted this ticket, that it is closed
         if (Player* submitter = ticket->GetPlayer())
         {
-            WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
+            WDataStore data(SMSG_GMTICKET_DELETETICKET, 4);
             data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
             submitter->User()->Send(&data);
             ChatHandler(submitter->User()).SendSysMessage(LANG_TICKET_CLOSED);
@@ -265,7 +265,7 @@ public:
         if (Player* player = ticket->GetPlayer())
         {
             // Force abandon ticket
-            WorldPacket data(SMSG_GMTICKET_DELETETICKET, 4);
+            WDataStore data(SMSG_GMTICKET_DELETETICKET, 4);
             data << uint32(GMTICKET_RESPONSE_TICKET_DELETED);
             player->User()->Send(&data);
         }

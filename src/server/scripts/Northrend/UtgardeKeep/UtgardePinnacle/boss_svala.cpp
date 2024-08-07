@@ -238,7 +238,7 @@ public:
                     break;
                 case 30:
                     {
-                        WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
+                        WDataStore data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
                         data << me->GetPackGUID();
                         me->SendMessageToSet(&data, false);
                         break;

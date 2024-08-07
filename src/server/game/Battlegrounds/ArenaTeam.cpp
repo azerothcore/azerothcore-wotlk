@@ -25,7 +25,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 ArenaTeam::ArenaTeam()
@@ -342,7 +342,7 @@ void ArenaTeam::DelMember(WOWGUID guid, bool cleanDb)
                     {
                         if (!ginfo.IsInvitedToBGInstanceGUID)
                         {
-                            WorldPacket data;
+                            WDataStore data;
                             playerMember->RemoveBattlegroundQueueId(bgQueue);
                             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, nullptr, playerMember->GetBattlegroundQueueIndex(bgQueue), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
                             queue.RemovePlayer(playerMember->GetGUID(), true);
@@ -439,7 +439,7 @@ void ArenaTeam::Roster(User* session)
     uint8 unk308 = 0;
     std::string tempName;
 
-    WorldPacket data(SMSG_ARENA_TEAM_ROSTER, 100);
+    WDataStore data(SMSG_ARENA_TEAM_ROSTER, 100);
     data << uint32(GetId());                                // team id
     data << uint8(unk308);                                  // 308 unknown value but affect packet structure
     data << uint32(GetMembersSize());                       // members count
@@ -475,7 +475,7 @@ void ArenaTeam::Roster(User* session)
 
 void ArenaTeam::Query(User* session)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_QUERY_RESPONSE, 4 * 7 + GetName().size() + 1);
+    WDataStore data(SMSG_ARENA_TEAM_QUERY_RESPONSE, 4 * 7 + GetName().size() + 1);
     data << uint32(GetId());                                // team id
     data << GetName();                                      // team name
     data << uint32(GetType());                              // arena team type (2=2x2, 3=3x3 or 5=5x5)
@@ -490,7 +490,7 @@ void ArenaTeam::Query(User* session)
 
 void ArenaTeam::SendStats(User* session)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_STATS, 4 * 7);
+    WDataStore data(SMSG_ARENA_TEAM_STATS, 4 * 7);
     data << uint32(GetId());                                // team id
     data << uint32(Stats.Rating);                           // rating
     data << uint32(Stats.WeekGames);                        // games this week
@@ -516,7 +516,7 @@ void ArenaTeam::Inspect(User* session, WOWGUID guid)
     if (!member || GetSlot() >= MAX_ARENA_SLOT)
         return;
 
-    WorldPacket data(MSG_INSPECT_ARENA_TEAMS, 8 + 1 + 4 * 6);
+    WDataStore data(MSG_INSPECT_ARENA_TEAMS, 8 + 1 + 4 * 6);
     data << guid;                                           // player guid
     data << uint8(GetSlot());                               // slot (0...2)
     data << uint32(GetId());                                // arena team id
@@ -560,7 +560,7 @@ void ArenaTeamMember::ModifyMatchmakerRating(int32 mod, uint32 /*slot*/)
         MaxMMR = MatchMakerRating;
 }
 
-void ArenaTeam::BroadcastPacket(WorldPacket* packet)
+void ArenaTeam::BroadcastPacket(WDataStore* packet)
 {
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->Guid))
@@ -569,7 +569,7 @@ void ArenaTeam::BroadcastPacket(WorldPacket* packet)
 
 void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, WOWGUID guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
 {
-    WorldPacket data(SMSG_ARENA_TEAM_EVENT, 1 + 1 + 1);
+    WDataStore data(SMSG_ARENA_TEAM_EVENT, 1 + 1 + 1);
     data << uint8(event);
     data << uint8(strCount);
     switch (strCount)
@@ -600,7 +600,7 @@ void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, WOWGUID guid, uint8 strCou
 
 void ArenaTeam::MassInviteToEvent(User* session)
 {
-    WorldPacket data(SMSG_CALENDAR_ARENA_TEAM, (Members.size() - 1) * (4 + 8 + 1));
+    WDataStore data(SMSG_CALENDAR_ARENA_TEAM, (Members.size() - 1) * (4 + 8 + 1));
     data << uint32(Members.size() - 1);
 
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)

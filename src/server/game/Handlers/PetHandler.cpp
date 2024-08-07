@@ -33,7 +33,7 @@
 #include "SpellMgr.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 #include "User.h"
 
 void User::HandleDismissCritter(WorldPackets::Pet::DismissCritter& packet)
@@ -54,7 +54,7 @@ void User::HandleDismissCritter(WorldPackets::Pet::DismissCritter& packet)
     }
 }
 
-void User::HandlePetAction(WorldPacket& recvData)
+void User::HandlePetAction(WDataStore& recvData)
 {
     WOWGUID guid1;
     uint32 data;
@@ -237,7 +237,7 @@ void User::HandlePetActionHelper(Unit* pet, WOWGUID guid1, uint32 spellId, uint1
 
                         if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))
                         {
-                            WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1);
+                            WDataStore data(SMSG_CAST_FAILED, 1 + 4 + 1);
                             data << uint8(0);
                             data << uint32(7389);
                             data << uint8(SPELL_FAILED_LINE_OF_SIGHT);
@@ -591,7 +591,7 @@ void User::HandlePetActionHelper(Unit* pet, WOWGUID guid1, uint32 spellId, uint1
     }
 }
 
-void User::HandlePetNameQuery(WorldPacket& recvData)
+void User::HandlePetNameQuery(WDataStore& recvData)
 {
     LOG_DEBUG("network.opcode", "HandlePetNameQuery. CMSG_PET_NAME_QUERY");
 
@@ -609,7 +609,7 @@ void User::SendPetNameQuery(WOWGUID petguid, uint32 petnumber)
     Creature* pet = ObjectAccessor::GetCreatureOrPetOrVehicle(*m_player, petguid);
     if (!pet)
     {
-        WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4 + 1 + 4 + 1));
+        WDataStore data(SMSG_PET_NAME_QUERY_RESPONSE, (4 + 1 + 4 + 1));
         data << uint32(petnumber);
         data << uint8(0);
         data << uint32(0);
@@ -631,7 +631,7 @@ void User::SendPetNameQuery(WOWGUID petguid, uint32 petnumber)
     else
         name = pet->GetName();
 
-    WorldPacket data(SMSG_PET_NAME_QUERY_RESPONSE, (4 + 4 + name.size() + 1));
+    WDataStore data(SMSG_PET_NAME_QUERY_RESPONSE, (4 + 4 + name.size() + 1));
     data << uint32(petnumber);
     data << name.c_str();
     data << uint32(pet->GetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP));
@@ -671,7 +671,7 @@ bool User::CheckStableMaster(WOWGUID guid)
     return true;
 }
 
-void User::HandlePetSetAction(WorldPacket& recvData)
+void User::HandlePetSetAction(WDataStore& recvData)
 {
     LOG_DEBUG("network.opcode", "HandlePetSetAction. CMSG_PET_SET_ACTION");
 
@@ -815,7 +815,7 @@ void User::HandlePetSetAction(WorldPacket& recvData)
     }
 }
 
-void User::HandlePetRename(WorldPacket& recvData)
+void User::HandlePetRename(WDataStore& recvData)
 {
     LOG_DEBUG("network.opcode", "HandlePetRename. CMSG_PET_RENAME");
 
@@ -986,7 +986,7 @@ void User::HandlePetSpellAutocastOpcode(WorldPackets::Pet::PetSpellAutocast& pac
     }
 }
 
-void User::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
+void User::HandlePetCastSpellOpcode(WDataStore& recvPacket)
 {
     LOG_DEBUG("network", "WORLD: CMSG_PET_CAST_SPELL");
 
@@ -1089,7 +1089,7 @@ void User::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
 
 void User::SendPetNameInvalid(uint32 error, const std::string& name, DeclinedName* declinedName)
 {
-    WorldPacket data(SMSG_PET_NAME_INVALID, 4 + name.size() + 1 + 1);
+    WDataStore data(SMSG_PET_NAME_INVALID, 4 + name.size() + 1 + 1);
     data << uint32(error);
     data << name;
     if (declinedName)
@@ -1103,7 +1103,7 @@ void User::SendPetNameInvalid(uint32 error, const std::string& name, DeclinedNam
     Send(&data);
 }
 
-void User::HandlePetLearnTalent(WorldPacket& recvData)
+void User::HandlePetLearnTalent(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_PET_LEARN_TALENT");
 
@@ -1115,7 +1115,7 @@ void User::HandlePetLearnTalent(WorldPacket& recvData)
     m_player->SendTalentsInfoData(true);
 }
 
-void User::HandleLearnPreviewTalentsPet(WorldPacket& recvData)
+void User::HandleLearnPreviewTalentsPet(WDataStore& recvData)
 {
     LOG_DEBUG("network", "CMSG_LEARN_PREVIEW_TALENTS_PET");
 

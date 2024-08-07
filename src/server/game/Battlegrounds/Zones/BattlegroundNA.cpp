@@ -17,7 +17,7 @@
 
 #include "BattlegroundNA.h"
 #include "Player.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 BattlegroundNA::BattlegroundNA()
 {
@@ -64,7 +64,7 @@ void BattlegroundNA::HandleAreaTrigger(Player* player, uint32 trigger)
     }
 }
 
-void BattlegroundNA::FillInitialWorldStates(WorldPacket& data)
+void BattlegroundNA::FillInitialWorldStates(WDataStore& data)
 {
     data << uint32(0xa11) << uint32(1);           // 9
     Arena::FillInitialWorldStates(data);

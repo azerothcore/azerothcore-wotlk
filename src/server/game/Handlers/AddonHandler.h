@@ -20,7 +20,7 @@
 
 #include "Common.h"
 #include "Config.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 class AddonHandler
 {
@@ -31,7 +31,7 @@ public:
     static AddonHandler* instance();
 
     //build addon packet
-    bool BuildAddonPacket(WorldPacket* Source, WorldPacket* Target);
+    bool BuildAddonPacket(WDataStore* Source, WDataStore* Target);
 };
 
 #define sAddOnHandler AddonHandler::instance()

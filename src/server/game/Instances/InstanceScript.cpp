@@ -712,7 +712,7 @@ void InstanceScript::SetCompletedEncountersMask(uint32 newMask, bool save)
 void InstanceScript::SendEncounterUnit(uint32 type, Unit* unit /*= nullptr*/, uint8 param1 /*= 0*/, uint8 param2 /*= 0*/)
 {
     // size of this packet is at most 15 (usually less)
-    WorldPacket data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
+    WDataStore data(SMSG_UPDATE_INSTANCE_ENCOUNTER_UNIT, 15);
     data << uint32(type);
 
     switch (type)

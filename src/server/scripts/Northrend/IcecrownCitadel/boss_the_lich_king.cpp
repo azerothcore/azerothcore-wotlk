@@ -365,7 +365,7 @@ bool IsValidPlatformTarget(Unit const* target)
     return target->GetExactDist2dSq(&CenterPosition) < 90.0f * 90.0f && target->GetPositionZ() > 840.0f && target->GetPositionZ() < 875.0f;
 }
 
-void SendPacketToPlayers(WorldPacket const* data, Unit* source)
+void SendPacketToPlayers(WDataStore const* data, Unit* source)
 {
     // Send packet to all players in The Frozen Throne
     Map::PlayerList const& players = source->GetMap()->GetPlayers();

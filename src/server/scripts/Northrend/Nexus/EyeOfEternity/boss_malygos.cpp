@@ -532,7 +532,7 @@ public:
 
                                             sScriptMgr->AnticheatSetCanFlybyServer(pPlayer, true);
 
-                                            WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
+                                            WDataStore data(SMSG_SPLINE_MOVE_UNROOT, 8);
                                             data << pPlayer->GetPackGUID();
                                             pPlayer->SendMessageToSet(&data, true);
 

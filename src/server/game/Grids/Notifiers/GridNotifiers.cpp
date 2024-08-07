@@ -21,7 +21,7 @@
 #include "SpellMgr.h"
 #include "Transport.h"
 #include "UpdateData.h"
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 using namespace Acore;
 
@@ -98,7 +98,7 @@ void VisibleNotifier::SendToSelf()
     if (!i_data.HasData())
         return;
 
-    WorldPacket packet;
+    WDataStore packet;
     i_data.BuildPacket(packet);
     i_player.User()->Send(&packet);
 

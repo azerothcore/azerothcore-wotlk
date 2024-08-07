@@ -20,7 +20,7 @@
 #include "Player.h"
 #include "User.h"
 
-void User::HandleGrantLevel(WorldPacket& recvData)
+void User::HandleGrantLevel(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_GRANT_LEVEL");
 
@@ -49,7 +49,7 @@ void User::HandleGrantLevel(WorldPacket& recvData)
 
     if (error)
     {
-        WorldPacket data(SMSG_REFER_A_FRIEND_FAILURE, 24);
+        WDataStore data(SMSG_REFER_A_FRIEND_FAILURE, 24);
         data << uint32(error);
         if (error == ERR_REFER_A_FRIEND_NOT_IN_GROUP)
             data << target->GetName();
@@ -58,12 +58,12 @@ void User::HandleGrantLevel(WorldPacket& recvData)
         return;
     }
 
-    WorldPacket data2(SMSG_PROPOSE_LEVEL_GRANT, 8);
+    WDataStore data2(SMSG_PROPOSE_LEVEL_GRANT, 8);
     data2 << m_player->GetPackGUID();
     target->User()->Send(&data2);
 }
 
-void User::HandleAcceptGrantLevel(WorldPacket& recvData)
+void User::HandleAcceptGrantLevel(WDataStore& recvData)
 {
     LOG_DEBUG("network", "WORLD: CMSG_ACCEPT_LEVEL_GRANT");
 

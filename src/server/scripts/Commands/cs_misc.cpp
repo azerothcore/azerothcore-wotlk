@@ -432,7 +432,7 @@ public:
             player->SetEntryPoint();
 
             uint32 queueSlot = 0;
-            WorldPacket data;
+            WDataStore data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
             player->User()->Send(&data);
 

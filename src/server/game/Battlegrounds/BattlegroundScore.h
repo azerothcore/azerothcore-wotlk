@@ -22,7 +22,7 @@
 #include "GUID.h"
 #include "SharedDefines.h"
 
-class WorldPacket;
+class WDataStore;
 
 enum ScoreType
 {
@@ -92,8 +92,8 @@ protected:
         }
     }
 
-    virtual void AppendToPacket(WorldPacket& data);
-    virtual void BuildObjectivesBlock(WorldPacket& /*data*/) = 0;
+    virtual void AppendToPacket(WDataStore& data);
+    virtual void BuildObjectivesBlock(WDataStore& /*data*/) = 0;
 
     // For Logging purpose
     virtual std::string ToString() const { return ""; }

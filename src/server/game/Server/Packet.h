@@ -18,28 +18,28 @@
 #ifndef PacketBaseWorld_h__
 #define PacketBaseWorld_h__
 
-#include "WorldPacket.h"
+#include "WDataStore.h"
 
 namespace WorldPackets
 {
     class AC_GAME_API Packet
     {
     public:
-        Packet(WorldPacket&& worldPacket);
+        Packet(WDataStore&& worldPacket);
 
         virtual ~Packet() = default;
 
         Packet(Packet const& right) = delete;
         Packet& operator=(Packet const& right) = delete;
 
-        virtual WorldPacket const* Write() = 0;
+        virtual WDataStore const* Write() = 0;
         virtual void Read() = 0;
 
-        [[nodiscard]] WorldPacket const* GetRawPacket() const { return &_worldPacket; }
+        [[nodiscard]] WDataStore const* GetRawPacket() const { return &_worldPacket; }
         [[nodiscard]] std::size_t GetSize() const { return _worldPacket.size(); }
 
     protected:
-        WorldPacket _worldPacket;
+        WDataStore _worldPacket;
     };
 
     class AC_GAME_API ServerPacket : public Packet
@@ -50,7 +50,7 @@ namespace WorldPackets
         void Read() final;
 
         void Clear() { _worldPacket.clear(); }
-        WorldPacket&& Move() { return std::move(_worldPacket); }
+        WDataStore&& Move() { return std::move(_worldPacket); }
         void ShrinkToFit() { _worldPacket.shrink_to_fit(); }
 
         [[nodiscard]] OpcodeServer GetOpcode() const { return OpcodeServer(_worldPacket.GetOpcode()); }
@@ -59,10 +59,10 @@ namespace WorldPackets
     class AC_GAME_API ClientPacket : public Packet
     {
     public:
-        ClientPacket(WorldPacket&& packet);
-        ClientPacket(OpcodeClient expectedOpcode, WorldPacket&& packet);
+        ClientPacket(WDataStore&& packet);
+        ClientPacket(OpcodeClient expectedOpcode, WDataStore&& packet);
 
-        WorldPacket const* Write() final;
+        WDataStore const* Write() final;
 
         [[nodiscard]] OpcodeClient GetOpcode() const { return OpcodeClient(_worldPacket.GetOpcode()); }
     };
