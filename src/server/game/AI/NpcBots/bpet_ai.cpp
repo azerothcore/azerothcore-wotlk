@@ -234,7 +234,7 @@ void bot_pet_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
                 else if (pdist > 10.0f)
                     speed = baserunspeed * 1.25f;
             }
-            me->GetMotionMaster()->Add(new PointMovementGenerator<Creature>(1, movepos.m_positionX, movepos.m_positionY, movepos.m_positionZ, true, speed));
+            me->GetMotionMaster()->Add(new PointMovementGenerator<Creature>(1, movepos.m_positionX, movepos.m_positionY, movepos.m_positionZ, speed, 0.f, nullptr, true));
         }
         RemoveBotCommandState(BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ATTACK | BOT_COMMAND_COMBATRESET);
     }
