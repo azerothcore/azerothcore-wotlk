@@ -110,6 +110,10 @@ static BOOL PlayerRechargeCheat (User*        user,
                                  Opcodes      msgId,
                                  uint         eventTime,
                                  WDataStore* msg);
+static BOOL PlayerDechargeCheat (User*        user,
+                                 Opcodes      msgId,
+                                 uint         eventTime,
+                                 WDataStore*  msg);
 
 
 enum CharacterFlags
@@ -16508,6 +16512,22 @@ static BOOL PlayerRechargeCheat (User*        user,
   return TRUE;
 }
 
+//===========================================================================
+static BOOL PlayerDechargeCheat (User*        user,
+                                 Opcodes      msgId,
+                                 uint         eventTime,
+                                 WDataStore*  msg) {
+
+  if (Player* plr = user->ActivePlayer()) {
+    // DECHARGE THE PLAYER'S HEALTH BAR
+    plr->SetHealth(0);
+    // DECHARGE THE PLAYER'S POWER BAR
+    POWER_TYPE power = plr->GetPowerType();
+    plr->SetPower(power, 0);
+  }
+  return TRUE;
+}
+
 
 /****************************************************************************
 *
@@ -16525,6 +16545,7 @@ void PlayerInitialize () {
   WowConnection::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler);
   WowConnection::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
   WowConnection::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
+  WowConnection::SetMessageHandler(CMSG_DECHARGE, PlayerDechargeCheat);
 
   s_initialized = true;
 }
@@ -16539,6 +16560,7 @@ void PlayerDestroy () {
   WowConnection::ClearMessageHandler(CMSG_LEARN_SPELL);
   WowConnection::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
   WowConnection::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
+  WowConnection::ClearMessageHandler(CMSG_DECHARGE);
 
   s_initialized = false;
 }
