@@ -58,10 +58,10 @@
 
 static bool s_initialized;
 
-static BOOL UserWorldTeleportHandler (User*         user,
-                                      Opcodes       msgId,
-                                      uint          eventTime,
-                                      WDataStore*  msg);
+static BOOL UserWorldTeleportHandler (User*       user,
+                                      NETMESSAGE  msgId,
+                                      uint        eventTime,
+                                      WDataStore* msg);
 
 namespace
 {
@@ -405,8 +405,8 @@ bool User::Update(uint32 diff, PacketFilter& updater)
     while (m_sock && _recvQueue.next(packet, updater))
     {
         // New msg system:
-        if (WowConnection::m_handlers.contains(static_cast<Opcodes>(packet->GetOpcode()))) {
-            WowConnection::m_handlers[static_cast<Opcodes>(packet->GetOpcode())](this, static_cast<Opcodes>(packet->GetOpcode()), currentTime, packet);
+        if (WowConnection::m_handlers.contains(static_cast<NETMESSAGE>(packet->GetOpcode()))) {
+            WowConnection::m_handlers[static_cast<NETMESSAGE>(packet->GetOpcode())](this, static_cast<NETMESSAGE>(packet->GetOpcode()), currentTime, packet);
         }
         else {  // TODO: NUKE ALL THIS GARBAGE
             OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
@@ -1856,10 +1856,10 @@ void User::SendPlayerNotFoundFailure()
 ***/
 
 //===========================================================================
-static BOOL UserWorldTeleportHandler (User        *user,
-                                      Opcodes     msgId,
+static BOOL UserWorldTeleportHandler (User*       user,
+                                      NETMESSAGE  msgId,
                                       uint        eventTime,
-                                      WDataStore *msg) {
+                                      WDataStore* msg) {
 
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);

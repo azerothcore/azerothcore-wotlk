@@ -16,7 +16,7 @@
  */
 
 /*
------ Opcodes Not Used yet -----
+----- NETMESSAGE Not Used yet -----
 
 SMSG_CALENDAR_EVENT_INVITE_NOTES        [ packguid(Invitee), uint64(inviteId), string(Text), Boolean(Unk) ]
 ?CMSG_CALENDAR_EVENT_INVITE_NOTES       [ uint32(unk1), uint32(unk2), uint32(unk3), uint32(unk4), uint32(unk5) ]

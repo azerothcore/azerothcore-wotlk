@@ -31,7 +31,7 @@
 using boost::asio::ip::tcp;
 
 typedef int(*MSGHANDLER)(User*        user,
-                         Opcodes      msgId,
+                         NETMESSAGE      msgId,
                          uint32_t     eventTime,
                          WDataStore* msg);
 
@@ -91,10 +91,10 @@ public:
 
     void SetSendBufferSize(std::size_t sendBufferSize) { _sendBufferSize = sendBufferSize; }
 
-    static int SetMessageHandler(Opcodes msgId, MSGHANDLER handler);
-    static int ClearMessageHandler(Opcodes msgId);
+    static int SetMessageHandler(NETMESSAGE msgId, MSGHANDLER handler);
+    static int ClearMessageHandler(NETMESSAGE msgId);
 
-    static std::map<Opcodes, MSGHANDLER> m_handlers;
+    static std::map<NETMESSAGE, MSGHANDLER> m_handlers;
 
 protected:
     void OnClose() override;

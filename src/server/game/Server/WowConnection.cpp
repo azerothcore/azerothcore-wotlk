@@ -786,9 +786,9 @@ bool WowConnection::HandlePing(WDataStore& recvPacket)
     return true;
 }
 
-std::map<Opcodes, MSGHANDLER> WowConnection::m_handlers;
+std::map<NETMESSAGE, MSGHANDLER> WowConnection::m_handlers;
 
-int WowConnection::SetMessageHandler(Opcodes msgId, MSGHANDLER handler) {
+int WowConnection::SetMessageHandler(NETMESSAGE msgId, MSGHANDLER handler) {
     if (msgId >= NUM_MSG_TYPES) {
         // TODO: handle error
         return 0;
@@ -797,7 +797,7 @@ int WowConnection::SetMessageHandler(Opcodes msgId, MSGHANDLER handler) {
         // TODO: handle error
         return 0;
     }
-    if (m_handlers.contains(static_cast<Opcodes>(msgId))) {
+    if (m_handlers.contains(static_cast<NETMESSAGE>(msgId))) {
         // TODO: handle error
         return 0;
     }
@@ -805,7 +805,7 @@ int WowConnection::SetMessageHandler(Opcodes msgId, MSGHANDLER handler) {
     return 1;
 }
 
-int WowConnection::ClearMessageHandler(Opcodes msgId) {
+int WowConnection::ClearMessageHandler(NETMESSAGE msgId) {
     if (msgId >= NUM_MSG_TYPES) {
         // TODO: handle error
         return 0;

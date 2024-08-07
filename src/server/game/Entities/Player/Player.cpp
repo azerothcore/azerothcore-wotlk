@@ -86,32 +86,32 @@
 
 static bool s_initialized;
 
-static BOOL PlayerCreateItemCheatHandler (User*         user,
-                                          Opcodes       msgId,
-                                          uint32_t      eventTime,
-                                          WDataStore*  msg);
-static BOOL OnGodMode (User*         user,
-                       Opcodes       msgId,
-                       uint          eventTime,
+static BOOL PlayerCreateItemCheatHandler (User*       user,
+                                          NETMESSAGE  msgId,
+                                          uint32_t    eventTime,
+                                          WDataStore* msg);
+static BOOL OnGodMode (User*        user,
+                       NETMESSAGE   msgId,
+                       uint         eventTime,
                        WDataStore*  msg);
-static BOOL PlayerLearnSpellCheatHandler (User*         user,
-                                          Opcodes       msgId,
-                                          uint          eventTime,
-                                          WDataStore*  msg);
-static BOOL PlayerLogoutRequestHandler (User*         user,
-                                        Opcodes       msgId,
-                                        uint32_t      eventTime,
-                                        WDataStore*  msg);
+static BOOL PlayerLearnSpellCheatHandler (User*       user,
+                                          NETMESSAGE  msgId,
+                                          uint        eventTime,
+                                          WDataStore* msg);
+static BOOL PlayerLogoutRequestHandler (User*       user,
+                                        NETMESSAGE  msgId,
+                                        uint32_t    eventTime,
+                                        WDataStore* msg);
 static BOOL PlayerLogoutCancelHandler (User*        user,
-                                       Opcodes      msgId,
+                                       NETMESSAGE   msgId,
                                        uint32_t     eventTime,
-                                       WDataStore* msg);
+                                       WDataStore*  msg);
 static BOOL PlayerRechargeCheat (User*        user,
-                                 Opcodes      msgId,
+                                 NETMESSAGE   msgId,
                                  uint         eventTime,
-                                 WDataStore* msg);
+                                 WDataStore*  msg);
 static BOOL PlayerDechargeCheat (User*        user,
-                                 Opcodes      msgId,
+                                 NETMESSAGE   msgId,
                                  uint         eventTime,
                                  WDataStore*  msg);
 
@@ -16364,10 +16364,10 @@ void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
 ***/
 
 //===========================================================================
-static BOOL PlayerCreateItemCheatHandler (User*         user,
-                                          Opcodes       msgId,
-                                          uint32_t      eventTime,
-                                          WDataStore*  msg) {
+static BOOL PlayerCreateItemCheatHandler (User*       user,
+                                          NETMESSAGE  msgId,
+                                          uint32_t    eventTime,
+                                          WDataStore* msg) {
 
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
@@ -16387,9 +16387,9 @@ static BOOL PlayerCreateItemCheatHandler (User*         user,
 }
 
 //===========================================================================
-static BOOL OnGodMode (User*         user,
-                       Opcodes       msgId,
-                       uint          eventTime,
+static BOOL OnGodMode (User*        user,
+                       NETMESSAGE   msgId,
+                       uint         eventTime,
                        WDataStore*  msg) {
 
   if (!user->IsGMAccount()) {
@@ -16415,10 +16415,10 @@ static BOOL OnGodMode (User*         user,
 }
 
 //===========================================================================
-static BOOL PlayerLearnSpellCheatHandler (User*         user,
-                                          Opcodes       msgId,
-                                          uint          eventTime,
-                                          WDataStore*  msg) {
+static BOOL PlayerLearnSpellCheatHandler (User*       user,
+                                          NETMESSAGE  msgId,
+                                          uint        eventTime,
+                                          WDataStore* msg) {
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
     return FALSE;
@@ -16450,9 +16450,9 @@ static BOOL PlayerLearnSpellCheatHandler (User*         user,
 
 //===========================================================================
 static BOOL PlayerLogoutCancelHandler (User*        user,
-                                       Opcodes      msgId,
+                                       NETMESSAGE   msgId,
                                        uint32_t     eventTime,
-                                       WDataStore* msg) {
+                                       WDataStore*  msg) {
 
   if (!user->ActivePlayer())
     return FALSE;
@@ -16462,10 +16462,10 @@ static BOOL PlayerLogoutCancelHandler (User*        user,
 }
 
 //===========================================================================
-static BOOL PlayerLogoutRequestHandler (User*         user,
-                                        Opcodes       msgId,
-                                        uint32_t      eventTime,
-                                        WDataStore*  msg) {
+static BOOL PlayerLogoutRequestHandler (User*       user,
+                                        NETMESSAGE  msgId,
+                                        uint32_t    eventTime,
+                                        WDataStore* msg) {
 
   if (Player* plr = user->ActivePlayer()) {
     LogoutResponse res;
@@ -16496,9 +16496,9 @@ static BOOL PlayerLogoutRequestHandler (User*         user,
 
 //===========================================================================
 static BOOL PlayerRechargeCheat (User*        user,
-                                 Opcodes      msgId,
+                                 NETMESSAGE   msgId,
                                  uint         eventTime,
-                                 WDataStore* msg) {
+                                 WDataStore*  msg) {
 
   if (Player* plr = user->ActivePlayer()) {
     // RECHARGE THE PLAYER'S HEALTH BAR
@@ -16514,7 +16514,7 @@ static BOOL PlayerRechargeCheat (User*        user,
 
 //===========================================================================
 static BOOL PlayerDechargeCheat (User*        user,
-                                 Opcodes      msgId,
+                                 NETMESSAGE   msgId,
                                  uint         eventTime,
                                  WDataStore*  msg) {
 

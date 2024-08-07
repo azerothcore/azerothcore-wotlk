@@ -1449,7 +1449,7 @@ inline std::string GetOpcodeNameForLoggingImpl(T id)
     return ss.str();
 }
 
-std::string GetOpcodeNameForLogging(Opcodes opcode)
+std::string GetOpcodeNameForLogging(NETMESSAGE opcode)
 {
     return GetOpcodeNameForLoggingImpl(opcode);
 }

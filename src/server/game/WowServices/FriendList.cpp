@@ -14,34 +14,34 @@
 typedef std::map<WOWGUID, FriendList*> FRIENDLISTMAP_T;
 
 
-static BOOL AddFriendHandler (User*         user,
-                              Opcodes       msgId,
-                              uint32_t      eventTime,
-                              WDataStore*  msg);
-static BOOL AddIgnoreHandler (User*         user,
-                              Opcodes       msgId,
-                              uint32_t      eventTime,
-                              WDataStore*  msg);
-static BOOL ContactListHandler (User*         user,
-                                Opcodes       msgId,
-                                uint32_t      eventTime,
-                                WDataStore*  msg);
+static BOOL AddFriendHandler (User*       user,
+                              NETMESSAGE  msgId,
+                              uint32_t    eventTime,
+                              WDataStore* msg);
+static BOOL AddIgnoreHandler (User*       user,
+                              NETMESSAGE  msgId,
+                              uint32_t    eventTime,
+                              WDataStore* msg);
+static BOOL ContactListHandler (User*       user,
+                                NETMESSAGE  msgId,
+                                uint32_t    eventTime,
+                                WDataStore* msg);
 static BOOL DeleteFriendHandler (User*        user,
-                                 Opcodes      msgId,
+                                 NETMESSAGE   msgId,
                                  uint32_t     eventTime,
-                                 WDataStore* msg);
-static BOOL DelIgnoreHandler (User*         user,
-                              Opcodes       msgId,
-                              uint32_t      eventTime,
-                              WDataStore*  msg);
+                                 WDataStore*  msg);
+static BOOL DelIgnoreHandler (User*       user,
+                              NETMESSAGE  msgId,
+                              uint32_t    eventTime,
+                              WDataStore* msg);
 static BOOL SetFriendNotesHandler (User*        user,
-                                   Opcodes      msgId,
+                                   NETMESSAGE   msgId,
                                    uint32_t     eventTime,
-                                   WDataStore* msg);
-static BOOL WhoIsHandler (User*         user,
-                          Opcodes       msgId,
-                          uint32_t      eventTime,
-                          WDataStore*  msg);
+                                   WDataStore*  msg);
+static BOOL WhoIsHandler (User*       user,
+                          NETMESSAGE  msgId,
+                          uint32_t    eventTime,
+                          WDataStore* msg);
 
 
 /****************************************************************************
@@ -501,10 +501,10 @@ void FriendList::SetFriendNotes (WOWGUID const& guid, char const* notes) {
 ***/
 
 //===========================================================================
-static BOOL AddFriendHandler (User*         user,
-                              Opcodes       msgId,
-                              uint32_t      eventTime,
-                              WDataStore*  msg) {
+static BOOL AddFriendHandler (User*       user,
+                              NETMESSAGE  msgId,
+                              uint32_t    eventTime,
+                              WDataStore* msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -523,10 +523,10 @@ static BOOL AddFriendHandler (User*         user,
 }
 
 //===========================================================================
-static BOOL AddIgnoreHandler (User*         user,
-                              Opcodes       msgId,
-                              uint32_t      eventTime,
-                              WDataStore*  msg) {
+static BOOL AddIgnoreHandler (User*       user,
+                              NETMESSAGE  msgId,
+                              uint32_t    eventTime,
+                              WDataStore* msg) {
 
   FriendList* friendList = user->ActivePlayer()->FriendListPtr();
 
@@ -548,10 +548,10 @@ static BOOL AddIgnoreHandler (User*         user,
 }
 
 //===========================================================================
-static BOOL ContactListHandler (User*         user,
-                                Opcodes       msgId,
-                                uint32_t      eventTime,
-                                WDataStore*  msg) {
+static BOOL ContactListHandler (User*       user,
+                                NETMESSAGE  msgId,
+                                uint32_t    eventTime,
+                                WDataStore* msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -567,9 +567,9 @@ static BOOL ContactListHandler (User*         user,
 
 //===========================================================================
 static BOOL DeleteFriendHandler (User*        user,
-                                 Opcodes      msgId,
+                                 NETMESSAGE   msgId,
                                  uint32_t     eventTime,
-                                 WDataStore* msg) {
+                                 WDataStore*  msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -591,10 +591,10 @@ static BOOL DeleteFriendHandler (User*        user,
 }
 
 //===========================================================================
-static BOOL DelIgnoreHandler (User*         user,
-                              Opcodes       msgId,
-                              uint32_t      eventTime,
-                              WDataStore*  msg) {
+static BOOL DelIgnoreHandler (User*       user,
+                              NETMESSAGE  msgId,
+                              uint32_t    eventTime,
+                              WDataStore* msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -611,9 +611,9 @@ static BOOL DelIgnoreHandler (User*         user,
 
 //===========================================================================
 static BOOL SetFriendNotesHandler (User*        user,
-                                   Opcodes      msgId,
+                                   NETMESSAGE   msgId,
                                    uint32_t     eventTime,
-                                   WDataStore* msg) {
+                                   WDataStore*  msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
@@ -638,10 +638,10 @@ static BOOL SetFriendNotesHandler (User*        user,
 }
 
 //===========================================================================
-static BOOL WhoIsHandler (User*         user,
-                          Opcodes       msgId,
-                          uint32_t      eventTime,
-                          WDataStore*  msg) {
+static BOOL WhoIsHandler (User*       user,
+                          NETMESSAGE  msgId,
+                          uint32_t    eventTime,
+                          WDataStore* msg) {
 
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);

@@ -25,8 +25,7 @@
 #include "Define.h"
 #include <string>
 
-/// List of Opcodes
-enum Opcodes : uint16
+enum NETMESSAGE : uint16
 {
     MSG_NULL_ACTION,
     CMSG_BOOTME                                     = 0x001,
@@ -1348,8 +1347,8 @@ enum OpcodeMisc : uint16
     NULL_OPCODE = 0x0000
 };
 
-typedef Opcodes OpcodeClient;
-typedef Opcodes OpcodeServer;
+typedef NETMESSAGE OpcodeClient;
+typedef NETMESSAGE OpcodeServer;
 
 /// Player state
 enum SessionStatus
@@ -1412,7 +1411,7 @@ public:
 
     void Initialize();
 
-    ClientOpcodeHandler const* operator[](Opcodes index) const
+    ClientOpcodeHandler const* operator[](NETMESSAGE index) const
     {
         return _internalTableClient[index];
     }
@@ -1429,6 +1428,6 @@ private:
 extern OpcodeTable opcodeTable;
 
 /// Lookup opcode name for human understandable logging
-std::string GetOpcodeNameForLogging(Opcodes opcode);
+std::string GetOpcodeNameForLogging(NETMESSAGE opcode);
 
 #endif
