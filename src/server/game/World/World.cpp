@@ -580,6 +580,8 @@ void World::LoadConfigSettings(bool reload)
         LOG_ERROR("server.loading", "Rate.Talent.Pet ({}) must be > 0. Using 1 instead.", _rate_values[RATE_TALENT_PET]);
         _rate_values[RATE_TALENT_PET] = 1.0f;
     }
+
+    // Controls Player movespeed rate.
     _rate_values[RATE_MOVESPEED] = sConfigMgr->GetOption<float>("Rate.MoveSpeed", 1.0f);
     if (_rate_values[RATE_MOVESPEED] < 0)
     {
@@ -587,6 +589,17 @@ void World::LoadConfigSettings(bool reload)
         _rate_values[RATE_MOVESPEED] = 1.0f;
     }
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) playerBaseMoveSpeed[i] = baseMoveSpeed[i] * _rate_values[RATE_MOVESPEED];
+
+    // Controls all other movespeed rate.
+    // Note: Should be done after player movespeed config.
+    _rate_values[RATE_MOVESPEED_OTHER] = sConfigMgr->GetOption<float>("Rate.MoveSpeedOther", 1.0f);
+    if (_rate_values[RATE_MOVESPEED_OTHER] < 0)
+    {
+        LOG_ERROR("server.loading", "Rate.MoveSpeedOther ({}) must be > 0. Using 1 instead.", _rate_values[RATE_MOVESPEED_OTHER]);
+        _rate_values[RATE_MOVESPEED_OTHER] = 1.0f;
+    }
+    for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i) baseMoveSpeed[i] *= _rate_values[RATE_MOVESPEED_OTHER];
+
     _rate_values[RATE_CORPSE_DECAY_LOOTED] = sConfigMgr->GetOption<float>("Rate.Corpse.Decay.Looted", 0.5f);
 
     _rate_values[RATE_DURABILITY_LOSS_ON_DEATH]  = sConfigMgr->GetOption<float>("DurabilityLoss.OnDeath", 10.0f);
