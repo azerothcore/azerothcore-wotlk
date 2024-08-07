@@ -24,7 +24,7 @@ enum DarkRangerPetSpecial
 {
     SPELL_GENERATE_THREAT               = 23604, //reduce threat
     THREAT_BASE                         = 5,
-    MINION_DURATION                     = 80000
+    MINION_DURATION                     = 160000
 };
 
 class dark_ranger_pet_bot : public CreatureScript

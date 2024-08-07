@@ -39,6 +39,7 @@ class bot_pet_ai : public CreatureAI
         void IsSummonedBy(WorldObject* summoner) override;
 
         Creature* GetPetsOwner() const { return petOwner; }
+        void CalculatePetsOwnerFollowPosition(Position &pos) { _calculatePos(pos); }
 
         //EventProcessor* GetEvents() { return &_petEvents; }
         uint32 GetLastDiff() const { return lastdiff; }

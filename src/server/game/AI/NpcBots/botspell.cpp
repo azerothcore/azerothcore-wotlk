@@ -892,7 +892,7 @@ void GenerateBotCustomSpells()
     //sinfo->Effects[0].ApplyAuraName = SPELL_AURA_PERIODIC_DAMAGE;
     sinfo->Effects[0].BasePoints = 100;
     //sinfo->Effects[0].DieSides = 0;
-    sinfo->Effects[0].BonusMultiplier = 2.f;
+    sinfo->Effects[0].BonusMultiplier = 1.5f;
     sinfo->Effects[0].DamageMultiplier = 1.f;
     sinfo->Effects[0].RealPointsPerLevel = 10.f;
     //sinfo->Effects[0].ValueMultiplier = 1.f;

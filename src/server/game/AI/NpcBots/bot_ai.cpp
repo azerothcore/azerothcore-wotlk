@@ -1134,7 +1134,7 @@ void bot_ai::_calculatePos(Unit const* followUnit, Position& pos, float* speed/*
         {
             const float baserunspeed = bmover->GetSpeed(MOVE_RUN);
             if (posdist > 50.0f)
-                *speed = baserunspeed * 1.75f;
+                *speed = baserunspeed * 2.0f;
             else if (posdist > 30.0f)
                 *speed = baserunspeed * 1.5f;
             else if (posdist > 10.0f)
@@ -7328,12 +7328,11 @@ void bot_ai::OnSpellHit(Unit* caster, SpellInfo const* spell)
         if (auraname == SPELL_AURA_MOUNTED)
         {
             //TC_LOG_ERROR("entities.unit", "OnSpellHit: mount on %s", me->GetName().c_str());
-            if (!IAmFree())
-                UnsummonAll();
             if (master->HasAuraType(SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED) ||
                 master->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
             {
                 //TC_LOG_ERROR("entities.unit", "OnSpellHit: modding flight speed");
+                UnsummonAll(false);
                 const_cast<CreatureTemplate*>(me->GetCreatureTemplate())->Movement.Flight = CreatureFlightMovementType::DisableGravity;
                 me->SetCanFly(true);
                 me->SetDisableGravity(true);
@@ -14398,7 +14397,7 @@ void bot_ai::SetSpec(uint8 spec, bool activate)
     {
         BotDataMgr::UpdateNpcBotData(me->GetEntry(), NPCBOT_UPDATE_SPEC, &spec);
 
-        UnsummonAll();
+        UnsummonAll(false);
         removeShapeshiftForm();
         //from DefaultInit
         me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
@@ -15741,6 +15740,80 @@ void bot_ai::KilledUnit(Unit* u)
         if (me->GetMap()->GetEntry()->IsContinent())
             evadeDelayTimer = 3000;
     }
+}
+
+void bot_ai::UnsummonCreature(Creature* creature, bool save)
+{
+    if (creature)
+    {
+        if (!save)
+        {
+            ASSERT_NOTNULL(creature->ToTempSummon())->UnSummon();
+            return;
+        }
+
+        bot_pet_ai* petai = creature->GetBotPetAI();
+        if (petai)
+        {
+            petai->KillEvents(true);
+            petai->canUpdate = false;
+        }
+
+        creature->m_Events.KillAllEvents(false);
+        Map* petmap = creature->FindMap();
+        if (petmap)
+        {
+            if (creature->IsInWorld())
+            {
+                creature->RemoveFromWorld();
+                creature->BotStopMovement();
+                creature->RemoveAurasByType(SPELL_AURA_MOD_STUN);
+                creature->RemoveAurasByType(SPELL_AURA_MOD_FEAR);
+                creature->RemoveAurasByType(SPELL_AURA_MOD_CONFUSE);
+                creature->RemoveAurasByType(SPELL_AURA_MOD_ROOT);
+                creature->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
+                creature->InterruptNonMeleeSpells(true);
+                creature->RemoveAllGameObjects();
+                creature->CombatStop();
+                creature->ClearComboPoints();
+                creature->ClearComboPointHolders();
+            }
+
+            if (creature->IsInGrid())
+                petmap->RemoveFromMap(creature, false);
+        }
+    }
+}
+void bot_ai::UnsummonPet(bool save)
+{
+    UnsummonCreature(botPet, save);
+}
+
+void bot_ai::ResummonCreature(Creature* creature)
+{
+    if (creature)
+    {
+        if (creature->FindMap())
+            creature->ResetMap();
+        creature->SetMap(me->GetMap());
+
+        Position pos;
+        bot_pet_ai* petai = creature->GetBotPetAI();
+        if (petai)
+            petai->CalculatePetsOwnerFollowPosition(pos);
+        else
+            pos.Relocate(me);
+
+        creature->Relocate(pos);
+        me->GetMap()->AddToMap(creature);
+
+        if (petai)
+            petai->canUpdate = true;
+    }
+}
+void bot_ai::ResummonPet()
+{
+    ResummonCreature(botPet);
 }
 
 void bot_ai::MoveInLineOfSight(Unit* /*u*/)
@@ -18348,6 +18421,7 @@ bool bot_ai::FinishTeleport(bool reset)
             this->Reset();
         //bot->SetAI(oldAI);
         //me->IsAIEnabled = true;
+        ResummonAll();
         canUpdate = true;
         outdoorsTimer = 0;
 
@@ -19020,7 +19094,6 @@ void bot_ai::OnBotEnterVehicle(Vehicle const* vehicle)
 {
     if (VehicleSeatEntry const* seat = vehicle->GetSeatForPassenger(me))
     {
-        UnsummonAll();
         if (seat->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
         {
             vehicle->GetBase()->SetFaction(master->GetFaction());
@@ -19042,6 +19115,7 @@ void bot_ai::OnBotEnterVehicle(Vehicle const* vehicle)
                 case CREATURE_OCULUS_DRAKE_RUBY:
                 case CREATURE_OCULUS_DRAKE_EMERALD:
                 case CREATURE_OCULUS_DRAKE_AMBER:
+                    UnsummonAll(false);
                     vehicle->GetBase()->SetCanFly(true);
                     vehicle->GetBase()->SetDisableGravity(true);
                     break;

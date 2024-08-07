@@ -133,7 +133,7 @@ public:
             protected:
                 bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
                 {
-                    (dynamic_cast<blademaster_botAI*>(_bot->GetAI()))->UnsummonAll();
+                    (dynamic_cast<blademaster_botAI*>(_bot->GetAI()))->UnsummonAll(false);
 
                     return true;
                 }
@@ -450,7 +450,7 @@ public:
             //OKAY
 
             //destroy existing illusions if any
-            UnsummonAll();
+            UnsummonAll(false);
             //mirror image renders BM invulnerable for a short period of time,
             //removing all but passive auras
             Unit::AuraMap const auras = me->GetOwnedAuras(); //copy
@@ -821,7 +821,7 @@ public:
             bot_ai::JustDied(u);
 
             if (!IsTempBot())
-                UnsummonAll();
+                UnsummonAll(false);
         }
 
         void OnBotDespawn(Creature* summon) override
@@ -839,7 +839,7 @@ public:
             }
         }
 
-        void UnsummonAll() override
+        void UnsummonAll(bool /*savePets*/ = true) override
         {
             while (!_illusionGuids.empty())
             {
@@ -866,7 +866,7 @@ public:
 
         void Reset() override
         {
-            UnsummonAll();
+            UnsummonAll(false);
 
             _dmdevent = nullptr;
             Windwalk_Timer = 0;

@@ -51,7 +51,7 @@ enum NecromancerSpecial
     //get 80% mana back if casting on a skeleton
     UNHOLY_FRENZY_REFUND    = UNHOLY_FRENZY_COST / 10 * 8,
 
-    MAX_MINIONS             = 6,
+    MAX_MINIONS             = 12,
 
     SPELL_SPAWN_ANIM        = 25035,
     SPELL_BLOODY_EXPLOSION  = 36599,
@@ -143,7 +143,7 @@ public:
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
-        void JustDied(Unit* u) override { UnsummonAll(); bot_ai::JustDied(u); }
+        void JustDied(Unit* u) override { UnsummonAll(false); bot_ai::JustDied(u); }
         void DoNonCombatActions(uint32 /*diff*/) { }
 
         void CheckCorpseExplosion(uint32 diff)
@@ -515,7 +515,7 @@ public:
 
                 if (baseId == UNHOLY_FRENZY_1)
                 {
-                    if (target->GetEntry() == BOT_PET_NECROSKELETON && _minions.find(target) != _minions.end())
+                    if (target->GetEntry() == BOT_PET_NECROSKELETON && _minions.find(target->ToCreature()) != _minions.end())
                     {
                         //get 80% mana back if casting on a skeleton
                         me->EnergizeBySpell(me, UNHOLY_FRENZY_1, UNHOLY_FRENZY_REFUND, POWER_MANA);
@@ -609,11 +609,9 @@ public:
                         }
                     }
                 }
-                //try 3: last resort
-                if (!u)
-                    u = *(_minions.begin());
 
-                u->ToTempSummon()->UnSummon();
+                if (!u)
+                    return;
             }
 
             Position pos = from->GetPosition();
@@ -651,10 +649,9 @@ public:
             _minions.insert(myPet);
         }
 
-        void UnsummonAll() override
+        void UnsummonAll(bool savePets = true) override
         {
-            while (!_minions.empty())
-                (*_minions.begin())->ToTempSummon()->UnSummon();
+            UnsummonCreatures(_minions, savePets);
         }
 
         void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
@@ -665,6 +662,11 @@ public:
         {
             if (_minions.find(summon) != _minions.end())
                 _minions.erase(summon);
+        }
+
+        void ResummonAll() override
+        {
+            ResummonCreatures(_minions);
         }
 
         uint32 GetAIMiscValue(uint32 data) const override
@@ -693,7 +695,7 @@ public:
             _corpseExplosionCheckTimer = 0;
             _raiseDeadCheckTimer = 0;
 
-            UnsummonAll();
+            UnsummonAll(false);
 
             DefaultInit();
         }
@@ -766,7 +768,7 @@ public:
         uint32 _corpseExplosionCheckTimer;
         uint32 _raiseDeadCheckTimer;
 
-        typedef std::set<Unit*> Summons;
+        typedef std::set<Creature*> Summons;
         Summons _minions;
     };
 };

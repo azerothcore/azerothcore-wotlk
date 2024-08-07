@@ -340,6 +340,20 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
         }
     }
 
+    //npcbot
+    if (owner->IsNPCBotPet() && !owner->IsInCombat() && !owner->HasUnitFlag(UNIT_FLAG_POSSESSED) && (target->GetGUID() == owner->GetOwnerGUID() || target->GetGUID() == owner->GetCreatorGUID()))
+    {
+        UnitMoveType moveType = Movement::SelectSpeedType(target->GetUnitMovementFlags());
+        speed = target->GetSpeed(moveType);
+        float distance = owner->GetDistance2d(dest.x, dest.y) - target->GetObjectSize() - (*speed / 2.f);
+        if (distance > 0.f)
+        {
+            float multiplier = 1.f + (distance / 10.f);
+            *speed *= multiplier;
+        }
+    }
+    //end npcbot
+
     return speed;
 }
 

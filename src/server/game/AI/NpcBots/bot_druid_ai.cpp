@@ -259,7 +259,7 @@ public:
         void KilledUnit(Unit* u) override { bot_ai::KilledUnit(u); }
         void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { bot_ai::EnterEvadeMode(why); }
         void MoveInLineOfSight(Unit* u) override { bot_ai::MoveInLineOfSight(u); }
-        void JustDied(Unit* u) override { removeShapeshiftForm(); UnsummonAll(); bot_ai::JustDied(u); }
+        void JustDied(Unit* u) override { removeShapeshiftForm(); UnsummonAll(false); bot_ai::JustDied(u); }
 
         uint8 GetBotStance() const override
         {
@@ -2603,11 +2603,8 @@ public:
             }
         }
 
-        void UnsummonAll() override
+        void UnsummonAll(bool /*savePets*/ = true) override
         {
-            //if (botPet)
-            //    botPet->ToTempSummon()->UnSummon();
-
             for (uint8 i = 0; i != MAX_TREANTS; ++i)
             {
                 if (_treants[i])
@@ -2631,7 +2628,7 @@ public:
 
         void Reset() override
         {
-            UnsummonAll();
+            UnsummonAll(false);
             for (uint8 i = 0; i != MAX_TREANTS; ++i)
                 _treants[i] = ObjectGuid::Empty;
 

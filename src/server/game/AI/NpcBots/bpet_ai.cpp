@@ -6,6 +6,7 @@
 #include "Map.h"
 #include "MotionMaster.h"
 #include "ObjectMgr.h"
+#include "PointMovementGenerator.h"
 #include "SpellAuraEffects.h"
 #include "Transport.h"
 #include "World.h"
@@ -17,7 +18,7 @@ static constexpr uint32 SHAMAN_MAX_PET_POSITIONS = 2;
 static constexpr uint32 DRUID_MAX_PET_POSITIONS = 3;
 static constexpr uint32 DK_MAX_PET_POSITIONS = 10;
 static constexpr uint32 DARK_RANGER_MAX_PET_POSITIONS = 5;
-static constexpr uint32 NECROMANCER_MAX_PET_POSITIONS = 6;
+static constexpr uint32 NECROMANCER_MAX_PET_POSITIONS = 12;
 static constexpr uint32 CRYPT_LORD_MAX_PET_POSITIONS = 6;
 float constexpr ShamanPetPositionAnglesByPosNumber[SHAMAN_MAX_PET_POSITIONS] =
 {
@@ -55,10 +56,16 @@ float constexpr NecromancerPetPositionAnglesByPosNumber[NECROMANCER_MAX_PET_POSI
 {
     0.f,
     float(M_PI),
-    0.6283185f,//1*M_PI/5
-    2.5132741f,//4*M_PI/5
-    1.2566370f,//2*M_PI/5
-    1.8849555f //3*M_PI/5
+    float(1 *M_PI/11),
+    float(2 *M_PI/11),
+    float(3 *M_PI/11),
+    float(4 *M_PI/11),
+    float(5 *M_PI/11),
+    float(6 *M_PI/11),
+    float(7 *M_PI/11),
+    float(8 *M_PI/11),
+    float(9 *M_PI/11),
+    float(10*M_PI/11)
 };
 float constexpr CryptLordPetPositionAnglesByPosNumber[CRYPT_LORD_MAX_PET_POSITIONS] =
 {
@@ -198,7 +205,9 @@ void bot_pet_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
         if (me->isMoving() && Rand() > 10) return;
 
         float x,y,z;
-        if (petOwner->GetMotionMaster()->GetDestination(x, y, z) && (me->GetDistance(x, y, z) < 6.f || me->GetDistance(x, y, z) > 20.f))
+        bool dest_valid = petOwner->GetMotionMaster()->GetDestination(x, y, z);
+        float pdist = dest_valid ? me->GetDistance(x, y, z) : 0.0f;
+        if (dest_valid && (pdist < 6.f || pdist > 20.f))
         {
             if (!me->HasUnitState(UNIT_STATE_FOLLOW))
                 me->GetMotionMaster()->MoveFollow(petOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
@@ -213,7 +222,19 @@ void bot_pet_ai::SetBotCommandState(uint32 st, bool force, Position* newpos)
                 movepos.m_positionY = newpos->m_positionY;
                 movepos.m_positionZ = newpos->m_positionZ;
             }
-            me->GetMotionMaster()->MovePoint(petOwner->GetMapId(), movepos);
+
+            float speed = 0.0f;
+            if (!IAmFree() && !(petOwner->IsWalking() || HasBotCommandState(BOT_COMMAND_WALK)))
+            {
+                const float baserunspeed = petOwner->GetSpeed(MOVE_RUN);
+                if (pdist > 50.0f)
+                    speed = baserunspeed * 2.0f;
+                else if (pdist > 30.0f)
+                    speed = baserunspeed * 1.5f;
+                else if (pdist > 10.0f)
+                    speed = baserunspeed * 1.25f;
+            }
+            me->GetMotionMaster()->Add(new PointMovementGenerator<Creature>(1, movepos.m_positionX, movepos.m_positionY, movepos.m_positionZ, true, speed));
         }
         RemoveBotCommandState(BOT_COMMAND_STAY | BOT_COMMAND_FULLSTOP | BOT_COMMAND_ATTACK | BOT_COMMAND_COMBATRESET);
     }
