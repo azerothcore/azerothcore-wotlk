@@ -20,20 +20,20 @@
  *  \file WorldSocketMgr.h
  */
 
-#ifndef __WORLDSOCKETMGR_H
-#define __WORLDSOCKETMGR_H
+#ifndef _WOWCONNECTIONNET_H
+#define _WOWCONNECTIONNET_H
 
 #include "SocketMgr.h"
 
 class WowConnection;
 
 /// Manages all sockets connected to peers and network threads
-class AC_GAME_API WorldSocketMgr : public SocketMgr<WowConnection>
+class AC_GAME_API WowConnectionNet : public SocketMgr<WowConnection>
 {
     typedef SocketMgr<WowConnection> BaseSocketMgr;
 
 public:
-    static WorldSocketMgr& Instance();
+    static WowConnectionNet& Instance();
 
     /// Start network, listen at address:port .
     bool StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int networkThreads);
@@ -46,7 +46,7 @@ public:
     std::size_t GetApplicationSendBufferSize() const { return _socketApplicationSendBufferSize; }
 
 protected:
-    WorldSocketMgr();
+    WowConnectionNet();
 
     NetworkThread<WowConnection>* CreateThreads() const override;
 
@@ -61,7 +61,7 @@ private:
     bool _tcpNoDelay;
 };
 
-#define sWorldSocketMgr WorldSocketMgr::Instance()
+#define sWorldSocketMgr WowConnectionNet::Instance()
 
 #endif
 /// @}

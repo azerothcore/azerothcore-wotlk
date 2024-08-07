@@ -51,7 +51,7 @@
 #include "SharedDefines.h"
 #include "World.h"
 #include "WowConnection.h"
-#include "WorldSocketMgr.h"
+#include "WowConnectionNet.h"
 #include <boost/asio/signal_set.hpp>
 #include <boost/program_options.hpp>
 #include <csignal>

@@ -38,7 +38,7 @@ protected:
     ServerScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
-    // Called when reactive socket I/O is started (WorldSocketMgr).
+    // Called when reactive socket I/O is started (WowConnectionNet).
     virtual void OnNetworkStart() { }
 
     // Called when reactive I/O is stopped.

@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "WorldSocketMgr.h"
+#include "WowConnectionNet.h"
 #include "Config.h"
 #include "NetworkThread.h"
 #include "ScriptMgr.h"
@@ -37,18 +37,18 @@ public:
     }
 };
 
-WorldSocketMgr::WorldSocketMgr() :
+WowConnectionNet::WowConnectionNet() :
     BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(65536), _tcpNoDelay(true)
 {
 }
 
-WorldSocketMgr& WorldSocketMgr::Instance()
+WowConnectionNet& WowConnectionNet::Instance()
 {
-    static WorldSocketMgr instance;
+    static WowConnectionNet instance;
     return instance;
 }
 
-bool WorldSocketMgr::StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int threadCount)
+bool WowConnectionNet::StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, int threadCount)
 {
     _tcpNoDelay = sConfigMgr->GetOption<bool>("Network.TcpNodelay", true);
 
@@ -68,20 +68,20 @@ bool WorldSocketMgr::StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::s
     if (!BaseSocketMgr::StartNetwork(ioContext, bindIp, port, threadCount))
         return false;
 
-    _acceptor->AsyncAcceptWithCallback<&WorldSocketMgr::OnSocketAccept>();
+    _acceptor->AsyncAcceptWithCallback<&WowConnectionNet::OnSocketAccept>();
 
     sScriptMgr->OnNetworkStart();
     return true;
 }
 
-void WorldSocketMgr::StopNetwork()
+void WowConnectionNet::StopNetwork()
 {
     BaseSocketMgr::StopNetwork();
 
     sScriptMgr->OnNetworkStop();
 }
 
-void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
+void WowConnectionNet::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
 {
     // set some options here
     if (_socketSystemSendBufferSize >= 0)
@@ -91,7 +91,7 @@ void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
 
         if (err && err != boost::system::errc::not_supported)
         {
-            LOG_ERROR("network", "WorldSocketMgr::OnSocketOpen sock.set_option(boost::asio::socket_base::send_buffer_size) err = {}", err.message());
+            LOG_ERROR("network", "WowConnectionNet::OnSocketOpen sock.set_option(boost::asio::socket_base::send_buffer_size) err = {}", err.message());
             return;
         }
     }
@@ -104,7 +104,7 @@ void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
 
         if (err)
         {
-            LOG_ERROR("network", "WorldSocketMgr::OnSocketOpen sock.set_option(boost::asio::ip::tcp::no_delay) err = {}", err.message());
+            LOG_ERROR("network", "WowConnectionNet::OnSocketOpen sock.set_option(boost::asio::ip::tcp::no_delay) err = {}", err.message());
             return;
         }
     }
@@ -112,7 +112,7 @@ void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
     BaseSocketMgr::OnSocketOpen(std::forward<tcp::socket>(sock), threadIndex);
 }
 
-NetworkThread<WowConnection>* WorldSocketMgr::CreateThreads() const
+NetworkThread<WowConnection>* WowConnectionNet::CreateThreads() const
 {
 
     NetworkThread<WowConnection>* threads = new WorldSocketThread[GetNetworkThreadCount()];
