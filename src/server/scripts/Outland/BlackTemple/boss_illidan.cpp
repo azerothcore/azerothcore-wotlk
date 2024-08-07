@@ -893,7 +893,7 @@ struct npc_akama_illidan : public ScriptedAI
                     {
                         float x, y, z;
                         me->GetNearPoint(illidan, x, y, z, 25.f, 0, me->GetAngle(illidan));
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_2, x, y, z);
+                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_2, x, y, z);  // Wait for Maiev to despawn
                     }
                 }
             }
@@ -971,6 +971,7 @@ struct npc_akama_illidan : public ScriptedAI
             case PATH_AKAMA_MINIONS:
             {
                 me->SetControlled(true, UNIT_STATE_ROOT);
+                me->SetReactState(REACT_AGGRESSIVE);
 
                 for (int i = 0; i < 10; ++i)
                     me->SummonCreature(NPC_ILLIDARI_ELITE, IllidariMinionPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
