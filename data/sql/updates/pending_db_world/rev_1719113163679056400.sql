@@ -1,0 +1,2 @@
+--
+UPDATE `quest_offer_reward` SET `RewardText`='We will leave this place on our own, $G Lord:Lady; $N - once we are certain that the evil within has been wholly destroyed. Your journey of legend is almost at an end.' WHERE `ID`=8801;
