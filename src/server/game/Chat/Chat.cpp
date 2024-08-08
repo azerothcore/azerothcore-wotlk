@@ -99,6 +99,26 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     return false;
 }
 
+void ChatHandler::SendGMText(std::string_view str)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+    // Session should have permissions to receive global gm messages
+    if (AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
+        return;
+
+    // Player should be in world
+    Player* player = m_session->GetPlayer();
+    if (!player || !player->IsInWorld())
+        return;
+
+    for (std::string_view line : lines)
+    {
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+        player->SendDirectMessage(&data);
+    }
+}
+
 void ChatHandler::SendWorldText(std::string_view str)
 {
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
