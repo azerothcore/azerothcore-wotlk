@@ -386,10 +386,6 @@ int main(int argc, char** argv)
 
     sScriptMgr->OnStartup();
 
-#if OPENSSL_VERSION_NUMBER < 0x30000000L
-    LOG_WARN("server", "WARNING: You are using OpenSSL version 1.1 which is soon EOL!\nThis version will be deprecated. Consider upgrading to OpenSSL 3.0 or 3.1!");
-#endif
-
     // Launch CliRunnable thread
     std::shared_ptr<std::thread> cliThread;
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS

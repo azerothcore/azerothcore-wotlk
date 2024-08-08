@@ -19,6 +19,8 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "mechanar.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Says
 {

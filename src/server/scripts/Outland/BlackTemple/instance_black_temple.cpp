@@ -20,6 +20,9 @@
 #include "InstanceScript.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 DoorData const doorData[] =
 {

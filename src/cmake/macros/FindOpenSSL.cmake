@@ -217,18 +217,7 @@ if(OPENSSL_USE_STATIC_LIBS)
   endif()
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "QNX" AND
-  CMAKE_SYSTEM_VERSION VERSION_GREATER_EQUAL "7.0" AND CMAKE_SYSTEM_VERSION VERSION_LESS "7.1" AND
-  OpenSSL_FIND_VERSION VERSION_GREATER_EQUAL "1.1" AND OpenSSL_FIND_VERSION VERSION_LESS "1.2")
-  # QNX 7.0.x provides openssl 1.0.2 and 1.1.1 in parallel:
-  # * openssl 1.0.2: libcrypto.so.2 and libssl.so.2, headers under usr/include/openssl
-  # * openssl 1.1.1: libcrypto1_1.so.2.1 and libssl1_1.so.2.1, header under usr/include/openssl1_1
-  # See http://www.qnx.com/developers/articles/rel_6726_0.html
-  set(_OPENSSL_FIND_PATH_SUFFIX "openssl1_1")
-  set(_OPENSSL_NAME_POSTFIX "1_1")
-else()
-  set(_OPENSSL_FIND_PATH_SUFFIX "include")
-endif()
+set(_OPENSSL_FIND_PATH_SUFFIX "include")
 
 if (OPENSSL_ROOT_DIR OR NOT "$ENV{OPENSSL_ROOT_DIR}" STREQUAL "")
   set(_OPENSSL_ROOT_HINTS HINTS ${OPENSSL_ROOT_DIR} ENV OPENSSL_ROOT_DIR)
@@ -284,7 +273,6 @@ endif ()
 
 if(HOMEBREW_PREFIX)
   list(APPEND _OPENSSL_ROOT_HINTS
-    "${HOMEBREW_PREFIX}/opt/openssl@1.1"
     "${HOMEBREW_PREFIX}/opt/openssl@3")
 endif()
 
@@ -633,41 +621,6 @@ function(from_hex HEX DEC)
 endfunction()
 
 if(OPENSSL_INCLUDE_DIR AND EXISTS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h")
-  file(STRINGS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h" openssl_version_str
-       REGEX "^#[\t ]*define[\t ]+OPENSSL_VERSION_NUMBER[\t ]+0x([0-9a-fA-F])+.*")
-
-  if(openssl_version_str)
-    # The version number is encoded as 0xMNNFFPPS: major minor fix patch status
-    # The status gives if this is a developer or prerelease and is ignored here.
-    # Major, minor, and fix directly translate into the version numbers shown in
-    # the string. The patch field translates to the single character suffix that
-    # indicates the bug fix state, which 00 -> nothing, 01 -> a, 02 -> b and so
-    # on.
-
-    string(REGEX REPLACE "^.*OPENSSL_VERSION_NUMBER[\t ]+0x([0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F][0-9a-fA-F])([0-9a-fA-F]).*$"
-           "\\1;\\2;\\3;\\4;\\5" OPENSSL_VERSION_LIST "${openssl_version_str}")
-    list(GET OPENSSL_VERSION_LIST 0 OPENSSL_VERSION_MAJOR)
-    list(GET OPENSSL_VERSION_LIST 1 OPENSSL_VERSION_MINOR)
-    from_hex("${OPENSSL_VERSION_MINOR}" OPENSSL_VERSION_MINOR)
-    list(GET OPENSSL_VERSION_LIST 2 OPENSSL_VERSION_FIX)
-    from_hex("${OPENSSL_VERSION_FIX}" OPENSSL_VERSION_FIX)
-    list(GET OPENSSL_VERSION_LIST 3 OPENSSL_VERSION_PATCH)
-
-    if (NOT OPENSSL_VERSION_PATCH STREQUAL "00")
-      from_hex("${OPENSSL_VERSION_PATCH}" _tmp)
-      # 96 is the ASCII code of 'a' minus 1
-      math(EXPR OPENSSL_VERSION_PATCH_ASCII "${_tmp} + 96")
-      unset(_tmp)
-      # Once anyone knows how OpenSSL would call the patch versions beyond 'z'
-      # this should be updated to handle that, too. This has not happened yet
-      # so it is simply ignored here for now.
-      string(ASCII "${OPENSSL_VERSION_PATCH_ASCII}" OPENSSL_VERSION_PATCH_STRING)
-    endif ()
-
-    set(OPENSSL_VERSION "${OPENSSL_VERSION_MAJOR}.${OPENSSL_VERSION_MINOR}.${OPENSSL_VERSION_FIX}${OPENSSL_VERSION_PATCH_STRING}")
-  else ()
-    # Since OpenSSL 3.0.0, the new version format is MAJOR.MINOR.PATCH and
-    # a new OPENSSL_VERSION_STR macro contains exactly that
     file(STRINGS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h" OPENSSL_VERSION_STR
          REGEX "^#[\t ]*define[\t ]+OPENSSL_VERSION_STR[\t ]+\"([0-9])+\\.([0-9])+\\.([0-9])+\".*")
     string(REGEX REPLACE "^.*OPENSSL_VERSION_STR[\t ]+\"([0-9]+\\.[0-9]+\\.[0-9]+)\".*$"
@@ -676,7 +629,6 @@ if(OPENSSL_INCLUDE_DIR AND EXISTS "${OPENSSL_INCLUDE_DIR}/openssl/opensslv.h")
     set(OPENSSL_VERSION "${OPENSSL_VERSION_STR}")
 
     unset(OPENSSL_VERSION_STR)
-  endif ()
 endif ()
 
 foreach(_comp IN LISTS OpenSSL_FIND_COMPONENTS)

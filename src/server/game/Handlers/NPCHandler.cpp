@@ -124,7 +124,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
     data << guid;
     data << uint32(trainer_spells->trainerType);
 
-    size_t count_pos = data.wpos();
+    std::size_t count_pos = data.wpos();
     data << uint32(trainer_spells->spellList.size());
 
     // reputation discount
@@ -483,7 +483,7 @@ void WorldSession::SendStablePet(ObjectGuid guid)
 
     WorldPacket data(MSG_LIST_STABLED_PETS, 200);           // guess size
     data << guid;
-    size_t wpos = data.wpos();
+    std::size_t wpos = data.wpos();
     data << uint8(0);                                       // place holder for slot show number
 
     PetStable* petStable = GetPlayer()->GetPetStable();

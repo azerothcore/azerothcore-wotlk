@@ -16,7 +16,6 @@
  */
 
 #include "Channel.h"
-#include "CreatureScript.h"
 #include "Group.h"
 #include "Guild.h"
 #include "Log.h"

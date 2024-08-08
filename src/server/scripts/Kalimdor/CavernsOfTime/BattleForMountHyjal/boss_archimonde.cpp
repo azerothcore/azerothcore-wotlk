@@ -16,10 +16,10 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
-#include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "hyjal.h"
@@ -145,32 +145,35 @@ struct npc_doomfire_spirit : public ScriptedAI
 {
     npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
-    float const turnConstant = 0.785402f;
-    float fAngle = urand(0, M_PI * 2);
+    float const turnConstant = 0.785402f; // 45 degree turns, verified with sniffs
 
     void Reset() override
     {
-        scheduler.CancelAll();
-        ScheduleTimedEvent(0s, [&] {
-            float nextOrientation = Position::NormalizeOrientation(me->GetOrientation() + irand(-1, 1) * turnConstant);
-            Position pos = GetFirstRandomAngleCollisionPosition(8.f, nextOrientation); // both orientation and distance verified with sniffs
-            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), nextOrientation);
-            }, 1600ms);
+        ScheduleUniqueTimedEvent(10ms, [&] {
+            TryTeleportInDirection(1.f, M_PI, 1.f, true); //turns around and teleports 1 unit on spawn, assuming same logic as later teleports applies
 
-        fAngle = urand(0, M_PI * 2);
+            ScheduleTimedEvent(10ms, [&] {
+                float angle = irand(-1, 1) * turnConstant;
+                TryTeleportInDirection(8.f, angle, 2.f, false);
+            }, 1600ms);
+        },1);
     }
 
-    Position GetFirstRandomAngleCollisionPosition(float dist, float angle)
+    void TryTeleportInDirection(float dist, float angle, float step, bool alwaysturn)
     {
         Position pos;
-        for (uint32 i = 0; i < 10; ++i)
+        while (dist >= 0)
         {
             pos = me->WorldObject::GetFirstCollisionPosition(dist, angle);
-            if (me->GetDistance(pos) > dist * 0.8f) // if at least 80% distance, good enough
+            if (fabsf(dist - me->GetExactDist2d(pos)) < 0.001) // Account for small deviation
                 break;
-            angle += (M_PI / 5); // else try slightly different angle
+            dist -= step; // Distance drops with each unsuccessful attempt
         }
-        return pos;
+
+        if (dist || alwaysturn)
+            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), Position::NormalizeOrientation(me->GetOrientation() + angle));
+        else // Orientation does not change if not moving, verified with sniffs
+            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetOrientation());
     }
 
     void UpdateAI(uint32 diff) override
@@ -264,14 +267,16 @@ struct boss_archimonde : public BossAI
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(25s, 35s, [&]
         {
-            scheduler.DelayGroup(GROUP_FEAR, 5s);
-            Talk(SAY_AIR_BURST);
-            DoCastRandomTarget(SPELL_AIR_BURST);
+            if (DoCastRandomTarget(SPELL_AIR_BURST, 1) == SPELL_CAST_OK)
+            {
+                scheduler.DelayGroup(GROUP_FEAR, 5s);
+                Talk(SAY_AIR_BURST);
+            }
         }, 25s, 40s);
-        ScheduleTimedEvent(25s, 35s, [&]
+        ScheduleTimedEvent(8s, [&]
         {
             DoCastDoomFire();
-        }, 20s);
+        }, 8s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
             DoCastRandomTarget(SPELL_GRIP_OF_THE_LEGION);
@@ -400,7 +405,7 @@ struct boss_archimonde : public BossAI
         float angle = 2 * M_PI * rand() / RAND_MAX;
         float x = me->GetPositionX() + DOOMFIRE_OFFSET * cos(angle);
         float y = me->GetPositionY() + DOOMFIRE_OFFSET * sin(angle);
-        Position spiritPosition = Position(x, y, me->GetPositionZ());
+        Position spiritPosition = Position(x, y, me->GetPositionZ(), Position::NormalizeOrientation(angle + M_PI)); //spirit faces archimonde on spawn
         Position doomfirePosition = Position(x, y, me->GetPositionZ());
         if (Creature* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
         {
@@ -468,24 +473,6 @@ class spell_red_sky_effect : public SpellScript
     }
 };
 
-class spell_air_burst : public SpellScript
-{
-    PrepareSpellScript(spell_air_burst);
-
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        if (Unit* victim = GetCaster()->GetVictim())
-        {
-            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
-        }
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_air_burst::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
-    }
-};
-
 class spell_doomfire : public AuraScript
 {
     PrepareAuraScript(spell_doomfire);
@@ -516,7 +503,6 @@ class spell_doomfire : public AuraScript
 void AddSC_boss_archimonde()
 {
     RegisterSpellScript(spell_red_sky_effect);
-    RegisterSpellScript(spell_air_burst);
     RegisterSpellScript(spell_doomfire);
     RegisterHyjalAI(boss_archimonde);
     RegisterHyjalAI(npc_ancient_wisp);

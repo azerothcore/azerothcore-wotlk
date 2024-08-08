@@ -18,7 +18,12 @@
 #include "halls_of_reflection.h"
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "InstanceScript.h"
 #include "MotionMaster.h"
+#include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
 enum Events

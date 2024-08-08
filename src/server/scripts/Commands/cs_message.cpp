@@ -64,7 +64,7 @@ public:
         if (WorldSession* session = handler->GetSession())
             name = session->GetPlayer()->GetName();
 
-        sWorld->SendWorldText(LANG_ANNOUNCE_COLOR, name.c_str(), message.data());
+        handler->SendWorldText(LANG_ANNOUNCE_COLOR, name, message.data());
         return true;
     }
 
@@ -87,7 +87,7 @@ public:
         if (message.empty())
             return false;
 
-        sWorld->SendServerMessage(SERVER_MSG_STRING, Acore::StringFormat(handler->GetAcoreString(LANG_SYSTEMMESSAGE), message.data()).c_str());
+        sWorld->SendServerMessage(SERVER_MSG_STRING, Acore::StringFormatFmt(handler->GetAcoreString(LANG_SYSTEMMESSAGE), message.data()));
         return true;
     }
 
