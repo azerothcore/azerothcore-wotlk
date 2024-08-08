@@ -4664,10 +4664,10 @@ NpcBot.Limit.Raid    = 1
 #        Description: Prevent inactive bots from entering world
 #        Note:        Botgiver npc will become the only way to hire bots
 #        Note2:       Only GM's presense will reveal bot's spawn location (temporarily)
-#        Default:     0 - (Disabled, keep all spawned bots in world)
-#                     1 - (Enabled)
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled, keep all spawned bots in world)
 
-NpcBot.HideSpawns = 0
+NpcBot.HideSpawns = 1
 
 #
 #    NpcBot.Cost
