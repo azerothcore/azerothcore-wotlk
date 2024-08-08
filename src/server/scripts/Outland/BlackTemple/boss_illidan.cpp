@@ -893,7 +893,7 @@ struct npc_akama_illidan : public ScriptedAI
                     {
                         float x, y, z;
                         me->GetNearPoint(illidan, x, y, z, 25.f, 0, me->GetAngle(illidan));
-                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_2, x, y, z);  // Wait for Maiev to despawn
+                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_2, x, y, z);  // Maiev starts Akama's Ending scene
                     }
                 }
             }
@@ -1029,6 +1029,150 @@ struct npc_akama_illidan : public ScriptedAI
 private:
     InstanceScript* instance;
     SummonList summons;
+};
+
+enum Maiev
+{
+    SPELL_MAIEV_DOWN = 40409,
+    SPELL_THROW_DAGGER = 41152,
+    SPELL_SHADOW_STRIKE = 40685,
+    SPELL_CAGE_TRAP     = 40693,
+    SPELL_CAGE_TRAP_SUMMON = 40694,
+    SPELL_TELEPORT_VISUAL  = 41236,
+
+    SAY_MAIEV_SHADOWSONG_TAUNT = 0,
+    SAY_MAIEV_SHADOWSONG_APPEAR = 1,
+    SAY_MAIEV_SHADOWSONG_JUSTICE = 2,
+    SAY_MAIEV_SHADOWSONG_TRAP = 3,
+    SAY_MAIEV_SHADOWSONG_DOWN = 4,
+    SAY_MAIEV_SHADOWSONG_FINISHED = 5,
+    SAY_MAIEV_SHADOWSONG_OUTRO = 6,
+    SAY_MAIEV_SHADOWSONG_FAREWELL = 7,
+
+    ACTION_MAIEV_ENDING = 1
+};
+
+struct npc_maiev_illidan : public ScriptedAI
+{
+    npc_maiev_illidan(Creature* creature) : ScriptedAI(creature)
+    {
+        instance = creature->GetInstanceScript();
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_MAIEV_ENDING)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->RemoveAurasDueToSpell(SPELL_MAIEV_DOWN);
+            me->SetWalk(true);
+            if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
+            {
+                float x, y, z;
+                me->GetNearPoint(illidan, x, y, z, 15.f, 0, me->GetAngle(illidan));
+                me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_2, x, y, z);  // Maiev starts Akama's Ending scene
+            }
+
+            me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_MAIEV_SHADOWSONG_FINISHED);
+            }, 1420ms);
+            me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_MAIEV_SHADOWSONG_OUTRO);
+            }, 28550ms); // 27130ms
+            me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_MAIEV_SHADOWSONG_FAREWELL);
+            }, 39510ms); // 10960ms
+            me->m_Events.AddEventAtOffset([&] {
+                DoCastSelf(SPELL_TELEPORT_VISUAL);
+            }, 41700ms); // 2190ms
+            me->m_Events.AddEventAtOffset([&] {
+                if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
+                    akama->AI()->DoAction(ACTION_AKAMA_MAIEV_DESPAWN);
+                me->DespawnOnEvade();
+            }, 43320ms); // 1620ms
+        }
+    }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        me->SetReactState(REACT_PASSIVE);
+        me->SetFacingToObject(summoner);
+
+        me->m_Events.AddEventAtOffset([&] {
+            Talk(SAY_MAIEV_SHADOWSONG_APPEAR);
+        }, 25ms);
+        me->m_Events.AddEventAtOffset([&] {
+            me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+        }, 2415ms); // 2390ms
+        me->m_Events.AddEventAtOffset([&] {
+            Talk(SAY_MAIEV_SHADOWSONG_JUSTICE);
+        }, 14815ms); // 12400ms
+        me->m_Events.AddEventAtOffset([&] {
+            me->HandleEmoteCommand(EMOTE_ONESHOT_YES);
+        }, 17015ms); // 2200ms
+        me->m_Events.AddEventAtOffset([&] {
+            me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+        }, 19445ms); // 2430ms
+        me->m_Events.AddEventAtOffset([&] {
+            me->SetReactState(REACT_AGGRESSIVE);
+        }, 21920ms); // 2475ms
+        me->m_Events.AddEventAtOffset([&] {
+            if (Unit* illidan = summoner->ToUnit())
+                AttackStart(illidan);
+        }, 23095ms); // 1175ms
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        ScheduleTimedEvent(7s, [&] {
+            DoCastVictim(SPELL_THROW_DAGGER);
+        }, 30s);
+
+        ScheduleTimedEvent(22s, [&] {
+            DoCastVictim(SPELL_SHADOW_STRIKE);
+            if (roll_chance_i(50))
+                Talk(SAY_MAIEV_SHADOWSONG_TAUNT);
+        }, 30s);
+
+        ScheduleTimedEvent(1200ms, [&] {
+            if (me->HealthBelowPct(20))
+            {
+                Talk(SAY_MAIEV_SHADOWSONG_DOWN);
+                DoCastSelf(SPELL_MAIEV_DOWN);
+            }
+        }, 1200ms);
+
+        ScheduleTimedEvent(30s, [&] {
+            DoCastSelf(SPELL_CAGE_TRAP);
+            DoCastSelf(SPELL_CAGE_TRAP_SUMMON, true);
+            Talk(SAY_MAIEV_SHADOWSONG_TRAP);
+        }, 2min);
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (damage >= me->GetHealth())
+            damage = me->GetHealth() - 1;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!me->HasUnitState(UNIT_STATE_STUNNED))
+            scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    InstanceScript* instance;
 };
 
 class spell_illidan_draw_soul : public SpellScript
@@ -1368,6 +1512,7 @@ class spell_illidan_cage_trap_stun_aura : public AuraScript
 void AddSC_boss_illidan()
 {
     new boss_illidan_stormrage();
+    RegisterBlackTempleCreatureAI(npc_maiev_illidan);
     RegisterBlackTempleCreatureAI(npc_akama_illidan);
     RegisterSpellScript(spell_illidan_draw_soul);
     RegisterSpellScript(spell_illidan_parasitic_shadowfiend_aura);

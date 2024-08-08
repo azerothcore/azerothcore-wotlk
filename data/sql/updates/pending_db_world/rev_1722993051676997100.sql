@@ -273,3 +273,7 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 (230894,3,752.2771,369.94006,353.15842,NULL,0,1,0,100,0),
 (230894,4,799.1155,304.4322,319.75153,NULL,0,1,0,100,0),
 (230894,5,799.1155,304.4322,319.75153,3.071779489517211914,0,1,0,100,0);
+
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_maiev_illidan' WHERE (`entry` = 23197);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23197);
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2319700);
