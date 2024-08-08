@@ -45,6 +45,11 @@ char const* ChatHandler::GetAcoreString(uint32 entry) const
     return m_session->GetAcoreString(entry);
 }
 
+std::string const* ChatHandler::GetModuleString(std::string module, uint32 id) const
+{
+    return m_session->GetModuleString(module, id);
+}
+
 bool ChatHandler::IsAvailable(uint32 securityLevel) const
 {
     // check security level only for simple  command (without child commands)

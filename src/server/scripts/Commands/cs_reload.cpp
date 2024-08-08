@@ -166,6 +166,7 @@ public:
             { "spell_threats",                 HandleReloadSpellThreatsCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "spell_group_stack_rules",       HandleReloadSpellGroupStackRulesCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "player_loot_template",          HandleReloadLootTemplatesPlayerCommand,        SEC_ADMINISTRATOR, Console::Yes },
+            { "module_string",                 HandleReloadModuleStringCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "acore_string",                  HandleReloadAcoreStringCommand,                SEC_ADMINISTRATOR, Console::Yes },
             { "warden_action",                 HandleReloadWardenactionCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "waypoint_scripts",              HandleReloadWpScriptsCommand,                  SEC_ADMINISTRATOR, Console::Yes },
@@ -713,6 +714,17 @@ public:
         LootTemplates_Player.CheckLootRefs();
         handler->SendGlobalGMSysMessage("DB table `player_loot_template` reloaded.");
         sConditionMgr->LoadConditions(true);
+        return true;
+    }
+
+    static bool HandleReloadModuleStringCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading module_string Table!");
+        sObjectMgr->LoadModuleStrings();
+        handler->SendGlobalGMSysMessage("DB table `module_string` reloaded.");
+        LOG_INFO("server.loading", "Reloading module_string_locale Table!");
+        sObjectMgr->LoadModuleStringsLocale();
+        handler->SendGlobalGMSysMessage("DB table `module_string_locale` reloaded.");
         return true;
     }
 
