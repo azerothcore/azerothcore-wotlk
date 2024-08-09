@@ -239,6 +239,7 @@ public:
             me->CastSpell(me, SPELL_DUAL_WIELD, true);
             me->LoadEquipment(0, true);
             me->SetImmuneToAll(true);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE); //In case raid wiped during phase 2
             beamPosId = urand(0, 3);
         }
 
@@ -247,7 +248,15 @@ public:
             if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
                 akama->DespawnOrUnsummon();
 
+            if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
+            {
+                if (illidan->GetThreatMgr().GetThreatList().size() > 0) //Don't enter evade mode, there's still a player
+                    return;
+            }
+
+            //If we reach here, raid wiped
             BossAI::EnterEvadeMode(why);
+            Reset();
         }
 
         bool CanAIAttack(Unit const* target) const override
