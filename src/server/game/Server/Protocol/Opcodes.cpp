@@ -136,7 +136,7 @@ void OpcodeTable::Initialize()
     /*0x005*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_QUERY_OBJECT_POSITION,                              STATUS_NEVER);
     /*0x006*/ DEFINE_HANDLER(CMSG_QUERY_OBJECT_ROTATION,                                            STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x007*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_QUERY_OBJECT_ROTATION,                              STATUS_NEVER);
-    /*0x008*/ DEFINE_HANDLER(CMSG_WORLD_TELEPORT,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleWorldTeleportOpcode                );
+    /*0x008*/ DEFINE_HANDLER(CMSG_WORLD_TELEPORT, STATUS_LOGGEDIN, PROCESS_THREADUNSAFE, &WorldSession::HandleWorldTeleport);
     /*0x009*/ DEFINE_HANDLER(CMSG_TELEPORT_TO_UNIT,                                                 STATUS_LOGGEDIN,   PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x00A*/ DEFINE_HANDLER(CMSG_ZONE_MAP,                                                         STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x00B*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_ZONE_MAP,                                           STATUS_NEVER);
