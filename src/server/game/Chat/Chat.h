@@ -51,6 +51,28 @@ public:
 
     static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
+    void SendGMText(std::string_view str);
+    template<typename... Args>
+    void SendGMText(uint32 strId, Args&&... args)
+    {
+        // WorldText should be sent to all sessions
+        SessionMap::const_iterator itr;
+        for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        {
+            Player* player = itr->second->GetPlayer();
+            if (player && player->IsInWorld())
+            {
+                m_session = player->GetSession();
+                SendGMText(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+            }
+        }
+    }
+    template<typename... Args>
+    void SendGMText(char const* fmt, Args&&... args)
+    {
+        SendGMText(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+    }
+
     void SendWorldText(std::string_view str);
     template<typename... Args>
     void SendWorldText(uint32 strId, Args&&... args)
