@@ -20,6 +20,7 @@
 
 #include "ByteBuffer.h"
 #include "Define.h"
+#include "TC9Sidecar.h"
 #include <deque>
 #include <functional>
 #include <list>
@@ -300,6 +301,11 @@ public:
 
     ObjectGuid::LowType Generate() override
     {
+        if (high == HighGuid::Player && sToCloud9Sidecar->ClusterModeEnabled())
+            return ObjectGuid::LowType(sToCloud9Sidecar->GenerateCharacterGuid());
+        if (high == HighGuid::Item && sToCloud9Sidecar->ClusterModeEnabled())
+            return ObjectGuid::LowType(sToCloud9Sidecar->GenerateItemGuid());
+
         if (_nextGuid >= ObjectGuid::GetMaxCounter(high) - 1)
             HandleCounterOverflow(high);
 
