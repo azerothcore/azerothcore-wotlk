@@ -1891,6 +1891,23 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         Unit::DealDamage(this, victim, damageInfo->damages[i].damage, &cleanDamage, DIRECT_DAMAGE, SpellSchoolMask(damageInfo->damages[i].damageSchoolMask), nullptr, durabilityLoss);
     }
 
+    // gain rage if attack is fully blocked, dodged or parried
+    if (HasActivePowerType(POWER_RAGE) && (damageInfo->TargetState == VICTIMSTATE_BLOCKS || damageInfo->TargetState == VICTIMSTATE_DODGE || damageInfo->TargetState == VICTIMSTATE_PARRY))
+    {
+        switch (damageInfo->attackType)
+        {
+            case BASE_ATTACK:
+            case OFF_ATTACK:
+            {
+                uint32 weaponSpeedHitFactor = uint32(GetAttackTime(damageInfo->attackType) / 1000.0f * (damageInfo->attackType == BASE_ATTACK ? 3.5f : 1.75f));
+                RewardRage(damageInfo->cleanDamage, weaponSpeedHitFactor, true);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
     // If this is a creature and it attacks from behind it has a probability to daze it's victim
     if ((damageInfo->damages[0].damage + damageInfo->damages[1].damage) && ((damageInfo->hitOutCome == MELEE_HIT_CRIT || damageInfo->hitOutCome == MELEE_HIT_CRUSHING || damageInfo->hitOutCome == MELEE_HIT_NORMAL || damageInfo->hitOutCome == MELEE_HIT_GLANCING) &&
                                GetTypeId() != TYPEID_PLAYER && !ToCreature()->IsControlledByPlayer() && !victim->HasInArc(M_PI, this)
@@ -20354,9 +20371,9 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 
     if (attacker)
     {
-        addRage = (damage / rageconversion * 7.5f + weaponSpeedHitFactor) / 2;
-
-        // talent who gave more rage on attack
+        float rageFromDamageDealt = damage / rageconversion * 7.5f;
+        addRage = (rageFromDamageDealt + weaponSpeedHitFactor) / 2.0f;
+        addRage = std::min(addRage, rageFromDamageDealt * 2.0f);
         AddPct(addRage, GetTotalAuraModifier(SPELL_AURA_MOD_RAGE_FROM_DAMAGE_DEALT));
     }
     else
