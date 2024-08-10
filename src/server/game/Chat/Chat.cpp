@@ -99,6 +99,23 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     return false;
 }
 
+void ChatHandler::SendNotification(std::string_view str)
+{
+    if (!m_session)
+    {
+        LOG_ERROR("chat.chat", "ChatHandler::SendNotification sent without a session. Skipped.");
+        return;
+    }
+
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+    for (std::string_view line : lines)
+    {
+        WorldPacket data(SMSG_NOTIFICATION, line.size() + 1);
+        data << line.data();
+        m_session->SendPacket(&data);
+    }
+}
+
 void ChatHandler::SendGMText(std::string_view str)
 {
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
@@ -157,6 +174,12 @@ void ChatHandler::SendWorldTextOptional(std::string_view str, uint32 flag)
 
 void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
 {
+    if (!m_session)
+    {
+        LOG_ERROR("chat.chat", "ChatHandler::SendSysMessage sent without a session. Skipped.");
+        return;
+    }
+
     std::string msg{ str };
 
     // Replace every "|" with "||" in msg

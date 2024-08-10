@@ -51,11 +51,23 @@ public:
 
     static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
 
+    void SendNotification(std::string_view str);
+    template<typename... Args>
+    void SendNotification(uint32 strId, Args&&... args)
+    {
+        SendNotification(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
+    }
+    template<typename... Args>
+    void SendNotification(char const* fmt, Args&&... args)
+    {
+        SendNotification(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+    }
+
     void SendGMText(std::string_view str);
     template<typename... Args>
     void SendGMText(uint32 strId, Args&&... args)
     {
-        // WorldText should be sent to all sessions
+        // GMText should be sent to all sessions
         SessionMap::const_iterator itr;
         for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
         {
