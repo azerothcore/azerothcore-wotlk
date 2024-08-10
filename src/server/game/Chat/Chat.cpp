@@ -443,7 +443,7 @@ void ChatHandler::DoForAllValidSessions(std::function<void(Player*)> exec)
     SessionMap::const_iterator itr;
     for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
         if (Player* player = itr->second->GetPlayer())
-            if (player && player->IsInWorld())
+            if (player->IsInWorld())
                 exec(player);
 }
 
