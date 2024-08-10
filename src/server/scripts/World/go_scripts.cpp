@@ -16,6 +16,7 @@
  */
 
 #include "CellImpl.h"
+#include "Chat.h"
 #include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
@@ -1081,7 +1082,7 @@ public:
         if (player->GetQuestRewardStatus(QUEST_TELE_CRYSTAL_FLAG))
             return false;
 
-        player->GetSession()->SendNotification(GO_TELE_TO_DALARAN_CRYSTAL_FAILED);
+        ChatHandler(player->GetSession()).SendNotification(GO_TELE_TO_DALARAN_CRYSTAL_FAILED);
 
         return true;
     }
@@ -1599,7 +1600,7 @@ public:
         else
         {
             CloseGossipMenuFor(player);
-            player->GetSession()->SendNotification(GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND);
+            ChatHandler(player->GetSession()).SendNotification(GO_ANDERHOLS_SLIDER_CIDER_NOT_FOUND);
             return false;
         }
     }

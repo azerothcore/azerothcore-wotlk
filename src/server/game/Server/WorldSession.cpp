@@ -787,16 +787,6 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
     return false;
 }
 
-void WorldSession::SendNotification(std::string_view str)
-{
-    WorldPacket data(SMSG_NOTIFICATION, str.size() + 1);
-    for (std::string_view line : Acore::Tokenize(str, '\n', true))
-    {
-        data << line.data();
-        SendPacket(&data);
-    }
-}
-
 char const* WorldSession::GetAcoreString(uint32 entry) const
 {
     return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
