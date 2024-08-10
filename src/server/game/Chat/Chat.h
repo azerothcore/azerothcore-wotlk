@@ -200,6 +200,7 @@ public:
 
     bool HasValidSession();
     // Do whatever you want to all the players with a valid session [including GameMasters], i.e.: param exec = [&](Player* p) { p->Whatever(); }
+    // A "valid" session requires player->IsInWorld() to be true
     void DoForAllValidSessions(std::function<void(Player*)> exec);
 
     char* extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
