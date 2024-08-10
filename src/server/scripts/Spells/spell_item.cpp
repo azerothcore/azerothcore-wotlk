@@ -4070,7 +4070,7 @@ class spell_item_skyguard_blasting_charges : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* kaliri = GetHitUnit())
-            kaliri->ToCreature()->DespawnOrUnsummon();
+            kaliri->ToCreature()->DespawnOrUnsummon(0s, 30s);
     }
 
     SpellCastResult CheckQuest()
