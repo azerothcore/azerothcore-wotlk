@@ -45,7 +45,7 @@ private:
 class AC_SHARED_API ByteBufferPositionException : public ByteBufferException
 {
 public:
-    ByteBufferPositionException(bool add, size_t pos, size_t size, size_t valueSize);
+    ByteBufferPositionException(bool add, std::size_t pos, std::size_t size, std::size_t valueSize);
 
     ~ByteBufferPositionException() noexcept override = default;
 };
@@ -53,7 +53,7 @@ public:
 class AC_SHARED_API ByteBufferSourceException : public ByteBufferException
 {
 public:
-    ByteBufferSourceException(size_t pos, size_t size, size_t valueSize);
+    ByteBufferSourceException(std::size_t pos, std::size_t size, std::size_t valueSize);
 
     ~ByteBufferSourceException() noexcept override = default;
 };
@@ -211,7 +211,7 @@ public:
 
     ByteBuffer& operator<<(std::string_view value)
     {
-        if (size_t len = value.length())
+        if (std::size_t len = value.length())
         {
             append(reinterpret_cast<uint8 const*>(value.data()), len);
         }
@@ -294,7 +294,7 @@ public:
         return *this;
     }
 
-    uint8& operator[](size_t const pos)
+    uint8& operator[](std::size_t const pos)
     {
         if (pos >= size())
         {
@@ -304,7 +304,7 @@ public:
         return _storage[pos];
     }
 
-    uint8 const& operator[](size_t const pos) const
+    uint8 const& operator[](std::size_t const pos) const
     {
         if (pos >= size())
         {
@@ -314,9 +314,9 @@ public:
         return _storage[pos];
     }
 
-    [[nodiscard]] size_t rpos() const { return _rpos; }
+    [[nodiscard]] std::size_t rpos() const { return _rpos; }
 
-    size_t rpos(size_t rpos_)
+    std::size_t rpos(std::size_t rpos_)
     {
         _rpos = rpos_;
         return _rpos;
@@ -327,9 +327,9 @@ public:
         _rpos = wpos();
     }
 
-    [[nodiscard]] size_t wpos() const { return _wpos; }
+    [[nodiscard]] std::size_t wpos() const { return _wpos; }
 
-    size_t wpos(size_t wpos_)
+    std::size_t wpos(std::size_t wpos_)
     {
         _wpos = wpos_;
         return _wpos;
@@ -338,7 +338,7 @@ public:
     template<typename T>
     void read_skip() { read_skip(sizeof(T)); }
 
-    void read_skip(size_t skip)
+    void read_skip(std::size_t skip)
     {
         if (_rpos + skip > size())
         {
@@ -355,7 +355,7 @@ public:
         return r;
     }
 
-    template <typename T> [[nodiscard]] T read(size_t pos) const
+    template <typename T> [[nodiscard]] T read(std::size_t pos) const
     {
         if (pos + sizeof(T) > size())
         {
@@ -367,7 +367,7 @@ public:
         return val;
     }
 
-    void read(uint8* dest, size_t len)
+    void read(uint8* dest, std::size_t len)
     {
         if (_rpos  + len > size())
         {
@@ -378,7 +378,7 @@ public:
         _rpos += len;
     }
 
-    template <size_t Size>
+    template <std::size_t Size>
     void read(std::array<uint8, Size>& arr)
     {
         read(arr.data(), Size);
@@ -441,17 +441,17 @@ public:
         return _storage.data();
     }
 
-    [[nodiscard]] size_t size() const { return _storage.size(); }
+    [[nodiscard]] std::size_t size() const { return _storage.size(); }
     [[nodiscard]] bool empty() const { return _storage.empty(); }
 
-    void resize(size_t newsize)
+    void resize(std::size_t newsize)
     {
         _storage.resize(newsize, 0);
         _rpos = 0;
         _wpos = size();
     }
 
-    void reserve(size_t ressize)
+    void reserve(std::size_t ressize)
     {
         if (ressize > size())
         {
@@ -464,17 +464,17 @@ public:
         _storage.shrink_to_fit();
     }
 
-    void append(const char *src, size_t cnt)
+    void append(const char *src, std::size_t cnt)
     {
         return append((const uint8 *)src, cnt);
     }
 
-    template<class T> void append(const T* src, size_t cnt)
+    template<class T> void append(const T* src, std::size_t cnt)
     {
         return append((const uint8*)src, cnt * sizeof(T));
     }
 
-    void append(uint8 const* src, size_t cnt);
+    void append(uint8 const* src, std::size_t cnt);
 
     void append(ByteBuffer const& buffer)
     {
@@ -484,7 +484,7 @@ public:
         }
     }
 
-    template <size_t Size>
+    template <std::size_t Size>
     void append(std::array<uint8, Size> const& arr)
     {
         append(arr.data(), Size);
@@ -504,7 +504,7 @@ public:
     {
         uint8 packGUID[8 + 1];
         packGUID[0] = 0;
-        size_t size = 1;
+        std::size_t size = 1;
 
         for (uint8 i = 0; guid != 0;++i)
         {
@@ -522,13 +522,13 @@ public:
     }
 
     void AppendPackedTime(time_t time);
-    void put(size_t pos, const uint8 *src, size_t cnt);
+    void put(std::size_t pos, const uint8 *src, std::size_t cnt);
     void print_storage() const;
     void textlike() const;
     void hexlike() const;
 
 protected:
-    size_t _rpos{0}, _wpos{0};
+    std::size_t _rpos{0}, _wpos{0};
     std::vector<uint8> _storage;
 };
 

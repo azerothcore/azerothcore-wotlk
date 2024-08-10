@@ -608,7 +608,7 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid 
         *data << uint32(0);                                 // unk (count?)
     else                                                    // battleground
     {
-        size_t count_pos = data->wpos();
+        std::size_t count_pos = data->wpos();
         *data << uint32(0);                                 // number of bg instances
 
         auto const& it = bgDataStore.find(bgTypeId);
