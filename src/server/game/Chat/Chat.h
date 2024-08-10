@@ -55,13 +55,13 @@ public:
     template<typename... Args>
     void SendNotification(uint32 strId, Args&&... args)
     {
-        if (HasValidSession())
+        if (HasSession())
             SendNotification(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
     }
     template<typename... Args>
     void SendNotification(char const* fmt, Args&&... args)
     {
-        if (HasValidSession())
+        if (HasSession())
             SendNotification(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
     }
 
@@ -141,14 +141,14 @@ public:
     template<typename... Args>
     void PSendSysMessage(char const* fmt, Args&&... args)
     {
-        if (HasValidSession())
+        if (HasSession())
             SendSysMessage(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     void PSendSysMessage(uint32 entry, Args&&... args)
     {
-        if (HasValidSession())
+        if (HasSession())
             SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...));
     }
 
@@ -198,7 +198,7 @@ public:
     // Returns either the selected player or self if there is no selected player
     Player* getSelectedPlayerOrSelf() const;
 
-    bool HasValidSession();
+    bool HasSession();
     // Do whatever you want to all the players with a valid session [including GameMasters], i.e.: param exec = [&](Player* p) { p->Whatever(); }
     // A "valid" session requires player->IsInWorld() to be true
     void DoForAllValidSessions(std::function<void(Player*)> exec);

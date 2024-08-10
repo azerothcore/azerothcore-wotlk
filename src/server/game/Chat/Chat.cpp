@@ -430,7 +430,7 @@ Player* ChatHandler::getSelectedPlayerOrSelf() const
     return targetPlayer;
 }
 
-bool ChatHandler::HasValidSession()
+bool ChatHandler::HasSession()
 {
     if (!m_session)
         return false;
