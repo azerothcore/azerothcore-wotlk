@@ -26,6 +26,7 @@
 
 //npcbot
 #include "botmgr.h"
+#include "bpet_ai.h"
 //end npcbot
 
 TempSummon::TempSummon(SummonPropertiesEntry const* properties, ObjectGuid owner, bool isWorldObject) :
@@ -312,6 +313,14 @@ void TempSummon::UnSummon(uint32 msTime)
         return;
     }
 
+    //npcbot
+    if (IsNPCBotPet())
+    {
+        if (Creature* petowner = GetBotPetAI()->GetPetsOwner())
+            petowner->AI()->SummonedCreatureDespawn(this);
+    }
+    else
+    //end npcbot
     if (WorldObject* owner = GetSummoner())
     {
         if (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled)

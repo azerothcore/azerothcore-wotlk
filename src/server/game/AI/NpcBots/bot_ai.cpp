@@ -15746,13 +15746,28 @@ void bot_ai::UnsummonCreature(Creature* creature, bool save)
 {
     if (creature)
     {
+        bot_pet_ai* petai = creature->GetBotPetAI();
+
+        if (save && !petai)
+        {
+            LOG_WARN("npcbots", "bot_ai::Unsummon: Trying to save creature {} (id: {}) which isn't a bot pet! Unsummoning instead.", creature->GetName(), creature->GetEntry());
+            save = false;
+        }
+
         if (!save)
         {
+            if (!IAmFree() && !creature->IsInWorld() && master->GetSession()->isLogingOut() && master->IsInWorld())
+            {
+                if (creature->FindMap())
+                    creature->ResetMap();
+                creature->SetMap(master->GetMap());
+                master->GetMap()->AddToMap(creature);
+            }
+
             ASSERT_NOTNULL(creature->ToTempSummon())->UnSummon();
             return;
         }
 
-        bot_pet_ai* petai = creature->GetBotPetAI();
         if (petai)
         {
             petai->KillEvents(true);
@@ -15805,7 +15820,8 @@ void bot_ai::ResummonCreature(Creature* creature)
             pos.Relocate(me);
 
         creature->Relocate(pos);
-        me->GetMap()->AddToMap(creature);
+        if (!creature->IsInGrid())
+            me->GetMap()->AddToMap(creature);
 
         if (petai)
             petai->canUpdate = true;
