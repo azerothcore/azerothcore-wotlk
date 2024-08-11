@@ -162,7 +162,6 @@ void OpcodeTable::Initialize()
     /*0x022*/ DEFINE_HANDLER(CMSG_GODMODE,                                                          STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
     /*0x023*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_GODMODE,                                            STATUS_NEVER);
     /*0x024*/ DEFINE_HANDLER(CMSG_CHEAT_SETMONEY,                                                   STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
-    /*0x025*/ DEFINE_HANDLER(CMSG_LEVEL_CHEAT,                                                      STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
     /*0x026*/ DEFINE_HANDLER(CMSG_PET_LEVEL_CHEAT,                                                  STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
     /*0x027*/ DEFINE_HANDLER(CMSG_SET_WORLDSTATE,                                                   STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
     /*0x028*/ DEFINE_HANDLER(CMSG_COOLDOWN_CHEAT,                                                   STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );

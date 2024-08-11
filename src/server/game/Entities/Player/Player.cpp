@@ -98,6 +98,10 @@ static BOOL PlayerLearnSpellCheatHandler (User*       user,
                                           NETMESSAGE  msgId,
                                           uint        eventTime,
                                           WDataStore* msg);
+static BOOL PlayerLevelCheatHandler (User*        user,
+                                     NETMESSAGE   msgId,
+                                     uint         eventTime,
+                                     WDataStore*  msg);
 static BOOL PlayerLogoutRequestHandler (User*       user,
                                         NETMESSAGE  msgId,
                                         uint32_t    eventTime,
@@ -16449,6 +16453,27 @@ static BOOL PlayerLearnSpellCheatHandler (User*       user,
 }
 
 //===========================================================================
+static BOOL PlayerLevelCheatHandler (User*        user,
+                                     NETMESSAGE   msgId,
+                                     uint         eventTime,
+                                     WDataStore*  msg) {
+
+  // VALIDATE USER PERMISSIONS
+  if (!user->IsGMAccount()) {
+    user->SendNotification(LANG_PERMISSION_DENIED);
+    return FALSE;
+  }
+
+  if (Player* plr = user->ActivePlayer()) {
+    // READ THE MESSAGE DATA
+    auto level = msg->read<int>();
+    // SET THE PLAYER LEVEL
+    plr->SetLevel(level);
+  }
+  return TRUE;
+}
+
+//===========================================================================
 static BOOL PlayerLogoutCancelHandler (User*        user,
                                        NETMESSAGE   msgId,
                                        uint32_t     eventTime,
@@ -16546,6 +16571,7 @@ void PlayerInitialize () {
   WowConnection::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
   WowConnection::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
   WowConnection::SetMessageHandler(CMSG_DECHARGE, PlayerDechargeCheat);
+  WowConnection::SetMessageHandler(CMSG_LEVEL_CHEAT, PlayerLevelCheatHandler);
 
   s_initialized = true;
 }
@@ -16561,6 +16587,7 @@ void PlayerDestroy () {
   WowConnection::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
   WowConnection::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
   WowConnection::ClearMessageHandler(CMSG_DECHARGE);
+  WowConnection::ClearMessageHandler(CMSG_LEVEL_CHEAT);
 
   s_initialized = false;
 }
