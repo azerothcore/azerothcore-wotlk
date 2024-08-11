@@ -16520,7 +16520,7 @@ static BOOL PlayerDechargeCheat (User*        user,
 
   if (Player* plr = user->ActivePlayer()) {
     // DECHARGE THE PLAYER'S HEALTH BAR
-    plr->SetHealth(0);
+    plr->SetHealth(1);
     // DECHARGE THE PLAYER'S POWER BAR
     POWER_TYPE power = plr->GetPowerType();
     plr->SetPower(power, 0);
