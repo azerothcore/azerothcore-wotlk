@@ -454,6 +454,23 @@ Player* ChatHandler::getSelectedPlayerOrSelf() const
     return targetPlayer;
 }
 
+bool ChatHandler::HasSession() const
+{
+    if (!m_session)
+        return false;
+
+    return true;
+}
+
+void ChatHandler::DoForAllValidSessions(std::function<void(Player*)> exec)
+{
+    SessionMap::const_iterator itr;
+    for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        if (Player* player = itr->second->GetPlayer())
+            if (player->IsInWorld())
+                exec(player);
+}
+
 char* ChatHandler::extractKeyFromLink(char* text, char const* linkType, char** something1)
 {
     // skip empty
@@ -972,6 +989,11 @@ LocaleConstant CliHandler::GetSessionDbcLocale() const
 int CliHandler::GetSessionDbLocaleIndex() const
 {
     return sObjectMgr->GetDBCLocaleIndex();
+}
+
+bool CliHandler::HasSession() const
+{
+    return true;
 }
 
 bool AddonChannelCommandHandler::ParseCommands(std::string_view str)
