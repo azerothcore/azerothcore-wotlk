@@ -430,7 +430,7 @@ Player* ChatHandler::getSelectedPlayerOrSelf() const
     return targetPlayer;
 }
 
-bool ChatHandler::HasSession()
+bool ChatHandler::HasSession() const
 {
     if (!m_session)
         return false;
@@ -965,6 +965,11 @@ LocaleConstant CliHandler::GetSessionDbcLocale() const
 int CliHandler::GetSessionDbLocaleIndex() const
 {
     return sObjectMgr->GetDBCLocaleIndex();
+}
+
+bool CliHandler::HasSession() const
+{
+    return true;
 }
 
 bool AddonChannelCommandHandler::ParseCommands(std::string_view str)

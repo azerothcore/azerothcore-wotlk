@@ -198,7 +198,8 @@ public:
     // Returns either the selected player or self if there is no selected player
     Player* getSelectedPlayerOrSelf() const;
 
-    bool HasSession();
+    // Has different implementation for console
+    virtual bool HasSession() const;
     // Do whatever you want to all the players with a valid session [including GameMasters], i.e.: param exec = [&](Player* p) { p->Whatever(); }
     // A "valid" session requires player->IsInWorld() to be true
     void DoForAllValidSessions(std::function<void(Player*)> exec);
@@ -251,6 +252,9 @@ public:
     bool needReportToTarget(Player* chr) const override;
     LocaleConstant GetSessionDbcLocale() const override;
     int GetSessionDbLocaleIndex() const override;
+
+    // CLI does not have a session, so we override it to always be true to output SendNotification and PSendSysMessage to console
+    bool HasSession() const override;
 
 private:
     void* m_callbackArg;
