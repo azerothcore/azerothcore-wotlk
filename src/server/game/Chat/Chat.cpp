@@ -101,12 +101,6 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
 
 void ChatHandler::SendNotification(std::string_view str)
 {
-    if (!m_session)
-    {
-        LOG_ERROR("chat.chat", "ChatHandler::SendNotification sent without a session. Skipped.");
-        return;
-    }
-
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
     for (std::string_view line : lines)
     {
@@ -123,16 +117,11 @@ void ChatHandler::SendGMText(std::string_view str)
     if (AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
         return;
 
-    // Player should be in world
-    Player* player = m_session->GetPlayer();
-    if (!player || !player->IsInWorld())
-        return;
-
     for (std::string_view line : lines)
     {
         WorldPacket data;
         ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
-        player->SendDirectMessage(&data);
+        m_session->SendPacket(&data);
     }
 }
 
@@ -140,15 +129,11 @@ void ChatHandler::SendWorldText(std::string_view str)
 {
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
 
-    Player* player = m_session->GetPlayer();
-    if (!player || !player->IsInWorld())
-        return;
-
     for (std::string_view line : lines)
     {
         WorldPacket data;
         ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
-        player->SendDirectMessage(&data);
+        m_session->SendPacket(&data);
     }
 }
 
@@ -157,9 +142,6 @@ void ChatHandler::SendWorldTextOptional(std::string_view str, uint32 flag)
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
 
     Player* player = m_session->GetPlayer();
-    if (!player || !player->IsInWorld())
-        return;
-
     if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
         if (player->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
             return;
@@ -174,12 +156,6 @@ void ChatHandler::SendWorldTextOptional(std::string_view str, uint32 flag)
 
 void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
 {
-    if (!m_session)
-    {
-        LOG_ERROR("chat.chat", "ChatHandler::SendSysMessage sent without a session. Skipped.");
-        return;
-    }
-
     std::string msg{ str };
 
     // Replace every "|" with "||" in msg
