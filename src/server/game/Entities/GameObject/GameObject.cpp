@@ -1831,8 +1831,8 @@ void GameObject::Use(Unit* user)
                     if (owner->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    // accept only use by player from same group as owner, excluding owner itself (unique use already added in spell effect)
-                    if (player == owner->ToPlayer() || (info->summoningRitual.castersGrouped && !player->IsInSameRaidWith(owner->ToPlayer())))
+                    // accept only use by player from same group as owner
+                    if (info->summoningRitual.castersGrouped && !player->IsInSameRaidWith(owner->ToPlayer()))
                         return;
 
                     // expect owner to already be channeling, so if not...
@@ -1905,8 +1905,8 @@ void GameObject::Use(Unit* user)
 
                 Player* targetPlayer = ObjectAccessor::FindPlayer(player->GetTarget());
 
-                // accept only use by player from same raid as caster, except caster itself
-                if (!targetPlayer || targetPlayer == player || !targetPlayer->IsInSameRaidWith(player))
+                // accept only use by player from same raid as caster
+                if (!targetPlayer || !targetPlayer->IsInSameRaidWith(player))
                     return;
 
                 //required lvl checks!
