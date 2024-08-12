@@ -1917,10 +1917,7 @@ void GameObject::Use(Unit* user)
                 if (level < info->meetingstone.minLevel)
                     return;
 
-                if (info->entry == 194097)
-                    spellId = 61994;                            // Ritual of Summoning
-                else
-                    spellId = 23598;                            // Meeting Stone Summon
+                spellId = 23598;                            // Meeting Stone Summon
 
                 break;
             }
