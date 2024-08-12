@@ -16478,10 +16478,6 @@ static BOOL PlayerLogoutCancelHandler (User*        user,
                                        NETMESSAGE   msgId,
                                        uint32_t     eventTime,
                                        WDataStore*  msg) {
-
-  if (!user->ActivePlayer())
-    return FALSE;
-
   user->CharacterAbortLogout();
   return TRUE;
 }
