@@ -5,7 +5,7 @@
 -- 3640 (gnome engineering - pledge of secrecy, alliance)
 -- 3642 (gnome engineering - pledge of secrecy, horde)
 UPDATE `quest_template` SET `RewardNextQuest`=0 WHERE `ID`=3638 OR `ID`=3640 OR `ID`=3642;
-UPDATE `quest_template` SET `RewardNextQuest`=3639 WHERE `ID`=3633;
+UPDATE `quest_template` SET `RewardNextQuest`=3639 WHERE `ID`=3526 OR `ID`=3629 OR `ID`=3633 OR `ID`=4181;
 UPDATE `quest_template` SET `RewardNextQuest`=3641 WHERE `ID`=3630 OR `ID`=3632 OR `ID`=3634;
 UPDATE `quest_template` SET `RewardNextQuest`=3643 WHERE `ID`=3635 OR `ID`=3637;
 
