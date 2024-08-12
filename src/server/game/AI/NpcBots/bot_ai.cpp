@@ -2364,7 +2364,7 @@ void bot_ai::SetStats(bool force)
     if (me->GetLevel() != mylevel)
     {
         if (me->GetLevel() > mylevel)
-            UnsummonAll();
+            UnsummonAll(false);
 
         me->SetLevel(mylevel);
         force = true; //reinit spells/passives/other
