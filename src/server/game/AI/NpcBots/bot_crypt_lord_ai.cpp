@@ -361,8 +361,8 @@ public:
             }
 
             CheckAttackState();
-            if (!me->IsAlive() || !mytar->IsAlive())
-                return;
+            //if (!me->IsAlive() || !mytar->IsAlive())
+            //    return;
         }
 
         void ApplyClassDamageMultiplierMeleeSpell(int32& damage, SpellNonMeleeDamage& /*damageinfo*/, SpellInfo const* spellInfo, WeaponAttackType /*attackType*/, bool /*iscrit*/) const override
