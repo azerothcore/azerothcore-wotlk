@@ -5938,9 +5938,6 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     if (!caster)
         return;
 
-    if (caster->IsTotem())
-        caster = caster->ToTotem()->GetOwner();
-
     // in another case summon new
     uint8 summonLevel = caster->GetLevel();
 
