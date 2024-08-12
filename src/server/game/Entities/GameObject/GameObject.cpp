@@ -203,6 +203,10 @@ void GameObject::CheckRitualList()
     if (m_unique_users.empty())
         return;
 
+    uint32 animSpell = GetGOInfo()->summoningRitual.animSpell;
+    if (!animSpell)
+        animSpell = GetSpellId();
+
     for (GuidSet::iterator itr = m_unique_users.begin(); itr != m_unique_users.end();)
     {
         if (*itr == GetOwnerGUID())
@@ -214,7 +218,7 @@ void GameObject::CheckRitualList()
         bool erase = true;
         if (Player* channeler = ObjectAccessor::GetPlayer(*this, *itr))
             if (Spell* spell = channeler->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                if (spell->m_spellInfo->Id == GetGOInfo()->summoningRitual.animSpell)
+                if (spell->m_spellInfo->Id == animSpell)
                     erase = false;
 
         if (erase)
@@ -226,9 +230,12 @@ void GameObject::CheckRitualList()
 
 void GameObject::ClearRitualList()
 {
-    uint32 animSpell = GetGOInfo()->summoningRitual.animSpell;
-    if (!animSpell || m_unique_users.empty())
+    if (m_unique_users.empty())
         return;
+
+    uint32 animSpell = GetGOInfo()->summoningRitual.animSpell;
+    if (!animSpell)
+        animSpell = GetSpellId();
 
     for (ObjectGuid const& guid : m_unique_users)
     {
@@ -526,18 +533,15 @@ void GameObject::Update(uint32 diff)
                             if (GameTime::GetGameTimeMS().count() < m_cooldownTime)
                                 return;
                             GameObjectTemplate const* info = GetGOInfo();
-                            if (info->summoningRitual.animSpell)
-                            {
-                                // xinef: if ritual requires animation, ensure that all users performs channel
-                                CheckRitualList();
-                            }
+
+                            CheckRitualList();
+
                             if (GetUniqueUseCount() < info->summoningRitual.reqParticipants)
                             {
                                 SetLootState(GO_READY);
                                 return;
                             }
 
-                            bool triggered = info->summoningRitual.animSpell;
                             Unit* owner = GetOwner();
                             Unit* spellCaster = owner ? owner : ObjectAccessor::GetPlayer(*this, m_ritualOwnerGUID);
                             if (!spellCaster)
@@ -553,7 +557,6 @@ void GameObject::Update(uint32 diff)
                                 // spell have reagent and mana cost but it not expected use its
                                 // it triggered spell in fact casted at currently channeled GO
                                 spellId = 61993;
-                                triggered = true;
                             }
 
                             // Cast casterTargetSpell at a random GO user
@@ -583,7 +586,7 @@ void GameObject::Update(uint32 diff)
                                 SetLootState(GO_READY);
 
                             ClearRitualList();
-                            spellCaster->CastSpell(spellCaster, spellId, triggered);
+                            spellCaster->CastSpell(spellCaster, spellId, true);
                             return;
                         }
                     case GAMEOBJECT_TYPE_CHEST:
@@ -1848,17 +1851,18 @@ void GameObject::Use(Unit* user)
                         return;
                 }
 
+                CheckRitualList();
+
+                if (GetUniqueUseCount() == info->summoningRitual.reqParticipants)
+                    return;
+
                 if (info->summoningRitual.animSpell)
-                {
-                    // xinef: if ritual requires animation, ensure that all users performs channel
-                    CheckRitualList();
-
-                    // xinef: all participants found
-                    if (GetUniqueUseCount() == info->summoningRitual.reqParticipants)
-                        return;
-
                     player->CastSpell(player, info->summoningRitual.animSpell, true);
-                }
+                else
+                    player->CastSpell(player, GetSpellId(),
+                        TriggerCastFlags(TRIGGERED_IGNORE_EFFECTS
+                                       | TRIGGERED_IGNORE_POWER_AND_REAGENT_COST
+                                       | TRIGGERED_CAST_DIRECTLY));
 
                 AddUniqueUse(player);
 
@@ -1866,11 +1870,9 @@ void GameObject::Use(Unit* user)
                 if (GetUniqueUseCount() == info->summoningRitual.reqParticipants)
                 {
                     SetLootState(GO_NOT_READY);
-                    // can be deleted now, if
-                    if (!info->summoningRitual.animSpell)
-                        m_cooldownTime = 0;
-                    else // channel ready, maintain this
-                        m_cooldownTime = GameTime::GetGameTimeMS().count() + 5 * IN_MILLISECONDS;
+
+                    // channel ready, maintain this
+                    m_cooldownTime = GameTime::GetGameTimeMS().count() + 5 * IN_MILLISECONDS;
                 }
 
                 return;
