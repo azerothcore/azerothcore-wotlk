@@ -16521,11 +16521,16 @@ static BOOL PlayerRechargeCheat (User*        user,
                                  uint         eventTime,
                                  WDataStore*  msg) {
 
+  // VALIDATE USER PERMISSIONS
+  if (!user->IsGMAccount()) {
+    user->SendNotification(LANG_PERMISSION_DENIED);
+    return FALSE;
+  }
   if (Player* plr = user->ActivePlayer()) {
     // RECHARGE THE PLAYER'S HEALTH BAR
     uint maxHealth = plr->GetMaxHealth();
     plr->SetHealth(maxHealth);
-    // RECHARGER THE PLAYER'S POWER BAR
+    // RECHARGE THE PLAYER'S POWER BAR
     POWER_TYPE power = plr->GetPowerType();
     uint val = plr->GetMaxPower(power);
     plr->SetPower(power, val);
