@@ -877,18 +877,17 @@ bool bot_ai::doCast(Unit* victim, uint32 spellId, TriggerCastFlags flags)
     }
 
     //spells with cast time
-    if (me->isMoving() && !(flags & TRIGGERED_CAST_DIRECTLY) && !(m_botSpellInfo->Attributes & SPELL_ATTR0_ON_NEXT_SWING) &&
-        !m_botSpellInfo->IsAutoRepeatRangedSpell() &&
-        ((m_botSpellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT)
-        //autorepeat spells missing SPELL_INTERRUPT_FLAG_MOVEMENT
-        || spellId == SHOOT_WAND
-        //channeled spells missing SPELL_INTERRUPT_FLAG_MOVEMENT
-        //Mind Flay (Rank 8)
-        || spellId == 48155) &&
-        (m_botSpellInfo->IsChanneled() || m_botSpellInfo->CalcCastTime()))
+    if (me->isMoving() && !(flags & TRIGGERED_CAST_DIRECTLY) && !m_botSpellInfo->IsAutoRepeatRangedSpell() && (m_botSpellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_MOVEMENT) &&
+        !m_botSpellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING))
     {
-        int32 cast_time = int32(m_botSpellInfo->CalcCastTime());
-        me->ModSpellCastTime(m_botSpellInfo, cast_time);
+        int32 cast_time;
+        if (m_botSpellInfo->IsChanneled())
+            cast_time = m_botSpellInfo->GetDuration();
+        else
+        {
+            cast_time = int32(m_botSpellInfo->CalcCastTime());
+            me->ModSpellCastTime(m_botSpellInfo, cast_time);
+        }
 
         if (cast_time > 0)
         {

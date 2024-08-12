@@ -1527,7 +1527,8 @@ void GenerateBotCustomSpells()
     sinfo->PowerType = POWER_MANA;
     sinfo->ManaCost = 100 * 5;
     sinfo->MaxAffectedTargets = 0;
-    sinfo->ChannelInterruptFlags = 0x100C;
+    sinfo->InterruptFlags = 0x1;
+    sinfo->ChannelInterruptFlags = 0x0;
     sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); //0
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(5); //40 yds
     sinfo->DurationEntry = sSpellDurationStore.LookupEntry(592); //400ms
@@ -1713,7 +1714,8 @@ void GenerateBotCustomSpells()
     sinfo->PowerType = POWER_MANA;
     sinfo->ManaCost = 50 * 5;
     sinfo->MaxAffectedTargets = 1;
-    //sinfo->ChannelInterruptFlags = 0; // 0x100C
+    sinfo->InterruptFlags = 0x1;
+    sinfo->ChannelInterruptFlags = 0x100C;
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
     sinfo->DurationEntry = sSpellDurationStore.LookupEntry(327); //500ms // (36); // 1000ms // (327); //500ms
     sinfo->ExplicitTargetMask = TARGET_FLAG_CORPSE_ENEMY;
@@ -1751,6 +1753,7 @@ void GenerateBotCustomSpells()
     sinfo->ManaCost = 50 * 5;
     sinfo->MaxAffectedTargets = 0;
     sinfo->StackAmount = 0;
+    sinfo->InterruptFlags = 0x1;
     sinfo->ChannelInterruptFlags = 0x100C;
     sinfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(1); //0
     sinfo->RangeEntry = sSpellRangeStore.LookupEntry(4); //30 yds
@@ -1884,6 +1887,13 @@ void GenerateBotCustomSpells()
     sinfo->Effects[0].BasePoints = 0;
     sinfo->Effects[0].DieSides = 0;
     //51) END ENERGIZE VISUAL
+
+
+    //XX) FIXES
+    spellId = 48155; // Mind Flay (Rank 8)
+    botSpellInfoOverrides.insert({ spellId, *sSpellMgr->GetSpellInfo(spellId) });
+    sinfo = &botSpellInfoOverrides.at(spellId);
+    sinfo->InterruptFlags &= SPELL_INTERRUPT_FLAG_MOVEMENT;
 
     for (auto& p : botSpellInfoOverrides)
     {
