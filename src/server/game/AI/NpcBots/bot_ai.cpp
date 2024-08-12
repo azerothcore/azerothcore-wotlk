@@ -865,14 +865,15 @@ bool bot_ai::doCast(Unit* victim, uint32 spellId, TriggerCastFlags flags)
         return false;
 
     //for debug only
-    if (victim->isType(TYPEMASK_UNIT) && victim->isDead() &&
-        !(m_botSpellInfo->AttributesEx2 & SPELL_ATTR2_ALLOW_DEAD_TARGET) &&
-        !m_botSpellInfo->HasEffect(SPELL_EFFECT_RESURRECT) &&
-        !m_botSpellInfo->HasEffect(SPELL_EFFECT_RESURRECT_NEW) &&
-        !m_botSpellInfo->HasEffect(SPELL_EFFECT_SELF_RESURRECT))
+    if (victim->isType(TYPEMASK_UNIT) && victim->isDead())
     {
-        LOG_DEBUG("npcbots", "bot_ai::doCast(): {} (bot class {}) tried to cast spell {} on a dead target {}",
-            me->GetName().c_str(), _botclass, spellId, victim->GetName().c_str());
+        if (victim->getDeathState() == DeathState::Dead)
+            LOG_DEBUG("npcbots", "bot_ai::doCast(): {} (bot class {}) tried to cast spell {} on a DEAD target {}", me->GetName(), _botclass, spellId, victim->GetName());
+        else if (!(m_botSpellInfo->AttributesEx2 & SPELL_ATTR2_ALLOW_DEAD_TARGET) &&
+            !m_botSpellInfo->HasEffect(SPELL_EFFECT_RESURRECT) &&
+            !m_botSpellInfo->HasEffect(SPELL_EFFECT_RESURRECT_NEW) &&
+            !m_botSpellInfo->HasEffect(SPELL_EFFECT_SELF_RESURRECT))
+            LOG_DEBUG("npcbots", "bot_ai::doCast(): {} (bot class {}) tried to cast spell {} on a CORPSE target {}", me->GetName(), _botclass, spellId, victim->GetName());
         //return false;
     }
 
