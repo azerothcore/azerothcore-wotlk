@@ -16544,6 +16544,12 @@ static BOOL PlayerDechargeCheat (User*        user,
                                  uint         eventTime,
                                  WDataStore*  msg) {
 
+  // VALIDATE USER PERMISSIONS
+  if (!user->IsGMAccount()) {
+    user->SendNotification(LANG_PERMISSION_DENIED);
+    return FALSE;
+  }
+
   if (Player* plr = user->ActivePlayer()) {
     // DECHARGE THE PLAYER'S HEALTH BAR
     plr->SetHealth(1);
