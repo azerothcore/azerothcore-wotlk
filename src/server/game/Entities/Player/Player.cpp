@@ -119,6 +119,44 @@ static BOOL PlayerDechargeCheat (User*        user,
                                  uint         eventTime,
                                  WDataStore*  msg);
 
+/****************************************************************************
+*
+*   EXTERNAL FUNCTIONS
+*
+***/
+
+//===========================================================================
+void PlayerInitialize () {
+  if (s_initialized) return;
+
+  WowConnection::SetMessageHandler(CMSG_RECHARGE, PlayerRechargeCheat);
+  WowConnection::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
+  WowConnection::SetMessageHandler(CMSG_GODMODE, OnGodMode);
+  WowConnection::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler);
+  WowConnection::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
+  WowConnection::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
+  WowConnection::SetMessageHandler(CMSG_DECHARGE, PlayerDechargeCheat);
+  WowConnection::SetMessageHandler(CMSG_LEVEL_CHEAT, PlayerLevelCheatHandler);
+
+  s_initialized = true;
+}
+
+//===========================================================================
+void PlayerDestroy () {
+  if (!s_initialized) return;
+
+  WowConnection::ClearMessageHandler(CMSG_RECHARGE);
+  WowConnection::ClearMessageHandler(CMSG_CREATEITEM);
+  WowConnection::ClearMessageHandler(CMSG_GODMODE);
+  WowConnection::ClearMessageHandler(CMSG_LEARN_SPELL);
+  WowConnection::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
+  WowConnection::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
+  WowConnection::ClearMessageHandler(CMSG_DECHARGE);
+  WowConnection::ClearMessageHandler(CMSG_LEVEL_CHEAT);
+
+  s_initialized = false;
+}
+
 
 enum CharacterFlags
 {
@@ -16559,43 +16597,3 @@ static BOOL PlayerDechargeCheat (User*        user,
   }
   return TRUE;
 }
-
-
-/****************************************************************************
-*
-*   Public functions
-*
-***/
-
-//===========================================================================
-void PlayerInitialize () {
-  if (s_initialized) return;
-
-  WowConnection::SetMessageHandler(CMSG_RECHARGE, PlayerRechargeCheat);
-  WowConnection::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
-  WowConnection::SetMessageHandler(CMSG_GODMODE, OnGodMode);
-  WowConnection::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler);
-  WowConnection::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
-  WowConnection::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
-  WowConnection::SetMessageHandler(CMSG_DECHARGE, PlayerDechargeCheat);
-  WowConnection::SetMessageHandler(CMSG_LEVEL_CHEAT, PlayerLevelCheatHandler);
-
-  s_initialized = true;
-}
-
-//===========================================================================
-void PlayerDestroy () {
-  if (!s_initialized) return;
-
-  WowConnection::ClearMessageHandler(CMSG_RECHARGE);
-  WowConnection::ClearMessageHandler(CMSG_CREATEITEM);
-  WowConnection::ClearMessageHandler(CMSG_GODMODE);
-  WowConnection::ClearMessageHandler(CMSG_LEARN_SPELL);
-  WowConnection::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
-  WowConnection::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
-  WowConnection::ClearMessageHandler(CMSG_DECHARGE);
-  WowConnection::ClearMessageHandler(CMSG_LEVEL_CHEAT);
-
-  s_initialized = false;
-}
-
