@@ -1191,8 +1191,8 @@ void Creature::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, 
     float basePct          = GetModifierValue(unitMod, BASE_PCT) * attackSpeedMulti;
     //npcbot
     */
-    float baseValue        = GetModifierValue(unitMod, BASE_VALUE) + (attackPower / 14.0f) * variance * attackSpeedMulti;
-    float basePct          = GetModifierValue(unitMod, BASE_PCT);
+    float baseValue        = GetModifierValue(unitMod, BASE_VALUE) + (attackPower / 14.0f) * variance * (IsNPCBot() ? attackSpeedMulti : 1.0f);
+    float basePct          = GetModifierValue(unitMod, BASE_PCT) * (!IsNPCBot() ? attackSpeedMulti : 1.0f);
     //end npcbot
     float totalValue       = GetModifierValue(unitMod, TOTAL_VALUE);
     float totalPct         = addTotalPct ? GetModifierValue(unitMod, TOTAL_PCT) : 1.0f;
