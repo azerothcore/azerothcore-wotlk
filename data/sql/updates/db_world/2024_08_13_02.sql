@@ -1,3 +1,4 @@
+-- DB update 2024_08_13_01 -> 2024_08_13_02
 --
 DROP TABLE IF EXISTS `module_string`;
 CREATE TABLE IF NOT EXISTS `module_string` (
