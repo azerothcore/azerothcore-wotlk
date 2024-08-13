@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "nexus.h"
+#include "PassiveAI.h"
 
 enum eEnums
 {

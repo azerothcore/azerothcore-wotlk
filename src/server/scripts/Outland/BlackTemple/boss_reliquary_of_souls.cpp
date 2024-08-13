@@ -91,24 +91,7 @@ enum Misc
     EVENT_ESSENCE_OF_SUFFERING      = 1,
     EVENT_ESSENCE_OF_DESIRE         = 2,
     EVENT_ESSENCE_OF_ANGER          = 3,
-    EVENT_ENGAGE_ESSENCE            = 4,
-    EVENT_SPAWN_ENSLAVED_SOULS      = 5,
-    EVENT_SPAWN_SOUL                = 6,
-    EVENT_SUCK_ESSENCE              = 7,
 
-    EVENT_SUFF_FRENZY               = 10,
-    EVENT_SUFF_FRENZY_EMOTE         = 11,
-    EVENT_SUFF_SOUL_DRAIN           = 12,
-
-    EVENT_DESI_DEADEN               = 20,
-    EVENT_DESI_SPIRIT_SHOCK         = 21,
-    EVENT_DESI_RUNE_SHIELD          = 22,
-
-    EVENT_ANGER_SPITE               = 30,
-    EVENT_ANGER_SOUL_SCREAM         = 31,
-    EVENT_ANGER_SEETHE              = 32,
-
-    EVENT_KILL_TALK                 = 100,
     POINT_GO_BACK                   = 1
 };
 
@@ -162,29 +145,59 @@ public:
                 return;
 
             me->SetInCombatWithZone();
-            events.ScheduleEvent(EVENT_ESSENCE_OF_SUFFERING, 5000); // 15000);
             me->SetStandState(UNIT_STAND_STATE_STAND);
+
+            ScheduleUniqueTimedEvent(5s, [&] { // 15s
+                me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+                DoCastSelf(SPELL_SUMMON_ESSENCE_OF_SUFFERING);
+            }, EVENT_ESSENCE_OF_SUFFERING);
         }
 
         void DoAction(int32 param) override
         {
             if (param == ACTION_ESSENCE_OF_SUFFERING)
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                events.ScheduleEvent(EVENT_SUCK_ESSENCE, 1000);
-                events.ScheduleEvent(EVENT_SPAWN_ENSLAVED_SOULS, 8000);
-                events.ScheduleEvent(EVENT_ESSENCE_OF_DESIRE, 38000);
+                PhaseTransitionSpawns();
+
+                ScheduleUniqueTimedEvent(38s, [&] {
+                    summons.DespawnAll();
+                    me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+                    DoCastSelf(SPELL_SUMMON_ESSENCE_OF_DESIRE);
+                }, EVENT_ESSENCE_OF_DESIRE);
             }
             else if (param == ACTION_ESSENCE_OF_DESIRE)
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                events.ScheduleEvent(EVENT_SUCK_ESSENCE, 1000);
-                events.ScheduleEvent(EVENT_SPAWN_ENSLAVED_SOULS, 8000);
-                events.ScheduleEvent(EVENT_ESSENCE_OF_ANGER, 38000);
+                PhaseTransitionSpawns();
+
+                ScheduleUniqueTimedEvent(38s, [&] {
+                    summons.DespawnAll();
+                    me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+                    DoCastSelf(SPELL_SUMMON_ESSENCE_OF_ANGER);
+                }, EVENT_ESSENCE_OF_ANGER);
             }
             else if (param == ACTION_ESSENCE_OF_ANGER)
             {
             }
+        }
+
+        void PhaseTransitionSpawns()
+        {
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->m_Events.AddEventAtOffset([&] {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+            }, 1s);
+
+            me->m_Events.AddEventAtOffset([&] {
+                me->CastCustomSpell(SPELL_SUMMON_ENSLAVED_SOUL, SPELLVALUE_MAX_TARGETS, 1, me, false);
+                me->CastCustomSpell(SPELL_SUMMON_ENSLAVED_SOUL, SPELLVALUE_MAX_TARGETS, 1, me, false);
+
+                for (uint8 i = 0; i < 16; ++i)
+                {
+                    me->m_Events.AddEventAtOffset([&] {
+                        me->CastCustomSpell(SPELL_SUMMON_ENSLAVED_SOUL, SPELLVALUE_MAX_TARGETS, 1, me, false);
+                        }, i * 1200ms);
+                }
+            }, 8s);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -200,7 +213,9 @@ public:
 
             summon->SetReactState(REACT_PASSIVE);
             summon->CastSpell(summon, SPELL_EMERGE_VISUAL, true);
-            events.ScheduleEvent(EVENT_ENGAGE_ESSENCE, 4000);
+            me->m_Events.AddEventAtOffset([&] {
+                summons.DoAction(ACTION_ENGAGE_ESSENCE);
+            }, 4s);
         }
 
         void SummonedCreatureDies(Creature* summon, Unit*) override
@@ -221,39 +236,7 @@ public:
             if (me->getStandState() == UNIT_STAND_STATE_SLEEP)
                 return;
 
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SUCK_ESSENCE:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    break;
-                case EVENT_ENGAGE_ESSENCE:
-                    summons.DoAction(ACTION_ENGAGE_ESSENCE);
-                    break;
-                case EVENT_ESSENCE_OF_SUFFERING:
-                    me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-                    me->CastSpell(me, SPELL_SUMMON_ESSENCE_OF_SUFFERING, false);
-                    break;
-                case EVENT_ESSENCE_OF_DESIRE:
-                    summons.DespawnAll();
-                    me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-                    me->CastSpell(me, SPELL_SUMMON_ESSENCE_OF_DESIRE, false);
-                    break;
-                case EVENT_ESSENCE_OF_ANGER:
-                    summons.DespawnAll();
-                    me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
-                    me->CastSpell(me, SPELL_SUMMON_ESSENCE_OF_ANGER, false);
-                    break;
-                case EVENT_SPAWN_ENSLAVED_SOULS:
-                    events.ScheduleEvent(EVENT_SPAWN_SOUL, 0);
-                    events.ScheduleEvent(EVENT_SPAWN_SOUL, 0);
-                    for (uint8 i = 0; i < 16; ++i)
-                        events.ScheduleEvent(EVENT_SPAWN_SOUL, i * 1200);
-                    break;
-                case EVENT_SPAWN_SOUL:
-                    me->CastCustomSpell(SPELL_SUMMON_ENSLAVED_SOUL, SPELLVALUE_MAX_TARGETS, 1, me, false);
-                    break;
-            }
+            scheduler.Update(diff);
 
             if (!UpdateVictim())
                 return;
@@ -278,13 +261,12 @@ public:
 
     struct boss_essence_of_sufferingAI : public ScriptedAI
     {
-        boss_essence_of_sufferingAI(Creature* creature) : ScriptedAI(creature) { }
-
-        EventMap events;
+        boss_essence_of_sufferingAI(Creature* creature) : ScriptedAI(creature), _recentlySpoken(false) { }
 
         void Reset() override
         {
-            events.Reset();
+            _recentlySpoken = false;
+            scheduler.CancelAll();
         }
 
         void DoAction(int32 param) override
@@ -311,7 +293,7 @@ public:
         {
             if (damage >= me->GetHealth())
             {
-                damage = 0;
+                damage = me->GetHealth() - 1;
                 if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
                     me->RemoveAurasDueToSpell(SPELL_ESSENCE_OF_SUFFERING_PASSIVE); // prevent fixate from triggering
@@ -320,29 +302,42 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), false);
-                    events.Reset();
+                    scheduler.CancelAll();
                 }
             }
         }
 
         void KilledUnit(Unit* /*victim*/) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!_recentlySpoken)
             {
                 Talk(SUFF_SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                me->m_Events.AddEventAtOffset([&] {
+                    _recentlySpoken = false;
+                }, 6s);
             }
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(SUFF_SAY_FREED);
-            me->CastSpell(me, SPELL_AURA_OF_SUFFERING, true);
-            me->CastSpell(me, SPELL_ESSENCE_OF_SUFFERING_PASSIVE, true);
-            me->CastSpell(me, SPELL_ESSENCE_OF_SUFFERING_PASSIVE2, true);
+            DoCastSelf(SPELL_AURA_OF_SUFFERING, true);
+            DoCastSelf(SPELL_ESSENCE_OF_SUFFERING_PASSIVE, true);
+            DoCastSelf(SPELL_ESSENCE_OF_SUFFERING_PASSIVE2, true);
 
-            events.ScheduleEvent(EVENT_SUFF_FRENZY, 45000);
-            events.ScheduleEvent(EVENT_SUFF_SOUL_DRAIN, 25000);
+            ScheduleTimedEvent(45s, [&] {
+                Talk(SUFF_SAY_ENRAGE);
+                Talk(SUFF_EMOTE_ENRAGE);
+                DoCastSelf(SPELL_FRENZY);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    Talk(SUFF_EMOTE_ENRAGE);
+                }, 3s);
+            }, 45s);
+
+            ScheduleTimedEvent(25s, [&] {
+                me->CastCustomSpell(SPELL_SOUL_DRAIN, SPELLVALUE_MAX_TARGETS, 3, me, false);
+             }, 30s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -350,30 +345,15 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
+            scheduler.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SUFF_SOUL_DRAIN:
-                    me->CastCustomSpell(SPELL_SOUL_DRAIN, SPELLVALUE_MAX_TARGETS, 3, me, false);
-                    events.ScheduleEvent(EVENT_SUFF_SOUL_DRAIN, 30000);
-                    break;
-                case EVENT_SUFF_FRENZY:
-                    Talk(SUFF_SAY_ENRAGE);
-                    Talk(SUFF_EMOTE_ENRAGE);
-                    me->CastSpell(me, SPELL_FRENZY, false);
-                    events.ScheduleEvent(EVENT_SUFF_FRENZY, 45000);
-                    events.ScheduleEvent(EVENT_SUFF_FRENZY_EMOTE, 3000);
-                    break;
-                case EVENT_SUFF_FRENZY_EMOTE:
-                    Talk(SUFF_EMOTE_ENRAGE);
-                    break;
-            }
-
             DoMeleeAttackIfReady();
         }
+
+    private:
+        bool _recentlySpoken;
     };
 };
 
@@ -389,13 +369,12 @@ public:
 
     struct boss_essence_of_desireAI : public ScriptedAI
     {
-        boss_essence_of_desireAI(Creature* creature) : ScriptedAI(creature) { }
-
-        EventMap events;
+        boss_essence_of_desireAI(Creature* creature) : ScriptedAI(creature), _recentlySpoken(false) { }
 
         void Reset() override
         {
-            events.Reset();
+            _recentlySpoken = false;
+            scheduler.CancelAll();
         }
 
         void DoAction(int32 param) override
@@ -422,7 +401,7 @@ public:
         {
             if (damage >= me->GetHealth())
             {
-                damage = 0;
+                damage = me->GetHealth() - 1;
                 if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 {
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -430,28 +409,48 @@ public:
                     me->SetReactState(REACT_PASSIVE);
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MovePoint(POINT_GO_BACK, me->GetHomePosition(), false);
-                    events.Reset();
+                    scheduler.CancelAll();
                 }
             }
         }
 
         void KilledUnit(Unit* /*victim*/) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!_recentlySpoken)
             {
                 Talk(DESI_SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                me->m_Events.AddEventAtOffset([&] {
+                    _recentlySpoken = false;
+                }, 6s);
             }
         }
 
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(DESI_SAY_FREED);
-            me->CastSpell(me, SPELL_AURA_OF_DESIRE, true);
+            DoCastSelf(SPELL_AURA_OF_DESIRE, true);
 
-            events.ScheduleEvent(EVENT_DESI_DEADEN, 28000);
-            events.ScheduleEvent(EVENT_DESI_SPIRIT_SHOCK, 20000);
-            events.ScheduleEvent(EVENT_DESI_RUNE_SHIELD, 13000);
+            ScheduleTimedEvent(28s, [&] {
+                if (roll_chance_i(50))
+                    Talk(DESI_SAY_SPEC);
+                DoCastVictim(SPELL_DEADEN);
+            }, 31s);
+
+            scheduler.Schedule(8s, 12s, [this](TaskContext context) {
+                if (!me->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    if (DoCastVictim(SPELL_SPIRIT_SHOCK) == SPELL_CAST_OK)
+                        context.Repeat(1200ms);
+                    else
+                        context.Repeat(3s, 8s);
+                }
+                else
+                    context.Repeat(1200ms);
+            });
+
+            ScheduleTimedEvent(13s, [&] {
+                DoCastSelf(SPELL_RUNE_SHIELD);
+            }, 15s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -459,30 +458,15 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
+            scheduler.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_DESI_DEADEN:
-                    if (roll_chance_i(50))
-                        Talk(DESI_SAY_SPEC);
-                    me->CastSpell(me->GetVictim(), SPELL_DEADEN, false);
-                    events.ScheduleEvent(EVENT_DESI_DEADEN, 31000);
-                    break;
-                case EVENT_DESI_SPIRIT_SHOCK:
-                    me->CastSpell(me->GetVictim(), SPELL_SPIRIT_SHOCK, false);
-                    events.ScheduleEvent(EVENT_DESI_SPIRIT_SHOCK, 12000);
-                    break;
-                case EVENT_DESI_RUNE_SHIELD:
-                    me->CastSpell(me, SPELL_RUNE_SHIELD, false);
-                    events.ScheduleEvent(EVENT_DESI_RUNE_SHIELD, 15000);
-                    break;
-            }
-
             DoMeleeAttackIfReady();
         }
+
+    private:
+        bool _recentlySpoken;
     };
 };
 
@@ -498,15 +482,15 @@ public:
 
     struct boss_essence_of_angerAI : public ScriptedAI
     {
-        boss_essence_of_angerAI(Creature* creature) : ScriptedAI(creature) { }
+        boss_essence_of_angerAI(Creature* creature) : ScriptedAI(creature), _recentlySpoken(false) { }
 
-        EventMap events;
         ObjectGuid targetGUID;
 
         void Reset() override
         {
+            _recentlySpoken = false;
             targetGUID.Clear();
-            events.Reset();
+            scheduler.CancelAll();
         }
 
         void DoAction(int32 param) override
@@ -521,10 +505,12 @@ public:
 
         void KilledUnit(Unit* /*victim*/) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!_recentlySpoken)
             {
                 Talk(ANGER_SAY_SLAY);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6000);
+                me->m_Events.AddEventAtOffset([&] {
+                    _recentlySpoken = false;
+                }, 6s);
             }
         }
 
@@ -539,11 +525,28 @@ public:
         void JustEngagedWith(Unit* /*who*/) override
         {
             Talk(ANGER_SAY_FREED);
-            me->CastSpell(me, SPELL_AURA_OF_ANGER, true);
+            DoCastSelf(SPELL_AURA_OF_ANGER, true);
 
-            events.ScheduleEvent(EVENT_ANGER_SPITE, 15000);
-            events.ScheduleEvent(EVENT_ANGER_SOUL_SCREAM, 10000);
-            events.ScheduleEvent(EVENT_ANGER_SEETHE, 1000);
+            ScheduleTimedEvent(15s, [&] {
+                if (roll_chance_i(30))
+                    Talk(ANGER_SAY_SPEC);
+                me->CastCustomSpell(SPELL_SPITE, SPELLVALUE_MAX_TARGETS, 3, me, false);
+            }, 25s);
+
+            ScheduleTimedEvent(10s, [&] {
+                DoCastVictim(SPELL_SOUL_SCREAM);
+            }, 10s);
+
+            ScheduleTimedEvent(1s, [&] {
+                if (Unit* victim = me->GetVictim())
+                {
+                    ObjectGuid victimGUID = victim->GetGUID();
+                    if (targetGUID && targetGUID != victimGUID)
+                        DoCastSelf(SPELL_SEETHE);
+                    // victim can be lost
+                    targetGUID = victimGUID;
+                }
+            }, 1s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -551,37 +554,15 @@ public:
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
+            scheduler.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ANGER_SPITE:
-                    if (roll_chance_i(30))
-                        Talk(ANGER_SAY_SPEC);
-                    me->CastCustomSpell(SPELL_SPITE, SPELLVALUE_MAX_TARGETS, 3, me, false);
-                    events.ScheduleEvent(EVENT_ANGER_SPITE, 25000);
-                    break;
-                case EVENT_ANGER_SOUL_SCREAM:
-                    me->CastSpell(me->GetVictim(), SPELL_SOUL_SCREAM, false);
-                    events.ScheduleEvent(EVENT_ANGER_SOUL_SCREAM, 10000);
-                    break;
-                case EVENT_ANGER_SEETHE:
-                    if (Unit* victim = me->GetVictim())
-                    {
-                        ObjectGuid victimGUID = victim->GetGUID();
-                        if (targetGUID && targetGUID != victimGUID)
-                            me->CastSpell(me, SPELL_SEETHE, false);
-                        // victim can be lost
-                        targetGUID = victimGUID;
-                    }
-                    events.ScheduleEvent(EVENT_ANGER_SEETHE, 1000);
-                    break;
-            }
-
             DoMeleeAttackIfReady();
         }
+
+    private:
+        bool _recentlySpoken;
     };
 };
 

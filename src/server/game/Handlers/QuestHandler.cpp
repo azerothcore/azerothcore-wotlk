@@ -17,6 +17,7 @@
 
 #include "Battleground.h"
 #include "BattlegroundAV.h"
+#include "Chat.h"
 #include "GameObjectAI.h"
 #include "Group.h"
 #include "Language.h"
@@ -586,7 +587,7 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
                     // Check if player is in BG
                     if (_player->InBattleground())
                     {
-                        _player->GetSession()->SendNotification(LANG_BG_SHARE_QUEST_ERROR);
+                        ChatHandler(_player->GetSession()).SendNotification(LANG_BG_SHARE_QUEST_ERROR);
                         continue;
                     }
                 }
@@ -641,7 +642,7 @@ void WorldSession::HandleQuestgiverStatusMultipleQuery(WorldPacket& /*recvPacket
 
 void WorldSession::HandleQueryQuestsCompleted(WorldPacket& /*recvData*/)
 {
-    size_t rew_count = _player->GetRewardedQuestCount();
+    std::size_t rew_count = _player->GetRewardedQuestCount();
 
     WorldPacket data(SMSG_QUERY_QUESTS_COMPLETED_RESPONSE, 4 + 4 * rew_count);
     data << uint32(rew_count);

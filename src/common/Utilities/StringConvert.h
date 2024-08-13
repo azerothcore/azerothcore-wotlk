@@ -219,7 +219,7 @@ namespace Acore::Impl::StringConvertImpl
                 }
                 tmp.append(str);
 
-                size_t n;
+                std::size_t n;
                 T val = static_cast<T>(std::stold(tmp, &n));
                 if (n != tmp.length())
                 {

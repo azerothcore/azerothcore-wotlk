@@ -22,6 +22,7 @@
 #include "BattlegroundSA.h"
 #include "BattlegroundWS.h"
 #include "CellImpl.h"
+#include "Chat.h"
 #include "Common.h"
 #include "Creature.h"
 #include "DynamicObject.h"
@@ -6168,7 +6169,7 @@ void Spell::EffectPlaySound(SpellEffIndex effIndex)
     {
         case 58730: // Restricted Flight Area
         case 58600: // Restricted Flight Area
-            player->GetSession()->SendNotification(LANG_ZONE_NOFLYZONE);
+            ChatHandler(player->GetSession()).SendNotification(LANG_ZONE_NOFLYZONE);
             break;
         default:
             break;

@@ -1074,7 +1074,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
     WorldPacket data(SMSG_LIST_INVENTORY, 8 + 1 + itemCount * 8 * 4);
     data << vendorGuid;
 
-    size_t countPos = data.wpos();
+    std::size_t countPos = data.wpos();
     data << uint8(count);
 
     float discountMod = _player->GetReputationPriceDiscount(vendor);

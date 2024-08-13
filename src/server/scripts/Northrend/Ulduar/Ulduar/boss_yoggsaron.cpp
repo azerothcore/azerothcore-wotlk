@@ -19,7 +19,6 @@
 #include "CreatureAI.h"
 #include "CreatureScript.h"
 #include "Object.h"
-#include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
