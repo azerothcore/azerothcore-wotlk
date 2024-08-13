@@ -8602,7 +8602,7 @@ bool ObjectMgr::LoadModuleStringsLocale()
         ModuleStringContainer::iterator ms = _moduleStringStore.find(pairKey);
         if (ms == _moduleStringStore.end())
         {
-            LOG_ERROR("sql.sql", "ModuleString (Id: {}) found in table `module_string_locale` but does not exist in `module_string`. Skipped!", id);
+            LOG_ERROR("sql.sql", "ModuleString (Module: {} Id: {}) found in table `module_string_locale` but does not exist in `module_string`. Skipped!", module, id);
             continue;
         }
 
