@@ -115,6 +115,11 @@ namespace Movement
                 moveFlagsForSpeed &= ~MOVEMENTFLAG_WALKING;
 
             args.velocity = unit->GetSpeed(SelectSpeedType(moveFlagsForSpeed));
+
+            //npcbot: do not emit an error if unit cannot move at all
+            if (!unit->CanFreeMove() && !(args.velocity > 0.01f))
+                return 0;
+            //end npcbot
         }
 
         // limit the speed in the same way the client does
