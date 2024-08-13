@@ -475,7 +475,6 @@ int32 SpellEffectInfo::CalcValue(Unit const* caster, int32 const* bp, Unit const
                 case SPELL_EFFECT_SCRIPT_EFFECT:
                 case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
                 case SPELL_EFFECT_FORCE_CAST_WITH_VALUE:
-                case SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE:
                 case SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE:
                     canEffectScale = true;
                     break;
