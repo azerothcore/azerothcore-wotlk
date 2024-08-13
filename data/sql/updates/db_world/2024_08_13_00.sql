@@ -1,3 +1,4 @@
+-- DB update 2024_08_08_00 -> 2024_08_13_00
 SET
 @ETCDMF           = 32, -- Do not change this one
 @BLIZZCON         = 47,
