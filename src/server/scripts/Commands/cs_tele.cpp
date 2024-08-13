@@ -130,7 +130,7 @@ public:
 
             if (target->IsBeingTeleported())
             {
-                handler->SendErrorMessage(LANG_IS_TELEPORTED, chrNameLink.c_str());
+                handler->SendErrorMessage(LANG_IS_TELEPORTED, chrNameLink);
                 return false;
             }
 
@@ -233,7 +233,7 @@ public:
         Group* grp = target->GetGroup();
         if (!grp)
         {
-            handler->SendErrorMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
+            handler->SendErrorMessage(LANG_NOT_IN_GROUP, nameLink);
             return false;
         }
 
