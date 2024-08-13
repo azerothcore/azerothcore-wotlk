@@ -1906,8 +1906,8 @@ void GameObject::Use(Unit* user)
 
                 Player* targetPlayer = ObjectAccessor::FindPlayer(player->GetTarget());
 
-                // accept only use by player from same raid as caster, except caster itself
-                if (!targetPlayer || targetPlayer == player || !targetPlayer->IsInSameRaidWith(player))
+                // accept only use by player from same raid as caster
+                if (!targetPlayer || !targetPlayer->IsInSameRaidWith(player))
                     return;
 
                 //required lvl checks!
@@ -1918,10 +1918,7 @@ void GameObject::Use(Unit* user)
                 if (level < info->meetingstone.minLevel)
                     return;
 
-                if (info->entry == 194097)
-                    spellId = 61994;                            // Ritual of Summoning
-                else
-                    spellId = 23598;                            // Meeting Stone Summon
+                spellId = 23598;                            // Meeting Stone Summon
 
                 break;
             }
