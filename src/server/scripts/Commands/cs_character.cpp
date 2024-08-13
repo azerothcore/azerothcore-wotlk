@@ -570,7 +570,7 @@ public:
             if (faction.Flags & FACTION_FLAG_INACTIVE)
                 ss << handler->GetAcoreString(LANG_FACTION_INACTIVE);
 
-            handler->SendSysMessage(ss.str().c_str());
+            handler->SendSysMessage(ss.str());
         }
 
         return true;

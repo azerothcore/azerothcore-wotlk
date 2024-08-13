@@ -256,7 +256,7 @@ public:
                 continue;
             }
 
-            handler->PSendSysMessage(LANG_TELEPORTING_TO, plNameLink.c_str(), "", tele->name);
+            handler->PSendSysMessage(LANG_TELEPORTING_TO, plNameLink, "", tele->name);
             if (handler->needReportToTarget(player))
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink);
 

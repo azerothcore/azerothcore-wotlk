@@ -153,7 +153,7 @@ public:
                     ss << areaEntry->ID << " - " << name << ' ' << localeNames[locale];
                 }
 
-                handler->SendSysMessage(ss.str().c_str());
+                handler->SendSysMessage(ss.str());
 
                 if (!found)
                 {
@@ -455,7 +455,7 @@ public:
                     ss << handler->GetAcoreString(LANG_FACTION_NOREPUTATION);
                 }
 
-                handler->SendSysMessage(ss.str().c_str());
+                handler->SendSysMessage(ss.str());
 
                 if (!found)
                 {
@@ -1147,7 +1147,7 @@ public:
                         ss << handler->GetAcoreString(LANG_ACTIVE);
                     }
 
-                    handler->SendSysMessage(ss.str().c_str());
+                    handler->SendSysMessage(ss.str());
 
                     if (!found)
                     {
@@ -1262,7 +1262,7 @@ public:
                 ss << handler->GetAcoreString(LANG_ACTIVE);
             }
 
-            handler->SendSysMessage(ss.str().c_str());
+            handler->SendSysMessage(ss.str());
 
             if (!found)
             {
@@ -1587,7 +1587,7 @@ public:
                         break;
                 }
 
-                handler->SendSysMessage(ss.str().c_str());
+                handler->SendSysMessage(ss.str());
 
                 ++counter;
             }
