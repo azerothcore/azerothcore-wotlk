@@ -6328,7 +6328,7 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         QuestGreetingContainer::iterator qgc = _questGreetingStore.find(pairKey);
         if (qgc == _questGreetingStore.end())
         {
-            LOG_ERROR("sql.sql", "QuestGreeting (Id: {} Type: {}) found in table `module_string_locale` but does not exist in `module_string`. Skipped!", id, type);
+            LOG_ERROR("sql.sql", "QuestGreeting (Id: {} Type: {}) found in table `quest_greeting_locale` but does not exist in `quest_greeting`. Skipped!", id, type);
             continue;
         }
 
