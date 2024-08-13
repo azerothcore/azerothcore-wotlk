@@ -5431,34 +5431,52 @@ void bot_ai::CalculateAttackPos(Unit* target, Position& pos, bool& force) const
         force = true;
         return;
     }
-    
+
     // Ranged bots that are being targeted should move towards a tank bot or towards the player
-    if (!IsTank(me) && HasRole(BOT_ROLE_RANGED) && target->GetVictim() == me)
+    if (!IAmFree() && !IsTank(me) && HasRole(BOT_ROLE_RANGED) && target->GetVictim() == me && !CCed(target))
     {
-        // By default go to the master
-        Unit* moveTarget = master;
-
-        // Look for a tank in the master's bots
-        BotMap const* map = master->GetBotMgr()->GetBotMap();
-        for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
-            if (itr->second && (IsTank(itr->second) || IsOffTank(itr->second)))
-                moveTarget = itr->second;
-
-        // Decide if the bot needs to move
-        float thresholdDistance = 1.5f;
-        bool rangedBotNeedsToMove = std::abs(me->GetDistance(moveTarget)) > thresholdDistance;
-        if (rangedBotNeedsToMove)
+        std::vector<Unit const*> safetyTargets;
+        if (Group const* gr = master->GetGroup())
         {
-            // Randomise and adjust the bot's position
-            float randomModifier = irand(0, 1) ? 1.0f : -1.0f;
-            float absoluteAngle = me->GetAbsoluteAngle(moveTarget);
-            pos.Relocate(Position(moveTarget->GetPositionX() + randomModifier * thresholdDistance * std::cos(absoluteAngle), moveTarget->GetPositionY() + randomModifier * thresholdDistance * std::sin(absoluteAngle)));
+            for (GroupReference const* itr = gr->GetFirstMember(); itr != nullptr; itr = itr->next())
+            {
+                Player const* pl = itr->GetSource();
+                if (!pl || !pl->IsInMap(me) || pl->GetDistance(me) > VISIBILITY_DISTANCE_NORMAL)
+                    continue;
+                if (pl->IsAlive() && IsTank(pl))
+                    safetyTargets.push_back(pl);
+                if (!pl->HaveBot())
+                    continue;
+                BotMap const* map = pl->GetBotMgr()->GetBotMap();
+                for (BotMap::const_iterator citr = map->begin(); citr != map->end(); ++citr)
+                    if (citr->second && citr->second->IsAlive() && IsTank(citr->second) && citr->second->GetBotAI()->HasRole(BOT_ROLE_DPS))
+                        safetyTargets.push_back(citr->second);
+            }
         }
-        
-        force = true;
-        return;
+        else
+        {
+            BotMap const* map = master->GetBotMgr()->GetBotMap();
+            for (BotMap::const_iterator citr = map->begin(); citr != map->end(); ++citr)
+                if (citr->second && citr->second->IsAlive() && IsTank(citr->second) && citr->second->GetBotAI()->HasRole(BOT_ROLE_DPS))
+                    safetyTargets.push_back(citr->second);
+        }
+        if (safetyTargets.empty() && master->IsAlive())
+            safetyTargets.push_back(master);
+
+        if (!safetyTargets.empty())
+        {
+            static const float ThresholdDistance = 1.5f;
+            Unit const* moveTarget = safetyTargets.size() == 1u ? safetyTargets.front() : safetyTargets[me->GetEntry() % safetyTargets.size()];
+            if (moveTarget->GetDistance(target) > ThresholdDistance && me->GetDistance(moveTarget) > ThresholdDistance * 2.0f)
+            {
+                float distanceMod = moveTarget->HasInArc(float(M_PI), target) ? 0.5f : -1.5f;
+                pos.Relocate(moveTarget->GetFirstCollisionPosition(ThresholdDistance * distanceMod, Position::NormalizeOrientation(moveTarget->GetAbsoluteAngle(target) - moveTarget->GetOrientation())));
+                force = true;
+                return;
+            }
+        }
     }
-    
+
     pos.Relocate(ppos);
     if (!me->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS))
         force = true;
