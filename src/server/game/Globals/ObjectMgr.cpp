@@ -8622,13 +8622,13 @@ bool ObjectMgr::LoadModuleStringsLocale()
 
 std::string const* ObjectMgr::GetModuleString(std::string module, uint32 id, LocaleConstant locale) const
 {
-    ModuleString const* ts = GetModuleString(module, id);
-    if (ts->Content.size())
+    ModuleString const* ms = GetModuleString(module, id);
+    if (ms->Content.size())
     {
-        if (ts->Content.size() > size_t(locale) && !ts->Content[locale].empty())
-            return &ts->Content[locale];
+        if (ms->Content.size() > size_t(locale) && !ms->Content[locale].empty())
+            return &ms->Content[locale];
 
-        return &ts->Content[DEFAULT_LOCALE];
+        return &ms->Content[DEFAULT_LOCALE];
     }
 
     LOG_ERROR("sql.sql", "Module string module {} id {} not found in DB.", module, id);
