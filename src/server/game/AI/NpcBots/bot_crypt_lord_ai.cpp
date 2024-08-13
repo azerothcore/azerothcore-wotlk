@@ -666,11 +666,6 @@ public:
             }
         }
 
-        void ResummonAll() override
-        {
-            ResummonCreatures(_minions);
-        }
-
         uint32 GetAIMiscValue(uint32 data) const override
         {
             switch (data)

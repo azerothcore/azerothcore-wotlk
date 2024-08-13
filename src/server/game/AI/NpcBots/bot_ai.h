@@ -82,16 +82,6 @@ class bot_ai : public CreatureAI
                 UnsummonCreature(c, save);
         }
 
-        virtual void ResummonAll() {}
-        void ResummonCreature(Creature* creature);
-        void ResummonPet();
-        template<typename C>
-        void ResummonCreatures(C const& container)
-        {
-            for (auto c : container)
-                ResummonCreature(c);
-        }
-
         virtual void OnBotDamageTaken(Unit* /*attacker*/, uint32 /*damage*/, CleanDamage const* /*cleanDamage*/, DamageEffectType /*damagetype*/, SpellInfo const* /*spellInfo*/) {}
         virtual void OnBotDamageDealt(Unit* /*victim*/, uint32 /*damage*/, CleanDamage const* /*cleanDamage*/, DamageEffectType /*damagetype*/, SpellInfo const* /*spellInfo*/) {}
         virtual void OnBotDispelDealt(Unit* /*dispelled*/, uint8 /*num*/) {}

@@ -1538,7 +1538,6 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
                 botai->Reset();
             botai->SetIsDuringTeleport(false);
             botai->ResetContestedPvP();
-            botai->ResummonAll();
 
             if (newMap->IsBattleground())
             {

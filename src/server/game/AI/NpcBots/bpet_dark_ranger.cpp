@@ -24,7 +24,7 @@ enum DarkRangerPetSpecial
 {
     SPELL_GENERATE_THREAT               = 23604, //reduce threat
     THREAT_BASE                         = 5,
-    MINION_DURATION                     = 160000
+    MINION_DURATION                     = 80000
 };
 
 class dark_ranger_pet_bot : public CreatureScript
@@ -69,7 +69,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if ((liveTimer += diff) >= MINION_DURATION)
+            if ((liveTimer += diff) >= MINION_DURATION * (IAmFree() ? 5u : 1u))
             {
                 canUpdate = false;
                 me->setDeathState(DeathState::JustDied);

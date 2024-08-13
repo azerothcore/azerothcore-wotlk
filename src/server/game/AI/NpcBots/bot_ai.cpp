@@ -15789,106 +15789,22 @@ void bot_ai::KilledUnit(Unit* u)
     }
 }
 
-void bot_ai::UnsummonCreature(Creature* creature, bool save)
+void bot_ai::UnsummonCreature(Creature* creature, bool /*save*/)
 {
     if (creature)
     {
-        bot_pet_ai* petai = creature->GetBotPetAI();
-
-        if (save && !petai)
-        {
-            LOG_WARN("npcbots", "bot_ai::Unsummon: Trying to save creature {} (id: {}) which isn't a bot pet! Unsummoning instead.", creature->GetName(), creature->GetEntry());
-            save = false;
-        }
-
-        if (!save)
-        {
-            if (!creature->FindMap() || !creature->IsInWorld())
-            {
-                Map* newmap = nullptr;
-                if (!IAmFree() && master->IsInWorld())
-                {
-                    newmap = master->GetMap();
-                    creature->Relocate(master);
-                }
-                else
-                {
-                    newmap = ASSERT_NOTNULL(sMapMgr->FindMap(1, 0));
-                    creature->Relocate(5470.f, -3800.f, 1611.f); // Hyjal
-                }
-
-                if (creature->FindMap())
-                    creature->ResetMap();
-                creature->SetMap(newmap);
-                newmap->AddToMap(creature);
-            }
-
-            ASSERT_NOTNULL(creature->ToTempSummon())->UnSummon();
-            return;
-        }
-
-        if (petai)
+        if (bot_pet_ai* petai = creature->GetBotPetAI())
         {
             petai->KillEvents(true);
             petai->canUpdate = false;
         }
 
-        creature->m_Events.KillAllEvents(false);
-        Map* petmap = creature->FindMap();
-        if (petmap)
-        {
-            if (creature->IsInWorld())
-            {
-                creature->RemoveFromWorld();
-                creature->BotStopMovement();
-                creature->RemoveAurasByType(SPELL_AURA_MOD_STUN);
-                creature->RemoveAurasByType(SPELL_AURA_MOD_FEAR);
-                creature->RemoveAurasByType(SPELL_AURA_MOD_CONFUSE);
-                creature->RemoveAurasByType(SPELL_AURA_MOD_ROOT);
-                creature->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
-                creature->InterruptNonMeleeSpells(true);
-                creature->RemoveAllGameObjects();
-                creature->CombatStop();
-                creature->ClearComboPoints();
-                creature->ClearComboPointHolders();
-            }
-
-            if (creature->IsInGrid())
-                petmap->RemoveFromMap(creature, false);
-        }
+        ASSERT_NOTNULL(creature->ToTempSummon())->UnSummon();
     }
 }
 void bot_ai::UnsummonPet(bool save)
 {
     UnsummonCreature(botPet, save);
-}
-
-void bot_ai::ResummonCreature(Creature* creature)
-{
-    if (creature)
-    {
-        if (creature->FindMap())
-            creature->ResetMap();
-        creature->SetMap(me->GetMap());
-
-        Position pos;
-        bot_pet_ai* petai = creature->GetBotPetAI();
-        if (petai)
-            petai->CalculatePetsOwnerFollowPosition(pos);
-        else
-            pos.Relocate(me);
-
-        creature->Relocate(pos);
-        if (!creature->IsInGrid())
-            me->GetMap()->AddToMap(creature);
-
-        if (petai)
-            petai->canUpdate = true;
-    }
-}
-void bot_ai::ResummonPet()
-{
-    ResummonCreature(botPet);
 }
 
 void bot_ai::MoveInLineOfSight(Unit* /*u*/)
@@ -18496,7 +18412,6 @@ bool bot_ai::FinishTeleport(bool reset)
             this->Reset();
         //bot->SetAI(oldAI);
         //me->IsAIEnabled = true;
-        ResummonAll();
         canUpdate = true;
         outdoorsTimer = 0;
 

@@ -1931,11 +1931,6 @@ public:
             }
         }
 
-        void ResummonAll() override
-        {
-            ResummonPet();
-        }
-
         float GetSpellAttackRange(bool longRange) const override
         {
             return longRange ? CalcSpellMaxRange(AUTO_SHOT_1) : 25.f;

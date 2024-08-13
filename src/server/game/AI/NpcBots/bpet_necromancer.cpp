@@ -22,7 +22,7 @@ enum NecromancerPetPassives
 enum NecromancerPetSpecial
 {
     THREAT_BASE                         = 5,
-    MINION_DURATION                     = 130000
+    MINION_DURATION                     = 65000
 };
 
 class necromancer_pet_bot : public CreatureScript
