@@ -319,12 +319,10 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const
 
     if (QuestGreeting const* questGreeting = sObjectMgr->GetQuestGreeting(guid.GetTypeId(), guid.GetEntry()))
     {
-        std::string strGreeting = questGreeting->Text;
-
-        LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
-        if (localeConstant != LOCALE_enUS)
-            if (QuestGreetingLocale const* questGreetingLocale = sObjectMgr->GetQuestGreetingLocale(guid.GetTypeId(), guid.GetEntry()))
-                ObjectMgr::GetLocaleString(questGreetingLocale->Greeting, localeConstant, strGreeting);
+        LocaleConstant locale = _session->GetSessionDbLocaleIndex();
+        std::string strGreeting = questGreeting->Greeting[DEFAULT_LOCALE];
+        if (questGreeting->Greeting.size() > size_t(locale) && !questGreeting->Greeting.empty())
+            strGreeting = questGreeting->Greeting[locale];
 
         data << strGreeting;
         data << uint32(questGreeting->EmoteDelay);
