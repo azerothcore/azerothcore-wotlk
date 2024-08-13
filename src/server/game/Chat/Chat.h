@@ -163,7 +163,8 @@ public:
     template<typename... Args>
     void PSendModuleSysMessage(std::string module, uint32 id, Args&&... args)
     {
-        SendSysMessage(PGetParseModuleString(module, id, std::forward<Args>(args)...));
+        if (HasSession())
+            SendSysMessage(PGetParseModuleString(module, id, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
