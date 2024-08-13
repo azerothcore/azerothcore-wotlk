@@ -5430,7 +5430,34 @@ void bot_ai::CalculateAttackPos(Unit* target, Position& pos, bool& force) const
         force = true;
         return;
     }
+    
+    // Ranged bots that are being targeted should move towards a tank bot or towards the player
+    if (!IsTank(me) && HasRole(BOT_ROLE_RANGED) && target->GetVictim() == me)
+    {
+        // By default go to the master
+        Unit* moveTarget = master;
 
+        // Look for a tank in the master's bots
+        BotMap const* map = master->GetBotMgr()->GetBotMap();
+        for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
+            if (itr->second && (IsTank(itr->second) || IsOffTank(itr->second)))
+                moveTarget = itr->second;
+
+        // Decide if the bot needs to move
+        float thresholdDistance = 1.5f;
+        bool rangedBotNeedsToMove = std::abs(me->GetDistance(moveTarget)) > thresholdDistance;
+        if (rangedBotNeedsToMove)
+        {
+            // Randomise and adjust the bot's position
+            float randomModifier = irand(0, 1) ? 1.0f : -1.0f;
+            float absoluteAngle = me->GetAbsoluteAngle(moveTarget);
+            pos.Relocate(Position(moveTarget->GetPositionX() + randomModifier * thresholdDistance * std::cos(absoluteAngle), moveTarget->GetPositionY() + randomModifier * thresholdDistance * std::sin(absoluteAngle)));
+        }
+        
+        force = true;
+        return;
+    }
+    
     pos.Relocate(ppos);
     if (!me->IsWithinLOSInMap(target, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_ALL_CHECKS))
         force = true;
