@@ -39,6 +39,7 @@
 #include "PathGenerator.h"
 #include "PointMovementGenerator.h"
 #include "ScriptedGossip.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 #include "TemporarySummon.h"
 #include "Transport.h"
@@ -11550,6 +11551,7 @@ void bot_ai::_autoLootCreatureGold(Creature* creature) const
 {
     Loot* loot = &creature->loot;
 
+    sScriptMgr->OnBeforeLootMoney(master, loot);
     loot->NotifyMoneyRemoved();
     Group const* gr = master->GetGroup();
     if (!gr)
