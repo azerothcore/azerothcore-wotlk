@@ -468,6 +468,57 @@ public:
     }
 };
 
+/*####
+## go_l70_etc_music
+####*/
+enum L70ETCMusic
+{
+    MUSIC_L70_ETC_MUSIC = 11803
+};
+
+enum L70ETCMusicEvents
+{
+    EVENT_ETC_START_MUSIC = 1
+};
+
+class go_l70_etc_music : public GameObjectScript
+{
+public:
+    go_l70_etc_music() : GameObjectScript("go_l70_etc_music") { }
+
+    struct go_l70_etc_musicAI : public GameObjectAI
+    {
+        go_l70_etc_musicAI(GameObject* go) : GameObjectAI(go)
+        {
+            _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600);
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            _events.Update(diff);
+            while (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                case EVENT_ETC_START_MUSIC:
+                    me->PlayDirectMusic(MUSIC_L70_ETC_MUSIC);
+                    _events.ScheduleEvent(EVENT_ETC_START_MUSIC, 1600);  // Every 1.6 seconds SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    private:
+        EventMap _events;
+    };
+
+    GameObjectAI* GetAI(GameObject* go) const override
+    {
+        return new go_l70_etc_musicAI(go);
+    }
+};
+
 // Theirs
 /*####
 ## go_brewfest_music
@@ -1911,6 +1962,7 @@ void AddSC_go_scripts()
     new go_heat();
     new go_bear_trap();
     new go_duskwither_spire_power_source();
+    new go_l70_etc_music();
 
     // Theirs
     new go_brewfest_music();

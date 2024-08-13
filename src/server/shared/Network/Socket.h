@@ -176,7 +176,7 @@ protected:
     virtual void OnClose() { }
     virtual void ReadHandler() = 0;
 
-    [[nodiscard]] bool AsyncProcessQueue()
+    bool AsyncProcessQueue()
     {
         if (_isWritingAsync)
             return false;
