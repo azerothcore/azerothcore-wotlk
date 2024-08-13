@@ -15803,12 +15803,24 @@ void bot_ai::UnsummonCreature(Creature* creature, bool save)
 
         if (!save)
         {
-            if (!IAmFree() && !creature->IsInWorld() && master->GetSession()->isLogingOut() && master->IsInWorld())
+            if (!creature->FindMap() || !creature->IsInWorld())
             {
+                Map* newmap = nullptr;
+                if (!IAmFree() && master->IsInWorld())
+                {
+                    newmap = master->GetMap();
+                    creature->Relocate(master);
+                }
+                else
+                {
+                    newmap = ASSERT_NOTNULL(sMapMgr->FindMap(1, 0));
+                    creature->Relocate(5470.f, -3800.f, 1611.f); // Hyjal
+                }
+
                 if (creature->FindMap())
                     creature->ResetMap();
-                creature->SetMap(master->GetMap());
-                master->GetMap()->AddToMap(creature);
+                creature->SetMap(newmap);
+                newmap->AddToMap(creature);
             }
 
             ASSERT_NOTNULL(creature->ToTempSummon())->UnSummon();
