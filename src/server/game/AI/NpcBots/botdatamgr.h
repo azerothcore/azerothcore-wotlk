@@ -191,6 +191,7 @@ class BotDataMgr
         static ObjectGuid GetNPCBotGuid(uint32 entry);
         static std::vector<uint32> GetExistingNPCBotIds();
         static uint8 GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask = 0);
+        static uint8 GetAccountBotsCount(uint32 account_id);
 
         static void DespawnWandererBot(uint32 entry);
         static void LoadWanderMap(bool reload = false);

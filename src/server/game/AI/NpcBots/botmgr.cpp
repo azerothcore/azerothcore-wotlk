@@ -53,6 +53,7 @@ static std::list<BotMgr::delayed_teleport_callback_type> delayed_bot_teleports;
 //config
 uint8 _basefollowdist;
 uint8 _maxClassNpcBots;
+uint8 _maxAccountNpcBots;
 uint8 _xpReductionAmount;
 uint8 _xpReductionStartingNumber;
 uint8 _mountLevel60;
@@ -312,6 +313,7 @@ void BotMgr::LoadConfig(bool reload)
     _enableNpcBots                  = sConfigMgr->GetBoolDefault("NpcBot.Enable", true);
     _logToDB                        = sConfigMgr->GetBoolDefault("NpcBot.LogToDB", true);
     _maxClassNpcBots                = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerClass", 1);
+    _maxAccountNpcBots              = sConfigMgr->GetIntDefault("NpcBot.MaxBotsPerAccount", 0);
     _filterRaces                    = sConfigMgr->GetBoolDefault("NpcBot.Botgiver.FilterRaces", false);
     _basefollowdist                 = sConfigMgr->GetIntDefault("NpcBot.BaseFollowDistance", 30);
     _xpReductionAmount              = sConfigMgr->GetIntDefault("NpcBot.XpReduction.Amount", 0);
@@ -902,6 +904,10 @@ bool BotMgr::IsBotHKAchievementsEnabled()
 uint8 BotMgr::GetMaxClassBots()
 {
     return _maxClassNpcBots;
+}
+uint8 BotMgr::GetMaxAccountBots()
+{
+    return _maxAccountNpcBots;
 }
 uint8 BotMgr::GetHealTargetIconFlags()
 {

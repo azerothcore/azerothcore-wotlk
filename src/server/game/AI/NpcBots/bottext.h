@@ -287,7 +287,7 @@ enum BotTexts : uint32
     BOT_TEXT_OWNERSHIP_EXPIRED              = 70550, //"Bot ownership expired due to inactivity"
     BOT_TEXT_BOTADDFAIL_DISABLED            = 70551, //"NpcBot system is currently disabled. Please contact administration."
     BOT_TEXT_BOTADDFAIL_OWNED               = 70552, //"%s will not join you, already has master: %s"
-    BOT_TEXT_BOTADDFAIL_TELEPORTED          = 70553, //"%s cannot join you while about to teleport"
+    BOT_TEXT_DO_REUSE_1                     = 70553, // WAS BOT_TEXT_BOTADDFAIL_TELEPORTED "%s cannot join you while about to teleport"
     BOT_TEXT_ASPECT                         = 70554, //"Aspect"
     BOT_TEXT_MONKEY                         = 70555, //"Monkey"
     BOT_TEXT_HAWK                           = 70556, //"Hawk"
@@ -419,7 +419,8 @@ enum BotTexts : uint32
     BOT_TEXT_SILVERMOON                     = 70682, //"Silvermoon"
     BOT_TEXT_SHATTRATH                      = 70683, //"Shattrath"
     BOT_TEXT_DALARAN                        = 70684, //"Dalaran"
-    //70685-70799 reserved for custom localization strings
+    BOT_TEXT_HIREFAIL_MAXBOTS_ACCOUNT       = 70685, //"You exceed max npcbots for your account (%u >= %u)"
+    //70686-70799 reserved for custom localization strings
 };
 
 #endif //BOTTEXT_H

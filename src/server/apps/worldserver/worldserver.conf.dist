@@ -4482,6 +4482,14 @@ NpcBot.MaxBots = 39,39,39,39,39,39,39,39,39
 NpcBot.MaxBotsPerClass = 0
 
 #
+#    NpcBot.MaxBotsPerAccount
+#        Description: Maximum total number of bots players can hire per account.
+#        Default:     0 - no limit
+#                     9 - up to 9 bots total per account
+
+NpcBot.MaxBotsPerAccount = 0
+
+#
 #    NpcBot.Botgiver.FilterRaces
 #        Description: Make botgiver only offer bots of player faction (normal classes).
 #        Default:     0 - disable

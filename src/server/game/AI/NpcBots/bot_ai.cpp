@@ -10230,6 +10230,17 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     break;
                 }
 
+                if (uint32 maxBotsPerAccount = BotMgr::GetMaxAccountBots())
+                {
+                    uint32 accountBotsCount = BotDataMgr::GetAccountBotsCount(player->GetSession()->GetAccountId());
+                    if (accountBotsCount >= maxBotsPerAccount)
+                    {
+                        ChatHandler ch(player->GetSession());
+                        ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_HIREFAIL_MAXBOTS_ACCOUNT).c_str(), accountBotsCount, maxBotsPerAccount);
+                        break;
+                    }
+                }
+
                 if (SetBotOwner(player))
                 {
                     if (_botclass == BOT_CLASS_SPHYNX)

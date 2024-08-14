@@ -636,6 +636,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_DEL_NPCBOT_GROUP_MEMBER_ALL, "DELETE FROM characters_npcbot_group_member WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_NPCBOT_GROUP_MEMBER_FLAG, "UPDATE characters_npcbot_group_member SET memberFlags = ? WHERE entry = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_NPCBOT_LOG, "INSERT INTO characters_npcbot_logs (entry, owner, mapid, inmap, inworld, type, param1, param2, param3, param4, param5) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_SEL_NPCBOT_ACC_BOT_COUNT, "SELECT COUNT(entry) FROM characters_npcbot WHERE owner IN (SELECT guid FROM characters WHERE account = ?);", CONNECTION_SYNCH);
     // End NPCBots
 }
 

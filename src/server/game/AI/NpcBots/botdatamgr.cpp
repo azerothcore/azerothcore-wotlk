@@ -2759,6 +2759,18 @@ uint8 BotDataMgr::GetOwnedBotsCount(ObjectGuid owner_guid, uint32 class_mask)
     return count;
 }
 
+uint8 BotDataMgr::GetAccountBotsCount(uint32 account_id)
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_NPCBOT_ACC_BOT_COUNT);
+    stmt->SetData(0, account_id);
+
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+    if (result)
+        return (*result)[0].Get<uint64>();
+
+    return 0;
+}
+
 uint8 BotDataMgr::GetLevelBonusForBotRank(uint32 rank)
 {
     switch (rank)

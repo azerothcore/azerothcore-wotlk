@@ -5,6 +5,7 @@
 #include "botspell.h"
 #include "bottext.h"
 #include "botmgr.h"
+#include "Chat.h"
 #include "Creature.h"
 #include "Log.h"
 #include "Player.h"
@@ -80,6 +81,17 @@ public:
                     {
                         WhisperTo(player, me, bot_ai::LocalizedNpcText(player, BOT_TEXT_BOTGIVER_TOO_MANY_BOTS).c_str());
                         break;
+                    }
+
+                    if (uint32 maxBotsPerAccount = BotMgr::GetMaxAccountBots())
+                    {
+                        uint32 accountBotsCount = BotDataMgr::GetAccountBotsCount(player->GetSession()->GetAccountId());
+                        if (accountBotsCount >= maxBotsPerAccount)
+                        {
+                            ChatHandler ch(player->GetSession());
+                            ch.PSendSysMessage(bot_ai::LocalizedNpcText(player, BOT_TEXT_HIREFAIL_MAXBOTS_ACCOUNT).c_str(), accountBotsCount, maxBotsPerAccount);
+                            break;
+                        }
                     }
 
                     subMenu = true;
