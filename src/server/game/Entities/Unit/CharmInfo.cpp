@@ -16,6 +16,7 @@
  */
 
 #include "CharmInfo.h"
+#include "Chat.h"
 #include "Creature.h"
 #include "Map.h"
 #include "SpellInfo.h"
@@ -40,7 +41,7 @@ CharmInfo::CharmInfo(Unit* unit)
     }
 }
 
-CharmInfo::~CharmInfo() { }
+CharmInfo::~CharmInfo() = default;
 
 void CharmInfo::RestoreState()
 {
