@@ -35,7 +35,12 @@ struct ItemSetEffect
     SpellInfo const* spells[8];
 };
 
-// EnumUtils: DESCRIBE THIS
+enum InventorySlot
+{
+    NULL_BAG    = 0,
+    NULL_SLOT   = 255
+};
+
 enum InventoryResult : uint8
 {
     EQUIP_ERR_OK                                 = 0,
