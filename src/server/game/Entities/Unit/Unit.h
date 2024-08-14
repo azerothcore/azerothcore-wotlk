@@ -30,6 +30,7 @@
 #include "SpellDefines.h"
 #include "ThreatMgr.h"
 #include "UnitDefines.h"
+#include "UnitUtils.h"
 #include <functional>
 #include <utility>
 
@@ -526,28 +527,6 @@ struct SpellPeriodicAuraLogInfo
 void createProcFlags(SpellInfo const* spellInfo, WeaponAttackType attackType, bool positive, uint32& procAttacker, uint32& procVictim);
 uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition);
 
-struct RedirectThreatInfo
-{
-    RedirectThreatInfo()  = default;
-    ObjectGuid _targetGUID;
-    uint32 _threatPct{0};
-
-    [[nodiscard]] ObjectGuid GetTargetGUID() const { return _targetGUID; }
-    [[nodiscard]] uint32 GetThreatPct() const { return _threatPct; }
-
-    void Set(ObjectGuid guid, uint32 pct)
-    {
-        _targetGUID = guid;
-        _threatPct = pct;
-    }
-
-    void ModifyThreatPct(int32 amount)
-    {
-        amount += _threatPct;
-        _threatPct = uint32(std::max(0, amount));
-    }
-};
-
 #define MAX_DECLINED_NAME_CASES 5
 
 struct DeclinedName
@@ -821,107 +800,6 @@ typedef std::unordered_map<uint32, uint32> PacketCooldowns;
 #define MAX_PLAYER_STEALTH_DETECT_RANGE 30.0f               // max distance for detection targets by player
 
 struct SpellProcEventEntry;                                 // used only privately
-
-class MMapTargetData
-{
-public:
-    MMapTargetData() = default;
-    MMapTargetData(uint32 endTime, const Position* o, const Position* t)
-    {
-        _endTime = endTime;
-        _posOwner.Relocate(o);
-        _posTarget.Relocate(t);
-    }
-    MMapTargetData(const MMapTargetData& c)
-    {
-        _endTime = c._endTime;
-        _posOwner.Relocate(c._posOwner);
-        _posTarget.Relocate(c._posTarget);
-    }
-    MMapTargetData(MMapTargetData&&) = default;
-    MMapTargetData& operator=(const MMapTargetData&) = default;
-    MMapTargetData& operator=(MMapTargetData&&) = default;
-    [[nodiscard]] bool PosChanged(const Position& o, const Position& t) const
-    {
-        return _posOwner.GetExactDistSq(&o) > 0.5f * 0.5f || _posTarget.GetExactDistSq(&t) > 0.5f * 0.5f;
-    }
-    uint32 _endTime;
-    Position _posOwner;
-    Position _posTarget;
-};
-
-class SafeUnitPointer
-{
-public:
-    explicit SafeUnitPointer(Unit* defVal) :  ptr(defVal), defaultValue(defVal) {}
-    SafeUnitPointer(const SafeUnitPointer& /*p*/) { ABORT(); }
-    void Initialize(Unit* defVal) { defaultValue = defVal; ptr = defVal; }
-    ~SafeUnitPointer();
-    void SetPointedTo(Unit* u);
-    void UnitDeleted();
-    Unit* operator->() const { return ptr; }
-    void operator=(Unit* u) { SetPointedTo(u); }
-    operator Unit* () const { return ptr; }
-private:
-    Unit* ptr;
-    Unit* defaultValue;
-};
-
-// BuildValuesCachePosPointers is marks of the position of some data inside of BuildValue cache.
-struct BuildValuesCachePosPointers
-{
-    BuildValuesCachePosPointers() :
-        UnitNPCFlagsPos(-1), UnitFieldAuraStatePos(-1), UnitFieldFlagsPos(-1), UnitFieldDisplayPos(-1),
-        UnitDynamicFlagsPos(-1), UnitFieldBytes2Pos(-1), UnitFieldFactionTemplatePos(-1) {}
-
-    void ApplyOffset(uint32 offset)
-    {
-        if (UnitNPCFlagsPos >= 0)
-            UnitNPCFlagsPos += offset;
-
-        if (UnitFieldAuraStatePos >= 0)
-            UnitFieldAuraStatePos += offset;
-
-        if (UnitFieldFlagsPos >= 0)
-            UnitFieldFlagsPos += offset;
-
-        if (UnitFieldDisplayPos >= 0)
-            UnitFieldDisplayPos += offset;
-
-        if (UnitDynamicFlagsPos >= 0)
-            UnitDynamicFlagsPos += offset;
-
-        if (UnitFieldBytes2Pos >= 0)
-            UnitFieldBytes2Pos += offset;
-
-        if (UnitFieldFactionTemplatePos >= 0)
-            UnitFieldFactionTemplatePos += offset;
-
-        for (auto it = other.begin(); it != other.end(); ++it)
-            it->second += offset;
-    }
-
-    int32 UnitNPCFlagsPos;
-    int32 UnitFieldAuraStatePos;
-    int32 UnitFieldFlagsPos;
-    int32 UnitFieldDisplayPos;
-    int32 UnitDynamicFlagsPos;
-    int32 UnitFieldBytes2Pos;
-    int32 UnitFieldFactionTemplatePos;
-
-    std::unordered_map<uint16 /*index*/, uint32 /*pos*/> other;
-};
-
-// BuildValuesCachedBuffer cache for calculated BuildValue.
-struct BuildValuesCachedBuffer
-{
-    BuildValuesCachedBuffer(uint32 bufferSize) :
-        buffer(bufferSize), posPointers() {}
-
-    ByteBuffer buffer;
-
-    BuildValuesCachePosPointers posPointers;
-};
 
 class Unit : public WorldObject
 {
@@ -1428,7 +1306,6 @@ public:
     virtual bool SetFeatherFall(bool enable, bool packetOnly = false);
     virtual bool SetHover(bool enable, bool packetOnly = false, bool updateAnimationTier = true);
 
-    // pussywizard:
     void SendMovementWaterWalking(Player* sendTo);
     void SendMovementFeatherFall(Player* sendTo);
     void SendMovementHover(Player* sendTo);
@@ -2311,17 +2188,6 @@ protected:
     Unit& _self;
     ObjectGuid _auraOwnerGUID;
     AuraEffect* _auraEffect;
-};
-
-class VehicleDespawnEvent : public BasicEvent
-{
-public:
-    VehicleDespawnEvent(Unit& self, uint32 duration) : _self(self), _duration(duration) { }
-    bool Execute(uint64 e_time, uint32 p_time) override;
-
-protected:
-    Unit& _self;
-    uint32 _duration;
 };
 
 #endif
