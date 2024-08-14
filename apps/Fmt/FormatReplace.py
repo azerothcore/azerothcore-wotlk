@@ -27,19 +27,33 @@ def islog(line):
     else :
         return False
 
-# def isSendSysMessage(line):
-#     substring = 'SendSysMessage'
-#     if substring in line:
-#         return True
-#     else :
-#         return False
+def isSendErrorMessage(line):
+    substring = 'SendErrorMessage'
+    if substring in line:
+        return True
+    else :
+        return False
 
-# def isPSendSysMessage(line):
-#     substring = 'PSendSysMessage'
-#     if substring in line:
-#         return True
-#     else :
-#         return False
+def isSendWorldText(line):
+    substring = 'SendWorldText'
+    if substring in line:
+        return True
+    else :
+        return False
+
+def isSendSysMessage(line):
+    substring = 'SendSysMessage'
+    if substring in line:
+        return True
+    else :
+        return False
+
+def isPSendSysMessage(line):
+    substring = 'PSendSysMessage'
+    if substring in line:
+        return True
+    else :
+        return False
 
 def isPQuery(line):
     substring = 'PQuery'
@@ -92,10 +106,14 @@ def checkSoloLine(line):
     elif isPAppend(line):
         line = line.replace("PAppend", "Append");
         return handleCleanup(line), False
-    # elif isSendSysMessage(line):
-    #     return handleCleanup(line), False
-    # elif isPSendSysMessage(line):
-    #     return handleCleanup(line), False
+    elif isSendErrorMessage(line):
+        return handleCleanup(line), False
+    elif isSendWorldText(line):
+        return handleCleanup(line), False
+    elif isSendSysMessage(line):
+        return handleCleanup(line), False
+    elif isPSendSysMessage(line):
+        return handleCleanup(line), False
     # elif isStringFormat(line):
     #     return handleCleanup(line), False
     else:
@@ -109,10 +127,14 @@ def startMultiLine(line):
         return handleCleanup(line), True
     elif islog(line):
         return handleCleanup(line), True
-    # elif isSendSysMessage(line):
-    #     return handleCleanup(line), True
-    # elif isPSendSysMessage(line):
-    #     return handleCleanup(line), True
+    elif isSendErrorMessage(line):
+        return handleCleanup(line), True
+    elif isSendWorldText(line):
+        return handleCleanup(line), True
+    elif isSendSysMessage(line):
+        return handleCleanup(line), True
+    elif isPSendSysMessage(line):
+        return handleCleanup(line), True
     elif isPQuery(line):
         line = line.replace("PQuery", "Query");
         return handleCleanup(line), True
@@ -177,6 +199,7 @@ def handleCleanup(line):
     line = line.replace("%3.1f", "{:3.1f}");
     line = line.replace("%%", "%");
     line = line.replace(".c_str()", "");
+    line = line.replace("->c_str()", "");
     line = line.replace("\" SZFMTD \"", "{}");
     line = line.replace("\" UI64FMTD \"", "{}");
     # line = line.replace("\" STRING_VIEW_FMT \"", "{}");

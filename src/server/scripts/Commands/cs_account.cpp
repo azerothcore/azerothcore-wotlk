@@ -164,7 +164,7 @@ public:
         }
 
         // new suggestion, or no token specified, output TOTP parameters
-        handler->SendErrorMessage(LANG_2FA_SECRET_SUGGESTION, Acore::Encoding::Base32::Encode(pair.first->second).c_str());
+        handler->SendErrorMessage(LANG_2FA_SECRET_SUGGESTION, Acore::Encoding::Base32::Encode(pair.first->second));
         return false;
     }
 
@@ -328,14 +328,14 @@ public:
         std::string accountName = account;
         if (!Utf8ToUpperOnlyLatin(accountName))
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
         uint32 accountId = AccountMgr::GetId(accountName);
         if (!accountId)
         {
-            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
             return false;
         }
 
@@ -352,13 +352,13 @@ public:
                 handler->PSendSysMessage(LANG_ACCOUNT_DELETED, accountName);
                 break;
             case AOR_NAME_NOT_EXIST:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName.c_str());
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, accountName);
                 return false;
             case AOR_DB_INTERNAL_ERROR:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_DELETED_SQL_ERROR, accountName.c_str());
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_DELETED_SQL_ERROR, accountName);
                 return false;
             default:
-                handler->SendErrorMessage(LANG_ACCOUNT_NOT_DELETED, accountName.c_str());
+                handler->SendErrorMessage(LANG_ACCOUNT_NOT_DELETED, accountName);
                 return false;
         }
 
