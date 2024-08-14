@@ -130,7 +130,7 @@ public:
 
             if (target->IsBeingTeleported())
             {
-                handler->SendErrorMessage(LANG_IS_TELEPORTED, chrNameLink.c_str());
+                handler->SendErrorMessage(LANG_IS_TELEPORTED, chrNameLink);
                 return false;
             }
 
@@ -233,7 +233,7 @@ public:
         Group* grp = target->GetGroup();
         if (!grp)
         {
-            handler->SendErrorMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
+            handler->SendErrorMessage(LANG_NOT_IN_GROUP, nameLink);
             return false;
         }
 
@@ -256,7 +256,7 @@ public:
                 continue;
             }
 
-            handler->PSendSysMessage(LANG_TELEPORTING_TO, plNameLink.c_str(), "", tele->name);
+            handler->PSendSysMessage(LANG_TELEPORTING_TO, plNameLink, "", tele->name);
             if (handler->needReportToTarget(player))
                 ChatHandler(player->GetSession()).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink);
 

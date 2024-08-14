@@ -81,7 +81,7 @@ public:
         {
             if (player->IsActiveQuest(entry))
             {
-                handler->SendErrorMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
+                handler->SendErrorMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle(), entry);
                 return false;
             }
 
@@ -98,7 +98,7 @@ public:
 
             if (result)
             {
-                handler->SendErrorMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
+                handler->SendErrorMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle(), entry);
                 return false;
             }
 
