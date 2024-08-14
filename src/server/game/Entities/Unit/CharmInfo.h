@@ -18,6 +18,8 @@
 #ifndef _CHARMINFO_H
 #define _CHARMINFO_H
 
+#include "Object.h"
+
 #define MAX_SPELL_CHARM         4
 #define MAX_SPELL_VEHICLE       6
 #define MAX_SPELL_POSSESS       8
@@ -30,7 +32,6 @@
 #define MAKE_UNIT_ACTION_BUTTON(A, T) (uint32(A) | (uint32(T) << 24))
 
 class GlobalCooldownMgr;
-class ObjectGuid;
 class SpellInfo;
 class Unit;
 class WorldPacket;
