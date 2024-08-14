@@ -25,7 +25,6 @@
 #include "Tokenize.h"
 #include "Unit.h"
 
-
 CharmInfo::CharmInfo(Unit* unit)
     : _unit(unit), _CommandState(COMMAND_FOLLOW), _petnumber(0), _oldReactState(REACT_PASSIVE),
       _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
@@ -41,9 +40,7 @@ CharmInfo::CharmInfo(Unit* unit)
     }
 }
 
-CharmInfo::~CharmInfo()
-{
-}
+CharmInfo::~CharmInfo() { }
 
 void CharmInfo::RestoreState()
 {
@@ -306,7 +303,6 @@ void CharmInfo::SetSpellAutocast(SpellInfo const* spellInfo, bool state)
         }
     }
 }
-
 
 void CharmInfo::SetIsCommandAttack(bool val)
 {

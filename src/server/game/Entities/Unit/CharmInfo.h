@@ -23,6 +23,8 @@
 #define MAX_SPELL_POSSESS       8
 #define MAX_SPELL_CONTROL_BAR   10
 
+#define MAX_UNIT_ACTION_BAR_INDEX (ACTION_BAR_INDEX_END-ACTION_BAR_INDEX_START)
+
 #define UNIT_ACTION_BUTTON_ACTION(X) (uint32(X) & 0x00FFFFFF)
 #define UNIT_ACTION_BUTTON_TYPE(X)   ((uint32(X) & 0xFF000000) >> 24)
 #define MAKE_UNIT_ACTION_BUTTON(A, T) (uint32(A) | (uint32(T) << 24))
@@ -32,7 +34,7 @@ class GlobalCooldownMgr;
 class SpellInfo;
 class WorldPacket;
 
-enum CommandStates;
+enum CommandStates : uint8;
 enum ReactStates : uint8;
 
 enum CharmType : uint8
@@ -50,9 +52,6 @@ enum ActionBarIndex
     ACTION_BAR_INDEX_PET_SPELL_END = 7,
     ACTION_BAR_INDEX_END = 10,
 };
-
-#define MAX_UNIT_ACTION_BAR_INDEX (ACTION_BAR_INDEX_END-ACTION_BAR_INDEX_START)
-
 
 enum ActiveStates : uint8
 {
@@ -95,7 +94,6 @@ struct UnitActionBarEntry
     }
 };
 typedef UnitActionBarEntry CharmSpellInfo;
-
 
 struct CharmInfo
 {

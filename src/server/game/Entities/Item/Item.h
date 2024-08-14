@@ -41,6 +41,7 @@ enum InventorySlot
     NULL_SLOT   = 255
 };
 
+// EnumUtils: DESCRIBE THIS
 enum InventoryResult : uint8
 {
     EQUIP_ERR_OK                                 = 0,
