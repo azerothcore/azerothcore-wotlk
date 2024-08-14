@@ -29,9 +29,10 @@
 #define UNIT_ACTION_BUTTON_TYPE(X)   ((uint32(X) & 0xFF000000) >> 24)
 #define MAKE_UNIT_ACTION_BUTTON(A, T) (uint32(A) | (uint32(T) << 24))
 
-class Unit;
 class GlobalCooldownMgr;
+class ObjectGuid;
 class SpellInfo;
+class Unit;
 class WorldPacket;
 
 enum CommandStates : uint8;
