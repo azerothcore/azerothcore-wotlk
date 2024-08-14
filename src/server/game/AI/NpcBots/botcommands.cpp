@@ -658,6 +658,7 @@ public:
             { "set",        npcbotSetCommandTable                                                                                   },
             { "add",        HandleNpcBotAddCommand,                 rbac::RBAC_PERM_COMMAND_NPCBOT_ADD,                Console::No  },
             { "remove",     HandleNpcBotRemoveCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_REMOVE,             Console::No  },
+            { "free",       HandleNpcBotFreeCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_REMOVE,             Console::No  },
             { "createnew",  HandleNpcBotCreateNewCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_CREATENEW,          Console::Yes },
             { "spawn",      HandleNpcBotSpawnCommand,               rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "move",       HandleNpcBotMoveCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_MOVE,               Console::No  },
@@ -906,7 +907,8 @@ public:
     }
     static void HandleWPUpdateLinks(ChatHandler* handler, WanderNode* wp, std::vector<uint32> linkIds, bool oneway = false)
     {
-        auto const linksCopy = wp->GetLinks();
+        auto const& links = wp->GetLinks();
+        std::remove_reference_t<decltype(links)> linksCopy = links;
 
         std::set<decltype(linksCopy)::value_type> wps_updates;
         std::copy(std::cbegin(linksCopy), std::cend(linksCopy), std::inserter(wps_updates, wps_updates.begin()));
@@ -2837,6 +2839,86 @@ public:
         return true;
     }
 
+    static bool HandeNpcBotCleanUpAndRemoval(ChatHandler* handler, Creature* bot, Player const* chr/* = nullptr*/)
+    {
+        Player const* botowner = bot->GetBotOwner()->ToPlayer();
+
+        if (bot->GetBotAI()->HasRealEquipment())
+        {
+            ObjectGuid receiver =
+                botowner ? botowner->GetGUID() :
+                bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
+                chr ? chr->GetGUID() : ObjectGuid::Empty;
+
+            if (!botowner && chr && receiver != chr->GetGUID() && !sCharacterCache->HasCharacterCacheEntry(receiver))
+                receiver = chr->GetGUID();
+
+            if (receiver == ObjectGuid::Empty)
+            {
+                handler->PSendSysMessage("Cannot delete bot {} from console: has gear but no player to give it back to! Can only delete this bot in-game.", bot->GetName());
+                return false;
+            }
+            if (!bot->GetBotAI()->UnEquipAll(receiver))
+            {
+                handler->PSendSysMessage("{} is unable to unequip some gear. Please remove equips manually first!", bot->GetName());
+                return false;
+            }
+        }
+
+        if (botowner)
+            botowner->GetBotMgr()->RemoveBot(bot->GetGUID(), BOT_REMOVE_DISMISS);
+
+        return true;
+    }
+
+    static bool HandleNpcBotFreeCommand(ChatHandler* handler)
+    {
+        Player* chr = handler->GetSession()->GetPlayer();
+        Unit* ubot = chr->GetSelectedUnit();
+        if (!ubot)
+        {
+            handler->SendSysMessage(".npcbot free");
+            handler->SendSysMessage("Immediately cancels selected npcbot's ownership");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Creature* bot = ubot->ToCreature();
+        if (!bot || !bot->IsNPCBot() || !bot->GetBotAI()->GetBotOwnerGuid() || bot->IsTempBot())
+        {
+            handler->SendSysMessage("No owned npcbot selected");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint32 owner_guid = bot->GetBotAI()->GetBotOwnerGuid();
+        Player const* botowner = bot->GetBotOwner()->ToPlayer();
+        if (!HandeNpcBotCleanUpAndRemoval(handler, bot, chr))
+        {
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        uint8 spec = bot_ai::SelectSpecForClass(bot->GetBotClass());
+        BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_SPEC, &spec);
+        uint32 roleMask = bot_ai::DefaultRolesForClass(bot->GetBotClass(), spec);
+        BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_ROLES, &roleMask);
+
+        if (!botowner)
+        {
+            uint32 newOwner = 0;
+            BotDataMgr::UpdateNpcBotData(bot->GetEntry(), NPCBOT_UPDATE_OWNER, &newOwner);
+
+            if (Group* gr = bot->GetBotGroup())
+                gr->RemoveMember(bot->GetGUID());
+
+            bot->GetBotAI()->ResetBotAI(BOTAI_RESET_DISMISS);
+        }
+
+        handler->PSendSysMessage("Npcbot {} successfully freed, owner was {}", bot->GetName(), owner_guid);
+        return true;
+    }
+
     static bool HandleNpcBotDeleteCommand(ChatHandler* handler)
     {
         Player* chr = handler->GetSession()->GetPlayer();
@@ -2864,21 +2946,11 @@ public:
             return true;
         }
 
-        Player const* botowner = bot->GetBotOwner()->ToPlayer();
-
-        ObjectGuid receiver =
-            botowner ? botowner->GetGUID() :
-            bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
-            chr->GetGUID();
-        if (!bot->GetBotAI()->UnEquipAll(receiver))
+        if (!HandeNpcBotCleanUpAndRemoval(handler, bot, chr))
         {
-            handler->PSendSysMessage("{} is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName());
             handler->SetSentErrorMessage(true);
             return false;
         }
-
-        if (botowner)
-            botowner->GetBotMgr()->RemoveBot(bot->GetGUID(), BOT_REMOVE_DISMISS);
 
         bot->CombatStop();
         bot->GetBotAI()->Reset();
@@ -2912,36 +2984,18 @@ public:
 
         if (bot->GetBotAI()->IsWanderer())
         {
-            handler->SendSysMessage("Cannot delete wanderer npcbot");
-            handler->SetSentErrorMessage(true);
-            return false;
+            BotDataMgr::DespawnWandererBot(bot->GetEntry());
+            handler->PSendSysMessage("Wandering bot {} '{}' successfully deleted", bot->GetEntry(), bot->GetName());
+            return true;
         }
 
         Player* chr = !handler->IsConsole() ? handler->GetSession()->GetPlayer() : nullptr;
-        Player const* botowner = bot->GetBotOwner()->ToPlayer();
 
-        if (bot->GetBotAI()->HasRealEquipment())
+        if (!HandeNpcBotCleanUpAndRemoval(handler, const_cast<Creature*>(bot), chr))
         {
-            ObjectGuid receiver =
-                botowner ? botowner->GetGUID() :
-                bot->GetBotAI()->GetBotOwnerGuid() != 0 ? ObjectGuid(HighGuid::Player, 0, bot->GetBotAI()->GetBotOwnerGuid()) :
-                chr ? chr->GetGUID() : ObjectGuid::Empty;
-            if (receiver == ObjectGuid::Empty)
-            {
-                handler->PSendSysMessage("Cannot delete bot {} from console: has gear but no player to give it back to! Can only delete this bot in-game.", bot->GetName());
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
-            if (!bot->GetBotAI()->UnEquipAll(receiver))
-            {
-                handler->PSendSysMessage("{} is unable to unequip some gear. Please remove equips before deleting bot!", bot->GetName());
-                handler->SetSentErrorMessage(true);
-                return false;
-            }
+            handler->SetSentErrorMessage(true);
+            return false;
         }
-
-        if (botowner)
-            botowner->GetBotMgr()->RemoveBot(bot->GetGUID(), BOT_REMOVE_DISMISS);
 
         const_cast<Creature*>(bot)->CombatStop();
         bot->GetBotAI()->Reset();
