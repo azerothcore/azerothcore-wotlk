@@ -16,7 +16,6 @@
  */
 
 #include "CharmInfo.h"
-#include "Chat.h"
 #include "Creature.h"
 #include "Map.h"
 #include "SpellInfo.h"

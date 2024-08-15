@@ -23,6 +23,7 @@
 #include "Battleground.h"
 #include "CellImpl.h"
 #include "CharacterCache.h"
+#include "CharmInfo.h"
 #include "Chat.h"
 #include "ChatPackets.h"
 #include "ChatTextBuilder.h"

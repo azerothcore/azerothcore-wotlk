@@ -21,7 +21,6 @@
 #include "Battleground.h"
 #include "BattlegroundIC.h"
 #include "CellImpl.h"
-#include "CharmInfo.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "DisableMgr.h"

@@ -18,7 +18,6 @@
 #ifndef __UNIT_H
 #define __UNIT_H
 
-#include "CharmInfo.h" // Temp
 #include "EnumFlag.h"
 #include "EventProcessor.h"
 #include "FollowerRefMgr.h"
@@ -47,6 +46,7 @@ static constexpr uint32 MAX_CREATURE_SPELLS = 8;
 static constexpr uint32 infinityCooldownDelay = 0x9A7EC800; // used for set "infinity cooldowns" for spells and check, MONTH*IN_MILLISECONDS
 static constexpr uint32 infinityCooldownDelayCheck = 0x4D3F6400; // MONTH*IN_MILLISECONDS/2;
 
+struct CharmInfo;
 struct FactionTemplateEntry;
 struct SpellValue;
 
@@ -76,9 +76,7 @@ class SpellCastTargets;
 typedef std::list<Unit*> UnitList;
 typedef std::list< std::pair<Aura*, uint8> > DispelChargesList;
 
-struct CharmInfo;
 enum CharmType : uint8;
-enum ActiveStates : uint8;
 
 enum VictimState
 {

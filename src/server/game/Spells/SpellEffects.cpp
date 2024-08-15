@@ -22,7 +22,6 @@
 #include "BattlegroundSA.h"
 #include "BattlegroundWS.h"
 #include "CellImpl.h"
-#include "CharmInfo.h"
 #include "Chat.h"
 #include "Common.h"
 #include "Creature.h"

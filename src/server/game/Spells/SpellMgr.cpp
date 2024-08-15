@@ -19,7 +19,6 @@
 #include "BattlefieldMgr.h"
 #include "BattlegroundIC.h"
 #include "BattlegroundMgr.h"
-#include "CharmInfo.h"
 #include "Chat.h"
 #include "DBCStores.h"
 #include "GameGraveyard.h"
