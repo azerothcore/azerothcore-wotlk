@@ -796,7 +796,7 @@ public:
 
         if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
         {
-            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, Acore::ToString(displayId));
+            handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, Acore::ToString(displayId).c_str());
             return false;
         }
 
@@ -1086,7 +1086,7 @@ public:
         if (/*creature->GetMotionMaster()->empty() ||*/
             creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
         {
-            handler->SendErrorMessage(LANG_CREATURE_NOT_FOLLOW_YOU, creature->GetName());
+            handler->SendErrorMessage(LANG_CREATURE_NOT_FOLLOW_YOU, creature->GetName().c_str());
             return false;
         }
 
@@ -1094,7 +1094,7 @@ public:
 
         if (mgen->GetTarget() != player)
         {
-            handler->SendErrorMessage(LANG_CREATURE_NOT_FOLLOW_YOU, creature->GetName());
+            handler->SendErrorMessage(LANG_CREATURE_NOT_FOLLOW_YOU, creature->GetName().c_str());
             return false;
         }
 
@@ -1259,7 +1259,7 @@ public:
 
         if (!sObjectMgr->SetCreatureLinkedRespawn(creature->GetSpawnId(), linkguid))
         {
-            handler->SendErrorMessage("Selected creature can't link with guid '{}'", linkguid);
+            handler->SendErrorMessage("Selected creature can't link with guid '%u'", linkguid);
             return false;
         }
 

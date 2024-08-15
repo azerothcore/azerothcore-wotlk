@@ -170,12 +170,12 @@ public:
                 if (Player* player = ObjectAccessor::FindPlayerByName(*playerNameArg))
                 {
                     handler->GetSession()->GetPlayer()->RemoveFromWhisperWhiteList(player->GetGUID());
-                    handler->PSendSysMessage(LANG_COMMAND_WHISPEROFFPLAYER, playerNameArg);
+                    handler->PSendSysMessage(LANG_COMMAND_WHISPEROFFPLAYER, playerNameArg->c_str());
                     return true;
                 }
                 else
                 {
-                    handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND, playerNameArg);
+                    handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND, playerNameArg->c_str());
                     return false;
                 }
             }
