@@ -2331,7 +2331,7 @@ public:
             summon->SetPvP(me->IsPvP());
             summon->SetOwnerGUID(master->GetGUID());
             summon->SetControlledByPlayer(!IAmFree());
-            summon->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
+            //summon->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
             // totem will claim master's summon slot
             // free it to avoid conflicts with other shaman bots and master
             // if master is a shaman his totem will despawn

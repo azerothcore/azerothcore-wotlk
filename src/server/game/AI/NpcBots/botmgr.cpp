@@ -1650,9 +1650,11 @@ void BotMgr::CleanupsBeforeBotDelete(Creature* bot)
     //bot->SetOwnerGUID(ObjectGuid::Empty);
     //_owner->m_Controlled.erase(bot);
     bot->SetControlledByPlayer(false);
+    //bot->RemoveUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
     //bot->RemoveUnitFlag(UNIT_FLAG_PVP_ATTACKABLE);
     bot->SetByteValue(UNIT_FIELD_BYTES_2, 1, 0);
     bot->SetCreator(nullptr);
+    //bot->SetCreatorGUID(ObjectGuid::Empty);
 
     Map* map = bot->FindMap();
     if (!map || map->IsDungeon())
@@ -1812,8 +1814,10 @@ BotAddResult BotMgr::AddBot(Creature* bot)
     //ASSERT(!bot->GetOwnerGUID());
     //bot->SetOwnerGUID(_owner->GetGUID());
     bot->SetCreator(_owner); //needed in case of FFAPVP
+    //bot->SetCreatorGUID(_owner->GetGUID());
     //_owner->m_Controlled.insert(bot);
     bot->SetControlledByPlayer(true);
+    //bot->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
     bot->SetByteValue(UNIT_FIELD_BYTES_2, 1, _owner->GetByteValue(UNIT_FIELD_BYTES_2, 1));
     bot->SetFaction(_owner->GetFaction());
     bot->SetPhaseMask(_owner->GetPhaseMask(), true);
