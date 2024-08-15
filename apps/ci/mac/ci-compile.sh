@@ -21,10 +21,6 @@ if [ ! -d "$mysql_include_path" ]; then
     mysql_lib_path=$base_dir/lib/libmysqlclient.dylib
 fi
 
-if [ ! -d "$mysql_include_path" ]; then
-    echo "Fuck!"
-fi
-
 time cmake ../../../ \
 -DTOOLS=1 \
 -DBUILD_TESTING=1 \
