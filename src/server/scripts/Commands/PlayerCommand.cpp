@@ -37,7 +37,7 @@ bool Acore::PlayerCommand::HandleLearnSpellCommand(ChatHandler* handler, Player*
         }
         else
         {
-            handler->SendErrorMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer));
+            handler->SendErrorMessage(LANG_TARGET_KNOWN_SPELL, handler->GetNameLink(targetPlayer).c_str());
         }
 
         return false;

@@ -217,7 +217,7 @@ public:
     static bool HandleMmapStatsCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage("mmap stats:");
-        //handler->PSendSysMessage("  global mmap pathfinding is {}abled", DisableMgr::IsPathfindingEnabled(mapId) ? "en" : "dis");
+        //handler->PSendSysMessage("  global mmap pathfinding is %sabled", DisableMgr::IsPathfindingEnabled(mapId) ? "en" : "dis");
 
         MMAP::MMapMgr* manager = MMAP::MMapFactory::createOrGetMMapMgr();
         handler->PSendSysMessage(" {} maps loaded with {} tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());

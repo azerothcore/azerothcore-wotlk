@@ -535,7 +535,7 @@ public:
         if (!listQueue && !checkAll)
         {
             itemState = "The player has the following " + itemState + " items: ";
-            handler->SendSysMessage(itemState);
+            handler->SendSysMessage(itemState.c_str());
             for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
             {
                 if (i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
@@ -941,7 +941,7 @@ public:
         while (ss.str().size() < 128000)
             ss << "This is a dummy string to push the packet's size beyond 128000 bytes. ";
 
-        handler->SendSysMessage(ss.str());
+        handler->SendSysMessage(ss.str().c_str());
         return true;
     }
 
