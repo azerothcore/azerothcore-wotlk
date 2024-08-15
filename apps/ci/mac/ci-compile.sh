@@ -10,6 +10,10 @@ ccache -s
 
 cd var/build/obj
 
+# Debug code
+ls $(brew --prefix mysql)/include/mysql
+head $(brew --prefix mysql)/lib/libmysqlclient.dylib
+
 time cmake ../../../ \
 -DTOOLS=1 \
 -DBUILD_TESTING=1 \
