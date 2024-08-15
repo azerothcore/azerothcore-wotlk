@@ -409,7 +409,7 @@ public:
 
             if (player->IsInFlight() && checkInFlight)
             {
-                handler->SendErrorMessage(LANG_CHAR_IN_FLIGHT, handler->GetNameLink(player));
+                handler->SendErrorMessage(LANG_CHAR_IN_FLIGHT, handler->GetNameLink(player).c_str());
                 return false;
             }
         }
@@ -799,7 +799,7 @@ public:
 
             if (r >= MAX_REPUTATION_RANK)
             {
-                handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, rankStr);
+                handler->SendErrorMessage(LANG_COMMAND_FACTION_INVPARAM, rankStr.c_str());
                 return false;
             }
         }

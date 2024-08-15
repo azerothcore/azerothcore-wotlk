@@ -407,7 +407,7 @@ void TicketMgr::ShowList(ChatHandler& handler, bool onlineOnly) const
     for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
         if (!itr->second->IsClosed() && !itr->second->IsCompleted())
             if (!onlineOnly || itr->second->GetPlayer())
-                handler.SendSysMessage(itr->second->FormatMessageString(handler));
+                handler.SendSysMessage(itr->second->FormatMessageString(handler).c_str());
 }
 
 void TicketMgr::ShowClosedList(ChatHandler& handler) const
@@ -415,7 +415,7 @@ void TicketMgr::ShowClosedList(ChatHandler& handler) const
     handler.SendSysMessage(LANG_COMMAND_TICKETSHOWCLOSEDLIST);
     for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
         if (itr->second->IsClosed())
-            handler.SendSysMessage(itr->second->FormatMessageString(handler));
+            handler.SendSysMessage(itr->second->FormatMessageString(handler).c_str());
 }
 
 void TicketMgr::ShowEscalatedList(ChatHandler& handler) const
@@ -423,7 +423,7 @@ void TicketMgr::ShowEscalatedList(ChatHandler& handler) const
     handler.SendSysMessage(LANG_COMMAND_TICKETSHOWESCALATEDLIST);
     for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
         if (!itr->second->IsClosed() && itr->second->GetEscalatedStatus() == TICKET_IN_ESCALATION_QUEUE)
-            handler.SendSysMessage(itr->second->FormatMessageString(handler));
+            handler.SendSysMessage(itr->second->FormatMessageString(handler).c_str());
 }
 
 void TicketMgr::SendTicket(WorldSession* session, GmTicket* ticket) const

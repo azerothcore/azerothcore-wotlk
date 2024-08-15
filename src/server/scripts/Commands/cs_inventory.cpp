@@ -173,7 +173,7 @@ public:
 
         str << ".";
 
-        handler->SendSysMessage(str.str());
+        handler->SendSysMessage(str.str().c_str());
 
         return true;
     }
