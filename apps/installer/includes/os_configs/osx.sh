@@ -35,5 +35,6 @@ fi
 # brew install openssl@3 readline boost bash-completion curl unzip mysql ccache
 brew install mysql 
 
+which mysql
 ls -la $(brew --cellar mysql)/$(basename $(readlink $(brew --prefix mysql)))
 head $(brew --prefix mysql)/lib/libmysqlclient.dylib
