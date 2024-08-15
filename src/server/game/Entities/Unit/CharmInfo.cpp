@@ -114,32 +114,27 @@ void CharmInfo::InitCharmCreateSpells()
     InitPetActionBar();
 
     if (_unit->GetTypeId() == TYPEID_PLAYER)                // charmed players don't have spells
-    {
-        //InitEmptyActionBar();
         return;
-    }
 
-    //InitPetActionBar();
-
-    for (uint32 x = 0; x < MAX_SPELL_CHARM; ++x)
+    for (uint32 i = 0; i < MAX_SPELL_CHARM; ++i)
     {
-        uint32 spellId = _unit->ToCreature()->m_spells[x];
+        uint32 spellId = _unit->ToCreature()->m_spells[i];
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
 
         if (!spellInfo)
         {
-            _charmspells[x].SetActionAndType(spellId, ACT_DISABLED);
+            _charmspells[i].SetActionAndType(spellId, ACT_DISABLED);
             continue;
         }
 
         if (spellInfo->IsPassive())
         {
             _unit->CastSpell(_unit, spellInfo, true);
-            _charmspells[x].SetActionAndType(spellId, ACT_PASSIVE);
+            _charmspells[i].SetActionAndType(spellId, ACT_PASSIVE);
         }
         else
         {
-            _charmspells[x].SetActionAndType(spellId, ACT_DISABLED);
+            _charmspells[i].SetActionAndType(spellId, ACT_DISABLED);
 
             ActiveStates newstate = ACT_PASSIVE;
 
@@ -236,9 +231,9 @@ void CharmInfo::ToggleCreatureAutocast(SpellInfo const* spellInfo, bool apply)
     if (spellInfo->IsPassive())
         return;
 
-    for (uint32 x = 0; x < MAX_SPELL_CHARM; ++x)
-        if (spellInfo->Id == _charmspells[x].GetAction())
-            _charmspells[x].SetType(apply ? ACT_ENABLED : ACT_DISABLED);
+    for (uint32 i = 0; i < MAX_SPELL_CHARM; ++i)
+        if (spellInfo->Id == _charmspells[i].GetAction())
+            _charmspells[i].SetType(apply ? ACT_ENABLED : ACT_DISABLED);
 }
 
 void CharmInfo::SetPetNumber(uint32 petnumber, bool statwindow)
