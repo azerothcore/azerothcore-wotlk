@@ -20,6 +20,7 @@
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "BattlegroundIC.h"
+#include "CharmInfo.h"
 #include "CellImpl.h"
 #include "Common.h"
 #include "ConditionMgr.h"

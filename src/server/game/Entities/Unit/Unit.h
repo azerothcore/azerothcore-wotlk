@@ -543,30 +543,6 @@ enum CurrentSpellTypes
 #define CURRENT_FIRST_NON_MELEE_SPELL 1
 #define CURRENT_MAX_SPELL             4
 
-struct GlobalCooldown
-{
-    explicit GlobalCooldown(uint32 _dur = 0, uint32 _time = 0) : duration(_dur), cast_time(_time) {}
-
-    uint32 duration;
-    uint32 cast_time;
-};
-
-typedef std::unordered_map<uint32 /*category*/, GlobalCooldown> GlobalCooldownList;
-
-class GlobalCooldownMgr                                     // Shared by Player and CharmInfo
-{
-public:
-    GlobalCooldownMgr() = default;
-
-public:
-    bool HasGlobalCooldown(SpellInfo const* spellInfo) const;
-    void AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd);
-    void CancelGlobalCooldown(SpellInfo const* spellInfo);
-
-private:
-    GlobalCooldownList m_GlobalCooldowns;
-};
-
 enum ReactStates : uint8
 {
     REACT_PASSIVE    = 0,

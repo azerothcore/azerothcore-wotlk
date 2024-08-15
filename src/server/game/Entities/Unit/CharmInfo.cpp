@@ -17,6 +17,7 @@
 
 #include "CharmInfo.h"
 #include "Creature.h"
+#include "GameTime.h"
 #include "Map.h"
 #include "SpellInfo.h"
 #include "Player.h"
@@ -389,4 +390,22 @@ void CharmInfo::SetIsReturning(bool val)
 bool CharmInfo::IsReturning()
 {
     return _isReturning;
+}
+
+////////////////////////////////////////////////////////////
+// Methods of class GlobalCooldownMgr
+bool GlobalCooldownMgr::HasGlobalCooldown(SpellInfo const* spellInfo) const
+{
+    GlobalCooldownList::const_iterator itr = m_GlobalCooldowns.find(spellInfo->StartRecoveryCategory);
+    return itr != m_GlobalCooldowns.end() && itr->second.duration && getMSTimeDiff(itr->second.cast_time, GameTime::GetGameTimeMS().count()) < itr->second.duration;
+}
+
+void GlobalCooldownMgr::AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd)
+{
+    m_GlobalCooldowns[spellInfo->StartRecoveryCategory] = GlobalCooldown(gcd, GameTime::GetGameTimeMS().count());
+}
+
+void GlobalCooldownMgr::CancelGlobalCooldown(SpellInfo const* spellInfo)
+{
+    m_GlobalCooldowns[spellInfo->StartRecoveryCategory].duration = 0;
 }
