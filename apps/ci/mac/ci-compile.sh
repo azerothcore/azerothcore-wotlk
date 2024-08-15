@@ -15,7 +15,8 @@ mysql_lib_path=$(brew --prefix mysql)/lib/libmysqlclient.dylib
 
 if [ ! -d "$mysql_include_path" ]; then
     echo "Original mysql include directory doesn't exist. Lets try to use the first available folder in mysql dir."
-    base_dir=$(brew --cellar mysql)/$(basename $(ls -d $base_dir/*/ | head -n 1))
+    base_dir=$(brew --cellar mysql)/$(basename $(ls -d $(brew --cellar mysql)/*/ | head -n 1))
+    echo "Trying the next mysql base dir: $base_dir"
     mysql_include_path=$base_dir/include/mysql
     mysql_lib_path=$base_dir/lib/libmysqlclient.dylib
 fi
