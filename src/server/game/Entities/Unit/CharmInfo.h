@@ -65,6 +65,30 @@ enum ActiveStates : uint8
     ACT_DECIDE   = 0x00                                     // custom
 };
 
+struct GlobalCooldown
+{
+    explicit GlobalCooldown(uint32 _dur = 0, uint32 _time = 0) : duration(_dur), cast_time(_time) {}
+
+    uint32 duration;
+    uint32 cast_time;
+};
+
+typedef std::unordered_map<uint32 /*category*/, GlobalCooldown> GlobalCooldownList;
+
+class GlobalCooldownMgr                                     // Shared by Player and CharmInfo
+{
+public:
+    GlobalCooldownMgr() = default;
+
+public:
+    bool HasGlobalCooldown(SpellInfo const* spellInfo) const;
+    void AddGlobalCooldown(SpellInfo const* spellInfo, uint32 gcd);
+    void CancelGlobalCooldown(SpellInfo const* spellInfo);
+
+private:
+    GlobalCooldownList m_GlobalCooldowns;
+};
+
 struct UnitActionBarEntry
 {
     UnitActionBarEntry() : packedData(uint32(ACT_DISABLED) << 24) {}
@@ -131,7 +155,7 @@ public:
 
     CharmSpellInfo* GetCharmSpell(uint8 index) { return &(_charmspells[index]); }
 
-    GlobalCooldownMgr& GetGlobalCooldownMgr() { return *_GlobalCooldownMgr; }
+    GlobalCooldownMgr& GetGlobalCooldownMgr() { return _GlobalCooldownMgr; }
 
     void SetIsCommandAttack(bool val);
     bool IsCommandAttack();
@@ -178,7 +202,7 @@ private:
     float _stayY;
     float _stayZ;
 
-    std::unique_ptr<GlobalCooldownMgr> _GlobalCooldownMgr;
+    GlobalCooldownMgr _GlobalCooldownMgr;
 };
 
 #endif // _CHARMINFO_H
