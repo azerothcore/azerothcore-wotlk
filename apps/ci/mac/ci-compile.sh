@@ -20,19 +20,17 @@ if [ ! -d "$mysql_include_path" ]; then
     mysql_lib_path=$base_dir/lib/libmysqlclient.dylib
 fi
 
-
-# Debug code
-echo "mysql folder content:"
-cd $(brew --prefix mysql) && ls -l && pwd
-head $(brew --prefix mysql)/lib/libmysqlclient.dylib
+if [ ! -d "$mysql_include_path" ]; then
+    echo "Fuck!"
+fi
 
 time cmake ../../../ \
 -DTOOLS=1 \
 -DBUILD_TESTING=1 \
 -DSCRIPTS=static \
 -DCMAKE_BUILD_TYPE=Release \
--DMYSQL_ADD_INCLUDE_PATH=$(brew --prefix mysql)/include/mysql \
--DMYSQL_LIBRARY=$(brew --prefix mysql)/lib/libmysqlclient.dylib \
+-DMYSQL_ADD_INCLUDE_PATH=$mysql_include_path \
+-DMYSQL_LIBRARY=$mysql_lib_path \
 -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include \
 -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib \
 -DOPENSSL_INCLUDE_DIR="$OPENSSL_ROOT_DIR/include" \
