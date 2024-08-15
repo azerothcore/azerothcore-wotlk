@@ -19,6 +19,7 @@
 #include "BattlefieldMgr.h"
 #include "Battleground.h"
 #include "CellImpl.h"
+#include "CharmInfo.h"
 #include "Common.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
