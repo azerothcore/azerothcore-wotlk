@@ -15,8 +15,8 @@ time cmake ../../../ \
 -DBUILD_TESTING=1 \
 -DSCRIPTS=static \
 -DCMAKE_BUILD_TYPE=Release \
--DMYSQL_ADD_INCLUDE_PATH=/usr/local/include \
--DMYSQL_LIBRARY=/usr/local/lib/libmysqlclient.dylib \
+-DMYSQL_ADD_INCLUDE_PATH=$(brew --prefix mysql)/include/mysql \
+-DMYSQL_LIBRARY=$(brew --prefix mysql)/lib/libmysqlclient.dylib \
 -DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include \
 -DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib \
 -DOPENSSL_INCLUDE_DIR="$OPENSSL_ROOT_DIR/include" \
