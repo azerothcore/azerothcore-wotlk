@@ -33,7 +33,7 @@ fi
 
 # DEBUG: speedup feedback loop
 # brew install openssl@3 readline boost bash-completion curl unzip mysql ccache
-# brew install mysql 
+brew install mysql 
 
 # Step 1: Check the Homebrew prefix for MySQL
 echo "Checking Homebrew prefix for MySQL..."
@@ -45,7 +45,7 @@ echo "Listing all MySQL versions installed in the Cellar..."
 ls -la $(brew --cellar mysql)
 
 # Step 3: Check if the specific version directory exists
-mysql_version="9.0.1"
+mysql_version="9.0.1.reinstall"
 mysql_cellar_path="$(brew --cellar mysql)/$mysql_version"
 echo "Checking if MySQL version $mysql_version directory exists..."
 if [ -d "$mysql_cellar_path" ]; then
