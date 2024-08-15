@@ -33,7 +33,7 @@ fi
 
 # DEBUG: speedup feedback loop
 # brew install openssl@3 readline boost bash-completion curl unzip mysql ccache
-brew install mysql 
+# brew install mysql 
 
 # Step 1: Check the Homebrew prefix for MySQL
 echo "Checking Homebrew prefix for MySQL..."
