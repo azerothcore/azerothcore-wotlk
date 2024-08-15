@@ -65,7 +65,6 @@ enum ActiveStates : uint8
     ACT_DECIDE   = 0x00                                     // custom
 };
 
-
 struct GlobalCooldown
 {
     explicit GlobalCooldown(uint32 _dur = 0, uint32 _time = 0) : duration(_dur), cast_time(_time) {}
