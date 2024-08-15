@@ -12,7 +12,7 @@ cd var/build/obj
 
 # Debug code
 echo "mysql folder content:"
-ls $(brew --prefix mysql)
+cd $(brew --prefix mysql) && ls -l && pwd
 head $(brew --prefix mysql)/lib/libmysqlclient.dylib
 
 time cmake ../../../ \
