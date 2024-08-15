@@ -49,7 +49,8 @@ mysql_version="9.0.1.reinstall"
 mysql_cellar_path="$(brew --cellar mysql)/$mysql_version"
 echo "Checking if MySQL version $mysql_version directory exists..."
 if [ -d "$mysql_cellar_path" ]; then
-    echo "Directory $mysql_cellar_path exists."
+    echo "Directory $mysql_cellar_path exists. Content:"
+    ls -la $mysql_cellar_path
 else
     echo "Directory $mysql_cellar_path does NOT exist. Listing contents of parent directory:"
     ls -la $(brew --cellar mysql)
