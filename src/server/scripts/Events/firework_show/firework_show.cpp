@@ -164,7 +164,7 @@ struct go_firework_show : public GameObjectAI
         uint32 posIdx = _show->schedule.entries[_curIdx].spawnIndex;
         if (posIdx < _show->spawns.size)
         {
-            me->SummonGameObject(_show->schedule.entries[_curIdx].gameobjectId,
+            GameObject* go = me->SummonGameObject(_show->schedule.entries[_curIdx].gameobjectId,
                 _show->spawns.entries[posIdx].x,
                 _show->spawns.entries[posIdx].y,
                 _show->spawns.entries[posIdx].z,
@@ -174,6 +174,14 @@ struct go_firework_show : public GameObjectAI
                 _show->spawns.entries[posIdx].rot2,
                 _show->spawns.entries[posIdx].rot3,
                 0);
+
+            // trigger despawn animation for firework explosion
+            if (go)
+            {
+                go->setActive(true);
+                go->DespawnOrUnsummon();
+                go->AddObjectToRemoveList();
+            }
         }
 
         uint32 ts = _show->schedule.entries[_curIdx].timestamp;

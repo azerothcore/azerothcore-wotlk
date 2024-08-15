@@ -22,6 +22,7 @@
 #include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GameObjectScript.h"
+#include "GridNotifiersImpl.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -30,7 +31,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
-#include "GridNotifiersImpl.h"
 
 // Ours
 /********
@@ -931,71 +931,49 @@ enum eFrostmourneCavern
     NPC_PRINCE_ARTHAS               = 27455,
 };
 
-class spell_q12478_frostmourne_cavern : public SpellScriptLoader
+class spell_q12478_frostmourne_cavern : public SpellScript
 {
-public:
-    spell_q12478_frostmourne_cavern() : SpellScriptLoader("spell_q12478_frostmourne_cavern") { }
+    PrepareSpellScript(spell_q12478_frostmourne_cavern);
 
-    class spell_q12478_frostmourne_cavern_SpellScript : public SpellScript
+    void HandleSendEvent(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_q12478_frostmourne_cavern_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        GetCaster()->SummonCreature(NPC_PRINCE_ARTHAS, 4821.3f, -580.14f, 163.541f, 4.57f);
+    }
 
-        void HandleSendEvent(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            GetCaster()->SummonCreature(NPC_PRINCE_ARTHAS, 4821.3f, -580.14f, 163.541f, 4.57f);
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_q12478_frostmourne_cavern_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q12478_frostmourne_cavern_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_q12478_frostmourne_cavern::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
-class spell_q12243_fire_upon_the_waters : public SpellScriptLoader
+class spell_q12243_fire_upon_the_waters_aura : public AuraScript
 {
-public:
-    spell_q12243_fire_upon_the_waters() : SpellScriptLoader("spell_q12243_fire_upon_the_waters") { }
+    PrepareAuraScript(spell_q12243_fire_upon_the_waters_aura);
 
-    class spell_q12243_fire_upon_the_waters_AuraScript : public AuraScript
+    void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_q12243_fire_upon_the_waters_AuraScript);
-
-        void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        std::list<Creature*> servants;
+        GetTarget()->GetCreatureListWithEntryInGrid(servants, 27233 /*NPC_ONSLAUGHT_DECKHAND*/, 40.0f);
+        for (std::list<Creature*>::const_iterator itr = servants.begin(); itr != servants.end(); ++itr)
         {
-            std::list<Creature*> servants;
-            GetTarget()->GetCreatureListWithEntryInGrid(servants, 27233 /*NPC_ONSLAUGHT_DECKHAND*/, 40.0f);
-            for (std::list<Creature*>::const_iterator itr = servants.begin(); itr != servants.end(); ++itr)
-            {
-                (*itr)->SetSpeed(MOVE_RUN, 0.7f, true);
-                (*itr)->GetMotionMaster()->MoveFleeing(GetTarget(), GetDuration());
-            }
+            (*itr)->SetSpeed(MOVE_RUN, 0.7f, true);
+            (*itr)->GetMotionMaster()->MoveFleeing(GetTarget(), GetDuration());
         }
+    }
 
-        void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            std::list<Creature*> servants;
-            GetTarget()->GetCreatureListWithEntryInGrid(servants, 27233 /*NPC_ONSLAUGHT_DECKHAND*/, 100.0f);
-            for (std::list<Creature*>::const_iterator itr = servants.begin(); itr != servants.end(); ++itr)
-                (*itr)->SetSpeed(MOVE_RUN, 1.1f, true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_q12243_fire_upon_the_waters_AuraScript::HandleApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_q12243_fire_upon_the_waters_AuraScript::HandleRemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_q12243_fire_upon_the_waters_AuraScript();
+        std::list<Creature*> servants;
+        GetTarget()->GetCreatureListWithEntryInGrid(servants, 27233 /*NPC_ONSLAUGHT_DECKHAND*/, 100.0f);
+        for (std::list<Creature*>::const_iterator itr = servants.begin(); itr != servants.end(); ++itr)
+            (*itr)->SetSpeed(MOVE_RUN, 1.1f, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_q12243_fire_upon_the_waters_aura::HandleApplyEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_q12243_fire_upon_the_waters_aura::HandleRemoveEffect, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1497,39 +1475,28 @@ private:
     bool _alive;
 };
 
-class spell_q24545_aod_special : public SpellScriptLoader
+class spell_q24545_aod_special : public SpellScript
 {
-public:
-    spell_q24545_aod_special() : SpellScriptLoader("spell_q24545_aod_special") { }
+    PrepareSpellScript(spell_q24545_aod_special);
 
-    class spell_q24545_aod_special_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_q24545_aod_special_SpellScript);
+        targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
+        Acore::Containers::RandomResize(targets, 2);
+    }
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            targets.remove_if(GhoulTargetCheck(GetSpellInfo()->Id == 70790));
-            Acore::Containers::RandomResize(targets, 2);
-        }
-
-        void HandleScript(SpellEffIndex effIndex)
-        {
-            PreventHitDefaultEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                if (target->GetTypeId() == TYPEID_UNIT)
-                    target->ToCreature()->AI()->DoAction(GetSpellInfo()->Id == 70790 ? -2 : -1);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_q24545_aod_special_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
-            OnEffectHitTarget += SpellEffectFn(spell_q24545_aod_special_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex effIndex)
     {
-        return new spell_q24545_aod_special_SpellScript();
+        PreventHitDefaultEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            if (target->GetTypeId() == TYPEID_UNIT)
+                target->ToCreature()->AI()->DoAction(GetSpellInfo()->Id == 70790 ? -2 : -1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_q24545_aod_special::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_q24545_aod_special::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2077,82 +2044,65 @@ enum StrengthenAncientsMisc
     NPC_LOTHALOR                = 26321
 };
 
-class spell_q12096_q12092_dummy : public SpellScriptLoader // Strengthen the Ancients: On Interact Dummy to Woodlands Walker
+class spell_q12096_q12092_dummy : public SpellScript
 {
-public:
-    spell_q12096_q12092_dummy() : SpellScriptLoader("spell_q12096_q12092_dummy") { }
+    PrepareSpellScript(spell_q12096_q12092_dummy);
 
-    class spell_q12096_q12092_dummy_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q12096_q12092_dummy_SpellScript);
+        return ValidateSpellInfo({ SPELL_CREATE_ITEM_BARK });
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            uint32 roll = rand() % 2;
-
-            Creature* tree = GetHitCreature();
-            Player* player = GetCaster()->ToPlayer();
-
-            if (!tree || !player)
-                return;
-
-            tree->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
-
-            if (roll == 1) // friendly version
-            {
-                tree->CastSpell(player, SPELL_CREATE_ITEM_BARK);
-                tree->AI()->Talk(SAY_WALKER_FRIENDLY, player);
-                tree->DespawnOrUnsummon(1000);
-            }
-            else if (roll == 0) // enemy version
-            {
-                tree->AI()->Talk(SAY_WALKER_ENEMY, player);
-                tree->SetFaction(FACTION_MONSTER);
-                tree->Attack(player, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_dummy_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_q12096_q12092_dummy_SpellScript();
+        uint32 roll = rand() % 2;
+
+        Creature* tree = GetHitCreature();
+        Player* player = GetCaster()->ToPlayer();
+
+        if (!tree || !player)
+            return;
+
+        tree->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+
+        if (roll == 1) // friendly version
+        {
+            tree->CastSpell(player, SPELL_CREATE_ITEM_BARK);
+            tree->AI()->Talk(SAY_WALKER_FRIENDLY, player);
+            tree->DespawnOrUnsummon(1000);
+        }
+        else if (roll == 0) // enemy version
+        {
+            tree->AI()->Talk(SAY_WALKER_ENEMY, player);
+            tree->SetFaction(FACTION_MONSTER);
+            tree->Attack(player, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_dummy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_q12096_q12092_bark : public SpellScriptLoader // Bark of the Walkers
+class spell_q12096_q12092_bark : public SpellScript
 {
-public:
-    spell_q12096_q12092_bark() : SpellScriptLoader("spell_q12096_q12092_bark") { }
+    PrepareSpellScript(spell_q12096_q12092_bark);
 
-    class spell_q12096_q12092_bark_SpellScript : public SpellScript
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_q12096_q12092_bark_SpellScript);
+        Creature* lothalor = GetHitCreature();
+        if (!lothalor || lothalor->GetEntry() != NPC_LOTHALOR)
+            return;
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            Creature* lothalor = GetHitCreature();
-            if (!lothalor || lothalor->GetEntry() != NPC_LOTHALOR)
-                return;
+        lothalor->AI()->Talk(SAY_LOTHALOR);
+        lothalor->RemoveAura(SPELL_CONFUSED);
+        lothalor->DespawnOrUnsummon(4000);
+    }
 
-            lothalor->AI()->Talk(SAY_LOTHALOR);
-            lothalor->RemoveAura(SPELL_CONFUSED);
-            lothalor->DespawnOrUnsummon(4000);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_bark_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q12096_q12092_bark_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_q12096_q12092_bark::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -2306,20 +2256,20 @@ void AddSC_dragonblight()
     RegisterSpellScript(spell_q12237_drop_off_villager);
     RegisterSpellScript(spell_call_wintergarde_gryphon);
     new npc_heated_battle();
-    new spell_q12478_frostmourne_cavern();
-    new spell_q12243_fire_upon_the_waters();
+    RegisterSpellScript(spell_q12478_frostmourne_cavern);
+    RegisterSpellScript(spell_q12243_fire_upon_the_waters_aura);
     new npc_q24545_lich_king();
     new at_q24545_frostmourne_cavern();
     new npc_q24545_wretched_ghoul();
-    new spell_q24545_aod_special();
+    RegisterSpellScript(spell_q24545_aod_special);
     new npc_q24545_vegard_dummy();
     new npc_q24545_vegard();
     new npc_spiritual_insight();
 
     // Theirs
     new npc_commander_eligor_dawnbringer();
-    new spell_q12096_q12092_dummy();
-    new spell_q12096_q12092_bark();
+    RegisterSpellScript(spell_q12096_q12092_dummy);
+    RegisterSpellScript(spell_q12096_q12092_bark);
     new npc_torturer_lecraft();
 
     RegisterSpellScript(spell_dragonblight_corrosive_spit);

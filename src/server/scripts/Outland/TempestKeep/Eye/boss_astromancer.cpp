@@ -17,6 +17,8 @@
 
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "the_eye.h"
 

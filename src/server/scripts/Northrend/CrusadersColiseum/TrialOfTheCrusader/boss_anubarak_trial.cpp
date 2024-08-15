@@ -19,6 +19,7 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "trial_of_the_crusader.h"
@@ -88,6 +89,7 @@ enum AnubSpells
     SPELL_SUBMERGE                              = 65981,
     SPELL_EMERGE                                = 65982,
     SPELL_BERSERK                               = 26662,
+    SPELL_CLEAR_ALL_DEBUFFS                     = 34098,
 
     SPELL_FREEZING_SLASH                        = 66012,
     SPELL_PENETRATING_COLD                      = 66013,
@@ -313,7 +315,7 @@ public:
                     {
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         bool berserk = me->HasAura(SPELL_BERSERK);
-                        me->RemoveAllAuras();
+                        DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                         if (berserk)
                             me->CastSpell(me, SPELL_BERSERK, true);
                         Talk(EMOTE_SUBMERGE);
@@ -681,7 +683,7 @@ public:
                     {
                         me->GetMotionMaster()->MoveIdle();
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        me->RemoveAllAuras();
+                        DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
                         me->CastSpell(me, SPELL_EXPOSE_WEAKNESS, true);
                         me->CastSpell(me, SPELL_SPIDER_FRENZY, true);
                         me->CastSpell(me, SPELL_SUBMERGE, false);

@@ -75,7 +75,7 @@ public:
         {
             // Resize
             typedef char* ptr;
-            size_t newSize = id + 1;
+            std::size_t newSize = id + 1;
             ptr* newArr = new ptr[newSize];
             memset(newArr, 0, newSize * sizeof(ptr));
             memcpy(newArr, _indexTable.AsChar, _indexTableSize * sizeof(ptr));

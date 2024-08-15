@@ -26,7 +26,6 @@ EndScriptData */
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Language.h"
-#include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -197,7 +196,7 @@ public:
 
             ChatHandler(playerTarget->GetSession()).SendSysMessage(LANG_RESET_SPELLS);
             if (!handler->GetSession() || handler->GetSession()->GetPlayer() != playerTarget)
-                handler->PSendSysMessage(LANG_RESET_SPELLS_ONLINE, handler->GetNameLink(playerTarget).c_str());
+                handler->PSendSysMessage(LANG_RESET_SPELLS_ONLINE, handler->GetNameLink(playerTarget));
         }
         else
         {
@@ -253,7 +252,7 @@ public:
             targetPlayer->SendTalentsInfoData(false);
             ChatHandler(targetPlayer->GetSession()).SendSysMessage(LANG_RESET_TALENTS);
             if (!handler->GetSession() || handler->GetSession()->GetPlayer() != targetPlayer)
-                handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(targetPlayer).c_str());
+                handler->PSendSysMessage(LANG_RESET_TALENTS_ONLINE, handler->GetNameLink(targetPlayer));
 
             Pet* pet = targetPlayer->GetPet();
             Pet::resetTalentsForAllPetsOf(targetPlayer, pet);
@@ -269,7 +268,7 @@ public:
             CharacterDatabase.Execute(stmt);
 
             std::string nameLink = handler->playerLink(target->GetName());
-            handler->PSendSysMessage(LANG_RESET_TALENTS_OFFLINE, nameLink.c_str());
+            handler->PSendSysMessage(LANG_RESET_TALENTS_OFFLINE, nameLink);
             return true;
         }
     }
@@ -282,14 +281,14 @@ public:
         if (caseName == "spells")
         {
             atLogin = AT_LOGIN_RESET_SPELLS;
-            sWorld->SendWorldText(LANG_RESETALL_SPELLS);
+            handler->SendWorldText(LANG_RESETALL_SPELLS);
             if (!handler->GetSession())
                 handler->SendSysMessage(LANG_RESETALL_SPELLS);
         }
         else if (caseName == "talents")
         {
             atLogin = AtLoginFlags(AT_LOGIN_RESET_TALENTS | AT_LOGIN_RESET_PET_TALENTS);
-            sWorld->SendWorldText(LANG_RESETALL_TALENTS);
+            handler->SendWorldText(LANG_RESETALL_TALENTS);
             if (!handler->GetSession())
                 handler->SendSysMessage(LANG_RESETALL_TALENTS);
         }
@@ -321,7 +320,7 @@ public:
         else
         {
             int16 deletedItemsCount = ResetItemsEquipped(targetPlayer);
-            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_EQUIPPED, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_EQUIPPED, deletedItemsCount, handler->GetNameLink(targetPlayer));
         }
 
         return true;
@@ -338,7 +337,7 @@ public:
         else
         {
             int16 deletedItemsCount = ResetItemsInBags(targetPlayer);
-            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_BAGS, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_BAGS, deletedItemsCount, handler->GetNameLink(targetPlayer));
         }
 
         return true;
@@ -355,7 +354,7 @@ public:
         else
         {
             int16 deletedItemsCount = ResetItemsInKeyring(targetPlayer);
-            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_KEYRING, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_KEYRING, deletedItemsCount, handler->GetNameLink(targetPlayer));
         }
 
         return true;
@@ -372,7 +371,7 @@ public:
         else
         {
             int16 deletedItemsCount = ResetItemsInCurrenciesList(targetPlayer);
-            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_CURRENCY, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_CURRENCY, deletedItemsCount, handler->GetNameLink(targetPlayer));
         }
 
         return true;
@@ -389,7 +388,7 @@ public:
         else
         {
             int16 deletedItemsCount = ResetItemsInBank(targetPlayer);
-            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_BANK, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_BANK, deletedItemsCount, handler->GetNameLink(targetPlayer));
         }
 
         return true;
@@ -406,7 +405,7 @@ public:
         else
         {
             int16 deletedItemsCount = ResetItemsInVendorBuyBackTab(targetPlayer);
-            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_BUYBACK, deletedItemsCount, handler->GetNameLink(targetPlayer).c_str());
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_BUYBACK, deletedItemsCount, handler->GetNameLink(targetPlayer));
         }
 
         return true;
@@ -431,7 +430,7 @@ public:
             int16 deletedItemsInCurrenciesListCount   = ResetItemsInCurrenciesList(targetPlayer);
             int16 deletedItemsInVendorBuyBackTabCount = ResetItemsInVendorBuyBackTab(targetPlayer);
 
-            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_ALL, handler->GetNameLink(targetPlayer).c_str(),
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_ALL, handler->GetNameLink(targetPlayer),
                 deletedItemsEquippedCount,
                 deletedItemsInBagsCount,
                 deletedItemsInBankCount,
@@ -464,7 +463,7 @@ public:
             int16 deletedItemsStandardBagsCount = ResetItemsDeleteStandardBags(targetPlayer);
             int16 deletedItemsBankBagsCount = ResetItemsDeleteBankBags(targetPlayer);
 
-            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_ALL_BAGS, handler->GetNameLink(targetPlayer).c_str(),
+            handler->PSendSysMessage(LANG_COMMAND_RESET_ITEMS_ALL_BAGS, handler->GetNameLink(targetPlayer),
                 deletedItemsEquippedCount,
                 deletedItemsInBagsCount,
                 deletedItemsInBankCount,

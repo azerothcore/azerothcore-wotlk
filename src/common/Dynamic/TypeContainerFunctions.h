@@ -24,10 +24,7 @@
  * to access or mutate the container.
  */
 
-#include "Define.h"
 #include "Dynamic/TypeList.h"
-#include <map>
-#include <unordered_map>
 
 namespace Acore
 {
@@ -159,31 +156,31 @@ namespace Acore
     /* ContainerMapList Helpers */
     // count functions
     template<class SPECIFIC_TYPE>
-    size_t Count(const ContainerMapList<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* /*fake*/)
+    std::size_t Count(const ContainerMapList<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* /*fake*/)
     {
         return elements._element.getSize();
     }
 
     template<class SPECIFIC_TYPE>
-    size_t Count(const ContainerMapList<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*fake*/)
+    std::size_t Count(const ContainerMapList<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*fake*/)
     {
         return 0;
     }
 
     template<class SPECIFIC_TYPE, class T>
-    size_t Count(const ContainerMapList<T>& /*elements*/, SPECIFIC_TYPE* /*fake*/)
+    std::size_t Count(const ContainerMapList<T>& /*elements*/, SPECIFIC_TYPE* /*fake*/)
     {
         return 0;
     }
 
     template<class SPECIFIC_TYPE, class T>
-    size_t Count(const ContainerMapList<TypeList<SPECIFIC_TYPE, T>>& elements, SPECIFIC_TYPE* fake)
+    std::size_t Count(const ContainerMapList<TypeList<SPECIFIC_TYPE, T>>& elements, SPECIFIC_TYPE* fake)
     {
         return Count(elements._elements, fake);
     }
 
     template<class SPECIFIC_TYPE, class H, class T>
-    size_t Count(const ContainerMapList<TypeList<H, T>>& elements, SPECIFIC_TYPE* fake)
+    std::size_t Count(const ContainerMapList<TypeList<H, T>>& elements, SPECIFIC_TYPE* fake)
     {
         return Count(elements._TailElements, fake);
     }

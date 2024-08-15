@@ -1,7 +1,6 @@
 #ifndef _REGULAR_GRID_H
 #define _REGULAR_GRID_H
 
-#include <G3D/BoundsTrait.h>
 #include <G3D/PositionTrait.h>
 #include <G3D/Ray.h>
 #include <G3D/Table.h>

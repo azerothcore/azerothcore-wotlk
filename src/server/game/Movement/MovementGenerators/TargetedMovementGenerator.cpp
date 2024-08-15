@@ -108,6 +108,14 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         mutualChase = true;
     }
 
+    // Prevent almost infinite spinning for pets with mutualTarget
+    // _mutualChase is false for previous check
+    if (angle && !mutualChase && !_mutualChase && mutualTarget && chaseRange < meleeRange && cOwner && cOwner->IsPet())
+    {
+        angle = Optional<ChaseAngle>();
+        mutualChase = true;
+    }
+
     // periodically check if we're already in the expected range...
     i_recheckDistance.Update(time_diff);
     if (i_recheckDistance.Passed())
@@ -512,7 +520,9 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(i_path->GetPath());
-        init.SetWalk(target->IsWalking() || target->movespline->isWalking());
+        if (_inheritWalkState)
+            init.SetWalk(target->IsWalking() || target->movespline->isWalking());
+
         if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
             init.SetVelocity(*velocity);
         init.Launch();

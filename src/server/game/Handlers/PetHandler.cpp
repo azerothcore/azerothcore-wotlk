@@ -16,6 +16,7 @@
  */
 
 #include "Common.h"
+#include "CharmInfo.h"
 #include "CreatureAI.h"
 #include "DisableMgr.h"
 #include "GameTime.h"
@@ -853,18 +854,6 @@ void WorldSession::HandlePetRename(WorldPacket& recvData)
     if (res != PET_NAME_SUCCESS)
     {
         SendPetNameInvalid(res, name, nullptr);
-        return;
-    }
-
-    if (sObjectMgr->IsReservedName(name))
-    {
-        SendPetNameInvalid(PET_NAME_RESERVED, name, nullptr);
-        return;
-    }
-
-    if (sObjectMgr->IsProfanityName(name))
-    {
-        SendPetNameInvalid(PET_NAME_PROFANE, name, nullptr);
         return;
     }
 

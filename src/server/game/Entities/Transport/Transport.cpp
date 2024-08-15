@@ -29,7 +29,6 @@
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "Vehicle.h"
-#include "World.h"
 #include "WorldModel.h"
 #include "Config.h"
 #include <chrono>

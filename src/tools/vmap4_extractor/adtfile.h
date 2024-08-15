@@ -75,8 +75,8 @@ public:
 const char* GetPlainName(const char* FileName);
 char* GetPlainName(char* FileName);
 char* GetExtension(char* FileName);
-void fixnamen(char* name, size_t len);
-void fixname2(char* name, size_t len);
-//void fixMapNamen(char *name, size_t len);
+void fixnamen(char* name, std::size_t len);
+void fixname2(char* name, std::size_t len);
+//void fixMapNamen(char *name, std::size_t len);
 
 #endif

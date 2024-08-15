@@ -81,6 +81,8 @@ enum Says
     SAY_RAISE_SKELETONS        = 1,
     SAY_SLAY                   = 2,
     SAY_DEATH                  = 3,
+    SAY_XHEALTH                = 14,
+    SAY_SHADOWFLAME            = 15,
 
     SAY_MAGE                   = 4,
     SAY_WARRIOR                = 5,
@@ -109,6 +111,7 @@ enum Paths
 
 enum GameObjects
 {
+    GO_DRAKONID_BONES          = 179804,
     GO_PORTCULLIS_ACTIVE       = 164726,
     GO_PORTCULLIS_TOBOSSROOMS  = 175186
 };
@@ -136,6 +139,8 @@ enum Spells
     SPELL_SHADOW_COMMAND            = 22667,
     SPELL_FEAR                      = 22678,
     SPELL_SHADOWBLINK               = 22664,
+    SPELL_RAISE_DRAKONID            = 23362,
+    SPELL_SUMMON_DRAKONID_CORPSE    = 23363,
 
     SPELL_NEFARIANS_BARRIER         = 22663,
 
@@ -272,6 +277,12 @@ public:
                     if (nefarian->GetMotionMaster()->GetCurrentMovementGeneratorType() == MovementGeneratorType::WAYPOINT_MOTION_TYPE)
                     {
                         nefarian->DespawnOrUnsummon();
+                    }
+                    std::list<GameObject*> drakonidBones;
+                    me->GetGameObjectListWithEntryInGrid(drakonidBones, GO_DRAKONID_BONES, DEFAULT_VISIBILITY_INSTANCE);
+                    for (auto const& bones : drakonidBones)
+                    {
+                        bones->DespawnOrUnsummon();
                     }
                 }
                 else
@@ -521,19 +532,10 @@ public:
 
 struct boss_nefarian : public BossAI
 {
-    boss_nefarian(Creature* creature) : BossAI(creature, DATA_NEFARIAN), _introDone(false)
-    {
-        Initialize();
-    }
-
-    void Initialize()
-    {
-        Phase3 = false;
-    }
+    boss_nefarian(Creature* creature) : BossAI(creature, DATA_NEFARIAN), _introDone(false) { }
 
     void Reset() override
     {
-        Initialize();
         me->SetReactState(REACT_PASSIVE);
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetCanFly(true);
@@ -552,6 +554,16 @@ struct boss_nefarian : public BossAI
         }
 
         classesPresent.clear();
+
+        ScheduleHealthCheckEvent(20, [&]
+        {
+            DoCastSelf(SPELL_RAISE_DRAKONID, true);
+            Talk(SAY_RAISE_SKELETONS);
+        });
+        ScheduleHealthCheckEvent(5, [&]
+        {
+            Talk(SAY_XHEALTH);
+        });
     }
 
     void JustEngagedWith(Unit* /*who*/) override {}
@@ -587,6 +599,7 @@ struct boss_nefarian : public BossAI
         if (id == 5)
         {
             DoCastAOE(SPELL_SHADOWFLAME_INITIAL);
+            Talk(SAY_SHADOWFLAME);
         }
     }
 
@@ -614,29 +627,6 @@ struct boss_nefarian : public BossAI
         events.ScheduleEvent(EVENT_TAILLASH, 10s);
         events.ScheduleEvent(EVENT_CLASSCALL, 30s, 35s);
         _introDone = true;
-    }
-
-    void DamageTaken(Unit* /*unit*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (me->HealthBelowPctDamaged(20, damage) && !Phase3)
-        {
-            std::list<Creature*> constructList;
-            me->GetCreatureListWithEntryInGrid(constructList, NPC_BONE_CONSTRUCT, 500.0f);
-            for (Creature* const& summon : constructList)
-            {
-                if (summon && !summon->IsAlive())
-                {
-                    summon->Respawn();
-                    summon->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    summon->SetReactState(REACT_AGGRESSIVE);
-                    summon->SetStandState(UNIT_STAND_STATE_STAND);
-                    DoZoneInCombat(summon);
-                }
-            }
-
-            Phase3 = true;
-            Talk(SAY_RAISE_SKELETONS);
-        }
     }
 
     void UpdateAI(uint32 diff) override
@@ -762,7 +752,6 @@ struct boss_nefarian : public BossAI
     }
 
 private:
-    bool Phase3;
     bool _introDone;
     std::set<uint8> classesPresent;
 };
@@ -797,7 +786,7 @@ struct npc_corrupted_totem : public ScriptedAI
         }
 
         me->AddAura(AURA_AVOIDANCE, me);
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
     }
 
     void SetAura(bool apply) const
@@ -877,8 +866,7 @@ struct npc_corrupted_totem : public ScriptedAI
     {
         me->SetInCombatWithZone();
 
-        _scheduler
-            .Schedule(1ms, [this](TaskContext context)
+        scheduler.Schedule(1ms, [this](TaskContext context)
             {
                 if (me->GetEntry() == NPC_TOTEM_C_FIRE_NOVA)
                 {
@@ -913,7 +901,7 @@ struct npc_corrupted_totem : public ScriptedAI
             SetAura(false);
         }
 
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
     }
 
     void UpdateAI(uint32 diff) override
@@ -923,11 +911,10 @@ struct npc_corrupted_totem : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
     }
 
     protected:
-        TaskScheduler _scheduler;
         bool _auraAdded;
 };
 
@@ -940,14 +927,14 @@ struct npc_drakonid_spawner : public ScriptedAI
         if (action == ACTION_SPAWNER_STOP)
         {
             me->RemoveAurasDueToSpell(SPELL_SPAWN_DRAKONID_GEN);
-            _scheduler.CancelAll();
+            scheduler.CancelAll();
         }
     }
 
     void IsSummonedBy(WorldObject* summoner) override
     {
         DoCastSelf(SPELL_SPAWN_DRAKONID_GEN);
-        _scheduler.Schedule(10s, 60s, [this](TaskContext /*context*/)
+        scheduler.Schedule(10s, 60s, [this](TaskContext /*context*/)
         {
             DoCastSelf(SPELL_SPAWN_CHROMATIC_DRAKONID);
         });
@@ -957,46 +944,29 @@ struct npc_drakonid_spawner : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
     }
 
     void SummonedCreatureDies(Creature* summon, Unit* /*unit*/) override
     {
-        if (summon->GetEntry() != NPC_BONE_CONSTRUCT)
+        if (Creature* victor = ObjectAccessor::GetCreature(*me, _owner))
         {
-            if (Creature* victor = ObjectAccessor::GetCreature(*me, _owner))
-            {
-                victor->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
-            }
-
-            ObjectGuid summonGuid = summon->GetGUID();
-
-            summon->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            summon->SetHomePosition(summon->GetPosition());
-
-            _scheduler.Schedule(1s, [this, summonGuid](TaskContext /*context*/)
-            {
-                if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
-                {
-                    construct->SetVisible(false);
-                }
-            }).Schedule(2s, [this, summonGuid](TaskContext /*context*/)
-            {
-                if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
-                {
-                    construct->UpdateEntry(NPC_BONE_CONSTRUCT, true);
-                    construct->SetReactState(REACT_PASSIVE);
-                    construct->SetStandState(UNIT_STAND_STATE_DEAD);
-                    construct->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    construct->SetCorpseRemoveTime(DAY * IN_MILLISECONDS);
-                    construct->SetVisible(true);
-                }
-            });
+            victor->AI()->DoAction(ACTION_NEFARIUS_ADD_KILLED);
         }
+
+        ObjectGuid summonGuid = summon->GetGUID();
+
+        scheduler.Schedule(1s, [this, summonGuid](TaskContext /*context*/)
+        {
+            if (Creature* construct = ObjectAccessor::GetCreature(*me, summonGuid))
+            {
+                construct->SetVisible(false);
+                construct->CastSpell(construct, SPELL_SUMMON_DRAKONID_CORPSE, true);
+            }
+        });
     }
 
 protected:
-    TaskScheduler _scheduler;
     ObjectGuid _owner;
 };
 

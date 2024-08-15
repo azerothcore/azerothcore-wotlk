@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS `pool_creature` (
   CONSTRAINT `pool_creature_chk_1` CHECK ((`chance` >= 0))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.pool_creature: ~1 501 rows (approximately)
+-- Dumping data for table acore_world.pool_creature: ~1 496 rows (approximately)
 DELETE FROM `pool_creature`;
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
 	(910, 1020, 0, 'High Priestess Hai\'watna (11383) - Spawn 1'),
@@ -171,7 +171,6 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 	(45860, 1030, 0, 'Lord Captain Wyrmak (14445) - Spawn 1'),
 	(47302, 1550, 0, 'BRD Lyceum shadowforge flame keepers'),
 	(47303, 1550, 0, 'BRD Lyceum shadowforge flame keepers'),
-	(48204, 1028, 0, 'Gilmorian (14447) - Spawn 1'),
 	(48345, 1033, 0, 'Molt Thorn (14448) - Spawn 1'),
 	(49058, 1023, 0, 'Rippa (14490) - Spawn 1'),
 	(49120, 478, 0, 'ZG Before Bats Troll 3-Pack entry 11351'),
@@ -740,7 +739,6 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 	(134377, 1041, 0, 'Spiteflayer (8299) - Spawn 13'),
 	(134378, 1041, 0, 'Spiteflayer (8299) - Spawn 14'),
 	(134379, 1041, 0, 'Spiteflayer (8299) - Spawn 15'),
-	(134380, 1042, 0, 'Teremus the Devourer (7846) - Spawn 1'),
 	(134381, 1043, 0, 'Deathmaw (10077) - Spawn 1'),
 	(134382, 1043, 0, 'Deathmaw (10077) - Spawn 2'),
 	(134383, 1043, 0, 'Deathmaw (10077) - Spawn 3'),
@@ -1227,17 +1225,14 @@ INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALU
 	(151924, 1083, 0, 'Speaker Mar\'grom (18693)'),
 	(151925, 1083, 0, 'Speaker Mar\'grom (18693)'),
 	(151926, 1083, 0, 'Speaker Mar\'grom (18693)'),
-	(151928, 1084, 100, 'Voidhunter Yar Spawnlocation 1'),
 	(151933, 1079, 0, 'Fulgore Spawnlocation 2'),
 	(151934, 1086, 0, 'Old Crystalbark - Spawnlocation 1'),
 	(151935, 1086, 0, 'Old Crystalbark - Spawnlocation 2'),
 	(151936, 1086, 0, 'Old Crystalbark - Spawnlocation 3'),
 	(151937, 1086, 0, 'Old Crystalbark - Spawnlocation 4'),
-	(151938, 1087, 100, 'Fumblub Gearwind - Spawnlocation 1'),
 	(151939, 1088, 0, 'Icehorn - Spawnlocation 1'),
 	(151940, 1088, 0, 'Icehorn Spawnlocation 2'),
 	(151941, 1088, 0, 'Icehorn Spawnlocation 3'),
-	(151942, 1089, 100, 'Crazed Indu le Survivor - Spawnlocation 1'),
 	(151943, 1090, 0, 'Scarlet Highlord Daion Spawnlocation 1'),
 	(151944, 1090, 0, 'Scarlet Highlord Daion Spawnlocation 2'),
 	(151945, 1090, 0, 'Scarlet Highlord Daion Spawnlocation 3'),

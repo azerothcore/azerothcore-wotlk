@@ -33,6 +33,8 @@
 #include "WorldSession.h"
 #include <iostream>
 
+#include "SpellMgr.h"
+
 class Player;
 //class Map;
 
@@ -102,10 +104,11 @@ namespace Acore
         float i_distSq;
         TeamId teamId;
         Player const* skipped_receiver;
-        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr)
+        bool required3dDist;
+        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr, bool req3dDist = false)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
             , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
-            , skipped_receiver(skipped)
+            , skipped_receiver(skipped), required3dDist(req3dDist)
         {
         }
         void Visit(PlayerMapType& m);
@@ -1706,7 +1709,7 @@ namespace Acore
 
         ~LocalizedPacketDo()
         {
-            for (size_t i = 0; i < i_data_cache.size(); ++i)
+            for (std::size_t i = 0; i < i_data_cache.size(); ++i)
                 delete i_data_cache[i];
         }
         void operator()(Player* p);
@@ -1726,8 +1729,8 @@ namespace Acore
 
         ~LocalizedPacketListDo()
         {
-            for (size_t i = 0; i < i_data_cache.size(); ++i)
-                for (size_t j = 0; j < i_data_cache[i].size(); ++j)
+            for (std::size_t i = 0; i < i_data_cache.size(); ++i)
+                for (std::size_t j = 0; j < i_data_cache[i].size(); ++j)
                     delete i_data_cache[i][j];
         }
         void operator()(Player* p);
