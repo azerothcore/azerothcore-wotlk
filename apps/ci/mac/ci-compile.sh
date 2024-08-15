@@ -11,7 +11,8 @@ ccache -s
 cd var/build/obj
 
 # Debug code
-ls $(brew --prefix mysql)/include/mysql
+echo "mysql folder content:"
+ls $(brew --prefix mysql)
 head $(brew --prefix mysql)/lib/libmysqlclient.dylib
 
 time cmake ../../../ \
