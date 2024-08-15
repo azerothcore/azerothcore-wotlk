@@ -31,4 +31,9 @@ if ! command -v cmake &>/dev/null ; then
 fi
 ##########################################
 
-brew install openssl@3 readline boost bash-completion curl unzip mysql ccache
+# DEBUG: speedup feedback loop
+# brew install openssl@3 readline boost bash-completion curl unzip mysql ccache
+brew install mysql 
+
+ls -la $(brew --prefix mysql)
+head $(brew --prefix mysql)/lib/libmysqlclient.dylib
