@@ -79,7 +79,7 @@ enum Spells
     SPELL_FLAME_STRIKE                  = 36735,
     SPELL_FLAME_STRIKE_DAMAGE           = 36731,
 
-    // Event
+    // transition scene spells
     SPELL_NETHERBEAM_AURA1              = 36364,
     SPELL_NETHERBEAM_AURA2              = 36370,
     SPELL_NETHERBEAM_AURA3              = 36371,
@@ -138,57 +138,43 @@ enum Spells
     SPELL_SILENCE                       = 30225
 };
 
-enum Misc
+enum Phases
 {
-    POINT_MIDDLE                        = 1,
-    POINT_AIR                           = 2,
-    POINT_START_LAST_PHASE              = 3,
-    DATA_RESURRECT_CAST                 = 1,
-    NPC_WORLD_TRIGGER                   = 19871,
-    NPC_NETHER_VAPOR                    = 21002,
-    NPC_NETHERSTRAND_LONGBOW            = 21268,
-    NPC_STAFF_OF_DISINTEGRATION         = 21274,
-
     PHASE_NONE                          = 0,
     PHASE_SINGLE_ADVISOR                = 1,
     PHASE_WEAPONS                       = 2,
     PHASE_TRANSITION                    = 3,
     PHASE_ALL_ADVISORS                  = 4,
-    PHASE_FINAL                         = 5,
+    PHASE_FINAL                         = 5
+};
 
-    EVENT_PREFIGHT_PHASE11              = 1,
-    EVENT_PREFIGHT_PHASE12              = 2,
-    EVENT_PREFIGHT_PHASE21              = 3,
-    EVENT_PREFIGHT_PHASE22              = 4,
-    EVENT_PREFIGHT_PHASE31              = 5,
-    EVENT_PREFIGHT_PHASE32              = 6,
-    EVENT_PREFIGHT_PHASE41              = 7,
-    EVENT_PREFIGHT_PHASE42              = 8,
-    EVENT_PREFIGHT_PHASE51              = 9,
-    EVENT_PREFIGHT_PHASE52              = 10,
-    EVENT_PREFIGHT_PHASE61              = 11,
-    EVENT_PREFIGHT_PHASE62              = 12,
-    EVENT_PREFIGHT_PHASE63              = 13,
-    EVENT_PREFIGHT_PHASE71              = 14,
-    EVENT_GATHER_ADVISORS               = 15,
+enum Misc
+{
+    POINT_MIDDLE                        = 1,
+    POINT_AIR                           = 2,
+    POINT_START_LAST_PHASE              = 3,
 
-    EVENT_SPELL_SEQ_1                   = 30,
-    EVENT_SPELL_SEQ_2                   = 31,
-    EVENT_SPELL_SEQ_3                   = 32,
-    EVENT_SPELL_FIREBALL                = 33,
-    EVENT_SPELL_PYROBLAST               = 34,
-    EVENT_SPELL_FLAMESTRIKE             = 35,
-    EVENT_SPELL_ARCANE_DISRUPTION       = 36,
-    EVENT_SPELL_MIND_CONTROL            = 37,
-    EVENT_SPELL_SUMMON_PHOENIX          = 38,
-    EVENT_CHECK_HEALTH                  = 39,
-    EVENT_SPELL_GRAVITY_LAPSE           = 40,
-    EVENT_GRAVITY_LAPSE_END             = 41,
-    EVENT_SPELL_SHOCK_BARRIER           = 42,
-    EVENT_SPELL_NETHER_BEAM             = 43,
-    EVENT_SPELL_NETHER_VAPOR            = 44,
+    DATA_RESURRECT_CAST                 = 1,
 
-    EVENT_SCENE_1                       = 50,
+    NPC_WORLD_TRIGGER                   = 19871,
+    NPC_NETHER_VAPOR                    = 21002,
+    NPC_NETHERSTRAND_LONGBOW            = 21268,
+    NPC_STAFF_OF_DISINTEGRATION         = 21274,
+};
+
+enum PreFightEvents
+{
+    EVENT_PREFIGHT_PHASE1_01              = 1,
+    EVENT_PREFIGHT_PHASE1_02              = 2,
+    EVENT_PREFIGHT_PHASE5_01              = 3,
+    EVENT_PREFIGHT_PHASE5_02              = 4,
+    EVENT_PREFIGHT_PHASE6_02              = 5,
+    EVENT_PREFIGHT_PHASE6_03              = 6,
+};
+
+enum TransitionScene
+{
+    EVENT_SCENE_1                       = 50, // NYI
     EVENT_SCENE_2                       = 51,
     EVENT_SCENE_3                       = 52,
     EVENT_SCENE_4                       = 53,
@@ -296,15 +282,6 @@ struct boss_kaelthas : public BossAI
         SetRoomState(GO_STATE_READY);
         me->SetDisableGravity(false);
         me->SetWalk(false);
-        ScheduleHealthCheckEvent(50, [&]{
-            scheduler.CancelAll();
-            me->CastStop();
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetReactState(REACT_PASSIVE);
-            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
-            me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-            me->SendMeleeAttackStop();
-        });
     }
 
     void AttackStart(Unit* who) override
@@ -313,17 +290,23 @@ struct boss_kaelthas : public BossAI
             BossAI::AttackStart(who);
     }
 
+    void JustReachedHome() override
+    {
+        Reset();
+    }
+
     void MoveInLineOfSight(Unit* who) override
     {
         if (_phase == PHASE_NONE && who->GetTypeId() == TYPEID_PLAYER && me->IsValidAttackTarget(who))
         {
             _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             Talk(SAY_INTRO);
             ScheduleUniqueTimedEvent(23s, [&]
             {
                 Talk(SAY_INTRO_THALADRED);
-            }, EVENT_PREFIGHT_PHASE11);
+            }, EVENT_PREFIGHT_PHASE1_01);
             ScheduleUniqueTimedEvent(30s, [&]
             {
                 if (Creature* thaladred = summons.GetCreatureWithEntry(NPC_THALADRED))
@@ -334,13 +317,8 @@ struct boss_kaelthas : public BossAI
                         thaladred->AI()->AttackStart(target);
                     thaladred->SetInCombatWithZone();
                 }
-            }, EVENT_PREFIGHT_PHASE12);
+            }, EVENT_PREFIGHT_PHASE1_02);
         }
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        BossAI::JustEngagedWith(who);
     }
 
     void KilledUnit(Unit* victim) override
@@ -376,7 +354,7 @@ struct boss_kaelthas : public BossAI
                     Talk(SAY_PHASE2_WEAPON);
                     DoCastSelf(SPELL_SUMMON_WEAPONS);
                     _phase = PHASE_WEAPONS;
-                }, EVENT_PREFIGHT_PHASE51);
+                }, EVENT_PREFIGHT_PHASE5_01);
                 ScheduleUniqueTimedEvent(9s, [&]{
                     summons.DoForAllSummons([&](WorldObject* summon)
                     {
@@ -397,7 +375,7 @@ struct boss_kaelthas : public BossAI
                     {
                         PhaseAllAdvisorsExecute();
                     });
-                }, EVENT_PREFIGHT_PHASE52);
+                }, EVENT_PREFIGHT_PHASE5_02);
                 break;
             case ACTION_PROGRESS_PHASE_CHECK:
                 if (_phase == PHASE_ALL_ADVISORS)
@@ -671,7 +649,7 @@ struct boss_kaelthas : public BossAI
         Talk(SAY_PHASE3_ADVANCE);
         ScheduleUniqueTimedEvent(6s, [&]{
             DoCastSelf(SPELL_RESURRECTION);
-        }, EVENT_PREFIGHT_PHASE62);
+        }, EVENT_PREFIGHT_PHASE6_02);
         ScheduleUniqueTimedEvent(12s, [&]{
             _phase = PHASE_ALL_ADVISORS;
             summons.DoForAllSummons([&](WorldObject* summon)
@@ -694,7 +672,7 @@ struct boss_kaelthas : public BossAI
             {
                 PhaseKaelExecute();
             });
-        }, EVENT_PREFIGHT_PHASE63);
+        }, EVENT_PREFIGHT_PHASE6_03);
     }
 
     void PhaseKaelExecute()
@@ -703,7 +681,7 @@ struct boss_kaelthas : public BossAI
         Talk(SAY_PHASE4_INTRO2);
         _phase = PHASE_FINAL;
         DoResetThreatList();
-        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
         {
             AttackStart(target);
@@ -721,7 +699,6 @@ struct boss_kaelthas : public BossAI
             Talk(SAY_SUMMON_PHOENIX);
             DoCastSelf(SPELL_PHOENIX);
         }, 35450ms, 41550ms);
-        //sequence
         ScheduleTimedEvent(20s, 23s, [&]
         {
             if (roll_chance_i(50))
@@ -756,12 +733,32 @@ struct boss_kaelthas : public BossAI
             return;
 
         DoMeleeAttackIfReady();
+
+        ScheduleHealthCheckEvent(50, [&]{
+            scheduler.CancelAll();
+            me->CastStop();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetReactState(REACT_PASSIVE);
+            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
+            me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
+            me->SendMeleeAttackStop();
+
+            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
+            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                {
+                   target->AttackStop();
+                }
+            }
+        });
     }
 
     bool CheckEvadeIfOutOfCombatArea() const override
     {
         return me->GetHomePosition().GetExactDist2d(me) > 165.0f || !SelectTargetFromPlayerList(165.0f);
     }
+
 private:
     uint32 _phase;
 };
