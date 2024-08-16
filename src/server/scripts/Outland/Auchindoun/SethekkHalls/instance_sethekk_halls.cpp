@@ -61,8 +61,9 @@ public:
 
         void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
-            if (!GetCreature(DATA_VOICE_OF_THE_RAVEN_GOD) && GetBossState(DATA_ANZU) != DONE)
-                instance->SummonCreature(NPC_VOICE_OF_THE_RAVEN_GOD, Position(-88.02f, 288.18f, 75.2f, 6.0f));
+            if (eventId == anzuSummonEventId)
+                if (!GetCreature(DATA_VOICE_OF_THE_RAVEN_GOD) && GetBossState(DATA_ANZU) != DONE)
+                    instance->SummonCreature(NPC_VOICE_OF_THE_RAVEN_GOD, Position(-88.02f, 288.18f, 75.2f, 6.0f));
         }
     };
 };
