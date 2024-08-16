@@ -5443,22 +5443,28 @@ void bot_ai::CalculateAttackPos(Unit* target, Position& pos, bool& force) const
                 Player const* pl = itr->GetSource();
                 if (!pl || !pl->IsInMap(me) || pl->GetDistance(me) > VISIBILITY_DISTANCE_NORMAL)
                     continue;
-                if (pl->IsAlive() && IsTank(pl))
+                if (pl->IsAlive() && !pl->HasUnitState(UNIT_STATE_ISOLATED) && IsTank(pl))
                     safetyTargets.push_back(pl);
                 if (!pl->HaveBot())
                     continue;
                 BotMap const* map = pl->GetBotMgr()->GetBotMap();
                 for (BotMap::const_iterator citr = map->begin(); citr != map->end(); ++citr)
-                    if (citr->second && citr->second->IsAlive() && IsTank(citr->second) && citr->second->GetBotAI()->HasRole(BOT_ROLE_DPS))
-                        safetyTargets.push_back(citr->second);
+                {
+                    Creature const* c = citr->second;
+                    if (c && c->IsInWorld() && me->GetMap() == c->FindMap() && c->IsAlive() && !c->HasUnitState(UNIT_STATE_ISOLATED) && IsTank(c) && c->GetBotAI()->HasRole(BOT_ROLE_DPS))
+                        safetyTargets.push_back(c);
+                }
             }
         }
         else
         {
             BotMap const* map = master->GetBotMgr()->GetBotMap();
             for (BotMap::const_iterator citr = map->begin(); citr != map->end(); ++citr)
-                if (citr->second && citr->second->IsAlive() && IsTank(citr->second) && citr->second->GetBotAI()->HasRole(BOT_ROLE_DPS))
-                    safetyTargets.push_back(citr->second);
+            {
+                Creature const* c = citr->second;
+                if (c && c->IsInWorld() && me->GetMap() == c->FindMap() && c->IsAlive() && !c->HasUnitState(UNIT_STATE_ISOLATED) && IsTank(c) && c->GetBotAI()->HasRole(BOT_ROLE_DPS))
+                    safetyTargets.push_back(c);
+            }
         }
         if (safetyTargets.empty() && master->IsAlive())
             safetyTargets.push_back(master);
