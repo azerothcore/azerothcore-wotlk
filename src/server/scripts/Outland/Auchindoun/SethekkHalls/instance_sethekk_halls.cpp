@@ -34,7 +34,7 @@ ObjectData const gameObjectData[] =
 ObjectData const creatureData[] =
 {
     { NPC_VOICE_OF_THE_RAVEN_GOD, DATA_VOICE_OF_THE_RAVEN_GOD },
-    { 0,                                                      }
+    { 0,                          0                           }
 };
 
 const uint32 anzuSummonEventId = 14797;
