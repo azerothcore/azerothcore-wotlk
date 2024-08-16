@@ -3,7 +3,7 @@ if ! command -v lsb_release &>/dev/null ; then
 fi
 
 DEBIAN_VERSION=$(lsb_release -sr)
-DEBIAN_VERSION_MIN="11"
+DEBIAN_VERSION_MIN="12"
 
 if [[ $DEBIAN_VERSION -lt $DEBIAN_VERSION_MIN ]]; then
   echo "########## ########## ##########"
