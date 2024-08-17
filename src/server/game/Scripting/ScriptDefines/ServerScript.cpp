@@ -43,6 +43,15 @@ void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
     CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_SOCKET_CLOSE, script->OnSocketClose(socket));
 }
 
+void ScriptMgr::OnPacketReceived(WorldSession* session, WorldPacket const& packet)
+{
+    WorldPacket copy(packet);
+    ExecuteScript<ServerScript>([&](ServerScript* script)
+    {
+        script->OnPacketReceived(session, copy);
+    });
+}
+
 bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
 {
     ASSERT(session);
