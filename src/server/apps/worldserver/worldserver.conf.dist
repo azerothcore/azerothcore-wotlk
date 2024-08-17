@@ -4455,6 +4455,26 @@ Debug.Arena = 0
 #
 ###################################################################################################
 
+# PVP Announcers#
+###################
+#
+#     KilledByCreature.Announcer
+#        Announce Player Killed by Creature to server.
+#        Default:     1 (Default)
+#                      0 (Disabled)
+
+KilledByCreature.Announcer = 1
+
+#
+#     PvPKill.Announcer
+#        Announce Player Killed by PVP to server.
+#        Default:     1 (Default)
+#                      0 (Disabled)
+
+PvPKill.Announcer = 1
+
+#
+
 ###################################################################################################
 # NPCBOT CONFIGURATION
 #
