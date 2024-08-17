@@ -2078,13 +2078,13 @@ public:
         }
         if (!owner->IsAlive())
         {
-            handler->GetSession()->SendNotification("You are dead");
+            handler->SendNotification("You are dead");
             handler->SetSentErrorMessage(true);
             return false;
         }
         if (owner->GetBotMgr()->IsPartyInCombat())
         {
-            handler->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
+            handler->SendNotification(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2107,13 +2107,13 @@ public:
         }
         if (!owner->IsAlive())
         {
-            handler->GetSession()->SendNotification("You are dead");
+            handler->SendNotification("You are dead");
             handler->SetSentErrorMessage(true);
             return false;
         }
         if (owner->GetBotMgr()->IsPartyInCombat() && (owner->IsPvP() || owner->IsFFAPvP()))
         {
-            handler->GetSession()->SendNotification("You can't do that while in PvP combat");
+            handler->SendNotification("You can't do that while in PvP combat");
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2445,7 +2445,7 @@ public:
         }
         if (owner->GetBotMgr()->IsPartyInCombat())
         {
-            handler->GetSession()->SendNotification(LANG_YOU_IN_COMBAT);
+            handler->SendNotification(LANG_YOU_IN_COMBAT);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -2509,13 +2509,13 @@ public:
         }
         if (!owner->IsAlive())
         {
-            handler->GetSession()->SendNotification("You are dead");
+            handler->SendNotification("You are dead");
             handler->SetSentErrorMessage(true);
             return false;
         }
         if (owner->GetBotMgr()->IsPartyInCombat() && (owner->IsPvP() || owner->IsFFAPvP()))
         {
-            handler->GetSession()->SendNotification("You can't do that while in PvP combat");
+            handler->SendNotification("You can't do that while in PvP combat");
             handler->SetSentErrorMessage(true);
             return false;
         }

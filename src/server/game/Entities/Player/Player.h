@@ -20,6 +20,7 @@
 
 #include "ArenaTeam.h"
 #include "Battleground.h"
+#include "CharmInfo.h"
 #include "CharacterCache.h"
 #include "CinematicMgr.h"
 #include "DBCStores.h"

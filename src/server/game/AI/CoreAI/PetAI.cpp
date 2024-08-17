@@ -16,6 +16,7 @@
  */
 
 #include "PetAI.h"
+#include "CharmInfo.h"
 #include "Creature.h"
 #include "Errors.h"
 #include "Group.h"

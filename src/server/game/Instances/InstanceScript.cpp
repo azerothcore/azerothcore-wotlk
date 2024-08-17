@@ -16,6 +16,7 @@
  */
 
 #include "InstanceScript.h"
+#include "Chat.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
 #include "GameObject.h"
@@ -606,7 +607,7 @@ void InstanceScript::DoSendNotifyToInstance(char const* format, ...)
 
         instance->DoForAllPlayers([&, buff](Player* player)
         {
-            player->GetSession()->SendNotification("%s", buff);
+            ChatHandler(player->GetSession()).SendNotification("{}", buff);
         });
     }
 }

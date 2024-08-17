@@ -45,6 +45,11 @@ char const* ChatHandler::GetAcoreString(uint32 entry) const
     return m_session->GetAcoreString(entry);
 }
 
+std::string const* ChatHandler::GetModuleString(std::string module, uint32 id) const
+{
+    return m_session->GetModuleString(module, id);
+}
+
 bool ChatHandler::IsAvailable(uint32 securityLevel) const
 {
     // check security level only for simple  command (without child commands)
@@ -99,6 +104,17 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     return false;
 }
 
+void ChatHandler::SendNotification(std::string_view str)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+    for (std::string_view line : lines)
+    {
+        WorldPacket data(SMSG_NOTIFICATION, line.size() + 1);
+        data << line.data();
+        m_session->SendPacket(&data);
+    }
+}
+
 void ChatHandler::SendGMText(std::string_view str)
 {
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
@@ -106,16 +122,11 @@ void ChatHandler::SendGMText(std::string_view str)
     if (AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
         return;
 
-    // Player should be in world
-    Player* player = m_session->GetPlayer();
-    if (!player || !player->IsInWorld())
-        return;
-
     for (std::string_view line : lines)
     {
         WorldPacket data;
         ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
-        player->SendDirectMessage(&data);
+        m_session->SendPacket(&data);
     }
 }
 
@@ -123,15 +134,11 @@ void ChatHandler::SendWorldText(std::string_view str)
 {
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
 
-    Player* player = m_session->GetPlayer();
-    if (!player || !player->IsInWorld())
-        return;
-
     for (std::string_view line : lines)
     {
         WorldPacket data;
         ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
-        player->SendDirectMessage(&data);
+        m_session->SendPacket(&data);
     }
 }
 
@@ -140,9 +147,6 @@ void ChatHandler::SendWorldTextOptional(std::string_view str, uint32 flag)
     std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
 
     Player* player = m_session->GetPlayer();
-    if (!player || !player->IsInWorld())
-        return;
-
     if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
         if (player->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
             return;
@@ -429,6 +433,23 @@ Player* ChatHandler::getSelectedPlayerOrSelf() const
         targetPlayer = m_session->GetPlayer();
 
     return targetPlayer;
+}
+
+bool ChatHandler::HasSession() const
+{
+    if (!m_session)
+        return false;
+
+    return true;
+}
+
+void ChatHandler::DoForAllValidSessions(std::function<void(Player*)> exec)
+{
+    SessionMap::const_iterator itr;
+    for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        if (Player* player = itr->second->GetPlayer())
+            if (player->IsInWorld())
+                exec(player);
 }
 
 char* ChatHandler::extractKeyFromLink(char* text, char const* linkType, char** something1)
@@ -949,6 +970,11 @@ LocaleConstant CliHandler::GetSessionDbcLocale() const
 int CliHandler::GetSessionDbLocaleIndex() const
 {
     return sObjectMgr->GetDBCLocaleIndex();
+}
+
+bool CliHandler::HasSession() const
+{
+    return true;
 }
 
 bool AddonChannelCommandHandler::ParseCommands(std::string_view str)
