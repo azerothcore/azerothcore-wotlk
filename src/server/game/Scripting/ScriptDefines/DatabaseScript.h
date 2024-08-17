@@ -52,6 +52,13 @@ public:
      */
     virtual void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> /*creatureTemplates*/) { }
 
+    [[nodiscard]] virtual bool OnDatabasesLoading() { return true; }
+    virtual void OnDatabasesKeepAlive() { }
+    virtual void OnDatabasesClosing() { }
+    virtual void OnDatabaseWarnAboutSyncQueries(bool /*apply*/) { }
+    virtual void OnDatabaseSelectIndexLogout(Player* /*player*/, uint32& /*statementIndex*/, uint32& /*statementParam*/) { }
+    virtual void OnDatabaseGetDBRevision(std::string& /*revision*/) { }
+
 };
 
 #endif
