@@ -828,25 +828,29 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // cast spells after mark quest complete (some spells have quest completed state requirements in spell_area data)
     if (quest->GetRewSpellCast() > 0)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpellCast());
-        if (questGiver->isType(TYPEMASK_UNIT) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM) && !spellInfo->IsSelfCast())
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpellCast()))
         {
-            if (Creature* creature = GetMap()->GetCreature(questGiver->GetGUID()))
-                creature->CastSpell(this, quest->GetRewSpellCast(), true);
+            if (questGiver->isType(TYPEMASK_UNIT) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM) && !spellInfo->IsSelfCast())
+            {
+                if (Creature* creature = GetMap()->GetCreature(questGiver->GetGUID()))
+                    creature->CastSpell(this, quest->GetRewSpellCast(), true);
+            }
+            else
+                CastSpell(this, quest->GetRewSpellCast(), true);
         }
-        else
-            CastSpell(this, quest->GetRewSpellCast(), true);
     }
     else if (quest->GetRewSpell() > 0)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpell());
-        if (questGiver->isType(TYPEMASK_UNIT) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM) && !spellInfo->IsSelfCast())
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpell()))
         {
-            if (Creature* creature = GetMap()->GetCreature(questGiver->GetGUID()))
-                creature->CastSpell(this, quest->GetRewSpell(), true);
+            if (questGiver->isType(TYPEMASK_UNIT) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL) && !spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM) && !spellInfo->IsSelfCast())
+            {
+                if (Creature* creature = GetMap()->GetCreature(questGiver->GetGUID()))
+                    creature->CastSpell(this, quest->GetRewSpell(), true);
+            }
+            else
+                CastSpell(this, quest->GetRewSpell(), true);
         }
-        else
-            CastSpell(this, quest->GetRewSpell(), true);
     }
 
     if (quest->GetZoneOrSort() > 0)
