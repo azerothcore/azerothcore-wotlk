@@ -1090,6 +1090,11 @@ void WorldObject::setActive(bool on)
     if (GetTypeId() == TYPEID_PLAYER)
         return;
 
+    //npcbot: bots should never be removed from active
+    if (on == false && IsNPCBotOrPet())
+        return;
+    //end npcbot
+
     m_isActive = on;
 
     if (on && !IsInWorld())
@@ -1149,6 +1154,10 @@ void WorldObject::SetPositionDataUpdate()
     // Calls immediately for charmed units
     if (GetTypeId() == TYPEID_UNIT && ToUnit()->IsCharmedOwnedByPlayerOrPlayer())
         UpdatePositionData();
+    //npcbot
+    else if (IsNPCBotOrPet() && ToUnit()->IsControlledByPlayer())
+        UpdatePositionData();
+    //end npcbot
 }
 
 void WorldObject::UpdatePositionData()
@@ -1881,6 +1890,26 @@ bool WorldObject::CanDetect(WorldObject const* obj, bool ignoreStealth, bool che
 {
     WorldObject const* seer = this;
 
+    //npcbot: master's sight only partially affects bots
+    if (IsNPCBot())
+    {
+        Unit const* owner = ToCreature()->GetBotOwner();
+        if (!owner)
+            owner = ToUnit();
+
+        if (!obj->IsAlwaysDetectableFor(seer) && !obj->IsAlwaysDetectableFor(owner) && !ignoreStealth)
+        {
+            if (!seer->CanDetectInvisibilityOf(obj) && !(owner->IsInWorld() && owner->GetMap()->IsDungeon() && owner->CanDetectInvisibilityOf(obj)))
+                return false;
+
+            if (!seer->CanDetectStealthOf(obj, checkAlert))
+                return false;
+        }
+
+        return true;
+    }
+    //end npcbot
+
     // Pets don't have detection, they use the detection of their masters
     if (Unit const* thisUnit = ToUnit())
         if (Unit* controller = thisUnit->GetCharmerOrOwner())
@@ -2228,6 +2257,11 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
             summon = new Puppet(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty);
             break;
         case UNIT_MASK_TOTEM:
+            //npcbot: totem emul step 1
+            if (summoner && summoner->IsNPCBot())
+                summon = new Totem(properties, summoner->ToCreature()->GetBotOwner()->GetGUID());
+            else
+            //end npcbot
             summon = new Totem(properties, summoner ? summoner->GetGUID() : ObjectGuid::Empty);
             break;
         case UNIT_MASK_MINION:
@@ -2244,6 +2278,25 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
         return nullptr;
     }
 
+    //npcbot: totem emul step 2
+    if (summoner && summoner->IsNPCBot())
+    {
+        summon->SetCreatorGUID(summoner->GetGUID()); // see TempSummon::InitStats()
+        if (mask == UNIT_MASK_TOTEM)
+        {
+            summon->SetFaction(summoner->ToCreature()->GetFaction());
+            summon->SetPvP(summoner->ToCreature()->IsPvP());
+            //set key flags if needed
+            if (!summoner->ToCreature()->IsFreeBot())
+            {
+                summon->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
+                summon->SetOwnerGUID(summoner->ToCreature()->GetBotOwner()->GetGUID());
+                summon->SetControlledByPlayer(true);
+            }
+        }
+    }
+    //end npcbot
+
     summon->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);
 
     summon->SetHomePosition(pos);
@@ -2259,6 +2312,11 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
     }
 
     summon->InitSummon();
+
+    //npcbot: totem emul step 3
+    if (summoner && summoner->IsNPCBot())
+        summoner->ToCreature()->OnBotSummon(summon);
+    //end npcbot
 
     //ObjectAccessor::UpdateObjectVisibility(summon);
 
@@ -2845,14 +2903,14 @@ Position WorldObject::GetFirstCollisionPosition(float destX, float destY, float 
     return pos;
 }
 
-Position WorldObject::GetFirstCollisionPosition(float dist, float angle)
+Position WorldObject::GetFirstCollisionPosition(float dist, float angle) const
 {
     Position pos = GetPosition();
     MovePositionToFirstCollision(pos, dist, angle);
     return pos;
 }
 
-void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle)
+void WorldObject::MovePositionToFirstCollision(Position& pos, float dist, float angle) const
 {
     angle += GetOrientation();
     float destx, desty, destz;

@@ -194,6 +194,12 @@ public:
     // FG: some hacky helpers
     void ForceValuesUpdateAtIndex(uint32);
 
+    //npcbot
+    virtual bool IsNPCBot() const { return false; }
+    virtual bool IsNPCBotPet() const { return false; }
+    virtual bool IsNPCBotOrPet() const { return false; }
+    //end npcbot
+
     [[nodiscard]] inline bool IsPlayer() const { return GetTypeId() == TYPEID_PLAYER; }
     Player* ToPlayer() { if (GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Player*>(this); else return nullptr; }
     [[nodiscard]] Player const* ToPlayer() const { if (GetTypeId() == TYPEID_PLAYER) return (Player const*)((Player*)this); else return nullptr; }
@@ -413,10 +419,10 @@ public:
     bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, WorldObject const* forWho = nullptr, bool force = false) const;
     void MovePosition(Position& pos, float dist, float angle);
     Position GetNearPosition(float dist, float angle);
-    void MovePositionToFirstCollision(Position& pos, float dist, float angle);
+    void MovePositionToFirstCollision(Position& pos, float dist, float angle) const;
     Position GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY);
     Position GetFirstCollisionPosition(float destX, float destY, float destZ);
-    Position GetFirstCollisionPosition(float dist, float angle);
+    Position GetFirstCollisionPosition(float dist, float angle) const;
     Position GetRandomNearPosition(float radius);
 
     void GetContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
@@ -592,6 +598,9 @@ public:
     [[nodiscard]] float GetTransOffsetY() const { return m_movementInfo.transport.pos.GetPositionY(); }
     [[nodiscard]] float GetTransOffsetZ() const { return m_movementInfo.transport.pos.GetPositionZ(); }
     [[nodiscard]] float GetTransOffsetO() const { return m_movementInfo.transport.pos.GetOrientation(); }
+    //npcbot: TC method transfer
+    [[nodiscard]] Position const& GetTransOffset() const { return m_movementInfo.transport.pos; }
+    //end npcbot
     [[nodiscard]] uint32 GetTransTime()   const { return m_movementInfo.transport.time; }
     [[nodiscard]] int8 GetTransSeat()     const { return m_movementInfo.transport.seat; }
     [[nodiscard]] virtual ObjectGuid GetTransGUID()   const;
