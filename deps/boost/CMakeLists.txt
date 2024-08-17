@@ -31,7 +31,7 @@ else()
   set(BOOST_REQUIRED_VERSION 1.67)
 endif()
 
-find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system filesystem program_options iostreams regex)
+find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED system filesystem program_options iostreams regex thread)
 
 if(NOT Boost_FOUND)
   if(NOT DEFINED ENV{Boost_ROOT} AND NOT DEFINED Boost_DIR AND NOT DEFINED BOOST_ROOT AND NOT DEFINED BOOSTROOT)
