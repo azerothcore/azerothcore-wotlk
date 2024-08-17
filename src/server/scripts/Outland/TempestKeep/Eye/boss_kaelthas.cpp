@@ -152,7 +152,8 @@ enum Misc
 {
     POINT_MIDDLE                        = 1,
     POINT_AIR                           = 2,
-    POINT_START_LAST_PHASE              = 3,
+    POINT_LAND                          = 3,                     
+    POINT_START_LAST_PHASE              = 4,
 
     DATA_RESURRECT_CAST                 = 1,
 
@@ -274,7 +275,9 @@ struct boss_kaelthas : public BossAI
         {
             PrepareAdvisors();
         });
+
         _phase = PHASE_NONE;
+        _transitionSceneReached = false;
 
         me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HOVER, true);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -489,7 +492,6 @@ struct boss_kaelthas : public BossAI
             me->SetTarget();
             DoCastSelf(SPELL_KAEL_EXPLODES1, true);
             DoCastSelf(SPELL_KAEL_GAINING_POWER);
-            me->SetDisableGravity(true);
         }, EVENT_SCENE_2);
         ScheduleUniqueTimedEvent(4000ms, [&]
         {
@@ -497,7 +499,10 @@ struct boss_kaelthas : public BossAI
             for (uint8 i = 0; i < 2; ++i)
                 if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i], TEMPSUMMON_TIMED_DESPAWN, 60000))
                     trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
-            me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 76.0f, false, true);
+            me->DisableSpline();
+            me->SetDisableGravity(true);
+            me->SendMovementFlagUpdate();
+            me->GetMotionMaster()->MoveTakeoff(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 75.0f, 2.99);
             DoCastSelf(SPELL_GROW, true);
         }, EVENT_SCENE_3);
         ScheduleUniqueTimedEvent(7000ms, [&]
@@ -529,8 +534,6 @@ struct boss_kaelthas : public BossAI
         ScheduleUniqueTimedEvent(17500ms, [&]
         {
             SetRoomState(GO_STATE_ACTIVE);
-            me->SetUnitMovementFlags(MOVEMENTFLAG_HOVER | MOVEMENTFLAG_WALKING | MOVEMENTFLAG_DISABLE_GRAVITY);
-            me->SendMovementFlagUpdate();
         }, EVENT_SCENE_7);
         ScheduleUniqueTimedEvent(19000ms, [&]
         {
@@ -590,8 +593,6 @@ struct boss_kaelthas : public BossAI
             DoCastSelf(SPELL_PURE_NETHER_BEAM4, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM5, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM6, true);
-            me->SetUnitMovementFlags(MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_WALKING);
-            me->SendMovementFlagUpdate();
         }, EVENT_SCENE_15);
         ScheduleUniqueTimedEvent(36000ms, [&]
         {
@@ -599,8 +600,13 @@ struct boss_kaelthas : public BossAI
             me->CastStop();
             me->GetMotionMaster()->Clear();
             me->RemoveAurasDueToSpell(SPELL_DARK_BANISH_STATE); // WRONG VISUAL
-            me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
+            me->GetMotionMaster()->MoveTakeoff(POINT_LAND, me->GetPositionX(), me->GetPositionY(), 48.0f, 2.99);
         }, EVENT_SCENE_16);
+        ScheduleUniqueTimedEvent(50000ms, [&]
+        {
+            me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
+            me->ClearUnitState(UNIT_FLAG_STUNNED);
+        }, 66);
     }
 
     void IntroduceNewAdvisor(Yells talkIntroduction, KaelActions kaelAction)
@@ -735,20 +741,24 @@ struct boss_kaelthas : public BossAI
         DoMeleeAttackIfReady();
 
         ScheduleHealthCheckEvent(50, [&]{
-            scheduler.CancelAll();
-            me->CastStop();
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-            me->SetReactState(REACT_PASSIVE);
-            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
-            me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-            me->SendMeleeAttackStop();
-
-            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
-            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+            if(!_transitionSceneReached)
             {
-                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                _transitionSceneReached = true;
+                scheduler.CancelAll();
+                me->CastStop();
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+                me->SetReactState(REACT_PASSIVE);
+                me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
+                me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
+                me->SendMeleeAttackStop();
+
+                ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
+                for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
                 {
-                   target->AttackStop();
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                    {
+                       target->AttackStop();
+                    }
                 }
             }
         });
@@ -761,6 +771,7 @@ struct boss_kaelthas : public BossAI
 
 private:
     uint32 _phase;
+    bool _transitionSceneReached = false;
 };
 struct npc_lord_sanguinar : public ScriptedAI
 {
