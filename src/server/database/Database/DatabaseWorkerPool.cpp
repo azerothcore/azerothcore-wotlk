@@ -41,6 +41,10 @@
 #include <sstream>
 #endif
 
+#ifdef MOD_PLAYERBOTS
+#include "Implementation/PlayerbotsDatabase.h"
+#endif
+
 class PingOperation : public SQLOperation
 {
     //! Operation for idle delaythreads
@@ -584,3 +588,7 @@ void DatabaseWorkerPool<T>::ExecuteOrAppend(SQLTransaction<T>& trans, PreparedSt
 template class AC_DATABASE_API DatabaseWorkerPool<LoginDatabaseConnection>;
 template class AC_DATABASE_API DatabaseWorkerPool<WorldDatabaseConnection>;
 template class AC_DATABASE_API DatabaseWorkerPool<CharacterDatabaseConnection>;
+
+#ifdef MOD_PLAYERBOTS
+template class AC_DATABASE_API DatabaseWorkerPool<PlayerbotsDatabaseConnection>;
+#endif
