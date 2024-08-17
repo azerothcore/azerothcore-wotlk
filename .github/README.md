@@ -25,9 +25,6 @@ Our main goal is to create a playable game server, offering a fully working in-g
 
 Here are the main points we focus on:
 
-* Stability
-  * We make sure all changes pass the CIs before being merged into the master branch.
-
 * Blizzlike content
   * We strive to make all in-game content to be blizzlike. Therefore we have a high standard for fixes being made.
 
