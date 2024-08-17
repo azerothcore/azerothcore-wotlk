@@ -152,7 +152,7 @@ enum Misc
 {
     POINT_MIDDLE                        = 1,
     POINT_AIR                           = 2,
-    POINT_LAND                          = 3,                     
+    POINT_LAND                          = 3,           
     POINT_START_LAST_PHASE              = 4,
 
     DATA_RESURRECT_CAST                 = 1,
