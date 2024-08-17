@@ -3272,7 +3272,9 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
     // Xinef: don't allow to learn active spell once more
     if (HasActiveSpell(spellId))
     {
+#ifndef MOD_PLAYERBOTS
         LOG_DEBUG("entities.player", "Player ({}) tries to learn already active spell: {}", GetGUID().ToString(), spellId);
+#endif
         return;
     }
 
@@ -4950,6 +4952,15 @@ void Player::CleanupChannels()
         m_channels.erase(m_channels.begin());               // remove from player's channel list
         ch->LeaveChannel(this, false);                     // not send to client, not remove from player's channel list
     }
+}
+
+// Playerbot helper if bot talks in a different locale
+bool Player::IsInChannel(const Channel* c)
+{
+    return std::any_of(m_channels.begin(), m_channels.end(), [c](const Channel* chan)
+    {
+        return c->GetChannelId() == chan->GetChannelId();
+    });
 }
 
 void Player::ClearChannelWatch()
