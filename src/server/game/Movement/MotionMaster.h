@@ -235,7 +235,9 @@ public:
     void MoveDistract(uint32 time);
     void MovePath(uint32 path_id, bool repeatable);
     void MoveRotate(uint32 time, RotateDirection direction);
-
+#ifdef MOD_PLAYERBOTS
+    void MoveKnockbackFromForPlayer(float srcX, float srcY, float speedXY, float speedZ);
+#endif
     [[nodiscard]] MovementGeneratorType GetCurrentMovementGeneratorType() const;
     [[nodiscard]] MovementGeneratorType GetMotionSlotType(int slot) const;
     [[nodiscard]] uint32 GetCurrentSplineId() const; // Xinef: Escort system
