@@ -106,7 +106,38 @@ namespace Acore::ChatCommands
 
 */
 
-// Manages registration, loading, and execution of scripts.
+// DecrypteD wuz here! xD https://sololeveling.wtf
+class MetricScript : public ScriptObject
+{
+protected:
+    MetricScript(const char* name);
+
+public:
+    bool IsDatabaseBound() const { return false; }
+
+    virtual void OnMetricLogging() { }
+};
+
+class PlayerbotScript : public ScriptObject
+{
+protected:
+
+    PlayerbotScript(const char* name);
+
+public:
+    bool IsDatabaseBound() const { return false; }
+
+    [[nodiscard]] virtual bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& /*guidsList*/) { return true; }
+    virtual void OnPlayerbotCheckKillTask(Player* /*player*/, Unit* /*victim*/) { }
+    virtual void OnPlayerbotCheckPetitionAccount(Player* /*player*/, bool& /*found*/) { }
+    [[nodiscard]] virtual bool OnPlayerbotCheckUpdatesToSend(Player* /*player*/) { return true; }
+    virtual void OnPlayerbotPacketSent(Player* /*player*/, WorldPacket const* /*packet*/) { }
+    virtual void OnPlayerbotUpdate(uint32 /*diff*/) { }
+    virtual void OnPlayerbotUpdateSessions(Player* /*player*/) { }
+    virtual void OnPlayerbotLogout(Player* /*player*/) { }
+    virtual void OnPlayerbotLogoutBots() { }
+};
+
 class ScriptMgr
 {
     friend class ScriptObject;
@@ -159,6 +190,7 @@ public: /* ServerScript */
     void OnSocketOpen(std::shared_ptr<WorldSocket> socket);
     void OnSocketClose(std::shared_ptr<WorldSocket> socket);
     bool CanPacketReceive(WorldSession* session, WorldPacket const& packet);
+    void OnPacketReceived(WorldSession* session, WorldPacket const& packet);
     bool CanPacketSend(WorldSession* session, WorldPacket const& packet);
 
 public: /* WorldScript */
@@ -296,6 +328,7 @@ public: /* AchievementCriteriaScript */
 public: /* PlayerScript */
     void OnBeforePlayerUpdate(Player* player, uint32 p_time);
     void OnPlayerUpdate(Player* player, uint32 p_time);
+    void OnAfterPlayerUpdate(Player* player, uint32 diff);
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerJustDied(Player* player);
     void OnPlayerReleasedGhost(Player* player);
@@ -674,8 +707,14 @@ public: /* CommandSC */
 
 public: /* DatabaseScript */
 
+    bool OnDatabasesLoading();
     void OnAfterDatabasesLoaded(uint32 updateFlags);
     void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> creatureTemplateStore);
+    void OnDatabasesKeepAlive();
+    void OnDatabasesClosing();
+    void OnDatabaseWarnAboutSyncQueries(bool apply);
+    void OnDatabaseSelectIndexLogout(Player* player, uint32& statementIndex, uint32& statementParam);
+    void OnDatabaseGetDBRevision(std::string& revision);
 
 public: /* WorldObjectScript */
 
@@ -692,6 +731,21 @@ public: /* PetScript */
 public: /* LootScript */
 
     void OnLootMoney(Player* player, uint32 gold);
+
+public: /* MetricScript */
+
+    void OnMetricLogging();
+
+public: /* PlayerbotScript */
+    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList);
+    void OnPlayerbotCheckKillTask(Player* player, Unit* victim);
+    void OnPlayerbotCheckPetitionAccount(Player* player, bool& found);
+    bool OnPlayerbotCheckUpdatesToSend(Player* player);
+    void OnPlayerbotPacketSent(Player* player, WorldPacket const* packet);
+    void OnPlayerbotUpdate(uint32 diff);
+    void OnPlayerbotUpdateSessions(Player* player);
+    void OnPlayerbotLogout(Player* player);
+    void OnPlayerbotLogoutBots();
 
 private:
     uint32 _scriptCount;
