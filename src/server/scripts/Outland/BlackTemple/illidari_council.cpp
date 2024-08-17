@@ -337,7 +337,7 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_AURA, 30000);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, HammerOfJusticeSelector(me)))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, HammerOfJusticeSelector(me)))
                     {
                         me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE, false);
                         events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 20000);
@@ -710,4 +710,3 @@ void AddSC_boss_illidari_council()
     RegisterSpellScript(spell_illidari_council_judgement);
     RegisterSpellScript(spell_illidari_council_deadly_strike_aura);
 }
-
