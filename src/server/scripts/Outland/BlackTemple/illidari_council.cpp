@@ -322,8 +322,10 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_BLESSING:
-                    if (Unit* member = SelectCouncilMember())
-                        me->CastSpell(member, RAND(SPELL_BLESSING_OF_SPELL_WARDING, SPELL_BLESSING_OF_PROTECTION), false);
+                    if (Unit* member = SelectCouncilMember()){
+                        _toggleIndex = (_toggleIndex + 1) % 2;
+                        me->CastSpell(member, _blessingSpells[_toggleIndex], false);
+                    }
                     events.ScheduleEvent(EVENT_SPELL_BLESSING, 15000);
                     break;
                 case EVENT_SPELL_AURA:
@@ -357,6 +359,12 @@ public:
 
             DoMeleeAttackIfReady();
         }
+        private:
+            uint32 _blessingSpells[2] = {
+                SPELL_BLESSING_OF_PROTECTION,
+                SPELL_BLESSING_OF_SPELL_WARDING
+            };
+            uint8 _toggleIndex = 1;
     };
 };
 
