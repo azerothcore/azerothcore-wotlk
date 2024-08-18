@@ -223,14 +223,14 @@ Map::EnterState MapMgr::PlayerCannotEnter(uint32 mapid, Player* player, bool log
     }
 
     // players are only allowed to enter 5 instances per hour
-    if (entry->IsDungeon() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
+    if (entry->IsNonRaidDungeon() && (!group || !group->isLFGGroup() || !group->IsLfgRandomInstance()))
     {
         uint32 instaceIdToCheck = 0;
         if (InstanceSave* save = sInstanceSaveMgr->PlayerGetInstanceSave(player->GetGUID(), mapid, player->GetDifficulty(entry->IsRaid())))
             instaceIdToCheck = save->GetInstanceId();
 
         // instaceIdToCheck can be 0 if save not found - means no bind so the instance is new
-        if (!player->CheckInstanceCount(instaceIdToCheck) && !entry->IsRaid())
+        if (!player->CheckInstanceCount(instaceIdToCheck))
         {
             player->SendTransferAborted(mapid, TRANSFER_ABORT_TOO_MANY_INSTANCES);
             return Map::CANNOT_ENTER_TOO_MANY_INSTANCES;
