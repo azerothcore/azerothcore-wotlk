@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `motd` (
 -- Dumping data for table acore_auth.motd: ~1 rows (approximately)
 DELETE FROM `motd`;
 INSERT INTO `motd` (`realmid`, `text`) VALUES
-	(-1, 'Welcome to an AzerothCore server.');
+	(-1, 'Welcome to a SoloCoRe private server.');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
