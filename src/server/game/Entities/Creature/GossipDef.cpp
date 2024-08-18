@@ -320,6 +320,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const
     if (QuestGreeting const* questGreeting = sObjectMgr->GetQuestGreeting(guid.GetTypeId(), guid.GetEntry()))
     {
         std::string strGreeting;
+        // Check if greeting exists. Blizzlike that some creatures have empty greeting
         if (!questGreeting->Greeting.empty())
         {
             LocaleConstant locale = _session->GetSessionDbLocaleIndex();
