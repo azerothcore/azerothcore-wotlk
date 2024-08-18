@@ -16,7 +16,7 @@ Development of this project dates back to 2004, and was developed under various 
 * SD2 project, 2008-2009, located at http://www.scriptdev2.com/
 * TrinityCore, 2008-2012, located at https://www.trinitycore.org/
 * SunwellCore 2012-2016, privately developed, more info at https://www.azerothcore.org/pages/sunwell.pl/
-* AzerothCore, 2016-2023, located at https://www.azerothcore.org/
+* AzerothCore, 2016-CURRENT, located at https://www.azerothcore.org/
 
 ## Authorship of the code
 Authorship is assigned for each commit within the git history, which is stored in these git repositories:
@@ -24,13 +24,13 @@ Authorship is assigned for each commit within the git history, which is stored i
 * github.com/TrinityCore/TrinityCore
 * github.com/azerothcore/azerothcore-wotlk
 
-Unfortunately we have no detailed information of the history of the WoWD project;
+Unfortunately, we have no detailed information on the history of the WoWD project;
 if somebody can provide information, please contact us, so that we can make this history available
 
-SunwellCore developed privately and has no git history.
+SunwellCore was developed privately and has unfortunately no git history.
 
-## Exceptions with third party libraries
-The third party libraries have their own way of addressing authorship, and the authorship of commits importing/ updating
-a third party library reflects who did the importing instead of who wrote the code within the commit.
+## Exceptions with third-party libraries
+The third-party libraries have their own way of addressing authorship, and the authorship of commits importing/updating
+a third-party library reflects who did the importing instead of who wrote the code within the commit.
 
-The Authors of third party libraries are not explicitly mentioned, and usually are possible to obtain from the files belonging to the third party libraries.
+The Authors of third-party libraries are not explicitly mentioned, and usually is possible to obtain from the files belonging to the third-party libraries.

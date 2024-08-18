@@ -517,6 +517,7 @@ public:
     LocaleConstant GetSessionDbcLocale() const { return /*_isBot? LOCALE_enUS : */m_sessionDbcLocale; }
     LocaleConstant GetSessionDbLocaleIndex() const { return /*_isBot? LOCALE_enUS : */m_sessionDbLocaleIndex; }
     char const* GetAcoreString(uint32 entry) const;
+    std::string const* GetModuleString(std::string module, uint32 id) const;
 
     uint32 GetLatency() const { return m_latency; }
     void SetLatency(uint32 latency) { m_latency = latency; }

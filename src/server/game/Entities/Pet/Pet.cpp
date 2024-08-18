@@ -17,6 +17,7 @@
 
 #include "Pet.h"
 #include "ArenaSpectator.h"
+#include "CharmInfo.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "GameTime.h"
