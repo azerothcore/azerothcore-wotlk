@@ -8,7 +8,6 @@ FROM ubuntu:$UBUNTU_VERSION AS skeleton
 ARG DOCKER=1
 ARG DEBIAN_FRONTEND=noninteractive
 
-ENV TZ=$TZ
 ENV AC_FORCE_CREATE_DB=1
 
 RUN mkdir -pv \
@@ -29,11 +28,12 @@ RUN mkdir -pv \
         /azerothcore/build
 
 # Configure Timezone
-RUN apt-get update                                          \
-    && apt-get install -y tzdata ca-certificates            \
-    && ln -snf /usr/share/zoneinfo/$TZ /etc/localtime   \
-    && echo $TZ > /etc/timezone                         \
-    && dpkg-reconfigure --frontend noninteractive tzdata
+RUN apt-get update                                                       \
+    && apt-get install -y --no-install-recommends tzdata ca-certificates \
+    && ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime                  \
+    && echo "$TZ" > /etc/timezone                                          \
+    && dpkg-reconfigure --frontend noninteractive tzdata                 \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /azerothcore
 
@@ -145,7 +145,7 @@ ENTRYPOINT ["/usr/bin/env", "bash", "/azerothcore/entrypoint.sh"]
 ###############
 
 FROM runtime AS authserver
-LABEL description "AzerothCore Auth Server"
+LABEL description="AzerothCore Auth Server"
 
 ENV ACORE_COMPONENT=authserver
 # Don't run database migrations. We can leave that up to the db-import container
@@ -167,7 +167,7 @@ CMD ["authserver"]
 
 FROM runtime AS worldserver
 
-LABEL description "AzerothCore World Server"
+LABEL description="AzerothCore World Server"
 
 ENV ACORE_COMPONENT=worldserver
 # Don't run database migrations. We can leave that up to the db-import container
@@ -190,7 +190,7 @@ CMD ["worldserver"]
 
 FROM runtime AS db-import
 
-LABEL description "AzerothCore Database Import tool"
+LABEL description="AzerothCore Database Import tool"
 
 USER $DOCKER_USER
 
@@ -203,7 +203,7 @@ COPY --chown=$DOCKER_USER:$DOCKER_USER\
      --from=build \
      /azerothcore/env/dist/bin/dbimport /azerothcore/env/dist/bin/dbimport
 
-CMD /azerothcore/env/dist/bin/dbimport
+CMD [ "/azerothcore/env/dist/bin/dbimport" ]
 
 ###############
 # Client Data #
@@ -225,7 +225,7 @@ VOLUME /azerothcore/env/dist/data
 
 USER $DOCKER_USER
 
-CMD bash -c "source /azerothcore/apps/installer/includes/functions.sh && inst_download_client_data"
+CMD ["bash",  "-c", "source /azerothcore/apps/installer/includes/functions.sh && inst_download_client_data" ]
 
 ##################
 # Map Extractors #
@@ -233,7 +233,7 @@ CMD bash -c "source /azerothcore/apps/installer/includes/functions.sh && inst_do
 
 FROM runtime AS tools
 
-LABEL description "AzerothCore Tools"
+LABEL description="AzerothCore Tools"
 
 WORKDIR /azerothcore/env/dist/
 
