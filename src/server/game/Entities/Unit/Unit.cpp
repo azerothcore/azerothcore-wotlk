@@ -14497,7 +14497,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         GetMotionMaster()->Clear(false);
         GetMotionMaster()->MoveIdle();
 
-        // Xinef: Remove Hover so the corpse can fall to the ground
+        // Remove Hover so the corpse can fall to the ground
         SetHover(false);
 
         if (despawn)
@@ -16606,7 +16606,7 @@ void Unit::ResumeMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
         movementGenerator->Resume(timer);
 }
 
-void Unit::StopMovingOnCurrentPos() // pussywizard
+void Unit::StopMovingOnCurrentPos()
 {
     ClearUnitState(UNIT_STATE_MOVING);
 
@@ -16614,7 +16614,7 @@ void Unit::StopMovingOnCurrentPos() // pussywizard
     if (!IsInWorld())
         return;
 
-    DisableSpline(); // pussywizard: required so Launch() won't recalculate position from previous spline
+    DisableSpline(); // required so Launch() won't recalculate position from previous spline
     Movement::MoveSplineInit init(this);
     init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZ());
     init.SetFacing(GetOrientation());
@@ -20493,6 +20493,12 @@ bool Unit::SetSwim(bool enable)
     return true;
 }
 
+/**
+ * @brief Add the movement flag: MOVEMENTFLAGCAN_FLY. Generaly only use by players, allowing
+ *  them to fly by pressing space for example. For creatures, please look for DisableGravity().
+ *
+ *  Doesn't inform the client.
+ */
 bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
 {
     if (enable == HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
@@ -20511,6 +20517,10 @@ bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
     return true;
 }
 
+/**
+ * @brief Allow to walk on water. Doesn't inform the client.
+ * Need to use SendMovementWaterWalking() if its for players. 
+ */
 bool Unit::SetWaterWalking(bool enable, bool /*packetOnly = false*/)
 {
     if (enable == HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING))

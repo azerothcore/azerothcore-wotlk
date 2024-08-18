@@ -236,6 +236,9 @@ void MotionMaster::MoveIdle()
         Mutate(GetIdleMovementGenerator(), MOTION_SLOT_IDLE);
 }
 
+/**
+ * @brief Enable a random in desired range around the unit
+ */
 void MotionMaster::MoveRandom(float wanderDistance)
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
