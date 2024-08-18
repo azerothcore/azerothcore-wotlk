@@ -152,7 +152,7 @@ enum Misc
 {
     POINT_MIDDLE                        = 1,
     POINT_AIR                           = 2,
-    POINT_LAND                          = 3,           
+    POINT_LAND                          = 3,
     POINT_START_LAST_PHASE              = 4,
 
     DATA_RESURRECT_CAST                 = 1,
@@ -499,7 +499,6 @@ struct boss_kaelthas : public BossAI
             for (uint8 i = 0; i < 2; ++i)
                 if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i], TEMPSUMMON_TIMED_DESPAWN, 60000))
                     trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
-            me->DisableSpline();
             me->SetDisableGravity(true);
             me->SendMovementFlagUpdate();
             me->GetMotionMaster()->MoveTakeoff(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 75.0f, 2.99);
@@ -600,13 +599,9 @@ struct boss_kaelthas : public BossAI
             me->CastStop();
             me->GetMotionMaster()->Clear();
             me->RemoveAurasDueToSpell(SPELL_DARK_BANISH_STATE); // WRONG VISUAL
-            me->GetMotionMaster()->MoveTakeoff(POINT_LAND, me->GetPositionX(), me->GetPositionY(), 48.0f, 2.99);
-        }, EVENT_SCENE_16);
-        ScheduleUniqueTimedEvent(50000ms, [&]
-        {
+            me->GetMotionMaster()->MoveLand(POINT_LAND, me->GetPositionX(), me->GetPositionY(), 48.0f, 2.99f); // Moveland doesn't handle POINT_START_LAST_PHASE so we need to use MovePoint
             me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
-            me->ClearUnitState(UNIT_FLAG_STUNNED);
-        }, 66);
+        }, EVENT_SCENE_16);
     }
 
     void IntroduceNewAdvisor(Yells talkIntroduction, KaelActions kaelAction)
