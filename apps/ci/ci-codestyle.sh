@@ -48,7 +48,7 @@ EXCLUDE_PATTERN="--exclude=src/server/game/Entities/Object/Object.h"
 for check in ${!classTtypeIdChecks[@]}; do
     echo "  Checking RegEx: '${check}'"
 
-    if grep -P -r -I -n ${EXCLUDE_PATTERN} ${check} src; then
+    if grep -P -r -I -n ${check} ${EXCLUDE_PATTERN} src; then
         echo
         echo "${classTtypeIdChecks[$check]}"
         exit 1
