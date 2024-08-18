@@ -158,6 +158,21 @@ public:
         return Acore::StringFormatFmt(GetAcoreString(entry), std::forward<Args>(args)...);
     }
 
+    std::string const* GetModuleString(std::string module, uint32 id) const;
+
+    template<typename... Args>
+    void PSendModuleSysMessage(std::string module, uint32 id, Args&&... args)
+    {
+        if (HasSession())
+            SendSysMessage(PGetParseModuleString(module, id, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    std::string PGetParseModuleString(std::string module, uint32 id, Args&&... args) const
+    {
+        return Acore::StringFormatFmt(GetModuleString(module, id)->c_str(), std::forward<Args>(args)...);
+    }
+
     void SendErrorMessage(uint32 entry);
     void SendErrorMessage(std::string_view str, bool escapeCharacters);
 

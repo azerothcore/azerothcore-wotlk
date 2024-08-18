@@ -16,6 +16,7 @@
  */
 
 #include "Common.h"
+#include "CharmInfo.h"
 #include "CreatureAI.h"
 #include "DisableMgr.h"
 #include "GameTime.h"
