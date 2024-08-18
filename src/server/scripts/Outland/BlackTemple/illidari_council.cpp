@@ -324,7 +324,7 @@ public:
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE:
                     if (Unit* target = me->GetVictim())
-                        if (target && target->GetTypeId() == TYPEID_PLAYER && me->IsInRange(target, 10.0f, 40.0f, true))
+                        if (target && target->IsPlayer() && me->IsInRange(target, 10.0f, 40.0f, true))
                         {
                             me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE);
                             events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 20s);
