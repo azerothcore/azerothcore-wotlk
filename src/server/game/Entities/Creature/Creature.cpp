@@ -2374,7 +2374,10 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
     return nullptr;
 }
 
-// @brief Select nearest hostile unit within the given distance (regardless of threat list).
+
+/**
+ * @brief Select nearest hostile unit within the given distance (regardless of threat list).
+ */
 Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) const
 {
     if (dist == 0.0f)
@@ -2390,7 +2393,9 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
     return target;
 }
 
-// @biref Select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
+/**
+ * @biref Select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
+ */
 Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 {
     if (dist < ATTACK_DISTANCE)

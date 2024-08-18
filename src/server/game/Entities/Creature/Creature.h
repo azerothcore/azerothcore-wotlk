@@ -96,7 +96,7 @@ public:
     */
     void SetReactState(ReactStates state) { m_reactState = state; }
     [[nodiscard]] ReactStates GetReactState() const { return m_reactState; }
-    [[nodiscard]] bool HasReactState(ReactStates state) const { return (m_reactState == state); }   // @brief Check if the creature has the specified ReactState
+    [[nodiscard]] bool HasReactState(ReactStates state) const { return (m_reactState == state); }   /// @brief Check if the creature has the specified ReactState
     void InitializeReactState();
 
     ///// @todo RENAME THIS!!!!!
@@ -316,8 +316,8 @@ public:
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id)  const override;
 
     bool isRegeneratingHealth() { return m_regenHealth; }
-    void SetRegeneratingHealth(bool creature) { m_regenHealth = creature; }
-    void SetRegeneratingPower(bool creature) { m_regenPower = creature; }
+    void SetRegeneratingHealth(bool enable) { m_regenHealth = enable; }
+    void SetRegeneratingPower(bool enable) { m_regenPower = enable; }
     [[nodiscard]] virtual uint8 GetPetAutoSpellSize() const { return MAX_SPELL_CHARM; }
     [[nodiscard]] virtual uint32 GetPetAutoSpellOnPos(uint8 pos) const
     {
