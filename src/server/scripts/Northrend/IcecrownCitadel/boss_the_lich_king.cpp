@@ -2677,6 +2677,9 @@ class spell_the_lich_king_valkyr_target_search : public SpellScript
             targets.clear();
             return;
         }
+            //npcbot
+            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+            //end npcbot
         targets.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
         targets.remove_if(Acore::UnitAuraCheck(true, SPELL_BOSS_HITTIN_YA_AURA)); // done in dbc, but just to be sure xd
         targets.remove_if(Acore::UnitAuraCheck(true, SPELL_HARVEST_SOUL_VALKYR));
