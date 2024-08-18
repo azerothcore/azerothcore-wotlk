@@ -43,12 +43,12 @@ declare -A getTypeIdChecks=(
     ["GetTypeId\(\)[[:space:]]*==[[:space:]]*TYPEID_DYNAMICOBJECT"]="Use IsDynObject() instead of GetTypeId() == TYPEID_DYNAMICOBJECT. Check the lines above"
 )
 
-EXCLUDE_PATTERN="src/server/game/Entities/Object/Object.h"
+EXCLUDE_FILE="src/server/game/Entities/Object/Object.h"
 
 for check in ${!getTypeIdChecks[@]}; do
     echo "  Checking RegEx: '${check}'"
 
-    if grep -P -r -I -n --exclude="$EXCLUDE_PATTERN" ${check} src; then
+    if grep -R -n --exclude=$EXCLUDE_FILE ${check} src; then
         echo
         echo "${getTypeIdChecks[$check]}"
         exit 1
