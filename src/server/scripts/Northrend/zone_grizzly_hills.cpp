@@ -797,7 +797,7 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_SMOKE_BOMB && caster->GetTypeId() == TYPEID_PLAYER)
+            if (spell->Id == SPELL_SMOKE_BOMB && caster->IsPlayer())
             {
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(true);
@@ -1000,7 +1000,7 @@ class spell_infected_worgen_bite_aura : public AuraScript
     void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
-        if (target->GetTypeId() == TYPEID_PLAYER)
+        if (target->IsPlayer())
             if (GetStackAmount() == GetSpellInfo()->StackAmount)
             {
                 SetDuration(0);

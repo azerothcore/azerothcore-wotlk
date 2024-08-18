@@ -315,7 +315,7 @@ struct boss_kaelthas : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (_phase == PHASE_NONE && who->GetTypeId() == TYPEID_PLAYER && me->IsValidAttackTarget(who))
+        if (_phase == PHASE_NONE && who->IsPlayer() && me->IsValidAttackTarget(who))
         {
             _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
@@ -345,7 +345,7 @@ struct boss_kaelthas : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
             Talk(SAY_SLAY);
     }
 
@@ -1270,7 +1270,7 @@ class spell_kaelthas_nether_beam : public SpellScript
         for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
         {
             Unit* target = ObjectAccessor::GetUnit(*GetCaster(), (*itr)->getUnitGuid());
-            if (target && target->GetTypeId() == TYPEID_PLAYER)
+            if (target && target->IsPlayer())
                 targetList.push_back(target);
         }
 

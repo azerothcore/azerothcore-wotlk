@@ -173,7 +173,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
+            if (victim->IsPlayer() && roll_chance_i(50))
                 Talk(YELL_KILL);
         }
 

@@ -110,7 +110,7 @@ public:
 
     bool operator()(Unit const* target) const
     {
-        return target && target->GetTypeId() == TYPEID_PLAYER && _me->IsInRange(target, 10.0f, 40.0f, true);
+        return target && target->IsPlayer() && _me->IsInRange(target, 10.0f, 40.0f, true);
     }
 
 private:

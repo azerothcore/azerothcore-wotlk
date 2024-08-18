@@ -171,7 +171,7 @@ class spell_warl_improved_demonic_tactics : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+        return GetUnitOwner()->IsPlayer();
     }
 
     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
@@ -223,7 +223,7 @@ class spell_warl_ritual_of_summoning : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        if (GetCaster()->GetTypeId() == TYPEID_PLAYER)
+        if (GetCaster()->IsPlayer())
             if (GetCaster()->ToPlayer()->InBattleground())
                 return SPELL_FAILED_NOT_IN_BATTLEGROUND;
         return SPELL_CAST_OK;
@@ -339,7 +339,7 @@ class spell_warl_generic_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, maximum), 15);
 
             // xinef: Update appropriate player field
-            if (owner->GetTypeId() == TYPEID_PLAYER)
+            if (owner->IsPlayer())
                 owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
         }
     }
@@ -450,7 +450,7 @@ class spell_warl_infernal_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, maximum), 15);
 
             // xinef: Update appropriate player field
-            if (owner->GetTypeId() == TYPEID_PLAYER)
+            if (owner->IsPlayer())
                 owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
         }
     }
@@ -900,7 +900,7 @@ class spell_warl_life_tap : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spell*/) override
@@ -1147,7 +1147,7 @@ class spell_warl_curse_of_doom : public AuraScript
 
     bool Load() override
     {
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster() && GetCaster()->IsPlayer();
     }
 
     void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -1322,7 +1322,7 @@ class spell_warl_drain_soul : public AuraScript
         Unit* caster = GetCaster();
         Unit* target = GetTarget();
 
-        if (caster && caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->isHonorOrXPTarget(target))
+        if (caster && caster->IsPlayer() && caster->ToPlayer()->isHonorOrXPTarget(target))
         {
             if (roll_chance_i(20))
             {

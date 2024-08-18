@@ -420,7 +420,7 @@ struct boss_taldaram : public BossAI
                             if (reference)
                             {
                                 Unit const* pTarget = ObjectAccessor::GetUnit(*me, reference->getUnitGuid());
-                                if (pTarget && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
+                                if (pTarget && pTarget->IsPlayer() && pTarget->IsAlive())
                                 {
                                     ++count;
                                 }

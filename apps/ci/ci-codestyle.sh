@@ -36,5 +36,24 @@ for check in ${!multiLineRegexChecks[@]}; do
     fi
 done
 
+declare -A classTtypeIdChecks=(
+    ["GetTypeId\(\) == TYPEID_PLAYER;"]="Use IsPlayer() instead of GetTypeId() == TYPEID_PLAYER. Check the lines above"
+    ["GetTypeId\(\) == TYPEID_CORPSE"]="Use IsCorpse() instead of GetTypeId() == TYPEID_CORPSE. Check the lines above"
+    ["GetTypeId\(\) == TYPEID_ITEM"]="Use IsItem() instead of GetTypeId() == TYPEID_ITEM. Check the lines above"
+    ["GetTypeId\(\) == TYPEID_DYNAMICOBJECT"]="Use IsDynObject() instead of GetTypeId() == TYPEID_DYNAMICOBJECT. Check the lines above"
+)
+
+EXCLUDE_PATTERN="--exclude=src/server/game/Entities/Object/Object.h"
+
+for check in ${!classTtypeIdChecks[@]}; do
+    echo "  Checking RegEx: '${check}'"
+
+    if grep -P -r -I -n ${EXCLUDE_PATTERN} ${check} src; then
+        echo
+        echo "${classTtypeIdChecks[$check]}"
+        exit 1
+    fi
+done
+
 echo
 echo "Everything looks good"

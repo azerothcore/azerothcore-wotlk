@@ -178,7 +178,7 @@ struct boss_moroes : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (!_recentlySpoken && victim->GetTypeId() == TYPEID_PLAYER)
+        if (!_recentlySpoken && victim->IsPlayer())
         {
             Talk(SAY_KILL);
             _recentlySpoken = true;

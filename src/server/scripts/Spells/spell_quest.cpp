@@ -201,7 +201,7 @@ class spell_q11026_a11051_banish_the_demons : public SpellScript
     {
         if (Unit* target = GetHitUnit())
             if (Unit* owner = target->ToTempSummon()->GetSummonerUnit())
-                if (owner->GetTypeId() == TYPEID_PLAYER)
+                if (owner->IsPlayer())
                     owner->ToPlayer()->KilledMonsterCredit(23327); // Some trigger, just count
     }
 
@@ -652,7 +652,7 @@ class spell_q13369_fate_up_against_your_will : public SpellScript
     {
         // Fate, Up Against Your Will (13369)
         if (Unit* caster = GetCaster())
-            if (caster->GetTypeId() == TYPEID_PLAYER && caster->ToPlayer()->GetQuestStatus(13369) >= QUEST_STATUS_COMPLETE)
+            if (caster->IsPlayer() && caster->ToPlayer()->GetQuestStatus(13369) >= QUEST_STATUS_COMPLETE)
                 return SPELL_CAST_OK;
         return SPELL_FAILED_DONT_REPORT;
     }
@@ -864,7 +864,7 @@ class spell_q5206_test_fetid_skull : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -903,7 +903,7 @@ class spell_q6124_6129_apply_salve : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1108,7 +1108,7 @@ class spell_q11730_ultrasonic_screwdriver : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER && GetCastItem();
+        return GetCaster()->IsPlayer() && GetCastItem();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -1346,7 +1346,7 @@ class spell_q12937_relief_for_the_fallen : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -1452,7 +1452,7 @@ class spell_q12659_ahunaes_knife : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1483,7 +1483,7 @@ class spell_q9874_liquid_fire : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -1515,7 +1515,7 @@ class spell_q12805_lifeblood_dummy : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
@@ -1616,7 +1616,7 @@ class spell_q9452_cast_net : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     SpellCastResult CheckCast()

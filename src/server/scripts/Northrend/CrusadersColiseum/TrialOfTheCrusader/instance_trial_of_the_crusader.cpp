@@ -155,7 +155,7 @@ public:
 
         void OnUnitDeath(Unit* u) override
         {
-            if (bNooneDied && u->GetTypeId() == TYPEID_PLAYER)
+            if (bNooneDied && u->IsPlayer())
             {
                 bNooneDied = false;
                 SaveToDB();

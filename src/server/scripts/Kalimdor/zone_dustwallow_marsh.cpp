@@ -99,7 +99,7 @@ class spell_energize_aoe : public SpellScript
     {
         for (std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end();)
         {
-            if ((*itr)->GetTypeId() == TYPEID_PLAYER && (*itr)->ToPlayer()->GetQuestStatus(GetSpellInfo()->Effects[EFFECT_1].CalcValue()) == QUEST_STATUS_INCOMPLETE)
+            if ((*itr)->IsPlayer() && (*itr)->ToPlayer()->GetQuestStatus(GetSpellInfo()->Effects[EFFECT_1].CalcValue()) == QUEST_STATUS_INCOMPLETE)
                 ++itr;
             else
                 targets.erase(itr++);
