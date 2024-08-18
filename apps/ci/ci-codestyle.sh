@@ -48,7 +48,7 @@ EXCLUDE_PATTERN="src/server/game/Entities/Object/Object.h"
 for check in ${!getTypeIdChecks[@]}; do
     echo "  Checking RegEx: '${check}'"
 
-    if grep -P -r -I -n --exclude=$EXCLUDE_PATTERN ${check} src; then
+    if grep -P -r -I -n --exclude="$EXCLUDE_PATTERN" ${check} src; then
         echo
         echo "${getTypeIdChecks[$check]}"
         exit 1
