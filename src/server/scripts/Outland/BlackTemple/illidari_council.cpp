@@ -323,12 +323,13 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_AURA, 30000);
                     break;
                 case EVENT_SPELL_HAMMER_OF_JUSTICE:
-                    if (Unit* target = me->GetVictim(); target && target->GetTypeId() == TYPEID_PLAYER && me->IsInRange(target, 10.0f, 40.0f, true))
-                    {
-                        me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE);
-                        events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 20s);
-                        break;
-                    }
+                    if (Unit* target = me->GetVictim())
+                        if (target && target->GetTypeId() == TYPEID_PLAYER && me->IsInRange(target, 10.0f, 40.0f, true))
+                        {
+                            me->CastSpell(target, SPELL_HAMMER_OF_JUSTICE);
+                            events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 20s);
+                            break;
+                        }
                     events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 0);
                     break;
                 case EVENT_SPELL_SEAL:
