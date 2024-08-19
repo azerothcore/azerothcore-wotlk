@@ -101,7 +101,9 @@ namespace Movement
             moveFlags = (moveFlags & ~(MOVEMENTFLAG_FORWARD)) | MOVEMENTFLAG_BACKWARD;
         }
 
-        if (moveFlags & MOVEMENTFLAG_ROOT)
+        bool isOrientationOnly = args.path.size() == 2 && args.path[0] == args.path[1];
+
+        if ((moveFlags & MOVEMENTFLAG_ROOT) || isOrientationOnly)
             moveFlags &= ~MOVEMENTFLAG_MASK_MOVING;
 
         if (!args.HasVelocity)
