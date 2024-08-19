@@ -287,6 +287,29 @@ struct boss_kaelthas : public BossAI
         me->SetWalk(false);
     }
 
+    void DamageTaken(Unit*, uint32&, DamageEffectType, SpellSchoolMask) override
+    {
+        if (me->HealthBelowPct(50) && !_transitionSceneReached)
+        {
+            _transitionSceneReached = true;
+            me->CastStop();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+            me->SetReactState(REACT_PASSIVE);
+            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
+            me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
+            me->SendMeleeAttackStop();
+
+            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
+            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
+                {
+                    target->AttackStop();
+                }
+            }
+        }
+    };
+
     void AttackStart(Unit* who) override
     {
         if (_phase == PHASE_FINAL /* check is scheduled&& events.GetNextEventTime(EVENT_GRAVITY_LAPSE_END) == 0*/)
@@ -501,7 +524,7 @@ struct boss_kaelthas : public BossAI
                     trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
             me->SetDisableGravity(true);
             me->SendMovementFlagUpdate();
-            me->GetMotionMaster()->MoveTakeoff(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 75.0f, 2.99);
+            me->GetMotionMaster()->MoveTakeoff(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 75.0f, 2.99f);
             DoCastSelf(SPELL_GROW, true);
         }, EVENT_SCENE_3);
         ScheduleUniqueTimedEvent(7000ms, [&]
@@ -734,29 +757,6 @@ struct boss_kaelthas : public BossAI
             return;
 
         DoMeleeAttackIfReady();
-
-        ScheduleHealthCheckEvent(50, [&]{
-            if(!_transitionSceneReached)
-            {
-                _transitionSceneReached = true;
-                scheduler.CancelAll();
-                me->CastStop();
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                me->SetReactState(REACT_PASSIVE);
-                me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
-                me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-                me->SendMeleeAttackStop();
-
-                ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
-                for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-                {
-                    if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
-                    {
-                       target->AttackStop();
-                    }
-                }
-            }
-        });
     }
 
     bool CheckEvadeIfOutOfCombatArea() const override
