@@ -20519,7 +20519,7 @@ bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
 
 /**
  * @brief Allow to walk on water. Doesn't inform the client.
- * Need to use SendMovementWaterWalking() if its for players. 
+ * Need to use SendMovementWaterWalking() if it's for players.
  */
 bool Unit::SetWaterWalking(bool enable, bool /*packetOnly = false*/)
 {

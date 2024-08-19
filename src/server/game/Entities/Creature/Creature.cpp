@@ -1946,11 +1946,11 @@ bool Creature::CanStartAttack(Unit const* who) const
 }
 
 /**
- * @brief A creature can be is 4 differents states: Alive, JustDied, Corpse, and JustRespawned. The cycle of follow the next order:
- * - Alive: The creature is alive and spawned in the world
+ * @brief A creature can be in 4 different states: Alive, JustDied, Corpse, and JustRespawned. The cycle follows the next order:
+ * - Alive: The creature is alive and has spawned in the world
  * - JustDied: The creature has just died. This is the state just before his body appeared
- * - Corpse: Thhe creature have been remove from the world and this corpse have been spawned
- * - JustRespawned: The creature has just respawned. Follow when the corpse disapear and the respawn timer is finish
+ * - Corpse: The creature has been removed from the world, and this corpse has been spawned
+ * - JustRespawned: The creature has just respawned. Follow when the corpse disappears and the respawn timer is finished
  *
  * @param state Specify one of 4 states above
  * @param despawn Despawn the creature immediately, without waiting for any movement to finish
@@ -2790,7 +2790,7 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
 }
 
 /**
- * @brief Set in combat all players in the dungeon or raid.
+ * @brief Set in combat all units in the dungeon/raid. Affect only units with IsAIEnabled.
  */
 void Creature::SetInCombatWithZone()
 {
