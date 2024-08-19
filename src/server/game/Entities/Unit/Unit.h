@@ -718,7 +718,7 @@ public:
     }
     bool Attack(Unit* victim, bool meleeAttack);
 
-    void CastStop(uint32 except_spellid = 0, bool withInstant = true);   /// @brief Interrupt the unit cast of all current spells
+    void CastStop(uint32 except_spellid = 0, bool withInstant = true);
     bool AttackStop();
     void RemoveAllAttackers();
     [[nodiscard]] AttackerSet const& getAttackers() const { return m_attackers; }

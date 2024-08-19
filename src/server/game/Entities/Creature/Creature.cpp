@@ -2374,7 +2374,6 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
     return nullptr;
 }
 
-
 /**
  * @brief Select nearest hostile unit within the given distance (regardless of threat list).
  */
