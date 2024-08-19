@@ -296,17 +296,7 @@ struct boss_kaelthas : public BossAI
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             me->SetReactState(REACT_PASSIVE);
             me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
-            me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-            me->SendMeleeAttackStop();
-
-            ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
-            for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-            {
-                if (Unit* target = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
-                {
-                    target->AttackStop();
-                }
-            }
+            me->RemoveAllAttackers();
         }
     };
 
