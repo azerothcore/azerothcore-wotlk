@@ -22,6 +22,7 @@
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include <random>
 
 enum Says
 {
@@ -284,7 +285,16 @@ public:
 
     struct boss_gathios_the_shattererAI : public boss_illidari_council_memberAI
     {
-        boss_gathios_the_shattererAI(Creature* creature) : boss_illidari_council_memberAI(creature) { }
+        boss_gathios_the_shattererAI(Creature* creature) : boss_illidari_council_memberAI(creature)
+        {
+            // Initialize toggle flags with random values to ensure the first toggled spell is cast randomly
+            std::random_device rd;
+            std::mt19937 gen(rd());
+            std::bernoulli_distribution distrib(0.5);
+            _toggleBlessing = distrib(gen);
+            _toggleAura = distrib(gen);
+            _toggleSeal = distrib(gen);
+        }
 
         Creature* SelectCouncilMember()
         {
@@ -322,14 +332,16 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_BLESSING:
-                    if (Unit* member = SelectCouncilMember()){
-                        _toggleIndex = (_toggleIndex + 1) % 2;
-                        me->CastSpell(member, _blessingSpells[_toggleIndex], false);
+                    if (Unit* member = SelectCouncilMember())
+                    {
+                         me->CastSpell(member, _toggleBlessing ? SPELL_BLESSING_OF_PROTECTION : SPELL_BLESSING_OF_SPELL_WARDING);
+                        _toggleBlessing = !_toggleBlessing;
                     }
                     events.ScheduleEvent(EVENT_SPELL_BLESSING, 15000);
                     break;
                 case EVENT_SPELL_AURA:
-                    me->CastSpell(me, RAND(SPELL_DEVOTION_AURA, SPELL_CHROMATIC_RESISTANCE_AURA), false);
+                    me->CastSpell(me, _toggleAura ? SPELL_DEVOTION_AURA : SPELL_CHROMATIC_RESISTANCE_AURA);
+                    _toggleAura = !_toggleAura;
                     events.ScheduleEvent(EVENT_SPELL_AURA, 60000);
                     break;
                 case EVENT_SPELL_CONSECRATION:
@@ -348,7 +360,8 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 0);
                     break;
                 case EVENT_SPELL_SEAL:
-                    me->CastSpell(me, RAND(SPELL_SEAL_OF_COMMAND, SPELL_SEAL_OF_BLOOD), false);
+                    me->CastSpell(me, _toggleSeal ? SPELL_SEAL_OF_COMMAND : SPELL_SEAL_OF_BLOOD);
+                    _toggleSeal = !_toggleSeal;
                     events.ScheduleEvent(EVENT_SPELL_SEAL, 20000);
                     break;
                 case EVENT_SPELL_JUDGEMENT:
@@ -359,12 +372,10 @@ public:
 
             DoMeleeAttackIfReady();
         }
-        private:
-            uint32 _blessingSpells[2] = {
-                SPELL_BLESSING_OF_PROTECTION,
-                SPELL_BLESSING_OF_SPELL_WARDING
-            };
-            uint8 _toggleIndex = 1;
+    private:
+        bool _toggleBlessing;
+        bool _toggleAura;
+        bool _toggleSeal;
     };
 };
 
