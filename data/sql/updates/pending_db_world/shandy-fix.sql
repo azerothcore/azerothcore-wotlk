@@ -20,4 +20,4 @@ INSERT INTO `creature_text`(`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`
 (36856,6,0,'Add the unmentionables... uh, I mean, the \'delicates\'!',12,0,100,25,0,0,36789,0,'Shandy Glossgleam'),
 (36856,7,0,'Aquanos, stop sending the clothes so high! You didn\'t have to see the look on Aethas Sunreaver\'s face when he found his pants in the fountain!',12,0,100,0,0,0,36817,0,'Shandy Glossgleam'),
 (36856,8,0,'See how easy that was with everyone working together? Just take what you need from the clean laundry here, but don\'t forget to return it when you\'re finished.',12,0,100,0,0,0,36791,0,'Shandy Glossgleam'),
-(36856,9,0,'Oh, no! That wasn\'t right. Now I\'ll have to go get more detergent so we can start over!',12,0,100,0,0,0,36763,0,'Shandy Glossgleam'),
+(36856,9,0,'Oh, no! That wasn\'t right. Now I\'ll have to go get more detergent so we can start over!',12,0,100,0,0,0,36763,0,'Shandy Glossgleam');
