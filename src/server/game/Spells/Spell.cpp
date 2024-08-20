@@ -3739,8 +3739,9 @@ void Spell::cancel(bool bySelf)
                         if (Unit* unit = m_caster->GetGUID() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
                             unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
 
-                if (m_spellInfo->HasAttribute(SPELL_ATTR0_COOLDOWN_ON_EVENT))
-                    m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    if (m_spellInfo->HasAttribute(SPELL_ATTR0_COOLDOWN_ON_EVENT))
+                        m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
 
                 SendChannelUpdate(0);
                 SendInterrupted(SPELL_FAILED_INTERRUPTED);
@@ -9034,7 +9035,7 @@ namespace Acore
             if (!target->ToGameObject()->IsInRange(_position->GetPositionX(), _position->GetPositionY(), _position->GetPositionZ(), _range))
                 return false;
         }
-        else if (!target->IsWithinDist3d(_position, _range))
+        else if (!target->IsInDist(_position, _range))
             return false;
         else if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsAvoidingAOE()) // pussywizard
             return false;

@@ -1104,7 +1104,8 @@ namespace Acore
 
             }
 
-            if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->IsDynamicObject() ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range))
+            if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->IsDynamicObject() ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range,true,false))
+
                 return true;
 
             return false;

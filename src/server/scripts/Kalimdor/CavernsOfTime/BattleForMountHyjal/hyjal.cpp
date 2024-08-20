@@ -113,7 +113,7 @@ public:
             scheduler.CancelAll();
             if (InstanceScript* hyjal = me->GetInstanceScript())
                 if (!hyjal->GetData(DATA_WAVE_STATUS))
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -138,7 +138,7 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             DoCastSelf(SPELL_SIMPLE_TELEPORT, true);
 
             // Should wait 2400ms
@@ -176,7 +176,7 @@ public:
 
     bool OnGossipSelect(Player* /*player*/ , Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
     {
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
         if (InstanceScript* hyjal = creature->GetInstanceScript())
         {
@@ -213,7 +213,7 @@ public:
             scheduler.CancelAll();
             if (InstanceScript* hyjal = me->GetInstanceScript())
                 if (!hyjal->GetData(DATA_WAVE_STATUS))
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -251,7 +251,7 @@ public:
 
     bool OnGossipSelect(Player* /*player*/, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
     {
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
         if (InstanceScript* hyjal = creature->GetInstanceScript())
         {
