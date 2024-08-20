@@ -16,6 +16,7 @@
  */
 
 #include "Common.h"
+#include "CharmInfo.h"
 #include "CreatureAI.h"
 #include "DisableMgr.h"
 #include "GameTime.h"
@@ -353,13 +354,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                     if (spellInfo->Effects[i].TargetA.GetTarget() == TARGET_UNIT_SRC_AREA_ENEMY || spellInfo->Effects[i].TargetA.GetTarget() == TARGET_UNIT_DEST_AREA_ENEMY || spellInfo->Effects[i].TargetA.GetTarget() == TARGET_DEST_DYNOBJ_ENEMY)
                         return;
                 }
-
-                //  Clear the flags as if owner clicked 'attack'. AI will reset them
-                //  after AttackStart, even if spell failed
-                charmInfo->SetIsAtStay(false);
-                charmInfo->SetIsCommandAttack(true);
-                charmInfo->SetIsReturning(false);
-                charmInfo->SetIsFollowing(false);
 
                 TriggerCastFlags triggerCastFlags = TRIGGERED_NONE;
 

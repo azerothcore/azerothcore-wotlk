@@ -345,18 +345,6 @@ public:
     void ReadMovementInfo(WorldPacket& data, MovementInfo* mi);
     void WriteMovementInfo(WorldPacket* data, MovementInfo* mi);
 
-    void SendNotification(std::string_view str);
-    template<typename... Args>
-    void SendNotification(uint32 strId, Args&&... args)
-    {
-        SendNotification(Acore::StringFormatFmt(GetAcoreString(strId), std::forward<Args>(args)...));
-    }
-    template<typename... Args>
-    void SendNotification(char const* fmt, Args&&... args)
-    {
-        SendNotification(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
-    }
-
     void SendPacket(WorldPacket const* packet);
     void SendPetNameInvalid(uint32 error, std::string const& name, DeclinedName* declinedName);
     void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res, uint32 val = 0);
@@ -509,6 +497,7 @@ public:
     LocaleConstant GetSessionDbcLocale() const { return m_sessionDbcLocale; }
     LocaleConstant GetSessionDbLocaleIndex() const { return m_sessionDbLocaleIndex; }
     char const* GetAcoreString(uint32 entry) const;
+    std::string const* GetModuleString(std::string module, uint32 id) const;
 
     uint32 GetLatency() const { return m_latency; }
     void SetLatency(uint32 latency) { m_latency = latency; }
