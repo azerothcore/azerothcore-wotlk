@@ -144,8 +144,6 @@ struct boss_netherspite : public BossAI
                         if (p && p->IsAlive() // alive
                             && (!target || target->GetDistance2d(portal) > p->GetDistance2d(portal)) // closer than current best
                             && !p->HasAura(PlayerDebuff[j]) // not exhausted
-                            && !p->HasAura(PlayerBuff[(j + 1) % 3]) // not on another beam
-                            && !p->HasAura(PlayerBuff[(j + 2) % 3])
                             && IsBetween(me, p, portal)) // on the beam
                             target = p;
                     }
@@ -296,6 +294,7 @@ struct boss_netherspite : public BossAI
     {
         BossAI::JustDied(killer);
         HandleDoors(true);
+        DestroyPortals();
     }
 
     void UpdateAI(uint32 diff) override

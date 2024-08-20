@@ -86,7 +86,8 @@ enum SpellData
     SPELL_HAND_PULSE_25_L                           = 64536,
 
     SPELL_SELF_REPAIR                               = 64383,
-    SPELL_SLEEP                                     = 64394,
+    SPELL_SLEEP_VISUAL_1                            = 64393,
+    SPELL_SLEEP_VISUAL_2                            = 64394,
 };
 
 enum NPCs
@@ -172,10 +173,11 @@ enum EVENTS
     EVENT_JOIN_ACU                                  = 35,
     EVENT_START_PHASE4                              = 36,
     EVENT_FINISH                                    = 50,
-    EVENT_SAY_VOLTRON_DEAD                          = 51,
-    EVENT_DISAPPEAR                                 = 52,
-    EVENT_BERSERK                                   = 53,
-    EVENT_BERSERK_2                                 = 54,
+    EVENT_STAND_UP_FRIENDLY                         = 51,
+    EVENT_SAY_VOLTRON_DEAD                          = 52,
+    EVENT_DISAPPEAR                                 = 53,
+    EVENT_BERSERK                                   = 54,
+    EVENT_BERSERK_2                                 = 55,
 
     // Leviathan:
     EVENT_SPELL_NAPALM_SHELL                        = 3,
@@ -754,16 +756,19 @@ public:
                         Position exitPos = me->GetPosition();
                         me->_ExitVehicle(&exitPos);
                         me->AttackStop();
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_TALK);
                         me->GetMotionMaster()->Clear();
                         summons.DoAction(1337); // despawn summons of summons
                         summons.DespawnEntry(NPC_FLAMES_INITIAL);
                         summons.DespawnEntry(33576);
 
+                        me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
                         float angle = VX001->GetOrientation();
                         float v_x = me->GetPositionX() + cos(angle) * 10.0f;
                         float v_y = me->GetPositionY() + std::sin(angle) * 10.0f;
                         me->GetMotionMaster()->MoveJump(v_x, v_y, 364.32f, 7.0f, 7.0f);
+
+                        DoCastSelf(SPELL_SLEEP_VISUAL_1);
 
                         if( pInstance )
                             for( uint16 i = 0; i < 3; ++i )
@@ -783,11 +788,20 @@ public:
                                 computer->AI()->Talk(TALK_COMPUTER_TERMINATED);
 
                         events.Reset();
-                        events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 6s);
+                        events.ScheduleEvent(EVENT_STAND_UP_FRIENDLY, 6s);
                     }
+                    break;
+                case EVENT_STAND_UP_FRIENDLY:
+                    me->RemoveAurasDueToSpell(SPELL_SLEEP_VISUAL_1);
+                    DoCastSelf(SPELL_SLEEP_VISUAL_2);
+                    me->SetFaction(FACTION_FRIENDLY);
+                    events.ScheduleEvent(EVENT_SAY_VOLTRON_DEAD, 4s);
                     break;
                 case EVENT_SAY_VOLTRON_DEAD:
                     Talk(SAY_V07TRON_DEATH);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    if (pInstance)
+                        pInstance->SetData(TYPE_MIMIRON, DONE);
                     // spawn chest
                     if (uint32 chestId = (hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
                     {
@@ -797,14 +811,21 @@ public:
                             go->SetLootRecipient(me->GetMap());
                         }
                     }
-                    events.ScheduleEvent(EVENT_DISAPPEAR, 15s);
+                    events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
                     break;
                 case EVENT_DISAPPEAR:
-                    if( pInstance )
-                        pInstance->SetData(TYPE_MIMIRON, DONE);
+                    DoCastSelf(SPELL_TELEPORT);
                     summons.DespawnAll();
-                    me->DespawnOrUnsummon();
                     break;
+            }
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
             }
         }
 
@@ -2083,87 +2104,83 @@ public:
     };
 };
 
-class spell_mimiron_rapid_burst : public SpellScriptLoader
+class spell_mimiron_rapid_burst_aura : public AuraScript
 {
-public:
-    spell_mimiron_rapid_burst() : SpellScriptLoader("spell_mimiron_rapid_burst") { }
+    PrepareAuraScript(spell_mimiron_rapid_burst_aura);
 
-    class spell_mimiron_rapid_burst_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_mimiron_rapid_burst_AuraScript)
-
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            if (Unit* c = GetCaster())
+        return ValidateSpellInfo(
             {
-                uint32 id = ( c->GetMap()->Is25ManRaid() ? ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_25_2 : SPELL_RAPID_BURST_DAMAGE_25_1) : ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_10_2 : SPELL_RAPID_BURST_DAMAGE_10_1) );
-                c->CastSpell((Unit*)nullptr, id, true);
-            }
-        }
+                SPELL_RAPID_BURST_DAMAGE_10_1,
+                SPELL_RAPID_BURST_DAMAGE_10_2,
+                SPELL_RAPID_BURST_DAMAGE_25_1,
+                SPELL_RAPID_BURST_DAMAGE_25_2
+            });
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_rapid_burst_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_mimiron_rapid_burst_AuraScript();
+        if (Unit* caster = GetCaster())
+        {
+            uint32 id = (caster->GetMap()->Is25ManRaid() ? ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_25_2 : SPELL_RAPID_BURST_DAMAGE_25_1) : ((aurEff->GetTickNumber() % 2) ? SPELL_RAPID_BURST_DAMAGE_10_2 : SPELL_RAPID_BURST_DAMAGE_10_1));
+            caster->CastSpell((Unit*)nullptr, id, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_rapid_burst_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
-class spell_mimiron_p3wx2_laser_barrage : public SpellScriptLoader
+enum p3wx2LaserBarrage
 {
-public:
-    spell_mimiron_p3wx2_laser_barrage() : SpellScriptLoader("spell_mimiron_p3wx2_laser_barrage") { }
+    SPELL_P3WX2_LASER_BARRAGE_1 = 63297,
+    SPELL_P3WX2_LASER_BARRAGE_2 = 64042
+};
 
-    class spell_mimiron_p3wx2_laser_barrage_AuraScript : public AuraScript
+class spell_mimiron_p3wx2_laser_barrage_aura : public AuraScript
+{
+    PrepareAuraScript(spell_mimiron_p3wx2_laser_barrage_aura);
+
+    bool Load() override
     {
-        PrepareAuraScript(spell_mimiron_p3wx2_laser_barrage_AuraScript)
-
-        uint32 lastMSTime;
-        float lastOrientation;
-
-        bool Load() override
-        {
-            lastMSTime = GameTime::GetGameTimeMS().count();
-            lastOrientation = -1.0f;
-            return true;
-        }
-
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* c = GetCaster())
-            {
-                if (c->GetTypeId() != TYPEID_UNIT)
-                    return;
-                uint32 diff = getMSTimeDiff(lastMSTime, GameTime::GetGameTimeMS().count());
-                if (lastOrientation == -1.0f)
-                {
-                    lastOrientation = (c->ToCreature()->AI()->GetData(0) * 2 * M_PI) / 100.0f;
-                    diff = 0;
-                }
-                float new_o = Position::NormalizeOrientation(lastOrientation - (M_PI / 60) * (diff / 250.0f));
-                lastMSTime = GameTime::GetGameTimeMS().count();
-                lastOrientation = new_o;
-                c->SetFacingTo(new_o);
-
-                c->CastSpell((Unit*)nullptr, 63297, true);
-                c->CastSpell((Unit*)nullptr, 64042, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_p3wx2_laser_barrage_AuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_mimiron_p3wx2_laser_barrage_AuraScript();
+        _lastMSTime = GameTime::GetGameTimeMS().count();
+        _lastOrientation = -1.0f;
+        return true;
     }
+
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            if (caster->GetTypeId() != TYPEID_UNIT)
+                return;
+            uint32 diff = getMSTimeDiff(_lastMSTime, GameTime::GetGameTimeMS().count());
+            if (_lastOrientation == -1.0f)
+            {
+                _lastOrientation = (caster->ToCreature()->AI()->GetData(0) * 2 * M_PI) / 100.0f;
+                diff = 0;
+            }
+            float new_o = Position::NormalizeOrientation(_lastOrientation - (M_PI / 60) * (diff / 250.0f));
+            _lastMSTime = GameTime::GetGameTimeMS().count();
+            _lastOrientation = new_o;
+            caster->SetFacingTo(new_o);
+
+            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_1, true);
+            caster->CastSpell((Unit*)nullptr, SPELL_P3WX2_LASER_BARRAGE_2, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mimiron_p3wx2_laser_barrage_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+
+private:
+    uint32 _lastMSTime;
+    float _lastOrientation;
 };
 
 class go_ulduar_do_not_push_this_button : public GameObjectScript
@@ -2497,8 +2514,8 @@ void AddSC_boss_mimiron()
     new npc_ulduar_mimiron_rocket();
     new npc_ulduar_magnetic_core();
     new npc_ulduar_bot_summon_trigger();
-    new spell_mimiron_rapid_burst();
-    new spell_mimiron_p3wx2_laser_barrage();
+    RegisterSpellScript(spell_mimiron_rapid_burst_aura);
+    RegisterSpellScript(spell_mimiron_p3wx2_laser_barrage_aura);
     new go_ulduar_do_not_push_this_button();
     new npc_ulduar_flames_initial();
     new npc_ulduar_flames_spread();

@@ -18,11 +18,7 @@
 #ifndef DEF_MECHANAR_H
 #define DEF_MECHANAR_H
 
-#include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "Player.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
 
 #define DataHeader "MR"
 

@@ -1054,10 +1054,10 @@ void ConditionMgr::LoadConditions(bool isReload)
         LootTemplates_Spell.ResetConditions();
         LootTemplates_Player.ResetConditions();
 
-        LOG_INFO("server.loading", "Re-Loading `gossip_menu` Table for Conditions!");
+        LOG_INFO("server.loading", "Reloading `gossip_menu` Table for Conditions!");
         sObjectMgr->LoadGossipMenu();
 
-        LOG_INFO("server.loading", "Re-Loading `gossip_menu_option` Table for Conditions!");
+        LOG_INFO("server.loading", "Reloading `gossip_menu_option` Table for Conditions!");
         sObjectMgr->LoadGossipMenuItems();
         sSpellMgr->UnloadSpellInfoImplicitTargetConditionLists();
     }

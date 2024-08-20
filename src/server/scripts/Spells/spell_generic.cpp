@@ -114,6 +114,12 @@ private:
     bool _hasFlag;
 };
 
+enum FlagOfOwnership
+{
+    TEXT_FLAG_OF_OWNERSHIP  = 28008,
+    SPELL_TAUNT_FLAG        = 52605
+};
+
 // 51640 - Taunt Flag Targeting
 class spell_the_flag_of_ownership : public SpellScript
 {
@@ -126,7 +132,7 @@ class spell_the_flag_of_ownership : public SpellScript
         return true;
     }
 
-    void HandleScript(SpellEffIndex  /*effIndex*/)
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
         if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
@@ -134,10 +140,13 @@ class spell_the_flag_of_ownership : public SpellScript
         Player* target = GetHitPlayer();
         if (!target)
             return;
-        caster->CastSpell(target, 52605, true);
-        char buff[100];
-        snprintf(buff, sizeof(buff), "%s plants the Flag of Ownership in the corpse of %s.", caster->GetName().c_str(), target->GetName().c_str());
-        caster->TextEmote(buff, caster);
+        caster->CastSpell(target, SPELL_TAUNT_FLAG, true);
+
+        LocaleConstant loc_idx = caster->ToPlayer()->GetSession()->GetSessionDbLocaleIndex();
+        BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_FLAG_OF_OWNERSHIP);
+        std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName().c_str(), target->GetName().c_str());
+        caster->Talk(bctMsg, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
+
         haveTarget = true;
     }
 
@@ -628,6 +637,7 @@ class spell_gen_black_magic_enchant : public AuraScript
 };
 
 // 53642 - The Might of Mograine
+// 64174 - Protective Gaze
 class spell_gen_area_aura_select_players : public AuraScript
 {
     PrepareAuraScript(spell_gen_area_aura_select_players);
@@ -639,6 +649,24 @@ class spell_gen_area_aura_select_players : public AuraScript
     void Register() override
     {
         DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_gen_area_aura_select_players::CheckAreaTarget);
+    }
+};
+
+// 62650 - Fortitude of Frost
+// 62670 - Resilience of Nature
+// 62671 - Speed of Invention
+// 62702 - Fury of the Storm
+class spell_gen_area_aura_select_players_and_caster : public AuraScript
+{
+    PrepareAuraScript(spell_gen_area_aura_select_players_and_caster);
+
+    bool CheckAreaTarget(Unit* target)
+    {
+        return target->GetTypeId() == TYPEID_PLAYER || target == GetCaster();
+    }
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_gen_area_aura_select_players_and_caster::CheckAreaTarget);
     }
 };
 
@@ -1674,10 +1702,8 @@ class spell_gen_pet_summoned : public SpellScript
         {
             PetType newPetType = (player->IsClass(CLASS_HUNTER, CLASS_CONTEXT_PET)) ? HUNTER_PET : SUMMON_PET;
             Pet* newPet = new Pet(player, newPetType);
-            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true, 100))
+            if (newPet->LoadPetFromDB(player, 0, player->GetLastPetNumber(), true, 100, true))
             {
-                newPet->SetPower(newPet->getPowerType(), newPet->GetMaxPower(newPet->getPowerType()));
-
                 switch (newPet->GetEntry())
                 {
                     case NPC_DOOMGUARD:
@@ -5171,6 +5197,130 @@ class spell_gen_consumption : public SpellScript
     }
 };
 
+// 37591 - Drunken Haze | 29690 - Drunken Skull Crack
+enum DrunkenHaze
+{
+    SPELL_DRUNKEN_HAZE        = 37591,
+    SPELL_DRUNKEN_SKULL_CRACK = 29690
+};
+
+class spell_gen_sober_up : public AuraScript
+{
+    PrepareAuraScript(spell_gen_sober_up);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUNKEN_HAZE, SPELL_DRUNKEN_SKULL_CRACK });
+    }
+
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (!target && !target->ToPlayer())
+            return;
+
+        SpellEffIndex InebriateEffIndex = EFFECT_0;
+        if (Player* player = target->ToPlayer())
+        {
+            switch (GetSpellInfo()->Id)
+            {
+                case SPELL_DRUNKEN_HAZE:
+                    InebriateEffIndex = EFFECT_1;
+                    break;
+                case SPELL_DRUNKEN_SKULL_CRACK:
+                    InebriateEffIndex = EFFECT_2;
+                    break;
+            }
+
+            uint16 level = aurEff->GetSpellInfo()->Effects[InebriateEffIndex].CalcValue();
+            player->SetDrunkValue(player->GetDrunkValue() - (level > 100 ? 100 : level)); // Some (maybe it's only 29690) spells can have over 100 inebriate points
+        }
+    }
+
+    void Register() override
+    {
+        if (m_scriptSpellId == SPELL_DRUNKEN_HAZE)
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_gen_sober_up::OnRemove, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        }
+        else
+        {
+            AfterEffectRemove += AuraEffectRemoveFn(spell_gen_sober_up::OnRemove, EFFECT_1, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        }
+    }
+};
+
+enum StealWeapon
+{
+    SPELL_STEAL_WEAPON = 36207, // in 36208 as script_effect
+    NPC_GLUMDOR        = 20730,
+    SAY_GLUMDOR_STEAL  = 0      // Stupid, squishy $r. That weapon mine now! Give!
+};
+
+ // 36208 - Steal Weapon
+class spell_gen_steal_weapon : public AuraScript
+{
+    PrepareAuraScript(spell_gen_steal_weapon);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_STEAL_WEAPON });
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (!caster || !target)
+            return;
+
+        if (Creature* stealer = caster->ToCreature())
+        {
+            if (Player* player = target->ToPlayer())
+            {
+                if (Item* mainItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+                {
+                    stealer->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, mainItem->GetEntry());
+                    stealer->CastSpell(stealer, SPELL_STEAL_WEAPON, true);
+
+                    if (stealer->GetEntry() == NPC_GLUMDOR)
+                    {
+                        stealer->AI()->Talk(SAY_GLUMDOR_STEAL, player);
+                    }
+                }
+            }
+            // He can steal creature weapons too
+            if (Creature* creature = target->ToCreature())
+            {
+                int8 mainhand = 1;
+                if (EquipmentInfo const* eInfo = sObjectMgr->GetEquipmentInfo(creature->GetEntry(), mainhand))
+                {
+                    stealer->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, eInfo->ItemEntry[0]);
+                    stealer->CastSpell(stealer, SPELL_STEAL_WEAPON, true);
+                }
+            }
+        }
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        if (Creature* stealer = caster->ToCreature())
+        {
+            stealer->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_gen_steal_weapon::OnApply, EFFECT_1, SPELL_AURA_MOD_DISARM, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_gen_steal_weapon::OnRemove, EFFECT_1, SPELL_AURA_MOD_DISARM, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5193,6 +5343,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_disabled_above_63);
     RegisterSpellScript(spell_gen_black_magic_enchant);
     RegisterSpellScript(spell_gen_area_aura_select_players);
+    RegisterSpellScript(spell_gen_area_aura_select_players_and_caster);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5);
@@ -5325,5 +5476,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_yehkinya_bramble);
     RegisterSpellScript(spell_gen_choking_vines);
     RegisterSpellScript(spell_gen_consumption);
+    RegisterSpellScript(spell_gen_sober_up);
+    RegisterSpellScript(spell_gen_steal_weapon);
 }
 

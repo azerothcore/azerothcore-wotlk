@@ -20,7 +20,6 @@
 
 #include "Define.h"
 #include <future>
-#include <memory>
 #include <string>
 #include <vector>
 

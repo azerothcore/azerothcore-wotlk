@@ -19,13 +19,13 @@
 #define AZEROTHCORE_CREATURE_H
 
 #include "Cell.h"
+#include "CharmInfo.h"
 #include "Common.h"
 #include "CreatureData.h"
 #include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
 #include "Unit.h"
-#include "UpdateMask.h"
 #include "World.h"
 #include <list>
 
@@ -53,7 +53,8 @@ public:
 
     float GetNativeObjectScale() const override;
     void SetObjectScale(float scale) override;
-    void SetDisplayId(uint32 modelId) override;
+    void SetDisplayId(uint32 displayId, float displayScale = 1.f) override;
+    void SetDisplayFromModel(uint32 modelIdx);
 
     void DisappearAndDie();
 

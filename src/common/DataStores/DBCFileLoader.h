@@ -46,7 +46,7 @@ public:
     class Record
     {
     public:
-        [[nodiscard]] float getFloat(size_t field) const
+        [[nodiscard]] float getFloat(std::size_t field) const
         {
             ASSERT(field < file.fieldCount);
             float val = *reinterpret_cast<float*>(offset + file.GetOffset(field));
@@ -54,7 +54,7 @@ public:
             return val;
         }
 
-        [[nodiscard]] uint32 getUInt(size_t field) const
+        [[nodiscard]] uint32 getUInt(std::size_t field) const
         {
             ASSERT(field < file.fieldCount);
             uint32 val = *reinterpret_cast<uint32*>(offset + file.GetOffset(field));
@@ -62,16 +62,16 @@ public:
             return val;
         }
 
-        [[nodiscard]] uint8 getUInt8(size_t field) const
+        [[nodiscard]] uint8 getUInt8(std::size_t field) const
         {
             ASSERT(field < file.fieldCount);
             return *reinterpret_cast<uint8*>(offset + file.GetOffset(field));
         }
 
-        [[nodiscard]] const char* getString(size_t field) const
+        [[nodiscard]] const char* getString(std::size_t field) const
         {
             ASSERT(field < file.fieldCount);
-            size_t stringOffset = getUInt(field);
+            std::size_t stringOffset = getUInt(field);
             ASSERT(stringOffset < file.stringSize);
             return reinterpret_cast<char*>(file.stringTable + stringOffset);
         }
@@ -85,12 +85,12 @@ public:
     };
 
     // Get record by id
-    Record getRecord(size_t id);
+    Record getRecord(std::size_t id);
 
     [[nodiscard]] uint32 GetNumRows() const { return recordCount; }
     [[nodiscard]] uint32 GetRowSize() const { return recordSize; }
     [[nodiscard]] uint32 GetCols() const { return fieldCount; }
-    [[nodiscard]] uint32 GetOffset(size_t id) const { return (fieldsOffset != nullptr && id < fieldCount) ? fieldsOffset[id] : 0; }
+    [[nodiscard]] uint32 GetOffset(std::size_t id) const { return (fieldsOffset != nullptr && id < fieldCount) ? fieldsOffset[id] : 0; }
     [[nodiscard]] bool IsLoaded() const { return data != nullptr; }
     char* AutoProduceData(char const* fmt, uint32& count, char**& indexTable);
     char* AutoProduceStrings(char const* fmt, char* dataTable);

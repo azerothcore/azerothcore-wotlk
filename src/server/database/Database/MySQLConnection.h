@@ -80,7 +80,7 @@ public:
     void RollbackTransaction();
     void CommitTransaction();
     int ExecuteTransaction(std::shared_ptr<TransactionBase> transaction);
-    size_t EscapeString(char* to, const char* from, size_t length);
+    std::size_t EscapeString(char* to, const char* from, std::size_t length);
     void Ping();
 
     uint32 GetLastError();

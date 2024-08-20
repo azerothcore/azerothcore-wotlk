@@ -161,41 +161,35 @@ public:
     };
 };
 
-class spell_boss_salramm_steal_flesh : public SpellScriptLoader
+class spell_boss_salramm_steal_flesh_aura : public AuraScript
 {
-public:
-    spell_boss_salramm_steal_flesh() : SpellScriptLoader("spell_boss_salramm_steal_flesh") { }
+    PrepareAuraScript(spell_boss_salramm_steal_flesh_aura);
 
-    class spell_boss_salramm_steal_flesh_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_boss_salramm_steal_flesh_AuraScript);
+        return ValidateSpellInfo({ SPELL_STEAL_FLESH_CASTER, SPELL_STEAL_FLESH_TARGET });
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* caster = GetCaster();
-            Unit* target = GetUnitOwner();
-            if (caster)
-            {
-                caster->CastSpell(caster, SPELL_STEAL_FLESH_CASTER, true);
-                caster->CastSpell(target, SPELL_STEAL_FLESH_TARGET, true);
-            }
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_boss_salramm_steal_flesh_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_boss_salramm_steal_flesh_AuraScript();
+        Unit* caster = GetCaster();
+        Unit* target = GetUnitOwner();
+        if (caster)
+        {
+            caster->CastSpell(caster, SPELL_STEAL_FLESH_CASTER, true);
+            caster->CastSpell(target, SPELL_STEAL_FLESH_TARGET, true);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_boss_salramm_steal_flesh_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
 void AddSC_boss_salramm()
 {
     new boss_salramm();
-    new spell_boss_salramm_steal_flesh();
+    RegisterSpellScript(spell_boss_salramm_steal_flesh_aura);
 }
 

@@ -31,7 +31,7 @@ TaskScheduler& TaskScheduler::Update(success_t const& callback)
     return *this;
 }
 
-TaskScheduler& TaskScheduler::Update(size_t const milliseconds, success_t const& callback)
+TaskScheduler& TaskScheduler::Update(std::size_t const milliseconds, success_t const& callback)
 {
     return Update(std::chrono::milliseconds(milliseconds), callback);
 }

@@ -15,13 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "forge_of_souls.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "forge_of_souls.h"
 
 enum Yells
 {
@@ -256,45 +256,44 @@ public:
     }
 };
 
-class spell_shield_of_bones : public SpellScriptLoader
+enum ShieldOfBones
 {
-public:
-    spell_shield_of_bones() : SpellScriptLoader("spell_shield_of_bones") { }
+    SPELL_SHIELD_OF_BONES_DAMAGE = 69642
+};
 
-    class spell_shield_of_bones_AuraScript : public AuraScript
+class spell_shield_of_bones_aura : public AuraScript
+{
+    PrepareAuraScript(spell_shield_of_bones_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_shield_of_bones_AuraScript);
+        return ValidateSpellInfo({ SPELL_SHIELD_OF_BONES_DAMAGE });
+    }
 
-        int32 amount;
-        bool fired;
+    int32 amount;
+    bool fired;
 
-        bool Load() override
-        {
-            fired = false;
-            amount = 0;
-            return true;
-        }
-
-        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
-        {
-            amount += absorbAmount;
-            if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints + 1)
-                if (Unit* caster = GetCaster())
-                {
-                    fired = true;
-                    caster->CastSpell(caster, 69642, true);
-                }
-        }
-
-        void Register() override
-        {
-            AfterEffectAbsorb += AuraEffectAbsorbFn(spell_shield_of_bones_AuraScript::HandleAfterEffectAbsorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Load() override
     {
-        return new spell_shield_of_bones_AuraScript();
+        fired = false;
+        amount = 0;
+        return true;
+    }
+
+    void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
+    {
+        amount += absorbAmount;
+        if (!fired && amount >= GetSpellInfo()->Effects[EFFECT_0].BasePoints + 1)
+            if (Unit* caster = GetCaster())
+            {
+                fired = true;
+                caster->CastSpell(caster, SPELL_SHIELD_OF_BONES_DAMAGE, true);
+            }
+    }
+
+    void Register() override
+    {
+        AfterEffectAbsorb += AuraEffectAbsorbFn(spell_shield_of_bones_aura::HandleAfterEffectAbsorb, EFFECT_0);
     }
 };
 
@@ -302,6 +301,6 @@ void AddSC_forge_of_souls()
 {
     new npc_fos_leader();
     new npc_fos_leader_second();
-    new spell_shield_of_bones();
+    RegisterSpellScript(spell_shield_of_bones_aura);
 }
 
