@@ -1,4 +1,4 @@
---
+-- .
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=22 AND `SourceEntry`=1428;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 1, 1428, 0, 0, 29, 0, 1433, 100, 0, 1, 0, 0, "", "Execute Rema Schneider's SAI only if Corbett Schneider is not nearby");
