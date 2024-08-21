@@ -35,3 +35,6 @@ for check in ${!multiLineRegexChecks[@]}; do
         exit 1
     fi
 done
+
+echo
+echo "Everything looks good"
