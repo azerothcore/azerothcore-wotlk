@@ -277,3 +277,4 @@ INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`
 UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_maiev_illidan' WHERE (`entry` = 23197);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23197);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2319700);
+UPDATE `creature_template_addon` SET `bytes1` = 0 WHERE (`entry` = 22917);
