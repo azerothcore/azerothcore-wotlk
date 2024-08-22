@@ -38,7 +38,7 @@ public:
 };
 
 WorldSocketMgr::WorldSocketMgr() :
-    BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(65536), _tcpNoDelay(true)
+    BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(4096), _tcpNoDelay(true)
 {
 }
 
