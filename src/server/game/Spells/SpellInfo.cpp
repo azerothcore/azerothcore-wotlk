@@ -880,6 +880,15 @@ bool SpellInfo::HasEffect(SpellEffects effect) const
     return false;
 }
 
+bool SpellInfo::HasEffectMechanic(Mechanics mechanic) const
+{
+    for (auto const& effect : Effects)
+        if (effect.Mechanic == mechanic)
+            return true;
+
+    return false;
+}
+
 bool SpellInfo::HasAura(AuraType aura) const
 {
     for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
