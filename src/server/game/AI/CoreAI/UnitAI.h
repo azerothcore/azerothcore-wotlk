@@ -368,7 +368,7 @@ public:
      */
     virtual void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) {}
 
-    /// @biref Called when the creature receives heal
+    /// @brief Called when the creature receives heal
     virtual void HealReceived(Unit* /*done_by*/, uint32& /*addhealth*/) {}
 
     /// @brief Called when the creature power updates
@@ -389,7 +389,7 @@ public:
     SpellCastResult DoAddAuraToAllHostilePlayers(uint32 spellid);
     SpellCastResult DoCast(uint32 spellId);
     SpellCastResult DoCast(Unit* victim, uint32 spellId, bool triggered = false);
-    SpellCastResult DoCastSelf(uint32 spellId, bool triggered = false) { return DoCast(me, spellId, triggered); }   /// @biref To specify the caster as target if the spell is self-cast
+    SpellCastResult DoCastSelf(uint32 spellId, bool triggered = false) { return DoCast(me, spellId, triggered); }   /// @brief To specify the caster as target if the spell is self-cast
     SpellCastResult DoCastToAllHostilePlayers(uint32 spellid, bool triggered = false);
     SpellCastResult DoCastVictim(uint32 spellId, bool triggered = false);
     SpellCastResult DoCastAOE(uint32 spellId, bool triggered = false);
