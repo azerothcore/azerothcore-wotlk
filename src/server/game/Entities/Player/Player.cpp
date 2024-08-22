@@ -1,21 +1,9 @@
-/*
- * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
- *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
- * more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+/****************************************************************************
+*
+*   Player.cpp
+*
+***/
 
-#include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaSpectator.h"
@@ -31,6 +19,7 @@
 #include "Channel.h"
 #include "CharacterCache.h"
 #include "CharacterDatabaseCleaner.h"
+#include "CharacterServices.h"
 #include "Chat.h"
 #include "CombatLogPackets.h"
 #include "Common.h"
@@ -63,6 +52,7 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "PetitionMgr.h"
+#include "Player.h"
 #include "QuestDef.h"
 #include "Realm.h"
 #include "ReputationMgr.h"
@@ -77,14 +67,18 @@
 #include "Transport.h"
 #include "UpdateData.h"
 #include "Util.h"
+#include "User.h"
 #include "Vehicle.h"
 #include "Weather.h"
 #include "World.h"
 #include "WDataStore.h"
-#include "User.h"
 
 
-static bool s_initialized;
+/****************************************************************************
+*
+*   Message handler declarations
+*
+***/
 
 static BOOL PlayerCreateItemCheatHandler (User*       user,
                                           NETMESSAGE  msgId,
@@ -119,16 +113,16 @@ static BOOL PlayerDechargeCheat (User*        user,
                                  uint         eventTime,
                                  WDataStore*  msg);
 
+
 /****************************************************************************
 *
-*   EXTERNAL FUNCTIONS
+*   Externals
 *
 ***/
 
 //===========================================================================
 void PlayerInitialize () {
-  if (s_initialized) return;
-
+  // REGISTER MESSAGE HANDLERS
   WowConnection::SetMessageHandler(CMSG_RECHARGE, PlayerRechargeCheat);
   WowConnection::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
   WowConnection::SetMessageHandler(CMSG_GODMODE, OnGodMode);
@@ -137,14 +131,11 @@ void PlayerInitialize () {
   WowConnection::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
   WowConnection::SetMessageHandler(CMSG_DECHARGE, PlayerDechargeCheat);
   WowConnection::SetMessageHandler(CMSG_LEVEL_CHEAT, PlayerLevelCheatHandler);
-
-  s_initialized = true;
 }
 
 //===========================================================================
 void PlayerDestroy () {
-  if (!s_initialized) return;
-
+  // UNREGISTER MESSAGE HANDLERS
   WowConnection::ClearMessageHandler(CMSG_RECHARGE);
   WowConnection::ClearMessageHandler(CMSG_CREATEITEM);
   WowConnection::ClearMessageHandler(CMSG_GODMODE);
@@ -153,68 +144,18 @@ void PlayerDestroy () {
   WowConnection::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
   WowConnection::ClearMessageHandler(CMSG_DECHARGE);
   WowConnection::ClearMessageHandler(CMSG_LEVEL_CHEAT);
-
-  s_initialized = false;
 }
 
 
-enum CharacterFlags
-{
-    CHARACTER_FLAG_NONE                 = 0x00000000,
-    CHARACTER_FLAG_UNK1                 = 0x00000001,
-    CHARACTER_FLAG_UNK2                 = 0x00000002,
-    CHARACTER_LOCKED_FOR_TRANSFER       = 0x00000004,
-    CHARACTER_FLAG_UNK4                 = 0x00000008,
-    CHARACTER_FLAG_UNK5                 = 0x00000010,
-    CHARACTER_FLAG_UNK6                 = 0x00000020,
-    CHARACTER_FLAG_UNK7                 = 0x00000040,
-    CHARACTER_FLAG_UNK8                 = 0x00000080,
-    CHARACTER_FLAG_UNK9                 = 0x00000100,
-    CHARACTER_FLAG_UNK10                = 0x00000200,
-    CHARACTER_FLAG_HIDE_HELM            = 0x00000400,
-    CHARACTER_FLAG_HIDE_CLOAK           = 0x00000800,
-    CHARACTER_FLAG_UNK13                = 0x00001000,
-    CHARACTER_FLAG_GHOST                = 0x00002000,
-    CHARACTER_FLAG_RENAME               = 0x00004000,
-    CHARACTER_FLAG_UNK16                = 0x00008000,
-    CHARACTER_FLAG_UNK17                = 0x00010000,
-    CHARACTER_FLAG_UNK18                = 0x00020000,
-    CHARACTER_FLAG_UNK19                = 0x00040000,
-    CHARACTER_FLAG_UNK20                = 0x00080000,
-    CHARACTER_FLAG_UNK21                = 0x00100000,
-    CHARACTER_FLAG_UNK22                = 0x00200000,
-    CHARACTER_FLAG_UNK23                = 0x00400000,
-    CHARACTER_FLAG_UNK24                = 0x00800000,
-    CHARACTER_FLAG_LOCKED_BY_BILLING    = 0x01000000,
-    CHARACTER_FLAG_DECLINED             = 0x02000000,
-    CHARACTER_FLAG_UNK27                = 0x04000000,
-    CHARACTER_FLAG_UNK28                = 0x08000000,
-    CHARACTER_FLAG_UNK29                = 0x10000000,
-    CHARACTER_FLAG_UNK30                = 0x20000000,
-    CHARACTER_FLAG_UNK31                = 0x40000000,
-    CHARACTER_FLAG_UNK32                = 0x80000000
-};
+/****************************************************************************
+*
+*   Player class implementation
+*
+***/
 
-enum CharacterCustomizeFlags
-{
-    CHAR_CUSTOMIZE_FLAG_NONE            = 0x00000000,
-    CHAR_CUSTOMIZE_FLAG_CUSTOMIZE       = 0x00000001,       // name, gender, etc...
-    CHAR_CUSTOMIZE_FLAG_FACTION         = 0x00010000,       // name, gender, faction, etc...
-    CHAR_CUSTOMIZE_FLAG_RACE            = 0x00100000        // name, gender, race, etc...
-};
-
-static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
-
-// we can disable this warning for this since it only
-// causes undefined behavior when passed to the base class constructor
-#ifdef _MSC_VER
-#pragma warning(disable:4355)
-#endif
+//===========================================================================
 Player::Player(class User* user): Unit(true), m_mover(this)
 {
-#ifdef _MSC_VER
-#pragma warning(default:4355)
-#endif
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
 
@@ -476,12 +417,10 @@ Player::Player(class User* user): Unit(true), m_mover(this)
     sScriptMgr->OnConstructPlayer(this);
 }
 
+//===========================================================================
 Player::~Player()
 {
     sScriptMgr->OnDestructPlayer(this);
-
-    // it must be unloaded already in CharacterLoggingOut and accessed only for loggined player
-    //m_social = nullptr;
 
     // Note: buy back item already deleted from DB when player was saved
     for (uint8 i = 0; i < PLAYER_SLOTS_COUNT; ++i)
@@ -1162,6 +1101,7 @@ void Player::RemoveRestState()
     RemovePlayerFlag(PLAYER_FLAGS_RESTING);
 }
 
+//TODO: Move out to User file and rename to SendCharEnum
 bool Player::BuildEnumData(PreparedQueryResult result, WDataStore* data)
 {
     //             0               1                2                3                 4                  5                 6               7
@@ -1230,34 +1170,34 @@ bool Player::BuildEnumData(PreparedQueryResult result, WDataStore* data)
     if (atLoginFlags & AT_LOGIN_RESURRECT)
         playerFlags &= ~PLAYER_FLAGS_GHOST;
     if (playerFlags & PLAYER_FLAGS_HIDE_HELM)
-        charFlags |= CHARACTER_FLAG_HIDE_HELM;
+        charFlags |= CHARACTER_HIDE_HELM;
     if (playerFlags & PLAYER_FLAGS_HIDE_CLOAK)
-        charFlags |= CHARACTER_FLAG_HIDE_CLOAK;
+        charFlags |= CHARACTER_HIDE_CLOAK;
     if (playerFlags & PLAYER_FLAGS_GHOST)
-        charFlags |= CHARACTER_FLAG_GHOST;
+        charFlags |= CHARACTER_GHOST;
     if (atLoginFlags & AT_LOGIN_RENAME)
-        charFlags |= CHARACTER_FLAG_RENAME;
+        charFlags |= CHARACTER_RENAME;
     if (fields[23].Get<uint32>())
-        charFlags |= CHARACTER_FLAG_LOCKED_BY_BILLING;
+        charFlags |= CHARACTER_LOCKED_BY_BILLING;
     if (sWorld->getBoolConfig(CONFIG_DECLINED_NAMES_USED))
     {
         if (!fields[25].Get<std::string>().empty())
-            charFlags |= CHARACTER_FLAG_DECLINED;
+            charFlags |= CHARACTER_DECLINED;
     }
     else
-        charFlags |= CHARACTER_FLAG_DECLINED;
+        charFlags |= CHARACTER_DECLINED;
 
     *data << uint32(charFlags);                              // character flags
 
     // character customize flags
     if (atLoginFlags & AT_LOGIN_CUSTOMIZE)
-        *data << uint32(CHAR_CUSTOMIZE_FLAG_CUSTOMIZE);
+        *data << uint32(CHAR_CUSTOMIZE_CUSTOMIZE);
     else if (atLoginFlags & AT_LOGIN_CHANGE_FACTION)
         *data << uint32(CHAR_CUSTOMIZE_FLAG_FACTION);
     else if (atLoginFlags & AT_LOGIN_CHANGE_RACE)
         *data << uint32(CHAR_CUSTOMIZE_FLAG_RACE);
     else
-        *data << uint32(CHAR_CUSTOMIZE_FLAG_NONE);
+        *data << uint32(CHAR_CUSTOMIZE_NONE);
 
     // First login
     *data << uint8(atLoginFlags & AT_LOGIN_FIRST ? 1 : 0);
@@ -12961,12 +12901,22 @@ void Player::SetMover(Unit* target)
         m_mover->GetMotionMaster()->Initialize();
 }
 
+
+/****************************************************************************
+*
+*   PLAYER CORPSE SYSTEM
+*
+***/
+
+static uint32 s_copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
+
+//===========================================================================
 uint32 Player::GetCorpseReclaimDelay(bool pvp) const
 {
     if (pvp)
     {
         if (!sWorld->getBoolConfig(CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVP))
-            return copseReclaimDelay[0];
+            return s_copseReclaimDelay[0];
     }
     else if (!sWorld->getBoolConfig(CONFIG_DEATH_CORPSE_RECLAIM_DELAY_PVE))
         return 0;
@@ -12975,9 +12925,10 @@ uint32 Player::GetCorpseReclaimDelay(bool pvp) const
     // 0..2 full period
     // should be std::ceil(x)-1 but not floor(x)
     uint64 count = (now < m_deathExpireTime - 1) ? (m_deathExpireTime - 1 - now) / DEATH_EXPIRE_STEP : 0;
-    return copseReclaimDelay[count];
+    return s_copseReclaimDelay[count];
 }
 
+//===========================================================================
 int32 Player::CalculateCorpseReclaimDelay(bool load)
 {
     Corpse* corpse = GetCorpse();
@@ -13005,7 +12956,7 @@ int32 Player::CalculateCorpseReclaimDelay(bool load)
                 count = MAX_DEATH_COUNT - 1;
         }
 
-        time_t expected_time = corpse->GetGhostTime() + copseReclaimDelay[count];
+        time_t expected_time = corpse->GetGhostTime() + s_copseReclaimDelay[count];
         time_t now = GameTime::GetGameTime().count();
 
         if (now >= expected_time)
@@ -13019,12 +12970,14 @@ int32 Player::CalculateCorpseReclaimDelay(bool load)
     return delay * IN_MILLISECONDS;
 }
 
+//===========================================================================
 void Player::SendCorpseReclaimDelay(uint32 delay)
 {
     WDataStore data(SMSG_CORPSE_RECLAIM_DELAY, 4);
     data << uint32(delay);
     User()->Send(&data);
 }
+
 
 Player* Player::GetNextRandomRaidMember(float radius)
 {

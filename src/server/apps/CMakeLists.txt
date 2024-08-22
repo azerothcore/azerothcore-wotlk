@@ -119,7 +119,8 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
 
   # Create the application project
   add_executable(${APP_PROJECT_NAME}
-    ${APP_PRIVATE_SOURCES})
+    ${APP_PRIVATE_SOURCES}
+          ../game/WowServices/CharacterServices.h)
 
   add_dependencies(${APP_PROJECT_NAME} revision.h)
 
