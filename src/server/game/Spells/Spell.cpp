@@ -9035,7 +9035,7 @@ namespace Acore
             if (!target->ToGameObject()->IsInRange(_position->GetPositionX(), _position->GetPositionY(), _position->GetPositionZ(), _range))
                 return false;
         }
-        else if (!target->IsInDist(_position, _range))
+        else if (!target->IsWithinDist3d(_position, _range))
             return false;
         else if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->IsAvoidingAOE()) // pussywizard
             return false;
