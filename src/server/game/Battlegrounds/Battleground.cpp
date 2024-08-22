@@ -1024,46 +1024,34 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
     }
 
     if (IsEventActive(EVENT_SPIRIT_OF_COMPETITION) && isBattleground())
-        SpiritofCompetitionEvent(winnerTeamId);
+        SpiritOfCompetitionEvent(winnerTeamId);
 
     sScriptMgr->OnBattlegroundEnd(this, GetTeamId(winnerTeamId));
 }
 
-bool Battleground::SpiritofCompetitionEvent(PvPTeamId winnerTeamId)
+void Battleground::SpiritOfCompetitionEvent(PvPTeamId winnerTeamId) const
 {
-    // Everyone is eligible for tabard reward
-    for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-    {
-        Player* player = itr->second;
-        bool questStatus = player->GetQuestStatus(QUEST_FLAG_PARTICIPANT) != QUEST_STATUS_REWARDED;
-
-        if (player && questStatus)
-            player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT, true);
-    }
-
-    // In case of a draw nobody get rewarded
-    if (winnerTeamId == PVP_TEAM_NEUTRAL)
-        return false;
+    bool isDraw = winnerTeamId == PVP_TEAM_NEUTRAL;
 
     std::vector<Player*> filteredPlayers;
+    GetBgMap()->DoForAllPlayers([&](Player* player)
+        {
+            // Reward all eligible players the participant reward
+            if (player->GetQuestStatus(QUEST_FLAG_PARTICIPANT) != QUEST_STATUS_REWARDED)
+                player->CastSpell(player, SPELL_SPIRIT_OF_COMPETITION_PARTICIPANT, true);
 
-    for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+            // Collect players of the winning team who has yet to recieve the winner reward
+            if (!isDraw && player->GetBgTeamId() == GetTeamId(winnerTeamId) &&
+                player->GetQuestStatus(QUEST_FLAG_WINNER) != QUEST_STATUS_REWARDED)
+                    filteredPlayers.push_back(player);
+        });
+
+    // Randomly select one player from winners team to recieve the reward, if any eligible
+    if (!filteredPlayers.empty())
     {
-        Player* player = itr->second;
-        bool playerTeam = player->GetBgTeamId() == GetTeamId(winnerTeamId);
-        bool questStatus = player->GetQuestStatus(QUEST_FLAG_WINNER) != QUEST_STATUS_REWARDED;
-
-        if (player && playerTeam && questStatus)
-            filteredPlayers.push_back(player);
+        Player* wPlayer = filteredPlayers[rand() % filteredPlayers.size()];
+        wPlayer->CastSpell(wPlayer, SPELL_SPIRIT_OF_COMPETITION_WINNER, true);
     }
-
-    if (filteredPlayers.size())
-    {
-        if (Player* wPlayer = filteredPlayers[rand() % filteredPlayers.size()])
-            wPlayer->CastSpell(wPlayer, SPELL_SPIRIT_OF_COMPETITION_WINNER, true);
-    }
-
-    return true;
 }
 
 uint32 Battleground::GetBonusHonorFromKill(uint32 kills) const

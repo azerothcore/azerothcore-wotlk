@@ -5445,16 +5445,11 @@ void Unit::RemoveMovementImpairingAuras(bool withRoot)
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
         Aura const* aura = iter->second->GetBase();
-        if (aura->GetSpellInfo()->Mechanic == MECHANIC_SNARE)
+        if (aura->GetSpellInfo()->Mechanic == MECHANIC_SNARE || aura->GetSpellInfo()->HasEffectMechanic(MECHANIC_SNARE))
         {
             RemoveAura(iter);
             continue;
         }
-
-        // Xinef: turn off snare auras by setting amount to 0 :)
-        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-            if (((1 << i) & iter->second->GetEffectMask()) && aura->GetSpellInfo()->Effects[i].Mechanic == MECHANIC_SNARE)
-                aura->GetEffect(i)->ChangeAmount(0);
 
         ++iter;
     }
