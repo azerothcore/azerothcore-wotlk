@@ -1,3 +1,4 @@
+-- DB update 2024_08_22_00 -> 2024_08_22_01
 -- Set RequiredNpcOrGo1 of quest 6661 Deeprun Rat Roundup to 13017
 UPDATE `quest_template` SET `RequiredNpcOrGo1`=13017 WHERE `ID`=6661;
 
