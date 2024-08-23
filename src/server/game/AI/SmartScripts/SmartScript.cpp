@@ -2064,21 +2064,21 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
         {
             for (WorldObject* target : targets)
                 if (IsCreature(target))
-                    target->ToUnit()->SetUInt32Value(UNIT_NPC_FLAGS, e.action.unitFlag.flag);
+                    target->ToUnit()->ReplaceAllNpcFlags(NPCFlags(e.action.unitFlag.flag));
             break;
         }
         case SMART_ACTION_ADD_NPC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsCreature(target))
-                    target->ToUnit()->SetFlag(UNIT_NPC_FLAGS, e.action.unitFlag.flag);
+                    target->ToUnit()->SetNpcFlag(NPCFlags(e.action.unitFlag.flag));
             break;
         }
         case SMART_ACTION_REMOVE_NPC_FLAG:
         {
             for (WorldObject* target : targets)
                 if (IsCreature(target))
-                    target->ToUnit()->RemoveFlag(UNIT_NPC_FLAGS, e.action.unitFlag.flag);
+                    target->ToUnit()->RemoveNpcFlag(NPCFlags(e.action.unitFlag.flag));
             break;
         }
         case SMART_ACTION_CROSS_CAST:

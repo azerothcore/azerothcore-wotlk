@@ -6171,6 +6171,9 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     if (!caster)
         return;
 
+    if (caster->IsTotem())
+        caster = caster->ToTotem()->GetOwner();
+
     // in another case summon new
     uint8 summonLevel = caster->GetLevel();
 
@@ -6283,6 +6286,14 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
             ((Minion*)summon)->SetFollowAngle(m_caster->GetAbsoluteAngle(pos.GetPositionX(), pos.GetPositionY()));
         //else if (summon->HasUnitTypeMask(UNIT_MASK_MINION) && m_targets.HasDst())
         //    ((Minion*)summon)->SetFollowAngle(m_caster->GetAngle(summon));
+
+        // xinef: move this here, some auras are added in initstatsforlevel!
+        if (!summon->IsInCombat() && !summon->IsTrigger())
+        {
+            //  summon->AI()->EnterEvadeMode();
+            summon->GetMotionMaster()->Clear(false);
+            summon->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, summon->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+        }
 
         if (properties && properties->Category == SUMMON_CATEGORY_ALLY)
             summon->SetFaction(caster->GetFaction());
