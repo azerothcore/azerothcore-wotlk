@@ -948,7 +948,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 void ObjectMgr::LoadCreatureCustomIDs()
 {
     // Hack for modules
-    std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "");
+    std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "190010,55005,999991,25462,98888,601014,34567,34568");
     std::vector<std::string_view> CustomCreatures = Acore::Tokenize(stringCreatureIds, ',', false);
 
     for (auto& itr : CustomCreatures)
