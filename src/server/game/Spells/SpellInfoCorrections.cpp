@@ -3954,12 +3954,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx7 |= SPELL_ATTR7_CAN_CAUSE_INTERRUPT;
     });
 
-    // Ritual of Summoning
-    ApplySpellFix({ 61994 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->ManaCostPercentage = 0; // Clicking on Warlock Summoning portal should not require mana
-    });
-
     // Shadowmeld
     ApplySpellFix({ 58984 }, [](SpellInfo* spellInfo)
     {
