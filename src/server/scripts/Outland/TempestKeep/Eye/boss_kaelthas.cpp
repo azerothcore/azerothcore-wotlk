@@ -604,7 +604,7 @@ struct boss_kaelthas : public BossAI
         }, EVENT_SCENE_16);
     }
 
-    void IntroduceNewAdvisor(Yells talkIntroduction, KaelActions kaelAction)
+    void IntroduceNewAdvisor(KTYells talkIntroduction, KTActions kaelAction)
     {
         std::chrono::milliseconds attackStartTimer = 0ms;
         EyeNPCs advisorNPCId = NPC_THALADRED;
