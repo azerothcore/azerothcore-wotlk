@@ -23,7 +23,7 @@
 #include "WorldPacket.h"
 #include "the_eye.h"
 
-enum Yells
+enum KTYells
 {
     // Kael'thas Speech
     SAY_INTRO                           = 0,
@@ -54,7 +54,7 @@ enum Yells
     EMOTE_THALADRED_FIXATE              = 2
 };
 
-enum Spells
+enum KTSpells
 {
     // _phase 2 spells
     SPELL_SUMMON_WEAPONS                = 36976,
@@ -138,7 +138,7 @@ enum Spells
     SPELL_SILENCE                       = 30225
 };
 
-enum Phases
+enum KTPhases
 {
     PHASE_NONE                          = 0,
     PHASE_SINGLE_ADVISOR                = 1,
@@ -148,7 +148,7 @@ enum Phases
     PHASE_FINAL                         = 5
 };
 
-enum Misc
+enum KTMisc
 {
     POINT_MIDDLE                        = 1,
     POINT_AIR                           = 2,
@@ -163,7 +163,7 @@ enum Misc
     NPC_STAFF_OF_DISINTEGRATION         = 21274,
 };
 
-enum PreFightEvents
+enum KTPreFightEvents
 {
     EVENT_PREFIGHT_PHASE1_01              = 1,
     EVENT_PREFIGHT_PHASE1_02              = 2,
@@ -173,7 +173,7 @@ enum PreFightEvents
     EVENT_PREFIGHT_PHASE6_03              = 6,
 };
 
-enum TransitionScene
+enum KTTransitionScene
 {
     EVENT_SCENE_1                       = 50, // NYI
     EVENT_SCENE_2                       = 51,
@@ -193,7 +193,7 @@ enum TransitionScene
     EVENT_SCENE_16                      = 65
 };
 
-enum KaelActions
+enum KTActions
 {
     ACTION_START_SANGUINAR              = 0,
     ACTION_START_CAPERNIAN              = 1,
@@ -202,7 +202,7 @@ enum KaelActions
     ACTION_PROGRESS_PHASE_CHECK         = 4
 };
 
-enum SpellGroups
+enum KTSpellGroups
 {
     GROUP_PROGRESS_PHASE                = 0,
     GROUP_PYROBLAST                     = 1,
