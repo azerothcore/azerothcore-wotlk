@@ -2002,7 +2002,10 @@ void Creature::setDeathState(DeathState state, bool despawn)
         ResetPlayerDamageReq();
         SetCannotReachTarget();
         CreatureTemplate const* cinfo = GetCreatureTemplate();
+        // Xinef: npc run by default
+        //SetWalk(true);
 
+        // pussywizard:
         if (HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
             RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
 
@@ -2090,7 +2093,7 @@ void Creature::Respawn(bool force)
 
             setDeathState(DeathState::JustRespawned);
 
-            // Do not override transform auras
+            // MDic - Acidmanifesto: Do not override transform auras
             if (GetAuraEffectsByType(SPELL_AURA_TRANSFORM).empty())
             {
                 CreatureModel display(GetNativeDisplayId(), GetNativeObjectScale(), 1.0f);
@@ -2155,7 +2158,7 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
     if (IsAlive())
         setDeathState(DeathState::JustDied, true);
 
-    // Set new respawn time, ignore corpse decay time...
+    // Xinef: Set new respawn time, ignore corpse decay time...
     RemoveCorpse(true);
 
     if (forceRespawnTimer > Seconds::zero())
@@ -2393,7 +2396,7 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
 }
 
 /**
- * @biref Select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
+ * @brief Select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
  */
 Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 {

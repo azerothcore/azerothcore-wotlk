@@ -3043,6 +3043,10 @@ void Unit::SendMeleeAttackStart(Unit* victim, Player* sendTo)
  */
 void Unit::SendMeleeAttackStop(Unit* victim)
 {
+    // pussywizard: calling SendMeleeAttackStop without clearing UNIT_STATE_MELEE_ATTACKING and then AttackStart the same player may spoil npc rotating!
+    // pussywizard: this happens in some boss scripts, just add clearing here
+    // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // commented out for now
+
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
     data << GetPackGUID();
 
@@ -14507,7 +14511,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
         GetMotionMaster()->Clear(false);
         GetMotionMaster()->MoveIdle();
 
-        // Remove Hover so the corpse can fall to the ground
+        // Xinef: Remove Hover so the corpse can fall to the ground
         SetHover(false);
 
         if (despawn)
@@ -16624,7 +16628,7 @@ void Unit::StopMovingOnCurrentPos()
     if (!IsInWorld())
         return;
 
-    DisableSpline(); // required so Launch() won't recalculate position from previous spline
+    DisableSpline(); // pussywizard: required so Launch() won't recalculate position from previous spline
     Movement::MoveSplineInit init(this);
     init.MoveTo(GetPositionX(), GetPositionY(), GetPositionZ());
     init.SetFacing(GetOrientation());

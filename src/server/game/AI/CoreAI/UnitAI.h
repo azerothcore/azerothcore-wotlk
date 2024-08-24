@@ -198,7 +198,7 @@ public:
     virtual ~UnitAI() {}
 
     virtual bool CanAIAttack(Unit const* /*target*/) const { return true; }
-    virtual void AttackStart(Unit* /*target*/);    /// @biref Use to start attacking a target. Called just before JustEngagedWith()
+    virtual void AttackStart(Unit* /*target*/);    /// @brief Use to start attacking a target. Called just before JustEngagedWith()
     virtual void UpdateAI(uint32 /*diff*/) = 0;
 
     virtual void InitializeAI() { if (!me->isDead()) Reset(); }
