@@ -2,7 +2,7 @@ import os
 import sys
 
 # Get the src directory of the project
-src_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'src')
+src_directory = os.path.join(os.getcwd(), 'src')
 
 # Global variables
 error_handler = False
