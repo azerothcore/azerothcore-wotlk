@@ -739,4 +739,3 @@ void AddSC_zulfarrak()
     new npc_shadowpriest_sezziz();
     new go_troll_cage();
 }
-

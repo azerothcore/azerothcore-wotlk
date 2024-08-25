@@ -1277,4 +1277,3 @@ void AddSC_boss_nefarian()
     RegisterSpellScript(spell_shadowblink);
     RegisterSpellScript(spell_spawn_drakonid);
 }
-

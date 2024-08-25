@@ -395,4 +395,3 @@ void AddSC_boss_elder_nadox()
     // Achievements
     new achievement_respect_your_elders();
 }
-

@@ -288,4 +288,3 @@ void AddSC_boss_warbringer_omrogg()
     RegisterShatteredHallsCreatureAI(boss_warbringer_omrogg);
     RegisterSpellScript(spell_burning_maul);
 }
-

@@ -172,4 +172,3 @@ void AddSC_boss_warlord_kalithresh()
     RegisterSteamvaultCreatureAI(boss_warlord_kalithresh);
     RegisterSpellScript(spell_warlords_rage);
 }
-

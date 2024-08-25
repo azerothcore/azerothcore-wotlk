@@ -283,4 +283,3 @@ void AddSC_boss_moroes()
     RegisterKarazhanCreatureAI(boss_moroes);
     RegisterSpellScript(spell_moroes_vanish);
 }
-

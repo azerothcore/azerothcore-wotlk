@@ -1511,4 +1511,3 @@ void AddSC_sholazar_basin()
 
     RegisterSpellScript(spell_q12611_deathbolt);
 }
-

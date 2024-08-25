@@ -503,4 +503,3 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_dementia_aura);
     RegisterSpellScript(spell_black_temple_summon_shadowfiends);
 }
-

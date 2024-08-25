@@ -303,4 +303,3 @@ void AddSC_forge_of_souls()
     new npc_fos_leader_second();
     RegisterSpellScript(spell_shield_of_bones_aura);
 }
-

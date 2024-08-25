@@ -2496,4 +2496,3 @@ void AddSC_boss_faction_champions()
     new npc_toc_pet_hunter();
     new spell_faction_champion_warl_unstable_affliction();
 }
-

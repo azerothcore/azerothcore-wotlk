@@ -771,4 +771,3 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_vanish_purge);
     RegisterSpellScript(spell_rog_vanish);
 }
-

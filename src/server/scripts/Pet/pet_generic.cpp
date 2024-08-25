@@ -837,4 +837,3 @@ void AddSC_generic_pet_scripts()
     RegisterCreatureAI(npc_pet_gen_moth);
     RegisterCreatureAI(npc_pet_darting_hatchling);
 }
-
