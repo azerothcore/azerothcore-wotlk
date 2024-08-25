@@ -2,7 +2,9 @@ import os
 import sys
 
 # Get the src directory of the project
-src_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'src/server/shared')
+src_directory = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'src')
+
+error_handler = False
 
 def parsing_file(directory):
     for root, _, files in os.walk(directory):
@@ -22,11 +24,15 @@ def parsing_file(directory):
                 except UnicodeDecodeError:
                     print(f"Could not decode file {file_path}")
                     sys.exit(1)
-    print(f"All codestyle checks are passed. Everything is fine")
+    if error_handler:
+        print("Please fix the codestyle issues above.")
+        sys.exit(1)
+    elif not error_handler:
+        print(f"All codestyle checks are passed. Everything is fine")
 
 # Codestyle patterns checking for multiple blank lines
 def multipleBlankLines_check(file, file_path):
-    error_handler = False
+    global error_handler
     file.seek(0)  # Reset file pointer to the beginning
     consecutive_blank_lines = 0
     for line_number, line in enumerate(file, start=1):
@@ -38,24 +44,20 @@ def multipleBlankLines_check(file, file_path):
                 error_handler = True
         else:
             consecutive_blank_lines = 0
-    if error_handler:
-        sys.exit(1)
 
 # Codestyle patterns checking for whitespace at the end of the lines
 def trailing_whitespace_check(file, file_path):
-    error_handler = False
+    global error_handler
     file.seek(0)  # Reset file pointer to the beginning
     for line_number, line in enumerate(file, start=1):
         if line.endswith(' \n'):
             print(
                 f"Trailing whitespace found: {file_path} at line {line_number}")
             error_handler = True
-    if error_handler:
-        sys.exit(1)
 
 # Codestyle patterns checking for ObjectGuid::GetCounter()
 def getCounter_check(file, file_path):
-    error_handler = False
+    global error_handler
     file.seek(0) # Reset file pointer to the beginning
     for line_number, line in enumerate(file, start=1):
         if 'ObjectGuid::GetCounter()' in line:
@@ -63,12 +65,10 @@ def getCounter_check(file, file_path):
                 f"Please use ObjectGuid::ToString().c_str() instead ObjectGuid::GetCounter():"
                 f" {file_path} at line {line_number}")
             error_handler = True
-    if error_handler:
-        sys.exit(1)
 
 # Codestyle patterns checking for GetTypeId()
 def getTypeId_check(file, file_path):
-    error_handler = False
+    global error_handler
     file.seek(0)  # Reset file pointer to the beginning
     for line_number, line in enumerate(file, start=1):
         if 'GetTypeId() == TYPEID_PLAYER' or 'GetTypeId() != TYPEID_PLAYER' in line:
@@ -87,12 +87,10 @@ def getTypeId_check(file, file_path):
             print(f"Please use IsDynamicObject() instead GetTypeId():"
                   f" {file_path} at line {line_number}")
             error_handler = True
-    if error_handler:
-        sys.exit(1)
 
 # Codestyle patterns checking for NpcFlag helpers
 def npcFlagHelpers_check(file, file_path):
-    error_handler = False
+    global error_handler
     file.seek(0)  # Reset file pointer to the beginning
     for line_number, line in enumerate(file, start=1):
         if 'GetUInt32Value(UNIT_NPC_FLAGS)' in line:
@@ -120,7 +118,5 @@ def npcFlagHelpers_check(file, file_path):
                 f"Please use RemoveNpcFlag() instead RemoveFlag(UNIT_NPC_FLAGS, ...):"
                 f" {file_path} at line {line_number}")
             error_handler = True
-    if error_handler:
-        sys.exit(1)
 
 parsing_file(src_directory)
