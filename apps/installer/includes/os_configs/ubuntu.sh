@@ -22,7 +22,8 @@ esac
 sudo apt update
 
 # shared deps
-sudo apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip
+sudo DEBIAN_FRONTEND="noninteractive" \
+apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip
 
 if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   # TODO: update CI / Docker section for Ubuntu 22.04+
@@ -30,7 +31,8 @@ if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   libboost1.74-dev libbz2-dev libncurses5-dev libmysql++-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool \
   openssl zlib1g-dev
 else
-  sudo apt-get install -y g++ gdb gdbserver gcc git \
+  sudo DEBIAN_FRONTEND="noninteractive" \
+  apt-get install -y g++ gdb gdbserver gcc git \
   libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
   libssl-dev
 
