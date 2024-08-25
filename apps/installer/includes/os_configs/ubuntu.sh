@@ -15,15 +15,18 @@ if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   openssl zlib1g-dev
 else
   case $UBUNTU_VERSION in
-     "20.04")
-       sudo apt-get install -y g++ gdb gdbserver gcc git \
-       libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-       libssl-dev mysql-server
-       ;;
-     *)
-       sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get install -y g++ gdb gdbserver gcc git \
-       libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-       libssl-dev mysql-server
-       ;;
+    *)
+      echo "########## ########## ##########"
+      echo ""
+      echo "    using unsupported Ubuntu version" $UBUNTU_VERSION
+      echo "    please update to Ubuntu 22.04 or later"
+      echo ""
+      echo "########## ########## ##########"
+    "22.04")
+    "24.04")
+      sudo apt-get install -y g++ gdb gdbserver gcc git \
+      libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
+      libssl-dev mysql-server
+      ;;
   esac
 fi
