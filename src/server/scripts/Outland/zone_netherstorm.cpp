@@ -869,4 +869,3 @@ void AddSC_netherstorm()
     RegisterSpellAndAuraScriptPair(spell_q10190_battery_recharging_blaster, spell_q10190_battery_recharging_blaster_aura);
     RegisterSpellScript(spell_challenge_veraku);
 }
-

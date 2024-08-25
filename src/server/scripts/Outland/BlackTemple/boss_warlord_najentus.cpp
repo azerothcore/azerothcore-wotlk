@@ -162,4 +162,3 @@ void AddSC_boss_najentus()
     RegisterSpellScript(spell_najentus_needle_spine);
     RegisterSpellScript(spell_najentus_hurl_spine);
 }
-

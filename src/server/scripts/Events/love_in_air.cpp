@@ -496,4 +496,3 @@ void AddSC_event_love_in_the_air()
     RegisterSpellScript(spell_love_is_in_the_air_romantic_picnic);
     RegisterSpellScript(spell_gen_aura_service_uniform);
 }
-

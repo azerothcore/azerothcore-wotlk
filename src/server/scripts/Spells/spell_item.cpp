@@ -4176,4 +4176,3 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_fel_mana_potion);
     RegisterSpellScript(spell_item_gor_dreks_ointment);
 }
-

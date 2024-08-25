@@ -1532,4 +1532,3 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_glyph_of_voidwalker);
     RegisterSpellScript(spell_warl_demonic_pact_aura);
 }
-

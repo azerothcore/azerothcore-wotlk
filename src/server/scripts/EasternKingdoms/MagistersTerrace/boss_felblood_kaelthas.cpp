@@ -313,4 +313,3 @@ void AddSC_boss_felblood_kaelthas()
     RegisterMagistersTerraceCreatureAI(boss_felblood_kaelthas);
     RegisterSpellScript(spell_mt_phoenix_burn);
 }
-

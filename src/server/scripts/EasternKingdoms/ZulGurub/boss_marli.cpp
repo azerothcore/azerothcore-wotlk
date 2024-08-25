@@ -343,4 +343,3 @@ void AddSC_boss_marli()
     RegisterSpellScript(spell_enveloping_webs);
     RegisterSpellScript(spell_marli_transform);
 }
-

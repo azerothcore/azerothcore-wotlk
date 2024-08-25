@@ -662,4 +662,3 @@ void AddSC_boss_lord_marrowgar()
     RegisterSpellScript(spell_marrowgar_bone_storm);
     RegisterSpellScript(spell_marrowgar_bone_slice);
 }
-

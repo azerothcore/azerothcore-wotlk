@@ -1547,4 +1547,3 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_eat_ooze);
     RegisterSpellScript(spell_putricide_regurgitated_ooze);
 }
-

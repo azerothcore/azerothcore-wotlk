@@ -222,4 +222,3 @@ void AddSC_boss_morogrim_tidewalker()
     RegisterSpellScript(spell_morogrim_tidewalker_watery_grave);
     RegisterSpellScript(spell_morogrim_tidewalker_water_globule_new_target);
 }
-

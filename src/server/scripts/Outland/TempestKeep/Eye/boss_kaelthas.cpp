@@ -1340,4 +1340,3 @@ void AddSC_boss_kaelthas()
     RegisterSpellScript(spell_kaelthas_summon_nether_vapor);
     RegisterSpellScript(spell_kael_pyroblast);
 }
-

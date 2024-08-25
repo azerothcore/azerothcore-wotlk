@@ -504,4 +504,3 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScript(spell_eredar_twins_blaze);
     new AreaTrigger_at_sunwell_eredar_twins();
 }
-

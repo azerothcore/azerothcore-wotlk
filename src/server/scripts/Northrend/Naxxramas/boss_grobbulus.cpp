@@ -305,4 +305,3 @@ void AddSC_boss_grobbulus()
     RegisterSpellScript(spell_grobbulus_mutating_injection_aura);
     RegisterSpellScript(spell_grobbulus_poison);
 }
-

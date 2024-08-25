@@ -453,4 +453,3 @@ void AddSC_boss_sapphiron()
     new boss_sapphiron();
     RegisterSpellScript(spell_sapphiron_frost_explosion);
 }
-

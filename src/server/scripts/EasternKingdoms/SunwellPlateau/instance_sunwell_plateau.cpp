@@ -299,4 +299,3 @@ void AddSC_instance_sunwell_plateau()
     new instance_sunwell_plateau();
     RegisterSpellScript(spell_cataclysm_breath);
 }
-

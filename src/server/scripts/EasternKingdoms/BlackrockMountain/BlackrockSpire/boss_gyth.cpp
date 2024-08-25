@@ -245,4 +245,3 @@ void AddSC_boss_gyth()
     new boss_gyth();
     RegisterSpellScript(spell_gyth_chromatic_protection);
 }
-

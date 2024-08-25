@@ -549,4 +549,3 @@ void AddSC_boss_taldaram()
     RegisterSpellScript(spell_prince_taldaram_conjure_flame_sphere);
     RegisterSpellScript(spell_prince_taldaram_flame_sphere_summon);
 }
-

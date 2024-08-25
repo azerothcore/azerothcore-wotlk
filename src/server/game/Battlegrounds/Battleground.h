@@ -343,7 +343,7 @@ public:
     [[nodiscard]] uint32 GetBonusHonorFromKill(uint32 kills) const;
 
     // Spirit of Competition event
-    bool SpiritofCompetitionEvent(PvPTeamId winnerTeamId);
+    void SpiritOfCompetitionEvent(PvPTeamId winnerTeamId) const;
 
     bool IsRandom() { return m_IsRandom; }
 

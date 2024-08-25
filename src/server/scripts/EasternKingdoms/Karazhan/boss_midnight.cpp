@@ -416,4 +416,3 @@ void AddSC_boss_attumen()
     RegisterKarazhanCreatureAI(boss_attumen);
     RegisterSpellScript(spell_midnight_fixate);
 }
-

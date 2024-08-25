@@ -526,4 +526,3 @@ void AddSC_boss_brutallus()
     RegisterSpellScript(spell_brutallus_burn);
     new AreaTrigger_at_sunwell_madrigosa();
 }
-

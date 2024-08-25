@@ -524,4 +524,3 @@ void AddSC_boss_ick()
     RegisterSpellScript(spell_krick_explosive_barrage_aura);
     RegisterSpellScript(spell_exploding_orb_auto_grow_aura);
 }
-
