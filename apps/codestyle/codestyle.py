@@ -10,7 +10,6 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "GetCounter() check": "Passed",
-    "GetTypeId() check": "Passed",
     "NpcFlagHelpers check": "Passed"
 }
 
