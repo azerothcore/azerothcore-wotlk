@@ -5,18 +5,18 @@ fi
 UBUNTU_VERSION=$(lsb_release -sr);
 
 case $UBUNTU_VERSION in
-"22.04")
-  ;;&
-"24.04")
-  ;;
-*)
-  echo "########## ########## ##########"
-  echo ""
-  echo "    using unsupported Ubuntu version" $UBUNTU_VERSION
-  echo "    please update to Ubuntu 22.04 or later"
-  echo ""
-  echo "########## ########## ##########"
-  ;;
+  "22.04")
+    ;;
+  "24.04")
+    ;;
+  *)
+    echo "########## ########## ##########"
+    echo ""
+    echo "    using unsupported Ubuntu version" $UBUNTU_VERSION
+    echo "    please update to Ubuntu 22.04 or later"
+    echo ""
+    echo "########## ########## ##########"
+    ;;
 esac
 
 sudo apt update
