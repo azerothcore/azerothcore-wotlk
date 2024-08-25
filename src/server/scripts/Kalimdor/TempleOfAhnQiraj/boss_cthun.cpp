@@ -233,10 +233,8 @@ struct boss_eye_of_cthun : public BossAI
             .Schedule(8s, [this](TaskContext task)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                {
                     if (Creature* tentacle = me->SummonCreature(NPC_CLAW_TENTACLE, *target, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                         tentacle->AI()->AttackStart(target);
-                }
 
                 task.SetGroup(GROUP_BEAM_PHASE);
                 task.Repeat();
@@ -388,7 +386,7 @@ struct boss_cthun : public BossAI
             }, 500ms);
 
             //Spawn flesh tentacle
-            for (auto const& position : FleshTentaclePos)
+            for (const auto& position : FleshTentaclePos)
                 me->SummonCreature(NPC_FLESH_TENTACLE, position, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
 
             ScheduleTasks();
