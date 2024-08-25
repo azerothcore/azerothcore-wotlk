@@ -480,4 +480,3 @@ void AddSC_isle_of_conquest()
     RegisterSpellScript(spell_ioc_parachute_ic_aura);
     RegisterSpellScript(spell_ioc_launch);
 }
-

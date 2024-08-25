@@ -375,4 +375,3 @@ void AddSC_deathknight_pet_scripts()
     new npc_pet_dk_dancing_rune_weapon();
     RegisterSpellScript(spell_pet_dk_gargoyle_strike);
 }
-

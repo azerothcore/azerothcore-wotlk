@@ -184,4 +184,3 @@ void AddSC_boss_falric()
 {
     new boss_falric();
 }
-

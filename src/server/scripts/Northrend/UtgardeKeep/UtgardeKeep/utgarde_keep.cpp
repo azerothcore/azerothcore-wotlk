@@ -239,4 +239,3 @@ void AddSC_utgarde_keep()
 
     RegisterSpellScript(spell_ticking_time_bomb_aura);
 }
-

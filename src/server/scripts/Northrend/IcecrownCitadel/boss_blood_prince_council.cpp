@@ -1710,4 +1710,3 @@ void AddSC_boss_blood_prince_council()
     RegisterSpellScript(spell_valanar_kinetic_bomb_summon);
     RegisterSpellScript(spell_blood_council_summon_shadow_resonance);
 }
-

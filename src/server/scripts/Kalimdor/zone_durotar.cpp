@@ -478,4 +478,3 @@ void AddSC_durotar()
     RegisterSpellScript(spell_voljin_war_drums);
     RegisterSpellScript(spell_voodoo);
 }
-

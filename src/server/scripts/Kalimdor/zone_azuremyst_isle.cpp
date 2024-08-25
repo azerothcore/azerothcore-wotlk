@@ -585,4 +585,3 @@ void AddSC_azuremyst_isle()
     new go_bristlelimb_cage();
     RegisterSpellScript(spell_inoculate_nestlewood_owlkin);
 }
-

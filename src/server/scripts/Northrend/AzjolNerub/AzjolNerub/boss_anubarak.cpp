@@ -304,4 +304,3 @@ void AddSC_boss_anub_arak()
     RegisterSpellScript(spell_azjol_nerub_pound);
     RegisterSpellScript(spell_azjol_nerub_impale_summon);
 }
-

@@ -216,4 +216,3 @@ void AddSC_boss_keristrasza()
     new boss_keristrasza();
     new achievement_intense_cold();
 }
-

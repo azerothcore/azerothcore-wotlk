@@ -531,4 +531,3 @@ void AddSC_instance_blackwing_lair()
     RegisterSpellScript(spell_bwl_shadowflame);
     new at_orb_of_command();
 }
-

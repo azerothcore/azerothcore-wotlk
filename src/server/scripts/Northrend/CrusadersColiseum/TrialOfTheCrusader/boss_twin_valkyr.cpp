@@ -927,4 +927,3 @@ void AddSC_boss_twin_valkyr()
     new spell_valkyr_touch();
     new spell_valkyr_ball_periodic_dummy();
 }
-

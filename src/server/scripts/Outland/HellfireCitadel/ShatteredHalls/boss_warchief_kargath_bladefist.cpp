@@ -322,4 +322,3 @@ void AddSC_boss_warchief_kargath_bladefist()
     RegisterShatteredHallsCreatureAI(npc_warchief_portal);
     RegisterSpellScript(spell_blade_dance_targeting);
 }
-

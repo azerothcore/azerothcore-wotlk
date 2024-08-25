@@ -2060,4 +2060,3 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
 }
-

@@ -1694,4 +1694,3 @@ void AddSC_instance_trial_of_the_crusader()
 {
     new instance_trial_of_the_crusader();
 }
-

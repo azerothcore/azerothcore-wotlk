@@ -758,4 +758,3 @@ void AddSC_boss_kalecgos()
     RegisterSpellScript(spell_kalecgos_spectral_realm_dummy);
     RegisterSpellScript(spell_kalecgos_spectral_realm_aura);
 }
-

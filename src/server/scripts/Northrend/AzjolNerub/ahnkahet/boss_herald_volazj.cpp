@@ -504,4 +504,3 @@ void AddSC_boss_volazj()
     RegisterSpellScript(spell_herald_volzaj_insanity);
     RegisterSpellScript(spell_volazj_whisper);
 }
-
