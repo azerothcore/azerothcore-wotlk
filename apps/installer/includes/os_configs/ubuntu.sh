@@ -4,6 +4,21 @@ fi
 
 UBUNTU_VERSION=$(lsb_release -sr);
 
+case $UBUNTU_VERSION in
+"22.04")
+  ;;&
+"24.04")
+  ;;
+*)
+  echo "########## ########## ##########"
+  echo ""
+  echo "    using unsupported Ubuntu version" $UBUNTU_VERSION
+  echo "    please update to Ubuntu 22.04 or later"
+  echo ""
+  echo "########## ########## ##########"
+  ;;
+esac
+
 sudo apt update
 
 # shared deps
@@ -14,20 +29,8 @@ if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
   libboost1.74-dev libbz2-dev libncurses5-dev libmysql++-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool \
   openssl zlib1g-dev
 else
-  case $UBUNTU_VERSION in
-    *)
-      echo "########## ########## ##########"
-      echo ""
-      echo "    using unsupported Ubuntu version" $UBUNTU_VERSION
-      echo "    please update to Ubuntu 22.04 or later"
-      echo ""
-      echo "########## ########## ##########"
-      ;;&
-    "22.04")
-    "24.04")
-      sudo apt-get install -y g++ gdb gdbserver gcc git \
-      libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-      libssl-dev mysql-server
-      ;;
-  esac
+  sudo apt-get install -y g++ gdb gdbserver gcc git \
+  libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
+  libssl-dev mysql-server
+  ;;
 fi
