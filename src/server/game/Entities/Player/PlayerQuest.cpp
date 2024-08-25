@@ -551,7 +551,7 @@ void Player::AddQuest(Quest const* quest, Object* questGiver)
         uint32 timeAllowed = quest->GetTimeAllowed();
 
         // shared timed quest
-        if (questGiver && questGiver->GetTypeId() == TYPEID_PLAYER)
+        if (questGiver && questGiver->IsPlayer())
             timeAllowed = questGiver->ToPlayer()->getQuestStatusMap()[quest_id].Timer / IN_MILLISECONDS;
 
         AddTimedQuest(quest_id);

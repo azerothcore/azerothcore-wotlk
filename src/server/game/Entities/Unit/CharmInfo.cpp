@@ -114,7 +114,7 @@ void CharmInfo::InitCharmCreateSpells()
 {
     InitPetActionBar();
 
-    if (_unit->GetTypeId() == TYPEID_PLAYER)                // charmed players don't have spells
+    if (_unit->IsPlayer())                // charmed players don't have spells
         return;
 
     for (uint32 i = 0; i < MAX_SPELL_CHARM; ++i)

@@ -151,7 +151,7 @@ struct boss_volazj : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
         {
             switch (urand(0, 2))
             {

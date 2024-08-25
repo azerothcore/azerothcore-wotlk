@@ -49,7 +49,7 @@ public:
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 if (apply)
                 {
@@ -869,7 +869,7 @@ public:
                 case EVENT_REACHED_HOME:
                     if (Vehicle* vehicle = me->GetVehicleKit())
                         if (Unit* player = vehicle->GetPassenger(0))
-                            if (player->GetTypeId() == TYPEID_PLAYER)
+                            if (player->IsPlayer())
                             {
                                 // for each prisoner on drake, give credit
                                 for (uint8 i = 1; i < 4; ++i)
@@ -910,7 +910,7 @@ public:
 
         void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 if (apply)
                     Start(false, true, who->GetGUID());
@@ -1116,7 +1116,7 @@ public:
                         {
                             if (Unit* player = vehicle->GetPassenger(0))
                             {
-                                if (player->GetTypeId() == TYPEID_PLAYER)
+                                if (player->IsPlayer())
                                 {
                                     player->m_Events.AddEventAtOffset([player]()
                                     {
@@ -1136,7 +1136,7 @@ public:
                         {
                             if (Unit* player = vehicle->GetPassenger(0))
                             {
-                                if (player->GetTypeId() == TYPEID_PLAYER)
+                                if (player->IsPlayer())
                                 {
                                     player->m_Events.AddEventAtOffset([player]()
                                     {
