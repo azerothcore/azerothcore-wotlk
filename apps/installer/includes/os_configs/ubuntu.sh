@@ -32,5 +32,4 @@ else
   sudo apt-get install -y g++ gdb gdbserver gcc git \
   libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
   libssl-dev mysql-server
-  ;;
 fi
