@@ -108,7 +108,7 @@ enum Yells
     RANDOM_SOUND_WHISPER                        = 8663,
 };
 
-const Position StomachPosition = { -8562.0f, 2037.0f, -70.0f, 5.05f };                      
+const Position StomachPosition = { -8562.0f, 2037.0f, -70.0f, 5.05f };
 
 const Position FleshTentaclePos[2] =
 {
