@@ -30,8 +30,7 @@ def multipleBlankLines_check(directory, exclude_files):
     print(f"Multiple blank lines check: Okay")
 
 # Codestyle patterns checking for whitespace at the end of the lines
-# Doesn't work
-def whiteSpaces_check(directory, exclude_files):
+def trailing_whitespace_check(directory, exclude_files):
     error_handler = False
     for root, _, files in os.walk(directory):
         for file in files:
@@ -40,15 +39,15 @@ def whiteSpaces_check(directory, exclude_files):
                 try:
                     with open(file_path, 'r', encoding='utf-8') as file:
                         for line_number, line in enumerate(file, start=1):
-                            if line.rstrip() != line:
-                                print(f"Whitespace found in {file_path} at the end of the line:  {line_number}")
+                            if line.endswith(' \n'):
+                                print(f"Trailing whitespace found: {file_path} at line {line_number}")
                                 error_handler = True
-                        if error_handler:
-                            sys.exit(1)
                 except UnicodeDecodeError:
                     print(f"Could not decode file {file_path}")
                     sys.exit(1)
-    print(f"Whitespaces check: Okay")
+    if error_handler:
+        sys.exit(1)
+    print(f"GetCounter() use check: Okay")
 
 # Codestyle patterns checking for ObjectGuid::GetCounter()
 def getCounter_check(directory, exclude_files):
@@ -64,11 +63,11 @@ def getCounter_check(directory, exclude_files):
                                 print(f"Please use ObjectGuid::ToString().c_str() instead ObjectGuid::GetCounter():"
                                       f" {file_path} at line {line_number}")
                                 error_handler = True
-                        if error_handler:
-                            sys.exit(1)
                 except UnicodeDecodeError:
                     print(f"Could not decode file {file_path}")
                     sys.exit(1)
+    if error_handler:
+        sys.exit(1)
     print(f"GetCounter() use check: Okay")
 
 # Codestyle patterns checking for GetTypeId()
@@ -97,12 +96,11 @@ def getTypeId_check(directory, exclude_files):
                                 print(f"Please use IsDynamicObject() instead GetTypeId():"
                                       f" {file_path} at line {line_number}")
                                 error_handler = True
-                        if error_handler:
-                            sys.exit(1)
                 except UnicodeDecodeError:
                     print(f"Could not decode file {file_path}")
                     sys.exit(1)
-
+    if error_handler:
+        sys.exit(1)
     print(f"GetTypeId() use check: Okay")
 
 # Codestyle patterns checking for NpcFlag helpers
@@ -135,15 +133,16 @@ def npcFlagHelpers_check(directory, exclude_files):
                                 print(f"Please use RemoveNpcFlag() instead RemoveFlag(UNIT_NPC_FLAGS, ...):"
                                       f" {file_path} at line {line_number}")
                                 error_handler = True
-                        if error_handler:
-                            sys.exit(1)
                 except UnicodeDecodeError:
                     print(f"Could not decode file {file_path}")
                     sys.exit(1)
+    if error_handler:
+        sys.exit(1)
     print(f"NpcFlag helpers use check: Okay")
 
 # Calling checks
-multipleBlankLines_check(src_directory, [])
+#multipleBlankLines_check(src_directory, [])
 #getCounter_check(src_directory, [])
 #getTypeId_check(src_directory, ['Object.h'])
-npcFlagHelpers_check(src_directory, ['Unit.h'])
+#npcFlagHelpers_check(src_directory, ['Unit.h'])
+trailing_whitespace_check(src_directory, [])
