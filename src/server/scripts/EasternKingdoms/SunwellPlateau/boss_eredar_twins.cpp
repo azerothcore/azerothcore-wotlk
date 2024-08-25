@@ -143,7 +143,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
+            if (victim->IsPlayer() && urand(0, 1))
                 Talk(YELL_SAC_KILL);
         }
 
@@ -291,7 +291,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
+            if (victim->IsPlayer() && urand(0, 1))
                 Talk(YELL_SAC_KILL);
         }
 
