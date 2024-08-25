@@ -22,6 +22,7 @@ else
       echo "    please update to Ubuntu 22.04 or later"
       echo ""
       echo "########## ########## ##########"
+      ;;&
     "22.04")
     "24.04")
       sudo apt-get install -y g++ gdb gdbserver gcc git \
