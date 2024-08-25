@@ -22,7 +22,6 @@
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
-#include <random>
 
 enum Says
 {
@@ -287,13 +286,9 @@ public:
     {
         boss_gathios_the_shattererAI(Creature* creature) : boss_illidari_council_memberAI(creature)
         {
-            // Initialize toggle flags with random values to ensure the first toggled spell is cast randomly
-            std::random_device rd;
-            std::mt19937 gen(rd());
-            std::bernoulli_distribution distrib(0.5);
-            _toggleBlessing = distrib(gen);
-            _toggleAura = distrib(gen);
-            _toggleSeal = distrib(gen);
+            _toggleBlessing = RAND(true, false);
+            _toggleAura = RAND(true, false);
+            _toggleSeal = RAND(true, false);
         }
 
         Creature* SelectCouncilMember()
