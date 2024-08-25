@@ -44,6 +44,11 @@ def multipleBlankLines_check(file, file_path):
                 error_handler = True
         else:
             consecutive_blank_lines = 0
+    # Additional check for the end of the file
+    if consecutive_blank_lines >= 1:
+        print(
+            f"Multiple blank lines found at the end of {file_path}")
+        error_handler = True
 
 # Codestyle patterns checking for whitespace at the end of the lines
 def trailing_whitespace_check(file, file_path):
