@@ -226,7 +226,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (22917, 7, 1, 'Give in to your fear!', 14, 0, 100, 0, 0, 11468, 0, 0, 'Illidan SAY_ILLIDAN_TAUNT'),
 (22917, 7, 2, 'You know nothing of power!', 14, 0, 100, 0, 0, 11469, 21500, 0, 'Illidan SAY_ILLIDAN_TAUNT'),
 (22917, 7, 3, 'Such... arrogance!', 14, 0, 100, 0, 0, 11471, 0, 0, 'Illidan SAY_ILLIDAN_TAUNT'),
-(22917, 8, 0, 'Akama. Your duplicity is hardly surprising. I should have slaughtered you and your malformed brethren long ago.', 14, 0, 100, 6, 0, 11463, 20867, 0, 'Illidan SAY_ILLIDAN_DUPLICITY'),
+(22917, 8, 0, 'Akama. Your duplicity is hardly surprising. I should have slaughtered you and your malformed brethren long ago.', 14, 0, 100, 0, 0, 11463, 20867, 0, 'Illidan SAY_ILLIDAN_DUPLICITY'),
 (22917, 9, 0, 'Boldly said. But I remain... unconvinced.', 14, 0, 100, 6, 0, 11464, 20868, 0, 'Illidan SAY_ILLIDAN_UNCONVINCED'),
 (22917, 10, 0, 'You are not prepared!', 14, 0, 100, 406, 0, 11466, 20884, 0, 'Illidan SAY_ILLIDAN_PREPARED'),
 (22917, 11, 0, 'Is this it, mortals? Is this all the fury you can muster?', 14, 0, 100, 0, 0, 11476, 21068, 0, 'Illidan SAY_ILLIDAN_SHADOW_PRISON'),
@@ -248,7 +248,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (23197, 6, 0, 'He\'s right. I feel nothing... I am... nothing.', 14, 0, 100, 0, 0, 11497, 21508, 0, 'Maiev Shadowsong SAY_MAIEV_SHADOWSONG_OUTRO'),
 (23197, 7, 0, 'Farewell, champions.', 14, 0, 100, 0, 0, 11498, 21509, 0, 'Maiev Shadowsong SAY_MAIEV_SHADOWSONG_FAREWELL');
 
-DELETE FROM `waypoint_data` WHERE `id` = @PATH;
+DELETE FROM `waypoint_data` WHERE `id` IN (230892, 230893, 230894);
 INSERT INTO `waypoint_data` (`id`,`point`,`position_x`,`position_y`,`position_z`,`orientation`,`delay`,`move_type`,`action`,`action_chance`,`wpguid`) VALUES
 -- Path Illidari Council 2
 (230892,1,673.1424,354.9833,271.6953,NULL,0,1,0,100,0),
@@ -278,3 +278,12 @@ UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_maiev_illidan'
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 23197);
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2319700);
 UPDATE `creature_template_addon` SET `bytes1` = 0 WHERE (`entry` = 22917);
+
+UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 23498;
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 23498) AND (`source_type` = 0);
+UPDATE `creature_template_addon` SET `bytes2` = 1, `auras` = '34429 41913' WHERE (`entry` = 23498);
+UPDATE `creature_template` SET `ScriptName` = 'npc_parasitic_shadowfiend' WHERE (`entry` = 23498);
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 22996;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 22996);
+UPDATE `creature_template` SET `ScriptName` = 'npc_blade_of_azzinoth' WHERE (`entry` = 22996);

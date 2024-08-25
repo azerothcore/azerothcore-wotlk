@@ -62,6 +62,7 @@ enum Spells
     SPELL_PARASITIC_SHADOWFIEND         = 41917,
     SPELL_PARASITIC_SHADOWFIEND_TRIGGER = 41914,
     SPELL_SUMMON_PARASITIC_SHADOWFIENDS = 41915,
+    SPELL_SHEAR                         = 41032,
 
     // Phase 2
     SPELL_THROW_GLAIVE                  = 39635,
@@ -129,7 +130,8 @@ enum Misc
     POINT_ILLIDAN_HOVER    = 2,
     POINT_ILLIDAN_LAND     = 3,
 
-    GROUP_PHASE_FLYING     = 1,
+    GROUP_BERSERK          = 1,
+    GROUP_PHASE_FLYING     = 2,
 
     NPC_WORLD_TRIGGER      = 22515,
     NPC_ILLIDAN_DB_TARGET  = 23070,
@@ -173,6 +175,8 @@ struct boss_illidan_stormrage : public BossAI
     void Reset() override
     {
         BossAI::Reset();
+        me->m_Events.CancelEventGroup(GROUP_BERSERK);
+        me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
         _canTalk = true;
         _dying = false;
         beamPosId = 0;
@@ -242,6 +246,7 @@ struct boss_illidan_stormrage : public BossAI
             case ACTION_ILLIDAN_LIFTOFF:
             {
                 me->SetReactState(REACT_PASSIVE);
+                me->SendMeleeAttackStop();
                 me->GetMotionMaster()->Clear();
                 me->StopMovingOnCurrentPos();
                 DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
@@ -344,6 +349,7 @@ struct boss_illidan_stormrage : public BossAI
                         if (!summons.HasEntry(NPC_FLAME_OF_AZZINOTH))
                         {
                             me->InterruptNonMeleeSpells(false);
+                            me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
                             me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_LAND, illidanLand);
                             scheduler.CancelAll();
                         }
@@ -390,7 +396,26 @@ struct boss_illidan_stormrage : public BossAI
         {
             case PHASE_INITIAL:
             {
+                ScheduleTimedEvent(25s, 30s, [&] {
+                    DoCastVictim(SPELL_FLAME_CRASH);
+                }, 26s, 35s);
 
+                // ScheduleTimedEvent(10s, [&] {
+                //     DoCastVictim(SPELL_SHEAR);
+                // }, 12s, 15s);
+
+                ScheduleTimedEvent(32s, [&] {
+                    DoCastVictim(SPELL_DRAW_SOUL);
+                }, 32s);
+
+                ScheduleTimedEvent(25s, 30s, [&] {
+                    DoCastRandomTarget(SPELL_PARASITIC_SHADOWFIEND, 0U, 100.f);
+                }, 25s, 30s);
+
+                // Custom from SunwellCore
+                ScheduleTimedEvent(30s, 60s, [&] {
+                    Talk(SAY_ILLIDAN_TAUNT);
+                }, 30s, 60s);
             }
             break;
             case PHASE_FLYING:
@@ -443,6 +468,10 @@ struct boss_illidan_stormrage : public BossAI
     {
         BossAI::JustEngagedWith(who);
         ScheduleAbilities(PHASE_INITIAL);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_BERSERK, true);
+        }, 25min, GROUP_BERSERK);
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -465,6 +494,7 @@ struct boss_illidan_stormrage : public BossAI
             akama->DespawnOnEvade();
 
         BossAI::EnterEvadeMode(why);
+        me->DespawnOnEvade();
     }
 
     void JustSummoned(Creature* summon) override
@@ -492,7 +522,7 @@ struct boss_illidan_stormrage : public BossAI
         }
     }
 
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override
     {
         if (damage >= me->GetHealth())
         {
@@ -501,6 +531,9 @@ struct boss_illidan_stormrage : public BossAI
             if (!_dying)
                 DoAction(ACTION_ILLIDAN_DIE);
         }
+
+        if (!_dying)
+            BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
     }
 
     void JustDied(Unit* killer) override
@@ -559,8 +592,8 @@ enum Akama
 };
 
 Position AkamaIllidariCouncilTeleport = { 609.772f, 308.456f, 271.826f, 6.1972566f };
-Position SpiritUdaloPos = { 203.4694f, 998.52563f, -64.33898f, 5.934119224548339843f };
-Position SpiritOlumPos = { 698.1477f, 191.44293f, 125.090294f, 1.099557399749755859f };
+Position SpiritUdaloPos = { 751.4565f, 311.01065f, 312.18997f, 0.f };
+Position SpiritOlumPos = { 751.6437f, 297.2233f, 312.20825f, 6.038839340209960937f };
 Position FaceIllidan = { 745.225f, 304.946f, 352.98593f };
 Position IllidanDefeated = { 753.04553f, 369.30273f, 353.1165f };
 Position IllidariMinionPos[10] =
@@ -587,6 +620,7 @@ struct npc_akama_illidan : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
+        me->m_Events.KillAllEvents(true);
         me->SetReactState(REACT_AGGRESSIVE);
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         me->setActive(false);
@@ -878,6 +912,7 @@ struct npc_maiev_illidan : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
+        me->m_Events.KillAllEvents(true);
     }
 
     void DoAction(int32 param) override
@@ -989,6 +1024,73 @@ struct npc_maiev_illidan : public ScriptedAI
 
 private:
     InstanceScript* instance;
+};
+
+struct npc_parasitic_shadowfiend : public ScriptedAI
+{
+    npc_parasitic_shadowfiend(Creature* creature) : ScriptedAI(creature) { }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        // Simulate blizz-like AI delay to avoid extreme overpopulation of adds
+        me->SetReactState(REACT_PASSIVE);
+        me->m_Events.AddEventAtOffset([&] {
+            me->SetReactState(REACT_AGGRESSIVE);
+            me->SetInCombatWithZone();
+        }, 1200ms);
+    }
+};
+
+enum WarbladeTear
+{
+    SOUND_WARBLADE_SPAWN = 11689,
+    SPELL_BIRTH          = 40031,
+    SPELL_SUMMON_TEAR    = 39855,
+    SPELL_TEAR_CHANNEL   = 39857,
+    MODEL_INVISIBLE      = 11686
+};
+
+struct npc_blade_of_azzinoth : public ScriptedAI
+{
+    npc_blade_of_azzinoth(Creature* creature) : ScriptedAI(creature) { illidan = nullptr; }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        illidan = summoner;
+        me->SetReactState(REACT_PASSIVE);
+        me->PlayRadiusSound(SOUND_WARBLADE_SPAWN, 150.f);
+
+        me->m_Events.AddEventAtOffset([&] {
+            DoCastSelf(SPELL_SUMMON_TEAR);
+        }, 2700ms);
+    }
+
+    void JustSummoned(Creature* /*summon*/) override
+    {
+        DoCastSelf(SPELL_TEAR_CHANNEL, true);
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_RETURN_BLADE)
+        {
+            if (illidan)
+            {
+                DoCast(illidan->ToUnit(), SPELL_GLAIVE_RETURNS);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    me->SetDisplayId(MODEL_INVISIBLE);
+                }, 10ms);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    me->DespawnOrUnsummon();
+                }, 2020ms);
+            }
+        }
+    }
+
+private:
+    WorldObject* illidan;
 };
 
 class spell_illidan_draw_soul : public SpellScript
@@ -1330,6 +1432,8 @@ void AddSC_boss_illidan()
     RegisterBlackTempleCreatureAI(boss_illidan_stormrage);
     RegisterBlackTempleCreatureAI(npc_maiev_illidan);
     RegisterBlackTempleCreatureAI(npc_akama_illidan);
+    RegisterBlackTempleCreatureAI(npc_parasitic_shadowfiend);
+    RegisterBlackTempleCreatureAI(npc_blade_of_azzinoth);
     RegisterSpellScript(spell_illidan_draw_soul);
     RegisterSpellScript(spell_illidan_parasitic_shadowfiend_aura);
     RegisterSpellAndAuraScriptPair(spell_illidan_parasitic_shadowfiend_trigger, spell_illidan_parasitic_shadowfiend_trigger_aura);
