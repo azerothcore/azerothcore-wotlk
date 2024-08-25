@@ -13,7 +13,7 @@ jobs:
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v4
-      - name: setup python
+      - name: Setup python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'

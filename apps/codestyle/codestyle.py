@@ -26,8 +26,6 @@ def parsing_file(directory):
                         multipleBlankLines_check(file, file_path)
                         trailing_whitespace_check(file, file_path)
                         getCounter_check(file, file_path)
-                        #if file_name != 'Object.h':
-                            #getTypeId_check(file, file_path)
                         if file_name != 'Unit.h':
                             npcFlagHelpers_check(file, file_path)
                 except UnicodeDecodeError:
@@ -89,6 +87,7 @@ def getCounter_check(file, file_path):
         results["GetCounter check"] = "Failed"
 
 # Codestyle patterns checking for GetTypeId()
+# Unused for now. Need to fix all usage in the core before adding the check to the github workflow
 def getTypeId_check(file, file_path):
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
