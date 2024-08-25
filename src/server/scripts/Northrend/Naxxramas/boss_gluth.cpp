@@ -278,4 +278,3 @@ void AddSC_boss_gluth()
     new boss_gluth();
     RegisterSpellScript(spell_gluth_decimate);
 }
-

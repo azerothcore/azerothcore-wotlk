@@ -259,4 +259,3 @@ void AddSC_boss_murmur()
     RegisterSpellScript(spell_shockwave_knockback);
     RegisterSpellScript(spell_murmur_sonic_boom_effect);
 }
-

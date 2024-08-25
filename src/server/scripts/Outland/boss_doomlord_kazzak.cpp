@@ -189,4 +189,3 @@ void AddSC_boss_doomlordkazzak()
     new boss_doomlord_kazzak();
     RegisterSpellScript(spell_mark_of_kazzak_aura);
 }
-

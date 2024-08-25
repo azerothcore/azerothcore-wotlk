@@ -475,4 +475,3 @@ void AddSC_the_black_morass()
 
     RegisterSpellScript(spell_black_morass_corrupt_medivh);
 }
-

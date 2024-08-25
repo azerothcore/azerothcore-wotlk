@@ -1313,4 +1313,3 @@ void AddSC_boss_freya()
     new achievement_freya_knock_on_wood("achievement_freya_knock_knock_on_wood", 2);
     new achievement_freya_knock_on_wood("achievement_freya_knock_knock_knock_on_wood", 3);
 }
-

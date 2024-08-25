@@ -1240,4 +1240,3 @@ void AddSC_instance_naxxramas()
     new boss_naxxramas_misc();
     new at_naxxramas_hub_portal();
 }
-

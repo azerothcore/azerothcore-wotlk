@@ -683,4 +683,3 @@ void AddSC_event_pilgrims_end_scripts()
     new achievement_pb_pilgrims_peril();
     new achievement_pb_terokkar_turkey_time();
 }
-

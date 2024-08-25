@@ -168,4 +168,3 @@ void AddSC_instance_the_eye()
     new instance_the_eye();
     RegisterSpellScript(spell_the_eye_countercharge_aura);
 }
-

@@ -711,4 +711,3 @@ void AddSC_boss_lord_marrowgar()
     new spell_marrowgar_bone_storm();
     new spell_marrowgar_bone_slice();
 }
-

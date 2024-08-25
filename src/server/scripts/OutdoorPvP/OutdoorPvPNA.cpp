@@ -928,4 +928,3 @@ void AddSC_outdoorpvp_na()
     new OutdoorPvP_nagrand();
     RegisterCreatureAI(outdoorpvp_na_halaa_creatures);
 }
-

@@ -538,4 +538,3 @@ void AddSC_boss_shade_of_akama()
     RegisterSpellScript(spell_shade_of_akama_shade_soul_channel);
     RegisterSpellScript(spell_shade_of_akama_akama_soul_expel);
 }
-

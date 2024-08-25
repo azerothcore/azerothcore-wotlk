@@ -153,4 +153,3 @@ void AddSC_instance_the_botanica()
     RegisterSpellScript(spell_botanica_call_of_the_falcon_aura);
     RegisterSpellScript(spell_botanica_shift_form_aura);
 }
-

@@ -476,4 +476,3 @@ void AddSC_boss_drakkari_colossus()
     RegisterSpellScript(spell_drakkari_colossus_surge);
     RegisterSpellScript(spell_drakkari_colossus_face_me);
 }
-

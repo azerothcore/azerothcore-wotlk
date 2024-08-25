@@ -730,4 +730,3 @@ void AddSC_boss_reliquary_of_souls()
     RegisterSpellScript(spell_reliquary_of_souls_aura_of_anger_aura);
     RegisterSpellScript(spell_reliquary_of_souls_spite_aura);
 }
-

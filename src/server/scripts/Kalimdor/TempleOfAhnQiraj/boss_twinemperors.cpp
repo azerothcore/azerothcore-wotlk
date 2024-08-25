@@ -487,4 +487,3 @@ void AddSC_boss_twinemperors()
     new at_twin_emperors();
     RegisterSpellScript(spell_mutate_explode_bug);
 }
-

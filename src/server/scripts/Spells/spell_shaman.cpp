@@ -1177,4 +1177,3 @@ void AddSC_shaman_spell_scripts()
     RegisterSpellScript(spell_sha_flurry_proc);
     RegisterSpellScript(spell_sha_t8_electrified);
 }
-

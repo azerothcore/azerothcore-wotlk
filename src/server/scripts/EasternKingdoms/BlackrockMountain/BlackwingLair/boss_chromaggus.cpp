@@ -365,4 +365,3 @@ void AddSC_boss_chromaggus()
     RegisterSpellScript(spell_gen_elemental_shield);
     RegisterSpellScript(spell_gen_brood_power);
 }
-

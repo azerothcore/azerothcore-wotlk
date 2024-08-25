@@ -420,4 +420,3 @@ void AddSC_boss_viscidus()
     RegisterSpellScript(spell_explode_trigger);
     RegisterSpellScript(spell_summon_toxin_slime);
 }
-

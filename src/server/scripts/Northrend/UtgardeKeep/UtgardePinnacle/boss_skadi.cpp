@@ -533,4 +533,3 @@ void AddSC_boss_skadi()
     new boss_skadi_grauf();
     new go_harpoon_canon();
 }
-

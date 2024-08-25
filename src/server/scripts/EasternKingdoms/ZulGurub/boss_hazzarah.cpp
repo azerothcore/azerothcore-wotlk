@@ -169,4 +169,3 @@ void AddSC_boss_hazzarah()
     RegisterZulGurubCreatureAI(boss_hazzarah);
     RegisterSpellScript(spell_chain_burn);
 }
-

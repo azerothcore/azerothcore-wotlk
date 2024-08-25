@@ -373,4 +373,3 @@ void AddSC_boss_bronjahm()
     RegisterSpellScript(spell_bronjahm_soulstorm_visual_aura);
     RegisterSpellScript(spell_bronjahm_soulstorm_targeting);
 }
-

@@ -127,4 +127,3 @@ void AddSC_dustwallow_marsh()
     RegisterSpellScript(spell_ooze_zap_channel_end);
     RegisterSpellScript(spell_energize_aoe);
 }
-

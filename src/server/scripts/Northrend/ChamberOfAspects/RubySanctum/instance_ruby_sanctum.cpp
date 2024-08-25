@@ -276,4 +276,3 @@ void AddSC_instance_ruby_sanctum()
     new instance_ruby_sanctum();
     RegisterSpellScript(spell_ruby_sanctum_rallying_shout);
 }
-

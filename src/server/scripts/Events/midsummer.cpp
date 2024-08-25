@@ -1308,4 +1308,3 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_torch_catch);
     RegisterSpellScript(spell_midsummer_summon_ahune_lieutenant);
 }
-

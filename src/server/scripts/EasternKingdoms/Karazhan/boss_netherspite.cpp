@@ -336,4 +336,3 @@ void AddSC_boss_netherspite()
     RegisterKarazhanCreatureAI(boss_netherspite);
     RegisterSpellScript(spell_nether_portal_perseverence);
 }
-

@@ -1187,4 +1187,3 @@ void AddSC_storm_peaks()
     new npc_vehicle_d16_propelled_delivery();
     RegisterSpellScript(spell_q12823_remove_collapsing_cave_aura);
 }
-

@@ -821,4 +821,3 @@ void AddSC_boss_palehoof()
     new npc_frenzied_worgen();
     new go_palehoof_sphere();
 }
-

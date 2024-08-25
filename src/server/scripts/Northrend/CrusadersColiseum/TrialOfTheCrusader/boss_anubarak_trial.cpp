@@ -955,4 +955,3 @@ void AddSC_boss_anubarak_trial()
     new spell_gen_leeching_swarm();
     new spell_gen_leeching_swarm_dmg();
 }
-

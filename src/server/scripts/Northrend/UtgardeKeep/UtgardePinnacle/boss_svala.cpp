@@ -439,4 +439,3 @@ void AddSC_boss_svala()
     new npc_ritual_channeler();
     RegisterSpellAndAuraScriptPair(spell_svala_ritual_strike, spell_svala_ritual_strike_aura);
 }
-

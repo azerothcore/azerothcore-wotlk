@@ -687,4 +687,3 @@ void AddSC_isle_of_queldanas()
     // THEIR:
     new npc_greengill_slave();
 }
-

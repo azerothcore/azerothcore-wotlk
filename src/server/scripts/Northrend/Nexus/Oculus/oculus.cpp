@@ -922,4 +922,3 @@ void AddSC_oculus()
     RegisterSpellScript(spell_oculus_rider_aura);
     RegisterSpellScript(spell_oculus_drake_flag_aura);
 }
-

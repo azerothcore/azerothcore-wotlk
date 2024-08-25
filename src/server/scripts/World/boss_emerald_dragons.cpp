@@ -860,4 +860,3 @@ void AddSC_emerald_dragons()
     RegisterSpellScript(spell_mark_of_nature);
     RegisterSpellScript(spell_shadow_bolt_whirl);
 };
-

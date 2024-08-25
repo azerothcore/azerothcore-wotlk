@@ -186,4 +186,3 @@ void AddSC_instance_gnomeregan()
     new npc_kernobee();
     new spell_gnomeregan_radiation_bolt();
 }
-

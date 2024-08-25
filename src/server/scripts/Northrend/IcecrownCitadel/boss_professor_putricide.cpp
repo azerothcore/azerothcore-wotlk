@@ -1730,4 +1730,3 @@ void AddSC_boss_professor_putricide()
     new spell_putricide_eat_ooze();
     new spell_putricide_regurgitated_ooze();
 }
-

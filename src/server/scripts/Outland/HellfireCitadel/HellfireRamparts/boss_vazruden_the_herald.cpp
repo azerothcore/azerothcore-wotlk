@@ -365,4 +365,3 @@ void AddSC_boss_vazruden_the_herald()
     RegisterSpellScript(spell_vazruden_fireball);
     RegisterSpellScript(spell_vazruden_call_nazan);
 }
-

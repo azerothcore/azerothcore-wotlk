@@ -302,4 +302,3 @@ void AddSC_instance_sunken_temple()
     new spell_temple_of_atal_hakkar_hex_of_jammal_an();
     new spell_temple_of_atal_hakkar_awaken_the_soulflayer();
 }
-

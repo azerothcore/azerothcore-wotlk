@@ -70,4 +70,3 @@ void AddSC_player_scripts()
 {
     new QuestApprenticeAnglerPlayerScript();
 }
-

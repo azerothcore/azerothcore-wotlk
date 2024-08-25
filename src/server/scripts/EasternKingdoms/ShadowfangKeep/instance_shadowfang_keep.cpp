@@ -237,4 +237,3 @@ void AddSC_instance_shadowfang_keep()
     new spell_shadowfang_keep_haunting_spirits();
     new spell_shadowfang_keep_forsaken_skills();
 }
-

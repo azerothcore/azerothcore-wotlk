@@ -194,4 +194,3 @@ void AddSC_instance_obsidian_sanctum()
 {
     new instance_obsidian_sanctum();
 }
-

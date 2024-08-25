@@ -1178,4 +1178,3 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_seal_of_righteousness);
     RegisterSpellScript(spell_pal_seal_of_vengeance);
 }
-

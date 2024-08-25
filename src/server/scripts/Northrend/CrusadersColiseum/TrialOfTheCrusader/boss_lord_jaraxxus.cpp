@@ -524,4 +524,3 @@ void AddSC_boss_jaraxxus()
     new spell_toc25_mistress_kiss();
     new spell_mistress_kiss_area();
 }
-

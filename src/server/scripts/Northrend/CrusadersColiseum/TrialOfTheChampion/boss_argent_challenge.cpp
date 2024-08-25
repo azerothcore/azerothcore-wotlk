@@ -822,4 +822,3 @@ void AddSC_boss_argent_challenge()
     RegisterSpellScript(spell_toc5_light_rain);
     RegisterSpellScript(spell_reflective_shield_aura);
 }
-

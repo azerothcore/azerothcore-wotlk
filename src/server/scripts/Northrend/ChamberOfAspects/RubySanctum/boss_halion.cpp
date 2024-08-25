@@ -1358,4 +1358,3 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_twilight_division);
     RegisterSpellScript(spell_halion_twilight_mending);
 }
-

@@ -79,4 +79,3 @@ void AddSC_server_mail()
 {
     new ServerMailReward();
 }
-

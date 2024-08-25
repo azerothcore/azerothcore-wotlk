@@ -974,4 +974,3 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_mind_control);
     RegisterSpellScript(spell_pri_t4_4p_bonus);
 }
-

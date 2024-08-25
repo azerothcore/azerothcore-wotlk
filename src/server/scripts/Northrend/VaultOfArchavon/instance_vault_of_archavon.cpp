@@ -268,4 +268,3 @@ void AddSC_instance_vault_of_archavon()
 {
     new instance_vault_of_archavon();
 }
-

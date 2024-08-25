@@ -130,4 +130,3 @@ void AddSC_outdoorpvp_gh()
 {
     new OutdoorPvP_grizzly_hills();
 }
-

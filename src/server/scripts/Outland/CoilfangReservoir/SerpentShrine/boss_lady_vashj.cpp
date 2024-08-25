@@ -461,4 +461,3 @@ void AddSC_boss_lady_vashj()
     RegisterSpellScript(spell_lady_vashj_spore_drop_effect);
     RegisterSpellScript(spell_lady_vashj_summons);
 }
-

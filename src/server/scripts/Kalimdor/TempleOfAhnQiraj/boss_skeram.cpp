@@ -261,4 +261,3 @@ void AddSC_boss_skeram()
     RegisterTempleOfAhnQirajCreatureAI(boss_skeram);
     RegisterSpellScript(spell_skeram_arcane_explosion);
 }
-

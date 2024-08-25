@@ -5479,4 +5479,3 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_sober_up);
     RegisterSpellScript(spell_gen_steal_weapon);
 }
-

@@ -802,4 +802,3 @@ void AddSC_boss_mandokir()
     RegisterSpellScript(spell_mandokir_charge);
     RegisterSpellScript(spell_threatening_gaze_charge);
 }
-

@@ -464,4 +464,3 @@ void AddSC_instance_scholomance()
     new spell_scholomance_boon_of_life();
     new npc_scholomance_occultist();
 }
-

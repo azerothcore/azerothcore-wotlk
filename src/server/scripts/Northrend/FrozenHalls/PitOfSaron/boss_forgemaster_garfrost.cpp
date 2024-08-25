@@ -368,4 +368,3 @@ void AddSC_boss_garfrost()
 
     RegisterSpellScript(spell_garfrost_permafrost);
 }
-

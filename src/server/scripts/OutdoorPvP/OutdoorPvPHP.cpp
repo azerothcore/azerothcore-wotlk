@@ -369,4 +369,3 @@ void AddSC_outdoorpvp_hp()
 {
     new OutdoorPvP_hellfire_peninsula();
 }
-

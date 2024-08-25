@@ -1283,4 +1283,3 @@ void AddSC_grizzly_hills()
     RegisterSpellScript(spell_q12227_camera_shake);
     RegisterSpellScript(spell_frog_kiss);
 }
-

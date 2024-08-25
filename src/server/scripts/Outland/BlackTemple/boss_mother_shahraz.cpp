@@ -275,4 +275,3 @@ void AddSC_boss_mother_shahraz()
     RegisterSpellScript(spell_mother_shahraz_fatal_attraction);
     RegisterSpellScript(spell_mother_shahraz_fatal_attraction_dummy);
 }
-

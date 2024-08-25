@@ -1990,4 +1990,3 @@ void AddSC_go_scripts()
     new go_veil_skith_cage();
     new go_bells();
 }
-
