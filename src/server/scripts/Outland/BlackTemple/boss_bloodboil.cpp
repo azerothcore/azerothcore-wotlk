@@ -235,4 +235,3 @@ void AddSC_boss_gurtogg_bloodboil()
     RegisterSpellScript(spell_gurtogg_bloodboil);
     RegisterSpellScript(spell_gurtogg_eject);
 }
-

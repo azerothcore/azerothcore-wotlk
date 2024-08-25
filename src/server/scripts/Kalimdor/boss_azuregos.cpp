@@ -229,4 +229,3 @@ void AddSC_boss_azuregos()
     RegisterSpellScript(spell_arcane_vacuum);
     RegisterSpellScript(spell_mark_of_frost_freeze);
 }
-

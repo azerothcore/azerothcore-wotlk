@@ -565,4 +565,3 @@ void AddSC_boss_felmyst()
     RegisterSpellScript(spell_felmyst_fog_of_corruption_charm_aura);
     RegisterSpellScript(spell_felmyst_open_brutallus_back_doors);
 }
-

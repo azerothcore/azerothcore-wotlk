@@ -171,4 +171,3 @@ void AddSC_boss_watchkeeper_gargolmar()
     RegisterHellfireRampartsCreatureAI(boss_watchkeeper_gargolmar);
     RegisterSpellScript(spell_gargolmar_retalliation);
 }
-

@@ -270,4 +270,3 @@ void AddSC_boss_buru()
     RegisterRuinsOfAhnQirajCreatureAI(npc_buru_egg);
     RegisterSpellScript(spell_egg_explosion);
 }
-

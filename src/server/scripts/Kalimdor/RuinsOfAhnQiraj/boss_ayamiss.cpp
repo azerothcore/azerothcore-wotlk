@@ -428,4 +428,3 @@ void AddSC_boss_ayamiss()
     RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_2", (NPC_HIVEZARA_SWARMER + 6) * 10);
     RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_3", (NPC_HIVEZARA_SWARMER + 7) * 10);
 }
-

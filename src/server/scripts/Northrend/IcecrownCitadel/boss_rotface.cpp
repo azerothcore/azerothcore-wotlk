@@ -913,4 +913,3 @@ void AddSC_boss_rotface()
 
     new npc_precious_icc();
 }
-

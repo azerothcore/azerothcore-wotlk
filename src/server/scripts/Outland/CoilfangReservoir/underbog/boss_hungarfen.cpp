@@ -189,4 +189,3 @@ void AddSC_boss_hungarfen()
     RegisterSpellScript(spell_spore_cloud);
     RegisterSpellScript(spell_despawn_underbog_mushrooms);
 }
-
