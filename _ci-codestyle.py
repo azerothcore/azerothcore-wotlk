@@ -101,8 +101,7 @@ def getTypeId_check(file, file_path):
             print(f"Please use IsItem() instead GetTypeId(): {file_path} at line {line_number}")
             error_handler = True
         if 'GetTypeId() == TYPEID_GAMEOBJECT' or 'GetTypeId() != TYPEID_GAMEOBJECT' in line:
-            print(f"Please use IsGameObject() instead GetTypeId():"
-                  f" {file_path} at line {line_number}")
+            print(f"Please use IsGameObject() instead GetTypeId(): {file_path} at line {line_number}")
             error_handler = True
         if 'GetTypeId() == TYPEID_DYNOBJECT' or 'GetTypeId() != TYPEID_DYNOBJECT' in line:
             print(f"Please use IsDynamicObject() instead GetTypeId(): {file_path} at line {line_number}")
