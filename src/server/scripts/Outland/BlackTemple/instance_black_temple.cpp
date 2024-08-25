@@ -490,9 +490,6 @@ class spell_black_temple_l5_arcane_charge : public SpellScript
 {
     PrepareSpellScript(spell_black_temple_l5_arcane_charge)
 
-public:
-    spell_black_temple_l5_arcane_charge() : SpellScript() { }
-
     void RecalculateDamage()
     {
         uint32 damage = GetHitUnit()->SpellDamageBonusTaken(GetCaster(), GetSpellInfo(), GetHitUnit()->CountPctFromMaxHealth(100), SPELL_DIRECT_DAMAGE);
