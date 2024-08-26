@@ -1,3 +1,4 @@
+-- DB update 2024_08_26_01 -> 2024_08_26_02
 -- Pilot Bellowfiz Smart Ai
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1378;
