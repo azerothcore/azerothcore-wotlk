@@ -170,7 +170,7 @@ public:
     {
         npc_ancestral_wolfAI(Creature* creature) : npc_escortAI(creature)
         {
-            if (creature->GetOwner() && creature->GetOwner()->GetTypeId() == TYPEID_PLAYER)
+            if (creature->GetOwner() && creature->GetOwner()->IsPlayer())
                 Start(false, false, creature->GetOwner()->GetGUID());
             creature->SetSpeed(MOVE_WALK, 1.5f);
             DoCast(SPELL_GUIDED_BY_THE_SPIRITS);

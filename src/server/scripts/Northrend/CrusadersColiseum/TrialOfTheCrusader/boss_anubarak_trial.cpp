@@ -385,7 +385,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if( who->IsPlayer() )
                 Talk(SAY_KILL_PLAYER);
         }
 
@@ -955,4 +955,3 @@ void AddSC_boss_anubarak_trial()
     new spell_gen_leeching_swarm();
     new spell_gen_leeching_swarm_dmg();
 }
-

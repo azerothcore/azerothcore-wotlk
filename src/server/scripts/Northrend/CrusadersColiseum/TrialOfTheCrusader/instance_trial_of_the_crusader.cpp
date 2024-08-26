@@ -155,7 +155,7 @@ public:
 
         void OnUnitDeath(Unit* u) override
         {
-            if (bNooneDied && u->GetTypeId() == TYPEID_PLAYER)
+            if (bNooneDied && u->IsPlayer())
             {
                 bNooneDied = false;
                 SaveToDB();
@@ -1694,4 +1694,3 @@ void AddSC_instance_trial_of_the_crusader()
 {
     new instance_trial_of_the_crusader();
 }
-

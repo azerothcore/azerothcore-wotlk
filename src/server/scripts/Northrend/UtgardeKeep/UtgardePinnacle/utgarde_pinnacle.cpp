@@ -72,4 +72,3 @@ void AddSC_utgarde_pinnacle()
 {
     RegisterSpellScript(spell_utgarde_pinnacle_beast_mark);
 }
-

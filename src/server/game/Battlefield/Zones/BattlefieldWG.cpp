@@ -720,9 +720,9 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
     TeamId killerTeam = killer->GetTeamId();
 
     // xinef: tower cannons also grant rank
-    if (victim->GetTypeId() == TYPEID_PLAYER || IsKeepNpc(victim->GetEntry()) || victim->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
+    if (victim->IsPlayer() || IsKeepNpc(victim->GetEntry()) || victim->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER && victim->HasAura(SPELL_LIEUTENANT))
+        if (victim->IsPlayer() && victim->HasAura(SPELL_LIEUTENANT))
         {
             // Quest - Wintergrasp - PvP Kill - Horde/Alliance
             for (auto& playerGuid : m_PlayersInWar[killerTeam])
@@ -749,7 +749,7 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
         }
 
         // Xinef: Allow to Skin non-released corpse
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
         {
             victim->SetUnitFlag(UNIT_FLAG_SKINNABLE);
         }

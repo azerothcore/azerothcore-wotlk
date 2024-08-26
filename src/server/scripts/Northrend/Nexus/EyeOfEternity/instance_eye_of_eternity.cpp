@@ -251,4 +251,3 @@ void AddSC_instance_eye_of_eternity()
 {
     new instance_eye_of_eternity();
 }
-

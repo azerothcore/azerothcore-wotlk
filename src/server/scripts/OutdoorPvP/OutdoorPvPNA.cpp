@@ -74,7 +74,7 @@ void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
 
 void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 {
-    if (killed->GetTypeId() == TYPEID_PLAYER && player->GetTeamId() != killed->ToPlayer()->GetTeamId())
+    if (killed->IsPlayer() && player->GetTeamId() != killed->ToPlayer()->GetTeamId())
     {
         player->KilledMonsterCredit(NA_CREDIT_MARKER);
         player->CastSpell(player, player->GetTeamId() == TEAM_ALLIANCE ? NA_KILL_TOKEN_ALLIANCE : NA_KILL_TOKEN_HORDE, true);
@@ -928,4 +928,3 @@ void AddSC_outdoorpvp_na()
     new OutdoorPvP_nagrand();
     RegisterCreatureAI(outdoorpvp_na_halaa_creatures);
 }
-

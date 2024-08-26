@@ -138,4 +138,3 @@ void AddSC_instance_shadow_labyrinth()
     new instance_shadow_labyrinth();
     RegisterSpellScript(spell_mark_of_malice);
 }
-

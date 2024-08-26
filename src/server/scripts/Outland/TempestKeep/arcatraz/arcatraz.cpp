@@ -622,4 +622,3 @@ void AddSC_arcatraz()
 
     RegisterSpellScript(spell_arcatraz_soul_steal_aura);
 }
-
