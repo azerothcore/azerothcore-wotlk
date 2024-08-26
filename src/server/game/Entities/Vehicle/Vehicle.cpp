@@ -498,14 +498,8 @@ void Vehicle::RemovePassenger(Unit* unit)
 
     seat->second.Passenger.Reset();
 
-    if (_me->GetTypeId() == TYPEID_UNIT && unit->GetTypeId() == TYPEID_PLAYER && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
-    {
-        //npcbot
-        if (unit->ToPlayer()->HaveBot())
-            BotMgr::OnBotOwnerExitVehicle(unit->ToPlayer(), this);
-        //end npcbot
+    if (_me->GetTypeId() == TYPEID_UNIT && unit->IsPlayer() && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
         _me->RemoveCharmedBy(unit);
-    }
 
     if (_me->IsInWorld())
     {
