@@ -786,11 +786,7 @@ class spell_pri_renew : public AuraScript
 
     bool Load() override
     {
-        //npcbot
-        if (GetCaster() && GetCaster()->IsNPCBot())
-            return true;
-        //end npcbot
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster() && GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
