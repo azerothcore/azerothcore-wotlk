@@ -561,24 +561,7 @@ class spell_pal_divine_sacrifice : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            //npcbot: handle for bots
-            if (caster->IsNPCBot())
-            {
-                Player const* owner = caster->ToCreature()->GetBotOwner();
-                if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
-                    return false;
-
-                if (owner->GetGroup())
-                    groupSize = owner->GetGroup()->GetMembersCount();
-                else
-                    groupSize = 1 + owner->GetNpcBotsCount();
-
-                remainingAmount = (caster->CountPctFromMaxHealth(GetSpellInfo()->Effects[EFFECT_2].CalcValue(caster)) * groupSize);
-                minHpPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue(caster);
-                return true;
-            }
-            //end npcbot
-            if (caster->GetTypeId() == TYPEID_PLAYER)
+            if (caster->IsPlayer())
             {
                 if (caster->ToPlayer()->GetGroup())
                     groupSize = caster->ToPlayer()->GetGroup()->GetMembersCount();
