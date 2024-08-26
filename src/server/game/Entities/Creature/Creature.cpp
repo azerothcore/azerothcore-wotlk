@@ -2658,7 +2658,10 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
     float dist = std::min<float>(GetDetectionRange() + GetObjectSize() * 2, 150.0f);
 
     if (Unit* unit = GetCharmerOrOwner())
+    {
+        dist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f); 
         return victim->IsWithinDist(unit, dist);
+    }
     else
     {
         // to prevent creatures in air ignore attacks because distance is already too high...
