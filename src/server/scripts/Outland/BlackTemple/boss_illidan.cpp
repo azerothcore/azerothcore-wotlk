@@ -660,18 +660,7 @@ struct npc_akama_illidan : public ScriptedAI
             break;
             case ACTION_AKAMA_MINIONS:
             {
-                me->SetReactState(REACT_PASSIVE);
-                me->CombatStop(true);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    Talk(SAY_AKAMA_MINIONS);
-                }, 6700ms);
-                me->m_Events.AddEventAtOffset([&] {
-                    me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
-                }, 9530ms); // 2830ms
-                me->m_Events.AddEventAtOffset([&] {
-                    me->GetMotionMaster()->MovePath(PATH_AKAMA_MINIONS, false);
-                }, 14400ms); // 4870ms
+                EnterEvadeMode(EVADE_REASON_OTHER);
             }
             break;
             case ACTION_AKAMA_ENDING:
@@ -833,9 +822,30 @@ struct npc_akama_illidan : public ScriptedAI
                 me->SetReactState(REACT_AGGRESSIVE);
 
                 for (int i = 0; i < 10; ++i)
-                    me->SummonCreature(NPC_ILLIDARI_ELITE, IllidariMinionPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+                    me->SummonCreature(NPC_ILLIDARI_ELITE, IllidariMinionPos[i], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1200);
             }
             break;
+        }
+    }
+
+    // Minions event
+    void JustReachedHome() override
+    {
+        if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) == IN_PROGRESS)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+
+            me->m_Events.AddEventAtOffset([&] {
+                Talk(SAY_AKAMA_MINIONS);
+            }, 6700ms);
+            me->m_Events.AddEventAtOffset([&] {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+            }, 9530ms); // 2830ms
+            me->m_Events.AddEventAtOffset([&] {
+                me->GetMotionMaster()->MovePath(PATH_AKAMA_MINIONS, false);
+            }, 14400ms); // 4870ms
         }
     }
 
