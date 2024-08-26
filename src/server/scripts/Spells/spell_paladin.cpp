@@ -28,10 +28,6 @@
  * Scriptnames of files in this file should be prefixed with "spell_pal_".
  */
 
-//npcbot
-#include "Creature.h"
-//end npcbot
-
 enum PaladinSpells
 {
     SPELL_PALADIN_DIVINE_PLEA                    = 54428,
@@ -182,7 +178,7 @@ class spell_pal_divine_intervention : public AuraScript
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (!GetTarget()->IsInCombat() && GetTarget()->GetTypeId() == TYPEID_PLAYER)
+        if (!GetTarget()->IsInCombat() && GetTarget()->IsPlayer())
             GetTarget()->RemoveAurasDueToSpell(GetTarget()->ToPlayer()->GetTeamId() == TEAM_ALLIANCE ? 57723 : 57724);
     }
 
@@ -333,13 +329,7 @@ private:
     {
         healPct = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
         absorbPct = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
-
-        //npcbot - allow for npcbots
-        if (GetUnitOwner()->IsNPCBot())
-            return true;
-        //end npcbot
-
-        return GetUnitOwner()->GetTypeId() == TYPEID_PLAYER;
+        return GetUnitOwner()->IsPlayer();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
@@ -353,39 +343,6 @@ private:
         Unit* victim = GetTarget();
         int32 remainingHealth = victim->GetHealth() - dmgInfo.GetDamage();
         uint32 allowedHealth = victim->CountPctFromMaxHealth(35);
-
-        //npcbot - calc for bots
-        if (victim->GetTypeId() == TYPEID_UNIT/* && victim->ToCreature()->IsNPCBot()*/)
-        {
-            if (remainingHealth <= 0 && !victim->HasSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL) &&
-                !victim->ToCreature()->HasSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL))
-            {
-                // Cast healing spell, completely avoid damage
-                absorbAmount = dmgInfo.GetDamage();
-
-                float defenseSkillValue = victim->GetDefenseSkillValue();
-                // Max heal when defense skill denies critical hits from raid bosses
-                // Formula: max defense at level + 140 (rating from gear)
-                float reqDefForMaxHeal = victim->GetMaxSkillValueForLevel() + 140.0f;
-                float defenseFactor = std::min(1.0f, defenseSkillValue / reqDefForMaxHeal);
-
-                int32 healAmount = int32(victim->CountPctFromMaxHealth(uint32(healPct * defenseFactor)));
-                victim->CastCustomSpell(PAL_SPELL_ARDENT_DEFENDER_HEAL, SPELLVALUE_BASE_POINT0, healAmount, victim, true, nullptr, aurEff);
-                victim->ToCreature()->AddBotSpellCooldown(PAL_SPELL_ARDENT_DEFENDER_HEAL, 120000);
-            }
-            else if (remainingHealth < int32(allowedHealth))
-            {
-                // Reduce damage that brings us under 35% (or full damage if we are already under 35%) by x%
-                uint32 damageToReduce = (victim->GetHealth() < allowedHealth)
-                    ? dmgInfo.GetDamage()
-                    : allowedHealth - remainingHealth;
-                absorbAmount = CalculatePct(damageToReduce, absorbPct);
-            }
-
-            return;
-        }
-        //end npcbot
-
         // If damage kills us
         if (remainingHealth <= 0 && !victim->ToPlayer()->HasAura(PAL_SPELL_ARDENT_DEFENDER_DEBUFF))
         {
@@ -1065,9 +1022,6 @@ class spell_pal_righteous_defense : public SpellScript
     {
         Unit* caster = GetCaster();
         if (caster->GetTypeId() != TYPEID_PLAYER)
-            //npcbot: this player check makes no sense
-            if (!caster->IsNPCBot())
-            //end npcbot
             return SPELL_FAILED_DONT_REPORT;
 
         if (Unit* target = GetExplTargetUnit())
@@ -1224,4 +1178,3 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_seal_of_righteousness);
     RegisterSpellScript(spell_pal_seal_of_vengeance);
 }
-
