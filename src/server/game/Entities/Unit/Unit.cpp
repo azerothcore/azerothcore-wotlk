@@ -12534,12 +12534,7 @@ int32 Unit::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
             // 0 == any inventory type (not wand then)
             DoneAdvertisedBenefit += (*i)->GetAmount();
 
-    //npcbot: apply bot spellpower
-    if ((schoolMask & SPELL_SCHOOL_MASK_MAGIC) && IsNPCBot())
-        DoneAdvertisedBenefit += ToCreature()->GetCreatureSpellPower();
-    //end npcbot
-
-    if (GetTypeId() == TYPEID_PLAYER)
+    if (IsPlayer())
     {
         // Base value
         DoneAdvertisedBenefit += ToPlayer()->GetBaseSpellPowerBonus();
