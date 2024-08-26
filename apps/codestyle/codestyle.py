@@ -104,9 +104,6 @@ def get_typeid_check(file, file_path: str) -> None:
         if 'GetTypeId() == TYPEID_ITEM' in line:
             print(f"Please use IsItem() instead GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_GAMEOBJECT' in line:
-            print(f"Please use IsGameObject() instead GetTypeId(): {file_path} at line {line_number}")
-            check_failed = True
         if 'GetTypeId() == TYPEID_DYNOBJECT' in line:
             print(f"Please use IsDynamicObject() instead GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
