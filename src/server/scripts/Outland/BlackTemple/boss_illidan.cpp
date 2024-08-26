@@ -561,12 +561,14 @@ enum Akama
     SPELL_AKAMA_DOOR_OPEN       = 41268,
     SPELL_AKAMA_DOOR_FAIL       = 41271,
     SPELL_DEATHSWORN_DOOR_OPEN  = 41269,
+    SPELL_ARCANE_EXPLOSION_VIS  = 35426,
     SPELL_HEALING_POTION        = 40535,
     SPELL_CHAIN_LIGHTNING       = 40536,
     SPELL_REDUCED_THREAT        = 41000,
     SPELL_AKAMA_TELEPORT        = 41077,
     SPELL_AKAMA_DESPAWN         = 41242,
 
+    NPC_ILLIDAN_DOOR_TRIGGER    = 23412,
     NPC_SPIRIT_OF_OLUM          = 23411,
     NPC_SPIRIT_OF_UDALO         = 23410,
     NPC_ILLIDARI_ELITE          = 23226,
@@ -803,11 +805,19 @@ struct npc_akama_illidan : public ScriptedAI
                         olum->AI()->DoCastSelf(SPELL_AKAMA_DOOR_OPEN);
                 }, 39710ms); // 8340ms
                 me->m_Events.AddEventAtOffset([&] {
+                    if (Creature* door = me->FindNearestCreature(NPC_ILLIDAN_DOOR_TRIGGER, 15.0f))
+                        door->AI()->DoCastSelf(SPELL_ARCANE_EXPLOSION_VIS);
+                }, 50660ms); // 10950ms
+                me->m_Events.AddEventAtOffset([&] {
+                    instance->SetBossState(DATA_AKAMA_ILLIDAN, NOT_STARTED);
+                    instance->SetBossState(DATA_AKAMA_ILLIDAN, DONE);
+                }, 50680ms); // 20ms
+                me->m_Events.AddEventAtOffset([&] {
                     Talk(SAY_AKAMA_SALUTE);
-                }, 56960ms); // 17250ms
+                }, 56955ms); // 6275ms
                 me->m_Events.AddEventAtOffset([&] {
                     me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_3, false);
-                }, 64030ms); // 7070ms
+                }, 64030ms); // 7075ms
             }
             break;
             // Talk to Initiate Fight
