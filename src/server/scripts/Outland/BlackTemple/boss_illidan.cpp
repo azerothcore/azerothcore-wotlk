@@ -468,6 +468,7 @@ struct boss_illidan_stormrage : public BossAI
     {
         BossAI::JustEngagedWith(who);
         ScheduleAbilities(PHASE_INITIAL);
+        instance->GetCreature(DATA_AKAMA_ILLIDAN)->AI()->AttackStart(me);
 
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BERSERK, true);
@@ -694,7 +695,7 @@ struct npc_akama_illidan : public ScriptedAI
                 {
                     if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                     {
-                        me->SetFacingToObject(instance->GetCreature(DATA_ILLIDAN_STORMRAGE));
+                        me->SetFacingToObject(illidan);
                         illidan->AI()->DoAction(ACTION_START_EVENT);
                         me->SetHomePosition(me->GetPosition());
 
@@ -739,7 +740,7 @@ struct npc_akama_illidan : public ScriptedAI
         }
         else if (type == WAYPOINT_MOTION_TYPE)
         {
-            if (me->GetWaypointPath() == PATH_AKAMA_MINIONS)
+            if (me->GetCurrentWaypointID() == PATH_AKAMA_MINIONS)
                 if (id == 2)
                     DoCastSelf(SPELL_AKAMA_TELEPORT);
         }
@@ -1051,11 +1052,11 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Simulate blizz-like AI delay to avoid extreme overpopulation of adds
-        me->SetReactState(REACT_PASSIVE);
+        me->SetReactState(REACT_DEFENSIVE);
         me->m_Events.AddEventAtOffset([&] {
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetInCombatWithZone();
-        }, 1200ms);
+        }, 2400ms);
     }
 };
 
