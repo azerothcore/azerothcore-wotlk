@@ -281,7 +281,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!me->IsInCombat() && who->GetTypeId() == TYPEID_PLAYER && who->IsAlive() && me->GetDistance(who) <= 50.0f)
+            if (!me->IsInCombat() && who->IsPlayer() && who->IsAlive() && me->GetDistance(who) <= 50.0f)
                 AttackStart(who);
         }
 
@@ -430,7 +430,7 @@ public:
                         ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
                         for (auto itr : threatList)
                         {
-                            if (itr->getTarget()->GetTypeId() == TYPEID_PLAYER
+                            if (itr->getTarget()->IsPlayer()
                                     && itr->getTarget()->getPowerType() == POWER_MANA
                                     && itr->getTarget()->GetPower(POWER_MANA))
                                     {
@@ -606,7 +606,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
+            if (who->IsPlayer() && me->GetInstanceScript())
             {
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
             }

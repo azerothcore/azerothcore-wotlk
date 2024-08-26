@@ -8,7 +8,7 @@
 
 namespace Loatheb {
 
-enum LoathebSpells
+enum Spells
 {
     SPELL_NECROTIC_AURA                         = 55593,
     SPELL_SUMMON_SPORE                          = 29234,
@@ -16,21 +16,21 @@ enum LoathebSpells
     SPELL_DEATHBLOOM_25                         = 55053,
     SPELL_INEVITABLE_DOOM_10                    = 29204,
     SPELL_INEVITABLE_DOOM_25                    = 55052,
-    LOATHEB_SPELL_BERSERK                               = 26662
+    SPELL_BERSERK                               = 26662
 };
 
-enum LoathebEvents
+enum Events
 {
     EVENT_NECROTIC_AURA                         = 1,
     EVENT_DEATHBLOOM                            = 2,
     EVENT_INEVITABLE_DOOM                       = 3,
-    LOATHEB_EVENT_BERSERK                               = 4,
+    EVENT_BERSERK                               = 4,
     EVENT_SUMMON_SPORE                          = 5,
     EVENT_NECROTIC_AURA_FADING                  = 6,
     EVENT_NECROTIC_AURA_REMOVED                 = 7
 };
 
-enum LoathebTexts
+enum Texts
 {
     SAY_NECROTIC_AURA_APPLIED                   = 0,
     SAY_NECROTIC_AURA_REMOVED                   = 1,
@@ -92,7 +92,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            if (who->IsPlayer() && pInstance)
             {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
             }
@@ -106,7 +106,7 @@ public:
             events.ScheduleEvent(EVENT_DEATHBLOOM, 5s);
             events.ScheduleEvent(EVENT_INEVITABLE_DOOM, 2min);
             events.ScheduleEvent(EVENT_SUMMON_SPORE, 15s);
-            events.ScheduleEvent(LOATHEB_EVENT_BERSERK, 12min);
+            events.ScheduleEvent(EVENT_BERSERK, 12min);
             if (pInstance)
             {
                 pInstance->SetData(BOSS_LOATHEB, IN_PROGRESS);
@@ -158,8 +158,8 @@ public:
                     doomCounter++;
                     events.Repeat(doomCounter < 6 ? 30s : 15s);
                     break;
-                case LOATHEB_EVENT_BERSERK:
-                    me->CastSpell(me, LOATHEB_SPELL_BERSERK, true);
+                case EVENT_BERSERK:
+                    me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_NECROTIC_AURA_FADING:
                     Talk(SAY_NECROTIC_AURA_FADING);
@@ -187,4 +187,5 @@ public:
 };
 
 }
+
 #endif
