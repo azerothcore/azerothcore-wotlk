@@ -10,6 +10,7 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "GetCounter() check": "Passed",
+    "GetTypeId() check": "Passed",
     "NpcFlagHelpers check": "Passed"
 }
 
@@ -25,6 +26,8 @@ def parsing_file(directory):
                         multipleBlankLines_check(file, file_path)
                         trailing_whitespace_check(file, file_path)
                         getCounter_check(file, file_path)
+                        if file_name != 'Object.h':
+                            getTypeId_check(file, file_path)
                         if file_name != 'Unit.h':
                             npcFlagHelpers_check(file, file_path)
                 except UnicodeDecodeError:
@@ -96,16 +99,16 @@ def getTypeId_check(file, file_path):
     check_failed = False
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        if 'GetTypeId() == TYPEID_PLAYER' or 'GetTypeId() != TYPEID_PLAYER' in line:
-            print(f"Please use IsPlayer() instead GetTypeId() == TYPEID_PLAYER: {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_PLAYER' in line:
+            print(f"Please use IsPlayer() instead GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_ITEM' or 'GetTypeId() != TYPEID_ITEM' in line:
+        if 'GetTypeId() == TYPEID_ITEM' in line:
             print(f"Please use IsItem() instead GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_GAMEOBJECT' or 'GetTypeId() != TYPEID_GAMEOBJECT' in line:
+        if 'GetTypeId() == TYPEID_GAMEOBJECT' in line:
             print(f"Please use IsGameObject() instead GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_DYNOBJECT' or 'GetTypeId() != TYPEID_DYNOBJECT' in line:
+        if 'GetTypeId() == TYPEID_DYNOBJECT' in line:
             print(f"Please use IsDynamicObject() instead GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
