@@ -570,11 +570,7 @@ class spell_rog_rupture : public AuraScript
     bool Load() override
     {
         Unit* caster = GetCaster();
-        //npcbot
-        if (caster && caster->IsNPCBot())
-            return true;
-        //end npcbot
-        return caster && caster->GetTypeId() == TYPEID_PLAYER;
+        return caster && caster->IsPlayer();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
