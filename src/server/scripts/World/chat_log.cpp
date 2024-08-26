@@ -159,4 +159,3 @@ void AddSC_chat_log()
 {
     new ChatLogScript();
 }
-

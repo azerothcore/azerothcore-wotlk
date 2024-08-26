@@ -33,4 +33,3 @@ void AddSC_boss_gothik()
     new npc_gothik_trigger();
     RegisterSpellScript(spell_gothik_shadow_bolt_volley);
 }
-

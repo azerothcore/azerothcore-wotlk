@@ -202,4 +202,3 @@ void AddSC_boss_gahzranka()
     RegisterSpellScript(spell_gahzranka_slam);
     RegisterSpellScript(spell_pagles_point_cast);
 }
-

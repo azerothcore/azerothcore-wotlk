@@ -1249,4 +1249,3 @@ void AddSC_the_scarlet_enclave_c5()
     new spell_chapter5_light_of_dawn_aura();
     new spell_chapter5_rebuke();
 }
-

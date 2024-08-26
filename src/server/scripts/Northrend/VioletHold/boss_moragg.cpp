@@ -155,4 +155,3 @@ void AddSC_boss_moragg()
     new boss_moragg();
     RegisterSpellScript(spell_optic_link_aura);
 }
-

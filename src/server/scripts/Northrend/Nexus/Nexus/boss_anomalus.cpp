@@ -222,4 +222,3 @@ void AddSC_boss_anomalus()
     new boss_anomalus();
     new achievement_chaos_theory();
 }
-
