@@ -1,3 +1,4 @@
+-- DB update 2024_08_25_00 -> 2024_08_26_00
 -- Fix the target_type for Chain lightning and Psychic Scream spells with Twilight Prophet
 SET @ENTRY := 15308;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0) AND (`entryorguid` = @ENTRY);
