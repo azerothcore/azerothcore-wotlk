@@ -721,11 +721,13 @@ void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*
     if (!_healthCheckEvents.empty())
     {
         for (auto& check : _healthCheckEvents)
+        {
             if (check._valid && me->HealthBelowPctDamaged(check._healthPct, damage))
             {
                 check._exec();
                 check._valid = false;
             }
+        }
 
         _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
         {
