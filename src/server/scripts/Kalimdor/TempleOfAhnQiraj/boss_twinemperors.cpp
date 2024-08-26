@@ -117,7 +117,7 @@ struct boss_twinemperorsAI : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim && victim->IsPlayer())
             Talk(SAY_KILL);
     }
 
@@ -487,4 +487,3 @@ void AddSC_boss_twinemperors()
     new at_twin_emperors();
     RegisterSpellScript(spell_mutate_explode_bug);
 }
-

@@ -382,4 +382,3 @@ void AddSC_boss_rajaxx()
     RegisterSpellScript(spell_rajaxx_thundercrash);
     RegisterRuinsOfAhnQirajCreatureAI(npc_general_andorov);
 }
-

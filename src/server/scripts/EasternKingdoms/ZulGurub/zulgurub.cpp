@@ -56,4 +56,3 @@ void AddSC_zulgurub()
 {
     RegisterSpellScript(spell_axe_flurry);
 }
-

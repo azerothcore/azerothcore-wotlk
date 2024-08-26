@@ -123,4 +123,3 @@ void AddSC_underbog()
     RegisterSpellScript(spell_fungal_decay);
     RegisterSpellScript(spell_allergies);
 }
-

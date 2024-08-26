@@ -43,4 +43,3 @@ void AddSC_the_slave_pens()
 {
     new at_quagmirran_lair();
 }
-
