@@ -899,4 +899,3 @@ void AddSC_brann_bronzebeard()
     new iron_golem_custodian();
     new spell_hos_dark_matter();
 }
-

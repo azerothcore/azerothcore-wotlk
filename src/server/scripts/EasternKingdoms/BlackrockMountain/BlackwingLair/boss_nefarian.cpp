@@ -673,7 +673,7 @@ struct boss_nefarian : public BossAI
                     {
                         for (auto& ref : me->GetThreatMgr().GetThreatList())
                         {
-                            if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                            if (ref->getTarget() && ref->getTarget()->IsPlayer())
                             {
                                 classesPresent.insert(ref->getTarget()->getClass());
                             }
@@ -1277,4 +1277,3 @@ void AddSC_boss_nefarian()
     RegisterSpellScript(spell_shadowblink);
     RegisterSpellScript(spell_spawn_drakonid);
 }
-

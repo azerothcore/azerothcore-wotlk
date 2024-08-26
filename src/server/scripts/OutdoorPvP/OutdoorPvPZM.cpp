@@ -470,4 +470,3 @@ void AddSC_outdoorpvp_zm()
 {
     new OutdoorPvP_zangarmarsh();
 }
-

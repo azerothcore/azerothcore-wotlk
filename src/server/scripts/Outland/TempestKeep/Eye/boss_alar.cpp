@@ -536,4 +536,3 @@ void AddSC_boss_alar()
     RegisterSpellScript(spell_alar_ember_blast);
     RegisterSpellScript(spell_alar_dive_bomb);
 }
-

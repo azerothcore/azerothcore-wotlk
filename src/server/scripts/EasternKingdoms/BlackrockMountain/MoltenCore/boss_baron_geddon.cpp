@@ -229,4 +229,3 @@ void AddSC_boss_baron_geddon()
     RegisterSpellScript(spell_geddon_inferno_aura);
     RegisterSpellScript(spell_geddon_armageddon_aura);
 }
-

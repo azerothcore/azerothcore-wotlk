@@ -597,7 +597,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER && me->GetInstanceScript())
+            if (who->IsPlayer() && me->GetInstanceScript())
             {
                 me->GetInstanceScript()->SetData(DATA_IMMORTAL_FAIL, 0);
             }
@@ -809,4 +809,3 @@ void AddSC_boss_gothik()
     new npc_gothik_trigger();
     RegisterSpellScript(spell_gothik_shadow_bolt_volley);
 }
-

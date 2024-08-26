@@ -352,7 +352,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->IsPlayer())
                 Talk(SAY_KELESETH_KILL);
         }
 
@@ -622,7 +622,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->IsPlayer())
                 Talk(SAY_TALDARAM_KILL);
         }
 
@@ -916,7 +916,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->IsPlayer())
                 Talk(SAY_VALANAR_KILL);
         }
 
@@ -1451,7 +1451,7 @@ class spell_blood_council_shadow_prison_aura : public AuraScript
 
     void HandleDummyTick(AuraEffect const* aurEff)
     {
-        if (GetTarget()->GetTypeId() == TYPEID_PLAYER && GetTarget()->isMoving())
+        if (GetTarget()->IsPlayer() && GetTarget()->isMoving())
         {
             GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, nullptr, aurEff);
         }
@@ -1710,4 +1710,3 @@ void AddSC_boss_blood_prince_council()
     RegisterSpellScript(spell_valanar_kinetic_bomb_summon);
     RegisterSpellScript(spell_blood_council_summon_shadow_resonance);
 }
-

@@ -315,4 +315,3 @@ void AddSC_boss_gruul()
     RegisterSpellScript(spell_gruul_shatter);
     RegisterSpellScript(spell_gruul_shatter_effect);
 }
-

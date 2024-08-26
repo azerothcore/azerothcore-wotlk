@@ -39,4 +39,3 @@ void AddSC_the_scarlet_enclave_c3()
 {
     RegisterSpellScript(spell_q12779_an_end_to_all_things);
 }
-

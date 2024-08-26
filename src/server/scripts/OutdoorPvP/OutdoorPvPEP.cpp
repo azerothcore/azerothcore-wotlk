@@ -775,4 +775,3 @@ void AddSC_outdoorpvp_ep()
 {
     new OutdoorPvP_eastern_plaguelands();
 }
-
