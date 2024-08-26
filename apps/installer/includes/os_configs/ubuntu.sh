@@ -12,7 +12,7 @@ case $UBUNTU_VERSION in
   *)
     echo "########## ########## ##########"
     echo ""
-    echo "    using unsupported Ubuntu version" $UBUNTU_VERSION
+    echo "    using unsupported Ubuntu version " $UBUNTU_VERSION
     echo "    please update to Ubuntu 22.04 or later"
     echo ""
     echo "########## ########## ##########"
