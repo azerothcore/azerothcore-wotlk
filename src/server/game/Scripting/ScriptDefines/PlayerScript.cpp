@@ -54,7 +54,7 @@ void ScriptMgr::OnPlayerJustDied(Player* player)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_JUST_DIED, script->OnPlayerJustDied(player));
 }
 
-void ScriptMgr::OnCalculateTalentsPoints(Player const* player, uint32 talentPointsForLevel)
+void ScriptMgr::OnCalculateTalentsPoints(Player const* player, uint32& talentPointsForLevel)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CALCULATE_TALENTS_POINTS, script->OnCalculateTalentsPoints(player, talentPointsForLevel));
 }

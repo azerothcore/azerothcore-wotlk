@@ -215,7 +215,7 @@ public:
     virtual void OnPlayerJustDied(Player* /*player*/) { }
 
     // Called player talent points are calculated
-    virtual void OnCalculateTalentsPoints(Player const* /*player*/, uint32 /*talentPointsForLevel*/) { }
+    virtual void OnCalculateTalentsPoints(Player const* /*player*/, uint32& /*talentPointsForLevel*/) { }
 
     // Called when clicking the release button
     virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
