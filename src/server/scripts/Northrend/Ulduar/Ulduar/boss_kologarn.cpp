@@ -174,7 +174,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2d(who) < 45.0f && me->getStandState() == UNIT_STAND_STATE_SUBMERGED)
+            if (who->IsPlayer() && me->GetExactDist2d(who) < 45.0f && me->getStandState() == UNIT_STAND_STATE_SUBMERGED)
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 if (Unit* arm = ObjectAccessor::GetCreature(*me, _left))

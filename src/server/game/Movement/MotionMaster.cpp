@@ -269,7 +269,7 @@ void MotionMaster::MoveTargetedHome(bool walk /*= false*/)
         Unit* target = _owner->ToCreature()->GetCharmerOrOwner();
         if (target)
         {
-            LOG_DEBUG("movement.motionmaster", "Following {} ({})", target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString());
+            LOG_DEBUG("movement.motionmaster", "Following {} ({})", target->IsPlayer() ? "player" : "creature", target->GetGUID().ToString());
             Mutate(new FollowMovementGenerator<Creature>(target, PET_FOLLOW_DIST, _owner->GetFollowAngle(),true), MOTION_SLOT_ACTIVE);
         }
     }
@@ -285,7 +285,7 @@ void MotionMaster::MoveConfused()
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) move confused", _owner->GetGUID().ToString());
         Mutate(new ConfusedMovementGenerator<Player>(), MOTION_SLOT_CONTROLLED);
@@ -305,16 +305,16 @@ void MotionMaster::MoveChase(Unit* target,  std::optional<ChaseRange> dist, std:
         return;
 
     //_owner->ClearUnitState(UNIT_STATE_FOLLOW);
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) chase to {} ({})",
-            _owner->GetGUID().ToString(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString());
+            _owner->GetGUID().ToString(), target->IsPlayer() ? "player" : "creature", target->GetGUID().ToString());
         Mutate(new ChaseMovementGenerator<Player>(target, dist, angle), MOTION_SLOT_ACTIVE);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) chase to {} ({})",
-            _owner->GetGUID().ToString(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString());
+            _owner->GetGUID().ToString(), target->IsPlayer() ? "player" : "creature", target->GetGUID().ToString());
         Mutate(new ChaseMovementGenerator<Creature>(target, dist, angle), MOTION_SLOT_ACTIVE);
     }
 }
@@ -401,16 +401,16 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
     }
 
     //_owner->AddUnitState(UNIT_STATE_FOLLOW);
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) follow to {} ({})",
-            _owner->GetGUID().ToString(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString());
+            _owner->GetGUID().ToString(), target->IsPlayer() ? "player" : "creature", target->GetGUID().ToString());
         Mutate(new FollowMovementGenerator<Player>(target, dist, angle, inheritWalkState), slot);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) follow to {} ({})",
-            _owner->GetGUID().ToString(), target->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", target->GetGUID().ToString());
+            _owner->GetGUID().ToString(), target->IsPlayer() ? "player" : "creature", target->GetGUID().ToString());
         Mutate(new FollowMovementGenerator<Creature>(target, dist, angle, inheritWalkState), slot);
     }
 }
@@ -421,7 +421,7 @@ void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generate
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) targeted point (Id: {} X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), id, x, y, z);
         Mutate(new PointMovementGenerator<Player>(id, x, y, z, 0.0f, orientation, nullptr, generatePath, forceDestination), slot);
@@ -439,7 +439,7 @@ void MotionMaster::MoveSplinePath(Movement::PointsArray* path)
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         Mutate(new EscortMovementGenerator<Player>(path), MOTION_SLOT_ACTIVE);
     }
@@ -527,7 +527,7 @@ void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed
 void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ)
 {
     //this function may make players fall below map
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
         return;
 
     if (speedXY <= 0.1f)
@@ -553,7 +553,7 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
 void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
 {
     //this function may make players fall below map
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
         return;
 
     float x, y, z;
@@ -603,7 +603,7 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     if (std::fabs(_owner->GetPositionZ() - tz) < 0.1f)
         return;
 
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         _owner->AddUnitMovementFlag(MOVEMENTFLAG_FALLING);
         _owner->m_movementInfo.SetFallTime(0);
@@ -634,7 +634,7 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id,
     if (Impl[MOTION_SLOT_CONTROLLED] && Impl[MOTION_SLOT_CONTROLLED]->GetMovementGeneratorType() != DISTRACT_MOTION_TYPE)
         return;
 
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) charge point (X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), x, y, z);
         Mutate(new PointMovementGenerator<Player>(id, x, y, z, speed, orientation, path, generatePath, generatePath, targetGUID), MOTION_SLOT_CONTROLLED);
@@ -665,7 +665,7 @@ void MotionMaster::MoveSeekAssistance(float x, float y, float z)
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         LOG_ERROR("movement.motionmaster", "Player ({}) attempt to seek assistance", _owner->GetGUID().ToString());
     }
@@ -685,7 +685,7 @@ void MotionMaster::MoveSeekAssistanceDistract(uint32 time)
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         LOG_ERROR("movement.motionmaster", "Player ({}) attempt to call distract after assistance", _owner->GetGUID().ToString());
     }
@@ -705,16 +705,16 @@ void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) flee from {} ({})",
-            _owner->GetGUID().ToString(), enemy->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", enemy->GetGUID().ToString());
+            _owner->GetGUID().ToString(), enemy->IsPlayer() ? "player" : "creature", enemy->GetGUID().ToString());
         Mutate(new FleeingMovementGenerator<Player>(enemy->GetGUID()), MOTION_SLOT_CONTROLLED);
     }
     else
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) flee from {} ({}) {}",
-            _owner->GetGUID().ToString(), enemy->GetTypeId() == TYPEID_PLAYER ? "player" : "creature", enemy->GetGUID().ToString(), time ? " for a limited time" : "");
+            _owner->GetGUID().ToString(), enemy->IsPlayer() ? "player" : "creature", enemy->GetGUID().ToString(), time ? " for a limited time" : "");
         if (time)
             Mutate(new TimedFleeingMovementGenerator(enemy->GetGUID(), time), MOTION_SLOT_CONTROLLED);
         else
@@ -724,7 +724,7 @@ void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
 
 void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
 {
-    if (_owner->GetTypeId() == TYPEID_PLAYER)
+    if (_owner->IsPlayer())
     {
         if (path < sTaxiPathNodesByPath.size())
         {
@@ -754,7 +754,7 @@ void MotionMaster::MoveDistract(uint32 timer)
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    /*if (_owner->GetTypeId() == TYPEID_PLAYER)
+    /*if (_owner->IsPlayer())
     {
         LOG_DEBUG("movement.motionmaster", "Player ({}) distracted (timer: {})", _owner->GetGUID().ToString(), timer);
     }
@@ -817,12 +817,12 @@ void MotionMaster::MovePath(uint32 path_id, bool repeatable)
             delete curr;
     }*/
 
-    //_owner->GetTypeId() == TYPEID_PLAYER ?
+    //_owner->IsPlayer() ?
     //Mutate(new WaypointMovementGenerator<Player>(path_id, repeatable)):
     Mutate(new WaypointMovementGenerator<Creature>(path_id, repeatable), MOTION_SLOT_IDLE);
 
     LOG_DEBUG("movement.motionmaster", "{} ({}) start moving over path(Id:{}, repeatable: {})",
-        _owner->GetTypeId() == TYPEID_PLAYER ? "Player" : "Creature", _owner->GetGUID().ToString(), path_id, repeatable ? "YES" : "NO");
+        _owner->IsPlayer() ? "Player" : "Creature", _owner->GetGUID().ToString(), path_id, repeatable ? "YES" : "NO");
 }
 
 void MotionMaster::MoveRotate(uint32 time, RotateDirection direction)

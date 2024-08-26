@@ -1905,13 +1905,13 @@ bool Creature::CanStartAttack(Unit const* who) const
 
     // This set of checks is should be done only for creatures
     if ((IsImmuneToNPC() && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
-        (IsImmuneToPC() && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
+        (IsImmuneToPC() && who->IsPlayer()))         // immune to PC and target is a player, return false
     {
         return false;
     }
 
     if (Unit* owner = who->GetOwner())
-        if (owner->GetTypeId() == TYPEID_PLAYER && IsImmuneToPC())     // immune to PC and target has player owner
+        if (owner->IsPlayer() && IsImmuneToPC())     // immune to PC and target has player owner
             return false;
 
     // Do not attack non-combat pets

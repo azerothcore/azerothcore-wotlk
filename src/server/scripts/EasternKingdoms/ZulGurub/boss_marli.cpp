@@ -299,7 +299,7 @@ class spell_enveloping_webs : public SpellScript
     {
         Unit* caster = GetCaster();
         Unit* hitUnit = GetHitUnit();
-        if (caster && hitUnit && hitUnit->GetTypeId() == TYPEID_PLAYER)
+        if (caster && hitUnit && hitUnit->IsPlayer())
         {
             caster->GetThreatMgr().ModifyThreatByPercent(hitUnit, -100);
         }

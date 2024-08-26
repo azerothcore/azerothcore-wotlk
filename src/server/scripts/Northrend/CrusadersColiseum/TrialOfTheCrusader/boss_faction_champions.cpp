@@ -107,7 +107,7 @@ struct boss_faction_championsAI : public ScriptedAI
         for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
         {
             Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-            if( pUnit && pUnit->GetTypeId() == TYPEID_PLAYER && me->GetThreatMgr().GetThreat(pUnit) )
+            if( pUnit && pUnit->IsPlayer() && me->GetThreatMgr().GetThreat(pUnit) )
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
                 me->GetThreatMgr().ModifyThreatByPercent(pUnit, -100);
