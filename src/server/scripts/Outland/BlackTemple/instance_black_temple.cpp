@@ -486,6 +486,22 @@ class spell_black_temple_summon_shadowfiends : public SpellScript
     }
 };
 
+class spell_black_temple_l5_arcane_charge : public SpellScript
+{
+    PrepareSpellScript(spell_black_temple_l5_arcane_charge)
+
+    void RecalculateDamage()
+    {
+        uint32 damage = GetHitUnit()->SpellDamageBonusTaken(GetCaster(), GetSpellInfo(), GetHitUnit()->CountPctFromMaxHealth(100), SPELL_DIRECT_DAMAGE);
+        SetHitDamage(int32(damage));
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_black_temple_l5_arcane_charge::RecalculateDamage);
+    }
+};
+
 void AddSC_instance_black_temple()
 {
     new instance_black_temple();
@@ -502,4 +518,5 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_curse_of_vitality_aura);
     RegisterSpellScript(spell_black_temple_dementia_aura);
     RegisterSpellScript(spell_black_temple_summon_shadowfiends);
+    RegisterSpellScript(spell_black_temple_l5_arcane_charge);
 }
