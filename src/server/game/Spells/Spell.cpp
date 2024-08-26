@@ -3739,9 +3739,8 @@ void Spell::cancel(bool bySelf)
                         if (Unit* unit = m_caster->GetGUID() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
                             unit->RemoveOwnedAura(m_spellInfo->Id, m_originalCasterGUID, 0, AURA_REMOVE_BY_CANCEL);
 
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                    if (m_spellInfo->HasAttribute(SPELL_ATTR0_COOLDOWN_ON_EVENT))
-                        m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+                if (m_caster->IsPlayer() && m_spellInfo->IsCooldownStartedOnEvent())
+                    m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
 
                 SendChannelUpdate(0);
                 SendInterrupted(SPELL_FAILED_INTERRUPTED);
@@ -4498,7 +4497,12 @@ void Spell::finish(bool ok)
     if (Creature* creatureCaster = m_caster->ToCreature())
         creatureCaster->ReleaseFocus(this);
 
-    if (!ok)
+    if (ok)
+    {
+        if (m_caster->IsPlayer() && m_spellInfo->IsChanneled() && m_spellInfo->IsCooldownStartedOnEvent())
+            m_caster->ToPlayer()->RemoveSpellCooldown(m_spellInfo->Id, true);
+    }
+    else
     {
         if (m_caster->IsPlayer())
         {
