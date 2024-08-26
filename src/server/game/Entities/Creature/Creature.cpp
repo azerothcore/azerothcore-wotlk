@@ -2659,7 +2659,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
     if (Unit* unit = GetCharmerOrOwner())
     {
-        dist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f); 
+        dist = std::min<float>(GetMap()->GetVisibilityRange() + GetObjectSize() * 2, 150.0f);
         return victim->IsWithinDist(unit, dist);
     }
     else
