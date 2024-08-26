@@ -44,6 +44,7 @@
 #include "MoveSplineInit.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
+#include "Object.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "PassiveAI.h"
@@ -1137,6 +1138,25 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     }
 
     LOG_DEBUG("entities.unit", "DealDamageEnd returned {} damage", damage);
+
+    if(!attacker->IsPlayer() || !attacker->IsCharmedOwnedByPlayerOrPlayer())
+    {
+        if(!victim->IsPlayer() || !victim->IsCharmedOwnedByPlayerOrPlayer())
+        {
+            if (Creature* victimCreature = victim->ToCreature())
+            {
+                if (victimCreature->GetSparringPct() > 0)
+                {
+                    if(damage >= victimCreature->GetHealth())
+                        damage = 0;
+
+                    uint32 sparringHealth = victimCreature->GetHealth() * (victimCreature->GetSparringPct() / 100);
+                    if (victimCreature->GetHealth() - damage <= sparringHealth)
+                        damage = sparringHealth - (victimCreature->GetHealth() - damage);
+                }
+            }
+        }
+    }
 
     return damage;
 }
