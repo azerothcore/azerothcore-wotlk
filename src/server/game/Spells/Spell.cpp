@@ -4611,12 +4611,7 @@ void Spell::finish(bool ok)
     if (Creature* creatureCaster = m_caster->ToCreature())
         creatureCaster->ReleaseFocus(this);
 
-    //npcbot
-    if (!ok && m_caster->IsNPCBotOrPet())
-        BotMgr::OnBotSpellGo(m_caster, this, false);
-    //end npcbot
-
-    if (!ok)
+    if (ok)
     {
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
         {
