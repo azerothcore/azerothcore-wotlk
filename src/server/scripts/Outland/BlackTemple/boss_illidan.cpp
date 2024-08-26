@@ -825,8 +825,6 @@ struct npc_akama_illidan : public ScriptedAI
             {
                 Talk(SAY_AKAMA_BETRAYER);
                 me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                instance->SetBossState(DATA_AKAMA_ILLIDAN, NOT_STARTED);
-                instance->SetBossState(DATA_AKAMA_ILLIDAN, DONE);
             }
             break;
             case PATH_AKAMA_MINIONS:
