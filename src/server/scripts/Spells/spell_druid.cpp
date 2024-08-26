@@ -1088,11 +1088,7 @@ class spell_dru_t10_restoration_4p_bonus : public SpellScript
 
     bool Load() override
     {
-        //npcbot
-        if (GetCaster()->IsNPCBot())
-            return true;
-        //end npcbot
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)
