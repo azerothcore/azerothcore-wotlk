@@ -278,4 +278,3 @@ void AddSC_boss_emalon()
     new spell_voa_overcharge();
     new spell_voa_lightning_nova();
 }
-

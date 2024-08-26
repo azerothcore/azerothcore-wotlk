@@ -725,7 +725,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill + 5 < GameTime::GetGameTime().count())
+            if (victim->IsPlayer() && !me->IsInEvadeMode() && _phase != PHASE_OUTRO && _lastTalkTimeKill + 5 < GameTime::GetGameTime().count())
             {
                 _lastTalkTimeKill = GameTime::GetGameTime().count();
                 Talk(SAY_LK_KILL);
@@ -2229,7 +2229,7 @@ public:
             me->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL, true);
             if (TempSummon* summon = me->ToTempSummon())
                 if (Unit* summoner = summon->GetSummonerUnit())
-                    if (summoner->GetTypeId() == TYPEID_PLAYER && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
+                    if (summoner->IsPlayer() && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
                     {
                         valid = true;
                         summoner->CastSpell(me, SPELL_RAGING_SPIRIT_VISUAL_CLONE, true);
@@ -2290,7 +2290,7 @@ public:
                             bool valid = false;
                             if (TempSummon* summon = me->ToTempSummon())
                                 if (Unit* summoner = summon->GetSummonerUnit())
-                                    if (summoner->GetTypeId() == TYPEID_PLAYER && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
+                                    if (summoner->IsPlayer() && summoner->IsAlive() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
                                     {
                                         valid = true;
                                         AttackStart(summoner);
@@ -2960,8 +2960,8 @@ public:
             {
                 if (Unit* summoner = summ->GetSummonerUnit())
                 {
-                    bool buff = _instance->GetBossState(DATA_THE_LICH_KING) == IN_PROGRESS && summoner->GetTypeId() == TYPEID_PLAYER && (!summoner->IsAlive() || summoner->ToPlayer()->IsBeingTeleported() || summoner->FindMap() != me->GetMap());
-                    if (summoner->GetTypeId() == TYPEID_PLAYER && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
+                    bool buff = _instance->GetBossState(DATA_THE_LICH_KING) == IN_PROGRESS && summoner->IsPlayer() && (!summoner->IsAlive() || summoner->ToPlayer()->IsBeingTeleported() || summoner->FindMap() != me->GetMap());
+                    if (summoner->IsPlayer() && !summoner->ToPlayer()->IsBeingTeleported() && summoner->FindMap() == me->GetMap())
                     {
                         if (buff)
                             summoner->CastSpell((Unit*)nullptr, SPELL_HARVESTED_SOUL_LK_BUFF, true, nullptr, nullptr, _instance->GetGuidData(DATA_THE_LICH_KING));
@@ -2997,7 +2997,7 @@ public:
                     if (TempSummon* summ = me->ToTempSummon())
                         if (Unit* summoner = summ->GetSummonerUnit())
                         {
-                            if (summoner->IsAlive() && summoner->GetTypeId() == TYPEID_PLAYER)
+                            if (summoner->IsAlive() && summoner->IsPlayer())
                             {
                                 summoner->CastSpell((Unit*)nullptr, SPELL_HARVEST_SOUL_VISUAL, true);
                                 summoner->ExitVehicle(summoner);
@@ -3490,7 +3490,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            return me->GetReactState() == REACT_AGGRESSIVE && target->GetTypeId() == TYPEID_PLAYER && target->GetExactDistSq(495.708f, -2523.76f, 1049.95f) < 40.0f * 40.0f;
+            return me->GetReactState() == REACT_AGGRESSIVE && target->IsPlayer() && target->GetExactDistSq(495.708f, -2523.76f, 1049.95f) < 40.0f * 40.0f;
         }
     };
 

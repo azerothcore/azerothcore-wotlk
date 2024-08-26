@@ -332,4 +332,3 @@ void AddSC_boss_teron_gorefiend()
     RegisterSpellScript(spell_teron_gorefiend_shadowy_construct);
     RegisterSpellScript(spell_teron_gorefiend_shadow_of_death_remove);
 }
-

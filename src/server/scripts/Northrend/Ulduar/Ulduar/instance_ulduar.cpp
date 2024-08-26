@@ -1097,7 +1097,7 @@ public:
         void OnUnitDeath(Unit* unit) override
         {
             // Feeds on Tears achievement
-            if (unit->GetTypeId() == TYPEID_PLAYER)
+            if (unit->IsPlayer())
             {
                 if (GetData(TYPE_ALGALON) == IN_PROGRESS)
                     if (Creature* algalon = instance->GetCreature(m_uiAlgalonGUID))
@@ -1114,7 +1114,7 @@ public:
             }
 
             // achievement Champion/Conqueror of Ulduar
-            if (unit->GetTypeId() == TYPEID_PLAYER)
+            if (unit->IsPlayer())
                 for (uint8 i = 0; i <= 12; ++i)
                 {
                     bool go = false;
@@ -1348,4 +1348,3 @@ void AddSC_instance_ulduar()
 {
     new instance_ulduar();
 }
-
