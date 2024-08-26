@@ -15,7 +15,7 @@ results = {
 }
 
 # Main function to parse all the files of the project
-def parsing_file(directory):
+def parsing_file(directory: str) -> None:
     for root, _, files in os.walk(directory):
         for file in files:
             if not file.endswith('.ico'):                                   # Skip .ico files that cannot be read
@@ -23,13 +23,13 @@ def parsing_file(directory):
                 file_name = file
                 try:
                     with open(file_path, 'r', encoding='utf-8') as file:
-                        multipleBlankLines_check(file, file_path)
+                        multiple_blank_lines_check(file, file_path)
                         trailing_whitespace_check(file, file_path)
-                        getCounter_check(file, file_path)
+                        get_counter_check(file, file_path)
                         if file_name != 'Object.h':
-                            getTypeId_check(file, file_path)
+                            get_typeid_check(file, file_path)
                         if file_name != 'Unit.h':
-                            npcFlagHelpers_check(file, file_path)
+                            npcflags_helpers_check(file, file_path)
                 except UnicodeDecodeError:
                     print(f"\nCould not decode file {file_path}")
                     sys.exit(1)
@@ -44,7 +44,7 @@ def parsing_file(directory):
         print(f"\nEverything looks good")
 
 # Codestyle patterns checking for multiple blank lines
-def multipleBlankLines_check(file, file_path):
+def multiple_blank_lines_check(file, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
@@ -68,7 +68,7 @@ def multipleBlankLines_check(file, file_path):
         results["Multiple blank lines check"] = "Failed"
 
 # Codestyle patterns checking for whitespace at the end of the lines
-def trailing_whitespace_check(file, file_path):
+def trailing_whitespace_check(file, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     # Parse all the file
@@ -80,7 +80,7 @@ def trailing_whitespace_check(file, file_path):
                 results["Trailing whitespace check"] = "Failed"
 
 # Codestyle patterns checking for ObjectGuid::GetCounter()
-def getCounter_check(file, file_path):
+def get_counter_check(file, file_path: str) -> None:
     global error_handler
     file.seek(0) # Reset file pointer to the beginning
     # Parse all the file
@@ -92,8 +92,7 @@ def getCounter_check(file, file_path):
                 results["GetCounter() check"] = "Failed"
 
 # Codestyle patterns checking for GetTypeId()
-# Unused for now. Need to fix all usage in the core before adding the check to the github workflow
-def getTypeId_check(file, file_path):
+def get_typeid_check(file, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
@@ -117,7 +116,7 @@ def getTypeId_check(file, file_path):
         results["GetTypeId() check"] = "Failed"
 
 # Codestyle patterns checking for NpcFlag helpers
-def npcFlagHelpers_check(file, file_path):
+def npcflags_helpers_check(file, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
