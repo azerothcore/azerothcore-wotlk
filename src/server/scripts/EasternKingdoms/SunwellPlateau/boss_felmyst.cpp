@@ -173,7 +173,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
+            if (victim->IsPlayer() && roll_chance_i(50))
                 Talk(YELL_KILL);
         }
 
@@ -565,4 +565,3 @@ void AddSC_boss_felmyst()
     RegisterSpellScript(spell_felmyst_fog_of_corruption_charm_aura);
     RegisterSpellScript(spell_felmyst_open_brutallus_back_doors);
 }
-

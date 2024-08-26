@@ -358,7 +358,7 @@ public:
         {
             if (me->ToTempSummon())
             {
-                if (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer())
+                if (who->IsPlayer() || who->GetOwnerGUID().IsPlayer())
                     if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                         summoner->GetAI()->DoAction(ACTION_INFORM);
                 return;
@@ -476,4 +476,3 @@ void AddSC_boss_drakkari_colossus()
     RegisterSpellScript(spell_drakkari_colossus_surge);
     RegisterSpellScript(spell_drakkari_colossus_face_me);
 }
-

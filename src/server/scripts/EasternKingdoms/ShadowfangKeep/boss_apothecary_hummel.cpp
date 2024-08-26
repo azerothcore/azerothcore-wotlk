@@ -531,4 +531,3 @@ void AddSC_boss_apothecary_hummel()
     RegisterSpellScript(spell_apothecary_perfume_spill);
     RegisterSpellScript(spell_apothecary_cologne_spill);
 }
-

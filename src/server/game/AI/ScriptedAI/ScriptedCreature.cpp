@@ -668,7 +668,7 @@ void BossAI::TeleportCheaters()
     ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
         if (Unit* target = (*itr)->getTarget())
-            if (target->GetTypeId() == TYPEID_PLAYER && !IsInBoundary(target))
+            if (target->IsPlayer() && !IsInBoundary(target))
                 target->NearTeleportTo(x, y, z, 0);
 }
 

@@ -290,6 +290,30 @@ private:
 
 //=================================================
 
+struct RedirectThreatInfo
+{
+    RedirectThreatInfo() = default;
+    ObjectGuid _targetGUID;
+    uint32 _threatPct{ 0 };
+
+    [[nodiscard]] ObjectGuid GetTargetGUID() const { return _targetGUID; }
+    [[nodiscard]] uint32 GetThreatPct() const { return _threatPct; }
+
+    void Set(ObjectGuid guid, uint32 pct)
+    {
+        _targetGUID = guid;
+        _threatPct = pct;
+    }
+
+    void ModifyThreatPct(int32 amount)
+    {
+        amount += _threatPct;
+        _threatPct = uint32(std::max(0, amount));
+    }
+};
+
+//=================================================
+
 namespace Acore
 {
     // Binary predicate for sorting HostileReferences based on threat value

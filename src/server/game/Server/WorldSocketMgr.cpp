@@ -38,7 +38,7 @@ public:
 };
 
 WorldSocketMgr::WorldSocketMgr() :
-    BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(65536), _tcpNoDelay(true)
+    BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(4096), _tcpNoDelay(true)
 {
 }
 
@@ -57,7 +57,7 @@ bool WorldSocketMgr::StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::s
 
     // -1 means use default
     _socketSystemSendBufferSize = sConfigMgr->GetOption<int32>("Network.OutKBuff", -1);
-    _socketApplicationSendBufferSize = sConfigMgr->GetOption<int32>("Network.OutUBuff", 65536);
+    _socketApplicationSendBufferSize = sConfigMgr->GetOption<int32>("Network.OutUBuff", 4096);
 
     if (_socketApplicationSendBufferSize <= 0)
     {

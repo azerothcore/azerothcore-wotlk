@@ -141,7 +141,7 @@ public:
             {
                 me->ModifyHealth(int32(me->GetMaxHealth() * 0.05f));
             }
-            if (who->GetTypeId() == TYPEID_PLAYER && pInstance)
+            if (who->IsPlayer() && pInstance)
             {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
             }
@@ -278,4 +278,3 @@ void AddSC_boss_gluth()
     new boss_gluth();
     RegisterSpellScript(spell_gluth_decimate);
 }
-
