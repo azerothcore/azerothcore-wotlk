@@ -3086,7 +3086,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
 
                             spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
                             break;
-                            
+
                             continue;
                     }
                 }
