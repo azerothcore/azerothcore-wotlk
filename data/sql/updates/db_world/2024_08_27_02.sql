@@ -1,3 +1,4 @@
+-- DB update 2024_08_27_01 -> 2024_08_27_02
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 13 AND `SourceGroup` = 1 AND `SourceEntry` IN (41333, 41342) AND `SourceId` = 0 AND `ElseGroup` IN (0, 1, 2, 3) AND `ConditionTypeOrReference` = 31 AND `ConditionValue2` IN (22949, 22950, 22951, 22952, 23426);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 41333, 0, 1, 31, 0, 3, 22949, 0, 0, 0, 0, '', 'Spell \'Empyreal Equivalency\' can hit \'Gathios the Shatterer\''),
