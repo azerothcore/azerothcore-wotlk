@@ -2301,7 +2301,7 @@ void ObjectMgr::LoadCreatureSparring()
 {
     uint32 oldMSTime = getMSTime();
 
-    QueryResult result = WorldDatabase.Query("SELECT Entry, SparringHealthPct FROM creature_sparring");
+    QueryResult result = WorldDatabase.Query("SELECT Entry, SparringPct FROM creature_sparring");
 
     if (!result)
     {
