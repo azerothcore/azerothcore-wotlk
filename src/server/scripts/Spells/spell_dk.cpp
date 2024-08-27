@@ -751,8 +751,8 @@ class spell_dk_pet_scaling : public AuraScript
             // Check just if owner has Ravenous Dead since it's effect is not an aura
             if (AuraEffect const* rdEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0))
             {
-                SpellInfo const* spellInfo = rdEff->GetSpellInfo();                                                 // Then get the SpellProto and add the dummy effect value
-                AddPct(modifier, spellInfo->Effects[EFFECT_1].CalcValue());                                          // Ravenous Dead edits the original scale
+                SpellInfo const* spellInfo = rdEff->GetSpellInfo(); // Then get the SpellProto and add the dummy effect value
+                AddPct(modifier, spellInfo->Effects[EFFECT_1].CalcValue()); // Ravenous Dead edits the original scale
             }
 
             // xinef: Glyph of the Ghoul
