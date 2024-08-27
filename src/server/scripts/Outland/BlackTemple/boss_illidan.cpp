@@ -477,20 +477,6 @@ struct boss_illidan_stormrage : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        // If there are any players in the threatlist, do not evade
-        ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-        {
-            if (Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid()))
-            {
-                if (unit->IsPlayer() && unit->IsAlive())
-                {
-                    AttackStart(unit);
-                    return;
-                }
-            }
-        }
-
         if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
             akama->DespawnOnEvade();
 
