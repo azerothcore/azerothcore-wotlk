@@ -603,7 +603,7 @@ class spell_illidari_council_empyreal_equivalency : public SpellScript
     void HandleDummy(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        if (Unit* target = GetHitUnit())
+        if (GetHitUnit())
         {
             _targetCount++;
         }
