@@ -529,6 +529,9 @@ class spell_illidari_council_balance_of_power_aura : public AuraScript
     {
         Unit* councilMember = GetTarget();
         InstanceScript* instance = councilMember->GetInstanceScript();
+        if (!instance)
+            return;
+
         Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
 
         int32 damage = dmgInfo.GetDamage();
