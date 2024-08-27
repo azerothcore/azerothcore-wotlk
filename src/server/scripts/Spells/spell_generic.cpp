@@ -5347,6 +5347,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_area_aura_select_players_and_caster);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2);
+    RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_3", TARGET_UNIT_SRC_AREA_ENEMY, 3);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_7_1", TARGET_UNIT_SRC_AREA_ENTRY, 1);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_24_1", TARGET_UNIT_CONE_ENEMY_24, 1);
