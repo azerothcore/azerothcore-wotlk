@@ -167,6 +167,7 @@ const Position airHoverPos[MAX_EYE_BEAM_POS] =
 
 Position illidanTakeoffPoint = { 727.6356f, 305.62753, 359.1486f };
 Position illidanLand = { 676.648f, 304.76074f, 354.18906f, 6.230825424194335937f };
+Position roomCenter = { 676.021f, 305.455f, 353.582f, 3.82227f };
 
 struct boss_illidan_stormrage : public BossAI
 {
@@ -187,6 +188,7 @@ struct boss_illidan_stormrage : public BossAI
         DoCastSelf(SPELL_DUAL_WIELD, true);
         me->LoadEquipment(EQUIPMENT_GLAIVES, true);
         me->SetStandState(UNIT_STAND_STATE_KNEEL);
+        me->SetSheath(SHEATH_STATE_UNARMED);
 
         ScheduleHealthCheckEvent(90, [&] {
             // Call for minions
@@ -333,7 +335,7 @@ struct boss_illidan_stormrage : public BossAI
             {
                 case POINT_ILLIDAN_TAKEOFF:
                 {
-                    me->SetFacingToObject(GetClosestCreatureWithEntry(me, NPC_WORLD_TRIGGER, 100.f));
+                    me->SetFacingTo(me->GetAngle(&roomCenter));
                     Talk(SAY_ILLIDAN_SUMMONFLAMES);
 
                     me->m_Events.AddEventAtOffset([&] {
@@ -351,6 +353,7 @@ struct boss_illidan_stormrage : public BossAI
                 case POINT_ILLIDAN_HOVER:
                 {
                     me->SetControlled(true, UNIT_STATE_ROOT);
+                    scheduler.CancelAll();
                     ScheduleAbilities(PHASE_FLYING);
                 }
                 break;
@@ -405,7 +408,7 @@ struct boss_illidan_stormrage : public BossAI
                     DoCastRandomTarget(SPELL_PARASITIC_SHADOWFIEND, 0U, 100.f);
                 }, 25s, 30s);
 
-                // Custom from SunwellCore
+                // Custom from SunwellCore?
                 ScheduleTimedEvent(30s, 60s, [&] {
                     Talk(SAY_ILLIDAN_TAUNT);
                 }, 30s, 60s);
@@ -413,6 +416,8 @@ struct boss_illidan_stormrage : public BossAI
             break;
             case PHASE_FLYING:
             {
+                me->SetFacingTo(me->GetAngle(&roomCenter));
+
                 scheduler.Schedule(0s, [this](TaskContext context)
                 {
                     // Do not repeat if interrupted (Eye Beam is cast)
@@ -924,6 +929,7 @@ struct npc_maiev_illidan : public ScriptedAI
         if (param == ACTION_MAIEV_ENDING)
         {
             me->SetReactState(REACT_PASSIVE);
+            DoStopAttack();
             me->RemoveAurasDueToSpell(SPELL_MAIEV_DOWN);
             me->SetWalk(true);
             if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
@@ -977,7 +983,7 @@ struct npc_maiev_illidan : public ScriptedAI
             me->SetReactState(REACT_AGGRESSIVE);
         }, 21920ms); // 2475ms
         me->m_Events.AddEventAtOffset([&] {
-            if (Unit* illidan = summoner->ToUnit())
+            if (Creature* illidan = me->FindNearestCreature(NPC_ILLIDAN_STORMRAGE, 15.0f))
                 AttackStart(illidan);
         }, 23095ms); // 1175ms
     }
@@ -1056,11 +1062,10 @@ enum WarbladeTear
 
 struct npc_blade_of_azzinoth : public ScriptedAI
 {
-    npc_blade_of_azzinoth(Creature* creature) : ScriptedAI(creature) { illidan = nullptr; }
+    npc_blade_of_azzinoth(Creature* creature) : ScriptedAI(creature) { }
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        illidan = summoner;
         me->SetReactState(REACT_PASSIVE);
         me->PlayRadiusSound(SOUND_WARBLADE_SPAWN, 150.f);
 
@@ -1078,23 +1083,17 @@ struct npc_blade_of_azzinoth : public ScriptedAI
     {
         if (param == ACTION_RETURN_BLADE)
         {
-            if (illidan)
-            {
-                DoCast(illidan->ToUnit(), SPELL_GLAIVE_RETURNS);
+            if (Creature* illidan = me->FindNearestCreature(NPC_ILLIDAN_STORMRAGE, 100.0f))
+                DoCast(illidan, SPELL_GLAIVE_RETURNS, true);
 
-                me->m_Events.AddEventAtOffset([&] {
-                    me->SetDisplayId(MODEL_INVISIBLE);
-                }, 10ms);
-
-                me->m_Events.AddEventAtOffset([&] {
-                    me->DespawnOrUnsummon();
-                }, 2020ms);
-            }
+            me->m_Events.AddEventAtOffset([&] {
+                me->SetDisplayId(MODEL_INVISIBLE);
+            }, 10ms);
+            me->m_Events.AddEventAtOffset([&] {
+                me->DespawnOrUnsummon();
+            }, 2020ms);
         }
     }
-
-private:
-    WorldObject* illidan;
 };
 
 class spell_illidan_draw_soul : public SpellScript
