@@ -170,7 +170,7 @@ Position illidanLand = { 676.648f, 304.76074f, 354.18906f, 6.230825424194335937f
 
 struct boss_illidan_stormrage : public BossAI
 {
-    boss_illidan_stormrage(Creature* creature) : BossAI(creature, DATA_ILLIDAN_STORMRAGE), _canTalk(true), _dying(false), beamPosId(0) { }
+    boss_illidan_stormrage(Creature* creature) : BossAI(creature, DATA_ILLIDAN_STORMRAGE), _canTalk(true), _dying(false), _inCutscene(false), beamPosId(0) { }
 
     void Reset() override
     {
@@ -179,9 +179,11 @@ struct boss_illidan_stormrage : public BossAI
         me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
         _canTalk = true;
         _dying = false;
+        _inCutscene = false;
         beamPosId = 0;
         me->ReplaceAllUnitFlags(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         me->SetDisableGravity(false);
+        me->SetHover(false);
         DoCastSelf(SPELL_DUAL_WIELD, true);
         me->LoadEquipment(EQUIPMENT_GLAIVES, true);
         me->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -246,7 +248,7 @@ struct boss_illidan_stormrage : public BossAI
             case ACTION_ILLIDAN_LIFTOFF:
             {
                 me->SetReactState(REACT_PASSIVE);
-                me->SendMeleeAttackStop();
+                DoStopAttack();
                 me->GetMotionMaster()->Clear();
                 me->StopMovingOnCurrentPos();
                 DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
@@ -266,6 +268,7 @@ struct boss_illidan_stormrage : public BossAI
             break;
             case ACTION_SHADOW_PRISON:
             {
+                _inCutscene = true;
                 DoCastSelf(SPELL_SHADOW_PRISON, true);
                 DoStopAttack();
                 me->SetReactState(REACT_PASSIVE);
@@ -289,6 +292,7 @@ struct boss_illidan_stormrage : public BossAI
                 me->m_Events.AddEventAtOffset([&] {
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
+                    _inCutscene = false;
                 }, 32830ms); // 9750ms
             }
             break;
@@ -342,18 +346,6 @@ struct boss_illidan_stormrage : public BossAI
                     me->m_Events.AddEventAtOffset([&] {
                         ScheduleAbilities(PHASE_FLYING);
                     }, 3090ms); // 660ms
-
-                    // Check for Flame of Azzinoth
-                    ScheduleTimedEvent(12s, [&] {
-                        summons.RemoveNotExisting();
-                        if (!summons.HasEntry(NPC_FLAME_OF_AZZINOTH))
-                        {
-                            me->InterruptNonMeleeSpells(false);
-                            me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
-                            me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_LAND, illidanLand);
-                            scheduler.CancelAll();
-                        }
-                    }, 3s);
                 }
                 break;
                 case POINT_ILLIDAN_HOVER:
@@ -379,6 +371,7 @@ struct boss_illidan_stormrage : public BossAI
                         // Clear Threat
                         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetReactState(REACT_AGGRESSIVE);
+                        me->SetControlled(false, UNIT_STATE_ROOT);
                         ScheduleAbilities(PHASE_DEMON);
                     }, 6095ms); // 2430ms
                     me->m_Events.AddEventAtOffset([&] {
@@ -448,10 +441,11 @@ struct boss_illidan_stormrage : public BossAI
                         summons.RemoveNotExisting();
                         if (!summons.HasEntry(NPC_FLAME_OF_AZZINOTH))
                         {
-                            me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
-                            scheduler.CancelAll();
+                            me->InterruptNonMeleeSpells(false);
                             me->SetControlled(false, UNIT_STATE_ROOT);
+                            me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
                             me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_LAND, illidanLand);
+                            scheduler.CancelAll();
                         }
                     }, 3s);
             }
@@ -477,6 +471,9 @@ struct boss_illidan_stormrage : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        if (_inCutscene)
+            return;
+
         if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
             akama->DespawnOnEvade();
 
@@ -536,6 +533,7 @@ struct boss_illidan_stormrage : public BossAI
 private:
     bool _canTalk;
     bool _dying;
+    bool _inCutscene;
     uint8 beamPosId;
 };
 
