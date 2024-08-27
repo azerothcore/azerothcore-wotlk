@@ -1,3 +1,4 @@
+-- DB update 2024_08_27_04 -> 2024_08_27_05
 -- Warlord Zim'bo smart ai
 SET @ENTRY := 26544;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
