@@ -1195,7 +1195,8 @@ class spell_gen_haunted_aura : public AuraScript
 };
 
 /* 39228 - Argussian Compass
-   60218 - Essence of Gossamer */
+   60218 - Essence of Gossamer
+   64765 - The General's Heart */
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
     PrepareAuraScript(spell_gen_absorb0_hitlimit1);
