@@ -358,6 +358,7 @@ struct boss_illidan_stormrage : public BossAI
                 {
                     EntryCheckPredicate pred(NPC_BLADE_OF_AZZINOTH);
                     summons.DoAction(ACTION_RETURN_BLADE, pred);
+                    scheduler.CancelAll();
 
                     me->m_Events.AddEventAtOffset([&] {
                         me->LoadEquipment(EQUIPMENT_GLAIVES);
@@ -445,7 +446,6 @@ struct boss_illidan_stormrage : public BossAI
                             me->SetControlled(false, UNIT_STATE_ROOT);
                             me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
                             me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_LAND, illidanLand);
-                            scheduler.CancelAll();
                         }
                     }, 3s);
             }
