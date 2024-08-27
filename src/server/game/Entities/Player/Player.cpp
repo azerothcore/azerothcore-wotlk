@@ -14728,10 +14728,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         // cache equipment...
         for (uint32 i = 0; i < EQUIPMENT_SLOT_END * 2; ++i)
         {
-            int32 item = GetInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i);
-            if (item < 0)
-                item = 0; // In the case of zero durability items
-            ss << item << ' ';
+            ss << abs(GetInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i)) << ' ';
         }
 
         // ...and bags for enum opcode
@@ -14873,10 +14870,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         // cache equipment...
         for (uint32 i = 0; i < EQUIPMENT_SLOT_END * 2; ++i)
         {
-            int32 item = GetInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i);
-            if (item < 0)
-                item = 0; // In the case of zero durability items
-            ss << item << ' ';
+            ss << abs(GetInt32Value(PLAYER_VISIBLE_ITEM_1_ENTRYID + i)) << ' ';
         }
 
         // ...and bags for enum opcode
