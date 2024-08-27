@@ -1,3 +1,4 @@
+import io
 import os
 import sys
 
@@ -44,7 +45,7 @@ def parsing_file(directory: str) -> None:
         print(f"\nEverything looks good")
 
 # Codestyle patterns checking for multiple blank lines
-def multiple_blank_lines_check(file, file_path: str) -> None:
+def multiple_blank_lines_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
@@ -68,7 +69,7 @@ def multiple_blank_lines_check(file, file_path: str) -> None:
         results["Multiple blank lines check"] = "Failed"
 
 # Codestyle patterns checking for whitespace at the end of the lines
-def trailing_whitespace_check(file, file_path: str) -> None:
+def trailing_whitespace_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     # Parse all the file
@@ -80,8 +81,8 @@ def trailing_whitespace_check(file, file_path: str) -> None:
                 results["Trailing whitespace check"] = "Failed"
 
 # Codestyle patterns checking for ObjectGuid::GetCounter()
-def get_counter_check(file, file_path: str) -> None:
-    global error_handler
+def get_counter_check(file: io, file_path: str) -> None:
+    global error_handler, results
     file.seek(0) # Reset file pointer to the beginning
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
@@ -92,7 +93,7 @@ def get_counter_check(file, file_path: str) -> None:
                 results["GetCounter() check"] = "Failed"
 
 # Codestyle patterns checking for GetTypeId()
-def get_typeid_check(file, file_path: str) -> None:
+def get_typeid_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
@@ -113,7 +114,7 @@ def get_typeid_check(file, file_path: str) -> None:
         results["GetTypeId() check"] = "Failed"
 
 # Codestyle patterns checking for NpcFlag helpers
-def npcflags_helpers_check(file, file_path: str) -> None:
+def npcflags_helpers_check(file: io, file_path: str) -> None:
     global error_handler, results
     file.seek(0)  # Reset file pointer to the beginning
     check_failed = False
