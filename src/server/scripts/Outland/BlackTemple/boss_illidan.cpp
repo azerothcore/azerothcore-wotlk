@@ -358,7 +358,6 @@ struct boss_illidan_stormrage : public BossAI
                 {
                     EntryCheckPredicate pred(NPC_BLADE_OF_AZZINOTH);
                     summons.DoAction(ACTION_RETURN_BLADE, pred);
-                    scheduler.CancelAll();
 
                     me->m_Events.AddEventAtOffset([&] {
                         me->LoadEquipment(EQUIPMENT_GLAIVES);
@@ -436,18 +435,20 @@ struct boss_illidan_stormrage : public BossAI
                         me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_HOVER, airHoverPos[beamPosId], false, true);
                     }, 30s, GROUP_PHASE_FLYING);
                 });
-
-                    // Check for Phase Transition
-                    ScheduleTimedEvent(5s, [&] {
-                        summons.RemoveNotExisting();
-                        if (!summons.HasEntry(NPC_FLAME_OF_AZZINOTH))
-                        {
-                            me->InterruptNonMeleeSpells(false);
-                            me->SetControlled(false, UNIT_STATE_ROOT);
-                            me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
-                            me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_LAND, illidanLand);
-                        }
-                    }, 3s);
+                // Check for Phase Transition
+                scheduler.Schedule(5s, [this](TaskContext context) {
+                    summons.RemoveNotExisting();
+                    if (!summons.HasEntry(NPC_FLAME_OF_AZZINOTH))
+                    {
+                        me->InterruptNonMeleeSpells(false);
+                        me->SetControlled(false, UNIT_STATE_ROOT);
+                        me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
+                        me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_LAND, illidanLand);
+                        scheduler.CancelAll();
+                    }
+                    else
+                        context.Repeat(3s);
+                });
             }
             break;
             case PHASE_DEMON:
