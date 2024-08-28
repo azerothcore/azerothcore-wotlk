@@ -1,3 +1,4 @@
+-- DB update 2024_08_28_03 -> 2024_08_28_04
 -- Removes creature reference to broadcast text
 /*
 https://www.azerothcore.org/wiki states that broadcast text table contains only confirmed retail data.
