@@ -247,8 +247,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         InstanceScript* instance = me->GetInstanceScript();
-        if (!instance)
-            return;
+
         if (me->GetHealth() <= damage)
             damage = me->GetHealth() - 1;
 
