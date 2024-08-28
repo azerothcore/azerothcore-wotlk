@@ -371,7 +371,7 @@ struct boss_illidan_stormrage : public BossAI
                         me->SetHover(false);
                     }, 3665ms); // 2450ms
                     me->m_Events.AddEventAtOffset([&] {
-                        // Clear Threat
+                        DoResetThreatList();
                         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->SetControlled(false, UNIT_STATE_ROOT);
@@ -421,9 +421,9 @@ struct boss_illidan_stormrage : public BossAI
                 scheduler.Schedule(0s, [this](TaskContext context)
                 {
                     // Do not repeat if interrupted (Eye Beam is cast)
-                    if (DoCastRandomTarget(SPELL_FIREBALL, 0U, 50000.f, true, true) == SPELL_CAST_OK)
+                    if (DoCastRandomTarget(SPELL_FIREBALL, 0U, 50000.f, true, false, true) == SPELL_CAST_OK)
                         context.Repeat(2400ms);
-                }).Schedule(25s, 45, [this](TaskContext context)
+                }).Schedule(25s, 45s, [this](TaskContext context)
                 {
                     // Eye Blast
                     me->InterruptNonMeleeSpells(false);
@@ -434,11 +434,12 @@ struct boss_illidan_stormrage : public BossAI
 
                     // Reposition
                     me->m_Events.AddEventAtOffset([&] {
+                        scheduler.CancelAll();
                         me->InterruptNonMeleeSpells(false);
                         me->SetControlled(false, UNIT_STATE_ROOT);
                         beamPosId = (beamPosId + 1) % MAX_EYE_BEAM_POS;
                         me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_HOVER, airHoverPos[beamPosId], false, true);
-                    }, 30s, GROUP_PHASE_FLYING);
+                    }, 20s, GROUP_PHASE_FLYING);
                 });
                 // Check for Phase Transition
                 scheduler.Schedule(5s, [this](TaskContext context) {
@@ -468,7 +469,8 @@ struct boss_illidan_stormrage : public BossAI
     {
         BossAI::JustEngagedWith(who);
         ScheduleAbilities(PHASE_INITIAL);
-        instance->GetCreature(DATA_AKAMA_ILLIDAN)->AI()->AttackStart(me);
+        if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
+            akama->AI()->AttackStart(me);
 
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_BERSERK, true);
@@ -688,31 +690,27 @@ struct npc_akama_illidan : public ScriptedAI
                         me->SetFacingToObject(illidan);
                         illidan->AI()->DoAction(ACTION_START_EVENT);
                         me->SetHomePosition(me->GetPosition());
-
-                        me->m_Events.AddEventAtOffset([&] {
-                            Talk(SAY_AKAMA_FREE);
-                        }, 15400ms);
-                        me->m_Events.AddEventAtOffset([&] {
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        }, 19440ms); // 4040ms
-                        me->m_Events.AddEventAtOffset([&] {
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-                        }, 23080ms); // 3640ms
-                        me->m_Events.AddEventAtOffset([&] {
-                            Talk(SAY_AKAMA_TIME_HAS_COME);
-                        }, 33840ms); // 10760ms
-                        me->m_Events.AddEventAtOffset([&] {
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                            me->SetSheath(SHEATH_STATE_MELEE);
-                        }, 35210ms); // 1370ms
-                        me->m_Events.AddEventAtOffset([&] {
-                            me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-                            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
-                        }, 37640ms); // 2430ms
-                        me->m_Events.AddEventAtOffset([&] {
-                            AttackStart(illidan);
-                        }, 43310ms); // 5670ms
                     }
+                    me->m_Events.AddEventAtOffset([&] {
+                        Talk(SAY_AKAMA_FREE);
+                    }, 15400ms);
+                    me->m_Events.AddEventAtOffset([&] {
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+                    }, 19440ms); // 4040ms
+                    me->m_Events.AddEventAtOffset([&] {
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                    }, 23080ms); // 3640ms
+                    me->m_Events.AddEventAtOffset([&] {
+                        Talk(SAY_AKAMA_TIME_HAS_COME);
+                    }, 33840ms); // 10760ms
+                    me->m_Events.AddEventAtOffset([&] {
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                        me->SetSheath(SHEATH_STATE_MELEE);
+                    }, 35210ms); // 1370ms
+                    me->m_Events.AddEventAtOffset([&] {
+                        me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+                    }, 37640ms); // 2430ms
                 }
                 break;
                 case POINT_ILLIDAN_DEFEATED_1:
