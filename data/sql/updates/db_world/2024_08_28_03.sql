@@ -1,6 +1,6 @@
 -- DB update 2024_08_28_02 -> 2024_08_28_03
 -- Scryers
-SET @CGUID := 12556;
+SET @CGUID := 52417;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+18 AND `id1` IN (23435, 23440);
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `VerifiedBuild`) VALUES
@@ -218,7 +218,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 (23452, 1, 0, 'Stand tall, soldiers. Show them no quarter!', 12, 0, 100, 5, 0, 0, 21633, 0, 'Commander Arcus to Player'),
 (23452, 2, 0, 'Victory to the Aldor! The Dragonmaw have been defeated!', 14, 0, 100, 0, 0, 0, 21728, 0, 'Commander Arcus to Commander Arcus');
 
-SET @CGUID := 12720;
+SET @CGUID := 52437;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+18 AND `id1` IN (23453, 23441);
 INSERT INTO `creature` (`guid`, `id1`, `map`, `zoneId`, `areaId`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
