@@ -189,6 +189,15 @@ struct boss_illidari_council : public BossAI
         }
     }
 
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (me->GetHealth() <= damage)
+        {
+            damage = me->GetHealth() - 1;
+            DoAction(ACTION_END_ENCOUNTER);
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!me->isActiveObject())
@@ -234,6 +243,20 @@ struct boss_illidari_council_memberAI : public ScriptedAI
         }
     }
 
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        InstanceScript* instance = me->GetInstanceScript();
+        if (!instance)
+            return;
+        if (me->GetHealth() <= damage)
+            damage = me->GetHealth() - 1;
+
+        int32 damageTaken = damage;
+        Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
+
+        me->CastCustomSpell(target->ToUnit(), SPELL_SHARED_RULE, &damageTaken, &damageTaken, &damageTaken, true, nullptr, nullptr, me->GetGUID());
+    }
+
     void KilledUnit(Unit*) override
     {
         if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
@@ -246,8 +269,6 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     void JustDied(Unit*) override
     {
         Talk(SAY_COUNCIL_DEATH);
-        if (Creature* council = instance->GetCreature(DATA_ILLIDARI_COUNCIL))
-            council->GetAI()->DoAction(ACTION_END_ENCOUNTER);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -525,24 +546,9 @@ class spell_illidari_council_balance_of_power_aura : public AuraScript
         amount = -1;
     }
 
-    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& /*absorbAmount*/)
-    {
-        Unit* councilMember = GetTarget();
-        InstanceScript* instance = councilMember->GetInstanceScript();
-        if (!instance)
-            return;
-
-        Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
-
-        int32 damage = dmgInfo.GetDamage();
-        if (Creature* caster = councilMember->ToCreature())
-            caster->CastCustomSpell(target, SPELL_SHARED_RULE, &damage, &damage, &damage, true, nullptr, nullptr, caster->GetGUID());
-    }
-
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_illidari_council_balance_of_power_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-        OnEffectAbsorb += AuraEffectAbsorbFn(spell_illidari_council_balance_of_power_aura::Absorb, EFFECT_0);
     }
 };
 
