@@ -25,7 +25,7 @@ TransportTemplate::~TransportTemplate()
 {
     // Collect shared pointers into a set to avoid deleting the same memory more than once
     std::set<TransportSpline*> splines;
-    for (size_t i = 0; i < keyFrames.size(); ++i)
+    for (std::size_t i = 0; i < keyFrames.size(); ++i)
         splines.insert(keyFrames[i].Spline);
 
     for (std::set<TransportSpline*>::iterator itr = splines.begin(); itr != splines.end(); ++itr)
@@ -118,7 +118,7 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
     std::vector<KeyFrame>& keyFrames = transport->keyFrames;
     Movement::PointsArray splinePath, allPoints;
     bool mapChange = false;
-    for (size_t i = 0; i < path.size(); ++i)
+    for (std::size_t i = 0; i < path.size(); ++i)
         allPoints.push_back(G3D::Vector3(path[i]->x, path[i]->y, path[i]->z));
 
     // Add extra points to allow derivative calculations for all path nodes
@@ -131,7 +131,7 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
     orientationSpline.init_spline_custom(initer);
     orientationSpline.initLengths();
 
-    for (size_t i = 0; i < path.size(); ++i)
+    for (std::size_t i = 0; i < path.size(); ++i)
     {
         if (!mapChange)
         {
@@ -208,16 +208,16 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
 
     // find the rest of the distances between key points
     // Every path segment has its own spline
-    size_t start = 0;
-    for (size_t i = 1; i < keyFrames.size(); ++i)
+    std::size_t start = 0;
+    for (std::size_t i = 1; i < keyFrames.size(); ++i)
     {
         if (keyFrames[i - 1].Teleport || i + 1 == keyFrames.size())
         {
-            size_t extra = !keyFrames[i - 1].Teleport ? 1 : 0;
+            std::size_t extra = !keyFrames[i - 1].Teleport ? 1 : 0;
             TransportSpline* spline = new TransportSpline();
             spline->init_spline(&splinePath[start], i - start + extra, Movement::SplineBase::ModeCatmullrom);
             spline->initLengths();
-            for (size_t j = start; j < i + extra; ++j)
+            for (std::size_t j = start; j < i + extra; ++j)
             {
                 keyFrames[j].Index = j - start + 1;
                 keyFrames[j].DistFromPrev = spline->length(j - start, j + 1 - start);
@@ -255,7 +255,7 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
     // and distUntilStop is to the next stopping keyframe.
     // this is required to properly handle cases of two stopping frames in a row (yes they do exist)
     float tmpDist = 0.0f;
-    for (size_t i = 0; i < keyFrames.size(); ++i)
+    for (std::size_t i = 0; i < keyFrames.size(); ++i)
     {
         int32 j = (i + lastStop) % keyFrames.size();
         if (keyFrames[j].IsStopFrame() || j == lastStop)
@@ -275,7 +275,7 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
             tmpDist = 0.0f;
     }
 
-    for (size_t i = 0; i < keyFrames.size(); ++i)
+    for (std::size_t i = 0; i < keyFrames.size(); ++i)
     {
         float total_dist = keyFrames[i].DistSinceStop + keyFrames[i].DistUntilStop;
         if (total_dist < 2 * accel_dist) // won't reach full speed
@@ -305,7 +305,7 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
 
     // calculate tFrom times from tTo times
     float segmentTime = 0.0f;
-    for (size_t i = 0; i < keyFrames.size(); ++i)
+    for (std::size_t i = 0; i < keyFrames.size(); ++i)
     {
         int32 j = (i + lastStop) % keyFrames.size();
         if (keyFrames[j].IsStopFrame() || j == lastStop)
@@ -322,7 +322,7 @@ void TransportMgr::GeneratePath(GameObjectTemplate const* goInfo, TransportTempl
         keyFrames[0].DepartureTime = uint32(curPathTime * IN_MILLISECONDS);
     }
 
-    for (size_t i = 1; i < keyFrames.size(); ++i)
+    for (std::size_t i = 1; i < keyFrames.size(); ++i)
     {
         curPathTime += keyFrames[i - 1].TimeTo;
         if (keyFrames[i].IsStopFrame())

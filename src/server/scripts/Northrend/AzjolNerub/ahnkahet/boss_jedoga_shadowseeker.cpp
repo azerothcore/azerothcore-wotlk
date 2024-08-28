@@ -735,4 +735,3 @@ void AddSC_boss_jedoga_shadowseeker()
     // Achievements
     new achievement_volunteer_work();
 }
-

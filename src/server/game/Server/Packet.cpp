@@ -22,7 +22,7 @@ WorldPackets::Packet::Packet(WorldPacket&& worldPacket) : _worldPacket(std::move
 {
 }
 
-WorldPackets::ServerPacket::ServerPacket(OpcodeServer opcode, size_t initialSize /*= 200*/) : Packet(WorldPacket(opcode, initialSize))
+WorldPackets::ServerPacket::ServerPacket(OpcodeServer opcode, std::size_t initialSize /*= 200*/) : Packet(WorldPacket(opcode, initialSize))
 {
 }
 

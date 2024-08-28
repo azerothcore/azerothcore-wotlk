@@ -62,12 +62,12 @@ namespace Acore::Impl::ChatCommands
             if (Optional<T> v = StringTo<T>(token, 0))
                 val = *v;
             else
-                return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, STRING_VIEW_FMT_ARG(token), GetTypeName<T>().c_str());
+                return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, token, GetTypeName<T>());
 
             if constexpr (std::is_floating_point_v<T>)
             {
                 if (!std::isfinite(val))
-                    return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, STRING_VIEW_FMT_ARG(token), GetTypeName<T>().c_str());
+                    return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, token, GetTypeName<T>());
             }
 
             return tail;
@@ -200,7 +200,7 @@ namespace Acore::Impl::ChatCommands
             }
 
             if (next1)
-                return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, STRING_VIEW_FMT_ARG(strVal), GetTypeName<T>().c_str());
+                return FormatAcoreString(handler, LANG_CMDPARSER_STRING_VALUE_INVALID, strVal, GetTypeName<T>());
             else
                 return next1;
         }
@@ -237,7 +237,7 @@ namespace Acore::Impl::ChatCommands
     };
 
     // fixed-size array
-    template <typename T, size_t N>
+    template <typename T, std::size_t N>
     struct ArgInfo<std::array<T, N>, void>
     {
         static ChatCommandResult TryConsume(std::array<T, N>& val, ChatHandler const* handler, std::string_view args)
@@ -255,9 +255,9 @@ namespace Acore::Impl::ChatCommands
     struct ArgInfo<Acore::ChatCommands::Variant<Ts...>>
     {
         using V = std::variant<Ts...>;
-        static constexpr size_t N = std::variant_size_v<V>;
+        static constexpr std::size_t N = std::variant_size_v<V>;
 
-        template <size_t I>
+        template <std::size_t I>
         static ChatCommandResult TryAtIndex([[maybe_unused]] Acore::ChatCommands::Variant<Ts...>& val, [[maybe_unused]] ChatHandler const* handler, [[maybe_unused]] std::string_view args)
         {
             if constexpr (I < N)

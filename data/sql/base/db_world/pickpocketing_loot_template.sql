@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `pickpocketing_loot_template` (
   PRIMARY KEY (`Entry`,`Item`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Loot System';
 
--- Dumping data for table acore_world.pickpocketing_loot_template: ~11 191 rows (approximately)
+-- Dumping data for table acore_world.pickpocketing_loot_template: ~10 906 rows (approximately)
 DELETE FROM `pickpocketing_loot_template`;
 INSERT INTO `pickpocketing_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 	(3, 929, 0, 2.449, 0, 1, 0, 1, 1, 'Flesh Eater - Healing Potion'),

@@ -1181,4 +1181,3 @@ void AddSC_boss_razorscale()
     new achievement_quick_shave();
     new achievement_iron_dwarf_medium_rare();
 }
-

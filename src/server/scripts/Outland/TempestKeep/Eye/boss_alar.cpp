@@ -15,13 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmath>
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "WaypointMgr.h"
 #include "the_eye.h"
+#include <cmath>
+
+#include "Player.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -533,4 +536,3 @@ void AddSC_boss_alar()
     RegisterSpellScript(spell_alar_ember_blast);
     RegisterSpellScript(spell_alar_dive_bomb);
 }
-

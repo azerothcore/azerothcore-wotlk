@@ -85,7 +85,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     bool forceDest =
         //(cOwner && (cOwner->isWorldBoss() || cOwner->IsDungeonBoss())) || // force for all bosses, even not in instances
-        (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) || // for .npc follow
+        (i_target->IsPlayer() && i_target->ToPlayer()->IsGameMaster()) || // for .npc follow
         (owner->CanFly())
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
@@ -103,6 +103,14 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     // Prevent almost infinite spinning of mutual targets.
     if (angle && !mutualChase && _mutualChase && mutualTarget && chaseRange < meleeRange)
+    {
+        angle = Optional<ChaseAngle>();
+        mutualChase = true;
+    }
+
+    // Prevent almost infinite spinning for pets with mutualTarget
+    // _mutualChase is false for previous check
+    if (angle && !mutualChase && !_mutualChase && mutualTarget && chaseRange < meleeRange && cOwner && cOwner->IsPet())
     {
         angle = Optional<ChaseAngle>();
         mutualChase = true;
@@ -444,11 +452,11 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
     bool forceDest =
         (followingMaster) || // allow pets following their master to cheat while generating paths
-        (i_target->GetTypeId() == TYPEID_PLAYER && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
+        (i_target->IsPlayer() && i_target->ToPlayer()->IsGameMaster()) // for .npc follow
         ; // closes "bool forceDest", that way it is more appropriate, so we can comment out crap whenever we need to
 
     bool targetIsMoving = false;
-    if (PositionOkay(target, owner->IsGuardian() && target->GetTypeId() == TYPEID_PLAYER, targetIsMoving, time_diff))
+    if (PositionOkay(target, owner->IsGuardian() && target->IsPlayer(), targetIsMoving, time_diff))
     {
         if (owner->HasUnitState(UNIT_STATE_FOLLOW_MOVE) && owner->movespline->Finalized())
         {
@@ -512,7 +520,9 @@ bool FollowMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         Movement::MoveSplineInit init(owner);
         init.MovebyPath(i_path->GetPath());
-        init.SetWalk(target->IsWalking() || target->movespline->isWalking());
+        if (_inheritWalkState)
+            init.SetWalk(target->IsWalking() || target->movespline->isWalking());
+
         if (Optional<float> velocity = GetVelocity(owner, target, i_path->GetActualEndPosition(), owner->IsGuardian()))
             init.SetVelocity(*velocity);
         init.Launch();

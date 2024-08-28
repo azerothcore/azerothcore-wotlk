@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "AllScriptsObjects.h"
-#include "LFGScripts.h"
 #include "InstanceScript.h"
+#include "LFGScripts.h"
 #include "ScriptObject.h"
 #include "ScriptSystem.h"
 #include "SmartAI.h"
@@ -30,9 +30,24 @@ namespace
     template<typename T>
     inline void SCR_CLEAR()
     {
-        for (auto const& [scriptID, script] : ScriptRegistry<T>::ScriptPointerList)
+        for (auto& [scriptID, script] : ScriptRegistry<T>::ScriptPointerList)
         {
-            delete script;
+            try
+            {
+                if(script)
+                {
+                    delete script;
+                    script = nullptr;
+                }
+            }
+            catch (const std::exception& e)
+            {
+                LOG_ERROR("scripts.unloading", "Failed to unload script {} with ID: {}. Error: {}", script->GetName(), scriptID, e.what());
+            }
+            catch (...)
+            {
+                LOG_ERROR("scripts.unloading", "Failed to unload script {} with ID: {}. Unknown error occurred.", script->GetName(), scriptID);
+            }
         }
 
         ScriptRegistry<T>::ScriptPointerList.clear();

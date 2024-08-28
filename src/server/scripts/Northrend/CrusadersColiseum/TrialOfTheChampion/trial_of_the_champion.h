@@ -18,7 +18,6 @@
 #ifndef DEF_TOC_H
 #define DEF_TOC_H
 
-#include "CombatAI.h"
 #include "CreatureAIImpl.h"
 
 #define DataHeader "TC"

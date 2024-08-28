@@ -19,6 +19,7 @@
 #include "DatabaseEnv.h"
 #include "LogMessage.h"
 #include "PreparedStatement.h"
+#include <vector>
 
 AppenderDB::AppenderDB(uint8 id, std::string const& name, LogLevel level, AppenderFlags /*flags*/, std::vector<std::string_view> const& /*args*/)
     : Appender(id, name, level), realmId(0), enabled(false) { }

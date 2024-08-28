@@ -21,7 +21,6 @@
 #include "CompilerDefs.h"
 #include <cinttypes>
 #include <climits>
-#include <cstddef>
 
 #define ACORE_LITTLEENDIAN 0
 #define ACORE_BIGENDIAN    1

@@ -162,7 +162,7 @@ public:
             Aura* aura = target->GetAura(deserterSpell);
             if (aura && aura->GetDuration() >= duration * IN_MILLISECONDS)
             {
-                handler->PSendSysMessage("Player %s already has a longer %s Deserter active.", handler->playerLink(*playerName), isInstance ? "Instance" : "Battleground");
+                handler->PSendSysMessage("Player {} already has a longer {} Deserter active.", handler->playerLink(*playerName), isInstance ? "Instance" : "Battleground");
                 return true;
             }
 
@@ -184,7 +184,7 @@ public:
 
                 if (remainTime < 0 || remainTime >= duration * IN_MILLISECONDS)
                 {
-                    handler->PSendSysMessage("Player %s already has a longer %s Deserter active.", handler->playerLink(*playerName), isInstance ? "Instance" : "Battleground");
+                    handler->PSendSysMessage("Player {} already has a longer {} Deserter active.", handler->playerLink(*playerName), isInstance ? "Instance" : "Battleground");
                     return true;
                 }
                 CharacterDatabase.Query("DELETE FROM character_aura WHERE guid = {} AND spell = {}", guid.GetCounter(), deserterSpell);
@@ -211,7 +211,7 @@ public:
             CharacterDatabase.Execute(stmt);
         }
 
-        handler->PSendSysMessage("%s of %s Deserter has been added to player %s.", secsToTimeString(duration), isInstance ? "Instance" : "Battleground", handler->playerLink(*playerName));
+        handler->PSendSysMessage("{} of {} Deserter has been added to player {}.", secsToTimeString(duration), isInstance ? "Instance" : "Battleground", handler->playerLink(*playerName));
         return true;
     }
 
@@ -274,17 +274,17 @@ public:
 
         if (duration == 0)
         {
-            handler->SendErrorMessage("Player %s does not have %s Deserter.", handler->playerLink(player->GetName()), isInstance ? "Instance" : "Battleground");
+            handler->SendErrorMessage("Player {} does not have {} Deserter.", handler->playerLink(player->GetName()), isInstance ? "Instance" : "Battleground");
             return true;
         }
 
         if (duration < 0)
         {
-            handler->SendErrorMessage("Permanent %s Deserter has been removed from player %s (GUID %u).", isInstance ? "Instance" : "Battleground", handler->playerLink(player->GetName()), player->GetGUID().GetCounter());
+            handler->SendErrorMessage("Permanent {} Deserter has been removed from player {} (GUID {}).", isInstance ? "Instance" : "Battleground", handler->playerLink(player->GetName()), player->GetGUID().ToString());
             return true;
         }
 
-        handler->PSendSysMessage("%s of %s Deserter has been removed from player %s (GUID %u).", secsToTimeString(duration / IN_MILLISECONDS), isInstance ? "Instance" : "Battleground", handler->playerLink(player->GetName()), player->GetGUID().GetCounter());
+        handler->PSendSysMessage("{} of {} Deserter has been removed from player {} (GUID {}).", secsToTimeString(duration / IN_MILLISECONDS), isInstance ? "Instance" : "Battleground", handler->playerLink(player->GetName()), player->GetGUID().ToString());
         return true;
     }
 
@@ -386,11 +386,11 @@ public:
 
         if (deserterCount == 0)
         {
-            handler->PSendSysMessage("No player on this realm has %s Deserter with a duration of %s or less.", isInstance ? "Instance" : "Battleground", remainTimeStr);
+            handler->PSendSysMessage("No player on this realm has {} Deserter with a duration of {} or less.", isInstance ? "Instance" : "Battleground", remainTimeStr);
             return true;
         }
 
-        handler->PSendSysMessage("%s Deserter has been removed from %u player(s) with a duration of %s or less.", isInstance ? "Instance" : "Battleground", deserterCount, remainTimeStr);
+        handler->PSendSysMessage("{} Deserter has been removed from {} player(s) with a duration of {} or less.", isInstance ? "Instance" : "Battleground", deserterCount, remainTimeStr);
         return true;
     }
 

@@ -362,7 +362,7 @@ const uint32 ItemQualityColors[MAX_ITEM_QUALITY] =
     0xffe6cc80         //LIGHT YELLOW
 };
 
-size_t constexpr MAX_QUEST_DIFFICULTY = 5;
+std::size_t constexpr MAX_QUEST_DIFFICULTY = 5;
 uint32 constexpr QuestDifficultyColors[MAX_QUEST_DIFFICULTY] =
 {
     0xff40c040,
@@ -441,7 +441,7 @@ enum SpellAttr1 : uint32
     SPELL_ATTR1_FINISHING_MOVE_DURATION                  = 0x00400000, // TITLE Requires combo points (type 2)
     SPELL_ATTR1_IGNORE_OWNERS_DEATH                      = 0x00800000, // TITLE Unknwon attribute 23@Attr1
     SPELL_ATTR1_SPECIAL_SKILLUP                          = 0x01000000, // TITLE Fishing (client only)
-    SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT                  = 0x02000000, // TITLE Unknown attribute 25@Attr1
+    SPELL_ATTR1_AURA_STAYS_AFTER_COMBAT                  = 0x02000000, // TITLE Aura stays after combat DESCRIPTION Aura will not be removed when the unit leaves combat
     SPELL_ATTR1_REQUIRE_ALL_TARGETS                      = 0x04000000, // TITLE Unknown attribute 26@Attr1 DESCRIPTION Related to [target=focus] and [target=mouseover] macros?
     SPELL_ATTR1_DISCOUNT_POWER_ON_MISS                   = 0x08000000, // TITLE Unknown attribute 27@Attr1 DESCRIPTION Melee spell?
     SPELL_ATTR1_NO_AURA_ICON                             = 0x10000000, // TITLE Hide in aura bar (client only)
@@ -616,7 +616,7 @@ enum SpellAttr6 : uint32
     SPELL_ATTR6_ALLOW_WHILE_RIDING_VEHICLE                 = 0x00001000, // TITLE Castable while caster is on vehicle
     SPELL_ATTR6_IGNORE_PHASE_SHIFT                         = 0x00002000, // TITLE Can target invisible units
     SPELL_ATTR6_AI_PRIMARY_RANGED_ATTACK                   = 0x00004000, // TITLE Unknown attribute 14@Attr6
-    SPELL_ATTR6_NO_PUSHBACK                                = 0x00008000, // TITLE Unknown attribute 15@Attr6 DESCRIPTION only 54368, 67892
+    SPELL_ATTR6_NO_PUSHBACK                                = 0x00008000, // TITLE Not affected by pushback DESCRIPTION Casts/Channels will not affected by pushback
     SPELL_ATTR6_NO_JUMP_PATHING                            = 0x00010000, // TITLE Unknown attribute 16@Attr6
     SPELL_ATTR6_ALLOW_EQUIP_WHILE_CASTING                  = 0x00020000, // TITLE Unknown attribute 17@Attr6 DESCRIPTION Mount related?
     SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER                  = 0x00040000, // TITLE Spell is cast by charmer DESCRIPTION Client will prevent casting if not possessed, charmer will be caster for all intents and purposes

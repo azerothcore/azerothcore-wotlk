@@ -16,11 +16,9 @@
  */
 
 #include "AreaTriggerScript.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "SpellMgr.h"
 /* ScriptData
 SDName: Areatrigger_Scripts
 SD%Complete: 100
@@ -452,4 +450,3 @@ void AddSC_areatrigger_scripts()
     new AreaTrigger_at_brewfest();
     new AreaTrigger_at_area_52_entrance();
 }
-

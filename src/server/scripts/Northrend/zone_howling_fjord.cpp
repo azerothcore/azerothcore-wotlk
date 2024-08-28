@@ -303,7 +303,7 @@ public:
             ObjectGuid summonerGUID;
             if (me->IsSummon())
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
-                    if (summoner->GetTypeId() == TYPEID_PLAYER)
+                    if (summoner->IsPlayer())
                         summonerGUID = summoner->GetGUID();
 
             if (!summonerGUID)

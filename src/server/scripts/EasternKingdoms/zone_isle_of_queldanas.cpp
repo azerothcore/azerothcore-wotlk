@@ -457,31 +457,20 @@ enum PurificationIds
     NPC_AURIC = 37765,
 };
 
-class spell_bh_cleanse_quel_delar : public SpellScriptLoader
+class spell_bh_cleanse_quel_delar : public SpellScript
 {
-public:
-    spell_bh_cleanse_quel_delar() : SpellScriptLoader("spell_bh_cleanse_quel_delar") { }
+    PrepareSpellScript(spell_bh_cleanse_quel_delar);
 
-    class spell_bh_cleanse_quel_delar_SpellScript : public SpellScript
+    void OnEffect(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_bh_cleanse_quel_delar_SpellScript);
+        if (Unit* caster = GetCaster())
+            if (Creature* c = caster->FindNearestCreature(NPC_ROMMATH, 50.0f, true))
+                c->AI()->DoAction(-1);
+    }
 
-        void OnEffect(SpellEffIndex  /*effIndex*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Creature* c = caster->FindNearestCreature(NPC_ROMMATH, 50.0f, true))
-                    c->AI()->DoAction(-1);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_bh_cleanse_quel_delar_SpellScript::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_bh_cleanse_quel_delar_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_bh_cleanse_quel_delar::OnEffect, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -510,7 +499,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!announced && who->GetTypeId() == TYPEID_PLAYER && who->GetPositionZ() < 30.0f)
+            if (!announced && who->IsPlayer() && who->GetPositionZ() < 30.0f)
             {
                 announced = true;
                 playerGUID = who->GetGUID();
@@ -692,10 +681,9 @@ void AddSC_isle_of_queldanas()
 {
     // OUR:
     new npc_bh_thalorien_dawnseeker();
-    new spell_bh_cleanse_quel_delar();
+    RegisterSpellScript(spell_bh_cleanse_quel_delar);
     new npc_grand_magister_rommath();
 
     // THEIR:
     new npc_greengill_slave();
 }
-

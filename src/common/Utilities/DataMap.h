@@ -1,5 +1,5 @@
 /*
- * Originally written by Rochet2 - Copyright (C) 2018+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Originally written by Rochet2 - Copyright (C) 2018+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: http://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE
  */
 
 #ifndef _DATA_MAP_H_
