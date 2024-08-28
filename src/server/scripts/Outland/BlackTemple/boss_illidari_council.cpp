@@ -353,6 +353,18 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
 {
     boss_high_nethermancer_zerevor(Creature* creature) : boss_illidari_council_memberAI(creature) { }
 
+    void Reset() override
+    {
+        _oocScheduler.Schedule(1s, [this](TaskContext context)
+        {
+            DoCastSelf(SPELL_DAMPEN_MAGIC);
+            context.Repeat(5min);
+        });
+
+        scheduler.CancelAll();
+        boss_illidari_council_memberAI::Reset();
+    }
+
     void AttackStart(Unit* who) override
     {
         if (who && me->Attack(who, true))
@@ -362,53 +374,48 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
     void JustEngagedWith(Unit* who) override
     {
         boss_illidari_council_memberAI::JustEngagedWith(who);
-        events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 25000);
-        events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 5000);
-        events.ScheduleEvent(EVENT_SPELL_ARCANE_BOLT, 15000);
-        events.ScheduleEvent(EVENT_SPELL_DAMPEN_MAGIC, 0);
         events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 10000);
+
+        ScheduleTimedEvent(25s, [&]
+        {
+            if (roll_chance_i(50))
+                Talk(SAY_COUNCIL_SPECIAL);
+            DoCastRandomTarget(SPELL_FLAMESTRIKE, 0, 100.0f);
+        }, 40s);
+
+        ScheduleTimedEvent(15s, [&]
+        {
+            DoCastVictim(SPELL_ARCANE_BOLT);
+        }, 3s);
+
+        ScheduleTimedEvent(5s, [&]
+        {
+            DoCastRandomTarget(SPELL_BLIZZARD, 0, 100.0f);
+        }, 40s);
+
+        ScheduleTimedEvent(10s, [&]
+        {
+            if (SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
+                DoCastAOE(SPELL_ARCANE_EXPLOSION);
+        }, 10s);
     }
 
     void UpdateAI(uint32 diff) override
     {
+        _oocScheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
 
-        events.Update(diff);
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
-        switch (events.ExecuteEvent())
-        {
-        case EVENT_SPELL_DAMPEN_MAGIC:
-            me->CastSpell(me, SPELL_DAMPEN_MAGIC, false);
-            events.ScheduleEvent(EVENT_SPELL_DAMPEN_MAGIC, 120000);
-            break;
-        case EVENT_SPELL_ARCANE_BOLT:
-            me->CastSpell(me->GetVictim(), SPELL_ARCANE_BOLT, false);
-            events.ScheduleEvent(EVENT_SPELL_ARCANE_BOLT, 3000);
-            break;
-        case EVENT_SPELL_FLAMESTRIKE:
-            if (roll_chance_i(50))
-                Talk(SAY_COUNCIL_SPECIAL);
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
-                me->CastSpell(target, SPELL_FLAMESTRIKE, false);
-            events.ScheduleEvent(EVENT_SPELL_FLAMESTRIKE, 40000);
-            break;
-        case EVENT_SPELL_BLIZZARD:
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
-                me->CastSpell(target, SPELL_BLIZZARD, false);
-            events.ScheduleEvent(EVENT_SPELL_BLIZZARD, 40000);
-            break;
-        case EVENT_SPELL_ARCANE_EXPLOSION:
-            if (SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
-                me->CastSpell(me, SPELL_ARCANE_EXPLOSION, false);
-            events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 10000);
-            break;
-        }
-
-        DoMeleeAttackIfReady();
+        scheduler.Update(diff,
+            std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
+
+    private:
+        TaskScheduler _oocScheduler;
 };
 
 struct boss_lady_malande : public boss_illidari_council_memberAI
@@ -560,9 +567,7 @@ class spell_illidari_council_empyreal_balance : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (GetHitUnit())
-        {
             _targetCount++;
-        }
     }
 
     void HandleAfterCast()
@@ -573,7 +578,7 @@ class spell_illidari_council_empyreal_balance : public SpellScript
             return;
         }
 
-        std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+        auto const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
         for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
             if (Creature* target = ObjectAccessor::GetCreature(*GetCaster(), ihit->targetGUID))
             {
@@ -607,19 +612,15 @@ class spell_illidari_council_empyreal_equivalency : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (GetHitUnit())
-        {
             _targetCount++;
-        }
     }
 
     void HandleAfterCast()
     {
         if (_targetCount != 4)
-        {
             return;
-        }
 
-        std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
+        auto const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
         for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
             if (Creature* target = ObjectAccessor::GetCreature(*GetCaster(), ihit->targetGUID))
                 target->SetHealth(GetCaster()->GetHealth() / _targetCount);
