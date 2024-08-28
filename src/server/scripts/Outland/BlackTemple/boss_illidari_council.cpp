@@ -374,7 +374,6 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
     void JustEngagedWith(Unit* who) override
     {
         boss_illidari_council_memberAI::JustEngagedWith(who);
-        events.ScheduleEvent(EVENT_SPELL_ARCANE_EXPLOSION, 10000);
 
         ScheduleTimedEvent(25s, [&]
         {
