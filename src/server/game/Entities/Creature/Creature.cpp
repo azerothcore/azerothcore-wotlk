@@ -2629,7 +2629,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         return false;
 
     // cannot attack if is during 5 second grace period, unless being attacked
-    if (m_respawnedTime && (GameTime::GetGameTime().count() - m_respawnedTime) < 5 && !GetLastDamagedTime())
+    if (m_respawnedTime && (GameTime::GetGameTime().count() - m_respawnedTime) < 5 && !GetLastLeashExtensionTime())
     {
         return false;
     }
