@@ -1195,29 +1195,31 @@ class spell_gen_haunted_aura : public AuraScript
 };
 
 /* 39228 - Argussian Compass
-   60218 - Essence of Gossamer */
+   60218 - Essence of Gossamer
+   64765 - The General's Heart */
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
     PrepareAuraScript(spell_gen_absorb0_hitlimit1);
 
-    uint32 limit;
-
     bool Load() override
     {
         // Max absorb stored in 1 dummy effect
-        limit = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        _limit = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
         return true;
     }
 
     void Absorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
     {
-        absorbAmount = std::min(limit, absorbAmount);
+        absorbAmount = std::min(_limit, absorbAmount);
     }
 
     void Register() override
     {
         OnEffectAbsorb += AuraEffectAbsorbFn(spell_gen_absorb0_hitlimit1::Absorb, EFFECT_0);
     }
+
+private:
+    uint32 _limit;
 };
 
 enum AdaptiveWarding
@@ -5345,6 +5347,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_area_aura_select_players_and_caster);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2);
+    RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_3", TARGET_UNIT_SRC_AREA_ENEMY, 3);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_7_1", TARGET_UNIT_SRC_AREA_ENTRY, 1);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_24_1", TARGET_UNIT_CONE_ENEMY_24, 1);

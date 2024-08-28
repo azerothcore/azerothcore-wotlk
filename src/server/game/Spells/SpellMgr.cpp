@@ -3070,10 +3070,11 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                     if (spellInfo->SpellFamilyName != SPELLFAMILY_MAGE || !(spellInfo->SpellFamilyFlags[0] & 0x20)) // frostbolt
                                         if (spellInfo->Id != 55095) // frost fever
                                             if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[1] & 0x40000)) // Haunt
-                                            {
-                                                spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
-                                                break;
-                                            }
+                                                if (spellInfo->SpellFamilyName != SPELLFAMILY_WARLOCK || !(spellInfo->SpellFamilyFlags[0] & 0x4000)) // Drain Soul
+                                                {
+                                                    spellInfo->AttributesCu |= SPELL_ATTR0_CU_BINARY_SPELL;
+                                                    break;
+                                                }
                             continue;
                     }
                 }

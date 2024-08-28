@@ -13,8 +13,12 @@ jobs:
     if: github.repository == 'azerothcore/azerothcore-wotlk'
     steps:
       - uses: actions/checkout@v4
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       - name: AzerothCore codestyle
-        run: source ./apps/ci/ci-codestyle.sh
+        run: python ./apps/codestyle/codestyle.py
       - name: C++ Advanced
         run: |
           sudo apt update -y
