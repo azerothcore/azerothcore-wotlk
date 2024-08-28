@@ -397,6 +397,17 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
             if (SelectTarget(SelectTargetMethod::Random, 0, 10.0f))
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
         }, 10s);
+
+        _oocScheduler.CancelAll();
+
+        if (Aura* aura = me->GetAura(SPELL_DAMPEN_MAGIC))
+            if (aura->GetDuration() <= 4 * MINUTE * IN_MILLISECONDS)
+                DoCastSelf(SPELL_DAMPEN_MAGIC);
+
+        ScheduleTimedEvent(1min, [&]
+        {
+            DoCastSelf(SPELL_DAMPEN_MAGIC);
+        }, 1min);
     }
 
     void UpdateAI(uint32 diff) override
