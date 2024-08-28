@@ -423,7 +423,7 @@ struct boss_illidan_stormrage : public BossAI
                     // Do not repeat if interrupted (Eye Beam is cast)
                     if (DoCastRandomTarget(SPELL_FIREBALL, 0U, 50000.f, true, false, true) == SPELL_CAST_OK)
                         context.Repeat(2400ms);
-                }).Schedule(25s, 45s, [this](TaskContext context)
+                }).Schedule(25s, 45s, [this](TaskContext /*context*/)
                 {
                     // Eye Blast
                     me->InterruptNonMeleeSpells(false);
@@ -778,15 +778,20 @@ struct npc_akama_illidan : public ScriptedAI
                 me->m_Events.AddEventAtOffset([&] {
                     DoCastSelf(SPELL_AKAMA_DOOR_OPEN);
                     if (Creature* udalo = me->FindNearestCreature(NPC_SPIRIT_OF_UDALO, 15.0f))
-                        udalo->AI()->DoCastSelf(SPELL_AKAMA_DOOR_OPEN);
+                        udalo->AI()->DoCastSelf(SPELL_DEATHSWORN_DOOR_OPEN);
                     if (Creature* olum = me->FindNearestCreature(NPC_SPIRIT_OF_OLUM, 15.0f))
-                        olum->AI()->DoCastSelf(SPELL_AKAMA_DOOR_OPEN);
+                        olum->AI()->DoCastSelf(SPELL_DEATHSWORN_DOOR_OPEN);
                 }, 39710ms); // 8340ms
                 me->m_Events.AddEventAtOffset([&] {
                     if (Creature* door = me->FindNearestCreature(NPC_ILLIDAN_DOOR_TRIGGER, 15.0f))
                         door->AI()->DoCastSelf(SPELL_ARCANE_EXPLOSION_VIS);
                 }, 50660ms); // 10950ms
                 me->m_Events.AddEventAtOffset([&] {
+                    me->InterruptNonMeleeSpells(false);
+                    if (Creature* udalo = me->FindNearestCreature(NPC_SPIRIT_OF_UDALO, 15.0f))
+                        udalo->InterruptNonMeleeSpells(false);
+                    if (Creature* olum = me->FindNearestCreature(NPC_SPIRIT_OF_OLUM, 15.0f))
+                        olum->InterruptNonMeleeSpells(false);
                     instance->SetBossState(DATA_AKAMA_ILLIDAN, NOT_STARTED);
                     instance->SetBossState(DATA_AKAMA_ILLIDAN, DONE);
                 }, 50680ms); // 20ms
@@ -1052,9 +1057,11 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
 enum WarbladeTear
 {
     SOUND_WARBLADE_SPAWN = 11689,
+
     SPELL_BIRTH          = 40031,
     SPELL_SUMMON_TEAR    = 39855,
     SPELL_TEAR_CHANNEL   = 39857,
+
     MODEL_INVISIBLE      = 11686
 };
 
