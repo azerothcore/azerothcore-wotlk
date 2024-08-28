@@ -2645,6 +2645,12 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         if (GetMap()->IsDungeon())
             return true;
 
+        float visibility = std::max<float>(GetVisibilityRange(), victim->GetVisibilityRange());
+
+        // if outside visibility
+        if (!IsWithinDist(victim, visibility))
+            return false;
+
         // pussywizard: don't check distance to home position if recently damaged (allow kiting away from spawnpoint!)
         // xinef: this should include taunt auras
         if (!isWorldBoss() && (GetLastLeashExtensionTime() + 12 > GameTime::GetGameTime().count() || HasAuraType(SPELL_AURA_MOD_TAUNT)))
