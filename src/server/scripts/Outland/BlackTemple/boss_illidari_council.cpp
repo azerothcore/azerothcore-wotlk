@@ -670,7 +670,7 @@ class spell_illidari_council_circle_of_healing : public SpellScript
 {
     PrepareSpellScript(spell_illidari_council_circle_of_healing);
 
-    void HandleSharedRule(SpellEffIndex effIndex)
+    void HandleSharedRule(SpellEffIndex /*effIndex*/)
     {
         Unit* councilMember = GetHitUnit();
         if (!councilMember)
@@ -683,8 +683,7 @@ class spell_illidari_council_circle_of_healing : public SpellScript
         Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
 
         int32 heal = GetHitHeal();
-        if (Creature* caster = councilMember->ToCreature())
-            target->CastCustomSpell(target, SPELL_SHARED_RULE_HEAL, &heal, &heal, &heal, true, nullptr, nullptr, target->GetGUID());
+        target->CastCustomSpell(target, SPELL_SHARED_RULE_HEAL, &heal, &heal, &heal, true, nullptr, nullptr, target->GetGUID());
     }
 
     void Register() override
