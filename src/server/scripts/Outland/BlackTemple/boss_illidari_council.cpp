@@ -35,7 +35,8 @@ enum Says
 enum Spells
 {
     SPELL_EMPYREAL_EQUIVALENCY          = 41333,
-    SPELL_SHARED_RULE                   = 41342,
+    SPELL_SHARED_RULE_DMG               = 41342,
+    SPELL_SHARED_RULE_HEAL              = 41343,
     SPELL_EMPYREAL_BALANCE              = 41499,
     SPELL_BERSERK                       = 41924,
 
@@ -254,7 +255,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
         int32 damageTaken = damage;
         Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
 
-        me->CastCustomSpell(target->ToUnit(), SPELL_SHARED_RULE, &damageTaken, &damageTaken, &damageTaken, true, nullptr, nullptr, me->GetGUID());
+        me->CastCustomSpell(target->ToUnit(), SPELL_SHARED_RULE_DMG, &damageTaken, &damageTaken, &damageTaken, true, nullptr, nullptr, me->GetGUID());
     }
 
     void KilledUnit(Unit*) override
@@ -665,6 +666,32 @@ class spell_illidari_council_reflective_shield_aura : public AuraScript
         AfterEffectAbsorb += AuraEffectAbsorbFn(spell_illidari_council_reflective_shield_aura::ReflectDamage, EFFECT_0);
     }
 };
+class spell_illidari_council_circle_of_healing : public SpellScript
+{
+    PrepareSpellScript(spell_illidari_council_circle_of_healing);
+
+    void HandleSharedRule(SpellEffIndex effIndex)
+    {
+        Unit* councilMember = GetHitUnit();
+        if (!councilMember)
+            return;
+
+        InstanceScript* instance = councilMember->GetInstanceScript();
+        if (!instance)
+            return;
+
+        Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
+
+        int32 heal = GetHitHeal();
+        if (Creature* caster = councilMember->ToCreature())
+            target->CastCustomSpell(target, SPELL_SHARED_RULE_HEAL, &heal, &heal, &heal, true, nullptr, nullptr, target->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidari_council_circle_of_healing::HandleSharedRule, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
+};
 
 class spell_illidari_council_judgement : public SpellScript
 {
@@ -722,6 +749,7 @@ void AddSC_boss_illidari_council()
     RegisterSpellScript(spell_illidari_council_empyreal_balance);
     RegisterSpellScript(spell_illidari_council_empyreal_equivalency);
     RegisterSpellScript(spell_illidari_council_reflective_shield_aura);
+    RegisterSpellScript(spell_illidari_council_circle_of_healing);
     RegisterSpellScript(spell_illidari_council_judgement);
     RegisterSpellScript(spell_illidari_council_deadly_strike_aura);
 }
