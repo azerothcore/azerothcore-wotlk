@@ -1,3 +1,4 @@
+-- DB update 2024_08_28_01 -> 2024_08_28_02
 UPDATE `smart_scripts`
 SET `link` = 28
 WHERE `entryorguid` = 9520 AND `source_type` = 0 AND `id` = 3;
