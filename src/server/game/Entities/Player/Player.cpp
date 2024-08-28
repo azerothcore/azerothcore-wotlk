@@ -9215,7 +9215,7 @@ Pet* Player::CreatePet(Creature* creatureTarget, uint32 spellID /*= 0*/)
     }
 
     // Everything looks OK, create new pet
-    Pet* pet = CreateTamedPetFrom(creatureTarget, spellID);
+    Pet* pet = CreatePet(creatureTarget, spellID);
     if (!pet)
     {
         return nullptr;
@@ -9262,7 +9262,7 @@ Pet* Player::CreatePet(uint32 creatureEntry, uint32 spellID /*= 0*/)
     }
 
     // Everything looks OK, create new pet
-    Pet* pet = CreateTamedPetFrom(creatureEntry, spellID);
+    Pet* pet = CreatePet(creatureEntry, spellID);
     if (!pet)
     {
         return nullptr;

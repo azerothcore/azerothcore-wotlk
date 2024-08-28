@@ -3083,7 +3083,7 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
     //SendChannelUpdate(0);
     finish();
 
-    Pet* pet = m_caster->CreateTamedPetFrom(creatureTarget, m_spellInfo->Id);
+    Pet* pet = m_caster->CreatePet(creatureTarget, m_spellInfo->Id);
     if (!pet)                                               // in very specific state like near world end/etc.
         return;
 
@@ -5822,7 +5822,7 @@ void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)
         return;
 
     uint32 creatureEntry = m_spellInfo->Effects[effIndex].MiscValue;
-    Pet* pet = unitTarget->CreateTamedPetFrom(creatureEntry, m_spellInfo->Id);
+    Pet* pet = unitTarget->CreatePet(creatureEntry, m_spellInfo->Id);
     if (!pet)
         return;
 

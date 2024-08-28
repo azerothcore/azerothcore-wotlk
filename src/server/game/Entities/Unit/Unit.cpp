@@ -17546,7 +17546,7 @@ bool Unit::IsPetAura(Aura const* aura)
     return false;
 }
 
-Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget, uint32 spell_id)
+Pet* Unit::CreatePet(Creature* creatureTarget, uint32 spell_id)
 {
     if (GetTypeId() != TYPEID_PLAYER)
         return nullptr;
@@ -17570,7 +17570,7 @@ Pet* Unit::CreateTamedPetFrom(Creature* creatureTarget, uint32 spell_id)
     return pet;
 }
 
-Pet* Unit::CreateTamedPetFrom(uint32 creatureEntry, uint32 spell_id)
+Pet* Unit::CreatePet(uint32 creatureEntry, uint32 spell_id)
 {
     if (GetTypeId() != TYPEID_PLAYER)
         return nullptr;
