@@ -1,3 +1,4 @@
+-- DB update 2024_08_28_05 -> 2024_08_28_06
 -- Calvin Montague smart ai
 SET @ENTRY := 6784;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
