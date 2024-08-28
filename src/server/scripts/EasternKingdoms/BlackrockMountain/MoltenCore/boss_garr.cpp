@@ -230,4 +230,3 @@ void AddSC_boss_garr()
     RegisterSpellScript(spell_garr_separation_anxiety_aura);
     RegisterSpellScript(spell_garr_frenzy);
 }
-

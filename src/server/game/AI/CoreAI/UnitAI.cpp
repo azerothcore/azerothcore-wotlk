@@ -140,7 +140,7 @@ SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
             {
-                if (unit->GetTypeId() == TYPEID_PLAYER)
+                if (unit->IsPlayer())
                 {
                     me->AddAura(spellid, unit);
                     return SPELL_CAST_OK;
@@ -163,7 +163,7 @@ SpellCastResult UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered
         {
             if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
             {
-                if (unit->GetTypeId() == TYPEID_PLAYER)
+                if (unit->IsPlayer())
                     return me->CastSpell(unit, spellid, triggered);
             }
             else
@@ -253,6 +253,9 @@ SpellCastResult UnitAI::DoCastAOE(uint32 spellId, bool triggered)
     return me->CastSpell((Unit*)nullptr, spellId, triggered);
 }
 
+/**
+ * @brief Cast the spell on a random unit from the threat list
+ */
 SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered, bool withTank)
 {
     if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly, withTank))

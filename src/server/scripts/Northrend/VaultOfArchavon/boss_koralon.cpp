@@ -263,4 +263,3 @@ void AddSC_boss_koralon()
     new spell_koralon_meteor_fists();
     new spell_flame_warder_meteor_fists();
 }
-

@@ -217,4 +217,3 @@ void AddSC_boss_nethermancer_sepethrea()
     RegisterMechanarCreatureAI(npc_raging_flames);
     RegisterSpellScript(spell_ragin_flames_inferno);
 }
-
