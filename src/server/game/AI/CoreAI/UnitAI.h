@@ -201,14 +201,14 @@ public:
     virtual ~UnitAI() {}
 
     virtual bool CanAIAttack(Unit const* /*target*/) const { return true; }
-    virtual void AttackStart(Unit* /*target*/);
+    virtual void AttackStart(Unit* /*target*/);    /// @brief Use to start attacking a target. Called just before JustEngagedWith()
     virtual void UpdateAI(uint32 /*diff*/) = 0;
 
     virtual void InitializeAI() { if (!me->isDead()) Reset(); }
 
     virtual void Reset() {};
 
-    // Called when unit is charmed
+    /// @brief Called when unit is charmed
     virtual void OnCharmed(bool apply) = 0;
 
     // Pass parameters between AI
@@ -261,16 +261,16 @@ public:
         }
     }
 
-    // Select the best (up to) <num> targets (in <targetType> order) from the threat list that fulfill the following:
-    // - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order,
-    //   if <targetType> is SelectTargetMethod::Random).
-    // - Within at most <dist> yards (if dist > 0.0f)
-    // - At least -<dist> yards away (if dist < 0.0f)
-    // - Is a player (if playerOnly = true)
-    // - Not the current tank (if withTank = false)
-    // - Has aura with ID <aura> (if aura > 0)
-    // - Does not have aura with ID -<aura> (if aura < 0)
-    // The resulting targets are stored in <targetList> (which is cleared first).
+    /** @brief Select the best (up to) <num> targets (in <targetType> order) from the threat list that fulfill the following:
+     * - Not among the first <offset> entries in <targetType> order (or SelectTargetMethod::MaxThreat order, if <targetType> is SelectTargetMethod::Random).
+     * - Within at most <dist> yards (if dist > 0.0f)
+     * - At least -<dist> yards away (if dist < 0.0f)
+     * - Is a player (if playerOnly = true)
+     * - Not the current tank (if withTank = false)
+     * - Has aura with ID <aura> (if aura > 0)
+     * - Does not have aura with ID -<aura> (if aura < 0)
+     * The resulting targets are stored in <targetList> (which is cleared first).
+     */
     void SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, uint32 position = 0, float dist = 0.0f, bool playerOnly = false, bool withTank = true, int32 aura = 0);
 
     // Select the best (up to) <num> targets (in <targetType> order) satisfying <predicate> from the threat list and stores them in <targetList> (which is cleared first).
@@ -348,7 +348,7 @@ public:
 
     /**
      * @brief Called when the unit enters combat
-     * (NOTE: Creature engage logic should NOT be here, but in JustEngagedWith, which happens once threat is established!)
+     * @note NOTE: Creature engage logic should NOT be here, but in JustEngagedWith, which happens once threat is established!)
      *
      * @todo Never invoked right now. Preparation for Combat Threat refactor
      */
@@ -361,28 +361,30 @@ public:
      */
     virtual void JustExitedCombat() { }
 
-    // Called at any Damage to any victim (before damage apply)
+    /// @brief Called at any Damage to any victim (before damage apply)
     virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/) { }
 
-    // Called at any Damage from any attacker (before damage apply)
-    // Note: it for recalculation damage or special reaction at damage
-    // for attack reaction use AttackedBy called for not DOT damage in Unit::DealDamage also
+    /** @brief Called at any Damage from any attacker (before damage apply)
+     *
+     *  @note It use for recalculation damage or special reaction at damage
+     *  for attack reaction use AttackedBy called for non DOT damage in Unit::DealDamage also
+     */
     virtual void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) {}
 
-    // Called when the creature receives heal
+    /// @brief Called when the creature receives heal
     virtual void HealReceived(Unit* /*done_by*/, uint32& /*addhealth*/) {}
 
-    // Called when the creature power updates
+    /// @brief Called when the creature power updates
     virtual void OnPowerUpdate(Powers /*power*/, int32 /*updateVal*/, int32 /*gain*/, uint32 /*currPower*/) {}
 
-    // Called when the unit heals
+    /// @brief Called when the unit heals
     virtual void HealDone(Unit* /*done_to*/, uint32& /*addhealth*/) {}
 
-    // Called during damage calculations
+    /// @brief Called during damage calculations
     virtual void OnCalculateMeleeDamageReceived(uint32& /*damage*/, Unit* /*attacker*/) {}
     virtual void OnCalculateSpellDamageReceived(int32& /*damage*/, Unit* /*attacker*/) {}
 
-    // Called during calculation when receiving periodic healing or damage (DoT or HoT)
+    /// @brief Called during calculation when receiving periodic healing or damage (DoT or HoT)
     virtual void OnCalculatePeriodicTickReceived(uint32& /*damage*/, Unit* /*attacker*/) {}
 
     void AttackStartCaster(Unit* victim, float dist);
@@ -390,13 +392,13 @@ public:
     SpellCastResult DoAddAuraToAllHostilePlayers(uint32 spellid);
     SpellCastResult DoCast(uint32 spellId);
     SpellCastResult DoCast(Unit* victim, uint32 spellId, bool triggered = false);
-    SpellCastResult DoCastSelf(uint32 spellId, bool triggered = false) { return DoCast(me, spellId, triggered); }
+    SpellCastResult DoCastSelf(uint32 spellId, bool triggered = false) { return DoCast(me, spellId, triggered); }   /// @brief To specify the caster as target if the spell is self-cast
     SpellCastResult DoCastToAllHostilePlayers(uint32 spellid, bool triggered = false);
     SpellCastResult DoCastVictim(uint32 spellId, bool triggered = false);
     SpellCastResult DoCastAOE(uint32 spellId, bool triggered = false);
     SpellCastResult DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false, bool withTank = true);
 
-    // Cast spell on the top threat target, which may not be the current victim.
+    /// @brief Cast spell on the top threat target, which may not be the current victim.
     SpellCastResult DoCastMaxThreat(uint32 spellId, uint32 threatTablePosition = 0, float dist = 0.0f, bool playerOnly = true, bool triggered = false);
 
     float DoGetSpellMaxRange(uint32 spellId, bool positive = false);
@@ -408,7 +410,7 @@ public:
     static AISpellInfoType* AISpellInfo;
     static void FillAISpellInfo();
 
-    // Called when a summon reaches a waypoint or point movement finished.
+    /// @brief Called when a summon reaches a waypoint or point movement finished.
     virtual void SummonMovementInform(Creature* /*creature*/, uint32 /*motionType*/, uint32 /*point*/) { }
 
     virtual void sGossipHello(Player* /*player*/) {}
