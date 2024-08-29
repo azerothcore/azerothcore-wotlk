@@ -86,9 +86,9 @@ class MPQFile
 public:
     MPQFile(const char* filename);    // filenames are not case sensitive
     ~MPQFile() { close(); }
-    size_t read(void* dest, size_t bytes);
-    size_t getSize() { return size; }
-    size_t getPos() { return pointer; }
+    std::size_t read(void* dest, std::size_t bytes);
+    std::size_t getSize() { return size; }
+    std::size_t getPos() { return pointer; }
     char* getBuffer() { return buffer; }
     char* getPointer() { return buffer + pointer; }
     bool isEof() { return eof; }

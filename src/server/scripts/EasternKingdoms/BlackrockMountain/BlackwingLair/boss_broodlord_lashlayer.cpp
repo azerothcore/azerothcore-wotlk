@@ -19,7 +19,6 @@
 #include "GameObject.h"
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
-#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -276,4 +275,3 @@ void AddSC_boss_broodlord()
     new go_suppression_device();
     RegisterSpellScript(spell_suppression_aura);
 }
-

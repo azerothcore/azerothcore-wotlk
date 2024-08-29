@@ -190,7 +190,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 Talk(SAY_SLAY);
         }
 
@@ -373,4 +373,3 @@ void AddSC_boss_bronjahm()
     RegisterSpellScript(spell_bronjahm_soulstorm_visual_aura);
     RegisterSpellScript(spell_bronjahm_soulstorm_targeting);
 }
-

@@ -19,6 +19,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "drak_tharon_keep.h"
+#include "SpellScript.h"
 
 enum Yells
 {
@@ -283,4 +284,3 @@ void AddSC_boss_tharon_ja()
     RegisterSpellScript(spell_tharon_ja_dummy_aura);
     RegisterSpellScript(spell_tharon_ja_clear_gift_of_tharon_ja);
 }
-

@@ -464,7 +464,7 @@ int MySQLConnection::ExecuteTransaction(std::shared_ptr<TransactionBase> transac
     return 0;
 }
 
-size_t MySQLConnection::EscapeString(char* to, const char* from, size_t length)
+std::size_t MySQLConnection::EscapeString(char* to, const char* from, std::size_t length)
 {
     return mysql_real_escape_string(m_Mysql, to, from, length);
 }

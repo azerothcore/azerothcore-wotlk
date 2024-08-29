@@ -46,9 +46,9 @@ namespace
     // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
     {
-        size_t foundAuth = fileName.find("authserver.conf");
-        size_t foundWorld = fileName.find("worldserver.conf");
-        size_t foundImport = fileName.find("dbimport.conf");
+        std::size_t foundAuth = fileName.find("authserver.conf");
+        std::size_t foundWorld = fileName.find("worldserver.conf");
+        std::size_t foundImport = fileName.find("dbimport.conf");
 
         return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos || foundImport != std::string_view::npos;
     }
@@ -56,8 +56,8 @@ namespace
     // Check logging system configs like Appender.* and Logger.*
     bool IsLoggingSystemOptions(std::string_view optionName)
     {
-        size_t foundAppender = optionName.find("Appender.");
-        size_t foundLogger = optionName.find("Logger.");
+        std::size_t foundAppender = optionName.find("Appender.");
+        std::size_t foundLogger = optionName.find("Logger.");
 
         return foundAppender != std::string_view::npos || foundLogger != std::string_view::npos;
     }
@@ -144,29 +144,17 @@ namespace
 
             // read line error
             if (!in.good() && !in.eof())
-            {
                 throw ConfigException(Acore::StringFormatFmt("> Config::LoadFile: Failure to read line number {} in file '{}'", lineNumber, file));
-            }
 
             // remove whitespace in line
             line = Acore::String::Trim(line, in.getloc());
 
             if (line.empty())
-            {
                 continue;
-            }
 
-            // comments
+            // comments and headers
             if (line[0] == '#' || line[0] == '[')
-            {
                 continue;
-            }
-
-            size_t found = line.find_first_of('#');
-            if (found != std::string::npos)
-            {
-                line = line.substr(0, found);
-            }
 
             auto const equal_pos = line.find('=');
 
@@ -183,9 +171,7 @@ namespace
 
             // Skip if 2+ same options in one config file
             if (IsDuplicateOption(entry))
-            {
                 continue;
-            }
 
             // Add to temp container
             fileConfigs.emplace(entry, value);
@@ -237,7 +223,7 @@ namespace
         std::string result;
 
         const char* str = key.c_str();
-        size_t n = key.length();
+        std::size_t n = key.length();
 
         char curr;
         bool isEnd;
@@ -245,7 +231,7 @@ namespace
         bool currIsNumeric;
         bool nextIsNumeric;
 
-        for (size_t i = 0; i < n; ++i)
+        for (std::size_t i = 0; i < n; ++i)
         {
             curr = str[i];
             if (curr == ' ' || curr == '.' || curr == '-')
@@ -661,30 +647,6 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
     }
 
     return true;
-}
-
-/// @deprecated DO NOT USE - use GetOption<std::string> instead.
-std::string ConfigMgr::GetStringDefault(std::string const& name, const std::string& def, bool showLogs /*= true*/)
-{
-    return GetOption<std::string>(name, def, showLogs);
-}
-
-/// @deprecated DO NOT USE - use GetOption<bool> instead.
-bool ConfigMgr::GetBoolDefault(std::string const& name, bool def, bool showLogs /*= true*/)
-{
-    return GetOption<bool>(name, def, showLogs);
-}
-
-/// @deprecated DO NOT USE - use GetOption<int32> instead.
-int ConfigMgr::GetIntDefault(std::string const& name, int def, bool showLogs /*= true*/)
-{
-    return GetOption<int32>(name, def, showLogs);
-}
-
-/// @deprecated DO NOT USE - use GetOption<float> instead.
-float ConfigMgr::GetFloatDefault(std::string const& name, float def, bool showLogs /*= true*/)
-{
-    return GetOption<float>(name, def, showLogs);
 }
 
 #define TEMPLATE_CONFIG_OPTION(__typename) \

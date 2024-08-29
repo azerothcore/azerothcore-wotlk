@@ -19,6 +19,8 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "mechanar.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Says
 {
@@ -215,4 +217,3 @@ void AddSC_boss_nethermancer_sepethrea()
     RegisterMechanarCreatureAI(npc_raging_flames);
     RegisterSpellScript(spell_ragin_flames_inferno);
 }
-

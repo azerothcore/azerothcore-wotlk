@@ -25,9 +25,6 @@
 #define _ACORE_PHYSICS_H
 
 #include "Geometry.h"
-#include <cmath>
-#include <cstdlib>
-#include <iostream>
 
 using namespace std;
 

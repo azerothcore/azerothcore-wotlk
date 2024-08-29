@@ -25,7 +25,6 @@ SQLUpdate:
 EndScriptData */
 
 #include "Cell.h"
-#include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
@@ -136,7 +135,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 Talk(SAY_KILL);
         }
 

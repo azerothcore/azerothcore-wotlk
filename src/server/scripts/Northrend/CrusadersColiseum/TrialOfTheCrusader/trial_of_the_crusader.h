@@ -20,7 +20,6 @@
 
 #include "CreatureAIImpl.h"
 #include "GridNotifiers.h"
-#include "SpellAuraEffects.h"
 
 #define DataHeader "TCR"
 

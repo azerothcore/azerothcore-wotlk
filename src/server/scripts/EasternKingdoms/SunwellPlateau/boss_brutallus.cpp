@@ -17,7 +17,11 @@
 
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "MapReference.h"
+#include "PassiveAI.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "WorldSession.h"
 #include "sunwell_plateau.h"
@@ -100,7 +104,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
+            if (victim->IsPlayer() && roll_chance_i(50))
                 Talk(YELL_KILL);
         }
 
@@ -522,4 +526,3 @@ void AddSC_boss_brutallus()
     RegisterSpellScript(spell_brutallus_burn);
     new AreaTrigger_at_sunwell_madrigosa();
 }
-

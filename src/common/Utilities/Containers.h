@@ -23,8 +23,6 @@
 #include <algorithm>
 #include <iterator>
 #include <stdexcept>
-#include <type_traits>
-#include <utility>
 #include <vector>
 
 namespace Acore
@@ -51,13 +49,13 @@ namespace Acore
         using reference = T&;
         using difference_type = std::ptrdiff_t;
 
-        CheckedBufferOutputIterator(T* buf, size_t n) : _buf(buf), _end(buf + n) {}
+        CheckedBufferOutputIterator(T* buf, std::size_t n) : _buf(buf), _end(buf + n) {}
 
         T& operator*() const { check(); return *_buf; }
         CheckedBufferOutputIterator& operator++() { check(); ++_buf; return *this; }
         CheckedBufferOutputIterator operator++(int) { CheckedBufferOutputIterator v = *this; operator++(); return v; }
 
-        [[nodiscard]] size_t remaining() const { return (_end - _buf); }
+        [[nodiscard]] std::size_t remaining() const { return (_end - _buf); }
 
     private:
         T* _buf;

@@ -22,7 +22,6 @@
 #include "Player.h"
 #include "PlayerScript.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -243,6 +242,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
                 if (_spellFocus)
                 {
                     _spellFocus->DespawnOrUnsummon();
+                    _spellFocus->AddObjectToRemoveList();
                     _spellFocus = nullptr;
                 }
 
@@ -378,7 +378,10 @@ struct npc_midsummer_bonfire_despawner : public ScriptedAI
         {
             // spawnID is 0 for temp spawns
             if (0 == (*itr)->GetSpawnId())
+            {
                 (*itr)->DespawnOrUnsummon();
+                (*itr)->AddObjectToRemoveList();
+            }
         }
 
         me->DespawnOrUnsummon();
@@ -434,7 +437,7 @@ struct npc_midsummer_torch_target : public ScriptedAI
         if (posVec.empty())
             return;
         // Triggered spell from torch
-        if (spellInfo->Id == SPELL_TORCH_TOSS_LAND && caster->GetTypeId() == TYPEID_PLAYER)
+        if (spellInfo->Id == SPELL_TORCH_TOSS_LAND && caster->IsPlayer())
         {
             me->CastSpell(me, SPELL_BRAZIERS_HIT_VISUAL, true); // hit visual anim
             if (++counter >= maxCount)
@@ -903,12 +906,12 @@ class spell_midsummer_ribbon_pole : public AuraScript
                 target->CastSpell(target, SPELL_RIBBON_POLE_XP, true);
 
                 // Achievement
-                if ((GameTime::GetGameTime().count() - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
+                if ((GameTime::GetGameTime().count() - GetApplyTime()) > 60 && target->IsPlayer())
                     target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
             }
 
             // Achievement
-            if ((time(nullptr) - GetApplyTime()) > 60 && target->GetTypeId() == TYPEID_PLAYER)
+            if ((time(nullptr) - GetApplyTime()) > 60 && target->IsPlayer())
                 target->ToPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 58934, 0, target);
         }
     }
@@ -1305,4 +1308,3 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_torch_catch);
     RegisterSpellScript(spell_midsummer_summon_ahune_lieutenant);
 }
-

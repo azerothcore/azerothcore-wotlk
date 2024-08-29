@@ -19,6 +19,9 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "GridNotifiers.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Says
 {
@@ -51,7 +54,6 @@ enum Spells
     SPELL_FATAL_ATTRACTION_AURA     = 41001,
     SPELL_FATAL_ATTRACTION_DAMAGE   = 40871,
     SPELL_ENRAGE                    = 45078,
-    SPELL_FRENZY                    = 40683,
     SPELL_SABER_LASH_IMMUNITY       = 43690
 };
 
@@ -71,7 +73,6 @@ struct boss_mother_shahraz : public BossAI
         _canTalk = true;
 
         ScheduleHealthCheckEvent(10, [&] {
-            DoCastSelf(SPELL_FRENZY, true);
             Talk(SAY_EMOTE_FRENZY);
         });
     }
@@ -107,7 +108,7 @@ struct boss_mother_shahraz : public BossAI
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_ENRAGE, true);
             Talk(SAY_ENRAGE);
-        }, 10min);
+        }, 10min, GROUP_ENRAGE);
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -145,7 +146,7 @@ class spell_mother_shahraz_random_periodic_aura : public AuraScript
     void Update(AuraEffect const* effect)
     {
         PreventDefaultAction();
-        if (effect->GetTickNumber() % 5 == 1)
+        if (GetUnitOwner() && (effect->GetTickNumber() % 6 == 1 || effect->GetTickNumber() == 1)) // Reapplies 12-18s after the third beam
             GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC), true);
     }
 
@@ -207,8 +208,6 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SABER_LASH_IMMUNITY));
-        if (targets.size() <= 1)
-            FinishCast(SPELL_FAILED_DONT_REPORT);
     }
 
     void SetDest(SpellDestination& dest)
@@ -248,36 +247,22 @@ class spell_mother_shahraz_fatal_attraction_dummy : public SpellScript
 
     void HandleDummy(SpellEffIndex  /*effIndex*/)
     {
-        if (Unit* target = GetHitUnit())
-        {
-            target->CastSpell(target, SPELL_FATAL_ATTRACTION_DAMAGE, true);
-            if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_FATAL_ATTRACTION_AURA, EFFECT_1))
-                aurEff->SetAmount(aurEff->GetTickNumber());
-        }
+        if (Unit* caster = GetCaster())
+            if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_FATAL_ATTRACTION_AURA, EFFECT_1))
+            {
+                if (aurEff->GetTickNumber() <= 2)
+                {
+                    int32 damage = 1000 * aurEff->GetTickNumber();
+                    caster->CastCustomSpell(caster, SPELL_FATAL_ATTRACTION_DAMAGE, &damage, 0, 0, true);
+                }
+                else
+                    caster->CastSpell(caster, SPELL_FATAL_ATTRACTION_DAMAGE, true);
+            }
     }
 
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_mother_shahraz_fatal_attraction_dummy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
-class spell_mother_shahraz_fatal_attraction_aura : public AuraScript
-{
-    PrepareAuraScript(spell_mother_shahraz_fatal_attraction_aura);
-
-    void Update(AuraEffect const* effect)
-    {
-        if (effect->GetTickNumber() > uint32(effect->GetAmount() + 1))
-        {
-            PreventDefaultAction();
-            SetDuration(0);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_fatal_attraction_aura::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -289,6 +274,4 @@ void AddSC_boss_mother_shahraz()
     RegisterSpellScript(spell_mother_shahraz_saber_lash_aura);
     RegisterSpellScript(spell_mother_shahraz_fatal_attraction);
     RegisterSpellScript(spell_mother_shahraz_fatal_attraction_dummy);
-    RegisterSpellScript(spell_mother_shahraz_fatal_attraction_aura);
 }
-

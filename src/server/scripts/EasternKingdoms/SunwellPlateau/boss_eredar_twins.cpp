@@ -17,8 +17,10 @@
 
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 
@@ -141,7 +143,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
+            if (victim->IsPlayer() && urand(0, 1))
                 Talk(YELL_SAC_KILL);
         }
 
@@ -289,7 +291,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && urand(0, 1))
+            if (victim->IsPlayer() && urand(0, 1))
                 Talk(YELL_SAC_KILL);
         }
 
@@ -502,4 +504,3 @@ void AddSC_boss_eredar_twins()
     RegisterSpellScript(spell_eredar_twins_blaze);
     new AreaTrigger_at_sunwell_eredar_twins();
 }
-

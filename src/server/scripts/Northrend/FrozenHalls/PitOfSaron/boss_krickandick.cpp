@@ -16,7 +16,6 @@
  */
 
 #include "CreatureScript.h"
-#include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -116,7 +115,7 @@ public:
         {
             if (!target || !spell)
                 return;
-            if (spell->Id == SPELL_PURSUIT && target->GetTypeId() == TYPEID_PLAYER)
+            if (spell->Id == SPELL_PURSUIT && target->IsPlayer())
             {
                 Talk(EMOTE_ICK_CHASE, target);
                 AttackStart(target);
@@ -263,7 +262,7 @@ public:
                 if (me->GetReactState() == REACT_PASSIVE)
                     me->SetReactState(REACT_AGGRESSIVE);
 
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 if (Creature* k = GetKrick())
                     k->AI()->Talk(SAY_SLAY);
         }
@@ -525,4 +524,3 @@ void AddSC_boss_ick()
     RegisterSpellScript(spell_krick_explosive_barrage_aura);
     RegisterSpellScript(spell_exploding_orb_auto_grow_aura);
 }
-

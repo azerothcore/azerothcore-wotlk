@@ -19,7 +19,6 @@
 #include "CreatureAI.h"
 #include "CreatureScript.h"
 #include "Object.h"
-#include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -1791,7 +1790,7 @@ public:
             if (!spellClickHandled)
                 return;
 
-            if (!me->GetUInt32Value(UNIT_NPC_FLAGS))
+            if (!me->GetNpcFlags())
                 return;
 
             switch (me->GetArmor())
@@ -1807,7 +1806,7 @@ public:
                     break;
             }
 
-            me->SetUInt32Value(UNIT_NPC_FLAGS, 0);
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
             me->DespawnOrUnsummon(1000);
         }
 

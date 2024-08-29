@@ -42,17 +42,17 @@ public:
     {
         static ChatCommandTable wpCommandTable =
         {
-            { "add",            SEC_ADMINISTRATOR,     false, &HandleWpAddCommand,                "" },
-            { "event",          SEC_ADMINISTRATOR,     false, &HandleWpEventCommand,              "" },
-            { "load",           SEC_ADMINISTRATOR,     false, &HandleWpLoadCommand,               "" },
-            { "modify",         SEC_ADMINISTRATOR,     false, &HandleWpModifyCommand,             "" },
-            { "unload",         SEC_ADMINISTRATOR,     false, &HandleWpUnLoadCommand,             "" },
-            { "reload",         SEC_ADMINISTRATOR,     false, &HandleWpReloadCommand,             "" },
-            { "show",           SEC_ADMINISTRATOR,     false, &HandleWpShowCommand,               "" }
+            { "add",        HandleWpAddCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "event",      HandleWpEventCommand,    SEC_ADMINISTRATOR, Console::No },
+            { "load",       HandleWpLoadCommand,     SEC_ADMINISTRATOR, Console::No },
+            { "modify",     HandleWpModifyCommand,   SEC_ADMINISTRATOR, Console::No },
+            { "unload",     HandleWpUnLoadCommand,   SEC_ADMINISTRATOR, Console::No },
+            { "reload",     HandleWpReloadCommand,   SEC_ADMINISTRATOR, Console::No },
+            { "show",       HandleWpShowCommand,     SEC_ADMINISTRATOR, Console::No }
         };
         static ChatCommandTable commandTable =
         {
-            { "wp",             SEC_ADMINISTRATOR,     false, nullptr,                            "", wpCommandTable }
+            { "wp", wpCommandTable }
         };
         return commandTable;
     }
@@ -101,7 +101,7 @@ public:
 
                 uint32 maxpathid = result->Fetch()->Get<int32>();
                 pathid = maxpathid + 1;
-                handler->PSendSysMessage("%s%s|r", "|cff00ff00", "New path started.");
+                handler->PSendSysMessage("{}{}|r", "|cff00ff00", "New path started.");
             }
         }
         else
@@ -112,7 +112,7 @@ public:
 
         if (!pathid)
         {
-            handler->PSendSysMessage("%s%s|r", "|cffff33ff", "Current creature haven't loaded path.");
+            handler->PSendSysMessage("{}{}|r", "|cffff33ff", "Current creature haven't loaded path.");
             return true;
         }
 
@@ -136,7 +136,7 @@ public:
 
         WorldDatabase.Execute(stmt);
 
-        handler->PSendSysMessage("%s%s%u%s%u%s|r", "|cff00ff00", "PathID: |r|cff00ffff", pathid, "|r|cff00ff00: Waypoint |r|cff00ffff", point + 1, "|r|cff00ff00 created. ");
+        handler->PSendSysMessage("{}{}{}{}{}{}|r", "|cff00ff00", "PathID: |r|cff00ffff", pathid, "|r|cff00ff00: Waypoint |r|cff00ffff", point + 1, "|r|cff00ff00 created. ");
         return true;
     }                                                           // HandleWpAddCommand
 
@@ -167,7 +167,7 @@ public:
 
         if (target->GetEntry() == 1)
         {
-            handler->SendErrorMessage("%s%s|r", "|cffff33ff", "You want to load path to a waypoint? Aren't you?");
+            handler->SendErrorMessage("{}{}|r", "|cffff33ff", "You want to load path to a waypoint? Aren't you?");
             return false;
         }
 
@@ -175,7 +175,7 @@ public:
 
         if (!pathid)
         {
-            handler->PSendSysMessage("%s%s|r", "|cffff33ff", "No valid path number provided.");
+            handler->PSendSysMessage("{}{}|r", "|cffff33ff", "No valid path number provided.");
             return true;
         }
 
@@ -229,7 +229,7 @@ public:
         if (!id)
             return false;
 
-        handler->PSendSysMessage("%s%s|r|cff00ffff%u|r", "|cff00ff00", "Loading Path: ", id);
+        handler->PSendSysMessage("{}{}|r|cff00ffff{}|r", "|cff00ff00", "Loading Path: ", id);
         sWaypointMgr->ReloadPath(id);
         return true;
     }
@@ -240,7 +240,7 @@ public:
 
         if (!target)
         {
-            handler->PSendSysMessage("%s%s|r", "|cff33ffff", "You must select target.");
+            handler->PSendSysMessage("{}{}|r", "|cff33ffff", "You must select target.");
             return true;
         }
 
@@ -270,7 +270,7 @@ public:
                 target->Say("Path unloaded.", LANG_UNIVERSAL);
                 return true;
             }
-            handler->PSendSysMessage("%s%s|r", "|cffff33ff", "Target have no loaded path.");
+            handler->PSendSysMessage("{}{}|r", "|cffff33ff", "Target have no loaded path.");
         }
         return true;
     }
@@ -309,10 +309,10 @@ public:
 
                     WorldDatabase.Execute(stmt);
 
-                    handler->PSendSysMessage("%s%s%u|r", "|cff00ff00", "Wp Event: New waypoint event added: ", id);
+                    handler->PSendSysMessage("{}{}{}|r", "|cff00ff00", "Wp Event: New waypoint event added: ", id);
                 }
                 else
-                    handler->PSendSysMessage("|cff00ff00Wp Event: You have choosed an existing waypoint script guid: %u|r", id);
+                    handler->PSendSysMessage("|cff00ff00Wp Event: You have choosed an existing waypoint script guid: {}|r", id);
             }
             else
             {
@@ -328,7 +328,7 @@ public:
 
                 WorldDatabase.Execute(stmt);
 
-                handler->PSendSysMessage("%s%s%u|r", "|cff00ff00", "Wp Event: New waypoint event added: |r|cff00ffff", id + 1);
+                handler->PSendSysMessage("{}{}{}|r", "|cff00ff00", "Wp Event: New waypoint event added: |r|cff00ffff", id + 1);
             }
 
             return true;
@@ -338,7 +338,7 @@ public:
         {
             if (!arg_id)
             {
-                handler->PSendSysMessage("%s%s|r", "|cff33ffff", "Wp Event: You must provide waypoint script id.");
+                handler->PSendSysMessage("{}{}|r", "|cff33ffff", "Wp Event: You must provide waypoint script id.");
                 return true;
             }
 
@@ -354,7 +354,7 @@ public:
 
             if (!result)
             {
-                handler->PSendSysMessage("%s%s%u|r", "|cff33ffff", "Wp Event: No waypoint scripts found on id: ", id);
+                handler->PSendSysMessage("{}{}{}|r", "|cff33ffff", "Wp Event: No waypoint scripts found on id: ", id);
                 return true;
             }
 
@@ -374,7 +374,7 @@ public:
                 a10 = fields[8].Get<float>();
                 a11 = fields[9].Get<float>();
 
-                handler->PSendSysMessage("|cffff33ffid:|r|cff00ffff %u|r|cff00ff00, guid: |r|cff00ffff%u|r|cff00ff00, delay: |r|cff00ffff%u|r|cff00ff00, command: |r|cff00ffff%u|r|cff00ff00, datalong: |r|cff00ffff%u|r|cff00ff00, datalong2: |r|cff00ffff%u|r|cff00ff00, datatext: |r|cff00ffff%s|r|cff00ff00, posx: |r|cff00ffff%f|r|cff00ff00, posy: |r|cff00ffff%f|r|cff00ff00, posz: |r|cff00ffff%f|r|cff00ff00, orientation: |r|cff00ffff%f|r", id, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11);
+                handler->PSendSysMessage("|cffff33ffid:|r|cff00ffff {}|r|cff00ff00, guid: |r|cff00ffff{}|r|cff00ff00, delay: |r|cff00ffff{}|r|cff00ff00, command: |r|cff00ffff{}|r|cff00ff00, datalong: |r|cff00ffff{}|r|cff00ff00, datalong2: |r|cff00ffff{}|r|cff00ff00, datatext: |r|cff00ffff{}|r|cff00ff00, posx: |r|cff00ffff{}|r|cff00ff00, posy: |r|cff00ffff{}|r|cff00ff00, posz: |r|cff00ffff{}|r|cff00ff00, orientation: |r|cff00ffff{}|r", id, a2, a3, a4, a5, a6, a7, a8, a9, a10, a11);
             } while (result->NextRow());
         }
 
@@ -402,10 +402,10 @@ public:
 
                 WorldDatabase.Execute(stmt);
 
-                handler->PSendSysMessage("%s%s%u|r", "|cff00ff00", "Wp Event: Waypoint script removed: ", id);
+                handler->PSendSysMessage("{}{}{}|r", "|cff00ff00", "Wp Event: Waypoint script removed: ", id);
             }
             else
-                handler->PSendSysMessage("|cffff33ffWp Event: ERROR: you have selected a non existing script: %u|r", id);
+                handler->PSendSysMessage("|cffff33ffWp Event: ERROR: you have selected a non existing script: {}|r", id);
 
             return true;
         }
@@ -457,7 +457,7 @@ public:
             if (arg_str_2 == "setid")
             {
                 uint32 newid = atoi(arg_3);
-                handler->PSendSysMessage("%s%s|r|cff00ffff%u|r|cff00ff00%s|r|cff00ffff%u|r", "|cff00ff00", "Wp Event: Wypoint scipt guid: ", newid, " id changed: ", id);
+                handler->PSendSysMessage("{}{}|r|cff00ffff{}|r|cff00ff00{}|r|cff00ffff{}|r", "|cff00ff00", "Wp Event: Wypoint scipt guid: ", newid, " id changed: ", id);
 
                 WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_WAYPOINT_SCRIPT_ID);
 
@@ -489,7 +489,7 @@ public:
 
                     WorldDatabase.Execute(stmt);
 
-                    handler->PSendSysMessage("|cff00ff00Waypoint script:|r|cff00ffff %u|r|cff00ff00 position_x updated.|r", id);
+                    handler->PSendSysMessage("|cff00ff00Waypoint script:|r|cff00ffff {}|r|cff00ff00 position_x updated.|r", id);
                     return true;
                 }
                 else if (arg_str_2 == "posy")
@@ -501,7 +501,7 @@ public:
 
                     WorldDatabase.Execute(stmt);
 
-                    handler->PSendSysMessage("|cff00ff00Waypoint script: %u position_y updated.|r", id);
+                    handler->PSendSysMessage("|cff00ff00Waypoint script: {} position_y updated.|r", id);
                     return true;
                 }
                 else if (arg_str_2 == "posz")
@@ -513,7 +513,7 @@ public:
 
                     WorldDatabase.Execute(stmt);
 
-                    handler->PSendSysMessage("|cff00ff00Waypoint script: |r|cff00ffff%u|r|cff00ff00 position_z updated.|r", id);
+                    handler->PSendSysMessage("|cff00ff00Waypoint script: |r|cff00ffff{}|r|cff00ff00 position_z updated.|r", id);
                     return true;
                 }
                 else if (arg_str_2 == "orientation")
@@ -525,14 +525,14 @@ public:
 
                     WorldDatabase.Execute(stmt);
 
-                    handler->PSendSysMessage("|cff00ff00Waypoint script: |r|cff00ffff%u|r|cff00ff00 orientation updated.|r", id);
+                    handler->PSendSysMessage("|cff00ff00Waypoint script: |r|cff00ffff{}|r|cff00ff00 orientation updated.|r", id);
                     return true;
                 }
                 else if (arg_str_2 == "dataint")
                 {
                     WorldDatabase.Execute("UPDATE waypoint_scripts SET {}='{}' WHERE guid='{}'", arg_2, atoi(arg_3), id); // Query can't be a prepared statement
 
-                    handler->PSendSysMessage("|cff00ff00Waypoint script: |r|cff00ffff%u|r|cff00ff00 dataint updated.|r", id);
+                    handler->PSendSysMessage("|cff00ff00Waypoint script: |r|cff00ffff{}|r|cff00ff00 dataint updated.|r", id);
                     return true;
                 }
                 else
@@ -542,7 +542,7 @@ public:
                     WorldDatabase.Execute("UPDATE waypoint_scripts SET {}='{}' WHERE guid='{}'", arg_2, arg_str_3, id); // Query can't be a prepared statement
                 }
             }
-            handler->PSendSysMessage("%s%s|r|cff00ffff%u:|r|cff00ff00 %s %s|r", "|cff00ff00", "Waypoint script:", id, arg_2, "updated.");
+            handler->PSendSysMessage("{}{}|r|cff00ffff{}:|r|cff00ff00 {} {}|r", "|cff00ff00", "Waypoint script:", id, arg_2, "updated.");
         }
         return true;
     }
@@ -642,7 +642,7 @@ public:
 
         if (show == "del")
         {
-            handler->PSendSysMessage("|cff00ff00DEBUG: wp modify del, PathID: |r|cff00ffff%u|r", pathid);
+            handler->PSendSysMessage("|cff00ff00DEBUG: wp modify del, PathID: |r|cff00ffff{}|r", pathid);
 
             if (wpSpawnId != 0)
                 if (Creature* wpCreature = handler->GetSession()->GetPlayer()->GetMap()->GetCreature(target->GetGUID()))
@@ -670,7 +670,7 @@ public:
 
         if (show == "move")
         {
-            handler->PSendSysMessage("|cff00ff00DEBUG: wp move, PathID: |r|cff00ffff%u|r", pathid);
+            handler->PSendSysMessage("|cff00ff00DEBUG: wp move, PathID: |r|cff00ffff{}|r", pathid);
 
             Player* chr = handler->GetSession()->GetPlayer();
             Map* map = chr->GetMap();
@@ -787,7 +787,7 @@ public:
 
         std::string show = show_str;
 
-        //handler->PSendSysMessage("wpshow - show: %s", show);
+        //handler->PSendSysMessage("wpshow - show: {}", show);
 
         // Show info for the selected waypoint
         if (show == "info")
@@ -822,11 +822,11 @@ public:
                 uint32 ev_id            = fields[4].Get<uint32>();
                 uint32 ev_chance        = fields[5].Get<uint32>();
 
-                handler->PSendSysMessage("|cff00ff00Show info: for current point: |r|cff00ffff%u|r|cff00ff00, Path ID: |r|cff00ffff%u|r", point, pathid);
-                handler->PSendSysMessage("|cff00ff00Show info: delay: |r|cff00ffff%u|r", delay);
-                handler->PSendSysMessage("|cff00ff00Show info: Move flag: |r|cff00ffff%u|r", flag);
-                handler->PSendSysMessage("|cff00ff00Show info: Waypoint event: |r|cff00ffff%u|r", ev_id);
-                handler->PSendSysMessage("|cff00ff00Show info: Event chance: |r|cff00ffff%u|r", ev_chance);
+                handler->PSendSysMessage("|cff00ff00Show info: for current point: |r|cff00ffff{}|r|cff00ff00, Path ID: |r|cff00ffff{}|r", point, pathid);
+                handler->PSendSysMessage("|cff00ff00Show info: delay: |r|cff00ffff{}|r", delay);
+                handler->PSendSysMessage("|cff00ff00Show info: Move flag: |r|cff00ffff{}|r", flag);
+                handler->PSendSysMessage("|cff00ff00Show info: Waypoint event: |r|cff00ffff{}|r", ev_id);
+                handler->PSendSysMessage("|cff00ff00Show info: Event chance: |r|cff00ffff{}|r", ev_chance);
             } while (result->NextRow());
 
             return true;
@@ -846,7 +846,7 @@ public:
                 return false;
             }
 
-            handler->PSendSysMessage("|cff00ff00DEBUG: wp on, PathID: |cff00ffff%u|r", pathid);
+            handler->PSendSysMessage("|cff00ff00DEBUG: wp on, PathID: |cff00ffff{}|r", pathid);
 
             // Delete all visuals for this NPC
             stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_WPGUID_BY_ID);
@@ -943,7 +943,7 @@ public:
 
         if (show == "first")
         {
-            handler->PSendSysMessage("|cff00ff00DEBUG: wp first, GUID: %u|r", pathid);
+            handler->PSendSysMessage("|cff00ff00DEBUG: wp first, GUID: {}|r", pathid);
 
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_FIRST_BY_ID);
             stmt->SetData(0, pathid);
@@ -992,7 +992,7 @@ public:
 
         if (show == "last")
         {
-            handler->PSendSysMessage("|cff00ff00DEBUG: wp last, PathID: |r|cff00ffff%u|r", pathid);
+            handler->PSendSysMessage("|cff00ff00DEBUG: wp last, PathID: |r|cff00ffff{}|r", pathid);
 
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_DATA_POS_LAST_BY_ID);
             stmt->SetData(0, pathid);

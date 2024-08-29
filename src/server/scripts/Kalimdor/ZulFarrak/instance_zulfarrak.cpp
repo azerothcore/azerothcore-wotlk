@@ -16,10 +16,12 @@
  */
 
 #include "CreatureScript.h"
+#include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "zulfarrak.h"
@@ -517,4 +519,3 @@ void AddSC_instance_zulfarrak()
     RegisterSpellScript(spell_zulfarrak_summon_zulfarrak_zombies);
     RegisterSpellScript(spell_zulfarrak_unlocking);
 }
-

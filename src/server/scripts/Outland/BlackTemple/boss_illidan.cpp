@@ -20,6 +20,10 @@
 #include "ScriptedEscortAI.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "Player.h"
+#include "ScriptedGossip.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Says
 {
@@ -1374,4 +1378,3 @@ void AddSC_boss_illidan()
     RegisterSpellScript(spell_illidan_cage_trap);
     RegisterSpellScript(spell_illidan_cage_trap_stun_aura);
 }
-

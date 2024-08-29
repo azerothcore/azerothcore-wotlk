@@ -21,6 +21,8 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "azjol_nerub.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -413,4 +415,3 @@ void AddSC_boss_hadronox()
     RegisterSpellScript(spell_hadronox_leech_poison_aura);
     new achievement_hadronox_denied();
 }
-

@@ -19,6 +19,8 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "azjol_nerub.h"
+#include "SpellInfo.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -93,7 +95,7 @@ class boss_anub_arak : public CreatureScript
 
             void MoveInLineOfSight(Unit* who) override
             {
-                if (!intro && who->GetTypeId() == TYPEID_PLAYER)
+                if (!intro && who->IsPlayer())
                 {
                     intro = true;
                     Talk(SAY_INTRO);
@@ -302,4 +304,3 @@ void AddSC_boss_anub_arak()
     RegisterSpellScript(spell_azjol_nerub_pound);
     RegisterSpellScript(spell_azjol_nerub_impale_summon);
 }
-

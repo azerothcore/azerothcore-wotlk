@@ -103,7 +103,7 @@ public:
         void MySelectNextTarget()
         {
             Unit* owner = me->GetOwner();
-            if (owner && owner->GetTypeId() == TYPEID_PLAYER && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
+            if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
             {
                 Unit* selection = owner->ToPlayer()->GetSelectedUnit();
                 if (selection && selection != me->GetVictim() && me->IsValidAttackTarget(selection))
@@ -375,4 +375,3 @@ void AddSC_deathknight_pet_scripts()
     new npc_pet_dk_dancing_rune_weapon();
     RegisterSpellScript(spell_pet_dk_gargoyle_strike);
 }
-

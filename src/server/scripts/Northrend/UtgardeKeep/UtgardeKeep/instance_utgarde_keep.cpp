@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -322,4 +321,3 @@ void AddSC_instance_utgarde_keep()
 {
     new instance_utgarde_keep();
 }
-

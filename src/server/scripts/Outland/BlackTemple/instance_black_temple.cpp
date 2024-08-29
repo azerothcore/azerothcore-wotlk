@@ -20,6 +20,9 @@
 #include "InstanceScript.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "SpellAuraEffects.h"
+#include "SpellAuras.h"
+#include "SpellScript.h"
 
 DoorData const doorData[] =
 {
@@ -104,7 +107,6 @@ public:
         {
             switch (creature->GetEntry())
             {
-                case NPC_VENGEFUL_SPIRIT:
                 case NPC_SHADOWY_CONSTRUCT:
                     if (Creature* teron = GetCreature(DATA_TERON_GOREFIEND))
                         teron->AI()->JustSummoned(creature);
@@ -458,6 +460,48 @@ class spell_black_temple_dementia_aura : public AuraScript
     }
 };
 
+// 39649 - Summon Shadowfiends
+class spell_black_temple_summon_shadowfiends : public SpellScript
+{
+    PrepareSpellScript(spell_black_temple_summon_shadowfiends);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SUMMON_SHADOWFIENDS });
+    }
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        for (uint8 i = 0; i < 11; i++)
+            caster->CastSpell(caster, SPELL_SUMMON_SHADOWFIENDS, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_black_temple_summon_shadowfiends::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+class spell_black_temple_l5_arcane_charge : public SpellScript
+{
+    PrepareSpellScript(spell_black_temple_l5_arcane_charge)
+
+    void RecalculateDamage()
+    {
+        uint32 damage = GetHitUnit()->SpellDamageBonusTaken(GetCaster(), GetSpellInfo(), GetHitUnit()->CountPctFromMaxHealth(100), SPELL_DIRECT_DAMAGE);
+        SetHitDamage(int32(damage));
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_black_temple_l5_arcane_charge::RecalculateDamage);
+    }
+};
+
 void AddSC_instance_black_temple()
 {
     new instance_black_temple();
@@ -473,5 +517,6 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_consuming_strikes_aura);
     RegisterSpellScript(spell_black_temple_curse_of_vitality_aura);
     RegisterSpellScript(spell_black_temple_dementia_aura);
+    RegisterSpellScript(spell_black_temple_summon_shadowfiends);
+    RegisterSpellScript(spell_black_temple_l5_arcane_charge);
 }
-

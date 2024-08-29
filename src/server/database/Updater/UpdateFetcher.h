@@ -31,12 +31,12 @@ struct AC_DATABASE_API UpdateResult
     UpdateResult()
         : updated(0), recent(0), archived(0) { }
 
-    UpdateResult(size_t const updated_, size_t const recent_, size_t const archived_)
+    UpdateResult(std::size_t const updated_, std::size_t const recent_, std::size_t const archived_)
         : updated(updated_), recent(recent_), archived(archived_) { }
 
-    size_t updated;
-    size_t recent;
-    size_t archived;
+    std::size_t updated;
+    std::size_t recent;
+    std::size_t archived;
 };
 
 class AC_DATABASE_API UpdateFetcher

@@ -19,6 +19,7 @@
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "trial_of_the_crusader.h"
@@ -384,7 +385,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if( who->IsPlayer() )
                 Talk(SAY_KILL_PLAYER);
         }
 
@@ -954,4 +955,3 @@ void AddSC_boss_anubarak_trial()
     new spell_gen_leeching_swarm();
     new spell_gen_leeching_swarm_dmg();
 }
-

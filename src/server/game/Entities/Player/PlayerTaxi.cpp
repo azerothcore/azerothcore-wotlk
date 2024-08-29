@@ -170,7 +170,7 @@ bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, TeamI
         return false;
     }
 
-    for (size_t i = 1; i < m_TaxiDestinations.size(); ++i)
+    for (std::size_t i = 1; i < m_TaxiDestinations.size(); ++i)
     {
         uint32 cost;
         uint32 path;
@@ -202,7 +202,7 @@ std::string PlayerTaxi::SaveTaxiDestinationsToString()
     std::ostringstream ss;
     ss << m_flightMasterFactionId << ' ';
 
-    for (size_t i = 0; i < m_TaxiDestinations.size(); ++i)
+    for (std::size_t i = 0; i < m_TaxiDestinations.size(); ++i)
     {
         ss << m_TaxiDestinations[i] << ' ';
     }

@@ -18,8 +18,6 @@
 #ifndef __ACORE_VEHICLE_H
 #define __ACORE_VEHICLE_H
 
-#include "EventProcessor.h"
-#include "ObjectDefines.h"
 #include "Unit.h"
 #include "VehicleDefines.h"
 
@@ -96,6 +94,17 @@ private:
     uint32 _usableSeatNum;         // Number of seats that match VehicleSeatEntry::UsableByPlayer, used for proper display flags
     uint32 _creatureEntry;         // Can be different than me->GetBase()->GetEntry() in case of players
     Status _status;
+};
+
+class VehicleDespawnEvent : public BasicEvent
+{
+public:
+    VehicleDespawnEvent(Unit& self, uint32 duration) : _self(self), _duration(duration) { }
+    bool Execute(uint64 e_time, uint32 p_time) override;
+
+protected:
+    Unit& _self;
+    uint32 _duration;
 };
 
 #endif

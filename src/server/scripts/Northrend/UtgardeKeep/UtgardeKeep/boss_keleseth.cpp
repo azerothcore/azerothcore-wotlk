@@ -373,4 +373,3 @@ void AddSC_boss_keleseth()
     new npc_vrykul_skeleton();
     RegisterSpellScript(spell_frost_tomb_aura);
 }
-

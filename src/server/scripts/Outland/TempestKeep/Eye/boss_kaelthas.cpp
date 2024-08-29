@@ -16,8 +16,9 @@
  */
 
 #include "CreatureScript.h"
-#include "Opcodes.h"
+#include "GridNotifiers.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "WorldPacket.h"
 #include "the_eye.h"
@@ -314,7 +315,7 @@ struct boss_kaelthas : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (_phase == PHASE_NONE && who->GetTypeId() == TYPEID_PLAYER && me->IsValidAttackTarget(who))
+        if (_phase == PHASE_NONE && who->IsPlayer() && me->IsValidAttackTarget(who))
         {
             _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
@@ -344,7 +345,7 @@ struct boss_kaelthas : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
             Talk(SAY_SLAY);
     }
 
@@ -1140,7 +1141,14 @@ class spell_kaelthas_mind_control : public SpellScript
         {
             targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
         }
-        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+
+        targets.remove_if([&](WorldObject const* target) -> bool
+        {
+            if (!target->ToPlayer())
+                return true;
+
+            return (!GetCaster()->IsWithinLOSInMap(target));
+        });
     }
 
     void HandleEffect(SpellEffIndex /*effIndex*/)
@@ -1262,7 +1270,7 @@ class spell_kaelthas_nether_beam : public SpellScript
         for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
         {
             Unit* target = ObjectAccessor::GetUnit(*GetCaster(), (*itr)->getUnitGuid());
-            if (target && target->GetTypeId() == TYPEID_PLAYER)
+            if (target && target->IsPlayer())
                 targetList.push_back(target);
         }
 
@@ -1332,4 +1340,3 @@ void AddSC_boss_kaelthas()
     RegisterSpellScript(spell_kaelthas_summon_nether_vapor);
     RegisterSpellScript(spell_kael_pyroblast);
 }
-

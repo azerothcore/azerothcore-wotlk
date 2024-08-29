@@ -17,6 +17,7 @@
 
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "the_eye.h"
 
@@ -167,4 +168,3 @@ void AddSC_instance_the_eye()
     new instance_the_eye();
     RegisterSpellScript(spell_the_eye_countercharge_aura);
 }
-

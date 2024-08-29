@@ -116,7 +116,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if( who->IsPlayer() )
             {
                 Talk(SAY_EADRIC_KILL_PLAYER);
             }
@@ -243,7 +243,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if( who->IsPlayer() )
             {
                 Talk(SAY_PALETRESS_KILL_PLAYER);
             }
@@ -822,4 +822,3 @@ void AddSC_boss_argent_challenge()
     RegisterSpellScript(spell_toc5_light_rain);
     RegisterSpellScript(spell_reflective_shield_aura);
 }
-

@@ -580,7 +580,7 @@ void Acore::LocalizedPacketListDo<Builder>::operator()(Player* p)
     else
         data_list = &i_data_cache[cache_idx];
 
-    for (size_t i = 0; i < data_list->size(); ++i)
+    for (std::size_t i = 0; i < data_list->size(); ++i)
         p->SendDirectMessage((*data_list)[i]);
 }
 

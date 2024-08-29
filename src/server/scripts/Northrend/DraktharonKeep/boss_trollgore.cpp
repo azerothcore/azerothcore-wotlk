@@ -21,6 +21,8 @@
 #include "SpellAuras.h"
 #include "SpellScriptLoader.h"
 #include "drak_tharon_keep.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Yells
 {
@@ -84,7 +86,7 @@ public:
 
             me->setActive(true);
             instance->SetBossState(DATA_TROLLGORE, IN_PROGRESS);
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 Talk(SAY_AGGRO);
                 me->SetInCombatWithZone();

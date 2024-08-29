@@ -18,6 +18,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "sunwell_plateau.h"
 
@@ -298,4 +299,3 @@ void AddSC_instance_sunwell_plateau()
     new instance_sunwell_plateau();
     RegisterSpellScript(spell_cataclysm_breath);
 }
-
