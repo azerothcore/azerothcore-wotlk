@@ -739,25 +739,8 @@ class spell_dk_pet_scaling : public AuraScript
         {
             // xinef: ebon garogyle - inherit 30% of stamina
             if (GetUnitOwner()->GetEntry() == NPC_EBON_GARGOYLE && stat == STAT_STAMINA)
-            {
                 if (Unit* owner = GetUnitOwner()->GetOwner())
                     amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
-            }
-            // army of the dead
-            else if (GetUnitOwner()->GetEntry() == NPC_ARMY_OF_THE_DEAD && (stat == STAT_STAMINA || stat == STAT_STRENGTH))
-            {
-                if (Unit* owner = GetUnitOwner()->GetOwner())
-                {
-                    int32 modifier = stat == STAT_STRENGTH ? 70 : 30;
-                    // Check just if owner has Ravenous Dead since it's effect is not an aura
-                    if (AuraEffect const* rdEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0))
-                    {
-                        SpellInfo const* spellInfo = rdEff->GetSpellInfo(); // Then get the SpellProto and add the dummy effect value
-                        AddPct(modifier, spellInfo->Effects[EFFECT_1].CalcValue()); // Ravenous Dead edits the original scale
-                    }
-                    amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), modifier);
-                }
-            }
             return;
         }
 
