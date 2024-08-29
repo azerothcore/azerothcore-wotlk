@@ -1368,9 +1368,6 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                         }
                     case NPC_ARMY_OF_THE_DEAD:
                         {
-                            // AddAura(SPELL_HUNTER_PET_SCALING_04, this); // Hit/expertise
-                            // AddAura(SPELL_DK_PET_SCALING_01, this); // Stat Scaling Stamina/Str
-                            // AddAura(SPELL_PET_AVOIDANCE, this);
                             AddAura(SPELL_DK_ARMY_OF_THE_DEAD_PASSIVE, this);
                             AddAura(SPELL_DK_PET_SCALING_01, this);
                             AddAura(SPELL_DK_PET_SCALING_03, this);
