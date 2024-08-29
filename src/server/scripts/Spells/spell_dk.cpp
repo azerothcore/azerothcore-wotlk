@@ -2206,6 +2206,115 @@ class spell_dk_will_of_the_necropolis : public AuraScript
     }
 };
 
+// 49040 - Army of the Dead Passive
+class spell_dk_army_of_the_dead_passive : public AuraScript
+{
+    PrepareAuraScript(spell_dk_army_of_the_dead_passive);
+
+    void CalculateAPAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        // army ghoul inherits 20% of AP
+        if (Unit* owner = GetUnitOwner()->GetOwner())
+        {
+            int32 modifier = 20;
+            // Check just if owner has Ravenous Dead since it's effect is not an aura
+            if (AuraEffect const* rdEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0))
+            {
+                SpellInfo const* spellInfo = rdEff->GetSpellInfo(); // Then get the SpellProto and add the dummy effect value
+                AddPct(modifier, spellInfo->Effects[EFFECT_1].CalcValue()); // Ravenous Dead edits the original scale
+            }
+            amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
+        }
+    }
+
+    void CalculateHealthAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        // army ghoul inherits 30% of health
+        if (Unit* owner = GetUnitOwner()->GetOwner())
+        {
+            int32 modifier = 30;
+            // Check just if owner has Ravenous Dead since it's effect is not an aura
+            if (AuraEffect const* rdEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0))
+            {
+                SpellInfo const* spellInfo = rdEff->GetSpellInfo(); // Then get the SpellProto and add the dummy effect value
+                AddPct(modifier, spellInfo->Effects[EFFECT_1].CalcValue()); // Ravenous Dead edits the original scale
+            }
+            amount = GetUnitOwner()->CountPctFromMaxHealth(modifier);
+        }
+    }
+
+    void CalculateSPAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        // army ghoul inherits 20% of AP
+        if (Unit* owner = GetUnitOwner()->GetOwner())
+        {
+            int32 modifier = 20;
+            if (AuraEffect const* rdEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0))
+            {
+                SpellInfo const* spellInfo = rdEff->GetSpellInfo(); // Then get the SpellProto and add the dummy effect value
+                AddPct(modifier, spellInfo->Effects[EFFECT_1].CalcValue()); // Ravenous Dead edits the original scale
+            }
+            amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
+        }
+    }
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetUnitOwner()->IsPet())
+            return;
+        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_STAT, true, SPELL_BLOCK_TYPE_POSITIVE);
+        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
+        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER, true, SPELL_BLOCK_TYPE_POSITIVE);
+        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
+    }
+
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
+    {
+        if (!GetUnitOwner()->IsPet())
+            return;
+
+        isPeriodic = true;
+        amplitude = 2 * IN_MILLISECONDS;
+    }
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
+        {
+            int32 currentAmount = aurEff->GetAmount();
+            int32 newAmount = GetEffect(aurEff->GetEffIndex())->CalculateAmount(GetCaster());
+            if (newAmount != currentAmount)
+            {
+                if (aurEff->GetMiscValue() == STAT_STAMINA)
+                {
+                    uint32 actStat = GetUnitOwner()->GetHealth();
+                    GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
+                    GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
+                }
+                else
+                {
+                    uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
+                    GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
+                    GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                }
+            }
+        }
+        else
+            GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_army_of_the_dead_passive::CalculateAPAmount, EFFECT_0, SPELL_AURA_MOD_ATTACK_POWER);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_army_of_the_dead_passive::CalculateHealthAmount, EFFECT_1, SPELL_AURA_MOD_INCREASE_HEALTH);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_army_of_the_dead_passive::CalculateSPAmount, EFFECT_2, SPELL_AURA_MOD_DAMAGE_DONE);
+        OnEffectApply += AuraEffectApplyFn(spell_dk_army_of_the_dead_passive::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_dk_army_of_the_dead_passive::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_army_of_the_dead_passive::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     RegisterSpellScript(spell_dk_wandering_plague);
@@ -2253,4 +2362,5 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_vampiric_blood);
     RegisterSpellScript(spell_dk_will_of_the_necropolis);
     RegisterSpellScript(spell_dk_ghoul_thrash);
+    RegisterSpellScript(spell_dk_army_of_the_dead_passive);
 }

@@ -1371,11 +1371,11 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                             // AddAura(SPELL_HUNTER_PET_SCALING_04, this); // Hit/expertise
                             // AddAura(SPELL_DK_PET_SCALING_01, this); // Stat Scaling Stamina/Str
                             // AddAura(SPELL_PET_AVOIDANCE, this);
-                            AddAura(49040, this); // Army of the Dead passive
-                            AddAura(SPELL_DK_PET_SCALING_02, this);
+                            AddAura(SPELL_DK_ARMY_OF_THE_DEAD_PASSIVE, this);
+                            AddAura(SPELL_DK_PET_SCALING_01, this);
                             AddAura(SPELL_DK_PET_SCALING_03, this);
                             AddAura(SPELL_DK_AVOIDANCE, this);
-                            AddAura(67561, this); // Serverside - Pet Scaling - Master Spell 06 - Spell Hit, Expertise, Spell Penetration
+                            AddAura(SPELL_PET_SCALING_MASTER_06, this);
 
                             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(petlevel - (petlevel / 4)));
                             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
