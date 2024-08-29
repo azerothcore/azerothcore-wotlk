@@ -2213,14 +2213,7 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
         // army ghoul inherits 20% of AP
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            int32 modifier = 20;
-            // Check just if owner has Ravenous Dead since it's effect is not an aura
-            if (AuraEffect const* rdEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0))
-            {
-                SpellInfo const* spellInfo = rdEff->GetSpellInfo(); // Then get the SpellProto and add the dummy effect value
-                AddPct(modifier, spellInfo->Effects[EFFECT_1].CalcValue()); // Ravenous Dead edits the original scale
-            }
-            amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
+            amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), 20);
         }
     }
 
@@ -2229,14 +2222,7 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
         // army ghoul inherits 30% of health
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            int32 modifier = 30;
-            // Check just if owner has Ravenous Dead since it's effect is not an aura
-            if (AuraEffect const* rdEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0))
-            {
-                SpellInfo const* spellInfo = rdEff->GetSpellInfo(); // Then get the SpellProto and add the dummy effect value
-                AddPct(modifier, spellInfo->Effects[EFFECT_1].CalcValue()); // Ravenous Dead edits the original scale
-            }
-            amount = GetUnitOwner()->CountPctFromMaxHealth(modifier);
+            amount = owner->CountPctFromMaxHealth(30);
         }
     }
 
@@ -2245,13 +2231,7 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
         // army ghoul inherits 20% of AP
         if (Unit* owner = GetUnitOwner()->GetOwner())
         {
-            int32 modifier = 20;
-            if (AuraEffect const* rdEff = owner->GetAuraEffect(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, SPELLFAMILY_DEATHKNIGHT, 3010, 0))
-            {
-                SpellInfo const* spellInfo = rdEff->GetSpellInfo(); // Then get the SpellProto and add the dummy effect value
-                AddPct(modifier, spellInfo->Effects[EFFECT_1].CalcValue()); // Ravenous Dead edits the original scale
-            }
-            amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), modifier);
+            amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(BASE_ATTACK)), 20);
         }
     }
 
