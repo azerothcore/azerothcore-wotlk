@@ -2951,9 +2951,21 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
     sWorld->SendGlobalMessage(&data, nullptr, (attacker->GetTeamId() == TEAM_ALLIANCE ? TEAM_HORDE : TEAM_ALLIANCE));
 }
 
-/**
- * @brief Set in combat all units in the dungeon/raid. Affect only units with IsAIEnabled.
- */
+uint32 Creature::GetShieldBlockValue() const
+{
+    //npcbot - bot block value is fully calculated inside botAI
+    if (bot_AI)
+    {
+        uint32 blockValue = bot_AI->GetShieldBlockValue();
+        blockValue += GetTotalAuraModifier(SPELL_AURA_MOD_SHIELD_BLOCKVALUE);
+        blockValue *= GetTotalAuraMultiplier(SPELL_AURA_MOD_SHIELD_BLOCKVALUE_PCT);
+        return uint32(blockValue);
+    }
+    //end npcbot
+
+    return (GetLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
+}
+
 void Creature::SetInCombatWithZone()
 {
     if (IsAIEnabled)
