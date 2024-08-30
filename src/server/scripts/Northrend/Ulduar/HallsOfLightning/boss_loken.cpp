@@ -290,4 +290,3 @@ void AddSC_boss_loken()
     new boss_loken();
     new spell_loken_pulsing_shockwave();
 }
-

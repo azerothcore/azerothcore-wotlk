@@ -268,4 +268,3 @@ void AddSC_molten_core()
     // Spells
     RegisterSpellScript(spell_mc_play_dead_aura);
 }
-

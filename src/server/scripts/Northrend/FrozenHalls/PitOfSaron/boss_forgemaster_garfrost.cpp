@@ -280,7 +280,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 Talk(SAY_SLAY);
         }
 
@@ -368,4 +368,3 @@ void AddSC_boss_garfrost()
 
     RegisterSpellScript(spell_garfrost_permafrost);
 }
-

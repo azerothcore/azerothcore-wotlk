@@ -157,7 +157,7 @@ struct boss_warchief_kargath_bladefist : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim && victim->IsPlayer())
             Talk(SAY_SLAY);
     }
 
@@ -322,4 +322,3 @@ void AddSC_boss_warchief_kargath_bladefist()
     RegisterShatteredHallsCreatureAI(npc_warchief_portal);
     RegisterSpellScript(spell_blade_dance_targeting);
 }
-

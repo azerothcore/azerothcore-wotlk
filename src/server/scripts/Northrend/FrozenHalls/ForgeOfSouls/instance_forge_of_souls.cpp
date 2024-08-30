@@ -219,4 +219,3 @@ void AddSC_instance_forge_of_souls()
 {
     new instance_forge_of_souls();
 }
-

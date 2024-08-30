@@ -415,4 +415,3 @@ void AddSC_boss_hadronox()
     RegisterSpellScript(spell_hadronox_leech_poison_aura);
     new achievement_hadronox_denied();
 }
-

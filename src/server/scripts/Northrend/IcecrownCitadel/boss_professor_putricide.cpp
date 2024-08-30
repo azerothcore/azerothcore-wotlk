@@ -333,7 +333,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->IsPlayer())
                 Talk(SAY_KILL);
         }
 
@@ -1547,4 +1547,3 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_eat_ooze);
     RegisterSpellScript(spell_putricide_regurgitated_ooze);
 }
-
