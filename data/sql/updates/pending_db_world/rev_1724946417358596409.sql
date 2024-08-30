@@ -10,4 +10,4 @@ WHERE `ID`=67561;
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (49040, 67561);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (49040, 'spell_dk_army_of_the_dead_passive'),
-(67561, 'spell_pet_hit_expertise_spellpen_scaling');
+(67561, 'spell_pet_spellhit_expertise_spellpen_scaling');

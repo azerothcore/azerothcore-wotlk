@@ -5321,9 +5321,9 @@ class spell_gen_steal_weapon : public AuraScript
 };
 
 // 67561 - Serverside - Pet Scaling - Master Spell 06 - Spell Hit, Expertise, Spell Penetration
-class spell_pet_hit_expertise_spellpen_scaling : public AuraScript
+class spell_pet_spellhit_expertise_spellpen_scaling : public AuraScript
 {
-    PrepareAuraScript(spell_pet_hit_expertise_spellpen_scaling)
+    PrepareAuraScript(spell_pet_spellhit_expertise_spellpen_scaling)
 
     int32 CalculatePercent(float hitChance, float cap, float maxChance)
     {
@@ -5376,12 +5376,12 @@ class spell_pet_hit_expertise_spellpen_scaling : public AuraScript
 
     void Register() override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_hit_expertise_spellpen_scaling::CalculateSpellHitAmount, EFFECT_0, SPELL_AURA_MOD_SPELL_HIT_CHANCE);
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_hit_expertise_spellpen_scaling::CalculateExpertiseAmount, EFFECT_1, SPELL_AURA_MOD_EXPERTISE);
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_hit_expertise_spellpen_scaling::CalculateSpellPenAmount, EFFECT_2, SPELL_AURA_MOD_TARGET_RESISTANCE);
-        OnEffectApply += AuraEffectApplyFn(spell_pet_hit_expertise_spellpen_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
-        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_pet_hit_expertise_spellpen_scaling::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pet_hit_expertise_spellpen_scaling::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_spellhit_expertise_spellpen_scaling::CalculateSpellHitAmount, EFFECT_0, SPELL_AURA_MOD_SPELL_HIT_CHANCE);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_spellhit_expertise_spellpen_scaling::CalculateExpertiseAmount, EFFECT_1, SPELL_AURA_MOD_EXPERTISE);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pet_spellhit_expertise_spellpen_scaling::CalculateSpellPenAmount, EFFECT_2, SPELL_AURA_MOD_TARGET_RESISTANCE);
+        OnEffectApply += AuraEffectApplyFn(spell_pet_spellhit_expertise_spellpen_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_pet_spellhit_expertise_spellpen_scaling::CalcPeriodic, EFFECT_ALL, SPELL_AURA_ANY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pet_spellhit_expertise_spellpen_scaling::HandlePeriodic, EFFECT_ALL, SPELL_AURA_ANY);
     }
 };
 
@@ -5541,5 +5541,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_consumption);
     RegisterSpellScript(spell_gen_sober_up);
     RegisterSpellScript(spell_gen_steal_weapon);
-    RegisterSpellScript(spell_pet_hit_expertise_spellpen_scaling);
+    RegisterSpellScript(spell_pet_spellhit_expertise_spellpen_scaling);
 }
