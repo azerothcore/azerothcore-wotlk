@@ -2800,7 +2800,7 @@ public:
         return true;
     }
 
-    static bool HandleDamageCommand(ChatHandler* handler, uint32 damage)
+    static bool HandleDamageCommand(ChatHandler* handler, uint32 damage, Optional<std::string> percent)
     {
         Unit* target = handler->getSelectedUnit();
         if (!target || !handler->GetSession()->GetPlayer()->GetTarget())
@@ -2810,34 +2810,24 @@ public:
         }
 
         if (target->IsPlayer())
-        {
             if (handler->HasLowerSecurity(target->ToPlayer()))
-            {
                 return false;
-            }
-        }
 
-        if (!target->IsAlive())
-        {
+        if (!target->IsAlive() || !damage)
             return true;
-        }
-
-        if (!damage)
-        {
-            return true;
-        }
 
         if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
-        {
             target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
-        }
+
+        if (percent)
+            if (StringStartsWith("pct", *percent))
+                if (damage <= 100)
+                    damage = target->CountPctFromMaxHealth(damage);
 
         Unit::DealDamage(handler->GetSession()->GetPlayer(), target, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
 
         if (target != handler->GetSession()->GetPlayer())
-        {
             handler->GetSession()->GetPlayer()->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_HIT, 0);
-        }
 
         return true;
     }

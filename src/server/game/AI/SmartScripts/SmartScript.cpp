@@ -2940,15 +2940,64 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
-        case SMART_ACTION_DISABLE:
+        case SMART_ACTION_SCRIPTED_SPAWN:
         {
-            for (WorldObject* target : targets)
+            // Enable Scripted Spawns
+            switch (e.action.scriptSpawn.state)
             {
-                if (IsUnit(target))
+            case 0: // Disable Respawn
+            {
+                for (WorldObject* target : targets)
                 {
-                    target->ToUnit()->SetImmuneToAll(!e.action.disable.state);
-                    target->ToUnit()->SetVisible(e.action.disable.state);
+                    if (Creature* c = target->ToCreature())
+                    {
+                        CAST_AI(SmartAI, c->AI())->SetCanRespawn(false);
+                        if (!e.action.scriptSpawn.dontDespawn)
+                            c->DespawnOrUnsummon();
+                    }
                 }
+                break;
+            }
+            case 1: // Respawn Once
+            {
+                for (WorldObject* target : targets)
+                {
+                    if (Creature* c = target->ToCreature())
+                    {
+                        CAST_AI(SmartAI, c->AI())->SetCanRespawn(true);
+                        c->Respawn(true);
+                        CAST_AI(SmartAI, c->AI())->SetCanRespawn(false);
+                    }
+                }
+                break;
+            }
+            case 2: // Enable Respawning
+            {
+                for (WorldObject* target : targets)
+                {
+                    if (Creature* c = target->ToCreature())
+                    {
+                        CAST_AI(SmartAI, c->AI())->SetCanRespawn(true);
+
+                        // If 0, respawn immediately
+                        if (e.action.scriptSpawn.spawnTimerMax)
+                            c->SetRespawnTime(urand(e.action.scriptSpawn.spawnTimerMin, e.action.scriptSpawn.spawnTimerMax));
+                        else
+                            c->Respawn(true);
+
+                        // If 0, use DB values
+                        if (e.action.scriptSpawn.respawnDelay)
+                            c->SetRespawnDelay(e.action.scriptSpawn.respawnDelay);
+
+                        // If 0, use default
+                        if (e.action.scriptSpawn.corpseDelay)
+                            c->SetCorpseDelay(e.action.scriptSpawn.corpseDelay);
+                    }
+                }
+                break;
+            }
+            default:
+                break;
             }
             break;
         }

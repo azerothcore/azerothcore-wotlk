@@ -449,10 +449,11 @@ private:
 
 struct HealthCheckEventData
 {
-    HealthCheckEventData(uint8 healthPct, std::function<void()> exec) : _healthPct(healthPct), _exec(exec) { };
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, bool valid = true) : _healthPct(healthPct), _exec(exec), _valid(valid) { };
 
     uint8 _healthPct;
     std::function<void()> _exec;
+    bool _valid;
 };
 
 class BossAI : public ScriptedAI
@@ -497,7 +498,6 @@ protected:
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
     void _EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
-    [[nodiscard]] bool _ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const;
 
     void TeleportCheaters();
 
