@@ -115,7 +115,7 @@ enum Spells
     SPELL_NETHER_BEAM_DAMAGE            = 35873,
 
     SPELL_REMOTE_TOY_STUN               = 37029,
-    SPELL_REMOVE_WEAPONS                = 39497,
+    SPELL_REMOVE_ENCHANTED_WEAPONS      = 39497,
 
     // Advisors
     // Universal
@@ -297,7 +297,7 @@ struct boss_kaelthas : public BossAI
         SetRoomState(GO_STATE_READY);
         me->SetDisableGravity(false);
         me->SetWalk(false);
-        DoCastAOE(SPELL_REMOVE_WEAPONS, true);
+        DoCastAOE(SPELL_REMOVE_ENCHANTED_WEAPONS, true);
         ScheduleHealthCheckEvent(50, [&]{
             scheduler.CancelAll();
             me->CastStop();
@@ -322,7 +322,7 @@ struct boss_kaelthas : public BossAI
             _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
             Talk(SAY_INTRO);
-            DoCastAOE(SPELL_REMOVE_WEAPONS, true);
+            DoCastAOE(SPELL_REMOVE_ENCHANTED_WEAPONS, true);
             ScheduleUniqueTimedEvent(23s, [&]
             {
                 Talk(SAY_INTRO_THALADRED);
@@ -1324,7 +1324,6 @@ class spell_kael_pyroblast : public SpellScript
     }
 };
 
-// 39497 - Remove Enchanted Weapons
 class spell_kaelthas_remove_enchanted_weapons : public SpellScript
 {
     PrepareSpellScript(spell_kaelthas_remove_enchanted_weapons);
