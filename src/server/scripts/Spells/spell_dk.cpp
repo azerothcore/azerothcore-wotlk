@@ -2243,6 +2243,9 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER, true, SPELL_BLOCK_TYPE_POSITIVE);
         GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
+        // Heroism / Bloodlust immunity
+        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_ID, 32182, true);
+        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_ID, 2825, true);
     }
 
     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
