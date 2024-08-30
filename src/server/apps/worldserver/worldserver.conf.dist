@@ -1292,20 +1292,6 @@ Visibility.Distance.Instances = 120
 Visibility.Distance.BGArenas = 180
 
 #
-#    Visibility.Notify.Period.OnContinents
-#    Visibility.Notify.Period.InInstances
-#    Visibility.Notify.Period.InBGArenas
-#        Description: Time (in milliseconds) for visibility update period. Lower values may have
-#                     performance impact.
-#        Default:     1000 - (Visibility.Notify.Period.OnContinents)
-#                     1000 - (Visibility.Notify.Period.InInstances)
-#                     1000 - (Visibility.Notify.Period.InBGArenas)
-
-Visibility.Notify.Period.OnContinents = 1000
-Visibility.Notify.Period.InInstances  = 1000
-Visibility.Notify.Period.InBGArenas   = 1000
-
-#
 #    Visibility.ObjectSparkles
 #        Description: Whether or not to display sparkles on gameobjects related to active quests.
 #        Default:     1 - (Show Sparkles)
@@ -1724,15 +1710,6 @@ PlayerStart.MapsExplored = 0
 InstantLogout = 1
 
 #
-#    CastUnstuck
-#        Description: Allow casting the Unstuck spell using .start or unstuck button in client
-#                     help options.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-CastUnstuck = 1
-
-#
 ###################################################################################################
 
 ###################################################################################################
@@ -2105,7 +2082,6 @@ Rate.Talent.Pet = 1
 #    Rate.RunicPower.Loss
 #    Rate.Focus
 #    Rate.Energy
-#    Rate.Loyalty
 #        Description: Multiplier to configure health, mana, incoming rage, loss of rage, focus
 #                     energy and loyalty increase or decrease.
 #        Default:     1 - (Rate.Health)
@@ -2116,7 +2092,6 @@ Rate.Talent.Pet = 1
 #                     1 - (Rate.RunicPower.Loss)
 #                     1 - (Rate.Focus)
 #                     1 - (Rate.Energy)
-#                     1 - (Rate.Loyalty)
 
 Rate.Health            = 1
 Rate.Mana              = 1

@@ -35,7 +35,8 @@ enum Says
 enum Spells
 {
     SPELL_EMPYREAL_EQUIVALENCY          = 41333,
-    SPELL_SHARED_RULE                   = 41342,
+    SPELL_SHARED_RULE_DMG               = 41342,
+    SPELL_SHARED_RULE_HEAL              = 41343,
     SPELL_EMPYREAL_BALANCE              = 41499,
     SPELL_BERSERK                       = 41924,
 
@@ -189,6 +190,15 @@ struct boss_illidari_council : public BossAI
         }
     }
 
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        if (me->GetHealth() <= damage)
+        {
+            damage = me->GetHealth() - 1;
+            DoAction(ACTION_END_ENCOUNTER);
+        }
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (!me->isActiveObject())
@@ -234,6 +244,19 @@ struct boss_illidari_council_memberAI : public ScriptedAI
         }
     }
 
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        InstanceScript* instance = me->GetInstanceScript();
+
+        if (me->GetHealth() <= damage)
+            damage = me->GetHealth() - 1;
+
+        int32 damageTaken = damage;
+        Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
+
+        me->CastCustomSpell(target->ToUnit(), SPELL_SHARED_RULE_DMG, &damageTaken, &damageTaken, &damageTaken, true, nullptr, nullptr, me->GetGUID());
+    }
+
     void KilledUnit(Unit*) override
     {
         if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
@@ -246,8 +269,6 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     void JustDied(Unit*) override
     {
         Talk(SAY_COUNCIL_DEATH);
-        if (Creature* council = instance->GetCreature(DATA_ILLIDARI_COUNCIL))
-            council->GetAI()->DoAction(ACTION_END_ENCOUNTER);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -525,24 +546,9 @@ class spell_illidari_council_balance_of_power_aura : public AuraScript
         amount = -1;
     }
 
-    void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& /*absorbAmount*/)
-    {
-        Unit* councilMember = GetTarget();
-        InstanceScript* instance = councilMember->GetInstanceScript();
-        if (!instance)
-            return;
-
-        Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
-
-        int32 damage = dmgInfo.GetDamage();
-        if (Creature* caster = councilMember->ToCreature())
-            caster->CastCustomSpell(target, SPELL_SHARED_RULE, &damage, &damage, &damage, true, nullptr, nullptr, caster->GetGUID());
-    }
-
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_illidari_council_balance_of_power_aura::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-        OnEffectAbsorb += AuraEffectAbsorbFn(spell_illidari_council_balance_of_power_aura::Absorb, EFFECT_0);
     }
 };
 
@@ -659,6 +665,31 @@ class spell_illidari_council_reflective_shield_aura : public AuraScript
         AfterEffectAbsorb += AuraEffectAbsorbFn(spell_illidari_council_reflective_shield_aura::ReflectDamage, EFFECT_0);
     }
 };
+class spell_illidari_council_circle_of_healing : public SpellScript
+{
+    PrepareSpellScript(spell_illidari_council_circle_of_healing);
+
+    void HandleSharedRule(SpellEffIndex /*effIndex*/)
+    {
+        Unit* councilMember = GetHitUnit();
+        if (!councilMember)
+            return;
+
+        InstanceScript* instance = councilMember->GetInstanceScript();
+        if (!instance)
+            return;
+
+        Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
+
+        int32 heal = GetHitHeal();
+        target->CastCustomSpell(target, SPELL_SHARED_RULE_HEAL, &heal, &heal, &heal, true, nullptr, nullptr, target->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_illidari_council_circle_of_healing::HandleSharedRule, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
+};
 
 class spell_illidari_council_judgement : public SpellScript
 {
@@ -716,6 +747,7 @@ void AddSC_boss_illidari_council()
     RegisterSpellScript(spell_illidari_council_empyreal_balance);
     RegisterSpellScript(spell_illidari_council_empyreal_equivalency);
     RegisterSpellScript(spell_illidari_council_reflective_shield_aura);
+    RegisterSpellScript(spell_illidari_council_circle_of_healing);
     RegisterSpellScript(spell_illidari_council_judgement);
     RegisterSpellScript(spell_illidari_council_deadly_strike_aura);
 }
