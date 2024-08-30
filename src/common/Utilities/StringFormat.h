@@ -19,6 +19,7 @@
 #define _STRING_FORMAT_H_
 
 #include "Define.h"
+#include <fmt/chrono.h>
 #include <fmt/format.h>
 #include <fmt/printf.h>
 #include <locale>
