@@ -13636,6 +13636,7 @@ uint32 Player::CalculateTalentsPoints() const
     }
 
     talentPointsForLevel += m_extraBonusTalentCount;
+    sScriptMgr->OnCalculateTalentsPoints(this, talentPointsForLevel);
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 

@@ -28,6 +28,7 @@
 enum PlayerHook
 {
     PLAYERHOOK_ON_PLAYER_JUST_DIED,
+    PLAYERHOOK_ON_CALCULATE_TALENTS_POINTS,
     PLAYERHOOK_ON_PLAYER_RELEASED_GHOST,
     PLAYERHOOK_ON_SEND_INITIAL_PACKETS_BEFORE_ADD_TO_MAP,
     PLAYERHOOK_ON_BATTLEGROUND_DESERTION,
@@ -212,6 +213,9 @@ protected:
 public:
     // Called when a player dies
     virtual void OnPlayerJustDied(Player* /*player*/) { }
+
+    // Called player talent points are calculated
+    virtual void OnCalculateTalentsPoints(Player const* /*player*/, uint32& /*talentPointsForLevel*/) { }
 
     // Called when clicking the release button
     virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
