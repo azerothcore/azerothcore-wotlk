@@ -1369,7 +1369,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     case NPC_ARMY_OF_THE_DEAD:
                         {
                             AddAura(SPELL_DK_ARMY_OF_THE_DEAD_PASSIVE, this);
-                            AddAura(SPELL_DK_PET_SCALING_01, this);
+                            AddAura(SPELL_DK_PET_SCALING_02, this);
                             AddAura(SPELL_DK_PET_SCALING_03, this);
                             AddAura(SPELL_DK_AVOIDANCE, this);
                             AddAura(SPELL_PET_SCALING_MASTER_06, this);
