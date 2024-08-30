@@ -764,13 +764,11 @@ struct boss_kaelthas : public BossAI
     {
         return me->GetHomePosition().GetExactDist2d(me) > 165.0f || !SelectTargetFromPlayerList(165.0f);
     }
-    
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
         DoCastAOE(SPELL_REMOVE_ENCHANTED_WEAPONS, true);
     }
-    
 private:
     uint32 _phase;
     bool _transitionSceneReached = false;
