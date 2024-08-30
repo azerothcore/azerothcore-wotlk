@@ -1339,13 +1339,14 @@ class spell_kaelthas_remove_enchanted_weapons : public SpellScript
         Unit* target = GetHitUnit();
         if (!target || !target->IsPlayer())
             return;
-        target->CastSpell((Unit*)nullptr, 39498, true);
-        target->CastSpell((Unit*)nullptr, 39499, true);
-        target->CastSpell((Unit*)nullptr, 39500, true);
-        target->CastSpell((Unit*)nullptr, 39501, true);
-        target->CastSpell((Unit*)nullptr, 39502, true);
-        target->CastSpell((Unit*)nullptr, 39503, true);
-        target->CastSpell((Unit*)nullptr, 39504, true);
+        TriggerCastFlags triggerFlags = TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+        target->CastSpell((Unit*)nullptr, 39498, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39499, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39500, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39501, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39502, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39503, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39504, triggerFlags);
     }
 
     void Register() override
