@@ -40,7 +40,7 @@ class CreatureGroup;
 // max different by z coordinate for creature aggro reaction
 #define CREATURE_Z_ATTACK_RANGE 3
 
-#define MAX_VENDOR_ITEMS 150                                // Limitation in 3.x.x item count in SMSG_LIST_INVENTORY
+#define MAX_VENDOR_ITEMS 150    // Limitation in 3.x.x item count in SMSG_LIST_INVENTORY
 
 class Creature : public Unit, public GridObject<Creature>, public MovableMapObject
 {
@@ -67,7 +67,7 @@ public:
 
     [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
-    void Update(uint32 time) override;                         // overwrited Unit::Update
+    void Update(uint32 time) override;  // overwrited Unit::Update
     void GetRespawnPosition(float& x, float& y, float& z, float* ori = nullptr, float* dist = nullptr) const;
 
     void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
@@ -88,9 +88,15 @@ public:
     MovementGeneratorType GetDefaultMovementType() const override { return m_defaultMovementType; }
     void SetDefaultMovementType(MovementGeneratorType mgt) { m_defaultMovementType = mgt; }
 
-    void SetReactState(ReactStates st) { m_reactState = st; }
+    /**
+    * @brief A creature can have 3 ReactStates : Agressive, Passive, Neutral
+    * - Agressive : The creature will attack any non friend units in sight
+    * - Passive : The creature will not attack anyone
+    * - Neutral : The creature will attack only if attacked
+    */
+    void SetReactState(ReactStates state) { m_reactState = state; }
     [[nodiscard]] ReactStates GetReactState() const { return m_reactState; }
-    [[nodiscard]] bool HasReactState(ReactStates state) const { return (m_reactState == state); }
+    [[nodiscard]] bool HasReactState(ReactStates state) const { return (m_reactState == state); }   /// @brief Check if the creature has the specified ReactState
     void InitializeReactState();
 
     ///// @todo RENAME THIS!!!!!
@@ -209,14 +215,14 @@ public:
     // override WorldObject function for proper name localization
     [[nodiscard]] std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
 
-    void setDeathState(DeathState s, bool despawn = false) override;                   // override virtual Unit::setDeathState
+    void setDeathState(DeathState s, bool despawn = false) override;    // override virtual Unit::setDeathState
 
     bool LoadFromDB(ObjectGuid::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, allowDuplicate); }
     bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool allowDuplicate = false);
     void SaveToDB();
-    // overriden in Pet
-    virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);
-    virtual void DeleteFromDB();                        // overriden in Pet
+
+    virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);   // overriden in Pet
+    virtual void DeleteFromDB();    // overriden in Pet
 
     Loot loot;
     [[nodiscard]] ObjectGuid GetLootRecipientGUID() const { return m_lootRecipient; }
@@ -224,7 +230,7 @@ public:
     [[nodiscard]] ObjectGuid::LowType GetLootRecipientGroupGUID() const { return m_lootRecipientGroup; }
     [[nodiscard]] Group* GetLootRecipientGroup() const;
     [[nodiscard]] bool hasLootRecipient() const { return m_lootRecipient || m_lootRecipientGroup; }
-    bool isTappedBy(Player const* player) const;                          // return true if the creature is tapped by the player or a member of his party.
+    bool isTappedBy(Player const* player) const;    // return true if the creature is tapped by the player or a member of his party.
     [[nodiscard]] bool CanGeneratePickPocketLoot() const;
     void SetPickPocketLootTime();
     void ResetPickPocketLootTime() { lootPickPocketRestoreTime = 0; }
@@ -266,7 +272,7 @@ public:
     bool _IsTargetAcceptable(Unit const* target) const;
     [[nodiscard]] bool CanIgnoreFeignDeath() const { return (GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH) != 0; }
 
-    // pussywizard: updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
+    // pussywizard: Updated at faction change, disable move in line of sight if actual faction is not hostile to anyone
     void UpdateMoveInLineOfSightState();
     bool IsMoveInLineOfSightDisabled() { return m_moveInLineOfSightDisabled; }
     bool IsMoveInLineOfSightStrictlyDisabled() { return m_moveInLineOfSightStrictlyDisabled; }
@@ -299,8 +305,8 @@ public:
 
     void DoImmediateBoundaryCheck() { m_boundaryCheckTime = 0; }
 
-    uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
-    uint32 lootingGroupLowGUID;                         // used to find group which is looting corpse
+    uint32 m_groupLootTimer;    // (msecs)timer used for group loot
+    uint32 lootingGroupLowGUID;   // used to find group which is looting corpse
 
     void SendZoneUnderAttackMessage(Player* attacker);
 
@@ -310,8 +316,8 @@ public:
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id)  const override;
 
     bool isRegeneratingHealth() { return m_regenHealth; }
-    void SetRegeneratingHealth(bool c) { m_regenHealth = c; }
-    void SetRegeneratingPower(bool c) { m_regenPower = c; }
+    void SetRegeneratingHealth(bool enable) { m_regenHealth = enable; }
+    void SetRegeneratingPower(bool enable) { m_regenPower = enable; }
     [[nodiscard]] virtual uint8 GetPetAutoSpellSize() const { return MAX_SPELL_CHARM; }
     [[nodiscard]] virtual uint32 GetPetAutoSpellOnPos(uint8 pos) const
     {
@@ -398,20 +404,17 @@ public:
 
     /**
      * @brief Helper to resume chasing current victim.
-     *
-     * */
+     */
     void ResumeChasingVictim() { GetMotionMaster()->MoveChase(GetVictim()); };
 
     /**
      * @brief Returns true if the creature is able to cast the spell.
-     *
-     * */
+     */
     bool CanCastSpell(uint32 spellID) const;
 
     /**
-    * @brief Helper to get the creature's summoner GUID, if it is a summon
-    *
-    * */
+     * @brief Helper to get the creature's summoner GUID, if it is a summon
+     */
     [[nodiscard]] ObjectGuid GetSummonerGUID() const;
 
     // Used to control if MoveChase() is to be used or not in AttackStart(). Some creatures does not chase victims
@@ -474,11 +477,11 @@ protected:
 
     bool DisableReputationGain;
 
-    CreatureTemplate const* m_creatureInfo;                 // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
+    CreatureTemplate const* m_creatureInfo;   // in difficulty mode > 0 can different from sObjectMgr->GetCreatureTemplate(GetEntry())
     CreatureData const* m_creatureData;
 
     float m_detectionDistance;
-    uint16 m_LootMode;                                  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
+    uint16 m_LootMode;  // bitmask, default LOOT_MODE_DEFAULT, determines what loot will be lootable
 
     [[nodiscard]] bool IsInvisibleDueToDespawn() const override;
     bool CanAlwaysSee(WorldObject const* obj) const override;
@@ -489,11 +492,11 @@ private:
 
     [[nodiscard]] bool CanPeriodicallyCallForAssistance() const;
 
-    //WaypointMovementGenerator vars
+    // WaypointMovementGenerator variable
     uint32 m_waypointID;
     uint32 m_path_id;
 
-    //Formation var
+    // Formation variable
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
 

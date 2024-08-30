@@ -236,9 +236,11 @@ void MotionMaster::MoveIdle()
         Mutate(GetIdleMovementGenerator(), MOTION_SLOT_IDLE);
 }
 
+/**
+ * @brief Enable a random movement in desired range around the unit. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveRandom(float wanderDistance)
 {
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
@@ -249,6 +251,11 @@ void MotionMaster::MoveRandom(float wanderDistance)
     }
 }
 
+/**
+ * @brief The unit will return this initial position (owner for pets and summoned creatures). Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ *
+ * @param walk The unit will run by default, but you can set it to walk
+ */
 void MotionMaster::MoveTargetedHome(bool walk /*= false*/)
 {
     Clear(false);
@@ -261,7 +268,7 @@ void MotionMaster::MoveTargetedHome(bool walk /*= false*/)
     else if (_owner->GetTypeId() == TYPEID_UNIT && _owner->ToCreature()->GetCharmerOrOwnerGUID())
     {
         _owner->ClearUnitState(UNIT_STATE_EVADE);
-        // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
+
         if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
             return;
 
@@ -279,6 +286,9 @@ void MotionMaster::MoveTargetedHome(bool walk /*= false*/)
     }
 }
 
+/**
+ * @brief Enable the confusion movement. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveConfused()
 {
     // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
@@ -297,9 +307,11 @@ void MotionMaster::MoveConfused()
     }
 }
 
+/**
+ * @brief Force the unit to chase this target. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveChase(Unit* target,  std::optional<ChaseRange> dist, std::optional<ChaseAngle> angle)
 {
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     // ignore movement request if target not exist
     if (!target || target == _owner || _owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
@@ -391,9 +403,11 @@ void MotionMaster::MoveCircleTarget(Unit* target)
     init.Launch();
 }
 
+/**
+ * @brief The unit will follow this target. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlot slot, bool inheritWalkState)
 {
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     // ignore movement request if target not exist
     if (!target || target == _owner || _owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
     {
@@ -415,9 +429,13 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
     }
 }
 
+/**
+ * @brief The unit will move to a specific point. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ *
+ * For transition movement between the ground and the air, use MoveLand or MoveTakeoff instead.
+ */
 void MotionMaster::MovePoint(uint32 id, float x, float y, float z, bool generatePath, bool forceDestination, MovementSlot slot, float orientation /* = 0.0f*/)
 {
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
@@ -464,9 +482,11 @@ void MotionMaster::MoveSplinePath(uint32 path_id)
     MoveSplinePath(points);
 }
 
+/**
+ * @brief Use to move the unit from the air to the ground. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0f*/)
 {
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
@@ -488,15 +508,20 @@ void MotionMaster::MoveLand(uint32 id, Position const& pos, float speed /* = 0.0
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
 }
 
+/**
+ * @brief Use to move the unit from the air to the ground. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveLand(uint32 id, float x, float y, float z, float speed /* = 0.0f*/)
 {
     Position pos = {x, y, z, 0.0f};
     MoveLand(id, pos, speed);
 }
 
+/**
+ * @brief Use to move the unit from the ground to the air. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 0.0f*/)
 {
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
@@ -518,6 +543,9 @@ void MotionMaster::MoveTakeoff(uint32 id, Position const& pos, float speed /* = 
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_ACTIVE);
 }
 
+/**
+ * @brief Use to move the unit from the air to the ground. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed /* = 0.0f*/)
 {
     Position pos = {x, y, z, 0.0f};
@@ -550,6 +578,9 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     Mutate(new EffectMovementGenerator(0), MOTION_SLOT_CONTROLLED);
 }
 
+/**
+ * @brief The unit will jump in a specific direction
+ */
 void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
 {
     //this function may make players fall below map
@@ -564,6 +595,9 @@ void MotionMaster::MoveJumpTo(float angle, float speedXY, float speedZ)
     MoveJump(x, y, z, speedXY, speedZ);
 }
 
+/**
+ * @brief The unit will jump to a specific point
+ */
 void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float speedZ, uint32 id, Unit const* target)
 {
     LOG_DEBUG("movement.motionmaster", "Unit ({}) jump to point (X: {} Y: {} Z: {})", _owner->GetGUID().ToString(), x, y, z);
@@ -584,9 +618,11 @@ void MotionMaster::MoveJump(float x, float y, float z, float speedXY, float spee
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
 }
 
+/**
+ * @brief The unit will fall. Used when in the air. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
 {
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
@@ -625,9 +661,11 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
     Mutate(new EffectMovementGenerator(id), MOTION_SLOT_CONTROLLED);
 }
 
+/**
+ * @brief The unit will charge the target. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id, const Movement::PointsArray* path, bool generatePath, float orientation /* = 0.0f*/, ObjectGuid targetGUID /*= ObjectGuid::Empty*/)
 {
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
@@ -646,6 +684,9 @@ void MotionMaster::MoveCharge(float x, float y, float z, float speed, uint32 id,
     }
 }
 
+/**
+ * @brief The unit will charge the target. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveCharge(PathGenerator const& path, float speed /*= SPEED_CHARGE*/, ObjectGuid targetGUID /*= ObjectGuid::Empty*/)
 {
     G3D::Vector3 dest = path.GetActualEndPosition();
@@ -696,12 +737,14 @@ void MotionMaster::MoveSeekAssistanceDistract(uint32 time)
     }
 }
 
+/**
+ * @brief Enable the target's fleeing movement. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MoveFleeing(Unit* enemy, uint32 time)
 {
     if (!enemy)
         return;
 
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
@@ -745,12 +788,15 @@ void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
     }
 }
 
+/**
+ * @brief Enable the target's distract movement. Doesn't work with UNIT_FLAG_DISABLE_MOVE and
+ * if the unit has MOTION_SLOT_CONTROLLED (generaly apply when the unit is controlled).
+ */
 void MotionMaster::MoveDistract(uint32 timer)
 {
     if (Impl[MOTION_SLOT_CONTROLLED])
         return;
 
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
@@ -773,7 +819,7 @@ void MotionMaster::Mutate(MovementGenerator* m, MovementSlot slot)
     {
         bool delayed = (_top == slot && (_cleanFlag & MMCF_UPDATE));
 
-        // pussywizard: clear slot AND decrease top immediately to avoid crashes when referencing null top in DirectDelete
+        // clear slot AND decrease top immediately to avoid crashes when referencing null top in DirectDelete
         Impl[slot] = nullptr;
         while (!empty() && !top())
             --_top;
@@ -797,12 +843,14 @@ void MotionMaster::Mutate(MovementGenerator* m, MovementSlot slot)
     }
 }
 
+/**
+ * @brief Move the unit following a specific path. Doesn't work with UNIT_FLAG_DISABLE_MOVE
+ */
 void MotionMaster::MovePath(uint32 path_id, bool repeatable)
 {
     if (!path_id)
         return;
 
-    // Xinef: do not allow to move with UNIT_FLAG_DISABLE_MOVE
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
@@ -825,6 +873,9 @@ void MotionMaster::MovePath(uint32 path_id, bool repeatable)
         _owner->IsPlayer() ? "Player" : "Creature", _owner->GetGUID().ToString(), path_id, repeatable ? "YES" : "NO");
 }
 
+/**
+ * @brief Rotate the unit. You can specify the time of the rotation.
+ */
 void MotionMaster::MoveRotate(uint32 time, RotateDirection direction)
 {
     if (!time)

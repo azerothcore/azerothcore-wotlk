@@ -1141,6 +1141,9 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     return damage;
 }
 
+ /**
+  * @brief Interrupt the unit cast for all the current spells
+  */
 void Unit::CastStop(uint32 except_spellid, bool withInstant)
 {
     for (uint32 i = CURRENT_FIRST_NON_MELEE_SPELL; i < CURRENT_MAX_SPELL; i++)
@@ -3034,6 +3037,10 @@ void Unit::SendMeleeAttackStart(Unit* victim, Player* sendTo)
     LOG_DEBUG("entities.unit", "WORLD: Sent SMSG_ATTACKSTART");
 }
 
+/**
+ * @brief Send to the client SMSG_ATTACKSTOP but doesn't clear UNIT_STATE_MELEE_ATTACKING on server side
+ * or interrupt spells. Unless you know exactly what you're doing, use AttackStop() or RemoveAllAttackers() instead
+ */
 void Unit::SendMeleeAttackStop(Unit* victim)
 {
     // pussywizard: calling SendMeleeAttackStop without clearing UNIT_STATE_MELEE_ATTACKING and then AttackStart the same player may spoil npc rotating!
@@ -10331,6 +10338,10 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     return true;
 }
 
+/**
+ * @brief Force the unit to stop attacking. This will clear UNIT_STATE_MELEE_ATTACKING,
+ * Interrupt current spell, AI assistance, and call SendMeleeAttackStop() to the client
+ */
 bool Unit::AttackStop()
 {
     if (!m_attacking)
@@ -10407,6 +10418,9 @@ bool Unit::isAttackingPlayer() const
     return false;
 }
 
+/**
+ * @brief Remove all units in m_attackers list and send them AttackStop()
+ */
 void Unit::RemoveAllAttackers()
 {
     while (!m_attackers.empty())
@@ -16600,7 +16614,7 @@ void Unit::ResumeMovement(uint32 timer /* = 0*/, uint8 slot /* = 0*/)
         movementGenerator->Resume(timer);
 }
 
-void Unit::StopMovingOnCurrentPos() // pussywizard
+void Unit::StopMovingOnCurrentPos()
 {
     ClearUnitState(UNIT_STATE_MOVING);
 
@@ -20487,6 +20501,12 @@ bool Unit::SetSwim(bool enable)
     return true;
 }
 
+/**
+ * @brief Add the movement flag: MOVEMENTFLAGCAN_FLY. Generaly only use by players, allowing
+ *  them to fly by pressing space for example. For creatures, please look for DisableGravity().
+ *
+ *  Doesn't inform the client.
+ */
 bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
 {
     if (enable == HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY))
@@ -20505,6 +20525,10 @@ bool Unit::SetCanFly(bool enable, bool /*packetOnly = false */)
     return true;
 }
 
+/**
+ * @brief Allow to walk on water. Doesn't inform the client.
+ * Need to use SendMovementWaterWalking() if it's for players.
+ */
 bool Unit::SetWaterWalking(bool enable, bool /*packetOnly = false*/)
 {
     if (enable == HasUnitMovementFlag(MOVEMENTFLAG_WATERWALKING))
