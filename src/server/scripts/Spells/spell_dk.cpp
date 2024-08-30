@@ -2257,28 +2257,7 @@ class spell_dk_army_of_the_dead_passive : public AuraScript
     void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
-        if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
-        {
-            int32 currentAmount = aurEff->GetAmount();
-            int32 newAmount = GetEffect(aurEff->GetEffIndex())->CalculateAmount(GetCaster());
-            if (newAmount != currentAmount)
-            {
-                if (aurEff->GetMiscValue() == STAT_STAMINA)
-                {
-                    uint32 actStat = GetUnitOwner()->GetHealth();
-                    GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
-                }
-                else
-                {
-                    uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
-                    GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
-                }
-            }
-        }
-        else
-            GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
+        GetEffect(aurEff->GetEffIndex())->RecalculateAmount();
     }
 
     void Register() override
