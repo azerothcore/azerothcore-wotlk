@@ -787,19 +787,8 @@ public:
     virtual SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const = 0;
     bool GetRandomContactPoint(Unit const* target, float& x, float& y, float& z, bool force = false) const;
 
-    [[nodiscard]] Unit* getAttackerForHelper() const                 // If someone wants to help, who to give them
-    {
-        if (GetVictim() != nullptr)
-            return GetVictim();
+    [[nodiscard]] Unit* getAttackerForHelper() const;                 // If someone wants to help, who to give them
 
-        if (!IsEngaged())
-            return nullptr;
-
-        if (!m_attackers.empty())
-            return *(m_attackers.begin());
-
-        return nullptr;
-    }
     bool Attack(Unit* victim, bool meleeAttack);
 
     void CastStop(uint32 except_spellid = 0, bool withInstant = true);
@@ -1667,17 +1656,8 @@ public:
     void UpdateAuraForGroup(uint8 slot);
 
     // proc trigger system
-    bool CanProc() {return !m_procDeep;}
-    void SetCantProc(bool apply)
-    {
-        if (apply)
-            ++m_procDeep;
-        else
-        {
-            ASSERT(m_procDeep);
-            --m_procDeep;
-        }
-    }
+    bool CanProc() { return !m_procDeep; }
+    void SetCantProc(bool apply);
 
     void AddPetAura(PetAura const* petSpell);
     void RemovePetAura(PetAura const* petSpell);
@@ -1892,7 +1872,7 @@ protected:
 
     AuraEffectList m_modAuras[TOTAL_AURAS];
     AuraList m_scAuras;                        // casted singlecast auras
-    AuraApplicationList m_interruptableAuras;             // auras which have interrupt mask applied on unit
+    AuraApplicationList m_interruptableAuras;  // auras which have interrupt mask applied on unit
     AuraStateAurasMap m_auraStateAuras;        // Used for improve performance of aura state checks on aura apply/remove
     uint32 m_interruptMask;
 
@@ -1948,14 +1928,8 @@ private:
 
     [[nodiscard]] float processDummyAuras(float TakenTotalMod) const;
 
-    void _addAttacker(Unit* pAttacker)                  // must be called only from Unit::Attack(Unit*)
-    {
-        m_attackers.insert(pAttacker);
-    }
-    void _removeAttacker(Unit* pAttacker)               // must be called only from Unit::AttackStop()
-    {
-        m_attackers.erase(pAttacker);
-    }
+    void _addAttacker(Unit* pAttacker) { m_attackers.insert(pAttacker); }   ///@note: Call only in Unit::Attack()
+    void _removeAttacker(Unit* pAttacker) { m_attackers.erase(pAttacker); } ///@note: Call only in Unit::AttackStop()
 
     //----------- Private variables ----------//
     uint32 m_state;                                     // Even derived shouldn't modify
