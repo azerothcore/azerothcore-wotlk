@@ -234,7 +234,7 @@ public:
 
     void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val); }
     [[nodiscard]] bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND); }
-    [[nodiscard]] bool IsBoundAccountWide() const { return (GetTemplate()->Flags & ITEM_FLAG_IS_BOUND_TO_ACCOUNT) != 0; }
+    [[nodiscard]] bool IsBoundAccountWide() const { return GetTemplate()->HasFlag(ITEM_FLAG_IS_BOUND_TO_ACCOUNT) != 0; }
     bool IsBindedNotWith(Player const* player) const;
     [[nodiscard]] bool IsBoundByEnchant() const;
     [[nodiscard]] bool IsBoundByTempEnchant() const;
@@ -258,6 +258,9 @@ public:
     [[nodiscard]] bool CanBeTraded(bool mail = false, bool trade = false) const;
     void SetInTrade(bool b = true) { mb_in_trade = b; }
     [[nodiscard]] bool IsInTrade() const { return mb_in_trade; }
+    [[nodiscard]] bool IsRefundable() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE); }
+    [[nodiscard]] bool IsBOPTradable() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE); }
+    [[nodiscard]] bool IsWrapped() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED); }
 
     bool HasEnchantRequiredSkill(Player const* player) const;
     [[nodiscard]] uint32 GetEnchantRequiredLevel() const;
