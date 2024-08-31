@@ -52,7 +52,7 @@ Pet::Pet(Player* owner, PetType type) : Guardian(nullptr, owner ? owner->GetGUID
     m_tempspellIsPositive(false),
     m_tempspell(0)
 {
-    ASSERT(m_owner && m_owner->GetTypeId() == TYPEID_PLAYER);
+    ASSERT(m_owner && m_owner->IsPlayer());
 
     m_unitTypeMask |= UNIT_MASK_PET;
 
@@ -415,7 +415,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
     map->AddToMap(ToCreature(), true);
 
     //set last used pet number (for use in BG's)
-    if (owner->GetTypeId() == TYPEID_PLAYER && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET))
+    if (owner->IsPlayer() && isControlled() && !isTemporarySummoned() && (getPetType() == SUMMON_PET || getPetType() == HUNTER_PET))
         owner->ToPlayer()->SetLastPetNumber(petInfo->PetNumber);
 
     owner->GetSession()->AddQueryHolderCallback(CharacterDatabase.DelayQueryHolder(std::make_shared<PetLoadQueryHolder>(ownerid, petInfo->PetNumber)))
@@ -1035,7 +1035,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
 
     //Determine pet type
     PetType petType = MAX_PET_TYPE;
-    if (owner->GetTypeId() == TYPEID_PLAYER)
+    if (owner->IsPlayer())
     {
         sScriptMgr->OnBeforeGuardianInitStatsForLevel(owner->ToPlayer(), this, cinfo, petType);
 
@@ -1132,8 +1132,8 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
         // remove elite bonuses included in DB values
         CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(petlevel, cinfo->unit_class);
         // xinef: multiply base values by creature_template factors!
-        float factorHealth = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModHealth) : cinfo->ModHealth;
-        float factorMana = owner->GetTypeId() == TYPEID_PLAYER ? std::min(1.0f, cinfo->ModMana) : cinfo->ModMana;
+        float factorHealth = owner->IsPlayer() ? std::min(1.0f, cinfo->ModHealth) : cinfo->ModHealth;
+        float factorMana = owner->IsPlayer() ? std::min(1.0f, cinfo->ModMana) : cinfo->ModMana;
 
         if (sWorld->getBoolConfig(CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH))
         {
@@ -1430,7 +1430,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
     SetFullHealth();
     SetPower(POWER_MANA, GetMaxPower(POWER_MANA));
 
-    if (owner->GetTypeId() == TYPEID_PLAYER)
+    if (owner->IsPlayer())
         sScriptMgr->OnAfterGuardianInitStatsForLevel(owner->ToPlayer(), this);
 
     return true;
@@ -2025,7 +2025,7 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
         {
             // need update action bar for last removed rank
             if (Unit* owner = GetOwner())
-                if (owner->GetTypeId() == TYPEID_PLAYER)
+                if (owner->IsPlayer())
                     owner->ToPlayer()->PetSpellInitialize();
         }
     }

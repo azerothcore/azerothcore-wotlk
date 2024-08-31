@@ -285,13 +285,13 @@ public:
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
             Talk(SAY_KILL);
     }
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_introDone && me->IsAlive() && who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2dSq(who) <= 10000.0f) // 100*100, moveinlineofsight limited to 60yd anyway
+        if (!_introDone && me->IsAlive() && who->IsPlayer() && me->GetExactDist2dSq(who) <= 10000.0f) // 100*100, moveinlineofsight limited to 60yd anyway
         {
             Talk(SAY_ENTER_ZONE);
             _introDone = true;

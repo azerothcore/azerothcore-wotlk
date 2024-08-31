@@ -364,7 +364,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && events.GetNextEventTime(EVENT_NO_KILL_TALK) == 0)
+            if (victim->IsPlayer() && events.GetNextEventTime(EVENT_NO_KILL_TALK) == 0)
                 Talk(SAY_KJ_SLAY);
         }
 
