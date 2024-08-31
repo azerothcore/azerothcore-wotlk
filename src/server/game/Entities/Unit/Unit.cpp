@@ -20210,7 +20210,7 @@ private:
 
 void Unit::CastDelayedSpellWithPeriodicAmount(Unit* caster, uint32 spellId, AuraType auraType, int32 addAmount, uint8 effectIndex)
 {
-    AuraEffect* aurEff;
+    AuraEffect* aurEff = nullptr;
     for (AuraEffectList::iterator i = m_modAuras[auraType].begin(); i != m_modAuras[auraType].end(); ++i)
     {
         aurEff = *i;
