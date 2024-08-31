@@ -114,6 +114,8 @@ enum Misc
     ACTION_ILLIDAN_CAGED   = 3,
     ACTION_SHADOW_PRISON   = 4,
     ACTION_ILLIDAN_DIE     = 5,
+    ACTION_ILLIDAN_DEMON_TRANSFORM = 6,
+    ACTION_ILLIDAN_DEMON_TRANSFORM_BACK = 7,
 
     ACTION_ILLIDARI_COUNCIL_DONE = 0,
     ACTION_AKAMA_MINIONS = 1,
@@ -141,7 +143,9 @@ enum Misc
 
     PHASE_INITIAL          = 1,
     PHASE_FLYING           = 2,
-    PHASE_DEMON            = 3
+    PHASE_LANDING          = 3,
+    PHASE_DEMON            = 4,
+    PHASE_MAIEV            = 5
 };
 
 const Position eyeBeamPos[MAX_EYE_BEAM_POS * 2] =
@@ -204,6 +208,8 @@ struct boss_illidan_stormrage : public BossAI
         ScheduleHealthCheckEvent(30, [&] {
             // Maiev Spawn Scene
             scheduler.CancelAll();
+            if (me->HasAura(SPELL_DEMON_FORM))
+                DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
             DoAction(ACTION_SHADOW_PRISON);
         });
     }
@@ -270,6 +276,7 @@ struct boss_illidan_stormrage : public BossAI
             break;
             case ACTION_SHADOW_PRISON:
             {
+                scheduler.CancelAll();
                 _inCutscene = true;
                 DoCastSelf(SPELL_SHADOW_PRISON, true);
                 DoStopAttack();
@@ -294,8 +301,40 @@ struct boss_illidan_stormrage : public BossAI
                 me->m_Events.AddEventAtOffset([&] {
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->SetReactState(REACT_AGGRESSIVE);
+                    ScheduleAbilities(PHASE_LANDING);
                     _inCutscene = false;
                 }, 32830ms); // 9750ms
+            }
+            break;
+            case ACTION_ILLIDAN_DEMON_TRANSFORM:
+            {
+                scheduler.CancelAll();
+                me->SetReactState(REACT_PASSIVE);
+                DoStopAttack();
+                me->SetControlled(true, UNIT_STATE_ROOT);
+                DoCastSelf(SPELL_DEMON_TRANSFORM_1);
+
+                me->m_Events.AddEventAtOffset([&] {
+                    Talk(SAY_ILLIDAN_MORPH);
+                }, 2630ms);
+                me->m_Events.AddEventAtOffset([&] {
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    ScheduleAbilities(PHASE_DEMON);
+                }, 12230ms);
+            }
+            break;
+            case ACTION_ILLIDAN_DEMON_TRANSFORM_BACK:
+            {
+                scheduler.CancelAll();
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->GetMotionMaster()->Clear();
+                me->SetControlled(false, UNIT_STATE_ROOT);
+                me->RemoveAurasDueToSpell(SPELL_DEMON_TRANSFORM_1);
+                me->RemoveAurasDueToSpell(SPELL_DEMON_TRANSFORM_2);
+                me->RemoveAurasDueToSpell(SPELL_DEMON_TRANSFORM_3);
+                me->RemoveAurasDueToSpell(SPELL_DEMON_FORM);
+                me->LoadEquipment(EQUIPMENT_GLAIVES, true);
             }
             break;
             case ACTION_ILLIDAN_CAGED:
@@ -375,7 +414,7 @@ struct boss_illidan_stormrage : public BossAI
                         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                         me->SetReactState(REACT_AGGRESSIVE);
                         me->SetControlled(false, UNIT_STATE_ROOT);
-                        ScheduleAbilities(PHASE_DEMON);
+                        ScheduleAbilities(PHASE_LANDING);
                     }, 6095ms); // 2430ms
                     me->m_Events.AddEventAtOffset([&] {
                         DoCastSelf(SPELL_HIT_CHANCE, true);
@@ -457,9 +496,54 @@ struct boss_illidan_stormrage : public BossAI
                 });
             }
             break;
+            case PHASE_LANDING:
+            {
+                scheduler.CancelAll();
+
+                ScheduleTimedEvent(25s, 30s, [&] {
+                    DoCastVictim(SPELL_FLAME_CRASH);
+                }, 26s, 35s);
+
+                // ScheduleTimedEvent(10s, [&] {
+                //     DoCastVictim(SPELL_SHEAR);
+                // }, 12s, 15s);
+
+                ScheduleTimedEvent(32s, [&] {
+                    DoCastVictim(SPELL_DRAW_SOUL);
+                }, 32s);
+
+                ScheduleTimedEvent(25s, 30s, [&] {
+                    DoCastRandomTarget(SPELL_PARASITIC_SHADOWFIEND, 0U, 100.f);
+                }, 25s, 30s);
+
+                ScheduleTimedEvent(25s, [&] {
+                    DoCastSelf(SPELL_AGONIZING_FLAMES);
+                }, 24s);
+
+                ScheduleTimedEvent(60s, [&] {
+                    DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM);
+                }, 60s);
+            }
+            break;
             case PHASE_DEMON:
             {
+                scheduler.CancelAll();
+                DoCastSelf(SPELL_SUMMON_SHADOW_DEMON, true);
 
+                ScheduleTimedEvent(1s, 2500ms, [&] {
+                    me->GetMotionMaster()->MoveChase(me->GetVictim(), 90.f);
+                    DoCastVictim(SPELL_SHADOW_BLAST);
+                }, 2500ms);
+
+                ScheduleTimedEvent(7s, [&] {
+                    DoCastSelf(SPELL_FLAME_BURST);
+                }, 19500ms);
+
+                ScheduleTimedEvent(60s, [&] {
+                    DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
+                    ScheduleAbilities(PHASE_LANDING);
+                    DoResetThreatList();
+                }, 60s);
             }
             break;
         }
@@ -1079,9 +1163,9 @@ struct npc_blade_of_azzinoth : public ScriptedAI
         }, 2700ms);
     }
 
-    void JustSummoned(Creature* /*summon*/) override
+    void JustSummoned(Creature* summon) override
     {
-        DoCastSelf(SPELL_TEAR_CHANNEL, true);
+        DoCast(summon, SPELL_TEAR_CHANNEL, true);
     }
 
     void DoAction(int32 param) override
