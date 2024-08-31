@@ -594,6 +594,7 @@ public:
         static ChatCommandTable npcbotOrderCommandTable =
         {
             { "cast",       HandleNpcBotOrderCastCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_ORDER_CAST,         Console::No  },
+            { "pull",       HandleNpcBotOrderPullCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_ORDER_CAST,         Console::No  },
         };
 
         static ChatCommandTable npcbotVehicleCommandTable =
@@ -1723,6 +1724,155 @@ public:
                 handler->SendSysMessage("Error!");
                 handler->SetSentErrorMessage(true);
                 return false;
+        }
+
+        return true;
+    }
+
+    static bool HandleNpcBotOrderPullCommand(ChatHandler* handler, Optional<std::string> bot_name, Optional<std::string_view> target_token)
+    {
+        Player* owner = handler->GetSession()->GetPlayer();
+        if (!owner->HaveBot() || !bot_name)
+        {
+            handler->SendSysMessage(".npcbot order pull #bot_name #[target_token]");
+            handler->SendSysMessage("Orders bot to pull target immediately");
+            return true;
+        }
+
+        if (owner->GetBotMgr()->IsPartyInCombat())
+        {
+            handler->SendSysMessage("Can't do that while in combat!");
+            return true;
+        }
+
+        for (std::decay_t<decltype(*bot_name)>::size_type i = 0u; i < bot_name->size(); ++i)
+            if ((*bot_name)[i] == '_')
+                (*bot_name)[i] = ' ';
+
+        Creature* bot = owner->GetBotMgr()->GetBotByName(*bot_name);
+        if (bot)
+        {
+            if (!bot->IsInWorld())
+            {
+                handler->PSendSysMessage("Bot {} is not found!", *bot_name);
+                return true;
+            }
+            if (!bot->IsAlive())
+            {
+                handler->PSendSysMessage("{} is dead!", bot->GetName());
+                return true;
+            }
+            if (!bot->GetBotAI()->HasRole(BOT_ROLE_DPS) || bot->GetVictim() || bot->IsInCombat() || !bot->getAttackers().empty())
+            {
+                handler->PSendSysMessage("{} cannot pull target! Must be idle and have DPS role", bot->GetName());
+                return true;
+            }
+        }
+        else
+        {
+            auto const& class_name = *bot_name;
+            for (auto const c : class_name)
+            {
+                if (!std::islower(c))
+                {
+                    handler->SendSysMessage("Bot class name must be in lower case!");
+                    return true;
+                }
+            }
+
+            uint8 bot_class = BotMgr::BotClassByClassName(class_name);
+            if (bot_class == BOT_CLASS_NONE)
+            {
+                handler->PSendSysMessage("Unknown bot name or class {}!", class_name);
+                return true;
+            }
+
+            std::list<Creature*> cBots = owner->GetBotMgr()->GetAllBotsByClass(bot_class);
+
+            if (cBots.empty())
+            {
+                handler->PSendSysMessage("No bots of class {} found!", bot_class);
+                return true;
+            }
+
+            bot = cBots.size() == 1 ? cBots.front() : Acore::Containers::SelectRandomContainerElement(cBots);
+
+            if (!bot)
+            {
+                handler->SendSysMessage("None of {} found bots can use pull yet!", cBots.size());
+                return true;
+            }
+        }
+
+        ObjectGuid target_guid = ObjectGuid::Empty;
+        bool token_valid = true;
+        if (!target_token || target_token == "mytarget")
+            target_guid = owner->GetTarget();
+        else if (Group const* group = owner->GetGroup())
+        {
+            if (target_token == "star")
+                target_guid = group->GetTargetIcons()[0];
+            else if (target_token == "circle")
+                target_guid = group->GetTargetIcons()[1];
+            else if (target_token == "diamond")
+                target_guid = group->GetTargetIcons()[2];
+            else if (target_token == "triangle")
+                target_guid = group->GetTargetIcons()[3];
+            else if (target_token == "moon")
+                target_guid = group->GetTargetIcons()[4];
+            else if (target_token == "square")
+                target_guid = group->GetTargetIcons()[5];
+            else if (target_token == "cross")
+                target_guid = group->GetTargetIcons()[6];
+            else if (target_token == "skull")
+                target_guid = group->GetTargetIcons()[7];
+            else if (target_token->size() == 1u && std::isdigit(target_token->front()))
+            {
+                uint8 digit = static_cast<uint8>(std::stoi(std::string(*target_token)));
+                switch (digit)
+                {
+                    case 1: case 2: case 3: case 4: case 5: case 6: case 7: case 8:
+                        target_guid = group->GetTargetIcons()[digit - 1];
+                        break;
+                    default:
+                        token_valid = false;
+                        break;
+                }
+            }
+            else
+                token_valid = false;
+        }
+        else
+            token_valid = false;
+
+        if (!token_valid)
+        {
+            handler->PSendSysMessage("Invalid target token '{}'!", *target_token);
+            handler->SendSysMessage("Valid target tokens:\n    '','mytarget', "
+                "'star','1', 'circle','2', 'diamond','3', 'triangle','4', 'moon','5', 'square','6', 'cross','7', 'skull','8'"
+                "\nNote that target icons tokens are only available while in group");
+            return true;
+        }
+
+        Unit* target = target_guid ? ObjectAccessor::GetUnit(*owner, target_guid) : nullptr;
+        if (!target || !bot->FindMap() || target->FindMap() != bot->FindMap())
+        {
+            handler->PSendSysMessage("Invalid target '{}'!", target ? target->GetName().c_str() : "unknown");
+            return true;
+        }
+
+        bot_ai::BotOrder order(BOT_ORDER_PULL);
+        order.params.pullParams.targetGuid = target_guid.GetRawValue();
+
+        if (bot->GetBotAI()->AddOrder(std::move(order)))
+        {
+            if (DEBUG_BOT_ORDERS)
+                handler->PSendSysMessage("Order given: {}: pull {}", bot->GetName(), target ? target->GetName().c_str() : "unknown");
+        }
+        else
+        {
+            if (DEBUG_BOT_ORDERS)
+                handler->PSendSysMessage("Order failed: {}: pull {}", bot->GetName(), target ? target->GetName().c_str() : "unknown");
         }
 
         return true;

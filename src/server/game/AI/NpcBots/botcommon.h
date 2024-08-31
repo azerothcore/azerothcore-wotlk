@@ -566,7 +566,10 @@ constexpr size_t MAX_SEND_POINTS = 5u;
 enum BotOrderTypes
 {
     BOT_ORDER_NONE          = 0,
-    BOT_ORDER_SPELLCAST     = 1
+    BOT_ORDER_SPELLCAST     = 1,
+    BOT_ORDER_PULL          = 2,
+
+    BOT_ORDER_END
 };
 constexpr bool DEBUG_BOT_ORDERS = false;
 constexpr size_t MAX_BOT_ORDERS_QUEUE_SIZE = 3u;
