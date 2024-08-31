@@ -1897,7 +1897,7 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
             if (!swap && GetItemByPos(INVENTORY_SLOT_BAG_0, eslot))
                 return EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE;
 
-            // if we are swapping 2 equiped items, CanEquipUniqueItem check
+            // if we are swapping 2 equipped items, CanEquipUniqueItem check
             // should ignore the item we are trying to swap, and not the
             // destination item. CanEquipUniqueItem should ignore destination
             // item only when we are swapping weapon from bag
@@ -2645,7 +2645,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
 
         if (pItem->GetTemplate()->Bonding == BIND_WHEN_PICKED_UP ||
             pItem->GetTemplate()->Bonding == BIND_QUEST_ITEM ||
-            (pItem->GetTemplate()->Bonding == BIND_WHEN_EQUIPED && IsBagPos(pos)))
+            (pItem->GetTemplate()->Bonding == BIND_WHEN_EQUIPPED && IsBagPos(pos)))
             pItem->SetBinding(true);
 
         Bag* pBag = (bag == INVENTORY_SLOT_BAG_0) ? nullptr : GetBagByPos(bag);
@@ -2685,7 +2685,7 @@ Item* Player::_StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool
     {
         if (pItem2->GetTemplate()->Bonding == BIND_WHEN_PICKED_UP ||
             pItem2->GetTemplate()->Bonding == BIND_QUEST_ITEM ||
-            (pItem2->GetTemplate()->Bonding == BIND_WHEN_EQUIPED && IsBagPos(pos)))
+            (pItem2->GetTemplate()->Bonding == BIND_WHEN_EQUIPPED && IsBagPos(pos)))
             pItem2->SetBinding(true);
 
         pItem2->SetCount(pItem2->GetCount() + count);
@@ -2893,7 +2893,7 @@ void Player::VisualizeItem(uint8 slot, Item* pItem)
         return;
 
     // check also  BIND_WHEN_PICKED_UP and BIND_QUEST_ITEM for .additem or .additemset case by GM (not binded at adding to inventory)
-    if (pItem->GetTemplate()->Bonding == BIND_WHEN_EQUIPED || pItem->GetTemplate()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetTemplate()->Bonding == BIND_QUEST_ITEM)
+    if (pItem->GetTemplate()->Bonding == BIND_WHEN_EQUIPPED || pItem->GetTemplate()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetTemplate()->Bonding == BIND_QUEST_ITEM)
         pItem->SetBinding(true);
 
     LOG_DEBUG("entities.player.items", "STORAGE: EquipItem slot = {}, item = {}", slot, pItem->GetEntry());
