@@ -378,18 +378,17 @@ private:
 
 struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
 {
-    boss_high_nethermancer_zerevor(Creature* creature) : boss_illidari_council_memberAI(creature) { }
+    boss_high_nethermancer_zerevor(Creature* creature) : boss_illidari_council_memberAI(creature), _canCastDampenMagic(true) { }
 
     void Reset() override
     {
-        _oocScheduler.Schedule(1s, [this](TaskContext context)
-        {
-            DoCastSelf(SPELL_DAMPEN_MAGIC);
-            context.Repeat(5min);
-        });
-
         scheduler.CancelAll();
+        _canCastDampenMagic = true;
         boss_illidari_council_memberAI::Reset();
+
+        me->m_Events.AddEventAtOffset([this] {
+            DoCastSelf(SPELL_DAMPEN_MAGIC);
+        }, 1s);
     }
 
     void AttackStart(Unit* who) override
@@ -425,22 +424,31 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
         }, 10s);
 
-        _oocScheduler.CancelAll();
-
         if (Aura* aura = me->GetAura(SPELL_DAMPEN_MAGIC))
             if (aura->GetDuration() <= 4 * MINUTE * IN_MILLISECONDS)
                 DoCastSelf(SPELL_DAMPEN_MAGIC);
 
-        ScheduleTimedEvent(1min, [&]
-        {
-            DoCastSelf(SPELL_DAMPEN_MAGIC);
+        me->m_Events.AddEventAtOffset([this] {
+            _canCastDampenMagic = true;
         }, 1min);
+    }
+
+    void OnAuraRemove(AuraApplication* auraApp, AuraRemoveMode mode)
+    {
+        if (auraApp->GetBase()->GetId() == SPELL_DAMPEN_MAGIC)
+            if (mode == AURA_REMOVE_BY_ENEMY_SPELL || mode == AURA_REMOVE_BY_EXPIRE)
+                if (!CastDampenMagicIfPossible())
+                {
+                    scheduler.Schedule(1s, [this](TaskContext context)
+                    {
+                        if (!CastDampenMagicIfPossible())
+                            context.Repeat();
+                    });
+                }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        _oocScheduler.Update(diff);
-
         if (!UpdateVictim())
             return;
 
@@ -451,8 +459,27 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
             std::bind(&BossAI::DoMeleeAttackIfReady, this));
     }
 
+    bool CastDampenMagicIfPossible()
+    {
+        if (_canCastDampenMagic)
+        {
+            _canCastDampenMagic = false;
+            me->m_Events.AddEventAtOffset([this] {
+                DoCastSelf(SPELL_DAMPEN_MAGIC);
+            }, 1s);
+
+            me->m_Events.AddEventAtOffset([this] {
+                _canCastDampenMagic = true;
+            }, 1min);
+
+            return true;
+        }
+
+        return false;
+    }
+
     private:
-        TaskScheduler _oocScheduler;
+        bool _canCastDampenMagic;
 };
 
 struct boss_lady_malande : public boss_illidari_council_memberAI
