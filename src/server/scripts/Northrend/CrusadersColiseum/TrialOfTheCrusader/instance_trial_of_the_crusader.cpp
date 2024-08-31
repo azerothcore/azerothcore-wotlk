@@ -118,7 +118,7 @@ public:
                 return true;
             if (item->ItemId == 46017) // Val'anyr, Hammer of Ancient Kings - exception, too powerful
                 return false;
-            if (item->ItemLevel == 245 && item->Bonding == BIND_WHEN_EQUIPED) // this also includes items crafted from patterns obtained in ToC 10 norm/hc
+            if (item->ItemLevel == 245 && item->Bonding == BIND_WHEN_EQUIPPED) // this also includes items crafted from patterns obtained in ToC 10 norm/hc
                 return true;
             if (validDedicatedInsanityItems.find(item->ItemId) != validDedicatedInsanityItems.end()) // list of items dropping from ToC 10 norm/hc and also items ilevel 245 buyable for emblems of triumph
                 return true;

@@ -3284,7 +3284,7 @@ class spell_gen_summon_tournament_mount : public SpellScript
         return ValidateSpellInfo({ SPELL_LANCE_EQUIPPED });
     }
 
-    SpellCastResult CheckIfLanceEquiped()
+    SpellCastResult CheckIfLanceEquipped()
     {
         if (GetCaster()->IsInDisallowedMountForm())
             GetCaster()->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
@@ -3300,7 +3300,7 @@ class spell_gen_summon_tournament_mount : public SpellScript
 
     void Register() override
     {
-        OnCheckCast += SpellCheckCastFn(spell_gen_summon_tournament_mount::CheckIfLanceEquiped);
+        OnCheckCast += SpellCheckCastFn(spell_gen_summon_tournament_mount::CheckIfLanceEquipped);
     }
 };
 
