@@ -621,4 +621,3 @@ void AddSC_boss_fathomlord_karathress()
     RegisterSpellScript(spell_karathress_power_of_tidalvess);
     RegisterSpellScript(spell_karathress_power_of_caribdis);
 }
-

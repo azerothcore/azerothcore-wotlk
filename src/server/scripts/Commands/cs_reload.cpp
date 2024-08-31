@@ -139,7 +139,6 @@ public:
             { "points_of_interest",            HandleReloadPointsOfInterestCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "prospecting_loot_template",     HandleReloadLootTemplatesProspectingCommand,   SEC_ADMINISTRATOR, Console::Yes },
             { "quest_greeting",                HandleReloadQuestGreetingCommand,              SEC_ADMINISTRATOR, Console::Yes },
-            { "quest_greeting_locale",         HandleReloadLocalesQuestGreetingCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "quest_poi",                     HandleReloadQuestPOICommand,                   SEC_ADMINISTRATOR, Console::Yes },
             { "quest_template",                HandleReloadQuestTemplateCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "reference_loot_template",       HandleReloadLootTemplatesReferenceCommand,     SEC_ADMINISTRATOR, Console::Yes },
@@ -270,7 +269,6 @@ public:
         HandleReloadQuestAreaTriggersCommand(handler);
         HandleReloadQuestPOICommand(handler);
         HandleReloadQuestTemplateCommand(handler);
-        HandleReloadLocalesQuestGreetingCommand(handler);
 
         LOG_INFO("server.loading", "Reloading Quests Relations...");
         sObjectMgr->LoadQuestStartersAndEnders();
@@ -556,13 +554,8 @@ public:
         LOG_INFO("server.loading", "Reloading Quest Greeting ...");
         sObjectMgr->LoadQuestGreetings();
         handler->SendGlobalGMSysMessage("DB table `quest_greeting` reloaded.");
-        return true;
-    }
-
-    static bool HandleReloadLocalesQuestGreetingCommand(ChatHandler* handler)
-    {
         LOG_INFO("server.loading", "Reloading Quest Greeting locales...");
-        sObjectMgr->LoadQuestGreetingsLocales();
+        sObjectMgr->LoadQuestGreetingsLocales(); // Must be after LoadQuestGreetings()
         handler->SendGlobalGMSysMessage("DB table `quest_greeting_locale` reloaded.");
         return true;
     }

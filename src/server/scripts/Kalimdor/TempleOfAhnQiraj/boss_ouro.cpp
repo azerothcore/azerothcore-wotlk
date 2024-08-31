@@ -75,7 +75,7 @@ struct npc_ouro_spawner : public ScriptedAI
     void MoveInLineOfSight(Unit* who) override
     {
         // Spawn Ouro on LoS check
-        if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 40.0f) && !who->ToPlayer()->IsGameMaster())
+        if (!hasSummoned && who->IsPlayer() && me->IsWithinDistInMap(who, 40.0f) && !who->ToPlayer()->IsGameMaster())
         {
             if (InstanceScript* instance = me->GetInstanceScript())
             {
