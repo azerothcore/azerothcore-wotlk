@@ -146,9 +146,10 @@ struct boss_illidari_council : public BossAI
 
     void DoAction(int32 param) override
     {
-        if (!me->isActiveObject() && param == ACTION_START_ENCOUNTER)
+        if (param == ACTION_START_ENCOUNTER)
         {
-            me->setActive(true);
+            if (!me->isActiveObject())
+                me->setActive(true);
 
             bool spoken = false;
 
