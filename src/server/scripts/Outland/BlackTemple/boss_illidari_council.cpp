@@ -425,12 +425,12 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
         }, 10s);
 
         if (Aura* aura = me->GetAura(SPELL_DAMPEN_MAGIC))
+        {
             if (aura->GetDuration() <= 4 * MINUTE * IN_MILLISECONDS)
-                DoCastSelf(SPELL_DAMPEN_MAGIC);
-
-        me->m_Events.AddEventAtOffset([this] {
-            _canCastDampenMagic = true;
-        }, 1min);
+                CastDampenMagicIfPossible();
+        }
+        else
+            CastDampenMagicIfPossible(); // Didn't find the aura, so recast it.
     }
 
     void OnAuraRemove(AuraApplication* auraApp, AuraRemoveMode mode) override
@@ -464,9 +464,10 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
         if (_canCastDampenMagic)
         {
             _canCastDampenMagic = false;
-            me->m_Events.AddEventAtOffset([this] {
+            scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
                 DoCastSelf(SPELL_DAMPEN_MAGIC);
-            }, 1s);
+            });
 
             me->m_Events.AddEventAtOffset([this] {
                 _canCastDampenMagic = true;
