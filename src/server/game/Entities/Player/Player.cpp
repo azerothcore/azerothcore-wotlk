@@ -10644,7 +10644,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         if (!bStore)
             AutoUnequipOffhandIfNeed();
 
-        if (pProto->Flags & ITEM_FLAG_ITEM_PURCHASE_RECORD && crItem->ExtendedCost && pProto->GetMaxStackSize() == 1)
+        if (pProto->HasFlag(ITEM_FLAG_ITEM_PURCHASE_RECORD) && crItem->ExtendedCost && pProto->GetMaxStackSize() == 1)
         {
             it->SetFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
             it->SetRefundRecipient(GetGUID().GetCounter());
@@ -10692,7 +10692,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         return false;
     }
 
-    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId(true) == TEAM_HORDE)))
+    if (!IsGameMaster() && ((pProto->HasFlag2(ITEM_FLAG2_FACTION_HORDE) && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE) && GetTeamId(true) == TEAM_HORDE)))
     {
         return false;
     }
@@ -11722,7 +11722,7 @@ void Player::SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint3
 
 void Player::ApplyEquipCooldown(Item* pItem)
 {
-    if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_NO_EQUIP_COOLDOWN))
+    if (pItem->GetTemplate()->HasFlag(ITEM_FLAG_NO_EQUIP_COOLDOWN))
         return;
 
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
@@ -13765,7 +13765,7 @@ InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limi
 InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot, uint32 limit_count) const
 {
     // check unique-equipped on item
-    if (itemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
+    if (itemProto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE))
     {
         // there is an equip limit on this item
         if (HasItemOrGemWithIdEquipped(itemProto->ItemId, 1, except_slot))
@@ -15471,7 +15471,7 @@ void Player::SendRefundInfo(Item* item)
     // This function call unsets ITEM_FLAGS_REFUNDABLE if played time is over 2 hours.
     item->UpdatePlayedTime(this);
 
-    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
+    if (!item->IsRefundable())
     {
         LOG_DEBUG("entities.player.items", "Item refund: item not refundable!");
         return;
@@ -15539,7 +15539,7 @@ PetStable& Player::GetOrInitPetStable()
 
 void Player::RefundItem(Item* item)
 {
-    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
+    if (!item->IsRefundable())
     {
         LOG_DEBUG("entities.player.items", "Item refund: item not refundable!");
         return;

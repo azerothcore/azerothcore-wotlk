@@ -2296,12 +2296,12 @@ InventoryResult Player::CanUseItem(ItemTemplate const* proto) const
         return EQUIP_ERR_ITEM_NOT_FOUND;
     }
 
-    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY) && GetTeamId(true) != TEAM_HORDE)
+    if (proto->HasFlag2(ITEM_FLAG2_FACTION_HORDE) && GetTeamId(true) != TEAM_HORDE)
     {
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
     }
 
-    if ((proto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) && GetTeamId(true) != TEAM_ALLIANCE)
+    if (proto->HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE) && GetTeamId(true) != TEAM_ALLIANCE)
     {
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
     }
@@ -3030,7 +3030,7 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
         // in case trade we already have item in other player inventory
         pLastItem->SetState(in_characterInventoryDB ? ITEM_CHANGED : ITEM_NEW, this);
 
-        if (pLastItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
+        if (pLastItem->IsBOPTradable())
             AddTradeableItem(pLastItem);
     }
 }
@@ -3047,7 +3047,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             for (uint8 i = 0; i < MAX_BAG_SIZE; ++i)
                 DestroyItem(slot, i, update);
 
-        if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
+        if (pItem->IsWrapped())
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
             stmt->SetData(0, pItem->GetGUID().GetCounter());
@@ -3117,7 +3117,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             pBag->RemoveItem(slot, update);
 
         // Xinef: item is removed, remove loot from storage if any
-        if (proto->Flags & ITEM_FLAG_HAS_LOOT)
+        if (proto->HasFlag(ITEM_FLAG_HAS_LOOT))
             sLootItemStorage->RemoveStoredLoot(pItem->GetGUID());
 
         if (IsInWorld() && update)
@@ -4169,7 +4169,7 @@ void Player::UpdateItemDuration(uint32 time, bool realtimeonly)
         Item* item = *itr;
         ++itr;                                              // current element can be erased in UpdateDuration
 
-        if (!realtimeonly || item->GetTemplate()->FlagsCu & ITEM_FLAGS_CU_DURATION_REAL_TIME)
+        if (!realtimeonly || item->GetTemplate()->HasFlagCu(ITEM_FLAGS_CU_DURATION_REAL_TIME))
             item->UpdateDuration(this, time);
     }
 }
@@ -5999,13 +5999,13 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                 remove = true;
             }
                 // "Conjured items disappear if you are logged out for more than 15 minutes"
-            else if (timeDiff > 15 * MINUTE && proto->Flags & ITEM_FLAG_CONJURED)
+            else if (timeDiff > 15 * MINUTE && proto->HasFlag(ITEM_FLAG_CONJURED))
             {
                 LOG_DEBUG("entities.player.loading", "Player::_LoadInventory: player ({}, name: '{}', diff: {}) has conjured item ({}, entry: {}) with expired lifetime (15 minutes). Deleting item.",
                           GetGUID().ToString(), GetName(), timeDiff, item->GetGUID().ToString(), item->GetEntry());
                 remove = true;
             }
-            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
+            else if (item->IsRefundable())
             {
                 if (item->GetPlayedTime() > (2 * HOUR))
                 {
@@ -6038,7 +6038,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                     }
                 }
             }
-            else if (item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
+            else if (item->IsBOPTradable())
             {
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_BOP_TRADE);
                 stmt->SetData(0, item->GetGUID().GetCounter());
@@ -7266,7 +7266,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
         if (item->GetState() == ITEM_NEW)
         {
             // Xinef: item is removed, remove loot from storage if any
-            if (item->GetTemplate()->Flags & ITEM_FLAG_HAS_LOOT)
+            if (item->GetTemplate()->HasFlag(ITEM_FLAG_HAS_LOOT))
                 sLootItemStorage->RemoveStoredLoot(item->GetGUID());
             continue;
         }
@@ -7281,7 +7281,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
         m_items[i]->FSetState(ITEM_NEW);
 
         // Xinef: item is removed, remove loot from storage if any
-        if (item->GetTemplate()->Flags & ITEM_FLAG_HAS_LOOT)
+        if (item->GetTemplate()->HasFlag(ITEM_FLAG_HAS_LOOT))
             sLootItemStorage->RemoveStoredLoot(item->GetGUID());
     }
 
