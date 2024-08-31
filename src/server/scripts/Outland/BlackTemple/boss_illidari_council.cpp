@@ -464,10 +464,20 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
         if (_canCastDampenMagic)
         {
             _canCastDampenMagic = false;
-            scheduler.Schedule(1s, [this](TaskContext /*context*/)
+
+            if (me->IsInCombat())
             {
-                DoCastSelf(SPELL_DAMPEN_MAGIC);
-            });
+                scheduler.Schedule(1s, [this](TaskContext /*context*/)
+                {
+                    DoCastSelf(SPELL_DAMPEN_MAGIC);
+                });
+            }
+            else
+            {
+                me->m_Events.AddEventAtOffset([this] {
+                    DoCastSelf(SPELL_DAMPEN_MAGIC);
+                }, 1min);
+            }
 
             me->m_Events.AddEventAtOffset([this] {
                 _canCastDampenMagic = true;
