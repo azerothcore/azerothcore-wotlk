@@ -212,14 +212,7 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-        for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
-            if (Unit* target = ObjectAccessor::GetUnit(*GetCaster(), ihit->targetGUID))
-            {
-                dest.Relocate(*target);
-                if (roll_chance_i(50))
-                    break;
-            }
+        dest.Relocate(GetCaster()->GetRandomNearPosition(50.0f));
     }
 
     void HandleTeleportUnits(SpellEffIndex  /*effIndex*/)
