@@ -146,9 +146,10 @@ struct boss_illidari_council : public BossAI
 
     void DoAction(int32 param) override
     {
-        if (!me->isActiveObject() && param == ACTION_START_ENCOUNTER)
+        if (param == ACTION_START_ENCOUNTER)
         {
-            me->setActive(true);
+            if (!me->isActiveObject())
+                me->setActive(true);
 
             bool spoken = false;
 
@@ -231,7 +232,12 @@ struct boss_illidari_council_memberAI : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        me->SetOwnerGUID(ObjectGuid::Empty);
+        if (Unit* council = me->GetOwner())
+        {
+            me->SetOwnerGUID(ObjectGuid::Empty); // Set owner here to avoid infinite loop of evade calls
+            if (council->ToCreature()->AI())
+                council->ToCreature()->AI()->EnterEvadeMode(why);
+        }
         ScriptedAI::EnterEvadeMode(why);
     }
 
