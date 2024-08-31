@@ -2034,7 +2034,7 @@ bool Creature::CanStartAttack(Unit const* who) const
 
     // This set of checks is should be done only for creatures
     if ((IsImmuneToNPC() && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
-        (IsImmuneToPC() && who->GetTypeId() == TYPEID_PLAYER))         // immune to PC and target is a player, return false
+        (IsImmuneToPC() && who->IsPlayer()))         // immune to PC and target is a player, return false
     {
         //npcbot: allow attacking PvP free bots
         /*
@@ -2047,7 +2047,7 @@ bool Creature::CanStartAttack(Unit const* who) const
     }
 
     if (Unit* owner = who->GetOwner())
-        if (owner->GetTypeId() == TYPEID_PLAYER && IsImmuneToPC())     // immune to PC and target has player owner
+        if (owner->IsPlayer() && IsImmuneToPC())     // immune to PC and target has player owner
             return false;
 
     // Do not attack non-combat pets
@@ -2081,11 +2081,21 @@ bool Creature::CanStartAttack(Unit const* who) const
     return IsWithinLOSInMap(who);
 }
 
-void Creature::setDeathState(DeathState s, bool despawn)
+/**
+ * @brief A creature can be in 4 different states: Alive, JustDied, Corpse, and JustRespawned. The cycle follows the next order:
+ * - Alive: The creature is alive and has spawned in the world
+ * - JustDied: The creature has just died. This is the state just before his body appeared
+ * - Corpse: The creature has been removed from the world, and this corpse has been spawned
+ * - JustRespawned: The creature has just respawned. Follow when the corpse disappears and the respawn timer is finished
+ *
+ * @param state Specify one of 4 states above
+ * @param despawn Despawn the creature immediately, without waiting for any movement to finish
+ */
+void Creature::setDeathState(DeathState state, bool despawn)
 {
-    Unit::setDeathState(s, despawn);
+    Unit::setDeathState(state, despawn);
 
-    if (s == DeathState::JustDied)
+    if (state == DeathState::JustDied)
     {
         _lastDamagedTime.reset();
 
@@ -2096,10 +2106,10 @@ void Creature::setDeathState(DeathState s, bool despawn)
         if (GetMap()->IsDungeon() || isWorldBoss() || GetCreatureTemplate()->rank >= CREATURE_ELITE_ELITE)
             SaveRespawnTime();
 
-        SetTarget();                // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
+        SetTarget();    // remove target selection in any cases (can be set at aura remove in Unit::setDeathState)
         ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
 
-        Dismount(); // if creature is mounted on a virtual mount, remove it at death
+        Dismount();     // if creature is mounted on a virtual mount, remove it at death
 
         setActive(false);
 
@@ -2121,10 +2131,8 @@ void Creature::setDeathState(DeathState s, bool despawn)
 
         Unit::setDeathState(DeathState::Corpse, despawn);
     }
-    else if (s == DeathState::JustRespawned)
+    else if (state == DeathState::JustRespawned)
     {
-        //if (IsPet())
-        //    setActive(true);
         SetFullHealth();
         SetLootRecipient(nullptr);
         ResetPlayerDamageReq();
@@ -2152,6 +2160,9 @@ void Creature::setDeathState(DeathState s, bool despawn)
     }
 }
 
+/**
+ * @param force Force the respawn by killing the creature.
+ */
 void Creature::Respawn(bool force)
 {
     //npcbot
@@ -2181,7 +2192,7 @@ void Creature::Respawn(bool force)
     }
 
     bool allowed = !IsAIEnabled || AI()->CanRespawn(); // First check if there are any scripts that prevent us respawning
-    if (!allowed && !force)                                               // Will be rechecked on next Update call
+    if (!allowed && !force) // Will be rechecked on next Update call
         return;
 
     ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
@@ -2223,8 +2234,7 @@ void Creature::Respawn(bool force)
 
             setDeathState(DeathState::JustRespawned);
 
-            // MDic - Acidmanifesto
-            // Do not override transform auras
+            // MDic - Acidmanifesto: Do not override transform auras
             if (GetAuraEffectsByType(SPELL_AURA_TRANSFORM).empty())
             {
                 CreatureModel display(GetNativeDisplayId(), GetNativeObjectScale(), 1.0f);
@@ -2243,7 +2253,7 @@ void Creature::Respawn(bool force)
             {
                 //reset the AI to be sure no dirty or uninitialized values will be used till next tick
                 AI()->Reset();
-                TriggerJustRespawned = true;//delay event to next tick so all creatures are created on the map before processing
+                TriggerJustRespawned = true;  //delay event to next tick so all creatures are created on the map before processing
             }
 
             uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
@@ -2261,7 +2271,7 @@ void Creature::Respawn(bool force)
         UpdateObjectVisibility(false);
 
     }
-    else                                // the master is dead
+    else   // the master is dead
     {
         ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
         if (targetGuid == dbtableHighGuid) // if linking self, never respawn (check delayed to next day)
@@ -2294,7 +2304,7 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn, Seconds forceRespawnTimer)
     if (IsAlive())
         setDeathState(DeathState::JustDied, true);
 
-    // Xinef: set new respawn time, ignore corpse decay time...
+    // Xinef: Set new respawn time, ignore corpse decay time...
     RemoveCorpse(true);
 
     if (forceRespawnTimer > Seconds::zero())
@@ -2340,8 +2350,6 @@ void Creature::InitializeReactState()
         SetReactState(REACT_PASSIVE);
     else
         SetReactState(REACT_AGGRESSIVE);
-    /*else if (IsCivilian())
-    SetReactState(REACT_DEFENSIVE);*/
 }
 
 bool Creature::HasMechanicTemplateImmunity(uint32 mask) const
@@ -2506,8 +2514,7 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
         float range = spellInfo->GetMaxRange(true);
         float minrange = spellInfo->GetMinRange(true);
         float dist = GetDistance(victim);
-        //if (!isInFront(victim, range) && spellInfo->AttributesEx)
-        //    continue;
+
         if (dist > range || dist < minrange)
             continue;
         if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasUnitFlag(UNIT_FLAG_SILENCED))
@@ -2519,7 +2526,9 @@ SpellInfo const* Creature::reachWithSpellCure(Unit* victim)
     return nullptr;
 }
 
-// select nearest hostile unit within the given distance (regardless of threat list).
+/**
+ * @brief Select nearest hostile unit within the given distance (regardless of threat list).
+ */
 Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) const
 {
     if (dist == 0.0f)
@@ -2535,7 +2544,9 @@ Unit* Creature::SelectNearestTarget(float dist, bool playerOnly /* = false */) c
     return target;
 }
 
-// select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
+/**
+ * @brief Select nearest hostile unit within the given attack distance (i.e. distance is ignored if > than ATTACK_DISTANCE), regardless of threat list.
+ */
 Unit* Creature::SelectNearestTargetInAttackDistance(float dist) const
 {
     if (dist < ATTACK_DISTANCE)
@@ -2788,7 +2799,7 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
         return false;
 
     // cannot attack if is during 5 second grace period, unless being attacked
-    if (m_respawnedTime && (GameTime::GetGameTime().count() - m_respawnedTime) < 5 && victim->getAttackers().empty())
+    if (m_respawnedTime && (GameTime::GetGameTime().count() - m_respawnedTime) < 5 && !GetLastDamagedTime())
     {
         return false;
     }
@@ -2954,6 +2965,9 @@ uint32 Creature::GetShieldBlockValue() const
     return (GetLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20));
 }
 
+/**
+ * @brief Set in combat all units in the dungeon/raid. Affect only units with IsAIEnabled.
+ */
 void Creature::SetInCombatWithZone()
 {
     if (IsAIEnabled)
@@ -3337,6 +3351,9 @@ bool Creature::IsImmuneToKnockback() const
     return cinfo && (cinfo->flags_extra & CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK);
 }
 
+/**
+ * @brief Enable or disable the creature's walk mode by removing: MOVEMENTFLAG_WALKING. Infom also the client
+ */
 bool Creature::SetWalk(bool enable)
 {
     if (!Unit::SetWalk(enable))
@@ -3348,6 +3365,9 @@ bool Creature::SetWalk(bool enable)
     return true;
 }
 
+/**
+ * @brief Enable or disable the creature's fly mode by adding or removing: MOVEMENTFLAG_FLYING. Infom also the client
+ */
 bool Creature::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool updateAnimationTier /*= true*/)
 {
     //! It's possible only a packet is sent but moveflags are not updated

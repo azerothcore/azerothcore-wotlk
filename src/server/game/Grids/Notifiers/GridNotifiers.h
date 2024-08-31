@@ -107,7 +107,7 @@ namespace Acore
         bool required3dDist;
         MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr, bool req3dDist = false)
             : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
-            , teamId((own_team_only && src->GetTypeId() == TYPEID_PLAYER) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
+            , teamId((own_team_only && src->IsPlayer()) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
             , skipped_receiver(skipped), required3dDist(req3dDist)
         {
         }
@@ -978,7 +978,7 @@ namespace Acore
         AnyFriendlyUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool playerOnly = false) : i_obj(obj), i_funit(funit), i_range(range), i_playerOnly(playerOnly) {}
         bool operator()(Unit* u)
         {
-            if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsFriendlyTo(u) && (!i_playerOnly || u->GetTypeId() == TYPEID_PLAYER))
+            if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsFriendlyTo(u) && (!i_playerOnly || u->IsPlayer()))
                 return true;
             else
                 return false;
@@ -996,7 +996,7 @@ namespace Acore
         AnyFriendlyNotSelfUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool playerOnly = false) : i_obj(obj), i_funit(funit), i_range(range), i_playerOnly(playerOnly) {}
         bool operator()(Unit* u)
         {
-            if (u != i_obj && u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsFriendlyTo(u) && (!i_playerOnly || u->GetTypeId() == TYPEID_PLAYER))
+            if (u != i_obj && u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsFriendlyTo(u) && (!i_playerOnly || u->IsPlayer()))
                 return true;
             else
                 return false;
@@ -1083,8 +1083,8 @@ namespace Acore
             Unit const* owner = i_funit->GetOwner();
             if (owner)
                 check = owner;
-            i_targetForPlayer = (check->GetTypeId() == TYPEID_PLAYER);
-            if (i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT)
+            i_targetForPlayer = (check->IsPlayer());
+            if (i_obj->IsDynamicObject())
                 _spellInfo = sSpellMgr->GetSpellInfo(((DynamicObject*)i_obj)->GetSpellId());
         }
         bool operator()(Unit* u)
@@ -1104,7 +1104,8 @@ namespace Acore
 
             }
 
-            if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->GetTypeId() == TYPEID_DYNAMICOBJECT ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range,true,false))
+            if (i_funit->_IsValidAttackTarget(u, _spellInfo, i_obj->IsDynamicObject() ? i_obj : nullptr) && i_obj->IsWithinDistInMap(u, i_range,true,false))
+
                 return true;
 
             return false;
@@ -1487,7 +1488,7 @@ namespace Acore
             }
 
             Player* player = nullptr;
-            if (u->GetTypeId() == TYPEID_PLAYER)
+            if (u->IsPlayer())
             {
                 player = u->ToPlayer();
             }

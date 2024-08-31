@@ -159,4 +159,3 @@ void AddSC_boss_ghazan()
     RegisterUnderbogCreatureAI(boss_ghazan);
     new at_underbog_ghazan();
 }
-

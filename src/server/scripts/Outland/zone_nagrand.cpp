@@ -489,4 +489,3 @@ void AddSC_nagrand()
     new npc_kurenai_captive();
     new go_warmaul_prison();
 }
-

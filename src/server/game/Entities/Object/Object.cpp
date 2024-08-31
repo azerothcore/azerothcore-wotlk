@@ -90,7 +90,7 @@ WorldObject::~WorldObject()
     // this may happen because there are many !create/delete
     if (IsWorldObject() && m_currMap)
     {
-        if (GetTypeId() == TYPEID_CORPSE)
+        if (IsCorpse())
         {
             LOG_FATAL("entities.object", "Object::~Object Corpse {}, type={} deleted but still in map!!", GetGUID().ToString(), ((Corpse*)this)->GetType());
             ABORT();
@@ -403,7 +403,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
 
             *data << object->GetOrientation();
 
-            if (GetTypeId() == TYPEID_CORPSE)
+            if (IsCorpse())
                 *data << float(object->GetOrientation());
             else
                 *data << float(0);
@@ -1087,7 +1087,7 @@ void WorldObject::setActive(bool on)
     if (m_isActive == on)
         return;
 
-    if (GetTypeId() == TYPEID_PLAYER)
+    if (IsPlayer())
         return;
 
     //npcbot: bots should never be removed from active
@@ -1108,7 +1108,7 @@ void WorldObject::setActive(bool on)
     {
         if (GetTypeId() == TYPEID_UNIT)
             map->AddToActive(this->ToCreature());
-        else if (GetTypeId() == TYPEID_DYNAMICOBJECT)
+        else if (IsDynamicObject())
             map->AddToActive((DynamicObject*)this);
         else if (GetTypeId() == TYPEID_GAMEOBJECT)
             map->AddToActive((GameObject*)this);
@@ -1117,7 +1117,7 @@ void WorldObject::setActive(bool on)
     {
         if (GetTypeId() == TYPEID_UNIT)
             map->RemoveFromActive(this->ToCreature());
-        else if (GetTypeId() == TYPEID_DYNAMICOBJECT)
+        else if (IsDynamicObject())
             map->RemoveFromActive((DynamicObject*)this);
         else if (GetTypeId() == TYPEID_GAMEOBJECT)
             map->RemoveFromActive((GameObject*)this);
@@ -1127,7 +1127,7 @@ void WorldObject::setActive(bool on)
 void WorldObject::SetVisibilityDistanceOverride(VisibilityDistanceType type)
 {
     ASSERT(type < VisibilityDistanceType::Max);
-    if (GetTypeId() == TYPEID_PLAYER)
+    if (IsPlayer())
     {
         return;
     }
@@ -1338,7 +1338,7 @@ bool WorldObject::IsWithinLOS(float ox, float oy, float oz, VMAP::ModelIgnoreFla
     {
         oz += GetCollisionHeight();
         float x, y, z;
-        if (GetTypeId() == TYPEID_PLAYER)
+        if (IsPlayer())
         {
             GetPosition(x, y, z);
             z += GetCollisionHeight();
@@ -1359,7 +1359,7 @@ bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlag
         return false;
 
     float ox, oy, oz;
-    if (obj->GetTypeId() == TYPEID_PLAYER)
+    if (obj->IsPlayer())
     {
         obj->GetPosition(ox, oy, oz);
         oz += obj->GetCollisionHeight();
@@ -1368,7 +1368,7 @@ bool WorldObject::IsWithinLOSInMap(WorldObject const* obj, VMAP::ModelIgnoreFlag
         obj->GetHitSpherePointFor({ GetPositionX(), GetPositionY(), GetPositionZ() + (collisionHeight ? *collisionHeight : GetCollisionHeight()) }, ox, oy, oz);
 
     float x, y, z;
-    if (GetTypeId() == TYPEID_PLAYER)
+    if (IsPlayer())
     {
         GetPosition(x, y, z);
         z += GetCollisionHeight();
@@ -1643,7 +1643,7 @@ float WorldObject::GetGridActivationRange() const
     {
         return ToCreature()->m_SightDistance;
     }
-    else if (((GetTypeId() == TYPEID_GAMEOBJECT && ToGameObject()->IsTransport()) || GetTypeId() == TYPEID_DYNAMICOBJECT) && isActiveObject())
+    else if (((GetTypeId() == TYPEID_GAMEOBJECT && ToGameObject()->IsTransport()) || IsDynamicObject()) && isActiveObject())
     {
         return GetMap()->GetVisibilityRange();
     }
@@ -1771,7 +1771,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
     }
 
     // pussywizard: arena spectator
-    if (obj->GetTypeId() == TYPEID_PLAYER)
+    if (obj->IsPlayer())
         if (((Player const*)obj)->IsSpectator() && ((Player const*)obj)->FindMap()->IsBattleArena())
             return false;
 
@@ -1867,7 +1867,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         return false;
 
     // pussywizard: arena spectator
-    if (this->GetTypeId() == TYPEID_PLAYER)
+    if (this->IsPlayer())
         if (((Player const*)this)->IsSpectator() && ((Player const*)this)->FindMap()->IsBattleArena() && (obj->m_invisibility.GetFlags() || obj->m_stealth.GetFlags()))
             return false;
 
@@ -2064,7 +2064,7 @@ bool WorldObject::CanDetectStealthOf(WorldObject const* obj, bool checkAlert) co
         Unit const* unit = ToUnit();
 
         // If this unit is an NPC then player detect range doesn't apply
-        if (unit && unit->GetTypeId() == TYPEID_PLAYER && visibilityRange > MAX_PLAYER_STEALTH_DETECT_RANGE)
+        if (unit && unit->IsPlayer() && visibilityRange > MAX_PLAYER_STEALTH_DETECT_RANGE)
             visibilityRange = MAX_PLAYER_STEALTH_DETECT_RANGE;
 
         if (checkAlert)
@@ -2087,7 +2087,7 @@ void WorldObject::SendPlayMusic(uint32 Music, bool OnlySelf)
 {
     WorldPacket data(SMSG_PLAY_MUSIC, 4);
     data << Music;
-    if (OnlySelf && GetTypeId() == TYPEID_PLAYER)
+    if (OnlySelf && IsPlayer())
         this->ToPlayer()->GetSession()->SendPacket(&data);
     else
         SendMessageToSet(&data, true); // ToSelf ignored in this case
@@ -2447,7 +2447,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     if (respawnTime)
         go->SetSpellId(1);
 
-    if (GetTypeId() == TYPEID_PLAYER || (GetTypeId() == TYPEID_UNIT && summonType == GO_SUMMON_TIMED_OR_CORPSE_DESPAWN)) //not sure how to handle this
+    if (IsPlayer() || (GetTypeId() == TYPEID_UNIT && summonType == GO_SUMMON_TIMED_OR_CORPSE_DESPAWN)) //not sure how to handle this
         ToUnit()->AddGameObject(go);
     else
         go->SetSpawnedByDefault(false);
@@ -2464,7 +2464,7 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint3
         return nullptr;
 
     //summon->SetName(GetName());
-    if (setLevel && (GetTypeId() == TYPEID_PLAYER || GetTypeId() == TYPEID_UNIT))
+    if (setLevel && (IsPlayer() || GetTypeId() == TYPEID_UNIT))
     {
         summon->SetFaction(((Unit*)this)->GetFaction());
         summon->SetLevel(((Unit*)this)->GetLevel());

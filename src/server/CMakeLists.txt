@@ -24,4 +24,3 @@ if (BUILD_APPLICATION_WORLDSERVER)
   add_subdirectory(game)
   add_subdirectory(scripts)
 endif()
-

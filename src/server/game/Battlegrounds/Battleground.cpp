@@ -494,13 +494,19 @@ inline void Battleground::_ProcessProgress(uint32 diff)
         if (newtime > (MINUTE * IN_MILLISECONDS))
         {
             if (newtime / (MINUTE * IN_MILLISECONDS) != m_PrematureCountDownTimer / (MINUTE * IN_MILLISECONDS))
-                PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING, CHAT_MSG_SYSTEM, nullptr, (uint32)(m_PrematureCountDownTimer / (MINUTE * IN_MILLISECONDS)));
+                GetBgMap()->DoForAllPlayers([&](Player* player)
+                    {
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING, (uint32)(m_PrematureCountDownTimer / (MINUTE * IN_MILLISECONDS)));
+                    });
         }
         else
         {
             //announce every 15 seconds
             if (newtime / (15 * IN_MILLISECONDS) != m_PrematureCountDownTimer / (15 * IN_MILLISECONDS))
-                PSendMessageToAll(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS, CHAT_MSG_SYSTEM, nullptr, (uint32)(m_PrematureCountDownTimer / IN_MILLISECONDS));
+                GetBgMap()->DoForAllPlayers([&](Player* player)
+                    {
+                        ChatHandler(player->GetSession()).PSendSysMessage(LANG_BATTLEGROUND_PREMATURE_FINISH_WARNING_SECS, (uint32)(m_PrematureCountDownTimer / IN_MILLISECONDS));
+                    });
         }
         m_PrematureCountDownTimer = newtime;
     }
@@ -1964,63 +1970,6 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
                    type, entry, m_MapId, m_InstanceID);
     EndNow();
     return false;
-}
-
-void Battleground::SendMessageToAll(uint32 entry, ChatMsg type, Player const* source)
-{
-    if (!entry)
-        return;
-
-    Acore::BattlegroundChatBuilder bg_builder(type, entry, source);
-    Acore::LocalizedPacketDo<Acore::BattlegroundChatBuilder> bg_do(bg_builder);
-    BroadcastWorker(bg_do);
-}
-
-void Battleground::PSendMessageToAll(uint32 entry, ChatMsg type, Player const* source, ...)
-{
-    if (!entry)
-        return;
-
-    va_list ap;
-    va_start(ap, source);
-
-    Acore::BattlegroundChatBuilder bg_builder(type, entry, source, &ap);
-    Acore::LocalizedPacketDo<Acore::BattlegroundChatBuilder> bg_do(bg_builder);
-    BroadcastWorker(bg_do);
-
-    va_end(ap);
-}
-
-void Battleground::SendWarningToAll(uint32 entry, ...)
-{
-    if (!entry)
-        return;
-
-    std::map<uint32, WorldPacket> localizedPackets;
-    for (BattlegroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-    {
-        if (localizedPackets.find(itr->second->GetSession()->GetSessionDbLocaleIndex()) == localizedPackets.end())
-        {
-            char const* format = sObjectMgr->GetAcoreString(entry, itr->second->GetSession()->GetSessionDbLocaleIndex());
-
-            char str[1024];
-            va_list ap;
-            va_start(ap, entry);
-            vsnprintf(str, 1024, format, ap);
-            va_end(ap);
-
-            ChatHandler::BuildChatPacket(localizedPackets[itr->second->GetSession()->GetSessionDbLocaleIndex()], CHAT_MSG_RAID_BOSS_EMOTE, LANG_UNIVERSAL, nullptr, nullptr, str);
-        }
-
-        itr->second->SendDirectMessage(&localizedPackets[itr->second->GetSession()->GetSessionDbLocaleIndex()]);
-    }
-}
-
-void Battleground::SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 arg1, uint32 arg2)
-{
-    Acore::Battleground2ChatBuilder bg_builder(type, entry, source, arg1, arg2);
-    Acore::LocalizedPacketDo<Acore::Battleground2ChatBuilder> bg_do(bg_builder);
-    BroadcastWorker(bg_do);
 }
 
 void Battleground::EndNow()

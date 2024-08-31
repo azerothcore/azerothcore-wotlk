@@ -442,7 +442,7 @@ void MotionTransport::UnloadNonStaticPassengers()
 {
     for (PassengerSet::iterator itr = _passengers.begin(); itr != _passengers.end(); )
     {
-        if ((*itr)->GetTypeId() == TYPEID_PLAYER)
+        if ((*itr)->IsPlayer())
         {
             ++itr;
             continue;
@@ -525,7 +525,7 @@ bool MotionTransport::TeleportTransport(uint32 newMapid, float x, float y, float
         // Teleport players, they need to know it
         for (PassengerSet::iterator itr = _passengers.begin(); itr != _passengers.end(); ++itr)
         {
-            if ((*itr)->GetTypeId() == TYPEID_PLAYER)
+            if ((*itr)->IsPlayer())
             {
                 float destX, destY, destZ, destO;
                 (*itr)->m_movementInfo.transport.pos.GetPosition(destX, destY, destZ, destO);

@@ -158,7 +158,7 @@ struct npc_pet_mage_mirror_image : CasterAI
             _ebonGargoyleGUID.Clear();
         }
         Unit* owner = me->GetOwner();
-        if (owner && owner->GetTypeId() == TYPEID_PLAYER)
+        if (owner && owner->IsPlayer())
         {
             Unit* selection = owner->ToPlayer()->GetSelectedUnit();
 

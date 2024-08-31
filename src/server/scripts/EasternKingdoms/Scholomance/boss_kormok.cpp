@@ -213,4 +213,3 @@ void AddSC_boss_kormok()
     RegisterSpellScript(spell_kormok_summon_bone_mages);
     RegisterSpellScript(spell_kormok_summon_bone_minions);
 }
-

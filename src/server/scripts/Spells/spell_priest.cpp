@@ -118,7 +118,7 @@ class spell_pri_shadowfiend_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, shadow), 30);
 
             // xinef: Update appropriate player field
-            if (owner->GetTypeId() == TYPEID_PLAYER)
+            if (owner->IsPlayer())
                 owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
         }
     }
@@ -556,7 +556,7 @@ class spell_pri_penance : public SpellScript
         if (GetCaster() && GetCaster()->IsNPCBot())
             return true;
         //end npcbot
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* spellInfo) override
@@ -790,7 +790,7 @@ class spell_pri_renew : public AuraScript
         if (GetCaster() && GetCaster()->IsNPCBot())
             return true;
         //end npcbot
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster() && GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -982,4 +982,3 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_mind_control);
     RegisterSpellScript(spell_pri_t4_4p_bonus);
 }
-

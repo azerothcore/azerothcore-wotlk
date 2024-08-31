@@ -508,4 +508,3 @@ void AddSC_boss_archimonde()
     RegisterHyjalAI(npc_ancient_wisp);
     RegisterHyjalAI(npc_doomfire_spirit);
 }
-

@@ -247,4 +247,3 @@ void AddSC_boss_shirrak_the_dead_watcher()
     RegisterAuchenaiCryptsCreatureAI(boss_shirrak_the_dead_watcher);
     RegisterSpellScript(spell_auchenai_possess);
 }
-

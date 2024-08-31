@@ -528,7 +528,7 @@ struct npc_pet_gen_imp_in_a_bottle : public NullCreatureAI
 
         if (TempSummon* summon = me->ToTempSummon())
             if (Unit* owner = summon->GetSummonerUnit())
-                if (owner->GetTypeId() == TYPEID_PLAYER)
+                if (owner->IsPlayer())
                 {
                     _ownerGUID = owner->GetGUID();
                     if (owner->ToPlayer()->GetGroup())
@@ -837,4 +837,3 @@ void AddSC_generic_pet_scripts()
     RegisterCreatureAI(npc_pet_gen_moth);
     RegisterCreatureAI(npc_pet_darting_hatchling);
 }
-

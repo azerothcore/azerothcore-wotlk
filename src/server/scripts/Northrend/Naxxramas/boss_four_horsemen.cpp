@@ -436,4 +436,3 @@ void AddSC_boss_four_horsemen()
     new boss_four_horsemen();
     RegisterSpellScript(spell_four_horsemen_mark_aura);
 }
-

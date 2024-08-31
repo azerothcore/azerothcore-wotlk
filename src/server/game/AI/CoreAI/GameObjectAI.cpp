@@ -28,4 +28,3 @@ int32 NullGameObjectAI::Permissible(GameObject const* /*go*/)
 {
     return PERMIT_BASE_IDLE;
 }
-

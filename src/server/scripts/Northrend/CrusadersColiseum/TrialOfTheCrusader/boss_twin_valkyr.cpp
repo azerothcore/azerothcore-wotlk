@@ -499,7 +499,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void KilledUnit(Unit* who) override
     {
-        if( who->GetTypeId() == TYPEID_PLAYER )
+        if( who->IsPlayer() )
         {
             Talk(SAY_KILL_PLAYER);
             if( Creature* twin = GetSister() )
@@ -927,4 +927,3 @@ void AddSC_boss_twin_valkyr()
     new spell_valkyr_touch();
     new spell_valkyr_ball_periodic_dummy();
 }
-
