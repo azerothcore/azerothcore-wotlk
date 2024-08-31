@@ -756,17 +756,6 @@ public:
     void SetFaction(uint32 faction);
     [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
 
-    //---------- To move --------//
-    DiminishingLevels GetDiminishing(DiminishingGroup group);
-    void IncrDiminishing(DiminishingGroup group);
-    float ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, Unit* caster, DiminishingLevels Level, int32 limitduration);
-    void ApplyDiminishingAura(DiminishingGroup group, bool apply);
-    void ClearDiminishings() { m_Diminishing.clear(); }
-
-    // target dependent range checks
-    float GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
-    float GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
-
     /*********************************************************/
     /***            METHODS RELATED TO COMBATS             ***/
     /*********************************************************/
@@ -818,7 +807,7 @@ public:
     void ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply);
     void ApplyCastTimePercentMod(float val, bool apply);
 
-        void SetImmuneToAll(bool apply, bool keepCombat = false) { SetImmuneToPC(apply, keepCombat); SetImmuneToNPC(apply, keepCombat); }
+    void SetImmuneToAll(bool apply, bool keepCombat = false) { SetImmuneToPC(apply, keepCombat); SetImmuneToNPC(apply, keepCombat); }
     bool IsImmuneToAll() const { return IsImmuneToPC() && IsImmuneToNPC(); }
     void SetImmuneToPC(bool apply, bool keepCombat = false);
     bool IsImmuneToPC() const { return HasUnitFlag(UNIT_FLAG_IMMUNE_TO_PC); }
@@ -935,6 +924,16 @@ public:
     uint32 CalculateDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, uint8 itemDamagesMask = 0);
     float GetAPMultiplier(WeaponAttackType attType, bool normalized);
     //------------------------------------------------------//
+
+    DiminishingLevels GetDiminishing(DiminishingGroup group);
+    void IncrDiminishing(DiminishingGroup group);
+    float ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, Unit* caster, DiminishingLevels Level, int32 limitduration);
+    void ApplyDiminishingAura(DiminishingGroup group, bool apply);
+    void ClearDiminishings() { m_Diminishing.clear(); }
+
+    // target dependent range checks
+    float GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
+    float GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
 
     [[nodiscard]] bool CanFreeMove() const
     {
@@ -1082,6 +1081,7 @@ public:
 
         return value;
     }
+
     uint32 GetUnitMeleeSkill(Unit const* target = nullptr) const { return (target ? getLevelForTarget(target) : GetLevel()) * 5; }
     uint32 GetDefenseSkillValue(Unit const* target = nullptr) const;
     uint32 GetWeaponSkillValue(WeaponAttackType attType, Unit const* target = nullptr) const;
@@ -1280,7 +1280,7 @@ public:
     void DeleteCharmInfo();
     void UpdateCharmAI();
     //Player* GetMoverSource() const;
-    
+
     SharedVisionList const& GetSharedVisionList() { return m_sharedVision; }
     void AddPlayerToVision(Player* player);
     void RemovePlayerFromVision(Player* player);
