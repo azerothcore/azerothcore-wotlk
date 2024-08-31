@@ -214,7 +214,7 @@ enum ItemFlags2 : uint32
     ITEM_FLAG2_USED_IN_A_TRADESKILL                     = 0x80000000 // NYI
 };
 
-enum ItemFlagsCustom
+enum ItemFlagsCustom : uint32
 {
     ITEM_FLAGS_CU_DURATION_REAL_TIME    = 0x0001,   // Item duration will tick even if player is offline
     ITEM_FLAGS_CU_IGNORE_QUEST_STATUS   = 0x0002,   // No quest status will be checked when this item drops
