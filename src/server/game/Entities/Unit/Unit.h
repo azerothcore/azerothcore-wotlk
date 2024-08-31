@@ -692,8 +692,6 @@ public:
     float GetMeleeRange(Unit const* target) const;
     virtual SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const = 0;
     bool GetRandomContactPoint(Unit const* target, float& x, float& y, float& z, bool force = false) const;
-    uint32 m_extraAttacks;
-    bool m_canDualWield;
 
     void _addAttacker(Unit* pAttacker)                  // must be called only from Unit::Attack(Unit*)
     {
@@ -1207,7 +1205,6 @@ public:
     void RemoveCharmedBy(Unit* charmer);
     void RestoreFaction();
 
-    ControlSet m_Controlled;
     [[nodiscard]] Unit* GetFirstControlled() const;
     void RemoveAllControlled(bool onDeath = false);
 
@@ -1228,7 +1225,7 @@ public:
     void DeleteCharmInfo();
     void UpdateCharmAI();
     //Player* GetMoverSource() const;
-    SafeUnitPointer m_movedByPlayer;
+    
     SharedVisionList const& GetSharedVisionList() { return m_sharedVision; }
     void AddPlayerToVision(Player* player);
     void RemovePlayerFromVision(Player* player);
@@ -1408,8 +1405,7 @@ public:
 
     [[nodiscard]] virtual bool IsMovementPreventedByCasting() const;
 
-    ObjectGuid m_SummonSlot[MAX_SUMMON_SLOT];
-    ObjectGuid m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
+    
 
     [[nodiscard]] ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_2, 3)); }
     void SetShapeshiftForm(ShapeshiftForm form)
@@ -1424,17 +1420,6 @@ public:
     }
 
     [[nodiscard]] bool IsInDisallowedMountForm() const;
-
-    float m_modMeleeHitChance;
-    float m_modRangedHitChance;
-    float m_modSpellHitChance;
-    int32 m_baseSpellCritChance;
-
-    float m_threatModifier[MAX_SPELL_SCHOOL];
-    float m_modAttackSpeedPct[3];
-
-    // Event handler
-    EventProcessor m_Events;
 
     // stat system
     bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
@@ -1475,9 +1460,6 @@ public:
     [[nodiscard]] uint32 GetPhaseByAuras() const;
     void SetPhaseMask(uint32 newPhaseMask, bool update) override;// overwrite WorldObject::SetPhaseMask
     void UpdateObjectVisibility(bool forced = true, bool fromUpdate = false) override;
-
-    SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
-    uint32 m_lastSanctuaryTime;
 
     // Threat related methods
     [[nodiscard]] bool CanHaveThreatList() const;
@@ -1672,9 +1654,6 @@ public:
         }
     }
 
-    // pet auras
-    typedef std::set<PetAura const*> PetAuraSet;
-    PetAuraSet m_petAuras;
     void AddPetAura(PetAura const* petSpell);
     void RemovePetAura(PetAura const* petSpell);
     void CastPetAura(PetAura const* aura);
@@ -1690,7 +1669,6 @@ public:
     uint32 GetRedirectThreatPercent() { return _redirectThreatInfo.GetThreatPct(); }
     [[nodiscard]] Unit* GetRedirectThreatTarget() const;
 
-    bool IsAIEnabled, NeedChangeAI;
     bool CreateVehicleKit(uint32 id, uint32 creatureEntry);
     void RemoveVehicleKit();
     [[nodiscard]] Vehicle* GetVehicleKit()const { return m_vehicleKit; }
@@ -1701,9 +1679,6 @@ public:
     [[nodiscard]] ObjectGuid GetTransGUID() const override;
     /// Returns the transport this unit is on directly (if on vehicle and transport, return vehicle)
     [[nodiscard]] TransportBase* GetDirectTransport() const;
-
-    bool m_ControlledByPlayer;
-    bool m_CreatedByPlayer;
 
     bool HandleSpellClick(Unit* clicker, int8 seatId = -1);
     void EnterVehicle(Unit* base, int8 seatId = -1);
@@ -1743,17 +1718,10 @@ public:
     TempSummon* ToTempSummon() { if (IsSummon()) return reinterpret_cast<TempSummon*>(this); else return nullptr; }
     [[nodiscard]] const TempSummon* ToTempSummon() const { if (IsSummon()) return reinterpret_cast<const TempSummon*>(this); else return nullptr; }
 
-    // Safe mover
-    std::set<SafeUnitPointer*> SafeUnitPointerSet;
     void AddPointedBy(SafeUnitPointer* sup) { SafeUnitPointerSet.insert(sup); }
     void RemovePointedBy(SafeUnitPointer* sup) { SafeUnitPointerSet.erase(sup); }
     static void HandleSafeUnitPointersOnDelete(Unit* thisUnit);
-    // Relocation Nofier optimization
-    Position m_last_notify_position;
-    uint32 m_last_notify_mstime;
-    uint16 m_delayed_unit_relocation_timer;
-    uint16 m_delayed_unit_ai_notify_timer;
-    bool bRequestForcedVisibilityUpdate;
+
     void ExecuteDelayedUnitRelocationEvent();
     void ExecuteDelayedUnitAINotifyEvent();
 
@@ -1779,9 +1747,6 @@ public:
     void SetInstantCast(bool set) { _instantCast = set; }
     [[nodiscard]] bool CanInstantCast() const { return _instantCast; }
 
-    // Movement info
-    Movement::MoveSpline* movespline;
-
     virtual void Talk(std::string_view text, ChatMsg msgType, Language language, float textRange, WorldObject const* target);
     virtual void Say(std::string_view text, Language language, WorldObject const* target = nullptr);
     virtual void Yell(std::string_view text, Language language, WorldObject const* target = nullptr);
@@ -1806,17 +1771,75 @@ public:
 
     [[nodiscard]] uint32 GetOldFactionId() const { return _oldFactionId; }
 
+    //----------- Public variables ----------//
+    uint32 m_extraAttacks;
+    bool m_canDualWield;
+
+    ControlSet m_Controlled;
+
+    SafeUnitPointer m_movedByPlayer;
+
+    ObjectGuid m_SummonSlot[MAX_SUMMON_SLOT];
+    ObjectGuid m_ObjectSlot[MAX_GAMEOBJECT_SLOT];
+
+    float m_modMeleeHitChance;
+    float m_modRangedHitChance;
+    float m_modSpellHitChance;
+    int32 m_baseSpellCritChance;
+
+    float m_threatModifier[MAX_SPELL_SCHOOL];
+    float m_modAttackSpeedPct[3];
+
+    // Event handler
+    EventProcessor m_Events;
+
+    SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
+    uint32 m_lastSanctuaryTime;
+
+    // pet auras
+    typedef std::set<PetAura const*> PetAuraSet;
+    PetAuraSet m_petAuras;
+
+    bool IsAIEnabled;
+    bool NeedChangeAI;
+
+    bool m_ControlledByPlayer;
+    bool m_CreatedByPlayer;
+
+    // Safe mover
+    std::set<SafeUnitPointer*> SafeUnitPointerSet;
+
+    // Relocation Nofier optimization
+    Position m_last_notify_position;
+    uint32 m_last_notify_mstime;
+    uint16 m_delayed_unit_relocation_timer;
+    uint16 m_delayed_unit_ai_notify_timer;
+    bool bRequestForcedVisibilityUpdate;
+
+    // Movement info
+    Movement::MoveSpline* movespline;
+
 protected:
     explicit Unit (bool isWorldObject);
 
     void BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) override;
 
-    UnitAI* i_AI, *i_disabledAI;
-
     void _UpdateSpells(uint32 time);
     void _DeleteRemovedAuras();
 
     void _UpdateAutoRepeatSpell();
+
+    bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
+    bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
+
+    void SetFeared(bool apply, Unit* fearedBy = nullptr, bool isFear = false);
+    void SetConfused(bool apply);
+    void SetStunned(bool apply);
+    void SetRooted(bool apply, bool isStun = false);
+
+    //----------- Protected variables ----------//
+    UnitAI* i_AI;
+    UnitAI* i_disabledAI;
 
     uint8 m_realRace;
     uint8 m_race;
@@ -1882,9 +1905,9 @@ protected:
 
     // xinef: apply resilience
     bool m_applyResilience;
-    bool IsAlwaysVisibleFor(WorldObject const* seer) const override;
-    bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
     bool _instantCast;
+
+    uint32 m_rootTimes;
 
 private:
     bool IsTriggeredAtSpellProcEvent(Unit* victim, Aura* aura, WeaponAttackType attType, bool isVictim, bool active, SpellProcEventEntry const*& spellProcEvent, ProcEventInfo const& eventInfo);
@@ -1905,15 +1928,9 @@ private:
     void PatchValuesUpdate(ByteBuffer& valuesUpdateBuf, BuildValuesCachePosPointers& posPointers, Player* target);
     void InvalidateValuesUpdateCache() { _valuesUpdateCache.clear(); }
 
-protected:
-    void SetFeared(bool apply, Unit* fearedBy = nullptr, bool isFear = false);
-    void SetConfused(bool apply);
-    void SetStunned(bool apply);
-    void SetRooted(bool apply, bool isStun = false);
+    [[nodiscard]] float processDummyAuras(float TakenTotalMod) const;
 
-    uint32 m_rootTimes;
-
-private:
+    //----------- Private variables ----------//
     uint32 m_state;                                     // Even derived shouldn't modify
     uint32 m_CombatTimer;
     uint32 m_lastManaUse;                               // msecs
@@ -1936,8 +1953,6 @@ private:
 
     uint32 _oldFactionId;           ///< faction before charm
     bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?
-
-    [[nodiscard]] float processDummyAuras(float TakenTotalMod) const;
 
     uint32 _lastExtraAttackSpell;
     std::unordered_map<ObjectGuid /*guid*/, uint32 /*count*/> extraAttacksTargets;
