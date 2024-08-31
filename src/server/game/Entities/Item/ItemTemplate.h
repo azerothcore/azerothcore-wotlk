@@ -691,7 +691,7 @@ struct ItemTemplate
     uint32 FoodType;
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
-    uint32 FlagsCu;
+    ItemFlagsCustom FlagsCu;
     WorldPacket queryData;                                  // pussywizard
 
     // helpers
