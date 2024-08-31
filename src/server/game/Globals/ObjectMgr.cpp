@@ -2318,6 +2318,12 @@ void ObjectMgr::LoadCreatureSparring()
         uint32 entry = fields[0].Get<uint32>();
         float sparringHealthPct = fields[1].Get<float>();
 
+        if (!sObjectMgr->GetCreatureTemplate(entry))
+        {
+            LOG_ERROR("sql.sql", "Entry: {} does not exist in Creature template`", entry);
+            continue;
+        }
+
         _creatureSparringStore[entry].push_back(sparringHealthPct);
 
         ++count;
