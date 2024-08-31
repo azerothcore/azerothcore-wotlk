@@ -1,3 +1,4 @@
+-- DB update 2024_08_31_00 -> 2024_08_31_01
 UPDATE `item_template`
 SET `stat_type1` = 5,
 `stat_value1` = 20,
