@@ -35,7 +35,7 @@ def parsing_file(directory: str) -> None:
                             npcflags_helpers_check(file, file_path)
                         if file_name != 'Item.h':
                             itemflag_helpers_check(file, file_path)
-                        if fime_name != 'ItemTemplate.h':
+                        if file_name != 'ItemTemplate.h':
                             itemtemplateflag_helpers_check(file, file_path)
                 except UnicodeDecodeError:
                     print(f"\nCould not decode file {file_path}")
