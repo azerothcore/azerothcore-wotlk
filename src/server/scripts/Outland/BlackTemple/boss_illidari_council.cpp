@@ -232,7 +232,12 @@ struct boss_illidari_council_memberAI : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
-        me->SetOwnerGUID(ObjectGuid::Empty);
+        if (Unit* council = me->GetOwner())
+        {
+            me->SetOwnerGUID(ObjectGuid::Empty); // Set owner here to avoid infinite loop of evade calls
+            if (council->ToCreature()->AI())
+                council->ToCreature()->AI()->EnterEvadeMode(why);
+        }
         ScriptedAI::EnterEvadeMode(why);
     }
 
