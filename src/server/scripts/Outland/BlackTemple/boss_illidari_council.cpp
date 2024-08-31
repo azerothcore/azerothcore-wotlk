@@ -433,7 +433,7 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
         }, 1min);
     }
 
-    void OnAuraRemove(AuraApplication* auraApp, AuraRemoveMode mode)
+    void OnAuraRemove(AuraApplication* auraApp, AuraRemoveMode mode) override
     {
         if (auraApp->GetBase()->GetId() == SPELL_DAMPEN_MAGIC)
             if (mode == AURA_REMOVE_BY_ENEMY_SPELL || mode == AURA_REMOVE_BY_EXPIRE)
