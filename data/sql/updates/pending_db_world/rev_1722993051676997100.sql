@@ -86,3 +86,7 @@ UPDATE `creature_template` SET `ScriptName` = 'npc_parasitic_shadowfiend' WHERE 
 UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 22996;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 22996);
 UPDATE `creature_template` SET `ScriptName` = 'npc_blade_of_azzinoth' WHERE (`entry` = 22996);
+
+UPDATE `creature_template` SET `AIName` = '' WHERE `entry` = 22997;
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 22997);
+UPDATE `creature_template` SET `ScriptName` = 'npc_flame_of_azzinoth' WHERE (`entry` = 22997);
