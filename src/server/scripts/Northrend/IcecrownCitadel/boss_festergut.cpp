@@ -290,13 +290,13 @@ class spell_festergut_pungent_blight : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->IsUnit();
+        return GetCaster()->IsCreature();
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        if (!caster->IsUnit())
+        if (!caster->IsCreature())
             return;
 
         // Get Inhaled Blight id for our difficulty
@@ -383,7 +383,7 @@ public:
 
     bool OnCheck(Player* /*source*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        if (target && target->IsUnit())
+        if (target && target->IsCreature())
             return target->ToCreature()->AI()->GetData(DATA_INOCULATED_STACK) < 3;
 
         return false;

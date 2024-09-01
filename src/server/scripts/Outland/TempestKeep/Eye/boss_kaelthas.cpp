@@ -1078,7 +1078,7 @@ class spell_kaelthas_kael_phase_two : public SpellScript
 
     bool Load() override
     {
-        if (GetCaster()->IsUnit())
+        if (GetCaster()->IsCreature())
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
                 if (Creature* kael = instance->GetCreature(DATA_KAELTHAS))
                     kael->AI()->SummonedCreatureDies(GetCaster()->ToCreature(), nullptr);
@@ -1196,7 +1196,7 @@ class spell_kaelthas_flame_strike : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->IsUnit();
+        return GetUnitOwner()->IsCreature();
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

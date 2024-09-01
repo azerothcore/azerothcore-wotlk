@@ -533,7 +533,7 @@ class DoorsGuidCheck
 public:
     bool operator()(WorldObject* object) const
     {
-        if (!object->IsUnit())
+        if (!object->IsCreature())
             return true;
 
         Creature* cr = object->ToCreature();

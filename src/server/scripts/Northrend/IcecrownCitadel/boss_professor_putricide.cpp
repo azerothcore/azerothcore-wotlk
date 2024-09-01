@@ -952,7 +952,7 @@ class spell_putricide_unstable_experiment : public SpellScript
     void HandleScript(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        if (!GetCaster()->IsUnit())
+        if (!GetCaster()->IsCreature())
             return;
 
         Creature* creature = GetCaster()->ToCreature();
@@ -1044,7 +1044,7 @@ class spell_putricide_ooze_channel : public SpellScript
     bool Load() override
     {
         _target = nullptr;
-        return GetCaster()->IsUnit();
+        return GetCaster()->IsCreature();
     }
 
     void SelectTarget(std::list<WorldObject*>& targets)

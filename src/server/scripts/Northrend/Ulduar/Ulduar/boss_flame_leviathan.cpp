@@ -447,7 +447,7 @@ public:
                 case EVENT_REINSTALL:
                     for (uint8 i = RAID_MODE(0, 2); i < 4; ++i)
                         if (Unit* seat = vehicle->GetPassenger(i))
-                            if (seat->IsUnit())
+                            if (seat->IsCreature())
                                 seat->ToCreature()->AI()->EnterEvadeMode();
                     Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
                     return;
@@ -780,7 +780,7 @@ public:
                     {
                         turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
                         turret->SetImmuneToAll(true);
-                        if (turret->IsUnit())
+                        if (turret->IsCreature())
                             turret->ToCreature()->AI()->EnterEvadeMode();
                     }
                 }
@@ -1753,7 +1753,7 @@ class spell_vehicle_grab_pyrite : public SpellScript
                     GetCaster()->CastSpell(parent, SPELL_ADD_PYRITE, true);
                     target->CastSpell(seat, GetEffectValue());
 
-                    if (target->IsUnit())
+                    if (target->IsCreature())
                         target->ToCreature()->DespawnOrUnsummon(1300);
                 }
             }

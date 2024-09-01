@@ -464,7 +464,7 @@ public:
             if (!summoner)
                 return;
 
-            if (!summoner->IsUnit())
+            if (!summoner->IsCreature())
                 return;
 
             _summonerGuid = summoner->GetGUID();

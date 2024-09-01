@@ -1259,7 +1259,7 @@ class spell_deathbringer_boiling_blood : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->IsUnit();
+        return GetCaster()->IsCreature();
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)

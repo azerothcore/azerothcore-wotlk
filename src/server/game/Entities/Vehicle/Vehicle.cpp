@@ -67,7 +67,7 @@ Vehicle::~Vehicle()
 
 void Vehicle::Install()
 {
-    if (_me->IsUnit())
+    if (_me->IsCreature())
     {
         if (PowerDisplayEntry const* powerDisplay = sPowerDisplayStore.LookupEntry(_vehicleInfo->m_powerDisplayId))
             _me->setPowerType(Powers(powerDisplay->PowerType));
@@ -76,7 +76,7 @@ void Vehicle::Install()
     }
 
     _status = STATUS_INSTALLED;
-    if (GetBase()->IsUnit())
+    if (GetBase()->IsCreature())
         sScriptMgr->OnInstall(this);
 }
 
@@ -107,7 +107,7 @@ void Vehicle::Uninstall()
     LOG_DEBUG("vehicles", "Vehicle::Uninstall {}", _me->GetGUID().ToString());
     RemoveAllPassengers();
 
-    if (_me && _me->IsUnit())
+    if (_me && _me->IsCreature())
     {
         sScriptMgr->OnUninstall(this);
     }
@@ -129,7 +129,7 @@ void Vehicle::Reset(bool evading /*= false*/)
             _me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
     }
 
-    if (GetBase()->IsUnit())
+    if (GetBase()->IsCreature())
         sScriptMgr->OnReset(this);
 }
 
@@ -274,8 +274,8 @@ void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 typ
         // already installed
         if (passenger->GetEntry() == entry)
         {
-            ASSERT(passenger->IsUnit());
-            if (_me->IsUnit())
+            ASSERT(passenger->IsCreature());
+            if (_me->IsCreature())
             {
                 if (_me->ToCreature()->IsInEvadeMode() && passenger->ToCreature()->IsAIEnabled)
                     passenger->ToCreature()->AI()->EnterEvadeMode();
@@ -297,7 +297,7 @@ void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 typ
             return;
         }
 
-        if (GetBase()->IsUnit())
+        if (GetBase()->IsCreature())
             sScriptMgr->OnInstallAccessory(this, accessory);
     }
 }
@@ -382,7 +382,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
     unit->m_movementInfo.transport.guid = _me->GetGUID();
 
     // xinef: removed seat->first == 0 check...
-    if (_me->IsUnit()
+    if (_me->IsCreature()
             && unit->IsPlayer()
             && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
     {
@@ -424,14 +424,14 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         init.SetTransportEnter();
         init.Launch();
 
-        if (_me->IsUnit())
+        if (_me->IsCreature())
         {
             if (_me->ToCreature()->IsAIEnabled)
                 _me->ToCreature()->AI()->PassengerBoarded(unit, seat->first, true);
         }
     }
 
-    if (GetBase()->IsUnit())
+    if (GetBase()->IsCreature())
         sScriptMgr->OnAddPassenger(this, unit, seatId);
 
     // Remove parachute on vehicle switch
@@ -468,7 +468,7 @@ void Vehicle::RemovePassenger(Unit* unit)
 
     seat->second.Passenger.Reset();
 
-    if (_me->IsUnit() && unit->IsPlayer() && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
+    if (_me->IsCreature() && unit->IsPlayer() && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
         _me->RemoveCharmedBy(unit);
 
     if (_me->IsInWorld())
@@ -486,10 +486,10 @@ void Vehicle::RemovePassenger(Unit* unit)
     if (_me->IsFlying() && !_me->GetInstanceId() && unit->IsPlayer() && !(unit->ToPlayer()->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT) && _me->GetEntry() != 30275 /*NPC_WILD_WYRM*/)
         _me->CastSpell(unit, VEHICLE_SPELL_PARACHUTE, true);
 
-    if (_me->IsUnit())
+    if (_me->IsCreature())
         sScriptMgr->OnRemovePassenger(this, unit);
 
-    if (_me->IsUnit() && _me->ToCreature()->IsAIEnabled)
+    if (_me->IsCreature() && _me->ToCreature()->IsAIEnabled)
         _me->ToCreature()->AI()->PassengerBoarded(unit, seat->first, false);
 }
 
@@ -520,7 +520,7 @@ void Vehicle::RelocatePassengers()
 
 void Vehicle::Dismiss()
 {
-    if (!GetBase()->IsUnit())
+    if (!GetBase()->IsCreature())
         return;
 
     LOG_DEBUG("vehicles", "Vehicle::Dismiss {}", _me->GetGUID().ToString());
@@ -535,7 +535,7 @@ bool Vehicle::IsVehicleInUse()
         {
             if (passenger->IsPlayer())
                 return true;
-            else if (passenger->IsUnit() && passenger->GetVehicleKit() && passenger->GetVehicleKit()->IsVehicleInUse())
+            else if (passenger->IsCreature() && passenger->GetVehicleKit() && passenger->GetVehicleKit()->IsVehicleInUse())
                 return true;
         }
 
@@ -556,7 +556,7 @@ void Vehicle::TeleportVehicle(float x, float y, float z, float ang)
                 passenger->NearTeleportTo(x, y, z, ang, false, true);
                 passenger->ToPlayer()->ScheduleDelayedOperation(DELAYED_VEHICLE_TELEPORT);
             }
-            else if (passenger->IsUnit() && passenger->GetVehicleKit())
+            else if (passenger->IsCreature() && passenger->GetVehicleKit())
                 passenger->GetVehicleKit()->TeleportVehicle(x, y, z, ang);
         }
 }

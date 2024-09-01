@@ -1506,7 +1506,7 @@ class spell_taldaram_summon_flame_ball : public SpellScript
 
     bool Load() override
     {
-        if (!GetCaster()->IsUnit())
+        if (!GetCaster()->IsCreature())
         {
             return false;
         }
@@ -1573,7 +1573,7 @@ class spell_valanar_kinetic_bomb_aura : public AuraScript
     void HandleDummyTick(AuraEffect const* /*aurEff*/)
     {
         Unit* target = GetTarget();
-        if (!target->IsUnit())
+        if (!target->IsCreature())
             return;
 
         if (Creature* bomb = target->FindNearestCreature(NPC_KINETIC_BOMB, 1.0f, true))

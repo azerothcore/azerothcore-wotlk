@@ -221,7 +221,7 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {
-            if (!summoner->IsUnit())
+            if (!summoner->IsCreature())
             {
                 return;
             }

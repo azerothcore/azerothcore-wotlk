@@ -347,7 +347,7 @@ class spell_herald_volzaj_insanity : public SpellScript
 {
     PrepareSpellScript(spell_herald_volzaj_insanity);
 
-    bool Load() override { return GetCaster()->IsUnit(); }
+    bool Load() override { return GetCaster()->IsCreature(); }
 
     void HandleDummyEffect(std::list<WorldObject*>& targets)
     {
@@ -466,7 +466,7 @@ class spell_volazj_whisper : public SpellScript
         });
     }
 
-    bool Load() override { return GetCaster()->IsUnit(); }
+    bool Load() override { return GetCaster()->IsCreature(); }
 
     void HandleScriptEffect(SpellEffIndex /* effIndex */)
     {

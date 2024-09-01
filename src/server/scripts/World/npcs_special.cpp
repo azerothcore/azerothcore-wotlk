@@ -2625,7 +2625,7 @@ public:
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (summoner->IsUnit() || summoner->IsPlayer())
+        if (summoner->IsCreature() || summoner->IsPlayer())
             me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
     }

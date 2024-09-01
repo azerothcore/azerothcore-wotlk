@@ -1101,7 +1101,7 @@ void WorldObject::setActive(bool on)
 
     if (on)
     {
-        if (IsUnit())
+        if (IsCreature())
             map->AddToActive(this->ToCreature());
         else if (IsDynamicObject())
             map->AddToActive((DynamicObject*)this);
@@ -1110,7 +1110,7 @@ void WorldObject::setActive(bool on)
     }
     else
     {
-        if (IsUnit())
+        if (IsCreature())
             map->RemoveFromActive(this->ToCreature());
         else if (IsDynamicObject())
             map->RemoveFromActive((DynamicObject*)this);
@@ -1147,7 +1147,7 @@ void WorldObject::SetPositionDataUpdate()
     _updatePositionData = true;
 
     // Calls immediately for charmed units
-    if (IsUnit() && ToUnit()->IsCharmedOwnedByPlayerOrPlayer())
+    if (IsCreature() && ToUnit()->IsCharmedOwnedByPlayerOrPlayer())
         UpdatePositionData();
 }
 
@@ -1644,7 +1644,7 @@ float WorldObject::GetGridActivationRange() const
 
 float WorldObject::GetVisibilityRange() const
 {
-    if (IsVisibilityOverridden() && IsUnit())
+    if (IsVisibilityOverridden() && IsCreature())
     {
         return *m_visibilityDistanceOverride;
     }
@@ -1677,7 +1677,7 @@ float WorldObject::GetSightRange(WorldObject const* target) const
         {
             if (target)
             {
-                if (target->IsVisibilityOverridden() && target->IsUnit())
+                if (target->IsVisibilityOverridden() && target->IsCreature())
                 {
                     return *target->m_visibilityDistanceOverride;
                 }
@@ -1872,7 +1872,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
 bool WorldObject::CanNeverSee(WorldObject const* obj) const
 {
-    if (IsUnit() && obj->IsUnit())
+    if (IsCreature() && obj->IsCreature())
         return GetMap() != obj->GetMap() || (!InSamePhase(obj) && ToUnit()->GetVehicleBase() != obj && this != obj->ToUnit()->GetVehicleBase());
     return GetMap() != obj->GetMap() || !InSamePhase(obj);
 }
@@ -2389,7 +2389,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
     if (respawnTime)
         go->SetSpellId(1);
 
-    if (IsPlayer() || (IsUnit() && summonType == GO_SUMMON_TIMED_OR_CORPSE_DESPAWN)) //not sure how to handle this
+    if (IsPlayer() || (IsCreature() && summonType == GO_SUMMON_TIMED_OR_CORPSE_DESPAWN)) //not sure how to handle this
         ToUnit()->AddGameObject(go);
     else
         go->SetSpawnedByDefault(false);
@@ -2406,7 +2406,7 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint3
         return nullptr;
 
     //summon->SetName(GetName());
-    if (setLevel && (IsPlayer() || IsUnit()))
+    if (setLevel && (IsPlayer() || IsCreature()))
     {
         summon->SetFaction(((Unit*)this)->GetFaction());
         summon->SetLevel(((Unit*)this)->GetLevel());
@@ -2428,7 +2428,7 @@ Creature* WorldObject::SummonTrigger(float x, float y, float z, float ang, uint3
 */
 void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= nullptr*/)
 {
-    ASSERT((IsGameObject() || IsUnit()) && "Only GOs and creatures can summon npc groups!");
+    ASSERT((IsGameObject() || IsCreature()) && "Only GOs and creatures can summon npc groups!");
 
     std::vector<TempSummonData> const* data = sObjectMgr->GetSummonGroup(GetEntry(), IsGameObject() ? SUMMONER_TYPE_GAMEOBJECT : SUMMONER_TYPE_CREATURE, group);
     if (!data)

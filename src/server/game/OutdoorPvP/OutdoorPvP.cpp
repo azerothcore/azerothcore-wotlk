@@ -513,7 +513,7 @@ void OutdoorPvP::HandleKill(Player* killer, Unit* killed)
 
             // creature kills must be notified, even if not inside objective / not outdoor pvp active
             // player kills only count if active and inside objective
-            if ((groupGuy->IsOutdoorPvPActive() && IsInsideObjective(groupGuy)) || killed->IsUnit())
+            if ((groupGuy->IsOutdoorPvPActive() && IsInsideObjective(groupGuy)) || killed->IsCreature())
             {
                 HandleKillImpl(groupGuy, killed);
             }
@@ -522,7 +522,7 @@ void OutdoorPvP::HandleKill(Player* killer, Unit* killed)
     else
     {
         // creature kills must be notified, even if not inside objective / not outdoor pvp active
-        if ((killer->IsOutdoorPvPActive() && IsInsideObjective(killer)) || killed->IsUnit())
+        if ((killer->IsOutdoorPvPActive() && IsInsideObjective(killer)) || killed->IsCreature())
         {
             HandleKillImpl(killer, killed);
         }

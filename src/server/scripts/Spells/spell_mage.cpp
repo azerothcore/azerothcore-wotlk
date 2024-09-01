@@ -884,7 +884,7 @@ class spell_mage_polymorph_cast_visual : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetCaster()->FindNearestCreature(NPC_AUROSALIA, 30.0f))
-            if (target->IsUnit())
+            if (target->IsCreature())
                 target->CastSpell(target, PolymorhForms[urand(0, 5)], true);
     }
 

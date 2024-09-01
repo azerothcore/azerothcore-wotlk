@@ -1018,7 +1018,7 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id != SPELL_CONSTELLATION_PHASE_EFFECT || !caster->IsUnit())
+            if (spell->Id != SPELL_CONSTELLATION_PHASE_EFFECT || !caster->IsCreature())
                 return;
 
             if (InstanceScript* instance = me->GetInstanceScript())

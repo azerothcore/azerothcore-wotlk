@@ -1153,7 +1153,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->IsUnit() && target->GetEntry() == NPC_RAZORSCALE && target->ToCreature()->AI()->GetData(1);
+        return target && target->IsCreature() && target->GetEntry() == NPC_RAZORSCALE && target->ToCreature()->AI()->GetData(1);
     }
 };
 

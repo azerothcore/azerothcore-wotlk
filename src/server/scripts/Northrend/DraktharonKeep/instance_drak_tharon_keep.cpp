@@ -84,7 +84,7 @@ class spell_dtk_raise_dead_aura : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->IsUnit();
+        return GetUnitOwner()->IsCreature();
     }
 
     void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)

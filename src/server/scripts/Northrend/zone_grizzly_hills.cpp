@@ -967,7 +967,7 @@ class spell_shredder_delivery : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->IsUnit();
+        return GetCaster()->IsCreature();
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)

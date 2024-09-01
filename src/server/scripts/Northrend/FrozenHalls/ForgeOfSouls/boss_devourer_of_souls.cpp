@@ -347,7 +347,7 @@ class spell_wailing_souls_periodic_aura : public AuraScript
             {
                 t->SetControlled(false, UNIT_STATE_ROOT);
                 t->DisableRotate(false);
-                if (t->IsUnit())
+                if (t->IsCreature())
                     t->ToCreature()->SetReactState(REACT_AGGRESSIVE);
                 if (t->GetVictim())
                 {

@@ -1136,7 +1136,7 @@ class spell_hun_volley_trigger : public SpellScript
         {
             if (Unit* pet = *itr)
             {
-                if (pet->IsAlive() && pet->IsUnit())
+                if (pet->IsAlive() && pet->IsCreature())
                 {
                     pet->ToCreature()->AI()->OwnerAttacked(_target->ToUnit());
                 }

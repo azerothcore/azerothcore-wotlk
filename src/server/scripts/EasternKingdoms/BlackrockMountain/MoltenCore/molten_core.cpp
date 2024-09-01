@@ -129,7 +129,7 @@ class spell_mc_play_dead_aura : public AuraScript
 
     bool Load() override
     {
-        return GetCaster()->IsUnit();
+        return GetCaster()->IsCreature();
     }
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

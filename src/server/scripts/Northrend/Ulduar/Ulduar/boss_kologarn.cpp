@@ -724,7 +724,7 @@ class spell_ulduar_stone_grip_cast_target : public SpellScript
 
     bool Load() override
     {
-        if (!GetCaster()->IsUnit())
+        if (!GetCaster()->IsCreature())
             return false;
         return true;
     }

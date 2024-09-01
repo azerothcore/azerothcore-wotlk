@@ -109,7 +109,7 @@ def get_typeid_check(file: io, file_path: str) -> None:
             print(f"Please use IsItem() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
         if 'GetTypeId() == TYPEID_UNIT' in line or 'GetTypeId() != TYPEID_UNIT' in line:
-            print(f"Please use IsUnit() instead of GetTypeId(): {file_path} at line {line_number}")
+            print(f"Please use IsCreature() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
         if 'GetTypeId() == TYPEID_PLAYER' in line or 'GetTypeId() != TYPEID_PLAYER' in line:
             print(f"Please use IsPlayer() instead of GetTypeId(): {file_path} at line {line_number}")

@@ -45,7 +45,7 @@ class spell_q11919_q11940_drake_hunt_aura : public AuraScript
 
     bool Load() override
     {
-        return GetOwner()->IsUnit();
+        return GetOwner()->IsCreature();
     }
 
     void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -217,7 +217,7 @@ public:
         {
             ScriptedAI::MoveInLineOfSight(who);
 
-            if (!who->IsUnit())
+            if (!who->IsCreature())
                 return;
 
             if (who->GetEntry() == NPC_ORPHANED_MAMMOTH_CALF && me->IsWithinDistInMap(who, 10.0f))

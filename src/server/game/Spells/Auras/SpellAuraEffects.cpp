@@ -2842,7 +2842,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
                 if ((*iter)->GetCurrentSpell(i) && (*iter)->GetCurrentSpell(i)->m_targets.GetUnitTargetGUID() == target->GetGUID())
                 {
                     SpellInfo const* si = (*iter)->GetCurrentSpell(i)->GetSpellInfo();
-                    if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->IsUnit())
+                    if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->IsCreature())
                     {
                         Creature* c = (*iter)->ToCreature();
                         if ((!c->IsPet() && c->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS) || c->isWorldBoss() || c->IsDungeonBoss())
@@ -3009,7 +3009,7 @@ void AuraEffect::HandleAuraModDisarm(AuraApplication const* aurApp, uint8 mode, 
     if (apply)
         target->SetFlag(field, flag);
 
-    if (target->IsUnit() && target->ToCreature()->GetCurrentEquipmentId())
+    if (target->IsCreature() && target->ToCreature()->GetCurrentEquipmentId())
         target->UpdateDamagePhysical(attType);
 }
 
@@ -3318,7 +3318,7 @@ void AuraEffect::HandleAuraAllowFlight(AuraApplication const* aurApp, uint8 mode
 
     target->SetCanFly(apply);
 
-    if (!apply && target->IsUnit() && !target->IsLevitating())
+    if (!apply && target->IsCreature() && !target->IsLevitating())
         target->GetMotionMaster()->MoveFall();
 }
 
@@ -3547,7 +3547,7 @@ void AuraEffect::HandleModPossess(AuraApplication const* aurApp, uint8 mode, boo
     Unit* caster = GetCaster();
 
     // no support for posession AI yet
-    if (caster && caster->IsUnit())
+    if (caster && caster->IsCreature())
     {
         HandleModCharm(aurApp, mode, apply);
         return;
@@ -3575,7 +3575,7 @@ void AuraEffect::HandleModPossessPet(AuraApplication const* aurApp, uint8 mode, 
     //    return;
 
     Unit* target = aurApp->GetTarget();
-    if (!target->IsUnit() || !target->IsPet())
+    if (!target->IsCreature() || !target->IsPet())
         return;
 
     Pet* pet = target->ToPet();
@@ -3675,7 +3675,7 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
         if (GetId() == 53111) // Devour Humanoid
         {
             Unit::Kill(target, caster);
-            if (caster->IsUnit())
+            if (caster->IsCreature())
                 caster->ToCreature()->RemoveCorpse();
         }
 
@@ -3725,7 +3725,7 @@ void AuraEffect::HandleAuraModIncreaseFlightSpeed(AuraApplication const* aurApp,
         {
             target->SetCanFly(apply);
 
-            if (!apply && target->IsUnit() && !target->IsLevitating())
+            if (!apply && target->IsCreature() && !target->IsLevitating())
                 target->GetMotionMaster()->MoveFall();
         }
 
@@ -5643,7 +5643,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             break;
                         case 46374: // quest The Power of the Elements (11893)
                             {
-                                if (target->isDead() && GetBase() && target->IsUnit() && target->GetEntry() == 24601)
+                                if (target->isDead() && GetBase() && target->IsCreature() && target->GetEntry() == 24601)
                                 {
                                     auto caster2 = GetBase()->GetCaster();
                                     if (caster2 && caster2->IsPlayer())
@@ -6355,7 +6355,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             return;
                         // Inoculate Nestlewood Owlkin
                         case 29528:
-                            if (!target->IsUnit()) // prevent error reports in case ignored player target
+                            if (!target->IsCreature()) // prevent error reports in case ignored player target
                                 return;
                             break;
                         // Feed Captured Animal
@@ -6367,7 +6367,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             {
                                 // move loot to player inventory and despawn target
                                 if (caster && caster->IsPlayer() &&
-                                        target->IsUnit() &&
+                                        target->IsCreature() &&
                                         target->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_GAS_CLOUD)
                                 {
                                     Player* player = caster->ToPlayer();

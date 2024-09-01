@@ -691,7 +691,7 @@ class spell_q11653_youre_not_so_big_now : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         Unit* target = GetHitUnit();
-        if (!target || !target->IsUnit())
+        if (!target || !target->IsCreature())
             return;
 
         static uint32 const spellPlayer[5] =
@@ -1014,7 +1014,7 @@ class spell_q11396_11399_scourging_crystal_controller_dummy : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
-            if (target->IsUnit())
+            if (target->IsCreature())
                 target->RemoveAurasDueToSpell(SPELL_FORCE_SHIELD_ARCANE_PURPLE_X3);
     }
 
@@ -1704,7 +1704,7 @@ class spell_q12277_wintergarde_mine_explosion : public SpellScript
         {
             if (Unit* caster = GetCaster())
             {
-                if (caster->IsUnit())
+                if (caster->IsCreature())
                 {
                     if (Unit* owner = caster->GetOwner())
                     {
@@ -2018,7 +2018,7 @@ enum BearFlankMaster
 
         bool Load() override
         {
-            return GetCaster()->IsUnit();
+            return GetCaster()->IsCreature();
         }
 
         void HandleScript(SpellEffIndex /*effIndex*/)
@@ -2079,7 +2079,7 @@ class spell_q12690_burst_at_the_seams : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->IsUnit();
+        return GetCaster()->IsCreature();
     }
 
     void HandleKnockBack(SpellEffIndex /*effIndex*/)
