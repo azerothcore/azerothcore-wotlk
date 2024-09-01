@@ -3950,7 +3950,7 @@ bool Unit::CanSparringWith(Unit const* attacker) const
         return false;
 
     if (Creature const* me = ToCreature())
-        if(me->GetSparringPct() == 0.0f)
+        if (me->GetSparringPct() == 0.0f)
             return false;
 
     return true;
