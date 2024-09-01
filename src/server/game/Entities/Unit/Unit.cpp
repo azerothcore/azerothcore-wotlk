@@ -1023,7 +1023,12 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     // Sparring
     if(victim->CanSparringWith(attacker))
     {
-        damage = 0;
+        if(damage >= victim->GetHealth())
+            damage = 0;
+
+        uint32 sparringHealth = victim->GetHealth() * (victim->ToCreature()->GetSparringPct() / 100);
+        if (victim->GetHealth() - damage <= sparringHealth)
+            damage = sparringHealth - (victim->GetHealth() - damage);
     }
 
     if (health <= damage)
@@ -2607,6 +2612,12 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
         {
             Unit::DealDamageMods(victim, damageInfo.damages[i].damage, &damageInfo.damages[i].absorb);
+        }
+
+        // sparring
+        if (victim->CanSparringWith(damageInfo.attacker))
+        {
+            damageInfo.HitInfo |= HITINFO_FAKE_DAMAGE;
         }
 
         SendAttackStateUpdate(&damageInfo);
