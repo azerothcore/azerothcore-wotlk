@@ -203,7 +203,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_VEZAX_SHADOW_CRASH_DMG)
+            if (target && spell && target->IsPlayer() && spell->Id == SPELL_VEZAX_SHADOW_CRASH_DMG)
                 bAchievShadowdodger = false;
         }
 
@@ -367,7 +367,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if( who->IsPlayer() )
                 Talk(SAY_SLAY);
         }
 

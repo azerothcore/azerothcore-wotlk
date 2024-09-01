@@ -2084,4 +2084,3 @@ void AddSC_boss_chess_event()
 
     RegisterSpellScript(spell_control_piece);
 }
-

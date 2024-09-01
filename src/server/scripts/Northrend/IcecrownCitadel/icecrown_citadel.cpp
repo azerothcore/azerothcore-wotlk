@@ -1211,7 +1211,7 @@ public:
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
             Talk(SAY_CAPTAIN_KILL);
     }
 
@@ -1237,7 +1237,7 @@ public:
     bool CanAIAttack(Unit const* target) const override
     {
         // do not see targets inside Frostwing Halls when we are not there
-        return (me->GetPositionY() > 2660.0f) == (target->GetPositionY() > 2660.0f) && (target->GetTypeId() == TYPEID_PLAYER || target->IsInCombat());
+        return (me->GetPositionY() > 2660.0f) == (target->GetPositionY() > 2660.0f) && (target->IsPlayer() || target->IsInCombat());
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -2713,7 +2713,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (me->IsAlive() && !me->IsInCombat() && who->GetTypeId() == TYPEID_PLAYER && who->GetExactDist2d(me) < 35.0f)
+            if (me->IsAlive() && !me->IsInCombat() && who->IsPlayer() && who->GetExactDist2d(me) < 35.0f)
                 AttackStart(who);
         }
 
@@ -3085,7 +3085,7 @@ public:
                 ScriptedAI::MoveInLineOfSight(who);
             else
             {
-                if (!me->IsInCombat() && who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2dSq(who) < 25.0f * 25.0f && me->CanSeeOrDetect(who) && me->IsValidAttackTarget(who))
+                if (!me->IsInCombat() && who->IsPlayer() && me->GetExactDist2dSq(who) < 25.0f * 25.0f && me->CanSeeOrDetect(who) && me->IsValidAttackTarget(who))
                     AttackStart(who);
             }
         }
@@ -3230,7 +3230,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!_didWebBeam && who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2d(who) < 70.0f)
+            if (!_didWebBeam && who->IsPlayer() && me->GetExactDist2d(who) < 70.0f)
             {
                 _didWebBeam = true;
                 float nx = me->GetPositionX();

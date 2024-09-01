@@ -100,7 +100,7 @@ struct boss_watchkeeper_gargolmar : public BossAI
     {
         if (!_taunted)
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 _taunted = true;
                 Talk(SAY_TAUNT);
@@ -171,4 +171,3 @@ void AddSC_boss_watchkeeper_gargolmar()
     RegisterHellfireRampartsCreatureAI(boss_watchkeeper_gargolmar);
     RegisterSpellScript(spell_gargolmar_retalliation);
 }
-
