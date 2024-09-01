@@ -510,7 +510,7 @@ void Map::ScriptsProcess()
                     Player* player = target->ToPlayer();
                     if (player)
                     {
-                        if (source->GetTypeId() != TYPEID_UNIT && !source->IsGameObject() && !source->IsPlayer())
+                        if (!source->IsUnit() && !source->IsGameObject() && !source->IsPlayer())
                         {
                             LOG_ERROR("maps.script", "{} source is not unit, gameobject or player ({}), skipping.", step.script->GetDebugInfo(), source->GetGUID().ToString());
                             break;
@@ -522,7 +522,7 @@ void Map::ScriptsProcess()
                         player = source->ToPlayer();
                         if (player)
                         {
-                            if (target->GetTypeId() != TYPEID_UNIT && !target->IsGameObject() && !target->IsPlayer())
+                            if (!target->IsUnit() && !target->IsGameObject() && !target->IsPlayer())
                             {
                                 LOG_ERROR("maps.script", "{} target is not unit, gameobject or player ({}), skipping.", step.script->GetDebugInfo(), target->GetGUID().ToString());
                                 break;
@@ -538,7 +538,7 @@ void Map::ScriptsProcess()
                     }
 
                     // quest id and flags checked at script loading
-                    if ((worldObject->GetTypeId() != TYPEID_UNIT || ((Unit*)worldObject)->IsAlive()) &&
+                    if ((!worldObject->IsUnit() || ((Unit*)worldObject)->IsAlive()) &&
                             (step.script->QuestExplored.Distance == 0 || worldObject->IsWithinDistInMap(player, float(step.script->QuestExplored.Distance))))
                         player->GroupEventHappens(step.script->QuestExplored.QuestID, worldObject);
                     else

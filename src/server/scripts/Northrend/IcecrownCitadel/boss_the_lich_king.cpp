@@ -2078,7 +2078,7 @@ class spell_the_lich_king_shadow_trap_periodic : public SpellScript
         GetCaster()->CastSpell((Unit*)nullptr, SPELL_SHADOW_TRAP_KNOCKBACK, true);
         if (Aura* a = GetCaster()->GetAura(SPELL_SHADOW_TRAP_AURA))
             a->SetDuration(0);
-        if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+        if (GetCaster()->IsUnit())
             GetCaster()->ToCreature()->DespawnOrUnsummon(3000);
     }
 
@@ -2102,7 +2102,7 @@ class spell_the_lich_king_ice_burst_target_search : public SpellScript
         if (unitList.empty())
             return;
 
-        if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+        if (GetCaster()->IsUnit())
             GetCaster()->ToCreature()->AI()->DoAction(-1);
     }
 
@@ -2336,7 +2336,7 @@ class VehicleCheck
 public:
     bool operator()(WorldObject* unit)
     {
-        return (unit->GetTypeId() != TYPEID_UNIT && !unit->IsPlayer()) || unit->ToUnit()->GetVehicle();
+        return (!unit->IsUnit() && !unit->IsPlayer()) || unit->ToUnit()->GetVehicle();
     }
 };
 
@@ -2804,7 +2804,7 @@ class spell_the_lich_king_vile_spirit_move_target_search : public SpellScript
     bool Load() override
     {
         _target = nullptr;
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsUnit();
     }
 
     void SelectTarget(std::list<WorldObject*>& targets)

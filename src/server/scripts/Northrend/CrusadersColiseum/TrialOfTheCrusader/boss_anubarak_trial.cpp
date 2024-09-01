@@ -846,7 +846,7 @@ public:
                 {
                     target->UpdatePosition(*c, false);
                     target->CastCustomSpell(SPELL_SPIKE_FAIL, SPELLVALUE_MAX_TARGETS, 1);
-                    if( target->GetTypeId() == TYPEID_UNIT )
+                    if( target->IsUnit() )
                         target->ToCreature()->AI()->DoAction(-1);
                     Remove();
                     return;

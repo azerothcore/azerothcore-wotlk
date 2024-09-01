@@ -614,7 +614,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
+        return target && target->GetEntry() == NPC_VEZAX && target->IsUnit() && target->ToCreature()->AI()->GetData(1);
     }
 };
 
@@ -625,7 +625,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
+        return target && target->GetEntry() == NPC_VEZAX && target->IsUnit() && target->ToCreature()->AI()->GetData(2);
     }
 };
 

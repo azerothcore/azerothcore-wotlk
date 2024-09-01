@@ -2384,7 +2384,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
         return;
     }
 
-    if (victim && victim->GetTypeId() == TYPEID_UNIT && !victim->ToCreature()->hasLootRecipient())
+    if (victim && victim->IsUnit() && !victim->ToCreature()->hasLootRecipient())
     {
         return;
     }
@@ -9255,7 +9255,7 @@ void Player::StopCastingCharm(Aura* except /*= nullptr*/)
         return;
     }
 
-    if (charm->GetTypeId() == TYPEID_UNIT)
+    if (charm->IsUnit())
     {
         if (charm->ToCreature()->HasUnitTypeMask(UNIT_MASK_PUPPET))
         {
@@ -12621,7 +12621,7 @@ bool Player::isHonorOrXPTarget(Unit* victim) const
         return false;
     }
 
-    if (victim->GetTypeId() == TYPEID_UNIT)
+    if (victim->IsUnit())
     {
         if (victim->IsTotem() || victim->IsCritter() || victim->IsPet() || (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP))
         {
@@ -12683,7 +12683,7 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
     if (!pRewardSource)
         return;
 
-    ObjectGuid creature_guid = (pRewardSource->GetTypeId() == TYPEID_UNIT) ? pRewardSource->GetGUID() : ObjectGuid::Empty;
+    ObjectGuid creature_guid = (pRewardSource->IsUnit()) ? pRewardSource->GetGUID() : ObjectGuid::Empty;
 
     // prepare data for near group iteration
     if (Group* group = GetGroup())
@@ -12817,7 +12817,7 @@ void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= 
         SetMover(target);
 
     // Xinef: disable moving if target has disable move flag
-    if (target->GetTypeId() != TYPEID_UNIT)
+    if (!target->IsUnit())
         return;
 
     if (allowMove && target->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
@@ -12854,12 +12854,12 @@ void Player::SetMover(Unit* target)
         LOG_INFO("misc", "Player::SetMover (B2) - {}, {}, {}, {}, {}, {}, {}, {}", target->GetGUID().ToString(), target->GetMapId(), target->GetInstanceId(), target->FindMap()->GetId(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
     }
     m_mover->m_movedByPlayer = nullptr;
-    if (m_mover->GetTypeId() == TYPEID_UNIT)
+    if (m_mover->IsUnit())
         m_mover->GetMotionMaster()->Initialize();
 
     m_mover = target;
     m_mover->m_movedByPlayer = this;
-    if (m_mover->GetTypeId() == TYPEID_UNIT)
+    if (m_mover->IsUnit())
         m_mover->GetMotionMaster()->Initialize();
 }
 

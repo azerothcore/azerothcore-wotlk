@@ -304,7 +304,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE:
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE:
-            if (!target || target->GetTypeId() != TYPEID_UNIT)
+            if (!target || !target->IsUnit())
                 return false;
             return target->GetEntry() == creature.id;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE:

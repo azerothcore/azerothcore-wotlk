@@ -565,7 +565,7 @@ class spell_illidari_council_empyreal_balance : public SpellScript
     bool Load() override
     {
         _targetCount = 0;
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsUnit();
     }
 
     void HandleDummy(SpellEffIndex effIndex)
@@ -612,7 +612,7 @@ class spell_illidari_council_empyreal_equivalency : public SpellScript
     bool Load() override
     {
         _targetCount = 0;
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsUnit();
     }
 
     void HandleDummy(SpellEffIndex effIndex)

@@ -254,7 +254,7 @@ void TempSummon::InitSummon()
     WorldObject* owner = GetSummoner();
     if (owner)
     {
-        if (owner->GetTypeId() == TYPEID_UNIT)
+        if (owner->IsUnit())
         {
             if (owner->ToCreature()->IsAIEnabled)
             {
@@ -304,7 +304,7 @@ void TempSummon::UnSummon(uint32 msTime)
 
     if (WorldObject* owner = GetSummoner())
     {
-        if (owner->GetTypeId() == TYPEID_UNIT && owner->ToCreature()->IsAIEnabled)
+        if (owner->IsUnit() && owner->ToCreature()->IsAIEnabled)
         {
             owner->ToCreature()->AI()->SummonedCreatureDespawn(this);
         }

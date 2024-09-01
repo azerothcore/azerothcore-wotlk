@@ -415,7 +415,7 @@ public:
                 {
                     if (Unit* u = v->GetBase())
                     {
-                        if (u->GetEntry() == NPC_BONE_SPIKE && u->GetTypeId() == TYPEID_UNIT)
+                        if (u->GetEntry() == NPC_BONE_SPIKE && u->IsUnit())
                         {
                             u->ToCreature()->AI()->DoAction(-1337);
                         }

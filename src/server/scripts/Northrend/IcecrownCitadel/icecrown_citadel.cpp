@@ -1757,7 +1757,7 @@ public:
 
         void SpellHitTarget(Unit* c, SpellInfo const* spell) override
         {
-            if (spell->Id == 71306 && c->GetTypeId() == TYPEID_UNIT) // Twisted Winds
+            if (spell->Id == 71306 && c->IsUnit()) // Twisted Winds
             {
                 Position myPos = me->GetPosition();
                 me->NearTeleportTo(c->GetPositionX(), c->GetPositionY(), c->GetPositionZ(), c->GetOrientation());

@@ -1154,7 +1154,7 @@ class spell_sindragosa_soul_preservation_aura : public AuraScript
             {
                 s->CastSpell(s, 72466, true);
                 s->RemoveAurasDueToSpell(72424);
-                if (s->GetTypeId() == TYPEID_UNIT) s->ToCreature()->SetLootMode(3);
+                if (s->IsUnit()) s->ToCreature()->SetLootMode(3);
                 SetDuration(1);
             }
     }

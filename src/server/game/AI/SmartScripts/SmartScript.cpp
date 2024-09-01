@@ -5269,7 +5269,7 @@ WorldObject* SmartScript::GetLastInvoker(WorldObject* invoker) const
 
 bool SmartScript::IsUnit(WorldObject* obj)
 {
-    return obj && (obj->GetTypeId() == TYPEID_UNIT || obj->IsPlayer());
+    return obj && (obj->IsUnit() || obj->IsPlayer());
 }
 
 bool SmartScript::IsPlayer(WorldObject* obj)
@@ -5279,7 +5279,7 @@ bool SmartScript::IsPlayer(WorldObject* obj)
 
 bool SmartScript::IsCreature(WorldObject* obj)
 {
-    return obj && obj->GetTypeId() == TYPEID_UNIT;
+    return obj && obj->IsUnit();
 }
 
 bool SmartScript::IsCharmedCreature(WorldObject* obj)

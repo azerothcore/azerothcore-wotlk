@@ -1053,7 +1053,7 @@ class spell_halion_twilight_phasing : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsUnit();
     }
 
     void Phase()

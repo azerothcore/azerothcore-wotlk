@@ -602,7 +602,7 @@ public:
                 Transport::PassengerSet const& passengers = t->GetStaticPassengers();
                 for (Transport::PassengerSet::const_iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
                 {
-                    if ((*itr)->GetTypeId() != TYPEID_UNIT || (*itr)->GetEntry() != NPC_GUNSHIP_HULL)
+                    if (!(*itr)->IsUnit() || (*itr)->GetEntry() != NPC_GUNSHIP_HULL)
                         continue;
                     (*itr)->ToCreature()->CastSpell((*itr)->ToCreature(), explosionSpell, true);
                 }
@@ -615,7 +615,7 @@ public:
                     Transport::PassengerSet const& passengers = t->GetStaticPassengers();
                     for (Transport::PassengerSet::const_iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
                     {
-                        if ((*itr)->GetTypeId() != TYPEID_UNIT || (*itr)->GetEntry() != cannonEntry)
+                        if (!(*itr)->IsUnit() || (*itr)->GetEntry() != cannonEntry)
                             continue;
                         Creature* cannon = (*itr)->ToCreature();
                         cannon->CastSpell(cannon, SPELL_EJECT_ALL_PASSENGERS, true);
@@ -661,7 +661,7 @@ public:
                             Transport::PassengerSet const& passengers = t->GetPassengers();
                             for (Transport::PassengerSet::const_iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
                             {
-                                if ((*itr)->GetTypeId() != TYPEID_UNIT)
+                                if (!(*itr)->IsUnit())
                                     continue;
                                 Creature* c = (*itr)->ToCreature();
                                 if (c->GetEntry() == NPC_SKYBREAKER_MARINE || c->GetEntry() == NPC_SKYBREAKER_SERGEANT || c->GetEntry() == NPC_KOR_KRON_REAVER || c->GetEntry() == NPC_KOR_KRON_SERGEANT)
@@ -2080,7 +2080,7 @@ class spell_igb_check_for_players : public SpellScript
     bool Load() override
     {
         _playerCount = 0;
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsUnit();
     }
 
     void CountTargets(std::list<WorldObject*>& targets)
@@ -2302,7 +2302,7 @@ class spell_igb_cannon_blast : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsUnit();
     }
 
     void CalculatePower()
