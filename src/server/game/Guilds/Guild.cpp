@@ -1704,6 +1704,9 @@ bool Guild::HandleMemberWithdrawMoney(User* session, uint32 amount, bool repair)
     if (uint32(_GetMemberRemainingMoney(*member)) < amount)   // Check if we have enough slot/money today
         return false;
 
+    if (!(_GetRankRights(member->GetRankId()) & GR_RIGHT_WITHDRAW_REPAIR) && repair)
+        return false;
+
     // Call script after validation and before money transfer.
     sScriptMgr->OnGuildMemberWitdrawMoney(this, player, amount, repair);
 
