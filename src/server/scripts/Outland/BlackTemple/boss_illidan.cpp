@@ -573,6 +573,11 @@ struct boss_illidan_stormrage : public BossAI
                     Talk(SAY_ILLIDAN_FRENZY);
                     DoCastSelf(SPELL_FRENZY, true);
                 }, 100s);
+
+                ScheduleTimedEvent(30s, [&] {
+                    if (Creature* maiev = summons.GetCreatureWithEntry(NPC_MAIEV_SHADOWSONG))
+                        DoCast(maiev, SPELL_CAGE_TRAP, true);
+                }, 45s);
             }
             break;
         }
@@ -1138,12 +1143,15 @@ struct npc_maiev_illidan : public ScriptedAI
                 DoCastSelf(SPELL_MAIEV_DOWN);
             }
         }, 1200ms);
+    }
 
-        ScheduleTimedEvent(30s, [&] {
-            DoCastSelf(SPELL_CAGE_TRAP);
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_CAGE_TRAP)
+        {
             DoCastSelf(SPELL_CAGE_TRAP_SUMMON, true);
             Talk(SAY_MAIEV_SHADOWSONG_TRAP);
-        }, 2min);
+        }
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
