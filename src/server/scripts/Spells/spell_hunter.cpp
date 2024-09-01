@@ -726,7 +726,7 @@ class spell_hun_scatter_shot : public SpellScript
     }
 };
 
-// 53302 - Sniper Training
+// -53302 - Sniper Training
 class spell_hun_sniper_training : public AuraScript
 {
     PrepareAuraScript(spell_hun_sniper_training);
