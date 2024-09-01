@@ -1020,6 +1020,12 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         }
     }
 
+    // Sparring
+    if(victim->CanSparringWith(attacker))
+    {
+        damage = 0;
+    }
+
     if (health <= damage)
     {
         LOG_DEBUG("entities.unit", "DealDamage: victim just died");
@@ -1138,25 +1144,6 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     }
 
     LOG_DEBUG("entities.unit", "DealDamageEnd returned {} damage", damage);
-
-    if(!attacker->IsPlayer() || !attacker->IsCharmedOwnedByPlayerOrPlayer())
-    {
-        if(!victim->IsPlayer() || !victim->IsCharmedOwnedByPlayerOrPlayer())
-        {
-            if (Creature* victimCreature = victim->ToCreature())
-            {
-                if (victimCreature->GetSparringPct() > 0)
-                {
-                    if(damage >= victimCreature->GetHealth())
-                        damage = 0;
-
-                    uint32 sparringHealth = victimCreature->GetHealth() * (victimCreature->GetSparringPct() / 100);
-                    if (victimCreature->GetHealth() - damage <= sparringHealth)
-                        damage = sparringHealth - (victimCreature->GetHealth() - damage);
-                }
-            }
-        }
-    }
 
     return damage;
 }
@@ -3939,6 +3926,24 @@ void Unit::_UpdateAutoRepeatSpell()
         // Reset attack
         resetAttackTimer(RANGED_ATTACK);
     }
+}
+
+bool Unit::CanSparringWith(const Unit* attacker) const
+{
+    if(GetTypeId() != TYPEID_UNIT || IsCharmedOwnedByPlayerOrPlayer())
+        return false;
+
+    if(!attacker)
+        return false;
+
+    if(attacker->GetTypeId() != TYPEID_UNIT || attacker->IsCharmedOwnedByPlayerOrPlayer())
+        return false;
+
+    if(Creature const* me = ToCreature())
+        if(me->GetSparringPct() == 0.0f)
+            return false;
+
+    return true;
 }
 
 void Unit::SetCurrentCastedSpell(Spell* pSpell)

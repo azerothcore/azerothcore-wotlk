@@ -2799,23 +2799,6 @@ void Creature::LoadSparringPct()
     }
 }
 
-bool Creature::CanSparringWith(const Unit* attacker) const
-{
-    if(GetSparringPct() == 0.0f)
-        return false;
-
-    if(!attacker)
-        return false;
-
-    if(attacker->IsPlayer() || attacker->GetTypeId() != TYPEID_UNIT)
-        return false;
-
-    if(IsCharmedOwnedByPlayerOrPlayer() || attacker->IsCharmedOwnedByPlayerOrPlayer())
-        return false;
-
-    return true;
-}
-
 /// Send a message to LocalDefense channel for players opposition team in the zone
 void Creature::SendZoneUnderAttackMessage(Player* attacker)
 {

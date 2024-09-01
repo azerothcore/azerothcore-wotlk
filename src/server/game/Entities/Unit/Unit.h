@@ -1818,6 +1818,8 @@ protected:
 
     void _UpdateAutoRepeatSpell();
 
+    bool CanSparringWith(const Unit* attacker) const;
+
     uint8 m_realRace;
     uint8 m_race;
 

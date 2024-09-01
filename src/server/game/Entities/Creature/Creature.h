@@ -191,7 +191,6 @@ public:
     void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) override;
 
     void LoadSparringPct();
-    [[nodiscard]] bool CanSparringWith(const Unit* attacker) const;
     [[nodiscard]] float GetSparringPct() const { return _sparringPct; }
 
     void SetCanDualWield(bool value) override;
