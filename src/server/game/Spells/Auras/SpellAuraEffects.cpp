@@ -4464,7 +4464,7 @@ void AuraEffect::HandleModPercentStat(AuraApplication const* aurApp, uint8 mode,
         return;
     }
 
-    // only players have base stats @fix this isn't fucking true
+    // only players currently use base stats
     if (!target->IsPlayer())
         return;
 
