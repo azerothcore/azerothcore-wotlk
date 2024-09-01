@@ -2614,7 +2614,7 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
             Unit::DealDamageMods(victim, damageInfo.damages[i].damage, &damageInfo.damages[i].absorb);
         }
 
-        // sparring
+        // Related to sparring system. Allow attack animations even if there are no damages
         if (victim->CanSparringWith(damageInfo.attacker))
         {
             damageInfo.HitInfo |= HITINFO_FAKE_DAMAGE;
