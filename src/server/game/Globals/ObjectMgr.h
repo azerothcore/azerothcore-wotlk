@@ -751,7 +751,7 @@ public:
 
     typedef std::map<uint32, uint32> CharacterConversionMap;
 
-    typedef std::unordered_map<uint32, std::vector<float>> CreatureSparringContainer;
+    typedef std::unordered_map<ObjectGuid::LowType, std::vector<float>> CreatureSparringContainer;
 
     GameObjectTemplate const* GetGameObjectTemplate(uint32 entry);
     bool IsGameObjectStaticTransport(uint32 entry);

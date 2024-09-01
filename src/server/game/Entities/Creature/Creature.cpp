@@ -603,7 +603,7 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
     SetCanModifyStats(true);
     UpdateAllStats();
 
-    LoadSparringPct(Entry);
+    LoadSparringPct();
 
     // checked and error show at loading templates
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(cInfo->faction))
@@ -1186,8 +1186,7 @@ bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, u
     }
 
     LoadCreaturesAddon();
-
-    LoadSparringPct(Entry);
+    LoadSparringPct();
 
     //! Need to be called after LoadCreaturesAddon - MOVEMENTFLAG_HOVER is set there
     m_positionZ += GetHoverHeight();
@@ -2023,6 +2022,8 @@ void Creature::setDeathState(DeathState state, bool despawn)
 
         Motion_Initialize();
         LoadCreaturesAddon(true);
+        LoadSparringPct();
+
         if (GetCreatureData() && GetPhaseMask() != GetCreatureData()->phaseMask)
             SetPhaseMask(GetCreatureData()->phaseMask, false);
     }
@@ -2787,14 +2788,32 @@ bool Creature::LoadCreaturesAddon(bool reload)
     return true;
 }
 
-void Creature::LoadSparringPct(uint32 entry)
+void Creature::LoadSparringPct()
 {
+    ObjectGuid::LowType spawnId = GetSpawnId();
     const auto& sparringData = sObjectMgr->GetSparringData();
 
-    auto itr = sparringData.find(entry);
+    auto itr = sparringData.find(spawnId);
     if (itr != sparringData.end() && !itr->second.empty()) {
         _sparringPct = itr->second[0];
     }
+}
+
+bool Creature::CanSparringWith(const Unit* attacker) const
+{
+    if(GetSparringPct() == 0.0f)
+        return false;
+
+    if(!attacker)
+        return false;
+
+    if(attacker->IsPlayer() || attacker->GetTypeId() != TYPEID_UNIT)
+        return false;
+
+    if(IsCharmedOwnedByPlayerOrPlayer() || attacker->IsCharmedOwnedByPlayerOrPlayer())
+        return false;
+
+    return true;
 }
 
 /// Send a message to LocalDefense channel for players opposition team in the zone
