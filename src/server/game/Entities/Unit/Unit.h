@@ -1818,7 +1818,7 @@ protected:
 
     void _UpdateAutoRepeatSpell();
 
-    bool CanSparringWith(const Unit* attacker) const;   ///@brief: Check if unit is eligible for sparring damages. Work only if attacker and victim are creatures.
+    bool CanSparringWith(Unit const* attacker) const;   ///@brief: Check if unit is eligible for sparring damages. Work only if attacker and victim are creatures.
 
     uint8 m_realRace;
     uint8 m_race;

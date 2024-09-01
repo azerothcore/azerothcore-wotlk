@@ -2791,10 +2791,11 @@ bool Creature::LoadCreaturesAddon(bool reload)
 void Creature::LoadSparringPct()
 {
     ObjectGuid::LowType spawnId = GetSpawnId();
-    const auto& sparringData = sObjectMgr->GetSparringData();
+    auto const& sparringData = sObjectMgr->GetSparringData();
 
     auto itr = sparringData.find(spawnId);
-    if (itr != sparringData.end() && !itr->second.empty()) {
+    if (itr != sparringData.end() && !itr->second.empty())
+    {
         _sparringPct = itr->second[0];
     }
 }

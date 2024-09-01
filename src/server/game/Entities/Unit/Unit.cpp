@@ -44,7 +44,6 @@
 #include "MoveSplineInit.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
-#include "Object.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "PassiveAI.h"
@@ -1021,7 +1020,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
     }
 
     // Sparring
-    if(victim->CanSparringWith(attacker))
+    if (victim->CanSparringWith(attacker))
     {
         if(damage >= victim->GetHealth())
             damage = 0;
@@ -3939,18 +3938,18 @@ void Unit::_UpdateAutoRepeatSpell()
     }
 }
 
-bool Unit::CanSparringWith(const Unit* attacker) const
+bool Unit::CanSparringWith(Unit const* attacker) const
 {
-    if(GetTypeId() != TYPEID_UNIT || IsCharmedOwnedByPlayerOrPlayer())
+    if (GetTypeId() != TYPEID_UNIT || IsCharmedOwnedByPlayerOrPlayer())
         return false;
 
-    if(!attacker)
+    if (!attacker)
         return false;
 
-    if(attacker->GetTypeId() != TYPEID_UNIT || attacker->IsCharmedOwnedByPlayerOrPlayer())
+    if (attacker->GetTypeId() != TYPEID_UNIT || attacker->IsCharmedOwnedByPlayerOrPlayer())
         return false;
 
-    if(Creature const* me = ToCreature())
+    if (Creature const* me = ToCreature())
         if(me->GetSparringPct() == 0.0f)
             return false;
 
