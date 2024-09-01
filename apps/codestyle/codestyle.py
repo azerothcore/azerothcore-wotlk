@@ -1,6 +1,7 @@
 import io
 import os
 import sys
+import re
 
 # Get the src directory of the project
 src_directory = os.path.join(os.getcwd(), 'src')
@@ -11,6 +12,7 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "GetCounter() check": "Passed",
+    "Misc codestyle check": "Passed",
     "GetTypeId() check": "Passed",
     "NpcFlagHelpers check": "Passed",
     "ItemFlagHelpers check": "Passed",
@@ -29,6 +31,7 @@ def parsing_file(directory: str) -> None:
                         multiple_blank_lines_check(file, file_path)
                         trailing_whitespace_check(file, file_path)
                         get_counter_check(file, file_path)
+                        misc_codestyle_check(file, file_path)
                         if file_name != 'Object.h':
                             get_typeid_check(file, file_path)
                         if file_name != 'Unit.h':
@@ -184,7 +187,7 @@ def itemtemplateflag_helpers_check(file: io, file_path: str) -> None:
     for line_number, line in enumerate(file, start = 1):
         if 'Flags & ITEM_FLAG' in line:
             print(
-                f"Please use HasFlag(ItemFlag) instead of 'Flags & ITEM_FLAG_' {file_path} at line {line_number}")
+                f"Please use HasFlag(ItemFlag) instead of 'Flags & ITEM_FLAG_': {file_path} at line {line_number}")
             check_failed = True
         if 'Flags2 & ITEM_FLAG2' in line:
             print(
@@ -198,6 +201,26 @@ def itemtemplateflag_helpers_check(file: io, file_path: str) -> None:
     if check_failed:
         error_handler = True
         results["ItemTemplateFlagHelpers check"] = "Failed"
+
+# Codestyle patterns checking for various codestyle issues
+def misc_codestyle_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+    # Parse all the file
+    for line_number, line in enumerate(file, start = 1):
+        if 'const auto&' in line:
+            print(
+                f"Please use 'auto const&' syntax instead of 'const auto&': {file_path} at line {line_number}")
+            check_failed = True
+        if re.search(r'\bconst\s+\w+\s*\*\b', line):
+            print(
+                f"Please use the syntax 'Class/ObjectType const*' instead of 'const Class/ObjectType*': {file_path} at line {line_number}")
+            check_failed = True
+    # Handle the script error and update the result output
+    if check_failed:
+        error_handler = True
+        results["Misc codestyle check"] = "Failed"
 
 # Main function
 parsing_file(src_directory)
