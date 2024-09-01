@@ -252,7 +252,7 @@ public:
         if (target->GetExactDist(_source) > 80.0f)
             return false;
 
-        if (target->GetTypeId() != TYPEID_PLAYER)
+        if (!target->IsPlayer())
             return false;
 
         if (target->HasAura(SPELL_FROST_IMBUED_BLADE))

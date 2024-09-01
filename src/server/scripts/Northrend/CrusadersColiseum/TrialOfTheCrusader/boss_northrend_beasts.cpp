@@ -172,7 +172,7 @@ public:
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
                     {
-                        if( t->GetTypeId() != TYPEID_PLAYER && pInstance )
+                        if( !t->IsPlayer() && pInstance )
                         {
                             GuidVector validPlayers;
                             Map::PlayerList const& pl = me->GetMap()->GetPlayers();

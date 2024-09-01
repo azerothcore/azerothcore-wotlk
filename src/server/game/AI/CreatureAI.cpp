@@ -175,7 +175,7 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
 void CreatureAI::TriggerAlert(Unit const* who) const
 {
     // If there's no target, or target isn't a player do nothing
-    if (!who || who->GetTypeId() != TYPEID_PLAYER)
+    if (!who || !who->IsPlayer())
         return;
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
     if (me->GetTypeId() != TYPEID_UNIT || me->IsEngaged() || me->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED))

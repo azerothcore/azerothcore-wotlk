@@ -314,7 +314,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (!killer || killer->GetTypeId() != TYPEID_PLAYER)
+            if (!killer || !killer->IsPlayer())
             {
                 return;
             }

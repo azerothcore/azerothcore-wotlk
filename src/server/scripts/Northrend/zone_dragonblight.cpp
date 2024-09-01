@@ -1648,7 +1648,7 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {
-            if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
+            if (!summoner || !summoner->IsPlayer())
                 return;
 
             uint8 id = GetSpeachId();

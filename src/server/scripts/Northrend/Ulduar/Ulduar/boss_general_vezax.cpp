@@ -486,7 +486,7 @@ class spell_aura_of_despair_aura : public AuraScript
         if (Unit* caster = GetCaster())
             if (Unit* target = GetTarget())
             {
-                if (target->GetTypeId() != TYPEID_PLAYER)
+                if (!target->IsPlayer())
                     return;
 
                 target->CastSpell(target, SPELL_AURA_OF_DESPAIR_2, true);

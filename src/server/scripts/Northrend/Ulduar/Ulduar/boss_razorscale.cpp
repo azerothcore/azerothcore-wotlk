@@ -711,7 +711,7 @@ public:
             if (_introSpoken)
                 return;
 
-            if (who->GetTypeId() != TYPEID_PLAYER || me->GetExactDist2d(who) > 15.0f)
+            if (!who->IsPlayer() || me->GetExactDist2d(who) > 15.0f)
                 return;
 
             _introSpoken = true;

@@ -930,7 +930,7 @@ namespace Acore
 
             uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
             Optional<float> collisionHeight = { };
-            if (i_obj->GetTypeId() == TYPEID_GAMEOBJECT)
+            if (i_obj->IsGameObject())
             {
                 losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
                 collisionHeight = i_owner->GetCollisionHeight();
@@ -1203,7 +1203,7 @@ namespace Acore
             if (!me->IsValidAttackTarget(u))
                 return false;
 
-            if (i_playerOnly && u->GetTypeId() != TYPEID_PLAYER)
+            if (i_playerOnly && !u->IsPlayer())
                 return false;
 
             m_range = me->GetDistance(u);   // use found unit range as new range limit for next check

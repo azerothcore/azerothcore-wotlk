@@ -400,7 +400,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER || me->GetExactDistSq(who) > 6400.0f) // 80yd*80yd
+            if (!who->IsPlayer() || me->GetExactDistSq(who) > 6400.0f) // 80yd*80yd
                 return;
 
             if (me->getStandState() != UNIT_STAND_STATE_STAND)

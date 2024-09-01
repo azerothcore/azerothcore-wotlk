@@ -1904,7 +1904,7 @@ bool Creature::CanStartAttack(Unit const* who) const
         return false;
 
     // This set of checks is should be done only for creatures
-    if ((IsImmuneToNPC() && who->GetTypeId() != TYPEID_PLAYER) ||      // flag is valid only for non player characters
+    if ((IsImmuneToNPC() && !who->IsPlayer()) ||      // flag is valid only for non player characters
         (IsImmuneToPC() && who->IsPlayer()))         // immune to PC and target is a player, return false
     {
         return false;

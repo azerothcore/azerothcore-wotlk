@@ -261,7 +261,7 @@ void TempSummon::InitSummon()
                 owner->ToCreature()->AI()->JustSummoned(this);
             }
         }
-        else if (owner->GetTypeId() == TYPEID_GAMEOBJECT)
+        else if (owner->IsGameObject())
         {
             if (owner->ToGameObject()->AI())
             {
@@ -308,7 +308,7 @@ void TempSummon::UnSummon(uint32 msTime)
         {
             owner->ToCreature()->AI()->SummonedCreatureDespawn(this);
         }
-        else if (owner->GetTypeId() == TYPEID_GAMEOBJECT && owner->ToGameObject()->AI())
+        else if (owner->IsGameObject() && owner->ToGameObject()->AI())
         {
             owner->ToGameObject()->AI()->SummonedCreatureDespawn(this);
         }
