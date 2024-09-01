@@ -5,5 +5,5 @@ CREATE TABLE `creature_sparring` (
   `SparringPCT` float NOT NULL),
   PRIMARY KEY (`GUID`),
   FOREIGN KEY (`GUID`) REFERENCES creature(`guid`),
-  CONSTRAINT `creature_sparring_chk_1` CHECK (`SparringPct` BETWEEN 0 AND 100)
+  CONSTRAINT `creature_sparring_chk_1` CHECK (`SparringPCT` BETWEEN 0 AND 100)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
