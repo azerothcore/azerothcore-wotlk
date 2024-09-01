@@ -244,11 +244,11 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE:
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES:
             return true;                                    // not check correctness node indexes
-        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM:
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPPED_ITEM:
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_ITEM_QUALITY:
             if (equipped_item.item_quality >= MAX_ITEM_QUALITY)
             {
-                LOG_ERROR("sql.sql", "Table `achievement_criteria_requirement` (Entry: {} Type: {}) for requirement ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPED_ITEM ({}) has unknown quality state in value1 ({}), ignored.",
+                LOG_ERROR("sql.sql", "Table `achievement_criteria_requirement` (Entry: {} Type: {}) for requirement ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPPED_ITEM ({}) has unknown quality state in value1 ({}), ignored.",
                                  criteria->ID, criteria->requiredType, dataType, equipped_item.item_quality);
                 return false;
             }
@@ -411,7 +411,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             }
             return instance->CheckAchievementCriteriaMeet(criteria_id, source, target, miscvalue1);
         }
-        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM:
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPPED_ITEM:
         {
             ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(miscvalue1);
             if (!pProto)
