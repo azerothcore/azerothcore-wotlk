@@ -159,7 +159,7 @@ void Player::Update(uint32 p_time)
         }
     }
 
-    m_achievementMgr->UpdateTimedAchievements(p_time);
+    m_achievementMgr->Update(p_time);
 
     if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING) && !HasUnitState(UNIT_STATE_CHARGING))
     {
