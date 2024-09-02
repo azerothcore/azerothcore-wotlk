@@ -1887,16 +1887,14 @@ void GameObject::Use(Unit* user)
                 {
                     if (!user->IsPlayer())
                         return;
-                    if (ObjectGuid ownerGuid = GetOwnerGUID())
+
+                    if (WOWGUID ownerGuid = GetOwnerGUID())
                     {
-                        if (WOWGUID ownerGuid = GetOwnerGUID())
-                        {
-                            Group* group = user->ToPlayer()->GetGroup();
-                            if (!group)
-                                return;
-                            if (!group->IsMember(ownerGuid))
-                                return;
-                        }
+                        Group* group = user->ToPlayer()->GetGroup();
+                        if (!group)
+                            return;
+                        if (!group->IsMember(ownerGuid))
+                            return;
                     }
                 }
 

@@ -954,7 +954,7 @@ void User::HandleRequestPartyMemberStatsOpcode(WDataStore& recvData)
     recvData >> Guid;
 
     Player* player = HashMapHolder<Player>::Find(Guid);
-    if (!player)
+    if (!player || !player->IsInSameRaidWith(m_player))
     {
         WDataStore data(SMSG_PARTY_MEMBER_STATS_FULL, 3 + 4 + 2);
         data << uint8(0);                                   // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
