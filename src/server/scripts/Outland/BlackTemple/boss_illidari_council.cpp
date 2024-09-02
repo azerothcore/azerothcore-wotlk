@@ -254,13 +254,13 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     {
         InstanceScript* instance = me->GetInstanceScript();
 
-        if (me->GetHealth() <= damage)
-            damage = me->GetHealth() - 1;
-
         int32 damageTaken = damage;
         Creature* target = instance->GetCreature(DATA_ILLIDARI_COUNCIL);
 
         me->CastCustomSpell(target->ToUnit(), SPELL_SHARED_RULE_DMG, &damageTaken, &damageTaken, &damageTaken, true, nullptr, nullptr, me->GetGUID());
+
+        if (me->GetHealth() <= damage)
+            damage = me->GetHealth() - 1;
     }
 
     void KilledUnit(Unit*) override
