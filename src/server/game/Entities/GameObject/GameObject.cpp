@@ -1885,13 +1885,21 @@ void GameObject::Use(Unit* user)
 
                 if (info->spellcaster.partyOnly)
                 {
-                    Player const* caster = ObjectAccessor::FindConnectedPlayer(GetOwnerGUID());
-                    if (!caster || user->GetTypeId() != TYPEID_PLAYER || !user->ToPlayer()->IsInSameRaidWith(caster))
+                    if (!user->IsPlayer())
                         return;
-                }
 
-                user->RemoveAurasByType(SPELL_AURA_MOUNTED);
-                spellId = info->spellcaster.spellId;
+                    if (Group* group = user->ToPlayer()->GetGroup())
+                    {
+                        if (ObjectGuid ownerGuid = GetOwnerGUID())
+                        {
+                            if (group->IsMember(ownerGuid))
+                            {
+                                user->RemoveAurasByType(SPELL_AURA_MOUNTED);
+                                spellId = info->spellcaster.spellId;
+                            }
+                        }
+                    }
+                }
 
                 break;
             }
