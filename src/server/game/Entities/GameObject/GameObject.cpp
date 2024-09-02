@@ -1887,14 +1887,17 @@ void GameObject::Use(Unit* user)
                 {
                     if (!user->IsPlayer())
                         return;
-                    Group* group = user->ToPlayer()->GetGroup();
-                    if (!group)
-                        return;
-                    ObjectGuid ownerGuid = GetOwnerGUID();
-                    if (!ownerGuid)
-                        return;
-                    if (!group->IsMember(ownerGuid))
-                        return;
+                    if (ObjectGuid ownerGuid = GetOwnerGUID())
+                    {
+                        if (user->GetGUID() != ownerGuid)
+                        {
+                            Group* group = user->ToPlayer()->GetGroup();
+                            if (!group)
+                                return;
+                            if (!group->IsMember(ownerGuid))
+                                return;
+                        }
+                    }
                 }
 
                 user->RemoveAurasByType(SPELL_AURA_MOUNTED);
