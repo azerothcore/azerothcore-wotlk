@@ -379,7 +379,6 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
         scheduler.CancelAll();
         _canCastDampenMagic = true;
         boss_illidari_council_memberAI::Reset();
-
         CastDampenMagicIfPossible();
     }
 
