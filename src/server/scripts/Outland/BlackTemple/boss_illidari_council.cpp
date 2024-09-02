@@ -88,12 +88,6 @@ enum Misc
     EVENT_SPELL_JUDGEMENT               = 5,
     EVENT_SPELL_CONSECRATION            = 6,
 
-    EVENT_SPELL_FLAMESTRIKE             = 10,
-    EVENT_SPELL_BLIZZARD                = 11,
-    EVENT_SPELL_ARCANE_BOLT             = 12,
-    EVENT_SPELL_DAMPEN_MAGIC            = 13,
-    EVENT_SPELL_ARCANE_EXPLOSION        = 14,
-
     EVENT_SPELL_REFLECTIVE_SHIELD       = 20,
     EVENT_SPELL_CIRCLE_OF_HEALING       = 21,
     EVENT_SPELL_DIVINE_WRATH            = 22,
@@ -386,9 +380,7 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
         _canCastDampenMagic = true;
         boss_illidari_council_memberAI::Reset();
 
-        me->m_Events.AddEventAtOffset([this] {
-            DoCastSelf(SPELL_DAMPEN_MAGIC);
-        }, 1s);
+        CastDampenMagicIfPossible();
     }
 
     void AttackStart(Unit* who) override
@@ -429,8 +421,6 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
             if (aura->GetDuration() <= 4 * MINUTE * IN_MILLISECONDS)
                 CastDampenMagicIfPossible();
         }
-        else
-            CastDampenMagicIfPossible(); // Didn't find the aura, so recast it.
     }
 
     void OnAuraRemove(AuraApplication* auraApp, AuraRemoveMode mode) override
@@ -463,17 +453,17 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
     {
         if (_canCastDampenMagic)
         {
+            _canCastDampenMagic = false;
+            me->m_Events.AddEventAtOffset([this] {
+                _canCastDampenMagic = true;
+            }, 1min);
+
             if (me->IsInCombat())
             {
-                _canCastDampenMagic = false;
                 scheduler.Schedule(1s, [this](TaskContext /*context*/)
                 {
                     DoCastSelf(SPELL_DAMPEN_MAGIC);
                 });
-
-                me->m_Events.AddEventAtOffset([this] {
-                    _canCastDampenMagic = true;
-                }, 1min);
             }
             else
             {
