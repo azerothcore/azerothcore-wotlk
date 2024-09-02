@@ -384,12 +384,9 @@ void SpellMgr::LoadSpellInfoCorrections()
         27892,  // To Anchor 1
         27928,  // To Anchor 1
         27935,  // To Anchor 1
-        27915,  // Anchor to Skulls
-        27931,  // Anchor to Skulls
-        27937   // Anchor to Skulls
-        }, [](SpellInfo* spellInfo)
+    }, [](SpellInfo* spellInfo)
     {
-        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS);
     });
 
     // Wrath of the Plaguebringer
@@ -1946,7 +1943,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Ulduar, Mimiron, Magnetic Core (summon)
-    ApplySpellFix({ 64444 }, [](SpellInfo* spellInfo)
+    // Meeting Stone Summon
+    ApplySpellFix({ 64444, 23598 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
@@ -3609,62 +3607,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_10_YARDS); // 10yd
     });
 
-    // Dragonmaw Race: All parts
-    ApplySpellFix({
-        40890   // Oldie's Rotten Pumpkin
-        }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40905;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Trope's Slime Cannon
-    ApplySpellFix({ 40909 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40905;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Corlok's Skull Barrage
-    ApplySpellFix({ 40894 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40900;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Ichman's Blazing Fireball
-    ApplySpellFix({ 40928 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40929;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Mulverick's Great Balls of Lightning
-    ApplySpellFix({ 40930 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 40931;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
-    // Sky Shatter
-    ApplySpellFix({ 40945 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Targets |= TARGET_FLAG_DEST_LOCATION;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 41064;
-        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_MISSILE;
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
-    });
-
     // Gauging the Resonant Frequency (10594)
     ApplySpellFix({ 37390 }, [](SpellInfo* spellInfo)
     {
@@ -4590,7 +4532,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Holiday - Midsummer, Ribbon Pole Periodic Visual
     ApplySpellFix({ 45406 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST );
+        spellInfo->AuraInterruptFlags |= ( AURA_INTERRUPT_FLAG_MOUNT | AURA_INTERRUPT_FLAG_CAST | AURA_INTERRUPT_FLAG_TALK );
     });
 
     // Improved Mind Flay and Smite
@@ -4701,12 +4643,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
     });
 
-    // Demonic Pact
-    ApplySpellFix({ 48090 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
-    });
-
     // Ancestral Awakening
     ApplySpellFix({ 52759 }, [](SpellInfo* spellInfo)
     {
@@ -4795,6 +4731,95 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 37135 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 5;
+    });
+
+    // Presence Of Mind
+    ApplySpellFix({ 12043 }, [](SpellInfo* spellInfo)
+    {
+        // It should not share cooldown mods with category[1151] spells (Arcane Power [12042], Decimate [47271])
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_CATEGORY_COOLDOWN_MODS;
+    });
+
+    // Eye of Grillok
+    ApplySpellFix({ 38495 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TriggerSpell = 38530; // Quest Credit for Eye of Grillok
+    });
+
+    // Greater Fireball
+    ApplySpellFix({ 33051 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
+    });
+
+    // Gor'drek's Ointment
+    ApplySpellFix({ 32578 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
+    // Shadow Grasp
+    ApplySpellFix({ 30410 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx6 |= SPELL_ATTR6_NO_PUSHBACK;
+    });
+
+    ApplySpellFix({
+        471, // Palamino
+        8980, // Skeletal Horse
+        10788, // Leopard
+        10790, // Tiger
+        10792, // Spotted Panther
+        60136, // Grand Caravan Mammoth
+        60140 // Grand Caravan Mammoth
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~AURA_INTERRUPT_FLAG_NOT_ABOVEWATER;
+    });
+
+    // Molten Punch
+    ApplySpellFix({ 40126 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
+    });
+
+    // Wing Buffet
+    ApplySpellFix({ 37319 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_24);
+        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(0);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS);
+    });
+
+    // Flame Wave
+    ApplySpellFix({ 33800 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_PERIODIC_TRIGGER_SPELL;
+        spellInfo->Effects[EFFECT_1].Amplitude = 500;
+    });
+
+    // Chromatic Resistance Aura
+    ApplySpellFix({ 41453 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].MiscValue = 124;
+    });
+
+    // Power of the Guardian
+    ApplySpellFix({ 28142, 28143, 28144, 28145 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
+    });
+
+    // Warrior stances passives
+    ApplySpellFix({
+        2457, // Battle Stance
+        2458, // Berserker Stance
+        7376  // Defensive Stance Passive
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
@@ -4917,6 +4942,14 @@ void SpellMgr::LoadSpellInfoCorrections()
     factionTemplateEntry->hostileMask |= 8;
     factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1921)); // The Taunka
     factionTemplateEntry->hostileMask |= 8;
+
+    // Remove 1 from guards friendly mask, making able to attack players
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1857)); // Area 52 Bruiser
+    factionTemplateEntry->friendlyMask &= ~1;
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1806)); // Netherstorm Agent
+    factionTemplateEntry->friendlyMask &= ~1;
+    factionTemplateEntry = const_cast<FactionTemplateEntry*>(sFactionTemplateStore.LookupEntry(1812)); // K3 Bruiser
+    factionTemplateEntry->friendlyMask &= ~1;
 
     // Remove vehicles attr, making accessories selectable
     VehicleSeatEntry* vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4689)); // Siege Engine, Accessory

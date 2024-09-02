@@ -21,6 +21,7 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "gruuls_lair.h"
+#include "SpellAuraEffects.h"
 
 enum Yells
 {
@@ -314,4 +315,3 @@ void AddSC_boss_gruul()
     RegisterSpellScript(spell_gruul_shatter);
     RegisterSpellScript(spell_gruul_shatter_effect);
 }
-

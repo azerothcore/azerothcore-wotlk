@@ -120,7 +120,7 @@ DBCFileLoader::~DBCFileLoader()
     delete[] fieldsOffset;
 }
 
-DBCFileLoader::Record DBCFileLoader::getRecord(size_t id)
+DBCFileLoader::Record DBCFileLoader::getRecord(std::size_t id)
 {
     ASSERT(data);
     return Record(*this, data + id * recordSize);

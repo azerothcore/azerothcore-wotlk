@@ -19,6 +19,7 @@
 #include "MapMgr.h"
 #include "Transport.h"
 #include "halls_of_reflection.h"
+#include "InstanceScript.h"
 
 class UtherBatteredHiltEvent : public BasicEvent
 {
@@ -1212,4 +1213,3 @@ void AddSC_instance_halls_of_reflection()
 {
     new instance_halls_of_reflection();
 }
-

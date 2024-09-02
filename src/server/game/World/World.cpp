@@ -1274,13 +1274,17 @@ void World::LoadConfigSettings(bool reload)
 
     _bool_configs[CONFIG_ALLOW_JOIN_BG_AND_LFG] = sConfigMgr->GetOption<bool>("JoinBGAndLFG.Enable", false);
 
-    _bool_configs[CONFIG_LEAVE_GROUP_ON_LOGOUT] = sConfigMgr->GetOption<bool>("LeaveGroupOnLogout.Enabled", true);
+    _bool_configs[CONFIG_LEAVE_GROUP_ON_LOGOUT] = sConfigMgr->GetOption<bool>("LeaveGroupOnLogout.Enabled", false);
 
     _bool_configs[CONFIG_QUEST_POI_ENABLED] = sConfigMgr->GetOption<bool>("QuestPOI.Enabled", true);
 
     _int_configs[CONFIG_CHANGE_FACTION_MAX_MONEY] = sConfigMgr->GetOption<uint32>("ChangeFaction.MaxMoney", 0);
 
     _bool_configs[CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH] = sConfigMgr->GetOption<bool>("Pet.RankMod.Health", true);
+
+    _bool_configs[CONFIG_MUNCHING_BLIZZLIKE] = sConfigMgr->GetOption<bool>("MunchingBlizzlike.Enabled", true);
+
+    _bool_configs[CONFIG_ENABLE_DAZE] = sConfigMgr->GetOption<bool>("Daze.Enabled", true);
 
     _int_configs[CONFIG_DAILY_RBG_MIN_LEVEL_AP_REWARD] = sConfigMgr->GetOption<uint32>("DailyRBGArenaPoints.MinLevel", 71);
 
@@ -1317,6 +1321,7 @@ void World::LoadConfigSettings(bool reload)
     bool enableHeight = sConfigMgr->GetOption<bool>("vmap.enableHeight", true);
     bool enablePetLOS = sConfigMgr->GetOption<bool>("vmap.petLOS", true);
     _bool_configs[CONFIG_VMAP_BLIZZLIKE_PVP_LOS] = sConfigMgr->GetOption<bool>("vmap.BlizzlikePvPLOS", true);
+    _bool_configs[CONFIG_VMAP_BLIZZLIKE_LOS_OPEN_WORLD] = sConfigMgr->GetOption<bool>("vmap.BlizzlikeLOSInOpenWorld", true);
 
     if (!enableHeight)
         LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
@@ -1357,7 +1362,9 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_WARDEN_CLIENT_RESPONSE_DELAY] = sConfigMgr->GetOption<int32>("Warden.ClientResponseDelay", 600);
 
     // Dungeon finder
-    _int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
+    _int_configs[CONFIG_LFG_OPTIONSMASK]    = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
+
+    _bool_configs[CONFIG_LFG_CAST_DESERTER] = sConfigMgr->GetOption<int32>("DungeonFinder.CastDeserter", true);
 
     // DBC_ItemAttributes
     _bool_configs[CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES] = sConfigMgr->GetOption<bool>("DBC.EnforceItemAttributes", true);
@@ -1536,6 +1543,11 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Acore Strings...");
     if (!sObjectMgr->LoadAcoreStrings())
         exit(1);                                            // Error message displayed in function already
+
+    LOG_INFO("server.loading", "Loading Module Strings...");
+    sObjectMgr->LoadModuleStrings();
+    LOG_INFO("server.loading", "Loading Module Strings Locale...");
+    sObjectMgr->LoadModuleStringsLocale();
 
     ///- Update the realm entry in the database with the realm type from the config file
     //No SQL injection as values are treated as integers
@@ -1783,7 +1795,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Quest Greetings...");
     sObjectMgr->LoadQuestGreetings();                               // must be loaded after creature_template, gameobject_template tables
     LOG_INFO("server.loading", "Loading Quest Greeting Locales...");
-    sObjectMgr->LoadQuestGreetingsLocales();                        // must be loaded after creature_template, gameobject_template tables
+    sObjectMgr->LoadQuestGreetingsLocales();                        // must be loaded after creature_template, gameobject_template tables, quest_greeting
 
     LOG_INFO("server.loading", "Loading Quest Money Rewards...");
     sObjectMgr->LoadQuestMoneyRewards();
@@ -1915,10 +1927,12 @@ void World::SetInitialWorldSettings()
     sGroupMgr->LoadGroups();
 
     LOG_INFO("server.loading", "Loading Reserved Names...");
-    sObjectMgr->LoadReservedPlayersNames();
+    sObjectMgr->LoadReservedPlayerNamesDB();
+    sObjectMgr->LoadReservedPlayerNamesDBC(); // Needs to be after LoadReservedPlayerNamesDB()
 
     LOG_INFO("server.loading", "Loading Profanity Names...");
-    sObjectMgr->LoadProfanityPlayersNames();
+    sObjectMgr->LoadProfanityNamesFromDB();
+    sObjectMgr->LoadProfanityNamesFromDBC(); // Needs to be after LoadProfanityNamesFromDB()
 
     LOG_INFO("server.loading", "Loading GameObjects for Quests...");
     sObjectMgr->LoadGameObjectForQuests();
@@ -2570,97 +2584,6 @@ namespace Acore
         va_list* i_args;
     };
 }                                                           // namespace Acore
-
-/// Send a System Message to all players (except self if mentioned)
-void World::SendWorldText(uint32 string_id, ...)
-{
-    va_list ap;
-    va_start(ap, string_id);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-    {
-        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
-            continue;
-
-        wt_do(itr->second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
-void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
-{
-    va_list ap;
-    va_start(ap, flag);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (auto const& itr : _sessions)
-    {
-        if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
-        {
-            continue;
-        }
-
-        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
-        {
-            if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
-            {
-                continue;
-            }
-        }
-
-        wt_do(itr.second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
-/// Send a System Message to all GMs (except self if mentioned)
-void World::SendGMText(uint32 string_id, ...)
-{
-    va_list ap;
-    va_start(ap, string_id);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-    {
-        // Session should have permissions to receive global gm messages
-        WorldSession* session = itr->second;
-        if (!session || AccountMgr::IsPlayerAccount(session->GetSecurity()))
-            continue;
-
-        // Player should be in world
-        Player* player = session->GetPlayer();
-        if (!player || !player->IsInWorld())
-            continue;
-
-        wt_do(session->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
-/// @deprecated only for debug purpose. Send a System Message to all players (except self if mentioned)
-void World::SendGlobalText(const char* text, WorldSession* self)
-{
-    WorldPacket data;
-
-    // need copy to prevent corruption by strtok call in LineFromMessage original string
-    char* buf = strdup(text);
-    char* pos = buf;
-
-    while (char* line = ChatHandler::LineFromMessage(pos))
-    {
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
-        SendGlobalMessage(&data, self);
-    }
-
-    free(buf);
-}
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
 bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId)

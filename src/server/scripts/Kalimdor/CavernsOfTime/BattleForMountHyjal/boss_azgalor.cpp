@@ -16,7 +16,10 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "hyjal.h"
 
 enum Spells
@@ -58,17 +61,17 @@ public:
         {
             DoCastVictim(SPELL_CLEAVE);
             context.Repeat(8s, 16s);
-        }).Schedule(25s, [this](TaskContext context)
+        }).Schedule(20s, 25s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_RAIN_OF_FIRE, 0, 40.f);
-            context.Repeat(15s);
+            DoCastRandomTarget(SPELL_RAIN_OF_FIRE, 0, 40.f, false);
+            context.Repeat(12s, 35s);
         }).Schedule(30s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_HOWL_OF_AZGALOR);
             context.Repeat(18s, 20s);
         }).Schedule(45s, 55s, [this](TaskContext context)
         {
-            DoCastRandomTarget(SPELL_DOOM, 0, 100.f, true, false, false);
+            DoCastAOE(SPELL_DOOM);
             Talk(SAY_DOOM);
             context.Repeat();
         }).Schedule(10min, [this](TaskContext context)
@@ -114,10 +117,47 @@ public:
 
 private:
     bool _recentlySpoken;
+};
 
+class spell_azgalor_doom : public SpellScript
+{
+    PrepareSpellScript(spell_azgalor_doom);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (Unit* victim = GetCaster()->GetVictim())
+        {
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_azgalor_doom::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
+class spell_azgalor_doom_aura : public AuraScript
+{
+    PrepareAuraScript(spell_azgalor_doom_aura);
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_DEATH && !IsExpired())
+        {
+            target->CastSpell(target, GetSpellInfo()->Effects[EFFECT_0].TriggerSpell, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_azgalor_doom_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 void AddSC_boss_azgalor()
 {
     RegisterHyjalAI(boss_azgalor);
+    RegisterSpellAndAuraScriptPair(spell_azgalor_doom, spell_azgalor_doom_aura);
 }

@@ -18,7 +18,6 @@
 #ifndef _VMAPMANAGER2_H
 #define _VMAPMANAGER2_H
 
-#include "Common.h"
 #include "IVMapMgr.h"
 #include <mutex>
 #include <unordered_map>

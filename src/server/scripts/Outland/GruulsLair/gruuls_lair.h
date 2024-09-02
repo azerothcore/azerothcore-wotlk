@@ -18,9 +18,7 @@
 #ifndef GRUULS_LAIR_H_
 #define GRUULS_LAIR_H_
 
-#include "CreatureAI.h"
 #include "CreatureAIImpl.h"
-#include "SpellAuraEffects.h"
 
 #define DataHeader "GL"
 

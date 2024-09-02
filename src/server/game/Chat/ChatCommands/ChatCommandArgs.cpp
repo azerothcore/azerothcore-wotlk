@@ -63,7 +63,7 @@ ChatCommandResult Acore::Impl::ChatCommands::ArgInfo<GameTele const*>::TryConsum
     if (val.holds_alternative<Hyperlink<tele>>())
         return FormatAcoreString(handler, LANG_CMDPARSER_GAME_TELE_ID_NO_EXIST, static_cast<uint32>(std::get<Hyperlink<tele>>(val)));
     else
-        return FormatAcoreString(handler, LANG_CMDPARSER_GAME_TELE_NO_EXIST, STRING_VIEW_FMT_ARG(std::get<std::string_view>(val)));
+        return FormatAcoreString(handler, LANG_CMDPARSER_GAME_TELE_NO_EXIST, std::get<std::string_view>(val));
 }
 
 struct ItemTemplateVisitor

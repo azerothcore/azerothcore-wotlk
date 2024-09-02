@@ -21,6 +21,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "shattered_halls.h"
+#include "SpellScript.h"
 
 enum Texts
 {

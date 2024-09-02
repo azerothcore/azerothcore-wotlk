@@ -26,7 +26,7 @@
 
 using boost::asio::ip::tcp;
 
-const size_t bufferSize = 4096;
+const std::size_t bufferSize = 4096;
 
 class RASession : public std::enable_shared_from_this<RASession>
 {

@@ -36,7 +36,7 @@ namespace WorldPackets
         virtual void Read() = 0;
 
         [[nodiscard]] WorldPacket const* GetRawPacket() const { return &_worldPacket; }
-        [[nodiscard]] size_t GetSize() const { return _worldPacket.size(); }
+        [[nodiscard]] std::size_t GetSize() const { return _worldPacket.size(); }
 
     protected:
         WorldPacket _worldPacket;
@@ -45,7 +45,7 @@ namespace WorldPackets
     class AC_GAME_API ServerPacket : public Packet
     {
     public:
-        ServerPacket(OpcodeServer opcode, size_t initialSize = 200);
+        ServerPacket(OpcodeServer opcode, std::size_t initialSize = 200);
 
         void Read() final;
 

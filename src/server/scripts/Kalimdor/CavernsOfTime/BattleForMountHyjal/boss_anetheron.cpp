@@ -16,7 +16,10 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "hyjal.h"
 
 enum Spells
@@ -58,18 +61,17 @@ public:
 
         scheduler.Schedule(20s, 28s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_CARRION_SWARM, 0, 60.f))
+            if (DoCastRandomTarget(SPELL_CARRION_SWARM, 0, 60.f, false) == SPELL_CAST_OK)
                 Talk(SAY_SWARM);
             context.Repeat(10s, 15s);
         }).Schedule(25s, 32s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_SLEEP))
-                Talk(SAY_SLEEP);
-
+            Talk(SAY_SLEEP);
+            DoCastRandomTarget(SPELL_SLEEP, 1, 0.0f, true, false, false);
             context.Repeat(35s, 48s);
         }).Schedule(30s, 48s, [this](TaskContext context)
         {
-            if (DoCastRandomTarget(SPELL_INFERNO))
+            if (DoCastRandomTarget(SPELL_INFERNO) == SPELL_CAST_OK)
                 Talk(SAY_INFERNO);
 
             context.Repeat(50s, 55s);
@@ -135,10 +137,31 @@ public:
 
 private:
     bool _recentlySpoken;
+};
 
+class spell_anetheron_sleep : public SpellScript
+{
+    PrepareSpellScript(spell_anetheron_sleep);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (!targets.empty())
+        {
+            if (Unit* victim = GetCaster()->GetVictim())
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+
+            Acore::Containers::RandomResize(targets, 3);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_anetheron_sleep::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
 };
 
 void AddSC_boss_anetheron()
 {
     RegisterHyjalAI(boss_anetheron);
+    RegisterSpellScript(spell_anetheron_sleep);
 }

@@ -15,13 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <cmath>
 #include "CreatureScript.h"
 #include "MoveSplineInit.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "WaypointMgr.h"
 #include "the_eye.h"
+#include <cmath>
+
+#include "Player.h"
+#include "SpellScript.h"
 
 enum Spells
 {
@@ -271,11 +274,11 @@ struct boss_alar : public BossAI
                 me->SummonCreature(NPC_FLAME_PATCH, *target, TEMPSUMMON_TIMED_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
             }
         }, 30s);
-        ScheduleTimedEvent(50s, [&]
+        ScheduleTimedEvent(34s, [&]
         {
             me->GetMotionMaster()->MovePoint(POINT_DIVE, alarPoints[POINT_DIVE], false, true);
             scheduler.DelayAll(15s);
-        }, 50s);
+        }, 57s);
         ScheduleUniqueTimedEvent(10min, [&]
         {
             DoCastSelf(SPELL_BERSERK);
@@ -533,4 +536,3 @@ void AddSC_boss_alar()
     RegisterSpellScript(spell_alar_ember_blast);
     RegisterSpellScript(spell_alar_dive_bomb);
 }
-

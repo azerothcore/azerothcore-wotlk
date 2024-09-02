@@ -17,11 +17,14 @@
 
 #include "CreatureGroups.h"
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "serpent_shrine.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Talk
 {
@@ -457,4 +460,3 @@ void AddSC_boss_leotheras_the_blind()
     RegisterSpellScript(spell_leotheras_demon_link);
     RegisterSpellScript(spell_leotheras_clear_consuming_madness);
 }
-

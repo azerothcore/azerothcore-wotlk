@@ -133,7 +133,7 @@ public:
         draft.SendMailTo(trans, MailReceiver(target->GetConnectedPlayer(), target->GetGUID().GetCounter()), sender);
         CharacterDatabase.CommitTransaction(trans);
 
-        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()).c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()));
         return true;
     }
 
@@ -158,7 +158,7 @@ public:
         draft.SendMailTo(trans, MailReceiver(target->GetConnectedPlayer(), target->GetGUID().GetCounter()), sender);
         CharacterDatabase.CommitTransaction(trans);
 
-        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()).c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()));
         return true;
     }
 
@@ -183,7 +183,7 @@ public:
         player->GetSession()->SendAreaTriggerMessage("|cffff0000[Message from administrator]:|r");
 
         // Confirmation message
-        handler->PSendSysMessage(LANG_SENDMESSAGE, handler->playerLink(target->GetName()).c_str(), msg.c_str());
+        handler->PSendSysMessage(LANG_SENDMESSAGE, handler->playerLink(target->GetName()), msg);
 
         return true;
     }
@@ -211,7 +211,7 @@ public:
 
         CharacterDatabase.CommitTransaction(trans);
 
-        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()).c_str());
+        handler->PSendSysMessage(LANG_MAIL_SENT, handler->playerLink(target->GetName()));
         return true;
     }
 };

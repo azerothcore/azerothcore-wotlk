@@ -28,6 +28,7 @@
 enum PlayerHook
 {
     PLAYERHOOK_ON_PLAYER_JUST_DIED,
+    PLAYERHOOK_ON_CALCULATE_TALENTS_POINTS,
     PLAYERHOOK_ON_PLAYER_RELEASED_GHOST,
     PLAYERHOOK_ON_SEND_INITIAL_PACKETS_BEFORE_ADD_TO_MAP,
     PLAYERHOOK_ON_BATTLEGROUND_DESERTION,
@@ -146,6 +147,8 @@ enum PlayerHook
     PLAYERHOOK_ON_VICTIM_REWARD_AFTER,
     PLAYERHOOK_ON_CUSTOM_SCALING_STAT_VALUE_BEFORE,
     PLAYERHOOK_ON_CUSTOM_SCALING_STAT_VALUE,
+    PLAYERHOOK_ON_APPLY_ITEM_MODS_BEFORE,
+    PLAYERHOOK_ON_APPLY_ENCHANTMENT_ITEM_MODS_BEFORE,
     PLAYERHOOK_CAN_ARMOR_DAMAGE_MODIFIER,
     PLAYERHOOK_ON_GET_FERAL_AP_BONUS,
     PLAYERHOOK_CAN_APPLY_WEAPON_DEPENDENT_AURA_DAMAGE_MOD,
@@ -210,6 +213,9 @@ protected:
 public:
     // Called when a player dies
     virtual void OnPlayerJustDied(Player* /*player*/) { }
+
+    // Called player talent points are calculated
+    virtual void OnCalculateTalentsPoints(Player const* /*player*/, uint32& /*talentPointsForLevel*/) { }
 
     // Called when clicking the release button
     virtual void OnPlayerReleasedGhost(Player* /*player*/) { }
@@ -541,6 +547,10 @@ public:
     virtual void OnCustomScalingStatValueBefore(Player* /*player*/, ItemTemplate const* /*proto*/, uint8 /*slot*/, bool /*apply*/, uint32& /*CustomScalingStatValue*/) { }
 
     virtual void OnCustomScalingStatValue(Player* /*player*/, ItemTemplate const* /*proto*/, uint32& /*statType*/, int32& /*val*/, uint8 /*itemProtoStatNumber*/, uint32 /*ScalingStatValue*/, ScalingStatValuesEntry const* /*ssv*/) { }
+
+    virtual void OnApplyItemModsBefore(Player* /*player*/, uint8 /*slot*/, bool /*apply*/, uint8 /*itemProtoStatNumber*/, uint32 /*statType*/, int32& /*val*/) { }
+
+    virtual void OnApplyEnchantmentItemModsBefore(Player* /*player*/, Item* /*item*/, EnchantmentSlot /*slot*/, bool /*apply*/, uint32 /*enchant_spell_id*/, uint32& /*enchant_amount*/) { }
 
     [[nodiscard]] virtual bool CanArmorDamageModifier(Player* /*player*/) { return true; }
 

@@ -197,6 +197,7 @@ enum ThorimEvents
     EVENT_THORIM_OUTRO1                     = 13,
     EVENT_THORIM_OUTRO2                     = 14,
     EVENT_THORIM_OUTRO3                     = 15,
+    EVENT_THORIM_OUTRO4                     = 16,
 
     EVENT_DR_ACOLYTE_GH                     = 20,
     EVENT_DR_ACOLYTE_HS                     = 21,
@@ -509,7 +510,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->IsPlayer())
                 Talk(SAY_SLAY);
         }
 
@@ -527,7 +528,7 @@ public:
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (who && _isHitAllowed && who->GetPositionZ() > 430 && who->GetTypeId() == TYPEID_PLAYER)
+            if (who && _isHitAllowed && who->GetPositionZ() > 430 && who->IsPlayer())
             {
                 _isHitAllowed = false;
                 DisableThorim(false);
@@ -630,11 +631,16 @@ public:
                 me->CastSpell(me, SPELL_LIGHTNING_CHARGE_BUFF, true);
                 events.RescheduleEvent(EVENT_THORIM_LIGHTNING_CHARGE, 10s, 0, EVENT_PHASE_RING);
             }
+            else if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                m_pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+            }
         }
 
         void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
         {
-            if (spellInfo->Id == SPELL_LIGHTNING_CHARGE_DAMAGE && target->GetTypeId() == TYPEID_PLAYER)
+            if (spellInfo->Id == SPELL_LIGHTNING_CHARGE_DAMAGE && target->IsPlayer())
                 _hitByLightning = true;
         }
 
@@ -773,12 +779,13 @@ public:
                     {
                         Talk(SAY_END_NORMAL_3);
                     }
-
                     // Defeat credit
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_THORIM, DONE);
-
-                    me->DespawnOrUnsummon(8000);
+                    events.ScheduleEvent(EVENT_THORIM_OUTRO4, 14s, 0, 3);
+                    break;
+                case EVENT_THORIM_OUTRO4:
+                    DoCastSelf(SPELL_TELEPORT);
                     break;
             }
 
@@ -1104,7 +1111,7 @@ public:
 
         void DamageTaken(Unit* who, uint32&, DamageEffectType, SpellSchoolMask) override
         {
-            if (!_playerAttack && who && (who->GetTypeId() == TYPEID_PLAYER || who->GetOwnerGUID().IsPlayer()))
+            if (!_playerAttack && who && (who->IsPlayer() || who->GetOwnerGUID().IsPlayer()))
             {
                 if (me->GetInstanceScript())
                     if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
@@ -1722,59 +1729,37 @@ public:
     }
 };
 
-class spell_thorim_lightning_pillar_P2 : public SpellScriptLoader
+class spell_thorim_lightning_pillar_P2_aura : public AuraScript
 {
-public:
-    spell_thorim_lightning_pillar_P2() : SpellScriptLoader("spell_thorim_lightning_pillar_P2") { }
+    PrepareAuraScript(spell_thorim_lightning_pillar_P2_aura);
 
-    class spell_thorim_lightning_pillar_P2_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const* aurEff)
     {
-        PrepareAuraScript(spell_thorim_lightning_pillar_P2_AuraScript);
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+            GetUnitOwner()->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
 
-        void OnPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-                GetUnitOwner()->CastSpell(caster, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_lightning_pillar_P2_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_thorim_lightning_pillar_P2_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_lightning_pillar_P2_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
-class spell_thorim_trash_impale : public SpellScriptLoader
+class spell_thorim_trash_impale_aura : public AuraScript
 {
-public:
-    spell_thorim_trash_impale() : SpellScriptLoader("spell_thorim_trash_impale") { }
+    PrepareAuraScript(spell_thorim_trash_impale_aura);
 
-    class spell_thorim_trash_impale_AuraScript : public AuraScript
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        PrepareAuraScript(spell_thorim_trash_impale_AuraScript);
+        // deals damage until target is healed above 90%
+        if (GetUnitOwner()->HealthAbovePct(90))
+            SetDuration(0);
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            // deals damage until target is healed above 90%
-            if (GetUnitOwner()->HealthAbovePct(90))
-                SetDuration(0);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_trash_impale_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_thorim_trash_impale_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_trash_impale_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
     }
 };
 
@@ -1831,8 +1816,8 @@ void AddSC_boss_thorim()
     new go_thorim_lever();
 
     // Spells
-    new spell_thorim_lightning_pillar_P2();
-    new spell_thorim_trash_impale();
+    RegisterSpellScript(spell_thorim_lightning_pillar_P2_aura);
+    RegisterSpellScript(spell_thorim_trash_impale_aura);
 
     // Achievements
     new achievement_thorim_stand_in_the_lightning();
