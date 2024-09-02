@@ -34,6 +34,11 @@ bool ScriptMgr::CanSaveToDB(ArenaTeam* team)
     CALL_ENABLED_BOOLEAN_HOOKS(ArenaScript, ARENAHOOK_CAN_SAVE_TO_DB, !script->CanSaveToDB(team));
 }
 
+bool ScriptMgr::OnBeforeArenaCheckWinConditions(Battleground* const bg)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(ArenaScript, ARENAHOOK_ON_BEFORE_CHECK_WIN_CONDITION, !script->OnBeforeArenaCheckWinConditions(bg));
+}
+
 ArenaScript::ArenaScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, ARENAHOOK_END)
 {
