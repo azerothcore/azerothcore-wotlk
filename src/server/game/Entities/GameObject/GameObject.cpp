@@ -1885,14 +1885,23 @@ void GameObject::Use(Unit* user)
 
                 if (info->spellcaster.partyOnly)
                 {
-                    Player const* caster = ObjectAccessor::FindConnectedPlayer(GetOwnerGUID());
-                    if (!caster || user->GetTypeId() != TYPEID_PLAYER || !user->ToPlayer()->IsInSameRaidWith(caster))
+                    if (!user->IsPlayer())
                         return;
+                    if (ObjectGuid ownerGuid = GetOwnerGUID())
+                    {
+                        if (user->GetGUID() != ownerGuid)
+                        {
+                            Group* group = user->ToPlayer()->GetGroup();
+                            if (!group)
+                                return;
+                            if (!group->IsMember(ownerGuid))
+                                return;
+                        }
+                    }
                 }
 
                 user->RemoveAurasByType(SPELL_AURA_MOUNTED);
                 spellId = info->spellcaster.spellId;
-
                 break;
             }
         case GAMEOBJECT_TYPE_MEETINGSTONE:                  //23

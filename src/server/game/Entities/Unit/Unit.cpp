@@ -11249,7 +11249,7 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
     {
         // prevent apply mods from weapon specific case to non weapon specific spells (Example: thunder clap and two-handed weapon specialization)
         if (spellProto->EquippedItemClass == -1 && (*i)->GetSpellInfo()->EquippedItemClass != -1 &&
-            !(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM) && (*i)->GetMiscValue() == SPELL_SCHOOL_MASK_NORMAL)
+            !(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM) && (*i)->GetMiscValue() == SPELL_SCHOOL_MASK_NORMAL)
         {
             continue;
         }
@@ -11264,7 +11264,7 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
         {
             if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
                 AddPct(DoneTotalMod, (*i)->GetAmount());
-            else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
+            else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
                 AddPct(DoneTotalMod, (*i)->GetAmount());
             else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
                 AddPct(DoneTotalMod, (*i)->GetAmount());
@@ -13089,7 +13089,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* victim, uint32 pdamage, WeaponAttackType
                 {
                     if ((*i)->GetSpellInfo()->EquippedItemClass == -1)
                         AddPct(DoneTotalMod, (*i)->GetAmount());
-                    else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
+                    else if (!(*i)->GetSpellInfo()->HasAttribute(SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM) && ((*i)->GetSpellInfo()->EquippedItemSubClassMask == 0))
                         AddPct(DoneTotalMod, (*i)->GetAmount());
                     else if (ToPlayer() && ToPlayer()->HasItemFitToSpellRequirements((*i)->GetSpellInfo()))
                         AddPct(DoneTotalMod, (*i)->GetAmount());
