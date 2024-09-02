@@ -96,6 +96,7 @@ enum Spells
     SPELL_DEATH                         = 41218,
 
     // Cage
+    SPELL_CAGE_TRAP                     = 40693,
     SPELL_CAGE_TRAP_PERIODIC            = 40760,
     SPELL_CAGE_TRAP_DUMMY               = 40761,
     SPELL_CAGED_DEBUFF                  = 40695,
@@ -314,13 +315,13 @@ struct boss_illidan_stormrage : public BossAI
                 DoStopAttack();
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->SetCombatMovement(false);
-                DoCastSelf(SPELL_DEMON_TRANSFORM_1);
+                DoCastSelf(SPELL_DEMON_TRANSFORM_1, true);
 
                 me->m_Events.AddEventAtOffset([&] {
                     Talk(SAY_ILLIDAN_MORPH);
                 }, 2630ms);
                 me->m_Events.AddEventAtOffset([&] {
-                    me->SetControlled(false, UNIT_STATE_ROOT);
+                    // me->SetControlled(false, UNIT_STATE_ROOT);
                     me->SetReactState(REACT_AGGRESSIVE);
                     ScheduleAbilities(PHASE_DEMON);
                 }, 12230ms);
@@ -347,7 +348,7 @@ struct boss_illidan_stormrage : public BossAI
 
                 me->m_Events.AddEventAtOffset([&] {
                     DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM);
-                }, 16200ms, GROUP_DEMON_FORM);
+                }, 15s, GROUP_DEMON_FORM);
             }
             break;
             case ACTION_ILLIDAN_DIE:
@@ -361,7 +362,7 @@ struct boss_illidan_stormrage : public BossAI
                 _dying = true;
                 if (Creature* maiev = summons.GetCreatureWithEntry(NPC_MAIEV_SHADOWSONG))
                     maiev->AI()->DoAction(ACTION_MAIEV_ENDING);
-                if (Creature* akama = summons.GetCreatureWithEntry(NPC_AKAMA_ILLIDAN))
+                if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
                     akama->AI()->DoAction(ACTION_AKAMA_ENDING);
 
                 me->SetControlled(true, UNIT_STATE_ROOT);
@@ -649,7 +650,6 @@ struct boss_illidan_stormrage : public BossAI
     void JustDied(Unit* killer) override
     {
         summons.clear();
-
         BossAI::JustDied(killer);
     }
 
@@ -667,24 +667,24 @@ private:
 
 enum Akama
 {
-    POINT_FACE_ILLIDAN          = 1,
-    POINT_ILLIDAN_DEFEATED_1    = 2,
-    POINT_ILLIDAN_DEFEATED_2    = 3,
+    POINT_FACE_ILLIDAN            = 1,
+    POINT_ILLIDAN_DEFEATED_1      = 2,
+    POINT_ILLIDAN_DEFEATED_2      = 3,
 
-    SPELL_AKAMA_DOOR_OPEN       = 41268,
-    SPELL_AKAMA_DOOR_FAIL       = 41271,
-    SPELL_DEATHSWORN_DOOR_OPEN  = 41269,
-    SPELL_ARCANE_EXPLOSION_VIS  = 35426,
-    SPELL_HEALING_POTION        = 40535,
-    SPELL_CHAIN_LIGHTNING       = 40536,
-    SPELL_REDUCED_THREAT        = 41000,
-    SPELL_AKAMA_TELEPORT        = 41077,
-    SPELL_AKAMA_DESPAWN         = 41242,
+    SPELL_AKAMA_DOOR_OPEN         = 41268,
+    SPELL_AKAMA_DOOR_FAIL         = 41271,
+    SPELL_DEATHSWORN_DOOR_OPEN    = 41269,
+    SPELL_ARCANE_EXPLOSION_VIS    = 35426,
+    SPELL_HEALING_POTION          = 40535,
+    SPELL_CHAIN_LIGHTNING         = 40536,
+    SPELL_REDUCED_THREAT          = 41000,
+    SPELL_AKAMA_TELEPORT          = 41077,
+    SPELL_AKAMA_DESPAWN           = 41242,
 
-    NPC_ILLIDAN_DOOR_TRIGGER    = 23412,
-    NPC_SPIRIT_OF_OLUM          = 23411,
-    NPC_SPIRIT_OF_UDALO         = 23410,
-    NPC_ILLIDARI_ELITE          = 23226,
+    NPC_ILLIDAN_DOOR_TRIGGER      = 23412,
+    NPC_SPIRIT_OF_OLUM            = 23411,
+    NPC_SPIRIT_OF_UDALO           = 23410,
+    NPC_ILLIDARI_ELITE            = 23226,
 
     PATH_AKAMA_ILLIDARI_COUNCIL_1 = 230891,
     PATH_AKAMA_ILLIDARI_COUNCIL_2 = 230892,
@@ -779,9 +779,13 @@ struct npc_akama_illidan : public ScriptedAI
             break;
             case ACTION_AKAMA_ENDING:
             {
-                summons.DespawnAll();
                 me->SetControlled(false, UNIT_STATE_ROOT);
-                me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_1, IllidanDefeated);
+                summons.DespawnAll();
+                me->SetReactState(REACT_PASSIVE);
+                me->m_Events.AddEventAtOffset([&] {
+                    me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                    me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_1, IllidanDefeated);
+                }, 1s);
             }
             break;
             case ACTION_AKAMA_MAIEV_DESPAWN:
@@ -791,9 +795,12 @@ struct npc_akama_illidan : public ScriptedAI
                     me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
                 }, 3490ms);
                 me->m_Events.AddEventAtOffset([&] {
+                    me->SetRespawnDelay(WEEK);
                     DoCastSelf(SPELL_AKAMA_DESPAWN);
-                    me->DespawnOnEvade();
                 }, 8340ms); // 4850ms
+                me->m_Events.AddEventAtOffset([&] {
+                    me->DespawnOnEvade();
+                }, 8740ms);
             }
             break;
         }
@@ -944,10 +951,10 @@ struct npc_akama_illidan : public ScriptedAI
         }
     }
 
-    // Minions event
     void JustReachedHome() override
     {
-        if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) == IN_PROGRESS)
+        // Minions Event
+        if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) == IN_PROGRESS && !instance->GetCreature(DATA_ILLIDAN_STORMRAGE)->HasAura(SPELL_DEATH))
         {
             me->SetReactState(REACT_PASSIVE);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -1027,7 +1034,6 @@ enum Maiev
     SPELL_MAIEV_DOWN = 40409,
     SPELL_THROW_DAGGER = 41152,
     SPELL_SHADOW_STRIKE = 40685,
-    SPELL_CAGE_TRAP     = 40693,
     SPELL_CAGE_TRAP_SUMMON = 40694,
     SPELL_TELEPORT_VISUAL  = 41236,
 
@@ -1594,7 +1600,6 @@ class spell_illidan_cage_trap : public SpellScript
             if (GetCaster()->GetExactDist2d(target) < 4.0f)
             {
                 target->AI()->DoAction(ACTION_ILLIDAN_CAGED);
-                target->CastSpell(target, SPELL_CAGE_TRAP, true);
                 GetCaster()->ToCreature()->DespawnOrUnsummon(1);
                 if (GameObject* gobject = GetCaster()->FindNearestGameObject(GO_CAGE_TRAP, 10.0f))
                     gobject->SetLootState(GO_JUST_DEACTIVATED);
