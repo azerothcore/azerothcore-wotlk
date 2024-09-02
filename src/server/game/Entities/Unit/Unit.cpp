@@ -4601,6 +4601,9 @@ void Unit::_UnapplyAura(AuraApplicationMap::iterator& i, AuraRemoveMode removeMo
     i = m_appliedAuras.begin();
 
     sScriptMgr->OnAuraRemove(this, aurApp, removeMode);
+
+    if (this->ToCreature() && this->ToCreature()->IsAIEnabled)
+        this->ToCreature()->AI()->OnAuraRemove(aurApp, removeMode);
 }
 
 void Unit::_UnapplyAura(AuraApplication* aurApp, AuraRemoveMode removeMode)
