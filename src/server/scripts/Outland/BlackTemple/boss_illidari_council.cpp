@@ -385,8 +385,7 @@ struct boss_high_nethermancer_zerevor : public boss_illidari_council_memberAI
 
     void AttackStart(Unit* who) override
     {
-        if (who && me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 20.0f);
+        AttackStartCaster(who, 20.0f);
     }
 
     void JustEngagedWith(Unit* who) override
