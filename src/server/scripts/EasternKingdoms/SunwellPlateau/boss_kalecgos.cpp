@@ -229,7 +229,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && roll_chance_i(50))
+            if (victim->IsPlayer() && roll_chance_i(50))
                 Talk(SAY_EVIL_SLAY);
         }
 
@@ -539,7 +539,7 @@ public:
 
         void KilledUnit(Unit* target) override
         {
-            if (target->GetTypeId() == TYPEID_PLAYER)
+            if (target->IsPlayer())
                 Talk(SAY_SATH_SLAY);
         }
 
@@ -758,4 +758,3 @@ void AddSC_boss_kalecgos()
     RegisterSpellScript(spell_kalecgos_spectral_realm_dummy);
     RegisterSpellScript(spell_kalecgos_spectral_realm_aura);
 }
-

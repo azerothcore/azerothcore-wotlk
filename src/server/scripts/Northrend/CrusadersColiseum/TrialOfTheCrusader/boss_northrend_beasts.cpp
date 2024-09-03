@@ -161,12 +161,12 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_SNOBOLLED:
-                    if( t->GetTypeId() == TYPEID_PLAYER )
+                    if( t->IsPlayer() )
                         me->CastSpell((Unit*)nullptr, SPELL_SNOBOLLED, true);
 
                     break;
                 case EVENT_SPELL_BATTER:
-                    if( t->GetTypeId() == TYPEID_PLAYER )
+                    if( t->IsPlayer() )
                         me->CastSpell(t, SPELL_BATTER);
                     events.Repeat(6s, 8s);
                     break;
@@ -198,7 +198,7 @@ public:
                     }
                     break;
                 case EVENT_SPELL_HEAD_CRACK:
-                    if( t->GetTypeId() == TYPEID_PLAYER )
+                    if( t->IsPlayer() )
                         me->CastSpell(t, SPELL_HEAD_CRACK);
                     events.Repeat(30s, 35s);
                     break;

@@ -1257,4 +1257,3 @@ void AddSC_the_scarlet_enclave_c1()
 
     RegisterSpellScript(spell_death_knight_initiate_visual);
 }
-

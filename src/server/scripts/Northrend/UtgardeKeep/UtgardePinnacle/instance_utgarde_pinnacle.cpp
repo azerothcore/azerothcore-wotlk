@@ -271,4 +271,3 @@ void AddSC_instance_utgarde_pinnacle()
 {
     new instance_utgarde_pinnacle();
 }
-

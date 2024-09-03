@@ -83,4 +83,3 @@ void AddSC_boss_zereketh_the_unbound()
 {
     RegisterArcatrazCreatureAI(boss_zereketh_the_unbound);
 }
-

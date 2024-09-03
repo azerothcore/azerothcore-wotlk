@@ -266,4 +266,3 @@ void AddSC_event_winter_veil_scripts()
     RegisterSpellScript(spell_winter_veil_racer_slam_hit);
     RegisterSpellScript(spell_winter_veil_shoot_air_rifle);
 }
-

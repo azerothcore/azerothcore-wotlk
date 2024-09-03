@@ -114,7 +114,7 @@ struct emerald_dragonAI : public WorldBossAI
     // Target killed during encounter, mark them as suspectible for Aura Of Nature
     void KilledUnit(Unit* who) override
     {
-        if (who->GetTypeId() == TYPEID_PLAYER)
+        if (who->IsPlayer())
             who->CastSpell(who, SPELL_MARK_OF_NATURE, true);
     }
 
@@ -431,7 +431,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_DRAW_SPIRIT && target->GetTypeId() == TYPEID_PLAYER)
+            if (spell->Id == SPELL_DRAW_SPIRIT && target->IsPlayer())
             {
                 Position targetPos = target->GetPosition();
                 me->SummonCreature(NPC_SPIRIT_SHADE, targetPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
@@ -531,7 +531,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 who->CastSpell(who, SPELL_PUTRID_MUSHROOM, true);
             }
@@ -860,4 +860,3 @@ void AddSC_emerald_dragons()
     RegisterSpellScript(spell_mark_of_nature);
     RegisterSpellScript(spell_shadow_bolt_whirl);
 };
-
