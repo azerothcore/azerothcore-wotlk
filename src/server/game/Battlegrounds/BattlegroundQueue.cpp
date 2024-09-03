@@ -772,12 +772,9 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
         MinPlayersPerTeam = 1;
 
     sScriptMgr->OnQueueUpdate(this, diff, bgTypeId, bracket_id, arenaType, isRated, arenaRating);
-
-    if (bg_template->isArena()) {
-        const auto standardArenaType = { ARENA_TYPE_2v2, ARENA_TYPE_3v3, ARENA_TYPE_5v5 };
-        bool isStandardArenaType = std::find(std::begin(standardArenaType), std::end(standardArenaType), arenaType) != std::end(standardArenaType);
-        if (!isStandardArenaType)
-            return;
+    
+    if (!sScriptMgr->OnQueueUpdateValidity(this, diff, bgTypeId, bracket_id, arenaType, isRated, arenaRating)) {
+        return;
     }
 
     m_SelectionPools[TEAM_ALLIANCE].Init();
