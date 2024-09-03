@@ -1,3 +1,4 @@
+-- DB update 2024_07_05_00 -> 2024_09_03_00
 DROP TABLE IF EXISTS `character_achievement_offline_updates`;
 CREATE TABLE `character_achievement_offline_updates` (
     `guid` BIGINT UNSIGNED NOT NULL COMMENT 'Character\'s GUID',
