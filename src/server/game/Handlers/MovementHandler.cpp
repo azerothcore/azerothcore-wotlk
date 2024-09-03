@@ -373,7 +373,7 @@ void User::HandleMovementOpcodes(WDataStore& recvData)
     // Stop emote on move
     if (Player* plrMover = mover->ToPlayer())
     {
-        if (plrMover->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_ONESHOT_NONE)
+        if (plrMover->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_ONESHOT_NONE && (movementInfo.m_moveFlags & MOVEFLAG_MOTION_MASK) != 0)
         {
             plrMover->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         }
