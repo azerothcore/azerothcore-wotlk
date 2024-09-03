@@ -1810,20 +1810,7 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
 
-                        //npcbot: handle Glyph of Guardian Spirit proc for bots
-                        if (Creature* bot = caster->ToCreature())
-                        {
-                            if (bot->IsNPCBot() && bot->HasSpellCooldown(47788))
-                            {
-                                bot->AddBotSpellCooldown(47788, 60000);
-                                //bot->GetSpellHistory()->ResetCooldown(GetSpellInfo()->Id, true);
-                                //bot->GetSpellHistory()->AddCooldown(GetSpellInfo()->Id, 0, std::chrono::seconds(60));
-                                break;
-                            }
-                        }
-                        //end npcbot
-
-                        if (caster->GetTypeId() != TYPEID_PLAYER)
+                        if (!caster->IsPlayer())
                             break;
 
                         Player* player = caster->ToPlayer();
