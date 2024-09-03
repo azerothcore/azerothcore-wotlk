@@ -33,6 +33,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <boost/algorithm/string/replace.hpp>
 
 Player* ChatHandler::GetPlayer() const
 {
@@ -42,6 +43,11 @@ Player* ChatHandler::GetPlayer() const
 char const* ChatHandler::GetAcoreString(uint32 entry) const
 {
     return m_session->GetAcoreString(entry);
+}
+
+std::string const* ChatHandler::GetModuleString(std::string module, uint32 id) const
+{
+    return m_session->GetModuleString(module, id);
 }
 
 bool ChatHandler::IsAvailable(uint32 securityLevel) const
@@ -98,6 +104,61 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     return false;
 }
 
+void ChatHandler::SendNotification(std::string_view str)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+    for (std::string_view line : lines)
+    {
+        WorldPacket data(SMSG_NOTIFICATION, line.size() + 1);
+        data << line.data();
+        m_session->SendPacket(&data);
+    }
+}
+
+void ChatHandler::SendGMText(std::string_view str)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+    // Session should have permissions to receive global gm messages
+    if (AccountMgr::IsPlayerAccount(m_session->GetSecurity()))
+        return;
+
+    for (std::string_view line : lines)
+    {
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+        m_session->SendPacket(&data);
+    }
+}
+
+void ChatHandler::SendWorldText(std::string_view str)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+
+    for (std::string_view line : lines)
+    {
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+        m_session->SendPacket(&data);
+    }
+}
+
+void ChatHandler::SendWorldTextOptional(std::string_view str, uint32 flag)
+{
+    std::vector<std::string_view> lines = Acore::Tokenize(str, '\n', true);
+
+    Player* player = m_session->GetPlayer();
+    if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
+        if (player->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
+            return;
+
+    for (std::string_view line : lines)
+    {
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, nullptr, nullptr, line);
+        player->SendDirectMessage(&data);
+    }
+}
+
 void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
 {
     std::string msg{ str };
@@ -108,7 +169,7 @@ void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
         std::vector<std::string_view> tokens = Acore::Tokenize(msg, '|', true);
         std::ostringstream stream;
 
-        for (size_t i = 0; i < tokens.size() - 1; ++i)
+        for (std::size_t i = 0; i < tokens.size() - 1; ++i)
             stream << tokens[i] << "||";
 
         stream << tokens[tokens.size() - 1];
@@ -149,6 +210,11 @@ void ChatHandler::SendSysMessage(uint32 entry)
     SendSysMessage(GetAcoreString(entry));
 }
 
+void ChatHandler::PSendSysMessage(std::string_view str, bool escapeCharacters)
+{
+    SendSysMessage(str, escapeCharacters);
+}
+
 void ChatHandler::SendErrorMessage(uint32 entry)
 {
     SendSysMessage(entry);
@@ -171,7 +237,7 @@ bool ChatHandler::_ParseCommands(std::string_view text)
         return false;
 
     // Send error message for GMs
-    SendErrorMessage(LANG_CMD_INVALID, STRING_VIEW_FMT_ARG(text));
+    SendErrorMessage(LANG_CMD_INVALID, text);
     return true;
 }
 
@@ -198,11 +264,11 @@ bool ChatHandler::ParseCommands(std::string_view text)
     return _ParseCommands(text.substr(1));
 }
 
-size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
+std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
                                     std::string const& senderName /*= ""*/, std::string const& receiverName /*= ""*/,
                                     uint32 achievementId /*= 0*/, bool gmMessage /*= false*/, std::string const& channelName /*= ""*/)
 {
-    size_t receiverGUIDPos = 0;
+    std::size_t receiverGUIDPos = 0;
     data.Initialize(!gmMessage ? SMSG_MESSAGECHAT : SMSG_GM_MESSAGECHAT);
     data << uint8(chatType);
     data << int32(language);
@@ -278,7 +344,7 @@ size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Languag
     return receiverGUIDPos;
 }
 
-size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message,
+std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message,
                                     uint32 achievementId /*= 0*/, std::string const& channelName /*= ""*/, LocaleConstant locale /*= DEFAULT_LOCALE*/)
 {
     ObjectGuid senderGUID;
@@ -367,6 +433,23 @@ Player* ChatHandler::getSelectedPlayerOrSelf() const
         targetPlayer = m_session->GetPlayer();
 
     return targetPlayer;
+}
+
+bool ChatHandler::HasSession() const
+{
+    if (!m_session)
+        return false;
+
+    return true;
+}
+
+void ChatHandler::DoForAllValidSessions(std::function<void(Player*)> exec)
+{
+    SessionMap::const_iterator itr;
+    for (itr = sWorld->GetAllSessions().begin(); itr != sWorld->GetAllSessions().end(); ++itr)
+        if (Player* player = itr->second->GetPlayer())
+            if (player->IsInWorld())
+                exec(player);
 }
 
 char* ChatHandler::extractKeyFromLink(char* text, char const* linkType, char** something1)
@@ -887,4 +970,111 @@ LocaleConstant CliHandler::GetSessionDbcLocale() const
 int CliHandler::GetSessionDbLocaleIndex() const
 {
     return sObjectMgr->GetDBCLocaleIndex();
+}
+
+bool CliHandler::HasSession() const
+{
+    return true;
+}
+
+bool AddonChannelCommandHandler::ParseCommands(std::string_view str)
+{
+    if (memcmp(str.data(), "AzerothCore\t", 12))
+        return false;
+    char opcode = str[12];
+    if (!opcode) // str[12] is opcode
+        return false;
+    if (!str[13] || !str[14] || !str[15] || !str[16]) // str[13] through str[16] is 4-character command counter
+        return false;
+    echo = str.substr(13);
+
+    switch (opcode)
+    {
+        case 'p': // p Ping
+            SendAck();
+            return true;
+        case 'h': // h Issue human-readable command
+        case 'i': // i Issue command
+            if (!str[17])
+                return false;
+            humanReadable = (opcode == 'h');
+            if (_ParseCommands(str.substr(17))) // actual command starts at str[17]
+            {
+                if (!hadAck)
+                    SendAck();
+                if (HasSentErrorMessage())
+                    SendFailed();
+                else
+                    SendOK();
+            }
+            else
+            {
+                SendSysMessage(LANG_CMD_INVALID);
+                SendFailed();
+            }
+            return true;
+        default:
+            return false;
+    }
+}
+
+void AddonChannelCommandHandler::Send(std::string const& msg)
+{
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_ADDON, GetSession()->GetPlayer(), GetSession()->GetPlayer(), msg);
+    GetSession()->SendPacket(&data);
+}
+
+void AddonChannelCommandHandler::SendAck() // a Command acknowledged, no body
+{
+    ASSERT(echo.size());
+    std::string ack = "AzerothCore\ta";
+    ack.resize(18);
+    memcpy(&ack[13], echo.data(), 4);
+    ack[17] = '\0';
+    Send(ack);
+    hadAck = true;
+}
+
+void AddonChannelCommandHandler::SendOK() // o Command OK, no body
+{
+    ASSERT(echo.size());
+    std::string ok = "AzerothCore\to";
+    ok.resize(18);
+    memcpy(&ok[13], echo.data(), 4);
+    ok[17] = '\0';
+    Send(ok);
+}
+
+void AddonChannelCommandHandler::SendFailed() // f Command failed, no body
+{
+    ASSERT(echo.size());
+    std::string fail = "AzerothCore\tf";
+    fail.resize(18);
+    memcpy(&fail[13], echo.data(), 4);
+    fail[17] = '\0';
+    Send(fail);
+}
+
+// m Command message, message in body
+void AddonChannelCommandHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
+{
+    ASSERT(echo.size());
+    if (!hadAck)
+        SendAck();
+
+    std::string msg = "AzerothCore\tm";
+    msg.append(echo.data(), 4);
+    std::string body(str);
+    if (escapeCharacters)
+        boost::replace_all(body, "|", "||");
+    std::size_t pos, lastpos;
+    for (lastpos = 0, pos = body.find('\n', lastpos); pos != std::string::npos; lastpos = pos + 1, pos = body.find('\n', lastpos))
+    {
+        std::string line(msg);
+        line.append(body, lastpos, pos - lastpos);
+        Send(line);
+    }
+    msg.append(body, lastpos, pos - lastpos);
+    Send(msg);
 }

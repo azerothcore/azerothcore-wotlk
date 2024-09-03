@@ -20,6 +20,8 @@
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "serpent_shrine.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Talk
 {
@@ -619,4 +621,3 @@ void AddSC_boss_fathomlord_karathress()
     RegisterSpellScript(spell_karathress_power_of_tidalvess);
     RegisterSpellScript(spell_karathress_power_of_caribdis);
 }
-

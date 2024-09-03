@@ -68,7 +68,7 @@ struct npc_brewfest_keg_thrower : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
+        if (me->GetDistance(who) < 10.0f && who->IsPlayer() && who->GetMountID() == RAM_DISPLAY_ID)
         {
             if (!who->ToPlayer()->HasItemCount(ITEM_PORTABLE_BREWFEST_KEG)) // portable brewfest keg
                 me->CastSpell(who, SPELL_THROW_KEG, true);          // throw keg
@@ -90,7 +90,7 @@ struct npc_brewfest_keg_reciver : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
+        if (me->GetDistance(who) < 10.0f && who->IsPlayer() && who->GetMountID() == RAM_DISPLAY_ID)
         {
             Player* player = who->ToPlayer();
             if (player->HasItemCount(ITEM_PORTABLE_BREWFEST_KEG)) // portable brewfest keg
@@ -149,7 +149,7 @@ struct npc_brewfest_bark_trigger : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (me->GetDistance(who) < 10.0f && who->GetTypeId() == TYPEID_PLAYER && who->GetMountID() == RAM_DISPLAY_ID)
+        if (me->GetDistance(who) < 10.0f && who->IsPlayer() && who->GetMountID() == RAM_DISPLAY_ID)
         {
             bool allow = false;
             uint32 quest = 0;

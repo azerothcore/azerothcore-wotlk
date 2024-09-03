@@ -45,93 +45,81 @@ npc_enraged_spirit
 EndContentData */
 
 // Ours
-class spell_q10612_10613_the_fel_and_the_furious : public SpellScriptLoader
+enum TheFelAndTheFurious
 {
-public:
-    spell_q10612_10613_the_fel_and_the_furious() : SpellScriptLoader("spell_q10612_10613_the_fel_and_the_furious") { }
+    SPELL_ROCKET_LAUNCHER = 38083
+};
 
-    class spell_q10612_10613_the_fel_and_the_furious_SpellScript : public SpellScript
+class spell_q10612_10613_the_fel_and_the_furious : public SpellScript
+{
+    PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious_SpellScript);
+        return ValidateSpellInfo({ SPELL_ROCKET_LAUNCHER });
+    }
 
-        void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
+    void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
+    {
+        Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
+        if (!charmer)
+            return;
+
+        std::list<GameObject*> gList;
+        GetCaster()->GetGameObjectListWithEntryInGrid(gList, 184979, 30.0f);
+        uint8 counter = 0;
+        for (std::list<GameObject*>::const_iterator itr = gList.begin(); itr != gList.end(); ++itr, ++counter)
         {
-            Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
-            if (!charmer)
-                return;
-
-            std::list<GameObject*> gList;
-            GetCaster()->GetGameObjectListWithEntryInGrid(gList, 184979, 30.0f);
-            uint8 counter = 0;
-            for (std::list<GameObject*>::const_iterator itr = gList.begin(); itr != gList.end(); ++itr, ++counter)
+            if (counter >= 10)
+                break;
+            GameObject* go = *itr;
+            if (!go->isSpawned())
+                continue;
+            Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
+            if (cr2)
             {
-                if (counter >= 10)
-                    break;
-                GameObject* go = *itr;
-                if (!go->isSpawned())
-                    continue;
-                Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
-                if (cr2)
-                {
-                    cr2->SetFaction(FACTION_MONSTER);
-                    cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                    GetCaster()->CastSpell(cr2, 38083, true);
-                }
-
-                go->SetLootState(GO_JUST_DEACTIVATED);
-                charmer->KilledMonsterCredit(21959);
+                cr2->SetFaction(FACTION_MONSTER);
+                cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
+                GetCaster()->CastSpell(cr2, SPELL_ROCKET_LAUNCHER, true);
             }
-        }
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q10612_10613_the_fel_and_the_furious_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+            go->SetLootState(GO_JUST_DEACTIVATED);
+            charmer->KilledMonsterCredit(21959);
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q10612_10613_the_fel_and_the_furious_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_q10612_10613_the_fel_and_the_furious::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
-class spell_q10563_q10596_to_legion_hold : public SpellScriptLoader
+class spell_q10563_q10596_to_legion_hold_aura : public AuraScript
 {
-public:
-    spell_q10563_q10596_to_legion_hold() : SpellScriptLoader("spell_q10563_q10596_to_legion_hold") { }
+    PrepareAuraScript(spell_q10563_q10596_to_legion_hold_aura);
 
-    class spell_q10563_q10596_to_legion_hold_AuraScript : public AuraScript
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_q10563_q10596_to_legion_hold_AuraScript)
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+        if (Player* player = GetTarget()->ToPlayer())
         {
-            if (Player* player = GetTarget()->ToPlayer())
-            {
-                player->KilledMonsterCredit(21502);
-                player->SetControlled(false, UNIT_STATE_STUNNED);
-            }
+            player->KilledMonsterCredit(21502);
+            player->SetControlled(false, UNIT_STATE_STUNNED);
         }
+    }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Player* player = GetTarget()->ToPlayer())
-            {
-                player->SetControlled(true, UNIT_STATE_STUNNED);
-                player->SummonCreature(21633, -3311.13f, 2946.15f, 171.1f, 4.86f, TEMPSUMMON_TIMED_DESPAWN, 64000);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_q10563_q10596_to_legion_hold_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_q10563_q10596_to_legion_hold_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_q10563_q10596_to_legion_hold_AuraScript();
+        if (Player* player = GetTarget()->ToPlayer())
+        {
+            player->SetControlled(true, UNIT_STATE_STUNNED);
+            player->SummonCreature(21633, -3311.13f, 2946.15f, 171.1f, 4.86f, TEMPSUMMON_TIMED_DESPAWN, 64000);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_q10563_q10596_to_legion_hold_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_q10563_q10596_to_legion_hold_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_TRANSFORM, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -335,7 +323,7 @@ public:
             if (bCanEat || bIsEating)
                 return;
 
-            if (pCaster->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_PLACE_CARCASS && !me->HasAura(SPELL_JUST_EATEN))
+            if (pCaster->IsPlayer() && spell->Id == SPELL_PLACE_CARCASS && !me->HasAura(SPELL_JUST_EATEN))
             {
                 uiPlayerGUID = pCaster->GetGUID();
                 bCanEat = true;
@@ -439,9 +427,6 @@ enum EnshlavedNetherwingDrake
     NPC_DRAGONMAW_WRANGLER          = 21717,
     NPC_ESCAPE_DUMMY                = 22317,
 
-    EVENT_TAKE_OFF                  = 1,
-    EVENT_CREDIT_PLAYER             = 2,
-
     // Point
     POINT_DESPAWN                   = 1
 };
@@ -451,18 +436,14 @@ struct npc_enslaved_netherwing_drake : public ScriptedAI
 public:
     npc_enslaved_netherwing_drake(Creature* creature) : ScriptedAI(creature)
     {
-        Tapped = false;
+        _tapped = false;
         Reset();
     }
 
-    ObjectGuid PlayerGUID;
-    bool Tapped;
-
-    Player* GetPlayer() { return ObjectAccessor::GetPlayer(*me, PlayerGUID); }
-
     void Reset() override
     {
-        if (!Tapped)
+        scheduler.CancelAll();
+        if (!_tapped)
         {
             me->RestoreFaction();
             me->SetReactState(REACT_AGGRESSIVE);
@@ -474,9 +455,8 @@ public:
 
     void JustDied(Unit* /*killer*/) override
     {
-        Tapped = false;
+        _tapped = false;
         me->RestoreFaction();
-        events.CancelEvent(EVENT_TAKE_OFF);
     }
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -485,20 +465,45 @@ public:
         if (!playerCaster)
             return;
 
-        if (spell->Id == SPELL_HIT_FORCE_OF_NELTHARAKU && !Tapped &&
+        if (spell->Id == SPELL_HIT_FORCE_OF_NELTHARAKU && !_tapped &&
             playerCaster->GetQuestStatus(QUEST_THE_FORCE_OF_NELTHARAKU) == QUEST_STATUS_INCOMPLETE)
         {
-            Tapped = true;
-            PlayerGUID = caster->GetGUID();
+            _tapped = true;
+            _playerGUID = caster->GetGUID();
 
-            me->SetFaction(FACTION_FLAYER_HUNTER); // Not sure if this is correct, it was taken off of Mordenai.
+            scheduler.Schedule(2s, [this](TaskContext)
+            {
+                me->SetFaction(FACTION_FLAYER_HUNTER); // Not sure if this is correct, it was taken off of Mordenai.
 
-            if (Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 25.0f))
-                AttackStart(Dragonmaw);
-            else if (Unit* Dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_WRANGLER, 25.0f))
-                AttackStart(Dragonmaw);
+                if (Unit* dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_SUBJUGATOR, 25.0f))
+                    AttackStart(dragonmaw);
+                else if (Unit* dragonmaw = me->FindNearestCreature(NPC_DRAGONMAW_WRANGLER, 25.0f))
+                    AttackStart(dragonmaw);
+                scheduler.Schedule(2s, [this](TaskContext)
+                {
+                    _tapped = false;
+                    Position pos;
+                    if (Unit* escapeDummy = me->FindNearestCreature(NPC_ESCAPE_DUMMY, 30.0f))
+                        pos = escapeDummy->GetPosition();
+                    else
+                    {
+                        pos = me->GetRandomNearPosition(20.0f);
+                        pos.m_positionZ += 25.0f;
+                    }
 
-            events.ScheduleEvent(EVENT_TAKE_OFF, 2s);
+                    me->SetDisableGravity(true);
+                    me->GetMotionMaster()->MovePoint(POINT_DESPAWN, pos);
+                    me->SetReactState(REACT_PASSIVE);
+                    scheduler.Schedule(100ms, [this](TaskContext)
+                    {
+                        if (Player* player = _GetPlayer())
+                        {
+                            DoCast(player, SPELL_FORCE_OF_NELTHARAKU, true);
+                        }
+                        me->DespawnOrUnsummon(3s, 0s);
+                    });
+                });
+            });
         }
     }
 
@@ -514,40 +519,21 @@ public:
 
     void UpdateAI(uint32 diff) override
     {
-        events.Update(diff);
+        scheduler.Update(diff);
 
         if (!UpdateVictim())
-        {
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_TAKE_OFF:
-                {
-                    Tapped = false;
-                    Position pos;
-                    if (Unit* EscapeDummy = me->FindNearestCreature(NPC_ESCAPE_DUMMY, 30))
-                        pos = EscapeDummy->GetPosition();
-                    else
-                    {
-                        pos = me->GetRandomNearPosition(20);
-                        pos.m_positionZ += 25;
-                    }
-
-                    me->SetDisableGravity(true);
-                    me->GetMotionMaster()->MovePoint(POINT_DESPAWN, pos);
-                    me->SetReactState(REACT_PASSIVE);
-                    events.ScheduleEvent(EVENT_CREDIT_PLAYER, 100ms);
-                    break;
-                }
-                case EVENT_CREDIT_PLAYER:
-                    DoCast(GetPlayer(), SPELL_FORCE_OF_NELTHARAKU, true);
-                    me->DespawnOrUnsummon(3s, 0s);
-                    break;
-            }
             return;
-        }
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
 
         DoMeleeAttackIfReady();
     }
+private:
+    bool _tapped;
+    ObjectGuid _playerGUID;
+
+    Player* _GetPlayer() { return ObjectAccessor::GetPlayer(*me, _playerGUID); }
 };
 
 /*#####
@@ -613,7 +599,7 @@ public:
 
             PlayerGUID = caster->GetGUID();
 
-            if (caster->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_POISON && !Tapped)
+            if (caster->IsPlayer() && spell->Id == SPELL_POISON && !Tapped)
             {
                 Tapped = true;
                 caster->GetClosePoint(x, y, z, me->GetObjectSize());
@@ -1292,7 +1278,7 @@ public:
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
-                        if (target->GetTypeId() == TYPEID_PLAYER)
+                        if (target->IsPlayer())
                         {
                             DoCast(target, SpawnCast[1].SpellId); //Focused Bursts
                             SpellTimer1 = SpawnCast[1].Timer2 + (rand() % 5 * 1000);
@@ -1832,13 +1818,431 @@ public:
     }
 };
 
+/*
+######
+# Dragonmaw Races
+######
+*/
+
+enum DragonmawRaces
+{
+    QUEST_MUCKJAW           = 11064,
+    QUEST_TROPE             = 11067,
+    QUEST_CORLOK            = 11068,
+    QUEST_ICHMAN            = 11069,
+    QUEST_MULVERICK         = 11070,
+    QUEST_SKYSHATTER        = 11071,
+
+    NPC_MUCKJAW             = 23340,
+    NPC_TROPE               = 23342,
+    NPC_CORLOK              = 23344,
+    NPC_ICHMAN              = 23345,
+    NPC_MULVERICK           = 23346,
+    NPC_SKYSHATTER          = 23348,
+
+    PATH_MUCKJAW            = 233401,
+    PATH_TROPE              = 233421,
+    PATH_CORLOK             = 233441,
+    PATH_ICHMAN             = 233451,
+    PATH_MULVERICK          = 233461,
+    PATH_SKYSHATTER         = 233481,
+
+    NPC_TARGET_MUCKJAW      = 23356,
+    NPC_TARGET_TROPE        = 23357,
+    NPC_TARGET_CORLOK       = 23358,
+    NPC_TARGET_ICHMAN       = 23359,
+    NPC_TARGET_MULVERICK    = 23360,
+    NPC_TARGET_SKYSHATTER   = 23361,
+
+    SAY_START               = 0,
+    SAY_COMPLETE            = 1,
+    SAY_SKYSHATTER_SPECIAL  = 2,
+};
+
+struct dragonmaw_race_npc : public ScriptedAI
+{
+    dragonmaw_race_npc(Creature* creature) : ScriptedAI(creature)
+    {
+        _player = nullptr;
+    }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+        me->SetWalk(true);
+        me->SetDisableGravity(false);
+        me->GetMotionMaster()->MoveIdle();
+    }
+
+    void sQuestAccept(Player* player, Quest const* /*quest*/) override
+    {
+        _player = player;
+        me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+        if (_player)
+            Talk(SAY_START, _player);
+
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            me->GetMotionMaster()->MovePath(PATH_MUCKJAW, false);
+            break;
+        case NPC_TROPE:
+            me->GetMotionMaster()->MovePath(PATH_TROPE, false);
+            break;
+        case NPC_CORLOK:
+            me->GetMotionMaster()->MovePath(PATH_CORLOK, false);
+            break;
+        case NPC_ICHMAN:
+            me->GetMotionMaster()->MovePath(PATH_ICHMAN, false);
+            break;
+        case NPC_MULVERICK:
+            me->GetMotionMaster()->MovePath(PATH_MULVERICK, false);
+            break;
+        case NPC_SKYSHATTER:
+            me->GetMotionMaster()->MovePath(PATH_SKYSHATTER, false);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void TakeOff()
+    {
+        me->SetDisableGravity(true);
+    }
+
+    void StartRace()
+    {
+        me->SetWalk(false);
+        ScheduleTimedEvent(5s, [&]
+        {
+            if (!_player)
+                FailQuest();
+            else if (!me->IsWithinDist(_player, 100.f))
+                FailQuest();
+        }, 5s);
+    }
+
+    void FailQuest()
+    {
+        if (_player)
+        {
+            switch (me->GetEntry())
+            {
+            case NPC_MUCKJAW:
+                _player->FailQuest(QUEST_MUCKJAW);
+                break;
+            case NPC_TROPE:
+                _player->FailQuest(QUEST_TROPE);
+                break;
+            case NPC_CORLOK:
+                _player->FailQuest(QUEST_CORLOK);
+                break;
+            case NPC_ICHMAN:
+                _player->FailQuest(QUEST_ICHMAN);
+                break;
+            case NPC_MULVERICK:
+                _player->FailQuest(QUEST_MULVERICK);
+                break;
+            case NPC_SKYSHATTER:
+                _player->FailQuest(QUEST_SKYSHATTER);
+                break;
+            default:
+                break;
+            }
+        }
+        scheduler.CancelAll();
+        me->DespawnOnEvade();
+    }
+
+    void StartRaceAttacks()
+    {
+        /*
+        * Timers are placeholders
+        * After spawned, the rest is done via SmartAI
+        */
+        if (!_player)
+            return;
+
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            ScheduleTimedEvent(4s, [&]
+            {
+                if (_player)
+                {
+                    Position summonPos;
+                    summonPos = me->GetRandomPoint(_player->GetPosition(), 15.f);
+                    summonPos.m_positionZ = _player->GetPositionZ();  // So they don't spawn at ground height
+                    me->SummonCreature(NPC_TARGET_MUCKJAW, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                }
+                else
+                    return;
+            }, 4s, 8s);
+            break;
+        case NPC_TROPE:
+            ScheduleTimedEvent(4s, [&]
+            {
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();
+                        me->SummonCreature(NPC_TARGET_TROPE, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
+            }, 1s, 3s);
+            break;
+        case NPC_CORLOK:
+            ScheduleTimedEvent(4s, [&]
+            {
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();
+                        me->SummonCreature(NPC_TARGET_CORLOK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
+            }, 1s, 3s);
+            break;
+        case NPC_ICHMAN:
+            ScheduleTimedEvent(4s, [&]
+            {
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();
+                        me->SummonCreature(NPC_TARGET_ICHMAN, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
+            }, 1s, 3s);
+            break;
+        case NPC_MULVERICK:
+            ScheduleTimedEvent(4s, [&]
+            {
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 10.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();
+                        me->SummonCreature(NPC_TARGET_MULVERICK, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
+            }, 1s, 3s);
+            break;
+        case NPC_SKYSHATTER:
+            ScheduleTimedEvent(4s, [&]
+            {
+                    if (_player)
+                    {
+                        Position summonPos;
+                        summonPos = me->GetRandomPoint(_player->GetPosition(), 7.f);
+                        summonPos.m_positionZ = _player->GetPositionZ();  // So they don't spawn at ground height
+                        me->SummonCreature(NPC_TARGET_SKYSHATTER, summonPos, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                    }
+                    else
+                        return;
+            }, 1s, 3s);
+            break;
+        default:
+            break;
+        }
+    }
+
+    void FinishRace()
+    {
+        scheduler.CancelAll();
+        me->SetHover(false);
+        me->SetDisableGravity(false);
+        me->SetWalk(true);
+
+        if (_player)
+        {
+            Talk(SAY_COMPLETE, _player);
+            switch (me->GetEntry())
+            {
+            case NPC_MUCKJAW:
+                _player->AreaExploredOrEventHappens(QUEST_MUCKJAW);
+                break;
+            case NPC_TROPE:
+                _player->AreaExploredOrEventHappens(QUEST_TROPE);
+                break;
+            case NPC_CORLOK:
+                _player->AreaExploredOrEventHappens(QUEST_CORLOK);
+                break;
+            case NPC_ICHMAN:
+                _player->AreaExploredOrEventHappens(QUEST_ICHMAN);
+                break;
+            case NPC_MULVERICK:
+                _player->AreaExploredOrEventHappens(QUEST_MULVERICK);
+                break;
+            case NPC_SKYSHATTER:
+                _player->AreaExploredOrEventHappens(QUEST_SKYSHATTER);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    void MovementInform(uint32 /*type*/, uint32 id) override
+    {
+        switch (me->GetEntry())
+        {
+        case NPC_MUCKJAW:
+            switch (id)
+            {
+            case 4:
+                TakeOff();
+                break;
+            case 7:
+                StartRace();
+                break;
+            case 9:
+                StartRaceAttacks();
+                break;
+            case 35:
+                FinishRace();
+                break;
+            case 37:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_TROPE:
+            switch (id)
+            {
+            case 5:
+                TakeOff();
+                break;
+            case 7:
+                StartRace();
+                break;
+            case 10:
+                StartRaceAttacks();
+                break;
+            case 53:
+                FinishRace();
+                break;
+            case 60:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_CORLOK:
+            switch (id)
+            {
+            case 6:
+                TakeOff();
+                break;
+            case 9:
+                StartRace();
+                break;
+            case 12:
+                StartRaceAttacks();
+                break;
+            case 79:
+                FinishRace();
+                break;
+            case 89:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_ICHMAN:
+            switch (id)
+            {
+            case 4:
+                TakeOff();
+                StartRace();
+                break;
+            case 12:
+                StartRaceAttacks();
+                break;
+            case 107:
+                FinishRace();
+                break;
+            case 111:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_MULVERICK:
+            switch (id)
+            {
+            case 5:
+                TakeOff();
+                break;
+            case 9:
+                StartRace();
+                break;
+            case 12:
+                StartRaceAttacks();
+                break;
+            case 166:
+                FinishRace();
+                break;
+            case 172:
+                Reset();
+                break;
+            }
+            break;
+        case NPC_SKYSHATTER:
+            switch (id)
+            {
+            case 3:
+                TakeOff();
+                break;
+            case 7:
+                StartRace();
+                if (_player)
+                    Talk(SAY_SKYSHATTER_SPECIAL, _player);
+                break;
+            case 10:
+                StartRaceAttacks();
+                break;
+            case 140:
+                FinishRace();
+                break;
+            case 145:
+                Reset();
+                break;
+            }
+            break;
+        default:
+            break;
+        }
+    }
+
+    void PathEndReached(uint32 /*pathId*/) override
+    {
+        Reset();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+    }
+
+    private:
+        Player* _player;
+};
+
 void AddSC_shadowmoon_valley()
 {
     // Ours
-    new spell_q10612_10613_the_fel_and_the_furious();
-    new spell_q10563_q10596_to_legion_hold();
+    RegisterSpellScript(spell_q10612_10613_the_fel_and_the_furious);
+    RegisterSpellScript(spell_q10563_q10596_to_legion_hold_aura);
 
     // Theirs
+    RegisterCreatureAI(dragonmaw_race_npc);
     new npc_invis_infernal_caster();
     new npc_infernal_attacker();
     new npc_mature_netherwing_drake();

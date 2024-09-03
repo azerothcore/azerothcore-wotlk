@@ -62,7 +62,7 @@ struct boss_warlord_kalithresh : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_introDone && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 35.0f))
+        if (!_introDone && who->IsPlayer() && me->IsWithinDistInMap(who, 35.0f))
         {
             Talk(SAY_INTRO);
             _introDone = true;
@@ -172,4 +172,3 @@ void AddSC_boss_warlord_kalithresh()
     RegisterSteamvaultCreatureAI(boss_warlord_kalithresh);
     RegisterSpellScript(spell_warlords_rage);
 }
-

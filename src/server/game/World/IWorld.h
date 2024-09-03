@@ -139,6 +139,7 @@ enum WorldBoolConfigs
     CONFIG_AUTOBROADCAST,
     CONFIG_ALLOW_TICKETS,
     CONFIG_DELETE_CHARACTER_TICKET_TRACE,
+    CONFIG_LFG_CAST_DESERTER,
     CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES,
     CONFIG_PRESERVE_CUSTOM_CHANNELS,
     CONFIG_PDUMP_NO_PATHS,
@@ -178,12 +179,15 @@ enum WorldBoolConfigs
     CONFIG_LEAVE_GROUP_ON_LOGOUT,
     CONFIG_QUEST_POI_ENABLED,
     CONFIG_VMAP_BLIZZLIKE_PVP_LOS,
+    CONFIG_VMAP_BLIZZLIKE_LOS_OPEN_WORLD,
     CONFIG_OBJECT_SPARKLES,
     CONFIG_LOW_LEVEL_REGEN_BOOST,
     CONFIG_OBJECT_QUEST_MARKERS,
     CONFIG_STRICT_NAMES_RESERVED,
     CONFIG_STRICT_NAMES_PROFANITY,
     CONFIG_ALLOWS_RANK_MOD_FOR_PET_HEALTH,
+    CONFIG_MUNCHING_BLIZZLIKE,
+    CONFIG_ENABLE_DAZE,
     BOOL_CONFIG_VALUE_COUNT
 };
 
@@ -563,10 +567,6 @@ public:
     [[nodiscard]] virtual uint16 GetConfigMaxSkillValue() const = 0;
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;
-    virtual void SendWorldText(uint32 string_id, ...) = 0;
-    virtual void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) = 0;
-    virtual void SendGlobalText(const char* text, WorldSession* self) = 0;
-    virtual void SendGMText(uint32 string_id, ...) = 0;
     virtual void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;

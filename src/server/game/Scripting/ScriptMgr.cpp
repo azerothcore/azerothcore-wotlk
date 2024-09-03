@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "AllScriptsObjects.h"
-#include "LFGScripts.h"
 #include "InstanceScript.h"
+#include "LFGScripts.h"
 #include "ScriptObject.h"
 #include "ScriptSystem.h"
 #include "SmartAI.h"
@@ -30,9 +30,24 @@ namespace
     template<typename T>
     inline void SCR_CLEAR()
     {
-        for (auto const& [scriptID, script] : ScriptRegistry<T>::ScriptPointerList)
+        for (auto& [scriptID, script] : ScriptRegistry<T>::ScriptPointerList)
         {
-            delete script;
+            try
+            {
+                if(script)
+                {
+                    delete script;
+                    script = nullptr;
+                }
+            }
+            catch (const std::exception& e)
+            {
+                LOG_ERROR("scripts.unloading", "Failed to unload script {} with ID: {}. Error: {}", script->GetName(), scriptID, e.what());
+            }
+            catch (...)
+            {
+                LOG_ERROR("scripts.unloading", "Failed to unload script {} with ID: {}. Unknown error occurred.", script->GetName(), scriptID);
+            }
         }
 
         ScriptRegistry<T>::ScriptPointerList.clear();
@@ -77,6 +92,31 @@ void ScriptMgr::Initialize()
 
     _script_loader_callback();
     _modules_loader_callback();
+
+    ScriptRegistry<AccountScript>::InitEnabledHooksIfNeeded(ACCOUNTHOOK_END);
+    ScriptRegistry<AchievementScript>::InitEnabledHooksIfNeeded(ACHIEVEMENTHOOK_END);
+    ScriptRegistry<ArenaScript>::InitEnabledHooksIfNeeded(ARENAHOOK_END);
+    ScriptRegistry<ArenaTeamScript>::InitEnabledHooksIfNeeded(ARENATEAMHOOK_END);
+    ScriptRegistry<AuctionHouseScript>::InitEnabledHooksIfNeeded(AUCTIONHOUSEHOOK_END);
+    ScriptRegistry<BGScript>::InitEnabledHooksIfNeeded(ALLBATTLEGROUNDHOOK_END);
+    ScriptRegistry<CommandSC>::InitEnabledHooksIfNeeded(ALLCOMMANDHOOK_END);
+    ScriptRegistry<DatabaseScript>::InitEnabledHooksIfNeeded(DATABASEHOOK_END);
+    ScriptRegistry<FormulaScript>::InitEnabledHooksIfNeeded(FORMULAHOOK_END);
+    ScriptRegistry<GameEventScript>::InitEnabledHooksIfNeeded(GAMEEVENTHOOK_END);
+    ScriptRegistry<GlobalScript>::InitEnabledHooksIfNeeded(GLOBALHOOK_END);
+    ScriptRegistry<GroupScript>::InitEnabledHooksIfNeeded(GROUPHOOK_END);
+    ScriptRegistry<GuildScript>::InitEnabledHooksIfNeeded(GUILDHOOK_END);
+    ScriptRegistry<LootScript>::InitEnabledHooksIfNeeded(LOOTHOOK_END);
+    ScriptRegistry<MailScript>::InitEnabledHooksIfNeeded(MAILHOOK_END);
+    ScriptRegistry<MiscScript>::InitEnabledHooksIfNeeded(MISCHOOK_END);
+    ScriptRegistry<MovementHandlerScript>::InitEnabledHooksIfNeeded(MOVEMENTHOOK_END);
+    ScriptRegistry<PetScript>::InitEnabledHooksIfNeeded(PETHOOK_END);
+    ScriptRegistry<PlayerScript>::InitEnabledHooksIfNeeded(PLAYERHOOK_END);
+    ScriptRegistry<ServerScript>::InitEnabledHooksIfNeeded(SERVERHOOK_END);
+    ScriptRegistry<SpellSC>::InitEnabledHooksIfNeeded(ALLSPELLHOOK_END);
+    ScriptRegistry<UnitScript>::InitEnabledHooksIfNeeded(UNITHOOK_END);
+    ScriptRegistry<WorldObjectScript>::InitEnabledHooksIfNeeded(WORLDOBJECTHOOK_END);
+    ScriptRegistry<WorldScript>::InitEnabledHooksIfNeeded(WORLDHOOK_END);
 }
 
 void ScriptMgr::Unload()

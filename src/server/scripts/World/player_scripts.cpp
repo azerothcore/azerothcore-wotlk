@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Player.h"
 #include "PlayerScript.h"
 
@@ -27,7 +26,7 @@ enum ApprenticeAnglerQuestEnum
 class QuestApprenticeAnglerPlayerScript : public PlayerScript
 {
 public:
-    QuestApprenticeAnglerPlayerScript() : PlayerScript("QuestApprenticeAnglerPlayerScript")
+    QuestApprenticeAnglerPlayerScript() : PlayerScript("QuestApprenticeAnglerPlayerScript", {PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST})
     {
     }
 
@@ -71,4 +70,3 @@ void AddSC_player_scripts()
 {
     new QuestApprenticeAnglerPlayerScript();
 }
-

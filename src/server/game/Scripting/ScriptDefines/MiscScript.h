@@ -20,11 +20,35 @@
 
 #include "ObjectGuid.h"
 #include "ScriptObject.h"
+#include <vector>
+
+enum MiscHook
+{
+    MISCHOOK_ON_CONSTRUCT_OBJECT,
+    MISCHOOK_ON_DESTRUCT_OBJECT,
+    MISCHOOK_ON_CONSTRUCT_PLAYER,
+    MISCHOOK_ON_DESTRUCT_PLAYER,
+    MISCHOOK_ON_CONSTRUCT_GROUP,
+    MISCHOOK_ON_DESTRUCT_GROUP,
+    MISCHOOK_ON_CONSTRUCT_INSTANCE_SAVE,
+    MISCHOOK_ON_DESTRUCT_INSTANCE_SAVE,
+    MISCHOOK_ON_ITEM_CREATE,
+    MISCHOOK_CAN_APPLY_SOULBOUND_FLAG,
+    MISCHOOK_CAN_ITEM_APPLY_EQUIP_SPELL,
+    MISCHOOK_CAN_SEND_AUCTIONHELLO,
+    MISCHOOK_VALIDATE_SPELL_AT_CAST_SPELL,
+    MISCHOOK_VALIDATE_SPELL_AT_CAST_SPELL_RESULT,
+    MISCHOOK_ON_AFTER_LOOT_TEMPLATE_PROCESS,
+    MISCHOOK_ON_PLAYER_SET_PHASE,
+    MISCHOOK_ON_INSTANCE_SAVE,
+    MISCHOOK_GET_DIALOG_STATUS,
+    MISCHOOK_END
+};
 
 class MiscScript : public ScriptObject
 {
 protected:
-    MiscScript(const char* name);
+    MiscScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }

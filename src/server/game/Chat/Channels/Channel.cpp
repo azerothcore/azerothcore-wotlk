@@ -213,7 +213,7 @@ void Channel::JoinChannel(Player* player, std::string const& pass)
     playersStore[guid] = pinfo;
 
     if (_channelRights.joinMessage.length())
-        ChatHandler(player->GetSession()).PSendSysMessage("%s", _channelRights.joinMessage.c_str());
+        ChatHandler(player->GetSession()).PSendSysMessage("{}", _channelRights.joinMessage);
 
     WorldPacket data;
     MakeYouJoined(&data);
@@ -364,7 +364,7 @@ void Channel::KickOrBan(Player const* player, std::string const& badname, bool b
                     }
                     else
                     {
-                        ChatHandler(player->GetSession()).PSendSysMessage("Character %s has other faction!", badname.c_str());
+                        ChatHandler(player->GetSession()).PSendSysMessage("Character {} has other faction!", badname);
                         return;
                     }
                 }
@@ -706,7 +706,7 @@ void Channel::List(Player const* player)
     data << GetName();                                  // channel name
     data << uint8(GetFlags());                          // channel flags?
 
-    size_t pos = data.wpos();
+    std::size_t pos = data.wpos();
     data << uint32(0);                                  // size of list, placeholder
 
     uint32 count  = 0;

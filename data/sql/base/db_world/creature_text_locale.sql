@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `creature_text_locale` (
   PRIMARY KEY (`CreatureID`,`GroupID`,`ID`,`Locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_text_locale: ~14 733 rows (approximately)
+-- Dumping data for table acore_world.creature_text_locale: ~14 365 rows (approximately)
 DELETE FROM `creature_text_locale`;
 INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Text`) VALUES
 	(6, 0, 0, 'zhCN', '不许抢走我的蜡烛！'),
@@ -13227,6 +13227,7 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 	(34797, 2, 0, 'zhCN', '%s爆发出狂烈的怒气，他面前的战士转眼间就被他踩在脚下！'),
 	(34799, 0, 0, 'zhCN', '看到同伴的死亡，%s被激怒了！'),
 	(34799, 1, 0, 'zhCN', '看到同伴的死亡，%s被激怒了！'),
+	(34799, 2, 0, 'ruRU', '%s вылезает из-под земли!'),
 	(34799, 2, 0, 'zhCN', '看到同伴的死亡，%s被激怒了！'),
 	(34883, 0, 0, 'zhCN', '部落的成员们为$N而欢呼。'),
 	(34887, 0, 0, 'zhCN', '联盟的成员们为$N而欢呼。'),
@@ -13384,6 +13385,7 @@ INSERT INTO `creature_text_locale` (`CreatureID`, `GroupID`, `ID`, `Locale`, `Te
 	(35127, 0, 0, 'zhCN', '非常荣幸。'),
 	(35144, 0, 0, 'zhCN', '看到同伴的死亡，%s被激怒了！'),
 	(35144, 1, 0, 'zhCN', '你已经被麻痹毒素感染了！'),
+	(35144, 2, 0, 'ruRU', '%s вылезает из-под земли!'),
 	(35144, 2, 0, 'zhCN', '%s从地下钻出来了！'),
 	(35320, 0, 0, 'zhCN', '谢谢，这是我唯一能做的。我们需要同心协力。'),
 	(35320, 1, 0, 'zhCN', '我相信萨尔会管住他的部下……'),

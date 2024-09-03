@@ -1,0 +1,38 @@
+-- DB update 2024_06_22_09 -> 2024_06_23_00
+--
+UPDATE `spell_script_names` SET `ScriptName`='spell_azjol_nerub_web_wrap_aura' WHERE `spell_id`=52086;
+UPDATE `spell_script_names` SET `ScriptName`='spell_hadronox_summon_periodic_crypt_fiend_aura' WHERE `spell_id`=53037;
+UPDATE `spell_script_names` SET `ScriptName`='spell_hadronox_leech_poison_aura' WHERE `spell_id` IN (53030,59417);
+UPDATE `spell_script_names` SET `ScriptName`='spell_reflective_shield_aura' WHERE `spell_id`=66515;
+UPDATE `spell_script_names` SET `ScriptName`='spell_dtk_raise_dead_aura' WHERE `spell_id` IN (48597,48605);
+UPDATE `spell_script_names` SET `ScriptName`='spell_trollgore_corpse_explode_aura' WHERE `spell_id` IN (49555,59807);
+UPDATE `spell_script_names` SET `ScriptName`='spell_novos_crystal_handler_death_aura' WHERE `spell_id`=47336;
+UPDATE `spell_script_names` SET `ScriptName`='spell_tharon_ja_curse_of_life_aura' WHERE `spell_id` IN (49527,59972);
+UPDATE `spell_script_names` SET `ScriptName`='spell_tharon_ja_dummy_aura' WHERE `spell_id`=49551;
+UPDATE `spell_script_names` SET `ScriptName`='spell_dred_grievious_bite_aura' WHERE `spell_id`=48920;
+UPDATE `spell_script_names` SET `ScriptName`='spell_moorabi_mojo_frenzy_aura' WHERE `spell_id`=55163;
+UPDATE `spell_script_names` SET `ScriptName`='spell_sladran_grip_of_sladran_aura' WHERE `spell_id`=55093;
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_stop_time_aura' WHERE `spell_id`=49838;
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_evasive_maneuvers_aura' WHERE `spell_id`=50240;
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_temporal_rift_aura' WHERE `spell_id`=49592;
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_dream_funnel_aura' WHERE `spell_id`=50344;
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_ride_ruby_emerald_amber_drake_que_aura' WHERE `spell_id` IN (49427,49459,49463);
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_evasive_charges_aura' WHERE `spell_id`=50241;
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_soar_aura' WHERE `spell_id`=50325;
+UPDATE `spell_script_names` SET `ScriptName`='spell_oculus_drake_flag_aura' WHERE `spell_id`=53797;
+UPDATE `spell_script_names` SET `ScriptName`='spell_boss_magus_telestra_summon_telestra_clones_aura' WHERE `spell_id`=47710;
+UPDATE `spell_script_names` SET `ScriptName`='spell_ticking_time_bomb_aura' WHERE `spell_id`=59686;
+UPDATE `spell_script_names` SET `ScriptName`='spell_frost_tomb_aura' WHERE `spell_id`=42672;
+UPDATE `spell_script_names` SET `ScriptName`='spell_optic_link_aura' WHERE `spell_id`=54396;
+UPDATE `spell_script_names` SET `ScriptName`='spell_destroy_door_seal_aura' WHERE `spell_id`=58040;
+UPDATE `spell_script_names` SET `ScriptName`='spell_shield_of_bones_aura' WHERE `spell_id` IN (69069,70207);
+UPDATE `spell_script_names` SET `ScriptName`='spell_wailing_souls_periodic_aura' WHERE `spell_id`=68875;
+UPDATE `spell_script_names` SET `ScriptName`='spell_bronjahm_soulstorm_channel_ooc_aura' WHERE `spell_id`=69008;
+UPDATE `spell_script_names` SET `ScriptName`='spell_bronjahm_soulstorm_visual_aura' WHERE `spell_id`=68870;
+UPDATE `spell_script_names` SET `ScriptName`='spell_krick_explosive_barrage_aura' WHERE `spell_id`=69012;
+UPDATE `spell_script_names` SET `ScriptName`='spell_exploding_orb_auto_grow_aura' WHERE `spell_id`=69020;
+UPDATE `spell_script_names` SET `ScriptName`='spell_pos_empowered_blizzard_aura' WHERE `spell_id`=70132;
+UPDATE `spell_script_names` SET `ScriptName`='spell_pos_blight_aura' WHERE `spell_id` IN (69603,69604,70285,70286);
+UPDATE `spell_script_names` SET `ScriptName`='spell_pos_glacial_strike_aura' WHERE `spell_id` IN (70292,71316,71317);
+UPDATE `spell_script_names` SET `ScriptName`='spell_hor_gunship_cannon_fire_aura' WHERE `spell_id`=70017;
+UPDATE `spell_script_names` SET `ScriptName`='spell_hor_shared_suffering_aura' WHERE `spell_id` IN (72368,72369);

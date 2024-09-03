@@ -20,7 +20,6 @@
 
 #include <atomic>
 #include <memory>
-#include <utility>
 
 namespace Acore::Impl
 {

@@ -38,7 +38,7 @@ public:
 };
 
 WorldSocketMgr::WorldSocketMgr() :
-    BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(65536), _tcpNoDelay(true)
+    BaseSocketMgr(), _socketSystemSendBufferSize(-1), _socketApplicationSendBufferSize(4096), _tcpNoDelay(true)
 {
 }
 
@@ -57,7 +57,7 @@ bool WorldSocketMgr::StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::s
 
     // -1 means use default
     _socketSystemSendBufferSize = sConfigMgr->GetOption<int32>("Network.OutKBuff", -1);
-    _socketApplicationSendBufferSize = sConfigMgr->GetOption<int32>("Network.OutUBuff", 65536);
+    _socketApplicationSendBufferSize = sConfigMgr->GetOption<int32>("Network.OutUBuff", 4096);
 
     if (_socketApplicationSendBufferSize <= 0)
     {
@@ -114,5 +114,13 @@ void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
 
 NetworkThread<WorldSocket>* WorldSocketMgr::CreateThreads() const
 {
-    return new WorldSocketThread[GetNetworkThreadCount()];
+
+    NetworkThread<WorldSocket>* threads = new WorldSocketThread[GetNetworkThreadCount()];
+
+    bool proxyProtocolEnabled = sConfigMgr->GetOption<bool>("Network.EnableProxyProtocol", false, true);
+    if (proxyProtocolEnabled)
+        for (int i = 0; i < GetNetworkThreadCount(); i++)
+            threads[i].EnableProxyProtocol();
+
+    return threads;
 }
