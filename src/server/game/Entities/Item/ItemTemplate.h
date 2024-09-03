@@ -827,9 +827,7 @@ struct ItemTemplate
     [[nodiscard]] bool IsPotion() const { return Class == ITEM_CLASS_CONSUMABLE && SubClass == ITEM_SUBCLASS_POTION; }
     [[nodiscard]] bool IsWeaponVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_WEAPON_ENCHANTMENT; }
     [[nodiscard]] bool IsArmorVellum() const { return Class == ITEM_CLASS_TRADE_GOODS && SubClass == ITEM_SUBCLASS_ARMOR_ENCHANTMENT; }
-    [[nodiscard]] bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
-    [[nodiscard]] bool IsWeapon() const { return Class == ITEM_CLASS_WEAPON; }
-    [[nodiscard]] bool IsRangedWeapon() const { return IsWeapon() && (InventoryType == INVTYPE_RANGED || InventoryType == INVTYPE_THROWN || InventoryType == INVTYPE_RANGEDRIGHT); }
+    [[nodiscard]] bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && HasFlag(ITEM_FLAG_CONJURED); }
 
     [[nodiscard]] bool HasStat(ItemModType stat) const;
     [[nodiscard]] bool HasSpellPowerStat() const;
