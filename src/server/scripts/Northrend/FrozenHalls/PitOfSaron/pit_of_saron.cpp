@@ -1130,7 +1130,7 @@ public:
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();
-            me->SetLastDamagedTime(0);
+            me->UpdateLeashExtensionTime();
         }
     };
 
