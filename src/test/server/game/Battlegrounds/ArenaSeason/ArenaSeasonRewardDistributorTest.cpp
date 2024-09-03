@@ -20,7 +20,7 @@
 #include "gtest/gtest.h"
 #include "ArenaSeasonRewardsDistributor.h"
 
-class MockArenaSeasonTeamRewarder : public ArenaSeasonTeamRewarder 
+class MockArenaSeasonTeamRewarder : public ArenaSeasonTeamRewarder
 {
 public:
     MOCK_METHOD(void, RewardTeamWithRewardGroup, (ArenaTeam* arenaTeam, ArenaSeasonRewardGroup const& rewardGroup), (override));
