@@ -6452,16 +6452,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                             m_spellInfo->Effects[i].TargetA.GetTarget() != TARGET_GAMEOBJECT_ITEM_TARGET)
                         break;
 
-                //npcbot
-                if (m_caster->IsNPCBot())
-                {
-                    if (m_spellInfo->Effects[i].TargetA.GetTarget() == TARGET_GAMEOBJECT_TARGET && !m_targets.GetGOTarget())
-                        return SPELL_FAILED_BAD_TARGETS;
-                    break;
-                }
-                //end npcbot
-
-                    if (m_caster->GetTypeId() != TYPEID_PLAYER  // only players can open locks, gather etc.
+                    if (!m_caster->IsPlayer()  // only players can open locks, gather etc.
                             // we need a go target in case of TARGET_GAMEOBJECT_TARGET
                             || (m_spellInfo->Effects[i].TargetA.GetTarget() == TARGET_GAMEOBJECT_TARGET && !m_targets.GetGOTarget()))
                         return SPELL_FAILED_BAD_TARGETS;
