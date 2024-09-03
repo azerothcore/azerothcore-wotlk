@@ -18053,10 +18053,7 @@ void Unit::ApplyCastTimePercentMod(float val, bool apply)
 uint32 Unit::GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const
 {
     // Not apply this to creature casted spells with casttime == 0
-    if (CastingTime == 0 && GetTypeId() == TYPEID_UNIT && !IsPet())
-        //npcbot - skip bots
-        if (!IsNPCBotOrPet())
-        //end npcbot
+    if (CastingTime == 0 && IsCreature() && !IsPet())
         return 3500;
 
     if (CastingTime > 7000) CastingTime = 7000;
