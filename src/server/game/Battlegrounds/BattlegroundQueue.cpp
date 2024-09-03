@@ -772,7 +772,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
         MinPlayersPerTeam = 1;
 
     sScriptMgr->OnQueueUpdate(this, diff, bgTypeId, bracket_id, arenaType, isRated, arenaRating);
-    
+
     if (!sScriptMgr->OnQueueUpdateValidity(this, diff, bgTypeId, bracket_id, arenaType, isRated, arenaRating)) {
         return;
     }
