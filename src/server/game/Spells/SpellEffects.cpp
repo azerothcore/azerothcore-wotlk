@@ -2246,46 +2246,7 @@ void Spell::EffectOpenLock(SpellEffIndex effIndex)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    //npcbot
-    if (m_caster->IsNPCBot() && gameObjTarget)
-    {
-        GameObjectTemplate const* botGoInfo = gameObjTarget->GetGOInfo();
-        Creature* bot = m_caster->ToCreature();
-
-        // Arathi Basin banner opening. /// @todo Verify correctness of this check
-        if ((botGoInfo->type == GAMEOBJECT_TYPE_BUTTON && botGoInfo->button.noDamageImmune) ||
-            (botGoInfo->type == GAMEOBJECT_TYPE_GOOBER && botGoInfo->goober.losOK))
-        {
-            //CanUseBattlegroundObject() already called in CheckCast()
-            // in battleground check
-            if (Battleground* bg = bot->GetBotBG())
-            {
-                bg->EventBotClickedOnFlag(bot, gameObjTarget);
-                return;
-            }
-        }
-        else if (botGoInfo->type == GAMEOBJECT_TYPE_FLAGSTAND)
-        {
-            //CanUseBattlegroundObject() already called in CheckCast()
-            // in battleground check
-            if (Battleground* bg = bot->GetBotBG())
-            {
-                if (bg->GetBgTypeID(true) == BATTLEGROUND_EY)
-                    bg->EventBotClickedOnFlag(bot, gameObjTarget);
-                return;
-            }
-        }
-        else if (botGoInfo->type == GAMEOBJECT_TYPE_TRAP)
-        {
-            gameObjTarget->SetLootState(GO_ACTIVATED);
-            return;
-        }
-
-        return;
-    }
-    //end npcbot
-
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+    if (!m_caster->IsPlayer())
     {
         LOG_DEBUG("spells.aura", "WORLD: Open Lock - No Player Caster!");
         return;
