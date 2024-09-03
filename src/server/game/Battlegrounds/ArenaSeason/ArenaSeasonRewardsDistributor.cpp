@@ -82,8 +82,8 @@ void ArenaSeasonTeamRewarderImpl::RewardWithAchievements(ArenaTeam* arenaTeam, A
             
             if (player)
                 player->CompletedAchievement(achievement);
-            // else
-            //     sAchievementMgr->CompletedAchievementForOfflinePlayer(member.Guid.GetCounter(), achievement);
+            else
+                sAchievementMgr->CompletedAchievementForOfflinePlayer(member.Guid.GetCounter(), achievement);
         }
     }
 }
