@@ -144,7 +144,7 @@ class spell_the_flag_of_ownership : public SpellScript
 
         LocaleConstant loc_idx = caster->ToPlayer()->GetSession()->GetSessionDbLocaleIndex();
         BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_FLAG_OF_OWNERSHIP);
-        std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName().c_str(), target->GetName().c_str());
+        std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName(), target->GetName());
         caster->Talk(bctMsg, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
 
         haveTarget = true;

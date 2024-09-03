@@ -273,9 +273,9 @@ namespace Acore::Impl::ChatCommands
                     if (!nestedResult.HasErrorMessage())
                         return thisResult;
                     if (StringStartsWith(nestedResult.GetErrorMessage(), "\""))
-                        return Acore::StringFormat("\"%s\"\n%s %s", thisResult.GetErrorMessage().c_str(), GetAcoreString(handler, LANG_CMDPARSER_OR), nestedResult.GetErrorMessage().c_str());
+                        return Acore::StringFormat("\"{}\"\n{} {}", thisResult.GetErrorMessage(), GetAcoreString(handler, LANG_CMDPARSER_OR), nestedResult.GetErrorMessage());
                     else
-                        return Acore::StringFormat("\"%s\"\n%s \"%s\"", thisResult.GetErrorMessage().c_str(), GetAcoreString(handler, LANG_CMDPARSER_OR), nestedResult.GetErrorMessage().c_str());
+                        return Acore::StringFormat("\"{}\"\n{} \"{}\"", thisResult.GetErrorMessage(), GetAcoreString(handler, LANG_CMDPARSER_OR), nestedResult.GetErrorMessage());
                 }
             }
             else
@@ -286,7 +286,7 @@ namespace Acore::Impl::ChatCommands
         {
             ChatCommandResult result = TryAtIndex<0>(val, handler, args);
             if (result.HasErrorMessage() && (result.GetErrorMessage().find('\n') != std::string::npos))
-                return Acore::StringFormat("%s %s", GetAcoreString(handler, LANG_CMDPARSER_EITHER), result.GetErrorMessage().c_str());
+                return Acore::StringFormat("{} {}", GetAcoreString(handler, LANG_CMDPARSER_EITHER), result.GetErrorMessage());
             return result;
         }
     };
