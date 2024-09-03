@@ -671,7 +671,7 @@ class spell_hun_readiness : public SpellScript
         std::set<std::pair<uint32, bool>> spellsToRemove;
         std::set<uint32> categoriesToRemove;
 
-        for (const auto& [spellId, cooldown] : cooldowns)
+        for (auto const& [spellId, cooldown] : cooldowns)
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (spellInfo
@@ -689,9 +689,9 @@ class spell_hun_readiness : public SpellScript
         }
 
         // we can't remove spell cooldowns while iterating.
-        for (const auto& [spellId, sendToClient] : spellsToRemove)
+        for (auto const& [spellId, sendToClient] : spellsToRemove)
             caster->RemoveSpellCooldown(spellId, sendToClient);
-        for (const auto& category : categoriesToRemove)
+        for (auto const& category : categoriesToRemove)
             caster->RemoveCategoryCooldown(category);
     }
 

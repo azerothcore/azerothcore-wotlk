@@ -7739,7 +7739,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
     // remove FD and invisibility at all loots
     constexpr std::array<AuraType, 2> toRemove = {SPELL_AURA_MOD_INVISIBILITY, SPELL_AURA_FEIGN_DEATH};
-    for (const auto& aura : toRemove)
+    for (auto const& aura : toRemove)
     {
         RemoveAurasByType(aura);
     }

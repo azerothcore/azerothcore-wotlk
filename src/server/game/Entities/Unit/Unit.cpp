@@ -2657,7 +2657,7 @@ bool Unit::GetMeleeAttackPoint(Unit* attacker, Position& pos)
 
     double attackerSize = attacker->GetCollisionRadius();
 
-    for (const auto& otherAttacker: attackers)
+    for (auto const& otherAttacker: attackers)
     {
         // if the otherAttacker is not valid, skip
         if (!otherAttacker || otherAttacker->GetGUID() == attacker->GetGUID() ||

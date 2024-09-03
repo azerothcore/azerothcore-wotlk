@@ -471,7 +471,7 @@ public:
                         SetData(TYPE_RING_OF_LAW, NOT_STARTED);
                         break;
                     case DONE:
-                        for (const auto& itr : ArenaSpectators)
+                        for (auto const& itr : ArenaSpectators)
                         {
                             if (Creature* spectator = instance->GetCreature(itr))
                             {
