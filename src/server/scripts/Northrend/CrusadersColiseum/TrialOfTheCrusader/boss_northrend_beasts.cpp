@@ -172,7 +172,7 @@ public:
                     break;
                 case EVENT_SPELL_FIRE_BOMB:
                     {
-                        if( t->GetTypeId() != TYPEID_PLAYER && pInstance )
+                        if( !t->IsPlayer() && pInstance )
                         {
                             GuidVector validPlayers;
                             Map::PlayerList const& pl = me->GetMap()->GetPlayers();
@@ -342,7 +342,7 @@ public:
                             if( Vehicle* vk = me->GetVehicleKit() )
                                 if( Unit* snobold = vk->GetPassenger(4) )
                                 {
-                                    if( snobold->GetTypeId() == TYPEID_UNIT )
+                                    if( snobold->IsCreature() )
                                     {
                                         CAST_AI(npc_snobold_vassal::npc_snobold_vassalAI, snobold->ToCreature()->AI())->TargetGUID = PlayerGUID;
                                         snobold->ToCreature()->AI()->AttackStart(p);
@@ -357,7 +357,7 @@ public:
                         {
                             events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 5s);
                             if( Unit* snobold = vk->GetPassenger(4) )
-                                if( snobold->GetTypeId() == TYPEID_UNIT )
+                                if( snobold->IsCreature() )
                                 {
                                     bool needDespawn = true;
                                     for( uint8 i = 0; i < 4; ++i )

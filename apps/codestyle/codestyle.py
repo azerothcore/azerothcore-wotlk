@@ -108,14 +108,20 @@ def get_typeid_check(file: io, file_path: str) -> None:
     check_failed = False
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        if 'GetTypeId() == TYPEID_PLAYER' in line:
-            print(f"Please use IsPlayer() instead GetTypeId(): {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_ITEM' in line or 'GetTypeId() != TYPEID_ITEM' in line:
+            print(f"Please use IsItem() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_ITEM' in line:
-            print(f"Please use IsItem() instead GetTypeId(): {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_UNIT' in line or 'GetTypeId() != TYPEID_UNIT' in line:
+            print(f"Please use IsCreature() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_DYNOBJECT' in line:
-            print(f"Please use IsDynamicObject() instead GetTypeId(): {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_PLAYER' in line or 'GetTypeId() != TYPEID_PLAYER' in line:
+            print(f"Please use IsPlayer() instead of GetTypeId(): {file_path} at line {line_number}")
+            check_failed = True
+        if 'GetTypeId() == TYPEID_GAMEOBJECT' in line or 'GetTypeId() != TYPEID_GAMEOBJECT' in line:
+            print(f"Please use IsGameObject() instead of GetTypeId(): {file_path} at line {line_number}")
+            check_failed = True
+        if 'GetTypeId() == TYPEID_DYNOBJECT' in line or 'GetTypeId() != TYPEID_DYNOBJECT' in line:
+            print(f"Please use IsDynamicObject() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
     if check_failed:

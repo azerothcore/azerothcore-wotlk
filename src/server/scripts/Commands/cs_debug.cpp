@@ -263,7 +263,7 @@ public:
         Unit* unit = handler->getSelectedUnit();
         Player* player = nullptr;
 
-        if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
+        if (!unit || (!unit->IsPlayer()))
         {
             player = handler->GetSession()->GetPlayer();
         }

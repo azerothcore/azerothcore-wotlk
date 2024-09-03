@@ -1405,7 +1405,7 @@ class spell_pos_rimefang_frost_nova : public SpellScript
             if (Unit* caster = GetCaster())
             {
                 Unit::Kill(caster, target);
-                if (target->GetTypeId() == TYPEID_UNIT)
+                if (target->IsCreature())
                     target->ToCreature()->DespawnOrUnsummon(30000);
             }
     }

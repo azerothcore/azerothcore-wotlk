@@ -333,7 +333,7 @@ class spell_garfrost_permafrost : public SpellScript
                         if (valid)
                         {
                             if (Aura* aur = target->ToUnit()->GetAura(70336))
-                                if (aur->GetStackAmount() >= 10 && caster->GetTypeId() == TYPEID_UNIT)
+                                if (aur->GetStackAmount() >= 10 && caster->IsCreature())
                                     caster->ToCreature()->AI()->SetData(1, aur->GetStackAmount());
                             targetList.push_back(*itrU);
                         }
