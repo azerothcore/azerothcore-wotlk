@@ -34,6 +34,7 @@
 #include "SpellScriptLoader.h"
 #include "Vehicle.h"
 #include "World.h"
+#include <cmath>
 
 enum eWGqueuenpctext
 {
@@ -1089,7 +1090,7 @@ class spell_wg_reduce_damage_by_distance : public SpellScript
         float maxDistance = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster()); // Xinef: always stored in EFFECT_0
         float distance = std::min<float>(GetHitUnit()->GetDistance(*GetExplTargetDest()), maxDistance);
 
-        int32 damage = std::max<int32>(0, int32(GetHitDamage() - floor(GetHitDamage() * (distance / maxDistance))));
+        int32 damage = std::max<int32>(0, int32(GetHitDamage() - std::floor(GetHitDamage() * (distance / maxDistance))));
         SetHitDamage(damage);
     }
 

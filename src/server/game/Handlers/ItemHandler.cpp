@@ -28,6 +28,7 @@
 #include "UpdateData.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <cmath>
 
 void WorldSession::HandleSplitItemOpcode(WorldPacket& recvData)
 {
@@ -1111,7 +1112,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
                 }
 
                 // reputation discount
-                int32 price = item->IsGoldRequired(itemTemplate) ? uint32(floor(itemTemplate->BuyPrice * discountMod)) : 0;
+                int32 price = item->IsGoldRequired(itemTemplate) ? uint32(std::floor(itemTemplate->BuyPrice * discountMod)) : 0;
 
                 data << uint32(slot + 1);       // client expects counting to start at 1
                 data << uint32(item->item);

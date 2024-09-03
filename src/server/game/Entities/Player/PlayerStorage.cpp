@@ -5023,7 +5023,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetCreationTime(fields[74].Get<Seconds>());
 
     // load achievements before anything else to prevent multiple gains for the same achievement/criteria on every loading (as loading does call UpdateAchievementCriteria)
-    m_achievementMgr->LoadFromDB(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS));
+    m_achievementMgr->LoadFromDB(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_ACHIEVEMENTS), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CRITERIA_PROGRESS), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_OFFLINE_ACHIEVEMENTS_UPDATES));
 
     uint32 money = fields[8].Get<uint32>();
     if (money > MAX_MONEY_AMOUNT)

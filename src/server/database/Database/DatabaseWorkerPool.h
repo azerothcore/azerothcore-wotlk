@@ -103,7 +103,7 @@ public:
         if (sql.empty())
             return;
 
-        Execute(Acore::StringFormatFmt(sql, std::forward<Args>(args)...));
+        Execute(Acore::StringFormat(sql, std::forward<Args>(args)...));
     }
 
     //! Enqueues a one-way SQL operation in prepared statement format that will be executed asynchronously.
@@ -126,7 +126,7 @@ public:
         if (sql.empty())
             return;
 
-        DirectExecute(Acore::StringFormatFmt(sql, std::forward<Args>(args)...));
+        DirectExecute(Acore::StringFormat(sql, std::forward<Args>(args)...));
     }
 
     //! Directly executes a one-way SQL operation in prepared statement format, that will block the calling thread until finished.
@@ -149,7 +149,7 @@ public:
         if (sql.empty())
             return QueryResult(nullptr);
 
-        return Query(Acore::StringFormatFmt(sql, std::forward<Args>(args)...));
+        return Query(Acore::StringFormat(sql, std::forward<Args>(args)...));
     }
 
     //! Directly executes an SQL query in prepared format that will block the calling thread until finished.

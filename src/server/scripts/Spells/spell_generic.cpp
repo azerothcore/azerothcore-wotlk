@@ -35,6 +35,7 @@
 #include "Unit.h"
 #include "Vehicle.h"
 #include <array>
+#include <cmath>
 /*
  * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file
  * of creature using it or can't be bound to any player class.
@@ -144,7 +145,7 @@ class spell_the_flag_of_ownership : public SpellScript
 
         LocaleConstant loc_idx = caster->ToPlayer()->GetSession()->GetSessionDbLocaleIndex();
         BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_FLAG_OF_OWNERSHIP);
-        std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName().c_str(), target->GetName().c_str());
+        std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName(), target->GetName());
         caster->Talk(bctMsg, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
 
         haveTarget = true;
@@ -4255,7 +4256,7 @@ class spell_gen_gift_of_naaru : public AuraScript
                 break;
         }
 
-        int32 healTick = floor(heal / aurEff->GetTotalTicks());
+        int32 healTick = std::floor(heal / aurEff->GetTotalTicks());
         amount += int32(std::max(healTick, 0));
     }
 
