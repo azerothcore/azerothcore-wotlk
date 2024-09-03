@@ -151,7 +151,7 @@ void UpdateTime::SortUpdateTimeDataTable()
 
 void WorldUpdateTime::LoadFromConfig()
 {
-    _recordUpdateTimeInverval = Milliseconds(sConfigMgr->GetOption<uint32>("RecordUpdateTimeDiffInterval", 60000));
+    _recordUpdateTimeInverval = Milliseconds(sConfigMgr->GetOption<uint32>("RecordUpdateTimeDiffInterval", 300000));
     _recordUpdateTimeMin = Milliseconds(sConfigMgr->GetOption<uint32>("MinRecordUpdateTimeDiff", 100));
 }
 
