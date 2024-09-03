@@ -18,6 +18,7 @@
 #ifndef _ARENASEASONMGR_H
 #define _ARENASEASONMGR_H
 
+#include "Common.h"
 #include <vector>
 #include <unordered_map>
 
@@ -63,7 +64,7 @@ struct ArenaSeasonRewardGroup
     std::vector<ArenaSeasonReward> itemRewards{};
     std::vector<ArenaSeasonReward> achievementRewards{};
 
-    bool operator<(const ArenaSeasonRewardGroup& other) const 
+    bool operator<(const ArenaSeasonRewardGroup& other) const
     {
         return this->minPctCriteria < other.minPctCriteria;
     }

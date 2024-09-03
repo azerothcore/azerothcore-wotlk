@@ -79,7 +79,7 @@ void ArenaSeasonTeamRewarderImpl::RewardWithAchievements(ArenaTeam* arenaTeam, A
             AchievementEntry const* achievement = sAchievementStore.LookupEntry(reward.entry);
             if (!achievement)
                 continue;
-            
+
             if (player)
                 player->CompletedAchievement(achievement);
             else
@@ -100,7 +100,7 @@ void ArenaSeasonRewardDistributor::DistributeRewards(ArenaTeamMgr::ArenaTeamCont
 
     const uint minRequiredGames = 30;
 
-    for (const auto& [id, team] : arenaTeams)
+    for (auto const& [id, team] : arenaTeams)
         if (team->GetStats().SeasonGames >= minRequiredGames)
             sortedTeams.push_back(team);
 
@@ -114,8 +114,8 @@ void ArenaSeasonRewardDistributor::DistributeRewards(ArenaTeamMgr::ArenaTeamCont
 
     size_t totalTeams = sortedTeams.size();
     size_t prevTeamIndexRewarded = 0;
-    
-    for (const auto& rewardGroup : rewardGroups)
+
+    for (auto const& rewardGroup : rewardGroups)
     {
         size_t minIndex = static_cast<size_t>(rewardGroup.minPctCriteria * totalTeams / 100);
         size_t maxIndex = static_cast<size_t>(rewardGroup.maxPctCriteria * totalTeams / 100);

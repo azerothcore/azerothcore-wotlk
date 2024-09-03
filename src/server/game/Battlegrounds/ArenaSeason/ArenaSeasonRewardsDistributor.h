@@ -51,5 +51,4 @@ private:
     ArenaSeasonTeamRewarder* _rewarder;
 };
 
-
 #endif // _ARENASEASONREWARDDISTRIBUTOR_H

@@ -137,7 +137,6 @@ void ArenaTeamMgr::DeleteAllArenaTeams()
 
     ArenaTeamStore.clear();
 
-
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
     trans->Append("DELETE FROM arena_team_member");
     trans->Append("DELETE FROM arena_team");

@@ -58,7 +58,6 @@ void ArenaSeasonMgr::LoadRewards()
         groupsMap[id] = group;
     } while (result->NextRow());
 
-
     result = WorldDatabase.Query("SELECT group_id, type, entry FROM arena_season_reward");
 
     if (!result)
@@ -140,7 +139,7 @@ void ArenaSeasonMgr::DeleteArenaTeams()
     for (BattlegroundQueueTypeId queueType : arenasQueueTypes)
     {
         auto queue = sBattlegroundMgr->GetBattlegroundQueue(queueType);
-        for (auto const& [playerGUID, other] : queue.m_QueuedPlayers) 
+        for (auto const& [playerGUID, other] : queue.m_QueuedPlayers)
             queue.RemovePlayer(playerGUID, true);
     }
 
@@ -208,4 +207,3 @@ void ArenaSeasonMgr::BroadcastUpdatedWorldState()
         });
     });
 }
-

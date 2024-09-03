@@ -337,9 +337,9 @@ Battleground* BattlegroundMgr::GetBattlegroundTemplate(BattlegroundTypeId bgType
 std::vector<const Battleground *> BattlegroundMgr::GetActiveBattlegrounds()
 {
     std::vector<const Battleground *> result;
-    
-    for (const auto& [bgType, bgData] : bgDataStore)
-        for (const auto& [id, bg] : bgData._Battlegrounds)
+
+    for (auto const& [bgType, bgData] : bgDataStore)
+        for (auto const& [id, bg] : bgData._Battlegrounds)
             if (bg->GetStatus() == STATUS_WAIT_JOIN || bg->GetStatus() == STATUS_IN_PROGRESS)
                 result.push_back(static_cast<const Battleground*>(bg));
 
