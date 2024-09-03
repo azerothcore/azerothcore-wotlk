@@ -87,7 +87,7 @@ public:
         if (message.empty())
             return false;
 
-        sWorld->SendServerMessage(SERVER_MSG_STRING, Acore::StringFormatFmt(handler->GetAcoreString(LANG_SYSTEMMESSAGE), message.data()));
+        sWorld->SendServerMessage(SERVER_MSG_STRING, Acore::StringFormat(handler->GetAcoreString(LANG_SYSTEMMESSAGE), message.data()));
         return true;
     }
 

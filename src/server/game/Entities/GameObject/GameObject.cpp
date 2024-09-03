@@ -1887,20 +1887,21 @@ void GameObject::Use(Unit* user)
                 {
                     if (!user->IsPlayer())
                         return;
-
-                    if (Group* group = user->ToPlayer()->GetGroup())
+                    if (ObjectGuid ownerGuid = GetOwnerGUID())
                     {
-                        if (ObjectGuid ownerGuid = GetOwnerGUID())
+                        if (user->GetGUID() != ownerGuid)
                         {
-                            if (group->IsMember(ownerGuid))
-                            {
-                                user->RemoveAurasByType(SPELL_AURA_MOUNTED);
-                                spellId = info->spellcaster.spellId;
-                            }
+                            Group* group = user->ToPlayer()->GetGroup();
+                            if (!group)
+                                return;
+                            if (!group->IsMember(ownerGuid))
+                                return;
                         }
                     }
                 }
 
+                user->RemoveAurasByType(SPELL_AURA_MOUNTED);
+                spellId = info->spellcaster.spellId;
                 break;
             }
         case GAMEOBJECT_TYPE_MEETINGSTONE:                  //23

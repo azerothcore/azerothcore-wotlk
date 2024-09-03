@@ -21,7 +21,7 @@
 
 void Acore::Banner::Show(std::string_view applicationName, void(*log)(std::string_view text), void(*logExtraInfo)())
 {
-    log(Acore::StringFormatFmt("{} ({})", GitRevision::GetFullVersion(), applicationName));
+    log(Acore::StringFormat("{} ({})", GitRevision::GetFullVersion(), applicationName));
     log("<Ctrl-C> to stop.\n");
     log("   █████╗ ███████╗███████╗██████╗  ██████╗ ████████╗██╗  ██╗");
     log("  ██╔══██╗╚══███╔╝██╔════╝██╔══██╗██╔═══██╗╚══██╔══╝██║  ██║");
