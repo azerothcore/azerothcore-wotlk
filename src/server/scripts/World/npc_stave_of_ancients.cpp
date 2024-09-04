@@ -1230,3 +1230,5 @@ void AddSC_npc_stave_of_ancients()
     new npc_nelson();
     new npc_franklin();
 }
+
+
