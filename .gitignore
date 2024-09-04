@@ -20,7 +20,7 @@
 /.env*
 /apps/joiner
 /deps/deno
-/data/sql/custom/*
+#/data/sql/custom/*
 /src/server/scripts/Custom/*
 !/src/server/scripts/Custom/README.md
 
