@@ -65,7 +65,7 @@ namespace
     template<typename Format, typename... Args>
     inline void PrintError(std::string_view filename, Format&& fmt, Args&& ... args)
     {
-        std::string message = Acore::StringFormatFmt(std::forward<Format>(fmt), std::forward<Args>(args)...);
+        std::string message = Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
 
         if (IsAppConfig(filename))
         {
@@ -117,7 +117,7 @@ namespace
                 return false;
             }
 
-            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Failed open {}file '{}'", isOptional ? "optional " : "", file));
+            throw ConfigException(Acore::StringFormat("Config::LoadFile: Failed open {}file '{}'", isOptional ? "optional " : "", file));
         }
 
         uint32 count = 0;
@@ -144,7 +144,7 @@ namespace
 
             // read line error
             if (!in.good() && !in.eof())
-                throw ConfigException(Acore::StringFormatFmt("> Config::LoadFile: Failure to read line number {} in file '{}'", lineNumber, file));
+                throw ConfigException(Acore::StringFormat("> Config::LoadFile: Failure to read line number {} in file '{}'", lineNumber, file));
 
             // remove whitespace in line
             line = Acore::String::Trim(line, in.getloc());
@@ -187,7 +187,7 @@ namespace
                 return false;
             }
 
-            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Empty file '{}'", file));
+            throw ConfigException(Acore::StringFormat("Config::LoadFile: Empty file '{}'", file));
         }
 
         // Add correct keys if file load without errors
