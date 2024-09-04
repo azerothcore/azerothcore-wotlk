@@ -392,7 +392,15 @@ public:
 
         void PassengerBoarded(Unit* passenger, int8 /*seatid*/, bool add) override
         {
-            if (!passenger->IsPlayer())
+            //npcbot
+            if (passenger->IsNPCBot() && add)
+            {
+                despawnTimer = 0;
+                return;
+            }
+            //end npcbot
+
+            if (passenger->GetTypeId() != TYPEID_PLAYER)
                 return;
 
             if (add)
