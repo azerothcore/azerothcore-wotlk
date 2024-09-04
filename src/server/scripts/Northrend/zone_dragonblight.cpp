@@ -694,7 +694,7 @@ public:
             if (Vehicle* gryphon = me->GetVehicleKit())
                 if (Unit* villager = gryphon->GetPassenger(1))
                 {
-                    if (villager->GetTypeId() != TYPEID_UNIT)
+                    if (!villager->IsCreature())
                         return;
 
                     if (Creature* seat = villager->ToCreature())
@@ -1296,7 +1296,7 @@ public:
                                     if (Unit* vb = c->GetVehicleBase())
                                     {
                                         if (Unit* pass = vb->GetVehicleKit()->GetPassenger(0))
-                                            if (pass->GetTypeId() == TYPEID_UNIT)
+                                            if (pass->IsCreature())
                                                 pass->ToCreature()->DespawnOrUnsummon(1);
                                         vb->RemoveAllAuras();
                                         vb->ToCreature()->DespawnOrUnsummon(1);
@@ -1323,7 +1323,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_SAC_REPEL_HAMMER && target->GetTypeId() == TYPEID_UNIT)
+            if (spell->Id == SPELL_SAC_REPEL_HAMMER && target->IsCreature())
             {
                 target->CastSpell((Unit*)nullptr, SPELL_SAC_THROW_HAMMER, true);
                 target->ToCreature()->DespawnOrUnsummon(1);
@@ -1469,7 +1469,7 @@ public:
     explicit GhoulTargetCheck(bool alive) : _alive(alive) {}
     bool operator()(WorldObject* object) const
     {
-        return _alive ^ (object->GetTypeId() != TYPEID_UNIT || ((Unit*)object)->GetDisplayId() != 11686);
+        return _alive ^ (!object->IsCreature() || ((Unit*)object)->GetDisplayId() != 11686);
     }
 private:
     bool _alive;
@@ -1489,7 +1489,7 @@ class spell_q24545_aod_special : public SpellScript
     {
         PreventHitDefaultEffect(effIndex);
         if (Unit* target = GetHitUnit())
-            if (target->GetTypeId() == TYPEID_UNIT)
+            if (target->IsCreature())
                 target->ToCreature()->AI()->DoAction(GetSpellInfo()->Id == 70790 ? -2 : -1);
     }
 
@@ -1648,7 +1648,7 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {
-            if (!summoner || summoner->GetTypeId() != TYPEID_PLAYER)
+            if (!summoner || !summoner->IsPlayer())
                 return;
 
             uint8 id = GetSpeachId();

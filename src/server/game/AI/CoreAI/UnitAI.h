@@ -148,7 +148,7 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
         if (target->getPowerType() != _power)
             return false;
 
-        if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
+        if (_playerOnly && !target->IsPlayer())
             return false;
 
         if (_dist > 0.0f && !_me->IsWithinCombatRange(target, _dist))
@@ -170,7 +170,7 @@ struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
         if (!_me || !target)
             return false;
 
-        if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
+        if (_playerOnly && !target->IsPlayer())
             return false;
 
         if (_maxDist > 0.0f && !_me->IsInRange(target, _minDist, _maxDist))

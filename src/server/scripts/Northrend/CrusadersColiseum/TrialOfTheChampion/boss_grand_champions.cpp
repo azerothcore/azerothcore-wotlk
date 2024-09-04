@@ -697,7 +697,7 @@ public:
                                     if( me->GetExactDist(plr) <= 5.0f )
                                         if( Vehicle* v = plr->GetVehicle() )
                                             if( Unit* c = v->GetBase() )
-                                                if( c->GetTypeId() == TYPEID_UNIT && c->ToCreature()->GetEntry() == (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_BATTLEWORG : VEHICLE_ARGENT_WARHORSE) )
+                                                if( c->IsCreature() && c->ToCreature()->GetEntry() == (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_BATTLEWORG : VEHICLE_ARGENT_WARHORSE) )
                                                 {
                                                     me->GetMotionMaster()->MovementExpired();
                                                     me->GetMotionMaster()->MoveIdle();

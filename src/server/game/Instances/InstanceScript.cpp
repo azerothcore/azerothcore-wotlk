@@ -717,7 +717,7 @@ void InstanceScript::DoCastSpellOnPlayer(Player* player, uint32 spell, bool incl
     for (auto itr2 = player->m_Controlled.begin(); itr2 != player->m_Controlled.end(); ++itr2)
     {
         if (Unit* controlled = *itr2)
-            if (controlled->IsInWorld() && controlled->GetTypeId() == TYPEID_UNIT)
+            if (controlled->IsInWorld() && controlled->IsCreature())
                 controlled->CastSpell(player, spell, true);
     }
 }

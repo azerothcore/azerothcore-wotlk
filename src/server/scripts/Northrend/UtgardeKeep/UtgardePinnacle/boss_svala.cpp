@@ -404,7 +404,7 @@ class spell_svala_ritual_strike : public SpellScript
     {
         if (Unit* unitTarget = GetHitUnit())
         {
-            if (unitTarget->GetTypeId() != TYPEID_UNIT)
+            if (!unitTarget->IsCreature())
                 return;
 
             Unit::DealDamage(GetCaster(), unitTarget, 7000, nullptr, DIRECT_DAMAGE);

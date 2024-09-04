@@ -139,13 +139,13 @@ CharacterDatabase.WorkerThreads = 1
 #    WorldDatabase.SynchThreads
 #    CharacterDatabase.SynchThreads
 #        Description: The amount of MySQL connections spawned to handle.
-#        Default:     1 - (LoginDatabase.WorkerThreads)
-#                     1 - (WorldDatabase.WorkerThreads)
-#                     2 - (CharacterDatabase.WorkerThreads)
+#        Default:     1 - (LoginDatabase.SynchThreads)
+#                     1 - (WorldDatabase.SynchThreads)
+#                     1 - (CharacterDatabase.SynchThreads)
 
 LoginDatabase.SynchThreads     = 1
 WorldDatabase.SynchThreads     = 1
-CharacterDatabase.SynchThreads = 2
+CharacterDatabase.SynchThreads = 1
 
 #
 #    MaxPingTime
@@ -1042,7 +1042,7 @@ MinWorldUpdateTime = 1
 #        Default:     10 - (10 minutes)
 #                     1+
 
-UpdateUptimeInterval = 1
+UpdateUptimeInterval = 10
 
 #
 #    MaxCoreStuckTime
@@ -1221,7 +1221,7 @@ Warden.ClientCheckFailAction = 0
 #        Default:     86400 - (24 hours)
 #                     0     - (Permanent ban)
 
-Warden.BanDuration = 259200
+Warden.BanDuration = 86400
 
 #
 ###################################################################################################
@@ -1279,17 +1279,17 @@ Visibility.GroupMode = 1
 #    Visibility.Distance.Instances
 #    Visibility.Distance.BGArenas
 #        Description: Visibility distance to see other players or gameobjects.
-#                     Visibility on continents on retail ~90 yards. In BG/Arenas ~180.
-#                     For instances default ~120.
+#                     Visibility on continents on retail ~100 yards. In BG/Arenas ~533.
+#                     For instances default ~170.
 #                     Max limited by active player zone: ~ 333
 #                     Min limit is max aggro radius (45) * Rate.Creature.Aggro
-#        Default:     90  - (Visibility.Distance.Continents)
-#                     120 - (Visibility.Distance.Instances)
-#                     180 - (Visibility.Distance.BGArenas)
+#        Default:     100  - (Visibility.Distance.Continents)
+#                     170 - (Visibility.Distance.Instances)
+#                     533 - (Visibility.Distance.BGArenas)
 
-Visibility.Distance.Continents = 90
-Visibility.Distance.Instances = 120
-Visibility.Distance.BGArenas = 180
+Visibility.Distance.Continents = 100
+Visibility.Distance.Instances = 170
+Visibility.Distance.BGArenas = 533
 
 #
 #    Visibility.ObjectSparkles
@@ -2542,7 +2542,7 @@ Death.SicknessLevel = 11
 #                     0 - (Disabled)
 
 Death.CorpseReclaimDelay.PvP = 1
-Death.CorpseReclaimDelay.PvE = 0
+Death.CorpseReclaimDelay.PvE = 1
 
 #
 #    Death.Bones.World
@@ -3417,7 +3417,7 @@ Wintergrasp.Enable = 1
 #         Description: Maximum number of players allowed in Wintergrasp.
 #         Default:     100
 
-Wintergrasp.PlayerMax = 120
+Wintergrasp.PlayerMax = 100
 
 #
 #     Wintergrasp.PlayerMin
@@ -3568,14 +3568,14 @@ Battleground.Random.ResetHour = 6
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Battleground.StoreStatistics.Enable = 1
+Battleground.StoreStatistics.Enable = 0
 
 #    Battleground.TrackDeserters.Enable
 #        Description: Track deserters of Battlegrounds.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-Battleground.TrackDeserters.Enable = 1
+Battleground.TrackDeserters.Enable = 0
 
 #
 #    Battleground.InvitationType
@@ -4066,7 +4066,7 @@ PartyLevelReq = 1
 #        Default:     0 - (Disabled, Blizzlike, Channel settings are lost if last person left)
 #                     1 - (Enabled)
 
-PreserveCustomChannels = 1
+PreserveCustomChannels = 0
 
 #
 #    PreserveCustomChannelDuration

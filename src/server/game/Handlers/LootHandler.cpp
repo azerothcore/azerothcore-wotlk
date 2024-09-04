@@ -372,7 +372,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
 
             player->DestroyItemCount(pItem, count, true);
         }
-        else if (pItem->loot.isLooted() || !(proto->Flags & ITEM_FLAG_HAS_LOOT))
+        else if (pItem->loot.isLooted() || !proto->HasFlag(ITEM_FLAG_HAS_LOOT))
         {
             player->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
             return;

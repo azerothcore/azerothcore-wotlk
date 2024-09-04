@@ -26,27 +26,12 @@
 
 namespace Acore
 {
-    /// Default AC string format function.
-    template<typename Format, typename... Args>
-    inline std::string StringFormat(Format&& fmt, Args&& ... args)
-    {
-        try
-        {
-            return fmt::sprintf(std::forward<Format>(fmt), std::forward<Args>(args)...);
-        }
-        catch (const fmt::format_error& formatError)
-        {
-            std::string error = "An error occurred formatting string \"" + std::string(fmt) + "\" : " + std::string(formatError.what());
-            return error;
-        }
-    }
-
     template<typename... Args>
     using FormatString = fmt::format_string<Args...>;
 
-    // Default string format function.
+    /// Default AC string format function.
     template<typename... Args>
-    inline std::string StringFormatFmt(FormatString<Args...> fmt, Args&&... args)
+    inline std::string StringFormat(FormatString<Args...> fmt, Args&&... args)
     {
         try
         {

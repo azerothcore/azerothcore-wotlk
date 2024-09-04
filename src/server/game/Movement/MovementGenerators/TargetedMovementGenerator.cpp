@@ -148,6 +148,15 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         owner->ClearUnitState(UNIT_STATE_CHASE_MOVE);
         owner->SetInFront(target);
         MovementInform(owner);
+
+        // Mobs should chase you infinitely if you stop and wait every few seconds.
+        i_leashExtensionTimer.Update(time_diff);
+        if (i_leashExtensionTimer.Passed())
+        {
+            i_leashExtensionTimer.Reset(5000);
+            if (Creature* creature = owner->ToCreature())
+                creature->UpdateLeashExtensionTime();
+        }
     }
 
     // if the target moved, we have to consider whether to adjust
@@ -305,7 +314,7 @@ void ChaseMovementGenerator<T>::DoReset(T* owner)
 template<class T>
 void ChaseMovementGenerator<T>::MovementInform(T* owner)
 {
-    if (owner->GetTypeId() != TYPEID_UNIT)
+    if (!owner->IsCreature())
         return;
 
     // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle
@@ -408,7 +417,7 @@ bool FollowMovementGenerator<T>::PositionOkay(Unit* target, bool isPlayerPet, bo
     float exactDistSq = target->GetExactDistSq(_lastTargetPosition->GetPositionX(), _lastTargetPosition->GetPositionY(), _lastTargetPosition->GetPositionZ());
     float distanceTolerance = 0.25f;
     // For creatures, increase tolerance
-    if (target->GetTypeId() == TYPEID_UNIT)
+    if (target->IsCreature())
     {
         distanceTolerance += _range + _range;
     }
@@ -577,7 +586,7 @@ void FollowMovementGenerator<T>::DoReset(T* owner)
 template<class T>
 void FollowMovementGenerator<T>::MovementInform(T* owner)
 {
-    if (owner->GetTypeId() != TYPEID_UNIT)
+    if (!owner->IsCreature())
         return;
 
     // Pass back the GUIDLow of the target. If it is pet's owner then PetAI will handle

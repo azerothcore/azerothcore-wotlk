@@ -1284,7 +1284,7 @@ bool GameObject::IsAlwaysVisibleFor(WorldObject const* seer) const
         Unit* owner = GetOwner();
         if (owner)
         {
-            if (seer->isType(TYPEMASK_UNIT) && owner->IsFriendlyTo(seer->ToUnit()))
+            if (seer->IsUnit() && owner->IsFriendlyTo(seer->ToUnit()))
                 return true;
         }
     }
@@ -1525,7 +1525,7 @@ void GameObject::Use(Unit* user)
             return;
         case GAMEOBJECT_TYPE_QUESTGIVER:                    //2
             {
-                if (user->GetTypeId() != TYPEID_PLAYER)
+                if (!user->IsPlayer())
                     return;
 
                 Player* player = user->ToPlayer();
@@ -1554,7 +1554,7 @@ void GameObject::Use(Unit* user)
                 if (!info)
                     return;
 
-                if (user->GetTypeId() != TYPEID_PLAYER)
+                if (!user->IsPlayer())
                     return;
 
                 if (ChairListSlots.empty())        // this is called once at first chair use to make list of available slots
@@ -1721,7 +1721,7 @@ void GameObject::Use(Unit* user)
                 if (!info)
                     return;
 
-                if (user->GetTypeId() != TYPEID_PLAYER)
+                if (!user->IsPlayer())
                     return;
 
                 Player* player = user->ToPlayer();
@@ -1835,7 +1835,7 @@ void GameObject::Use(Unit* user)
 
                 if (owner)
                 {
-                    if (owner->GetTypeId() != TYPEID_PLAYER)
+                    if (!owner->IsPlayer())
                         return;
 
                     // accept only use by player from same group as owner, excluding owner itself (unique use already added in spell effect)
@@ -1891,18 +1891,28 @@ void GameObject::Use(Unit* user)
                 {
                     if (!user->IsPlayer())
                         return;
+                    if (ObjectGuid ownerGuid = GetOwnerGUID())
+                    {
+                        if (user->GetGUID() != ownerGuid)
+                        {
+                            Group* group = user->ToPlayer()->GetGroup();
+                            if (!group)
+                                return;
+                            if (!group->IsMember(ownerGuid))
+                                return;
+                        }
+                    }
                 }
 
                 user->RemoveAurasByType(SPELL_AURA_MOUNTED);
                 spellId = info->spellcaster.spellId;
-
                 break;
             }
         case GAMEOBJECT_TYPE_MEETINGSTONE:                  //23
             {
                 GameObjectTemplate const* info = GetGOInfo();
 
-                if (user->GetTypeId() != TYPEID_PLAYER)
+                if (!user->IsPlayer())
                     return;
 
                 Player* player = user->ToPlayer();
@@ -1960,7 +1970,7 @@ void GameObject::Use(Unit* user)
 
         case GAMEOBJECT_TYPE_FISHINGHOLE:                   // 25
             {
-                if (user->GetTypeId() != TYPEID_PLAYER)
+                if (!user->IsPlayer())
                     return;
 
                 Player* player = user->ToPlayer();
@@ -2030,7 +2040,7 @@ void GameObject::Use(Unit* user)
                 if (!info)
                     return;
 
-                if (user->GetTypeId() != TYPEID_PLAYER)
+                if (!user->IsPlayer())
                     return;
 
                 Player* player = user->ToPlayer();
@@ -2057,7 +2067,7 @@ void GameObject::Use(Unit* user)
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
     {
-        if (user->GetTypeId() != TYPEID_PLAYER || !sOutdoorPvPMgr->HandleCustomSpell(user->ToPlayer(), spellId, this))
+        if (!user->IsPlayer() || !sOutdoorPvPMgr->HandleCustomSpell(user->ToPlayer(), spellId, this))
             LOG_ERROR("entities.gameobject", "WORLD: unknown spell id {} at use action for gameobject (Entry: {} GoType: {})", spellId, GetEntry(), GetGoType());
         else
             LOG_DEBUG("outdoorpvp", "WORLD: {} non-dbc spell was handled by OutdoorPvP", spellId);

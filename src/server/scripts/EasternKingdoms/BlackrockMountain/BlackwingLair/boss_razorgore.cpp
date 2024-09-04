@@ -110,7 +110,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            if (target->GetTypeId() == TYPEID_UNIT && !secondPhase)
+            if (target->IsCreature() && !secondPhase)
             {
                 return false;
             }

@@ -71,7 +71,7 @@ namespace Movement
         1.f,  0.f,  0.f, 0.f);
 
     /*  classic view:
-    inline void C_Evaluate(const Vector3 *vertice, float t, const float (&matrix)[4][4], Vector3 &position)
+    inline void C_Evaluate(Vector3 const* vertice, float t, const float (&matrix)[4][4], Vector3 &position)
     {
         Vector3 tvec(t*t*t, t*t, t);
         int i = 0;

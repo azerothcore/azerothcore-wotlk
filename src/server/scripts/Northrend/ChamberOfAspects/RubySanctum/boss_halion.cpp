@@ -1053,7 +1053,7 @@ class spell_halion_twilight_phasing : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void Phase()
@@ -1116,7 +1116,7 @@ class spell_halion_twilight_realm_aura : public AuraScript
             return;
 
         target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
-        if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
+        if (!GetTarget()->IsPlayer())
             return;
         GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
     }
@@ -1149,7 +1149,7 @@ class spell_halion_leave_twilight_realm_aura : public AuraScript
     {
         GetTarget()->RemoveAurasDueToSpell(SPELL_TWILIGHT_REALM);
 
-        if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
+        if (!GetTarget()->IsPlayer())
             return;
         GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
     }

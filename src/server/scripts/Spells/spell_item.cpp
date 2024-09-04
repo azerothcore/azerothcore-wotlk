@@ -401,7 +401,7 @@ class spell_item_lil_phylactery : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetActionTarget() && (eventInfo.GetActionTarget()->GetTypeId() != TYPEID_UNIT || eventInfo.GetActionTarget()->ToCreature()->isWorldBoss());
+        return eventInfo.GetActionTarget() && (!eventInfo.GetActionTarget()->IsCreature() || eventInfo.GetActionTarget()->ToCreature()->isWorldBoss());
     }
 
     void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo&  /*eventInfo*/)
@@ -501,7 +501,7 @@ class spell_item_lil_xt : public SpellScript
         Creature* target = GetHitCreature();
         if (!target)
             return;
-        if (GetCaster()->GetTypeId() == TYPEID_UNIT && GetCaster()->ToCreature()->AI())
+        if (GetCaster()->IsCreature() && GetCaster()->ToCreature()->AI())
             GetCaster()->ToCreature()->AI()->Talk(2);
         target->DespawnOrUnsummon(500);
     }
@@ -2291,7 +2291,7 @@ class spell_item_unsated_craving : public AuraScript
     bool CheckProc(ProcEventInfo& procInfo)
     {
         Unit* caster = procInfo.GetActor();
-        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+        if (!caster || !caster->IsPlayer())
         {
             return false;
         }
@@ -2302,7 +2302,7 @@ class spell_item_unsated_craving : public AuraScript
             return true;
         }
 
-        if (!target || target->GetTypeId() != TYPEID_UNIT || target->IsCritter() || target->IsSummon())
+        if (!target || !target->IsCreature() || target->IsCritter() || target->IsSummon())
         {
             return false;
         }

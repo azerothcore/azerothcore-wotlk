@@ -33,6 +33,20 @@ typedef std::list<AchievementEntry const*>         AchievementEntryList;
 typedef std::unordered_map<uint32, AchievementCriteriaEntryList> AchievementCriteriaListByAchievement;
 typedef std::map<uint32, AchievementEntryList>         AchievementListByReferencedId;
 
+enum AchievementOfflinePlayerUpdateType
+{
+    ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_COMPLETE_ACHIEVEMENT = 1,
+    ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_UPDATE_CRITERIA      = 2
+};
+
+struct AchievementOfflinePlayerUpdate
+{
+    AchievementOfflinePlayerUpdateType updateType;
+    uint32 arg1;
+    uint32 arg2;
+    uint32 arg3;
+};
+
 struct CriteriaProgress
 {
     uint32 counter;
@@ -62,7 +76,7 @@ enum AchievementCriteriaDataType
     ACHIEVEMENT_CRITERIA_DATA_TYPE_HOLIDAY              = 16, // holiday_id     0             event in holiday time
     ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE   = 17, // min_score      max_score     player's team win bg and opposition team have team score in range
     ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT      = 18, // 0              0             maker instance script call for check current criteria requirements fit
-    ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM       = 19, // item_level     item_quality  for equipped item in slot to check item level and quality
+    ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPPED_ITEM      = 19, // item_level     item_quality  for equipped item in slot to check item level and quality
     ACHIEVEMENT_CRITERIA_DATA_TYPE_MAP_ID               = 20, // map_id         0             player must be on map with id in map_id
     ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE  = 21, // class_id       race_id
     ACHIEVEMENT_CRITERIA_DATA_TYPE_NTH_BIRTHDAY         = 22, // N                            login on day of N-th Birthday
@@ -170,7 +184,7 @@ struct AchievementCriteriaData
             uint32 max_score;
         } bg_loss_team_score;
         // ACHIEVEMENT_CRITERIA_DATA_TYPE_INSTANCE_SCRIPT       = 18 (no data)
-        // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM        = 19
+        // ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPPED_ITEM       = 19
         struct
         {
             uint32 item_level;
@@ -284,7 +298,7 @@ public:
 
     void Reset();
     static void DeleteFromDB(ObjectGuid::LowType lowguid);
-    void LoadFromDB(PreparedQueryResult achievementResult, PreparedQueryResult criteriaResult);
+    void LoadFromDB(PreparedQueryResult achievementResult, PreparedQueryResult criteriaResult, PreparedQueryResult offlineUpdatesResult);
     void SaveToDB(CharacterDatabaseTransaction trans);
     void ResetAchievementCriteria(AchievementCriteriaCondition condition, uint32 value, bool evenIfCriteriaComplete = false);
     void UpdateAchievementCriteria(AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0, Unit* unit = nullptr);
@@ -294,7 +308,8 @@ public:
     void SendRespondInspectAchievements(Player* player) const;
     [[nodiscard]] bool HasAchieved(uint32 achievementId) const;
     [[nodiscard]] Player* GetPlayer() const { return _player; }
-    void UpdateTimedAchievements(uint32 timeDiff);
+
+    void Update(uint32 timeDiff);
     void StartTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry, uint32 timeLost = 0);
     void RemoveTimedAchievement(AchievementCriteriaTimedTypes type, uint32 entry);   // used for quest and scripted timed achievements
 
@@ -313,11 +328,23 @@ private:
     bool CanUpdateCriteria(AchievementCriteriaEntry const* criteria, AchievementEntry const* achievement);
     void BuildAllDataPacket(WorldPacket* data) const;
 
+    void UpdateTimedAchievements(uint32 timeDiff);
+
+    // Handles updates when character was offline.
+    void ProcessOfflineUpdate(AchievementOfflinePlayerUpdate const& update);
+    void ProcessOfflineUpdatesQueue();
+
     Player* _player;
     CriteriaProgressMap _criteriaProgress;
     CompletedAchievementMap _completedAchievements;
     typedef std::map<uint32, uint32> TimedAchievementMap;
     TimedAchievementMap _timedAchievements;      // Criteria id/time left in MS
+
+    // Offline updates cannot be processed while players are loading,
+    // as the player will not be notified of the changes.
+    // To ensure proper notification, introduce a delay before processing.
+    uint32 _offlineUpdatesDelayTimer;
+    std::vector<AchievementOfflinePlayerUpdate> _offlineUpdatesQueue;
 };
 
 class AchievementGlobalMgr
@@ -398,6 +425,8 @@ public:
 
     [[nodiscard]] AchievementEntry const* GetAchievement(uint32 achievementId) const;
 
+    void CompletedAchievementForOfflinePlayer(ObjectGuid::LowType playerLowGuid, AchievementEntry const* entry);
+    void UpdateAchievementCriteriaForOfflinePlayer(ObjectGuid::LowType playerLowGuid, AchievementCriteriaTypes type, uint32 miscValue1 = 0, uint32 miscValue2 = 0);
 private:
     AchievementCriteriaDataMap _criteriaDataMap;
 

@@ -1,6 +1,7 @@
 import io
 import os
 import sys
+import re
 
 # Get the src directory of the project
 src_directory = os.path.join(os.getcwd(), 'src')
@@ -11,8 +12,11 @@ results = {
     "Multiple blank lines check": "Passed",
     "Trailing whitespace check": "Passed",
     "GetCounter() check": "Passed",
+    "Misc codestyle check": "Passed",
     "GetTypeId() check": "Passed",
-    "NpcFlagHelpers check": "Passed"
+    "NpcFlagHelpers check": "Passed",
+    "ItemFlagHelpers check": "Passed",
+    "ItemTemplateFlagHelpers check": "Passed"
 }
 
 # Main function to parse all the files of the project
@@ -27,10 +31,15 @@ def parsing_file(directory: str) -> None:
                         multiple_blank_lines_check(file, file_path)
                         trailing_whitespace_check(file, file_path)
                         get_counter_check(file, file_path)
+                        misc_codestyle_check(file, file_path)
                         if file_name != 'Object.h':
                             get_typeid_check(file, file_path)
                         if file_name != 'Unit.h':
                             npcflags_helpers_check(file, file_path)
+                        if file_name != 'Item.h':
+                            itemflag_helpers_check(file, file_path)
+                        if file_name != 'ItemTemplate.h':
+                            itemtemplateflag_helpers_check(file, file_path)
                 except UnicodeDecodeError:
                     print(f"\nCould not decode file {file_path}")
                     sys.exit(1)
@@ -99,14 +108,20 @@ def get_typeid_check(file: io, file_path: str) -> None:
     check_failed = False
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        if 'GetTypeId() == TYPEID_PLAYER' in line:
-            print(f"Please use IsPlayer() instead GetTypeId(): {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_ITEM' in line or 'GetTypeId() != TYPEID_ITEM' in line:
+            print(f"Please use IsItem() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_ITEM' in line:
-            print(f"Please use IsItem() instead GetTypeId(): {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_UNIT' in line or 'GetTypeId() != TYPEID_UNIT' in line:
+            print(f"Please use IsCreature() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
-        if 'GetTypeId() == TYPEID_DYNOBJECT' in line:
-            print(f"Please use IsDynamicObject() instead GetTypeId(): {file_path} at line {line_number}")
+        if 'GetTypeId() == TYPEID_PLAYER' in line or 'GetTypeId() != TYPEID_PLAYER' in line:
+            print(f"Please use IsPlayer() instead of GetTypeId(): {file_path} at line {line_number}")
+            check_failed = True
+        if 'GetTypeId() == TYPEID_GAMEOBJECT' in line or 'GetTypeId() != TYPEID_GAMEOBJECT' in line:
+            print(f"Please use IsGameObject() instead of GetTypeId(): {file_path} at line {line_number}")
+            check_failed = True
+        if 'GetTypeId() == TYPEID_DYNOBJECT' in line or 'GetTypeId() != TYPEID_DYNOBJECT' in line:
+            print(f"Please use IsDynamicObject() instead of GetTypeId(): {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
     if check_failed:
@@ -139,10 +154,79 @@ def npcflags_helpers_check(file: io, file_path: str) -> None:
         if 'RemoveFlag(UNIT_NPC_FLAGS,' in line:
             print(
                 f"Please use RemoveNpcFlag() instead RemoveFlag(UNIT_NPC_FLAGS, ...): {file_path} at line {line_number}")
+            check_failed = True
     # Handle the script error and update the result output
     if check_failed:
         error_handler = True
         results["NpcFlagHelpers check"] = "Failed"
+
+# Codestyle patterns checking for ItemFlag helpers
+def itemflag_helpers_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+    # Parse all the file
+    for line_number, line in enumerate(file, start = 1):
+        if 'HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE)' in line:
+            print(
+                f"Please use IsRefundable() instead of HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE): {file_path} at line {line_number}")
+            check_failed = True
+        if 'HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE)' in line:
+            print(
+                f"Please use IsBOPTradable() instead of HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE): {file_path} at line {line_number}")
+            check_failed = True
+        if 'HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED)' in line:
+            print(
+                f"Please use IsWrapped() instead of HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED): {file_path} at line {line_number}")
+            check_failed = True
+    # Handle the script error and update the result output
+    if check_failed:
+        error_handler = True
+        results["ItemFlagHelpers check"] = "Failed"
+
+# Codestyle patterns checking for ItemTemplate helpers
+def itemtemplateflag_helpers_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+    # Parse all the file
+    for line_number, line in enumerate(file, start = 1):
+        if 'Flags & ITEM_FLAG' in line:
+            print(
+                f"Please use HasFlag(ItemFlag) instead of 'Flags & ITEM_FLAG_': {file_path} at line {line_number}")
+            check_failed = True
+        if 'Flags2 & ITEM_FLAG2' in line:
+            print(
+                f"Please use HasFlag2(ItemFlag2) instead of 'Flags2 & ITEM_FLAG2_': {file_path} at line {line_number}")
+            check_failed = True
+        if 'FlagsCu & ITEM_FLAGS_CU' in line:
+            print(
+                f"Please use HasFlagCu(ItemFlagsCustom) instead of 'FlagsCu & ITEM_FLAGS_CU_': {file_path} at line {line_number}")
+            check_failed = True
+    # Handle the script error and update the result output
+    if check_failed:
+        error_handler = True
+        results["ItemTemplateFlagHelpers check"] = "Failed"
+
+# Codestyle patterns checking for various codestyle issues
+def misc_codestyle_check(file: io, file_path: str) -> None:
+    global error_handler, results
+    file.seek(0)  # Reset file pointer to the beginning
+    check_failed = False
+    # Parse all the file
+    for line_number, line in enumerate(file, start = 1):
+        if 'const auto&' in line:
+            print(
+                f"Please use 'auto const&' syntax instead of 'const auto&': {file_path} at line {line_number}")
+            check_failed = True
+        if re.search(r'\bconst\s+\w+\s*\*\b', line):
+            print(
+                f"Please use the syntax 'Class/ObjectType const*' instead of 'const Class/ObjectType*': {file_path} at line {line_number}")
+            check_failed = True
+    # Handle the script error and update the result output
+    if check_failed:
+        error_handler = True
+        results["Misc codestyle check"] = "Failed"
 
 # Main function
 parsing_file(src_directory)

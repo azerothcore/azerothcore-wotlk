@@ -379,7 +379,7 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
 
                 trans->Append(stmt);
 
-                if ((uState == ITEM_CHANGED) && HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
+                if ((uState == ITEM_CHANGED) && IsWrapped())
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_GIFT_OWNER);
                     stmt->SetData(0, GetOwnerGUID().GetCounter());
@@ -394,7 +394,7 @@ void Item::SaveToDB(CharacterDatabaseTransaction trans)
                 stmt->SetData(0, guid);
                 trans->Append(stmt);
 
-                if (HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
+                if (IsWrapped())
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
                     stmt->SetData(0, guid);
@@ -493,7 +493,7 @@ bool Item::LoadFromDB(ObjectGuid::LowType guid, ObjectGuid owner_guid, Field* fi
     // update max durability (and durability) if need
     // xinef: do not overwrite durability for wrapped items!!
     SetUInt32Value(ITEM_FIELD_MAXDURABILITY, proto->MaxDurability);
-    if (durability > proto->MaxDurability && !HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_WRAPPED))
+    if (durability > proto->MaxDurability && !IsWrapped())
     {
         SetUInt32Value(ITEM_FIELD_DURABILITY, proto->MaxDurability);
         need_save = true;
@@ -794,7 +794,7 @@ bool Item::IsEquipped() const
 
 bool Item::CanBeTraded(bool mail, bool trade) const
 {
-    if ((!mail || !IsBoundAccountWide()) && (IsSoulBound() && (!HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE) || !trade)))
+    if ((!mail || !IsBoundAccountWide()) && (IsSoulBound() && (!IsBOPTradable() || !trade)))
         return false;
 
     if (IsBag() && (Player::IsBagPos(GetPos()) || !((Bag const*)this)->IsEmpty()))
@@ -1140,7 +1140,7 @@ bool Item::IsBindedNotWith(Player const* player) const
     if (GetOwnerGUID() == player->GetGUID())
         return false;
 
-    if (HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE))
+    if (IsBOPTradable())
         if (allowedGUIDs.find(player->GetGUID()) != allowedGUIDs.end())
             return false;
 
@@ -1200,7 +1200,7 @@ void Item::DeleteRefundDataFromDB(CharacterDatabaseTransaction* trans)
 
 void Item::SetNotRefundable(Player* owner, bool changestate /*=true*/, CharacterDatabaseTransaction* trans /*=nullptr*/)
 {
-    if (!HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
+    if (!IsRefundable())
         return;
 
     RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);

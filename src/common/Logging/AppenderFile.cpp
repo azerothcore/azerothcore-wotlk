@@ -31,7 +31,7 @@ AppenderFile::AppenderFile(uint8 id, std::string const& name, LogLevel level, Ap
 {
     if (args.size() < 4)
     {
-        throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Missing file name for appender {}", name));
+        throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Missing file name for appender {}", name));
     }
 
     _fileName.assign(args[3]);
@@ -63,7 +63,7 @@ AppenderFile::AppenderFile(uint8 id, std::string const& name, LogLevel level, Ap
         }
         else
         {
-            throw InvalidAppenderArgsException(Acore::StringFormatFmt("Log::CreateAppenderFromConfig: Invalid size '{}' for appender {}", args[5], name));
+            throw InvalidAppenderArgsException(Acore::StringFormat("Log::CreateAppenderFromConfig: Invalid size '{}' for appender {}", args[5], name));
         }
     }
 
