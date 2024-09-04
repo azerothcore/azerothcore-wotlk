@@ -1220,7 +1220,7 @@ struct npc_blade_of_azzinoth : public ScriptedAI
 {
     npc_blade_of_azzinoth(Creature* creature) : ScriptedAI(creature) { }
 
-    void IsSummonedBy(WorldObject* summoner) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         me->SetReactState(REACT_PASSIVE);
         me->PlayRadiusSound(SOUND_WARBLADE_SPAWN, 150.f);
