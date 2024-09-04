@@ -34,7 +34,7 @@ CharmInfo::CharmInfo(Unit* unit)
     for (uint8 i = 0; i < MAX_SPELL_CHARM; ++i)
         _charmspells[i].SetActionAndType(0, ACT_DISABLED);
 
-    if (_unit->GetTypeId() == TYPEID_UNIT)
+    if (_unit->IsCreature())
     {
         _oldReactState = _unit->ToCreature()->GetReactState();
         _unit->ToCreature()->SetReactState(REACT_PASSIVE);
@@ -76,7 +76,7 @@ void CharmInfo::InitEmptyActionBar(bool withAttack)
 
 void CharmInfo::InitPossessCreateSpells()
 {
-    if (_unit->GetTypeId() == TYPEID_UNIT)
+    if (_unit->IsCreature())
     {
         // Adding switch until better way is found. Malcrom
         // Adding entrys to this switch will prevent COMMAND_ATTACK being added to pet bar.

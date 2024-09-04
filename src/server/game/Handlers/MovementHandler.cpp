@@ -373,7 +373,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     // Stop emote on move
     if (Player* plrMover = mover->ToPlayer())
     {
-        if (plrMover->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_ONESHOT_NONE)
+        if (plrMover->GetUInt32Value(UNIT_NPC_EMOTESTATE) != EMOTE_ONESHOT_NONE && movementInfo.HasMovementFlag(MOVEMENTFLAG_MASK_MOVING))
         {
             plrMover->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         }
@@ -410,7 +410,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
         }
         movementInfo.pos.Relocate(mover->GetPositionX(), mover->GetPositionY(), mover->GetPositionZ());
 
-        if (mover->GetTypeId() == TYPEID_UNIT)
+        if (mover->IsCreature())
         {
             movementInfo.transport.guid = mover->m_movementInfo.transport.guid;
             movementInfo.transport.pos.Relocate(mover->m_movementInfo.transport.pos.GetPositionX(), mover->m_movementInfo.transport.pos.GetPositionY(), mover->m_movementInfo.transport.pos.GetPositionZ());

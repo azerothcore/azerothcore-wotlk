@@ -142,7 +142,7 @@ public:
             if (PlList.IsEmpty())
                 return;
 
-            for (const auto& i : PlList)
+            for (auto const& i : PlList)
             {
                 if (Player* player = i.GetSource())
                 {
@@ -400,7 +400,7 @@ public:
                 case EVENT_HUNDRED_CLUB:
                     {
                         Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                        for (const auto& itr : pList)
+                        for (auto const& itr : pList)
                         {
                             if (itr.GetSource()->GetResistance(SPELL_SCHOOL_FROST) > 100 && pInstance)
                             {

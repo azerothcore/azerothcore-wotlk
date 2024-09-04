@@ -43,7 +43,8 @@
 #define MAX_NETCLIENT_PACKET_SIZE (32767 - 1)               // Client hardcap: int16 with trailing zero space otherwise crash on memory free
 
 // TimeConstants
-constexpr auto MINUTE = 60;
+constexpr auto SECOND = 1;
+constexpr auto MINUTE = SECOND * 60;
 constexpr auto HOUR = MINUTE * 60;
 constexpr auto DAY = HOUR * 24;
 constexpr auto WEEK = DAY * 7;

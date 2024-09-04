@@ -409,7 +409,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         if (Vehicle* veh = mover->GetVehicleKit())
             if (const VehicleSeatEntry* seat = veh->GetSeatForPassenger(_player))
                 if (seat->m_flags & VEHICLE_SEAT_FLAG_CAN_ATTACK || spellInfo->Effects[EFFECT_0].Effect == SPELL_EFFECT_OPEN_LOCK /*allow looting from vehicle, but only if player has required spell (all necessary opening spells are in playercreateinfo_spell)*/)
-                    if ((mover->GetTypeId() == TYPEID_UNIT && !mover->ToCreature()->HasSpell(spellId)) || spellInfo->IsPassive()) // the creature can't cast that spell, check player instead
+                    if ((mover->IsCreature() && !mover->ToCreature()->HasSpell(spellId)) || spellInfo->IsPassive()) // the creature can't cast that spell, check player instead
                     {
                         if( !(spellInfo->Targets & TARGET_FLAG_GAMEOBJECT_ITEM) && (!_player->HasActiveSpell (spellId) || spellInfo->IsPassive()) )
                         {
@@ -419,12 +419,12 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
                         }
 
                         // at this point, player is a valid caster
-                        // swapping the mover will stop the check below at == TYPEID_UNIT, so everything works fine
+                        // swapping the mover will stop the check below at IsUnit, so everything works fine
                         mover = _player;
                     }
 
         // not have spell in spellbook or spell passive and not casted by client
-        if ((mover->GetTypeId() == TYPEID_UNIT && !mover->ToCreature()->HasSpell(spellId)) || spellInfo->IsPassive())
+        if ((mover->IsCreature() && !mover->ToCreature()->HasSpell(spellId)) || spellInfo->IsPassive())
         {
             //cheater? kick? ban?
             recvPacket.rfinish(); // prevent spam at ignore packet
