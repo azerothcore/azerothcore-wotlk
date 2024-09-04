@@ -27,6 +27,7 @@ enum ArenaHook
     ARENAHOOK_CAN_ADD_MEMBER,
     ARENAHOOK_ON_GET_POINTS,
     ARENAHOOK_CAN_SAVE_TO_DB,
+    ARENAHOOK_ON_BEFORE_CHECK_WIN_CONDITION,
     ARENAHOOK_END
 };
 
@@ -43,6 +44,8 @@ public:
     [[nodiscard]] virtual bool CanAddMember(ArenaTeam* /*team*/, ObjectGuid /*PlayerGuid*/) { return true; }
 
     virtual void OnGetPoints(ArenaTeam* /*team*/, uint32 /*memberRating*/, float& /*points*/) { }
+
+    [[nodiscard]] virtual bool OnBeforeArenaCheckWinConditions(Battleground* const /* bg */) { return true; }
 
     [[nodiscard]] virtual bool CanSaveToDB(ArenaTeam* /*team*/) { return true; }
 };
