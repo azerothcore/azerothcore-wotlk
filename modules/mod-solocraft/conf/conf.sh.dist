@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+#DB_CHARACTERS_CUSTOM_PATHS+=(
+#    "$MOD_SOLOCRAFT_ROOT/data/sql/db-characters/"
+#)

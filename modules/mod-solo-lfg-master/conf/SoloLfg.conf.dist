@@ -1,0 +1,22 @@
+[worldserver]
+
+###################################################################################################
+# SOLO LFG
+###################################################################################################
+
+#    SoloLFG.Enable
+#        Description: Enable the module
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+
+
+SoloLFG.Enable = 1
+
+#    SoloLFG.Announce
+#        Description: Announce the module
+#        Default:     1  - (Enabled)
+#                     0  - (Disabled)
+
+SoloLFG.Announce = 1
+
+###################################################################################################

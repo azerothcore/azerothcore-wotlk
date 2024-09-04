@@ -1,0 +1,86 @@
+[worldserver]
+
+###########################
+
+#  GainHonorGuard
+
+###########################
+
+#
+#   Enable the module? (1: true | 0: false)
+#
+
+GainHonorGuard.Enable = 1
+
+#
+#   Announce the module when the player logs in?
+#
+
+GainHonorGuard.Announce = 1
+
+#
+#   GainHonorOnGuardKill
+#   Set it to 1 to gain honor when you kill a guard.
+#   Note that not all city guards will give you honor. It seems only capital and big city guards are flagged
+#   as so in the database.
+#       Default : 0 (No honor when you kill a guard)
+#
+
+GainHonorGuard.GainHonorOnGuardKill = 0
+
+#
+#   GainHonorOnEliteKill
+#       Set it to 1 to gain honor when you kill an elite mob (this does not apply on rare mob, unless he is also elite).
+#       Default : 0 (No honor when you kill an elite mob)
+#
+
+GainHonorGuard.GainHonorOnEliteKill = 0
+
+#
+#   GainHonorOnGuardKillAnnounce
+#       Announce to player how much honor gained when player kills a non-gray guard.
+#       Must enable GainHonorOnGuardKill for this to work
+#       Default : 0 (Disabled)
+#
+
+GainHonorGuard.GainHonorOnGuardKillAnnounce = 0
+
+#
+#   GainHonorOnEliteKillAnnounce
+#   Announce to player how much honor gained when player kills a non-gray elite creature.
+#   Must enable GainHonorOnEliteKill for this to work
+#       Default : 0 (Disabled)
+#
+
+GainHonorGuard.GainHonorOnEliteKillAnnounce = 0
+
+#
+#   GainHonorRateEnable
+#   Enable the custom Honor Gain Rate to change the amount of Honor gained.
+#   The current rate is using the "honor_f *= sWorld->getRate(RATE_HONOR)" calculation.
+#   This setting allows you to change the RATE_HONOR value to a different rate.
+#       Default : 0 (Disabled)
+#
+
+GainHonorGuard.GainHonorRateEnable = 0
+
+#
+#   GainHonorRate
+#   Rate multiplier to base Honor gained.
+#   Must enable GainHonorRateEnable for this to work
+#   Example : 0.5 will half Honor gained
+#       Default : 1.0 (Standard RATE_HONOR)
+#
+
+GainHonorGuard.GainHonorRate = 1.0
+
+
+#
+#   SplitInGroup
+#   Splits honor between all currently online group members.
+#       Default : 0 (Disabled)
+#
+
+GainHonorGuard.SplitInGroup = 0
+
+###################################################################################################

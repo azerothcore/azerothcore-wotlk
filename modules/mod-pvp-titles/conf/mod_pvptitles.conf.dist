@@ -1,0 +1,41 @@
+[worldserver]
+
+###################################################################################################
+#	Old School PvP Titles
+###################################################################################################
+
+# Enable the module? (1: true | 0: false)
+
+PvPTitles.Enable = 0
+
+# Announce the module when the player logs in?
+
+PvPTitles.Announce = 1
+
+# Set Required honor kills for each rank
+
+PvPTitles.Rank_1 = 50
+PvPTitles.Rank_2 = 100
+PvPTitles.Rank_3 = 500
+PvPTitles.Rank_4 = 1000
+PvPTitles.Rank_5 = 2000
+PvPTitles.Rank_6 = 4000
+PvPTitles.Rank_7 = 5000
+PvPTitles.Rank_8 = 6000
+PvPTitles.Rank_9 = 8000
+PvPTitles.Rank_10 = 10000
+PvPTitles.Rank_11 = 12500
+PvPTitles.Rank_12 = 15000
+PvPTitles.Rank_13 = 20000
+PvPTitles.Rank_14 = 25000
+
+# Award titles on login if players meet their kill count requirement?
+
+PvPTitles.AwardTitlesOnLogin = 0
+
+# Clean up titles when players login?
+# Options:    0 - Disabled
+#             1 - Remove all titles (achievements will not be removed).
+#             2 - Remove invalid titles (if the kill count requirement is no longer met)
+
+PvPTitles.CleanUp = 0

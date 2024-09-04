@@ -92,3 +92,14 @@ local.properties
 #  !modules/yourmodule
 #
 # ==================
+
+!modules/mod-ah-bot
+!modules/mod-gain-honor-guard
+!modules/mod-individual-xp
+!modules/mod-pvp-titles
+!modules/mod-solocraft
+!modules/mod-solo-lfg-master
+!modules/mod-transmog
+!modules/mod-weekend-xp
+
+

@@ -1,0 +1,55 @@
+[worldserver]
+
+# XPWeekend.Announce
+# 	Annnounces to the player that the module is enabled even if its not the weekend.
+# default: 1 = true 
+#
+
+XPWeekend.Announce = 0
+
+# XPWeekend.Enabled
+#	Enable or Disable the module.
+#default: 1 = enable
+#
+
+XPWeekend.Enabled = 1
+
+# XPWeekend.xpAmount
+#	Allows the config file to set the amount of times xp is given
+# default = 2 (double)
+#
+XPWeekend.xpAmount = 2
+
+# XPWeekend.IndividualXPEnabled
+#     Allows players to set their own XP rates during the weekend through the weekendxp rates command.
+#     Default: 0 (Disabled)
+
+XPWeekend.IndividualXPEnabled = 0
+
+# XPWeekend.MaxAllowedRate
+#     Max allowed rates players may set while using the weekendxp rates command.
+#     Default: 2
+#
+
+XPWeekend.MaxAllowedRate = 2
+
+# XPWeekend.AlwaysEnabled
+#     Forces the weekend xp bonus event to always be enabled regardless of the day. Use this for debugging.
+#     Default: 0 (Disabled)
+#
+
+XPWeekend.AlwaysEnabled = 0
+
+# XPWeekend.QuestOnly
+#     Restricts the experience bonus to quest rewards only.
+#     Default: 0 (Disabled, both creatures and quests are affected)
+#
+
+XPWeekend.QuestOnly = 0
+
+# XPWeekend.MaxLevel = 80
+#     Restricts the experience bonus to characters of a certain level.
+#     Characters with a higher level than this will not receive any bonus experience.
+#
+
+XPWeekend.MaxLevel = 80
