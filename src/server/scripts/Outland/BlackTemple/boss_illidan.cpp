@@ -364,6 +364,10 @@ struct boss_illidan_stormrage : public BossAI
                     maiev->AI()->DoAction(ACTION_MAIEV_ENDING);
                 if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
                     akama->AI()->DoAction(ACTION_AKAMA_ENDING);
+                me->m_Events.AddEventAtOffset([&] {
+                    if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
+                        akama->AI()->DoAction(ACTION_AKAMA_ENDING);
+                }, 1s);
 
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
@@ -450,9 +454,9 @@ struct boss_illidan_stormrage : public BossAI
                     DoCastVictim(SPELL_FLAME_CRASH);
                 }, 26s, 35s);
 
-                // ScheduleTimedEvent(10s, [&] {
-                //     DoCastVictim(SPELL_SHEAR);
-                // }, 12s, 15s);
+                ScheduleTimedEvent(10s, [&] {
+                    DoCastVictim(SPELL_SHEAR);
+                }, 12s, 15s);
 
                 ScheduleTimedEvent(32s, [&] {
                     DoCastVictim(SPELL_DRAW_SOUL);
@@ -522,9 +526,9 @@ struct boss_illidan_stormrage : public BossAI
                     DoCastVictim(SPELL_FLAME_CRASH);
                 }, 26s, 35s);
 
-                // ScheduleTimedEvent(10s, [&] {
-                //     DoCastVictim(SPELL_SHEAR);
-                // }, 12s, 15s);
+                ScheduleTimedEvent(10s, [&] {
+                    DoCastVictim(SPELL_SHEAR);
+                }, 12s, 15s);
 
                 ScheduleTimedEvent(32s, [&] {
                     DoCastVictim(SPELL_DRAW_SOUL);
@@ -779,13 +783,17 @@ struct npc_akama_illidan : public ScriptedAI
             break;
             case ACTION_AKAMA_ENDING:
             {
-                me->SetControlled(false, UNIT_STATE_ROOT);
-                summons.DespawnAll();
-                me->SetReactState(REACT_PASSIVE);
-                me->m_Events.AddEventAtOffset([&] {
+                if (me->IsEngaged())
+                {
+                    summons.DespawnAll();
+                    me->SetReactState(REACT_PASSIVE);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
+                }
+                else
+                {
                     me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_1, IllidanDefeated);
-                }, 1s);
+                }
             }
             break;
             case ACTION_AKAMA_MAIEV_DESPAWN:
@@ -848,7 +856,7 @@ struct npc_akama_illidan : public ScriptedAI
                     if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
                     {
                         float x, y, z;
-                        me->GetNearPoint(illidan, x, y, z, 25.f, 0, me->GetAngle(illidan));
+                        me->GetNearPoint(illidan, x, y, z, 15.f, 0, me->GetAngle(illidan));
                         me->GetMotionMaster()->MovePoint(POINT_ILLIDAN_DEFEATED_2, x, y, z);  // Maiev starts Akama's Ending scene
                     }
                 }
