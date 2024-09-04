@@ -1809,7 +1809,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                     {
                         if (removeMode != AURA_REMOVE_BY_EXPIRE)
                             break;
-
                         if (!caster->IsPlayer())
                             break;
 
