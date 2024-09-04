@@ -193,9 +193,7 @@ void Arena::RemovePlayerAtLeave(Player* player)
 void Arena::CheckWinConditions()
 {
     if (!sScriptMgr->OnBeforeArenaCheckWinConditions(this))
-    {
         return;
-    }
 
     if (!GetAlivePlayersCountByTeam(TEAM_ALLIANCE) && GetPlayersCountByTeam(TEAM_HORDE))
         EndBattleground(TEAM_HORDE);
