@@ -951,7 +951,22 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                         case 49472: // Drink Coffee
                         case 57073:
                         case 61830:
-                            if (!caster || !caster->IsPlayer())
+                            //npcbot
+                            if (caster && caster->IsNPCBot())
+                            {
+                                if (AuraEffect* aurEff = GetBase()->GetEffect(EFFECT_0))
+                                {
+                                    if (aurEff->GetAuraType() == SPELL_AURA_MOD_POWER_REGEN)
+                                    {
+                                        aurEff->ChangeAmount(GetAmount());
+                                        m_isPeriodic = false;
+                                    }
+                                }
+                                break;
+                            }
+                            //end npcbot
+
+                            if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
                                 return;
                             // Get SPELL_AURA_MOD_POWER_REGEN aura from spell
                             if (AuraEffect* aurEff = GetBase()->GetEffect(0))
@@ -3484,7 +3499,17 @@ void AuraEffect::HandleAuraModTotalThreat(AuraApplication const* aurApp, uint8 m
 
     Unit* target = aurApp->GetTarget();
 
-    if (!target->IsAlive() || !target->IsPlayer())
+    //npcbot: handle for bots
+    if (target->IsAlive() && target->IsNPCBotOrPet())
+    {
+        Unit* caster = GetCaster();
+        if (caster && caster->IsAlive())
+            target->getHostileRefMgr().addTempThreat((float)GetAmount(), apply);
+        return;
+    }
+    //end npcbot
+
+    if (!target->IsAlive() || target->GetTypeId() != TYPEID_PLAYER)
         return;
 
     Unit* caster = GetCaster();
