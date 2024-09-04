@@ -48,7 +48,7 @@ enum Says
 
 enum Spells
 {
-    SPELL_ILLIDAN_KNEEL_INTRO           = 39656, // Removal does not play the full animation, using StandState instead
+    SPELL_ILLIDAN_KNEEL_INTRO           = 39656, // Aura removal does not play the full animation, using StandState instead
     SPELL_DUAL_WIELD                    = 42459,
     SPELL_BERSERK                       = 45078,
     SPELL_EMOTE_TALK_QUESTION           = 41616,
@@ -109,6 +109,7 @@ enum Misc
     EQUIPMENT_UNARMED                   = 0,
     EQUIPMENT_GLAIVES                   = 1,
 
+    // Illidan
     ACTION_START_EVENT                  = 1,
     ACTION_ILLIDAN_LIFTOFF              = 2,
     ACTION_ILLIDAN_CAGED                = 3,
@@ -117,13 +118,14 @@ enum Misc
     ACTION_ILLIDAN_DEMON_TRANSFORM      = 6,
     ACTION_ILLIDAN_DEMON_TRANSFORM_BACK = 7,
 
+    // Akama
     ACTION_ILLIDARI_COUNCIL_DONE        = 0,
     ACTION_AKAMA_MINIONS                = 1,
     ACTION_AKAMA_ENDING                 = 2,
     ACTION_AKAMA_MAIEV_DESPAWN          = 3,
 
+    // Summons
     ACTION_MAIEV_ENDING                 = 1,
-
     ACTION_RETURN_BLADE                 = 2, // Sent to 22996 (Blade of Azzinoth)
 
     MAX_EYE_BEAM_POS                    = 4,
@@ -562,7 +564,7 @@ struct boss_illidan_stormrage : public BossAI
 
                 ScheduleTimedEvent(60s, [&] {
                     DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
-                    if (Creature* maiev = summons.GetCreatureWithEntry(NPC_MAIEV_SHADOWSONG))
+                    if (summons.GetCreatureWithEntry(NPC_MAIEV_SHADOWSONG))
                         ScheduleAbilities(PHASE_MAIEV);
                     else
                         ScheduleAbilities(PHASE_LANDING);
@@ -695,19 +697,19 @@ enum Akama
     PATH_AKAMA_ILLIDARI_COUNCIL_3 = 230893,
     PATH_AKAMA_MINIONS            = 230894,
 
-    SAY_UDALO = 0,
-    SAY_OLUM = 0,
+    SAY_UDALO                     = 0,
+    SAY_OLUM                      = 0,
 
-    SAY_AKAMA_DOOR = 0,
-    SAY_AKAMA_ALONE = 1,
-    SAY_AKAMA_SALUTE = 2,
-    SAY_AKAMA_BETRAYER = 3,
-    SAY_AKAMA_FREE = 4,
-    SAY_AKAMA_TIME_HAS_COME = 5,
-    SAY_AKAMA_MINIONS = 6,
-    SAY_AKAMA_LIGHT = 7,
-    SAY_AKAMA_COUNCIL_1 = 8,
-    SAY_AKAMA_COUNCIL_2 = 9
+    SAY_AKAMA_DOOR                = 0,
+    SAY_AKAMA_ALONE               = 1,
+    SAY_AKAMA_SALUTE              = 2,
+    SAY_AKAMA_BETRAYER            = 3,
+    SAY_AKAMA_FREE                = 4,
+    SAY_AKAMA_TIME_HAS_COME       = 5,
+    SAY_AKAMA_MINIONS             = 6,
+    SAY_AKAMA_LIGHT               = 7,
+    SAY_AKAMA_COUNCIL_1           = 8,
+    SAY_AKAMA_COUNCIL_2           = 9
 };
 
 Position AkamaIllidariCouncilTeleport = { 609.772f, 308.456f, 271.826f, 6.1972566f };
@@ -1039,19 +1041,19 @@ private:
 
 enum Maiev
 {
-    SPELL_MAIEV_DOWN = 40409,
-    SPELL_THROW_DAGGER = 41152,
-    SPELL_SHADOW_STRIKE = 40685,
-    SPELL_CAGE_TRAP_SUMMON = 40694,
-    SPELL_TELEPORT_VISUAL  = 41236,
+    SPELL_MAIEV_DOWN              = 40409,
+    SPELL_THROW_DAGGER            = 41152,
+    SPELL_SHADOW_STRIKE           = 40685,
+    SPELL_CAGE_TRAP_SUMMON        = 40694,
+    SPELL_TELEPORT_VISUAL         = 41236,
 
-    SAY_MAIEV_SHADOWSONG_TAUNT = 0,
-    SAY_MAIEV_SHADOWSONG_APPEAR = 1,
-    SAY_MAIEV_SHADOWSONG_JUSTICE = 2,
-    SAY_MAIEV_SHADOWSONG_TRAP = 3,
-    SAY_MAIEV_SHADOWSONG_DOWN = 4,
+    SAY_MAIEV_SHADOWSONG_TAUNT    = 0,
+    SAY_MAIEV_SHADOWSONG_APPEAR   = 1,
+    SAY_MAIEV_SHADOWSONG_JUSTICE  = 2,
+    SAY_MAIEV_SHADOWSONG_TRAP     = 3,
+    SAY_MAIEV_SHADOWSONG_DOWN     = 4,
     SAY_MAIEV_SHADOWSONG_FINISHED = 5,
-    SAY_MAIEV_SHADOWSONG_OUTRO = 6,
+    SAY_MAIEV_SHADOWSONG_OUTRO    = 6,
     SAY_MAIEV_SHADOWSONG_FAREWELL = 7
 };
 
@@ -1208,7 +1210,6 @@ enum WarbladeTear
 {
     SOUND_WARBLADE_SPAWN = 11689,
 
-    SPELL_BIRTH          = 40031,
     SPELL_SUMMON_TEAR    = 39855,
     SPELL_TEAR_CHANNEL   = 39857,
 
