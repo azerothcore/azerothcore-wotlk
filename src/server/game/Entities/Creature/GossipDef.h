@@ -55,7 +55,9 @@ enum Gossip_Option
     GOSSIP_OPTION_MAX
 };
 
-enum GossipOptionIcon
+//NPCBot
+enum GossipOptionIcon : uint8
+//End NPCBot
 {
     GOSSIP_ICON_CHAT                = 0,                    // white chat bubble
     GOSSIP_ICON_VENDOR              = 1,                    // brown bag

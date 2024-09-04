@@ -355,7 +355,8 @@ public:
 
             if (me->GetEntry() == NPC_LADY_BLAUMEUX || me->GetEntry() == NPC_SIR_ZELIEK)
             {
-                if (Unit* pTarget = me->SelectNearestPlayer(300.0f))
+            	//NPCBot Changed this to target instead of player
+                if (Unit* pTarget = me->SelectNearestTarget(300.0f))
                 {
                     if (pTarget && me->IsValidAttackTarget(pTarget))
                     {

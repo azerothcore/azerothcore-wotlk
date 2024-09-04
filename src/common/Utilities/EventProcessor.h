@@ -55,6 +55,9 @@ class BasicEvent
 
         // Aborts the event at the next update tick
         void ScheduleAbort();
+        //npcbot
+        bool IsActive() const { return m_abortState == AbortState::STATE_RUNNING; }
+		//end npcbot
 
     private:
         void SetAborted();

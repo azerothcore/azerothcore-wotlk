@@ -63,6 +63,10 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+//npcbot
+#include "botmgr.h"
+//end npcbot
+
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
 SpellDestination::SpellDestination()
@@ -566,7 +570,12 @@ SpellValue::SpellValue(SpellInfo const* proto)
 }
 
 Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags, ObjectGuid originalCasterGUID, bool skipCheck) :
+//npcbot: override spellInfo
+/*
     m_spellInfo(sSpellMgr->GetSpellForDifficultyFromSpell(info, caster)),
+*/
+    m_spellInfo((caster->IsNPCBot() ? info : sSpellMgr->GetSpellForDifficultyFromSpell(info, caster))->TryGetSpellInfoOverride(caster)),
+//end npcbot
     m_caster((info->HasAttribute(SPELL_ATTR6_ORIGINATE_FROM_CONTROLLER) && caster->GetCharmerOrOwner()) ? caster->GetCharmerOrOwner() : caster)
     , m_spellValue(new SpellValue(m_spellInfo)), _spellEvent(nullptr)
 {
@@ -613,6 +622,15 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
         if ((m_caster->getClassMask() & CLASSMASK_WAND_USERS) != 0 && m_caster->IsPlayer())
             if (Item* pItem = m_caster->ToPlayer()->GetWeaponForAttack(RANGED_ATTACK))
                 m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+
+    //npcbot: ranged weapon dmg school
+    if (m_attackType == RANGED_ATTACK && m_caster->IsNPCBot() &&
+        ((1<<(m_caster->ToCreature()->GetBotClass()-1)) & CLASSMASK_WAND_USERS))
+    {
+        if (Item const* pItem = m_caster->ToCreature()->GetBotEquips(2))
+            m_spellSchoolMask = SpellSchoolMask(1 << pItem->GetTemplate()->Damage[0].DamageType);
+    }
+    //end npcbot
 
     if (originalCasterGUID)
         m_originalCasterGUID = originalCasterGUID;
@@ -1240,6 +1258,11 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
                     if ((*j)->IsAffectedOnSpell(m_spellInfo))
                         maxTargets += (*j)->GetAmount();
 
+                //npcbot - apply bot spell max targets mods
+                if (m_caster->IsNPCBot())
+                    m_caster->ToCreature()->ApplyCreatureSpellMaxTargetsMods(m_spellInfo, maxTargets);
+                //end npcbot
+
                 Acore::Containers::RandomResize(targets, maxTargets);
             }
 
@@ -1772,6 +1795,10 @@ void Spell::SelectImplicitCasterObjectTargets(SpellEffIndex effIndex, SpellImpli
             target = m_caster->GetGuardianPet();
             if (!target)
                 target = m_caster->GetCharm();
+            //npcbot: allow bot pet as target
+            if (!target && m_caster->IsNPCBot())
+                target = m_caster->ToCreature()->GetBotsPet();
+            //end npcbot
             break;
         case TARGET_UNIT_SUMMONER:
             if (m_caster->IsSummon())
@@ -1828,6 +1855,11 @@ void Spell::SelectImplicitChainTargets(SpellEffIndex effIndex, SpellImplicitTarg
     uint32 maxTargets = m_spellInfo->Effects[effIndex].ChainTarget;
     if (Player* modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_JUMP_TARGETS, maxTargets, this);
+
+    //npcbot - apply bot spell max targets mods
+    if (m_caster->IsNPCBot())
+        m_caster->ToCreature()->ApplyCreatureSpellMaxTargetsMods(m_spellInfo, maxTargets);
+    //end npcbot
 
     if (maxTargets > 1)
     {
@@ -2132,7 +2164,14 @@ uint32 Spell::GetSearcherTypeMask(SpellTargetObjectTypes objType, ConditionList*
     if (!m_spellInfo->HasAttribute(SPELL_ATTR2_ALLOW_DEAD_TARGET))
         retMask &= ~GRID_MAP_TYPE_MASK_CORPSE;
     if (m_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
+    {
+        //npcbot: do not exclude creatures, see WorldObjectSpellNearbyTargetCheck, WorldObjectSpellAreaTargetCheck
+        if (retMask & GRID_MAP_TYPE_MASK_CREATURE)
+            retMask &= GRID_MAP_TYPE_MASK_CORPSE | GRID_MAP_TYPE_MASK_PLAYER | GRID_MAP_TYPE_MASK_CREATURE;
+        else
+        //end npcbot
         retMask &= GRID_MAP_TYPE_MASK_CORPSE | GRID_MAP_TYPE_MASK_PLAYER;
+    }
     if (m_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_GHOSTS))
         retMask &= GRID_MAP_TYPE_MASK_PLAYER;
 
@@ -2894,6 +2933,13 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             if (caster->IsPlayer() && m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) == 0 &&
                     m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) == 0 && (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
                 caster->ToPlayer()->CastItemCombatSpell(unitTarget, m_attackType, procVictim, procEx);
+
+            //npcbot
+            if (caster->IsNPCBot() &&
+                !m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT) && !m_spellInfo->HasAttribute(SPELL_ATTR4_SUPRESS_WEAPON_PROCS) &&
+                (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MELEE || m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED))
+                caster->ToCreature()->CastCreatureItemCombatSpell(dmgInfo);
+            //end npcbot
         }
 
         m_damage = damageInfo.damage;
@@ -2979,6 +3025,15 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
 
         if (m_caster->IsCreature() && m_caster->ToCreature()->IsAIEnabled)
             m_caster->ToCreature()->AI()->SpellHitTarget(spellHitTarget, m_spellInfo);
+
+        //npcbot: vehicle spell hits
+        if (m_caster->GetTypeId() == TYPEID_UNIT && m_caster->ToCreature()->IsVehicle() && m_caster->ToCreature()->GetCharmerGUID().IsCreature())
+        {
+            Unit const* bot = m_caster->ToCreature()->GetCharmer();
+            if (bot && bot->ToCreature()->IsNPCBot())
+                bot->ToCreature()->AI()->SpellHitTarget(spellHitTarget, m_spellInfo);
+        }
+        //end npcbot
 
         // Needs to be called after dealing damage/healing to not remove breaking on damage auras
         DoTriggersOnSpellHit(spellHitTarget, mask);
@@ -3077,6 +3132,13 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
                 m_caster->SetContestedPvP();
                 if (m_caster->IsPlayer() && !m_spellInfo->HasAttribute(SPELL_ATTR0_CU_NO_PVP_FLAG))
                     m_caster->ToPlayer()->UpdatePvP(true);
+                //npcbot: bot assist case
+                else if (m_caster->IsNPCBotOrPet() && m_caster->ToCreature()->IsFreeBot())
+                {
+                    if (Unit const* bot = m_caster->IsNPCBotPet() ? m_caster->ToUnit()->GetCreator() : m_caster->ToUnit())
+                        BotMgr::SetBotContestedPvP(bot->ToCreature());
+                }
+                //end npcbot
             }
 
             // xinef: triggered spells should not prolong combat
@@ -3117,6 +3179,10 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             {
                 unit->IncrDiminishing(m_diminishGroup);
             }
+            //npcbot
+            else if (m_caster->IsNPCBotOrPet())
+                unit->IncrDiminishing(m_diminishGroup);
+            //end npcbot
         }
     }
 
@@ -3406,6 +3472,11 @@ bool Spell::UpdateChanneledTargetList()
         if (Player* modOwner = m_caster->GetSpellModOwner())
             modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, range, this);
 
+        //npcbot: apply range mods
+        if (m_caster->IsNPCBot())
+            m_caster->ToCreature()->ApplyCreatureSpellRangeMods(m_spellInfo, range);
+        //end npcbot
+
         // xinef: add little tolerance level
         range += std::min(3.0f, range * 0.1f); // 10% but no more than 3yd
     }
@@ -3654,6 +3725,9 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
 
     if (!(m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED) && !(m_spellInfo->Attributes & SPELL_ATTR0_ALLOW_WHILE_SITTING) && !m_triggeredByAuraSpell && m_caster->IsSitState())
     {
+        //npcbot
+        if (!m_originalCaster || m_caster == m_originalCaster)
+        //end npcbot
         m_caster->SetStandState(UNIT_STAND_STATE_STAND);
     }
 
@@ -3693,6 +3767,13 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
                 m_caster->ToCreature()->FocusTarget(this, m_targets.GetObjectTarget() != nullptr ? m_targets.GetObjectTarget() : m_caster);
             }
         }
+
+        //npcbot
+        // Call CreatureAI hook OnSpellStart
+        if (Creature* caster = m_caster->ToCreature())
+            if (caster->IsAIEnabled)
+                caster->AI()->OnSpellStart(GetSpellInfo());
+        //end npcbot
 
         //item: first cast may destroy item and second cast causes crash
         // xinef: removed !m_spellInfo->StartRecoveryTime
@@ -3860,6 +3941,11 @@ void Spell::_cast(bool skipCheck)
             SendCastResult(castResult);
             SendInterrupted(0);
 
+            //npcbot - hook for spellcast finish (unsuccessful)
+            if (m_caster->IsNPCBotOrPet())
+                BotMgr::OnBotSpellGo(m_caster->ToCreature(), this, false);
+            //end npcbot
+
             finish(false);
             SetExecutedCurrently(false);
             return;
@@ -3903,6 +3989,12 @@ void Spell::_cast(bool skipCheck)
     {
         SendInterrupted(0);
         finish(false);
+
+        //npcbot - hook for spellcast finish (unsuccessful)
+        if (m_caster->IsNPCBotOrPet())
+            BotMgr::OnBotSpellGo(m_caster->ToCreature(), this, false);
+        //end npcbot
+
         SetExecutedCurrently(false);
         return;
     }
@@ -4048,6 +4140,17 @@ void Spell::_cast(bool skipCheck)
         // Immediate spell, no big deal
         handle_immediate();
     }
+
+    //npcbot - hook for spellcast finish
+    if (m_caster->IsNPCBotOrPet())
+        BotMgr::OnBotSpellGo(m_caster->ToCreature(), this);
+    //npcbot - hook for master's spellcast finish
+    else if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->HaveBot())
+        BotMgr::OnBotOwnerSpellGo(m_caster->ToPlayer(), this);
+    //npcbot - hook for master's vehicle spellcast finish
+    else if (m_caster->ToUnit() && m_caster->ToUnit()->IsVehicle())
+        BotMgr::OnVehicleSpellGo(m_caster->ToUnit(), this);
+    //end npcbot
 
     if (resetAttackTimers)
     {
@@ -4452,6 +4555,11 @@ void Spell::update(uint32 difftime)
                     SendChannelUpdate(0);
 
                     finish();
+
+                    //npcbot: signal channel finish to botmgr
+                    if (m_caster->IsNPCBot())
+                        BotMgr::OnBotChannelFinish(m_caster->ToUnit(), this);
+                    //end npcbot
                 }
                 // Xinef: Dont update channeled target list on last tick, allow auras to update duration properly
                 // Xinef: Added this strange check because of diffrent update routines for players / creatures
@@ -4462,6 +4570,11 @@ void Spell::update(uint32 difftime)
                     LOG_DEBUG("spells.aura", "Channeled spell {} is removed due to lack of targets", m_spellInfo->Id);
                     SendChannelUpdate(0);
                     finish();
+
+                    //npcbot: signal channel finish to botmgr
+                    if (m_caster->IsNPCBot())
+                        BotMgr::OnBotChannelFinish(m_caster->ToUnit(), this);
+                    //end npcbot
                 }
                 break;
             }
@@ -4497,6 +4610,11 @@ void Spell::finish(bool ok)
 
     if (Creature* creatureCaster = m_caster->ToCreature())
         creatureCaster->ReleaseFocus(this);
+
+    //npcbot
+    if (!ok && m_caster->IsNPCBotOrPet())
+        BotMgr::OnBotSpellGo(m_caster, this, false);
+    //end npcbot
 
     if (ok)
     {
@@ -4549,6 +4667,9 @@ void Spell::finish(bool ok)
 
     // Stop Attack for some spells
     if (m_spellInfo->HasAttribute(SPELL_ATTR0_CANCELS_AUTO_ATTACK_COMBAT))
+    //npcbot: disable for npcbots
+    if (!m_caster->IsNPCBot())
+    //end npcbot
         m_caster->AttackStop();
 }
 
@@ -5333,9 +5454,39 @@ void Spell::TakePower()
                     }
     }
 
+    //npcbot: handle SPELLMOD_SPELL_COST_REFUND_ON_FAIL (druid Primal Precision)
+    if (m_caster->IsNPCBot() && m_caster->ToCreature()->GetBotClass() == CLASS_DRUID)
+    {
+        if (PowerType == POWER_ENERGY/* || PowerType == POWER_RAGE || PowerType == POWER_RUNE*/)
+        {
+            if (ObjectGuid targetGUID = m_targets.GetUnitTargetGUID())
+            {
+                //auto ihit = std::find_if(std::being());
+                for (std::list<TargetInfo>::iterator ihit= m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+                {
+                    if (ihit->targetGUID == targetGUID && ihit->missCondition != SPELL_MISS_NONE)
+                    {
+                        hit = false;
+                        //Primal Precision: 80% refund
+                        if ((m_spellInfo->SpellFamilyFlags[0] & 0x800000) || (m_spellInfo->SpellFamilyFlags[1] & 0x10000080))
+                            m_powerCost = m_powerCost / 5;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+    //end npcbot
+
     if (PowerType == POWER_RUNE)
     {
         TakeRunePower(hit);
+
+        //npcbot: spend runes (pass hit result)
+        if (m_caster->IsNPCBot() && m_caster->ToCreature()->GetBotClass() == CLASS_DEATH_KNIGHT)
+            m_caster->ToCreature()->SpendBotRunes(m_spellInfo, hit);
+        //end npcbot
+
         return;
     }
 
@@ -5682,6 +5833,17 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
         else if (!IsTriggered() && m_caster->IsCreature() && m_caster->ToCreature()->IsSpellProhibited(m_spellInfo->GetSchoolMask()))
             return SPELL_FAILED_NOT_READY;
+
+        //npcbot
+        if (m_caster->IsNPCBot() && m_caster->ToCreature()->HasSpellCooldown(m_spellInfo->Id) && !IsIgnoringCooldowns())
+        {
+            //TC_LOG_ERROR("spells", "%s has cd of %u on %s", m_caster->GetName().c_str(), m_caster->ToCreature()->GetCreatureSpellCooldownDelay(m_spellInfo->Id), m_spellInfo->SpellName[0]);
+            if (m_triggeredByAuraSpell)
+                return SPELL_FAILED_DONT_REPORT;
+            //else
+            //    return SPELL_FAILED_NOT_READY;
+        }
+        //end npcbot
     }
 
     if (m_spellInfo->HasAttribute(SPELL_ATTR7_DEBUG_SPELL) && !m_caster->HasUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS))
@@ -5962,6 +6124,11 @@ SpellCastResult Spell::CheckCast(bool strict)
     {
         if (m_spellInfo->Effects[j].TargetA.GetTarget() == TARGET_UNIT_PET)
         {
+            //npcbot: allow bot pet as target
+            if (m_caster->IsNPCBot() && m_caster->ToCreature()->GetBotsPet())
+                break;
+            else
+            //end npcbot
             if (!m_caster->GetGuardianPet() && !m_caster->GetCharm())
             {
                 if (m_triggeredByAuraSpell.spellInfo) // not report pet not existence for triggered spells
@@ -5987,6 +6154,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_NOT_IN_ARENA;
 
     // zone check
+    //npcbot: do not check location for bots (to avoid crash introduced in TC rev. 5cb8409f1ee57e8d)
+    if (m_caster->IsNPCBot())
+    {}
+    else
+    //end npcbot
     if (m_caster->IsCreature() || !m_caster->ToPlayer()->IsGameMaster())
     {
         uint32 zone, area;
@@ -6285,6 +6457,15 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (m_spellInfo->Effects[i].TargetA.GetTarget() != TARGET_GAMEOBJECT_TARGET &&
                             m_spellInfo->Effects[i].TargetA.GetTarget() != TARGET_GAMEOBJECT_ITEM_TARGET)
                         break;
+
+                //npcbot
+                if (m_caster->IsNPCBot())
+                {
+                    if (m_spellInfo->Effects[i].TargetA.GetTarget() == TARGET_GAMEOBJECT_TARGET && !m_targets.GetGOTarget())
+                        return SPELL_FAILED_BAD_TARGETS;
+                    break;
+                }
+                //end npcbot
 
                     if (!m_caster->IsPlayer()  // only players can open locks, gather etc.
                             // we need a go target in case of TARGET_GAMEOBJECT_TARGET
@@ -6646,6 +6827,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                         if (target->GetCharmerGUID())
                             return SPELL_FAILED_CHARMED;
 
+                        //npcbot: do not allow to charm owned npcbots
+                        if (target->GetCreator() && target->GetCreator()->IsPlayer())
+                            return SPELL_FAILED_TARGET_IS_PLAYER_CONTROLLED;
+                        else if (target->IsNPCBotOrPet())
+                            return SPELL_FAILED_CANT_BE_CHARMED;
+                        //end npcbot
+
                         if (target->GetOwnerGUID() && target->GetOwnerGUID().IsPlayer())
                             return SPELL_FAILED_TARGET_IS_PLAYER_CONTROLLED;
 
@@ -6777,6 +6965,14 @@ SpellCastResult Spell::CheckCast(bool strict)
     // check if caster has at least 1 combo point on target for spells that require combo points
     if (m_needComboPoints)
     {
+        //npcbot
+        if (m_caster->ToCreature() && m_caster->ToCreature()->IsNPCBot())
+        {
+            if (!m_caster->ToCreature()->GetCreatureComboPoints())
+                return SPELL_FAILED_NO_COMBO_POINTS;
+        }
+        else
+        //end npcbot
         if (m_spellInfo->NeedsExplicitUnitTarget())
         {
             if (!m_caster->GetComboPoints(m_targets.GetUnitTarget()))
@@ -7057,6 +7253,11 @@ SpellCastResult Spell::CheckRange(bool strict)
     float max_range = m_caster->GetSpellMaxRangeForTarget(target, m_spellInfo);
     float min_range = m_caster->GetSpellMinRangeForTarget(target, m_spellInfo);
 
+    //npcbot: apply range mods
+    if (m_caster->IsNPCBot())
+        m_caster->ToCreature()->ApplyCreatureSpellRangeMods(m_spellInfo, max_range);
+    //end npcbot
+
     // xinef: hack for npc shooters
     if (min_range && GetCaster()->IsCreature() && !GetCaster()->GetOwnerGUID().IsPlayer() && min_range <= 6.0f)
         range_type = SPELL_RANGE_RANGED;
@@ -7104,6 +7305,14 @@ SpellCastResult Spell::CheckRange(bool strict)
 
     if (GameObject* goTarget = m_targets.GetGOTarget())
     {
+        //npcbot
+        if (!m_caster->IsPlayer())
+        {
+            if (!goTarget->IsAtInteractDistance(*m_caster, m_spellInfo->GetMaxRange(m_spellInfo->IsPositive())))
+                return SPELL_FAILED_OUT_OF_RANGE;
+        }
+        else
+        //end npcbot
         if (!goTarget->IsAtInteractDistance(m_caster->ToPlayer(), m_spellInfo))
         {
             return SPELL_FAILED_OUT_OF_RANGE;
@@ -7868,6 +8077,9 @@ bool Spell::UpdatePointers()
             return false;
     }
     else
+    //npcbot
+    if (!m_caster->IsNPCBot())
+    //end npcbot
         m_CastItem = nullptr;
 
     m_targets.Update(m_caster);
@@ -8387,6 +8599,13 @@ SpellCastResult Spell::CanOpenLock(uint32 effIndex, uint32 lockId, SkillType& sk
                         // castitem check: rogue using skeleton keys. the skill values should not be added in this case.
                         skillValue = m_CastItem || !m_caster->IsPlayer() ?
                                      0 : m_caster->ToPlayer()->GetSkillValue(skillId);
+
+                        //npcbot: use bot skill if cast through gossip
+                        if (m_originalCasterGUID)
+                            if (Unit const* unit = ObjectAccessor::GetUnit(*m_caster, m_originalCasterGUID))
+                                if (unit->GetTypeId() == TYPEID_UNIT && unit->ToCreature()->GetBotClass() == CLASS_ROGUE)
+                                    skillValue = std::max<int32>(skillValue, int32(unit->GetLevel() * 5));
+                        //end npcbot
 
                         // skill bonus provided by casting spell (mostly item spells)
                         // add the effect base points modifier from the spell casted (cheat lock / skeleton key etc.)
@@ -9018,6 +9237,11 @@ namespace Acore
 
     bool WorldObjectSpellNearbyTargetCheck::operator()(WorldObject* target)
     {
+        //npcbot: custom check 1 for targeting bots by spells with SPELL_ATTR3_ONLY_ON_PLAYER
+        if (_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER) && target->GetTypeId() == TYPEID_UNIT && !target->IsNPCBot())
+            return false;
+        //end npcbot
+
         float dist = target->GetDistance(*_position);
         if (dist < _range && WorldObjectSpellTargetCheck::operator ()(target))
         {
@@ -9044,6 +9268,11 @@ namespace Acore
             return false;
         else if (target->IsCreature() && target->ToCreature()->IsAvoidingAOE()) // pussywizard
             return false;
+        //npcbot: custom check 2 for targeting bots by spells with SPELL_ATTR3_ONLY_ON_PLAYER
+        else if (_spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER) && target->GetTypeId() == TYPEID_UNIT && !target->IsNPCBot())
+            return false;
+        //end npcbot
+
         return WorldObjectSpellTargetCheck::operator ()(target);
     }
 

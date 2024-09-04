@@ -28,6 +28,10 @@
  * Scriptnames of files in this file should be prefixed with "spell_rog_".
  */
 
+//npcbot
+#include "Creature.h"
+//end npcbot
+
 enum RogueSpells
 {
     SPELL_ROGUE_BLADE_FLURRY_EXTRA_ATTACK       = 22482,
@@ -156,6 +160,10 @@ class spell_rog_cheat_death : public AuraScript
     bool Load() override
     {
         absorbChance = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        //npcbot
+        if (GetUnitOwner()->IsNPCBot())
+            return true;
+        //end npcbot
         return GetUnitOwner()->ToPlayer();
     }
 
@@ -167,6 +175,27 @@ class spell_rog_cheat_death : public AuraScript
 
     void Absorb(AuraEffect* /*aurEff*/, DamageInfo& dmgInfo, uint32& absorbAmount)
     {
+        //npcbot
+        if (Creature* bot = GetTarget()->ToCreature())
+        {
+            if (dmgInfo.GetDamage() < bot->GetHealth() || bot->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) ||
+                bot->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) || !roll_chance_i(absorbChance))
+                return;
+
+            bot->CastSpell(bot, SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, true);
+            bot->AddBotSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN, MINUTE * IN_MILLISECONDS);
+
+            uint32 health10 = bot->CountPctFromMaxHealth(10);
+
+            if (bot->GetHealth() > health10)
+                absorbAmount = dmgInfo.GetDamage() - bot->GetHealth() + health10;
+            else
+                absorbAmount = dmgInfo.GetDamage();
+
+            return;
+        }
+        //end npcbot
+
         Player* target = GetTarget()->ToPlayer();
         if (dmgInfo.GetDamage() < target->GetHealth() || target->HasSpellCooldown(SPELL_ROGUE_CHEAT_DEATH_COOLDOWN) || !roll_chance_i(absorbChance))
             return;
@@ -316,9 +345,16 @@ class spell_rog_killing_spree_aura : public AuraScript
 
                 GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_TELEPORT, true);
 
+                    //npcbot: prevent crash from trying to access player fields
+                    if (GetTarget()->GetTypeId() == TYPEID_PLAYER)
+                    {
+                    //end npcbot
                 // xinef: ensure fast coordinates switch, dont wait for client to send opcode
                 WorldLocation const& dest = GetTarget()->ToPlayer()->GetTeleportDest();
                 GetTarget()->ToPlayer()->UpdatePosition(dest, true);
+                    //npcbot
+                    }
+                    //end npcbot
 
                 GetTarget()->CastSpell(target, SPELL_ROGUE_KILLING_SPREE_WEAPON_DMG, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_DONT_REPORT_CAST_ERROR));
                 break;
@@ -534,6 +570,10 @@ class spell_rog_rupture : public AuraScript
     bool Load() override
     {
         Unit* caster = GetCaster();
+        //npcbot
+        if (caster && caster->IsNPCBot())
+            return true;
+        //end npcbot
         return caster && caster->IsPlayer();
     }
 
@@ -552,6 +592,18 @@ class spell_rog_rupture : public AuraScript
                 0.03428571f,    // 4 points: ${($m1 + $b1*4 + 0.03428571 * $AP) * 7} damage over 14 secs
                 0.0375f         // 5 points: ${($m1 + $b1*5 + 0.0375 * $AP) * 8} damage over 16 secs
             };
+
+            //npcbot
+            if (caster->GetTypeId() == TYPEID_UNIT)
+            {
+                uint8 cp = caster->ToCreature()->GetCreatureComboPoints();
+                if (cp > 5)
+                    cp = 5;
+
+                amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * attackpowerPerCombo[cp]);
+                return;
+            }
+            //end npcbot
 
             uint8 cp = caster->ToPlayer()->GetComboPoints();
             if (cp > 5)

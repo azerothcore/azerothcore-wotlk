@@ -2168,22 +2168,16 @@ void World::SetInitialWorldSettings()
     if (sWorld->getBoolConfig(CONFIG_PRELOAD_ALL_NON_INSTANCED_MAP_GRIDS))
     {
         LOG_INFO("server.loading", "Loading All Grids For All Non-Instanced Maps...");
-
-        for (uint32 i = 0; i < sMapStore.GetNumRows(); ++i)
-        {
-            MapEntry const* mapEntry = sMapStore.LookupEntry(i);
-
-            if (mapEntry && !mapEntry->Instanceable())
+		//Lanny -> Load only production grids - Removes all crap when starting up with load all grids -- IMPORTANT
+		sMapMgr->DoForAllMaps([](Map* map)
             {
-                Map* map = sMapMgr->CreateBaseMap(mapEntry->MapID);
-
-                if (map)
+				if (!map->Instanceable())
                 {
                     LOG_INFO("server.loading", ">> Loading All Grids For Map {}", map->GetId());
                     map->LoadAllCells();
                 }
-            }
-        }
+            });
+		//End Lanny
     }
 
     uint32 startupDuration = GetMSTimeDiffToNow(startupBegin);

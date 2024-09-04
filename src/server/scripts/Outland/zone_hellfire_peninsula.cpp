@@ -546,6 +546,172 @@ private:
     ObjectGuid _playerGUID;
 };
 
+//Trinitycore - NPCbot
+enum WatchCommanderLeonus
+{
+    SAY_COVER = 0,
+
+    EVENT_START = 1,
+    EVENT_CAST  = 2,
+    EVENT_END   = 3,
+
+    GAME_EVENT_HELLFIRE = 105,
+
+    NPC_INFERNAL_RAIN   = 18729,
+    NPC_FEAR_CONTROLLER = 19393,
+    SPELL_INFERNAL_RAIN = 33814,
+    SPELL_FEAR          = 33815  // Serverside spell
+};
+
+struct npc_watch_commander_leonus : public ScriptedAI
+{
+    npc_watch_commander_leonus(Creature* creature) : ScriptedAI(creature) { }
+
+    void sOnGameEvent(bool start, uint16 eventId) override
+    {
+        if (eventId == GAME_EVENT_HELLFIRE && start)
+        {
+            _events.Reset();
+            _events.ScheduleEvent(EVENT_START, 1s);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_START:
+                {
+                    Talk(SAY_COVER);
+                    me->HandleEmoteCommand(EMOTE_ONESHOT_SHOUT);
+
+                    std::list<Creature*> dummies;
+                    for (uint32 entry : { NPC_INFERNAL_RAIN, NPC_FEAR_CONTROLLER })
+                    {
+                        Acore::AllCreaturesOfEntryInRange pred(me, entry);
+                        Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, dummies, pred);
+                        Cell::VisitAllObjects(me, searcher, 500.0f);
+                    }
+
+                    for (Creature* dummy : dummies)
+                        if (dummy->GetCreatureData()->movementType == 0)
+                            dummy->AI()->SetData(EVENT_START, 0);
+                    break;
+                }
+            }
+        }
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    EventMap _events;
+};
+
+struct npc_infernal_rain_hellfire : public ScriptedAI
+{
+    npc_infernal_rain_hellfire(Creature* creature) : ScriptedAI(creature) { }
+
+    void SetData(uint32 type, uint32 /*data*/) override
+    {
+        if (type != EVENT_START)
+            return;
+
+        RebuildTargetList();
+        _events.ScheduleEvent(EVENT_CAST, 0s, 1s);
+        _events.ScheduleEvent(EVENT_END, 1min);
+    }
+
+    void RebuildTargetList()
+    {
+        _targets.clear();
+
+        std::vector<Creature*> others;
+        Acore::AllCreaturesOfEntryInRange pred(me, NPC_INFERNAL_RAIN);
+        Acore::CreatureListSearcher<Acore::AllCreaturesOfEntryInRange> searcher(me, others, pred);
+        Cell::VisitAllObjects(me, searcher, 500.0f);
+        for (Creature* other : others)
+            if (other->GetCreatureData()->movementType == 2)
+                _targets.push_back(other->GetGUID());
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_CAST:
+                {
+                    if (Creature* target = ObjectAccessor::GetCreature(*me, Acore::Containers::SelectRandomContainerElement(_targets)))
+                    {
+                        //CastSpellExtraArgs args;
+                        //args.AddSpellMod(SPELLVALUE_MAX_TARGETS, 1);
+                        //me->CastSpell(target, SPELL_INFERNAL_RAIN, args);
+						me->CastCustomSpell(SPELL_INFERNAL_RAIN, SPELLVALUE_MAX_TARGETS, 1, target, false);
+                    }
+
+                    _events.Repeat(1s, 2s);
+                    break;
+                }
+                case EVENT_END:
+                    _events.Reset();
+                    break;
+            }
+        }
+    }
+
+    private:
+        EventMap _events;
+        std::vector<ObjectGuid> _targets;
+};
+
+struct npc_fear_controller : public ScriptedAI
+{
+    npc_fear_controller(Creature* creature) : ScriptedAI(creature) { }
+
+    void SetData(uint32 type, uint32 /*data*/) override
+    {
+        if (type != EVENT_START)
+            return;
+
+        _events.ScheduleEvent(EVENT_CAST, 0s, 1s);
+        _events.ScheduleEvent(EVENT_END, 1min);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_CAST:
+                    DoCastAOE(SPELL_FEAR);
+                    _events.Repeat(10s);
+                    break;
+                case EVENT_END:
+                    _events.Reset();
+                    break;
+            }
+        }
+    }
+
+    private:
+        EventMap _events;
+};
+//end Trinitycore - NPCBot
+
 enum Beacon
 {
     NPC_STONESCHYE_WHELP        = 16927,
@@ -615,4 +781,9 @@ void AddSC_hellfire_peninsula()
     new go_beacon();
 
     RegisterCreatureAI(npc_magister_aledis);
+	//trinitycore - NPCbot
+	RegisterCreatureAI(npc_watch_commander_leonus);
+    RegisterCreatureAI(npc_infernal_rain_hellfire);
+    RegisterCreatureAI(npc_fear_controller);
+	//End trinitycore -NPCbot
 }
