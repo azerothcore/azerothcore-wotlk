@@ -951,7 +951,6 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                         case 49472: // Drink Coffee
                         case 57073:
                         case 61830:
-
                             if (!caster || !caster->IsPlayer())
                                 return;
                             // Get SPELL_AURA_MOD_POWER_REGEN aura from spell
