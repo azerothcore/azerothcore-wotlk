@@ -1268,7 +1268,7 @@ struct npc_flame_of_azzinoth : public ScriptedAI
 {
     npc_flame_of_azzinoth(Creature* creature) : ScriptedAI(creature), _bladeSummoner(nullptr) { }
 
-    void IsSummonedBy(WorldObject* summoner) override
+    void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Flame is set to be Illidan's summon, so we check for nearest blade
         _bladeSummoner = me->FindNearestCreature(NPC_BLADE_OF_AZZINOTH, 15.0f);
