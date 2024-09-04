@@ -84,7 +84,7 @@ public:
         if (target->GetExactDist(_source) > 175.0f)
             return false;
 
-        if (target->GetTypeId() != TYPEID_PLAYER)
+        if (!target->IsPlayer())
             return false;
 
         if (target->GetPositionX() > -337.0f)
@@ -415,7 +415,7 @@ public:
                 {
                     if (Unit* u = v->GetBase())
                     {
-                        if (u->GetEntry() == NPC_BONE_SPIKE && u->GetTypeId() == TYPEID_UNIT)
+                        if (u->GetEntry() == NPC_BONE_SPIKE && u->IsCreature())
                         {
                             u->ToCreature()->AI()->DoAction(-1337);
                         }

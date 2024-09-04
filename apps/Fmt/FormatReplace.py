@@ -62,12 +62,12 @@ def isPAppend(line):
     else :
         return False
 
-# def isStringFormat(line):
-#     substring = 'StringFormat'
-#     if substring in line:
-#         return True
-#     else :
-#         return False
+def isStringFormat(line):
+    substring = 'StringFormat'
+    if substring in line:
+        return True
+    else :
+        return False
 
 def haveDelimeter(line):
     if ';' in line:
@@ -96,8 +96,8 @@ def checkSoloLine(line):
     #     return handleCleanup(line), False
     # elif isPSendSysMessage(line):
     #     return handleCleanup(line), False
-    # elif isStringFormat(line):
-    #     return handleCleanup(line), False
+    elif isStringFormat(line):
+        return handleCleanup(line), False
     else:
         return line, False
 
@@ -122,8 +122,8 @@ def startMultiLine(line):
     elif isPAppend(line):
         line = line.replace("PAppend", "Append");
         return handleCleanup(line), True
-    # elif isStringFormat(line):
-    #     return handleCleanup(line), True
+    elif isStringFormat(line):
+        return handleCleanup(line), True
     else :
         return line, False
 

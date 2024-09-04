@@ -486,7 +486,7 @@ class spell_aura_of_despair_aura : public AuraScript
         if (Unit* caster = GetCaster())
             if (Unit* target = GetTarget())
             {
-                if (target->GetTypeId() != TYPEID_PLAYER)
+                if (!target->IsPlayer())
                     return;
 
                 target->CastSpell(target, SPELL_AURA_OF_DESPAIR_2, true);
@@ -614,7 +614,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
+        return target && target->GetEntry() == NPC_VEZAX && target->IsCreature() && target->ToCreature()->AI()->GetData(1);
     }
 };
 
@@ -625,7 +625,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->GetEntry() == NPC_VEZAX && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(2);
+        return target && target->GetEntry() == NPC_VEZAX && target->IsCreature() && target->ToCreature()->AI()->GetData(2);
     }
 };
 

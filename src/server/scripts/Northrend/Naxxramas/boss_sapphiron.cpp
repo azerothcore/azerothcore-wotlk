@@ -23,6 +23,7 @@
 #include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
+
 using namespace Sapphiron;
 
 void AddSC_boss_sapphiron()

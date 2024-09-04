@@ -1142,7 +1142,7 @@ public:
         {
             if (sWorld->getBoolConfig(CONFIG_DIE_COMMAND_MODE))
             {
-                if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
+                if (target->IsCreature() && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
                 {
                     target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
                 }
@@ -2393,7 +2393,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (player->GetTarget() && target)
         {
-            if (target->GetTypeId() != TYPEID_UNIT || target->IsPet())
+            if (!target->IsCreature() || target->IsPet())
             {
                 handler->SendErrorMessage(LANG_SELECT_CREATURE);
                 return false;
@@ -2745,7 +2745,7 @@ public:
                 }
                 case HOME_MOTION_TYPE:
                 {
-                    if (unit->GetTypeId() == TYPEID_UNIT)
+                    if (unit->IsCreature())
                     {
                         handler->PSendSysMessage(LANG_MOVEGENS_HOME_CREATURE, x, y, z);
                     }
@@ -2816,7 +2816,7 @@ public:
         if (!target->IsAlive() || !damage)
             return true;
 
-        if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
+        if (target->IsCreature() && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
             target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
 
         if (percent)

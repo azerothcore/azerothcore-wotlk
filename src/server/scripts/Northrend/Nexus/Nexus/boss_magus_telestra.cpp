@@ -245,7 +245,7 @@ class spell_boss_magus_telestra_summon_telestra_clones_aura : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+        return GetUnitOwner()->IsCreature();
     }
 
     void HandleApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)

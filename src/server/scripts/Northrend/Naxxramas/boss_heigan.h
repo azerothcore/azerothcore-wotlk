@@ -9,40 +9,40 @@
 
 namespace Heigan {
 
-enum HeiganSays
+enum Says
 {
-    HEIGAN_SAY_AGGRO                       = 0,
-    HEIGAN_SAY_SLAY                        = 1,
-    HEIGAN_SAY_TAUNT                       = 2,
-    HEIGAN_EMOTE_DEATH                     = 3,
-    HEIGAN_EMOTE_DANCE                     = 4,
-    HEIGAN_EMOTE_DANCE_END                 = 5,
-    HEIGAN_SAY_DANCE                       = 6
+    SAY_AGGRO                       = 0,
+    SAY_SLAY                        = 1,
+    SAY_TAUNT                       = 2,
+    EMOTE_DEATH                     = 3,
+    EMOTE_DANCE                     = 4,
+    EMOTE_DANCE_END                 = 5,
+    SAY_DANCE                       = 6
 };
 
-enum HeiganSpells
+enum Spells
 {
-    HEIGAN_SPELL_SPELL_DISRUPTION          = 29310,
-    HEIGAN_SPELL_DECREPIT_FEVER_10         = 29998,
-    HEIGAN_SPELL_DECREPIT_FEVER_25         = 55011,
-    HEIGAN_SPELL_PLAGUE_CLOUD              = 29350,
-    HEIGAN_SPELL_TELEPORT_SELF             = 30211
+    SPELL_SPELL_DISRUPTION          = 29310,
+    SPELL_DECREPIT_FEVER_10         = 29998,
+    SPELL_DECREPIT_FEVER_25         = 55011,
+    SPELL_PLAGUE_CLOUD              = 29350,
+    SPELL_TELEPORT_SELF             = 30211
 };
 
-enum HeiganEvents
+enum Events
 {
-    HEIGAN_EVENT_DISRUPTION                = 1,
-    HEIGAN_EVENT_DECEPIT_FEVER             = 2,
-    HEIGAN_EVENT_ERUPT_SECTION             = 3,
-    HEIGAN_EVENT_SWITCH_PHASE              = 4,
-    HEIGAN_EVENT_SAFETY_DANCE              = 5,
-    HEIGAN_EVENT_PLAGUE_CLOUD              = 6
+    EVENT_DISRUPTION                = 1,
+    EVENT_DECEPIT_FEVER             = 2,
+    EVENT_ERUPT_SECTION             = 3,
+    EVENT_SWITCH_PHASE              = 4,
+    EVENT_SAFETY_DANCE              = 5,
+    EVENT_PLAGUE_CLOUD              = 6
 };
 
-enum HeiganMisc
+enum Misc
 {
-    HEIGAN_PHASE_SLOW_DANCE                = 0,
-    HEIGAN_PHASE_FAST_DANCE                = 1
+    PHASE_SLOW_DANCE                = 0,
+    PHASE_FAST_DANCE                = 1
 };
 
 class boss_heigan : public CreatureScript
@@ -86,10 +86,10 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
-            Talk(HEIGAN_SAY_SLAY);
+            Talk(SAY_SLAY);
             if (pInstance)
             {
                 pInstance->SetData(DATA_IMMORTAL_FAIL, 0);
@@ -99,14 +99,14 @@ public:
         void JustDied(Unit*  killer) override
         {
             BossAI::JustDied(killer);
-            Talk(HEIGAN_EMOTE_DEATH);
+            Talk(EMOTE_DEATH);
         }
 
         void JustEngagedWith(Unit* who) override
         {
             BossAI::JustEngagedWith(who);
             me->SetInCombatWithZone();
-            Talk(HEIGAN_SAY_AGGRO);
+            Talk(SAY_AGGRO);
             if (pInstance)
             {
                 if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_HEIGAN_ENTER_GATE)))
@@ -114,7 +114,7 @@ public:
                     go->SetGoState(GO_STATE_READY);
                 }
             }
-            StartFightPhase(HEIGAN_PHASE_SLOW_DANCE);
+            StartFightPhase(PHASE_SLOW_DANCE);
         }
 
         void StartFightPhase(uint8 phase)
@@ -122,30 +122,30 @@ public:
             currentSection = 3;
             currentPhase = phase;
             events.Reset();
-            if (phase == HEIGAN_PHASE_SLOW_DANCE)
+            if (phase == PHASE_SLOW_DANCE)
             {
                 me->CastStop();
                 me->SetReactState(REACT_AGGRESSIVE);
                 DoZoneInCombat();
-                events.ScheduleEvent(HEIGAN_EVENT_DISRUPTION, 12s, 15s);
-                events.ScheduleEvent(HEIGAN_EVENT_DECEPIT_FEVER, 17s);
-                events.ScheduleEvent(HEIGAN_EVENT_ERUPT_SECTION, 15s);
-                events.ScheduleEvent(HEIGAN_EVENT_SWITCH_PHASE, 90s);
+                events.ScheduleEvent(EVENT_DISRUPTION, 12s, 15s);
+                events.ScheduleEvent(EVENT_DECEPIT_FEVER, 17s);
+                events.ScheduleEvent(EVENT_ERUPT_SECTION, 15s);
+                events.ScheduleEvent(EVENT_SWITCH_PHASE, 90s);
             }
-            else // if (phase == HEIGAN_PHASE_FAST_DANCE)
+            else // if (phase == PHASE_FAST_DANCE)
             {
-                Talk(HEIGAN_EMOTE_DANCE);
-                Talk(HEIGAN_SAY_DANCE);
+                Talk(EMOTE_DANCE);
+                Talk(SAY_DANCE);
                 me->AttackStop();
                 me->StopMoving();
                 me->SetReactState(REACT_PASSIVE);
-                me->CastSpell(me, HEIGAN_SPELL_TELEPORT_SELF, false);
+                me->CastSpell(me, SPELL_TELEPORT_SELF, false);
                 me->SetFacingTo(2.40f);
-                events.ScheduleEvent(HEIGAN_EVENT_PLAGUE_CLOUD, 1s);
-                events.ScheduleEvent(HEIGAN_EVENT_ERUPT_SECTION, 7s);
-                events.ScheduleEvent(HEIGAN_EVENT_SWITCH_PHASE, 45s);
+                events.ScheduleEvent(EVENT_PLAGUE_CLOUD, 1s);
+                events.ScheduleEvent(EVENT_ERUPT_SECTION, 7s);
+                events.ScheduleEvent(EVENT_SWITCH_PHASE, 45s);
             }
-            events.ScheduleEvent(HEIGAN_EVENT_SAFETY_DANCE, 5s);
+            events.ScheduleEvent(EVENT_SAFETY_DANCE, 5s);
         }
 
         bool IsInRoom(Unit* who)
@@ -172,29 +172,29 @@ public:
 
             switch (events.ExecuteEvent())
             {
-                case HEIGAN_EVENT_DISRUPTION:
-                    me->CastSpell(me, HEIGAN_SPELL_SPELL_DISRUPTION, false);
+                case EVENT_DISRUPTION:
+                    me->CastSpell(me, SPELL_SPELL_DISRUPTION, false);
                     events.Repeat(10s);
                     break;
-                case HEIGAN_EVENT_DECEPIT_FEVER:
-                    me->CastSpell(me, RAID_MODE(HEIGAN_SPELL_DECREPIT_FEVER_10, HEIGAN_SPELL_DECREPIT_FEVER_25), false);
+                case EVENT_DECEPIT_FEVER:
+                    me->CastSpell(me, RAID_MODE(SPELL_DECREPIT_FEVER_10, SPELL_DECREPIT_FEVER_25), false);
                     events.Repeat(22s, 25s);
                     break;
-                case HEIGAN_EVENT_PLAGUE_CLOUD:
-                    me->CastSpell(me, HEIGAN_SPELL_PLAGUE_CLOUD, false);
+                case EVENT_PLAGUE_CLOUD:
+                    me->CastSpell(me, SPELL_PLAGUE_CLOUD, false);
                     break;
-                case HEIGAN_EVENT_SWITCH_PHASE:
-                    if (currentPhase == HEIGAN_PHASE_SLOW_DANCE)
+                case EVENT_SWITCH_PHASE:
+                    if (currentPhase == PHASE_SLOW_DANCE)
                     {
-                        StartFightPhase(HEIGAN_PHASE_FAST_DANCE);
+                        StartFightPhase(PHASE_FAST_DANCE);
                     }
                     else
                     {
-                        StartFightPhase(HEIGAN_PHASE_SLOW_DANCE);
-                        Talk(HEIGAN_EMOTE_DANCE_END); // avoid play the emote on aggro
+                        StartFightPhase(PHASE_SLOW_DANCE);
+                        Talk(EMOTE_DANCE_END); // avoid play the emote on aggro
                     }
                     break;
-                case HEIGAN_EVENT_ERUPT_SECTION:
+                case EVENT_ERUPT_SECTION:
                     if (pInstance)
                     {
                         pInstance->SetData(DATA_HEIGAN_ERUPTION, currentSection);
@@ -208,16 +208,16 @@ public:
                         }
                         moveRight ? currentSection++ : currentSection--;
                     }
-                    if (currentPhase == HEIGAN_PHASE_SLOW_DANCE)
+                    if (currentPhase == PHASE_SLOW_DANCE)
                     {
-                        Talk(HEIGAN_SAY_TAUNT);
+                        Talk(SAY_TAUNT);
                     }
-                    events.Repeat(currentPhase == HEIGAN_PHASE_SLOW_DANCE ? 10s : 4s);
+                    events.Repeat(currentPhase == PHASE_SLOW_DANCE ? 10s : 4s);
                     break;
-                case HEIGAN_EVENT_SAFETY_DANCE:
+                case EVENT_SAFETY_DANCE:
                     {
                         Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-                        for (const auto& itr : pList)
+                        for (auto const& itr : pList)
                         {
                             if (IsInRoom(itr.GetSource()) && !itr.GetSource()->IsAlive())
                             {

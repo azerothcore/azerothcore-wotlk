@@ -159,7 +159,7 @@ void Player::Update(uint32 p_time)
         }
     }
 
-    m_achievementMgr->UpdateTimedAchievements(p_time);
+    m_achievementMgr->Update(p_time);
 
     if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING) && !HasUnitState(UNIT_STATE_CHARGING))
     {
@@ -940,7 +940,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
     if (GetShapeshiftForm() == FORM_TREE)
         return; // use weapon but not skill up
 
-    if (victim->GetTypeId() == TYPEID_UNIT &&
+    if (victim->IsCreature() &&
         (victim->ToCreature()->GetCreatureTemplate()->flags_extra &
          CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
         return;
@@ -1671,7 +1671,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
     {
         if (!CanSeeOrDetect(target, false, true))
         {
-            if (target->GetTypeId() == TYPEID_UNIT)
+            if (target->IsCreature())
                 BeforeVisibilityDestroy<Creature>(target->ToCreature(), this);
 
             target->DestroyForPlayer(this);
@@ -1688,7 +1688,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
             // target aura duration for caster show only if target exist at
             // caster client send data at target visibility change (adding to
             // client)
-            if (target->isType(TYPEMASK_UNIT))
+            if (target->IsUnit())
                 GetInitialVisiblePackets((Unit*) target);
         }
     }
@@ -1914,7 +1914,7 @@ void Player::UpdateCharmedAI()
 
     // Xinef: we should be killed if caster enters evade mode and charm is
     // infinite
-    if (charmer->GetTypeId() == TYPEID_UNIT &&
+    if (charmer->IsCreature() &&
         charmer->ToCreature()->IsInEvadeMode())
     {
         AuraEffectList const& auras =

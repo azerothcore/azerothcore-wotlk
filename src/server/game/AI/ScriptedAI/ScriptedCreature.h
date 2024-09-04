@@ -178,7 +178,7 @@ class PlayerOrPetCheck
 public:
     bool operator() (WorldObject* unit) const
     {
-        if (unit->GetTypeId() != TYPEID_PLAYER)
+        if (!unit->IsPlayer())
             if (!unit->ToUnit()->GetOwnerGUID().IsPlayer())
                 return true;
 
@@ -278,9 +278,6 @@ struct ScriptedAI : public CreatureAI
 
     //Pointer to creature we are manipulating
     Creature* me;
-
-    //For fleeing
-    bool IsFleeing;
 
     // *************
     //Pure virtual functions

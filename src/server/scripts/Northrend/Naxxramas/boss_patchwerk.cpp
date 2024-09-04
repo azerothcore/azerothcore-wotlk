@@ -20,6 +20,7 @@
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
+
 using namespace PatchWerk;
 
 void AddSC_boss_patchwerk()

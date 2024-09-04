@@ -24,6 +24,7 @@
 #include "SpellScriptLoader.h"
 #include "naxxramas.h"
 
+
 using namespace Thaddius;
 
 void AddSC_boss_thaddius()

@@ -251,7 +251,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             Talk(SAY_SLAY);
@@ -553,7 +553,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER && !who->IsPet())
+            if (!who->IsPlayer() && !who->IsPet())
                 return;
 
             ScriptedAI::MoveInLineOfSight(who);

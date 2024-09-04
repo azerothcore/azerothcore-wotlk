@@ -798,7 +798,7 @@ void AuraEffect::HandleEffect(Unit* target, uint8 mode, bool apply)
 
 void AuraEffect::ApplySpellMod(Unit* target, bool apply)
 {
-    if (!m_spellmod || target->GetTypeId() != TYPEID_PLAYER)
+    if (!m_spellmod || !target->IsPlayer())
         return;
 
     target->ToPlayer()->AddSpellMod(m_spellmod, apply);
@@ -951,7 +951,7 @@ void AuraEffect::UpdatePeriodic(Unit* caster)
                         case 49472: // Drink Coffee
                         case 57073:
                         case 61830:
-                            if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                            if (!caster || !caster->IsPlayer())
                                 return;
                             // Get SPELL_AURA_MOD_POWER_REGEN aura from spell
                             if (AuraEffect* aurEff = GetBase()->GetEffect(0))
@@ -1712,7 +1712,7 @@ void AuraEffect::HandleDetectAmore(AuraApplication const* aurApp, uint8 mode, bo
     }
 
     Unit* target = aurApp->GetTarget();
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
     {
         return;
     }
@@ -1744,7 +1744,7 @@ void AuraEffect::HandleSpiritOfRedemption(AuraApplication const* aurApp, uint8 m
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     // prepare spirit state
@@ -1779,7 +1779,7 @@ void AuraEffect::HandleAuraGhost(AuraApplication const* aurApp, uint8 mode, bool
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     if (apply)
@@ -2178,7 +2178,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                     // Orb of Deception
                     case 16739:
                         {
-                            if (target->GetTypeId() != TYPEID_PLAYER)
+                            if (!target->IsPlayer())
                                 return;
 
                             switch (target->getRace())
@@ -2237,7 +2237,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
                     // Corsair Costume
                     case 51926:
                         {
-                            if (target->GetTypeId() != TYPEID_PLAYER)
+                            if (!target->IsPlayer())
                                 return;
 
                             switch (target->getRace())
@@ -2811,7 +2811,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     if (Player* targetPlayer = target->ToPlayer())
@@ -2842,7 +2842,7 @@ void AuraEffect::HandleFeignDeath(AuraApplication const* aurApp, uint8 mode, boo
                 if ((*iter)->GetCurrentSpell(i) && (*iter)->GetCurrentSpell(i)->m_targets.GetUnitTargetGUID() == target->GetGUID())
                 {
                     SpellInfo const* si = (*iter)->GetCurrentSpell(i)->GetSpellInfo();
-                    if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->GetTypeId() == TYPEID_UNIT)
+                    if (si->HasAttribute(SPELL_ATTR6_IGNORE_PHASE_SHIFT) && (*iter)->IsCreature())
                     {
                         Creature* c = (*iter)->ToCreature();
                         if ((!c->IsPet() && c->GetCreatureTemplate()->rank == CREATURE_ELITE_WORLDBOSS) || c->isWorldBoss() || c->IsDungeonBoss())
@@ -3009,7 +3009,7 @@ void AuraEffect::HandleAuraModDisarm(AuraApplication const* aurApp, uint8 mode, 
     if (apply)
         target->SetFlag(field, flag);
 
-    if (target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->GetCurrentEquipmentId())
+    if (target->IsCreature() && target->ToCreature()->GetCurrentEquipmentId())
         target->UpdateDamagePhysical(attType);
 }
 
@@ -3112,7 +3112,7 @@ void AuraEffect::HandleAuraTrackCreatures(AuraApplication const* aurApp, uint8 m
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     if (apply)
@@ -3128,7 +3128,7 @@ void AuraEffect::HandleAuraTrackResources(AuraApplication const* aurApp, uint8 m
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     if (apply)
@@ -3144,7 +3144,7 @@ void AuraEffect::HandleAuraTrackStealthed(AuraApplication const* aurApp, uint8 m
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     if (!(apply))
@@ -3206,7 +3206,7 @@ void AuraEffect::HandleAuraModPetTalentsPoints(AuraApplication const* aurApp, ui
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     // Recalculate pet talent points
@@ -3220,7 +3220,7 @@ void AuraEffect::HandleAuraModSkill(AuraApplication const* aurApp, uint8 mode, b
         return;
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     uint32 prot = GetMiscValue();
@@ -3318,7 +3318,7 @@ void AuraEffect::HandleAuraAllowFlight(AuraApplication const* aurApp, uint8 mode
 
     target->SetCanFly(apply);
 
-    if (!apply && target->GetTypeId() == TYPEID_UNIT && !target->IsLevitating())
+    if (!apply && target->IsCreature() && !target->IsLevitating())
         target->GetMotionMaster()->MoveFall();
 }
 
@@ -3444,7 +3444,7 @@ void AuraEffect::HandleAuraModTotalThreat(AuraApplication const* aurApp, uint8 m
 
     Unit* target = aurApp->GetTarget();
 
-    if (!target->IsAlive() || target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsAlive() || !target->IsPlayer())
         return;
 
     Unit* caster = GetCaster();
@@ -3547,7 +3547,7 @@ void AuraEffect::HandleModPossess(AuraApplication const* aurApp, uint8 mode, boo
     Unit* caster = GetCaster();
 
     // no support for posession AI yet
-    if (caster && caster->GetTypeId() == TYPEID_UNIT)
+    if (caster && caster->IsCreature())
     {
         HandleModCharm(aurApp, mode, apply);
         return;
@@ -3567,7 +3567,7 @@ void AuraEffect::HandleModPossessPet(AuraApplication const* aurApp, uint8 mode, 
         return;
 
     Unit* caster = GetCaster();
-    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+    if (!caster || !caster->IsPlayer())
         return;
 
     //seems it may happen that when removing it is no longer owner's pet
@@ -3575,7 +3575,7 @@ void AuraEffect::HandleModPossessPet(AuraApplication const* aurApp, uint8 mode, 
     //    return;
 
     Unit* target = aurApp->GetTarget();
-    if (target->GetTypeId() != TYPEID_UNIT || !target->IsPet())
+    if (!target->IsCreature() || !target->IsPet())
         return;
 
     Pet* pet = target->ToPet();
@@ -3675,7 +3675,7 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
         if (GetId() == 53111) // Devour Humanoid
         {
             Unit::Kill(target, caster);
-            if (caster->GetTypeId() == TYPEID_UNIT)
+            if (caster->IsCreature())
                 caster->ToCreature()->RemoveCorpse();
         }
 
@@ -3725,7 +3725,7 @@ void AuraEffect::HandleAuraModIncreaseFlightSpeed(AuraApplication const* aurApp,
         {
             target->SetCanFly(apply);
 
-            if (!apply && target->GetTypeId() == TYPEID_UNIT && !target->IsLevitating())
+            if (!apply && target->IsCreature() && !target->IsLevitating())
                 target->GetMotionMaster()->MoveFall();
         }
 
@@ -4464,8 +4464,8 @@ void AuraEffect::HandleModPercentStat(AuraApplication const* aurApp, uint8 mode,
         return;
     }
 
-    // only players have base stats
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    // only players currently use base stats
+    if (!target->IsPlayer())
         return;
 
     for (int32 i = STAT_STRENGTH; i < MAX_STATS; ++i)
@@ -4482,7 +4482,7 @@ void AuraEffect::HandleModSpellDamagePercentFromStat(AuraApplication const* aurA
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     // Magic damage modifiers implemented in Unit::SpellDamageBonus
@@ -4498,7 +4498,7 @@ void AuraEffect::HandleModSpellHealingPercentFromStat(AuraApplication const* aur
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     // Recalculate bonus
@@ -4512,7 +4512,7 @@ void AuraEffect::HandleModSpellDamagePercentFromAttackPower(AuraApplication cons
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     // Magic damage modifiers implemented in Unit::SpellDamageBonus
@@ -4528,7 +4528,7 @@ void AuraEffect::HandleModSpellHealingPercentFromAttackPower(AuraApplication con
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     // Recalculate bonus
@@ -4542,7 +4542,7 @@ void AuraEffect::HandleModHealingDone(AuraApplication const* aurApp, uint8 mode,
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
     // implemented in Unit::SpellHealingBonus
     // this information is for client side only
@@ -4613,7 +4613,7 @@ void AuraEffect::HandleAuraModResistenceOfStatPercent(AuraApplication const* aur
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     if (GetMiscValue() != SPELL_SCHOOL_MASK_NORMAL)
@@ -4635,7 +4635,7 @@ void AuraEffect::HandleAuraModExpertise(AuraApplication const* aurApp, uint8 mod
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     target->ToPlayer()->UpdateExpertise(BASE_ATTACK);
@@ -4652,7 +4652,7 @@ void AuraEffect::HandleModPowerRegen(AuraApplication const* aurApp, uint8 mode, 
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     // Update manaregen value
@@ -4675,7 +4675,7 @@ void AuraEffect::HandleModManaRegen(AuraApplication const* aurApp, uint8 mode, b
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     //Note: an increase in regen does NOT cause threat.
@@ -4815,7 +4815,7 @@ void AuraEffect::HandleAuraModParryPercent(AuraApplication const* aurApp, uint8 
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     if (!target->ToPlayer()->CanParry())
@@ -4831,7 +4831,7 @@ void AuraEffect::HandleAuraModDodgePercent(AuraApplication const* aurApp, uint8 
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     target->ToPlayer()->UpdateDodgePercentage();
@@ -4844,7 +4844,7 @@ void AuraEffect::HandleAuraModBlockPercent(AuraApplication const* aurApp, uint8 
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     target->ToPlayer()->UpdateBlockPercentage();
@@ -4862,7 +4862,7 @@ void AuraEffect::HandleAuraModWeaponCritPercent(AuraApplication const* aurApp, u
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     for (int i = 0; i < MAX_ATTACK; ++i)
@@ -4937,7 +4937,7 @@ void AuraEffect::HandleModSpellCritChanceShool(AuraApplication const* aurApp, ui
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     for (int school = SPELL_SCHOOL_NORMAL; school < MAX_SPELL_SCHOOL; ++school)
@@ -4952,7 +4952,7 @@ void AuraEffect::HandleAuraModCritPct(AuraApplication const* aurApp, uint8 mode,
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
     {
         target->m_baseSpellCritChance += (apply) ? GetAmount() : -GetAmount();
         return;
@@ -5051,7 +5051,7 @@ void AuraEffect::HandleRangedAmmoHaste(AuraApplication const* aurApp, uint8 mode
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     target->ApplyAttackTimePercentMod(RANGED_ATTACK, (float)GetAmount(), apply);
@@ -5068,7 +5068,7 @@ void AuraEffect::HandleModRating(AuraApplication const* aurApp, uint8 mode, bool
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     for (uint32 rating = 0; rating < MAX_COMBAT_RATING; ++rating)
@@ -5083,7 +5083,7 @@ void AuraEffect::HandleModRatingFromStat(AuraApplication const* aurApp, uint8 mo
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     // Just recalculate ratings
@@ -5202,7 +5202,7 @@ void AuraEffect::HandleModDamageDone(AuraApplication const* aurApp, uint8 mode, 
     if ((GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) != 0 && sScriptMgr->CanModAuraEffectDamageDone(this, target, aurApp, mode, apply))
     {
         // apply generic physical damage bonuses including wand case
-        if (GetSpellInfo()->EquippedItemClass == -1 || target->GetTypeId() != TYPEID_PLAYER)
+        if (GetSpellInfo()->EquippedItemClass == -1 || !target->IsPlayer())
         {
             target->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_VALUE, float(GetAmount()), apply);
             target->HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_VALUE, float(GetAmount()), apply);
@@ -5279,7 +5279,7 @@ void AuraEffect::HandleModDamagePercentDone(AuraApplication const* aurApp, uint8
                 target->ToPlayer()->_ApplyWeaponDependentAuraDamageMod(item, WeaponAttackType(i), this, apply);
     }
 
-    if ((GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) && (GetSpellInfo()->EquippedItemClass == -1 || target->GetTypeId() != TYPEID_PLAYER))
+    if ((GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) && (GetSpellInfo()->EquippedItemClass == -1 || !target->IsPlayer()))
     {
         target->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, float(GetAmount()), apply);
         target->HandleStatModifier(UNIT_MOD_DAMAGE_OFFHAND,  TOTAL_PCT, float(GetAmount()), apply);
@@ -5373,7 +5373,7 @@ void AuraEffect::HandleNoReagentUseAura(AuraApplication const* aurApp, uint8 mod
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     flag96 mask;
@@ -5393,7 +5393,7 @@ void AuraEffect::HandleAuraRetainComboPoints(AuraApplication const* aurApp, uint
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     // combo points was added in SPELL_EFFECT_ADD_COMBO_POINTS handler
@@ -5609,7 +5609,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             break;
                         case 43681: // Inactive
                             {
-                                if (target->GetTypeId() != TYPEID_PLAYER || aurApp->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
+                                if (!target->IsPlayer() || aurApp->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE)
                                     return;
 
                                 if (target->GetMap()->IsBattleground())
@@ -5643,7 +5643,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             break;
                         case 46374: // quest The Power of the Elements (11893)
                             {
-                                if (target->isDead() && GetBase() && target->GetTypeId() == TYPEID_UNIT && target->GetEntry() == 24601)
+                                if (target->isDead() && GetBase() && target->IsCreature() && target->GetEntry() == 24601)
                                 {
                                     auto caster2 = GetBase()->GetCaster();
                                     if (caster2 && caster2->IsPlayer())
@@ -5716,7 +5716,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     case 57821: // Champion of the Kirin Tor
                     case 57822: // Wyrmrest Champion
                         {
-                            if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+                            if (!caster || !caster->IsPlayer())
                                 break;
 
                             uint32 FactionID = 0;
@@ -5860,7 +5860,7 @@ void AuraEffect::HandleChannelDeathItem(AuraApplication const* aurApp, uint8 mod
 
     Unit* caster = GetCaster();
 
-    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+    if (!caster || !caster->IsPlayer())
         return;
 
     Player* plCaster = caster->ToPlayer();
@@ -5904,7 +5904,7 @@ void AuraEffect::HandleBindSight(AuraApplication const* aurApp, uint8 mode, bool
 
     Unit* caster = GetCaster();
 
-    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+    if (!caster || !caster->IsPlayer())
         return;
 
     caster->ToPlayer()->SetViewpoint(target, apply);
@@ -5918,7 +5918,7 @@ void AuraEffect::HandleFarSight(AuraApplication const* /*aurApp*/, uint8 mode, b
     }
 
     Unit* caster = GetCaster();
-    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+    if (!caster || !caster->IsPlayer())
     {
         return;
     }
@@ -5943,7 +5943,7 @@ void AuraEffect::HandleForceReaction(AuraApplication const* aurApp, uint8 mode, 
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     Player* player = target->ToPlayer();
@@ -6023,7 +6023,7 @@ void AuraEffect::HandleAuraConvertRune(AuraApplication const* aurApp, uint8 mode
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
+    if (!target->IsPlayer())
         return;
 
     Player* player = target->ToPlayer();
@@ -6095,7 +6095,7 @@ void AuraEffect::HandleAuraOpenStable(AuraApplication const* aurApp, uint8 mode,
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER || !target->IsInWorld())
+    if (!target->IsPlayer() || !target->IsInWorld())
         return;
 
     if (apply)
@@ -6154,7 +6154,7 @@ void AuraEffect::HandleAuraSetVehicle(AuraApplication const* aurApp, uint8 mode,
 
     Unit* target = aurApp->GetTarget();
 
-    if (target->GetTypeId() != TYPEID_PLAYER || !target->IsInWorld())
+    if (!target->IsPlayer() || !target->IsInWorld())
         return;
 
     uint32 vehicleId = GetMiscValue();
@@ -6184,7 +6184,7 @@ void AuraEffect::HandlePreventResurrection(AuraApplication const* aurApp, uint8 
     if (!(mode & AURA_EFFECT_HANDLE_REAL))
         return;
 
-    if (aurApp->GetTarget()->GetTypeId() != TYPEID_PLAYER)
+    if (!aurApp->GetTarget()->IsPlayer())
         return;
 
     if (apply)
@@ -6270,7 +6270,7 @@ void AuraEffect::HandlePeriodicDummyAuraTick(Unit* target, Unit* caster) const
             // Death Rune Mastery
             if (GetSpellInfo()->SpellIconID == 3041 || GetSpellInfo()->SpellIconID == 22 || GetSpellInfo()->SpellIconID == 2622)
             {
-                if (target->GetTypeId() != TYPEID_PLAYER)
+                if (!target->IsPlayer())
                     return;
                 if (!target->ToPlayer()->IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
                     return;
@@ -6355,7 +6355,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             return;
                         // Inoculate Nestlewood Owlkin
                         case 29528:
-                            if (target->GetTypeId() != TYPEID_UNIT) // prevent error reports in case ignored player target
+                            if (!target->IsCreature()) // prevent error reports in case ignored player target
                                 return;
                             break;
                         // Feed Captured Animal
@@ -6367,7 +6367,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                             {
                                 // move loot to player inventory and despawn target
                                 if (caster && caster->IsPlayer() &&
-                                        target->GetTypeId() == TYPEID_UNIT &&
+                                        target->IsCreature() &&
                                         target->ToCreature()->GetCreatureTemplate()->type == CREATURE_TYPE_GAS_CLOUD)
                                 {
                                     Player* player = caster->ToPlayer();

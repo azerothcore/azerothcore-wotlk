@@ -137,7 +137,7 @@ void WardenCheckMgr::LoadWardenChecks()
                     continue;
                 }
 
-                std::string str2 = Acore::StringFormat("%04u", id);
+                std::string str2 = Acore::StringFormat("{:04}", id);
                 ASSERT(str2.size() == 4);
                 std::copy(str2.begin(), str2.end(), wardenCheck.IdStr.begin());
 

@@ -209,7 +209,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             reviveGUID = victim->GetGUID();
@@ -449,7 +449,7 @@ public:
                             {
                                 if (!me || !target)
                                     return false;
-                                if (target->GetTypeId() != TYPEID_PLAYER || !me->IsWithinLOSInMap(target))
+                                if (!target->IsPlayer() || !me->IsWithinLOSInMap(target))
                                     return false;
                                 return true;
                             }))
@@ -540,7 +540,7 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             _scheduler.Schedule(6s, 12s, [this](TaskContext context)
@@ -557,7 +557,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             reviveGUID = victim->GetGUID();
