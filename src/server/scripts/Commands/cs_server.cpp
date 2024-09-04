@@ -121,9 +121,9 @@ public:
                 dbPort = (*res)[0].Get<uint16>();
 
             if (dbPort)
-                dbPortOutput = Acore::StringFormatFmt("Realmlist (Realm Id: {}) configured in port {}", realm.Id.Realm, dbPort);
+                dbPortOutput = Acore::StringFormat("Realmlist (Realm Id: {}) configured in port {}", realm.Id.Realm, dbPort);
             else
-                dbPortOutput = Acore::StringFormatFmt("Realm Id: {} not found in `realmlist` table. Please check your setup", realm.Id.Realm);
+                dbPortOutput = Acore::StringFormat("Realm Id: {} not found in `realmlist` table. Please check your setup", realm.Id.Realm);
         }
 
         HandleServerInfoCommand(handler);

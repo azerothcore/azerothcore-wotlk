@@ -32,7 +32,7 @@ class DatabaseWorkerPool;
 class AC_DATABASE_API DatabaseLoader
 {
 public:
-    DatabaseLoader(std::string const& logger, uint32 const defaultUpdateMask = 0, std::string_view modulesList = {});
+    DatabaseLoader(std::string const& logger, uint32 const defaultUpdateMask = 7, std::string_view modulesList = {});
 
     // Register a database to the loader (lazy implemented)
     template <class T>

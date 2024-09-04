@@ -925,7 +925,7 @@ struct boss_sartharion_dragonAI : public BossAI
 
     void KilledUnit(Unit* victim) final
     {
-        if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
+        if (!victim->IsPlayer() || urand(0, 2))
         {
             return;
         }

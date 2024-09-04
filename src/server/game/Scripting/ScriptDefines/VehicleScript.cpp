@@ -22,7 +22,7 @@
 void ScriptMgr::OnInstall(Vehicle* veh)
 {
     ASSERT(veh);
-    ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
+    ASSERT(veh->GetBase()->IsCreature());
 
     if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
     {
@@ -33,7 +33,7 @@ void ScriptMgr::OnInstall(Vehicle* veh)
 void ScriptMgr::OnUninstall(Vehicle* veh)
 {
     ASSERT(veh);
-    ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
+    ASSERT(veh->GetBase()->IsCreature());
 
     if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
     {
@@ -44,7 +44,7 @@ void ScriptMgr::OnUninstall(Vehicle* veh)
 void ScriptMgr::OnReset(Vehicle* veh)
 {
     ASSERT(veh);
-    ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
+    ASSERT(veh->GetBase()->IsCreature());
 
     if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
     {
@@ -55,7 +55,7 @@ void ScriptMgr::OnReset(Vehicle* veh)
 void ScriptMgr::OnInstallAccessory(Vehicle* veh, Creature* accessory)
 {
     ASSERT(veh);
-    ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
+    ASSERT(veh->GetBase()->IsCreature());
     ASSERT(accessory);
 
     if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
@@ -67,7 +67,7 @@ void ScriptMgr::OnInstallAccessory(Vehicle* veh, Creature* accessory)
 void ScriptMgr::OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
 {
     ASSERT(veh);
-    ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
+    ASSERT(veh->GetBase()->IsCreature());
     ASSERT(passenger);
 
     if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))
@@ -79,7 +79,7 @@ void ScriptMgr::OnAddPassenger(Vehicle* veh, Unit* passenger, int8 seatId)
 void ScriptMgr::OnRemovePassenger(Vehicle* veh, Unit* passenger)
 {
     ASSERT(veh);
-    ASSERT(veh->GetBase()->GetTypeId() == TYPEID_UNIT);
+    ASSERT(veh->GetBase()->IsCreature());
     ASSERT(passenger);
 
     if (auto tempScript = ScriptRegistry<VehicleScript>::GetScriptById(veh->GetBase()->ToCreature()->GetScriptId()))

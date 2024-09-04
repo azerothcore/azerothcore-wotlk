@@ -140,7 +140,7 @@ public:
     void InitEmptyActionBar(bool withAttack = true);
 
     //return true if successful
-    bool AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates newstate = ACT_DECIDE);
+    bool AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates newstate = ACT_DECIDE, uint32 index = MAX_UNIT_ACTION_BAR_INDEX + 1);
     bool RemoveSpellFromActionBar(uint32 spell_id);
     void LoadPetActionBar(const std::string& data);
     void BuildActionBar(WorldPacket* data);

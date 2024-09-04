@@ -1103,7 +1103,7 @@ public:
                     if (Creature* algalon = instance->GetCreature(m_uiAlgalonGUID))
                         algalon->AI()->DoAction(ACTION_FEEDS_ON_TEARS_FAILED);
             }
-            else if (unit->GetTypeId() == TYPEID_UNIT && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
+            else if (unit->IsCreature() && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
             {
                 if (GameTime::GetGameTime().count() > (m_conspeedatoryAttempt + DAY))
                 {

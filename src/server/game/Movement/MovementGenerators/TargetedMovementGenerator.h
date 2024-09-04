@@ -39,7 +39,7 @@ class ChaseMovementGenerator : public MovementGeneratorMedium<T, ChaseMovementGe
 {
 public:
     ChaseMovementGenerator(Unit* target, Optional<ChaseRange> range = {}, Optional<ChaseAngle> angle = {})
-        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
+        : TargetedMovementGeneratorBase(target), i_leashExtensionTimer(0), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
     ~ChaseMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
@@ -59,6 +59,7 @@ public:
     bool HasLostTarget(Unit* unit) const { return unit->GetVictim() != this->GetTarget(); }
 
 private:
+    TimeTrackerSmall i_leashExtensionTimer;
     std::unique_ptr<PathGenerator> i_path;
     TimeTrackerSmall i_recheckDistance;
     bool i_recalculateTravel;

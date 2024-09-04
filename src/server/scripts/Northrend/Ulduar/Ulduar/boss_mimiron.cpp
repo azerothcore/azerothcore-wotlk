@@ -1342,7 +1342,7 @@ public:
                 if( Vehicle* vk = me->GetVehicleKit() )
                     for (uint8 i = 0; i < 2; ++i)
                         if (Unit* r = vk->GetPassenger(5 + i))
-                            if (r->GetTypeId() == TYPEID_UNIT)
+                            if (r->IsCreature())
                                 r->ToCreature()->DespawnOrUnsummon(1);
         }
 
@@ -1438,7 +1438,7 @@ public:
                                     exitPos.m_positionZ += 2.0f * Phase;
                                     r->_ExitVehicle(&exitPos);
                                     me->RemoveAurasByType(SPELL_AURA_CONTROL_VEHICLE, r->GetGUID());
-                                    if (r->GetTypeId() == TYPEID_UNIT)
+                                    if (r->IsCreature())
                                         r->ToCreature()->AI()->SetData(0, 0);
                                 }
                         }
@@ -2155,7 +2155,7 @@ class spell_mimiron_p3wx2_laser_barrage_aura : public AuraScript
     {
         if (Unit* caster = GetCaster())
         {
-            if (caster->GetTypeId() != TYPEID_UNIT)
+            if (!caster->IsCreature())
                 return;
             uint32 diff = getMSTimeDiff(_lastMSTime, GameTime::GetGameTimeMS().count());
             if (_lastOrientation == -1.0f)
@@ -2466,7 +2466,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && target->ToCreature()->AI()->GetData(1);
+        return target && target->GetEntry() == NPC_MIMIRON && target->IsCreature() && target->ToCreature()->AI()->GetData(1);
     }
 };
 
@@ -2477,7 +2477,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(11);
+        return target && target->GetEntry() == NPC_MIMIRON && target->IsCreature() && !target->ToCreature()->AI()->GetData(11);
     }
 };
 
@@ -2488,7 +2488,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(12);
+        return target && target->GetEntry() == NPC_MIMIRON && target->IsCreature() && !target->ToCreature()->AI()->GetData(12);
     }
 };
 
@@ -2499,7 +2499,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->GetEntry() == NPC_MIMIRON && target->GetTypeId() == TYPEID_UNIT && !target->ToCreature()->AI()->GetData(13);
+        return target && target->GetEntry() == NPC_MIMIRON && target->IsCreature() && !target->ToCreature()->AI()->GetData(13);
     }
 };
 

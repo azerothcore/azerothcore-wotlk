@@ -175,7 +175,7 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
         zoneName = zone->area_name[locale];
     }
 
-    std::string logMessage = Acore::StringFormatFmt("Command: {} [Player: {} ({}) (Account: {}) X: {} Y: {} Z: {} Map: {} ({}) Area: {} ({}) Zone: {} ({}) Selected: {} ({})]",
+    std::string logMessage = Acore::StringFormat("Command: {} [Player: {} ({}) (Account: {}) X: {} Y: {} Z: {} Map: {} ({}) Area: {} ({}) Zone: {} ({}) Selected: {} ({})]",
         cmdStr, player->GetName(), player->GetGUID().ToString(),
         session.GetAccountId(),
         player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId(),
@@ -443,11 +443,11 @@ namespace Acore::Impl::ChatCommands
                 {
                     if (prefix.empty())
                     {
-                        return Acore::StringFormatFmt("{}{}{}", match, COMMAND_DELIMITER, suffix);
+                        return Acore::StringFormat("{}{}{}", match, COMMAND_DELIMITER, suffix);
                     }
                     else
                     {
-                        return Acore::StringFormatFmt("{}{}{}{}{}", prefix, COMMAND_DELIMITER, match, COMMAND_DELIMITER, suffix);
+                        return Acore::StringFormat("{}{}{}{}{}", prefix, COMMAND_DELIMITER, match, COMMAND_DELIMITER, suffix);
                     }
                 });
 
@@ -465,7 +465,7 @@ namespace Acore::Impl::ChatCommands
             path.assign(it1->first);
         else
         {
-            path = Acore::StringFormatFmt("{}{}{}", path, COMMAND_DELIMITER, it1->first);
+            path = Acore::StringFormat("{}{}{}", path, COMMAND_DELIMITER, it1->first);
         }
         cmd = &it1->second;
         map = &cmd->_subCommands;
@@ -477,7 +477,7 @@ namespace Acore::Impl::ChatCommands
     { /* there is some trailing text, leave it as is */
         if (cmd)
         { /* if we matched a command at some point, auto-complete it */
-            return { Acore::StringFormatFmt("{}{}{}", path, COMMAND_DELIMITER, oldTail) };
+            return { Acore::StringFormat("{}{}{}", path, COMMAND_DELIMITER, oldTail) };
         }
         else
             return {};
@@ -490,7 +490,7 @@ namespace Acore::Impl::ChatCommands
                 return std::string(match);
             else
             {
-                return Acore::StringFormatFmt("{}{}{}", prefix, COMMAND_DELIMITER, match);
+                return Acore::StringFormat("{}{}{}", prefix, COMMAND_DELIMITER, match);
             }
         });
 
