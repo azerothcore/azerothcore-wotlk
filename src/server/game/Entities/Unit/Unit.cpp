@@ -3211,7 +3211,10 @@ uint32 Unit::CalculateDamage(WeaponAttackType attType, bool normalized, bool add
 
 float Unit::CalculateLevelPenalty(SpellInfo const* spellProto) const
 {
-    if (!IsPlayer())
+    if (GetTypeId() != TYPEID_PLAYER)
+    //npcbot
+    if (!IsNPCBot())
+    //end npcbot
         return 1.0f;
 
     if (spellProto->SpellLevel <= 0 || spellProto->SpellLevel >= spellProto->MaxLevel)
@@ -8625,7 +8628,41 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 // Flametongue Weapon (Passive)
                 if (dummySpell->SpellFamilyFlags[0] & 0x200000)
                 {
-                    if (!IsPlayer() || !victim || !victim->IsAlive() || !castItem || !castItem->IsEquipped())
+                    //npcbot: handle proc for bots
+                    if (IsNPCBot())
+                    {
+                        if (!victim || !victim->IsAlive() || !castItem)
+                            return false;
+
+                        WeaponAttackType attType = ToCreature()->GetBotEquips(0) == castItem ? BASE_ATTACK : OFF_ATTACK;
+                        if ((attType != BASE_ATTACK && attType != OFF_ATTACK)
+                            || (attType == BASE_ATTACK && procFlag & PROC_FLAG_DONE_OFFHAND_ATTACK)
+                            || (attType == OFF_ATTACK && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK))
+                            return false;
+
+                        float fire_onhit = float(CalculatePct(dummySpell->Effects[EFFECT_0].CalcValue(), 1.0f));
+                        float add_spellpower = (float)(SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_FIRE)
+                                             + victim->SpellBaseDamageBonusTaken(SPELL_SCHOOL_MASK_FIRE));
+
+                        // 1.3speed = 5%, 2.6speed = 10%, 4.0 speed = 15%, so, 1.0speed = 3.84%
+                        ApplyPct(add_spellpower, 3.84f);
+
+                        float BaseWeaponSpeed;
+                        if (attType == OFF_ATTACK && (procFlag & PROC_FLAG_DONE_OFFHAND_ATTACK))
+                            BaseWeaponSpeed = GetAttackTime(OFF_ATTACK) / 1000.0f;
+                        else if (attType == BASE_ATTACK && procFlag & PROC_FLAG_DONE_MAINHAND_ATTACK)
+                            BaseWeaponSpeed = GetAttackTime(BASE_ATTACK) / 1000.0f;
+                        else
+                            return false;
+
+                        basepoints0 = int32((fire_onhit + add_spellpower) * BaseWeaponSpeed);
+                        triggered_spell_id = 10444;
+                        CastCustomSpell(victim, triggered_spell_id, &basepoints0, nullptr, nullptr, true, castItem, triggeredByAura);
+                        return true;
+                    }
+                    //end npcbot
+
+                    if (GetTypeId() != TYPEID_PLAYER  || !victim || !victim->IsAlive() || !castItem || !castItem->IsEquipped())
                         return false;
 
                     WeaponAttackType attType = WeaponAttackType(Player::GetAttackBySlot(castItem->GetSlot()));
@@ -9844,7 +9881,25 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
         case 12849:
         case 12867:
             {
-                if (!IsPlayer())
+                //npcbot: Deep Wounds for bots
+                if (IsNPCBot())
+                {
+                    // now compute approximate weapon damage by formula from wowwiki.com
+                    Item const* item = ToCreature()->GetBotEquips((procFlags & PROC_FLAG_DONE_OFFHAND_ATTACK) ? 1/*BOT_SLOT_OFFHAND*/ : 0/*BOT_SLOT_MAINHAND*/);
+                    if (!item)
+                        return false;
+
+                    ItemTemplate const* weapon = item->GetTemplate();
+
+                    float weaponDPS = weapon->getDPS();
+                    float attackPowerDPS = GetTotalAttackPowerValue(BASE_ATTACK) / 14.0f;
+                    float weaponSpeed = float(weapon->Delay) / 1000.0f;
+                    basepoints0 = int32((weaponDPS + attackPowerDPS) * weaponSpeed);
+                    break;
+                }
+                //end npcbot
+
+                if (GetTypeId() != TYPEID_PLAYER)
                     return false;
 
                 if (procFlags & PROC_FLAG_DONE_OFFHAND_ATTACK)
@@ -12545,7 +12600,10 @@ int32 Unit::SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask, bool isDoT)
 float Unit::SpellDoneCritChance(Unit const* /*victim*/, SpellInfo const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType, bool skipEffectCheck) const
 {
     // Mobs can't crit with spells.
-    if (IsCreature() && !GetSpellModOwner())
+    if (GetTypeId() == TYPEID_UNIT && !GetSpellModOwner())
+        //npcbot - allow bots to crit
+        if (!IsNPCBotOrPet())
+        //end npcbot
         return -100.0f;
 
     // not critting spell
@@ -18057,7 +18115,10 @@ void Unit::ApplyCastTimePercentMod(float val, bool apply)
 uint32 Unit::GetCastingTimeForBonus(SpellInfo const* spellProto, DamageEffectType damagetype, uint32 CastingTime) const
 {
     // Not apply this to creature casted spells with casttime == 0
-    if (CastingTime == 0 && IsCreature() && !IsPet())
+    if (CastingTime == 0 && GetTypeId() == TYPEID_UNIT && !IsPet())
+        //npcbot - skip bots
+        if (!IsNPCBotOrPet())
+        //end npcbot
         return 3500;
 
     if (CastingTime > 7000) CastingTime = 7000;
