@@ -168,7 +168,7 @@ Updates.EnableDatabases = 7
 #       Example:     "mod_name,mod_name2,mod_name3" (selected modules)
 #                     "all" - (All modules are allowed)
 #
-Updates.AllowedModules = ""
+Updates.AllowedModules = "all"
 
 #
 #    Updates.AutoSetup

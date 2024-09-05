@@ -104,7 +104,7 @@ bool StartDB()
     MySQL::Library_Init();
 
     // Load modules conditionally based on what modules are allowed to auto-update or none
-    std::string modules = sConfigMgr->GetOption("Updates.AllowedModules", std::string(""));
+    std::string modules = sConfigMgr->GetOption<std::string>("Updates.AllowedModules", "all");
     LOG_INFO("dbimport", "Loading modules: {}", modules.empty() ? "none" : modules);
 
     DatabaseLoader loader =
