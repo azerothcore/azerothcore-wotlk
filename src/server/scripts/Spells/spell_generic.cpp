@@ -35,6 +35,7 @@
 #include "Unit.h"
 #include "Vehicle.h"
 #include <array>
+#include <cmath>
 /*
  * Scripts for spells with SPELLFAMILY_GENERIC which cannot be included in AI script file
  * of creature using it or can't be bound to any player class.
@@ -135,7 +136,7 @@ class spell_the_flag_of_ownership : public SpellScript
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+        if (!caster || !caster->IsPlayer())
             return;
         Player* target = GetHitPlayer();
         if (!target)
@@ -144,7 +145,7 @@ class spell_the_flag_of_ownership : public SpellScript
 
         LocaleConstant loc_idx = caster->ToPlayer()->GetSession()->GetSessionDbLocaleIndex();
         BroadcastText const* bct = sObjectMgr->GetBroadcastText(TEXT_FLAG_OF_OWNERSHIP);
-        std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName().c_str(), target->GetName().c_str());
+        std::string bctMsg = Acore::StringFormat(bct->GetText(loc_idx, caster->getGender()), caster->GetName(), target->GetName());
         caster->Talk(bctMsg, CHAT_MSG_MONSTER_EMOTE, LANG_UNIVERSAL, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), target);
 
         haveTarget = true;
@@ -154,7 +155,7 @@ class spell_the_flag_of_ownership : public SpellScript
     {
         for( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
         {
-            if ((*itr)->GetTypeId() != TYPEID_PLAYER || (*itr)->ToPlayer()->IsAlive())
+            if (!(*itr)->IsPlayer() || (*itr)->ToPlayer()->IsAlive())
             {
                 targets.erase(itr);
                 itr = targets.begin();
@@ -644,7 +645,7 @@ class spell_gen_area_aura_select_players : public AuraScript
 
     bool CheckAreaTarget(Unit* target)
     {
-        return target->GetTypeId() == TYPEID_PLAYER;
+        return target->IsPlayer();
     }
     void Register() override
     {
@@ -662,7 +663,7 @@ class spell_gen_area_aura_select_players_and_caster : public AuraScript
 
     bool CheckAreaTarget(Unit* target)
     {
-        return target->GetTypeId() == TYPEID_PLAYER || target == GetCaster();
+        return target->IsPlayer() || target == GetCaster();
     }
     void Register() override
     {
@@ -1195,29 +1196,31 @@ class spell_gen_haunted_aura : public AuraScript
 };
 
 /* 39228 - Argussian Compass
-   60218 - Essence of Gossamer */
+   60218 - Essence of Gossamer
+   64765 - The General's Heart */
 class spell_gen_absorb0_hitlimit1 : public AuraScript
 {
     PrepareAuraScript(spell_gen_absorb0_hitlimit1);
 
-    uint32 limit;
-
     bool Load() override
     {
         // Max absorb stored in 1 dummy effect
-        limit = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        _limit = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
         return true;
     }
 
     void Absorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
     {
-        absorbAmount = std::min(limit, absorbAmount);
+        absorbAmount = std::min(_limit, absorbAmount);
     }
 
     void Register() override
     {
         OnEffectAbsorb += AuraEffectAbsorbFn(spell_gen_absorb0_hitlimit1::Absorb, EFFECT_0);
     }
+
+private:
+    uint32 _limit;
 };
 
 enum AdaptiveWarding
@@ -1692,7 +1695,7 @@ class spell_gen_pet_summoned : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
@@ -1832,7 +1835,7 @@ class spell_gen_feign_death_all_flags : public AuraScript
         target->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         target->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
 
-        if (target->GetTypeId() == TYPEID_UNIT)
+        if (target->IsCreature())
             target->ToCreature()->SetReactState(REACT_PASSIVE);
     }
 
@@ -1843,7 +1846,7 @@ class spell_gen_feign_death_all_flags : public AuraScript
         target->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         target->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
 
-        if (target->GetTypeId() == TYPEID_UNIT)
+        if (target->IsCreature())
             target->ToCreature()->InitializeReactState();
     }
 
@@ -1867,7 +1870,7 @@ class spell_gen_feign_death_no_dyn_flag : public AuraScript
         target->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         target->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
 
-        if (target->GetTypeId() == TYPEID_UNIT)
+        if (target->IsCreature())
             target->ToCreature()->SetReactState(REACT_PASSIVE);
     }
 
@@ -1877,7 +1880,7 @@ class spell_gen_feign_death_no_dyn_flag : public AuraScript
         target->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         target->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
 
-        if (target->GetTypeId() == TYPEID_UNIT)
+        if (target->IsCreature())
             target->ToCreature()->InitializeReactState();
     }
 
@@ -1900,7 +1903,7 @@ class spell_gen_feign_death_no_prevent_emotes : public AuraScript
         target->SetUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         target->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
 
-        if (target->GetTypeId() == TYPEID_UNIT)
+        if (target->IsCreature())
             target->ToCreature()->SetReactState(REACT_PASSIVE);
     }
 
@@ -1910,7 +1913,7 @@ class spell_gen_feign_death_no_prevent_emotes : public AuraScript
         target->RemoveUnitFlag2(UNIT_FLAG2_FEIGN_DEATH);
         target->RemoveUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
 
-        if (target->GetTypeId() == TYPEID_UNIT)
+        if (target->IsCreature())
             target->ToCreature()->InitializeReactState();
     }
 
@@ -1941,7 +1944,7 @@ class spell_gen_teleporting : public SpellScript
     void HandleScript(SpellEffIndex /* effIndex */)
     {
         Unit* target = GetHitUnit();
-        if (target->GetTypeId() != TYPEID_PLAYER)
+        if (!target->IsPlayer())
             return;
 
         // return from top
@@ -1973,7 +1976,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -2097,7 +2100,7 @@ class spell_gen_divine_storm_cd_reset : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -2128,7 +2131,7 @@ class spell_gen_profession_research : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     SpellCastResult CheckRequirement()
@@ -2358,7 +2361,7 @@ class spell_gen_seaforium_blast : public SpellScript
     bool Load() override
     {
         // OriginalCaster is always available in Spell::prepare
-        return GetOriginalCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetOriginalCaster()->IsPlayer();
     }
 
     void AchievementCredit(SpellEffIndex /*effIndex*/)
@@ -2501,7 +2504,7 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
 
     bool Load() override
     {
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster() && GetCaster()->IsPlayer() && GetOwner()->IsCreature();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
@@ -2547,7 +2550,7 @@ class spell_gen_oracle_wolvar_reputation : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex effIndex)
@@ -2667,7 +2670,7 @@ class spell_gen_spirit_healer_res : public SpellScript
 
     bool Load() override
     {
-        return GetOriginalCaster() && GetOriginalCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetOriginalCaster() && GetOriginalCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex /* effIndex */)
@@ -3243,7 +3246,7 @@ class spell_gen_tournament_duel : public SpellScript
             }
             else if (Unit* unitTarget = GetHitUnit())
             {
-                if (unitTarget->GetCharmer() && unitTarget->GetCharmer()->GetTypeId() == TYPEID_PLAYER && unitTarget->GetCharmer()->HasAura(SPELL_ON_TOURNAMENT_MOUNT))
+                if (unitTarget->GetCharmer() && unitTarget->GetCharmer()->IsPlayer() && unitTarget->GetCharmer()->HasAura(SPELL_ON_TOURNAMENT_MOUNT))
                     rider->CastSpell(unitTarget->GetCharmer(), SPELL_MOUNTED_DUEL, true);
             }
         }
@@ -3282,7 +3285,7 @@ class spell_gen_summon_tournament_mount : public SpellScript
         return ValidateSpellInfo({ SPELL_LANCE_EQUIPPED });
     }
 
-    SpellCastResult CheckIfLanceEquiped()
+    SpellCastResult CheckIfLanceEquipped()
     {
         if (GetCaster()->IsInDisallowedMountForm())
             GetCaster()->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
@@ -3298,7 +3301,7 @@ class spell_gen_summon_tournament_mount : public SpellScript
 
     void Register() override
     {
-        OnCheckCast += SpellCheckCastFn(spell_gen_summon_tournament_mount::CheckIfLanceEquiped);
+        OnCheckCast += SpellCheckCastFn(spell_gen_summon_tournament_mount::CheckIfLanceEquipped);
     }
 };
 
@@ -3450,7 +3453,7 @@ class spell_gen_on_tournament_mount : public AuraScript
     bool Load() override
     {
         _pennantSpellId = 0;
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster() && GetCaster()->IsPlayer();
     }
 
     void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -3630,7 +3633,7 @@ class spell_gen_tournament_pennant : public AuraScript
 
     bool Load() override
     {
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster() && GetCaster()->IsPlayer();
     }
 
     void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -3686,7 +3689,6 @@ class spell_gen_ds_flush_knockback : public SpellScript
    60864 - Jaws of Death            (spell_gen_default_count_pct_from_max_hp)
    38441 - Cataclysmic Bolt                         (spell_gen_50pct_count_pct_from_max_hp)
    66316, 67100, 67101, 67102 - Spinning Pain Spike (spell_gen_50pct_count_pct_from_max_hp)
-   41360 - L5 Arcane Charge                         (spell_gen_100pct_count_pct_from_max_hp)
    33711/38794 - Murmur's Touch
    */
 class spell_gen_count_pct_from_max_hp : public SpellScript
@@ -3727,7 +3729,7 @@ class spell_gen_despawn_self : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void HandleDummy(SpellEffIndex effIndex)
@@ -3953,7 +3955,7 @@ public:
     {
         if (GetCaster())
             if (Unit* owner = GetCaster()->GetOwner())
-                if (owner->GetTypeId() == TYPEID_PLAYER) /// @todo this check is maybe wrong
+                if (owner->IsPlayer()) /// @todo this check is maybe wrong
                     owner->ToPlayer()->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
     }
 
@@ -4254,7 +4256,7 @@ class spell_gen_gift_of_naaru : public AuraScript
                 break;
         }
 
-        int32 healTick = floor(heal / aurEff->GetTotalTicks());
+        int32 healTick = std::floor(heal / aurEff->GetTotalTicks());
         amount += int32(std::max(healTick, 0));
     }
 
@@ -5346,6 +5348,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_area_aura_select_players_and_caster);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_1", TARGET_UNIT_SRC_AREA_ENEMY, 1);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_2", TARGET_UNIT_SRC_AREA_ENEMY, 2);
+    RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_3", TARGET_UNIT_SRC_AREA_ENEMY, 3);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_15_5", TARGET_UNIT_SRC_AREA_ENEMY, 5);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_7_1", TARGET_UNIT_SRC_AREA_ENTRY, 1);
     RegisterSpellScriptWithArgs(spell_gen_select_target_count, "spell_gen_select_target_count_24_1", TARGET_UNIT_CONE_ENEMY_24, 1);
@@ -5424,7 +5427,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_default_count_pct_from_max_hp");
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_10pct_count_pct_from_max_hp", 10);
     RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_50pct_count_pct_from_max_hp", 50);
-    RegisterSpellScriptWithArgs(spell_gen_count_pct_from_max_hp, "spell_gen_100pct_count_pct_from_max_hp", 100);
     RegisterSpellScript(spell_gen_despawn_self);
     RegisterSpellScript(spell_gen_bandage);
     RegisterSpellScript(spell_gen_paralytic_poison);
@@ -5479,4 +5481,3 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_sober_up);
     RegisterSpellScript(spell_gen_steal_weapon);
 }
-

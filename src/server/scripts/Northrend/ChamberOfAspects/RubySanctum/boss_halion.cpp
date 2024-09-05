@@ -308,7 +308,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (victim->IsPlayer() && events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_KILL);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -475,7 +475,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (victim->IsPlayer() && _events.GetNextEventTime(EVENT_KILL_TALK) == 0)
             {
                 Talk(SAY_KILL);
                 _events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -1053,7 +1053,7 @@ class spell_halion_twilight_phasing : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void Phase()
@@ -1116,7 +1116,7 @@ class spell_halion_twilight_realm_aura : public AuraScript
             return;
 
         target->RemoveAurasDueToSpell(SPELL_FIERY_COMBUSTION, ObjectGuid::Empty, 0, AURA_REMOVE_BY_ENEMY_SPELL);
-        if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
+        if (!GetTarget()->IsPlayer())
             return;
         GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
     }
@@ -1149,7 +1149,7 @@ class spell_halion_leave_twilight_realm_aura : public AuraScript
     {
         GetTarget()->RemoveAurasDueToSpell(SPELL_TWILIGHT_REALM);
 
-        if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
+        if (!GetTarget()->IsPlayer())
             return;
         GetTarget()->m_Events.AddEvent(new SendEncounterUnit(GetTarget()->ToPlayer()), GetTarget()->m_Events.CalculateTime(500));
     }
@@ -1358,4 +1358,3 @@ void AddSC_boss_halion()
     RegisterSpellScript(spell_halion_twilight_division);
     RegisterSpellScript(spell_halion_twilight_mending);
 }
-

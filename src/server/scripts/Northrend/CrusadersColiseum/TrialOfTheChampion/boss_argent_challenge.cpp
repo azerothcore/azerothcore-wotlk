@@ -116,7 +116,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if( who->IsPlayer() )
             {
                 Talk(SAY_EADRIC_KILL_PLAYER);
             }
@@ -243,7 +243,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if( who->GetTypeId() == TYPEID_PLAYER )
+            if( who->IsPlayer() )
             {
                 Talk(SAY_PALETRESS_KILL_PLAYER);
             }
@@ -765,7 +765,7 @@ class spell_toc5_light_rain : public SpellScript
     {
         for( std::list<WorldObject*>::iterator itr = targets.begin(); itr != targets.end(); )
         {
-            if ((*itr)->GetTypeId() == TYPEID_UNIT)
+            if ((*itr)->IsCreature())
                 if ((*itr)->ToCreature()->GetEntry() == NPC_FOUNTAIN_OF_LIGHT)
                 {
                     targets.erase(itr);
@@ -822,4 +822,3 @@ void AddSC_boss_argent_challenge()
     RegisterSpellScript(spell_toc5_light_rain);
     RegisterSpellScript(spell_reflective_shield_aura);
 }
-

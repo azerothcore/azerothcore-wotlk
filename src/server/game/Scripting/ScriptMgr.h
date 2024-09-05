@@ -298,6 +298,7 @@ public: /* PlayerScript */
     void OnPlayerUpdate(Player* player, uint32 p_time);
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerJustDied(Player* player);
+    void OnCalculateTalentsPoints(Player const* player, uint32& talentPointsForLevel);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
     void OnPlayerPVPFlagChange(Player* player, bool state);
@@ -645,6 +646,7 @@ public: /* ArenaScript */
     bool CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid);
     void OnGetPoints(ArenaTeam* team, uint32 memberRating, float& points);
     bool CanSaveToDB(ArenaTeam* team);
+    bool OnBeforeArenaCheckWinConditions(Battleground* const bg);
 
 public: /* MiscScript */
 

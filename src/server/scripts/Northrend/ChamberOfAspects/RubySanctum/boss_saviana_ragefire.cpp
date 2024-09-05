@@ -229,4 +229,3 @@ void AddSC_boss_saviana_ragefire()
     RegisterSpellScript(spell_saviana_conflagration_init);
     RegisterSpellScript(spell_saviana_conflagration_throwback);
 }
-

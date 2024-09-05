@@ -35,7 +35,7 @@ protected:
     // For Logging purpose
     std::string ToString() const override
     {
-        return Acore::StringFormatFmt("Damage done: {}, Healing done: {}, Killing blows: {}", DamageDone, HealingDone, KillingBlows);
+        return Acore::StringFormat("Damage done: {}, Healing done: {}, Killing blows: {}", DamageDone, HealingDone, KillingBlows);
     }
 
     uint8 PvPTeamId;

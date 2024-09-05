@@ -1156,7 +1156,7 @@ public:
                                     {
                                         NPC_BlackKnightGUID = bk->GetGUID();
                                         bk->SendMovementFlagUpdate(); // put him on vehicle visually
-                                        if( bk->GetTypeId() == TYPEID_UNIT )
+                                        if( bk->IsCreature() )
                                             bk->ToCreature()->SetReactState(REACT_PASSIVE);
                                     }
 
@@ -1310,4 +1310,3 @@ void AddSC_instance_trial_of_the_champion()
 {
     new instance_trial_of_the_champion();
 }
-

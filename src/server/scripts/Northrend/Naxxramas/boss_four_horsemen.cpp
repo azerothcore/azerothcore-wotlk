@@ -258,7 +258,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             Talk(SAY_SLAY);
@@ -436,4 +436,3 @@ void AddSC_boss_four_horsemen()
     new boss_four_horsemen();
     RegisterSpellScript(spell_four_horsemen_mark_aura);
 }
-

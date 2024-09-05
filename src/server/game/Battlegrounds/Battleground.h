@@ -470,13 +470,6 @@ public:
 
     void BlockMovement(Player* player);
 
-    void SendWarningToAll(uint32 entry, ...);
-    void SendMessageToAll(uint32 entry, ChatMsg type, Player const* source = nullptr);
-    void PSendMessageToAll(uint32 entry, ChatMsg type, Player const* source, ...);
-
-    // specialized version with 2 string id args
-    void SendMessage2ToAll(uint32 entry, ChatMsg type, Player const* source, uint32 strId1 = 0, uint32 strId2 = 0);
-
     // Raid Group
     [[nodiscard]] Group* GetBgRaid(TeamId teamId) const { return m_BgRaids[teamId]; }
     void SetBgRaid(TeamId teamId, Group* bg_raid);
