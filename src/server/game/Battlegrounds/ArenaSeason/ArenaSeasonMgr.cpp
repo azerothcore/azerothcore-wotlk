@@ -153,7 +153,7 @@ void ArenaSeasonMgr::DeleteArenaTeams()
     for (BattlegroundQueueTypeId queueType : arenasQueueTypes)
     {
         auto queue = sBattlegroundMgr->GetBattlegroundQueue(queueType);
-        for (auto const& [playerGUID, other] : queue.m_QueuedPlayers) 
+        for (auto const& [playerGUID, other] : queue.m_QueuedPlayers)
             queue.RemovePlayer(playerGUID, true);
     }
 
