@@ -33,7 +33,12 @@ void ArenaSeasonMgr::LoadRewards()
 {
     uint32 oldMSTime = getMSTime();
 
-    QueryResult result = WorldDatabase.Query("SELECT id, arena_season, min_pct_criteria, max_pct_criteria, reward_mail_template_id FROM arena_season_reward_group");
+    std::unordered_map<std::string, ArenaSeasonRewardGroupCriteriaType> stringToArenaSeasonRewardGroupCriteriaType = {
+        {"pct", ArenaSeasonRewardGroupCriteriaType::ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE},
+        {"abs", ArenaSeasonRewardGroupCriteriaType::ARENA_SEASON_REWARD_CRITERIA_TYPE_ABSOLUTE_VALUE}
+    };
+
+    QueryResult result = WorldDatabase.Query("SELECT id, arena_season, criteria_type, min_criteria, max_criteria, reward_mail_template_id, reward_mail_subject, reward_mail_body, gold_reward FROM arena_season_reward_group");
 
     if (!result)
     {
@@ -50,13 +55,22 @@ void ArenaSeasonMgr::LoadRewards()
         uint32 id = fields[0].Get<uint32>();
 
         ArenaSeasonRewardGroup group;
-        group.season = fields[1].Get<uint8>();
-        group.minPctCriteria = fields[2].Get<float>();
-        group.maxPctCriteria = fields[3].Get<float>();
-        group.rewardMailTemplateID = fields[4].Get<uint32>();
+        group.season               = fields[1].Get<uint8>();
+        group.criteriaType         = stringToArenaSeasonRewardGroupCriteriaType[fields[2].Get<std::string>()];
+        group.minCriteria          = fields[3].Get<float>();
+        group.maxCriteria          = fields[4].Get<float>();
+        group.rewardMailTemplateID = fields[5].Get<uint32>();
+        group.rewardMailSubject    = fields[6].Get<std::string>();
+        group.rewardMailBody       = fields[7].Get<std::string>();
+        group.goldReward           = fields[8].Get<uint32>();
 
         groupsMap[id] = group;
     } while (result->NextRow());
+
+    std::unordered_map<std::string, ArenaSeasonRewardType> stringToArenaSeasonRewardType = {
+        {"achievement", ArenaSeasonRewardType::ARENA_SEASON_REWARD_TYPE_ACHIEVEMENT},
+        {"item", ArenaSeasonRewardType::ARENA_SEASON_REWARD_TYPE_ITEM}
+    };
 
     result = WorldDatabase.Query("SELECT group_id, type, entry FROM arena_season_reward");
 
@@ -73,7 +87,7 @@ void ArenaSeasonMgr::LoadRewards()
         uint32 groupId = fields[0].Get<uint32>();
 
         ArenaSeasonReward reward;
-        reward.type  = static_cast<ArenaSeasonRewardType>(fields[1].Get<uint8>());
+        reward.type  = stringToArenaSeasonRewardType[fields[1].Get<std::string>()];
         reward.entry = fields[2].Get<uint32>();
 
         auto itr = groupsMap.find(groupId);
@@ -139,7 +153,7 @@ void ArenaSeasonMgr::DeleteArenaTeams()
     for (BattlegroundQueueTypeId queueType : arenasQueueTypes)
     {
         auto queue = sBattlegroundMgr->GetBattlegroundQueue(queueType);
-        for (auto const& [playerGUID, other] : queue.m_QueuedPlayers)
+        for (auto const& [playerGUID, other] : queue.m_QueuedPlayers) 
             queue.RemovePlayer(playerGUID, true);
     }
 

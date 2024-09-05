@@ -49,8 +49,8 @@ ArenaTeam ArenaTeamWithRating(int rating, int gamesPlayed)
     return team;
 }
 
-// This test verifies that a single team receives the correct reward group when multiple reward groups are defined.
-TEST_F(ArenaSeasonRewardDistributorTest, SingleTeamMultipleRewardDistribution)
+// This test verifies that a single team receives the correct reward group when multiple percent reward groups are defined.
+TEST_F(ArenaSeasonRewardDistributorTest, SingleTeamMultiplePctRewardDistribution)
 {
     ArenaTeamMgr::ArenaTeamContainer arenaTeams;
     std::vector<ArenaSeasonRewardGroup> rewardGroups;
@@ -59,42 +59,42 @@ TEST_F(ArenaSeasonRewardDistributorTest, SingleTeamMultipleRewardDistribution)
     arenaTeams[1] = &team;
 
     ArenaSeasonRewardGroup rewardGroup;
-    rewardGroup.minPctCriteria = 0;
-    rewardGroup.maxPctCriteria = 0.5;
+    rewardGroup.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE;
+    rewardGroup.minCriteria = 0;
+    rewardGroup.maxCriteria = 0.5;
     rewardGroups.push_back(rewardGroup);
     ArenaSeasonRewardGroup rewardGroup2;
-    rewardGroup2.minPctCriteria = 0.5;
-    rewardGroup2.maxPctCriteria = 100;
+    rewardGroup2.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE;
+    rewardGroup2.minCriteria = 0.5;
+    rewardGroup2.maxCriteria = 100;
     rewardGroups.push_back(rewardGroup2);
 
-    EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&team, rewardGroup)).Times(1);
+    EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&team, rewardGroup2)).Times(1);
 
     _distributor->DistributeRewards(arenaTeams, rewardGroups);
 }
 
-// Input: Two teams with different ratings (1500 and 1100) and two reward groups with 0% - 0.5% and 0.5% - 100% percentage criteria.
-// Purpose: Ensures that both teams receive rewards based on their rankings and that each team receives a reward only once.
-TEST_F(ArenaSeasonRewardDistributorTest, TwoTeamsTwoRewardsDistribution)
+// This test verifies that a single team receives the correct reward group when multiple abs percent reward groups are defined.
+TEST_F(ArenaSeasonRewardDistributorTest, SingleTeamMultipleAbsRewardDistribution)
 {
     ArenaTeamMgr::ArenaTeamContainer arenaTeams;
     std::vector<ArenaSeasonRewardGroup> rewardGroups;
 
     ArenaTeam team = ArenaTeamWithRating(1500, 50);
-    ArenaTeam team2 = ArenaTeamWithRating(1100, 50);
     arenaTeams[1] = &team;
-    arenaTeams[2] = &team2;
 
     ArenaSeasonRewardGroup rewardGroup;
-    rewardGroup.minPctCriteria = 0;
-    rewardGroup.maxPctCriteria = 0.5;
+    rewardGroup.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_ABSOLUTE_VALUE;
+    rewardGroup.minCriteria = 1;
+    rewardGroup.maxCriteria = 1;
     rewardGroups.push_back(rewardGroup);
     ArenaSeasonRewardGroup rewardGroup2;
-    rewardGroup2.minPctCriteria = 0.5;
-    rewardGroup2.maxPctCriteria = 100;
+    rewardGroup2.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_ABSOLUTE_VALUE;
+    rewardGroup2.minCriteria = 2;
+    rewardGroup2.maxCriteria = 10;
     rewardGroups.push_back(rewardGroup2);
 
     EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&team, rewardGroup)).Times(1);
-    EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&team2, rewardGroup2)).Times(1);
 
     _distributor->DistributeRewards(arenaTeams, rewardGroups);
 }
@@ -116,26 +116,60 @@ TEST_F(ArenaSeasonRewardDistributorTest, ManyTeamsTwoRewardsDistribution)
     }
 
     ArenaSeasonRewardGroup rewardGroup1;
-    rewardGroup1.minPctCriteria = 0.0;  // 0%
-    rewardGroup1.maxPctCriteria = 0.5;  // 0.5% of total teams
+    rewardGroup1.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE;
+    rewardGroup1.minCriteria = 0.0;  // 0%
+    rewardGroup1.maxCriteria = 0.5;  // 0.5% of total teams
     rewardGroups.push_back(rewardGroup1);
 
     ArenaSeasonRewardGroup rewardGroup2;
-    rewardGroup2.minPctCriteria = 0.5;  // 0.5% (the top 0.5% of the teams)
-    rewardGroup2.maxPctCriteria = 3.0;  // 3% of total teams
+    rewardGroup2.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE;
+    rewardGroup2.minCriteria = 0.5;  // 0.5% (the top 0.5% of the teams)
+    rewardGroup2.maxCriteria = 3.0;  // 3% of total teams
     rewardGroups.push_back(rewardGroup2);
 
+    ArenaSeasonRewardGroup rewardGroup3;
+    rewardGroup3.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE;
+    rewardGroup3.minCriteria = 3;
+    rewardGroup3.maxCriteria = 10;
+    rewardGroups.push_back(rewardGroup3);
+
+    ArenaSeasonRewardGroup rewardGroup4;
+    rewardGroup4.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE;
+    rewardGroup4.minCriteria = 10;
+    rewardGroup4.maxCriteria = 35;
+    rewardGroups.push_back(rewardGroup4);
+
+    // Top 1
+    ArenaSeasonRewardGroup rewardGroup5;
+    rewardGroup5.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_ABSOLUTE_VALUE;
+    rewardGroup5.minCriteria = 1;
+    rewardGroup5.maxCriteria = 1;
+    rewardGroups.push_back(rewardGroup5);
+
     // Calculate expected reward distributions
-    int expectedTeamsInGroup1 = std::max(1, static_cast<int>(0.005 * numTeams));  // 0.5% of 1000 = 5
-    int expectedTeamsInGroup2 = std::max(1, static_cast<int>(0.03 * numTeams));   // 3% of 1000 = 30
+    int expectedTeamsInGroup1 = static_cast<int>(0.005 * numTeams);  // 0.5% of 1000 = 5
+    int expectedTeamsInGroup2 = static_cast<int>(0.03 * numTeams);   // 3% of 1000 = 30
+    int expectedTeamsInGroup3 = static_cast<int>(0.10 * numTeams);   // 10% of 1000 = 100
+    int expectedTeamsInGroup4 = static_cast<int>(0.35 * numTeams);   // 35% of 1000 = 350
+
+    int teamsIndexCounter = numTeams;
 
     // Expectation for rewardGroup1 (top 0.5% of teams)
-    for (int i = numTeams; i > numTeams - expectedTeamsInGroup1; --i)
-        EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&teams[i], rewardGroup1)).Times(1);
+    for (; teamsIndexCounter > numTeams - expectedTeamsInGroup1; --teamsIndexCounter)
+        EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&teams[teamsIndexCounter], rewardGroup1)).Times(1);
 
     // Expectation for rewardGroup2 (next 3% - 0.5% teams)
-    for (int i = numTeams - expectedTeamsInGroup1; i > numTeams - expectedTeamsInGroup2; --i)
-        EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&teams[i], rewardGroup2)).Times(1);
+    for (; teamsIndexCounter > numTeams - expectedTeamsInGroup2; --teamsIndexCounter)
+        EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&teams[teamsIndexCounter], rewardGroup2)).Times(1);
+
+    for (; teamsIndexCounter > numTeams - expectedTeamsInGroup3; --teamsIndexCounter)
+        EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&teams[teamsIndexCounter], rewardGroup3)).Times(1);
+
+    for (; teamsIndexCounter > numTeams - expectedTeamsInGroup4; --teamsIndexCounter)
+        EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&teams[teamsIndexCounter], rewardGroup4)).Times(1);
+
+    // Top 1
+    EXPECT_CALL(*_mockRewarder, RewardTeamWithRewardGroup(&teams[numTeams], rewardGroup5)).Times(1);
 
     _distributor->DistributeRewards(arenaTeams, rewardGroups);
 }
@@ -159,8 +193,9 @@ TEST_F(ArenaSeasonRewardDistributorTest, MinimumRequiredGamesFilter)
 
     // Creating a single reward group covering all teams
     ArenaSeasonRewardGroup rewardGroup;
-    rewardGroup.minPctCriteria = 0;
-    rewardGroup.maxPctCriteria = 100;
+    rewardGroup.criteriaType = ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE;
+    rewardGroup.minCriteria = 0.0;
+    rewardGroup.maxCriteria = 100;
     rewardGroups.push_back(rewardGroup);
 
     // We expect the rewarder to be called for team1 and team3, but not for team2.

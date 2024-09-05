@@ -20,6 +20,7 @@
 #include "CharacterDatabase.h"
 #include "Mail.h"
 #include "Player.h"
+#include <algorithm>
 
 const float minPctTeamGamesForMemberToGetReward = 30;
 
@@ -31,6 +32,9 @@ void ArenaSeasonTeamRewarderImpl::RewardTeamWithRewardGroup(ArenaTeam *arenaTeam
 
 void ArenaSeasonTeamRewarderImpl::RewardWithMail(ArenaTeam* arenaTeam, ArenaSeasonRewardGroup const & rewardGroup)
 {
+    if (rewardGroup.itemRewards.empty() && rewardGroup.goldReward == 0)
+        return;
+
     const int npcKingDondSender = 18897;
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
@@ -47,7 +51,13 @@ void ArenaSeasonTeamRewarderImpl::RewardWithMail(ArenaTeam* arenaTeam, ArenaSeas
 
         Player* player = ObjectAccessor::FindPlayer(member.Guid);
 
-        auto draft = MailDraft(rewardGroup.rewardMailTemplateID);
+        auto draft = (rewardGroup.rewardMailTemplateID > 0) ?
+            MailDraft(rewardGroup.rewardMailTemplateID) :
+            MailDraft(rewardGroup.rewardMailSubject, rewardGroup.rewardMailBody);
+
+        if (rewardGroup.goldReward > 0)
+            draft.AddMoney(rewardGroup.goldReward);
+
         for (auto const& reward : rewardGroup.itemRewards)
             if (Item* item = Item::CreateItem(reward.entry, 1))
             {
@@ -62,6 +72,9 @@ void ArenaSeasonTeamRewarderImpl::RewardWithMail(ArenaTeam* arenaTeam, ArenaSeas
 
 void ArenaSeasonTeamRewarderImpl::RewardWithAchievements(ArenaTeam* arenaTeam, ArenaSeasonRewardGroup const & rewardGroup)
 {
+    if (rewardGroup.achievementRewards.empty())
+        return;
+
     for (auto const& member : arenaTeam->GetMembers())
     {
         uint32 teamSeasonGames = arenaTeam->GetStats().SeasonGames;
@@ -108,32 +121,45 @@ void ArenaSeasonRewardDistributor::DistributeRewards(ArenaTeamMgr::ArenaTeamCont
         return a->GetRating() > b->GetRating();
     });
 
-    std::sort(rewardGroups.begin(), rewardGroups.end(), [](ArenaSeasonRewardGroup a, ArenaSeasonRewardGroup b) {
-        return a.minPctCriteria < b.minPctCriteria;
-    });
+    std::vector<ArenaSeasonRewardGroup> pctRewardGroup;
+    std::vector<ArenaSeasonRewardGroup> absRewardGroup;
+
+    for (auto const& reward : rewardGroups)
+    {
+        if (reward.criteriaType == ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE)
+            pctRewardGroup.push_back(reward);
+        else
+            absRewardGroup.push_back(reward);
+    }
 
     size_t totalTeams = sortedTeams.size();
-    size_t prevTeamIndexRewarded = 0;
-
-    for (auto const& rewardGroup : rewardGroups)
+    for (auto const& rewardGroup : pctRewardGroup)
     {
-        size_t minIndex = static_cast<size_t>(rewardGroup.minPctCriteria * totalTeams / 100);
-        size_t maxIndex = static_cast<size_t>(rewardGroup.maxPctCriteria * totalTeams / 100);
+        size_t minIndex = static_cast<size_t>(rewardGroup.minCriteria * totalTeams / 100);
+        size_t maxIndex = static_cast<size_t>(rewardGroup.maxCriteria * totalTeams / 100);
 
         minIndex = std::min(minIndex, totalTeams);
         maxIndex = std::min(maxIndex, totalTeams);
 
-        // Prevent rewarding the same team twice
-        minIndex = std::max(minIndex, prevTeamIndexRewarded);
-
-        // Ensure that at least one team is rewarded, even if the percentage is very small
-        if (minIndex == maxIndex && minIndex < totalTeams)
-            maxIndex = minIndex + 1;
-
-        // Distribute rewards to the selected teams
-        for (prevTeamIndexRewarded = minIndex; prevTeamIndexRewarded < maxIndex; ++prevTeamIndexRewarded)
+        for (size_t i = minIndex; i < maxIndex; ++i)
         {
-            ArenaTeam* team = sortedTeams[prevTeamIndexRewarded];
+            ArenaTeam* team = sortedTeams[i];
+            _rewarder->RewardTeamWithRewardGroup(team, rewardGroup);
+        }
+    }
+
+    for (auto const& rewardGroup : absRewardGroup)
+    {
+        size_t minIndex = rewardGroup.minCriteria-1; // Top 1 team is the team with index 0, so we need make -1.
+        size_t maxIndex = rewardGroup.maxCriteria;
+
+        minIndex = std::max(minIndex, size_t(0));
+        minIndex = std::min(minIndex, totalTeams);
+        maxIndex = std::min(maxIndex, totalTeams);
+
+        for (size_t i = minIndex; i < maxIndex; ++i)
+        {
+            ArenaTeam* team = sortedTeams[i];
             _rewarder->RewardTeamWithRewardGroup(team, rewardGroup);
         }
     }

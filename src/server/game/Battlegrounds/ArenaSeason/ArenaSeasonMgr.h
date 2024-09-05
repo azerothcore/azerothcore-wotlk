@@ -30,8 +30,14 @@ enum ArenaSeasonState
 
 enum ArenaSeasonRewardType
 {
-    ARENA_SEASON_REWARD_TYPE_ITEM = 1,
-    ARENA_SEASON_REWARD_TYPE_ACHIEVEMENT = 2
+    ARENA_SEASON_REWARD_TYPE_ITEM,
+    ARENA_SEASON_REWARD_TYPE_ACHIEVEMENT
+};
+
+enum ArenaSeasonRewardGroupCriteriaType
+{
+    ARENA_SEASON_REWARD_CRITERIA_TYPE_PERCENT_VALUE,
+    ARENA_SEASON_REWARD_CRITERIA_TYPE_ABSOLUTE_VALUE
 };
 
 // ArenaSeasonReward represents one reward, it can be an item or achievement.
@@ -44,6 +50,7 @@ struct ArenaSeasonReward
 
     ArenaSeasonRewardType type{ARENA_SEASON_REWARD_TYPE_ITEM};
 
+    // Used in unit tests.
     bool operator==(const ArenaSeasonReward& other) const
     {
         return entry == other.entry && type == other.type;
@@ -56,23 +63,25 @@ struct ArenaSeasonRewardGroup
 
     uint8 season{0};
 
-    float minPctCriteria{0};
-    float maxPctCriteria{0};
+    ArenaSeasonRewardGroupCriteriaType criteriaType;
+
+    float minCriteria{0};
+    float maxCriteria{0};
 
     uint32 rewardMailTemplateID{0};
+    std::string rewardMailSubject{""};
+    std::string rewardMailBody{""};
+    uint32 goldReward{0};
 
     std::vector<ArenaSeasonReward> itemRewards{};
     std::vector<ArenaSeasonReward> achievementRewards{};
 
-    bool operator<(const ArenaSeasonRewardGroup& other) const
-    {
-        return this->minPctCriteria < other.minPctCriteria;
-    }
-
+    // Used in unit tests.
     bool operator==(const ArenaSeasonRewardGroup& other) const
     {
-        return minPctCriteria == other.minPctCriteria &&
-               maxPctCriteria == other.maxPctCriteria &&
+        return minCriteria == other.minCriteria &&
+               maxCriteria == other.maxCriteria &&
+               criteriaType == other.criteriaType &&
                itemRewards == other.itemRewards &&
                achievementRewards == other.achievementRewards;
     }
