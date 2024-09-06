@@ -57,7 +57,9 @@ enum Spells
     SPELL_ASHTONGUE_WAVE_A          = 42073,   // unused
     SPELL_ASHTONGUE_WAVE_B          = 42035,
     SPELL_SUMMON_ASHTONGUE_SORCERER = 40476,
-    SPELL_SUMMON_ASHTONGUE_DEFENDER = 40474
+    SPELL_SUMMON_ASHTONGUE_DEFENDER = 40474,
+
+    SPELL_SEAL_OF_LIGHT             = 20167
 };
 
 enum Creatures
@@ -203,6 +205,7 @@ struct npc_akama_shade : public ScriptedAI
     npc_akama_shade(Creature* creature) : ScriptedAI(creature)
     {
         instance = creature->GetInstanceScript();
+        me->ApplySpellImmune(SPELL_SEAL_OF_LIGHT, IMMUNITY_ID, SPELL_SEAL_OF_LIGHT, true);
     }
 
     InstanceScript* instance;
