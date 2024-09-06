@@ -80,9 +80,9 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES ('arena season complet
 INSERT INTO `command` (`name`, `security`, `help`) VALUES ('arena season set state', 3, 'Syntax: .arena season set state $state\nChanges the state for the current season.\nAvailable states:\n 0 - disabled. Players can\'t queue for the arena.\n 1 - in progress. Players can use arena-related functionality.');
 
 DELETE FROM `achievement_reward` WHERE `ID` IN (3336, 2091, 2092, 2093, 2090);
-INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, `Subject`, `Body`, `MailTemplateID`)
-VALUES (3336, 157, 157, 0, 0, '', '', 0),
-VALUES (2091, 42, 42, 0, 0, '', '', 0),
-VALUES (2092, 43, 43, 0, 0, '', '', 0),
-VALUES (2093, 44, 44, 0, 0, '', '', 0),
-VALUES (2090, 45, 45, 0, 0, '', '', 0);
+INSERT INTO `achievement_reward` (`ID`, `TitleA`, `TitleH`, `ItemID`, `Sender`, `Subject`, `Body`, `MailTemplateID`) VALUES 
+(3336, 157, 157, 0, 0, '', '', 0),
+(2091, 42, 42, 0, 0, '', '', 0),
+(2092, 43, 43, 0, 0, '', '', 0),
+(2093, 44, 44, 0, 0, '', '', 0),
+(2090, 45, 45, 0, 0, '', '', 0);
