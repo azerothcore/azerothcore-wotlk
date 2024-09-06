@@ -1493,7 +1493,7 @@ public:
     [[nodiscard]] bool IsTotem() const { return m_unitTypeMask & UNIT_MASK_TOTEM; }
     [[nodiscard]] bool IsVehicle() const { return m_unitTypeMask & UNIT_MASK_VEHICLE; }
 
-    [[nodiscard]] uint8 GetLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
+    uint32_t GetLevel() const { return GetUInt32Value(UNIT_FIELD_LEVEL); }
     uint8 getLevelForTarget(WorldObject const* /*target*/) const override { return GetLevel(); }
     void SetLevel(uint8 lvl, bool showLevelChange = true);
     [[nodiscard]] uint8 getRace(bool original = false) const;

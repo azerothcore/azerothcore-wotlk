@@ -127,7 +127,7 @@ class spell_item_mind_amplify_dish : public SpellScript
                     if (target->GetLevel() > 60)
                         return;
 
-                uint8 pct = std::max(0, 20 + player->GetLevel() - target->GetLevel());
+                uint32_t pct = std::max(0u, 20u + player->GetLevel() - target->GetLevel());
                 if (roll_chance_i(pct))
                     player->CastSpell(target, SPELL_MENTAL_BATTLE, true);
                 else if (roll_chance_i(pct))

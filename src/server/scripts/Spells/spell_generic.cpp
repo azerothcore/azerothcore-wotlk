@@ -284,7 +284,7 @@ class spell_gen_reduced_above_60 : public SpellScript
             if (target->GetLevel() > 60)
             {
                 int32 damage = GetHitDamage();
-                AddPct(damage, -4 * int8(std::min(target->GetLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
+                AddPct(damage, -4 * std::min(target->GetLevel(), 85u - 60u)); // prevents reduce by more than 100%
                 SetHitDamage(damage);
             }
     }
@@ -303,7 +303,7 @@ class spell_gen_reduced_above_60_aura : public AuraScript
     {
         if (Unit* owner = GetUnitOwner())
             if (owner->GetLevel() > 60)
-                AddPct(amount, -4 * int8(std::min(owner->GetLevel(), uint8(85)) - 60)); // prevents reduce by more than 100%
+                AddPct(amount, -4 * (std::min(owner->GetLevel(), 85u) - 60u)); // prevents reduce by more than 100%
     }
 
     void Register() override

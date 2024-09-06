@@ -56,7 +56,7 @@ inline bool roll_chance_f(float chance)
 }
 
 /* Return true if a random roll fits in the specified chance (range 0-100). */
-inline bool roll_chance_i(int chance)
+inline bool roll_chance_i(uint32_t chance)
 {
     return chance > irand(0, 99);
 }

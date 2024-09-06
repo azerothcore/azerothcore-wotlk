@@ -198,7 +198,7 @@ class spell_pri_divine_aegis : public AuraScript
     {
         PreventDefaultAction();
 
-        int32 absorb = CalculatePct(int32(eventInfo.GetHealInfo()->GetHeal()), aurEff->GetAmount());
+        uint32_t absorb = CalculatePct(eventInfo.GetHealInfo()->GetHeal(), aurEff->GetAmount());
 
         // Multiple effects stack, so let's try to find this aura.
         if (AuraEffect const* aegis = eventInfo.GetProcTarget()->GetAuraEffect(SPELL_PRIEST_DIVINE_AEGIS, EFFECT_0))
