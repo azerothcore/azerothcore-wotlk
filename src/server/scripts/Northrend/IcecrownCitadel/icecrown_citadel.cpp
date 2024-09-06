@@ -2867,7 +2867,7 @@ public:
 
                             target->CastSpell(c, 60352, true); // Mirror Image, clone visual appearance
                         }
-                    c->AI()->DoAction(target->getClass());
+                    c->AI()->DoAction(target->GetClass());
                 }
             }
         }

@@ -99,7 +99,7 @@ bool ArenaTeam::AddMember(WOWGUID playerGuid)
     Player* player = ObjectAccessor::FindConnectedPlayer(playerGuid);
     if (player)
     {
-        playerClass = player->getClass();
+        playerClass = player->GetClass();
         playerName = player->GetName();
     }
     else

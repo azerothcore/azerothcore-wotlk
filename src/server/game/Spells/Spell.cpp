@@ -8979,7 +8979,7 @@ namespace Acore
                         return false;
                     break;
                 case TARGET_CHECK_RAID_CLASS:
-                    if (_referer->getClass() != unitTarget->getClass())
+                    if (_referer->GetClass() != unitTarget->GetClass())
                         return false;
                     [[fallthrough]];
                 case TARGET_CHECK_RAID:

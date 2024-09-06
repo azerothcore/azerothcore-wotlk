@@ -1234,7 +1234,7 @@ class spell_item_eye_of_gruul_healing_discount : public AuraScript
         if (Unit* unitTarget = GetTarget())
         {
             uint32 spell_id = 0;
-            switch (unitTarget->getClass())
+            switch (unitTarget->GetClass())
             {
                 case CLASS_DRUID:
                     spell_id = SPELL_DRUID_ITEM_HEALING_TRANCE;
@@ -1728,7 +1728,7 @@ class spell_item_flask_of_the_north : public SpellScript
     {
         Unit* caster = GetCaster();
         std::vector<uint32> possibleSpells;
-        switch (caster->getClass())
+        switch (caster->GetClass())
         {
             case CLASS_WARLOCK:
             case CLASS_MAGE:

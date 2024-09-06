@@ -1972,7 +1972,7 @@ public:
             level             = playerTarget->GetLevel();
             latency           = playerTarget->User()->GetLatency();
             raceid            = playerTarget->getRace();
-            classid           = playerTarget->getClass();
+            classid           = playerTarget->GetClass();
             muteTime          = playerTarget->User()->m_muteTime;
             mapId             = playerTarget->GetMapId();
             areaId            = playerTarget->GetAreaId();

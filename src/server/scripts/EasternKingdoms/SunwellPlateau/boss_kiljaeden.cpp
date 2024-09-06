@@ -1090,7 +1090,7 @@ class spell_kiljaeden_sinister_reflection_clone : public SpellScript
         targets.clear();
         if (target && target->GetTypeId() == TYPEID_UNIT)
         {
-            target->ToCreature()->AI()->SetData(1, GetCaster()->getClass());
+            target->ToCreature()->AI()->SetData(1, GetCaster()->GetClass());
             targets.push_back(target);
         }
     }

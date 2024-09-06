@@ -6632,7 +6632,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 return false;
 
                             // Select class defined buff
-                            switch (getClass())
+                            switch (GetClass())
                             {
                                 case CLASS_PALADIN:                 // 39511, 40997, 40998, 40999, 41002, 41005, 41009, 41011, 41409
                                 case CLASS_DRUID:                   // 39511, 40997, 40998, 40999, 41002, 41005, 41009, 41011, 41409
@@ -6825,7 +6825,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             AddSpellCooldown(71484, 0, cooldown);
 
                             std::vector<uint32> RandomSpells;
-                            switch (getClass())
+                            switch (GetClass())
                             {
                                 case CLASS_WARRIOR:
                                 case CLASS_PALADIN:
@@ -6868,7 +6868,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             AddSpellCooldown(71561, 0, cooldown);
 
                             std::vector<uint32> RandomSpells;
-                            switch (getClass())
+                            switch (GetClass())
                             {
                                 case CLASS_WARRIOR:
                                 case CLASS_PALADIN:
@@ -7755,7 +7755,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 return false;
 
                             // Set class defined buff
-                            switch (victim->getClass())
+                            switch (victim->GetClass())
                             {
                                 case CLASS_PALADIN:
                                 case CLASS_PRIEST:
@@ -8000,7 +8000,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                                 return false;
 
                             // Set class defined buff
-                            switch (victim->getClass())
+                            switch (victim->GetClass())
                             {
                                 case CLASS_PALADIN:
                                 case CLASS_PRIEST:
@@ -9165,7 +9165,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                         // Soul Preserver
                         case 60510:
                             {
-                                switch (getClass())
+                                switch (GetClass())
                                 {
                                     case CLASS_DRUID:
                                         trigger_spell_id = 60512;
@@ -21584,6 +21584,6 @@ std::string Unit::GetDebugInfo() const
         << std::boolalpha
         << "AliveState: " << IsAlive()
         << " UnitMovementFlags: " << GetUnitMovementFlags() << " ExtraUnitMovementFlags: " << GetExtraUnitMovementFlags()
-        << " Class: " << std::to_string(getClass());
+        << " Class: " << std::to_string(GetClass());
     return sstr.str();
 }

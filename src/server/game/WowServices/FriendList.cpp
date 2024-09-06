@@ -74,7 +74,7 @@ FriendList::FriendList (Player* plr) {
       msg << (unsigned char)FRIEND_STATUS_ONLINE;
       msg << plr->GetAreaId();
       msg << (uint32_t)plr->GetLevel();
-      msg << (uint32_t)plr->getClass();
+      msg << (uint32_t)plr->GetClass();
       it->second->m_playerPtr->User()->Send(&msg);
     }
   }
@@ -167,7 +167,7 @@ void FriendList::AddFriend (char* name, char* notes) {
 
       frnd.m_areaId = plr->GetAreaId();
       frnd.m_level = plr->GetLevel();
-      frnd.m_classId = plr->getClass();
+      frnd.m_classId = plr->GetClass();
     }
 
     // Save the new contact to the database
@@ -272,7 +272,7 @@ void FriendList::AddContacts () {
 
         frnd.m_areaId = plr->GetAreaId();
         frnd.m_level = plr->GetLevel();
-        frnd.m_classId = plr->getClass();
+        frnd.m_classId = plr->GetClass();
       }
 
       msg << (unsigned char)frnd.m_status;
@@ -417,7 +417,7 @@ void FriendList::SendContactList (uint32_t flags) {
       pFriend->m_status = FRIEND_STATUS_ONLINE;
       pFriend->m_areaId = plr->GetAreaId();
       pFriend->m_level = plr->GetLevel();
-      pFriend->m_classId = plr->getClass();
+      pFriend->m_classId = plr->GetClass();
       if (plr->isAFK()) {
         pFriend->m_status = FRIEND_STATUS_AFK;
       }

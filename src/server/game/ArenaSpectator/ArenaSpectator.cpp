@@ -245,7 +245,7 @@ void ArenaSpectator::HandleResetCommand(Player* player)
         SendCommand_String(player, itr->first, "NME", plr->GetName().c_str());
         // Xinef: addon compatibility
         SendCommand_UInt32Value(player, itr->first, "TEM", plr->GetBgTeamId() == TEAM_ALLIANCE ? ALLIANCE : HORDE);
-        SendCommand_UInt32Value(player, itr->first, "CLA", plr->getClass());
+        SendCommand_UInt32Value(player, itr->first, "CLA", plr->GetClass());
         SendCommand_UInt32Value(player, itr->first, "MHP", plr->GetMaxHealth());
         SendCommand_UInt32Value(player, itr->first, "CHP", plr->GetHealth());
         SendCommand_UInt32Value(player, itr->first, "STA", plr->IsAlive() ? 1 : 0);

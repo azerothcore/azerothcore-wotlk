@@ -341,7 +341,7 @@ struct boss_archimonde : public BossAI
         {
             if (Player* player = ObjectAccessor::GetPlayer(*me, guid))
             {
-                switch (player->getClass())
+                switch (player->GetClass())
                 {
                     case CLASS_MAGE:
                     case CLASS_PRIEST:

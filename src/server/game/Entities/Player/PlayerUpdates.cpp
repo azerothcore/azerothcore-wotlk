@@ -1047,7 +1047,7 @@ void Player::UpdateSkillsForLevel()
 
         uint32                         pskill = itr->first;
         SkillRaceClassInfoEntry const* rcEntry =
-            GetSkillRaceClassInfo(pskill, getRace(), getClass());
+            GetSkillRaceClassInfo(pskill, getRace(), GetClass());
         if (!rcEntry)
             continue;
 

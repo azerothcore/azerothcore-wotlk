@@ -1060,7 +1060,7 @@ namespace lfg
                         maxPower = (p->GetPowerType() == POWER_TYPE_RAGE || p->GetPowerType() == POWER_TYPE_RUNIC_POWER) ? p->GetMaxPower(p->GetPowerType()) / 10 : p->GetMaxPower(p->GetPowerType());
 
                     currInternalInfoMap[sitr->first] = RBInternalInfo(guid, sitr->second.comment, !groupGuid.IsEmpty(), groupGuid, sitr->second.roles, encounterMask, instanceGuid,
-                                                       1, p->GetLevel(), p->getClass(), p->getRace(), p->GetAverageItemLevel(),
+                                                       1, p->GetLevel(), p->GetClass(), p->getRace(), p->GetAverageItemLevel(),
                                                        talents, p->GetAreaId(), p->GetArmor(), (uint32)std::max<int32>(0, spellDamage), (uint32)std::max<int32>(0, spellHeal),
                                                        p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_MELEE)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_RANGED)), p->GetUInt32Value(PLAYER_FIELD_COMBAT_RATING_1 + static_cast<uint16>(CR_CRIT_SPELL)), std::max<float>(0.0f, mp5), std::max<float>(0.0f, mp5combat),
                                                        std::max<uint32>(baseAP, rangedAP), (uint32)p->GetStat(STAT_AGILITY), p->GetMaxHealth(), maxPower, p->GetDefenseSkillValue(),

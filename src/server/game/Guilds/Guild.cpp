@@ -522,7 +522,7 @@ void Guild::Member::SetStats(Player* player)
 {
     m_name      = player->GetName();
     m_level     = player->GetLevel();
-    m_class     = player->getClass();
+    m_class     = player->GetClass();
     m_gender    = player->getGender();
     m_zoneId    = player->GetZoneId();
     m_accountId = player->User()->GetAccountId();

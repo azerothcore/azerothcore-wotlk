@@ -217,7 +217,7 @@ struct ClassCallSelector : public Acore::unary_function<Unit*, bool>
             return false;
         }
 
-        if (target->getClass() != _targetClass)
+        if (target->GetClass() != _targetClass)
         {
             return false;
         }
@@ -675,7 +675,7 @@ struct boss_nefarian : public BossAI
                         {
                             if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
                             {
-                                classesPresent.insert(ref->getTarget()->getClass());
+                                classesPresent.insert(ref->getTarget()->GetClass());
                             }
                         }
                     }
@@ -686,7 +686,7 @@ struct boss_nefarian : public BossAI
 
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ClassCallSelector(me, targetClass)))
                     {
-                        switch (target->getClass())
+                        switch (target->GetClass())
                         {
                             case CLASS_MAGE:
                                 Talk(SAY_MAGE);
@@ -1007,7 +1007,7 @@ class spell_class_call_handler : public SpellScript
                 auto it = classCallSpells.find(spellInfo->Id);
                 if (it != classCallSpells.end()) // should never happen but only to be sure.
                 {
-                    return target->ToPlayer()->getClass() != it->second;
+                    return target->ToPlayer()->GetClass() != it->second;
                 }
 
                 return false;
