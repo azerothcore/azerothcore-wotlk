@@ -1260,7 +1260,7 @@ enum FlameAzzinoth
 
 struct npc_flame_of_azzinoth : public ScriptedAI
 {
-    npc_flame_of_azzinoth(Creature* creature) : ScriptedAI(creature), _bladeSummoner(nullptr) { }
+    npc_flame_of_azzinoth(Creature* creature) : ScriptedAI(creature) { }
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
