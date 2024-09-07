@@ -1041,10 +1041,6 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         if (!victim->IsPlayer())
         {
-            /// @fix: Hack to avoid premature leashing
-            if (damagetype != DOT && damage > 0 && !victim->GetOwnerGUID().IsPlayer() && (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
-                victim->ToCreature()->UpdateLeashExtensionTime();
-
             if (attacker)
             {
                 if (spellProto && victim->CanHaveThreatList() && !victim->HasUnitState(UNIT_STATE_EVADE) && !victim->IsInCombatWith(attacker))
@@ -13699,8 +13695,6 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
         if (enemy)
         {
-            creature->UpdateLeashExtensionTime();
-
             if (IsAIEnabled)
                 creature->AI()->JustEngagedWith(enemy);
 
