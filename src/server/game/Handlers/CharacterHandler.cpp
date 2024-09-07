@@ -901,7 +901,7 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
                 if (AreaTriggerTeleport const* at = sObjectMgr->GetGoBackTrigger(plr->GetMapId()))
                     plr->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, plr->GetOrientation());
                 else
-                    plr->TeleportTo(plr->m_homebindMapId, plr->m_homebindX, plr->m_homebindY, plr->m_homebindZ, plr->m_homebindO);
+                    plr->TeleportTo(plr->m_homebindMapId, plr->m_homebindX, plr->m_homebindY, plr->m_homebindZ, plr->GetOrientation());
             }
         }, 1s);
     }
