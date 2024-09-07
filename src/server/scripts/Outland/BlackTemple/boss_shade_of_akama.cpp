@@ -233,14 +233,14 @@ struct npc_akama_shade : public ScriptedAI
             case POINT_ENGAGE:
                 me->SetHomePosition(me->GetPosition());
                 me->SetFaction(FACTION_ENGAGE);
-                DoCast(me, SPELL_AKAMA_SOUL_CHANNEL, true);
+                DoCastSelf(SPELL_AKAMA_SOUL_CHANNEL, true);
                 break;
             case POINT_OUTRO:
                 DoCastSelf(SPELL_AKAMA_SOUL_RETRIEVE, true);
                 ScheduleUniqueTimedEvent(15600ms, [&]
                 {
-                        Talk(SAY_BROKEN_FREE_0);
-                        me->SummonCreatureGroup(SUMMON_GROUP_BROKENS);
+                    Talk(SAY_BROKEN_FREE_0);
+                    me->SummonCreatureGroup(SUMMON_GROUP_BROKENS);
                 }, 1);
                 ScheduleUniqueTimedEvent(26550ms, [&]
                 {
