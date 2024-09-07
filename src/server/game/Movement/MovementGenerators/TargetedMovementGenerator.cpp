@@ -148,15 +148,16 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         owner->ClearUnitState(UNIT_STATE_CHASE_MOVE);
         owner->SetInFront(target);
         MovementInform(owner);
+    }
 
-        // Mobs should chase you infinitely if you stop and wait every few seconds.
-        i_leashExtensionTimer.Update(time_diff);
-        if (i_leashExtensionTimer.Passed())
-        {
-            i_leashExtensionTimer.Reset(5000);
+    // Mobs should chase you infinitely if you stop and wait every few seconds.
+    i_leashExtensionTimer.Update(time_diff);
+    if (i_leashExtensionTimer.Passed())
+    {
+        i_leashExtensionTimer.Reset(5000);
+        if (owner->HasUnitState(UNIT_STATE_CHASE) && owner->movespline->Finalized() && !target->isMoving())
             if (Creature* creature = owner->ToCreature())
                 creature->UpdateLeashExtensionTime();
-        }
     }
 
     // if the target moved, we have to consider whether to adjust
