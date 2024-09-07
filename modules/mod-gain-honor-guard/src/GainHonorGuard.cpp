@@ -161,13 +161,13 @@ public:
         if (GainHonorGuardOnGuardKill && killed->ToCreature()->IsGuard() && GainHonorGuardOnGuardKillAnnounce)
         {
             std::ostringstream ss;
-            ss << "You have been awarded |cff4CFF00%i |rHonor.";
+            ss << "You have been awarded |cff4CFF00{} |rHonor.";
             ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str(), honor);
         }
         else if (GainHonorGuardOnEliteKill && killed->ToCreature()->isElite() && GainHonorGuardOnEliteKillAnnounce)
         {
             std::ostringstream ss;
-            ss << "You have been awarded |cffFF8000%i |rHonor.";
+            ss << "You have been awarded |cffFF8000{} |rHonor.";
             ChatHandler(player->GetSession()).PSendSysMessage(ss.str().c_str(), honor);
         }
     }
