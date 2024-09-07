@@ -892,14 +892,18 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
     if (!pCurrChar->GetMap()->AddPlayerToMap(pCurrChar) || !pCurrChar->CheckInstanceLoginValid())
     {
-        AreaTriggerTeleport const* at = sObjectMgr->GetGoBackTrigger(pCurrChar->GetMapId());
-        if (at)
-            pCurrChar->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, pCurrChar->GetOrientation());
-        else
-            pCurrChar->TeleportTo(pCurrChar->m_homebindMapId, pCurrChar->m_homebindX, pCurrChar->m_homebindY, pCurrChar->m_homebindZ, pCurrChar->GetOrientation());
-
-        // Probably a hackfix, but currently the best workaround to prevent character names showing as Unknown after teleport out from instances at login.
-        pCurrChar->GetSession()->SendNameQueryOpcode(pCurrChar->GetGUID());
+        ObjectGuid playerGUID = pCurrChar->GetGUID();
+        Map* map = pCurrChar->FindMap();
+        pCurrChar->m_Events.AddEventAtOffset([map, playerGUID]()
+        {
+            if (Player* plr = ObjectAccessor::GetPlayer(map, playerGUID))
+            {
+                if (AreaTriggerTeleport const* at = sObjectMgr->GetGoBackTrigger(plr->GetMapId()))
+                    plr->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, plr->GetOrientation());
+                else
+                    plr->TeleportTo(plr->m_homebindMapId, plr->m_homebindX, plr->m_homebindY, plr->m_homebindZ, plr->m_homebindO);
+            }
+        }, 1s);
     }
 
     pCurrChar->SendInitialPacketsAfterAddToMap();
