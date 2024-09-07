@@ -238,10 +238,10 @@ bool EffectMovementGenerator::Update(Unit* unit, uint32)
 
 void EffectMovementGenerator::Finalize(Unit* unit)
 {
-    if (unit->GetTypeId() != TYPEID_UNIT)
+    if (!unit->IsCreature())
         return;
 
-    if (unit->GetTypeId() == TYPEID_UNIT && unit->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) && unit->movespline->isFalling()) // pussywizard
+    if (unit->IsCreature() && unit->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) && unit->movespline->isFalling()) // pussywizard
         unit->RemoveUnitMovementFlag(MOVEMENTFLAG_FALLING);
 
     // Need restore previous movement since we have no proper states system

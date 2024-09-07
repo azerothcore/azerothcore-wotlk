@@ -183,7 +183,7 @@ public:
 
         bool Load() override
         {
-            return GetUnitOwner()->GetTypeId() == TYPEID_UNIT && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
+            return GetUnitOwner()->IsCreature() && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
         }
 
         void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

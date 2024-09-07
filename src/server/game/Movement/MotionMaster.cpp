@@ -244,7 +244,7 @@ void MotionMaster::MoveRandom(float wanderDistance)
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    if (_owner->GetTypeId() == TYPEID_UNIT)
+    if (_owner->IsCreature())
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) start moving random", _owner->GetGUID().ToString());
         Mutate(new RandomMovementGenerator<Creature>(wanderDistance), MOTION_SLOT_IDLE);
@@ -260,12 +260,12 @@ void MotionMaster::MoveTargetedHome(bool walk /*= false*/)
 {
     Clear(false);
 
-    if (_owner->GetTypeId() == TYPEID_UNIT && !_owner->ToCreature()->GetCharmerOrOwnerGUID())
+    if (_owner->IsCreature() && !_owner->ToCreature()->GetCharmerOrOwnerGUID())
     {
         LOG_DEBUG("movement.motionmaster", "Creature ({}) targeted home", _owner->GetGUID().ToString());
         Mutate(new HomeMovementGenerator<Creature>(walk), MOTION_SLOT_ACTIVE);
     }
-    else if (_owner->GetTypeId() == TYPEID_UNIT && _owner->ToCreature()->GetCharmerOrOwnerGUID())
+    else if (_owner->IsCreature() && _owner->ToCreature()->GetCharmerOrOwnerGUID())
     {
         _owner->ClearUnitState(UNIT_STATE_EVADE);
 
@@ -665,7 +665,7 @@ void MotionMaster::MoveFall(uint32 id /*=0*/, bool addFlagForNPC)
         _owner->m_movementInfo.SetFallTime(0);
         _owner->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), _owner->GetPositionZ());
     }
-    else if (_owner->GetTypeId() == TYPEID_UNIT && addFlagForNPC) // pussywizard
+    else if (_owner->IsCreature() && addFlagForNPC) // pussywizard
     {
         _owner->RemoveUnitMovementFlag(MOVEMENTFLAG_MASK_MOVING);
         _owner->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING | MOVEMENTFLAG_CAN_FLY);

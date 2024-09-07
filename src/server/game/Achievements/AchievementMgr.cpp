@@ -244,11 +244,11 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_LOSS_TEAM_SCORE:
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_BG_TEAMS_SCORES:
             return true;                                    // not check correctness node indexes
-        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM:
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPPED_ITEM:
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_ITEM_QUALITY:
             if (equipped_item.item_quality >= MAX_ITEM_QUALITY)
             {
-                LOG_ERROR("sql.sql", "Table `achievement_criteria_requirement` (Entry: {} Type: {}) for requirement ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPED_ITEM ({}) has unknown quality state in value1 ({}), ignored.",
+                LOG_ERROR("sql.sql", "Table `achievement_criteria_requirement` (Entry: {} Type: {}) for requirement ACHIEVEMENT_CRITERIA_REQUIRE_S_EQUIPPED_ITEM ({}) has unknown quality state in value1 ({}), ignored.",
                                  criteria->ID, criteria->requiredType, dataType, equipped_item.item_quality);
                 return false;
             }
@@ -304,11 +304,11 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_NONE:
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_CREATURE:
-            if (!target || target->GetTypeId() != TYPEID_UNIT)
+            if (!target || !target->IsCreature())
                 return false;
             return target->GetEntry() == creature.id;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE:
-            if (!target || target->GetTypeId() != TYPEID_PLAYER)
+            if (!target || !target->IsPlayer())
                 return false;
             if (classRace.class_id && classRace.class_id != target->ToPlayer()->getClass())
                 return false;
@@ -316,7 +316,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE:
-            if (!source || source->GetTypeId() != TYPEID_PLAYER)
+            if (!source || !source->IsPlayer())
                 return false;
             if (classRace.class_id && classRace.class_id != source->ToPlayer()->getClass())
                 return false;
@@ -324,7 +324,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
                 return false;
             return true;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_LESS_HEALTH:
-            if (!target || target->GetTypeId() != TYPEID_PLAYER)
+            if (!target || !target->IsPlayer())
                 return false;
             return !target->HealthAbovePct(health.percent);
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_DEAD:
@@ -371,7 +371,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             return source->GetMap()->GetPlayersCountExceptGMs() <= map_players.maxcount;
         case ACHIEVEMENT_CRITERIA_DATA_TYPE_T_TEAM:
         {
-            if (!target || target->GetTypeId() != TYPEID_PLAYER)
+            if (!target || !target->IsPlayer())
                 return false;
 
             // DB data compatibility...
@@ -411,7 +411,7 @@ bool AchievementCriteriaData::Meets(uint32 criteria_id, Player const* source, Un
             }
             return instance->CheckAchievementCriteriaMeet(criteria_id, source, target, miscvalue1);
         }
-        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPED_ITEM:
+        case ACHIEVEMENT_CRITERIA_DATA_TYPE_S_EQUIPPED_ITEM:
         {
             ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(miscvalue1);
             if (!pProto)
@@ -481,6 +481,7 @@ bool AchievementCriteriaDataSet::Meets(Player const* source, Unit const* target,
 AchievementMgr::AchievementMgr(Player* player)
 {
     _player = player;
+    _offlineUpdatesDelayTimer = 0;
 }
 
 AchievementMgr::~AchievementMgr()
@@ -550,6 +551,10 @@ void AchievementMgr::DeleteFromDB(ObjectGuid::LowType lowguid)
     stmt->SetData(0, lowguid);
     trans->Append(stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_OFFLINE_UPDATES);
+    stmt->SetData(0, lowguid);
+    trans->Append(stmt);
+
     CharacterDatabase.CommitTransaction(trans);
 }
 
@@ -609,7 +614,7 @@ void AchievementMgr::SaveToDB(CharacterDatabaseTransaction trans)
     }
 }
 
-void AchievementMgr::LoadFromDB(PreparedQueryResult achievementResult, PreparedQueryResult criteriaResult)
+void AchievementMgr::LoadFromDB(PreparedQueryResult achievementResult, PreparedQueryResult criteriaResult, PreparedQueryResult offlineUpdatesResult)
 {
     if (achievementResult)
     {
@@ -668,6 +673,28 @@ void AchievementMgr::LoadFromDB(PreparedQueryResult achievementResult, PreparedQ
             progress.date    = date;
             progress.changed = false;
         } while (criteriaResult->NextRow());
+    }
+
+    if (offlineUpdatesResult)
+    {
+        uint32 count = 0;
+        do
+        {
+            Field* fields = offlineUpdatesResult->Fetch();
+
+            AchievementOfflinePlayerUpdate update;
+            update.updateType = static_cast<AchievementOfflinePlayerUpdateType>(fields[0].Get<uint8>());
+            update.arg1       = fields[1].Get<uint32>();
+            update.arg2       = fields[2].Get<uint32>();
+            update.arg3       = fields[3].Get<uint32>();
+
+            _offlineUpdatesQueue.push_back(update);
+
+            ++count;
+        } while (offlineUpdatesResult->NextRow());
+
+        if (count > 0)
+            _offlineUpdatesDelayTimer = 5 * SECOND * IN_MILLISECONDS;
     }
 }
 
@@ -884,7 +911,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_NUMBER_OF_TALENT_RESETS:
             case ACHIEVEMENT_CRITERIA_TYPE_LOSE_DUEL:
             case ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION:
-            case ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS:    /* FIXME: for online player only currently */
+            case ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS:
             case ACHIEVEMENT_CRITERIA_TYPE_ROLL_NEED:
             case ACHIEVEMENT_CRITERIA_TYPE_ROLL_GREED:
             case ACHIEVEMENT_CRITERIA_TYPE_ROLL_DISENCHANT:
@@ -904,7 +931,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
             case ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_AT_BARBER:
             case ACHIEVEMENT_CRITERIA_TYPE_GOLD_SPENT_FOR_MAIL:
             case ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY:
-            case ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS:/* FIXME: for online player only currently */
+            case ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS:
             case ACHIEVEMENT_CRITERIA_TYPE_TOTAL_DAMAGE_RECEIVED:
             case ACHIEVEMENT_CRITERIA_TYPE_TOTAL_HEALING_RECEIVED:
             case ACHIEVEMENT_CRITERIA_TYPE_USE_LFD_TO_GROUP_WITH_PLAYERS:
@@ -915,7 +942,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 break;
             // std case: high value at miscvalue1
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_BID:
-            case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_SOLD: /* FIXME: for online player only currently */
+            case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_SOLD:
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_DEALT:
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HIT_RECEIVED:
             case ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_HEAL_CASTED:
@@ -1474,7 +1501,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                             continue;
 
                         // map specific case (BG in fact) expected player targeted damage/heal
-                        if (!unit || unit->GetTypeId() != TYPEID_PLAYER)
+                        if (!unit || !unit->IsPlayer())
                             continue;
                     }
 
@@ -2158,6 +2185,22 @@ void AchievementMgr::RemoveCriteriaProgress(const AchievementCriteriaEntry* entr
     _criteriaProgress.erase(criteriaProgress);
 }
 
+void AchievementMgr::Update(uint32 timeDiff)
+{
+    if (_offlineUpdatesDelayTimer > 0)
+    {
+        if (timeDiff >= _offlineUpdatesDelayTimer)
+        {
+            _offlineUpdatesDelayTimer = 0;
+            ProcessOfflineUpdatesQueue();
+        }
+        else
+            _offlineUpdatesDelayTimer -= timeDiff;
+    }
+
+    UpdateTimedAchievements(timeDiff);
+}
+
 void AchievementMgr::UpdateTimedAchievements(uint32 timeDiff)
 {
     if (!_timedAchievements.empty())
@@ -2435,6 +2478,46 @@ bool AchievementMgr::CanUpdateCriteria(AchievementCriteriaEntry const* criteria,
 CompletedAchievementMap const& AchievementMgr::GetCompletedAchievements()
 {
     return _completedAchievements;
+}
+
+void AchievementMgr::ProcessOfflineUpdatesQueue()
+{
+    if (_offlineUpdatesQueue.empty())
+        return;
+
+    for (auto const& update : _offlineUpdatesQueue)
+        ProcessOfflineUpdate(update);
+
+    _offlineUpdatesQueue.clear();
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACHIEVEMENT_OFFLINE_UPDATES);
+    stmt->SetData(0, GetPlayer()->GetGUID().GetCounter());
+    CharacterDatabase.Execute(stmt);
+}
+
+void AchievementMgr::ProcessOfflineUpdate(AchievementOfflinePlayerUpdate const& update)
+{
+    switch (update.updateType)
+    {
+        case ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_COMPLETE_ACHIEVEMENT:
+        {
+            AchievementEntry const* achievement = sAchievementStore.LookupEntry(update.arg1);
+
+            ASSERT(achievement != NULL, "Not found achievement to complete for offline achievements update. Wrong arg1 ({}) value?", update.arg1);
+
+            CompletedAchievement(achievement);
+            break;
+        }
+        case ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_UPDATE_CRITERIA:
+        {
+            AchievementCriteriaTypes criteriaType = static_cast<AchievementCriteriaTypes>(update.arg1);
+            UpdateAchievementCriteria(criteriaType, update.arg2, update.arg3);
+            break;
+        }
+        default:
+            ASSERT(false, "Unknown offline achievement update type ({}) for player - {}", update.updateType, GetPlayer()->GetGUID().GetCounter());
+            break;
+    }
 }
 
 AchievementGlobalMgr* AchievementGlobalMgr::instance()
@@ -3053,4 +3136,26 @@ void AchievementGlobalMgr::LoadRewardLocales()
 AchievementEntry const* AchievementGlobalMgr::GetAchievement(uint32 achievementId) const
 {
     return sAchievementStore.LookupEntry(achievementId);
+}
+
+void AchievementGlobalMgr::CompletedAchievementForOfflinePlayer(ObjectGuid::LowType playerLowGuid, AchievementEntry const* entry)
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT_OFFLINE_UPDATES);
+    stmt->SetData(0, playerLowGuid);
+    stmt->SetData(1, uint32(ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_COMPLETE_ACHIEVEMENT));
+    stmt->SetData(2, entry->ID);
+    stmt->SetData(3, 0);
+    stmt->SetData(4, 0);
+    CharacterDatabase.Execute(stmt);
+}
+
+void AchievementGlobalMgr::UpdateAchievementCriteriaForOfflinePlayer(ObjectGuid::LowType playerLowGuid, AchievementCriteriaTypes type, uint32 miscValue1, uint32 miscValue2)
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT_OFFLINE_UPDATES);
+    stmt->SetData(0, playerLowGuid);
+    stmt->SetData(1, uint32(ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_UPDATE_CRITERIA));
+    stmt->SetData(2, type);
+    stmt->SetData(3, miscValue1);
+    stmt->SetData(4, miscValue2);
+    CharacterDatabase.Execute(stmt);
 }

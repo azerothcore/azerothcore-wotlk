@@ -379,7 +379,7 @@ class spell_pri_lightwell : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void HandleScriptEffect(SpellEffIndex /* effIndex */)

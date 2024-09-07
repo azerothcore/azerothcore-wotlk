@@ -447,7 +447,7 @@ public:
                 case EVENT_REINSTALL:
                     for (uint8 i = RAID_MODE(0, 2); i < 4; ++i)
                         if (Unit* seat = vehicle->GetPassenger(i))
-                            if (seat->GetTypeId() == TYPEID_UNIT)
+                            if (seat->IsCreature())
                                 seat->ToCreature()->AI()->EnterEvadeMode();
                     Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
                     return;
@@ -758,7 +758,7 @@ public:
 
         void PassengerBoarded(Unit* who, int8 seatId, bool apply) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER || !me->GetVehicle())
+            if (!who->IsPlayer() || !me->GetVehicle())
                 return;
 
             who->ApplySpellImmune(63847, IMMUNITY_ID, 63847, apply); // SPELL_FLAME_VENTS_TRIGGER
@@ -780,7 +780,7 @@ public:
                     {
                         turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
                         turret->SetImmuneToAll(true);
-                        if (turret->GetTypeId() == TYPEID_UNIT)
+                        if (turret->IsCreature())
                             turret->ToCreature()->AI()->EnterEvadeMode();
                     }
                 }
@@ -829,7 +829,7 @@ public:
 
         bool CanAIAttack(Unit const* who) const override
         {
-            if (!who || who->GetTypeId() != TYPEID_PLAYER || !who->GetVehicle() || who->GetVehicleBase()->GetEntry() != NPC_SEAT)
+            if (!who || !who->IsPlayer() || !who->GetVehicle() || who->GetVehicleBase()->GetEntry() != NPC_SEAT)
                 return false;
             return true;
         }
@@ -1231,7 +1231,7 @@ public:
         {
             if (!_lock)
             {
-                if (who->GetTypeId() != TYPEID_PLAYER && !who->IsVehicle())
+                if (!who->IsPlayer() && !who->IsVehicle())
                     return;
 
                 // MIMIRON
@@ -1753,7 +1753,7 @@ class spell_vehicle_grab_pyrite : public SpellScript
                     GetCaster()->CastSpell(parent, SPELL_ADD_PYRITE, true);
                     target->CastSpell(seat, GetEffectValue());
 
-                    if (target->GetTypeId() == TYPEID_UNIT)
+                    if (target->IsCreature())
                         target->ToCreature()->DespawnOrUnsummon(1300);
                 }
             }
@@ -1927,7 +1927,7 @@ class spell_demolisher_ride_vehicle : public SpellScript
 
     SpellCastResult CheckCast()
     {
-        if (GetCaster()->GetTypeId() != TYPEID_PLAYER)
+        if (!GetCaster()->IsPlayer())
             return SPELL_CAST_OK;
 
         Unit* target = this->GetExplTargetUnit();

@@ -252,7 +252,7 @@ public:
         if (target->GetExactDist(_source) > 80.0f)
             return false;
 
-        if (target->GetTypeId() != TYPEID_PLAYER)
+        if (!target->IsPlayer())
             return false;
 
         if (target->HasAura(SPELL_FROST_IMBUED_BLADE))
@@ -1168,7 +1168,7 @@ class spell_sindragosa_soul_preservation_aura : public AuraScript
             {
                 s->CastSpell(s, 72466, true);
                 s->RemoveAurasDueToSpell(72424);
-                if (s->GetTypeId() == TYPEID_UNIT) s->ToCreature()->SetLootMode(3);
+                if (s->IsCreature()) s->ToCreature()->SetLootMode(3);
                 SetDuration(1);
             }
     }

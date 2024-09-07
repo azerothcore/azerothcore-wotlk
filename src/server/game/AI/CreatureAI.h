@@ -225,6 +225,9 @@ public:
 
     virtual bool OnTeleportUnreacheablePlayer(Player* /*player*/) { return false; }
 
+    // Called when an aura is removed or expires.
+    virtual void OnAuraRemove(AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
+
 protected:
     virtual void MoveInLineOfSight(Unit* /*who*/);
 

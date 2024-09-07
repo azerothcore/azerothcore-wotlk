@@ -91,7 +91,7 @@ namespace Acore
     {
         Unit& i_unit;
         bool isCreature;
-        explicit AIRelocationNotifier(Unit& unit) : i_unit(unit), isCreature(unit.GetTypeId() == TYPEID_UNIT)  {}
+        explicit AIRelocationNotifier(Unit& unit) : i_unit(unit), isCreature(unit.IsCreature())  {}
         template<class T> void Visit(GridRefMgr<T>&) {}
         void Visit(CreatureMapType&);
     };
@@ -864,7 +864,7 @@ namespace Acore
         bool operator()(Unit* u)
         {
             if (u->IsAlive() && !u->IsCritter() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u) &&
-                    (i_funit->GetTypeId() != TYPEID_UNIT || !i_funit->ToCreature()->IsAvoidingAOE())) // pussywizard
+                    (!i_funit->IsCreature() || !i_funit->ToCreature()->IsAvoidingAOE())) // pussywizard
                 return true;
             else
                 return false;
@@ -887,7 +887,7 @@ namespace Acore
             if (u->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
                 return false;
 
-            if (u->GetTypeId() == TYPEID_UNIT && (u->ToCreature()->IsTotem() || u->ToCreature()->IsTrigger() || u->ToCreature()->IsAvoidingAOE())) // pussywizard: added IsAvoidingAOE()
+            if (u->IsCreature() && (u->ToCreature()->IsTotem() || u->ToCreature()->IsTrigger() || u->ToCreature()->IsAvoidingAOE())) // pussywizard: added IsAvoidingAOE()
                 return false;
 
             if (!u->isTargetableForAttack(false, i_funit))
@@ -918,7 +918,7 @@ namespace Acore
                 return false;
             }
 
-            if (u->GetTypeId() == TYPEID_UNIT && u->ToCreature()->IsTotem())
+            if (u->IsCreature() && u->ToCreature()->IsTotem())
             {
                 return false;
             }
@@ -930,7 +930,7 @@ namespace Acore
 
             uint32 losChecks = LINEOFSIGHT_ALL_CHECKS;
             Optional<float> collisionHeight = { };
-            if (i_obj->GetTypeId() == TYPEID_GAMEOBJECT)
+            if (i_obj->IsGameObject())
             {
                 losChecks &= ~LINEOFSIGHT_CHECK_GOBJECT_M2;
                 collisionHeight = i_owner->GetCollisionHeight();
@@ -1203,7 +1203,7 @@ namespace Acore
             if (!me->IsValidAttackTarget(u))
                 return false;
 
-            if (i_playerOnly && u->GetTypeId() != TYPEID_PLAYER)
+            if (i_playerOnly && !u->IsPlayer())
                 return false;
 
             m_range = me->GetDistance(u);   // use found unit range as new range limit for next check

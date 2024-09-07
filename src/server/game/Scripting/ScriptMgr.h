@@ -648,6 +648,7 @@ public: /* ArenaScript */
     bool CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid);
     void OnGetPoints(ArenaTeam* team, uint32 memberRating, float& points);
     bool CanSaveToDB(ArenaTeam* team);
+    bool OnBeforeArenaCheckWinConditions(Battleground* const bg);
 
 public: /* MiscScript */
 

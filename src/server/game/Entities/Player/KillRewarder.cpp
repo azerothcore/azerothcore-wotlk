@@ -138,7 +138,7 @@ void KillRewarder::_InitXP(Player* player)
         _xp = Acore::XP::Gain(player, _victim, _isBattleGround);
 
     if (_xp && !_isBattleGround && _victim) // pussywizard: npcs with relatively low hp give lower exp
-        if (_victim->GetTypeId() == TYPEID_UNIT)
+        if (_victim->IsCreature())
             if (const CreatureTemplate* ct = _victim->ToCreature()->GetCreatureTemplate())
                 if (ct->ModHealth <= 0.75f && ct->ModHealth >= 0.0f)
                     _xp = uint32(_xp * ct->ModHealth);

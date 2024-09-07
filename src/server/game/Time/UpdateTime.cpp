@@ -20,6 +20,7 @@
 #include "Log.h"
 #include "Timer.h"
 #include <algorithm>
+#include <cmath>
 #include <iterator>
 
 // create instance
@@ -87,12 +88,12 @@ uint32 UpdateTime::GetPercentile(uint8 p)
     double index = (double(p) / 100.0) * (GetDatasetSize() - 1);
 
     // If the index is an integer, return the value at that index
-    if (index == floor(index))
+    if (index == std::floor(index))
        return _orderedUpdateTimeDataTable[index];
 
     // Otherwise, perform linear interpolation
-    int lowerIndex = floor(index);
-    int upperIndex = ceil(index);
+    int lowerIndex = std::floor(index);
+    int upperIndex = std::ceil(index);
     double fraction = index - lowerIndex;
 
     return _orderedUpdateTimeDataTable[lowerIndex] * (1 - fraction) + _orderedUpdateTimeDataTable[upperIndex] * fraction;
@@ -150,7 +151,7 @@ void UpdateTime::SortUpdateTimeDataTable()
 
 void WorldUpdateTime::LoadFromConfig()
 {
-    _recordUpdateTimeInverval = Milliseconds(sConfigMgr->GetOption<uint32>("RecordUpdateTimeDiffInterval", 60000));
+    _recordUpdateTimeInverval = Milliseconds(sConfigMgr->GetOption<uint32>("RecordUpdateTimeDiffInterval", 300000));
     _recordUpdateTimeMin = Milliseconds(sConfigMgr->GetOption<uint32>("MinRecordUpdateTimeDiff", 100));
 }
 

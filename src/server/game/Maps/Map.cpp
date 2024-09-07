@@ -594,7 +594,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     if (!obj->IsNPCBotOrPet())
     //end npcbot
     if (checkTransport)
-        if (!(obj->GetTypeId() == TYPEID_GAMEOBJECT && obj->ToGameObject()->IsTransport())) // dont add transport to transport ;d
+        if (!(obj->IsGameObject() && obj->ToGameObject()->IsTransport())) // dont add transport to transport ;d
             if (Transport* transport = GetTransportForPos(obj->GetPhaseMask(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj))
                 transport->AddPassenger(obj, true);
 
@@ -609,7 +609,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 
     // Xinef: little hack for vehicles, accessories have to be added after visibility update so they wont fall off the vehicle, moved from Creature::AIM_Initialize
     // Initialize vehicle, this is done only for summoned npcs, DB creatures are handled by grid loaders
-    if (obj->GetTypeId() == TYPEID_UNIT)
+    if (obj->IsCreature())
         if (Vehicle* vehicle = obj->ToCreature()->GetVehicleKit())
             vehicle->Reset();
     return true;
@@ -2684,8 +2684,8 @@ void Map::AddObjectToSwitchList(WorldObject* obj, bool on)
 {
     ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
     // i_objectsToSwitch is iterated only in Map::RemoveAllObjectsInRemoveList() and it uses
-    // the contained objects only if GetTypeId() == TYPEID_UNIT , so we can return in all other cases
-    if (obj->GetTypeId() != TYPEID_UNIT && obj->GetTypeId() != TYPEID_GAMEOBJECT)
+    // the contained objects only if IsCreature() , so we can return in all other cases
+    if (!obj->IsCreature() && !obj->IsGameObject())
         return;
 
     std::map<WorldObject*, bool>::iterator itr = i_objectsToSwitch.find(obj);

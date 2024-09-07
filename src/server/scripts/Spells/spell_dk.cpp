@@ -615,7 +615,7 @@ class spell_dk_dancing_rune_weapon : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (!eventInfo.GetActor() || !eventInfo.GetActionTarget() || !eventInfo.GetActionTarget()->IsAlive() || eventInfo.GetActor()->GetTypeId() != TYPEID_PLAYER)
+        if (!eventInfo.GetActor() || !eventInfo.GetActionTarget() || !eventInfo.GetActionTarget()->IsAlive() || !eventInfo.GetActor()->IsPlayer())
             return false;
 
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();

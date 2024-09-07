@@ -323,7 +323,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             Talk(SAY_KILL);
@@ -387,7 +387,7 @@ public:
             {
                 bool checklife = false;
                 bool checkdead = false;
-                for (const auto& i : PlayerList)
+                for (auto const& i : PlayerList)
                 {
                     Player* player = i.GetSource();
                     if (player->IsAlive() &&

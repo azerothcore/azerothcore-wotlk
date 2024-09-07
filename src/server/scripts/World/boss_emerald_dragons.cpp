@@ -464,10 +464,8 @@ public:
             if (!summoner)
                 return;
 
-            if (summoner->GetTypeId() != TYPEID_UNIT)
-            {
+            if (!summoner->IsCreature())
                 return;
-            }
 
             _summonerGuid = summoner->GetGUID();
             me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), 0.0f, 0.0f);

@@ -1584,7 +1584,7 @@ struct npc_coren_direbrew : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_events.IsInPhase(PHASE_ALL) || who->GetTypeId() != TYPEID_PLAYER)
+        if (!_events.IsInPhase(PHASE_ALL) || !who->IsPlayer())
         {
             return;
         }
