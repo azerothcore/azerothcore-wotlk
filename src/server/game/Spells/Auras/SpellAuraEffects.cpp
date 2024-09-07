@@ -2773,6 +2773,7 @@ void AuraEffect::HandleAuraModScale(AuraApplication const* aurApp, uint8 mode, b
     if (!(mode & AURA_EFFECT_HANDLE_CHANGE_AMOUNT_SEND_FOR_CLIENT_MASK))
         return;
 
+    //aurApp->GetTarget()->RecalculateObjectScale();
     Unit* target = aurApp->GetTarget();
     float scale = target->GetObjectScale();
     ApplyPercentModFloatVar(scale, float(GetAmount()), apply);
