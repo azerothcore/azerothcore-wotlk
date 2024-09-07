@@ -62,7 +62,6 @@ enum Spells
     SPELL_PARASITIC_SHADOWFIEND         = 41917,
     SPELL_PARASITIC_SHADOWFIEND_TRIGGER = 41914,
     SPELL_SUMMON_PARASITIC_SHADOWFIENDS = 41915,
-    SPELL_SHEAR                         = 41032,
 
     // Phase 2
     SPELL_THROW_GLAIVE                  = 39635,
@@ -456,10 +455,6 @@ struct boss_illidan_stormrage : public BossAI
                     DoCastVictim(SPELL_FLAME_CRASH);
                 }, 26s, 35s);
 
-                ScheduleTimedEvent(10s, [&] {
-                    DoCastVictim(SPELL_SHEAR);
-                }, 12s, 15s);
-
                 ScheduleTimedEvent(32s, [&] {
                     DoCastVictim(SPELL_DRAW_SOUL);
                 }, 32s);
@@ -527,10 +522,6 @@ struct boss_illidan_stormrage : public BossAI
                 ScheduleTimedEvent(25s, 30s, [&] {
                     DoCastVictim(SPELL_FLAME_CRASH);
                 }, 26s, 35s);
-
-                ScheduleTimedEvent(10s, [&] {
-                    DoCastVictim(SPELL_SHEAR);
-                }, 12s, 15s);
 
                 ScheduleTimedEvent(32s, [&] {
                     DoCastVictim(SPELL_DRAW_SOUL);
