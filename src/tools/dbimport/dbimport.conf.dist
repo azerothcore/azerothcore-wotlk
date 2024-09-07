@@ -160,6 +160,17 @@ CharacterDatabase.SynchThreads = 1
 Updates.EnableDatabases = 7
 
 #
+#   Updates.AllowedModules
+#       Description: A list of modules that are allowed to be updated automatically by the DBImport tool.
+#                    If the list is empty, no modules are allowed to automatically update. (current behavior)
+#       Default:     "" - (No modules are allowed)
+#
+#       Example:     "mod_name,mod_name2,mod_name3" (selected modules)
+#                     "all" - (All modules are allowed)
+#
+Updates.AllowedModules = "all"
+
+#
 #    Updates.AutoSetup
 #        Description: Auto populate empty databases.
 #        Default:     1 - (Enabled)
