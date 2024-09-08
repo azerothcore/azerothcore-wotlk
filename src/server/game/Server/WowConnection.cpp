@@ -787,8 +787,9 @@ bool WowConnection::HandlePing(WDataStore& recvPacket)
 }
 
 std::map<NETMESSAGE, MSGHANDLER> WowConnection::m_handlers;
+std::map<NETMESSAGE, uint32_t> WowConnection::m_handlerPermissions;
 
-int WowConnection::SetMessageHandler(NETMESSAGE msgId, MSGHANDLER handler) {
+int WowConnection::SetMessageHandler(NETMESSAGE msgId, MSGHANDLER handler, uint32_t security /*= DEFAULT_SECURITY*/) {
     if (msgId >= NUM_MSG_TYPES) {
         // TODO: handle error
         return 0;
@@ -797,11 +798,12 @@ int WowConnection::SetMessageHandler(NETMESSAGE msgId, MSGHANDLER handler) {
         // TODO: handle error
         return 0;
     }
-    if (m_handlers.contains(static_cast<NETMESSAGE>(msgId))) {
+    if (m_handlers.contains(msgId)) {
         // TODO: handle error
         return 0;
     }
     m_handlers[msgId] = handler;
+    m_handlerPermissions[msgId] = security;
     return 1;
 }
 
@@ -810,6 +812,7 @@ int WowConnection::ClearMessageHandler(NETMESSAGE msgId) {
         // TODO: handle error
         return 0;
     }
-    m_handlers[msgId] = nullptr;
+    m_handlers.erase(msgId);
+    m_handlerPermissions.erase(msgId);
     return 1;
 }

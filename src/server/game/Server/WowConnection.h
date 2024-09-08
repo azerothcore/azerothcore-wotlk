@@ -30,10 +30,10 @@
 
 using boost::asio::ip::tcp;
 
-typedef int(*MSGHANDLER)(User*        user,
-                         NETMESSAGE      msgId,
-                         uint32_t     eventTime,
-                         WDataStore* msg);
+typedef int(*MSGHANDLER) (User*        user,
+                          NETMESSAGE   msgId,
+                          uint32_t     eventTime,
+                          WDataStore*  msg);
 
 class EncryptableAndCompressiblePacket : public WDataStore
 {
@@ -91,10 +91,11 @@ public:
 
     void SetSendBufferSize(std::size_t sendBufferSize) { _sendBufferSize = sendBufferSize; }
 
-    static int SetMessageHandler(NETMESSAGE msgId, MSGHANDLER handler);
+    static int SetMessageHandler(NETMESSAGE msgId, MSGHANDLER handler, uint32_t security = 0);
     static int ClearMessageHandler(NETMESSAGE msgId);
 
     static std::map<NETMESSAGE, MSGHANDLER> m_handlers;
+    static std::map<NETMESSAGE, uint32_t> m_handlerPermissions;
 
 protected:
     void OnClose() override;

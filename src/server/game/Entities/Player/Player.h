@@ -21,6 +21,7 @@
 #include "ArenaTeam.h"
 #include "Battleground.h"
 #include "CharacterCache.h"
+#include "CharacterServices.h"
 #include "CinematicMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnvFwd.h"
@@ -38,6 +39,7 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "TradeData.h"
+#include "WowConnection.h"
 #include "Unit.h"
 #include "User.h"
 #include "FriendList.h"
@@ -1082,6 +1084,8 @@ public:
     void CleanupsBeforeDelete(bool finalCleanup = true) override;
 
     FriendList* FriendListPtr();
+
+    CHAR_SECURITY_GROUP GetSecurityGroup() const { return m_securityGroup; }
 
     bool IsResting () const { return HasPlayerFlag(PLAYER_FLAGS_RESTING); }
 
@@ -2906,6 +2910,7 @@ public:
 private:
 
     //uint m_cheatFlags;
+    CHAR_SECURITY_GROUP m_securityGroup;
 
     // internal common parts for CanStore/StoreItem functions
     BAG_RESULT CanStoreItem_InSpecificSlot(uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemTemplate const* pProto, uint32& count, bool swap, Item* pSrcItem) const;

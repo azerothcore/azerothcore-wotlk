@@ -684,7 +684,7 @@ void FriendListInitialize () {
     return;
   }
 
-  WowConnection::SetMessageHandler(CMSG_WHOIS, WhoIsHandler);
+  WowConnection::SetMessageHandler(CMSG_WHOIS, WhoIsHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_CONTACT_LIST, ContactListHandler);
   WowConnection::SetMessageHandler(CMSG_ADD_FRIEND, AddFriendHandler);
   WowConnection::SetMessageHandler(CMSG_DEL_FRIEND, DeleteFriendHandler);
