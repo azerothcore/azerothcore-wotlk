@@ -358,8 +358,6 @@ public: /* PlayerScript */
     void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
     void OnPlayerJoinBG(Player* player);
     void OnPlayerJoinArena(Player* player);
-    void GetCustomGetArenaTeamId(Player const* player, uint8 slot, uint32& teamID) const;
-    void GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const;
     void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
     void OnBeforeFillQuestLootItem(Player* player, LootItem& item);
