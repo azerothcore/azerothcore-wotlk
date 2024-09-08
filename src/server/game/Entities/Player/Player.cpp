@@ -123,14 +123,14 @@ static void PlayerDechargeCheat (User*        user,
 //===========================================================================
 void PlayerInitialize () {
   // REGISTER MESSAGE HANDLERS
-  WowConnection::SetMessageHandler(CMSG_RECHARGE, PlayerRechargeCheat);
-  WowConnection::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler);
-  WowConnection::SetMessageHandler(CMSG_GODMODE, OnGodMode);
-  WowConnection::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler);
+  WowConnection::SetMessageHandler(CMSG_RECHARGE, PlayerRechargeCheat, GM_SECURITY);
+  WowConnection::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler, GM_SECURITY);
+  WowConnection::SetMessageHandler(CMSG_GODMODE, OnGodMode, GM_SECURITY);
+  WowConnection::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
   WowConnection::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
-  WowConnection::SetMessageHandler(CMSG_DECHARGE, PlayerDechargeCheat);
-  WowConnection::SetMessageHandler(CMSG_LEVEL_CHEAT, PlayerLevelCheatHandler);
+  WowConnection::SetMessageHandler(CMSG_DECHARGE, PlayerDechargeCheat, GM_SECURITY);
+  WowConnection::SetMessageHandler(CMSG_LEVEL_CHEAT, PlayerLevelCheatHandler, GM_SECURITY);
 }
 
 //===========================================================================
@@ -14952,6 +14952,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, IsInWorld() && !User()->CharacterLoggingOut() ? 1 : 0);
         // Index
         stmt->SetData(index++, GetGUID().GetCounter());
+        stmt->SetData(index++, GetSecurityGroup());
     }
 
     trans->Append(stmt);

@@ -406,7 +406,12 @@ bool User::Update(uint32 diff, PacketFilter& updater)
     {
         // New msg system:
         if (WowConnection::m_handlers.contains(static_cast<NETMESSAGE>(packet->GetOpcode()))) {
-            WowConnection::m_handlers[static_cast<NETMESSAGE>(packet->GetOpcode())](this, static_cast<NETMESSAGE>(packet->GetOpcode()), currentTime, packet);
+            auto requiredPermission = WowConnection::m_handlerPermissions.at(static_cast<NETMESSAGE>(packet->GetOpcode()));
+            if ((ActivePlayer() && ActivePlayer()->GetSecurityGroup() < requiredPermission) ||
+                (!ActivePlayer() && requiredPermission > DEFAULT_SECURITY && !IsGMAccount())) {
+                SendNotification(LANG_PERMISSION_DENIED);
+            } else
+                WowConnection::m_handlers[static_cast<NETMESSAGE>(packet->GetOpcode())](this, static_cast<NETMESSAGE>(packet->GetOpcode()), currentTime, packet);
         }
         else {  // TODO: NUKE ALL THIS GARBAGE
             OpcodeClient opcode = static_cast<OpcodeClient>(packet->GetOpcode());
@@ -1894,7 +1899,7 @@ static void UserWorldTeleportHandler (User*       user,
 void UserInitialize () {
   if (s_initialized) return;
 
-  WowConnection::SetMessageHandler(CMSG_WORLD_TELEPORT, UserWorldTeleportHandler);
+  WowConnection::SetMessageHandler(CMSG_WORLD_TELEPORT, UserWorldTeleportHandler, GM_SECURITY);
 
   s_initialized = true;
 }
