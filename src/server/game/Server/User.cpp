@@ -58,7 +58,7 @@
 
 static bool s_initialized;
 
-static BOOL UserWorldTeleportHandler (User*       user,
+static void UserWorldTeleportHandler (User*       user,
                                       NETMESSAGE  msgId,
                                       uint        eventTime,
                                       WDataStore* msg);
@@ -1856,14 +1856,14 @@ void User::SendPlayerNotFoundFailure()
 ***/
 
 //===========================================================================
-static BOOL UserWorldTeleportHandler (User*       user,
+static void UserWorldTeleportHandler (User*       user,
                                       NETMESSAGE  msgId,
                                       uint        eventTime,
                                       WDataStore* msg) {
 
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
-    return FALSE;
+    return;
   }
 
   // READ THE MESSAGE DATA
@@ -1878,7 +1878,7 @@ static BOOL UserWorldTeleportHandler (User*       user,
   Player* playerPtr = player ? ObjectAccessor::FindPlayer(player) : user->ActivePlayer();
   if (!playerPtr) {
     // TODO: Look for a matching character GUID in DB and set its position offline
-    return FALSE;
+    return;
   }
 
   // WRITE THE ACTION TO THE GM LOG
@@ -1888,7 +1888,6 @@ static BOOL UserWorldTeleportHandler (User*       user,
 
   // TELEPORT THE PLAYER
   playerPtr->Teleport(continentID, position.x, position.y, position.z, facing, TELE_TO_GM_MODE);
-  return TRUE;
 }
 
 //===========================================================================

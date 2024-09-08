@@ -80,35 +80,35 @@
 *
 ***/
 
-static BOOL PlayerCreateItemCheatHandler (User*       user,
+static void PlayerCreateItemCheatHandler (User*       user,
                                           NETMESSAGE  msgId,
                                           uint32_t    eventTime,
                                           WDataStore* msg);
-static BOOL OnGodMode (User*        user,
+static void OnGodMode (User*        user,
                        NETMESSAGE   msgId,
                        uint         eventTime,
                        WDataStore*  msg);
-static BOOL PlayerLearnSpellCheatHandler (User*       user,
+static void PlayerLearnSpellCheatHandler (User*       user,
                                           NETMESSAGE  msgId,
                                           uint        eventTime,
                                           WDataStore* msg);
-static BOOL PlayerLevelCheatHandler (User*        user,
+static void PlayerLevelCheatHandler (User*        user,
                                      NETMESSAGE   msgId,
                                      uint         eventTime,
                                      WDataStore*  msg);
-static BOOL PlayerLogoutRequestHandler (User*       user,
+static void PlayerLogoutRequestHandler (User*       user,
                                         NETMESSAGE  msgId,
                                         uint32_t    eventTime,
                                         WDataStore* msg);
-static BOOL PlayerLogoutCancelHandler (User*        user,
+static void PlayerLogoutCancelHandler (User*        user,
                                        NETMESSAGE   msgId,
                                        uint32_t     eventTime,
                                        WDataStore*  msg);
-static BOOL PlayerRechargeCheat (User*        user,
+static void PlayerRechargeCheat (User*        user,
                                  NETMESSAGE   msgId,
                                  uint         eventTime,
                                  WDataStore*  msg);
-static BOOL PlayerDechargeCheat (User*        user,
+static void PlayerDechargeCheat (User*        user,
                                  NETMESSAGE   msgId,
                                  uint         eventTime,
                                  WDataStore*  msg);
@@ -16359,14 +16359,14 @@ void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
 ***/
 
 //===========================================================================
-static BOOL PlayerCreateItemCheatHandler (User*       user,
+static void PlayerCreateItemCheatHandler (User*       user,
                                           NETMESSAGE  msgId,
                                           uint32_t    eventTime,
                                           WDataStore* msg) {
 
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
-    return FALSE;
+    return;
   }
 
   if (Player* plr = user->ActivePlayer()) {
@@ -16375,21 +16375,18 @@ static BOOL PlayerCreateItemCheatHandler (User*       user,
     auto quantity = msg->read<uint32_t>();
     // CREATE THE ITEM(S)
     plr->CreateItem(itemId, quantity);
-    return TRUE;
   }
-
-  return FALSE;
 }
 
 //===========================================================================
-static BOOL OnGodMode (User*        user,
+static void OnGodMode (User*        user,
                        NETMESSAGE   msgId,
                        uint         eventTime,
                        WDataStore*  msg) {
 
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
-    return FALSE;
+    return;
   }
 
   if (Player* plr = user->ActivePlayer()) {
@@ -16405,18 +16402,16 @@ static BOOL OnGodMode (User*        user,
     netMessage << (uchar)enable;
     user->Send(&netMessage);
   }
-
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL PlayerLearnSpellCheatHandler (User*       user,
+static void PlayerLearnSpellCheatHandler (User*       user,
                                           NETMESSAGE  msgId,
                                           uint        eventTime,
                                           WDataStore* msg) {
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
-    return FALSE;
+    return;
   }
 
   if (Player* plr = user->ActivePlayer()) {
@@ -16439,12 +16434,10 @@ static BOOL PlayerLearnSpellCheatHandler (User*       user,
     // Learn the spell
     plr->LearnSpell(spellId);
   }
-
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL PlayerLevelCheatHandler (User*        user,
+static void PlayerLevelCheatHandler (User*        user,
                                      NETMESSAGE   msgId,
                                      uint         eventTime,
                                      WDataStore*  msg) {
@@ -16452,7 +16445,7 @@ static BOOL PlayerLevelCheatHandler (User*        user,
   // VALIDATE USER PERMISSIONS
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
-    return FALSE;
+    return;
   }
 
   if (Player* plr = user->ActivePlayer()) {
@@ -16461,20 +16454,18 @@ static BOOL PlayerLevelCheatHandler (User*        user,
     // SET THE PLAYER LEVEL
     plr->SetLevel(level);
   }
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL PlayerLogoutCancelHandler (User*        user,
+static void PlayerLogoutCancelHandler (User*        user,
                                        NETMESSAGE   msgId,
                                        uint32_t     eventTime,
                                        WDataStore*  msg) {
   user->CharacterAbortLogout();
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL PlayerLogoutRequestHandler (User*       user,
+static void PlayerLogoutRequestHandler (User*       user,
                                         NETMESSAGE  msgId,
                                         uint32_t    eventTime,
                                         WDataStore* msg) {
@@ -16499,15 +16490,11 @@ static BOOL PlayerLogoutRequestHandler (User*       user,
     // IF WE SENT A SUCCESSFUL LOGOUT RESPONSE
     if (res.logoutFailed == FALSE)
       user->CharacterLogout(res.instantLogout);
-
-    return TRUE;
   }
-
-  return FALSE;
 }
 
 //===========================================================================
-static BOOL PlayerRechargeCheat (User*        user,
+static void PlayerRechargeCheat (User*        user,
                                  NETMESSAGE   msgId,
                                  uint         eventTime,
                                  WDataStore*  msg) {
@@ -16515,7 +16502,7 @@ static BOOL PlayerRechargeCheat (User*        user,
   // VALIDATE USER PERMISSIONS
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
-    return FALSE;
+    return;
   }
   if (Player* plr = user->ActivePlayer()) {
     // RECHARGE THE PLAYER'S HEALTH BAR
@@ -16526,11 +16513,10 @@ static BOOL PlayerRechargeCheat (User*        user,
     uint val = plr->GetMaxPower(power);
     plr->SetPower(power, val);
   }
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL PlayerDechargeCheat (User*        user,
+static void PlayerDechargeCheat (User*        user,
                                  NETMESSAGE   msgId,
                                  uint         eventTime,
                                  WDataStore*  msg) {
@@ -16538,7 +16524,7 @@ static BOOL PlayerDechargeCheat (User*        user,
   // VALIDATE USER PERMISSIONS
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
-    return FALSE;
+    return;
   }
 
   if (Player* plr = user->ActivePlayer()) {
@@ -16548,5 +16534,4 @@ static BOOL PlayerDechargeCheat (User*        user,
     POWER_TYPE power = plr->GetPowerType();
     plr->SetPower(power, 0);
   }
-  return TRUE;
 }

@@ -30,10 +30,10 @@
 
 using boost::asio::ip::tcp;
 
-typedef int(*MSGHANDLER)(User*        user,
-                         NETMESSAGE      msgId,
-                         uint32_t     eventTime,
-                         WDataStore* msg);
+typedef void(*MSGHANDLER) (User*        user,
+                           NETMESSAGE   msgId,
+                           uint32_t     eventTime,
+                           WDataStore*  msg);
 
 class EncryptableAndCompressiblePacket : public WDataStore
 {

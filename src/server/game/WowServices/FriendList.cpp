@@ -14,31 +14,31 @@
 typedef std::map<WOWGUID, FriendList*> FRIENDLISTMAP_T;
 
 
-static BOOL AddFriendHandler (User*       user,
+static void AddFriendHandler (User*       user,
                               NETMESSAGE  msgId,
                               uint32_t    eventTime,
                               WDataStore* msg);
-static BOOL AddIgnoreHandler (User*       user,
+static void AddIgnoreHandler (User*       user,
                               NETMESSAGE  msgId,
                               uint32_t    eventTime,
                               WDataStore* msg);
-static BOOL ContactListHandler (User*       user,
+static void ContactListHandler (User*       user,
                                 NETMESSAGE  msgId,
                                 uint32_t    eventTime,
                                 WDataStore* msg);
-static BOOL DeleteFriendHandler (User*        user,
+static void DeleteFriendHandler (User*        user,
                                  NETMESSAGE   msgId,
                                  uint32_t     eventTime,
                                  WDataStore*  msg);
-static BOOL DelIgnoreHandler (User*       user,
+static void DelIgnoreHandler (User*       user,
                               NETMESSAGE  msgId,
                               uint32_t    eventTime,
                               WDataStore* msg);
-static BOOL SetFriendNotesHandler (User*        user,
+static void SetFriendNotesHandler (User*        user,
                                    NETMESSAGE   msgId,
                                    uint32_t     eventTime,
                                    WDataStore*  msg);
-static BOOL WhoIsHandler (User*       user,
+static void WhoIsHandler (User*       user,
                           NETMESSAGE  msgId,
                           uint32_t    eventTime,
                           WDataStore* msg);
@@ -501,14 +501,14 @@ void FriendList::SetFriendNotes (WOWGUID const& guid, char const* notes) {
 ***/
 
 //===========================================================================
-static BOOL AddFriendHandler (User*       user,
+static void AddFriendHandler (User*       user,
                               NETMESSAGE  msgId,
                               uint32_t    eventTime,
                               WDataStore* msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
-    return FALSE;
+    return;
   }
 
   // Read the message data
@@ -519,11 +519,10 @@ static BOOL AddFriendHandler (User*       user,
   msg->GetString(notes, sizeof(notes));
 
   plr->FriendListPtr()->AddFriend(name, notes);
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL AddIgnoreHandler (User*       user,
+static void AddIgnoreHandler (User*       user,
                               NETMESSAGE  msgId,
                               uint32_t    eventTime,
                               WDataStore* msg) {
@@ -543,37 +542,34 @@ static BOOL AddIgnoreHandler (User*       user,
   else {
     friendList->SendFriendStatus(FRIEND_IGNORE_NOT_FOUND, WOWGUID());
   }
-
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL ContactListHandler (User*       user,
+static void ContactListHandler (User*       user,
                                 NETMESSAGE  msgId,
                                 uint32_t    eventTime,
                                 WDataStore* msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
-    return FALSE;
+    return;
   }
 
   // Read the message data
   auto flags = msg->read<uint32_t>();
 
   plr->FriendListPtr()->SendContactList(flags);
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL DeleteFriendHandler (User*        user,
+static void DeleteFriendHandler (User*        user,
                                  NETMESSAGE   msgId,
                                  uint32_t     eventTime,
                                  WDataStore*  msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
-    return FALSE;
+    return;
   }
 
   // Read the message data
@@ -586,38 +582,34 @@ static BOOL DeleteFriendHandler (User*        user,
   else {
     friendList->SendFriendStatus(FRIEND_DB_ERROR, guid);
   }
-
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL DelIgnoreHandler (User*       user,
+static void DelIgnoreHandler (User*       user,
                               NETMESSAGE  msgId,
                               uint32_t    eventTime,
                               WDataStore* msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
-    return FALSE;
+    return;
   }
 
   // Read the message data
   auto guid = msg->read<WOWGUID>();
 
   plr->FriendListPtr()->DelIgnore(guid);
-
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL SetFriendNotesHandler (User*        user,
+static void SetFriendNotesHandler (User*        user,
                                    NETMESSAGE   msgId,
                                    uint32_t     eventTime,
                                    WDataStore*  msg) {
 
   Player* plr = user->ActivePlayer();
   if (!plr) {
-    return FALSE;
+    return;
   }
 
   // Read the message data
@@ -633,19 +625,17 @@ static BOOL SetFriendNotesHandler (User*        user,
   else {
     friendList->SendFriendStatus(FRIEND_DB_ERROR, guid);
   }
-
-  return TRUE;
 }
 
 //===========================================================================
-static BOOL WhoIsHandler (User*       user,
+static void WhoIsHandler (User*       user,
                           NETMESSAGE  msgId,
                           uint32_t    eventTime,
                           WDataStore* msg) {
 
   if (!user->IsGMAccount()) {
     user->SendNotification(LANG_PERMISSION_DENIED);
-    return FALSE;
+    return;
   }
 
   // Read the message data
@@ -667,8 +657,6 @@ static BOOL WhoIsHandler (User*       user,
   WDataStore outbound(SMSG_WHOIS, strlen(szResponse) + 1);
   outbound << szResponse;
   user->Send(&outbound);
-
-  return TRUE;
 }
 
 
