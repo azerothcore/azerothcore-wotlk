@@ -1985,7 +1985,7 @@ void GameObject::Use(Unit* user)
                 }
                 //end npcbot
 
-                if (user->IsPlayer())
+                if (!user->IsPlayer())
                     return;
 
                 Player* player = user->ToPlayer();
@@ -2061,7 +2061,7 @@ void GameObject::Use(Unit* user)
                 }
                 //end npcbot
 
-                if (user->IsPlayer())
+                if (!user->IsPlayer())
                     return;
 
                 Player* player = user->ToPlayer();
