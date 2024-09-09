@@ -78,6 +78,12 @@ ByteBuffer& operator>>(ByteBuffer& buf, WOWGUID& guid)
     return buf;
 }
 
+ByteBuffer& operator>>(ByteBuffer* buf, WOWGUID& guid)
+{
+  guid.Set(buf->read<uint64>());
+  return *buf;
+}
+
 ByteBuffer& operator<<(ByteBuffer& buf, SmartGUID const& guid)
 {
     buf.append(guid.m_packedGUID);

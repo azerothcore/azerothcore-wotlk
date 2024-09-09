@@ -309,6 +309,7 @@ public:
 
 ByteBuffer& operator<<(ByteBuffer& buf, WOWGUID const& guid);
 ByteBuffer& operator>>(ByteBuffer& buf, WOWGUID&       guid);
+ByteBuffer& operator>>(ByteBuffer* buf, WOWGUID&       guid);
 
 ByteBuffer& operator<<(ByteBuffer& buf, SmartGUID const& guid);
 ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid);

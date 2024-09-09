@@ -75,6 +75,12 @@ ByteBuffer& ByteBuffer::operator>>(double& value)
 }
 
 //===========================================================================
+ByteBuffer &ByteBuffer::Get (uint32_t &val) {
+  val = read<uint32_t>();
+  return *this;
+}
+
+//===========================================================================
 ByteBuffer& ByteBuffer::GetString(char* string, uint32_t maxChars)
 {
     ASSERT(string);
