@@ -78,8 +78,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         owner->StopMoving();
         _lastTargetPosition.reset();
-        if (Creature* cOwner2 = owner->ToCreature())
-            cOwner2->SetCannotReachTarget();
+        if (cOwner)
+            cOwner->SetCannotReachTarget();
         return true;
     }
 
@@ -128,8 +128,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             {
                 i_recalculateTravel = false;
                 i_path = nullptr;
-                if (Creature* cOwner2 = owner->ToCreature())
-                    cOwner2->SetCannotReachTarget();
+                if (cOwner)
+                    cOwner->SetCannotReachTarget();
                 owner->StopMoving();
                 owner->SetInFront(target);
                 MovementInform(owner);
@@ -143,8 +143,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         i_recalculateTravel = false;
         i_path = nullptr;
-        if (Creature* cOwner2 = owner->ToCreature())
-            cOwner2->SetCannotReachTarget();
+        if (cOwner)
+            cOwner->SetCannotReachTarget();
         owner->ClearUnitState(UNIT_STATE_CHASE_MOVE);
         owner->SetInFront(target);
         MovementInform(owner);
@@ -154,10 +154,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     i_leashExtensionTimer.Update(time_diff);
     if (i_leashExtensionTimer.Passed())
     {
-        i_leashExtensionTimer.Reset(5000);
+        i_leashExtensionTimer.Reset(1500);
         if (owner->HasUnitState(UNIT_STATE_CHASE) && owner->movespline->Finalized() && !target->isMoving())
-            if (Creature* creature = owner->ToCreature())
-                creature->UpdateLeashExtensionTime();
+            if (cOwner)
+                cOwner->UpdateLeashExtensionTime();
     }
 
     // if the target moved, we have to consider whether to adjust
