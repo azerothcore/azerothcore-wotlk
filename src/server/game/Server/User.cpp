@@ -130,6 +130,61 @@ Player* User::ActivePlayer() const
     return m_player;
 }
 
+//===========================================================================
+void User::AddFriend (char const* name, char const* notes) {
+  ASSERT(name);
+  ASSERT(notes);
+
+  // Look for a character profile matching the name provided
+  if (auto charInfo = sCharacterCache->GetCharacterCacheByName(name)) {
+    FriendList::Friend frnd;
+    frnd.m_flags = CONTACT_FRIEND;
+    frnd.m_GUID = charInfo->Guid;
+    frnd.SetName(name);
+    frnd.SetNotes(notes);
+
+    // Fill in the player info for the friend if they are in-game
+    if (Player* plrFriend = ObjectAccessor::FindPlayer(charInfo->Guid)) {
+      frnd.m_status = FRIEND_STATUS_ONLINE;
+      if (plrFriend->isAFK())
+        frnd.m_status = FRIEND_STATUS_AFK;
+      if (plrFriend->isDND())
+        frnd.m_status = FRIEND_STATUS_DND;
+      frnd.m_areaId = plrFriend->GetAreaId();
+      frnd.m_level = plrFriend->GetLevel();
+      frnd.m_classId = plrFriend->GetClass();
+    }
+
+    // Add the friend
+    FRIEND_RESULT res = FriendList()->AddFriend(frnd);
+    SendFriendStatus(res, charInfo->Guid);
+  }
+  else
+    SendFriendStatus(FRIEND_NOT_FOUND, WOWGUID());
+}
+
+//===========================================================================
+void User::AddIgnore (char const* name) {
+  auto charInfo = sCharacterCache->GetCharacterCacheByName(name);
+  if (!charInfo) {
+    SendFriendStatus(FRIEND_IGNORE_NOT_FOUND, WOWGUID());
+    return;
+  }
+  FRIEND_RESULT res = FriendList()->AddIgnore(charInfo->Guid);
+  SendFriendStatus(res, charInfo->Guid);
+}
+
+//===========================================================================
+void User::DelIgnore (WOWGUID& guid) {
+  FRIEND_RESULT res = FriendList()->DelIgnore(guid);
+  SendFriendStatus(res, guid);
+}
+
+//===========================================================================
+FriendList* User::FriendList () const {
+  return m_player->FriendList();
+}
+
 /// User constructor
 User::User(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WowConnection> sock, AccountTypes sec, uint8 expansion,
     time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime) :
@@ -1389,6 +1444,117 @@ void User::SendAddonsInfo()
     }
 
     Send(&data);
+}
+
+//===========================================================================
+void User::RemoveFriend(WOWGUID &guid) {
+  FRIEND_RESULT res = FriendList()->RemoveFriend(guid);
+  SendFriendStatus(res, guid);
+  if (res == FRIEND_REMOVED) {
+    // Remove the friend from the FriendList database
+    CharacterDatabase.Execute("DELETE FROM character_social "
+                              "WHERE friend = {} AND guid = {}",
+                              guid.GetCounter(), ActivePlayer()->GetGUID().GetCounter());
+  }
+}
+
+//===========================================================================
+void User::SendContactList (uint32_t flags) {
+  WDataStore msg(SMSG_CONTACT_LIST);
+
+  msg << flags;
+
+  // Initialize contact indexes
+  uint32_t iFriend = FriendList()->GetNumFriends();
+  uint32_t iIgnore = FriendList()->GetNumIgnores();
+  uint32_t iMute = FriendList()->GetNumMutes();
+
+  // Write the total number of contacts to the message
+  msg << iFriend + iIgnore + iMute;
+
+  // Write each contact information to the outbound message
+  for (auto pFriend = FriendList()->m_friends.begin(); pFriend != FriendList()->m_friends.end(); pFriend++) {
+    msg << pFriend->m_GUID;
+    msg << pFriend->m_flags;
+    msg << pFriend->m_notes;
+
+    // Look for a player object in the world matching the friend GUID
+    if (Player* plrFriend = ObjectAccessor::FindConnectedPlayer(pFriend->m_GUID)) {
+      // Show GM Invis friends as offline if this user is non-GM
+      if (!IsGMAccount() && !plrFriend->isGMVisible()) {
+        pFriend->m_status = FRIEND_STATUS_OFFLINE;
+      }
+      else {
+        pFriend->m_status = FRIEND_STATUS_ONLINE;
+        pFriend->m_areaId = plrFriend->GetAreaId();
+        pFriend->m_level = plrFriend->GetLevel();
+        pFriend->m_classId = plrFriend->GetClass();
+        if (plrFriend->isAFK())
+          pFriend->m_status = FRIEND_STATUS_AFK;
+        if (plrFriend->isDND())
+          pFriend->m_status = FRIEND_STATUS_DND;
+      }
+    }
+    else
+      pFriend->m_status = FRIEND_STATUS_OFFLINE;
+
+    // Write the friend status to the message
+    msg << pFriend->m_status;
+
+    // Send player info for this friend if they are online
+    if (pFriend->m_status != FRIEND_STATUS_OFFLINE) {
+      msg << pFriend->m_areaId;
+      msg << pFriend->m_level;
+      msg << pFriend->m_classId;
+    }
+  }
+
+  // Write the GUIDs and flags of all ignored contacts
+  for (uint32_t i = 0; i < iIgnore; i++) {
+    msg << FriendList()->m_ignore[i];
+    msg << CONTACT_IGNORED;
+  }
+
+  // Write the GUIDs and flags of all muted contacts
+  for (uint32_t i = 0; i < iMute; i++) {
+    msg << FriendList()->m_mute[i];
+    msg << CONTACT_MUTED;
+  }
+
+  // Send the message
+  Send(&msg);
+}
+
+//===========================================================================
+void User::SendFriendStatus (FRIEND_RESULT res, WOWGUID guid) {
+  FriendList::Friend const* frnd = FriendList()->GetFriend(guid);
+  if (!frnd)
+    res = FRIEND_NOT_FOUND;
+
+  WDataStore msg(SMSG_FRIEND_STATUS);
+  msg << static_cast<uint8_t>(res);
+  msg << guid;
+
+  // Write friend notes to the message buffer if the friend was just added
+  if (res == FRIEND_ADDED_ONLINE || res == FRIEND_ADDED_OFFLINE) {
+    msg << frnd->m_notes;
+  }
+
+  // Write player info to the message buffer if the friend is online
+  if (res == FRIEND_ONLINE || res == FRIEND_ADDED_ONLINE) {
+    msg << frnd->m_status;
+    msg << frnd->m_areaId;
+    msg << frnd->m_level;
+    msg << frnd->m_classId;
+  }
+
+  // Send the message
+  Send(&msg);
+}
+
+//===========================================================================
+void User::SetFriendNotes (WOWGUID const& guid, char const* notes) {
+  FriendList()->SetFriendNotes(guid, notes);
 }
 
 void User::SetPlayer(Player* player)

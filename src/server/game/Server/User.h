@@ -36,6 +36,7 @@
 #include <memory>
 #include <utility>
 
+#include "FriendList.h"
 class Creature;
 class GameObject;
 class InstanceSave;
@@ -337,6 +338,14 @@ class User
 {
 public:
     Player* ActivePlayer() const;
+    void AddFriend (char const* name, char const* notes);
+    void AddIgnore (char const* name);
+    void DelIgnore (WOWGUID& guid);
+    FriendList* FriendList () const;
+    void RemoveFriend (WOWGUID& guid);
+    void SendContactList (uint32_t flags);
+    void SendFriendStatus (FRIEND_RESULT res, WOWGUID guid);
+    void SetFriendNotes (WOWGUID const& guid, char const* notes);
 
     User(uint32 id, uint32_t accountFlags, std::string&& name, std::shared_ptr<WowConnection> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
     ~User();

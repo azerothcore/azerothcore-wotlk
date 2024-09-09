@@ -1731,7 +1731,7 @@ void Player::AddToWorld()
         if (m_items[i])
             m_items[i]->AddToWorld();
 
-    m_friendListPtr = new FriendList(this);
+    m_friendListPtr = new class FriendList(this);
 }
 
 void Player::RemoveFromWorld()

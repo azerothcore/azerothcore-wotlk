@@ -1,3 +1,12 @@
+/****************************************************************************
+*
+*  FriendList.cpp
+*  Friend list functions and handlers
+*
+*  Written by Tristan Cormier (3/6/2024)
+*
+***/
+
 #include "FriendList.h"
 
 #include "CharacterCache.h"
@@ -46,7 +55,7 @@ static void WhoIsHandler (User*       user,
 
 /****************************************************************************
 *
-*   FriendList Class Implementation
+*  FriendList Class Implementation
 *
 ***/
 
@@ -54,27 +63,49 @@ static FRIENDLISTMAP_T  s_friendListMap;
 static bool             s_initialized;
 
 //===========================================================================
-FriendList::FriendList (Player* plr) {
+FriendList::Friend::~Friend() {
+  if (m_name)
+    FREE(m_name);
+  if (m_notes)
+    FREE(m_notes);
+}
+
+//===========================================================================
+void FriendList::Friend::SetName (char const *name) {
+  if (!name) name = "Unknown";
+
+  m_name = (char*)realloc(m_name, strlen(name)+1);
+  strcpy(m_name, name);
+}
+
+//===========================================================================
+void FriendList::Friend::SetNotes (char const *notes) {
+  if (!notes) notes = "";
+
+  m_notes = (char*)realloc(m_notes, strlen(notes)+1);
+  strcpy(m_notes, notes);
+}
+
+//===========================================================================
+FriendList::FriendList (Player* plr) : m_playerPtr(plr) {
   ASSERT(plr);
 
-  m_playerPtr = plr;
-  WOWGUID guid = plr->GetGUID();
-
-  s_friendListMap[guid] = this;
+  // Add this FriendList instance to the global hash table
+  s_friendListMap[plr->GetGUID()] = this;
 
   AddContacts();
 
-  // Send a friend status packet
+  // Send a FRIEND_STATUS_ONLINE message
   // to all users that have this player on their friends list
   for (auto it = s_friendListMap.begin(); it != s_friendListMap.end(); it++) {
-    if (it->second != this && it->second->GetFriend(guid)) {
+    if (it->second != this && it->second->GetFriend(plr->GetGUID())) {
       WDataStore msg(SMSG_FRIEND_STATUS);
-      msg << (unsigned char)FRIEND_ONLINE;
-      msg << guid;
-      msg << (unsigned char)FRIEND_STATUS_ONLINE;
+      msg << static_cast<uint8_t>(FRIEND_ONLINE);
+      msg << plr->GetGUID();
+      msg << static_cast<uint8_t>(FRIEND_STATUS_ONLINE);
       msg << plr->GetAreaId();
-      msg << (uint32_t)plr->GetLevel();
-      msg << (uint32_t)plr->GetClass();
+      msg << plr->GetLevel();
+      msg << plr->GetClass();
       it->second->m_playerPtr->User()->Send(&msg);
     }
   }
@@ -83,7 +114,7 @@ FriendList::FriendList (Player* plr) {
 //===========================================================================
 FriendList::~FriendList () {
   for (auto pFriend = m_friends.begin(); pFriend != m_friends.end(); pFriend++) {
-    // Save each contact to the database
+    // Save each friend to the database
     SaveContact(pFriend->m_GUID, CONTACT_FRIEND, pFriend->m_notes);
 
     // Notify every user with this character on their friends list
@@ -91,123 +122,64 @@ FriendList::~FriendList () {
     if (s_friendListMap.contains(pFriend->m_GUID)) {
       FriendList* friendList = s_friendListMap.at(pFriend->m_GUID);
       if (friendList->GetFriend(m_playerPtr->GetGUID())) {
-        friendList->SendFriendStatus(FRIEND_OFFLINE, m_playerPtr->GetGUID());
+        friendList->m_playerPtr->User()->SendFriendStatus(FRIEND_OFFLINE, m_playerPtr->GetGUID());
       }
     }
-
-    if (pFriend->m_name)
-      FREE(pFriend->m_name);
-    if (pFriend->m_notes)
-      FREE(pFriend->m_notes);
   }
   for (uint32_t i = 0; i < GetNumIgnores(); i++) {
+    // Save each ignored contact to the database
     SaveContact(m_ignore[i], CONTACT_IGNORED, "");
   }
   for (uint32_t i = 0; i < GetNumMutes(); i++) {
+    // Save each muted contact to the database
     SaveContact(m_mute[i], CONTACT_MUTED, "");
   }
 
-  // Remove this FriendList object reference from the hash table
+  // Remove this FriendList object reference from the global hash table
   s_friendListMap.erase(m_playerPtr->GetGUID());
 }
 
 //===========================================================================
-void FriendList::AddFriend (char* name, char* notes) {
-  ASSERT(name);
+FRIEND_RESULT FriendList::AddFriend (Friend& frnd) {
+  FRIEND_RESULT res;
 
-  FormatCharacterName(name);
-
-  WOWGUID guid = WOWGUID();
-  FRIEND_RESULT res = FRIEND_NOT_FOUND;
-
-  auto charInfo = sCharacterCache->GetCharacterCacheByName(name);
-  if (!charInfo) {
-    SendFriendStatus(res, guid);
-    return;
-  }
-
-  guid = charInfo->Guid;
-
-  if (guid == m_playerPtr->GetGUID()) {
+  if (m_playerPtr->GetGUID() == frnd.m_GUID)
     res = FRIEND_SELF;
-  }
-  else if (m_playerPtr->GetTeamId() != Player::TeamIdForRace(charInfo->Race)) {
-    res = FRIEND_ENEMY;
-  }
-  else if (GetFriend(guid)) {
+  else if (GetFriend(frnd.m_GUID))
     res = FRIEND_ALREADY;
-  }
   else if (GetNumFriends() < NUM_MAX_FRIENDS) {
-    Friend frnd;
-    frnd.m_flags = CONTACT_FRIEND;
-    frnd.m_GUID = guid;
-
-    frnd.m_name = (char*)malloc(strlen(name) + 1);
-    strcpy(frnd.m_name, name);
-
-    if (notes) {
-      frnd.m_notes = (char*)malloc(strlen(notes) + 1);
-      strcpy(frnd.m_notes, notes);
-    }
-
-    Player* plr = ObjectAccessor::FindPlayer(guid);
-    if (!plr) {
-      res = FRIEND_ADDED_OFFLINE;
-    }
-    else {
-      res = FRIEND_ADDED_ONLINE;
-
-      frnd.m_status = FRIEND_STATUS_ONLINE;
-      if (plr->isAFK()) {
-        frnd.m_status = FRIEND_STATUS_AFK;
-      }
-      if (plr->isDND()) {
-        frnd.m_status = FRIEND_STATUS_DND;
-      }
-
-      frnd.m_areaId = plr->GetAreaId();
-      frnd.m_level = plr->GetLevel();
-      frnd.m_classId = plr->GetClass();
-    }
-
-    // Save the new contact to the database
-    SaveContact(guid, frnd.m_flags, frnd.m_notes);
-
+    res = frnd.m_status == FRIEND_STATUS_ONLINE ? FRIEND_ADDED_ONLINE : FRIEND_ADDED_OFFLINE;
     m_friends.push_back(frnd);
+    SaveContact(frnd.m_GUID, frnd.m_flags, frnd.m_notes);
   }
-  else {
+  else
     res = FRIEND_LIST_FULL;
-  }
 
-  SendFriendStatus(res, guid);
+  return res;
 }
 
 //===========================================================================
-void FriendList::AddIgnore (WOWGUID const& guid) {
-  FRIEND_RESULT res = FRIEND_IGNORE_FULL;
-  for (uint32_t i = 0; i < NUM_MAX_IGNORE; i++) {
-    if (m_ignore[i]) {
-      continue;
-    }
-    else {
-      if (m_ignore[i] == guid) {
-        res = FRIEND_IGNORE_ALREADY;
-      }
-      else if (m_ignore[i] == m_playerPtr->GetGUID()) {
-        res = FRIEND_IGNORE_SELF;
-      }
-      else {
-        res = FRIEND_IGNORE_ADDED;
-        m_ignore[i] = guid;
-      }
-      break;
-    }
+FRIEND_RESULT FriendList::AddIgnore (WOWGUID const& guid) {
+  uint32_t numIgnores = GetNumIgnores();
+  if (numIgnores == NUM_MAX_IGNORE)
+    return FRIEND_IGNORE_FULL;
+
+  uint32_t i = 0;
+  for (i = 0; i < numIgnores; i++) {
+    if (m_ignore[i] == guid)
+      return FRIEND_IGNORE_ALREADY;
+    if (m_ignore[i] == m_playerPtr->GetGUID())
+      return FRIEND_IGNORE_SELF;
   }
+
+  m_ignore[i] = guid;
+
+  // Save the ignored contact to the FriendList database
   CharacterDatabase.Execute("INSERT INTO character_social (guid, friend, flags) "
                             "VALUES ({}, {}, {})",
                             m_playerPtr->GetGUID().GetCounter(), guid.GetCounter(), CONTACT_IGNORED);
 
-  SendFriendStatus(res, guid);
+  return FRIEND_IGNORE_ADDED;
 }
 
 //===========================================================================
@@ -223,45 +195,39 @@ void FriendList::AddContacts () {
     return;
   }
 
+  // Fetch query results
   Field* fields = results->Fetch();
-  uint32_t numRows = results->GetRowCount();
+  uint32_t numContacts = results->GetRowCount();
 
-  // Initialize indexes
-  uint32_t iFriends = 0;
-  uint32_t iIgnore = 0;
-  uint32_t iMute = 0;
+  // Initialize indexes and flags
+  uint32_t iFriends, iIgnore, iMute = 0;
+  uint32_t flags = CONTACT_FRIEND | CONTACT_IGNORED | CONTACT_MUTED;
 
   WDataStore msg(SMSG_CONTACT_LIST);
-  msg << uint32_t(CONTACT_FRIEND | CONTACT_IGNORED | CONTACT_MUTED);
-  msg << numRows; // Total number of contacts
+  msg << flags;
+  msg << numContacts;
 
-  // Add each contact to the user's friends list
-  // and send a contact list packet to the active player
-  for (uint32_t i = 0; i < numRows; i++) {
+  // Write data to the message buffer for every contact
+  for (uint32_t i = 0; i < numContacts; i++) {
     WOWGUID guid = WOWGUID(HighGuid::Player, fields[0].Get<uint32_t>());
-    uint32_t flags = fields[1].Get<uint8_t>();
+    flags = fields[1].Get<uint8_t>();
 
     msg << guid;
     msg << flags;
 
-    if (flags & CONTACT_FRIEND && iFriends < NUM_MAX_FRIENDS) {
+    if ((flags & CONTACT_FRIEND) != 0 && iFriends < NUM_MAX_FRIENDS) {
       Friend frnd;
       frnd.m_GUID = guid;
       frnd.m_flags = flags;
-
-      std::string notes = fields[2].Get<std::string>();
-      frnd.m_notes = (char*)malloc(notes.length() + 1);
-      strcpy(frnd.m_notes, notes.c_str());
+      frnd.SetNotes(fields[2].Get<std::string>().c_str());
 
       msg << frnd.m_notes;
 
-      Player* plr = ObjectAccessor::FindConnectedPlayer(guid);
-      if (plr) {
+      // Check if this friend is online
+      if (Player* plr = ObjectAccessor::FindConnectedPlayer(guid)) {
         frnd.m_status = FRIEND_STATUS_ONLINE;
 
-        char const* name = plr->GetName().c_str();
-        frnd.m_name = (char*)malloc(strlen(name) + 1);
-        strcpy(frnd.m_name, name);
+        frnd.SetName(plr->GetName().c_str());
 
         if (plr->isAFK()) {
           frnd.m_status = FRIEND_STATUS_AFK;
@@ -275,7 +241,9 @@ void FriendList::AddContacts () {
         frnd.m_classId = plr->GetClass();
       }
 
-      msg << (unsigned char)frnd.m_status;
+      msg << frnd.m_status;
+
+      // Send player info for this friend if they are online
       if (frnd.m_status != FRIEND_STATUS_OFFLINE) {
         msg << frnd.m_areaId;
         msg << frnd.m_level;
@@ -285,33 +253,33 @@ void FriendList::AddContacts () {
       m_friends.push_back(frnd);
       iFriends++;
     }
-    else if (flags & CONTACT_IGNORED && iIgnore < NUM_MAX_IGNORE) {
+    else if ((flags & CONTACT_IGNORED) != 0 && iIgnore < NUM_MAX_IGNORE) {
       m_ignore[iIgnore++] = guid;
     }
-    else if (flags & CONTACT_MUTED && iMute < NUM_MAX_MUTE) {
+    else if ((flags & CONTACT_MUTED) != 0 && iMute < NUM_MAX_MUTE) {
       m_mute[iMute++] = guid;
     }
 
     results->NextRow();
   }
 
+  // Send the message
   m_playerPtr->User()->Send(&msg);
 }
 
 //===========================================================================
-void FriendList::DelIgnore (WOWGUID const& guid) {
-  FRIEND_RESULT res = FRIEND_IGNORE_NOT_FOUND;
+FRIEND_RESULT FriendList::DelIgnore (WOWGUID const& guid) {
   for (uint32_t i = 0; i < GetNumIgnores(); i++) {
     if (m_ignore[i] == guid) {
-      res = FRIEND_IGNORE_REMOVED;
       m_ignore[i] = WOWGUID();
-      break;
+      // Delete the ignored contact from the FriendList database
+      CharacterDatabase.Execute("DELETE FROM character_social "
+                                "WHERE guid = {} AND friend = {}",
+                                m_playerPtr->GetGUID().GetCounter(), guid.GetCounter());
+      return FRIEND_IGNORE_REMOVED;
     }
   }
-  CharacterDatabase.Execute("DELETE FROM character_social "
-                            "WHERE guid = {} AND friend = {}",
-                            m_playerPtr->GetGUID().GetCounter(), guid.GetCounter());
-  SendFriendStatus(res, guid);
+  return FRIEND_IGNORE_NOT_FOUND;;
 }
 
 //===========================================================================
@@ -369,20 +337,14 @@ bool FriendList::IsIgnored (WOWGUID const& guid) {
 }
 
 //===========================================================================
-void FriendList::RemoveFriend (WOWGUID const& guid) {
+FRIEND_RESULT FriendList::RemoveFriend (WOWGUID const& guid) {
   for (auto pFriend = m_friends.begin(); pFriend != m_friends.end(); pFriend++) {
     if (pFriend->m_GUID == guid) {
-      CharacterDatabase.Execute("DELETE FROM character_social "
-                                "WHERE friend = {} AND guid = {}",
-                                guid.GetCounter(), m_playerPtr->GetGUID().GetCounter());
       m_friends.erase(pFriend);
-
-      SendFriendStatus(FRIEND_REMOVED, guid);
-      return;
+      return FRIEND_REMOVED;
     }
   }
-
-  SendFriendStatus(FRIEND_NOT_FOUND, WOWGUID());
+  return FRIEND_NOT_FOUND;
 }
 
 //===========================================================================
@@ -394,82 +356,6 @@ void FriendList::SaveContact (WOWGUID const& guid, uint32_t flags, const char* n
                             "(guid, friend, flags, note) "
                             "VALUES ({}, {}, {}, '{}')",
                             loGuid, loFriend, flags, notes ? notes : "");
-}
-
-//===========================================================================
-void FriendList::SendContactList (uint32_t flags) {
-  WDataStore msg(SMSG_CONTACT_LIST);
-  msg << flags;
-
-  uint32_t iFriend = GetNumFriends();
-  uint32_t iIgnore = GetNumIgnores();
-  uint32_t iMute = GetNumMutes();
-
-  msg << iFriend + iIgnore + iMute;   // Total number of contacts
-
-  for (auto pFriend = m_friends.begin(); pFriend != m_friends.end(); pFriend++) {
-    msg << pFriend->m_GUID;
-    msg << pFriend->m_flags;
-    msg << pFriend->m_notes;
-
-    Player* plr = ObjectAccessor::FindConnectedPlayer(pFriend->m_GUID);
-    if (plr && plr->isGMVisible()) {
-      pFriend->m_status = FRIEND_STATUS_ONLINE;
-      pFriend->m_areaId = plr->GetAreaId();
-      pFriend->m_level = plr->GetLevel();
-      pFriend->m_classId = plr->GetClass();
-      if (plr->isAFK()) {
-        pFriend->m_status = FRIEND_STATUS_AFK;
-      }
-      if (plr->isDND()) {
-        pFriend->m_status = FRIEND_STATUS_DND;
-      }
-    }
-    else {
-      pFriend->m_status = FRIEND_STATUS_OFFLINE;
-    }
-
-    msg << (unsigned char)pFriend->m_status;
-
-    // Send additional data if the character is online
-    if (pFriend->m_status != FRIEND_STATUS_OFFLINE) {
-      msg << pFriend->m_areaId;
-      msg << pFriend->m_level;
-      msg << pFriend->m_classId;
-    }
-  }
-  for (uint32_t i = 0; i < iIgnore; i++) {
-    msg << m_ignore[i];
-    msg << CONTACT_IGNORED;
-  }
-  for (uint32_t i = 0; i < iMute; i++) {
-    msg << m_mute[i];
-    msg << CONTACT_MUTED;
-  }
-
-  m_playerPtr->User()->Send(&msg);
-}
-
-//===========================================================================
-void FriendList::SendFriendStatus (FRIEND_RESULT res, WOWGUID guid) {
-  WDataStore msg(SMSG_FRIEND_STATUS);
-  msg << (unsigned char)res;
-  msg << guid;
-
-  Friend const* frnd = GetFriend(guid);
-  if (frnd) {
-    if (res == FRIEND_ADDED_ONLINE || res == FRIEND_ADDED_OFFLINE) {
-      msg << frnd->m_notes;
-    }
-    if (res == FRIEND_ONLINE || res == FRIEND_ADDED_ONLINE) {
-      msg << (unsigned char)frnd->m_status;
-      msg << frnd->m_areaId;
-      msg << frnd->m_level;
-      msg << frnd->m_classId;
-    }
-  }
-
-  m_playerPtr->User()->Send(&msg);
 }
 
 //===========================================================================
@@ -487,7 +373,8 @@ void FriendList::SetFriendNotes (WOWGUID const& guid, char const* notes) {
       CharacterDatabase.Execute("UPDATE character_social "
                                 "SET note = '{}' "
                                 "WHERE friend = {} AND guid = {}",
-                                pFriend->m_notes, pFriend->m_GUID.GetCounter(), m_playerPtr->GetGUID().GetCounter());
+                                pFriend->m_notes,
+                                pFriend->m_GUID.GetCounter(), m_playerPtr->GetGUID().GetCounter());
       return;
     }
   }
@@ -496,7 +383,7 @@ void FriendList::SetFriendNotes (WOWGUID const& guid, char const* notes) {
 
 /****************************************************************************
 *
-*   NETMESSAGE HANDLERS
+*  Message handlers
 *
 ***/
 
@@ -506,19 +393,13 @@ static void AddFriendHandler (User*       user,
                               uint32_t    eventTime,
                               WDataStore* msg) {
 
-  Player* plr = user->ActivePlayer();
-  if (!plr) {
-    return;
-  }
-
-  // Read the message data
   char name[MAX_NAME_SIZE];
   msg->GetString(name, sizeof(name));
 
   char notes[MAX_NOTES_SIZE];
   msg->GetString(notes, sizeof(notes));
 
-  plr->FriendListPtr()->AddFriend(name, notes);
+  user->AddFriend(name, notes);
 }
 
 //===========================================================================
@@ -527,21 +408,12 @@ static void AddIgnoreHandler (User*       user,
                               uint32_t    eventTime,
                               WDataStore* msg) {
 
-  FriendList* friendList = user->ActivePlayer()->FriendListPtr();
-
-  // Read the message data
   char name[256];
   msg->GetString(name, sizeof(name));
 
   FormatCharacterName(name);
 
-  auto charInfo = sCharacterCache->GetCharacterCacheByName(name);
-  if (charInfo) {
-    friendList->AddIgnore(charInfo->Guid);
-  }
-  else {
-    friendList->SendFriendStatus(FRIEND_IGNORE_NOT_FOUND, WOWGUID());
-  }
+  user->AddIgnore(name);
 }
 
 //===========================================================================
@@ -549,16 +421,10 @@ static void ContactListHandler (User*       user,
                                 NETMESSAGE  msgId,
                                 uint32_t    eventTime,
                                 WDataStore* msg) {
+  uint32_t flags;
+  msg->Get(flags);
 
-  Player* plr = user->ActivePlayer();
-  if (!plr) {
-    return;
-  }
-
-  // Read the message data
-  auto flags = msg->read<uint32_t>();
-
-  plr->FriendListPtr()->SendContactList(flags);
+  user->SendContactList(flags);
 }
 
 //===========================================================================
@@ -566,22 +432,10 @@ static void DeleteFriendHandler (User*        user,
                                  NETMESSAGE   msgId,
                                  uint32_t     eventTime,
                                  WDataStore*  msg) {
+  WOWGUID guid;
+  msg >> guid;
 
-  Player* plr = user->ActivePlayer();
-  if (!plr) {
-    return;
-  }
-
-  // Read the message data
-  auto guid = msg->read<WOWGUID>();
-
-  FriendList* friendList = plr->FriendListPtr();
-  if (friendList->GetFriend(guid)) {
-    friendList->RemoveFriend(guid);
-  }
-  else {
-    friendList->SendFriendStatus(FRIEND_DB_ERROR, guid);
-  }
+  user->RemoveFriend(guid);
 }
 
 //===========================================================================
@@ -590,15 +444,10 @@ static void DelIgnoreHandler (User*       user,
                               uint32_t    eventTime,
                               WDataStore* msg) {
 
-  Player* plr = user->ActivePlayer();
-  if (!plr) {
-    return;
-  }
+  WOWGUID guid;
+  msg >> guid;
 
-  // Read the message data
-  auto guid = msg->read<WOWGUID>();
-
-  plr->FriendListPtr()->DelIgnore(guid);
+  user->DelIgnore(guid);
 }
 
 //===========================================================================
@@ -607,24 +456,13 @@ static void SetFriendNotesHandler (User*        user,
                                    uint32_t     eventTime,
                                    WDataStore*  msg) {
 
-  Player* plr = user->ActivePlayer();
-  if (!plr) {
-    return;
-  }
-
-  // Read the message data
-  auto guid = msg->read<WOWGUID>();
-
   char notes[MAX_NOTES_SIZE];
   msg->GetString(notes, sizeof(notes));
 
-  FriendList* friendList = plr->FriendListPtr();
-  if (friendList->GetFriend(guid)) {
-    friendList->SetFriendNotes(guid, notes);
-  }
-  else {
-    friendList->SendFriendStatus(FRIEND_DB_ERROR, guid);
-  }
+  WOWGUID guid;
+  msg >> guid;
+
+  user->SetFriendNotes(guid, notes);
 }
 
 //===========================================================================
@@ -633,28 +471,24 @@ static void WhoIsHandler (User*       user,
                           uint32_t    eventTime,
                           WDataStore* msg) {
 
-  if (!user->IsGMAccount()) {
-    user->SendNotification(LANG_PERMISSION_DENIED);
-    return;
-  }
-
-  // Read the message data
   char name[256];
-  msg->GetString(name, -1);
+  char szResponse[256];
 
+  // Read the character name from the message and format it
+  msg->GetString(name, -1);
   FormatCharacterName(name);
 
-  char szResponse[256] = "Character not found"; // Failure case response
+  // Find the account ID of the named character
+  uint32_t accountId = sCharacterCache->GetCharacterAccountIdByName(name);
 
-  // Find a Player object in the world that matches the name provided
-  // and copy its account name to the response buffer
-  Player* playerPtr = ObjectAccessor::FindPlayerByName(name);
-  if (playerPtr) {
-    strcpy(szResponse, playerPtr->User()->GetAccountName());
-  }
+  // Look for an account name matching the account ID
+  if (auto queryResults = LoginDatabase.Query("SELECT username FROM account WHERE id = %d", accountId))
+    strcpy(szResponse, queryResults->Fetch()->Get<std::string>().c_str());
+  else
+    strcpy(szResponse, "Character not found");
 
-  // Send the response
-  WDataStore outbound(SMSG_WHOIS, strlen(szResponse) + 1);
+  // Send the response message
+  WDataStore outbound(SMSG_WHOIS, strlen(szResponse)+1);
   outbound << szResponse;
   user->Send(&outbound);
 }
@@ -662,16 +496,15 @@ static void WhoIsHandler (User*       user,
 
 /****************************************************************************
 *
-*   Public Functions
+*  Public Functions
 *
 ***/
 
 //===========================================================================
 void FriendListInitialize () {
-  if (s_initialized) {
-    return;
-  }
+  if (s_initialized) return;
 
+  // Register message handlers
   WowConnection::SetMessageHandler(CMSG_WHOIS, WhoIsHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_CONTACT_LIST, ContactListHandler);
   WowConnection::SetMessageHandler(CMSG_ADD_FRIEND, AddFriendHandler);
@@ -685,13 +518,21 @@ void FriendListInitialize () {
 
 //===========================================================================
 void FriendListDestroy () {
-  if (!s_initialized) {
-    return;
-  }
+  if (!s_initialized) return;
 
+  // Clear the global FriendList object hash table
   for (auto i = s_friendListMap.begin(); i != s_friendListMap.end(); i++) {
     s_friendListMap.erase(i);
   }
+
+  // Unregister message handlers
+  WowConnection::ClearMessageHandler(CMSG_WHOIS);
+  WowConnection::ClearMessageHandler(CMSG_CONTACT_LIST);
+  WowConnection::ClearMessageHandler(CMSG_ADD_FRIEND);
+  WowConnection::ClearMessageHandler(CMSG_DEL_FRIEND);
+  WowConnection::ClearMessageHandler(CMSG_SET_CONTACT_NOTES);
+  WowConnection::ClearMessageHandler(CMSG_ADD_IGNORE);
+  WowConnection::ClearMessageHandler(CMSG_DEL_IGNORE);
 
   s_initialized = false;
 }

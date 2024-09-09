@@ -1071,6 +1071,7 @@ struct EntryPointData
 
 class Player : public Unit, public GridObject<Player>
 {
+    friend class FriendList;
     friend class User;
     friend class CinematicMgr;
     friend void Item::AddToUpdateQueueOf(Player* player);
@@ -1989,6 +1990,7 @@ public:
     void RemovedInsignia(Player* looterPlr);
 
     User* User () const { return m_user; }
+    FriendList* FriendList () const { return m_friendListPtr; }
     void SetUser (class User* user) { m_user = user; }
 
     void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) override;
@@ -2921,7 +2923,7 @@ private:
 
     CinematicMgr* _cinematicMgr;
 
-    FriendList* m_friendListPtr = nullptr;
+    class FriendList* m_friendListPtr = nullptr;
 
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;

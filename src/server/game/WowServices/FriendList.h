@@ -1,3 +1,12 @@
+/****************************************************************************
+*
+*  FriendList.h
+*  Friend list public interface
+*
+*  Written by Tristan Cormier (3/6/2024)
+*
+***/
+
 #ifndef _FRIENDLIST_H_
 #define _FRIENDLIST_H_
 
@@ -63,49 +72,54 @@ enum FRIEND_RESULT {
 
 /****************************************************************************
 *
-*   FriendList class
+*  FriendList class
 *
 ***/
 
 class FriendList {
 
-private:
+public:
 
   struct Friend {
-    WOWGUID  m_GUID    = WOWGUID();
-    char*       m_name    = nullptr;
-    char*       m_notes   = nullptr;
-    char        m_status  = FRIEND_STATUS_OFFLINE;
-    uint32_t    m_flags   = 0u;
-    uint32_t    m_areaId  = 0u;
-    uint32_t    m_level   = 0u;
-    uint32_t    m_classId = 0u;
+
+    WOWGUID   m_GUID    = WOWGUID();
+    char*     m_name    = nullptr;
+    char*     m_notes   = nullptr;
+    uint8_t   m_status  = FRIEND_STATUS_OFFLINE;
+    uint32_t  m_flags   = 0u;
+    uint32_t  m_areaId  = 0u;
+    uint32_t  m_level   = 0u;
+    uint32_t  m_classId = 0u;
+
+    ~Friend ();
+    void SetName (char const* name);
+    void SetNotes (char const* notes);
+
   };
 
   list<Friend>  m_friends                 = {};
-  WOWGUID    m_ignore[NUM_MAX_IGNORE]  = {};
-  WOWGUID    m_mute[NUM_MAX_MUTE]      = {};
-  Player*       m_playerPtr               = nullptr;
-
-public:
+  WOWGUID       m_ignore[NUM_MAX_IGNORE]  = {};
+  WOWGUID       m_mute[NUM_MAX_MUTE]      = {};
 
   FriendList (Player* plr);
   ~FriendList ();
-  void AddFriend (char* name, char* notes);
-  void AddIgnore (WOWGUID const& guid);
+  FRIEND_RESULT AddFriend (Friend& frnd);
+  FRIEND_RESULT AddIgnore (WOWGUID const& guid);
   void AddContacts ();
-  void DelIgnore (WOWGUID const& guid);
+  FRIEND_RESULT DelIgnore (WOWGUID const& guid);
   Friend const* GetFriend (WOWGUID const& guid);
   uint32_t GetNumFriends ();
   uint32_t GetNumIgnores ();
   uint32_t GetNumMutes ();
   bool IsFriend (WOWGUID const& guid);
   bool IsIgnored (WOWGUID const& guid);
-  void RemoveFriend (WOWGUID const& guid);
+  FRIEND_RESULT RemoveFriend (WOWGUID const& guid);
   void SaveContact (WOWGUID const& guid, uint32_t flags, char const* notes);
-  void SendContactList (uint32_t flags);
-  void SendFriendStatus (FRIEND_RESULT res, WOWGUID guid);
   void SetFriendNotes (WOWGUID const& guid, char const* notes);
+
+private:
+
+  Player* m_playerPtr = nullptr;
 
 };
 
