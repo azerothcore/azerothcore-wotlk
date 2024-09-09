@@ -904,6 +904,10 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
 
     sScriptMgr->OnQueueUpdate(this, diff, bgTypeId, bracket_id, arenaType, isRated, arenaRating);
 
+    if (!sScriptMgr->OnQueueUpdateValidity(this, diff, bgTypeId, bracket_id, arenaType, isRated, arenaRating)) {
+        return;
+    }
+
     m_SelectionPools[TEAM_ALLIANCE].Init();
     m_SelectionPools[TEAM_HORDE].Init();
 
