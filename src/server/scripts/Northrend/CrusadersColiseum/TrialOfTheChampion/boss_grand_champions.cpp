@@ -27,6 +27,7 @@
 
 enum MountSpells
 {
+    SPELL_LANCE_EQUIPPED                    = 62853,
     SPELL_PLAYER_VEHICLE_DEFEND             = 66482,
     SPELL_MINIONS_DEFEND                    = 64100,
     SPELL_BOSS_DEFEND                       = 62719,
@@ -173,7 +174,7 @@ public:
             if (me->IsDuringRemoveFromWorld())
                 return;
 
-            if( apply )
+            if (apply)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 2.0f, false);
@@ -193,13 +194,33 @@ public:
             if (me->IsDuringRemoveFromWorld())
                 return;
 
-            if( !apply )
+            if (!apply)
             {
                 me->RemoveAura(SPELL_PLAYER_VEHICLE_DEFEND);
                 who->RemoveAura(SPELL_PLAYER_VEHICLE_DEFEND);
                 for (uint8 i = 0; i < 3; ++i)
                     who->RemoveAura(SPELL_SHIELD_LEVEL_1_VISUAL + i);
             }
+        }
+
+        bool BeforeSpellClick(Unit* clicker) override
+        {
+            if (!clicker->IsPlayer())
+                return true;
+
+            if (clicker->IsInDisallowedMountForm())
+                clicker->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+
+            if (clicker->HasAura(SPELL_LANCE_EQUIPPED))
+                return true;
+
+            WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1);
+            data << uint8(0); // single cast or multi 2.3 (0/1)
+            data << uint32(VEHICLE_SPELL_RIDE_HARDCODED);
+            data << uint8(SPELL_FAILED_CUSTOM_ERROR);
+            data << uint32(SPELL_CUSTOM_ERROR_MUST_HAVE_LANCE_EQUIPPED);
+            clicker->ToPlayer()->GetSession()->SendPacket(&data);
+            return false;
         }
 
         //void EnterEvadeMode() { CreatureAI::EnterEvadeMode(); }
