@@ -79,7 +79,10 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         owner->StopMoving();
         _lastTargetPosition.reset();
         if (cOwner)
+        {
+            cOwner->UpdateLeashExtensionTime();
             cOwner->SetCannotReachTarget();
+        }
         return true;
     }
 
