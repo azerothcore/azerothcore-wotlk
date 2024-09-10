@@ -152,16 +152,9 @@ public:
         return GetTrialOfTheChampionAI<npc_toc5_player_vehicleAI>(pCreature);
     }
 
-    struct npc_toc5_player_vehicleAI : public NullCreatureAI
+    struct npc_toc5_player_vehicleAI : public VehicleAI
     {
-        npc_toc5_player_vehicleAI(Creature* pCreature) : NullCreatureAI(pCreature)
-        {
-            conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_TEMPLATE_VEHICLE, me->GetEntry());
-            m_ConditionsTimer = 1000;
-        }
-
-        ConditionList conditions;
-        uint16 m_ConditionsTimer;
+        npc_toc5_player_vehicleAI(Creature* creature) : VehicleAI(creature) { }
 
         void Reset() override
         {
@@ -223,22 +216,6 @@ public:
             return false;
         }
 
-        //void EnterEvadeMode() { CreatureAI::EnterEvadeMode(); }
-        void MoveInLineOfSight(Unit*  /*who*/) override {}
-        void UpdateAI(uint32 diff) override
-        {
-            if (m_ConditionsTimer <= diff)
-            {
-                if (!conditions.empty())
-                    if (Unit* passenger = me->GetVehicleKit()->GetPassenger(0))
-                        if (!sConditionMgr->IsObjectMeetToConditions(passenger, me, conditions))
-                            passenger->ExitVehicle();
-                m_ConditionsTimer = VEHICLE_CONDITION_CHECK_TIME;
-            }
-            else
-                m_ConditionsTimer -= diff;
-        }
-        void AttackStart(Unit*  /*who*/) override {}
         void JustEngagedWith(Unit*  /*who*/) override {}
     };
 };
