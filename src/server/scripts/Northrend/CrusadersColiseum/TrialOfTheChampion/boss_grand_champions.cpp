@@ -215,8 +215,6 @@ public:
             clicker->ToPlayer()->GetSession()->SendPacket(&data);
             return false;
         }
-
-        void JustEngagedWith(Unit*  /*who*/) override {}
     };
 };
 
