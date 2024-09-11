@@ -233,7 +233,7 @@ int main(int argc, char** argv)
     signals.async_wait(SignalHandler);
 
     // Start the Boost based thread pool
-    int numThreads = sConfigMgr->GetOption<int32>("ThreadPool", 1);
+    int numThreads = sConfigMgr->GetOption<int32>("ThreadPool", 2);
     std::shared_ptr<std::vector<std::thread>> threadPool(new std::vector<std::thread>(), [ioContext](std::vector<std::thread>* del)
     {
         ioContext->stop();
@@ -257,7 +257,7 @@ int main(int argc, char** argv)
     }
 
     // Set process priority according to configuration settings
-    SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
+    SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, true));
 
     // Loading modules configs before scripts
     sConfigMgr->LoadModulesConfigs();

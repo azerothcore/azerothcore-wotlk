@@ -65,127 +65,110 @@ enum Misc
     GROUP_DELAY                     = 1
 };
 
-class boss_gurtogg_bloodboil : public CreatureScript
+struct boss_gurtogg_bloodboil : public BossAI
 {
-public:
-    boss_gurtogg_bloodboil() : CreatureScript("boss_gurtogg_bloodboil") { }
+    boss_gurtogg_bloodboil(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL), _recentlySpoken(false) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetBlackTempleAI<boss_gurtogg_bloodboilAI>(creature);
+        BossAI::Reset();
+        _recentlySpoken = false;
     }
 
-    struct boss_gurtogg_bloodboilAI : public BossAI
+    void JustEngagedWith(Unit* who) override
     {
-        boss_gurtogg_bloodboilAI(Creature* creature) : BossAI(creature, DATA_GURTOGG_BLOODBOIL), _recentlySpoken(false) { }
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
 
-        void Reset() override
-        {
-            BossAI::Reset();
-            _recentlySpoken = false;
-        }
+        DoCastSelf(SPELL_ACIDIC_WOUND, true);
 
-        void JustEngagedWith(Unit* who) override
-        {
-            BossAI::JustEngagedWith(who);
-            Talk(SAY_AGGRO);
-
-            DoCastSelf(SPELL_ACIDIC_WOUND, true);
-
-            ScheduleTimedEvent(10s, [&] {
+        ScheduleTimedEvent(10s, [&] {
+            if (!me->HasAura(SPELL_FEL_RAGE_SELF))
                 me->CastCustomSpell(SPELL_BLOODBOIL, SPELLVALUE_MAX_TARGETS, 5, me, false);
-            }, 10s);
+        }, 10s);
 
-            ScheduleTimedEvent(38s, [&] {
-                DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_FEL_ACID_BREATH2 : SPELL_FEL_ACID_BREATH1);
-            }, 30s);
+        ScheduleTimedEvent(38s, [&] {
+            DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_FEL_ACID_BREATH2 : SPELL_FEL_ACID_BREATH1);
+        }, 30s);
 
-            ScheduleTimedEvent(14s, [&] {
-                DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_EJECT2 : SPELL_EJECT1);
-            }, 20s);
+        ScheduleTimedEvent(14s, [&] {
+            DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_EJECT2 : SPELL_EJECT1);
+        }, 20s);
 
-            ScheduleTimedEvent(5s, [&] {
-                DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_ARCING_SMASH2 : SPELL_ARCING_SMASH1);
-            }, 15s);
+        ScheduleTimedEvent(5s, [&] {
+            DoCastVictim(me->HasAura(SPELL_FEL_RAGE_SELF) ? SPELL_ARCING_SMASH2 : SPELL_ARCING_SMASH1);
+        }, 15s);
 
-            ScheduleTimedEvent(1min, [&] {
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
-                {
-                    me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
-                    DoCastSelf(SPELL_FEL_RAGE_SELF, true);
-                    DoCast(target, SPELL_FEL_RAGE_TARGET, true);
-                    DoCast(target, SPELL_FEL_RAGE_2, true);
-                    DoCast(target, SPELL_FEL_RAGE_3, true);
-                    DoCast(target, SPELL_FEL_RAGE_SIZE, true);
-                    target->CastSpell(me, SPELL_TAUNT_GURTOGG, true);
-
-                    DoCast(target, SPELL_FEL_GEYSER_SUMMON, true);
-                    DoCastSelf(SPELL_FEL_GEYSER_STUN, true);
-                    DoCastSelf(SPELL_INSIGNIFICANCE, true);
-
-                    me->m_Events.AddEventAtOffset([&] {
-                        DoCastVictim(SPELL_CHARGE);
-                    }, 2s);
-
-                    scheduler.DelayGroup(GROUP_DELAY, 30s);
-                }
-            }, 90s);
-
-            ScheduleUniqueTimedEvent(10min, [&] {
-                Talk(SAY_ENRAGE);
-                DoCastSelf(SPELL_BERSERK, true);
-            }, EVENT_SPELL_BERSERK);
-
-            scheduler.Schedule(28s, [this](TaskContext context) {
-                context.SetGroup(GROUP_DELAY);
-                DoCastVictim(SPELL_BEWILDERING_STRIKE);
-                context.Repeat(30s);
-            });
-        }
-
-        void KilledUnit(Unit*  /*victim*/) override
-        {
-            if (!_recentlySpoken)
+        ScheduleTimedEvent(1min, [&] {
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 40.0f, true))
             {
-                Talk(SAY_SLAY);
+                me->RemoveAurasByType(SPELL_AURA_MOD_TAUNT);
+                DoCastSelf(SPELL_FEL_RAGE_SELF, true);
+                DoCast(target, SPELL_FEL_RAGE_TARGET, true);
+                DoCast(target, SPELL_FEL_RAGE_2, true);
+                DoCast(target, SPELL_FEL_RAGE_3, true);
+                DoCast(target, SPELL_FEL_RAGE_SIZE, true);
+                target->CastSpell(me, SPELL_TAUNT_GURTOGG, true);
+
+                DoCast(target, SPELL_FEL_GEYSER_SUMMON, true);
+                DoCastSelf(SPELL_FEL_GEYSER_STUN, true);
+                DoCastSelf(SPELL_INSIGNIFICANCE, true);
+
                 me->m_Events.AddEventAtOffset([&] {
-                    _recentlySpoken = false;
-                }, 6s);
+                    DoCastVictim(SPELL_CHARGE);
+                }, 2s);
+
+                scheduler.DelayGroup(GROUP_DELAY, 30s);
             }
-        }
+        }, 90s);
 
-        void JustSummoned(Creature* summon) override
+        ScheduleUniqueTimedEvent(10min, [&] {
+            Talk(SAY_ENRAGE);
+            DoCastSelf(SPELL_BERSERK, true);
+        }, EVENT_SPELL_BERSERK);
+
+        scheduler.Schedule(28s, [this](TaskContext context) {
+            context.SetGroup(GROUP_DELAY);
+            DoCastVictim(SPELL_BEWILDERING_STRIKE);
+            context.Repeat(30s);
+        });
+    }
+
+    bool CanAIAttack(Unit const* who) const override
+    {
+        return !who->IsImmunedToDamage(SPELL_SCHOOL_MASK_ALL);
+    }
+
+    void KilledUnit(Unit*  /*victim*/) override
+    {
+        if (!_recentlySpoken)
         {
-            summons.Summon(summon);
-            summon->CastSpell(summon, SPELL_FEL_GEYSER_DAMAGE, false);
+            Talk(SAY_SLAY);
+            me->m_Events.AddEventAtOffset([&] {
+                _recentlySpoken = false;
+            }, 6s);
         }
+    }
 
-        void JustDied(Unit* killer) override
-        {
-            BossAI::JustDied(killer);
-            Talk(SAY_DEATH);
-        }
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        summon->CastSpell(summon, SPELL_FEL_GEYSER_DAMAGE, false);
+    }
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
+    }
 
-            scheduler.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
+    bool CheckEvadeIfOutOfCombatArea() const override
+    {
+        return me->GetHomePosition().GetExactDist2d(me) > 105.0f;
+    }
 
-            DoMeleeAttackIfReady();
-        }
-
-        bool CheckEvadeIfOutOfCombatArea() const override
-        {
-            return me->GetHomePosition().GetExactDist2d(me) > 105.0f;
-        }
-
-        private:
-            bool _recentlySpoken;
-    };
+private:
+    bool _recentlySpoken;
 };
 
 class spell_gurtogg_bloodboil : public SpellScript
@@ -231,7 +214,7 @@ class spell_gurtogg_eject : public SpellScript
 
 void AddSC_boss_gurtogg_bloodboil()
 {
-    new boss_gurtogg_bloodboil();
+    RegisterBlackTempleCreatureAI(boss_gurtogg_bloodboil);
     RegisterSpellScript(spell_gurtogg_bloodboil);
     RegisterSpellScript(spell_gurtogg_eject);
 }

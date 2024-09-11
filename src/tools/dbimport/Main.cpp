@@ -103,8 +103,15 @@ bool StartDB()
 {
     MySQL::Library_Init();
 
-    // Load databases
-    DatabaseLoader loader("dbimport");
+    // Load modules conditionally based on what modules are allowed to auto-update or none
+    std::string modules = sConfigMgr->GetOption<std::string>("Updates.AllowedModules", "all");
+    LOG_INFO("dbimport", "Loading modules: {}", modules.empty() ? "none" : modules);
+
+    DatabaseLoader loader =
+        modules.empty() ? DatabaseLoader("dbimport") :
+        (modules == "all") ? DatabaseLoader("dbimport", DatabaseLoader::DATABASE_NONE, AC_MODULES_LIST) :
+        DatabaseLoader("dbimport", DatabaseLoader::DATABASE_NONE, modules);
+
     loader
         .AddDatabase(LoginDatabase, "Login")
         .AddDatabase(CharacterDatabase, "Character")

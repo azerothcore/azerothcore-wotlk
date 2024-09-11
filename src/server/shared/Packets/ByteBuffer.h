@@ -464,14 +464,14 @@ public:
         _storage.shrink_to_fit();
     }
 
-    void append(const char *src, std::size_t cnt)
+    void append(char const* src, std::size_t cnt)
     {
-        return append((const uint8 *)src, cnt);
+        return append((uint8 const*)src, cnt);
     }
 
     template<class T> void append(const T* src, std::size_t cnt)
     {
-        return append((const uint8*)src, cnt * sizeof(T));
+        return append((uint8 const*)src, cnt * sizeof(T));
     }
 
     void append(uint8 const* src, std::size_t cnt);
@@ -522,7 +522,7 @@ public:
     }
 
     void AppendPackedTime(time_t time);
-    void put(std::size_t pos, const uint8 *src, std::size_t cnt);
+    void put(std::size_t pos, uint8 const* src, std::size_t cnt);
     void print_storage() const;
     void textlike() const;
     void hexlike() const;

@@ -818,7 +818,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr5>::ToString(SpellAttr5 value)
         case SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC: return { "SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC", "Duration scales with Haste Rating", "" };
         case SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED: return { "SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED", "Charmed units cannot cast this spell", "" };
         case SPELL_ATTR5_TREAT_AS_AREA_EFFECT: return { "SPELL_ATTR5_TREAT_AS_AREA_EFFECT", "Unknown attribute 15@Attr5", "Related to multi-target spells?" };
-        case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM: return { "SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM", "DESCRIPTION this allows spells with EquippedItemClass to affect spells from other items if the required item is equipped", "" };
+        case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM: return { "SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM", "DESCRIPTION this allows spells with EquippedItemClass to affect spells from other items if the required item is equipped", "" };
         case SPELL_ATTR5_ALLOW_WHILE_FLEEING: return { "SPELL_ATTR5_ALLOW_WHILE_FLEEING", "Usable while feared", "" };
         case SPELL_ATTR5_ALLOW_WHILE_CONFUSED: return { "SPELL_ATTR5_ALLOW_WHILE_CONFUSED", "Usable while confused", "" };
         case SPELL_ATTR5_AI_DOESNT_FACE_TARGET: return { "SPELL_ATTR5_AI_DOESNT_FACE_TARGET", "Do not auto-turn while casting", "" };
@@ -862,7 +862,7 @@ AC_API_EXPORT SpellAttr5 EnumUtils<SpellAttr5>::FromIndex(std::size_t index)
         case 13: return SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC;
         case 14: return SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED;
         case 15: return SPELL_ATTR5_TREAT_AS_AREA_EFFECT;
-        case 16: return SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM;
+        case 16: return SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM;
         case 17: return SPELL_ATTR5_ALLOW_WHILE_FLEEING;
         case 18: return SPELL_ATTR5_ALLOW_WHILE_CONFUSED;
         case 19: return SPELL_ATTR5_AI_DOESNT_FACE_TARGET;
@@ -903,7 +903,7 @@ AC_API_EXPORT std::size_t EnumUtils<SpellAttr5>::ToIndex(SpellAttr5 value)
         case SPELL_ATTR5_SPELL_HASTE_AFFECTS_PERIODIC: return 13;
         case SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED: return 14;
         case SPELL_ATTR5_TREAT_AS_AREA_EFFECT: return 15;
-        case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPED_ITEM: return 16;
+        case SPELL_ATTR5_AURA_AFFECTS_NOT_JUST_REQ_EQUIPPED_ITEM: return 16;
         case SPELL_ATTR5_ALLOW_WHILE_FLEEING: return 17;
         case SPELL_ATTR5_ALLOW_WHILE_CONFUSED: return 18;
         case SPELL_ATTR5_AI_DOESNT_FACE_TARGET: return 19;

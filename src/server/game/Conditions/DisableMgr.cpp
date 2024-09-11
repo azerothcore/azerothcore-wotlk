@@ -326,7 +326,7 @@ namespace DisableMgr
                     if (unit)
                     {
                         if ((spellFlags & SPELL_DISABLE_PLAYER && unit->IsPlayer()) ||
-                                (unit->GetTypeId() == TYPEID_UNIT && ((unit->IsPet() && spellFlags & SPELL_DISABLE_PET) || spellFlags & SPELL_DISABLE_CREATURE)))
+                                (unit->IsCreature() && ((unit->IsPet() && spellFlags & SPELL_DISABLE_PET) || spellFlags & SPELL_DISABLE_CREATURE)))
                         {
                             if (spellFlags & SPELL_DISABLE_MAP)
                             {

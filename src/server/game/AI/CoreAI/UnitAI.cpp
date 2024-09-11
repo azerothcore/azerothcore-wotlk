@@ -427,7 +427,7 @@ bool NonTankTargetSelector::operator()(Unit const* target) const
     if (!target)
         return false;
 
-    if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
+    if (_playerOnly && !target->IsPlayer())
         return false;
 
     if (Unit* currentVictim = _source->GetThreatMgr().GetCurrentVictim())

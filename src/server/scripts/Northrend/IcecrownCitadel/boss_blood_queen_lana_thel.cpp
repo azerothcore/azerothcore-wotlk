@@ -823,7 +823,7 @@ class spell_blood_queen_vampiric_bite : public SpellScript
             return;
         }
 
-        if (GetCaster()->GetTypeId() != TYPEID_PLAYER || GetCaster()->GetMapId() != 631)
+        if (!GetCaster()->IsPlayer() || GetCaster()->GetMapId() != 631)
             return;
         InstanceScript* instance = GetCaster()->GetInstanceScript();
         if (!instance || instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != IN_PROGRESS)
