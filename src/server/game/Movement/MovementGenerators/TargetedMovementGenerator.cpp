@@ -78,8 +78,11 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         owner->StopMoving();
         _lastTargetPosition.reset();
-        if (Creature* cOwner2 = owner->ToCreature())
-            cOwner2->SetCannotReachTarget();
+        if (cOwner)
+        {
+            cOwner->UpdateLeashExtensionTime();
+            cOwner->SetCannotReachTarget();
+        }
         return true;
     }
 
@@ -128,8 +131,8 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
             {
                 i_recalculateTravel = false;
                 i_path = nullptr;
-                if (Creature* cOwner2 = owner->ToCreature())
-                    cOwner2->SetCannotReachTarget();
+                if (cOwner)
+                    cOwner->SetCannotReachTarget();
                 owner->StopMoving();
                 owner->SetInFront(target);
                 MovementInform(owner);
@@ -143,22 +146,25 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         i_recalculateTravel = false;
         i_path = nullptr;
-        if (Creature* cOwner2 = owner->ToCreature())
-            cOwner2->SetCannotReachTarget();
+        if (cOwner)
+            cOwner->SetCannotReachTarget();
         owner->ClearUnitState(UNIT_STATE_CHASE_MOVE);
         owner->SetInFront(target);
         MovementInform(owner);
     }
 
-    // Mobs should chase you infinitely if you stop and wait every few seconds.
-    i_leashExtensionTimer.Update(time_diff);
-    if (i_leashExtensionTimer.Passed())
-    {
-        i_leashExtensionTimer.Reset(5000);
-        if (owner->HasUnitState(UNIT_STATE_CHASE) && owner->movespline->Finalized() && !target->isMoving())
-            if (Creature* creature = owner->ToCreature())
-                creature->UpdateLeashExtensionTime();
+    if (owner->movespline->Finalized())
+    { // Mobs should chase you infinitely if you stop and wait every few seconds.
+        i_leashExtensionTimer.Update(time_diff);
+        if (i_leashExtensionTimer.Passed())
+        {
+            i_leashExtensionTimer.Reset(1500);
+            if (cOwner)
+                cOwner->UpdateLeashExtensionTime();
+        }
     }
+    else if (i_recalculateTravel)
+        i_leashExtensionTimer.Reset(1500);
 
     // if the target moved, we have to consider whether to adjust
     if (!_lastTargetPosition || target->GetPosition() != _lastTargetPosition.value() || mutualChase != _mutualChase || !owner->IsWithinLOSInMap(target))
