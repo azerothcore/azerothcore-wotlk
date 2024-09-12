@@ -1186,6 +1186,25 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
 {
     npc_parasitic_shadowfiend(Creature* creature) : ScriptedAI(creature) { }
 
+    bool CanAIAttack(Unit const* who) const
+    {
+        return !who->HasAura(SPELL_PARASITIC_SHADOWFIEND) && !who->HasAura(SPELL_PARASITIC_SHADOWFIEND_TRIGGER);
+    }
+
+    void Reset() override
+    {
+        scheduler.Schedule(2s, [this](TaskContext context)
+        {
+            me->SetInCombatWithZone();
+            context.Repeat();
+        });
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        me->DespawnOrUnsummon();
+    }
+
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Simulate blizz-like AI delay to avoid extreme overpopulation of adds
@@ -1194,6 +1213,16 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetInCombatWithZone();
         }, 2400ms);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
     }
 };
 
