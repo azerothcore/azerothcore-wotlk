@@ -611,15 +611,15 @@ struct boss_illidan_stormrage : public BossAI
         summons.Summon(summon);
 
         if (summon->GetEntry() == NPC_ILLIDAN_DB_TARGET)
+        {
             DoCast(summon, SPELL_EYE_BLAST);
-
-        if (summon->GetEntry() == NPC_MAIEV_SHADOWSONG)
+        }
+        else if (summon->GetEntry() == NPC_MAIEV_SHADOWSONG)
         {
             me->SetTarget(summon->GetGUID());
             me->SetFacingToObject(summon);
         }
-
-        if (summon->GetEntry() == NPC_SHADOW_DEMON)
+        else if (summon->GetEntry() == NPC_SHADOW_DEMON)
         {
             summon->SetControlled(true, UNIT_STATE_MOVE);
             summon->SetInCombatWithZone();
