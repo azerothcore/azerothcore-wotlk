@@ -39,6 +39,11 @@ bool ScriptMgr::OnBeforeArenaCheckWinConditions(Battleground* const bg)
     CALL_ENABLED_BOOLEAN_HOOKS(ArenaScript, ARENAHOOK_ON_BEFORE_CHECK_WIN_CONDITION, !script->OnBeforeArenaCheckWinConditions(bg));
 }
 
+void ScriptMgr::OnArenaStart(Battleground* bg)
+{
+    CALL_ENABLED_HOOKS(ArenaScript, ARENAHOOK_ON_ARENA_START, script->OnArenaStart(bg));
+}
+
 ArenaScript::ArenaScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, ARENAHOOK_END)
 {
