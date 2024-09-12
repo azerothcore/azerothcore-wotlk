@@ -16,15 +16,15 @@ jobs:
       matrix:
         # the result of the matrix will be the combination of all attributes, so we get os*compiler builds
         include:
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             c_compiler: clang
             cpp_compiler: clang++
             build_type: Release
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             c_compiler: gcc
             cpp_compiler: g++
             build_type: Release
-          - os: ubuntu-latest
+          - os: ubuntu-24.04
             c_compiler: gcc
             cpp_compiler: g++
             build_type: Release
