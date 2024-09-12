@@ -959,6 +959,11 @@ public:
 
     [[nodiscard]] bool CanFreeMove() const
     {
+        //npcbot: skip owner guid condition for bots
+        if (IsNPCBotOrPet())
+            return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT |
+                                 UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED);
+        //end npcbot
         return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT |
                              UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && !GetOwnerGUID();
     }
@@ -1793,6 +1798,13 @@ public:
 
     void SetInstantCast(bool set) { _instantCast = set; }
     [[nodiscard]] bool CanInstantCast() const { return _instantCast; }
+
+    // Movement info
+    Movement::MoveSpline* movespline;
+
+    //npcbot: TC method transfer
+    bool IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType auraType, int32 effectAmount, uint8 auraEffectMask, bool removeOtherAuraApplications = false);
+    //end npcbot
 
     virtual void Talk(std::string_view text, ChatMsg msgType, Language language, float textRange, WorldObject const* target);
     virtual void Say(std::string_view text, Language language, WorldObject const* target = nullptr);
