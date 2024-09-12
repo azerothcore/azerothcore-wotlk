@@ -1186,7 +1186,7 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
 {
     npc_parasitic_shadowfiend(Creature* creature) : ScriptedAI(creature) { }
 
-    bool CanAIAttack(Unit const* who) const
+    bool CanAIAttack(Unit const* who) const override
     {
         return !who->HasAura(SPELL_PARASITIC_SHADOWFIEND) && !who->HasAura(SPELL_PARASITIC_SHADOWFIEND_TRIGGER);
     }
