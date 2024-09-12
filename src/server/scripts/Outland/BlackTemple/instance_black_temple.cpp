@@ -186,12 +186,11 @@ public:
                     default:
                         break;
                 }
+
+                if (AllBossesDone({ DATA_SHADE_OF_AKAMA, DATA_TERON_GOREFIEND, DATA_GURTOGG_BLOODBOIL, DATA_RELIQUARY_OF_SOULS }))
+                    if (Creature* trigger = GetCreature(DATA_BLACK_TEMPLE_TRIGGER))
+                        trigger->AI()->Talk(EMOTE_LOWER_TEMPLE_DEFEATED);
             }
-
-            if (AllBossesDone({ DATA_SHADE_OF_AKAMA, DATA_TERON_GOREFIEND, DATA_GURTOGG_BLOODBOIL, DATA_RELIQUARY_OF_SOULS }))
-                if (Creature* trigger = GetCreature(DATA_BLACK_TEMPLE_TRIGGER))
-                    trigger->AI()->Talk(EMOTE_LOWER_TEMPLE_DEFEATED);
-
             return true;
         }
 
