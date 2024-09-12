@@ -359,16 +359,6 @@ void ScriptMgr::OnPlayerJoinArena(Player* player)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_JOIN_ARENA, script->OnPlayerJoinArena(player));
 }
 
-void ScriptMgr::GetCustomGetArenaTeamId(Player const* player, uint8 slot, uint32& teamID) const
-{
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_GET_CUSTOM_GET_ARENA_TEAM_ID, script->GetCustomGetArenaTeamId(player, slot, teamID));
-}
-
-void ScriptMgr::GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const
-{
-    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_GET_CUSTOM_ARENA_PERSONAL_RATING, script->GetCustomArenaPersonalRating(player, slot, rating));
-}
-
 void ScriptMgr::OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_MAX_PERSONAL_ARENA_RATING_REQUIREMENT, script->OnGetMaxPersonalArenaRatingRequirement(player, minSlot, maxArenaRating));
