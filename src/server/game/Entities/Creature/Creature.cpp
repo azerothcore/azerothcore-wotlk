@@ -3680,7 +3680,7 @@ void Creature::UpdateMovementFlags()
 
 float Creature::GetNativeObjectScale() const
 {
-    return GetCreatureTemplate()->scale;
+    return ObjectMgr::ChooseDisplayId(GetCreatureTemplate())->DisplayScale;
 }
 
 void Creature::SetObjectScale(float scale)
@@ -3887,7 +3887,7 @@ bool Creature::IsNotReachableAndNeedRegen() const
 std::shared_ptr<time_t> const& Creature::GetLastLeashExtensionTimePtr() const
 {
     if (m_lastLeashExtensionTime == nullptr)
-        m_lastLeashExtensionTime = std::make_shared<time_t>(time(nullptr));
+        m_lastLeashExtensionTime = std::make_shared<time_t>(GameTime::GetGameTime().count());
     return m_lastLeashExtensionTime;
 }
 
@@ -3908,7 +3908,7 @@ time_t Creature::GetLastLeashExtensionTime() const
 
 void Creature::UpdateLeashExtensionTime()
 {
-    (*GetLastLeashExtensionTimePtr()) = time(nullptr);
+    (*GetLastLeashExtensionTimePtr()) = GameTime::GetGameTime().count();
 }
 
 bool Creature::CanPeriodicallyCallForAssistance() const
