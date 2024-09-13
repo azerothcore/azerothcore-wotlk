@@ -1191,15 +1191,6 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
         return !who->HasAura(SPELL_PARASITIC_SHADOWFIEND) && !who->HasAura(SPELL_PARASITIC_SHADOWFIEND_TRIGGER);
     }
 
-    void Reset() override
-    {
-        scheduler.Schedule(3s, [this](TaskContext context)
-        {
-            me->SetInCombatWithZone();
-            context.Repeat();
-        });
-    }
-
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
         me->DespawnOrUnsummon();
@@ -1209,10 +1200,13 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
     {
         // Simulate blizz-like AI delay to avoid extreme overpopulation of adds
         me->SetReactState(REACT_DEFENSIVE);
-        me->m_Events.AddEventAtOffset([&] {
+
+        scheduler.Schedule(2400ms, [this](TaskContext context)
+        {
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetInCombatWithZone();
-        }, 2400ms);
+            context.Repeat();
+        });
     }
 
     void UpdateAI(uint32 diff) override
