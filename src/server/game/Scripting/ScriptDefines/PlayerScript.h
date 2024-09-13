@@ -404,12 +404,6 @@ public:
     // After player enters queue for Arena
     virtual void OnPlayerJoinArena(Player* /*player*/) { }
 
-    //Called when trying to get a team ID of a slot > 2 (This is for custom teams created by modules)
-    virtual void GetCustomGetArenaTeamId(Player const* /*player*/, uint8 /*slot*/, uint32& /*teamID*/) const { }
-
-    //Called when trying to get players personal rating of an arena slot > 2 (This is for custom teams created by modules)
-    virtual void GetCustomArenaPersonalRating(Player const* /*player*/, uint8 /*slot*/, uint32& /*rating*/) const { }
-
     //Called after the normal slots (0..2) for arena have been evaluated so that custom arena teams could modify it if nececasry
     virtual void OnGetMaxPersonalArenaRatingRequirement(Player const* /*player*/, uint32 /*minSlot*/, uint32& /*maxArenaRating*/) const {}
 
