@@ -1087,7 +1087,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     for (RewardedQuestSet::const_iterator itr = rewQuests.begin(); itr != rewQuests.end(); ++itr)
                     {
                         Quest const* quest = sObjectMgr->GetQuestTemplate(*itr);
-                        if (quest && quest->GetZoneOrSort() >= 0 && uint32(quest->GetZoneOrSort()) == achievementCriteria->complete_quests_in_zone.zoneID)
+                        if (quest && quest->GetZoneOrSort() >= 0 && uint32(quest->GetZoneOrSort()) == achievementCriteria->complete_quests_in_zone.zoneID && !(quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_LOREMASTER_COUNT)))
                             ++counter;
                     }
                     SetCriteriaProgress(achievementCriteria, counter);
