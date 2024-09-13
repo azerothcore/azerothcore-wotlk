@@ -611,8 +611,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                         }
                 m_ToBeTeleported.clear();
             }
-
-            sScriptMgr->OnArenaStart(this);
         }
         else
         {

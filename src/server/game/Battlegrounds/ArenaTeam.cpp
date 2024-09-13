@@ -1034,10 +1034,7 @@ void ArenaTeam::CreateTempArenaTeam(std::vector<Player*> playerList, uint8 type,
 {
     auto playerCountInTeam = static_cast<uint32>(playerList.size());
 
-    const auto standardArenaType = { ARENA_TYPE_2v2, ARENA_TYPE_3v3, ARENA_TYPE_5v5 };
-    bool isStandardArenaType = std::find(std::begin(standardArenaType), std::end(standardArenaType), type) != std::end(standardArenaType);
-    if (isStandardArenaType)
-        ASSERT(playerCountInTeam == GetReqPlayersForType(type));
+    ASSERT(playerCountInTeam == GetReqPlayersForType(type));
 
     // Generate new arena team id
     TeamId = sArenaTeamMgr->GenerateTempArenaTeamId();
