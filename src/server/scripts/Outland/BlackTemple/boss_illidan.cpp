@@ -1193,7 +1193,7 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
 
     void Reset() override
     {
-        scheduler.Schedule(2s, [this](TaskContext context)
+        scheduler.Schedule(3s, [this](TaskContext context)
         {
             me->SetInCombatWithZone();
             context.Repeat();
