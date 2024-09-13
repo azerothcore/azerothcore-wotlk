@@ -294,6 +294,11 @@ struct boss_kaelthas : public BossAI
             BossAI::AttackStart(who);
     }
 
+    void JustReachedHome() override
+    {
+        Reset();
+    }
+
     void MoveInLineOfSight(Unit* who) override
     {
         if (_phase == PHASE_NONE && who->IsPlayer() && me->IsValidAttackTarget(who))

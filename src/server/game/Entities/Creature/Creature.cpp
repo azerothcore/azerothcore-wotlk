@@ -3679,7 +3679,7 @@ bool Creature::IsNotReachableAndNeedRegen() const
 std::shared_ptr<time_t> const& Creature::GetLastLeashExtensionTimePtr() const
 {
     if (m_lastLeashExtensionTime == nullptr)
-        m_lastLeashExtensionTime = std::make_shared<time_t>(GameTime::GetGameTime().count());
+        m_lastLeashExtensionTime = std::make_shared<time_t>(time(nullptr));
     return m_lastLeashExtensionTime;
 }
 
@@ -3700,7 +3700,7 @@ time_t Creature::GetLastLeashExtensionTime() const
 
 void Creature::UpdateLeashExtensionTime()
 {
-    (*GetLastLeashExtensionTimePtr()) = GameTime::GetGameTime().count();
+    (*GetLastLeashExtensionTimePtr()) = time(nullptr);
 }
 
 bool Creature::CanPeriodicallyCallForAssistance() const

@@ -220,7 +220,6 @@ struct npc_akama_shade : public ScriptedAI
         DoCastSelf(SPELL_STEALTH, true);
         me->SetWalk(true);
         _sayLowHealth = false;
-        _died = false;
         scheduler.CancelAll();
     }
 
@@ -233,14 +232,14 @@ struct npc_akama_shade : public ScriptedAI
             case POINT_ENGAGE:
                 me->SetHomePosition(me->GetPosition());
                 me->SetFaction(FACTION_ENGAGE);
-                DoCastSelf(SPELL_AKAMA_SOUL_CHANNEL, true);
+                DoCast(me, SPELL_AKAMA_SOUL_CHANNEL, true);
                 break;
             case POINT_OUTRO:
                 DoCastSelf(SPELL_AKAMA_SOUL_RETRIEVE, true);
                 ScheduleUniqueTimedEvent(15600ms, [&]
                 {
-                    Talk(SAY_BROKEN_FREE_0);
-                    me->SummonCreatureGroup(SUMMON_GROUP_BROKENS);
+                        Talk(SAY_BROKEN_FREE_0);
+                        me->SummonCreatureGroup(SUMMON_GROUP_BROKENS);
                 }, 1);
                 ScheduleUniqueTimedEvent(26550ms, [&]
                 {
@@ -276,19 +275,6 @@ struct npc_akama_shade : public ScriptedAI
             _sayLowHealth = true;
             Talk(SAY_LOW_HEALTH);
         }
-        else if (damage >= me->GetHealth() && !_died)
-        {
-            damage = me->GetHealth() - 1;
-            Talk(SAY_DEATH);
-            if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
-            {
-                shade->SetHomePosition(shade->GetHomePosition());
-                shade->AI()->EnterEvadeMode();
-            }
-
-            me->DespawnOrUnsummon();
-            ScriptedAI::EnterEvadeMode(EvadeReason::EVADE_REASON_OTHER);
-        }
     }
 
     void DoAction(int32 param) override
@@ -311,6 +297,18 @@ struct npc_akama_shade : public ScriptedAI
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override { }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        Talk(SAY_DEATH);
+        if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
+        {
+            shade->SetHomePosition(shade->GetHomePosition());
+            shade->AI()->EnterEvadeMode();
+        }
+
+        me->DespawnOrUnsummon();
+    }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
@@ -340,7 +338,6 @@ struct npc_akama_shade : public ScriptedAI
 
     private:
         bool _sayLowHealth;
-        bool _died;
 };
 
 struct npc_creature_generator_akama : public ScriptedAI
@@ -448,18 +445,27 @@ private:
 
 struct npc_ashtongue_sorcerer : public NullCreatureAI
 {
-    npc_ashtongue_sorcerer(Creature* creature) : NullCreatureAI(creature) { }
+    npc_ashtongue_sorcerer(Creature* creature) : NullCreatureAI(creature)
+    {
+        instance = creature->GetInstanceScript();
+    }
 
     void MovementInform(uint32 type, uint32 point) override
     {
         if (type == POINT_MOTION_TYPE && point == POINT_ENGAGE)
             me->CastSpell(me, SPELL_SHADE_SOUL_CHANNEL, true);
     }
+
+private:
+    InstanceScript* instance;
 };
 
 struct npc_ashtongue_channeler : public NullCreatureAI
 {
-    npc_ashtongue_channeler(Creature* creature) : NullCreatureAI(creature) { }
+    npc_ashtongue_channeler(Creature* creature) : NullCreatureAI(creature)
+    {
+        instance = creature->GetInstanceScript();
+    }
 
     void Reset() override
     {
@@ -478,6 +484,7 @@ struct npc_ashtongue_channeler : public NullCreatureAI
     }
 
 private:
+    InstanceScript* instance;
     TaskScheduler scheduler;
 };
 
