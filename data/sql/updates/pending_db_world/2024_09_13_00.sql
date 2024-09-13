@@ -1,5 +1,3 @@
-UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23403;
-
 UPDATE `creature_template` SET `flags_extra` = 134217728 WHERE (`entry` = 23403);
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 23403) AND (`source_type` = 0) AND (`id` IN (2));
