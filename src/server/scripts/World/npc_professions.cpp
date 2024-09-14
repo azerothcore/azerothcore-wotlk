@@ -1283,7 +1283,7 @@ public:
 
     void SendActionMenu(Player* player, GameObject*  /*gameobject*/, uint32 uiAction)
     {
-        switch(uiAction)
+        switch (uiAction)
         {
             // Learn Goblin
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -1353,7 +1353,7 @@ public:
     bool OnGossipSelect(Player* player, GameObject* gameobject, uint32 uiSender, uint32 uiAction) override
     {
         ClearGossipMenuFor(player);
-        switch(uiSender)
+        switch (uiSender)
         {
             case GOSSIP_SENDER_LEARN:
                 SendActionMenu(player, gameobject, uiAction);

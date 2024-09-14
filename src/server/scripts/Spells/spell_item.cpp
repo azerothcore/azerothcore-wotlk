@@ -620,7 +620,7 @@ class spell_item_feast : public SpellScript
         {
             LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
 
-            switch(GetSpellInfo()->Id)
+            switch (GetSpellInfo()->Id)
             {
                 case SPELL_GREAT_FEAST:
                     if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
