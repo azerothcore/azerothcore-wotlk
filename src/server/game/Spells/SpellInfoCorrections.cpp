@@ -4016,12 +4016,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx7 |= SPELL_ATTR7_CAN_CAUSE_INTERRUPT;
     });
 
-    // Ritual of Summoning
-    ApplySpellFix({ 61994 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->ManaCostPercentage = 0; // Clicking on Warlock Summoning portal should not require mana
-    });
-
     // Shadowmeld
     ApplySpellFix({ 58984 }, [](SpellInfo* spellInfo)
     {
@@ -4882,6 +4876,21 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
+    });
+
+    // Conjure Refreshment Table (Rank 1, Rank 2)
+    ApplySpellFix({ 43985, 58661 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_FRONT);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS);
+    });
+
+    ApplySpellFix({
+        698, // Ritual of Summoning (portal for clicking)
+        61993 // Ritual of Summoning (summons the closet)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_3_YARDS);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

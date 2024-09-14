@@ -62,7 +62,6 @@ enum Spells
     SPELL_PARASITIC_SHADOWFIEND         = 41917,
     SPELL_PARASITIC_SHADOWFIEND_TRIGGER = 41914,
     SPELL_SUMMON_PARASITIC_SHADOWFIENDS = 41915,
-    SPELL_SHEAR                         = 41032,
 
     // Phase 2
     SPELL_THROW_GLAIVE                  = 39635,
@@ -456,10 +455,6 @@ struct boss_illidan_stormrage : public BossAI
                     DoCastVictim(SPELL_FLAME_CRASH);
                 }, 26s, 35s);
 
-                ScheduleTimedEvent(10s, [&] {
-                    DoCastVictim(SPELL_SHEAR);
-                }, 12s, 15s);
-
                 ScheduleTimedEvent(32s, [&] {
                     DoCastVictim(SPELL_DRAW_SOUL);
                 }, 32s);
@@ -527,10 +522,6 @@ struct boss_illidan_stormrage : public BossAI
                 ScheduleTimedEvent(25s, 30s, [&] {
                     DoCastVictim(SPELL_FLAME_CRASH);
                 }, 26s, 35s);
-
-                ScheduleTimedEvent(10s, [&] {
-                    DoCastVictim(SPELL_SHEAR);
-                }, 12s, 15s);
 
                 ScheduleTimedEvent(32s, [&] {
                     DoCastVictim(SPELL_DRAW_SOUL);
@@ -1218,7 +1209,10 @@ enum WarbladeTear
 
 struct npc_blade_of_azzinoth : public ScriptedAI
 {
-    npc_blade_of_azzinoth(Creature* creature) : ScriptedAI(creature) { }
+    npc_blade_of_azzinoth(Creature* creature) : ScriptedAI(creature)
+    {
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+    }
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
@@ -1266,12 +1260,13 @@ enum FlameAzzinoth
 
 struct npc_flame_of_azzinoth : public ScriptedAI
 {
-    npc_flame_of_azzinoth(Creature* creature) : ScriptedAI(creature), _bladeSummoner(nullptr) { }
+    npc_flame_of_azzinoth(Creature* creature) : ScriptedAI(creature) { }
 
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Flame is set to be Illidan's summon, so we check for nearest blade
-        _bladeSummoner = me->FindNearestCreature(NPC_BLADE_OF_AZZINOTH, 15.0f);
+        if (Creature* _blade = me->FindNearestCreature(NPC_BLADE_OF_AZZINOTH, 15.0f))
+            _bladeGUID = _blade->GetGUID();
 
         me->SetCorpseDelay(2);
         me->SetReactState(REACT_DEFENSIVE);
@@ -1294,8 +1289,8 @@ struct npc_flame_of_azzinoth : public ScriptedAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         ScheduleTimedEvent(10s, [&] {
-            if (_bladeSummoner)
-                if (Unit* target = _bladeSummoner->AI()->SelectTarget(SelectTargetMethod::Random, 0, 30.f, true))
+            if (Creature* _blade = ObjectAccessor::GetCreature(*me, _bladeGUID))
+                if (Unit* target = _blade->AI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                     DoCast(target, SPELL_CHARGE);
         }, 5s, 20s);
 
@@ -1310,7 +1305,7 @@ struct npc_flame_of_azzinoth : public ScriptedAI
     }
 
 private:
-    Creature* _bladeSummoner;
+    ObjectGuid _bladeGUID;
 };
 
 class spell_illidan_draw_soul : public SpellScript

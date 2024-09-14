@@ -94,7 +94,7 @@ public:
                             _conflagrateThreat = me->GetThreatMgr().GetThreat(me->GetVictim());
                             me->GetThreatMgr().ModifyThreatByPercent(target, -100);
                         }
-                        events.ScheduleEvent(EVENT_CONFLAGRATION, 10s, 13s);
+                        events.ScheduleEvent(EVENT_CONFLAGRATION, 18s, 25s);
                         events.ScheduleEvent(EVENT_CHECK_CONFLAGRATION_TARGET, 10s);
                         break;
                     case EVENT_THUNDERCLAP:

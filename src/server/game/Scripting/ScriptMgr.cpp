@@ -34,24 +34,9 @@ namespace
     template<typename T>
     inline void SCR_CLEAR()
     {
-        for (auto& [scriptID, script] : ScriptRegistry<T>::ScriptPointerList)
+        for (auto const& [scriptID, script] : ScriptRegistry<T>::ScriptPointerList)
         {
-            try
-            {
-                if(script)
-                {
-                    delete script;
-                    script = nullptr;
-                }
-            }
-            catch (const std::exception& e)
-            {
-                LOG_ERROR("scripts.unloading", "Failed to unload script {} with ID: {}. Error: {}", script->GetName(), scriptID, e.what());
-            }
-            catch (...)
-            {
-                LOG_ERROR("scripts.unloading", "Failed to unload script {} with ID: {}. Unknown error occurred.", script->GetName(), scriptID);
-            }
+            delete script;
         }
 
         ScriptRegistry<T>::ScriptPointerList.clear();
