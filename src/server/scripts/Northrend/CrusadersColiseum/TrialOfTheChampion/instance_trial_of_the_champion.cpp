@@ -336,7 +336,7 @@ public:
                                 c->DespawnOrUnsummon();
                             NPC_GrandChampionGUID[i].Clear();
                         }
-                        if (Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* c = instance->GetCreature(NPC_AnnouncerGUID))
                         {
                             c->DespawnOrUnsummon();
                             c->SetHomePosition(748.309f, 619.488f, 411.172f, 4.71239f);
@@ -349,7 +349,7 @@ public:
                     break;
                 case INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED:
                     {
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                         {
                             announcer->DespawnOrUnsummon();
                             announcer->SetHomePosition(735.81f, 661.92f, 412.39f, 4.714f);
@@ -365,21 +365,21 @@ public:
                                     switch( i )
                                     {
                                         case 0:
-                                            if (Creature* pBoss = announcer->SummonCreature(entry, 736.695f, 650.02f, 412.4f, 3 * M_PI / 2) )
+                                            if (Creature* pBoss = announcer->SummonCreature(entry, 736.695f, 650.02f, 412.4f, 3 * M_PI / 2))
                                             {
                                                 NPC_GrandChampionGUID[0] = pBoss->GetGUID();
                                                 pBoss->AI()->SetData(0, 2);
                                             }
                                             break;
                                         case 1:
-                                            if (Creature* pBoss = announcer->SummonCreature(entry, 756.32f, 650.05f, 412.4f, 3 * M_PI / 2) )
+                                            if (Creature* pBoss = announcer->SummonCreature(entry, 756.32f, 650.05f, 412.4f, 3 * M_PI / 2))
                                             {
                                                 NPC_GrandChampionGUID[1] = pBoss->GetGUID();
                                                 pBoss->AI()->SetData(1, 2);
                                             }
                                             break;
                                         case 2:
-                                            if (Creature* pBoss = announcer->SummonCreature(entry, 746.5f, 650.65f, 411.7f, 3 * M_PI / 2) )
+                                            if (Creature* pBoss = announcer->SummonCreature(entry, 746.5f, 650.65f, 411.7f, 3 * M_PI / 2))
                                             {
                                                 NPC_GrandChampionGUID[2] = pBoss->GetGUID();
                                                 pBoss->AI()->SetData(2, 2);
@@ -401,13 +401,13 @@ public:
                                     c->DespawnOrUnsummon();
                                 NPC_ArgentSoldierGUID[i][j].Clear();
                             }
-                        if (Creature* c = instance->GetCreature(NPC_ArgentChampionGUID) )
+                        if (Creature* c = instance->GetCreature(NPC_ArgentChampionGUID))
                         {
                             c->AI()->DoAction(-1); // paletress despawn memory
                             c->DespawnOrUnsummon();
                         }
                         NPC_ArgentChampionGUID.Clear();
-                        if (Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* c = instance->GetCreature(NPC_AnnouncerGUID))
                         {
                             c->DespawnOrUnsummon();
                             c->SetHomePosition(743.14f, 628.77f, 411.2f, 4.71239f);
@@ -422,16 +422,16 @@ public:
                 case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
                     // revert to INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED
                     {
-                        if (Creature* c = instance->GetCreature(NPC_BlackKnightVehicleGUID) )
+                        if (Creature* c = instance->GetCreature(NPC_BlackKnightVehicleGUID))
                             c->DespawnOrUnsummon();
                         NPC_BlackKnightVehicleGUID.Clear();
-                        if (Creature* c = instance->GetCreature(NPC_BlackKnightGUID) )
+                        if (Creature* c = instance->GetCreature(NPC_BlackKnightGUID))
                         {
                             c->AI()->DoAction(-1);
                             c->DespawnOrUnsummon();
                         }
                         NPC_BlackKnightGUID.Clear();
-                        if (Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* c = instance->GetCreature(NPC_AnnouncerGUID))
                         {
                             c->DespawnOrUnsummon();
                             c->SetHomePosition(743.14f, 628.77f, 411.2f, 4.71239f);
@@ -443,7 +443,7 @@ public:
                     }
                     break;
                 case INSTANCE_PROGRESS_FINISHED:
-                    if (Creature* c = instance->GetCreature(NPC_AnnouncerGUID) )
+                    if (Creature* c = instance->GetCreature(NPC_AnnouncerGUID))
                         c->DespawnOrUnsummon();
                     break;
             }
@@ -496,11 +496,11 @@ public:
                             {
                                 shortver = false;
 
-                                if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                                if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                                 {
-                                    if (GameObject* gate = instance->GetGameObject(GO_MainGateGUID) )
+                                    if (GameObject* gate = instance->GetGameObject(GO_MainGateGUID))
                                         announcer->SetFacingToObject(gate);
-                                    if (Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
+                                    if (Creature* tirion = instance->GetCreature(NPC_TirionGUID))
                                         tirion->AI()->Talk(TEXT_WELCOME);
                                 }
                                 events.RescheduleEvent(EVENT_YELL_WELCOME_2, 8s);
@@ -521,7 +521,7 @@ public:
 
                                 InstanceProgress = INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST;
                                 uiData = DONE; // save to db
-                                if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                                if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                                 {
                                     announcer->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
                                     announcer->GetMotionMaster()->MovePoint(1, 735.81f, 661.92f, 412.39f);
@@ -530,7 +530,7 @@ public:
                             }
                             break;
                         case INSTANCE_PROGRESS_CHAMPIONS_DEAD:
-                            if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                            if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                             {
                                 Counter = urand(0, 1);
                                 if (Counter)
@@ -542,7 +542,7 @@ public:
                             events.RescheduleEvent(EVENT_START_ARGENT_CHALLENGE_INTRO, 0ms);
                             break;
                         case INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED:
-                            if (Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
+                            if (Creature* tirion = instance->GetCreature(NPC_TirionGUID))
                                 tirion->AI()->Talk(TEXT_BK_INTRO);
                             events.RescheduleEvent(EVENT_SUMMON_BLACK_KNIGHT, 3s);
                             break;
@@ -560,7 +560,7 @@ public:
                             events.ScheduleEvent(EVENT_SUMMON_GRAND_CHAMPION_3, 0ms);
                             break;
                         case 2:
-                            if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                            if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                             {
                                 InstanceProgress = INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST;
                                 uiData = DONE; // save to db
@@ -636,7 +636,7 @@ public:
                                     creditCasted = true;
                                 }
                             }
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                         {
                             announcer->GetMotionMaster()->MovePoint(0, 743.14f, 628.77f, 411.2f);
                             announcer->SummonGameObject(instance->IsHeroic() ? GO_CHAMPIONS_LOOT_H : GO_CHAMPIONS_LOOT, 746.59f, 618.49f, 411.09f, 1.42f, 0, 0, 0, 0, 90000000); // [LOOT]
@@ -754,7 +754,7 @@ public:
                         break;
                 }
 
-            if (Creature* pBoss = instance->SummonCreature(CHAMPION_TO_SUMMON, SpawnPos) )
+            if (Creature* pBoss = instance->SummonCreature(CHAMPION_TO_SUMMON, SpawnPos))
             {
                 NPC_GrandChampionGUID[BossOrder] = pBoss->GetGUID();
                 pBoss->ToCreature()->SetReactState(REACT_PASSIVE);
@@ -764,7 +764,7 @@ public:
                 pBoss->AI()->SetData(BossOrder, (shortver ? 1 : 0));
 
                 for( uint8 i = 0; i < 3; ++i )
-                    if (Creature* pAdd = instance->SummonCreature(MINION_TO_SUMMON, SpawnPos) )
+                    if (Creature* pAdd = instance->SummonCreature(MINION_TO_SUMMON, SpawnPos))
                     {
                         NPC_GrandChampionMinionsGUID[BossOrder][i] = pAdd->GetGUID();
                         pAdd->SetReactState(REACT_PASSIVE);
@@ -776,7 +776,7 @@ public:
             }
 
             if (!shortver)
-                if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                 {
                     announcer->AI()->Talk(TEXT_ID); /// @todo: Missing Argent Raid Spectator cheers.
                 }
@@ -842,10 +842,10 @@ public:
                     }
                 case EVENT_GRAND_GROUP_1_MOVE_MIDDLE:
                     {
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                         {
                             announcer->SetFacingTo(4.714f);
-                            if (Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
+                            if (Creature* tirion = instance->GetCreature(NPC_TirionGUID))
                                 tirion->AI()->Talk(TEXT_BEGIN);
                             HandleGameObject(GO_EnterGateGUID, false);
                         }
@@ -867,7 +867,7 @@ public:
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 c->SetImmuneToAll(false);
-                                if (Unit* target = c->SelectNearestTarget(200.0f) )
+                                if (Unit* target = c->SelectNearestTarget(200.0f))
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }
@@ -894,7 +894,7 @@ public:
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 c->SetImmuneToAll(false);
-                                if (Unit* target = c->SelectNearestTarget(200.0f) )
+                                if (Unit* target = c->SelectNearestTarget(200.0f))
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }
@@ -920,7 +920,7 @@ public:
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 c->SetImmuneToAll(false);
-                                if (Unit* target = c->SelectNearestTarget(200.0f) )
+                                if (Unit* target = c->SelectNearestTarget(200.0f))
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                             }
@@ -946,7 +946,7 @@ public:
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 c->SetImmuneToAll(false);
-                                if (Unit* target = c->SelectNearestTarget(200.0f) )
+                                if (Unit* target = c->SelectNearestTarget(200.0f))
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                                 c->CastSpell(c, 67865, true); // SPELL_TRAMPLE_AURA
@@ -984,7 +984,7 @@ public:
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 c->SetImmuneToAll(false);
-                                if (Unit* target = c->SelectNearestTarget(200.0f) )
+                                if (Unit* target = c->SelectNearestTarget(200.0f))
                                     c->AI()->AttackStart(target);
                                 c->AI()->DoZoneInCombat();
                                 c->AI()->DoAction(2);
@@ -993,7 +993,7 @@ public:
                     break;
                 case EVENT_GRATZ_SLAIN_CHAMPIONS:
                     {
-                        if (Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
+                        if (Creature* tirion = instance->GetCreature(NPC_TirionGUID))
                             tirion->AI()->Talk(TEXT_GRATZ_SLAIN_CHAMPIONS);
 
                         HandleGameObject(GO_EnterGateGUID, true);
@@ -1001,15 +1001,15 @@ public:
                     break;
                 case EVENT_RESTORE_ANNOUNCER_GOSSIP:
                     {
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                             announcer->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     }
                     break;
                 case EVENT_START_ARGENT_CHALLENGE_INTRO:
                     {
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                         {
-                            if (GameObject* gate = instance->GetGameObject(GO_MainGateGUID) )
+                            if (GameObject* gate = instance->GetGameObject(GO_MainGateGUID))
                             {
                                 announcer->SetFacingToObject(gate);
                                 HandleGameObject(GO_MainGateGUID, true, gate);
@@ -1023,19 +1023,19 @@ public:
                             float x = pos.GetPositionX();
 
                             pos.m_positionX = x - 2.0f + (i - 1) * 10.0f;
-                            if (Creature* pTrash = instance->SummonCreature(NPC_ARGENT_LIGHTWIELDER, pos) )
+                            if (Creature* pTrash = instance->SummonCreature(NPC_ARGENT_LIGHTWIELDER, pos))
                             {
                                 pTrash->AI()->SetData(i, 0);
                                 NPC_ArgentSoldierGUID[i][0] = pTrash->GetGUID();
                             }
                             pos.m_positionX = x + (i - 1) * 10.0f;
-                            if (Creature* pTrash = instance->SummonCreature(NPC_ARGENT_MONK, pos) )
+                            if (Creature* pTrash = instance->SummonCreature(NPC_ARGENT_MONK, pos))
                             {
                                 pTrash->AI()->SetData(i, 0);
                                 NPC_ArgentSoldierGUID[i][1] = pTrash->GetGUID();
                             }
                             pos.m_positionX = x + 2.0f + (i - 1) * 10.0f;
-                            if (Creature* pTrash = instance->SummonCreature(NPC_PRIESTESS, pos) )
+                            if (Creature* pTrash = instance->SummonCreature(NPC_PRIESTESS, pos))
                             {
                                 pTrash->AI()->SetData(i, 0);
                                 NPC_ArgentSoldierGUID[i][2] = pTrash->GetGUID();
@@ -1046,7 +1046,7 @@ public:
                     break;
                 case EVENT_SUMMON_ARGENT_CHALLENGE:
                     {
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                             announcer->GetMotionMaster()->MovePoint(0, 735.81f, 661.92f, 412.39f);
                         if (Creature* boss = instance->SummonCreature(Counter ? NPC_EADRIC : NPC_PALETRESS, SpawnPosition))
                             boss->GetMotionMaster()->MovePoint(0, 746.881f, 660.263f, 411.7f);
@@ -1057,7 +1057,7 @@ public:
                     break;
                 case EVENT_ARGENT_CHALLENGE_SAY_1:
                     {
-                        if (Creature* ac = instance->GetCreature(NPC_ArgentChampionGUID) )
+                        if (Creature* ac = instance->GetCreature(NPC_ArgentChampionGUID))
                             ac->AI()->Talk(Counter ? SAY_EADRIC_INTRO : SAY_PALETRESS_INTRO_1);
                         if (!Counter)
                             events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_SAY_2, 6s);
@@ -1065,7 +1065,7 @@ public:
                     break;
                 case EVENT_ARGENT_CHALLENGE_SAY_2:
                     {
-                        if (Creature* ac = instance->GetCreature(NPC_ArgentChampionGUID) )
+                        if (Creature* ac = instance->GetCreature(NPC_ArgentChampionGUID))
                             ac->AI()->Talk(SAY_PALETRESS_INTRO_2);
                     }
                     break;
@@ -1081,7 +1081,7 @@ public:
                                     c->SetImmuneToAll(false);
                                     //c->AI()->DoZoneInCombat();
                                 }
-                        if (Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
+                        if (Creature* tirion = instance->GetCreature(NPC_TirionGUID))
                             tirion->AI()->Talk(TEXT_YOU_MAY_BEGIN);
                     }
                     break;
@@ -1096,12 +1096,12 @@ public:
                     break;
                 case EVENT_ARGENT_CHALLENGE_ATTACK:
                     {
-                        if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID) )
+                        if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
                         {
                             boss->SetReactState(REACT_AGGRESSIVE);
                             boss->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             boss->SetImmuneToAll(false);
-                            if (Unit* target = boss->SelectNearestTarget(200.0f) )
+                            if (Unit* target = boss->SelectNearestTarget(200.0f))
                                 boss->AI()->AttackStart(target);
                             boss->AI()->DoZoneInCombat();
                         }
@@ -1109,7 +1109,7 @@ public:
                     break;
                 case EVENT_ARGENT_CHALLENGE_RUN_MIDDLE:
                     {
-                        if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID) )
+                        if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
                         {
                             boss->GetMotionMaster()->MovePoint(1, 747.13f, 628.037f, 411.2f);
                             events.ScheduleEvent(EVENT_ARGENT_CHALLENGE_LEAVE_CHEST, 6s);
@@ -1118,8 +1118,8 @@ public:
                     break;
                 case EVENT_ARGENT_CHALLENGE_LEAVE_CHEST:
                     {
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
-                            if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
+                            if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
                             {
                                 announcer->GetMotionMaster()->MovePoint(0, 743.14f, 628.77f, 411.2f);
                                 uint32 chest = 0;
@@ -1136,7 +1136,7 @@ public:
                     break;
                 case EVENT_ARGENT_CHALLENGE_DISAPPEAR:
                     {
-                        if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID) )
+                        if (Creature* boss = instance->GetCreature(NPC_ArgentChampionGUID))
                         {
                             boss->GetMotionMaster()->MovePoint(0, SpawnPosition);
                             boss->DespawnOrUnsummon(3000);
@@ -1145,14 +1145,14 @@ public:
                     break;
                 case EVENT_SUMMON_BLACK_KNIGHT:
                     {
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
-                            if (Creature* bk_vehicle = announcer->SummonCreature(VEHICLE_BLACK_KNIGHT, 769.834f, 651.915f, 447.035f, 0.0f) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
+                            if (Creature* bk_vehicle = announcer->SummonCreature(VEHICLE_BLACK_KNIGHT, 769.834f, 651.915f, 447.035f, 0.0f))
                             {
                                 NPC_BlackKnightVehicleGUID = bk_vehicle->GetGUID();
                                 bk_vehicle->SetReactState(REACT_PASSIVE);
                                 bk_vehicle->SetFacingTo(M_PI);
                                 if (Vehicle* v = bk_vehicle->GetVehicleKit() )
-                                    if (Unit* bk = v->GetPassenger(0) )
+                                    if (Unit* bk = v->GetPassenger(0))
                                     {
                                         NPC_BlackKnightGUID = bk->GetGUID();
                                         bk->SendMovementFlagUpdate(); // put him on vehicle visually
@@ -1167,7 +1167,7 @@ public:
                     break;
                 case EVENT_START_BLACK_KNIGHT_SCENE:
                     {
-                        if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
+                        if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID))
                         {
                             Position exitPos = { 751.003357f, 638.145508f, 411.570129f, M_PI };
                             bk->ExitVehicle(/*&exitPos*/);
@@ -1179,9 +1179,9 @@ public:
                     break;
                 case EVENT_BLACK_KNIGHT_CAST_ANNOUNCER:
                     {
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                         {
-                            if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
+                            if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID))
                             {
                                 bk->SetPosition(745.016f, 631.506f, 411.575f, bk->GetAngle(announcer));
                                 bk->SetHomePosition(*bk);
@@ -1189,7 +1189,7 @@ public:
                                 announcer->SetFacingToObject(bk);
                                 announcer->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                                 bk->AddAura(68306, announcer); // spell has attribute player only
-                                if (Creature* tirion = instance->GetCreature(NPC_TirionGUID) )
+                                if (Creature* tirion = instance->GetCreature(NPC_TirionGUID))
                                     tirion->AI()->Talk(TEXT_BK_MEANING);
                             }
                         }
@@ -1198,7 +1198,7 @@ public:
                     break;
                 case EVENT_BLACK_KNIGHT_KILL_ANNOUNCER:
                     {
-                        if (Creature* bk_vehicle = instance->GetCreature(NPC_BlackKnightVehicleGUID) )
+                        if (Creature* bk_vehicle = instance->GetCreature(NPC_BlackKnightVehicleGUID))
                             bk_vehicle->AI()->DoAction(1);
 
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_MOVE_FORWARD, 4s);
@@ -1206,13 +1206,13 @@ public:
                     break;
                 case EVENT_BLACK_KNIGHT_MOVE_FORWARD:
                     {
-                        if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
+                        if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID))
                         {
                             bk->SetUnitMovementFlags(MOVEMENTFLAG_WALKING);
                             bk->GetMotionMaster()->MovePoint(0, 746.81f, 623.15f, 411.42f);
                             bk->AI()->Talk(SAY_BK_INTRO_2);
                         }
-                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID) )
+                        if (Creature* announcer = instance->GetCreature(NPC_AnnouncerGUID))
                             if (announcer->IsAlive())
                                 Unit::Kill(announcer, announcer);
                         events.ScheduleEvent(EVENT_BLACK_KNIGHT_SAY_TASK, 14s);
@@ -1220,7 +1220,7 @@ public:
                     break;
                 case EVENT_BLACK_KNIGHT_SAY_TASK:
                     {
-                        if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
+                        if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID))
                         {
                             bk->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             bk->AI()->Talk(SAY_BK_INTRO_3);
@@ -1230,11 +1230,11 @@ public:
                     break;
                 case EVENT_BLACK_KNIGHT_ATTACK:
                     {
-                        if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID) )
+                        if (Creature* bk = instance->GetCreature(NPC_BlackKnightGUID))
                         {
                             bk->SetReactState(REACT_AGGRESSIVE);
                             bk->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                            if (Unit* target = bk->SelectNearestTarget(200.0f) )
+                            if (Unit* target = bk->SelectNearestTarget(200.0f))
                                 bk->AI()->AttackStart(target);
                             bk->AI()->DoZoneInCombat();
                             bk->AI()->DoAction(1);

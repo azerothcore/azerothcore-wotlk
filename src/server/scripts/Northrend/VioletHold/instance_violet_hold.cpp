@@ -409,7 +409,7 @@ public:
                     break;
                 case EVENT_CHECK_PLAYERS:
                     {
-                        if (DoNeedCleanup(false) )
+                        if (DoNeedCleanup(false))
                             InstanceCleanup();
                         events.Repeat(5s);
                     }

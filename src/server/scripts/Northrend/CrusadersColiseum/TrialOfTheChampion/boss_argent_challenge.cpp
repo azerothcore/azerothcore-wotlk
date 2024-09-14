@@ -169,7 +169,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -182,7 +182,7 @@ public:
                     events.Repeat(16s);
                     break;
                 case EVENT_SPELL_HAMMER_RIGHTEOUS:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 55.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 55.0f, true))
                     {
                         Talk(SAY_EADRIC_EMOTE_HAMMER_RIGHTEOUS, target);
                         Talk(SAY_EADRIC_HAMMER_RIGHTEOUS);
@@ -226,7 +226,7 @@ public:
             summoned = false;
             if (MemoryGUID)
             {
-                if (Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
+                if (Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID))
                     memory->DespawnOrUnsummon();
                 MemoryGUID.Clear();
             }
@@ -268,10 +268,10 @@ public:
                 me->RemoveAura(SPELL_SHIELD);
                 Talk(SAY_PALETRESS_MEMORY_DEATH);
             }
-            else if (param == (-1) )
+            else if (param == (-1))
             {
                 if (MemoryGUID)
-                    if (Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
+                    if (Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID))
                     {
                         memory->DespawnOrUnsummon();
                         MemoryGUID.Clear();
@@ -281,7 +281,7 @@ public:
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            //if (me->HasAura(SPELL_SHIELD) )
+            //if (me->HasAura(SPELL_SHIELD))
             //  return;
 
             if (damage >= me->GetHealth() )
@@ -329,7 +329,7 @@ public:
 
             events.Update(diff);
 
-            if (!summoned && HealthBelowPct(25) )
+            if (!summoned && HealthBelowPct(25))
             {
                 me->InterruptNonMeleeSpells(true);
                 Talk(SAY_PALETRESS_MEMORY_SUMMON);
@@ -343,7 +343,7 @@ public:
                 return;
             }
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -351,12 +351,12 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_SMITE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_SMITE, false);
                     events.Repeat(3s, 4s);
                     break;
                 case EVENT_SPELL_HOLY_FIRE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_HOLY_FIRE, false);
                     events.Repeat(9s, 12s);
                     break;
@@ -365,9 +365,9 @@ public:
                     {
                         break;
                     }
-                    if (urand(0, 1) )
+                    if (urand(0, 1))
                         me->CastSpell(me, SPELL_RENEW, false);
-                    else if (Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID) )
+                    else if (Creature* memory = ObjectAccessor::GetCreature(*me, MemoryGUID))
                         if (memory->IsAlive() )
                             me->CastSpell(memory, SPELL_RENEW, false);
                     events.Repeat(15s, 17s);
@@ -421,7 +421,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -436,7 +436,7 @@ public:
                 case EVENT_MEMORY_START_ATTACK:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetImmuneToAll(false);
-                    if (Unit* target = me->SelectNearestTarget(200.0f) )
+                    if (Unit* target = me->SelectNearestTarget(200.0f))
                     {
                         AttackStart(target);
                         DoZoneInCombat();
@@ -447,12 +447,12 @@ public:
                     events.ScheduleEvent(EVENT_SPELL_WAKING_NIGHTMARE, 20s, 30s);
                     break;
                 case EVENT_SPELL_OLD_WOUNDS:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
                         me->CastSpell(target, SPELL_OLD_WOUNDS, true);
                     events.Repeat(12s);
                     break;
                 case EVENT_SPELL_SHADOWS_PAST:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                         me->CastSpell(target, SPELL_SHADOWS_PAST, false);
                     events.Repeat(15s, 20s);
                     break;
@@ -658,7 +658,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -691,7 +691,7 @@ public:
                     events.Repeat(35s, 45s);
                     break;
                 case EVENT_PRIESTESS_SPELL_MIND_CONTROL_H:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_MIND_CONTROL_H, false);
                     events.Repeat(22s, 30s);
                     break;

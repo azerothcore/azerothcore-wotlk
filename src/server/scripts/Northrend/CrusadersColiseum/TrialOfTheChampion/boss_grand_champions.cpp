@@ -273,7 +273,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -568,7 +568,7 @@ public:
                     if (pInstance)
                     {
                         pInstance->SetData(DATA_MOUNT_DIED, BossOrder);
-                        if (Creature* mount = me->FindNearestCreature( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_WARHORSE : VEHICLE_ARGENT_BATTLEWORG, 100.0f, true ) )
+                        if (Creature* mount = me->FindNearestCreature( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_WARHORSE : VEHICLE_ARGENT_BATTLEWORG, 100.0f, true ))
                         {
                             NewMountGUID = mount->GetGUID();
                             me->GetMotionMaster()->MovePoint(7, *mount);
@@ -606,7 +606,7 @@ public:
             if (!pInstance)
                 return;
 
-            if ((i == 2 && (BossOrder == 1 || BossOrder == 2)) || (i == 3 && BossOrder == 0) )
+            if ((i == 2 && (BossOrder == 1 || BossOrder == 2)) || (i == 3 && BossOrder == 0))
                 pInstance->SetData(DATA_GRAND_CHAMPION_REACHED_DEST, BossOrder);
         }
 
@@ -622,7 +622,7 @@ public:
                 else if (id == 7) // reached new mount!
                 {
                     if (NewMountGUID)
-                        if (Creature* mount = ObjectAccessor::GetCreature(*me, NewMountGUID) )
+                        if (Creature* mount = ObjectAccessor::GetCreature(*me, NewMountGUID))
                         {
                             mount->DespawnOrUnsummon();
                             me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, mount->GetDisplayId());
@@ -637,7 +637,7 @@ public:
                             me->SetReactState(REACT_AGGRESSIVE);
                             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->SetImmuneToAll(false);
-                            if (Unit* target = me->SelectNearestTarget(200.0f) )
+                            if (Unit* target = me->SelectNearestTarget(200.0f))
                                 AttackStart(target);
                             DoZoneInCombat();
                             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
@@ -675,7 +675,7 @@ public:
                     break;
                 case EVENT_FIND_NEW_MOUNT:
                     {
-                        if (me->HasAura(SPELL_TRAMPLE_STUN) )
+                        if (me->HasAura(SPELL_TRAMPLE_STUN))
                         {
                             events.Repeat(200ms);
                             break;
@@ -691,7 +691,7 @@ public:
                                     if (me->GetExactDist(plr) <= 5.0f )
                                         if (Vehicle* v = plr->GetVehicle() )
                                             if (Unit* c = v->GetBase() )
-                                                if (c->IsCreature() && c->ToCreature()->GetEntry() == (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_BATTLEWORG : VEHICLE_ARGENT_WARHORSE) )
+                                                if (c->IsCreature() && c->ToCreature()->GetEntry() == (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_BATTLEWORG : VEHICLE_ARGENT_WARHORSE))
                                                 {
                                                     me->GetMotionMaster()->MovementExpired();
                                                     me->GetMotionMaster()->MoveIdle();
@@ -708,7 +708,7 @@ public:
                             }
                         }
 
-                        if (Creature* mount = ObjectAccessor::GetCreature(*me, NewMountGUID) )
+                        if (Creature* mount = ObjectAccessor::GetCreature(*me, NewMountGUID))
                             if (mount->IsAlive() )
                             {
                                 if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE )
@@ -717,7 +717,7 @@ public:
                                 break;
                             }
 
-                        if (Creature* mount = me->FindNearestCreature( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_WARHORSE : VEHICLE_ARGENT_BATTLEWORG, 100.0f, true ) )
+                        if (Creature* mount = me->FindNearestCreature( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? VEHICLE_ARGENT_WARHORSE : VEHICLE_ARGENT_BATTLEWORG, 100.0f, true ))
                         {
                             me->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
                             NewMountGUID = mount->GetGUID();
@@ -804,7 +804,7 @@ public:
                     events.Repeat(22s);
                     break;
                 case EVEMT_MAGE_SPELL_POLYMORPH:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_POLYMORPH, false);
                     events.Repeat(8s);
                     break;
@@ -812,7 +812,7 @@ public:
 
                 /****************** SHAMAN ******************/
                 case EVENT_SHAMAN_SPELL_CHAIN_LIGHTNING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
                     events.Repeat(16s);
                     break;
@@ -823,7 +823,7 @@ public:
                 case EVENT_SHAMAN_SPELL_HEALING_WAVE:
                     {
                         Unit* target = nullptr;
-                        if (urand(0, 1) )
+                        if (urand(0, 1))
                         {
                             target = DoSelectLowestHpFriendly(40.0f);
                             if (!target)
@@ -854,7 +854,7 @@ public:
                     {
                         if (!UnitTargetGUID)
                         {
-                            if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 30.0f, true) )
+                            if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 30.0f, true))
                             {
                                 me->CastSpell(target, SPELL_SHOOT, false);
                                 UnitTargetGUID = target->GetGUID();
@@ -865,7 +865,7 @@ public:
                         else
                         {
                             Unit* target = ObjectAccessor::GetUnit(*me, UnitTargetGUID);
-                            if (target && me->IsInRange(target, 5.0f, 30.0f, false) )
+                            if (target && me->IsInRange(target, 5.0f, 30.0f, false))
                                 me->CastSpell(target, SPELL_MULTI_SHOT, false);
                             else
                             {
@@ -873,7 +873,7 @@ public:
                                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                                 {
                                     Player* player = itr->GetSource();
-                                    if (player && me->IsInRange(player, 5.0f, 30.0f, false) )
+                                    if (player && me->IsInRange(player, 5.0f, 30.0f, false))
                                     {
                                         me->CastSpell(player, SPELL_MULTI_SHOT, false);
                                         break;
@@ -898,7 +898,7 @@ public:
                     events.Repeat(14s);
                     break;
                 case EVENT_ROGUE_SPELL_POISON_BOTTLE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
                         me->CastSpell(target, SPELL_POISON_BOTTLE, false);
                     events.Repeat(19s);
                     break;
@@ -921,7 +921,7 @@ public:
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                         {
                             Player* player = itr->GetSource();
-                            if (player && me->IsInRange(player, 8.0f, 25.0f, false) )
+                            if (player && me->IsInRange(player, 8.0f, 25.0f, false))
                             {
                                 DoResetThreatList();
                                 me->AddThreat(player, 5.0f);

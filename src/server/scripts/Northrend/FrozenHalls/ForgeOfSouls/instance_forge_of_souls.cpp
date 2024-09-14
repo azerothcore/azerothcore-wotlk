@@ -183,7 +183,7 @@ public:
             switch(criteria_id)
             {
                 case 12752: // Soul Power
-                    if (Creature* c = instance->GetCreature(NPC_BronjahmGUID) )
+                    if (Creature* c = instance->GetCreature(NPC_BronjahmGUID))
                     {
                         std::list<Creature*> L;
                         uint8 count = 0;
@@ -195,7 +195,7 @@ public:
                     }
                     break;
                 case 12976:
-                    if (Creature* c = instance->GetCreature(NPC_DevourerGUID) )
+                    if (Creature* c = instance->GetCreature(NPC_DevourerGUID))
                         return (bool)c->AI()->GetData(1);
                     break;
             }

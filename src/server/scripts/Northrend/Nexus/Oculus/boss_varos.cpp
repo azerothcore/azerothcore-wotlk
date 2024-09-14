@@ -162,7 +162,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             DoMeleeAttackIfReady();
@@ -173,7 +173,7 @@ public:
                     break;
                 case EVENT_AMPLIFY_MAGIC:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                             me->CastSpell(target, SPELL_AMPLIFY_MAGIC, false);
                         events.Repeat(17s + 500ms, 22s + 500ms);
                     }
@@ -204,11 +204,11 @@ public:
                                 events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 16s);
                                 break;
                         }
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         {
-                            if (Creature* trigger = me->SummonCreature(NPC_ARCANE_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13000) )
+                            if (Creature* trigger = me->SummonCreature(NPC_ARCANE_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13000))
                             {
-                                if (Creature* c = me->FindNearestCreature(NPC_AZURE_RING_CAPTAIN, 500.0f, true) )
+                                if (Creature* c = me->FindNearestCreature(NPC_AZURE_RING_CAPTAIN, 500.0f, true))
                                     c->CastSpell(trigger, SPELL_ARCANE_BEAM_VISUAL, true);
                                 trigger->GetMotionMaster()->MoveChase(target, 0.1f);
                                 trigger->CastSpell(me, SPELL_ARCANE_BEAM_PERIODIC_DAMAGE, true);

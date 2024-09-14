@@ -110,17 +110,17 @@ public:
             {
                 pInstance->SetData(DATA_EREGOS, IN_PROGRESS);
 
-                if (me->FindNearestCreature(NPC_AMBER_DRAKE, 750.0f, true) )
+                if (me->FindNearestCreature(NPC_AMBER_DRAKE, 750.0f, true))
                     pInstance->SetData(DATA_AMBER_VOID, 0);
                 else
                     pInstance->SetData(DATA_AMBER_VOID, 1);
 
-                if (me->FindNearestCreature(NPC_EMERALD_DRAKE, 750.0f, true) )
+                if (me->FindNearestCreature(NPC_EMERALD_DRAKE, 750.0f, true))
                     pInstance->SetData(DATA_EMERALD_VOID, 0);
                 else
                     pInstance->SetData(DATA_EMERALD_VOID, 1);
 
-                if (me->FindNearestCreature(NPC_RUBY_DRAKE, 750.0f, true) )
+                if (me->FindNearestCreature(NPC_RUBY_DRAKE, 750.0f, true))
                     pInstance->SetData(DATA_RUBY_VOID, 0);
                 else
                     pInstance->SetData(DATA_RUBY_VOID, 1);
@@ -151,7 +151,7 @@ public:
             if (!me->GetMap()->IsHeroic() )
                 return;
 
-            if (shiftNumber <= uint32(1) && uint32(me->GetHealth() * 100 / me->GetMaxHealth()) <= uint32(60 - shiftNumber * 40) )
+            if (shiftNumber <= uint32(1) && uint32(me->GetHealth() * 100 / me->GetMaxHealth()) <= uint32(60 - shiftNumber * 40))
             {
                 ++shiftNumber;
                 events.RescheduleEvent(EVENT_SPELL_PLANAR_SHIFT, 0ms);
@@ -178,12 +178,12 @@ public:
             if (!UpdateVictim() )
                 return;
 
-            if (me->HasAura(SPELL_PLANAR_SHIFT) || me->HasAura(SPELL_DRAKE_STOP_TIME) )
+            if (me->HasAura(SPELL_PLANAR_SHIFT) || me->HasAura(SPELL_DRAKE_STOP_TIME))
                 return;
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             DoMeleeAttackIfReady();
@@ -224,8 +224,8 @@ public:
                     Talk(SAY_SHIELD);
                     me->CastSpell(me, SPELL_PLANAR_SHIFT, false);
                     for( uint8 i = 0; i < 3; ++i )
-                        if (Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 300.0f, false) )
-                            if (Creature* pa = me->SummonCreature(NPC_PLANAR_ANOMALY, *me, TEMPSUMMON_TIMED_DESPAWN, 17000) )
+                        if (Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 300.0f, false))
+                            if (Creature* pa = me->SummonCreature(NPC_PLANAR_ANOMALY, *me, TEMPSUMMON_TIMED_DESPAWN, 17000))
                             {
                                 pa->SetCanFly(true);
                                 pa->SetDisableGravity(true);

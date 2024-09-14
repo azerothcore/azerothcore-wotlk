@@ -422,11 +422,11 @@ public:
                 case 0:
                     break;
                 case EVENT_COMPUTER_SAY_INITIATED:
-                    if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000) )
+                    if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
                         computer->AI()->Talk(TALK_COMPUTER_INITIATED);
                     break;
                 case EVENT_COMPUTER_SAY_MINUTES:
-                    if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000) )
+                    if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
                         computer->AI()->Talk(minutesTalkNum++);
                     break;
                 case EVENT_MIMIRON_SAY_HARDMODE:
@@ -501,7 +501,7 @@ public:
                         {
                             LMK2->CastSpell(LMK2, SPELL_EMERGENCY_MODE, true);
                             if (Vehicle* veh = LMK2->GetVehicleKit() )
-                                if (Unit* cannon = veh->GetPassenger(3) )
+                                if (Unit* cannon = veh->GetPassenger(3))
                                     cannon->CastSpell(cannon, SPELL_EMERGENCY_MODE, true);
                         }
                         LMK2->AI()->SetData(1, 1);
@@ -521,7 +521,7 @@ public:
                     EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_ELEVATOR_INTERVAL_0:
-                    if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f) )
+                    if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f))
                     {
                         elevator->SetLootState(GO_READY);
                         elevator->UseDoorOrButton(0, false);
@@ -532,7 +532,7 @@ public:
                 case EVENT_ELEVATOR_INTERVAL_1:
                     if (me->SummonCreature(NPC_VX001, 2744.65f, 2569.46f, 364.40f, 3.14f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
-                        if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f) )
+                        if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 100.0f))
                         {
                             elevator->SetLootState(GO_READY);
                             elevator->UseDoorOrButton(0, true);
@@ -597,7 +597,7 @@ public:
                     break;
                 case EVENT_GET_OUT_VX001:
                     if (Creature* VX001 = GetVX001() )
-                        if (Creature* ACU = me->SummonCreature(NPC_AERIAL_COMMAND_UNIT, 2743.91f, 2568.78f, 391.34f, M_PI, TEMPSUMMON_MANUAL_DESPAWN) )
+                        if (Creature* ACU = me->SummonCreature(NPC_AERIAL_COMMAND_UNIT, 2743.91f, 2568.78f, 391.34f, M_PI, TEMPSUMMON_MANUAL_DESPAWN))
                         {
                             me->EnterVehicle(VX001, 4);
                             float speed = ACU->GetDistance(2737.75f, 2574.22f, 381.34f) / 2.0f;
@@ -772,8 +772,8 @@ public:
 
                         if (pInstance)
                             for( uint16 i = 0; i < 3; ++i )
-                                if (ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
-                                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
+                                if (ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
+                                    if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
                                         if (door->GetGoState() != GO_STATE_ACTIVE )
                                         {
                                             door->SetLootState(GO_READY);
@@ -784,7 +784,7 @@ public:
                             pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_LEVIATHAN_MKII, 1, me);
 
                         if (hardmode)
-                            if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000) )
+                            if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
                                 computer->AI()->Talk(TALK_COMPUTER_TERMINATED);
 
                         events.Reset();
@@ -875,15 +875,15 @@ public:
         {
             if (pInstance)
                 for( uint16 i = 0; i < 3; ++i )
-                    if (ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
-                        if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
+                    if (ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
+                        if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
                             if (door->GetGoState() != GO_STATE_ACTIVE )
                             {
                                 door->SetLootState(GO_READY);
                                 door->UseDoorOrButton(0, false);
                             }
 
-            if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 200.0f) )
+            if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 200.0f))
             {
                 if (elevator->GetGoState() != GO_STATE_ACTIVE )
                 {
@@ -893,7 +893,7 @@ public:
                 elevator->EnableCollision(false);
             }
 
-            if (GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f) )
+            if (GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f))
                 if (button->GetGoState() != GO_STATE_READY )
                 {
                     button->SetLootState(GO_READY);
@@ -906,15 +906,15 @@ public:
         {
             if (pInstance)
                 for( uint16 i = 0; i < 3; ++i )
-                    if (ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i) )
-                        if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid) )
+                    if (ObjectGuid guid = pInstance->GetGuidData(DATA_GO_MIMIRON_DOOR_1 + i))
+                        if (GameObject* door = ObjectAccessor::GetGameObject(*me, guid))
                             if (door->GetGoState() != GO_STATE_READY )
                             {
                                 door->SetLootState(GO_READY);
                                 door->UseDoorOrButton(0, false);
                             }
 
-            if (GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f) )
+            if (GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f))
                 if (button->GetGoState() != GO_STATE_ACTIVE )
                 {
                     button->SetLootState(GO_READY);
@@ -1427,10 +1427,10 @@ public:
                         for( int i = 0; i < (Phase / 2); ++i )
                         {
                             uint8 index = (Phase == 2 ? rand() % 2 : i);
-                            if (Unit* r = vk->GetPassenger(5 + index) )
+                            if (Unit* r = vk->GetPassenger(5 + index))
                                 if (Player* temp = SelectTargetFromPlayerList(100.0f))
                                 {
-                                    if (Creature* trigger = me->SummonCreature(NPC_ROCKET_STRIKE_N, temp->GetPositionX(), temp->GetPositionY(), temp->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 6000) )
+                                    if (Creature* trigger = me->SummonCreature(NPC_ROCKET_STRIKE_N, temp->GetPositionX(), temp->GetPositionY(), temp->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 6000))
                                         trigger->CastSpell(trigger, SPELL_ROCKET_STRIKE_AURA, true);
                                     Position exitPos = r->GetPosition();
                                     exitPos.m_positionX += cos(me->GetOrientation()) * 2.35f;
@@ -1783,13 +1783,13 @@ public:
                     events.Repeat(15s);
                     break;
                 case EVENT_SUMMON_ASSAULT_BOT:
-                    if (GameObject* pad = me->FindNearestGameObject(RAND(194742, 194746, 194745), 200.0f) )
+                    if (GameObject* pad = me->FindNearestGameObject(RAND(194742, 194746, 194745), 200.0f))
                         if (Creature* trigger = me->SummonCreature(NPC_BOT_SUMMON_TRIGGER, *pad, TEMPSUMMON_TIMED_DESPAWN, 15000))
                             trigger->AI()->DoAction(2);
                     events.Repeat(30s);
                     break;
                 case EVENT_SUMMON_JUNK_BOT:
-                    if (GameObject* pad = me->FindNearestGameObject(RAND(194741, 194744, 194747), 200.0f) )
+                    if (GameObject* pad = me->FindNearestGameObject(RAND(194741, 194744, 194747), 200.0f))
                         if (Creature* trigger = me->SummonCreature(NPC_BOT_SUMMON_TRIGGER, *pad, TEMPSUMMON_TIMED_DESPAWN, 15000))
                             trigger->AI()->DoAction(1);
                     events.Repeat(10s);
@@ -1798,7 +1798,7 @@ public:
                     {
                         uint32 ids[3] = {194740, 194743, 194748};
                         for( uint8 i = 0; i < 3; ++i )
-                            if (GameObject* pad = me->FindNearestGameObject(ids[i], 200.0f) )
+                            if (GameObject* pad = me->FindNearestGameObject(ids[i], 200.0f))
                                 if (Creature* trigger = me->SummonCreature(NPC_BOT_SUMMON_TRIGGER, *pad, TEMPSUMMON_MANUAL_DESPAWN))
                                     trigger->AI()->DoAction(3);
                         events.Repeat(45s);
@@ -2086,7 +2086,7 @@ public:
                 uint32 option_npcid[3] = {NPC_JUNK_BOT, NPC_ASSAULT_BOT, NPC_EMERGENCY_FIRE_BOT};
                 InstanceScript* pInstance = me->GetInstanceScript();
                 if (Creature* ACU = GetACU()) // ACU summons for easy removing
-                    if (Creature* bot = ACU->SummonCreature( option_npcid[option - 1], *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 25000) )
+                    if (Creature* bot = ACU->SummonCreature( option_npcid[option - 1], *me, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 25000))
                     {
                         if (option < 3)
                             bot->SetInCombatWithZone();
@@ -2226,7 +2226,7 @@ public:
             CreateTime = GameTime::GetGameTime().count();
             events.Reset();
             events.ScheduleEvent(EVENT_FLAMES_SPREAD, 5750ms);
-            if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f) )
+            if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, me->GetPositionX(), me->GetPositionY(), 364.32f, 0.0f))
             {
                 FlameList.push_back(flame->GetGUID());
                 flame->CastSpell(flame, SPELL_FLAMES_AURA, true);
@@ -2245,7 +2245,7 @@ public:
 
         void SpreadFlame(float x, float y)
         {
-            if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, x, y, 364.32f, 0.0f) )
+            if (Creature* flame = me->SummonCreature(NPC_FLAMES_SPREAD, x, y, 364.32f, 0.0f))
             {
                 FlameList.push_back(flame->GetGUID());
                 if (Creature* c = me->FindNearestCreature(NPC_FLAMES_SPREAD, 10.0f))

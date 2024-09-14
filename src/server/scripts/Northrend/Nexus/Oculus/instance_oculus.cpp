@@ -148,14 +148,14 @@ public:
                     {
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 0);
 
-                        if (Creature* urom = instance->GetCreature(uiUromGUID) )
+                        if (Creature* urom = instance->GetCreature(uiUromGUID))
                             urom->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
                 case DATA_UROM:
                     m_auiEncounter[DATA_UROM] = data;
                     if (data == DONE)
-                        if (Creature* eregos = instance->GetCreature(uiEregosGUID) )
+                        if (Creature* eregos = instance->GetCreature(uiEregosGUID))
                             eregos->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case DATA_EREGOS:
@@ -180,7 +180,7 @@ public:
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
                     }
                     if (CentrifugeCount >= 10)
-                        if (Creature* varos = instance->GetCreature(uiVarosGUID) )
+                        if (Creature* varos = instance->GetCreature(uiVarosGUID))
                         {
                             varos->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             varos->InterruptNonMeleeSpells(false);

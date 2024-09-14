@@ -105,7 +105,7 @@ public:
             {
                 if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
                 {
-                    if (!p->HasAura(SPELL_FROST_TOMB_AURA) )
+                    if (!p->HasAura(SPELL_FROST_TOMB_AURA))
                         me->KillSelf();
                 }
                 else
@@ -186,7 +186,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -198,8 +198,8 @@ public:
                     events.Repeat(4s, 5s);
                     break;
                 case EVENT_FROST_TOMB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
-                        if (!target->HasAura(SPELL_FROST_TOMB_AURA) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
+                        if (!target->HasAura(SPELL_FROST_TOMB_AURA))
                         {
                             Talk(SAY_FROST_TOMB_EMOTE, target);
                             Talk(SAY_FROST_TOMB);
@@ -215,8 +215,8 @@ public:
                     {
                         float dist = rand_norm() * 4 + 3.0f;
                         float angle = rand_norm() * 2 * M_PI;
-                        if (Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
-                            if (Unit* target = c->SelectNearestTarget(250.0f) )
+                        if (Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
+                            if (Unit* target = c->SelectNearestTarget(250.0f))
                             {
                                 c->AddThreat(target, 5.0f);
                                 DoZoneInCombat(c);
@@ -304,7 +304,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -312,12 +312,12 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_DECREPIFY:
-                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                         me->CastSpell(me->GetVictim(), SPELL_DECREPIFY, false);
                     events.Repeat(15s, 25s);
                     break;
                 case EVENT_SPELL_BONE_ARMOR:
-                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                         me->CastSpell((Unit*)nullptr, SPELL_BONE_ARMOR, false);
                     events.Repeat(40s, 120s);
                     break;
@@ -337,7 +337,7 @@ public:
                     break;
             }
 
-            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
+            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 DoMeleeAttackIfReady();
         }
     };

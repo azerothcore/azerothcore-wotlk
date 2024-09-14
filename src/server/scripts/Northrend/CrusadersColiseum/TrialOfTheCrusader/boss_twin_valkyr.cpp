@@ -207,7 +207,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     /*void AttackStart(Unit* victim)
     {
-        if (victim && me->Attack(victim, true) )
+        if (victim && me->Attack(victim, true))
             me->GetMotionMaster()->MoveChase(victim, 0.0f, 0.0f, 6.0f);
     }*/
 
@@ -218,7 +218,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         DoZoneInCombat();
         if (Creature* twin = GetSister() )
             if (!twin->IsInCombat() )
-                if (Unit* target = twin->SelectNearestTarget(200.0f) )
+                if (Unit* target = twin->SelectNearestTarget(200.0f))
                     twin->AI()->AttackStart(target);
 
         Talk(SAY_AGGRO);
@@ -287,7 +287,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
         UpdateSharedHealth();
         events.Update(diff);
 
-        if (me->HasUnitState(UNIT_STATE_CASTING) )
+        if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
         uint8 eventId = events.ExecuteEvent();
@@ -318,7 +318,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     for( uint8 i = 0; i < count; ++i )
                     {
                         float angle = rand_norm() * 2 * M_PI;
-                        if (Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500) )
+                        if (Creature* ball = me->SummonCreature((i % 2) ? NPC_CONCENTRATED_DARK : NPC_CONCENTRATED_LIGHT, Locs[LOC_CENTER].GetPositionX() + cos(angle) * 47.0f, Locs[LOC_CENTER].GetPositionY() + std::sin(angle) * 47.0f, Locs[LOC_CENTER].GetPositionZ() + 1.5f, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500))
                             boss_twin_valkyrAI::JustSummoned(ball);
                     }
 
@@ -382,7 +382,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     }
 
                     /*
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, essenceId) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, essenceId))
                         me->CastSpell(target, me->GetEntry()==NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
                     events.RepeatEvent(urand(45000,50000));
                     */
@@ -709,7 +709,7 @@ public:
             if (type != POINT_MOTION_TYPE || id != 0)
                 return;
 
-            if (urand(0, 2) )
+            if (urand(0, 2))
                 me->DespawnOrUnsummon(0);
         }
 
@@ -785,13 +785,13 @@ public:
                             empoweredId = 65724;
                             break;
                     }
-                    if (!owner->HasAura(auraId) )
+                    if (!owner->HasAura(auraId))
                     {
                         owner->CastSpell(owner, SPELL_POWERING_UP, true);
                         if (--count == 0)
                             return;
                     }
-                    if (Aura* aur = owner->GetAura(auraId) )
+                    if (Aura* aur = owner->GetAura(auraId))
                     {
                         if (aur->GetStackAmount() + count < 100 )
                         {
@@ -842,7 +842,7 @@ public:
                 Map::PlayerList const& pl = caster->GetMap()->GetPlayers();
                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                     if (Player* plr = itr->GetSource() )
-                        if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) )
+                        if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
                         {
                             uint32 absorb = 0;
                             uint32 resist = 0;

@@ -182,7 +182,7 @@ public:
             {
                 float angle = rand_norm() * 2 * M_PI;
                 float dist = rand_norm() * 40.0f;
-                if (Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + std::sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000) )
+                if (Creature* c = me->SummonCreature(NPC_SCARAB, AnubLocs[0].GetPositionX() + cos(angle) * dist, AnubLocs[0].GetPositionY() + std::sin(angle) * dist, AnubLocs[0].GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000))
                 {
                     c->SetFaction(FACTION_PREY);
                     c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -248,10 +248,10 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            if (!bPhase3 && HealthBelowPct(30) && !me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && !me->HasAura(SPELL_SUBMERGE) && !me->HasAura(SPELL_EMERGE) )
+            if (!bPhase3 && HealthBelowPct(30) && !me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) && !me->HasAura(SPELL_SUBMERGE) && !me->HasAura(SPELL_EMERGE))
             {
                 bPhase3 = true;
                 events.CancelEvent(EVENT_SUBMERGE);
@@ -281,7 +281,7 @@ public:
                         do
                         {
                             if (Creature* c = ObjectAccessor::GetCreature(*me, SphereGUID[i]) )
-                                if (!c->HasAura(SPELL_FROST_SPHERE) )
+                                if (!c->HasAura(SPELL_FROST_SPHERE))
                                 {
                                     if (Creature* c = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]) )
                                         SphereGUID[i] = c->GetGUID();
@@ -453,11 +453,11 @@ public:
             determinationTimer = urand(10000, 50000);
             despawnTimer = 0;
             if (me->GetFaction() == FACTION_MONSTER_2) // hostile - it's phase 2
-                if (Unit* target = me->SelectNearestTarget(250.0f) )
+                if (Unit* target = me->SelectNearestTarget(250.0f))
                 {
                     AttackStart(target);
                     DoZoneInCombat();
-                    if (Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
+                    if (Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
                     {
                         me->AddThreat(t, 20000.0f);
                         AttackStart(t);
@@ -559,7 +559,7 @@ public:
             if (me->GetHealth() <= damage )
             {
                 damage = 0;
-                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) )
+                if (!me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE))
                 {
                     me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                     me->GetMotionMaster()->MoveIdle();
@@ -633,7 +633,7 @@ public:
             events.RescheduleEvent(EVENT_SUBMERGE, 30s);
             if (IsHeroic() )
                 events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 30s, 45s);
-            if (Unit* target = me->SelectNearestTarget(250.0f) )
+            if (Unit* target = me->SelectNearestTarget(250.0f))
             {
                 AttackStart(target);
                 DoZoneInCombat();
@@ -666,7 +666,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -674,7 +674,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_SHADOW_STRIKE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
                         me->CastSpell(target, SPELL_SHADOW_STRIKE, false);
                     events.Repeat(30s, 45s);
                     break;
@@ -745,7 +745,7 @@ public:
         {
             if (param == -1)
             {
-                if (Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
+                if (Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID))
                     target->RemoveAura(SPELL_MARK);
                 TargetGUID.Clear();
                 me->RemoveAllAuras();
@@ -758,7 +758,7 @@ public:
         void SelectNewTarget(bool next)
         {
             if (TargetGUID)
-                if (Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID) )
+                if (Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID))
                     target->RemoveAura(SPELL_MARK);
             TargetGUID.Clear();
             if (!next)
@@ -768,7 +768,7 @@ public:
             }
             DoZoneInCombat();
             DoResetThreatList();
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true) )
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 250.0f, true))
             {
                 if (!next)
                 {
@@ -794,7 +794,7 @@ public:
             if (TargetGUID)
             {
                 Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID);
-                if (!target || !target->HasAura(SPELL_MARK) || !me->IsValidAttackTarget(target) || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE || !me->HasUnitState(UNIT_STATE_CHASE_MOVE) )
+                if (!target || !target->HasAura(SPELL_MARK) || !me->IsValidAttackTarget(target) || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE || !me->HasUnitState(UNIT_STATE_CHASE_MOVE))
                 {
                     SelectNewTarget(true);
                     return;
@@ -842,7 +842,7 @@ public:
         {
             if (Unit* target = GetTarget() )
             {
-                if (Creature* c = target->FindNearestCreature(NPC_FROST_SPHERE, 8.0f, true) )
+                if (Creature* c = target->FindNearestCreature(NPC_FROST_SPHERE, 8.0f, true))
                 {
                     target->UpdatePosition(*c, false);
                     target->CastCustomSpell(SPELL_SPIKE_FAIL, SPELLVALUE_MAX_TARGETS, 1);

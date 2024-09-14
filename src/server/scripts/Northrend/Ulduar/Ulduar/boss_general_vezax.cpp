@@ -212,12 +212,12 @@ public:
             if (!UpdateVictim() )
                 return;
 
-            if (!berserk && (me->GetPositionX() < 1720.0f || me->GetPositionX() > 1940.0f || me->GetPositionY() < 20.0f || me->GetPositionY() > 210.0f) )
+            if (!berserk && (me->GetPositionX() < 1720.0f || me->GetPositionX() > 1940.0f || me->GetPositionY() < 20.0f || me->GetPositionY() > 210.0f))
                 events.RescheduleEvent(EVENT_BERSERK, 1ms);
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -283,7 +283,7 @@ public:
                                 }
 
                         Player* t = nullptr;
-                        if (outside.size() >= uint8(me->GetMap()->Is25ManRaid() ? 9 : 4) )
+                        if (outside.size() >= uint8(me->GetMap()->Is25ManRaid() ? 9 : 4))
                             t = outside.at(urand(0, outside.size() - 1));
                         else if (!inside.empty() )
                             t = inside.at(urand(0, inside.size() - 1));
@@ -357,7 +357,7 @@ public:
 
             Talk(SAY_DEATH);
 
-            if (GameObject* door = me->FindNearestGameObject(GO_VEZAX_DOOR, 500.0f) )
+            if (GameObject* door = me->FindNearestGameObject(GO_VEZAX_DOOR, 500.0f))
                 if (door->GetGoState() != GO_STATE_ACTIVE )
                 {
                     door->SetLootState(GO_READY);

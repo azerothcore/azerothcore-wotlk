@@ -278,15 +278,15 @@ public:
                 case SPELL_CHAIN_4:
                     {
                         uint8 count = 0;
-                        if (me->HasAura(SPELL_CHAIN_1) )
+                        if (me->HasAura(SPELL_CHAIN_1))
                             count++;
-                        if (me->HasAura(SPELL_CHAIN_3) )
+                        if (me->HasAura(SPELL_CHAIN_3))
                             count++;
                         if (RAID_MODE(0, 1))
                         {
-                            if (me->HasAura(SPELL_CHAIN_2) )
+                            if (me->HasAura(SPELL_CHAIN_2))
                                 count++;
-                            if (me->HasAura(SPELL_CHAIN_4) )
+                            if (me->HasAura(SPELL_CHAIN_4))
                                 count++;
                         }
                         if (count >= REQ_CHAIN_COUNT)
@@ -397,12 +397,12 @@ public:
                         }
                     break;
                 case EVENT_SPELL_FIREBALL:
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true) )
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
                         me->CastSpell(pTarget, SPELL_FIREBALL, false);
                     events.Repeat(4s);
                     break;
                 case EVENT_SPELL_DEVOURING_FLAME:
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true) )
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
                         me->CastSpell(pTarget, SPELL_DEVOURINGFLAME, false);
                     events.Repeat(13s);
                     break;
@@ -415,7 +415,7 @@ public:
                             // X: (550, 625) Y: (-185, -230)
                             cords[i][0] = urand(550, 625);
                             cords[i][1] = -230 + rand() % 45;
-                            if (GameObject* drill = me->SummonGameObject(GO_DRILL, cords[i][0], cords[i][1], 391.1f, M_PI / 4, 0.0f, 0.0f, 0.0f, 0.0f, 8) )
+                            if (GameObject* drill = me->SummonGameObject(GO_DRILL, cords[i][0], cords[i][1], 391.1f, M_PI / 4, 0.0f, 0.0f, 0.0f, 0.0f, 8))
                             {
                                 //drill->SetGoAnimProgress(0);
                                 //drill->SetLootState(GO_READY);
@@ -498,8 +498,8 @@ public:
                     me->SetInCombatWithZone(); // just in case
                     if (pInstance)
                         for( int i = 0; i < 4; ++i )
-                            if (ObjectGuid guid = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
-                                if (Creature* hfs = ObjectAccessor::GetCreature(*me, guid) )
+                            if (ObjectGuid guid = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i))
+                                if (Creature* hfs = ObjectAccessor::GetCreature(*me, guid))
                                 {
                                     me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
                                     hfs->AI()->SetData(1, 0);
@@ -753,11 +753,11 @@ public:
         {
             if (pInstance)
             {
-                if (me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1) )
+                if (me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
                     return GO_HARPOON_GUN_1;
-                else if (me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2) )
+                else if (me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
                     return GO_HARPOON_GUN_2;
-                else if (me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3) )
+                else if (me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
                     return GO_HARPOON_GUN_3;
                 else
                     return GO_HARPOON_GUN_4;
@@ -773,12 +773,12 @@ public:
                     if (pInstance)
                     {
                         uint32 h_entry = GetHarpoonGunIdForThisHFS();
-                        if (GameObject* wh = me->FindNearestGameObject(h_entry, 5.0f) )
+                        if (GameObject* wh = me->FindNearestGameObject(h_entry, 5.0f))
                         {
                             wh->SetRespawnTime(0);
                             wh->Delete();
                         }
-                        if (GameObject* bh = me->FindNearestGameObject(GO_BROKEN_HARPOON, 5.0f) )
+                        if (GameObject* bh = me->FindNearestGameObject(GO_BROKEN_HARPOON, 5.0f))
                             if (bh->GetPhaseMask() != 1)
                                 bh->SetPhaseMask(1, true);
                     }
@@ -789,9 +789,9 @@ public:
                     {
                         if (++repairPoints >= REPAIR_POINTS)
                         {
-                            if (GameObject* bh = me->FindNearestGameObject(GO_BROKEN_HARPOON, 4.0f) )
+                            if (GameObject* bh = me->FindNearestGameObject(GO_BROKEN_HARPOON, 4.0f))
                                 bh->SetPhaseMask(2, true);
-                            if (GameObject* wh = me->SummonGameObject(GetHarpoonGunIdForThisHFS(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3 * M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 0) )
+                            if (GameObject* wh = me->SummonGameObject(GetHarpoonGunIdForThisHFS(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 3 * M_PI / 2, 0.0f, 0.0f, 0.0f, 0.0f, 0))
                             {
                                 me->RemoveGameObject(wh, false);
                                 if (Creature* cr = me->SummonCreature(NPC_RAZORSCALE_CONTROLLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
@@ -899,7 +899,7 @@ public:
                     if (!fixingGUID)
                     {
                         Creature* razorscale = nullptr;
-                        if (ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
+                        if (ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE))
                             razorscale = ObjectAccessor::GetCreature(*me, rsGUID);
 
                         if (!razorscale || !razorscale->IsInCombat() )
@@ -910,8 +910,8 @@ public:
                         }
 
                         for( int i = 0; i < 4; ++i )
-                            if (ObjectGuid fs_GUID = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i) )
-                                if (Creature* fs = ObjectAccessor::GetCreature(*me, fs_GUID) )
+                            if (ObjectGuid fs_GUID = pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1 + i))
+                                if (Creature* fs = ObjectAccessor::GetCreature(*me, fs_GUID))
                                     if (!fs->AI()->GetData(2))
                                     {
                                         float a = rand_norm() * M_PI;
@@ -948,7 +948,7 @@ public:
             return true;
 
         Creature* rs = nullptr;
-        if (ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE) )
+        if (ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE))
             rs = ObjectAccessor::GetCreature(*go, rsGUID);
 
         if (!rs || !rs->IsInCombat() )
@@ -980,8 +980,8 @@ public:
                 break;
         }
 
-        if (ObjectGuid g = pInstance->GetGuidData(npc) )
-            if (Creature* hfs = ObjectAccessor::GetCreature(*go, g) )
+        if (ObjectGuid g = pInstance->GetGuidData(npc))
+            if (Creature* hfs = ObjectAccessor::GetCreature(*go, g))
                 hfs->AI()->SetData(3, spell);
 
         go->SetLootState(GO_JUST_DEACTIVATED);

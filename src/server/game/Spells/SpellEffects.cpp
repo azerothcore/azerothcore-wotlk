@@ -681,7 +681,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // Trial of the Champion, Trample
                     case 67866:
                         {
-                            if (unitTarget && !unitTarget->IsVehicle() && !unitTarget->GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID) )
+                            if (unitTarget && !unitTarget->IsVehicle() && !unitTarget->GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID))
                                 unitTarget->CastSpell(unitTarget, 67867, false);
                             return;
                         }
@@ -690,7 +690,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                         {
                             if (!unitTarget)
                                 return;
-                            if (unitTarget->HasAura(66940) )
+                            if (unitTarget->HasAura(66940))
                                 m_caster->CastSpell(unitTarget, 66903, true);
                             else
                                 m_caster->CastSpell(unitTarget, 66904, true);
@@ -704,7 +704,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
                             gameObjTarget->SetRespawnTime(10);
                             gameObjTarget->SendCustomAnim(gameObjTarget->GetGoAnimProgress());
-                            if (Creature* trigger = gameObjTarget->SummonCreature(12758, *gameObjTarget, TEMPSUMMON_TIMED_DESPAWN, 1000) )
+                            if (Creature* trigger = gameObjTarget->SummonCreature(12758, *gameObjTarget, TEMPSUMMON_TIMED_DESPAWN, 1000))
                                 trigger->CastSpell(trigger, 17731, false);
 
                             return;
@@ -3469,7 +3469,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 {
                     float disease_amt = m_spellInfo->Effects[EFFECT_2].CalcValue();
                     //Death Knight T8 Melee 4P Bonus
-                    if (AuraEffect* aurEff = m_caster->GetAuraEffectDummy(64736) )
+                    if (AuraEffect* aurEff = m_caster->GetAuraEffectDummy(64736))
                         AddPct(disease_amt, aurEff->GetAmount());
 
                     AddPct(totalDamagePercentMod, disease_amt * unitTarget->GetDiseasesByCaster(m_caster->GetGUID()) / 2.0f);
@@ -3501,7 +3501,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
 
                     float disease_amt = m_spellInfo->Effects[EFFECT_2].CalcValue();
                     //Death Knight T8 Melee 4P Bonus
-                    if (AuraEffect* aurEff = m_caster->GetAuraEffectDummy(64736) )
+                    if (AuraEffect* aurEff = m_caster->GetAuraEffectDummy(64736))
                         AddPct(disease_amt, aurEff->GetAmount());
 
                     AddPct(totalDamagePercentMod, disease_amt * unitTarget->GetDiseasesByCaster(m_caster->GetGUID(), consumeDiseases) / 2.0f);
@@ -3520,7 +3520,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                 {
                     float disease_amt = m_spellInfo->Effects[EFFECT_2].CalcValue();
                     //Death Knight T8 Melee 4P Bonus
-                    if (AuraEffect* aurEff = m_caster->GetAuraEffectDummy(64736) )
+                    if (AuraEffect* aurEff = m_caster->GetAuraEffectDummy(64736))
                         AddPct(disease_amt, aurEff->GetAmount());
 
                     AddPct(totalDamagePercentMod, disease_amt * unitTarget->GetDiseasesByCaster(m_caster->GetGUID()));

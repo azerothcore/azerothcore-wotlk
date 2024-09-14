@@ -156,7 +156,7 @@ public:
 
                 me->SetInCombatWithZone();
                 me->SetHomePosition(cords[0][0], cords[0][1], cords[0][2], cords[0][3]);
-                if (me->FindCurrentSpellBySpellId(SPELL_EVOCATION) )
+                if (me->FindCurrentSpellBySpellId(SPELL_EVOCATION))
                     me->InterruptNonMeleeSpells(false);
 
                 events.RescheduleEvent(EVENT_FROSTBOMB, 7s, 11s);
@@ -320,7 +320,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             DoMeleeAttackIfReady();
@@ -335,7 +335,7 @@ public:
                     events.Repeat(7s, 11s);
                     break;
                 case EVENT_TIME_BOMB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         DoCast(target, DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H));
                     events.Repeat(20s, 25s);
                     break;

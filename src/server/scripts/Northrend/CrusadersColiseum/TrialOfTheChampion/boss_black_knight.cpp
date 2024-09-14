@@ -241,7 +241,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -265,7 +265,7 @@ public:
                     events.Repeat(5s, 6s);
                     break;
                 case EVENT_SPELL_DEATH_RESPITE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_DEATH_RESPITE, false);
                     events.Repeat(13s, 15s);
                     break;
@@ -275,7 +275,7 @@ public:
                     events.Repeat(15s, 17s);
                     break;
                 case EVENT_SPELL_DESECRATION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                         me->CastSpell(target, SPELL_DESECRATION, false);
                     events.Repeat(14s, 17s);
                     break;
@@ -284,7 +284,7 @@ public:
                     events.Repeat(2s, 4s);
                     break;
                 case EVENT_SPELL_MARKED_DEATH:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.000000f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.000000f, true))
                         me->CastSpell(target, SPELL_MARKED_DEATH, false);
                     events.Repeat(9s);
                     break;
@@ -296,7 +296,7 @@ public:
         void JustSummoned(Creature* summon) override
         {
             summons.Summon(summon);
-            if (Unit* target = summon->SelectNearestTarget(200.0f) )
+            if (Unit* target = summon->SelectNearestTarget(200.0f))
             {
                 summon->AI()->AttackStart(target);
                 DoZoneInCombat(summon);
@@ -448,7 +448,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )

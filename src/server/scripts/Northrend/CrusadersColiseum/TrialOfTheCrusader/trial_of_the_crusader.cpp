@@ -72,7 +72,7 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 uiAction) override
     {
-        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP) )
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         InstanceScript* pInstance = creature->GetInstanceScript();

@@ -154,7 +154,7 @@ public:
                 case 67106:
                 case 67107:
                 case 67108:
-                    if (Aura* a = me->GetAura(spell->Id) )
+                    if (Aura* a = me->GetAura(spell->Id))
                         a->SetStackAmount(spell->StackAmount);
                     break;
                 case 30449:
@@ -177,7 +177,7 @@ public:
                                 id = 67108;
                                 break;
                         }
-                        if (Aura* a = me->GetAura(id) )
+                        if (Aura* a = me->GetAura(id))
                         {
                             if (a->GetStackAmount() > 1 )
                                 a->ModStackAmount(-1);
@@ -199,7 +199,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -212,12 +212,12 @@ public:
                     events.Repeat(10s, 15s);
                     break;
                 case EVENT_SPELL_FEL_LIGHTNING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
                         me->CastSpell(target, SPELL_FEL_LIGHTNING, false);
                     events.Repeat(10s, 15s);
                     break;
                 case EVENT_SPELL_INCINERATE_FLESH:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
                     {
                         Talk(EMOTE_INCINERATE, target);
                         Talk(SAY_INCINERATE);
@@ -231,7 +231,7 @@ public:
                     events.Repeat(25s, 45s);
                     break;
                 case EVENT_SPELL_LEGION_FLAME:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
                     {
                         Talk(EMOTE_LEGION_FLAME, target);
                         me->CastSpell(target, SPELL_LEGION_FLAME, false);
@@ -239,7 +239,7 @@ public:
                     events.Repeat(30s);
                     break;
                 case EVENT_SPELL_TOUCH_OF_JARAXXUS:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                         me->CastSpell(target, SPELL_TOUCH_OF_JARAXXUS, false);
                     events.Repeat(10s, 15s);
                     break;
@@ -311,7 +311,7 @@ public:
 
         void Reset() override
         {
-            if (Unit* target = me->SelectNearestTarget(200.0f) )
+            if (Unit* target = me->SelectNearestTarget(200.0f))
             {
                 AttackStart(target);
                 DoZoneInCombat();
@@ -327,7 +327,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -335,7 +335,7 @@ public:
                 case 0:
                     break;
                 case EVENT_SPELL_FEL_STEAK:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 44.0f, true))
                     {
                         DoResetThreatList();
                         me->AddThreat(target, 50000.0f);
@@ -381,7 +381,7 @@ public:
 
         void Reset() override
         {
-            if (Unit* target = me->SelectNearestTarget(200.0f) )
+            if (Unit* target = me->SelectNearestTarget(200.0f))
             {
                 AttackStart(target);
                 DoZoneInCombat();
@@ -406,7 +406,7 @@ public:
 
             events.Update(diff);
 
-            if (me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             switch( events.ExecuteEvent() )
@@ -419,7 +419,7 @@ public:
                     events.Repeat(15s, 25s);
                     break;
                 case EVENT_SPELL_SPINNING_PAIN_SPIKE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 140.0f, true))
                         me->CastSpell(target, SPELL_SPINNING_PAIN_SPIKE, false);
                     events.Repeat(25s, 30s);
                     break;
@@ -457,7 +457,7 @@ public:
         {
             if (Unit* caster = GetCaster())
                 if (Unit* target = GetTarget())
-                    if (target->HasUnitState(UNIT_STATE_CASTING) )
+                    if (target->HasUnitState(UNIT_STATE_CASTING))
                     {
                         caster->CastSpell(target, 66359, true);
                         SetDuration(0);
