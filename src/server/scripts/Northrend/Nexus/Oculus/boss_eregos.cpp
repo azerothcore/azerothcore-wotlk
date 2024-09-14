@@ -188,7 +188,7 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

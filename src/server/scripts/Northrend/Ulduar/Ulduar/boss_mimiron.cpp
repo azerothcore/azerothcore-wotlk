@@ -417,7 +417,7 @@ public:
 
             events.Update(diff);
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -2062,7 +2062,7 @@ public:
 
         void DoAction(int32 param) override
         {
-            switch( param )
+            switch (param)
             {
                 case 1:
                     me->CastSpell(me, SPELL_BEAM_GREEN, true);
@@ -2280,7 +2280,7 @@ public:
 
             events.Update(diff);
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -2345,7 +2345,7 @@ public:
 
         void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
         {
-            switch( spell->Id )
+            switch (spell->Id)
             {
                 case SPELL_FROST_BOMB_EXPLOSION_10:
                 case SPELL_FROST_BOMB_EXPLOSION_25:
@@ -2403,7 +2403,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

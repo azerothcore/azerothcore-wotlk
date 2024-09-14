@@ -276,7 +276,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -423,7 +423,7 @@ public:
         {
             me->m_spellImmune[IMMUNITY_MECHANIC].clear();
             events.Reset();
-            switch( me->GetEntry())
+            switch (me->GetEntry())
             {
                 case NPC_AMBROSE: // Ambrose Boltspark
                 case NPC_ERESSEA: // Eressea Dawnsinger
@@ -509,7 +509,7 @@ public:
             BossOrder = uiType;
             if (uiData > 1)
                 return;
-            switch( BossOrder )
+            switch (BossOrder)
             {
                 case 0:
                     if (uiData == 0) // 1 == short version
@@ -669,7 +669,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING) || ((me->GetEntry() == NPC_JACOB || me->GetEntry() == NPC_MOKRA) && me->HasAura(SPELL_BLADESTORM)))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

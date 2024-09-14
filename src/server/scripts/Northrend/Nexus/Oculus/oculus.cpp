@@ -251,10 +251,10 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
         ClearGossipMenuFor(player);
-        switch(creature->GetEntry())
+        switch (creature->GetEntry())
         {
         case NPC_VERDISA:
-            switch(uiAction)
+            switch (uiAction)
             {
             case GOSSIP_ACTION_INFO_DEF:
                 SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA2, creature->GetGUID());
@@ -273,7 +273,7 @@ public:
             CloseGossipMenuFor(player);
             break;
         case NPC_BELGARISTRASZ:
-            switch(uiAction)
+            switch (uiAction)
             {
             case GOSSIP_ACTION_INFO_DEF:
                 openedMenu[player->GetGUID()] = true;

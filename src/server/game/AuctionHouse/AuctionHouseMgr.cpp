@@ -250,7 +250,7 @@ AuctionHouseObject* AuctionHouseMgr::GetAuctionsMapByHouseId(uint8 auctionHouseI
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
         return &_neutralAuctions;
 
-    switch(auctionHouseId)
+    switch (auctionHouseId)
     {
         case AUCTIONHOUSE_ALLIANCE:
             return &_allianceAuctions;

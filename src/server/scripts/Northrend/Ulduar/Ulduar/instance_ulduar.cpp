@@ -310,7 +310,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_LEVIATHAN:
                     m_uiLeviathanGUID = creature->GetGUID();
@@ -669,7 +669,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case TYPE_LEVIATHAN:
                     m_auiEncounter[type] = data;
@@ -1056,7 +1056,7 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            switch(type)
+            switch (type)
             {
                 case TYPE_LEVIATHAN:
                 case TYPE_IGNIS:

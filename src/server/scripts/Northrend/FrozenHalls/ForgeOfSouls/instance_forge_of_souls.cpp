@@ -151,7 +151,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_BRONJAHM:
                     m_auiEncounter[type] = data;
@@ -180,7 +180,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 12752: // Soul Power
                     if (Creature* c = instance->GetCreature(NPC_BronjahmGUID))

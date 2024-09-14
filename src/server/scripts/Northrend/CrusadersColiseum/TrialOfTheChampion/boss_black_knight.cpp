@@ -190,7 +190,7 @@ public:
 
         void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
         {
-            switch( spell->Id )
+            switch (spell->Id)
             {
                 case SPELL_BLACK_KNIGHT_RES:
                     me->SetHealth(me->GetMaxHealth());
@@ -205,7 +205,7 @@ public:
 
                     ++Phase;
 
-                    switch( Phase )
+                    switch (Phase)
                     {
                         case 2:
                             me->SetDisplayId(MODEL_SKELETON);
@@ -244,7 +244,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -422,7 +422,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            switch(spell->Id)
+            switch (spell->Id)
             {
                 case SPELL_CLAW_N:
                 case SPELL_CLAW_H:
@@ -451,7 +451,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

@@ -107,7 +107,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_SINCLARI:
                     NPC_SinclariGUID = creature->GetGUID();
@@ -162,7 +162,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_ACTIVATION_CRYSTAL:
                     HandleGameObject(ObjectGuid::Empty, false, go); // make go not used yet
@@ -202,7 +202,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_ACTIVATE_DEFENSE_SYSTEM:
                     {
@@ -277,7 +277,7 @@ public:
 
         void SetGuidData(uint32 type, ObjectGuid data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_ADD_TRASH_MOB:
                     trashMobs.insert(data);
@@ -291,7 +291,7 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_ENCOUNTER_STATUS:
                     return (uint32)EncounterStatus;
@@ -333,7 +333,7 @@ public:
         {
             Creature* pBoss = nullptr;
 
-            switch(uiBoss)
+            switch (uiBoss)
             {
                 case BOSS_MORAGG:
                     HandleGameObject(GO_MoraggCellGUID, true);
@@ -403,7 +403,7 @@ public:
         void Update(uint32 diff) override
         {
             events.Update(diff);
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -638,7 +638,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case CRITERIA_DEFENSELESS:
                     return GateHealth == 100 && !bDefensesUsed;

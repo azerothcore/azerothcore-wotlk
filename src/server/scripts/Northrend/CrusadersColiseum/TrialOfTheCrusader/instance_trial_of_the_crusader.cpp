@@ -196,7 +196,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch( creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_BARRENT:
                     NPC_BarrettGUID = creature->GetGUID();
@@ -246,7 +246,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch( go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_MAIN_GATE_DOOR:
                     GO_MainGateGUID = go->GetGUID();
@@ -274,7 +274,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch( type )
+            switch (type)
             {
                 case TYPE_FAILED:
                     // - some scene here?
@@ -293,7 +293,7 @@ public:
                 case TYPE_ANNOUNCER_GOSSIP_SELECT:
                     if (instance->IsHeroic() && AttemptsLeft == 0 )
                         break;
-                    switch( InstanceProgress )
+                    switch (InstanceProgress)
                     {
                         case INSTANCE_PROGRESS_INITIAL:
                             events.RescheduleEvent(EVENT_SCENE_001, 0);
@@ -427,7 +427,7 @@ public:
                             if (Creature* c = instance->GetCreature(NPC_TirionGUID))
                             {
                                 uint32 cacheEntry = 0;
-                                switch( instance->GetDifficulty())
+                                switch (instance->GetDifficulty())
                                 {
                                     case RAID_DIFFICULTY_10MAN_NORMAL:
                                         cacheEntry = GO_CRUSADERS_CACHE_10;
@@ -528,7 +528,7 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            switch( type )
+            switch (type)
             {
                 case TYPE_INSTANCE_PROGRESS:
                     return InstanceProgress;
@@ -538,7 +538,7 @@ public:
 
         ObjectGuid GetGuidData(uint32 type) const override
         {
-            switch( type )
+            switch (type)
             {
                 case TYPE_GORMOK:
                     return NPC_GormokGUID;
@@ -560,7 +560,7 @@ public:
         void Update(uint32 diff) override
         {
             events.Update(diff);
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1049,7 +1049,7 @@ public:
                         for( uint8 i = 0; i < healersSubtracted; ++i )
                         {
                             uint8 pos = urand(0, vHealerEntries.size() - 1);
-                            switch( vHealerEntries[pos] )
+                            switch (vHealerEntries[pos])
                             {
                                 case NPC_ALLIANCE_DRUID_RESTORATION:
                                     vOtherEntries.push_back(NPC_ALLIANCE_DRUID_BALANCE);
@@ -1445,7 +1445,7 @@ public:
                 return;
             CLEANED = true;
 
-            switch( InstanceProgress )
+            switch (InstanceProgress)
             {
                 case INSTANCE_PROGRESS_INITIAL:
                     if (Creature* c = instance->GetCreature(NPC_BarrettGUID))
@@ -1621,7 +1621,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case ACHIEV_CRITERIA_UPPER_BACK_PAIN_10_N:
                 case ACHIEV_CRITERIA_UPPER_BACK_PAIN_10_H:

@@ -142,14 +142,14 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void DoAction(int32 a) override
     {
-        switch( a )
+        switch (a)
         {
             case -1:
                 summons.DespawnAll();
                 if (pInstance && me->GetEntry() == NPC_LIGHTBANE )
                 {
                     uint32 essenceId1 = 0, empoweredId1 = 0, touchId1 = 0, essenceId2 = 0, empoweredId2 = 0, touchId2 = 0;
-                    switch( me->GetMap()->GetDifficulty())
+                    switch (me->GetMap()->GetDifficulty())
                     {
                         case 0:
                             essenceId1 = 65684;
@@ -292,7 +292,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
         uint8 eventId = events.ExecuteEvent();
 
-        switch(eventId)
+        switch (eventId)
         {
             case 0:
                 break;
@@ -322,7 +322,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             boss_twin_valkyrAI::JustSummoned(ball);
                     }
 
-                    switch( eventId )
+                    switch (eventId)
                     {
                         case EVENT_SUMMON_BALLS_1:
                             events.RescheduleEvent(EVENT_SUMMON_BALLS_2, 8s);
@@ -343,10 +343,10 @@ struct boss_twin_valkyrAI : public ScriptedAI
             case EVENT_SPELL_TOUCH:
                 {
                     uint32 essenceId = 0;
-                    switch( me->GetEntry())
+                    switch (me->GetEntry())
                     {
                         case NPC_LIGHTBANE:
-                            switch( GetDifficulty())
+                            switch (GetDifficulty())
                             {
                                 case 0:
                                     essenceId = 65684;
@@ -363,7 +363,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             }
                             break;
                         case NPC_DARKBANE:
-                            switch( GetDifficulty())
+                            switch (GetDifficulty())
                             {
                                 case 0:
                                     essenceId = 65686;
@@ -414,7 +414,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     do s = urand(0, 3);
                     while( SpecialMask & (1 << s) && (SpecialMask & 0xF) != 0xF );
                     SpecialMask |= (1 << s);
-                    switch( s )
+                    switch (s)
                     {
                         case 0: // light vortex
                             me->CastSpell((Unit*)nullptr, SPELL_LIGHT_VORTEX, false);
@@ -573,7 +573,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        switch( creature->GetEntry())
+        switch (creature->GetEntry())
         {
             case NPC_LIGHT_ESSENCE:
                 {
@@ -582,7 +582,7 @@ public:
                     //uint32 empoweredId = 0;
                     uint32 touchId1 = 0;
                     //uint32 touchId2 = 0;
-                    switch( creature->GetMap()->GetDifficulty())
+                    switch (creature->GetMap()->GetDifficulty())
                     {
                         case 0:
                             essenceId = 65684;
@@ -628,7 +628,7 @@ public:
                     //uint32 empoweredId = 0;
                     //uint32 touchId1 = 0;
                     uint32 touchId2 = 0;
-                    switch( creature->GetMap()->GetDifficulty())
+                    switch (creature->GetMap()->GetDifficulty())
                     {
                         case 0:
                             essenceId = 65686;
@@ -750,7 +750,7 @@ public:
                 {
                     uint32 auraId = 0;
                     uint32 empoweredId = 0;
-                    switch( se->Id )
+                    switch (se->Id)
                     {
                         case 65686:
                             auraId = 67590;

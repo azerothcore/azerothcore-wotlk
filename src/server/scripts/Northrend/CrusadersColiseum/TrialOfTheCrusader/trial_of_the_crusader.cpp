@@ -44,7 +44,7 @@ public:
             return true;
 
         uint32 gossipTextId = 0;
-        switch(pInstance->GetData(TYPE_INSTANCE_PROGRESS))
+        switch (pInstance->GetData(TYPE_INSTANCE_PROGRESS))
         {
             case INSTANCE_PROGRESS_INITIAL:
                 gossipTextId = MSG_TESTED;

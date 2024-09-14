@@ -148,7 +148,7 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            switch( spell->Id )
+            switch (spell->Id)
             {
                 case 66228:
                 case 67106:
@@ -162,7 +162,7 @@ public:
                         if (!caster)
                             return;
                         uint32 id = 0;
-                        switch( me->GetMap()->GetDifficulty())
+                        switch (me->GetMap()->GetDifficulty())
                         {
                             case 0:
                                 id = 66228;
@@ -202,7 +202,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -330,7 +330,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -409,7 +409,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

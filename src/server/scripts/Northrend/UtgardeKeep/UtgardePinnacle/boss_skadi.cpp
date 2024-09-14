@@ -355,7 +355,7 @@ public:
 
         void MovementInform(uint32  /*uiType*/, uint32 Id) override
         {
-            switch(Id)
+            switch (Id)
             {
                 case 0:
                 case 1:

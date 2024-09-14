@@ -271,7 +271,7 @@ public:
                             king->SetDisableGravity(true);
                             me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                             me->GetMotionMaster()->MoveChase(me->GetVictim());
-                            switch(BoatOrder[BoatNum - 1])
+                            switch (BoatOrder[BoatNum - 1])
                             {
                                 case 0:
                                     events.ScheduleEvent(EVENT_YMIRON_RANULF_ABILITY, 3s, 1);

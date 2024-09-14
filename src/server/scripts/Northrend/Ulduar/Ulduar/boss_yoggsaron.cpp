@@ -791,7 +791,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SARA_P1_DOORS_CLOSE:
                     // Whispers of YS
@@ -1419,7 +1419,7 @@ public:
                 return;
 
             summons.DespawnAll();
-            switch(param)
+            switch (param)
             {
                 case ACTION_ILLUSION_STORMWIND:
                     PrepareStormwindIllusion();

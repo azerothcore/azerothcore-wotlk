@@ -132,7 +132,7 @@ struct boss_lady_vashj : public BossAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
-        switch(summon->GetEntry()) {
+        switch (summon->GetEntry()) {
             case(WORLD_TRIGGER):
                 summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
                 break;

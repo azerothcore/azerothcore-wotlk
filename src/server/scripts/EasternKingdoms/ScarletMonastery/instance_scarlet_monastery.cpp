@@ -140,7 +140,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case TYPE_MOGRAINE_AND_WHITE_EVENT:
                     if (data == IN_PROGRESS)
@@ -468,7 +468,7 @@ public:
 
             while (uint32 eventId = events.ExecuteEvent())
             {
-                switch(eventId)
+                switch (eventId)
                 {
                     case EVENT_SPELL_CRUSADER_STRIKE:
                         me->CastSpell(me->GetVictim(), SPELL_CRUSADER_STRIKE, true);

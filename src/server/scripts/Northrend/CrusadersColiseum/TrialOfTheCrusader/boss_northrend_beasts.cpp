@@ -156,7 +156,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -288,7 +288,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -394,7 +394,7 @@ public:
 
         void DoAction(int32 param) override
         {
-            switch( param )
+            switch (param)
             {
                 case -1:
                     summons.DespawnAll();
@@ -488,7 +488,7 @@ struct boss_jormungarAI : public ScriptedAI
 
     void DoAction(int32 param) override
     {
-        switch( param )
+        switch (param)
         {
             case -1:
                 if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
@@ -561,7 +561,7 @@ struct boss_jormungarAI : public ScriptedAI
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
-        switch( events.ExecuteEvent())
+        switch (events.ExecuteEvent())
         {
             case 0:
                 break;
@@ -870,7 +870,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -947,7 +947,7 @@ public:
                         events.RescheduleEvent(EVENT_TRAMPLE, 1500ms);
 
                         if (pInstance)
-                            switch( GetDifficulty())
+                            switch (GetDifficulty())
                             {
                                 case RAID_DIFFICULTY_10MAN_NORMAL:
                                     pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MASSIVE_CRASH);

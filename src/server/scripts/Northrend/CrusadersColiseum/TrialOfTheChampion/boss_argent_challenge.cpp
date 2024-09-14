@@ -172,7 +172,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -346,7 +346,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -424,7 +424,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -543,7 +543,7 @@ public:
         {
             if (uiPoint == 1)
             {
-                switch( uiWaypoint )
+                switch (uiWaypoint)
                 {
                     case 0:
                         me->SetFacingTo(5.4f);
@@ -561,10 +561,10 @@ public:
         void SetData(uint32 uiType, uint32 /*uiData*/) override
         {
             AddWaypoint(0, me->GetPositionX(), 660.0f, 411.80f);
-            switch( me->GetEntry())
+            switch (me->GetEntry())
             {
                 case NPC_ARGENT_LIGHTWIELDER:
-                    switch( uiType )
+                    switch (uiType)
                     {
                         case 0:
                             AddWaypoint(1, 716.321f, 647.047f, 411.93f);
@@ -578,7 +578,7 @@ public:
                     }
                     break;
                 case NPC_ARGENT_MONK:
-                    switch( uiType )
+                    switch (uiType)
                     {
                         case 0:
                             AddWaypoint(1, 717.86f, 649.0f, 411.923f);
@@ -592,7 +592,7 @@ public:
                     }
                     break;
                 case NPC_PRIESTESS:
-                    switch( uiType )
+                    switch (uiType)
                     {
                         case 0:
                             AddWaypoint(1, 719.872f, 650.94f, 411.93f);
@@ -625,7 +625,7 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            switch( me->GetEntry())
+            switch (me->GetEntry())
             {
                 case NPC_ARGENT_MONK:
                     events.RescheduleEvent(EVENT_MONK_SPELL_FLURRY_OF_BLOWS, 5s);
@@ -661,7 +661,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

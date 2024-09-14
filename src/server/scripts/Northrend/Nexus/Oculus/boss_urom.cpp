@@ -167,7 +167,7 @@ public:
             {
                 lock = true;
 
-                switch( phase )
+                switch (phase)
                 {
                     case 0:
                         Talk(SAY_SUMMON_1);
@@ -234,7 +234,7 @@ public:
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
-            switch( spell->Id )
+            switch (spell->Id)
             {
                 case SPELL_SUMMON_MENAGERIE_1:
                     {
@@ -325,7 +325,7 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

@@ -447,13 +447,13 @@ public:
                             float y = cords[i][1] + 4.0f * std::sin(j * M_PI / 2);
 
                             uint32 npc_entry = 0;
-                            switch( opt )
+                            switch (opt)
                             {
                                 case 1:
                                     if (j == 1) npc_entry = NPC_DARK_RUNE_SENTINEL;
                                     break;
                                 case 2:
-                                    switch( j )
+                                    switch (j)
                                     {
                                         case 1:
                                             npc_entry = NPC_DARK_RUNE_WATCHER;
@@ -464,7 +464,7 @@ public:
                                     }
                                     break;
                                 default: // case 3:
-                                    switch( j )
+                                    switch (j)
                                     {
                                         case 1:
                                             npc_entry = NPC_DARK_RUNE_WATCHER;
@@ -960,7 +960,7 @@ public:
 
         uint32 npc = 0;
         uint32 spell = 0;
-        switch( go->GetEntry())
+        switch (go->GetEntry())
         {
             case GO_HARPOON_GUN_1:
                 npc = DATA_HARPOON_FIRE_STATE_1;

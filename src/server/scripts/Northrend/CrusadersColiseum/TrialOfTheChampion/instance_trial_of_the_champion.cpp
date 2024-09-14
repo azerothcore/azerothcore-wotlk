@@ -117,7 +117,7 @@ public:
                         TeamIdInInstance = pPlayer->GetTeamId();
             }
 
-            switch( creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 // Grand Champions:
                 case NPC_MOKRA:
@@ -204,7 +204,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch( go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_MAIN_GATE:
                     GO_MainGateGUID = go->GetGUID();
@@ -309,7 +309,7 @@ public:
             if (CLEANED)
                 return;
 
-            switch( InstanceProgress )
+            switch (InstanceProgress)
             {
                 case INSTANCE_PROGRESS_INITIAL:
                 case INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST:
@@ -362,7 +362,7 @@ public:
                                 {
                                     uint32 entry = c->GetEntry();
                                     c->DespawnOrUnsummon();
-                                    switch( i )
+                                    switch (i)
                                     {
                                         case 0:
                                             if (Creature* pBoss = announcer->SummonCreature(entry, 736.695f, 650.02f, 412.4f, 3 * M_PI / 2))
@@ -460,7 +460,7 @@ public:
 
         uint32 GetData(uint32 uiData) const override
         {
-            switch( uiData )
+            switch (uiData)
             {
                 case DATA_INSTANCE_PROGRESS:
                     return InstanceProgress;
@@ -473,7 +473,7 @@ public:
 
         ObjectGuid GetGuidData(uint32 uiData) const override
         {
-            switch( uiData )
+            switch (uiData)
             {
                 case DATA_ANNOUNCER:
                     return NPC_AnnouncerGUID;
@@ -486,10 +486,10 @@ public:
 
         void SetData(uint32 uiType, uint32 uiData) override
         {
-            switch( uiType )
+            switch (uiType)
             {
                 case DATA_ANNOUNCER_GOSSIP_SELECT:
-                    switch( InstanceProgress )
+                    switch (InstanceProgress)
                     {
                         case INSTANCE_PROGRESS_INITIAL:
                             if (uiData == 0) // normal intro
@@ -551,7 +551,7 @@ public:
                 case DATA_GRAND_CHAMPION_REACHED_DEST:
                     if (shortver)
                         break;
-                    switch( uiData )
+                    switch (uiData)
                     {
                         case 0:
                             events.ScheduleEvent(EVENT_SUMMON_GRAND_CHAMPION_2, 0ms);
@@ -572,7 +572,7 @@ public:
                     }
                     break;
                 case DATA_MOUNT_DIED:
-                    switch( InstanceProgress )
+                    switch (InstanceProgress)
                     {
                         case INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST: // fighting group 1/3
                             if (++Counter >= 3)
@@ -708,7 +708,7 @@ public:
             uint32 MINION_TO_SUMMON = 0;
             int32 TEXT_ID = 0;
 
-            switch( BossNumber )
+            switch (BossNumber)
             {
                 case 0:
                     CHAMPION_TO_SUMMON = NPC_MOKRA;
@@ -785,7 +785,7 @@ public:
         void Update(uint32 diff) override
         {
             events.Update(diff);
-            switch( events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_NULL:
                     break;
@@ -959,7 +959,7 @@ public:
                             if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]))
                             {
                                 c->AI()->DoAction(1);
-                                switch( i )
+                                switch (i)
                                 {
                                     case 0:
                                         c->GetMotionMaster()->MovePoint(5, 736.695f, 650.02f, 412.4f);
@@ -1246,7 +1246,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 11789: // I've Had Worse criteria id
                     return bAchievIveHadWorse;

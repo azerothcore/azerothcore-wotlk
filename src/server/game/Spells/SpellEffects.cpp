@@ -3957,7 +3957,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
             }
         case SPELLFAMILY_ROGUE:
             {
-                switch( m_spellInfo->Id )
+                switch (m_spellInfo->Id)
                 {
                     // Master of Subtlety
                     case 31666:

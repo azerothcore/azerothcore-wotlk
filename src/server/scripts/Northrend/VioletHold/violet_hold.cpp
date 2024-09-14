@@ -91,7 +91,7 @@ public:
     {
         ClearGossipMenuFor(player);
 
-        switch(uiAction)
+        switch (uiAction)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
                 CloseGossipMenuFor(player);
@@ -172,7 +172,7 @@ public:
 
             events.Update(diff);
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -325,7 +325,7 @@ struct violet_hold_trashAI : public npc_escortAI
         if (!bAddedWP)
         {
             bAddedWP = true;
-            switch(PLoc)
+            switch (PLoc)
             {
                 case 0:
                     for(int i = 0; i < 6; i++)
@@ -1040,7 +1040,7 @@ public:
             if (!pInstance)
                 return;
 
-            switch(uiBoss)
+            switch (uiBoss)
             {
                 case 1:
                     if (uiWPointId == 2)
@@ -1076,7 +1076,7 @@ public:
             if (!bAddedWPs)
             {
                 bAddedWPs = true;
-                switch(uiBoss)
+                switch (uiBoss)
                 {
                     case 1:
                         for(int i = 0; i < 3; i++)

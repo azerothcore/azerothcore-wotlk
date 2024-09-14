@@ -63,7 +63,7 @@ public:
 
         void OnCreatureCreate(Creature* pCreature) override
         {
-            switch( pCreature->GetEntry())
+            switch (pCreature->GetEntry())
             {
                 case NPC_DRAKOS:
                     uiDrakosGUID = pCreature->GetGUID();
@@ -82,7 +82,7 @@ public:
 
         void OnGameObjectCreate(GameObject* pGo) override
         {
-            switch( pGo->GetEntry())
+            switch (pGo->GetEntry())
             {
                 case GO_DRAGON_CAGE_DOOR:
                     for( uint8 i = 0; i < 3; ++i )
@@ -129,7 +129,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch( type )
+            switch (type)
             {
                 case DATA_DRAKOS:
                     m_auiEncounter[DATA_DRAKOS] = data;
@@ -204,7 +204,7 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            switch( type )
+            switch (type)
             {
                 case DATA_DRAKOS:
                 case DATA_VAROS:
@@ -220,7 +220,7 @@ public:
 
         ObjectGuid GetGuidData(uint32 identifier) const override
         {
-            switch( identifier )
+            switch (identifier)
             {
                 case DATA_DRAKOS:
                     return uiDrakosGUID;
@@ -259,7 +259,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case CRITERIA_EXPERIENCED_AMBER:
                     if (source)
