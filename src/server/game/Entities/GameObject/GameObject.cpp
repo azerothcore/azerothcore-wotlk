@@ -1922,28 +1922,6 @@ void GameObject::Use(Unit* user)
 
                 if (info->spellcaster.partyOnly)
                 {
-                    //npcbot
-                    //if (!caster && GetOwnerGUID().IsCreature() && user->IsPlayer())
-                    //{
-                    //    if (Creature const* bot = user->ToPlayer()->GetBotMgr()->GetBot(GetOwnerGUID()))
-                    //        caster = user->ToPlayer();
-                    //    else if (Group const* group = user->ToPlayer()->GetGroup())
-                    //    {
-                    //        for (GroupReference const* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    //        {
-                    //            if (Player const* player = itr->GetSource())
-                    //            {
-                    //                bot = player->GetBotMgr()->GetBot(GetOwnerGUID());
-                    //                if (bot)
-                    //                {
-                    //                    caster = player;
-                    //                    break;
-                    //                }
-                    //            }
-                    //        }
-                    //    }
-                    //}
-                    //end npcbot
                     if (!user->IsPlayer())
                         return;
                     if (ObjectGuid ownerGuid = GetOwnerGUID())
