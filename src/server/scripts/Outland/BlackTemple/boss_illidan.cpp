@@ -1298,10 +1298,19 @@ struct npc_flame_of_azzinoth : public ScriptedAI
             DoCastVictim(SPELL_FLAME_BLAST);
 
             me->m_Events.AddEventAtOffset([&] {
-                if (Unit* target = me->GetVictim())
-                    target->CastSpell(target, SPELL_BLAZE, true);
+                DoCastVictim(SPELL_BLAZE);
             }, 1s);
         }, 15s, 20s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
     }
 
 private:
