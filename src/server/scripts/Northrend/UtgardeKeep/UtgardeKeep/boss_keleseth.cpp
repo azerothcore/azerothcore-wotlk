@@ -76,7 +76,7 @@ public:
                 if (Unit* s = t->GetSummonerUnit())
                 {
                     PrisonerGUID = s->GetGUID();
-                    if (me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic() )
+                    if (me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic())
                     {
                         const int32 dmg = 2000;
                         c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, nullptr, &dmg, nullptr, true);
@@ -189,7 +189,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -266,7 +266,7 @@ public:
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_DECREPIFY, 10s, 20s);
-            if (IsHeroic() )
+            if (IsHeroic())
                 events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, 25s, 120s);
         }
 
@@ -294,7 +294,7 @@ public:
         {
             if (pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
             {
-                if (me->IsAlive() )
+                if (me->IsAlive())
                     me->KillSelf();
                 return;
             }
@@ -307,7 +307,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -356,7 +356,7 @@ class spell_frost_tomb_aura : public AuraScript
     {
         PreventDefaultAction();
         if (aurEff->GetTickNumber() == 1)
-            if (Unit* target = GetTarget() )
+            if (Unit* target = GetTarget())
                 target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
     }
 

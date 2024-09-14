@@ -189,7 +189,7 @@ public:
                         uint8 count = 0;
                         c->GetCreaturesWithEntryInRange(L, 200.0f, 36535); // find all Corrupted Soul Fragment (36535)
                         for( std::list<Creature*>::const_iterator itr = L.begin(); itr != L.end(); ++itr )
-                            if ((*itr)->IsAlive() )
+                            if ((*itr)->IsAlive())
                                 ++count;
                         return (count >= 4);
                     }

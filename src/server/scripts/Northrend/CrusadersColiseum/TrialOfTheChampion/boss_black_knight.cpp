@@ -143,7 +143,7 @@ public:
                 return;
             }
 
-            if (Phase < 3 && damage >= me->GetHealth() )
+            if (Phase < 3 && damage >= me->GetHealth())
             {
                 damage = 0;
                 me->SetHealth(me->GetMaxHealth());
@@ -176,7 +176,7 @@ public:
                 pInstance->SetData(BOSS_BLACK_KNIGHT, IN_PROGRESS);
                 Talk(SAY_BK_AGGRO);
                 me->CastSpell((Unit*)nullptr, (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? SPELL_RAISE_DEAD_JAEREN : SPELL_RAISE_DEAD_ARELAS), false);
-                if (Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)) )
+                if (Creature* announcer = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_ANNOUNCER)))
                     announcer->DespawnOrUnsummon();
 
                 events.Reset();
@@ -236,7 +236,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -244,23 +244,23 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_ANNOUNCER_SAY_ZOMBIE:
-                    if (pInstance && !summons.empty() )
-                        if (Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()) )
+                    if (pInstance && !summons.empty())
+                        if (Creature* ghoul = pInstance->instance->GetCreature(*summons.begin()))
                             if (urand(0, 1))
                                 ghoul->Yell("[Zombie] .... . Brains ....", LANG_UNIVERSAL); /// @todo: Multiple variations + not always happening, from video sources, needs sniff to transition from DB.
                     break;
                 case EVENT_SPELL_PLAGUE_STRIKE:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_PLAGUE_STRIKE, false);
                     events.Repeat(10s, 12s);
                     break;
                 case EVENT_SPELL_ICY_TOUCH:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_ICY_TOUCH, false);
                     events.Repeat(5s, 6s);
                     break;
@@ -270,7 +270,7 @@ public:
                     events.Repeat(13s, 15s);
                     break;
                 case EVENT_SPELL_OBLITERATE:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_OBLITERATE, false);
                     events.Repeat(15s, 17s);
                     break;
@@ -305,7 +305,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->IsPlayer() )
+            if (victim->IsPlayer())
             {
                 Talk(SAY_BK_KILL_PLAYER);
             }
@@ -317,7 +317,7 @@ public:
             Talk(SAY_BK_DEATH);
             if (pInstance)
                 pInstance->SetData(BOSS_BLACK_KNIGHT, DONE);
-            if (me->ToTempSummon() )
+            if (me->ToTempSummon())
                 me->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
         }
     };
@@ -366,7 +366,7 @@ public:
                 me->DisableRotate(true);
                 me->SetFacingTo(3.62f);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_MOUNT_SPECIAL);
-                if (InstanceScript* pInstance = me->GetInstanceScript() )
+                if (InstanceScript* pInstance = me->GetInstanceScript())
                     pInstance->SetData(DATA_SKELETAL_GRYPHON_LANDED, 0);
             }
         }
@@ -443,7 +443,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -451,7 +451,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;

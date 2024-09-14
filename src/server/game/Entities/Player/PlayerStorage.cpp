@@ -991,7 +991,7 @@ InventoryResult Player::CanStoreItem_InBag(uint8 bag, ItemPosCountVec& dest, Ite
 
     // skip not existed bag or self targeted bag
     Bag* pBag = GetBagByPos(bag);
-    if (!pBag || pBag == pSrcItem || (pSrcItem && (pSrcItem->GetGUID() == pBag->GetGUID())) )
+    if (!pBag || pBag == pSrcItem || (pSrcItem && (pSrcItem->GetGUID() == pBag->GetGUID())))
         return EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG;
 
     if (pSrcItem && pSrcItem->IsNotEmptyBag())
@@ -1120,7 +1120,7 @@ InventoryResult Player::CanStoreItem(uint8 bag, uint8 slot, ItemPosCountVec& des
     {
         // you bad chet0rz, wpe pro
         if (bag == NULL_BAG && slot == NULL_SLOT)
-            if (pItem->IsBag() && pItem->IsNotEmptyBag() )
+            if (pItem->IsBag() && pItem->IsNotEmptyBag())
                 return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
 
         // Xinef: Removed next loot generated check

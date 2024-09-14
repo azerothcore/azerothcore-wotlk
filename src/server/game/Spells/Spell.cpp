@@ -3248,7 +3248,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             HandleEffects(unit, nullptr, nullptr, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
     }
 
-    if (sanct_effect >= 0 && (effectMask & (1 << sanct_effect)) )
+    if (sanct_effect >= 0 && (effectMask & (1 << sanct_effect)))
         HandleEffects(unit, nullptr, nullptr, sanct_effect, SPELL_EFFECT_HANDLE_HIT_TARGET);
 
     return SPELL_MISS_NONE;
@@ -6547,10 +6547,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                     Unit::VisibleAuraMap const* visibleAuras = m_targets.GetUnitTarget()->GetVisibleAuras();
                     for(Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
                     {
-                        if (itr->second->GetBase()->IsPassive() )
+                        if (itr->second->GetBase()->IsPassive())
                             continue;
 
-                        if (!itr->second->IsPositive() )
+                        if (!itr->second->IsPositive())
                             continue;
 
                         found = true;

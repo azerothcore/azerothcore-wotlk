@@ -162,7 +162,7 @@ public:
                         if (!caster)
                             return;
                         uint32 id = 0;
-                        switch( me->GetMap()->GetDifficulty() )
+                        switch( me->GetMap()->GetDifficulty())
                         {
                             case 0:
                                 id = 66228;
@@ -194,7 +194,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -202,12 +202,12 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_FEL_FIREBALL:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_FEL_FIREBALL, false);
                     events.Repeat(10s, 15s);
                     break;
@@ -322,7 +322,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -330,7 +330,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -389,7 +389,7 @@ public:
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_SHIVAN_SLASH, 10s, 20s);
             events.RescheduleEvent(EVENT_SPELL_SPINNING_PAIN_SPIKE, 22s, 30s);
-            if (IsHeroic() )
+            if (IsHeroic())
                 events.RescheduleEvent(EVENT_SPELL_MISTRESS_KISS, 10s, 15s);
         }
 
@@ -401,7 +401,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -409,12 +409,12 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_SHIVAN_SLASH:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SHIVAN_SLASH, false);
                     events.Repeat(15s, 25s);
                     break;

@@ -185,8 +185,8 @@ public:
         {
             Map::PlayerList const& pl = instance->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                if (Player* plr = itr->GetSource() )
-                    if (plr->IsAlive() && !plr->IsGameMaster() )
+                if (Player* plr = itr->GetSource())
+                    if (plr->IsAlive() && !plr->IsGameMaster())
                         return EncounterStatus == IN_PROGRESS; // found alive player
 
             if (EncounterStatus != NOT_STARTED)
@@ -196,7 +196,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch( creature->GetEntry() )
+            switch( creature->GetEntry())
             {
                 case NPC_BARRENT:
                     NPC_BarrettGUID = creature->GetGUID();
@@ -246,7 +246,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch( go->GetEntry() )
+            switch( go->GetEntry())
             {
                 case GO_MAIN_GATE_DOOR:
                     GO_MainGateGUID = go->GetGUID();
@@ -284,7 +284,7 @@ public:
                             --AttemptsLeft;
                         Map::PlayerList const& pl = instance->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            if (Player* plr = itr->GetSource() )
+                            if (Player* plr = itr->GetSource())
                                 plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
                     }
                     InstanceCleanup(true);
@@ -352,7 +352,7 @@ public:
                                 c->DespawnOrUnsummon(10000);
                             if (Creature* c = instance->GetCreature(NPC_DreadscaleGUID))
                                 c->DespawnOrUnsummon(10000);
-                            if (AchievementTimer + 10 >= GameTime::GetGameTime().count() )
+                            if (AchievementTimer + 10 >= GameTime::GetGameTime().count())
                                 DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_JORMUNGAR_ACHIEV);
                             AchievementTimer = 0;
 
@@ -410,7 +410,7 @@ public:
                 case TYPE_FACTION_CHAMPIONS:
                     if (data == DONE)
                     {
-                        if (++Counter >= NPC_ChampionGUIDs.size() )
+                        if (++Counter >= NPC_ChampionGUIDs.size())
                         {
                             if (Creature* c = instance->GetCreature(NPC_TirionGUID))
                                 c->CastSpell(c, SPELL_FACTION_CHAMPIONS_KILL_CREDIT, true);
@@ -427,7 +427,7 @@ public:
                             if (Creature* c = instance->GetCreature(NPC_TirionGUID))
                             {
                                 uint32 cacheEntry = 0;
-                                switch( instance->GetDifficulty() )
+                                switch( instance->GetDifficulty())
                                 {
                                     case RAID_DIFFICULTY_10MAN_NORMAL:
                                         cacheEntry = GO_CRUSADERS_CACHE_10;
@@ -451,7 +451,7 @@ public:
 
                             HandleGameObject(GO_EnterGateGUID, true);
 
-                            if (AchievementTimer + 60 >= GameTime::GetGameTime().count() )
+                            if (AchievementTimer + 60 >= GameTime::GetGameTime().count())
                                 DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, SPELL_RESILIENCE_WILL_FIX_IT_CREDIT);
                             AchievementTimer = 0;
 
@@ -560,7 +560,7 @@ public:
         void Update(uint32 diff) override
         {
             events.Update(diff);
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -973,8 +973,8 @@ public:
                     {
                         Map::PlayerList const& pl = instance->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            if (Player* plr = itr->GetSource() )
-                                if (!plr->IsGameMaster() )
+                            if (Player* plr = itr->GetSource())
+                                if (!plr->IsGameMaster())
                                 {
                                     TeamIdInInstance = plr->GetTeamId();
                                     break;
@@ -1089,7 +1089,7 @@ public:
                         uint8 pos2 = 10;
                         for( std::vector<uint32>::iterator itr = vOtherEntries.begin(); itr != vOtherEntries.end(); ++itr )
                         {
-                            if (Creature* pTemp = instance->SummonCreature(*itr, FactionChampionLoc[urand(0, 4) + (TeamIdInInstance == TEAM_ALLIANCE ? 0 : 5)]) )
+                            if (Creature* pTemp = instance->SummonCreature(*itr, FactionChampionLoc[urand(0, 4) + (TeamIdInInstance == TEAM_ALLIANCE ? 0 : 5)]))
                             {
                                 NPC_ChampionGUIDs.push_back(pTemp->GetGUID());
                                 pTemp->SetHomePosition((TeamIdInInstance == TEAM_ALLIANCE ? FactionChampionLoc[pos2].GetPositionX() : (Locs[LOC_CENTER].GetPositionX() * 2 - FactionChampionLoc[pos2].GetPositionX())), FactionChampionLoc[pos2].GetPositionY(), FactionChampionLoc[pos2].GetPositionZ(), 0.0f);
@@ -1200,8 +1200,8 @@ public:
                         {
                             Map::PlayerList const& pl = instance->GetPlayers();
                             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                                if (Player* plr = itr->GetSource() )
-                                    if (!plr->IsGameMaster() )
+                                if (Player* plr = itr->GetSource())
+                                    if (!plr->IsGameMaster())
                                     {
                                         TeamIdInInstance = plr->GetTeamId();
                                         break;
@@ -1226,7 +1226,7 @@ public:
                         HandleGameObject(GO_EnterGateGUID, false);
                         EncounterStatus = IN_PROGRESS;
                         if (Creature* c = instance->GetCreature(NPC_TirionGUID))
-                            if (Creature* t = c->SummonCreature(NPC_LICH_KING, Locs[LOC_ARTHAS_PORTAL]) )
+                            if (Creature* t = c->SummonCreature(NPC_LICH_KING, Locs[LOC_ARTHAS_PORTAL]))
                             {
                                 t->SetReactState(REACT_PASSIVE);
                                 t->AddUnitMovementFlag(MOVEMENTFLAG_WALKING);
@@ -1354,7 +1354,7 @@ public:
                     }
                 case EVENT_SCENE_502:
                     {
-                        if (instance->IsHeroic() )
+                        if (instance->IsHeroic())
                         {
                             uint32 tributeChest = 0;
                             if (instance->GetSpawnMode() == RAID_DIFFICULTY_10MAN_HEROIC )
@@ -1397,7 +1397,7 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
-            if (instance->IsHeroic() )
+            if (instance->IsHeroic())
             {
                 plr->SendUpdateWorldState(UPDATE_STATE_UI_SHOW, 1);
                 plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
@@ -1574,7 +1574,7 @@ public:
                 --AttemptsLeft;
                 Map::PlayerList const& pl = instance->GetPlayers();
                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                    if (Player* plr = itr->GetSource() )
+                    if (Player* plr = itr->GetSource())
                         plr->SendUpdateWorldState(UPDATE_STATE_UI_COUNT, AttemptsLeft);
             }
 
@@ -1631,7 +1631,7 @@ public:
                         uint8 count = 0;
                         c->GetCreaturesWithEntryInRange(L, 200.0f, 34800); // find all snobolds
                         for( std::list<Creature*>::const_iterator itr = L.begin(); itr != L.end(); ++itr )
-                            if ((*itr)->GetVehicle() )
+                            if ((*itr)->GetVehicle())
                                 ++count;
                         return (count >= 2);
                     }
@@ -1644,7 +1644,7 @@ public:
                         uint8 count = 0;
                         c->GetCreaturesWithEntryInRange(L, 200.0f, 34800); // find all snobolds
                         for( std::list<Creature*>::const_iterator itr = L.begin(); itr != L.end(); ++itr )
-                            if ((*itr)->GetVehicle() )
+                            if ((*itr)->GetVehicle())
                                 ++count;
                         return (count >= 4);
                     }
@@ -1659,7 +1659,7 @@ public:
                         uint8 count = 0;
                         c->GetCreaturesWithEntryInRange(L, 200.0f, 34826); // find all mistress of pain
                         for( std::list<Creature*>::const_iterator itr = L.begin(); itr != L.end(); ++itr )
-                            if ((*itr)->IsAlive() )
+                            if ((*itr)->IsAlive())
                                 ++count;
                         return (count >= 2);
                     }

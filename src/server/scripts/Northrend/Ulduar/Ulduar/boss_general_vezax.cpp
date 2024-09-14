@@ -209,7 +209,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             if (!berserk && (me->GetPositionX() < 1720.0f || me->GetPositionX() > 1940.0f || me->GetPositionY() < 20.0f || me->GetPositionY() > 210.0f))
@@ -220,7 +220,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -273,8 +273,8 @@ public:
                         std::vector<Player*> inside;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            if (Player* tmp = itr->GetSource() )
-                                if (tmp->IsAlive() )
+                            if (Player* tmp = itr->GetSource())
+                                if (tmp->IsAlive())
                                 {
                                     if (tmp->GetDistance(me) > 15.0f )
                                         outside.push_back(tmp);
@@ -285,7 +285,7 @@ public:
                         Player* t = nullptr;
                         if (outside.size() >= uint8(me->GetMap()->Is25ManRaid() ? 9 : 4))
                             t = outside.at(urand(0, outside.size() - 1));
-                        else if (!inside.empty() )
+                        else if (!inside.empty())
                             t = inside.at(urand(0, inside.size() - 1));
 
                         if (t)
@@ -321,7 +321,7 @@ public:
                     if (summons.size())
                     {
                         Talk(SAY_EMOTE_ANIMUS);
-                        if (Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())) )
+                        if (Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())))
                             sv->CastSpell(sv, SPELL_SARONITE_ANIMUS_FORMATION_VISUAL, true);
 
                         events.ScheduleEvent(EVENT_SPELL_SUMMON_SARONITE_ANIMUS, 2s);
@@ -334,7 +334,7 @@ public:
                         Talk(SAY_HARDMODE);
                         Talk(SAY_EMOTE_BARRIER);
                         me->CastSpell(me, SPELL_SARONITE_BARRIER, true);
-                        if (Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())) )
+                        if (Creature* sv = ObjectAccessor::GetCreature(*me, *(summons.begin())))
                             sv->CastSpell(sv, SPELL_SUMMON_SARONITE_ANIMUS, true);
 
                         events.ScheduleEvent(EVENT_DESPAWN_SARONITE_VAPORS, 2500ms);
@@ -367,7 +367,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->IsPlayer() )
+            if (who->IsPlayer())
                 Talk(SAY_SLAY);
         }
 
@@ -411,7 +411,7 @@ public:
 
             // killed saronite vapors, hard mode unavailable
             if (pInstance)
-                if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)) )
+                if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))
                     vezax->AI()->DoAction(1);
         }
 
@@ -438,7 +438,7 @@ public:
         {
             pInstance = pCreature->GetInstanceScript();
             if (pInstance)
-                if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)) )
+                if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))
                     vezax->AI()->JustSummoned(me);
             timer = 0;
             me->SetInCombatWithZone();
@@ -452,7 +452,7 @@ public:
             me->DespawnOrUnsummon(3000);
 
             if (pInstance)
-                if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)) )
+                if (Creature* vezax = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_VEZAX)))
                     vezax->AI()->DoAction(2);
         }
 

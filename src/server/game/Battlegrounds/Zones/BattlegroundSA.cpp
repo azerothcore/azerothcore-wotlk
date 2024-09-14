@@ -589,7 +589,7 @@ void BattlegroundSA::DefendersPortalTeleport(GameObject* portal, Player* plr)
 
     uint32 portal_num = 0;
     //get it via X
-    switch( (uint32)portal->GetPositionX() )
+    switch( (uint32)portal->GetPositionX())
     {
         case 1394:
             portal_num = 0;

@@ -403,7 +403,7 @@ public:
         void Update(uint32 diff) override
         {
             events.Update(diff);
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -522,7 +522,7 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
-            if (DoNeedCleanup(plr->IsAlive()) )
+            if (DoNeedCleanup(plr->IsAlive()))
                 InstanceCleanup();
 
             if (EncounterStatus == IN_PROGRESS)
@@ -542,7 +542,7 @@ public:
             uint8 aliveCount = 0;
             Map::PlayerList const& pl = instance->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                if (Player* plr = itr->GetSource() )
+                if (Player* plr = itr->GetSource())
                     if (plr->IsAlive() && !plr->IsGameMaster() && !plr->HasAura(27827)/*spirit of redemption aura*/ )
                         ++aliveCount;
 

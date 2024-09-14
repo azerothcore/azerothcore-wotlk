@@ -10007,7 +10007,7 @@ void Player::RemoveSpellMods(Spell* spell)
                 // Missile Barrage, Hot Streak, Brain Freeze (trigger spell - Fireball!)
                 if (sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938)
                     if (AuraEffect* aurEff = GetAuraEffectDummy(64869))
-                        if (roll_chance_i(aurEff->GetAmount()) )
+                        if (roll_chance_i(aurEff->GetAmount()))
                         {
                             mod->charges = 1;
                             continue;

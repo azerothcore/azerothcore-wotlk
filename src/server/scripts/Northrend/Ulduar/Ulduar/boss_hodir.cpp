@@ -533,8 +533,8 @@ public:
             if (faction)
                 for( uint8 k = 0; k < 4; ++k )
                 {
-                    if ((faction == 'A' && ( k > 1 || (k == 1 && RAID_MODE(1, 0)) )) ||
-                            (faction == 'H' && ( k < 2 || (k == 3 && RAID_MODE(1, 0)) )) )
+                    if ((faction == 'A' && ( k > 1 || (k == 1 && RAID_MODE(1, 0)))) ||
+                            (faction == 'H' && ( k < 2 || (k == 3 && RAID_MODE(1, 0)))))
                         continue;
 
                     for( uint8 i = 0; i < 4; ++i )
@@ -817,7 +817,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -914,7 +914,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1019,7 +1019,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1114,7 +1114,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1147,7 +1147,7 @@ public:
                         bool found = false;
                         me->GetCreaturesWithEntryInRange(FB, 150.0f, NPC_FLASH_FREEZE_NPC);
                         for( std::list<Creature*>::const_iterator itr = FB.begin(); itr != FB.end(); ++itr )
-                            if (!((*itr)->HasAura(SPELL_MAGE_MELT_ICE)) )
+                            if (!((*itr)->HasAura(SPELL_MAGE_MELT_ICE)))
                             {
                                 me->CastSpell((*itr), SPELL_MAGE_MELT_ICE, false);
                                 found = true;

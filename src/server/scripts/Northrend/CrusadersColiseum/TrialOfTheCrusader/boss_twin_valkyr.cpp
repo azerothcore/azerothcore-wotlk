@@ -127,7 +127,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
             events.RescheduleEvent(EVENT_SPECIAL, 45s);
         }
         events.RescheduleEvent(EVENT_SPELL_SPIKE, 5s, 8s);
-        if (IsHeroic() )
+        if (IsHeroic())
             events.RescheduleEvent(EVENT_SPELL_TOUCH, 10s, 25s, 1);
 
         me->SetCanFly(true);
@@ -149,7 +149,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                 if (pInstance && me->GetEntry() == NPC_LIGHTBANE )
                 {
                     uint32 essenceId1 = 0, empoweredId1 = 0, touchId1 = 0, essenceId2 = 0, empoweredId2 = 0, touchId2 = 0;
-                    switch( me->GetMap()->GetDifficulty() )
+                    switch( me->GetMap()->GetDifficulty())
                     {
                         case 0:
                             essenceId1 = 65684;
@@ -216,8 +216,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
         me->setActive(true);
         me->LowerPlayerDamageReq(me->GetMaxHealth());
         DoZoneInCombat();
-        if (Creature* twin = GetSister() )
-            if (!twin->IsInCombat() )
+        if (Creature* twin = GetSister())
+            if (!twin->IsInCombat())
                 if (Unit* target = twin->SelectNearestTarget(200.0f))
                     twin->AI()->AttackStart(target);
 
@@ -266,8 +266,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
     {
         // lightbane synchronizes
         if (me->GetEntry() == NPC_LIGHTBANE )
-            if (Creature* twin = GetSister() )
-                if (twin->IsAlive() && me->IsAlive() )
+            if (Creature* twin = GetSister())
+                if (twin->IsAlive() && me->IsAlive())
                 {
                     int32 d = CAST_AI(boss_twin_valkyrAI, twin->AI())->LastSynchroHP - (int32)twin->GetHealth();
                     int32 newhealth = (int32)me->GetHealth() - d;
@@ -281,7 +281,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim() )
+        if (!UpdateVictim())
             return;
 
         UpdateSharedHealth();
@@ -299,7 +299,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
             case EVENT_BERSERK:
                 me->CastSpell(me, SPELL_BERSERK, true);
                 Talk(SAY_BERSERK);
-                if (Creature* twin = GetSister() )
+                if (Creature* twin = GetSister())
                 {
                     twin->CastSpell(twin, SPELL_BERSERK, true);
                     twin->AI()->Talk(SAY_BERSERK);
@@ -311,7 +311,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
             case EVENT_SUMMON_BALLS_3:
                 {
                     uint8 count = 0;
-                    if (IsHeroic() )
+                    if (IsHeroic())
                         count = eventId == EVENT_SUMMON_BALLS_3 ? 36 : 6;
                     else
                         count = eventId == EVENT_SUMMON_BALLS_3 ? 24 : 4;
@@ -343,10 +343,10 @@ struct boss_twin_valkyrAI : public ScriptedAI
             case EVENT_SPELL_TOUCH:
                 {
                     uint32 essenceId = 0;
-                    switch( me->GetEntry() )
+                    switch( me->GetEntry())
                     {
                         case NPC_LIGHTBANE:
-                            switch( GetDifficulty() )
+                            switch( GetDifficulty())
                             {
                                 case 0:
                                     essenceId = 65684;
@@ -363,7 +363,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             }
                             break;
                         case NPC_DARKBANE:
-                            switch( GetDifficulty() )
+                            switch( GetDifficulty())
                             {
                                 case 0:
                                     essenceId = 65686;
@@ -420,11 +420,11 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             me->CastSpell((Unit*)nullptr, SPELL_LIGHT_VORTEX, false);
                             Talk(EMOTE_VORTEX);
                             Talk(SAY_LIGHT);
-                            if (Creature* twin = GetSister() )
+                            if (Creature* twin = GetSister())
                                 twin->AI()->Talk(SAY_LIGHT);
                             break;
                         case 1: // dark vortex
-                            if (Creature* twin = GetSister() )
+                            if (Creature* twin = GetSister())
                             {
                                 twin->CastSpell((Unit*)nullptr, SPELL_DARK_VORTEX, false);
                                 twin->AI()->Talk(EMOTE_VORTEX);
@@ -435,7 +435,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                         case 2: // light pact
                             Talk(EMOTE_TWINK_PACT);
                             Talk(SAY_TWINK_PACT);
-                            if (Creature* twin = GetSister() )
+                            if (Creature* twin = GetSister())
                             {
                                 twin->AI()->Talk(SAY_TWINK_PACT);
                                 twin->AI()->DoAction(-3);
@@ -444,7 +444,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             me->CastSpell(me, SPELL_LIGHT_TWIN_PACT, false);
                             break;
                         case 3: // dark pact
-                            if (Creature* twin = GetSister() )
+                            if (Creature* twin = GetSister())
                             {
                                 twin->AI()->Talk(EMOTE_TWINK_PACT);
                                 twin->AI()->Talk(SAY_TWINK_PACT);
@@ -479,8 +479,8 @@ struct boss_twin_valkyrAI : public ScriptedAI
             pInstance->SetData(TYPE_VALKYR, DONE);
             pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_POWERING_UP);
         }
-        if (Creature* twin = GetSister() )
-            if (twin->IsAlive() )
+        if (Creature* twin = GetSister())
+            if (twin->IsAlive())
             {
                 twin->SetHealth(1);
                 Unit::Kill(twin, twin);
@@ -499,10 +499,10 @@ struct boss_twin_valkyrAI : public ScriptedAI
 
     void KilledUnit(Unit* who) override
     {
-        if (who->IsPlayer() )
+        if (who->IsPlayer())
         {
             Talk(SAY_KILL_PLAYER);
-            if (Creature* twin = GetSister() )
+            if (Creature* twin = GetSister())
                 twin->AI()->Talk(SAY_KILL_PLAYER);
         }
     }
@@ -530,9 +530,9 @@ public:
         {
             me->SetFlag(UNIT_FIELD_AURASTATE, 1 << (19 - 1));
             SetEquipmentSlots(false, EQUIP_MAIN_2, EQUIP_OFFHAND_2, EQUIP_RANGED_2);
-            if (Creature* c = me->SummonCreature(NPC_DARK_ESSENCE, Locs[LOC_DARKESS_1]) )
+            if (Creature* c = me->SummonCreature(NPC_DARK_ESSENCE, Locs[LOC_DARKESS_1]))
                 boss_twin_valkyrAI::JustSummoned(c);
-            if (Creature* c = me->SummonCreature(NPC_DARK_ESSENCE, Locs[LOC_DARKESS_2]) )
+            if (Creature* c = me->SummonCreature(NPC_DARK_ESSENCE, Locs[LOC_DARKESS_2]))
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
@@ -556,9 +556,9 @@ public:
         {
             me->SetFlag(UNIT_FIELD_AURASTATE, 1 << (22 - 1));
             SetEquipmentSlots(false, EQUIP_MAIN_1, EQUIP_OFFHAND_1, EQUIP_RANGED_1);
-            if (Creature* c = me->SummonCreature(NPC_LIGHT_ESSENCE, Locs[LOC_LIGHTESS_1]) )
+            if (Creature* c = me->SummonCreature(NPC_LIGHT_ESSENCE, Locs[LOC_LIGHTESS_1]))
                 boss_twin_valkyrAI::JustSummoned(c);
-            if (Creature* c = me->SummonCreature(NPC_LIGHT_ESSENCE, Locs[LOC_LIGHTESS_2]) )
+            if (Creature* c = me->SummonCreature(NPC_LIGHT_ESSENCE, Locs[LOC_LIGHTESS_2]))
                 boss_twin_valkyrAI::JustSummoned(c);
         }
 
@@ -573,7 +573,7 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        switch( creature->GetEntry() )
+        switch( creature->GetEntry())
         {
             case NPC_LIGHT_ESSENCE:
                 {
@@ -582,7 +582,7 @@ public:
                     //uint32 empoweredId = 0;
                     uint32 touchId1 = 0;
                     //uint32 touchId2 = 0;
-                    switch( creature->GetMap()->GetDifficulty() )
+                    switch( creature->GetMap()->GetDifficulty())
                     {
                         case 0:
                             essenceId = 65684;
@@ -628,7 +628,7 @@ public:
                     //uint32 empoweredId = 0;
                     //uint32 touchId1 = 0;
                     uint32 touchId2 = 0;
-                    switch( creature->GetMap()->GetDifficulty() )
+                    switch( creature->GetMap()->GetDifficulty())
                     {
                         case 0:
                             essenceId = 65686;
@@ -742,11 +742,11 @@ public:
         void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
         {
             uint16 count = absorbAmount / 1000;
-            if (!count || !GetOwner() )
+            if (!count || !GetOwner())
                 return;
 
-            if (SpellInfo const* se = GetAura()->GetSpellInfo() )
-                if (Unit* owner = GetOwner()->ToUnit() )
+            if (SpellInfo const* se = GetAura()->GetSpellInfo())
+                if (Unit* owner = GetOwner()->ToUnit())
                 {
                     uint32 auraId = 0;
                     uint32 empoweredId = 0;
@@ -841,7 +841,7 @@ public:
                 uint32 excludedID = GetSpellInfo()->ExcludeTargetAuraSpell;
                 Map::PlayerList const& pl = caster->GetMap()->GetPlayers();
                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                    if (Player* plr = itr->GetSource() )
+                    if (Player* plr = itr->GetSource())
                         if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
                         {
                             uint32 absorb = 0;

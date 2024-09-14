@@ -125,7 +125,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -135,7 +135,7 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;

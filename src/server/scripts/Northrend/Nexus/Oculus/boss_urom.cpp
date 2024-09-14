@@ -200,8 +200,8 @@ public:
         void JustSummoned(Creature* pSummon) override
         {
             pSummon->SetInCombatWithZone();
-            if (Unit* v = pSummon->SelectVictim() )
-                if (pSummon->AI() )
+            if (Unit* v = pSummon->SelectVictim())
+                if (pSummon->AI())
                     pSummon->AI()->AttackStart(v);
         }
 
@@ -315,7 +315,7 @@ public:
                     releaseLockTimer += diff;
             }
 
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -325,12 +325,12 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_FROSTBOMB:
-                    if (Unit* v = me->GetVictim() )
+                    if (Unit* v = me->GetVictim())
                         me->CastSpell(v, SPELL_FROSTBOMB, false);
                     events.Repeat(7s, 11s);
                     break;

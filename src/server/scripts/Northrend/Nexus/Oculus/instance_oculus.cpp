@@ -63,7 +63,7 @@ public:
 
         void OnCreatureCreate(Creature* pCreature) override
         {
-            switch( pCreature->GetEntry() )
+            switch( pCreature->GetEntry())
             {
                 case NPC_DRAKOS:
                     uiDrakosGUID = pCreature->GetGUID();
@@ -82,7 +82,7 @@ public:
 
         void OnGameObjectCreate(GameObject* pGo) override
         {
-            switch( pGo->GetEntry() )
+            switch( pGo->GetEntry())
             {
                 case GO_DRAGON_CAGE_DOOR:
                     for( uint8 i = 0; i < 3; ++i )
@@ -263,19 +263,19 @@ public:
             {
                 case CRITERIA_EXPERIENCED_AMBER:
                     if (source)
-                        if (Unit* drake = source->GetVehicleBase() )
+                        if (Unit* drake = source->GetVehicleBase())
                             if (drake->GetEntry() == NPC_AMBER_DRAKE )
                                 return true;
                     break;
                 case CRITERIA_EXPERIENCED_EMERALD:
                     if (source)
-                        if (Unit* drake = source->GetVehicleBase() )
+                        if (Unit* drake = source->GetVehicleBase())
                             if (drake->GetEntry() == NPC_EMERALD_DRAKE )
                                 return true;
                     break;
                 case CRITERIA_EXPERIENCED_RUBY:
                     if (source)
-                        if (Unit* drake = source->GetVehicleBase() )
+                        if (Unit* drake = source->GetVehicleBase())
                             if (drake->GetEntry() == NPC_RUBY_DRAKE )
                                 return true;
                     break;

@@ -122,14 +122,14 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!TargetGUID && !me->GetVehicle() )
+            if (!TargetGUID && !me->GetVehicle())
                 return;
 
             Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID);
-            if (!t && !(t = me->GetVehicleBase()) )
+            if (!t && !(t = me->GetVehicleBase()))
                 return;
 
-            if (t->isDead() )
+            if (t->isDead())
             {
                 t->RemoveAura(SPELL_CHANGE_VEHICLE);
                 me->RemoveAllAuras();
@@ -137,9 +137,9 @@ public:
                 me->CombatStop(true);
                 me->SetHealth(me->GetMaxHealth());
                 if (pInstance)
-                    if (Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)) )
-                        if (gormok->IsAlive() )
-                            if (Vehicle* vk = gormok->GetVehicleKit() )
+                    if (Creature* gormok = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_GORMOK)))
+                        if (gormok->IsAlive())
+                            if (Vehicle* vk = gormok->GetVehicleKit())
                                 for( uint8 i = 0; i < 4; ++i )
                                     if (!vk->GetPassenger(i))
                                     {
@@ -156,17 +156,17 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_SNOBOLLED:
-                    if (t->IsPlayer() )
+                    if (t->IsPlayer())
                         me->CastSpell((Unit*)nullptr, SPELL_SNOBOLLED, true);
 
                     break;
                 case EVENT_SPELL_BATTER:
-                    if (t->IsPlayer() )
+                    if (t->IsPlayer())
                         me->CastSpell(t, SPELL_BATTER);
                     events.Repeat(6s, 8s);
                     break;
@@ -180,13 +180,13 @@ public:
 
                             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                             {
-                                if (Player* p = itr->GetSource() )
-                                    if (p->IsAlive() && p->GetGUID() != TargetGUID && (!gormok || !p->IsWithinMeleeRange(gormok)) )
+                                if (Player* p = itr->GetSource())
+                                    if (p->IsAlive() && p->GetGUID() != TargetGUID && (!gormok || !p->IsWithinMeleeRange(gormok)))
                                         validPlayers.push_back(p->GetGUID());
                             }
 
-                            if (!validPlayers.empty() )
-                                if (Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))) )
+                            if (!validPlayers.empty())
+                                if (Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))))
                                     if (Creature* trigger = me->SummonCreature(NPC_FIRE_BOMB, *p, TEMPSUMMON_TIMED_DESPAWN, 60000))
                                     {
                                         me->CastSpell(trigger, SPELL_FIRE_BOMB_AURA, true); // periodic damage aura, speed 14.0f
@@ -198,7 +198,7 @@ public:
                     }
                     break;
                 case EVENT_SPELL_HEAD_CRACK:
-                    if (t->IsPlayer() )
+                    if (t->IsPlayer())
                         me->CastSpell(t, SPELL_HEAD_CRACK);
                     events.Repeat(30s, 35s);
                     break;
@@ -212,7 +212,7 @@ public:
             if (Unit* t = ObjectAccessor::GetUnit(*me, TargetGUID))
             {
                 t->RemoveAura(SPELL_CHANGE_VEHICLE);
-                if (t->IsAlive() )
+                if (t->IsAlive())
                     t->RemoveAurasDueToSpell(SPELL_SNOBOLLED);
             }
         }
@@ -265,7 +265,7 @@ public:
             events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 16s, 24s);
 
             // refresh snobold position
-            if (Vehicle* vk = me->GetVehicleKit() )
+            if (Vehicle* vk = me->GetVehicleKit())
                 for( uint8 i = 0; i < 4; ++i )
                     if (Unit* snobold = vk->GetPassenger(i))
                         snobold->SendMovementFlagUpdate();
@@ -280,7 +280,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -288,14 +288,14 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_IMPALE:
                     if (!me->HasUnitFlag(UNIT_FLAG_DISARMED))
                     {
-                        if (Unit* victim = me->GetVictim() )
+                        if (Unit* victim = me->GetVictim())
                             me->CastSpell(victim, SPELL_IMPALE, false);
                         events.Repeat(9s, 10s);
                     }
@@ -307,7 +307,7 @@ public:
                     events.Repeat(20s, 25s);
                     break;
                 case EVENT_PICK_SNOBOLD_TARGET:
-                    if (Vehicle* vk = me->GetVehicleKit() )
+                    if (Vehicle* vk = me->GetVehicleKit())
                         for( uint8 i = 0; i < 4; ++i )
                             if (Unit* snobold = vk->GetPassenger(i))
                             {
@@ -315,13 +315,13 @@ public:
                                 Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                                 {
-                                    if (Player* p = itr->GetSource() )
-                                        if (p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle() && !p->IsGameMaster() )
+                                    if (Player* p = itr->GetSource())
+                                        if (p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle() && !p->IsGameMaster())
                                             validPlayers.push_back(p->GetGUID());
                                 }
 
-                                if (!validPlayers.empty() )
-                                    if (Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))) )
+                                if (!validPlayers.empty())
+                                    if (Player* p = ObjectAccessor::GetPlayer(*me, validPlayers.at(urand(0, validPlayers.size() - 1))))
                                     {
                                         snobold->ChangeSeat(4); // switch to hand
                                         me->setAttackTimer(BASE_ATTACK, 3000);
@@ -337,12 +337,12 @@ public:
                     {
                         me->CastSpell(me, SPELL_RISING_ANGER, true);
                         Player* p = ObjectAccessor::GetPlayer(*me, PlayerGUID);
-                        if (p && p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle() )
+                        if (p && p->IsAlive() && !p->GetVehicleKit() && !p->IsMounted() && !p->GetVehicle())
                         {
-                            if (Vehicle* vk = me->GetVehicleKit() )
+                            if (Vehicle* vk = me->GetVehicleKit())
                                 if (Unit* snobold = vk->GetPassenger(4))
                                 {
-                                    if (snobold->IsCreature() )
+                                    if (snobold->IsCreature())
                                     {
                                         CAST_AI(npc_snobold_vassal::npc_snobold_vassalAI, snobold->ToCreature()->AI())->TargetGUID = PlayerGUID;
                                         snobold->ToCreature()->AI()->AttackStart(p);
@@ -353,11 +353,11 @@ public:
                                     //snobold->ClearUnitState(UNIT_STATE_ONVEHICLE);
                                 }
                         }
-                        else if (Vehicle* vk = me->GetVehicleKit() )
+                        else if (Vehicle* vk = me->GetVehicleKit())
                         {
                             events.RescheduleEvent(EVENT_PICK_SNOBOLD_TARGET, 5s);
                             if (Unit* snobold = vk->GetPassenger(4))
-                                if (snobold->IsCreature() )
+                                if (snobold->IsCreature())
                                 {
                                     bool needDespawn = true;
                                     for( uint8 i = 0; i < 4; ++i )
@@ -553,7 +553,7 @@ struct boss_jormungarAI : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim() )
+        if (!UpdateVictim())
             return;
 
         events.Update(diff);
@@ -561,7 +561,7 @@ struct boss_jormungarAI : public ScriptedAI
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
 
-        switch( events.ExecuteEvent() )
+        switch( events.ExecuteEvent())
         {
             case 0:
                 break;
@@ -574,7 +574,7 @@ struct boss_jormungarAI : public ScriptedAI
 
                     // second one submerge 1.5sec after the first one, used also for synchronizing
                     if (pInstance)
-                        if (Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(_TYPE_OTHER)) )
+                        if (Creature* c = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(_TYPE_OTHER)))
                             c->AI()->DoAction(-1);
 
                     events.Reset();
@@ -607,7 +607,7 @@ struct boss_jormungarAI : public ScriptedAI
                     {
                         me->SetNativeDisplayId(_MODEL_MOBILE);
                         me->SetCombatMovement(true);
-                        if (Unit* victim = me->GetVictim() )
+                        if (Unit* victim = me->GetVictim())
                             me->GetMotionMaster()->MoveChase(victim);
                     }
                     else
@@ -632,7 +632,7 @@ struct boss_jormungarAI : public ScriptedAI
                 events.Repeat(15s, 30s);
                 break;
             case EVENT_SPELL_BITE:
-                if (Unit* victim = me->GetVictim() )
+                if (Unit* victim = me->GetVictim())
                     me->CastSpell(victim, _SPELL_BITE, false);
                 events.Repeat(20s);
                 break;
@@ -660,8 +660,8 @@ struct boss_jormungarAI : public ScriptedAI
     {
         if (pInstance)
         {
-            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(_TYPE_OTHER)) )
-                if (c->IsAlive() )
+            if (Creature* c = pInstance->instance->GetCreature(pInstance->GetGuidData(_TYPE_OTHER)))
+                if (c->IsAlive())
                     c->AI()->DoAction(-2);
             pInstance->SetData(TYPE_JORMUNGAR, DONE);
         }
@@ -817,7 +817,7 @@ public:
         {
             Map::PlayerList const& lPlayers = me->GetMap()->GetPlayers();
             for( Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr )
-                if (Unit* p = itr->GetSource() )
+                if (Unit* p = itr->GetSource())
                     if (p->IsAlive() && p->GetExactDist(me) <= 12.0f )
                     {
                         DoCastAOE(SPELL_TRAMPLE);
@@ -843,7 +843,7 @@ public:
                 me->UpdatePosition(destX, destY, destZ, angle, true);
                 me->StopMovingOnCurrentPos();
 
-                if (!DoTrampleIfValid() )
+                if (!DoTrampleIfValid())
                 {
                     me->CastSpell(me, SPELL_STAGGERED_DAZE, true);
                     me->CastSpell((Unit*)nullptr, SPELL_TRAMPLE, true);
@@ -862,7 +862,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -870,12 +870,12 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_FEROCIOUS_BUTT:
-                    if (Unit* victim = me->GetVictim() )
+                    if (Unit* victim = me->GetVictim())
                         me->CastSpell(victim, SPELL_FEROCIOUS_BUTT, false);
                     events.Repeat(15s, 30s);
                     break;
@@ -947,7 +947,7 @@ public:
                         events.RescheduleEvent(EVENT_TRAMPLE, 1500ms);
 
                         if (pInstance)
-                            switch( GetDifficulty() )
+                            switch( GetDifficulty())
                             {
                                 case RAID_DIFFICULTY_10MAN_NORMAL:
                                     pInstance->DoRemoveAurasDueToSpellOnPlayers(SPELL_MASSIVE_CRASH);
@@ -976,7 +976,7 @@ public:
 
                     break;
                 case EVENT_CHECK_TRAMPLE_PLAYERS:
-                    if (DoTrampleIfValid() )
+                    if (DoTrampleIfValid())
                     {
                         events.Reset();
                         events.RescheduleEvent(EVENT_SPELL_FEROCIOUS_BUTT, 5s, 15s);

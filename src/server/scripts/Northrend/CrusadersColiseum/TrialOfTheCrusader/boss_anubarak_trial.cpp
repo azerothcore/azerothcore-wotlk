@@ -210,7 +210,7 @@ public:
             events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 15s, 20s);
             events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s, 8s);
             events.RescheduleEvent(EVENT_SUBMERGE, 80s);
-            if (!IsHeroic() )
+            if (!IsHeroic())
                 events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4s);
 
             for (ObjectGuid const& guid : summons)
@@ -224,10 +224,10 @@ public:
                     }
             summons.clear();
             for( uint8 i = 0; i < 4; ++i )
-                if (Creature* c = me->SummonCreature(NPC_BURROW, AnubLocs[i + 1]) )
+                if (Creature* c = me->SummonCreature(NPC_BURROW, AnubLocs[i + 1]))
                     BurrowGUID[i] = c->GetGUID();
             for( uint8 i = 0; i < 6; ++i )
-                if (Creature* c = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]) )
+                if (Creature* c = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]))
                     SphereGUID[i] = c->GetGUID();
 
             Talk(SAY_AGGRO);
@@ -243,7 +243,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -257,7 +257,7 @@ public:
                 events.CancelEvent(EVENT_SUBMERGE);
                 events.CancelEvent(EVENT_EMERGE);
                 events.CancelEvent(EVENT_EMERGE_2);
-                if (!IsHeroic() )
+                if (!IsHeroic())
                     events.CancelEvent(EVENT_SUMMON_NERUBIAN);
                 me->CastSpell((Unit*)nullptr, SPELL_LEECHING_SWARM, false);
                 Talk(EMOTE_LEECHING_SWARM);
@@ -265,7 +265,7 @@ public:
                 return;
             }
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -280,10 +280,10 @@ public:
                         uint8 i = StartAt;
                         do
                         {
-                            if (Creature* c = ObjectAccessor::GetCreature(*me, SphereGUID[i]) )
+                            if (Creature* c = ObjectAccessor::GetCreature(*me, SphereGUID[i]))
                                 if (!c->HasAura(SPELL_FROST_SPHERE))
                                 {
-                                    if (Creature* c = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]) )
+                                    if (Creature* c = me->SummonCreature(NPC_FROST_SPHERE, AnubLocs[i + 5]))
                                         SphereGUID[i] = c->GetGUID();
                                     break;
                                 }
@@ -294,7 +294,7 @@ public:
                     break;
                 case EVENT_SPELL_FREEZING_SLASH:
                     {
-                        if (me->GetVictim() )
+                        if (me->GetVictim())
                             me->CastSpell(me->GetVictim(), SPELL_FREEZING_SLASH, false);
                         events.Repeat(15s, 20s);
                     }
@@ -332,7 +332,7 @@ public:
                 case EVENT_SUMMON_SCARAB:
                     {
                         uint8 i = urand(0, 3);
-                        if (Creature* c = ObjectAccessor::GetCreature(*me, BurrowGUID[i]) )
+                        if (Creature* c = ObjectAccessor::GetCreature(*me, BurrowGUID[i]))
                             me->CastSpell(c, SPELL_SUMMON_SCARAB, true);
                         events.Repeat(4s);
                     }
@@ -385,7 +385,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->IsPlayer() )
+            if (who->IsPlayer())
                 Talk(SAY_KILL_PLAYER);
         }
 
@@ -409,7 +409,7 @@ public:
             if (!bIntro)
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                if (!me->IsInCombat() )
+                if (!me->IsInCombat())
                     Talk(SAY_INTRO);
                 bIntro = true;
             }
@@ -485,7 +485,7 @@ public:
                 return;
             }
 
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             if (determinationTimer <= (int32)diff )
@@ -631,7 +631,7 @@ public:
             me->CastSpell(me, SPELL_SPIDER_FRENZY, true);
             events.Reset();
             events.RescheduleEvent(EVENT_SUBMERGE, 30s);
-            if (IsHeroic() )
+            if (IsHeroic())
                 events.RescheduleEvent(EVENT_SPELL_SHADOW_STRIKE, 30s, 45s);
             if (Unit* target = me->SelectNearestTarget(250.0f))
             {
@@ -661,7 +661,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -669,7 +669,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -679,7 +679,7 @@ public:
                     events.Repeat(30s, 45s);
                     break;
                 case EVENT_SUBMERGE:
-                    if (HealthBelowPct(80) && !me->HasAura(RAID_MODE(66193, 67855, 67856, 67857)) ) // not having permafrost - allow submerge
+                    if (HealthBelowPct(80) && !me->HasAura(RAID_MODE(66193, 67855, 67856, 67857))) // not having permafrost - allow submerge
                     {
                         me->GetMotionMaster()->MoveIdle();
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -803,7 +803,7 @@ public:
 
             events.Update(diff);
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -840,13 +840,13 @@ public:
 
         void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
         {
-            if (Unit* target = GetTarget() )
+            if (Unit* target = GetTarget())
             {
                 if (Creature* c = target->FindNearestCreature(NPC_FROST_SPHERE, 8.0f, true))
                 {
                     target->UpdatePosition(*c, false);
                     target->CastCustomSpell(SPELL_SPIKE_FAIL, SPELLVALUE_MAX_TARGETS, 1);
-                    if (target->IsCreature() )
+                    if (target->IsCreature())
                         target->ToCreature()->AI()->DoAction(-1);
                     Remove();
                     return;

@@ -148,7 +148,7 @@ public:
 
         void DamageTaken(Unit*, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
         {
-            if (!me->GetMap()->IsHeroic() )
+            if (!me->GetMap()->IsHeroic())
                 return;
 
             if (shiftNumber <= uint32(1) && uint32(me->GetHealth() * 100 / me->GetMaxHealth()) <= uint32(60 - shiftNumber * 40))
@@ -175,7 +175,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             if (me->HasAura(SPELL_PLANAR_SHIFT) || me->HasAura(SPELL_DRAKE_STOP_TIME))
@@ -188,12 +188,12 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_ARCANE_BARRAGE:
-                    if (Unit* v = me->GetVictim() )
+                    if (Unit* v = me->GetVictim())
                         me->CastSpell(v, SPELL_ARCANE_BARRAGE, false);
                     events.Repeat(2500ms);
                     break;
@@ -234,7 +234,7 @@ public:
                                 pa->CastSpell(pa, SPELL_PLANAR_AURA_DAMAGE, true);
                                 if (Aura* a = pa->GetAura(SPELL_PLANAR_AURA_DAMAGE))
                                     a->SetDuration(15000);
-                                if (pa->AI() )
+                                if (pa->AI())
                                 {
                                     pa->AI()->AttackStart(t);
                                     pa->GetMotionMaster()->MoveChase(t, 0.01f);

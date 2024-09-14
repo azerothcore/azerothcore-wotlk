@@ -699,7 +699,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     case 17731:
                     case 69294:
                         {
-                            if (!gameObjTarget || gameObjTarget->GetRespawnTime() > GameTime::GetGameTime().count() )
+                            if (!gameObjTarget || gameObjTarget->GetRespawnTime() > GameTime::GetGameTime().count())
                                 return;
 
                             gameObjTarget->SetRespawnTime(10);
@@ -712,7 +712,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // HoL, Arc Weld
                     case 59086:
                         {
-                            if (m_caster && m_caster->IsPlayer() && m_caster->ToPlayer()->isMoving() )
+                            if (m_caster && m_caster->IsPlayer() && m_caster->ToPlayer()->isMoving())
                                 m_caster->CastSpell(m_caster, 59097, true);
 
                             return;

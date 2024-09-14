@@ -112,12 +112,12 @@ public:
             if (TeamIdInInstance == TEAM_NEUTRAL)
             {
                 Map::PlayerList const& players = instance->GetPlayers();
-                if (!players.IsEmpty() )
-                    if (Player* pPlayer = players.begin()->GetSource() )
+                if (!players.IsEmpty())
+                    if (Player* pPlayer = players.begin()->GetSource())
                         TeamIdInInstance = pPlayer->GetTeamId();
             }
 
-            switch( creature->GetEntry() )
+            switch( creature->GetEntry())
             {
                 // Grand Champions:
                 case NPC_MOKRA:
@@ -204,7 +204,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch( go->GetEntry() )
+            switch( go->GetEntry())
             {
                 case GO_MAIN_GATE:
                     GO_MainGateGUID = go->GetGUID();
@@ -328,11 +328,11 @@ public:
                         {
                             for( uint8 j = 0; j < 3; ++j )
                             {
-                                if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[i][j]) )
+                                if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[i][j]))
                                     c->DespawnOrUnsummon();
                                 NPC_GrandChampionMinionsGUID[i][j].Clear();
                             }
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]))
                                 c->DespawnOrUnsummon();
                             NPC_GrandChampionGUID[i].Clear();
                         }
@@ -358,7 +358,7 @@ public:
                             announcer->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                             for( uint8 i = 0; i < 3; ++i )
-                                if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
+                                if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]))
                                 {
                                     uint32 entry = c->GetEntry();
                                     c->DespawnOrUnsummon();
@@ -397,7 +397,7 @@ public:
                         for( uint8 i = 0; i < 3; ++i )
                             for( uint8 j = 0; j < 3; ++j )
                             {
-                                if (Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
+                                if (Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]))
                                     c->DespawnOrUnsummon();
                                 NPC_ArgentSoldierGUID[i][j].Clear();
                             }
@@ -627,7 +627,7 @@ public:
                         m_auiEncounter[0] = DONE;
                         bool creditCasted = false;
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]))
                             {
                                 c->GetMotionMaster()->MovePoint(9, 747.36f, 670.07f, 411.9f);
                                 if (!creditCasted)
@@ -645,7 +645,7 @@ public:
                         }
 
                         // bind players to instance
-                        if (instance->IsHeroic() )
+                        if (instance->IsHeroic())
                             instance->ToInstanceMap()->PermBindAllPlayers();
                     }
                     break;
@@ -785,7 +785,7 @@ public:
         void Update(uint32 diff) override
         {
             events.Update(diff);
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case EVENT_NULL:
                     break;
@@ -850,7 +850,7 @@ public:
                             HandleGameObject(GO_EnterGateGUID, false);
                         }
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]))
                             {
                                 float angle = rand_norm() * 2 * M_PI;
                                 c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
@@ -862,7 +862,7 @@ public:
                 case EVENT_GRAND_GROUP_1_ATTACK:
                     {
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[1][i]))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -877,7 +877,7 @@ public:
                 case EVENT_GRAND_GROUP_2_MOVE_MIDDLE:
                     {
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]))
                             {
                                 float angle = rand_norm() * 2 * M_PI;
                                 c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
@@ -889,7 +889,7 @@ public:
                 case EVENT_GRAND_GROUP_2_ATTACK:
                     {
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[0][i]))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -903,7 +903,7 @@ public:
                 case EVENT_GRAND_GROUP_3_MOVE_MIDDLE:
                     {
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]))
                             {
                                 float angle = rand_norm() * 2 * M_PI;
                                 c->GetMotionMaster()->MovePoint(0, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
@@ -915,7 +915,7 @@ public:
                 case EVENT_GRAND_GROUP_3_ATTACK:
                     {
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionMinionsGUID[2][i]))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -929,7 +929,7 @@ public:
                 case EVENT_GRAND_CHAMPIONS_MOVE_MIDDLE:
                     {
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]))
                             {
                                 float angle = rand_norm() * 2 * M_PI;
                                 c->GetMotionMaster()->MovePoint(4, 748.309f + 3.0f * cos(angle), 619.448f + 3.0f * std::sin(angle), 411.3f);
@@ -941,7 +941,7 @@ public:
                 case EVENT_GRAND_CHAMPIONS_MOUNTS_ATTACK:
                     {
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -956,7 +956,7 @@ public:
                 case EVENT_GRAND_CHAMPIONS_MOVE_SIDE:
                     {
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]))
                             {
                                 c->AI()->DoAction(1);
                                 switch( i )
@@ -979,7 +979,7 @@ public:
                 case EVENT_GRAND_CHAMPIONS_ATTACK:
                     {
                         for( uint8 i = 0; i < 3; ++i )
-                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]) )
+                            if (Creature* c = instance->GetCreature(NPC_GrandChampionGUID[i]))
                             {
                                 c->SetReactState(REACT_AGGRESSIVE);
                                 c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -1074,7 +1074,7 @@ public:
                         Counter = 0;
                         for( uint8 i = 0; i < 3; ++i )
                             for( uint8 j = 0; j < 3; ++j )
-                                if (Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]) )
+                                if (Creature* c = instance->GetCreature(NPC_ArgentSoldierGUID[i][j]))
                                 {
                                     c->SetReactState(REACT_AGGRESSIVE);
                                     c->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -1123,7 +1123,7 @@ public:
                             {
                                 announcer->GetMotionMaster()->MovePoint(0, 743.14f, 628.77f, 411.2f);
                                 uint32 chest = 0;
-                                if (instance->IsHeroic() )
+                                if (instance->IsHeroic())
                                     chest = (boss->GetEntry() == NPC_EADRIC || boss->GetEntry() == NPC_EADRIC_H) ? GO_EADRIC_LOOT_H : GO_PALETRESS_LOOT_H;
                                 else
                                     chest = (boss->GetEntry() == NPC_EADRIC || boss->GetEntry() == NPC_EADRIC_H) ? GO_EADRIC_LOOT : GO_PALETRESS_LOOT;
@@ -1151,12 +1151,12 @@ public:
                                 NPC_BlackKnightVehicleGUID = bk_vehicle->GetGUID();
                                 bk_vehicle->SetReactState(REACT_PASSIVE);
                                 bk_vehicle->SetFacingTo(M_PI);
-                                if (Vehicle* v = bk_vehicle->GetVehicleKit() )
+                                if (Vehicle* v = bk_vehicle->GetVehicleKit())
                                     if (Unit* bk = v->GetPassenger(0))
                                     {
                                         NPC_BlackKnightGUID = bk->GetGUID();
                                         bk->SendMovementFlagUpdate(); // put him on vehicle visually
-                                        if (bk->IsCreature() )
+                                        if (bk->IsCreature())
                                             bk->ToCreature()->SetReactState(REACT_PASSIVE);
                                     }
 

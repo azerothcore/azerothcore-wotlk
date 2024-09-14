@@ -409,7 +409,7 @@ public:
                 case EVENT_SUMMON_MOLE_MACHINES:
                     {
                         memset(cords, '\0', sizeof(cords));
-                        uint8 num = RAID_MODE( urand(2, 3), urand(2, 4) );
+                        uint8 num = RAID_MODE( urand(2, 3), urand(2, 4));
                         for( int i = 0; i < num; ++i )
                         {
                             // X: (550, 625) Y: (-185, -230)
@@ -902,7 +902,7 @@ public:
                         if (ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE))
                             razorscale = ObjectAccessor::GetCreature(*me, rsGUID);
 
-                        if (!razorscale || !razorscale->IsInCombat() )
+                        if (!razorscale || !razorscale->IsInCombat())
                         {
                             Reset();
                             me->GetMotionMaster()->MoveTargetedHome();
@@ -951,7 +951,7 @@ public:
         if (ObjectGuid rsGUID = pInstance->GetGuidData(TYPE_RAZORSCALE))
             rs = ObjectAccessor::GetCreature(*go, rsGUID);
 
-        if (!rs || !rs->IsInCombat() )
+        if (!rs || !rs->IsInCombat())
         {
             go->SetRespawnTime(0);
             go->Delete();
@@ -960,7 +960,7 @@ public:
 
         uint32 npc = 0;
         uint32 spell = 0;
-        switch( go->GetEntry() )
+        switch( go->GetEntry())
         {
             case GO_HARPOON_GUN_1:
                 npc = DATA_HARPOON_FIRE_STATE_1;
@@ -1017,7 +1017,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             if (timer2 <= diff) timer2 = 0;
@@ -1066,7 +1066,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             if (timer1 <= diff)
@@ -1122,7 +1122,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             if (timer1 <= diff)

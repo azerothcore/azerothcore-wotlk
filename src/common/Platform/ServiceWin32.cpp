@@ -52,7 +52,7 @@ bool WinServiceInstall()
     if (serviceControlMgr)
     {
         char path[_MAX_PATH + 10];
-        if (GetModuleFileName( 0, path, sizeof(path) / sizeof(path[0]) ) > 0)
+        if (GetModuleFileName( 0, path, sizeof(path) / sizeof(path[0])) > 0)
         {
             SC_HANDLE service;
             std::strcat(path, " --service");

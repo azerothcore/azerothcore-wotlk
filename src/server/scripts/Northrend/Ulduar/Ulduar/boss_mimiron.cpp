@@ -417,7 +417,7 @@ public:
 
             events.Update(diff);
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -442,12 +442,12 @@ public:
                         std::vector<Player*> pg;
                         Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                            if (Player* plr = itr->GetSource() )
-                                if (plr->IsAlive() && plr->GetExactDist2d(me) < 150.0f && !plr->IsGameMaster() )
+                            if (Player* plr = itr->GetSource())
+                                if (plr->IsAlive() && plr->GetExactDist2d(me) < 150.0f && !plr->IsGameMaster())
                                     pg.push_back(plr);
 
                         for( uint8 i = 0; i < 3; ++i )
-                            if (!pg.empty() )
+                            if (!pg.empty())
                             {
                                 uint8 index = urand(0, pg.size() - 1);
                                 Player* player = pg[index];
@@ -500,7 +500,7 @@ public:
                         if (hardmode)
                         {
                             LMK2->CastSpell(LMK2, SPELL_EMERGENCY_MODE, true);
-                            if (Vehicle* veh = LMK2->GetVehicleKit() )
+                            if (Vehicle* veh = LMK2->GetVehicleKit())
                                 if (Unit* cannon = veh->GetPassenger(3))
                                     cannon->CastSpell(cannon, SPELL_EMERGENCY_MODE, true);
                         }
@@ -557,7 +557,7 @@ public:
                     events.ScheduleEvent(EVENT_ENTER_VX001, 5s);
                     break;
                 case EVENT_ENTER_VX001:
-                    if (Creature* VX001 = GetVX001() )
+                    if (Creature* VX001 = GetVX001())
                     {
                         me->EnterVehicle(VX001, 1);
                         events.ScheduleEvent(EVENT_EMOTE_VX001, 2s);
@@ -566,7 +566,7 @@ public:
                     EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_EMOTE_VX001:
-                    if (Creature* VX001 = GetVX001() )
+                    if (Creature* VX001 = GetVX001())
                     {
                         VX001->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
                         events.ScheduleEvent(EVENT_VX001_START_FIGHT, 1750ms);
@@ -575,7 +575,7 @@ public:
                     EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_VX001_START_FIGHT:
-                    if (Creature* VX001 = GetVX001() )
+                    if (Creature* VX001 = GetVX001())
                     {
                         if (hardmode)
                             VX001->CastSpell(VX001, SPELL_EMERGENCY_MODE, true);
@@ -586,7 +586,7 @@ public:
                     EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_VX001_EMOTESTATE_DEATH:
-                    if (Creature* VX001 = GetVX001() )
+                    if (Creature* VX001 = GetVX001())
                     {
                         VX001->HandleEmoteCommand(EMOTE_STATE_DROWNED);
                         VX001->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_DROWNED);
@@ -596,7 +596,7 @@ public:
                     EnterEvadeMode(EVADE_REASON_OTHER);
                     break;
                 case EVENT_GET_OUT_VX001:
-                    if (Creature* VX001 = GetVX001() )
+                    if (Creature* VX001 = GetVX001())
                         if (Creature* ACU = me->SummonCreature(NPC_AERIAL_COMMAND_UNIT, 2743.91f, 2568.78f, 391.34f, M_PI, TEMPSUMMON_MANUAL_DESPAWN))
                         {
                             me->EnterVehicle(VX001, 4);
@@ -614,7 +614,7 @@ public:
                     events.ScheduleEvent(EVENT_ENTER_ACU, 7s);
                     break;
                 case EVENT_ENTER_ACU:
-                    if (Creature* ACU = GetACU() )
+                    if (Creature* ACU = GetACU())
                     {
                         me->EnterVehicle(ACU, 0);
                         events.ScheduleEvent(EVENT_SAY_ACU_ACTIVATE, 6s);
@@ -627,7 +627,7 @@ public:
                     events.ScheduleEvent(EVENT_ACU_START_ATTACK, 4s);
                     break;
                 case EVENT_ACU_START_ATTACK:
-                    if (Creature* ACU = GetACU() )
+                    if (Creature* ACU = GetACU())
                     {
                         if (hardmode)
                             ACU->CastSpell(ACU, SPELL_EMERGENCY_MODE, true);
@@ -1339,7 +1339,7 @@ public:
         void DoAction(int32 action) override
         {
             if (action == 1337)
-                if (Vehicle* vk = me->GetVehicleKit() )
+                if (Vehicle* vk = me->GetVehicleKit())
                     for (uint8 i = 0; i < 2; ++i)
                         if (Unit* r = vk->GetPassenger(5 + i))
                             if (r->IsCreature())
@@ -1422,7 +1422,7 @@ public:
                     events.Repeat(10s);
                     break;
                 case EVENT_SPELL_ROCKET_STRIKE:
-                    if (Vehicle* vk = me->GetVehicleKit() )
+                    if (Vehicle* vk = me->GetVehicleKit())
                     {
                         for( int i = 0; i < (Phase / 2); ++i )
                         {
@@ -1716,11 +1716,11 @@ public:
 
             // following :D
             if (Phase == 3 && !immobilized)
-                if (Unit* victim = me->GetVictim() )
+                if (Unit* victim = me->GetVictim())
                     if (me->GetExactDist2d(victim) > 25.0f )
                     {
                         float angle = victim->GetAngle(me->GetPositionX(), me->GetPositionY());
-                        me->SetOrientation( me->GetAngle(victim->GetPositionX(), victim->GetPositionY()) );
+                        me->SetOrientation( me->GetAngle(victim->GetPositionX(), victim->GetPositionY()));
                         float x = victim->GetPositionX() + 15.0f * cos(angle);
                         float y = victim->GetPositionY() + 15.0f * std::sin(angle);
 
@@ -1763,7 +1763,7 @@ public:
                     {
                         if (Phase == 3)
                         {
-                            if (Unit* victim = me->GetVictim() )
+                            if (Unit* victim = me->GetVictim())
                                 me->CastSpell(victim, SPELL_PLASMA_BALL, false);
                         }
                         else
@@ -2280,13 +2280,13 @@ public:
 
             events.Update(diff);
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_FLAMES_SPREAD:
                     {
-                        if (FlameList.empty() )
+                        if (FlameList.empty())
                         {
                             me->DespawnOrUnsummon();
                             return;
@@ -2307,8 +2307,8 @@ public:
 
                             Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                                if (Player* plr = itr->GetSource() )
-                                    if (plr->IsAlive() && plr->GetExactDist2d(last) < prevdist && !plr->IsGameMaster() )
+                                if (Player* plr = itr->GetSource())
+                                    if (plr->IsAlive() && plr->GetExactDist2d(last) < prevdist && !plr->IsGameMaster())
                                     {
                                         target = plr;
                                         prevdist = plr->GetExactDist2d(last);
@@ -2403,7 +2403,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;

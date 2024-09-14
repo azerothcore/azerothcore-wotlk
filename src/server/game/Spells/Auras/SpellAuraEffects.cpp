@@ -5631,7 +5631,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                 Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
                                 Cell::VisitWorldObjects(target, searcher, 10.0f);
 
-                                if (player && player->GetGUID() != target->GetGUID() )
+                                if (player && player->GetGUID() != target->GetGUID())
                                     target->CastSpell(player, 52921, true);
 
                                 return;

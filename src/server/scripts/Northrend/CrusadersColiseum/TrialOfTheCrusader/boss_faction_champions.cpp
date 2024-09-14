@@ -148,7 +148,7 @@ struct boss_faction_championsAI : public ScriptedAI
         // for casting, silence, disarm check individually in the ai
         if (me->isFeared() || me->isFrozen() || me->HasUnitState(UNIT_STATE_STUNNED) || me->HasUnitState(UNIT_STATE_CONFUSED))
         {
-            if (!IsHeroic() )
+            if (!IsHeroic())
                 return true;
             if (me->HasSpellCooldown(SPELL_PVP_TRINKET))
                 return true;
@@ -164,7 +164,7 @@ struct boss_faction_championsAI : public ScriptedAI
     Creature* SelectTarget_MostHPLostFriendlyMissingBuff(uint32 spell, float range)
     {
         std::list<Creature*> lst = DoFindFriendlyMissingBuff(range, spell);
-        if (lst.empty() )
+        if (lst.empty())
             return nullptr;
         std::list<Creature*>::const_iterator iter = lst.begin();
         uint32 lowestHP = (*iter)->GetMaxHealth() - (*iter)->GetHealth();
@@ -300,15 +300,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -429,15 +429,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -480,7 +480,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_EARTH_SHOCK:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_EARTH_SHOCK, false);
                     events.Repeat(5s, 10s);
                     EventMapGCD(events, 1500);
@@ -552,15 +552,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -685,15 +685,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -716,7 +716,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_DISPEL:
-                    if (Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
+                    if (Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)))
                         me->CastSpell(target, SPELL_DISPEL, false);
                     events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
@@ -808,15 +808,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -832,25 +832,25 @@ public:
                         events.Repeat(6s);
                     break;
                 case EVENT_SPELL_VAMPIRIC_TOUCH:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_VAMPIRIC_TOUCH, false);
                     events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SW_PAIN:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SW_PAIN, false);
                     events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_MIND_FLAY:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_MIND_FLAY, false);
                     events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_MIND_BLAST:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_MIND_BLAST, false);
                     events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
@@ -876,7 +876,7 @@ public:
                         events.Repeat(6s);
                     break;
                 case EVENT_SPELL_DISPEL:
-                    if (Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)) )
+                    if (Unit* target = (urand(0, 1) ? SelectTarget(SelectTargetMethod::MaxThreat, 0, 30.0f, true) : SelectTarget_MostHPLostFriendlyMissingBuff(SPELL_DISPEL, 40.0f)))
                         me->CastSpell(target, SPELL_DISPEL, false);
                     events.Repeat(10s, 15s);
                     EventMapGCD(events, 1500);
@@ -968,15 +968,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -995,19 +995,19 @@ public:
                         events.Repeat(6s);
                     break;
                 case EVENT_SPELL_CORRUPTION:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_CORRUPTION, false);
                     events.Repeat(10s, 20s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CURSE_OF_AGONY:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_CURSE_OF_AGONY, false);
                     events.Repeat(10s, 20s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_CURSE_OF_EXHAUSTION:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_CURSE_OF_EXHAUSTION, false);
                     events.Repeat(10s, 20s);
                     EventMapGCD(events, 1500);
@@ -1019,19 +1019,19 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SEARING_PAIN:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SEARING_PAIN, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SHADOW_BOLT:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_UNSTABLE_AFFLICTION:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_UNSTABLE_AFFLICTION, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
@@ -1105,26 +1105,26 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_ARCANE_BARRAGE:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_ARCANE_BARRAGE, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_ARCANE_BLAST:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_ARCANE_BLAST, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
@@ -1161,7 +1161,7 @@ public:
                         events.Repeat(6s);
                     break;
                 case EVENT_SPELL_FROSTBOLT:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
@@ -1259,15 +1259,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1276,7 +1276,7 @@ public:
 
                     break;
                 case EVENT_SPELL_AIMED_SHOT:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_AIMED_SHOT, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
@@ -1302,7 +1302,7 @@ public:
                         events.Repeat(6s);
                     break;
                 case EVENT_SPELL_EXPLOSIVE_SHOT:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_EXPLOSIVE_SHOT, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
@@ -1313,7 +1313,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_STEADY_SHOT:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_STEADY_SHOT, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
@@ -1412,15 +1412,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1435,25 +1435,25 @@ public:
                         events.Repeat(6s);
                     break;
                 case EVENT_SPELL_WRATH:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_WRATH, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_MOONFIRE:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_STARFIRE:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_STARFIRE, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_INSECT_SWARM:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_INSECT_SWARM, false);
                     events.Repeat(5s, 15s);
                     EventMapGCD(events, 1500);
@@ -1465,7 +1465,7 @@ public:
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_FAERIE_FIRE:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_FAERIE_FIRE, false);
                     events.Repeat(15s, 20s);
                     EventMapGCD(events, 1500);
@@ -1551,15 +1551,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1594,7 +1594,7 @@ public:
                         events.Repeat(5s);
                         break;
                     }
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
                     events.Repeat(6s, 8s);
                     EventMapGCD(events, 1500);
@@ -1743,15 +1743,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1900,15 +1900,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -2058,15 +2058,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -2196,15 +2196,15 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -2341,26 +2341,26 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_DEVOUR_MAGIC:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_DEVOUR_MAGIC, false);
                     events.Repeat(8s, 15s);
                     EventMapGCD(events, 1500);
                     break;
                 case EVENT_SPELL_SPELL_LOCK:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_SPELL_LOCK, false);
                     events.Repeat(24s);
                     EventMapGCD(events, 1500);
@@ -2415,20 +2415,20 @@ public:
         void UpdateAI(uint32 diff) override
         {
             boss_faction_championsAI::UpdateAI(diff);
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if (!myCanCast() )
+            if (!myCanCast())
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_CLAW:
-                    if (me->GetVictim() )
+                    if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_CLAW, false);
                     events.Repeat(8s, 15s);
                     break;

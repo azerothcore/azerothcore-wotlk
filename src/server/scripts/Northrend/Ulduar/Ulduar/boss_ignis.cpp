@@ -219,7 +219,7 @@ public:
             bShattered = false;
             lastShatterMSTime = 0;
 
-            if (InstanceScript* m_pInstance = me->GetInstanceScript() )
+            if (InstanceScript* m_pInstance = me->GetInstanceScript())
             {
                 m_pInstance->SetData(TYPE_IGNIS, NOT_STARTED);
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
@@ -256,7 +256,7 @@ public:
             Talk(SAY_AGGRO);
             DoZoneInCombat();
 
-            if (InstanceScript* m_pInstance = me->GetInstanceScript() )
+            if (InstanceScript* m_pInstance = me->GetInstanceScript())
             {
                 m_pInstance->SetData(TYPE_IGNIS, IN_PROGRESS);
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_STOKIN_THE_FURNACE_EVENT);
@@ -298,7 +298,7 @@ public:
         {
             Talk(SAY_DEATH);
 
-            if (me->GetInstanceScript() )
+            if (me->GetInstanceScript())
                 me->GetInstanceScript()->SetData(TYPE_IGNIS, DONE);
 
             std::list<Creature*> icl;
@@ -382,7 +382,7 @@ public:
                             temp = itr->GetSource();
                             if (!temp->IsAlive() || temp->GetExactDist2d(me) > 90.0f )
                                 continue;
-                            if (me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID() )
+                            if (me->GetVictim() && temp->GetGUID() == me->GetVictim()->GetGUID())
                                 continue;
                             bool found = false;
                             for (std::list<Creature*>::iterator iterator = icl.begin(); iterator != icl.end(); ++iterator)
@@ -398,10 +398,10 @@ public:
                                 playerGUIDs.push_back(temp->GetGUID());
                         }
 
-                        if (!playerGUIDs.empty() )
+                        if (!playerGUIDs.empty())
                         {
                             int8 pos = urand(0, playerGUIDs.size() - 1);
-                            if (Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)) )
+                            if (Player* pTarget = ObjectAccessor::GetPlayer(*me, playerGUIDs.at(pos)))
                             {
                                 Talk(SAY_SLAG_POT);
                                 me->CastSpell(pTarget, SPELL_GRAB, false);

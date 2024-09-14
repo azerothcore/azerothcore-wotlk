@@ -419,7 +419,7 @@ public:
                 {
                     if (target && target->IsAlive() && !target->CanFly() && target->IsHostileTo(me) && !spell->IsTargetingArea())
                     {
-                        if (Unit* charmer = me->GetCharmer() )
+                        if (Unit* charmer = me->GetCharmer())
                             Unit::Kill(charmer, charmer, false);
                     }
                     break;

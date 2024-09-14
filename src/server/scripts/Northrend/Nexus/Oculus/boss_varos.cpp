@@ -157,7 +157,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
@@ -167,7 +167,7 @@ public:
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch( events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -185,7 +185,7 @@ public:
                     {
                         Talk(SAY_AZURE);
                         Talk(SAY_AZURE_EMOTE);
-                        switch( events.ExecuteEvent() )
+                        switch( events.ExecuteEvent())
                         {
                             case EVENT_CALL_AZURE_RING_CAPTAIN_1:
                                 me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_1, true);
