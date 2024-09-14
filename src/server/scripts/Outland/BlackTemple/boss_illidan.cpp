@@ -140,7 +140,6 @@ enum Misc
     NPC_WORLD_TRIGGER                   = 22515,
     NPC_ILLIDAN_DB_TARGET               = 23070,
     NPC_MAIEV_SHADOWSONG                = 23197,
-    NPC_SHADOW_DEMON                    = 23375,
 
     GO_CAGE_TRAP                        = 185916,
 
@@ -609,20 +608,13 @@ struct boss_illidan_stormrage : public BossAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
-
         if (summon->GetEntry() == NPC_ILLIDAN_DB_TARGET)
         {
             DoCast(summon, SPELL_EYE_BLAST);
-        }
         else if (summon->GetEntry() == NPC_MAIEV_SHADOWSONG)
         {
             me->SetTarget(summon->GetGUID());
             me->SetFacingToObject(summon);
-        }
-        else if (summon->GetEntry() == NPC_SHADOW_DEMON)
-        {
-            summon->SetControlled(true, UNIT_STATE_MOVE);
-            summon->SetInCombatWithZone();
         }
     }
 
