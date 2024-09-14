@@ -2505,7 +2505,7 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
     bool Load() override
     {
         //npcbot
-        if (GetCaster() && GetCaster()->IsNPCBot() && GetOwner()->IsCreature())
+        if (GetCaster() && GetCaster()->IsNPCBot() && GetOwner()->GetTypeId() == TYPEID_UNIT)
             return true;
         //end npcbot
         return GetCaster() && GetCaster()->IsPlayer() && GetOwner()->IsCreature();

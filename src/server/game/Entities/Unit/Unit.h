@@ -816,11 +816,6 @@ public:
 
     [[nodiscard]] uint32 GetAttackTime(WeaponAttackType att) const
     {
-        //npcbot: skip owner guid condition for bots
-        if (IsNPCBotOrPet())
-            return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT |
-                                 UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED);
-        //end npcbot
         float f_BaseAttackTime = GetFloatValue(static_cast<uint16>(UNIT_FIELD_BASEATTACKTIME) + att) / m_modAttackSpeedPct[att];
         return (uint32)f_BaseAttackTime;
     }
