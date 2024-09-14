@@ -609,7 +609,6 @@ struct boss_illidan_stormrage : public BossAI
     {
         summons.Summon(summon);
         if (summon->GetEntry() == NPC_ILLIDAN_DB_TARGET)
-        {
             DoCast(summon, SPELL_EYE_BLAST);
         else if (summon->GetEntry() == NPC_MAIEV_SHADOWSONG)
         {
