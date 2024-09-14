@@ -35,6 +35,12 @@ struct ItemSetEffect
     SpellInfo const* spells[8];
 };
 
+enum InventorySlot
+{
+    NULL_BAG    = 0,
+    NULL_SLOT   = 255
+};
+
 enum BAG_RESULT : uint8
 {
     BAG_OK  = 0,

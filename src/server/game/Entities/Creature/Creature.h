@@ -19,6 +19,7 @@
 #define AZEROTHCORE_CREATURE_H
 
 #include "Cell.h"
+#include "CharmInfo.h"
 #include "Common.h"
 #include "CreatureData.h"
 #include "DatabaseEnv.h"

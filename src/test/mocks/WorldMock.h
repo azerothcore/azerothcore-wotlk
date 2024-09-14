@@ -75,9 +75,9 @@ public:
     void SendWorldText(uint32 string_id, ...) override {}
     void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) override {}
     void SendGMText(uint32 string_id, ...) override {}
-    MOCK_METHOD(void, SendGlobalMessage, (WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
-    MOCK_METHOD(void, SendGlobalGMMessage, (WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
-    MOCK_METHOD(bool, SendZoneMessage, (uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId), ());
+    MOCK_METHOD(void, SendGlobalMessage, (WDataStore const* packet, WorldSession* self, TeamId teamId), ());
+    MOCK_METHOD(void, SendGlobalGMMessage, (WDataStore const* packet, WorldSession* self, TeamId teamId), ());
+    MOCK_METHOD(bool, SendZoneMessage, (uint32 zone, WDataStore const* packet, WorldSession* self, TeamId teamId), ());
     MOCK_METHOD(void, SendZoneText, (uint32 zone, const char* text, WorldSession* self, TeamId teamId), ());
     MOCK_METHOD(void, SendServerMessage, (ServerMessageType messageID, std::string stringParam, Player* player));
     MOCK_METHOD(bool, IsShuttingDown, (), (const));

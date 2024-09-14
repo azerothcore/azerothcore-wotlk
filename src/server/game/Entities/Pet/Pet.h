@@ -18,6 +18,7 @@
 #ifndef AZEROTHCORE_PET_H
 #define AZEROTHCORE_PET_H
 
+#include "CharmInfo.h"
 #include "PetDefines.h"
 #include "TemporarySummon.h"
 
