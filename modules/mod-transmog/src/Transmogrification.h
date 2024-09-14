@@ -27,8 +27,11 @@ struct ItemTemplate;
 
 enum TransmogSettings
 {
-    SETTING_HIDE_TRANSMOG = 0,
-    SETTING_RETROACTIVE_CHECK = 1
+    SETTING_HIDE_TRANSMOG             = 0,
+    SETTING_RETROACTIVE_CHECK         = 1,
+
+    // Subscriptions
+    SETTING_TRANSMOG_MEMBERSHIP_LEVEL = 0
 };
 
 enum MixedWeaponSettings
@@ -270,7 +273,7 @@ public:
     // Transmog Plus
     bool IsTransmogPlusEnabled;
     [[nodiscard]] bool IsPlusFeatureEligible(ObjectGuid const& playerGuid, uint32 feature) const;
-    uint32 getPlayerMembershipLevel(ObjectGuid const & playerGuid) const;
+    [[nodiscard]] uint32 GetPlayerMembershipLevel(Player* player) const { return player->GetPlayerSetting("acore_cms_subscriptions", SETTING_TRANSMOG_MEMBERSHIP_LEVEL).value; };
     [[nodiscard]] bool IgnoreLevelRequirement(ObjectGuid const& playerGuid) const { return IgnoreReqLevel || IsPlusFeatureEligible(playerGuid, PLUS_FEATURE_SKIP_LEVEL_REQ); }
 
     uint32 PetSpellId;
