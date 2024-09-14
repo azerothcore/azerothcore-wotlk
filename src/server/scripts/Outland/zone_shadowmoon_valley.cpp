@@ -323,7 +323,7 @@ public:
             if (bCanEat || bIsEating)
                 return;
 
-            if (pCaster->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_PLACE_CARCASS && !me->HasAura(SPELL_JUST_EATEN))
+            if (pCaster->IsPlayer() && spell->Id == SPELL_PLACE_CARCASS && !me->HasAura(SPELL_JUST_EATEN))
             {
                 uiPlayerGUID = pCaster->GetGUID();
                 bCanEat = true;
@@ -599,7 +599,7 @@ public:
 
             PlayerGUID = caster->GetGUID();
 
-            if (caster->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_POISON && !Tapped)
+            if (caster->IsPlayer() && spell->Id == SPELL_POISON && !Tapped)
             {
                 Tapped = true;
                 caster->GetClosePoint(x, y, z, me->GetObjectSize());
@@ -1278,7 +1278,7 @@ public:
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     {
-                        if (target->GetTypeId() == TYPEID_PLAYER)
+                        if (target->IsPlayer())
                         {
                             DoCast(target, SpawnCast[1].SpellId); //Focused Bursts
                             SpellTimer1 = SpawnCast[1].Timer2 + (rand() % 5 * 1000);

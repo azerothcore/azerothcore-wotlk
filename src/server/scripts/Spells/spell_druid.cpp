@@ -355,7 +355,7 @@ class spell_dru_treant_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, nature), 15);
 
             // xinef: Update appropriate player field
-            if (owner->GetTypeId() == TYPEID_PLAYER)
+            if (owner->IsPlayer())
                 owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
         }
     }
@@ -791,7 +791,7 @@ class spell_dru_rip : public AuraScript
     bool Load() override
     {
         Unit* caster = GetCaster();
-        return caster && caster->GetTypeId() == TYPEID_PLAYER;
+        return caster && caster->IsPlayer();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
@@ -1005,7 +1005,7 @@ class spell_dru_swift_flight_passive : public AuraScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
@@ -1063,7 +1063,7 @@ class spell_dru_t10_restoration_4p_bonus : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)
@@ -1151,7 +1151,7 @@ class spell_dru_berserk : public SpellScript
     {
         Unit* caster = GetCaster();
 
-        if (caster->GetTypeId() == TYPEID_PLAYER)
+        if (caster->IsPlayer())
         {
             // Remove tiger fury / mangle(bear)
             const uint32 TigerFury[6] = { 5217, 6793, 9845, 9846, 50212, 50213 };

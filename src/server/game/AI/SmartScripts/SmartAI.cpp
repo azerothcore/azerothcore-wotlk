@@ -202,7 +202,7 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
         mCanRepeatPath = repeat;
         SetRun(run);
 
-        if (invoker && invoker->GetTypeId() == TYPEID_PLAYER)
+        if (invoker && invoker->IsPlayer())
         {
             mEscortNPCFlags = me->GetNpcFlags();
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);

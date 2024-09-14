@@ -389,7 +389,7 @@ public:
 
         void KilledUnit(Unit* pVictim) override
         {
-            if (!urand(0, 2) && pVictim->GetTypeId() == TYPEID_PLAYER)
+            if (!urand(0, 2) && pVictim->IsPlayer())
             {
                 Talk(SAY_SARTHARION_SLAY);
             }

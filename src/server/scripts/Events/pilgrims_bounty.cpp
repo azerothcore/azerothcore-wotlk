@@ -118,7 +118,7 @@ struct npc_pilgrims_bounty_chair : public VehicleAI
 
     void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
     {
-        if (apply && who->GetTypeId() == TYPEID_PLAYER)
+        if (apply && who->IsPlayer())
             who->ToPlayer()->SetClientControl(me, 0, true);
     }
 

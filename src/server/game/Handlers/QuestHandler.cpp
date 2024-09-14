@@ -122,8 +122,8 @@ void User::HandleQuestgiverAcceptQuestOpcode(WDataStore& recvData)
     Object* object = ObjectAccessor::GetObjectByTypeMask(*m_player, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_ITEM | TYPEMASK_PLAYER);
 
     // no or incorrect quest giver
-    if (!object || object == m_player || (object->GetTypeId() != TYPEID_PLAYER && !object->hasQuest(questId)) ||
-            (object->GetTypeId() == TYPEID_PLAYER && !object->ToPlayer()->CanShareQuest(questId)))
+    if (!object || object == m_player || (!object->IsPlayer() && !object->hasQuest(questId)) ||
+            (object->IsPlayer() && !object->ToPlayer()->CanShareQuest(questId)))
     {
         m_player->PlayerTalkClass->SendCloseGossip();
         m_player->SetDivider();
@@ -137,7 +137,7 @@ void User::HandleQuestgiverAcceptQuestOpcode(WDataStore& recvData)
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         // pussywizard: exploit fix, can't share quests that give items to be sold
-        if (object->GetTypeId() == TYPEID_PLAYER)
+        if (object->IsPlayer())
             if (uint32 itemId = quest->GetSrcItemId())
                 if (ItemTemplate const* srcItem = sObjectMgr->GetItemTemplate(itemId))
                     if (srcItem->SellPrice > 0)
@@ -219,7 +219,7 @@ void User::HandleQuestgiverQueryQuestOpcode(WDataStore& recvData)
     if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
     {
         // not sure here what should happen to quests with QUEST_FLAGS_AUTOCOMPLETE
-        // if this breaks them, add && object->GetTypeId() == TYPEID_ITEM to this check
+        // if this breaks them, add && object->IsItem() to this check
         // item-started quests never have that flag
         if (!m_player->CanTakeQuest(quest, true))
             return;

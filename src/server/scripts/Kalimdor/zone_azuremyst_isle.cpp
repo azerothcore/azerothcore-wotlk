@@ -94,7 +94,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (CanSayHelp && who->GetTypeId() == TYPEID_PLAYER && me->IsFriendlyTo(who) && me->IsWithinDistInMap(who, 25.0f))
+            if (CanSayHelp && who->IsPlayer() && me->IsFriendlyTo(who) && me->IsWithinDistInMap(who, 25.0f))
             {
                 //Random switch between 4 texts
                 Talk(SAY_HELP, who);

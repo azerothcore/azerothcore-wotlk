@@ -281,7 +281,7 @@ void Spell::EffectInstaKill(SpellEffIndex /*effIndex*/)
     if (!unitTarget || !unitTarget->IsAlive() || unitTarget->HasAura(27827)) // Spirit of redemption doesn't make you death, but can cause infinite loops
         return;
 
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    if (unitTarget->IsPlayer())
         if (unitTarget->ToPlayer()->GetCommandStatus(CHEAT_GOD))
             return;
 
@@ -471,7 +471,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
             case SPELLFAMILY_DRUID:
                 {
                     // Ferocious Bite
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER && (m_spellInfo->SpellFamilyFlags[0] & 0x000800000) && m_spellInfo->SpellVisual[0] == 6587)
+                    if (m_caster->IsPlayer() && (m_spellInfo->SpellFamilyFlags[0] & 0x000800000) && m_spellInfo->SpellVisual[0] == 6587)
                     {
                         // converts each extra point of energy into ($f1+$AP/410) additional damage
                         float ap = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
@@ -543,7 +543,7 @@ void Spell::EffectSchoolDMG(SpellEffIndex effIndex)
                     // Eviscerate
                     else if (m_spellInfo->SpellFamilyFlags[0] & 0x00020000)
                     {
-                        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                        if (m_caster->IsPlayer())
                         {
                             if (uint32 combo = m_caster->ToPlayer()->GetComboPoints())
                             {
@@ -710,7 +710,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // HoL, Arc Weld
                     case 59086:
                         {
-                            if( m_caster && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->ToPlayer()->isMoving() )
+                            if( m_caster && m_caster->IsPlayer() && m_caster->ToPlayer()->isMoving() )
                                 m_caster->CastSpell(m_caster, 59097, true);
 
                             return;
@@ -932,7 +932,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
     }
 
     // Remove spell cooldown (not category) if spell triggering spell with cooldown and same category
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && spellInfo->CategoryRecoveryTime && m_spellInfo->GetCategory() == spellInfo->GetCategory())
+    if (m_caster->IsPlayer() && spellInfo->CategoryRecoveryTime && m_spellInfo->GetCategory() == spellInfo->GetCategory())
     {
         m_caster->ToPlayer()->RemoveSpellCooldown(spellInfo->Id);
     }
@@ -986,7 +986,7 @@ void Spell::EffectTriggerMissileSpell(SpellEffIndex effIndex)
     }
 
     // Remove spell cooldown (not category) if spell triggering spell with cooldown and same category
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && spellInfo->CategoryRecoveryTime && m_spellInfo->GetCategory() == spellInfo->GetCategory())
+    if (m_caster->IsPlayer() && spellInfo->CategoryRecoveryTime && m_spellInfo->GetCategory() == spellInfo->GetCategory())
     {
         m_caster->ToPlayer()->RemoveSpellCooldown(spellInfo->Id);
     }
@@ -1083,7 +1083,7 @@ void Spell::EffectJump(SpellEffIndex effIndex)
     CalculateJumpSpeeds(effIndex, m_caster->GetExactDist2d(unitTarget), speedXY, speedZ);
     m_caster->GetMotionMaster()->MoveJump(*unitTarget, speedXY, speedZ);
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->IsPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
     }
@@ -1122,7 +1122,7 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
             player->SetCanTeleport(true);
         }
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->IsPlayer())
         {
             sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
         }
@@ -1146,7 +1146,7 @@ void Spell::EffectJumpDest(SpellEffIndex effIndex)
     }
     m_caster->GetMotionMaster()->MoveJump(x, y, z, speedXY, speedZ);
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->IsPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
     }
@@ -1171,7 +1171,7 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
     if (!unitTarget || unitTarget->IsOnTaxi())
         return;
 
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    if (unitTarget->IsPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
     }
@@ -1213,13 +1213,13 @@ void Spell::EffectTeleportUnits(SpellEffIndex /*effIndex*/)
             unitTarget->GetVehicleKit()->TeleportVehicle(x, y, z, orientation);
         else
         {
-            bool withPet = unitTarget->GetTypeId() == TYPEID_PLAYER && m_spellInfo->SpellFamilyName == SPELLFAMILY_GENERIC && unitTarget->GetMap()->IsDungeon() && unitTarget->GetExactDist(x, y, z) > 50.0f;
+            bool withPet = unitTarget->IsPlayer() && m_spellInfo->SpellFamilyName == SPELLFAMILY_GENERIC && unitTarget->GetMap()->IsDungeon() && unitTarget->GetExactDist(x, y, z) > 50.0f;
             unitTarget->NearTeleportTo(x, y, z, orientation, unitTarget == m_caster, false, withPet, true);
-            if (unitTarget->GetTypeId() == TYPEID_PLAYER) // pussywizard: for units it's done inside NearTeleportTo
+            if (unitTarget->IsPlayer()) // pussywizard: for units it's done inside NearTeleportTo
                 unitTarget->UpdateObjectVisibility(true);
         }
     }
-    else if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    else if (unitTarget->IsPlayer())
         unitTarget->ToPlayer()->Teleport(mapid, x, y, z, orientation, unitTarget == m_caster ? TELE_TO_SPELL : 0);
     else
     {
@@ -1876,7 +1876,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
 
     POWER_TYPE power = POWER_TYPE(m_spellInfo->Effects[effIndex].MiscValue);
 
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER && !unitTarget->HasActivePowerType(power) && m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION
+    if (unitTarget->IsPlayer() && !unitTarget->HasActivePowerType(power) && m_spellInfo->SpellFamilyName != SPELLFAMILY_POTION
             && !m_spellInfo->HasAttribute(SPELL_ATTR7_ONLY_IN_SPELLBOOK_UNTIL_LEARNED))
         return;
 
@@ -1981,7 +1981,7 @@ void Spell::EffectEnergizePct(SpellEffIndex effIndex)
 
     POWER_TYPE power = POWER_TYPE(m_spellInfo->Effects[effIndex].MiscValue);
 
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER && !unitTarget->HasActivePowerType(power) && !m_spellInfo->HasAttribute(SPELL_ATTR7_ONLY_IN_SPELLBOOK_UNTIL_LEARNED))
+    if (unitTarget->IsPlayer() && !unitTarget->HasActivePowerType(power) && !m_spellInfo->HasAttribute(SPELL_ATTR7_ONLY_IN_SPELLBOOK_UNTIL_LEARNED))
         return;
 
     uint32 maxPower = unitTarget->GetMaxPower(power);
@@ -2723,7 +2723,7 @@ void Spell::EffectUntrainTalents(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT_TARGET)
         return;
 
-    if (!unitTarget || m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (!unitTarget || m_caster->IsPlayer())
         return;
 
     if (WOWGUID guid = m_caster->GetGUID()) // the trainer is the caster
@@ -3106,7 +3106,7 @@ void Spell::EffectTameCreature(SpellEffIndex /*effIndex*/)
 
     pet->InitTalentForLevel();
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->IsPlayer())
     {
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         m_caster->ToPlayer()->PetSpellInitialize();
@@ -3185,7 +3185,7 @@ void Spell::EffectSummonPet(SpellEffIndex effIndex)
             return;
         }
 
-        if (owner->GetTypeId() == TYPEID_PLAYER)
+        if (owner->IsPlayer())
             owner->ToPlayer()->RemovePet(OldSummon, PET_SAVE_NOT_IN_SLOT, false);
         else
             return;
@@ -3365,7 +3365,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
                         AddComboPointGain(unitTarget, 1);
                     }
                     // 50% more damage with daggers
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                    if (m_caster->IsPlayer())
                         if (Item* item = m_caster->ToPlayer()->GetWeaponForAttack(m_attackType, true))
                             if (item->GetTemplate()->SubClass == ITEM_SUBCLASS_WEAPON_DAGGER)
                                 AddPct(totalDamagePercentMod, 50.0f);
@@ -4016,7 +4016,7 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
         if (m_spellInfo->Id != 59646)
             unitTarget->getHostileRefMgr().addThreatPercent(-100);
 
-        if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+        if (unitTarget->IsPlayer())
             unitTarget->ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
     }
     else
@@ -4667,7 +4667,7 @@ void Spell::EffectParry(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->IsPlayer())
         m_caster->ToPlayer()->SetCanParry(true);
 }
 
@@ -4676,7 +4676,7 @@ void Spell::EffectBlock(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->IsPlayer())
         m_caster->ToPlayer()->SetCanBlock(true);
 }
 
@@ -4947,7 +4947,7 @@ void Spell::EffectChargeDest(SpellEffIndex /*effIndex*/)
 
         m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ);
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->IsPlayer())
         {
             sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
         }
@@ -5005,7 +5005,7 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
 
     unitTarget->KnockbackFrom(x, y, speedxy, speedz);
 
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    if (unitTarget->IsPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
     }
@@ -5024,13 +5024,13 @@ void Spell::EffectLeapBack(SpellEffIndex effIndex)
     //1891: Disengage
     m_caster->JumpTo(speedxy, speedz, m_spellInfo->SpellFamilyName != SPELLFAMILY_HUNTER);
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->IsPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(m_caster->ToPlayer());
     }
 
     // xinef: changes fall time
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->IsPlayer())
         m_caster->ToPlayer()->SetFallInformation(GameTime::GetGameTime().count(), m_caster->GetPositionZ());
 }
 
@@ -5123,7 +5123,7 @@ void Spell::EffectPullTowards(SpellEffIndex effIndex)
 
     unitTarget->GetMotionMaster()->MoveJump(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), speedXY, speedZ);
 
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    if (unitTarget->IsPlayer())
     {
         sScriptMgr->AnticheatSetUnderACKmount(unitTarget->ToPlayer());
     }
@@ -5419,7 +5419,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
             }
         case GAMEOBJECT_TYPE_SUMMONING_RITUAL:
             {
-                if (m_caster->GetTypeId() == TYPEID_PLAYER)
+                if (m_caster->IsPlayer())
                 {
                     pGameObj->AddUniqueUse(m_caster->ToPlayer());
                     m_caster->AddGameObject(pGameObj);      // will be removed at spell cancel
@@ -5834,7 +5834,7 @@ void Spell::EffectCreateTamedPet(SpellEffIndex effIndex)
 
     pet->InitTalentForLevel();
 
-    if (unitTarget->GetTypeId() == TYPEID_PLAYER)
+    if (unitTarget->IsPlayer())
     {
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
         unitTarget->ToPlayer()->PetSpellInitialize();
@@ -5865,7 +5865,7 @@ void Spell::EffectTitanGrip(SpellEffIndex /*effIndex*/)
     if (effectHandleMode != SPELL_EFFECT_HANDLE_HIT)
         return;
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_caster->IsPlayer())
     {
         if (Aura* aur = m_caster->GetAura(49152))
             aur->RecalculateAmountOfEffects();
@@ -5940,7 +5940,7 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
     uint8 summonLevel = caster->GetLevel();
 
     // level of pet summoned using engineering item based at engineering skill level
-    if (m_CastItem && caster->GetTypeId() == TYPEID_PLAYER)
+    if (m_CastItem && caster->IsPlayer())
         if (ItemTemplate const* proto = m_CastItem->GetTemplate())
         {
             // xinef: few special cases

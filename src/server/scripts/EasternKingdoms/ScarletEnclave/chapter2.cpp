@@ -77,7 +77,7 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_PERSUASIVE_STRIKE && caster->GetTypeId() == TYPEID_PLAYER && me->IsAlive() && !speechCounter)
+            if (spell->Id == SPELL_PERSUASIVE_STRIKE && caster->IsPlayer() && me->IsAlive() && !speechCounter)
             {
                 if (Player* player = caster->ToPlayer())
                 {

@@ -376,7 +376,7 @@ class spell_ioc_gunship_portal : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleScript(SpellEffIndex effIndex)

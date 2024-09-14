@@ -657,7 +657,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::KilledUnit(Unit* who)
     if (who == me->GetVictim())
         events.RescheduleEvent(EVENT_PURSUE, 0ms);
 
-    if (who->GetTypeId() == TYPEID_PLAYER)
+    if (who->IsPlayer())
         Talk(FLAME_LEVIATHAN_SAY_SLAY);
 }
 

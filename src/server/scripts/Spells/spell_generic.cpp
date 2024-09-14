@@ -644,7 +644,7 @@ class spell_gen_area_aura_select_players : public AuraScript
 
     bool CheckAreaTarget(Unit* target)
     {
-        return target->GetTypeId() == TYPEID_PLAYER;
+        return target->IsPlayer();
     }
     void Register() override
     {
@@ -662,7 +662,7 @@ class spell_gen_area_aura_select_players_and_caster : public AuraScript
 
     bool CheckAreaTarget(Unit* target)
     {
-        return target->GetTypeId() == TYPEID_PLAYER || target == GetCaster();
+        return target->IsPlayer() || target == GetCaster();
     }
     void Register() override
     {
@@ -1692,7 +1692,7 @@ class spell_gen_pet_summoned : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
@@ -1973,7 +1973,7 @@ class spell_pvp_trinket_wotf_shared_cd : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -2097,7 +2097,7 @@ class spell_gen_divine_storm_cd_reset : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -2128,7 +2128,7 @@ class spell_gen_profession_research : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     SpellCastResult CheckRequirement()
@@ -2358,7 +2358,7 @@ class spell_gen_seaforium_blast : public SpellScript
     bool Load() override
     {
         // OriginalCaster is always available in Spell::prepare
-        return GetOriginalCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetOriginalCaster()->IsPlayer();
     }
 
     void AchievementCredit(SpellEffIndex /*effIndex*/)
@@ -2501,7 +2501,7 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
 
     bool Load() override
     {
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER && GetOwner()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster() && GetCaster()->IsPlayer() && GetOwner()->GetTypeId() == TYPEID_UNIT;
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
@@ -2547,7 +2547,7 @@ class spell_gen_oracle_wolvar_reputation : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex effIndex)
@@ -2667,7 +2667,7 @@ class spell_gen_spirit_healer_res : public SpellScript
 
     bool Load() override
     {
-        return GetOriginalCaster() && GetOriginalCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetOriginalCaster() && GetOriginalCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex /* effIndex */)
@@ -3243,7 +3243,7 @@ class spell_gen_tournament_duel : public SpellScript
             }
             else if (Unit* unitTarget = GetHitUnit())
             {
-                if (unitTarget->GetCharmer() && unitTarget->GetCharmer()->GetTypeId() == TYPEID_PLAYER && unitTarget->GetCharmer()->HasAura(SPELL_ON_TOURNAMENT_MOUNT))
+                if (unitTarget->GetCharmer() && unitTarget->GetCharmer()->IsPlayer() && unitTarget->GetCharmer()->HasAura(SPELL_ON_TOURNAMENT_MOUNT))
                     rider->CastSpell(unitTarget->GetCharmer(), SPELL_MOUNTED_DUEL, true);
             }
         }
@@ -3450,7 +3450,7 @@ class spell_gen_on_tournament_mount : public AuraScript
     bool Load() override
     {
         _pennantSpellId = 0;
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster() && GetCaster()->IsPlayer();
     }
 
     void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -3630,7 +3630,7 @@ class spell_gen_tournament_pennant : public AuraScript
 
     bool Load() override
     {
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster() && GetCaster()->IsPlayer();
     }
 
     void HandleApplyEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -3953,7 +3953,7 @@ public:
     {
         if (GetCaster())
             if (Unit* owner = GetCaster()->GetOwner())
-                if (owner->GetTypeId() == TYPEID_PLAYER) /// @todo this check is maybe wrong
+                if (owner->IsPlayer()) /// @todo this check is maybe wrong
                     owner->ToPlayer()->RemovePet(nullptr, PET_SAVE_NOT_IN_SLOT, true);
     }
 

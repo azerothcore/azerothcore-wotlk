@@ -55,7 +55,7 @@ void NPCStaveQuestAI::StorePlayerGUID()
 
     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
     {
-        if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER)
+        if ((*itr)->getTarget()->IsPlayer())
         {
             playerGUID = (*itr)->getUnitGuid();
         }

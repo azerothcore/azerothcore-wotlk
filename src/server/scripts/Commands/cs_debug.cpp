@@ -1134,7 +1134,7 @@ public:
             return true;
 
         // check index
-        if (unit->GetTypeId() == TYPEID_PLAYER)
+        if (unit->IsPlayer())
         {
             if (index >= PLAYER_END)
                 return true;

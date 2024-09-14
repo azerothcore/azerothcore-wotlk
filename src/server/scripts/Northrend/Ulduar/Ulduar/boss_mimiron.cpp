@@ -1186,7 +1186,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 if (Creature* c = GetMimiron())
                 {
                     if (Phase == 1)
@@ -1522,7 +1522,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 if (Creature* c = GetMimiron())
                 {
                     if (Phase == 2)
@@ -1827,7 +1827,7 @@ public:
 
         void KilledUnit(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 if (Creature* c = GetMimiron())
                 {
                     if (Phase == 3)
@@ -1909,7 +1909,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == SPELL_MINE_EXPLOSION)
+            if (target && spell && target->IsPlayer() && spell->Id == SPELL_MINE_EXPLOSION)
                 if (InstanceScript* pInstance = me->GetInstanceScript())
                     if (Creature* c = GetMimiron())
                         c->AI()->SetData(0, 11);
@@ -2450,7 +2450,7 @@ public:
             {
                 if (target->GetEntry() == NPC_ASSAULT_BOT)
                     me->CastSpell(me, 65040, true); // achievement Not-So-Friendly Fire
-                else if (target->GetTypeId() == TYPEID_PLAYER)
+                else if (target->IsPlayer())
                     if (InstanceScript* pInstance = me->GetInstanceScript())
                         if (Creature* c = GetMimiron())
                             c->AI()->SetData(0, 13);

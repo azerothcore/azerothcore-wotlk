@@ -239,7 +239,7 @@ struct npc_ulduar_snow_mound : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_activated && who->GetTypeId() == TYPEID_PLAYER)
+        if (!_activated && who->IsPlayer())
         {
             if (me->GetExactDist2d(who) <= 10.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f,
                 who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing))

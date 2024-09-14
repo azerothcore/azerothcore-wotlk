@@ -218,11 +218,11 @@ void TempSummon::InitStats(uint32 duration)
         {
             SetFaction(owner->GetFaction());
             SetLevel(owner->GetLevel());
-            if (owner->GetTypeId() == TYPEID_PLAYER)
+            if (owner->IsPlayer())
                 m_ControlledByPlayer = true;
         }
 
-        if (owner->GetTypeId() == TYPEID_PLAYER)
+        if (owner->IsPlayer())
             m_CreatedByPlayer = true;
     }
 
@@ -397,7 +397,7 @@ void Minion::setDeathState(DeathState s, bool despawn)
     Creature::setDeathState(s, despawn);
     if (s == DeathState::JustDied && IsGuardianPet())
         if (Unit* owner = GetOwner())
-            if (owner->GetTypeId() == TYPEID_PLAYER && owner->GetMinionGUID() == GetGUID())
+            if (owner->IsPlayer() && owner->GetMinionGUID() == GetGUID())
                 for (Unit::ControlSet::const_iterator itr = owner->m_Controlled.begin(); itr != owner->m_Controlled.end(); ++itr)
                     if ((*itr)->IsAlive() && (*itr)->GetEntry() == GetEntry())
                     {
@@ -434,7 +434,7 @@ void Guardian::InitStats(uint32 duration)
     {
         InitStatsForLevel(m_owner->GetLevel());
 
-        if (m_owner->GetTypeId() == TYPEID_PLAYER && HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
+        if (m_owner->IsPlayer() && HasUnitTypeMask(UNIT_MASK_CONTROLABLE_GUARDIAN))
             m_charmInfo->InitCharmCreateSpells();
     }
 
@@ -447,7 +447,7 @@ void Guardian::InitSummon()
 
     if (Unit* m_owner = GetOwner())
     {
-        if (m_owner->GetTypeId() == TYPEID_PLAYER && m_owner->GetMinionGUID() == GetGUID() && !m_owner->GetCharmGUID())
+        if (m_owner->IsPlayer() && m_owner->GetMinionGUID() == GetGUID() && !m_owner->GetCharmGUID())
         {
             m_owner->ToPlayer()->CharmSpellInitialize();
         }

@@ -351,7 +351,7 @@ void User::HandleCastSpellOpcode(WDataStore& recvPacket)
 
     // ignore for remote control state (for player case)
     Unit* mover = m_player->m_mover;
-    if (mover != m_player && mover->GetTypeId() == TYPEID_PLAYER)
+    if (mover != m_player && mover->IsPlayer())
     {
         recvPacket.rfinish(); // prevent spam at ignore packet
         return;
@@ -372,7 +372,7 @@ void User::HandleCastSpellOpcode(WDataStore& recvPacket)
     HandleClientCastFlags(recvPacket, castFlags, targets);
 
     // not have spell in spellbook
-    if (mover->GetTypeId() == TYPEID_PLAYER)
+    if (mover->IsPlayer())
     {
         // not have spell in spellbook or spell passive and not casted by client
         if( !(spellInfo->Targets & TARGET_FLAG_GAMEOBJECT_ITEM) && (!mover->ToPlayer()->HasActiveSpell(spellId) || spellInfo->IsPassive()) )
@@ -688,7 +688,7 @@ void User::HandleMirrorImageDataRequest(WDataStore& recvData)
     data << uint8(creator->getGender());
     data << uint8(creator->GetClass());
 
-    if (creator->GetTypeId() == TYPEID_PLAYER)
+    if (creator->IsPlayer())
     {
         Player* player = creator->ToPlayer();
         data << uint8(player->GetByteValue(PLAYER_BYTES, 0));   // skin
