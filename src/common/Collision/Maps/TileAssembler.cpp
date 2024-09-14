@@ -418,7 +418,7 @@ namespace VMAP
             std::string model_name(buff, name_length);
 
             WorldModel_Raw raw_model;
-            if ( !raw_model.Read((iSrcDir + "/" + model_name).c_str()) )
+            if (!raw_model.Read((iSrcDir + "/" + model_name).c_str()) )
             {
                 continue;
             }

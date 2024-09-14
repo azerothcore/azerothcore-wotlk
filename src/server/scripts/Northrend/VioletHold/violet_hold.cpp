@@ -1043,27 +1043,27 @@ public:
             switch(uiBoss)
             {
                 case 1:
-                    if(uiWPointId == 2)
+                    if (uiWPointId == 2)
                         FinishPointReached();
                     break;
                 case 2:
-                    if(uiWPointId == 2)
+                    if (uiWPointId == 2)
                         FinishPointReached();
                     break;
                 case 3:
-                    if(uiWPointId == 1)
+                    if (uiWPointId == 1)
                         FinishPointReached();
                     break;
                 case 4:
-                    if(uiWPointId == 0)
+                    if (uiWPointId == 0)
                         FinishPointReached();
                     break;
                 case 5:
-                    if(uiWPointId == 0)
+                    if (uiWPointId == 0)
                         FinishPointReached();
                     break;
                 case 6:
-                    if(uiWPointId == 4)
+                    if (uiWPointId == 4)
                         FinishPointReached();
                     break;
             }
@@ -1073,7 +1073,7 @@ public:
         {
             npc_escortAI::UpdateAI(diff);
 
-            if(!bAddedWPs)
+            if (!bAddedWPs)
             {
                 bAddedWPs = true;
                 switch(uiBoss)

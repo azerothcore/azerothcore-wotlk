@@ -409,7 +409,7 @@ public:
                     break;
                 case EVENT_CHECK_PLAYERS:
                     {
-                        if( DoNeedCleanup(false) )
+                        if (DoNeedCleanup(false) )
                             InstanceCleanup();
                         events.Repeat(5s);
                     }
@@ -522,7 +522,7 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
-            if( DoNeedCleanup(plr->IsAlive()) )
+            if (DoNeedCleanup(plr->IsAlive()) )
                 InstanceCleanup();
 
             if (EncounterStatus == IN_PROGRESS)
@@ -542,19 +542,19 @@ public:
             uint8 aliveCount = 0;
             Map::PlayerList const& pl = instance->GetPlayers();
             for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                if( Player* plr = itr->GetSource() )
-                    if( plr->IsAlive() && !plr->IsGameMaster() && !plr->HasAura(27827)/*spirit of redemption aura*/ )
+                if (Player* plr = itr->GetSource() )
+                    if (plr->IsAlive() && !plr->IsGameMaster() && !plr->HasAura(27827)/*spirit of redemption aura*/ )
                         ++aliveCount;
 
             bool need = enter ? aliveCount <= 1 : aliveCount == 0;
-            if( !need && CLEANED )
+            if (!need && CLEANED)
                 CLEANED = false;
             return need;
         }
 
         void InstanceCleanup()
         {
-            if( CLEANED )
+            if (CLEANED)
                 return;
             CLEANED = true;
 

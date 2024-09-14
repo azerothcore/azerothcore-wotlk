@@ -685,7 +685,7 @@ struct boss_kaelthas : public BossAI
             AttackStart(target);
         }
         ScheduleHealthCheckEvent(50, [&]{
-            if(!_transitionSceneReached)
+            if (!_transitionSceneReached)
             {
                 _transitionSceneReached = true;
                 scheduler.CancelAll();

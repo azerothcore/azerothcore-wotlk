@@ -137,7 +137,7 @@ namespace Acore
     template<class SPECIFIC_TYPE> bool Remove(ContainerMapList<SPECIFIC_TYPE>& elements, CountedPtr<SPECIFIC_TYPE>& obj, OBJECT_HANDLE hdl)
     {
         typename std::map<OBJECT_HANDLE, CountedPtr<SPECIFIC_TYPE>>::iterator iter = elements._element.find(hdl);
-        if ( iter != elements._element.end() )
+        if (iter != elements._element.end() )
         {
             elements._element.erase(iter);
             return true;

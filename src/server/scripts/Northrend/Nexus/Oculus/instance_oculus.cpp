@@ -87,14 +87,14 @@ public:
                 case GO_DRAGON_CAGE_DOOR:
                     for( uint8 i = 0; i < 3; ++i )
                     {
-                        if( DragonCageDoorGUID[i] )
+                        if (DragonCageDoorGUID[i])
                             continue;
 
                         DragonCageDoorGUID[i] = pGo->GetGUID();
                         break;
                     }
-                    if( m_auiEncounter[DATA_DRAKOS] == DONE )
-                        if( pGo->GetGoState() != GO_STATE_ACTIVE )
+                    if (m_auiEncounter[DATA_DRAKOS] == DONE)
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE )
                         {
                             pGo->SetLootState(GO_READY);
                             pGo->UseDoorOrButton(0, false);
@@ -133,7 +133,7 @@ public:
             {
                 case DATA_DRAKOS:
                     m_auiEncounter[DATA_DRAKOS] = data;
-                    if( data == DONE )
+                    if (data == DONE)
                     {
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 1);
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
@@ -144,18 +144,18 @@ public:
                     break;
                 case DATA_VAROS:
                     m_auiEncounter[DATA_VAROS] = data;
-                    if( data == DONE )
+                    if (data == DONE)
                     {
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW, 0);
 
-                        if( Creature* urom = instance->GetCreature(uiUromGUID) )
+                        if (Creature* urom = instance->GetCreature(uiUromGUID) )
                             urom->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
                     break;
                 case DATA_UROM:
                     m_auiEncounter[DATA_UROM] = data;
-                    if( data == DONE )
-                        if( Creature* eregos = instance->GetCreature(uiEregosGUID) )
+                    if (data == DONE)
+                        if (Creature* eregos = instance->GetCreature(uiEregosGUID) )
                             eregos->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     break;
                 case DATA_EREGOS:
@@ -174,13 +174,13 @@ public:
                     }
                     break;
                 case DATA_CC_COUNT:
-                    if( CentrifugeCount < 10 )
+                    if (CentrifugeCount < 10)
                     {
                         ++CentrifugeCount;
                         DoUpdateWorldState(WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT, 10 - CentrifugeCount);
                     }
-                    if( CentrifugeCount >= 10 )
-                        if( Creature* varos = instance->GetCreature(uiVarosGUID) )
+                    if (CentrifugeCount >= 10)
+                        if (Creature* varos = instance->GetCreature(uiVarosGUID) )
                         {
                             varos->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             varos->InterruptNonMeleeSpells(false);
@@ -198,7 +198,7 @@ public:
                     break;
             }
 
-            if( data == DONE )
+            if (data == DONE)
                 SaveToDB();
         }
 
@@ -262,21 +262,21 @@ public:
             switch(criteria_id)
             {
                 case CRITERIA_EXPERIENCED_AMBER:
-                    if( source )
-                        if( Unit* drake = source->GetVehicleBase() )
-                            if( drake->GetEntry() == NPC_AMBER_DRAKE )
+                    if (source)
+                        if (Unit* drake = source->GetVehicleBase() )
+                            if (drake->GetEntry() == NPC_AMBER_DRAKE )
                                 return true;
                     break;
                 case CRITERIA_EXPERIENCED_EMERALD:
-                    if( source )
-                        if( Unit* drake = source->GetVehicleBase() )
-                            if( drake->GetEntry() == NPC_EMERALD_DRAKE )
+                    if (source)
+                        if (Unit* drake = source->GetVehicleBase() )
+                            if (drake->GetEntry() == NPC_EMERALD_DRAKE )
                                 return true;
                     break;
                 case CRITERIA_EXPERIENCED_RUBY:
-                    if( source )
-                        if( Unit* drake = source->GetVehicleBase() )
-                            if( drake->GetEntry() == NPC_RUBY_DRAKE )
+                    if (source)
+                        if (Unit* drake = source->GetVehicleBase() )
+                            if (drake->GetEntry() == NPC_RUBY_DRAKE )
                                 return true;
                     break;
                 case CRITERIA_AMBER_VOID:

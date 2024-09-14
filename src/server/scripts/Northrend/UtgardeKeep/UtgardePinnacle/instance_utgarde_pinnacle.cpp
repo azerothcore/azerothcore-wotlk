@@ -73,7 +73,7 @@ public:
         bool IsEncounterInProgress() const override
         {
             for(uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                if(Encounters[i] == IN_PROGRESS)
+                if (Encounters[i] == IN_PROGRESS)
                     return true;
 
             return false;

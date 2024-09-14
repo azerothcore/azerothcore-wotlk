@@ -139,7 +139,7 @@ public:
         void SetData(uint32 uiType, uint32 uiData) override
         {
             m_auiEncounter[uiType] = uiData;
-            if( uiType == TYPE_LOKEN_INTRO )
+            if (uiType == TYPE_LOKEN_INTRO)
                 SaveToDB();
 
             // Achievements
@@ -148,7 +148,7 @@ public:
             else if (uiType == DATA_VOLKHAN_ACHIEVEMENT)
                 volkhanAchievement = (bool)uiData;
 
-            if( uiData != DONE )
+            if (uiData != DONE)
                 return;
 
             switch(uiType)

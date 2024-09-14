@@ -509,7 +509,7 @@ public:
                         _spawnSelection++;
                         break;
                     case 3:
-                        if(_pummelerCount < 2)
+                        if (_pummelerCount < 2)
                             me->SummonCreature(NPC_XM024_PUMMELLER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
 
                         _pummelerCount++;

@@ -103,7 +103,7 @@ struct boss_lady_vashj : public BossAI
 
     void KilledUnit(Unit* /*victim*/) override
     {
-        if(!_recentlySpoken)
+        if (!_recentlySpoken)
         {
             Talk(SAY_SLAY);
             _recentlySpoken = true;

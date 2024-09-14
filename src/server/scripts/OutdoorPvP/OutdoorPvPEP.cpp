@@ -38,12 +38,12 @@ OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP* pvp)
 void OPvPCapturePointEP_EWT::ChangeState()
 {
     // if changing from controlling alliance to horde or vice versa
-    if ( _oldState == OBJECTIVESTATE_ALLIANCE && _oldState != _state )
+    if (_oldState == OBJECTIVESTATE_ALLIANCE && _oldState != _state)
     {
         sWorld->SendZoneText(EP_GraveYardZone, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_EP_LOSE_EWT_A));
         ((OutdoorPvPEP*)_pvp)->SetControlledState(EP_EWT, TEAM_NEUTRAL);
     }
-    else if ( _oldState == OBJECTIVESTATE_HORDE && _oldState != _state )
+    else if (_oldState == OBJECTIVESTATE_HORDE && _oldState != _state)
     {
         sWorld->SendZoneText(EP_GraveYardZone, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_EP_LOSE_EWT_H));
         ((OutdoorPvPEP*)_pvp)->SetControlledState(EP_EWT, TEAM_NEUTRAL);
@@ -170,12 +170,12 @@ OPvPCapturePointEP_NPT::OPvPCapturePointEP_NPT(OutdoorPvP* pvp)
 void OPvPCapturePointEP_NPT::ChangeState()
 {
     // if changing from controlling alliance to horde or vice versa
-    if ( _oldState == OBJECTIVESTATE_ALLIANCE && _oldState != _state )
+    if (_oldState == OBJECTIVESTATE_ALLIANCE && _oldState != _state)
     {
         sWorld->SendZoneText(EP_GraveYardZone, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_EP_LOSE_NPT_A));
         ((OutdoorPvPEP*)_pvp)->SetControlledState(EP_NPT, TEAM_NEUTRAL);
     }
-    else if ( _oldState == OBJECTIVESTATE_HORDE && _oldState != _state )
+    else if (_oldState == OBJECTIVESTATE_HORDE && _oldState != _state)
     {
         sWorld->SendZoneText(EP_GraveYardZone, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_EP_LOSE_NPT_H));
         ((OutdoorPvPEP*)_pvp)->SetControlledState(EP_NPT, TEAM_NEUTRAL);
@@ -312,12 +312,12 @@ OPvPCapturePointEP_CGT::OPvPCapturePointEP_CGT(OutdoorPvP* pvp)
 void OPvPCapturePointEP_CGT::ChangeState()
 {
     // if changing from controlling alliance to horde or vice versa
-    if ( _oldState == OBJECTIVESTATE_ALLIANCE && _oldState != _state )
+    if (_oldState == OBJECTIVESTATE_ALLIANCE && _oldState != _state)
     {
         sWorld->SendZoneText(EP_GraveYardZone, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_EP_LOSE_CGT_A));
         ((OutdoorPvPEP*)_pvp)->SetControlledState(EP_CGT, TEAM_NEUTRAL);
     }
-    else if ( _oldState == OBJECTIVESTATE_HORDE && _oldState != _state )
+    else if (_oldState == OBJECTIVESTATE_HORDE && _oldState != _state)
     {
         sWorld->SendZoneText(EP_GraveYardZone, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_EP_LOSE_CGT_H));
         ((OutdoorPvPEP*)_pvp)->SetControlledState(EP_CGT, TEAM_NEUTRAL);
@@ -439,12 +439,12 @@ OPvPCapturePointEP_PWT::OPvPCapturePointEP_PWT(OutdoorPvP* pvp)
 void OPvPCapturePointEP_PWT::ChangeState()
 {
     // if changing from controlling alliance to horde or vice versa
-    if ( _oldState == OBJECTIVESTATE_ALLIANCE && _oldState != _state )
+    if (_oldState == OBJECTIVESTATE_ALLIANCE && _oldState != _state)
     {
         sWorld->SendZoneText(EP_GraveYardZone, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_EP_LOSE_PWT_A));
         ((OutdoorPvPEP*)_pvp)->SetControlledState(EP_PWT, TEAM_NEUTRAL);
     }
-    else if ( _oldState == OBJECTIVESTATE_HORDE && _oldState != _state )
+    else if (_oldState == OBJECTIVESTATE_HORDE && _oldState != _state)
     {
         sWorld->SendZoneText(EP_GraveYardZone, sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_EP_LOSE_PWT_H));
         ((OutdoorPvPEP*)_pvp)->SetControlledState(EP_PWT, TEAM_NEUTRAL);

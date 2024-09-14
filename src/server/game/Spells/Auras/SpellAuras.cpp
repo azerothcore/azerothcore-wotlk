@@ -2010,7 +2010,7 @@ bool Aura::IsAuraStronger(Aura const* newAura) const
                 return true;
 
             if (curValue == std::abs(newEffect->GetAmount()))
-                if(!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
+                if (!IsPassive() && !IsPermanent() && GetDuration() < newAura->GetDuration())
                     return true;
         }
     }

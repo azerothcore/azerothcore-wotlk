@@ -317,7 +317,7 @@ public:
                     mograine->Kill(me, me, true);
                     return 0;
                 default:
-                    if(mograine)
+                    if (mograine)
                         mograine->DespawnOrUnsummon(0);
                     return 0;
             }
