@@ -542,7 +542,7 @@ struct boss_veras_darkshadow : public boss_illidari_council_memberAI
         me->SetCanDualWield(true);
         boss_illidari_council_memberAI::JustEngagedWith(who);
         events.ScheduleEvent(EVENT_SPELL_VANISH, 10s);
-        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 90s);
+        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 15min);
     }
 
     void JustSummoned(Creature* summon) override
