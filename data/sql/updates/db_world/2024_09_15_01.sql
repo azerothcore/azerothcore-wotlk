@@ -1,3 +1,4 @@
+-- DB update 2024_09_15_00 -> 2024_09_15_01
 -- implement QUEST_SPECIAL_FLAGS_NO_LOREMASTER_COUNT
 -- extend column datatype from tinyint to int
 ALTER TABLE `quest_template_addon` MODIFY COLUMN `SpecialFlags` INT UNSIGNED DEFAULT 0 NOT NULL;
