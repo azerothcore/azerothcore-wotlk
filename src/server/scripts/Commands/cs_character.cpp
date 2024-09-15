@@ -267,17 +267,12 @@ public:
         else
         {
             // Update level and reset XP, everything else will be updated at login
-            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
             auto* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_LEVEL);
             stmt->SetData(0, uint8(newLevel));
             stmt->SetData(1, playerGuid.GetCounter());
-            trans->Append(stmt);
+            CharacterDatabase.Execute(stmt);
 
-            stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
-            stmt->SetData(0, uint16(AT_LOGIN_CHECK_ACHIEVS));
-            stmt->SetData(1, playerGuid.GetCounter());
-            trans->Append(stmt);
-            CharacterDatabase.CommitTransaction(trans);
+            sAchievementMgr->UpdateAchievementCriteriaForOfflinePlayer(playerGuid.GetCounter(), ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
 
             sCharacterCache->UpdateCharacterLevel(playerGuid, newLevel);
         }
