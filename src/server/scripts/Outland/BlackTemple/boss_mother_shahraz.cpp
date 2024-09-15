@@ -215,7 +215,18 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        dest.Relocate(CenterOfOutdoorCourt);
+        // Initialize a first destination
+        Position teleportDest = GetCaster()->GetRandomNearPosition(50.0f);
+
+        // Ensure that the destination is not too close to the caster.
+        // @todo: Need maybe a LOS Check?
+        while (teleportDest.GetExactDist(GetCaster()->GetPosition()) < 50.0f)
+        {
+            teleportDest = GetCaster()->GetRandomNearPosition(50.0f);
+        }
+
+        // When a valid destination is found, relocate it.
+        dest.Relocate(teleportDest);
     }
 
     void HandleTeleportUnits(SpellEffIndex  /*effIndex*/)
