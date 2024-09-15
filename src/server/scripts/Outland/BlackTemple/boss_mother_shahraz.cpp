@@ -57,9 +57,6 @@ enum Spells
     SPELL_SABER_LASH_IMMUNITY       = 43690
 };
 
-/// @todo: Need a proper sniff. Currently, estimated values with videos.
-Position const CenterOfOutdoorCourt = { 949.15f, 305.88f, 191.21f };
-
 enum Misc
 {
     GROUP_ENRAGE                    = 1
