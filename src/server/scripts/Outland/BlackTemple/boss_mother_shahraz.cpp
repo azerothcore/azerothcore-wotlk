@@ -57,9 +57,8 @@ enum Spells
     SPELL_SABER_LASH_IMMUNITY       = 43690
 };
 
-/// @note: Estimated values with videos evidences
-/// @todo: Need a proper sniff
-const Position teleport_room_center = { 949.15f, 305.88f, 191.21f, 0.0f };
+/// @todo: Need a proper sniff. Currently, estimated values with videos.
+Position const CenterOfOutdoorCourt = { 949.15f, 305.88f, 191.21f };
 
 enum Misc
 {
@@ -216,7 +215,7 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        dest.Relocate(teleport_room_center);
+        dest.Relocate(CenterOfOutdoorCourt);
     }
 
     void HandleTeleportUnits(SpellEffIndex  /*effIndex*/)
