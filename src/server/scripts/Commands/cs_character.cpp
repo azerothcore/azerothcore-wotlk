@@ -23,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "AccountMgr.h"
+#include "AchievementMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "DBCStores.h"
