@@ -243,7 +243,7 @@ class spell_mother_shahraz_fatal_attraction_dummy : public SpellScript
         if (Unit* caster = GetCaster())
             if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_FATAL_ATTRACTION_AURA, EFFECT_1))
             {
-                if (aurEff->GetTickNumber() <= 2)
+                if (aurEff->GetTickNumber() >= 2)
                 {
                     int32 damage = 1000 * aurEff->GetTickNumber();
                     caster->CastCustomSpell(caster, SPELL_FATAL_ATTRACTION_DAMAGE, &damage, 0, 0, true);
