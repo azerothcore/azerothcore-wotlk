@@ -147,11 +147,11 @@ struct boss_illidari_council : public BossAI
 
             bool spoken = false;
 
-            me->CastSpell(me, SPELL_EMPYREAL_BALANCE, true);
+            DoCastSelf(SPELL_EMPYREAL_BALANCE, true);
 
             ScheduleTimedEvent(3200ms, [&]
                 {
-                    me->CastSpell(me, SPELL_EMPYREAL_EQUIVALENCY, true);
+                    DoCastSelf(SPELL_EMPYREAL_EQUIVALENCY, true);
                 }, 3200ms);
 
             for (uint8 i = DATA_GATHIOS_THE_SHATTERER; i <= DATA_VERAS_DARKSHADOW; ++i)
@@ -239,7 +239,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
     {
         if (param == ACTION_ENRAGE)
         {
-            me->CastSpell(me, SPELL_BERSERK, true);
+            DoCastSelf(SPELL_BERSERK, true);
             Talk(SAY_COUNCIL_ENRAGE);
         }
     }
@@ -331,14 +331,14 @@ struct boss_gathios_the_shatterer : public boss_illidari_council_memberAI
             events.ScheduleEvent(EVENT_SPELL_BLESSING, 15s);
             break;
         case EVENT_SPELL_AURA:
-            me->CastSpell(me, _toggleAura ? SPELL_DEVOTION_AURA : SPELL_CHROMATIC_RESISTANCE_AURA);
+            DoCastSelf(_toggleAura ? SPELL_DEVOTION_AURA : SPELL_CHROMATIC_RESISTANCE_AURA);
             _toggleAura = !_toggleAura;
             events.ScheduleEvent(EVENT_SPELL_AURA, 60s);
             break;
         case EVENT_SPELL_CONSECRATION:
             if (roll_chance_i(50))
                 Talk(SAY_COUNCIL_SPECIAL);
-            me->CastSpell(me, SPELL_CONSECRATION, false);
+            DoCastSelf(SPELL_CONSECRATION);
             events.ScheduleEvent(EVENT_SPELL_AURA, 30s);
             break;
         case EVENT_SPELL_HAMMER_OF_JUSTICE:
@@ -352,12 +352,12 @@ struct boss_gathios_the_shatterer : public boss_illidari_council_memberAI
             events.ScheduleEvent(EVENT_SPELL_HAMMER_OF_JUSTICE, 0s);
             break;
         case EVENT_SPELL_SEAL:
-            me->CastSpell(me, _toggleSeal ? SPELL_SEAL_OF_COMMAND : SPELL_SEAL_OF_BLOOD);
+            DoCastSelf(_toggleSeal ? SPELL_SEAL_OF_COMMAND : SPELL_SEAL_OF_BLOOD);
             _toggleSeal = !_toggleSeal;
             events.ScheduleEvent(EVENT_SPELL_SEAL, 20s);
             break;
         case EVENT_SPELL_JUDGEMENT:
-            me->CastSpell(me->GetVictim(), SPELL_JUDGEMENT, false);
+            me->CastSpell(me->GetVictim(), SPELL_JUDGEMENT);
             events.ScheduleEvent(EVENT_SPELL_JUDGEMENT, 16s, 20s);
             break;
         }
@@ -511,22 +511,22 @@ struct boss_lady_malande : public boss_illidari_council_memberAI
         switch (events.ExecuteEvent())
         {
         case EVENT_SPELL_CIRCLE_OF_HEALING:
-            me->CastSpell(me, SPELL_CIRCLE_OF_HEALING, false);
+            DoCastSelf(SPELL_CIRCLE_OF_HEALING);
             events.ScheduleEvent(EVENT_SPELL_CIRCLE_OF_HEALING, 20s);
             break;
         case EVENT_SPELL_REFLECTIVE_SHIELD:
             if (roll_chance_i(50))
                 Talk(SAY_COUNCIL_SPECIAL);
-            me->CastSpell(me, SPELL_REFLECTIVE_SHIELD, false);
+            DoCastSelf(SPELL_REFLECTIVE_SHIELD);
             events.ScheduleEvent(EVENT_SPELL_REFLECTIVE_SHIELD, 40s);
             break;
         case EVENT_SPELL_DIVINE_WRATH:
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f))
-                me->CastSpell(target, SPELL_DIVINE_WRATH, false);
+                me->CastSpell(target, SPELL_DIVINE_WRATH);
             events.ScheduleEvent(EVENT_SPELL_DIVINE_WRATH, 20s);
             break;
         case EVENT_SPELL_EMPOWERED_SMITE:
-            me->CastSpell(me->GetVictim(), SPELL_EMPOWERED_SMITE, false);
+            me->CastSpell(me->GetVictim(), SPELL_EMPOWERED_SMITE);
             events.ScheduleEvent(EVENT_SPELL_EMPOWERED_SMITE, 3s);
             break;
         }
@@ -542,7 +542,7 @@ struct boss_veras_darkshadow : public boss_illidari_council_memberAI
         me->SetCanDualWield(true);
         boss_illidari_council_memberAI::JustEngagedWith(who);
         events.ScheduleEvent(EVENT_SPELL_VANISH, 10s);
-        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 90s);
+        events.ScheduleEvent(EVENT_SPELL_ENRAGE, 15min);
     }
 
     void JustSummoned(Creature* summon) override
@@ -564,13 +564,13 @@ struct boss_veras_darkshadow : public boss_illidari_council_memberAI
         case EVENT_SPELL_VANISH:
             if (roll_chance_i(50))
                 Talk(SAY_COUNCIL_SPECIAL);
-            me->CastSpell(me, SPELL_DEADLY_STRIKE, false);
-            me->CastSpell(me, SPELL_VANISH, false);
+            DoCastSelf(SPELL_DEADLY_STRIKE);
+            DoCastSelf(SPELL_VANISH);
             events.ScheduleEvent(EVENT_SPELL_VANISH, 60s);
             events.ScheduleEvent(EVENT_SPELL_VANISH_OUT, 29s);
             break;
         case EVENT_SPELL_VANISH_OUT:
-            me->CastSpell(me, SPELL_VANISH_OUT, false);
+            DoCastSelf(SPELL_VANISH_OUT);
             break;
         case EVENT_SPELL_ENRAGE:
             DoResetThreatList();
