@@ -165,17 +165,18 @@ enum QuestSpecialFlags
     QUEST_SPECIAL_FLAGS_CAST                    = 0x0020,    // Set by 32 in SpecialFlags in DB if the quest requires RequiredOrNpcGo killcredit but NOT kill (a spell cast)
     QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER        = 0x0040,    // Set by 64 in SpecialFlags in DB if the quest does not share rewarded reputation with other allied factions
     QUEST_SPECIAL_FLAGS_CAN_FAIL_IN_ANY_STATE   = 0x0080,    // Set by 128 in SpecialFlags in DB if the quest is allowed to fail in Player::FailQuest() independant of its current state
+    QUEST_SPECIAL_FLAGS_NO_LOREMASTER_COUNT     = 0x0100,    // Set by 256 in SpecialFlags in DB if the quest should not count towards Loremaster Achievement
     // room for more custom flags
 
     QUEST_SPECIAL_FLAGS_DB_ALLOWED              = QUEST_SPECIAL_FLAGS_REPEATABLE | QUEST_SPECIAL_FLAGS_EXPLORATION_OR_EVENT | QUEST_SPECIAL_FLAGS_AUTO_ACCEPT |
                                                   QUEST_SPECIAL_FLAGS_DF_QUEST | QUEST_SPECIAL_FLAGS_MONTHLY | QUEST_SPECIAL_FLAGS_CAST | QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER |
-                                                  QUEST_SPECIAL_FLAGS_CAN_FAIL_IN_ANY_STATE,
+                                                  QUEST_SPECIAL_FLAGS_CAN_FAIL_IN_ANY_STATE | QUEST_SPECIAL_FLAGS_NO_LOREMASTER_COUNT,
 
-    QUEST_SPECIAL_FLAGS_DELIVER                 = 0x0100,   // Internal flag computed only
-    QUEST_SPECIAL_FLAGS_SPEAKTO                 = 0x0200,   // Internal flag computed only
-    QUEST_SPECIAL_FLAGS_KILL                    = 0x0400,   // Internal flag computed only
-    QUEST_SPECIAL_FLAGS_TIMED                   = 0x0800,   // Internal flag computed only
-    QUEST_SPECIAL_FLAGS_PLAYER_KILL             = 0x1000    // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_DELIVER                 = 0x0200,   // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_SPEAKTO                 = 0x0400,   // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_KILL                    = 0x0800,   // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_TIMED                   = 0x1000,   // Internal flag computed only
+    QUEST_SPECIAL_FLAGS_PLAYER_KILL             = 0x2000    // Internal flag computed only
 };
 
 struct QuestLocale
