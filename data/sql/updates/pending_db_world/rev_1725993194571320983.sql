@@ -17,10 +17,13 @@ UPDATE `creature_template` SET `npcflag`=16777216,`VehicleId`=616,`IconName`='ve
 UPDATE `creature_template` SET `npcflag`=16777216,`VehicleId`=615,`IconName`='vehichleCursor' WHERE `entry`=37980;
 UPDATE `creature_template` SET `npcflag`=16777216,`VehicleId`=548,`IconName`='vehichleCursor' WHERE `entry`=36812;
 
+-- trigger NPC, make invisible to players
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 128 WHERE (`entry` IN (36817, 37964, 36812));
+
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (37966,37964,37981,37980,36817,36812);
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (37966,37964,37980,37981,36817,36812) AND `source_type`=0;
 
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (36812, 0, 0, 0, 1, 0, 100, 1, 5000, 5000, 0, 0, 0, 0, 53, 0, 36812, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Love Boat - Out of Combat - Start Waypoint Path 36812 (No Repeat)'),
 (36812, 0, 1, 2, 40, 0, 100, 0, 21, 36812, 0, 0, 0, 0, 11, 50630, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Love Boat - On Point 21 of Path 36812 Reached - Cast \'Eject All Passengers\''),
 (36812, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 2000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Love Boat - On Point 21 of Path 36812 Reached - Despawn In 2000 ms'),
