@@ -34,7 +34,7 @@ CharmInfo::CharmInfo(Unit* unit)
     for (uint8 i = 0; i < MAX_SPELL_CHARM; ++i)
         _charmspells[i].SetActionAndType(0, ACT_DISABLED);
 
-    if (_unit->GetTypeId() == TYPEID_UNIT)
+    if (_unit->IsCreature())
     {
         _oldReactState = _unit->ToCreature()->GetReactState();
         _unit->ToCreature()->SetReactState(REACT_PASSIVE);
@@ -76,7 +76,7 @@ void CharmInfo::InitEmptyActionBar(bool withAttack)
 
 void CharmInfo::InitPossessCreateSpells()
 {
-    if (_unit->GetTypeId() == TYPEID_UNIT)
+    if (_unit->IsCreature())
     {
         // Adding switch until better way is found. Malcrom
         // Adding entrys to this switch will prevent COMMAND_ATTACK being added to pet bar.
@@ -98,12 +98,10 @@ void CharmInfo::InitPossessCreateSpells()
             uint32 spellId = _unit->ToCreature()->m_spells[i];
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (spellInfo)
-            {
                 if (spellInfo->IsPassive())
                     _unit->CastSpell(_unit, spellInfo, true);
-                else
-                    AddSpellToActionBar(spellInfo, ACT_PASSIVE);
-            }
+
+            AddSpellToActionBar(spellInfo, ACT_PASSIVE, i);
         }
     }
     else
@@ -157,10 +155,16 @@ void CharmInfo::InitCharmCreateSpells()
     }
 }
 
-bool CharmInfo::AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates newstate)
+bool CharmInfo::AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates newstate, uint32 index)
 {
-    uint32 spell_id = spellInfo->Id;
-    uint32 first_id = spellInfo->GetFirstRankSpell()->Id;
+    uint32 spell_id = 0;
+    uint32 first_id = 0;
+
+    if (spellInfo)
+    {
+        spell_id = spellInfo->Id;
+        first_id = spellInfo->GetFirstRankSpell()->Id;
+    }
 
     // new spell rank can be already listed
     for (uint8 i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
@@ -180,6 +184,9 @@ bool CharmInfo::AddSpellToActionBar(SpellInfo const* spellInfo, ActiveStates new
     {
         if (!PetActionBar[i].GetAction() && PetActionBar[i].IsActionBarForSpell())
         {
+            if (i != index && index <= MAX_UNIT_ACTION_BAR_INDEX)
+                continue;
+
             SetActionBar(i, spell_id, newstate == ACT_DECIDE ? spellInfo->IsAutocastable() ? ACT_DISABLED : ACT_PASSIVE : newstate);
 
             if (_unit->GetCharmer() && _unit->GetCharmer()->IsPlayer())
@@ -218,7 +225,7 @@ bool CharmInfo::RemoveSpellFromActionBar(uint32 spell_id)
         {
             if (PetActionBar[i].IsActionBarForSpell() && sSpellMgr->GetFirstSpellInChain(action) == first_id)
             {
-                SetActionBar(i, 0, ACT_PASSIVE);
+                SetActionBar(i, 0, ACT_DISABLED);
                 return true;
             }
         }

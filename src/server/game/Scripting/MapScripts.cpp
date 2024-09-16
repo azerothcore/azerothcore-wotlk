@@ -157,7 +157,7 @@ inline Unit* Map::_GetScriptUnit(Object* obj, bool isSource, const ScriptInfo* s
     Unit* unit = nullptr;
     if (!obj)
         LOG_ERROR("maps.script", "{} {} object is nullptr.", scriptInfo->GetDebugInfo(), isSource ? "source" : "target");
-    else if (!obj->isType(TYPEMASK_UNIT))
+    else if (!obj->IsUnit())
         LOG_ERROR("maps.script", "{} {} object is not unit (TypeId: {}, Entry: {}, GUID: {}), skipping.",
                        scriptInfo->GetDebugInfo(), isSource ? "source" : "target", obj->GetTypeId(), obj->GetEntry(), obj->GetGUID().ToString());
     else
@@ -236,7 +236,7 @@ inline void Map::_ScriptProcessDoor(Object* source, Object* target, const Script
         LOG_ERROR("maps.script", "{} door guid is not specified.", scriptInfo->GetDebugInfo());
     else if (!source)
         LOG_ERROR("maps.script", "{} source object is nullptr.", scriptInfo->GetDebugInfo());
-    else if (!source->isType(TYPEMASK_UNIT))
+    else if (!source->IsUnit())
         LOG_ERROR("maps.script", "{} source object is not unit ({}), skipping.", scriptInfo->GetDebugInfo(), source->GetGUID().ToString());
     else
     {
@@ -510,7 +510,7 @@ void Map::ScriptsProcess()
                     Player* player = target->ToPlayer();
                     if (player)
                     {
-                        if (source->GetTypeId() != TYPEID_UNIT && source->GetTypeId() != TYPEID_GAMEOBJECT && source->GetTypeId() != TYPEID_PLAYER)
+                        if (!source->IsCreature() && !source->IsGameObject() && !source->IsPlayer())
                         {
                             LOG_ERROR("maps.script", "{} source is not unit, gameobject or player ({}), skipping.", step.script->GetDebugInfo(), source->GetGUID().ToString());
                             break;
@@ -522,7 +522,7 @@ void Map::ScriptsProcess()
                         player = source->ToPlayer();
                         if (player)
                         {
-                            if (target->GetTypeId() != TYPEID_UNIT && target->GetTypeId() != TYPEID_GAMEOBJECT && target->GetTypeId() != TYPEID_PLAYER)
+                            if (!target->IsCreature() && !target->IsGameObject() && !target->IsPlayer())
                             {
                                 LOG_ERROR("maps.script", "{} target is not unit, gameobject or player ({}), skipping.", step.script->GetDebugInfo(), target->GetGUID().ToString());
                                 break;
@@ -538,7 +538,7 @@ void Map::ScriptsProcess()
                     }
 
                     // quest id and flags checked at script loading
-                    if ((worldObject->GetTypeId() != TYPEID_UNIT || ((Unit*)worldObject)->IsAlive()) &&
+                    if ((!worldObject->IsCreature() || ((Unit*)worldObject)->IsAlive()) &&
                             (step.script->QuestExplored.Distance == 0 || worldObject->IsWithinDistInMap(player, float(step.script->QuestExplored.Distance))))
                         player->GroupEventHappens(step.script->QuestExplored.QuestID, worldObject);
                     else
@@ -641,7 +641,7 @@ void Map::ScriptsProcess()
                         break;
                     }
 
-                    if (target->GetTypeId() != TYPEID_GAMEOBJECT)
+                    if (!target->IsGameObject())
                     {
                         LOG_ERROR("maps.script", "{} target object is not gameobject ({}), skipping.", step.script->GetDebugInfo(), target->GetGUID().ToString());
                         break;
@@ -697,13 +697,13 @@ void Map::ScriptsProcess()
                             break;
                     }
 
-                    if (!uSource || !uSource->isType(TYPEMASK_UNIT))
+                    if (!uSource || !uSource->IsUnit())
                     {
                         LOG_ERROR("maps.script", "{} no source unit found for spell {}", step.script->GetDebugInfo(), step.script->CastSpell.SpellID);
                         break;
                     }
 
-                    if (!uTarget || !uTarget->isType(TYPEMASK_UNIT))
+                    if (!uTarget || !uTarget->IsUnit())
                     {
                         LOG_ERROR("maps.script", "{} no target unit found for spell {}", step.script->GetDebugInfo(), step.script->CastSpell.SpellID);
                         break;

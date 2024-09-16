@@ -875,7 +875,7 @@ public:
                                 for (uint8 i = 1; i < 4; ++i)
                                     if (Unit* prisoner = me->GetVehicleKit()->GetPassenger(i))
                                     {
-                                        if (prisoner->GetTypeId() != TYPEID_UNIT)
+                                        if (!prisoner->IsCreature())
                                             return;
                                         prisoner->CastSpell(player, SPELL_KILL_CREDIT_PRISONER, true);
                                         prisoner->CastSpell(prisoner, SPELL_SUMMON_LIBERATED, true);

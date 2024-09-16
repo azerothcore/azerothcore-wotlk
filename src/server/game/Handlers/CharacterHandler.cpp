@@ -216,6 +216,10 @@ bool LoginQueryHolder::Initialize()
     stmt->SetData(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS, stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_ACHIEVEMENT_OFFLINE_UPDATES);
+    stmt->SetData(0, lowGuid);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_OFFLINE_ACHIEVEMENTS_UPDATES, stmt);
+
     return res;
 }
 
@@ -983,8 +987,12 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
     if (pCurrChar->HasAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS))
     {
-        pCurrChar->RemoveAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS, true);
-        pCurrChar->CheckAllAchievementCriteria();
+        // If we process the check while players are loading they won't be notified of the changes.
+        pCurrChar->m_Events.AddEventAtOffset([pCurrChar]
+        {
+            pCurrChar->RemoveAtLoginFlag(AT_LOGIN_CHECK_ACHIEVS, true);
+            pCurrChar->CheckAllAchievementCriteria();
+        }, 1s);
     }
 
     bool firstLogin = pCurrChar->HasAtLoginFlag(AT_LOGIN_FIRST);

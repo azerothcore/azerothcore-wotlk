@@ -62,6 +62,7 @@ ObjectData const creatureData[] =
     { NPC_VERAS_DARKSHADOW,          DATA_VERAS_DARKSHADOW          },
     { NPC_AKAMA_ILLIDAN,             DATA_AKAMA_ILLIDAN             },
     { NPC_ILLIDAN_STORMRAGE,         DATA_ILLIDAN_STORMRAGE         },
+    { NPC_BLACK_TEMPLE_TRIGGER,      DATA_BLACK_TEMPLE_TRIGGER      },
     { 0,                             0                              }
 };
 
@@ -165,18 +166,31 @@ public:
             if (!InstanceScript::SetBossState(type, state))
                 return false;
 
-            if (type == DATA_SHADE_OF_AKAMA && state == DONE)
+            if (state == DONE)
             {
-                for (ObjectGuid const& guid : ashtongueGUIDs)
-                    if (Creature* ashtongue = instance->GetCreature(guid))
-                        ashtongue->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
-            }
-            else if (type == DATA_ILLIDARI_COUNCIL && state == DONE)
-            {
-                if (Creature* akama = GetCreature(DATA_AKAMA_ILLIDAN))
-                    akama->AI()->DoAction(0);
-            }
+                switch (type)
+                {
+                    case DATA_HIGH_WARLORD_NAJENTUS:
+                        if (Creature* trigger = GetCreature(DATA_BLACK_TEMPLE_TRIGGER))
+                            trigger->AI()->Talk(EMOTE_NAJENTUS_DEFEATED);
+                        break;
+                    case DATA_SHADE_OF_AKAMA:
+                        for (ObjectGuid const& guid : ashtongueGUIDs)
+                            if (Creature* ashtongue = instance->GetCreature(guid))
+                                ashtongue->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
+                        break;
+                    case DATA_ILLIDARI_COUNCIL:
+                        if (Creature* akama = GetCreature(DATA_AKAMA_ILLIDAN))
+                            akama->AI()->DoAction(0);
+                        break;
+                    default:
+                        break;
+                }
 
+                if (AllBossesDone({ DATA_SHADE_OF_AKAMA, DATA_TERON_GOREFIEND, DATA_GURTOGG_BLOODBOIL, DATA_RELIQUARY_OF_SOULS }))
+                    if (Creature* trigger = GetCreature(DATA_BLACK_TEMPLE_TRIGGER))
+                        trigger->AI()->Talk(EMOTE_LOWER_TEMPLE_DEFEATED);
+            }
             return true;
         }
 

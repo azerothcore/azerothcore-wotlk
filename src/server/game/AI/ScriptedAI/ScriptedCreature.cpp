@@ -190,8 +190,7 @@ bool SummonList::IsAnyCreatureInCombat() const
 }
 
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
-    me(creature),
-    IsFleeing(false)
+    me(creature)
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
@@ -720,9 +719,18 @@ void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*
 {
     if (!_healthCheckEvents.empty())
     {
+        for (auto& check : _healthCheckEvents)
+        {
+            if (check._valid && me->HealthBelowPctDamaged(check._healthPct, damage))
+            {
+                check._exec();
+                check._valid = false;
+            }
+        }
+
         _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
         {
-            return _ProccessHealthCheckEvent(data._healthPct, damage, data._exec);
+            return !data._valid;
         });
     }
 }
@@ -744,17 +752,6 @@ void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, st
     {
         _healthCheckEvents.push_back(HealthCheckEventData(checks, exec));
     }
-}
-
-bool BossAI::_ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const
-{
-    if (me->HealthBelowPctDamaged(healthPct, damage))
-    {
-        exec();
-        return true;
-    }
-
-    return false;
 }
 
 // WorldBossAI - for non-instanced bosses

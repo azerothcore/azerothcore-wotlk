@@ -332,7 +332,7 @@ struct npc_midsummer_bonfire : public ScriptedAI
 
     void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
     {
-        if (caster->GetTypeId() != TYPEID_PLAYER)
+        if (!caster->IsPlayer())
             return;
 
         switch (spellInfo->Id)
@@ -1172,7 +1172,7 @@ class spell_midsummer_juggling_torch : public SpellScript
     void HandleFinish()
     {
         Unit* caster = GetCaster();
-        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+        if (!caster || !caster->IsPlayer())
             return;
 
         if (const WorldLocation* loc = GetExplTargetDest())

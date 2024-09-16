@@ -253,6 +253,9 @@ SpellCastResult UnitAI::DoCastAOE(uint32 spellId, bool triggered)
     return me->CastSpell((Unit*)nullptr, spellId, triggered);
 }
 
+/**
+ * @brief Cast the spell on a random unit from the threat list
+ */
 SpellCastResult UnitAI::DoCastRandomTarget(uint32 spellId, uint32 threatTablePosition, float dist, bool playerOnly, bool triggered, bool withTank)
 {
     if (Unit* target = SelectTarget(SelectTargetMethod::Random, threatTablePosition, dist, playerOnly, withTank))
@@ -424,7 +427,7 @@ bool NonTankTargetSelector::operator()(Unit const* target) const
     if (!target)
         return false;
 
-    if (_playerOnly && target->GetTypeId() != TYPEID_PLAYER)
+    if (_playerOnly && !target->IsPlayer())
         return false;
 
     if (Unit* currentVictim = _source->GetThreatMgr().GetCurrentVictim())

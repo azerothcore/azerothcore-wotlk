@@ -58,7 +58,7 @@ struct npc_pet_hunter_snake_trap : public ScriptedAI
         me->LoadCreaturesAddon(true);
         me->SetLootRecipient(nullptr);
         me->ResetPlayerDamageReq();
-        me->SetLastDamagedTime(0);
+        me->ClearLastLeashExtensionTimePtr();
 
         me->AddUnitState(UNIT_STATE_EVADE);
         me->GetMotionMaster()->MoveTargetedHome();

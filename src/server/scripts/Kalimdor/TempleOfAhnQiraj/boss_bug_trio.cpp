@@ -367,7 +367,7 @@ struct boss_vem : public boss_bug_trio
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [this](Unit* target) -> bool
                 {
-                    if (target->GetTypeId() != TYPEID_PLAYER)
+                    if (!target->IsPlayer())
                         return false;
                     if (me->IsWithinMeleeRange(target) || target == me->GetVictim())
                         return false;
