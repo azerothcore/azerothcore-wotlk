@@ -115,6 +115,7 @@ enum Spells
     SPELL_NETHER_BEAM_DAMAGE            = 35873,
 
     SPELL_REMOTE_TOY_STUN               = 37029,
+    SPELL_REMOVE_ENCHANTED_WEAPONS      = 39497,
 
     // Advisors
     // Universal
@@ -320,6 +321,7 @@ struct boss_kaelthas : public BossAI
             _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
             Talk(SAY_INTRO);
+            DoCastAOE(SPELL_REMOVE_ENCHANTED_WEAPONS, true);
             ScheduleUniqueTimedEvent(23s, [&]
             {
                 Talk(SAY_INTRO_THALADRED);
@@ -762,6 +764,13 @@ struct boss_kaelthas : public BossAI
     {
         return me->GetHomePosition().GetExactDist2d(me) > 165.0f || !SelectTargetFromPlayerList(165.0f);
     }
+    
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        DoCastAOE(SPELL_REMOVE_ENCHANTED_WEAPONS, true);
+    }
+    
 private:
     uint32 _phase;
 };
@@ -1321,6 +1330,31 @@ class spell_kael_pyroblast : public SpellScript
     }
 };
 
+class spell_kaelthas_remove_enchanted_weapons : public SpellScript
+{
+    PrepareSpellScript(spell_kaelthas_remove_enchanted_weapons);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+        if (!target || !target->IsPlayer())
+            return;
+        TriggerCastFlags triggerFlags = TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+        target->CastSpell((Unit*)nullptr, 39498, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39499, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39500, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39501, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39502, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39503, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39504, triggerFlags);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_remove_enchanted_weapons::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_boss_kaelthas()
 {
     RegisterTheEyeAI(boss_kaelthas);
@@ -1339,4 +1373,5 @@ void AddSC_boss_kaelthas()
     RegisterSpellScript(spell_kaelthas_nether_beam);
     RegisterSpellScript(spell_kaelthas_summon_nether_vapor);
     RegisterSpellScript(spell_kael_pyroblast);
+    RegisterSpellScript(spell_kaelthas_remove_enchanted_weapons);
 }
