@@ -1,3 +1,4 @@
+-- DB update 2024_09_15_01 -> 2024_09_16_00
 -- wp modify
 
 UPDATE `command` SET `help` = 'Syntax: .gobject set $subcommand
