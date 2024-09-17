@@ -482,7 +482,7 @@ static void WhoIsHandler (User*       user,
   uint32_t accountId = sCharacterCache->GetCharacterAccountIdByName(name);
 
   // Look for an account name matching the account ID
-  if (auto queryResults = LoginDatabase.Query("SELECT username FROM account WHERE id = %d", accountId))
+  if (auto queryResults = LoginDatabase.Query("SELECT username FROM account WHERE id = {}", accountId))
     strcpy(szResponse, queryResults->Fetch()->Get<std::string>().c_str());
   else
     strcpy(szResponse, "Character not found");
