@@ -2949,7 +2949,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
             const uint32 SPELL_PREMEDITATION = 14183;
             if (m_spellInfo->Id != SPELL_PREMEDITATION)
             {
-                if (!effectUnit->IsStandState())
+                if (!effectUnit->IsStanding())
                 {
                     effectUnit->SetStandState(UNIT_STANDING);
                 }

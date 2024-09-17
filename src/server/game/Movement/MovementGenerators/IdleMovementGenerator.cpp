@@ -79,7 +79,7 @@ void RotateMovementGenerator::Finalize(Unit* unit)
 void DistractMovementGenerator::Initialize(Unit* owner)
 {
     // Distracted creatures stand up if not standing
-    if (!owner->IsStandState())
+    if (!owner->IsStanding())
         owner->SetStandState(UNIT_STANDING);
 
     owner->AddUnitState(UNIT_STATE_DISTRACTED);

@@ -524,7 +524,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             }
             else if (ConditionValue2 == 0)
             {
-                condMeets = unit->IsStandState();
+                condMeets = unit->IsStanding();
             }
             else if (ConditionValue2 == 1)
             {

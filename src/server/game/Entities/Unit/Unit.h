@@ -871,7 +871,7 @@ public:
 
     UNITSTANDSTATE GetStandState() const { return static_cast<UNITSTANDSTATE>(GetByteValue(UNIT_FIELD_BYTES_1, 0)); }
     bool IsSitting() const;
-    [[nodiscard]] bool IsStandState() const;
+    [[nodiscard]] bool IsStanding() const;
     void SetStandState(uint8 state);
 
     void  SetStandFlags(uint8 flags) { SetByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }

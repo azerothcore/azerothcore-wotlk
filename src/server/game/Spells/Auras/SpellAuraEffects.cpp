@@ -1754,7 +1754,7 @@ void AuraEffect::HandleSpiritOfRedemption(AuraApplication const* aurApp, uint8 m
         target->ToPlayer()->StopMirrorTimers();
 
         // set stand state (expected in this form)
-        if (!target->IsStandState())
+        if (!target->IsStanding())
             target->SetStandState(UNIT_STANDING);
 
         target->SetHealth(1);

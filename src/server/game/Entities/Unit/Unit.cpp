@@ -13704,7 +13704,7 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy, uint32 duration)
 
         if (!(creature->GetCreatureTemplate()->type_flags & CREATURE_TYPE_FLAG_ALLOW_MOUNTED_COMBAT))
             Dismount();
-        if (!IsStandState()) // pussywizard: already done in CombatStart(target, initialAggro) for the target, but when aggro'ing from MoveInLOS CombatStart is not called!
+        if (!IsStanding()) // pussywizard: already done in CombatStart(target, initialAggro) for the target, but when aggro'ing from MoveInLOS CombatStart is not called!
             SetStandState(UNIT_STANDING);
     }
 
@@ -16634,17 +16634,17 @@ bool Unit::IsSitting() const {
          (standState >= UNIT_FIRSTCHAIRSIT && standState <= UNIT_LASTCHAIRSIT);
 }
 
-bool Unit::IsStandState() const
-{
-    uint8 s = GetStandState();
-    return !IsSitting() && s != UNIT_SLEEPING && s != UNIT_KNEEL;
+//===========================================================================
+bool Unit::IsStanding() const {
+  UNITSTANDSTATE standState = GetStandState();
+  return !IsSitting() && standState != UNIT_SLEEPING && standState != UNIT_KNEEL;
 }
 
 void Unit::SetStandState(uint8 state)
 {
     SetByteValue(UNIT_FIELD_BYTES_1, UNIT_BYTES_1_OFFSET_STAND_STATE, state);
 
-    if (IsStandState())
+    if (IsStanding())
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_SEATED);
 
     if (IsPlayer())

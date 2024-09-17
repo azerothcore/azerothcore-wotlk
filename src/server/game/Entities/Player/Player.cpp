@@ -2036,7 +2036,7 @@ void Player::RegenerateHealth()
     {
         addvalue = OCTRegenHPPerSpirit() * HealthIncreaseRate;
 
-        if (!IsStandState())
+        if (!IsStanding())
         {
             addvalue *= 1.33f;
         }

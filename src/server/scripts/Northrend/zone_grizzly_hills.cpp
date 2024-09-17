@@ -573,7 +573,7 @@ public:
             Talk(SAY_RANDOM, caster);
             DoCast(caster, SPELL_KILL_CREDIT);
 
-            if (!me->IsStandState())
+            if (!me->IsStanding())
             {
                 me->SetStandState(UNIT_STANDING);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
