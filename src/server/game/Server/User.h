@@ -610,7 +610,6 @@ public:                                                 // opcodes handlers
     void HandleLootReleaseOpcode(WDataStore& recvPacket);
     void HandleLootMasterGiveOpcode(WDataStore& recvPacket);
     void HandleWhoOpcode(WDataStore& recvPacket);
-    void HandlePlayerLogout(WDataStore &msg);
 
     // GM Ticket opcodes
     void HandleGMTicketCreateOpcode(WDataStore& recvPacket);

@@ -413,16 +413,6 @@ void User::HandleWhoOpcode(WDataStore& recvData)
     LOG_DEBUG("network", "WORLD: Send SMSG_WHO Message");
 }
 
-//===========================================================================
-void User::HandlePlayerLogout(WDataStore &msg)
-{
-    if (!IsGMAccount()) {
-        SendNotification(LANG_PERMISSION_DENIED);
-        return;
-    }
-    CharacterRemoveFromGame(true);
-}
-
 void User::HandleTogglePvP(WDataStore& recv_data)
 {
     // this opcode can be used in two ways: Either set explicit new status or toggle old status

@@ -105,6 +105,10 @@ static void PlayerLogoutCancelHandler (User*        user,
                                        NETMESSAGE   msgId,
                                        uint32_t     eventTime,
                                        WDataStore*  msg);
+static void PlayerLogoutInstantHandler (User*       user,
+                                        NETMESSAGE  msgId,
+                                        uint32_t    eventTime,
+                                        WDataStore* msg);
 static void PlayerRechargeCheat (User*        user,
                                  NETMESSAGE   msgId,
                                  uint         eventTime,
@@ -130,6 +134,7 @@ void PlayerInitialize () {
   WowConnection::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
   WowConnection::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
+  WowConnection::SetMessageHandler(CMSG_PLAYER_LOGOUT, PlayerLogoutInstantHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_DECHARGE, PlayerDechargeCheat, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_LEVEL_CHEAT, PlayerLevelCheatHandler, GM_SECURITY);
 }
@@ -143,6 +148,7 @@ void PlayerDestroy () {
   WowConnection::ClearMessageHandler(CMSG_LEARN_SPELL);
   WowConnection::ClearMessageHandler(CMSG_LOGOUT_REQUEST);
   WowConnection::ClearMessageHandler(CMSG_LOGOUT_CANCEL);
+  WowConnection::ClearMessageHandler(CMSG_PLAYER_LOGOUT);
   WowConnection::ClearMessageHandler(CMSG_DECHARGE);
   WowConnection::ClearMessageHandler(CMSG_LEVEL_CHEAT);
 }
@@ -16465,6 +16471,14 @@ static void PlayerLogoutCancelHandler (User*        user,
                                        uint32_t     eventTime,
                                        WDataStore*  msg) {
   user->CharacterAbortLogout();
+}
+
+//===========================================================================
+static void PlayerLogoutInstantHandler (User*       user,
+                                        NETMESSAGE  msgId,
+                                        uint32_t    eventTime,
+                                        WDataStore* msg) {
+  user->CharacterLogout(true);
 }
 
 //===========================================================================

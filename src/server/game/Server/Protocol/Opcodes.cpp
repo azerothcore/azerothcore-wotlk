@@ -198,7 +198,6 @@ void OpcodeTable::Initialize()
     /*0x047*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_GAMESPEED_SET,                                      STATUS_NEVER);
     /*0x048*/ DEFINE_HANDLER(CMSG_SERVERTIME,                                                       STATUS_NEVER,      PROCESS_INPLACE,        &User::Handle_NULL                              );
     /*0x049*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_SERVERTIME,                                         STATUS_NEVER);
-    /*0x04A*/ DEFINE_HANDLER(CMSG_PLAYER_LOGOUT,                                                    STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &User::HandlePlayerLogout                 );
     /*0x04C*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LOGOUT_RESPONSE,                                    STATUS_NEVER);
     /*0x04D*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_LOGOUT_COMPLETE,                                    STATUS_NEVER);
     /*0x050*/ DEFINE_HANDLER(CMSG_NAME_QUERY,                                                       STATUS_LOGGEDIN,   PROCESS_INPLACE,        &User::HandleNameQueryOpcode                    );
