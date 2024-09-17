@@ -27,7 +27,6 @@ enum UnitBytes1Offsets : uint8
 };
 
 // byte value (UNIT_FIELD_BYTES_1, 0)
-// byte value (UNIT_FIELD_BYTES_1, 0)
 enum UNITSTANDSTATE {
   UNIT_STANDING           = 0x0,
   UNIT_SITTING            = 0x1,

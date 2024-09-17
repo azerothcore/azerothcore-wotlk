@@ -1589,7 +1589,7 @@ void GameObject::Use(Unit* user)
                     {
                         if (Player* ChairUser = ObjectAccessor::GetPlayer(*this, itr->second))
                         {
-                            if (ChairUser->IsSitState() && ChairUser->GetStandState() != UNIT_SITTING && ChairUser->GetExactDist2d(x_i, y_i) < 0.1f)
+                            if (ChairUser->IsSitting() && ChairUser->GetStandState() != UNIT_SITTING && ChairUser->GetExactDist2d(x_i, y_i) < 0.1f)
                                 continue;        // This seat is already occupied by ChairUser. NOTE: Not sure if the ChairUser->GetStandState() != UNIT_SITTING check is required.
                             else
                                 itr->second.Clear(); // This seat is unoccupied.

@@ -870,7 +870,7 @@ public:
     }
 
     UNITSTANDSTATE GetStandState() const { return static_cast<UNITSTANDSTATE>(GetByteValue(UNIT_FIELD_BYTES_1, 0)); }
-    [[nodiscard]] bool IsSitState() const;
+    bool IsSitting() const;
     [[nodiscard]] bool IsStandState() const;
     void SetStandState(uint8 state);
 

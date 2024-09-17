@@ -528,7 +528,7 @@ bool Condition::Meets(ConditionSourceInfo& sourceInfo)
             }
             else if (ConditionValue2 == 1)
             {
-                condMeets = unit->IsSitState();
+                condMeets = unit->IsSitting();
             }
         }
 

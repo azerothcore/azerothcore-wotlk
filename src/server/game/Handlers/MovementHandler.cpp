@@ -579,7 +579,7 @@ void User::HandleMovementOpcodes(WDataStore& recvData)
 
     if (plrMover)                                            // nothing is charmed, or player charmed
     {
-        if (plrMover->IsSitState() && (movementInfo.m_moveFlags & (MOVEFLAG_MOVE_MASK | MOVEFLAG_TURN_MASK)))
+        if (plrMover->IsSitting() && (movementInfo.m_moveFlags & (MOVEFLAG_MOVE_MASK | MOVEFLAG_TURN_MASK)))
             plrMover->SetStandState(UNIT_STANDING);
 
         plrMover->UpdateFallInformationIfNeed(movementInfo, opcode);

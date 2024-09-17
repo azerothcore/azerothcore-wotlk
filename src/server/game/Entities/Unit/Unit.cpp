@@ -2550,7 +2550,7 @@ void Unit::AttackerStateUpdate(Unit* victim, WeaponAttackType attType /*= BASE_A
         return;
 
     // CombatStart puts the target into stand state, so we need to cache sit state here to know if we should crit later
-    const bool sittingVictim = victim->IsPlayer() && (victim->IsSitState() || victim->GetStandState() == UNIT_SLEEPING);
+    const bool sittingVictim = victim->IsPlayer() && (victim->IsSitting() || victim->GetStandState() == UNIT_SLEEPING);
 
     CombatStart(victim);
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_MELEE_ATTACK);
@@ -4492,7 +4492,7 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
         return;
 
     // Sitdown on apply aura req seated
-    if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED && !IsSitState())
+    if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED && !IsSitting())
         SetStandState(UNIT_SITTING);
 
     if (aurApp->GetRemoveMode())
@@ -12149,7 +12149,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
             }
 
             // 100% critical chance against sitting target
-            if (IsPlayer() && (IsSitState() || GetStandState() == UNIT_SLEEPING))
+            if (IsPlayer() && (IsSitting() || GetStandState() == UNIT_SLEEPING))
             {
                 return 100.0f;
             }
@@ -16626,19 +16626,18 @@ void Unit::SendMovementFlagUpdate(bool self /* = false */)
     SendMessageToSet(&data, self);
 }
 
-bool Unit::IsSitState() const
-{
-    uint8 s = GetStandState();
-    return
-        s == UNIT_SITTINGCHAIR        || s == UNIT_SITTINGCHAIRLOW  ||
-        s == UNIT_SITTINGCHAIRMEDIUM || s == UNIT_SITTINGCHAIRHIGH ||
-        s == UNIT_SITTING;
+
+//===========================================================================
+bool Unit::IsSitting() const {
+  UNITSTANDSTATE standState = GetStandState();
+  return standState == UNIT_SITTING || standState == UNIT_SITTINGCHAIR ||
+         (standState >= UNIT_FIRSTCHAIRSIT && standState <= UNIT_LASTCHAIRSIT);
 }
 
 bool Unit::IsStandState() const
 {
     uint8 s = GetStandState();
-    return !IsSitState() && s != UNIT_SLEEPING && s != UNIT_KNEEL;
+    return !IsSitting() && s != UNIT_SLEEPING && s != UNIT_KNEEL;
 }
 
 void Unit::SetStandState(uint8 state)
