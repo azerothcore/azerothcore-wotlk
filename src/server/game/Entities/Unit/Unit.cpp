@@ -20233,19 +20233,19 @@ public:
     bool Execute(uint64 /*eventTime*/, uint32 /*updateTime*/) override
     {
         if (_owner.IsInWorld() && _owner.FindMap())
-        {
-            bool auraFound = false;
-            Unit::AuraEffectList const& auraEffects = _owner.GetAuraEffectsByType(_auraType);
-            for (Unit::AuraEffectList::const_iterator j = auraEffects.begin(); j != auraEffects.end(); ++j)
-                if ((*j) == _aurEff)
-                    auraFound = true;
-
-            if (!auraFound)
-                _aurEff = nullptr;
-
             if (Unit* target = ObjectAccessor::GetUnit(_owner, _targetGUID))
+            {
+                bool auraFound = false; // Used to ensure _aurEff exists to avoid nullptr dereference/crash
+                Unit::AuraEffectList const& auraEffects = target->GetAuraEffectsByType(_auraType);
+                for (Unit::AuraEffectList::const_iterator j = auraEffects.begin(); j != auraEffects.end(); ++j)
+                    if ((*j) == _aurEff)
+                        auraFound = true;
+
+                if (!auraFound)
+                    _aurEff = nullptr;
+
                 _owner.CastCustomSpell(_spellId, SPELLVALUE_BASE_POINT0, _basePoints, target, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_NO_PERIODIC_RESET), nullptr, _aurEff, _owner.GetGUID());
-        }
+            }
 
         return true;
     }
