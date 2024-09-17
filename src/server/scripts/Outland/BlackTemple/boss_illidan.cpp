@@ -1186,14 +1186,37 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
 {
     npc_parasitic_shadowfiend(Creature* creature) : ScriptedAI(creature) { }
 
+    bool CanAIAttack(Unit const* who) const override
+    {
+        return !who->HasAura(SPELL_PARASITIC_SHADOWFIEND) && !who->HasAura(SPELL_PARASITIC_SHADOWFIEND_TRIGGER);
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        me->DespawnOrUnsummon();
+    }
+
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Simulate blizz-like AI delay to avoid extreme overpopulation of adds
         me->SetReactState(REACT_DEFENSIVE);
-        me->m_Events.AddEventAtOffset([&] {
+
+        scheduler.Schedule(2400ms, [this](TaskContext context)
+        {
             me->SetReactState(REACT_AGGRESSIVE);
             me->SetInCombatWithZone();
-        }, 2400ms);
+            context.Repeat();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -1298,10 +1321,19 @@ struct npc_flame_of_azzinoth : public ScriptedAI
             DoCastVictim(SPELL_FLAME_BLAST);
 
             me->m_Events.AddEventAtOffset([&] {
-                if (Unit* target = me->GetVictim())
-                    target->CastSpell(target, SPELL_BLAZE, true);
+                DoCastVictim(SPELL_BLAZE);
             }, 1s);
         }, 15s, 20s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
     }
 
 private:
