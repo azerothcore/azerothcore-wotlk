@@ -4806,6 +4806,22 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValue = 124;
     });
 
+    // Power of the Guardian
+    ApplySpellFix({ 28142, 28143, 28144, 28145 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
+    });
+
+    // Warrior stances passives
+    ApplySpellFix({
+        2457, // Battle Stance
+        2458, // Berserker Stance
+        7376  // Defensive Stance Passive
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
