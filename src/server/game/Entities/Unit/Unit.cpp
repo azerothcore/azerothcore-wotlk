@@ -20235,7 +20235,7 @@ public:
         if (_owner.IsInWorld() && _owner.FindMap())
             if (Unit* target = ObjectAccessor::GetUnit(_owner, _targetGUID))
             {
-                bool auraFound = false; // Used to ensure _aurEff exists to avoid nullptr dereference/crash
+                bool auraFound = false; // Used to ensure _aurEff exists to avoid wild pointer access/crash
                 Unit::AuraEffectList const& auraEffects = target->GetAuraEffectsByType(_auraType);
                 for (Unit::AuraEffectList::const_iterator j = auraEffects.begin(); j != auraEffects.end(); ++j)
                     if ((*j) == _aurEff)
