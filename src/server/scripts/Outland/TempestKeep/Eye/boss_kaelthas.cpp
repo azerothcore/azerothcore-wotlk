@@ -92,7 +92,7 @@ enum KTSpells
     SPELL_KAEL_EXPLODES4                = 36354,
     SPELL_KAEL_EXPLODES5                = 36092,
     SPELL_GROW                          = 36184,
-    SPELL_KEAL_STUNNED                  = 36185,
+    SPELL_KAEL_STUNNED                  = 36185,
     SPELL_KAEL_FULL_POWER               = 36187,
     SPELL_FLOATING_DROWNED              = 36550,
     SPELL_DARK_BANISH_STATE             = 52241, // wrong visual apparently
@@ -522,8 +522,6 @@ struct boss_kaelthas : public BossAI
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA2);
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA3);
             DoCastSelf(SPELL_KAEL_EXPLODES5, true);
-            DoCastSelf(SPELL_FLOATING_DROWNED);
-            //me->CastSpell(me, SPELL_KEAL_STUNNED, true);
         }, EVENT_SCENE_8);
         ScheduleUniqueTimedEvent(22000ms, [&]
         {
@@ -567,8 +565,8 @@ struct boss_kaelthas : public BossAI
         ScheduleUniqueTimedEvent(32000ms, [&]
         {
             me->RemoveAurasDueToSpell(SPELL_FLOATING_DROWNED);
-            me->RemoveAurasDueToSpell(SPELL_KEAL_STUNNED);
             DoCastSelf(SPELL_KAEL_FULL_POWER);
+            // me->RemoveAurasDueToSpell(SPELL_KAEL_STUNNED);
             DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM4, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM5, true);
@@ -1324,6 +1322,27 @@ class spell_kaelthas_remove_enchanted_weapons : public SpellScript
     }
 };
 
+// 36092 - Kael Explodes
+class spell_kaelthas_kael_explodes : public SpellScript
+{
+    PrepareSpellScript(spell_kaelthas_kael_explodes);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        // caster->CastSpell((Unit*)nullptr, SPELL_KAEL_STUNNED, TRIGGERED_NONE);
+        caster->CastSpell((Unit*)nullptr, SPELL_FLOATING_DROWNED, TRIGGERED_NONE);
+        caster->PlayDirectSound(3320);
+        caster->PlayDirectSound(10845);
+        caster->PlayDirectSound(6539);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_kael_explodes::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_boss_kaelthas()
 {
     RegisterTheEyeAI(boss_kaelthas);
@@ -1343,4 +1362,5 @@ void AddSC_boss_kaelthas()
     RegisterSpellScript(spell_kaelthas_summon_nether_vapor);
     RegisterSpellScript(spell_kael_pyroblast);
     RegisterSpellScript(spell_kaelthas_remove_enchanted_weapons);
+    RegisterSpellScript(spell_kaelthas_kael_explodes);
 }
