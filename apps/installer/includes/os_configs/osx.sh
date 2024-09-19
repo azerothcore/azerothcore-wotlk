@@ -22,8 +22,6 @@ rm /usr/local/bin/python3.11-config || true
 rm /usr/local/bin/python3.12-config || true
 ##########################################
 
-brew cleanup 
-
 brew update
 
 ##########################################
@@ -33,4 +31,4 @@ if ! command -v cmake &>/dev/null ; then
 fi
 ##########################################
 
-brew install z3 openssl@3 readline boost bash-completion curl unzip mysql ccache
+brew install openssl@3 readline boost bash-completion curl unzip mysql ccache
