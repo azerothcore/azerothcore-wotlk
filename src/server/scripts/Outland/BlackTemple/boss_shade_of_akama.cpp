@@ -278,6 +278,7 @@ struct npc_akama_shade : public ScriptedAI
         }
         else if (damage >= me->GetHealth() && !_died)
         {
+            _died = true;
             damage = me->GetHealth() - 1;
             Talk(SAY_DEATH);
             if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
