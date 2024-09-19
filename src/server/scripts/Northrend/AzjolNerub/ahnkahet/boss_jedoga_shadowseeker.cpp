@@ -333,7 +333,7 @@ struct boss_jedoga_shadowseeker : public BossAI
 
     void KilledUnit(Unit* who) override
     {
-        if (who->GetTypeId() != TYPEID_PLAYER)
+        if (!who->IsPlayer())
         {
             return;
         }
@@ -735,4 +735,3 @@ void AddSC_boss_jedoga_shadowseeker()
     // Achievements
     new achievement_volunteer_work();
 }
-

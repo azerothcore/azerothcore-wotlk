@@ -110,7 +110,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            if (target->GetTypeId() == TYPEID_UNIT && !secondPhase)
+            if (target->IsCreature() && !secondPhase)
             {
                 return false;
             }
@@ -338,4 +338,3 @@ void AddSC_boss_razorgore()
     new go_orb_of_domination();
     RegisterSpellScript(spell_egg_event);
 }
-

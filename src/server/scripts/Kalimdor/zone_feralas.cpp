@@ -56,4 +56,3 @@ void AddSC_feralas()
 {
     RegisterSpellScript(spell_gordunni_trap);
 }
-

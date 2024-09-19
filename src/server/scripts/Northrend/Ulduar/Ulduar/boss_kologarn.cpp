@@ -174,7 +174,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2d(who) < 45.0f && me->getStandState() == UNIT_STAND_STATE_SUBMERGED)
+            if (who->IsPlayer() && me->GetExactDist2d(who) < 45.0f && me->getStandState() == UNIT_STAND_STATE_SUBMERGED)
             {
                 me->SetStandState(UNIT_STAND_STATE_STAND);
                 if (Unit* arm = ObjectAccessor::GetCreature(*me, _left))
@@ -707,7 +707,7 @@ public:
         if (target == _victim && _me->GetThreatMgr().GetThreatListSize() > 1)
             return true;
 
-        if (target->GetTypeId() != TYPEID_PLAYER)
+        if (!target->IsPlayer())
             return true;
 
         return false;
@@ -724,7 +724,7 @@ class spell_ulduar_stone_grip_cast_target : public SpellScript
 
     bool Load() override
     {
-        if (GetCaster()->GetTypeId() != TYPEID_UNIT)
+        if (!GetCaster()->IsCreature())
             return false;
         return true;
     }

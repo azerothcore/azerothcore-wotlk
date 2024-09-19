@@ -994,7 +994,7 @@ bool CanRollOnItem(LootItem const& item, Player const* player, Loot* loot)
         return false;
 
     uint32 itemCount = player->GetItemCount(item.itemid);
-    if ((proto->MaxCount > 0 && static_cast<int32>(itemCount) >= proto->MaxCount) || (player->CanEquipUniqueItem(proto) != EQUIP_ERR_OK))
+    if ((proto->MaxCount > 0 && static_cast<int32>(itemCount) >= proto->MaxCount))
         return false;
 
     if (!item.AllowedForPlayer(player, loot->sourceWorldObjectGUID))
@@ -1202,7 +1202,7 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
                 if (item->DisenchantID && m_maxEnchantingLevel >= item->RequiredDisenchantSkill)
                     r->rollVoteMask |= ROLL_FLAG_TYPE_DISENCHANT;
 
-                if (item->Flags2 & ITEM_FLAGS_EXTRA_NEED_ROLL_DISABLED)
+                if (item->HasFlag2(ITEM_FLAG2_CAN_ONLY_ROLL_GREED))
                     r->rollVoteMask &= ~ROLL_FLAG_TYPE_NEED;
 
                 loot->items[itemSlot].is_blocked = true;

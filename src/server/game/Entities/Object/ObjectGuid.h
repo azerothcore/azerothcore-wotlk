@@ -181,20 +181,20 @@ class ObjectGuid
         {
             switch (high)
             {
-                case HighGuid::Item:         return TYPEID_ITEM;
-                //case HighGuid::Container:    return TYPEID_CONTAINER; HighGuid::Container == HighGuid::Item currently
-                case HighGuid::Unit:         return TYPEID_UNIT;
-                case HighGuid::Pet:          return TYPEID_UNIT;
-                case HighGuid::Player:       return TYPEID_PLAYER;
-                case HighGuid::GameObject:   return TYPEID_GAMEOBJECT;
+                case HighGuid::Item:          return TYPEID_ITEM;
+                //case HighGuid::Container:   return TYPEID_CONTAINER; HighGuid::Container == HighGuid::Item currently
+                case HighGuid::Unit:          return TYPEID_UNIT;
+                case HighGuid::Pet:           return TYPEID_UNIT;
+                case HighGuid::Player:        return TYPEID_PLAYER;
+                case HighGuid::GameObject:    return TYPEID_GAMEOBJECT;
                 case HighGuid::DynamicObject: return TYPEID_DYNAMICOBJECT;
-                case HighGuid::Corpse:       return TYPEID_CORPSE;
-                case HighGuid::Mo_Transport: return TYPEID_GAMEOBJECT;
-                case HighGuid::Vehicle:      return TYPEID_UNIT;
+                case HighGuid::Corpse:        return TYPEID_CORPSE;
+                case HighGuid::Mo_Transport:  return TYPEID_GAMEOBJECT;
+                case HighGuid::Vehicle:       return TYPEID_UNIT;
                 // unknown
                 case HighGuid::Instance:
                 case HighGuid::Group:
-                default:                    return TYPEID_OBJECT;
+                default:                      return TYPEID_OBJECT;
             }
         }
 

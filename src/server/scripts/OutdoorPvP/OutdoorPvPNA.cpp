@@ -56,7 +56,7 @@ void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
 
             // creature kills must be notified, even if not inside objective / not outdoor pvp active
             // player kills only count if active and inside objective
-            if ((groupGuy->IsOutdoorPvPActive() && groupGuy->GetAreaId() == NA_HALAA_ZONE_ID) || killed->GetTypeId() == TYPEID_UNIT)
+            if ((groupGuy->IsOutdoorPvPActive() && groupGuy->GetAreaId() == NA_HALAA_ZONE_ID) || killed->IsCreature())
             {
                 HandleKillImpl(groupGuy, killed);
             }
@@ -65,7 +65,7 @@ void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
     else
     {
         // creature kills must be notified, even if not inside objective / not outdoor pvp active
-        if (killer && ((killer->IsOutdoorPvPActive() && killer->ToPlayer()->GetAreaId() == NA_HALAA_ZONE_ID) || killed->GetTypeId() == TYPEID_UNIT))
+        if (killer && ((killer->IsOutdoorPvPActive() && killer->ToPlayer()->GetAreaId() == NA_HALAA_ZONE_ID) || killed->IsCreature()))
         {
             HandleKillImpl(killer, killed);
         }
@@ -74,7 +74,7 @@ void OutdoorPvPNA::HandleKill(Player* killer, Unit* killed)
 
 void OutdoorPvPNA::HandleKillImpl(Player* player, Unit* killed)
 {
-    if (killed->GetTypeId() == TYPEID_PLAYER && player->GetTeamId() != killed->ToPlayer()->GetTeamId())
+    if (killed->IsPlayer() && player->GetTeamId() != killed->ToPlayer()->GetTeamId())
     {
         player->KilledMonsterCredit(NA_CREDIT_MARKER);
         player->CastSpell(player, player->GetTeamId() == TEAM_ALLIANCE ? NA_KILL_TOKEN_ALLIANCE : NA_KILL_TOKEN_HORDE, true);
@@ -928,4 +928,3 @@ void AddSC_outdoorpvp_na()
     new OutdoorPvP_nagrand();
     RegisterCreatureAI(outdoorpvp_na_halaa_creatures);
 }
-

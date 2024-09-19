@@ -115,7 +115,7 @@ public:
         {
             if (!target || !spell)
                 return;
-            if (spell->Id == SPELL_PURSUIT && target->GetTypeId() == TYPEID_PLAYER)
+            if (spell->Id == SPELL_PURSUIT && target->IsPlayer())
             {
                 Talk(EMOTE_ICK_CHASE, target);
                 AttackStart(target);
@@ -262,7 +262,7 @@ public:
                 if (me->GetReactState() == REACT_PASSIVE)
                     me->SetReactState(REACT_AGGRESSIVE);
 
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
                 if (Creature* k = GetKrick())
                     k->AI()->Talk(SAY_SLAY);
         }
@@ -470,7 +470,7 @@ class spell_krick_explosive_barrage_aura : public AuraScript
     {
         PreventDefaultAction();
         if (Unit* caster = GetCaster())
-            if (caster->GetTypeId() == TYPEID_UNIT)
+            if (caster->IsCreature())
             {
                 Map::PlayerList const& players = caster->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
@@ -505,7 +505,7 @@ class spell_exploding_orb_auto_grow_aura : public AuraScript
                 target->RemoveAurasDueToSpell(SPELL_HASTY_GROW);
                 target->RemoveAurasDueToSpell(SPELL_AUTO_GROW);
                 target->RemoveAurasDueToSpell(SPELL_EXPLODING_ORB_VISUAL);
-                if (target->GetTypeId() == TYPEID_UNIT)
+                if (target->IsCreature())
                     target->ToCreature()->DespawnOrUnsummon(2000);
             }
     }
@@ -524,4 +524,3 @@ void AddSC_boss_ick()
     RegisterSpellScript(spell_krick_explosive_barrage_aura);
     RegisterSpellScript(spell_exploding_orb_auto_grow_aura);
 }
-

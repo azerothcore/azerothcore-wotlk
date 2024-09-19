@@ -212,7 +212,7 @@ struct ClassCallSelector : public Acore::unary_function<Unit*, bool>
 
     bool operator()(Unit const* target) const
     {
-        if (!_me || !target || target->GetTypeId() != TYPEID_PLAYER)
+        if (!_me || !target || !target->IsPlayer())
         {
             return false;
         }
@@ -673,7 +673,7 @@ struct boss_nefarian : public BossAI
                     {
                         for (auto& ref : me->GetThreatMgr().GetThreatList())
                         {
-                            if (ref->getTarget() && ref->getTarget()->GetTypeId() == TYPEID_PLAYER)
+                            if (ref->getTarget() && ref->getTarget()->IsPlayer())
                             {
                                 classesPresent.insert(ref->getTarget()->getClass());
                             }
@@ -1114,7 +1114,7 @@ class spell_class_call_polymorph : public SpellScript
     {
         targets.remove_if([&](WorldObject const* target) -> bool
             {
-                return target->GetTypeId() != TYPEID_PLAYER || target->ToPlayer()->IsGameMaster() || target->ToPlayer()->HasAura(SPELL_POLYMORPH);
+                return !target->IsPlayer() || target->ToPlayer()->IsGameMaster() || target->ToPlayer()->HasAura(SPELL_POLYMORPH);
             });
 
         if (!targets.empty())
@@ -1277,4 +1277,3 @@ void AddSC_boss_nefarian()
     RegisterSpellScript(spell_shadowblink);
     RegisterSpellScript(spell_spawn_drakonid);
 }
-

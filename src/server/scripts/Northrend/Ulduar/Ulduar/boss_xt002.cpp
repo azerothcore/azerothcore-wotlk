@@ -225,7 +225,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && !urand(0, 2))
+            if (victim->IsPlayer() && !urand(0, 2))
             {
                 Talk(SAY_SLAY);
             }
@@ -427,7 +427,7 @@ public:
         {
             summons.Summon(cr);
             if (Unit* owner = me->GetVehicleBase())
-                if (owner->GetTypeId() == TYPEID_UNIT)
+                if (owner->IsCreature())
                     owner->ToCreature()->AI()->JustSummoned(cr);
         }
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override

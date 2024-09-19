@@ -15,23 +15,16 @@ Versions of AzerothCore:
 | AzerothCore Branch | Supported          |
 | ------------------ | ------------------ |
 | master             | :white_check_mark: |
+| Any playerbot fork | :red_circle:       |
+| Any NPCBot fork    | :red_circle:       |
 
 Versions of MySQL:
 
 | MySQL Version | Supported          |
 | ------------- | ------------------ |
-| 8.1           | :white_check_mark: |
+| 8.4           | :white_check_mark: |
 | 8.0           | :white_check_mark: |
-| 5.7           | :white_check_mark: |
-| 5.6 and lower | :red_circle:       |
-
-Versions of MariaDB:
-
-| MariaDB Version | Supported          |
-| --------------- | ------------------ |
-| 10.6            | :white_check_mark: |
-| 10.5            | :white_check_mark: |
-| 10.4 and lower  | :red_circle:       |
+| 5.7 and lower | :red_circle:       |
 
 Versions of CLang:
 
@@ -43,26 +36,26 @@ Versions of CLang:
 
 Versions of GCC:
 
-| GCC Version | Supported          |
-| ----------- | ------------------ |
-| 14          | :white_check_mark: |
-| 12          | :white_check_mark: |
-| 11 and lower| :red_circle:       |
+| GCC Version  | Supported          |
+| ------------ | ------------------ |
+| 14           | :white_check_mark: |
+| 12           | :white_check_mark: |
+| 11 and lower | :red_circle:       |
 
 Versions of Ubuntu:
 
-| Ubuntu version | Supported          |
-| -------------- | ------------------ |
-| 24.04          | :white_check_mark: |
-| 22.04          | :white_check_mark: |
-| 20.04 and lower| :red_circle:       |
+| Ubuntu version  | Supported          |
+| --------------- | ------------------ |
+| 24.04           | :white_check_mark: |
+| 22.04           | :white_check_mark: |
+| 20.04 and lower | :red_circle:       |
 
 Versions of macOS:
 
-| macOS Version  | Supported          |
-| -------------- | ------------------ |
-| 12             | :white_check_mark: |
-| 11 and lower   | :red_circle:       |
+| macOS Version | Supported          |
+| ------------- | ------------------ |
+| 12            | :white_check_mark: |
+| 11 and lower  | :red_circle:       |
 
 **Note**: We do NOT support any repacks that may or may not have been made based on AzerothCore. This is because they are usually based on older versions and there is no way to know what is in the precompiled binaries. Instead, you should compile your binaries from the AzerothCore source. To get started, read the [Installation Guide](https://www.azerothcore.org/wiki/installation).
 

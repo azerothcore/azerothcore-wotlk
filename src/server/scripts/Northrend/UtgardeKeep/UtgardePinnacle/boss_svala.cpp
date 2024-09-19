@@ -205,7 +205,7 @@ public:
                 instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, 26555, 1, nullptr);
             }
 
-            if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->IsPlayer())
                 Talk(SAY_SLAY);
         }
 
@@ -404,7 +404,7 @@ class spell_svala_ritual_strike : public SpellScript
     {
         if (Unit* unitTarget = GetHitUnit())
         {
-            if (unitTarget->GetTypeId() != TYPEID_UNIT)
+            if (!unitTarget->IsCreature())
                 return;
 
             Unit::DealDamage(GetCaster(), unitTarget, 7000, nullptr, DIRECT_DAMAGE);
@@ -439,4 +439,3 @@ void AddSC_boss_svala()
     new npc_ritual_channeler();
     RegisterSpellAndAuraScriptPair(spell_svala_ritual_strike, spell_svala_ritual_strike_aura);
 }
-

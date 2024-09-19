@@ -264,7 +264,7 @@ class spell_teron_gorefiend_shadowy_construct : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+        return GetUnitOwner()->IsCreature();
     }
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -332,4 +332,3 @@ void AddSC_boss_teron_gorefiend()
     RegisterSpellScript(spell_teron_gorefiend_shadowy_construct);
     RegisterSpellScript(spell_teron_gorefiend_shadow_of_death_remove);
 }
-
