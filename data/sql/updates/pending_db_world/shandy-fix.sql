@@ -1,9 +1,9 @@
 
-DELETE FROM creature_text
-WHERE CreatureID = 36856
-  AND GroupID IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+DELETE FROM `creature_text`
+WHERE `CreatureID` = 36856
+  AND `GroupID` IN (0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
 
-INSERT INTO `creature_text`(`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES 
+INSERT INTO `creature_text`(`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`,`Probability`,`Emote`,`Duration`,`Sound`,`BroadcastTextId`,`TextRange`,`comment`) VALUES  
 (36856,0,0,'You\'re in luck. I\'ve got just what you need in the load I\'m about to wash.',12,0,100,0,0,0,36761,0,'Shandy Glossgleam'),
 (36856,1,0,'Well done!',12,0,16,4,0,0,3287,0,'Shandy say 2'),
 (36856,1,1,'Aquanos can hardly keep up!',12,0,14,4,0,0,37988,0,'Shandy say 2'),
@@ -22,6 +22,6 @@ INSERT INTO `creature_text`(`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`
 (36856,8,0,'See how easy that was with everyone working together? Just take what you need from the clean laundry here, but don\'t forget to return it when you\'re finished.',12,0,100,0,0,0,36791,0,'Shandy Glossgleam'),
 (36856,9,0,'Oh, no! That wasn\'t right. Now I\'ll have to go get more detergent so we can start over!',12,0,100,0,0,0,36763,0,'Shandy Glossgleam');
 
-UPDATE gossip_menu_option
-SET BoxBroadcastTextID = 0
-WHERE menuid = 10854 AND OptionBroadcastTextID = 37552;
+UPDATE `gossip_menu_option`
+SET `BoxBroadcastTextID` = 0
+WHERE `menuid` = 10854 AND `OptionBroadcastTextID` = 37552;
