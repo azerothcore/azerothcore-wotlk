@@ -153,8 +153,7 @@ enum KTMisc
 {
     POINT_MIDDLE                        = 1,
     POINT_AIR                           = 2,
-    POINT_LAND                          = 3,
-    POINT_START_LAST_PHASE              = 4,
+    POINT_START_LAST_PHASE              = 3,
 
     DATA_RESURRECT_CAST                 = 1,
 
@@ -280,7 +279,7 @@ struct boss_kaelthas : public BossAI
         _phase = PHASE_NONE;
         _transitionSceneReached = false;
 
-        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HOVER, true);
+        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HOVER, true); // hover effect 36550 - Floating Drowned
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
         SetRoomState(GO_STATE_READY);
@@ -300,7 +299,6 @@ struct boss_kaelthas : public BossAI
         {
             _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             PhaseKaelExecute();
         }
     }
@@ -389,12 +387,16 @@ struct boss_kaelthas : public BossAI
 
     void MovementInform(uint32 type, uint32 point) override
     {
-        if (type != POINT_MOTION_TYPE)
+        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
             return;
 
         if (point == POINT_MIDDLE)
         {
             ExecuteMiddleEvent();
+        }
+        else if (point == POINT_AIR)
+        {
+            me->SetDisableGravity(true, false, false); // updating AnimationTier will break drowning animation later
         }
         else if (point == POINT_START_LAST_PHASE)
         {
@@ -463,6 +465,7 @@ struct boss_kaelthas : public BossAI
 
     void ExecuteMiddleEvent()
     {
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         scheduler.ClearValidator();
         me->SetTarget();
         me->SetFacingTo(M_PI);
@@ -565,8 +568,8 @@ struct boss_kaelthas : public BossAI
         ScheduleUniqueTimedEvent(32000ms, [&]
         {
             me->RemoveAurasDueToSpell(SPELL_FLOATING_DROWNED);
-            DoCastSelf(SPELL_KAEL_FULL_POWER);
             // me->RemoveAurasDueToSpell(SPELL_KAEL_STUNNED);
+            DoCastSelf(SPELL_KAEL_FULL_POWER, true);
             DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM4, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM5, true);
@@ -578,8 +581,10 @@ struct boss_kaelthas : public BossAI
             me->CastStop();
             me->GetMotionMaster()->Clear();
             me->RemoveAurasDueToSpell(SPELL_DARK_BANISH_STATE); // WRONG VISUAL
-            me->GetMotionMaster()->MoveLand(POINT_LAND, me->GetPositionX(), me->GetPositionY(), 48.0f, 2.99f); // Moveland doesn't handle POINT_START_LAST_PHASE so we need to use MovePoint
-            me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
+            me->SetDisableGravity(true);
+            me->SetOrientation(M_PI);
+            me->SendMovementFlagUpdate();
+            me->GetMotionMaster()->MoveLand(POINT_START_LAST_PHASE, me->GetHomePosition(), 2.99f);
         }, EVENT_SCENE_16);
     }
 
@@ -674,7 +679,6 @@ struct boss_kaelthas : public BossAI
                 me->AttackStop();
                 me->RemoveAllAttackers();
                 me->CastStop();
-                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                 me->SetReactState(REACT_PASSIVE);
                 me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
             }
@@ -1330,8 +1334,8 @@ class spell_kaelthas_kael_explodes : public SpellScript
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        // caster->CastSpell((Unit*)nullptr, SPELL_KAEL_STUNNED, TRIGGERED_NONE);
-        caster->CastSpell((Unit*)nullptr, SPELL_FLOATING_DROWNED, TRIGGERED_NONE);
+        // caster->CastSpell((Unit*)nullptr, SPELL_KAEL_STUNNED, true);
+        caster->CastSpell((Unit*)nullptr, SPELL_FLOATING_DROWNED, true);
         caster->PlayDirectSound(3320);
         caster->PlayDirectSound(10845);
         caster->PlayDirectSound(6539);
