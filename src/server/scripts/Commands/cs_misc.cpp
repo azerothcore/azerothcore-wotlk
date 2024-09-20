@@ -157,9 +157,6 @@ public:
 
         if (args.empty() || !tokens.size())
         {
-            handler->PSendSysMessage("Usage: .skirmish [arena] [XvX] [Nick1] [Nick2] ... [NickN]");
-            handler->PSendSysMessage("[arena] can be \"all\" or comma-separated list of possible arenas (NA, BE, RL, DS, RV).");
-            handler->PSendSysMessage("[XvX] can be 1v1, 2v2, 3v3, 5v5. After [XvX] specify enough nicknames for that mode.");
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -627,7 +624,7 @@ public:
 
         if (object->GetTransport())
         {
-            handler->PSendSysMessage("Transport offset: %.2f, %.2f, %.2f, %.2f", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
+            handler->PSendSysMessage("Transport offset: {:0.2f}, {:0.2f}, {:0.2f}, {:0.2f}", object->m_movementInfo.transport.pos.GetPositionX(), object->m_movementInfo.transport.pos.GetPositionY(), object->m_movementInfo.transport.pos.GetPositionZ(), object->m_movementInfo.transport.pos.GetOrientation());
         }
 
         return true;
@@ -1130,7 +1127,7 @@ public:
             return false;
         }
 
-        if (target->GetTypeId() == TYPEID_PLAYER)
+        if (target->IsPlayer())
         {
             if (handler->HasLowerSecurity(target->ToPlayer()))
             {
@@ -1142,7 +1139,7 @@ public:
         {
             if (sWorld->getBoolConfig(CONFIG_DIE_COMMAND_MODE))
             {
-                if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
+                if (target->IsCreature() && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
                 {
                     target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
                 }
@@ -2393,7 +2390,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (player->GetTarget() && target)
         {
-            if (target->GetTypeId() != TYPEID_UNIT || target->IsPet())
+            if (!target->IsCreature() || target->IsPet())
             {
                 handler->SendErrorMessage(LANG_SELECT_CREATURE);
                 return false;
@@ -2659,7 +2656,7 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_MOVEGENS_LIST, (unit->GetTypeId() == TYPEID_PLAYER ? "Player" : "Creature"), unit->GetGUID().ToString());
+        handler->PSendSysMessage(LANG_MOVEGENS_LIST, (unit->IsPlayer() ? "Player" : "Creature"), unit->GetGUID().ToString());
 
         MotionMaster* motionMaster = unit->GetMotionMaster();
         float x, y, z;
@@ -2694,7 +2691,7 @@ public:
                 case CHASE_MOTION_TYPE:
                 {
                     Unit* target = nullptr;
-                    if (unit->GetTypeId() == TYPEID_PLAYER)
+                    if (unit->IsPlayer())
                     {
                         target = static_cast<ChaseMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
                     }
@@ -2707,7 +2704,7 @@ public:
                     {
                         handler->SendSysMessage(LANG_MOVEGENS_CHASE_NULL);
                     }
-                    else if (target->GetTypeId() == TYPEID_PLAYER)
+                    else if (target->IsPlayer())
                     {
                         handler->PSendSysMessage(LANG_MOVEGENS_CHASE_PLAYER, target->GetName(), target->GetGUID().ToString());
                     }
@@ -2720,7 +2717,7 @@ public:
                 case FOLLOW_MOTION_TYPE:
                 {
                     Unit* target = nullptr;
-                    if (unit->GetTypeId() == TYPEID_PLAYER)
+                    if (unit->IsPlayer())
                     {
                         target = static_cast<FollowMovementGenerator<Player> const*>(movementGenerator)->GetTarget();
                     }
@@ -2733,7 +2730,7 @@ public:
                     {
                         handler->SendSysMessage(LANG_MOVEGENS_FOLLOW_NULL);
                     }
-                    else if (target->GetTypeId() == TYPEID_PLAYER)
+                    else if (target->IsPlayer())
                     {
                         handler->PSendSysMessage(LANG_MOVEGENS_FOLLOW_PLAYER, target->GetName(), target->GetGUID().ToString());
                     }
@@ -2745,7 +2742,7 @@ public:
                 }
                 case HOME_MOTION_TYPE:
                 {
-                    if (unit->GetTypeId() == TYPEID_UNIT)
+                    if (unit->IsCreature())
                     {
                         handler->PSendSysMessage(LANG_MOVEGENS_HOME_CREATURE, x, y, z);
                     }
@@ -2800,7 +2797,7 @@ public:
         return true;
     }
 
-    static bool HandleDamageCommand(ChatHandler* handler, uint32 damage)
+    static bool HandleDamageCommand(ChatHandler* handler, uint32 damage, Optional<std::string> percent)
     {
         Unit* target = handler->getSelectedUnit();
         if (!target || !handler->GetSession()->GetPlayer()->GetTarget())
@@ -2809,35 +2806,25 @@ public:
             return false;
         }
 
-        if (target->GetTypeId() == TYPEID_PLAYER)
-        {
+        if (target->IsPlayer())
             if (handler->HasLowerSecurity(target->ToPlayer()))
-            {
                 return false;
-            }
-        }
 
-        if (!target->IsAlive())
-        {
+        if (!target->IsAlive() || !damage)
             return true;
-        }
 
-        if (!damage)
-        {
-            return true;
-        }
-
-        if (target->GetTypeId() == TYPEID_UNIT && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
-        {
+        if (target->IsCreature() && handler->GetSession()->GetSecurity() == SEC_CONSOLE) // pussywizard
             target->ToCreature()->LowerPlayerDamageReq(target->GetMaxHealth());
-        }
+
+        if (percent)
+            if (StringStartsWith("pct", *percent))
+                if (damage <= 100)
+                    damage = target->CountPctFromMaxHealth(damage);
 
         Unit::DealDamage(handler->GetSession()->GetPlayer(), target, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false, true);
 
         if (target != handler->GetSession()->GetPlayer())
-        {
             handler->GetSession()->GetPlayer()->SendAttackStateUpdate(HITINFO_AFFECTS_VICTIM, target, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_HIT, 0);
-        }
 
         return true;
     }

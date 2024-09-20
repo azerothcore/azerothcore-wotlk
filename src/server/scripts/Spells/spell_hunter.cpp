@@ -231,7 +231,7 @@ class spell_hun_generic_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, owner->GetTotalAttackPowerValue(RANGED_ATTACK)), modifier);
 
             // xinef: Update appropriate player field
-            if (owner->GetTypeId() == TYPEID_PLAYER)
+            if (owner->IsPlayer())
                 owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
         }
     }
@@ -322,7 +322,7 @@ class spell_hun_aspect_of_the_beast : public AuraScript
 
     bool Load() override
     {
-        return GetCaster() && GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster() && GetCaster()->IsPlayer();
     }
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
@@ -655,7 +655,7 @@ class spell_hun_readiness : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -671,7 +671,7 @@ class spell_hun_readiness : public SpellScript
         std::set<std::pair<uint32, bool>> spellsToRemove;
         std::set<uint32> categoriesToRemove;
 
-        for (const auto& [spellId, cooldown] : cooldowns)
+        for (auto const& [spellId, cooldown] : cooldowns)
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             if (spellInfo
@@ -689,9 +689,9 @@ class spell_hun_readiness : public SpellScript
         }
 
         // we can't remove spell cooldowns while iterating.
-        for (const auto& [spellId, sendToClient] : spellsToRemove)
+        for (auto const& [spellId, sendToClient] : spellsToRemove)
             caster->RemoveSpellCooldown(spellId, sendToClient);
-        for (const auto& category : categoriesToRemove)
+        for (auto const& category : categoriesToRemove)
             caster->RemoveCategoryCooldown(category);
     }
 
@@ -708,7 +708,7 @@ class spell_hun_scatter_shot : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
@@ -930,7 +930,7 @@ class spell_hun_disengage : public SpellScript
     SpellCastResult CheckCast()
     {
         Unit* caster = GetCaster();
-        if (caster->GetTypeId() == TYPEID_PLAYER && !caster->IsInCombat())
+        if (caster->IsPlayer() && !caster->IsInCombat())
             return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
 
         return SPELL_CAST_OK;
@@ -950,7 +950,7 @@ class spell_hun_tame_beast : public SpellScript
     SpellCastResult CheckCast()
     {
         Unit* caster = GetCaster();
-        if (caster->GetTypeId() != TYPEID_PLAYER)
+        if (!caster->IsPlayer())
             return SPELL_FAILED_DONT_REPORT;
 
         Player* player = GetCaster()->ToPlayer();
@@ -1136,7 +1136,7 @@ class spell_hun_volley_trigger : public SpellScript
         {
             if (Unit* pet = *itr)
             {
-                if (pet->IsAlive() && pet->GetTypeId() == TYPEID_UNIT)
+                if (pet->IsAlive() && pet->IsCreature())
                 {
                     pet->ToCreature()->AI()->OwnerAttacked(_target->ToUnit());
                 }
@@ -1295,7 +1295,7 @@ class spell_hun_bestial_wrath : public SpellScript
     SpellCastResult CheckCast()
     {
         Unit* caster = GetCaster();
-        if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+        if (!caster || !caster->IsPlayer())
         {
             return SPELL_FAILED_NO_VALID_TARGETS;
         }
@@ -1378,4 +1378,3 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_bestial_wrath);
     RegisterSpellScript(spell_hun_target_self_and_pet);
 }
-

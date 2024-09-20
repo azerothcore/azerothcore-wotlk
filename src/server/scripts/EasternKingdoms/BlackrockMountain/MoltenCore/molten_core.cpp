@@ -129,7 +129,7 @@ class spell_mc_play_dead_aura : public AuraScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -268,4 +268,3 @@ void AddSC_molten_core()
     // Spells
     RegisterSpellScript(spell_mc_play_dead_aura);
 }
-

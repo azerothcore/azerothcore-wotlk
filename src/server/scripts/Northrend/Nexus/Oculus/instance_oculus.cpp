@@ -295,4 +295,3 @@ void AddSC_instance_oculus()
 {
     new instance_oculus();
 }
-

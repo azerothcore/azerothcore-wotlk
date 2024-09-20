@@ -290,7 +290,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->IsPlayer())
                 Talk(SAY_SLAY);
         }
 
@@ -542,7 +542,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        if (!target || target->GetTypeId() != TYPEID_UNIT)
+        if (!target || !target->IsCreature())
             return false;
         return !!target->ToCreature()->AI()->GetData(1337);
     }

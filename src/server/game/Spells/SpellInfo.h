@@ -407,6 +407,7 @@ public:
 
     uint32 GetCategory() const;
     bool HasEffect(SpellEffects effect) const;
+    bool HasEffectMechanic(Mechanics mechanic) const;
     bool HasAura(AuraType aura) const;
     bool HasAnyAura() const;
     bool HasAreaAuraEffect() const;

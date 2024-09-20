@@ -711,7 +711,7 @@ public:
             if (_introSpoken)
                 return;
 
-            if (who->GetTypeId() != TYPEID_PLAYER || me->GetExactDist2d(who) > 15.0f)
+            if (!who->IsPlayer() || me->GetExactDist2d(who) > 15.0f)
                 return;
 
             _introSpoken = true;
@@ -1153,7 +1153,7 @@ public:
 
     bool OnCheck(Player*  /*player*/, Unit* target, uint32 /*criteria_id*/) override
     {
-        return target && target->GetTypeId() == TYPEID_UNIT && target->GetEntry() == NPC_RAZORSCALE && target->ToCreature()->AI()->GetData(1);
+        return target && target->IsCreature() && target->GetEntry() == NPC_RAZORSCALE && target->ToCreature()->AI()->GetData(1);
     }
 };
 
@@ -1181,4 +1181,3 @@ void AddSC_boss_razorscale()
     new achievement_quick_shave();
     new achievement_iron_dwarf_medium_rare();
 }
-

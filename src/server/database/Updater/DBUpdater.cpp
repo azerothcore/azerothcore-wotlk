@@ -235,7 +235,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
 
     auto CheckUpdateTable = [&](std::string const& tableName)
     {
-        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormatFmt("SHOW TABLES LIKE '{}'", tableName));
+        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '{}'", tableName));
         if (!checkTable)
         {
             LOG_WARN("sql.updates", "> Table '{}' not exist! Try add based table", tableName);
@@ -279,7 +279,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
         return false;
     }
 
-    std::string const info = Acore::StringFormatFmt("Containing {} new and {} archived updates.", result.recent, result.archived);
+    std::string const info = Acore::StringFormat("Containing {} new and {} archived updates.", result.recent, result.archived);
 
     if (!result.updated)
         LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", DBUpdater<T>::GetTableName(), info);
@@ -307,7 +307,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> 
 
     auto CheckUpdateTable = [&](std::string const& tableName)
     {
-        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormatFmt("SHOW TABLES LIKE '{}'", tableName));
+        auto checkTable = DBUpdater<T>::Retrieve(pool, Acore::StringFormat("SHOW TABLES LIKE '{}'", tableName));
         if (!checkTable)
         {
             Path const temp(GetBaseFilesDirectory() + tableName + ".sql");
@@ -493,21 +493,12 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
     // Set max allowed packet to 1 GB
     args.emplace_back("--max-allowed-packet=1GB");
 
-#if !defined(MARIADB_VERSION_ID) && MYSQL_VERSION_ID >= 80000
-
     if (ssl == "ssl")
         args.emplace_back("--ssl-mode=REQUIRED");
 
-#else
-
-    if (ssl == "ssl")
-        args.emplace_back("--ssl");
-
-#endif
-
     // Execute sql file
     args.emplace_back("-e");
-    args.emplace_back(Acore::StringFormat("BEGIN; SOURCE %s; COMMIT;", path.generic_string().c_str()));
+    args.emplace_back(Acore::StringFormat("BEGIN; SOURCE {}; COMMIT;", path.generic_string()));
 
     // Database
     if (!database.empty())

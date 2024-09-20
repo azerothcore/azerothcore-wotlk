@@ -364,7 +364,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && events.GetNextEventTime(EVENT_NO_KILL_TALK) == 0)
+            if (victim->IsPlayer() && events.GetNextEventTime(EVENT_NO_KILL_TALK) == 0)
                 Talk(SAY_KJ_SLAY);
         }
 
@@ -1088,7 +1088,7 @@ class spell_kiljaeden_sinister_reflection_clone : public SpellScript
         WorldObject* target = targets.front();
 
         targets.clear();
-        if (target && target->GetTypeId() == TYPEID_UNIT)
+        if (target && target->IsCreature())
         {
             target->ToCreature()->AI()->SetData(1, GetCaster()->getClass());
             targets.push_back(target);
@@ -1133,7 +1133,7 @@ class spell_kiljaeden_darkness_aura : public AuraScript
 
     void HandleRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (GetUnitOwner()->GetTypeId() == TYPEID_UNIT)
+        if (GetUnitOwner()->IsCreature())
             GetUnitOwner()->ToCreature()->AI()->DoAction(ACTION_NO_KILL_TALK);
 
         GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DARKNESS_OF_A_THOUSAND_SOULS_DAMAGE, true);
@@ -1262,4 +1262,3 @@ void AddSC_boss_kiljaeden()
     RegisterSpellScript(spell_kiljaeden_armageddon_missile);
     RegisterSpellScript(spell_kiljaeden_dragon_breath);
 }
-

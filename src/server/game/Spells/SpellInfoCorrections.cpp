@@ -3954,12 +3954,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx7 |= SPELL_ATTR7_CAN_CAUSE_INTERRUPT;
     });
 
-    // Ritual of Summoning
-    ApplySpellFix({ 61994 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->ManaCostPercentage = 0; // Clicking on Warlock Summoning portal should not require mana
-    });
-
     // Shadowmeld
     ApplySpellFix({ 58984 }, [](SpellInfo* spellInfo)
     {
@@ -4804,6 +4798,43 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 41453 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].MiscValue = 124;
+    });
+
+    // Power of the Guardian
+    ApplySpellFix({ 28142, 28143, 28144, 28145 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
+    });
+
+    // Warrior stances passives
+    ApplySpellFix({
+        2457, // Battle Stance
+        2458, // Berserker Stance
+        7376  // Defensive Stance Passive
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_CASTER_PROCS;
+    });
+
+    // Conjure Refreshment Table (Rank 1, Rank 2)
+    ApplySpellFix({ 43985, 58661 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER_FRONT);
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_5_YARDS);
+    });
+
+    ApplySpellFix({
+        698, // Ritual of Summoning (portal for clicking)
+        61993 // Ritual of Summoning (summons the closet)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_3_YARDS);
+    });
+
+    // Paralyze
+    ApplySpellFix({ 41083 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_ACTION_DURING_CHANNEL;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

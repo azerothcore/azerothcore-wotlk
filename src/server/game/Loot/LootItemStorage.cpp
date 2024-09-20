@@ -214,7 +214,7 @@ bool LootItemStorage::LoadStoredLoot(Item* item, Player* player)
             // non-conditional one-player only items are counted here,
             // free for all items are counted in FillFFALoot(),
             // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
-            if ((!li.needs_quest && li.conditions.empty() && !(proto->Flags & ITEM_FLAG_MULTI_DROP)) || li.is_counted)
+            if ((!li.needs_quest && li.conditions.empty() && !proto->HasFlag(ITEM_FLAG_MULTI_DROP)) || li.is_counted)
             {
                 ++loot->unlootedCount;
             }

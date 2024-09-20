@@ -209,7 +209,7 @@ public:
 
     bool operator()(Unit const* target) const
     {
-        if (!me || !target || target->GetTypeId() != TYPEID_PLAYER)
+        if (!me || !target || !target->IsPlayer())
             return false;
 
         if (me->IsWithinCombatRange(target, 7.0f))
@@ -333,7 +333,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim->IsPlayer())
                 Talk(SAY_KILL);
         }
 
@@ -952,7 +952,7 @@ class spell_putricide_unstable_experiment : public SpellScript
     void HandleScript(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        if (GetCaster()->GetTypeId() != TYPEID_UNIT)
+        if (!GetCaster()->IsCreature())
             return;
 
         Creature* creature = GetCaster()->ToCreature();
@@ -1044,7 +1044,7 @@ class spell_putricide_ooze_channel : public SpellScript
     bool Load() override
     {
         _target = nullptr;
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void SelectTarget(std::list<WorldObject*>& targets)
@@ -1318,7 +1318,7 @@ class spell_putricide_mutation_init : public SpellScript
         if (!GetExplTargetUnit())
             return SPELL_FAILED_BAD_TARGETS;
 
-        if (GetExplTargetUnit()->GetTypeId() != TYPEID_PLAYER)
+        if (!GetExplTargetUnit()->IsPlayer())
             return SPELL_FAILED_TARGET_NOT_PLAYER;
 
         SpellCustomErrors extension = SPELL_CUSTOM_ERROR_NONE;
@@ -1547,4 +1547,3 @@ void AddSC_boss_professor_putricide()
     RegisterSpellScript(spell_putricide_eat_ooze);
     RegisterSpellScript(spell_putricide_regurgitated_ooze);
 }
-
