@@ -486,7 +486,7 @@ struct boss_kaelthas : public BossAI
                     trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
             me->SetDisableGravity(true);
             me->SendMovementFlagUpdate();
-            me->GetMotionMaster()->MoveTakeoff(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 75.0f, 2.99);
+            me->GetMotionMaster()->MoveTakeoff(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 75.0f, 2.99, true); // AnimType Movement::ToFly does not exist for Kael
             DoCastSelf(SPELL_GROW, true);
         }, EVENT_SCENE_3);
         ScheduleUniqueTimedEvent(7000ms, [&]
