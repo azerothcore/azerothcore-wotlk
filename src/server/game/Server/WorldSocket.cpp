@@ -491,7 +491,6 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             break;
         }
 
-
         default:
             packetToQueue = new WorldPacket(std::move(packet));
             break;
