@@ -1313,7 +1313,7 @@ struct npc_flame_of_azzinoth : public ScriptedAI
     {
         ScheduleTimedEvent(10s, [&] {
             if (Creature* _blade = ObjectAccessor::GetCreature(*me, _bladeGUID))
-                if (Unit* target = _blade->AI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true))
+                if (Unit* target = _blade->AI()->SelectTarget(SelectTargetMethod::Random, 0, -40.0f, true))
                     DoCast(target, SPELL_CHARGE);
         }, 5s, 20s);
 
@@ -1463,16 +1463,6 @@ class spell_illidan_tear_of_azzinoth_summon_channel_aura : public AuraScript
                 GetTarget()->CastSpell(GetTarget(), SPELL_UNCAGED_WRATH, true);
             }
         }
-
-        // xinef: ugly hax, dunno how it really works on blizz
-        Map::PlayerList const& pl = GetTarget()->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-            if (Player* player = itr->GetSource())
-                if (player->GetPositionX() > 693.4f || player->GetPositionY() < 271.8f || player->GetPositionX() < 658.43f || player->GetPositionY() > 338.68f)
-                {
-                    GetTarget()->CastSpell(player, SPELL_CHARGE, true);
-                    break;
-                }
     }
 
     void Register() override
