@@ -301,7 +301,24 @@ struct boss_kaelthas : public BossAI
         {
             _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
-            PhaseKaelExecute();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
+            Talk(SAY_INTRO);
+            DoCastAOE(SPELL_REMOVE_ENCHANTED_WEAPONS, true);
+            ScheduleUniqueTimedEvent(23s, [&]
+            {
+                Talk(SAY_INTRO_THALADRED);
+            }, EVENT_PREFIGHT_PHASE1_01);
+            ScheduleUniqueTimedEvent(30s, [&]
+            {
+                if (Creature* thaladred = summons.GetCreatureWithEntry(NPC_THALADRED))
+                {
+                    thaladred->SetReactState(REACT_AGGRESSIVE);
+                    thaladred->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                        thaladred->AI()->AttackStart(target);
+                    thaladred->SetInCombatWithZone();
+                }
+            }, EVENT_PREFIGHT_PHASE1_02);
         }
     }
 
