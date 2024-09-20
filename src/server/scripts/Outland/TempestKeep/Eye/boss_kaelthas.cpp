@@ -190,7 +190,9 @@ enum KTTransitionScene
     EVENT_SCENE_13                      = 62,
     EVENT_SCENE_14                      = 63,
     EVENT_SCENE_15                      = 64,
-    EVENT_SCENE_16                      = 65
+    EVENT_SCENE_16                      = 65,
+    EVENT_SCENE_17                      = 66,
+    EVENT_SCENE_18                      = 67
 };
 
 enum KTActions
@@ -566,16 +568,24 @@ struct boss_kaelthas : public BossAI
             if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX()-5, me->GetPositionY()+5, me->GetPositionZ()+15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                 trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM3, true);
         }, EVENT_SCENE_14);
+        ScheduleUniqueTimedEvent(30500ms, [&]
+        {
+            me->SetFacingTo(M_PI);
+            me->RemoveAurasDueToSpell(SPELL_FLOATING_DROWNED);
+            me->CastStop();
+        }, EVENT_SCENE_15);
+        ScheduleUniqueTimedEvent(30700ms, [&]
+        {
+            me->CastStop();
+            DoCastSelf(SPELL_KAEL_FULL_POWER);
+        }, EVENT_SCENE_16);
         ScheduleUniqueTimedEvent(32000ms, [&]
         {
-            me->RemoveAurasDueToSpell(SPELL_FLOATING_DROWNED);
-            // me->RemoveAurasDueToSpell(SPELL_KAEL_STUNNED);
-            DoCastSelf(SPELL_KAEL_FULL_POWER, true);
             DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM4, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM5, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM6, true);
-        }, EVENT_SCENE_15);
+        }, EVENT_SCENE_17);
         ScheduleUniqueTimedEvent(36000ms, [&]
         {
             summons.DespawnEntry(WORLD_TRIGGER);
@@ -583,10 +593,9 @@ struct boss_kaelthas : public BossAI
             me->GetMotionMaster()->Clear();
             me->RemoveAurasDueToSpell(SPELL_DARK_BANISH_STATE); // WRONG VISUAL
             me->SetDisableGravity(true);
-            me->SetOrientation(M_PI);
             me->SendMovementFlagUpdate();
             me->GetMotionMaster()->MoveLand(POINT_START_LAST_PHASE, me->GetHomePosition(), 2.99f);
-        }, EVENT_SCENE_16);
+        }, EVENT_SCENE_18);
     }
 
     void IntroduceNewAdvisor(KTYells talkIntroduction, KTActions kaelAction)
@@ -1334,8 +1343,8 @@ class spell_kaelthas_kael_explodes : public SpellScript
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        // caster->CastSpell((Unit*)nullptr, SPELL_KAEL_STUNNED, true);
         caster->CastSpell((Unit*)nullptr, SPELL_FLOATING_DROWNED, true);
+        // caster->CastSpell((Unit*)nullptr, SPELL_KAEL_STUNNED, true);
         caster->PlayDirectSound(3320);
         caster->PlayDirectSound(10845);
         caster->PlayDirectSound(6539);
