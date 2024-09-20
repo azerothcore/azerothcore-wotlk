@@ -84,6 +84,7 @@ private:
     bool HandleReconnectChallenge();
     bool HandleReconnectProof();
     bool HandleRealmList();
+    bool HandleRelayPacket();
 
     void CheckIpCallback(PreparedQueryResult result);
     void LogonChallengeCallback(PreparedQueryResult result);

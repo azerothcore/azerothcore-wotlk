@@ -1338,7 +1338,8 @@ enum Opcodes : uint16
     SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT1         = 0x51C,
     SMSG_COMMENTATOR_SKIRMISH_QUEUE_RESULT2         = 0x51D,
     SMSG_MULTIPLE_MOVES                             = 0x51E, // uncompressed version of SMSG_COMPRESSED_MOVES
-    NUM_MSG_TYPES                                   = 0x51F
+    NUM_MSG_TYPES                                   = 0x51F,
+    RELAY_SERVER_CMD_WORLD                          = 0xA32 // Relay packet from relay server to worldserver according to the https://github.com/masterking32/WoW-Server-Relay
 };
 
 enum OpcodeMisc : uint16

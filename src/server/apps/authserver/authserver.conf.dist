@@ -12,6 +12,7 @@
 #    CRYPTOGRAPHY
 #    UPDATE SETTINGS
 #    LOGGING SYSTEM SETTINGS
+#    CONFIGURATION FOR RELAY SERVER
 #
 ###################################################################################################
 
@@ -437,6 +438,18 @@ Appender.Auth=2,5,0,Auth.log,w
 #
 
 Logger.root=4,Console Auth
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+#   CONFIGURATION FOR RELAY SERVER
+#   Secret Key for Relay Server
+#       Please use a secure key that is between 32 and 64 characters in length. Note that the maximum length allowed is 64 characters.
+#
+
+RelayServerSecret = "secret"
 
 #
 ###################################################################################################

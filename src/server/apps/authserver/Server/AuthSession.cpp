@@ -25,6 +25,7 @@
 #include "DatabaseEnv.h"
 #include "Errors.h"
 #include "IPLocation.h"
+#include "IpAddress.h"
 #include "Log.h"
 #include "RealmList.h"
 #include "SecretMgr.h"
@@ -46,7 +47,8 @@ enum eAuthCmd
     XFER_DATA = 0x31,
     XFER_ACCEPT = 0x32,
     XFER_RESUME = 0x33,
-    XFER_CANCEL = 0x34
+    XFER_CANCEL = 0x34,
+    RELAY_PACKET = 0x64 // Relay packet from relay server to auth server according to the https://github.com/masterking32/WoW-Server-Relay
 };
 
 #pragma pack(push, 1)
@@ -111,6 +113,16 @@ typedef struct AUTH_RECONNECT_PROOF_C
 } sAuthReconnectProof_C;
 static_assert(sizeof(sAuthReconnectProof_C) == (1 + 16 + 20 + 20 + 1));
 
+typedef struct RELAY_PACKET_C
+{
+    uint8    cmd;
+    uint16   secret_len;
+    uint16   ip_len;
+    uint8    secret[1];
+    uint8    ip[1];
+} sRelayPacket_C;
+static_assert(sizeof(sRelayPacket_C) == (1 + 2 + 2 + 1 + 1)); // 1 byte for the cmd, 2 bytes for the secret length, 2 bytes for the IP length
+
 #pragma pack(pop)
 
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
@@ -119,6 +131,7 @@ std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B,
 
 #define AUTH_LOGON_CHALLENGE_INITIAL_SIZE 4
 #define REALM_LIST_PACKET_SIZE 5
+#define MAX_RELAY_PACKET_SIZE (sizeof(RELAY_PACKET_C) + 64 + 46) // 64 bytes for the secret, 46 bytes for the IP address (Even though IPv6 is 39 bytes, we use 46 bytes to be safe)
 
 std::unordered_map<uint8, AuthHandler> AuthSession::InitHandlers()
 {
@@ -129,6 +142,7 @@ std::unordered_map<uint8, AuthHandler> AuthSession::InitHandlers()
     handlers[AUTH_RECONNECT_CHALLENGE] =    { STATUS_CHALLENGE,         AUTH_LOGON_CHALLENGE_INITIAL_SIZE, &AuthSession::HandleReconnectChallenge };
     handlers[AUTH_RECONNECT_PROOF] =        { STATUS_RECONNECT_PROOF,   sizeof(AUTH_RECONNECT_PROOF_C),    &AuthSession::HandleReconnectProof };
     handlers[REALM_LIST] =                  { STATUS_AUTHED,            REALM_LIST_PACKET_SIZE,            &AuthSession::HandleRealmList };
+    handlers[RELAY_PACKET] =                { STATUS_CHALLENGE,         sizeof(RELAY_PACKET_C),            &AuthSession::HandleRelayPacket };
 
     return handlers;
 }
@@ -252,6 +266,16 @@ void AuthSession::ReadHandler()
                 return;
             }
         }
+        else if (cmd == RELAY_PACKET)
+        {
+            sRelayPacket_C* relayPacket = reinterpret_cast<sRelayPacket_C*>(packet.GetReadPointer());
+            size += relayPacket->secret_len + relayPacket->ip_len - 2; // -2 because the secret and IP lengths are already included in the size
+            if (size > MAX_RELAY_PACKET_SIZE)
+            {
+                CloseSocket();
+                return;
+            }
+        }
 
         if (packet.GetActiveSize() < size)
             break;
@@ -279,6 +303,77 @@ void AuthSession::SendPacket(ByteBuffer& packet)
         buffer.Write(packet.contents(), packet.size());
         QueuePacket(std::move(buffer));
     }
+}
+
+bool AuthSession::HandleRelayPacket()
+{
+    sRelayPacket_C* relayPacket = reinterpret_cast<sRelayPacket_C*>(GetReadBuffer().GetReadPointer());
+
+    if (relayPacket->secret_len > 64 || relayPacket->ip_len > 46)
+    {
+        LOG_DEBUG("server.authserver", "[RelayPacket] Relay packet is too large");
+        _status = STATUS_CLOSED; // Close the connection if the packet is too large
+        return false;
+    }
+
+    if (relayPacket->secret_len < 1 || relayPacket->ip_len < 1)
+    {
+        LOG_DEBUG("server.authserver", "[RelayPacket] Relay packet is too small");
+        _status = STATUS_CLOSED; // Close the connection if the packet is too small
+        return false;
+    }
+
+    std::string secret(reinterpret_cast<char const*>(relayPacket->secret), relayPacket->secret_len);
+    std::string ip(reinterpret_cast<char const*>(relayPacket->secret + relayPacket->secret_len), relayPacket->ip_len);
+    std::string configSecretKey = sConfigMgr->GetOption<std::string>("RelayServerSecret", "secret");
+
+    if (configSecretKey.empty() || configSecretKey == "secret")
+    {
+        LOG_ERROR("server.authserver", "[RelayPacket] Relay server secret is not set or is default. Please set a unique secret key with a maximum of 64 characters in the authserver.conf configuration file.");
+        _status = STATUS_CLOSED; // Close the connection if the secret is not set
+        return false;
+    }
+
+    if (secret != configSecretKey)
+    {
+        LOG_DEBUG("server.authserver", "[RelayPacket] Invalid secret");
+        _status = STATUS_CLOSED; // Close the connection if the secret is invalid
+        return false;
+    }
+
+    if (ip.empty())
+    {
+        LOG_DEBUG("server.authserver", "[RelayPacket] IP is empty");
+        _status = STATUS_CLOSED; // Close the connection if the IP is empty
+        return false;
+    }
+
+    boost::system::error_code ip_error;
+    boost::asio::ip::address ip_address = Acore::Net::make_address(ip, ip_error);
+
+    if (ip_error)
+    {
+        LOG_DEBUG("server.authserver", "[RelayPacket] Invalid IP '{}'", ip);
+        _status = STATUS_CLOSED; // Close the connection if the IP is invalid
+        return false;
+    }
+
+    std::string RelayIPAddress = GetRemoteIpAddress().to_string();
+
+    SetRemoteIpAddress(ip_address); // Change the remote IP address to the one received from the relay server
+
+    std::string UserIPAddress = GetRemoteIpAddress().to_string();
+
+    LOG_DEBUG("server.authserver", "[RelayPacket] Received relay packet from '{}' for IP '{}'", RelayIPAddress, UserIPAddress);
+
+    // We need to check the database once again to determine if the client's IP is banned or not.
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_INFO);
+
+    stmt->SetData(0, UserIPAddress);
+
+    _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&AuthSession::CheckIpCallback, this, std::placeholders::_1)));
+
+    return true;
 }
 
 bool AuthSession::HandleLogonChallenge()

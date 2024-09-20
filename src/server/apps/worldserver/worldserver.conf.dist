@@ -17,6 +17,7 @@
 #    PERFORMANCE
 #    LOGGING
 #    METRIC
+#    CONFIGURATION FOR RELAY SERVER
 #    SERVER
 #    PACKET SPOOF PROTECTION SETTINGS
 #    WARDEN
@@ -849,6 +850,18 @@ Metric.OverallStatusInterval = 1
 
 #Metric.Threshold.world_update_sessions_time = 100
 #Metric.Threshold.worldsession_update_opcode_time = 50
+
+#
+###################################################################################################
+
+###################################################################################################
+#
+#   CONFIGURATION FOR RELAY SERVER
+#   Secret Key for Relay Server
+#       Please use a secure key that is between 32 and 64 characters in length. Note that the maximum length allowed is 64 characters.
+#
+
+RelayServerSecret = "secret"
 
 #
 ###################################################################################################

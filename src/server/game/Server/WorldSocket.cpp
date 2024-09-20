@@ -23,6 +23,7 @@
 #include "DatabaseEnv.h"
 #include "GameTime.h"
 #include "IPLocation.h"
+#include "IpAddress.h"
 #include "Opcodes.h"
 #include "PacketLog.h"
 #include "Random.h"
@@ -32,6 +33,7 @@
 #include "WorldSession.h"
 #include "zlib.h"
 #include <memory>
+#include <Config.h>
 
 using boost::asio::ip::tcp;
 
@@ -341,6 +343,12 @@ struct AuthSession
     ByteBuffer AddonInfo;
 };
 
+struct RelayPacketInfo
+{
+    std::string SecretKey;
+    std::string UserIP;
+};
+
 struct AccountInfo
 {
     uint32 Id;
@@ -421,6 +429,27 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             LOG_ERROR("network", "WorldSocket::ReadDataHandler(): client {} sent malformed CMSG_PING", GetRemoteIpAddress().to_string());
             return ReadDataHandlerResult::Error;
         }
+
+        case RELAY_SERVER_CMD_WORLD:
+        {
+            LogOpcodeText(opcode, sessionGuard);
+
+            if (_authed)
+            {
+                return ReadDataHandlerResult::Error;
+            }
+
+            try
+            {
+                HandleRelayPacket(packet);
+                return ReadDataHandlerResult::WaitingForQuery;
+            }
+            catch (ByteBufferException const&) {}
+
+            LOG_ERROR("network", "WorldSocket::ReadDataHandler(): client {} sent malformed RELAY_SERVER_CMD_WORLD", GetRemoteIpAddress().to_string());
+            return ReadDataHandlerResult::Error;
+        }
+
         case CMSG_AUTH_SESSION:
         {
             LogOpcodeText(opcode, sessionGuard);
@@ -442,7 +471,9 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             LOG_ERROR("network", "WorldSocket::ReadDataHandler(): client {} sent malformed CMSG_AUTH_SESSION", GetRemoteIpAddress().to_string());
             return ReadDataHandlerResult::Error;
         }
+
         case CMSG_KEEP_ALIVE: /// @todo: handle this packet in the same way of CMSG_TIME_SYNC_RESP
+        {
             sessionGuard.lock();
             LogOpcodeText(opcode, sessionGuard);
             if (_worldSession)
@@ -452,9 +483,15 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
             }
             LOG_ERROR("network", "WorldSocket::ReadDataHandler: client {} sent CMSG_KEEP_ALIVE without being authenticated", GetRemoteIpAddress().to_string());
             return ReadDataHandlerResult::Error;
+        }
+
         case CMSG_TIME_SYNC_RESP:
+        {
             packetToQueue = new WorldPacket(std::move(packet), GameTime::Now());
             break;
+        }
+
+
         default:
             packetToQueue = new WorldPacket(std::move(packet));
             break;
@@ -519,6 +556,87 @@ void WorldSocket::SendPacket(WorldPacket const& packet)
         sPacketLog->LogPacket(packet, SERVER_TO_CLIENT, GetRemoteIpAddress(), GetRemotePort());
 
     _bufferQueue.Enqueue(new EncryptableAndCompressiblePacket(packet, _authCrypt.IsInitialized()));
+}
+
+void WorldSocket::HandleRelayPacket(WorldPacket& recvPacket)
+{
+    std::shared_ptr<RelayPacketInfo> relayPacketInfo = std::make_shared<RelayPacketInfo>();
+
+    // Read the content of the packet
+    recvPacket >> relayPacketInfo->SecretKey; // Secret key used to authenticate the relay server
+    recvPacket >> relayPacketInfo->UserIP; // User IP sent by the relay server
+
+    std::string ConfigSecretKey = sConfigMgr->GetOption<std::string>("RelayServerSecret", "secret"); // Get the secret key from the configuration file
+
+    if (ConfigSecretKey.empty() || ConfigSecretKey == "secret")
+    {
+        SendAuthResponseError(AUTH_REJECT);
+        LOG_ERROR("network", "WorldSocket::HandleRelayPacket: Relay server secret is not set or is default. Please set a unique secret key with a maximum of 64 characters in the worldserver.conf configuration file.");
+        DelayedCloseSocket();
+        return;
+    }
+
+    if (relayPacketInfo->SecretKey.empty() || relayPacketInfo->SecretKey != ConfigSecretKey)
+    {
+        SendAuthResponseError(AUTH_REJECT);
+        LOG_ERROR("network", "WorldSocket::HandleRelayPacket: Sent Auth Response (invalid secret key).");
+        DelayedCloseSocket();
+        return;
+    }
+
+    if (relayPacketInfo->UserIP.empty())
+    {
+        SendAuthResponseError(AUTH_REJECT);
+        LOG_ERROR("network", "WorldSocket::HandleRelayPacket: Sent Auth Response (invalid user IP).");
+        DelayedCloseSocket();
+        return;
+    }
+
+    boost::system::error_code ip_error;
+    boost::asio::ip::address ip_address = Acore::Net::make_address(relayPacketInfo->UserIP, ip_error);
+
+    if (ip_error)
+    {
+        SendAuthResponseError(AUTH_REJECT);
+        LOG_ERROR("network", "WorldSocket::HandleRelayPacket: Sent Auth Response (invalid user IP).");
+        DelayedCloseSocket();
+        return;
+    }
+
+    std::string RelayIPAddress = GetRemoteIpAddress().to_string();
+
+    SetRemoteIpAddress(ip_address); // Change the remote IP address to the one received from the relay server
+
+    std::string UserIPAddress = GetRemoteIpAddress().to_string();
+
+    LOG_DEBUG("network", "WorldSocket::HandleRelayPacket: Changed remote IP address from '{}' to '{}'.", RelayIPAddress, UserIPAddress);
+
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_IP_INFO);
+
+    stmt->SetData(0, UserIPAddress);
+
+    _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSocket::CheckIpCallbackRelay, this, std::placeholders::_1)));
+}
+void WorldSocket::CheckIpCallbackRelay(PreparedQueryResult result)
+{
+    if (result)
+    {
+        bool banned = false;
+        do
+        {
+            Field* fields = result->Fetch();
+            if (fields[0].Get<uint64>() != 0)
+                banned = true;
+        } while (result->NextRow());
+        if (banned)
+        {
+            SendAuthResponseError(AUTH_REJECT);
+            LOG_ERROR("network", "WorldSocket::CheckIpCallbackRelay: Sent Auth Response (IP {} banned).", GetRemoteIpAddress().to_string());
+            DelayedCloseSocket();
+            return;
+        }
+    }
+    AsyncRead();
 }
 
 void WorldSocket::HandleAuthSession(WorldPacket & recvPacket)

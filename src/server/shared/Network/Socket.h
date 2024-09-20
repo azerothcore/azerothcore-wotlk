@@ -92,6 +92,17 @@ public:
         return _remoteAddress;
     }
 
+    bool SetRemoteIpAddress(const boost::asio::ip::address& address)
+    {
+        if (_RealRemoteAddress.is_unspecified())
+        {
+            _RealRemoteAddress = address;
+            return true;
+        }
+
+        return false;
+    }
+
     [[nodiscard]] uint16 GetRemotePort() const
     {
         return _remotePort;
@@ -416,6 +427,7 @@ private:
     tcp::socket _socket;
 
     boost::asio::ip::address _remoteAddress;
+    boost::asio::ip::address _RealRemoteAddress;
     uint16 _remotePort;
 
     MessageBuffer _readBuffer;
