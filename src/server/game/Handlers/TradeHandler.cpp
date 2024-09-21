@@ -462,12 +462,12 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         // execute trade: 2. store
         moveItems(myItems, hisItems);
 
-        if( my_trade->GetMoney() >= 10 * GOLD )
+        if (my_trade->GetMoney() >= 10 * GOLD )
         {
             CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"goods\", NOW(), {})",
                 GetAccountId(), _player->GetGUID().GetCounter(), _player->GetName(), GetRemoteAddress(), trader->GetSession()->GetAccountId(), trader->GetName(), my_trade->GetMoney(), 6);
         }
-        if( his_trade->GetMoney() >= 10 * GOLD )
+        if (his_trade->GetMoney() >= 10 * GOLD )
         {
             CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"goods\", NOW(), {})",
                 trader->GetSession()->GetAccountId(), trader->GetGUID().GetCounter(), trader->GetName(), trader->GetSession()->GetRemoteAddress(), GetAccountId(), _player->GetName(), his_trade->GetMoney(), 6);

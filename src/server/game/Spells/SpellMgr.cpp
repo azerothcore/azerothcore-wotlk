@@ -3038,7 +3038,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
             {
                 if (spellInfo->Effects[j].Effect)
                 {
-                    switch(spellInfo->Effects[j].Effect)
+                    switch (spellInfo->Effects[j].Effect)
                     {
                         case SPELL_EFFECT_SCHOOL_DAMAGE:
                         case SPELL_EFFECT_WEAPON_DAMAGE:
@@ -3503,7 +3503,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
         {
             if (spellInfo->Effects[j].ApplyAuraName && spellInfo->Effects[j].TriggerSpell)
             {
-                switch(spellInfo->Effects[j].ApplyAuraName)
+                switch (spellInfo->Effects[j].ApplyAuraName)
                 {
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                     case SPELL_AURA_PERIODIC_TRIGGER_SPELL_FROM_CLIENT:

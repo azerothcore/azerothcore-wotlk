@@ -1160,7 +1160,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
     ObjectGuid guid1 = getGuid(playerName1);
     ObjectGuid guid2 = getGuid(playerName2);
 
-    if(!guid1 || !guid2)
+    if (!guid1 || !guid2)
     {
         SendPartyResult(PARTY_OP_SWAP, playerName1, ERR_GROUP_SWAP_FAILED);
         return;

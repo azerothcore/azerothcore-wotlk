@@ -1573,7 +1573,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         ItemPosCountVec dest;
                         InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, roll->itemid, item->count);
 
-                        if(msg == EQUIP_ERR_OK)
+                        if (msg == EQUIP_ERR_OK)
                         {
                             player->AutoStoreLoot(pProto->DisenchantID, LootTemplates_Disenchant, true);
                         }

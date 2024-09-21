@@ -194,7 +194,7 @@ public:
 
             _events.Update(diff);
 
-            switch(_events.ExecuteEvent())
+            switch (_events.ExecuteEvent())
             {
                 case EVENT_SPELL_FIREBLAST:
                     DoCastVictim(SPELL_FIREBLAST);

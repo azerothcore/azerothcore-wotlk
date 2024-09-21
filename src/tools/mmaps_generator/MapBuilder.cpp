@@ -461,7 +461,7 @@ namespace MMAP
     /**************************************************************************/
     void TileBuilder::buildTile(uint32 mapID, uint32 tileX, uint32 tileY, dtNavMesh* navMesh)
     {
-        if(shouldSkipTile(mapID, tileX, tileY))
+        if (shouldSkipTile(mapID, tileX, tileY))
         {
             ++m_mapBuilder->m_totalTilesProcessed;
             return;

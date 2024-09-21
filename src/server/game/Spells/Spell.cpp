@@ -3069,7 +3069,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
         {
             // for delayed spells ignore negative spells (after duel end) for friendly targets
             /// @todo: this cause soul transfer bugged
-            if(!IsTriggered() && m_spellInfo->Speed > 0.0f && unit->IsPlayer() && !m_spellInfo->IsPositive())
+            if (!IsTriggered() && m_spellInfo->Speed > 0.0f && unit->IsPlayer() && !m_spellInfo->IsPositive())
                 return SPELL_MISS_EVADE;
 
             // assisting case, healing and resurrection
@@ -3248,7 +3248,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
             HandleEffects(unit, nullptr, nullptr, effectNumber, SPELL_EFFECT_HANDLE_HIT_TARGET);
     }
 
-    if( sanct_effect >= 0 && (effectMask & (1 << sanct_effect)) )
+    if (sanct_effect >= 0 && (effectMask & (1 << sanct_effect)))
         HandleEffects(unit, nullptr, nullptr, sanct_effect, SPELL_EFFECT_HANDLE_HIT_TARGET);
 
     return SPELL_MISS_NONE;
@@ -3275,7 +3275,7 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
             m_caster->CastSpell(unit, 61988, true);
 
         // Fearie Fire (Feral) - damage
-        if( m_preCastSpell == 60089 )
+        if (m_preCastSpell == 60089)
             m_caster->CastSpell(unit, m_preCastSpell, true);
         else if (sSpellMgr->GetSpellInfo(m_preCastSpell))
             // Blizz seems to just apply aura without bothering to cast
@@ -6540,24 +6540,24 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             case SPELL_EFFECT_STEAL_BENEFICIAL_BUFF:
                 {
-                    if( !m_targets.GetUnitTarget() || m_targets.GetUnitTarget() == m_caster)
+                    if (!m_targets.GetUnitTarget() || m_targets.GetUnitTarget() == m_caster)
                         return SPELL_FAILED_BAD_TARGETS;
 
                     bool found = false;
                     Unit::VisibleAuraMap const* visibleAuras = m_targets.GetUnitTarget()->GetVisibleAuras();
                     for(Unit::VisibleAuraMap::const_iterator itr = visibleAuras->begin(); itr != visibleAuras->end(); ++itr)
                     {
-                        if( itr->second->GetBase()->IsPassive() )
+                        if (itr->second->GetBase()->IsPassive())
                             continue;
 
-                        if( !itr->second->IsPositive() )
+                        if (!itr->second->IsPositive())
                             continue;
 
                         found = true;
                         break;
                     }
 
-                    if( !found )
+                    if (!found)
                         return SPELL_FAILED_NOTHING_TO_STEAL;
 
                     break;
@@ -8757,17 +8757,17 @@ void Spell::PrepareTriggersExecutedOnHit()
     {
         case SPELLFAMILY_PALADIN:
             {
-                if( m_spellInfo->SpellFamilyFlags[1] & 0x40000000 )
+                if (m_spellInfo->SpellFamilyFlags[1] & 0x40000000)
                 {
                     Unit::AuraEffectList const& mVindication = m_caster->GetAuraEffectsByType(SPELL_AURA_PROC_TRIGGER_SPELL);
                     for(Unit::AuraEffectList::const_iterator itr = mVindication.begin(); itr != mVindication.end(); ++itr)
                     {
-                        if( (*itr)->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell == 26017 )
+                        if ((*itr)->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell == 26017 )
                         {
                             m_preCastSpell = 26017;
                             break;
                         }
-                        else if( (*itr)->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell == 67 )
+                        else if ((*itr)->GetSpellInfo()->Effects[EFFECT_0].TriggerSpell == 67 )
                             m_preCastSpell = 67;
                     }
                 }
@@ -8776,7 +8776,7 @@ void Spell::PrepareTriggersExecutedOnHit()
         case SPELLFAMILY_DRUID:
             {
                 // Faerie Fire (Feral)
-                if( m_spellInfo->Id == 16857 && (m_caster->GetShapeshiftForm() == FORM_BEAR || m_caster->GetShapeshiftForm() == FORM_DIREBEAR) )
+                if (m_spellInfo->Id == 16857 && (m_caster->GetShapeshiftForm() == FORM_BEAR || m_caster->GetShapeshiftForm() == FORM_DIREBEAR))
                     m_preCastSpell = 60089;
 
                 break;
