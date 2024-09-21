@@ -613,7 +613,7 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, char const* err, uint8 att
                 // It's possible this attempted reconnect throws 2006 at us.
                 // To prevent crazy recursive calls, sleep here.
                 std::this_thread::sleep_for(3s); // Sleep 3 seconds
-                return _HandleMySQLErrno(lErrno, "", attempts); // Call self (recursive)
+                return _HandleMySQLErrno(lErrno, mysql_error(m_Mysql), attempts); // Call self (recursive)
             }
             [[fallthrough]];
         }
