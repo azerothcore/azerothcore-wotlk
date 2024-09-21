@@ -54,7 +54,7 @@ SourceDirectory = ""
 #    MySQLExecutable
 #        Description: The path to your MySQL CLI binary.
 #                     If the path is left empty, built-in path from cmake is used.
-#        Example:     "C:/Program Files/MariaDB 10.9/bin/mysql.exe"
+#        Example:     "C:/Program Files/MySQL Server 8.4/bin/mysql.exe"
 #                     "mysql.exe"
 #                     "/usr/bin/mysql"
 #        Default:     ""
