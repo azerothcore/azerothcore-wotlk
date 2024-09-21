@@ -19,11 +19,24 @@
 #define SCRIPT_OBJECT_ALL_MAP_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum AllMapHook
+{
+    ALLMAPHOOK_ON_PLAYER_ENTER_ALL,
+    ALLMAPHOOK_ON_PLAYER_LEAVE_ALL,
+    ALLMAPHOOK_ON_BEFORE_CREATE_INSTANCE_SCRIPT,
+    ALLMAPHOOK_ON_DESTROY_INSTANCE,
+    ALLMAPHOOK_ON_CREATE_MAP,
+    ALLMAPHOOK_ON_DESTROY_MAP,
+    ALLMAPHOOK_ON_MAP_UPDATE,
+    ALLMAPHOOK_END
+};
 
 class AllMapScript : public ScriptObject
 {
 protected:
-    AllMapScript(const char* name);
+    AllMapScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     /**

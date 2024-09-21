@@ -304,7 +304,7 @@ namespace lfg
             //UpdateBestCompatibleInQueue(itQueue, strGuids);
             AddToCompatibles(strGuids);
             if (roleCheckResult && roleCheckResult <= 15)
-                foundMask |= ( (((uint64)1) << (roleCheckResult - 1)) | (((uint64)1) << (16 + roleCheckResult - 1)) | (((uint64)1) << (32 + roleCheckResult - 1)) | (((uint64)1) << (48 + roleCheckResult - 1)) );
+                foundMask |= ( (((uint64)1) << (roleCheckResult - 1)) | (((uint64)1) << (16 + roleCheckResult - 1)) | (((uint64)1) << (32 + roleCheckResult - 1)) | (((uint64)1) << (48 + roleCheckResult - 1)));
             return LFG_COMPATIBLES_WITH_LESS_PLAYERS;
         }
 

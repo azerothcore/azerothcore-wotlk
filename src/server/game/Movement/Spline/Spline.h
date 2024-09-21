@@ -205,7 +205,6 @@ namespace Movement
         void set_length(index_type i, length_type length) { lengths[i] = length;}
         void clear();
     };
-
 }
 
 #include "SplineImpl.h"

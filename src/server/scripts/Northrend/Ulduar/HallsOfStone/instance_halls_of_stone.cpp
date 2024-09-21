@@ -80,7 +80,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_KADDRAK:
                     goKaddrakGUID = go->GetGUID();
@@ -124,7 +124,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_SJONNIR:
                     SjonnirGUID = creature->GetGUID();
