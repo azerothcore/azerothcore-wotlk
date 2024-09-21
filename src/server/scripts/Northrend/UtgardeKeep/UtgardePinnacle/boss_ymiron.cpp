@@ -148,7 +148,7 @@ public:
 
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
 
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(DATA_KING_YMIRON, NOT_STARTED);
                 pInstance->SetData(DATA_YMIRON_ACHIEVEMENT, true);
@@ -168,7 +168,7 @@ public:
         void JustEngagedWith(Unit*  /*pWho*/) override
         {
             Talk(SAY_AGGRO);
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(DATA_KING_YMIRON, IN_PROGRESS);
                 if (pInstance->GetData(DATA_SKADI_THE_RUTHLESS) == DONE)
@@ -183,7 +183,7 @@ public:
 
         void MovementInform(uint32 uiType, uint32 point) override
         {
-            if(uiType != POINT_MOTION_TYPE)
+            if (uiType != POINT_MOTION_TYPE)
                 return;
 
             if (point == 0)
@@ -271,7 +271,7 @@ public:
                             king->SetDisableGravity(true);
                             me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
                             me->GetMotionMaster()->MoveChase(me->GetVictim());
-                            switch(BoatOrder[BoatNum - 1])
+                            switch (BoatOrder[BoatNum - 1])
                             {
                                 case 0:
                                     events.ScheduleEvent(EVENT_YMIRON_RANULF_ABILITY, 3s, 1);
@@ -338,7 +338,7 @@ public:
             summons.DespawnAll();
             summons2.DespawnAll();
 
-            if(pInstance)
+            if (pInstance)
                 pInstance->SetData(DATA_KING_YMIRON, DONE);
         }
 

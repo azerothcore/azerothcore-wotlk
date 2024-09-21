@@ -237,7 +237,7 @@ namespace Acore
     //{
     //    // The head element is bad
     //    SPECIFIC_TYPE* t = Remove(elements._elements, obj);
-    //    return ( t != nullptr ? t : Remove(elements._TailElements, obj) );
+    //    return ( t != nullptr ? t : Remove(elements._TailElements, obj));
     //}
 }
 #endif

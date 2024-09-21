@@ -242,7 +242,7 @@ struct boss_nightbane : public BossAI
                 _skeletonscheduler.Schedule(50ms, [this](TaskContext context)
                 {
                     //spawns skeletons every 2 seconds until skeletonCount is reached
-                    if(_skeletonSpawnCounter < _skeletonCount)
+                    if (_skeletonSpawnCounter < _skeletonCount)
                     {
                         me->CastSpell(_skeletonSpawnPos.GetPositionX(), _skeletonSpawnPos.GetPositionY(), _skeletonSpawnPos.GetPositionZ(), SPELL_SUMMON_SKELETON, true);
                         _skeletonSpawnCounter++;
