@@ -1,0 +1,3 @@
+--
+ALTER TABLE `recovery_item`
+    ADD COLUMN `DeleteDate` INT UNSIGNED NULL DEFAULT NULL AFTER `Count`;
