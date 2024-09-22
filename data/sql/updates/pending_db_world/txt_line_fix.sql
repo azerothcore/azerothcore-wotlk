@@ -17,6 +17,9 @@ UPDATE `creature_text` SET `BroadcastTextId` = 36718 WHERE `CreatureID` = 36889 
 -- connect heroic version template
 UPDATE `creature_template` SET `difficulty_entry_1` = 37654 WHERE `entry` = 36889;
 
+-- Rescued Alliance Slave connect heroic version template
+UPDATE `creature_template` SET `difficulty_entry_1` = 37653 WHERE `entry` = 36888;
+
 -- remove duplicated line (already exist in GroupID=0
 DELETE FROM `creature_text` WHERE `CreatureID`=36993 AND `GroupID`=36 AND `ID`=0;
 DELETE FROM `creature_text` WHERE `CreatureID`=36990 AND `GroupID`=37 AND `ID`=0;
