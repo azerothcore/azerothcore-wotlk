@@ -193,7 +193,7 @@ public:
         {
             summons.DespawnAll();
             Talk(SAY_DEATH);
-            if(instance)
+            if (instance)
                 instance->SetData(DATA_SVALA_SORROWGRAVE, DONE);
         }
 

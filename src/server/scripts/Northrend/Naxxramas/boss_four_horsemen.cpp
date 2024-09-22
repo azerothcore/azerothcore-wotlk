@@ -157,7 +157,7 @@ public:
 
         void MoveToCorner()
         {
-            switch(me->GetEntry())
+            switch (me->GetEntry())
             {
                 case NPC_THANE_KORTHAZZ:
                     currentWaypoint = 0;

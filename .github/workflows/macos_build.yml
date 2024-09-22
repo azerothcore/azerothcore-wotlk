@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macos-12
+          - macos-14
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     if: |
