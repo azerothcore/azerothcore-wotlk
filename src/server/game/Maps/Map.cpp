@@ -2757,16 +2757,16 @@ bool Map::CheckForObjectsAround(Position startPos, float distance, uint32 phasem
     {
         Position endPos = startPos;
         endPos.RelocatePolarOffset(angle, distance);
-        
+
         G3D::Vector3 startVec(startPos.m_positionX, startPos.m_positionY, startPos.m_positionZ);
         G3D::Vector3 endVec(endPos.m_positionX, endPos.m_positionY, endPos.m_positionZ);
         G3D::Vector3 resultHit;
-        
+
         if (_dynamicTree.GetObjectHitPos(phasemask, startVec, endVec, resultHit, 0.0f))
             return true;
     }
 
-    // No object found in the 16 directions
+    // No object found
     return false;
 }
 
