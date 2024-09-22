@@ -212,21 +212,15 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        float constexpr minDist = 30.0f;
-        float constexpr maxDist = 48.0f;
-
-        // Randomize the teleportation distance from the caster
-        float const teleportDist = frand(minDist, maxDist);
-
         // Initialize a first destination
-        Position teleportDest = GetCaster()->GetRandomNearPosition(teleportDist);
+        Position teleportDest = GetCaster()->GetRandomNearPosition(50.0f);
 
         // Ensure that the destination is not too close to the caster.
         // Add a check for LOS, to ensure to not be teleported under the map
         while (!teleportDest.IsRadiusPositionValid(GetCaster(), teleportDest, 25.0f))
         {
             // If the conditions are not met, find a new destination.
-            teleportDest = GetCaster()->GetRandomNearPosition(teleportDist);
+            teleportDest = GetCaster()->GetRandomNearPosition(50.0f);
         }
 
         // When a valid destination is found, relocate it.
