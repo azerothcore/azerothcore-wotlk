@@ -20,6 +20,8 @@
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "serpent_shrine.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Talk
 {
@@ -66,7 +68,8 @@ enum Spells
 
 enum Misc
 {
-    GO_CAGE                         = 185474
+    GO_CAGE                         = 185474,
+    ACTION_RESET_ADDS               = 1
 };
 
 const Position olumWalk = { 456.17194f, -544.31866f, -7.5470476f, 0.00f };
@@ -74,6 +77,17 @@ const Position olumWalk = { 456.17194f, -544.31866f, -7.5470476f, 0.00f };
 struct boss_fathomlord_karathress : public BossAI
 {
     boss_fathomlord_karathress(Creature* creature) : BossAI(creature, DATA_FATHOM_LORD_KARATHRESS){ }
+
+    void JustReachedHome() override
+    {
+        instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard)
+        {
+            if (!fathomguard->IsAlive())
+            {
+                fathomguard->Respawn(true);
+            }
+        });
+    }
 
     void Reset() override
     {
@@ -155,6 +169,18 @@ struct boss_fathomlord_karathress : public BossAI
         {
             DoCastSelf(SPELL_ENRAGE, true);
         });
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_RESET_ADDS)
+        {
+            EnterEvadeMode();
+            instance->DoForAllMinions(DATA_FATHOM_LORD_KARATHRESS, [&](Creature* fathomguard)
+            {
+                fathomguard->DespawnOrUnsummon();
+            });
+        }
     }
 private:
     bool _recentlySpoken;
@@ -259,6 +285,15 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
+        {
+            karathress->AI()->DoAction(ACTION_RESET_ADDS);
+        }
+        ScriptedAI::EnterEvadeMode(why);
+    }
+
 private:
     InstanceScript* _instance;
     SummonList _summons;
@@ -323,7 +358,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         int32 action = 0;
         uint8 group = 0;
 
-        switch(entry)
+        switch (entry)
         {
             case NPC_SPITFIRE_TOTEM:
                 timer = 59s;
@@ -372,7 +407,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
 
     void SummonTotem(uint32 entry)
     {
-        switch(entry)
+        switch (entry)
         {
             case NPC_SPITFIRE_TOTEM:
                 DoCastSelf(SPELL_SPITFIRE_TOTEM);
@@ -432,6 +467,15 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         _totemScheduler.Update(diff);
 
         DoMeleeAttackIfReady();
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
+        {
+            karathress->AI()->DoAction(ACTION_RESET_ADDS);
+        }
+        ScriptedAI::EnterEvadeMode(why);
     }
 
 private:
@@ -518,6 +562,15 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (Creature* karathress = _instance->GetCreature(DATA_FATHOM_LORD_KARATHRESS))
+        {
+            karathress->AI()->DoAction(ACTION_RESET_ADDS);
+        }
+        ScriptedAI::EnterEvadeMode(why);
+    }
+
 private:
     TaskScheduler _scheduler;
     InstanceScript* _instance;
@@ -568,4 +621,3 @@ void AddSC_boss_fathomlord_karathress()
     RegisterSpellScript(spell_karathress_power_of_tidalvess);
     RegisterSpellScript(spell_karathress_power_of_caribdis);
 }
-

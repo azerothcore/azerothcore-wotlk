@@ -456,7 +456,7 @@ public:
             {
                 case TYPE_RING_OF_LAW:
                     encounter[0] = data;
-                    switch(data)
+                    switch (data)
                     {
                     case IN_PROGRESS:
                         TempSummonGrimstone = instance->SummonCreature(NPC_GRIMSTONE, GrimstonePositon);
@@ -471,7 +471,7 @@ public:
                         SetData(TYPE_RING_OF_LAW, NOT_STARTED);
                         break;
                     case DONE:
-                        for (const auto& itr : ArenaSpectators)
+                        for (auto const& itr : ArenaSpectators)
                         {
                             if (Creature* spectator = instance->GetCreature(itr))
                             {

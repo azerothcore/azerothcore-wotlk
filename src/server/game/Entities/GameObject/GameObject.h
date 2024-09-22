@@ -26,7 +26,6 @@
 #include "Object.h"
 #include "SharedDefines.h"
 #include "Unit.h"
-#include <array>
 
 class GameObjectAI;
 class Transport;
@@ -124,7 +123,7 @@ public:
     explicit GameObject();
     ~GameObject() override;
 
-    void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const override;
+    void BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) override;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -288,8 +287,6 @@ public:
     void CastSpell(Unit* target, uint32 spell);
     void SendCustomAnim(uint32 anim);
     [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
-
-    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
 
     void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }

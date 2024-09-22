@@ -93,7 +93,7 @@ struct boss_high_king_maulgar : public BossAI
 
     void KilledUnit(Unit*  /*victim*/) override
     {
-        if(!_recentlySpoken)
+        if (!_recentlySpoken)
         {
             Talk(SAY_SLAY);
             _recentlySpoken = true;

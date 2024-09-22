@@ -40,7 +40,7 @@ enum AhnKahetCreatures
     NPC_ELDER_NADOX                 = 29309,
     NPC_PRINCE_TALDARAM             = 29308,
     NPC_JEDOGA_SHADOWSEEKER         = 29310,
-    NPC_HERALD_JOLAZJ               = 29311,
+    NPC_HERALD_VOLAZJ               = 29311,
     NPC_AMANITAR                    = 30258,
     // Teldaram and Jedoga encounter related
     NPC_JEDOGA_CONTROLLER           = 30181,
@@ -83,6 +83,5 @@ inline AI* GetAhnKahetAI(T* obj)
 }
 
 #define RegisterAhnKahetCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetAhnKahetAI)
-#define RegisterAhnKahetGameObjectAI(ai_name) RegisterGameObjectAIWithFactory(ai_name, GetAhnKahetAI)
 
 #endif // DEF_AHNKAHET_H

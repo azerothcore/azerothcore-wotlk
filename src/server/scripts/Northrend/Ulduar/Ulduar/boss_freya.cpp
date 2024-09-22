@@ -307,7 +307,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
+            if (!victim->IsPlayer() || urand(0, 2))
                 return;
 
             Talk(SAY_SLAY);
@@ -347,7 +347,6 @@ public:
                     uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
                     chestId -= 2 * _elderCount; // offset
 
-                    me->DespawnOrUnsummon(5000);
                     if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
                     {
                         go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
@@ -360,7 +359,21 @@ public:
                         me->CastSpell(me, 65074, true); // credit
                         m_pInstance->SetData(TYPE_FREYA, DONE);
                     }
+
+                    scheduler.Schedule(14s, [this](TaskContext /*context*/)
+                    {
+                        DoCastSelf(SPELL_TELEPORT);
+                    });
                 }
+            }
+        }
+
+        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+        {
+            if (spellInfo->Id == SPELL_TELEPORT)
+            {
+                me->DespawnOrUnsummon();
+                m_pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
             }
         }
 
@@ -489,7 +502,7 @@ public:
             events.ScheduleEvent(EVENT_FREYA_BERSERK, 10min);
             events.SetPhase(EVENT_PHASE_ADDS);
 
-            if( !m_pInstance )
+            if (!m_pInstance)
                 return;
 
             if (m_pInstance->GetData(TYPE_FREYA) != DONE)
@@ -547,6 +560,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            scheduler.Update(diff);
             if (!UpdateVictim())
                 return;
 
@@ -1299,4 +1313,3 @@ void AddSC_boss_freya()
     new achievement_freya_knock_on_wood("achievement_freya_knock_knock_on_wood", 2);
     new achievement_freya_knock_on_wood("achievement_freya_knock_knock_knock_on_wood", 3);
 }
-

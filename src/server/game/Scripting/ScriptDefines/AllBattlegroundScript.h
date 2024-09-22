@@ -19,6 +19,29 @@
 #define SCRIPT_OBJECT_ALL_BATTLEGROUND_SCRIPT_H_
 
 #include "ScriptObject.h"
+#include <vector>
+
+enum AllBattlegroundHook
+{
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_START,
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_END_REWARD,
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_UPDATE,
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_ADD_PLAYER,
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_BEFORE_ADD_PLAYER,
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_REMOVE_PLAYER_AT_LEAVE,
+    ALLBATTLEGROUNDHOOK_ON_QUEUE_UPDATE,
+    ALLBATTLEGROUNDHOOK_ON_QUEUE_UPDATE_VALIDITY,
+    ALLBATTLEGROUNDHOOK_ON_ADD_GROUP,
+    ALLBATTLEGROUNDHOOK_CAN_FILL_PLAYERS_TO_BG,
+    ALLBATTLEGROUNDHOOK_IS_CHECK_NORMAL_MATCH,
+    ALLBATTLEGROUNDHOOK_CAN_SEND_MESSAGE_BG_QUEUE,
+    ALLBATTLEGROUNDHOOK_ON_BEFORE_SEND_JOIN_MESSAGE_ARENA_QUEUE,
+    ALLBATTLEGROUNDHOOK_ON_BEFORE_SEND_EXIT_MESSAGE_ARENA_QUEUE,
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_END,
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_DESTROY,
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_CREATE,
+    ALLBATTLEGROUNDHOOK_END
+};
 
 enum BattlegroundBracketId : uint8;
 enum BattlegroundTypeId : uint8;
@@ -27,7 +50,7 @@ enum TeamId : uint8;
 class AllBattlegroundScript : public ScriptObject
 {
 protected:
-    AllBattlegroundScript(const char* name);
+    AllBattlegroundScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
@@ -55,6 +78,8 @@ public:
     virtual void OnBattlegroundRemovePlayerAtLeave(Battleground* /*bg*/, Player* /*player*/) { }
 
     virtual void OnQueueUpdate(BattlegroundQueue* /*queue*/, uint32 /* diff */, BattlegroundTypeId /* bgTypeId */, BattlegroundBracketId /* bracket_id */, uint8 /* arenaType */, bool /* isRated */, uint32 /* arenaRating */) { }
+
+    [[nodiscard]] virtual bool OnQueueUpdateValidity(BattlegroundQueue* /*queue*/, uint32 /* diff */, BattlegroundTypeId /* bgTypeId */, BattlegroundBracketId /* bracket_id */, uint8 /* arenaType */, bool /* isRated */, uint32 /* arenaRating */) { return true; }
 
     virtual void OnAddGroup(BattlegroundQueue* /*queue*/, GroupQueueInfo* /*ginfo*/, uint32& /*index*/, Player* /*leader*/, Group* /*group*/, BattlegroundTypeId /* bgTypeId */, PvPDifficultyEntry const* /* bracketEntry */,
             uint8 /* arenaType */, bool /* isRated */, bool /* isPremade */, uint32 /* arenaRating */, uint32 /* matchmakerRating */, uint32 /* arenaTeamId */, uint32 /* opponentsArenaTeamId */) { }

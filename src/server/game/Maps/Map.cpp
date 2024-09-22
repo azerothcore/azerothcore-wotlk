@@ -70,7 +70,7 @@ Map::~Map()
         WorldObject* obj = *i_worldObjects.begin();
         ASSERT(obj->IsWorldObject());
         LOG_DEBUG("maps", "Map::~Map: WorldObject TypeId is not a corpse! ({})", static_cast<uint8>(obj->GetTypeId()));
-        //ASSERT(obj->GetTypeId() == TYPEID_CORPSE);
+        //ASSERT(obj->IsCorpse());
         obj->RemoveFromWorld();
         obj->ResetMap();
     }
@@ -587,7 +587,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     obj->AddToWorld();
 
     if (checkTransport)
-        if (!(obj->GetTypeId() == TYPEID_GAMEOBJECT && obj->ToGameObject()->IsTransport())) // dont add transport to transport ;d
+        if (!(obj->IsGameObject() && obj->ToGameObject()->IsTransport())) // dont add transport to transport ;d
             if (Transport* transport = GetTransportForPos(obj->GetPhaseMask(), obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), obj))
                 transport->AddPassenger(obj, true);
 
@@ -602,7 +602,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 
     // Xinef: little hack for vehicles, accessories have to be added after visibility update so they wont fall off the vehicle, moved from Creature::AIM_Initialize
     // Initialize vehicle, this is done only for summoned npcs, DB creatures are handled by grid loaders
-    if (obj->GetTypeId() == TYPEID_UNIT)
+    if (obj->IsCreature())
         if (Vehicle* vehicle = obj->ToCreature()->GetVehicleKit())
             vehicle->Reset();
     return true;
@@ -644,7 +644,7 @@ bool Map::AddToMap(MotionTransport* obj, bool /*checkTransport*/)
                 UpdateData data;
                 obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
                 WorldPacket packet;
-                data.BuildPacket(&packet);
+                data.BuildPacket(packet);
                 itr->GetSource()->SendDirectMessage(&packet);
             }
         }
@@ -700,9 +700,6 @@ void Map::VisitNearbyCellsOf(WorldObject* obj, TypeContainerVisitor<Acore::Objec
 {
     // Check for valid position
     if (!obj->IsPositionValid())
-        return;
-
-    if (obj->GetGridActivationRange() <= 0.0f) // pussywizard: gameobjects for example are on active lists, but range is equal to 0 (they just prevent grid unloading)
         return;
 
     // Update mobs/objects in ALL visible cells around object!
@@ -971,7 +968,7 @@ void Map::RemoveFromMap(MotionTransport* obj, bool remove)
         UpdateData data;
         obj->BuildOutOfRangeUpdateBlock(&data);
         WorldPacket packet;
-        data.BuildPacket(&packet);
+        data.BuildPacket(packet);
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (itr->GetSource()->GetTransport() != obj)
                 itr->GetSource()->SendDirectMessage(&packet);
@@ -1269,7 +1266,7 @@ void Map::RemoveAllPlayers()
             {
                 // this is happening for bg
                 LOG_ERROR("maps", "Map::UnloadAll: player {} is still in map {} during unload, this should not happen!", player->GetName(), GetId());
-                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
+                player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
             }
         }
     }
@@ -2448,6 +2445,14 @@ bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, floa
         }
     }
 
+    if (!sWorld->getBoolConfig(CONFIG_VMAP_BLIZZLIKE_LOS_OPEN_WORLD))
+    {
+        if (IsWorldMap())
+        {
+            ignoreFlags = VMAP::ModelIgnoreFlags::Nothing;
+        }
+    }
+
     if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, ignoreFlags))
     {
         return false;
@@ -2536,7 +2541,7 @@ void Map::SendInitSelf(Player* player)
     player->BuildCreateUpdateBlockForPlayer(&data, player);
 
     // build and send self update packet before sending to player his own auras
-    data.BuildPacket(&packet);
+    data.BuildPacket(packet);
     player->SendDirectMessage(&packet);
 
     // send to player his own auras (this is needed here for timely initialization of some fields on client)
@@ -2552,7 +2557,7 @@ void Map::SendInitSelf(Player* player)
             if (player != (*itr) && player->HaveAtClient(*itr))
                 (*itr)->BuildCreateUpdateBlockForPlayer(&data, player);
 
-    data.BuildPacket(&packet);
+    data.BuildPacket(packet);
     player->SendDirectMessage(&packet);
 }
 
@@ -2565,7 +2570,7 @@ void Map::SendInitTransports(Player* player)
             (*itr)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
     WorldPacket packet;
-    transData.BuildPacket(&packet);
+    transData.BuildPacket(packet);
     player->GetSession()->SendPacket(&packet);
 }
 
@@ -2590,7 +2595,7 @@ void Map::SendRemoveTransports(Player* player)
     }
 
     WorldPacket packet;
-    transData.BuildPacket(&packet);
+    transData.BuildPacket(packet);
     player->GetSession()->SendPacket(&packet);
 }
 
@@ -2621,7 +2626,7 @@ void Map::SendObjectUpdates()
     WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
     for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
-        iter->second.BuildPacket(&packet);
+        iter->second.BuildPacket(packet);
         iter->first->GetSession()->SendPacket(&packet);
         packet.clear();                                     // clean the string
     }
@@ -2657,8 +2662,8 @@ void Map::AddObjectToSwitchList(WorldObject* obj, bool on)
 {
     ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
     // i_objectsToSwitch is iterated only in Map::RemoveAllObjectsInRemoveList() and it uses
-    // the contained objects only if GetTypeId() == TYPEID_UNIT , so we can return in all other cases
-    if (obj->GetTypeId() != TYPEID_UNIT && obj->GetTypeId() != TYPEID_GAMEOBJECT)
+    // the contained objects only if IsCreature() , so we can return in all other cases
+    if (!obj->IsCreature() && !obj->IsGameObject())
         return;
 
     std::map<WorldObject*, bool>::iterator itr = i_objectsToSwitch.find(obj);
@@ -3058,7 +3063,7 @@ void InstanceMap::CreateInstanceScript(bool load, std::string data, uint32 compl
 
     bool isOtherAI = false;
 
-    sScriptMgr->OnBeforeCreateInstanceScript(this, instance_data, load, data, completedEncounterMask);
+    sScriptMgr->OnBeforeCreateInstanceScript(this, &instance_data, load, data, completedEncounterMask);
 
     if (instance_data)
         isOtherAI = true;

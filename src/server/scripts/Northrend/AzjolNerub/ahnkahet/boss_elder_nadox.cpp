@@ -73,7 +73,7 @@ enum Yells
 
 struct boss_elder_nadox : public BossAI
 {
-    boss_elder_nadox(Creature* creature) : BossAI(creature, DATA_PRINCE_TALDARAM),
+    boss_elder_nadox(Creature* creature) : BossAI(creature, DATA_ELDER_NADOX),
         guardianSummoned(false),
         respectYourElders(true)
     {
@@ -146,7 +146,7 @@ struct boss_elder_nadox : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
         {
             Talk(SAY_SLAY);
         }
@@ -395,4 +395,3 @@ void AddSC_boss_elder_nadox()
     // Achievements
     new achievement_respect_your_elders();
 }
-

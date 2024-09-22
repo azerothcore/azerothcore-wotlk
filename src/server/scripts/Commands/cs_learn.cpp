@@ -50,7 +50,7 @@ public:
 
         static ChatCommandTable learnAllCommandTable =
         {
-            { "my", learnAllMyCommandTable },
+            { "my",        learnAllMyCommandTable },
             { "gm",        HandleLearnAllGMCommand,            SEC_GAMEMASTER, Console::No },
             { "crafts",    HandleLearnAllCraftsCommand,        SEC_GAMEMASTER, Console::No },
             { "default",   HandleLearnAllDefaultCommand,       SEC_GAMEMASTER, Console::No },
@@ -60,14 +60,14 @@ public:
 
         static ChatCommandTable learnCommandTable =
         {
-            { "all", learnAllCommandTable },
+            { "all",  learnAllCommandTable },
             { "",     HandleLearnCommand,                      SEC_GAMEMASTER, Console::No }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "learn", learnCommandTable },
-            { "unlearn",     HandleUnLearnCommand,             SEC_GAMEMASTER, Console::No }
+            { "learn",   learnCommandTable },
+            { "unlearn", HandleUnLearnCommand,             SEC_GAMEMASTER, Console::No }
         };
         return commandTable;
     }
@@ -303,7 +303,7 @@ public:
         target->LearnCustomSpells();
         target->learnQuestRewardedSpells();
 
-        handler->PSendSysMessage(LANG_COMMAND_LEARN_ALL_DEFAULT_AND_QUEST, handler->GetNameLink(target).c_str());
+        handler->PSendSysMessage(LANG_COMMAND_LEARN_ALL_DEFAULT_AND_QUEST, handler->GetNameLink(target));
         return true;
     }
 
@@ -390,16 +390,8 @@ public:
     {
         uint32 classmask = player->getClassMask();
 
-        for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+        for (SkillLineAbilityEntry const* skillLine : GetSkillLineAbilitiesBySkillLine(skillId))
         {
-            SkillLineAbilityEntry const* skillLine = sSkillLineAbilityStore.LookupEntry(j);
-            if (!skillLine)
-                continue;
-
-            // wrong skill
-            if (skillLine->SkillLine != skillId)
-                continue;
-
             // not high rank
             if (skillLine->SupercededBySpell)
                 continue;

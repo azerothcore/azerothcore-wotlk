@@ -34,7 +34,6 @@ EndContentData */
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 
 /*######
 ## npc_lord_gregor_lescovar
@@ -240,7 +239,7 @@ public:
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
-                    if (summoner->GetTypeId() == TYPEID_UNIT && summoner->IsAlive() && !summoner->IsInCombat())
+                    if (summoner->IsCreature() && summoner->IsAlive() && !summoner->IsInCombat())
                         summoner->ToCreature()->AI()->AttackStart(who);
                 }
             }
@@ -254,7 +253,7 @@ public:
             {
                 if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
                 {
-                    if (summoner->GetTypeId() == TYPEID_UNIT && summoner->IsAlive())
+                    if (summoner->IsCreature() && summoner->IsAlive())
                         summoner->ToCreature()->DisappearAndDie();
                 }
             }
@@ -268,7 +267,7 @@ public:
             if (me->IsSummon())
             {
                 Unit* summoner = me->ToTempSummon()->GetSummonerUnit();
-                if (summoner && summoner->GetTypeId() == TYPEID_UNIT && summoner->IsAIEnabled)
+                if (summoner && summoner->IsCreature() && summoner->IsAIEnabled)
                 {
                     npc_lord_gregor_lescovar::npc_lord_gregor_lescovarAI* ai =
                         CAST_AI(npc_lord_gregor_lescovar::npc_lord_gregor_lescovarAI, summoner->GetAI());

@@ -80,7 +80,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_KADDRAK:
                     goKaddrakGUID = go->GetGUID();
@@ -124,7 +124,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_SJONNIR:
                     SjonnirGUID = creature->GetGUID();
@@ -268,4 +268,3 @@ void AddSC_instance_halls_of_stone()
 {
     new instance_halls_of_stone();
 }
-

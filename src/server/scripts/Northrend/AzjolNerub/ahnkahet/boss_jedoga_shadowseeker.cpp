@@ -333,7 +333,7 @@ struct boss_jedoga_shadowseeker : public BossAI
 
     void KilledUnit(Unit* who) override
     {
-        if (who->GetTypeId() != TYPEID_PLAYER)
+        if (!who->IsPlayer())
         {
             return;
         }
@@ -641,7 +641,7 @@ struct npc_twilight_volunteer : public ScriptedAI
         }
         else if (id == POINT_RITUAL)
         {
-            if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_JEDOGA_SHADOWSEEKER)))
+            if (Creature* jedoga = pInstance->GetCreature(DATA_JEDOGA_SHADOWSEEKER))
             {
                 jedoga->AI()->Talk(SAY_SACRIFICE_2);
                 jedoga->CastSpell(nullptr, SPELL_SACRIFICE_BEAM); /// @todo: Visual is not working. (cosmetic)
@@ -665,7 +665,7 @@ struct npc_twilight_volunteer : public ScriptedAI
                 me->SetWalk(true);
                 me->GetMotionMaster()->MovePoint(POINT_RITUAL, JedogaPosition[2], false);
 
-                if (Creature* jedoga = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_JEDOGA_SHADOWSEEKER)))
+                if (Creature* jedoga = pInstance->GetCreature(DATA_JEDOGA_SHADOWSEEKER))
                 {
                     if (Creature* ritualTrigger = jedoga->SummonCreature(NPC_JEDOGA_CONTROLLER, JedogaPosition[2], TEMPSUMMON_TIMED_DESPAWN, 15000))
                     {
@@ -735,4 +735,3 @@ void AddSC_boss_jedoga_shadowseeker()
     // Achievements
     new achievement_volunteer_work();
 }
-

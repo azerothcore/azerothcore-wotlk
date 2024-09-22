@@ -133,7 +133,7 @@ public:
         return GetDataBinary();
     }
 
-    template <typename T, size_t S>
+    template <typename T, std::size_t S>
     inline std::enable_if_t<std::is_same_v<Binary, T>, std::array<uint8, S>> Get() const
     {
         std::array<uint8, S> buf = {};
@@ -173,7 +173,7 @@ private:
     QueryResultFieldMetadata const* meta;
     void LogWrongType(std::string_view getter, std::string_view typeName) const;
     void SetMetadata(QueryResultFieldMetadata const* fieldMeta);
-    void GetBinarySizeChecked(uint8* buf, size_t size) const;
+    void GetBinarySizeChecked(uint8* buf, std::size_t size) const;
 };
 
 #endif

@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "hyjal.h"
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
-#include "hyjal.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 enum Spells
 {
@@ -55,6 +57,7 @@ enum Spells
     SPELL_RAISE_DEAD_1                = 31617,
     SPELL_RAISE_DEAD_2                = 31624,
     SPELL_RAISE_DEAD_3                = 31625,
+    SPELL_UNHOLY_FRENZY               = 31626,
     SPELL_SHADOW_BOLT                 = 31627,
 
     // Banshee (Ranged)
@@ -69,7 +72,10 @@ enum Spells
     SPELL_FROST_BREATH                = 31688,
 
     // Fel Stalker
-    SPELL_MANA_BURN                   = 31729
+    SPELL_MANA_BURN                   = 31729,
+
+    // Misc
+    SPELL_DEATH_AND_DECAY             = 31258
 };
 
 enum Talk
@@ -84,6 +90,8 @@ enum Talk
     SAY_TELEPORT = 7
 };
 
+const float UNHOLY_FRENZY_RANGE = 30.0f;
+
 class npc_hyjal_jaina : public CreatureScript
 {
 public:
@@ -95,14 +103,17 @@ public:
     }
     struct hyjalJainaAI : public ScriptedAI
     {
-        hyjalJainaAI(Creature* creature) : ScriptedAI(creature) { }
+        hyjalJainaAI(Creature* creature) : ScriptedAI(creature)
+        {
+            me->ApplySpellImmune(SPELL_DEATH_AND_DECAY, IMMUNITY_ID, SPELL_DEATH_AND_DECAY, true);
+        }
 
         void Reset() override
         {
             scheduler.CancelAll();
             if (InstanceScript* hyjal = me->GetInstanceScript())
                 if (!hyjal->GetData(DATA_WAVE_STATUS))
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -127,7 +138,7 @@ public:
 
         void IsSummonedBy(WorldObject* /*summoner*/) override
         {
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             DoCastSelf(SPELL_SIMPLE_TELEPORT, true);
 
             // Should wait 2400ms
@@ -165,7 +176,7 @@ public:
 
     bool OnGossipSelect(Player* /*player*/ , Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
     {
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
         if (InstanceScript* hyjal = creature->GetInstanceScript())
         {
@@ -202,7 +213,7 @@ public:
             scheduler.CancelAll();
             if (InstanceScript* hyjal = me->GetInstanceScript())
                 if (!hyjal->GetData(DATA_WAVE_STATUS))
-                    me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                    me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -240,7 +251,7 @@ public:
 
     bool OnGossipSelect(Player* /*player*/, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
     {
-        creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
         if (InstanceScript* hyjal = creature->GetInstanceScript())
         {
@@ -316,6 +327,26 @@ public:
         return true;
     }
 
+};
+
+// 31538 - Cannibalize (Heal)
+class spell_cannibalize_heal : public SpellScript
+{
+    PrepareSpellScript(spell_cannibalize_heal);
+
+    void HandleHeal(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            uint32 heal = caster->CountPctFromMaxHealth(7);
+            SetHitHeal(heal);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_cannibalize_heal::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
 };
 
 struct npc_hyjal_ground_trash : public ScriptedAI
@@ -411,6 +442,13 @@ struct npc_hyjal_ground_trash : public ScriptedAI
                             break;
                         }
                         context.Repeat(10s, 20s);
+                    }).Schedule(15s, 20s, [this](TaskContext context)
+                    {
+                        if (Creature* target = GetNearbyFriendlyTrashCreature(UNHOLY_FRENZY_RANGE))
+                        {
+                            DoCast(target, SPELL_UNHOLY_FRENZY);
+                        }
+                        context.Repeat(15s, 20s);
                     });
             break;
         }
@@ -499,6 +537,27 @@ struct npc_hyjal_ground_trash : public ScriptedAI
                 }, 1s);
             break;
         }
+    }
+
+    Creature* GetNearbyFriendlyTrashCreature(float radius)
+    {
+        //need accurate timer
+        Creature* creatureToReturn = nullptr;
+        std::list<Creature*> creatureList;
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_ABOMI, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_BANSH, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_STALK, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_NECRO, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_CRYPT, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_GHOUL, radius);
+        GetCreatureListWithEntryInGrid(creatureList, me, NPC_SKELETON_INVADER, radius);
+        Acore::Containers::RandomResize(creatureList, 1);
+        if (creatureList.size() > 0)
+        {
+            creatureToReturn = creatureList.front();
+        }
+        creatureList.clear();
+        return creatureToReturn;
     }
 
     void UpdateAI(uint32 diff) override
@@ -614,7 +673,7 @@ struct npc_hyjal_frost_wyrm : public ScriptedAI
     {
         scheduler.Schedule(0s, [this](TaskContext context)
             {
-                DoCastVictim(SPELL_GARGOYLE_STRIKE);
+                DoCastVictim(SPELL_FROST_BREATH);
                 context.Repeat(3500ms, 4s);
             });
     }
@@ -667,4 +726,5 @@ void AddSC_hyjal()
     RegisterHyjalAI(npc_hyjal_ground_trash);
     RegisterHyjalAI(npc_hyjal_gargoyle);
     RegisterHyjalAI(npc_hyjal_frost_wyrm);
+    RegisterSpellScript(spell_cannibalize_heal);
 }

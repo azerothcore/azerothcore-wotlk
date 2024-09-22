@@ -46,7 +46,11 @@ enum CreatureIds
     NPC_HEXLORD                         = 24239,
     NPC_HALAZZI                         = 23577,
     NPC_NALORAKK                        = 23576,
-    NPC_SPIRIT_LYNX                     = 24143
+    NPC_SPIRIT_LYNX                     = 24143,
+    NPC_AMANISHI_WARBRINGER             = 23580,
+    NPC_AMANISHI_TRIBESMAN              = 23582,
+    NPC_AMANISHI_MEDICINE_MAN           = 23581,
+    NPC_AMANISHI_AXE_THROWER            = 23542
 };
 
 enum GameobjectIds

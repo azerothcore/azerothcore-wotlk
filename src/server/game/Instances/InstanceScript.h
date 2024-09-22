@@ -186,6 +186,9 @@ public:
 
     virtual void OnPlayerAreaUpdate(Player* /*player*/, uint32 /*oldArea*/, uint32 /*newArea*/) {}
 
+    //Called when a player enters/leaves water bodies.
+    virtual void OnPlayerInWaterStateUpdate(Player* /*player*/, bool /*inWater*/) {}
+
     //Handle open / close objects
     //use HandleGameObject(ObjectGuid::Empty, boolen, GO); in OnObjectCreate in instance scripts
     //use HandleGameObject(GUID, boolen, nullptr); in any other script
@@ -271,6 +274,10 @@ public:
     [[nodiscard]] uint8 GetStoredGameObjectState(ObjectGuid::LowType spawnId) const;
 
     void LoadInstanceSavedGameobjectStateData();
+
+    [[nodiscard]] bool IsBossDone(uint32 bossId) const { return GetBossState(bossId) == DONE; };
+    [[nodiscard]] bool AllBossesDone() const;
+    [[nodiscard]] bool AllBossesDone(std::initializer_list<uint32> bossIds) const;
 
     TaskScheduler scheduler;
 protected:

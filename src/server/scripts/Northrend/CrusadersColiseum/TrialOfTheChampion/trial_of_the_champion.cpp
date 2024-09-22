@@ -88,14 +88,14 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
-        if(!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
+        if (!creature->HasNpcFlag(UNIT_NPC_FLAG_GOSSIP))
             return true;
 
         InstanceScript* pInstance = creature->GetInstanceScript();
-        if(!pInstance)
+        if (!pInstance)
             return true;
 
-        if(uiAction == GOSSIP_ACTION_INFO_DEF + 1 || uiAction == GOSSIP_ACTION_INFO_DEF + 2 || uiAction == GOSSIP_ACTION_INFO_DEF + 3 || uiAction == GOSSIP_ACTION_INFO_DEF + 4)
+        if (uiAction == GOSSIP_ACTION_INFO_DEF + 1 || uiAction == GOSSIP_ACTION_INFO_DEF + 2 || uiAction == GOSSIP_ACTION_INFO_DEF + 3 || uiAction == GOSSIP_ACTION_INFO_DEF + 4)
         {
             pInstance->SetData(DATA_ANNOUNCER_GOSSIP_SELECT, (uiAction == GOSSIP_ACTION_INFO_DEF + 2 ? 1 : 0));
             creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -117,9 +117,9 @@ public:
         void Reset() override
         {
             InstanceScript* pInstance = me->GetInstanceScript();
-            if( !pInstance )
+            if (!pInstance)
                 return;
-            if( pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE )
+            if (pInstance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_ALLIANCE )
                 me->UpdateEntry(NPC_ARELAS);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); // removed during black knight scene
         }
@@ -135,7 +135,7 @@ public:
             if (type != EFFECT_MOTION_TYPE)
                 return;
             InstanceScript* pInstance = me->GetInstanceScript();
-            if( !pInstance )
+            if (!pInstance)
                 return;
             if (pInstance->GetData(DATA_INSTANCE_PROGRESS) < INSTANCE_PROGRESS_ARGENT_CHALLENGE_DIED)
                 return;

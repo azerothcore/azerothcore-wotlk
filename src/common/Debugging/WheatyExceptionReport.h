@@ -164,7 +164,7 @@ private:
 
     static void DumpTypeIndex(DWORD64, DWORD, DWORD_PTR, bool&, char const*, char*, bool, bool);
 
-    static void FormatOutputValue(char* pszCurrBuffer, BasicType basicType, DWORD64 length, PVOID pAddress, size_t bufferSize, size_t countOverride = 0);
+    static void FormatOutputValue(char* pszCurrBuffer, BasicType basicType, DWORD64 length, PVOID pAddress, std::size_t bufferSize, std::size_t countOverride = 0);
 
     static BasicType GetBasicType(DWORD typeIndex, DWORD64 modBase);
     static DWORD_PTR DereferenceUnsafePointer(DWORD_PTR address);

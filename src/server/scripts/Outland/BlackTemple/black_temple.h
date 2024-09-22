@@ -19,12 +19,6 @@
 #define BLACK_TEMPLE_H_
 
 #include "CreatureAIImpl.h"
-#include "GridNotifiers.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "ScriptedGossip.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
 
 #define DataHeader "BT"
 
@@ -40,17 +34,28 @@ enum DataTypes
     DATA_RELIQUARY_OF_SOULS         = 5,
     DATA_MOTHER_SHAHRAZ             = 6,
     DATA_ILLIDARI_COUNCIL           = 7,
-    DATA_AKAMA_FINISHED             = 8,
+    DATA_AKAMA_ILLIDAN              = 8,
     DATA_ILLIDAN_STORMRAGE          = 9,
-    MAX_ENCOUNTERS                  = 10
+    MAX_ENCOUNTERS                  = 10,
+
+    DATA_AKAMA_SHADE                = 11,
+    DATA_GATHIOS_THE_SHATTERER      = 12,
+    DATA_HIGH_NETHERMANCER_ZEREVOR  = 13,
+    DATA_LADY_MALANDE               = 14,
+    DATA_VERAS_DARKSHADOW           = 15,
+    DATA_BLACK_TEMPLE_TRIGGER       = 16
 };
 
 enum CreatureIds
 {
+    NPC_HIGH_WARLORD_NAJENTUS       = 22887,
+    NPC_SUPREMUS                    = 22898,
     NPC_SHADE_OF_AKAMA              = 22841,
     NPC_AKAMA_SHADE                 = 23191,
-    NPC_STORM_FURY                  = 22848,
+    NPC_ASHTONGUE_CHANNELER         = 23421,
+    NPC_CREATURE_GENERATOR_AKAMA    = 23210,
     NPC_TERON_GOREFIEND             = 22871,
+    NPC_GURTOGG_BLOODBOIL           = 22948,
     NPC_VENGEFUL_SPIRIT             = 23109,
     NPC_SHADOWY_CONSTRUCT           = 23111,
     NPC_ANGERED_SOUL_FRAGMENT       = 23398,
@@ -58,18 +63,28 @@ enum CreatureIds
     NPC_SUFFERING_SOUL_FRAGMENT     = 23399,
     NPC_RELIQUARY_OF_THE_LOST       = 22856,
     NPC_ENSLAVED_SOUL               = 23469,
+    NPC_MOTHER_SHAHRAZ              = 22947,
     NPC_GATHIOS_THE_SHATTERER       = 22949,
     NPC_HIGH_NETHERMANCER_ZEREVOR   = 22950,
     NPC_LADY_MALANDE                = 22951,
     NPC_VERAS_DARKSHADOW            = 22952,
     NPC_ILLIDARI_COUNCIL            = 23426,
-    NPC_AKAMA                       = 23089,
+    NPC_AKAMA_ILLIDAN               = 23089,
     NPC_ILLIDAN_STORMRAGE           = 22917,
     NPC_PARASITIC_SHADOWFIEND       = 23498,
     NPC_BLADE_OF_AZZINOTH           = 22996,
     NPC_FLAME_OF_AZZINOTH           = 22997,
 
-    NPC_DRAGON_TURTLE               = 22885
+    NPC_ASHTONGUE_BATTLELORD        = 22844,
+    NPC_ASHTONGUE_MYSTIC            = 22845,
+    NPC_ASHTONGUE_STORMCALLER       = 22846,
+    NPC_ASHTONGUE_PRIMALIST         = 22847,
+    NPC_ASHTONGUE_FERAL_SPIRIT      = 22849,
+    NPC_ASHTONGUE_STALKER           = 23374,
+    NPC_STORM_FURY                  = 22848,
+
+    NPC_DRAGON_TURTLE               = 22885,
+    NPC_BLACK_TEMPLE_TRIGGER        = 22984
 };
 
 enum GameObjectIds
@@ -96,7 +111,14 @@ enum MiscIds
     SPELL_SHADOW_INFERNO_DAMAGE     = 39646,
     SPELL_CHAOTIC_CHARGE            = 41033,
     SPELL_DEMENTIA1                 = 41406,
-    SPELL_DEMENTIA2                 = 41409
+    SPELL_DEMENTIA2                 = 41409,
+    SPELL_SUMMON_SHADOWFIENDS       = 41159
+};
+
+enum Texts
+{
+    EMOTE_NAJENTUS_DEFEATED           = 0,
+    EMOTE_LOWER_TEMPLE_DEFEATED       = 1
 };
 
 template <class AI, class T>
