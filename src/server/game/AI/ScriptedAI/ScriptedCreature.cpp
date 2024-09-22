@@ -522,6 +522,10 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
     if (loadDefault)
     {
         me->LoadEquipment(me->GetOriginalEquipmentId(), true);
+        if (me->HasWeapon(OFF_ATTACK))
+            me->SetCanDualWield(true);
+        else
+            me->SetCanDualWield(false);
         return;
     }
 
