@@ -567,7 +567,7 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bo
     float weaponMinDamage = GetWeaponDamageRange(attType, MINDAMAGE);
     float weaponMaxDamage = GetWeaponDamageRange(attType, MAXDAMAGE);
 
-    if (IsInFeralForm()) // check if player is druid and in cat or bear forms
+    if (IsAttackSpeedOverridenShapeShift()) // forms with no override on attack speed use normal weapon damage
     {
         uint8 lvl = GetLevel();
         if (lvl > 60)

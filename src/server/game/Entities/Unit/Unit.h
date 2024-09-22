@@ -1065,6 +1065,9 @@ public:
     inline bool HasRangedWeaponForAttack() const { return HasWeaponForAttack(RANGED_ATTACK); }
     [[nodiscard]] bool CanUseAttackType(uint8 attacktype) const
     {
+        if (IsAttackSpeedOverridenShapeShift())
+            return false;
+
         switch (attacktype)
         {
             case BASE_ATTACK:
@@ -1477,6 +1480,8 @@ public:
     {
         SetByteValue(UNIT_FIELD_BYTES_2, 3, form);
     }
+
+    bool IsAttackSpeedOverridenShapeShift() const;
 
     [[nodiscard]] bool IsInFeralForm() const
     {

@@ -19467,6 +19467,16 @@ Unit* Unit::GetRedirectThreatTarget() const
     return _redirectThreatInfo.GetTargetGUID() ? ObjectAccessor::GetUnit(*this, _redirectThreatInfo.GetTargetGUID()) : nullptr;
 }
 
+bool Unit::IsAttackSpeedOverridenShapeShift() const
+{
+    // Mirroring clientside gameplay logic
+    if (ShapeshiftForm form = GetShapeshiftForm())
+        if (SpellShapeshiftFormEntry const* entry = sSpellShapeshiftFormStore.LookupEntry(form))
+            return entry->attackSpeed > 0;
+
+    return false;
+}
+
 void Unit::JumpTo(float speedXY, float speedZ, bool forward)
 {
     float angle = forward ? 0 : M_PI;
