@@ -1,3 +1,4 @@
+-- DB update 2024_09_22_01 -> 2024_09_22_02
 -- AzjolNerub
 -- Anubarak 29120 txt line ruRU loc (BroadcastTextId unknown)
 DELETE FROM `creature_text_locale` WHERE `CreatureID`=29120 AND `GroupID`=5 AND `ID`=0 AND `locale`='ruRU' ;
