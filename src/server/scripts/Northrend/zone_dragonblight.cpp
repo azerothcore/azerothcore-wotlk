@@ -283,12 +283,12 @@ public:
 
     bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if(!player || !go)
+        if (!player || !go)
             return true;
 
         Creature* t = player->FindNearestCreature(NPC_CONVERSING_WITH_THE_DEPTHS_TRIGGER, 10.0f, true);
-        if(t && t->AI() && CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI()))
-            if(!CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->running)
+        if (t && t->AI() && CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI()))
+            if (!CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->running)
                 CAST_AI(npc_conversing_with_the_depths_trigger::npc_conversing_with_the_depths_triggerAI, t->AI())->Start(player->GetGUID());
 
         return true;

@@ -3273,6 +3273,7 @@ enum TournamentMountsSpells
    62785 - Summon Tournament Kodo
    62786 - Summon Tournament Hawkstrider
    62787 - Summon Tournament Warhorse
+   63215 - Summon Campaign Charger
    63663 - Summon Tournament Argent Charger
    63791 - Summon Tournament Hawkstrider (Aspirant)
    63792 - Summon Tournament Steed (Aspirant) */

@@ -90,7 +90,7 @@ std::string secsToTimeString(uint64 timeInSecs, bool shortText)
     {
         ss << minutes << (shortText ? "m" : " minute(s) ");
     }
-    if (secs || (!days && !hours && !minutes) )
+    if (secs || (!days && !hours && !minutes))
     {
         ss << secs << (shortText ? "s" : " second(s) ");
     }
