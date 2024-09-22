@@ -1582,6 +1582,9 @@ public:
     static void DeleteOldCharacters();
     static void DeleteOldCharacters(uint32 keepDays);
 
+    static void DeleteOldRecoveryItems();
+    static void DeleteOldRecoveryItems(uint32 keepDays);
+
     bool m_mailsUpdated;
 
     void SetBindPoint(ObjectGuid guid);
