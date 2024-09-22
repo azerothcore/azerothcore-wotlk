@@ -3609,10 +3609,10 @@ float Creature::GetAttackDistance(Unit const* player) const
     if (creatureLevel + 5 <= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
         // detect range auras
-        retDistance += static_cast<float>( GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE) );
+        retDistance += static_cast<float>( GetTotalAuraModifier(SPELL_AURA_MOD_DETECT_RANGE));
 
         // detected range auras
-        retDistance += static_cast<float>( player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE) );
+        retDistance += static_cast<float>( player->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE));
     }
 
     // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
@@ -3678,7 +3678,7 @@ bool Creature::IsNotReachableAndNeedRegen() const
 std::shared_ptr<time_t> const& Creature::GetLastLeashExtensionTimePtr() const
 {
     if (m_lastLeashExtensionTime == nullptr)
-        m_lastLeashExtensionTime = std::make_shared<time_t>(time(nullptr));
+        m_lastLeashExtensionTime = std::make_shared<time_t>(GameTime::GetGameTime().count());
     return m_lastLeashExtensionTime;
 }
 
@@ -3699,7 +3699,7 @@ time_t Creature::GetLastLeashExtensionTime() const
 
 void Creature::UpdateLeashExtensionTime()
 {
-    (*GetLastLeashExtensionTimePtr()) = time(nullptr);
+    (*GetLastLeashExtensionTimePtr()) = GameTime::GetGameTime().count();
 }
 
 bool Creature::CanPeriodicallyCallForAssistance() const

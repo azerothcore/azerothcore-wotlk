@@ -151,7 +151,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_BRONJAHM:
                     m_auiEncounter[type] = data;
@@ -180,22 +180,22 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 12752: // Soul Power
-                    if( Creature* c = instance->GetCreature(NPC_BronjahmGUID) )
+                    if (Creature* c = instance->GetCreature(NPC_BronjahmGUID))
                     {
                         std::list<Creature*> L;
                         uint8 count = 0;
                         c->GetCreaturesWithEntryInRange(L, 200.0f, 36535); // find all Corrupted Soul Fragment (36535)
                         for( std::list<Creature*>::const_iterator itr = L.begin(); itr != L.end(); ++itr )
-                            if( (*itr)->IsAlive() )
+                            if ((*itr)->IsAlive())
                                 ++count;
                         return (count >= 4);
                     }
                     break;
                 case 12976:
-                    if( Creature* c = instance->GetCreature(NPC_DevourerGUID) )
+                    if (Creature* c = instance->GetCreature(NPC_DevourerGUID))
                         return (bool)c->AI()->GetData(1);
                     break;
             }

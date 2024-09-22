@@ -28,8 +28,8 @@ time cmake ../../../ \
 -DCMAKE_BUILD_TYPE=Release \
 -DMYSQL_ADD_INCLUDE_PATH=$mysql_include_path \
 -DMYSQL_LIBRARY=$mysql_lib_path \
--DREADLINE_INCLUDE_DIR=/usr/local/opt/readline/include \
--DREADLINE_LIBRARY=/usr/local/opt/readline/lib/libreadline.dylib \
+-DREADLINE_INCLUDE_DIR=$(brew --prefix readline)/include \
+-DREADLINE_LIBRARY=$(brew --prefix readline)/lib/libreadline.dylib \
 -DOPENSSL_INCLUDE_DIR="$OPENSSL_ROOT_DIR/include" \
 -DOPENSSL_SSL_LIBRARIES="$OPENSSL_ROOT_DIR/lib/libssl.dylib" \
 -DOPENSSL_CRYPTO_LIBRARIES="$OPENSSL_ROOT_DIR/lib/libcrypto.dylib" \

@@ -294,11 +294,6 @@ struct boss_kaelthas : public BossAI
             BossAI::AttackStart(who);
     }
 
-    void JustReachedHome() override
-    {
-        Reset();
-    }
-
     void MoveInLineOfSight(Unit* who) override
     {
         if (_phase == PHASE_NONE && who->IsPlayer() && me->IsValidAttackTarget(who))
@@ -343,7 +338,7 @@ struct boss_kaelthas : public BossAI
 
     void DoAction(int32 action) override
     {
-        switch(action)
+        switch (action)
         {
             case ACTION_START_SANGUINAR:
                 IntroduceNewAdvisor(SAY_INTRO_SANGUINAR, ACTION_START_SANGUINAR);
@@ -615,7 +610,7 @@ struct boss_kaelthas : public BossAI
             Talk(talkIntroduction);
         });
         //switch because talk times are different
-        switch(kaelAction)
+        switch (kaelAction)
         {
             case ACTION_START_SANGUINAR:
                 attackStartTimer = 14500ms;
@@ -690,7 +685,7 @@ struct boss_kaelthas : public BossAI
             AttackStart(target);
         }
         ScheduleHealthCheckEvent(50, [&]{
-            if(!_transitionSceneReached)
+            if (!_transitionSceneReached)
             {
                 _transitionSceneReached = true;
                 scheduler.CancelAll();

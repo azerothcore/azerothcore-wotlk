@@ -241,7 +241,7 @@ void Guild::BankEventLogEntry::WritePacket(WorldPackets::Guild::GuildBankLogQuer
     bankLogEntry.TimeOffset = int32(GameTime::GetGameTime().count() - m_timestamp);
     bankLogEntry.EntryType = int8(m_eventType);
 
-    switch(m_eventType)
+    switch (m_eventType)
     {
         case GUILD_BANK_LOG_DEPOSIT_ITEM:
         case GUILD_BANK_LOG_WITHDRAW_ITEM:

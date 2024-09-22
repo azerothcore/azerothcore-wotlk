@@ -1265,6 +1265,7 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_ITEMDELETE_VENDOR]    = sConfigMgr->GetOption<bool>("ItemDelete.Vendor", 0);
     _int_configs[CONFIG_ITEMDELETE_QUALITY]    = sConfigMgr->GetOption<int32>("ItemDelete.Quality", 3);
     _int_configs[CONFIG_ITEMDELETE_ITEM_LEVEL] = sConfigMgr->GetOption<int32>("ItemDelete.ItemLevel", 80);
+    _int_configs[CONFIG_ITEMDELETE_KEEP_DAYS]  = sConfigMgr->GetOption<int32>("ItemDelete.KeepDays", 0);
 
     _int_configs[CONFIG_FFA_PVP_TIMER] = sConfigMgr->GetOption<int32>("FFAPvPTimer", 30);
 
@@ -2090,6 +2091,9 @@ void World::SetInitialWorldSettings()
 
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
+
+    // Delete all items which have been deleted X days before
+    Player::DeleteOldRecoveryItems();
 
     // Delete all custom channels which haven't been used for PreserveCustomChannelDuration days.
     Channel::CleanOldChannelsInDB();

@@ -502,7 +502,7 @@ public:
             events.ScheduleEvent(EVENT_FREYA_BERSERK, 10min);
             events.SetPhase(EVENT_PHASE_ADDS);
 
-            if( !m_pInstance )
+            if (!m_pInstance)
                 return;
 
             if (m_pInstance->GetData(TYPE_FREYA) != DONE)

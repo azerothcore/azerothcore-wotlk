@@ -95,15 +95,15 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if(!UpdateVictim())
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case EVENT_STORM:
                     {
