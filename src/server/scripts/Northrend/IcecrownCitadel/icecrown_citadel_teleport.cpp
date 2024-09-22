@@ -134,4 +134,3 @@ void AddSC_icecrown_citadel_teleport()
     new icecrown_citadel_teleport();
     new at_frozen_throne_teleport();
 }
-

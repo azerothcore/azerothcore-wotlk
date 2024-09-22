@@ -125,7 +125,7 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_UROM, NOT_STARTED);
-                if( pInstance->GetData(DATA_VAROS) != DONE )
+                if (pInstance->GetData(DATA_VAROS) != DONE )
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 else
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -143,20 +143,20 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            if( lock )
+            if (lock)
                 return;
 
             uint8 phase = GetPhaseByCurrentPosition();
-            if( phase == 3 )
+            if (phase == 3)
             {
                 Talk(SAY_AGGRO);
 
-                if( pInstance )
+                if (pInstance)
                     pInstance->SetData(DATA_UROM, IN_PROGRESS);
 
                 me->SetInCombatWithZone();
                 me->SetHomePosition(cords[0][0], cords[0][1], cords[0][2], cords[0][3]);
-                if( me->FindCurrentSpellBySpellId(SPELL_EVOCATION) )
+                if (me->FindCurrentSpellBySpellId(SPELL_EVOCATION))
                     me->InterruptNonMeleeSpells(false);
 
                 events.RescheduleEvent(EVENT_FROSTBOMB, 7s, 11s);
@@ -167,7 +167,7 @@ public:
             {
                 lock = true;
 
-                switch( phase )
+                switch (phase)
                 {
                     case 0:
                         Talk(SAY_SUMMON_1);
@@ -190,7 +190,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if( lock )
+            if (lock)
                 return;
 
             if (me->GetDistance(1103.0f, 1049.0f, 510.0f) < 55.0f)
@@ -200,8 +200,8 @@ public:
         void JustSummoned(Creature* pSummon) override
         {
             pSummon->SetInCombatWithZone();
-            if( Unit* v = pSummon->SelectVictim() )
-                if( pSummon->AI() )
+            if (Unit* v = pSummon->SelectVictim())
+                if (pSummon->AI())
                     pSummon->AI()->AttackStart(v);
         }
 
@@ -234,7 +234,7 @@ public:
 
         void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
         {
-            switch( spell->Id )
+            switch (spell->Id)
             {
                 case SPELL_SUMMON_MENAGERIE_1:
                     {
@@ -299,9 +299,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( releaseLockTimer )
+            if (releaseLockTimer)
             {
-                if( releaseLockTimer >= 5000 )
+                if (releaseLockTimer >= 5000)
                 {
                     lock = false;
                     if (me->IsInCombat())
@@ -315,27 +315,27 @@ public:
                     releaseLockTimer += diff;
             }
 
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_FROSTBOMB:
-                    if( Unit* v = me->GetVictim() )
+                    if (Unit* v = me->GetVictim())
                         me->CastSpell(v, SPELL_FROSTBOMB, false);
                     events.Repeat(7s, 11s);
                     break;
                 case EVENT_TIME_BOMB:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         DoCast(target, DUNGEON_MODE(SPELL_TIME_BOMB_N, SPELL_TIME_BOMB_H));
                     events.Repeat(20s, 25s);
                     break;

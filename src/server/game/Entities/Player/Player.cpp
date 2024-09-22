@@ -28,6 +28,7 @@
 #include "BattlegroundAV.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
+#include "CharmInfo.h"
 #include "Channel.h"
 #include "CharacterCache.h"
 #include "CharacterDatabaseCleaner.h"
@@ -82,6 +83,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <cmath>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -2383,7 +2385,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
         return;
     }
 
-    if (victim && victim->GetTypeId() == TYPEID_UNIT && !victim->ToCreature()->hasLootRecipient())
+    if (victim && victim->IsCreature() && !victim->ToCreature()->hasLootRecipient())
     {
         return;
     }
@@ -4332,6 +4334,49 @@ void Player::DeleteOldCharacters(uint32 keepDays)
     }
 }
 
+/**
+ * Items which were kept back in the database after being deleted and are now too old (see config option "ItemDelete.KeepDays"), will be completely deleted.
+ */
+void Player::DeleteOldRecoveryItems()
+{
+    uint32 keepDays = sWorld->getIntConfig(CONFIG_ITEMDELETE_KEEP_DAYS);
+    if (!keepDays)
+        return;
+
+    Player::DeleteOldRecoveryItems(keepDays);
+}
+
+/**
+ * Items which were kept back in the database after being deleted and are older than the specified amount of days, will be completely deleted.
+ */
+void Player::DeleteOldRecoveryItems(uint32 keepDays)
+{
+    LOG_INFO("server.loading", "Player::DeleteOldRecoveryItems: Deleting all items which have been deleted {} days before...", keepDays);
+    LOG_INFO("server.loading", " ");
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_OLD_ITEMS);
+    stmt->SetData(0, uint32(GameTime::GetGameTime().count() - time_t(keepDays * DAY)));
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result)
+    {
+        LOG_INFO("server.loading", "Player::DeleteOldRecoveryItems: Found {} item(s) to delete", result->GetRowCount());
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 guid = fields[0].Get<uint32>();
+            uint32 itemEntry = fields[1].Get<uint32>();
+
+            CharacterDatabasePreparedStatement* deleteStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_GUID);
+            deleteStmt->SetData(0, guid);
+            CharacterDatabase.Execute(deleteStmt);
+
+            LOG_INFO("server.loading", "Deleted item from recovery_item table where guid {} and item id {}", guid, itemEntry);
+        } while (result->NextRow());
+    }
+}
+
 void Player::SetMovement(PlayerMovementType pType)
 {
     WorldPacket data;
@@ -4682,7 +4727,7 @@ void Player::DurabilityLossAll(double percent, bool inventory)
 
 void Player::DurabilityLoss(Item* item, double percent)
 {
-    if(!item || percent == 0.0)
+    if (!item || percent == 0.0)
         return;
 
     uint32 pMaxDurability = item ->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
@@ -5903,7 +5948,7 @@ float Player::CalculateReputationGain(ReputationSource source, uint32 creatureOr
 // Calculates how many reputation points player gains in victim's enemy factions
 void Player::RewardReputation(Unit* victim)
 {
-    if (!victim || victim->GetTypeId() == TYPEID_PLAYER)
+    if (!victim || victim->IsPlayer())
         return;
 
     if (victim->ToCreature()->IsReputationGainDisabled())
@@ -6021,7 +6066,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
     // do not reward honor in arenas, but enable onkill spellproc
     if (InArena())
     {
-        if (!uVictim || uVictim == this || uVictim->GetTypeId() != TYPEID_PLAYER)
+        if (!uVictim || uVictim == this || !uVictim->IsPlayer())
             return false;
 
         if (GetBgTeamId() == uVictim->ToPlayer()->GetBgTeamId())
@@ -6035,7 +6080,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
         return false;
 
     /* check if player has same IP
-    if (uVictim && uVictim->GetTypeId() == TYPEID_PLAYER)
+    if (uVictim && uVictim->IsPlayer())
     {
         if (GetSession()->GetRemoteAddress() == uVictim->ToPlayer()->GetSession()->GetRemoteAddress())
             return false;
@@ -6062,7 +6107,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
 
         victim_guid = uVictim->GetGUID();
 
-        if (uVictim->GetTypeId() == TYPEID_PLAYER)
+        if (uVictim->IsPlayer())
         {
             Player* victim = uVictim->ToPlayer();
 
@@ -6173,7 +6218,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
         if (!uVictim || uVictim == this || uVictim->HasAuraType(SPELL_AURA_NO_PVP_CREDIT))
             return true;
 
-        if (uVictim->GetTypeId() == TYPEID_PLAYER)
+        if (uVictim->IsPlayer())
         {
             // Check if allowed to receive it in current map
             uint8 MapType = sWorld->getIntConfig(CONFIG_PVP_TOKEN_MAP_TYPE);
@@ -7737,7 +7782,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
     // remove FD and invisibility at all loots
     constexpr std::array<AuraType, 2> toRemove = {SPELL_AURA_MOD_INVISIBILITY, SPELL_AURA_FEIGN_DEATH};
-    for (const auto& aura : toRemove)
+    for (auto const& aura : toRemove)
     {
         RemoveAurasByType(aura);
     }
@@ -9160,7 +9205,7 @@ Pet* Player::CreatePet(Creature* creatureTarget, uint32 spellID /*= 0*/)
         return nullptr;
     }
 
-    if (!creatureTarget || creatureTarget->IsPet() || creatureTarget->GetTypeId() == TYPEID_PLAYER)
+    if (!creatureTarget || creatureTarget->IsPet() || creatureTarget->IsPlayer())
     {
         return nullptr;
     }
@@ -9254,7 +9299,7 @@ void Player::StopCastingCharm(Aura* except /*= nullptr*/)
         return;
     }
 
-    if (charm->GetTypeId() == TYPEID_UNIT)
+    if (charm->IsCreature())
     {
         if (charm->ToCreature()->HasUnitTypeMask(UNIT_MASK_PUPPET))
         {
@@ -9609,7 +9654,7 @@ void Player::CharmSpellInitialize()
     }
 
     uint8 addlist = 0;
-    if (charm->GetTypeId() != TYPEID_PLAYER)
+    if (!charm->IsPlayer())
     {
         //CreatureInfo const* cinfo = charm->ToCreature()->GetCreatureTemplate();
         //if (cinfo && cinfo->type == CREATURE_TYPE_DEMON && getClass() == CLASS_WARLOCK)
@@ -9625,7 +9670,7 @@ void Player::CharmSpellInitialize()
     data << uint16(0);
     data << uint32(0);
 
-    if (charm->GetTypeId() != TYPEID_PLAYER)
+    if (!charm->IsPlayer())
         data << uint8(charm->ToCreature()->GetReactState()) << uint8(charmInfo->GetCommandState()) << uint16(0);
     else
         data << uint32(0);
@@ -9999,13 +10044,13 @@ void Player::RemoveSpellMods(Spell* spell)
             spell->m_appliedMods.erase(iterMod);
 
             // MAGE T8P4 BONUS
-            if( spellInfo->SpellFamilyName == SPELLFAMILY_MAGE )
+            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE)
             {
                 SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
                 // Missile Barrage, Hot Streak, Brain Freeze (trigger spell - Fireball!)
-                if( sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938 )
-                    if( AuraEffect* aurEff = GetAuraEffectDummy(64869) )
-                        if( roll_chance_i(aurEff->GetAmount()) )
+                if (sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938)
+                    if (AuraEffect* aurEff = GetAuraEffectDummy(64869))
+                        if (roll_chance_i(aurEff->GetAmount()))
                         {
                             mod->charges = 1;
                             continue;
@@ -10643,7 +10688,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         if (!bStore)
             AutoUnequipOffhandIfNeed();
 
-        if (pProto->Flags & ITEM_FLAG_ITEM_PURCHASE_RECORD && crItem->ExtendedCost && pProto->GetMaxStackSize() == 1)
+        if (pProto->HasFlag(ITEM_FLAG_ITEM_PURCHASE_RECORD) && crItem->ExtendedCost && pProto->GetMaxStackSize() == 1)
         {
             it->SetFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE);
             it->SetRefundRecipient(GetGUID().GetCounter());
@@ -10691,7 +10736,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         return false;
     }
 
-    if (!IsGameMaster() && ((pProto->Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY && GetTeamId(true) == TEAM_HORDE)))
+    if (!IsGameMaster() && ((pProto->HasFlag2(ITEM_FLAG2_FACTION_HORDE) && GetTeamId(true) == TEAM_ALLIANCE) || (pProto->HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE) && GetTeamId(true) == TEAM_HORDE)))
     {
         return false;
     }
@@ -10803,7 +10848,7 @@ bool Player::BuyItemFromVendorSlot(ObjectGuid vendorguid, uint32 vendorslot, uin
         price = pProto->BuyPrice * count; //it should not exceed MAX_MONEY_AMOUNT
 
         // reputation discount
-        price = uint32(floor(price * GetReputationPriceDiscount(creature)));
+        price = uint32(std::floor(price * GetReputationPriceDiscount(creature)));
 
         if (!HasEnoughMoney(price))
         {
@@ -11721,7 +11766,7 @@ void Player::SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint3
 
 void Player::ApplyEquipCooldown(Item* pItem)
 {
-    if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_FLAG_NO_EQUIP_COOLDOWN))
+    if (pItem->GetTemplate()->HasFlag(ITEM_FLAG_NO_EQUIP_COOLDOWN))
         return;
 
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
@@ -12424,6 +12469,14 @@ void Player::AutoUnequipOffhandIfNeed(bool force /*= false*/)
     if (!CanDualWield() && (offItem->GetTemplate()->InventoryType == INVTYPE_WEAPONOFFHAND || offItem->GetTemplate()->InventoryType == INVTYPE_WEAPON))
         force = true;
 
+    // unequip offhand weapon if player main hand weapon is a polearm or staff or fishing pole
+    if (Item* mhWeapon = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+        if (ItemTemplate const* mhWeaponProto = mhWeapon->GetTemplate())
+            if (mhWeaponProto->SubClass == ITEM_SUBCLASS_WEAPON_POLEARM ||
+                mhWeaponProto->SubClass == ITEM_SUBCLASS_WEAPON_STAFF ||
+                mhWeaponProto->SubClass == ITEM_SUBCLASS_WEAPON_FISHING_POLE)
+                force = true;
+
     // need unequip offhand for 2h-weapon without TitanGrip (in any from hands)
     if (!force && (CanTitanGrip() || (offItem->GetTemplate()->InventoryType != INVTYPE_2HWEAPON && !IsTwoHandUsed())))
     {
@@ -12620,7 +12673,7 @@ bool Player::isHonorOrXPTarget(Unit* victim) const
         return false;
     }
 
-    if (victim->GetTypeId() == TYPEID_UNIT)
+    if (victim->IsCreature())
     {
         if (victim->IsTotem() || victim->IsCritter() || victim->IsPet() || (victim->ToCreature()->GetCreatureTemplate()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP))
         {
@@ -12682,7 +12735,7 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
     if (!pRewardSource)
         return;
 
-    ObjectGuid creature_guid = (pRewardSource->GetTypeId() == TYPEID_UNIT) ? pRewardSource->GetGUID() : ObjectGuid::Empty;
+    ObjectGuid creature_guid = (pRewardSource->IsCreature()) ? pRewardSource->GetGUID() : ObjectGuid::Empty;
 
     // prepare data for near group iteration
     if (Group* group = GetGroup())
@@ -12816,7 +12869,7 @@ void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= 
         SetMover(target);
 
     // Xinef: disable moving if target has disable move flag
-    if (target->GetTypeId() != TYPEID_UNIT)
+    if (!target->IsCreature())
         return;
 
     if (allowMove && target->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
@@ -12853,12 +12906,12 @@ void Player::SetMover(Unit* target)
         LOG_INFO("misc", "Player::SetMover (B2) - {}, {}, {}, {}, {}, {}, {}, {}", target->GetGUID().ToString(), target->GetMapId(), target->GetInstanceId(), target->FindMap()->GetId(), target->IsInWorld() ? 1 : 0, target->IsDuringRemoveFromWorld() ? 1 : 0, (target->ToPlayer() && target->ToPlayer()->IsBeingTeleported() ? 1 : 0), target->isBeingLoaded() ? 1 : 0);
     }
     m_mover->m_movedByPlayer = nullptr;
-    if (m_mover->GetTypeId() == TYPEID_UNIT)
+    if (m_mover->IsCreature())
         m_mover->GetMotionMaster()->Initialize();
 
     m_mover = target;
     m_mover->m_movedByPlayer = this;
-    if (m_mover->GetTypeId() == TYPEID_UNIT)
+    if (m_mover->IsCreature())
         m_mover->GetMotionMaster()->Initialize();
 }
 
@@ -13103,7 +13156,7 @@ void Player::StopCastingBindSight(Aura* except /*= nullptr*/)
 {
     if (WorldObject* target = GetViewpoint())
     {
-        if (target->isType(TYPEMASK_UNIT))
+        if (target->IsUnit())
         {
             ((Unit*)target)->RemoveAurasByType(SPELL_AURA_BIND_SIGHT, GetGUID(), except);
             ((Unit*)target)->RemoveAurasByType(SPELL_AURA_MOD_POSSESS, GetGUID(), except);
@@ -13127,7 +13180,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
         // farsight dynobj or puppet may be very far away
         UpdateVisibilityOf(target);
 
-        if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
+        if (target->IsUnit() && !GetVehicle())
             ((Unit*)target)->AddPlayerToVision(this);
         SetSeer(target);
     }
@@ -13144,7 +13197,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
             return;
         }
 
-        if (target->isType(TYPEMASK_UNIT) && !GetVehicle())
+        if (target->IsUnit() && !GetVehicle())
             static_cast<Unit*>(target)->RemovePlayerFromVision(this);
 
         // must immediately set seer back otherwise may crash
@@ -13583,6 +13636,7 @@ uint32 Player::CalculateTalentsPoints() const
     }
 
     talentPointsForLevel += m_extraBonusTalentCount;
+    sScriptMgr->OnCalculateTalentsPoints(this, talentPointsForLevel);
     return uint32(talentPointsForLevel * sWorld->getRate(RATE_TALENT));
 }
 
@@ -13763,7 +13817,7 @@ InventoryResult Player::CanEquipUniqueItem(Item* pItem, uint8 eslot, uint32 limi
 InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 except_slot, uint32 limit_count) const
 {
     // check unique-equipped on item
-    if (itemProto->Flags & ITEM_FLAG_UNIQUE_EQUIPPABLE)
+    if (itemProto->HasFlag(ITEM_FLAG_UNIQUE_EQUIPPABLE))
     {
         // there is an equip limit on this item
         if (HasItemOrGemWithIdEquipped(itemProto->ItemId, 1, except_slot))
@@ -15432,7 +15486,7 @@ void Player::PrepareCharmAISpells()
             }
             else if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
             {
-                if( (int32)periodic_damage < CalculateSpellDamage(this, spellInfo, i) )
+                if ((int32)periodic_damage < CalculateSpellDamage(this, spellInfo, i))
                 {
                     m_charmAISpells[SPELL_DOT_DAMAGE] = spellInfo->Id;
                     break;
@@ -15469,7 +15523,7 @@ void Player::SendRefundInfo(Item* item)
     // This function call unsets ITEM_FLAGS_REFUNDABLE if played time is over 2 hours.
     item->UpdatePlayedTime(this);
 
-    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
+    if (!item->IsRefundable())
     {
         LOG_DEBUG("entities.player.items", "Item refund: item not refundable!");
         return;
@@ -15537,7 +15591,7 @@ PetStable& Player::GetOrInitPetStable()
 
 void Player::RefundItem(Item* item)
 {
-    if (!item->HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_REFUNDABLE))
+    if (!item->IsRefundable())
     {
         LOG_DEBUG("entities.player.items", "Item refund: item not refundable!");
         return;

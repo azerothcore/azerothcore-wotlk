@@ -86,7 +86,7 @@ public:
 
             me->setActive(true);
             instance->SetBossState(DATA_TROLLGORE, IN_PROGRESS);
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 Talk(SAY_AGGRO);
                 me->SetInCombatWithZone();
@@ -133,7 +133,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_INFECTED_WOUND:
                     me->CastSpell(me->GetVictim(), SPELL_INFECTED_WOUND, false);

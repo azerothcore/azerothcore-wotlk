@@ -91,7 +91,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -155,4 +155,3 @@ void AddSC_boss_moragg()
     new boss_moragg();
     RegisterSpellScript(spell_optic_link_aura);
 }
-

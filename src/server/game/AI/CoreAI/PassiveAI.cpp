@@ -25,7 +25,7 @@ NullCreatureAI::NullCreatureAI(Creature* c) : CreatureAI(c) { me->SetReactState(
 
 int32 NullCreatureAI::Permissible(Creature const* creature)
 {
-    if (creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPELLCLICK))
+    if (creature->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
         return PERMIT_BASE_PROACTIVE + 50;
 
     if (creature->IsTrigger())
@@ -65,7 +65,7 @@ void PossessedAI::JustDied(Unit* /*u*/)
 void PossessedAI::KilledUnit(Unit*  /*victim*/)
 {
     // We killed a creature, disable victim's loot
-    //if (victim->GetTypeId() == TYPEID_UNIT)
+    //if (victim->IsCreature())
     //    victim->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
 }
 

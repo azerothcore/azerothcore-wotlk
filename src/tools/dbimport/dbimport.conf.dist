@@ -54,7 +54,7 @@ SourceDirectory = ""
 #    MySQLExecutable
 #        Description: The path to your MySQL CLI binary.
 #                     If the path is left empty, built-in path from cmake is used.
-#        Example:     "C:/Program Files/MariaDB 10.9/bin/mysql.exe"
+#        Example:     "C:/Program Files/MySQL Server 8.4/bin/mysql.exe"
 #                     "mysql.exe"
 #                     "/usr/bin/mysql"
 #        Default:     ""
@@ -158,6 +158,17 @@ CharacterDatabase.SynchThreads = 1
 #                     0  - (All disabled)
 
 Updates.EnableDatabases = 7
+
+#
+#   Updates.AllowedModules
+#       Description: A list of modules that are allowed to be updated automatically by the DBImport tool.
+#                    If the list is empty, no modules are allowed to automatically update. (current behavior)
+#       Default:     "" - (No modules are allowed)
+#
+#       Example:     "mod_name,mod_name2,mod_name3" (selected modules)
+#                     "all" - (All modules are allowed)
+#
+Updates.AllowedModules = "all"
 
 #
 #    Updates.AutoSetup

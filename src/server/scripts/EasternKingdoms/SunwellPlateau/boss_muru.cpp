@@ -393,7 +393,7 @@ class spell_entropius_negative_energy : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_UNIT;
+        return GetCaster()->IsCreature();
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)
@@ -485,4 +485,3 @@ void AddSC_boss_muru()
     RegisterSpellScript(spell_entropius_void_zone_visual_aura);
     RegisterSpellScript(spell_entropius_black_hole_effect);
 }
-

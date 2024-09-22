@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Chat.h"
 #include "DatabaseEnv.h"
 #include "Group.h"
 #include "GroupMgr.h"
@@ -725,7 +726,7 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket& recvData)
             // Check if player is in BG
             if (_player->InBattleground())
             {
-                _player->GetSession()->SendNotification(LANG_BG_READY_CHECK_ERROR);
+                ChatHandler(_player->GetSession()).SendNotification(LANG_BG_READY_CHECK_ERROR);
                 return;
             }
         }
@@ -955,7 +956,7 @@ void WorldSession::HandleRequestPartyMemberStatsOpcode(WorldPacket& recvData)
     recvData >> Guid;
 
     Player* player = HashMapHolder<Player>::Find(Guid);
-    if (!player)
+    if (!player || !player->IsInSameRaidWith(_player))
     {
         WorldPacket data(SMSG_PARTY_MEMBER_STATS_FULL, 3 + 4 + 2);
         data << uint8(0);                                   // only for SMSG_PARTY_MEMBER_STATS_FULL, probably arena/bg related
@@ -1159,7 +1160,7 @@ void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket& recv_data)
     ObjectGuid guid1 = getGuid(playerName1);
     ObjectGuid guid2 = getGuid(playerName2);
 
-    if(!guid1 || !guid2)
+    if (!guid1 || !guid2)
     {
         SendPartyResult(PARTY_OP_SWAP, playerName1, ERR_GROUP_SWAP_FAILED);
         return;

@@ -360,4 +360,3 @@ void AddSC_boss_hydross_the_unstable()
     RegisterSpellScript(spell_hydross_cleansing_field_command);
     RegisterSpellScript(spell_hydross_mark_of_hydross);
 }
-

@@ -517,7 +517,7 @@ public:
 
         void WaypointReached(uint32 uiPointId) override
         {
-            switch(uiPointId)
+            switch (uiPointId)
             {
                 // Starting waypoint, After reaching uther and jaina
                 case 0:
@@ -1550,7 +1550,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!allowTimer && !locked && (who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && me->GetDistance(who) < 15.0f)
+            if (!allowTimer && !locked && (who->IsPlayer() || who->IsPet()) && me->GetDistance(who) < 15.0f)
                 InfectMe(2000);
 
             ScriptedAI::MoveInLineOfSight(who);

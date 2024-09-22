@@ -70,6 +70,8 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
 
     mJustReset = false;
 
+    mcanSpawn = true;
+
     // Xinef: Vehicle conditions
     m_ConditionsTimer = 0;
     if (me->GetVehicleKit())
@@ -202,7 +204,7 @@ void SmartAI::StartPath(bool run, uint32 path, bool repeat, Unit* invoker)
         mCanRepeatPath = repeat;
         SetRun(run);
 
-        if (invoker && invoker->GetTypeId() == TYPEID_PLAYER)
+        if (invoker && invoker->IsPlayer())
         {
             mEscortNPCFlags = me->GetNpcFlags();
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
@@ -1166,6 +1168,7 @@ void SmartAI::OnSpellClick(Unit* clicker, bool&  /*result*/)
 void SmartAI::PathEndReached(uint32 /*pathId*/)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_DATA_ENDED, nullptr, 0, me->GetWaypointPath());
+    me->LoadPath(0);
 }
 
 void SmartGameObjectAI::SummonedCreatureDies(Creature* summon, Unit* /*killer*/)

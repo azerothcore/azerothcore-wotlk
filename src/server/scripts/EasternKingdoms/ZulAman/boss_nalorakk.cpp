@@ -89,6 +89,7 @@ struct boss_nalorakk : public BossAI
 {
     boss_nalorakk(Creature* creature) : BossAI(creature, DATA_NALORAKKEVENT)
     {
+        _phase = PHASE_SEND_GUARDS_1;
         _ranIntro = false;
         _active = true;
         creature->SetReactState(REACT_PASSIVE);

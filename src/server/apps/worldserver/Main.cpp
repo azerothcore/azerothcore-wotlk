@@ -233,7 +233,7 @@ int main(int argc, char** argv)
     signals.async_wait(SignalHandler);
 
     // Start the Boost based thread pool
-    int numThreads = sConfigMgr->GetOption<int32>("ThreadPool", 1);
+    int numThreads = sConfigMgr->GetOption<int32>("ThreadPool", 2);
     std::shared_ptr<std::vector<std::thread>> threadPool(new std::vector<std::thread>(), [ioContext](std::vector<std::thread>* del)
     {
         ioContext->stop();
@@ -257,7 +257,7 @@ int main(int argc, char** argv)
     }
 
     // Set process priority according to configuration settings
-    SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, false));
+    SetProcessPriority("server.worldserver", sConfigMgr->GetOption<int32>(CONFIG_PROCESSOR_AFFINITY, 0), sConfigMgr->GetOption<bool>(CONFIG_HIGH_PRIORITY, true));
 
     // Loading modules configs before scripts
     sConfigMgr->LoadModulesConfigs();
@@ -385,12 +385,6 @@ int main(int argc, char** argv)
     LOG_INFO("server.worldserver", "{} (worldserver-daemon) ready...", GitRevision::GetFullVersion());
 
     sScriptMgr->OnStartup();
-
-// Be kind and warn people of EOL deprecation :)
-#if !defined(MARIADB_VERSION_ID)
-    if (MySQL::GetLibraryVersion() < 80000)
-        LOG_WARN("server", "WARNING: You are using MySQL version 5.7 which is soon EOL!\nThis version will be deprecated. Consider upgrading to MySQL 8.0 or 8.1!");
-#endif
 
     // Launch CliRunnable thread
     std::shared_ptr<std::thread> cliThread;

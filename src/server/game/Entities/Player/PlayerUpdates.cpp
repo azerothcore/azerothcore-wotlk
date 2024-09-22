@@ -159,7 +159,7 @@ void Player::Update(uint32 p_time)
         }
     }
 
-    m_achievementMgr->UpdateTimedAchievements(p_time);
+    m_achievementMgr->Update(p_time);
 
     if (HasUnitState(UNIT_STATE_MELEE_ATTACKING) && !HasUnitState(UNIT_STATE_CASTING) && !HasUnitState(UNIT_STATE_CHARGING))
     {
@@ -265,7 +265,7 @@ void Player::Update(uint32 p_time)
 
     if (!IsPositionValid()) // pussywizard: will crash below at eg. GetZoneAndAreaId
     {
-        LOG_INFO("misc", "Player::Update - invalid position ({0:.1f}, {0:.1f}, {0:.1f})! Map: {}, MapId: {}, {}",
+        LOG_INFO("misc", "Player::Update - invalid position ({:0.1f}, {:0.1f}, {:0.1f})! Map: {}, MapId: {}, {}",
             GetPositionX(), GetPositionY(), GetPositionZ(), (FindMap() ? FindMap()->GetId() : 0), GetMapId(), GetGUID().ToString());
         GetSession()->KickPlayer("Invalid position");
         return;
@@ -939,7 +939,7 @@ void Player::UpdateWeaponSkill(Unit* victim, WeaponAttackType attType, Item* ite
     if (GetShapeshiftForm() == FORM_TREE)
         return; // use weapon but not skill up
 
-    if (victim->GetTypeId() == TYPEID_UNIT &&
+    if (victim->IsCreature() &&
         (victim->ToCreature()->GetCreatureTemplate()->flags_extra &
          CREATURE_FLAG_EXTRA_NO_SKILL_GAINS))
         return;
@@ -1016,7 +1016,7 @@ void Player::UpdateCombatSkills(Unit* victim, WeaponAttackType attType, bool def
 
     chance = chance < 1.0f ? 1.0f : chance; // minimum chance to increase skill is 1%
 
-    LOG_DEBUG("entities.player", "Player::UpdateCombatSkills(defence:{}, playerLevel:{}, moblevel:{}) -> ({}/{}) chance to increase skill is {}\%", defence, playerLevel, moblevel, currentSkillValue, currentSkillMax, chance);
+    LOG_DEBUG("entities.player", "Player::UpdateCombatSkills(defence:{}, playerLevel:{}, moblevel:{}) -> ({}/{}) chance to increase skill is {}%", defence, playerLevel, moblevel, currentSkillValue, currentSkillMax, chance);
 
     if (roll_chance_f(chance))
     {
@@ -1670,7 +1670,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
     {
         if (!CanSeeOrDetect(target, false, true))
         {
-            if (target->GetTypeId() == TYPEID_UNIT)
+            if (target->IsCreature())
                 BeforeVisibilityDestroy<Creature>(target->ToCreature(), this);
 
             target->DestroyForPlayer(this);
@@ -1687,7 +1687,7 @@ void Player::UpdateVisibilityOf(WorldObject* target)
             // target aura duration for caster show only if target exist at
             // caster client send data at target visibility change (adding to
             // client)
-            if (target->isType(TYPEMASK_UNIT))
+            if (target->IsUnit())
                 GetInitialVisiblePackets((Unit*) target);
         }
     }
@@ -1913,7 +1913,7 @@ void Player::UpdateCharmedAI()
 
     // Xinef: we should be killed if caster enters evade mode and charm is
     // infinite
-    if (charmer->GetTypeId() == TYPEID_UNIT &&
+    if (charmer->IsCreature() &&
         charmer->ToCreature()->IsInEvadeMode())
     {
         AuraEffectList const& auras =
@@ -1946,7 +1946,7 @@ void Player::UpdateCharmedAI()
                           1 << (CLASS_PRIEST - 1));
 
     // Xinef: charmer type specific actions
-    if (charmer->GetTypeId() == TYPEID_PLAYER)
+    if (charmer->IsPlayer())
     {
         bool follow = false;
         if (!target)

@@ -103,7 +103,7 @@ struct boss_lady_vashj : public BossAI
 
     void KilledUnit(Unit* /*victim*/) override
     {
-        if(!_recentlySpoken)
+        if (!_recentlySpoken)
         {
             Talk(SAY_SLAY);
             _recentlySpoken = true;
@@ -132,7 +132,7 @@ struct boss_lady_vashj : public BossAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
-        switch(summon->GetEntry()) {
+        switch (summon->GetEntry()) {
             case(WORLD_TRIGGER):
                 summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
                 break;
@@ -170,7 +170,7 @@ struct boss_lady_vashj : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_intro && who->GetTypeId() == TYPEID_PLAYER)
+        if (!_intro && who->IsPlayer())
         {
             _intro = true;
             Talk(SAY_INTRO);
@@ -462,4 +462,3 @@ void AddSC_boss_lady_vashj()
     RegisterSpellScript(spell_lady_vashj_spore_drop_effect);
     RegisterSpellScript(spell_lady_vashj_summons);
 }
-

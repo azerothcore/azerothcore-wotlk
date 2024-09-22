@@ -273,4 +273,3 @@ void AddSC_instance_nexus()
     new instance_nexus();
     new npc_crystalline_frayer();
 }
-
