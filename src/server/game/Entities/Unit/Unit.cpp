@@ -1856,7 +1856,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
         float offtime  = float(victim->getAttackTimer(OFF_ATTACK));
         float basetime = float(victim->getAttackTimer(BASE_ATTACK));
         // Reduce attack time
-        if (victim->haveOffhandWeapon() && offtime < basetime)
+        if (victim->HasOffhandWeaponForAttack() && offtime < basetime)
         {
             float percent20 = victim->GetAttackTime(OFF_ATTACK) * 0.20f;
             float percent60 = 3.0f * percent20;
@@ -8430,7 +8430,7 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                 if (dummySpell->SpellIconID == 2023)
                 {
                     // Must Dual Wield
-                    if (!procSpell || !haveOffhandWeapon())
+                    if (!procSpell || !HasOffhandWeaponForAttack())
                         return false;
                     // Chance as basepoints for dummy aura
                     if (!roll_chance_i(triggerAmount))
@@ -10348,9 +10348,9 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
         SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
     }
 
-    // delay offhand weapon attack to next attack time
-    if (haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
-        setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
+    // delay offhand weapon attack by 50% of the base attack time
+    if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
+        setAttackTimer(OFF_ATTACK, std::max(getAttackTimer(OFF_ATTACK), getAttackTimer(BASE_ATTACK) + int32(CalculatePct(GetFloatValue(UNIT_FIELD_BASEATTACKTIME), 50))));
 
     if (meleeAttack)
         SendMeleeAttackStart(victim);
@@ -13400,7 +13400,7 @@ float Unit::GetWeaponProcChance() const
     // (odd formula...)
     if (isAttackReady(BASE_ATTACK))
         return (GetAttackTime(BASE_ATTACK) * 1.8f / 1000.0f);
-    else if (haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
+    else if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
         return (GetAttackTime(OFF_ATTACK) * 1.6f / 1000.0f);
     return 0;
 }
@@ -15406,7 +15406,7 @@ float Unit::GetTotalAttackPowerValue(WeaponAttackType attType, Unit* victim) con
 
 float Unit::GetWeaponDamageRange(WeaponAttackType attType, WeaponDamageRange type, uint8 damageIndex /*= 0*/) const
 {
-    if (attType == OFF_ATTACK && !haveOffhandWeapon())
+    if (attType == OFF_ATTACK && !HasOffhandWeaponForAttack())
         return 0.0f;
 
     return m_weaponDamage[attType][type][damageIndex];
@@ -18953,7 +18953,7 @@ float Unit::MeleeSpellMissChance(Unit const* victim, WeaponAttackType attType, i
     float missChance = victim->GetUnitMissChance(attType);
 
     // Check if dual wielding, add additional miss penalty - when mainhand has on next swing spell, offhand doesnt suffer penalty
-    if (!spellId && (attType != RANGED_ATTACK) && haveOffhandWeapon() && (!m_currentSpells[CURRENT_MELEE_SPELL] || !m_currentSpells[CURRENT_MELEE_SPELL]->IsNextMeleeSwingSpell()))
+    if (!spellId && (attType != RANGED_ATTACK) && HasOffhandWeaponForAttack() && (!m_currentSpells[CURRENT_MELEE_SPELL] || !m_currentSpells[CURRENT_MELEE_SPELL]->IsNextMeleeSwingSpell()))
     {
         missChance += 19;
     }
