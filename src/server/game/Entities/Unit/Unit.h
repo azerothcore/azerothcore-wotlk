@@ -1777,6 +1777,9 @@ public:
     [[nodiscard]] float GetCollisionWidth() const override;
     [[nodiscard]] float GetCollisionRadius() const override;
 
+    uint32 GetVirtualItemId(uint32 slot) const;
+    void SetVirtualItem(uint32 slot, uint32 itemId);
+
     void ProcessPositionDataChanged(PositionFullTerrainStatus const& data) override;
     virtual void ProcessTerrainStatusUpdate();
 
