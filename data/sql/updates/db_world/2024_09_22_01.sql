@@ -1,3 +1,4 @@
+-- DB update 2024_09_22_00 -> 2024_09_22_01
 -- Unyielding Footman
 
 -- Runecloth chance 50 (chance was 20)
