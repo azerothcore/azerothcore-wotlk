@@ -1,3 +1,4 @@
+-- DB update 2024_09_22_03 -> 2024_09_23_00
 -- Bug Report #19575
 
 -- Unlink from engineering quest chain:
