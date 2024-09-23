@@ -18,7 +18,7 @@ UPDATE `creature_template` SET `npcflag`=16777216,`VehicleId`=615,`IconName`='ve
 UPDATE `creature_template` SET `npcflag`=16777216,`VehicleId`=548,`IconName`='vehichleCursor' WHERE `entry`=36812;
 
 -- trigger NPC, make invisible to players
-UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 128 WHERE (`entry` IN (36817, 37964, 36812));
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 128 WHERE (`entry` IN (36817, 37964, 37981));
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` IN (37966,37964,37981,37980,36817,36812);
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (37966,37964,37980,37981,36817,36812) AND `source_type`=0;
