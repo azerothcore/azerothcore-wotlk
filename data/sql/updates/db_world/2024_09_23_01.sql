@@ -1,3 +1,4 @@
+-- DB update 2024_09_23_00 -> 2024_09_23_01
 --
 DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_item_skyguard_blasting_charges';
 INSERT INTO `spell_script_names` (`spell_id`,`ScriptName`) VALUES
