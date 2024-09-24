@@ -1,3 +1,4 @@
+-- DB update 2024_09_23_02 -> 2024_09_24_00
 --
 -- Boat summoners
 SET @GUID := 52030;
