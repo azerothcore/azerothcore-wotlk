@@ -3475,7 +3475,7 @@ inline TeamId GetTeamId(PvPTeamId teamId)
 }
 
 // indexes of BattlemasterList.dbc
-enum BattlegroundTypeId : uint8
+enum BattlegroundTypeId : uint16
 {
     BATTLEGROUND_TYPE_NONE     = 0, // None
     BATTLEGROUND_AV            = 1, // Alterac Valley
