@@ -582,9 +582,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
         }
 
         if (bg->isArena() && (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
-        {
             sScriptMgr->OnBattlegroundDesertion(_player, ARENA_DESERTION_TYPE_LEAVE_QUEUE);
-        }
     }
 }
 
