@@ -16373,11 +16373,6 @@ static void PlayerCreateItemCheatHandler (User*       user,
                                           uint32_t    eventTime,
                                           WDataStore* msg) {
 
-  if (!user->IsGMAccount()) {
-    user->SendNotification(LANG_PERMISSION_DENIED);
-    return;
-  }
-
   if (Player* plr = user->ActivePlayer()) {
     // READ THE MESSAGE DATA
     auto itemId = msg->read<uint32_t>();
@@ -16392,11 +16387,6 @@ static void OnGodMode (User*        user,
                        NETMESSAGE   msgId,
                        uint         eventTime,
                        WDataStore*  msg) {
-
-  if (!user->IsGMAccount()) {
-    user->SendNotification(LANG_PERMISSION_DENIED);
-    return;
-  }
 
   if (Player* plr = user->ActivePlayer()) {
     auto enable = msg->read<uint>();
@@ -16418,10 +16408,6 @@ static void PlayerLearnSpellCheatHandler (User*       user,
                                           NETMESSAGE  msgId,
                                           uint        eventTime,
                                           WDataStore* msg) {
-  if (!user->IsGMAccount()) {
-    user->SendNotification(LANG_PERMISSION_DENIED);
-    return;
-  }
 
   if (Player* plr = user->ActivePlayer()) {
     // Read the msg data
@@ -16450,12 +16436,6 @@ static void PlayerLevelCheatHandler (User*        user,
                                      NETMESSAGE   msgId,
                                      uint         eventTime,
                                      WDataStore*  msg) {
-
-  // VALIDATE USER PERMISSIONS
-  if (!user->IsGMAccount()) {
-    user->SendNotification(LANG_PERMISSION_DENIED);
-    return;
-  }
 
   if (Player* plr = user->ActivePlayer()) {
     // READ THE MESSAGE DATA
@@ -16516,11 +16496,6 @@ static void PlayerRechargeCheat (User*        user,
                                  uint         eventTime,
                                  WDataStore*  msg) {
 
-  // VALIDATE USER PERMISSIONS
-  if (!user->IsGMAccount()) {
-    user->SendNotification(LANG_PERMISSION_DENIED);
-    return;
-  }
   if (Player* plr = user->ActivePlayer()) {
     // RECHARGE THE PLAYER'S HEALTH BAR
     uint maxHealth = plr->GetMaxHealth();
@@ -16537,12 +16512,6 @@ static void PlayerDechargeCheat (User*        user,
                                  NETMESSAGE   msgId,
                                  uint         eventTime,
                                  WDataStore*  msg) {
-
-  // VALIDATE USER PERMISSIONS
-  if (!user->IsGMAccount()) {
-    user->SendNotification(LANG_PERMISSION_DENIED);
-    return;
-  }
 
   if (Player* plr = user->ActivePlayer()) {
     // DECHARGE THE PLAYER'S HEALTH BAR

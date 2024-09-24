@@ -2032,11 +2032,6 @@ static void UserWorldTeleportHandler (User*       user,
                                       uint        eventTime,
                                       WDataStore* msg) {
 
-  if (!user->IsGMAccount()) {
-    user->SendNotification(LANG_PERMISSION_DENIED);
-    return;
-  }
-
   // READ THE MESSAGE DATA
   auto requestTime  = msg->read<uint32>();
   auto continentID  = msg->read<uint32>();
