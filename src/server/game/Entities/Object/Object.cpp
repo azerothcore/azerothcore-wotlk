@@ -2750,12 +2750,16 @@ Position WorldObject::GetRandomNearPositionWithCollisionCheck(Unit* caster, floa
 
         G3D::Vector3 hitResult;
 
-        if (caster->GetMap()->GetObjectHitPos(caster->GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ,
+        if (GetMap()->GetObjectHitPos(caster->GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ,
             endPos.m_positionX, endPos.m_positionY, endPos.m_positionZ,
             hitResult.x, hitResult.y, hitResult.z, 0.0f))
         {
-            pos.Relocate(hitResult.x, hitResult.y, hitResult.z);
-            pos.RelocatePolarOffset(angle + 180.f, radius);
+
+            G3D::Vector3 newPos;
+            newPos.x = 2 * pos.GetPositionX() - endPos.GetPositionX();
+            newPos.y = 2 * pos.GetPositionY() - endPos.GetPositionY();
+            newPos.z = 2 * pos.GetPositionZ() - endPos.GetPositionZ();
+            pos.Relocate(newPos.x, newPos.y, newPos.z);
             break;
         }
     }
