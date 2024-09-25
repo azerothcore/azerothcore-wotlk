@@ -23,6 +23,7 @@ Category: commandscripts
 EndScriptData */
 
 #include "AccountMgr.h"
+#include "AchievementMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "DBCStores.h"
@@ -271,6 +272,8 @@ public:
             stmt->SetData(0, uint8(newLevel));
             stmt->SetData(1, playerGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
+
+            sAchievementMgr->UpdateAchievementCriteriaForOfflinePlayer(playerGuid.GetCounter(), ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
 
             sCharacterCache->UpdateCharacterLevel(playerGuid, newLevel);
         }

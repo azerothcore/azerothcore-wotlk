@@ -1175,7 +1175,7 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                     SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(petlevel + (petlevel / 4)));
                 }
 
-                switch(GetEntry())
+                switch (GetEntry())
                 {
                     case NPC_FELGUARD:
                         {

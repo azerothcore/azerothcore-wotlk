@@ -103,7 +103,7 @@ struct boss_lady_vashj : public BossAI
 
     void KilledUnit(Unit* /*victim*/) override
     {
-        if(!_recentlySpoken)
+        if (!_recentlySpoken)
         {
             Talk(SAY_SLAY);
             _recentlySpoken = true;
@@ -132,7 +132,7 @@ struct boss_lady_vashj : public BossAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
-        switch(summon->GetEntry()) {
+        switch (summon->GetEntry()) {
             case(WORLD_TRIGGER):
                 summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
                 break;

@@ -256,7 +256,7 @@ void TurretAI::UpdateAI(uint32 /*diff*/)
     if (!UpdateVictim())
         return;
 
-    if( me->m_spells[0] )
+    if (me->m_spells[0])
         DoSpellAttackIfReady(me->m_spells[0]);
 }
 

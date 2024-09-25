@@ -702,7 +702,6 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
     {
         sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
     }
-
 }
 
 void ObjectMgr::LoadCreatureTemplateModels()

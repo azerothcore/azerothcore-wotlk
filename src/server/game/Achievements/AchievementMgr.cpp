@@ -1087,7 +1087,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                     for (RewardedQuestSet::const_iterator itr = rewQuests.begin(); itr != rewQuests.end(); ++itr)
                     {
                         Quest const* quest = sObjectMgr->GetQuestTemplate(*itr);
-                        if (quest && quest->GetZoneOrSort() >= 0 && uint32(quest->GetZoneOrSort()) == achievementCriteria->complete_quests_in_zone.zoneID)
+                        if (quest && quest->GetZoneOrSort() >= 0 && uint32(quest->GetZoneOrSort()) == achievementCriteria->complete_quests_in_zone.zoneID && !(quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_LOREMASTER_COUNT)))
                             ++counter;
                     }
                     SetCriteriaProgress(achievementCriteria, counter);
@@ -2352,7 +2352,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
             LocaleConstant localeConstant = GetPlayer()->GetSession()->GetSessionDbLocaleIndex();
             if (localeConstant != LOCALE_enUS)
             {
-                if(AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
+                if (AchievementRewardLocale const* loc = sAchievementMgr->GetAchievementRewardLocale(achievement))
                 {
                     ObjectMgr::GetLocaleString(loc->Subject, localeConstant, subject);
                     ObjectMgr::GetLocaleString(loc->Text, localeConstant, text);
@@ -2503,7 +2503,7 @@ void AchievementMgr::ProcessOfflineUpdate(AchievementOfflinePlayerUpdate const& 
         {
             AchievementEntry const* achievement = sAchievementStore.LookupEntry(update.arg1);
 
-            ASSERT(achievement != NULL, "Not found achievement to complete for offline achievements update. Wrong arg1 ({}) value?", update.arg1);
+            ASSERT(achievement, "Not found achievement to complete for offline achievements update. Wrong arg1 ({}) value?", update.arg1);
 
             CompletedAchievement(achievement);
             break;
@@ -2539,7 +2539,7 @@ bool AchievementGlobalMgr::IsStatisticAchievement(AchievementEntry const* achiev
     AchievementCategoryEntry const* cat = sAchievementCategoryStore.LookupEntry(achievement->categoryId);
     do
     {
-        switch(cat->ID)
+        switch (cat->ID)
         {
             case ACHIEVEMENT_CATEGORY_STATISTICS:
                 return true;
@@ -3142,7 +3142,7 @@ void AchievementGlobalMgr::CompletedAchievementForOfflinePlayer(ObjectGuid::LowT
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT_OFFLINE_UPDATES);
     stmt->SetData(0, playerLowGuid);
-    stmt->SetData(1, uint32(ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_COMPLETE_ACHIEVEMENT));
+    stmt->SetData(1, ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_COMPLETE_ACHIEVEMENT);
     stmt->SetData(2, entry->ID);
     stmt->SetData(3, 0);
     stmt->SetData(4, 0);
@@ -3153,7 +3153,7 @@ void AchievementGlobalMgr::UpdateAchievementCriteriaForOfflinePlayer(ObjectGuid:
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACHIEVEMENT_OFFLINE_UPDATES);
     stmt->SetData(0, playerLowGuid);
-    stmt->SetData(1, uint32(ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_UPDATE_CRITERIA));
+    stmt->SetData(1, ACHIEVEMENT_OFFLINE_PLAYER_UPDATE_TYPE_UPDATE_CRITERIA);
     stmt->SetData(2, type);
     stmt->SetData(3, miscValue1);
     stmt->SetData(4, miscValue2);

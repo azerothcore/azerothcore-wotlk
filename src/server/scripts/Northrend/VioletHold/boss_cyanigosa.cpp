@@ -99,7 +99,7 @@ public:
         {
             if (!target || !spell)
                 return;
-            switch(spell->Id)
+            switch (spell->Id)
             {
                 case SPELL_ARCANE_VACUUM:
                     target->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, target->GetOrientation());
@@ -117,7 +117,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

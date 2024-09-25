@@ -417,7 +417,7 @@ public:
                 return;
             }
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 1:
                     me->CastSpell(me, BONE_ARMOR_SPELL, false);
