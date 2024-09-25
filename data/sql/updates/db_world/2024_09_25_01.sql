@@ -1,3 +1,4 @@
+-- DB update 2024_09_25_00 -> 2024_09_25_01
 --
 DELETE FROM `smart_scripts` WHERE `entryorguid`=24077 AND `source_type`=0;
 DELETE FROM `smart_scripts` WHERE `entryorguid`=2407700 AND `source_type`=9;
