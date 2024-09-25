@@ -4843,6 +4843,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->MaxAffectedTargets = 1;
     });
 
+    // Removing Dragonflayer Harpoon
+    ApplySpellFix({ 42968 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->MaxAffectedTargets = 1;
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(7);
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];

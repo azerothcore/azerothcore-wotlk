@@ -1052,8 +1052,22 @@ public:
     [[nodiscard]] float GetUnitMissChance(WeaponAttackType attType)     const;
     float GetUnitCriticalChance(WeaponAttackType attackType, Unit const* victim) const;
     int32 GetMechanicResistChance(SpellInfo const* spell);
+
+    virtual bool HasWeapon(WeaponAttackType type) const = 0;
+    inline bool HasMainhandWeapon() const { return HasWeapon(BASE_ATTACK); }
+    inline bool HasOffhandWeapon() const { return HasWeapon(OFF_ATTACK); }
+    inline bool HasRangedWeapon() const { return HasWeapon(RANGED_ATTACK); }
+
+    inline bool hasMainhandWeaponForAttack() const { return HasWeaponForAttack(BASE_ATTACK); }
+    virtual bool HasWeaponForAttack(WeaponAttackType type) const { return CanUseAttackType(type); }
+    inline bool HasMainhandWeaponForAttack() const { return HasWeaponForAttack(BASE_ATTACK); }
+    inline bool HasOffhandWeaponForAttack() const { return HasWeaponForAttack(OFF_ATTACK); }
+    inline bool HasRangedWeaponForAttack() const { return HasWeaponForAttack(RANGED_ATTACK); }
     [[nodiscard]] bool CanUseAttackType(uint8 attacktype) const
     {
+        if (IsAttackSpeedOverridenShapeShift())
+            return false;
+
         switch (attacktype)
         {
             case BASE_ATTACK:
@@ -1062,8 +1076,9 @@ public:
                 return !HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND);
             case RANGED_ATTACK:
                 return !HasUnitFlag2(UNIT_FLAG2_DISARM_RANGED);
+            default:
+                return true;
         }
-        return true;
     }
 
     [[nodiscard]] virtual uint32 GetShieldBlockValue() const = 0;
@@ -1466,6 +1481,8 @@ public:
         SetByteValue(UNIT_FIELD_BYTES_2, 3, form);
     }
 
+    bool IsAttackSpeedOverridenShapeShift() const;
+
     [[nodiscard]] bool IsInFeralForm() const
     {
         ShapeshiftForm form = GetShapeshiftForm();
@@ -1759,6 +1776,9 @@ public:
     [[nodiscard]] float GetCollisionHeight() const override;
     [[nodiscard]] float GetCollisionWidth() const override;
     [[nodiscard]] float GetCollisionRadius() const override;
+
+    uint32 GetVirtualItemId(uint32 slot) const;
+    void SetVirtualItem(uint32 slot, uint32 itemId);
 
     void ProcessPositionDataChanged(PositionFullTerrainStatus const& data) override;
     virtual void ProcessTerrainStatusUpdate();
