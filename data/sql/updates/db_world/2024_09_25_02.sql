@@ -1,3 +1,4 @@
+-- DB update 2024_09_25_01 -> 2024_09_25_02
 --
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` | 2048 WHERE `entry` IN (
 3672,  -- Boahn
