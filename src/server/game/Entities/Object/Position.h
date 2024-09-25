@@ -153,7 +153,6 @@ struct Position
     }
 
     [[nodiscard]] bool IsPositionValid() const;
-    [[nodiscard]] bool IsRadiusPositionValid(Unit* caster, Position startPos, float distance) const;
 
     [[nodiscard]] float GetExactDist2dSq(const float x, const float y) const
     {

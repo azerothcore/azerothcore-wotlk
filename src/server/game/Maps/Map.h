@@ -480,8 +480,6 @@ public:
     void AddWorldObject(WorldObject* obj) { i_worldObjects.insert(obj); }
     void RemoveWorldObject(WorldObject* obj) { i_worldObjects.erase(obj); }
 
-    [[nodiscard]] bool CheckForObjectsAround(Position startPos, float distance, uint32 phasemask) const;
-
     void SendToPlayers(WorldPacket const* data) const;
 
     typedef MapRefMgr PlayerList;

@@ -177,17 +177,6 @@ bool Position::IsPositionValid() const
     return Acore::IsValidMapCoord(m_positionX, m_positionY, m_positionZ, m_orientation);
 }
 
-bool Position::IsRadiusPositionValid(Unit* caster, Position startPos, float distance) const
-{
-    if (!IsPositionValid())
-        return false;
-
-    if (caster->GetMap()->CheckForObjectsAround(startPos, distance, caster->GetPhaseMask()))
-        return false;
-
-    return true;
-}
-
 ByteBuffer& operator>>(ByteBuffer& buf, Position::PositionXYZOStreamer const& streamer)
 {
     float x, y, z, o;

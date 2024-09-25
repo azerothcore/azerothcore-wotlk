@@ -2739,6 +2739,34 @@ Position WorldObject::GetRandomNearPosition(float radius)
     return pos;
 }
 
+Position WorldObject::GetRandomNearPositionWithCollisionCheck(Unit* caster, float radius)
+{
+    Position pos = GetRandomNearPosition(radius);
+
+    for (float angle = float(M_PI) / 8; angle < float(M_PI) * 2; angle += float(M_PI) / 8)
+    {
+        Position endPos = pos;
+        endPos.RelocatePolarOffset(angle, radius);
+
+        G3D::Vector3 hitResult;
+
+        if (GetMap()->GetObjectHitPos(caster->GetPhaseMask(), pos.m_positionX, pos.m_positionY, pos.m_positionZ,
+            endPos.m_positionX, endPos.m_positionY, endPos.m_positionZ,
+            hitResult.x, hitResult.y, hitResult.z, 0.0f))
+        {
+
+            G3D::Vector3 newPos;
+            newPos.x = 2 * pos.GetPositionX() - endPos.GetPositionX();
+            newPos.y = 2 * pos.GetPositionY() - endPos.GetPositionY();
+            newPos.z = 2 * pos.GetPositionZ() - endPos.GetPositionZ();
+            pos.Relocate(newPos.x, newPos.y, newPos.z);
+            break;
+        }
+    }
+
+    return pos;
+}
+
 void WorldObject::GetContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d) const
 {
     // angle to face `obj` to `this` using distance includes size of `obj`
