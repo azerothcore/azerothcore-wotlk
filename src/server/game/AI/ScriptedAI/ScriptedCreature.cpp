@@ -522,17 +522,33 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
     if (loadDefault)
     {
         me->LoadEquipment(me->GetOriginalEquipmentId(), true);
+        if (me->HasWeapon(OFF_ATTACK))
+            me->SetCanDualWield(true);
+        else
+            me->SetCanDualWield(false);
         return;
     }
 
     if (mainHand >= 0)
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(mainHand));
+    {
+        me->SetVirtualItem(0, uint32(mainHand));
+        me->UpdateDamagePhysical(BASE_ATTACK);
+    }
 
     if (offHand >= 0)
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(offHand));
+    {
+        me->SetVirtualItem(1, uint32(offHand));
+        if (offHand >= 1)
+            me->SetCanDualWield(true);
+        else
+            me->SetCanDualWield(false);
+    }
 
     if (ranged >= 0)
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, uint32(ranged));
+    {
+        me->SetVirtualItem(2, uint32(ranged));
+        me->UpdateDamagePhysical(RANGED_ATTACK);
+    }
 }
 
 enum eNPCs

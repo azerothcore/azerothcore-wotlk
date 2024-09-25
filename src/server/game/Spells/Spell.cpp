@@ -4068,7 +4068,7 @@ void Spell::_cast(bool skipCheck)
         {
             m_caster->resetAttackTimer(BASE_ATTACK);
 
-            if (m_caster->haveOffhandWeapon())
+            if (m_caster->HasOffhandWeaponForAttack())
             {
                 m_caster->resetAttackTimer(OFF_ATTACK);
             }
