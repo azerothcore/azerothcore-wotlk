@@ -20417,6 +20417,7 @@ void Unit::SendRemoveFromThreatListOpcode(HostileReference* pHostileReference)
 
 void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 {
+    // Rage formulae https://wowwiki-archive.fandom.com/wiki/Rage#Formulae
     float addRage;
 
     float rageconversion = ((0.0091107836f * GetLevel() * GetLevel()) + 3.225598133f * GetLevel()) + 4.2652911f;
@@ -20427,6 +20428,7 @@ void Unit::RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker)
 
     if (attacker)
     {
+        // see Bornak's bluepost explanation (05/29/2009)
         float rageFromDamageDealt = damage / rageconversion * 7.5f;
         addRage = (rageFromDamageDealt + weaponSpeedHitFactor) / 2.0f;
         addRage = std::min(addRage, rageFromDamageDealt * 2.0f);
