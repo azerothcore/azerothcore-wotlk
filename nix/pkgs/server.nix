@@ -1,17 +1,21 @@
 {
   lib,
+  callPackage,
   clangStdenv,
   boost,
   clang,
   cmake,
   openssl,
-  libmysqlclient,
   readline,
   bzip2,
   git,
+  zlib,
   modules ? [ ],
 }:
 
+let
+  libmysqlclient = callPackage ./libmysqlclient.nix { };
+in
 clangStdenv.mkDerivation {
   name = "azerothcore-wotlk";
 
@@ -39,13 +43,14 @@ clangStdenv.mkDerivation {
     readline
     bzip2
     git
+    zlib
   ];
 
   configurePhase = ''
     mkdir build $out
     cd build
-    cmake ../ -DCMAKE_INSTALL_PREFIX=$out -DCMAKE_C_COMPILER=${clang}/bin/clang -DCMAKE_CXX_COMPILER=${clang}/bin/clang++ -DWITH_WARNINGS=1 -DTOOLS_BUILD=all -DSCRIPTS=static -DMODULES=static -DMYSQL_INCLUDE_DIR=${
-      libmysqlclient.dev + "/include/mysql"
+    cmake ../ -DCMAKE_INSTALL_PREFIX=$out -DCMAKE_C_COMPILER=${clang}/bin/clang -DCMAKE_CXX_COMPILER=${clang}/bin/clang++ -DWITH_WARNINGS=1 -DTOOLS_BUILD=all -DSCRIPTS=static -DMODULES=static -DMYSQL_LIBRARY=${libmysqlclient} -DMYSQL_INCLUDE_DIR=${
+      libmysqlclient.dev + "/include"
     }
   '';
 

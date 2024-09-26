@@ -114,6 +114,8 @@
         system:
         let
           pkgs = nixpkgsFor.${system};
+
+          libmysqlclient = pkgs.callPackage ./nix/pkgs/libmysqlclient.nix { };
         in
         {
           default = pkgs.mkShell.override { stdenv = pkgs.clangStdenv; } {
@@ -126,7 +128,7 @@
               bzip2
             ];
 
-            MYSQL_INCLUDE_DIR = pkgs.libmysqlclient.dev + "/include/mysql";
+            MYSQL_INCLUDE_DIR = libmysqlclient.dev + "/include";
           };
         }
       );
