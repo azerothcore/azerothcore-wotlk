@@ -3027,12 +3027,12 @@ struct npc_icc_spire_frostwyrm : public ScriptedAI
 const Position VengefulWP[VENGEFUL_WP_COUNT] =
 {
     {4432.21f, 3041.5f, 372.783f, 0.0f},
-    {4408.67f, 3041.81f, 372.48f, 0.0f}, /*New point*/
+    {4408.67f, 3041.81f, 372.48f, 0.0f},
     {4370.50f, 3042.00f, 372.80f, 0.0f},
-    {4370.37f, 3059.16f, 371.69f, 0.0f}, /*Jump between these two points*/
-    {4342.53f, 3058.97f, 371.68f, 0.0f}, /*Jump between these two points*/
+    {4370.37f, 3059.16f, 371.69f, 0.0f},
+    {4342.53f, 3058.97f, 371.68f, 0.0f},
     {4342.51f, 3041.24f, 372.80f, 0.0f},
-    {4304.75f, 3041.57f, 372.43f, 0.0f}, /*New point*/
+    {4304.75f, 3041.57f, 372.43f, 0.0f},
     {4281.30f, 3041.77f, 372.78f, 0.0f},
 };
 
@@ -3089,7 +3089,7 @@ public:
                 ScriptedAI::MoveInLineOfSight(who);
             else
             {
-                if (!me->IsInCombat() && who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2dSq(who) < 25.0f * 25.0f && me->CanSeeOrDetect(who) && me->IsValidAttackTarget(who))
+                if (!me->IsInCombat() && who->IsPlayer() && me->GetExactDist2dSq(who) < 25.0f * 25.0f && me->CanSeeOrDetect(who) && me->IsValidAttackTarget(who))
                     AttackStart(who);
             }
         }
