@@ -3023,14 +3023,16 @@ struct npc_icc_spire_frostwyrm : public ScriptedAI
         bool _canResetFlyingEffects;
 };
 
-#define VENGEFUL_WP_COUNT 6
+#define VENGEFUL_WP_COUNT 8
 const Position VengefulWP[VENGEFUL_WP_COUNT] =
 {
     {4432.21f, 3041.5f, 372.783f, 0.0f},
+    {4408.67f, 3041.81f, 372.48f, 0.0f}, /*New point*/
     {4370.50f, 3042.00f, 372.80f, 0.0f},
-    {4370.37f, 3059.16f, 371.69f, 0.0f},
-    {4342.53f, 3058.97f, 371.68f, 0.0f},
+    {4370.37f, 3059.16f, 371.69f, 0.0f}, /*Jump between these two points*/
+    {4342.53f, 3058.97f, 371.68f, 0.0f}, /*Jump between these two points*/
     {4342.51f, 3041.24f, 372.80f, 0.0f},
+    {4304.75f, 3041.57f, 372.43f, 0.0f}, /*New point*/
     {4281.30f, 3041.77f, 372.78f, 0.0f},
 };
 
@@ -3064,6 +3066,8 @@ public:
             me->SetWalk(false);
             events.Reset();
             events.ScheduleEvent(1, 3s, 6s); // leaping face maul
+            if (currPipeWP != VENGEFUL_WP_COUNT)
+                needMove = true;
         }
 
         void JustReachedHome() override
@@ -3085,7 +3089,7 @@ public:
                 ScriptedAI::MoveInLineOfSight(who);
             else
             {
-                if (!me->IsInCombat() && who->IsPlayer() && me->GetExactDist2dSq(who) < 25.0f * 25.0f && me->CanSeeOrDetect(who) && me->IsValidAttackTarget(who))
+                if (!me->IsInCombat() && who->GetTypeId() == TYPEID_PLAYER && me->GetExactDist2dSq(who) < 25.0f * 25.0f && me->CanSeeOrDetect(who) && me->IsValidAttackTarget(who))
                     AttackStart(who);
             }
         }
@@ -3131,7 +3135,7 @@ public:
                         --currPipeWP;
                 }
                 me->SetHomePosition(VengefulWP[currPipeWP].GetPositionX(), VengefulWP[currPipeWP].GetPositionY(), VengefulWP[currPipeWP].GetPositionZ(), me->GetOrientation());
-                if ((forward && currPipeWP == 3) || (!forward && currPipeWP == 2))
+                if ((forward && currPipeWP == 4) || (!forward && currPipeWP == 3))
                     me->GetMotionMaster()->MoveJump(VengefulWP[currPipeWP].GetPositionX(), VengefulWP[currPipeWP].GetPositionY(), VengefulWP[currPipeWP].GetPositionZ(), 10.0f, 6.0f, 1);
                 else
                     me->GetMotionMaster()->MovePoint(1, VengefulWP[currPipeWP].GetPositionX(), VengefulWP[currPipeWP].GetPositionY(), VengefulWP[currPipeWP].GetPositionZ());
