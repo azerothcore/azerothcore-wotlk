@@ -212,7 +212,31 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        dest.Relocate(GetCaster()->GetRandomNearPositionWithCollisionCheck(GetCaster(), 50.0f));
+        Position finalDest = GetCaster()->GetNearPosition(frand(30.f, 50.f), (float) rand_norm() * static_cast<float>(2 * M_PI));
+
+        /// @note: Estimated - Safe Areatrigger to avoid teleporting into/near walls - 15y of distance with walls
+        /// @todo: find a better way than this hackfix
+        // x: 932.f/960.f
+        if (finalDest.m_positionX < 932.f)
+            finalDest.m_positionX = 932.f;
+        else if (finalDest.m_positionX > 960.f)
+            finalDest.m_positionX = 960.f;
+        // y: 112.f/458.f
+        if (finalDest.m_positionY < 112.f)
+            finalDest.m_positionY = 112.f;
+        else if (finalDest.m_positionY > 458.f)
+            finalDest.m_positionY = 458.f;
+
+        // After relocate a finalDest outside of the safe area, we need to recheck the distance with the boss
+        if (GetCaster()->GetExactDist2d(finalDest) < 30.f)
+        {
+            if (finalDest.m_positionX == 932.f || finalDest.m_positionX == 960.f)
+                finalDest.m_positionY = finalDest.m_positionY + (30.f - GetCaster()->GetExactDist2d(finalDest));
+            else if (finalDest.m_positionY == 112.f || finalDest.m_positionY == 458.f)
+                finalDest.m_positionX = finalDest.m_positionX + (30.f - GetCaster()->GetExactDist2d(finalDest));
+        }
+
+        dest.Relocate(finalDest);
     }
 
     void HandleTeleportUnits(SpellEffIndex  /*effIndex*/)
