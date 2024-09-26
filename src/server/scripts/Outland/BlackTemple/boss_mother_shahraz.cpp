@@ -214,6 +214,11 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
     {
         Position finalDest = GetCaster()->GetNearPosition(frand(30.f, 50.f), (float) rand_norm() * static_cast<float>(2 * M_PI));
 
+        // If the finalDest is on stairs or something like that, the players can pass trought the map because the z position is based on the boss
+        // So if the player will not be in LOS with the boss, we redone a GetNearPosition with larger radius.
+        if(!GetCaster()->IsWithinLOS(finalDest.GetPositionX(), finalDest.GetPositionY(), finalDest.GetPositionZ()))
+            finalDest = GetCaster()->GetNearPosition(frand(30.f, 50.f), (float) rand_norm() * static_cast<float>(2 * M_PI));
+
         /// @note: Estimated - Safe Areatrigger to avoid teleporting into/near walls - 15y of distance with walls
         /// @todo: find a better way than this hackfix
         // x: 932.f/960.f
