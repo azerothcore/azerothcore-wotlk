@@ -41,9 +41,6 @@ Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) 
             }
     }
 
-    // Ulduar demolisher
-    if (vehInfo->m_ID == 338)
-        ++_usableSeatNum;
     // Set or remove correct flags based on available seats. Will overwrite db data (if wrong).
     if (_usableSeatNum)
         _me->SetNpcFlag((_me->IsPlayer() ? UNIT_NPC_FLAG_PLAYER_VEHICLE : UNIT_NPC_FLAG_SPELLCLICK));
