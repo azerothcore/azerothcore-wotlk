@@ -2781,9 +2781,11 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle, bool disa
     desty = pos.m_positionY + dist * std::sin(angle);
 
     // Prevent invalid coordinates here, position is unchanged
-    if (!Acore::IsValidMapCoord(destx, desty) && !disableWarning)
+    if (!Acore::IsValidMapCoord(destx, desty))
     {
-        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: {} and Y: {} were passed!", destx, desty);
+        if (!disableWarning)
+            LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: {} and Y: {} were passed!", destx, desty);
+
         return;
     }
 
