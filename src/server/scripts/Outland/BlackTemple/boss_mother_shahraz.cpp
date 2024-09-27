@@ -238,7 +238,7 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
             /* @note: To avoid teleporting players near a walls, we will define a safe area.
              * As the boss have an area boudary around y: 320.f. We will limit the safe area to this value, avoiding wird issues.
-             * x limit: 932.f/960.f | y limit: 196.f/320.f
+             * x limit: 932.f/960.f | y limit: 224.f/320.f
              */
             if (finalDest.m_positionX < 932.f)
                 finalDest.m_positionX = 932.f;
