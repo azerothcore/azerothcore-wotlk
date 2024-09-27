@@ -19730,6 +19730,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (!m_vehicle)
         return;
 
+    // This should be done before dismiss, because there may be some aura removal
     VehicleSeatAddon const* seatAddon = m_vehicle->GetSeatAddonForSeatOfPassenger(this);
     m_vehicle->RemovePassenger(this);
 
@@ -19739,7 +19740,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (player && player->duel && player->duel->IsMounted)
         player->DuelComplete(DUEL_FLED);
 
-    // This should be done before dismiss, because there may be some aura removal
     Vehicle* vehicle = m_vehicle;
     Unit* vehicleBase = m_vehicle->GetBase();
     m_vehicle = nullptr;
@@ -19769,7 +19769,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         }
     }
 
-    VehicleEntry const* vehicleInfo = vehicle->GetVehicleInfo();
     // HACK
     // if (vehicleInfo)
     // {
@@ -19809,6 +19808,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     // xinef: hack for flameleviathan seat vehicle
+    VehicleEntry const* vehicleInfo = vehicle->GetVehicleInfo();
     if (!vehicleInfo || vehicleInfo->m_ID != 341)
     {
         Movement::MoveSplineInit init(this);
