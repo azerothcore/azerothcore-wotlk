@@ -196,6 +196,15 @@ class spell_mother_shahraz_saber_lash_aura : public AuraScript
     }
 };
 
+const Position validTeleportStairsPos[5] =
+{
+    {965.84f, 163.61f, 192.84f},
+    {927.22f, 187.04f, 192.84f},
+    {922.54f, 110.09f, 192.84f},
+    {958.01f, 110.47f, 192.84f},
+    {946.52f, 149.97f, 197.08f}
+};
+
 class spell_mother_shahraz_fatal_attraction : public SpellScript
 {
     PrepareSpellScript(spell_mother_shahraz_fatal_attraction);
@@ -212,12 +221,18 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        Position finalDest = GetCaster()->GetNearPosition(frand(30.f, 50.f), (float) rand_norm() * static_cast<float>(2 * M_PI));
+        // Specific case if the boss is near stairs to avoid LOS issues.
+        if (GetCaster()->GetPositionY() > 194.f)
+        {
+            dest.Relocate(validTeleportStairsPos[urand(1, 5)]);
+            return;
+        }
 
-        // If the finalDest is on stairs or something like that, the players can pass trought the map because the z position is based on the boss
-        // So if the player will not be in LOS with the boss, we redone a GetNearPosition with larger radius.
+        Position finalDest = GetCaster()->GetNearPosition(frand(30.f, 50.f), (float) rand_norm() * static_cast<float>(2 * M_PI), true);
+
+        // Maybe not necessary but just in case to avoid LOS issues with an object
         if(!GetCaster()->IsWithinLOS(finalDest.GetPositionX(), finalDest.GetPositionY(), finalDest.GetPositionZ()))
-            finalDest = GetCaster()->GetNearPosition(frand(30.f, 50.f), (float) rand_norm() * static_cast<float>(2 * M_PI));
+            finalDest = GetCaster()->GetNearPosition(frand(30.f, 50.f), (float) rand_norm() * static_cast<float>(2 * M_PI), true);
 
         /// @note: Estimated - Safe Areatrigger to avoid teleporting into/near walls - 15y of distance with walls
         /// @todo: find a better way than this hackfix
@@ -226,9 +241,9 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
             finalDest.m_positionX = 932.f;
         else if (finalDest.m_positionX > 960.f)
             finalDest.m_positionX = 960.f;
-        // y: 112.f/458.f
-        if (finalDest.m_positionY < 112.f)
-            finalDest.m_positionY = 112.f;
+        // y: 196.f/458.f
+        if (finalDest.m_positionY < 224.f)
+            finalDest.m_positionY = 224.f;
         else if (finalDest.m_positionY > 458.f)
             finalDest.m_positionY = 458.f;
 
