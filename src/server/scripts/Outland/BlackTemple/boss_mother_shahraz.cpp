@@ -222,7 +222,7 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
     void SetDest(SpellDestination& dest)
     {
         // Specific case if the boss is near stairs to avoid LOS issues.
-        if (GetCaster()->GetPositionY() > 194.f)
+        if (GetCaster()->GetPositionY() < 194.f)
         {
             dest.Relocate(validTeleportStairsPos[urand(1, 5)]);
             return;
