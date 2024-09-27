@@ -204,6 +204,9 @@ const Position validTeleportStairsPos[4] =
     {958.01f, 110.47f, 192.84f}
 };
 
+constexpr float minTeleportDist = 30.f;
+constexpr float maxTeleportDist = 50.f;
+
 class spell_mother_shahraz_fatal_attraction : public SpellScript
 {
     PrepareSpellScript(spell_mother_shahraz_fatal_attraction);
@@ -227,9 +230,6 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
             finalDest = validTeleportStairsPos[urand(0, 3)];
         else
         {
-            constexpr float minTeleportDist = 30.f;
-            constexpr float maxTeleportDist = 50.f;
-
             finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
 
             // Maybe not necessary but just in case to avoid LOS issues with an object
