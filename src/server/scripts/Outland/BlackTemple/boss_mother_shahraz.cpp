@@ -198,10 +198,10 @@ class spell_mother_shahraz_saber_lash_aura : public AuraScript
 
 const Position validTeleportStairsPos[4] =
 {
-    {965.84f, 163.61f, 192.84f, 0.f},
-    {927.22f, 187.04f, 192.84f, 0.f},
-    {922.54f, 110.09f, 192.84f, 0.f},
-    {958.01f, 110.47f, 192.84f, 0.f}
+    {966.87f, 184.45f, 192.84f},
+    {927.22f, 187.04f, 192.84f},
+    {922.54f, 110.09f, 192.84f},
+    {958.01f, 110.47f, 192.84f}
 };
 
 class spell_mother_shahraz_fatal_attraction : public SpellScript
@@ -222,8 +222,10 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
     {
         Position finalDest;
 
-        // Check if the boss isn't near stairs to avoid LOS issues.
-        if(GetCaster()->GetPositionY() > 194.f)
+        // Check if the boss is near stairs to avoid players falling through the platform with random teleports.
+        if(GetCaster()->GetPositionY() < 194.f)
+            finalDest = validTeleportStairsPos[urand(0, 3)];
+        else
         {
             constexpr float minTeleportDist = 30.f;
             constexpr float maxTeleportDist = 50.f;
@@ -234,30 +236,29 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
             if(!GetCaster()->IsWithinLOS(finalDest.GetPositionX(), finalDest.GetPositionY(), finalDest.GetPositionZ()))
                 finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
 
-            /// @note: Estimated - Safe Areatrigger to avoid teleporting into/near walls - 15y of distance with walls
-            /// @todo: find a better way than this hackfix
-            // x: 932.f/960.f
+            /* @note: To avoid teleporting players near a walls, we will define a safe area.
+             * As the boss have an area boudary around y: 320.f. We will limit the safe area to this value, avoiding wird issues.
+             * x limit: 932.f/960.f | y limit: 196.f/320.f
+             */
             if (finalDest.m_positionX < 932.f)
                 finalDest.m_positionX = 932.f;
             else if (finalDest.m_positionX > 960.f)
                 finalDest.m_positionX = 960.f;
-            // y: 196.f/365.f - Note: the boss have an area boudary around y: 320.f. We will limit the safe area to 365.f
+
             if (finalDest.m_positionY < 224.f)
                 finalDest.m_positionY = 224.f;
-            else if (finalDest.m_positionY > 365.f)
-                finalDest.m_positionY = 365.f;
+            else if (finalDest.m_positionY > 320.f)
+                finalDest.m_positionY = 320.f;
 
             // After relocate a finalDest outside the safe area, we need to recheck the distance with the boss
-            if (GetCaster()->GetExactDist2d(finalDest) < 30.f)
+            if (GetCaster()->GetExactDist2d(finalDest) < minTeleportDist)
             {
                 if (finalDest.m_positionX == 932.f || finalDest.m_positionX == 960.f)
                     finalDest.m_positionY = finalDest.m_positionY + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
-                else if (finalDest.m_positionY == 112.f || finalDest.m_positionY == 458.f)
+                else if (finalDest.m_positionY == 224.f || finalDest.m_positionY == 320.f)
                     finalDest.m_positionX = finalDest.m_positionX + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
             }
         }
-        else
-            finalDest = validTeleportStairsPos[urand(0, 3)];
 
         dest.Relocate(finalDest);
     }
