@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS `creature_template_spell` (
   CONSTRAINT `creature_template_spell_chk_1` CHECK (((`Index` >= 0) and (`Index` <= 7)))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.creature_template_spell: ~9 552 rows (approximately)
+-- Dumping data for table acore_world.creature_template_spell: ~9 555 rows (approximately)
 DELETE FROM `creature_template_spell`;
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
 	(30, 0, 744, 12340),
@@ -5312,7 +5312,6 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(16595, 0, 3391, 12340),
 	(16595, 1, 29935, 12340),
 	(16595, 2, 29939, 12340),
-	(16697, 0, 28865, 12340),
 	(16699, 0, 15496, 12340),
 	(16699, 1, 30485, 12340),
 	(16699, 2, 30471, 12340),
@@ -5876,6 +5875,7 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(17888, 1, 40936, 12340),
 	(17888, 2, 31447, 12340),
 	(17888, 3, 31477, 12340),
+	(17899, 1, 31626, 54205),
 	(17903, 0, 31618, 12340),
 	(17905, 0, 31662, 12340),
 	(17905, 1, 31651, 12340),
@@ -6854,6 +6854,9 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(20041, 0, 37106, 12340),
 	(20041, 1, 39425, 12340),
 	(20041, 2, 37104, 12340),
+	(20042, 1, 37112, 55261),
+	(20042, 2, 37118, 55261),
+	(20042, 3, 37120, 55261),
 	(20045, 0, 37126, 12340),
 	(20045, 1, 37135, 12340),
 	(20048, 0, 37268, 12340),
@@ -8771,10 +8774,10 @@ INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `Verified
 	(27292, 0, 48619, 12340),
 	(27292, 1, 48620, 12340),
 	(27292, 2, 52812, 12340),
-	(27354, 0, 48558, 12340),
-	(27354, 1, 48604, 12340),
-	(27354, 2, 48548, 12340),
-	(27354, 4, 48610, 12340),
+	(27354, 0, 48548, 53788),
+	(27354, 1, 48558, 53788),
+	(27354, 2, 48604, 53788),
+	(27354, 4, 48610, 53788),
 	(27377, 4, 56843, 12340),
 	(27409, 0, 48677, 12340),
 	(27409, 1, 48768, 12340),

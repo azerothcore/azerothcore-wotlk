@@ -485,7 +485,7 @@ int main(int argc, char** argv)
             map_ids[x].id = dbc->getRecord(x).getUInt(0);
 
             char const* map_name = dbc->getRecord(x).getString(1);
-            size_t max_map_name_length = sizeof(map_ids[x].name);
+            std::size_t max_map_name_length = sizeof(map_ids[x].name);
             if (strlen(map_name) >= max_map_name_length)
             {
                 delete dbc;

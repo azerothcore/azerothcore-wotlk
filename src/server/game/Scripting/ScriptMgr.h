@@ -298,6 +298,7 @@ public: /* PlayerScript */
     void OnPlayerUpdate(Player* player, uint32 p_time);
     void OnSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerJustDied(Player* player);
+    void OnCalculateTalentsPoints(Player const* player, uint32& talentPointsForLevel);
     void OnPlayerReleasedGhost(Player* player);
     void OnPVPKill(Player* killer, Player* killed);
     void OnPlayerPVPFlagChange(Player* player, bool state);
@@ -357,8 +358,6 @@ public: /* PlayerScript */
     void OnEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool update);
     void OnPlayerJoinBG(Player* player);
     void OnPlayerJoinArena(Player* player);
-    void GetCustomGetArenaTeamId(Player const* player, uint8 slot, uint32& teamID) const;
-    void GetCustomArenaPersonalRating(Player const* player, uint8 slot, uint32& rating) const;
     void OnGetMaxPersonalArenaRatingRequirement(Player const* player, uint32 minSlot, uint32& maxArenaRating) const;
     void OnLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid);
     void OnBeforeFillQuestLootItem(Player* player, LootItem& item);
@@ -530,7 +529,7 @@ public: /* GlobalScript */
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
     uint32 DecreaseScheduledScriptCount() { return --_scheduledScripts; }
-    uint32 DecreaseScheduledScriptCount(size_t count) { return _scheduledScripts -= count; }
+    uint32 DecreaseScheduledScriptCount(std::size_t count) { return _scheduledScripts -= count; }
     bool IsScriptScheduled() const { return _scheduledScripts > 0; }
 
 public: /* UnitScript */
@@ -572,7 +571,7 @@ public: /* AllGameobjectScript */
     void OnGameObjectSaveToDB(GameObject* go);
 
 public: /* AllMapScript */
-    void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript* instanceData, bool load, std::string data, uint32 completedEncounterMask);
+    void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript** instanceData, bool load, std::string data, uint32 completedEncounterMask);
     void OnDestroyInstance(MapInstanced* mapInstanced, Map* map);
 
 public: /* BGScript */
@@ -583,6 +582,7 @@ public: /* BGScript */
     void OnBattlegroundBeforeAddPlayer(Battleground* bg, Player* player);
     void OnBattlegroundRemovePlayerAtLeave(Battleground* bg, Player* player);
     void OnQueueUpdate(BattlegroundQueue* queue, uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating);
+    bool OnQueueUpdateValidity(BattlegroundQueue* queue, uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating);
     void OnAddGroup(BattlegroundQueue* queue, GroupQueueInfo* ginfo, uint32& index, Player* leader, Group* group, BattlegroundTypeId bgTypeId, PvPDifficultyEntry const* bracketEntry,
         uint8 arenaType, bool isRated, bool isPremade, uint32 arenaRating, uint32 matchmakerRating, uint32 arenaTeamId, uint32 opponentsArenaTeamId);
     bool CanFillPlayersToBG(BattlegroundQueue* queue, Battleground* bg, BattlegroundBracketId bracket_id);
@@ -645,6 +645,8 @@ public: /* ArenaScript */
     bool CanAddMember(ArenaTeam* team, ObjectGuid PlayerGuid);
     void OnGetPoints(ArenaTeam* team, uint32 memberRating, float& points);
     bool CanSaveToDB(ArenaTeam* team);
+    bool OnBeforeArenaCheckWinConditions(Battleground* const bg);
+    void OnArenaStart(Battleground* const bg);
 
 public: /* MiscScript */
 
@@ -796,7 +798,7 @@ public:
                     if (oldScript)
                     {
                         for (auto& vIt : EnabledHooks)
-                            for (size_t i = 0; i < vIt.size(); ++i)
+                            for (std::size_t i = 0; i < vIt.size(); ++i)
                                 if (vIt[i] == oldScript)
                                 {
                                     vIt.erase(vIt.begin() + i);

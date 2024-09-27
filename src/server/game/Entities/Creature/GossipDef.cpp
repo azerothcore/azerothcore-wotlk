@@ -319,12 +319,16 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const
 
     if (QuestGreeting const* questGreeting = sObjectMgr->GetQuestGreeting(guid.GetTypeId(), guid.GetEntry()))
     {
-        std::string strGreeting = questGreeting->Text;
-
-        LocaleConstant localeConstant = _session->GetSessionDbLocaleIndex();
-        if (localeConstant != LOCALE_enUS)
-            if (QuestGreetingLocale const* questGreetingLocale = sObjectMgr->GetQuestGreetingLocale(guid.GetTypeId(), guid.GetEntry()))
-                ObjectMgr::GetLocaleString(questGreetingLocale->Greeting, localeConstant, strGreeting);
+        std::string strGreeting;
+        // Check if greeting exists. Blizzlike that some creatures have empty greeting
+        if (!questGreeting->Greeting.empty())
+        {
+            LocaleConstant locale = _session->GetSessionDbLocaleIndex();
+            if (questGreeting->Greeting.size() > size_t(locale))
+                strGreeting = questGreeting->Greeting[locale];
+            else
+                strGreeting = questGreeting->Greeting[DEFAULT_LOCALE];
+        }
 
         data << strGreeting;
         data << uint32(questGreeting->EmoteDelay);
@@ -337,7 +341,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote const& eEmote, std::string const
         data << uint32(eEmote._Emote); // NPC emote
     }
 
-    size_t count_pos = data.wpos();
+    std::size_t count_pos = data.wpos();
     data << uint8(0);
     uint32 count = 0;
 
@@ -451,7 +455,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* quest, ObjectGuid npcGU
 
         uint32 moneyRew = 0;
         Player* player = _session->GetPlayer();
-        if (player && (player->getLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player)))
+        if (player && (player->GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(player)))
         {
             moneyRew = quest->GetRewMoneyMaxLevel();
         }

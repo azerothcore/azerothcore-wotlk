@@ -245,9 +245,9 @@ uint32 ReadBuild(int locale)
     std::string text = std::string(m.getPointer(), m.getSize());
     m.close();
 
-    size_t pos = text.find("version=\"");
-    size_t pos1 = pos + strlen("version=\"");
-    size_t pos2 = text.find("\"", pos1);
+    std::size_t pos = text.find("version=\"");
+    std::size_t pos1 = pos + strlen("version=\"");
+    std::size_t pos2 = text.find("\"", pos1);
     if (pos == text.npos || pos2 == text.npos || pos1 >= pos2)
     {
         printf("Fatal error: Invalid  %s file format!\n", filename.c_str());
@@ -277,7 +277,7 @@ uint32 ReadMapDBC()
         exit(1);
     }
 
-    size_t map_count = dbc.getRecordCount();
+    std::size_t map_count = dbc.getRecordCount();
     map_ids.resize(map_count);
     for (uint32 x = 0; x < map_count; ++x)
     {
@@ -990,7 +990,7 @@ void ExtractMapsFromMpq(uint32 build)
     {
         printf("Extract %s (%d/%u)                  \n", map_ids[z].name, z + 1, map_count);
         // Loadup map grid data
-        mpqMapName = Acore::StringFormat(R"(World\Maps\%s\%s.wdt)", map_ids[z].name, map_ids[z].name);
+        mpqMapName = Acore::StringFormat(R"(World\Maps\{}\{}.wdt)", map_ids[z].name, map_ids[z].name);
         WDT_file wdt;
         if (!wdt.loadFile(mpqMapName, false))
         {
@@ -1004,8 +1004,8 @@ void ExtractMapsFromMpq(uint32 build)
             {
                 if (!wdt.main->adt_list[y][x].exist)
                     continue;
-                mpqFileName = Acore::StringFormat(R"(World\Maps\%s\%s_%u_%u.adt)", map_ids[z].name, map_ids[z].name, x, y);
-                outputFileName = Acore::StringFormat("%s/maps/%03u%02u%02u.map", output_path, map_ids[z].id, y, x);
+                mpqFileName = Acore::StringFormat(R"(World\Maps\{}\{}_{}_{}.adt)", map_ids[z].name, map_ids[z].name, x, y);
+                outputFileName = Acore::StringFormat("{}/maps/{:03}{:02}{:02}.map", output_path, map_ids[z].id, y, x);
                 ConvertADT(mpqFileName, outputFileName, y, x, build);
             }
             // draw progress bar
@@ -1094,12 +1094,12 @@ void ExtractCameraFiles(int locale, bool basicLocale)
 
     // get camera file list from DBC
     std::vector<std::string> camerafiles;
-    size_t cam_count = camdbc.getRecordCount();
+    std::size_t cam_count = camdbc.getRecordCount();
 
-    for (size_t i = 0; i < cam_count; ++i)
+    for (std::size_t i = 0; i < cam_count; ++i)
     {
         std::string camFile(camdbc.getRecord(i).getString(1));
-        size_t loc = camFile.find(".mdx");
+        std::size_t loc = camFile.find(".mdx");
         if (loc != std::string::npos)
         {
             camFile.replace(loc, 4, ".m2");

@@ -16,11 +16,9 @@
  */
 
 #include "AreaTriggerScript.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "SpellMgr.h"
 /* ScriptData
 SDName: Areatrigger_Scripts
 SD%Complete: 100
@@ -304,7 +302,7 @@ public:
 
         if (!player->FindNearestCreature(NPC_TERVOSH, 100.0f))
         {
-            if(Creature* tervosh = player->SummonCreature(NPC_TERVOSH, -3476.51f, -4105.94f, 17.1f, 5.3816f, TEMPSUMMON_TIMED_DESPAWN, 60000))
+            if (Creature* tervosh = player->SummonCreature(NPC_TERVOSH, -3476.51f, -4105.94f, 17.1f, 5.3816f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                 tervosh->CastSpell(tervosh, SPELL_TELEPORT_VISUAL, true);
         }
 
@@ -452,4 +450,3 @@ void AddSC_areatrigger_scripts()
     new AreaTrigger_at_brewfest();
     new AreaTrigger_at_area_52_entrance();
 }
-

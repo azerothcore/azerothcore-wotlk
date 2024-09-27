@@ -29,7 +29,7 @@ PlayerSocial::PlayerSocial(): m_playerGUID() { }
 uint32 PlayerSocial::GetNumberOfSocialsWithFlag(SocialFlag flag) const
 {
     uint32 counter = 0;
-    for (const auto& itr : m_playerSocialMap)
+    for (auto const& itr : m_playerSocialMap)
     {
         if ((itr.second.Flags & flag) != 0)
             ++counter;
@@ -132,7 +132,7 @@ void PlayerSocial::SendSocialList(Player* player, uint32 flags)
 
     WorldPacket data(SMSG_CONTACT_LIST, (4 + 4 + m_playerSocialMap.size() * 25)); // just can guess size
     data << uint32(flags);                                                        // 0x1 = Friendlist update. 0x2 = Ignorelist update. 0x4 = Mutelist update.
-    size_t countPos = data.wpos();
+    std::size_t countPos = data.wpos();
     data << uint32(0);                                                           // contacts count placeholder
 
     for (auto& itr : m_playerSocialMap)
@@ -178,7 +178,7 @@ void PlayerSocial::SendSocialList(Player* player, uint32 flags)
 
 bool PlayerSocial::_checkContact(ObjectGuid guid, SocialFlag flags) const
 {
-    const auto& itr = m_playerSocialMap.find(guid);
+    auto const& itr = m_playerSocialMap.find(guid);
     if (itr != m_playerSocialMap.end())
         return (itr->second.Flags & flags) != 0;
 

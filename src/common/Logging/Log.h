@@ -21,7 +21,6 @@
 #include "Define.h"
 #include "LogCommon.h"
 #include "StringFormat.h"
-#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -70,7 +69,7 @@ public:
     template<typename... Args>
     inline void outMessage(std::string const& filter, LogLevel const level, Acore::FormatString<Args...> fmt, Args&&... args)
     {
-        _outMessage(filter, level, Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+        _outMessage(filter, level, Acore::StringFormat(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
@@ -81,7 +80,7 @@ public:
             return;
         }
 
-        _outCommand(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...), std::to_string(account));
+        _outCommand(Acore::StringFormat(fmt, std::forward<Args>(args)...), std::to_string(account));
     }
 
     void SetRealmId(uint32 id);

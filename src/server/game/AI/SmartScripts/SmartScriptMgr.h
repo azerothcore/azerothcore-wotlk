@@ -716,7 +716,7 @@ enum SMART_ACTION
     SMART_ACTION_DO_ACTION                          = 223,    // ActionId
     SMART_ACTION_ATTACK_STOP                        = 224,    //
     SMART_ACTION_SET_GUID                           = 225,    // Sends the invoker's or the base object's own ObjectGuid to target
-    SMART_ACTION_DISABLE                            = 226,    // state
+    SMART_ACTION_SCRIPTED_SPAWN                     = 226,    // state, spawnTimerMin, spawnTimerMax, respawnDelay, corpseDelay, dontDespawn
     SMART_ACTION_SET_SCALE                          = 227,    // scale
     SMART_ACTION_SUMMON_RADIAL                      = 228,    // summonEntry, summonDuration, repetitions, startAngle, stepAngle, dist
     SMART_ACTION_PLAY_SPELL_VISUAL                  = 229,    // visualId, visualIdImpact
@@ -978,6 +978,7 @@ struct SmartAction
         {
             uint32 delay;
             uint32 forceRespawnTimer;
+            SAIBool removeObjectFromWorld;
         } forceDespawn;
 
         struct
@@ -1201,6 +1202,7 @@ struct SmartAction
             SAIBool transport;
             uint32 controlled;
             uint32 ContactDistance;
+            uint32 combatReach;
         } moveToPos;
 
         struct
@@ -1409,7 +1411,12 @@ struct SmartAction
         struct
         {
             SAIBool state;
-        } disable;
+            uint32 spawnTimerMin;
+            uint32 spawnTimerMax;
+            uint32 respawnDelay;
+            uint32 corpseDelay;
+            SAIBool dontDespawn;
+        } scriptSpawn;
 
         struct
         {

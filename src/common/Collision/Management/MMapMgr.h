@@ -22,12 +22,11 @@
 #include "DetourAlloc.h"
 #include "DetourExtended.h"
 #include "DetourNavMesh.h"
-#include <shared_mutex>
 #include <unordered_map>
 #include <vector>
 
 //  memory management
-inline void* dtCustomAlloc(size_t size, dtAllocHint /*hint*/)
+inline void* dtCustomAlloc(std::size_t size, dtAllocHint /*hint*/)
 {
     return (void*)new unsigned char[size];
 }

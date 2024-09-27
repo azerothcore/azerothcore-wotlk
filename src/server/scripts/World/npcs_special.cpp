@@ -572,6 +572,10 @@ public:
             if (!SpawnAssoc)
                 return;
 
+            // check if they're hostile
+            if (!(me->IsHostileTo(who) || who->IsHostileTo(me)))
+                return;
+
             if (me->IsValidAttackTarget(who))
             {
                 Player* playerTarget = who->ToPlayer();
@@ -2534,7 +2538,7 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {
-            if (summoner->GetTypeId() != TYPEID_PLAYER)
+            if (!summoner->IsPlayer())
             {
                 return;
             }
@@ -2621,7 +2625,7 @@ public:
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (summoner->GetTypeId() == TYPEID_UNIT || summoner->IsPlayer())
+        if (summoner->IsCreature() || summoner->IsPlayer())
             me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
     }

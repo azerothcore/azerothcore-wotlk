@@ -19,6 +19,7 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "SpellScript.h"
 
 enum Yells
 {
@@ -98,7 +99,7 @@ struct boss_najentus : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER && _canTalk)
+        if (victim->IsPlayer() && _canTalk)
         {
             Talk(SAY_SLAY);
             _canTalk = false;
@@ -161,4 +162,3 @@ void AddSC_boss_najentus()
     RegisterSpellScript(spell_najentus_needle_spine);
     RegisterSpellScript(spell_najentus_hurl_spine);
 }
-

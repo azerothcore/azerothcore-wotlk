@@ -20,6 +20,7 @@
 #include "Log.h"
 #include "Timer.h"
 #include <algorithm>
+#include <cmath>
 #include <iterator>
 
 // create instance
@@ -87,12 +88,12 @@ uint32 UpdateTime::GetPercentile(uint8 p)
     double index = (double(p) / 100.0) * (GetDatasetSize() - 1);
 
     // If the index is an integer, return the value at that index
-    if (index == floor(index))
+    if (index == std::floor(index))
        return _orderedUpdateTimeDataTable[index];
 
     // Otherwise, perform linear interpolation
-    int lowerIndex = floor(index);
-    int upperIndex = ceil(index);
+    int lowerIndex = std::floor(index);
+    int upperIndex = std::ceil(index);
     double fraction = index - lowerIndex;
 
     return _orderedUpdateTimeDataTable[lowerIndex] * (1 - fraction) + _orderedUpdateTimeDataTable[upperIndex] * fraction;
@@ -150,7 +151,7 @@ void UpdateTime::SortUpdateTimeDataTable()
 
 void WorldUpdateTime::LoadFromConfig()
 {
-    _recordUpdateTimeInverval = Milliseconds(sConfigMgr->GetOption<uint32>("RecordUpdateTimeDiffInterval", 60000));
+    _recordUpdateTimeInverval = Milliseconds(sConfigMgr->GetOption<uint32>("RecordUpdateTimeDiffInterval", 300000));
     _recordUpdateTimeMin = Milliseconds(sConfigMgr->GetOption<uint32>("MinRecordUpdateTimeDiff", 100));
 }
 
@@ -165,10 +166,11 @@ void WorldUpdateTime::RecordUpdateTime(Milliseconds gameTimeMs, uint32 diff, uin
     {
         if (GetMSTimeDiff(_lastRecordTime, gameTimeMs) > _recordUpdateTimeInverval)
         {
-            LOG_INFO("time.update", "Last {} diffs summary with {} players online:", GetDatasetSize(), sessionCount);
-            LOG_INFO("time.update", " - Mean: {};", GetAverageUpdateTime());
-            LOG_INFO("time.update", " - Median: {};", GetPercentile(50));
-            LOG_INFO("time.update", " - Percentiles (95, 99, max): {}, {}, {}.", GetPercentile(95), GetPercentile(99), GetPercentile(100));
+            LOG_INFO("time.update", "Update time diff: {}ms with {} players online", GetLastUpdateTime(), sessionCount);
+            LOG_INFO("time.update", "Last {} diffs summary:", GetDatasetSize());
+            LOG_INFO("time.update", "|- Mean: {}ms", GetAverageUpdateTime());
+            LOG_INFO("time.update", "|- Median: {}ms", GetPercentile(50));
+            LOG_INFO("time.update", "|- Percentiles (95, 99, max): {}ms, {}ms, {}ms", GetPercentile(95), GetPercentile(99), GetPercentile(100));
             _lastRecordTime = gameTimeMs;
         }
     }

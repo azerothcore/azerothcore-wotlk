@@ -76,7 +76,7 @@ public:
                 if (Unit* s = t->GetSummonerUnit())
                 {
                     PrisonerGUID = s->GetGUID();
-                    if( me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic() )
+                    if (me->GetInstanceScript() && me->GetInstanceScript()->instance->IsHeroic())
                     {
                         const int32 dmg = 2000;
                         c->CastCustomSpell(s, SPELL_FROST_TOMB_AURA, nullptr, &dmg, nullptr, true);
@@ -105,7 +105,7 @@ public:
             {
                 if (Unit* p = ObjectAccessor::GetUnit(*me, PrisonerGUID))
                 {
-                    if( !p->HasAura(SPELL_FROST_TOMB_AURA) )
+                    if (!p->HasAura(SPELL_FROST_TOMB_AURA))
                         me->KillSelf();
                 }
                 else
@@ -173,7 +173,7 @@ public:
 
         void AttackStart(Unit* who) override
         {
-            if( !who )
+            if (!who)
                 return;
 
             UnitAI::AttackStartCaster(who, 12.0f);
@@ -186,10 +186,10 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -198,8 +198,8 @@ public:
                     events.Repeat(4s, 5s);
                     break;
                 case EVENT_FROST_TOMB:
-                    if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true) )
-                        if( !target->HasAura(SPELL_FROST_TOMB_AURA) )
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
+                        if (!target->HasAura(SPELL_FROST_TOMB_AURA))
                         {
                             Talk(SAY_FROST_TOMB_EMOTE, target);
                             Talk(SAY_FROST_TOMB);
@@ -215,8 +215,8 @@ public:
                     {
                         float dist = rand_norm() * 4 + 3.0f;
                         float angle = rand_norm() * 2 * M_PI;
-                        if( Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000) )
-                            if( Unit* target = c->SelectNearestTarget(250.0f) )
+                        if (Creature* c = me->SummonCreature(NPC_SKELETON, 156.2f + cos(angle) * dist, 259.1f + std::sin(angle) * dist, 42.9f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000))
+                            if (Unit* target = c->SelectNearestTarget(250.0f))
                             {
                                 c->AddThreat(target, 5.0f);
                                 DoZoneInCombat(c);
@@ -266,7 +266,7 @@ public:
         {
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_DECREPIFY, 10s, 20s);
-            if( IsHeroic() )
+            if (IsHeroic())
                 events.RescheduleEvent(EVENT_SPELL_BONE_ARMOR, 25s, 120s);
         }
 
@@ -292,9 +292,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
+            if (pInstance && pInstance->GetData(DATA_KELESETH) != IN_PROGRESS )
             {
-                if( me->IsAlive() )
+                if (me->IsAlive())
                     me->KillSelf();
                 return;
             }
@@ -304,20 +304,20 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_SPELL_DECREPIFY:
-                    if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                         me->CastSpell(me->GetVictim(), SPELL_DECREPIFY, false);
                     events.Repeat(15s, 25s);
                     break;
                 case EVENT_SPELL_BONE_ARMOR:
-                    if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
+                    if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                         me->CastSpell((Unit*)nullptr, SPELL_BONE_ARMOR, false);
                     events.Repeat(40s, 120s);
                     break;
@@ -337,38 +337,32 @@ public:
                     break;
             }
 
-            if( !me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE) )
+            if (!me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                 DoMeleeAttackIfReady();
         }
     };
 };
 
-class spell_frost_tomb : public SpellScriptLoader
+class spell_frost_tomb_aura : public AuraScript
 {
-public:
-    spell_frost_tomb() : SpellScriptLoader("spell_frost_tomb") { }
+    PrepareAuraScript(spell_frost_tomb_aura);
 
-    class spell_frost_tombAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_frost_tombAuraScript);
+        return ValidateSpellInfo({ SPELL_FROST_TOMB_SUMMON });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            if (aurEff->GetTickNumber() == 1)
-                if( Unit* target = GetTarget() )
-                    target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tombAuraScript::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_frost_tombAuraScript();
+        PreventDefaultAction();
+        if (aurEff->GetTickNumber() == 1)
+            if (Unit* target = GetTarget())
+                target->CastSpell((Unit*)nullptr, SPELL_FROST_TOMB_SUMMON, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_frost_tomb_aura::HandleEffectPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -377,6 +371,5 @@ void AddSC_boss_keleseth()
     new boss_keleseth();
     new npc_frost_tomb();
     new npc_vrykul_skeleton();
-    new spell_frost_tomb();
+    RegisterSpellScript(spell_frost_tomb_aura);
 }
-

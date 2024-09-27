@@ -23,6 +23,7 @@
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "magtheridons_lair.h"
+#include "SpellScript.h"
 
 enum Yells
 {
@@ -214,7 +215,7 @@ struct boss_magtheridon : public BossAI
                 });
             }
         }
-        else if (action == ACTION_BANISH_SELF )
+        else if (action == ACTION_BANISH_SELF)
         {
             Talk(SAY_BANISH);
             me->CastSpell(me, SPELL_SHADOW_CAGE_STUN, true);

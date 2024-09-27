@@ -29,7 +29,7 @@ public:
     // just container for later use
     WorldPacket() : ByteBuffer(0) { }
 
-    explicit WorldPacket(uint16 opcode, size_t res = 200) :
+    explicit WorldPacket(uint16 opcode, std::size_t res = 200) :
         ByteBuffer(res), m_opcode(opcode) { }
 
     WorldPacket(WorldPacket&& packet) noexcept :
@@ -66,7 +66,7 @@ public:
     WorldPacket(uint16 opcode, MessageBuffer&& buffer) :
         ByteBuffer(std::move(buffer)), m_opcode(opcode) { }
 
-    void Initialize(uint16 opcode, size_t newres = 200)
+    void Initialize(uint16 opcode, std::size_t newres = 200)
     {
         clear();
         _storage.reserve(newres);

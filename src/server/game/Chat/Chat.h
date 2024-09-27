@@ -20,6 +20,7 @@
 
 #include "ChatCommand.h"
 #include "Errors.h"
+#include "Player.h"
 #include "SharedDefines.h"
 #include "WorldSession.h"
 #include <vector>
@@ -41,37 +42,135 @@ public:
     virtual ~ChatHandler() { }
 
     // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
-    static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
+    static std::size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
                                   std::string const& senderName = "", std::string const& receiverName = "",
                                   uint32 achievementId = 0, bool gmMessage = false, std::string const& channelName = "");
 
     // Builds chat packet and returns receiver guid position in the packet to substitute in whisper builders
-    static size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message, uint32 achievementId = 0, std::string const& channelName = "", LocaleConstant locale = DEFAULT_LOCALE);
+    static std::size_t BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, WorldObject const* sender, WorldObject const* receiver, std::string_view message, uint32 achievementId = 0, std::string const& channelName = "", LocaleConstant locale = DEFAULT_LOCALE);
 
     static char* LineFromMessage(char*& pos) { char* start = strtok(pos, "\n"); pos = nullptr; return start; }
+
+    void SendNotification(std::string_view str);
+    template<typename... Args>
+    void SendNotification(uint32 strId, Args&&... args)
+    {
+        if (HasSession())
+            SendNotification(Acore::StringFormat(GetAcoreString(strId), std::forward<Args>(args)...));
+    }
+    template<typename... Args>
+    void SendNotification(char const* fmt, Args&&... args)
+    {
+        if (HasSession())
+            SendNotification(Acore::StringFormat(fmt, std::forward<Args>(args)...));
+    }
+
+    void SendGMText(std::string_view str);
+    template<typename... Args>
+    void SendGMText(uint32 strId, Args&&... args)
+    {
+        // GMText should be sent to all sessions
+        DoForAllValidSessions([&](Player* player)
+            {
+                m_session = player->GetSession();
+                SendGMText(Acore::StringFormat(GetAcoreString(strId), std::forward<Args>(args)...));
+            });
+    }
+    template<typename... Args>
+    void SendGMText(char const* fmt, Args&&... args)
+    {
+        // GMText should be sent to all sessions
+        DoForAllValidSessions([&](Player* player)
+            {
+                m_session = player->GetSession();
+                SendGMText(Acore::StringFormat(fmt, std::forward<Args>(args)...));
+            });
+    }
+
+    void SendWorldText(std::string_view str);
+    template<typename... Args>
+    void SendWorldText(uint32 strId, Args&&... args)
+    {
+        // WorldText should be sent to all sessions
+        DoForAllValidSessions([&](Player* player)
+            {
+                m_session = player->GetSession();
+                SendWorldText(Acore::StringFormat(GetAcoreString(strId), std::forward<Args>(args)...));
+            });
+    }
+    template<typename... Args>
+    void SendWorldText(char const* fmt, Args&&... args)
+    {
+        // WorldText should be sent to all sessions
+        DoForAllValidSessions([&](Player* player)
+            {
+                m_session = player->GetSession();
+                SendWorldText(Acore::StringFormat(fmt, std::forward<Args>(args)...));
+            });
+    }
+
+    void SendWorldTextOptional(std::string_view str, uint32 flag);
+    template<typename... Args>
+    void SendWorldTextOptional(uint32 strId, uint32 flag, Args&&... args)
+    {
+        // WorldTextOptional should be sent to all sessions
+        DoForAllValidSessions([&](Player* player)
+            {
+                m_session = player->GetSession();
+                SendWorldTextOptional(Acore::StringFormat(GetAcoreString(strId), std::forward<Args>(args)...), flag);
+            });
+    }
+    template<typename... Args>
+    void SendWorldTextOptional(char const* fmt, uint32 flag, Args&&... args)
+    {
+        // WorldTextOptional should be sent to all sessions
+        DoForAllValidSessions([&](Player* player)
+            {
+                m_session = player->GetSession();
+                SendWorldTextOptional(Acore::StringFormat(fmt, std::forward<Args>(args)...), flag);
+            });
+    }
 
     // function with different implementation for chat/console
     virtual char const* GetAcoreString(uint32 entry) const;
     virtual void SendSysMessage(std::string_view str, bool escapeCharacters = false);
 
     void SendSysMessage(uint32 entry);
+    void PSendSysMessage(std::string_view str, bool escapeCharacters = false);
 
     template<typename... Args>
     void PSendSysMessage(char const* fmt, Args&&... args)
     {
-        SendSysMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...).c_str());
+        if (HasSession())
+            SendSysMessage(Acore::StringFormat(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     void PSendSysMessage(uint32 entry, Args&&... args)
     {
-        SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...).c_str());
+        if (HasSession())
+            SendSysMessage(PGetParseString(entry, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
     std::string PGetParseString(uint32 entry, Args&&... args) const
     {
         return Acore::StringFormat(GetAcoreString(entry), std::forward<Args>(args)...);
+    }
+
+    std::string const* GetModuleString(std::string module, uint32 id) const;
+
+    template<typename... Args>
+    void PSendModuleSysMessage(std::string module, uint32 id, Args&&... args)
+    {
+        if (HasSession())
+            SendSysMessage(PGetParseModuleString(module, id, std::forward<Args>(args)...));
+    }
+
+    template<typename... Args>
+    std::string PGetParseModuleString(std::string module, uint32 id, Args&&... args) const
+    {
+        return Acore::StringFormat(GetModuleString(module, id)->c_str(), std::forward<Args>(args)...);
     }
 
     void SendErrorMessage(uint32 entry);
@@ -113,6 +212,12 @@ public:
     WorldObject* getSelectedObject() const;
     // Returns either the selected player or self if there is no selected player
     Player* getSelectedPlayerOrSelf() const;
+
+    // Has different implementation for console
+    virtual bool HasSession() const;
+    // Do whatever you want to all the players with a valid session [including GameMasters], i.e.: param exec = [&](Player* p) { p->Whatever(); }
+    // A "valid" session requires player->IsInWorld() to be true
+    void DoForAllValidSessions(std::function<void(Player*)> exec);
 
     char* extractKeyFromLink(char* text, char const* linkType, char** something1 = nullptr);
     char* extractKeyFromLink(char* text, char const* const* linkTypes, int* found_idx, char** something1 = nullptr);
@@ -163,9 +268,32 @@ public:
     LocaleConstant GetSessionDbcLocale() const override;
     int GetSessionDbLocaleIndex() const override;
 
+    // CLI does not have a session, so we override it to always be true to output SendNotification and PSendSysMessage to console
+    bool HasSession() const override;
+
 private:
     void* m_callbackArg;
     Print* m_print;
+};
+
+class AC_GAME_API AddonChannelCommandHandler : public ChatHandler
+{
+    public:
+        using ChatHandler::ChatHandler;
+        bool ParseCommands(std::string_view str) override;
+        void SendSysMessage(std::string_view str, bool escapeCharacters) override;
+        using ChatHandler::SendSysMessage;
+        bool IsHumanReadable() const override { return humanReadable; }
+
+    private:
+        void Send(std::string const& msg);
+        void SendAck();
+        void SendOK();
+        void SendFailed();
+
+        std::string echo;
+        bool hadAck = false;
+        bool humanReadable = false;
 };
 
 #endif

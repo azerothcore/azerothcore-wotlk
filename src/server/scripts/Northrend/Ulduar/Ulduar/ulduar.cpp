@@ -15,20 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ulduar.h"
 #include "AreaTriggerScript.h"
 #include "CombatAI.h"
 #include "CreatureScript.h"
-#include "GameObjectScript.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "PassiveAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "Vehicle.h"
-#include "ulduar.h"
 
 enum Texts
 {
@@ -240,7 +239,7 @@ struct npc_ulduar_snow_mound : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_activated && who->GetTypeId() == TYPEID_PLAYER)
+        if (!_activated && who->IsPlayer())
         {
             if (me->GetExactDist2d(who) <= 10.0f && me->GetMap()->isInLineOfSight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 5.0f,
                 who->GetPositionX(), who->GetPositionY(), who->GetPositionZ() + 5.0f, 2, LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing))
@@ -547,7 +546,7 @@ struct npc_salvaged_siege_engine : public VehicleAI
             {
                 if (Unit* turret = vehicle->GetPassenger(7))
                 {
-                    if (Vehicle* turretVehicle = me->GetVehicleKit())
+                    if (Vehicle* turretVehicle = turret->GetVehicleKit())
                     {
                         if (!turretVehicle->IsVehicleInUse())
                         {
