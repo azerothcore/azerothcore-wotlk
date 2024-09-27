@@ -19769,28 +19769,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         }
     }
 
-    // HACK
-    // if (vehicleInfo)
-    // {
-    //     if (vehicleInfo->m_ID == 380) // Kologarn right arm
-    //     {
-    //         pos.Relocate(1776.0f, -24.0f, 448.75f, 0.0f);
-    //     }
-    //     else if (vehicleInfo->m_ID == 91) // Helsman's Ship
-    //     {
-    //         pos.Relocate(2802.18f, 7054.91f, -0.6f, 4.67f);
-    //     }
-    //     else if (vehicleInfo->m_ID == 349) // AT Mounts, dismount to the right
-    //     {
-    //         float x = pos.GetPositionX() + 2.0f * cos(pos.GetOrientation() - M_PI / 2.0f);
-    //         float y = pos.GetPositionY() + 2.0f * std::sin(pos.GetOrientation() - M_PI / 2.0f);
-    //         float z = GetMapHeight(x, y, pos.GetPositionZ());
-    //         if (z > INVALID_HEIGHT)
-    //         {
-    //             pos.Relocate(x, y, z);
-    //         }
-    //     }
-    // }
 
     AddUnitState(UNIT_STATE_MOVE);
 
