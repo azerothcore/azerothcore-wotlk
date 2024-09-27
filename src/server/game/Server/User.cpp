@@ -58,6 +58,11 @@
 
 static bool s_initialized;
 
+static void UserBootMeHandler (User*        user,
+                               NETMESSAGE   msgId,
+                               uint         eventTime,
+                               WDataStore*  msg);
+
 static void UserWorldTeleportHandler (User*       user,
                                       NETMESSAGE  msgId,
                                       uint        eventTime,
@@ -2027,6 +2032,16 @@ void User::SendPlayerNotFoundFailure()
 ***/
 
 //===========================================================================
+static void UserBootMeHandler (User*        user,
+                               NETMESSAGE   msgId,
+                               uint         eventTime,
+                               WDataStore*  msg) {
+
+  // Forcibly remove the user from the server completely
+  user->KickPlayer();
+}
+
+//===========================================================================
 static void UserWorldTeleportHandler (User*       user,
                                       NETMESSAGE  msgId,
                                       uint        eventTime,
@@ -2060,6 +2075,7 @@ static void UserWorldTeleportHandler (User*       user,
 void UserInitialize () {
   if (s_initialized) return;
 
+  WowConnection::SetMessageHandler(CMSG_BOOTME, UserBootMeHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_WORLD_TELEPORT, UserWorldTeleportHandler, GM_SECURITY);
 
   s_initialized = true;
@@ -2069,6 +2085,7 @@ void UserInitialize () {
 void UserDestroy () {
   if (!s_initialized) return;
 
+  WowConnection::ClearMessageHandler(CMSG_BOOTME);
   WowConnection::ClearMessageHandler(CMSG_WORLD_TELEPORT);
 
   s_initialized = false;

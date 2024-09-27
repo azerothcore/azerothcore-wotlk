@@ -1613,16 +1613,6 @@ void User::HandleUpdateMissileTrajectory(WDataStore& recvPacket)
 }
 
 //===========================================================================
-void User::BootMeHandler(WDataStore& msg)
-{
-    if (!IsGMAccount()) {
-        SendNotification(LANG_PERMISSION_DENIED);
-        return;
-    }
-    m_sock->Disconnect();
-}
-
-//===========================================================================
 void User::GmResurrectHandler(WDataStore& msg)
 {
     if (!IsGMAccount()) {
