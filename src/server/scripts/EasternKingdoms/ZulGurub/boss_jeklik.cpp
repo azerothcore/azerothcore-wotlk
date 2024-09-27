@@ -372,7 +372,7 @@ struct npc_batrider : public CreatureAI
     {
         if (_mode == BATRIDER_MODE_BOSS)
         {
-            if (!me->isMoving())
+            if (!me->IsMoving())
             {
                 me->SetCanFly(true);
                 me->GetMotionMaster()->MoveSplinePath(PATH_BATRIDER_LOOP);

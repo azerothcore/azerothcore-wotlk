@@ -163,7 +163,7 @@ struct boss_alar : public BossAI
 
     bool CanAIAttack(Unit const* victim) const override
     {
-        if (me->isMoving())
+        if (me->IsMoving())
             return true;
 
         return _hasPretendedToDie || me->IsWithinMeleeRange(victim);
@@ -365,7 +365,7 @@ struct boss_alar : public BossAI
     {
         scheduler.Schedule(timer, GROUP_FLAME_BUFFET, [this](TaskContext context)
         {
-            if (!me->SelectNearestTarget(me->GetCombatReach()) && !me->isMoving())
+            if (!me->SelectNearestTarget(me->GetCombatReach()) && !me->IsMoving())
             {
                 DoCastVictim(SPELL_FLAME_BUFFET);
             }

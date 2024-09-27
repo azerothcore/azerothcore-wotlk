@@ -999,7 +999,7 @@ public:
             if (!me->GetVictim() || me->GetVictim()->GetEntry() != NPC_VALITHRIA_DREAMWALKER)
                 return;
 
-            if (!me->HasUnitState(UNIT_STATE_CASTING) && !me->isMoving() && me->IsWithinMeleeRange(me->GetVictim()))
+            if (!me->HasUnitState(UNIT_STATE_CASTING) && !me->IsMoving() && me->IsWithinMeleeRange(me->GetVictim()))
                 me->CastSpell((Unit*)nullptr, SPELL_SUPPRESSION, false);
         }
     };

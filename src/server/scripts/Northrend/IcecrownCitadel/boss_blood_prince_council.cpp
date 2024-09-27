@@ -1451,7 +1451,7 @@ public:
 
         void HandleDummyTick(AuraEffect const* aurEff)
         {
-            if (GetTarget()->IsPlayer() && GetTarget()->isMoving())
+            if (GetTarget()->IsPlayer() && GetTarget()->IsMoving())
             {
                 GetTarget()->CastSpell(GetTarget(), SPELL_SHADOW_PRISON_DAMAGE, true, nullptr, aurEff);
             }

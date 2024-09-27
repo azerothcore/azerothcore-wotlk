@@ -832,7 +832,7 @@ class spell_slippery_floor_periodic : public SpellScript
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
-            if (target->isMoving())
+            if (target->IsMoving())
             {
                 target->CastSpell(target, SPELL_SLIPPERY_FLOOR_SLIP, true);
                 target->CastSpell(target, SPELL_SLIPPERY_FLOOR_YOU_SLIPPED, true);

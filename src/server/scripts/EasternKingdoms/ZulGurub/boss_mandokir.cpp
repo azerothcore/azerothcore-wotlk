@@ -131,7 +131,7 @@ void RevivePlayer(Unit* victim, WOWGUID& reviveGUID)
     // Now we have to check if the spirit is already reviving someone...
     for (Creature* spirit : chainedSpirits)
     {
-        if (!spirit->isMoving() && !spirit->HasUnitState(UNIT_STATE_CASTING))
+        if (!spirit->IsMoving() && !spirit->HasUnitState(UNIT_STATE_CASTING))
         {
             spirit->AI()->SetGUID(reviveGUID);
             spirit->AI()->DoAction(ACTION_REVIVE);

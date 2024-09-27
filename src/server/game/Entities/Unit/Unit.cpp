@@ -712,7 +712,7 @@ bool Unit::GetRandomContactPoint(Unit const* obj, float& x, float& y, float& z, 
         if (c->isWorldBoss() || c->IsDungeonBoss() || (obj->IsPet() && const_cast<Unit*>(obj)->ToPet()->isControlled()))
             attacker_number = 0; // pussywizard: pets and bosses just come to target from their angle
 
-    GetNearPoint(obj, x, y, z, isMoving() ? (obj->GetCombatReach() > 7.75f ? obj->GetCombatReach() - 7.5f : 0.25f) : obj->GetCombatReach(), 0.0f,
+    GetNearPoint(obj, x, y, z, IsMoving() ? (obj->GetCombatReach() > 7.75f ? obj->GetCombatReach() - 7.5f : 0.25f) : obj->GetCombatReach(), 0.0f,
                  GetAngle(obj) + (attacker_number ? (static_cast<float>(M_PI / 2) - static_cast<float>(M_PI) * (float)rand_norm()) * float(attacker_number) / combat_reach * 0.3f : 0));
 
     // pussywizard
@@ -2663,7 +2663,7 @@ bool Unit::GetMeleeAttackPoint(Unit* attacker, Position& pos)
     {
         // if the otherAttacker is not valid, skip
         if (!otherAttacker || otherAttacker->GetGUID() == attacker->GetGUID() ||
-            !otherAttacker->IsWithinMeleeRange(this) || otherAttacker->isMoving())
+            !otherAttacker->IsWithinMeleeRange(this) || otherAttacker->IsMoving())
         {
             continue;
         }
@@ -3880,7 +3880,7 @@ void Unit::_UpdateAutoRepeatSpell()
     static uint32 const HUNTER_AUTOSHOOT = 75;
 
     // Check "realtime" interrupts
-    if ((IsPlayer() && ToPlayer()->isMoving()) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
+    if ((IsPlayer() && ToPlayer()->IsMoving()) || IsNonMeleeSpellCast(false, false, true, spellProto->Id == HUNTER_AUTOSHOOT))
     {
         // cancel wand shoot
         if (spellProto->Id != HUNTER_AUTOSHOOT)

@@ -762,7 +762,7 @@ class spell_hun_sniper_training : public AuraScript
         if (Player* playerTarget = GetUnitOwner()->ToPlayer())
         {
             int32 baseAmount = aurEff->GetBaseAmount();
-            int32 amount = playerTarget->isMoving() || aurEff->GetAmount() <= 0 ?
+            int32 amount = playerTarget->IsMoving() || aurEff->GetAmount() <= 0 ?
                             playerTarget->CalculateSpellDamage(playerTarget, GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount) :
                             aurEff->GetAmount() - 1;
             aurEff->SetAmount(amount);

@@ -1212,7 +1212,7 @@ class spell_hodir_biting_cold_main_aura : public AuraScript
         if ((aurEff->GetTickNumber() % 4) == 0)
             if (Unit* target = GetTarget())
                 if (target->IsPlayer()
-                    && !target->isMoving()
+                    && !target->IsMoving()
                     && !target->HasAura(SPELL_BITING_COLD_PLAYER_AURA)
                     && !target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
                     target->CastSpell(target, SPELL_BITING_COLD_PLAYER_AURA, true);
@@ -1248,7 +1248,7 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
                 SetDuration(GetMaxDuration());
             if (target->HasAura(SPELL_FLASH_FREEZE_TRAPPED_PLAYER))
                 return;
-            if (target->isMoving() || target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
+            if (target->IsMoving() || target->HasAura(SPELL_MAGE_TOASTY_FIRE_AURA))
             {
                 if (_prev)
                 {

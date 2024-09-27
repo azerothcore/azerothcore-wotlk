@@ -1079,7 +1079,7 @@ class spell_item_enchanted_broom_periodic : public AuraScript
         PreventDefaultAction();
         if (Unit* owner = GetTarget()->GetOwner())
         {
-            if (owner->isMoving())
+            if (owner->IsMoving())
             {
                 GetTarget()->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, GetTarget()->GetFollowAngle(), MOTION_SLOT_ACTIVE);
             }
@@ -1618,7 +1618,7 @@ public:
             return true;
         }
 
-        if (m_player->isMoving())
+        if (m_player->IsMoving())
         {
             m_player->HandleEmoteCommand(RAND(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN));
         }

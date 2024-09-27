@@ -624,7 +624,7 @@ public:
                 checkTimer = 0;
                 if (Unit* victim = me->GetVictim())
                 {
-                    if (victim->GetEntry() == 33531 /*NPC_CAMPAIGN_WARHORSE*/ && me->GetDistance2d(victim) < 3.0f && victim->isMoving())
+                    if (victim->GetEntry() == 33531 /*NPC_CAMPAIGN_WARHORSE*/ && me->GetDistance2d(victim) < 3.0f && victim->IsMoving())
                     {
                         me->LowerPlayerDamageReq(me->GetMaxHealth());
                         Unit::Kill(victim, me);

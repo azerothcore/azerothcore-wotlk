@@ -710,7 +710,7 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
                     // HoL, Arc Weld
                     case 59086:
                         {
-                            if( m_caster && m_caster->IsPlayer() && m_caster->ToPlayer()->isMoving() )
+                            if( m_caster && m_caster->IsPlayer() && m_caster->ToPlayer()->IsMoving() )
                                 m_caster->CastSpell(m_caster, 59097, true);
 
                             return;

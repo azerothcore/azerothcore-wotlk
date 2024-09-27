@@ -124,7 +124,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
         if (i_recalculateTravel && PositionOkay(owner, target, _movingTowards ? maxTarget : Optional<float>(), angle))
         {
-            if ((owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && !target->isMoving() && !mutualChase) || _range)
+            if ((owner->HasUnitState(UNIT_STATE_CHASE_MOVE) && !target->IsMoving() && !mutualChase) || _range)
             {
                 i_recalculateTravel = false;
                 i_path = nullptr;
@@ -181,7 +181,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
 
             // Predict chase destination to keep up with chase target
             float additionalRange = 0;
-            bool predictDestination = !mutualChase && target->isMoving();
+            bool predictDestination = !mutualChase && target->IsMoving();
             if (predictDestination)
             {
                 UnitMoveType moveType = MOVE_RUN;

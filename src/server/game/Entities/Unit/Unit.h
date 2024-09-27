@@ -1714,7 +1714,7 @@ public:
     virtual bool CanSwim() const;
     bool IsLevitating() const { return (m_movement.m_moveFlags & MOVEFLAG_DISABLE_GRAVITY) != 0; }
     bool IsWalking() const { return (m_movement.m_moveFlags & MOVEFLAG_WALK) != 0; }
-    bool isMoving() const { return (m_movement.m_moveFlags & MOVEFLAG_MOVE_MASK) != 0; }
+    bool IsMoving() const { return (m_movement.m_moveFlags & MOVEFLAG_MOVE_MASK) != 0; }
     bool isTurning() const { return (m_movement.m_moveFlags & MOVEFLAG_TURN_MASK) != 0; }
     bool IsHovering() const { return (m_movement.m_moveFlags & MOVEFLAG_HOVER) != 0; }
     bool isSwimming() const { return (m_movement.m_moveFlags & MOVEFLAG_SWIMMING) != 0; }
