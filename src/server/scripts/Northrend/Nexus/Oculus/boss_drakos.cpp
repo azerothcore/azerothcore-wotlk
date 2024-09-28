@@ -105,9 +105,9 @@ public:
             {
                 pInstance->SetData(DATA_DRAKOS, DONE);
                 for( uint8 i = 0; i < 3; ++i )
-                    if( ObjectGuid guid = pInstance->GetGuidData(DATA_DCD_1 + i) )
-                        if( GameObject* pGo = ObjectAccessor::GetGameObject(*me, guid) )
-                            if( pGo->GetGoState() != GO_STATE_ACTIVE )
+                    if (ObjectGuid guid = pInstance->GetGuidData(DATA_DCD_1 + i))
+                        if (GameObject* pGo = ObjectAccessor::GetGameObject(*me, guid))
+                            if (pGo->GetGoState() != GO_STATE_ACTIVE )
                             {
                                 pGo->SetLootState(GO_READY);
                                 pGo->UseDoorOrButton(0, false);
@@ -125,17 +125,17 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -206,10 +206,10 @@ public:
 
         void MovementInform(uint32 type, uint32 id) override
         {
-            if( type != POINT_MOTION_TYPE || id != 1 )
+            if (type != POINT_MOTION_TYPE || id != 1)
                 return;
 
-            if( !located )
+            if (!located)
                 gonext = true;
         }
 
@@ -231,21 +231,21 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( timer == 0 )
+            if (timer == 0)
                 me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
 
             timer += diff;
 
-            if( timer > 10000 )
+            if (timer > 10000)
             {
-                if( !located )
+                if (!located)
                     me->GetMotionMaster()->MoveIdle();
                 located = true;
                 me->CastSpell(me, SPELL_UNSTABLE_SPHERE_PULSE, true);
                 timer -= 2000;
             }
 
-            if( !located && gonext )
+            if (!located && gonext)
             {
                 PickNewLocation();
                 gonext = false;

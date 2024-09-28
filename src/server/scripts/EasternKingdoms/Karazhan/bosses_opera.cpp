@@ -941,7 +941,7 @@ struct boss_julianne : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        switch(action)
+        switch (action)
         {
             case ACTION_FAKING_DEATH:
                 isFakingDeath = false;
@@ -1138,7 +1138,7 @@ struct boss_romulo : public ScriptedAI
 
     void DoAction(int32 action) override
     {
-        switch(action)
+        switch (action)
         {
             case ACTION_FAKING_DEATH:
                 isFakingDeath = false;

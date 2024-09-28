@@ -181,7 +181,7 @@ class spell_hun_generic_scaling : public AuraScript
             int32 modifier = 45;
 
             // xinef: Wild Hunt bonus for stamina
-            if  (AuraEffect* wildHuntEff = GetUnitOwner()->GetDummyAuraEffect(SPELLFAMILY_PET, 3748, EFFECT_0))
+            if (AuraEffect* wildHuntEff = GetUnitOwner()->GetDummyAuraEffect(SPELLFAMILY_PET, 3748, EFFECT_0))
                 AddPct(modifier, wildHuntEff->GetAmount());
 
             amount = CalculatePct(std::max<int32>(0, owner->GetStat(Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue))), modifier);

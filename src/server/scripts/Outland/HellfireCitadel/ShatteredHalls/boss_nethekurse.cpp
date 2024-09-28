@@ -271,7 +271,7 @@ struct boss_grand_warlock_nethekurse : public BossAI
             {
                 // check if door is openened
                 //this should only happen before the intro, if the door is picked by someone
-                if(nethekursedoor->GetGoState() == 0)
+                if (nethekursedoor->GetGoState() == 0)
                 {
                     DoAction(ACTION_START_INTRO);
                 }

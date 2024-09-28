@@ -4438,6 +4438,49 @@ void Player::DeleteOldCharacters(uint32 keepDays)
     }
 }
 
+/**
+ * Items which were kept back in the database after being deleted and are now too old (see config option "ItemDelete.KeepDays"), will be completely deleted.
+ */
+void Player::DeleteOldRecoveryItems()
+{
+    uint32 keepDays = sWorld->getIntConfig(CONFIG_ITEMDELETE_KEEP_DAYS);
+    if (!keepDays)
+        return;
+
+    Player::DeleteOldRecoveryItems(keepDays);
+}
+
+/**
+ * Items which were kept back in the database after being deleted and are older than the specified amount of days, will be completely deleted.
+ */
+void Player::DeleteOldRecoveryItems(uint32 keepDays)
+{
+    LOG_INFO("server.loading", "Player::DeleteOldRecoveryItems: Deleting all items which have been deleted {} days before...", keepDays);
+    LOG_INFO("server.loading", " ");
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RECOVERY_ITEM_OLD_ITEMS);
+    stmt->SetData(0, uint32(GameTime::GetGameTime().count() - time_t(keepDays * DAY)));
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (result)
+    {
+        LOG_INFO("server.loading", "Player::DeleteOldRecoveryItems: Found {} item(s) to delete", result->GetRowCount());
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 guid = fields[0].Get<uint32>();
+            uint32 itemEntry = fields[1].Get<uint32>();
+
+            CharacterDatabasePreparedStatement* deleteStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RECOVERY_ITEM_BY_GUID);
+            deleteStmt->SetData(0, guid);
+            CharacterDatabase.Execute(deleteStmt);
+
+            LOG_INFO("server.loading", "Deleted item from recovery_item table where guid {} and item id {}", guid, itemEntry);
+        } while (result->NextRow());
+    }
+}
+
 void Player::SetMovement(PlayerMovementType pType)
 {
     WorldPacket data;
@@ -4788,7 +4831,7 @@ void Player::DurabilityLossAll(double percent, bool inventory)
 
 void Player::DurabilityLoss(Item* item, double percent)
 {
-    if(!item || percent == 0.0)
+    if (!item || percent == 0.0)
         return;
 
     uint32 pMaxDurability = item ->GetUInt32Value(ITEM_FIELD_MAXDURABILITY);
@@ -10156,13 +10199,13 @@ void Player::RemoveSpellMods(Spell* spell)
             spell->m_appliedMods.erase(iterMod);
 
             // MAGE T8P4 BONUS
-            if( spellInfo->SpellFamilyName == SPELLFAMILY_MAGE )
+            if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE)
             {
                 SpellInfo const* sp = mod->ownerAura->GetSpellInfo();
                 // Missile Barrage, Hot Streak, Brain Freeze (trigger spell - Fireball!)
-                if( sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938 )
-                    if( AuraEffect* aurEff = GetAuraEffectDummy(64869) )
-                        if( roll_chance_i(aurEff->GetAmount()) )
+                if (sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938)
+                    if (AuraEffect* aurEff = GetAuraEffectDummy(64869))
+                        if (roll_chance_i(aurEff->GetAmount()))
                         {
                             mod->charges = 1;
                             continue;
@@ -11459,6 +11502,9 @@ void Player::LeaveBattleground(Battleground* bg)
         }
         sScriptMgr->OnBattlegroundDesertion(this, BG_DESERTION_TYPE_LEAVE_BG);
     }
+
+    if (bg->isArena() && (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
+        sScriptMgr->OnBattlegroundDesertion(this, ARENA_DESERTION_TYPE_LEAVE_BG);
 
     bg->RemovePlayerAtLeave(this);
 
@@ -15615,7 +15661,7 @@ void Player::PrepareCharmAISpells()
             }
             else if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
             {
-                if( (int32)periodic_damage < CalculateSpellDamage(this, spellInfo, i) )
+                if ((int32)periodic_damage < CalculateSpellDamage(this, spellInfo, i))
                 {
                     m_charmAISpells[SPELL_DOT_DAMAGE] = spellInfo->Id;
                     break;

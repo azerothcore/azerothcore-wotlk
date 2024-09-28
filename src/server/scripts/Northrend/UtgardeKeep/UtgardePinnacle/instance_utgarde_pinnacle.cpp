@@ -73,14 +73,14 @@ public:
         bool IsEncounterInProgress() const override
         {
             for(uint8 i = 0; i < MAX_ENCOUNTERS; ++i)
-                if(Encounters[i] == IN_PROGRESS)
+                if (Encounters[i] == IN_PROGRESS)
                     return true;
 
             return false;
         }
         void OnCreatureCreate(Creature* pCreature) override
         {
-            switch(pCreature->GetEntry())
+            switch (pCreature->GetEntry())
             {
                 case NPC_SVALA_SORROWGRAVE:
                     SvalaSorrowgrave = pCreature->GetGUID();
@@ -114,7 +114,7 @@ public:
 
         void OnGameObjectCreate(GameObject* pGo) override
         {
-            switch(pGo->GetEntry())
+            switch (pGo->GetEntry())
             {
                 case GO_SKADI_THE_RUTHLESS_DOOR:
                     SkadiRuthlessDoor = pGo->GetGUID();
@@ -137,7 +137,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7322: // The Incredible Hulk (2043)
                     return svalaAchievement;
@@ -151,7 +151,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_SVALA_SORROWGRAVE:
                 case DATA_GORTOK_PALEHOOF:
@@ -212,7 +212,7 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_SVALA_SORROWGRAVE:
                     return Encounters[0];

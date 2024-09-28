@@ -375,16 +375,6 @@ class spell_gen_bg_preparation : public AuraScript
 {
     PrepareAuraScript(spell_gen_bg_preparation)
 
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        GetTarget()->ApplySpellImmune(GetId(), IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, true);
-    }
-
-    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        GetTarget()->ApplySpellImmune(GetId(), IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, false);
-    }
-
     void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
     {
         isPeriodic = true;
@@ -405,9 +395,6 @@ class spell_gen_bg_preparation : public AuraScript
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_gen_bg_preparation::HandleEffectApply, EFFECT_0, SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_gen_bg_preparation::HandleEffectRemove, EFFECT_0, SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT, AURA_EFFECT_HANDLE_REAL);
-
         DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_bg_preparation::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT);
         OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_bg_preparation::Update, EFFECT_0, SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT);
     }
@@ -3289,6 +3276,7 @@ enum TournamentMountsSpells
    62785 - Summon Tournament Kodo
    62786 - Summon Tournament Hawkstrider
    62787 - Summon Tournament Warhorse
+   63215 - Summon Campaign Charger
    63663 - Summon Tournament Argent Charger
    63791 - Summon Tournament Hawkstrider (Aspirant)
    63792 - Summon Tournament Steed (Aspirant) */

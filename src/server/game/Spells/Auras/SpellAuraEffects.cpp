@@ -1096,7 +1096,7 @@ float AuraEffect::CalcPeriodicCritChance(Unit const* caster, Unit const* target)
                 }
             }
 
-            switch(GetSpellInfo()->SpellFamilyName)
+            switch (GetSpellInfo()->SpellFamilyName)
             {
                 // Rupture - since 3.3.3 can crit
                 case SPELLFAMILY_ROGUE:
@@ -5679,7 +5679,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             {
                                 if (Battleground* bg = target->ToPlayer()->GetBattleground())
                                     bg->RemovePlayerFromResurrectQueue(target->ToPlayer());
-                                if(Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId()))
+                                if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId()))
                                     bf->RemovePlayerFromResurrectQueue(target->GetGUID());
                             }
                             break;
@@ -5699,7 +5699,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                         // Halls of Lightning, Arc Lightning
                         case 52921:
                             {
-                                if( aurApp->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE )
+                                if (aurApp->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE )
                                     return;
 
                                 Player* player = nullptr;
@@ -5707,7 +5707,7 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                                 Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, player, checker);
                                 Cell::VisitWorldObjects(target, searcher, 10.0f);
 
-                                if( player && player->GetGUID() != target->GetGUID() )
+                                if (player && player->GetGUID() != target->GetGUID())
                                     target->CastSpell(player, 52921, true);
 
                                 return;
@@ -6564,7 +6564,7 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                 {
                     if (caster)
                         if (Unit* victim = caster->GetVictim())
-                            if(victim->GetDistance(caster) < 45.0f)
+                            if (victim->GetDistance(caster) < 45.0f)
                             {
                                 target = victim;
                                 break;

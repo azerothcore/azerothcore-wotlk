@@ -2305,7 +2305,10 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
 
     summon->SetVisibleBySummonerOnly(visibleBySummonerOnly);
 
-    if (!AddToMap(summon->ToCreature(), summon->GetOwnerGUID().IsPlayer() || (summoner && summoner->GetTransport())))
+    bool summonerHasTransport = summoner && summoner->GetTransport();
+    bool summonerIsVehicle = summoner && summoner->IsUnit() && summoner->ToUnit()->IsVehicle();
+    bool checkTransport = summon->GetOwnerGUID().IsPlayer() || (summonerHasTransport && !summonerIsVehicle);
+    if (!AddToMap(summon->ToCreature(), checkTransport))
     {
         delete summon;
         return nullptr;

@@ -54,7 +54,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_NO_TAUNT                        = 0x00000100,   // creature is immune to taunt auras and 'attack me' effects
     CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE            = 0x00000200,   // creature won't update movement flags
     CREATURE_FLAG_EXTRA_GHOST_VISIBILITY                = 0x00000400,   // creature will only be visible to dead players
-    CREATURE_FLAG_EXTRA_UNUSED_12                       = 0x00000800,   /// @todo: Implement CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK (creature will use offhand attacks)
+    CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK              = 0x00000800,   // creature will use offhand attacks
     CREATURE_FLAG_EXTRA_NO_SELL_VENDOR                  = 0x00001000,   // players can't sell items to this vendor
     CREATURE_FLAG_EXTRA_IGNORE_COMBAT                   = 0x00002000,
     CREATURE_FLAG_EXTRA_WORLDEVENT                      = 0x00004000,   // custom flag for world event creatures (left room for merging)
@@ -82,9 +82,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_NPCBOT_PET                      = (CREATURE_FLAG_EXTRA_HARD_RESET | CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE | CREATURE_FLAG_DONT_OVERRIDE_ENTRY_SAI),
     //end npcbot
 
-    CREATURE_FLAG_EXTRA_UNUSED                          = (CREATURE_FLAG_EXTRA_UNUSED_12), // SKIP
-
-    CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~(CREATURE_FLAG_EXTRA_UNUSED | CREATURE_FLAG_EXTRA_DUNGEON_BOSS)) // SKIP
+    CREATURE_FLAG_EXTRA_DB_ALLOWED                      = (0xFFFFFFFF & ~CREATURE_FLAG_EXTRA_DUNGEON_BOSS) // SKIP
 };
 
 enum class CreatureGroundMovementType : uint8
