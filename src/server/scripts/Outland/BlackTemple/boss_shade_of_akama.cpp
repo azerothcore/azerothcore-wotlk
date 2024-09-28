@@ -105,11 +105,10 @@ struct boss_shade_of_akama : public BossAI
     {
         channelers.clear();
         generators.clear();
+
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetWalk(true);
         me->SetReactState(REACT_DEFENSIVE);
-        CreaturesAttackAkama();
-        _shadeMinionList.clear();
         BossAI::Reset();
     }
 
@@ -197,21 +196,6 @@ struct boss_shade_of_akama : public BossAI
 
         DoMeleeAttackIfReady();
     }
-
-    void CreaturesAttackAkama()
-    {
-        // populate list of creatures to keep attacking Akama
-        me->GetCreaturesWithEntryInRange(_shadeMinionList, 100.0f, NPC_ASHTONGUE_SPIRITBIND);
-        me->GetCreaturesWithEntryInRange(_shadeMinionList, 100.0f, NPC_ASHTONGUE_DEFENDER);
-        me->GetCreaturesWithEntryInRange(_shadeMinionList, 100.0f, NPC_ASHTONGUE_ELEMENTAL);
-        me->GetCreaturesWithEntryInRange(_shadeMinionList, 100.0f, NPC_ASHTONGUE_ROGUE);
-        for (Creature* minion : _shadeMinionList)
-            if (minion->IsAlive())
-                minion->SetInCombatWith(instance->GetCreature(DATA_AKAMA_SHADE));
-    }
-private:
-    std::list<Creature* > _shadeMinionList;
-    bool allPlayersInactive;
 };
 
 
