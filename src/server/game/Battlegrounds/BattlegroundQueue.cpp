@@ -702,6 +702,24 @@ void BattlegroundQueue::UpdateEvents(uint32 diff)
     m_events.Update(diff);
 }
 
+uint32 GetMinPlayersPerTeam(Battleground* bg, PvPDifficultyEntry const* bracketEntry)
+{
+    // The problem is that bg->GetMinPlayersPerTeam() has a different meaning
+    // according to whether the BG is a template (then it's the value from `battleground_template`)
+    // or if it's the real BG (then it's the brack minimum level, e.g. "60" for "60-69"
+
+    if (!bg->isTemplate() || bg->isArena())
+    {
+        return bg->GetMinPlayersPerTeam();
+    }
+
+    auto isMaxLevel = bracketEntry->minLevel == sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+
+    auto lowLevelsOverride = sWorld->getIntConfig(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS);
+
+    return (lowLevelsOverride && !isMaxLevel) ? lowLevelsOverride : bg->GetMinPlayersPerTeam();
+}
+
 void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating)
 {
     // if no players in queue - do nothing
@@ -760,7 +778,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
     }
 
     // get min and max players per team
-    uint32 MinPlayersPerTeam = bg_template->GetMinPlayersPerTeam();
+    uint32 MinPlayersPerTeam = GetMinPlayersPerTeam(bg_template, bracketEntry);
     uint32 MaxPlayersPerTeam = bg_template->GetMaxPlayersPerTeam();
 
     if (bg_template->isArena())
@@ -996,7 +1014,7 @@ void BattlegroundQueue::BattlegroundQueueAnnouncerUpdate(uint32 diff, Battlegrou
                 _queueAnnouncementTimer[bracket_id] = -1;
 
                 auto bgName = bg_template->GetName();
-                uint32 MaxPlayers = bg_template->GetMinPlayersPerTeam() * 2;
+                uint32 MaxPlayers = GetMinPlayersPerTeam(bg_template, bracketEntry) * 2;
                 uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32) 80);
                 uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32) 80);
 
@@ -1047,7 +1065,7 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
 
     BattlegroundBracketId bracketId = bracketEntry->GetBracketId();
     auto bgName = bg->GetName();
-    uint32 MinPlayers = bg->GetMinPlayersPerTeam();
+    uint32 MinPlayers = GetMinPlayersPerTeam(bg, bracketEntry);
     uint32 MaxPlayers = MinPlayers * 2;
     uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32)80);
     uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32)80);
