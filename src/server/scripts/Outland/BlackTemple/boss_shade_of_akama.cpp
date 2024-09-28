@@ -281,8 +281,7 @@ struct npc_akama_shade : public ScriptedAI
         else if (damage >= me->GetHealth() && !_died)
         {
             _died = true;
-            me->GetCreatureListWithEntryInGrid(_generators, NPC_CREATURE_GENERATOR_AKAMA, 150.0f);
-            me->Yell(std::to_string(_generators.size()), LANG_UNIVERSAL);
+            me->GetCreatureListWithEntryInGrid(_generators, NPC_CREATURE_GENERATOR_AKAMA, 100.0f);
             for (Creature* generator : _generators)
                 generator->AI()->DoAction(ACTION_GENERATOR_DESPAWN_ALL);
 
