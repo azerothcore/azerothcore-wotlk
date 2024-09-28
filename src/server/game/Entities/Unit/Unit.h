@@ -1529,7 +1529,7 @@ public:
     MeleeHitOutcome RollMeleeOutcomeAgainst (Unit const* victim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance) const;
 
     [[nodiscard]] bool HasAuraTypeWithFamilyFlags(AuraType auraType, uint32 familyName, uint32 familyFlags) const;
-    
+
     [[nodiscard]] bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura = 0) const;
     bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel = nullptr) const;
 
@@ -1557,7 +1557,7 @@ public:
     [[nodiscard]] Unit* GetOwner() const;
     [[nodiscard]] Guardian* GetGuardianPet() const;
     [[nodiscard]] Minion* GetFirstMinion() const;
-    
+
     [[nodiscard]] Player* GetAffectingPlayer() const;
 
     void RemoveBindSightAuras();
