@@ -136,7 +136,7 @@ struct boss_gurtogg_bloodboil : public BossAI
 
     bool CanAIAttack(Unit const* who) const override
     {
-        return !who->IsImmunedToDamage(SPELL_SCHOOL_MASK_ALL);
+        return !who->IsImmunedToDamage(SPELL_SCHOOL_MASK_ALL) && !who->HasUnitState(UNIT_STATE_CONFUSED);
     }
 
     void KilledUnit(Unit*  /*victim*/) override
@@ -195,52 +195,6 @@ class spell_gurtogg_bloodboil : public SpellScript
     }
 };
 
-class spell_gurtogg_bloodboil_bewildering_strike_aura : public AuraScript
-{
-    PrepareAuraScript(spell_gurtogg_bloodboil_bewildering_strike_aura);
-
-    ObjectGuid tankGuid;
-    float originalThreat;
-
-    bool Validate(SpellInfo const* /*spell*/) override
-    {
-        return ValidateSpellInfo({ SPELL_BEWILDERING_STRIKE });
-    }
-
-    void HandleOnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Unit* caster = GetCaster())
-        {
-            if (Unit* target = GetTarget())
-            {
-                if (target->IsPlayer())
-                {
-                    tankGuid = target->GetGUID();
-                    originalThreat = caster->GetThreatMgr().GetThreat(target);
-                    caster->GetThreatMgr().ModifyThreatByPercent(target, -100);
-                }
-            }
-        }
-    }
-
-    void HandleOnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-    {
-        if (Unit* caster = GetCaster())
-        {
-            if (Unit* tank = ObjectAccessor::GetUnit(*caster, tankGuid))
-            {
-                caster->GetThreatMgr().AddThreat(tank, originalThreat);
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_gurtogg_bloodboil_bewildering_strike_aura::HandleOnApply, EFFECT_ALL, SPELL_AURA_MOD_CONFUSE, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_gurtogg_bloodboil_bewildering_strike_aura::HandleOnRemove, EFFECT_ALL, SPELL_AURA_MOD_CONFUSE, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 class spell_gurtogg_eject : public SpellScript
 {
     PrepareSpellScript(spell_gurtogg_eject);
@@ -262,6 +216,5 @@ void AddSC_boss_gurtogg_bloodboil()
 {
     RegisterBlackTempleCreatureAI(boss_gurtogg_bloodboil);
     RegisterSpellScript(spell_gurtogg_bloodboil);
-    RegisterSpellScript(spell_gurtogg_bloodboil_bewildering_strike_aura);
     RegisterSpellScript(spell_gurtogg_eject);
 }
