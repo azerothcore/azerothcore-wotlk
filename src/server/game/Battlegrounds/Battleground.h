@@ -338,7 +338,8 @@ public:
     [[nodiscard]] uint32 GetMinLevel() const          { return m_LevelMin; }
     [[nodiscard]] uint32 GetMaxLevel() const          { return m_LevelMax; }
 
-    [[nodiscard]] bool isMaxLevel() const {
+    [[nodiscard]] bool isMaxLevel() const
+    {
         return this->GetMinLevel() == sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
     }
 
