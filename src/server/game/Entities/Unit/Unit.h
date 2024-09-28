@@ -836,8 +836,7 @@ public:
     void resetAttackTimer(WeaponAttackType type = BASE_ATTACK);
     [[nodiscard]] int32 getAttackTimer(WeaponAttackType type) const { return m_attackTimer[type]; }
     [[nodiscard]] bool isAttackReady(WeaponAttackType type = BASE_ATTACK) const { return m_attackTimer[type] <= 0; }
-    
-    
+
     virtual SpellSchoolMask GetMeleeDamageSchoolMask(WeaponAttackType attackType = BASE_ATTACK, uint8 damageIndex = 0) const = 0;
     bool GetRandomContactPoint(Unit const* target, float& x, float& y, float& z, bool force = false) const;
 
@@ -1014,7 +1013,7 @@ public:
     void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
     [[nodiscard]] float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;
     [[nodiscard]] float GetTotalStatValue(Stats stat, float additionalValue = 0.0f) const;
-    
+
     void SetCanModifyStats(bool modifyStats) { m_canModifyStats = modifyStats; }
     [[nodiscard]] bool CanModifyStats() const { return m_canModifyStats; }
 
@@ -1137,7 +1136,6 @@ public:
     [[nodiscard]] float GetWeaponDamageRange(WeaponAttackType attType, WeaponDamageRange type, uint8 damageIndex = 0) const;
     void SetBaseWeaponDamage(WeaponAttackType attType, WeaponDamageRange damageRange, float value, uint8 damageIndex = 0) { m_weaponDamage[attType][damageRange][damageIndex] = value; }
 
-    
     // Virtual methods
     virtual bool UpdateStats(Stats stat) = 0;
     virtual bool UpdateAllStats() = 0;
