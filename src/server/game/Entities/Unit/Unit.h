@@ -684,7 +684,6 @@ public:
     void SetCritterGUID(ObjectGuid guid) { SetGuidValue(UNIT_FIELD_CRITTER, guid); }
     [[nodiscard]] ObjectGuid GetCritterGUID() const { return GetGuidValue(UNIT_FIELD_CRITTER); }
 
-
     void AddUnitState(uint32 f) { m_state |= f; }
     [[nodiscard]] bool HasUnitState(const uint32 f) const { return (m_state & f); }
     void ClearUnitState(uint32 f) { m_state &= ~f; }
@@ -892,7 +891,7 @@ public:
     // stat system
     [[nodiscard]] float GetStat(Stats stat) const { return float(GetUInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat)); }
     void SetStat(Stats stat, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_STAT0) + stat, val); }
-    
+
     bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
     void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
     [[nodiscard]] float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;
@@ -918,7 +917,7 @@ public:
     [[nodiscard]] bool HealthBelowPctDamaged(int32 pct, uint32 damage) const { return int64(GetHealth()) - int64(damage) < int64(CountPctFromMaxHealth(pct)); }
     [[nodiscard]] bool HealthAbovePct(int32 pct) const { return GetHealth() > CountPctFromMaxHealth(pct); }
     [[nodiscard]] bool HealthAbovePctHealed(int32 pct, uint32 heal) const { return uint64(GetHealth()) + uint64(heal) > CountPctFromMaxHealth(pct); }
-    
+
     [[nodiscard]] uint32 CountPctFromMaxHealth(int32 pct) const { return CalculatePct(GetMaxHealth(), pct); }
     [[nodiscard]] uint32 CountPctFromCurHealth(int32 pct) const { return CalculatePct(GetHealth(), pct); }
 
@@ -1074,7 +1073,7 @@ public:
     [[nodiscard]] bool IsCharmedOwnedByPlayerOrPlayer() const { return GetCharmerOrOwnerOrOwnGUID().IsPlayer(); }
 
     void SetCharm(Unit* target, bool apply);
-    
+
     bool SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* aurApp = nullptr);
     void RemoveCharmedBy(Unit* charmer);
 
@@ -1286,7 +1285,6 @@ public:
     void SendEnergizeSpellLog(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
     void EnergizeBySpell(Unit* victim, uint32 SpellID, uint32 Damage, Powers powertype);
 
-
     // SpellCastResult methods
     SpellCastResult CastSpell(SpellCastTargets const& targets, SpellInfo const* spellInfo, CustomSpellValues const* value, TriggerCastFlags triggerFlags = TRIGGERED_NONE, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
     SpellCastResult CastSpell(Unit* victim, uint32 spellId, bool triggered, Item* castItem = nullptr, AuraEffect const* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid::Empty);
@@ -1453,7 +1451,7 @@ public:
     [[nodiscard]] bool IsHostileToPlayers() const;
     bool IsFriendlyTo(Unit const* unit) const;
     [[nodiscard]] bool IsNeutralToAll() const;
-    
+
     // PvP
     [[nodiscard]] bool IsContestedGuard() const
     {
@@ -1481,7 +1479,7 @@ public:
 
     void  SetStandFlags(uint8 flags) { SetByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
     void  RemoveStandFlags(uint8 flags) { RemoveByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
-    
+
     // Emote
     void HandleEmoteCommand(uint32 emoteId);
 
@@ -1803,8 +1801,6 @@ public:
     void _EnterVehicle(Vehicle* vehicle, int8 seatId, AuraApplication const* aurApp = nullptr);
 
     void BuildMovementPacket(ByteBuffer* data) const;
-
-    
 
     void RewardRage(uint32 damage, uint32 weaponSpeedHitFactor, bool attacker);
 
