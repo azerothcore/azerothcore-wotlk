@@ -14262,14 +14262,14 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             {
                 if (IsCreature() && IsControlledByPlayer()) // not sure if good for pet
                 {
-                    main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED);
+                    main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
                     stack_bonus     = GetTotalAuraMultiplier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACKING);
 
                     // for some spells this mod is applied on vehicle owner
                     int32 owner_speed_mod = 0;
 
                     if (Unit* owner = GetCharmer())
-                        owner_speed_mod = owner->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED);
+                        owner_speed_mod = owner->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
 
                     main_speed_mod = std::max(main_speed_mod, owner_speed_mod);
                 }
@@ -14281,8 +14281,8 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 }
                 else             // Use not mount (shapeshift for example) auras (should stack)
                 {
-                    main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED);
-                    stack_bonus     = GetTotalAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_STACKING);
+                    main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
+                    stack_bonus     = GetTotalAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS);
                     non_stack_bonus += GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACKING) / 100.0f;
                 }
 
