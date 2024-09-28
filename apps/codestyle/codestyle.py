@@ -224,9 +224,9 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
             print(
                 f"Please use the syntax 'Class/ObjectType const*' instead of 'const Class/ObjectType*': {file_path} at line {line_number}")
             check_failed = True
-        if ' if(' in line:
+        if ' if(' in line or ' if ( ' in line:
             print(
-                f"Please add a space after 'if': {file_path} at line {line_number}")
+                f"AC have as standard: if (XXXX). Please check spaces in your condition': {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
     if check_failed:

@@ -327,7 +327,7 @@ class spell_pri_hymn_of_hope : public SpellScript
 
         uint32 const maxTargets = 3;
 
-        if (targets.size() > maxTargets)
+        if ( targets.size() > maxTargets)
         {
             targets.sort(Acore::PowerPctOrderPred(POWER_MANA));
             targets.resize(maxTargets);
