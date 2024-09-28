@@ -23,6 +23,7 @@
 #include "DBCEnums.h"
 #include "GameObject.h"
 #include "SharedDefines.h"
+#include "World.h"
 
 class Creature;
 class GameObject;
@@ -337,8 +338,16 @@ public:
     [[nodiscard]] uint32 GetMinLevel() const          { return m_LevelMin; }
     [[nodiscard]] uint32 GetMaxLevel() const          { return m_LevelMax; }
 
+    [[nodiscard]] bool isMaxLevel() const {
+        return this->GetMinLevel() == sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+    }
+
     [[nodiscard]] uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayersPerTeam; }
-    [[nodiscard]] uint32 GetMinPlayersPerTeam() const { return m_MinPlayersPerTeam; }
+    [[nodiscard]] uint32 GetMinPlayersPerTeam() const
+    {
+        auto override = sWorld->getIntConfig(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS);
+        return (override > 0 && override < m_MinPlayersPerTeam && !this.isMaxLevel() && !this->isArena()) ? override: m_MinPlayersPerTeam;
+    }
 
     [[nodiscard]] int32 GetStartDelayTime() const     { return m_StartDelayTime; }
     [[nodiscard]] uint8 GetArenaType() const          { return m_ArenaType; }
