@@ -226,14 +226,14 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
         Position finalDest;
 
         // Check if the boss is near stairs to avoid players falling through the platform with random teleports.
-        if(GetCaster()->GetPositionY() < 194.f)
+        if (GetCaster()->GetPositionY() < 194.f)
             finalDest = validTeleportStairsPos[urand(0, 3)];
         else
         {
             finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
 
             // Maybe not necessary but just in case to avoid LOS issues with an object
-            if(!GetCaster()->IsWithinLOS(finalDest.GetPositionX(), finalDest.GetPositionY(), finalDest.GetPositionZ()))
+            if (!GetCaster()->IsWithinLOS(finalDest.GetPositionX(), finalDest.GetPositionY(), finalDest.GetPositionZ()))
                 finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
 
             /* @note: To avoid teleporting players near a walls, we will define a safe area.
