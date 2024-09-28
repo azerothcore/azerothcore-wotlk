@@ -105,10 +105,12 @@ struct boss_shade_of_akama : public BossAI
     {
         channelers.clear();
         generators.clear();
-
+        allPlayersInactive = false;
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetWalk(true);
         me->SetReactState(REACT_DEFENSIVE);
+        CreaturesAttackAkama();
+        _shadeMinionList.clear();
         BossAI::Reset();
     }
 
@@ -196,7 +198,23 @@ struct boss_shade_of_akama : public BossAI
 
         DoMeleeAttackIfReady();
     }
+
+    void CreaturesAttackAkama()
+    {
+        // populate list of creatures to keep attacking Akama
+        me->GetCreaturesWithEntryInRange(_shadeMinionList, 100.0f, NPC_ASHTONGUE_SPIRITBIND);
+        me->GetCreaturesWithEntryInRange(_shadeMinionList, 100.0f, NPC_ASHTONGUE_DEFENDER);
+        me->GetCreaturesWithEntryInRange(_shadeMinionList, 100.0f, NPC_ASHTONGUE_ELEMENTAL);
+        me->GetCreaturesWithEntryInRange(_shadeMinionList, 100.0f, NPC_ASHTONGUE_ROGUE);
+        for (Creature* minion : _shadeMinionList)
+            if (minion->IsAlive())
+                minion->SetInCombatWith(instance->GetCreature(DATA_AKAMA_SHADE));
+    }
+private:
+    std::list<Creature* > _shadeMinionList;
+    bool allPlayersInactive;
 };
+
 
 struct npc_akama_shade : public ScriptedAI
 {
@@ -222,6 +240,7 @@ struct npc_akama_shade : public ScriptedAI
         _sayLowHealth = false;
         _died = false;
         scheduler.CancelAll();
+        _generators.clear();
     }
 
     void MovementInform(uint32 type, uint32 point) override
@@ -279,6 +298,11 @@ struct npc_akama_shade : public ScriptedAI
         else if (damage >= me->GetHealth() && !_died)
         {
             _died = true;
+            me->GetCreatureListWithEntryInGrid(_generators, NPC_CREATURE_GENERATOR_AKAMA, 150.0f);
+            me->Yell(std::to_string(_generators.size()), LANG_UNIVERSAL);
+            for (Creature* generator : _generators)
+                generator->AI()->DoAction(ACTION_GENERATOR_DESPAWN_ALL);
+
             damage = me->GetHealth() - 1;
             Talk(SAY_DEATH);
             if (Creature* shade = instance->GetCreature(DATA_SHADE_OF_AKAMA))
@@ -342,6 +366,7 @@ struct npc_akama_shade : public ScriptedAI
     private:
         bool _sayLowHealth;
         bool _died;
+        std::list<Creature *> _generators;
 };
 
 struct npc_creature_generator_akama : public ScriptedAI
@@ -355,7 +380,6 @@ struct npc_creature_generator_akama : public ScriptedAI
 
     void Reset() override
     {
-        summons.DespawnAll();
         scheduler.CancelAll();
     }
 
@@ -363,6 +387,7 @@ struct npc_creature_generator_akama : public ScriptedAI
     {
         spawnCounter++;
         ScriptedAI::JustSummoned(summon);
+        summons.Summon(summon);
 
         switch (summon->GetEntry())
         {
@@ -374,13 +399,10 @@ struct npc_creature_generator_akama : public ScriptedAI
                 summon->GetMotionMaster()->MovePoint(POINT_ENGAGE, x, y, z);
             }
             break;
-        case NPC_ASHTONGUE_DEFENDER:
+        default:
             summon->SetFaction(FACTION_DEFENDER);
             if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
                 summon->AI()->AttackStart(akama);
-            break;
-        default:
-            summon->SetInCombatWithZone();
             break;
         }
     }
