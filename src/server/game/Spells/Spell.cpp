@@ -3160,6 +3160,13 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
 
             if (m_spellAura)
             {
+                // Prevent aura application if target is immuned
+                if (m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsImmunedToDamageOrSchool(m_spellAura->GetSpellInfo()))
+                {
+                    m_spellAura->Remove();
+                    return SPELL_MISS_IMMUNE;
+                }
+
                 // Set aura stack amount to desired value
                 if (m_spellValue->AuraStackAmount > 1)
                 {
@@ -4061,7 +4068,7 @@ void Spell::_cast(bool skipCheck)
         {
             m_caster->resetAttackTimer(BASE_ATTACK);
 
-            if (m_caster->haveOffhandWeapon())
+            if (m_caster->HasOffhandWeaponForAttack())
             {
                 m_caster->resetAttackTimer(OFF_ATTACK);
             }

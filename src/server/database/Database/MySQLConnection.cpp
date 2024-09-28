@@ -188,7 +188,7 @@ bool MySQLConnection::Execute(std::string_view sql)
             LOG_INFO("sql.sql", "SQL: {}", sql);
             LOG_ERROR("sql.sql", "[{}] {}", lErrno, mysql_error(m_Mysql));
 
-            if (_HandleMySQLErrno(lErrno))  // If it returns true, an error was handled successfully (i.e. reconnection)
+            if (_HandleMySQLErrno(lErrno, mysql_error(m_Mysql)))  // If it returns true, an error was handled successfully (i.e. reconnection)
                 return Execute(sql);       // Try again
 
             return false;
@@ -226,7 +226,7 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
         uint32 lErrno = mysql_errno(m_Mysql);
         LOG_ERROR("sql.sql", "SQL(p): {}\n [ERROR]: [{}] {}", m_mStmt->getQueryString(), lErrno, mysql_stmt_error(msql_STMT));
 
-        if (_HandleMySQLErrno(lErrno))  // If it returns true, an error was handled successfully (i.e. reconnection)
+        if (_HandleMySQLErrno(lErrno, mysql_stmt_error(msql_STMT)))  // If it returns true, an error was handled successfully (i.e. reconnection)
             return Execute(stmt);       // Try again
 
         m_mStmt->ClearParameters();
@@ -238,7 +238,7 @@ bool MySQLConnection::Execute(PreparedStatementBase* stmt)
         uint32 lErrno = mysql_errno(m_Mysql);
         LOG_ERROR("sql.sql", "SQL(p): {}\n [ERROR]: [{}] {}", m_mStmt->getQueryString(), lErrno, mysql_stmt_error(msql_STMT));
 
-        if (_HandleMySQLErrno(lErrno))  // If it returns true, an error was handled successfully (i.e. reconnection)
+        if (_HandleMySQLErrno(lErrno, mysql_stmt_error(msql_STMT)))  // If it returns true, an error was handled successfully (i.e. reconnection)
             return Execute(stmt);       // Try again
 
         m_mStmt->ClearParameters();
@@ -278,7 +278,7 @@ bool MySQLConnection::_Query(PreparedStatementBase* stmt, MySQLPreparedStatement
         uint32 lErrno = mysql_errno(m_Mysql);
         LOG_ERROR("sql.sql", "SQL(p): {}\n [ERROR]: [{}] {}", m_mStmt->getQueryString(), lErrno, mysql_stmt_error(msql_STMT));
 
-        if (_HandleMySQLErrno(lErrno))  // If it returns true, an error was handled successfully (i.e. reconnection)
+        if (_HandleMySQLErrno(lErrno, mysql_stmt_error(msql_STMT)))  // If it returns true, an error was handled successfully (i.e. reconnection)
             return _Query(stmt, mysqlStmt, pResult, pRowCount, pFieldCount);       // Try again
 
         m_mStmt->ClearParameters();
@@ -290,7 +290,7 @@ bool MySQLConnection::_Query(PreparedStatementBase* stmt, MySQLPreparedStatement
         uint32 lErrno = mysql_errno(m_Mysql);
         LOG_ERROR("sql.sql", "SQL(p): {}\n [ERROR]: [{}] {}", m_mStmt->getQueryString(), lErrno, mysql_stmt_error(msql_STMT));
 
-        if (_HandleMySQLErrno(lErrno))  // If it returns true, an error was handled successfully (i.e. reconnection)
+        if (_HandleMySQLErrno(lErrno, mysql_stmt_error(msql_STMT)))  // If it returns true, an error was handled successfully (i.e. reconnection)
             return _Query(stmt, mysqlStmt, pResult, pRowCount, pFieldCount);      // Try again
 
         m_mStmt->ClearParameters();
@@ -338,7 +338,7 @@ bool MySQLConnection::_Query(std::string_view sql, MySQLResult** pResult, MySQLF
             LOG_INFO("sql.sql", "SQL: {}", sql);
             LOG_ERROR("sql.sql", "[{}] {}", lErrno, mysql_error(m_Mysql));
 
-            if (_HandleMySQLErrno(lErrno)) // If it returns true, an error was handled successfully (i.e. reconnection)
+            if (_HandleMySQLErrno(lErrno, mysql_error(m_Mysql))) // If it returns true, an error was handled successfully (i.e. reconnection)
                 return _Query(sql, pResult, pFields, pRowCount, pFieldCount);    // We try again
 
             return false;
@@ -553,8 +553,9 @@ PreparedResultSet* MySQLConnection::Query(PreparedStatementBase* stmt)
     return new PreparedResultSet(mysqlStmt->GetSTMT(), result, rowCount, fieldCount);
 }
 
-bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
+bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, char const* err, uint8 attempts /*= 5*/)
 {
+    std::string str = "";
     switch (errNo)
     {
         case CR_SERVER_GONE_ERROR:
@@ -582,9 +583,10 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
                 // Don't remove 'this' pointer unless you want to skip loading all prepared statements...
                 if (!this->PrepareStatements())
                 {
-                    LOG_FATAL("sql.sql", "Could not re-prepare statements!");
+                    str = "Could not re-prepare statements!";
+                    LOG_FATAL("sql.sql", "{}", str);
                     std::this_thread::sleep_for(10s);
-                    ABORT();
+                    ABORT("{}\n\n[{}] {}", str, errNo, err);
                 }
 
                 LOG_INFO("sql.sql", "Successfully reconnected to {} @{}:{} ({}).",
@@ -599,19 +601,21 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
             {
                 // Shut down the server when the mysql server isn't
                 // reachable for some time
-                LOG_FATAL("sql.sql", "Failed to reconnect to the MySQL server, terminating the server to prevent data corruption!");
+                str = "Failed to reconnect to the MySQL server, terminating the server to prevent data corruption!";
+                LOG_FATAL("sql.sql", "{}", str);
 
                 // We could also initiate a shutdown through using std::raise(SIGTERM)
                 std::this_thread::sleep_for(10s);
-                ABORT();
+                ABORT("{}\n\n[{}] {}", str, errNo, err);
             }
             else
             {
                 // It's possible this attempted reconnect throws 2006 at us.
                 // To prevent crazy recursive calls, sleep here.
                 std::this_thread::sleep_for(3s); // Sleep 3 seconds
-                return _HandleMySQLErrno(lErrno, attempts); // Call self (recursive)
+                return _HandleMySQLErrno(lErrno, mysql_error(m_Mysql), attempts); // Call self (recursive)
             }
+            [[fallthrough]];
         }
 
         case ER_LOCK_DEADLOCK:
@@ -625,14 +629,16 @@ bool MySQLConnection::_HandleMySQLErrno(uint32 errNo, uint8 attempts /*= 5*/)
         // Outdated table or database structure - terminate core
         case ER_BAD_FIELD_ERROR:
         case ER_NO_SUCH_TABLE:
-            LOG_ERROR("sql.sql", "Your database structure is not up to date. Please make sure you've executed all queries in the sql/updates folders.");
+            str = "Your database structure is not up to date. Please make sure you've executed all queries in the sql/updates folders.";
+            LOG_FATAL("sql.sql", "{}", str);
             std::this_thread::sleep_for(10s);
-            ABORT();
+            ABORT("{}\n\n[{}] {}", str, errNo, err);
             return false;
         case ER_PARSE_ERROR:
-            LOG_ERROR("sql.sql", "Error while parsing SQL. Core fix required.");
+            str = "Error while parsing SQL. Core fix required.";
+            LOG_FATAL("sql.sql", "{}", str);
             std::this_thread::sleep_for(10s);
-            ABORT();
+            ABORT("{}\n\n[{}] {}", str, errNo, err);
             return false;
         default:
             LOG_ERROR("sql.sql", "Unhandled MySQL errno {}. Unexpected behaviour possible.", errNo);
