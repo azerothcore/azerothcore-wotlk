@@ -3680,7 +3680,7 @@ Battleground.SpeedBuffRespawn = 150
 #        Description: Lowers the minimum number of required players per team all levels < MaxPlayerLevel
 #        Default:     0 (Disabled)
 
-Battleground.Override.LowLevels.MinPlayers
+Battleground.Override.LowLevels.MinPlayers = 0
 
 #
 ###################################################################################################
