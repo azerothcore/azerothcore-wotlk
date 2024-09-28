@@ -340,7 +340,7 @@ public:
 
     [[nodiscard]] bool isMaxLevel() const
     {
-        return this->GetMinLevel() == sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+        return GetMinLevel() == sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
     }
 
     [[nodiscard]] uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayersPerTeam; }
