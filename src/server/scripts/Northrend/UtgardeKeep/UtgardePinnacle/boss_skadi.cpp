@@ -148,7 +148,7 @@ public:
             me->UpdatePosition(343.02f, -507.325f, 104.567f, M_PI, true);
             me->StopMovingOnCurrentPos();
 
-            if(m_pInstance)
+            if (m_pInstance)
             {
                 m_pInstance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_TIMED_LODI_DODI);
                 m_pInstance->SetData(DATA_SKADI_THE_RUTHLESS, NOT_STARTED);
@@ -355,7 +355,7 @@ public:
 
         void MovementInform(uint32  /*uiType*/, uint32 Id) override
         {
-            switch(Id)
+            switch (Id)
             {
                 case 0:
                 case 1:

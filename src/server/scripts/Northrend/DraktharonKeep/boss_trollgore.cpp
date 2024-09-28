@@ -133,7 +133,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_SPELL_INFECTED_WOUND:
                     me->CastSpell(me->GetVictim(), SPELL_INFECTED_WOUND, false);

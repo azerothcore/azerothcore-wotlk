@@ -1562,7 +1562,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                 for (WorldObject* target : targets)
                 {
                     // xinef: allow gameobjects to summon gameobjects!
-                    //if(!IsUnit((*itr)))
+                    //if (!IsUnit((*itr)))
                     //  continue;
 
                     target->GetPosition(x, y, z, o);

@@ -1,0 +1,4 @@
+-- DB update 2024_09_03_00 -> 2024_09_22_00
+--
+ALTER TABLE `recovery_item`
+    ADD COLUMN `DeleteDate` INT UNSIGNED NULL DEFAULT NULL AFTER `Count`;

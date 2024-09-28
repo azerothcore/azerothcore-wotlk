@@ -358,7 +358,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         int32 action = 0;
         uint8 group = 0;
 
-        switch(entry)
+        switch (entry)
         {
             case NPC_SPITFIRE_TOTEM:
                 timer = 59s;
@@ -407,7 +407,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
 
     void SummonTotem(uint32 entry)
     {
-        switch(entry)
+        switch (entry)
         {
             case NPC_SPITFIRE_TOTEM:
                 DoCastSelf(SPELL_SPITFIRE_TOTEM);

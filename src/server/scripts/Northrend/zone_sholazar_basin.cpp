@@ -400,7 +400,7 @@ public:
                 if (timer)
                 {
                     timer -= diff;
-                    if( timer < 0 )
+                    if (timer < 0)
                         timer = 0;
                 }
                 else if (success)

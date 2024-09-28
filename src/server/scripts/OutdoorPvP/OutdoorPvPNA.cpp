@@ -791,7 +791,7 @@ void OPvPCapturePointNA::ChangeState()
             break;
         case OBJECTIVESTATE_ALLIANCE:
             m_HalaaState = HALAA_A;
-            if(m_canRecap)
+            if (m_canRecap)
                 FactionTakeOver(TEAM_ALLIANCE);
             artkit = 2;
             break;
