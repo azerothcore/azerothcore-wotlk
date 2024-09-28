@@ -345,8 +345,8 @@ public:
     [[nodiscard]] uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayersPerTeam; }
     [[nodiscard]] uint32 GetMinPlayersPerTeam() const
     {
-        auto override = sWorld->getIntConfig(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS);
-        return (override > 0 && override < m_MinPlayersPerTeam && !this.isMaxLevel() && !this->isArena()) ? override : m_MinPlayersPerTeam;
+        auto lowLevelsOverride = sWorld->getIntConfig(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS);
+        return (lowLevelsOverride > 0 && !this->isMaxLevel() && !this->isArena()) ? lowLevelsOverride : m_MinPlayersPerTeam;
     }
 
     [[nodiscard]] int32 GetStartDelayTime() const     { return m_StartDelayTime; }
