@@ -105,7 +105,6 @@ struct boss_shade_of_akama : public BossAI
     {
         channelers.clear();
         generators.clear();
-        allPlayersInactive = false;
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetWalk(true);
         me->SetReactState(REACT_DEFENSIVE);
