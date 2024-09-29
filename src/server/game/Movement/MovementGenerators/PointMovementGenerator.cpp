@@ -18,7 +18,6 @@
 #include "PointMovementGenerator.h"
 #include "Creature.h"
 #include "CreatureAI.h"
-#include "Errors.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "ObjectAccessor.h"
