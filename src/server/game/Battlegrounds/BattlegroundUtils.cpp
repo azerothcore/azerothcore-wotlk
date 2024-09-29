@@ -1,5 +1,5 @@
 #include "BattlegroundUtils.h"
-#include "World.h"  // Include necessary headers
+#include "World.h"
 
 uint32 GetMinPlayersPerTeam(Battleground* bg, PvPDifficultyEntry const* bracketEntry)
 {
