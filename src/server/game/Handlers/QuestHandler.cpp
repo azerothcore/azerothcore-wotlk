@@ -38,14 +38,8 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
     recvData >> guid;
     uint32 questStatus = DIALOG_STATUS_NONE;
 
-    GossipMenu& gossipMenu = _player->PlayerTalkClass->GetGossipMenu();
-    // Did we already get a gossip menu with that NPC? if so no need to status query
-    if (gossipMenu.GetSenderGUID() == guid)
-    {
-        return;
-    }
-
     Object* questGiver = ObjectAccessor::GetObjectByTypeMask(*_player, guid, TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT);
+
     if (!questGiver)
     {
         LOG_DEBUG("network.opcode", "Error in CMSG_QUESTGIVER_STATUS_QUERY, called for not found questgiver ({})", guid.ToString());
@@ -55,21 +49,23 @@ void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket& recvData)
     switch (questGiver->GetTypeId())
     {
         case TYPEID_UNIT:
-            {
-                LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for npc {}", guid.ToString());
-                if (!questGiver->ToCreature()->IsHostileTo(_player)) // do not show quest status to enemies
-                    questStatus = _player->GetQuestDialogStatus(questGiver);
-                break;
-            }
+        {
+            LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for npc {}", guid.ToString());
+            if (!questGiver->ToCreature()->IsHostileTo(_player)) // do not show quest status to enemies
+                questStatus = _player->GetQuestDialogStatus(questGiver);
+            break;
+        }
+
         case TYPEID_GAMEOBJECT:
+        {
+            LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject {}", guid.ToString());
+            if (sWorld->getBoolConfig(CONFIG_OBJECT_QUEST_MARKERS))
             {
-                LOG_DEBUG("network", "WORLD: Received CMSG_QUESTGIVER_STATUS_QUERY for GameObject {}", guid.ToString());
-                if (sWorld->getBoolConfig(CONFIG_OBJECT_QUEST_MARKERS))
-                {
-                    questStatus = _player->GetQuestDialogStatus(questGiver);
-                }
-                break;
+                questStatus = _player->GetQuestDialogStatus(questGiver);
             }
+            break;
+        }
+
         default:
             LOG_ERROR("network.opcode", "QuestGiver called for unexpected type {}", questGiver->GetTypeId());
             break;
