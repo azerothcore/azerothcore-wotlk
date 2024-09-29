@@ -256,7 +256,7 @@ public:
 
         void JustSummoned(Creature* summon) override
         {
-            if(summon->GetEntry() != me->GetEntry())
+            if (summon->GetEntry() != me->GetEntry())
             {
                 summon->GetMotionMaster()->MovePoint(0, *me, false);
                 summon->GetMotionMaster()->MoveFollow(me, 0.1f, 0.0f + M_PI * 0.3f * summons.size());
@@ -415,4 +415,3 @@ void AddSC_boss_hadronox()
     RegisterSpellScript(spell_hadronox_leech_poison_aura);
     new achievement_hadronox_denied();
 }
-

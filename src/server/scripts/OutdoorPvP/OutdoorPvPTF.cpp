@@ -486,4 +486,3 @@ void AddSC_outdoorpvp_tf()
 {
     new OutdoorPvP_terokkar_forest();
 }
-

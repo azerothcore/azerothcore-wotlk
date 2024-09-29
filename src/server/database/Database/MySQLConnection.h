@@ -79,7 +79,7 @@ public:
     void RollbackTransaction();
     void CommitTransaction();
     int ExecuteTransaction(std::shared_ptr<TransactionBase> transaction);
-    size_t EscapeString(char* to, const char* from, size_t length);
+    std::size_t EscapeString(char* to, const char* from, std::size_t length);
     void Ping();
 
     uint32 GetLastError();
@@ -98,7 +98,7 @@ protected:
     void PrepareStatement(uint32 index, std::string_view sql, ConnectionFlags flags);
 
     virtual void DoPrepareStatements() = 0;
-    virtual bool _HandleMySQLErrno(uint32 errNo, uint8 attempts = 5);
+    virtual bool _HandleMySQLErrno(uint32 errNo, char const* err = "", uint8 attempts = 5);
 
     typedef std::vector<std::unique_ptr<MySQLPreparedStatement>> PreparedStatementContainer;
 

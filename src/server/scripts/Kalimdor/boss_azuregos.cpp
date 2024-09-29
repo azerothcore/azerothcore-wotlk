@@ -77,7 +77,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+            if (victim && victim->IsPlayer())
             {
                 Talk(SAY_KILL);
                 victim->CastSpell(victim, SPELL_MARK_OF_FROST, true);
@@ -229,4 +229,3 @@ void AddSC_boss_azuregos()
     RegisterSpellScript(spell_arcane_vacuum);
     RegisterSpellScript(spell_mark_of_frost_freeze);
 }
-

@@ -23,11 +23,11 @@ Category: commandscripts
 EndScriptData */
 
 #include "AccountMgr.h"
+#include "AchievementMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
-#include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -272,6 +272,8 @@ public:
             stmt->SetData(1, playerGuid.GetCounter());
             CharacterDatabase.Execute(stmt);
 
+            sAchievementMgr->UpdateAchievementCriteriaForOfflinePlayer(playerGuid.GetCounter(), ACHIEVEMENT_CRITERIA_TYPE_REACH_LEVEL);
+
             sCharacterCache->UpdateCharacterLevel(playerGuid, newLevel);
         }
     }
@@ -310,7 +312,7 @@ public:
                 if (target->GetUInt32Value(PLAYER_CHOSEN_TITLE) == titleInfo->bit_index)
                     activeStr = handler->GetAcoreString(LANG_ACTIVE);
 
-                std::string titleName = Acore::StringFormat(name, player->GetName().c_str());
+                std::string titleName = Acore::StringFormat(name, player->GetName());
 
                 // send title in "id (idx:idx) - [namedlink locale]" format
                 if (handler->GetSession())

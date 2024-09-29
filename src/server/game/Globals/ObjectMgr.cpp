@@ -381,7 +381,7 @@ void ObjectMgr::AddLocaleString(std::string&& s, LocaleConstant locale, std::vec
 {
     if (!s.empty())
     {
-        if (data.size() <= size_t(locale))
+        if (data.size() <= std::size_t(locale))
             data.resize(locale + 1);
 
         data[locale] = std::move(s);
@@ -702,7 +702,6 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
     {
         sScriptMgr->OnAfterDatabaseLoadCreatureTemplates(_creatureTemplateStoreFast);
     }
-
 }
 
 void ObjectMgr::LoadCreatureTemplateModels()
@@ -948,7 +947,7 @@ void ObjectMgr::LoadCreatureTemplateAddons()
 void ObjectMgr::LoadCreatureCustomIDs()
 {
     // Hack for modules
-    std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "");
+    std::string stringCreatureIds = sConfigMgr->GetOption<std::string>("Creatures.CustomIDs", "190010,55005,999991,25462,98888,601014,34567,34568");
     std::vector<std::string_view> CustomCreatures = Acore::Tokenize(stringCreatureIds, ',', false);
 
     for (auto& itr : CustomCreatures)
@@ -2720,8 +2719,8 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.Name1                     = fields[4].Get<std::string>();
         itemTemplate.DisplayInfoID             = fields[5].Get<uint32>();
         itemTemplate.Quality                   = uint32(fields[6].Get<uint8>());
-        itemTemplate.Flags                     = fields[7].Get<uint32>();
-        itemTemplate.Flags2                    = fields[8].Get<uint32>();
+        itemTemplate.Flags                     = ItemFlags(fields[7].Get<uint32>());
+        itemTemplate.Flags2                    = ItemFlags2(fields[8].Get<uint32>());
         itemTemplate.BuyCount                  = uint32(fields[9].Get<uint8>());
         itemTemplate.BuyPrice                  = int32(fields[10].Get<int64>() * sWorld->getRate((Rates)(RATE_BUYVALUE_ITEM_POOR + itemTemplate.Quality)));
         itemTemplate.SellPrice                 = uint32(fields[11].Get<uint32>() * sWorld->getRate((Rates)(RATE_SELLVALUE_ITEM_POOR + itemTemplate.Quality)));
@@ -2817,7 +2816,7 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.FoodType                = uint32(fields[134].Get<uint8>());
         itemTemplate.MinMoneyLoot            = fields[135].Get<uint32>();
         itemTemplate.MaxMoneyLoot            = fields[136].Get<uint32>();
-        itemTemplate.FlagsCu                 = fields[137].Get<uint32>();
+        itemTemplate.FlagsCu                 = ItemFlagsCustom(fields[137].Get<uint32>());
 
         // Checks
         ItemEntry const* dbcitem = sItemStore.LookupEntry(entry);
@@ -2873,23 +2872,23 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.Quality = ITEM_QUALITY_NORMAL;
         }
 
-        if (itemTemplate.Flags2 & ITEM_FLAGS_EXTRA_HORDE_ONLY)
+        if (itemTemplate.HasFlag2(ITEM_FLAG2_FACTION_HORDE))
         {
             if (FactionEntry const* faction = sFactionStore.LookupEntry(HORDE))
                 if ((itemTemplate.AllowableRace & faction->BaseRepRaceMask[0]) == 0)
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) has value ({}) in `AllowableRace` races, not compatible with ITEM_FLAGS_EXTRA_HORDE_ONLY ({}) in Flags field, item cannot be equipped or used by these races.",
-                                     entry, itemTemplate.AllowableRace, ITEM_FLAGS_EXTRA_HORDE_ONLY);
+                    LOG_ERROR("sql.sql", "Item (Entry: {}) has value ({}) in `AllowableRace` races, not compatible with ITEM_FLAG2_FACTION_HORDE ({}) in Flags field, item cannot be equipped or used by these races.",
+                                     entry, itemTemplate.AllowableRace, ITEM_FLAG2_FACTION_HORDE);
 
-            if (itemTemplate.Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY)
-                LOG_ERROR("sql.sql", "Item (Entry: {}) has value ({}) in `Flags2` flags (ITEM_FLAGS_EXTRA_ALLIANCE_ONLY) and ITEM_FLAGS_EXTRA_HORDE_ONLY ({}) in Flags field, this is a wrong combination.",
-                                 entry, ITEM_FLAGS_EXTRA_ALLIANCE_ONLY, ITEM_FLAGS_EXTRA_HORDE_ONLY);
+            if (itemTemplate.HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE))
+                LOG_ERROR("sql.sql", "Item (Entry: {}) has value ({}) in `Flags2` flags (ITEM_FLAG2_FACTION_ALLIANCE) and ITEM_FLAG2_FACTION_HORDE ({}) in Flags field, this is a wrong combination.",
+                                 entry, ITEM_FLAG2_FACTION_ALLIANCE, ITEM_FLAG2_FACTION_HORDE);
         }
-        else if (itemTemplate.Flags2 & ITEM_FLAGS_EXTRA_ALLIANCE_ONLY)
+        else if (itemTemplate.HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE))
         {
             if (FactionEntry const* faction = sFactionStore.LookupEntry(ALLIANCE))
                 if ((itemTemplate.AllowableRace & faction->BaseRepRaceMask[0]) == 0)
-                    LOG_ERROR("sql.sql", "Item (Entry: {}) has value ({}) in `AllowableRace` races, not compatible with ITEM_FLAGS_EXTRA_ALLIANCE_ONLY ({}) in Flags field, item cannot be equipped or used by these races.",
-                                     entry, itemTemplate.AllowableRace, ITEM_FLAGS_EXTRA_ALLIANCE_ONLY);
+                    LOG_ERROR("sql.sql", "Item (Entry: {}) has value ({}) in `AllowableRace` races, not compatible with ITEM_FLAG2_FACTION_ALLIANCE ({}) in Flags field, item cannot be equipped or used by these races.",
+                                     entry, itemTemplate.AllowableRace, ITEM_FLAG2_FACTION_ALLIANCE);
         }
 
         if (itemTemplate.BuyCount <= 0)
@@ -2989,7 +2988,6 @@ void ObjectMgr::LoadItemTemplates()
             switch (itemTemplate.ItemStat[j].ItemStatType)
             {
                 case ITEM_MOD_SPELL_HEALING_DONE:
-                case ITEM_MOD_SPELL_DAMAGE_DONE:
                     LOG_ERROR("sql.sql", "Item (Entry: {}) has deprecated stat_type{} ({})", entry, j + 1, itemTemplate.ItemStat[j].ItemStatType);
                     break;
                 default:
@@ -3201,10 +3199,10 @@ void ObjectMgr::LoadItemTemplates()
             itemTemplate.HolidayId = 0;
         }
 
-        if (itemTemplate.FlagsCu & ITEM_FLAGS_CU_DURATION_REAL_TIME && !itemTemplate.Duration)
+        if (itemTemplate.HasFlagCu(ITEM_FLAGS_CU_DURATION_REAL_TIME) && !itemTemplate.Duration)
         {
             LOG_ERROR("sql.sql", "Item (Entry {}) has flag ITEM_FLAGS_CU_DURATION_REAL_TIME but it does not have duration limit", entry);
-            itemTemplate.FlagsCu &= ~ITEM_FLAGS_CU_DURATION_REAL_TIME;
+            itemTemplate.FlagsCu = static_cast<ItemFlagsCustom>(static_cast<uint32>(itemTemplate.FlagsCu) & ~ITEM_FLAGS_CU_DURATION_REAL_TIME);
         }
 
         // Fill categories map
@@ -5514,9 +5512,9 @@ void ObjectMgr::LoadEventScripts()
                     if (spell->Effects[j].MiscValue)
                         evt_scripts.insert(spell->Effects[j].MiscValue);
 
-    for (size_t path_idx = 0; path_idx < sTaxiPathNodesByPath.size(); ++path_idx)
+    for (std::size_t path_idx = 0; path_idx < sTaxiPathNodesByPath.size(); ++path_idx)
     {
-        for (size_t node_idx = 0; node_idx < sTaxiPathNodesByPath[path_idx].size(); ++node_idx)
+        for (std::size_t node_idx = 0; node_idx < sTaxiPathNodesByPath[path_idx].size(); ++node_idx)
         {
             TaxiPathNodeEntry const* node = sTaxiPathNodesByPath[path_idx][node_idx];
 
@@ -6213,7 +6211,7 @@ void ObjectMgr::LoadQuestAreaTriggers()
 
 QuestGreeting const* ObjectMgr::GetQuestGreeting(TypeID type, uint32 id) const
 {
-    uint32 typeIndex;
+    uint8 typeIndex;
     if (type == TYPEID_UNIT)
         typeIndex = 0;
     else if (type == TYPEID_GAMEOBJECT)
@@ -6221,15 +6219,19 @@ QuestGreeting const* ObjectMgr::GetQuestGreeting(TypeID type, uint32 id) const
     else
         return nullptr;
 
-    return Acore::Containers::MapGetValuePtr(_questGreetingStore[typeIndex], id);
+    std::pair<uint32, uint8> pairKey = std::make_pair(id, typeIndex);
+    QuestGreetingContainer::const_iterator itr = _questGreetingStore.find(pairKey);
+    if (itr == _questGreetingStore.end())
+        return nullptr;
+
+    return &itr->second;
 }
 
 void ObjectMgr::LoadQuestGreetings()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (std::size_t i = 0; i < _questGreetingStore.size(); ++i)
-        _questGreetingStore[i].clear();
+    _questGreetingStore.clear(); // For reload case
 
     //                                                0   1          2                3             4
     QueryResult result = WorldDatabase.Query("SELECT ID, Type, GreetEmoteType, GreetEmoteDelay, Greeting FROM quest_greeting");
@@ -6239,8 +6241,6 @@ void ObjectMgr::LoadQuestGreetings()
         return;
     }
 
-    uint32 count = 0;
-
     do
     {
         Field* fields = result->Fetch();
@@ -6249,43 +6249,41 @@ void ObjectMgr::LoadQuestGreetings()
         uint8 type = fields[1].Get<uint8>();
         switch (type)
         {
-        case 0: // Creature
-            if (!sObjectMgr->GetCreatureTemplate(id))
-            {
-                LOG_ERROR("sql.sql", "Table `quest_greeting`: creature template entry {} does not exist.", id);
+            case 0: // Creature
+                if (!sObjectMgr->GetCreatureTemplate(id))
+                {
+                    LOG_ERROR("sql.sql", "Table `quest_greeting`: creature template entry {} does not exist.", id);
+                    continue;
+                }
+                break;
+            case 1: // GameObject
+                if (!sObjectMgr->GetGameObjectTemplate(id))
+                {
+                    LOG_ERROR("sql.sql", "Table `quest_greeting`: gameobject template entry {} does not exist.", id);
+                    continue;
+                }
+                break;
+            default:
+                LOG_ERROR("sql.sql", "Table `quest_greeting` has unknown type {} for id {}, skipped.", type, id);
                 continue;
-            }
-            break;
-        case 1: // GameObject
-            if (!sObjectMgr->GetGameObjectTemplate(id))
-            {
-                LOG_ERROR("sql.sql", "Table `quest_greeting`: gameobject template entry {} does not exist.", id);
-                continue;
-            }
-            break;
-        default:
-            continue;
         }
 
-        uint16 greetEmoteType = fields[2].Get<uint16>();
-        uint32 greetEmoteDelay = fields[3].Get<uint32>();
-        std::string greeting = fields[4].Get<std::string>();
+        std::pair<uint32, uint8> pairKey = std::make_pair(id, type);
+        QuestGreeting& data = _questGreetingStore[pairKey];
 
-        _questGreetingStore[type].emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(greetEmoteType, greetEmoteDelay, std::move(greeting)));
-
-        ++count;
+        data.EmoteType = fields[2].Get<uint16>();
+        data.EmoteDelay = fields[3].Get<uint32>();
+        AddLocaleString(fields[4].Get<std::string>(), LOCALE_enUS, data.Greeting);
     }
     while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded {} quest_greeting in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} quest_greeting in {} ms", _questGreetingStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
 void ObjectMgr::LoadQuestGreetingsLocales()
 {
     uint32 oldMSTime = getMSTime();
-
-    _questGreetingLocaleStore.clear();
 
     //                                               0     1      2       3
     QueryResult result = WorldDatabase.Query("SELECT ID, Type, Locale, Greeting FROM quest_greeting_locale");
@@ -6295,6 +6293,7 @@ void ObjectMgr::LoadQuestGreetingsLocales()
         return;
     }
 
+    uint32 localeCount = 0;
     do
     {
         Field* fields = result->Fetch();
@@ -6321,17 +6320,25 @@ void ObjectMgr::LoadQuestGreetingsLocales()
             continue;
         }
 
-        std::string localeName = fields[2].Get<std::string>();
+        std::pair<uint32, uint8> pairKey = std::make_pair(id, type);
+        QuestGreeting& data = _questGreetingStore[pairKey];
 
-        LocaleConstant locale = GetLocaleByName(localeName);
+        QuestGreetingContainer::iterator qgc = _questGreetingStore.find(pairKey);
+        if (qgc == _questGreetingStore.end())
+        {
+            LOG_ERROR("sql.sql", "QuestGreeting (Id: {} Type: {}) found in table `quest_greeting_locale` but does not exist in `quest_greeting`. Skipped!", id, type);
+            continue;
+        }
+
+        LocaleConstant locale = GetLocaleByName(fields[2].Get<std::string>());
         if (locale == LOCALE_enUS)
             continue;
 
-        QuestGreetingLocale& data = _questGreetingLocaleStore[MAKE_PAIR32(type, id)];
         AddLocaleString(fields[3].Get<std::string>(), locale, data.Greeting);
+        localeCount++;
     } while (result->NextRow());
 
-    LOG_INFO("server.loading", ">> Loaded {} quest greeting Locale Strings in {} ms", (uint32)_questGreetingLocaleStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} quest greeting Locale Strings in {} ms", localeCount, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -8388,7 +8395,7 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create)
 
     // Check for three consecutive letters
     wstrToLower(wname);
-    for (size_t i = 2; i < wname.size(); ++i)
+    for (std::size_t i = 2; i < wname.size(); ++i)
         if (wname[i] == wname[i - 1] && wname[i] == wname[i - 2])
             return CHAR_NAME_THREE_CONSECUTIVE;
 
@@ -8544,6 +8551,98 @@ void ObjectMgr::LoadGameObjectForQuests()
     LOG_INFO("server.loading", " ");
 }
 
+bool ObjectMgr::LoadModuleStrings()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _moduleStringStore.clear(); // for reload case
+    QueryResult result = WorldDatabase.Query("SELECT module, id, string FROM module_string");
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 module strings. DB table `module_string` is empty.");
+        LOG_INFO("server.loading", " ");
+        return false;
+    }
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        std::string module = fields[0].Get<std::string>();
+        uint32 id          = fields[1].Get<uint32>();
+
+        std::pair<std::string, uint32> pairKey = std::make_pair(module, id);
+        ModuleString& data = _moduleStringStore[pairKey];
+
+        AddLocaleString(fields[2].Get<std::string>(), LOCALE_enUS, data.Content);
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Module Strings in {} ms", _moduleStringStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+
+    return true;
+}
+
+bool ObjectMgr::LoadModuleStringsLocale()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT module, id, locale, string FROM module_string_locale");
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 module strings locale. DB table `module_string_locale` is empty.");
+        LOG_INFO("server.loading", " ");
+        return false;
+    }
+
+    uint32 localeCount = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        std::string module = fields[0].Get<std::string>();
+        uint32 id          = fields[1].Get<uint32>();
+
+        std::pair<std::string, uint32> pairKey = std::make_pair(module, id);
+        ModuleString& data = _moduleStringStore[pairKey];
+
+        ModuleStringContainer::iterator ms = _moduleStringStore.find(pairKey);
+        if (ms == _moduleStringStore.end())
+        {
+            LOG_ERROR("sql.sql", "ModuleString (Module: {} Id: {}) found in table `module_string_locale` but does not exist in `module_string`. Skipped!", module, id);
+            continue;
+        }
+
+        LocaleConstant locale = GetLocaleByName(fields[2].Get<std::string>());
+        if (locale == LOCALE_enUS)
+            continue;
+
+        AddLocaleString(fields[3].Get<std::string>(), locale, data.Content);
+        localeCount++;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Module Strings Locales in {} ms", localeCount, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+
+    return true;
+}
+
+std::string const* ObjectMgr::GetModuleString(std::string module, uint32 id, LocaleConstant locale) const
+{
+    ModuleString const* ms = GetModuleString(module, id);
+    if (ms->Content.size())
+    {
+        if (ms->Content.size() > size_t(locale) && !ms->Content[locale].empty())
+            return &ms->Content[locale];
+
+        return &ms->Content[DEFAULT_LOCALE];
+    }
+
+    LOG_ERROR("sql.sql", "Module string module {} id {} not found in DB.", module, id);
+
+    return (std::string*)"error";
+}
+
 bool ObjectMgr::LoadAcoreStrings()
 {
     uint32 oldMSTime = getMSTime();
@@ -8581,7 +8680,7 @@ char const* ObjectMgr::GetAcoreString(uint32 entry, LocaleConstant locale) const
 {
     if (AcoreString const* ts = GetAcoreString(entry))
     {
-        if (ts->Content.size() > size_t(locale) && !ts->Content[locale].empty())
+        if (ts->Content.size() > std::size_t(locale) && !ts->Content[locale].empty())
             return ts->Content[locale].c_str();
 
         return ts->Content[DEFAULT_LOCALE].c_str();

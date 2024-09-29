@@ -29,7 +29,6 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "Vehicle.h"
 
  /*######
  ## npc_eye_of_acherus
@@ -1257,4 +1256,3 @@ void AddSC_the_scarlet_enclave_c1()
 
     RegisterSpellScript(spell_death_knight_initiate_visual);
 }
-

@@ -77,7 +77,8 @@ public:
         static ChatCommandTable morphCommandTable =
         {
             { "reset",          HandleMorphResetCommand,          SEC_MODERATOR,        Console::No },
-            { "target",         HandleMorphTargetCommand,         SEC_MODERATOR,        Console::No }
+            { "target",         HandleMorphTargetCommand,         SEC_MODERATOR,        Console::No },
+            { "mount",          HandleMorphMountCommand,          SEC_MODERATOR,        Console::No }
         };
 
         static ChatCommandTable commandTable =
@@ -354,7 +355,7 @@ public:
             return false;
         }
 
-        if (target->GetTypeId() == TYPEID_PLAYER)
+        if (target->IsPlayer())
         {
             // check online security
             if (handler->HasLowerSecurity(target->ToPlayer()))
@@ -369,7 +370,7 @@ public:
         else if (target->IsPet())
         {
             Unit* owner = target->GetOwner();
-            if (owner && owner->GetTypeId() == TYPEID_PLAYER && ((Pet*)target)->IsPermanentPetFor(owner->ToPlayer()))
+            if (owner && owner->IsPlayer() && ((Pet*)target)->IsPermanentPetFor(owner->ToPlayer()))
             {
                 // check online security
                 if (handler->HasLowerSecurity(owner->ToPlayer()))
@@ -665,7 +666,7 @@ public:
         }
 
         // check online security
-        if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer()))
+        if (target->IsPlayer() && handler->HasLowerSecurity(target->ToPlayer()))
         {
             return false;
         }
@@ -842,7 +843,7 @@ public:
         {
             target = handler->GetSession()->GetPlayer();
         }
-        else if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer())) // check online security
+        else if (target->IsPlayer() && handler->HasLowerSecurity(target->ToPlayer())) // check online security
         {
             return false;
         }
@@ -859,12 +860,27 @@ public:
         {
             target = handler->GetSession()->GetPlayer();
         }
-        else if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer())) // check online security
+        else if (target->IsPlayer() && handler->HasLowerSecurity(target->ToPlayer())) // check online security
         {
             return false;
         }
 
         target->DeMorph();
+        return true;
+    }
+
+    static bool HandleMorphMountCommand(ChatHandler* handler, uint32 displayID)
+    {
+        Player* target = handler->getSelectedPlayerOrSelf();
+
+        if (target->IsPlayer() && handler->HasLowerSecurity(target->ToPlayer())) // check online security
+            return false;
+
+        if (!target->GetAuraEffectsByType(SPELL_AURA_MOUNTED).empty())
+            target->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, displayID);
+        else
+            return false;
+
         return true;
     }
 
@@ -876,7 +892,7 @@ public:
         {
             target = handler->GetSession()->GetPlayer();
         }
-        else if (target->GetTypeId() == TYPEID_PLAYER && handler->HasLowerSecurity(target->ToPlayer())) // check online security
+        else if (target->IsPlayer() && handler->HasLowerSecurity(target->ToPlayer())) // check online security
         {
             return false;
         }

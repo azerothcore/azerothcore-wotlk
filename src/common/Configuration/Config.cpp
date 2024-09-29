@@ -46,9 +46,9 @@ namespace
     // Check system configs like *server.conf*
     bool IsAppConfig(std::string_view fileName)
     {
-        size_t foundAuth = fileName.find("authserver.conf");
-        size_t foundWorld = fileName.find("worldserver.conf");
-        size_t foundImport = fileName.find("dbimport.conf");
+        std::size_t foundAuth = fileName.find("authserver.conf");
+        std::size_t foundWorld = fileName.find("worldserver.conf");
+        std::size_t foundImport = fileName.find("dbimport.conf");
 
         return foundAuth != std::string_view::npos || foundWorld != std::string_view::npos || foundImport != std::string_view::npos;
     }
@@ -56,8 +56,8 @@ namespace
     // Check logging system configs like Appender.* and Logger.*
     bool IsLoggingSystemOptions(std::string_view optionName)
     {
-        size_t foundAppender = optionName.find("Appender.");
-        size_t foundLogger = optionName.find("Logger.");
+        std::size_t foundAppender = optionName.find("Appender.");
+        std::size_t foundLogger = optionName.find("Logger.");
 
         return foundAppender != std::string_view::npos || foundLogger != std::string_view::npos;
     }
@@ -65,7 +65,7 @@ namespace
     template<typename Format, typename... Args>
     inline void PrintError(std::string_view filename, Format&& fmt, Args&& ... args)
     {
-        std::string message = Acore::StringFormatFmt(std::forward<Format>(fmt), std::forward<Args>(args)...);
+        std::string message = Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
 
         if (IsAppConfig(filename))
         {
@@ -117,7 +117,7 @@ namespace
                 return false;
             }
 
-            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Failed open {}file '{}'", isOptional ? "optional " : "", file));
+            throw ConfigException(Acore::StringFormat("Config::LoadFile: Failed open {}file '{}'", isOptional ? "optional " : "", file));
         }
 
         uint32 count = 0;
@@ -144,7 +144,7 @@ namespace
 
             // read line error
             if (!in.good() && !in.eof())
-                throw ConfigException(Acore::StringFormatFmt("> Config::LoadFile: Failure to read line number {} in file '{}'", lineNumber, file));
+                throw ConfigException(Acore::StringFormat("> Config::LoadFile: Failure to read line number {} in file '{}'", lineNumber, file));
 
             // remove whitespace in line
             line = Acore::String::Trim(line, in.getloc());
@@ -187,7 +187,7 @@ namespace
                 return false;
             }
 
-            throw ConfigException(Acore::StringFormatFmt("Config::LoadFile: Empty file '{}'", file));
+            throw ConfigException(Acore::StringFormat("Config::LoadFile: Empty file '{}'", file));
         }
 
         // Add correct keys if file load without errors
@@ -223,7 +223,7 @@ namespace
         std::string result;
 
         const char* str = key.c_str();
-        size_t n = key.length();
+        std::size_t n = key.length();
 
         char curr;
         bool isEnd;
@@ -231,7 +231,7 @@ namespace
         bool currIsNumeric;
         bool nextIsNumeric;
 
-        for (size_t i = 0; i < n; ++i)
+        for (std::size_t i = 0; i < n; ++i)
         {
             curr = str[i];
             if (curr == ' ' || curr == '.' || curr == '-')

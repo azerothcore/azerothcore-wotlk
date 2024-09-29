@@ -54,7 +54,6 @@ enum Spells
     SPELL_FATAL_ATTRACTION_AURA     = 41001,
     SPELL_FATAL_ATTRACTION_DAMAGE   = 40871,
     SPELL_ENRAGE                    = 45078,
-    SPELL_FRENZY                    = 40683,
     SPELL_SABER_LASH_IMMUNITY       = 43690
 };
 
@@ -74,7 +73,6 @@ struct boss_mother_shahraz : public BossAI
         _canTalk = true;
 
         ScheduleHealthCheckEvent(10, [&] {
-            DoCastSelf(SPELL_FRENZY, true);
             Talk(SAY_EMOTE_FRENZY);
         });
     }
@@ -110,7 +108,7 @@ struct boss_mother_shahraz : public BossAI
         me->m_Events.AddEventAtOffset([&] {
             DoCastSelf(SPELL_ENRAGE, true);
             Talk(SAY_ENRAGE);
-        }, 10min);
+        }, 10min, GROUP_ENRAGE);
     }
 
     void KilledUnit(Unit* /*victim*/) override
@@ -148,7 +146,7 @@ class spell_mother_shahraz_random_periodic_aura : public AuraScript
     void Update(AuraEffect const* effect)
     {
         PreventDefaultAction();
-        if (effect->GetTickNumber() % 5 == 1)
+        if (GetUnitOwner() && (effect->GetTickNumber() % 6 == 1 || effect->GetTickNumber() == 1)) // Reapplies 12-18s after the third beam
             GetUnitOwner()->CastSpell(GetUnitOwner(), RAND(SPELL_SINFUL_PERIODIC, SPELL_SINISTER_PERIODIC, SPELL_VILE_PERIODIC, SPELL_WICKED_PERIODIC), true);
     }
 
@@ -198,6 +196,17 @@ class spell_mother_shahraz_saber_lash_aura : public AuraScript
     }
 };
 
+const Position validTeleportStairsPos[4] =
+{
+    {966.87f, 184.45f, 192.84f},
+    {927.22f, 187.04f, 192.84f},
+    {922.54f, 110.09f, 192.84f},
+    {958.01f, 110.47f, 192.84f}
+};
+
+constexpr float minTeleportDist = 30.f;
+constexpr float maxTeleportDist = 50.f;
+
 class spell_mother_shahraz_fatal_attraction : public SpellScript
 {
     PrepareSpellScript(spell_mother_shahraz_fatal_attraction);
@@ -210,20 +219,48 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         targets.remove_if(Acore::UnitAuraCheck(true, SPELL_SABER_LASH_IMMUNITY));
-        if (targets.size() <= 1)
-            FinishCast(SPELL_FAILED_DONT_REPORT);
     }
 
     void SetDest(SpellDestination& dest)
     {
-        std::list<TargetInfo> const* targetsInfo = GetSpell()->GetUniqueTargetInfo();
-        for (std::list<TargetInfo>::const_iterator ihit = targetsInfo->begin(); ihit != targetsInfo->end(); ++ihit)
-            if (Unit* target = ObjectAccessor::GetUnit(*GetCaster(), ihit->targetGUID))
+        Position finalDest;
+
+        // Check if the boss is near stairs to avoid players falling through the platform with random teleports.
+        if (GetCaster()->GetPositionY() < 194.f)
+            finalDest = validTeleportStairsPos[urand(0, 3)];
+        else
+        {
+            finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
+
+            // Maybe not necessary but just in case to avoid LOS issues with an object
+            if (!GetCaster()->IsWithinLOS(finalDest.GetPositionX(), finalDest.GetPositionY(), finalDest.GetPositionZ()))
+                finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
+
+            /* @note: To avoid teleporting players near a walls, we will define a safe area.
+             * As the boss have an area boudary around y: 320.f. We will limit the safe area to this value, avoiding wird issues.
+             * x limit: 932.f/960.f | y limit: 224.f/320.f
+             */
+            if (finalDest.m_positionX < 932.f)
+                finalDest.m_positionX = 932.f;
+            else if (finalDest.m_positionX > 960.f)
+                finalDest.m_positionX = 960.f;
+
+            if (finalDest.m_positionY < 224.f)
+                finalDest.m_positionY = 224.f;
+            else if (finalDest.m_positionY > 320.f)
+                finalDest.m_positionY = 320.f;
+
+            // After relocate a finalDest outside the safe area, we need to recheck the distance with the boss
+            if (GetCaster()->GetExactDist2d(finalDest) < minTeleportDist)
             {
-                dest.Relocate(*target);
-                if (roll_chance_i(50))
-                    break;
+                if (finalDest.m_positionX == 932.f || finalDest.m_positionX == 960.f)
+                    finalDest.m_positionY = finalDest.m_positionY + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
+                else if (finalDest.m_positionY == 224.f || finalDest.m_positionY == 320.f)
+                    finalDest.m_positionX = finalDest.m_positionX + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
             }
+        }
+
+        dest.Relocate(finalDest);
     }
 
     void HandleTeleportUnits(SpellEffIndex  /*effIndex*/)
@@ -246,41 +283,34 @@ class spell_mother_shahraz_fatal_attraction_dummy : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_FATAL_ATTRACTION_DAMAGE });
+        return ValidateSpellInfo({ SPELL_FATAL_ATTRACTION_DAMAGE, SPELL_FATAL_ATTRACTION_AURA });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            GetCaster()->RemoveAurasDueToSpell(SPELL_FATAL_ATTRACTION_AURA);
     }
 
     void HandleDummy(SpellEffIndex  /*effIndex*/)
     {
-        if (Unit* target = GetHitUnit())
-        {
-            target->CastSpell(target, SPELL_FATAL_ATTRACTION_DAMAGE, true);
-            if (AuraEffect* aurEff = target->GetAuraEffect(SPELL_FATAL_ATTRACTION_AURA, EFFECT_1))
-                aurEff->SetAmount(aurEff->GetTickNumber());
-        }
+        if (Unit* caster = GetCaster())
+            if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_FATAL_ATTRACTION_AURA, EFFECT_1))
+            {
+                if (aurEff->GetTickNumber() <= 2)
+                {
+                    int32 damage = 1000 * aurEff->GetTickNumber();
+                    caster->CastCustomSpell(caster, SPELL_FATAL_ATTRACTION_DAMAGE, &damage, 0, 0, true);
+                }
+                else
+                    caster->CastSpell(caster, SPELL_FATAL_ATTRACTION_DAMAGE, true);
+            }
     }
 
     void Register() override
     {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mother_shahraz_fatal_attraction_dummy::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ALLY);
         OnEffectHitTarget += SpellEffectFn(spell_mother_shahraz_fatal_attraction_dummy::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
-class spell_mother_shahraz_fatal_attraction_aura : public AuraScript
-{
-    PrepareAuraScript(spell_mother_shahraz_fatal_attraction_aura);
-
-    void Update(AuraEffect const* effect)
-    {
-        if (effect->GetTickNumber() > uint32(effect->GetAmount() + 1))
-        {
-            PreventDefaultAction();
-            SetDuration(0);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_mother_shahraz_fatal_attraction_aura::Update, EFFECT_1, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -292,6 +322,4 @@ void AddSC_boss_mother_shahraz()
     RegisterSpellScript(spell_mother_shahraz_saber_lash_aura);
     RegisterSpellScript(spell_mother_shahraz_fatal_attraction);
     RegisterSpellScript(spell_mother_shahraz_fatal_attraction_dummy);
-    RegisterSpellScript(spell_mother_shahraz_fatal_attraction_aura);
 }
-

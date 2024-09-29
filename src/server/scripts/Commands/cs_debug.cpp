@@ -64,7 +64,7 @@ public:
         {
             { "buyerror",       HandleDebugSendBuyErrorCommand,        SEC_ADMINISTRATOR, Console::No },
             { "channelnotify",  HandleDebugSendChannelNotifyCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "chatmmessage",   HandleDebugSendChatMsgCommand,         SEC_ADMINISTRATOR, Console::No },
+            { "chatmessage",    HandleDebugSendChatMsgCommand,         SEC_ADMINISTRATOR, Console::No },
             { "equiperror",     HandleDebugSendEquipErrorCommand,      SEC_ADMINISTRATOR, Console::No },
             { "largepacket",    HandleDebugSendLargePacketCommand,     SEC_ADMINISTRATOR, Console::No },
             { "opcode",         HandleDebugSendOpcodeCommand,          SEC_ADMINISTRATOR, Console::No },
@@ -82,6 +82,7 @@ public:
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
             { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::No },
+            { "cooldown",       HandleDebugCooldownCommand,            SEC_ADMINISTRATOR, Console::No },
             { "getitemstate",   HandleDebugGetItemStateCommand,        SEC_ADMINISTRATOR, Console::No },
             { "lootrecipient",  HandleDebugGetLootRecipientCommand,    SEC_ADMINISTRATOR, Console::No },
             { "getvalue",       HandleDebugGetValueCommand,            SEC_ADMINISTRATOR, Console::No },
@@ -263,7 +264,7 @@ public:
         Unit* unit = handler->getSelectedUnit();
         Player* player = nullptr;
 
-        if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
+        if (!unit || (!unit->IsPlayer()))
         {
             player = handler->GetSession()->GetPlayer();
         }
@@ -733,14 +734,14 @@ public:
 
                 if (item->GetOwnerGUID() != player->GetGUID())
                 {
-                    handler->SendSysMessage(Acore::StringFormatFmt("queue({}): For the item {}, the owner ({}) and the player ({}) don't match!", index, item->GetGUID().ToString(), item->GetOwnerGUID().ToString(), player->GetGUID().ToString()));
+                    handler->SendSysMessage(Acore::StringFormat("queue({}): For the item {}, the owner ({}) and the player ({}) don't match!", index, item->GetGUID().ToString(), item->GetOwnerGUID().ToString(), player->GetGUID().ToString()));
                     error = true;
                     continue;
                 }
 
                 if (item->GetQueuePos() != index)
                 {
-                    handler->SendSysMessage(Acore::StringFormatFmt("queue({}): For the item {}, the queuepos doesn't match it's position in the queue!", index, item->GetGUID().ToString()));
+                    handler->SendSysMessage(Acore::StringFormat("queue({}): For the item {}, the queuepos doesn't match it's position in the queue!", index, item->GetGUID().ToString()));
                     error = true;
                     continue;
                 }
@@ -752,14 +753,14 @@ public:
 
                 if (!test)
                 {
-                    handler->SendSysMessage(Acore::StringFormatFmt("queue({}): The bag({}) and slot({}) values for {} are incorrect, the player doesn't have any item at that position!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString()));
+                    handler->SendSysMessage(Acore::StringFormat("queue({}): The bag({}) and slot({}) values for {} are incorrect, the player doesn't have any item at that position!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString()));
                     error = true;
                     continue;
                 }
 
                 if (test != item)
                 {
-                    handler->SendSysMessage(Acore::StringFormatFmt("queue({}): The bag({}) and slot({}) values for the {} are incorrect, {} is there instead!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString(), test->GetGUID().ToString()));
+                    handler->SendSysMessage(Acore::StringFormat("queue({}): The bag({}) and slot({}) values for the {} are incorrect, {} is there instead!", index, item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString(), test->GetGUID().ToString()));
                     error = true;
                     continue;
                 }
@@ -781,6 +782,33 @@ public:
     static bool HandleDebugBattlegroundCommand(ChatHandler* /*handler*/)
     {
         sBattlegroundMgr->ToggleTesting();
+        return true;
+    }
+
+    static bool HandleDebugCooldownCommand(ChatHandler* handler, uint32 spell_id, uint32 end_time, Optional<uint32> item_id)
+    {
+        Player* player = handler->GetPlayer();
+
+        if (!player || !spell_id || !end_time)
+            return false;
+
+        if (!sSpellMgr->GetSpellInfo(spell_id))
+            return false;
+
+        if (!item_id)
+            item_id = 0;
+        else if (!sItemStore.LookupEntry(*item_id))
+            return false;
+
+        if (end_time < player->GetSpellCooldownDelay(spell_id))
+            player->RemoveSpellCooldown(spell_id, true);
+
+        player->AddSpellCooldown(spell_id, *item_id, end_time, true, false);
+
+        WorldPacket data;
+        player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spell_id, end_time);
+        player->SendDirectMessage(&data);
+
         return true;
     }
 
@@ -1134,7 +1162,7 @@ public:
             return true;
 
         // check index
-        if (unit->GetTypeId() == TYPEID_PLAYER)
+        if (unit->IsPlayer())
         {
             if (index >= PLAYER_END)
                 return true;

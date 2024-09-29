@@ -176,7 +176,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case EVENT_ARCHAVON:
                 case EVENT_EMALON:
@@ -268,4 +268,3 @@ void AddSC_instance_vault_of_archavon()
 {
     new instance_vault_of_archavon();
 }
-

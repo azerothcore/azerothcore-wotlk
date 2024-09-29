@@ -519,4 +519,3 @@ void AddSC_instance_zulfarrak()
     RegisterSpellScript(spell_zulfarrak_summon_zulfarrak_zombies);
     RegisterSpellScript(spell_zulfarrak_unlocking);
 }
-

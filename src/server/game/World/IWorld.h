@@ -139,6 +139,7 @@ enum WorldBoolConfigs
     CONFIG_AUTOBROADCAST,
     CONFIG_ALLOW_TICKETS,
     CONFIG_DELETE_CHARACTER_TICKET_TRACE,
+    CONFIG_LFG_CAST_DESERTER,
     CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES,
     CONFIG_PRESERVE_CUSTOM_CHANNELS,
     CONFIG_PDUMP_NO_PATHS,
@@ -308,6 +309,7 @@ enum WorldIntConfigs
     CONFIG_DEATH_SICKNESS_LEVEL,
     CONFIG_INSTANT_LOGOUT,
     CONFIG_DISABLE_BREATHING,
+    CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY,
     CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMER,
     CONFIG_BATTLEGROUND_PREMATURE_FINISH_TIMER,
@@ -388,6 +390,7 @@ enum WorldIntConfigs
     CONFIG_ICC_BUFF_ALLIANCE,
     CONFIG_ITEMDELETE_QUALITY,
     CONFIG_ITEMDELETE_ITEM_LEVEL,
+    CONFIG_ITEMDELETE_KEEP_DAYS,
     CONFIG_BG_REWARD_WINNER_HONOR_FIRST,
     CONFIG_BG_REWARD_WINNER_ARENA_FIRST,
     CONFIG_BG_REWARD_WINNER_HONOR_LAST,
@@ -566,9 +569,6 @@ public:
     [[nodiscard]] virtual uint16 GetConfigMaxSkillValue() const = 0;
     virtual void SetInitialWorldSettings() = 0;
     virtual void LoadConfigSettings(bool reload = false) = 0;
-    virtual void SendWorldText(uint32 string_id, ...) = 0;
-    virtual void SendWorldTextOptional(uint32 string_id, uint32 flag, ...) = 0;
-    virtual void SendGMText(uint32 string_id, ...) = 0;
     virtual void SendGlobalMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual void SendGlobalGMMessage(WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;
     virtual bool SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self = nullptr, TeamId teamId = TEAM_NEUTRAL) = 0;

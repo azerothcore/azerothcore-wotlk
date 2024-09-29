@@ -23,7 +23,7 @@
 #include "WorldPacket.h"
 #include "the_eye.h"
 
-enum Yells
+enum KTYells
 {
     // Kael'thas Speech
     SAY_INTRO                           = 0,
@@ -54,7 +54,7 @@ enum Yells
     EMOTE_THALADRED_FIXATE              = 2
 };
 
-enum Spells
+enum KTSpells
 {
     // _phase 2 spells
     SPELL_SUMMON_WEAPONS                = 36976,
@@ -79,7 +79,7 @@ enum Spells
     SPELL_FLAME_STRIKE                  = 36735,
     SPELL_FLAME_STRIKE_DAMAGE           = 36731,
 
-    // Event
+    // transition scene spells
     SPELL_NETHERBEAM_AURA1              = 36364,
     SPELL_NETHERBEAM_AURA2              = 36370,
     SPELL_NETHERBEAM_AURA3              = 36371,
@@ -92,7 +92,7 @@ enum Spells
     SPELL_KAEL_EXPLODES4                = 36354,
     SPELL_KAEL_EXPLODES5                = 36092,
     SPELL_GROW                          = 36184,
-    SPELL_KEAL_STUNNED                  = 36185,
+    SPELL_KAEL_STUNNED                  = 36185,
     SPELL_KAEL_FULL_POWER               = 36187,
     SPELL_FLOATING_DROWNED              = 36550,
     SPELL_DARK_BANISH_STATE             = 52241, // wrong visual apparently
@@ -115,6 +115,7 @@ enum Spells
     SPELL_NETHER_BEAM_DAMAGE            = 35873,
 
     SPELL_REMOTE_TOY_STUN               = 37029,
+    SPELL_REMOVE_ENCHANTED_WEAPONS      = 39497,
 
     // Advisors
     // Universal
@@ -138,57 +139,43 @@ enum Spells
     SPELL_SILENCE                       = 30225
 };
 
-enum Misc
+enum KTPhases
 {
-    POINT_MIDDLE                        = 1,
-    POINT_AIR                           = 2,
-    POINT_START_LAST_PHASE              = 3,
-    DATA_RESURRECT_CAST                 = 1,
-    NPC_WORLD_TRIGGER                   = 19871,
-    NPC_NETHER_VAPOR                    = 21002,
-    NPC_NETHERSTRAND_LONGBOW            = 21268,
-    NPC_STAFF_OF_DISINTEGRATION         = 21274,
-
     PHASE_NONE                          = 0,
     PHASE_SINGLE_ADVISOR                = 1,
     PHASE_WEAPONS                       = 2,
     PHASE_TRANSITION                    = 3,
     PHASE_ALL_ADVISORS                  = 4,
-    PHASE_FINAL                         = 5,
+    PHASE_FINAL                         = 5
+};
 
-    EVENT_PREFIGHT_PHASE11              = 1,
-    EVENT_PREFIGHT_PHASE12              = 2,
-    EVENT_PREFIGHT_PHASE21              = 3,
-    EVENT_PREFIGHT_PHASE22              = 4,
-    EVENT_PREFIGHT_PHASE31              = 5,
-    EVENT_PREFIGHT_PHASE32              = 6,
-    EVENT_PREFIGHT_PHASE41              = 7,
-    EVENT_PREFIGHT_PHASE42              = 8,
-    EVENT_PREFIGHT_PHASE51              = 9,
-    EVENT_PREFIGHT_PHASE52              = 10,
-    EVENT_PREFIGHT_PHASE61              = 11,
-    EVENT_PREFIGHT_PHASE62              = 12,
-    EVENT_PREFIGHT_PHASE63              = 13,
-    EVENT_PREFIGHT_PHASE71              = 14,
-    EVENT_GATHER_ADVISORS               = 15,
+enum KTMisc
+{
+    POINT_MIDDLE                        = 1,
+    POINT_AIR                           = 2,
+    POINT_START_LAST_PHASE              = 3,
 
-    EVENT_SPELL_SEQ_1                   = 30,
-    EVENT_SPELL_SEQ_2                   = 31,
-    EVENT_SPELL_SEQ_3                   = 32,
-    EVENT_SPELL_FIREBALL                = 33,
-    EVENT_SPELL_PYROBLAST               = 34,
-    EVENT_SPELL_FLAMESTRIKE             = 35,
-    EVENT_SPELL_ARCANE_DISRUPTION       = 36,
-    EVENT_SPELL_MIND_CONTROL            = 37,
-    EVENT_SPELL_SUMMON_PHOENIX          = 38,
-    EVENT_CHECK_HEALTH                  = 39,
-    EVENT_SPELL_GRAVITY_LAPSE           = 40,
-    EVENT_GRAVITY_LAPSE_END             = 41,
-    EVENT_SPELL_SHOCK_BARRIER           = 42,
-    EVENT_SPELL_NETHER_BEAM             = 43,
-    EVENT_SPELL_NETHER_VAPOR            = 44,
+    DATA_RESURRECT_CAST                 = 1,
 
-    EVENT_SCENE_1                       = 50,
+    NPC_WORLD_TRIGGER                   = 19871,
+    NPC_NETHER_VAPOR                    = 21002,
+    NPC_NETHERSTRAND_LONGBOW            = 21268,
+    NPC_STAFF_OF_DISINTEGRATION         = 21274,
+};
+
+enum KTPreFightEvents
+{
+    EVENT_PREFIGHT_PHASE1_01              = 1,
+    EVENT_PREFIGHT_PHASE1_02              = 2,
+    EVENT_PREFIGHT_PHASE5_01              = 3,
+    EVENT_PREFIGHT_PHASE5_02              = 4,
+    EVENT_PREFIGHT_PHASE6_02              = 5,
+    EVENT_PREFIGHT_PHASE6_03              = 6,
+};
+
+enum KTTransitionScene
+{
+    EVENT_SCENE_1                       = 50, // NYI
     EVENT_SCENE_2                       = 51,
     EVENT_SCENE_3                       = 52,
     EVENT_SCENE_4                       = 53,
@@ -203,10 +190,12 @@ enum Misc
     EVENT_SCENE_13                      = 62,
     EVENT_SCENE_14                      = 63,
     EVENT_SCENE_15                      = 64,
-    EVENT_SCENE_16                      = 65
+    EVENT_SCENE_16                      = 65,
+    EVENT_SCENE_17                      = 66,
+    EVENT_SCENE_18                      = 67
 };
 
-enum KaelActions
+enum KTActions
 {
     ACTION_START_SANGUINAR              = 0,
     ACTION_START_CAPERNIAN              = 1,
@@ -215,7 +204,7 @@ enum KaelActions
     ACTION_PROGRESS_PHASE_CHECK         = 4
 };
 
-enum SpellGroups
+enum KTSpellGroups
 {
     GROUP_PROGRESS_PHASE                = 0,
     GROUP_PYROBLAST                     = 1,
@@ -288,23 +277,16 @@ struct boss_kaelthas : public BossAI
         {
             PrepareAdvisors();
         });
-        _phase = PHASE_NONE;
 
-        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HOVER, true);
+        _phase = PHASE_NONE;
+        _transitionSceneReached = false;
+
+        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_HOVER, true); // hover effect 36550 - Floating Drowned
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
         SetRoomState(GO_STATE_READY);
         me->SetDisableGravity(false);
         me->SetWalk(false);
-        ScheduleHealthCheckEvent(50, [&]{
-            scheduler.CancelAll();
-            me->CastStop();
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            me->SetReactState(REACT_PASSIVE);
-            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
-            me->ClearUnitState(UNIT_STATE_MELEE_ATTACKING);
-            me->SendMeleeAttackStop();
-        });
     }
 
     void AttackStart(Unit* who) override
@@ -315,15 +297,17 @@ struct boss_kaelthas : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (_phase == PHASE_NONE && who->GetTypeId() == TYPEID_PLAYER && me->IsValidAttackTarget(who))
+        if (_phase == PHASE_NONE && who->IsPlayer() && me->IsValidAttackTarget(who))
         {
             _phase = PHASE_SINGLE_ADVISOR;
             me->SetInCombatWithZone();
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             Talk(SAY_INTRO);
+            DoCastAOE(SPELL_REMOVE_ENCHANTED_WEAPONS, true);
             ScheduleUniqueTimedEvent(23s, [&]
             {
                 Talk(SAY_INTRO_THALADRED);
-            }, EVENT_PREFIGHT_PHASE11);
+            }, EVENT_PREFIGHT_PHASE1_01);
             ScheduleUniqueTimedEvent(30s, [&]
             {
                 if (Creature* thaladred = summons.GetCreatureWithEntry(NPC_THALADRED))
@@ -334,18 +318,13 @@ struct boss_kaelthas : public BossAI
                         thaladred->AI()->AttackStart(target);
                     thaladred->SetInCombatWithZone();
                 }
-            }, EVENT_PREFIGHT_PHASE12);
+            }, EVENT_PREFIGHT_PHASE1_02);
         }
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        BossAI::JustEngagedWith(who);
     }
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
             Talk(SAY_SLAY);
     }
 
@@ -360,7 +339,7 @@ struct boss_kaelthas : public BossAI
 
     void DoAction(int32 action) override
     {
-        switch(action)
+        switch (action)
         {
             case ACTION_START_SANGUINAR:
                 IntroduceNewAdvisor(SAY_INTRO_SANGUINAR, ACTION_START_SANGUINAR);
@@ -376,7 +355,7 @@ struct boss_kaelthas : public BossAI
                     Talk(SAY_PHASE2_WEAPON);
                     DoCastSelf(SPELL_SUMMON_WEAPONS);
                     _phase = PHASE_WEAPONS;
-                }, EVENT_PREFIGHT_PHASE51);
+                }, EVENT_PREFIGHT_PHASE5_01);
                 ScheduleUniqueTimedEvent(9s, [&]{
                     summons.DoForAllSummons([&](WorldObject* summon)
                     {
@@ -397,7 +376,7 @@ struct boss_kaelthas : public BossAI
                     {
                         PhaseAllAdvisorsExecute();
                     });
-                }, EVENT_PREFIGHT_PHASE52);
+                }, EVENT_PREFIGHT_PHASE5_02);
                 break;
             case ACTION_PROGRESS_PHASE_CHECK:
                 if (_phase == PHASE_ALL_ADVISORS)
@@ -427,12 +406,16 @@ struct boss_kaelthas : public BossAI
 
     void MovementInform(uint32 type, uint32 point) override
     {
-        if (type != POINT_MOTION_TYPE)
+        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
             return;
 
         if (point == POINT_MIDDLE)
         {
             ExecuteMiddleEvent();
+        }
+        else if (point == POINT_AIR)
+        {
+            me->SetDisableGravity(true, false, false); // updating AnimationTier will break drowning animation later
         }
         else if (point == POINT_START_LAST_PHASE)
         {
@@ -501,6 +484,8 @@ struct boss_kaelthas : public BossAI
 
     void ExecuteMiddleEvent()
     {
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+        me->RemoveAllAttackers();
         scheduler.ClearValidator();
         me->SetTarget();
         me->SetFacingTo(M_PI);
@@ -511,7 +496,6 @@ struct boss_kaelthas : public BossAI
             me->SetTarget();
             DoCastSelf(SPELL_KAEL_EXPLODES1, true);
             DoCastSelf(SPELL_KAEL_GAINING_POWER);
-            me->SetDisableGravity(true);
         }, EVENT_SCENE_2);
         ScheduleUniqueTimedEvent(4000ms, [&]
         {
@@ -519,7 +503,9 @@ struct boss_kaelthas : public BossAI
             for (uint8 i = 0; i < 2; ++i)
                 if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, triggersPos[i], TEMPSUMMON_TIMED_DESPAWN, 60000))
                     trigger->CastSpell(me, SPELL_NETHERBEAM1 + i, false);
-            me->GetMotionMaster()->MovePoint(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 76.0f, false, true);
+            me->SetDisableGravity(true);
+            me->SendMovementFlagUpdate();
+            me->GetMotionMaster()->MoveTakeoff(POINT_AIR, me->GetPositionX(), me->GetPositionY(), 75.0f, 2.99, true); // AnimType Movement::ToFly does not exist for Kael
             DoCastSelf(SPELL_GROW, true);
         }, EVENT_SCENE_3);
         ScheduleUniqueTimedEvent(7000ms, [&]
@@ -551,8 +537,6 @@ struct boss_kaelthas : public BossAI
         ScheduleUniqueTimedEvent(17500ms, [&]
         {
             SetRoomState(GO_STATE_ACTIVE);
-            me->SetUnitMovementFlags(MOVEMENTFLAG_HOVER | MOVEMENTFLAG_WALKING | MOVEMENTFLAG_DISABLE_GRAVITY);
-            me->SendMovementFlagUpdate();
         }, EVENT_SCENE_7);
         ScheduleUniqueTimedEvent(19000ms, [&]
         {
@@ -561,8 +545,6 @@ struct boss_kaelthas : public BossAI
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA2);
             me->RemoveAurasDueToSpell(SPELL_NETHERBEAM_AURA3);
             DoCastSelf(SPELL_KAEL_EXPLODES5, true);
-            DoCastSelf(SPELL_FLOATING_DROWNED);
-            //me->CastSpell(me, SPELL_KEAL_STUNNED, true);
         }, EVENT_SCENE_8);
         ScheduleUniqueTimedEvent(22000ms, [&]
         {
@@ -603,29 +585,37 @@ struct boss_kaelthas : public BossAI
             if (Creature* trigger = me->SummonCreature(WORLD_TRIGGER, me->GetPositionX()-5, me->GetPositionY()+5, me->GetPositionZ()+15.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000))
                 trigger->CastSpell(me, SPELL_PURE_NETHER_BEAM3, true);
         }, EVENT_SCENE_14);
+        ScheduleUniqueTimedEvent(30500ms, [&]
+        {
+            me->SetFacingTo(M_PI);
+            me->RemoveAurasDueToSpell(SPELL_FLOATING_DROWNED);
+            me->CastStop();
+        }, EVENT_SCENE_15);
+        ScheduleUniqueTimedEvent(30700ms, [&]
+        {
+            me->CastStop();
+            DoCastSelf(SPELL_KAEL_FULL_POWER);
+        }, EVENT_SCENE_16);
         ScheduleUniqueTimedEvent(32000ms, [&]
         {
-            me->RemoveAurasDueToSpell(SPELL_FLOATING_DROWNED);
-            me->RemoveAurasDueToSpell(SPELL_KEAL_STUNNED);
-            DoCastSelf(SPELL_KAEL_FULL_POWER);
             DoCastSelf(SPELL_KAEL_PHASE_TWO, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM4, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM5, true);
             DoCastSelf(SPELL_PURE_NETHER_BEAM6, true);
-            me->SetUnitMovementFlags(MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_WALKING);
-            me->SendMovementFlagUpdate();
-        }, EVENT_SCENE_15);
+        }, EVENT_SCENE_17);
         ScheduleUniqueTimedEvent(36000ms, [&]
         {
             summons.DespawnEntry(WORLD_TRIGGER);
             me->CastStop();
             me->GetMotionMaster()->Clear();
             me->RemoveAurasDueToSpell(SPELL_DARK_BANISH_STATE); // WRONG VISUAL
-            me->GetMotionMaster()->MovePoint(POINT_START_LAST_PHASE, me->GetHomePosition(), false, true);
-        }, EVENT_SCENE_16);
+            me->SetDisableGravity(true);
+            me->SendMovementFlagUpdate();
+            me->GetMotionMaster()->MoveLand(POINT_START_LAST_PHASE, me->GetHomePosition(), 2.99f);
+        }, EVENT_SCENE_18);
     }
 
-    void IntroduceNewAdvisor(Yells talkIntroduction, KaelActions kaelAction)
+    void IntroduceNewAdvisor(KTYells talkIntroduction, KTActions kaelAction)
     {
         std::chrono::milliseconds attackStartTimer = 0ms;
         EyeNPCs advisorNPCId = NPC_THALADRED;
@@ -634,7 +624,7 @@ struct boss_kaelthas : public BossAI
             Talk(talkIntroduction);
         });
         //switch because talk times are different
-        switch(kaelAction)
+        switch (kaelAction)
         {
             case ACTION_START_SANGUINAR:
                 attackStartTimer = 14500ms;
@@ -671,7 +661,7 @@ struct boss_kaelthas : public BossAI
         Talk(SAY_PHASE3_ADVANCE);
         ScheduleUniqueTimedEvent(6s, [&]{
             DoCastSelf(SPELL_RESURRECTION);
-        }, EVENT_PREFIGHT_PHASE62);
+        }, EVENT_PREFIGHT_PHASE6_02);
         ScheduleUniqueTimedEvent(12s, [&]{
             _phase = PHASE_ALL_ADVISORS;
             summons.DoForAllSummons([&](WorldObject* summon)
@@ -694,7 +684,7 @@ struct boss_kaelthas : public BossAI
             {
                 PhaseKaelExecute();
             });
-        }, EVENT_PREFIGHT_PHASE63);
+        }, EVENT_PREFIGHT_PHASE6_03);
     }
 
     void PhaseKaelExecute()
@@ -703,11 +693,22 @@ struct boss_kaelthas : public BossAI
         Talk(SAY_PHASE4_INTRO2);
         _phase = PHASE_FINAL;
         DoResetThreatList();
-        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE);
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
         {
             AttackStart(target);
         }
+        ScheduleHealthCheckEvent(50, [&]{
+            if (!_transitionSceneReached)
+            {
+                _transitionSceneReached = true;
+                scheduler.CancelAll();
+                me->AttackStop();
+                me->CastStop();
+                me->SetReactState(REACT_PASSIVE);
+                me->GetMotionMaster()->MovePoint(POINT_MIDDLE, me->GetHomePosition(), true, true);
+            }
+        });
         ScheduleTimedEvent(1000ms, [&]
         {
             DoCastVictim(SPELL_FIREBALL);
@@ -721,7 +722,6 @@ struct boss_kaelthas : public BossAI
             Talk(SAY_SUMMON_PHOENIX);
             DoCastSelf(SPELL_PHOENIX);
         }, 35450ms, 41550ms);
-        //sequence
         ScheduleTimedEvent(20s, 23s, [&]
         {
             if (roll_chance_i(50))
@@ -762,8 +762,14 @@ struct boss_kaelthas : public BossAI
     {
         return me->GetHomePosition().GetExactDist2d(me) > 165.0f || !SelectTargetFromPlayerList(165.0f);
     }
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        DoCastAOE(SPELL_REMOVE_ENCHANTED_WEAPONS, true);
+    }
 private:
     uint32 _phase;
+    bool _transitionSceneReached = false;
 };
 struct npc_lord_sanguinar : public ScriptedAI
 {
@@ -1070,7 +1076,7 @@ class spell_kaelthas_kael_phase_two : public SpellScript
 
     bool Load() override
     {
-        if (GetCaster()->GetTypeId() == TYPEID_UNIT)
+        if (GetCaster()->IsCreature())
             if (InstanceScript* instance = GetCaster()->GetInstanceScript())
                 if (Creature* kael = instance->GetCreature(DATA_KAELTHAS))
                     kael->AI()->SummonedCreatureDies(GetCaster()->ToCreature(), nullptr);
@@ -1188,7 +1194,7 @@ class spell_kaelthas_flame_strike : public AuraScript
 
     bool Load() override
     {
-        return GetUnitOwner()->GetTypeId() == TYPEID_UNIT;
+        return GetUnitOwner()->IsCreature();
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1270,7 +1276,7 @@ class spell_kaelthas_nether_beam : public SpellScript
         for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
         {
             Unit* target = ObjectAccessor::GetUnit(*GetCaster(), (*itr)->getUnitGuid());
-            if (target && target->GetTypeId() == TYPEID_PLAYER)
+            if (target && target->IsPlayer())
                 targetList.push_back(target);
         }
 
@@ -1321,6 +1327,52 @@ class spell_kael_pyroblast : public SpellScript
     }
 };
 
+class spell_kaelthas_remove_enchanted_weapons : public SpellScript
+{
+    PrepareSpellScript(spell_kaelthas_remove_enchanted_weapons);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+        if (!target || !target->IsPlayer())
+            return;
+        TriggerCastFlags triggerFlags = TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+        target->CastSpell((Unit*)nullptr, 39498, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39499, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39500, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39501, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39502, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39503, triggerFlags);
+        target->CastSpell((Unit*)nullptr, 39504, triggerFlags);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_remove_enchanted_weapons::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 36092 - Kael Explodes
+class spell_kaelthas_kael_explodes : public SpellScript
+{
+    PrepareSpellScript(spell_kaelthas_kael_explodes);
+
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        caster->CastSpell((Unit*)nullptr, SPELL_FLOATING_DROWNED, true);
+        // caster->CastSpell((Unit*)nullptr, SPELL_KAEL_STUNNED, true);
+        caster->PlayDirectSound(3320);
+        caster->PlayDirectSound(10845);
+        caster->PlayDirectSound(6539);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_kaelthas_kael_explodes::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 void AddSC_boss_kaelthas()
 {
     RegisterTheEyeAI(boss_kaelthas);
@@ -1339,5 +1391,6 @@ void AddSC_boss_kaelthas()
     RegisterSpellScript(spell_kaelthas_nether_beam);
     RegisterSpellScript(spell_kaelthas_summon_nether_vapor);
     RegisterSpellScript(spell_kael_pyroblast);
+    RegisterSpellScript(spell_kaelthas_remove_enchanted_weapons);
+    RegisterSpellScript(spell_kaelthas_kael_explodes);
 }
-

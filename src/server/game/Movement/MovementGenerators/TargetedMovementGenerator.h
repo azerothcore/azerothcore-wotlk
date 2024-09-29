@@ -39,7 +39,7 @@ class ChaseMovementGenerator : public MovementGeneratorMedium<T, ChaseMovementGe
 {
 public:
     ChaseMovementGenerator(Unit* target, Optional<ChaseRange> range = {}, Optional<ChaseAngle> angle = {})
-        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
+        : TargetedMovementGeneratorBase(target), i_leashExtensionTimer(1500), i_path(nullptr), i_recheckDistance(0), i_recalculateTravel(true), _range(range), _angle(angle) {}
     ~ChaseMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return CHASE_MOTION_TYPE; }
@@ -59,6 +59,7 @@ public:
     bool HasLostTarget(Unit* unit) const { return unit->GetVictim() != this->GetTarget(); }
 
 private:
+    TimeTrackerSmall i_leashExtensionTimer;
     std::unique_ptr<PathGenerator> i_path;
     TimeTrackerSmall i_recheckDistance;
     bool i_recalculateTravel;
@@ -74,8 +75,8 @@ template<class T>
 class FollowMovementGenerator : public MovementGeneratorMedium<T, FollowMovementGenerator<T>>, public TargetedMovementGeneratorBase
 {
 public:
-    FollowMovementGenerator(Unit* target, float range, ChaseAngle angle)
-        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckPredictedDistanceTimer(0), i_recheckPredictedDistance(false), _range(range), _angle(angle) {}
+    FollowMovementGenerator(Unit* target, float range, ChaseAngle angle, bool inheritWalkState)
+        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckPredictedDistanceTimer(0), i_recheckPredictedDistance(false), _range(range), _angle(angle),_inheritWalkState(inheritWalkState) {}
     ~FollowMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }
@@ -106,6 +107,7 @@ private:
     Optional<Position> _lastPredictedPosition;
     float _range;
     ChaseAngle _angle;
+    bool _inheritWalkState;
 };
 
 #endif

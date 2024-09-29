@@ -46,12 +46,13 @@
 #include "Tokenize.h"
 #include "Transport.h"
 #include "Vehicle.h"
-#include "WardenMac.h"
 #include "WardenWin.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSocket.h"
 #include <zlib.h>
+
+#include "BanMgr.h"
 
 namespace
 {
@@ -636,6 +637,9 @@ void WorldSession::LogoutPlayer(bool save)
                     sScriptMgr->OnBattlegroundDesertion(_player, BG_DESERTION_TYPE_INVITE_LOGOUT);
                 }
 
+                if (bgQueueTypeId >= BATTLEGROUND_QUEUE_2v2 && bgQueueTypeId < MAX_BATTLEGROUND_QUEUE_TYPES && _player->IsInvitedForBattlegroundQueueType(bgQueueTypeId))
+                    sScriptMgr->OnBattlegroundDesertion(_player, ARENA_DESERTION_TYPE_INVITE_LOGOUT);
+
                 _player->RemoveBattlegroundQueueId(bgQueueTypeId);
                 sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId).RemovePlayer(_player->GetGUID(), true);
             }
@@ -786,19 +790,14 @@ bool WorldSession::DisallowHyperlinksAndMaybeKick(std::string_view str)
     return false;
 }
 
-void WorldSession::SendNotification(std::string_view str)
-{
-    WorldPacket data(SMSG_NOTIFICATION, str.size() + 1);
-    for (std::string_view line : Acore::Tokenize(str, '\n', true))
-    {
-        data << line.data();
-        SendPacket(&data);
-    }
-}
-
 char const* WorldSession::GetAcoreString(uint32 entry) const
 {
     return sObjectMgr->GetAcoreString(entry, GetSessionDbLocaleIndex());
+}
+
+std::string const* WorldSession::GetModuleString(std::string module, uint32 id) const
+{
+    return sObjectMgr->GetModuleString(module, id, GetSessionDbLocaleIndex());
 }
 
 void WorldSession::Handle_NULL(WorldPacket& null)
@@ -992,7 +991,7 @@ void WorldSession::ReadMovementInfo(WorldPacket& data, MovementInfo* mi)
     if (mi->HasMovementFlag(MOVEMENTFLAG_SPLINE_ELEVATION))
         data >> mi->splineElevation;
 
-    //! Anti-cheat checks. Please keep them in seperate if() blocks to maintain a clear overview.
+    //! Anti-cheat checks. Please keep them in seperate if () blocks to maintain a clear overview.
     //! Might be subject to latency, so just remove improper flags.
 #ifdef ACORE_DEBUG
 #define REMOVE_VIOLATING_FLAGS(check, maskToRemove) \

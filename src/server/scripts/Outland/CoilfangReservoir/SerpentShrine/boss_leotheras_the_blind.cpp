@@ -460,4 +460,3 @@ void AddSC_boss_leotheras_the_blind()
     RegisterSpellScript(spell_leotheras_demon_link);
     RegisterSpellScript(spell_leotheras_clear_consuming_madness);
 }
-

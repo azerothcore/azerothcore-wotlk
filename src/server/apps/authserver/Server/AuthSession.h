@@ -112,7 +112,7 @@ private:
 struct AuthHandler
 {
     AuthStatus status;
-    size_t packetSize;
+    std::size_t packetSize;
     bool (AuthSession::* handler)();
 };
 

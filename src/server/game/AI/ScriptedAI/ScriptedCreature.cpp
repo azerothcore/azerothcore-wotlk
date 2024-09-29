@@ -190,8 +190,7 @@ bool SummonList::IsAnyCreatureInCombat() const
 }
 
 ScriptedAI::ScriptedAI(Creature* creature) : CreatureAI(creature),
-    me(creature),
-    IsFleeing(false)
+    me(creature)
 {
     _isHeroic = me->GetMap()->IsHeroic();
     _difficulty = Difficulty(me->GetMap()->GetSpawnMode());
@@ -523,17 +522,33 @@ void ScriptedAI::SetEquipmentSlots(bool loadDefault, int32 mainHand /*= EQUIP_NO
     if (loadDefault)
     {
         me->LoadEquipment(me->GetOriginalEquipmentId(), true);
+        if (me->HasWeapon(OFF_ATTACK))
+            me->SetCanDualWield(true);
+        else
+            me->SetCanDualWield(false);
         return;
     }
 
     if (mainHand >= 0)
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 0, uint32(mainHand));
+    {
+        me->SetVirtualItem(0, uint32(mainHand));
+        me->UpdateDamagePhysical(BASE_ATTACK);
+    }
 
     if (offHand >= 0)
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 1, uint32(offHand));
+    {
+        me->SetVirtualItem(1, uint32(offHand));
+        if (offHand >= 1)
+            me->SetCanDualWield(true);
+        else
+            me->SetCanDualWield(false);
+    }
 
     if (ranged >= 0)
-        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + 2, uint32(ranged));
+    {
+        me->SetVirtualItem(2, uint32(ranged));
+        me->UpdateDamagePhysical(RANGED_ATTACK);
+    }
 }
 
 enum eNPCs
@@ -668,7 +683,7 @@ void BossAI::TeleportCheaters()
     ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
         if (Unit* target = (*itr)->getTarget())
-            if (target->GetTypeId() == TYPEID_PLAYER && !IsInBoundary(target))
+            if (target->IsPlayer() && !IsInBoundary(target))
                 target->NearTeleportTo(x, y, z, 0);
 }
 
@@ -720,9 +735,18 @@ void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*
 {
     if (!_healthCheckEvents.empty())
     {
+        for (auto& check : _healthCheckEvents)
+        {
+            if (check._valid && me->HealthBelowPctDamaged(check._healthPct, damage))
+            {
+                check._exec();
+                check._valid = false;
+            }
+        }
+
         _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
         {
-            return _ProccessHealthCheckEvent(data._healthPct, damage, data._exec);
+            return !data._valid;
         });
     }
 }
@@ -744,17 +768,6 @@ void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, st
     {
         _healthCheckEvents.push_back(HealthCheckEventData(checks, exec));
     }
-}
-
-bool BossAI::_ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const
-{
-    if (me->HealthBelowPctDamaged(healthPct, damage))
-    {
-        exec();
-        return true;
-    }
-
-    return false;
 }
 
 // WorldBossAI - for non-instanced bosses

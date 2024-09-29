@@ -976,15 +976,15 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_TELEPORT_TIMEOUT_FAR]              = sConfigMgr->GetOption<int32>("TeleportTimeoutFar", 45); // pussywizard
     _int_configs[CONFIG_MAX_ALLOWED_MMR_DROP]              = sConfigMgr->GetOption<int32>("MaxAllowedMMRDrop", 500); // pussywizard
     _bool_configs[CONFIG_ENABLE_LOGIN_AFTER_DC]            = sConfigMgr->GetOption<bool>("EnableLoginAfterDC", true); // pussywizard
-    _bool_configs[CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS] = sConfigMgr->GetOption<bool>("DontCacheRandomMovementPaths", true); // pussywizard
+    _bool_configs[CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS] = sConfigMgr->GetOption<bool>("DontCacheRandomMovementPaths", false);
 
     _int_configs[CONFIG_SKILL_CHANCE_ORANGE] = sConfigMgr->GetOption<int32>("SkillChance.Orange", 100);
     _int_configs[CONFIG_SKILL_CHANCE_YELLOW] = sConfigMgr->GetOption<int32>("SkillChance.Yellow", 75);
     _int_configs[CONFIG_SKILL_CHANCE_GREEN]  = sConfigMgr->GetOption<int32>("SkillChance.Green", 25);
     _int_configs[CONFIG_SKILL_CHANCE_GREY]   = sConfigMgr->GetOption<int32>("SkillChance.Grey", 0);
 
-    _int_configs[CONFIG_SKILL_CHANCE_MINING_STEPS]     = sConfigMgr->GetOption<int32>("SkillChance.MiningSteps", 75);
-    _int_configs[CONFIG_SKILL_CHANCE_SKINNING_STEPS]   = sConfigMgr->GetOption<int32>("SkillChance.SkinningSteps", 75);
+    _int_configs[CONFIG_SKILL_CHANCE_MINING_STEPS]     = sConfigMgr->GetOption<int32>("SkillChance.MiningSteps", 0);
+    _int_configs[CONFIG_SKILL_CHANCE_SKINNING_STEPS]   = sConfigMgr->GetOption<int32>("SkillChance.SkinningSteps", 0);
 
     _bool_configs[CONFIG_SKILL_PROSPECTING] = sConfigMgr->GetOption<bool>("SkillChance.Prospecting", false);
     _bool_configs[CONFIG_SKILL_MILLING]     = sConfigMgr->GetOption<bool>("SkillChance.Milling", false);
@@ -1086,7 +1086,7 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_SILENTLY_GM_JOIN_TO_CHANNEL] = sConfigMgr->GetOption<bool>("Channel.SilentlyGMJoin", false);
 
     _bool_configs[CONFIG_TALENTS_INSPECTING]                = sConfigMgr->GetOption<bool>("TalentsInspecting", true);
-    _bool_configs[CONFIG_CHAT_FAKE_MESSAGE_PREVENTING]      = sConfigMgr->GetOption<bool>("ChatFakeMessagePreventing", false);
+    _bool_configs[CONFIG_CHAT_FAKE_MESSAGE_PREVENTING]      = sConfigMgr->GetOption<bool>("ChatFakeMessagePreventing", true);
     _int_configs[CONFIG_CHAT_STRICT_LINK_CHECKING_SEVERITY] = sConfigMgr->GetOption<int32>("ChatStrictLinkChecking.Severity", 0);
     _int_configs[CONFIG_CHAT_STRICT_LINK_CHECKING_KICK]     = sConfigMgr->GetOption<int32>("ChatStrictLinkChecking.Kick", 0);
 
@@ -1112,6 +1112,7 @@ void World::LoadConfigSettings(bool reload)
     _float_configs[CONFIG_LISTEN_RANGE_TEXTEMOTE] = sConfigMgr->GetOption<float>("ListenRange.TextEmote", 25.0f);
     _float_configs[CONFIG_LISTEN_RANGE_YELL]      = sConfigMgr->GetOption<float>("ListenRange.Yell", 300.0f);
 
+    _int_configs[CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS]        = sConfigMgr->GetOption<uint32>("Battleground.Override.LowLevels.MinPlayers", 0);
     _bool_configs[CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG]           = sConfigMgr->GetOption<bool>("Battleground.DisableQuestShareInBG", false);
     _bool_configs[CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG]           = sConfigMgr->GetOption<bool>("Battleground.DisableReadyCheckInBG", false);
     _bool_configs[CONFIG_BATTLEGROUND_CAST_DESERTER]                       = sConfigMgr->GetOption<bool>("Battleground.CastDeserter", true);
@@ -1171,10 +1172,10 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_POINTS]              = sConfigMgr->GetOption<bool>("Arena.AutoDistributePoints", false);
     _int_configs[CONFIG_ARENA_AUTO_DISTRIBUTE_INTERVAL_DAYS]        = sConfigMgr->GetOption<uint32>("Arena.AutoDistributeInterval", 7); // pussywizard: spoiled by implementing constant day and hour, always 7 now
     _int_configs[CONFIG_ARENA_GAMES_REQUIRED]                       = sConfigMgr->GetOption<uint32>("Arena.GamesRequired", 10);
-    _int_configs[CONFIG_ARENA_SEASON_ID]                            = sConfigMgr->GetOption<uint32>("Arena.ArenaSeason.ID", 1);
+    _int_configs[CONFIG_ARENA_SEASON_ID]                            = sConfigMgr->GetOption<uint32>("Arena.ArenaSeason.ID", 8);
     _int_configs[CONFIG_ARENA_START_RATING]                         = sConfigMgr->GetOption<uint32>("Arena.ArenaStartRating", 0);
     _int_configs[CONFIG_LEGACY_ARENA_POINTS_CALC]                   = sConfigMgr->GetOption<uint32>("Arena.LegacyArenaPoints", 0);
-    _int_configs[CONFIG_ARENA_START_PERSONAL_RATING]                = sConfigMgr->GetOption<uint32>("Arena.ArenaStartPersonalRating", 1000);
+    _int_configs[CONFIG_ARENA_START_PERSONAL_RATING]                = sConfigMgr->GetOption<uint32>("Arena.ArenaStartPersonalRating", 0);
     _int_configs[CONFIG_ARENA_START_MATCHMAKER_RATING]              = sConfigMgr->GetOption<uint32>("Arena.ArenaStartMatchmakerRating", 1500);
     _bool_configs[CONFIG_ARENA_SEASON_IN_PROGRESS]                  = sConfigMgr->GetOption<bool>("Arena.ArenaSeason.InProgress", true);
     _float_configs[CONFIG_ARENA_WIN_RATING_MODIFIER_1]              = sConfigMgr->GetOption<float>("Arena.ArenaWinRatingModifier1", 48.0f);
@@ -1265,6 +1266,7 @@ void World::LoadConfigSettings(bool reload)
     _bool_configs[CONFIG_ITEMDELETE_VENDOR]    = sConfigMgr->GetOption<bool>("ItemDelete.Vendor", 0);
     _int_configs[CONFIG_ITEMDELETE_QUALITY]    = sConfigMgr->GetOption<int32>("ItemDelete.Quality", 3);
     _int_configs[CONFIG_ITEMDELETE_ITEM_LEVEL] = sConfigMgr->GetOption<int32>("ItemDelete.ItemLevel", 80);
+    _int_configs[CONFIG_ITEMDELETE_KEEP_DAYS]  = sConfigMgr->GetOption<int32>("ItemDelete.KeepDays", 0);
 
     _int_configs[CONFIG_FFA_PVP_TIMER] = sConfigMgr->GetOption<int32>("FFAPvPTimer", 30);
 
@@ -1315,8 +1317,8 @@ void World::LoadConfigSettings(bool reload)
         LOG_INFO("server.loading", "Using DataDir {}", _dataPath);
     }
 
-    _bool_configs[CONFIG_VMAP_INDOOR_CHECK] = sConfigMgr->GetOption<bool>("vmap.enableIndoorCheck", 0);
     bool enableIndoor = sConfigMgr->GetOption<bool>("vmap.enableIndoorCheck", true);
+    _bool_configs[CONFIG_VMAP_INDOOR_CHECK] = enableIndoor;
     bool enableLOS = sConfigMgr->GetOption<bool>("vmap.enableLOS", true);
     bool enableHeight = sConfigMgr->GetOption<bool>("vmap.enableHeight", true);
     bool enablePetLOS = sConfigMgr->GetOption<bool>("vmap.petLOS", true);
@@ -1330,7 +1332,7 @@ void World::LoadConfigSettings(bool reload)
     VMAP::VMapFactory::createOrGetVMapMgr()->setEnableHeightCalc(enableHeight);
     LOG_INFO("server.loading", "WORLD: VMap support included. LineOfSight:{}, getHeight:{}, indoorCheck:{} PetLOS:{}", enableLOS, enableHeight, enableIndoor, enablePetLOS);
 
-    _bool_configs[CONFIG_PET_LOS]            = sConfigMgr->GetOption<bool>("vmap.petLOS", true);
+    _bool_configs[CONFIG_PET_LOS]            = enablePetLOS;
     _bool_configs[CONFIG_START_CUSTOM_SPELLS] = sConfigMgr->GetOption<bool>("PlayerStart.CustomSpells", false);
     _int_configs[CONFIG_HONOR_AFTER_DUEL]    = sConfigMgr->GetOption<int32>("HonorPointsAfterDuel", 0);
     _bool_configs[CONFIG_START_ALL_EXPLORED] = sConfigMgr->GetOption<bool>("PlayerStart.MapsExplored", false);
@@ -1362,7 +1364,9 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_WARDEN_CLIENT_RESPONSE_DELAY] = sConfigMgr->GetOption<int32>("Warden.ClientResponseDelay", 600);
 
     // Dungeon finder
-    _int_configs[CONFIG_LFG_OPTIONSMASK] = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
+    _int_configs[CONFIG_LFG_OPTIONSMASK]    = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
+
+    _bool_configs[CONFIG_LFG_CAST_DESERTER] = sConfigMgr->GetOption<int32>("DungeonFinder.CastDeserter", true);
 
     // DBC_ItemAttributes
     _bool_configs[CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES] = sConfigMgr->GetOption<bool>("DBC.EnforceItemAttributes", true);
@@ -1541,6 +1545,11 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Acore Strings...");
     if (!sObjectMgr->LoadAcoreStrings())
         exit(1);                                            // Error message displayed in function already
+
+    LOG_INFO("server.loading", "Loading Module Strings...");
+    sObjectMgr->LoadModuleStrings();
+    LOG_INFO("server.loading", "Loading Module Strings Locale...");
+    sObjectMgr->LoadModuleStringsLocale();
 
     ///- Update the realm entry in the database with the realm type from the config file
     //No SQL injection as values are treated as integers
@@ -1788,7 +1797,7 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Quest Greetings...");
     sObjectMgr->LoadQuestGreetings();                               // must be loaded after creature_template, gameobject_template tables
     LOG_INFO("server.loading", "Loading Quest Greeting Locales...");
-    sObjectMgr->LoadQuestGreetingsLocales();                        // must be loaded after creature_template, gameobject_template tables
+    sObjectMgr->LoadQuestGreetingsLocales();                        // must be loaded after creature_template, gameobject_template tables, quest_greeting
 
     LOG_INFO("server.loading", "Loading Quest Money Rewards...");
     sObjectMgr->LoadQuestMoneyRewards();
@@ -2083,6 +2092,9 @@ void World::SetInitialWorldSettings()
 
     // Delete all characters which have been deleted X days before
     Player::DeleteOldCharacters();
+
+    // Delete all items which have been deleted X days before
+    Player::DeleteOldRecoveryItems();
 
     // Delete all custom channels which haven't been used for PreserveCustomChannelDuration days.
     Channel::CleanOldChannelsInDB();
@@ -2577,79 +2589,6 @@ namespace Acore
         va_list* i_args;
     };
 }                                                           // namespace Acore
-
-/// Send a System Message to all players (except self if mentioned)
-void World::SendWorldText(uint32 string_id, ...)
-{
-    va_list ap;
-    va_start(ap, string_id);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-    {
-        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
-            continue;
-
-        wt_do(itr->second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
-void World::SendWorldTextOptional(uint32 string_id, uint32 flag, ...)
-{
-    va_list ap;
-    va_start(ap, flag);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (auto const& itr : _sessions)
-    {
-        if (!itr.second || !itr.second->GetPlayer() || !itr.second->GetPlayer()->IsInWorld())
-        {
-            continue;
-        }
-
-        if (sWorld->getBoolConfig(CONFIG_PLAYER_SETTINGS_ENABLED))
-        {
-            if (itr.second->GetPlayer()->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS).HasFlag(flag))
-            {
-                continue;
-            }
-        }
-
-        wt_do(itr.second->GetPlayer());
-    }
-
-    va_end(ap);
-}
-
-/// Send a System Message to all GMs (except self if mentioned)
-void World::SendGMText(uint32 string_id, ...)
-{
-    va_list ap;
-    va_start(ap, string_id);
-
-    Acore::WorldWorldTextBuilder wt_builder(string_id, &ap);
-    Acore::LocalizedPacketListDo<Acore::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
-    {
-        // Session should have permissions to receive global gm messages
-        WorldSession* session = itr->second;
-        if (!session || AccountMgr::IsPlayerAccount(session->GetSecurity()))
-            continue;
-
-        // Player should be in world
-        Player* player = session->GetPlayer();
-        if (!player || !player->IsInWorld())
-            continue;
-
-        wt_do(session->GetPlayer());
-    }
-
-    va_end(ap);
-}
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
 bool World::SendZoneMessage(uint32 zone, WorldPacket const* packet, WorldSession* self, TeamId teamId)
