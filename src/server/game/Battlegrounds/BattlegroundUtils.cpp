@@ -3,7 +3,7 @@
 
 uint32 GetMinPlayersPerTeam(Battleground* bg, PvPDifficultyEntry const* bracketEntry)
 {
-    // The problem we are trying to solve here is that bg->GetMinPlayersPerTeam() has a different meaning
+    // The problem addressed here is that methods such as bg->GetMinLevel() and bg->GetMaxLevel() have a different meaning
     // according to whether the BG is a template (then it's the value from the `battleground_template` table)
     // or if it's the real BG (then it's the specific bracket minimum level, e.g. "60" for "60-69").
 
