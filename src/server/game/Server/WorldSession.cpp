@@ -668,7 +668,7 @@ void WorldSession::LogoutPlayer(bool save)
         if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
             _player->RepopAtGraveyard();
 
-        // Repop at GraveYard or other player far teleport will prevent saving player because of not present map
+        // Repop at Graveyard or other player far teleport will prevent saving player because of not present map
         // Teleport player immediately for correct player save
         while (_player && _player->IsBeingTeleportedFar())
             HandleMoveWorldportAck();

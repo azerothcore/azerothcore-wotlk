@@ -507,7 +507,7 @@ void BattlegroundEY::EventTeamCapturedPoint(Player* player, TeamId teamId, uint3
 
     _capturePointInfo[point]._ownerTeamId = teamId;
 
-    GraveyardStruct const* sg = sGraveyard->GetGraveyard(m_CapturingPointTypes[point].GraveYardId);
+    GraveyardStruct const* sg = sGraveyard->GetGraveyard(m_CapturingPointTypes[point].GraveyardId);
     AddSpiritGuide(point, sg->x, sg->y, sg->z, 3.124139f, teamId);
 
     UpdatePointsIcons(point);
@@ -609,7 +609,7 @@ GraveyardStruct const* BattlegroundEY::GetClosestGraveyard(Player* player)
     for (uint8 i = 0; i < EY_POINTS_MAX; ++i)
         if (_capturePointInfo[i].IsUnderControl(player->GetTeamId()))
         {
-            entry = sGraveyard->GetGraveyard(m_CapturingPointTypes[i].GraveYardId);
+            entry = sGraveyard->GetGraveyard(m_CapturingPointTypes[i].GraveyardId);
             dist = (entry->x - pX) * (entry->x - pX) + (entry->y - pY) * (entry->y - pY) + (entry->z - pZ) * (entry->z - pZ);
             if (dist < minDist)
             {

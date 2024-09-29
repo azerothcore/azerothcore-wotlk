@@ -75,7 +75,7 @@ bool BattlefieldWG::SetupBattlefield()
 
     m_saveTimer = 60000;
 
-    // Init GraveYards
+    // Init Graveyards
     SetGraveyardNumber(BATTLEFIELD_WG_GRAVEYARD_MAX);
 
     // Load from db
@@ -103,12 +103,12 @@ bool BattlefieldWG::SetupBattlefield()
         BfGraveyardWG* graveyard = new BfGraveyardWG(this);
 
         // When between games, the graveyard is controlled by the defending team
-        if (WGGraveYard[i].startcontrol == TEAM_NEUTRAL)
-            graveyard->Initialize(WGGraveYard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SE || WGGraveYard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SW ? GetAttackerTeam() : m_DefenderTeam, WGGraveYard[i].gyid);
+        if (WGGraveyard[i].startcontrol == TEAM_NEUTRAL)
+            graveyard->Initialize(WGGraveyard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SE || WGGraveyard[i].gyid == BATTLEFIELD_WG_GY_WORKSHOP_SW ? GetAttackerTeam() : m_DefenderTeam, WGGraveyard[i].gyid);
         else
-            graveyard->Initialize(WGGraveYard[i].startcontrol, WGGraveYard[i].gyid);
+            graveyard->Initialize(WGGraveyard[i].startcontrol, WGGraveyard[i].gyid);
 
-        graveyard->SetTextId(WGGraveYard[i].textid);
+        graveyard->SetTextId(WGGraveyard[i].textid);
         m_GraveyardList[i] = graveyard;
     }
 

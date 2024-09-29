@@ -25,9 +25,9 @@ const uint32 EP_AllianceBuffs[4] = {11413, 11414, 11415, 1386};
 
 const uint32 EP_HordeBuffs[4] = {30880, 30683, 30682, 29520};
 
-const uint32 EP_GraveYardZone = 139;
+const uint32 EP_GraveyardZone = 139;
 
-const uint32 EP_GraveYardId = 927;
+const uint32 EP_GraveyardId = 927;
 
 const uint8 EPBuffZonesNum = 3;
 
