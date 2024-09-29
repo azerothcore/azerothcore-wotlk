@@ -86,7 +86,6 @@ enum Misc
     ACTION_AKAMA_START_OUTRO        = 1,
 
     FACTION_DEFAULT                 = 1820,
-    FACTION_MONSTER_SPAR_BUDDY      = 1868,
     FACTION_MONSTER_SPAR            = 1847
 };
 
