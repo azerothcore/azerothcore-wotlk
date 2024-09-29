@@ -105,6 +105,7 @@ struct boss_shade_of_akama : public BossAI
     {
         channelers.clear();
         generators.clear();
+        _engagedPlayerList.clear();
 
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetWalk(true);
@@ -143,6 +144,11 @@ struct boss_shade_of_akama : public BossAI
 
             me->GetCreatureListWithEntryInGrid(channelers, NPC_ASHTONGUE_CHANNELER, 40.0f);
             me->GetCreatureListWithEntryInGrid(generators, NPC_CREATURE_GENERATOR_AKAMA, 100.0f);
+            me->GetMap()->DoForAllPlayers([&](Player* p)
+            {
+                if (me->IsWithinRange(p, 100.0f))
+                    _engagedPlayerList.push_front(p);
+            });
 
             for (Creature* channeler : channelers)
                 channeler->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -156,6 +162,32 @@ struct boss_shade_of_akama : public BossAI
                 {
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MovePoint(POINT_ENGAGE, ShadeEngage);
+                }
+            }, 1200ms);
+            ScheduleTimedEvent(1200ms, [&]
+            {
+                if (!_engagedPlayerList.empty())
+                {
+                    // check if all players are still engaged 
+                    uint8 engagedCounter = 0;
+                    for (Player* p : _engagedPlayerList)
+                    {
+                        if (p->IsEngaged())
+                            engagedCounter++;
+                    }
+                    if (!engagedCounter)
+                    {
+                        // change faction so Akama is attacked
+                        std::list<Creature* > nearbyHostiles;
+                        me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_ROGUE, 100.0f);
+                        me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_ELEMENTAL, 100.0f);
+                        me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_SPIRITBIND, 100.0f);
+                        for (Creature* hostile : nearbyHostiles)
+                        {
+                            hostile->SetFaction(FACTION_DEFENDER);
+                        }
+                        nearbyHostiles.clear();
+                    }
                 }
             }, 1200ms);
         }
@@ -196,8 +228,9 @@ struct boss_shade_of_akama : public BossAI
 
         DoMeleeAttackIfReady();
     }
+private:
+    std::list<Player* > _engagedPlayerList;
 };
-
 
 struct npc_akama_shade : public ScriptedAI
 {
