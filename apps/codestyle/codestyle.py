@@ -31,7 +31,8 @@ def parsing_file(directory: str) -> None:
                         multiple_blank_lines_check(file, file_path)
                         trailing_whitespace_check(file, file_path)
                         get_counter_check(file, file_path)
-                        misc_codestyle_check(file, file_path)
+                        if not file_name.endswith('.cmake') and file_name != 'CMakeLists.txt':
+                            misc_codestyle_check(file, file_path)
                         if file_name != 'Object.h':
                             get_typeid_check(file, file_path)
                         if file_name != 'Unit.h':
@@ -222,6 +223,10 @@ def misc_codestyle_check(file: io, file_path: str) -> None:
         if re.search(r'\bconst\s+\w+\s*\*\b', line):
             print(
                 f"Please use the syntax 'Class/ObjectType const*' instead of 'const Class/ObjectType*': {file_path} at line {line_number}")
+            check_failed = True
+        if [match for match in [' if(', ' if ( '] if match in line]:
+            print(
+                f"AC have as standard: if (XXXX). Please check spaces in your condition': {file_path} at line {line_number}")
             check_failed = True
     # Handle the script error and update the result output
     if check_failed:
