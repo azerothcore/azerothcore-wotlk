@@ -165,7 +165,7 @@ struct boss_shade_of_akama : public BossAI
                     me->GetMotionMaster()->MovePoint(POINT_ENGAGE, ShadeEngage);
                 }
             }, 1200ms);
-            ScheduleTimedEvent(1200ms, [&]
+            ScheduleTimedEvent(5ms, [&]
             {
                 if (!_engagedPlayerList.empty())
                 {
@@ -173,12 +173,13 @@ struct boss_shade_of_akama : public BossAI
                     uint8 engagedCounter = 0;
                     for (Player* p : _engagedPlayerList)
                     {
-                        if (p->IsEngaged())
+                        if (p->IsInCombat())
                             engagedCounter++;
                     }
                     if (!engagedCounter)
                     {
-                        // change faction so Akama is attacked
+                        // change faction so Akama is attacked, and keep doing this as long as akama is alive
+                        // so new creatures also attack him
                         std::list<Creature* > nearbyHostiles;
                         me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_ROGUE, 100.0f);
                         me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_ELEMENTAL, 100.0f);
@@ -188,15 +189,14 @@ struct boss_shade_of_akama : public BossAI
                             for (Creature* hostile : nearbyHostiles)
                             {
                                 hostile->SetFaction(FACTION_DEFENDER);
-                                hostile->SetInCombatWith(akama);
+                                hostile->Attack(akama, true);
                                 
                             }
                         }
                         nearbyHostiles.clear();
-                        _engagedPlayerList.clear();
                     }
                 }
-            }, 1200ms);
+            }, 2s);
         }
     }
 
