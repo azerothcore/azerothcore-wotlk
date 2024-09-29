@@ -20,7 +20,6 @@
 
 #include "FactoryHolder.h"
 #include "GameObjectAI.h"
-#include "ObjectRegistry.h"
 
 typedef FactoryHolder<GameObjectAI, GameObject> GameObjectAICreator;
 

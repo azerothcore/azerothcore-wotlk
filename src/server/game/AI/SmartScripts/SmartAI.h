@@ -18,7 +18,6 @@
 #ifndef ACORE_SMARTAI_H
 #define ACORE_SMARTAI_H
 
-#include "Common.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "GameObjectAI.h"
