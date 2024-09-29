@@ -19,7 +19,6 @@
 #define ACORE_CELL_H
 
 #include "GridDefines.h"
-#include "TypeContainer.h"
 #include "TypeContainerVisitor.h"
 
 class Map;

@@ -21,8 +21,6 @@
 #include "Cell.h"
 #include "Define.h"
 #include "GridDefines.h"
-#include "GridLoader.h"
-#include "TypeList.h"
 
 class ObjectWorldLoader;
 
