@@ -22,6 +22,7 @@
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "World.h"
+#include "WorldStatePackets.h"
 
 class Group;
 class BattlefieldWG;
@@ -404,7 +405,7 @@ public:
 
     void SendInitWorldStatesTo(Player* player);
     void SendInitWorldStatesToAll() override;
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void HandleKill(Player* killer, Unit* victim) override;
     void OnUnitDeath(Unit* unit) override;

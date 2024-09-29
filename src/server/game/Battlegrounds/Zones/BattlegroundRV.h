@@ -90,7 +90,7 @@ public:
     /* inherited from BattlegroundClass */
     void StartingEventOpenDoors() override;
     void Init() override;
-    void FillInitialWorldStates(WorldPacket& d) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
     void HandleAreaTrigger(Player* player, uint32 trigger) override;
     bool SetupBattleground() override;
     bool HandlePlayerUnderMap(Player* player) override;

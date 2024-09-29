@@ -65,7 +65,7 @@ class SpellCastTargets;
 class UpdateMask;
 
 typedef std::deque<Mail*> PlayerMails;
-typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
+typedef void(*bgZoneRef)(Battleground*, WorldPackets::WorldState::InitWorldStates&);
 
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_MAX_DAILY_QUESTS     25

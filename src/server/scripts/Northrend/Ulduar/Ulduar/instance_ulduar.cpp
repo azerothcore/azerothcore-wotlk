@@ -22,6 +22,7 @@
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "WorldPacket.h"
+#include "WorldStatePackets.h"
 #include "ulduar.h"
 
 class instance_ulduar : public InstanceMapScript
@@ -169,10 +170,10 @@ public:
             m_mimironTramUsed       = false;
         }
 
-        void FillInitialWorldStates(WorldPacket& packet) override
+        void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
-            packet << uint32(WORLD_STATE_ALGALON_TIMER_ENABLED) << uint32(m_algalonTimer && m_algalonTimer <= 60);
-            packet << uint32(WORLD_STATE_ALGALON_DESPAWN_TIMER) << uint32(std::min<uint32>(m_algalonTimer, 60));
+            packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_TIMER_ENABLED, (m_algalonTimer && m_algalonTimer <= 60) ? 1 : 0);
+            packet.Worldstates.emplace_back(WORLD_STATE_ALGALON_DESPAWN_TIMER, std::min<int32>(m_algalonTimer, 60));
         }
 
         void OnPlayerEnter(Player* player) override

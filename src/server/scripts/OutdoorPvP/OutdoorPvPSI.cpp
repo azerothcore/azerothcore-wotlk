@@ -28,6 +28,7 @@
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "WorldStatePackets.h"
 
 OutdoorPvPSI::OutdoorPvPSI()
 {
@@ -37,11 +38,11 @@ OutdoorPvPSI::OutdoorPvPSI()
     m_LastController = TEAM_NEUTRAL;
 }
 
-void OutdoorPvPSI::FillInitialWorldStates(WorldPacket& data)
+void OutdoorPvPSI::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    data << SI_GATHERED_A << m_Gathered_A;
-    data << SI_GATHERED_H << m_Gathered_H;
-    data << SI_SILITHYST_MAX << SI_MAX_RESOURCES;
+    packet.Worldstates.emplace_back(SI_GATHERED_A, m_Gathered_A);
+    packet.Worldstates.emplace_back(SI_GATHERED_H, m_Gathered_H);
+    packet.Worldstates.emplace_back(SI_SILITHYST_MAX, SI_MAX_RESOURCES);
 }
 
 void OutdoorPvPSI::SendRemoveWorldStates(Player* player)

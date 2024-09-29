@@ -21,6 +21,7 @@
 #include "SharedDefines.h"
 #include "Util.h"
 #include "ZoneScript.h"
+#include "WorldStatePackets.h"
 #include <array>
 
 class GameObject;
@@ -93,7 +94,7 @@ public:
     explicit OPvPCapturePoint(OutdoorPvP* pvp);
     virtual ~OPvPCapturePoint() = default;
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) { }
 
     // send world state update to all players present
     void SendUpdateWorldState(uint32 field, uint32 value);
@@ -200,7 +201,7 @@ public:
     typedef std::pair<ObjectGuid::LowType, GameObject*> GoScriptPair;
     typedef std::pair<ObjectGuid::LowType, Creature*> CreatureScriptPair;
 
-    virtual void FillInitialWorldStates(WorldPacket& /*data*/) {}
+    virtual void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& /*packet*/) {}
 
     // called when a player triggers an area trigger
     virtual bool HandleAreaTrigger(Player* player, uint32 trigger);

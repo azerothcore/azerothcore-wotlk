@@ -8304,7 +8304,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 packet.Worldstates.emplace_back(2325, 0); // AQ_SANDWORM_E
                 break;
             case 2597: // Alterac Valley
-                if (battleground && battleground->GetTypeID(true) == BATTLEGROUND_AV)
+                if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_AV)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
@@ -8385,7 +8385,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(1325, 1); // AV_AID_A_C
                 }
                 break;
-            case 3277:                                          // Warsong Gulch
+            case 3277: // Warsong Gulch
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_WS)
                     battleground->FillInitialWorldStates(packet);
                 else
@@ -8400,9 +8400,9 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 packet.Worldstates.emplace_back(2339, 1); // alliance (0 - hide, 1 - flag ok, 2 - flag picked up (flashing), 3 - flag picked up (not flashing)
                 }
                 break;
-            case 3358:                                          // Arathi Basin
+            case 3358: // Arathi Basin
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_AB)
-                    battleground->FillInitialWorldStates(data);
+                    battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.emplace_back(1767, 0);    // stables alliance
@@ -8440,7 +8440,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 break;
             case 3820: // Eye of the Storm
-                if (battleground && battleground->GetTypeID(true) == BATTLEGROUND_EY)
+                if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_EY)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
@@ -8608,7 +8608,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 break;
             case 3698: // Nagrand Arena
-                if (battleground && battleground->GetTypeID(true) == BATTLEGROUND_NA)
+                if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_NA)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
@@ -8618,7 +8618,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 break;
             case 3702: // Blade's Edge Arena
-                if (battleground && battleground->GetTypeID(true) == BATTLEGROUND_BE)
+                if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_BE)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
@@ -8628,7 +8628,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 break;
             case 3968: // Ruins of Lordaeron
-                if (battleground && battleground->GetTypeID(true) == BATTLEGROUND_RL)
+                if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_RL)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
@@ -8638,7 +8638,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 break;
             case 4378: // Dalaran Sewers
-                if (battleground && battleground->GetTypeID(true) == BATTLEGROUND_DS)
+                if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_DS)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
@@ -8648,7 +8648,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 break;
             case 4384: // Strand of the Ancients
-                if (battleground && battleground->GetTypeID(true) == BATTLEGROUND_SA)
+                if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_SA)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
@@ -8684,7 +8684,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 break;
             case 4406: // Ring of Valor
-                if (battleground && battleground->GetTypeID(true) == BATTLEGROUND_RV)
+                if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_RV)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
@@ -8694,7 +8694,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 break;
             case 4710: // Isle of Conquest
-                if (battleground && battleground->GetTypeID(true) == BATTLEGROUND_IC)
+                if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_IC)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
@@ -8729,7 +8729,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 }
                 break;
             case 4812: // Icecrown Citadel
-                if (instance && mapid == 631)
+                if (instance && mapId == 631)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
@@ -8798,7 +8798,6 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 {
                     if (CreatureAI* mograineAI = mograine->AI())
                     {
-                        packet.Worldstates.emplace_back(4884, 0);
                         packet.Worldstates.emplace_back(3590, mograineAI->GetData(3590));
                         packet.Worldstates.emplace_back(3591, mograineAI->GetData(3591));
                         packet.Worldstates.emplace_back(3592, mograineAI->GetData(3592));
@@ -8811,7 +8810,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
             case 4197: // Wintergrasp
                 if (battlefield && battlefield->GetTypeId() == BATTLEFIELD_WG)
                 {
-                    battlefield->FillInitialWorldStates(data);
+                    battlefield->FillInitialWorldStates(packet);
                     break;
                 }
                 [[fallthrough]];
@@ -8821,6 +8820,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 packet.Worldstates.emplace_back(2322, 0);
                 packet.Worldstates.emplace_back(2325, 0);
                 break;
+            }
         }
     }
 

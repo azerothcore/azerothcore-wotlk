@@ -191,7 +191,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -217,7 +217,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -243,7 +243,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -269,7 +269,7 @@ public:
 
     void SendChangePhase() override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     // used when player is activated/inactivated in the area
     bool HandlePlayerEnter(Player* player) override;
@@ -298,7 +298,7 @@ public:
 
     bool Update(uint32 diff) override;
 
-    void FillInitialWorldStates(WorldPacket& data) override;
+    void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override;
 
     void SendRemoveWorldStates(Player* player) override;
 
