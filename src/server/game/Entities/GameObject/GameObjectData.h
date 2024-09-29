@@ -18,7 +18,6 @@
 #ifndef GAMEOBJECTDATA_H
 #define GAMEOBJECTDATA_H
 
-#include "Common.h"
 #include "SharedDefines.h"
 #include "WorldPacket.h"
 #include <string>
