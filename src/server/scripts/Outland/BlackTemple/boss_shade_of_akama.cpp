@@ -18,7 +18,6 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
-#include "Player.h"
 #include "black_temple.h"
 #include "PassiveAI.h"
 #include "ScriptedGossip.h"
