@@ -165,7 +165,7 @@ struct boss_shade_of_akama : public BossAI
                     me->GetMotionMaster()->MovePoint(POINT_ENGAGE, ShadeEngage);
                 }
             }, 1200ms);
-            ScheduleTimedEvent(5ms, [&]
+            ScheduleTimedEvent(5s, [&]
             {
                 if (!_engagedPlayerList.empty())
                 {
