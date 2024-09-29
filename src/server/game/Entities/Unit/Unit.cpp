@@ -19769,7 +19769,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         }
     }
 
-
     AddUnitState(UNIT_STATE_MOVE);
 
     if (player)
