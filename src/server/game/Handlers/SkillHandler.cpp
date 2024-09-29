@@ -17,7 +17,6 @@
 
 #include "Log.h"
 #include "Opcodes.h"
-#include "Pet.h"
 #include "Player.h"
 #include "SpellMgr.h"
 #include "WorldPacket.h"

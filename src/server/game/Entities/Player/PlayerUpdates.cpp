@@ -195,7 +195,7 @@ void Player::Update(uint32 p_time)
 
                     // prevent base and off attack in same time, delay attack at
                     // 0.2 sec
-                    if (haveOffhandWeapon())
+                    if (HasOffhandWeaponForAttack())
                         if (getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
                             setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
 
@@ -205,7 +205,7 @@ void Player::Update(uint32 p_time)
                 }
             }
 
-            if (haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
+            if (HasOffhandWeaponForAttack() && isAttackReady(OFF_ATTACK))
             {
                 if (!IsWithinMeleeRange(victim))
                     setAttackTimer(OFF_ATTACK, 100);
