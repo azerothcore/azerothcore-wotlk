@@ -19,7 +19,6 @@
 #define DEF_BLOOD_FURNACE_H
 
 #include "CreatureAIImpl.h"
-#include "Player.h"
 
 #define DataHeader "BF"
 
