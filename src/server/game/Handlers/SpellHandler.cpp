@@ -26,7 +26,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
-#include "TemporarySummon.h"
 #include "Totem.h"
 #include "TotemPackets.h"
 #include "Vehicle.h"
