@@ -28,7 +28,6 @@ EndScriptData */
 #include "CommandScript.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
-#include "Log.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"

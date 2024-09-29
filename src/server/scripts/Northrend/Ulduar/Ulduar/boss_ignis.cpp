@@ -24,7 +24,6 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "Vehicle.h"
 #include "ulduar.h"
 
 #define SPELL_FLAME_JETS_10             62680

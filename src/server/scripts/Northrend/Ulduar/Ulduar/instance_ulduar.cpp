@@ -21,7 +21,6 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
-#include "Vehicle.h"
 #include "WorldPacket.h"
 #include "ulduar.h"
 
