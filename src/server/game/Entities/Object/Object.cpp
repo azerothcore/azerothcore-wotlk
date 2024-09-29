@@ -2783,17 +2783,17 @@ bool WorldObject::GetClosePoint(float& x, float& y, float& z, float size, float 
     return true;
 }
 
-Position WorldObject::GetNearPosition(float dist, float angle)
+Position WorldObject::GetNearPosition(float dist, float angle, bool disableWarning)
 {
     Position pos = GetPosition();
-    MovePosition(pos, dist, angle);
+    MovePosition(pos, dist, angle, disableWarning);
     return pos;
 }
 
-Position WorldObject::GetRandomNearPosition(float radius)
+Position WorldObject::GetRandomNearPosition(float radius, bool disableWarning)
 {
     Position pos = GetPosition();
-    MovePosition(pos, radius * (float) rand_norm(), (float) rand_norm() * static_cast<float>(2 * M_PI));
+    MovePosition(pos, radius * (float) rand_norm(), (float) rand_norm() * static_cast<float>(2 * M_PI), disableWarning);
     return pos;
 }
 
@@ -2831,7 +2831,7 @@ void WorldObject::GetChargeContactPoint(WorldObject const* obj, float& x, float&
     return (m_valuesCount > UNIT_FIELD_COMBATREACH) ? m_floatValues[UNIT_FIELD_COMBATREACH] : DEFAULT_WORLD_OBJECT_SIZE * GetObjectScale();
 }
 
-void WorldObject::MovePosition(Position& pos, float dist, float angle)
+void WorldObject::MovePosition(Position& pos, float dist, float angle, bool disableWarning)
 {
     angle += GetOrientation();
     float destx, desty, destz, ground, floor;
@@ -2841,7 +2841,9 @@ void WorldObject::MovePosition(Position& pos, float dist, float angle)
     // Prevent invalid coordinates here, position is unchanged
     if (!Acore::IsValidMapCoord(destx, desty))
     {
-        LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: {} and Y: {} were passed!", destx, desty);
+        if (!disableWarning)
+            LOG_FATAL("entities.object", "WorldObject::MovePosition invalid coordinates X: {} and Y: {} were passed!", destx, desty);
+
         return;
     }
 
