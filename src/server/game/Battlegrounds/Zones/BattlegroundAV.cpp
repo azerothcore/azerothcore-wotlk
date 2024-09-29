@@ -21,7 +21,6 @@
 #include "GameEventMgr.h"
 #include "GameGraveyard.h"
 #include "GameObject.h"
-#include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "SpellAuras.h"

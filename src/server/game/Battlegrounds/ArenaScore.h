@@ -19,6 +19,7 @@
 #define _ARENA_SCORE_H
 
 #include "BattlegroundScore.h"
+#include "SharedDefines.h"
 #include "StringFormat.h"
 
 struct AC_GAME_API ArenaScore : public BattlegroundScore
