@@ -21,16 +21,13 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "GridNotifiers.h"
-#include "Log.h"
 #include "Map.h"
 #include "MapMgr.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
 #include "Transport.h"
-#include "Vehicle.h"
 
 template<class T>
 void HashMapHolder<T>::Insert(T* o)
