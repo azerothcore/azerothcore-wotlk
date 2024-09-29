@@ -30,7 +30,6 @@
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "DeadlineTimer.h"
-#include "GitRevision.h"
 #include "IPLocation.h"
 #include "IoContext.h"
 #include "Log.h"

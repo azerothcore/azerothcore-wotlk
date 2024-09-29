@@ -20,7 +20,6 @@
 
 #include "Define.h"
 #include "Duration.h"
-#include "Optional.h"
 #include "SQLOperation.h"
 #include <future>
 #include <tuple>
