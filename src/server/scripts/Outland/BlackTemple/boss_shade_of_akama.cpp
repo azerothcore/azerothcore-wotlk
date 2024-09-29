@@ -183,11 +183,17 @@ struct boss_shade_of_akama : public BossAI
                         me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_ROGUE, 100.0f);
                         me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_ELEMENTAL, 100.0f);
                         me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_SPIRITBIND, 100.0f);
-                        for (Creature* hostile : nearbyHostiles)
+                        if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
                         {
-                            hostile->SetFaction(FACTION_DEFENDER);
+                            for (Creature* hostile : nearbyHostiles)
+                            {
+                                hostile->SetFaction(FACTION_DEFENDER);
+                                hostile->SetInCombatWith(akama);
+                                
+                            }
                         }
                         nearbyHostiles.clear();
+                        _engagedPlayerList.clear();
                     }
                 }
             }, 1200ms);
