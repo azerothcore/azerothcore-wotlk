@@ -106,7 +106,6 @@ struct boss_shade_of_akama : public BossAI
     {
         channelers.clear();
         generators.clear();
-        _engagedPlayerList.clear();
 
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         me->SetWalk(true);
@@ -145,11 +144,6 @@ struct boss_shade_of_akama : public BossAI
 
             me->GetCreatureListWithEntryInGrid(channelers, NPC_ASHTONGUE_CHANNELER, 40.0f);
             me->GetCreatureListWithEntryInGrid(generators, NPC_CREATURE_GENERATOR_AKAMA, 100.0f);
-            me->GetMap()->DoForAllPlayers([&](Player* p)
-            {
-                if (!p->IsGameMaster() && me->IsWithinDist(p, 100.0f))
-                    _engagedPlayerList.push_front(p);
-            });
 
             for (Creature* channeler : channelers)
                 channeler->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -165,37 +159,6 @@ struct boss_shade_of_akama : public BossAI
                     me->GetMotionMaster()->MovePoint(POINT_ENGAGE, ShadeEngage);
                 }
             }, 1200ms);
-            ScheduleTimedEvent(5s, [&]
-            {
-                if (!_engagedPlayerList.empty())
-                {
-                    // check if all players are still engaged
-                    uint8 engagedCounter = 0;
-                    for (Player* p : _engagedPlayerList)
-                    {
-                        if (p->IsInCombat())
-                            engagedCounter++;
-                    }
-                    if (!engagedCounter)
-                    {
-                        // change faction so Akama is attacked, and keep doing this as long as akama is alive
-                        // so new creatures also attack him
-                        std::list<Creature* > nearbyHostiles;
-                        me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_ROGUE, 100.0f);
-                        me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_ELEMENTAL, 100.0f);
-                        me->GetCreatureListWithEntryInGrid(nearbyHostiles, NPC_ASHTONGUE_SPIRITBIND, 100.0f);
-                        if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
-                        {
-                            for (Creature* hostile : nearbyHostiles)
-                            {
-                                hostile->SetFaction(FACTION_MONSTER_SPAR);
-                                hostile->Attack(akama, true);
-                            }
-                        }
-                        nearbyHostiles.clear();
-                    }
-                }
-            }, 2s);
         }
     }
 
@@ -234,8 +197,6 @@ struct boss_shade_of_akama : public BossAI
 
         DoMeleeAttackIfReady();
     }
-private:
-    std::list<Player* > _engagedPlayerList;
 };
 
 struct npc_akama_shade : public ScriptedAI
@@ -421,6 +382,7 @@ struct npc_creature_generator_akama : public ScriptedAI
             }
             break;
         default:
+            summon->SetFaction(FACTION_MONSTER_SPAR_BUDDY);
             summon->SetInCombatWithZone();
             if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
                 summon->AI()->AttackStart(akama);
