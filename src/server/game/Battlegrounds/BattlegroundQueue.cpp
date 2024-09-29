@@ -31,6 +31,8 @@
 #include "ScriptMgr.h"
 #include <unordered_map>
 
+#include "BattlegroundUtils.h"
+
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
 /*********************************************************/
@@ -700,24 +702,6 @@ bool BattlegroundQueue::CheckSkirmishForSameFaction(BattlegroundBracketId bracke
 void BattlegroundQueue::UpdateEvents(uint32 diff)
 {
     m_events.Update(diff);
-}
-
-uint32 GetMinPlayersPerTeam(Battleground* bg, PvPDifficultyEntry const* bracketEntry)
-{
-    // The problem is that bg->GetMinPlayersPerTeam() has a different meaning
-    // according to whether the BG is a template (then it's the value from `battleground_template`)
-    // or if it's the real BG (then it's the brack minimum level, e.g. "60" for "60-69"
-
-    if (!bg->isTemplate() || bg->isArena())
-    {
-        return bg->GetMinPlayersPerTeam();
-    }
-
-    auto isMaxLevel = bracketEntry->minLevel == sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
-
-    auto lowLevelsOverride = sWorld->getIntConfig(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS);
-
-    return (lowLevelsOverride && !isMaxLevel) ? lowLevelsOverride : bg->GetMinPlayersPerTeam();
 }
 
 void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId bgTypeId, BattlegroundBracketId bracket_id, uint8 arenaType, bool isRated, uint32 arenaRating)
