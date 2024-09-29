@@ -20,7 +20,6 @@
 
 #include "Errors.h"
 #include "ObjectGuid.h"
-#include "SharedDefines.h"
 
 class WorldPacket;
 
