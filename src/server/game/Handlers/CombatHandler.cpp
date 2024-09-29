@@ -19,7 +19,6 @@
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
-#include "ObjectDefines.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "Vehicle.h"
