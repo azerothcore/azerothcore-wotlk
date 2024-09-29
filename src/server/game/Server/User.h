@@ -1083,7 +1083,6 @@ public:                                                 // opcodes handlers
     void InitializeSession();
     void InitializeSessionCallback(CharacterDatabaseQueryHolder const& realmHolder, uint32 clientCacheVersion);
 
-    void GmResurrectHandler(WDataStore& msg);
     void SendGmResurrectFailure();
     void SendGmResurrectSuccess();
     void SendPlayerNotFoundFailure();

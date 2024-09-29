@@ -62,7 +62,10 @@ static void UserBootMeHandler (User*        user,
                                NETMESSAGE   msgId,
                                uint         eventTime,
                                WDataStore*  msg);
-
+static void UserGmResurrectHandler (User*        user,
+                                    NETMESSAGE   msgId,
+                                    uint         eventTime,
+                                    WDataStore*  msg);
 static void UserWorldTeleportHandler (User*       user,
                                       NETMESSAGE  msgId,
                                       uint        eventTime,
@@ -2042,6 +2045,30 @@ static void UserBootMeHandler (User*        user,
 }
 
 //===========================================================================
+static void UserGmResurrectHandler (User*        user,
+                                    NETMESSAGE   msgId,
+                                    uint         eventTime,
+                                    WDataStore*  msg) {
+
+  // Read the character name from the message buffer
+  char name[256];
+  msg->GetString(name, -1);
+
+  FormatCharacterName(name);
+
+  if (Player* player = ObjectAccessor::FindPlayerByName(name)) {
+    if (player->IsDeadOrGhost()) {
+      player->Resurrect(1.0f);
+      user->SendGmResurrectSuccess();
+    }
+    else
+      user->SendGmResurrectFailure();
+  }
+  else
+    user->SendPlayerNotFoundFailure();
+}
+
+//===========================================================================
 static void UserWorldTeleportHandler (User*       user,
                                       NETMESSAGE  msgId,
                                       uint        eventTime,
@@ -2077,6 +2104,7 @@ void UserInitialize () {
 
   WowConnection::SetMessageHandler(CMSG_BOOTME, UserBootMeHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_WORLD_TELEPORT, UserWorldTeleportHandler, GM_SECURITY);
+  WowConnection::SetMessageHandler(CMSG_GM_RESURRECT, UserGmResurrectHandler, GM_SECURITY);
 
   s_initialized = true;
 }
@@ -2087,6 +2115,7 @@ void UserDestroy () {
 
   WowConnection::ClearMessageHandler(CMSG_BOOTME);
   WowConnection::ClearMessageHandler(CMSG_WORLD_TELEPORT);
+  WowConnection::ClearMessageHandler(CMSG_GM_RESURRECT);
 
   s_initialized = false;
 }

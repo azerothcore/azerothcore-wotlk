@@ -1611,34 +1611,3 @@ void User::HandleUpdateMissileTrajectory(WDataStore& recvPacket)
         HandleMovementOpcodes(recvPacket);
     }
 }
-
-//===========================================================================
-void User::GmResurrectHandler(WDataStore& msg)
-{
-    if (!IsGMAccount()) {
-        SendNotification(LANG_PERMISSION_DENIED);
-        return;
-    }
-
-    // READ THE MESSAGE DATA
-    char name[256];
-    msg.GetString(name, -1);
-
-    FormatCharacterName(name);
-
-    // LOOK FOR A PLAYER OBJECT IN THE WORLD THAT MATCHES THE NAME
-    Player* playerPtr = ObjectAccessor::FindPlayerByName(name);
-    if (!playerPtr) {
-        SendPlayerNotFoundFailure();
-        return;
-    }
-
-    // RESURRECT THE PLAYER
-    if (playerPtr->IsAlive()) {
-        SendGmResurrectFailure();
-    }
-    else {
-        playerPtr->Resurrect(100.0f);
-        SendGmResurrectSuccess();
-    }
-}
