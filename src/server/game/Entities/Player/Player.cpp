@@ -487,6 +487,13 @@ FriendList* Player::FriendListPtr()
     return m_friendListPtr;
 }
 
+//===========================================================================
+bool Player::IsDeadOrGhost() const {
+  if (GetHealth() > 0)
+    return HasPlayerFlag(PLAYER_FLAGS_GHOST);
+  return true;
+}
+
 bool Player::Create(WOWGUID::LowType guidlow, CharacterCreateInfo* createInfo)
 {
     // FIXME: outfitId not used in player creating

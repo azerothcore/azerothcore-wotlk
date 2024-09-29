@@ -1090,6 +1090,7 @@ public:
 
     CHAR_SECURITY_GROUP GetSecurityGroup() const { return m_securityGroup; }
 
+    bool IsDeadOrGhost () const;
     bool IsResting () const { return HasPlayerFlag(PLAYER_FLAGS_RESTING); }
 
     void AddToWorld() override;
