@@ -190,7 +190,6 @@ struct boss_shade_of_akama : public BossAI
                             {
                                 hostile->SetFaction(FACTION_DEFENDER);
                                 hostile->Attack(akama, true);
-                                
                             }
                         }
                         nearbyHostiles.clear();
