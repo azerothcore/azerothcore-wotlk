@@ -342,7 +342,8 @@ public:
     [[nodiscard]] bool isMaxLevel() const
     {
         // NOTE: this only works when the BG is not a template but the real BG
-        return GetMinLevel() == sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+        auto maxPlayerLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+        return GetMinLevel() <= maxPlayerLevel && maxPlayerLevel <= GetMaxLevel();
     }
 
     [[nodiscard]] uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayersPerTeam; }
