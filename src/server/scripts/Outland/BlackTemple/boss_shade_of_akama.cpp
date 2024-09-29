@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
+#include "Player.h"
 #include "black_temple.h"
 #include "PassiveAI.h"
 #include "ScriptedGossip.h"
@@ -146,7 +147,7 @@ struct boss_shade_of_akama : public BossAI
             me->GetCreatureListWithEntryInGrid(generators, NPC_CREATURE_GENERATOR_AKAMA, 100.0f);
             me->GetMap()->DoForAllPlayers([&](Player* p)
             {
-                if (me->IsWithinRange(p, 100.0f))
+                if (!p->IsGameMaster() && me->IsWithinDist(p, 100.0f))
                     _engagedPlayerList.push_front(p);
             });
 
