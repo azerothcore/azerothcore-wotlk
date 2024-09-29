@@ -146,6 +146,7 @@ Battleground::Battleground()
     m_LastResurrectTime = 0;
     m_ArenaType         = 0;
     m_IsArena           = false;
+    m_IsTemplate        = true;
     m_WinnerId          = PVP_TEAM_NEUTRAL;
     m_StartTime         = 0;
     m_ResetStatTimer    = 0;
@@ -1822,6 +1823,7 @@ GraveyardStruct const* Battleground::GetClosestGraveyard(Player* player)
 
 void Battleground::SetBracket(PvPDifficultyEntry const* bracketEntry)
 {
+    m_IsTemplate = false;
     m_BracketId = bracketEntry->GetBracketId();
     SetLevelRange(bracketEntry->minLevel, bracketEntry->maxLevel);
 }
