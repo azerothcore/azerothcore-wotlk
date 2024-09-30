@@ -28,7 +28,6 @@
 #include "SRP6.h"
 #include "Socket.h"
 #include <boost/asio/ip/tcp.hpp>
-#include <memory>
 
 using boost::asio::ip::tcp;
 
