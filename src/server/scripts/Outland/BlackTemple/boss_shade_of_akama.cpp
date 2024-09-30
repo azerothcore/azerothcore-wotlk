@@ -442,7 +442,7 @@ struct npc_creature_generator_akama : public ScriptedAI
             {
                 if (Creature* c = summon->ToCreature())
                     if (c->GetEntry() != NPC_ASHTONGUE_DEFENDER)
-                        c->DespawnOrUnsummon();            
+                        c->DespawnOrUnsummon();
             });
             scheduler.CancelAll();
             break;
