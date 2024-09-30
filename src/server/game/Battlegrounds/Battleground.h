@@ -23,6 +23,7 @@
 #include "DBCEnums.h"
 #include "GameObject.h"
 #include "SharedDefines.h"
+#include "World.h"
 
 class Creature;
 class GameObject;
@@ -344,8 +345,20 @@ public:
     [[nodiscard]] uint32 GetMinLevel() const          { return m_LevelMin; }
     [[nodiscard]] uint32 GetMaxLevel() const          { return m_LevelMax; }
 
+    [[nodiscard]] bool isTemplate() const             { return m_IsTemplate; }
+    [[nodiscard]] bool isMaxLevel() const
+    {
+        // NOTE: this only works when the BG is not a template but the real BG
+        auto maxPlayerLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+        return GetMinLevel() <= maxPlayerLevel && maxPlayerLevel <= GetMaxLevel();
+    }
+
     [[nodiscard]] uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayersPerTeam; }
-    [[nodiscard]] uint32 GetMinPlayersPerTeam() const { return m_MinPlayersPerTeam; }
+    [[nodiscard]] uint32 GetMinPlayersPerTeam() const
+    {
+        auto lowLevelsOverride = sWorld->getIntConfig(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS);
+        return (lowLevelsOverride && !isTemplate() && !isMaxLevel() && !isArena()) ? lowLevelsOverride : m_MinPlayersPerTeam;
+    }
 
     [[nodiscard]] int32 GetStartDelayTime() const     { return m_StartDelayTime; }
     [[nodiscard]] uint8 GetArenaType() const          { return m_ArenaType; }
@@ -695,6 +708,7 @@ private:
     bool   _InBGFreeSlotQueue{ false };                // used to make sure that BG is only once inserted into the BattlegroundMgr.BGFreeSlotQueue[bgTypeId] deque
     bool   m_SetDeleteThis;                             // used for safe deletion of the bg after end / all players leave
     bool   m_IsArena;
+    bool   m_IsTemplate;
     PvPTeamId m_WinnerId;
     int32  m_StartDelayTime;
     bool   m_IsRated;                                   // is this battle rated?
