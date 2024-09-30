@@ -554,26 +554,6 @@ class spell_gen_rallying_cry_of_the_dragonslayer : public SpellScript
     }
 };
 
-// 39953 - A'dal's Song of Battle
-class spell_gen_adals_song_of_battle : public SpellScript
-{
-    PrepareSpellScript(spell_gen_adals_song_of_battle);
-
-    void SelectTarget(std::list<WorldObject*>& targets)
-    {
-        targets.clear();
-        Map::PlayerList const& pList = GetCaster()->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-            if (itr->GetSource()->GetZoneId() == 3703 /*Shattrath*/)
-                targets.push_back(itr->GetSource());
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_gen_adals_song_of_battle::SelectTarget, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ALLY);
-    }
-};
-
 /* 15366 - Songflower Serenade
    22888 - Rallying Cry of the Dragonslayer */
 class spell_gen_disabled_above_63 : public AuraScript
@@ -5329,7 +5309,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_pet_hit_expertise_scalling);
     RegisterSpellScript(spell_gen_grow_flower_patch);
     RegisterSpellScript(spell_gen_rallying_cry_of_the_dragonslayer);
-    RegisterSpellScript(spell_gen_adals_song_of_battle);
     RegisterSpellScript(spell_gen_disabled_above_63);
     RegisterSpellScript(spell_gen_black_magic_enchant);
     RegisterSpellScript(spell_gen_area_aura_select_players);

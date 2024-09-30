@@ -727,8 +727,10 @@ enum SMART_ACTION
     SMART_ACTION_MOVEMENT_STOP                      = 234,    //
     SMART_ACTION_MOVEMENT_PAUSE                     = 235,    // timer
     SMART_ACTION_MOVEMENT_RESUME                    = 236,    // timerOverride
+    SMART_ACTION_SET_WORLD_STATE                    = 237,    // index, value
+    SMART_ACTION_WORLD_SCRIPT                       = 238,    // eventId, param
 
-    SMART_ACTION_AC_END                             = 237,    // placeholder
+    SMART_ACTION_AC_END                             = 239,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1472,6 +1474,18 @@ struct SmartAction
         {
             uint32 timer;
         } move;
+
+        struct
+        {
+            uint32 index;
+            uint32 value;
+        } worldState;
+
+        struct
+        {
+            uint32 eventId;
+            uint32 param;
+        } worldStateScript;
         //! Note for any new future actions
         //! All parameters must have type uint32
 
