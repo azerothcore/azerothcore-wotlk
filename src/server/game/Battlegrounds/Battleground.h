@@ -23,6 +23,7 @@
 #include "DBCEnums.h"
 #include "GameObject.h"
 #include "SharedDefines.h"
+#include "World.h"
 #include "WorldStatePackets.h"
 
 class Creature;

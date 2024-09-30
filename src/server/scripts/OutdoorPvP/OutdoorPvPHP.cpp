@@ -161,7 +161,6 @@ void OutdoorPvPHP::FillInitialWorldStates(WorldPackets::WorldState::InitWorldSta
     packet.Worldstates.emplace_back(HP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
     packet.Worldstates.emplace_back(HP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
 
-
     packet.Worldstates.emplace_back(HP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
     packet.Worldstates.emplace_back(HP_UI_TOWER_SLIDER_DISPLAY, 0);
     packet.Worldstates.emplace_back(HP_UI_TOWER_SLIDER_POS, 50);

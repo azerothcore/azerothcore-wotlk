@@ -8209,7 +8209,6 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     packet.Worldstates.emplace_back(2260, 0); // SCOURGE_EVENT_WORLDSTATE_AZSHARA
     packet.Worldstates.emplace_back(2259, 0); // SCOURGE_EVENT_WORLDSTATE_WINTERSPRING
 
-
     // ARENA_SEASON_IN_PROGRESS
     //   7 - arena season in progress
     //   0 - end of season
