@@ -16415,23 +16415,20 @@ static void PlayerLearnSpellCheatHandler (User*       user,
                                           WDataStore* msg) {
 
   if (Player* plr = user->ActivePlayer()) {
-    // Read the msg data
-    int spellId = msg->read<int>();
-
-    // TODO: Learn all spells if spellId == -1
-
+    auto spellId = msg->read<int>();
+    // LEARN ALL SPELLS IF -1
+    if (spellId == -1) {
+      for (auto itr = sSpellStore.begin(); itr != sSpellStore.end(); ++itr)
+        plr->LearnSpell(itr->Id);
+    }
     SpellEntry const* spell = sSpellStore.LookupEntry(spellId);
+    // IF THE SPELL IS INTERNAL ONLY AND THE PLAYER IS ALLOWED TO CAST IT
+    // THEN TEACH HIM THE REQUIRED INTERNAL SKILL ALSO
     if (spell && spell->AttributesEx7 == SPELL_ATTR7_DEBUG_SPELL &&
         !plr->HasFlag(UNIT_FIELD_FLAGS_2, UNIT_FLAG2_ALLOW_CHEAT_SPELLS)) {
-      // The player is trying to learn a debug spell,
-      // which can only be cast by units with the flag UNIT_FLAG2_ALLOW_CHEAT_SPELLS
-      // to prevent player abuse of internal spells.
-      // Teach them the Internal Knowledge spell to give them the Internal skill,
-      // allowing the casting of debug spells.
-      plr->LearnSpell(36356);
+      plr->LearnSpell(36356); // Internal Knowledge
     }
-
-    // Learn the spell
+    // LEARN THE SPELL
     plr->LearnSpell(spellId);
   }
 }
