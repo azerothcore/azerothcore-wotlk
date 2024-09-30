@@ -360,6 +360,12 @@ struct npc_creature_generator_akama : public ScriptedAI
 
     void Reset() override
     {
+        summons.DoForAllSummons([&](WorldObject* summon)
+        {
+            if (Creature* c = summon->ToCreature())
+                if (c->GetEntry() != NPC_ASHTONGUE_DEFENDER)
+                    c->DespawnOrUnsummon();            
+        });
         scheduler.CancelAll();
     }
 
@@ -380,7 +386,6 @@ struct npc_creature_generator_akama : public ScriptedAI
             }
             break;
         default:
-            summon->SetFaction(FACTION_MONSTER_SPAR_BUDDY);
             summon->SetInCombatWithZone();
             if (Creature* akama = instance->GetCreature(DATA_AKAMA_SHADE))
                 summon->AI()->AttackStart(akama);
