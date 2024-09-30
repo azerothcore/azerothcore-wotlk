@@ -16469,18 +16469,14 @@ static void PlayerLogoutRequestHandler (User*       user,
     LogoutResponse res;
     res.logoutFailed = FALSE;
     res.instantLogout = FALSE;
-
     // THE PLAYER CAN'T LOG OUT WHILE IN COMBAT OR FALLING
     // OR WHILE THEY ARE NOT IN CONTROL OF THEIR CHARACTER
     if (plr->IsInCombat() || plr->IsFalling() || (!plr->CanFreeMove() && !plr->IsOnTaxi()))
       res.logoutFailed = TRUE;
-
     // THE PLAYER CAN LOG OUT INSTANTLY WHILE ON TAXI OR RESTING
     if (plr->IsOnTaxi() || plr->IsResting())
       res.instantLogout = TRUE;
-
     user->SendLogoutResponse(res);
-
     // INITIATE THE CHARACTER LOGOUT PROCESS
     // IF WE SENT A SUCCESSFUL LOGOUT RESPONSE
     if (res.logoutFailed == FALSE)
