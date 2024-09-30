@@ -16388,10 +16388,8 @@ static void PlayerCreateItemCheatHandler (User*       user,
                                           WDataStore* msg) {
 
   if (Player* plr = user->ActivePlayer()) {
-    // READ THE MESSAGE DATA
     auto itemId = msg->read<uint32_t>();
     auto quantity = msg->read<uint32_t>();
-    // CREATE THE ITEM(S)
     plr->CreateItem(itemId, quantity);
   }
 }
@@ -16440,9 +16438,7 @@ static void PlayerLevelCheatHandler (User*        user,
                                      WDataStore*  msg) {
 
   if (Player* plr = user->ActivePlayer()) {
-    // READ THE MESSAGE DATA
     auto level = msg->read<int>();
-    // SET THE PLAYER LEVEL
     plr->SetLevel(level);
   }
 }
