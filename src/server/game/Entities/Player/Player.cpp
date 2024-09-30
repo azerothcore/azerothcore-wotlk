@@ -6230,7 +6230,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             uint32 itemID = sWorld->getIntConfig(CONFIG_PVP_TOKEN_ID);
             int32 count = sWorld->getIntConfig(CONFIG_PVP_TOKEN_COUNT);
 
-            if (CreateItem(itemID, count))
+            if (CreateItem(itemID, count) == BAG_OK)
                 ChatHandler(User()).PSendSysMessage("You have been awarded a token for slaying another player.");
         }
     }
@@ -15590,12 +15590,8 @@ void Player::SendRefundInfo(Item* item)
 }
 
 //===========================================================================
-bool Player::CreateItem(uint32_t const itemId, uint32_t quantity)
-{
-    if (!quantity || !itemId) {
-        return false;
-    }
-    return StoreItemInBag(itemId,quantity) == BAG_OK;
+BAG_RESULT Player::CreateItem(uint32_t const itemId, uint32_t quantity) {
+  return StoreItemInBag(itemId, quantity);
 }
 
 PetStable& Player::GetOrInitPetStable()

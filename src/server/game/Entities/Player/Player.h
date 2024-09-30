@@ -1414,7 +1414,7 @@ public:
     void LoadCorpse(PreparedQueryResult result);
     void LoadPet();
 
-    bool CreateItem(uint32_t itemId, uint32_t quantity);
+    BAG_RESULT CreateItem(uint32_t itemId, uint32_t quantity);
 
     /*********************************************************/
     /***                    GOSSIP SYSTEM                  ***/
