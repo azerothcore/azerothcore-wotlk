@@ -85,10 +85,10 @@ static void PlayerCreateItemCheatHandler (User*       user,
                                           NETMESSAGE  msgId,
                                           uint32_t    eventTime,
                                           WDataStore* msg);
-static void OnGodMode (User*        user,
-                       NETMESSAGE   msgId,
-                       uint         eventTime,
-                       WDataStore*  msg);
+static void PlayerGodModeHandler (User*        user,
+                                  NETMESSAGE   msgId,
+                                  uint         eventTime,
+                                  WDataStore*  msg);
 static void PlayerLearnSpellCheatHandler (User*       user,
                                           NETMESSAGE  msgId,
                                           uint        eventTime,
@@ -130,7 +130,7 @@ void PlayerInitialize () {
   // REGISTER MESSAGE HANDLERS
   WowConnection::SetMessageHandler(CMSG_RECHARGE, PlayerRechargeCheat, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_CREATEITEM, PlayerCreateItemCheatHandler, GM_SECURITY);
-  WowConnection::SetMessageHandler(CMSG_GODMODE, OnGodMode, GM_SECURITY);
+  WowConnection::SetMessageHandler(CMSG_GODMODE, PlayerGodModeHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_LEARN_SPELL, PlayerLearnSpellCheatHandler, GM_SECURITY);
   WowConnection::SetMessageHandler(CMSG_LOGOUT_REQUEST, PlayerLogoutRequestHandler);
   WowConnection::SetMessageHandler(CMSG_LOGOUT_CANCEL, PlayerLogoutCancelHandler);
@@ -16390,10 +16390,10 @@ static void PlayerCreateItemCheatHandler (User*       user,
 }
 
 //===========================================================================
-static void OnGodMode (User*        user,
-                       NETMESSAGE   msgId,
-                       uint         eventTime,
-                       WDataStore*  msg) {
+static void PlayerGodModeHandler (User*        user,
+                                  NETMESSAGE   msgId,
+                                  uint         eventTime,
+                                  WDataStore*  msg) {
 
   if (Player* plr = user->ActivePlayer()) {
     auto enable = msg->read<uint>();
