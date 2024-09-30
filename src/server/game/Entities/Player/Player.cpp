@@ -1790,6 +1790,17 @@ void Player::RemoveFromWorld()
     }
 }
 
+//===========================================================================
+void Player::OnGodMode (BOOL enable) {
+  if (enable)
+    m_cheatFlags |= CHEAT_GODMODE;
+  else
+    m_cheatFlags &= ~CHEAT_GODMODE;
+  WDataStore netMessage(SMSG_GODMODE, sizeof(uchar));
+  netMessage << (uchar)enable;
+  User()->Send(&netMessage);
+}
+
 void Player::RegenerateAll()
 {
     //if (m_regenTimer <= 500)
@@ -16397,16 +16408,7 @@ static void PlayerGodModeHandler (User*        user,
 
   if (Player* plr = user->ActivePlayer()) {
     auto enable = msg->read<uint>();
-
-    if (enable)
-      plr->m_cheatFlags |= CHEAT_GODMODE;
-    else
-      plr->m_cheatFlags &= ~CHEAT_GODMODE;
-
-    // Send the the response message
-    WDataStore netMessage (SMSG_GODMODE, sizeof(uchar));
-    netMessage << (uchar)enable;
-    user->Send(&netMessage);
+    plr->OnGodMode(enable);
   }
 }
 

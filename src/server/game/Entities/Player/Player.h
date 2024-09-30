@@ -1096,6 +1096,8 @@ public:
     void AddToWorld() override;
     void RemoveFromWorld() override;
 
+    void OnGodMode (BOOL enable);
+
     void SetObjectScale(float scale) override
     {
         Unit::SetObjectScale(scale);
