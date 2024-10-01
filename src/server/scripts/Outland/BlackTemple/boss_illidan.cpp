@@ -751,7 +751,7 @@ struct npc_akama_illidan : public ScriptedAI
         {
             me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_2, false);
         }
-        else
+        else if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE)
         {
             me->SetSheath(SHEATH_STATE_UNARMED);
             me->GetMotionMaster()->MovePoint(POINT_FACE_ILLIDAN, FaceIllidan);
