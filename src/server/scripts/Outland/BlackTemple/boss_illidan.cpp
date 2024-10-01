@@ -683,6 +683,8 @@ enum Akama
     NPC_SPIRIT_OF_UDALO           = 23410,
     NPC_ILLIDARI_ELITE            = 23226,
 
+    GOSSIP_ILLIDAN_ENGAGE         = 8713,
+
     PATH_AKAMA_ILLIDARI_COUNCIL_1 = 230891,
     PATH_AKAMA_ILLIDARI_COUNCIL_2 = 230892,
     PATH_AKAMA_ILLIDARI_COUNCIL_3 = 230893,
@@ -741,6 +743,19 @@ struct npc_akama_illidan : public ScriptedAI
         me->SetControlled(false, UNIT_STATE_ROOT);
     }
 
+    void sGossipHello(Player* player) override
+    {
+        if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE)
+        {
+            player->PrepareGossipMenu(me, GOSSIP_ILLIDAN_ENGAGE);
+            player->SendPreparedGossip(me);
+        }
+        else
+        {
+            // don't send gossip menu
+        }
+    }
+
     void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
     {
         CloseGossipMenuFor(player);
@@ -751,7 +766,7 @@ struct npc_akama_illidan : public ScriptedAI
         {
             me->GetMotionMaster()->MovePath(PATH_AKAMA_ILLIDARI_COUNCIL_2, false);
         }
-        else if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE)
+        else
         {
             me->SetSheath(SHEATH_STATE_UNARMED);
             me->GetMotionMaster()->MovePoint(POINT_FACE_ILLIDAN, FaceIllidan);
