@@ -647,6 +647,9 @@ struct boss_illidan_stormrage : public BossAI
     void JustDied(Unit* killer) override
     {
         summons.clear();
+        if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
+            akama->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+
         BossAI::JustDied(killer);
     }
 
@@ -682,8 +685,6 @@ enum Akama
     NPC_SPIRIT_OF_OLUM            = 23411,
     NPC_SPIRIT_OF_UDALO           = 23410,
     NPC_ILLIDARI_ELITE            = 23226,
-
-    GOSSIP_ILLIDAN_ENGAGE         = 8713,
 
     PATH_AKAMA_ILLIDARI_COUNCIL_1 = 230891,
     PATH_AKAMA_ILLIDARI_COUNCIL_2 = 230892,
@@ -743,18 +744,6 @@ struct npc_akama_illidan : public ScriptedAI
         me->SetControlled(false, UNIT_STATE_ROOT);
     }
 
-    void sGossipHello(Player* player) override
-    {
-        if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE)
-        {
-            player->PrepareGossipMenu(me, GOSSIP_ILLIDAN_ENGAGE);
-            player->SendPreparedGossip(me);
-        }
-        else
-        {
-            // don't send gossip menu
-        }
-    }
 
     void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
     {
