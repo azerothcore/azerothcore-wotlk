@@ -27,6 +27,7 @@
 #include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "ScriptedGossip.h"
 #include "SmartAI.h"
 #include "SpellAuraEffects.h"
 #include "SpellScriptLoader.h"
