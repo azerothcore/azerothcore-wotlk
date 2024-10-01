@@ -79,6 +79,7 @@ void Player::Update(uint32 p_time)
 
     // used to implement delayed far teleports
     SetMustDelayTeleport(true);
+    ExecuteSortedCastRequests();
     Unit::Update(p_time);
     SetMustDelayTeleport(false);
 

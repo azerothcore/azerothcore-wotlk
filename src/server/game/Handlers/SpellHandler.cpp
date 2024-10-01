@@ -17,6 +17,7 @@
 
 #include "DBCStores.h"
 #include "GameObjectAI.h"
+#include "Item.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -70,6 +71,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     uint32 glyphIndex;                                      // something to do with glyphs?
     uint32 spellId;                                         // casted spell id
 
+    WorldPacket const copy_packet = recvPacket;
+
     recvPacket >> bagIndex >> slot >> castCount >> spellId >> itemGUID >> glyphIndex >> castFlags;
 
     if (glyphIndex >= MAX_GLYPH_SLOT_INDEX)
@@ -84,6 +87,56 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
         return;
     }
+
+    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+
+    if (!spellInfo)
+    {
+        LOG_ERROR("network.opcode", "WORLD: unknown spell id {}", spellId);
+        recvPacket.rfinish(); // prevent spam at ignore packet
+        return;
+    }
+
+    // fail if we are cancelling pending request
+    if (_player->SpellQueue.size())
+    {
+        // PendingSpellCastRequest* request = _player->GetCastRequest(spellInfo->StartRecoveryCategory);
+        // if (request && request->cancel_in_progress && request->spellId == spellId)
+        // {
+            // LOG_ERROR("sql.sql", "HandleUseItemCode: send equip error");
+            // pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
+            // Spell *spell = new Spell(_player, spellInfo, TRIGGERED_NONE);
+            // spell->m_cast_count = castCount; // set count of casts
+            // spell->m_glyphIndex = glyphIndex;
+            // spell->SendCastResult(SPELL_FAILED_DONT_REPORT);
+            // spell->finish(false);
+            // recvPacket.rfinish();
+            // return;
+        // }
+    }
+
+    PendingSpellCastRequest newRequest
+    {
+        spellId,
+        spellInfo->GetCategory(),
+        recvPacket.ReadPackedTime(),
+        true,
+        {copy_packet},
+        false,
+        castCount,
+        true,
+    };
+
+    // try queue spell if it can't be executed right now
+    // if (!_player->CanExecutePendingSpellCastRequest(&newRequest, true))
+    // {
+        // if (_player->CanRequestSpellCast(spellInfo))
+        // {
+            // _player->RequestSpellCast(newRequest);
+            // LOG_ERROR("sql.sql", "Add item to queue with spellId {} cat {}", spellInfo->Id, spellInfo->GetCategory());
+            // return;
+        // }
+    // }
 
     if (pItem->GetGUID() != itemGUID)
     {
@@ -341,6 +394,12 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
     uint32 spellId;
     uint8  castCount, castFlags;
+
+    if (recvPacket.empty())
+        return;
+
+    WorldPacket copyPacket = recvPacket;
+
     recvPacket >> castCount >> spellId >> castFlags;
     TriggerCastFlags triggerFlag = TRIGGERED_NONE;
 
@@ -363,6 +422,42 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         LOG_ERROR("network.opcode", "WORLD: unknown spell id {}", spellId);
         recvPacket.rfinish(); // prevent spam at ignore packet
         return;
+    }
+
+    // fail if we are cancelling pending request
+    if (_player->SpellQueue.size())
+    {
+        PendingSpellCastRequest& request = _player->SpellQueue.front(); // Peek at the first spell
+        if (request.cancel_in_progress)
+        {
+            Spell *spell = new Spell(_player, spellInfo, TRIGGERED_NONE);
+            spell->m_cast_count = castCount; // set count of casts
+            spell->SendCastResult(SPELL_FAILED_DONT_REPORT);
+            spell->finish(false);
+            recvPacket.rfinish();
+            return;
+        }
+    }
+
+    // try queue spell if it can't be executed right now
+    if (!_player->CanExecutePendingSpellCastRequest(spellInfo, true))
+    {
+        if (_player->CanRequestSpellCast(spellInfo))
+        {
+            PendingSpellCastRequest request
+            {
+                spellId,
+                spellInfo->GetCategory(),
+                recvPacket.ReadPackedTime(),
+                true,
+                copyPacket,
+                false,
+                castCount
+            };
+
+            _player->RequestSpellCast(&request);
+            return;
+        }
     }
 
     // client provided targets
@@ -482,6 +577,8 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
 
     recvPacket.read_skip<uint8>();                          // counter, increments with every CANCEL packet, don't use for now
     recvPacket >> spellId;
+
+    _player->ClearSpellQueue();
 
     _player->InterruptSpell(CURRENT_MELEE_SPELL);
     if (_player->IsNonMeleeSpellCast(false))

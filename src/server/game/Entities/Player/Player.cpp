@@ -1026,6 +1026,9 @@ void Player::setDeathState(DeathState s, bool /*despawn = false*/)
             return;
         }
 
+        // clear all pending spell cast requests when dying
+        ClearSpellQueue();
+
         // drunken state is cleared on death
         SetDrunkValue(0);
         // lost combo points at any target (targeted combo points clear in Unit::setDeathState)
@@ -16364,4 +16367,241 @@ std::string Player::GetDebugInfo() const
 void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
 {
     ChatHandler(GetSession()).SendSysMessage(msg, escapeCharacters);
+}
+
+bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool withoutQueue/* = false*/)
+{
+    // Check gcd
+    GlobalCooldownMgr globalCooldownMgr = GetGlobalCooldownMgr();
+    if (globalCooldownMgr.GetGlobalCooldown(spellInfo) > uint32(0))
+    {
+        if (!SpellQueue.empty())
+        {
+            PendingSpellCastRequest request = SpellQueue.front();
+            if (!withoutQueue) // todo
+                if (globalCooldownMgr.GetGlobalCooldown(spellInfo) > uint32(SPELL_QUEUE_TIME_WINDOW))
+                    CancelSpellCastRequest(&request);
+        }
+        LOG_ERROR("sql.sql", "global cooldown for {} is {}", spellInfo->Id, globalCooldownMgr.GetGlobalCooldown(spellInfo));
+        return false;
+    }
+
+    // Check spell cooldown
+    if (GetSpellCooldownDelay(spellInfo->Id) > (withoutQueue ? 0 : SPELL_QUEUE_TIME_WINDOW))
+        return false;
+
+    // Check spell in progress
+    for (CurrentSpellTypes spellSlot : {CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL})
+        if (Spell* spell = GetCurrentSpell(spellSlot))
+        {
+            bool autoshot = spell->m_spellInfo->IsAutoRepeatRangedSpell();
+            // bool autoshot = spellInfo->IsAutoRepeatRangedSpell();
+            if (IsNonMeleeSpellCast(false, true, true, autoshot))
+                return false;
+        }
+    LOG_ERROR("sql.sql", "CanExecutePendingSpellCastRequest {}) returns true", !withoutQueue);
+    return true;
+}
+
+bool Player::IsSpellQueueEnabled() const
+{
+    // TODO: config
+    return true;
+}
+
+void Player::RequestSpellCast(PendingSpellCastRequest* castRequest)
+{
+    // Remove any existing request of the same category
+    // auto itr = std::find_if(
+        // SpellQueue.begin(), SpellQueue.end(),
+        // [&](const PendingSpellCastRequest& request) {
+            // return request.category == castRequest.category;
+        // });
+
+    // if (itr != SpellQueue.end())
+        // SpellQueue.erase(itr);
+
+    // Add the new request to the end of the queue
+    SpellQueue.push_back(*castRequest);
+}
+
+void Player::CancelSpellCastRequest(PendingSpellCastRequest* request)
+{
+    if (WorldSession* session = GetSession())
+    {
+        request->cancel_in_progress = true;
+        if (request->is_item)
+            session->HandleUseItemOpcode(request->request_packet);
+        else
+            session->HandleCastSpellOpcode(request->request_packet);
+    }
+}
+
+
+void Player::ClearSpellQueue()
+{
+    // if (!SpellQueue.size())
+        // return;
+    // PendingSpellCastRequest request = SpellQueue.front();
+    // CancelSpellCastRequest(&request);
+    SpellQueue.clear(); // Clear all
+}
+
+uint16 Player::GetSpellQueueWindow(bool gcd) const
+{
+    /*
+        This number appears to be a "feeling" issue.
+        When spells are queued against eachother's GCD, the gcd after the queue is sent to the client as more progressed than it actually is.
+
+        This deceives players into thinking their spells are ready without queue, and therefore when spells are queued, it feels like "lag".
+
+        Ex:
+        Queue moonfire at 400 ms before gcd
+        Moonfire executes 10 ms after GCD (100 ms ticks)
+        Moonfire sends an 1100 ms GCD to the client (normally should be 1500)
+        player queues up another moonfire with an apparent 0 ms remaining (1100 ms after the gcd was delivered to them)
+
+        In reality, this queue still 400 ms behind the GCD, and appears to be a 400 ms "lag".
+
+    */
+    uint16 result = SPELL_QUEUE_TIME_WINDOW;
+    if (gcd)
+        result = SPELL_QUEUE_TIME_WINDOW;
+
+    return result;
+}
+
+// PendingSpellCastRequest* Player::GetCastRequest(SpellInfo const* spellInfo) const
+// {
+    // if (spellInfo)
+        // return GetCastRequest(spellInfo->StartRecoveryCategory);
+    // return nullptr;
+// };
+
+// void Player::ClearCastRequest(SpellInfo const* info)
+// {
+        // ClearCastRequest(info->StartRecoveryCategory);
+    // if (info)
+// }
+
+// void Player::ClearCastRequest(uint32 category)
+// {
+    // SpellQueue.erase(category);
+    // todo also destroy the cast struct
+// }
+void Player::ClearSpellRequestByCategory(uint32 category)
+{
+    auto it = std::remove_if(SpellQueue.begin(), SpellQueue.end(),
+        [&](const PendingSpellCastRequest& request)
+        {
+            if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId))
+                return spellInfo->StartRecoveryCategory == category;
+            return false;
+        });
+
+    if (it != SpellQueue.end())
+        SpellQueue.erase(it, SpellQueue.end()); // Remove the cleared spells
+}
+
+const PendingSpellCastRequest* Player::GetCastRequest(uint32 category) const
+{
+    for (const PendingSpellCastRequest& request : SpellQueue)
+    {
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId); spellInfo->StartRecoveryCategory == category)
+            return &request;
+    }
+    return nullptr;
+}
+
+bool Player::CanRequestSpellCast(SpellInfo const* spellInfo) const
+{
+    if (!IsSpellQueueEnabled())
+        return false;
+
+    // Check for existing cast request with the same category
+    if (PendingSpellCastRequest const* castRequest = GetCastRequest(spellInfo->StartRecoveryCategory))
+        return false; // A request with the same category already exists
+
+    if (m_GlobalCooldownMgr.GetGlobalCooldown(spellInfo) > uint32(GetSpellQueueWindow(true)))
+        return false;
+
+    if (GetSpellCooldownDelay(spellInfo->Id) > SPELL_QUEUE_TIME_WINDOW)
+        return false;
+
+    for (CurrentSpellTypes spellSlot : { CURRENT_MELEE_SPELL, CURRENT_GENERIC_SPELL })
+        if (Spell* spell = GetCurrentSpell(spellSlot))
+            if (spell->GetCastTimeRemaining() > static_cast<float>(SPELL_QUEUE_TIME_WINDOW))
+                return false;
+
+    return true;
+}
+
+void Player::ProcessPendingSpellCastRequest(PendingSpellCastRequest* request)
+{
+    WorldPacket packet = request->request_packet;
+    if (packet.empty())
+        return;
+
+    if (WorldSession* session = GetSession())
+    {
+        // AddSameTickQueueBlock(category);
+        if (request->is_item)
+            session->HandleUseItemOpcode(packet);
+        else
+            session->HandleCastSpellOpcode(packet);
+    }
+}
+
+// void Player::RemoveSameTickQueueBlock(uint32 category)
+// {
+//     if (!SameTickBlocks.size())
+//         return;
+//     if (SameTickBlocks.find(category) != SameTickBlocks.end())
+//     {
+//         SameTickBlocks.erase(category);
+//         LOG_ERROR("sql.sql", "removing same tick block from category {} at {}", category, getMSTime());
+//     }
+// }
+
+// void Player::AddSameTickQueueBlock(uint32 category)
+// {
+//     LOG_ERROR("sql.sql", "adding same tick block to category {} at {}", category, getMSTime());
+//     SameTickBlocks[category] = getMSTime();
+// }
+
+// bool Player::HasSameTickQueueBlock(uint32 category, bool ignore_time) const
+// {
+//     if (!SameTickBlocks.size())
+//         return false;
+//     if (SameTickBlocks.find(category) != SameTickBlocks.end())
+//     {
+//         auto block = SameTickBlocks.find(category);
+//         uint32 time = block->second;
+//         if (ignore_time || (GetMSTimeDiffToNow(time) < 140))
+//             return true;
+//     }
+//     return false;
+// }
+
+void Player::ExecuteSortedCastRequests()
+{
+    while (!SpellQueue.empty())
+    {
+        // PendingSpellCastRequest request = SpellQueue.front();
+        auto& request = SpellQueue.front(); // Peek at the first spell
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(request.spellId);
+        if (CanExecutePendingSpellCastRequest(spellInfo))
+        {
+            LOG_ERROR("sql.sql", "Player::ExecuteSortedCastRequests: CanExecute Success");
+            ProcessPendingSpellCastRequest(&request);
+            SpellQueue.pop_front(); // Remove from the queue
+            LOG_ERROR("sql.sql", "Player::ExecuteSortedCastRequests: Processed {}", request.spellId);
+        }
+        else
+        {
+            LOG_ERROR("sql.sql", "Player::ExecuteSortedCastRequests: CanExecute Fail");
+            // If the first spell can't execute, stop processing
+            break;
+        }
+    }
 }

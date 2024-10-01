@@ -4413,6 +4413,13 @@ void Spell::update(uint32 difftime)
         return;
     }
 
+    // TODO: spell q ueue
+    // if (auto info = GetSpellInfo())
+    //     if (auto caster = GetCaster())
+    //         if (auto player = caster->ToPlayer())
+    //             if (player->HasSameTickQueueBlock(info->StartRecoveryCategory, true))
+    //                 player->RemoveSameTickQueueBlock(info->StartRecoveryCategory);
+
     if (m_targets.GetUnitTargetGUID() && !m_targets.GetUnitTarget())
     {
         LOG_DEBUG("spells.aura", "Spell {} is cancelled due to removal of target.", m_spellInfo->Id);

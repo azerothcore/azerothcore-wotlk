@@ -1044,6 +1044,7 @@ struct BGData
     time_t             bgAfkReportedTimer{0};
 };
 
+
 // holder for Entry Point data (pussywizard: stored in db)
 struct EntryPointData
 {
@@ -1058,6 +1059,18 @@ struct EntryPointData
 
     void ClearTaxiPath() { taxiPath.fill(0); }
     [[nodiscard]] bool HasTaxiPath() const { return taxiPath[0] && taxiPath[1]; }
+};
+
+struct PendingSpellCastRequest
+{
+    uint32      spellId;
+    uint32      category;
+    uint32      time_requested;
+    bool        active;
+    WorldPacket request_packet;
+    bool        cancel_in_progress = false;
+    uint32      cast_count;
+    bool        is_item = false;
 };
 
 class Player : public Unit, public GridObject<Player>
@@ -1785,7 +1798,7 @@ public:
     void RemoveSpellCooldown(uint32 spell_id, bool update = false);
     void SendClearCooldown(uint32 spell_id, Unit* target);
 
-    GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
+    GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; };
 
     void RemoveCategoryCooldown(uint32 cat);
     void RemoveArenaSpellCooldowns(bool removeActivePetCooldowns = false);
@@ -2615,6 +2628,58 @@ public:
 
     std::string GetDebugInfo() const override;
 
+    /*********************************************************/
+    /***               SPELL QUEUE SYSTEM                  ***/
+    /*********************************************************/
+
+    // Queues up a spell cast request that has been received via packet and processes it whenever possible.
+    // void RequestSpellCast(std::unique_ptr<SpellCastRequest> castRequest);
+    // void CancelSpellCastRequest();
+
+    //SPELL QUEUEING
+    // A spell can be queued up within 400 milliseconds before global cooldown expires or the cast finishes
+    constexpr static uint16 SPELL_QUEUE_TIME_WINDOW = 1000; // testing
+    // static constexpr uint16 SPELL_QUEUE_TIME_WINDOW = 5000;
+
+    // PendingSpellCastRequest* GetCastRequest(SpellInfo const* spellInfo) const;
+    const PendingSpellCastRequest* GetCastRequest(uint32 category) const;
+    void ClearSpellRequestByCategory(uint32 category);
+    void ClearCastRequest(SpellInfo const* info);
+    void ClearCastRequest(uint32 category);
+
+    // typedef std::map<uint32 /*category*/, PendingSpellCastRequest> PendingCastList;
+    typedef std::deque<PendingSpellCastRequest> PendingCastList;
+    PendingCastList SpellQueue;
+
+    // unused
+    // multi-threading safety
+    // world session and player::update
+    typedef std::map<uint32 /*category*/, uint32 /*time which block was set*/> SameTickQueueBlockList;
+    SameTickQueueBlockList SameTickBlocks;
+    void RemoveSameTickQueueBlock(uint32 category);
+    void AddSameTickQueueBlock(uint32 category);
+    bool HasSameTickQueueBlock(uint32 category, bool ignore_time) const;
+
+    void ExecuteSortedCastRequests();
+
+    uint16 GetSpellQueueWindow(bool gcd = false) const;
+    bool IsSpellQueueEnabled() const;
+    void RequestSpellCast(PendingSpellCastRequest* castRequest);
+    void CancelSpellCastRequest(PendingSpellCastRequest* castRequest);
+    void ClearSpellQueue();
+    bool CanRequestSpellCast(SpellInfo const* spellInfo) const;
+    void ProcessPendingSpellCastRequest(PendingSpellCastRequest* request);
+    bool CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo, bool withoutQueue = false);
+    void ExecutePendingSpellCastRequest();
+
+
+    bool HandleProcTriggerSpell(Unit* victim, uint32 damage, uint32 absorbed, uint32 resisted, uint32 blocked, uint32 armorMitigated, AuraEffect* triggeredByAura, SpellInfo const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown, const uint8 effectMask = MAX_EFFECT_MASK);
+
+    // private:
+    // std::unique_ptr<SpellCastRequest> _pendingSpellCastRequest;
+    // bool ProcessItemCast(SpellCastRequest& castRequest, SpellCastTargets const& targets);
+    // bool CanExecutePendingSpellCastRequest();
+
  protected:
     // Gamemaster whisper whitelist
     WhisperListContainer WhisperList;
@@ -2735,6 +2800,8 @@ public:
     void StopMirrorTimer(MirrorTimerType Type);
     void HandleDrowning(uint32 time_diff);
     int32 getMaxTimer(MirrorTimerType timer);
+
+
 
     /*********************************************************/
     /***                  HONOR SYSTEM                     ***/
@@ -2976,6 +3043,7 @@ private:
     PlayerSettingMap m_charSettingsMap;
 
     Seconds m_creationTime;
+
 };
 
 void AddItemsSetItem(Player* player, Item* item);
