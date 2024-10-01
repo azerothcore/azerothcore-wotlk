@@ -441,7 +441,7 @@ struct npc_creature_generator_akama : public ScriptedAI
             summons.DoForAllSummons([&](WorldObject* summon)
             {
                 if (Creature* c = summon->ToCreature())
-                    if (c->GetEntry() != NPC_ASHTONGUE_DEFENDER || c->GetEntry() != NPC_ASHTONGUE_SORCERER)
+                    if (c->GetEntry() != NPC_ASHTONGUE_DEFENDER && c->GetEntry() != NPC_ASHTONGUE_SORCERER)
                         c->DespawnOrUnsummon();
             });
             break;
