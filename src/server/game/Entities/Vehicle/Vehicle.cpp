@@ -428,16 +428,15 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         init.DisableTransportPathTransformations();
         init.MoveTo(x, y, z, false, true);
         // Xinef: did not found anything unique in dbc, maybe missed something
-        // if (veSeat->m_ID == 3566 || veSeat->m_ID == 3567 || veSeat->m_ID == 3568 || veSeat->m_ID == 3570)
-        // {
-        //     float x = veSeat->m_attachmentOffsetX, y = veSeat->m_attachmentOffsetY, z = veSeat->m_attachmentOffsetZ, o;
-        //     CalculatePassengerPosition(x, y, z, &o);
-        //     init.SetFacing(_me->GetAngle(x, y));
-        // }
-        // else
-        // {
-        init.SetFacing(o);
-        // }
+        if (veSeat->m_ID == 3566 || veSeat->m_ID == 3567 || veSeat->m_ID == 3568 || veSeat->m_ID == 3570)
+        {
+            CalculatePassengerPosition(x, y, z, &o);
+            init.SetFacing(_me->GetAngle(x, y));
+        }
+        else
+        {
+            init.SetFacing(o);
+        }
 
         init.SetTransportEnter();
         init.Launch();
