@@ -744,7 +744,6 @@ struct npc_akama_illidan : public ScriptedAI
         me->SetControlled(false, UNIT_STATE_ROOT);
     }
 
-
     void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
     {
         CloseGossipMenuFor(player);
