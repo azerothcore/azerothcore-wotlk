@@ -736,6 +736,9 @@ struct npc_akama_illidan : public ScriptedAI
         me->SetReactState(REACT_AGGRESSIVE);
         if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE)
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        else
+            // Akama has the gossip flag as standard
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         me->setActive(false);
         summons.DespawnAll();
         DoCastSelf(SPELL_REDUCED_THREAT, true);
