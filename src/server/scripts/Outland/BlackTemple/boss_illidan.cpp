@@ -647,9 +647,6 @@ struct boss_illidan_stormrage : public BossAI
     void JustDied(Unit* killer) override
     {
         summons.clear();
-        if (Creature* akama = instance->GetCreature(DATA_AKAMA_ILLIDAN))
-            akama->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-
         BossAI::JustDied(killer);
     }
 
@@ -737,7 +734,8 @@ struct npc_akama_illidan : public ScriptedAI
         scheduler.CancelAll();
         me->m_Events.KillAllEvents(true);
         me->SetReactState(REACT_AGGRESSIVE);
-        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) != DONE)
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         me->setActive(false);
         summons.DespawnAll();
         DoCastSelf(SPELL_REDUCED_THREAT, true);
