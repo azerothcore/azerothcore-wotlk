@@ -1,3 +1,4 @@
+-- DB update 2024_10_01_01 -> 2024_10_01_02
  -- Rogue, elementalist, spiritbinder
 UPDATE `creature_template` SET `faction` = 16, `VerifiedBuild` = 53788 WHERE `entry` IN (23318, 23523, 23524);
 
