@@ -19,7 +19,6 @@
 #define ACORE_CREATUREAI_H
 
 #include "AreaBoundary.h"
-#include "Common.h"
 #include "Creature.h"
 #include "EventMap.h"
 #include "TaskScheduler.h"
