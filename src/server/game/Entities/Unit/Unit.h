@@ -1065,9 +1065,6 @@ public:
     inline bool HasRangedWeaponForAttack() const { return HasWeaponForAttack(RANGED_ATTACK); }
     [[nodiscard]] bool CanUseAttackType(uint8 attacktype) const
     {
-        if (IsAttackSpeedOverridenShapeShift())
-            return false;
-
         switch (attacktype)
         {
             case BASE_ATTACK:
