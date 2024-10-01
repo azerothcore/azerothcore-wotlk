@@ -3158,8 +3158,9 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
 
             if (m_spellAura)
             {
-                // Prevent aura application if target is immuned
-                if (m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsImmunedToDamageOrSchool(m_spellAura->GetSpellInfo()))
+                // Prevent aura application if target is banished and immuned
+                if (m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsImmunedToDamageOrSchool(m_spellAura->GetSpellInfo())
+                    && m_targets.GetUnitTarget()->HasUnitState(UNIT_STATE_ISOLATED))
                 {
                     m_spellAura->Remove();
                     return SPELL_MISS_IMMUNE;
