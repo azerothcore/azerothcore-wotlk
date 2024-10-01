@@ -36,7 +36,7 @@ class SmartScript
         uint32 var0;
         uint32 var1;
         bool bvar;
-        const SpellInfo* spell;
+        SpellInfo const* spell;
         GameObject* gob;
     };
 
