@@ -18,7 +18,6 @@
 #ifndef _FIELD_H
 #define _FIELD_H
 
-#include "DatabaseEnvFwd.h"
 #include "Define.h"
 #include "Duration.h"
 #include <array>
