@@ -21,7 +21,6 @@
 #include "DatabaseEnvFwd.h"
 #include "Define.h"
 #include <map>
-#include <memory>
 #include <mutex>
 #include <string>
 #include <vector>
