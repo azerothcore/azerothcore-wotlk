@@ -15,7 +15,6 @@
 
 let
   libmysqlclient = callPackage ./libmysqlclient.nix { };
-  libmysqlclient-dev = callPackage ./libmysqlclient-dev.nix { };
 in
 clangStdenv.mkDerivation {
   name = "azerothcore-wotlk";
@@ -56,7 +55,7 @@ clangStdenv.mkDerivation {
     "-DSCRIPTS=static"
     "-DMODULES=static"
     "-DMYSQL_LIBRARY=${libmysqlclient}"
-    "-DMYSQL_INCLUDE_DIR=${libmysqlclient-dev.dev + "/include"}"
+    "-DMYSQL_INCLUDE_DIR=${libmysqlclient.dev + "/include"}"
   ];
 
   buildPhase = ''

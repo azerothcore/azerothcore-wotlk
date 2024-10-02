@@ -1,46 +1,24 @@
 {
   stdenv,
-  fetchurl,
-  autoPatchelfHook,
-  dpkg,
-  libgcc,
-  openssl,
-  zlib,
-  zstd,
+  mysql84,
 }:
 
-stdenv.mkDerivation rec {
-  pname = "libmysqlclient-dev";
-  version = "8.0.39-0ubuntu0.24.04.1";
+stdenv.mkDerivation {
+  pname = "libmysqlclient";
+  version = mysql84.version;
 
-  src = fetchurl {
-    url = "http://security.ubuntu.com/ubuntu/pool/main/m/mysql-8.0/libmysqlclient21_${version}_amd64.deb";
-    hash = "sha256-Gvs6F2cVGHmNxQo7nnFF8D/bn0chQ1KU4ZsgM3eAFl0=";
-  };
+  src = mysql84.src;
 
-  unpackPhase = ''
-    dpkg -x $src .
-  '';
+  buildInputs = mysql84.buildInputs;
 
-  nativeBuildInputs = [
-    autoPatchelfHook
-    dpkg
-    stdenv.cc.cc.lib
+  nativeBuildInputs = mysql84.nativeBuildInputs;
+
+  outputs = [
+    "dev"
+    "out"
   ];
 
-  buildInputs = [
-    libgcc
+  cmakeFlags = [
+    "-DWITHOUT_SERVER=1"
   ];
-
-  propagatedBuildInputs = [
-    openssl
-    zlib
-    zstd
-  ];
-
-  installPhase = ''
-    mkdir $out
-    mv usr/lib/x86_64-linux-gnu/ $out/lib
-    mv usr/share $out/share
-  '';
 }
