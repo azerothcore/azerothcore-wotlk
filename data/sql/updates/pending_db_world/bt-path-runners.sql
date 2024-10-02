@@ -6,5 +6,5 @@ UPDATE `waypoint_data` SET `move_type` = 0 WHERE `id` IN (
 1480190, -- Aqueous Spawn
 1483640, -- Bonechewer Behemoth
 1483630, -- Bonechewer Behemoth
-1483600, -- Bonechewer Behemoth
+1483600 -- Bonechewer Behemoth
 );
