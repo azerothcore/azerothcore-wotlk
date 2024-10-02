@@ -119,13 +119,14 @@
         in
         {
           default = pkgs.mkShell.override { stdenv = pkgs.clangStdenv; } {
-            nativeBuildInputs = with pkgs; [
+            buildInputs = with pkgs; [
               boost
-              cmake
-              openssl
-              libmysqlclient
-              readline
               bzip2
+              cmake
+              libmysqlclient
+              openssl
+              readline
+              zlib
             ];
 
             MYSQL_INCLUDE_DIR = libmysqlclient.dev + "/include";
