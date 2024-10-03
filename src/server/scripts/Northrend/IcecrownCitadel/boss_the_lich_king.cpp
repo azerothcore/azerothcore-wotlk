@@ -946,7 +946,7 @@ public:
                     events.ScheduleEvent(EVENT_QUAKE, 62s + 500ms);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 6s, EVENT_GROUP_ABILITIES);
                     break;
                 case POINT_CENTER_2:
                     me->SetFacingTo(0.0f);
@@ -958,7 +958,7 @@ public:
                     events.ScheduleEvent(EVENT_QUAKE_2, 62s + 500ms);
                     events.ScheduleEvent(EVENT_PAIN_AND_SUFFERING, 3500ms, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 8s, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 4s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, 5s, EVENT_GROUP_ABILITIES);
                     break;
                 default:
                     break;
@@ -1020,7 +1020,7 @@ public:
                     _phase = PHASE_TWO;
                     events.CancelEventGroup(EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_INFEST, 14s, EVENT_GROUP_ABILITIES);
-                    events.ScheduleEvent(EVENT_SUMMON_VALKYR, 20s, EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_VALKYR, 78s, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_SOUL_REAPER, 40s, EVENT_GROUP_ABILITIES);
                     events.ScheduleEvent(EVENT_DEFILE, 38s, EVENT_GROUP_ABILITIES);
 
@@ -1090,9 +1090,9 @@ public:
                     events.ScheduleEvent(EVENT_SUMMON_ICE_SPHERE, 7500ms, EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_SUMMON_RAGING_SPIRIT:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                         me->CastSpell(target, SPELL_RAGING_SPIRIT, false);
-                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 15s : 20s), EVENT_GROUP_ABILITIES);
+                    events.ScheduleEvent(EVENT_SUMMON_RAGING_SPIRIT, (!HealthAbovePct(40) ? 18s : 23s), EVENT_GROUP_ABILITIES);
                     break;
                 case EVENT_DEFILE:
                     {
@@ -2417,7 +2417,7 @@ public:
         ObjectGuid _grabbedPlayer;
         bool didbelow50pct;
         bool dropped;
-        bool grabbed;
+		bool grabbed;
         float _lastSpeed;
         InstanceScript* _instance;
 
@@ -2506,7 +2506,7 @@ public:
                         if (me->GetExactDist(&_destPoint) > 1.5f) // movement was interrupted (probably by a stun, start again)
                         {
                             _events.Reset();
-                            _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 0ms);
+                            _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 500ms);
                             break;
                         }
                         dropped = true;
@@ -2549,7 +2549,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING | UNIT_STATE_STUNNED))
                 return;
 
-            HandleSpeedChangeIfNeeded();
+			HandleSpeedChangeIfNeeded();
 
             switch (_events.ExecuteEvent())
             {
@@ -2561,7 +2561,7 @@ public:
                     }
                     break;
                 case EVENT_MOVE_TO_DROP_POS:
-                    grabbed = true;
+					grabbed = true;
                     _lastSpeed = me->GetSpeed(MOVE_WALK);
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                     me->SetCanFly(false);
@@ -2602,22 +2602,19 @@ public:
                     break;
             }
         }
-
-        // For some reason, when the Valkyr has a slowdown effect, the speed of PointMovementGenerator
+		
+		// For some reason, when the Valkyr has a slowdown effect, the speed of PointMovementGenerator
         // and the speed on the client side differ, which leads to a "teleportation" effect when a stun aura is applied.
         // Restarting the motion master on speed change ensures the movement is synced between the server and client.
         void HandleSpeedChangeIfNeeded()
         {
             if (!grabbed || dropped)
                 return;
-
             if (me->GetSpeed(MOVE_WALK) == _lastSpeed)
                 return;
-
             _lastSpeed = me->GetSpeed(MOVE_WALK);
             me->GetMotionMaster()->Clear();
             me->StopMovingOnCurrentPos();
-
             _events.ScheduleEvent(EVENT_MOVE_TO_DROP_POS, 0);
         }
     };
