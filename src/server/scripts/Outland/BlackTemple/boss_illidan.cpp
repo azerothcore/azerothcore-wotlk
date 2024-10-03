@@ -316,6 +316,7 @@ struct boss_illidan_stormrage : public BossAI
                 DoStopAttack();
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->SetCombatMovement(false);
+                DoResetThreatList();
                 DoCastSelf(SPELL_DEMON_TRANSFORM_1, true);
 
                 me->m_Events.AddEventAtOffset([&] {
