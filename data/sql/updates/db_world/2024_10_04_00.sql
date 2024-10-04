@@ -1,3 +1,4 @@
+-- DB update 2024_10_03_00 -> 2024_10_04_00
 DELETE FROM `spell_linked_spell` WHERE `spell_trigger` IN (-41608, -41609, -41610, -41611, -46837, -46839, -45373);
 INSERT INTO `spell_linked_spell` (`spell_trigger`, `spell_effect`, `type`, `comment`) VALUES
 (-41609, -41607, 0, 'Shattrath Flask of Fortification'),
