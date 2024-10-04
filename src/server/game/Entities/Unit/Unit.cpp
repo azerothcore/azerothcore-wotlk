@@ -5046,15 +5046,19 @@ void Unit::RemoveAurasDueToSpellBySteal(uint32 spellId, WOWGUID casterGUID, Unit
 
 void Unit::RemoveAurasDueToItemSpell(uint32 spellId, WOWGUID castItemGuid)
 {
-    for (AuraApplicationMap::iterator iter = m_appliedAuras.lower_bound(spellId); iter != m_appliedAuras.upper_bound(spellId);)
+    for (auto iter = m_appliedAuras.lower_bound(spellId); iter != m_appliedAuras.upper_bound(spellId); ++iter)
     {
         if (iter->second->GetBase()->GetCastItemGUID() == castItemGuid)
         {
             RemoveAura(iter);
             iter = m_appliedAuras.lower_bound(spellId);
         }
-        else
-            ++iter;
+    }
+
+    for (auto itr = m_ownedAuras.begin(); itr != m_ownedAuras.end(); ++itr)
+    {
+        if (itr->second->GetCastItemGUID() == castItemGuid)
+            RemoveOwnedAura(itr, AURA_REMOVE_BY_DEFAULT);
     }
 }
 
