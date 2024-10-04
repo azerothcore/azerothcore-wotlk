@@ -14518,6 +14518,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
 {
     // death state needs to be updated before RemoveAllAurasOnDeath() calls HandleChannelDeathItem(..) so that
     // it can be used to check creation of death items (such as soul shards).
+    m_deathState = s;
 
     if (s != DeathState::Alive && s != DeathState::JustRespawned)
     {
@@ -14567,8 +14568,6 @@ void Unit::setDeathState(DeathState s, bool despawn)
     {
         RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // clear skinnable for creature and player (at battleground)
     }
-
-    m_deathState = s;
 }
 
 /*########################################
@@ -14576,14 +14575,14 @@ void Unit::setDeathState(DeathState s, bool despawn)
 ########       AGGRO SYSTEM       ########
 ########                          ########
 ########################################*/
-bool Unit::CanHaveThreatList() const
+bool Unit::CanHaveThreatList(bool skipAliveCheck) const
 {
     // only creatures can have threat list
     if (!IsCreature())
         return false;
 
     // only alive units can have threat list
-    if (!IsAlive() || isDying())
+    if (!skipAliveCheck && !IsAlive())
         return false;
 
     // totems can not have threat list
