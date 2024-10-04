@@ -1321,9 +1321,7 @@ struct npc_flame_of_azzinoth : public ScriptedAI
 
                 if (Unit* target = _blade->AI()->SelectTarget(SelectTargetMethod::Random, 0, -40.0f, true))
                 {
-                    if (!offTank)
-                        DoCast(target, SPELL_CHARGE);
-                    else if (offTank != target)
+                    if (!offTank || offTank != target)
                         DoCast(target, SPELL_CHARGE);
                 }
             }
