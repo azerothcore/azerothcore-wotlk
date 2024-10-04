@@ -22,12 +22,7 @@
 #include "Common.h"
 #include "Duration.h"
 #include "ObjectGuid.h"
-#include "QueryResult.h"
 #include "SharedDefines.h"
-#include <atomic>
-#include <list>
-#include <map>
-#include <set>
 #include <unordered_map>
 
 class WorldPacket;

@@ -316,6 +316,7 @@ struct boss_illidan_stormrage : public BossAI
                 DoStopAttack();
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->SetCombatMovement(false);
+                DoResetThreatList();
                 DoCastSelf(SPELL_DEMON_TRANSFORM_1, true);
 
                 me->m_Events.AddEventAtOffset([&] {
@@ -734,7 +735,10 @@ struct npc_akama_illidan : public ScriptedAI
         scheduler.CancelAll();
         me->m_Events.KillAllEvents(true);
         me->SetReactState(REACT_AGGRESSIVE);
-        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) == DONE)
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        else
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         me->setActive(false);
         summons.DespawnAll();
         DoCastSelf(SPELL_REDUCED_THREAT, true);

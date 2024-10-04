@@ -21,11 +21,7 @@
 #include "Define.h"
 #include "GridDefines.h"
 #include "Object.h"
-#include "UpdateData.h"
-#include <mutex>
-#include <set>
 #include <shared_mutex>
-#include <unordered_map>
 
 class Creature;
 class Corpse;

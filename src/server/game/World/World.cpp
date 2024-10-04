@@ -86,7 +86,6 @@
 #include "Util.h"
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
-#include "Vehicle.h"
 #include "Warden.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
