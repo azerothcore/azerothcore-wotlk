@@ -32,8 +32,8 @@ VALUES(28610, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0
 
 INSERT INTO acore_world.creature_text
 (CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
-VALUES(28936, 1, 0, 'You'll be hanging in the gallows shortly, Scourge fiend!', 12, 0, 100.0, 0, 0, 0, 29160, 0, 'crusader SAY_CURSADER1'),
-(28936, 1, 1, 'You'll have to kill me, monster. I will tell you NOTHING!', 12, 0, 100.0, 0, 0, 0, 29142, 0, 'crusader SAY_CURSADER2'),
+VALUES(28936, 1, 0, 'You''ll be hanging in the gallows shortly, Scourge fiend!', 12, 0, 100.0, 0, 0, 0, 29160, 0, 'crusader SAY_CURSADER1'),
+(28936, 1, 1, 'You''ll have to kill me, monster. I will tell you NOTHING!', 12, 0, 100.0, 0, 0, 0, 29142, 0, 'crusader SAY_CURSADER2'),
 (28936, 1, 2, 'You hit like a girl. Honestly. Is that the best you can do?', 12, 0, 100.0, 0, 0, 0, 29146, 0, 'crusader SAY_CURSADER3'),
 (28936, 1, 3, 'ARGH! You burned my last good tabard!', 12, 0, 100.0, 0, 0, 0, 29162, 0, 'crusader SAY_CURSADER4'),
 (28936, 1, 4, 'Argh... The pain... The pain is almost as unbearable as the lashings I received in grammar school when I was but a child.', 12, 0, 100.0, 0, 0, 0, 29143, 0, 'crusader SAY_CURSADER5');
@@ -53,7 +53,7 @@ VALUES(28936, 1, 0, 'You'll be hanging in the gallows shortly, Scourge fiend!', 
 (28936, 8, 1, 'Tell me what you know about "Crimson Dawn" or the beatings will continue!', 12, 0, 100.0, 0, 0, 0, 29134, 0, 'player SAY_PERSUADE2'),
 (28936, 8, 2, 'I''m through being courteous with your kind, human! What is the "Crimson Dawn?"', 12, 0, 100.0, 0, 0, 0, 29135, 0, 'player SAY_PERSUADE3'),
 (28936, 8, 3, 'Is your life worth so little? Just tell me what I need to know about "Crimson Dawn" and I''ll end your suffering quickly.', 12, 0, 100.0, 0, 0, 0, 29139, 0, 'player SAY_PERSUADE4'),
-(28936, 8, 4, 'I can keep this up for a very long time, Scarlet dog! Tell me about the "Crimson Dawn!"', 12, 0, 100.0, 0, 0, 0, 29137, 0, 'player SAY_PERSUADE5'),
+(28936, 8, 4, 'I can keep this up for a very long time, Scarlet dog! Tell me about the "Crimson Dawn!"', 12, 0, 100.0, 0, 0, 0, 29137, 0, 'player SAY_PERSUADE
 (28936, 8, 5, 'What is the "Crimson Dawn?"', 12, 0, 100.0, 0, 0, 0, 29133, 0, 'player SAY_PERSUADE6'),
 (28936, 8, 6, '"Crimson Dawn!" What is it! Speak!', 12, 0, 100.0, 0, 0, 0, 29136, 0, 'player SAY_PERSUADE7');
 
