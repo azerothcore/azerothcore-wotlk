@@ -1316,7 +1316,7 @@ struct npc_flame_of_azzinoth : public ScriptedAI
             {
                 Unit* offTank = nullptr;
 
-                if (Creature* secondBlaze = me->FindNearestCreature(NPC_BLADE_OF_AZZINOTH, 100.0f, true))
+                if (Creature* secondBlaze = me->FindNearestCreature(NPC_BLAZE, 100.0f, true))
                     offTank = secondBlaze->GetVictim();
 
                 if (Unit* target = _blade->AI()->SelectTarget(SelectTargetMethod::Random, 0, -40.0f, true))
