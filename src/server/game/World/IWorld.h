@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "Duration.h"
 #include "ObjectGuid.h"
+#include "QueryHolder.h"
 #include "SharedDefines.h"
 #include <unordered_map>
 
