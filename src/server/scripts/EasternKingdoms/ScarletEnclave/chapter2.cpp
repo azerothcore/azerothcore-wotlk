@@ -124,7 +124,7 @@ public:
                         return;
                     }
 
-                    if (persuaded) 
+                    if (persuaded)
                     {
                         switch (speechCounter)
                         {
