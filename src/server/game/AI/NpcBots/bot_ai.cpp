@@ -7395,7 +7395,7 @@ void bot_ai::OnSpellHit(Unit* caster, SpellInfo const* spell)
         if (auraname == SPELL_AURA_MOUNTED)
         {
             //TC_LOG_ERROR("entities.unit", "OnSpellHit: mount on %s", me->GetName().c_str());
-            if (master->HasAuraType(SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED) ||
+            if (master->HasAuraType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) ||
                 master->HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED))
             {
                 //TC_LOG_ERROR("entities.unit", "OnSpellHit: modding flight speed");
@@ -7408,7 +7408,7 @@ void bot_ai::OnSpellHit(Unit* caster, SpellInfo const* spell)
                     //TC_LOG_ERROR("entities.unit", "OnSpellHit: found aura");
                     for (uint8 j = 0; j != MAX_SPELL_EFFECTS; ++j)
                     {
-                        if (spell->Effects[j].ApplyAuraName != SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED &&
+                        if (spell->Effects[j].ApplyAuraName != SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED &&
                             spell->Effects[j].ApplyAuraName != SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED &&
                             spell->Effects[j].ApplyAuraName != SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED)
                             continue;
@@ -19216,13 +19216,13 @@ void bot_ai::OnBotEnterVehicle(Vehicle const* vehicle)
                 vehTemplate->Movement.Flight == CreatureFlightMovementType::DisableGravity))
             {
                 //hack to use vehicle speed
-                vehicle->GetBase()->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED);
-                vehicle->GetBase()->RemoveAurasByType(SPELL_AURA_MOD_VEHICLE_SPEED_ALWAYS);
-                vehicle->GetBase()->RemoveAurasByType(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK);
+                vehicle->GetBase()->RemoveAurasByType(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
+                vehicle->GetBase()->RemoveAurasByType(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACKING);
+                vehicle->GetBase()->RemoveAurasByType(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_NOT_STACKING);
                 vehicle->GetBase()->RemoveAurasByType(SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK);
-                vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED, true);
-                vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_VEHICLE_SPEED_ALWAYS, true);
-                vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK, true);
+                vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED, true);
+                vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACKING, true);
+                vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_NOT_STACKING, true);
                 vehicle->GetBase()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_MOUNTED_SPEED_NOT_STACK, true);
                 vehicle->GetBase()->SetSpeedRate(MOVE_FLIGHT, oVeh->GetSpeedRate(MOVE_FLIGHT) * 1.17f);
                 vehicle->GetBase()->SetSpeedRate(MOVE_RUN, oVeh->GetSpeedRate(MOVE_FLIGHT) * 1.17f);

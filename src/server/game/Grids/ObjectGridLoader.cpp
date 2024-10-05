@@ -24,7 +24,6 @@
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
-#include "Vehicle.h"
 
 // for loading world object at grid loading (Corpses)
 //TODO: to implement npc on transport, also need to load npcs at grid loading

@@ -57,7 +57,6 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "StringConvert.h"
 #include "TargetedMovementGenerator.h"
 #include "TemporarySummon.h"
 #include "Tokenize.h"
@@ -5330,6 +5329,14 @@ void Unit::RemoveAurasDueToItemSpell(uint32 spellId, ObjectGuid castItemGuid)
             RemoveAura(iter);
             iter = m_appliedAuras.lower_bound(spellId);
         }
+        else
+            ++iter;
+    }
+
+    for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
+    {
+        if (iter->second->GetCastItemGUID() == castItemGuid)
+                RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
         else
             ++iter;
     }
@@ -15174,14 +15181,14 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
             {
                 if (IsCreature() && IsControlledByPlayer()) // not sure if good for pet
                 {
-                    main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED);
-                    stack_bonus     = GetTotalAuraMultiplier(SPELL_AURA_MOD_VEHICLE_SPEED_ALWAYS);
+                    main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
+                    stack_bonus     = GetTotalAuraMultiplier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACKING);
 
                     // for some spells this mod is applied on vehicle owner
                     int32 owner_speed_mod = 0;
 
                     if (Unit* owner = GetCharmer())
-                        owner_speed_mod = owner->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED);
+                        owner_speed_mod = owner->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
 
                     main_speed_mod = std::max(main_speed_mod, owner_speed_mod);
                 }
@@ -15189,11 +15196,14 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 {
                     main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED);
                     stack_bonus     = GetTotalAuraMultiplier(SPELL_AURA_MOD_MOUNTED_FLIGHT_SPEED_ALWAYS);
+                    non_stack_bonus += GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_MOUNTED_NOT_STACKING) / 100.0f;
                 }
                 else             // Use not mount (shapeshift for example) auras (should stack)
-                    main_speed_mod  = GetTotalAuraModifier(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED) + GetTotalAuraModifier(SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED);
-
-                non_stack_bonus += GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACK) / 100.0f;
+                {
+                    main_speed_mod  = GetMaxPositiveAuraModifier(SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
+                    stack_bonus     = GetTotalAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_ALWAYS);
+                    non_stack_bonus += GetMaxPositiveAuraModifier(SPELL_AURA_MOD_FLIGHT_SPEED_NOT_STACKING) / 100.0f;
+                }
 
                 // Update speed for vehicle if available
                 if (IsPlayer() && GetVehicle())
@@ -15423,6 +15433,7 @@ void Unit::setDeathState(DeathState s, bool despawn)
 {
     // death state needs to be updated before RemoveAllAurasOnDeath() calls HandleChannelDeathItem(..) so that
     // it can be used to check creation of death items (such as soul shards).
+    m_deathState = s;
 
     if (s != DeathState::Alive && s != DeathState::JustRespawned)
     {
@@ -15472,8 +15483,6 @@ void Unit::setDeathState(DeathState s, bool despawn)
     {
         RemoveFlag (UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE); // clear skinnable for creature and player (at battleground)
     }
-
-    m_deathState = s;
 }
 
 /*########################################
@@ -15481,14 +15490,14 @@ void Unit::setDeathState(DeathState s, bool despawn)
 ########       AGGRO SYSTEM       ########
 ########                          ########
 ########################################*/
-bool Unit::CanHaveThreatList() const
+bool Unit::CanHaveThreatList(bool skipAliveCheck) const
 {
     // only creatures can have threat list
     if (!IsCreature())
         return false;
 
     // only alive units can have threat list
-    if (!IsAlive() || isDying())
+    if (!skipAliveCheck && !IsAlive())
         return false;
 
     // totems can not have threat list

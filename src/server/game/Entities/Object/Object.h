@@ -426,13 +426,13 @@ public:
     void GetNearPoint(WorldObject const* searcher, float& x, float& y, float& z, float searcher_size, float distance2d, float absAngle, float controlZ = 0, Position const* startPos = nullptr) const;
     void GetVoidClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float relAngle = 0, float controlZ = 0) const;
     bool GetClosePoint(float& x, float& y, float& z, float size, float distance2d = 0, float angle = 0, WorldObject const* forWho = nullptr, bool force = false) const;
-    void MovePosition(Position& pos, float dist, float angle);
-    Position GetNearPosition(float dist, float angle);
+    void MovePosition(Position& pos, float dist, float angle, bool disableWarning = false);
+    Position GetNearPosition(float dist, float angle, bool disableWarning = false);
     void MovePositionToFirstCollision(Position& pos, float dist, float angle) const;
     Position GetFirstCollisionPosition(float startX, float startY, float startZ, float destX, float destY);
     Position GetFirstCollisionPosition(float destX, float destY, float destZ);
     Position GetFirstCollisionPosition(float dist, float angle) const;
-    Position GetRandomNearPosition(float radius);
+    Position GetRandomNearPosition(float radius, bool disableWarning = false);
 
     void GetContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;
     void GetChargeContactPoint(WorldObject const* obj, float& x, float& y, float& z, float distance2d = CONTACT_DISTANCE) const;

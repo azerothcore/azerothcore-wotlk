@@ -20,10 +20,7 @@
 #include "GuildPackets.h"
 #include "Log.h"
 #include "ObjectMgr.h"
-#include "Opcodes.h"
 #include "SocialMgr.h"
-#include "World.h"
-#include "WorldPacket.h"
 #include "WorldSession.h"
 
 void WorldSession::HandleGuildQueryOpcode(WorldPackets::Guild::QueryGuildInfo& query)

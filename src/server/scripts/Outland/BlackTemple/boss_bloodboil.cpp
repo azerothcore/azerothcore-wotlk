@@ -136,7 +136,7 @@ struct boss_gurtogg_bloodboil : public BossAI
 
     bool CanAIAttack(Unit const* who) const override
     {
-        return !who->IsImmunedToDamage(SPELL_SCHOOL_MASK_ALL);
+        return !who->IsImmunedToDamage(SPELL_SCHOOL_MASK_ALL) && !who->HasUnitState(UNIT_STATE_CONFUSED);
     }
 
     void KilledUnit(Unit*  /*victim*/) override

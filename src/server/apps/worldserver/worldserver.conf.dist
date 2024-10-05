@@ -3678,6 +3678,13 @@ Battleground.BerserkingBuffRespawn = 120
 Battleground.SpeedBuffRespawn = 150
 
 #
+#    Battleground.Override.LowLevels.MinPlayers
+#        Description: Overrides the minimum number of required players per team for all levels < MaxPlayerLevel
+#        Default:     0 (Disabled)
+
+Battleground.Override.LowLevels.MinPlayers = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
