@@ -332,7 +332,7 @@ public:
                         const Map::PlayerList& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
-                                if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 70.0f)
+                                if (p->IsAlive() && p->GetDistance(me) < 70.0f)
                                 {
                                     float th = me->GetThreatMgr().getThreatWithoutTemp(p);
                                     if (!target || th > maxThreat)
