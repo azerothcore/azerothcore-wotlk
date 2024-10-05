@@ -29,9 +29,9 @@
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "UpdateMask.h"
 #include "WDataStore.h"
 #include "User.h"
+#include <cmath>
 
 enum StableResultCode
 {

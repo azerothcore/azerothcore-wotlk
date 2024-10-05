@@ -20,9 +20,6 @@
 #include "GuildPackets.h"
 #include "Log.h"
 #include "ObjectMgr.h"
-#include "Opcodes.h"
-#include "World.h"
-#include "WDataStore.h"
 #include "User.h"
 
 void User::HandleGuildQueryOpcode(WorldPackets::Guild::QueryGuildInfo& query)

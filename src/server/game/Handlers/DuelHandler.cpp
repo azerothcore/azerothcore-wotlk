@@ -19,7 +19,6 @@
 #include "Log.h"
 #include "Opcodes.h"
 #include "Player.h"
-#include "UpdateData.h"
 #include "WDataStore.h"
 #include "User.h"
 

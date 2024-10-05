@@ -18,8 +18,6 @@
 #ifndef __ADDONHANDLER_H
 #define __ADDONHANDLER_H
 
-#include "Common.h"
-#include "Config.h"
 #include "WDataStore.h"
 
 class AddonHandler

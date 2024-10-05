@@ -28,7 +28,6 @@
 #include "Pet.h"
 #include "PetPackets.h"
 #include "Player.h"
-#include "QueryHolder.h"
 #include "Spell.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"

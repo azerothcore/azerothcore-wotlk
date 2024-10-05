@@ -52,7 +52,6 @@
 #include "StringConvert.h"
 #include "Tokenize.h"
 #include "Transport.h"
-#include "UpdateMask.h"
 #include "Util.h"
 #include "World.h"
 #include "WDataStore.h"
