@@ -154,12 +154,13 @@ struct boss_attumen : public BossAI
                 if (midnight->GetHealth() > me->GetHealth())
                 {
                     summon->SetHealth(midnight->GetHealth());
+                    summon->SetMaxHealth(midnight->GetHealth());
                 }
                 else
                 {
                     summon->SetHealth(me->GetHealth());
+                    summon->SetMaxHealth(me->GetHealth());
                 }
-                summon->SetMaxHealth(me->GetHealth() + midnight->GetHealth());
                 summon->AI()->DoZoneInCombat();
             }
         }
