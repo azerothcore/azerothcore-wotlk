@@ -214,7 +214,7 @@ const Position validTeleportStairsPos[9] =
     {945.68f, 205.74f, 192.84f}
 };
 
-constexpr float minTeleportDist = 35.f;
+constexpr float minTeleportDist = 30.f;
 constexpr float maxTeleportDist = 50.f;
 
 class spell_mother_shahraz_fatal_attraction : public SpellScript
