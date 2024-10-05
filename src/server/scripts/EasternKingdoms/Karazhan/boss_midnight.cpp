@@ -151,16 +151,8 @@ struct boss_attumen : public BossAI
         {
             if (Creature* midnight = instance->GetCreature(DATA_MIDNIGHT))
             {
-                if (midnight->GetHealth() > me->GetHealth())
-                {
-                    summon->SetHealth(midnight->GetHealth());
-                    summon->SetMaxHealth(midnight->GetHealth());
-                }
-                else
-                {
-                    summon->SetHealth(me->GetHealth());
-                    summon->SetMaxHealth(me->GetHealth());
-                }
+                summon->SetHealth(std::max(midnight->GetHealth(), me->GetHealth()));
+                summon->SetMaxHealth(summon->GetHealth());
                 summon->AI()->DoZoneInCombat();
             }
         }
