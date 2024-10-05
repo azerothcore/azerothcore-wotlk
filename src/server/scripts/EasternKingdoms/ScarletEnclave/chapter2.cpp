@@ -23,7 +23,6 @@
 #include "ScriptedEscortAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include <cstdlib>
 
 //How to win friends and influence enemies
 // texts signed for creature 28939 but used for 28939, 28940, 28610
@@ -93,7 +92,7 @@ public:
                     playerGUID = player->GetGUID();
                     speechTimer = SPEECH_TIMER_DEFAULT;
                     speechCounter = SPEECH_COUNTER_START_SUCCESS_ROLEPLAY;
-                    uint32 persuadeRoll = std::rand() % 10 + 1;
+                    uint32 persuadeRoll = urand(1, 10);
 
                     sCreatureTextMgr->SendChat(me, SAY_PERSUADE_RAND, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
 

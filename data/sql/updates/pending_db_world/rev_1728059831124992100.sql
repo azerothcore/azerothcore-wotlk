@@ -1,4 +1,4 @@
-INSERT INTO acore_world.broadcast_text
+INSERT INTO broadcast_text
 (ID, LanguageID, MaleText, FemaleText, EmoteID1, EmoteID2, EmoteID3, EmoteDelay1, EmoteDelay2, EmoteDelay3, SoundEntriesId, EmotesID, Flags, VerifiedBuild)
 VALUES(77372, 0, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019),
 (77373, 0, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019),
@@ -6,15 +6,15 @@ VALUES(77372, 0, 'Do you think this to be pain? To be suffering? HAH! Destroy th
 (77375, 0, 'That one tickled...', 'That one tickled...', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019),
 (77376, 0, 'I''m going to send you back to the Lich King in pieces!', 'I''m going to send you back to the Lich King in pieces!', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019);
 
-INSERT INTO acore_world.creature_text
+INSERT INTO creature_text
 (CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
 VALUES(28939, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0, 0, 0, 0, 77372, 0, 'crusader SAY_CURSADER7'),
 (28939, 1, 7, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 12, 0, 100.0, 0, 0, 0, 77373, 0, 'crusader SAY_CURSADER8'),
 (28939, 1, 8, 'Look out! There''s a bee loose and it''s on a stinging rampage!', 12, 0, 100.0, 0, 0, 0, 77374, 0, 'crusader SAY_CURSADER9'),
 (28939, 1, 9, 'That one tickled...', 12, 0, 100.0, 0, 0, 0, 77375, 0, 'crusader SAY_CURSADER10'),
-(28939, 1, 10, 'I''m going to send you back to the Lich King in pieces!', 12, 0, 100.0, 0, 0, 0, 6, 0, 'crusader SAY_CURSADER11');
+(28939, 1, 10, 'I''m going to send you back to the Lich King in pieces!', 12, 0, 100.0, 0, 0, 0, 77376, 0, 'crusader SAY_CURSADER11');
 
-INSERT INTO acore_world.creature_text
+INSERT INTO creature_text
 (CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
 VALUES(28940, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0, 0, 0, 0, 77372, 0, 'crusader SAY_CURSADER7'),
 (28940, 1, 7, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 12, 0, 100.0, 0, 0, 0, 77373, 0, 'crusader SAY_CURSADER8'),
@@ -22,7 +22,7 @@ VALUES(28940, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0
 (28940, 1, 9, 'That one tickled...', 12, 0, 100.0, 0, 0, 0, 77375, 0, 'crusader SAY_CURSADER10'),
 (28940, 1, 10, 'I''m going to send you back to the Lich King in pieces!', 12, 0, 100.0, 0, 0, 0, 77376, 0, 'crusader SAY_CURSADER11');
 
-INSERT INTO acore_world.creature_text
+INSERT INTO creature_text
 (CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
 VALUES(28610, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0, 0, 0, 0, 77372, 0, 'crusader SAY_CURSADER7'),
 (28610, 1, 7, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 12, 0, 100.0, 0, 0, 0, 77373, 0, 'crusader SAY_CURSADER8'),
@@ -30,7 +30,7 @@ VALUES(28610, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0
 (28610, 1, 9, 'That one tickled...', 12, 0, 100.0, 0, 0, 0, 77375, 0, 'crusader SAY_CURSADER10'),
 (28610, 1, 10, 'I''m going to send you back to the Lich King in pieces!', 12, 0, 100.0, 0, 0, 0, 77376, 0, 'crusader SAY_CURSADER11');
 
-INSERT INTO acore_world.creature_text
+INSERT INTO creature_text
 (CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
 VALUES(28936, 1, 0, 'You''ll be hanging in the gallows shortly, Scourge fiend!', 12, 0, 100.0, 0, 0, 0, 29160, 0, 'crusader SAY_CURSADER1'),
 (28936, 1, 1, 'You''ll have to kill me, monster. I will tell you NOTHING!', 12, 0, 100.0, 0, 0, 0, 29142, 0, 'crusader SAY_CURSADER2'),
