@@ -1,35 +1,3 @@
-INSERT INTO broadcast_text
-(ID, LanguageID, MaleText, FemaleText, EmoteID1, EmoteID2, EmoteID3, EmoteDelay1, EmoteDelay2, EmoteDelay3, SoundEntriesId, EmotesID, Flags, VerifiedBuild)
-VALUES(77372, 0, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019),
-(77373, 0, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019),
-(77374, 0, 'Look out! There''s a bee loose and it''s on a stinging rampage!', 'Look out! There''s a bee loose and it''s on a stinging rampage!', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019),
-(77375, 0, 'That one tickled...', 'That one tickled...', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019),
-(77376, 0, 'I''m going to send you back to the Lich King in pieces!', 'I''m going to send you back to the Lich King in pieces!', 0, 0, 0, 0, 0, 0, 0, 0, 1, 18019);
-
-INSERT INTO creature_text
-(CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
-VALUES(28939, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0, 0, 0, 0, 77372, 0, 'crusader SAY_CURSADER7'),
-(28939, 1, 7, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 12, 0, 100.0, 0, 0, 0, 77373, 0, 'crusader SAY_CURSADER8'),
-(28939, 1, 8, 'Look out! There''s a bee loose and it''s on a stinging rampage!', 12, 0, 100.0, 0, 0, 0, 77374, 0, 'crusader SAY_CURSADER9'),
-(28939, 1, 9, 'That one tickled...', 12, 0, 100.0, 0, 0, 0, 77375, 0, 'crusader SAY_CURSADER10'),
-(28939, 1, 10, 'I''m going to send you back to the Lich King in pieces!', 12, 0, 100.0, 0, 0, 0, 77376, 0, 'crusader SAY_CURSADER11');
-
-INSERT INTO creature_text
-(CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
-VALUES(28940, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0, 0, 0, 0, 77372, 0, 'crusader SAY_CURSADER7'),
-(28940, 1, 7, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 12, 0, 100.0, 0, 0, 0, 77373, 0, 'crusader SAY_CURSADER8'),
-(28940, 1, 8, 'Look out! There''s a bee loose and it''s on a stinging rampage!', 12, 0, 100.0, 0, 0, 0, 77374, 0, 'crusader SAY_CURSADER9'),
-(28940, 1, 9, 'That one tickled...', 12, 0, 100.0, 0, 0, 0, 77375, 0, 'crusader SAY_CURSADER10'),
-(28940, 1, 10, 'I''m going to send you back to the Lich King in pieces!', 12, 0, 100.0, 0, 0, 0, 77376, 0, 'crusader SAY_CURSADER11');
-
-INSERT INTO creature_text
-(CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
-VALUES(28610, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0, 0, 0, 0, 77372, 0, 'crusader SAY_CURSADER7'),
-(28610, 1, 7, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 12, 0, 100.0, 0, 0, 0, 77373, 0, 'crusader SAY_CURSADER8'),
-(28610, 1, 8, 'Look out! There''s a bee loose and it''s on a stinging rampage!', 12, 0, 100.0, 0, 0, 0, 77374, 0, 'crusader SAY_CURSADER9'),
-(28610, 1, 9, 'That one tickled...', 12, 0, 100.0, 0, 0, 0, 77375, 0, 'crusader SAY_CURSADER10'),
-(28610, 1, 10, 'I''m going to send you back to the Lich King in pieces!', 12, 0, 100.0, 0, 0, 0, 77376, 0, 'crusader SAY_CURSADER11');
-
 INSERT INTO creature_text
 (CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
 VALUES(28936, 1, 0, 'You''ll be hanging in the gallows shortly, Scourge fiend!', 12, 0, 100.0, 0, 0, 0, 29160, 0, 'crusader SAY_CURSADER1'),
@@ -38,11 +6,6 @@ VALUES(28936, 1, 0, 'You''ll be hanging in the gallows shortly, Scourge fiend!',
 (28936, 1, 3, 'ARGH! You burned my last good tabard!', 12, 0, 100.0, 0, 0, 0, 29162, 0, 'crusader SAY_CURSADER4'),
 (28936, 1, 4, 'Argh... The pain... The pain is almost as unbearable as the lashings I received in grammar school when I was but a child.', 12, 0, 100.0, 0, 0, 0, 29143, 0, 'crusader SAY_CURSADER5'),
 (28936, 1, 5, 'I used to work for Grand Inquisitor Isillien! Your idea of pain is a normal mid-afternoon for me!', 12, 0, 100.0, 0, 0, 0, 29161, 0, 'crusader SAY_CURSADER6'),
-(28936, 1, 6, 'You... You''ll get nothing... And like it...', 12, 0, 100.0, 0, 0, 0, 77372, 0, 'crusader SAY_CURSADER7'),
-(28936, 1, 7, 'Do you think this to be pain? To be suffering? HAH! Destroy this mortal shell so that I may ascend to the heavens!', 12, 0, 100.0, 0, 0, 0, 77373, 0, 'crusader SAY_CURSADER8'),
-(28936, 1, 8, 'Look out! There''s a bee loose and it''s on a stinging rampage!', 12, 0, 100.0, 0, 0, 0, 77374, 0, 'crusader SAY_CURSADER9'),
-(28936, 1, 9, 'That one tickled...', 12, 0, 100.0, 0, 0, 0, 77375, 0, 'crusader SAY_CURSADER10'),
-(28936, 1, 10, 'I''m going to send you back to the Lich King in pieces!', 12, 0, 100.0, 0, 0, 0, 77376, 0, 'crusader SAY_CURSADER11'),
 (28936, 2, 0, 'I''ll tell you everything! STOP! PLEASE!', 12, 0, 100.0, 0, 0, 0, 29149, 0, 'break crusader SAY_PERSUADED1'),
 (28936, 3, 0, 'We... We have only been told that the "Crimson Dawn" is an awakening. You... You see, the Light speaks to the High General. It is the Light...', 12, 0, 100.0, 0, 0, 0, 29150, 0, 'break crusader SAY_PERSUADED2'),
 (28936, 4, 0, 'The Light that guides us. This movement was set in motion before you came... We... We do as we are told. It is what must be done.', 12, 0, 100.0, 0, 0, 0, 29151, 0, 'break crusader SAY_PERSUADED3'),
