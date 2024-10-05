@@ -22,10 +22,7 @@
 #include "CreatureAI.h"
 #include "GridNotifiers.h"
 #include "Object.h"
-#include "Opcodes.h"
 #include "Player.h"
-#include "SpellAuras.h"
-#include "UpdateData.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 

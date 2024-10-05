@@ -196,6 +196,17 @@ class spell_mother_shahraz_saber_lash_aura : public AuraScript
     }
 };
 
+const Position validTeleportStairsPos[4] =
+{
+    {966.87f, 184.45f, 192.84f},
+    {927.22f, 187.04f, 192.84f},
+    {922.54f, 110.09f, 192.84f},
+    {958.01f, 110.47f, 192.84f}
+};
+
+constexpr float minTeleportDist = 30.f;
+constexpr float maxTeleportDist = 50.f;
+
 class spell_mother_shahraz_fatal_attraction : public SpellScript
 {
     PrepareSpellScript(spell_mother_shahraz_fatal_attraction);
@@ -212,7 +223,44 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
     void SetDest(SpellDestination& dest)
     {
-        dest.Relocate(GetCaster()->GetRandomNearPosition(50.0f));
+        Position finalDest;
+
+        // Check if the boss is near stairs to avoid players falling through the platform with random teleports.
+        if (GetCaster()->GetPositionY() < 194.f)
+            finalDest = validTeleportStairsPos[urand(0, 3)];
+        else
+        {
+            finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
+
+            // Maybe not necessary but just in case to avoid LOS issues with an object
+            if (!GetCaster()->IsWithinLOS(finalDest.GetPositionX(), finalDest.GetPositionY(), finalDest.GetPositionZ()))
+                finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
+
+            /* @note: To avoid teleporting players near a walls, we will define a safe area.
+             * As the boss have an area boudary around y: 320.f. We will limit the safe area to this value, avoiding wird issues.
+             * x limit: 932.f/960.f | y limit: 224.f/320.f
+             */
+            if (finalDest.m_positionX < 932.f)
+                finalDest.m_positionX = 932.f;
+            else if (finalDest.m_positionX > 960.f)
+                finalDest.m_positionX = 960.f;
+
+            if (finalDest.m_positionY < 224.f)
+                finalDest.m_positionY = 224.f;
+            else if (finalDest.m_positionY > 320.f)
+                finalDest.m_positionY = 320.f;
+
+            // After relocate a finalDest outside the safe area, we need to recheck the distance with the boss
+            if (GetCaster()->GetExactDist2d(finalDest) < minTeleportDist)
+            {
+                if (finalDest.m_positionX == 932.f || finalDest.m_positionX == 960.f)
+                    finalDest.m_positionY = finalDest.m_positionY + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
+                else if (finalDest.m_positionY == 224.f || finalDest.m_positionY == 320.f)
+                    finalDest.m_positionX = finalDest.m_positionX + (minTeleportDist - GetCaster()->GetExactDist2d(finalDest));
+            }
+        }
+
+        dest.Relocate(finalDest);
     }
 
     void HandleTeleportUnits(SpellEffIndex  /*effIndex*/)
