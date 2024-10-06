@@ -237,6 +237,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
     else
     {
         Group* grp = _player->GetGroup();
+        //npcbot: check premade for bots
+        if (isPremade && !BotMgr::IsNpcBotsPremadeEnabled() && grp->GetFirstBotMember() != nullptr)
+            isPremade = false;
+        //end npcbot
 
         // no group or not a leader
         if (!grp || grp->GetLeaderGUID() != _player->GetGUID())

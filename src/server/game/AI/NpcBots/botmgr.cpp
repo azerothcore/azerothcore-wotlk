@@ -85,6 +85,7 @@ bool _enableNpcBotsRaids;
 bool _enableNpcBotsBGs;
 bool _enableNpcBotsArenas;
 bool _enableDungeonFinder;
+bool _enableNpcBotsPremade;
 bool _limitNpcBotsDungeons;
 bool _limitNpcBotsRaids;
 bool _hideSpawns;
@@ -358,6 +359,7 @@ void BotMgr::LoadConfig(bool reload)
     _enableNpcBotsBGs               = sConfigMgr->GetBoolDefault("NpcBot.Enable.BG", false);
     _enableNpcBotsArenas            = sConfigMgr->GetBoolDefault("NpcBot.Enable.Arena", false);
     _enableDungeonFinder            = sConfigMgr->GetBoolDefault("NpcBot.Enable.DungeonFinder", true);
+    _enableNpcBotsPremade           = sConfigMgr->GetBoolDefault("NpcBot.Premade.Enable", false);
     _limitNpcBotsDungeons           = sConfigMgr->GetBoolDefault("NpcBot.Limit.Dungeon", true);
     _limitNpcBotsRaids              = sConfigMgr->GetBoolDefault("NpcBot.Limit.Raid", true);
     _hideSpawns                     = sConfigMgr->GetBoolDefault("NpcBot.HideSpawns", false);
@@ -707,6 +709,11 @@ bool BotMgr::IsNpcBotLogEnabled()
 bool BotMgr::IsNpcBotDungeonFinderEnabled()
 {
     return _enableDungeonFinder;
+}
+
+bool BotMgr::IsNpcBotsPremadeEnabled()
+{
+    return _enableNpcBotsPremade;
 }
 
 bool BotMgr::DisplayEquipment()

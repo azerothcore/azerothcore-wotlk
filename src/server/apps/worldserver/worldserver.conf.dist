@@ -5060,6 +5060,15 @@ NpcBot.HK.Achievements.Enable = 0
 NpcBot.HK.Rate.Honor = 1.0
 
 #
+#    NpcBot.Premade.Enable
+#        Description: Enable joining BG as premade group while having NPCBots in group.
+#        Note:        Queued premade groups do not trigger BG bots generation.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+NpcBot.Premade.Enable = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
