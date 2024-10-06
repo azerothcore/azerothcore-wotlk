@@ -446,6 +446,8 @@ uint32 bot_pet_ai::GetData(uint32 data) const
     {
         case BOTPETAI_MISC_DURATION:
             return 0;
+        case BOTPETAI_MISC_DURATION_MAX:
+            return 0;
         case BOTPETAI_MISC_MAXLEVEL:
             return petOwner->GetLevel();
         case BOTPETAI_MISC_FIXEDLEVEL:

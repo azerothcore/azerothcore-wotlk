@@ -69,7 +69,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if ((liveTimer += diff) >= MINION_DURATION * (IAmFree() ? 5u : 1u))
+            if ((liveTimer += diff) >= _getMaxDuration())
             {
                 canUpdate = false;
                 me->setDeathState(DeathState::JustDied);
@@ -159,6 +159,8 @@ public:
             {
                 case BOTPETAI_MISC_DURATION:
                     return liveTimer;
+                case BOTPETAI_MISC_DURATION_MAX:
+                    return _getMaxDuration();
                 case BOTPETAI_MISC_MAXLEVEL:
                     return maxlevel;
                 default:
@@ -201,6 +203,11 @@ public:
         }
 
     private:
+        uint32 _getMaxDuration() const
+        {
+            return MINION_DURATION * (IAmFree() ? 5u : 1u);
+        }
+
         uint32 liveTimer;
         uint8 maxlevel;
     };
