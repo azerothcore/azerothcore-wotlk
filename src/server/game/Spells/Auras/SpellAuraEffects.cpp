@@ -500,6 +500,7 @@ int32 AuraEffect::CalculateAmount(Unit* caster)
             amount = int32(GetBase()->GetUnitOwner()->CountPctFromMaxHealth(10));
             if (caster)
             {
+                amount = sObjectMgr->GetCreatureBaseStats(caster->GetLevel(), Classes::CLASS_WARRIOR)->BaseHealth[EXPANSION_WRATH_OF_THE_LICH_KING] / 4.75f;
                 // Glyphs increasing damage cap
                 Unit::AuraEffectList const& overrideClassScripts = caster->GetAuraEffectsByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
                 for (Unit::AuraEffectList::const_iterator itr = overrideClassScripts.begin(); itr != overrideClassScripts.end(); ++itr)
