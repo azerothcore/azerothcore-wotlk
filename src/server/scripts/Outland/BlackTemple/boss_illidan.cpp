@@ -1317,8 +1317,18 @@ struct npc_flame_of_azzinoth : public ScriptedAI
     {
         ScheduleTimedEvent(10s, [&] {
             if (Creature* _blade = ObjectAccessor::GetCreature(*me, _bladeGUID))
+            {
+                Unit* offTank = nullptr;
+
+                if (Creature* secondBlaze = me->FindNearestCreature(NPC_BLAZE, 100.0f, true))
+                    offTank = secondBlaze->GetVictim();
+
                 if (Unit* target = _blade->AI()->SelectTarget(SelectTargetMethod::Random, 0, -40.0f, true))
-                    DoCast(target, SPELL_CHARGE);
+                {
+                    if (!offTank || offTank != target)
+                        DoCast(target, SPELL_CHARGE);
+                }
+            }
         }, 5s, 20s);
 
         ScheduleTimedEvent(10s, 20s, [&] {
