@@ -5027,6 +5027,17 @@ NpcBot.WanderingBots.Classes.SeaWitch.Enable          = 1
 NpcBot.WanderingBots.Classes.CryptLord.Enable         = 1
 
 #
+#    NpcBot.WanderingBots.SkipTarget.Questgiver
+#    NpcBot.WanderingBots.SkipTarget.Flightmaster
+#        Description: Make wandering bots skip certain npc types when selecting attack target.
+#        Note:        This option does not apply to npcs engaging the bot on their own accord.
+#        Default:     0 - (NpcBot.WanderingBots.SkipTarget.Questgiver)
+#                     0 - (NpcBot.WanderingBots.SkipTarget.Flightmaster)
+
+NpcBot.WanderingBots.SkipTarget.Questgiver   = 0
+NpcBot.WanderingBots.SkipTarget.Flightmaster = 0
+
+#
 #    NpcBot.HK.Enable
 #        Description: Count NPCBot kill at honor kill.
 #        Default:     1 - (Enabled)

@@ -3693,6 +3693,14 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) cons
     if (IsPointedNoDPSTarget(target))
         return false;
 
+    if (IsWanderer() && target->IsCreature() && target->GetVictim() != me)
+    {
+        if (BotMgr::EnableWanderingUntargetNpcQuestgiver() && target->IsQuestGiver())
+            return false;
+        if (BotMgr::EnableWanderingUntargetNpcFlightmaster() && target->IsTaxi())
+            return false;
+    }
+
     if (IAmFree())
     {
         switch (target->GetEntry())

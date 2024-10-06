@@ -148,6 +148,8 @@ bool _enableConfigLevelCapBGFirst;
 bool _bothk_enable;
 bool _bothk_message_enable;
 bool _bothk_achievements_enable;
+bool _untarget_wnpc_questgiver;
+bool _untarget_wnpc_flightmaster;
 float _botStatLimits_dodge;
 float _botStatLimits_parry;
 float _botStatLimits_block;
@@ -420,6 +422,8 @@ void BotMgr::LoadConfig(bool reload)
     _enableclass_wander_necromancer = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.Necromancer.Enable", true);
     _enableclass_wander_seawitch    = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.SeaWitch.Enable", true);
     _enableclass_wander_cryptlord   = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.Classes.CryptLord.Enable", true);
+    _untarget_wnpc_questgiver       = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.SkipTarget.Questgiver", false);
+    _untarget_wnpc_flightmaster     = sConfigMgr->GetBoolDefault("NpcBot.WanderingBots.SkipTarget.Flightmaster", false);
     _enrageOnDismiss                = sConfigMgr->GetBoolDefault("NpcBot.EnrageOnDismiss", true);
     _botStatLimits                  = sConfigMgr->GetBoolDefault("NpcBot.Stats.Limits.Enable", false);
     _botStatLimits_dodge            = sConfigMgr->GetFloatDefault("NpcBot.Stats.Limits.Dodge", 95.0f);
@@ -854,6 +858,15 @@ bool BotMgr::IsWanderingClassEnabled(uint8 m_class)
         default:
             return true;
     }
+}
+
+bool BotMgr::EnableWanderingUntargetNpcQuestgiver()
+{
+    return _untarget_wnpc_questgiver;
+}
+bool BotMgr::EnableWanderingUntargetNpcFlightmaster()
+{
+    return _untarget_wnpc_flightmaster;
 }
 
 bool BotMgr::HideBotSpawns()
