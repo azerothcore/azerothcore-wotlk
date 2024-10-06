@@ -31,7 +31,6 @@
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellInfo.h"
-#include "WorldState.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -1216,12 +1215,6 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                     return s->GetData(251 /*DATA_BUFF_AVAILABLE*/) != 0;
             return false;
             break;
-        case 39953: // Ad'al Song of Battle
-            return sWorldState->IsConditionFulfilled(CONDITION_ADAL_SONG_OF_BATTLE);
-        case 39911: // Trollbane's Command
-            return sWorldState->IsConditionFulfilled(CONDITION_TROLLBANES_COMMAND);
-        case 39913: // Nazgrel's Fervor
-            return sWorldState->IsConditionFulfilled(CONDITION_NAZGRELS_FAVOR);
     }
 
     return true;

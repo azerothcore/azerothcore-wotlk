@@ -112,8 +112,60 @@ void WorldState::Update(uint32 diff)
     }
 }
 
-void WorldState::HandlePlayerEnterZone(Player* player, uint32 zoneId) {};
-void WorldState::HandlePlayerLeaveZone(Player* player, uint32 zoneId) {};
+void WorldState::HandlePlayerEnterZone(Player* player, uint32 zoneId)
+{
+    std::lock_guard<std::mutex> guard(_mutex);
+    switch (zoneId)
+    {
+        case ZONEID_SHATTRATH:
+        case ZONEID_BOTANICA:
+        case ZONEID_MECHANAR:
+        case ZONEID_ARCATRAZ:
+            if (_adalSongOfBattleTimer)
+                player->CastSpell(player, SPELL_ADAL_SONG_OF_BATTLE, true);
+            break;
+        case ZONEID_HELLFIRE_PENINSULA:
+        case ZONEID_HELLFIRE_RAMPARTS:
+        case ZONEID_HELLFIRE_CITADEL:
+        case ZONEID_BLOOD_FURNACE:
+        case ZONEID_SHATTERED_HALLS:
+        case ZONEID_MAGTHERIDON_LAIR:
+            if (_isMagtheridonHeadSpawnedAlliance && player->GetTeamId() == TEAM_ALLIANCE)
+                player->CastSpell(player, SPELL_TROLLBANES_COMMAND, true);
+            else if (_isMagtheridonHeadSpawnedHorde && player->GetTeamId() == TEAM_HORDE)
+                player->CastSpell(player, SPELL_NAZGRELS_FAVOR, true);
+            break;
+        default:
+            break;
+    }
+};
+void WorldState::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
+{
+    std::lock_guard<std::mutex> guard(_mutex);
+    switch (zoneId)
+    {
+        case ZONEID_SHATTRATH:
+        case ZONEID_BOTANICA:
+        case ZONEID_MECHANAR:
+        case ZONEID_ARCATRAZ:
+            if (!_adalSongOfBattleTimer)
+                player->RemoveAurasDueToSpell(SPELL_ADAL_SONG_OF_BATTLE);
+            break;
+        case ZONEID_HELLFIRE_PENINSULA:
+        case ZONEID_HELLFIRE_RAMPARTS:
+        case ZONEID_HELLFIRE_CITADEL:
+        case ZONEID_BLOOD_FURNACE:
+        case ZONEID_SHATTERED_HALLS:
+        case ZONEID_MAGTHERIDON_LAIR:
+            if (player->GetTeamId() == TEAM_ALLIANCE)
+                player->RemoveAurasDueToSpell(SPELL_TROLLBANES_COMMAND);
+            else if (player->GetTeamId() == TEAM_HORDE)
+                player->RemoveAurasDueToSpell(SPELL_NAZGRELS_FAVOR);
+            break;
+        default:
+            break;
+    }
+};
 
 void WorldState::BuffMagtheridonTeam(TeamId team)
 {
@@ -124,8 +176,10 @@ void WorldState::BuffMagtheridonTeam(TeamId team)
             case 530: // Outland
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetZoneId() == 3483 && player->GetTeamId() == team) // Hellfire Peninsula
-                        player->UpdateZoneDependentAuras(player->GetZoneId());
+                    if (player->GetZoneId() == ZONEID_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
+                        player->CastSpell(player, SPELL_TROLLBANES_COMMAND, true);
+                    else if (player->GetZoneId() == ZONEID_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_HORDE && team == TEAM_HORDE)
+                        player->CastSpell(player, SPELL_NAZGRELS_FAVOR, true);
                 });
                 break;
             case 540: // The Shattered Halls
@@ -134,8 +188,10 @@ void WorldState::BuffMagtheridonTeam(TeamId team)
             case 544: // Magtheridon's Lair
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetTeamId() == team)
-                        player->UpdateZoneDependentAuras(player->GetZoneId());
+                    if (player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
+                        player->CastSpell(player, SPELL_TROLLBANES_COMMAND, true);
+                    else if (player->GetTeamId() == TEAM_HORDE && team == TEAM_HORDE)
+                        player->CastSpell(player, SPELL_NAZGRELS_FAVOR, true);
                 });
                 break;
             default:
@@ -153,8 +209,10 @@ void WorldState::DispelMagtheridonTeam(TeamId team)
             case 530: // Outland
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetZoneId() == 3483 && player->GetTeamId() == team) // Hellfire Peninsula
-                        player->UpdateAreaDependentAuras(player->GetAreaId());
+                    if (player->GetZoneId() == ZONEID_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
+                        player->RemoveAurasDueToSpell(SPELL_TROLLBANES_COMMAND);
+                    else if (player->GetZoneId() == ZONEID_HELLFIRE_PENINSULA && player->GetTeamId() == TEAM_HORDE && team == TEAM_HORDE)
+                        player->RemoveAurasDueToSpell(SPELL_NAZGRELS_FAVOR);
                 });
                 break;
             case 540: // The Shattered Halls
@@ -163,8 +221,10 @@ void WorldState::DispelMagtheridonTeam(TeamId team)
             case 544: // Magtheridon's Lair
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetTeamId() == team)
-                        player->UpdateAreaDependentAuras(player->GetAreaId());
+                    if (player->GetTeamId() == TEAM_ALLIANCE && team == TEAM_ALLIANCE)
+                        player->RemoveAurasDueToSpell(SPELL_TROLLBANES_COMMAND);
+                    else if (player->GetTeamId() == TEAM_HORDE && team == TEAM_HORDE)
+                        player->RemoveAurasDueToSpell(SPELL_NAZGRELS_FAVOR);
                 });
                 break;
             default:
@@ -182,8 +242,8 @@ void WorldState::BuffAdalsSongOfBattle()
             case 530: // Outland
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetZoneId() == 3703) // Shattrath
-                        player->UpdateZoneDependentAuras(player->GetZoneId());
+                    if (player->GetZoneId() == ZONEID_SHATTRATH)
+                        player->CastSpell(player, SPELL_ADAL_SONG_OF_BATTLE, true);
                 });
                 break;
             case 552: // Arcatraz
@@ -191,7 +251,7 @@ void WorldState::BuffAdalsSongOfBattle()
             case 554: // Mechanar
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    player->UpdateZoneDependentAuras(player->GetZoneId());
+                    player->CastSpell(player, SPELL_ADAL_SONG_OF_BATTLE, true);
                 });
                 break;
             default:
@@ -209,8 +269,8 @@ void WorldState::DispelAdalsSongOfBattle()
             case 530: // Outland
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    if (player->GetZoneId() == 3703) // Shattrath
-                        player->UpdateAreaDependentAuras(player->GetAreaId());
+                    if (player->GetZoneId() == ZONEID_SHATTRATH)
+                        player->RemoveAurasDueToSpell(SPELL_ADAL_SONG_OF_BATTLE);
                 });
                 break;
             case 552: // Arcatraz
@@ -218,7 +278,7 @@ void WorldState::DispelAdalsSongOfBattle()
             case 554: // Mechanar
                 map->DoForAllPlayers([&](Player* player)
                 {
-                    player->UpdateAreaDependentAuras(player->GetAreaId());
+                    player->RemoveAurasDueToSpell(SPELL_ADAL_SONG_OF_BATTLE);
                 });
                 break;
             default:
