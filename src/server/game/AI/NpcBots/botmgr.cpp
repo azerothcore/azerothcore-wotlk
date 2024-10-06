@@ -1538,6 +1538,7 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
             bot->SetMap(newMap);
             if (!bot->IsWandererBot() && !botai->CanAppearInWorld())
             {
+                botai->AbortTeleport();
                 TeleportFinishEvent* delayedTeleportEvent = new TeleportFinishEvent(botai, reset);
                 botai->GetEvents()->AddEvent(delayedTeleportEvent, botai->GetEvents()->CalculateTime(urand(5000, 8000)));
                 botai->SetTeleportFinishEvent(delayedTeleportEvent);
@@ -1603,13 +1604,12 @@ void BotMgr::_teleportBot(Creature* bot, Map* newMap, float x, float y, float z,
             return;
         }
 
-        botai->AbortTeleport();
-
         //update group member online state
         if (Group* gr = bot->GetBotOwner()->GetGroup())
             if (gr->IsMember(bot->GetGUID()))
                 gr->SendUpdate();
 
+        botai->AbortTeleport();
         TeleportFinishEvent* finishEvent = new TeleportFinishEvent(botai, reset);
         uint64 delay = quick ? urand(500, 1500) : urand(5000, 8000);
         botai->GetEvents()->AddEvent(finishEvent, botai->GetEvents()->CalculateTime(delay));
