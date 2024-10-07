@@ -90,6 +90,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(4); // 120 seconds
     });
 
+    // оглушить
+    ApplySpellFix({ 58861 }, [](SpellInfo* spellInfo)
+    {   
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_AUTOCAST_AI;
+    });      
+
     // дк требование кузни SpellFocusObject
     ApplySpellFix({
         62158,
