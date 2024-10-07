@@ -352,6 +352,8 @@ public:
     uint32 GetTimer() { return m_Timer; }
     void SetTimer(uint32 timer) { m_Timer = timer; }
 
+    uint32 GetTimeAnnounce() { return m_StartGroupingTimerAnnounce; }
+
     void DoPlaySoundToAll(uint32 SoundID);
 
     void InvitePlayerToQueue(Player* player);
@@ -399,7 +401,9 @@ protected:
     uint32 m_LastResurectTimer;                             // Timer for resurect player every 30 sec
 
     uint32 m_StartGroupingTimer;                            // Timer for invite players in area 15 minute before start battle
+    uint32 m_StartGroupingTimerAnnounce;                    // Timer for announce 5 minute before start battle
     bool m_StartGrouping;                                   // bool for know if all players in area has been invited
+    bool m_StartAnnounce5min;                               // bool for know if announce is passed
 
     GuidUnorderedSet m_Groups[PVP_TEAMS_COUNT];              // Contain different raid group
 

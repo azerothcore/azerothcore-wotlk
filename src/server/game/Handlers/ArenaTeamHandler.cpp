@@ -141,7 +141,7 @@ void WorldSession::HandleArenaTeamInviteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (player->GetArenaTeamIdInvited())
+    if (player->GetArenaTeamIdInvited() || arenaTeam->GetType() == ARENA_TEAM_5v5)
     {
         SendArenaTeamCommandResult(ERR_ARENA_TEAM_INVITE_SS, "", invitedName, ERR_ALREADY_INVITED_TO_ARENA_TEAM_S);
         return;

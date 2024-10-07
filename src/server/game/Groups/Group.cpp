@@ -1933,6 +1933,9 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
     if (isLFGGroup())
         return ERR_LFG_CANT_USE_BATTLEGROUND;
 
+    if(!isRated)
+        return ERR_BATTLEGROUND_JOIN_FAILED; 
+
     BattlemasterListEntry const* bgEntry = sBattlemasterListStore.LookupEntry(bgTemplate->GetBgTypeID());
     if (!bgEntry)
         return ERR_GROUP_JOIN_BATTLEGROUND_FAIL;
@@ -1940,6 +1943,10 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
     // too many players in the group
     if (GetMembersCount() > bgEntry->maxGroupSize)
         return ERR_BATTLEGROUND_NONE;
+
+    // Dont allow to join as group in 1v1
+    if (arenaSlot == 2 && GetMembersCount() > 1)
+        return ERR_BATTLEGROUND_JOIN_FAILED;        
 
     // get a player as reference, to compare other players' stats to (arena team id, level bracket, etc.)
     Player* reference = GetFirstMember()->GetSource();

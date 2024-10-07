@@ -60,6 +60,7 @@ bool BattlefieldWG::SetupBattlefield()
 
     m_TimeForAcceptInvite = 20;
     m_StartGroupingTimer = 15 * MINUTE * IN_MILLISECONDS;
+    m_StartGroupingTimerAnnounce = 5 * MINUTE * IN_MILLISECONDS;
     m_StartGrouping = false;
 
     m_tenacityStack = 0;

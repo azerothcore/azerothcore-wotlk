@@ -22,7 +22,9 @@ void AddSC_npc_trainer();
 void AddSC_Enchat_npc_new();
 void AddSC_Login_script();
 void AddSC_DuelReset();
-void AddSC_ServerMenuPlayerGossip();
+void AddSC_CustomTeleportOrCommand();
+void AddSC_TemplateNPC();
+void AddSC_npc_1v1arena();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -33,5 +35,7 @@ void AddCustomScripts()
     AddSC_Enchat_npc_new(); 
     AddSC_Login_script();
     AddSC_DuelReset();
-    AddSC_ServerMenuPlayerGossip();
+    AddSC_CustomTeleportOrCommand();
+    AddSC_TemplateNPC();
+    AddSC_npc_1v1arena();
 }

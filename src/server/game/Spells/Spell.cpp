@@ -6592,10 +6592,18 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_DONT_REPORT;
                 // can't change during already started arena/battleground
                 if (m_caster->IsPlayer())
+                {
+                    Player* plr = m_caster->ToPlayer();
+                    if (plr->InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5))
+                    {
+                        plr->GetSession()->SendAreaTriggerMessage("Нельзя менять таланты во время ожидания арены 1v1");
+                        return SPELL_FAILED_DONT_REPORT;
+                    }
                     if (Battleground const* bg = m_caster->ToPlayer()->GetBattleground())
                         if (bg->GetStatus() == STATUS_IN_PROGRESS)
                             return SPELL_FAILED_NOT_IN_BATTLEGROUND;
-                break;
+                }
+                break; 
             default:
                 break;
         }

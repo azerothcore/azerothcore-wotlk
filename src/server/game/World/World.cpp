@@ -1182,6 +1182,7 @@ void World::LoadConfigSettings(bool reload)
     _float_configs[CONFIG_ARENA_LOSE_RATING_MODIFIER]               = sConfigMgr->GetOption<float>("Arena.ArenaLoseRatingModifier", 24.0f);
     _float_configs[CONFIG_ARENA_MATCHMAKER_RATING_MODIFIER]         = sConfigMgr->GetOption<float>("Arena.ArenaMatchmakerRatingModifier", 24.0f);
     _bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_ENABLE]              = sConfigMgr->GetOption<bool>("Arena.QueueAnnouncer.Enable", false);
+    _bool_configs[CONFIG_ARENA_LEAVE_ANNOUNCER_ENABLE]              = sConfigMgr->GetOption<bool>("Arena.LeaveAnnouncer.Enable", false);
     _bool_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_PLAYERONLY]          = sConfigMgr->GetOption<bool>("Arena.QueueAnnouncer.PlayerOnly", false);
     _int_configs[CONFIG_ARENA_QUEUE_ANNOUNCER_DETAIL]               = sConfigMgr->GetOption<uint32>("Arena.QueueAnnouncer.Detail", 3);
 

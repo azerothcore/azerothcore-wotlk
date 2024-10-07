@@ -669,6 +669,8 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
     // Type penalties for teams < 5v5
     if (Type == ARENA_TEAM_2v2)
         points *= 0.76f;
+    if (Type == ARENA_TEAM_5v5)
+        points *= 0.64f; 
     else if (Type == ARENA_TEAM_3v3)
         points *= 0.88f;
 
@@ -1090,7 +1092,7 @@ std::unordered_map<uint32, uint8> ArenaTeam::ArenaSlotByType =
 {
     { ARENA_TEAM_2v2, ARENA_SLOT_2v2},
     { ARENA_TEAM_3v3, ARENA_SLOT_3v3},
-    { ARENA_TEAM_5v5, ARENA_SLOT_5v5}
+    { ARENA_TEAM_5v5, ARENA_SLOT_5v5},
 };
 
 // init/update unordered_map ArenaReqPlayersForType
@@ -1098,5 +1100,5 @@ std::unordered_map<uint8, uint8> ArenaTeam::ArenaReqPlayersForType =
 {
     { ARENA_TYPE_2v2, 4},
     { ARENA_TYPE_3v3, 6},
-    { ARENA_TYPE_5v5, 10}
+    { ARENA_TYPE_5v5, 2},
 };

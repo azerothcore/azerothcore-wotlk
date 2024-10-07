@@ -30,6 +30,7 @@
 #include "Group.h"
 #include "GuildMgr.h"
 #include "InstanceScript.h"
+#include "Item.h"
 #include "Language.h"
 #include "Log.h"
 #include "LootMgr.h"

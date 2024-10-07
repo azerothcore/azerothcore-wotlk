@@ -299,21 +299,6 @@ public:
                 break;
             }
         }
-
-        if (player->HasSpell(33388))
-            player->learnSpell(33388);
-        if (player->HasSpell(33391))
-            player->learnSpell(33391);
-        if (player->HasSpell(34090))
-            player->learnSpell(34090);
-        if (player->HasSpell(34091))
-            player->learnSpell(34091);
-        if (player->HasSpell(54197))
-            player->learnSpell(54197);
-
-        player->CastSpell(player, 63680);
-        player->CastSpell(player, 63624);
-        player->UpdateSkillsToMaxSkillsForLevel();
         return;
     }
 
@@ -583,6 +568,21 @@ public:
                     break;
                 case 10: // тренер
                     learnSpellOnStart(player);
+                    if (player->HasSpell(33388))
+                        player->learnSpell(33388);
+                    if (player->HasSpell(33391))
+                        player->learnSpell(33391);
+                    if (player->HasSpell(34090))
+                        player->learnSpell(34090);
+                    if (player->HasSpell(34091))
+                        player->learnSpell(34091);
+                    if (player->HasSpell(54197))
+                        player->learnSpell(54197);
+
+                    player->CastSpell(player, 63680);
+                    player->CastSpell(player, 63624);
+                    player->UpdateSkillsToMaxSkillsForLevel();
+                    player->PlayerTalkClass->SendCloseGossip();
                     break;
                 default:
                     break;

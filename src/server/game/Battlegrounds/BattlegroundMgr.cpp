@@ -995,6 +995,7 @@ std::unordered_map<int, BattlegroundTypeId> BattlegroundMgr::queueToBg =
     { BATTLEGROUND_QUEUE_2v2,   BATTLEGROUND_AA },
     { BATTLEGROUND_QUEUE_3v3,   BATTLEGROUND_AA },
     { BATTLEGROUND_QUEUE_5v5,   BATTLEGROUND_AA },
+    { BATTLEGROUND_QUEUE_1v1,   BATTLEGROUND_AA },
 };
 
 std::unordered_map<int, Battleground*> BattlegroundMgr::bgtypeToBattleground =
