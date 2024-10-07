@@ -5,17 +5,29 @@
 
 using namespace Acore::ChatCommands;
 
-void sServerMenu::OpenBankSlot(Player* player) {
+void sServerMenu::OpenBankSlot(Player* player) 
+{
+    if (!player)
+        return;
+
     player->PlayerTalkClass->SendCloseGossip();
 	player->GetSession()->SendShowBank(player->GetGUID());
 }
 
-void sServerMenu::OpenMailSlot(Player* player) {
+void sServerMenu::OpenMailSlot(Player* player) 
+{
+    if (!player)
+        return;
+
     player->PlayerTalkClass->SendCloseGossip();
 	player->GetSession()->SendShowMailBox(player->GetGUID());
 }
 
-std::string sServerMenu::ConfirmChangeRFN(Player* player, uint32 cost) {
+std::string sServerMenu::ConfirmChangeRFN(Player* player, uint32 cost) 
+{
+    if (!player)
+        return "Cбой системы...";
+
     std::ostringstream ss;
     if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU)
         ss << "\nНужно заплатить: " << cost << " бонусов. Продолжим ?";
@@ -24,7 +36,10 @@ std::string sServerMenu::ConfirmChangeRFN(Player* player, uint32 cost) {
     return ss.str().c_str();
 }
 
-void sServerMenu::ChangeRFN(Player* player, int i) {
+void sServerMenu::ChangeRFN(Player* player, int i) 
+{   
+    if (!player)
+        return;
 
     uint32 bonuses = player->GetSession()->GetBonuses();
 
@@ -67,6 +82,7 @@ void sServerMenu::CharControlMenu(Player* player) {
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_2, EN_CHAR_CONTROL_2), GOSSIP_SENDER_MAIN + 1, 1);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_3, EN_CHAR_CONTROL_3), GOSSIP_SENDER_MAIN + 1, 5);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_7, EN_CHAR_CONTROL_7), GOSSIP_SENDER_MAIN + 1, 6);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_EXCHANGE_MAIN, EN_HONOR_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 7);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_4, EN_CHAR_CONTROL_4), GOSSIP_SENDER_MAIN + 1, 2, ConfirmChangeRFN(player, sServerMenuMgr->getFactionCost()), 0, false);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_5, EN_CHAR_CONTROL_5), GOSSIP_SENDER_MAIN + 1, 3, ConfirmChangeRFN(player, sServerMenuMgr->getRaceCost()), 0, false);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_6, EN_CHAR_CONTROL_6), GOSSIP_SENDER_MAIN + 1, 4, ConfirmChangeRFN(player, sServerMenuMgr->getNickCost()), 0, false);
@@ -74,7 +90,11 @@ void sServerMenu::CharControlMenu(Player* player) {
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 1), player->GetGUID());
 }
 
-std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId) {
+std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId) 
+{
+    if (!player)
+        return "Сбой системы...";
+
     std::ostringstream ss;
     switch (MenuId) {
         case 0: {
@@ -106,9 +126,23 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId) {
                 ss << "Для этого вам нужно получить [5 ранг] а потом уже выбрать количество которое хотите передать и указать ник игрока.\n";
             } else {
                 ss << "Greetings, " << player->GetName() << "\n\n";
+                ss << "You have " << player->GetHonorPoints() << " honor points.\n\n";
+                ss << "In this section, you can transfer part or all of your honor to any player on this project.\n";
+                ss << "To do this, you need to get [5 Rank] and then select the amount you want to transfer and indicate the player's nickname.\n";
+            }
+        } break;
+
+        case 3: {
+            if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+                ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "У вас " << player->GetHonorPoints() << " очков чести.\n\n";
-                ss << "В данном разделе вы можете передать любому игроку на этом проекте часть или весь ваш хонор.\n";
-                ss << "Для этого вам нужно получить [5 ранг] а потом уже выбрать количество которое хотите передать и указать ник игрока.\n";
+                ss << "В данном разделе вы можете обменять очки чести на опыт для ранга.\n\n";
+                ss << "Каждый ваш ранг снижает цену на обмен на 200 очков чести.";
+            } else {
+                ss << "Greetings, " << player->GetName() << "\n\n";
+                ss << "You have " << player->GetHonorPoints() << " honor points.\n\n";
+                ss << "In this section, you can exchange honor points for experience for a rank.\n\n";
+                ss << "Each of your ranks reduces the exchange price for 200 honor points.";
             }
         } break;
 
@@ -117,7 +151,11 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId) {
     return ss.str().c_str();
 }
 
-void sServerMenu::GossipHelloMenu(Player* player) {
+void sServerMenu::GossipHelloMenu(Player* player) 
+{
+    if (!player)
+        return;
+
     ClearGossipMenuFor(player);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_1, EN_HOME_MENU_1), GOSSIP_SENDER_MAIN, 1);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_2, EN_HOME_MENU_2), GOSSIP_SENDER_MAIN, 2);
@@ -130,7 +168,68 @@ void sServerMenu::GossipHelloMenu(Player* player) {
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 0), player->GetGUID());
 }
 
-void sServerMenu::RankInfo(Player* player) {
+void sServerMenu::GossipMenuExchangeHonor(Player* player)
+{
+    if (!player)
+        return;
+
+    ClearGossipMenuFor(player);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 10000, 50, 1), GOSSIP_SENDER_MAIN + 7, 50);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 20000, 100, 2), GOSSIP_SENDER_MAIN + 7, 100);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 50000, 250, 5), GOSSIP_SENDER_MAIN + 7, 250);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 100000, 500, 10), GOSSIP_SENDER_MAIN + 7, 500);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 250000, 1250, 25), GOSSIP_SENDER_MAIN + 7, 1250);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, "Назад", "Back"), GOSSIP_SENDER_MAIN, 5);
+    player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 3), player->GetGUID());    
+}
+
+std::string sServerMenu::ConverterHonorRang(Player* player, uint32 honor, uint32 exp, uint8 count) 
+{   
+    if (!player || !honor || !exp)
+        return "Сбой системы...";
+
+    std::stringstream ss;
+    uint32 need = sServerMenuMgr->CalculHonorForExp(player, honor, count);
+    if (need <= 0)
+        need = honor;
+    if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+        ss << "Обменять " << need << " очков чести на\n    |cff473B32" << exp << " опыта для ранга.|r";
+    } else {
+        ss << "Exchange " << need << " honor points for\n  |cff473B32" << exp << " exp for rang.|r";
+    }
+    return ss.str();
+}
+
+uint32 sServerMenu::CalculHonorForExp(Player* player, uint32 honor, uint8 count) 
+{
+    if (!player || !honor)
+        return 0;
+
+    return uint32(honor - (player->GetRankByExp() * 200 * count));
+}
+
+void sServerMenu::ConfirmExchangeHonorForExp(Player* player, uint32 honor, uint32 exp, uint8 count) 
+{
+    if (!player || !honor || !exp)
+        return;
+
+    uint32 total = sServerMenuMgr->CalculHonorForExp(player, honor, count);
+    if (player->GetHonorPoints() >= total) {
+        // снимает у игрока очки чести 
+        player->ModifyHonorPoints(-uint32(total));
+        player->RewardRankPoints(exp, 7 /*Обменник*/);
+        return sServerMenuMgr->GossipMenuExchangeHonor(player);
+    } else {
+        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_HONOR_EXCHANGE_FAIL, EN_HONOR_EXCHANGE_FAIL));
+        return sServerMenuMgr->GossipMenuExchangeHonor(player);
+    }
+}
+
+void sServerMenu::RankInfo(Player* player) 
+{
+    if (!player)
+        return;
+
     player->PlayerTalkClass->ClearMenus();
     std::string name = player->GetName();
     std::ostringstream femb;
@@ -169,12 +268,20 @@ void sServerMenu::RankInfo(Player* player) {
     player->PlayerTalkClass->SendGossipMenu(femb.str().c_str(), player->GetGUID());
 }
 
-void sServerMenu::CommingSoon(Player* player) {
+void sServerMenu::CommingSoon(Player* player)
+{
+    if (!player)
+        return;
+
     ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Система в разработке, некоторые разделы еще не готовы.", "Система в разработке, некоторые разделы еще не готовы."));
     player->PlayerTalkClass->SendCloseGossip(); 
 }
 
-bool sServerMenu::CanOpenMenu(Player* player) {
+bool sServerMenu::CanOpenMenu(Player* player) 
+{
+    if (!player)
+        return true;
+
     if (player->IsInCombat() || player->IsInFlight() || player->IsDeathMatch() || player->GetMap()->IsBattlegroundOrArena()
         || player->HasStealthAura() || player->isDead() || (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609 && !player->IsGameMaster() && !player->HasSpell(50977))) {
         ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "Сейчас это невозможно.", "Now it is impossible"));
@@ -183,7 +290,11 @@ bool sServerMenu::CanOpenMenu(Player* player) {
     return false;
 }
 
-void sServerMenu::OpenTradeHonor(Player* player) {
+void sServerMenu::OpenTradeHonor(Player* player)
+{
+    if (!player)
+        return;
+
     ClearGossipMenuFor(player);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_TRADE_1000, EN_HONOR_TRADE_1000), GOSSIP_SENDER_MAIN, 1000, "После подтверждение введите ник игрока", 0, true);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_TRADE_5000, EN_HONOR_TRADE_5000), GOSSIP_SENDER_MAIN, 5000, "После подтверждение введите ник игрока", 0, true);

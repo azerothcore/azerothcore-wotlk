@@ -4976,6 +4976,14 @@ void Player::RepopAtGraveyard()
         return;
     }
 
+    if (GetMapId() == 44)
+    {
+        ResurrectPlayer(1.0f);
+        SpawnCorpseBones();
+        TeleportTo(44, 125.49f, 10.91f, 18.8f, 6.27f);
+        return;
+    }
+
     // stop countdown until repop
     m_deathTimer = 0;
 
@@ -16413,16 +16421,15 @@ void Player::RewardRankPoints(uint32 amount, int source)
     char const* rankInfo;
     switch (source)
     {
-        case PVP_HK:    rankInfo = GetCustomText(this, RU_glory_win_1, EN_glory_win_1); break;
-        case PVP_BG:    rankInfo = GetCustomText(this, RU_glory_win_2, EN_glory_win_2); break;
-        case PVP_ARENA: rankInfo = GetCustomText(this, RU_glory_win_3, EN_glory_win_3); break;
-        case PVP_QUEST: rankInfo = GetCustomText(this, RU_glory_win_7, EN_glory_win_7); break;
-        case PVP_ITEM:  rankInfo = GetCustomText(this, RU_glory_win_8, EN_glory_win_8); break;
-        case PVP_KILL:  rankInfo = GetCustomText(this, RU_glory_win_11, EN_glory_win_11); break;
-        case PVE_ACHIV: rankInfo = GetCustomText(this, RU_glory_win_12, EN_glory_win_12); break;
-
-        default: rankInfo = GetCustomText(this, RU_glory_win_4, EN_glory_win_4);
-        break;
+        case PVP_HK:          rankInfo = GetCustomText(this, RU_glory_win_1, EN_glory_win_1);   break;
+        case PVP_BG:          rankInfo = GetCustomText(this, RU_glory_win_2, EN_glory_win_2);   break;
+        case PVP_ARENA:       rankInfo = GetCustomText(this, RU_glory_win_3, EN_glory_win_3);   break;
+        case PVP_QUEST:       rankInfo = GetCustomText(this, RU_glory_win_7, EN_glory_win_7);   break;
+        case PVP_ITEM:        rankInfo = GetCustomText(this, RU_glory_win_8, EN_glory_win_8);   break;
+        case PVP_KILL:        rankInfo = GetCustomText(this, RU_glory_win_11, EN_glory_win_11); break;
+        case PVE_ACHIV:       rankInfo = GetCustomText(this, RU_glory_win_12, EN_glory_win_12); break;
+        case EXCHANGER_HONOR: rankInfo = GetCustomText(this, RU_glory_win_14, EN_glory_win_14); break;
+        default:              rankInfo = GetCustomText(this, RU_glory_win_4, EN_glory_win_4);   break;
     }
 
     if (!CanRankUp()) {

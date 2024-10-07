@@ -96,7 +96,7 @@ public:
     void OnFirstLogin(Player* player) override
     {
         player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(1156), 42999);
-        DeleteItem_OnLogin(player);
+        //DeleteItem_OnLogin(player);
         if (!player->HasSpell(33388))
             player->learnSpell(33388);
         if (!player->HasSpell(33391))

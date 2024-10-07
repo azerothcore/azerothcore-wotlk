@@ -59,6 +59,8 @@ public:
                     case 5: sProfessionMgr->MainMenu(player); break;
                     // Передача очков чести
                     case 6: sServerMenuMgr->OpenTradeHonor(player); break;
+                    // Обменик
+                    case 7: sServerMenuMgr->GossipMenuExchangeHonor(player); break;
                 }
             } break;
 
@@ -97,6 +99,12 @@ public:
                     case 3: ArenaOneMgr->LeaveQueue(player); break;
                     case 4: sServerMenuMgr->GossipHelloMenu(player); break;
                 }
+            } break;
+
+            // Раздел обменика
+            case GOSSIP_SENDER_MAIN + 7: {
+                uint8 count = action == 1250 ? 25 : action == 500 ? 10 : action == 250 ? 5 : action == 100 ? 2 : 1;
+                sServerMenuMgr->ConfirmExchangeHonorForExp(player, action*200, action, count);
             } break;
 
             default: break;

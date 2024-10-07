@@ -37,6 +37,15 @@ public:
     // Снимает и выдаем
     void SendHonorToPlayer(Player* /*sender*/, ObjectGuid /*receiver*/, uint32 /*amount*/, bool /*online*/, Player* /*Preceiver*/, char const* /*name*/);
 
+    // Главное меню обменика
+    void GossipMenuExchangeHonor(Player* /*player*/);
+    // Отоброжение в менюшке сколько что стоит
+    std::string ConverterHonorRang(Player* /*player*/, uint32 /*honor*/, uint32 /*exp*/, uint8 /* count */);
+    // Расчёт сколько хонора будет стоить
+    uint32 CalculHonorForExp(Player* /*player*/, uint32 /*honor*/, uint8 /* count */);
+    // Подтверждение обмена валюты
+    void ConfirmExchangeHonorForExp(Player* /*player*/, uint32 /*honor*/, uint32 /*exp*/, uint8 /* count */);
+
 private:
     static const uint32 _factionCost = 50;
     static const uint32 _raceCost = 30;

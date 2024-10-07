@@ -34,6 +34,9 @@
 #define EN_glory_win_12 "gain achievement"
 #define RU_glory_win_12 "получение достижения"
 
+#define EN_glory_win_14 "exchange for honor points"
+#define RU_glory_win_14 "обмен на очки чести"
+
 #define EN_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: Your rank is not high enough, you need rank |cffffff4d%u|cffff9933.|r"
 #define RU_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас не достаточно высокий ранг, нужен |cffffff4d%u|cffff9933 ранг.|r"
 
@@ -739,4 +742,10 @@
 
 #define EN_ARENA1VS1_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена 1x1]: To join arena 1vs1, you need to log out from the second client."
 #define RU_ARENA1VS1_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена 1x1]: Для регистрации арены 1x1 нужно выйти со второго клиента."
+
+#define EN_HONOR_EXCHANGE_FAIL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Exchanger]: Unfortunately, you don't have enough honor points.|r"
+#define RU_HONOR_EXCHANGE_FAIL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Обменник]: К сожалению у вас недостаточно очков чести.|r"
+
+#define RU_HONOR_EXCHANGE_MAIN "|TInterface/ICONS/Inv_crate_07:20:20:-20|tОбменник"
+#define EN_HONOR_EXCHANGE_MAIN "|TInterface/ICONS/Inv_crate_07:20:20:-20|tExchanger"
 #endif
