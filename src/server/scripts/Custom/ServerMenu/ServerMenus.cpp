@@ -2,21 +2,20 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
+#include "../Profession/NpcProfessionMgr.h"
+#include "../CustomTeleport/CustomTeleport.h"
 
 class ServerMenuPlayerGossip : public PlayerScript
 {
 public:
     ServerMenuPlayerGossip() : PlayerScript("ServerMenuPlayerGossip") { }
 
-    void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action)
+    void OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 sender, uint32 action)
     {    
         if (!player)
             return;
 
         ClearGossipMenuFor(player);
-
-        if (sServerMenuMgr->CanOpenMenu(player))
-            return;
 
         switch (sender) {
             // Глобальные функции
@@ -25,14 +24,14 @@ public:
                     // Старт меню
                     case 0: sServerMenuMgr->GossipHelloMenu(player); break;
                     // Телепорт
-                    case 1: sServerMenuMgr->CommingSoon(player); break;
-                    // Ранг система
-                    case 2: sServerMenuMgr->CommingSoon(player);break;
+                    case 1: sCustomTeleportMgr->TeleportListMain(player); break;
+                    // Ранг система - ок
+                    case 2: sServerMenuMgr->RankInfo(player); break;
                     // Магазин
                     case 3: sServerMenuMgr->CommingSoon(player);break;
                     // Премиум
                     case 4: sServerMenuMgr->CommingSoon(player); break;
-                    // Управление персонажем
+                    // Управление персонажем - ок
                     case 5: sServerMenuMgr->CharControlMenu(player); break;
                     // Управление акков
                     case 6: sServerMenuMgr->CommingSoon(player); break;
@@ -41,6 +40,7 @@ public:
                     default: break;
                 }
             } break;
+
             // Управление персонажем
             case GOSSIP_SENDER_MAIN + 1: {
                 switch (action) {
@@ -54,8 +54,38 @@ public:
                     case 3: sServerMenuMgr->ChangeRFN(player, 1); break;
                     // Смена ника
                     case 4: sServerMenuMgr->ChangeRFN(player, 2); break;
+                    // Проффер
+                    case 5: sProfessionMgr->MainMenu(player); break;
                 }
-            }
+            } break;
+
+            // меню профессий первый выбор
+            case GOSSIP_SENDER_MAIN + 2: {
+                switch (action) {
+                    case 1: sProfessionMgr->PrimaryMenu(player); break; /* меню основных проф */
+                    case 2: sProfessionMgr->SecondMenu(player);  break; /* меню вторичных проф */
+                    default: break;
+                }
+            } break;
+
+            // Обучение профессий
+            case GOSSIP_SENDER_MAIN + 3: {
+                if (!player->HasSkill(action))
+                    sProfessionMgr->CompleteLearnProfession(player, action);
+            } break;
+
+            // Телепорт меню (первое)
+            case GOSSIP_SENDER_MAIN + 4: {
+                /* пересылаем на окно телепортации по пунктам в меню */
+                sCustomTeleportMgr->GetTeleportListAfter(player, action, player->GetTeamId() == TEAM_HORDE ? 1 : 2);
+            } break;
+
+            // Окончательное меню телепорта
+            case GOSSIP_SENDER_MAIN + 5: {
+                /* портуем игрока в нужную ему точку */
+                sCustomTeleportMgr->TeleportFunction(player, action);
+            } break;
+
             default: break;
         } 
     }
@@ -71,8 +101,10 @@ class SpServerMenuPlayerGossip : public SpellScriptLoader {
 
             void HandleScript(SpellEffIndex /*effIndex*/)
             {
-				if (Player* player = GetCaster()->ToPlayer())
-                	sServerMenuMgr->GossipHelloMenu(player);
+                if (Player* player = GetCaster()->ToPlayer()) {
+                    if (!sServerMenuMgr->CanOpenMenu(player))
+                        sServerMenuMgr->GossipHelloMenu(player);
+                }
             }
 
             void Register() override

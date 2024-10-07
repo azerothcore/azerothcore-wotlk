@@ -35,30 +35,9 @@ class Professions_ : public CreatureScript
 public:
     Professions_() : CreatureScript("Professions_") {}
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    bool OnGossipHello(Player* player, Creature*)
     {
-        sProfessionMgr->MainMenu(player, creature);
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-        switch (sender)
-        {
-            case GOSSIP_SENDER_MAIN: {
-                switch (action) {
-                    case 0: sProfessionMgr->MainMenu(player, creature); break; /* начальное меню проф*/
-                    case 1: sProfessionMgr->PrimaryMenu(player, creature); break; /* меню основных проф */
-                    case 2: sProfessionMgr->SecondMenu(player, creature);  break; /* меню вторичных проф */
-                    case 3: OnGossipHello(player, creature); break; /* начальное меню */
-                }
-            } break;
-            case GOSSIP_SENDER_MAIN + 1: {
-                if (!player->HasSkill(action))
-                    sProfessionMgr->CompleteLearnProfession(player, action);
-            } break;
-        }
+        sProfessionMgr->MainMenu(player);
         return true;
     }
 };

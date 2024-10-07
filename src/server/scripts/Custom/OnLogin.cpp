@@ -102,6 +102,9 @@ public:
         player->RankControlOnLogin();
         player->LoadPvPRank();
         RemoveDementia(player);
+
+        if (!player->HasSpell(28698))
+            player->learnSpell(28698);
     }
 };
 

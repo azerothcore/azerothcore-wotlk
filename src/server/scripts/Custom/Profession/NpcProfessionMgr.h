@@ -49,13 +49,13 @@ public:
     /* защита задания */
     void CompleteQuest(Player* /* player */);
     /* главное меню профессий */
-    void MainMenu(Player* /* player */, Creature* /* creature */);
+    void MainMenu(Player* /* player */);
     /* меню primary */
-    void PrimaryMenu(Player* /* player */, Creature* /* creature */);
+    void PrimaryMenu(Player* /* player */);
     /* меню second */
-    void SecondMenu(Player* /* player */, Creature* /* creature */);
+    void SecondMenu(Player* /* player */);
     /* меню реагентов */
-    void ReagentsMenu(Player* /* player */, Creature* /* creature */);
+    void ReagentsMenu(Player* /* player */, Creature*);
     /* заголовка в госипке */
     std::string HeadMenu(Player* /* player */);
     /* заголовка в разделе реагентов */

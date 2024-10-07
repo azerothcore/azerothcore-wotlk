@@ -1,5 +1,5 @@
-#ifndef SERVER_MENU_H
-#define SERVER_MENU_H
+#ifndef CUSTOM_TELEPORT_H
+#define CUSTOM_TELEPORT_H
 
 #define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
@@ -32,8 +32,8 @@ public:
 
    /* загрузка таблиц */
    void LoadTeleportListContainer();
-   void TeleportListMain(Player* player, Creature* creature);
-   void GetTeleportListAfter(Player* player, Creature* creature, uint32 action, uint8 faction);
+   void TeleportListMain(Player* player);
+   void GetTeleportListAfter(Player* player, uint32 action, uint8 faction);
    void TeleportFunction(Player* player, uint32 i);
    std::string HeadMenu(Player* player);
    uint32 CalculRequiredMoney(Player* player, uint32 money);

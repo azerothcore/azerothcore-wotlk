@@ -1,8 +1,10 @@
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "Player.h"
+#include "../ServerMenu/ServerMenuMgr.h"
 
 using namespace std;
+
 #define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
 #define RankVendorID 44199
@@ -296,57 +298,7 @@ public:
         if (!player || !creature)
             return true;
 
-        player->PlayerTalkClass->ClearMenus();
-        std::string name = player->GetName();
-        std::ostringstream femb;
-
-        if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU)
-        {
-            femb << "Уважаемый|cff065961 " << name << "|r\n\n"
-                 << "Ваш текуший ранг: |cff065961" << player->GetAuraCount(71201) << "|r\n"
-                 << "У вас: |cff065961" << player->GetRankPoints() << "|r опыта\n"
-                 << "До следущего ранга: |cff065961" << player->PointsUntilNextRank() << "|r опыта\n\n"
-                 << "Ранги это вот этот значок |TInterface\\icons\\Ability_warrior_rampage:14:14:0:-1|t который отображается в дебафах.\n\n"
-                 << "Поднимать ранг вы можете за опыт который получите за:\n"
-                 << "   * Победу на арене\n   * Победу на поле боя\n   * Убийство игроков\n   * Награда за квесты\n   * Ивенты\n"
-                //  << "У |cff065961VIP аккаунтов|r рейтинг на опыт в 2 раза больше.\n\n"
-                 << "Что дает ранг ?\n"
-                 << "На каждом ранге есть свои бонусы, чем выше ранг тем больше бонусов.\n"
-                 << "На каждом ранге у вас открываются секретный продавец в котором могут быть полезные вещи такие как: вещи на А9-T11, трансмогрификацию, маунты, итд...";
-        }
-        else
-        {
-            femb << "Respected|cff065961 " << name << "|r\n\n"
-                 << "Your current rank: |cff065961" << player->GetAuraCount(71201) << "|r\n"
-                 << "You have |cff065961" << player->GetRankPoints() << "|r experience\n"
-                 << "To next rank: |cff065961" << player->PointsUntilNextRank() << "|r experience\n\n"
-                 << "Ranks this is this icon |TInterface\\icons\\Ability_warrior_rampage:14:14:0:-1|t which is displayed in debuffs.\n\n"
-                 << "You can raise the rank for the experience that you get for:\n"
-                 << "   * Victory in the arena\n   * Victory on the battlefield\n   * Kill the players\n   * Completing quests\n   * Events\n"
-                //  << "At |cff065961VIP accounts|r experience rating is 2 times higher.\n\n"
-                 << "What gives the rank?\n"
-                 << "Each rank has its own bonuses, the higher the rank the more bonuses.\n"
-                 << "At each rank you will have a secret prodigy in which there may be useful things such as: А9-T11, things for transmogrification, mounts, etc.";
-        }
-
-        AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player, "Обновить меню", "Refresh menu"), GOSSIP_SENDER_MAIN, 1);
-        player->PlayerTalkClass->SendGossipMenu(femb.str().c_str(), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
-    {
-        player->PlayerTalkClass->ClearMenus();
-
-        if (sender == GOSSIP_SENDER_MAIN)
-        {
-            switch (action)
-            {
-                case 1:
-                    OnGossipHello(player, creature);
-                break;
-            }
-        }
+        sServerMenuMgr->RankInfo(player);
         return true;
     }
 };

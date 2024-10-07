@@ -11,7 +11,6 @@
 #include "ScriptMgr.h"
 #include "DeathMatch.h"
 
-#define GossipHelloMenuID 0
 using namespace Acore::ChatCommands;
 
 /* ################  загрузка таблиц ################ */
@@ -55,27 +54,27 @@ void sCustomTeleport::LoadTeleportListContainer() {
     LOG_INFO("Custom.TeleportMaster", ">> TeleportMaster: Loaded {} teleportlist in {} ms.", count, GetMSTimeDiffToNow(oldMSTime));
 }
 
-void sCustomTeleport::TeleportListMain(Player* player, Creature* creature) {
+void sCustomTeleport::TeleportListMain(Player* player) {
     ClearGossipMenuFor(player);
     for (sCustomTeleport::TeleportList_Container::const_iterator itr = m_TeleportList_Container.begin(); itr != m_TeleportList_Container.end(); ++itr)
         if((*itr)->gossip_menu == 0)
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, (*itr)->name_RU, (*itr)->name_EN), GOSSIP_SENDER_MAIN + 1, (*itr)->id);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, GossipHelloMenuID);
-    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), creature->GetGUID());
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, (*itr)->name_RU, (*itr)->name_EN), GOSSIP_SENDER_MAIN + 4, (*itr)->id);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 0);
+    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
 }
 
-void sCustomTeleport::GetTeleportListAfter(Player* player, Creature* creature, uint32 action, uint8 faction) {
+void sCustomTeleport::GetTeleportListAfter(Player* player, uint32 action, uint8 faction) {
     ClearGossipMenuFor(player);
     for (sCustomTeleport::TeleportList_Container::const_iterator itr = m_TeleportList_Container.begin(); itr != m_TeleportList_Container.end(); ++itr) {
         if((*itr)->gossip_menu != 0 && (*itr)->gossip_menu == action && ((*itr)->faction == faction || (*itr)->faction == 3)) {
             AddGossipItemFor(player, GOSSIP_ICON_TAXI, GetText(player, (*itr)->name_RU + ConverterMoneyToGold(player, CalculRequiredMoney(player, (*itr)->cost)), (*itr)->name_EN +
             ConverterMoneyToGold(player, CalculRequiredMoney(player, (*itr)->cost))),
-            GOSSIP_SENDER_MAIN + 2, (*itr)->id, ConfirmMoneyTeleport(player, GetText(player, (*itr)->name_RU, (*itr)->name_EN)),
+            GOSSIP_SENDER_MAIN + 5, (*itr)->id, ConfirmMoneyTeleport(player, GetText(player, (*itr)->name_RU, (*itr)->name_EN)),
             CalculRequiredMoney(player, (*itr)->cost), false);
         }
     }
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, GossipHelloMenuID + 1);
-    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), creature->GetGUID());
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 1);
+    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
 }
 
 void sCustomTeleport::TeleportFunction(Player* player, uint32 i) {
@@ -147,10 +146,10 @@ class TeleportMaster : public CreatureScript
 public:
     TeleportMaster() : CreatureScript("TeleportMaster") { }
 
-    bool OnGossipHello(Player* player, Creature* creature) {
+    bool OnGossipHello(Player* player, Creature* /* creature */) {
         /* проверка на разрешение открыть спелл */
         if (!CanOpenMenu(player))
-            sCustomTeleportMgr->TeleportListMain(player, creature);
+            sCustomTeleportMgr->TeleportListMain(player);
         return true;    
     }
 
@@ -161,42 +160,6 @@ public:
             return true;
         }
         return false;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
-    {
-        if (!player || !creature)
-            return false;
-
-        player->PlayerTalkClass->ClearMenus();
-
-        switch (sender) {
-            case GOSSIP_SENDER_MAIN: { /* обычные функции */
-                switch (action) {
-                    case GossipHelloMenuID: { /* закрыть меню */
-                        player->PlayerTalkClass->ClearMenus();
-                        break;
-                    }
-                    case GossipHelloMenuID + 1: { /* меню телепортации - главная */
-                        OnGossipHello(player, creature);
-                        break;
-                    }    
-                }
-                break;
-            }
-            case GOSSIP_SENDER_MAIN + 1: { /* листинг точек для тп */
-                /* пересылаем на окно телепортации по пунктам в меню */
-                sCustomTeleportMgr->GetTeleportListAfter(player, creature, action, player->GetTeamId() == TEAM_HORDE ? 1 : 2);
-                break;
-            }
-
-            case GOSSIP_SENDER_MAIN + 2: { /* листинг уже готовых тп точек */
-                /* портуем игрока в нужную ему точку */
-                sCustomTeleportMgr->TeleportFunction(player, action);
-                break;
-            }    
-        }
-        return true;
     }
 };
 
