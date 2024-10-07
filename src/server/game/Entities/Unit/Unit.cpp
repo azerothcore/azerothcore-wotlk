@@ -8973,6 +8973,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
                     // Mana Drain Trigger
                     case 27522:
                     case 40336:
+                    case 46939:
                         {
                             // On successful melee or ranged attack gain $29471s1 mana and if possible drain $27526s1 mana from the target.
                             if (IsAlive())
