@@ -28,6 +28,9 @@ public:
 
     void static CreatePet(Player *player, Creature * creature, uint32 entry)
     {
+        if (!player || !creature || !entry)
+            return;
+
         if (player->getClass() != CLASS_HUNTER)
         {
             player->PlayerTalkClass->SendCloseGossip();
@@ -62,6 +65,13 @@ public:
 
     void learnSpellOnStart(Player* player)
     {
+        if (!player)
+            return;
+
+        if (!player->HasSpell(28698)) {
+            player->learnSpell(28698);
+        }
+
         switch (player->getClass())
         {
             case CLASS_WARRIOR:
@@ -355,6 +365,8 @@ public:
 
     void DisplayExoticPetMenu(Player* player, Creature* creature)
     {
+        if(!creature || !player)
+            return;
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_1, EN_player_learn_1), GOSSIP_SENDER_MAIN, 23);
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_2, EN_player_learn_2), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CORE_HOUND);
         AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_3, EN_player_learn_3), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_DEVILSAUR);
@@ -367,6 +379,9 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
+        if(!creature || !player)
+            return true;
+
         std::string name = player->GetName();
         std::ostringstream info;
 
@@ -384,7 +399,7 @@ public:
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_17, EN_player_learn_17), GOSSIP_SENDER_MAIN, 7);
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_18, EN_player_learn_18), GOSSIP_SENDER_MAIN, 8);
             AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_19, EN_player_learn_19), GOSSIP_SENDER_MAIN, 9);
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_20, EN_player_learn_20), GOSSIP_SENDER_MAIN, GOSSIP_RESET_TAL);
+            //AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_20, EN_player_learn_20), GOSSIP_SENDER_MAIN, GOSSIP_RESET_TAL);
         }
 
         AddGossipItemFor(player, 4, GetText(player, RU_player_learn_12, EN_player_learn_12), GOSSIP_SENDER_MAIN, 1, GetText(player, "Вы уверены что хотите сбросить свои таланты ?", "Are you sure you want to reset your talents?"), 0, false);
@@ -397,6 +412,9 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* creature, uint32 sender, uint32 action)
     {
+        if(!creature || !player)
+            return true;
+
         player->PlayerTalkClass->ClearMenus();
         if (sender == GOSSIP_SENDER_MAIN)
         {
