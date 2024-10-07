@@ -321,10 +321,21 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Ascendance (Talisman of Ascendance trinket)
-    ApplySpellFix({ 28200 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 41406, 41409 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->ProcCharges = 6;
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+        // spellInfo->ProcCharges = 0;
+        spellInfo->StackAmount = 10;
     });
+
+    ApplySpellFix({ 71201 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+        // spellInfo->ProcCharges = 0;
+        spellInfo->StackAmount = 50;
+    });    
 
     // rank system
     ApplySpellFix({ 71201 }, [](SpellInfo* spellInfo)
