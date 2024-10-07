@@ -1349,6 +1349,15 @@ bool Guardian::InitStatsForLevel(uint8 petlevel)
                                 SetCreateHealth(28 + 30 * petlevel);
                             }
 
+                            if(Player* pSummoner = owner->ToPlayer())
+                            {
+                                float bonus = pSummoner->GetRatingBonusValue(CR_HASTE_MELEE);
+                                ApplyPercentModFloatValue(UNIT_MOD_CAST_SPEED, bonus, false);
+
+                                int meleeHaste = pSummoner->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_HASTE) + pSummoner->GetTotalAuraModifier(SPELL_AURA_MOD_MELEE_RANGED_HASTE);
+                                ApplyCastTimePercentMod(meleeHaste, true);
+                            }
+
                             AddAura(SPELL_HUNTER_PET_SCALING_04, this);
                             AddAura(SPELL_DK_PET_SCALING_01, this);
                             AddAura(SPELL_DK_PET_SCALING_02, this);

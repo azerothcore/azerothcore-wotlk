@@ -732,19 +732,26 @@ class spell_dk_pet_scaling : public AuraScript
 
     void CalculateStatAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
     {
+        Unit* unitOwner = GetUnitOwner();
+        if (!unitOwner)
+            return;
+
         Stats stat = Stats(aurEff->GetSpellInfo()->Effects[aurEff->GetEffIndex()].MiscValue);
 
         // xinef: dk ghoul inherits 70% of strength and 30% of stamina
-        if (GetUnitOwner()->GetEntry() != NPC_RISEN_GHOUL)
+        if (unitOwner->GetEntry() != NPC_RISEN_GHOUL)
         {
             // xinef: ebon garogyle - inherit 30% of stamina
             if (GetUnitOwner()->GetEntry() == NPC_EBON_GARGOYLE && stat == STAT_STAMINA)
-                if (Unit* owner = GetUnitOwner()->GetOwner())
+                if (Unit* owner = unitOwner->GetCharmerOrOwner())
                     amount = CalculatePct(std::max<int32>(0, owner->GetStat(stat)), 30);
             return;
         }
 
-        if (Unit* owner = GetUnitOwner()->GetOwner())
+        if (unitOwner->GetEntry() != NPC_DK_GHOUL && !(stat == STAT_STRENGTH || stat == STAT_STAMINA))
+            return;
+
+        if (Unit* owner = unitOwner->GetOwner())
         {
             int32 modifier = stat == STAT_STRENGTH ? 70 : 30;
 
@@ -788,9 +795,16 @@ class spell_dk_pet_scaling : public AuraScript
     void CalculateHasteAmount(AuraEffect const*  /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         // xinef: scale haste with owners melee haste
-        if (Unit* owner = GetUnitOwner()->GetOwner())
+        if (Unit* owner = GetUnitOwner()->GetOwner()) {
             if (owner->m_modAttackSpeedPct[BASE_ATTACK] < 1.0f) // inherit haste only
-                amount = std::min<int32>(100, int32(((1.0f / owner->m_modAttackSpeedPct[BASE_ATTACK]) - 1.0f) * 100.0f));
+            {
+                float const _amount = std::min<int32>(100, int32(((1.0f / owner->m_modAttackSpeedPct[BASE_ATTACK]) - 1.0f) * 100.0f));
+                if (GetUnitOwner()->GetEntry() == NPC_EBON_GARGOYLE)
+                    amount = static_cast<int32>(amount - _amount);
+                else
+                    amount = static_cast<int32>(_amount);
+            }
+        }
     }
 
     void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
@@ -798,17 +812,23 @@ class spell_dk_pet_scaling : public AuraScript
         if (aurEff->GetAuraType() != SPELL_AURA_MELEE_SLOW)
             return;
 
-        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, true, SPELL_BLOCK_TYPE_POSITIVE);
-        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_MELEE_RANGED_HASTE, true, SPELL_BLOCK_TYPE_POSITIVE);
-        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MELEE_SLOW, true, SPELL_BLOCK_TYPE_POSITIVE);
-
-        if (GetUnitOwner()->IsPet())
+        Unit* unitOwner = GetUnitOwner();
+        if (!unitOwner)
             return;
 
-        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_STAT, true, SPELL_BLOCK_TYPE_POSITIVE);
-        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
-        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER, true, SPELL_BLOCK_TYPE_POSITIVE);
-        GetUnitOwner()->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
+        unitOwner->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, true, SPELL_BLOCK_TYPE_POSITIVE);
+        unitOwner->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_MELEE_RANGED_HASTE, true, SPELL_BLOCK_TYPE_POSITIVE);
+        unitOwner->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MELEE_SLOW, true, SPELL_BLOCK_TYPE_POSITIVE);
+
+        if (unitOwner->IsPet())
+            return;
+
+        if (unitOwner->GetEntry() != NPC_EBON_GARGOYLE)
+            unitOwner->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_STAT, true, SPELL_BLOCK_TYPE_POSITIVE);
+
+        unitOwner->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE, true, SPELL_BLOCK_TYPE_POSITIVE);
+        unitOwner->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER, true, SPELL_BLOCK_TYPE_POSITIVE);
+        unitOwner->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_MOD_ATTACK_POWER_PCT, true, SPELL_BLOCK_TYPE_POSITIVE);
     }
 
     void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
@@ -823,6 +843,11 @@ class spell_dk_pet_scaling : public AuraScript
     void HandlePeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
+
+        Unit* unitOwner = GetUnitOwner();
+        if (!unitOwner)
+            return;
+
         if (aurEff->GetAuraType() == SPELL_AURA_MOD_STAT && (aurEff->GetMiscValue() == STAT_STAMINA || aurEff->GetMiscValue() == STAT_INTELLECT))
         {
             int32 currentAmount = aurEff->GetAmount();
@@ -833,13 +858,13 @@ class spell_dk_pet_scaling : public AuraScript
                 {
                     uint32 actStat = GetUnitOwner()->GetHealth();
                     GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetHealth(std::min<uint32>(GetUnitOwner()->GetMaxHealth(), actStat));
+                    unitOwner->SetHealth(std::min<uint32>(unitOwner->GetMaxHealth(), actStat));
                 }
                 else
                 {
                     uint32 actStat = GetUnitOwner()->GetPower(POWER_MANA);
                     GetEffect(aurEff->GetEffIndex())->ChangeAmount(newAmount, false);
-                    GetUnitOwner()->SetPower(POWER_MANA, std::min<uint32>(GetUnitOwner()->GetMaxPower(POWER_MANA), actStat));
+                    unitOwner->SetPower(POWER_MANA, std::min<uint32>(unitOwner->GetMaxPower(POWER_MANA), actStat));
                 }
             }
         }
@@ -849,13 +874,13 @@ class spell_dk_pet_scaling : public AuraScript
 
     void Register() override
     {
-        if (m_scriptSpellId == 54566)
+        if (m_scriptSpellId == SPELL_DK_PET_SCALING_02)
         {
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling::CalculateStatAmount, EFFECT_ALL, SPELL_AURA_MOD_STAT);
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling::CalculateSPAmount, EFFECT_ALL, SPELL_AURA_MOD_DAMAGE_DONE);
         }
 
-        if (m_scriptSpellId == 51996)
+        if (m_scriptSpellId == SPELL_DK_PET_SCALING_01)
             DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dk_pet_scaling::CalculateHasteAmount, EFFECT_ALL, SPELL_AURA_MELEE_SLOW);
 
         OnEffectApply += AuraEffectApplyFn(spell_dk_pet_scaling::HandleEffectApply, EFFECT_ALL, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
