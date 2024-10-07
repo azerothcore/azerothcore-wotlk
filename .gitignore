@@ -4,7 +4,6 @@
 
 /conf/*
 !/conf/dist
-/modules/*
 !/modules/*.md
 !/modules/*.sh
 !/modules/CMakeLists.txt
@@ -20,8 +19,6 @@
 /.env*
 /apps/joiner
 /deps/deno
-/data/sql/custom/*
-/src/server/scripts/Custom/*
 !/src/server/scripts/Custom/README.md
 
 /*.override.yml
