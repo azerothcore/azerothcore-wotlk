@@ -527,6 +527,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
     if (opcode == MSG_MOVE_JUMP)
     {
         jumpopcode = true;
+        if(plrMover->IsDeathMatch())
+            plrMover->CastSpell(plrMover, 74608, true);
         if (plrMover && !sScriptMgr->AnticheatHandleDoubleJump(plrMover, mover))
         {
             plrMover->GetSession()->KickPlayer();

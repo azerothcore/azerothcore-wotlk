@@ -20,6 +20,7 @@
 #include "CellImpl.h"
 #include "Channel.h"
 #include "ChannelMgr.h"
+#include "DeathMatch.h"
 #include "Formulas.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
@@ -1180,7 +1181,7 @@ void Player::UpdateArea(uint32 newArea)
     m_areaUpdateId = newArea;
 
     AreaTableEntry const* area = sAreaTableStore.LookupEntry(newArea);
-    pvpInfo.IsInFFAPvPArea     = area && (area->flags & AREA_FLAG_ARENA);
+    pvpInfo.IsInFFAPvPArea     = area && ((area->flags & AREA_FLAG_ARENA) || DeathMatchMgr->IsDeathMatchZone(newArea));
     UpdateFFAPvPState(false);
 
     UpdateAreaDependentAuras(newArea);

@@ -651,19 +651,19 @@
 /************************************************ Деадматч ************************************************/
 
 #define RU_DEATHMATCH_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Зона исключила вас по причине входа второго персонажа с одинаковым ip адрессом в зону."
-#define EN_DEATHMATCH_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Royale Battle]: The zone excluded you due to the entrance of the second character with the same ip address in zone."
+#define EN_DEATHMATCH_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: The zone excluded you due to the entrance of the second character with the same ip address in zone."
 
 #define RU_DEATHMATCH_JOIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Вы присоединились к Королевской Битве, для выхода из зоны пропишите в чат |cffffff4d.dm exit|r"
-#define EN_DEATHMATCH_JOIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Royale Battle]: You joined the Royale Battle, to leave the zone, write to the chat |cffffff4d.dm exit|r"
+#define EN_DEATHMATCH_JOIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: You joined the Battle Royale, to leave the zone, write to the chat |cffffff4d.dm exit|r"
 
 #define RU_DEATHMATCH_EXIT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Вы покинули Королевскую Битву, за текущий бой вы убили |cffffff4d%u|r|cffff9933 игроков"
-#define EN_DEATHMATCH_EXIT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Royale Battle]: You left the Royale Battle, you have killed in the current battle |cffffff4d%u|r|cffff9933 player(s)"
+#define EN_DEATHMATCH_EXIT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: You left the Battle Royale, you have killed in the current battle |cffffff4d%u|r|cffff9933 player(s)"
 
 #define RU_DEATHMATCH_JOIN_NPC "|TInterface/ICONS/Achievement_bg_grab_cap_flagunderxseconds:20:20:-20:0|tПрисоединиться к Королевской Битве"
-#define EN_DEATHMATCH_JOIN_NPC "|TInterface/ICONS/Achievement_bg_grab_cap_flagunderxseconds:20:20:-20:0|tJoin the Royale Battle"
+#define EN_DEATHMATCH_JOIN_NPC "|TInterface/ICONS/Achievement_bg_grab_cap_flagunderxseconds:20:20:-20:0|tJoin the Battle Royale"
 
 #define RU_DEATHMATCH_INFO_NPC "Вы уверены что хотите попасть в Королевскую Битву ?"
-#define EN_DEATHMATCH_INFO_NPC "Are you sure you want to get to the Royale Battle?"
+#define EN_DEATHMATCH_INFO_NPC "Are you sure you want to get to the Battle Royale?"
 
 /******************************************** Бонус система **********************************************/
 

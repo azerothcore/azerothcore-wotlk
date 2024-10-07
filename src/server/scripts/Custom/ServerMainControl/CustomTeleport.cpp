@@ -9,6 +9,7 @@
 #include "ScriptedGossip.h"
 #include "CustomTeleport.h"
 #include "ScriptMgr.h"
+#include "DeathMatch.h"
 
 #define GossipHelloMenuID 0
 using namespace Acore::ChatCommands;
@@ -233,13 +234,41 @@ public:
             {"olo", HandleJoinOloCommand, SEC_PLAYER, Console::No},
         };
 
+        static ChatCommandTable DeathmatchTable =
+        {
+            { "join", HandleJoinDmCommand, SEC_PLAYER, Console::No},
+            { "exit", HandleExitDmCommand, SEC_PLAYER, Console::No},
+        };
+
         static ChatCommandTable commandTable =
         {
             { "tpmaster", ServerMenuTable },
             { "join", JoinOloCommand },
+            { "dm", DeathmatchTable },
         };
         return commandTable;
     }
+
+    static bool HandleJoinDmCommand(ChatHandler* handler)
+    {
+        Player* targetPlayer = handler->GetSession()->GetPlayer();
+        if (!targetPlayer)
+            return true;
+
+        DeathMatchMgr->AddPlayer(targetPlayer);
+        return true;
+    }
+
+    static bool HandleExitDmCommand(ChatHandler* handler)
+    {
+        Player* targetPlayer = handler->GetSession()->GetPlayer();
+        if(!targetPlayer)
+            return true;
+
+        if (targetPlayer->IsDeathMatch())
+            DeathMatchMgr->RemovePlayer(targetPlayer);
+        return true;
+    }    
 
     static bool HandleJoinOloCommand(ChatHandler* handler)
     {

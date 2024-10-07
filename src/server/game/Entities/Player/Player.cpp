@@ -39,6 +39,7 @@
 #include "Config.h"
 #include "CreatureAI.h"
 #include "DatabaseEnv.h"
+#include "DeathMatch.h"
 #include "DisableMgr.h"
 #include "Formulas.h"
 #include "GameEventMgr.h"
@@ -282,6 +283,10 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     for (uint8 i = 0; i < MAX_MOVE_TYPE; ++i)
         m_forced_speed_changes[i] = 0;
+
+    /////////////////// DeathMatch /////////////////
+
+    m_deathmatch            = false;        
 
     /////////////////// Instance System /////////////////////
 
@@ -4409,6 +4414,12 @@ void Player::SetMovement(PlayerMovementType pType)
 */
 void Player::BuildPlayerRepop()
 {
+    if (IsDeathMatch())
+    {
+        DeathMatchMgr->RevivePlayer(this);
+        return;
+    }
+
     WorldPacket data(SMSG_PRE_RESURRECT, GetPackGUID().size());
     data << GetPackGUID();
     GetSession()->SendPacket(&data);
@@ -4907,6 +4918,11 @@ void Player::RepopAtGraveyard()
 {
     // note: this can be called also when the player is alive
     // for example from WorldSession::HandleMovementOpcodes
+
+    if (IsDeathMatch()) {
+        DeathMatchMgr->RevivePlayer(this);
+        return;
+    }
 
     AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetAreaId());
 
@@ -11370,6 +11386,12 @@ bool Player::CanJoinToBattleground() const
     if (HasAura(26013))
         return false;
 
+    if(IsDeathMatch())
+        return false;
+
+    if (InBattlegroundQueueForBattlegroundQueueType(BATTLEGROUND_QUEUE_5v5))
+        return false;        
+
     return true;
 }
 
@@ -13674,7 +13696,8 @@ bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell)
 
 void Player::learnSpellHighRank(uint32 spellid)
 {
-    learnSpell(spellid);
+    if (!HasSpell(spellid))
+        learnSpell(spellid);
 
     if (uint32 next = sSpellMgr->GetNextSpellInChain(spellid))
         learnSpellHighRank(next);
@@ -13889,6 +13912,9 @@ void Player::HandleFall(MovementInfo const& movementInfo)
                 // Gust of Wind
                 if (HasAura(43621))
                     damage = GetMaxHealth() / 2;
+
+                if (IsDeathMatch())
+                    damage = 0;    
 
                 // Divine Protection
                 if (HasAura(498))
