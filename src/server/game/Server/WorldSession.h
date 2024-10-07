@@ -329,7 +329,7 @@ struct PacketCounter
 class WorldSession
 {
 public:
-    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime);
+    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime, uint32 Bonuses);
     ~WorldSession();
 
     bool IsGMAccount() const;
@@ -374,6 +374,9 @@ public:
 
     void SetTotalTime(uint32 TotalTime) { m_total_time = TotalTime; }
     uint32 GetTotalTime() const { return m_total_time; }
+
+    void SetBonuses(uint32 Bonuses) { m_bonuses = Bonuses; }
+    uint32 GetBonuses() const { return m_bonuses; }
 
     void InitWarden(SessionKey const&, std::string const& os);
     Warden* GetWarden();
@@ -1151,6 +1154,7 @@ private:
     std::string _accountName;
     uint8 m_expansion;
     uint32 m_total_time;
+    uint32 m_bonuses;
 
     typedef std::list<AddonInfo> AddonsList;
 

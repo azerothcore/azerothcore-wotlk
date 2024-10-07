@@ -788,6 +788,7 @@ enum AcoreStrings
     LANG_PINFO_MUTED                    = 35403,
     LANG_PINFO_ACC_ACCOUNT              = 35404,
     LANG_PINFO_ACC_LASTLOGIN            = 35405,
+    LANG_PINFO_ACC_BONUSES              = 35410,
     LANG_PINFO_ACC_OS                   = 749,
     LANG_PINFO_ACC_REGMAILS             = 35406,
     LANG_PINFO_ACC_IP                   = 752,
