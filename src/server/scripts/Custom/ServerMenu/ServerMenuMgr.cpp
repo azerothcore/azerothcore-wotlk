@@ -103,12 +103,12 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId) {
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "У вас " << player->GetHonorPoints() << " очков чести.\n\n";
                 ss << "В данном разделе вы можете передать любому игроку на этом проекте часть или весь ваш хонор.\n";
-                ss << "Для этого вам нужно выбрать количество которое хотите передать и указать ник игрока.\n";
+                ss << "Для этого вам нужно получить [5 ранг] а потом уже выбрать количество которое хотите передать и указать ник игрока.\n";
             } else {
                 ss << "Greetings, " << player->GetName() << "\n\n";
                 ss << "У вас " << player->GetHonorPoints() << " очков чести.\n\n";
                 ss << "В данном разделе вы можете передать любому игроку на этом проекте часть или весь ваш хонор.\n";
-                ss << "Для этого вам нужно выбрать количество которое хотите передать и указать ник игрока.\n";
+                ss << "Для этого вам нужно получить [5 ранг] а потом уже выбрать количество которое хотите передать и указать ник игрока.\n";
             }
         } break;
 
@@ -198,6 +198,11 @@ void sServerMenu::TradeHonorAccept(Player* player, uint32 honor, char const* nam
 
     if (!player || !honor ||!name)
         return;
+
+    if (player->GetRankByExp() < 5) {
+        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_glory_win_9, EN_glory_win_9), 5);
+        return sServerMenuMgr->OpenTradeHonor(player); 
+    }
 
     ObjectGuid TargetGUID;
     Player* target = ObjectAccessor::FindPlayerByName(name, false);
