@@ -90,6 +90,28 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(4); // 120 seconds
     });
 
+    // дк требование кузни SpellFocusObject
+    ApplySpellFix({
+        62158,
+        53343,
+        70164,
+        53341,
+        53344,
+        53331,
+        54447,
+        53323,
+        54446,
+        53342 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RequiresSpellFocus = 0;
+    });    
+
+    ApplySpellFix({ 28698 /* меню */ }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(0);
+    });   
+
     ApplySpellFix({
         63026, // Force Cast (HACK: Target shouldn't be changed)
         63137  // Force Cast (HACK: Target shouldn't be changed; summon position should be untied from spell destination)
