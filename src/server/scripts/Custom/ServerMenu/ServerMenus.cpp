@@ -56,6 +56,8 @@ public:
                     case 4: sServerMenuMgr->ChangeRFN(player, 2); break;
                     // Проффер
                     case 5: sProfessionMgr->MainMenu(player); break;
+                    // Передача очков чести
+                    case 6: sServerMenuMgr->OpenTradeHonor(player); break;
                 }
             } break;
 
@@ -88,6 +90,17 @@ public:
 
             default: break;
         } 
+    }
+
+    void OnGossipSelectCode(Player* player, uint32 /*menu_id*/, uint32 sender, uint32 action, const char* code)
+    {
+        ClearGossipMenuFor(player);
+        switch (sender) {
+            // Передача очков чести
+            case GOSSIP_SENDER_MAIN: {
+                sServerMenuMgr->TradeHonorAccept(player, action, code);
+            } break;
+        }
     }
 };
 

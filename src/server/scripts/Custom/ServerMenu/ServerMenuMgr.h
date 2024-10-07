@@ -30,6 +30,13 @@ public:
     uint32 getRaceCost() { return _raceCost; }
     uint32 getNickCost() { return _nickCost; }
 
+    // Передача очков чести игроку
+    void OpenTradeHonor(Player* /*player*/);
+    // Проверяем игрок онлайн или нет
+    void TradeHonorAccept(Player* /*player*/, uint32 /*honor*/, char const* /*args*/);
+    // Снимает и выдаем
+    void SendHonorToPlayer(Player* /*sender*/, ObjectGuid /*receiver*/, uint32 /*amount*/, bool /*online*/, Player* /*Preceiver*/, char const* /*name*/);
+
 private:
     static const uint32 _factionCost = 50;
     static const uint32 _raceCost = 30;

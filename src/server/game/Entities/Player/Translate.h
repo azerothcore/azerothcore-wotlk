@@ -91,6 +91,9 @@
 #define RU_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:20:20:-20:0|tСменить ник за 15 бонусов"
 #define EN_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:20:20:-20:0|tChange nickname for 15 bonuses"
 
+#define RU_CHAR_CONTROL_7 "|TInterface\\icons\\Achievement_reputation_01:20:20:-20:0|tТрансфер очков чести"
+#define EN_CHAR_CONTROL_7 "|TInterface\\icons\\Achievement_reputation_01:20:20:-20:0|tTransfer honor points"
+
 #define RU_NOTVIP_MENU_1 "Узнать о бонусах Премиум аккаунте"
 #define EN_NOTVIP_MENU_1 "Learn about Premium account bonuses"
 
@@ -703,5 +706,26 @@
 
 #define EN_DEMETIA_STACK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Dementia]: Damage and healing is going to be progressively increased every minute from now!|r"
 #define RU_DEMETIA_STACK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Безумие]: С этого момента урон и исцеление будут увеличиваться с каждой минутой!|r"
+
+#define RU_HONOR_TRADE_1000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t1000 очков чести"
+#define EN_HONOR_TRADE_1000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t1000 honor points"
+
+#define RU_HONOR_TRADE_5000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t5000 очков чести"
+#define EN_HONOR_TRADE_5000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t5000 honor points"
+
+#define RU_HONOR_TRADE_10000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t10000 очков чести"
+#define EN_HONOR_TRADE_10000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t10000 honor points"
+
+#define RU_HONOR_TRADE_25000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t25000 очков чести"
+#define EN_HONOR_TRADE_25000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t25000 honor points"
+
+#define RU_HONOR_TRADE_50000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t50000 очков чести"
+#define EN_HONOR_TRADE_50000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t50000 honor points"
+
+#define EN_HONOR_TRADE_OK_SENDER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Transfer]: Player |cffffff4d%s|cffff9933 successfully received |cffffff4d%u|cffff9933 honor points.|r"
+#define RU_HONOR_TRADE_OK_SENDER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Трансфер]: Игрок |cffffff4d%s|cffff9933 успешно получил |cffffff4d%u|cffff9933 очков чести.|r"
+
+#define EN_HONOR_TRADE_OK_RECEIVER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Transfer]: You received |cffffff4d%u|cffff9933 honor points from the player |cffffff4d%s|cffff9933.|r"
+#define RU_HONOR_TRADE_OK_RECEIVER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Трансфер]: Вы получили |cffffff4d%u|cffff9933 очков чести от игрока |cffffff4d%s|cffff9933.|r"
 
 #endif
