@@ -10,10 +10,13 @@ using namespace std;
 class npc_pvp_rang_10 : public CreatureScript
 {
 public:
-        npc_pvp_rang_10() : CreatureScript("npc_pvp_rang_10") { }
+    npc_pvp_rang_10() : CreatureScript("npc_pvp_rang_10") { }
 
     bool OnGossipHello(Player* player, Creature * creature)
     {
+        if (!player || !creature)
+            return true;
+
         player->PlayerTalkClass->ClearMenus();
         std::string name = player->GetName();
         std::ostringstream femb;
@@ -67,6 +70,9 @@ public:
 
     bool OnGossipHello(Player* player, Creature * creature)
     {
+        if (!player || !creature)
+            return true;
+
         player->PlayerTalkClass->ClearMenus();
         std::string name = player->GetName();
         std::ostringstream femb;
@@ -120,6 +126,9 @@ public:
 
     bool OnGossipHello(Player* player, Creature * creature)
     {
+        if (!player || !creature)
+            return true;
+
         player->PlayerTalkClass->ClearMenus();
         std::string name = player->GetName();
         std::ostringstream femb;
@@ -173,6 +182,9 @@ public:
 
     bool OnGossipHello(Player* player, Creature * creature)
     {
+        if (!player || !creature)
+            return true;
+
         player->PlayerTalkClass->ClearMenus();
         std::string name = player->GetName();
         std::ostringstream femb;
@@ -222,10 +234,13 @@ public:
 class npc_pvp_rang_50 : public CreatureScript
 {
 public:
-        npc_pvp_rang_50() : CreatureScript("npc_pvp_rang_50") { }
+    npc_pvp_rang_50() : CreatureScript("npc_pvp_rang_50") { }
 
     bool OnGossipHello(Player* player, Creature * creature)
     {
+        if (!player || !creature)
+            return true;
+
         player->PlayerTalkClass->ClearMenus();
         std::string name = player->GetName();
         std::ostringstream femb;
@@ -278,6 +293,9 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature)
     {
+        if (!player || !creature)
+            return true;
+
         player->PlayerTalkClass->ClearMenus();
         std::string name = player->GetName();
         std::ostringstream femb;

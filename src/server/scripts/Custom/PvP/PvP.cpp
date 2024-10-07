@@ -10,6 +10,9 @@ class duel_reset : public PlayerScript
 
     void Reset_coold_pet(Pet* pet)
     {
+        if (!pet)
+            return;
+
         //pet->RemoveArenaAuras();
         pet->SetHealth(pet->GetMaxHealth());
         pet->SetPower(pet->getPowerType(), pet->GetMaxPower(pet->getPowerType()));
@@ -17,6 +20,8 @@ class duel_reset : public PlayerScript
 
     void rage_runis(Player* player)
     {
+        if (!player)
+            return;
 		switch (player->getPowerType())
         {
             case POWER_RAGE:
@@ -32,6 +37,9 @@ class duel_reset : public PlayerScript
 
     void Reset_stat(Player* player)
     {
+        if (!player)
+            return;
+
         player->SetHealth(player->GetMaxHealth());
         player->CombatStop();
         if (player->getPowerType() == POWER_MANA)
@@ -40,6 +48,9 @@ class duel_reset : public PlayerScript
 
     void Reset_coold(Player* player)
     {
+        if (!player)
+            return;
+
         if (player->HasAura(25771))
             player->RemoveAura(25771);
         if (player->HasAura(57724))
@@ -52,13 +63,17 @@ class duel_reset : public PlayerScript
 
     void DruidForm(Player * player)
     {
-        // Druid form.
+        if (!player)
+            return;
+
         if (player->getClass() == CLASS_DRUID)
             player->SetPower(POWER_MANA, player->GetMaxPower(POWER_MANA));
     }
 
     void OnDuelStart(Player* player1, Player* player2)
     {
+        if (!player1 || !player2)
+            return;
 
         Pet* pet = player1->GetPet();
         Pet* pets = player2->GetPet();
@@ -83,6 +98,9 @@ class duel_reset : public PlayerScript
 
     void OnDuelEnd(Player* pWinner, Player* pLoser, DuelCompleteType /*type*/)
     {
+        if (!pWinner || !pLoser)
+            return;
+
         Reset_stat(pWinner);
         Reset_stat(pLoser);
     }

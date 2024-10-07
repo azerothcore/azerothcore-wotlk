@@ -109,7 +109,11 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 28698 /* меню */ }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(0);
+        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+        spellInfo->Effects[EFFECT_2].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
     });   
 
     ApplySpellFix({
@@ -321,30 +325,36 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Ascendance (Talisman of Ascendance trinket)
-    ApplySpellFix({ 41406, 41409 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 28200 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 6;
+    });
+
+    ApplySpellFix({ 40874 }, [](SpellInfo* spellInfo)
     {
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
-        // spellInfo->ProcCharges = 0;
+        spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->ProcCharges = 50;
         spellInfo->StackAmount = 10;
     });
 
-    ApplySpellFix({ 71201 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 29001, 29002, 29003}, [](SpellInfo* spellInfo)
     {
-        spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
-        // spellInfo->ProcCharges = 0;
-        spellInfo->StackAmount = 50;
-    });    
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
 
     // rank system
     ApplySpellFix({ 71201 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
+        spellInfo->AttributesEx |= SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
-        //spellInfo->ProcCharges = 0;
-        spellInfo->StackAmount = 50;
+        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->ProcCharges = 100;
+        spellInfo->StackAmount = 100;
     });    
 
     // The Eye of Acherus (no spawn in phase 2 in db)

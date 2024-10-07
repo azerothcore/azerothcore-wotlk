@@ -1957,7 +1957,7 @@ public:
         std::string userName          = handler->GetAcoreString(LANG_ERROR);
         ObjectGuid::LowType lowguid   = target->GetGUID().GetCounter();
         uint32 accId                  = 0;
-        uint32 accBonuses             = playerTarget->GetSession()->GetBonuses();
+        uint32 accBonuses             = 0;
         std::string eMail             = handler->GetAcoreString(LANG_ERROR);
         std::string regMail           = handler->GetAcoreString(LANG_ERROR);
         uint32 security               = 0;
@@ -2017,6 +2017,7 @@ public:
             }
 
             accId             = playerTarget->GetSession()->GetAccountId();
+            accBonuses        = playerTarget->GetSession()->GetBonuses();
             money             = playerTarget->GetMoney();
             totalPlayerTime   = playerTarget->GetTotalPlayedTime();
             level             = playerTarget->GetLevel();

@@ -34,6 +34,9 @@ void DeathMatch::RevivePlayer(Player* player)
 
 void DeathMatch::ResetHpMana(Player* player)
 {
+    if (!player)
+        return;
+
     player->SetHealth(player->GetMaxHealth());
     player->CombatStop();
     if (player->getPowerType() == POWER_MANA)
@@ -41,6 +44,10 @@ void DeathMatch::ResetHpMana(Player* player)
 }
 
 bool DeathMatch::CanOpenMenu(Player* player) {
+
+    if (!player)
+        return true;
+
     if (player->IsDeathMatch() || player->IsInFlight() || player->GetMap()->IsBattlegroundOrArena() || !DeathMatchMgr->CheckFullEquipAndTalents(player)
         || player->isDead() || (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609 && !player->IsGameMaster() && !player->HasSpell(50977))) {
         ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "Сейчас это невозможно.", "Now it is impossible"));
@@ -95,17 +102,17 @@ void DeathMatch::AddPlayer(Player* player)
     if (!player)
         return;
 
-    if (DeathMatchMgr->CanOpenMenu(player)) {
-        if (IsDeathMatchZone(player->GetZoneId()))
-            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
-        return;
-    }
-
     if (player->InBattlegroundQueue())
         return;
 
     if (!player->HasFreeBattlegroundQueueId())
         return;
+
+    if (DeathMatchMgr->CanOpenMenu(player)) {
+        if (IsDeathMatchZone(player->GetZoneId()))
+            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+        return;
+    }        
 
     auto itr = _players.find(player->GetSession()->GetRemoteAddress());
     if (itr != _players.end() && itr->second != player->GetGUID()) {
@@ -308,12 +315,18 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
+        if (!player || !creature)
+            return true;
+
         DeathMatchMgr->DeathMatchWelcome(player, creature);
         return true;
     }
 
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
+        if (!player || !action)
+            return true;
+
         player->PlayerTalkClass->ClearMenus();
         switch (action)
         {
@@ -342,8 +355,6 @@ public:
 
         if (killed->getLevel() < 80)
             return;
-
-
 
         // дроп сундука
         int win = urand(1, 3);
@@ -379,6 +390,9 @@ public:
 
     void OnLogin(Player* player) override
     {
+        if (!player)
+            return;
+
         if (DeathMatchMgr->IsDeathMatchZone(player->GetZoneId())) {
             if (!player->IsDeathMatch())
                 DeathMatchMgr->AddPlayer(player);

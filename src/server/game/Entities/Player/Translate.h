@@ -82,14 +82,14 @@
 #define RU_CHAR_CONTROL_3 "|TInterface\\icons\\Inv_crate_08:20:20:-20:0|tПрофессии"
 #define EN_CHAR_CONTROL_3 "|TInterface\\icons\\Inv_crate_08:20:20:-20:0|tProfessions"
 
-#define RU_CHAR_CONTROL_4 "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:20:20:-20:0|tСменить фракцию за 15 000 |TInterface\\moneyframe\\ui-goldicon:12:12:-1:1|t"
-#define EN_CHAR_CONTROL_4 "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:20:20:-20:0|tChange faction for 15 000 |TInterface\\moneyframe\\ui-goldicon:12:12:-1:1|t"
+#define RU_CHAR_CONTROL_4 "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:20:20:-20:0|tСменить фракцию за 50 бонусов"
+#define EN_CHAR_CONTROL_4 "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:20:20:-20:0|tChange faction for 50 bonuses"
 
-#define RU_CHAR_CONTROL_5 "|TInterface\\icons\\INV_Misc_Toy_04:20:20:-20:0|tСменить расу за 7 500 |TInterface\\moneyframe\\ui-goldicon:12:12:-1:1|t"
-#define EN_CHAR_CONTROL_5 "|TInterface\\icons\\INV_Misc_Toy_04:20:20:-20:0|tChange race for 7 500 |TInterface\\moneyframe\\ui-goldicon:12:12:-1:1|t"
+#define RU_CHAR_CONTROL_5 "|TInterface\\icons\\INV_Misc_Toy_04:20:20:-20:0|tСменить расу за 30 бонусов"
+#define EN_CHAR_CONTROL_5 "|TInterface\\icons\\INV_Misc_Toy_04:20:20:-20:0|tChange race for 30 bonuses"
 
-#define RU_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:20:20:-20:0|tСменить ник за 5 000 |TInterface\\moneyframe\\ui-goldicon:12:12:-1:1|t"
-#define EN_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:20:20:-20:0|tChange nickname for 5 000 |TInterface\\moneyframe\\ui-goldicon:12:12:-1:1|t"
+#define RU_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:20:20:-20:0|tСменить ник за 15 бонусов"
+#define EN_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:20:20:-20:0|tChange nickname for 15 bonuses"
 
 #define RU_NOTVIP_MENU_1 "Узнать о бонусах Премиум аккаунте"
 #define EN_NOTVIP_MENU_1 "Learn about Premium account bonuses"
@@ -673,6 +673,9 @@
 #define RU_GET_BONUS_USE_ITEM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система бонусов]: Вы успешно получили |cffffff4d%u|r|cffff9933 бонусов !|r"
 #define EN_GET_BONUS_USE_ITEM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Bonus system]: You have successfully received |cffffff4d%u|r|cffff9933 bonuses !|r"
 
+#define RU_NO_BONUS_HAVE "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система бонусов]: Недостаточно бонусов, вам нужно |cffffff4d%u|r|cffff9933 бонусов !|r"
+#define EN_NO_BONUS_HAVE "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Bonus system]: Not enough bonuses, you need |cffffff4d%u|r|cffff9933 bonuses !|r"
+
 #define RU_DUEL_ZONE_ONLY "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t Дуэли разрешены только в дуэль зоне !|r"
 #define EN_DUEL_ZONE_ONLY "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t Duels are only allowed in the duel zone !|r"
 
@@ -698,7 +701,7 @@
                          "Enter the slot you want to replace:\n from 1 to 5.\n\n"\
                          "Then click on |cff069E02TO ACCEPT|r."
 
-#define EN_DEMETIA_STACK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Dementia]: Congratulations! You received |cffffff4dnew|cffff9933 rank.|r"
-#define RU_DEMETIA_STACK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Безумие]: Поздравляем! Вы получили |cffffff4dновый|cffff9933 ранг.|r"
+#define EN_DEMETIA_STACK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Dementia]: Damage and healing is going to be progressively increased every minute from now!|r"
+#define RU_DEMETIA_STACK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Безумие]: С этого момента урон и исцеление будут увеличиваться с каждой минутой!|r"
 
 #endif

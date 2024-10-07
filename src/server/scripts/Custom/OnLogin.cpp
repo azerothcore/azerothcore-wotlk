@@ -6,7 +6,7 @@
 #include "Pet.h"
 #include "ReputationMgr.h"
 
-const uint32 SPELL_DEMENTIA = 41406;
+const uint32 SPELL_DEMENTIA = 40874;
 
 class Login_script : public PlayerScript
 {
@@ -18,20 +18,9 @@ public:
         if (!player || !newZone || !newArea)
             return;
 
-        Pet* pet = player->GetPet();
-
         // Remove Dementia on updating zone for player
         if (player->HasAura(SPELL_DEMENTIA))
             player->RemoveAura(SPELL_DEMENTIA);
-
-        // Remove Dementia on upddating zone for pet
-        if (pet)
-        {
-            if (pet->HasAura(SPELL_DEMENTIA))
-            {
-                pet->RemoveAura(SPELL_DEMENTIA);
-            }
-        }
     }
 
     void RemoveDementia(Player* player) 
@@ -39,19 +28,9 @@ public:
         if (!player)
             return;
 
-        Pet* pet = player->GetPet();
         // Remove Dementia on player login
         if (player->HasAura(SPELL_DEMENTIA))
             player->RemoveAura(SPELL_DEMENTIA);
-
-        // Remove Dementia on Pet Login
-        if (pet)
-        {
-            if (pet->HasAura(SPELL_DEMENTIA))
-            {
-                pet->RemoveAura(SPELL_DEMENTIA);
-            }
-        }
     }
 
 
