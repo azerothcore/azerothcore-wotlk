@@ -41,18 +41,65 @@ void DeathMatch::ResetHpMana(Player* player)
 }
 
 bool DeathMatch::CanOpenMenu(Player* player) {
-    if (player->IsDeathMatch() || player->IsInFlight() || player->GetMap()->IsBattlegroundOrArena()
-        || player->HasStealthAura() || player->isDead() || (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609 && !player->IsGameMaster() && !player->HasSpell(50977))) {
+    if (player->IsDeathMatch() || player->IsInFlight() || player->GetMap()->IsBattlegroundOrArena() || !DeathMatchMgr->CheckFullEquipAndTalents(player)
+        || player->isDead() || (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609 && !player->IsGameMaster() && !player->HasSpell(50977))) {
         ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "Сейчас это невозможно.", "Now it is impossible"));
         return true;
     }
     return false;
 }
 
+bool DeathMatch::CheckFullEquipAndTalents(Player* player)
+{
+    if (!player)
+        return false;
+
+    std::stringstream err;
+
+    if (player->GetFreeTalentPoints() > 0) {
+        err << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933";
+        if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU)
+            err << "[Королевская Битва]: В данный момент у вас еще " << player->GetFreeTalentPoints() << " очков таланта. Прокачайте все таланты.\n";
+        else
+            err << "[Battle Royale]: At the moment you still have " << player->GetFreeTalentPoints() << " talent points. Pump all the talents.\n";
+    }
+
+    Item* newItem = NULL;
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        if (slot == EQUIPMENT_SLOT_OFFHAND || slot == EQUIPMENT_SLOT_RANGED || slot == EQUIPMENT_SLOT_TABARD || slot == EQUIPMENT_SLOT_BODY)
+            continue;
+
+        newItem = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+        if (newItem == NULL)
+        {
+            err << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933";
+            if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU)
+                err << "[Королевская Битва]: Вы должны надеть фул экипировку.\n";
+            else
+                err << "[Battle Royale]: You must wear full equipment.\n";
+            break;
+        }
+    }
+
+    if (err.str().length() > 0)
+    {
+        ChatHandler(player->GetSession()).SendSysMessage(err.str().c_str());
+        return false;
+    }
+    return true;
+} 
+
 void DeathMatch::AddPlayer(Player* player)
 {
-    if (DeathMatchMgr->CanOpenMenu(player))
+    if (!player)
         return;
+
+    if (DeathMatchMgr->CanOpenMenu(player)) {
+        if (IsDeathMatchZone(player->GetZoneId()))
+            player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+        return;
+    }
 
     if (player->InBattlegroundQueue())
         return;
@@ -305,17 +352,15 @@ public:
 
         // кв на убийство игроков 150
         if (sWorld->getBoolConfig(CONFIG_RANK_SYSTEM_WIN_ENABLE)) {
-            killer->RewardRankPoints(sWorld->getIntConfig(CONFIG_RANK_SYSTEM_KILL_RATE_BG), PVP_KILL);
+            killer->RewardRankPoints(sWorld->getIntConfig(CONFIG_RANK_SYSTEM_KILL_RATE_BG), 5);
             killer->RewardRankMoney(6/*килл*/, sWorld->getIntConfig(CONFIG_RANK_SYSTEM_KILL_RATE_BG));
             if (killer->GetQuestStatus(26039) == QUEST_STATUS_INCOMPLETE)
                 killer->KilledMonsterCredit(200004);
         }    
 
         // кв на убийство игрока для зоны
-        if (quest) {
-            if(killer->GetQuestStatus(26036) == QUEST_STATUS_INCOMPLETE)
-                killer->KilledMonsterCredit(200000);   
-        }
+        if (killer->GetQuestStatus(26036) == QUEST_STATUS_INCOMPLETE)
+            killer->KilledMonsterCredit(200000);
 
         if (DeathMatchMgr->IsDeathMatchZone(killed->GetZoneId()))
             DeathMatchMgr->RevivePlayer(killed);
@@ -334,8 +379,10 @@ public:
 
     void OnLogin(Player* player) override
     {
-        if (DeathMatchMgr->IsDeathMatchZone(player->GetZoneId()) && !player->IsDeathMatch())
-            DeathMatchMgr->AddPlayer(player);
+        if (DeathMatchMgr->IsDeathMatchZone(player->GetZoneId())) {
+            if (!player->IsDeathMatch())
+                DeathMatchMgr->AddPlayer(player);
+        }
     }
 
     void OnLogout(Player* player) override

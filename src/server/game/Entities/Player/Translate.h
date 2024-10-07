@@ -698,4 +698,7 @@
                          "Enter the slot you want to replace:\n from 1 to 5.\n\n"\
                          "Then click on |cff069E02TO ACCEPT|r."
 
+#define EN_DEMETIA_STACK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Dementia]: Congratulations! You received |cffffff4dnew|cffff9933 rank.|r"
+#define RU_DEMETIA_STACK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Безумие]: Поздравляем! Вы получили |cffffff4dновый|cffff9933 ранг.|r"
+
 #endif

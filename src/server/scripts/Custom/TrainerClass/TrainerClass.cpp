@@ -74,11 +74,11 @@ public:
 
                 /* exeptions */
                 if (player->HasSpell(12294)) {
-                    if (player->HasSpell(47486))
+                    if (!player->HasSpell(47486))
                         player->learnSpell(47486);
                 }
                 if (player->HasSpell(20243)) {
-                    if (player->HasSpell(47498))
+                    if (!player->HasSpell(47498))
                         player->learnSpell(47498);
                 }
                 player->SaveToDB(false, false);
@@ -139,13 +139,17 @@ public:
                 }
 
                 if (player->HasSpell(19386))
-                    player->learnSpell(49012);
+                    if (!player->HasSpell(49012))
+                        player->learnSpell(49012);
                 if (player->HasSpell(53301))
-                    player->learnSpell(60053);
+                    if (!player->HasSpell(60053))
+                        player->learnSpell(60053);
                 if (player->HasSpell(19306))
-                    player->learnSpell(48999);
+                    if (!player->HasSpell(48999))
+                        player->learnSpell(48999);
                 if (player->HasSpell(19434))
-                    player->learnSpell(49050);
+                    if (!player->HasSpell(49050))
+                        player->learnSpell(49050);
                 player->SaveToDB(false, false);
                 break;
             }
@@ -158,17 +162,23 @@ public:
                 }
 
                 if (player->HasSpell(11366))
-                    player->learnSpell(42891);
+                    if (!player->HasSpell(42891))
+                        player->learnSpell(42891);
                 if (player->HasSpell(11426))
-                    player->learnSpell(43039);
+                    if (!player->HasSpell(43039))
+                        player->learnSpell(43039);
                 if (player->HasSpell(44457))
-                    player->learnSpell(55360);
+                    if (!player->HasSpell(55360))
+                        player->learnSpell(55360);
                 if (player->HasSpell(31661))
-                    player->learnSpell(42950);
+                    if (!player->HasSpell(42950))
+                        player->learnSpell(42950);
                 if (player->HasSpell(11113))
-                    player->learnSpell(42945);
+                    if (!player->HasSpell(42945))
+                        player->learnSpell(42945);
                 if (player->HasSpell(44425))
-                    player->learnSpell(44781);
+                    if (!player->HasSpell(44781))
+                        player->learnSpell(44781);
                 player->SaveToDB(false, false);
                 break;
             }
@@ -181,17 +191,23 @@ public:
                 }
 
                 if (player->HasSpell(17877))
-                    player->learnSpell(47827);
+                    if (!player->HasSpell(47827))
+                        player->learnSpell(47827);
                 if (player->HasSpell(30283))
-                    player->learnSpell(47847);
+                     if (!player->HasSpell(47847))
+                        player->learnSpell(47847);
                 if (player->HasSpell(30108))
-                    player->learnSpell(47843);
+                    if (!player->HasSpell(47843))
+                        player->learnSpell(47843);
                 if (player->HasSpell(50796))
-                    player->learnSpell(59172);
+                    if (!player->HasSpell(59172))
+                        player->learnSpell(59172);
                 if (player->HasSpell(48181))
-                    player->learnSpell(59164);
+                    if (!player->HasSpell(59164))
+                        player->learnSpell(59164);
                 if (player->HasSpell(18220))
-                    player->learnSpell(59092);
+                    if (!player->HasSpell(59092))
+                        player->learnSpell(59092);
                 player->SaveToDB(false, false);
                 break;
             }
@@ -204,9 +220,11 @@ public:
                 }
 
                 if (player->HasSpell(16511))
-                    player->learnSpell(48660);
+                    if (!player->HasSpell(48660))
+                        player->learnSpell(48660);
                 if (player->HasSpell(1329))
-                    player->learnSpell(48666);
+                    if (!player->HasSpell(48666))
+                        player->learnSpell(48666);
                 player->SaveToDB(false, false);
                 break;
             }
@@ -219,17 +237,23 @@ public:
                 }
 
                 if (player->HasSpell(34914))
-                    player->learnSpell(48160);
+                    if (!player->HasSpell(48160))
+                        player->learnSpell(48160);
                 if (player->HasSpell(47540))
-                    player->learnSpell(53007);
+                    if (!player->HasSpell(53007))
+                        player->learnSpell(53007);
                 if (player->HasSpell(724))
-                    player->learnSpell(48087);
+                    if (!player->HasSpell(48087))
+                        player->learnSpell(48087);
                 if (player->HasSpell(19236))
-                    player->learnSpell(48173);
+                    if (!player->HasSpell(48173))
+                        player->learnSpell(48173);
                 if (player->HasSpell(34861))
-                    player->learnSpell(48089);
+                    if (!player->HasSpell(48089))
+                        player->learnSpell(48089);
                 if (player->HasSpell(15407))
-                    player->learnSpell(48156);
+                    if (!player->HasSpell(48156))
+                        player->learnSpell(48156);
                 player->SaveToDB(false, false);
                 break;
             }
@@ -242,15 +266,20 @@ public:
                 }
 
                 if (player->HasSpell(55050))
-                    player->learnSpell(55262);
+                    if (!player->HasSpell(55262))
+                        player->learnSpell(55262);
                 if (player->HasSpell(49143))
-                    player->learnSpell(55268);
+                    if (!player->HasSpell(55268))
+                        player->learnSpell(55268);
                 if (player->HasSpell(49184))
-                    player->learnSpell(51411);
+                    if (!player->HasSpell(51411))
+                        player->learnSpell(51411);
                 if (player->HasSpell(55090))
-                    player->learnSpell(55271);
+                    if (!player->HasSpell(55271))
+                        player->learnSpell(55271);
                 if (player->HasSpell(49158))
-                    player->learnSpell(51328);
+                    if (!player->HasSpell(51328))
+                        player->learnSpell(51328);
                 player->SaveToDB(false, false);
                 break;
             }
@@ -263,17 +292,23 @@ public:
                 }
 
                 if (player->GetTeamId() == TEAM_ALLIANCE)
-                    player->learnSpell(32182);
+                    if (!player->HasSpell(32182))
+                        player->learnSpell(32182);
                 if (player->GetTeamId() == TEAM_HORDE)
-                    player->learnSpell(2825);
+                    if (!player->HasSpell(2825))
+                        player->learnSpell(2825);
                 if (player->HasSpell(61295))
-                    player->learnSpell(61301);
+                    if (!player->HasSpell(61301))
+                        player->learnSpell(61301);
                 if (player->HasSpell(974))
-                    player->learnSpell(49284);
+                    if (!player->HasSpell(49284))
+                        player->learnSpell(49284);
                 if (player->HasSpell(30706))
-                    player->learnSpell(57722);
+                    if (!player->HasSpell(57722))
+                        player->learnSpell(57722);
                 if (player->HasSpell(51490))
-                    player->learnSpell(59159);
+                    if (!player->HasSpell(59159))
+                        player->learnSpell(59159);
                 player->SaveToDB(false, false);
                 break;
             }
@@ -286,25 +321,29 @@ public:
                 }
 
                 if (player->HasSpell(50516))
-                    player->learnSpell(61384);
+                    if (!player->HasSpell(61384))
+                        player->learnSpell(61384);
                 if (player->HasSpell(48505))
-                    player->learnSpell(53201);
+                    if (!player->HasSpell(53201))
+                        player->learnSpell(53201);
                 if (player->HasSpell(48438))
-                    player->learnSpell(53251);
+                    if (!player->HasSpell(53251))
+                        player->learnSpell(53251);
                 if (player->HasSpell(5570))
-                    player->learnSpell(48468);
+                    if (!player->HasSpell(48468))
+                        player->learnSpell(48468);
                 if (player->HasSpell(49377))
                 {
-                    if (player->HasSpell(16979))
+                    if (!player->HasSpell(16979))
                         player->learnSpell(16979);
-                    if (player->HasSpell(49376))
+                    if (!player->HasSpell(49376))
                         player->learnSpell(49376);
                 }
                 if (player->HasSpell(33917))
                 {
-                    if (player->HasSpell(48566))
+                    if (!player->HasSpell(48566))
                         player->learnSpell(48566);
-                    if (player->HasSpell(48564))
+                    if (!player->HasSpell(48564))
                         player->learnSpell(48564);
                 }
                 player->SaveToDB(false, false);
