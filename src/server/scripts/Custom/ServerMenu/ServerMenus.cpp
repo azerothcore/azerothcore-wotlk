@@ -4,6 +4,7 @@
 #include "ScriptedGossip.h"
 #include "../Profession/NpcProfessionMgr.h"
 #include "../CustomTeleport/CustomTeleport.h"
+#include "ArenaOnevsOne.h"
 
 class ServerMenuPlayerGossip : public PlayerScript
 {
@@ -36,7 +37,7 @@ public:
                     // Управление акков
                     case 6: sServerMenuMgr->CommingSoon(player); break;
                     // Арена
-                    case 7: sServerMenuMgr->CommingSoon(player); break;
+                    case 7: ArenaOneMgr->ArenaMainMenu(player); break;
                     default: break;
                 }
             } break;
@@ -86,6 +87,16 @@ public:
             case GOSSIP_SENDER_MAIN + 5: {
                 /* портуем игрока в нужную ему точку */
                 sCustomTeleportMgr->TeleportFunction(player, action);
+            } break;
+
+            // Раздел арены
+            case GOSSIP_SENDER_MAIN + 6: {
+                switch (action) {
+                    case 1: ArenaOneMgr->CreateArenateam(player); break;
+                    case 2: ArenaOneMgr->JoinQueue(player); break;
+                    case 3: ArenaOneMgr->LeaveQueue(player); break;
+                    case 4: sServerMenuMgr->GossipHelloMenu(player); break;
+                }
             } break;
 
             default: break;

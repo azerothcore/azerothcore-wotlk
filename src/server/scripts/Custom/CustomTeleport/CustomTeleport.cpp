@@ -10,6 +10,7 @@
 #include "CustomTeleport.h"
 #include "ScriptMgr.h"
 #include "DeathMatch.h"
+#include "ArenaOnevsOne.h"
 
 using namespace Acore::ChatCommands;
 
@@ -195,6 +196,7 @@ public:
         static ChatCommandTable JoinOloCommand =
         {
             {"olo", HandleJoinOloCommand, SEC_PLAYER, Console::No},
+            {"solo", HandleJoinSoloCommand, SEC_PLAYER, Console::No},
         };
 
         static ChatCommandTable DeathmatchTable =
@@ -231,6 +233,19 @@ public:
         if (targetPlayer->IsDeathMatch())
             DeathMatchMgr->RemovePlayer(targetPlayer);
         return true;
+    }
+
+    static bool HandleJoinSoloCommand(ChatHandler* handler)
+    {
+        Player* targetPlayer = handler->GetSession()->GetPlayer();
+        if(!targetPlayer)
+            return true;
+
+        if(targetPlayer->IsInFlight() || targetPlayer->GetMap()->IsBattlegroundOrArena())
+            return true;
+
+        ArenaOneMgr->JoinQueue(targetPlayer);
+        return true;  
     }    
 
     static bool HandleJoinOloCommand(ChatHandler* handler)
