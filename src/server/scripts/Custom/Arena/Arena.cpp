@@ -231,12 +231,15 @@ void ArenaOne::ArenaMainMenu(Player* player)
     ArenaTeam* at = sArenaTeamMgr->GetArenaTeamById(player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5)));
     std::stringstream s;
 
-    s << "Начисление Очков Арены будет через:\n             ";
+    s << "\nНачисление очков арены будет через:\n             ";
     s <<  secsToTimeString((sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME) - GameTime::GetGameTime().count()), true).c_str();
+    s << "\nСброс капа очков арены будет через:\n             ";
+    s <<  secsToTimeString((sWorld->getWorldState(WS_DAYLY_ARENA_POINTS_CAP) - GameTime::GetGameTime().count()), true).c_str();
+    s << "\n\nТекущий кап: [ " << player->GetArenaCapToday() << " / " << sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS) << " ]";
     if (at) {
         uint32 rating = uint32((at->GetStats().Rating / 50) + player->GetRankByExp());
-        s << "\n\nЗа победу на арене вы получите:\n          " << rating << " очков арены.\n";
-        s << "\nЗа поражение на арене вы получите:\n            " << uint32(rating/2) << " очков арены.";
+        s << "\nНа арене вы получите:\nЗа победу: " << rating << " очков арены.\n";
+        s << "\nЗа поражение: " << uint32(rating/2) << " очков арены.";
     }
     s << "\n\nВы так же можете воспользоваться командой: .join solo\nдля вступление в очередь на арену 1v1.";
 

@@ -1474,6 +1474,7 @@ public:
     void SetMonthlyQuestStatus(uint32 quest_id);
     void SetSeasonalQuestStatus(uint32 quest_id);
     void ResetDailyQuestStatus();
+    void ResetDailyArenaCapStatus();
     void ResetWeeklyQuestStatus();
     void ResetMonthlyQuestStatus();
     void ResetSeasonalQuestStatus(uint16 event_id);
@@ -2113,6 +2114,9 @@ public:
     uint32 GetRankPoints() { return m_rankPoints; }
     void SetRankPoints(uint32 val) { m_rankPoints = val; }
 
+    uint32 GetArenaCapToday() { return m_todayArena; }
+    void SetArenaCapToday(uint32 val) { m_todayArena = val; }
+
     ReputationMgr&       GetReputationMgr()       { return *m_reputationMgr; }
     [[nodiscard]] ReputationMgr const& GetReputationMgr() const { return *m_reputationMgr; }
     [[nodiscard]] ReputationRank GetReputationRank(uint32 faction_id) const;
@@ -2673,7 +2677,10 @@ public:
     /* выдача баффов в инстах  */
     void GetRangBuffInInstance(int /*amount*/);
     void RemoveRankBuff();
-    void VerifiedRankBuff(Map* /*map*/);   
+    void VerifiedRankBuff(Map* /*map*/);  
+
+    // проверка на выдачи арены или нет за победу или поражение
+    bool AcceptArenaToday(); 
 
     // Settings
     [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
@@ -2957,8 +2964,10 @@ public:
 
     uint8 m_grantableLevels;
 
-    // rank system
-    uint32 m_rankPoints;    
+    // опыт для ранга
+    uint32 m_rankPoints; 
+    // сап арены в день
+    uint32 m_todayArena;  
 
     bool m_needZoneUpdate;
 

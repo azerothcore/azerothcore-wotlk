@@ -277,6 +277,9 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     ////////////////////Rank System/////////////////////
     m_rankPoints = 0;
 
+    ////////////////////Arena Cap System/////////////////////
+    m_todayArena = 0;
+
     ////////////////////Rest System/////////////////////
 
     m_mailsUpdated = false;
@@ -12206,6 +12209,12 @@ void Player::ResetDailyQuestStatus()
     m_lastDailyQuestTime = 0;
 }
 
+void Player::ResetDailyArenaCapStatus()
+{
+    // если игрок в онлайне
+    SetArenaCapToday(0);
+}
+
 void Player::ResetWeeklyQuestStatus()
 {
     if (m_weeklyquests.empty())
@@ -14856,6 +14865,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, _innTriggerId);
         stmt->SetData(index++, m_extraBonusTalentCount);
         stmt->SetData(index++, m_rankPoints);
+        stmt->SetData(index++, m_todayArena);
     }
     else
     {
@@ -14997,6 +15007,7 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
         stmt->SetData(index++, _innTriggerId);
         stmt->SetData(index++, m_extraBonusTalentCount);
         stmt->SetData(index++, GetRankPoints());
+        stmt->SetData(index++, GetArenaCapToday());
 
         stmt->SetData(index++, IsInWorld() && !GetSession()->PlayerLogout() ? 1 : 0);
         // Index
@@ -16369,6 +16380,15 @@ std::string Player::GetPlayerName()
     return "|Hplayer:" + name + "|h" + color + name + "|h|r";
 }
 
+bool Player::AcceptArenaToday()
+{
+    if (GetArenaCapToday() >= sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS)) {
+        ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, RU_REWARD_ARENA_POINTS_CAP, EN_REWARD_ARENA_POINTS_CAP));
+        return true;
+    }
+    return false;    
+}
+
 void Player::RewardRankPoints(uint32 amount, int source)
  {
     /* если уже максимальный ранг */
@@ -16514,7 +16534,7 @@ void Player::VerifiedRankBuff(Map* map)
         if(!HasAura(62519) && !HasAura(66721))
             GetRangBuffInInstance(GetRankByExp());
         else {
-            if(GetAuraCount(62519) != GetRankByExp()) {
+            if(GetAuraCount(62519) != uint32(GetRankByExp())) {
                 RemoveRankBuff();
                 GetRangBuffInInstance(GetRankByExp());
             }
@@ -16581,16 +16601,27 @@ void Player::RewardArenaPoints(uint32 rate, int8 type, bool win)
     if (!win)
         arena /= 2;
 
+    if (AcceptArenaToday())
+        return;
+
+    // бонусы от арены 2на2 и 3на3
+    arena += type == ARENA_TYPE_2v2 ? 5 : type == ARENA_TYPE_3v3 ? 10 : 0;
+
+    if ((this->GetArenaCapToday() + arena) > sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS)) {
+        arena = sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS) - this->GetArenaCapToday();
+    }
+
+    // записываем в кап
+    this->SetArenaCapToday(this->GetArenaCapToday() + arena);
+
     switch (type) {
         case ARENA_TYPE_2v2: 
         {
-            arena += 5;
             this->ModifyArenaPoints(arena);
             ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, win ? RU_REWARD_ARENA_POINTS_WIN : RU_REWARD_ARENA_POINTS_LOOS, win ? EN_REWARD_ARENA_POINTS_WIN : EN_REWARD_ARENA_POINTS_LOOS), arena);
         } break;
         case ARENA_TYPE_3v3: 
         {
-            arena += 10;
             this->ModifyArenaPoints(arena);
             ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, win ? RU_REWARD_ARENA_POINTS_WIN : RU_REWARD_ARENA_POINTS_LOOS, win ? EN_REWARD_ARENA_POINTS_WIN : EN_REWARD_ARENA_POINTS_LOOS), arena);
         } break;

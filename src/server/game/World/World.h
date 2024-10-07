@@ -137,7 +137,8 @@ enum WorldStates
     WS_DAILY_QUEST_RESET_TIME                  = 20005,                     // Next daily reset time
     WS_GUILD_DAILY_RESET_TIME                  = 20006,                     // Next guild cap reset time
     WS_MONTHLY_QUEST_RESET_TIME                = 20007,                     // Next monthly reset time
-    WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20008                      // Next daily calendar deletions of old events time
+    WS_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME = 20008,                     // Next daily calendar deletions of old events time
+    WS_DAYLY_ARENA_POINTS_CAP                  = 20009
 };
 
 // xinef: petitions storage
@@ -226,6 +227,9 @@ public:
     [[nodiscard]] Seconds GetNextDailyQuestsResetTime() const override { return _nextDailyQuestReset; }
     [[nodiscard]] Seconds GetNextWeeklyQuestsResetTime() const override { return _nextWeeklyQuestReset; }
     [[nodiscard]] Seconds GetNextRandomBGResetTime() const override { return _nextRandomBGReset; }
+
+    // кап арены
+    [[nodiscard]] Seconds GetNextDailyArenaCapResetTime() const { return _NextDailyArenaCapReset; }
 
     /// Get the maximum skill level a player can reach
     [[nodiscard]] uint16 GetConfigMaxSkillValue() const override
@@ -351,12 +355,14 @@ protected:
     void _UpdateRealmCharCount(PreparedQueryResult resultCharCount);
 
     void InitDailyQuestResetTime();
+    void InitDailyArenaCapResetTime();
     void InitWeeklyQuestResetTime();
     void InitMonthlyQuestResetTime();
     void InitRandomBGResetTime();
     void InitCalendarOldEventsDeletionTime();
     void InitGuildResetTime();
     void ResetDailyQuests();
+    void ResetDailyArenaCap();
     void ResetWeeklyQuests();
     void ResetMonthlyQuests();
     void ResetRandomBG();
@@ -412,6 +418,7 @@ private:
 
     // next daily quests and random bg reset time
     Seconds _nextDailyQuestReset;
+    Seconds _NextDailyArenaCapReset;
     Seconds _nextWeeklyQuestReset;
     Seconds _nextMonthlyQuestReset;
     Seconds _nextRandomBGReset;

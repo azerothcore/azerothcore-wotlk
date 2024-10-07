@@ -731,6 +731,9 @@
 #define EN_REWARD_ARENA_POINTS_WIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: You received |cffffff4d%u|cffff9933 arena points for win.|r"
 #define RU_REWARD_ARENA_POINTS_WIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Вы получили |cffffff4d%u|cffff9933 очков арены за победу.|r"
 
+#define EN_REWARD_ARENA_POINTS_CAP "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: Arena reward cap exceeded, you didn't get anything.|r"
+#define RU_REWARD_ARENA_POINTS_CAP "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Кап награды за арену превышен, вы ничего не получили.|r"
+
 #define EN_REWARD_ARENA_POINTS_LOOS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: You received |cffffff4d%u|cffff9933 arena points for loos in arena.|r"
 #define RU_REWARD_ARENA_POINTS_LOOS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Вы получили |cffffff4d%u|cffff9933 очков арены за поражение на арене.|r"
 
