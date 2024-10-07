@@ -13,7 +13,7 @@ class Login_script : public PlayerScript
 public:
     Login_script() : PlayerScript("Login_script") {}
 
-    void OnUpdateZone(Player* player, uint32 newZone, uint32 newArea)
+    void OnUpdateZone(Player* player, uint32 newZone, uint32 newArea) override
     {
         if (!player || !newZone || !newArea)
             return;
@@ -93,7 +93,7 @@ public:
         }
     }
 
-    void OnFirstLogin(Player* player)
+    void OnFirstLogin(Player* player) override
     {
         player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(1156), 42999);
         DeleteItem_OnLogin(player);
@@ -109,7 +109,7 @@ public:
             player->learnSpell(54197);
     }
 
-    void OnLogin(Player* player)
+    void OnLogin(Player* player) override
     {
         player->RankControlOnLogin();
         player->LoadPvPRank();
