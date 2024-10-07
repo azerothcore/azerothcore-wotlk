@@ -16531,6 +16531,45 @@ void Player::LoadPvPRank()
         ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, RU_glory_win_10, EN_glory_win_10));
 }
 
+void Player::RewardArenaPoints(uint32 rate, int8 type, bool win)
+{
+    if (!type || !rate)
+        return;
+
+    // если у игрока рейтинг меньше чем 50
+    if (rate < 100)
+        rate = 100;
+
+    uint32 arena = uint32((rate / 100) + GetRankByExp());
+    if (arena < 0)
+        arena = 0;
+
+    // если поражение то даем в 2 раза меньше
+    if (!win)
+        arena /= 2;
+
+    switch (type) {
+        case ARENA_TYPE_2v2: 
+        {
+            arena += 5;
+            this->ModifyArenaPoints(arena);
+            ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, win ? RU_REWARD_ARENA_POINTS_WIN : RU_REWARD_ARENA_POINTS_LOOS, win ? EN_REWARD_ARENA_POINTS_WIN : EN_REWARD_ARENA_POINTS_LOOS), arena);
+        } break;
+        case ARENA_TYPE_3v3: 
+        {
+            arena += 10;
+            this->ModifyArenaPoints(arena);
+            ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, win ? RU_REWARD_ARENA_POINTS_WIN : RU_REWARD_ARENA_POINTS_LOOS, win ? EN_REWARD_ARENA_POINTS_WIN : EN_REWARD_ARENA_POINTS_LOOS), arena);
+        } break;
+        case ARENA_TYPE_5v5:
+        {
+            this->ModifyArenaPoints(arena);
+            ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, win ? RU_REWARD_ARENA_POINTS_WIN : RU_REWARD_ARENA_POINTS_LOOS, win ? EN_REWARD_ARENA_POINTS_WIN : EN_REWARD_ARENA_POINTS_LOOS), arena);
+        } break;
+        default: break;
+    }
+}
+
 void Player::SetSummonPoint(uint32 mapid, float x, float y, float z, uint32 delay /*= 0*/, bool asSpectator /*= false*/)
 {
     m_summon_expire = GameTime::GetGameTime().count() + (delay ? delay : MAX_PLAYER_SUMMON_DELAY);

@@ -2667,7 +2667,9 @@ public:
     void RewardRankMoney(uint8 /*type*/, uint32 /*money*/, bool win = true);
     // инфа при входе в игру скоколько опыта и какой ранг
     void LoadPvPRank();
-
+    // награда очки арены
+    void RewardArenaPoints(uint32 /*rate*/, int8 /*type*/, bool /*win*/);
+    
     // Settings
     [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
     void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
