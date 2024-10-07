@@ -288,10 +288,127 @@ void Battleground::Update(uint32 diff)
         case STATUS_IN_PROGRESS:
             if (isArena())
             {
-                if (GetStartTime() >= 46 * MINUTE * IN_MILLISECONDS) // pussywizard: 1min startup + 45min allowed duration
+                if (GetStartTime() >= 46 * MINUTE * IN_MILLISECONDS) 
                 {
                     EndBattleground(PVP_TEAM_NEUTRAL);
                     return;
+                } else {
+                    // Anti-Draw (Dementia)
+                    if (sWorld->getBoolConfig(CONFIG_ARENA_DEMENTIA_ENABLED))
+                    {
+                        for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
+                        {
+                            if (Player* player = ObjectAccessor::FindPlayer(itr->first))
+                            {
+                                if (player->InArena() && GetArenaType() == ARENA_TYPE_5v5 && GetStatus() != STATUS_WAIT_LEAVE)
+                                {
+                                    Aura* demAura = player->GetAura(40874);
+
+                                    if (!player->IsSpectator() && !player->IsGameMaster() && !player->isDead())
+                                    {
+                                        if ((GetStartTime() >= 10 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 10.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (!player->HasAura(40874))
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 11 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 11.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 1)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 12 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 12.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 2)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 13 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 13.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 3)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 14 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 14.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 4)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 15 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 15.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 5)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 16 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 16.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 6)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 17 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 17.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 7)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 18 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 18.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 8)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 19 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 19.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 9)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+
+                                        if ((GetStartTime() >= 20 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 20.1 * MINUTE * IN_MILLISECONDS))
+                                        {
+                                            if (demAura->GetStackAmount() == 10)
+                                            {
+                                                player->AddAura(40874, player);
+                                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             else
@@ -315,177 +432,6 @@ void Battleground::Update(uint32 diff)
     m_ResetStatTimer += diff;
 
     PostUpdateImpl(diff);
-
-    // Anti-Draw (Dementia)
-    if (sWorld->getBoolConfig(CONFIG_ARENA_DEMENTIA_ENABLED))
-    {
-        for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
-        {
-            if (Player* player = ObjectAccessor::FindPlayer(itr->first))
-            {
-                if (player->InArena() && GetArenaType() == ARENA_TYPE_5v5)
-                {
-                    Aura* demAura = player->GetAura(41406);
-
-                    if (!player->IsSpectator() && !player->IsGameMaster())
-                    {
-                        if ((GetStartTime() >= 10 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 10.1 * MINUTE * IN_MILLISECONDS))
-                        {
-                            if (!player->HasAura(41406))
-                            {
-                                player->AddAura(41406, player);
-                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
-                            }
-
-                            if (Pet* pet = player->GetPet())
-                            {
-                                if (!pet->HasAura(41406))
-                                    pet->AddAura(41406, pet);
-                                else if (pet->IsSummon())
-                                    pet->AddAura(41406, pet);
-                            }
-                        }
-
-                        if ((GetStartTime() >= 11 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 11.1 * MINUTE * IN_MILLISECONDS))
-                        {
-                            if (demAura->GetStackAmount() == 1)
-                            {
-                                player->AddAura(41406, player);
-                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
-                            }
-
-                            if (Pet* pet = player->GetPet())
-                            {
-                                if (pet && demAura->GetStackAmount() == 1)
-                                    pet->AddAura(41406, pet);
-                                else if (pet->IsSummon())
-                                    pet->AddAura(41406, pet);
-                            }
-                        }
-
-                        if ((GetStartTime() >= 12 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 12.1 * MINUTE * IN_MILLISECONDS))
-                        {
-                            if (demAura->GetStackAmount() == 2)
-                            {
-                                player->AddAura(41406, player);
-                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
-                            }
-
-                            if (Pet* pet = player->GetPet())
-                            {
-                                if (pet && demAura->GetStackAmount() == 2)
-                                    pet->AddAura(41406, pet);
-                                else if (pet->IsSummon())
-                                    pet->AddAura(41406, pet);
-                            }
-                        }
-
-                        if ((GetStartTime() >= 13 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 13.1 * MINUTE * IN_MILLISECONDS))
-                        {
-                            if (demAura->GetStackAmount() == 3)
-                            {
-                                player->AddAura(41406, player);
-                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
-                            }
-
-                            if (Pet* pet = player->GetPet())
-                            {
-                                if (pet && demAura->GetStackAmount() == 3)
-                                    pet->AddAura(41406, pet);
-                                else if (pet->IsSummon())
-                                    pet->AddAura(41406, pet);
-                            }
-                        }
-
-                        if ((GetStartTime() >= 14 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 14.1 * MINUTE * IN_MILLISECONDS))
-                        {
-                            if (demAura->GetStackAmount() == 4)
-                            {
-                                player->AddAura(41406, player);
-                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
-                            }
-
-                            if (Pet* pet = player->GetPet())
-                            {
-                                if (pet && demAura->GetStackAmount() == 4)
-                                    pet->AddAura(41406, pet);
-                                else if (pet->IsSummon())
-                                    pet->AddAura(41406, pet);
-                            }
-                        }
-
-                        if ((GetStartTime() >= 15 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 15.1 * MINUTE * IN_MILLISECONDS))
-                        {
-                            if (demAura->GetStackAmount() == 5)
-                            {
-                                player->AddAura(41406, player);
-                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
-                            }
-
-                            if (Pet* pet = player->GetPet())
-                            {
-                                if (pet && demAura->GetStackAmount() == 5)
-                                    pet->AddAura(41406, pet);
-                                else if (pet->IsSummon())
-                                    pet->AddAura(41406, pet);
-                            }
-                        }
-
-                        if ((GetStartTime() >= 16 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 16.1 * MINUTE * IN_MILLISECONDS))
-                        {
-                            if (demAura->GetStackAmount() == 6)
-                            {
-                                player->AddAura(41406, player);
-                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
-                            }
-
-                            if (Pet* pet = player->GetPet())
-                            {
-                                if (pet && demAura->GetStackAmount() == 6)
-                                    pet->AddAura(41406, pet);
-                                else if (pet->IsSummon())
-                                    pet->AddAura(41406, pet);
-                            }
-                        }
-
-                        if ((GetStartTime() >= 17 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 17.1 * MINUTE * IN_MILLISECONDS))
-                        {
-                            if (demAura->GetStackAmount() == 7)
-                            {
-                                player->AddAura(41406, player);
-                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
-                            }
-
-                            if (Pet* pet = player->GetPet())
-                            {
-                                if (pet && demAura->GetStackAmount() == 7)
-                                    pet->AddAura(41406, pet);
-                                else if (pet->IsSummon())
-                                    pet->AddAura(41406, pet);
-                            }
-                        }
-
-                        if ((GetStartTime() >= 18 * MINUTE * IN_MILLISECONDS) && (GetStartTime() <= 18.1 * MINUTE * IN_MILLISECONDS))
-                        {
-                            if (demAura->GetStackAmount() == 8)
-                            {
-                                player->AddAura(41406, player);
-                                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_DEMETIA_STACK, EN_DEMETIA_STACK));
-                            }
-
-                            if (Pet* pet = player->GetPet())
-                            {
-                                if (pet && demAura->GetStackAmount() == 8)
-                                    pet->AddAura(41406, pet);
-                                else if (pet->IsSummon())
-                                    pet->AddAura(41406, pet);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
 
     sScriptMgr->OnBattlegroundUpdate(this, diff);
 }
