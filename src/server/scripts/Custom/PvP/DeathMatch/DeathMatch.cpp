@@ -241,9 +241,17 @@ public:
         if (killed->getLevel() < 80)
             return;
 
+        // дроп сундука
         int win = urand(1, 3);
         if (win == 3) /* 33.334% */
             killer->AddItem(30806, 1);
+
+        // кв на убийство
+        Quest const* quest = sObjectMgr->GetQuestTemplate(26036);
+        if (quest) {
+            if(killer->GetQuestStatus(26036) == QUEST_STATUS_INCOMPLETE)
+                killer->KilledMonsterCredit(200000);   
+        }
 
         if (DeathMatchMgr->IsDeathMatchZone(killed->GetZoneId()))
             DeathMatchMgr->RevivePlayer(killed);

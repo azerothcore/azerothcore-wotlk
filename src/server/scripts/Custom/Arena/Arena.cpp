@@ -36,8 +36,8 @@ public:
         std::stringstream s;
         if (at)
         {
-            s << "\n            Статистика вашей команды 1v1:";
-            s << "\n\n             Рейтинг: " << at->GetStats().Rating;
+            s << "\n     Статистика вашей команды 1v1:";
+            s << "\n\n            Рейтинг: " << at->GetStats().Rating;
             s << "\n            Ранг: " << at->GetStats().Rank;
             s << "\n            Игр за сезон: " << at->GetStats().SeasonGames;
             s << "\n            Побед за сезон: " << at->GetStats().SeasonWins;
@@ -94,7 +94,7 @@ public:
 
             case 2: // Join Queue Arena (rated)
             {  
-                if ((Arena1v1CheckTalents(player) && ArenaCheckFullEquipAndTalents(player) && !JoinQueueArena(player, creature, true)))
+                if (Arena1v1CheckTalents(player) && ArenaCheckFullEquipAndTalents(player) && !JoinQueueArena(player, creature, true))
                     ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_err_queue, EN_arena_err_queue));
                 CloseGossipMenuFor(player);
                 return true;
@@ -297,32 +297,11 @@ private:
         if (!player)
             return false;
 
-        uint32 count = 0;
-
-        for (uint32 talentId = 0; talentId < sTalentStore.GetNumRows(); ++talentId)
-        {
-            TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
-
-            if (!talentInfo)
-                continue;
-
-            if (std::find(forbiddenTalents.begin(), forbiddenTalents.end(), talentInfo->TalentID) != forbiddenTalents.end())
-            {
-                ChatHandler(player->GetSession()).SendSysMessage("You can not join because you have forbidden talents.");
-                return false;
-            }
-
-            for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
-                if (talentInfo->RankID[rank] == 0)
-                    continue;
-        }
-
-        if (count >= 36)
+        if(player->HasHealSpec())
         {
             ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_queue_1v1_disable_for_heal, EN_arena_queue_1v1_disable_for_heal));
             return false;
         }
-
         return true;
     }
 };

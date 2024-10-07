@@ -61,10 +61,7 @@ public:
        { SPELLFAMILY_WARLOCK, {
            AddSpell{ .spellId = 47893 },
            AddSpell{ .spellId = 132 },
-           AddSpell{ .spellId = 5697 },
-           AddSpell{ .spellId = 691, .spec = TALENT_TREE_WARLOCK_AFFLICTION },
-           AddSpell{ .spellId = 691, .spec = TALENT_TREE_WARLOCK_DESTRUCTION },
-           AddSpell{ .spellId = 30146, .spec = TALENT_TREE_WARLOCK_DEMONOLOGY } } },
+           AddSpell{ .spellId = 5697 }, } },
        { SPELLFAMILY_PALADIN, {
            AddSpell{ .spellId = 25780 },
            AddSpell{ .spellId = 25898 },

@@ -567,7 +567,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                     player->GetSession()->SendPacket(&status);
 
                     player->RemoveAurasDueToSpell(SPELL_ARENA_PREPARATION);
-                    player->SetCommandStatusOff(CHEAT_CASTTIME);
                     player->ResetAllPowers();
                     // remove auras with duration lower than 30s
                     Unit::AuraApplicationMap& auraMap = player->GetAppliedAuras();
@@ -622,7 +621,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
             {
-                itr->second->SetCommandStatusOff(CHEAT_CASTTIME);
                 itr->second->RemoveAurasDueToSpell(SPELL_PREPARATION);
                 itr->second->ResetAllPowers();
             }
@@ -878,6 +876,15 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
 
                 if (!player->GetRandomWinner())
                     player->SetRandomWinner(true);
+            }
+
+            // квест на победу бг
+            if (!isArena()) {
+                Quest const* quest = sObjectMgr->GetQuestTemplate(26035);
+                if (quest) {
+                    if (player->GetQuestStatus(26035) == QUEST_STATUS_INCOMPLETE)
+                        player->KilledMonsterCredit(200003);
+                }
             }
 
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, player->GetMapId());
@@ -1153,7 +1160,6 @@ void Battleground::AddPlayer(Player* player)
         if (GetStatus() == STATUS_WAIT_JOIN)                 // not started yet
         {
             player->CastSpell(player, SPELL_ARENA_PREPARATION, true);
-            player->SetCommandStatusOn(CHEAT_CASTTIME);
             player->ResetAllPowers();
         }
     }
@@ -1161,7 +1167,6 @@ void Battleground::AddPlayer(Player* player)
     {
         if (GetStatus() == STATUS_WAIT_JOIN) {                // not started yet
             player->CastSpell(player, SPELL_PREPARATION, true);   // reduces all mana cost of spells.
-            player->SetCommandStatusOn(CHEAT_CASTTIME);
         }
     }
 
