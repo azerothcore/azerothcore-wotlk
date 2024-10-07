@@ -17,10 +17,19 @@
 
 // This is where scripts' loading functions should be declared:
 // void MyExampleScript()
+void AddSC_Professions_NPC();
+void AddSC_npc_trainer();
+void AddSC_Enchat_npc_new();
+void AddSC_Login_script();
+void AddSC_DuelReset();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
 void AddCustomScripts()
 {
-    // MyExampleScript()
+    AddSC_Professions_NPC();
+    AddSC_npc_trainer();
+    AddSC_Enchat_npc_new(); 
+    AddSC_Login_script();
+    AddSC_DuelReset();
 }
