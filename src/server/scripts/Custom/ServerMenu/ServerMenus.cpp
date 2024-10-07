@@ -59,8 +59,12 @@ public:
                     case 5: sProfessionMgr->MainMenu(player); break;
                     // Передача очков чести
                     case 6: sServerMenuMgr->OpenTradeHonor(player); break;
-                    // Обменик
+                    // Обменик очков чести
                     case 7: sServerMenuMgr->GossipMenuExchangeHonor(player); break;
+                    // Сброс кд инстов
+                    case 8: sServerMenuMgr->InstanceResetCooldown(player); break;
+                    // Обменник эмблем
+                    case 9: sServerMenuMgr->ExchangerToken(player); break;
                 }
             } break;
 
@@ -101,12 +105,16 @@ public:
                 }
             } break;
 
-            // Раздел обменика
+            // Раздел обменника очков чести
             case GOSSIP_SENDER_MAIN + 7: {
                 uint8 count = action == 1250 ? 25 : action == 500 ? 10 : action == 250 ? 5 : action == 100 ? 2 : 1;
                 sServerMenuMgr->ConfirmExchangeHonorForExp(player, action*200, action, count);
             } break;
 
+            // Раздел обменника эмблем
+            case GOSSIP_SENDER_MAIN + 8: {
+                sServerMenuMgr->ExchangerConfirm(player, action == 1 ? true : false);
+            } break;
             default: break;
         } 
     }
@@ -151,8 +159,24 @@ class SpServerMenuPlayerGossip : public SpellScriptLoader {
         }
 };
 
+class ExchagerToken : public CreatureScript
+{
+public:
+    ExchagerToken() : CreatureScript("ExchagerToken") { }
+
+    bool OnGossipHello(Player* player, Creature* /* creature */) 
+    {
+        if (!player)
+            return true;
+
+        sServerMenuMgr->ExchangerToken(player);
+        return true;    
+    }
+};
+
 void AddSC_ServerMenuPlayerGossip()
 {
     new ServerMenuPlayerGossip();
     new SpServerMenuPlayerGossip();
+    new ExchagerToken();
 }

@@ -1,4 +1,5 @@
 #include "ServerMenuMgr.h"
+#include "DeathMatch.h"
 #include "Player.h"
 #include "Chat.h"
 #include "Translate.h"
@@ -83,6 +84,8 @@ void sServerMenu::CharControlMenu(Player* player) {
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_3, EN_CHAR_CONTROL_3), GOSSIP_SENDER_MAIN + 1, 5);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_7, EN_CHAR_CONTROL_7), GOSSIP_SENDER_MAIN + 1, 6);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_EXCHANGE_MAIN, EN_HONOR_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 7);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_RESET_INSTANCE_CD, EN_RESET_INSTANCE_CD), GOSSIP_SENDER_MAIN + 1, 8);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_TOKEN_EXCHANGE_MAIN, EN_TOKEN_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 9);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_4, EN_CHAR_CONTROL_4), GOSSIP_SENDER_MAIN + 1, 2, ConfirmChangeRFN(player, sServerMenuMgr->getFactionCost()), 0, false);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_5, EN_CHAR_CONTROL_5), GOSSIP_SENDER_MAIN + 1, 3, ConfirmChangeRFN(player, sServerMenuMgr->getRaceCost()), 0, false);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_6, EN_CHAR_CONTROL_6), GOSSIP_SENDER_MAIN + 1, 4, ConfirmChangeRFN(player, sServerMenuMgr->getNickCost()), 0, false);
@@ -98,7 +101,7 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
     std::ostringstream ss;
     switch (MenuId) {
         case 0: {
-            if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "На вашем аккаунте " << player->GetSession()->GetBonuses() << " бонусов.\n";
                 ss << "Пополнить счёт: wow-idk.ru\n\n";
@@ -110,7 +113,7 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
             }
         } break;
         case 1: {
-            if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "В данном разделе будет добавлятся уникальные разработки как и стандарт по нужде игрокам.\n";
             } else {
@@ -119,7 +122,7 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
             }
         } break;
         case 2: {
-            if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "У вас " << player->GetHonorPoints() << " очков чести.\n\n";
                 ss << "В данном разделе вы можете передать любому игроку на этом проекте часть или весь ваш хонор.\n";
@@ -133,7 +136,7 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
         } break;
 
         case 3: {
-            if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "У вас " << player->GetHonorPoints() << " очков чести.\n\n";
                 ss << "В данном разделе вы можете обменять очки чести на опыт для ранга.\n\n";
@@ -145,6 +148,22 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
                 ss << "Each of your ranks reduces the exchange price for 200 honor points.";
             }
         } break;
+
+        case 4: {
+            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+                ss << "Приветствую вас, " << player->GetName() << "\n\n";
+                ss << "В данном разделе вы можете обменять эмблемы льда и триумфа на осколки каменного хранителя.\n";
+                ss << "\nУ вас:\n\n  " << DeathMatchMgr->GetItemIcon(49426, 16, 16, 0, -4) << " эмблем льда x" << player->GetItemCount(49426, true) << "\n\n";
+                ss << "  " << DeathMatchMgr->GetItemIcon(47241, 16, 16, 0, -4) << " эмблем триумфа x" << player->GetItemCount(47241, true) << "\n\n";
+                ss << "  " << DeathMatchMgr->GetItemIcon(43228, 16, 16, 0, -4) << " осколков каменного хранителя x" << player->GetItemCount(43228, true);
+            } else {
+                ss << "Greetings, " << player->GetName() << "\n\n";
+                ss << "In this section, you can exchange emblems of ice and triumph for shards of the stone guardian.\n";
+                ss << "\nYou have:\n\n  " << DeathMatchMgr->GetItemIcon(49426, 16, 16, 0, -4) << " emblems of frost x" << player->GetItemCount(49426, true) << "\n\n";
+                ss << "  " << DeathMatchMgr->GetItemIcon(47241, 16, 16, 0, -4) << " emblems of triumf x" << player->GetItemCount(47241, true) << "\n\n";
+                ss << "  " << DeathMatchMgr->GetItemIcon(43228, 16, 16, 0, -4) << " shards of the stone guardian x" << player->GetItemCount(43228, true);
+            }
+        } break;        
 
         default: break;
     }
@@ -198,6 +217,26 @@ std::string sServerMenu::ConverterHonorRang(Player* player, uint32 honor, uint32
         ss << "Exchange " << need << " honor points for\n  |cff473B32" << exp << " exp for rang.|r";
     }
     return ss.str();
+}
+
+void sServerMenu::InstanceResetCooldown(Player* player) 
+{
+    for (uint8 i = 0; i < MAX_DIFFICULTY; ++i)
+    {
+        BoundInstancesMap const& m_boundInstances = sInstanceSaveMgr->PlayerGetBoundInstances(player->GetGUID(), Difficulty(i));
+        for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end();)
+        {
+            if (itr->first != player->GetMapId())
+            {
+                sInstanceSaveMgr->PlayerUnbindInstance(player->GetGUID(), itr->first, Difficulty(i), true, player);
+                itr = m_boundInstances.begin();
+            }
+            else
+                ++itr;
+        }
+    }
+    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_RESET_INSTANCE_CD_OK, EN_RESET_INSTANCE_CD_OK));
+    player->PlayerTalkClass->SendCloseGossip();
 }
 
 uint32 sServerMenu::CalculHonorForExp(Player* player, uint32 honor, uint8 count) 
@@ -303,6 +342,37 @@ void sServerMenu::OpenTradeHonor(Player* player)
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_TRADE_50000, EN_HONOR_TRADE_50000), GOSSIP_SENDER_MAIN, 50000, "После подтверждение введите ник игрока", 0, true);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 5);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 2), player->GetGUID());
+}
+
+void sServerMenu::ExchangerToken(Player* player)
+{
+    if (!player)
+        return;
+
+    ClearGossipMenuFor(player);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_FROST_EXCHANGE_MENU, EN_FROST_EXCHANGE_MENU), GOSSIP_SENDER_MAIN + 8, 1);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_TRIUMF_EXCHANGE_MENU, EN_TRIUMF_EXCHANGE_MENU), GOSSIP_SENDER_MAIN + 8, 2);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 5);
+    player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 4), player->GetGUID());   
+}
+
+void sServerMenu::ExchangerConfirm(Player* player, bool frost)
+{
+    if (!player)
+        return;
+
+    uint32 ID = frost ? 49426 : 47241;
+    uint32 count = frost ? 1 : 10;
+
+    if (player->HasItemCount(ID, count)) {
+        player->DestroyItemCount(ID, count, true);
+        player->AddItem(43228, 1);
+        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_TOKEN_EXCHANGE_SUCCESS, EN_TOKEN_EXCHANGE_SUCCESS));
+    } else {
+        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_TOKEN_EXCHANGE_FAIL, EN_TOKEN_EXCHANGE_FAIL));
+    }
+
+    sServerMenuMgr->ExchangerToken(player);
 }
 
 void sServerMenu::TradeHonorAccept(Player* player, uint32 honor, char const* name) {

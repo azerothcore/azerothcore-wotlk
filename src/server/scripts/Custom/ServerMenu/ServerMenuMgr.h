@@ -46,6 +46,14 @@ public:
     // Подтверждение обмена валюты
     void ConfirmExchangeHonorForExp(Player* /*player*/, uint32 /*honor*/, uint32 /*exp*/, uint8 /* count */);
 
+    // сброс кд инстов
+    void InstanceResetCooldown(Player* /*player*/);
+
+    // обменник эмблем
+    void ExchangerToken(Player* /*player*/);
+    // подтверждение обмена
+    void ExchangerConfirm(Player* /*player*/, bool /*frost*/);
+
 private:
     static const uint32 _factionCost = 50;
     static const uint32 _raceCost = 30;
