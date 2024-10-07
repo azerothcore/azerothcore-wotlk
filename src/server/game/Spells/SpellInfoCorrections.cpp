@@ -112,7 +112,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RequiresSpellFocus = 0;
     });    
 
-    ApplySpellFix({ 28698 /* меню */ }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 28698, 23951 /* меню */ }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
