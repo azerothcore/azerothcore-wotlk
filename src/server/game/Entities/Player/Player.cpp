@@ -4968,7 +4968,7 @@ void Player::RepopAtGraveyard()
         return;
     }
 
-    if (GetAreaId() == 11)
+    if (GetAreaId() == 11 || GetAreaId() == 1)
     {
         ResurrectPlayer(1.0f);
         SpawnCorpseBones();
