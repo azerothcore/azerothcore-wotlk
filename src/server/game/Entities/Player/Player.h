@@ -2670,6 +2670,11 @@ public:
     // награда очки арены
     void RewardArenaPoints(uint32 /*rate*/, int8 /*type*/, bool /*win*/);
     
+    /* выдача баффов в инстах  */
+    void GetRangBuffInInstance(int /*amount*/);
+    void RemoveRankBuff();
+    void VerifiedRankBuff(Map* /*map*/);   
+
     // Settings
     [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
     void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);

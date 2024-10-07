@@ -351,6 +351,18 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
     });
 
+    ApplySpellFix({ 62519, 66721 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].BasePoints = -1; // еффект повышение роста
+        spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
+        spellInfo->AttributesEx |= SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+        spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
+        spellInfo->ProcCharges = 50;
+        spellInfo->StackAmount = 50;
+    });
+
     // rank system
     ApplySpellFix({ 71201 }, [](SpellInfo* spellInfo)
     {

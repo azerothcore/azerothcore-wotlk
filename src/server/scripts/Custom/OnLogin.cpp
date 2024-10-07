@@ -23,6 +23,18 @@ public:
             player->RemoveAura(SPELL_DEMENTIA);
     }
 
+    void OnMapChanged(Player *player) override
+    {
+        if (!player)
+            return;
+
+        Map *map = player->GetMap();
+        if (!map)
+            return;
+
+        player->VerifiedRankBuff(map);
+    }    
+
     void RemoveDementia(Player* player) 
     {
         if (!player)
@@ -103,8 +115,10 @@ public:
         player->LoadPvPRank();
         RemoveDementia(player);
 
-        if (!player->HasSpell(28698))
-            player->learnSpell(28698);
+        Map *map = player->GetMap();
+        if (!map)
+            return;
+        player->VerifiedRankBuff(map);
     }
 };
 

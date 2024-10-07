@@ -16493,6 +16493,37 @@ void Player::RankControlOnLogin()
     SaveToDB(false, false);
 }
 
+void Player::GetRangBuffInInstance(int amount)
+{
+    for(int i = 0; i < amount; i++) {
+        AddAura(62519, this); /* лечение +8% */
+        AddAura(66721, this); /* урон +5% */
+    }
+}
+
+void Player::RemoveRankBuff() {
+    if(HasAura(62519))
+        RemoveAura(62519); /* лечение +8% */
+    if(HasAura(66721))
+        RemoveAura(66721); /* урон +5% */
+}
+
+void Player::VerifiedRankBuff(Map* map)
+{
+    if(map->IsRaid() || map->IsDungeon()) {
+        if(!HasAura(62519) && !HasAura(66721))
+            GetRangBuffInInstance(GetRankByExp());
+        else {
+            if(GetAuraCount(62519) != GetRankByExp()) {
+                RemoveRankBuff();
+                GetRangBuffInInstance(GetRankByExp());
+            }
+        }
+    }
+    else
+        RemoveRankBuff();
+}
+
 void Player::RewardPvPRank(/*int rank*/)
 {
     /* выдаем ауру */
@@ -16501,6 +16532,8 @@ void Player::RewardPvPRank(/*int rank*/)
     CastSpell(this, 47292, true);
     /* инфа */
     ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, RU_glory_win_13, EN_glory_win_13));
+    /* выдаем бафф если игрок в инсте */
+    VerifiedRankBuff(GetMap());
     /* сохраняем */
     SaveToDB(false, false);
 }
