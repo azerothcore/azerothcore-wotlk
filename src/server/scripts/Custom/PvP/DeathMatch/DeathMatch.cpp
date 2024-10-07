@@ -296,13 +296,22 @@ public:
         if (killed->getLevel() < 80)
             return;
 
+
+
         // дроп сундука
         int win = urand(1, 3);
         if (win == 3) /* 33.334% */
             killer->AddItem(30806, 1);
 
-        // кв на убийство
-        Quest const* quest = sObjectMgr->GetQuestTemplate(26036);
+        // кв на убийство игроков 150
+        if (sWorld->getBoolConfig(CONFIG_RANK_SYSTEM_WIN_ENABLE)) {
+            killer->RewardRankPoints(sWorld->getIntConfig(CONFIG_RANK_SYSTEM_KILL_RATE_BG), PVP_KILL);
+            killer->RewardRankMoney(6/*килл*/, sWorld->getIntConfig(CONFIG_RANK_SYSTEM_KILL_RATE_BG));
+            if (killer->GetQuestStatus(26039) == QUEST_STATUS_INCOMPLETE)
+                killer->KilledMonsterCredit(200004);
+        }    
+
+        // кв на убийство игрока для зоны
         if (quest) {
             if(killer->GetQuestStatus(26036) == QUEST_STATUS_INCOMPLETE)
                 killer->KilledMonsterCredit(200000);   

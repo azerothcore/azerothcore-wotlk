@@ -22,6 +22,7 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
+#include "DeathMatch.h"
 #include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
@@ -4069,7 +4070,7 @@ public:
             AreaTableEntry const* area = sAreaTableStore.LookupEntry(target->GetAreaId());
             // Xinef: add battlefield check
             Battlefield* Bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId());
-            if ((area && canFly && (area->flags & AREA_FLAG_NO_FLY_ZONE)) || (Bf && !Bf->CanFlyIn()))
+            if ((area && canFly && (area->flags & AREA_FLAG_NO_FLY_ZONE)) || (Bf && !Bf->CanFlyIn()) || DeathMatchMgr->IsDeathMatchZone(target->GetZoneId()))
                 canFly = false;
 
             uint32 mount = 0;

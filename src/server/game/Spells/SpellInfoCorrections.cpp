@@ -332,7 +332,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
-        spellInfo->ProcCharges = 0;
+        //spellInfo->ProcCharges = 0;
         spellInfo->StackAmount = 50;
     });    
 
