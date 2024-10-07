@@ -4934,6 +4934,15 @@ void Player::RepopAtGraveyard()
             ClosestGrave = sGraveyard->GetClosestGraveyard(this, GetTeamId());
     }
 
+    /* дуэль зона */
+    if (GetAreaId() == 2249)
+    {
+        ResurrectPlayer(1.0f);
+        SpawnCorpseBones();
+        TeleportTo(1, 5209.53f, -4816.09f, 702.0f, 0.55f);
+        return;
+    }
+
     // stop countdown until repop
     m_deathTimer = 0;
 
