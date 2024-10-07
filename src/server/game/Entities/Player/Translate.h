@@ -656,7 +656,7 @@
 
 /************************************************ Деадматч ************************************************/
 
-#define RU_DEATHMATCH_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Зона исключила вас по причине входа второго персонажа с одинаковым ip адрессом в зону."
+#define RU_DEATHMATCH_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Зона исключила вас по причине входа второго персонажа с одинаковым ip адрессом в зоне."
 #define EN_DEATHMATCH_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: The zone excluded you due to the entrance of the second character with the same ip address in zone."
 
 #define RU_DEATHMATCH_JOIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Вы присоединились к Королевской Битве, для выхода из зоны пропишите в чат |cffffff4d.dm exit|r"
@@ -728,4 +728,12 @@
 #define EN_HONOR_TRADE_OK_RECEIVER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Transfer]: You received |cffffff4d%u|cffff9933 honor points from the player |cffffff4d%s|cffff9933.|r"
 #define RU_HONOR_TRADE_OK_RECEIVER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Трансфер]: Вы получили |cffffff4d%u|cffff9933 очков чести от игрока |cffffff4d%s|cffff9933.|r"
 
+#define EN_REWARD_ARENA_POINTS_WIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: You received |cffffff4d%u|cffff9933 arena points for win.|r"
+#define RU_REWARD_ARENA_POINTS_WIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Вы получили |cffffff4d%u|cffff9933 очков арены за победу.|r"
+
+#define EN_REWARD_ARENA_POINTS_LOOS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: You received |cffffff4d%u|cffff9933 arena points for loos in arena.|r"
+#define RU_REWARD_ARENA_POINTS_LOOS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Вы получили |cffffff4d%u|cffff9933 очков арены за поражение на арене.|r"
+
+#define EN_ARENA1VS1_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена 1x1]: To join arena 1vs1, you need to log out from the second client."
+#define RU_ARENA1VS1_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена 1x1]: Для регистрации арены 1x1 нужно выйти со второго клиента."
 #endif

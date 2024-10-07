@@ -679,9 +679,25 @@ inline void Battleground::_ProcessJoin(uint32 diff)
             if (BattlegroundMap* map = GetBgMap())
                 map->SetVisibilityRange(World::GetMaxVisibleDistanceInBGArenas());
 
+            // counter
+            uint8 counter_arena{0}; 
+            std::ostringstream announce_arena;
+            announce_arena << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена 1x1]: Стартовал бой ";  
+
             for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
                 if (Player* player = itr->second)
                 {
+                    if (GetArenaType() == ARENA_TYPE_5v5) {
+                        if (counter_arena == 0) {
+                            announce_arena << "|cffffff4d" << player->GetName() << "|cffff9933 vs |cffffff4d";
+                            counter_arena++;
+                        }
+                        else {
+                            announce_arena << player->GetName() << "|cffff9933 -- |cffffff4d.sp spec " << player->GetName() << "|r";
+                            counter_arena++;
+                        }
+                    }
+
                     WorldPacket status;
                     sBattlegroundMgr->BuildBattlegroundStatusPacket(&status, this, player->GetCurrentBattlegroundQueueSlot(), STATUS_IN_PROGRESS, 0, GetStartTime(), GetArenaType(), player->GetBgTeamId());
                     player->GetSession()->SendPacket(&status);
@@ -706,6 +722,9 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
                     player->UpdateObjectVisibility(true);
                 }
+
+            if (counter_arena > 1)
+                sWorld->SendWorldText(LANG_ARENA_STARTED_CUSTOM, announce_arena.str().c_str());
 
             for (SpectatorList::const_iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
                 ArenaSpectator::HandleResetCommand(*itr);

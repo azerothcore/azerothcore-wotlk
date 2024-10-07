@@ -809,6 +809,7 @@ enum AcoreStrings
     LANG_UNAUTHORIZED                   = 35408,
     LANG_PINFO_CHR_MAP_WITH_AREA        = 35409,
     LANG_PINFO_CHAR_RANK_POINTS         = 35411,
+    LANG_ARENA_STARTED_CUSTOM           = 35412,
 
     LANG_CHARACTER_GENDER_MALE          = 855,
     LANG_CHARACTER_GENDER_FEMALE        = 856,
