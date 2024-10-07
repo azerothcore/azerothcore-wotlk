@@ -376,7 +376,7 @@ public:
     uint32 GetTotalTime() const { return m_total_time; }
 
     void SetBonuses(uint32 Bonuses) { m_bonuses = Bonuses; }
-    uint32 GetBonuses() const { return m_bonuses; }
+    uint32 GetBonuses() { return m_bonuses; }
 
     void InitWarden(SessionKey const&, std::string const& os);
     Warden* GetWarden();
