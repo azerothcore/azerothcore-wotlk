@@ -235,6 +235,9 @@ public:
         if (killer->GetGUID() == killed->GetGUID())
             return;
 
+        if (killer->GetQuestStatus(26039) == QUEST_STATUS_INCOMPLETE)
+            killer->KilledMonsterCredit(200004);         
+
         if(!killer->IsDeathMatch() || !killed->IsDeathMatch())
             return;
 

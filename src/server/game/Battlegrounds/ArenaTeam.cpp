@@ -771,6 +771,9 @@ int32 ArenaTeam::GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won 
     else
         mod = sWorld->getFloatConfig(CONFIG_ARENA_LOSE_RATING_MODIFIER) * (-chance);
 
+    if (GetType() == ARENA_TYPE_5v5 && won)
+        mod *= 1.7f;    
+
     return (int32)ceil(mod);
 }
 
