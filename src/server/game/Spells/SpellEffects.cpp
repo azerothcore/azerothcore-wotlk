@@ -60,6 +60,8 @@
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include "Translate.h"
+#include "../../scripts/Custom/CustomTeleport/CustomTeleport.h"
 
  /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -4105,6 +4107,13 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
     {
         SendCastResult(SPELL_FAILED_NO_DUELING);            // Dueling isn't allowed here
         return;
+    }
+
+    if (caster->GetAreaId() == 12 || caster->GetAreaId() == 14) {
+        SendCastResult(SPELL_FAILED_NO_DUELING);            // Dueling isn't allowed here
+        ChatHandler(caster->GetSession()).PSendSysMessage(GetText(caster, RU_DUEL_ZONE_ONLY, EN_DUEL_ZONE_ONLY));
+        sCustomTeleportMgr->GetTeleportListAfter(caster, 99, caster->GetTeamId() == TEAM_HORDE ? 1 : 2);
+        return; 
     }
 
     //CREATE DUEL FLAG OBJECT
