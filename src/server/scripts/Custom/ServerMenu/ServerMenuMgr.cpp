@@ -256,5 +256,15 @@ void sServerMenu::SendHonorToPlayer(Player* sender, ObjectGuid receiver, uint32 
 
     // кидаем нотификацию отправителю
     ChatHandler(sender->GetSession()).PSendSysMessage(GetText(sender, RU_HONOR_TRADE_OK_SENDER, EN_HONOR_TRADE_OK_SENDER), Preceiver ? Preceiver->GetName() : name, amount);
+
+    // логи
+    CharacterDatabasePreparedStatement* stmt_log = CharacterDatabase.GetPreparedStatement(CHAR_INS_TRANSFERT_POINTS);
+    stmt_log->SetData(0, sender->GetGUID().GetCounter());
+    stmt_log->SetData(1, sender->GetName());
+    stmt_log->SetData(2, receiver.GetCounter());
+    stmt_log->SetData(3, Preceiver ? Preceiver->GetName() : name);
+    stmt_log->SetData(4, amount);
+    CharacterDatabase.Execute(stmt_log);
+
     return sServerMenuMgr->OpenTradeHonor(sender);
 }
