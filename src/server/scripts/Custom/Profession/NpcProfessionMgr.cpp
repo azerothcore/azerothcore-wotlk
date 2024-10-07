@@ -10,8 +10,9 @@
 
 #define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
-uint8 sProfession::CountPlayerCanLearn() {
-    return 2;
+uint8 sProfession::CountPlayerCanLearn(const Player *player) {
+    static int MaxPrimaryTradeSkill = sWorld->getIntConfig(CONFIG_MAX_PRIMARY_TRADE_SKILL);
+    return MaxPrimaryTradeSkill + (player->GetAuraCount(71201) / 5);
 }
 
 bool sProfession::PlayerAlreadyHasMaxProfessions(const Player *player)
@@ -20,7 +21,7 @@ bool sProfession::PlayerAlreadyHasMaxProfessions(const Player *player)
     for (const auto& i: _PROF)
         if(player->HasSkill(i) && !IsSecondarySkill(i))
             skillCount++;
-    return (CountPlayerCanLearn() > skillCount) ? false : true;
+    return (CountPlayerCanLearn(player) > skillCount) ? false : true;
 }
 
 bool sProfession::LearnAllRecipesInProfession(Player *player, uint32 skill)

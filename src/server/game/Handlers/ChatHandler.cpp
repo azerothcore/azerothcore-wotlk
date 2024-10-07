@@ -231,7 +231,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 lang = ModLangAuras.front()->GetMiscValue();
         }
 
-        if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
+        if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND && type != CHAT_MSG_SAY)
             sender->UpdateSpeakTime(lang == LANG_ADDON ? Player::ChatFloodThrottle::ADDON : Player::ChatFloodThrottle::REGULAR);
     }
 

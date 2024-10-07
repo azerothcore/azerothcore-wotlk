@@ -14,13 +14,13 @@
 #define RU_glory_win_4 "неизвестная причина"
 
 #define EN_glory_win_5 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You got |cffffff4d%u|cffff9933 experience for|cffffff4d %s|cffff9933. You have to gain|cffffff4d %u|cffff9933 experience to the next rank.|r"
-#define RU_glory_win_5 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система Рангов]: Вы получили |cffffff4d%u|cffff9933 опыта за|cffffff4d %s|cffff9933. Вам осталось набрать|cffffff4d %u|cffff9933 опыта до следущего ранга.|r"
+#define RU_glory_win_5 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: Вы получили |cffffff4d%u|cffff9933 опыта за|cffffff4d %s|cffff9933. Вам осталось набрать|cffffff4d %u|cffff9933 опыта до следущего ранга.|r"
 
 #define EN_glory_win_6 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You have|cffffff4d %u|cffff9933 experience (%u rank)\n|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]:|cffffff4d %u|cffff9933 experience left until next rank.|r"
-#define RU_glory_win_6 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система Рангов]: У вас|cffffff4d %u|cffff9933 опыта (%u ранг)\n|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система Рангов]: До следующего ранга осталось|cffffff4d %u|cffff9933 опыта.|r"
+#define RU_glory_win_6 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас|cffffff4d %u|cffff9933 опыта (%u ранг)\n|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: До следующего ранга осталось|cffffff4d %u|cffff9933 опыта.|r"
 
 #define EN_glory_win_10 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You have the|cffffff4d maximum|cffff9933 rank.|r"
-#define RU_glory_win_10 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система Рангов]: У вас|cffffff4d максимальный|cffff9933 ранг.|r"
+#define RU_glory_win_10 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас|cffffff4d максимальный|cffff9933 ранг.|r"
 
 #define EN_glory_win_7 "an completed quest"
 #define RU_glory_win_7 "выполненное задание"
@@ -28,17 +28,17 @@
 #define EN_glory_win_8 "an clicking on an item"
 #define RU_glory_win_8 "нажатие на предмет"
 
-#define EN_glory_win_11 "kill boss in dungeon/raid"
-#define RU_glory_win_11 "убийство босса в инсте/рейде"
+#define EN_glory_win_11 "kill player"
+#define RU_glory_win_11 "убийство игрока"
 
 #define EN_glory_win_12 "gain achievement"
 #define RU_glory_win_12 "получение достижения"
 
 #define EN_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: Your rank is not high enough, you need rank |cffffff4d%u|cffff9933.|r"
-#define RU_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система Рангов]: У вас не достаточно высокий ранг, нужен |cffffff4d%u|cffff9933 ранг.|r"
+#define RU_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас не достаточно высокий ранг, нужен |cffffff4d%u|cffff9933 ранг.|r"
 
 #define EN_glory_win_13 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: Congratulations! You received |cffffff4dnew|cffff9933 rank.|r"
-#define RU_glory_win_13 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система Рангов]: Поздравляем! Вы получили |cffffff4dновый|cffff9933 ранг.|r"
+#define RU_glory_win_13 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: Поздравляем! Вы получили |cffffff4dновый|cffff9933 ранг.|r"
 
 #define EN_NOT_FOUND_MENU "|cffff9933This menu ID was not found, inform the administration\nError code: NOT_FOUND_%u_MENU_ID"
 #define RU_NOT_FOUND_MENU "|cffff9933Данный меню ID не найден, сообщите администрации\nКод ошибки: NOT_FOUND_%u_MENU_ID"
@@ -56,7 +56,7 @@
 #define RU_HOME_MENU_1 "|TInterface\\icons\\Achievement_zone_easternkingdoms_01:20:20:-20:0|tТелепортация"
 
 #define EN_HOME_MENU_2 "|TInterface\\icons\\ability_warrior_rampage:20:20:-20:0|tRank system"
-#define RU_HOME_MENU_2 "|TInterface\\icons\\ability_warrior_rampage:20:20:-20:0|tСистема рангов"
+#define RU_HOME_MENU_2 "|TInterface\\icons\\ability_warrior_rampage:20:20:-20:0|tРанг Система"
 
 #define EN_HOME_MENU_3 "|TInterface\\icons\\Inv_misc_coin_02:20:20:-20:0|tItem Store"
 #define RU_HOME_MENU_3 "|TInterface\\icons\\Inv_misc_coin_02:20:20:-20:0|tМагазин предметов"
@@ -259,7 +259,7 @@
 #define RU_back "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:-20|tНазад"
 
 #define EN_player_errors_2 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You have already learned available quantity professions!"
-#define RU_player_errors_2 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система Рангов]: Вы уже выучили доступное количество профессий!"
+#define RU_player_errors_2 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: Вы уже выучили доступное количество профессий!"
 
 #define EN_arena_queue_1v1_disable_for_heal "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Queue]: You cannot join because you have invested a lot of points in forbidden talents. Please change your talents."
 #define RU_arena_queue_1v1_disable_for_heal "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Очередь Арены]: Вы не можете присоединиться, потому что вы вложили много очков в запрещенные таланты. Пожалуйста измените свои таланты."
@@ -292,7 +292,7 @@
 #define RU_arena_leave_queue "|TInterface\\icons\\Achievement_arena_2v2_7:20:20:-20|tПокинуть очередь"
 
 #define EN_equipe_rank "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You must have |cffffff4d%u|cffff9933 rank in order to equip an item."
-#define RU_equipe_rank "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система Рангов]: У вас должен быть |cffffff4d%u|cffff9933 ранг для того чтобы оборудовать предметом."
+#define RU_equipe_rank "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас должен быть |cffffff4d%u|cffff9933 ранг для того чтобы оборудовать предметом."
 
 /************************************************   TemplateNPC.cpp  ********************************************/
 
@@ -647,6 +647,9 @@
 
 #define RU_MRBGE "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за поражение на поле битве."
 #define EN_MRBGE "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for defeat on the battleground."
+
+#define RU_MRKILL "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за убийство игрока."
+#define EN_MRKILL "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for killing a player."
 
 /************************************************ Деадматч ************************************************/
 

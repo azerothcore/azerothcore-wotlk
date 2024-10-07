@@ -87,6 +87,9 @@ typedef void(*bgZoneRef)(Battleground*, WorldPacket&);
 #define SKILL_PERM_BONUS(x)    int16(PAIR32_HIPART(x))
 #define MAKE_SKILL_BONUS(t, p) MAKE_PAIR32(t, p)
 
+#define GetCustomText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
+#define RANKSYSTEMID 71201
+
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType
 {
@@ -2107,6 +2110,9 @@ public:
     uint8 GetGrantableLevels() { return m_grantableLevels; }
     void SetGrantableLevels(uint8 val) { m_grantableLevels = val; }
 
+    uint32 GetRankPoints() { return m_rankPoints; }
+    void SetRankPoints(uint32 val) { m_rankPoints = val; }
+
     ReputationMgr&       GetReputationMgr()       { return *m_reputationMgr; }
     [[nodiscard]] ReputationMgr const& GetReputationMgr() const { return *m_reputationMgr; }
     [[nodiscard]] ReputationRank GetReputationRank(uint32 faction_id) const;
@@ -2609,6 +2615,59 @@ public:
 
     std::string GetPlayerName();
 
+    // за какие услуги получен опыт
+    enum RewardSource
+    {
+        PVP_HK = 0,
+        PVP_BG,
+        PVP_ARENA,
+        PVP_QUEST,
+        PVP_ITEM,
+        PVP_KILL,
+        PVE_ACHIV
+    };
+
+    // опыты для каждого ранга
+    constexpr static const uint32 pvp_rang_points[100] = {
+                             /*   1    2     3     4      5    6     7       8     9     10      11     12 */
+                                 250, 500, 1000, 2000, 4000, 8000, 16000, 32000, 60000, 80000, 100000, 125000,
+                                 /* 13     14      15        16     17     18        19    20       21     22    */
+                                 150000, 175000, 200000, 225000, 250000, 275000, 300000, 350000, 400000, 450000,
+                                /* 23      24      25       26     27     28        29     30      31      32     */
+                                  500000, 550000, 600000, 650000, 700000, 750000, 800000, 850000, 900000, 950000,
+                                /* 33         34       35      36       37        38      39        40      41       42   */
+                                  1000000, 1100000, 1200000, 1300000, 1400000, 1500000, 1600000, 1700000, 1800000, 1900000,
+                                /*    43       44     45       46         47      48      49       50  */
+                                  2000000, 2100000, 2200000, 2300000, 2400000, 2500000, 2600000, 3000000,
+                                /*     51      52      53       54        55     56        57        58      59      60     */
+                                  3500000, 4000000, 4500000, 5000000, 5500000, 6000000, 6500000, 7000000, 7500000, 8000000,
+                                /*     61      62      63         64        65        66        67        68        69      70     */
+                                  9000000, 10000000, 1100000, 12000000, 13000000, 14000000, 15000000, 16000000, 17000000, 18000000,
+                                /*     71        72       73        74         75       76        77        78       79      80     */
+                                  20000000, 22000000, 24000000, 26000000, 28000000, 30000000, 34000000, 38000000, 42000000, 48000000,
+                                /*     81        82       83        84         85       86        87        88       89      90     */
+                                  55000000, 60000000, 65000000, 70000000, 75000000, 80000000, 85000000, 90000000, 95000000, 100000000,
+                                /*      91        92        93         94          95        96         97         98        99      100(MAX)  */
+                                  110000000, 120000000, 130000000, 140000000, 150000000, 160000000, 170000000, 180000000, 190000000, 200000000
+                               };
+
+    // выдаем опыт для ранга и за что был получен
+    void RewardRankPoints(uint32 /*amount*/, int /*source*/);
+    // сколько опыта осталось до след ранга
+    uint32 PointsUntilNextRank();
+    // набрал необходимое количество опыта для ранга или нет
+    bool CanRankUp();
+    // показывает какой ранг у игрока в зависимости от опыта
+    int GetRankByExp();
+    // проверка при входе в игру (если в друг ранг пропал)
+    void RankControlOnLogin();
+    // при получение необходимого опыта выдаем ранг
+    void RewardPvPRank();
+    // награда в виде голды
+    void RewardRankMoney(uint8 /*type*/, uint32 /*money*/, bool win = true);
+    // инфа при входе в игру скоколько опыта и какой ранг
+    void LoadPvPRank();
+
     // Settings
     [[nodiscard]] PlayerSetting GetPlayerSetting(std::string source, uint8 index);
     void UpdatePlayerSetting(std::string source, uint8 index, uint32 value);
@@ -2890,6 +2949,9 @@ public:
     bool IsAlwaysDetectableFor(WorldObject const* seer) const override;
 
     uint8 m_grantableLevels;
+
+    // rank system
+    uint32 m_rankPoints;    
 
     bool m_needZoneUpdate;
 

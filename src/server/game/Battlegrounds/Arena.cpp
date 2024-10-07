@@ -346,19 +346,22 @@ void Arena::EndBattleground(TeamId winnerTeamId)
                         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, rating ? rating : 1);
                         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA, GetMapId());
 
-                        Quest const* quest = sObjectMgr->GetQuestTemplate(26037);
-                        if (quest) {
-                            // квест на победу 1на1 - 10 побед
-                            if (GetArenaType() == ARENA_TYPE_5v5) {
-                                if (player->GetQuestStatus(26037) == QUEST_STATUS_INCOMPLETE)
-                                    player->KilledMonsterCredit(200001);
-                            }
-                            // квест на победу 1на1 - 10 побед
-                            if (GetArenaType() == ARENA_TYPE_2v2) {
-                                if (player->GetQuestStatus(26038) == QUEST_STATUS_INCOMPLETE)
-                                    player->KilledMonsterCredit(200002);
-                            }  
+
+                        // квест на победу 1на1 - 10 побед
+                        if (GetArenaType() == ARENA_TYPE_5v5) {
+                            if (player->GetQuestStatus(26037) == QUEST_STATUS_INCOMPLETE)
+                                player->KilledMonsterCredit(200001);
                         }
+                        // квест на победу 1на1 - 10 побед
+                        if (GetArenaType() == ARENA_TYPE_2v2) {
+                            if (player->GetQuestStatus(26038) == QUEST_STATUS_INCOMPLETE)
+                                player->KilledMonsterCredit(200002);
+                        }
+
+                        uint32 RankGetRating = (GetArenaType() == ARENA_TYPE_2v2 ? 3 : GetArenaType() == ARENA_TYPE_5v5 ? 2 : 4)
+                                             * sWorld->getIntConfig(CONFIG_RANK_SYSTEM_WIN_RATE_ARENA);
+                        player->RewardRankPoints(RankGetRating, Player::PVP_BG);
+                        player->RewardRankMoney(GetArenaType(), RankGetRating); 
 
                         // Last standing - Rated 5v5 arena & be solely alive player
                         if (GetArenaType() == ARENA_TYPE_5v5 && aliveWinners == 1 && player->IsAlive())
@@ -372,6 +375,10 @@ void Arena::EndBattleground(TeamId winnerTeamId)
                 }
                 else
                 {
+                    uint32 RankGetRating = (GetArenaType() == ARENA_TYPE_2v2 ? 3 : GetArenaType() == ARENA_TYPE_5v5 ? 2 : 4)
+                                             * sWorld->getIntConfig(CONFIG_RANK_SYSTEM_WIN_RATE_ARENA);
+                    player->RewardRankMoney(GetArenaType(), RankGetRating, false);
+
                     loserArenaTeam->MemberLost(player, winnerMatchmakerRating, loserMatchmakerChange);
 
                     // Arena lost => reset the win_rated_arena having the "no_lose" condition

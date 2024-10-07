@@ -1990,6 +1990,7 @@ public:
         uint32 money                    = 0;
         uint32 xp                       = 0;
         uint32 xptotal                  = 0;
+        uint32 rankPoints               = 0;
 
         // Position data print
         uint32 mapId;
@@ -2028,6 +2029,7 @@ public:
             alive             = playerTarget->IsAlive() ? handler->GetAcoreString(LANG_YES) : handler->GetAcoreString(LANG_NO);
             gender            = playerTarget->getGender();
             phase             = playerTarget->GetPhaseMask();
+            rankPoints        = playerTarget->GetRankPoints();
         }
         // get additional information from DB
         else
@@ -2364,6 +2366,9 @@ public:
 
         // Output XX. LANG_PINFO_CHR_PLAYEDTIME
         handler->PSendSysMessage(LANG_PINFO_CHR_PLAYEDTIME, (secsToTimeString(totalPlayerTime, true)));
+
+        // Outpout XX. LANG_PINFO_CHAR_RANK_POINTS
+        handler->PSendSysMessage(LANG_PINFO_CHAR_RANK_POINTS, uint32(rankPoints));
 
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"

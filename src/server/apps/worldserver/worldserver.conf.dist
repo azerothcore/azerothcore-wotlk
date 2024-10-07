@@ -3260,6 +3260,17 @@ LFG.MaxKickCount = 2
 LFG.KickPreventionTimer = 900
 
 #
+#      RankSystemConfig
+#        Description: Управление рейтингом выдачи опыта для ранга
+#        Default:     Все включено и настроена по дефольту
+
+# Арена & Бг
+RankSystem.RewardWinArenaEnable = 1
+RankSystem.RewardWinArena = 25
+RankSystem.RewardWinBG = 150
+RankSystem.RewardKillBG = 10
+
+#
 #    DungeonAccessRequirements.LFGLevelDBCOverride
 #
 #        Description: If enabled, use `min_level` and `max_level` values from table `dungeon_access_requirements` to list or to hide a dungeon from the LFG window.

@@ -326,6 +326,16 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ProcCharges = 6;
     });
 
+    // rank system
+    ApplySpellFix({ 71201 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
+        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
+        spellInfo->ProcCharges = 0;
+        spellInfo->StackAmount = 50;
+    });    
+
     // The Eye of Acherus (no spawn in phase 2 in db)
     ApplySpellFix({ 51852 }, [](SpellInfo* spellInfo)
     {

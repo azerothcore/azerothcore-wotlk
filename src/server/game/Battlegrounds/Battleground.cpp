@@ -879,18 +879,23 @@ void Battleground::EndBattleground(PvPTeamId winnerTeamId)
             }
 
             // квест на победу бг
-            if (!isArena()) {
-                Quest const* quest = sObjectMgr->GetQuestTemplate(26035);
-                if (quest) {
-                    if (player->GetQuestStatus(26035) == QUEST_STATUS_INCOMPLETE)
-                        player->KilledMonsterCredit(200003);
+            if (isBattleground()) {
+                if (sWorld->getBoolConfig(CONFIG_RANK_SYSTEM_WIN_ENABLE)) {
+                    player->RewardRankPoints(sWorld->getIntConfig(CONFIG_RANK_SYSTEM_WIN_RATE_BG), Player::PVP_BG);
+                    player->RewardRankMoney(4/*бг*/, sWorld->getIntConfig(CONFIG_RANK_SYSTEM_WIN_RATE_BG));
                 }
+
+                if (player->GetQuestStatus(26035) == QUEST_STATUS_INCOMPLETE)
+                    player->KilledMonsterCredit(200003);
             }
 
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_BG, player->GetMapId());
         }
         else
         {
+            if (isBattleground() && sWorld->getBoolConfig(CONFIG_RANK_SYSTEM_WIN_ENABLE)) {
+                player->RewardRankMoney(4/*бг*/, sWorld->getIntConfig(CONFIG_RANK_SYSTEM_WIN_RATE_BG), false);
+            }
             if (IsRandom() || BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)))
                 UpdatePlayerScore(player, SCORE_BONUS_HONOR, GetBonusHonorFromKill(loser_kills));
         }

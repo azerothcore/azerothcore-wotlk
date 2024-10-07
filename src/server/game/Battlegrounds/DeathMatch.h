@@ -30,6 +30,9 @@ public:
    void DeathMatchWelcome(Player* /* player */, Creature*);
    void GetInfoNpc(Player* /* player */);
 
+   std::string GetItemLink(uint32 /*entry*/, WorldSession* /*session*/) const;
+   std::string GetItemIcon(uint32 entry, uint32 width, uint32 height, int x, int y) const;
+
    struct AddSpell
    {
        uint32 spellId;

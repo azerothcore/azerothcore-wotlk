@@ -163,27 +163,82 @@ bool DeathMatch::IsDeathMatchZone(uint32 zoneId) {
     return zoneId == 3817;
 }
 
+std::string DeathMatch::GetItemLink(uint32 entry, WorldSession* session) const
+{
+    const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
+    int loc_idx = session->GetSessionDbLocaleIndex();
+    std::string name = temp->Name1;
+    if (ItemLocale const* il = sObjectMgr->GetItemLocale(entry))
+        ObjectMgr::GetLocaleString(il->Name, loc_idx, name);
+
+    std::ostringstream oss;
+    oss << std::dec <<
+        "|Hitem:" << entry << ":0:0:0:0:0:0:0:0:0|h[" << name << "]|h|r";
+
+    return oss.str();
+}
+
+std::string DeathMatch::GetItemIcon(uint32 entry, uint32 width, uint32 height, int x, int y) const
+{
+    std::ostringstream ss;
+    ss << "|TInterface";
+    const ItemTemplate* temp = sObjectMgr->GetItemTemplate(entry);
+    const ItemDisplayInfoEntry* dispInfo = NULL;
+    if (temp)
+    {
+        dispInfo = sItemDisplayInfoStore.LookupEntry(temp->DisplayInfoID);
+        if (dispInfo)
+            ss << "/ICONS/" << dispInfo->inventoryIcon;
+    }
+    if (!dispInfo)
+        ss << "/InventoryItems/WoWUnknownItem01";
+    ss << ":" << width << ":" << height << ":" << x << ":" << y << "|t";
+    return ss.str();
+}
+
 void DeathMatch::DeathMatchHead(Player* player, Creature* creature)
 {
     if (!player || !creature)
         return;
 
+    WorldSession* session = player->GetSession();
+    if (!session)
+        return;
+
     std::ostringstream femb;
     if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU)
     {
-        femb << "Королевская Битва это зона каждый сам за себя.\n\n";
-        femb << "При убийстве игрока у вас есть шанс 1 из 3 залутать сундук с подарком.\n";
-        femb << "А также шанс получить дополнительный бафф который будет вас выделять от остальных !\n\n";
+        femb << "Королевская Битва это зона каждый сам за себя.\n";
+        femb << "При убийстве игрока у вас есть шанс 1 из 3 залутать сундук с подарком и золотом:\n\n";
+        femb << DeathMatchMgr->GetItemIcon(1042, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(1042, session) << "     шанс 50%\n";
+        femb << DeathMatchMgr->GetItemIcon(1043, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(1043, session) << "   шанс 10.3%\n";
+        femb << DeathMatchMgr->GetItemIcon(11663, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(11663, session) << "  шанс 10%\n";
+        femb << DeathMatchMgr->GetItemIcon(43589, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(43589, session) << " шанс 7%\n";
+        femb << DeathMatchMgr->GetItemIcon(1044, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(1044, session) << " шанс 5%\n";
+        femb << DeathMatchMgr->GetItemIcon(18942, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(18942, session) << " шанс 5%\n";
+        femb << DeathMatchMgr->GetItemIcon(44115, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(44115, session) << " шанс 5%\n";
+        femb << DeathMatchMgr->GetItemIcon(38570, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(38570, session) << " шанс 3%\n";
+        femb << DeathMatchMgr->GetItemIcon(45280, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(45280, session) << " шанс 3%\n";
+        femb << DeathMatchMgr->GetItemIcon(35778, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(35778, session) << " шанс 1.5%\n";
+        femb << DeathMatchMgr->GetItemIcon(842, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(842, session) << " шанс 0.2%\n";
         femb << "В данный момент в зоне " << _players.size() << " игроков\n";
-        // femb << "Вы уже убили " << player->GetDeathMatchKillTotal() << " игроков в этой зоне";
     }
     else
     {
-        femb << "The Royale Battle is a zone every man for himself\n\n";
-        femb << "When you kill a player, you have a 1 in 3 chance of looting a chest with a gift.\n";
-        femb << "And also a chance to get an additional buff that will set you apart from the rest!\n\n";
+        femb << "The Royale Battle is a zone every man for himself.\n";
+        femb << "When you kill a player, you have a 1 in 3 chance of looting a chest with a gift and gold:\n";
+        femb << DeathMatchMgr->GetItemIcon(1042, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(1042, session) << "     chance 50%\n";
+        femb << DeathMatchMgr->GetItemIcon(1043, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(1043, session) << "   chance 10.3%\n";
+        femb << DeathMatchMgr->GetItemIcon(1044, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(11663, session) << "  chance 10%\n";
+        femb << DeathMatchMgr->GetItemIcon(43589, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(43589, session) << " chance 7%\n";
+        femb << DeathMatchMgr->GetItemIcon(1044, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(1044, session) << " chance 5%\n";
+        femb << DeathMatchMgr->GetItemIcon(18942, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(18942, session) << " chance 5%\n";
+        femb << DeathMatchMgr->GetItemIcon(44115, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(44115, session) << " chance 5%\n";
+        femb << DeathMatchMgr->GetItemIcon(38570, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(38570, session) << " chance 3%\n";
+        femb << DeathMatchMgr->GetItemIcon(45280, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(45280, session) << " chance 3%\n";
+        femb << DeathMatchMgr->GetItemIcon(35778, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(35778, session) << " chance 1.5%\n";
+        femb << DeathMatchMgr->GetItemIcon(842, 12, 12, 0, -2) << " " << DeathMatchMgr->GetItemLink(842, session) << " chance 0.2%\n";
         femb << "Currently in the zone " << _players.size() << " player(s).\n";
-        // femb << "You have already killed " << player->GetDeathMatchKillTotal() << " player(s) in this zone";
     }
     player->PlayerTalkClass->SendGossipMenu(femb.str().c_str(), creature->GetGUID());
     return;
@@ -233,10 +288,7 @@ public:
             return;
 
         if (killer->GetGUID() == killed->GetGUID())
-            return;
-
-        if (killer->GetQuestStatus(26039) == QUEST_STATUS_INCOMPLETE)
-            killer->KilledMonsterCredit(200004);         
+            return;      
 
         if(!killer->IsDeathMatch() || !killed->IsDeathMatch())
             return;

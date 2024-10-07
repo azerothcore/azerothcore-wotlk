@@ -9393,7 +9393,7 @@ bool Unit::HandleProcTriggerSpell(Unit* victim, uint32 damage, AuraEffect* trigg
     if (!triggerEntry)
     {
         // Don't cast unknown spell
-        LOG_ERROR("entities.unit", "Unit::HandleProcTriggerSpell: Spell {} (effIndex: {}) has unknown TriggerSpell {}. Unhandled custom case?", auraSpellInfo->Id, triggeredByAura->GetEffIndex(), trigger_spell_id);
+        //LOG_ERROR("entities.unit", "Unit::HandleProcTriggerSpell: Spell {} (effIndex: {}) has unknown TriggerSpell {}. Unhandled custom case?", auraSpellInfo->Id, triggeredByAura->GetEffIndex(), trigger_spell_id);
         return false;
     }
 

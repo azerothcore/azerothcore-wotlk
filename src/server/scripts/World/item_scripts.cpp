@@ -217,6 +217,20 @@ public:
     }
 };
 
+class RandomMorphItem : public ItemScript
+{
+public:
+    RandomMorphItem() : ItemScript("RandomMorphItem") { }
+
+    static constexpr uint32 tab[3] = {29001, 29002, 29003};
+
+    bool OnUse(Player* player, Item* /*item*/, SpellCastTargets const& /*targets*/) override
+    {
+        player->CastSpell(player, urand(tab[0], tab[2]), true);
+        return false;
+    }
+};
+
 class BonusGetOnAccountItem : public ItemScript
 {
 public:
@@ -240,6 +254,52 @@ public:
     }
 };
 
+class ItemUse_Glory_Exp : public ItemScript
+{
+public:
+    ItemUse_Glory_Exp() : ItemScript("ItemUse_Glory_Exp") { }
+
+    bool OnUse(Player* pPlayer, Item* pItem, const SpellCastTargets& /*pTargets*/) override
+    {
+        if (pPlayer->GetAuraCount(71201) >= 100)
+            return true;
+
+        uint32 entry = pItem->GetEntry();
+        uint32 rate = 0;
+
+        if (pPlayer->GetAuraCount(71201) < 100) {
+            switch (entry) {
+                case 1042:
+                    rate = 50;
+                    break;
+                case 1043:
+                    rate = 100;
+                    break;
+                case 1044:
+                    rate = 250;
+                    break;
+                case 35778:
+                    rate = 1000;
+                    break;
+                case 842:
+                    rate = 5000;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (rate != 0)
+        {
+            pPlayer->DestroyItemCount(entry,1,true);
+            pPlayer->RewardRankPoints(rate, 4);
+        }
+        else
+            ChatHandler(pPlayer->GetSession()).PSendSysMessage(GetText(pPlayer,"Вам нужен более высокий ранг для использование данного предмета.","You need a higher rank to use this item."));
+        return true;
+    }
+};
+
 void AddSC_item_scripts()
 {
     new item_only_for_flight();
@@ -250,4 +310,6 @@ void AddSC_item_scripts()
     new item_captured_frog();
     new item_generic_limit_chance_above_60();
     new BonusGetOnAccountItem();
+    new RandomMorphItem();
+    new ItemUse_Glory_Exp();
 }

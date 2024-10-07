@@ -73,10 +73,14 @@ public:
                 }
 
                 /* exeptions */
-                if (player->HasSpell(12294))
-                    player->learnSpell(47486);
-                if (player->HasSpell(20243))
-                    player->learnSpell(47498);
+                if (player->HasSpell(12294)) {
+                    if (player->HasSpell(47486))
+                        player->learnSpell(47486);
+                }
+                if (player->HasSpell(20243)) {
+                    if (player->HasSpell(47498))
+                        player->learnSpell(47498);
+                }
                 player->SaveToDB(false, false);
                 break;
             }
@@ -88,31 +92,39 @@ public:
                     }
                 }
 
-                if (player->HasSpell(20925))
-                    player->learnSpell(48952);
-                if (player->HasSpell(31935))
-                    player->learnSpell(48827);
-                if (player->HasSpell(20911))
-                    player->learnSpell(25899);
-                if (player->HasSpell(20473))
-                    player->learnSpell(48825);
+                if (player->HasSpell(20925)) {
+                    if (!player->HasSpell(48952))
+                        player->learnSpell(48952);
+                }
+                if (player->HasSpell(31935)) {
+                    if (!player->HasSpell(48827))
+                        player->learnSpell(48827);
+                }
+                if (player->HasSpell(20911)) {
+                    if (!player->HasSpell(25899))
+                        player->learnSpell(25899);
+                }
+                if (player->HasSpell(20473)) {
+                    if (!player->HasSpell(48825))
+                        player->learnSpell(48825);
+                }
 
                 if (player->GetTeamId() == TEAM_ALLIANCE)
                 {
-                    if (player->HasSpell(31801))
+                    if (!player->HasSpell(31801))
                         player->learnSpell(31801);
-                    if (player->HasSpell(13819))
+                    if (!player->HasSpell(13819))
                         player->learnSpell(13819);
-                    if (player->HasSpell(23214))
+                    if (!player->HasSpell(23214))
                         player->learnSpell(23214);
                 }
                 if (player->GetTeamId() == TEAM_HORDE)
                 {
-                    if (player->HasSpell(53736))
+                    if (!player->HasSpell(53736))
                         player->learnSpell(53736);
-                    if (player->HasSpell(34769))
+                    if (!player->HasSpell(34769))
                         player->learnSpell(34769);
-                    if (player->HasSpell(34767))
+                    if (!player->HasSpell(34767))
                         player->learnSpell(34767);
                 }
                 player->SaveToDB(false, false);
