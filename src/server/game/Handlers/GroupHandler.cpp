@@ -254,12 +254,11 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
     }
 
     Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
+    if (!leader)
+        return;
 
     if (leader->IsDeathMatch())
-    {
-        SendPartyResult(PARTY_OP_INVITE, "", ERR_GROUP_FULL);
         return;
-    }
 
     // Forming a new group, create it
     if (!group->IsCreated())
