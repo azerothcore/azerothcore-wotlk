@@ -1101,8 +1101,16 @@ class event_mage_fire : public CreatureScript
                 }
             }
 
-            void HealReceived(Unit* /*healer*/, uint32& heal) override
+            void HealReceived(Unit* healer, uint32& heal) override
             {
+                if (!healer->IsPlayer())
+                    return;
+                if (!me->IsInCombat())
+                    return;
+
+                healer->ToPlayer()->SetPvP(true);
+                healer->ToPlayer()->UpdatePvPState();
+
                 if (me->HealthAbovePctHealed(100, heal) && !done) {
                     done = !done;
                     for (int i = 0; i < 5; i++) {
@@ -1122,7 +1130,7 @@ class event_mage_fire : public CreatureScript
                     if (Player* player = it->second->GetPlayer())
                     {
                         if (player->IsInWorld() && player->GetAreaId() == areaId && player->GetTeamId() == (alliance ? TEAM_ALLIANCE : TEAM_HORDE)) {
-                            player->AddItem(20486, 1);
+                            player->AddItem(20486, 5);
                             ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_WIN_EVENT_BOSS, EN_WIN_EVENT_BOSS));
                         }
                     }
