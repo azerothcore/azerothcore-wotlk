@@ -6,6 +6,7 @@
 #include "Chat.h"
 #include "Config.h"
 #include "DisableMgr.h"
+#include "GameEventMgr.h"
 #include "Language.h"
 #include "Log.h"
 #include "Player.h"
@@ -83,6 +84,22 @@ void ArenaOne::JoinQueue(Player* player)
     if (!player)
         return;
 
+    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
+    if (activeEvents.find(91) != activeEvents.end())
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_arena_team_dissables_event, EN_arena_team_dissables_event));
+        return CloseGossipMenuFor(player);
+    }        
+
+    if (player->GetRankByExp() < 5) {
+        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_glory_win_9, EN_glory_win_9), 5);
+        return ArenaOneMgr->ArenaMainMenu(player);
+    }   
+
+    if (!player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5))) {
+        CreateArenateam(player);
+    }    
+
     if (ArenaOneMgr->Arena1v1CheckTalents(player) && ArenaOneMgr->ArenaCheckFullEquipAndTalents(player) && !ArenaOneMgr->JoinQueueArena(player, true))
         ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_err_queue, EN_arena_err_queue));
     CloseGossipMenuFor(player);
@@ -153,10 +170,12 @@ bool ArenaOne::JoinQueueArena(Player* player, bool isRated)
     }
 
     BattlegroundQueue& bgQueue = sBattlegroundMgr->GetBattlegroundQueue(bgQueueTypeId);
+    BattlegroundTypeId bgTypeId = bg->GetBgTypeID();
+
     bg->SetRated(isRated);
     bg->SetMaxPlayersPerTeam(1);
 
-    GroupQueueInfo* ginfo = bgQueue.AddGroup(player, nullptr, BATTLEGROUND_AA, bracketEntry, arenatype, isRated, false, arenaRating, matchmakerRating, ateamId);
+    GroupQueueInfo* ginfo = bgQueue.AddGroup(player, nullptr, bgTypeId, bracketEntry, arenatype, isRated, false, arenaRating, matchmakerRating, ateamId);
     uint32 avgTime = bgQueue.GetAverageQueueWaitTime(ginfo);
     uint32 queueSlot = player->AddBattlegroundQueueId(bgQueueTypeId);
 
@@ -165,7 +184,7 @@ bool ArenaOne::JoinQueueArena(Player* player, bool isRated)
     sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_WAIT_QUEUE, avgTime, 0, arenatype, TEAM_NEUTRAL, isRated);
     player->GetSession()->SendPacket(&data);
 
-    sBattlegroundMgr->ScheduleQueueUpdate(matchmakerRating, arenatype, bgQueueTypeId, BATTLEGROUND_AA, bracketEntry->GetBracketId());
+    sBattlegroundMgr->ScheduleQueueUpdate(matchmakerRating, arenatype, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
     return true;
 }
 
@@ -215,10 +234,29 @@ bool ArenaOne::Arena1v1CheckTalents(Player* player)
     if (!player)
         return false;
 
-    if(player->HasHealSpec())
+    if (player->HasHealSpec())
     {
         ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_queue_1v1_disable_for_heal, EN_arena_queue_1v1_disable_for_heal));
         return false;
+    }
+
+    switch(player->getClass()) {
+        case CLASS_DEATH_KNIGHT: {
+            if (!player->HasSpell(49206) && !player->HasSpell(49143) && !player->HasSpell(55050)) {
+                ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_queue_1v1_disable_for_hybrid, EN_arena_queue_1v1_disable_for_hybrid));
+                return false;
+            } else {
+                return true;
+            }
+        } break;
+        case CLASS_PALADIN: {
+            if (!player->HasSpell(53385) && !player->HasSpell(53595)) {
+                ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_queue_1v1_disable_for_hybrid, EN_arena_queue_1v1_disable_for_hybrid));
+                return false;
+            } else {
+                return true;
+            }
+        }
     }
     return true;
 }
@@ -241,16 +279,12 @@ void ArenaOne::ArenaMainMenu(Player* player)
         s << "\nНа арене вы получите:\nЗа победу: " << rating << " очков арены.\n";
         s << "\nЗа поражение: " << uint32(rating/2) << " очков арены.";
     }
-    s << "\n\nВы так же можете воспользоваться командой: .join solo\nдля вступление в очередь на арену 1v1.";
+    s << "\n\nВы так же можете воспользоваться командой: .join solo\nдля вступление в очередь на арену 1v1.\n\n";
+    s << "Для регистрации арены 1v1 необходимо иметь не менее 5 ранг.";
 
     if (player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId))
     {
         AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetText(player, RU_arena_leave_queue, EN_arena_leave_queue), GOSSIP_SENDER_MAIN + 6, 3, GetText(player, RU_arena_leave_queue_confirm, EN_arena_leave_queue_confirm), 0, false);
-    }
-
-    if (!player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5)))
-    {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetText(player, RU_arena_create_team, EN_arena_create_team), GOSSIP_SENDER_MAIN + 6, 1, GetText(player, RU_arena_leave_queue_confirm, EN_arena_leave_queue_confirm), 0, false);
     }
     else
     {
@@ -287,6 +321,14 @@ public:
         }
     }
 
+    void OnQueueIdToArenaType(const BattlegroundQueueTypeId _bgQueueTypeId, uint8& arenaType) override
+    {
+        if (_bgQueueTypeId == bgQueueTypeId)
+        {
+            arenaType = ARENA_TYPE_5v5;
+        }
+    }    
+
     void OnSetArenaMaxPlayersPerTeam(const uint8 type, uint32& maxPlayersPerTeam) override
     {
         if (type == ARENA_TYPE_5v5)
@@ -294,6 +336,7 @@ public:
             maxPlayersPerTeam = 1;
         }
     }
+
 
 };
 
