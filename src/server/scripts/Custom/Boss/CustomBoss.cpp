@@ -1044,32 +1044,36 @@ class event_mage_fire : public CreatureScript
             {
                 InitialPosition = c->GetPosition();
                 MaxDistance = 100.0f;
+                _spawnHealth = 1; // just in case if not set below
+                if (CreatureData const* data = sObjectMgr->GetCreatureData(me->GetSpawnId()))
+                    if (data->curhealth)
+                        _spawnHealth = data->curhealth;
             }
-
-            uint32 m_uiHealTimer;
-            uint32 m_uiFFireballTimer;
-            uint32 m_uiFireNovaTimer;
-	        uint32 m_uiShipTimer;
-            uint32 m_uiFeerTimer;
-            bool done = false;
 
             void Reset() override
             {
+                me->SetHealth(_spawnHealth);
+                me->LoadCreaturesAddon(true);
+
                 m_uiHealTimer      = urand(15000, 20000);
                 m_uiFFireballTimer = urand(10000, 15000);
                 m_uiFireNovaTimer  = urand(10000, 20000);
 		        m_uiShipTimer      = urand(30000, 35000);
                 m_uiFeerTimer      = urand(50000, 55000);
+                done               = false;
             }
 
             void JustSummoned(Creature* /*summon*/) override
-            {
-                if (me->GetHealth() != 5000000)
-                    me->SetHealth(5000000); 
+            { 
             }
 
             void EnterCombat(Unit* /*pWho*/) override
             {
+                if (me->GetEntry() == 99008) { // альянс босс
+                    me->Yell("Неужели вы, безжалостные Орда, думаете, что можете захватить нашу Землю? Мы Альянс, мы мудрость и доблесть. Поднимите оружие и готовьтесь к бою!", LANG_UNIVERSAL);
+                } else {
+                    me->Yell("Жалкие слуги Альянса, вы думаете, что можете победить нас, владельцев Земли? Мы Орда, мы сила и могущество. Поднимите оружие и готовьтесь к смерти!", LANG_UNIVERSAL);
+                }
             }
 
             void EnterEvadeMode(EvadeReason pWhy) override
@@ -1079,6 +1083,11 @@ class event_mage_fire : public CreatureScript
 
             void KilledUnit(Unit* /*victim*/) override
             {
+                if (me->GetEntry() == 99008) { // альянс босс
+                    me->Yell("Жаль, что вы не смогли защитить себя. Ваша смерть будет отмщена, ваша душа будет освобождена.", LANG_UNIVERSAL);
+                } else {
+                    me->Yell("Еще одна жертва для Орды. Ваша жизнь принадлежит нам, а ваша душа будет служить нам навсегда!", LANG_UNIVERSAL);
+                } 
             }
 
             // если убили босса
@@ -1087,36 +1096,24 @@ class event_mage_fire : public CreatureScript
                 std::ostringstream ss;
                 ss << "|TInterface/GossipFrame/Battlemastergossipicon:15:15|t |cffff9933[Сообщение о событии]:|r Осада столиц, победа";
 
-                if (me->GetEntry() == 99008) { // альянс босс
-                    ss << " Орды!";
-                } else {
-                    ss << " Альянса!";
-                }
-
+                bool isAlliance = me->GetEntry() == 99008;
+                ss << (isAlliance ? " Орды!" : " Альянса!");
                 sWorld->SendServerMessage(SERVER_MSG_STRING, ss.str().c_str());
-                // награда
-                RewarBossKill(me, me->GetEntry() == 99008 ? false : true);
-
-                // отключение ивента
-                GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
-                if (activeEvents.find(92) != activeEvents.end())
-                {
+                RewarBossKill(me, !isAlliance);
+                if (sGameEventMgr->IsActiveEvent(92))
                     sGameEventMgr->StopEvent(92, true);
-                }
             }
 
             void HealReceived(Unit* healer, uint32& heal) override
             {
-                if (!healer->IsPlayer())
-                    return;
-                if (!me->IsInCombat())
+                if (!healer->IsPlayer() || !me->IsInCombat())
                     return;
 
                 healer->ToPlayer()->SetPvP(true);
                 healer->ToPlayer()->UpdatePvPState();
 
-                if (me->HealthAbovePctHealed(100, heal) && !done) {
-                    done = !done;
+                if (!done && me->HealthAbovePctHealed(100, heal)) {
+                    done = true;
                     for (int i = 0; i < 5; i++) {
                         DoCast(me, 62519);
                         DoCast(me, 66721);
@@ -1134,7 +1131,7 @@ class event_mage_fire : public CreatureScript
                     if (Player* player = it->second->GetPlayer())
                     {
                         if (player->IsInWorld() && player->GetAreaId() == areaId && player->GetTeamId() == (alliance ? TEAM_ALLIANCE : TEAM_HORDE)) {
-                            player->AddItem(20486, 5);
+                            player->AddItem(20486, 3);
                             ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_WIN_EVENT_BOSS, EN_WIN_EVENT_BOSS));
                         }
                     }
@@ -1146,8 +1143,10 @@ class event_mage_fire : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
-                if (me->GetDistance(InitialPosition) > MaxDistance)
-                    me->GetMotionMaster()->MovePoint(0, InitialPosition);                    
+                if (me->GetDistance(InitialPosition) > MaxDistance) {
+                    EnterEvadeMode(EVADE_REASON_OTHER);
+                    return;
+                }                  
 
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
@@ -1212,6 +1211,13 @@ class event_mage_fire : public CreatureScript
         private:
             Position InitialPosition;
             float MaxDistance;
+            uint32 _spawnHealth;
+            uint32 m_uiHealTimer;
+            uint32 m_uiFFireballTimer;
+            uint32 m_uiFireNovaTimer;
+            uint32 m_uiShipTimer;
+            uint32 m_uiFeerTimer;
+            bool done = false;
         };
 
         CreatureAI* GetAI(Creature* creature) const
@@ -1450,12 +1456,6 @@ class IceMan : public CreatureScript
         {
             IceManAI(Creature *c) : ScriptedAI(c) {}
 
-            uint32 Knockback_timer;
-            uint32 Flame_timer;
-            uint32 Meteor_timer;
-
-
-
             void Reset() override
             {
                 Knockback_timer = 40000;
@@ -1463,10 +1463,16 @@ class IceMan : public CreatureScript
                 Meteor_timer = 3500;
             }
 
-            void JustDied(Unit* /*victim*/) override
+            // если убили босса
+            void JustDied(Unit* /*killer*/) override
             {
-                me->Say("НЕЕЕЕЕЕЕЕЕЕТ!!!",LANG_UNIVERSAL);
-            }
+                me->Say("Неужели это конец? Я был слишком слаб для вас, но я вернусь, и в следующий раз я не буду так легкой добычей. Подождите меня...",LANG_UNIVERSAL);
+                std::ostringstream ss;
+                ss << "|TInterface/GossipFrame/Battlemastergossipicon:15:15|t |cffff9933[Сообщение о событии]:|r Герои нашего мира, мы с радостью сообщаем вам, что босс Сверх способный аномалиус был успешно убит! Огромное спасибо всем участникам за их стойкость и мужество. Поздравляем победителей и ждем вас на новых ивентах!";
+                sWorld->SendServerMessage(SERVER_MSG_STRING, ss.str().c_str());
+                if (sGameEventMgr->IsActiveEvent(93))
+                    sGameEventMgr->StopEvent(93, true);
+            } 
 
             void KilledUnit(Unit* /*victim*/) override
             {
@@ -1475,7 +1481,7 @@ class IceMan : public CreatureScript
 
             void EnterCombat(Unit* /*who*/) override
             {
-                me->Say("Вы думаете, что вы можете убить меня?!",LANG_UNIVERSAL);
+                me->Say("Готовьтесь погибнуть, слабые существа! Я, Сверх способный Аномалиус, буду вашим конечным судьбой!",LANG_UNIVERSAL);
             }
 
             void UpdateAI(const uint32 uiDiff) override
@@ -1517,7 +1523,11 @@ class IceMan : public CreatureScript
                     Meteor_timer -=uiDiff;
                 DoMeleeAttackIfReady();
             }
-        };
+        private:
+            uint32 Knockback_timer;
+            uint32 Flame_timer;
+            uint32 Meteor_timer;    
+    };
 };
 
 void AddSC_npc_custom_boss()
