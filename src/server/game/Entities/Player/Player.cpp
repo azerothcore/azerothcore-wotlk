@@ -16440,6 +16440,7 @@ void Player::RewardRankPoints(uint32 amount, int source)
         case PVE_ACHIV:       rankInfo = GetCustomText(this, RU_glory_win_12, EN_glory_win_12); break;
         case EXCHANGER_HONOR: rankInfo = GetCustomText(this, RU_glory_win_14, EN_glory_win_14); break;
         case EVENT_REWARD:    rankInfo = GetCustomText(this, RU_glory_win_15, EN_glory_win_15); break;
+        case KILL_BOSS:       rankInfo = GetCustomText(this, RU_glory_win_16, EN_glory_win_16); break;
         default:              rankInfo = GetCustomText(this, RU_glory_win_4, EN_glory_win_4);   break;
     }
 

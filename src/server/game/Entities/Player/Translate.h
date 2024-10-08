@@ -40,6 +40,9 @@
 #define EN_glory_win_15 "event"
 #define RU_glory_win_15 "ивент"
 
+#define EN_glory_win_16 "kill boss"
+#define RU_glory_win_16 "убийство босса"
+
 #define EN_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: Your rank is not high enough, you need rank |cffffff4d%u|cffff9933.|r"
 #define RU_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас не достаточно высокий ранг, нужен |cffffff4d%u|cffff9933 ранг.|r"
 
@@ -79,26 +82,26 @@
 #define RU_HOME_MENU_7 "|TInterface\\icons\\Achievement_pvp_p_07:20:20:-20:0|tПвП раздел арены"
 #define EN_HOME_MENU_7 "|TInterface\\icons\\Achievement_pvp_p_07:20:20:-20:0|tPvP arena section"
 
-#define RU_CHAR_CONTROL_1 "|TInterface\\icons\\INV_Misc_Bag_07:20:20:-20:0|tБанк"
-#define EN_CHAR_CONTROL_1 "|TInterface\\icons\\INV_Misc_Bag_07:20:20:-20:0|tBank"
+#define RU_CHAR_CONTROL_1 "|TInterface\\icons\\INV_Misc_Bag_07:18:18:-20:0|tБанк"
+#define EN_CHAR_CONTROL_1 "|TInterface\\icons\\INV_Misc_Bag_07:18:18:-20:0|tBank"
 
-#define RU_CHAR_CONTROL_2 "|TInterface\\icons\\INV_Letter_11:20:20:-20:0|tПочта"
-#define EN_CHAR_CONTROL_2 "|TInterface\\icons\\INV_Letter_11:20:20:-20:0|tMail"
+#define RU_CHAR_CONTROL_2 "|TInterface\\icons\\INV_Letter_11:18:18:-20:0|tПочта"
+#define EN_CHAR_CONTROL_2 "|TInterface\\icons\\INV_Letter_11:18:18:-20:0|tMail"
 
-#define RU_CHAR_CONTROL_3 "|TInterface\\icons\\Inv_crate_08:20:20:-20:0|tПрофессии"
-#define EN_CHAR_CONTROL_3 "|TInterface\\icons\\Inv_crate_08:20:20:-20:0|tProfessions"
+#define RU_CHAR_CONTROL_3 "|TInterface\\icons\\Inv_crate_08:18:18:-20:0|tПрофессии"
+#define EN_CHAR_CONTROL_3 "|TInterface\\icons\\Inv_crate_08:18:18:-20:0|tProfessions"
 
-#define RU_CHAR_CONTROL_4 "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:20:20:-20:0|tСменить фракцию за 50 бонусов"
-#define EN_CHAR_CONTROL_4 "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:20:20:-20:0|tChange faction for 50 bonuses"
+#define RU_CHAR_CONTROL_4 "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:18:18:-20:0|tСменить фракцию за 50 бонусов"
+#define EN_CHAR_CONTROL_4 "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:18:18:-20:0|tChange faction for 50 bonuses"
 
-#define RU_CHAR_CONTROL_5 "|TInterface\\icons\\INV_Misc_Toy_04:20:20:-20:0|tСменить расу за 30 бонусов"
-#define EN_CHAR_CONTROL_5 "|TInterface\\icons\\INV_Misc_Toy_04:20:20:-20:0|tChange race for 30 bonuses"
+#define RU_CHAR_CONTROL_5 "|TInterface\\icons\\INV_Misc_Toy_04:18:18:-20:0|tСменить расу за 30 бонусов"
+#define EN_CHAR_CONTROL_5 "|TInterface\\icons\\INV_Misc_Toy_04:18:18:-20:0|tChange race for 30 bonuses"
 
-#define RU_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:20:20:-20:0|tСменить ник за 15 бонусов"
-#define EN_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:20:20:-20:0|tChange nickname for 15 bonuses"
+#define RU_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:18:18:-20:0|tСменить ник за 15 бонусов"
+#define EN_CHAR_CONTROL_6 "|TInterface\\icons\\Achievement_character_nightelf_female:18:18:-20:0|tChange nickname for 15 bonuses"
 
-#define RU_CHAR_CONTROL_7 "|TInterface\\icons\\Achievement_reputation_01:20:20:-20:0|tТрансфер очков чести"
-#define EN_CHAR_CONTROL_7 "|TInterface\\icons\\Achievement_reputation_01:20:20:-20:0|tTransfer honor points"
+#define RU_CHAR_CONTROL_7 "|TInterface\\icons\\Achievement_reputation_01:18:18:-20:0|tТрансфер очков чести"
+#define EN_CHAR_CONTROL_7 "|TInterface\\icons\\Achievement_reputation_01:18:18:-20:0|tTransfer honor points"
 
 #define RU_NOTVIP_MENU_1 "Узнать о бонусах Премиум аккаунте"
 #define EN_NOTVIP_MENU_1 "Learn about Premium account bonuses"
@@ -266,6 +269,9 @@
 
 #define EN_back "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:-20|tBack"
 #define RU_back "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:-20|tНазад"
+
+#define EN_back_CHAR "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:18:18:-20|tBack"
+#define RU_back_CHAR "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:18:18:-20|tНазад"
 
 #define EN_player_errors_2 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You have already learned available quantity professions!"
 #define RU_player_errors_2 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: Вы уже выучили доступное количество профессий!"
@@ -759,17 +765,20 @@
 #define EN_HONOR_EXCHANGE_FAIL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Exchanger]: Unfortunately, you don't have enough honor points.|r"
 #define RU_HONOR_EXCHANGE_FAIL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Обменник]: К сожалению у вас недостаточно очков чести.|r"
 
-#define RU_HONOR_EXCHANGE_MAIN "|TInterface/ICONS/Inv_crate_07:20:20:-20|tОбменник очков чести"
-#define EN_HONOR_EXCHANGE_MAIN "|TInterface/ICONS/Inv_crate_07:20:20:-20|tExchanger honor points"
+#define RU_HONOR_EXCHANGE_MAIN "|TInterface/ICONS/Inv_crate_07:18:18:-20|tОбменять очки чести на опыт"
+#define EN_HONOR_EXCHANGE_MAIN "|TInterface/ICONS/Inv_crate_07:18:18:-20|tExchanger honor points for exp"
 
-#define RU_RESET_INSTANCE_CD "|TInterface/ICONS/Inv_scroll_05:20:20:-20|tУдалить мои сохраненные подземелья."
-#define EN_RESET_INSTANCE_CD "|TInterface/ICONS/Inv_scroll_05:20:20:-20|tRemove my instance saves."
+#define RU_RESET_INSTANCE_CD "|TInterface/ICONS/Inv_scroll_05:18:18:-20|tУдалить мои сохраненные подземелья"
+#define EN_RESET_INSTANCE_CD "|TInterface/ICONS/Inv_scroll_05:18:18:-20|tRemove my instance saves"
+
+#define RU_REPAIR_EQUIPMENT "|TInterface/ICONS/trade_engineering:18:18:-20|tОтремонтировать предметы"
+#define EN_REPAIR_EQUIPMENT "|TInterface/ICONS/trade_engineering:18:18:-20|tRepair items"
 
 #define EN_RESET_INSTANCE_CD_OK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Instances]: Your instances have been reset.|r"
 #define RU_RESET_INSTANCE_CD_OK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Подземелья]: Ваши подземелья перезагружены.|r"
 
-#define RU_TOKEN_EXCHANGE_MAIN "|TInterface/ICONS/inv_misc_platnumdisks:20:20:-20|tОбменник эмблем"
-#define EN_TOKEN_EXCHANGE_MAIN "|TInterface/ICONS/inv_misc_platnumdisks:20:20:-20|tExchanger emblems"
+#define RU_TOKEN_EXCHANGE_MAIN "|TInterface/ICONS/inv_misc_platnumdisks:18:18:-20|tОбменник эмблем"
+#define EN_TOKEN_EXCHANGE_MAIN "|TInterface/ICONS/inv_misc_platnumdisks:18:18:-20|tExchanger emblems"
 
 #define EN_TOKEN_EXCHANGE_FAIL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Exchanger]: Unfortunately, you don't have enough emblems.|r"
 #define RU_TOKEN_EXCHANGE_FAIL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Обменник]: К сожалению у вас недостаточно эмблем.|r"
