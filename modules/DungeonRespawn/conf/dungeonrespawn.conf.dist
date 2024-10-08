@@ -1,0 +1,26 @@
+#
+# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+#
+
+[worldserver]
+
+########################################
+# Dungeon Respawn configuration
+########################################
+#
+#    DungeonRespawn.Enable
+#        Description: Enables the Dungeon Respawn module.
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+
+DungeonRespawn.Enable = 0
+
+#
+#    DungeonRespawn.RespawnHealthPct
+#        Description: The amount of health in % to respawn with.
+#        Range:       0.0 - 100.0
+#        Default:     100.0
+#
+
+DungeonRespawn.RespawnHealthPct = 50.0

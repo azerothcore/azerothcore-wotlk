@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+## CUSTOM SQL - Important file used by the db_assembler.sh
+## Keep only the required variables (base sql files or updates, depending on the DB)
+
+
+## BASE SQL
+
+DB_AUTH_CUSTOM_PATHS+=(
+	"$MOD_IP_TRACKER/sql/auth/base/"
+)

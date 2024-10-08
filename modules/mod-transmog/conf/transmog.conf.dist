@@ -1,0 +1,333 @@
+[worldserver]
+
+
+###################################################################################################
+#    Transmogrification config
+###################################################################################################
+#
+#    SETTINGS
+#
+#    Transmogrification.Enable
+#        Description: Enables/Disables transmog.
+#                     Players won't be able to see any transmogrified item while disabled, however, database data remains intact.
+#        Default:     1
+#
+#    Transmogrification.UseCollectionSystem
+#        Description: Enables/Disables Legion-style appearance collection system.
+#                     If enabled, players can use the appearance of any item equipped or rewarded from a completed quest.
+#                     If disabled, players must have an item in their bags to use as a transmogrification appearance source.
+#        Default:     1
+#
+#    Transmogrification.UseVendorInterface
+#        Description: Enables/Disables the use of a fake vendor interface for item selection.
+#                     There are (optional) custom items available for Hide Item and Remove Transmog if data/sql/db-world/tasm_world_VendorItems.sql is imported.
+#                     If enabled, players can select items from a vendor menu, complete with ctrl-click previews.
+#                     If disabled, players will use the gossip menu to select items and will not have access to previews.
+#        Default:     0
+#
+#    Transmogrification.AllowHiddenTransmog
+#        Description: Enables/Disables the hiding of equipment through transmog
+#                     If enabled, players can select an "invisible" appearance for items at the transmog vendor
+#        Default:     1
+#
+#    Transmogrification.HiddenTransmogIsFree
+#        Description: Enables/Disables free hiding of items through the transmog system.
+#                     If enabled, players can hide pieces of equipment for free.
+#                     If disabled, players will be charged the standard transmog price (affected by all modifiers) to hide an item.
+#        Default:     1
+#
+#    Transmogrification.TrackUnusableItems
+#        Description: If enabled, appearances are collected even for items that are not suitable for transmogrification.
+#                     This allows these appearances to be used later if the configuration is changed.
+#        Default:     1
+#
+#    Transmogrification.RetroActiveAppearances
+#        Description: Enables/Disables checking all completed quests for uncollected appearances.
+#                     Occurs only once per player.
+#        Default:    1
+#
+#    Transmogrification.ResetRetroActiveAppearancesFlag
+#        Description: Resets the flag indicating whether the retroactive appearance check has been run.
+#                     Occurs for each character on log in.
+#        Default:    0
+#
+#    Transmogrification.EnableTransmogInfo
+#        Description: Enables / Disables the info button for transmogrification
+#        Default:    1
+#
+#    Transmogrification.TransmogNpcText
+#        Description: The npc_text entry of the info menu for transmogrification
+#        Default:    601083
+#
+#    Transmogrification.Allowed
+#        Description: A list of item entries that are allowed for transmogrification (skips quality and CanUseItem check)
+#                     Example: "25 35674 5623"
+#        Default:    ""
+#
+#    Transmogrification.NotAllowed
+#        Description: A list of item entries that are NOT allowed for transmogrification
+#                     Example: "25 35674 5623"
+#        Default:    ""
+#
+#    Transmogrification.EnablePortable
+#        Description: Enables / Disables the portable transmogrification NPC.
+#        Default:    1
+#
+#    Transmogrification.EnableSortByQualityAndName
+#        Description: Enables / Disables the sorting of the items by quality and then by names
+#        Default:    1
+#
+
+Transmogrification.Enable = 1
+Transmogrification.UseCollectionSystem = 1
+Transmogrification.UseVendorInterface = 0
+Transmogrification.AllowHiddenTransmog = 1
+Transmogrification.HiddenTransmogIsFree = 1
+Transmogrification.TrackUnusableItems = 1
+Transmogrification.RetroActiveAppearances = 1
+Transmogrification.ResetRetroActiveAppearancesFlag = 0
+
+Transmogrification.EnableTransmogInfo = 1
+Transmogrification.TransmogNpcText = 601083
+
+Transmogrification.Allowed = ""
+Transmogrification.NotAllowed = ""
+
+Transmogrification.EnablePortable = 1
+
+Transmogrification.EnableSortByQualityAndName = 1
+
+#
+#    COPPER COST
+#
+#    Transmogrification.ScaledCostModifier
+#        Description: A multiplier for the default gold cost (change to 0 for no default cost)
+#        Default:    1.0
+#
+#    Transmogrification.CopperCost
+#        Description: Cost added on top of other costs (can be negative)
+#        Default:    0
+#
+#    For custom gold cost set ScaledCostModifier to 0.0 and CopperCost to what ever cost you want
+
+Transmogrification.ScaledCostModifier = 1.0
+Transmogrification.CopperCost = 0
+
+#
+#    TOKEN COST
+#
+#    Transmogrification.RequireToken
+#        Description: Adds/disables token cost
+#        Default:    0
+#
+#    Transmogrification.TokenEntry
+#        Description: Entry of the token item
+#        Default:    49426
+#
+#    Transmogrification.TokenAmount
+#        Description: Amount of tokens required
+#        Default:    1
+
+Transmogrification.RequireToken = 0
+Transmogrification.TokenEntry = 49426
+Transmogrification.TokenAmount = 1
+
+#
+#    REQUIREMENTS
+#
+#    Transmogrification.AllowPoor
+#        Description: Allow poor quality items to be used as source and target items
+#        Default:    0
+#
+#    Transmogrification.AllowCommon
+#        Description: Allow common quality items to be used as source and target items
+#        Default:    0
+#
+#    Transmogrification.AllowUncommon
+#        Description: Allow uncommon quality items to be used as source and target items
+#        Default:    1
+#
+#    Transmogrification.AllowRare
+#        Description: Allow rare quality items to be used as source and target items
+#        Default:    1
+#
+#    Transmogrification.AllowEpic
+#        Description: Allow epic quality items to be used as source and target items
+#        Default:    1
+#
+#    Transmogrification.AllowLegendary
+#        Description: Allow legendary quality items to be used as source and target items
+#        Default:    0
+#
+#    Transmogrification.AllowArtifact
+#        Description: Allow artifact quality items to be used as source and target items
+#        Default:    0
+#
+#    Transmogrification.AllowHeirloom
+#        Description: Allow heirloom quality items to be used as source and target items
+#        Default:    1
+#
+#    Transmogrification.AllowTradeable
+#        Description: Allow items that are tradeable (i.e. During 2 hour grace period during an instance)
+#        Default:    0
+#
+#    Transmogrification.AllowMixedArmorTypes
+#        Description: Allow cloth items to be transmogrified with plate for example
+#        Default:    0
+#
+#    Transmogrification.AllowLowerTiers
+#        Description: Allows using any armor tier the player can equip (i.e. Warrior plate->cloth | Mage cloth)
+#        Default:    0
+#
+#    Transmogrification.AllowMixedOffhandArmorTypes
+#        Description: Allow shields, offhands (i.e. lamps), and bucklers to be used interchangeably
+#        Default:    0
+#
+#    Transmogrification.AllowMixedWeaponTypes
+#        Description: Allow axe to be transmogrified with dagger for example
+#        Possible options:
+#            Default:    0 - STRICT - Fully restricted like original Blizzard 4.3 transmog - Weapons must be the same weapon type (exceptions: Guns, Crossbows, or Bows)
+#                        1 - MODERN - Like later retail WoW, allow swords to be transmogged to axes, etc.
+#                        2 - FULL - No restrictions, allow any weapon to be transmogrified to any other weapon
+#
+#    Transmogrification.AllowMixedWeaponHandedness
+#        Description: Normally main-hand and off-hand weapons can only be transmogged to this same type. Enable to remove this restriction.
+#                     Not necessary when AllowMixedWeaponTypes is set to FULL.
+#        Default:    0
+#
+#    Transmogrification.AllowFishingPoles
+#        Description: Allow fishing poles to be transmogrified
+#        Default:    0
+#
+#    Transmogrification.IgnoreReqRace
+#        Description: Ignore required race for source items
+#        Default:    0
+#
+#    Transmogrification.IgnoreReqClass
+#        Description: Ignore required class for source items
+#        Default:    0
+#
+#    Transmogrification.IgnoreReqSkill
+#        Description: Ignore required skill for source items
+#        Default:    0
+#
+#    Transmogrification.IgnoreReqSpell
+#        Description: Ignore required spell for source items
+#        Default:    0
+#
+#    Transmogrification.IgnoreReqLevel
+#        Description: Ignore required level for source items
+#        Default:    0
+#
+#    Transmogrification.IgnoreReqEvent
+#        Description: Ignore required event for source items
+#        Default:    0
+#
+#    Transmogrification.IgnoreReqStats
+#        Description: Ignore stat count > 0 requirement for source items
+#        Default:    0
+
+
+Transmogrification.AllowPoor = 0
+Transmogrification.AllowCommon = 0
+Transmogrification.AllowUncommon = 1
+Transmogrification.AllowRare = 1
+Transmogrification.AllowEpic = 1
+Transmogrification.AllowLegendary = 0
+Transmogrification.AllowArtifact = 0
+Transmogrification.AllowHeirloom = 1
+Transmogrification.AllowTradeable = 0
+
+Transmogrification.AllowMixedArmorTypes = 0
+Transmogrification.AllowLowerTiers = 0
+Transmogrification.AllowMixedOffhandArmorTypes = 0
+Transmogrification.AllowMixedWeaponTypes = 0
+Transmogrification.AllowMixedWeaponHandedness = 0
+Transmogrification.AllowFishingPoles = 0
+
+Transmogrification.IgnoreReqRace = 0
+Transmogrification.IgnoreReqClass = 0
+Transmogrification.IgnoreReqSkill = 0
+Transmogrification.IgnoreReqSpell = 0
+Transmogrification.IgnoreReqLevel = 0
+Transmogrification.IgnoreReqEvent = 0
+Transmogrification.IgnoreReqStats = 0
+
+#
+#    SET FEATURE
+#
+#    Transmogrification.EnableSets
+#        Description: Enables / Disables the set feature. If you want permanent disable, check Transmogrification.h
+#        Default:    1
+#
+#    Transmogrification.MaxSets
+#        Description: Maximum amount of sets a player can save (hardcap at 25)
+#        Default:    10
+#
+#    Transmogrification.EnableSetInfo
+#        Description: Enables / Disables the info button for set fature
+#        Default:    1
+#
+#    Transmogrification.SetNpcText
+#        Description: The npc_text entry of the info menu for the set feature
+#        Default:    601084
+#
+#    Transmogrification.SetCostModifier
+#        Description: A multiplier for the default gold cost (all costs summed together) (change to 0 for no default cost)
+#        Default:    3.0
+#
+#    Transmogrification.SetCopperCost
+#        Description: Cost added on top of other costs (can be negative)
+#        Default:    0
+
+Transmogrification.EnableSets = 1
+Transmogrification.MaxSets = 10
+
+Transmogrification.EnableSetInfo = 1
+Transmogrification.SetNpcText = 601084
+
+Transmogrification.SetCostModifier = 3.0
+Transmogrification.SetCopperCost = 0
+
+#
+#    TRANSMOG PLUS
+#
+#    Transmogrification.EnablePlus
+#        Description: Enables/Disables TransmogPlus.
+#        Default:     0
+#
+#    Transmogrification.MembershipLevels
+#        Description: Membership levels ID from acore_cms_subscriptions.
+#        Example:     Transmogrification.MembershipLevels = "1,2,3"
+#        Default:     ""
+#
+#    Transmogrification.MembershipLevelsLegendary
+#        Description: Membership levels ID from acore_cms_subscriptions that define the eligibility for legendary items
+#        Example:     Transmogrification.MembershipLevelsLegendary = "1,2,3"
+#        Default:     ""
+#
+#    Transmogrification.MembershipLevelsPet
+#        Description: Membership levels ID from acore_cms_subscriptions that define the eligibility for transmog pet
+#        Example:     Transmogrification.MembershipLevelsPet = "1,2,3"
+#        Default:     ""
+#
+#    Transmogrification.MembershipLevelsSkipLevelReq
+#        Description: Membership levels ID from acore_cms_subscriptions that define the eligibility for skipping level checks when transmogfrifying
+#        Example:     Transmogrification.MembershipLevelsSkipLevelReq = "1,2,3"
+#        Default:     ""
+#
+#    Transmogrification.PetSpellId
+#        Description: The ID used by the transmog pet in the spell_dbc table
+#        Example:     Transmogrification.PetSpellId = 2000100
+#        Default:     2000100
+#
+
+Transmogrification.EnablePlus = 0
+Transmogrification.MembershipLevels = ""
+Transmogrification.MembershipLevelsLegendary = ""
+Transmogrification.MembershipLevelsPet = ""
+Transmogrification.MembershipLevelsSkipLevelReq = ""
+Transmogrification.PetSpellId = 2000100
+
+#
+###################################################################################################

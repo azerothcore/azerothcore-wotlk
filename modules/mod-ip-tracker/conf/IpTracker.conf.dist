@@ -1,0 +1,22 @@
+#
+# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+#
+
+########################################
+# IpTracker module configuration
+########################################
+#
+#    IpTracker.Enabled
+#        Description: Enable the mod-ip-tracker
+#        Default:     0 - Disabled
+#                     1 - Enabled
+
+IpTracker.Enabled = 0
+
+#
+#    IpTracker.CleanOlderThanDays
+#        Description: Clean old logs at server startup
+#        Default:       0  - Disabled (do not remove anything)
+#                       90 - Remove ip logs older than 90 days
+
+IpTracker.CleanOlderThanDays = 0

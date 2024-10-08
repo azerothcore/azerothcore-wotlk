@@ -1,0 +1,66 @@
+[worldserver]
+
+#
+#    Skip Death Knight Starting Area
+#        Enable this if you want to skip the Deathknight starting area
+#        Start with level 58 DK with Runeforging.
+#
+#    Skip.Deathknight.Starter.Announce.enable
+#         Description: Announces Module when player logs in.
+#         Default:    0 - (Disabled)
+#                     1 - (Enabled)
+#
+
+Skip.Deathknight.Starter.Announce.enable = 1
+
+#
+#    Skip.DeathKnight.Starter.Enable
+#         Active Module for all new accounts regardless of account level. Instant Skip on DK Creation.
+#         Default:    0 - (Disabled)
+#                     1 - (Enabled)
+#
+
+Skip.Deathknight.Starter.Enable = 1
+
+#
+#    GM.Skip.Deathknight.Starter.Enable
+#         Active Module for all new accounts of a GM account level ONLY. Instant Skip on DK Creation.
+#         Ensure you have Skip.Deathknight.Starter.Enable set to 0 if using this conf.
+#         Default:    0 - (Disabled)
+#                     1 - (Enabled)
+#
+
+GM.Skip.Deathknight.Starter.Enable = 0
+
+#
+#    Skip.Deathknight.Start.Level
+#         Adjusted Death Knight Start Level if module is used.
+#         Default:    58 - (Default)
+#
+#
+
+Skip.Deathknight.Start.Level = 58
+
+#
+#    Skip.Deathknight.Start.Trained
+#         Automatically trains skills up to 58, as might be expected by the end of the start zone.
+#         Default: 0 - (Inactive)
+#
+
+Skip.Deathknight.Start.Trained = 1
+
+#
+#    Skip.Deathknight.Optional.Enable
+#    Enables optional to skip when talking to lich king on first creation of dk.
+#    Default: 1 - (Active)
+#
+
+Skip.Deathknight.Optional.Enable = 1
+
+#
+#    DeleteGold.Deathknight.Optional.Enable
+#    Enables option to delete all gold reward from quests on skip of dk. To stop this as sort of exploitative gold income.
+#    Default: 1 - (Active)
+#
+
+DeleteGold.Deathknight.Optional.Enable = 1

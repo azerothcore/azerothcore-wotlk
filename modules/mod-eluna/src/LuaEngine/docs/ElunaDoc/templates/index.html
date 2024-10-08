@@ -1,0 +1,90 @@
+{% extends '_base.html' %}
+
+
+{% block document_title -%}
+    Eluna API Documentation
+{%- endblock %}
+
+
+{% block content %}
+    <div class='docblock'>
+        <h1 id="the-eluna-engine-api" class='section-header'>
+            <a href="#the-eluna-engine-api">The Eluna Lua Engine&copy; API</a>
+        </h1>
+        <p>
+            The Eluna Lua Engine&copy; API allows you to add your own Lua code to be executed when certain events (called "hooks") occur.
+        </p>
+        <p>
+            Add a new in-game command, give life to creatures with new AI, or even light players who try to duel on fire!
+            If the hook exists, you can script it.
+        </p>
+
+        <h2 id="about-eluna" class='section-header'>
+            <a href="#about-eluna">About Eluna</a>
+        </h2>
+        <p>
+            Eluna is a <a href="http://www.lua.org/">Lua</a> engine for World of Warcraft emulators.
+            These pages are for <a href="https://www.azerothcore.org/">AzerothCore</a>'s version, but Eluna also supports
+            <a href="https://cmangos.net/">CMaNGOS</a>/<a href="https://www.getmangos.eu/">MaNGOS</a> and <a href="https://www.trinitycore.org/">TrinityCore</a>.
+        </p>
+        <p>
+            If you come from the TypeScript / JavaScript world, or would prefer to use a typed language instead of Lua, check out <a href="https://github.com/azerothcore/eluna-ts">eluna-ts</a>!
+        </p>
+        <p>
+            You can get support in the <code>#eluna-ac</code> channel of <a href="https://discord.com/invite/V3Dkwxvh">AzerothCore's Discord server</a>.
+        </p>
+        <p>
+            You can also join the <a href="https://discord.com/invite/bjkCVWqqfX">official Eluna Discord server</a>, where you'll be able to find resources, releases and support provided by the Eluna community.
+        </p>
+
+        <h2 id="installation" class='section-header'>
+            <a href="#installation">How to Install</a>
+        </h2>
+        <p>
+            <ol>
+                <li>If you haven't already, clone AzerothCore from <a href="https://github.com/azerothcore/azerothcore-wotlk">our GitHub repository</a></li>
+                <li>Go to the modules directory and run the following command: <pre>git clone https://github.com/azerothcore/mod-eluna.git mod-eluna</pre></li>
+                <li>Run CMake</li>
+                <li>Build AzerothCore</li>
+            </ol>
+        </p>
+
+        <!-- <h2 id="tutorials-and-guides" class='section-header'>
+            <a href="#tutorials-and-guides">Tutorials & Guides</a>
+        </h2>
+        <p>
+            We haven't written tutorials yet, but when we do, we'll put the links here.
+        </p> -->
+
+        <h2 id="about-this-documentation" class='section-header'>
+            <a href="#about-this-documentation">About this Documentation</a>
+        </h2>
+        <p>
+            The layout, CSS, and Javascript code for this documentation was borrowed from <a href="http://doc.rust-lang.org/">doc.rust-lang.org</a>.
+        </p>
+        <p>
+            The documentation generator was originally written by <a href="https://github.com/Patman64">Patman64</a> and is maintained by the Eluna team.
+        </p>
+    </div>
+
+    <h2 id='modules' class='section-header'><a href="#modules">Classes</a></h2>
+    <table>
+    {%- for class in classes %}
+        <tr>
+            <td>
+                {%- if class.fully_documented %}
+                <a class='stability Stable' title='Fully Documented'></a>
+                {%- elif class.fully_undocumented %}
+                <a class='stability Experimental' title='Fully Undocumented'></a>
+                {%- else %}
+                <a class='stability Unstable' title='Partially Documented'></a>
+                {%- endif %}
+                <a class='mod' href='{{ root(class.name + '/index.html') }}'>{{ class.name }}</a>
+            </td>
+            <td class='docblock short'>
+                <p>{{ class.short_description|parse_links }}</p>
+            </td>
+        </tr>
+    {%- endfor %}
+    </table>
+{% endblock %}

@@ -1,0 +1,361 @@
+/*
+                        _______
+                       /       \
+                      .==.    .==.
+                     ((  ))==((  ))
+                    / "=="    "=="\
+                   /____|| || ||___\
+       ________     ____    ________  ___    ___
+       |  ___  \   /    \   |  ___  \ |  |  /  /
+       |  |  \  \ /  /\  \  |  |  \  \|  |_/  /
+       |  |   )  /  /__\  \ |  |__/  /|  ___  \
+       |  |__/  /  ______  \|  ____  \|  |  \  \
+_______|_______/__/ ____ \__\__|___\__\__|___\__\____
+|  ___  \ |  ____/ /    \   |  ___  \ |  ____|  ___  \
+|  |  \  \|  |___ /  /\  \  |  |  \  \|  |___|  |  \  \
+|  |__/  /|  ____/  /__\  \ |  |   )  |  ____|  |__/  /
+|  ____  \|  |__/  ______  \|  |__/  /|  |___|  ____  \
+|__|   \__\____/__/      \__\_______/ |______|__|   \__\
+                https://darkreader.org
+*/
+
+/*! Dark reader generated CSS | Licensed under MIT https://github.com/darkreader/darkreader/blob/main/LICENSE */
+
+/* User-Agent Style */
+html {
+    background-color: #181a1b !important;
+}
+html {
+    color-scheme: dark !important;
+}
+html, body, input, textarea, select, button, dialog {
+    background-color: #181a1b;
+}
+html, body, input, textarea, select, button {
+    border-color: #736b5e;
+    color: #e8e6e3;
+}
+a {
+    color: #3391ff;
+}
+table {
+    border-color: #545b5e;
+}
+::placeholder {
+    color: #b2aba1;
+}
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+    background-color: #404400 !important;
+    color: #e8e6e3 !important;
+}
+::-webkit-scrollbar {
+    background-color: #202324;
+    color: #aba499;
+}
+::-webkit-scrollbar-thumb {
+    background-color: #454a4d;
+}
+::-webkit-scrollbar-thumb:hover {
+    background-color: #575e62;
+}
+::-webkit-scrollbar-thumb:active {
+    background-color: #484e51;
+}
+::-webkit-scrollbar-corner {
+    background-color: #181a1b;
+}
+::selection {
+    background-color: #004daa !important;
+    color: #e8e6e3 !important;
+}
+::-moz-selection {
+    background-color: #004daa !important;
+    color: #e8e6e3 !important;
+}
+
+/* Invert Style */
+.jfk-bubble.gtx-bubble, .captcheck_answer_label > input + img, span#closed_text > img[src^="https://www.gstatic.com/images/branding/googlelogo"], span[data-href^="https://www.hcaptcha.com/"] > #icon, #bit-notification-bar-iframe, ::-webkit-calendar-picker-indicator {
+    filter: invert(100%) hue-rotate(180deg) contrast(90%) !important;
+}
+
+/* Variables Style */
+:root {
+   --darkreader-neutral-background: #131516;
+   --darkreader-neutral-text: #d8d4cf;
+   --darkreader-selection-background: #004daa;
+   --darkreader-selection-text: #e8e6e3;
+}
+
+/* Modified CSS */
+body {
+    color: rgb(200, 195, 188);
+}
+h1,
+h2,
+h3:not(.impl):not(.method),
+h4:not(.method) {
+    color: rgb(232, 230, 227);
+}
+h1.fqn {
+    border-bottom-color: rgb(60, 65, 67);
+}
+h2,
+h3:not(.impl):not(.method),
+h4:not(.method) {
+    border-bottom-color: rgb(58, 62, 65);
+}
+.docblock code {
+    background-color: rgb(30, 32, 33);
+}
+pre {
+    background-color: rgb(30, 32, 33);
+}
+.sidebar .location {
+    background-image: initial;
+    background-color: rgb(41, 44, 46);
+    color: rgb(200, 195, 188);
+}
+.block a:hover {
+    background-image: initial;
+    background-color: rgb(30, 32, 33);
+}
+.content pre.line-numbers {
+    border-color: initial;
+}
+.line-numbers span {
+    color: rgb(214, 149, 75);
+}
+.line-numbers .line-highlighted {
+    background-color: rgb(68, 73, 2);
+}
+.content .highlighted {
+    background-color: rgb(53, 57, 59);
+    color: rgb(232, 230, 227) !important;
+}
+.content .highlighted a {
+    color: rgb(232, 230, 227) !important;
+}
+.content .highlighted.trait {
+    background-color: rgb(128, 80, 1);
+}
+.content .highlighted.mod {
+    background-color: rgb(29, 54, 86);
+}
+.content .highlighted.enum {
+    background-color: rgb(47, 77, 58);
+}
+.content .highlighted.struct {
+    background-color: rgb(98, 42, 25);
+}
+.content .highlighted.fn {
+    background-color: rgb(78, 55, 59);
+}
+.docblock h1,
+.docblock h2,
+.docblock h3,
+.docblock h4,
+.docblock h5 {
+    border-bottom-color: rgb(58, 62, 65);
+}
+nav {
+    border-bottom-color: rgb(57, 61, 64);
+}
+nav.main .current {
+    border-top-color: rgb(140, 130, 115);
+    border-bottom-color: rgb(140, 130, 115);
+}
+nav.main .separator {
+    border-color: rgb(140, 130, 115);
+}
+a {
+    text-decoration-color: initial;
+    color: rgb(232, 230, 227);
+    background-image: initial;
+    background-color: transparent;
+}
+p a {
+    color: rgb(92, 155, 206);
+}
+p a:hover {
+    text-decoration-color: initial;
+}
+.content a.trait,
+.block a.current.trait {
+    color: rgb(252, 173, 39);
+}
+.content a.mod,
+.block a.current.mod {
+    color: rgb(115, 156, 193);
+}
+.content a.enum,
+.block a.current.enum {
+    color: rgb(155, 146, 133);
+}
+.content a.struct,
+.block a.current.struct {
+    color: rgb(255, 94, 44);
+}
+.content a.fn,
+.block a.current.fn {
+    color: rgb(157, 149, 136);
+}
+.content .fnname {
+    color: rgb(157, 149, 136);
+}
+.search-input {
+    outline-color: initial;
+    border-color: initial;
+    color: rgb(178, 172, 162);
+    box-shadow: rgb(42, 45, 47) 0px 0px 0px 1px,
+    rgba(0, 0, 0, 0) 0px 0px 0px 2px;
+}
+.search-input:focus {
+    border-color: initial;
+    outline-color: initial;
+    box-shadow: rgb(6, 113, 173) 0px 0px 8px;
+}
+#help {
+    background-image: initial;
+    background-color: rgb(36, 39, 41);
+    box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 6px;
+    border-color: rgb(66, 72, 74);
+}
+#help dt {
+    border-color: rgb(66, 72, 74);
+    background-image: initial;
+    background-color: rgb(24, 26, 27);
+}
+.stability {
+    border-left-color: initial;
+}
+.stability.Deprecated {
+    border-color: rgb(100, 65, 106);
+    color: rgb(179, 123, 188);
+}
+.stability.Experimental {
+    border-color: rgb(124, 38, 36);
+    color: rgb(202, 101, 98);
+}
+.stability.Unstable {
+    border-color: rgb(124, 95, 36);
+    color: rgb(202, 167, 98);
+}
+.stability.Stable {
+    border-color: rgb(60, 120, 64);
+    color: rgb(123, 211, 128);
+}
+.stability.Frozen {
+    border-color: rgb(0, 211, 70);
+    color: rgb(121, 255, 164);
+}
+.stability.Locked {
+    border-color: rgb(0, 145, 200);
+    color: rgb(106, 215, 255);
+}
+.stability.Unmarked {
+    border-color: rgb(67, 73, 76);
+}
+.summary.Deprecated {
+    background-color: rgb(110, 72, 117);
+}
+.summary.Experimental {
+    background-color: rgb(129, 40, 37);
+}
+.summary.Unstable {
+    background-color: rgb(97, 74, 28);
+}
+.summary.Stable {
+    background-color: rgb(67, 134, 71);
+}
+.summary.Unmarked {
+    background-color: rgb(62, 68, 70);
+}
+:target {
+    background-image: initial;
+    background-color: rgb(56, 58, 0);
+}
+pre.rust .kw {
+    color: rgb(149, 105, 177);
+}
+pre.rust .kw-2,
+pre.rust .prelude-ty {
+    color: rgb(114, 160, 201);
+}
+pre.rust .number,
+pre.rust .string {
+    color: rgb(226, 255, 106);
+}
+pre.rust .self,
+pre.rust .boolval,
+pre.rust .prelude-val,
+pre.rust .attribute,
+pre.rust .attribute .ident {
+    color: rgb(219, 73, 73);
+}
+pre.rust .comment {
+    color: rgb(161, 152, 140);
+}
+pre.rust .doccomment {
+    color: rgb(184, 178, 168);
+}
+pre.rust .macro,
+pre.rust .macro-nonterminal {
+    color: rgb(107, 192, 197);
+}
+pre.rust .lifetime {
+    color: rgb(236, 158, 81);
+}
+.methods .section-header {
+    border-bottom-color: initial !important;
+}
+.collapse-toggle {
+    color: rgb(168, 160, 149);
+}
+.toggle-label {
+    color: rgb(168, 160, 149);
+}
+
+/* Override Style */
+.vimvixen-hint {
+    background-color: #7b5300 !important;
+    border-color: #d8b013 !important;
+    color: #f3e8c8 !important;
+}
+::placeholder {
+    opacity: 0.5 !important;
+}
+#edge-translate-panel-body,
+.MuiTypography-body1,
+.nfe-quote-text {
+    color: var(--darkreader-neutral-text) !important;
+}
+gr-main-header {
+    background-color: #0f3a48 !important;
+}
+.tou-z65h9k,
+.tou-mignzq,
+.tou-1b6i2ox,
+.tou-lnqlqk {
+    background-color: var(--darkreader-neutral-background) !important;
+}
+.tou-75mvi {
+    background-color: #032029 !important;
+}
+.tou-ta9e87,
+.tou-1w3fhi0,
+.tou-1b8t2us,
+.tou-py7lfi,
+.tou-1lpmd9d,
+.tou-1frrtv8,
+.tou-17ezmgn {
+    background-color: #0a0a0a !important;
+}
+.tou-uknfeu {
+    background-color: #231603 !important;
+}
+.tou-6i3zyv {
+    background-color: #19576c !important;
+}
+embed[type="application/pdf"][src="about:blank"] { filter: invert(100%) contrast(90%); }

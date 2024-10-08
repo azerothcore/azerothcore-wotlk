@@ -1,0 +1,31 @@
+[worldserver]
+
+# Allow gamemasters to learn spells
+LearnSpells.Gamemasters = 0
+
+# Learn class-specific spells
+LearnSpells.ClassSpells = 1
+
+# Learn ranks of known talents
+LearnSpells.TalentRanks = 1
+
+# Learn weapon and defense skills
+LearnSpells.Proficiencies = 1
+
+# Learn spells normally obtained from quests
+LearnSpells.SpellsFromQuests = 1
+
+# Learn apprentice (75%) riding and mount spells
+LearnSpells.Riding.Apprentice = 0
+
+# Learn journeyman (150%) riding and mount spells
+LearnSpells.Riding.Journeyman = 0
+
+# Learn expert (225%) riding and mount spells
+LearnSpells.Riding.Expert = 0
+
+# Learn artisan (300%) riding and mount spells
+LearnSpells.Riding.Artisan = 0
+
+# Learn cold weather flying at level 77
+LearnSpells.Riding.ColdWeatherFlying = 0

@@ -1,0 +1,75 @@
+[worldserver]
+#
+###################################################################################################
+
+###################################################################################################
+#
+# RANDOM ENCHANTS OPTIONS
+#
+#     RandomEnchants.Enable
+#        Enable or disable the module
+#        Default:     1 (enabled)
+
+RandomEnchants.Enable = 1
+
+#
+#     RandomEnchants.AnnounceOnLogin
+#        Announce a message on login for this module
+#        Default:     1
+
+RandomEnchants.AnnounceOnLogin=1
+
+#
+#     RandomEnchants.OnLoginMessage
+#        Message to display on login(Only applies if AnnounceOnLogin is enabled)
+#        Default:    "This server is running a RandomEnchants Module."
+
+RandomEnchants.OnLoginMessage="This server is running a RandomEnchants Module."
+
+#
+#     RandomEnchants.OnLoot
+#        Chance at random enchant on looting an item
+#        Default:     1
+
+RandomEnchants.OnLoot=1
+
+#
+#     RandomEnchants.OnCreate
+#        Chance at random enchant on creating an item via profession
+#        Default:     1
+
+RandomEnchants.OnCreate=1
+
+#
+#     RandomEnchants.OnQuestReward
+#        Chance at random enchant on obtaining item from quest reward
+#        Default:     1
+
+RandomEnchants.OnQuestReward=1
+
+#
+#     RandomEnchants.OnGroupRoll 
+#        Chance at random enchant on obtaining item from group rolls
+#        Default:     1
+
+RandomEnchants.OnGroupRoll = 1
+
+#     RandomEnchants.EnchantChance1
+#        Probability (in percentage) for the first enchant to be applied.
+#        Default:     70.0
+
+RandomEnchants.EnchantChance1=70.0
+
+#
+#     RandomEnchants.EnchantChance2
+#        Probability (in percentage) for the second enchant to be applied (only if the first enchant is applied).
+#        Default:     65.0
+
+RandomEnchants.EnchantChance2=65.0
+
+#
+#     RandomEnchants.EnchantChance3
+#        Probability (in percentage) for the third enchant to be applied (only if the second enchant is applied).
+#        Default:     60.0
+
+RandomEnchants.EnchantChance3=60.0

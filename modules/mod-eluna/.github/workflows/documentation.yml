@@ -1,0 +1,38 @@
+name: documentation
+on:
+  push:
+    branches:
+      - 'main'
+      - 'master'
+jobs:
+  Push-Docs-To-AzerothCore-Website:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+      - name: Install Python dependencies
+        run: pip install jinja2 typedecorator markdown
+      - name: Compile documentation
+        run: |
+          cd ${{ github.workspace }}/src/LuaEngine/docs/
+          python -m ElunaDoc
+      - name: Create pull request
+        run: |
+          chmod +x "${GITHUB_WORKSPACE}/.github/workflows/create-pr.sh"
+          "${GITHUB_WORKSPACE}/.github/workflows/create-pr.sh"
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+          SOURCE_FOLDER: '${{ github.workspace }}/src/LuaEngine/docs/build'
+          DESTINATION_REPO: 'azerothcore/azerothcore.github.io'
+          DESTINATION_FOLDER: 'pages/eluna'
+          DESTINATION_BASE_BRANCH: 'master'
+          DESTINATION_HEAD_BRANCH: 'eluna-docs'
+          PR_TITLE: 'chore: update eluna documentation'
+          COMMIT_MESSAGE: 'chore: update eluna documentation'
+          USER_EMAIL: 'ax.cocat@gmail.com'
+          USER_NAME: 'r-o-b-o-t-o'

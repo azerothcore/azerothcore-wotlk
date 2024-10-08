@@ -1,0 +1,77 @@
+#
+# Copyright (С) since 2019 Andrei Guluaev (Winfidonarleyan/Kargatum) https://github.com/Winfidonarleyan
+# Copyright (С) since 2019+ AzerothCore <www.azerothcore.org>
+# Licence MIT https://opensource.org/MIT
+#
+
+#############################
+# CFBG configuration system #
+#############################
+[worldserver]
+
+###################################################################################################
+#   CFBG
+#
+#   CFBG.Enable
+#       Description: Enable mixed alliance and horde in one battleground
+#       Default: 1
+#
+#   CFBG.Include.Avg.Ilvl.Enable
+#       Description: Enable check average item level for bg
+#       Default: 0
+#
+#   CFBG.BalancedTeams
+#       Description: Enable check average player level for bg
+#       Default: 1
+#
+#   CFBG.BalancedTeams.Class.LowLevel
+#       Description: Enable class balance for BGs LowLevel
+#       Default: 0
+#                1 - (Enabled. Balance the number of Hunters per team)
+#
+#   CFBG.BalancedTeams.Class.MinLevel
+#       Description: Define min level to use the LowLevelClass balance
+#       Default: 10
+#
+#   CFBG.BalancedTeams.Class.MaxLevel
+#       Description: Define max level to use the LowLevelClass balance
+#       Default: 19
+#
+#   CFBG.BalancedTeams.Class.LevelDiff
+#       Description: Only taking into account characters having level >= BgMaxLevel - LevelDiff
+#                    for example in a 10-19 BG, if this value is set to 2, then it will consider only
+#                    players of level 17, 18, 19 (>= 19-2)
+#       Default: 2
+#
+#   CFBG.Players.Count.In.Group
+#       Description: Maximum players in party for enter queue
+#       Default: 3
+#
+#   CFBG.EvenTeams.Enabled
+#        Description: Set Battleground invitation type.
+#        Default:     0 - (Disabled, one team can have one extra player if an odd number of players queues)
+#                     1 - (Enabled. Get even teams.)
+#
+#   CFBG.EvenTeams.MaxPlayersThreshold
+#       Description: team member quantity until the EvenTeams rule is valid
+#       Default: 5 - (Quantity of players per team after the EvenTeams rule will be ignored)
+#                0 - (No treshold)
+#
+#   CFBG.RandomRaceSelection
+#       Description: allows players to choose the race they will be morphed into when joining battlegrounds as the opposite team.
+#       Default: 1 - Random
+#                0 - Player choice
+
+CFBG.Enable = 1
+CFBG.BalancedTeams = 1
+CFBG.BalancedTeams.Class.LowLevel = 0
+CFBG.BalancedTeams.Class.MinLevel = 10
+CFBG.BalancedTeams.Class.MaxLevel = 19
+CFBG.BalancedTeams.Class.LevelDiff = 2
+CFBG.Include.Avg.Ilvl.Enable = 0
+CFBG.Players.Count.In.Group = 3
+CFBG.EvenTeams.Enabled = 0
+CFBG.EvenTeams.MaxPlayersThreshold = 5
+CFBG.ResetCooldowns = 0
+CFBG.Show.PlayerName = 0
+CFBG.RandomRaceSelection = 1

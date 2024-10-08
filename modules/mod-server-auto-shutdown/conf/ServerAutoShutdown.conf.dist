@@ -1,0 +1,58 @@
+#
+# Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+# Copyright (C) 2021+ WarheadCore <https://github.com/WarheadCore>
+#
+
+########################################
+# ServerAutoShutdown module configuration
+########################################
+#
+#    ServerAutoShutdown.Enabled
+#        Description: Enable to automatically shut down the server, so it can be restarted on a daily basis
+#        Default:     0 - Disabled
+#                     1 - Enabled
+#
+
+ServerAutoShutdown.Enabled = 0
+
+#
+#    ServerAutoShutdown.EveryDays
+#        Description: Every these days to automatically shut down the server, need big than 0(at lest 1 day) and less then 366(1 year)
+#        Default:     1 - Every one day
+#
+
+ServerAutoShutdown.EveryDays = 1
+
+#
+#    ServerAutoShutdown.Time
+#        Description: Time (in HH:MM:SS) - 24 hours format
+#        Default:     04:00:00
+#
+
+ServerAutoShutdown.Time = "04:00:00"
+
+#
+#    ServerAutoShutdown.PreAnnounce.Seconds
+#        Description: Seconds of delay, so the players will be informed about the server restart, less than 86400 second(24 hour)
+#        Default:     3600 (1 hour)
+#
+
+ServerAutoShutdown.PreAnnounce.Seconds = 3600
+
+#
+#    ServerAutoShutdown.PreAnnounce.Message
+#        Description: An announcement to be broadcasted in-game
+#        Default:     "[SERVER]: Automated (quick) server restart in %s"
+#
+
+ServerAutoShutdown.PreAnnounce.Message = "[SERVER]: Automated (quick) server restart in %s"
+
+#
+#    ServerAutoShutdown.StartEvents
+#        Description: Starts the events listed in the config separated by space whenever the server starts up.
+#                     Use this if you wish to start events manually and don't wish them to reset with the daily restart.
+#        Example:     "1 2" -- This will start Midsummer Festival (1) and Winter Veil (2) whenever your server restarts.
+#        Default:     ""
+#
+
+ServerAutoShutdown.StartEvents = ""
