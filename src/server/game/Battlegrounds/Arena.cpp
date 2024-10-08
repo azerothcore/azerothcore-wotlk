@@ -19,6 +19,7 @@
 #include "ArenaTeamMgr.h"
 #include "GroupMgr.h"
 #include "Log.h"
+#include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
@@ -355,8 +356,9 @@ void Arena::EndBattleground(TeamId winnerTeamId)
                         }
                         // квест на победу 2на2 - 10 побед
                         if (GetArenaType() == ARENA_TYPE_2v2) {
-                            if (player->GetQuestStatus(26038) == QUEST_STATUS_INCOMPLETE)
-                                player->KilledMonsterCredit(200002);
+                            if (player->GetQuestStatus(26038) == QUEST_STATUS_INCOMPLETE ||
+                                player->GetQuestStatus(26052) == QUEST_STATUS_INCOMPLETE)
+                                player->KilledMonsterCredit(200002);   
                         }
 
                         player->RewardArenaPoints(winnerArenaTeam->GetRating(), GetArenaType(), true);
@@ -387,6 +389,12 @@ void Arena::EndBattleground(TeamId winnerTeamId)
 
                     // Arena lost => reset the win_rated_arena having the "no_lose" condition
                     player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_LOSE, 0);
+                }
+
+                // квест на авто ивент 2на2
+                if (GetArenaType() == ARENA_TYPE_2v2) {
+                    if (player->GetQuestStatus(26052) == QUEST_STATUS_INCOMPLETE)
+                        player->KilledMonsterCredit(200005);
                 }
 
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_PLAY_ARENA, GetMapId());
