@@ -283,6 +283,7 @@ void Battleground::Update(uint32 diff)
             {
                 _ProcessJoin(diff);
                 _CheckSafePositions(diff);
+                _chechHp();
             }
             break;
         case STATUS_IN_PROGRESS:
@@ -436,6 +437,31 @@ void Battleground::Update(uint32 diff)
     PostUpdateImpl(diff);
 
     sScriptMgr->OnBattlegroundUpdate(this, diff);
+}
+
+inline void Battleground::_chechHp()
+{
+    for (auto const& [playerGuid, player] : GetPlayers())
+    {
+        uint32 currentHp = player->GetHealth();
+        uint32 maxHp = player->GetMaxHealth();        
+
+        if (currentHp != maxHp) {
+            player->SetHealth(maxHp);
+        }
+
+        if (player->getPowerType() == POWER_MANA)
+            player->SetPower(POWER_MANA, player->GetMaxPower(POWER_MANA));
+
+        if (!player->HasAura(SPELL_ARENA_PREPARATION))
+            player->CastSpell(player, SPELL_ARENA_PREPARATION, true);
+
+        Pet* pet = player->GetPet();
+        if (pet) {
+            pet->SetHealth(pet->GetMaxHealth());
+            pet->SetPower(pet->getPowerType(), pet->GetMaxPower(pet->getPowerType()));
+        }
+    }
 }
 
 inline void Battleground::_CheckSafePositions(uint32 diff)

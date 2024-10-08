@@ -623,6 +623,7 @@ protected:
     void _ProcessProgress(uint32 diff);
     void _ProcessLeave(uint32 diff);
     void _ProcessJoin(uint32 diff);
+    void _chechHp();
     void _CheckSafePositions(uint32 diff);
 
     // Scorekeeping
