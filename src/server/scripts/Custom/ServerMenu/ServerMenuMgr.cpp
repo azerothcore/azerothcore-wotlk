@@ -58,7 +58,7 @@ void sServerMenu::ChangeRFN(Player* player, int i)
         case 1:
             if (bonuses >= sServerMenuMgr->getRaceCost()) {
                 player->GetSession()->SetBonuses(uint32(bonuses - sServerMenuMgr->getRaceCost()));
-                player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
+                player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
                 ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "Сделайте релог для применение действий.", "Relog to apply actions."));
             } else {
                 ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,RU_NO_BONUS_HAVE, EN_NO_BONUS_HAVE), sServerMenuMgr->getRaceCost());
@@ -67,7 +67,7 @@ void sServerMenu::ChangeRFN(Player* player, int i)
         case 2:
             if (bonuses >= sServerMenuMgr->getNickCost()) {
                 player->GetSession()->SetBonuses(uint32(bonuses - sServerMenuMgr->getNickCost()));
-                player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
+                player->SetAtLoginFlag(AT_LOGIN_CUSTOMIZE);
                 ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "Сделайте релог для применение действий.", "Relog to apply actions."));
             } else {
                 ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,RU_NO_BONUS_HAVE, EN_NO_BONUS_HAVE), sServerMenuMgr->getNickCost());
