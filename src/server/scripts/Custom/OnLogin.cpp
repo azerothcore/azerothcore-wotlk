@@ -7,6 +7,74 @@
 #include "ReputationMgr.h"
 
 const uint32 SPELL_DEMENTIA = 40874;
+uint32 vip_buff[] = { 31700, 18991, 18992}; /* указывать ид спеллов через запятую, например:  123, 321, 5432 */
+uint32 count_spell = 3;                     /* количесто спеллов */
+
+struct Event
+{
+        uint8 Events;
+};
+
+enum Enums
+{
+        FIRST_DELAY    = 5000,
+        SECOND_DELAY   = 10000,
+        THIRD_DELAY    = 15000,
+        FOURTH_DELAY   = 20000,
+        FIFETH_DELAY   = 25000,
+        BACK_DELAY     = 30000,
+};
+
+static std::map<ObjectGuid, Event> _events;
+
+class Information_Server : public BasicEvent
+{
+public:
+        Information_Server(Player* player) : _Plr(player) {}
+
+        virtual bool Execute(uint64 /*time*/, uint32 /*diff*/) override
+        {
+            ObjectGuid pEvent;
+            pEvent = _Plr->GetGUID();
+            char const* icon_color;
+            icon_color = "|TInterface\\GossipFrame\\Availablequesticon:15:15:|t|cffff9933 ";
+
+            switch(_events[pEvent].Events)
+            {
+                case 0:
+                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sДобро пожаловать на проект |cffffff4dWoW-IDK.RU|r", icon_color);
+                    _events[pEvent].Events = 1;
+                    break;
+
+                case 1:
+                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sПеред вами стоит моб быстрого старта 'Mr.Gladiator' в котором сможете ваш спек, он всё сделает за вас.", icon_color);
+                    _events[pEvent].Events = 2;
+                    break;
+
+                case 2:
+                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sРядом с ним находится продавцы экипиров, если вы хотите сами одеть вашего персонажа.", icon_color);
+                    _events[pEvent].Events = 3;
+                    break;
+
+                case 3:
+                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sЧуть дальше прямо стоят мастера арены - арена спектатор - 3vs3 SoloQueue", icon_color);
+                    _events[pEvent].Events = 4;
+                    break;
+
+                case 4:
+                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sУ вас первоначальное задание: 'Добро пожаловать' выполните его, это цепочка чтобы получить первый ранг.", icon_color);
+                    _events[pEvent].Events = 5;
+                    break;
+
+                case 5:
+                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sМы желаем вам приятной игры на нашем проекте <3", icon_color);
+                    _events.clear();
+                    break;
+            }
+            return true;
+        }
+        Player* _Plr;
+};
 
 class Login_script : public PlayerScript
 {
@@ -33,7 +101,26 @@ public:
             return;
 
         player->VerifiedRankBuff(map);
-    }    
+    }
+
+    void PremiumSpell(Player* player)
+    {
+        if (player->GetSession()->IsPremium())
+        {
+            for (uint32 i = 0; i < count_spell; i++) {
+                if (!player->HasSpell(vip_buff[i]))
+                    player->learnSpell(vip_buff[i], false);
+            }
+        }
+        else
+        {
+            for (uint32 i = 0; i < count_spell; i++) {
+                if (player->HasSpell(vip_buff[i]))
+                    player->removeSpell(vip_buff[i], SPEC_MASK_ALL, false);
+            }
+        }
+    }        
+    
 
     void RemoveDementia(Player* player) 
     {
@@ -96,7 +183,7 @@ public:
     void OnFirstLogin(Player* player) override
     {
         player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(1156), 42999);
-        //DeleteItem_OnLogin(player);
+        DeleteItem_OnLogin(player);
         if (!player->HasSpell(33388))
             player->learnSpell(33388);
         if (!player->HasSpell(33391))
@@ -107,6 +194,13 @@ public:
             player->learnSpell(34091);
         if (!player->HasSpell(54197))
             player->learnSpell(54197);
+
+        player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(FIRST_DELAY));
+        player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(SECOND_DELAY));
+        player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(THIRD_DELAY));
+        player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(FOURTH_DELAY));
+        player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(FIFETH_DELAY));
+        player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(BACK_DELAY));
     }
 
     void OnLogin(Player* player) override
@@ -116,7 +210,9 @@ public:
 
         player->RankControlOnLogin();
         player->LoadPvPRank();
+
         RemoveDementia(player);
+        PremiumSpell(player);
 
         Map *map = player->GetMap();
         if (!map)

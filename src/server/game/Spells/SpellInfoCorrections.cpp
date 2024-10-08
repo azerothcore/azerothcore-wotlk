@@ -112,6 +112,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RequiresSpellFocus = 0;
     });    
 
+    // Премиум маунты
+    ApplySpellFix({ 31700, 18991, 18992}, [](SpellInfo* spellInfo)
+    {
+        spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(3);
+    });
+
     ApplySpellFix({ 28698, 23951 /* меню */ }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
