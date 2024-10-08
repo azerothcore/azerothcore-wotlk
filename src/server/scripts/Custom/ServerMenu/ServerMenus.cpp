@@ -12,10 +12,13 @@ class ServerMenuPlayerGossip : public PlayerScript
 public:
     ServerMenuPlayerGossip() : PlayerScript("ServerMenuPlayerGossip") { }
 
-    void OnGossipSelect(Player* player, uint32 /*menu_id*/, uint32 sender, uint32 action)
+    void OnGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action)
     {    
         if (!player)
             return;
+
+        if (menu_id != UNIQUE_MENU_ID)
+            return; 
 
         ClearGossipMenuFor(player);
 

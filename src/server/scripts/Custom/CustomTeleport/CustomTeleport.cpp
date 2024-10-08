@@ -62,6 +62,7 @@ void sCustomTeleport::TeleportListMain(Player* player) {
         if((*itr)->gossip_menu == 0)
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, (*itr)->name_RU, (*itr)->name_EN), GOSSIP_SENDER_MAIN + 4, (*itr)->id);
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 0);
+    player->PlayerTalkClass->GetGossipMenu().SetMenuId(123);
     player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
 }
 
