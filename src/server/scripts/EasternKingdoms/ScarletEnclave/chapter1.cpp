@@ -290,7 +290,7 @@ public:
 
                 timer = 600000; // clear playerGUIDs after 10 minutes if no one initiates a duel
                 me->SetFacingToObject(caster);
-                
+
                 events.ScheduleEvent(EVENT_SPEAK, 3s);
                 events.ScheduleEvent(EVENT_SPEAK + 1, 7s);
                 events.ScheduleEvent(EVENT_SPEAK + 2, 8s);
