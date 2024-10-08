@@ -41,23 +41,13 @@ public:
             switch(_events[pEvent].Events)
             {
                 case 0:
-                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sДобро пожаловать на проект |cffffff4dWoW-IDK.RU|r", icon_color);
+                    ChatHandler(_Plr->GetSession()).PSendSysMessage("{} Добро пожаловать на проект |cffffff4dOneGo WoW|r", icon_color);
                     _events[pEvent].Events = 1;
                     break;
 
                 case 1:
-                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sПеред вами стоит моб быстрого старта 'Mr.Gladiator' в котором сможете выбрать ваш спек, он всё сделает за вас.", icon_color);
+                    ChatHandler(_Plr->GetSession()).PSendSysMessage("{} Мы желаем вам приятной игры на нашем проекте <3", icon_color);
                     _events[pEvent].Events = 2;
-                    break;
-
-                case 2:
-                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sРядом с ним находится продавцы экипиров, если вы хотите сами одеть вашего персонажа.", icon_color);
-                    _events[pEvent].Events = 3;
-                    break;
-
-                case 3:
-                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sМы желаем вам приятной игры на нашем проекте <3", icon_color);
-                    _events[pEvent].Events = 5;
                     break;
             }
             return true;
@@ -154,7 +144,7 @@ public:
 
     void OnFirstLogin(Player* player) override
     {
-        player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(1156), 42999);
+        /*player->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(1156), 42999);
         DeleteItem_OnLogin(player);
         if (!player->HasSpell(33388))
             player->learnSpell(33388);
@@ -165,7 +155,7 @@ public:
         if (!player->HasSpell(34091))
             player->learnSpell(34091);
         if (!player->HasSpell(54197))
-            player->learnSpell(54197);
+            player->learnSpell(54197);*/
 
         player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(FIRST_DELAY));
         player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(SECOND_DELAY));
@@ -194,6 +184,11 @@ public:
         if (!player)
             return; 
 
+        if (!player->HasSpell(28698))
+            player->learnSpell(28698);
+        if (!player->HasSpell(31700))
+            player->learnSpell(31700);
+        
         JoinCustomChannel(player);                 
 
         player->RankControlOnLogin();

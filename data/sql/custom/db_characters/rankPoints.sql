@@ -1,0 +1,1 @@
+ALTER TABLE characters ADD rankPoints int NOT NULL DEFAULT 0

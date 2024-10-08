@@ -1,0 +1,4 @@
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (28698, 'SpServerMenuPlayerGossip');
+
+
+INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES (11022, '|cffe6cc80[{}]: We glad to see your first character here, and present you a little bonus :|r {}|TInterface\\MoneyFrame\\UI-GoldIcon:0:0:2:0|t {}|TInterface\\MoneyFrame\\UI-SilverIcon:0:0:2:0|t {}|TInterface\\MoneyFrame\\UI-CopperIcon:0:0:2:0|t', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|cffe6cc80[{}]: Мы рады видеть вас и вашего первого персонажа, и дарим вам небольшой презент :|r {}|TInterface\\MoneyFrame\\UI-GoldIcon:0:0:2:0|t {}|TInterface\\MoneyFrame\\UI-SilverIcon:0:0:2:0|t {}|TInterface\\MoneyFrame\\UI-CopperIcon:0:0:2:0|t');

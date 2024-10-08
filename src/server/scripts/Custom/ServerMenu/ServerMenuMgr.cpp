@@ -104,7 +104,7 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
             if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "На вашем аккаунте " << player->GetSession()->GetBonuses() << " бонусов.\n";
-                ss << "Пополнить счёт: wow-idk.ru\n\n";
+                ss << "Пополнить счёт: onegocore.online\n\n";
                 if (player->GetSession()->IsPremium())
                     ss << "Ваш премиум статус |cff156B06активирован|r.";
                 else {
@@ -115,7 +115,7 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
             else {
                 ss << "Greetings, " << player->GetName() << "\n\n";
                 ss << "You have " << player->GetSession()->GetBonuses() << "bonuses in your account";
-                ss << "Top up account wow-idk.ru\n\n";
+                ss << "Top up account onegocore.online\n\n";
                 if (player->GetSession()->IsPremium())
                     ss << "Your premium status|cff156B06activated|r.";
                 else {

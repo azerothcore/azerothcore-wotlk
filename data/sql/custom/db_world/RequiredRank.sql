@@ -1,0 +1,1 @@
+ALTER TABLE item_template ADD RequiredRank int NOT NULL DEFAULT 0

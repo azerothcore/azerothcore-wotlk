@@ -13,11 +13,11 @@
 #define EN_glory_win_4 "an unknown reason"
 #define RU_glory_win_4 "неизвестная причина"
 
-#define EN_glory_win_5 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You got |cffffff4d%u|cffff9933 experience for|cffffff4d %s|cffff9933. You have to gain|cffffff4d %u|cffff9933 experience to the next rank.|r"
-#define RU_glory_win_5 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: Вы получили |cffffff4d%u|cffff9933 опыта за|cffffff4d %s|cffff9933. Вам осталось набрать|cffffff4d %u|cffff9933 опыта до следущего ранга.|r"
+#define EN_glory_win_5 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You got |cffffff4d{}|cffff9933 experience for|cffffff4d {}|cffff9933. You have to gain|cffffff4d {}|cffff9933 experience to the next rank.|r"
+#define RU_glory_win_5 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: Вы получили |cffffff4d{}|cffff9933 опыта за|cffffff4d {}|cffff9933. Вам осталось набрать|cffffff4d {}|cffff9933 опыта до следущего ранга.|r"
 
-#define EN_glory_win_6 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You have|cffffff4d %u|cffff9933 experience (%u rank)\n|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]:|cffffff4d %u|cffff9933 experience left until next rank.|r"
-#define RU_glory_win_6 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас|cffffff4d %u|cffff9933 опыта (%u ранг)\n|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: До следующего ранга осталось|cffffff4d %u|cffff9933 опыта.|r"
+#define EN_glory_win_6 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You have|cffffff4d {}|cffff9933 experience ({} rank)\n|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]:|cffffff4d {}|cffff9933 experience left until next rank.|r"
+#define RU_glory_win_6 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас|cffffff4d {}|cffff9933 опыта ({} ранг)\n|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: До следующего ранга осталось|cffffff4d {}|cffff9933 опыта.|r"
 
 #define EN_glory_win_10 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You have the|cffffff4d maximum|cffff9933 rank.|r"
 #define RU_glory_win_10 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас|cffffff4d максимальный|cffff9933 ранг.|r"
@@ -43,14 +43,14 @@
 #define EN_glory_win_16 "kill boss"
 #define RU_glory_win_16 "убийство босса"
 
-#define EN_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: Your rank is not high enough, you need rank |cffffff4d%u|cffff9933.|r"
-#define RU_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас не достаточно высокий ранг, нужен |cffffff4d%u|cffff9933 ранг.|r"
+#define EN_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: Your rank is not high enough, you need rank |cffffff4d{}|cffff9933.|r"
+#define RU_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас не достаточно высокий ранг, нужен |cffffff4d{}|cffff9933 ранг.|r"
 
 #define EN_glory_win_13 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: Congratulations! You received |cffffff4dnew|cffff9933 rank.|r"
 #define RU_glory_win_13 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: Поздравляем! Вы получили |cffffff4dновый|cffff9933 ранг.|r"
 
-#define EN_NOT_FOUND_MENU "|cffff9933This menu ID was not found, inform the administration\nError code: NOT_FOUND_%u_MENU_ID"
-#define RU_NOT_FOUND_MENU "|cffff9933Данный меню ID не найден, сообщите администрации\nКод ошибки: NOT_FOUND_%u_MENU_ID"
+#define EN_NOT_FOUND_MENU "|cffff9933This menu ID was not found, inform the administration\nError code: NOT_FOUND_{}_MENU_ID"
+#define RU_NOT_FOUND_MENU "|cffff9933Данный меню ID не найден, сообщите администрации\nКод ошибки: NOT_FOUND_{}_MENU_ID"
 
 #define EN_HOME_MENU   "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:25:25:-19:0|tHome page"
 #define RU_HOME_MENU   "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:25:25:-19:0|tГлавная страница"
@@ -58,8 +58,8 @@
 #define EN_HOME_MENU_NO_ICON   "<- Home page"
 #define RU_HOME_MENU_NO_ICON   "<- Главная страница"
 
-#define EN_SUCCESS_TELEPORT "You have been successfully delivered to the zone \"%s\""
-#define RU_SUCCESS_TELEPORT "Вы успешно были доставлены в зону \"%s\""
+#define EN_SUCCESS_TELEPORT "You have been successfully delivered to the zone \"{}\""
+#define RU_SUCCESS_TELEPORT "Вы успешно были доставлены в зону \"{}\""
 
 #define EN_HOME_MENU_1 "|TInterface\\icons\\Achievement_zone_easternkingdoms_01:20:20:-20:0|tTeleportation"
 #define RU_HOME_MENU_1 "|TInterface\\icons\\Achievement_zone_easternkingdoms_01:20:20:-20:0|tТелепортация"
@@ -312,8 +312,8 @@
 #define EN_arena_leave_queue "|TInterface\\icons\\Achievement_arena_2v2_7:20:20:-20|tLeave Queue"
 #define RU_arena_leave_queue "|TInterface\\icons\\Achievement_arena_2v2_7:20:20:-20|tПокинуть очередь"
 
-#define EN_equipe_rank "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You must have |cffffff4d%u|cffff9933 rank in order to equip an item."
-#define RU_equipe_rank "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас должен быть |cffffff4d%u|cffff9933 ранг для того чтобы оборудовать предметом."
+#define EN_equipe_rank "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: You must have |cffffff4d{}|cffff9933 rank in order to equip an item."
+#define RU_equipe_rank "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас должен быть |cffffff4d{}|cffff9933 ранг для того чтобы оборудовать предметом."
 
 /************************************************   TemplateNPC.cpp  ********************************************/
 
@@ -440,14 +440,14 @@
 #define EN_template_33 "You have already spent some talent points. You need to reset your talents first."
 #define RU_template_33 "Сначала нужно сбросить свои таланты."
 
-#define EN_template_34 "Successfuly equipped %s template!"
-#define RU_template_34 "Успешно использовали %s экипировку!"
+#define EN_template_34 "Successfuly equipped {} template!"
+#define RU_template_34 "Успешно использовали {} экипировку!"
 
 #define EN_template_35 "Get glyphs and re-extract the template!"
 #define RU_template_35 "Получите глифы и повторно извлеките шаблон!"
 
-#define EN_template_36 "There's no templates for %s specialization yet."
-#define RU_template_36 "Шаблонов по специализации %s пока нет."
+#define EN_template_36 "There's no templates for {} specialization yet."
+#define RU_template_36 "Шаблонов по специализации {} пока нет."
 
 /************************************************   Transmogrifier.cpp  ********************************************/
 
@@ -642,35 +642,35 @@
 
 /************************************************   награда |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t система  ********************************************/
 
-#define RU_MRQW "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за выполненное задание."
-#define EN_MRQW "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for the completed task."
+#define RU_MRQW "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за выполненное задание."
+#define EN_MRQW "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for the completed task."
 
-#define RU_MR1W "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за победу на арене 1c."
-#define EN_MR1W "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for winning the arena 1c."
+#define RU_MR1W "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за победу на арене 1c."
+#define EN_MR1W "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for winning the arena 1c."
 
-#define RU_MR1E "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за поражение на арене 1c."
-#define EN_MR1E "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for defeat in arena 1c."
+#define RU_MR1E "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за поражение на арене 1c."
+#define EN_MR1E "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for defeat in arena 1c."
 
-#define RU_MR2W "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за победу на арене 2c."
-#define EN_MR2W "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for winning in the arena 2c."
+#define RU_MR2W "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за победу на арене 2c."
+#define EN_MR2W "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for winning in the arena 2c."
 
-#define RU_MR2E "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за поражение на арене 2c."
-#define EN_MR2E "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for defeat in the arena 2c"
+#define RU_MR2E "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за поражение на арене 2c."
+#define EN_MR2E "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for defeat in the arena 2c"
 
-#define RU_MR3W "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за победу на арене 3c."
-#define EN_MR3W "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for winning in the arena 3c."
+#define RU_MR3W "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за победу на арене 3c."
+#define EN_MR3W "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for winning in the arena 3c."
 
-#define RU_MR3E "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за поражение на арене 3c."
-#define EN_MR3E "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for defeat in the arena 3c."
+#define RU_MR3E "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за поражение на арене 3c."
+#define EN_MR3E "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for defeat in the arena 3c."
 
-#define RU_MRBGW "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за победу на поле битве."
-#define EN_MRBGW "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for winning on the battleground."
+#define RU_MRBGW "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за победу на поле битве."
+#define EN_MRBGW "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for winning on the battleground."
 
-#define RU_MRBGE "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за поражение на поле битве."
-#define EN_MRBGE "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for defeat on the battleground."
+#define RU_MRBGE "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за поражение на поле битве."
+#define EN_MRBGE "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for defeat on the battleground."
 
-#define RU_MRKILL "Вы получили %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за убийство игрока."
-#define EN_MRKILL "You received %u |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for killing a player."
+#define RU_MRKILL "Вы получили {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t за убийство игрока."
+#define EN_MRKILL "You received {} |TInterface\\moneyframe\\ui-goldicon:15:15:-1:3|t for killing a player."
 
 /************************************************ Деадматч ************************************************/
 
@@ -680,8 +680,8 @@
 #define RU_DEATHMATCH_JOIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Вы присоединились к Королевской Битве, для выхода из зоны пропишите в чат |cffffff4d.dm exit|r"
 #define EN_DEATHMATCH_JOIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: You joined the Battle Royale, to leave the zone, write to the chat |cffffff4d.dm exit|r"
 
-#define RU_DEATHMATCH_EXIT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Вы покинули Королевскую Битву, за текущий бой вы убили |cffffff4d%u|r|cffff9933 игроков"
-#define EN_DEATHMATCH_EXIT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: You left the Battle Royale, you have killed in the current battle |cffffff4d%u|r|cffff9933 player(s)"
+#define RU_DEATHMATCH_EXIT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Вы покинули Королевскую Битву, за текущий бой вы убили |cffffff4d{}|r|cffff9933 игроков"
+#define EN_DEATHMATCH_EXIT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: You left the Battle Royale, you have killed in the current battle |cffffff4d{}|r|cffff9933 player(s)"
 
 #define RU_DEATHMATCH_JOIN_NPC "|TInterface/ICONS/Achievement_bg_grab_cap_flagunderxseconds:20:20:-20:0|tПрисоединиться к Королевской Битве"
 #define EN_DEATHMATCH_JOIN_NPC "|TInterface/ICONS/Achievement_bg_grab_cap_flagunderxseconds:20:20:-20:0|tJoin the Battle Royale"
@@ -689,17 +689,17 @@
 #define RU_DEATHMATCH_INFO_NPC "Вы уверены что хотите попасть в Королевскую Битву ?"
 #define EN_DEATHMATCH_INFO_NPC "Are you sure you want to get to the Battle Royale?"
 
-#define RU_DEATHMATCH_KILL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Игрок |cffffff4d%s|r|cffff9933 убил игрока |cffffff4d%s|r|cffff9933."
-#define EN_DEATHMATCH_KILL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: Player |cffffff4d%s|r|cffff9933 killed a player |cffffff4d%s|r|cffff9933."
+#define RU_DEATHMATCH_KILL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Игрок |cffffff4d{}|r|cffff9933 убил игрока |cffffff4d{}|r|cffff9933."
+#define EN_DEATHMATCH_KILL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: Player |cffffff4d{}|r|cffff9933 killed a player |cffffff4d{}|r|cffff9933."
 
 
 /******************************************** Бонус система **********************************************/
 
-#define RU_GET_BONUS_USE_ITEM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система бонусов]: Вы успешно получили |cffffff4d%u|r|cffff9933 бонусов !|r"
-#define EN_GET_BONUS_USE_ITEM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Bonus system]: You have successfully received |cffffff4d%u|r|cffff9933 bonuses !|r"
+#define RU_GET_BONUS_USE_ITEM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система бонусов]: Вы успешно получили |cffffff4d{}|r|cffff9933 бонусов !|r"
+#define EN_GET_BONUS_USE_ITEM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Bonus system]: You have successfully received |cffffff4d{}|r|cffff9933 bonuses !|r"
 
-#define RU_NO_BONUS_HAVE "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система бонусов]: Недостаточно бонусов, вам нужно |cffffff4d%u|r|cffff9933 бонусов !|r"
-#define EN_NO_BONUS_HAVE "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Bonus system]: Not enough bonuses, you need |cffffff4d%u|r|cffff9933 bonuses !|r"
+#define RU_NO_BONUS_HAVE "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система бонусов]: Недостаточно бонусов, вам нужно |cffffff4d{}|r|cffff9933 бонусов !|r"
+#define EN_NO_BONUS_HAVE "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Bonus system]: Not enough bonuses, you need |cffffff4d{}|r|cffff9933 bonuses !|r"
 
 #define RU_DUEL_ZONE_ONLY "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t Дуэли разрешены только в дуэль зоне !|r"
 #define EN_DUEL_ZONE_ONLY "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t Duels are only allowed in the duel zone !|r"
@@ -715,8 +715,8 @@
 #define RU_UPGRADE_GO_BACK2 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:23:23:-20|tНазад"
 #define EN_UPGRADE_GO_BACK2 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:23:23:-20|tBack"
 
-#define RU_UPGRADE_SUCCESS "Отлично ! Вы успешно улучшили %u слот."
-#define EN_UPGRADE_SUCCESS "Excellent ! You have successfully upgraded slot %u."
+#define RU_UPGRADE_SUCCESS "Отлично ! Вы успешно улучшили {} слот."
+#define EN_UPGRADE_SUCCESS "Excellent ! You have successfully upgraded slot {}."
 
 #define RU_UPGRADE_FORCE "Вы пытаетесь заменить уже существующий усилитель на такого же уровня или выше, |cffE72117форсировать|r улучшение ?\n\n"\
                          "Введите слот который хотите заменить:\n от 1 до 5.\n\n"\
@@ -744,20 +744,20 @@
 #define RU_HONOR_TRADE_50000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t50000 очков чести"
 #define EN_HONOR_TRADE_50000 "|TInterface/ICONS/Achievement_Arena_2v2_1:20:20:-20|t50000 honor points"
 
-#define EN_HONOR_TRADE_OK_SENDER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Transfer]: Player |cffffff4d%s|cffff9933 successfully received |cffffff4d%u|cffff9933 honor points.|r"
-#define RU_HONOR_TRADE_OK_SENDER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Трансфер]: Игрок |cffffff4d%s|cffff9933 успешно получил |cffffff4d%u|cffff9933 очков чести.|r"
+#define EN_HONOR_TRADE_OK_SENDER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Transfer]: Player |cffffff4d{}|cffff9933 successfully received |cffffff4d{}|cffff9933 honor points.|r"
+#define RU_HONOR_TRADE_OK_SENDER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Трансфер]: Игрок |cffffff4d{}|cffff9933 успешно получил |cffffff4d{}|cffff9933 очков чести.|r"
 
-#define EN_HONOR_TRADE_OK_RECEIVER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Transfer]: You received |cffffff4d%u|cffff9933 honor points from the player |cffffff4d%s|cffff9933.|r"
-#define RU_HONOR_TRADE_OK_RECEIVER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Трансфер]: Вы получили |cffffff4d%u|cffff9933 очков чести от игрока |cffffff4d%s|cffff9933.|r"
+#define EN_HONOR_TRADE_OK_RECEIVER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Transfer]: You received |cffffff4d{}|cffff9933 honor points from the player |cffffff4d{}|cffff9933.|r"
+#define RU_HONOR_TRADE_OK_RECEIVER "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Трансфер]: Вы получили |cffffff4d{}|cffff9933 очков чести от игрока |cffffff4d{}|cffff9933.|r"
 
-#define EN_REWARD_ARENA_POINTS_WIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: You received |cffffff4d%u|cffff9933 arena points for win.|r"
-#define RU_REWARD_ARENA_POINTS_WIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Вы получили |cffffff4d%u|cffff9933 очков арены за победу.|r"
+#define EN_REWARD_ARENA_POINTS_WIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: You received |cffffff4d{}|cffff9933 arena points for win.|r"
+#define RU_REWARD_ARENA_POINTS_WIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Вы получили |cffffff4d{}|cffff9933 очков арены за победу.|r"
 
 #define EN_REWARD_ARENA_POINTS_CAP "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: Arena reward cap exceeded, you didn't get anything.|r"
 #define RU_REWARD_ARENA_POINTS_CAP "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Кап награды за арену превышен, вы ничего не получили.|r"
 
-#define EN_REWARD_ARENA_POINTS_LOOS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: You received |cffffff4d%u|cffff9933 arena points for loos in arena.|r"
-#define RU_REWARD_ARENA_POINTS_LOOS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Вы получили |cffffff4d%u|cffff9933 очков арены за поражение на арене.|r"
+#define EN_REWARD_ARENA_POINTS_LOOS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Reward]: You received |cffffff4d{}|cffff9933 arena points for loos in arena.|r"
+#define RU_REWARD_ARENA_POINTS_LOOS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена награда]: Вы получили |cffffff4d{}|cffff9933 очков арены за поражение на арене.|r"
 
 #define EN_ARENA1VS1_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена 1x1]: To join arena 1vs1, you need to log out from the second client."
 #define RU_ARENA1VS1_FARM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Арена 1x1]: Для регистрации арены 1x1 нужно выйти со второго клиента."

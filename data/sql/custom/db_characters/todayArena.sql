@@ -1,0 +1,1 @@
+ALTER TABLE characters ADD todayArena int NOT NULL DEFAULT 0
