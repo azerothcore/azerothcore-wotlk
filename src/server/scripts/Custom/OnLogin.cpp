@@ -7,6 +7,7 @@
 #include "ReputationMgr.h"
 #include "Translate.h"
 #include "ServerMenu/ServerMenuMgr.h"
+#include "ChannelMgr.h"
 
 const uint32 SPELL_DEMENTIA = 40874;
 
@@ -68,6 +69,8 @@ class Login_script : public PlayerScript
 {
 public:
     Login_script() : PlayerScript("Login_script") {}
+
+    ChannelMgr* _channelMgr = nullptr;
 
     void OnUpdateZone(Player* player, uint32 newZone, uint32 newArea) override
     {
@@ -170,10 +173,28 @@ public:
         player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(FOURTH_DELAY));
     }
 
-    void OnLogin(Player* player) override
+    void JoinCustomChannel(Player* player)
     {
         if (!player)
             return;
+
+        if (!_channelMgr)
+            _channelMgr = ChannelMgr::forTeam(player->GetTeamId());
+
+        if (_channelMgr)
+        {
+            if (Channel* channel = _channelMgr->GetJoinChannel("world", 5))
+                channel->JoinChannel(player->GetSession()->GetPlayer(), "");
+        }
+    }
+
+    void OnLogin(Player* player) override
+    {
+
+        if (!player)
+            return; 
+
+        JoinCustomChannel(player);                 
 
         player->RankControlOnLogin();
         player->LoadPvPRank();
