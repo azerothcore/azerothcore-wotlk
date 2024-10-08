@@ -96,7 +96,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(4); // 21
         spellInfo->MaxAffectedTargets = 1;
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6);
-
     });
 
     ApplySpellFix({ 69960 }, [](SpellInfo* spellInfo)
@@ -104,12 +103,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(4); // 21
         spellInfo->MaxAffectedTargets = 1;
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(6);
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);
-        spellInfo->Effects[EFFECT_2].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_SRC_AREA_ALLY);        
+        spellInfo->ProcChance = 101;
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ANY);
+        spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ANY);
+        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ANY);
+        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ANY);
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ANY);
+        spellInfo->Effects[EFFECT_2].TargetB = SpellImplicitTargetInfo(TARGET_DEST_TARGET_ANY);  
     });
 
     // оглушить

@@ -263,7 +263,16 @@ public:
         Player* targetPlayer = handler->GetSession()->GetPlayer();
         Player* plr = handler->getSelectedPlayer();
 
-        if (!plr || !plr->IsInWorld() || plr->IsDuringRemoveFromWorld() || plr->IsBeingTeleported())
+        if (!plr || !targetPlayer)
+            return true;
+
+        if (!plr->IsAlive() || !targetPlayer->IsAlive())
+            return true;
+
+        if (targetPlayer->IsInFlight() || targetPlayer->GetMap()->IsBattlegroundOrArena())
+            return true;
+
+        if (!plr->IsInWorld() || plr->IsDuringRemoveFromWorld() || plr->IsBeingTeleported())
         {
             handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
             handler->SetSentErrorMessage(true);
