@@ -4284,6 +4284,30 @@ Calendar.DeleteOldEventsHour = 6
 
 ###################################################################################################
 #
+# FIRST LOGIN ACC BONUS CONFIG
+#
+#    Description: First character on account will receive a money bonus
+#    Default:     1 - enabled
+#
+#    FLAB.Script.Enabled = 1 - enabled.
+#    FLAB.Script.Enabled = 0 - disabled.
+
+FLAB.Script.Enabled = 1
+
+#    Description: a count of characters for give a bonus
+#    Default:     0 - it should be a first character on acc, right?
+
+FLAB.Script.MaxChars = 0
+
+#    Description: a count of money ( 500 gold )
+
+FLAB.Script.BonusMoney = 10000000
+
+#
+###################################################################################################
+
+###################################################################################################
+#
 # Custom Premium
 Rate.Honor.Premium = 2.000000
 Rate.Rank.Premium = 2.000000

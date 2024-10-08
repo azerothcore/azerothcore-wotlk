@@ -1373,6 +1373,11 @@ void World::LoadConfigSettings(bool reload)
     _int_configs[CONFIG_WARDEN_CLIENT_FAIL_ACTION]    = sConfigMgr->GetOption<int32>("Warden.ClientCheckFailAction", 0);
     _int_configs[CONFIG_WARDEN_CLIENT_RESPONSE_DELAY] = sConfigMgr->GetOption<int32>("Warden.ClientResponseDelay", 600);
 
+    // First Login Acc Bonus script
+    _bool_configs[CONFIG_FIRST_LOGIN_ACC_BONUS]                = sConfigMgr->GetOption<bool>("FLAB.Script.Enabled", false);
+    _int_configs[CONFIG_MAX_CHARS_FOR_FIRST_LOGIN_ACC_BONUS]   = sConfigMgr->GetOption<int32>("FLAB.Script.MaxChars", 0);
+    _int_configs[CONFIG_BONUS_MONEY_FOR_FIRST_LOGIN_ACC_BONUS] = sConfigMgr->GetOption<int32>("FLAB.Script.BonusMoney", 1);
+ 
     // Dungeon finder
     _int_configs[CONFIG_LFG_OPTIONSMASK]    = sConfigMgr->GetOption<int32>("DungeonFinder.OptionsMask", 5);
 
