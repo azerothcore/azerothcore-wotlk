@@ -1,4 +1,8 @@
 #include "ScriptPCH.h"
+#include "Player.h"
+#include "WorldSession.h"
+#include "Translate.h"
+#include "Chat.h"
 
 enum Spells
 {
@@ -1044,8 +1048,45 @@ class event_mage_fire : public CreatureScript
             {
             }
 
+            // если убили босса
             void JustDied(Unit* /*killer*/) override
             {
+                std::ostringstream ss;
+                ss << "|TInterface/GossipFrame/Battlemastergossipicon:15:15|t |cffff9933[Сообщение о событии]:|r Осада столиц, победа";
+
+                if (me->GetEntry() == 99008) { // альянс босс
+                    ss << " Орды!";
+                } else {
+                    ss << " Альянса!";
+                }
+
+                sWorld->SendServerMessage(SERVER_MSG_STRING, ss.str().c_str());
+                // награда
+                RewarBossKill(me, me->GetEntry() == 99008 ? false : true);
+
+                // отключение ивента
+                GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
+                if (activeEvents.find(92) != activeEvents.end())
+                {
+                    sGameEventMgr->StopEvent(92, true);
+                }
+            }
+
+            void RewarBossKill(Creature* killer, bool alliance)
+            {
+                SessionMap const& sessions = sWorld->GetAllSessions();
+                uint32 areaId = killer->GetAreaId();
+
+                for (SessionMap::const_iterator it = sessions.begin(); it != sessions.end(); ++it)
+                {
+                    if (Player* player = it->second->GetPlayer())
+                    {
+                        if (player->IsInWorld() && player->GetAreaId() == areaId && player->GetTeamId() == (alliance ? TEAM_ALLIANCE : TEAM_HORDE)) {
+                            player->AddItem(20486, 1);
+                            ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_WIN_EVENT_BOSS, EN_WIN_EVENT_BOSS));
+                        }
+                    }
+                }
             }
 
             void UpdateAI(uint32 uiDiff) override

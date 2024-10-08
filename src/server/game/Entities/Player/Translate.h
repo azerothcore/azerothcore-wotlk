@@ -792,4 +792,6 @@
 #define EN_HOLIDAY_ONLOGIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Holiday]: Today is holiday! Rank points gain increased by 50%!|r"
 #define RU_HOLIDAY_ONLOGIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Выходной день]: Сегодня выходной день ! Получение очков для ранга повышено на 50%!|r"
 
+#define EN_WIN_EVENT_BOSS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Capital Siege]: You have received a reward for winning the auto event! The next auto event will be in 3 hours."
+#define RU_WIN_EVENT_BOSS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Осада столиц]: Вы получили награду за победу на авто ивенте! Следующий авто ивент будет через 3 часа."
 #endif
