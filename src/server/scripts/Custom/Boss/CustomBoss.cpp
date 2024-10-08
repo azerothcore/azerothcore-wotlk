@@ -155,6 +155,9 @@ class event_npc_firelord : public CreatureScript
             void JustDied(Unit* /*killer*/) override
             {
                 me->Yell(FIRE_SAY_DIE, LANG_UNIVERSAL);
+                if (GameObject* go = me->FindNearestGameObject(180424, 40.0f)) {
+                    go->UseDoorOrButton();
+                }
             }
 
             void UpdateAI(uint32 uiDiff) override
@@ -167,6 +170,11 @@ class event_npc_firelord : public CreatureScript
 
                 if (!me->GetVictim())
                 {
+                    me->CombatStop(true);
+                    EnterEvadeMode(EVADE_REASON_OTHER);
+                }
+
+                if (me->GetPositionX() < 223.0f || me->GetPositionX() > 290.0f) {
                     me->CombatStop(true);
                     EnterEvadeMode(EVADE_REASON_OTHER);
                 }
@@ -386,12 +394,9 @@ class event_npc_icelord : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                if (GameObject *pDoor1 = GetClosestGameObjectWithEntry(me, GO_ICE_DOOR_1, INTERACTION_DISTANCE*1000))
-                    if (pDoor1->GetGoState() != GO_STATE_ACTIVE)
-                        pDoor1->UseDoorOrButton();
-                if (GameObject *pDoor2 = GetClosestGameObjectWithEntry(me, GO_ICE_DOOR_2, INTERACTION_DISTANCE*1000))
-                    if (pDoor2->GetGoState() != GO_STATE_ACTIVE)
-                        pDoor2->UseDoorOrButton();
+                if (GameObject* go = me->FindNearestGameObject(180424, 40.0f)) {
+                    go->UseDoorOrButton();
+                }
                 me->Yell(ICE_SAY_DIE, LANG_UNIVERSAL);
             }
 
@@ -407,6 +412,11 @@ class event_npc_icelord : public CreatureScript
                 {
                     me->CombatStop(true);
                     EnterEvadeMode(EVADE_REASON_OTHER);
+                }
+
+                if (me->GetPositionX() < 239.0f || me->GetPositionX() > 293.0f) {
+                    me->CombatStop(true);
+                    EnterEvadeMode(EVADE_REASON_OTHER);                   
                 }
 
                 //Icebolt Timer
@@ -495,7 +505,7 @@ class event_npc_icelord : public CreatureScript
 };
 
 #define EARTH_SAY_AGGRO                               "Вам не следовало сюда приходить! Это место станет вашей могилой!"
-#define EARTH_EMOTE_NATURE                            "Стража замли Акрилия наполняют силы земли"
+#define EARTH_EMOTE_NATURE                            "Стража земли Акрилия наполняют силы земли"
 #define EARTH_SAY_KILL                                "Отправляйся в землю!"
 #define EARTH_SAY_DIE                                 "Мать земля, помо... ох..."
 
@@ -558,6 +568,10 @@ class event_npc_earthlord : public CreatureScript
             void JustDied(Unit* /*killer*/) override
             {
                 me->Yell(EARTH_SAY_DIE, LANG_UNIVERSAL);
+                if (GameObject* go = me->FindNearestGameObject(499999, 1000.0f)) {
+                    if (go->GetGoState() != GO_STATE_ACTIVE)
+                        go->UseDoorOrButton();
+                } 
             }
 
             void UpdateAI(uint32 uiDiff) override
@@ -573,6 +587,11 @@ class event_npc_earthlord : public CreatureScript
                     me->CombatStop(true);
                     EnterEvadeMode(EVADE_REASON_OTHER);
                 }
+
+                if (me->GetPositionX() > 225.0f) {
+                    me->CombatStop(true);
+                    EnterEvadeMode(EVADE_REASON_OTHER);                   
+                }                
 
                 //Attuned to Nature Timer
                 if (m_uiNatureTimer <= uiDiff)
@@ -757,6 +776,11 @@ class event_npc_darklord : public CreatureScript
                     me->CombatStop(true);
                     EnterEvadeMode(EVADE_REASON_OTHER);
                 }
+
+                if (me->GetPositionY() > -15.0f) {
+                    me->CombatStop(true);
+                    EnterEvadeMode(EVADE_REASON_OTHER);                   
+                }                 
 
                 //Random 1 Timer
                 if (m_uiRandom1Timer <= uiDiff)
@@ -1022,6 +1046,7 @@ class event_mage_fire : public CreatureScript
             uint32 m_uiFFireballTimer;
             uint32 m_uiFireNovaTimer;
 	        uint32 m_uiShipTimer;
+            uint32 m_uiFeerTimer;
 
             void Reset() override
             {
@@ -1029,6 +1054,7 @@ class event_mage_fire : public CreatureScript
                 m_uiFFireballTimer = urand(10000, 15000);
                 m_uiFireNovaTimer  = urand(10000, 20000);
 		        m_uiShipTimer      = urand(30000, 35000);
+                m_uiFeerTimer      = urand(50000, 55000);
             }
 
             void JustSummoned(Creature* /*summon*/) override
@@ -1117,7 +1143,18 @@ class event_mage_fire : public CreatureScript
                     m_uiFFireballTimer = urand(10000, 15000);
                 }
                 else
-                    m_uiShipTimer -= uiDiff;
+                    m_uiFFireballTimer -= uiDiff;
+
+                // fear
+                if (m_uiFeerTimer <= uiDiff)
+                {
+                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                        DoCast(pTarget, SPELL_STUN_EARTH);
+
+                    m_uiFeerTimer = urand(50000, 55000);
+                } else {
+                    m_uiFeerTimer -= uiDiff;
+                }
 
 				// polymorph
                 if (m_uiShipTimer <= uiDiff)
