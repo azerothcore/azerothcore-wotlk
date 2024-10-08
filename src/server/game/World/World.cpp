@@ -2025,6 +2025,10 @@ void World::SetInitialWorldSettings()
     CharacterDatabase.Execute("DELETE mi FROM mail_items mi LEFT JOIN mail m ON mi.mail_id = m.id WHERE m.id IS NULL");
     CharacterDatabase.Execute("UPDATE mail m LEFT JOIN mail_items mi ON m.id = mi.mail_id SET m.has_items=0 WHERE m.has_items<>0 AND mi.mail_id IS NULL");
 
+    LOG_INFO("server.loading", "Deleting deserter for all players...");
+    LOG_INFO("server.loading", " ");
+    CharacterDatabase.Execute("DELETE FROM character_aura WHERE spell = {} AND remainTime <= 1800000", 26013);
+
     ///- Handle outdated emails (delete/return)
     LOG_INFO("server.loading", "Returning Old Mails...");
     LOG_INFO("server.loading", " ");
