@@ -777,6 +777,9 @@
 #define EN_RESET_INSTANCE_CD_OK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Instances]: Your instances have been reset.|r"
 #define RU_RESET_INSTANCE_CD_OK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Подземелья]: Ваши подземелья перезагружены.|r"
 
+#define EN_REPAIR_EQUIPMENT_OK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Repair]: Your items have been repaired.|r"
+#define RU_REPAIR_EQUIPMENT_OK "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ремонт]: Ваши предметы были отремонтированы.|r"
+
 #define RU_TOKEN_EXCHANGE_MAIN "|TInterface/ICONS/inv_misc_platnumdisks:18:18:-20|tОбменник эмблем"
 #define EN_TOKEN_EXCHANGE_MAIN "|TInterface/ICONS/inv_misc_platnumdisks:18:18:-20|tExchanger emblems"
 

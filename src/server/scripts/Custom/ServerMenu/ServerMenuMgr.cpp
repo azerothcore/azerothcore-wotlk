@@ -85,12 +85,13 @@ void sServerMenu::CharControlMenu(Player* player) {
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_3, EN_CHAR_CONTROL_3), GOSSIP_SENDER_MAIN + 1, 5);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_7, EN_CHAR_CONTROL_7), GOSSIP_SENDER_MAIN + 1, 6);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HONOR_EXCHANGE_MAIN, EN_HONOR_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 7);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_RESET_INSTANCE_CD, EN_RESET_INSTANCE_CD), GOSSIP_SENDER_MAIN + 1, 8);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_TOKEN_EXCHANGE_MAIN, EN_TOKEN_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 9);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_RESET_INSTANCE_CD, EN_RESET_INSTANCE_CD), GOSSIP_SENDER_MAIN + 1, 8);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_REPAIR_EQUIPMENT, EN_REPAIR_EQUIPMENT), GOSSIP_SENDER_MAIN + 1, 10);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_4, EN_CHAR_CONTROL_4), GOSSIP_SENDER_MAIN + 1, 2, ConfirmChangeRFN(player, sServerMenuMgr->getFactionCost()), 0, false);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_5, EN_CHAR_CONTROL_5), GOSSIP_SENDER_MAIN + 1, 3, ConfirmChangeRFN(player, sServerMenuMgr->getRaceCost()), 0, false);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_6, EN_CHAR_CONTROL_6), GOSSIP_SENDER_MAIN + 1, 4, ConfirmChangeRFN(player, sServerMenuMgr->getNickCost()), 0, false);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 0);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_back_CHAR, EN_back_CHAR), GOSSIP_SENDER_MAIN, 0);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 1), player->GetGUID());
 }
 
@@ -183,14 +184,14 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "Что входит в Премиум аккаунт ?\n";
                 ss << "   * Опыт для ранга X2\n   * Очки арены за победу/поражение X2\n   * Очки чести X2\n   * Кап арены X2\n";
-                ss << "   * Возможность снять дезертир\n   * Возможность снять слабость\n   * Получить бафы\n   * Берсерк 25% в подземелей\n\n";
+                ss << "   * Возможность снять дезертир\n   * Возможность снять слабость\n   * Получить бафы\n   * Каждый ранг дает бонус в инстах\n\n";
                 ss << "Цена на премиум аккаунт 350 бонусов на 7 дней.";
             }
             else {
                 ss << "Greetings, " << player->GetName() << "\n\n";
                 ss << "What is included in the Premium account ?\n";
                 ss << "   * Experience to rank X2\n   * Arena points for victory/defeat X2\n   * Honor Points X2\n   * Кап арены X2\n";
-                ss << "   * Ability to remove a deserter\n   * The ability to relieve weakness\n   * Buffs\n   * Berserk 25% in dungeons\n\n";
+                ss << "   * Ability to remove a deserter\n   * The ability to relieve weakness\n   * Buffs\n   * Each rank gives a bonus in dungeons\n\n";
                 ss << "Premium service cost 350 bonuses for 7 days.\n";
             }
         } break;
@@ -278,6 +279,13 @@ void sServerMenu::InstanceResetCooldown(Player* player)
         }
     }
     ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_RESET_INSTANCE_CD_OK, EN_RESET_INSTANCE_CD_OK));
+    player->PlayerTalkClass->SendCloseGossip();
+}
+
+void sServerMenu::RepairItems(Player* player) 
+{
+    player->DurabilityRepairAll(false, 0, false);
+    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_REPAIR_EQUIPMENT_OK, EN_REPAIR_EQUIPMENT_OK));
     player->PlayerTalkClass->SendCloseGossip();
 }
 
@@ -602,9 +610,9 @@ void sServerMenu::VipSetBuff(Player* player)
     if (!player)
         return;
 
-    for(const auto& i: BuffList)
-        if(!player->HasAura(i))
-            player->CastSpell(player, i,true);
+    for (const auto& i: BuffList)
+        if (!player->HasAura(i))
+            player->CastSpell(player, i, true);
     player->PlayerTalkClass->SendCloseGossip();
 }
 

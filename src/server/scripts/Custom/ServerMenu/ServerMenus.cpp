@@ -66,6 +66,8 @@ public:
                     case 8: sServerMenuMgr->InstanceResetCooldown(player); break;
                     // Обменник эмблем
                     case 9: sServerMenuMgr->ExchangerToken(player); break;
+                    // Ремонт предметов
+                    case 10: sServerMenuMgr->RepairItems(player); break;
                 }
             } break;
 

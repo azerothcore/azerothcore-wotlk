@@ -77,8 +77,11 @@ public:
     void SetItemRewardID(uint32 id) { _usedItemRewardID = id; }
     uint32 GetItemRewardID() { return _usedItemRewardID; }
 
-    // выходные опыт на 50% больше
+    // выходные опыт на 25% больше
     bool isDoubleDays();
+
+    // Ремонт предметов
+    void RepairItems(Player* /*player*/);
 
 private:
     static const uint32 _factionCost = 50;
