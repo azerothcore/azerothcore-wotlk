@@ -273,6 +273,9 @@
 #define EN_arena_queue_1v1_disable_for_heal "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Queue]: You cannot join because you have invested a lot of points in forbidden talents. Please change your talents."
 #define RU_arena_queue_1v1_disable_for_heal "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Очередь Арены]: Вы не можете присоединиться, потому что вы вложили много очков в запрещенные таланты. Пожалуйста измените свои таланты."
 
+#define EN_arena_queue_1v1_disable_for_hybrid "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Queue]: You cannot join because you are using a forbidden 1v1 arena talent build."
+#define RU_arena_queue_1v1_disable_for_hybrid "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Очередь Арены]: Вы не можете присоединиться, потому что вы используете запретный билд талантов для арены 1v1."
+
 #define EN_arena_err_queue "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Queue]: Something went wrong ... Check if you are standing on the battlefield."
 #define RU_arena_err_queue "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Очередь Арены]: Что-то пошло не так... Проверьте не стоите те ли вы в учете на поле битве."
 
@@ -296,6 +299,9 @@
 
 #define EN_arena_team_dissables "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Queue]: Arena is disabled!"
 #define RU_arena_team_dissables "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Очередь Арены]: Арена отключена!"
+
+#define EN_arena_team_dissables_event "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Queue]: Arena 1v1 is disabled during the 2v2 event!"
+#define RU_arena_team_dissables_event "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Очередь Арены]: Арена 1v1 отключена во время ивента 2v2!"
 
 #define EN_arena_leave_queue "|TInterface\\icons\\Achievement_arena_2v2_7:20:20:-20|tLeave Queue"
 #define RU_arena_leave_queue "|TInterface\\icons\\Achievement_arena_2v2_7:20:20:-20|tПокинуть очередь"

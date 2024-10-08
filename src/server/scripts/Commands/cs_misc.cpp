@@ -1720,25 +1720,6 @@ public:
         if (!playerTarget)
             return false;
 
-        if (player->GetSession()->GetSecurity() == SEC_ADMINISTRATOR) 
-        {    
-            constexpr static const uint32 ItemEventList[6] = {
-                34628, 34629, 34630, 34634, 34635,  34636
-            };
-
-            bool ok = false;
-
-            for (const auto& i: ItemEventList)
-                if (itemId == i)
-                    ok = true;
-
-            if (!ok) {
-                handler->PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemTemplate->ItemId);
-                handler->SetSentErrorMessage(true);                
-                return false;
-            }
-        }        
-
         // Subtract
         if (count < 0)
         {

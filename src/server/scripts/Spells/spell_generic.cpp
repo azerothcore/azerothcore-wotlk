@@ -370,37 +370,6 @@ class spell_gen_allow_proc_from_spells_with_cost : public AuraScript
     }
 };
 
-/* 32727 - Arena Preparation
-   44521 - Preparation */
-class spell_gen_bg_preparation : public AuraScript
-{
-    PrepareAuraScript(spell_gen_bg_preparation)
-
-    void CalcPeriodic(AuraEffect const* /*effect*/, bool& isPeriodic, int32& amplitude)
-    {
-        isPeriodic = true;
-        amplitude = 3 * IN_MILLISECONDS;
-    }
-
-    void Update(AuraEffect*  /*effect*/)
-    {
-        if (Player* player = GetUnitOwner()->GetCharmerOrOwnerPlayerOrPlayerItself())
-            if (MapEntry const* mapEntry = sMapStore.LookupEntry(player->GetMapId()))
-                if ((GetId() == 32727 && mapEntry->IsBattleArena()) || (GetId() == 44521 && mapEntry->IsBattleground()))
-                    if (Battleground* bg = player->GetBattleground())
-                        if (bg->GetStatus() == STATUS_WAIT_JOIN)
-                            return;
-        SetMaxDuration(1);
-        SetDuration(1);
-    }
-
-    void Register() override
-    {
-        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_gen_bg_preparation::CalcPeriodic, EFFECT_0, SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT);
-        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_gen_bg_preparation::Update, EFFECT_0, SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT);
-    }
-};
-
 /* 27867 - Freeze            (spell_gen_disabled_above_70)
    59917 - Minor Mount Speed (spell_gen_disabled_above_70)
    46629 - Deathfrost        (spell_gen_disabled_above_73) */
@@ -5324,7 +5293,6 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScriptWithArgs(spell_gen_relocaste_dest, "spell_q10838_demoniac_scryer_visual", 0, 0, 20.0, 0);
     RegisterSpellScriptWithArgs(spell_gen_relocaste_dest, "spell_q20438_q24556_aquantos_laundry", 0, 0, 7.0f, 0);
     RegisterSpellScript(spell_gen_allow_proc_from_spells_with_cost);
-    RegisterSpellScript(spell_gen_bg_preparation);
     RegisterSpellScriptWithArgs(spell_gen_disabled_above_level, "spell_gen_disabled_above_73", 73);
     RegisterSpellScriptWithArgs(spell_gen_disabled_above_level, "spell_gen_disabled_above_70", 70);
     RegisterSpellScript(spell_pet_hit_expertise_scalling);
