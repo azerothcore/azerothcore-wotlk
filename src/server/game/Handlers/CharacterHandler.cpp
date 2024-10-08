@@ -631,12 +631,12 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     }
 
     // is arena team captain
-    if (sArenaTeamMgr->GetArenaTeamByCaptain(guid))
-    {
-        sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
-        SendCharDelete(CHAR_DELETE_FAILED_ARENA_CAPTAIN);
-        return;
-    }
+    // if (sArenaTeamMgr->GetArenaTeamByCaptain(guid))
+    // {
+    //     sScriptMgr->OnPlayerFailedDelete(guid, initAccountId);
+    //     SendCharDelete(CHAR_DELETE_FAILED_ARENA_CAPTAIN);
+    //     return;
+    // }
 
     if (CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid))
     {
@@ -657,6 +657,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket& recvData)
     // To prevent hook failure, place hook before removing reference from DB
     sScriptMgr->OnPlayerDelete(guid, initAccountId); // To prevent race conditioning, but as it also makes sense, we hand the accountId over for successful delete.
     sCalendarMgr->RemoveAllPlayerEventsAndInvites(guid);
+    Player::LeaveAllArenaTeams(guid);
     Player::DeleteFromDB(guid.GetCounter(), GetAccountId(), true, false);
 
     sWorld->UpdateRealmCharCount(GetAccountId());
