@@ -354,7 +354,7 @@ public:
         if(!killer->IsDeathMatch() || !killed->IsDeathMatch())
             return;
 
-        if (killed->getLevel() < 80)
+        if (killed->GetLevel() < 80)
             return;
 
         // кв на убийство игроков 150

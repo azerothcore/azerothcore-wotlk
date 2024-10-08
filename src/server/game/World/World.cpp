@@ -3039,7 +3039,7 @@ void World::ResetDailyArenaCap()
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ARENA_CAP_DAILY);
     CharacterDatabase.Execute(stmt);
 
-    for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    for (SessionMap::const_iterator itr = _sessions.begin(); itr != _sessions.end(); ++itr)
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->ResetDailyArenaCapStatus();
 

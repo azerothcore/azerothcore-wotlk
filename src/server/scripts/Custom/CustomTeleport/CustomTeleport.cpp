@@ -315,7 +315,7 @@ public:
         if(!targetPlayer)
             return true;
 
-        if (targetPlayer->getLevel() < sWorld->getIntConfig(CONFIG_WINTERGRASP_PLR_MIN_LVL))
+        if (targetPlayer->GetLevel() < sWorld->getIntConfig(CONFIG_WINTERGRASP_PLR_MIN_LVL))
             return true;
 
         if(targetPlayer->IsInFlight() || targetPlayer->GetMap()->IsBattlegroundOrArena())

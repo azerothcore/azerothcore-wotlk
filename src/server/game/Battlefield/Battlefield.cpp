@@ -24,6 +24,7 @@
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
+#include "Chat.h"
 #include "GroupMgr.h"
 #include "Map.h"
 #include "MapMgr.h"
@@ -175,7 +176,7 @@ bool Battlefield::Update(uint32 diff)
     if(!IsWarTime() && m_StartGrouping && !m_StartAnnounce5min && m_Timer <= m_StartGroupingTimerAnnounce)
     {
         m_StartAnnounce5min = true;
-        sWorld->SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE_5MIN);
+        ChatHandler(nullptr).SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE_5MIN);
         m_StartGroupingTimerAnnounce = 5000;
     }
 

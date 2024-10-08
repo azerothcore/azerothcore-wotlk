@@ -444,7 +444,7 @@ void Arena::EndBattleground(TeamId winnerTeamId)
         }
 
         if (counter_arena > 1)
-            sWorld->SendWorldText(LANG_ARENA_STARTED_CUSTOM, announce_arena.str().c_str());   
+            ChatHandler(nullptr).SendWorldText(LANG_ARENA_STARTED_CUSTOM, announce_arena.str().c_str());
     }
 
     // end battleground

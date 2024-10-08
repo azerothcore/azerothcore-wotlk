@@ -94,7 +94,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (GetPlayer()->IsDeathMatch() || player->IsDeathMatch())
+    if (GetPlayer()->IsDeathMatch() || invitedPlayer->IsDeathMatch())
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_IGNORING_YOU_S);
             return;

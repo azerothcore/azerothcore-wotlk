@@ -752,7 +752,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
                 }
 
             if (counter_arena > 1)
-                sWorld->SendWorldText(LANG_ARENA_STARTED_CUSTOM, announce_arena.str().c_str());
+                ChatHandler(nullptr).SendWorldText(LANG_ARENA_STARTED_CUSTOM, announce_arena.str().c_str());
 
             for (SpectatorList::const_iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
                 ArenaSpectator::HandleResetCommand(*itr);

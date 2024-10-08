@@ -4287,6 +4287,9 @@ Calendar.DeleteOldEventsHour = 6
 # Custom Premium
 Rate.Honor.Premium = 2.000000
 Rate.Rank.Premium = 2.000000
+Rate.XP.Quest.Premium    = 2.000000
+Rate.XP.Explore.Premium  = 2.000000
+Rate.Reputation.Premium  = 2.000000
 
 # AntiDraw
 Arena.AntiDraw.Enabled = 1

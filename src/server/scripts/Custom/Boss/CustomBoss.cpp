@@ -1479,7 +1479,7 @@ class IceMan : public CreatureScript
                 me->Say("Уверены?!",LANG_UNIVERSAL);
             }
 
-            void EnterCombat(Unit* /*who*/) override
+            void EnterCombat(Unit* /*who*/)
             {
                 me->Say("Готовьтесь погибнуть, слабые существа! Я, Сверх способный Аномалиус, буду вашим конечным судьбой!",LANG_UNIVERSAL);
             }

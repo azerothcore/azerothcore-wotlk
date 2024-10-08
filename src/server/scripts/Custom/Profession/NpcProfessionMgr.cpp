@@ -183,7 +183,7 @@ void sProfession::MainMenu(Player *player) {
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player,RU_player_proff_text_18,EN_player_proff_text_18), GOSSIP_SENDER_MAIN + 2, 2); // primary
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player,RU_back,EN_back), GOSSIP_SENDER_MAIN, 0); //  на главное меню
     player->PlayerTalkClass->GetGossipMenu().SetMenuId(GossipHelloMenu + 2);
-    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), creature->GetGUID());
+    player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
 }
 
 void sProfession::PrimaryMenu(Player *player) {

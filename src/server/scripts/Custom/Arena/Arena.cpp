@@ -103,7 +103,7 @@ bool ArenaOne::JoinQueueArena(Player* player, bool isRated)
     if (!player)
         return false;
 
-    if (80 > player->getLevel())
+    if (80 > player->GetLevel())
         return false;
 
     uint8 arenaslot = ArenaTeam::GetSlotByType(ARENA_TEAM_5v5);
@@ -129,7 +129,7 @@ bool ArenaOne::JoinQueueArena(Player* player, bool isRated)
         return false;
     }
 
-    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), player->getLevel());
+    PvPDifficultyEntry const* bracketEntry = GetBattlegroundBracketByLevel(bg->GetMapId(), player->GetLevel());
     if (!bracketEntry)
         return false;
 

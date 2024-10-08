@@ -50,11 +50,11 @@ public:
             newpet->SetPower(POWER_HAPPINESS, 1048000);
 
             // prepare visual effect for levelup
-            newpet->SetUInt32Value(UNIT_FIELD_LEVEL, player->getLevel() - 1);
+            newpet->SetUInt32Value(UNIT_FIELD_LEVEL, player->GetLevel() - 1);
             newpet->GetMap()->AddToMap(newpet->ToCreature());
 
             // visual effect for levelup
-            newpet->SetUInt32Value(UNIT_FIELD_LEVEL, player->getLevel());
+            newpet->SetUInt32Value(UNIT_FIELD_LEVEL, player->GetLevel());
             newpet->SavePetToDB(PET_SAVE_AS_CURRENT);
             newpet->InitTalentForLevel();
         }
