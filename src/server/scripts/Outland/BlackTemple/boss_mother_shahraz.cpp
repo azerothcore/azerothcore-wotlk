@@ -196,12 +196,22 @@ class spell_mother_shahraz_saber_lash_aura : public AuraScript
     }
 };
 
-const Position validTeleportStairsPos[4] =
+const Position validTeleportStairsPos[9] =
 {
+    //Platform teleports
+
+    {945.00f, 149.17f, 197.07483},
+    {956.92f, 153.20f, 197.07483},
+    {933.69f, 154.15f, 197.07483},
+
+    //Floor teleports
+
     {966.87f, 184.45f, 192.84f},
     {927.22f, 187.04f, 192.84f},
     {922.54f, 110.09f, 192.84f},
-    {958.01f, 110.47f, 192.84f}
+    {958.01f, 110.47f, 192.84f},
+    {939.95f, 108.29f, 192.84f},
+    {945.68f, 205.74f, 192.84f}
 };
 
 constexpr float minTeleportDist = 30.f;
@@ -227,7 +237,7 @@ class spell_mother_shahraz_fatal_attraction : public SpellScript
 
         // Check if the boss is near stairs to avoid players falling through the platform with random teleports.
         if (GetCaster()->GetPositionY() < 194.f)
-            finalDest = validTeleportStairsPos[urand(0, 3)];
+            finalDest = validTeleportStairsPos[urand(0, 8)];
         else
         {
             finalDest = GetCaster()->GetNearPosition(frand(minTeleportDist, maxTeleportDist), static_cast<float>(rand_norm()) * static_cast<float>(2 * M_PI), true);
