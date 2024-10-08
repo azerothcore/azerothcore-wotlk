@@ -4955,9 +4955,9 @@ void Player::RepopAtGraveyard()
     {
         if (sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
             ClosestGrave = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId())->GetClosestGraveyard(this);
-        else if (GetAreaId() == 2249 || GetAreaId() == 11 || GetAreaId() == 1 || GetMapId() == 44) {
+        else if (GetZoneId() == 618 || GetAreaId() == 11 || GetAreaId() == 1 || GetMapId() == 44) {
             /* дуэль зона */
-            if (GetAreaId() == 2249)
+            if (GetZoneId() == 618)
                 TeleportTo(1, 5209.53f, -4816.09f, 702.0f, 0.55f);
 
             if (GetAreaId() == 11 || GetAreaId() == 1)

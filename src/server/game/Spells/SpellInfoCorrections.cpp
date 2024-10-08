@@ -1628,7 +1628,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Break Ice
-    ApplySpellFix({ 46638 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 46638, 71942 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 &= ~SPELL_ATTR3_ONLY_ON_PLAYER; // Obvious fail, it targets gameobject...
     });
