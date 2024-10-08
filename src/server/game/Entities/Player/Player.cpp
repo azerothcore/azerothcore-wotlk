@@ -4955,33 +4955,23 @@ void Player::RepopAtGraveyard()
     {
         if (sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId()))
             ClosestGrave = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId())->GetClosestGraveyard(this);
+        else if (GetAreaId() == 2249 || GetAreaId() == 11 || GetAreaId() == 1 || GetMapId() == 44) {
+            /* дуэль зона */
+            if (GetAreaId() == 2249)
+                TeleportTo(1, 5209.53f, -4816.09f, 702.0f, 0.55f);
+
+            if (GetAreaId() == 11 || GetAreaId() == 1)
+                TeleportTo(0, -4176.85f, -1401.07f, 200.5f, 0.03f);
+
+            if (GetMapId() == 44)
+                TeleportTo(44, 125.49f, 10.91f, 18.8f, 6.27f);
+
+            ResurrectPlayer(1.0f);
+            SpawnCorpseBones();
+            return;
+        }
         else
             ClosestGrave = sGraveyard->GetClosestGraveyard(this, GetTeamId());
-    }
-
-    /* дуэль зона */
-    if (GetAreaId() == 2249)
-    {
-        ResurrectPlayer(1.0f);
-        SpawnCorpseBones();
-        TeleportTo(1, 5209.53f, -4816.09f, 702.0f, 0.55f);
-        return;
-    }
-
-    if (GetAreaId() == 11 || GetAreaId() == 1)
-    {
-        ResurrectPlayer(1.0f);
-        SpawnCorpseBones();
-        TeleportTo(0, -4176.85f, -1401.07f, 200.5f, 0.03f);
-        return;
-    }
-
-    if (GetMapId() == 44)
-    {
-        ResurrectPlayer(1.0f);
-        SpawnCorpseBones();
-        TeleportTo(44, 125.49f, 10.91f, 18.8f, 6.27f);
-        return;
     }
 
     // stop countdown until repop
