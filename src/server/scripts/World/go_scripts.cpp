@@ -1966,8 +1966,10 @@ public:
         };
 
         bool receivedLoot = false;
+        const uint32 random = urand(0, 100);
+
         for (unsigned int i = 0; !receivedLoot && i < sizeof(lootTable) / sizeof(Loot); i++) {
-            if (urand(0, 100) <= lootTable[i].percentage) {
+            if (random <= lootTable[i].percentage) {
                 player->AddItem(lootTable[i].itemId, lootTable[i].count);
                 receivedLoot = true;
             }
@@ -1981,6 +1983,33 @@ private:
         uint32 count;
         uint32 percentage;
     };
+};
+
+class tikva_farm_zona_gameobject : public GameObjectScript
+{
+public:
+    tikva_farm_zona_gameobject() : GameObjectScript("tikva_farm_zona_gameobject") { }
+
+    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    {
+        const uint32 random = urand(0, 100);
+        const float x = player->GetPositionX() + 1.0f;
+        const float y = player->GetPositionY() + 1.0f;
+        const float z = player->GetPositionZ() + 0.1f;
+        const float ang = player->GetOrientation();
+        const float rot2 = std::sin(ang / 2);
+        const float rot3 = std::cos(ang / 2);
+
+        if (random <= 10) {
+            player->SummonCreature(23545, x, y, z, ang, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
+        }
+        else if (random >= 90) {
+            player->SummonGameObject(500007, x, y, z, ang, 0, 0, rot2, rot3, 60000);
+        }
+
+        player->AddItem(22898, 1);
+        return false;        
+    }
 };
 
 void AddSC_go_scripts()
@@ -2028,4 +2057,5 @@ void AddSC_go_scripts()
     new go_veil_skith_cage();
     new go_bells();
     new gurubashi_gameobject_event();
+    new tikva_farm_zona_gameobject();
 }
