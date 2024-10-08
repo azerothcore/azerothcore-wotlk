@@ -1945,6 +1945,49 @@ public:
     }
 };
 
+class gurubashi_gameobject_event : public GameObjectScript
+{
+public:
+    gurubashi_gameobject_event() : GameObjectScript("gurubashi_gameobject_event") { }
+
+    bool OnGossipHello(Player* player, GameObject* /*go*/) override
+    {
+        std::string playerName = player->GetName();
+        std::string message = "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Сообщение о событии]:|r Игрок " + playerName + " одерживает победу на арене Гурубаши и забирает достойную награды !";
+        sWorld->SendServerMessage(SERVER_MSG_STRING, message.c_str());
+
+        // Create a vector of structs to store the loot information
+        std::vector<Loot> lootTable = {
+            {842, 1, 10},   // 5000
+            {1043, 1, 25},  // 1000
+            {1043, 1, 60},  // 250
+            {1043, 1, 90},  // 100
+            {1042, 1, 100}, // 50
+        };
+
+        // A flag to check if the player already received a loot
+        bool receivedLoot = false;
+
+        // Iterate through the loot table
+        for (auto const& loot : lootTable)
+        {
+            if (!receivedLoot && urand(0, 100) < loot.percentage)
+            {
+                player->AddItem(loot.itemId, loot.count);
+                receivedLoot = true;
+            }
+        }
+        return false;
+    }
+
+private:
+    struct Loot {
+        uint32 itemId;
+        uint32 count;
+        uint32 percentage;
+    };
+};
+
 void AddSC_go_scripts()
 {
     // Ours
@@ -1989,4 +2032,5 @@ void AddSC_go_scripts()
     new go_massive_seaforium_charge();
     new go_veil_skith_cage();
     new go_bells();
+    new gurubashi_gameobject_event();
 }
