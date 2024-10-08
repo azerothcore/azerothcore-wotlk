@@ -2818,6 +2818,11 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ProcChance = 100;
     });
 
+    ApplySpellFix({36482}, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcChance = 30;
+    });
+
     // Icy Blast
     ApplySpellFix({ 69232 }, [](SpellInfo* spellInfo)
     {
