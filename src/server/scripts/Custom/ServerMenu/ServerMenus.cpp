@@ -179,6 +179,11 @@ public:
             case GOSSIP_SENDER_MAIN: {
                 sServerMenuMgr->TradeHonorAccept(player, action, code);
             } break;
+
+            // Обмен эмблем льда на осколки
+            case GOSSIP_SENDER_MAIN + 1: {
+                sServerMenuMgr->ExchangeEmblemToShard(player, atoi(code));
+            } break;
         }
     }
 };

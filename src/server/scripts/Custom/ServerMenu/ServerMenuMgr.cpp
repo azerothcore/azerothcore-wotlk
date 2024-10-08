@@ -472,6 +472,7 @@ void sServerMenu::ExchangerToken(Player* player)
     ClearGossipMenuFor(player);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_FROST_EXCHANGE_MENU, EN_FROST_EXCHANGE_MENU), GOSSIP_SENDER_MAIN + 8, 1);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_TRIUMF_EXCHANGE_MENU, EN_TRIUMF_EXCHANGE_MENU), GOSSIP_SENDER_MAIN + 8, 2);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_FROST_EXCHANGE_MENU_FAST, EN_FROST_EXCHANGE_MENU_FAST), GOSSIP_SENDER_MAIN + 1, 0, GetCustomText(player, RU_FROST_EXCHANGE_FAST_INFO, EN_FROST_EXCHANGE_FAST_INFO), 0, true);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 5);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 4), player->GetGUID());   
 }
@@ -493,6 +494,30 @@ void sServerMenu::ExchangerConfirm(Player* player, bool frost)
     }
 
     sServerMenuMgr->ExchangerToken(player);
+}
+
+void sServerMenu::ExchangeEmblemToShard(Player* player, const uint32 count)
+{
+    const uint32 ID = 49426;
+
+    if (!player)
+        return;
+
+    if (!count) {
+       ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_TOKEN_EXCHANGE_FAIL_ERR, EN_TOKEN_EXCHANGE_FAIL_ERR));
+       sServerMenuMgr->ExchangerToken(player);
+       return;
+    }
+
+    if (player->HasItemCount(ID, count)) {
+        player->DestroyItemCount(ID, count, true);
+        player->AddItem(43228, count);
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_TOKEN_EXCHANGE_SUCCESS, EN_TOKEN_EXCHANGE_SUCCESS));
+    } else {
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_TOKEN_EXCHANGE_FAIL, EN_TOKEN_EXCHANGE_FAIL));
+    }
+
+    sServerMenuMgr->ExchangerToken(player);        
 }
 
 void sServerMenu::TradeHonorAccept(Player* player, uint32 honor, char const* name) {

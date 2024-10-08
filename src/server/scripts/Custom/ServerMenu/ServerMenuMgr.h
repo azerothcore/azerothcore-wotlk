@@ -62,7 +62,9 @@ public:
     void ExchangerToken(Player* /*player*/);
     // подтверждение обмена
     void ExchangerConfirm(Player* /*player*/, bool /*frost*/);
-
+    // масовый обмен эмблем
+    void ExchangeEmblemToShard(Player* /*player*/, const uint32 /*count*/);
+    
     /* выдача VIP - delay это кол дней указывать в 1,7,30 итд... */
     void GetVipStatus(Player* /*player*/, uint16 /*days*/);
     void GetVipMenu(Player* /*player*/);

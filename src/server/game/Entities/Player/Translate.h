@@ -789,11 +789,20 @@
 #define EN_TOKEN_EXCHANGE_FAIL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Exchanger]: Unfortunately, you don't have enough emblems.|r"
 #define RU_TOKEN_EXCHANGE_FAIL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Обменник]: К сожалению у вас недостаточно эмблем.|r"
 
+#define EN_TOKEN_EXCHANGE_FAIL_ERR "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Exchanger]: Incorrect value.|r"
+#define RU_TOKEN_EXCHANGE_FAIL_ERR "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Обменник]: Неверное значение.|r"
+
 #define RU_FROST_EXCHANGE_MENU "|TInterface/ICONS/inv_misc_frostemblem_01:20:20:-20|t1 эмблему льда на 1 осколок."
 #define EN_FROST_EXCHANGE_MENU "|TInterface/ICONS/inv_misc_frostemblem_01:20:20:-20|t1 emblems of frost for 1 shard."
 
 #define RU_TRIUMF_EXCHANGE_MENU "|TInterface/ICONS/spell_holy_summonchampion:20:20:-20|t10 эмблем триумфа на 1 осколок."
 #define EN_TRIUMF_EXCHANGE_MENU "|TInterface/ICONS/spell_holy_summonchampion:20:20:-20|t10 emblems of triumph for 1 shard."
+
+#define RU_FROST_EXCHANGE_MENU_FAST "|TInterface/ICONS/inv_misc_frostemblem_01:20:20:-20|tБыстрый обмен льда на осколки."
+#define EN_FROST_EXCHANGE_MENU_FAST "|TInterface/ICONS/inv_misc_frostemblem_01:20:20:-20|tQuick exchange frost for shards."
+
+#define RU_FROST_EXCHANGE_FAST_INFO "     ВНИМАНИЕ !\n\n  Укажите количество эмблем льда которые хотите обменять на осколки !\n\n   После чего нажмите на [ принять ]."
+#define EN_FROST_EXCHANGE_FAST_INFO "      ATTENTION!\n\n  Specify the number of ice emblems you want to exchange for shards !\n\n   Then click on [ accept ]."
 
 #define EN_TOKEN_EXCHANGE_SUCCESS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Exchanger]: The exchange has been successful.|r"
 #define RU_TOKEN_EXCHANGE_SUCCESS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Обменник]: Обмен успешно произошел.|r"
