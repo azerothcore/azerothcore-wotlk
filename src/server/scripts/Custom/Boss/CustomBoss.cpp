@@ -155,7 +155,7 @@ class event_npc_firelord : public CreatureScript
             void JustDied(Unit* /*killer*/) override
             {
                 me->Yell(FIRE_SAY_DIE, LANG_UNIVERSAL);
-                if (GameObject* go = me->FindNearestGameObject(180424, 40.0f)) {
+                if (GameObject* go = me->FindNearestGameObject(180424, 60.0f)) {
                     go->UseDoorOrButton();
                 }
             }
@@ -394,7 +394,7 @@ class event_npc_icelord : public CreatureScript
 
             void JustDied(Unit* /*killer*/) override
             {
-                if (GameObject* go = me->FindNearestGameObject(180424, 40.0f)) {
+                if (GameObject* go = me->FindNearestGameObject(180424, 60.0f)) {
                     go->UseDoorOrButton();
                 }
                 me->Yell(ICE_SAY_DIE, LANG_UNIVERSAL);
