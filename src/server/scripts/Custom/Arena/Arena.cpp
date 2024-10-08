@@ -82,14 +82,7 @@ bool ArenaOne::CreateArenateam(Player* player)
 void ArenaOne::JoinQueue(Player* player) 
 {
     if (!player)
-        return;
-
-    GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
-    if (activeEvents.find(91) != activeEvents.end())
-    {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_arena_team_dissables_event, EN_arena_team_dissables_event));
-        return CloseGossipMenuFor(player);
-    }        
+        return;    
 
     if (player->GetRankByExp() < 5) {
         ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_glory_win_9, EN_glory_win_9), 5);
