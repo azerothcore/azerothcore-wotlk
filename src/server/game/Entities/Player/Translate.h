@@ -677,6 +677,10 @@
 #define RU_DEATHMATCH_INFO_NPC "Вы уверены что хотите попасть в Королевскую Битву ?"
 #define EN_DEATHMATCH_INFO_NPC "Are you sure you want to get to the Battle Royale?"
 
+#define RU_DEATHMATCH_KILL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Игрок |cffffff4d%s|r|cffff9933 убил игрока |cffffff4d%s|r|cffff9933."
+#define EN_DEATHMATCH_KILL "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Battle Royale]: Player |cffffff4d%s|r|cffff9933 killed a player |cffffff4d%s|r|cffff9933."
+
+
 /******************************************** Бонус система **********************************************/
 
 #define RU_GET_BONUS_USE_ITEM "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система бонусов]: Вы успешно получили |cffffff4d%u|r|cffff9933 бонусов !|r"
@@ -775,5 +779,8 @@
 
 #define EN_ONLINE_REWARD "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Online Reward]: You have successfully received the bonus for online.|r"
 #define RU_ONLINE_REWARD "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Онлайн Награда]: Вы успешно получили бонус за онлайн.|r"
+
+#define EN_FARM_ATTEMPT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Protection system]: Farm attempt detected, we warn the administration.|r"
+#define RU_FARM_ATTEMPT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система защиты]: Обнаружена попытка фарма, предупреждаем администрацию.|r"
 
 #endif

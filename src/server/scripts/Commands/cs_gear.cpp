@@ -20,6 +20,9 @@
 #include "Language.h"
 #include "Player.h"
 #include "WorldSession.h"
+#include "Translate.h"
+
+#define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
 using namespace Acore::ChatCommands;
 
@@ -85,9 +88,9 @@ public:
         {
             return false;
         }
-
-        handler->PSendSysMessage("Character: {}", player->GetPlayerName());
-        handler->PSendSysMessage("Current equipment average item level: |cff00ffff{}|r", (int16)player->GetAverageItemLevel());
+        
+        handler->PSendSysMessage(GetText(player, "Игрок: {}", "Character: {}"), player->GetPlayerName());
+        handler->PSendSysMessage(GetText(player, "Текущий средний уровень предмета снаряжения: |cff00ffff{}|r", "Current equipment average item level: |cff00ffff{}|r"), (int16)player->GetAverageItemLevel());
 
         if (sWorld->getIntConfig(CONFIG_MIN_LEVEL_STAT_SAVE))
         {

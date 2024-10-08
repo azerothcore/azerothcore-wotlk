@@ -23,11 +23,12 @@ void DeathMatch::RevivePlayer(Player* player)
     if (!player)
         return;
 
+    /* выдаем фриз чтобы дамаг не залетал */
+    if (Aura* aura = player->AddAura(9454, player))
+        aura->SetDuration(3 * IN_MILLISECONDS); /* на 3 секунды */
+
     TeleportToRandomLocation(player);
     player->ResurrectPlayer(1.0f);
-    /* выдаем фриз чтобы дамаг не залетал */
-    if(Aura* aura = player->AddAura(9454, player))
-        aura->SetDuration(3 * IN_MILLISECONDS); /* на 3 секунды */
     SetBuffForClassSpec(player);
     ResetHpMana(player);
 }
@@ -356,22 +357,31 @@ public:
         if (killed->getLevel() < 80)
             return;
 
+        // кв на убийство игроков 150
+        if (sWorld->getBoolConfig(CONFIG_RANK_SYSTEM_WIN_ENABLE)) {
+            if ((int16)killed->GetAverageItemLevel() >= 265) {
+                killer->RewardRankPoints(sWorld->getIntConfig(CONFIG_RANK_SYSTEM_KILL_RATE_BG), 5);
+                killer->RewardRankMoney(6/*килл*/, sWorld->getIntConfig(CONFIG_RANK_SYSTEM_KILL_RATE_BG));
+                if (killer->GetQuestStatus(26039) == QUEST_STATUS_INCOMPLETE)
+                    killer->KilledMonsterCredit(200004);
+                // кв на убийство игрока для зоны
+                if (killer->GetQuestStatus(26036) == QUEST_STATUS_INCOMPLETE)
+                    killer->KilledMonsterCredit(200000);
+
+                std::ostringstream ss;
+                ss << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Королевская Битва]: Игрок |cffffff4d";
+                ss << killer->GetName() << "|r|cffff9933 убил игрока |cffffff4d" << killed->GetName() << "|r|cffff9933.";
+                sWorld->SendZoneText(3817, ss.str().c_str());
+            } else {
+                ChatHandler(killer->GetSession()).PSendSysMessage(GetText(killer, RU_FARM_ATTEMPT, EN_FARM_ATTEMPT));
+                return;
+            }
+        }
+
         // дроп сундука
         int win = urand(1, 3);
         if (win == 3) /* 33.334% */
             killer->AddItem(30806, 1);
-
-        // кв на убийство игроков 150
-        if (sWorld->getBoolConfig(CONFIG_RANK_SYSTEM_WIN_ENABLE)) {
-            killer->RewardRankPoints(sWorld->getIntConfig(CONFIG_RANK_SYSTEM_KILL_RATE_BG), 5);
-            killer->RewardRankMoney(6/*килл*/, sWorld->getIntConfig(CONFIG_RANK_SYSTEM_KILL_RATE_BG));
-            if (killer->GetQuestStatus(26039) == QUEST_STATUS_INCOMPLETE)
-                killer->KilledMonsterCredit(200004);
-        }    
-
-        // кв на убийство игрока для зоны
-        if (killer->GetQuestStatus(26036) == QUEST_STATUS_INCOMPLETE)
-            killer->KilledMonsterCredit(200000);
 
         if (DeathMatchMgr->IsDeathMatchZone(killed->GetZoneId()))
             DeathMatchMgr->RevivePlayer(killed);
