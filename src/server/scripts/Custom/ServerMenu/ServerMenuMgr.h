@@ -48,7 +48,7 @@ public:
     // Расчёт сколько хонора будет стоить
     uint32 CalculHonorForExp(Player* /*player*/, uint32 /*honor*/, uint8 /* count */);
     // Подтверждение обмена валюты
-    void ConfirmExchangeHonorForExp(Player* /*player*/, uint32 /*honor*/, uint32 /*exp*/, uint8 /* count */);
+    void ConfirmExchangeHonorForExp(Player* /*player*/, uint32 /*honor*/, uint32 /*exp*/, uint32 /* count */);
 
     // сброс кд инстов
     void InstanceResetCooldown(Player* /*player*/);
@@ -74,10 +74,16 @@ public:
     void GossipMenuEventReward(Player* player, uint32 entry, bool bigEvent, uint32 prize);
     void RewardEvent(Player* player, uint8 value, uint32 amount);
 
+    void SetItemRewardID(uint32 id) { _usedItemRewardID = id; }
+    uint32 GetItemRewardID() { return _usedItemRewardID; }
+
 private:
     static const uint32 _factionCost = 50;
     static const uint32 _raceCost = 30;
-    static const uint32 _nickCost = 15;    
+    static const uint32 _nickCost = 15;
+
+    // ID предмета который игрок за ивент нажал
+    uint32 _usedItemRewardID = 0; 
 };
 
 #define sServerMenuMgr sServerMenu::instance()

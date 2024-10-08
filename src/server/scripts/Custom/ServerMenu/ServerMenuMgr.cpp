@@ -288,12 +288,14 @@ uint32 sServerMenu::CalculHonorForExp(Player* player, uint32 honor, uint8 count)
     return uint32(honor - (player->GetRankByExp() * 100 * count));
 }
 
-void sServerMenu::ConfirmExchangeHonorForExp(Player* player, uint32 honor, uint32 exp, uint8 count) 
+void sServerMenu::ConfirmExchangeHonorForExp(Player* player, uint32 honor, uint32 exp, uint32 count)
 {
     if (!player || !honor || !exp)
         return;
 
-    uint32 total = sServerMenuMgr->CalculHonorForExp(player, honor, count);
+    uint8 new_count = count == 1250 ? 25 : count == 500 ? 10 : count == 250 ? 5 : count == 100 ? 2 : 1;    
+
+    uint32 total = sServerMenuMgr->CalculHonorForExp(player, honor, new_count);
     if (player->GetHonorPoints() >= total) {
         // снимает у игрока очки чести 
         player->ModifyHonorPoints(-uint32(total));
@@ -697,6 +699,11 @@ void sServerMenu::RewardEvent(Player* player, uint8 value, uint32 amount)
         default: break;
     }
 
+    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Награда за ивент]: Вы успешно получили награду за ивент.", "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Event Reward]: You have successfully received an event reward."));
+
+    // удаляем предмет после выбора пункта
+    player->DestroyItemCount(GetItemRewardID(), 1, true);
+
     // логи
     CharacterDatabasePreparedStatement* stmt_log = CharacterDatabase.GetPreparedStatement(CHAR_INS_EVENT_REWARD);
     stmt_log->SetData(0, player->GetGUID().GetCounter());
@@ -706,6 +713,5 @@ void sServerMenu::RewardEvent(Player* player, uint8 value, uint32 amount)
     stmt_log->SetData(4, value == 3 ? amount : 0);
     CharacterDatabase.Execute(stmt_log);
 
-    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Награда за ивент]: Вы успешно получили награду за ивент.", "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Event Reward]: You have successfully received an event reward."));
     player->PlayerTalkClass->SendCloseGossip();  
 }

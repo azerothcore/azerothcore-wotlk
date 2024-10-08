@@ -108,8 +108,7 @@ public:
 
             // Раздел обменника очков чести
             case GOSSIP_SENDER_MAIN + 7: {
-                uint8 count = action == 1250 ? 25 : action == 500 ? 10 : action == 250 ? 5 : action == 100 ? 2 : 1;
-                sServerMenuMgr->ConfirmExchangeHonorForExp(player, action*200, action, count);
+                sServerMenuMgr->ConfirmExchangeHonorForExp(player, action*200, action, action);
             } break;
 
             // Раздел обменника эмблем
