@@ -54,9 +54,9 @@ enum Spells
     SPELL_GLACIAL_STRIKE                             = 49184,
     SPELL_ANTIMAGIC_ZONE                             = 51052,
     //===================Warrior=============================
-    SPELL_SHOCKWAVE                                  = 75418,
-    SPELL_BLOODTHRIST                                = 33964,
-    SPELL_DISARM                                     = 15752,
+    SPELL_SHOCKWAVE                                  = 46968,
+    SPELL_BLOODTHRIST                                = 47502,
+    SPELL_DISARM                                     = 47465,
     //===================Common==============================
     SPELL_FRENZY                                     = 47774,  // 15% AS for 2 min. Stacks.
     SPELL_FURY                                       = 66721,  // 5% damage. Stacks
