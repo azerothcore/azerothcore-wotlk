@@ -1953,11 +1953,11 @@ public:
     bool OnGossipHello(Player* player, GameObject* /*go*/) override
     {
         std::string playerName = player->GetName();
-        std::string message = "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Сообщение о событии]:|r Игрок " + playerName + " одерживает победу на арене Гурубаши и забирает достойную награды !";
+        std::string message = "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Сообщение о событии]:|r Игрок " + playerName + " одерживает победу на арене Гурубаши и забирает достойную награду !";
         sWorld->SendServerMessage(SERVER_MSG_STRING, message.c_str());
 
         // Create a vector of structs to store the loot information
-        std::vector<Loot> lootTable = {
+        const static std::array<Loot, 5> lootTable = {
             {842, 1, 10},   // 5000
             {1043, 1, 25},  // 1000
             {1043, 1, 60},  // 250
@@ -1967,15 +1967,16 @@ public:
 
         // A flag to check if the player already received a loot
         bool receivedLoot = false;
-
+        uint32 i = 0;
         // Iterate through the loot table
-        for (auto const& loot : lootTable)
+        while (!receivedLoot && i < lootTable.size())
         {
-            if (!receivedLoot && urand(0, 100) < loot.percentage)
+            if (urand(0, 100) < lootTable[i].percentage)
             {
-                player->AddItem(loot.itemId, loot.count);
+                player->AddItem(lootTable[i].itemId, lootTable[i].count);
                 receivedLoot = true;
             }
+            ++i;
         }
         return false;
     }
