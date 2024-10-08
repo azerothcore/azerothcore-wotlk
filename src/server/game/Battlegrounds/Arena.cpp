@@ -414,6 +414,35 @@ void Arena::EndBattleground(TeamId winnerTeamId)
 
         loserArenaTeam->SaveToDB();
         loserArenaTeam->NotifyStatsChanged();
+    } else {
+        // skirmish
+        uint8 counter_arena{0}; 
+        std::ostringstream announce_arena;
+        std::ostringstream winner;
+
+        announce_arena << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Турнир]: Завершился бой ";
+
+        for (BattlegroundPlayerMap::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr) {
+            if (Player* player = itr->second)
+            {
+                auto const& bgTeamId = player->GetBgTeamId();
+
+                if (bgTeamId == winnerTeamId)
+                    winner << player->GetName();
+
+                if (counter_arena == 0) {
+                    announce_arena << "|cffffff4d" << player->GetName() << "|cffff9933 vs |cffffff4d";
+                    counter_arena++;
+                }
+                else {
+                    announce_arena << player->GetName() << "|cffff9933 - победил |cffffff4d" << winner.str().c_str() << "|r";
+                    counter_arena++;
+                }
+            }
+        }
+
+        if (counter_arena > 1)
+            sWorld->SendWorldText(LANG_ARENA_STARTED_CUSTOM, announce_arena.str().c_str());   
     }
 
     // end battleground

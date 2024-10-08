@@ -155,7 +155,7 @@ public:
     {
         auto tokens = args;
 
-        if (args.empty() || !tokens.size())
+        if (args.empty() || tokens.size() == 0)
         {
             handler->SetSentErrorMessage(true);
             return false;
@@ -233,14 +233,14 @@ public:
             else if (mode == "5v5")
             {
                 count = 10;
+            } else {
+                handler->PSendSysMessage("Invalid bracket. Can be 1v1, 2v2, 3v3, 5v5");
+                handler->SetSentErrorMessage(true);
+                return false;   
             }
         }
 
-        if (!count)
-        {
-            handler->SendErrorMessage("Invalid bracket. Can be 1v1, 2v2, 3v3, 5v5");
-            return false;
-        }
+        handler->PSendSysMessage("tokens.size(): %u - uint16(count + 2): %u", tokens.size(), count + 2);
 
         if (tokens.size() != uint16(count + 2))
         {
@@ -413,7 +413,7 @@ public:
             return false;
         }
 
-        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, GetBattlegroundBracketById(bgt->GetMapId(), bgt->GetBracketId()), ArenaType(hcnt >= 2 ? hcnt : 2), false);
+        Battleground* bg = sBattlegroundMgr->CreateNewBattleground(randomizedArenaBgTypeId, GetBattlegroundBracketById(bgt->GetMapId(), bgt->GetBracketId()), ArenaType(hcnt >= 2 ? ARENA_TYPE_2v2 : ARENA_TYPE_5v5), false);
         if (!bg)
         {
             handler->SendErrorMessage("Couldn't create arena map!");
@@ -435,8 +435,9 @@ public:
             player->SetEntryPoint();
 
             uint32 queueSlot = 0;
+            uint8 arenatype = count == 2 ? ARENA_TYPE_5v5 : count == 4 ? ARENA_TYPE_2v2 : ARENA_TYPE_3v3;
             WorldPacket data;
-            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), arenatype, teamId);
             player->GetSession()->SendPacket(&data);
 
             // Remove from LFG queues
