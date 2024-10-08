@@ -2554,9 +2554,7 @@ void World::SendGlobalMessage(WorldPacket const* packet, WorldSession* self, Tea
                 itr->second != self &&
                 (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
         {
-            // Autobroadcast
-            if (itr->second->GetPlayer()->GetSession()->GetAutobroadcast() && self == nullptr)
-                itr->second->SendPacket(packet);
+            itr->second->SendPacket(packet);
         }
     }
 }
