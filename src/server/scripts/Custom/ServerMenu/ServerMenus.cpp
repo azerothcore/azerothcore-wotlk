@@ -36,7 +36,7 @@ public:
                     // Управление персонажем - ок
                     case 5: sServerMenuMgr->CharControlMenu(player); break;
                     // Управление акков
-                    case 6: sServerMenuMgr->AccControlMenu(player); break;
+                    case 6: sServerMenuMgr->CommingSoon(player); break;
                     // Арена
                     case 7: ArenaOneMgr->ArenaMainMenu(player); break;
                     default: break;
@@ -165,16 +165,7 @@ public:
             case GOSSIP_SENDER_MAIN + 17: {
                 sServerMenuMgr->ConfirmExchangeHonorForArena(player, action);
             } break; 
-
-            // Управление акков
-            case GOSSIP_SENDER_MAIN + 18: {
-                switch (action) {
-                    case 0: sServerMenuMgr->SetBroadcastControl(player); break;
-                    default: break;
-                };
-            }    
-
-
+  
             default: break;
         } 
     }

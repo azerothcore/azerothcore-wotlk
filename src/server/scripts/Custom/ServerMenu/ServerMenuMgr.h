@@ -30,10 +30,6 @@ public:
     bool CanOpenMenu(Player* /*player*/);
     void RankInfo(Player* /*player*/);
 
-    // управление акком
-    void AccControlMenu(Player* /*player*/);
-    void SetBroadcastControl(Player* /*player*/);
-
     uint32 getFactionCost() { return _factionCost; }
     uint32 getRaceCost() { return _raceCost; }
     uint32 getNickCost() { return _nickCost; }

@@ -93,31 +93,6 @@ void sServerMenu::CharControlMenu(Player* player) {
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 1), player->GetGUID());
 }
 
-void sServerMenu::AccControlMenu(Player* player) {
-    static std::stringstream ss;
-    ss.str("");
-    const char* broadcastText = player->GetSession()->GetAutobroadcast() ?
-        (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? RU_ACC_CONTROL_BROADCAST_ON : EN_ACC_CONTROL_BROADCAST_ON) :
-        (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? RU_ACC_CONTROL_BROADCAST_OFF : EN_ACC_CONTROL_BROADCAST_OFF);
-    ss << (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? RU_ACC_CONTROL_BROADCAST : EN_ACC_CONTROL_BROADCAST) << broadcastText;
-
-    ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ss.str().c_str(), GOSSIP_SENDER_MAIN + 18, 0);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, "Назад", "Back"), GOSSIP_SENDER_MAIN, 0);
-    player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 8), player->GetGUID());
-}
-
-void sServerMenu::SetBroadcastControl(Player* player) {
-
-    uint32 accountId = player->GetSession()->GetAccountId();
-
-    if (!accountId)
-        return;
-
-    player->GetSession()->SetAutobroadcast(!player->GetSession()->GetAutobroadcast());
-    sServerMenuMgr->AccControlMenu(player);
-}
-
 std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId) 
 {
     if (!player)
@@ -152,12 +127,10 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
         case 1: {
             if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
-                ss << "Позволяет вам обменивать очки чести на опыт, удалять сохраненные подземелья, отремонтировать предметы,";
-                ss << "обменивать эмблемы, использовать банк и почту, а также управлять их профессиями.";
-                ss << "Этот интерфейс поможет вам легко управлять различными аспектами из игрового процесса и облегчить вашу игру.\n";
+                ss << "В данном разделе будет добавлятся уникальные разработки как и стандарт по нужде игрокам.\n";
             } else {
                 ss << "Greetings, " << player->GetName() << "\n\n";
-                ss << "Allows you to exchange honor points for experience, delete saved dungeons, repair items, trade emblems, use the bank and mail, and manage their professions. This interface will help you easily manage various aspects of the gameplay and make your game easier.\n";
+                ss << "In this section, unique developments will be added as well as a standard according to the needs of the players.\n";
             }
         } break;
         case 2: {
@@ -248,16 +221,6 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
                 ss << "Exchange rate 1000 honor = 1 arena.";
             }
         } break;              
-
-        case 8: {
-            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
-                ss << "Приветствую вас, " << player->GetName() << "\n\n";
-                ss << "Это интуитивный интерфейс, который дает вам полный доступ к настройкам вашего аккаунта. Здесь вы можете настроить ваш профиль, управлять паролем и безопасностью, отслеживать свои транзакции и многое другое. Этот раздел предлагает вам полный контроль над вашим аккаунтом и позволяет настраивать его так, как вам нравится, сделав вашу игру более комфортной и приятной.\n";
-            } else {
-                ss << "Greetings, " << player->GetName() << "\n\n";
-                ss << "Is an intuitive interface that gives you full access to your account settings. Here you can customize your profile, manage your password and security, track your transactions and much more. This section offers you complete control over your account and allows you to customize it as you wish, making your game more comfortable and pleasant.";
-            }
-        } break;
 
         default: break;
     }

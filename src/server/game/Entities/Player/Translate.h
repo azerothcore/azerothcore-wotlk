@@ -822,13 +822,4 @@
 #define RU_DONAT_MENU_OPTION "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:17:17:-1:1|t Разные функции"
 #define EN_DONAT_MENU_OPTION "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:17:17:-1:1|t Miscellaneous functions"
 
-#define RU_ACC_CONTROL_BROADCAST "Режим подсказок "
-#define EN_ACC_CONTROL_BROADCAST "Autobroadcast "
-
-#define RU_ACC_CONTROL_BROADCAST_ON "включен"
-#define EN_ACC_CONTROL_BROADCAST_ON "enable"
-
-#define RU_ACC_CONTROL_BROADCAST_OFF "выключен"
-#define EN_ACC_CONTROL_BROADCAST_OFF "disable"
-
 #endif
