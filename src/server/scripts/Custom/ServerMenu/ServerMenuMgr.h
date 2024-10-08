@@ -65,6 +65,8 @@ public:
     void BuyVip(Player* /*player*/, uint16 /*days*/);
     void RemoveAuraForVip(Player* /*player*/, bool /*disert*/);
     void VipSetBuff(Player* /* player */);
+    /* Обучение маунтов */
+    void VipMountLearn(Player* /*player*/);
 
 private:
     static const uint32 _factionCost = 50;

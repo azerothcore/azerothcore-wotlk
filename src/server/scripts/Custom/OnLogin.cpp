@@ -5,11 +5,9 @@
 #include "Item.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
+#include "ServerMenu/ServerMenuMgr.h"
 
 const uint32 SPELL_DEMENTIA = 40874;
-//                           сколл    
-uint32 vip_buff[] = { 31700, 18991, 18992}; /* указывать ид спеллов через запятую, например:  123, 321, 5432 */
-uint32 count_spell = 3;                     /* количесто спеллов */
 
 struct Event
 {
@@ -91,25 +89,6 @@ public:
 
         player->VerifiedRankBuff(map);
     }
-
-    void PremiumSpell(Player* player)
-    {
-        if (player->GetSession()->IsPremium())
-        {
-            for (uint32 i = 0; i < count_spell; i++) {
-                if (!player->HasSpell(vip_buff[i]))
-                    player->learnSpell(vip_buff[i], false);
-            }
-        }
-        else
-        {
-            for (uint32 i = 0; i < count_spell; i++) {
-                if (player->HasSpell(vip_buff[i]))
-                    player->removeSpell(vip_buff[i], SPEC_MASK_ALL, false);
-            }
-        }
-    }        
-    
 
     void RemoveDementia(Player* player) 
     {
@@ -199,7 +178,7 @@ public:
         player->LoadPvPRank();
 
         RemoveDementia(player);
-        PremiumSpell(player);
+        sServerMenuMgr->VipMountLearn(player);
 
         Map *map = player->GetMap();
         if (!map)

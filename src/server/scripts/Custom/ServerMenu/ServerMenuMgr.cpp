@@ -152,12 +152,12 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "У вас " << player->GetHonorPoints() << " очков чести.\n\n";
                 ss << "В данном разделе вы можете обменять очки чести на опыт для ранга.\n\n";
-                ss << "Каждый ваш ранг снижает цену на обмен на 200 очков чести.";
+                ss << "Каждый ваш ранг снижает цену на обмен на 100 очков чести.";
             } else {
                 ss << "Greetings, " << player->GetName() << "\n\n";
                 ss << "You have " << player->GetHonorPoints() << " honor points.\n\n";
                 ss << "In this section, you can exchange honor points for experience for a rank.\n\n";
-                ss << "Each of your ranks reduces the exchange price for 200 honor points.";
+                ss << "Each of your ranks reduces the exchange price for 100 honor points.";
             }
         } break;
 
@@ -273,7 +273,7 @@ uint32 sServerMenu::CalculHonorForExp(Player* player, uint32 honor, uint8 count)
     if (!player || !honor)
         return 0;
 
-    return uint32(honor - (player->GetRankByExp() * 200 * count));
+    return uint32(honor - (player->GetRankByExp() * 100 * count));
 }
 
 void sServerMenu::ConfirmExchangeHonorForExp(Player* player, uint32 honor, uint32 exp, uint8 count) 
@@ -479,16 +479,24 @@ void sServerMenu::SendHonorToPlayer(Player* sender, ObjectGuid receiver, uint32 
     return sServerMenuMgr->OpenTradeHonor(sender);
 }
 
-void sServerMenu::GetVipStatus(Player* player, uint16 days) {
+void sServerMenu::GetVipStatus(Player* player, uint16 days) 
+{
+    if (!player)
+        return;
 
     const uint32 modtime = days * 86400; // кол дней
     const uint32 login   = player->GetSession()->GetAccountId();
 
+    /* обновляем статус без релога */
+    player->GetSession()->SetPremium(true);
+
     LoginDatabasePreparedStatement* SETpremium = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_PREMIUM);
     SETpremium->SetData(0, login);
     SETpremium->SetData(1, modtime);
-
     LoginDatabase.Execute(SETpremium);
+
+    /* маунты */
+    sServerMenuMgr->VipMountLearn(player);
 }
 
 void sServerMenu::BuyVip(Player* player, uint16 days) 
@@ -505,9 +513,6 @@ void sServerMenu::BuyVip(Player* player, uint16 days)
 
         player->GetSession()->SetBonuses(rest);
         sServerMenuMgr->GetVipStatus(player, days);
-
-        /* обновляем статус без релога */
-        player->GetSession()->SetPremium(true);
 
         if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
             NOTIFI << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Премиум Аккаунт]: Поздравляем! Вы получили |cffffff4dпремиум|cffff9933 аккаунт на ( ";
@@ -586,4 +591,25 @@ void sServerMenu::VipSetBuff(Player* player)
         if(!player->HasAura(i))
             player->CastSpell(player, i,true);
     player->PlayerTalkClass->SendCloseGossip();
+}
+
+void sServerMenu::VipMountLearn(Player* player)
+{
+    if (!player)
+        return;
+
+    const uint32 vip_buff[] = { 31700, 18991, 18992}; /* указывать ид спеллов через запятую, например:  123, 321, 5432 */
+    const uint32 count_spell = 3;                     /* количесто спеллов */    
+
+    if (player->GetSession()->IsPremium()) {
+        for (uint32 i = 0; i < count_spell; i++) {
+            if (!player->HasSpell(vip_buff[i]))
+                player->learnSpell(vip_buff[i], false);
+        }
+    } else {
+        for (uint32 i = 0; i < count_spell; i++) {
+            if (player->HasSpell(vip_buff[i]))
+                player->removeSpell(vip_buff[i], SPEC_MASK_ALL, false);
+        }
+    }   
 }

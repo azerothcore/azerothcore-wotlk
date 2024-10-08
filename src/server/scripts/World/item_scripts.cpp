@@ -22,6 +22,8 @@
 #include "Spell.h"
 #include "Translate.h"
 #include "WorldSession.h"
+#include "../Custom/ServerMenu/ServerMenuMgr.h"
+
 
 #define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
@@ -261,8 +263,11 @@ public:
 
     bool OnUse(Player* pPlayer, Item* pItem, const SpellCastTargets& /*pTargets*/) override
     {
-        if (pPlayer->GetAuraCount(71201) >= 100)
+        if (!pPlayer || !pItem)
             return true;
+
+        if (pPlayer->GetAuraCount(71201) >= 100)
+            return true;            
 
         uint32 entry = pItem->GetEntry();
         uint32 rate = 0;
@@ -300,6 +305,42 @@ public:
     }
 };
 
+class PremiumItemGetter : public ItemScript
+{
+public:
+    PremiumItemGetter() : ItemScript("PremiumItemGetter") { }
+
+    bool OnUse(Player* pPlayer, Item* pItem, const SpellCastTargets& /*pTargets*/) override
+    {
+        if (!pPlayer || !pItem)
+            return true;
+
+        if (pPlayer->GetSession()->IsPremium()) {
+            ChatHandler(pPlayer->GetSession()).PSendSysMessage(GetText(pPlayer, 
+            "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Премиум Аккаунт]: Дождитеcь окончание премиума перед использованием.", 
+            "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Premium Account]: Wait until the end of the premium before using"));
+            return true;
+        }    
+
+        uint32 entry = pItem->GetEntry();
+        uint32 days = 1;
+
+        switch (entry) {
+            // 1 день
+            case 34631: days = 1; break;
+            // 7 дней    
+            case 34632: days = 7; break;
+            // 31 дня
+            case 34633: days = 31; break;
+            default: break;
+        }
+
+        pPlayer->DestroyItemCount(entry, 1, true);
+        sServerMenuMgr->GetVipStatus(pPlayer, days);
+        return true;
+    }
+};
+
 void AddSC_item_scripts()
 {
     new item_only_for_flight();
@@ -312,4 +353,5 @@ void AddSC_item_scripts()
     new BonusGetOnAccountItem();
     new RandomMorphItem();
     new ItemUse_Glory_Exp();
+    new PremiumItemGetter();
 }

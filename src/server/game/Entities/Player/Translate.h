@@ -770,4 +770,7 @@
 #define EN_TOKEN_EXCHANGE_SUCCESS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Exchanger]: The exchange has been successful.|r"
 #define RU_TOKEN_EXCHANGE_SUCCESS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Обменник]: Обмен успешно произошел.|r"
 
+#define EN_ONLINE_REWARD "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Online Reward]: You have successfully received the bonus for online.|r"
+#define RU_ONLINE_REWARD "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Онлайн Награда]: Вы успешно получили бонус за онлайн.|r"
+
 #endif
