@@ -366,9 +366,9 @@ public:
             case 34634: bigEvent = true; prize = 1; break;
             case 34635: bigEvent = true; prize = 2; break;
             case 34636: bigEvent = true; prize = 3; break;
-            case 20486: /* авто ивент осада столиц */
             case 34628: bigEvent = false; prize = 1; break;
             case 34629: bigEvent = false; prize = 2; break;
+            case 20486: /* авто ивент осада столиц */
             case 34630: bigEvent = false; prize = 3; break;
             default: break;
         }

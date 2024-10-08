@@ -6224,6 +6224,9 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
 
     honor_f *= sWorld->getRate(RATE_HONOR);
 
+    if (sServerMenuMgr->isDoubleDays())
+        honor_f *= 1.25f;    
+
     if (GetSession()->IsPremium())
         honor_f *= sWorld->getRate(RATE_HONOR_PREMIUM);
 
@@ -16416,7 +16419,7 @@ void Player::RewardRankPoints(uint32 amount, int source)
         return;
 
     if (sServerMenuMgr->isDoubleDays())
-        amount *= 1.5f;
+        amount *= 1.25f;
 
     if (GetSession()->IsPremium())
         amount *= sWorld->getRate(RATE_RANK_REWARD_PREMIUM);    
