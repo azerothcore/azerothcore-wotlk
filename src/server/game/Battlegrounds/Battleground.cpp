@@ -1299,6 +1299,9 @@ void Battleground::AddPlayer(Player* player)
     if (player->HasPlayerFlag(PLAYER_FLAGS_AFK))
         player->ToggleAFK();
 
+    if (player->GetGroup() && m_ArenaType == ARENA_TYPE_5v5)
+        player->GetGroup()->Disband();   
+
     sScriptMgr->OnBattlegroundBeforeAddPlayer(this, player);
 
     // score struct must be created in inherited class
