@@ -174,7 +174,7 @@ class event_npc_firelord : public CreatureScript
                     EnterEvadeMode(EVADE_REASON_OTHER);
                 }
 
-                if (me->GetPositionX() < 223.0f || me->GetPositionX() > 290.0f) {
+                if (me->GetPositionX() < 220.0f) {
                     me->CombatStop(true);
                     EnterEvadeMode(EVADE_REASON_OTHER);
                 }
