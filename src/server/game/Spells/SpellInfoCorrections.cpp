@@ -2344,13 +2344,16 @@ void SpellMgr::LoadSpellInfoCorrections()
     });
 
     // Trial of the Champion, Desecration
-    ApplySpellFix({ 67778, 67877 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 68766;
-    });
+    // ApplySpellFix({ 67778, 67877 }, [](SpellInfo* spellInfo)
+    // {
+    //     spellInfo->Effects[EFFECT_0].TriggerSpell = 68766;
+    // });
 
-    // Killing Spree (Off hand damage)
-    ApplySpellFix({ 57842 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({
+        55741, // Desecration (Rank 1)
+        68766, // Desecration (Rank 2)
+        57842  // Killing Spree (Off hand damage)
+    }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(2); // Melee Range
     });
