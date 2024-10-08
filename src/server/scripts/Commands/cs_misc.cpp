@@ -651,6 +651,13 @@ public:
             return false;
         }
 
+        // запрет прописи ранга
+        if (spell->Id == 71201) {
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         Aura::TryRefreshStackOrCreate(spell, MAX_EFFECT_MASK, target, target);
 
         return true;

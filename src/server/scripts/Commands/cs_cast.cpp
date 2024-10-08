@@ -106,6 +106,13 @@ public:
         if (!CheckSpellExistsAndIsValid(handler, spell))
             return false;
 
+        // запрет прописи ранга
+        if (spell->Id == 71201) {
+            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         Optional<TriggerCastFlags> triggerFlags = GetTriggerFlags(triggeredStr);
         if (!triggerFlags)
             return false;
