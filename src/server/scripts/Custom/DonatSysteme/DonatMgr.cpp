@@ -7,6 +7,7 @@
 #include "GossipDef.h"
 #include "Language.h"
 #include "DeathMatch.h"
+#include "../ServerMenu/ServerMenuMgr.h"
 
 /* ################  загрузка таблиц ################ */
 void DonationSysteme::LoadDonationSystemeListContainer() 
@@ -54,6 +55,8 @@ void DonationSysteme::DonationSystemeListMain(Player* player) {
     for (DonationSysteme::DonationSysteme_Container::const_iterator itr = m_DonationSysteme_Container.begin(); itr != m_DonationSysteme_Container.end(); ++itr)
         if ((*itr)->gossip_menu == 0)
             AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, (*itr)->name_RU, (*itr)->name_EN), GOSSIP_SENDER_MAIN + 13, (*itr)->id);
+    // меню опций
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_DONAT_MENU_OPTION, EN_DONAT_MENU_OPTION), GOSSIP_SENDER_MAIN + 16, 0);   
     AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 0);
     player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
 }
@@ -67,6 +70,19 @@ void DonationSysteme::GetDonationSystemeAfter(Player* player, uint32 action, uin
     }
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 3);
     player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
+}
+
+void DonationSysteme::DonatOption(Player* player)
+{
+    if (!player)
+        return;
+
+    ClearGossipMenuFor(player);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_4, EN_CHAR_CONTROL_4), GOSSIP_SENDER_MAIN + 1, 2, sServerMenuMgr->ConfirmChangeRFN(player, sServerMenuMgr->getFactionCost()), 0, false);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_5, EN_CHAR_CONTROL_5), GOSSIP_SENDER_MAIN + 1, 3, sServerMenuMgr->ConfirmChangeRFN(player, sServerMenuMgr->getRaceCost()), 0, false);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_6, EN_CHAR_CONTROL_6), GOSSIP_SENDER_MAIN + 1, 4, sServerMenuMgr->ConfirmChangeRFN(player, sServerMenuMgr->getNickCost()), 0, false);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_back_CHAR, EN_back_CHAR), GOSSIP_SENDER_MAIN, 3);
+    player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player), player->GetGUID());
 }
 
 std::string DonationSysteme::ReturnFullName(Player* player, uint32 entry, uint32 cost, uint32 count, uint32 discount) 

@@ -38,6 +38,8 @@ public:
     std::string ReturnFullName(Player* player, uint32 entry, uint32 cost, uint32 count, uint32 discount);
     uint32 returnCost(uint32 cost, uint32 discount);
     void DonationFunction(Player* player, uint32 i);
+    //  меню функция в донате
+    void DonatOption(Player* /*player*/);
     std::string HeadMenu(Player* player);
     void LookingItem(Player* player, uint32 entry);
     void DonatPayementFuction(Player* player, uint32 i);
