@@ -215,8 +215,15 @@ public:
         static ChatCommandTable DeathmatchTable =
         {
             { "join", HandleJoinDmCommand, SEC_PLAYER, Console::No},
+            { "visual", HandleChangeVisualCommand, SEC_PLAYER, Console::No},
             { "exit", HandleExitDmCommand, SEC_PLAYER, Console::No},
         };
+
+        static ChatCommandTable VisualCommand =
+        {
+            { "off", HandleChangeVisualOffCommand, SEC_PLAYER, Console::No},
+            { "on", HandleChangeVisualCommand, SEC_PLAYER, Console::No},
+        };        
 
         static ChatCommandTable commandTable =
         {
@@ -224,6 +231,7 @@ public:
             { "donat", ServerDonatSysteme },
             { "join", JoinOloCommand },
             { "dm", DeathmatchTable },
+            { "visual", VisualCommand },
         };
         return commandTable;
     }
@@ -236,6 +244,35 @@ public:
 
         DeathMatchMgr->AddPlayer(targetPlayer);
         return true;
+    }
+
+    static bool HandleChangeVisualOffCommand(ChatHandler* handler)
+    {
+        Player* targetPlayer = handler->GetSession()->GetPlayer();
+        if (targetPlayer) {
+            targetPlayer->RemoveAura(69960);
+            targetPlayer->RemoveAura(60352);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    static bool HandleChangeVisualCommand(ChatHandler* handler)
+    {
+        Player* targetPlayer = handler->GetSession()->GetPlayer();
+        Player* plr = handler->getSelectedPlayer();
+
+        if (!plr || !plr->IsInWorld() || plr->IsDuringRemoveFromWorld() || plr->IsBeingTeleported())
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            handler->SetSentErrorMessage(true);
+            return false;
+        } else {
+            plr->CastSpell(targetPlayer, 69960, false); // nick
+            plr->CastSpell(targetPlayer, 60352, false); // equip
+            return true;
+        }  
     }
 
     static bool HandleExitDmCommand(ChatHandler* handler)
