@@ -7,6 +7,7 @@
 #include "ReputationMgr.h"
 
 const uint32 SPELL_DEMENTIA = 40874;
+//                           сколл    
 uint32 vip_buff[] = { 31700, 18991, 18992}; /* указывать ид спеллов через запятую, например:  123, 321, 5432 */
 uint32 count_spell = 3;                     /* количесто спеллов */
 
@@ -20,9 +21,7 @@ enum Enums
         FIRST_DELAY    = 5000,
         SECOND_DELAY   = 10000,
         THIRD_DELAY    = 15000,
-        FOURTH_DELAY   = 20000,
-        FIFETH_DELAY   = 25000,
-        BACK_DELAY     = 30000,
+        FOURTH_DELAY   = 20000
 };
 
 static std::map<ObjectGuid, Event> _events;
@@ -57,18 +56,8 @@ public:
                     break;
 
                 case 3:
-                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sЧуть дальше прямо стоят мастера арены - арена спектатор - 3vs3 SoloQueue", icon_color);
-                    _events[pEvent].Events = 4;
-                    break;
-
-                case 4:
-                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sУ вас первоначальное задание: 'Добро пожаловать' выполните его, это цепочка чтобы получить первый ранг.", icon_color);
-                    _events[pEvent].Events = 5;
-                    break;
-
-                case 5:
                     ChatHandler(_Plr->GetSession()).PSendSysMessage("%sМы желаем вам приятной игры на нашем проекте <3", icon_color);
-                    _events.clear();
+                    _events[pEvent].Events = 5;
                     break;
             }
             return true;
@@ -199,8 +188,6 @@ public:
         player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(SECOND_DELAY));
         player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(THIRD_DELAY));
         player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(FOURTH_DELAY));
-        player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(FIFETH_DELAY));
-        player->m_Events.AddEvent(new Information_Server(player), player->m_Events.CalculateTime(BACK_DELAY));
     }
 
     void OnLogin(Player* player) override
