@@ -1040,7 +1040,11 @@ class event_mage_fire : public CreatureScript
 
         struct event_mage_fireAI : public ScriptedAI
         {
-            event_mage_fireAI(Creature *c) : ScriptedAI(c) {}
+            event_mage_fireAI(Creature *c) : ScriptedAI(c) 
+            {
+                InitialPosition = c->GetPosition();
+                MaxDistance = 100.0f;
+            }
 
             uint32 m_uiHealTimer;
             uint32 m_uiFFireballTimer;
@@ -1142,6 +1146,9 @@ class event_mage_fire : public CreatureScript
                 if (!UpdateVictim())
                     return;
 
+                if (me->GetDistance(InitialPosition) > MaxDistance)
+                    me->GetMotionMaster()->MovePoint(0, InitialPosition);                    
+
                 if (me->HasUnitState(UNIT_STATE_CASTING))
                     return;
 
@@ -1202,6 +1209,9 @@ class event_mage_fire : public CreatureScript
 
                 DoMeleeAttackIfReady();
             }
+        private:
+            Position InitialPosition;
+            float MaxDistance;
         };
 
         CreatureAI* GetAI(Creature* creature) const
