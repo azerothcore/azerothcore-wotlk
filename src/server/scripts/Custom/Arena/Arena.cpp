@@ -84,10 +84,10 @@ void ArenaOne::JoinQueue(Player* player)
     if (!player)
         return;    
 
-    if (player->GetRankByExp() < 5) {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_glory_win_9, EN_glory_win_9), 5);
-        return ArenaOneMgr->ArenaMainMenu(player);
-    }   
+    // if (player->GetRankByExp() < 5) {
+    //     ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_glory_win_9, EN_glory_win_9), 5);
+    //     return ArenaOneMgr->ArenaMainMenu(player);
+    // } 
 
     if (!player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5))) {
         CreateArenateam(player);
