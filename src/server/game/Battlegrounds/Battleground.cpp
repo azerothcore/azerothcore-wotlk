@@ -300,7 +300,7 @@ void Battleground::Update(uint32 diff)
                         {
                             if (Player* player = ObjectAccessor::FindPlayer(itr->first))
                             {
-                                if (player->InArena() && GetArenaType() == ARENA_TYPE_5v5 && GetStatus() != STATUS_WAIT_LEAVE)
+                                if (player->InArena() && (GetArenaType() == ARENA_TYPE_5v5 || GetArenaType() == ARENA_TYPE_2v2) && GetStatus() != STATUS_WAIT_LEAVE)
                                 {
                                     Aura* demAura = player->GetAura(40874);
 
