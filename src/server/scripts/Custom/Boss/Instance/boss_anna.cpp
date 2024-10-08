@@ -69,7 +69,7 @@ public:
 			_events.Reset();
 		}
 
-		void EnterCombat(Unit* /*who*/) override
+		void EnterCombat(Unit* /*who*/)
 		{
             me->Yell(SAY_PHASE_ZERO, LANG_UNIVERSAL);
 			_events.SetPhase(PHASE_ONE);
