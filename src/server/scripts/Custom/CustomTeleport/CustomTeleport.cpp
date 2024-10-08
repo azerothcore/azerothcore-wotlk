@@ -11,6 +11,7 @@
 #include "ScriptMgr.h"
 #include "DeathMatch.h"
 #include "ArenaOnevsOne.h"
+#include "../DonatSysteme/DonatMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -178,6 +179,13 @@ public:
         // прогрузка телепорт мест
         LOG_INFO("Custom.TeleportMaster", ">> TeleportMaster: Loading teleport lists ...");
         sCustomTeleportMgr->LoadTeleportListContainer();
+
+        // создаем базу если не создано
+        CharacterDatabase.DirectExecute(DonationSystemeMgr->sql_donation_systeme);
+
+        // прогрузка телепорт мест
+        LOG_INFO("Custom.DonationSyteme", ">> DonationSyteme: Loading donat item lists ...");
+        DonationSystemeMgr->LoadDonationSystemeListContainer();    
     }
 };
 
@@ -192,6 +200,11 @@ public:
         {
             {"reload", HandleReloadServerMenuCommand, SEC_ADMINISTRATOR, Console::No},
         };
+
+        static ChatCommandTable ServerDonatSysteme =
+        {
+            {"reload", HandleReloadDonatSystemeCommand, SEC_ADMINISTRATOR, Console::No},
+        };        
 
         static ChatCommandTable JoinOloCommand =
         {
@@ -208,6 +221,7 @@ public:
         static ChatCommandTable commandTable =
         {
             { "tpmaster", ServerMenuTable },
+            { "donat", ServerDonatSysteme },
             { "join", JoinOloCommand },
             { "dm", DeathmatchTable },
         };
@@ -266,6 +280,14 @@ public:
         else /* приглашаем в очередь */
             wintergrasp->InvitePlayerToQueue(targetPlayer);
         return true;
+    }
+
+    static bool HandleReloadDonatSystemeCommand(ChatHandler* handler)
+    {
+        LOG_INFO("Custom.DonationSyteme", ">> Reloading `server_donat_menu` table.");
+        DonationSystemeMgr->LoadDonationSystemeListContainer();        
+        handler->SendGlobalGMSysMessage("DB table `server_donat_menu` reloaded.");
+        return true;        
     }
 
     static bool HandleReloadServerMenuCommand(ChatHandler* handler)

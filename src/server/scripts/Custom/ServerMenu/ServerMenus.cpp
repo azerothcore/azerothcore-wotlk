@@ -4,6 +4,7 @@
 #include "ScriptedGossip.h"
 #include "../Profession/NpcProfessionMgr.h"
 #include "../CustomTeleport/CustomTeleport.h"
+#include "../DonatSysteme/DonatMgr.h"
 #include "ArenaOnevsOne.h"
 
 class ServerMenuPlayerGossip : public PlayerScript
@@ -29,7 +30,7 @@ public:
                     // Ранг система - ок
                     case 2: sServerMenuMgr->RankInfo(player); break;
                     // Магазин
-                    case 3: sServerMenuMgr->CommingSoon(player);break;
+                    case 3: DonationSystemeMgr->DonationSystemeListMain(player); break;
                     // Премиум
                     case 4: player->GetSession()->IsPremium() ? sServerMenuMgr->GetVipMenu(player) : sServerMenuMgr->GetVipMenuForBuy(player); break;
                     // Управление персонажем - ок
@@ -108,7 +109,7 @@ public:
             // Раздел обменника очков чести
             case GOSSIP_SENDER_MAIN + 7: {
                 uint8 count = action == 1250 ? 25 : action == 500 ? 10 : action == 250 ? 5 : action == 100 ? 2 : 1;
-                sServerMenuMgr->ConfirmExchangeHonorForExp(player, action*100, action, count);
+                sServerMenuMgr->ConfirmExchangeHonorForExp(player, action*200, action, count);
             } break;
 
             // Раздел обменника эмблем
@@ -137,6 +138,21 @@ public:
             case GOSSIP_SENDER_MAIN + 12: {
                 sServerMenuMgr->RewardEvent(player, 3, action);
             } break;
+
+            // Магазин выбраная категория
+            case GOSSIP_SENDER_MAIN + 13: {
+                DonationSystemeMgr->GetDonationSystemeAfter(player, action, player->getClass());
+            } break;
+
+            // Магазин пред покупка предмета
+            case GOSSIP_SENDER_MAIN + 14: {
+                DonationSystemeMgr->DonatPayementFuction(player, action);
+            } break;
+
+            // Магазин покупка предмета
+            case GOSSIP_SENDER_MAIN + 15: {
+                DonationSystemeMgr->DonationFunction(player, action);
+            } break;            
 
             default: break;
         } 
