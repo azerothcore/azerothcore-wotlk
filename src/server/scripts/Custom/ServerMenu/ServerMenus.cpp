@@ -68,6 +68,8 @@ public:
                     case 9: sServerMenuMgr->ExchangerToken(player); break;
                     // Ремонт предметов
                     case 10: sServerMenuMgr->RepairItems(player); break;
+                    // Обмен очков чести на очки арены
+                    case 11: sServerMenuMgr->GossipMenuExchangeArena(player); break;
                 }
             } break;
 
@@ -153,7 +155,17 @@ public:
             // Магазин покупка предмета
             case GOSSIP_SENDER_MAIN + 15: {
                 DonationSystemeMgr->DonationFunction(player, action);
-            } break;            
+            } break;
+
+            // Опции для доната (смена ника, итд)
+            case GOSSIP_SENDER_MAIN + 16: {
+                DonationSystemeMgr->DonatOption(player);
+            } break; 
+
+            case GOSSIP_SENDER_MAIN + 17: {
+                sServerMenuMgr->ConfirmExchangeHonorForArena(player, action);
+            } break;     
+
 
             default: break;
         } 

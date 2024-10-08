@@ -58,6 +58,7 @@ class duel_reset : public PlayerScript
         if (player->HasAura(57723))
             player->RemoveAura(57723);
         player->RemoveAllSpellCooldown();
+        player->RemoveArenaSpellCooldowns(false);
         player->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
     }
 

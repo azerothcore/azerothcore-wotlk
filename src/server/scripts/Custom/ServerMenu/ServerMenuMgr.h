@@ -22,7 +22,7 @@ public:
     void OpenMailSlot(Player* /*player*/);
     void ChangeRFN(Player* /*player*/, int /*i*/);
     std::string ConfirmChangeRFN(Player* /*player*/, uint32 /*cost*/);
-    std::string HeadMenu(Player* /*player*/, uint8 /*MenuId*/);
+    std::string HeadMenu(Player* /*player*/, uint8 MenuId = 0);
     void CharControlMenu(Player* /*player*/);
     void GossipHelloMenu(Player* /*player*/);
     void CommingSoon(Player* player);
@@ -43,13 +43,18 @@ public:
 
     // Главное меню обменика
     void GossipMenuExchangeHonor(Player* /*player*/);
+    // Обменник очков чести на очки арены
+    void GossipMenuExchangeArena(Player* /*player*/);
     // Отоброжение в менюшке сколько что стоит
     std::string ConverterHonorRang(Player* /*player*/, uint32 /*honor*/, uint32 /*exp*/, uint8 /* count */);
+    // Отоброжение в меню сколько обменять на сколько
+    std::string ConverterHonorToArena(Player* /*player*/, uint32 /*honor*/);
     // Расчёт сколько хонора будет стоить
     uint32 CalculHonorForExp(Player* /*player*/, uint32 /*honor*/, uint8 /* count */);
     // Подтверждение обмена валюты
     void ConfirmExchangeHonorForExp(Player* /*player*/, uint32 /*honor*/, uint32 /*exp*/, uint32 /* count */);
-
+    // Подтверждение обмена очков чести на арену
+    void ConfirmExchangeHonorForArena(Player* /*player*/, uint32 /*arena*/);
     // сброс кд инстов
     void InstanceResetCooldown(Player* /*player*/);
 

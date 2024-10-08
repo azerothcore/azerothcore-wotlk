@@ -768,6 +768,9 @@
 #define RU_HONOR_EXCHANGE_MAIN "|TInterface/ICONS/Inv_crate_07:18:18:-20|tОбменять очки чести на опыт"
 #define EN_HONOR_EXCHANGE_MAIN "|TInterface/ICONS/Inv_crate_07:18:18:-20|tExchanger honor points for exp"
 
+#define RU_ARENA_EXCHANGE_MAIN "|TInterface/ICONS/Inv_cask_01:18:18:-20|tОбменять очки чести на очки арены"
+#define EN_ARENA_EXCHANGE_MAIN "|TInterface/ICONS/Inv_cask_01:18:18:-20|tExchanger honor points for arena points"
+
 #define RU_RESET_INSTANCE_CD "|TInterface/ICONS/Inv_scroll_05:18:18:-20|tУдалить мои сохраненные подземелья"
 #define EN_RESET_INSTANCE_CD "|TInterface/ICONS/Inv_scroll_05:18:18:-20|tRemove my instance saves"
 
@@ -806,4 +809,7 @@
 
 #define EN_WIN_EVENT_BOSS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Capital Siege]: You have received a reward for winning the auto event! The next auto event will be in 6 часов."
 #define RU_WIN_EVENT_BOSS "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Осада столиц]: Вы получили награду за победу на авто ивенте! Следующий авто ивент будет через 6 часов."
+
+#define RU_DONAT_MENU_OPTION "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:17:17:-1:1|t Разные функции"
+#define EN_DONAT_MENU_OPTION "|TInterface\\icons\\INV_Misc_Tournaments_Banner_Orc:17:17:-1:1|t Miscellaneous functions"
 #endif
