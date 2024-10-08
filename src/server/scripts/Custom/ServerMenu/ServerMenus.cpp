@@ -108,7 +108,7 @@ public:
 
             // Раздел обменника очков чести
             case GOSSIP_SENDER_MAIN + 7: {
-                sServerMenuMgr->ConfirmExchangeHonorForExp(player, action*200, action, action);
+                sServerMenuMgr->ConfirmExchangeHonorForExp(player, action*150, action, action);
             } break;
 
             // Раздел обменника эмблем
