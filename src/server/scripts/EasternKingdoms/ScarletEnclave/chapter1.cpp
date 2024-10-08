@@ -287,10 +287,10 @@ public:
                 playerGUIDs.insert(caster->GetGUID().GetCounter());
                 _duelGUID = caster->GetGUID();
                 _duelInProgress = true;
+                me->SetFacingToObject(caster);
 
                 timer = 600000; // clear playerGUIDs after 10 minutes if no one initiates a duel
-                me->GetMotionMaster()->MoveFollow(caster, 2.0f, 0.0f);
-
+                
                 events.ScheduleEvent(EVENT_SPEAK, 3s);
                 events.ScheduleEvent(EVENT_SPEAK + 1, 7s);
                 events.ScheduleEvent(EVENT_SPEAK + 2, 8s);
