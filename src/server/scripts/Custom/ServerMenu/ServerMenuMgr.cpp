@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Chat.h"
 #include "Translate.h"
+#include <time.h>
 
 using namespace Acore::ChatCommands;
 
@@ -49,27 +50,27 @@ void sServerMenu::ChangeRFN(Player* player, int i)
             if (bonuses >= sServerMenuMgr->getFactionCost()) {
                 player->GetSession()->SetBonuses(uint32(bonuses - sServerMenuMgr->getFactionCost()));
                 player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
-                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "Сделайте релог для применение действий.", "Relog to apply actions."));
+                ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "Сделайте релог для применение действий.", "Relog to apply actions."));
             } else {
-                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,RU_NO_BONUS_HAVE, EN_NO_BONUS_HAVE), sServerMenuMgr->getFactionCost());
+                ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,RU_NO_BONUS_HAVE, EN_NO_BONUS_HAVE), sServerMenuMgr->getFactionCost());
             }
             break;
         case 1:
             if (bonuses >= sServerMenuMgr->getRaceCost()) {
                 player->GetSession()->SetBonuses(uint32(bonuses - sServerMenuMgr->getRaceCost()));
                 player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
-                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "Сделайте релог для применение действий.", "Relog to apply actions."));
+                ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "Сделайте релог для применение действий.", "Relog to apply actions."));
             } else {
-                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,RU_NO_BONUS_HAVE, EN_NO_BONUS_HAVE), sServerMenuMgr->getRaceCost());
+                ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,RU_NO_BONUS_HAVE, EN_NO_BONUS_HAVE), sServerMenuMgr->getRaceCost());
             }
             break;
         case 2:
             if (bonuses >= sServerMenuMgr->getNickCost()) {
                 player->GetSession()->SetBonuses(uint32(bonuses - sServerMenuMgr->getNickCost()));
                 player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
-                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "Сделайте релог для применение действий.", "Relog to apply actions."));
+                ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "Сделайте релог для применение действий.", "Relog to apply actions."));
             } else {
-                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,RU_NO_BONUS_HAVE, EN_NO_BONUS_HAVE), sServerMenuMgr->getNickCost());
+                ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,RU_NO_BONUS_HAVE, EN_NO_BONUS_HAVE), sServerMenuMgr->getNickCost());
             }
             break;
         default: break;
@@ -79,17 +80,17 @@ void sServerMenu::ChangeRFN(Player* player, int i)
 
 void sServerMenu::CharControlMenu(Player* player) {
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_1, EN_CHAR_CONTROL_1), GOSSIP_SENDER_MAIN + 1, 0);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_2, EN_CHAR_CONTROL_2), GOSSIP_SENDER_MAIN + 1, 1);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_3, EN_CHAR_CONTROL_3), GOSSIP_SENDER_MAIN + 1, 5);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_7, EN_CHAR_CONTROL_7), GOSSIP_SENDER_MAIN + 1, 6);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_EXCHANGE_MAIN, EN_HONOR_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 7);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_RESET_INSTANCE_CD, EN_RESET_INSTANCE_CD), GOSSIP_SENDER_MAIN + 1, 8);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_TOKEN_EXCHANGE_MAIN, EN_TOKEN_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 9);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_4, EN_CHAR_CONTROL_4), GOSSIP_SENDER_MAIN + 1, 2, ConfirmChangeRFN(player, sServerMenuMgr->getFactionCost()), 0, false);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_5, EN_CHAR_CONTROL_5), GOSSIP_SENDER_MAIN + 1, 3, ConfirmChangeRFN(player, sServerMenuMgr->getRaceCost()), 0, false);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_CHAR_CONTROL_6, EN_CHAR_CONTROL_6), GOSSIP_SENDER_MAIN + 1, 4, ConfirmChangeRFN(player, sServerMenuMgr->getNickCost()), 0, false);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 0);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_1, EN_CHAR_CONTROL_1), GOSSIP_SENDER_MAIN + 1, 0);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_2, EN_CHAR_CONTROL_2), GOSSIP_SENDER_MAIN + 1, 1);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_3, EN_CHAR_CONTROL_3), GOSSIP_SENDER_MAIN + 1, 5);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_7, EN_CHAR_CONTROL_7), GOSSIP_SENDER_MAIN + 1, 6);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HONOR_EXCHANGE_MAIN, EN_HONOR_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 7);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_RESET_INSTANCE_CD, EN_RESET_INSTANCE_CD), GOSSIP_SENDER_MAIN + 1, 8);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_TOKEN_EXCHANGE_MAIN, EN_TOKEN_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 9);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_4, EN_CHAR_CONTROL_4), GOSSIP_SENDER_MAIN + 1, 2, ConfirmChangeRFN(player, sServerMenuMgr->getFactionCost()), 0, false);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_5, EN_CHAR_CONTROL_5), GOSSIP_SENDER_MAIN + 1, 3, ConfirmChangeRFN(player, sServerMenuMgr->getRaceCost()), 0, false);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_6, EN_CHAR_CONTROL_6), GOSSIP_SENDER_MAIN + 1, 4, ConfirmChangeRFN(player, sServerMenuMgr->getNickCost()), 0, false);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 0);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 1), player->GetGUID());
 }
 
@@ -217,13 +218,13 @@ void sServerMenu::GossipHelloMenu(Player* player)
         return;
 
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_1, EN_HOME_MENU_1), GOSSIP_SENDER_MAIN, 1);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_2, EN_HOME_MENU_2), GOSSIP_SENDER_MAIN, 2);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_3, EN_HOME_MENU_3), GOSSIP_SENDER_MAIN, 3);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_4, EN_HOME_MENU_4), GOSSIP_SENDER_MAIN, 4);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_5, EN_HOME_MENU_5), GOSSIP_SENDER_MAIN, 5);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_6, EN_HOME_MENU_6), GOSSIP_SENDER_MAIN, 6);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_7, EN_HOME_MENU_7), GOSSIP_SENDER_MAIN, 7);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_1, EN_HOME_MENU_1), GOSSIP_SENDER_MAIN, 1);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_2, EN_HOME_MENU_2), GOSSIP_SENDER_MAIN, 2);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_3, EN_HOME_MENU_3), GOSSIP_SENDER_MAIN, 3);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_4, EN_HOME_MENU_4), GOSSIP_SENDER_MAIN, 4);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_5, EN_HOME_MENU_5), GOSSIP_SENDER_MAIN, 5);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_6, EN_HOME_MENU_6), GOSSIP_SENDER_MAIN, 6);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_7, EN_HOME_MENU_7), GOSSIP_SENDER_MAIN, 7);
     player->PlayerTalkClass->GetGossipMenu().SetMenuId(UNIQUE_MENU_ID);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 0), player->GetGUID());
 }
@@ -239,7 +240,7 @@ void sServerMenu::GossipMenuExchangeHonor(Player* player)
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 50000, 250, 5), GOSSIP_SENDER_MAIN + 7, 250);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 100000, 500, 10), GOSSIP_SENDER_MAIN + 7, 500);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 250000, 1250, 25), GOSSIP_SENDER_MAIN + 7, 1250);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, "Назад", "Back"), GOSSIP_SENDER_MAIN, 5);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, "Назад", "Back"), GOSSIP_SENDER_MAIN, 5);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 3), player->GetGUID());    
 }
 
@@ -276,7 +277,7 @@ void sServerMenu::InstanceResetCooldown(Player* player)
                 ++itr;
         }
     }
-    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_RESET_INSTANCE_CD_OK, EN_RESET_INSTANCE_CD_OK));
+    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_RESET_INSTANCE_CD_OK, EN_RESET_INSTANCE_CD_OK));
     player->PlayerTalkClass->SendCloseGossip();
 }
 
@@ -302,7 +303,7 @@ void sServerMenu::ConfirmExchangeHonorForExp(Player* player, uint32 honor, uint3
         player->RewardRankPoints(exp, 7 /*Обменник*/);
         return sServerMenuMgr->GossipMenuExchangeHonor(player);
     } else {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_HONOR_EXCHANGE_FAIL, EN_HONOR_EXCHANGE_FAIL));
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_HONOR_EXCHANGE_FAIL, EN_HONOR_EXCHANGE_FAIL));
         return sServerMenuMgr->GossipMenuExchangeHonor(player);
     }
 }
@@ -345,8 +346,8 @@ void sServerMenu::RankInfo(Player* player)
                 << "At each rank you will have a secret prodigy in which there may be useful things such as: А9-T11, things for transmogrification, mounts, etc.";
     }
 
-    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player, "Обновить", "Refresh"), GOSSIP_SENDER_MAIN, 2);
-    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player, "Назад", "Back"), GOSSIP_SENDER_MAIN, 0);
+    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player, "Обновить", "Refresh"), GOSSIP_SENDER_MAIN, 2);
+    AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player, "Назад", "Back"), GOSSIP_SENDER_MAIN, 0);
     player->PlayerTalkClass->SendGossipMenu(femb.str().c_str(), player->GetGUID());
 }
 
@@ -355,7 +356,7 @@ void sServerMenu::CommingSoon(Player* player)
     if (!player)
         return;
 
-    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Система в разработке, некоторые разделы еще не готовы.", "Система в разработке, некоторые разделы еще не готовы."));
+    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Система в разработке, некоторые разделы еще не готовы.", "Система в разработке, некоторые разделы еще не готовы."));
     player->PlayerTalkClass->SendCloseGossip(); 
 }
 
@@ -366,7 +367,7 @@ bool sServerMenu::CanOpenMenu(Player* player)
 
     if (player->IsInCombat() || player->IsInFlight() || player->IsDeathMatch() || player->GetMap()->IsBattlegroundOrArena()
         || player->HasStealthAura() || player->isDead() || (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609 && !player->IsGameMaster() && !player->HasSpell(50977))) {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "Сейчас это невозможно.", "Now it is impossible"));
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "Сейчас это невозможно.", "Now it is impossible"));
         return true;
     }
     return false;
@@ -378,12 +379,12 @@ void sServerMenu::OpenTradeHonor(Player* player)
         return;
 
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_TRADE_1000, EN_HONOR_TRADE_1000), GOSSIP_SENDER_MAIN, 1000, "После подтверждение введите ник игрока", 0, true);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_TRADE_5000, EN_HONOR_TRADE_5000), GOSSIP_SENDER_MAIN, 5000, "После подтверждение введите ник игрока", 0, true);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_TRADE_10000, EN_HONOR_TRADE_10000), GOSSIP_SENDER_MAIN, 10000, "После подтверждение введите ник игрока", 0, true);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_TRADE_25000, EN_HONOR_TRADE_25000), GOSSIP_SENDER_MAIN, 25000, "После подтверждение введите ник игрока", 0, true);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HONOR_TRADE_50000, EN_HONOR_TRADE_50000), GOSSIP_SENDER_MAIN, 50000, "После подтверждение введите ник игрока", 0, true);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 5);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HONOR_TRADE_1000, EN_HONOR_TRADE_1000), GOSSIP_SENDER_MAIN, 1000, "После подтверждение введите ник игрока", 0, true);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HONOR_TRADE_5000, EN_HONOR_TRADE_5000), GOSSIP_SENDER_MAIN, 5000, "После подтверждение введите ник игрока", 0, true);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HONOR_TRADE_10000, EN_HONOR_TRADE_10000), GOSSIP_SENDER_MAIN, 10000, "После подтверждение введите ник игрока", 0, true);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HONOR_TRADE_25000, EN_HONOR_TRADE_25000), GOSSIP_SENDER_MAIN, 25000, "После подтверждение введите ник игрока", 0, true);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HONOR_TRADE_50000, EN_HONOR_TRADE_50000), GOSSIP_SENDER_MAIN, 50000, "После подтверждение введите ник игрока", 0, true);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 5);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 2), player->GetGUID());
 }
 
@@ -393,9 +394,9 @@ void sServerMenu::ExchangerToken(Player* player)
         return;
 
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_FROST_EXCHANGE_MENU, EN_FROST_EXCHANGE_MENU), GOSSIP_SENDER_MAIN + 8, 1);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_TRIUMF_EXCHANGE_MENU, EN_TRIUMF_EXCHANGE_MENU), GOSSIP_SENDER_MAIN + 8, 2);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 5);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_FROST_EXCHANGE_MENU, EN_FROST_EXCHANGE_MENU), GOSSIP_SENDER_MAIN + 8, 1);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_TRIUMF_EXCHANGE_MENU, EN_TRIUMF_EXCHANGE_MENU), GOSSIP_SENDER_MAIN + 8, 2);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 5);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 4), player->GetGUID());   
 }
 
@@ -410,9 +411,9 @@ void sServerMenu::ExchangerConfirm(Player* player, bool frost)
     if (player->HasItemCount(ID, count)) {
         player->DestroyItemCount(ID, count, true);
         player->AddItem(43228, 1);
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_TOKEN_EXCHANGE_SUCCESS, EN_TOKEN_EXCHANGE_SUCCESS));
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_TOKEN_EXCHANGE_SUCCESS, EN_TOKEN_EXCHANGE_SUCCESS));
     } else {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_TOKEN_EXCHANGE_FAIL, EN_TOKEN_EXCHANGE_FAIL));
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_TOKEN_EXCHANGE_FAIL, EN_TOKEN_EXCHANGE_FAIL));
     }
 
     sServerMenuMgr->ExchangerToken(player);
@@ -424,7 +425,7 @@ void sServerMenu::TradeHonorAccept(Player* player, uint32 honor, char const* nam
         return;
 
     if (player->GetRankByExp() < 5) {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_glory_win_9, EN_glory_win_9), 5);
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_glory_win_9, EN_glory_win_9), 5);
         return sServerMenuMgr->OpenTradeHonor(player); 
     }
 
@@ -444,13 +445,13 @@ void sServerMenu::TradeHonorAccept(Player* player, uint32 honor, char const* nam
 
     // самому себе нельзя
     if (TargetGUID == player->GetGUID()) {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "Вы не можете отправить самому себе!", "You cannot send to yourself!"));
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "Вы не можете отправить самому себе!", "You cannot send to yourself!"));
         return sServerMenuMgr->OpenTradeHonor(player);      
     }
 
     // если у сендера недостаточно хонора
     if (player->GetHonorPoints() < honor) {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "У вас недостаточно очков чести!", "You don't have enough honor points!"));
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "У вас недостаточно очков чести!", "You don't have enough honor points!"));
         return sServerMenuMgr->OpenTradeHonor(player);
     }
 
@@ -469,7 +470,7 @@ void sServerMenu::SendHonorToPlayer(Player* sender, ObjectGuid receiver, uint32 
         // выдает получателю
         Preceiver->ModifyHonorPoints(amount);
         // кидаем нотификацию получателю
-        ChatHandler(Preceiver->GetSession()).PSendSysMessage(GetText(Preceiver, RU_HONOR_TRADE_OK_RECEIVER, EN_HONOR_TRADE_OK_RECEIVER), amount, sender->GetName());
+        ChatHandler(Preceiver->GetSession()).PSendSysMessage(GetCustomText(Preceiver, RU_HONOR_TRADE_OK_RECEIVER, EN_HONOR_TRADE_OK_RECEIVER), amount, sender->GetName());
     } else {
         // если игрок оффлайн то обновляем в базе
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_HONOR_BY_GUID);
@@ -479,7 +480,7 @@ void sServerMenu::SendHonorToPlayer(Player* sender, ObjectGuid receiver, uint32 
     }
 
     // кидаем нотификацию отправителю
-    ChatHandler(sender->GetSession()).PSendSysMessage(GetText(sender, RU_HONOR_TRADE_OK_SENDER, EN_HONOR_TRADE_OK_SENDER), Preceiver ? Preceiver->GetName() : name, amount);
+    ChatHandler(sender->GetSession()).PSendSysMessage(GetCustomText(sender, RU_HONOR_TRADE_OK_SENDER, EN_HONOR_TRADE_OK_SENDER), Preceiver ? Preceiver->GetName() : name, amount);
 
     // логи
     CharacterDatabasePreparedStatement* stmt_log = CharacterDatabase.GetPreparedStatement(CHAR_INS_TRANSFERT_POINTS);
@@ -568,9 +569,9 @@ void sServerMenu::GetVipMenuForBuy(Player* player)
         return;
 
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_NOTVIP_MENU_2, EN_NOTVIP_MENU_2), GOSSIP_SENDER_MAIN + 9, 4, GetText(player, RU_BUY_VIP_TEXT, EN_BUY_VIP_TEXT), 0, false);
-    // AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_NOTVIP_MENU_3, EN_NOTVIP_MENU_3), GOSSIP_SENDER_MAIN + 4, GossipHelloMenu + 1);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 0);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_NOTVIP_MENU_2, EN_NOTVIP_MENU_2), GOSSIP_SENDER_MAIN + 9, 4, GetCustomText(player, RU_BUY_VIP_TEXT, EN_BUY_VIP_TEXT), 0, false);
+    // AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_NOTVIP_MENU_3, EN_NOTVIP_MENU_3), GOSSIP_SENDER_MAIN + 4, GossipHelloMenu + 1);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 0);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 5), player->GetGUID());
 }
 
@@ -580,10 +581,10 @@ void sServerMenu::GetVipMenu(Player* player)
         return;
 
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_VIP_MENU_1, EN_VIP_MENU_1), GOSSIP_SENDER_MAIN + 9, 1);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_VIP_MENU_2, EN_VIP_MENU_2), GOSSIP_SENDER_MAIN + 9, 2);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_VIP_MENU_3, EN_VIP_MENU_3), GOSSIP_SENDER_MAIN + 9, 3);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 0);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_VIP_MENU_1, EN_VIP_MENU_1), GOSSIP_SENDER_MAIN + 9, 1);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_VIP_MENU_2, EN_VIP_MENU_2), GOSSIP_SENDER_MAIN + 9, 2);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_VIP_MENU_3, EN_VIP_MENU_3), GOSSIP_SENDER_MAIN + 9, 3);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 0);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player,  5), player->GetGUID());
 }
 
@@ -699,7 +700,7 @@ void sServerMenu::RewardEvent(Player* player, uint8 value, uint32 amount)
         default: break;
     }
 
-    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Награда за ивент]: Вы успешно получили награду за ивент.", "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Event Reward]: You have successfully received an event reward."));
+    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Награда за ивент]: Вы успешно получили награду за ивент.", "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Event Reward]: You have successfully received an event reward."));
 
     // удаляем предмет после выбора пункта
     player->DestroyItemCount(GetItemRewardID(), 1, true);
@@ -714,4 +715,10 @@ void sServerMenu::RewardEvent(Player* player, uint8 value, uint32 amount)
     CharacterDatabase.Execute(stmt_log);
 
     player->PlayerTalkClass->SendCloseGossip();  
+}
+
+bool sServerMenu::isDoubleDays() {
+    time_t t = time(nullptr);
+    tm* now = localtime(&t);
+    return now->tm_wday == 6 || now->tm_wday == 0;
 }

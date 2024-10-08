@@ -5,8 +5,6 @@
 
 using namespace std;
 
-#define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
-
 #define RankVendorID 44199
 
 class npc_pvp_rang_10 : public CreatureScript
@@ -42,8 +40,8 @@ public:
 
         if (player->GetAuraCount(71201) == 0)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
         }
 
         player->PlayerTalkClass->SendGossipMenu(femb.str().c_str(), creature->GetGUID());
@@ -98,8 +96,8 @@ public:
 
         if (player->GetAuraCount(71201) < 11)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
         }
 
         player->PlayerTalkClass->SendGossipMenu(femb.str().c_str(), creature->GetGUID());
@@ -154,8 +152,8 @@ public:
 
         if (player->GetAuraCount(71201) < 21)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
         }
 
         player->PlayerTalkClass->SendGossipMenu(femb.str().c_str(), creature->GetGUID());
@@ -210,8 +208,8 @@ public:
 
         if (player->GetAuraCount(71201) < 31)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
         }
 
         player->PlayerTalkClass->SendGossipMenu(femb.str().c_str(), creature->GetGUID());
@@ -266,8 +264,8 @@ public:
 
         if (player->GetAuraCount(71201) < 41)
         {
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
-            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player,"Вам нужно поднять ранги для просмотра содержимого","You need to up Rank for open vendor."), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_BATTLE, GetCustomText(player, "До свидания","Goodbye"), GOSSIP_SENDER_MAIN, 0);
         }
 
         player->PlayerTalkClass->SendGossipMenu(femb.str().c_str(), creature->GetGUID());

@@ -73,7 +73,7 @@ bool ArenaOne::CreateArenateam(Player* player)
     // Register arena team
     sArenaTeamMgr->AddArenaTeam(arenaTeam);
 
-    ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_team_create_success, EN_arena_team_create_success));
+    ChatHandler(player->GetSession()).SendSysMessage(GetCustomText(player, RU_arena_team_create_success, EN_arena_team_create_success));
 
     ArenaOneMgr->ArenaMainMenu(player);
     return true;
@@ -87,12 +87,12 @@ void ArenaOne::JoinQueue(Player* player)
     GameEventMgr::ActiveEvents const& activeEvents = sGameEventMgr->GetActiveEventList();
     if (activeEvents.find(91) != activeEvents.end())
     {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_arena_team_dissables_event, EN_arena_team_dissables_event));
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_arena_team_dissables_event, EN_arena_team_dissables_event));
         return CloseGossipMenuFor(player);
     }        
 
     if (player->GetRankByExp() < 5) {
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_glory_win_9, EN_glory_win_9), 5);
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_glory_win_9, EN_glory_win_9), 5);
         return ArenaOneMgr->ArenaMainMenu(player);
     }   
 
@@ -101,7 +101,7 @@ void ArenaOne::JoinQueue(Player* player)
     }    
 
     if (ArenaOneMgr->Arena1v1CheckTalents(player) && ArenaOneMgr->ArenaCheckFullEquipAndTalents(player) && !ArenaOneMgr->JoinQueueArena(player, true))
-        ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_err_queue, EN_arena_err_queue));
+        ChatHandler(player->GetSession()).SendSysMessage(GetCustomText(player, RU_arena_err_queue, EN_arena_err_queue));
     CloseGossipMenuFor(player);
 }
 
@@ -236,14 +236,14 @@ bool ArenaOne::Arena1v1CheckTalents(Player* player)
 
     if (player->HasHealSpec())
     {
-        ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_queue_1v1_disable_for_heal, EN_arena_queue_1v1_disable_for_heal));
+        ChatHandler(player->GetSession()).SendSysMessage(GetCustomText(player, RU_arena_queue_1v1_disable_for_heal, EN_arena_queue_1v1_disable_for_heal));
         return false;
     }
 
     switch(player->getClass()) {
         case CLASS_DEATH_KNIGHT: {
             if (!player->HasSpell(49206) && !player->HasSpell(49143) && !player->HasSpell(55050)) {
-                ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_queue_1v1_disable_for_hybrid, EN_arena_queue_1v1_disable_for_hybrid));
+                ChatHandler(player->GetSession()).SendSysMessage(GetCustomText(player, RU_arena_queue_1v1_disable_for_hybrid, EN_arena_queue_1v1_disable_for_hybrid));
                 return false;
             } else {
                 return true;
@@ -251,7 +251,7 @@ bool ArenaOne::Arena1v1CheckTalents(Player* player)
         } break;
         case CLASS_PALADIN: {
             if (!player->HasSpell(53385) && !player->HasSpell(53595)) {
-                ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_arena_queue_1v1_disable_for_hybrid, EN_arena_queue_1v1_disable_for_hybrid));
+                ChatHandler(player->GetSession()).SendSysMessage(GetCustomText(player, RU_arena_queue_1v1_disable_for_hybrid, EN_arena_queue_1v1_disable_for_hybrid));
                 return false;
             } else {
                 return true;
@@ -284,16 +284,16 @@ void ArenaOne::ArenaMainMenu(Player* player)
 
     if (player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId))
     {
-        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetText(player, RU_arena_leave_queue, EN_arena_leave_queue), GOSSIP_SENDER_MAIN + 6, 3, GetText(player, RU_arena_leave_queue_confirm, EN_arena_leave_queue_confirm), 0, false);
+        AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetCustomText(player, RU_arena_leave_queue, EN_arena_leave_queue), GOSSIP_SENDER_MAIN + 6, 3, GetCustomText(player, RU_arena_leave_queue_confirm, EN_arena_leave_queue_confirm), 0, false);
     }
     else
     {
         if (!player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId))
         {
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetText(player, RU_arena_join_queue_1vs1, EN_arena_join_queue_1vs1), GOSSIP_SENDER_MAIN + 6, 2);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetCustomText(player, RU_arena_join_queue_1vs1, EN_arena_join_queue_1vs1), GOSSIP_SENDER_MAIN + 6, 2);
         }
     }
-    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN + 6, 4);
+    AddGossipItemFor(player, GOSSIP_ICON_CHAT, GetCustomText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN + 6, 4);
     player->PlayerTalkClass->SendGossipMenu(s.str().c_str(), player->GetGUID());
 }
 class npc_1v1arena : public CreatureScript

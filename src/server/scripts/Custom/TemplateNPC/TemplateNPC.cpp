@@ -12,8 +12,6 @@ TO DO:
 #include "Translate.h"
 #include "Chat.h"
 
-#define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
-
 void sTemplateNPC::LearnPlateMailSpells(Player *player)
 {
     switch (player->getClass())
@@ -833,14 +831,14 @@ void sTemplateNPC::EquipFullTemplateGear(Player* player, std::string playerSpecS
         sTemplateNpcMgr->CheckSpendTalents(player) &&
         sTemplateNpcMgr->ApplyTalentsAndGlyphs(player, playerSpecStr) &&
         sTemplateNpcMgr->ApplyGear(player, playerSpecStr))
-        player->GetSession()->SendAreaTriggerMessage(GetText(player, RU_template_34, EN_template_34), playerSpecStr.c_str());
+        player->GetSession()->SendAreaTriggerMessage(GetCustomText(player, RU_template_34, EN_template_34), playerSpecStr.c_str());
 }
 
 bool sTemplateNPC::TemplateExistsCheck(Player* player, std::string playerSpecStr)
 {
     if (sTemplateNpcMgr->CanEquipTemplate(player, playerSpecStr) == false)
     {
-        player->GetSession()->SendAreaTriggerMessage(GetText(player, RU_template_36, EN_template_36), playerSpecStr.c_str());
+        player->GetSession()->SendAreaTriggerMessage(GetCustomText(player, RU_template_36, EN_template_36), playerSpecStr.c_str());
         return false;
     }
     return true;
@@ -855,7 +853,7 @@ bool sTemplateNPC::CheckPlayerIsNaked(Player* player)
         {
             if (haveItemEquipped)
             {
-                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_template_32, EN_template_32));
+                ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_template_32, EN_template_32));
                 CloseGossipMenuFor(player);
                 return false;
             }
@@ -869,7 +867,7 @@ bool sTemplateNPC::CheckSpendTalents(Player* player)
     // Don't let players to use Template feature after spending some talent points
     if (player->GetFreeTalentPoints() < 71)
     {
-        player->GetSession()->SendAreaTriggerMessage(GetText(player, RU_template_33, EN_template_33));
+        player->GetSession()->SendAreaTriggerMessage(GetCustomText(player, RU_template_33, EN_template_33));
         CloseGossipMenuFor(player);
         return false;
     }
@@ -924,54 +922,54 @@ public:
         switch (player->getClass())
         {
             case CLASS_PRIEST:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_2,EN_template_2), GOSSIP_SENDER_MAIN, 30);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_3,EN_template_3), GOSSIP_SENDER_MAIN, 1);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_4,EN_template_4), GOSSIP_SENDER_MAIN, 2);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_2,EN_template_2), GOSSIP_SENDER_MAIN, 30);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_3,EN_template_3), GOSSIP_SENDER_MAIN, 1);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_4,EN_template_4), GOSSIP_SENDER_MAIN, 2);
                 break;
             case CLASS_PALADIN:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_5,EN_template_5), GOSSIP_SENDER_MAIN, 3);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_6,EN_template_6), GOSSIP_SENDER_MAIN, 4);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_7,EN_template_7), GOSSIP_SENDER_MAIN, 5);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_5,EN_template_5), GOSSIP_SENDER_MAIN, 3);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_6,EN_template_6), GOSSIP_SENDER_MAIN, 4);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_7,EN_template_7), GOSSIP_SENDER_MAIN, 5);
                 break;
             case CLASS_WARRIOR:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_9,EN_template_9), GOSSIP_SENDER_MAIN, 7);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_8,EN_template_8), GOSSIP_SENDER_MAIN, 6);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_10,EN_template_10), GOSSIP_SENDER_MAIN, 8);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_9,EN_template_9), GOSSIP_SENDER_MAIN, 7);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_8,EN_template_8), GOSSIP_SENDER_MAIN, 6);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_10,EN_template_10), GOSSIP_SENDER_MAIN, 8);
                 break;
             case CLASS_MAGE:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_11,EN_template_11), GOSSIP_SENDER_MAIN, 9);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_12,EN_template_12), GOSSIP_SENDER_MAIN, 10);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_13,EN_template_13), GOSSIP_SENDER_MAIN, 11);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_11,EN_template_11), GOSSIP_SENDER_MAIN, 9);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_12,EN_template_12), GOSSIP_SENDER_MAIN, 10);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_13,EN_template_13), GOSSIP_SENDER_MAIN, 11);
                 break;
             case CLASS_WARLOCK:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_14,EN_template_14), GOSSIP_SENDER_MAIN, 12);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_15,EN_template_15), GOSSIP_SENDER_MAIN, 13);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_16,EN_template_16), GOSSIP_SENDER_MAIN, 14);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_14,EN_template_14), GOSSIP_SENDER_MAIN, 12);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_15,EN_template_15), GOSSIP_SENDER_MAIN, 13);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_16,EN_template_16), GOSSIP_SENDER_MAIN, 14);
                 break;
             case CLASS_SHAMAN:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_17,EN_template_17), GOSSIP_SENDER_MAIN, 15);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_18,EN_template_18), GOSSIP_SENDER_MAIN, 16);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_19,EN_template_19), GOSSIP_SENDER_MAIN, 17);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_17,EN_template_17), GOSSIP_SENDER_MAIN, 15);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_18,EN_template_18), GOSSIP_SENDER_MAIN, 16);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_19,EN_template_19), GOSSIP_SENDER_MAIN, 17);
                 break;
             case CLASS_DRUID:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_20,EN_template_20), GOSSIP_SENDER_MAIN, 18);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_21,EN_template_21), GOSSIP_SENDER_MAIN, 19);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_22,EN_template_22), GOSSIP_SENDER_MAIN, 20);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_20,EN_template_20), GOSSIP_SENDER_MAIN, 18);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_21,EN_template_21), GOSSIP_SENDER_MAIN, 19);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_22,EN_template_22), GOSSIP_SENDER_MAIN, 20);
                 break;
             case CLASS_HUNTER:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_24,EN_template_24), GOSSIP_SENDER_MAIN, 22);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_23,EN_template_23), GOSSIP_SENDER_MAIN, 21);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_25,EN_template_25), GOSSIP_SENDER_MAIN, 23);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_24,EN_template_24), GOSSIP_SENDER_MAIN, 22);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_23,EN_template_23), GOSSIP_SENDER_MAIN, 21);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_25,EN_template_25), GOSSIP_SENDER_MAIN, 23);
                 break;
             case CLASS_ROGUE:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_26,EN_template_26), GOSSIP_SENDER_MAIN, 24);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_27,EN_template_27), GOSSIP_SENDER_MAIN, 25);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_28,EN_template_28), GOSSIP_SENDER_MAIN, 26);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_26,EN_template_26), GOSSIP_SENDER_MAIN, 24);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_27,EN_template_27), GOSSIP_SENDER_MAIN, 25);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_28,EN_template_28), GOSSIP_SENDER_MAIN, 26);
                 break;
             case CLASS_DEATH_KNIGHT:
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_29,EN_template_29), GOSSIP_SENDER_MAIN, 27);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_30,EN_template_30), GOSSIP_SENDER_MAIN, 28);
-                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_template_31,EN_template_31), GOSSIP_SENDER_MAIN, 29);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_29,EN_template_29), GOSSIP_SENDER_MAIN, 27);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_30,EN_template_30), GOSSIP_SENDER_MAIN, 28);
+                AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_template_31,EN_template_31), GOSSIP_SENDER_MAIN, 29);
                 break;
         }
         TemplateNpcWelcome(player, creature);

@@ -3,7 +3,7 @@
 
 #define UNIQUE_MENU_ID 123
 
-#define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
+#define GetCustomText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
 constexpr static const uint32 BuffList[9] = {
     25898, 48470, 53307, 48074, 48162, 48170, 57623, 43002, 47440
@@ -76,6 +76,9 @@ public:
 
     void SetItemRewardID(uint32 id) { _usedItemRewardID = id; }
     uint32 GetItemRewardID() { return _usedItemRewardID; }
+
+    // выходные опыт на 50% больше
+    bool isDoubleDays();
 
 private:
     static const uint32 _factionCost = 50;

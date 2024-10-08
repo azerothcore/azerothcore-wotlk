@@ -789,4 +789,7 @@
 #define EN_FARM_ATTEMPT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Protection system]: Farm attempt detected, we warn the administration.|r"
 #define RU_FARM_ATTEMPT "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Система защиты]: Обнаружена попытка фарма, предупреждаем администрацию.|r"
 
+#define EN_HOLIDAY_ONLOGIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Holiday]: Today is holiday! Rank points gain increased by 50%!|r"
+#define RU_HOLIDAY_ONLOGIN "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Выходной день]: Сегодня выходной день ! Получение очков для ранга повышено на 50%!|r"
+
 #endif

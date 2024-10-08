@@ -17,8 +17,6 @@
 #include "SpellMgr.h"
 #include "TrainerClass.h"
 
-#define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
-
 using namespace std;
 
 class npc_trainer : public CreatureScript
@@ -39,7 +37,7 @@ public:
 
         if (player->GetPet())
         {
-            ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_player_learn_13, EN_player_learn_13));
+            ChatHandler(player->GetSession()).SendSysMessage(GetCustomText(player, RU_player_learn_13, EN_player_learn_13));
             player->PlayerTalkClass->SendCloseGossip();
             return;
         }
@@ -367,13 +365,13 @@ public:
     {
         if(!creature || !player)
             return;
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_1, EN_player_learn_1), GOSSIP_SENDER_MAIN, 23);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_2, EN_player_learn_2), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CORE_HOUND);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_3, EN_player_learn_3), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_DEVILSAUR);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_4, EN_player_learn_4), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_RHINO);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_5, EN_player_learn_5), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SILITHID);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_6, EN_player_learn_6), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WORM);
-        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_7, EN_player_learn_7), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SPIRIT_BEAST);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_1, EN_player_learn_1), GOSSIP_SENDER_MAIN, 23);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_2, EN_player_learn_2), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CORE_HOUND);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_3, EN_player_learn_3), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_DEVILSAUR);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_4, EN_player_learn_4), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_RHINO);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_5, EN_player_learn_5), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SILITHID);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_6, EN_player_learn_6), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WORM);
+        AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_7, EN_player_learn_7), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SPIRIT_BEAST);
         SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
     }
 
@@ -394,18 +392,18 @@ public:
         {
             player->PlayerTalkClass->ClearMenus();
             if (player->CanTameExoticPets())
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_15, EN_player_learn_15), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_NEWPET_EXOTIC);
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_16, EN_player_learn_16), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_NEWPET);
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_17, EN_player_learn_17), GOSSIP_SENDER_MAIN, 7);
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_18, EN_player_learn_18), GOSSIP_SENDER_MAIN, 8);
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_19, EN_player_learn_19), GOSSIP_SENDER_MAIN, 9);
-            //AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetText(player, RU_player_learn_20, EN_player_learn_20), GOSSIP_SENDER_MAIN, GOSSIP_RESET_TAL);
+                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetCustomText(player, RU_player_learn_15, EN_player_learn_15), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_NEWPET_EXOTIC);
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetCustomText(player, RU_player_learn_16, EN_player_learn_16), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_NEWPET);
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetCustomText(player, RU_player_learn_17, EN_player_learn_17), GOSSIP_SENDER_MAIN, 7);
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetCustomText(player, RU_player_learn_18, EN_player_learn_18), GOSSIP_SENDER_MAIN, 8);
+            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetCustomText(player, RU_player_learn_19, EN_player_learn_19), GOSSIP_SENDER_MAIN, 9);
+            //AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GetCustomText(player, RU_player_learn_20, EN_player_learn_20), GOSSIP_SENDER_MAIN, GOSSIP_RESET_TAL);
         }
 
-        AddGossipItemFor(player, 4, GetText(player, RU_player_learn_12, EN_player_learn_12), GOSSIP_SENDER_MAIN, 1, GetText(player, "Вы уверены что хотите сбросить свои таланты ?", "Are you sure you want to reset your talents?"), 0, false);
-        AddGossipItemFor(player, 4, GetText(player, RU_player_learn_49, EN_player_learn_49), GOSSIP_SENDER_MAIN, 10);
-        AddGossipItemFor(player, 4, GetText(player, RU_player_learn_8, EN_player_learn_8), GOSSIP_SENDER_MAIN, 3);
-        AddGossipItemFor(player, 4, GetText(player, RU_player_learnspell, EN_player_learnspell), GOSSIP_SENDER_MAIN, 2);
+        AddGossipItemFor(player, 4, GetCustomText(player, RU_player_learn_12, EN_player_learn_12), GOSSIP_SENDER_MAIN, 1, GetCustomText(player, "Вы уверены что хотите сбросить свои таланты ?", "Are you sure you want to reset your talents?"), 0, false);
+        AddGossipItemFor(player, 4, GetCustomText(player, RU_player_learn_49, EN_player_learn_49), GOSSIP_SENDER_MAIN, 10);
+        AddGossipItemFor(player, 4, GetCustomText(player, RU_player_learn_8, EN_player_learn_8), GOSSIP_SENDER_MAIN, 3);
+        AddGossipItemFor(player, 4, GetCustomText(player, RU_player_learnspell, EN_player_learnspell), GOSSIP_SENDER_MAIN, 2);
         player->PlayerTalkClass->SendGossipMenu(info.str().c_str(), creature->GetGUID());
         return true;
     }
@@ -433,7 +431,7 @@ public:
                 {
                     player->resetTalents(true);
                     player->SendTalentsInfoData(false);
-                    ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_player_learn_47, EN_player_learn_47));
+                    ChatHandler(player->GetSession()).SendSysMessage(GetCustomText(player, RU_player_learn_47, EN_player_learn_47));
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }
@@ -505,31 +503,31 @@ public:
                     break;
                 case GOSSIP_OPTION_NEWPET:
                 {
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_21, EN_player_learn_21), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_BAT);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_22, EN_player_learn_22), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_BOAR);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_23, EN_player_learn_23), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_BEAR);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_24, EN_player_learn_24), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CAT);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_25, EN_player_learn_25), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CARRION_BIRD);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_26, EN_player_learn_26), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CROCOLISK);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_27, EN_player_learn_27), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CRAB);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_28, EN_player_learn_28), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_DRAGONHAWK);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_29, EN_player_learn_29), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_GORILLA);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_30, EN_player_learn_30), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_HYENA);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_31, EN_player_learn_31), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_MOTH);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_32, EN_player_learn_32), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_NETHER_RAY);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_33, EN_player_learn_33), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_OWL);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_34, EN_player_learn_34), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_RAPTOR);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_35, EN_player_learn_35), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_RAVAGER);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_36, EN_player_learn_36), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SCORPID);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_37, EN_player_learn_37), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SERPENT);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_38, EN_player_learn_38), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SPIDER);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_39, EN_player_learn_39), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SPIDER);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_40, EN_player_learn_40), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_TALLSTRIDER);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_41, EN_player_learn_41), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_TURTLE);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_42, EN_player_learn_42), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WARP_STALKER);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_43, EN_player_learn_43), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WASP);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_44, EN_player_learn_44), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WIND_SERPENT);
-                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_player_learn_45, EN_player_learn_45), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WOLF);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_21, EN_player_learn_21), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_BAT);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_22, EN_player_learn_22), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_BOAR);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_23, EN_player_learn_23), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_BEAR);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_24, EN_player_learn_24), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CAT);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_25, EN_player_learn_25), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CARRION_BIRD);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_26, EN_player_learn_26), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CROCOLISK);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_27, EN_player_learn_27), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_CRAB);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_28, EN_player_learn_28), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_DRAGONHAWK);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_29, EN_player_learn_29), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_GORILLA);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_30, EN_player_learn_30), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_HYENA);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_31, EN_player_learn_31), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_MOTH);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_32, EN_player_learn_32), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_NETHER_RAY);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_33, EN_player_learn_33), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_OWL);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_34, EN_player_learn_34), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_RAPTOR);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_35, EN_player_learn_35), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_RAVAGER);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_36, EN_player_learn_36), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SCORPID);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_37, EN_player_learn_37), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SERPENT);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_38, EN_player_learn_38), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SPIDER);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_39, EN_player_learn_39), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_SPIDER);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_40, EN_player_learn_40), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_TALLSTRIDER);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_41, EN_player_learn_41), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_TURTLE);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_42, EN_player_learn_42), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WARP_STALKER);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_43, EN_player_learn_43), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WASP);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_44, EN_player_learn_44), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WIND_SERPENT);
+                    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_player_learn_45, EN_player_learn_45), GOSSIP_SENDER_MAIN, GOSSIP_OPTION_WOLF);
                     SendGossipMenuFor(player, DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
                     break;
                 }
@@ -623,7 +621,7 @@ public:
                     Pet::resetTalentsForAllPetsOf(player, pet);
                     if (pet)
                         player->SendTalentsInfoData(true);
-                    ChatHandler(player->GetSession()).SendSysMessage(GetText(player, RU_player_learn_48, EN_player_learn_48));
+                    ChatHandler(player->GetSession()).SendSysMessage(GetCustomText(player, RU_player_learn_48, EN_player_learn_48));
                     player->PlayerTalkClass->SendCloseGossip();
                     break;
                 }

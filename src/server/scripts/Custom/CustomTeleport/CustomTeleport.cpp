@@ -60,8 +60,8 @@ void sCustomTeleport::TeleportListMain(Player* player) {
     ClearGossipMenuFor(player);
     for (sCustomTeleport::TeleportList_Container::const_iterator itr = m_TeleportList_Container.begin(); itr != m_TeleportList_Container.end(); ++itr)
         if((*itr)->gossip_menu == 0)
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, (*itr)->name_RU, (*itr)->name_EN), GOSSIP_SENDER_MAIN + 4, (*itr)->id);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, (*itr)->name_RU, (*itr)->name_EN), GOSSIP_SENDER_MAIN + 4, (*itr)->id);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 0);
     player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
 }
 
@@ -69,13 +69,13 @@ void sCustomTeleport::GetTeleportListAfter(Player* player, uint32 action, uint8 
     ClearGossipMenuFor(player);
     for (sCustomTeleport::TeleportList_Container::const_iterator itr = m_TeleportList_Container.begin(); itr != m_TeleportList_Container.end(); ++itr) {
         if((*itr)->gossip_menu != 0 && (*itr)->gossip_menu == action && ((*itr)->faction == faction || (*itr)->faction == 3)) {
-            AddGossipItemFor(player, GOSSIP_ICON_TAXI, GetText(player, (*itr)->name_RU + ConverterMoneyToGold(player, CalculRequiredMoney(player, (*itr)->cost)), (*itr)->name_EN +
+            AddGossipItemFor(player, GOSSIP_ICON_TAXI, GetCustomText(player, (*itr)->name_RU + ConverterMoneyToGold(player, CalculRequiredMoney(player, (*itr)->cost)), (*itr)->name_EN +
             ConverterMoneyToGold(player, CalculRequiredMoney(player, (*itr)->cost))),
-            GOSSIP_SENDER_MAIN + 5, (*itr)->id, ConfirmMoneyTeleport(player, GetText(player, (*itr)->name_RU, (*itr)->name_EN)),
+            GOSSIP_SENDER_MAIN + 5, (*itr)->id, ConfirmMoneyTeleport(player, GetCustomText(player, (*itr)->name_RU, (*itr)->name_EN)),
             CalculRequiredMoney(player, (*itr)->cost), false);
         }
     }
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 1);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 1);
     player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
 }
 
@@ -84,7 +84,7 @@ void sCustomTeleport::TeleportFunction(Player* player, uint32 i) {
         if((*itr)->id == i) {
             player->TeleportTo((*itr)->map, (*itr)->position_x, (*itr)->position_y, (*itr)->position_z, (*itr)->orientation);
             player->ModifyMoney(-CalculRequiredMoney(player, (*itr)->cost));
-            ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_SUCCESS_TELEPORT, EN_SUCCESS_TELEPORT), GetText(player, (*itr)->name_RU.c_str(), (*itr)->name_EN.c_str()));
+            ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_SUCCESS_TELEPORT, EN_SUCCESS_TELEPORT), GetCustomText(player, (*itr)->name_RU.c_str(), (*itr)->name_EN.c_str()));
             player->PlayerTalkClass->SendCloseGossip();
             break;
         }
@@ -158,7 +158,7 @@ public:
     bool CanOpenMenu(Player* player) {
         if (player->IsInCombat() || player->IsInFlight() || player->GetMap()->IsBattlegroundOrArena()
             || player->HasStealthAura() || player->isDead() || (player->getClass() == CLASS_DEATH_KNIGHT && player->GetMapId() == 609 && !player->IsGameMaster() && !player->HasSpell(50977))) {
-            ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "Сейчас это невозможно.", "Now it is impossible"));
+            ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, "Сейчас это невозможно.", "Now it is impossible"));
             return true;
         }
         return false;

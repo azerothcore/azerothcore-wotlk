@@ -10,8 +10,6 @@
 
 using namespace std;
 
-#define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
-
 struct VisualData
 {
     uint32 Menu;
@@ -202,40 +200,40 @@ public:
     {
     	if (!item)
     	{
-    		ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Вы должны одеть предмет для зачарование!", "You must wear an item for enchantment!"));
+    		ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Вы должны одеть предмет для зачарование!", "You must wear an item for enchantment!"));
     		return;
     	}
 
     	if (!socketGem)
     	{
-    		ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Что-то пошло не так в коде.","Something went wrong in the code."));
+    		ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Что-то пошло не так в коде.","Something went wrong in the code."));
     		return;
     	}
 
     	player->ApplyEnchantment(item, slot, false);
     	item->SetEnchantment(slot, socketGem, 0, 0);
     	player->ApplyEnchantment(item, slot, true);
-    	ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"%s - успешно был улучшен!","%s - has been successfully improved!"), item->GetTemplate()->Name1.c_str());
+    	ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"%s - успешно был улучшен!","%s - has been successfully improved!"), item->GetTemplate()->Name1.c_str());
     }
 
     void Enchant(Player* player, Item* item, uint32 enchantid)
     {
     	if (!item)
     	{
-    		ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Вы должны одеть предмет для зачарование!", "You must wear an item for enchantment!"));
+    		ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Вы должны одеть предмет для зачарование!", "You must wear an item for enchantment!"));
     		return;
     	}
 
     	if (!enchantid)
     	{
-    		ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Что-то пошло не так в коде.","Something went wrong in the code."));
+    		ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Что-то пошло не так в коде.","Something went wrong in the code."));
     		return;
     	}
 
     	player->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, false);
     	item->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantid, 0, 0);
     	player->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, true);
-        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"%s - успешно был улучшен!","%s - has been successfully improved!"), item->GetTemplate()->Name1.c_str());
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"%s - успешно был улучшен!","%s - has been successfully improved!"), item->GetTemplate()->Name1.c_str());
     }
 
     /* name list */
@@ -243,20 +241,20 @@ public:
     {
         switch (slot)
         {                                                       /*  Русский перевод            English Translate */
-            case EQUIPMENT_SLOT_HEAD:       return  GetText(player, "Зачаровать Голову",        "Enchant Head");
-            case EQUIPMENT_SLOT_SHOULDERS:  return  GetText(player, "Зачаровать Плечи",         "Enchant Shoulders");
-            case EQUIPMENT_SLOT_CHEST:      return  GetText(player, "Зачаровать Грудь",         "Enchant Chest");
-            case EQUIPMENT_SLOT_LEGS:       return  GetText(player, "Зачаровать Ноги",          "Enchant Legs");
-            case EQUIPMENT_SLOT_HANDS:      return  GetText(player, "Зачаровать Кисти рук",     "Enchant Hands");
-            case EQUIPMENT_SLOT_WAIST:      return  GetText(player, "Зачаровать Пояс",          "Enchant Waist");
-            case EQUIPMENT_SLOT_FEET:       return  GetText(player, "Зачаровать Ступни",        "Enchant Feet");
-            case EQUIPMENT_SLOT_WRISTS:     return  GetText(player, "Зачаровать Запястья",      "Enchant Wrists");
-            case EQUIPMENT_SLOT_BACK:       return  GetText(player, "Зачаровать Плащ",          "Enchant Back");
-            case EQUIPMENT_SLOT_MAINHAND:   return  GetText(player, "Зачаровать Оружие",        "Enchant Mainhand");
-            case EQUIPMENT_SLOT_OFFHAND:    return  GetText(player, "Зачаровать Левую руку",    "Enchant Offhand");
-            case EQUIPMENT_SLOT_RANGED:     return  GetText(player, "Зачаровать Дальний бой",   "Enchant Ranged");
-            case EQUIPMENT_SLOT_FINGER1:    return  GetText(player, "Зачаровать Первое Кольцо", "Enchant First Fingers");
-            case EQUIPMENT_SLOT_FINGER2:    return  GetText(player, "Зачаровать Второе кольцо", "Enchant Second Fingers");
+            case EQUIPMENT_SLOT_HEAD:       return  GetCustomText(player, "Зачаровать Голову",        "Enchant Head");
+            case EQUIPMENT_SLOT_SHOULDERS:  return  GetCustomText(player, "Зачаровать Плечи",         "Enchant Shoulders");
+            case EQUIPMENT_SLOT_CHEST:      return  GetCustomText(player, "Зачаровать Грудь",         "Enchant Chest");
+            case EQUIPMENT_SLOT_LEGS:       return  GetCustomText(player, "Зачаровать Ноги",          "Enchant Legs");
+            case EQUIPMENT_SLOT_HANDS:      return  GetCustomText(player, "Зачаровать Кисти рук",     "Enchant Hands");
+            case EQUIPMENT_SLOT_WAIST:      return  GetCustomText(player, "Зачаровать Пояс",          "Enchant Waist");
+            case EQUIPMENT_SLOT_FEET:       return  GetCustomText(player, "Зачаровать Ступни",        "Enchant Feet");
+            case EQUIPMENT_SLOT_WRISTS:     return  GetCustomText(player, "Зачаровать Запястья",      "Enchant Wrists");
+            case EQUIPMENT_SLOT_BACK:       return  GetCustomText(player, "Зачаровать Плащ",          "Enchant Back");
+            case EQUIPMENT_SLOT_MAINHAND:   return  GetCustomText(player, "Зачаровать Оружие",        "Enchant Mainhand");
+            case EQUIPMENT_SLOT_OFFHAND:    return  GetCustomText(player, "Зачаровать Левую руку",    "Enchant Offhand");
+            case EQUIPMENT_SLOT_RANGED:     return  GetCustomText(player, "Зачаровать Дальний бой",   "Enchant Ranged");
+            case EQUIPMENT_SLOT_FINGER1:    return  GetCustomText(player, "Зачаровать Первое Кольцо", "Enchant First Fingers");
+            case EQUIPMENT_SLOT_FINGER2:    return  GetCustomText(player, "Зачаровать Второе кольцо", "Enchant Second Fingers");
             default: return NULL;
         }
     }
@@ -338,7 +336,7 @@ public:
 
             item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu);
             if(!item) {
-                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Не найден предмет в указаном слоте, оденьте предмет пожалуйста !",
+                ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Не найден предмет в указаном слоте, оденьте предмет пожалуйста !",
                                                                                  "No item found in the specified slot, put on an item please!"));
                 return true;
             }
@@ -356,7 +354,7 @@ public:
                 if(player->HasSkill(SKILL_INSCRIPTION) && player->GetSkillValue(SKILL_INSCRIPTION) == 450)
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Для этого вам нужно: Начертание - 450/450", "For this you need: Inscription - 450/450"));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Для этого вам нужно: Начертание - 450/450", "For this you need: Inscription - 450/450"));
             }
 
             if (menuData == 2) /* ENGINEERING - Инженерное Дело */
@@ -368,10 +366,10 @@ public:
                     if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) == 450)
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                     else
-                        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Для этого вам нужно: Инженерное Дело - 450/450","For this you need: Engineering - 450/450"));
+                        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Для этого вам нужно: Инженерное Дело - 450/450","For this you need: Engineering - 450/450"));
                 }
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Уровень предмета должнен быть выше чем 150.","Item level must be higher than 150."));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Уровень предмета должнен быть выше чем 150.","Item level must be higher than 150."));
             }
 
             if (menuData == 22) /* ENGINEERING - Инженерное Дело */
@@ -383,10 +381,10 @@ public:
                     if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) == 450)
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                     else
-                        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Для этого вам нужно: Инженерное Дело - 450/450","For this you need: Engineering - 450/450"));
+                        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Для этого вам нужно: Инженерное Дело - 450/450","For this you need: Engineering - 450/450"));
                 }
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Уровень предмета должнен быть выше чем 150.","Item level must be higher than 150."));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Уровень предмета должнен быть выше чем 150.","Item level must be higher than 150."));
             }
 
             if (menuData == 23) /* ENGINEERING - Инженерное Дело */
@@ -398,10 +396,10 @@ public:
                     if (player->HasSkill(SKILL_ENGINEERING) && player->GetSkillValue(SKILL_ENGINEERING) == 450)
                         Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                     else
-                        ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Для этого вам нужно: Инженерное Дело - 450/450","For this you need: Engineering - 450/450"));
+                        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Для этого вам нужно: Инженерное Дело - 450/450","For this you need: Engineering - 450/450"));
                 }
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Уровень предмета должнен быть выше чем 150.","Item level must be higher than 150."));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Уровень предмета должнен быть выше чем 150.","Item level must be higher than 150."));
             }
 
             if (menuData == 3) /* Bkacksmithing - Кузнечное дело */
@@ -409,7 +407,7 @@ public:
                 if (player->HasSkill(SKILL_BLACKSMITHING) && player->GetSkillValue(SKILL_BLACKSMITHING) == 450)
                     AdvancedEnchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), PRISMATIC_ENCHANTMENT_SLOT, vData[action].Id);
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Для этого вам нужно: Кузнечное Дело - 450/450","For this you need: Blacksmithing - 450/450"));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Для этого вам нужно: Кузнечное Дело - 450/450","For this you need: Blacksmithing - 450/450"));
             }
 
             if (menuData == 4) /* Echanting - Наложение чар */
@@ -417,7 +415,7 @@ public:
                 if (player->HasSkill(SKILL_ENCHANTING) && player->GetSkillValue(SKILL_ENCHANTING) == 450)
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Для этого вам нужно: Наложение чар - 450/450","For this you need: Enchanting - 450/450"));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Для этого вам нужно: Наложение чар - 450/450","For this you need: Enchanting - 450/450"));
             }
 
             if (menuData == 5) /* Tailoring - Портняжное дело */
@@ -425,7 +423,7 @@ public:
                 if (player->HasSkill(SKILL_TAILORING) && player->GetSkillValue(SKILL_TAILORING) == 450)
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Для этого вам нужно: Портняжное дело - 450/450", "For this you need: Tailoring - 450/450"));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Для этого вам нужно: Портняжное дело - 450/450", "For this you need: Tailoring - 450/450"));
             }
 
             if (menuData == 6) /* Leatherworking - Кожевнечиство */
@@ -433,7 +431,7 @@ public:
                 if (player->HasSkill(SKILL_LEATHERWORKING) && player->GetSkillValue(SKILL_LEATHERWORKING) == 450)
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Для этого вам нужно: Кожевничество - 450/450", "For this you need: Leatherworking - 450/450"));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Для этого вам нужно: Кожевничество - 450/450", "For this you need: Leatherworking - 450/450"));
             }
 
             if (menuData == 7)
@@ -443,7 +441,7 @@ public:
                 if (item->GetTemplate()->Class == 2 && (item->GetTemplate()->SubClass == 18 || item->GetTemplate()->SubClass == 3 || item->GetTemplate()->SubClass == 2))
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Невозможно улучшить данный предмет !", "Unable to improve this item!"));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Невозможно улучшить данный предмет !", "Unable to improve this item!"));
             }
 
             if (menuData == 8)
@@ -453,7 +451,7 @@ public:
                 if(item->GetTemplate()->InventoryType == 17)
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Данная чарка для двуручного оружия !", "This enchantment for two-handed weapons!"));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Данная чарка для двуручного оружия !", "This enchantment for two-handed weapons!"));
             }
 
             if (menuData == 9)
@@ -463,7 +461,7 @@ public:
                 if(item->GetTemplate()->InventoryType == 14)
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Данное зачарование для щитов !", "This enchantment for shields!"));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Данное зачарование для щитов !", "This enchantment for shields!"));
             }
 
             if (menuData == 11)
@@ -473,7 +471,7 @@ public:
                 if(item->GetTemplate()->InventoryType != 14 && item->GetTemplate()->InventoryType != 23)
                     Enchant(player, player->GetItemByPos(INVENTORY_SLOT_BAG_0, vData[action].Menu), vData[action].Id);
                 else
-                    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player,"Данное зачарование не может быть наложена на щиты / книги!", "This enchantment cannot be cast on shields!"));
+                    ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"Данное зачарование не может быть наложена на щиты / книги!", "This enchantment cannot be cast on shields!"));
             }
 
             if (menuData == 10) /* return on gossip menu */

@@ -5,6 +5,7 @@
 #include "Item.h"
 #include "Pet.h"
 #include "ReputationMgr.h"
+#include "Translate.h"
 #include "ServerMenu/ServerMenuMgr.h"
 
 const uint32 SPELL_DEMENTIA = 40874;
@@ -184,6 +185,11 @@ public:
         if (!map)
             return;
         player->VerifiedRankBuff(map);
+
+        // выходные бонусы
+        if (sServerMenuMgr->isDoubleDays()) {
+            ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_HOLIDAY_ONLOGIN, EN_HOLIDAY_ONLOGIN));
+        }
     }
 };
 

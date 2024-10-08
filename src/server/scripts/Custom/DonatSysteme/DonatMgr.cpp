@@ -53,8 +53,8 @@ void DonationSysteme::DonationSystemeListMain(Player* player) {
     ClearGossipMenuFor(player);
     for (DonationSysteme::DonationSysteme_Container::const_iterator itr = m_DonationSysteme_Container.begin(); itr != m_DonationSysteme_Container.end(); ++itr)
         if ((*itr)->gossip_menu == 0)
-            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, (*itr)->name_RU, (*itr)->name_EN), GOSSIP_SENDER_MAIN + 13, (*itr)->id);
-    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, (*itr)->name_RU, (*itr)->name_EN), GOSSIP_SENDER_MAIN + 13, (*itr)->id);
+    AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, GetCustomText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 0);
     player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
 }
 
@@ -65,7 +65,7 @@ void DonationSysteme::GetDonationSystemeAfter(Player* player, uint32 action, uin
             AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG, ReturnFullName(player, (*itr)->itemID, (*itr)->cost, (*itr)->count, (*itr)->discount), GOSSIP_SENDER_MAIN + 14, (*itr)->id);
         }
     }
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 3);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_NO_ICON, EN_HOME_MENU_NO_ICON), GOSSIP_SENDER_MAIN, 3);
     player->PlayerTalkClass->SendGossipMenu(HeadMenu(player), player->GetGUID());
 }
 
