@@ -22,10 +22,12 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "Player.h"
+#include "Realm.h"
 #include "ScriptMgr.h"
 #include "StringFormat.h"
 #include "Tokenize.h"
 #include "WorldSession.h"
+#include "World.h"
 
 using ChatSubCommandMap = std::map<std::string_view, Acore::Impl::ChatCommands::ChatCommandNode, StringCompareLessI_T>;
 
@@ -174,6 +176,21 @@ static void LogCommandUsage(WorldSession const& session, std::string_view cmdStr
     {
         zoneName = zone->area_name[locale];
     }
+
+    // Database Logging
+    ObjectGuid sel_guid = player->GetTarget();
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_LOG);
+    stmt->SetData(0, player->GetName());
+    stmt->SetData<uint32>(1, session.GetAccountId());
+    stmt->SetData(2, cmdStr.data());
+    char position[96];
+    sprintf(position, "X: {} Y: {} Z: {} Map: {}", player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetMapId());
+    stmt->SetData(3, position);
+    char selection[96];
+    sprintf(selection, "{}: {} (GUID: {})", sel_guid.GetTypeName(), (player->GetSelectedUnit()) ? player->GetSelectedUnit()->GetName().c_str() : "", sel_guid.GetCounter());
+    stmt->SetData(4, selection);
+    stmt->SetData<uint32>(5, int32(realm.Id.Realm));
+    LoginDatabase.Execute(stmt);
 
     std::string logMessage = Acore::StringFormat("Command: {} [Player: {} ({}) (Account: {}) X: {} Y: {} Z: {} Map: {} ({}) Area: {} ({}) Zone: {} ({}) Selected: {} ({})]",
         cmdStr, player->GetName(), player->GetGUID().ToString(),

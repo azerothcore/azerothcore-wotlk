@@ -2286,6 +2286,11 @@ void Player::SetGameMaster(bool on)
     UpdateObjectVisibility();
 }
 
+bool Player::HasPermissionToAddItem() const
+{
+    return GetSession()->GetSecurity();
+}
+
 void Player::SetGMVisible(bool on)
 {
     const uint32 VISUAL_AURA = 37800;

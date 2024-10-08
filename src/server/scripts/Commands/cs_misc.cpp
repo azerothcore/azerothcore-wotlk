@@ -44,6 +44,7 @@
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
 #include "WeatherMgr.h"
+#include "World.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1791,6 +1792,20 @@ public:
 
         if (noSpaceForCount)
             handler->PSendSysMessage(LANG_ITEM_CANNOT_CREATE, itemId, noSpaceForCount);
+
+        // if Target haven't permission to add item (just player) - need to go log for him in DB
+        if (player && !playerTarget->HasPermissionToAddItem())
+        {
+            // Prepare a log in DB
+            LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_INS_GM_CHAR_ITEM_ADD);
+            stmt->SetData(0, player->GetName());
+            stmt->SetData<uint32>(1, handler->GetSession()->GetAccountId());
+            stmt->SetData<uint32>(2, item->GetEntry());
+            stmt->SetData<uint32>(3, count);
+            stmt->SetData(4, fmt::format("{} gave item to {} (GUID: {})", player ? player->GetName() : "Console", playerTarget->GetName(), playerTarget->GetGUID().GetCounter()));
+            stmt->SetData<uint32>(5, int32(realm.Id.Realm));
+            LoginDatabase.Execute(stmt);
+        }
 
         return true;
     }
