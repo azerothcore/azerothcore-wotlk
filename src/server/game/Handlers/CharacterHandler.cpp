@@ -1994,11 +1994,11 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         }
 
         // is arena team captain
-        if (sArenaTeamMgr->GetArenaTeamByCaptain(factionChangeInfo->Guid))
-        {
-            SendCharFactionChange(CHAR_CREATE_CHARACTER_ARENA_LEADER, factionChangeInfo.get());
-            return;
-        }
+        // if (sArenaTeamMgr->GetArenaTeamByCaptain(factionChangeInfo->Guid))
+        // {
+        //     SendCharFactionChange(CHAR_CREATE_CHARACTER_ARENA_LEADER, factionChangeInfo.get());
+        //     return;
+        // }
 
         // check mailbox
         if (playerData->MailCount)
