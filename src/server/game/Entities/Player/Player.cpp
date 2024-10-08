@@ -16541,14 +16541,11 @@ void Player::RankControlOnLogin()
 
 void Player::GetRangBuffInInstance(int amount)
 {
+    amount = this->GetSession()->IsPremium() ? amount : amount / 2;
     for (int i = 0; i < amount; i++) {
         AddAura(62519, this); /* лечение +8% */
         AddAura(66721, this); /* урон +5% */
     }
-
-    // Берсерк для випов
-    if (this->GetSession()->IsPremium())
-        AddAura(41107, this);
 }
 
 void Player::RemoveRankBuff() {
@@ -16566,7 +16563,13 @@ void Player::VerifiedRankBuff(Map* map)
         if (!HasAura(62519) && !HasAura(66721))
             GetRangBuffInInstance(GetRankByExp());
         else {
-            if (GetAuraCount(62519) != uint32(GetRankByExp())) {
+            if (this->GetSession()->IsPremium()) {
+                if (GetAuraCount(62519) != uint32(GetRankByExp())) {
+                    RemoveRankBuff();
+                    GetRangBuffInInstance(GetRankByExp());
+                }               
+            }
+            else if (GetAuraCount(62519)*2 != uint32(GetRankByExp())) {
                 RemoveRankBuff();
                 GetRangBuffInInstance(GetRankByExp());
             }
