@@ -84,11 +84,11 @@ void ArenaOne::JoinQueue(Player* player)
     if (!player)
         return;    
 
-    // if (player->GetRankByExp() < 5) {
-    //     ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_glory_win_9, EN_glory_win_9), 5);
-    //     return ArenaOneMgr->ArenaMainMenu(player);
-    // } 
-
+    if (player->GetRankByExp() < 5) {
+         ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player, RU_glory_win_9, EN_glory_win_9), 5);
+         return ArenaOneMgr->ArenaMainMenu(player);
+    }
+    
     if (!player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5))) {
         CreateArenateam(player);
     }    
@@ -207,7 +207,7 @@ bool ArenaOne::ArenaCheckFullEquipAndTalents(Player* player)
         {
             err << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Arena Queue]: ";
             if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU)
-                err << "Вы должны надеть фул экипировку.\n";
+                err << "Вам необходимо одеть полное снаряжение.\n";
             else
                 err << "You must wear full equipment.\n";
             break;
@@ -262,18 +262,17 @@ void ArenaOne::ArenaMainMenu(Player* player)
     ArenaTeam* at = sArenaTeamMgr->GetArenaTeamById(player->GetArenaTeamId(ArenaTeam::GetSlotByType(ARENA_TEAM_5v5)));
     std::stringstream s;
 
-    s << "\nНачисление очков арены будет через:\n             ";
-    s <<  secsToTimeString((sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME) - GameTime::GetGameTime().count()), true).c_str();
-    s << "\nСброс капа очков арены будет через:\n             ";
-    s <<  secsToTimeString((sWorld->getWorldState(WS_DAYLY_ARENA_POINTS_CAP) - GameTime::GetGameTime().count()), true).c_str();
-    s << "\n\nТекущий кап: [ " << player->GetArenaCapToday() << " / " << player->ReturnCapArenaPerDays() << " ]";
+    s << "Обновление капа и начисление очков арены через:\n";
+    s << "\nНачисление: " <<  secsToTimeString((sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME) - GameTime::GetGameTime().count()), true).c_str();
+    s << "\nОбновление: " <<  secsToTimeString((sWorld->getWorldState(WS_DAYLY_ARENA_POINTS_CAP) - GameTime::GetGameTime().count()), true).c_str() << "\n";
+
     if (at) {
         uint32 rating = uint32((at->GetStats().Rating / 50) + player->GetRankByExp());
-        s << "\nНа арене вы получите:\nЗа победу: " << rating << " очков арены.\n";
-        s << "\nЗа поражение: " << uint32(rating/2) << " очков арены.";
+        s << "\nКаждый бой на арене приносит " << rating << " очков за победу и " << uint32(rating/2) << " за поражение.";
+        s << "\nТекущий кап: [ " << player->GetArenaCapToday() << " / " << player->ReturnCapArenaPerDays() << " ]\n";
     }
-    s << "\n\nВы так же можете воспользоваться командой: .join solo\nдля вступление в очередь на арену 1v1.\n\n";
-    s << "Для регистрации арены 1v1 необходимо иметь не менее 5 ранг.";
+
+    s << "\nДругой способ вступить в очередь на 1v1 арену - ввести команду: .join solo\nРегистрация на 1v1 арене требует минимум 5 ранга.";
 
     if (player->InBattlegroundQueueForBattlegroundQueueType(bgQueueTypeId))
     {
