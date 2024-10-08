@@ -125,6 +125,19 @@ public:
                     case 4: sServerMenuMgr->BuyVip(player, 7); break; /* купить вип на 7 дней */
                 }
             } break;
+            // Награда за ивенты (очки чести)
+            case GOSSIP_SENDER_MAIN + 10: {
+                sServerMenuMgr->RewardEvent(player, 1, action);
+            } break;
+            // Награда за ивенты (очки арены)
+            case GOSSIP_SENDER_MAIN + 11: {
+                sServerMenuMgr->RewardEvent(player, 2, action);
+            } break;
+            // Награда за ивенты (очки опыта)
+            case GOSSIP_SENDER_MAIN + 12: {
+                sServerMenuMgr->RewardEvent(player, 3, action);
+            } break;
+
             default: break;
         } 
     }

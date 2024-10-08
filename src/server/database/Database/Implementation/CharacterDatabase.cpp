@@ -155,6 +155,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_DEL_DECLINED_NAME, "DELETE FROM character_declinedname WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_UPD_HONOR_BY_GUID, "UPDATE characters SET totalHonorPoints = totalHonorPoints + ? WHERE guid = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_TRANSFERT_POINTS, "INSERT INTO character_transfer_points (senderGuid, senderName, receiverGuid, reveiverName, amount) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_EVENT_REWARD, "INSERT INTO character_event_reward (guid, name, honor, arena, exp) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
 
     // Guild handling
     // 0: uint32, 1: string, 2: uint32, 3: string, 4: string, 5: uint64, 6-10: uint32, 11: uint64

@@ -762,7 +762,7 @@ void Player::StopMirrorTimer(MirrorTimerType Type)
 bool Player::IsImmuneToEnvironmentalDamage()
 {
     // check for GM and death state included in isAttackableByAOE
-    return (!isTargetableForAttack(false, nullptr)) || isTotalImmune();
+    return (!isTargetableForAttack(false, nullptr));
 }
 
 uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
@@ -16442,6 +16442,7 @@ void Player::RewardRankPoints(uint32 amount, int source)
         case PVP_KILL:        rankInfo = GetCustomText(this, RU_glory_win_11, EN_glory_win_11); break;
         case PVE_ACHIV:       rankInfo = GetCustomText(this, RU_glory_win_12, EN_glory_win_12); break;
         case EXCHANGER_HONOR: rankInfo = GetCustomText(this, RU_glory_win_14, EN_glory_win_14); break;
+        case EVENT_REWARD:    rankInfo = GetCustomText(this, RU_glory_win_15, EN_glory_win_15); break;
         default:              rankInfo = GetCustomText(this, RU_glory_win_4, EN_glory_win_4);   break;
     }
 

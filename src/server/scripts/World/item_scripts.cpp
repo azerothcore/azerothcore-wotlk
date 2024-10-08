@@ -341,6 +341,41 @@ public:
     }
 };
 
+class EventItemReward : public ItemScript
+{
+public:
+    EventItemReward() : ItemScript("EventItemReward") { }
+
+    bool OnUse(Player* pPlayer, Item* pItem, const SpellCastTargets& /*pTargets*/) override
+    {
+        if (!pPlayer || !pItem)
+            return true;
+
+        uint32 entry = pItem->GetEntry();
+
+        if (!entry)
+            return true;
+
+        uint32 prize = 0;
+        bool bigEvent = false;            
+
+        switch (entry) {
+            case 34634: bigEvent = true; prize = 1; break;
+            case 34635: bigEvent = true; prize = 2; break;
+            case 34636: bigEvent = true; prize = 3; break;
+            case 34628: bigEvent = false; prize = 1; break;
+            case 34629: bigEvent = false; prize = 2; break;
+            case 34630: bigEvent = false; prize = 3; break;
+            default: break;
+        }
+
+        sServerMenuMgr->GossipMenuEventReward(pPlayer, entry, bigEvent, prize);
+
+        pPlayer->DestroyItemCount(entry, 1, true);
+        return true;
+    }
+};
+
 void AddSC_item_scripts()
 {
     new item_only_for_flight();
@@ -354,4 +389,5 @@ void AddSC_item_scripts()
     new RandomMorphItem();
     new ItemUse_Glory_Exp();
     new PremiumItemGetter();
+    new EventItemReward();
 }

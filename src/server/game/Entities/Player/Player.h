@@ -2629,7 +2629,8 @@ public:
         PVP_ITEM,
         PVP_KILL,
         PVE_ACHIV,
-        EXCHANGER_HONOR
+        EXCHANGER_HONOR,
+        EVENT_REWARD,
     };
 
     // опыты для каждого ранга

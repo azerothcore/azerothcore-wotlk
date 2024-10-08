@@ -37,6 +37,9 @@
 #define EN_glory_win_14 "exchange for honor points"
 #define RU_glory_win_14 "обмен на очки чести"
 
+#define EN_glory_win_15 "event"
+#define RU_glory_win_15 "ивент"
+
 #define EN_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Rank System]: Your rank is not high enough, you need rank |cffffff4d%u|cffff9933.|r"
 #define RU_glory_win_9 "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Ранг Система]: У вас не достаточно высокий ранг, нужен |cffffff4d%u|cffff9933 ранг.|r"
 

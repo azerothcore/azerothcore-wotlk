@@ -68,6 +68,12 @@ public:
     /* Обучение маунтов */
     void VipMountLearn(Player* /*player*/);
 
+    /* награды за ивент */
+    uint32 RewardEventValue(Player* /*player*/, uint32 /*entry*/, bool /*bigEvent*/, uint32 /* prize */, int /*value*/);
+    std::string ConverterEventReward(Player* player, uint32 entry, bool bigEvent, uint32 prize, int value, std::string name);
+    void GossipMenuEventReward(Player* player, uint32 entry, bool bigEvent, uint32 prize);
+    void RewardEvent(Player* player, uint8 value, uint32 amount);
+
 private:
     static const uint32 _factionCost = 50;
     static const uint32 _raceCost = 30;

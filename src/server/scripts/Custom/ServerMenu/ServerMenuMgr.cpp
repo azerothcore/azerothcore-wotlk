@@ -192,7 +192,19 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
                 ss << "   * Ability to remove a deserter\n   * The ability to relieve weakness\n   * Buffs\n   * Berserk 25% in dungeons\n\n";
                 ss << "Premium service cost 350 bonuses for 7 days.\n";
             }
-        } break;        
+        } break;
+
+        case 6: {
+            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+                ss << "Приветствую вас, " << player->GetName() << "\n\n";
+                ss << "Каждый ранг дает вам 5% бонусов к награде.\n";
+                ss << "Выберите вашу награду за ивент:\n";
+            } else {
+                ss << "Greetings, " << player->GetName() << "\n\n";
+                ss << "Each rank gives you 5% reward bonuses.\n";
+                ss << "Select your event reward:\n";
+            }
+        }              
 
         default: break;
     }
@@ -611,5 +623,89 @@ void sServerMenu::VipMountLearn(Player* player)
             if (player->HasSpell(vip_buff[i]))
                 player->removeSpell(vip_buff[i], SPEC_MASK_ALL, false);
         }
-    }   
+    } 
+}
+
+uint32 sServerMenu::RewardEventValue(Player* player, uint32 /*entry*/, bool bigEvent, uint32 prize, int value) 
+{
+    if (!player)
+        return 0;
+
+    uint32 val = 0;    
+
+    // Выдаем бонус от ранга (каждый ранг даёт 5%)
+    if (value == 1) {
+        // Определение большой или меленький ивент
+        uint32 honor = bigEvent ? 80000 : 40000;
+        // Делим в зависимости от месте на ивенте
+        honor /= prize;
+        uint32 bonus = honor / 20;
+        val = honor + (player->GetRankByExp() * bonus);
+    }
+    else if (value == 2) {
+        uint32 arena = bigEvent ? 300 : 150;
+        arena /= prize;
+        uint32 bonus = arena / 20;
+        val = arena + (player->GetRankByExp() * bonus);
+    }
+    else { 
+        uint32 exp = bigEvent ? 800 : 400;
+        exp /= prize;
+        uint32 bonus = exp / 20;
+        val = exp + (player->GetRankByExp() * bonus);
+    }
+
+    return val;
+}
+
+void sServerMenu::GossipMenuEventReward(Player* player, uint32 entry, bool bigEvent, uint32 prize)
+{
+    if (!player)
+        return;
+
+    ClearGossipMenuFor(player);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterEventReward(player, entry, bigEvent, prize, 1, "очков чести"), GOSSIP_SENDER_MAIN + 10, RewardEventValue(player, entry, bigEvent, prize, 1));
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterEventReward(player, entry, bigEvent, prize, 2, "очков арены"), GOSSIP_SENDER_MAIN + 11, RewardEventValue(player, entry, bigEvent, prize, 2));
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterEventReward(player, entry, bigEvent, prize, 3, "опыта для ранга"), GOSSIP_SENDER_MAIN + 12, RewardEventValue(player, entry, bigEvent, prize, 3));
+    //if (prize == 1)
+    //    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, "Выбор предмета для трансмогрикации\n  |cff473B32Временно не доступно.|r", GOSSIP_SENDER_MAIN + 14, 4);
+    player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 6), player->GetGUID());    
+}
+
+std::string sServerMenu::ConverterEventReward(Player* player, uint32 entry, bool bigEvent, uint32 prize, int value, std::string name) 
+{   
+    if (!player)
+        return "Сбой системы...";
+
+    std::stringstream ss;
+    uint32 reward = RewardEventValue(player, entry, bigEvent, prize, value);
+
+    if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+        ss << "Получить " << reward << " " << name << "\n  |cff473B32Награда за " << prize << " место.|r";
+    } else {
+        ss << "Get " << reward << " " << name << "\n  |cff473B32Award for " << prize << " place.|r";
+    }
+    return ss.str();
+}
+
+void sServerMenu::RewardEvent(Player* player, uint8 value, uint32 amount) 
+{
+    switch(value) {
+        case 1: player->ModifyHonorPoints(uint32(amount)); break;
+        case 2: player->ModifyArenaPoints(uint32(amount)); break;
+        case 3: player->RewardRankPoints(uint32(amount), 8 /*Ивент*/); break;
+        default: break;
+    }
+
+    // логи
+    CharacterDatabasePreparedStatement* stmt_log = CharacterDatabase.GetPreparedStatement(CHAR_INS_EVENT_REWARD);
+    stmt_log->SetData(0, player->GetGUID().GetCounter());
+    stmt_log->SetData(1, player->GetName());
+    stmt_log->SetData(2, value == 1 ? amount : 0);
+    stmt_log->SetData(3, value == 2 ? amount : 0);
+    stmt_log->SetData(4, value == 3 ? amount : 0);
+    CharacterDatabase.Execute(stmt_log);
+
+    ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Награда за ивент]: Вы успешно получили награду за ивент.", "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Event Reward]: You have successfully received an event reward."));
+    player->PlayerTalkClass->SendCloseGossip();  
 }
