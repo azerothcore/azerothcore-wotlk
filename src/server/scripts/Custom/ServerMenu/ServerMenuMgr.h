@@ -18,6 +18,7 @@ public:
         return instance;
     }
 
+    // управление персонажем
     void OpenBankSlot(Player* /*player*/);
     void OpenMailSlot(Player* /*player*/);
     void ChangeRFN(Player* /*player*/, int /*i*/);
@@ -27,8 +28,11 @@ public:
     void GossipHelloMenu(Player* /*player*/);
     void CommingSoon(Player* player);
     bool CanOpenMenu(Player* /*player*/);
-
     void RankInfo(Player* /*player*/);
+
+    // управление акком
+    void AccControlMenu(Player* /*player*/);
+    void SetBroadcastControl(Player* /*player*/);
 
     uint32 getFactionCost() { return _factionCost; }
     uint32 getRaceCost() { return _raceCost; }
@@ -64,7 +68,7 @@ public:
     void ExchangerConfirm(Player* /*player*/, bool /*frost*/);
     // масовый обмен эмблем
     void ExchangeEmblemToShard(Player* /*player*/, const uint32 /*count*/);
-    
+
     /* выдача VIP - delay это кол дней указывать в 1,7,30 итд... */
     void GetVipStatus(Player* /*player*/, uint16 /*days*/);
     void GetVipMenu(Player* /*player*/);
