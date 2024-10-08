@@ -427,16 +427,18 @@ void Arena::EndBattleground(TeamId winnerTeamId)
             {
                 auto const& bgTeamId = player->GetBgTeamId();
 
-                if (bgTeamId == winnerTeamId)
-                    winner << player->GetName();
+                if (GetArenaType() == ARENA_TYPE_5v5) {
+                    if (bgTeamId == winnerTeamId)
+                        winner << player->GetName();
 
-                if (counter_arena == 0) {
-                    announce_arena << "|cffffff4d" << player->GetName() << "|cffff9933 vs |cffffff4d";
-                    counter_arena++;
-                }
-                else {
-                    announce_arena << player->GetName() << "|cffff9933 - победил |cffffff4d" << winner.str().c_str() << "|r";
-                    counter_arena++;
+                    if (counter_arena == 0) {
+                        announce_arena << "|cffffff4d" << player->GetName() << "|cffff9933 vs |cffffff4d";
+                        counter_arena++;
+                    }
+                    else {
+                        announce_arena << player->GetName() << "|cffff9933 - победил |cffffff4d" << winner.str().c_str() << "|r";
+                        counter_arena++;
+                    }
                 }
             }
         }
