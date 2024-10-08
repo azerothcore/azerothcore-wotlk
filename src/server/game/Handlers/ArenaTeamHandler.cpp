@@ -246,6 +246,11 @@ void WorldSession::HandleArenaTeamLeaveOpcode(WorldPacket& recvData)
         }
     }
 
+    if (arenaTeam->GetType() == ARENA_TYPE_5v5) {
+        SendArenaTeamCommandResult(ERR_ARENA_TEAM_QUIT_S, "", "", ERR_ARENA_TEAMS_LOCKED);
+        return;        
+    }
+
     // If team consists only of the captain, disband the team
     if (_player->GetGUID() == arenaTeam->GetCaptain())
     {
