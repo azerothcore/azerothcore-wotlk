@@ -31,7 +31,7 @@ public:
                     // Магазин
                     case 3: sServerMenuMgr->CommingSoon(player);break;
                     // Премиум
-                    case 4: sServerMenuMgr->CommingSoon(player); break;
+                    case 4: player->GetSession()->IsPremium() ? sServerMenuMgr->GetVipMenu(player) : sServerMenuMgr->GetVipMenuForBuy(player); break;
                     // Управление персонажем - ок
                     case 5: sServerMenuMgr->CharControlMenu(player); break;
                     // Управление акков
@@ -114,6 +114,16 @@ public:
             // Раздел обменника эмблем
             case GOSSIP_SENDER_MAIN + 8: {
                 sServerMenuMgr->ExchangerConfirm(player, action == 1 ? true : false);
+            } break;
+
+            // Раздел VIP
+            case GOSSIP_SENDER_MAIN + 9: {
+                switch (action ) {
+                    case 1: sServerMenuMgr->RemoveAuraForVip(player, false); break; /* слабость */
+                    case 2: sServerMenuMgr->RemoveAuraForVip(player, true); break; /* дизертир */
+                    case 3: sServerMenuMgr->VipSetBuff(player); break; /* баффы */
+                    case 4: sServerMenuMgr->BuyVip(player, 7); break; /* купить вип на 7 дней */
+                }
             } break;
             default: break;
         } 

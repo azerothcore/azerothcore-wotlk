@@ -329,7 +329,7 @@ struct PacketCounter
 class WorldSession
 {
 public:
-    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime, uint32 Bonuses);
+    WorldSession(uint32 id, std::string&& name, std::shared_ptr<WorldSocket> sock, AccountTypes sec, bool ispremium, uint8 expansion, time_t mute_time, LocaleConstant locale, uint32 recruiter, bool isARecruiter, bool skipQueue, uint32 TotalTime, uint32 Bonuses);
     ~WorldSession();
 
     bool IsGMAccount() const;
@@ -357,6 +357,10 @@ public:
     void SendClientCacheVersion(uint32 version);
 
     AccountTypes GetSecurity() const { return _security; }
+
+    bool IsPremium() const { return _ispremium; }
+    void SetPremium(bool premium) { _ispremium = premium; }
+
     bool CanSkipQueue() const { return _skipQueue; }
     uint32 GetAccountId() const { return _accountId; }
     Player* GetPlayer() const { return _player; }
@@ -1149,6 +1153,7 @@ private:
     std::string m_Address;
 
     AccountTypes _security;
+    bool _ispremium;
     bool _skipQueue;
     uint32 _accountId;
     std::string _accountName;

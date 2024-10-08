@@ -5,6 +5,10 @@
 
 #define GetText(a, b, c)    a->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU ? b : c
 
+constexpr static const uint32 BuffList[9] = {
+    25898, 48470, 53307, 48074, 48162, 48170, 57623, 43002, 47440
+};
+
 class sServerMenu
 {
 public:
@@ -53,6 +57,14 @@ public:
     void ExchangerToken(Player* /*player*/);
     // подтверждение обмена
     void ExchangerConfirm(Player* /*player*/, bool /*frost*/);
+
+    /* выдача VIP - delay это кол дней указывать в 1,7,30 итд... */
+    void GetVipStatus(Player* /*player*/, uint16 /*days*/);
+    void GetVipMenu(Player* /*player*/);
+    void GetVipMenuForBuy(Player* /*player*/);
+    void BuyVip(Player* /*player*/, uint16 /*days*/);
+    void RemoveAuraForVip(Player* /*player*/, bool /*disert*/);
+    void VipSetBuff(Player* /* player */);
 
 private:
     static const uint32 _factionCost = 50;

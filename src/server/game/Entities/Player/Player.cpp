@@ -5869,6 +5869,10 @@ void Player::CheckAreaExploreAndOutdoor()
                 }
 
                 sScriptMgr->OnGivePlayerXP(this, XP, nullptr, PlayerXPSource::XPSOURCE_EXPLORE);
+ 
+                if(GetSession()->IsPremium())
+                    XP *= sWorld->getRate(RATE_XP_EXPLORE_PREMIUM);
+
                 GiveXP(XP, nullptr);
                 SendExplorationExperience(areaId, XP);
             }
@@ -6228,6 +6232,10 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
     }
 
     honor_f *= sWorld->getRate(RATE_HONOR);
+
+    if (GetSession()->IsPremium())
+        honor_f *= sWorld->getRate(RATE_HONOR_PREMIUM);
+
     // Back to int now
     honor = int32(honor_f);
     // honor - for show honor points in log
@@ -16396,9 +16404,14 @@ std::string Player::GetPlayerName()
     return "|Hplayer:" + name + "|h" + color + name + "|h|r";
 }
 
+uint32 Player::ReturnCapArenaPerDays()
+{
+    return this->GetSession()->IsPremium() ? sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS) * 2 : sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS);
+}
+
 bool Player::AcceptArenaToday()
 {
-    if (GetArenaCapToday() >= sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS)) {
+    if (GetArenaCapToday() >= ReturnCapArenaPerDays()) {
         ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, RU_REWARD_ARENA_POINTS_CAP, EN_REWARD_ARENA_POINTS_CAP));
         return true;
     }
@@ -16411,8 +16424,8 @@ void Player::RewardRankPoints(uint32 amount, int source)
     if (GetRankPoints() >= pvp_rang_points[99])
         return;
 
-     /*if (GetSession()->IsPremium())
-         amount *= sWorld->getFloatConfig(CONFIG_RANK_REWARD_PREMIUM);*/
+    if (GetSession()->IsPremium())
+        amount *= sWorld->getRate(RATE_RANK_REWARD_PREMIUM);
 
     if ((GetRankPoints() + amount) >= 0) {
         SetRankPoints(GetRankPoints() + amount);
@@ -16530,26 +16543,32 @@ void Player::RankControlOnLogin()
 
 void Player::GetRangBuffInInstance(int amount)
 {
-    for(int i = 0; i < amount; i++) {
+    for (int i = 0; i < amount; i++) {
         AddAura(62519, this); /* лечение +8% */
         AddAura(66721, this); /* урон +5% */
     }
+
+    // Берсерк для випов
+    if (this->GetSession()->IsPremium())
+        AddAura(41107, this);
 }
 
 void Player::RemoveRankBuff() {
-    if(HasAura(62519))
+    if (HasAura(62519))
         RemoveAura(62519); /* лечение +8% */
-    if(HasAura(66721))
+    if (HasAura(66721))
         RemoveAura(66721); /* урон +5% */
+    if (HasAura(41107))
+        RemoveAura(41107); /* берсерк 25% */ 
 }
 
 void Player::VerifiedRankBuff(Map* map)
 {
-    if(map->IsRaid() || map->IsDungeon()) {
-        if(!HasAura(62519) && !HasAura(66721))
+    if (map->IsRaid() || map->IsDungeon()) {
+        if (!HasAura(62519) && !HasAura(66721))
             GetRangBuffInInstance(GetRankByExp());
         else {
-            if(GetAuraCount(62519) != uint32(GetRankByExp())) {
+            if (GetAuraCount(62519) != uint32(GetRankByExp())) {
                 RemoveRankBuff();
                 GetRangBuffInInstance(GetRankByExp());
             }
@@ -16593,7 +16612,7 @@ uint32 Player::PointsUntilNextRank()
 
 void Player::LoadPvPRank()
 {
-    if(GetAuraCount(RANKSYSTEMID) < 100)
+    if (GetAuraCount(RANKSYSTEMID) < 100)
         ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, RU_glory_win_6, EN_glory_win_6), GetRankPoints(), GetRankByExp(), PointsUntilNextRank());
     else
         ChatHandler(GetSession()).PSendSysMessage(GetCustomText(this, RU_glory_win_10, EN_glory_win_10));
@@ -16622,8 +16641,8 @@ void Player::RewardArenaPoints(uint32 rate, int8 type, bool win)
     // бонусы от арены 2на2 и 3на3
     arena += type == ARENA_TYPE_2v2 ? 5 : type == ARENA_TYPE_3v3 ? 10 : 0;
 
-    if ((this->GetArenaCapToday() + arena) > sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS)) {
-        arena = sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS) - this->GetArenaCapToday();
+    if ((this->GetArenaCapToday() + arena) > ReturnCapArenaPerDays()) {
+        arena = this->ReturnCapArenaPerDays() - this->GetArenaCapToday();
     }
 
     // записываем в кап

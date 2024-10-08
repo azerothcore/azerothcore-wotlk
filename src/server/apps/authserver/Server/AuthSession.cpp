@@ -522,6 +522,9 @@ bool AuthSession::HandleLogonProof()
         stmt->SetData(4, _accountInfo.Login);
         LoginDatabase.DirectExecute(stmt);
 
+        stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_EXPIRED_ACCOUNT_PREMIUM);
+        LoginDatabase.DirectExecute(stmt);
+
         // Finish SRP6 and send the final result to the client
         Acore::Crypto::SHA1::Digest M2 = Acore::Crypto::SRP6::GetSessionVerifier(logonProof->A, logonProof->clientM, _sessionKey);
 

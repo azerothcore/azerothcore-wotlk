@@ -744,6 +744,9 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     // Not give XP in case already completed once repeatable quest
     uint32 XP = rewarded ? 0 : CalculateQuestRewardXP(quest);
 
+    if(GetSession()->IsPremium())
+        XP *= sWorld->getRate(RATE_XP_QUEST_PREMIUM);
+
     sScriptMgr->OnQuestComputeXP(this, quest, XP);
     int32 moneyRew = 0;
     if (GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) || sScriptMgr->ShouldBeRewardedWithMoneyInsteadOfExp(this))

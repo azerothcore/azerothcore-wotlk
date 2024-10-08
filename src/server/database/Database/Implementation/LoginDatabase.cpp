@@ -129,6 +129,13 @@ void LoginDatabaseConnection::DoPrepareStatements()
     // 0: string, 1: string, 2: string                      // Complete name: "Login_Insert_Failed_Account_Login_due_password_IP_Logging"
     PrepareStatement(LOGIN_INS_FALP_IP_LOGGING, "INSERT INTO logs_ip_actions (account_id,character_guid,type,ip,systemnote,unixtime,time) VALUES (?, 0, 1, ?, ?, unix_timestamp(NOW()), NOW())", CONNECTION_ASYNC);
 
+    /* VIP аккаунты */
+    PrepareStatement(LOGIN_UPD_EXPIRED_ACCOUNT_PREMIUM, "UPDATE account_premium SET active = 0 WHERE unsetdate<=UNIX_TIMESTAMP() AND unsetdate<>setdate", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_ACCOUNT_PREMUM, "SELECT COUNT(id) FROM account_premium WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_UPD_ACCOUNT_PREMIUM, "UPDATE account_premium SET active = 1, setdate = unix_timestamp(NOW()), unsetdate = unix_timestamp(NOW())+? WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_INS_ACCOUNT_PREMIUM, "REPLACE INTO account_premium VALUES (?, unix_timestamp(NOW()), unix_timestamp(NOW())+?, 1, 1)", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_SEL_PREMIUM, "SELECT 1 FROM account_premium WHERE id = ? AND active = 1", CONNECTION_SYNCH);
+
     // DB logging
     PrepareStatement(LOGIN_INS_LOG, "INSERT INTO logs (time, realm, type, level, string) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
 

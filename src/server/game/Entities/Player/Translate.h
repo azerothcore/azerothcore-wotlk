@@ -100,8 +100,8 @@
 #define RU_NOTVIP_MENU_1 "Узнать о бонусах Премиум аккаунте"
 #define EN_NOTVIP_MENU_1 "Learn about Premium account bonuses"
 
-#define RU_NOTVIP_MENU_2 "|TInterface\\icons\\Achievement_bg_trueavshutout:20:20:-20:0|tКупить Премиум аккаунт"
-#define EN_NOTVIP_MENU_2 "|TInterface\\icons\\Achievement_bg_trueavshutout:20:20:-20:0|tBuy Premium account"
+#define RU_NOTVIP_MENU_2 "|TInterface\\icons\\Achievement_bg_trueavshutout:20:20:-20:0|tКупить премиум аккаунт на 7 дней"
+#define EN_NOTVIP_MENU_2 "|TInterface\\icons\\Achievement_bg_trueavshutout:20:20:-20:0|tBuy premium account for 7 days"
 
 #define RU_NOTVIP_MENU_3 "|TInterface\\icons\\Achievement_bg_tophealer_wsg:20:20:-20:0|tКак получить бесплатно ?"
 #define EN_NOTVIP_MENU_3 "|TInterface\\icons\\Achievement_bg_tophealer_wsg:20:20:-20:0|tHow to get it for free?"
@@ -118,8 +118,8 @@
 #define RU_BUY_VIP_SUCCES "Поздравляем Вас, с получением Премиум аккаунта.\nТеперь у вас доступна меню Премиум аккаунта."
 #define EN_BUY_VIP_SUCCES "Congratulations on receiving your Premium account.\nNow you have access to the Premium account menu."
 
-#define RU_BUY_VIP_TEXT "Стоимость Премиум аккаунта в день стоит 25 бонусов\nВведите количество дней на сколько хотите приобрести Премиум аккаунт.\nМинимальное количество дней -> 4\n"
-#define EN_BUY_VIP_TEXT "Premium account cost per day costs 25 bonuses\nEnter the number of days for how long you want to purchase a Premium account.\nMinimum number of days -> 4\n"
+#define RU_BUY_VIP_TEXT "Стоимость премиум аккаунта в день стоит 350 бонусов.\n\nВы уверены что хотите купить премиум аккаунт ?"
+#define EN_BUY_VIP_TEXT "The cost of a premium account per day costs 350 bonus points.\n\nAre you sure you want to buy a premium account ?"
 
 /******************************************************  proffesion.cpp *********************************************************/
 

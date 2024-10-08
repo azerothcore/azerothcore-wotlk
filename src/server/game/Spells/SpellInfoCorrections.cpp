@@ -112,7 +112,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RequiresSpellFocus = 0;
     });    
 
-    ApplySpellFix({ 28698, 62320, 23951 /* меню */ }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 28698, 23951 /* меню */ }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
         spellInfo->Effects[EFFECT_0].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
@@ -120,6 +120,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
         spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
         spellInfo->Effects[EFFECT_2].TargetB = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
+
+    ApplySpellFix({41107, 62320}, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
+        spellInfo->AttributesEx |= SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
     });   
 
     ApplySpellFix({
@@ -4268,19 +4274,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
         spellInfo->AttributesEx2 |= SPELL_ATTR2_IGNORE_LINE_OF_SIGHT;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
-    });
-
-    // Everlasting Affliction
-    ApplySpellFix({ 47422 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->SchoolMask = SPELL_SCHOOL_MASK_SHADOW;
-    });
-
-    // Flametongue Weapon (Passive) (Rank 6)
-    ApplySpellFix({ 16312 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Attributes |= SPELL_ATTR0_PASSIVE;
-        spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
     });
 
     // Mana Tide Totem

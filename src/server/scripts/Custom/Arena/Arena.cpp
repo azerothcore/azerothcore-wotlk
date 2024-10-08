@@ -235,7 +235,7 @@ void ArenaOne::ArenaMainMenu(Player* player)
     s <<  secsToTimeString((sWorld->getWorldState(WS_ARENA_DISTRIBUTION_TIME) - GameTime::GetGameTime().count()), true).c_str();
     s << "\nСброс капа очков арены будет через:\n             ";
     s <<  secsToTimeString((sWorld->getWorldState(WS_DAYLY_ARENA_POINTS_CAP) - GameTime::GetGameTime().count()), true).c_str();
-    s << "\n\nТекущий кап: [ " << player->GetArenaCapToday() << " / " << sWorld->getIntConfig(CONFIG_ARENA_CAP_PER_DAYS) << " ]";
+    s << "\n\nТекущий кап: [ " << player->GetArenaCapToday() << " / " << player->ReturnCapArenaPerDays() << " ]";
     if (at) {
         uint32 rating = uint32((at->GetStats().Rating / 50) + player->GetRankByExp());
         s << "\nНа арене вы получите:\nЗа победу: " << rating << " очков арены.\n";

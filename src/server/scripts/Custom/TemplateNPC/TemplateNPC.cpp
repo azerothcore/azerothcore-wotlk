@@ -689,19 +689,14 @@ void sTemplateNPC::GetSpecAction(Player* player, int action)
 
         case 5: // Use Retribution Paladin Spec
             sTemplateNpcMgr->EquipFullTemplateGear(player, "Retribution");
-            player->AddItem(51452,1); // щит
-            player->AddItem(51454,1); // одноручка
             break;
 
         case 6: // Use Fury Warrior Spec
             sTemplateNpcMgr->EquipFullTemplateGear(player, "Fury");
-            player->AddItem(50730, 1); // меч
             break;
 
         case 7: // Use Arms Warrior Spec
             sTemplateNpcMgr->EquipFullTemplateGear(player, "Arms");
-            player->AddItem(51533,1); // щит
-            player->AddItem(51516,1); // одноручка
             break;
 
         case 8: // Use Protection Warrior Spec
@@ -860,7 +855,7 @@ bool sTemplateNPC::CheckPlayerIsNaked(Player* player)
         {
             if (haveItemEquipped)
             {
-                player->GetSession()->SendAreaTriggerMessage(GetText(player, RU_template_32, EN_template_32));
+                ChatHandler(player->GetSession()).PSendSysMessage(GetText(player, RU_template_32, EN_template_32));
                 CloseGossipMenuFor(player);
                 return false;
             }

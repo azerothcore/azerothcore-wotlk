@@ -111,6 +111,9 @@ public:
 
     void OnLogin(Player* player) override
     {
+        if (!player)
+            return;
+
         player->RankControlOnLogin();
         player->LoadPvPRank();
         RemoveDementia(player);

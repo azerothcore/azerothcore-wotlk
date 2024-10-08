@@ -105,11 +105,23 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
                 ss << "Приветствую вас, " << player->GetName() << "\n\n";
                 ss << "На вашем аккаунте " << player->GetSession()->GetBonuses() << " бонусов.\n";
                 ss << "Пополнить счёт: wow-idk.ru\n\n";
+                if (player->GetSession()->IsPremium())
+                    ss << "Ваш премиум статус |cff156B06активирован|r.";
+                else {
+                    ss << "Ваш премиум статус |cffff0000не активирован|r.\n";
+                    ss << "Можно приобрести в разделе премиум аккаунт";
+                }
             }
             else {
                 ss << "Greetings, " << player->GetName() << "\n\n";
                 ss << "You have " << player->GetSession()->GetBonuses() << "bonuses in your account";
                 ss << "Top up account wow-idk.ru\n\n";
+                if (player->GetSession()->IsPremium())
+                    ss << "Your premium status|cff156B06activated|r.";
+                else {
+                    ss << "Your premium status |cffff0000not activated|r.\n";
+                    ss << "Can be purchased in the section premium account";
+                } 
             }
         } break;
         case 1: {
@@ -162,6 +174,23 @@ std::string sServerMenu::HeadMenu(Player* player, uint8 MenuId)
                 ss << "\nYou have:\n\n  " << DeathMatchMgr->GetItemIcon(49426, 16, 16, 0, -4) << " emblems of frost x" << player->GetItemCount(49426, true) << "\n\n";
                 ss << "  " << DeathMatchMgr->GetItemIcon(47241, 16, 16, 0, -4) << " emblems of triumf x" << player->GetItemCount(47241, true) << "\n\n";
                 ss << "  " << DeathMatchMgr->GetItemIcon(43228, 16, 16, 0, -4) << " shards of the stone guardian x" << player->GetItemCount(43228, true);
+            }
+        } break; 
+
+        case 5: {
+            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+                ss << "Приветствую вас, " << player->GetName() << "\n\n";
+                ss << "Что входит в Премиум аккаунт ?\n";
+                ss << "   * Опыт для ранга X2\n   * Очки арены за победу/поражение X2\n   * Очки чести X2\n   * Кап арены X2\n";
+                ss << "   * Возможность снять дезертир\n   * Возможность снять слабость\n   * Получить бафы\n   * Берсерк 25% в подземелей\n\n";
+                ss << "Цена на премиум аккаунт 350 бонусов на 7 дней.";
+            }
+            else {
+                ss << "Greetings, " << player->GetName() << "\n\n";
+                ss << "What is included in the Premium account ?\n";
+                ss << "   * Experience to rank X2\n   * Arena points for victory/defeat X2\n   * Honor Points X2\n   * Кап арены X2\n";
+                ss << "   * Ability to remove a deserter\n   * The ability to relieve weakness\n   * Buffs\n   * Berserk 25% in dungeons\n\n";
+                ss << "Premium service cost 350 bonuses for 7 days.\n";
             }
         } break;        
 
@@ -282,7 +311,7 @@ void sServerMenu::RankInfo(Player* player)
                 << "Ранги это вот этот значок |TInterface\\icons\\Ability_warrior_rampage:14:14:0:-1|t который отображается в дебафах.\n\n"
                 << "Поднимать ранг вы можете за опыт который получите за:\n"
                 << "   * Победу на арене\n   * Победу на поле боя\n   * Убийство игроков\n   * Награда за квесты\n   * Ивенты\n"
-            //  << "У |cff065961VIP аккаунтов|r рейтинг на опыт в 2 раза больше.\n\n"
+                << "У |cff065961VIP аккаунтов|r рейтинг на опыт в 2 раза больше.\n\n"
                 << "Что дает ранг ?\n"
                 << "На каждом ранге есть свои бонусы, чем выше ранг тем больше бонусов.\n"
                 << "На каждом ранге у вас открываются секретный продавец в котором могут быть полезные вещи такие как: вещи на А9-T11, трансмогрификацию, маунты, итд...";
@@ -296,7 +325,7 @@ void sServerMenu::RankInfo(Player* player)
                 << "Ranks this is this icon |TInterface\\icons\\Ability_warrior_rampage:14:14:0:-1|t which is displayed in debuffs.\n\n"
                 << "You can raise the rank for the experience that you get for:\n"
                 << "   * Victory in the arena\n   * Victory on the battlefield\n   * Kill the players\n   * Completing quests\n   * Events\n"
-            //  << "At |cff065961VIP accounts|r experience rating is 2 times higher.\n\n"
+                << "At |cff065961VIP accounts|r experience rating is 2 times higher.\n\n"
                 << "What gives the rank?\n"
                 << "Each rank has its own bonuses, the higher the rank the more bonuses.\n"
                 << "At each rank you will have a secret prodigy in which there may be useful things such as: А9-T11, things for transmogrification, mounts, etc.";
@@ -448,4 +477,113 @@ void sServerMenu::SendHonorToPlayer(Player* sender, ObjectGuid receiver, uint32 
     CharacterDatabase.Execute(stmt_log);
 
     return sServerMenuMgr->OpenTradeHonor(sender);
+}
+
+void sServerMenu::GetVipStatus(Player* player, uint16 days) {
+
+    const uint32 modtime = days * 86400; // кол дней
+    const uint32 login   = player->GetSession()->GetAccountId();
+
+    LoginDatabasePreparedStatement* SETpremium = LoginDatabase.GetPreparedStatement(LOGIN_INS_ACCOUNT_PREMIUM);
+    SETpremium->SetData(0, login);
+    SETpremium->SetData(1, modtime);
+
+    LoginDatabase.Execute(SETpremium);
+}
+
+void sServerMenu::BuyVip(Player* player, uint16 days) 
+{
+    if (!player)
+        return;
+
+    std::stringstream NOTIFI;
+    const uint32 cost = days*50;
+    const uint32 bonuses = player->GetSession()->GetBonuses();
+    const uint32 rest = bonuses - cost;
+
+    if (days >= 7 && bonuses >= cost) {
+
+        player->GetSession()->SetBonuses(rest);
+        sServerMenuMgr->GetVipStatus(player, days);
+
+        /* обновляем статус без релога */
+        player->GetSession()->SetPremium(true);
+
+        if(player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU) {
+            NOTIFI << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Премиум Аккаунт]: Поздравляем! Вы получили |cffffff4dпремиум|cffff9933 аккаунт на ( ";
+            NOTIFI << days << " ) кол.дней.";
+        }
+        else {
+            NOTIFI << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Premium Account]: Congratulations! You received |cffffff4dpremium|cffff9933 account for ( ";
+            NOTIFI << days << " ) day(s).";
+        }
+
+        sServerMenuMgr->GetVipMenu(player);
+    }
+    else {
+        /* минимальное количество дней */
+        if (days < 7) {
+            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU)
+                NOTIFI << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Премиум Аккаунт]: Минимальное количество дней 7.\n";
+            else
+                NOTIFI << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Премиум Аккаунт]: Minimum number of days 7.\n";
+            sServerMenuMgr->GetVipMenuForBuy(player);
+        }
+
+        else if (bonuses < cost) {
+            if (player->GetSession()->GetSessionDbLocaleIndex() == LOCALE_ruRU)
+                NOTIFI << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Премиум Аккаунт]: У вас не хватает бонусов, нужно еще: " << cost-bonuses;
+            else
+                NOTIFI << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Премиум Аккаунт]: You do not have enough bonuses, you also need: " << cost-bonuses;
+            sServerMenuMgr->GetVipMenuForBuy(player);
+        }
+    }
+
+    ChatHandler(player->GetSession()).PSendSysMessage("%s", NOTIFI.str().c_str());
+    player->GetSession()->SendAreaTriggerMessage("%s", NOTIFI.str().c_str());
+}
+
+void sServerMenu::GetVipMenuForBuy(Player* player) 
+{
+    if (!player)
+        return;
+
+    ClearGossipMenuFor(player);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_NOTVIP_MENU_2, EN_NOTVIP_MENU_2), GOSSIP_SENDER_MAIN + 9, 4, GetText(player, RU_BUY_VIP_TEXT, EN_BUY_VIP_TEXT), 0, false);
+    // AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_NOTVIP_MENU_3, EN_NOTVIP_MENU_3), GOSSIP_SENDER_MAIN + 4, GossipHelloMenu + 1);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 0);
+    player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 5), player->GetGUID());
+}
+
+void sServerMenu::GetVipMenu(Player* player) 
+{
+    if (!player)
+        return;
+
+    ClearGossipMenuFor(player);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_VIP_MENU_1, EN_VIP_MENU_1), GOSSIP_SENDER_MAIN + 9, 1);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_VIP_MENU_2, EN_VIP_MENU_2), GOSSIP_SENDER_MAIN + 9, 2);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_VIP_MENU_3, EN_VIP_MENU_3), GOSSIP_SENDER_MAIN + 9, 3);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, RU_back, EN_back), GOSSIP_SENDER_MAIN, 0);
+    player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player,  5), player->GetGUID());
+}
+
+void sServerMenu::RemoveAuraForVip(Player* player, bool disert)
+{
+    if (!player)
+        return;
+
+    player->RemoveAura(disert ? 26013 : 15007); /* слабость */ /* дизертир */
+    player->PlayerTalkClass->SendCloseGossip();
+}
+
+void sServerMenu::VipSetBuff(Player* player) 
+{
+    if (!player)
+        return;
+
+    for(const auto& i: BuffList)
+        if(!player->HasAura(i))
+            player->CastSpell(player, i,true);
+    player->PlayerTalkClass->SendCloseGossip();
 }
