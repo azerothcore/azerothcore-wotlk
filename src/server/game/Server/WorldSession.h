@@ -379,7 +379,7 @@ public:
     void SetTotalTime(uint32 TotalTime) { m_total_time = TotalTime; }
     uint32 GetTotalTime() const { return m_total_time; }
 
-    void SetBonuses(uint32 Bonuses) { m_bonuses = Bonuses; }
+    void SetBonuses(uint32 Bonuses);
     uint32 GetBonuses() { return m_bonuses; }
 
     void InitWarden(SessionKey const&, std::string const& os);

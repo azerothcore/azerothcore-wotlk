@@ -136,6 +136,10 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_INS_ACCOUNT_PREMIUM, "REPLACE INTO account_premium VALUES (?, unix_timestamp(NOW()), unix_timestamp(NOW())+?, 1, 1)", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_PREMIUM, "SELECT 1 FROM account_premium WHERE id = ? AND active = 1", CONNECTION_SYNCH);
 
+    // Бонусы
+    PrepareStatement(LOGIN_UPD_ACCOUNT_BONUSES, "UPDATE account SET bonuses = ? WHERE id = ?", CONNECTION_ASYNC);
+    PrepareStatement(LOGIN_SEL_ACCOUNT_BONUSES, "SELECT bonuses FROM account WHERE id = ?", CONNECTION_SYNCH);
+
     // DB logging
     PrepareStatement(LOGIN_INS_LOG, "INSERT INTO logs (time, realm, type, level, string) VALUES (?, ?, ?, ?, ?)", CONNECTION_ASYNC);
 
