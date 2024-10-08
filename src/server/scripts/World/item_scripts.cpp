@@ -363,66 +363,69 @@ public:
         std::ostringstream rus;
         std::ostringstream eng;
 
+        rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: ";
+        eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: ";
+
         switch(randomNumber) {
             case 1:                                     // 1% - 2500 очков арены
                 pPlayer->ModifyArenaPoints(2500);
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4d2500|cffff9933 очков арены.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4d2500|cffff9933 arena points.";
+                rus << "Вы получили |cffffff4d2500|cffff9933 очков арены.";
+                eng << "You got |cffffff4d2500|cffff9933 arena points.";
                 break;              
             case 2 ... 5:                                // 4% - 250к очков чести
                 pPlayer->ModifyHonorPoints(250000);
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4d250 000|cffff9933 очков чести.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4d250 000|cffff9933 honor points.";      
+                rus << "Вы получили |cffffff4d250 000|cffff9933 очков чести.";
+                eng << "You got |cffffff4d250 000|cffff9933 honor points.";        
                 break;      
             case 6 ... 10:                               // 5% - 10 бонусов 
-                pPlayer->GetSession()->SetBonuses(10);
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4d10|cffff9933 бонусов.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4d10|cffff9933 bonuses."; 
+                pPlayer->AddItem(38570, 10);
+                rus << "Вы получили |cffffff4d10|cffff9933 бонусов.";
+                eng << "You got |cffffff4d10|cffff9933 bonuses."; 
                 break;   
             case 11 ... 20:                              // 10% - забирает 50к очков чести
                 pPlayer->ModifyHonorPoints(-50000);
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You fucked up |cffffff4d50 000|cffff9933 honor points."; 
+                rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
+                eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
                 break;     
             case 21 ... 30:                              // 10% - 100 Осколоков каменного хранителя
                 pPlayer->AddItem(43228, 100);
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4d100|cffff9933 осколоков каменного хранителя.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4d100|cffff9933 stone keeper's shard.";  
+                rus << "Вы получили |cffffff4d100|cffff9933 осколоков каменного хранителя.";
+                eng << "You got |cffffff4d100|cffff9933 stone keeper's shard.";   
                 break;           
             case 31 ... 50:                              // 20% - Просто убивает вас (русская рулетка же)
                 pPlayer->CastSpell(pPlayer, 74090, false); 
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4dп#зды|cffff9933.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4dcunts|cffff9933.";
+                rus << "Вы получили |cffffff4dп#зды|cffff9933.";
+                eng << "You got |cffffff4dcunts|cffff9933.";
                 break;              
             case 51 ... 52:                              // 2% - 3 жетона русской рулетки
                 pPlayer->AddItem(52361, 3);
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4d3|cffff9933 жетона русской рулетки.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4d3|cffff9933 russian roulette tokens.";   
+                rus << "Вы получили |cffffff4d3|cffff9933 жетона русской рулетки.";
+                eng << "You got |cffffff4d3|cffff9933 russian roulette tokens.";    
                 break;             
             case 53 ... 60:                              // 9% - забирает 50 очков арены
-                pPlayer->ModifyArenaPoints(50);
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы потеряли |cffffff4d50|cffff9933 очков арены.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You lost |cffffff4d50|cffff9933 arena points.";    
+                pPlayer->ModifyArenaPoints(-50);
+                rus << "Вы потеряли |cffffff4d50|cffff9933 очков арены.";
+                eng << "You lost |cffffff4d50|cffff9933 arena points."; 
                 break;         
             case 61 ... 90:                              // 30% - 2 слитка по 250 опыта для ранга
                 pPlayer->AddItem(1044, 2); 
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4d2|cffff9933 слитка по 250 опыта для ранга.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4d2|cffff9933 250 xp ingot per rank."; 
+                rus << "Вы получили |cffffff4d2|cffff9933 слитка по 250 опыта для ранга.";
+                eng << "You got |cffffff4d2|cffff9933 250 xp ingot per rank."; 
                 break;
             case 91 ... 95:                              // 5% - Премиум аккаунт на 1 день
                 pPlayer->AddItem(34631, 1);
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4d1|cffff9933 премиум аккаунт на 1 день.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4d1|cffff9933 premium account for 1 day.";
+                rus << "Вы получили |cffffff4d1|cffff9933 премиум аккаунт на 1 день.";
+                eng << "You got |cffffff4d1|cffff9933 premium account for 1 day.";
                 break;
             case 96 ... 99:                              // 4% - 10 слитков по 1к опыта для ранга
                 pPlayer->AddItem(35778, 10); 
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4d10|cffff9933 слитка по 1 000 опыта для ранга.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4d10|cffff9933 1000 xp ingot per rank.";
+                rus << "Вы получили |cffffff4d10|cffff9933 слитка по 1 000 опыта для ранга.";
+                eng << "You got |cffffff4d10|cffff9933 1000 xp ingot per rank.";
                 break;            
             case 100:                                   // 1% - 10 слитков по 5к опыта для ранга
                 pPlayer->AddItem(842, 10);
-                rus << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Русская рулетка]: Вы получили |cffffff4d10|cffff9933 слитка по 5 000 опыта для ранга.";
-                eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: You got |cffffff4d10|cffff9933 5 000 xp ingot per rank."; 
+                rus << "Вы получили |cffffff4d10|cffff9933 слитка по 5 000 опыта для ранга.";
+                eng << "You got |cffffff4d10|cffff9933 5 000 xp ingot per rank.";
                 break;                   
             default: 
                 rus << "Ошибка";
