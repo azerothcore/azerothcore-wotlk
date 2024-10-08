@@ -46,7 +46,7 @@ public:
                     break;
 
                 case 1:
-                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sПеред вами стоит моб быстрого старта 'Mr.Gladiator' в котором сможете ваш спек, он всё сделает за вас.", icon_color);
+                    ChatHandler(_Plr->GetSession()).PSendSysMessage("%sПеред вами стоит моб быстрого старта 'Mr.Gladiator' в котором сможете выбрать ваш спек, он всё сделает за вас.", icon_color);
                     _events[pEvent].Events = 2;
                     break;
 

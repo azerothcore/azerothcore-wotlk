@@ -222,11 +222,11 @@ void sServerMenu::GossipMenuExchangeHonor(Player* player)
         return;
 
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 10000, 50, 1), GOSSIP_SENDER_MAIN + 7, 50);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 20000, 100, 2), GOSSIP_SENDER_MAIN + 7, 100);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 50000, 250, 5), GOSSIP_SENDER_MAIN + 7, 250);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 100000, 500, 10), GOSSIP_SENDER_MAIN + 7, 500);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 250000, 1250, 25), GOSSIP_SENDER_MAIN + 7, 1250);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 5000, 50, 1), GOSSIP_SENDER_MAIN + 7, 50);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 10000, 100, 2), GOSSIP_SENDER_MAIN + 7, 100);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 25000, 250, 5), GOSSIP_SENDER_MAIN + 7, 250);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 50000, 500, 10), GOSSIP_SENDER_MAIN + 7, 500);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 125000, 1250, 25), GOSSIP_SENDER_MAIN + 7, 1250);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetText(player, "Назад", "Back"), GOSSIP_SENDER_MAIN, 5);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 3), player->GetGUID());    
 }
