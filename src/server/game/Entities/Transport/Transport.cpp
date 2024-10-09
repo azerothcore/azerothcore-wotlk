@@ -30,8 +30,28 @@
 #include "Spell.h"
 #include "Vehicle.h"
 #include "WorldModel.h"
+#include "Config.h"
+#include <chrono>
 
-MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false)
+namespace
+{
+    // Any date would work. Lets use this one - August 10, 2023, 00:00:00.
+    std::time_t startTimestamp = 1689139200;
+    std::chrono::system_clock::time_point tarnsportStartDate = std::chrono::system_clock::from_time_t(startTimestamp);
+
+    // Calculates time of the next departure cycle.
+    std::chrono::system_clock::time_point calculateNextDepartureTime(int oneIterationInterval) {
+        std::chrono::system_clock::time_point currentTime = std::chrono::system_clock::now();
+        std::chrono::milliseconds interval(oneIterationInterval);
+        std::chrono::milliseconds timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - tarnsportStartDate);
+        int64 intervalsPassed = timeSinceStart.count() / oneIterationInterval;
+        std::chrono::system_clock::time_point nextDeparture = tarnsportStartDate + (interval * (intervalsPassed + 1));
+        return nextDeparture;
+    }
+}
+
+MotionTransport::MotionTransport() : Transport(), _transportInfo(nullptr), _isMoving(true), _pendingStop(false), _triggeredArrivalEvent(false), _triggeredDepartureEvent(false), _passengersLoaded(false), _delayedTeleport(false),
+    _requiresFirstDepartureSync(false), _firstDepartureTime(tarnsportStartDate)
 {
     m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
 }
@@ -76,6 +96,13 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
 
     _transportInfo = tInfo;
 
+    // Enable transport sync only in cluster mode and for transport with several maps.
+    if (sConfigMgr->GetOption<bool>("Cluster.Enabled", false) && tInfo->mapsUsed.size() > 1)
+    {
+        _requiresFirstDepartureSync = true;
+        this->SetPhaseMask(2, true);
+    }
+
     // initialize waypoints
     _nextFrame = tInfo->keyFrames.begin();
     _currentFrame = _nextFrame++;
@@ -108,6 +135,51 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     return true;
 }
 
+// Delays first departure to make sure that transport follows strict schedule
+// and with that makes transport synced between cluster nodes.
+uint32 MotionTransport::HandleFirstDepartureSync(uint32 diff)
+{
+    if (!_requiresFirstDepartureSync)
+        return diff;
+
+    if (_firstDepartureTime == tarnsportStartDate)
+    {
+        _firstDepartureTime = calculateNextDepartureTime(_transportInfo->pathTime);
+        return diff;
+    }
+
+    // Making system call for current time to be more accurate.
+    // Shouldn't be an issue since it runs only before the very first departure.
+    int32 millLeftToDeparture = std::chrono::duration_cast<std::chrono::milliseconds>(_firstDepartureTime - std::chrono::system_clock::now()).count();
+    if (millLeftToDeparture > 0)
+        return diff;
+
+    // At this point we are ready for first departure.
+    _requiresFirstDepartureSync = false;
+    this->SetPhaseMask(1, true);
+
+    // Players don't know about transport because it was in a different phase.
+    // We need to notify players that object exists before departure.
+    Map::PlayerList const& players = this->GetMap()->GetPlayers();
+    if (!players.IsEmpty())
+    {
+        for (Map::PlayerList::const_iterator i = players.begin(); i != players.end(); ++i)
+        {
+            if (Player* player = i->GetSource())
+            {
+                UpdateData transData;
+                this->BuildCreateUpdateBlockForPlayer(&transData, player);
+
+                WorldPacket packet;
+                transData.BuildPacket(packet);
+                player->GetSession()->SendPacket(&packet);
+            }
+        }
+    }
+
+    return millLeftToDeparture * -1;
+}
+
 void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
 {
     UnloadStaticPassengers();
@@ -137,6 +209,13 @@ void MotionTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
 
 void MotionTransport::Update(uint32 diff)
 {
+    if (_requiresFirstDepartureSync)
+    {
+        diff = HandleFirstDepartureSync(diff);
+        if (_requiresFirstDepartureSync)
+            return;
+    }
+
     uint32 const positionUpdateDelay = 1;
 
     if (AI())
