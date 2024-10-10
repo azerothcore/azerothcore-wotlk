@@ -48,6 +48,11 @@ enum Events
     EVENT_ENRAGE                    = 2
 };
 
+enum Misc
+{
+    ITEM_NAJENTUS_SPINE             = 32408
+};
+
 struct boss_najentus : public BossAI
 {
     boss_najentus(Creature* creature) : BossAI(creature, DATA_HIGH_WARLORD_NAJENTUS), _canTalk(true) { }
@@ -64,6 +69,10 @@ struct boss_najentus : public BossAI
 
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
+        me->GetMap()->DoForAllPlayers([&](Player* player)
+        {
+            player->DestroyItemCount(ITEM_NAJENTUS_SPINE, 5, true);
+        });
 
         me->m_Events.AddEventAtOffset([this] {
             Talk(SAY_ENRAGE);
