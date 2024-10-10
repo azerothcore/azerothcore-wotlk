@@ -113,6 +113,7 @@ struct boss_najentus : public BossAI
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
+        me->m_Events.CancelEventGroup(EVENT_ENRAGE);
         Talk(SAY_DEATH);
     }
 
