@@ -584,7 +584,8 @@ Player* ScriptedAI::SelectTargetFromPlayerList(float maxdist, uint32 excludeAura
 BossAI::BossAI(Creature* creature, uint32 bossId) : ScriptedAI(creature),
     instance(creature->GetInstanceScript()),
     summons(creature),
-    _bossId(bossId)
+    _bossId(bossId),
+    _nextHealthCheck(0, { }, false)
 {
     callForHelpRange = 0.0f;
     if (instance)
@@ -733,22 +734,20 @@ void BossAI::UpdateAI(uint32 diff)
 
 void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/)
 {
-    if (!_healthCheckEvents.empty())
-    {
-        for (auto& check : _healthCheckEvents)
+    if (_nextHealthCheck._valid)
+        if (me->HealthBelowPctDamaged(_nextHealthCheck._healthPct, damage))
         {
-            if (check._valid && me->HealthBelowPctDamaged(check._healthPct, damage))
-            {
-                check._exec();
-                check._valid = false;
-            }
-        }
+            _nextHealthCheck._exec();
+            _nextHealthCheck._valid = false;
 
-        _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
-        {
-            return !data._valid;
-        });
-    }
+            _healthCheckEvents.remove_if([&](HealthCheckEventData data) -> bool
+            {
+                return data._healthPct == _nextHealthCheck._healthPct;
+            });
+
+            if (!_healthCheckEvents.empty())
+                _nextHealthCheck = _healthCheckEvents.front();
+        }
 }
 
 /**
@@ -760,6 +759,7 @@ void BossAI::DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*
 void BossAI::ScheduleHealthCheckEvent(uint32 healthPct, std::function<void()> exec)
 {
     _healthCheckEvents.push_back(HealthCheckEventData(healthPct, exec));
+    _nextHealthCheck = _healthCheckEvents.front();
 };
 
 void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, std::function<void()> exec)
@@ -768,6 +768,8 @@ void BossAI::ScheduleHealthCheckEvent(std::initializer_list<uint8> healthPct, st
     {
         _healthCheckEvents.push_back(HealthCheckEventData(checks, exec));
     }
+
+    _nextHealthCheck = _healthCheckEvents.front();
 }
 
 // WorldBossAI - for non-instanced bosses
