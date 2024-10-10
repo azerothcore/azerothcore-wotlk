@@ -623,7 +623,7 @@ public:
             ExecuteSpeech_Counter = 0;
             PlayerGUID.Clear();
 
-            me->SetImmuneToPC(false);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);  
         }
 
         bool MeetQuestCondition(Player* player)
@@ -734,7 +734,7 @@ public:
                     case 9:
                         Talk(SAY_EXEC_TIME, player);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        me->SetImmuneToPC(false);
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         break;
                     case 10:
                         Talk(SAY_EXEC_WAITING, player);
