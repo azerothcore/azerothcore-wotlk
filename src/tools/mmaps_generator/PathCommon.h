@@ -90,7 +90,7 @@ namespace MMAP
         do
         {
             if ((findFileInfo.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
-                fileList.push_back(std::string(findFileInfo.cFileName));
+                fileList.emplace_back(findFileInfo.cFileName);
         } while (FindNextFile(hFind, &findFileInfo));
 
         FindClose(hFind);
