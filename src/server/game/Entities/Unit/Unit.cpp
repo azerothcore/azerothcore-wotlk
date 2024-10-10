@@ -5117,6 +5117,9 @@ void Unit::RemoveAurasByType(AuraType auraType, ObjectGuid casterGUID, Aura* exc
         if (aura != except && (!casterGUID || aura->GetCasterGUID() == casterGUID)
                 && ((negative && !aurApp->IsPositive()) || (positive && aurApp->IsPositive())))
         {
+            if (aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+                continue;
+
             uint32 removedAuras = m_removedAurasCount;
             RemoveAura(aurApp);
             if (m_removedAurasCount > removedAuras + 1)
@@ -5252,11 +5255,12 @@ void Unit::RemoveAurasWithMechanic(uint32 mechanic_mask, AuraRemoveMode removemo
         Aura const* aura = iter->second->GetBase();
         if (!except || aura->GetId() != except)
         {
-            if (aura->GetSpellInfo()->GetAllEffectsMechanicMask() & mechanic_mask)
-            {
-                RemoveAura(iter, removemode);
-                continue;
-            }
+            if (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+                if (aura->GetSpellInfo()->GetAllEffectsMechanicMask() & mechanic_mask)
+                {
+                    RemoveAura(iter, removemode);
+                    continue;
+                }
         }
         ++iter;
     }
