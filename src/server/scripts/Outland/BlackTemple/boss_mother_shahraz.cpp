@@ -127,6 +127,7 @@ struct boss_mother_shahraz : public BossAI
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
+        me->m_Events.CancelEventGroup(GROUP_ENRAGE);
         Talk(SAY_DEATH);
     }
 
