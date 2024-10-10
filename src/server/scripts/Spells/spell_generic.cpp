@@ -5311,6 +5311,30 @@ class spell_gen_steal_weapon : public AuraScript
     }
 };
 
+// 65917 - Magic Rooster
+// Due to a flaw in the spell design
+// The mount can be used, they are on another mount
+class spell_magic_rooster_egg : public SpellScript
+{
+    PrepareSpellScript(spell_magic_rooster_egg);
+
+    void HandleBeforeCast()
+    {
+        Unit* caster = GetCaster();
+
+        if (caster)
+        {
+            caster->Dismount();
+            caster->RemoveAurasByType(SPELL_AURA_MOUNTED);
+        }
+    }
+
+    void Register() override
+    {
+        BeforeCast += SpellCastFn(spell_magic_rooster_egg::HandleBeforeCast);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5468,4 +5492,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_consumption);
     RegisterSpellScript(spell_gen_sober_up);
     RegisterSpellScript(spell_gen_steal_weapon);
+    RegisterSpellScript(spell_magic_rooster_egg);
 }
