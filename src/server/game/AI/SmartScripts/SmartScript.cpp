@@ -145,7 +145,16 @@ void SmartScript::ProcessEventsFor(SMART_EVENT e, Unit* unit, uint32 var0, uint3
             ConditionSourceInfo info = ConditionSourceInfo(unit, GetBaseObject(), me ? me->GetVictim() : nullptr);
 
             if (sConditionMgr->IsObjectMeetToConditions(info, conds))
-                ProcessEvent(*i, unit, var0, var1, bvar, spell, gob);
+            {
+                ASSERT(executionStack.empty());
+                executionStack.emplace_back(SmartScriptFrame{ *i, unit, var0, var1, bvar, spell, gob });
+                while (!executionStack.empty())
+                {
+                    auto [stack_holder , stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob] = executionStack.back();
+                    executionStack.pop_back();
+                    ProcessEvent(stack_holder, stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob);
+                }
+            }
         }
     }
 }
@@ -3255,9 +3264,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
     if (e.link && e.link != e.event_id)
     {
-        SmartScriptHolder linked = FindLinkedEvent(e.link);
-        if (linked.GetActionType() && linked.GetEventType() == SMART_EVENT_LINK)
-            ProcessEvent(linked, unit, var0, var1, bvar, spell, gob);
+        auto linked = FindLinkedEvent(e.link);
+        if (linked.has_value() && linked.value().get().GetEventType() == SMART_EVENT_LINK)
+            executionStack.emplace_back(SmartScriptFrame{ linked.value(), unit, var0, var1, bvar, spell, gob });
         else
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Link Event {} not found or invalid, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.link);
     }
@@ -4852,7 +4861,14 @@ void SmartScript::UpdateTimer(SmartScriptHolder& e, uint32 const diff)
             case SMART_EVENT_DISTANCE_CREATURE:
             case SMART_EVENT_DISTANCE_GAMEOBJECT:
                 {
-                    ProcessEvent(e);
+                    ASSERT(executionStack.empty());
+                    executionStack.emplace_back(SmartScriptFrame{ e, nullptr, 0, 0, false, nullptr, nullptr });
+                    while (!executionStack.empty())
+                    {
+                        auto [stack_holder, stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob] = executionStack.back();
+                        executionStack.pop_back();
+                        ProcessEvent(stack_holder, stack_unit, stack_var0, stack_var1, stack_bvar, stack_spell, stack_gob);
+                    }
                     if (e.GetScriptType() == SMART_SCRIPT_TYPE_TIMED_ACTIONLIST)
                     {
                         e.enableTimed = false;//disable event if it is in an ActionList and was processed once
