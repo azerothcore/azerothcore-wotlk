@@ -139,7 +139,8 @@ struct boss_supremus : public BossAI
                     DoResetThreatList();
                     me->AddThreat(target, 5000000.0f);
                     Talk(EMOTE_NEW_TARGET);
-                    DoCastVictim(SPELL_CHARGE);
+                    if (target->IsWithinDist(me, 40))
+                        DoCast(target, SPELL_CHARGE);
                 }
 
                 context.Repeat(10s);
