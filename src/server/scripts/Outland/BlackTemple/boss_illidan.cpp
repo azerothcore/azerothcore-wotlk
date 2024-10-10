@@ -1335,7 +1335,7 @@ struct npc_flame_of_azzinoth : public ScriptedAI
             DoCastVictim(SPELL_FLAME_BLAST);
 
             me->m_Events.AddEventAtOffset([&] {
-                DoCastVictim(SPELL_BLAZE);
+                me->GetVictim()->CastSpell(me->GetVictim(), SPELL_BLAZE, true);
             }, 1s);
         }, 15s, 20s);
     }
