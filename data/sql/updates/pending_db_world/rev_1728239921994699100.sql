@@ -1,7 +1,8 @@
 UPDATE `creature_template` SET `unit_flags` = 33587202 WHERE (`entry` = 28782);
 
-INSERT INTO creature_text
-(CreatureID, GroupID, ID, `Text`, `Type`, `Language`, Probability, Emote, Duration, Sound, BroadcastTextId, TextRange, comment)
+
+DELETE FROM `creature_text` WHERE (`CreatureID` = 28782) AND (`GroupID` = 0) AND (`ID` IN (0));
+INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`)
 VALUES(28782, 0, 0, '%s rears up, beckoning you to ride it.', 16, 0, 100.0, 0, 0, 0, 29069, 0, 'Archerus Deathcharger');
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28768;
