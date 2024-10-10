@@ -56,14 +56,22 @@ public:
     {
         npc_crusade_persuadedAI(Creature* creature) : CombatAI(creature) { }
 
+        const uint32 SAY_AGGRO_CHANCE = 33;
+        const uint32 PERSUADE_SUCCESS_CHANCE = 3; // 30% chance
+        const uint32 SPEECH_TIMER_DEFAULT = 1000;
+        const uint32 SPEECH_TIMER_FOR_ROLEPLAY = 8000;
+        const uint32 SPEECH_COUNTER_PREVENT_SUCCESS_ROLEPLAY = 0;
+        const uint32 SPEECH_COUNTER_START_SUCCESS_ROLEPLAY = 1;
+
         uint32 speechTimer;
         uint32 speechCounter;
         ObjectGuid playerGUID;
+        bool persuaded;
 
         void Reset() override
         {
             speechTimer = 0;
-            speechCounter = 0;
+            speechCounter = SPEECH_COUNTER_PREVENT_SUCCESS_ROLEPLAY;
             playerGUID.Clear();
             me->SetReactState(REACT_AGGRESSIVE);
             me->RestoreFaction();
@@ -71,7 +79,7 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
-            if (roll_chance_i(33))
+            if (roll_chance_i(SAY_AGGRO_CHANCE))
                 Talk(SAY_AGGRO);
         }
 
@@ -81,20 +89,23 @@ public:
             {
                 if (Player* player = caster->ToPlayer())
                 {
-                    if (player->GetQuestStatus(QUEST_HOW_TO_WIN_FRIENDS) == QUEST_STATUS_INCOMPLETE)
+                    playerGUID = player->GetGUID();
+                    speechTimer = SPEECH_TIMER_DEFAULT;
+                    speechCounter = SPEECH_COUNTER_START_SUCCESS_ROLEPLAY;
+                    uint32 persuadeRoll = urand(1, 10);
+
+                    sCreatureTextMgr->SendChat(me, SAY_PERSUADE_RAND, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
+
+                    if (persuadeRoll <= PERSUADE_SUCCESS_CHANCE && player->GetQuestStatus(QUEST_HOW_TO_WIN_FRIENDS) == QUEST_STATUS_INCOMPLETE)
                     {
-                        playerGUID = player->GetGUID();
-                        speechTimer = 1000;
-                        speechCounter = 1;
+                        persuaded = true;
                         me->SetFaction(player->GetFaction());
                         me->CombatStop(true);
                         me->GetMotionMaster()->MoveIdle();
                         me->SetReactState(REACT_PASSIVE);
-                        DoCastAOE(SPELL_THREAT_PULSE, true);
-
-                        sCreatureTextMgr->SendChat(me, SAY_PERSUADE_RAND, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
-                        Talk(SAY_CRUSADER);
                     }
+                    else
+                        persuaded = false;
                 }
             }
         }
@@ -112,46 +123,53 @@ public:
                         return;
                     }
 
-                    switch (speechCounter)
+                    if (persuaded)
                     {
+                        switch (speechCounter)
+                        {
                         case 1:
                             Talk(SAY_PERSUADED1);
-                            speechTimer = 8000;
+                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
                             break;
 
                         case 2:
                             Talk(SAY_PERSUADED2);
-                            speechTimer = 8000;
+                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
                             break;
 
                         case 3:
                             Talk(SAY_PERSUADED3);
-                            speechTimer = 8000;
+                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
                             break;
 
                         case 4:
                             Talk(SAY_PERSUADED4);
-                            speechTimer = 8000;
+                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
                             break;
 
                         case 5:
                             sCreatureTextMgr->SendChat(me, SAY_PERSUADED5, nullptr, CHAT_MSG_ADDON, LANG_ADDON, TEXT_RANGE_NORMAL, 0, TEAM_NEUTRAL, false, player);
-                            speechTimer = 8000;
+                            speechTimer = SPEECH_TIMER_FOR_ROLEPLAY;
                             break;
 
                         case 6:
                             Talk(SAY_PERSUADED6);
                             Unit::Kill(player, me);
-                            speechCounter = 0;
+                            speechCounter = SPEECH_COUNTER_PREVENT_SUCCESS_ROLEPLAY;
                             player->GroupEventHappens(QUEST_HOW_TO_WIN_FRIENDS, me);
                             return;
-                    }
+                        }
 
-                    ++speechCounter;
-                    DoCastAOE(SPELL_THREAT_PULSE, true);
+                        ++speechCounter;
+                    }
+                    else
+                    {
+                        Talk(SAY_CRUSADER);
+                        speechCounter = SPEECH_COUNTER_PREVENT_SUCCESS_ROLEPLAY;
+                    }
                 }
                 else
-                    speechTimer -= diff;
+                    speechTimer = (speechTimer > diff) ? (speechTimer - diff) : 0;
 
                 return;
             }
