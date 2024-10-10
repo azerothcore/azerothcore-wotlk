@@ -12,7 +12,7 @@ CREATE TABLE `vehicle_seat_addon` (
 );
 
 DELETE FROM `vehicle_seat_addon` WHERE `SeatEntry` IN (2726, 2727, 2728, 2729, 2730, 1472, 1473, 1474, 1475, 1476, 2764, 2765, 2767, 2768, 6446, 6447, 7326, 7327, 7328, 7329, 861, 862, 1682, 2097, 2172, 2178, 2179, 2180, 3690, 3691, 3692, 3129, 2772, 2771);
-INSERT INTO `vehicle_seat_addon` (`SeatEntry`, `SeatOrientation`, `ExitParamX`, `ExitParamY`, `ExitParamZ`, `ExitParamO`, ExitParamValue) VALUES
+INSERT INTO `vehicle_seat_addon` (`SeatEntry`, `SeatOrientation`, `ExitParamX`, `ExitParamY`, `ExitParamZ`, `ExitParamO`, `ExitParamValue`) VALUES
 (2764, 0.0, -2.0, 2.0, 0.0, 0.0, 1), -- 312 Traveler's Tundra Mammoth
 (2765, 0.0, -2.0, -2.0, 0.0, 0.0, 1), -- 312
 (2767, 0.0, -2.0, 2.0, 0.0, 0.0, 1),  -- 313 Traveler's Tundra Mammoth
