@@ -16,12 +16,10 @@
  */
 
 #include "BattlegroundRV.h"
-#include "ArenaScore.h"
 #include "Battleground.h"
 #include "GameObject.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
-#include "Pet.h"
 #include "Player.h"
 #include "WorldPacket.h"
 

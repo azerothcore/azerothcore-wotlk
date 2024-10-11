@@ -4051,6 +4051,46 @@ class spell_item_gor_dreks_ointment : public SpellScript
     }
 };
 
+enum Skettis
+{
+    QUEST_FIRES_OVER_SKETTIS = 11008
+};
+
+class spell_item_skyguard_blasting_charges : public SpellScript
+{
+    PrepareSpellScript(spell_item_skyguard_blasting_charges);
+
+    void HandleOpenObject(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+        if (GameObject* go = GetHitGObj())
+            go->UseDoorOrButton();
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* kaliri = GetHitUnit())
+            kaliri->ToCreature()->DespawnOrUnsummon(0s, 30s);
+    }
+
+    SpellCastResult CheckQuest()
+    {
+        if (Player* playerCaster = GetCaster()->ToPlayer())
+        {
+            if (playerCaster->GetQuestStatus(QUEST_FIRES_OVER_SKETTIS) == QUEST_STATUS_INCOMPLETE)
+                return SPELL_CAST_OK;
+        }
+        return SPELL_FAILED_DONT_REPORT;
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_item_skyguard_blasting_charges::HandleOpenObject, EFFECT_1, SPELL_EFFECT_ACTIVATE_OBJECT);
+        OnEffectHitTarget += SpellEffectFn(spell_item_skyguard_blasting_charges::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnCheckCast += SpellCheckCastFn(spell_item_skyguard_blasting_charges::CheckQuest);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4175,4 +4215,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellAndAuraScriptPair(spell_item_eye_of_grillok, spell_item_eye_of_grillok_aura);
     RegisterSpellScript(spell_item_fel_mana_potion);
     RegisterSpellScript(spell_item_gor_dreks_ointment);
+    RegisterSpellScript(spell_item_skyguard_blasting_charges);
 }

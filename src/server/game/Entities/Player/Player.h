@@ -1248,6 +1248,8 @@ public:
         return GetItemByPos(bag, slot);
     }
     [[nodiscard]] Item* GetWeaponForAttack(WeaponAttackType attackType, bool useable = false) const;
+    bool HasWeapon(WeaponAttackType type) const override { return GetWeaponForAttack(type, false); }
+    bool HasWeaponForAttack(WeaponAttackType type) const override { return (Unit::HasWeaponForAttack(type) && GetWeaponForAttack(type, true)); }
     [[nodiscard]] Item* GetShield(bool useable = false) const;
     static uint8 GetAttackBySlot(uint8 slot);        // MAX_ATTACK if not weapon slot
     std::vector<Item*>& GetItemUpdateQueue() { return m_itemUpdateQueue; }
