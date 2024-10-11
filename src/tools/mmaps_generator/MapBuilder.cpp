@@ -112,7 +112,7 @@ namespace MMAP
             mapID = uint32(atoi(file.substr(0, file.size() - 8).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
             {
-                m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
+                m_tiles.emplace_back(mapID, new std::set<uint32>);
                 count++;
             }
         }
@@ -124,7 +124,7 @@ namespace MMAP
             mapID = uint32(atoi(file.substr(0, file.size() - 7).c_str()));
             if (std::find(m_tiles.begin(), m_tiles.end(), mapID) == m_tiles.end())
             {
-                m_tiles.emplace_back(MapTiles(mapID, new std::set<uint32>));
+                m_tiles.emplace_back(mapID, new std::set<uint32>);
                 count++;
             }
         }
@@ -199,7 +199,7 @@ namespace MMAP
             return (*itr).m_tiles;
 
         std::set<uint32>* tiles = new std::set<uint32>();
-        m_tiles.emplace_back(MapTiles(mapID, tiles));
+        m_tiles.emplace_back(mapID, tiles);
         return tiles;
     }
 

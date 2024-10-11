@@ -733,7 +733,7 @@ struct npc_akama_illidan : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        me->m_Events.KillAllEvents(true);
+        me->m_Events.KillAllEvents(false);
         me->SetReactState(REACT_AGGRESSIVE);
         if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) == DONE)
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -1317,15 +1317,26 @@ struct npc_flame_of_azzinoth : public ScriptedAI
     {
         ScheduleTimedEvent(10s, [&] {
             if (Creature* _blade = ObjectAccessor::GetCreature(*me, _bladeGUID))
+            {
+                Unit* offTank = nullptr;
+
+                if (Creature* secondBlaze = me->FindNearestCreature(NPC_BLAZE, 100.0f, true))
+                    offTank = secondBlaze->GetVictim();
+
                 if (Unit* target = _blade->AI()->SelectTarget(SelectTargetMethod::Random, 0, -40.0f, true))
-                    DoCast(target, SPELL_CHARGE);
+                {
+                    if (!offTank || offTank != target)
+                        DoCast(target, SPELL_CHARGE);
+                }
+            }
         }, 5s, 20s);
 
         ScheduleTimedEvent(10s, 20s, [&] {
             DoCastVictim(SPELL_FLAME_BLAST);
 
             me->m_Events.AddEventAtOffset([&] {
-                DoCastVictim(SPELL_BLAZE);
+                if (Unit* victim = me->GetVictim())
+                    victim->CastSpell(victim, SPELL_BLAZE, true);
             }, 1s);
         }, 15s, 20s);
     }

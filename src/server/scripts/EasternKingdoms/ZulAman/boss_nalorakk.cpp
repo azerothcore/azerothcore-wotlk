@@ -346,6 +346,14 @@ struct boss_nalorakk : public BossAI
         }
         return true;
     }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
+        instance->SetData(DATA_NALORAKKEVENT, DONE);
+    }
+
 private:
     uint8 _phase;
     bool _ranIntro;
