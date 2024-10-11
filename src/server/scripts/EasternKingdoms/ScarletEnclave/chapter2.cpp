@@ -623,8 +623,8 @@ public:
             ExecuteSpeech_Counter = 0;
             PlayerGUID.Clear();
 
-            me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
-            me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetImmuneToPC(true);
         }
 
         bool MeetQuestCondition(Player* player)
@@ -735,8 +735,8 @@ public:
                     case 9:
                         Talk(SAY_EXEC_TIME, player);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        me->SetUnitFlag(UNIT_FLAG_PACIFIED);
-                        me->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
+                        me->SetReactState(REACT_PASSIVE);
+                        me->SetImmuneToPC(false);
                         break;
                     case 10:
                         Talk(SAY_EXEC_WAITING, player);
