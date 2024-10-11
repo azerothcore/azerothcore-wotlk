@@ -40,7 +40,8 @@ enum Spells
     SPELL_TIDAL_SHIELD              = 39872,
     SPELL_IMPALING_SPINE            = 39837,
     SPELL_SUMMON_IMPALING_SPINE     = 39929,
-    SPELL_BERSERK                   = 26662
+    SPELL_BERSERK                   = 26662,
+    SPELL_REMOVE_SPINES             = 40354
 };
 
 enum Events
@@ -62,6 +63,7 @@ struct boss_najentus : public BossAI
     {
         _Reset();
         me->m_Events.CancelEventGroup(EVENT_ENRAGE);
+        DoCastSelf(SPELL_REMOVE_SPINES);
     }
 
     void JustEngagedWith(Unit* who) override
@@ -70,10 +72,7 @@ struct boss_najentus : public BossAI
 
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
-        me->GetMap()->DoForAllPlayers([&](Player* player)
-        {
-            player->DestroyItemCount(ITEM_NAJENTUS_SPINE, 5, true);
-        });
+        DoCastSelf(SPELL_REMOVE_SPINES);
 
         me->m_Events.AddEventAtOffset([this] {
             Talk(SAY_ENRAGE);
@@ -167,9 +166,31 @@ class spell_najentus_hurl_spine : public SpellScript
     }
 };
 
+class spell_najentus_remove_spines : public SpellScript
+{
+    PrepareSpellScript(spell_najentus_remove_spines);
+
+    void RemoveSpines()
+    {
+        if (Unit* caster = GetCaster())
+        {
+            caster->GetMap()->DoForAllPlayers([&](Player* player)
+            {
+                player->DestroyItemCount(ITEM_NAJENTUS_SPINE, 5, true);
+            });
+        }
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_najentus_remove_spines::RemoveSpines);
+    }
+};
+
 void AddSC_boss_najentus()
 {
     RegisterBlackTempleCreatureAI(boss_najentus);
     RegisterSpellScript(spell_najentus_needle_spine);
     RegisterSpellScript(spell_najentus_hurl_spine);
+    RegisterSpellScript(spell_najentus_remove_spines);
 }
