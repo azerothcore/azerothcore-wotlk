@@ -19,7 +19,6 @@
 #define ACORE_TOTEMAI_H
 
 #include "CreatureAI.h"
-#include "Timer.h"
 
 class Creature;
 class Totem;
@@ -50,7 +49,7 @@ public:
     KillMagnetEvent(Unit& self) : _self(self) { }
     bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
     {
-        _self.setDeathState(JUST_DIED);
+        _self.setDeathState(DeathState::JustDied);
         return true;
     }
 

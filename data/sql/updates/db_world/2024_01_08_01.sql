@@ -1,0 +1,33 @@
+-- DB update 2024_01_08_00 -> 2024_01_08_01
+-- Fix Midsummer Bonfire gossip menu option conditions
+DELETE FROM `conditions` WHERE (`SourceGroup` IN (9381, 9406, 9372, 9358, 9356, 9375, 9366, 9370, 9377, 9382, 9380, 9376, 9363, 9361, 9367, 9359, 9374, 9360, 9371, 9383, 9369, 9373, 9368, 9365, 9378, 9357, 9379, 9364, 9362)) AND (`SourceTypeOrReferenceId` = 15) AND (`ConditionTypeOrReference` = 8);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(15, 9381, 0, 0, 0, 8, 0, 11801, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9406, 0, 0, 0, 8, 0, 11581, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9372, 0, 0, 0, 8, 0, 11781, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9358, 0, 0, 0, 8, 0, 11768, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9356, 0, 0, 0, 8, 0, 11766, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9375, 0, 0, 0, 8, 0, 11784, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9366, 0, 0, 0, 8, 0, 11776, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9370, 0, 0, 0, 8, 0, 11580, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9377, 0, 0, 0, 8, 0, 11786, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9382, 0, 0, 0, 8, 0, 11802, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9380, 0, 0, 0, 8, 0, 11800, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9376, 0, 0, 0, 8, 0, 11785, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9363, 0, 0, 0, 8, 0, 11773, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9361, 0, 0, 0, 8, 0, 11771, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9367, 0, 0, 0, 8, 0, 11777, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9359, 0, 0, 0, 8, 0, 11769, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9374, 0, 0, 0, 8, 0, 11783, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9360, 0, 0, 0, 8, 0, 11770, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9371, 0, 0, 0, 8, 0, 11780, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9383, 0, 0, 0, 8, 0, 11803, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9369, 0, 0, 0, 8, 0, 11779, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9373, 0, 0, 0, 8, 0, 11782, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9368, 0, 0, 0, 8, 0, 11778, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9365, 0, 0, 0, 8, 0, 11775, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9378, 0, 0, 0, 8, 0, 11787, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9357, 0, 0, 0, 8, 0, 11767, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9379, 0, 0, 0, 8, 0, 11799, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9364, 0, 0, 0, 8, 0, 11774, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\''),
+(15, 9362, 0, 0, 0, 8, 0, 11772, 0, 0, 0, 0, 0, '', 'gossip menu option requires rewarded quest \'Desecrate this Fire!\'');

@@ -16,13 +16,14 @@
  */
 
 #include "OutdoorPvPHP.h"
+#include "CreatureScript.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 
@@ -62,7 +63,7 @@ OPvPCapturePointHP::OPvPCapturePointHP(OutdoorPvP* pvp, OutdoorPvPHPTowerType ty
 
 OutdoorPvPHP::OutdoorPvPHP()
 {
-    m_TypeId = OUTDOOR_PVP_HP;
+    _typeId = OUTDOOR_PVP_HP;
     m_AllianceTowersControlled = 0;
     m_HordeTowersControlled = 0;
 }
@@ -162,7 +163,7 @@ void OutdoorPvPHP::FillInitialWorldStates(WorldPacket& data)
     data << uint32(HP_UI_TOWER_SLIDER_DISPLAY) << uint32(0);
     data << uint32(HP_UI_TOWER_SLIDER_POS) << uint32(50);
     data << uint32(HP_UI_TOWER_SLIDER_N) << uint32(100);
-    for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    for (OPvPCapturePointMap::iterator itr = _capturePoints.begin(); itr != _capturePoints.end(); ++itr)
     {
         itr->second->FillInitialWorldStates(data);
     }
@@ -171,21 +172,21 @@ void OutdoorPvPHP::FillInitialWorldStates(WorldPacket& data)
 void OPvPCapturePointHP::ChangeState()
 {
     uint32 field = 0;
-    switch (m_OldState)
+    switch (_oldState)
     {
         case OBJECTIVESTATE_NEUTRAL:
             field = HP_MAP_N[m_TowerType];
             break;
         case OBJECTIVESTATE_ALLIANCE:
             field = HP_MAP_A[m_TowerType];
-            if (uint32 alliance_towers = ((OutdoorPvPHP*)m_PvP)->GetAllianceTowersControlled())
-                ((OutdoorPvPHP*)m_PvP)->SetAllianceTowersControlled(--alliance_towers);
+            if (uint32 alliance_towers = ((OutdoorPvPHP*)_pvp)->GetAllianceTowersControlled())
+                ((OutdoorPvPHP*)_pvp)->SetAllianceTowersControlled(--alliance_towers);
             sWorld->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_A[m_TowerType]));
             break;
         case OBJECTIVESTATE_HORDE:
             field = HP_MAP_H[m_TowerType];
-            if (uint32 horde_towers = ((OutdoorPvPHP*)m_PvP)->GetHordeTowersControlled())
-                ((OutdoorPvPHP*)m_PvP)->SetHordeTowersControlled(--horde_towers);
+            if (uint32 horde_towers = ((OutdoorPvPHP*)_pvp)->GetHordeTowersControlled())
+                ((OutdoorPvPHP*)_pvp)->SetHordeTowersControlled(--horde_towers);
             sWorld->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_LOSE_H[m_TowerType]));
             break;
         case OBJECTIVESTATE_NEUTRAL_ALLIANCE_CHALLENGE:
@@ -205,12 +206,12 @@ void OPvPCapturePointHP::ChangeState()
     // send world state update
     if (field)
     {
-        m_PvP->SendUpdateWorldState(field, 0);
+        _pvp->SendUpdateWorldState(field, 0);
         field = 0;
     }
     uint32 artkit = 21;
     uint32 artkit2 = HP_TowerArtKit_N[m_TowerType];
-    switch (m_State)
+    switch (_state)
     {
         case OBJECTIVESTATE_NEUTRAL:
             field = HP_MAP_N[m_TowerType];
@@ -220,9 +221,9 @@ void OPvPCapturePointHP::ChangeState()
                 field = HP_MAP_A[m_TowerType];
                 artkit = 2;
                 artkit2 = HP_TowerArtKit_A[m_TowerType];
-                uint32 alliance_towers = ((OutdoorPvPHP*)m_PvP)->GetAllianceTowersControlled();
+                uint32 alliance_towers = ((OutdoorPvPHP*)_pvp)->GetAllianceTowersControlled();
                 if (alliance_towers < 3)
-                    ((OutdoorPvPHP*)m_PvP)->SetAllianceTowersControlled(++alliance_towers);
+                    ((OutdoorPvPHP*)_pvp)->SetAllianceTowersControlled(++alliance_towers);
                 sWorld->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_A[m_TowerType]));
                 break;
             }
@@ -231,9 +232,9 @@ void OPvPCapturePointHP::ChangeState()
                 field = HP_MAP_H[m_TowerType];
                 artkit = 1;
                 artkit2 = HP_TowerArtKit_H[m_TowerType];
-                uint32 horde_towers = ((OutdoorPvPHP*)m_PvP)->GetHordeTowersControlled();
+                uint32 horde_towers = ((OutdoorPvPHP*)_pvp)->GetHordeTowersControlled();
                 if (horde_towers < 3)
-                    ((OutdoorPvPHP*)m_PvP)->SetHordeTowersControlled(++horde_towers);
+                    ((OutdoorPvPHP*)_pvp)->SetHordeTowersControlled(++horde_towers);
                 sWorld->SendZoneText(OutdoorPvPHPBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(HP_LANG_CAPTURE_H[m_TowerType]));
                 break;
             }
@@ -250,24 +251,24 @@ void OPvPCapturePointHP::ChangeState()
     for (auto itr = bounds.first; itr != bounds.second; ++itr)
         itr->second->SetGoArtKit(artkit);
 
-    bounds = map->GetGameObjectBySpawnIdStore().equal_range(m_Objects[m_TowerType]);
+    bounds = map->GetGameObjectBySpawnIdStore().equal_range(_objects[m_TowerType]);
     for (auto itr = bounds.first; itr != bounds.second; ++itr)
         itr->second->SetGoArtKit(artkit2);
 
     // send world state update
     if (field)
-        m_PvP->SendUpdateWorldState(field, 1);
+        _pvp->SendUpdateWorldState(field, 1);
 
     // complete quest objective
-    if (m_State == OBJECTIVESTATE_ALLIANCE || m_State == OBJECTIVESTATE_HORDE)
+    if (_state == OBJECTIVESTATE_ALLIANCE || _state == OBJECTIVESTATE_HORDE)
         SendObjectiveComplete(HP_CREDITMARKER[m_TowerType]);
 }
 
 void OPvPCapturePointHP::SendChangePhase()
 {
-    SendUpdateWorldState(HP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+    SendUpdateWorldState(HP_UI_TOWER_SLIDER_N, _neutralValuePct);
     // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+    uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
     SendUpdateWorldState(HP_UI_TOWER_SLIDER_POS, phase);
     // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(HP_UI_TOWER_SLIDER_DISPLAY, 1);
@@ -275,7 +276,7 @@ void OPvPCapturePointHP::SendChangePhase()
 
 void OPvPCapturePointHP::FillInitialWorldStates(WorldPacket& data)
 {
-    switch (m_State)
+    switch (_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
         case OBJECTIVESTATE_ALLIANCE_HORDE_CHALLENGE:
@@ -305,9 +306,9 @@ bool OPvPCapturePointHP::HandlePlayerEnter(Player* player)
     if (OPvPCapturePoint::HandlePlayerEnter(player))
     {
         player->SendUpdateWorldState(HP_UI_TOWER_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+        uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
         player->SendUpdateWorldState(HP_UI_TOWER_SLIDER_POS, phase);
-        player->SendUpdateWorldState(HP_UI_TOWER_SLIDER_N, m_neutralValuePct);
+        player->SendUpdateWorldState(HP_UI_TOWER_SLIDER_N, _neutralValuePct);
         return true;
     }
     return false;
@@ -321,7 +322,7 @@ void OPvPCapturePointHP::HandlePlayerLeave(Player* player)
 
 void OutdoorPvPHP::HandleKillImpl(Player* player, Unit* killed)
 {
-    if (killed->GetTypeId() != TYPEID_PLAYER)
+    if (!killed->IsPlayer())
         return;
 
     if (player->GetTeamId() == TEAM_ALLIANCE && killed->ToPlayer()->GetTeamId() != TEAM_ALLIANCE)

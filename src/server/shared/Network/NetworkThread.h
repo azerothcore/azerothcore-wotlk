@@ -23,6 +23,7 @@
 #include "Errors.h"
 #include "IoContext.h"
 #include "Log.h"
+#include "Socket.h"
 #include "Timer.h"
 #include <atomic>
 #include <boost/asio/ip/tcp.hpp>
@@ -38,8 +39,8 @@ template<class SocketType>
 class NetworkThread
 {
 public:
-    NetworkThread() : _connections(0), _stopped(false), _thread(nullptr), _ioContext(1),
-        _acceptSocket(_ioContext), _updateTimer(_ioContext) { }
+    NetworkThread() :
+        _ioContext(1), _acceptSocket(_ioContext), _updateTimer(_ioContext), _proxyHeaderReadingEnabled(false) { }
 
     virtual ~NetworkThread()
     {
@@ -48,7 +49,6 @@ public:
         if (_thread)
         {
             Wait();
-            delete _thread;
         }
     }
 
@@ -63,7 +63,7 @@ public:
         if (_thread)
             return false;
 
-        _thread = new std::thread(&NetworkThread::Run, this);
+        _thread = std::make_unique<std::thread>([this]() { NetworkThread::Run(); });
         return true;
     }
 
@@ -71,12 +71,15 @@ public:
     {
         ASSERT(_thread);
 
-        _thread->join();
-        delete _thread;
-        _thread = nullptr;
+        if (_thread->joinable())
+        {
+            _thread->join();
+        }
+
+        _thread.reset();
     }
 
-    int32 GetConnectionCount() const
+    [[nodiscard]] int32 GetConnectionCount() const
     {
         return _connections;
     }
@@ -86,11 +89,13 @@ public:
         std::lock_guard<std::mutex> lock(_newSocketsLock);
 
         ++_connections;
-        _newSockets.push_back(sock);
+        _newSockets.emplace_back(sock);
         SocketAdded(sock);
     }
 
     tcp::socket* GetSocketForAccept() { return &_acceptSocket; }
+
+    void EnableProxyProtocol() { _proxyHeaderReadingEnabled = true; }
 
 protected:
     virtual void SocketAdded(std::shared_ptr<SocketType> /*sock*/) { }
@@ -103,18 +108,73 @@ protected:
         if (_newSockets.empty())
             return;
 
-        for (std::shared_ptr<SocketType> sock : _newSockets)
+        if (!_proxyHeaderReadingEnabled)
         {
+            for (std::shared_ptr<SocketType> sock : _newSockets)
+            {
+                if (!sock->IsOpen())
+                {
+                    SocketRemoved(sock);
+                    --_connections;
+                    continue;
+                }
+
+                _sockets.emplace_back(sock);
+
+                sock->Start();
+            }
+
+            _newSockets.clear();
+        }
+        else
+        {
+            HandleNewSocketsProxyReadingOnConnect();
+        }
+    }
+
+    void HandleNewSocketsProxyReadingOnConnect()
+    {
+        std::size_t index = 0;
+        std::vector<int> newSocketsToRemoveIndexes;
+        for (auto sock_iter = _newSockets.begin(); sock_iter != _newSockets.end(); ++sock_iter, ++index)
+        {
+            std::shared_ptr<SocketType> sock = *sock_iter;
+
             if (!sock->IsOpen())
             {
+                newSocketsToRemoveIndexes.emplace_back(index);
                 SocketRemoved(sock);
                 --_connections;
+                continue;
             }
-            else
-                _sockets.push_back(sock);
+
+            const auto proxyHeaderReadingState = sock->GetProxyHeaderReadingState();
+            if (proxyHeaderReadingState == PROXY_HEADER_READING_STATE_STARTED)
+                continue;
+
+            switch (proxyHeaderReadingState) {
+                case PROXY_HEADER_READING_STATE_NOT_STARTED:
+                    sock->AsyncReadProxyHeader();
+                    break;
+
+                case PROXY_HEADER_READING_STATE_FINISHED:
+                    newSocketsToRemoveIndexes.emplace_back(index);
+                    _sockets.emplace_back(sock);
+
+                    sock->Start();
+
+                    break;
+
+                default:
+                    newSocketsToRemoveIndexes.emplace_back(index);
+                    SocketRemoved(sock);
+                    --_connections;
+                    break;
+            }
         }
 
-        _newSockets.clear();
+        for (auto it = newSocketsToRemoveIndexes.rbegin(); it != newSocketsToRemoveIndexes.rend(); ++it)
+            _newSockets.erase(_newSockets.begin() + *it);
     }
 
     void Run()
@@ -158,12 +218,12 @@ protected:
     }
 
 private:
-    typedef std::vector<std::shared_ptr<SocketType>> SocketContainer;
+    using SocketContainer = std::vector<std::shared_ptr<SocketType>>;
 
-    std::atomic<int32> _connections;
-    std::atomic<bool> _stopped;
+    std::atomic<int32> _connections{};
+    std::atomic<bool> _stopped{};
 
-    std::thread* _thread;
+    std::unique_ptr<std::thread> _thread;
 
     SocketContainer _sockets;
 
@@ -173,6 +233,8 @@ private:
     Acore::Asio::IoContext _ioContext;
     tcp::socket _acceptSocket;
     Acore::Asio::DeadlineTimer _updateTimer;
+
+    bool _proxyHeaderReadingEnabled;
 };
 
 #endif // NetworkThread_h__

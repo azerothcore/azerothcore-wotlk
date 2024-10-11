@@ -20,8 +20,8 @@
  * Scriptnames of files in this file should be prefixed with "npc_pet_sha_".
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 
 enum ShamanSpells

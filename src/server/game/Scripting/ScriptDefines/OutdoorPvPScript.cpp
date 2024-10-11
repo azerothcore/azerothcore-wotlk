@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "OutdoorPvPScript.h"
 #include "OutdoorPvPMgr.h"
 #include "ScriptMgr.h"
 
@@ -25,3 +26,11 @@ OutdoorPvP* ScriptMgr::CreateOutdoorPvP(OutdoorPvPData const* data)
     auto tempScript = ScriptRegistry<OutdoorPvPScript>::GetScriptById(data->ScriptId);
     return tempScript ? tempScript->GetOutdoorPvP() : nullptr;
 }
+
+OutdoorPvPScript::OutdoorPvPScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<OutdoorPvPScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<OutdoorPvPScript>;

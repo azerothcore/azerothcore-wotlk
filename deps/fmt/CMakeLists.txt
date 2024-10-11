@@ -34,22 +34,23 @@ endfunction()
 
 # Define the fmt library, its includes and the needed defines.
 add_headers(FMT_HEADERS
-  args.h
-  chrono.h
-  color.h
-  compile.h
-  core.h
-  format.h
-  format-inl.h
-  locale.h os.h
-  ostream.h
-  printf.h
-  ranges.h
-  xchar.h)
+    args.h
+    chrono.h
+    color.h
+    compile.h
+    core.h
+    format.h
+    format-inl.h
+    os.h
+    ostream.h
+    printf.h
+    ranges.h
+    std.h
+    xchar.h)
 
 set(FMT_SOURCES
-  src/format.cc
-  src/os.cc)
+    src/format.cc
+    src/os.cc)
 
 add_library(fmt STATIC ${FMT_SOURCES} ${FMT_HEADERS})
 

@@ -15,6 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObjectScript.h"
+#include "AllGameObjectScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 #include "ScriptedGossip.h"
@@ -36,7 +38,7 @@ bool ScriptMgr::OnGossipHello(Player* player, GameObject* go)
 
     auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
     ClearGossipMenuFor(player);
-    return tempScript ? tempScript->OnGossipHello(player, go) : false;
+    return tempScript && tempScript->OnGossipHello(player, go);
 }
 
 bool ScriptMgr::OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 action)
@@ -126,7 +128,6 @@ uint32 ScriptMgr::GetDialogStatus(Player* player, GameObject* go)
     ASSERT(go);
 
     auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
-    ClearGossipMenuFor(player);
     return tempScript ? tempScript->GetDialogStatus(player, go) : DIALOG_STATUS_SCRIPTED_NO_STATUS;
 }
 
@@ -157,6 +158,21 @@ void ScriptMgr::OnGameObjectDamaged(GameObject* go, Player* player)
     if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
     {
         tempScript->OnDamaged(go, player);
+    }
+}
+
+void ScriptMgr::OnGameObjectModifyHealth(GameObject* go, Unit* attackerOrHealer, int32& change, SpellInfo const* spellInfo)
+{
+    ASSERT(go);
+
+    ExecuteScript<AllGameObjectScript>([&](AllGameObjectScript* script)
+    {
+        script->OnGameObjectModifyHealth(go, attackerOrHealer, change, spellInfo);
+    });
+
+    if (auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId()))
+    {
+        tempScript->OnModifyHealth(go, attackerOrHealer, change, spellInfo);
     }
 }
 
@@ -222,3 +238,11 @@ GameObjectAI* ScriptMgr::GetGameObjectAI(GameObject* go)
     auto tempScript = ScriptRegistry<GameObjectScript>::GetScriptById(go->GetScriptId());
     return tempScript ? tempScript->GetAI(go) : nullptr;
 }
+
+GameObjectScript::GameObjectScript(const char* name)
+    : ScriptObject(name)
+{
+    ScriptRegistry<GameObjectScript>::AddScript(this);
+}
+
+template class AC_GAME_API ScriptRegistry<GameObjectScript>;

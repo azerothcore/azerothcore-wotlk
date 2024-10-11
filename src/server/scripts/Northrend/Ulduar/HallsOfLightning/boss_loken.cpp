@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "halls_of_lightning.h"
 
 enum LokenSpells
@@ -142,7 +143,7 @@ public:
         {
             if (hp)
             {
-                switch(HealthCheck)
+                switch (HealthCheck)
                 {
                     case 75:
                         Talk(SAY_75HEALTH);
@@ -161,7 +162,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             Talk(SAY_SLAY);

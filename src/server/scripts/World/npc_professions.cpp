@@ -15,18 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
+#include "Player.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellInfo.h"
 /* ScriptData
 SDName: Npc_Professions
 SD%Complete: 80
 SDComment: Provides learn/unlearn/relearn-options for professions. Not supported: Unlearn engineering, re-learn engineering.
 SDCategory: NPCs
 EndScriptData */
-
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
-#include "SpellInfo.h"
 
 /*
 A few notes for future developement:
@@ -486,7 +486,7 @@ public:
         if (creature->IsTrainer())
             AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
 
-        if (player->HasSkill(SKILL_ALCHEMY) && player->GetBaseSkillValue(SKILL_ALCHEMY) >= 350 && player->GetLevel() > 67)
+        if (player->HasSkill(SKILL_ALCHEMY) && player->GetBaseSkillValue(SKILL_ALCHEMY) >= 325 && player->GetLevel() > 67)
         {
             if (player->GetQuestRewardStatus(Q_MASTER_TRANSMUTE) || player->GetQuestRewardStatus(Q_MASTER_ELIXIR) || player->GetQuestRewardStatus(Q_MASTER_POTION))
             {
@@ -1283,7 +1283,7 @@ public:
 
     void SendActionMenu(Player* player, GameObject*  /*gameobject*/, uint32 uiAction)
     {
-        switch(uiAction)
+        switch (uiAction)
         {
             // Learn Goblin
             case GOSSIP_ACTION_INFO_DEF + 1:
@@ -1353,7 +1353,7 @@ public:
     bool OnGossipSelect(Player* player, GameObject* gameobject, uint32 uiSender, uint32 uiAction) override
     {
         ClearGossipMenuFor(player);
-        switch(uiSender)
+        switch (uiSender)
         {
             case GOSSIP_SENDER_LEARN:
                 SendActionMenu(player, gameobject, uiAction);

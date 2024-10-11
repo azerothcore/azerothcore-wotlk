@@ -28,13 +28,13 @@ namespace Acore::Crypto
     class AC_COMMON_API SRP6
     {
     public:
-        static constexpr size_t SALT_LENGTH = 32;
+        static constexpr std::size_t SALT_LENGTH = 32;
         using Salt = std::array<uint8, SALT_LENGTH>;
 
-        static constexpr size_t VERIFIER_LENGTH = 32;
+        static constexpr std::size_t VERIFIER_LENGTH = 32;
         using Verifier = std::array<uint8, VERIFIER_LENGTH>;
 
-        static constexpr size_t EPHEMERAL_KEY_LENGTH = 32;
+        static constexpr std::size_t EPHEMERAL_KEY_LENGTH = 32;
         using EphemeralKey = std::array<uint8, EPHEMERAL_KEY_LENGTH>;
 
         static std::array<uint8, 1> const g;

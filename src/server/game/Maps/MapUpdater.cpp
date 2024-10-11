@@ -15,10 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "MapUpdater.h"
 #include "DatabaseEnv.h"
 #include "LFGMgr.h"
 #include "Map.h"
-#include "MapUpdater.h"
 #include "Metric.h"
 
 class UpdateRequest
@@ -71,10 +71,10 @@ MapUpdater::MapUpdater(): pending_requests(0)
 {
 }
 
-void MapUpdater::activate(size_t num_threads)
+void MapUpdater::activate(std::size_t num_threads)
 {
     _workerThreads.reserve(num_threads);
-    for (size_t i = 0; i < num_threads; ++i)
+    for (std::size_t i = 0; i < num_threads; ++i)
     {
         _workerThreads.push_back(std::thread(&MapUpdater::WorkerThread, this));
     }

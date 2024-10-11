@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,8 +18,8 @@
 DROP TABLE IF EXISTS `pet_name_generation_locale`;
 CREATE TABLE IF NOT EXISTS `pet_name_generation_locale` (
   `ID` int unsigned NOT NULL,
-  `Locale` varchar(4) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Word` tinytext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Locale` varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Word` tinytext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `Entry` int unsigned NOT NULL DEFAULT '0',
   `Half` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`,`Locale`)

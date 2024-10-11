@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "blackwing_lair.h"
 
 enum Say
@@ -108,7 +110,7 @@ public:
 
         bool CanAIAttack(Unit const* target) const override
         {
-            if (target->GetTypeId() == TYPEID_UNIT && !secondPhase)
+            if (target->IsCreature() && !secondPhase)
             {
                 return false;
             }
@@ -290,7 +292,7 @@ public:
     bool OnGossipHello(Player* player, GameObject* go) override
     {
         if (InstanceScript* instance = go->GetInstanceScript())
-            if (instance->GetData(DATA_EGG_EVENT) != DONE && !player->HasAura(SPELL_MIND_EXHAUSTION))
+            if (instance->GetData(DATA_EGG_EVENT) != DONE && !player->HasAura(SPELL_MIND_EXHAUSTION) && !player->GetPet())
                 if (Creature* razor = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
                 {
                     razor->AI()->SetGUID(player->GetGUID());
@@ -301,43 +303,32 @@ public:
     }
 };
 
-class spell_egg_event : public SpellScriptLoader
+class spell_egg_event : public SpellScript
 {
-public:
-    spell_egg_event() : SpellScriptLoader("spell_egg_event") { }
+    PrepareSpellScript(spell_egg_event);
 
-    class spell_egg_eventSpellScript : public SpellScript
+    void HandleOnHit()
     {
-        PrepareSpellScript(spell_egg_eventSpellScript);
-
-        void HandleOnHit()
+        if (InstanceScript* instance = GetCaster()->GetInstanceScript())
         {
-            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-            {
-                instance->SetData(DATA_EGG_EVENT, SPECIAL);
-            }
-
-            if (Creature* razorgore = GetCaster()->ToCreature())
-            {
-                if (GameObject* egg = GetHitGObj())
-                {
-                    razorgore->AI()->DoAction(TALK_EGG_BROKEN_RAND);
-                    egg->SetLootState(GO_READY);
-                    egg->UseDoorOrButton(10000);
-                    egg->SetRespawnTime(WEEK);
-                }
-            }
+            instance->SetData(DATA_EGG_EVENT, SPECIAL);
         }
 
-        void Register() override
+        if (Creature* razorgore = GetCaster()->ToCreature())
         {
-            OnHit += SpellHitFn(spell_egg_eventSpellScript::HandleOnHit);
+            if (GameObject* egg = GetHitGObj())
+            {
+                razorgore->AI()->DoAction(TALK_EGG_BROKEN_RAND);
+                egg->SetLootState(GO_READY);
+                egg->UseDoorOrButton(10000);
+                egg->SetRespawnTime(WEEK);
+            }
         }
-    };
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_egg_eventSpellScript();
+        OnHit += SpellHitFn(spell_egg_event::HandleOnHit);
     }
 };
 
@@ -345,5 +336,5 @@ void AddSC_boss_razorgore()
 {
     new boss_razorgore();
     new go_orb_of_domination();
-    new spell_egg_event();
+    RegisterSpellScript(spell_egg_event);
 }

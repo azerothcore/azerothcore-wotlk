@@ -23,7 +23,6 @@
 #include "GameObject.h"
 #include "Object.h"
 #include "QuestDef.h"
-#include <list>
 
 class Creature;
 class GameObject;
@@ -68,10 +67,12 @@ public:
     virtual bool CanBeSeen(Player const* /*seer*/) { return true; }
 
     // Called when the gameobject summon successfully other creature
-    virtual void JustSummoned(Creature* /*summon*/) { }
-    virtual void SummonedCreatureDespawn(Creature* /*summon*/) { }
+    virtual void JustSummoned(Creature* /*summon*/) {}
+    virtual void SummonedCreatureDespawn(Creature* /*summon*/) {}
 
-    virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) { }
+    virtual void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) {}
+
+    virtual void SummonedCreatureEvade(Creature* /*summon*/) {}
 };
 
 class NullGameObjectAI : public GameObjectAI

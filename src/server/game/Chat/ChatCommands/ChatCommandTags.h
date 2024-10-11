@@ -23,17 +23,12 @@
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include "Util.h"
-#include "advstd.h"
 #include <boost/preprocessor/punctuation/comma_if.hpp>
 #include <boost/preprocessor/repetition/repeat.hpp>
-#include <cmath>
-#include <cstring>
 #include <iostream>
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <type_traits>
-#include <utility>
 #include <variant>
 
 class ChatHandler;
@@ -52,8 +47,8 @@ namespace Acore::Impl::ChatCommands
         using type = typename T::value_type;
     };
 
-    template <size_t N>
-    inline constexpr char GetChar(char const (&s)[N], size_t i)
+    template <std::size_t N>
+    inline constexpr char GetChar(char const (&s)[N], std::size_t i)
     {
         static_assert(N <= 25, "The EXACT_SEQUENCE macro can only be used with up to 25 character long literals. Specify them char-by-char (null terminated) as parameters to ExactSequence<> instead.");
         return i >= N ? '\0' : s[i];
@@ -102,7 +97,7 @@ namespace Acore::ChatCommands
                     return tail;
                 start = args.substr(0, _string.length() + remainingToken.length());
             }
-            return Acore::Impl::ChatCommands::FormatAcoreString(handler, LANG_CMDPARSER_EXACT_SEQ_MISMATCH, STRING_VIEW_FMT_ARG(_string), STRING_VIEW_FMT_ARG(start));
+            return Acore::Impl::ChatCommands::FormatAcoreString(handler, LANG_CMDPARSER_EXACT_SEQ_MISMATCH, _string, start);
         }
 
         private:
@@ -204,7 +199,7 @@ namespace Acore::ChatCommands
     struct Hyperlink : Acore::Impl::ChatCommands::ContainerTag
     {
         using value_type = typename linktag::value_type;
-        using storage_type = advstd::remove_cvref_t<value_type>;
+        using storage_type = std::remove_cvref_t<value_type>;
 
         operator value_type() const { return val; }
         value_type operator*() const { return val; }
@@ -274,7 +269,7 @@ namespace Acore::ChatCommands
         }
 
         template<bool C = have_operators>
-        operator std::enable_if_t<C && !std::is_same_v<first_type, size_t> && std::is_convertible_v<first_type, size_t>, size_t>() const
+        operator std::enable_if_t<C && !std::is_same_v<first_type, std::size_t> && std::is_convertible_v<first_type, std::size_t>, std::size_t>() const
         {
             return operator*();
         }
@@ -285,9 +280,9 @@ namespace Acore::ChatCommands
         template <typename T>
         Variant& operator=(T&& arg) { base::operator=(std::forward<T>(arg)); return *this; }
 
-        template <size_t index>
+        template <std::size_t index>
         constexpr decltype(auto) get() { return std::get<index>(static_cast<base&>(*this)); }
-        template <size_t index>
+        template <std::size_t index>
         constexpr decltype(auto) get() const { return std::get<index>(static_cast<base const&>(*this)); }
         template <typename type>
         constexpr decltype(auto) get() { return std::get<type>(static_cast<base&>(*this)); }

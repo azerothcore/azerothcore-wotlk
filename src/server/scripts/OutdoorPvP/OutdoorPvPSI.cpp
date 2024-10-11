@@ -16,21 +16,22 @@
  */
 
 #include "OutdoorPvPSI.h"
+#include "CreatureScript.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPScript.h"
 #include "Player.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
 
 OutdoorPvPSI::OutdoorPvPSI()
 {
-    m_TypeId = OUTDOOR_PVP_SI;
+    _typeId = OUTDOOR_PVP_SI;
     m_Gathered_A = 0;
     m_Gathered_H = 0;
     m_LastController = TEAM_NEUTRAL;

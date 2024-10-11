@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -21,18 +21,14 @@ CREATE TABLE IF NOT EXISTS `uptime` (
   `starttime` int unsigned NOT NULL DEFAULT '0',
   `uptime` int unsigned NOT NULL DEFAULT '0',
   `maxplayers` smallint unsigned NOT NULL DEFAULT '0',
-  `revision` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'AzerothCore',
+  `revision` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'AzerothCore',
   PRIMARY KEY (`realmid`,`starttime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Uptime system';
 
--- Dumping data for table acore_auth.uptime: ~5 rows (approximately)
+-- Dumping data for table acore_auth.uptime: ~1 rows (approximately)
 DELETE FROM `uptime`;
 INSERT INTO `uptime` (`realmid`, `starttime`, `uptime`, `maxplayers`, `revision`) VALUES
-	(1, 1550400304, 121, 0, 'AzerothCore rev. 2bcedc2859e7 2019-02-17 10:04:09 +0100 (master branch) (Unix, Debug)'),
-	(1, 1550400454, 1440, 0, 'AzerothCore rev. 2bcedc2859e7 2019-02-17 10:04:09 +0100 (master branch) (Unix, Debug)'),
-	(1, 1661068597, 0, 0, 'AzerothCore rev. 5d6dfca80cf1 2022-08-21 09:48:09 +0200 (new-squash-POGGIES branch) (Win64, RelWithDebInfo, Static)'),
-	(1, 1675207201, 0, 0, 'AzerothCore rev. e7cbc80a913b 2023-01-31 22:22:22 +0000 (master branch) (Win64, RelWithDebInfo, Static)'),
-	(1, 1682284745, 0, 0, 'AzerothCore rev. 5dc6f9cf78f1 2023-04-23 21:03:18 +0000 (master branch) (Win64, RelWithDebInfo, Static)');
+	(1, 1721169877, 0, 0, 'AzerothCore rev. bdf204f1eb0c 2024-07-16 16:28:59 +0000 (time-for-A-SQUASH branch) (Win64, RelWithDebInfo, Static)');
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

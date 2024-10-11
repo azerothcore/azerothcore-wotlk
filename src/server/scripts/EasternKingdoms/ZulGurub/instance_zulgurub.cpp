@@ -22,9 +22,11 @@ SDComment: Missing reset function after killing a boss for Ohgan, Thekal.
 SDCategory: Zul'Gurub
 EndScriptData */
 
+#include "GameEventMgr.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
 #include "zulgurub.h"
 
 DoorData const doorData[] =
@@ -38,7 +40,8 @@ ObjectData const creatureData[] =
     { NPC_HIGH_PRIEST_THEKAL, DATA_THEKAL  },
     { NPC_ZEALOT_LORKHAN,     DATA_LORKHAN },
     { NPC_ZEALOT_ZATH,        DATA_ZATH    },
-    { NPC_PRIESTESS_MARLI,    DATA_MARLI   }
+    { NPC_PRIESTESS_MARLI,    DATA_MARLI   },
+    { 0,                      0            }
 };
 
 class instance_zulgurub : public InstanceMapScript

@@ -39,10 +39,10 @@ AC_API_EXPORT EnumText EnumUtils<WardenActions>::ToString(WardenActions value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<WardenActions>::Count() { return 3; }
+AC_API_EXPORT std::size_t EnumUtils<WardenActions>::Count() { return 3; }
 
 template <>
-AC_API_EXPORT WardenActions EnumUtils<WardenActions>::FromIndex(size_t index)
+AC_API_EXPORT WardenActions EnumUtils<WardenActions>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -54,7 +54,7 @@ AC_API_EXPORT WardenActions EnumUtils<WardenActions>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<WardenActions>::ToIndex(WardenActions value)
+AC_API_EXPORT std::size_t EnumUtils<WardenActions>::ToIndex(WardenActions value)
 {
     switch (value)
     {

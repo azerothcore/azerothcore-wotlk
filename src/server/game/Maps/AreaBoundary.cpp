@@ -17,7 +17,6 @@
 
 #include "AreaBoundary.h"
 #include "Unit.h"
-#include "TemporarySummon.h"
 
 // ---== RECTANGLE ==---
 RectangleBoundary::RectangleBoundary(float southX, float northX, float eastY, float westY, bool isInverted) :
@@ -110,4 +109,22 @@ BoundaryUnionBoundary::~BoundaryUnionBoundary()
 bool BoundaryUnionBoundary::IsWithinBoundaryArea(Position const* pos) const
 {
     return (_b1->IsWithinBoundary(pos) || _b2->IsWithinBoundary(pos));
+}
+
+// ---== INTERSECT OF 2 BOUNDARIES ==---
+BoundaryIntersectBoundary::BoundaryIntersectBoundary(AreaBoundary const* b1, AreaBoundary const* b2, bool isInverted) :
+    AreaBoundary(isInverted), _b1(b1), _b2(b2)
+{
+    ASSERT(b1 && b2);
+}
+
+BoundaryIntersectBoundary::~BoundaryIntersectBoundary()
+{
+    delete _b1;
+    delete _b2;
+}
+
+bool BoundaryIntersectBoundary::IsWithinBoundaryArea(Position const* pos) const
+{
+    return (_b1->IsWithinBoundary(pos) && _b2->IsWithinBoundary(pos));
 }

@@ -16,9 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
+#include "MapReference.h"
 #include "ScriptedCreature.h"
 #include "nexus.h"
+#include "Player.h"
 
 enum eEnums
 {

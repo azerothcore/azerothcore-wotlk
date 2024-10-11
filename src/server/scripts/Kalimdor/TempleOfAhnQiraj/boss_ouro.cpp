@@ -17,12 +17,11 @@
 
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
-#include "TaskScheduler.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -76,7 +75,7 @@ struct npc_ouro_spawner : public ScriptedAI
     void MoveInLineOfSight(Unit* who) override
     {
         // Spawn Ouro on LoS check
-        if (!hasSummoned && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 40.0f) && !who->ToPlayer()->IsGameMaster())
+        if (!hasSummoned && who->IsPlayer() && me->IsWithinDistInMap(who, 40.0f) && !who->ToPlayer()->IsGameMaster())
         {
             if (InstanceScript* instance = me->GetInstanceScript())
             {
@@ -107,9 +106,8 @@ struct boss_ouro : public BossAI
 {
     boss_ouro(Creature* creature) : BossAI(creature, DATA_OURO)
     {
-        SetCombatMovement(false);
+        me->SetCombatMovement(false);
         me->SetControlled(true, UNIT_STATE_ROOT);
-        _scheduler.SetValidator([this] { return !me->HasUnitState(UNIT_STATE_CASTING); });
     }
 
     bool CanAIAttack(Unit const* victim) const override
@@ -123,8 +121,8 @@ struct boss_ouro : public BossAI
         {
             DoCastSelf(SPELL_BERSERK, true);
             _enraged = true;
-            _scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
-            _scheduler.Schedule(1s, [this](TaskContext context)
+            scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
+            scheduler.Schedule(1s, [this](TaskContext context)
                 {
                     if (!IsPlayerWithinMeleeRange())
                         DoSpellAttackToRandomTargetIfReady(SPELL_BOULDER);
@@ -150,8 +148,8 @@ struct boss_ouro : public BossAI
         _submergeMelee = 0;
         _submerged = true;
         DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
-        _scheduler.CancelGroup(GROUP_EMERGED);
-        _scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
+        scheduler.CancelGroup(GROUP_EMERGED);
+        scheduler.CancelGroup(GROUP_PHASE_TRANSITION);
 
         if (GameObject* base = me->FindNearestGameObject(GO_SANDWORM_BASE, 10.f))
         {
@@ -206,8 +204,7 @@ struct boss_ouro : public BossAI
         DoCastSelf(SPELL_SUMMON_SANDWORM_BASE, true);
         me->SetReactState(REACT_AGGRESSIVE);
         CastGroundRupture();
-        _scheduler
-            .Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
+        scheduler.Schedule(20s, GROUP_EMERGED, [this](TaskContext context)
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true))
                     {
@@ -265,7 +262,7 @@ struct boss_ouro : public BossAI
     void Reset() override
     {
         instance->SetBossState(DATA_OURO, NOT_STARTED);
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
         _submergeMelee = 0;
         _submerged = false;
         _enraged = false;
@@ -286,7 +283,6 @@ struct boss_ouro : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         Emerge();
-
         BossAI::JustEngagedWith(who);
     }
 
@@ -294,14 +290,11 @@ struct boss_ouro : public BossAI
     {
         UpdateVictim();
 
-        _scheduler.Update(diff, [this]
-            {
-                DoMeleeAttackIfReady();
-            });
+        scheduler.Update(diff,
+            std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
 
 protected:
-    TaskScheduler _scheduler;
     bool _enraged;
     uint8 _submergeMelee;
     bool _submerged;
@@ -338,16 +331,16 @@ struct npc_dirt_mound : ScriptedAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         DoZoneInCombat();
-        _scheduler.Schedule(30s, [this](TaskContext /*context*/)
-            {
-                DoCastSelf(SPELL_SUMMON_SCARABS, true);
-                me->DespawnOrUnsummon(1000);
-            })
+        scheduler.Schedule(30s, [this](TaskContext /*context*/)
+        {
+            DoCastSelf(SPELL_SUMMON_SCARABS, true);
+            me->DespawnOrUnsummon(1000);
+        })
             .Schedule(100ms, [this](TaskContext context)
-            {
-                ChaseNewTarget();
-                context.Repeat(5s, 10s);
-            });
+        {
+            ChaseNewTarget();
+            context.Repeat(5s, 10s);
+        });
     }
 
     void ChaseNewTarget()
@@ -365,7 +358,7 @@ struct npc_dirt_mound : ScriptedAI
         if (!UpdateVictim())
             return;
 
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
     }
 
     void Reset() override
@@ -389,7 +382,6 @@ struct npc_dirt_mound : ScriptedAI
     }
 
 protected:
-    TaskScheduler _scheduler;
     uint32 _ouroHealth;
     InstanceScript* _instance;
 };

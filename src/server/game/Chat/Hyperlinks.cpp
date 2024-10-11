@@ -18,7 +18,6 @@
 #include "Hyperlinks.h"
 #include "Common.h"
 #include "DBCStores.h"
-#include "Errors.h"
 #include "ObjectMgr.h"
 #include "QuestDef.h"
 #include "SharedDefines.h"
@@ -62,7 +61,7 @@ HyperlinkInfo Acore::Hyperlinks::ParseSingleHyperlink(std::string_view str)
     str.remove_prefix(2);
 
     // tag+data part follows
-    if (size_t delimPos = str.find('|'); delimPos != std::string_view::npos)
+    if (std::size_t delimPos = str.find('|'); delimPos != std::string_view::npos)
     {
         tag = str.substr(0, delimPos);
         str.remove_prefix(delimPos+1);
@@ -71,7 +70,7 @@ HyperlinkInfo Acore::Hyperlinks::ParseSingleHyperlink(std::string_view str)
         return {};
 
     // split tag if : is present (data separator)
-    if (size_t dataStart = tag.find(':'); dataStart != std::string_view::npos)
+    if (std::size_t dataStart = tag.find(':'); dataStart != std::string_view::npos)
     {
         data = tag.substr(dataStart+1);
         tag = tag.substr(0, dataStart);
@@ -82,7 +81,7 @@ HyperlinkInfo Acore::Hyperlinks::ParseSingleHyperlink(std::string_view str)
         return {};
     str.remove_prefix(1);
     // skip to final |
-    if (size_t end = str.find('|'); end != std::string_view::npos)
+    if (std::size_t end = str.find('|'); end != std::string_view::npos)
     {
         // check end tag
         if (str.substr(end, 4) != "|h|r")

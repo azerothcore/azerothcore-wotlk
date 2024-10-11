@@ -21,7 +21,6 @@
 #include "Define.h"
 #include "LogCommon.h"
 #include "StringFormat.h"
-#include <memory>
 #include <unordered_map>
 #include <vector>
 
@@ -68,20 +67,20 @@ public:
     bool SetLogLevel(std::string const& name, int32 level, bool isLogger = true);
 
     template<typename... Args>
-    inline void outMessage(std::string const& filter, LogLevel const level, std::string_view fmt, Args&&... args)
+    inline void outMessage(std::string const& filter, LogLevel const level, Acore::FormatString<Args...> fmt, Args&&... args)
     {
-        _outMessage(filter, level, Acore::StringFormatFmt(fmt, std::forward<Args>(args)...));
+        _outMessage(filter, level, Acore::StringFormat(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
-    void outCommand(uint32 account, std::string_view fmt, Args&&... args)
+    void outCommand(uint32 account, Acore::FormatString<Args...> fmt, Args&&... args)
     {
         if (!ShouldLog("commands.gm", LOG_LEVEL_INFO))
         {
             return;
         }
 
-        _outCommand(Acore::StringFormatFmt(fmt, std::forward<Args>(args)...), std::to_string(account));
+        _outCommand(Acore::StringFormat(fmt, std::forward<Args>(args)...), std::to_string(account));
     }
 
     void SetRealmId(uint32 id);
@@ -121,8 +120,6 @@ private:
 
     Acore::Asio::IoContext* _ioContext;
     Acore::Asio::Strand* _strand;
-    // Deprecated debug filter logs
-    DebugLogFilters _debugLogMask;
 };
 
 #define sLog Log::instance()

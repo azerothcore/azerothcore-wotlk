@@ -15,13 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "temple_of_ahnqiraj.h"
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "MapReference.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "temple_of_ahnqiraj.h"
-#include "TaskScheduler.h"
+#include "SpellScriptLoader.h"
 
 enum Spells
 {
@@ -72,13 +73,11 @@ enum Spells
 
 struct npc_anubisath_defender : public ScriptedAI
 {
-    npc_anubisath_defender(Creature* creature) : ScriptedAI(creature)
-    {
-    }
+    npc_anubisath_defender(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
         _enraged = false;
     }
 
@@ -88,7 +87,7 @@ struct npc_anubisath_defender : public ScriptedAI
 
         if (urand(0, 1))
         {
-            _scheduler.Schedule(6s, 10s, [this](TaskContext context)
+            scheduler.Schedule(6s, 10s, [this](TaskContext context)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1))
                     DoCast(target, SPELL_METEOR, true);
@@ -97,7 +96,7 @@ struct npc_anubisath_defender : public ScriptedAI
         }
         else
         {
-            _scheduler.Schedule(6s, 10s, [this](TaskContext context)
+            scheduler.Schedule(6s, 10s, [this](TaskContext context)
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1))
                     DoCast(target, SPELL_PLAGUE, true);
@@ -107,7 +106,7 @@ struct npc_anubisath_defender : public ScriptedAI
 
         if (urand(0, 1))
         {
-            _scheduler.Schedule(5s, 8s, [this](TaskContext context)
+            scheduler.Schedule(5s, 8s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_THUNDERCLAP, true);
                 context.Repeat(5s, 8s);
@@ -115,7 +114,7 @@ struct npc_anubisath_defender : public ScriptedAI
         }
         else
         {
-            _scheduler.Schedule(5s, 8s, [this](TaskContext context)
+            scheduler.Schedule(5s, 8s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_SHADOW_STORM, true);
                 context.Repeat(5s, 8s);
@@ -124,7 +123,7 @@ struct npc_anubisath_defender : public ScriptedAI
 
         if (urand(0, 1))
         {
-            _scheduler.Schedule(3s, 5s, [this](TaskContext context)
+            scheduler.Schedule(3s, 5s, [this](TaskContext context)
             {
                 DoCastSelf(SPELL_SUMMON_WARRIOR, true);
                 context.Repeat(12s, 16s);
@@ -132,7 +131,7 @@ struct npc_anubisath_defender : public ScriptedAI
         }
         else
         {
-            _scheduler.Schedule(3s, 5s, [this](TaskContext context)
+            scheduler.Schedule(3s, 5s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_SUMMON_SWARMGUARD, true);
                 context.Repeat(12s, 16s);
@@ -171,31 +170,28 @@ struct npc_anubisath_defender : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
 
 private:
-    TaskScheduler _scheduler;
     bool _enraged;
 };
 
 struct npc_vekniss_stinger : public ScriptedAI
 {
-    npc_vekniss_stinger(Creature* creature) : ScriptedAI(creature)
-    {
-    }
+    npc_vekniss_stinger(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
     }
 
     void JustEngagedWith(Unit* who) override
     {
         DoCast(who ,who->HasAura(SPELL_VEKNISS_CATALYST) ? SPELL_STINGER_CHARGE_BUFFED : SPELL_STINGER_CHARGE_NORMAL, true);
 
-        _scheduler.Schedule(6s, [this](TaskContext context)
+        scheduler.Schedule(6s, [this](TaskContext context)
         {
             Unit* target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* u)
             {
@@ -225,44 +221,35 @@ struct npc_vekniss_stinger : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
-
-private:
-    TaskScheduler _scheduler;
 };
 
 struct npc_obsidian_eradicator : public ScriptedAI
 {
-    npc_obsidian_eradicator(Creature* creature) : ScriptedAI(creature)
-    {
-    }
+    npc_obsidian_eradicator(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
         me->SetPower(POWER_MANA, 0);
         _targetGUIDs.clear();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        _scheduler.Schedule(3500ms, [this](TaskContext context)
+        scheduler.Schedule(3500ms, [this](TaskContext context)
         {
             if (_targetGUIDs.empty())
             {
-                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
-                    if (Player* player = itr->GetSource())
+                    if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
                     {
-                        if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
-                        {
-                            _targetGUIDs.push_back(player->GetGUID());
-                        }
+                        _targetGUIDs.push_back(player->GetGUID());
                     }
-                }
+                });
 
                 Acore::Containers::RandomResize(_targetGUIDs, 10);
             }
@@ -291,31 +278,28 @@ struct npc_obsidian_eradicator : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
 
 private:
-    TaskScheduler _scheduler;
     GuidList _targetGUIDs;
 };
 
 struct npc_anubisath_warder : public ScriptedAI
 {
-    npc_anubisath_warder(Creature* creature) : ScriptedAI(creature)
-    {
-    }
+    npc_anubisath_warder(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         if (urand(0, 1))
         {
-            _scheduler.Schedule(5s, 5s, [this](TaskContext context)
+            scheduler.Schedule(5s, 5s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_FEAR, true);
                 context.Repeat(20s, 20s);
@@ -323,7 +307,7 @@ struct npc_anubisath_warder : public ScriptedAI
         }
         else
         {
-            _scheduler.Schedule(5s, 5s, [this](TaskContext context)
+            scheduler.Schedule(5s, 5s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_ENTAGLING_ROOTS, true);
                 context.Repeat(20s, 20s);
@@ -332,7 +316,7 @@ struct npc_anubisath_warder : public ScriptedAI
 
         if (urand(0, 1))
         {
-            _scheduler.Schedule(4s, 4s, [this](TaskContext context)
+            scheduler.Schedule(4s, 4s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_SILENCE, true);
                 context.Repeat(15s, 15s);
@@ -340,14 +324,14 @@ struct npc_anubisath_warder : public ScriptedAI
         }
         else
         {
-            _scheduler.Schedule(4s, 4s, [this](TaskContext context)
+            scheduler.Schedule(4s, 4s, [this](TaskContext context)
             {
                 DoCastAOE(SPELL_DUST_CLOUD, true);
                 context.Repeat(15s, 15s);
             });
         }
 
-        _scheduler.Schedule(2s, 2s, [this](TaskContext context)
+        scheduler.Schedule(2s, 2s, [this](TaskContext context)
         {
             DoCastAOE(SPELL_FIRE_NOVA, true);
             context.Repeat(8s, 15s);
@@ -361,44 +345,35 @@ struct npc_anubisath_warder : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
-
-private:
-    TaskScheduler _scheduler;
 };
 
 struct npc_obsidian_nullifier : public ScriptedAI
 {
-    npc_obsidian_nullifier(Creature* creature) : ScriptedAI(creature)
-    {
-    }
+    npc_obsidian_nullifier(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
         me->SetPower(POWER_MANA, 0);
         _targetGUIDs.clear();
     }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        _scheduler.Schedule(6s, [this](TaskContext context)
+        scheduler.Schedule(6s, [this](TaskContext context)
         {
             if (_targetGUIDs.empty())
             {
-                Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
-                    if (Player* player = itr->GetSource())
+                    if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
                     {
-                        if (player->IsAlive() && !player->IsGameMaster() && !player->IsSpectator() && player->GetPower(POWER_MANA) > 0)
-                        {
-                            _targetGUIDs.push_back(player->GetGUID());
-                        }
+                        _targetGUIDs.push_back(player->GetGUID());
                     }
-                }
+                });
 
                 Acore::Containers::RandomResize(_targetGUIDs, 11);
             }
@@ -432,26 +407,23 @@ struct npc_obsidian_nullifier : public ScriptedAI
             return;
         }
 
-        _scheduler.Update(diff,
+        scheduler.Update(diff,
             std::bind(&ScriptedAI::DoMeleeAttackIfReady, this));
     }
 
 private:
-    TaskScheduler _scheduler;
     GuidList _targetGUIDs;
 };
 
 struct npc_ahnqiraji_critter : public ScriptedAI
 {
-    npc_ahnqiraji_critter(Creature* creature) : ScriptedAI(creature)
-    {
-    }
+    npc_ahnqiraji_critter(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
         me->RestoreFaction();
 
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
 
         // Don't attack nearby players randomly if they are the Twin's pet bugs.
         if (CreatureData const* crData = me->GetCreatureData())
@@ -465,7 +437,7 @@ struct npc_ahnqiraji_critter : public ScriptedAI
             }
         }
 
-        _scheduler.Schedule(100ms, [this](TaskContext context)
+        scheduler.Schedule(100ms, [this](TaskContext context)
         {
             if (Player* player = me->SelectNearestPlayer(10.f))
             {
@@ -481,11 +453,11 @@ struct npc_ahnqiraji_critter : public ScriptedAI
 
     void JustEngagedWith(Unit* /*who*/) override
     {
-        _scheduler.CancelAll();
+        scheduler.CancelAll();
 
         if (me->GetEntry() == NPC_QIRAJI_SCORPION)
         {
-            _scheduler.Schedule(2s, 5s, [this](TaskContext context)
+            scheduler.Schedule(2s, 5s, [this](TaskContext context)
             {
                 DoCastVictim(SPELL_PIERCE_ARMOR, true);
                 context.Repeat(5s, 9s);
@@ -508,7 +480,7 @@ struct npc_ahnqiraji_critter : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        _scheduler.Update(diff);
+        scheduler.Update(diff);
 
         if (!UpdateVictim())
         {
@@ -517,9 +489,6 @@ struct npc_ahnqiraji_critter : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-
-private:
-    TaskScheduler _scheduler;
 };
 
 enum NPCs

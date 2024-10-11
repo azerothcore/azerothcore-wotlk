@@ -18,9 +18,9 @@
 #ifndef ACore_game_Position_h__
 #define ACore_game_Position_h__
 
-#include <cmath>
 #include "Common.h"
 #include "G3D/Vector3.h"
+#include <cmath>
 
 class ByteBuffer;
 
@@ -196,10 +196,10 @@ struct Position
 
     float GetRelativeAngle(const Position* pos) const
     {
-        return GetAngle(pos) - m_orientation;
+        return NormalizeOrientation(GetAngle(pos) - m_orientation);
     }
 
-    [[nodiscard]] float GetRelativeAngle(float x, float y) const { return GetAngle(x, y) - m_orientation; }
+    [[nodiscard]] float GetRelativeAngle(float x, float y) const { return NormalizeOrientation(GetAngle(x, y) - m_orientation); }
     [[nodiscard]] float ToAbsoluteAngle(float relAngle) const { return NormalizeOrientation(relAngle + m_orientation); }
 
     void GetSinCos(float x, float y, float& vsin, float& vcos) const;

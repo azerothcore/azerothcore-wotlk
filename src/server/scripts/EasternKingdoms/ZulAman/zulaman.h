@@ -32,9 +32,10 @@ enum DataTypes
     DATA_HALAZZIEVENT                   = 4,
     DATA_HEXLORDEVENT                   = 5,
     DATA_ZULJINEVENT                    = 6,
-    DATA_CHESTLOOTED                    = 7,
-    TYPE_RAND_VENDOR_1                  = 8,
-    TYPE_RAND_VENDOR_2                  = 9
+    DATA_SPIRIT_LYNX                    = 7,
+    DATA_CHESTLOOTED                    = 8,
+    TYPE_RAND_VENDOR_1                  = 9,
+    TYPE_RAND_VENDOR_2                  = 10
 };
 
 enum CreatureIds
@@ -44,7 +45,12 @@ enum CreatureIds
     NPC_ZULJIN                          = 23863,
     NPC_HEXLORD                         = 24239,
     NPC_HALAZZI                         = 23577,
-    NPC_NALORAKK                        = 23576
+    NPC_NALORAKK                        = 23576,
+    NPC_SPIRIT_LYNX                     = 24143,
+    NPC_AMANISHI_WARBRINGER             = 23580,
+    NPC_AMANISHI_TRIBESMAN              = 23582,
+    NPC_AMANISHI_MEDICINE_MAN           = 23581,
+    NPC_AMANISHI_AXE_THROWER            = 23542
 };
 
 enum GameobjectIds
@@ -67,5 +73,7 @@ inline AI* GetZulAmanAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, ZulAmanScriptName);
 }
+
+#define RegisterZulAmanCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetZulAmanAI)
 
 #endif

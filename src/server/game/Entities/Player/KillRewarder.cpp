@@ -20,6 +20,7 @@
 #include "Group.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "SpellAuraEffects.h"
 
 // KillRewarder incapsulates logic of rewarding player upon kill with:
@@ -69,7 +70,7 @@ KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
         _isFullXP(false), _maxLevel(0), _isBattleGround(isBattleGround), _isPvP(false)
 {
     // mark the credit as pvp if victim is player
-    if (victim->GetTypeId() == TYPEID_PLAYER)
+    if (victim->IsPlayer())
         _isPvP = true;
         // or if its owned by player and its not a vehicle
     else if (victim->GetCharmerOrOwnerGUID().IsPlayer())
@@ -129,7 +130,7 @@ void KillRewarder::_InitXP(Player* player)
         _xp = Acore::XP::Gain(player, _victim, _isBattleGround);
 
     if (_xp && !_isBattleGround && _victim) // pussywizard: npcs with relatively low hp give lower exp
-        if (_victim->GetTypeId() == TYPEID_UNIT)
+        if (_victim->IsCreature())
             if (const CreatureTemplate* ct = _victim->ToCreature()->GetCreatureTemplate())
                 if (ct->ModHealth <= 0.75f && ct->ModHealth >= 0.0f)
                     _xp = uint32(_xp * ct->ModHealth);
@@ -200,15 +201,16 @@ void KillRewarder::_RewardPlayer(Player* player, bool isDungeon)
         // 4.1. Give honor (player must be alive and not on BG).
         _RewardHonor(player);
         // 4.1.1 Send player killcredit for quests with PlayerSlain
-        if (_victim->GetTypeId() == TYPEID_PLAYER)
+        if (_victim->IsPlayer())
             player->KilledPlayerCredit();
     }
+
     // Give XP only in PvE or in battlegrounds.
     // Give reputation and kill credit only in PvE.
     if (!_isPvP || _isBattleGround)
     {
         float xpRate = _group ? _groupRate * float(player->GetLevel()) / _aliveSumLevel : /*Personal rate is 100%.*/ 1.0f; // Group rate depends on the sum of levels.
-        sScriptMgr->OnRewardKillRewarder(player, isDungeon, xpRate);                                              // Personal rate is 100%.
+        sScriptMgr->OnRewardKillRewarder(player, this, isDungeon, xpRate);                                              // Personal rate is 100%.
 
         if (_xp)
         {
@@ -254,7 +256,7 @@ void KillRewarder::_RewardGroup()
                     {
                         _RewardPlayer(member, isDungeon);
                         // Xinef: only count players
-                        //if (_victim->GetTypeId() == TYPEID_PLAYER)
+                        //if (_victim->IsPlayer())
                         //    member->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_SPECIAL_PVP_KILL, 1, 0, _victim);
                     }
                 }
@@ -288,4 +290,14 @@ void KillRewarder::Reward()
         if (victim->IsDungeonBoss())
             if (Map* map = _victim->FindMap())
                 map->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, _victim->GetEntry(), _victim);
+}
+
+Unit* KillRewarder::GetVictim()
+{
+    return _victim;
+}
+
+Player* KillRewarder::GetKiller()
+{
+    return _killer;
 }

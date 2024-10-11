@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYSERVER_PACKET_BUILDER_H
-#define TRINITYSERVER_PACKET_BUILDER_H
+#ifndef AC_PACKET_BUILDER_H
+#define AC_PACKET_BUILDER_H
 
 #include "Define.h"
 
@@ -40,4 +40,4 @@ namespace Movement
         static void WriteCreate(const MoveSpline& mov, ByteBuffer& data);
     };
 }
-#endif // TRINITYSERVER_PACKET_BUILDER_H
+#endif // AC_PACKET_BUILDER_H

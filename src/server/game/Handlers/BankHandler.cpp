@@ -19,7 +19,6 @@
 #include "DBCStores.h"
 #include "Item.h"
 #include "Log.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -45,8 +44,6 @@ bool WorldSession::CanUseBank(ObjectGuid bankerGUID) const
 void WorldSession::HandleBankerActivateOpcode(WorldPacket& recvData)
 {
     ObjectGuid guid;
-
-    LOG_DEBUG("network", "WORLD: Received CMSG_BANKER_ACTIVATE");
 
     recvData >> guid;
 

@@ -20,7 +20,6 @@
 
 #include "Errors.h"
 #include "ObjectGuid.h"
-#include "SharedDefines.h"
 
 class WorldPacket;
 
@@ -122,4 +121,4 @@ protected:
     uint32 HealingDone = 0;
 };
 
-#endif // TRINITY_BATTLEGROUND_SCORE_H
+#endif // _BATTLEGROUND_SCORE_H

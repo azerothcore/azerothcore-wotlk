@@ -20,14 +20,12 @@
 #include "GameGraveyard.h"
 #include "GameObject.h"
 #include "GameTime.h"
-#include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WorldPacket.h"
-#include "WorldSession.h"
 
 void BattlegroundICScore::BuildObjectivesBlock(WorldPacket& data)
 {

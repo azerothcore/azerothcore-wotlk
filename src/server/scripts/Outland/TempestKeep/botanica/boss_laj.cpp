@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "the_botanica.h"
 
@@ -67,7 +67,7 @@ LajTransformData const LajTransform[5] =
 
 struct boss_laj : public BossAI
 {
-    boss_laj(Creature* creature) : BossAI(creature, DATA_LAJ) { }
+    boss_laj(Creature* creature) : BossAI(creature, DATA_LAJ), _lastTransform(LajTransform[0]) { }
 
     void Reset() override
     {
@@ -85,16 +85,13 @@ struct boss_laj : public BossAI
         }
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void ScheduleTasks() override
     {
-        _JustEngagedWith();
-
-        scheduler.Schedule(5s, [this](TaskContext context)
-        {
+        ScheduleTimedEvent(5s, [&] {
             DoCastVictim(SPELL_ALLERGIC_REACTION);
-            context.Repeat(25s);
-        }).Schedule(30s, [this](TaskContext context)
-        {
+        }, 25s);
+
+        ScheduleTimedEvent(30s, [&] {
             me->RemoveAurasDueToSpell(_lastTransform.spellId);
             _lastTransform = Acore::Containers::SelectRandomContainerElementIf(_transformContainer, [&](LajTransformData data) -> bool
             {
@@ -102,9 +99,9 @@ struct boss_laj : public BossAI
             });
             me->SetDisplayId(_lastTransform.modelId);
             DoCastSelf(_lastTransform.spellId, true);
-            context.Repeat(35s);
-        }).Schedule(20s, [this](TaskContext context)
-        {
+        }, 35s);
+
+        ScheduleTimedEvent(20s, [&] {
             DoCastSelf(SPELL_TELEPORT_SELF);
             me->SetReactState(REACT_PASSIVE);
             me->GetMotionMaster()->Clear();
@@ -117,14 +114,12 @@ struct boss_laj : public BossAI
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->ResumeChasingVictim();
             });
-
-            context.Repeat(30s);
-        });
+        }, 30s);
     }
 
 private:
     LajTransformData _lastTransform;
-    std::vector<LajTransformData> _transformContainer;
+    std::list<LajTransformData> _transformContainer;
 };
 
 void AddSC_boss_laj()

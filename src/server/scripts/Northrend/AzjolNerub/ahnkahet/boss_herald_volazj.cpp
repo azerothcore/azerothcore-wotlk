@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ahnkahet.h"
 
 enum Spells
@@ -150,7 +151,7 @@ struct boss_volazj : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim->IsPlayer())
         {
             switch (urand(0, 2))
             {
@@ -346,7 +347,7 @@ class spell_herald_volzaj_insanity : public SpellScript
 {
     PrepareSpellScript(spell_herald_volzaj_insanity);
 
-    bool Load() override { return GetCaster()->GetTypeId() == TYPEID_UNIT; }
+    bool Load() override { return GetCaster()->IsCreature(); }
 
     void HandleDummyEffect(std::list<WorldObject*>& targets)
     {
@@ -361,7 +362,7 @@ class spell_herald_volzaj_insanity : public SpellScript
         {
             targets.remove_if([this](WorldObject* targetObj) -> bool
             {
-                return !targetObj || targetObj->GetTypeId() != TYPEID_PLAYER || !targetObj->ToPlayer()->IsInCombatWith(GetCaster()) ||
+                return !targetObj || !targetObj->IsPlayer() || !targetObj->ToPlayer()->IsInCombatWith(GetCaster()) ||
                         targetObj->GetDistance(GetCaster()) >= (MAX_VISIBILITY_DISTANCE * 2);
             });
         }
@@ -465,7 +466,7 @@ class spell_volazj_whisper : public SpellScript
         });
     }
 
-    bool Load() override { return GetCaster()->GetTypeId() == TYPEID_UNIT; }
+    bool Load() override { return GetCaster()->IsCreature(); }
 
     void HandleScriptEffect(SpellEffIndex /* effIndex */)
     {

@@ -19,6 +19,7 @@
 #define APPENDERCONSOLE_H
 
 #include "Appender.h"
+#include <vector>
 
 // EnumUtils: DESCRIBE THIS
 enum ColorTypes

@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -46,10 +46,10 @@ CREATE TABLE IF NOT EXISTS `vehicle_dbc` (
   `MsslTrgtArcWidth` float NOT NULL DEFAULT '0',
   `MsslTrgtImpactRadius_1` float NOT NULL DEFAULT '0',
   `MsslTrgtImpactRadius_2` float NOT NULL DEFAULT '0',
-  `MsslTrgtArcTexture` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `MsslTrgtImpactTexture` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `MsslTrgtImpactModel_1` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `MsslTrgtImpactModel_2` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `MsslTrgtArcTexture` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `MsslTrgtImpactTexture` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `MsslTrgtImpactModel_1` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `MsslTrgtImpactModel_2` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `CameraYawOffset` float NOT NULL DEFAULT '0',
   `UilocomotionType` int NOT NULL DEFAULT '0',
   `MsslTrgtImpactTexRadius` float NOT NULL DEFAULT '0',

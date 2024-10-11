@@ -51,7 +51,7 @@ void Totem::InitStats(uint32 duration)
     if (Unit* owner = ObjectAccessor::GetUnit(*this, m_owner))
     {
         uint32 slot = m_Properties->Slot;
-        if (owner->GetTypeId() == TYPEID_PLAYER && slot >= SUMMON_SLOT_TOTEM && slot < MAX_TOTEM_SLOT)
+        if (owner->IsPlayer() && slot >= SUMMON_SLOT_TOTEM && slot < MAX_TOTEM_SLOT)
         {
             WorldPackets::Totem::TotemCreated data;
             data.Totem = GetGUID();
@@ -173,12 +173,13 @@ void Totem::UnSummon(uint32 msTime)
 
 bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const
 {
-    // xinef: immune to all positive spells, except of stoneclaw totem absorb and sentry totem bind sight
+    // xinef: immune to all positive spells, except of stoneclaw totem absorb, sentry totem bind sight and intervene
     // totems positive spells have unit_caster target
     if (spellInfo->Effects[index].Effect != SPELL_EFFECT_DUMMY &&
             spellInfo->Effects[index].Effect != SPELL_EFFECT_SCRIPT_EFFECT &&
             spellInfo->IsPositive() && spellInfo->Effects[index].TargetA.GetTarget() != TARGET_UNIT_CASTER &&
-            spellInfo->Effects[index].TargetA.GetCheckType() != TARGET_CHECK_ENTRY && spellInfo->Id != 55277 && spellInfo->Id != 6277)
+            spellInfo->Effects[index].TargetA.GetCheckType() != TARGET_CHECK_ENTRY &&
+            spellInfo->Id != SPELL_STONECLAW && spellInfo->Id != SPELL_BIND_SIGHT && spellInfo->Id != SPELL_INTERVENE)
         return true;
 
     // Cyclone shouldn't be casted on totems

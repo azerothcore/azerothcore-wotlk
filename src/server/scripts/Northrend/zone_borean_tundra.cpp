@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
@@ -25,7 +25,7 @@
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
-#include "WorldSession.h"
+#include "SpellScriptLoader.h"
 
 // Ours
 enum eDrakeHunt
@@ -34,47 +34,41 @@ enum eDrakeHunt
     SPELL_SUBDUED                       = 46675
 };
 
-class spell_q11919_q11940_drake_hunt : public SpellScriptLoader
+class spell_q11919_q11940_drake_hunt_aura : public AuraScript
 {
-public:
-    spell_q11919_q11940_drake_hunt() : SpellScriptLoader("spell_q11919_q11940_drake_hunt") { }
+    PrepareAuraScript(spell_q11919_q11940_drake_hunt_aura);
 
-    class spell_q11919_q11940_drake_hunt_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_q11919_q11940_drake_hunt_AuraScript)
+        return ValidateSpellInfo({ SPELL_SUBDUED, SPELL_DRAKE_HATCHLING_SUBDUED });
+    }
 
-        bool Load() override
-        {
-            return GetOwner()->GetTypeId() == TYPEID_UNIT;
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE || !GetCaster())
-                return;
-
-            Creature* owner = GetOwner()->ToCreature();
-            owner->RemoveAllAurasExceptType(SPELL_AURA_DUMMY);
-            owner->CombatStop(true);
-            owner->GetThreatMgr().ClearAllThreat();
-            owner->GetMotionMaster()->Clear(false);
-            owner->GetMotionMaster()->MoveFollow(GetCaster(), 4.0f, M_PI, MOTION_SLOT_ACTIVE);
-            owner->CastSpell(owner, SPELL_SUBDUED, true);
-            GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
-            owner->SetFaction(FACTION_FRIENDLY);
-            owner->SetImmuneToAll(true);
-            owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
-        }
-
-        void Register() override
-        {
-            AfterEffectRemove += AuraEffectRemoveFn(spell_q11919_q11940_drake_hunt_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    bool Load() override
     {
-        return new spell_q11919_q11940_drake_hunt_AuraScript();
+        return GetOwner()->IsCreature();
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_EXPIRE || !GetCaster())
+            return;
+
+        Creature* owner = GetOwner()->ToCreature();
+        owner->RemoveAllAurasExceptType(SPELL_AURA_DUMMY);
+        owner->CombatStop(true);
+        owner->GetThreatMgr().ClearAllThreat();
+        owner->GetMotionMaster()->Clear(false);
+        owner->GetMotionMaster()->MoveFollow(GetCaster(), 4.0f, M_PI, MOTION_SLOT_ACTIVE);
+        owner->CastSpell(owner, SPELL_SUBDUED, true);
+        GetCaster()->CastSpell(GetCaster(), SPELL_DRAKE_HATCHLING_SUBDUED, true);
+        owner->SetFaction(FACTION_FRIENDLY);
+        owner->SetImmuneToAll(true);
+        owner->DespawnOrUnsummon(3 * MINUTE * IN_MILLISECONDS);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_q11919_q11940_drake_hunt_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -223,14 +217,14 @@ public:
         {
             ScriptedAI::MoveInLineOfSight(who);
 
-            if (who->GetTypeId() != TYPEID_UNIT)
+            if (!who->IsCreature())
                 return;
 
             if (who->GetEntry() == NPC_ORPHANED_MAMMOTH_CALF && me->IsWithinDistInMap(who, 10.0f))
             {
                 if (Unit* owner = who->GetOwner())
                 {
-                    if (owner->GetTypeId() == TYPEID_PLAYER)
+                    if (owner->IsPlayer())
                     {
                         owner->CastSpell(owner, SPELL_MAMMOTH_CALF_ESCORT_CREDIT, true);
                         who->ToCreature()->DespawnOrUnsummon();
@@ -320,7 +314,7 @@ public:
 
         void JustDied(Unit* killer) override
         {
-            if (!killer || killer->GetTypeId() != TYPEID_PLAYER)
+            if (!killer || !killer->IsPlayer())
             {
                 return;
             }
@@ -667,29 +661,23 @@ public:
 };
 
 // Spell 45625: - Arcane Chains: Character Force Cast
-class spell_arcane_chains_character_force_cast : public SpellScriptLoader
+class spell_arcane_chains_character_force_cast : public SpellScript
 {
-public:
-    spell_arcane_chains_character_force_cast() : SpellScriptLoader("spell_arcane_chains_character_force_cast") {}
+    PrepareSpellScript(spell_arcane_chains_character_force_cast);
 
-    class spell_arcane_chains_character_force_cast_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_arcane_chains_character_force_cast_SpellScript);
+        return ValidateSpellInfo({ SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, 45626 });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /* effIndex */)
-        {
-            GetHitUnit()->CastSpell(GetCaster(), SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SET_FACING & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_GCD)); // Player cast back 45626 on npc
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_arcane_chains_character_force_cast_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /* effIndex */)
     {
-        return new spell_arcane_chains_character_force_cast_SpellScript();
+        GetHitUnit()->CastSpell(GetCaster(), SPELL_ARCANE_CHAINS_SUMMON_CHAINED_MAGE_HUNTER, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SET_FACING & ~TRIGGERED_IGNORE_AURA_INTERRUPT_FLAGS & ~TRIGGERED_IGNORE_CAST_ITEM & ~TRIGGERED_IGNORE_GCD)); // Player cast back 45626 on npc
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_arcane_chains_character_force_cast::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -758,7 +746,7 @@ public:
 
         void SpellHit(Unit* unit, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_NEURAL_NEEDLE && unit->GetTypeId() == TYPEID_PLAYER)
+            if (spell->Id == SPELL_NEURAL_NEEDLE && unit->IsPlayer())
             {
                 if (Player* player = unit->ToPlayer())
                 {
@@ -1049,7 +1037,7 @@ public:
     {
         npc_warmage_coldarraAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         uint32 m_uiTimer;                 //Timer until recast
@@ -1309,31 +1297,20 @@ enum BloodsporeRuination
     EVENT_RESET_ORIENTATION
 };
 
-class spell_q11719_bloodspore_ruination_45997 : public SpellScriptLoader
+class spell_q11719_bloodspore_ruination_45997 : public SpellScript
 {
-public:
-    spell_q11719_bloodspore_ruination_45997() : SpellScriptLoader("spell_q11719_bloodspore_ruination_45997") { }
+    PrepareSpellScript(spell_q11719_bloodspore_ruination_45997);
 
-    class spell_q11719_bloodspore_ruination_45997_SpellScript : public SpellScript
+    void HandleEffect(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_q11719_bloodspore_ruination_45997_SpellScript);
+        if (Unit* caster = GetCaster())
+            if (Creature* laurith = caster->FindNearestCreature(NPC_BLOODMAGE_LAURITH, 100.0f))
+                laurith->AI()->SetGUID(caster->GetGUID());
+    }
 
-        void HandleEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Creature* laurith = caster->FindNearestCreature(NPC_BLOODMAGE_LAURITH, 100.0f))
-                    laurith->AI()->SetGUID(caster->GetGUID());
-        }
-
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_q11719_bloodspore_ruination_45997_SpellScript::HandleEffect, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_q11719_bloodspore_ruination_45997_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_q11719_bloodspore_ruination_45997::HandleEffect, EFFECT_1, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -2059,7 +2036,7 @@ public:
 void AddSC_borean_tundra()
 {
     // Ours
-    new spell_q11919_q11940_drake_hunt();
+    RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
     new npc_thassarian();
     new npc_thassarian2();
     new npc_leryssa();
@@ -2073,13 +2050,13 @@ void AddSC_borean_tundra()
     new npc_lurgglbr();
     new npc_beryl_sorcerer();
     new npc_captured_beryl_sorcerer();
-    new spell_arcane_chains_character_force_cast();
+    RegisterSpellScript(spell_arcane_chains_character_force_cast);
     new npc_imprisoned_beryl_sorcerer();
     new npc_mootoo_the_younger();
     new npc_bonker_togglevolt();
     new npc_valiance_keep_cannoneer();
     new npc_warmage_coldarra();
     new npc_hidden_cultist();
-    new spell_q11719_bloodspore_ruination_45997();
+    RegisterSpellScript(spell_q11719_bloodspore_ruination_45997);
     new npc_bloodmage_laurith();
 }

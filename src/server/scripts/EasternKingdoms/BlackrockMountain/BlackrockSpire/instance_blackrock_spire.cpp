@@ -15,24 +15,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "blackrock_spire.h"
 
 uint32 const DragonspireMobs[3] = { NPC_BLACKHAND_DREADWEAVER, NPC_BLACKHAND_SUMMONER, NPC_BLACKHAND_VETERAN };
 
 enum EventIds
 {
-    EVENT_DARGONSPIRE_ROOM_STORE           = 1,
-    EVENT_DARGONSPIRE_ROOM_CHECK           = 2,
+    EVENT_DRAGONSPIRE_ROOM_STORE           = 1,
+    EVENT_DRAGONSPIRE_ROOM_CHECK           = 2,
 
     EVENT_SOLAKAR_WAVE                     = 3
 };
@@ -176,7 +178,7 @@ public:
                     creature->AI()->Talk(SAY_FINKLE_GANG);
                     break;
                 case NPC_CHROMATIC_ELITE_GUARD:
-                    AddMinion(creature, true);
+                    AddMinion(creature);
                     break;
             }
         }
@@ -352,11 +354,11 @@ public:
                     if (data == AREATRIGGER_DRAGONSPIRE_HALL)
                     {
                         if (GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE)
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_STORE, 1s);
+                            Events.ScheduleEvent(EVENT_DRAGONSPIRE_ROOM_STORE, 1s);
                     }
                     break;
                 case DATA_SOLAKAR_FLAMEWREATH:
-                    switch(data)
+                    switch (data)
                     {
                         case IN_PROGRESS:
                             if (SolakarState == NOT_STARTED)
@@ -399,14 +401,14 @@ public:
                                 pile->SetLootState(GO_READY);
                                 pile->Respawn();
                             }
-                            for (const auto& circleGUID : go_urokOgreCirles)
+                            for (auto const& circleGUID : go_urokOgreCirles)
                             {
                                 if (GameObject* circle = instance->GetGameObject(circleGUID))
                                 {
                                     circle->Delete();
                                 }
                             }
-                            for (const auto& mobGUID : UrokMobs)
+                            for (auto const& mobGUID : UrokMobs)
                             {
                                 if (Creature* mob = instance->GetCreature(mobGUID))
                                 {
@@ -555,14 +557,14 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_DARGONSPIRE_ROOM_STORE:
+                    case EVENT_DRAGONSPIRE_ROOM_STORE:
                         Dragonspireroomstore();
-                        Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3s);
+                        Events.ScheduleEvent(EVENT_DRAGONSPIRE_ROOM_CHECK, 3s);
                         break;
-                    case EVENT_DARGONSPIRE_ROOM_CHECK:
+                    case EVENT_DRAGONSPIRE_ROOM_CHECK:
                         Dragonspireroomcheck();
                         if ((GetBossState(DATA_DRAGONSPIRE_ROOM) != DONE))
-                            Events.ScheduleEvent(EVENT_DARGONSPIRE_ROOM_CHECK, 3s);
+                            Events.ScheduleEvent(EVENT_DRAGONSPIRE_ROOM_CHECK, 3s);
                         break;
                     case EVENT_SOLAKAR_WAVE:
                         SummonSolakarWave(CurrentSolakarWave);

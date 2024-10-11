@@ -28,12 +28,13 @@ quest_a_pawn_on_the_eternal_pawn
 EndContentData */
 
 #include "AccountMgr.h"
+#include "CreatureScript.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
+#include "GameObjectScript.h"
 #include "Group.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
@@ -828,7 +829,6 @@ public:
             if (Group* EventGroup = player->GetGroup())
             {
                 uint8 GroupMemberCount = 0;
-                uint8 DeadMemberCount = 0;
                 uint8 FailedMemberCount = 0;
 
                 Group::MemberSlotList const& members = EventGroup->GetMemberSlots();
@@ -844,9 +844,6 @@ public:
                         ++FailedMemberCount;
                     }
                     ++GroupMemberCount;
-
-                    if (groupMember->isDead())
-                        ++DeadMemberCount;
                 }
 
                 if (GroupMemberCount == FailedMemberCount || !player->IsWithinDistInMap(me, EVENT_AREA_RADIUS))

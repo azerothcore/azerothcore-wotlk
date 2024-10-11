@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,7 +18,7 @@
 DROP TABLE IF EXISTS `gameobjectdisplayinfo_dbc`;
 CREATE TABLE IF NOT EXISTS `gameobjectdisplayinfo_dbc` (
   `ID` int NOT NULL DEFAULT '0',
-  `ModelName` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `ModelName` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Sound_1` int NOT NULL DEFAULT '0',
   `Sound_2` int NOT NULL DEFAULT '0',
   `Sound_3` int NOT NULL DEFAULT '0',

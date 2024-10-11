@@ -18,20 +18,20 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CombatAI.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
-#include "DBCStructure.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Pet.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SmartAI.h"
 #include "SpellAuras.h"
+#include "TaskScheduler.h"
 #include "WaypointMgr.h"
 #include "World.h"
 
@@ -334,7 +334,7 @@ public:
     {
         npc_training_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
         }
 
@@ -392,7 +392,7 @@ public:
     {
         npc_target_dummyAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
             deathTimer = 15000;
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
         }
@@ -570,6 +570,10 @@ public:
 
         {
             if (!SpawnAssoc)
+                return;
+
+            // check if they're hostile
+            if (!(me->IsHostileTo(who) || who->IsHostileTo(me)))
                 return;
 
             if (me->IsValidAttackTarget(who))
@@ -1006,7 +1010,7 @@ public:
                             {
                                 if (guid != savedPatient->GetGUID()) // Don't kill the last guy we just saved
                                     if (Creature* patient = ObjectAccessor::GetCreature(*me, guid))
-                                        patient->setDeathState(JUST_DIED);
+                                        patient->setDeathState(DeathState::JustDied);
                             }
                         }
 
@@ -1155,7 +1159,7 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_IN_COMBAT);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                me->setDeathState(JUST_DIED);
+                me->setDeathState(DeathState::JustDied);
                 me->SetDynamicFlag(32);
 
                 if (DoctorGUID)
@@ -2015,13 +2019,15 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
+        auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
+
         if (!player->HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN))
         {
-            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1); // "I no longer wish to gain experience."
+            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1, toggleXpCost); // "I no longer wish to gain experience."
         }
         else
         {
-            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2); // "I wish to start gaining experience again."
+            AddGossipItemFor(player, GOSSIP_MENU_EXP_NPC, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2, toggleXpCost); // "I wish to start gaining experience again."
         }
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature);
@@ -2030,43 +2036,29 @@ public:
 
     bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
     {
-        ClearGossipMenuFor(player);
-        bool noXPGain = player->HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
-        bool doSwitch = false;
         auto toggleXpCost = sWorld->getIntConfig(CONFIG_TOGGLE_XP_COST);
+
+        ClearGossipMenuFor(player);
+
+        if (!player->HasEnoughMoney(toggleXpCost))
+        {
+            player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
+            player->PlayerTalkClass->SendCloseGossip();
+            return true;
+        }
+
+        player->ModifyMoney(-toggleXpCost);
 
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF + 1://xp off
-                {
-                    if (!noXPGain)//does gain xp
-                        doSwitch = true;//switch to don't gain xp
-                }
+                player->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
                 break;
             case GOSSIP_ACTION_INFO_DEF + 2://xp on
-                {
-                    if (noXPGain)//doesn't gain xp
-                        doSwitch = true;//switch to gain xp
-                }
+                player->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
                 break;
         }
-        if (doSwitch)
-        {
-            if (!player->HasEnoughMoney(toggleXpCost))
-            {
-                player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
-            }
-            else if (noXPGain)
-            {
-                player->ModifyMoney(-toggleXpCost);
-                player->RemovePlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
-            }
-            else if (!noXPGain)
-            {
-                player->ModifyMoney(-toggleXpCost);
-                player->SetPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN);
-            }
-        }
+
         player->PlayerTalkClass->SendCloseGossip();
         return true;
     }
@@ -2518,9 +2510,9 @@ enum VenomhideHatchlingMisc
     ITEM_VENOMHIDE_BABY_TOOTH = 47196,
 
     MODEL_BABY_RAPTOR              = 29251,
-    MODEL_BABY_RAPTOR_REPTILE_EYES = 29809,
-    MODEL_ADOLESCENT_RAPTOR        = 29103,
-    MODEL_FULL_RAPTOR              = 5291,
+    MODEL_BABY_RAPTOR_REPTILE_EYES = 29274,
+    MODEL_ADOLESCENT_RAPTOR        = 29275,
+    MODEL_FULL_RAPTOR              = 29276,
 };
 
 enum VenomhideHatchlingTexts
@@ -2546,7 +2538,7 @@ public:
 
         void IsSummonedBy(WorldObject* summoner) override
         {
-            if (summoner->GetTypeId() != TYPEID_PLAYER)
+            if (!summoner->IsPlayer())
             {
                 return;
             }
@@ -2614,6 +2606,17 @@ public:
         events.Reset();
     }
 
+    bool CanAIAttack(Unit const* target) const override
+    {
+        if (Unit* summoner = me->GetCharmerOrOwner())
+        {
+            if (target->IsPlayer() && (!summoner->IsPvP() || !target->IsPvP()))
+                return false;
+        }
+
+        return true;
+    }
+
     void JustEngagedWith(Unit* /*who*/) override
     {
         events.ScheduleEvent(EVENT_FLAME_BUFFET, 4s);
@@ -2622,12 +2625,9 @@ public:
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (summoner->GetTypeId() != TYPEID_UNIT)
-        {
-            return;
-        }
+        if (summoner->IsCreature() || summoner->IsPlayer())
+            me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-        me->GetMotionMaster()->MoveFollow(summoner->ToUnit(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
     }
 
     void UpdateAI(uint32 diff) override
@@ -2650,6 +2650,45 @@ public:
         }
 
         DoMeleeAttackIfReady();
+    }
+};
+
+struct npc_crashin_thrashin_robot : public ScriptedAI
+{
+public:
+    npc_crashin_thrashin_robot(Creature* creature) : ScriptedAI(creature)
+    {
+    }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        _scheduler.Schedule(180s, [this](TaskContext /*context*/)
+        {
+            me->KillSelf();
+        });
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+
+        ScriptedAI::UpdateAI(diff);
+    }
+
+private:
+    TaskScheduler _scheduler;
+};
+
+struct npc_controller : public PossessedAI
+{
+    npc_controller(Creature* creature) : PossessedAI(creature) { }
+
+    void OnCharmed(bool apply) override
+    {
+        if (!apply)
+        {
+            me->GetCharmerOrOwner()->InterruptNonMeleeSpells(false);
+        }
     }
 };
 
@@ -2680,4 +2719,6 @@ void AddSC_npcs_special()
     new npc_spring_rabbit();
     new npc_stable_master();
     RegisterCreatureAI(npc_arcanite_dragonling);
+    RegisterCreatureAI(npc_crashin_thrashin_robot);
+    RegisterCreatureAI(npc_controller);
 }

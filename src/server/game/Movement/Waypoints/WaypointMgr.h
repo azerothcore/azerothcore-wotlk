@@ -19,6 +19,7 @@
 #define ACORE_WAYPOINTMANAGER_H
 
 #include "Common.h"
+#include <optional>
 #include <unordered_map>
 #include <vector>
 

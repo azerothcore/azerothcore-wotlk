@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,13 +20,13 @@ CREATE TABLE IF NOT EXISTS `disables` (
   `sourceType` int unsigned NOT NULL,
   `entry` int unsigned NOT NULL,
   `flags` tinyint unsigned NOT NULL DEFAULT '0',
-  `params_0` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `params_1` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `comment` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `params_0` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `params_1` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `comment` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`sourceType`,`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.disables: ~905 rows (approximately)
+-- Dumping data for table acore_world.disables: ~910 rows (approximately)
 DELETE FROM `disables`;
 INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, `comment`) VALUES
 	(0, 128, 8, '', '', 'Spell for deprecated item'),
@@ -55,6 +55,7 @@ INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, 
 	(0, 23482, 8, '', '', 'Spell for deprecated item'),
 	(0, 23483, 8, '', '', 'Spell for deprecated item'),
 	(0, 23789, 8, '', '', 'Stoneclaw Totem TEST - can crash client by spawning too many totems'),
+	(0, 26522, 64, '', '', 'Disable LOS for Lunar Fortune'),
 	(0, 27252, 8, '', '', 'Spell for deprecated item'),
 	(0, 27256, 8, '', '', 'Spell for deprecated item'),
 	(0, 28096, 64, '', '', 'Stalagg Tesla Visual - Ignore LoS'),
@@ -88,7 +89,11 @@ INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, 
 	(0, 45669, 64, '', '', 'Disable LOS for Torch Catching quests'),
 	(0, 45949, 64, '', '', 'Ignore LOS on Release Aberration'),
 	(0, 46171, 64, '', '', 'Ignore LOS on Scuttle Wrecked Flying Machine'),
+	(0, 46314, 64, '0', '0', 'Disable LOS for spell Ahune - Slippery Floor Ambient'),
+	(0, 46422, 64, '0', '0', 'Disable LOS for spell Shamans Look for Opening'),
 	(0, 46585, 64, '', '', 'Disable LOS for Raise Dead Guardian'),
+	(0, 46593, 64, '0', '0', 'Disable LOS for spell Whisp Flight Missile and Beam'),
+	(0, 46603, 64, '0', '0', 'Disable LOS for spell Force Whisp to Flight'),
 	(0, 47117, 64, '', '', 'Ignore LOS on Script Cast Summon Image of Drakuru 01'),
 	(0, 47149, 64, '', '', 'Ignore LOS on Script Cast Summon Image of Drakuru 02'),
 	(0, 47316, 64, '', '', 'Ignore LOS on Script Cast Summon Image of Drakuru 03'),

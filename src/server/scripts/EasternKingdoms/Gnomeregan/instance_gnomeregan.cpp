@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "gnomeregan.h"
 
 class instance_gnomeregan : public InstanceMapScript
@@ -60,7 +62,7 @@ public:
                 case GO_CAVE_IN_2:
                 case GO_WORKSHOP_DOOR:
                 case GO_FINAL_CHAMBER_DOOR:
-                    gameobject->UpdateSaveToDb(true);
+                    gameobject->AllowSaveToDB(true);
                     break;
             }
         }

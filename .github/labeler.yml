@@ -1,37 +1,59 @@
 file-cpp:
-  - src/**/*.cpp
-  - src/**/*.h
-  - deps/**/*.cpp
-  - deps/**/*.h
+- changed-files:
+    - any-glob-to-any-file: 
+      - 'src/**/*.cpp'
+      - 'src/**/*.h'
+      - 'deps/**/*.cpp'
+      - 'deps/**/*.h'
 
 DB:
-  - data/**/*.sql
+- changed-files:
+  - any-glob-to-any-file: 'data/**/*.sql'
 
 CORE:
-  - any: ['src/**/*', '!src/server/scripts/*', '!src/tests/*']
+- changed-files:
+    - any-glob-to-any-file:
+      - 'src/*'
+      - 'src/common/**/*'
+      - 'src/genrev/**/*'
+      - 'src/server/*'
+      - 'src/server/apps/**/*'
+      - 'src/server/database/**/*'
+      - 'src/server/game/**/*'
+      - 'src/server/shared/**/*'
+      - 'src/tools/**/*'
 
 Script:
-  - src/server/scripts/**/*.cpp
-  - src/server/scripts/**/*.h
+- changed-files:
+    - any-glob-to-any-file: 
+      - 'src/server/scripts/**/*.cpp'
+      - 'src/server/scripts/**/*.h'
 
 UnitTests:
-  - src/test/**/*
+- changed-files:
+    - any-glob-to-any-file: 'src/test/**/*'
 
 Documentation:
-  - ./*.md
+- changed-files:
+    - any-glob-to-any-file: '**/*.md'
 
 Bash:
-  - ./*.sh
-  - apps/**/*.sh
-  - conf/**/*.sh
-  - deps/**/*.sh
-  - modules/**/*.sh
+- changed-files:
+    - any-glob-to-any-file: 
+      - '*.sh'
+      - 'apps/**/*.sh'
+      - 'conf/**/*.sh'
+      - 'deps/**/*.sh'
+      - 'modules/**/*.sh'
 
 CMake:
-  - ./*.cmake
+- changed-files:
+    - any-glob-to-any-file: '**/*.cmake'
 
 Workflow:
-  - .github/workflows/*
+- changed-files:
+    - any-glob-to-any-file: '.github/workflows/*'
 
 Batch:
-  - apps/**/*.bat
+- changed-files:
+    - any-glob-to-any-file: 'apps/**/*.bat'

@@ -153,7 +153,6 @@ if(WITH_STRICT_DATABASE_TYPE_CHECKS)
   message(" *** WITH_STRICT_DATABASE_TYPE_CHECKS - WARNING!")
   message(" *** Validates uses of database Get***() functions from Field class")
   message(" *** invalid calls will result in returning value 0")
-  message(" *** NOT COMPATIBLE WITH MARIADB!")
   add_definitions(-DACORE_STRICT_DATABASE_TYPE_CHECKS)
 endif()
 

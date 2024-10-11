@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
 #include "gundrak.h"
 
@@ -107,7 +107,7 @@ public:
                 case GO_GAL_DARAH_DOORS0:
                 case GO_GAL_DARAH_DOORS1:
                 case GO_GAL_DARAH_DOORS2:
-                    AddDoor(gameobject, true);
+                    AddDoor(gameobject);
                     break;
             }
         }
@@ -121,7 +121,7 @@ public:
                 case GO_GAL_DARAH_DOORS0:
                 case GO_GAL_DARAH_DOORS1:
                 case GO_GAL_DARAH_DOORS2:
-                    AddDoor(gameobject, false);
+                    RemoveDoor(gameobject);
                     break;
             }
         }

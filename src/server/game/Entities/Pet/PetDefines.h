@@ -147,6 +147,7 @@ enum PetScalingSpells
     SPELL_WARLOCK_PET_SCALING_04        = 34958,
     SPELL_WARLOCK_PET_SCALING_05        = 61013, // Hit / Expertise
     SPELL_GLYPH_OF_FELGUARD             = 56246,
+    SPELL_GLYPH_OF_VOIDWALKER           = 56247,
     SPELL_INFERNAL_SCALING_01           = 36186,
     SPELL_INFERNAL_SCALING_02           = 36188,
     SPELL_INFERNAL_SCALING_03           = 36189,

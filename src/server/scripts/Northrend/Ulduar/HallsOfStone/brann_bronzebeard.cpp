@@ -15,17 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "halls_of_stone.h"
 
 #define GOSSIP_ITEM_1       "Brann, it would be our honor!"
 #define GOSSIP_ITEM_2       "Let's move Brann, enough of the history lessons!"
-#define GOSSIP_ITEM_3       "We dont have time for this right now, we have to keep going."
+#define GOSSIP_ITEM_3       "There will be plenty of time for this later Brann, we need to get moving!"
 #define GOSSIP_ITEM_4       "We're with you Brann! Open it!"
 #define TEXT_ID_START       13100
 
@@ -318,7 +319,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 1);
                 pInstance->SetData(DATA_BRANN_ACHIEVEMENT, true);
@@ -585,7 +586,7 @@ public:
             for (int i = 0; i < count; ++i)
             {
                 Creature* cr = me->SummonCreature(entry, 946.5971f + urand(0, 6), 383.5330f + urand(0, 6), 205.9943f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-                if(cr)
+                if (cr)
                 {
                     cr->AI()->AttackStart(me);
                     cr->AddThreat(me, 100.0f);
@@ -597,11 +598,11 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             ResetEvent();
-            if(pInstance)
+            if (pInstance)
             {
                 if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                 {
-                    brann->setDeathState(JUST_DIED);
+                    brann->setDeathState(DeathState::JustDied);
                     brann->Respawn();
                     brann->AI()->DoAction(5);
                 }
@@ -661,7 +662,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
         // In front of Console
         case 11:
             SetEscortPaused(true);
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, IN_PROGRESS);
                 if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_TRIBUNAL_CONSOLE)))
@@ -671,7 +672,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
         // Before Sjonnir's door
         case 27:
             SetEscortPaused(true);
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 5);
                 me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);

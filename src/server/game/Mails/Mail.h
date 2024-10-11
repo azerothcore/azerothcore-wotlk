@@ -42,7 +42,7 @@ enum MailMessageType
     MAIL_CALENDAR       = 5
 };
 
-enum MailCheckMask
+enum MailCheckMask : uint8
 {
     MAIL_CHECK_MASK_NONE        = 0x00,
     MAIL_CHECK_MASK_READ        = 0x01,

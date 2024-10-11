@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
-#include "TaskScheduler.h"
+#include "SpellScriptLoader.h"
 #include "temple_of_ahnqiraj.h"
 
 enum Spells
@@ -88,11 +89,6 @@ struct boss_twinemperorsAI : public BossAI
     boss_twinemperorsAI(Creature* creature): BossAI(creature, DATA_TWIN_EMPERORS), _introDone(false)
     {
         me->SetStandState(UNIT_STAND_STATE_KNEEL);
-
-        _scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
     }
 
     Creature* GetTwin()
@@ -121,7 +117,7 @@ struct boss_twinemperorsAI : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim && victim->GetTypeId() == TYPEID_PLAYER)
+        if (victim && victim->IsPlayer())
             Talk(SAY_KILL);
     }
 
@@ -132,8 +128,6 @@ struct boss_twinemperorsAI : public BossAI
         if (Creature* twin = GetTwin())
             if (!twin->IsInEvadeMode())
                 twin->AI()->EnterEvadeMode(why);
-
-        _scheduler.CancelAll();
     }
 
     void JustDied(Unit* killer) override
@@ -152,7 +146,7 @@ struct boss_twinemperorsAI : public BossAI
         if (action == ACTION_CANCEL_INTRO)
         {
             _introDone = true;
-            _scheduler.CancelGroup(GROUP_INTRO);
+            scheduler.CancelGroup(GROUP_INTRO);
             return;
         }
 
@@ -161,32 +155,31 @@ struct boss_twinemperorsAI : public BossAI
             DoResetThreatList();
             me->SetReactState(REACT_PASSIVE);
             DoCastSelf(SPELL_TWIN_TELEPORT_VISUAL, true);
-            _scheduler.DelayAll(2300ms);
-            _scheduler.Schedule(2s, [this](TaskContext /*context*/)
+            scheduler.DelayAll(2300ms);
+            scheduler.Schedule(2s, [this](TaskContext /*context*/)
+            {
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->SetControlled(false, UNIT_STATE_ROOT);
+                if (Unit* victim = me->SelectNearestTarget())
                 {
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetControlled(false, UNIT_STATE_ROOT);
-                    if (Unit* victim = me->SelectNearestTarget())
-                    {
-                        me->AddThreat(victim, 2000.f);
-                        AttackStart(victim);
-                    }
-                });
+                    me->AddThreat(victim, 2000.f);
+                    AttackStart(victim);
+                }
+            });
         }
 
         if (action != ACTION_START_INTRO)
             return;
 
-        _scheduler.Schedule(5s, [this](TaskContext /*context*/)
-            {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
-                me->LoadEquipment(1, true);
-            });
+        scheduler.Schedule(5s, [this](TaskContext /*context*/)
+        {
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->LoadEquipment(1, true);
+        });
 
         if (IAmVeklor())
         {
-            _scheduler
-                .Schedule(12s, GROUP_INTRO, [this](TaskContext /*context*/)
+            scheduler.Schedule(12s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     Talk(SAY_INTRO_0);
                 })
@@ -211,8 +204,7 @@ struct boss_twinemperorsAI : public BossAI
         }
         else
         {
-            _scheduler
-                .Schedule(17s, GROUP_INTRO, [this](TaskContext /*context*/)
+            scheduler.Schedule(17s, GROUP_INTRO, [this](TaskContext /*context*/)
                 {
                     Talk(SAY_INTRO_0);
                 })
@@ -252,8 +244,7 @@ struct boss_twinemperorsAI : public BossAI
             if (!twin->IsInCombat())
                 twin->AI()->AttackStart(who);
 
-        _scheduler
-            .Schedule(15min, [this](TaskContext /*context*/)
+        scheduler.Schedule(15min, [this](TaskContext /*context*/)
             {
                 if (IAmVeklor())
                 {
@@ -280,17 +271,16 @@ struct boss_twinemperorsAI : public BossAI
         if (!UpdateVictim() && _introDone)
             return;
 
-        _scheduler.Update(diff, [this]
-            {
-                if (!IAmVeklor())
-                    DoMeleeAttackIfReady();
-            });
+        scheduler.Update(diff, [this]
+        {
+            if (!IAmVeklor())
+                DoMeleeAttackIfReady();
+        });
     }
 
     virtual bool IAmVeklor() = 0;
 
 protected:
-    TaskScheduler _scheduler;
     bool _introDone;
 };
 
@@ -306,8 +296,7 @@ struct boss_veknilash : public boss_twinemperorsAI
 
         DoPlaySoundToSet(me, SOUND_VN_AGGRO);
 
-        _scheduler
-            .Schedule(14s, [this](TaskContext context)
+        scheduler.Schedule(14s, [this](TaskContext context)
             {
                 DoCastRandomTarget(SPELL_UPPERCUT, 0, me->GetMeleeReach(), true);
                 context.Repeat(4s, 15s);
@@ -337,8 +326,7 @@ struct boss_veklor : public boss_twinemperorsAI
 
         DoPlaySoundToSet(me, SOUND_VK_AGGRO);
 
-        _scheduler
-            .Schedule(4s, [this](TaskContext context)
+        scheduler.Schedule(4s, [this](TaskContext context)
             {
                 if (me->GetVictim())
                 {

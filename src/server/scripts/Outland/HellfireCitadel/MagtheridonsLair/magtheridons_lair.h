@@ -19,15 +19,13 @@
 #define DEF_MAGTHERIDONS_LAIR_H
 
 #include "CreatureAIImpl.h"
-#include "SpellScript.h"
-
 #define DataHeader "ML"
 
 #define MagtheridonsLairScriptName "instance_magtheridons_lair"
 
 enum DataTypes
 {
-    TYPE_MAGTHERIDON                = 0,
+    DATA_MAGTHERIDON                = 0,
     MAX_ENCOUNTER                   = 1,
 
     DATA_CHANNELER_COMBAT           = 10,
@@ -39,7 +37,9 @@ enum NpcIds
 {
     NPC_MAGTHERIDON                 = 17257,
     NPC_HELLFIRE_CHANNELER          = 17256,
-    NPC_HELLFIRE_WARDER             = 18829
+    NPC_HELLFIRE_WARDER             = 18829,
+    NPC_HELLFIRE_RAID_TRIGGER       = 17376,
+    NPC_TARGET_TRIGGER              = 17474
 };
 
 enum GoIds
@@ -61,5 +61,7 @@ inline AI* GetMagtheridonsLairAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, MagtheridonsLairScriptName);
 }
+
+#define RegisterMagtheridonsLairCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetMagtheridonsLairAI)
 
 #endif

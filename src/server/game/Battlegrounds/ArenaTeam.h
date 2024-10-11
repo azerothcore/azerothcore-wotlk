@@ -21,7 +21,6 @@
 #include "Map.h"
 #include "QueryResult.h"
 #include <list>
-#include <map>
 
 class WorldSession;
 class WorldPacket;
@@ -167,7 +166,7 @@ public:
     // and this method removes given record from list. So invalid reference can happen.
     void DelMember(ObjectGuid guid, bool cleanDb);
 
-    [[nodiscard]] size_t GetMembersSize() const         { return Members.size(); }
+    [[nodiscard]] std::size_t GetMembersSize() const         { return Members.size(); }
     [[nodiscard]] bool   Empty() const                  { return Members.empty(); }
     MemberList::iterator m_membersBegin() { return Members.begin(); }
     MemberList::iterator m_membersEnd()   { return Members.end(); }

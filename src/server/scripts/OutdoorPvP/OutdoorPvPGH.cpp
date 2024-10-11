@@ -19,13 +19,13 @@
 #include "GameEventMgr.h"
 #include "MapMgr.h"
 #include "OutdoorPvPMgr.h"
+#include "OutdoorPvPScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "WorldPacket.h"
 
 OutdoorPvPGH::OutdoorPvPGH()
 {
-    m_TypeId = OUTDOOR_PVP_GH;
+    _typeId = OUTDOOR_PVP_GH;
 }
 
 bool OutdoorPvPGH::SetupOutdoorPvP()
@@ -61,9 +61,9 @@ void OPvPCapturePointGH::SendChangePhase()
     // send this too, sometimes the slider disappears, dunno why :(
     SendUpdateWorldState(GH_UI_SLIDER_DISPLAY, 1);
     // send these updates to only the ones in this objective
-    uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+    uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
     SendUpdateWorldState(GH_UI_SLIDER_POS, phase);
-    SendUpdateWorldState(GH_UI_SLIDER_N, m_neutralValuePct);
+    SendUpdateWorldState(GH_UI_SLIDER_N, _neutralValuePct);
 }
 
 bool OPvPCapturePointGH::HandlePlayerEnter(Player* player)
@@ -71,9 +71,9 @@ bool OPvPCapturePointGH::HandlePlayerEnter(Player* player)
     if (OPvPCapturePoint::HandlePlayerEnter(player))
     {
         player->SendUpdateWorldState(GH_UI_SLIDER_DISPLAY, 1);
-        uint32 phase = (uint32)ceil((m_value + m_maxValue) / (2 * m_maxValue) * 100.0f);
+        uint32 phase = (uint32)ceil((_value + _maxValue) / (2 * _maxValue) * 100.0f);
         player->SendUpdateWorldState(GH_UI_SLIDER_POS, phase);
-        player->SendUpdateWorldState(GH_UI_SLIDER_N, m_neutralValuePct);
+        player->SendUpdateWorldState(GH_UI_SLIDER_N, _neutralValuePct);
         return true;
     }
     return false;
@@ -88,7 +88,7 @@ void OPvPCapturePointGH::HandlePlayerLeave(Player* player)
 void OPvPCapturePointGH::ChangeState()
 {
     uint32 artkit = 21;
-    switch (m_State)
+    switch (_state)
     {
         case OBJECTIVESTATE_ALLIANCE:
             sGameEventMgr->StopEvent(GH_ALLIANCE_DEFENSE_EVENT);

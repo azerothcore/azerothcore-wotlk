@@ -23,13 +23,12 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Creature.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "WorldSession.h"
 
 using namespace Acore::ChatCommands;
 
@@ -71,15 +70,13 @@ public:
     {
         if (!spell)
         {
-            handler->PSendSysMessage(LANG_COMMAND_NOSPELLFOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_NOSPELLFOUND);
             return false;
         }
 
         if (!SpellMgr::IsSpellValid(spell))
         {
-            handler->PSendSysMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_SPELL_BROKEN, spell->Id);
             return false;
         }
         return true;
@@ -102,8 +99,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -128,8 +124,7 @@ public:
         Creature* caster = handler->getSelectedCreature();
         if (!caster)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -175,8 +170,7 @@ public:
         Unit* target = handler->getSelectedUnit();
         if (!target)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
@@ -201,15 +195,13 @@ public:
         Creature* caster = handler->getSelectedCreature();
         if (!caster)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 
         if (!caster->GetVictim())
         {
-            handler->SendSysMessage(LANG_SELECTED_TARGET_NOT_HAVE_VICTIM);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECTED_TARGET_NOT_HAVE_VICTIM);
             return false;
         }
 
@@ -234,8 +226,7 @@ public:
         Unit* caster = handler->getSelectedUnit();
         if (!caster)
         {
-            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_SELECT_CHAR_OR_CREATURE);
             return false;
         }
 

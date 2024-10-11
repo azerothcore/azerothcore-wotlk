@@ -21,7 +21,6 @@
 
 #include "CliRunnable.h"
 #include "Config.h"
-#include "Errors.h"
 #include "ObjectMgr.h"
 #include "World.h"
 #include <fmt/core.h>
@@ -47,7 +46,7 @@ namespace Acore::Impl::Readline
     static std::vector<std::string> vec;
     char* cli_unpack_vector(char const*, int state)
     {
-        static size_t i=0;
+        static std::size_t i=0;
         if (!state)
             i = 0;
         if (i < vec.size())

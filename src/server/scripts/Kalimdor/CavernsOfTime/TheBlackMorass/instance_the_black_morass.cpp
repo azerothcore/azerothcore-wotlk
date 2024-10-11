@@ -15,10 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
 #include "SpellInfo.h"
 #include "TemporarySummon.h"
 #include "the_black_morass.h"
@@ -31,9 +30,10 @@ const Position PortalLocation[4] =
     { -1930.9106f, 7183.5970f, 23.007639f, 3.59537f }
 };
 
-ObjectData const creatureData[1] =
+ObjectData const creatureData[] =
 {
-    { NPC_MEDIVH, DATA_MEDIVH }
+    { NPC_MEDIVH, DATA_MEDIVH },
+    { 0,          0           }
 };
 
 class instance_the_black_morass : public InstanceMapScript

@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
@@ -85,7 +86,11 @@ public:
 # npc_zephyr
 ######*/
 
-#define GOSSIP_HZ "Take me to the Caverns of Time."
+enum Zephyr : int32
+{
+    GOSSIP_MENU_ZEPHYR              = 9205,
+    SPELL_TELEPORT_CAVERNS_OF_TIME  = 37778,
+};
 
 class npc_zephyr : public CreatureScript
 {
@@ -96,7 +101,7 @@ public:
     {
         ClearGossipMenuFor(player);
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
-            player->CastSpell(player, 37778, false);
+            player->CastSpell(player, SPELL_TELEPORT_CAVERNS_OF_TIME, false);
 
         return true;
     }
@@ -104,7 +109,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetReputationRank(989) >= REP_REVERED)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_HZ, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_ZEPHYR, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
 
@@ -249,9 +254,166 @@ public:
     };
 };
 
+enum ShattrathQuests
+{
+    // QuestID : Creature Template ID
+    // Heroic Daily Quests
+    QUEST_H_NAZZAN              = 11354, // 24410
+    QUEST_H_KELIDAN             = 11362, // 24413
+    QUEST_H_BLADEFIST           = 11363, // 24414
+    QUEST_H_QUAG                = 11368, // 24419
+    QUEST_H_BLACKSTALKER        = 11369, // 24420
+    QUEST_H_WARLORD             = 11370, // 24421
+    QUEST_H_IKISS               = 11372, // 24422
+    QUEST_H_SHAFFAR             = 11373, // 24423
+    QUEST_H_EXARCH              = 11374, // 24424
+    QUEST_H_MURMUR              = 11375, // 24425
+    QUEST_H_EPOCH               = 11378, // 24427
+    QUEST_H_AEONUS              = 11382, // 24428
+    QUEST_H_WARP                = 11384, // 24431
+    QUEST_H_CALCULATOR          = 11386, // 21504
+    QUEST_H_SKYRISS             = 11388, // 24435
+    QUEST_H_KAEL                = 11499, // 24855
+    // Normal Daily Quests
+    QUEST_N_CENTURIONS          = 11364, // 24411
+    QUEST_N_MYRMIDONS           = 11371, // 24415
+    QUEST_N_INSTRUCTORS         = 11376, // 24426
+    QUEST_N_LORDS               = 11383, // 24429
+    QUEST_N_CHANNELERS          = 11385, // 24430
+    QUEST_N_DESTROYERS          = 11387, // 24432
+    QUEST_N_SENTINELS           = 11389, // 24434
+    QUEST_N_SISTERS             = 11500, // 24854
+
+    ACTION_UPDATE_QUEST_STATUS   = 1,
+
+    POOL_SHATTRATH_DAILY_H      = 356,
+    POOL_SHATTRATH_DAILY_N      = 357,
+
+    // Image NPCs
+    NPC_SHATTRATH_DAILY_H       = 24854,
+    NPC_SHATTRATH_DAILY_N       = 24410
+};
+
+struct npc_shattrath_daily_quest : public NullCreatureAI
+{
+    npc_shattrath_daily_quest(Creature* c) : NullCreatureAI(c) {}
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_UPDATE_QUEST_STATUS)
+        {
+            uint32 creature = me->GetEntry();
+            QueryResult result = CharacterDatabase.Query("SELECT `quest_id` FROM `pool_quest_save` WHERE `pool_id` = '{}'", creature == NPC_SHATTRATH_DAILY_H ? POOL_SHATTRATH_DAILY_H : POOL_SHATTRATH_DAILY_N);
+            if (result)
+            {
+                Field *fields = result->Fetch();
+                int quest_id = fields[0].Get<int>();
+                uint32 templateID = 0;
+
+                if (creature == NPC_SHATTRATH_DAILY_H)
+                {
+                    switch (quest_id)
+                    {
+                        case QUEST_H_NAZZAN:
+                            templateID = 24410;
+                            break;
+                        case QUEST_H_KELIDAN:
+                            templateID = 24413;
+                            break;
+                        case QUEST_H_BLADEFIST:
+                            templateID = 24414;
+                            break;
+                        case QUEST_H_QUAG:
+                            templateID = 24419;
+                            break;
+                        case QUEST_H_BLACKSTALKER:
+                            templateID = 24420;
+                            break;
+                        case QUEST_H_WARLORD:
+                            templateID = 24421;
+                            break;
+                        case QUEST_H_IKISS:
+                            templateID = 24422;
+                            break;
+                        case QUEST_H_SHAFFAR:
+                            templateID = 24423;
+                            break;
+                        case QUEST_H_EXARCH:
+                            templateID = 24424;
+                            break;
+                        case QUEST_H_MURMUR:
+                            templateID = 24425;
+                            break;
+                        case QUEST_H_EPOCH:
+                            templateID = 24427;
+                            break;
+                        case QUEST_H_AEONUS:
+                            templateID = 24428;
+                            break;
+                        case QUEST_H_WARP:
+                            templateID = 24431;
+                            break;
+                        case QUEST_H_CALCULATOR:
+                            templateID = 21504;
+                            break;
+                        case QUEST_H_SKYRISS:
+                            templateID = 24435;
+                            break;
+                        case QUEST_H_KAEL:
+                            templateID = 24855;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (creature == NPC_SHATTRATH_DAILY_N)
+                {
+                    switch (quest_id)
+                    {
+                        case QUEST_N_CENTURIONS:
+                            templateID = 24411;
+                            break;
+                        case QUEST_N_MYRMIDONS:
+                            templateID = 24415;
+                            break;
+                        case QUEST_N_INSTRUCTORS:
+                            templateID = 24426;
+                            break;
+                        case QUEST_N_LORDS:
+                            templateID = 24429;
+                            break;
+                        case QUEST_N_CHANNELERS:
+                            templateID = 24430;
+                            break;
+                        case QUEST_N_DESTROYERS:
+                            templateID = 24432;
+                            break;
+                        case QUEST_N_SENTINELS:
+                            templateID = 24434;
+                            break;
+                        case QUEST_N_SISTERS:
+                            templateID = 24854;
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                if (CreatureTemplate const* ci = sObjectMgr->GetCreatureTemplate(templateID))
+                {
+                    CreatureModel const* model = ObjectMgr::ChooseDisplayId(ci);
+                    me->SetDisplayId(model->CreatureDisplayID, model->DisplayScale);
+                }
+            }
+        }
+    }
+};
+
 void AddSC_shattrath_city()
 {
     new npc_shattrathflaskvendors();
     new npc_zephyr();
     new npc_kservant();
+    RegisterCreatureAI(npc_shattrath_daily_quest);
 }

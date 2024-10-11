@@ -15,14 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
 #include "CreatureAI.h"
 #include "EventMap.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "SpellScript.h"
-#include "sunken_temple.h"
+#include "SpellScriptLoader.h"
 #include "Unit.h"
+#include "sunken_temple.h"
 
 class instance_sunken_temple : public InstanceMapScript
 {
@@ -62,7 +64,7 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
-            if (unit->GetTypeId() == TYPEID_UNIT && unit->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && unit->GetEntry() != NPC_SHADE_OF_ERANIKUS)
+            if (unit->IsCreature() && unit->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && unit->GetEntry() != NPC_SHADE_OF_ERANIKUS)
                 _dragonkinList.remove(unit->GetGUID());
             if (unit->GetEntry() == NPC_JAMMAL_AN_THE_PROPHET)
             {

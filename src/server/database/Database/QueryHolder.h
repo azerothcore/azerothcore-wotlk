@@ -28,12 +28,12 @@ friend class SQLQueryHolderTask;
 public:
     SQLQueryHolderBase() = default;
     virtual ~SQLQueryHolderBase();
-    void SetSize(size_t size);
-    PreparedQueryResult GetPreparedResult(size_t index) const;
-    void SetPreparedResult(size_t index, PreparedResultSet* result);
+    void SetSize(std::size_t size);
+    PreparedQueryResult GetPreparedResult(std::size_t index) const;
+    void SetPreparedResult(std::size_t index, PreparedResultSet* result);
 
 protected:
-    bool SetPreparedQueryImpl(size_t index, PreparedStatementBase* stmt);
+    bool SetPreparedQueryImpl(std::size_t index, PreparedStatementBase* stmt);
 
 private:
     std::vector<std::pair<PreparedStatementBase*, PreparedQueryResult>> m_queries;
@@ -43,7 +43,7 @@ template<typename T>
 class SQLQueryHolder : public SQLQueryHolderBase
 {
 public:
-    bool SetPreparedQuery(size_t index, PreparedStatement<T>* stmt)
+    bool SetPreparedQuery(std::size_t index, PreparedStatement<T>* stmt)
     {
         return SetPreparedQueryImpl(index, stmt);
     }

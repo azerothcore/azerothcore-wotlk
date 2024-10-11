@@ -122,6 +122,8 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
       PUBLIC
         database
       PRIVATE
+        modules
+        scripts
         acore-core-interface)
 
     # Install config
@@ -153,6 +155,8 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
   target_include_directories(${TOOL_PROJECT_NAME}
     PUBLIC
       ${TOOL_PUBLIC_INCLUDES}
+      ${CMAKE_SOURCE_DIR}/src
+      ${CMAKE_SOURCE_DIR}/modules
     PRIVATE
       ${CMAKE_CURRENT_BINARY_DIR}/${TOOL_NAME})
 

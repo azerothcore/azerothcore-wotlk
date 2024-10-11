@@ -20,7 +20,6 @@
 #include "Creature.h"
 #include "GameGraveyard.h"
 #include "GameTime.h"
-#include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "Util.h"
@@ -114,6 +113,8 @@ void BattlegroundEY::AddPoints(TeamId teamId, uint32 points)
 {
     uint8 honorRewards = uint8(m_TeamScores[teamId] / _honorTics);
     m_TeamScores[teamId] += points;
+    if (m_TeamScores[teamId] > BG_EY_MAX_TEAM_SCORE)
+        m_TeamScores[teamId] = BG_EY_MAX_TEAM_SCORE;
 
     for (; honorRewards < uint8(m_TeamScores[teamId] / _honorTics); ++honorRewards)
         RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);

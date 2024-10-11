@@ -1,4 +1,4 @@
-// Formatting library for C++ - dynamic format arguments
+// Formatting library for C++ - dynamic argument lists
 //
 // Copyright (c) 2012 - present, Victor Zverovich
 // All rights reserved.
@@ -95,10 +95,10 @@ class dynamic_format_arg_store
   };
 
   template <typename T>
-  using stored_type = conditional_t<detail::is_string<T>::value &&
-                                        !has_formatter<T, Context>::value &&
-                                        !detail::is_reference_wrapper<T>::value,
-                                    std::basic_string<char_type>, T>;
+  using stored_type = conditional_t<
+      std::is_convertible<T, std::basic_string<char_type>>::value &&
+          !detail::is_reference_wrapper<T>::value,
+      std::basic_string<char_type>, T>;
 
   // Storage of basic_format_arg must be contiguous.
   std::vector<basic_format_arg<Context>> data_;

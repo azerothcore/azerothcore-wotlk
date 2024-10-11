@@ -21,7 +21,6 @@
 #include "Define.h"
 #include <cmath>
 #include <map>
-#include <math.h>
 
 enum UsedPosType { USED_POS_PLUS, USED_POS_MINUS };
 

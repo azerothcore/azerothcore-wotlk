@@ -74,7 +74,7 @@ enum MiscIds
 
     ENCOUNTER_PROGRESS_NONE             = 0,
     ENCOUNTER_PROGRESS_BARRELS          = 1,
-    ENCOUNTER_PROGRESS_DRAKE_KILLED     = 2,
+    //ENCOUNTER_PROGRESS_DRAKE_KILLED     = 2, No longer used. Kept as reference as DB might rely on the existing order.
     ENCOUNTER_PROGRESS_THRALL_ARMORED   = 3,
     ENCOUNTER_PROGRESS_AMBUSHES_1       = 4,
     ENCOUNTER_PROGRESS_SKARLOC_KILLED   = 5,

@@ -20,10 +20,15 @@
 #include "Creature.h"
 #include "DBCStores.h"
 #include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "ObjectAccessor.h"
 #include "SpellMgr.h"
 #include "Totem.h"
+
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 int32 TotemAI::Permissible(Creature const* creature)
 {
@@ -124,7 +129,7 @@ void TotemAI::UpdateAI(uint32 /*diff*/)
 void TotemAI::AttackStart(Unit* /*victim*/)
 {
     // Sentry totem sends ping on attack
-    if (me->GetEntry() == SENTRY_TOTEM_ENTRY && me->GetOwner()->GetTypeId() == TYPEID_PLAYER)
+    if (me->GetEntry() == SENTRY_TOTEM_ENTRY && me->GetOwner()->IsPlayer())
     {
         WorldPacket data(MSG_MINIMAP_PING, (8 + 4 + 4));
         data << me->GetGUID();

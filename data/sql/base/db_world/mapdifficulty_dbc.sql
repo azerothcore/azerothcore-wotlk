@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -20,26 +20,26 @@ CREATE TABLE IF NOT EXISTS `mapdifficulty_dbc` (
   `ID` int NOT NULL DEFAULT '0',
   `MapID` int NOT NULL DEFAULT '0',
   `Difficulty` int NOT NULL DEFAULT '0',
-  `Message_Lang_enUS` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_enGB` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_koKR` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_frFR` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_deDE` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_enCN` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_zhCN` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_enTW` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_zhTW` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_esES` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_esMX` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_ruRU` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_ptPT` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_ptBR` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_itIT` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Message_Lang_Unk` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_enUS` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_enGB` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_koKR` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_frFR` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_deDE` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_enCN` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_zhCN` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_enTW` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_zhTW` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_esES` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_esMX` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_ruRU` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_ptPT` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_ptBR` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_itIT` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Message_Lang_Unk` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `Message_Lang_Mask` int unsigned NOT NULL DEFAULT '0',
   `RaidDuration` int NOT NULL DEFAULT '0',
   `MaxPlayers` int NOT NULL DEFAULT '0',
-  `Difficultystring` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Difficultystring` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

@@ -15,10 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "utgarde_keep.h"
+
+ObjectData const creatureData[] =
+{
+    { NPC_DALRONN,            DATA_DALRONN            },
+    { NPC_SKARVALD,           DATA_SKARVALD           },
+    { NPC_DALRONN_GHOST,      DATA_DALRONN_GHOST      },
+    { NPC_SKARVALD_GHOST,     DATA_SKARVALD_GHOST     },
+    { NPC_DARK_RANGER_MARRAH, DATA_DARK_RANGER_MARRAH },
+    { 0,                      0                       }
+};
 
 class instance_utgarde_keep : public InstanceMapScript
 {
@@ -32,7 +42,10 @@ public:
 
     struct instance_utgarde_keep_InstanceMapScript : public InstanceScript
     {
-        instance_utgarde_keep_InstanceMapScript(Map* pMap) : InstanceScript(pMap) {}
+        instance_utgarde_keep_InstanceMapScript(Map* pMap) : InstanceScript(pMap)
+        {
+            LoadObjectData(creatureData, nullptr);
+        }
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         uint32 ForgeEventMask;
@@ -43,13 +56,6 @@ public:
         ObjectGuid GO_ForgeAnvilGUID[3];
         ObjectGuid GO_PortcullisGUID[2];
 
-        ObjectGuid NPC_KelesethGUID;
-        ObjectGuid NPC_DalronnGUID;
-        ObjectGuid NPC_SkarvaldGUID;
-        ObjectGuid NPC_DalronnGhostGUID;
-        ObjectGuid NPC_SkarvaldGhostGUID;
-        ObjectGuid NPC_IngvarGUID;
-        ObjectGuid NPC_DarkRangerMarrahGUID;
         ObjectGuid NPC_SpecialDrakeGUID;
         bool bRocksAchiev;
 
@@ -71,7 +77,7 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
-            if (Creature* c = instance->GetCreature(NPC_DarkRangerMarrahGUID))
+            if (Creature* c = GetCreature(DATA_DARK_RANGER_MARRAH))
             {
                 c->SetReactState(REACT_PASSIVE);
                 c->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -79,47 +85,29 @@ public:
                 {
                     if (!c->IsVisible())
                         c->SetVisible(true);
-                    return;
                 }
-                else if(c->IsVisible())
+                else if (c->IsVisible())
+                {
                     c->SetVisible(false);
+                }
             }
         }
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
-                case NPC_KELESETH:
-                    NPC_KelesethGUID = creature->GetGUID();
-                    break;
-                case NPC_DALRONN:
-                    NPC_DalronnGUID = creature->GetGUID();
-                    break;
-                case NPC_SKARVALD:
-                    NPC_SkarvaldGUID = creature->GetGUID();
-                    break;
-                case NPC_DALRONN_GHOST:
-                    NPC_DalronnGhostGUID = creature->GetGUID();
-                    break;
-                case NPC_SKARVALD_GHOST:
-                    NPC_SkarvaldGhostGUID = creature->GetGUID();
-                    break;
-                case NPC_INGVAR:
-                    NPC_IngvarGUID = creature->GetGUID();
-                    break;
-                case NPC_DARK_RANGER_MARRAH:
-                    NPC_DarkRangerMarrahGUID = creature->GetGUID();
-                    break;
                 case NPC_ENSLAVED_PROTO_DRAKE:
                     if (creature->GetPositionX() < 250.0f) NPC_SpecialDrakeGUID = creature->GetGUID();
                     break;
             }
+
+            InstanceScript::OnCreatureCreate(creature);
         }
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_BELLOW_1:
                     GO_ForgeBellowGUID[0] = go->GetGUID();
@@ -170,7 +158,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_KELESETH:
                     m_auiEncounter[0] = data;
@@ -183,42 +171,45 @@ public:
                 case DATA_DALRONN_AND_SKARVALD:
                     if (data == NOT_STARTED)
                     {
-                        if( Creature* c = instance->GetCreature(NPC_DalronnGUID) )
-                            if( c->isDead() )
+                        if (Creature* c = GetCreature(DATA_DALRONN))
+                            if (c->isDead())
                             {
                                 c->AI()->DoAction(-1);
                                 c->Respawn();
                             }
-                        if( Creature* c = instance->GetCreature(NPC_SkarvaldGUID) )
-                            if( c->isDead() )
+
+                        if (Creature* c = GetCreature(DATA_SKARVALD))
+                            if (c->isDead())
                                 c->Respawn();
-                        if( Creature* c = instance->GetCreature(NPC_DalronnGhostGUID) )
+
+                        if (Creature* c = GetCreature(DATA_DALRONN_GHOST))
                         {
                             c->AI()->DoAction(-1);
                             c->DespawnOrUnsummon();
                         }
-                        NPC_DalronnGhostGUID.Clear();
-                        if( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
+
+                        if (Creature* c = GetCreature(DATA_SKARVALD_GHOST))
                             c->DespawnOrUnsummon();
-                        NPC_SkarvaldGhostGUID.Clear();
+
                     }
+
                     if (data == DONE)
                     {
-                        if( Creature* c = instance->GetCreature(NPC_DalronnGhostGUID) )
+                        if (Creature* c = GetCreature(DATA_DALRONN_GHOST))
                         {
                             c->AI()->DoAction(-1);
                             c->DespawnOrUnsummon();
                         }
-                        NPC_DalronnGhostGUID.Clear();
-                        if( Creature* c = instance->GetCreature(NPC_SkarvaldGhostGUID) )
+
+                        if (Creature* c = GetCreature(DATA_SKARVALD_GHOST))
                             c->DespawnOrUnsummon();
-                        NPC_SkarvaldGhostGUID.Clear();
+
                     }
 
                     m_auiEncounter[1] = data;
                     break;
                 case DATA_UNLOCK_SKARVALD_LOOT:
-                    if( Creature* c = instance->GetCreature(NPC_SkarvaldGUID) )
+                    if (Creature* c = GetCreature(DATA_SKARVALD))
                     {
                         c->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
                         c->SetLootMode(1);
@@ -232,7 +223,7 @@ public:
                     }
                     break;
                 case DATA_UNLOCK_DALRONN_LOOT:
-                    if( Creature* c = instance->GetCreature(NPC_DalronnGUID) )
+                    if (Creature* c = GetCreature(DATA_DALRONN))
                     {
                         c->AI()->DoAction(-1);
                         c->SetDynamicFlag(UNIT_DYNFLAG_LOOTABLE | UNIT_DYNFLAG_TAPPED | UNIT_DYNFLAG_TAPPED_BY_PLAYER);
@@ -284,23 +275,6 @@ public:
             }
         }
 
-        ObjectGuid GetGuidData(uint32 id) const override
-        {
-            switch (id)
-            {
-                case DATA_KELESETH:
-                    return NPC_KelesethGUID;
-                case DATA_DALRONN:
-                    return NPC_DalronnGUID;
-                case DATA_SKARVALD:
-                    return NPC_SkarvaldGUID;
-                case DATA_INGVAR:
-                    return NPC_IngvarGUID;
-            }
-
-            return ObjectGuid::Empty;
-        }
-
         uint32 GetData(uint32 id) const override
         {
             switch (id)
@@ -333,7 +307,7 @@ public:
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
-            switch(criteria_id)
+            switch (criteria_id)
             {
                 case 7231: // On The Rocks
                     return bRocksAchiev;

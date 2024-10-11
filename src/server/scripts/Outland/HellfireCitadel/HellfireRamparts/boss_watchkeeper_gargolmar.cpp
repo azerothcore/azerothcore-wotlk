@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "hellfire_ramparts.h"
+#include "SpellScript.h"
 
 enum Says
 {
@@ -98,7 +100,7 @@ struct boss_watchkeeper_gargolmar : public BossAI
     {
         if (!_taunted)
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 _taunted = true;
                 Talk(SAY_TAUNT);

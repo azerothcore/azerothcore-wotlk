@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "PassiveAI.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "gruuls_lair.h"
-#include "PassiveAI.h"
+#include "SpellAuraEffects.h"
 
 enum Yells
 {
@@ -87,11 +89,11 @@ struct boss_gruul : public BossAI
                 _caveInTimer = _caveInTimer - 1500ms;
             }
             context.Repeat(_caveInTimer);
-        }).Schedule(20s, [this](TaskContext context)
+        }).Schedule(39900ms, 55700ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_REVERBERATION);
-            context.Repeat(22s);
-        }).Schedule(10s, [this](TaskContext context)
+            context.Repeat(39900ms, 55700ms);
+        }).Schedule(5600ms, [this](TaskContext context)
         {
             if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat, 1, 5.0f))
             {
@@ -101,7 +103,7 @@ struct boss_gruul : public BossAI
             {
                 DoCastVictim(SPELL_HURTFUL_STRIKE);
             }
-            context.Repeat(15s);
+            context.Repeat(8400ms);
         }).Schedule(35s, [this](TaskContext context)
         {
             Talk(SAY_SLAM);

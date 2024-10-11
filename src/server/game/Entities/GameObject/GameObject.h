@@ -21,12 +21,11 @@
 #include "Common.h"
 #include "DatabaseEnv.h"
 #include "G3D/Quat.h"
+#include "GameObjectData.h"
 #include "LootMgr.h"
 #include "Object.h"
 #include "SharedDefines.h"
-#include "GameObjectData.h"
 #include "Unit.h"
-#include <array>
 
 class GameObjectAI;
 class Transport;
@@ -124,7 +123,7 @@ public:
     explicit GameObject();
     ~GameObject() override;
 
-    void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, Player* target) const override;
+    void BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* target) override;
 
     void AddToWorld() override;
     void RemoveFromWorld() override;
@@ -289,8 +288,6 @@ public:
     void SendCustomAnim(uint32 anim);
     [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
 
-    void SendMessageToSetInRange(WorldPacket const* data, float dist, bool /*self*/, bool includeMargin = false, Player const* skipped_rcvr = nullptr) const override; // pussywizard!
-
     void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
     // sets GameObject type 33 destruction flags and optionally default health for that state
@@ -350,25 +347,21 @@ public:
 
     static std::unordered_map<int, goEventFlag> gameObjectToEventFlag; // Gameobject -> event flag
 
-    void SaveInstanceData(uint8 state);
-    void UpdateInstanceData(uint8 state);
-    bool FindStateSavedOnInstance();
-    bool ValidateGameobjectType();
-    uint8 GetStateSavedOnInstance();
-    bool IsInstanceGameobject();
-    uint8 GameobjectStateToInt(GOState* state);
+    [[nodiscard]] bool ValidateGameobjectType() const;
+    [[nodiscard]] bool IsInstanceGameobject() const;
+    [[nodiscard]] uint8 GameobjectStateToInt(GOState* state) const;
 
     /* A check to verify if this object is available to be saved on the DB when
      * a state change occurs
      */
-    bool IsAbleToSaveOnDb();
+    [[nodiscard]] bool IsAllowedToSaveToDB() const { return m_saveStateOnDb; };
 
     /* Enable or Disable the ability to save on the database this gameobject's state
      * whenever it changes
      */
-    void UpdateSaveToDb(bool enable);
+    void AllowSaveToDB(bool enable) { m_saveStateOnDb = enable; };
 
-    void SavingStateOnDB();
+    void SaveStateToDB();
 
     std::string GetDebugInfo() const override;
 protected:

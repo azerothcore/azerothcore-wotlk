@@ -68,7 +68,7 @@ void WorldSession::HandleLfgJoinOpcode(WorldPackets::LFG::LFGJoin& packet)
     }
 
     LOG_DEBUG("network", "CMSG_LFG_JOIN [{}] roles: {}, Dungeons: {}, Comment: {}",
-                 GetPlayerInfo().c_str(), packet.Roles, newDungeons.size(), packet.Comment.c_str());
+                 GetPlayerInfo(), packet.Roles, newDungeons.size(), packet.Comment);
 
     sLFGMgr->JoinLfg(GetPlayer(), uint8(packet.Roles), newDungeons, packet.Comment);
 }
@@ -188,7 +188,10 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
             uint8 playerLevel = GetPlayer() ? GetPlayer()->GetLevel() : 0;
             data << uint8(done);
             data << uint32(quest->GetRewOrReqMoney(playerLevel));
-            data << uint32(quest->XPValue(playerLevel));
+            if (!GetPlayer()->IsMaxLevel())
+                data << uint32(quest->XPValue(playerLevel));
+            else
+                data << uint32(0);
             data << uint32(0);
             data << uint32(0);
             data << uint8(quest->GetRewItemsCount());

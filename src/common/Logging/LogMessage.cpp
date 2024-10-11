@@ -16,7 +16,6 @@
  */
 
 #include "LogMessage.h"
-#include "StringFormat.h"
 #include "Timer.h"
 
 LogMessage::LogMessage(LogLevel _level, std::string const& _type, std::string_view _text)

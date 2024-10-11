@@ -28,15 +28,15 @@ npc_highborne_lamenter
 npc_parqual_fintallas
 EndContentData */
 
+#include "CreatureScript.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
-#include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 /*######
 ## npc_lady_sylvanas_windrunner
@@ -1300,7 +1300,7 @@ public:
                     {
                         khanokGUID = temp->GetGUID();
                         if (Creature* khanok = ObjectAccessor::GetCreature(*me, khanokGUID))
-                            khanok->setDeathState(JUST_DIED);
+                            khanok->setDeathState(DeathState::JustDied);
                     }
                     if (Unit* temp = me->SummonCreature(NPC_PUTRESS, AllianceSpawn[12].x, AllianceSpawn[12].y, AllianceSpawn[12].z, TEMPSUMMON_MANUAL_DESPAWN))
                     {
@@ -2167,7 +2167,7 @@ public:
     {
         boss_blight_wormAI(Creature* creature) : ScriptedAI(creature)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         void Reset() override
@@ -2222,36 +2222,25 @@ public:
 ######*/
 
 // - 61123 - Ingest
-class spell_blight_worm_ingest : public SpellScriptLoader
+class spell_blight_worm_ingest : public SpellScript
 {
-public:
-    spell_blight_worm_ingest() : SpellScriptLoader("spell_blight_worm_ingest") { }
+    PrepareSpellScript(spell_blight_worm_ingest);
 
-    class spell_blight_worm_ingest_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_blight_worm_ingest_SpellScript);
+        return ValidateSpellInfo({ SPELL_INGEST });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_INGEST });
-        }
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                if (Unit* caster = GetCaster())
-                    target->CastSpell(caster, SPELL_INGEST_TRIGGER, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_blight_worm_ingest_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_blight_worm_ingest_SpellScript();
+        if (Unit* target = GetHitUnit())
+            if (Unit* caster = GetCaster())
+                target->CastSpell(caster, SPELL_INGEST_TRIGGER, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_blight_worm_ingest::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -4081,5 +4070,5 @@ void AddSC_undercity()
     new npc_jaina_proudmoore_bfu();
     new npc_lady_sylvanas_windrunner_bfu();
     new boss_blight_worm();
-    new spell_blight_worm_ingest();
+    RegisterSpellScript(spell_blight_worm_ingest);
 }

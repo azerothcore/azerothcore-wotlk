@@ -55,7 +55,7 @@ public:
     // overwrite virtual Item::DeleteFromDB
     void DeleteFromDB(CharacterDatabaseTransaction trans) override;
 
-    void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
+    void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) override;
 
     std::string GetDebugInfo() const override;
 

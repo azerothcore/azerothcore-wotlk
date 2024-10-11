@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "GameObjectScript.h"
 #include "PassiveAI.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuras.h"
@@ -412,7 +413,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 if (playerGUID)
                 {
@@ -686,7 +687,7 @@ public:
                         me->DespawnOrUnsummon();
                     }
                     else
-                        me->setDeathState(JUST_DIED);
+                        me->setDeathState(DeathState::JustDied);
                 }
             }
         }

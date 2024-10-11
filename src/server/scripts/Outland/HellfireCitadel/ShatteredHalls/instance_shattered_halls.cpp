@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaTriggerScript.h"
+#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptedCreature.h"
-#include "ScriptMgr.h"
 #include "shattered_halls.h"
 
 ObjectData const creatureData[] =

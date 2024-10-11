@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
 #include "dire_maul.h"
 
 class instance_dire_maul : public InstanceMapScript
@@ -119,7 +120,7 @@ public:
                             immol->GetAI()->SetData(1, 1);
                             immol->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         }
-                        for (const auto& guid : HighborneSummoners)
+                        for (auto const& guid : HighborneSummoners)
                         {
                             if (Creature* summoner = instance->GetCreature(guid))
                             {

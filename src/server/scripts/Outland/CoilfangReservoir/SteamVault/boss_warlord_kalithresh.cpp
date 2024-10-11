@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
-#include "SpellScript.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "steam_vault.h"
 
 enum Texts
@@ -61,7 +62,7 @@ struct boss_warlord_kalithresh : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_introDone && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 35.0f))
+        if (!_introDone && who->IsPlayer() && me->IsWithinDistInMap(who, 35.0f))
         {
             Talk(SAY_INTRO);
             _introDone = true;

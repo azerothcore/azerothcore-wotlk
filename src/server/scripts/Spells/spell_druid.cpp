@@ -15,19 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Containers.h"
+#include "CreatureScript.h"
+#include "GridNotifiers.h"
+#include "Player.h"
+#include "SpellAuraEffects.h"
+#include "SpellMgr.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /*
  * Scripts for spells with SPELLFAMILY_DRUID and SPELLFAMILY_GENERIC spells used by druid players.
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_dru_".
  */
-
-#include "Containers.h"
-#include "GridNotifiers.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "SpellAuraEffects.h"
-#include "SpellMgr.h"
-#include "SpellScript.h"
 
 enum DruidSpells
 {
@@ -355,7 +355,7 @@ class spell_dru_treant_scaling : public AuraScript
             amount = CalculatePct(std::max<int32>(0, nature), 15);
 
             // xinef: Update appropriate player field
-            if (owner->GetTypeId() == TYPEID_PLAYER)
+            if (owner->IsPlayer())
                 owner->SetUInt32Value(PLAYER_PET_SPELL_POWER, (uint32)amount);
         }
     }
@@ -388,20 +388,45 @@ class spell_dru_treant_scaling : public AuraScript
 };
 
 // -1850 - Dash
-class spell_dru_dash : public AuraScript
+class spell_dru_dash : public SpellScript
 {
-    PrepareAuraScript(spell_dru_dash);
+    PrepareSpellScript(spell_dru_dash);
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+        if (caster->GetShapeshiftForm() != FORM_CAT)
+        {
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_MUST_BE_IN_CAT_FORM);
+            return SPELL_FAILED_CUSTOM_ERROR;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_dru_dash::CheckCast);
+    }
+};
+
+// -1850 - Dash
+class spell_dru_dash_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dru_dash_aura);
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
         // do not set speed if not in cat form
         if (GetUnitOwner()->GetShapeshiftForm() != FORM_CAT)
+        {
             amount = 0;
+        }
     }
 
     void Register() override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_dash::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_dash_aura::CalculateAmount, EFFECT_0, SPELL_AURA_MOD_INCREASE_SPEED);
     }
 };
 
@@ -766,7 +791,7 @@ class spell_dru_rip : public AuraScript
     bool Load() override
     {
         Unit* caster = GetCaster();
-        return caster && caster->GetTypeId() == TYPEID_PLAYER;
+        return caster && caster->IsPlayer();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& canBeRecalculated)
@@ -980,7 +1005,7 @@ class spell_dru_swift_flight_passive : public AuraScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
@@ -992,7 +1017,7 @@ class spell_dru_swift_flight_passive : public AuraScript
 
     void Register() override
     {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_swift_flight_passive::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_INCREASE_VEHICLE_FLIGHT_SPEED);
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_swift_flight_passive::CalculateAmount, EFFECT_1, SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED);
     }
 };
 
@@ -1038,7 +1063,7 @@ class spell_dru_t10_restoration_4p_bonus : public SpellScript
 
     bool Load() override
     {
-        return GetCaster()->GetTypeId() == TYPEID_PLAYER;
+        return GetCaster()->IsPlayer();
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)
@@ -1126,7 +1151,7 @@ class spell_dru_berserk : public SpellScript
     {
         Unit* caster = GetCaster();
 
-        if (caster->GetTypeId() == TYPEID_PLAYER)
+        if (caster->IsPlayer())
         {
             // Remove tiger fury / mangle(bear)
             const uint32 TigerFury[6] = { 5217, 6793, 9845, 9846, 50212, 50213 };
@@ -1180,7 +1205,7 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_barkskin);
     RegisterSpellScript(spell_dru_treant_scaling);
     RegisterSpellScript(spell_dru_berserk);
-    RegisterSpellScript(spell_dru_dash);
+    RegisterSpellAndAuraScriptPair(spell_dru_dash, spell_dru_dash_aura);
     RegisterSpellScript(spell_dru_enrage);
     RegisterSpellScript(spell_dru_glyph_of_starfire);
     RegisterSpellScript(spell_dru_idol_lifebloom);

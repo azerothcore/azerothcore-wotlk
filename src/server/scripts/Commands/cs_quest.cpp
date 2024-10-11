@@ -23,11 +23,11 @@ Category: commandscripts
 EndScriptData */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ReputationMgr.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -61,8 +61,7 @@ public:
 
         if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -74,8 +73,7 @@ public:
 
         if (result != itc->end())
         {
-            handler->PSendSysMessage(LANG_COMMAND_QUEST_STARTFROMITEM, entry, result->second.ItemId);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_QUEST_STARTFROMITEM, entry, result->second.ItemId);
             return false;
         }
 
@@ -83,8 +81,7 @@ public:
         {
             if (player->IsActiveQuest(entry))
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
                 return false;
             }
 
@@ -101,8 +98,7 @@ public:
 
             if (result)
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_QUEST_ACTIVE, quest->GetTitle().c_str(), entry);
                 return false;
             }
 
@@ -130,7 +126,7 @@ public:
             CharacterDatabase.Execute(stmt);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_ADD, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_ADD, quest->GetTitle(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -144,8 +140,7 @@ public:
 
         if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -153,8 +148,7 @@ public:
 
         if (!quest)
         {
-            handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
             return false;
         }
 
@@ -222,7 +216,7 @@ public:
             CharacterDatabase.CommitTransaction(trans);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_REMOVED, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REMOVED, quest->GetTitle(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -236,8 +230,7 @@ public:
 
         if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -248,8 +241,7 @@ public:
             // If player doesn't have the quest
             if (player->GetQuestStatus(entry) == QUEST_STATUS_NONE)
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
                 return false;
             }
 
@@ -352,8 +344,7 @@ public:
 
             if (!result)
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG, quest->GetTitle(), entry);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_QUEST_NOT_FOUND_IN_LOG, quest->GetTitle(), entry);
                 return false;
             }
 
@@ -371,7 +362,7 @@ public:
                     continue;
                 }
 
-                questItems.push_back(std::pair(id, count));
+                questItems.emplace_back(id, count);
             }
 
             if (!questItems.empty())
@@ -491,7 +482,7 @@ public:
             CharacterDatabase.Execute(stmt);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_COMPLETE, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_COMPLETE, quest->GetTitle(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -505,8 +496,7 @@ public:
 
         if (!playerTarget)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -517,8 +507,7 @@ public:
             // If player doesn't have the quest
             if (player->GetQuestStatus(entry) != QUEST_STATUS_COMPLETE)
             {
-                handler->PSendSysMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_QUEST_NOTFOUND, entry);
                 return false;
             }
 
@@ -540,8 +529,7 @@ public:
 
             if (!result)
             {
-                handler->SendSysMessage(LANG_COMMAND_QUEST_NOT_COMPLETE);
-                handler->SetSentErrorMessage(true);
+                handler->SendErrorMessage(LANG_COMMAND_QUEST_NOT_COMPLETE);
                 return false;
             }
 
@@ -597,7 +585,7 @@ public:
                 for (uint32 const& itemId : quest->RewardChoiceItemId)
                 {
                     uint8 index = 0;
-                    questRewardItems.push_back(std::pair(itemId, quest->RewardChoiceItemCount[index++]));
+                    questRewardItems.emplace_back(itemId, quest->RewardChoiceItemCount[index++]);
                 }
             }
 
@@ -606,7 +594,7 @@ public:
                 for (uint32 const& itemId : quest->RewardItemId)
                 {
                     uint8 index = 0;
-                    questRewardItems.push_back(std::pair(itemId, quest->RewardItemIdCount[index++]));
+                    questRewardItems.emplace_back(itemId, quest->RewardItemIdCount[index++]);
                 }
             }
 
@@ -739,7 +727,7 @@ public:
             CharacterDatabase.CommitTransaction(trans);
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, quest->GetTitle().c_str(), entry);
+        handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, quest->GetTitle(), entry);
         handler->SetSentErrorMessage(false);
         return true;
     }

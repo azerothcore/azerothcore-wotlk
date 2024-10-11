@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "the_botanica.h"
 
 enum Says
@@ -44,37 +45,39 @@ enum Spells
 
 struct boss_commander_sarannis : public BossAI
 {
-    boss_commander_sarannis(Creature* creature) : BossAI(creature, DATA_COMMANDER_SARANNIS), _summoned(false) { }
-
-    void Reset() override
-    {
-        _Reset();
-        _summoned = false;
-    }
+    boss_commander_sarannis(Creature* creature) : BossAI(creature, DATA_COMMANDER_SARANNIS) { }
 
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
         Talk(SAY_AGGRO);
 
-        scheduler.Schedule(20s, [this](TaskContext context)
+        if (!IsHeroic())
         {
-            if (roll_chance_i(50))
-                Talk(SAY_ARCANE_RESONANCE);
-            DoCastVictim(SPELL_ARCANE_RESONANCE);
-            context.Repeat(27s);
-        }).Schedule(10s, [this](TaskContext context)
-        {
-            if (roll_chance_i(50))
-                Talk(SAY_ARCANE_DEVASTATION);
-            DoCastVictim(SPELL_ARCANE_DEVASTATION);
-            context.Repeat(17s);
-        });
-
-        if (IsHeroic())
+            ScheduleHealthCheckEvent(55, [&] {
+                ScheduleReinforcements();
+            });
+        }
+        else
         {
             ScheduleReinforcements();
         }
+
+        ScheduleTimedEvent(20s, [&] {
+            if (roll_chance_i(50))
+            {
+                Talk(SAY_ARCANE_RESONANCE);
+            }
+            DoCastVictim(SPELL_ARCANE_RESONANCE);
+        }, 27s);
+
+        ScheduleTimedEvent(10s, [&] {
+            if (roll_chance_i(50))
+            {
+                Talk(SAY_ARCANE_DEVASTATION);
+            }
+            DoCastVictim(SPELL_ARCANE_DEVASTATION);
+        }, 17s);
     }
 
     void KilledUnit(Unit* victim) override
@@ -91,15 +94,6 @@ struct boss_commander_sarannis : public BossAI
         Talk(SAY_DEATH);
     }
 
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-    {
-        if (!_summoned && me->HealthBelowPctDamaged(55, damage) && !IsHeroic())
-        {
-            _summoned = true;
-            ScheduleReinforcements();
-        }
-    }
-
     void ScheduleReinforcements()
     {
         scheduler.Schedule(IsHeroic() ? 1min : 1s, [this](TaskContext context)
@@ -114,9 +108,6 @@ struct boss_commander_sarannis : public BossAI
             }
         });
     }
-
-    private:
-        bool _summoned;
 };
 
 // 34799 - Arcane Devastation

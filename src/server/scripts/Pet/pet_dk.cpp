@@ -15,20 +15,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Cell.h"
+#include "CellImpl.h"
+#include "CombatAI.h"
+#include "CreatureScript.h"
+#include "GridNotifiers.h"
+#include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 /*
  * Ordered alphabetically using scriptname.
  * Scriptnames of files in this file should be prefixed with "npc_pet_dk_".
  */
-
-#include "Cell.h"
-#include "CellImpl.h"
-#include "CombatAI.h"
-#include "GridNotifiers.h"
-#include "PassiveAI.h"
-#include "ScriptMgr.h"
-#include "ScriptedCreature.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -103,7 +103,7 @@ public:
         void MySelectNextTarget()
         {
             Unit* owner = me->GetOwner();
-            if (owner && owner->GetTypeId() == TYPEID_PLAYER && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
+            if (owner && owner->IsPlayer() && (!me->GetVictim() || me->GetVictim()->IsImmunedToSpell(sSpellMgr->GetSpellInfo(51963)) || !me->IsValidAttackTarget(me->GetVictim()) || !owner->CanSeeOrDetect(me->GetVictim())))
             {
                 Unit* selection = owner->ToPlayer()->GetSelectedUnit();
                 if (selection && selection != me->GetVictim() && me->IsValidAttackTarget(selection))

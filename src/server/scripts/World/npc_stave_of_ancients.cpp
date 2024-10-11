@@ -17,9 +17,9 @@
 
 #include "npc_stave_of_ancients.h"
 #include "CreatureGroups.h"
+#include "CreatureScript.h"
 #include "GameTime.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "Spell.h"
@@ -55,7 +55,7 @@ void NPCStaveQuestAI::StorePlayerGUID()
 
     for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
     {
-        if ((*itr)->getTarget()->GetTypeId() == TYPEID_PLAYER)
+        if ((*itr)->getTarget()->IsPlayer())
         {
             playerGUID = (*itr)->getUnitGuid();
         }
@@ -200,7 +200,7 @@ void NPCStaveQuestAI::StoreAttackerGuidValue(Unit* attacker)
     bool isGUIDPresent = std::find(attackerGuids.begin(), attackerGuids.end(), guidValue) != attackerGuids.end();
 
     // don't store snaketrap's snakes and trap triggers
-    if (isGUIDPresent || (IsAllowedEntry(attacker->GetEntry()) && attacker->GetTypeId() != TYPEID_PLAYER))
+    if (isGUIDPresent || (IsAllowedEntry(attacker->GetEntry()) && !attacker->IsPlayer()))
     {
         return;
     }
@@ -577,7 +577,7 @@ public:
             Precious()->RemoveCorpse(false, false);
             Precious()->SetPosition(current);
             Precious()->SetHomePosition(current);
-            Precious()->setDeathState(JUST_RESPAWNED);
+            Precious()->setDeathState(DeathState::JustRespawned);
             Precious()->UpdateObjectVisibility(true);
         }
 

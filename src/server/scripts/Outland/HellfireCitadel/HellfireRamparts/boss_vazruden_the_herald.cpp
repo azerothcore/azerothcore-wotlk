@@ -15,10 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "hellfire_ramparts.h"
+#include "SpellScript.h"
 
 enum Says
 {

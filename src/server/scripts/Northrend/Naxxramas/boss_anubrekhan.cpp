@@ -15,7 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "naxxramas.h"
 
@@ -146,7 +146,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             Talk(SAY_SLAY);
@@ -184,7 +184,7 @@ public:
 
         void MoveInLineOfSight(Unit* who) override
         {
-            if (!sayGreet && who->GetTypeId() == TYPEID_PLAYER)
+            if (!sayGreet && who->IsPlayer())
             {
                 Talk(SAY_GREET);
                 sayGreet = true;

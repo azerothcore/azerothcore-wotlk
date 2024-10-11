@@ -15,11 +15,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 
 enum LightOfDawnSays
 {
@@ -457,7 +458,7 @@ public:
             {
                 Position pos = LightOfDawnFightPos[urand(0, 9)];
                 if (Unit* target = cr->SelectNearbyTarget(nullptr, 10.0f))
-                    if (target->GetTypeId() == TYPEID_UNIT)
+                    if (target->IsCreature())
                         target->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
                 cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
             }

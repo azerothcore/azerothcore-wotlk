@@ -15,8 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Player.h"
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "shadow_labyrinth.h"
 
@@ -187,7 +186,7 @@ struct boss_grandmaster_vorpil : public BossAI
     void MoveInLineOfSight(Unit* who) override
     {
         ScriptedAI::MoveInLineOfSight(who);
-        if (!sayIntro && who->GetTypeId() == TYPEID_PLAYER)
+        if (!sayIntro && who->IsPlayer())
         {
             Talk(SAY_INTRO);
             sayIntro = true;
@@ -201,6 +200,8 @@ struct npc_voidtraveler : public ScriptedAI
 
     void Reset() override
     {
+        me->SetReactState(REACT_PASSIVE);
+
         if (TempSummon* summon = me->ToTempSummon())
         {
             if (Unit* vorpil = summon->GetSummonerUnit())

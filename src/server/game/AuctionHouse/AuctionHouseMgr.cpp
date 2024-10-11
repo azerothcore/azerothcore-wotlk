@@ -16,8 +16,6 @@
  */
 
 #include "AuctionHouseMgr.h"
-#include "AccountMgr.h"
-#include "AsyncAuctionListing.h"
 #include "Common.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
@@ -252,7 +250,7 @@ AuctionHouseObject* AuctionHouseMgr::GetAuctionsMapByHouseId(uint8 auctionHouseI
     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
         return &_neutralAuctions;
 
-    switch(auctionHouseId)
+    switch (auctionHouseId)
     {
         case AUCTIONHOUSE_ALLIANCE:
             return &_allianceAuctions;
@@ -262,7 +260,6 @@ AuctionHouseObject* AuctionHouseMgr::GetAuctionsMapByHouseId(uint8 auctionHouseI
     }
 
     return &_neutralAuctions;
-
 }
 
 uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item* pItem, uint32 count)
@@ -320,9 +317,13 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
         {
             if (sendNotification) // can be changed in the hook
                 bidder->GetSession()->SendAuctionBidderNotification(auction->GetHouseId(), auction->Id, auction->bidder, 0, 0, auction->item_template);
-            // FIXME: for offline player need also
+
             if (updateAchievementCriteria) // can be changed in the hook
                 bidder->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS, 1);
+        }
+        else if (updateAchievementCriteria)
+        {
+            sAchievementMgr->UpdateAchievementCriteriaForOfflinePlayer(auction->bidder.GetCounter(), ACHIEVEMENT_CRITERIA_TYPE_WON_AUCTIONS, 1);
         }
 
         if (sendMail) // can be changed in the hook
@@ -376,6 +377,11 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, Character
 
             if (sendNotification) // can be changed in the hook
                 owner->GetSession()->SendAuctionOwnerNotification(auction);
+        }
+        else if (updateAchievementCriteria)
+        {
+            sAchievementMgr->UpdateAchievementCriteriaForOfflinePlayer(auction->owner.GetCounter(), ACHIEVEMENT_CRITERIA_TYPE_GOLD_EARNED_BY_AUCTIONS, profit);
+            sAchievementMgr->UpdateAchievementCriteriaForOfflinePlayer(auction->owner.GetCounter(), ACHIEVEMENT_CRITERIA_TYPE_HIGHEST_AUCTION_SOLD, auction->bid);
         }
 
         if (sendMail) // can be changed in the hook
@@ -763,6 +769,9 @@ bool AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
             }
 
             AuctionEntry* Aentry = itr->second;
+            if (!Aentry)
+                return false;
+
             // Skip expired auctions
             if (Aentry->expire_time < curTime.count())
             {

@@ -15,10 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "vault_of_archavon.h"
 
 enum Spells
@@ -216,7 +217,7 @@ public:
         void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
         {
             Unit* target = GetTarget();
-            if (target->GetTypeId() == TYPEID_UNIT && GetAura()->GetStackAmount() >= 10)
+            if (target->IsCreature() && GetAura()->GetStackAmount() >= 10)
             {
                 target->CastSpell(target, SPELL_OVERCHARGED_BLAST, true);
                 Unit::Kill(target, target, false);

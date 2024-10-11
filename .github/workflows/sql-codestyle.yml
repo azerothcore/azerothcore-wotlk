@@ -1,0 +1,17 @@
+name: Codestyle
+on:
+  pull_request:
+    paths:
+      - data/**
+      - "!README.md"
+      - "!docs/**"
+
+jobs:
+  triage:
+    runs-on: ubuntu-latest
+    name: SQL
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check pending SQL
+        run: source ./apps/ci/ci-pending.sh

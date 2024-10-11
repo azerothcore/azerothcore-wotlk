@@ -1,8 +1,40 @@
 /*
- * Copyright (C) 2016+     AzerothCore <www.azerothcore.org>, released under GNU GPL v2 license, you may redistribute it and/or modify it under version 2 of the License, or (at your option), any later version.
- * Copyright (C) 2008-2016 TrinityCore <http://www.trinitycore.org/>
- * Copyright (C) 2005-2009 MaNGOS <http://getmangos.com/>
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Affero General Public License as published by the
+ * Free Software Foundation; either version 3 of the License, or (at your
+ * option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+#include "zulfarrak.h"
+#include "Cell.h"
+#include "CellImpl.h"
+#include "CreatureScript.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
+#include "GameObjectScript.h"
+#include "GridNotifiers.h"
+#include "InstanceScript.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
+#include "ScriptSystem.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
 
 /* ScriptData
 SDName: Zulfarrak
@@ -15,22 +47,6 @@ EndScriptData */
 npc_sergeant_bly
 npc_weegli_blastfuse
 EndContentData */
-
-#include "zulfarrak.h"
-#include "Cell.h"
-#include "CellImpl.h"
-#include "GameObject.h"
-#include "GameObjectAI.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
-#include "InstanceScript.h"
-#include "MotionMaster.h"
-#include "ObjectAccessor.h"
-#include "Player.h"
-#include "ScriptMgr.h"
-#include "ScriptSystem.h"
-#include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 
 /*######
 ## npc_sergeant_bly
@@ -314,12 +330,12 @@ public:
             instance->SetData(DATA_PYRAMID, PYRAMID_CAGES_OPEN);
 
             //setting gossip option as soon as the cages open
-            if(Creature* bly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
+            if (Creature* bly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
             {
                 bly->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
 
-            if(Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
+            if (Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
             {
                 weegli->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }

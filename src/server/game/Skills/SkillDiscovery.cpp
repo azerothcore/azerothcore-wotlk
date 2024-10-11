@@ -109,7 +109,7 @@ void LoadSkillDiscoveryTable()
                 continue;
             }
 
-            SkillDiscoveryStore[reqSkillOrSpell].push_back(SkillDiscoveryEntry(spellId, reqSkillValue, chance));
+            SkillDiscoveryStore[reqSkillOrSpell].emplace_back(spellId, reqSkillValue, chance);
         }
         else if (reqSkillOrSpell == 0)                      // skill case
         {
@@ -122,7 +122,7 @@ void LoadSkillDiscoveryTable()
             }
 
             for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
-                SkillDiscoveryStore[-int32(_spell_idx->second->SkillLine)].push_back(SkillDiscoveryEntry(spellId, reqSkillValue, chance));
+                SkillDiscoveryStore[-int32(_spell_idx->second->SkillLine)].emplace_back(spellId, reqSkillValue, chance);
         }
         else
         {
@@ -139,12 +139,12 @@ void LoadSkillDiscoveryTable()
     // report about empty data for explicit discovery spells
     for (uint32 spell_id = 1; spell_id < sSpellMgr->GetSpellInfoStoreSize(); ++spell_id)
     {
-        SpellInfo const* spellEntry = sSpellMgr->GetSpellInfo(spell_id);
-        if (!spellEntry)
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spell_id);
+        if (!spellInfo)
             continue;
 
         // skip not explicit discovery spells
-        if (!spellEntry->IsExplicitDiscovery())
+        if (!spellInfo->IsExplicitDiscovery())
             continue;
 
         if (SkillDiscoveryStore.find(int32(spell_id)) == SkillDiscoveryStore.end())

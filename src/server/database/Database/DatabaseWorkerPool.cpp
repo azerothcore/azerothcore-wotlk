@@ -31,20 +31,14 @@
 #include "SQLOperation.h"
 #include "Transaction.h"
 #include "WorldDatabase.h"
-#include <mysqld_error.h>
 #include <limits>
+#include <mysqld_error.h>
+#include <sstream>
+#include <vector>
 
 #ifdef ACORE_DEBUG
 #include <boost/stacktrace.hpp>
 #include <sstream>
-#endif
-
-#if MARIADB_VERSION_ID >= 100600
-#define MIN_MYSQL_SERVER_VERSION 100500u
-#define MIN_MYSQL_CLIENT_VERSION 30203u
-#else
-#define MIN_MYSQL_SERVER_VERSION 50700u
-#define MIN_MYSQL_CLIENT_VERSION 50700u
 #endif
 
 class PingOperation : public SQLOperation
@@ -65,15 +59,10 @@ DatabaseWorkerPool<T>::DatabaseWorkerPool() :
 {
     WPFatal(mysql_thread_safe(), "Used MySQL library isn't thread-safe.");
 
-#if !defined(MARIADB_VERSION_ID) || MARIADB_VERSION_ID < 100600
     bool isSupportClientDB = mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION;
     bool isSameClientDB = mysql_get_client_version() == MYSQL_VERSION_ID;
-#else // MariaDB 10.6+
-    bool isSupportClientDB = mysql_get_client_version() >= MIN_MYSQL_CLIENT_VERSION;
-    bool isSameClientDB    = true; // Client version 3.2.3?
-#endif
 
-    WPFatal(isSupportClientDB, "AzerothCore does not support MySQL versions below 5.7 or MariaDB versions below 10.5.\n\nFound version: {} / {}. Server compiled with: {}.\nSearch the wiki for ACE00043 in Common Errors (https://www.azerothcore.org/wiki/common-errors#ace00043).",
+    WPFatal(isSupportClientDB, "AzerothCore does not support MySQL versions below 8.0\n\nFound version: {} / {}. Server compiled with: {}.\nSearch the wiki for ACE00043 in Common Errors (https://www.azerothcore.org/wiki/common-errors#ace00043).",
         mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
     WPFatal(isSameClientDB, "Used MySQL library version ({} id {}) does not match the version id used to compile AzerothCore (id {}).\nSearch the wiki for ACE00046 in Common Errors (https://www.azerothcore.org/wiki/common-errors#ace00046).",
         mysql_get_client_info(), mysql_get_client_version(), MYSQL_VERSION_ID);
@@ -157,11 +146,11 @@ bool DatabaseWorkerPool<T>::PrepareStatements()
             else
                 connection->Unlock();
 
-            size_t const preparedSize = connection->m_stmts.size();
+            std::size_t const preparedSize = connection->m_stmts.size();
             if (_preparedStatementSize.size() < preparedSize)
                 _preparedStatementSize.resize(preparedSize);
 
-            for (size_t i = 0; i < preparedSize; ++i)
+            for (std::size_t i = 0; i < preparedSize; ++i)
             {
                 // already set by another connection
                 // (each connection only has prepared statements of it's own type sync/async)
@@ -377,6 +366,50 @@ void DatabaseWorkerPool<T>::KeepAlive()
         Enqueue(new PingOperation);
 }
 
+/**
+* @brief Returns true if the version string given is incompatible
+*
+* Intended to be used with mysql_get_server_info()'s output as the source
+*
+* DatabaseIncompatibleVersion("8.0.35") => false
+* DatabaseIncompatibleVersion("5.6.6") => true
+*
+* Adapted from stackoverflow response
+* https://stackoverflow.com/a/2941508
+*
+* @param mysqlVersion The output from GetServerInfo()/mysql_get_server_info()
+* @return Returns true if the Server version is incompatible
+*/
+bool DatabaseIncompatibleVersion(std::string const mysqlVersion)
+{
+    // anon func to turn a version string into an array of uint8
+    // "1.2.3" => [1, 2, 3]
+    auto parse = [](std::string const& input)
+    {
+        std::vector<uint8> result;
+        std::istringstream parser(input);
+        result.push_back(parser.get());
+        for (int i = 1; i < 3; i++)
+        {
+            // Skip period
+            parser.get();
+            // Append int from parser to output
+            result.push_back(parser.get());
+        }
+        return result;
+    };
+
+    // default to values for MySQL
+    uint8 offset = 0;
+    std::string minVersion = MIN_MYSQL_SERVER_VERSION;
+
+    auto parsedMySQLVersion = parse(mysqlVersion.substr(offset));
+    auto parsedMinVersion = parse(minVersion);
+
+    return std::lexicographical_compare(parsedMySQLVersion.begin(), parsedMySQLVersion.end(),
+                                        parsedMinVersion.begin(), parsedMinVersion.end());
+}
+
 template <class T>
 uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConnections)
 {
@@ -402,10 +435,10 @@ uint32 DatabaseWorkerPool<T>::OpenConnections(InternalIndex type, uint8 numConne
             _connections[type].clear();
             return error;
         }
-        else if (connection->GetServerVersion() < MIN_MYSQL_SERVER_VERSION)
+        else if (DatabaseIncompatibleVersion(connection->GetServerInfo()))
         {
-            LOG_ERROR("sql.driver", "AzerothCore does not support MySQL versions below 5.7 or MariaDB versions below 10.5.\n\nFound server version: {}. Server compiled with: {}.",
-                connection->GetServerVersion(), MYSQL_VERSION_ID);
+            LOG_ERROR("sql.driver", "AzerothCore does not support MySQL versions below 8.0\n\nFound server version: {}. Server compiled with: {}.",
+                connection->GetServerInfo(), MYSQL_VERSION_ID);
             return 1;
         }
         else
@@ -434,7 +467,7 @@ void DatabaseWorkerPool<T>::Enqueue(SQLOperation* op)
 }
 
 template <class T>
-size_t DatabaseWorkerPool<T>::QueueSize() const
+std::size_t DatabaseWorkerPool<T>::QueueSize() const
 {
     return _queue->Size();
 }

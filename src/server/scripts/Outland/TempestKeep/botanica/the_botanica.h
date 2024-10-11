@@ -19,7 +19,6 @@
 #define DEF_THE_BOTANICA_H
 
 #include "CreatureAIImpl.h"
-#include "SpellScript.h"
 
 #define TheBotanicaScriptName "instance_the_botanica"
 

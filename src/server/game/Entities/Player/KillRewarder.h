@@ -30,6 +30,8 @@ public:
     KillRewarder(Player* killer, Unit* victim, bool isBattleGround);
 
     void Reward();
+    Unit* GetVictim();
+    Player* GetKiller();
 
 private:
     void _InitXP(Player* player);

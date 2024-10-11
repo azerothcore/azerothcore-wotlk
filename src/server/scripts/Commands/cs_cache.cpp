@@ -16,10 +16,10 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Group.h"
 #include "Language.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 using namespace Acore::ChatCommands;
 
@@ -53,8 +53,7 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -62,13 +61,12 @@ public:
 
         if (!cache)
         {
-            handler->PSendSysMessage(LANG_COMMAND_CACHE_NOT_FOUND, player->GetName());
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_COMMAND_CACHE_NOT_FOUND, player->GetName());
             return false;
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_CACHE_INFO, cache->Name, cache->Guid.GetCounter(), cache->AccountId,
-            cache->Class, cache->Race, cache->Sex, cache->Level, cache->MailCount, cache->GuildId, cache->GroupGuid.GetCounter(),
+        handler->PSendSysMessage(LANG_COMMAND_CACHE_INFO, cache->Name, cache->Guid.ToString(), cache->AccountId,
+            cache->Class, cache->Race, cache->Sex, cache->Level, cache->MailCount, cache->GuildId, cache->GroupGuid.ToString(),
             cache->ArenaTeamId[ARENA_SLOT_2v2], cache->ArenaTeamId[ARENA_SLOT_3v3], cache->ArenaTeamId[ARENA_SLOT_5v5]);
 
         handler->SetSentErrorMessage(false);
@@ -84,13 +82,12 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
         sCharacterCache->DeleteCharacterCacheEntry(player->GetGUID(), player->GetName());
-        handler->PSendSysMessage(LANG_COMMAND_CACHE_DELETE, player->GetName(), player->GetGUID().GetCounter());
+        handler->PSendSysMessage(LANG_COMMAND_CACHE_DELETE, player->GetName(), player->GetGUID().ToString());
         handler->SetSentErrorMessage(false);
         return true;
     }
@@ -104,8 +101,7 @@ public:
 
         if (!player)
         {
-            handler->SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            handler->SetSentErrorMessage(true);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
 
@@ -145,7 +141,7 @@ public:
             sCharacterCache->RefreshCacheEntry(player->GetGUID().GetCounter());
         }
 
-        handler->PSendSysMessage(LANG_COMMAND_CACHE_REFRESH, player->GetName(), player->GetGUID().GetCounter());
+        handler->PSendSysMessage(LANG_COMMAND_CACHE_REFRESH, player->GetName(), player->GetGUID().ToString());
         handler->SetSentErrorMessage(false);
         return true;
     }

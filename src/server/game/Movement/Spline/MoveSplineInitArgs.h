@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef TRINITYSERVER_MOVESPLINEINIT_ARGS_H
-#define TRINITYSERVER_MOVESPLINEINIT_ARGS_H
+#ifndef AC_MOVESPLINEINIT_ARGS_H
+#define AC_MOVESPLINEINIT_ARGS_H
 
 #include "MoveSplineFlag.h"
 #include <G3D/Vector3.h>
@@ -43,7 +43,7 @@ namespace Movement
 
     struct MoveSplineInitArgs
     {
-        MoveSplineInitArgs(size_t path_capacity = 16)
+        MoveSplineInitArgs(std::size_t path_capacity = 16)
         {
             path.reserve(path_capacity);
         }
@@ -68,4 +68,4 @@ namespace Movement
     };
 }
 
-#endif // TRINITYSERVER_MOVESPLINEINIT_ARGS_H
+#endif // AC_MOVESPLINEINIT_ARGS_H

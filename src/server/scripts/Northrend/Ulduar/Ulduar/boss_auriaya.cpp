@@ -15,11 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ulduar.h"
 
 enum AuriayaSpells
@@ -192,7 +194,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
+            if (!victim->IsPlayer() || urand(0, 2))
                 return;
 
             Talk(SAY_SLAY);
@@ -384,7 +386,7 @@ public:
         {
             if (param == ACTION_FERAL_RESPAWN)
             {
-                me->setDeathState(JUST_RESPAWNED);
+                me->setDeathState(DeathState::JustRespawned);
 
                 if (Player* target = SelectTargetFromPlayerList(200))
                     AttackStart(target);
@@ -430,29 +432,18 @@ public:
     };
 };
 
-class spell_auriaya_sentinel_blast : public SpellScriptLoader
+class spell_auriaya_sentinel_blast : public SpellScript
 {
-public:
-    spell_auriaya_sentinel_blast() : SpellScriptLoader("spell_auriaya_sentinel_blast") { }
+    PrepareSpellScript(spell_auriaya_sentinel_blast);
 
-    class spell_auriaya_sentinel_blast_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& unitList)
     {
-        PrepareSpellScript(spell_auriaya_sentinel_blast_SpellScript);
+        unitList.remove_if(PlayerOrPetCheck());
+    }
 
-        void FilterTargets(std::list<WorldObject*>& unitList)
-        {
-            unitList.remove_if(PlayerOrPetCheck());
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auriaya_sentinel_blast_SpellScript::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_auriaya_sentinel_blast_SpellScript();
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_auriaya_sentinel_blast::FilterTargets, EFFECT_ALL, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -494,7 +485,7 @@ void AddSC_boss_auriaya()
     new npc_auriaya_sanctum_sentry();
     new npc_auriaya_feral_defender();
 
-    new spell_auriaya_sentinel_blast();
+    RegisterSpellScript(spell_auriaya_sentinel_blast);
 
     new achievement_auriaya_crazy_cat_lady();
     new achievement_auriaya_nine_lives();

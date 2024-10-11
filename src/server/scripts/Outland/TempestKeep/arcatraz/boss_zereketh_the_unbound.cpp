@@ -15,8 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 #include "arcatraz.h"
 
 enum Say
@@ -37,13 +38,7 @@ enum Spells
 
 struct boss_zereketh_the_unbound : public BossAI
 {
-    boss_zereketh_the_unbound(Creature* creature) : BossAI(creature, DATA_ZEREKETH)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    boss_zereketh_the_unbound(Creature* creature) : BossAI(creature, DATA_ZEREKETH) { }
 
     void JustDied(Unit* /*killer*/) override
     {
@@ -84,36 +79,7 @@ struct boss_zereketh_the_unbound : public BossAI
     }
 };
 
-// 36123, 39367 -- Seed of Corruption
-class spell_zereketh_seed_of_corruption: public AuraScript
-{
-    PrepareAuraScript(spell_zereketh_seed_of_corruption);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_CORRUPTION_PROC });
-    }
-
-    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
-    {
-        PreventDefaultAction();
-        uint32 val = GetSpellInfo()->GetEffect(EFFECT_1).BasePoints;
-        GetTarget()->RemoveAurasDueToSpell(GetSpellInfo()->Id);
-
-        if (GetCaster())
-        {
-            GetCaster()->CastCustomSpell(SPELL_CORRUPTION_PROC, SPELLVALUE_BASE_POINT0, val, GetTarget(), true);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_zereketh_seed_of_corruption::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
-    }
-};
-
 void AddSC_boss_zereketh_the_unbound()
 {
     RegisterArcatrazCreatureAI(boss_zereketh_the_unbound);
-    RegisterSpellScript(spell_zereketh_seed_of_corruption);
 }

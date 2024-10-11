@@ -43,10 +43,10 @@ AC_API_EXPORT EnumText EnumUtils<LogLevel>::ToString(LogLevel value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<LogLevel>::Count() { return 7; }
+AC_API_EXPORT std::size_t EnumUtils<LogLevel>::Count() { return 7; }
 
 template <>
-AC_API_EXPORT LogLevel EnumUtils<LogLevel>::FromIndex(size_t index)
+AC_API_EXPORT LogLevel EnumUtils<LogLevel>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -62,7 +62,7 @@ AC_API_EXPORT LogLevel EnumUtils<LogLevel>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<LogLevel>::ToIndex(LogLevel value)
+AC_API_EXPORT std::size_t EnumUtils<LogLevel>::ToIndex(LogLevel value)
 {
     switch (value)
     {
@@ -94,10 +94,10 @@ AC_API_EXPORT EnumText EnumUtils<AppenderType>::ToString(AppenderType value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<AppenderType>::Count() { return 4; }
+AC_API_EXPORT std::size_t EnumUtils<AppenderType>::Count() { return 4; }
 
 template <>
-AC_API_EXPORT AppenderType EnumUtils<AppenderType>::FromIndex(size_t index)
+AC_API_EXPORT AppenderType EnumUtils<AppenderType>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -110,7 +110,7 @@ AC_API_EXPORT AppenderType EnumUtils<AppenderType>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<AppenderType>::ToIndex(AppenderType value)
+AC_API_EXPORT std::size_t EnumUtils<AppenderType>::ToIndex(AppenderType value)
 {
     switch (value)
     {
@@ -118,6 +118,57 @@ AC_API_EXPORT size_t EnumUtils<AppenderType>::ToIndex(AppenderType value)
         case APPENDER_CONSOLE: return 1;
         case APPENDER_FILE: return 2;
         case APPENDER_DB: return 3;
+        default: throw std::out_of_range("value");
+    }
+}
+
+/*****************************************************************\
+|* data for enum 'AppenderFlags' in 'LogCommon.h' auto-generated *|
+\*****************************************************************/
+template <>
+AC_API_EXPORT EnumText EnumUtils<AppenderFlags>::ToString(AppenderFlags value)
+{
+    switch (value)
+    {
+        case APPENDER_FLAGS_NONE: return { "APPENDER_FLAGS_NONE", "APPENDER_FLAGS_NONE", "" };
+        case APPENDER_FLAGS_PREFIX_TIMESTAMP: return { "APPENDER_FLAGS_PREFIX_TIMESTAMP", "APPENDER_FLAGS_PREFIX_TIMESTAMP", "" };
+        case APPENDER_FLAGS_PREFIX_LOGLEVEL: return { "APPENDER_FLAGS_PREFIX_LOGLEVEL", "APPENDER_FLAGS_PREFIX_LOGLEVEL", "" };
+        case APPENDER_FLAGS_PREFIX_LOGFILTERTYPE: return { "APPENDER_FLAGS_PREFIX_LOGFILTERTYPE", "APPENDER_FLAGS_PREFIX_LOGFILTERTYPE", "" };
+        case APPENDER_FLAGS_USE_TIMESTAMP: return { "APPENDER_FLAGS_USE_TIMESTAMP", "APPENDER_FLAGS_USE_TIMESTAMP", "" };
+        case APPENDER_FLAGS_MAKE_FILE_BACKUP: return { "APPENDER_FLAGS_MAKE_FILE_BACKUP", "APPENDER_FLAGS_MAKE_FILE_BACKUP", "" };
+        default: throw std::out_of_range("value");
+    }
+}
+
+template <>
+AC_API_EXPORT std::size_t EnumUtils<AppenderFlags>::Count() { return 6; }
+
+template <>
+AC_API_EXPORT AppenderFlags EnumUtils<AppenderFlags>::FromIndex(std::size_t index)
+{
+    switch (index)
+    {
+        case 0: return APPENDER_FLAGS_NONE;
+        case 1: return APPENDER_FLAGS_PREFIX_TIMESTAMP;
+        case 2: return APPENDER_FLAGS_PREFIX_LOGLEVEL;
+        case 3: return APPENDER_FLAGS_PREFIX_LOGFILTERTYPE;
+        case 4: return APPENDER_FLAGS_USE_TIMESTAMP;
+        case 5: return APPENDER_FLAGS_MAKE_FILE_BACKUP;
+        default: throw std::out_of_range("index");
+    }
+}
+
+template <>
+AC_API_EXPORT std::size_t EnumUtils<AppenderFlags>::ToIndex(AppenderFlags value)
+{
+    switch (value)
+    {
+        case APPENDER_FLAGS_NONE: return 0;
+        case APPENDER_FLAGS_PREFIX_TIMESTAMP: return 1;
+        case APPENDER_FLAGS_PREFIX_LOGLEVEL: return 2;
+        case APPENDER_FLAGS_PREFIX_LOGFILTERTYPE: return 3;
+        case APPENDER_FLAGS_USE_TIMESTAMP: return 4;
+        case APPENDER_FLAGS_MAKE_FILE_BACKUP: return 5;
         default: throw std::out_of_range("value");
     }
 }

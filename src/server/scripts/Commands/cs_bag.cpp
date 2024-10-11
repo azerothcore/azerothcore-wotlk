@@ -16,9 +16,9 @@
  */
 
 #include "Chat.h"
+#include "CommandScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "ScriptMgr.h"
 
 constexpr std::array<std::string_view, MAX_ITEM_QUALITY> itemQualityToString =
 {

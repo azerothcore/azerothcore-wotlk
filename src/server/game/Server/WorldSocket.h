@@ -30,17 +30,21 @@
 
 using boost::asio::ip::tcp;
 
-class EncryptablePacket : public WorldPacket
+class EncryptableAndCompressiblePacket : public WorldPacket
 {
 public:
-    EncryptablePacket(WorldPacket const& packet, bool encrypt) : WorldPacket(packet), _encrypt(encrypt)
+    EncryptableAndCompressiblePacket(WorldPacket const& packet, bool encrypt) : WorldPacket(packet), _encrypt(encrypt)
     {
         SocketQueueLink.store(nullptr, std::memory_order_relaxed);
     }
 
     bool NeedsEncryption() const { return _encrypt; }
 
-    std::atomic<EncryptablePacket*> SocketQueueLink;
+    bool NeedsCompression() const { return GetOpcode() == SMSG_UPDATE_OBJECT && size() > 100; }
+
+    void CompressIfNeeded();
+
+    std::atomic<EncryptableAndCompressiblePacket*> SocketQueueLink;
 
 private:
     bool _encrypt;
@@ -125,7 +129,7 @@ private:
 
     MessageBuffer _headerBuffer;
     MessageBuffer _packetBuffer;
-    MPSCQueue<EncryptablePacket, &EncryptablePacket::SocketQueueLink> _bufferQueue;
+    MPSCQueue<EncryptableAndCompressiblePacket, &EncryptableAndCompressiblePacket::SocketQueueLink> _bufferQueue;
     std::size_t _sendBufferSize;
 
     QueryCallbackProcessor _queryProcessor;

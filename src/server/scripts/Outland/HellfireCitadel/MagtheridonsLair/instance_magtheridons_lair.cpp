@@ -15,24 +15,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "InstanceMapScript.h"
 #include "InstanceScript.h"
-#include "ScriptMgr.h"
 #include "magtheridons_lair.h"
 
 BossBoundaryData const boundaries =
 {
-    { TYPE_MAGTHERIDON, new CircleBoundary(Position(-18.70f, 2.24f), 52.30) }
+    { DATA_MAGTHERIDON, new CircleBoundary(Position(-18.70f, 2.24f), 52.30) }
 };
 
 DoorData const doorData[] =
 {
-    { GO_MAGTHERIDON_DOORS,     TYPE_MAGTHERIDON,           DOOR_TYPE_ROOM },
+    { GO_MAGTHERIDON_DOORS,     DATA_MAGTHERIDON,           DOOR_TYPE_ROOM },
     { 0,                        0,                          DOOR_TYPE_ROOM } // END
 };
 
 MinionData const minionData[] =
 {
-    { NPC_HELLFIRE_CHANNELER,   TYPE_MAGTHERIDON }
+    { NPC_HELLFIRE_CHANNELER,   DATA_MAGTHERIDON }
 };
 
 class instance_magtheridons_lair : public InstanceMapScript
@@ -66,7 +66,7 @@ public:
                     _magtheridonGUID = creature->GetGUID();
                     break;
                 case NPC_HELLFIRE_CHANNELER:
-                    AddMinion(creature, true);
+                    AddMinion(creature);
                     break;
                 case NPC_HELLFIRE_WARDER:
                     _wardersSet.insert(creature->GetGUID());
@@ -79,7 +79,7 @@ public:
             switch (creature->GetEntry())
             {
                 case NPC_HELLFIRE_CHANNELER:
-                    AddMinion(creature, false);
+                    RemoveMinion(creature);
                     break;
             }
         }
@@ -89,7 +89,7 @@ public:
             switch (go->GetEntry())
             {
                 case GO_MAGTHERIDON_DOORS:
-                    AddDoor(go, true);
+                    AddDoor(go);
                     break;
                 case GO_MANTICRON_CUBE:
                     _cubesSet.insert(go->GetGUID());
@@ -111,7 +111,7 @@ public:
             switch (go->GetEntry())
             {
                 case GO_MAGTHERIDON_DOORS:
-                    AddDoor(go, false);
+                    RemoveDoor(go);
                     break;
                 case GO_MANTICRON_CUBE:
                     _cubesSet.erase(go->GetGUID());
@@ -133,7 +133,7 @@ public:
             if (!InstanceScript::SetBossState(id, state))
                 return false;
 
-            if (id == TYPE_MAGTHERIDON)
+            if (id == DATA_MAGTHERIDON)
             {
                 if (state == IN_PROGRESS)
                 {
@@ -163,7 +163,7 @@ public:
             switch (type)
             {
                 case DATA_CHANNELER_COMBAT:
-                    if (GetBossState(TYPE_MAGTHERIDON) != IN_PROGRESS)
+                    if (GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS)
                         if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
                             magtheridon->SetInCombatWithZone();
                     break;

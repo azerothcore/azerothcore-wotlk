@@ -86,7 +86,7 @@ double rand_chance()
     return urd(engine);
 }
 
-uint32 urandweighted(size_t count, double const* chances)
+uint32 urandweighted(std::size_t count, double const* chances)
 {
     std::discrete_distribution<uint32> dd(chances, chances + count);
     return dd(engine);

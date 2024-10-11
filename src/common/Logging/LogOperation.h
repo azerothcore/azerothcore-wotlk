@@ -18,7 +18,6 @@
 #ifndef LOGOPERATION_H
 #define LOGOPERATION_H
 
-#include "Define.h"
 #include <memory>
 
 class Logger;

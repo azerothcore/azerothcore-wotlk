@@ -18,7 +18,6 @@
 #ifndef _VMAPTOOLS_H
 #define _VMAPTOOLS_H
 
-#include "Define.h"
 #include <G3D/AABox.h>
 #include <G3D/CollisionDetection.h>
 

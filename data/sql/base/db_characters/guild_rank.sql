@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
 -- Host:                         127.0.0.1
--- Server version:               8.0.29 - MySQL Community Server - GPL
+-- Server version:               8.1.0 - MySQL Community Server - GPL
 -- Server OS:                    Win64
--- HeidiSQL Version:             12.0.0.6468
+-- HeidiSQL Version:             12.3.0.6589
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -19,7 +19,7 @@ DROP TABLE IF EXISTS `guild_rank`;
 CREATE TABLE IF NOT EXISTS `guild_rank` (
   `guildid` int unsigned NOT NULL DEFAULT '0',
   `rid` tinyint unsigned NOT NULL,
-  `rname` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `rname` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `rights` int unsigned DEFAULT '0',
   `BankMoneyPerDay` int unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guildid`,`rid`),

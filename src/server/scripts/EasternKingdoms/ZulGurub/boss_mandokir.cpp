@@ -15,14 +15,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptMgr.h"
+#include "CreatureScript.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
-#include "zulgurub.h"
-#include "Player.h"
+#include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
+#include "zulgurub.h"
 
 enum Says
 {
@@ -208,7 +209,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             reviveGUID = victim->GetGUID();
@@ -448,7 +449,7 @@ public:
                             {
                                 if (!me || !target)
                                     return false;
-                                if (target->GetTypeId() != TYPEID_PLAYER || !me->IsWithinLOSInMap(target))
+                                if (!target->IsPlayer() || !me->IsWithinLOSInMap(target))
                                     return false;
                                 return true;
                             }))
@@ -539,7 +540,7 @@ public:
 
         void JustEngagedWith(Unit* who) override
         {
-            if (who->GetTypeId() != TYPEID_PLAYER)
+            if (!who->IsPlayer())
                 return;
 
             _scheduler.Schedule(6s, 12s, [this](TaskContext context)
@@ -556,7 +557,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             reviveGUID = victim->GetGUID();

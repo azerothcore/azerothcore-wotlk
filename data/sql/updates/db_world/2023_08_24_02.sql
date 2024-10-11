@@ -1,0 +1,38 @@
+-- DB update 2023_08_24_01 -> 2023_08_24_02
+--
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 488000 AND `source_type` = 9;
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 4880 AND `source_type` = 0;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(4880, 0, 0, 2, 19, 0, 100, 512, 1270, 0, 0, 0, 0, 0, 80, 488000, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stinky\'s Escape - H) - Run Script'),
+(4880, 0, 1, 2, 19, 0, 100, 512, 1222, 0, 0, 0, 0, 0, 80, 488000, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stinky\'s Escape - A) - Run Script'),
+(4880, 0, 2, 3, 40, 0, 100, 512, 8, 0, 0, 0, 0, 0, 54, 3000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP8 - Pause WP (3 Seconds)'),
+(4880, 0, 3, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP8 - Say Line 1'),
+(4880, 0, 4, 5, 40, 0, 100, 512, 12, 0, 0, 0, 0, 0, 54, 3000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP12 - Pause WP (3 Seconds)'),
+(4880, 0, 5, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP12 - Say Line 2'),
+(4880, 0, 6, 0, 40, 0, 100, 0, 26, 0, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP26 - Say Line 3'),
+(4880, 0, 7, 8, 40, 0, 100, 512, 27, 0, 0, 0, 0, 0, 54, 6000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached 27 - Pause WP (6 Seconds)'),
+(4880, 0, 8, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached 27 - Say Line 4'),
+(4880, 0, 9, 10, 40, 0, 100, 512, 28, 0, 0, 0, 0, 0, 54, 6000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP28 - Pause WP (6 Seconds)'),
+(4880, 0, 10, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached 28 - Say Line 5'),
+(4880, 0, 11, 12, 40, 0, 100, 512, 29, 0, 0, 0, 0, 0, 54, 6000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP29 - Pause WP (6 Seconds)'),
+(4880, 0, 12, 13, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached 29 - Set Bytes 1'),
+(4880, 0, 13, 26, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached 29 - Say Line 6'),
+(4880, 0, 14, 15, 40, 0, 100, 512, 30, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP30 - Set Bytes 1'),
+(4880, 0, 15, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP30 - Say Line 7'),
+(4880, 0, 16, 17, 40, 0, 100, 512, 38, 0, 0, 0, 0, 0, 54, 6000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP38 - Pause WP (6 Seconds)'),
+(4880, 0, 17, 18, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 1, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP38 - Say Line 8'),
+(4880, 0, 18, 19, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 15, 1270, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP38 - Complete Quest'),
+(4880, 0, 19, 20, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 15, 1222, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP38 - Complete Quest'),
+(4880, 0, 20, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP38 - Set Run On'),
+(4880, 0, 21, 22, 40, 0, 100, 0, 40, 0, 0, 0, 0, 0, 1, 9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP40 - Say Line 9'),
+(4880, 0, 22, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP40 - Despawn'),
+(4880, 0, 23, 24, 6, 0, 100, 512, 0, 0, 0, 0, 0, 0, 6, 1270, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Death - Fail Quest'),
+(4880, 0, 24, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 6, 1222, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Death - Fail Quest'),
+(4880, 0, 25, 0, 0, 0, 100, 0, 1000, 1000, 30000, 30000, 0, 0, 1, 10, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - IC  - Say Line 10'),
+(4880, 0, 26, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 70, 300, 0, 0, 0, 0, 0, 14, 11757, 20939, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Reached WP29 - Despawn Bogbean Plant'),
+(4880, 0, 27, 0, 7, 0, 100, 512, 0, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - On Evade - Set Bytes 1'),
+(488000, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 81, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - Script - Set NPC Flags'),
+(488000, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 250, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - Script - Set Faction'),
+(488000, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 91, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - Script - Set Bytes 1'),
+(488000, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - Script - Say Line 0'),
+(488000, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 4880, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, '"Stinky" Ignatz - Script - Start WP');
