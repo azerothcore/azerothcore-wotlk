@@ -1,3 +1,4 @@
+-- DB update 2024_10_10_00 -> 2024_10_11_00
 --
 DROP TABLE IF EXISTS `vehicle_seat_addon`;
 CREATE TABLE `vehicle_seat_addon` (
