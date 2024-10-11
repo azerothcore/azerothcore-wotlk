@@ -56,7 +56,7 @@ namespace AddonMgr
             std::string name = fields[0].Get<std::string>();
             uint32 crc = fields[1].Get<uint32>();
 
-            m_knownAddons.push_back(SavedAddon(name, crc));
+            m_knownAddons.emplace_back(name, crc);
 
             ++count;
         } while (result->NextRow());
@@ -76,13 +76,12 @@ namespace AddonMgr
             {
                 Field* fields = result->Fetch();
 
-                BannedAddon addon{};
-                addon.Id = fields[0].Get<uint32>() + offset;
-                addon.Timestamp = uint32(fields[3].Get<uint64>());
-                addon.NameMD5 = Acore::Crypto::MD5::GetDigestOf(fields[1].Get<std::string>());
-                addon.VersionMD5 = Acore::Crypto::MD5::GetDigestOf(fields[2].Get<std::string>());
+                uint32 Id = fields[0].Get<uint32>() + offset;
+                std::array<uint8, 16> NameMD5 = Acore::Crypto::MD5::GetDigestOf(fields[1].Get<std::string>());
+                std::array<uint8, 16> VersionMD5 = Acore::Crypto::MD5::GetDigestOf(fields[2].Get<std::string>());
+                uint32 Timestamp = uint32(fields[3].Get<uint64>());
 
-                m_bannedAddons.emplace_back(addon);
+                m_bannedAddons.emplace_back(Id, NameMD5, VersionMD5, Timestamp);
 
                 ++count2;
             } while (result->NextRow());
@@ -94,16 +93,14 @@ namespace AddonMgr
 
     void SaveAddon(AddonInfo const& addon)
     {
-        std::string name = addon.Name;
-
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ADDON);
 
-        stmt->SetData(0, name);
+        stmt->SetData(0, addon.Name);
         stmt->SetData(1, addon.CRC);
 
         CharacterDatabase.Execute(stmt);
 
-        m_knownAddons.push_back(SavedAddon(addon.Name, addon.CRC));
+        m_knownAddons.emplace_back(addon.Name, addon.CRC);
     }
 
     SavedAddon const* GetAddonInfo(const std::string& name)
