@@ -676,6 +676,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 &= ~SPELL_ATTR3_SUPRESS_CASTER_PROCS;
     });
 
+    // Arcane Missiles
+    ApplySpellFix({ 5143, 5144, 5145, 8416, 8417, 10211, 10212, 25345, 27075, 38699, 38704, 42843, 42846 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+    });
+
     ApplySpellFix({
         54968,  // Glyph of Holy Light, Damage Class should be magic
         53652,  // Beacon of Light heal, Damage Class should be magic
@@ -5048,10 +5054,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4693)); // Siege Engine, Accessory
     vse->m_flags &= ~VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
-    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3011)); // Salvaged Demolisher, Ulduar - not allow to change seats
-    vse->m_flags &= ~VEHICLE_SEAT_FLAG_CAN_SWITCH;
-    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(3077)); // Salvaged Demolisher Seat, Ulduar - not allow to change seats
-    vse->m_flags &= ~VEHICLE_SEAT_FLAG_CAN_SWITCH;
 
     // pussywizard: fix z offset for some vehicles:
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(6206)); // Marrowgar - Bone Spike
