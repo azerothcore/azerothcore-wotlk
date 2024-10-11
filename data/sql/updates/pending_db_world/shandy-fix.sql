@@ -24,4 +24,4 @@ INSERT INTO `creature_text`(`CreatureID`,`GroupID`,`ID`,`Text`,`Type`,`Language`
 
 UPDATE `gossip_menu_option`
 SET `BoxBroadcastTextID` = 0
-WHERE `menuid` = 10854 AND `OptionBroadcastTextID` = 37552;
+WHERE `menuid` = 10854 AND `OptionBroadcastTextID` IN (37552, 36760);
