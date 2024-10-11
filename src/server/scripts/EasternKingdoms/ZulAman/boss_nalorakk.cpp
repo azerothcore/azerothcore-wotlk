@@ -351,8 +351,7 @@ struct boss_nalorakk : public BossAI
     {
         BossAI::JustDied(killer);
         Talk(SAY_DEATH);
-        if (instance)
-            instance->SetData(DATA_NALORAKKEVENT, DONE);
+        instance->SetData(DATA_NALORAKKEVENT, DONE);
     }
 
 private:
