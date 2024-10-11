@@ -596,10 +596,10 @@ public:
                         u = *itr;
                     }
                 }
-                //try 2: by minimal duration
+                //try 2: by minimal duration (if expiring already)
                 if (!u)
                 {
-                    uint32 minduration = 0;
+                    uint32 minduration = static_cast<uint32>((*_minions.begin())->GetAI()->GetData(BOTPETAI_MISC_DURATION_MAX) * 3 / 4);
                     for (Summons::const_iterator itr = _minions.begin(); itr != _minions.end(); ++itr)
                     {
                         if ((*itr)->GetAI()->GetData(BOTPETAI_MISC_DURATION) > minduration)
@@ -612,6 +612,8 @@ public:
 
                 if (!u)
                     return;
+
+                u->ToTempSummon()->UnSummon();
             }
 
             Position pos = from->GetPosition();

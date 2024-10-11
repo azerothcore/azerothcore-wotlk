@@ -291,6 +291,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         }
 
         isPremade = (grp->GetMembersCount() >= bg->GetMinPlayersPerTeam() && bgTypeId != BATTLEGROUND_RB);
+        //npcbot: check premade for bots
+        if (isPremade && !BotMgr::IsNpcBotsPremadeEnabled() && grp->GetFirstBotMember() != nullptr)
+            isPremade = false;
+        //end npcbot
         uint32 avgWaitTime = 0;
 
         GroupQueueInfo* ginfo = bgQueue.AddGroup(_player, grp, bgTypeId, bracketEntry, 0, false, isPremade, 0, 0);

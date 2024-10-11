@@ -608,8 +608,7 @@ void bot_ai::ResetBotAI(uint8 resetType)
     if (resetType == BOTAI_RESET_INIT || resetType == BOTAI_RESET_LOGOUT)
     {
         NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
-        _checkOwershipTimer = (BotMgr::GetOwnershipExpireTime() && npcBotData->owner) ?
-            ((resetType == BOTAI_RESET_INIT || BotMgr::GetOwnershipExpireMode() == BOT_OWNERSHIP_EXPIRE_HIRE) ? 1000 : CalculateOwnershipCheckTime()) : 0;
+        _checkOwershipTimer = (BotMgr::GetOwnershipExpireTime() && npcBotData->owner) ? (resetType == BOTAI_RESET_INIT) ? 1000 : CalculateOwnershipCheckTime() : 0;
         if (resetType == BOTAI_RESET_INIT)
             homepos.Relocate(me);
         else //if (resetType == BOTAI_RESET_LOGOUT)
@@ -3693,6 +3692,14 @@ bool bot_ai::CanBotAttack(Unit const* target, int8 byspell, bool secondary) cons
         return false;
     if (IsPointedNoDPSTarget(target))
         return false;
+
+    if (IsWanderer() && target->IsCreature() && target->GetVictim() != me)
+    {
+        if (BotMgr::EnableWanderingUntargetNpcQuestgiver() && target->IsQuestGiver())
+            return false;
+        if (BotMgr::EnableWanderingUntargetNpcFlightmaster() && target->IsTaxi())
+            return false;
+    }
 
     if (IAmFree())
     {
@@ -13367,28 +13374,32 @@ float bot_ai::_getTotalBotStat(BotStatMods stat) const
         value += _stats[slot][stat];
 
     uint8 lvl = me->GetLevel();
+    Stats fstat = STAT_STRENGTH;
+    UnitMods fmod = UNIT_MOD_STAT_STRENGTH;
+    float fpct = 0.0f;
     float fval = float(value);
 
     switch (stat)
     {
         case BOT_STAT_MOD_STRENGTH:
-            fval += me->GetTotalStatValue(STAT_STRENGTH);
+            fstat = STAT_STRENGTH;
+            fmod = UNIT_MOD_STAT_STRENGTH;
             switch (_botclass)
             {
                 case BOT_CLASS_WARRIOR:
                     //Vitality, Strength of Arms
                     if (lvl >= 45 && GetSpec() == BOT_SPEC_WARRIOR_PROTECTION)
-                        fval *= 1.06f;
+                        fpct += 0.06f;
                     if (lvl >= 40 && GetSpec() == BOT_SPEC_WARRIOR_ARMS)
-                        fval *= 1.04f;
+                        fpct += 0.04f;
                     //Improved Berserker Stance part 1 (all stances)
                     if (lvl >= 45 && GetSpec() == BOT_SPEC_WARRIOR_FURY/* && GetBotStance() == WARRIOR_BERSERKER_STANCE*/)
-                        fval *= 1.2f;
+                        fpct += 0.2f;
                     break;
                 case BOT_CLASS_PALADIN:
                     //Divine Strength
                     if (lvl >= 10)
-                        fval *= 1.15f;
+                        fpct += 0.15f;
                     break;
                 case BOT_CLASS_DEATH_KNIGHT:
                     //Ravenous Dead part 1
@@ -13396,192 +13407,196 @@ float bot_ai::_getTotalBotStat(BotStatMods stat) const
                     //Veteran of the Third War part 1
                     //Abomination's might part 2
                     if (lvl >= 56)
-                        fval *= 1.03f;
+                        fpct += 0.03f;
                     if (lvl >= 58)
-                        fval *= 1.04f;
+                        fpct += 0.04f;
                     if (lvl >= 59 && GetSpec() == BOT_SPEC_DK_BLOOD)
-                        fval *= 1.06f;
+                        fpct += 0.06f;
                     if (lvl >= 60 && GetSpec() == BOT_SPEC_DK_BLOOD)
-                        fval *= 1.02f;
+                        fpct += 0.02f;
                     //Frost Presence passive / Improved Frost Presence
                     if (lvl >= 61 && GetBotStance() == DEATH_KNIGHT_FROST_PRESENCE && GetSpec() == BOT_SPEC_DK_FROST)
-                        fval *= 1.08f;
+                        fpct += 0.08f;
                     break;
                 case BOT_CLASS_DRUID:
                     //Survival of the Fittest, Improved Mark of the Wild
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_DRUID_FERAL)
-                        fval *= 1.08f;
+                        fpct += 0.08f;
                     else if (lvl >= 10)
-                        fval *= 1.02f;
+                        fpct += 0.02f;
                     break;
                 default:
                     break;
             }
             break;
         case BOT_STAT_MOD_AGILITY:
-            fval += me->GetTotalStatValue(STAT_AGILITY);
+            fstat = STAT_AGILITY;
+            fmod = UNIT_MOD_STAT_AGILITY;
             switch (_botclass)
             {
                 case BOT_CLASS_HUNTER:
                     //Combat Experience, Lightning Reflexes
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_HUNTER_MARKSMANSHIP)
-                        fval *= 1.04f;
+                        fpct += 0.04f;
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_HUNTER_SURVIVAL)
-                        fval *= 1.15f;
+                        fpct += 0.15f;
                     //Hunting Party
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_HUNTER_SURVIVAL)
-                        fval *= 1.03f;
+                        fpct += 0.03f;
                     break;
                 case BOT_CLASS_ROGUE:
                     //Sinister Calling
                     if (lvl >= 45 && GetSpec() == BOT_SPEC_ROGUE_SUBTLETY)
-                        fval *= 1.15f;
+                        fpct += 0.15f;
                     break;
                 case BOT_CLASS_DRUID:
                     //Survival of the Fittest, Improved Mark of the Wild
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_DRUID_FERAL)
-                        fval *= 1.08f;
+                        fpct += 0.08f;
                     else if (lvl >= 10)
-                        fval *= 1.02f;
+                        fpct += 0.02f;
                     break;
                 default:
                     break;
             }
             break;
         case BOT_STAT_MOD_STAMINA:
-            fval += me->GetTotalStatValue(STAT_STAMINA);
+            fstat = STAT_STAMINA;
+            fmod = UNIT_MOD_STAT_STAMINA;
             switch (_botclass)
             {
                 case BOT_CLASS_WARRIOR:
                     //Vitality, Strength of Arms
                     if (lvl >= 45 && GetSpec() == BOT_SPEC_WARRIOR_PROTECTION)
-                        fval *= 1.09f;
+                        fpct += 0.09f;
                     if (lvl >= 40 && GetSpec() == BOT_SPEC_WARRIOR_ARMS)
-                        fval *= 1.04f;
+                        fpct += 0.04f;
                     break;
                 case BOT_CLASS_PALADIN:
                     //Combat Expertise, Sacred Duty
                     if (lvl >= 45 && GetSpec() == BOT_SPEC_PALADIN_PROTECTION)
-                        fval *= 1.06f;
+                        fpct += 0.06f;
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_PALADIN_PROTECTION)
-                        fval *= 1.04f;
+                        fpct += 0.04f;
                     break;
                 case BOT_CLASS_HUNTER:
                     //Survivalist
                     if (lvl >= 20)
-                        fval *= 1.1f;
+                        fpct += 0.1f;
                     break;
                 case BOT_CLASS_ROGUE:
                     //Lightning Reflexes part 2
                     if (lvl >= 25 && GetSpec() == BOT_SPEC_ROGUE_COMBAT)
-                        fval *= 1.04f;
+                        fpct += 0.04f;
                     break;
                 case BOT_CLASS_PRIEST:
                     //Improved Power Word: Fortitude
                     if (lvl >= 15)
-                        fval *= 1.04f;
+                        fpct += 0.04f;
                     break;
                 case BOT_CLASS_DEATH_KNIGHT:
                     //Veteran of the Third War part 2
                     if (lvl >= 59 && GetSpec() == BOT_SPEC_DK_BLOOD)
-                        fval *= 1.03f;
+                        fpct += 0.03f;
                     break;
                 case BOT_CLASS_WARLOCK:
                     //Demonic Embrace: 10% stam bonus
                     if (lvl >= 10)
-                        fval *= 1.1f;
+                        fpct += 0.1f;
                     break;
                 case BOT_CLASS_DRUID:
                     if (GetBotStance() == DRUID_BEAR_FORM)
                     {
                         //Bear form: stamina bonus base 25%
                         //Heart of the Wild: 10% stam bonus for bear
-                        fval *= 1.25f;
+                        fpct += 0.25f;
                         if (lvl >= 35 && GetSpec() == BOT_SPEC_DRUID_FERAL)
-                            fval *= 1.1f;
+                            fpct += 0.1f;
                     }
                     //Survival of the Fittest, Improved Mark of the Wild
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_DRUID_FERAL)
-                        fval *= 1.06f;
+                        fpct += 0.06f;
                     if (lvl >= 10)
-                        fval *= 1.02f;
+                        fpct += 0.02f;
                     break;
                 default:
                     break;
             }
             break;
         case BOT_STAT_MOD_INTELLECT:
-            fval += me->GetTotalStatValue(STAT_INTELLECT);
+            fstat = STAT_INTELLECT;
+            fmod = UNIT_MOD_STAT_INTELLECT;
             switch (_botclass)
             {
                 case BOT_CLASS_PALADIN:
                     //Divine Intellect
                     if (lvl >= 15)
-                        fval *= 1.1f;
+                        fpct += 0.1f;
                     break;
                 case BOT_CLASS_HUNTER:
                     //Combat Experience
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_HUNTER_MARKSMANSHIP)
-                        fval *= 1.04f;
+                        fpct += 0.04f;
                     break;
                 case BOT_CLASS_MAGE:
                     //Arcane Mind
                     if (lvl >= 30 && GetSpec() == BOT_SPEC_MAGE_ARCANE)
-                        fval *= 1.15f;
+                        fpct += 0.15f;
                     break;
                 case BOT_CLASS_PRIEST:
                     //Mental Strength
                     if (lvl >= 30 && GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE)
-                        fval *= 1.15f;
+                        fpct += 0.15f;
                     break;
                 case BOT_CLASS_SHAMAN:
                     //Ancestral Knowledge
                     if (lvl >= 10)
-                        fval *= 1.1f;
+                        fpct += 0.1f;
                     break;
                 case BOT_CLASS_DRUID:
                     //Survival of the Fittest, Improved Mark of the Wild
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_DRUID_FERAL)
-                        fval *= 1.08f;
+                        fpct += 0.08f;
                     else if (lvl >= 10)
-                        fval *= 1.02f;
+                        fpct += 0.02f;
                     //Furor (Moonkin Form)
                     if (GetBotStance() == DRUID_MOONKIN_FORM)
-                        fval *= 1.1f;
+                        fpct += 0.1f;
                     //Heart of the Wild: ferals only (tanks included)
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_DRUID_FERAL)
-                        fval *= 1.2f;
+                        fpct += 0.2f;
                     break;
                 default:
                     break;
             }
             break;
         case BOT_STAT_MOD_SPIRIT:
-            fval += me->GetTotalStatValue(STAT_SPIRIT);
+            fstat = STAT_SPIRIT;
+            fmod = UNIT_MOD_STAT_SPIRIT;
             switch (_botclass)
             {
                 case BOT_CLASS_PRIEST:
                     //Spirit of Redemption part 1
                     if (lvl >= 30 && GetSpec() == BOT_SPEC_PRIEST_HOLY)
-                        fval *= 1.05f;
+                        fpct += 0.05f;
                     //Enlightenment part 1
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_PRIEST_DISCIPLINE)
-                        fval *= 1.06f;
+                        fpct += 0.06f;
                     break;
                 case BOT_CLASS_MAGE:
                     //Student of the Mind
                     if (lvl >= 20)
-                        fval *= 1.1f;
+                        fpct += 0.1f;
                     break;
                 case BOT_CLASS_DRUID:
                     //Survival of the Fittest, Improved Mark of the Wild
                     if (lvl >= 35 && GetSpec() == BOT_SPEC_DRUID_FERAL)
-                        fval *= 1.08f;
+                        fpct += 0.08f;
                     else if (lvl >= 10)
-                        fval *= 1.02f;
+                        fpct += 0.02f;
                     //Living Spirit
                     if (lvl >= 40 && GetSpec() == BOT_SPEC_DRUID_RESTORATION)
-                        fval *= 1.15f;
+                        fpct += 0.15f;
                     break;
                 default:
                     break;
@@ -13591,6 +13606,9 @@ float bot_ai::_getTotalBotStat(BotStatMods stat) const
             break;
     }
 
+    fpct += me->GetModifierValue(fmod, TOTAL_PCT);
+    fval *= fpct;
+    fval += me->GetTotalStatValue(fstat);
     return fval;
 }
 
@@ -15231,7 +15249,14 @@ void bot_ai::FindMaster()
 
 uint32 bot_ai::CalculateOwnershipCheckTime()
 {
-    return std::min<uint32>(BotMgr::GetOwnershipExpireTime(), urand(58 * MINUTE * IN_MILLISECONDS, 62 * MINUTE * IN_MILLISECONDS));
+    NpcBotData const* npcBotData = BotDataMgr::SelectNpcBotData(me->GetEntry());
+    if (!npcBotData->owner)
+        return 0;
+
+    if (!IAmFree() || BotMgr::GetOwnershipExpireMode() == BOT_OWNERSHIP_EXPIRE_OFFLINE)
+        return static_cast<uint32>(std::min<uint32>(BotMgr::GetOwnershipExpireTime(), urand(3 * MINUTE, 7 * MINUTE)) * IN_MILLISECONDS);
+
+    return static_cast<uint32>(std::max<time_t>(time_t(npcBotData->hire_time + BotMgr::GetOwnershipExpireTime() + 1) - time(0), 5) * IN_MILLISECONDS);
 }
 
 bool bot_ai::IAmFree() const
@@ -18449,6 +18474,7 @@ bool bot_ai::FinishTeleport(bool reset)
             GetHomePosition(mapid, &pos);
         if (BotMgr::HideBotSpawns() && !CanAppearInWorld() && me->GetMapId() == mapid && me->GetExactDist2d(pos) < 10.0f)
         {
+            AbortTeleport();
             TeleportFinishEvent* delayedTeleportEvent = new TeleportFinishEvent(this, reset);
             Events.AddEvent(delayedTeleportEvent, Events.CalculateTime(urand(5000, 8000)));
             SetTeleportFinishEvent(delayedTeleportEvent);

@@ -5027,6 +5027,17 @@ NpcBot.WanderingBots.Classes.SeaWitch.Enable          = 1
 NpcBot.WanderingBots.Classes.CryptLord.Enable         = 1
 
 #
+#    NpcBot.WanderingBots.SkipTarget.Questgiver
+#    NpcBot.WanderingBots.SkipTarget.Flightmaster
+#        Description: Make wandering bots skip certain npc types when selecting attack target.
+#        Note:        This option does not apply to npcs engaging the bot on their own accord.
+#        Default:     0 - (NpcBot.WanderingBots.SkipTarget.Questgiver)
+#                     0 - (NpcBot.WanderingBots.SkipTarget.Flightmaster)
+
+NpcBot.WanderingBots.SkipTarget.Questgiver   = 0
+NpcBot.WanderingBots.SkipTarget.Flightmaster = 0
+
+#
 #    NpcBot.HK.Enable
 #        Description: Count NPCBot kill at honor kill.
 #        Default:     1 - (Enabled)
@@ -5058,6 +5069,15 @@ NpcBot.HK.Achievements.Enable = 0
 #        Maximum:    10.0
 
 NpcBot.HK.Rate.Honor = 1.0
+
+#
+#    NpcBot.Premade.Enable
+#        Description: Enable joining BG as premade group while having NPCBots in group.
+#        Note:        Queued premade groups do not trigger BG bots generation.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+NpcBot.Premade.Enable = 0
 
 #
 ###################################################################################################
