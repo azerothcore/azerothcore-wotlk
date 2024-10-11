@@ -623,7 +623,7 @@ public:
             ExecuteSpeech_Counter = 0;
             PlayerGUID.Clear();
 
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);  
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
         }
 
         bool MeetQuestCondition(Player* player)
