@@ -1,3 +1,4 @@
+-- DB update 2024_10_11_01 -> 2024_10_11_02
 -- Update creature 'Monstrous Kaliri Egg Trigger' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` IN (22991))
