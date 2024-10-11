@@ -733,7 +733,7 @@ struct npc_akama_illidan : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        me->m_Events.KillAllEvents(true);
+        me->m_Events.KillAllEvents(false);
         me->SetReactState(REACT_AGGRESSIVE);
         if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) == DONE)
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
