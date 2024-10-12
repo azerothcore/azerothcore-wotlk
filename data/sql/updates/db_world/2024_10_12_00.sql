@@ -1,3 +1,4 @@
+-- DB update 2024_10_11_04 -> 2024_10_12_00
 UPDATE `creature_template` SET `unit_flags` = 33587202 WHERE (`entry` = 28782);
 
 
