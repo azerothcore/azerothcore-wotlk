@@ -87,6 +87,7 @@ void CharmInfo::InitPossessCreateSpells()
             case 27664: // Crashin' Thrashin' Racer
             case 40281: // Crashin' Thrashin' Racer
             case 23109: // Vengeful Spirit
+            case 25653: // Power of the Blue Flight
                 break;
             default:
                 InitEmptyActionBar();

@@ -46,10 +46,8 @@
 #include "SpellMgr.h"
 #include "SpellScript.h"
 #include "TemporarySummon.h"
-#include "Totem.h"
 #include "Unit.h"
 #include "UpdateData.h"
-#include "UpdateMask.h"
 #include "Util.h"
 #include "VMapFactory.h"
 #include "Vehicle.h"
@@ -2931,7 +2929,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo* target)
     {
         if (missInfo != SPELL_MISS_EVADE && !m_caster->IsFriendlyTo(effectUnit) && (!m_spellInfo->IsPositive() || m_spellInfo->HasEffect(SPELL_EFFECT_DISPEL)))
         {
-            if (!m_triggeredByAuraSpell.spellInfo || (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo))))
+            if (!m_triggeredByAuraSpell.spellInfo || m_damage || (!(m_triggeredByAuraSpell.spellInfo->Effects[m_triggeredByAuraSpell.effectIndex].TriggerSpell == m_spellInfo->Id) && !(m_triggeredByAuraSpell.spellInfo->IsAuraEffectEqual(m_spellInfo))))
                 m_caster->CombatStart(effectUnit, !(m_spellInfo->AttributesEx3 & SPELL_ATTR3_SUPRESS_TARGET_PROCS));
 
             // Patch 3.0.8: All player spells which cause a creature to become aggressive to you will now also immediately cause the creature to be tapped.
@@ -3160,8 +3158,9 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
 
             if (m_spellAura)
             {
-                // Prevent aura application if target is immuned
-                if (m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsImmunedToDamageOrSchool(m_spellAura->GetSpellInfo()))
+                // Prevent aura application if target is banished and immuned
+                if (m_targets.GetUnitTarget() && m_targets.GetUnitTarget()->IsImmunedToDamageOrSchool(m_spellAura->GetSpellInfo())
+                    && m_targets.GetUnitTarget()->HasUnitState(UNIT_STATE_ISOLATED))
                 {
                     m_spellAura->Remove();
                     return SPELL_MISS_IMMUNE;
@@ -4082,13 +4081,15 @@ void Spell::_cast(bool skipCheck)
     if (modOwner)
         modOwner->SetSpellModTakingSpell(this, false);
 
-    if (const std::vector<int32>* spell_triggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id))
+    if (std::vector<int32> const* spell_triggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id))
     {
-        for (std::vector<int32>::const_iterator i = spell_triggered->begin(); i != spell_triggered->end(); ++i)
-            if (*i < 0)
-                m_caster->RemoveAurasDueToSpell(-(*i));
+        for (int32 id : *spell_triggered)
+        {
+            if (id < 0)
+                m_caster->RemoveAurasDueToSpell(-id);
             else
-                m_caster->CastSpell(m_targets.GetUnitTarget() ? m_targets.GetUnitTarget() : m_caster, *i, true);
+                m_caster->CastSpell(m_targets.GetUnitTarget() ? m_targets.GetUnitTarget() : m_caster, id, true);
+        }
     }
 
     // Interrupt Spell casting

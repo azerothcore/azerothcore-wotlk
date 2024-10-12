@@ -175,6 +175,25 @@ Position illidanTakeoffPoint = { 727.6356f, 305.62753, 359.1486f };
 Position illidanLand = { 676.648f, 304.76074f, 354.18906f, 6.230825424194335937f };
 Position roomCenter = { 676.021f, 305.455f, 353.582f, 3.82227f };
 
+Position const BladesPositions[2] =
+{
+    { 676.226013f, 325.230988f },
+    { 678.059998f, 285.220001f }
+};
+
+class ChargeTargetSelector
+{
+public:
+    ChargeTargetSelector() { }
+
+    bool operator()(Unit* unit) const
+    {
+        return unit->IsPlayer()
+            && unit->GetDistance2d(BladesPositions[0].GetPositionX(), BladesPositions[0].GetPositionY()) > 25.0f
+            && unit->GetDistance2d(BladesPositions[1].GetPositionX(), BladesPositions[1].GetPositionY()) > 25.0f;
+    }
+};
+
 struct boss_illidan_stormrage : public BossAI
 {
     boss_illidan_stormrage(Creature* creature) : BossAI(creature, DATA_ILLIDAN_STORMRAGE), _canTalk(true), _dying(false), _inCutscene(false), beamPosId(0) { }
@@ -196,6 +215,7 @@ struct boss_illidan_stormrage : public BossAI
         me->LoadEquipment(EQUIPMENT_GLAIVES, true);
         me->SetStandState(UNIT_STAND_STATE_KNEEL);
         me->SetSheath(SHEATH_STATE_UNARMED);
+        me->SetControlled(false, UNIT_STATE_ROOT);
 
         ScheduleHealthCheckEvent(90, [&] {
             // Call for minions
@@ -316,6 +336,7 @@ struct boss_illidan_stormrage : public BossAI
                 DoStopAttack();
                 me->SetControlled(true, UNIT_STATE_ROOT);
                 me->SetCombatMovement(false);
+                DoResetThreatList();
                 DoCastSelf(SPELL_DEMON_TRANSFORM_1, true);
 
                 me->m_Events.AddEventAtOffset([&] {
@@ -732,9 +753,12 @@ struct npc_akama_illidan : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        me->m_Events.KillAllEvents(true);
+        me->m_Events.KillAllEvents(false);
         me->SetReactState(REACT_AGGRESSIVE);
-        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) == DONE)
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+        else
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
         me->setActive(false);
         summons.DespawnAll();
         DoCastSelf(SPELL_REDUCED_THREAT, true);
@@ -1312,16 +1336,16 @@ struct npc_flame_of_azzinoth : public ScriptedAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         ScheduleTimedEvent(10s, [&] {
-            if (Creature* _blade = ObjectAccessor::GetCreature(*me, _bladeGUID))
-                if (Unit* target = _blade->AI()->SelectTarget(SelectTargetMethod::Random, 0, -40.0f, true))
-                    DoCast(target, SPELL_CHARGE);
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ChargeTargetSelector()))
+                DoCast(target, SPELL_CHARGE);
         }, 5s, 20s);
 
         ScheduleTimedEvent(10s, 20s, [&] {
             DoCastVictim(SPELL_FLAME_BLAST);
 
             me->m_Events.AddEventAtOffset([&] {
-                DoCastVictim(SPELL_BLAZE);
+                if (Unit* victim = me->GetVictim())
+                    victim->CastSpell(victim, SPELL_BLAZE, true);
             }, 1s);
         }, 15s, 20s);
     }
