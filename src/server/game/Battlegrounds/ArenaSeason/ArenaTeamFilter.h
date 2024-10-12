@@ -74,7 +74,7 @@ public:
     }
 };
 
-class ArenaTeamFilterFabricByUserInput
+class ArenaTeamFilterFactoryByUserInput
 {
 public:
     std::unique_ptr<ArenaTeamFilter> CreateFilterByUserInput(std::string userInput)

@@ -248,7 +248,7 @@ public:
 
     static bool HandleArenaSeasonRewardCommand(ChatHandler* handler, std::string teamsFilterStr)
     {
-        std::unique_ptr<ArenaTeamFilter> uniqueFilter = ArenaTeamFilterFabricByUserInput().CreateFilterByUserInput(teamsFilterStr);
+        std::unique_ptr<ArenaTeamFilter> uniqueFilter = ArenaTeamFilterFactoryByUserInput().CreateFilterByUserInput(teamsFilterStr);
         if (!uniqueFilter)
         {
             handler->PSendSysMessage("Invalid filter. Please check your input.");
