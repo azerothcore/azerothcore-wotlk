@@ -122,12 +122,13 @@ void ArenaSeasonMgr::LoadActiveSeason()
     LOG_INFO("server.loading", " ");
 }
 
-void ArenaSeasonMgr::RewardTeamsForTheSeason()
+void ArenaSeasonMgr::RewardTeamsForTheSeason(std::shared_ptr<ArenaTeamFilter> teamsFilter)
 {
     ArenaSeasonTeamRewarderImpl rewarder = ArenaSeasonTeamRewarderImpl();
     ArenaSeasonRewardDistributor distributor = ArenaSeasonRewardDistributor(&rewarder);
     std::vector<ArenaSeasonRewardGroup> rewards = _arenaSeasonRewardGroupsStore[GetCurrentSeason()];
-    distributor.DistributeRewards(sArenaTeamMgr->GetArenaTeams(), rewards);
+    ArenaTeamMgr::ArenaTeamContainer filteredTeams = teamsFilter->Filter(sArenaTeamMgr->GetArenaTeams());
+    distributor.DistributeRewards(filteredTeams, rewards);
 }
 
 bool ArenaSeasonMgr::CanDeleteArenaTeams()

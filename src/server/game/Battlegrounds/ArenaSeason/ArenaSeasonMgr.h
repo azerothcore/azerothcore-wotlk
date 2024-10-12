@@ -19,6 +19,7 @@
 #define _ARENASEASONMGR_H
 
 #include "Common.h"
+#include "ArenaTeamFilter.h"
 #include <vector>
 #include <unordered_map>
 
@@ -106,7 +107,7 @@ public:
     ArenaSeasonState GetSeasonState() { return _currentSeasonState; }
 
     // Season completion functions
-    void RewardTeamsForTheSeason();
+    void RewardTeamsForTheSeason(std::shared_ptr<ArenaTeamFilter> teamsFilter);
     bool CanDeleteArenaTeams();
     void DeleteArenaTeams();
 

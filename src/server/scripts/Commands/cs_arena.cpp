@@ -24,6 +24,7 @@ EndScriptData */
 
 #include "ArenaTeamMgr.h"
 #include "ArenaSeasonMgr.h"
+#include "ArenaTeamFilter.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
@@ -44,8 +45,9 @@ public:
 
         static ChatCommandTable arenaSeasonCommandTable =
         {
-            { "complete",       HandleArenaSeasonCompleteCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "start",          HandleArenaSeasonStartCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "reward",         HandleArenaSeasonRewardCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "deleteteams",    HandleArenaSeasonDeleteTeamsCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "start",          HandleArenaSeasonStartCommand,       SEC_ADMINISTRATOR, Console::Yes },
             { "set",            arenaSeasonSetCommandTable }
         };
 
@@ -244,8 +246,17 @@ public:
         return true;
     }
 
-    static bool HandleArenaSeasonCompleteCommand(ChatHandler* handler)
+    static bool HandleArenaSeasonRewardCommand(ChatHandler* handler, std::string teamsFilterStr)
     {
+        std::unique_ptr<ArenaTeamFilter> uniqueFilter = ArenaTeamFilterFabricByUserInput().CreateFilterByUserInput(teamsFilterStr);
+        if (!uniqueFilter)
+        {
+            handler->PSendSysMessage("Invalid filter. Please check your input.");
+            return false;
+        }
+
+        std::shared_ptr<ArenaTeamFilter> sharedFilter = std::move(uniqueFilter);
+
         if (!sArenaSeasonMgr->CanDeleteArenaTeams())
         {
             handler->PSendSysMessage("Cannot proceed. Make sure there are no active arenas and that rewards exist for the current season.");
@@ -253,10 +264,14 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage("Distributing rewards for arena teams...");
-        sArenaSeasonMgr->RewardTeamsForTheSeason();
+        handler->PSendSysMessage("Distributing rewards for arena teams (types: "+teamsFilterStr+")...");
+        sArenaSeasonMgr->RewardTeamsForTheSeason(sharedFilter);
         handler->PSendSysMessage("Rewards distributed.");
-        handler->PSendSysMessage(" ");
+        return true;
+    }
+
+    static bool HandleArenaSeasonDeleteTeamsCommand(ChatHandler* handler)
+    {
         handler->PSendSysMessage("Deleting arena teams...");
         sArenaSeasonMgr->DeleteArenaTeams();
         handler->PSendSysMessage("Arena teams deleted.");
