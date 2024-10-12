@@ -215,6 +215,7 @@ struct boss_illidan_stormrage : public BossAI
         me->LoadEquipment(EQUIPMENT_GLAIVES, true);
         me->SetStandState(UNIT_STAND_STATE_KNEEL);
         me->SetSheath(SHEATH_STATE_UNARMED);
+        me->SetControlled(false, UNIT_STATE_ROOT);
 
         ScheduleHealthCheckEvent(90, [&] {
             // Call for minions
