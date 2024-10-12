@@ -45,7 +45,7 @@ public:
     {
         ArenaTeamMgr::ArenaTeamContainer result;
 
-        for (const auto& pair : teams)
+        for (auto const& pair : teams)
         {
             ArenaTeam* team = pair.second;
             for (uint8 arenaType : _validTypes)
