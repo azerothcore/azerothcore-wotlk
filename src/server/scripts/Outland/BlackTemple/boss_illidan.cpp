@@ -188,7 +188,7 @@ public:
 
     bool operator()(Unit* unit) const
     {
-        return unit->GetTypeId() == TYPEID_PLAYER
+        return unit->IsPlayer()
             && unit->GetDistance2d(BladesPositions[0].GetPositionX(), BladesPositions[0].GetPositionY()) > 25.0f
             && unit->GetDistance2d(BladesPositions[1].GetPositionX(), BladesPositions[1].GetPositionY()) > 25.0f;
     }
