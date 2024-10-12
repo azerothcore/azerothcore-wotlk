@@ -16,7 +16,6 @@
  */
 
 // This is where scripts' loading functions should be declared:
-void AddSC_account_commandscript();
 void AddSC_achievement_commandscript();
 void AddSC_arena_commandscript();
 void AddSC_bag_commandscript();
@@ -67,7 +66,6 @@ void AddSC_player_settings_commandscript();
 // void Add${NameOfDirectory}Scripts()
 void AddCommandsScripts()
 {
-    AddSC_account_commandscript();
     AddSC_achievement_commandscript();
     AddSC_arena_commandscript();
     AddSC_bag_commandscript();
