@@ -503,6 +503,7 @@ protected:
 private:
     uint32 const _bossId;
     std::list<HealthCheckEventData> _healthCheckEvents;
+    HealthCheckEventData _nextHealthCheck;
 };
 
 class WorldBossAI : public ScriptedAI

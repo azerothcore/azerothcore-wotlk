@@ -47,7 +47,7 @@ namespace MMAP
         uint32 m_mapId;
         std::set<uint32>* m_tiles{nullptr};
 
-        bool operator==(uint32 id)
+        bool operator==(uint32 id) const
         {
             return m_mapId == id;
         }

@@ -38,10 +38,7 @@ struct AddonInfo
 
 struct SavedAddon
 {
-    SavedAddon(std::string  name, uint32 crc) : Name(std::move(name))
-    {
-        CRC = crc;
-    }
+    SavedAddon(std::string  name, uint32 crc) : Name(std::move(name)), CRC(crc) {}
 
     std::string Name;
     uint32 CRC;
@@ -49,6 +46,9 @@ struct SavedAddon
 
 struct BannedAddon
 {
+    BannedAddon(uint32 id, std::array<uint8, 16> const& nameMD5, std::array<uint8, 16> const& versionMD5, uint32 timestamp)
+        : Id(id), NameMD5(nameMD5), VersionMD5(versionMD5), Timestamp(timestamp) {}
+
     uint32 Id;
     std::array<uint8, 16> NameMD5;
     std::array<uint8, 16> VersionMD5;
