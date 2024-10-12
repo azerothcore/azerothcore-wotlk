@@ -623,7 +623,8 @@ public:
             ExecuteSpeech_Counter = 0;
             PlayerGUID.Clear();
 
-            me->SetImmuneToPC(false);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetImmuneToPC(true);
         }
 
         bool MeetQuestCondition(Player* player)
@@ -734,6 +735,7 @@ public:
                     case 9:
                         Talk(SAY_EXEC_TIME, player);
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                        me->SetReactState(REACT_PASSIVE);
                         me->SetImmuneToPC(false);
                         break;
                     case 10:
