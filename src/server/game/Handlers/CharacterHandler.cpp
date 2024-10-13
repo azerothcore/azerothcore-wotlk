@@ -219,6 +219,14 @@ bool LoginQueryHolder::Initialize()
     stmt->SetData(0, lowGuid);
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_OFFLINE_ACHIEVEMENTS_UPDATES, stmt);
 
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ACCOUNT_TRANSMOG);
+    stmt->SetData(0, m_accountId);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_TRANSMOG, stmt);
+
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_TRANSMOG_SETS);
+    stmt->SetData(0, m_accountId);
+    res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_TRANSMOG_SETS, stmt);
+
     return res;
 }
 
@@ -2176,7 +2184,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         trans->Append(stmt);
 
         // Race specific languages
-        if (factionChangeInfo->Race != RACE_ORC && factionChangeInfo->Race != RACE_HUMAN)
+        if (factionChangeInfo->Race != RACE_ORC && factionChangeInfo->Race != RACE_HUMAN && factionChangeInfo->Race != RACE_WORGEN && factionChangeInfo->Race != RACE_GOBLIN)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SKILL_LANGUAGE);
             stmt->SetData(0, lowGuid);

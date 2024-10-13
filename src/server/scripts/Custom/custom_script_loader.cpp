@@ -28,11 +28,12 @@ void AddSC_npc_1v1arena();
 void AddSC_DeathMatchkill();
 void AddSC_NPC_RANK_VENDOR();
 void AddSC_ServerMenuPlayerGossip();
-void AddSC_npc_custom_boss();
 void AddSC_RewardRangKillBoss();
 void AddSC_CustomBossAnna();
 void AddSC_custom_reload_commands();
 void AddSC_PlayedTimeRewards();
+void AddSC_event_npc();
+void AddSC_Transmogrification();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -49,9 +50,10 @@ void AddCustomScripts()
     AddSC_DeathMatchkill();
     AddSC_NPC_RANK_VENDOR();
     AddSC_ServerMenuPlayerGossip();
-    AddSC_npc_custom_boss();
     AddSC_RewardRangKillBoss();
     AddSC_CustomBossAnna();
     AddSC_custom_reload_commands();
     AddSC_PlayedTimeRewards();
+    AddSC_event_npc();
+    AddSC_Transmogrification();
 }

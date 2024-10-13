@@ -61,6 +61,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "Translate.h"
+#include "Transmogrification.h"
 #include "../../scripts/Custom/CustomTeleport/CustomTeleport.h"
 
  /// @todo: this import is not necessary for compilation and marked as unused by the IDE
@@ -2860,6 +2861,8 @@ void Spell::EffectEnchantItemPerm(SpellEffIndex effIndex)
 
         item_owner->RemoveTradeableItem(itemTarget);
         itemTarget->ClearSoulboundTradeable(item_owner);
+
+        Transmogrification::instance().AddToCollection(item_owner, itemTarget);
     }
 }
 

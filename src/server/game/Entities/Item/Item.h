@@ -232,7 +232,7 @@ public:
     void SetOwnerGUID(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
     [[nodiscard]] Player* GetOwner() const;
 
-    void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND, val); }
+    void SetBinding(bool val);
     [[nodiscard]] bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_SOULBOUND); }
     [[nodiscard]] bool IsBoundAccountWide() const { return GetTemplate()->HasFlag(ITEM_FLAG_IS_BOUND_TO_ACCOUNT) != 0; }
     bool IsBindedNotWith(Player const* player) const;
@@ -357,6 +357,11 @@ public:
     void ClearSoulboundTradeable(Player* currentOwner);
     bool CheckSoulboundTradeExpire();
 
+    void SetTransmog(uint32 entry) { transmog = GetEntry() == entry ? 0 : entry; }
+    void SetEnchant(uint32 entry) { enchant = GetEnchantmentId(PERM_ENCHANTMENT_SLOT) == entry ? 0 : entry; }
+    uint32 GetTransmog() const { return transmog; }
+    uint32 GetEnchant() const { return enchant; }
+
     void BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&) override;
     void AddToObjectUpdate() override;
     void RemoveFromObjectUpdate() override;
@@ -376,5 +381,8 @@ private:
     uint32 m_paidMoney;
     uint32 m_paidExtendedCost;
     AllowedLooterSet allowedGUIDs;
+    
+    uint32 transmog = 0;
+    uint32 enchant = 0;
 };
 #endif

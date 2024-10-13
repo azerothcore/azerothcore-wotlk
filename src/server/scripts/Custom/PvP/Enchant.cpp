@@ -213,7 +213,7 @@ public:
     	player->ApplyEnchantment(item, slot, false);
     	item->SetEnchantment(slot, socketGem, 0, 0);
     	player->ApplyEnchantment(item, slot, true);
-    	ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"%s - успешно был улучшен!","%s - has been successfully improved!"), item->GetTemplate()->Name1.c_str());
+    	ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"{} - успешно был улучшен!","{} - has been successfully improved!"), item->GetTemplate()->Name1.c_str());
     }
 
     void Enchant(Player* player, Item* item, uint32 enchantid)
@@ -233,7 +233,7 @@ public:
     	player->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, false);
     	item->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantid, 0, 0);
     	player->ApplyEnchantment(item, PERM_ENCHANTMENT_SLOT, true);
-        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"%s - успешно был улучшен!","%s - has been successfully improved!"), item->GetTemplate()->Name1.c_str());
+        ChatHandler(player->GetSession()).PSendSysMessage(GetCustomText(player,"{} - успешно был улучшен!","{} - has been successfully improved!"), item->GetTemplate()->Name1.c_str());
     }
 
     /* name list */

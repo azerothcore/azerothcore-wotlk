@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Transmogrification.h"
 #include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
@@ -4133,6 +4134,10 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
                 }
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER);
+                stmt->SetData(0, lowGuid);
+                trans->Append(stmt);
+
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TRANSMOG_SETS);
                 stmt->SetData(0, lowGuid);
                 trans->Append(stmt);
 
@@ -12423,6 +12428,9 @@ float Player::GetReputationPriceDiscount(Creature const* creature) const
 
 float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemplate) const
 {
+    if (HasSpell(69044)) // Best Deals Anywhere
+        return 0.8f;
+    
     if (!factionTemplate || !factionTemplate->faction)
     {
         return 1.0f;
@@ -12580,7 +12588,12 @@ void Player::AutoUnequipOffhandIfNeed(bool force /*= false*/)
     }
     else
     {
+        uint32 transmog = offItem->GetTransmog();
+        uint32 enchant = offItem->GetEnchant();
         MoveItemFromInventory(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND, true);
+        offItem->SetTransmog(transmog);
+        offItem->SetEnchant(enchant);
+
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
         offItem->DeleteFromInventoryDB(trans);                   // deletes item from character's inventory
         offItem->SaveToDB(trans);                                // recursive and not have transaction guard into self, item not in inventory and can be save standalone
@@ -15046,6 +15059,24 @@ void Player::_SaveCharacter(bool create, CharacterDatabaseTransaction trans)
     }
 
     trans->Append(stmt);
+
+    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_TRANSMOG_SETS);
+    stmt->SetData(0, GetGUID().GetCounter());
+    trans->Append(stmt);
+    for (auto&& it : presetMap)
+    {
+        if (it.second.data.empty())
+            continue;
+        std::ostringstream ss;
+        for (auto const & v : it.second.data)
+            ss << static_cast<uint32>(std::get<uint8>(v)) << ' ' << std::get<uint32>(v) << ' ' << static_cast<uint32>(std::get<AppearanceType>(v)) << ' ';
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_TRANSMOG_SETS);
+        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(1, it.first);
+        stmt->SetData(2, it.second.name);
+        stmt->SetData(3, ss.str());
+        trans->Append(stmt);
+    }
 }
 
 void Player::_LoadGlyphs(PreparedQueryResult result)

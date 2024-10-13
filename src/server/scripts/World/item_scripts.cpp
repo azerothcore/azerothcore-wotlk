@@ -274,20 +274,26 @@ public:
 
         if (pPlayer->GetAuraCount(71201) < 100) {
             switch (entry) {
-                case 1042:
-                    rate = 50;
+                case 600013:
+                    rate = 10000;
                     break;
-                case 1043:
-                    rate = 100;
+                case 600014:
+                    rate = 20000;
                     break;
-                case 1044:
-                    rate = 250;
+                case 600015:
+                    rate = 25000;
                     break;
-                case 35778:
-                    rate = 1000;
+                case 600016:
+                    rate = 30000;
                     break;
-                case 842:
-                    rate = 5000;
+                case 600017:
+                    rate = 50000;
+                    break;
+                case 600018:
+                    rate = 100000;
+                    break;
+                case 600019:
+                    rate = 150000;
                     break;
                 default:
                     break;
@@ -297,7 +303,7 @@ public:
         if (rate != 0)
         {
             pPlayer->DestroyItemCount(entry,1,true);
-            pPlayer->RewardRankPoints(rate, 4);
+            pPlayer->RewardRankPoints(rate, 7);
         }
         else
             ChatHandler(pPlayer->GetSession()).PSendSysMessage(GetText(pPlayer,"Вам нужен более высокий ранг для использование данного предмета.","You need a higher rank to use this item."));
@@ -367,51 +373,19 @@ public:
         eng << "|TInterface\\GossipFrame\\Battlemastergossipicon:15:15:|t |cffff9933[Russian roulette]: ";
 
         switch(randomNumber) {
-            case 1:                                     // 1% - 2500 очков арены
-                pPlayer->ModifyArenaPoints(2500);
-                rus << "Вы получили |cffffff4d2500|cffff9933 очков арены.";
-                eng << "You got |cffffff4d2500|cffff9933 arena points.";
-                break;              
+            case 1:                                               
             case 2:
-                pPlayer->ModifyHonorPoints(250000);
-                rus << "Вы получили |cffffff4d250 000|cffff9933 очков чести.";
-                eng << "You got |cffffff4d250 000|cffff9933 honor points.";
-                break;
             case 3:
-                pPlayer->ModifyHonorPoints(250000);
-                rus << "Вы получили |cffffff4d250 000|cffff9933 очков чести.";
-                eng << "You got |cffffff4d250 000|cffff9933 honor points.";
-                break;
             case 4: // 4% - 250к очков чести
                 pPlayer->ModifyHonorPoints(250000);
                 rus << "Вы получили |cffffff4d250 000|cffff9933 очков чести.";
                 eng << "You got |cffffff4d250 000|cffff9933 honor points.";        
                 break;      
             case 6:
-                pPlayer->AddItem(38570, 10);
-                rus << "Вы получили |cffffff4d10|cffff9933 бонусов.";
-                eng << "You got |cffffff4d10|cffff9933 bonuses.";
-                break;
             case 7:
-                pPlayer->AddItem(38570, 10);
-                rus << "Вы получили |cffffff4d10|cffff9933 бонусов.";
-                eng << "You got |cffffff4d10|cffff9933 bonuses.";
-                break;
             case 8:
-                pPlayer->AddItem(38570, 10);
-                rus << "Вы получили |cffffff4d10|cffff9933 бонусов.";
-                eng << "You got |cffffff4d10|cffff9933 bonuses.";
-                break;
             case 9:
-                pPlayer->AddItem(38570, 10);
-                rus << "Вы получили |cffffff4d10|cffff9933 бонусов.";
-                eng << "You got |cffffff4d10|cffff9933 bonuses.";
-                break;
-            case 10:// 5% - 10 бонусов 
-                pPlayer->AddItem(38570, 10);
-                rus << "Вы получили |cffffff4d10|cffff9933 бонусов.";
-                eng << "You got |cffffff4d10|cffff9933 bonuses."; 
-                break;   
+            case 10:
             case 11:
                 pPlayer->ModifyHonorPoints(-50000);
                 rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
@@ -423,45 +397,13 @@ public:
                 eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
                 break;
             case 13:
-                pPlayer->ModifyHonorPoints(-50000);
-                rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
-                eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
-                break;
             case 14:
-                pPlayer->ModifyHonorPoints(-50000);
-                rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
-                eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
-                break;
             case 15:
-                pPlayer->ModifyHonorPoints(-50000);
-                rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
-                eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
-                break;
             case 16:
-                pPlayer->ModifyHonorPoints(-50000);
-                rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
-                eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
-                break;
             case 17:
-                pPlayer->ModifyHonorPoints(-50000);
-                rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
-                eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
-                break;
             case 18:
-                pPlayer->ModifyHonorPoints(-50000);
-                rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
-                eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
-                break;
             case 19:
-                pPlayer->ModifyHonorPoints(-50000);
-                rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
-                eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
-                break;
-            case 20:// 10% - забирает 50к очков чести                          // 10% - забирает 50к очков чести
-                pPlayer->ModifyHonorPoints(-50000);
-                rus << "Вы проеб@ли |cffffff4d50 000|cffff9933 очков чести.";
-                eng << "You fucked up |cffffff4d50 000|cffff9933 honor points.";
-                break;     
+            case 20:
             case 21:
                 pPlayer->AddItem(43228, 100);
                 rus << "Вы получили |cffffff4d100|cffff9933 осколоков каменного хранителя.";
@@ -495,32 +437,16 @@ public:
             case 27:
             case 28:
             case 29:
-            case 30:// 10% - 100 Осколоков каменного хранителя          
+            case 30:
             case 31:
-                pPlayer->CastSpell(pPlayer, 74090, false);
-                rus << "Вы получили |cffffff4dп#зды|cffff9933.";
-                eng << "You got |cffffff4dcunts|cffff9933.";
-                break;
             case 32:
             case 33:
             case 34:
             case 35:
-                pPlayer->CastSpell(pPlayer, 74090, false);
-                rus << "Вы получили |cffffff4dп#зды|cffff9933.";
-                eng << "You got |cffffff4dcunts|cffff9933.";
-                break;
             case 36:
             case 37:
-                pPlayer->CastSpell(pPlayer, 74090, false);
-                rus << "Вы получили |cffffff4dп#зды|cffff9933.";
-                eng << "You got |cffffff4dcunts|cffff9933.";
-                break;
             case 38:
             case 39:
-                pPlayer->CastSpell(pPlayer, 74090, false);
-                rus << "Вы получили |cffffff4dп#зды|cffff9933.";
-                eng << "You got |cffffff4dcunts|cffff9933.";
-                break;
             case 40:
             case 41:
             case 42:
@@ -531,11 +457,7 @@ public:
             case 47:
             case 48:
             case 49:
-            case 50:// 20% - Просто убивает вас (русская рулетка же)
-                pPlayer->CastSpell(pPlayer, 74090, false); 
-                rus << "Вы получили |cffffff4dп#зды|cffff9933.";
-                eng << "You got |cffffff4dcunts|cffff9933.";
-                break;              
+            case 50:// 20% - Просто убивает вас (русская рулетка же)             
             case 51:
             case 52:// 2% - 3 жетона русской рулетки
                 pPlayer->AddItem(52361, 3);
@@ -583,10 +505,10 @@ public:
             case 87:
             case 88:
             case 89:
-            case 90:// 30% - 2 слитка по 250 опыта для ранга
-                pPlayer->AddItem(1044, 2); 
-                rus << "Вы получили |cffffff4d2|cffff9933 слитка по 250 опыта для ранга.";
-                eng << "You got |cffffff4d2|cffff9933 250 xp ingot per rank."; 
+            case 90:// 30% - 2 слитка по 10 000 опыта для ранга
+                pPlayer->AddItem(600013, 2);
+                rus << "Вы получили |cffffff4d2|cffff9933 слитка по 10 000 опыта для ранга.";
+                eng << "You got |cffffff4d2|cffff9933 10 000 xp ingot per rank."; 
                 break;
             case 91:
             case 92:
@@ -600,14 +522,14 @@ public:
             case 96:
             case 97:
             case 98:
-            case 99:// 4% - 10 слитков по 1к опыта для ранга
-                pPlayer->AddItem(35778, 10); 
-                rus << "Вы получили |cffffff4d10|cffff9933 слитка по 1 000 опыта для ранга.";
+            case 99:// 4% - 10 слитков по 20к опыта для ранга
+                pPlayer->AddItem(600014, 10);
+                rus << "Вы получили |cffffff4d10|cffff9933 слитка по 20 000 опыта для ранга.";
                 eng << "You got |cffffff4d10|cffff9933 1000 xp ingot per rank.";
                 break;            
-            case 100:                                   // 1% - 10 слитков по 5к опыта для ранга
-                pPlayer->AddItem(842, 10);
-                rus << "Вы получили |cffffff4d10|cffff9933 слитка по 5 000 опыта для ранга.";
+            case 100:// 1% - 10 слитков по 25к опыта для ранга
+                pPlayer->AddItem(600014, 10);
+                rus << "Вы получили |cffffff4d10|cffff9933 слитка по 25 000 опыта для ранга.";
                 eng << "You got |cffffff4d10|cffff9933 5 000 xp ingot per rank.";
                 break;                   
             default: 
