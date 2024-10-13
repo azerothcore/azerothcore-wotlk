@@ -207,7 +207,7 @@ struct boss_janalai : public BossAI
         me->GetCreaturesWithEntryInRange(eggList, 100.0f, NPC_EGG);
         if (eggList.empty())
             return false;
-        
+
         if (hatchAction == HATCH_RESET)
             for (Creature* egg : eggList)
                 egg->Respawn();
@@ -285,7 +285,7 @@ struct boss_janalai : public BossAI
         FireWall();
         SpawnBombs();
         _isBombing = true;
-    
+
         if (Map* map = me->GetMap())
         {
             map->DoForAllPlayers([&](Player* player)
@@ -347,7 +347,7 @@ struct npc_janalai_firebomb : public NullCreatureAI
 struct npc_janalai_hatcher : public ScriptedAI
 {
     npc_janalai_hatcher(Creature* creature) : ScriptedAI(creature)
-    { 
+    {
         _instance = creature->GetInstanceScript();
     }
 
