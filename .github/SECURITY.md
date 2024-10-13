@@ -90,20 +90,17 @@ We support the following versions of dependencies.
 
 ### Supported GCC Versions:
 
-| GCC   |       Status       |     Recommended      |
-| :---- | :----------------: | :------------------: |
-| 8.4 ≥ | :white_check_mark: | :large_blue_diamond: |
-| 14    | :white_check_mark: |                      |
-| 12    | :white_check_mark: |                      |
-| 11 ≤  |    :red_circle:    |                      |
-
+| GCC  |       Status       |     Recommended      |
+| :--- | :----------------: | :------------------: |
+| 14   | :white_check_mark: | :large_blue_diamond: |
+| 12   | :white_check_mark: |                      |
+| 11 ≤ |    :red_circle:    |                      |
 
 > [!NOTE]
 > We do **NOT** support any repacks that may or may not have been made based on AzerothCore. This is because they are usually based on older versions and there is no way to know what is in the precompiled binaries. Instead, you should compile your binaries from the AzerothCore source. To get started, read the [Installation Guide](https://www.azerothcore.org/wiki/installation).
 
-> [!CAUTION]
+> [!CAUTION] 
 > [Why you should not use repacks to run your WoW server](https://www.mangosrumors.org/why-you-should-not-use-repacks-to-run-your-wow-server/)
-
 
 ## Reporting a Vulnerability
 
