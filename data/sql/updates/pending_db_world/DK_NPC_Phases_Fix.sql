@@ -40,3 +40,106 @@ UPDATE creature SET `phaseMask`=`phaseMask`|2 WHERE (`id1` = 29501) AND (`guid` 
 
 UPDATE creature SET `phaseMask`=`phaseMask`|2 WHERE (`id1` = 28614) AND (`guid` IN (129308, 129309));
 
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 25462) AND (`guid` IN (128738));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28487) AND (`guid` IN (128515, 128516));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29488) AND (`guid` IN (128500, 128501));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28510) AND (`guid` IN (128582));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 27928) AND (`guid` IN (128460));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28486) AND (`guid` IN (128514));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28447) AND (`guid` IN (128481));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28448) AND (`guid` IN (128482));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28449) AND (`guid` IN (128483));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28444) AND (`guid` IN (128470));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28445) AND (`guid` IN (128475));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28356) AND (`guid` IN (129306));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28474) AND (`guid` IN (128507));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28488) AND (`guid` IN (128522, 128523, 128525, 128526));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28472) AND (`guid` IN (128506));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28471) AND (`guid` IN (128505));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28489) AND (`guid` IN (128527, 128528, 128529, 128530, 128531, 128532, 128533, 128534));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28490) AND (`guid` IN (128535, 128536, 128537, 128538, 128539, 128540, 128541, 128542, 128543));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28491) AND (`guid` IN (128545, 128546, 128547, 128548, 128549, 128550, 128551, 128552, 128553));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29203) AND (`guid` IN (128456));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29207) AND (`guid` IN (128458));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29208) AND (`guid` IN (128459));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29205) AND (`guid` IN (128457));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29212) AND (`guid` IN (128465));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28506) AND (`guid` IN (128580));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28500) AND (`guid` IN (128577));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28505) AND (`guid` IN (128579));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28357) AND (`guid` IN (129307));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28383) AND (`guid` IN (129388, 129389, 129390, 129391));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191609) AND (`guid` IN (65961, 65962));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191612) AND (`guid` IN (65963, 65964));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191613) AND (`guid` IN (65965, 65966));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191577) AND (`guid` IN (65915));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191580) AND (`guid` IN (65916));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191581) AND (`guid` IN (65920));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191582) AND (`guid` IN (65921));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191583) AND (`guid` IN (65923));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191584) AND (`guid` IN (65925));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191585) AND (`guid` IN (65926));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191586) AND (`guid` IN (65927));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191587) AND (`guid` IN (65928));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191588) AND (`guid` IN (65929));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191589) AND (`guid` IN (65930));
+
+UPDATE gameobject SET `phaseMask`=`phaseMask` |2 WHERE (`id` = 191590) AND (`guid` IN (65931));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29519) AND (`guid` IN (128557, 128558, 128559));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29520) AND (`guid` IN (128561, 128563));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29565) AND (`guid` IN (128740));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29566) AND (`guid` IN (128742, 128743, 128744));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29567) AND (`guid` IN (128747, 128748, 128749));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 29521) AND (`guid` IN (128565, 128566, 128567, 128568, 128569, 128570, 128571, 128572, 128573, 128574, 128575, 128576));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28385) AND (`guid` IN (129392, 129393, 129395));
+
+UPDATE creature SET `phaseMask`=`phaseMask` |2 WHERE (`id1` = 28386) AND (`guid` IN (129401, 129402, 129404));
