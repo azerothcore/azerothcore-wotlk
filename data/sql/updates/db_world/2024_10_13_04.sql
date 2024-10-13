@@ -1,3 +1,4 @@
+-- DB update 2024_10_13_03 -> 2024_10_13_04
 
 DELETE FROM `creature_text`
 WHERE `CreatureID` = 36856
