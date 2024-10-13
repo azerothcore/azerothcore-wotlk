@@ -1,3 +1,4 @@
+-- DB update 2024_10_13_01 -> 2024_10_13_02
 
 UPDATE creature SET `phaseMask`=`phaseMask`& ~1 WHERE (id1 = 28660) AND (guid IN (129474, 129475, 129476, 129477, 129478, 129479));
 UPDATE creature SET `phaseMask`=`phaseMask`|2  WHERE (id1 = 28660) AND (guid IN (129474, 129475, 129476, 129477, 129478, 129479)); 
