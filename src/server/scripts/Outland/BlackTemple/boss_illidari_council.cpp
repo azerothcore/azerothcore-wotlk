@@ -177,6 +177,7 @@ struct boss_illidari_council : public BossAI
         else if (param == ACTION_END_ENCOUNTER)
         {
             me->setActive(false);
+            me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
             for (uint8 i = DATA_GATHIOS_THE_SHATTERER; i <= DATA_VERAS_DARKSHADOW; ++i)
                 if (Creature* member = instance->GetCreature(i))
                     if (member->IsAlive())
