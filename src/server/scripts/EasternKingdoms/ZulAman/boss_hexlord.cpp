@@ -104,35 +104,6 @@ enum Spells
     SPELL_DK_PLAGUE_STRIKE          = 57599,
     SPELL_DK_DEATH_AND_DECAY        = 43265,
     SPELL_DK_BLOOD_WORMS            = 97630,
-
-
-    // Thurg
-    SPELL_BLOODLUST                 = 43578,
-    SPELL_CLEAVE                    = 15496,
-
-    // Gazakroth
-    SPELL_FIREBOLT                  = 43584,
-
-    // Alyson Antille
-    SPELL_FLASH_HEAL                = 43575,
-    SPELL_DISPEL_MAGIC              = 43577,
-
-    // Lord Raadan
-    SPELL_FLAME_BREATH              = 43582,
-    SPELL_THUNDERCLAP               = 43583,
-
-    // Darkheart
-    SPELL_PSYCHIC_WAIL              = 43590,
-
-    // Slither
-    SPELL_VENOM_SPIT                = 43579,
-
-    // Fenstalker
-    SPELL_VOLATILE_INFECTION        = 43586,
-
-    // Koragg
-    SPELL_COLD_STARE                = 43593,
-    SPELL_MIGHTY_BLOW               = 43592
 };
 
 const Position addPosition[4] =
