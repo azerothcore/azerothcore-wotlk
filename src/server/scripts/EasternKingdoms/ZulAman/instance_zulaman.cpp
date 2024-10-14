@@ -66,6 +66,11 @@ ObjectData const gameObjectData[] =
     { 0,               0                }
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_HEXLORD,    new RectangleBoundary(80.50557f, 920.9858f, 155.88986f, 1015.27563f)}
+};
+
 class instance_zulaman : public InstanceMapScript
 {
 public:
@@ -106,6 +111,7 @@ public:
             LoadObjectData(creatureData, gameObjectData);
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
             SetBossNumber(MAX_ENCOUNTER);
+            LoadBossBoundaries(boundaries);
 
             QuestTimer = 0;
             QuestMinute = 0;
