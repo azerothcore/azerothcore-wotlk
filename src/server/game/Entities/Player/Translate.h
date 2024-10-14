@@ -451,107 +451,68 @@
 
 /************************************************   Transmogrifier.cpp  ********************************************/
 
-#define EN_player_trans_1 "You need a visual diamond!"
-#define RU_player_trans_1 "Вам нужен Визуальный бриллиант!"
+#define EN_player_trans_1 "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|tHow transmogrification works!"
+#define RU_player_trans_1 "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|tКак работает Трансмодификация!"
 
-#define EN_player_trans_2 "On our server, transmogrification is an indicator of strength! The cooler the transmogrification the higher your skill.\n\n"
-#define RU_player_trans_2 "На нашем сервере, трансмогрификация это показатель силы ! Чем круче трансмогрификация тем выше ваш скилл.\n\n"
+#define EN_player_trans_2 "|TInterface/RAIDFRAME/UI-RAIDFRAME-MAINASSIST:30:30:-18:0|t Manage sets!"
+#define RU_player_trans_2 "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|t Как работает Трансмодификация!"
 
-#define EN_player_trans_3 "You can transmog your gear to any item\n"
-#define RU_player_trans_3 "Вы можете трансить вашу экипировку в любой предмет\n"
+#define EN_player_trans_3 "|TInterface/ICONS/INV_Enchant_EssenceCosmicGreater:30:30:-18:0|t Save pending transmogrifications"
+#define RU_player_trans_3 "|TInterface/ICONS/INV_Enchant_EssenceCosmicGreater:30:30:-18:0|t Сохранение трансмогрификацию"
 
-#define EN_player_trans_4 "Example: A staff in a dagger or even a cloth in the skin."
-#define RU_player_trans_4 "Пример: Посох в кинжал или даже ткань в кожу."
+#define EN_player_trans_4 "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t Cancel pending transmogrifications"
+#define RU_player_trans_4 "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t Отмените трансмогрификации"
 
-#define EN_player_trans_5 "|TInterface/ICONS/Spell_holy_devineaegis:26:26:-20:0|tTransmogrification by inventory"
-#define RU_player_trans_5 "|TInterface/ICONS/Spell_holy_devineaegis:26:26:-20:0|tТранс по инвентарю"
+#define EN_player_trans_5 "|TInterface/ICONS/Spell_Holy_Restoration:30:30:-18:0|t Restore original look"
+#define RU_player_trans_5 "|TInterface/ICONS/Spell_Holy_Restoration:30:30:-18:0|t Восстановите первоначальный вид"
 
-#define EN_player_trans_6 "|TInterface/ICONS/Spell_holy_dizzy:26:26:-20:0|tTransmogrification in an invisible slot"
-#define RU_player_trans_6 "|TInterface/ICONS/Spell_holy_dizzy:26:26:-20:0|tТранс в невидимый слот"
+#define EN_player_trans_6 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|t Update menu"
+#define RU_player_trans_6 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:30:30:-18:0|t Обновить меню"
 
-#define EN_player_trans_7 "|TInterface/ICONS/Achievement_bg_trueavshutout:26:26:-20:0|tVisual effects on weapons"
-#define RU_player_trans_7 "|TInterface/ICONS/Achievement_bg_trueavshutout:26:26:-20:0|tВизуальные эффекты на оружие"
+#define EN_player_trans_7 "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t Remove pending transmogrification"
+#define RU_player_trans_7 "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t Удалить трансмогрификацию"
 
-#define EN_player_trans_8 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:26:26:-20:0|tUpdate menu"
-#define RU_player_trans_8 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:26:26:-20:0|tОбновить меню"
+#define EN_player_trans_8 "|TInterface/ICONS/Ability_Vanish:30:30:-18:0|t Hide item"
+#define RU_player_trans_8 "|TInterface/ICONS/Ability_Vanish:30:30:-18:0|t Hide item"
 
-#define EN_player_trans_9 "|TInterface/ICONS/INV_Misc_Book_11:20:20:-20:0|tHow does transmogrification work?"
-#define RU_player_trans_9 "|TInterface/ICONS/INV_Misc_Book_11:20:20:-20:0|tКак работает трансмогрификация?"
+#define EN_player_trans_9 "|TInterface/ICONS/Spell_Holy_Restoration:30:30:-18:0|t Restore original look"
+#define RU_player_trans_9 "|TInterface/ICONS/Spell_Holy_Restoration:30:30:-18:0|t Сбросить все зачарования"
 
-#define EN_player_trans_10 "|TInterface/RAIDFRAME/UI-RAIDFRAME-MAINASSIST:20:20:-20:0|tManaging Sets"
-#define RU_player_trans_10 "|TInterface/RAIDFRAME/UI-RAIDFRAME-MAINASSIST:20:20:-20:0|tУправление наборами"
+#define EN_player_trans_10 "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t Remove pending enchant"
+#define RU_player_trans_10 "|TInterface/ICONS/INV_Enchant_Disenchant:30:30:-18:0|t Снять зачарования"
 
-#define EN_player_trans_11 "|TInterface/ICONS/INV_Enchant_Disenchant:20:20:-20:0|tDelete all changes"
-#define RU_player_trans_11 "|TInterface/ICONS/INV_Enchant_Disenchant:20:20:-20:0|tУдалить все изменение"
+#define EN_player_trans_11 "|TInterface/ICONS/Ability_Vanish:30:30:-18:0|t Hide enchant"
+#define RU_player_trans_11 "|TInterface/ICONS/Ability_Vanish:30:30:-18:0|t Скрыть, зачарования"
 
-#define EN_player_trans_12 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:-20:0|tBack"
-#define RU_player_trans_12 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:-20:0|tНазад"
+#define EN_player_trans_12 "|TInterface/ICONS/Spell_Holy_Restoration:30:30:-18:0|t Restore original look"
+#define RU_player_trans_12 "|TInterface/ICONS/Spell_Holy_Restoration:30:30:-18:0|t Сбросить Транмодификацию"
 
-#define EN_player_trans_13 "The invisible slot is successfully active."
-#define RU_player_trans_13 "Невидимый слот успешно активен."
+#define EN_player_trans_13 "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|t How sets work"
+#define RU_player_trans_13 "|TInterface/ICONS/INV_Misc_Book_11:30:30:-18:0|t Как работают декорации"
 
-#define EN_player_trans_14 "The invisible slot has been successfully disabled."
-#define RU_player_trans_14 "Невидимый слот успешно был отключен."
+#define EN_player_trans_14 "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:30:30:-18:0|t Save set"
+#define RU_player_trans_14 "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:30:30:-18:0|t Сохранить Набор"
 
-#define EN_player_trans_15 "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20:-20:0|tSave set"
-#define RU_player_trans_15 "|TInterface/GuildBankFrame/UI-GuildBankFrame-NewTab:20:20:-20:0|tСохранить набор"
+#define EN_player_trans_15 "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t Back.."
+#define RU_player_trans_15 "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t Назад.."
 
-#define EN_player_trans_16 "Paste the name of the set"
-#define RU_player_trans_16 "Вставьте имя набора"
+#define EN_player_trans_16 "|TInterface/ICONS/INV_Misc_Statue_02:30:30:-18:0|t Use set"
+#define RU_player_trans_16 "|TInterface/ICONS/INV_Misc_Statue_02:30:30:-18:0|t Использовать набор"
 
-#define EN_player_trans_17 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:-20:0|tUpdate menu"
-#define RU_player_trans_17 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:20:20:-20:0|tОбновить меню"
+#define EN_player_trans_17 "|TInterface/ICONS/INV_Misc_Statue_02:30:30:-18:0|t Rename set"
+#define RU_player_trans_17 "|TInterface/ICONS/INV_Misc_Statue_02:30:30:-18:0|t Переименовать набор"
 
-#define EN_player_trans_18 "|TInterface/ICONS/Ability_Spy:20:20:-20:0|tBack"
-#define RU_player_trans_18 "|TInterface/ICONS/Ability_Spy:20:20:-20:0|tНазад"
+#define EN_player_trans_18 "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:30:30:-18:0|t Delete set"
+#define RU_player_trans_18 "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:30:30:-18:0|t Удалить набор"
 
-#define EN_player_trans_19 "|TInterface/ICONS/INV_Enchant_Disenchant:20:20:-20:0|tDelete all changes"
-#define RU_player_trans_19 "|TInterface/ICONS/INV_Enchant_Disenchant:20:20:-20:0|tУдалить все изменение"
+#define EN_player_trans_19 "|TInterface/ICONS/Spell_ChargePositive:30:30:-18:0|t Next page"
+#define RU_player_trans_19 "|TInterface/ICONS/Spell_ChargePositive:30:30:-18:0|t Следующия страницы"
 
-#define EN_player_trans_20 "|TInterface/ICONS/INV_Misc_Statue_02:20:20:-20:0|tUse set"
-#define RU_player_trans_20 "|TInterface/ICONS/INV_Misc_Statue_02:20:20:-20:0|tИспользовать набор"
+#define EN_player_trans_20 "|TInterface/ICONS/Spell_ChargeNegative:30:30:-18:0|t Previous page"
+#define RU_player_trans_20 "|TInterface/ICONS/Spell_ChargeNegative:30:30:-18:0|t Предыдущая страница"
 
-#define EN_player_trans_21 "Using this set for transformation will lead to binding of the elements transferred to you and make them unrecoverable and irreplaceable.\nDo you want to continue?\n\n"
-#define RU_player_trans_21 "Использование этого набора для трансформирования приведет к связыванию передаваемых вам элементов и сделает их невозмещаемыми и невосполнимыми.\nВы хотите продолжить?\n\n"
-
-#define EN_player_trans_22 "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:20:20:-20:0|tDelete set"
-#define RU_player_trans_22 "|TInterface/PaperDollInfoFrame/UI-GearManager-LeaveItem-Opaque:20:20:-20:0|tУдалить набор"
-
-#define EN_player_trans_23 "Are you sure you want to delete "
-#define RU_player_trans_23 "Вы уверены, что хотите удалить "
-
-#define EN_player_trans_24 "|TInterface/ICONS/INV_Misc_Book_11:20:20:-20:0|tHow does it work?"
-#define RU_player_trans_24 "|TInterface/ICONS/INV_Misc_Book_11:20:20:-20:0|tКак работает?"
-
-#define EN_player_trans_25 "|TInterface/PaperDoll/UI-PaperDoll-Slot-MainHand:26:26:-20:0|tRight hand"
-#define RU_player_trans_25 "|TInterface/PaperDoll/UI-PaperDoll-Slot-MainHand:26:26:-20:0|tПравая Рука"
-
-#define EN_player_trans_26 "|TInterface/PaperDoll/UI-PaperDoll-Slot-SecondaryHand:26:26:-20:0|tLeft hand"
-#define RU_player_trans_26 "|TInterface/PaperDoll/UI-PaperDoll-Slot-SecondaryHand:26:26:-20:0|tЛевая Рука"
-
-#define EN_player_trans_27 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:26:26:-20:0|tBack"
-#define RU_player_trans_27 "|TInterface/PaperDollInfoFrame/UI-GearManager-Undo:26:26:-20:0|tНазад"
-
-#define EN_player_trans_28 "This function makes it possible to give a random visual effect to your weapon. All effects are preserved and do not propagate after the log.\n\n"
-#define RU_player_trans_28 "Данная функция дает возможность выдать рандом визульный еффект на ваше оружие. Все еффекты сохраняются и не проподает после релога.\n\n"
-
-#define EN_player_trans_29 "Cost: |cff730099[Visual diamond]|r x1\n"
-#define RU_player_trans_29 "Стоимость: |cff730099[Визуальный бриллиант]|r x1\n"
-
-#define EN_player_trans_30 "This coin can be purchased at rank 3."
-#define RU_player_trans_30 "Данную монету можно купить на 3 ранге."
-
-#define EN_player_trans_31 "You need a Invisible Thunderstorm x1!"
-#define RU_player_trans_31 "Вам нужна Невидимая Гроза x1!"
-
-#define EN_player_trans_32 "Cost: |cff730099[Invisible Thunderstorm]|r x1\n"
-#define RU_player_trans_32 "Стоимость: |cff730099[Невидимая Гроза]|r x1\n"
-
-#define EN_player_trans_33 "This coin can be purchased at rank 4."
-#define RU_player_trans_33 "Данную монету можно купить на 4 ранге."
-
-#define EN_player_trans_34 "This function will allow you to hide the appearance of the object, make it invisible.\n\n"
-#define RU_player_trans_34 "Данная функция позволит вам скрыть вид предмета, сделать его невидимым.\n\n"
+#define EN_player_trans_21 "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t Show main menu"
+#define RU_player_trans_21 "|TInterface/ICONS/Ability_Spy:30:30:-18:0|t Показать главное меню"
 
 #define EN_player_gossip_text_1 "Greetings|cffB404AE "
 #define RU_player_gossip_text_1 "Уважаемый|cffB404AE "
