@@ -225,9 +225,9 @@ static PlayerAbilityStruct PlayerAbility[12][3] =
     },
     // 10 UNK class (should never be set)
     {
-        {NULL, ABILITY_TARGET_SELF, 0ms},
-        {NULL, ABILITY_TARGET_SELF, 0ms},
-        {NULL, ABILITY_TARGET_SELF, 0ms}
+        {0, ABILITY_TARGET_SELF, 0ms},
+        {0, ABILITY_TARGET_SELF, 0ms},
+        {0, ABILITY_TARGET_SELF, 0ms}
     },
     // 11 druid
     {   {SPELL_DR_LIFEBLOOM, ABILITY_TARGET_HEAL, 10000ms},
@@ -289,10 +289,12 @@ struct boss_hexlord_malacrass : public BossAI
                         siphonTrigger->AI()->DoCast(target, SPELL_SIPHON_SOUL, true);
                         siphonTrigger->GetMotionMaster()->MoveChase(me);
                         if (Player* player = target->ToPlayer())
+                        {
                             if (player->HasAura(AURA_SHADOW_FORM))
                                 _currentClass = ADDITIONAL_CLASS_SPRIEST;
                             else
                                 _currentClass = player->getClass() - 1;
+                        }
                     }
                 }
             });
