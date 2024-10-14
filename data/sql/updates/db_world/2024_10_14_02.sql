@@ -1,3 +1,4 @@
+-- DB update 2024_10_14_01 -> 2024_10_14_02
 -- Update creature 'Raging Soul' with sniffed values
 
 -- new spawns
