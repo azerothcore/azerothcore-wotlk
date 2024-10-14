@@ -167,8 +167,6 @@ public:
 
         void Reset() override
         {
-            instance->SetData(DATA_ZULJINEVENT, NOT_STARTED);
-
             Phase = 0;
 
             health_20 = me->CountPctFromMaxHealth(20);
@@ -203,8 +201,6 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            instance->SetData(DATA_ZULJINEVENT, IN_PROGRESS);
-
             DoZoneInCombat();
 
             Talk(YELL_INTRO);
@@ -222,7 +218,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            instance->SetData(DATA_ZULJINEVENT, DONE);
+            instance->SetData(DATA_ZULJIN, DONE);
 
             Talk(YELL_DEATH);
             Summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
