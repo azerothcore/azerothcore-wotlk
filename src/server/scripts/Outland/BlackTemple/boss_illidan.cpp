@@ -624,6 +624,10 @@ struct boss_illidan_stormrage : public BossAI
 
         BossAI::EnterEvadeMode(why);
         me->DespawnOnEvade();
+
+        me->m_Events.CancelEventGroup(GROUP_BERSERK);
+        me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
+        me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
     }
 
     void JustSummoned(Creature* summon) override
