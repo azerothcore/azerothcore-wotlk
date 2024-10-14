@@ -99,6 +99,12 @@ enum Spells
     SPELL_WR_WHIRLWIND              = 43442,
     SPELL_WR_SPELL_REFLECT          = 43443,
 
+    // Death Knight
+    SPELL_DK_PLAGUE_STRIKE          = 57599,
+    SPELL_DK_DEATH_AND_DECAY        = 43265,
+    SPELL_DK_BLOOD_WORMS            = 97630,
+
+
     // Thurg
     SPELL_BLOODLUST                 = 43578,
     SPELL_CLEAVE                    = 15496,
@@ -128,22 +134,25 @@ enum Spells
     SPELL_MIGHTY_BLOW               = 43592
 };
 
-#define ORIENT                  1.5696f
-#define POS_Y                   921.2795f
-#define POS_Z                   33.8883f
-
-static float Pos_X[4] = {112.8827f, 107.8827f, 122.8827f, 127.8827f};
-
-static uint32 AddEntryList[8] =
+const Position addPosition[4] =
 {
-    24240, //Alyson Antille
-    24241, //Thurg
-    24242, //Slither
-    24243, //Lord Raadan
-    24244, //Gazakroth
-    24245, //Fenstalker
-    24246, //Darkheart
-    24247  //Koragg
+    {112.8827f, 921.2795f, 33.8883f, 1.5696f},
+    {107.8827f, 921.2795f, 33.8883f, 1.5696f},
+    {122.8827f, 921.2795f, 33.8883f, 1.5696f},
+    {127.8827f, 921.2795f, 33.8883f, 1.5696f}
+};
+
+static uint32 addEntrySets[4][2] =
+{
+    {24240, 24241}, // Thurg or Alyson Antille
+    {24242, 24243}, // Lord Raadan or Slither
+    {24244, 24245}, // Gazakroth or Fenstalker
+    {24246, 24247}  // Darkheart or Koragg
+};
+
+enum Misc
+{
+    MAX_ADD_COUNT       = 4
 };
 
 enum AbilityTarget
@@ -214,298 +223,56 @@ static PlayerAbilityStruct PlayerAbility[][3] =
     {   {SPELL_DR_LIFEBLOOM, ABILITY_TARGET_HEAL, 10000},
         {SPELL_DR_THORNS, ABILITY_TARGET_SELF, 10000},
         {SPELL_DR_MOONFIRE, ABILITY_TARGET_ENEMY, 8000}
+    },
+    // 12 death knight
+    {
+        {SPELL_DK_PLAGUE_STRIKE, ABILITY_TARGET_ENEMY, 2000},
+        {SPELL_DK_DEATH_AND_DECAY, ABILITY_TARGET_SELF, 10000},
+        {SPELL_DK_BLOOD_WORMS, ABILITY_TARGET_ENEMY, 5000}
     }
 };
 
-struct boss_hexlord_addAI : public ScriptedAI
+struct boss_hexlord_malacrass : public BossAI
 {
-    InstanceScript* instance;
+    boss_hexlord_malacrass(Creature* creature) : BossAI(creature, DATA_HEXLORD) { }
 
-    boss_hexlord_addAI(Creature* creature) : ScriptedAI(creature)
+    void Reset() override
     {
-        instance = creature->GetInstanceScript();
+        BossAI::Reset();
+        SpawnAdds();
     }
 
-    void Reset() override { }
-
-    void JustEngagedWith(Unit* /*who*/) override
+    void SpawnAdds()
     {
-        DoZoneInCombat();
+        for (uint8 i = 0; i < MAX_ADD_COUNT; ++i)
+        {
+            uint8 flip = urand(0, 1);
+            me->SummonCreature(addEntrySets[i][flip], addPosition[i], TEMPSUMMON_DEAD_DESPAWN, 0);
+        }
     }
 
-    void UpdateAI(uint32 /*diff*/) override
+    void JustEngagedWith(Unit* who) override
     {
-        if (instance->GetData(DATA_HEXLORDEVENT) != IN_PROGRESS)
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+        summons.DoForAllSummons([&](WorldObject* summon)
         {
-            EnterEvadeMode();
-            return;
-        }
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-class boss_hexlord_malacrass : public CreatureScript
-{
-public:
-    boss_hexlord_malacrass()
-        : CreatureScript("boss_hexlord_malacrass")
-    {
+            if (Creature* add = summon->ToCreature())
+                add->SetInCombatWithZone();
+        });
     }
 
-    struct boss_hex_lord_malacrassAI : public ScriptedAI
+    void KilledUnit(Unit* victim) override
     {
-        boss_hex_lord_malacrassAI(Creature* creature) : ScriptedAI(creature)
-        {
-            instance = creature->GetInstanceScript();
-            SelectAddEntry();
-        }
+        BossAI::KilledUnit(victim);
+        if (urand(0, 1))
+            Talk(SAY_KILL_ONE);
+        else
+            Talk(SAY_KILL_TWO);
+    }
 
-        InstanceScript* instance;
-
-        ObjectGuid AddGUID[4];
-        uint32 AddEntry[4];
-
-        ObjectGuid PlayerGUID;
-
-        uint32 SpiritBolts_Timer;
-        uint32 DrainPower_Timer;
-        uint32 SiphonSoul_Timer;
-        uint32 PlayerAbility_Timer;
-        uint32 CheckAddState_Timer;
-        uint32 ResetTimer;
-
-        uint32 PlayerClass;
-
-        void Reset() override
-        {
-            instance->SetData(DATA_HEXLORDEVENT, NOT_STARTED);
-
-            SpiritBolts_Timer = 20000;
-            DrainPower_Timer = 60000;
-            SiphonSoul_Timer = 100000;
-            PlayerAbility_Timer = 99999;
-            CheckAddState_Timer = 5000;
-            ResetTimer = 5000;
-
-            SpawnAdds();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            instance->SetData(DATA_HEXLORDEVENT, IN_PROGRESS);
-
-            DoZoneInCombat();
-            Talk(SAY_AGGRO);
-
-            for (uint8 i = 0; i < 4; ++i)
-            {
-                Creature* creature = ObjectAccessor::GetCreature(*me, AddGUID[i]);
-                if (creature && creature->IsAlive())
-                    creature->AI()->AttackStart(me->GetVictim());
-                else
-                {
-                    EnterEvadeMode();
-                    break;
-                }
-            }
-        }
-
-        void KilledUnit(Unit* /*victim*/) override
-        {
-            switch (urand(0, 1))
-            {
-                case 0:
-                    Talk(SAY_KILL_ONE);
-                    break;
-                case 1:
-                    Talk(SAY_KILL_TWO);
-                    break;
-            }
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetData(DATA_HEXLORDEVENT, DONE);
-
-            Talk(SAY_DEATH);
-
-            for (uint8 i = 0; i < 4; ++i)
-            {
-                Unit* Temp = ObjectAccessor::GetUnit(*me, AddGUID[i]);
-                if (Temp && Temp->IsAlive())
-                    Unit::DealDamage(Temp, Temp, Temp->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-            }
-        }
-
-        void SelectAddEntry()
-        {
-            std::vector<uint32> AddList;
-
-            for (uint8 i = 0; i < 8; ++i)
-                AddList.push_back(AddEntryList[i]);
-
-            while (AddList.size() > 4)
-                AddList.erase(AddList.begin() + rand() % AddList.size());
-
-            uint8 i = 0;
-            for (std::vector<uint32>::const_iterator itr = AddList.begin(); itr != AddList.end(); ++itr, ++i)
-                AddEntry[i] = *itr;
-        }
-
-        void SpawnAdds()
-        {
-            for (uint8 i = 0; i < 4; ++i)
-            {
-                Creature* creature = (ObjectAccessor::GetCreature((*me), AddGUID[i]));
-                if (!creature || !creature->IsAlive())
-                {
-                    if (creature) creature->setDeathState(DeathState::Dead);
-                    creature = me->SummonCreature(AddEntry[i], Pos_X[i], POS_Y, POS_Z, ORIENT, TEMPSUMMON_DEAD_DESPAWN, 0);
-                    if (creature) AddGUID[i] = creature->GetGUID();
-                }
-                else
-                {
-                    creature->AI()->EnterEvadeMode();
-                    creature->SetPosition(Pos_X[i], POS_Y, POS_Z, ORIENT);
-                    creature->StopMovingOnCurrentPos();
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (ResetTimer <= diff)
-            {
-                if (me->IsWithinDist3d(119.223f, 1035.45f, 29.4481f, 10))
-                {
-                    EnterEvadeMode();
-                    return;
-                }
-                ResetTimer = 5000;
-            }
-            else ResetTimer -= diff;
-
-            if (CheckAddState_Timer <= diff)
-            {
-                for (uint8 i = 0; i < 4; ++i)
-                    if (Creature* temp = ObjectAccessor::GetCreature(*me, AddGUID[i]))
-                        if (temp->IsAlive() && !temp->GetVictim())
-                            temp->AI()->AttackStart(me->GetVictim());
-
-                CheckAddState_Timer = 5000;
-            }
-            else CheckAddState_Timer -= diff;
-
-            if (DrainPower_Timer <= diff)
-            {
-                DoCast(me, SPELL_DRAIN_POWER, true);
-                Talk(SAY_DRAIN_POWER);
-                DrainPower_Timer = urand(40000, 55000);    // must cast in 60 sec, or buff/debuff will disappear
-            }
-            else DrainPower_Timer -= diff;
-
-            if (SpiritBolts_Timer <= diff)
-            {
-                if (DrainPower_Timer < 12000)    // channel 10 sec
-                    SpiritBolts_Timer = 13000;   // cast drain power first
-                else
-                {
-                    DoCast(me, SPELL_SPIRIT_BOLTS, false);
-                    Talk(SAY_SPIRIT_BOLTS);
-                    SpiritBolts_Timer = 40000;
-                    SiphonSoul_Timer = 10000;    // ready to drain
-                    PlayerAbility_Timer = 99999;
-                }
-            }
-            else SpiritBolts_Timer -= diff;
-
-            if (SiphonSoul_Timer <= diff)
-            {
-                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 70, true);
-                Unit* trigger = DoSpawnCreature(NPC_TEMP_TRIGGER, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 30000);
-                if (!target || !trigger)
-                {
-                    EnterEvadeMode();
-                    return;
-                }
-                else
-                {
-                    trigger->SetDisplayId(11686);
-                    trigger->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    trigger->CastSpell(target, SPELL_SIPHON_SOUL, true);
-                    trigger->GetMotionMaster()->MoveChase(me);
-
-                    //DoCast(target, SPELL_SIPHON_SOUL, true);
-                    //me->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, target->GetGUID());
-                    //me->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_SIPHON_SOUL);
-
-                    PlayerGUID = target->GetGUID();
-                    PlayerAbility_Timer = urand(8000, 10000);
-                    PlayerClass = target->getClass() - 1;
-
-                    if (target->IsClass(CLASS_DRUID))
-                        PlayerClass = CLASS_DRUID;
-                    else if (target->IsClass(CLASS_PRIEST) && target->HasSpell(15473))
-                        PlayerClass = CLASS_PRIEST; // shadow priest
-
-                    SiphonSoul_Timer = 99999;   // buff lasts 30 sec
-                }
-            }
-            else SiphonSoul_Timer -= diff;
-
-            if (PlayerAbility_Timer <= diff)
-            {
-                //Unit* target = ObjectAccessor::GetUnit(*me, PlayerGUID);
-                //if (target && target->IsAlive())
-                //{
-                UseAbility();
-                PlayerAbility_Timer = urand(8000, 10000);
-                //}
-            }
-            else PlayerAbility_Timer -= diff;
-
-            DoMeleeAttackIfReady();
-        }
-
-        void UseAbility()
-        {
-            uint8 random = urand(0, 2);
-            Unit* target = nullptr;
-            switch (PlayerAbility[PlayerClass][random].target)
-            {
-                case ABILITY_TARGET_SELF:
-                    target = me;
-                    break;
-                case ABILITY_TARGET_VICTIM:
-                    target = me->GetVictim();
-                    break;
-                case ABILITY_TARGET_ENEMY:
-                default:
-                    target = SelectTarget(SelectTargetMethod::Random, 0, 100, true);
-                    break;
-                case ABILITY_TARGET_HEAL:
-                    target = DoSelectLowestHpFriendly(50, 0);
-                    break;
-                case ABILITY_TARGET_BUFF:
-                    {
-                        std::list<Creature*> templist = DoFindFriendlyMissingBuff(50, PlayerAbility[PlayerClass][random].spell);
-                        if (!templist.empty())
-                            target = *(templist.begin());
-                    }
-                    break;
-            }
-            if (target)
-                DoCast(target, PlayerAbility[PlayerClass][random].spell, false);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustDied(Unit* /*killer*/) override
     {
-        return GetZulAmanAI<boss_hex_lord_malacrassAI>(creature);
     }
 };
 
@@ -634,7 +401,7 @@ class spell_hexlord_unstable_affliction : public AuraScript
 
 void AddSC_boss_hex_lord_malacrass()
 {
-    new boss_hexlord_malacrass();
-    new boss_alyson_antille();
+    //new boss_hexlord_malacrass();
+    //new boss_alyson_antille();
     RegisterSpellScript(spell_hexlord_unstable_affliction);
 }
