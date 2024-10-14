@@ -30,7 +30,6 @@ EndScriptData */
 
 enum Misc
 {
-    MAX_ENCOUNTER                  = 7,
     RAND_VENDOR                    = 2,
     WORLDSTATE_SHOW_TIMER          = 3104,
     WORLDSTATE_TIME_TO_SACRIFICE   = 3106
