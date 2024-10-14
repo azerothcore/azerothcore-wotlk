@@ -340,7 +340,7 @@ struct boss_gathios_the_shatterer : public boss_illidari_council_memberAI
             if (roll_chance_i(50))
                 Talk(SAY_COUNCIL_SPECIAL);
             DoCastSelf(SPELL_CONSECRATION);
-            events.ScheduleEvent(EVENT_SPELL_AURA, 30s);
+            events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 30s);
             break;
         case EVENT_SPELL_HAMMER_OF_JUSTICE:
             if (Unit* target = me->GetVictim())
