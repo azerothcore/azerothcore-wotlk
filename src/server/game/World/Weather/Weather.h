@@ -60,17 +60,16 @@ enum WeatherState : uint32
     WEATHER_STATE_BLACKSNOW         = 106
 };
 
-enum WeatherType
-{
-    WEATHER_TYPE_FINE       = 0,
-    WEATHER_TYPE_RAIN       = 1,
-    WEATHER_TYPE_SNOW       = 2,
-    WEATHER_TYPE_STORM      = 3,
-    WEATHER_TYPE_THUNDERS   = 86,
-    WEATHER_TYPE_BLACKRAIN  = 90
+enum WEATHER_TYPE {
+  WEATHER_TYPE_FINE   = 0x0,
+  WEATHER_TYPE_RAIN   = 0x1,
+  WEATHER_TYPE_SNOW   = 0x2,
+  WEATHER_TYPE_STORM  = 0x3,
+  MAX_WEATHER_TYPE    = 0x4,
+  //TODO:
+  WEATHER_TYPE_THUNDERS   = 86,
+  WEATHER_TYPE_BLACKRAIN  = 90
 };
-
-#define MAX_WEATHER_TYPE 4
 
 /// Weather for one zone
 class Weather
@@ -84,7 +83,7 @@ public:
     bool UpdateWeather();
 
     void SendWeatherUpdateToPlayer(Player* player);
-    void SetWeather(WeatherType type, float grade);
+    void SetWeather(WEATHER_TYPE type, float grade);
 
     /// For which zone is this weather?
     [[nodiscard]] uint32 GetZone() const { return m_zone; };
@@ -93,7 +92,7 @@ public:
 private:
     [[nodiscard]] WeatherState GetWeatherState() const;
     uint32 m_zone;
-    WeatherType m_type;
+    WEATHER_TYPE m_type;
     float m_grade;
     IntervalTimer m_timer;
     WeatherData const* m_weatherChances;

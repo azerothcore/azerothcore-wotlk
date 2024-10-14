@@ -1825,7 +1825,7 @@ public:
             return false;
         }
 
-        weather->SetWeather(WeatherType(type), grade);
+        weather->SetWeather(WEATHER_TYPE(type), grade);
 
         return true;
     }

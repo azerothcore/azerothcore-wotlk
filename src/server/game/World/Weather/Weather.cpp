@@ -83,7 +83,7 @@ bool Weather::ReGenerate()
         return false;
 
     // remember old values
-    WeatherType old_type = m_type;
+    WEATHER_TYPE old_type = m_type;
     float old_grade = m_grade;
 
     //78 days between January 1st and March 20nd; 365/4=91 days by season
@@ -258,7 +258,7 @@ bool Weather::UpdateWeather()
 }
 
 /// Set the weather
-void Weather::SetWeather(WeatherType type, float grade)
+void Weather::SetWeather(WEATHER_TYPE type, float grade)
 {
     if (m_type == type && m_grade == grade)
         return;
