@@ -1,3 +1,4 @@
+-- DB update 2024_10_14_03 -> 2024_10_14_04
 -- Update gameobject 'Draenethyst Mine Crystal' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (184689))
