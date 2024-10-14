@@ -3133,18 +3133,6 @@ enum CorpseDynFlags
     CORPSE_DYNFLAG_LOOTABLE        = 0x0001
 };
 
-enum WeatherType
-{
-    WEATHER_TYPE_FINE       = 0,
-    WEATHER_TYPE_RAIN       = 1,
-    WEATHER_TYPE_SNOW       = 2,
-    WEATHER_TYPE_STORM      = 3,
-    WEATHER_TYPE_THUNDERS   = 86,
-    WEATHER_TYPE_BLACKRAIN  = 90
-};
-
-#define MAX_WEATHER_TYPE 4
-
 // EnumUtils: DESCRIBE THIS
 enum ChatMsg
 {
