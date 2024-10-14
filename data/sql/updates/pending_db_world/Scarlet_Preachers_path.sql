@@ -1,7 +1,4 @@
 
--- Init New Paths
-
-
 DELETE FROM `waypoint_data` WHERE `id` = 12916500;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 ('12916500', '1', '1477.94', '-5793.97', '131.225', NULL, '0', '0', '0', '100', '0'),
@@ -78,22 +75,12 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 ('12917100', '13', '1385.91', '-5701.93', '137.997', NULL, '0', '0', '0', '100', '0'),
 ('12917100', '14', '1389.99', '-5705.07', '136.058', NULL, '0', '0', '0', '100', '0');
 
-
---Change spawn point for a preacher
-
-
 UPDATE `creature` SET `position_x` = 1389.9873, `position_y` = -5705.0527, `position_z` = 136.05995 WHERE `guid` = 129171 AND `id1` = 28594;
-
-
---Change Movement Type for the Preachers
 
 UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 129165 AND `id1` = 28594;
 UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 129168 AND `id1` = 28594;
 UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 129170 AND `id1` = 28594;
 UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 129171 AND `id1` = 28594;
-
-
---Init pathfinding (I have no idea how best to configure this init. It is Keira setup, but it works.).
 
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (129165, 129168, 129170, 129171));
