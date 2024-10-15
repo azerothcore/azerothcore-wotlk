@@ -15,7 +15,6 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 
 DELETE FROM `waypoint_data` WHERE `id` = 12873600;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-
 (12873600, 1, 1544.95, -5795.18, 120.667, NULL, 0, 0, 0, 100, 0),
 (12873600, 2, 1522.59, -5795.45, 129.724, NULL, 0, 0, 0, 100, 0),
 (12873600, 3, 1484.63, -5807.62, 131.214, NULL, 0, 0, 0, 100, 0),
