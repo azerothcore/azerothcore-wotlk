@@ -1,3 +1,4 @@
+-- DB update 2024_10_14_29 -> 2024_10_15_30
 
 UPDATE `creature_template` SET `MovementType`= 0, `movementId`= 0 WHERE (`entry` = 28683);
 UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 128455 AND `id1` = 28683;
