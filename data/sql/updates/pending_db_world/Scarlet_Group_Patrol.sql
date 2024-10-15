@@ -50,7 +50,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 
 UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 128736 AND `id1` = 28530;
-UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 8WHERE `guid` = 128705 AND `id1` = 28529;
+UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128705 AND `id1` = 28529;
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128706 AND `id1` = 28529;
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128707 AND `id1` = 28529;
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128708 AND `id1` = 28529;
