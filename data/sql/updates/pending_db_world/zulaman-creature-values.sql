@@ -21,7 +21,6 @@ UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run`
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 1.1429,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23807;
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 1.1429,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23813;
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 1.1429,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23814;
--- 23815
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 1.1429,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23817;
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 1.4286,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23834;
 UPDATE `creature_template` SET `speed_walk` = 2.4,                   `speed_run` = 2.1429,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 23863;
@@ -43,7 +42,6 @@ UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run`
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 1.1429,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 24363;
 UPDATE `creature_template` SET `speed_walk` = 0.6666679859161376952, `speed_run` = 1.4286,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 24374;
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 1.1429,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 24396;
--- 24444
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 2,                        `BaseAttackTime` = 1800, `RangeAttackTime` = 1800 WHERE `entry` = 24530;
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 1.4286,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 24549;
 UPDATE `creature_template` SET `speed_walk` = 1,                     `speed_run` = 1.1429,                   `BaseAttackTime` = 2000, `RangeAttackTime` = 2000 WHERE `entry` = 25173;
