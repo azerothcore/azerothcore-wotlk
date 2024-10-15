@@ -35,13 +35,15 @@ function import() {
     PENDING_PATH="$AC_PATH_ROOT/data/sql/updates/pending_db_$1"
     UPDATES_DIR="$UPDATES_PATH/db_$1"
 
-    # Get latest SQL file applied to this database
+    # Get the most recent SQL file applied to this database. Used for the header comment
     LATEST_UPDATE="$(find "$UPDATES_DIR" -iname "*.sql" | sort -h | tail -n 1)"
+    # Get latest SQL file applied to this database, today. This could be empty.
+    LATEST_UPDATE_TODAY="$(find "$UPDATES_DIR" -iname "$TODAY*.sql" | sort -h | tail -n 1)"
 
     for entry in "$PENDING_PATH"/*.sql
     do
         if [[ -f "$entry" ]]; then
-            INDEX="$(get_next_index "$LATEST_UPDATE")"
+            INDEX="$(get_next_index "$LATEST_UPDATE_TODAY")"
             OUTPUT_FILE="${UPDATES_DIR}/${TODAY}_${INDEX}.sql"
 
             # ensure a note is added as a header comment
@@ -51,6 +53,7 @@ function import() {
             # remove the unneeded file
             rm -f "$entry"
             # set the newest file to the file we just moved
+            LATEST_UPDATE_TODAY="$OUTPUT_FILE"
             LATEST_UPDATE="$OUTPUT_FILE"
         fi
     done
