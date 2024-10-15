@@ -1,6 +1,5 @@
 
-UPDATE `creature_template` SET `MovementType`= 0 WHERE (`entry` = 28683);
-UPDATE `creature_template` SET `movementId`= 0 WHERE (`entry` = 28683);
+UPDATE `creature_template` SET `MovementType`= 0, `movementId`= 0 WHERE (`entry` = 28683);
 UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 128455 AND `id1` = 28683;
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (128455));
