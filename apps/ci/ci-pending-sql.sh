@@ -35,7 +35,8 @@ function import() {
     PENDING_PATH="$AC_PATH_ROOT/data/sql/updates/pending_db_$1"
     UPDATES_DIR="$UPDATES_PATH/db_$1"
 
-    LATEST_UPDATE="$(find "$UPDATES_DIR" -iname "$TODAY*.sql" | sort -h | tail -n 1)"
+    # Get latest SQL file applied to this database
+    LATEST_UPDATE="$(find "$UPDATES_DIR" -iname "*.sql" | sort -h | tail -n 1)"
 
     for entry in "$PENDING_PATH"/*.sql
     do
@@ -44,7 +45,7 @@ function import() {
             OUTPUT_FILE="${UPDATES_DIR}/${TODAY}_${INDEX}.sql"
 
             # ensure a note is added as a header comment
-            echo "-- DB update $(realpath --relative-to "$AC_PATH_ROOT" "$entry") -> $(realpath --relative-to "$AC_PATH_ROOT" "$OUTPUT_FILE")" > "$OUTPUT_FILE"
+            echo "-- DB update $(basename "$LATEST_UPDATE" .sql) -> $(basename "$OUTPUT_FILE" .sql)" > "$OUTPUT_FILE"
             # fill in the SQL contents under that
             cat "$entry" >> "$OUTPUT_FILE"
             # remove the unneeded file
