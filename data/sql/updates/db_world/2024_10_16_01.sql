@@ -1,3 +1,4 @@
+-- DB update 2024_10_16_00 -> 2024_10_16_01
 
 UPDATE `creature` SET `position_x` = 1415.4373, `position_y` = -5752.8945, `position_z` = 131.30084, `orientation` = 3.839396476745605468, `wander_distance` = 0, `MovementType` = 2, `CreateObject` = 1, `VerifiedBuild` = 56713 WHERE `id1` = 28594 AND `guid` = 129165;
 UPDATE `creature` SET `position_x` = 1418.6387, `position_y` = -5758.492,  `position_z` = 131.24905, `orientation` = 1.177735805511474609, `wander_distance` = 0, `MovementType` = 2, `CreateObject` = 1, `VerifiedBuild` = 56713 WHERE `id1` = 28594 AND `guid` = 129168;
