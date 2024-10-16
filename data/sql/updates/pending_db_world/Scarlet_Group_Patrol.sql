@@ -48,6 +48,16 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12873600, 31, 1605.2, -5779.08, 116.113, NULL, 0, 0, 0, 100, 0),
 (12873600, 32, 1572.25, -5783.7, 118.883, NULL, 0, 0, 0, 100, 0);
 
+DELETE FROM `waypoint_data` WHERE `id` = 12873500;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(12873500, 1, 1775.14, -5831.91, 116.277, NULL, 0, 0, 0, 100, 0),
+(12873500, 2, 1756.09, -5834.77, 116.437, NULL, 0, 0, 0, 100, 0);
+
+DELETE FROM `waypoint_data` WHERE `id` = 12873700;
+INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(12873700, 1, 1763.12, -5808.21, 116.607, NULL, 0, 0, 0, 100, 0),
+(12873700, 2, 1783.93, -5806.33, 114.325, NULL, 0, 0, 0, 100, 0);
+
 
 UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 128736 AND `id1` = 28530;
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128705 AND `id1` = 28529;
@@ -59,8 +69,18 @@ UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 12
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128711 AND `id1` = 28529;
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128712 AND `id1` = 28529;
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128713 AND `id1` = 28529;
+UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 128735 AND `id1` = 28530;
+UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 128737 AND `id1` = 28530;
 
+
+DELETE FROM `creature_addon` WHERE (`guid` IN (128735));
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(128735, 12873500, 2404, 0, 0, 0, 0, NULL);
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (128736));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (128736, 12873600, 2404, 0, 0, 0, 0, NULL);
+
+DELETE FROM `creature_addon` WHERE (`guid` IN (128737));
+INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(128737, 12873700, 2404, 0, 0, 0, 0, NULL);
