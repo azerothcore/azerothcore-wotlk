@@ -5095,10 +5095,13 @@ void Unit::RemoveAurasDueToItemSpell(uint32 spellId, ObjectGuid castItemGuid)
             ++iter;
     }
 
-    for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
+    for (AuraMap::iterator iter = m_ownedAuras.lower_bound(spellId); iter != m_ownedAuras.upper_bound(spellId);)
     {
         if (iter->second->GetCastItemGUID() == castItemGuid)
-                RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
+        {
+            RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
+            iter = m_ownedAuras.lower_bound(spellId);
+        }
         else
             ++iter;
     }
