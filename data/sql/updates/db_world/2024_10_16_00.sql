@@ -1,3 +1,4 @@
+-- DB update 2024_10_15_32 -> 2024_10_16_00
 -- Update creature 'Oomailiq' with sniffed values
 
 -- new spawns
