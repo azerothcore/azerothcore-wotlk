@@ -220,6 +220,7 @@ public:
         {
             creature->SetStandState(UNIT_STAND_STATE_STAND);
             creature->setActive(true);
+            creature->SetReactState(REACT_DEFENSIVE);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_koltira_deathweaver::npc_koltira_deathweaverAI, creature->AI()))
                 pEscortAI->Start(false, false, player->GetGUID());
@@ -236,7 +237,8 @@ public:
     {
         npc_koltira_deathweaverAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
-            me->SetReactState(REACT_DEFENSIVE);
+            m_uiWave = 0;
+            m_uiWave_Timer = 3000;
         }
 
         uint32 m_uiWave;
@@ -252,6 +254,7 @@ public:
                 m_uiWave_Timer = 3000;
                 m_uiValrothGUID.Clear();
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetReactState(REACT_PASSIVE);
                 me->LoadEquipment(0, true);
                 me->RemoveAllAuras();
                 summons.DespawnAll();
@@ -284,6 +287,17 @@ public:
                 return;
 
             npc_escortAI::AttackStart(who);
+        }
+
+        void JustDied(Unit* /*who*/) override
+        {
+            Player* player = GetPlayerForEscort();
+
+            if (!player)
+                return;
+
+            if (player->GetQuestStatus(QUEST_BREAKOUT) == QUEST_STATUS_INCOMPLETE)
+                player->FailQuest(QUEST_BREAKOUT);
         }
 
         void WaypointReached(uint32 waypointId) override
