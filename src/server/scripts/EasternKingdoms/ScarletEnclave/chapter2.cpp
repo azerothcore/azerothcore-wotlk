@@ -288,6 +288,11 @@ public:
 
         void WaypointReached(uint32 waypointId) override
         {
+            Player* player = GetPlayerForEscort();
+
+            if (!player)
+                return;
+
             switch (waypointId)
             {
                 case 0:
@@ -343,6 +348,17 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
+            if (Player* player = GetPlayerForEscort())
+            {
+                if (!player->IsAlive() || !player->IsWithinDist(me, INTERACTION_DISTANCE * 3))
+                {
+                    summons.DespawnAll();
+                    me->DespawnOrUnsummon();
+                    if (player->GetQuestStatus(QUEST_BREAKOUT) == QUEST_STATUS_INCOMPLETE)
+                        player->FailQuest(QUEST_BREAKOUT);
+                }
+            }
+
             npc_escortAI::UpdateAI(uiDiff);
 
             if (HasEscortState(STATE_ESCORT_PAUSED))
