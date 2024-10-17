@@ -725,10 +725,7 @@ void WorldSession::HandleMirrorImageDataRequest(WorldPacket& recvData)
                 uint32 displayInfoId = item->GetTemplate()->DisplayInfoID;
                 sScriptMgr->OnGlobalMirrorImageDisplayItem(item, displayInfoId);
 
-                if (auto const * itemTemplate = sObjectMgr->GetItemTemplate(item->GetTransmog()))
-                    data << uint32(itemTemplate->DisplayInfoID);
-                else
-                    data << uint32(item->GetTemplate()->DisplayInfoID);
+                data << uint32(displayInfoId);
             }
             else
                 data << uint32(0);

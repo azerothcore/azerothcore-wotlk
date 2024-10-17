@@ -33,7 +33,6 @@ void AddSC_CustomBossAnna();
 void AddSC_custom_reload_commands();
 void AddSC_PlayedTimeRewards();
 void AddSC_event_npc();
-void AddSC_Transmogrification();
 
 // The name of this function should match:
 // void Add${NameOfDirectory}Scripts()
@@ -55,5 +54,4 @@ void AddCustomScripts()
     AddSC_custom_reload_commands();
     AddSC_PlayedTimeRewards();
     AddSC_event_npc();
-    AddSC_Transmogrification();
 }
