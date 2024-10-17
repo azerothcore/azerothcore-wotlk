@@ -560,8 +560,8 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr3>::ToString(SpellAttr3 value)
         case SPELL_ATTR3_HIDE_CHANNEL_BAR: return { "SPELL_ATTR3_HIDE_CHANNEL_BAR", "Do not display channel bar (client only)", "" };
         case SPELL_ATTR3_HIDE_IN_RAID_FILTER: return { "SPELL_ATTR3_HIDE_IN_RAID_FILTER", "Honorless Target", "" };
         case SPELL_ATTR3_NORMAL_RANGED_ATTACK: return { "SPELL_ATTR3_NORMAL_RANGED_ATTACK", "Unknown attribute 15@Attr3", "Auto Shoot, Shoot, Throw - ranged normal attack attribute?" };
-        case SPELL_ATTR3_SUPRESS_CASTER_PROCS: return { "SPELL_ATTR3_SUPRESS_CASTER_PROCS", "Cannot trigger procs", "" };
-        case SPELL_ATTR3_SUPRESS_TARGET_PROCS: return { "SPELL_ATTR3_SUPRESS_TARGET_PROCS", "No initial aggro", "" };
+        case SPELL_ATTR3_SUPPRESS_CASTER_PROCS: return { "SPELL_ATTR3_SUPPRESS_CASTER_PROCS", "Cannot trigger procs", "" };
+        case SPELL_ATTR3_SUPPRESS_TARGET_PROCS: return { "SPELL_ATTR3_SUPPRESS_TARGET_PROCS", "No initial aggro", "" };
         case SPELL_ATTR3_ALWAYS_HIT: return { "SPELL_ATTR3_ALWAYS_HIT", "Ignore hit result", "Spell cannot miss, or be dodged/parried/blocked" };
         case SPELL_ATTR3_INSTANT_TARGET_PROCS: return { "SPELL_ATTR3_INSTANT_TARGET_PROCS", "Cannot trigger spells during aura proc", "" };
         case SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD: return { "SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD", "Persists through death", "" };
@@ -604,8 +604,8 @@ AC_API_EXPORT SpellAttr3 EnumUtils<SpellAttr3>::FromIndex(std::size_t index)
         case 13: return SPELL_ATTR3_HIDE_CHANNEL_BAR;
         case 14: return SPELL_ATTR3_HIDE_IN_RAID_FILTER;
         case 15: return SPELL_ATTR3_NORMAL_RANGED_ATTACK;
-        case 16: return SPELL_ATTR3_SUPRESS_CASTER_PROCS;
-        case 17: return SPELL_ATTR3_SUPRESS_TARGET_PROCS;
+        case 16: return SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+        case 17: return SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
         case 18: return SPELL_ATTR3_ALWAYS_HIT;
         case 19: return SPELL_ATTR3_INSTANT_TARGET_PROCS;
         case 20: return SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD;
@@ -645,8 +645,8 @@ AC_API_EXPORT std::size_t EnumUtils<SpellAttr3>::ToIndex(SpellAttr3 value)
         case SPELL_ATTR3_HIDE_CHANNEL_BAR: return 13;
         case SPELL_ATTR3_HIDE_IN_RAID_FILTER: return 14;
         case SPELL_ATTR3_NORMAL_RANGED_ATTACK: return 15;
-        case SPELL_ATTR3_SUPRESS_CASTER_PROCS: return 16;
-        case SPELL_ATTR3_SUPRESS_TARGET_PROCS: return 17;
+        case SPELL_ATTR3_SUPPRESS_CASTER_PROCS: return 16;
+        case SPELL_ATTR3_SUPPRESS_TARGET_PROCS: return 17;
         case SPELL_ATTR3_ALWAYS_HIT: return 18;
         case SPELL_ATTR3_INSTANT_TARGET_PROCS: return 19;
         case SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD: return 20;
@@ -696,7 +696,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr4>::ToString(SpellAttr4 value)
         case SPELL_ATTR4_AURA_NEVER_BOUNCES: return { "SPELL_ATTR4_AURA_NEVER_BOUNCES", "Allow self-cast to override stronger aura (client only)", "" };
         case SPELL_ATTR4_ALLOW_ENETRING_ARENA: return { "SPELL_ATTR4_ALLOW_ENETRING_ARENA", "Keep when entering arena", "" };
         case SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM: return { "SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM", "Unknown attribute 22@Attr4", "Seal of Command (42058,57770) and Gymer's Smash 55426" };
-        case SPELL_ATTR4_SUPRESS_WEAPON_PROCS: return { "SPELL_ATTR4_SUPRESS_WEAPON_PROCS", "Cannot trigger item spells", "" };
+        case SPELL_ATTR4_SUPPRESS_WEAPON_PROCS: return { "SPELL_ATTR4_SUPPRESS_WEAPON_PROCS", "Cannot trigger item spells", "" };
         case SPELL_ATTR4_AUTO_RANGED_COMBAT: return { "SPELL_ATTR4_AUTO_RANGED_COMBAT", "Unknown attribute 24@Attr4", "Shoot-type spell?" };
         case SPELL_ATTR4_OWNER_POWER_SCALING: return { "SPELL_ATTR4_OWNER_POWER_SCALING", "Pet Scaling aura", "" };
         case SPELL_ATTR4_ONLY_FLYING_AREAS: return { "SPELL_ATTR4_ONLY_FLYING_AREAS", "Only in Outland/Northrend", "" };
@@ -740,7 +740,7 @@ AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(std::size_t index)
         case 20: return SPELL_ATTR4_AURA_NEVER_BOUNCES;
         case 21: return SPELL_ATTR4_ALLOW_ENETRING_ARENA;
         case 22: return SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM;
-        case 23: return SPELL_ATTR4_SUPRESS_WEAPON_PROCS;
+        case 23: return SPELL_ATTR4_SUPPRESS_WEAPON_PROCS;
         case 24: return SPELL_ATTR4_AUTO_RANGED_COMBAT;
         case 25: return SPELL_ATTR4_OWNER_POWER_SCALING;
         case 26: return SPELL_ATTR4_ONLY_FLYING_AREAS;
@@ -781,7 +781,7 @@ AC_API_EXPORT std::size_t EnumUtils<SpellAttr4>::ToIndex(SpellAttr4 value)
         case SPELL_ATTR4_AURA_NEVER_BOUNCES: return 20;
         case SPELL_ATTR4_ALLOW_ENETRING_ARENA: return 21;
         case SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM: return 22;
-        case SPELL_ATTR4_SUPRESS_WEAPON_PROCS: return 23;
+        case SPELL_ATTR4_SUPPRESS_WEAPON_PROCS: return 23;
         case SPELL_ATTR4_AUTO_RANGED_COMBAT: return 24;
         case SPELL_ATTR4_OWNER_POWER_SCALING: return 25;
         case SPELL_ATTR4_ONLY_FLYING_AREAS: return 26;
