@@ -1356,7 +1356,7 @@ void BotMgr::_reviveBot(Creature* bot, WorldLocation* dest)
             bot->Relocate(dest);
     }
 
-    bot->SetDisplayId(bot->GetNativeDisplayId());
+    bot->SetDisplayId(bot->GetNativeDisplayId(), bot->GetCreatureTemplate()->scale);
     bot->ReplaceAllNpcFlags(NPCFlags(bot->GetCreatureTemplate()->npcflag));
     bot->ClearUnitState(uint32(UNIT_STATE_ALL_STATE & ~(UNIT_STATE_IGNORE_PATHFINDING | UNIT_STATE_NO_ENVIRONMENT_UPD)));
     bot->ReplaceAllUnitFlags(UnitFlags(0));
