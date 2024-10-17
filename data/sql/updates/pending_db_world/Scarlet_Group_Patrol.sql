@@ -13,8 +13,10 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (128736, 128713, 4, 247.5, 515, 0, 0);
 
 
-DELETE FROM `waypoint_data` WHERE `id` = 12873600;
+DELETE FROM `waypoint_data` WHERE `id` = 12873500, 12873600, 12873700;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(12873500, 1, 1773.9238, -5832.1016, 116.31873, NULL, 0, 0, 0, 100, 0),
+(12873500, 2, 1756.1492, -5834.704, 116.430405, NULL, 0, 0, 0, 100, 0),
 (12873600, 1, 1544.7605, -5794.4155, 121.35939, NULL, 0, 0, 0, 100, 0),
 (12873600, 2, 1522.0105, -5794.6655, 130.10939, NULL, 0, 0, 0, 100, 0),
 (12873600, 3, 1483.8894, -5808.3174, 131.46725, NULL, 0, 0, 0, 100, 0),
@@ -46,15 +48,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (12873600, 29, 1700.1221, -5785.6084, 114.60457, NULL, 0, 0, 0, 100, 0),
 (12873600, 30, 1671.1221, -5779.1084, 116.10457, NULL, 0, 0, 0, 100, 0),
 (12873600, 31, 1602.1147, -5781.56, 116.68636, NULL, 0, 0, 0, 100, 0),
-(12873600, 32, 1576.719, -5785.6636, 119.117615, NULL, 0, 0, 0, 100, 0);
-
-DELETE FROM `waypoint_data` WHERE `id` = 12873500;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-(12873500, 1, 1773.9238, -5832.1016, 116.31873, NULL, 0, 0, 0, 100, 0),
-(12873500, 2, 1756.1492, -5834.704, 116.430405, NULL, 0, 0, 0, 100, 0);
-
-DELETE FROM `waypoint_data` WHERE `id` = 12873700;
-INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
+(12873600, 32, 1576.719, -5785.6636, 119.117615, NULL, 0, 0, 0, 100, 0),
 (12873700, 1, 1783.6888, -5806.3467, 114.37271, NULL, 0, 0, 0, 100, 0),
 (12873700, 2, 1765.1584, -5808.4717, 116.48846, NULL, 0, 0, 0, 100, 0);
 
@@ -73,14 +67,8 @@ UPDATE `creature` SET `MovementType`= 2, `position_x`= 1756.1492, `position_y`= 
 UPDATE `creature` SET `MovementType`= 2, `position_x`= 1765.1584, `position_y`= -5808.4717, `position_z`= 116.48846 WHERE `guid` = 128737 AND `id1` = 28530;
 
 
-DELETE FROM `creature_addon` WHERE (`guid` IN (128735));
+DELETE FROM `creature_addon` WHERE (`guid` IN (128735, 128736, 128737));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(128735, 12873500, 2404, 0, 0, 0, 0, NULL);
-
-DELETE FROM `creature_addon` WHERE (`guid` IN (128736));
-INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(128736, 12873600, 2404, 0, 0, 0, 0, NULL);
-
-DELETE FROM `creature_addon` WHERE (`guid` IN (128737));
-INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(128735, 12873500, 2404, 0, 0, 0, 0, NULL),
+(128736, 12873600, 2404, 0, 0, 0, 0, NULL),
 (128737, 12873700, 2404, 0, 0, 0, 0, NULL);
