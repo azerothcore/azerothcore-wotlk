@@ -365,16 +365,19 @@ public:
         {
             if (Player* player = GetPlayerForEscort())
             {
-                if (!player->IsAlive() || !player->IsWithinDist(me, INTERACTION_DISTANCE * 3))
+                if (!player->IsAlive() || !player->IsWithinDist(me, INTERACTION_DISTANCE * 6))
                 {
                     summons.DespawnAll();
                     me->DespawnOrUnsummon();
                     if (player->GetQuestStatus(QUEST_BREAKOUT) == QUEST_STATUS_INCOMPLETE)
                         player->FailQuest(QUEST_BREAKOUT);
                 }
-            } else
+            }
+            else
+            {
                 if (active)
                     me->DespawnOrUnsummon();
+            }
 
             npc_escortAI::UpdateAI(uiDiff);
 
