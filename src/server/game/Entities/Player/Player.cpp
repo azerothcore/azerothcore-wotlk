@@ -11339,8 +11339,6 @@ void Player::LeaveBattleground(Battleground* bg)
     if (bg->isArena() && (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN))
         sScriptMgr->OnBattlegroundDesertion(this, ARENA_DESERTION_TYPE_LEAVE_BG);
 
-    bg->RemovePlayerAtLeave(this);
-
     // xinef: reset corpse reclaim time
     m_deathExpireTime = GameTime::GetGameTime().count();
 
