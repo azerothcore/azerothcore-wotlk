@@ -214,19 +214,6 @@ class npc_koltira_deathweaver : public CreatureScript
 public:
     npc_koltira_deathweaver() : CreatureScript("npc_koltira_deathweaver") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_BREAKOUT)
-        {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
-            creature->setActive(true);
-
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_koltira_deathweaver::npc_koltira_deathweaverAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID());
-        }
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_koltira_deathweaverAI(creature);
@@ -234,15 +221,30 @@ public:
 
     struct npc_koltira_deathweaverAI : public npc_escortAI
     {
+        void sQuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_BREAKOUT)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->setActive(true);
+                me->SetReactState(REACT_DEFENSIVE);
+                npc_escortAI::Start(true, false, player->GetGUID(), quest);
+                active = true;
+            }
+        }
+
         npc_koltira_deathweaverAI(Creature* creature) : npc_escortAI(creature), summons(me)
         {
-            me->SetReactState(REACT_DEFENSIVE);
+            m_uiWave = 0;
+            m_uiWave_Timer = 3000;
+            active = false;
         }
 
         uint32 m_uiWave;
         uint32 m_uiWave_Timer;
         ObjectGuid m_uiValrothGUID;
         SummonList summons;
+        bool active;
 
         void Reset() override
         {
@@ -252,9 +254,11 @@ public:
                 m_uiWave_Timer = 3000;
                 m_uiValrothGUID.Clear();
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetReactState(REACT_PASSIVE);
                 me->LoadEquipment(0, true);
                 me->RemoveAllAuras();
                 summons.DespawnAll();
+                active = false;
             }
         }
 
@@ -286,8 +290,24 @@ public:
             npc_escortAI::AttackStart(who);
         }
 
+        void JustDied(Unit* /*who*/) override
+        {
+            Player* player = GetPlayerForEscort();
+
+            if (!player)
+                return;
+
+            if (player->GetQuestStatus(QUEST_BREAKOUT) == QUEST_STATUS_INCOMPLETE)
+                player->FailQuest(QUEST_BREAKOUT);
+        }
+
         void WaypointReached(uint32 waypointId) override
         {
+            Player* player = GetPlayerForEscort();
+
+            if (!player)
+                return;
+
             switch (waypointId)
             {
                 case 0:
@@ -343,6 +363,22 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
+            if (Player* player = GetPlayerForEscort())
+            {
+                if (!player->IsAlive() || !player->IsWithinDist(me, INTERACTION_DISTANCE * 6))
+                {
+                    summons.DespawnAll();
+                    me->DespawnOrUnsummon();
+                    if (player->GetQuestStatus(QUEST_BREAKOUT) == QUEST_STATUS_INCOMPLETE)
+                        player->FailQuest(QUEST_BREAKOUT);
+                }
+            }
+            else
+            {
+                if (active)
+                    me->DespawnOrUnsummon();
+            }
+
             npc_escortAI::UpdateAI(uiDiff);
 
             if (HasEscortState(STATE_ESCORT_PAUSED))
