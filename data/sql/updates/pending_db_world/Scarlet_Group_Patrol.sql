@@ -50,13 +50,13 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 
 DELETE FROM `waypoint_data` WHERE `id` = 12873500;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-(12873500, 1, 1775.14, -5831.91, 116.277, NULL, 0, 0, 0, 100, 0),
-(12873500, 2, 1756.09, -5834.77, 116.437, NULL, 0, 0, 0, 100, 0);
+(12873500, 1, 1773.9238, -5832.1016, 116.31873, NULL, 0, 0, 0, 100, 0),
+(12873500, 2, 1756.1492, -5834.704, 116.430405, NULL, 0, 0, 0, 100, 0);
 
 DELETE FROM `waypoint_data` WHERE `id` = 12873700;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-(12873700, 1, 1763.12, -5808.21, 116.607, NULL, 0, 0, 0, 100, 0),
-(12873700, 2, 1783.93, -5806.33, 114.325, NULL, 0, 0, 0, 100, 0);
+(12873700, 1, 1783.6888, -5806.3467, 114.37271, NULL, 0, 0, 0, 100, 0),
+(12873700, 2, 1765.1584, -5808.4717, 116.48846, NULL, 0, 0, 0, 100, 0);
 
 
 UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 128736 AND `id1` = 28530;
@@ -69,8 +69,8 @@ UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 12
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128711 AND `id1` = 28529;
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128712 AND `id1` = 28529;
 UPDATE `creature` SET `MovementType`= 0, `wander_distance` = 0 WHERE `guid` = 128713 AND `id1` = 28529;
-UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 128735 AND `id1` = 28530;
-UPDATE `creature` SET `MovementType`= 2 WHERE `guid` = 128737 AND `id1` = 28530;
+UPDATE `creature` SET `MovementType`= 2, `position_x`= 1756.1492, `position_y`= -5834.704, `position_z`= 116.430405 WHERE `guid` = 128735 AND `id1` = 28530;
+UPDATE `creature` SET `MovementType`= 2, `position_x`= 1765.1584, `position_y`= -5808.4717, `position_z`= 116.48846 WHERE `guid` = 128737 AND `id1` = 28530;
 
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (128735));
