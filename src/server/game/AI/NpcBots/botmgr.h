@@ -27,6 +27,7 @@ class DPSTracker;
 struct AreaTrigger;
 struct CleanDamage;
 struct GroupQueueInfo;
+struct NpcBotMgrData;
 struct Position;
 
 enum BattlegroundTypeId : uint8;
@@ -35,6 +36,15 @@ enum DamageEffectType : uint8;
 
 constexpr size_t TargetIconNamesCacheSize = 8u; // Group.h TARGETICONCOUNT
 constexpr size_t BracketsCount = DEFAULT_MAX_LEVEL / 10 + 1; //0-9, 10-19, 20-29, 30-39, 40-49, 50-59, 60-69, 70-79, 80-83
+
+enum BotMgrDataFlags : uint32
+{
+    NPCBOT_MGR_FLAG_HIDE_BOTS                  = 0x00000001,
+    NPCBOT_MGR_FLAG_DISABLE_COMBAT_POSITIONING = 0x00000002,
+
+    NPCBOT_MGR_FLAG_MASK_ALL_ALLOWED           = (NPCBOT_MGR_FLAG_HIDE_BOTS | NPCBOT_MGR_FLAG_DISABLE_COMBAT_POSITIONING),
+    NPCBOT_MGR_FLAG_MASK_ALL_DB_ALLOWED        = (NPCBOT_MGR_FLAG_DISABLE_COMBAT_POSITIONING)
+};
 
 enum BotAddResult
 {
@@ -71,13 +81,17 @@ enum BotAttackRange
 {
     BOT_ATTACK_RANGE_SHORT              = 1,
     BOT_ATTACK_RANGE_LONG               = 2,
-    BOT_ATTACK_RANGE_EXACT              = 3
+    BOT_ATTACK_RANGE_EXACT              = 3,
+
+    BOT_ATTACK_RANGE_END                = BOT_ATTACK_RANGE_EXACT
 };
 
 enum BotAttackAngle
 {
     BOT_ATTACK_ANGLE_NORMAL             = 1,
-    BOT_ATTACK_ANGLE_AVOID_FRONTAL_AOE  = 2
+    BOT_ATTACK_ANGLE_AVOID_FRONTAL_AOE  = 2,
+
+    BOT_ATTACK_ANGLE_END                = BOT_ATTACK_ANGLE_AVOID_FRONTAL_AOE
 };
 
 typedef std::unordered_map<ObjectGuid /*guid*/, Creature* /*bot*/> BotMap;
@@ -163,6 +177,10 @@ class AC_GAME_API BotMgr
         static float GetBotDamageModByClass(uint8 botclass);
         static float GetBotDamageModByLevel(uint8 botlevel);
 
+        static uint8 GetFollowDistDefault();
+        static uint32 GetEngageDelayDPSDefault();
+        static uint32 GetEngageDelayHealDefault();
+
         static void Initialize();
         static void ReloadConfig();
         static void LoadConfig(bool reload = false);
@@ -193,6 +211,8 @@ class AC_GAME_API BotMgr
         static float GetBotDamageTakenMod(Creature const* bot, bool magic);
         static int32 GetBotStat(Creature const* bot, BotStatMods stat);
         static float GetBotResilience(Creature const* botOrPet);
+
+        void LoadData();
 
         void Update(uint32 diff);
 
@@ -260,27 +280,27 @@ class AC_GAME_API BotMgr
         bool RemoveBotFromGroup(Creature* bot);
         bool RemoveAllBotsFromGroup();
 
-        static uint8 GetBotFollowDistDefault() { return 100; }
-        uint8 GetBotFollowDist() const { return _followdist; }
-        void SetBotFollowDist(uint8 dist) { _followdist = dist; }
+        static uint8 GetBotFollowDistMax() { return 100; }
+        uint8 GetBotFollowDist() const;
+        void SetBotFollowDist(uint8 dist);
 
-        uint8 GetBotExactAttackRange() const { return _exactAttackRange; }
-        uint8 GetBotAttackRangeMode() const { return _attackRangeMode; }
-        void SetBotAttackRangeMode(uint8 mode, uint8 exactRange = 0) { _attackRangeMode = mode; _setBotExactAttackRange(exactRange); }
+        uint8 GetBotExactAttackRange() const;
+        uint8 GetBotAttackRangeMode() const;
+        void SetBotAttackRangeMode(uint8 mode, uint8 exactRange = 0);
 
-        uint8 GetBotAttackAngleMode() const { return _attackAngleMode; }
-        void SetBotAttackAngleMode(uint8 mode) { _attackAngleMode = mode; }
+        uint8 GetBotAttackAngleMode() const;
+        void SetBotAttackAngleMode(uint8 mode);
 
-        bool GetBotAllowCombatPositioning() const { return _allowCombatPositioning; }
-        void SetBotAllowCombatPositioning(bool allow) { _allowCombatPositioning = allow; }
+        bool GetBotAllowCombatPositioning() const;
+        void SetBotAllowCombatPositioning(bool allow);
 
-        uint32 GetEngageDelayDPS() const { return _npcBotEngageDelayDPS; }
-        uint32 GetEngageDelayHeal() const { return _npcBotEngageDelayHeal; }
-        void SetEngageDelayDPS(uint32 delay) { _npcBotEngageDelayDPS = delay; }
-        void SetEngageDelayHeal(uint32 delay) { _npcBotEngageDelayHeal = delay; }
+        void SetBotsHidden(bool hidden);
+
+        uint32 GetEngageDelayDPS() const;
+        uint32 GetEngageDelayHeal() const;
+        void SetEngageDelayDPS(uint32 delay);
+        void SetEngageDelayHeal(uint32 delay);
         void PropagateEngageTimers() const;
-
-        void SetBotsHidden(bool hidden) { _botsHidden = hidden; }
 
         void SetBotsShouldUpdateStats();
         void UpdatePhaseForBots();
@@ -325,23 +345,15 @@ class AC_GAME_API BotMgr
     private:
         static void _teleportBot(Creature* bot, Map* newMap, float x, float y, float z, float ori, bool quick, bool reset, bot_ai* detached_ai);
         static void _reviveBot(Creature* bot, WorldLocation* dest = nullptr);
-        void _setBotExactAttackRange(uint8 exactRange) { _exactAttackRange = exactRange; }
+        void _setBotExactAttackRange(uint8 exactRange);
         static delayed_teleport_mutex_type* _getTpLock();
 
         Player* const _owner;
         BotMap _bots;
         std::list<ObjectGuid> _removeList;
         DPSTracker* const _dpstracker;
+        NpcBotMgrData* _data;
 
-        uint8 _followdist;
-        uint8 _exactAttackRange;
-        uint8 _attackRangeMode;
-        uint8 _attackAngleMode;
-        bool _allowCombatPositioning;
-        uint32 _npcBotEngageDelayDPS;
-        uint32 _npcBotEngageDelayHeal;
-
-        bool _botsHidden;
         bool _quickrecall;
 
         AoeSpotsVec _aoespots;

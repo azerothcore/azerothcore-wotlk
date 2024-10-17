@@ -31,6 +31,28 @@ enum LocaleConstant : uint8;
 constexpr float MIN_WANDER_NODE_DISTANCE = 50.0f; // VISIBILITY_DISTANCE_NORMAL * 0.5f;
 constexpr float MAX_WANDER_NODE_DISTANCE = 800.0f; //SIZE_OF_GRIDS * 1.5f;
 
+struct NpcBotMgrData
+{
+    friend class BotDataMgr;
+public:
+    uint8 dist_follow;
+    uint8 dist_attack;
+    uint8 attack_range_mode;
+    uint8 attack_angle_mode;
+    uint32 engage_delay_dps;
+    uint32 engage_delay_heal;
+    uint32 flags;
+
+    inline void SetFlag(uint32 flags_) { flags |= flags_; }
+    inline void RemoveFlag(uint32 flags_) { flags &= ~flags_; }
+    inline bool HasFlag(uint32 flags_) const { return !!(flags & flags_); }
+
+private:
+    explicit NpcBotMgrData(uint8 idist_follow, uint8 idist_attack, uint8 iattack_range_mode, uint8 iattack_angle_mode, uint32 iengage_delay_dps, uint32 iengage_delay_heal, uint32 iflags) :
+        dist_follow(idist_follow), dist_attack(idist_attack), attack_range_mode(iattack_range_mode), attack_angle_mode(iattack_angle_mode),
+        engage_delay_dps(iengage_delay_dps), engage_delay_heal(iengage_delay_heal), flags(iflags) { }
+};
+
 enum NpcBotDataUpdateType
 {
     NPCBOT_UPDATE_OWNER                 = 1,
@@ -165,6 +187,8 @@ class BotDataMgr
         static void LoadNpcBotGroupData();
         static void LoadNpcBotGearStorage();
 
+        static void LoadNpcBotMgrData();
+
         static void DeleteOldLogs();
 
         static void AddNpcBotData(uint32 entry, uint32 roles, uint8 spec, uint32 faction);
@@ -219,6 +243,11 @@ class BotDataMgr
         static Item* WithdrawBotBankItem(ObjectGuid playerGuid, ObjectGuid::LowType itemGuidLow);
         static void DepositBotBankItem(ObjectGuid playerGuid, Item* item);
         static void SaveNpcBotStoredGear(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
+
+        static NpcBotMgrData* SelectOrCreateNpcBotMgrData(ObjectGuid playerGuid);
+        static void EraseNpcBotMgrData(ObjectGuid playerGuid);
+        static void RemoveNpcBotMgrDataFromDB(ObjectGuid playerGuid);
+        static void SaveNpcBotMgrData(ObjectGuid playerGuid, CharacterDatabaseTransaction trans);
 
         static std::shared_mutex* GetLock();
 

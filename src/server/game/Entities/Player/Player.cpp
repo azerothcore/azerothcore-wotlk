@@ -4366,9 +4366,10 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
 
                 Corpse::DeleteFromDB(playerGuid, trans);
 
-                //npcbot - erase npcbots
+                //npcbot - erase npcbots and manager data
                 uint32 newOwner = 0;
                 BotDataMgr::UpdateNpcBotDataAll(lowGuid, NPCBOT_UPDATE_OWNER, &newOwner);
+                BotDataMgr::EraseNpcBotMgrData(playerGuid);
                 //end npcbot
 
                 sScriptMgr->OnDeleteFromDB(trans, lowGuid);

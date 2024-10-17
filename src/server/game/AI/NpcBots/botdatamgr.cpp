@@ -7,6 +7,7 @@
 #include "botspell.h"
 #include "botwanderful.h"
 #include "bpet_ai.h"
+#include "CharacterCache.h"
 #include "Containers.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
@@ -35,6 +36,9 @@ NpcBots DB Data management
 #ifdef _MSC_VER
 # pragma warning(push, 4)
 #endif
+
+typedef std::unordered_map<ObjectGuid /*player_guid*/, NpcBotMgrData*> NpcBotMgrDataMap;
+NpcBotMgrDataMap _botMgrsData;
 
 typedef std::unordered_map<uint32 /*entry*/, NpcBotData*> NpcBotDataMap;
 typedef std::unordered_map<uint32 /*entry*/, NpcBotAppearanceData*> NpcBotAppearanceDataMap;
@@ -1014,6 +1018,84 @@ void BotDataMgr::LoadNpcBotGearStorage()
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} NPCBot stored items for {} bot owners in {} ms", count, uint32(player_guids.size()), GetMSTimeDiffToNow(oldMSTime));
+}
+
+void BotDataMgr::LoadNpcBotMgrData()
+{
+    LOG_INFO("server.loading", "Loading NPCBot managers data...");
+
+    uint32 oldMSTime = getMSTime();
+
+    //                                                   0      1            2            3                  4                  5                 6                  7
+    QueryResult result = CharacterDatabase.Query("SELECT owner, dist_follow, dist_attack, attack_range_mode, attack_angle_mode, engage_delay_dps, engage_delay_heal, flags FROM characters_npcbot_settings");
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 idx = 0;
+            ObjectGuid player_guid = ObjectGuid::Create<HighGuid::Player>(fields[  idx].Get<uint32>());
+
+            if (!sCharacterCache->HasCharacterCacheEntry(player_guid))
+            {
+                LOG_ERROR("server.loading", "Player {} found in table `characters_npcbot_settings` doesn't exist!", player_guid.GetCounter());
+                BotDataMgr::RemoveNpcBotMgrDataFromDB(player_guid);
+                continue;
+            }
+
+            uint8 dist_follow        = fields[++idx].Get<uint8>();
+            uint8 dist_attack        = fields[++idx].Get<uint8>();
+            uint8 attack_range_mode  = fields[++idx].Get<uint8>();
+            uint8 attack_angle_mode  = fields[++idx].Get<uint8>();
+            uint32 engage_delay_dps  = fields[++idx].Get<uint32>();
+            uint32 engage_delay_heal = fields[++idx].Get<uint32>();
+            uint32 flags             = fields[++idx].Get<uint32>();
+
+            if (dist_follow > 100)
+            {
+                LOG_WARN("server.loading", "Bot follow distance has invalid value {} > 100 for player {}, reduced!", uint32(dist_follow), player_guid.GetCounter());
+                dist_follow = 100;
+            }
+            if (dist_attack > 50)
+            {
+                LOG_WARN("server.loading", "Bot attack distance has invalid value {} > 50 for player {}, reduced!", uint32(dist_attack), player_guid.GetCounter());
+                dist_attack = 50;
+            }
+            if (attack_range_mode > BOT_ATTACK_RANGE_END)
+            {
+                LOG_WARN("server.loading", "Bot attack range mode has invalid value {} for player {}, reset to default!", uint32(attack_range_mode), player_guid.GetCounter());
+                attack_range_mode = BOT_ATTACK_RANGE_SHORT;
+            }
+            if (attack_angle_mode > BOT_ATTACK_ANGLE_END)
+            {
+                LOG_WARN("server.loading", "Bot attack angle mode has invalid value {} for player {}, reset to default!", uint32(attack_angle_mode), player_guid.GetCounter());
+                attack_angle_mode = BOT_ATTACK_ANGLE_NORMAL;
+            }
+            if (engage_delay_dps > 10 * IN_MILLISECONDS)
+            {
+                LOG_WARN("server.loading", "Bot dps engage timer has invalid value {} for player {}, reduced!", engage_delay_dps, player_guid.GetCounter());
+                engage_delay_dps = BotMgr::GetEngageDelayDPSDefault();
+            }
+            if (engage_delay_heal > 10 * IN_MILLISECONDS)
+            {
+                LOG_WARN("server.loading", "Bot heal engage timer has invalid value {} for player {}, reduced!", engage_delay_heal, player_guid.GetCounter());
+                engage_delay_heal = BotMgr::GetEngageDelayHealDefault();
+            }
+            if (flags & ~NPCBOT_MGR_FLAG_MASK_ALL_ALLOWED)
+            {
+                LOG_WARN("server.loading", "Bot manager flags have invalid value {} for player {}, removing invalid flags!", flags, player_guid.GetCounter());
+                flags &= NPCBOT_MGR_FLAG_MASK_ALL_ALLOWED;
+            }
+
+            _botMgrsData[player_guid] = new NpcBotMgrData(dist_follow, dist_attack, attack_range_mode, attack_angle_mode, engage_delay_dps, engage_delay_heal, flags);
+
+        } while (result->NextRow());
+
+        LOG_INFO("server.loading", ">> Loaded NPCBot manager data for {} bot owners in {} ms", uint32(_botMgrsData.size()), GetMSTimeDiffToNow(oldMSTime));
+    }
+    else
+        LOG_INFO("server.loading", ">> Bot managers data is not loaded. Table `characters_npcbot_settings` is empty!");
 }
 
 void BotDataMgr::DeleteOldLogs()
@@ -3082,6 +3164,53 @@ void BotDataMgr::SaveNpcBotStoredGear(ObjectGuid playerGuid, CharacterDatabaseTr
         item->DeleteFromInventoryDB(trans);
         trans->Append("INSERT INTO characters_npcbot_gear_storage (guid, item_guid) VALUES ({}, {})", mci->first.GetCounter(), item->GetGUID().GetCounter());
     }
+}
+
+NpcBotMgrData* BotDataMgr::SelectOrCreateNpcBotMgrData(ObjectGuid playerGuid)
+{
+    std::unique_lock<std::shared_mutex> lock(*GetLock());
+    decltype(_botMgrsData)::iterator bmci = _botMgrsData.find(playerGuid);
+    NpcBotMgrData* mgrData;
+    if (bmci == _botMgrsData.cend())
+    {
+        CharacterDatabase.Execute("INSERT INTO characters_npcbot_settings (owner) VALUES ({})", playerGuid.GetCounter());
+        _botMgrsData[playerGuid] = new NpcBotMgrData(BotMgr::GetFollowDistDefault(), 0, BOT_ATTACK_RANGE_SHORT, BOT_ATTACK_ANGLE_NORMAL, 0, 0, 0);
+        mgrData = _botMgrsData.at(playerGuid);
+    }
+    else
+        mgrData = bmci->second;
+
+    return mgrData;
+}
+
+void BotDataMgr::EraseNpcBotMgrData(ObjectGuid playerGuid)
+{
+    std::unique_lock<std::shared_mutex> lock(*GetLock());
+    decltype(_botMgrsData)::iterator bmci = _botMgrsData.find(playerGuid);
+    if (bmci == _botMgrsData.cend())
+        return;
+
+    RemoveNpcBotMgrDataFromDB(playerGuid);
+    _botMgrsData.erase(bmci);
+}
+
+void BotDataMgr::RemoveNpcBotMgrDataFromDB(ObjectGuid playerGuid)
+{
+    CharacterDatabase.Execute("DELETE FROM characters_npcbot_settings WHERE owner = {}", playerGuid.GetCounter());
+}
+
+void BotDataMgr::SaveNpcBotMgrData(ObjectGuid playerGuid, CharacterDatabaseTransaction trans)
+{
+    std::shared_lock<std::shared_mutex> lock(*GetLock());
+    decltype(_botMgrsData)::iterator bmci = _botMgrsData.find(playerGuid);
+    if (bmci == _botMgrsData.cend())
+        return;
+
+    NpcBotMgrData const* md = bmci->second;
+    trans->Append("DELETE FROM characters_npcbot_settings WHERE owner = {}", bmci->first.GetCounter());
+    trans->Append("INSERT INTO characters_npcbot_settings (owner,dist_follow,dist_attack,attack_range_mode,attack_angle_mode,engage_delay_dps,engage_delay_heal,flags) VALUES ({},{},{},{},{},{},{},{})",
+        bmci->first.GetCounter(), md->dist_follow, md->dist_attack, md->attack_range_mode, md->attack_angle_mode, md->engage_delay_dps, md->engage_delay_heal,
+        (md->flags & NPCBOT_MGR_FLAG_MASK_ALL_DB_ALLOWED));
 }
 
 class AC_GAME_API WanderingBotXpGainFormulaScript : public FormulaScript
