@@ -91,6 +91,9 @@ enum BotCommonValues
 //COMMON AOE TRIGGERS
     CREATURE_FOCUS_FIRE_N               = 18374,
     CREATURE_FOCUS_FIRE_H               = 20308,
+    CREATURE_MT_PHOENIX                 = 24674,
+    CREATURE_MT_ARCANE_SPHERE_N         = 24708,
+    CREATURE_MT_ARCANE_SPHERE_H         = 25543,
     CREATURE_ZA_FIRE_BOMB               = 23920,
     CREATURE_UK_SHADOW_AXE_N            = 23997,
     CREATURE_UK_SHADOW_AXE_H            = 31835,

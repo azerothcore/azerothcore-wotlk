@@ -5075,6 +5075,24 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
             spots.push_back(AoeSpotsVec::value_type(*creature, radius));
         }
     }
+    //Magister's Terrace
+    else if (unit->GetMapId() == 585)
+    {
+        std::list<Creature*> cList;
+        static const auto kael_aoe_check = [](Creature const* c) {
+            return (c->GetEntry() == CREATURE_MT_PHOENIX || c->GetEntry() == CREATURE_MT_ARCANE_SPHERE_N || c->GetEntry() == CREATURE_MT_ARCANE_SPHERE_H);
+        };
+        Acore::CreatureListSearcher searcher3(unit, cList, kael_aoe_check);
+        Cell::VisitAllObjects(unit, searcher3, 40.f);
+
+        if (!cList.empty())
+        {
+            spellInfo = sSpellMgr->GetSpellInfo(44198); //Burn damage (44197 -> 44198)
+            float radius = spellInfo->Effects[0].CalcRadius() + DEFAULT_COMBAT_REACH * 3.0f;
+            for (Creature* c : cList)
+                spots.emplace_back(*c, radius);
+        }
+    }
     //The Eye of Eternity
     else if (unit->GetMapId() == 616 && unit->GetVehicle())
     {
