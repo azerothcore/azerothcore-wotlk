@@ -2928,6 +2928,7 @@ bool Player::addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank)
         newTalent->inSpellBook = talentInfo->addToSpellBook && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL);
 
         m_talents[spellId] = newTalent;
+        m_usedTalentCount += talentInfo->RankID.size() - oldTalentRank;
         return true;
     }
     // xinef: if current mask does not cover addMask, add it to iterator and save changes to DB
