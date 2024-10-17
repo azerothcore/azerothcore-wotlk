@@ -4,60 +4,103 @@
 
 We support the following versions of dependencies.
 
-:white_check_mark: = supported
+| Icon                   |             Meaning             |
+| :--------------------- | :-----------------------------: |
+| :white_check_mark:     |          **Supported**          |
+| :red_circle:           |        **NOT** Supported        |
+| :large_blue_diamond:   |         **Recommended**         |
+| :large_orange_diamond: | **MIGHT** work but no guarantee |
 
-:red_circle: = NOT supported
+### Versions of AzerothCore:
 
-unspecified = might work but no guarantee
+| AzerothCore Branch             |         Status         |     Recommended      |
+| ------------------------------ | :--------------------: | :------------------: |
+| **master**                     |   :white_check_mark:   | :large_blue_diamond: |
+| bg-arena-modules-compatibility | :large_orange_diamond: |                      |
+| Any non-official fork          | :large_orange_diamond: |                      |
+| Any Playerbots fork            |      :red_circle:      |                      |
+| Any NPCBots fork               |      :red_circle:      |                      |
+| Any AC (non-official) repack   |      :red_circle:      |                      |
 
-Versions of AzerothCore:
+### Supported Operating Systems
 
-| AzerothCore Branch | Supported          |
-| ------------------ | ------------------ |
-| master             | :white_check_mark: |
-| Any playerbot fork | :red_circle:       |
-| Any NPCBot fork    | :red_circle:       |
+<details>
+    <summary> [Click the arrow to see]</summary>
 
-Versions of MySQL:
+| Linux (Ubuntu) |       Status       |     Recommended      |
+| :------------- | :----------------: | :------------------: |
+| 24.04          | :white_check_mark: | :large_blue_diamond: |
+| 22.04          | :white_check_mark: |                      |
+| 20.04 ≤        |    :red_circle:    |                      |
 
-| MySQL Version | Supported          |
-| ------------- | ------------------ |
-| 8.4           | :white_check_mark: |
-| 8.0           | :white_check_mark: |
-| 5.7 and lower | :red_circle:       |
+| Linux (Debian) |         Status         | Recommended |
+| :------------- | :--------------------: | :---------: |
+| 12             | :large_orange_diamond: |             |
+| 11             | :large_orange_diamond: |             |
 
-Versions of CLang:
+| macOS |         Status         |     Recommended      |
+| :---- | :--------------------: | :------------------: |
+| 14    |   :white_check_mark:   | :large_blue_diamond: |
+| 13    | :large_orange_diamond: |                      |
+| 12 ≤  |      :red_circle:      |                      |
 
-| CLang Version | Supported          |
-| ------------- | ------------------ |
-| 18            | :white_check_mark: |
-| 15            | :white_check_mark: |
-| 14 and lower  | :red_circle:       |
+| Windows       |       Status       | Recommended |
+| :------------ | :----------------: | :---------: |
+| Windows 10    | :white_check_mark: |
+| Windows 11    | :white_check_mark: |
+| Windows 8.1 ≤ |    :red_circle:    |
 
-Versions of GCC:
+</details>
+<br>
 
-| GCC Version  | Supported          |
-| ------------ | ------------------ |
-| 14           | :white_check_mark: |
-| 12           | :white_check_mark: |
-| 11 and lower | :red_circle:       |
+### Supported Boost Versions:
 
-Versions of Ubuntu:
+| Boost  |       Status       |     Recommended      |
+| :----- | :----------------: | :------------------: |
+| 1.70 ≥ | :white_check_mark: | :large_blue_diamond: |
 
-| Ubuntu version  | Supported          |
-| --------------- | ------------------ |
-| 24.04           | :white_check_mark: |
-| 22.04           | :white_check_mark: |
-| 20.04 and lower | :red_circle:       |
+### Supported OpenSSL Versions:
 
-Versions of macOS:
+| OpenSSL |       Status       |     Recommended      |
+| :------ | :----------------: | :------------------: |
+| 3.X.X ≥ | :white_check_mark: | :large_blue_diamond: |
 
-| macOS Version | Supported          |
-| ------------- | ------------------ |
-| 14            | :white_check_mark: |
-| 12 and lower  | :red_circle:       |
+### Supported CMake Versions:
 
-**Note**: We do NOT support any repacks that may or may not have been made based on AzerothCore. This is because they are usually based on older versions and there is no way to know what is in the precompiled binaries. Instead, you should compile your binaries from the AzerothCore source. To get started, read the [Installation Guide](https://www.azerothcore.org/wiki/installation).
+| CMake  |       Status       |     Recommended      |
+| :----- | :----------------: | :------------------: |
+| 3.16 ≥ | :white_check_mark: | :large_blue_diamond: |
+
+### Supported MySQL Versions:
+
+| MySQL |       Status       |     Recommended      |
+| :---- | :----------------: | :------------------: |
+| 8.4 ≥ | :white_check_mark: | :large_blue_diamond: |
+| 8.0   | :white_check_mark: |                      |
+| 8.1   |    :red_circle:    |                      |
+| 8.0 < |    :red_circle:    |                      |
+
+### Supported CLang Versions:
+
+| CLang |       Status       | Recommended |
+| :---- | :----------------: | :---------: |
+| 18    | :white_check_mark: |             |
+| 15    | :white_check_mark: |             |
+| 14 ≤  |    :red_circle:    |             |
+
+### Supported GCC Versions:
+
+| GCC  |       Status       |     Recommended      |
+| :--- | :----------------: | :------------------: |
+| 14   | :white_check_mark: | :large_blue_diamond: |
+| 12   | :white_check_mark: |                      |
+| 11 ≤ |    :red_circle:    |                      |
+
+> [!NOTE]
+> We do **NOT** support any repacks that may or may not have been made based on AzerothCore. This is because they are usually based on older versions and there is no way to know what is in the precompiled binaries. Instead, you should compile your binaries from the AzerothCore source. To get started, read the [Installation Guide](https://www.azerothcore.org/wiki/installation).
+
+> [!CAUTION] 
+> [Why you should not use repacks to run your WoW server](https://www.mangosrumors.org/why-you-should-not-use-repacks-to-run-your-wow-server/)
 
 ## Reporting a Vulnerability
 
