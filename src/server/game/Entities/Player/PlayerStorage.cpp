@@ -74,6 +74,7 @@
 
 //npcbot
 #include "botdatamgr.h"
+#include "botmgr.h"
 //end npcbot
 
 /*********************************************************/
@@ -5620,6 +5621,11 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         if (!HasAuraState((AuraStateType)m_spellInfo->CasterAuraState))
             aura->HandleAllEffects(itr->second, AURA_EFFECT_HANDLE_REAL, false);
     }
+
+    //npcbots: load BotManager data
+    _botMgr->LoadData();
+    //end npcbots
+
     return true;
 }
 
@@ -7121,8 +7127,9 @@ void Player::SaveToDB(CharacterDatabaseTransaction trans, bool create, bool logo
     if (Pet* pet = GetPet())
         pet->SavePetToDB(PET_SAVE_AS_CURRENT);
 
-    //npcbot: save stored items
+    //npcbot: save player-related npcbot data
     BotDataMgr::SaveNpcBotStoredGear(GetGUID(), trans);
+    BotDataMgr::SaveNpcBotMgrData(GetGUID(), trans);
     //end npcbot
 }
 
