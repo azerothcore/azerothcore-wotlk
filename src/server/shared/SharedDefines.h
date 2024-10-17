@@ -506,8 +506,8 @@ enum SpellAttr3 : uint32
     SPELL_ATTR3_HIDE_CHANNEL_BAR                      = 0x00002000, // TITLE Do not display channel bar (client only)
     SPELL_ATTR3_HIDE_IN_RAID_FILTER                   = 0x00004000, // TITLE Honorless Target
     SPELL_ATTR3_NORMAL_RANGED_ATTACK                  = 0x00008000, // TITLE Unknown attribute 15@Attr3 DESCRIPTION Auto Shoot, Shoot, Throw - ranged normal attack attribute?
-    SPELL_ATTR3_SUPPRESS_CASTER_PROCS                  = 0x00010000, // TITLE Cannot trigger procs
-    SPELL_ATTR3_SUPPRESS_TARGET_PROCS                  = 0x00020000, // TITLE No initial aggro
+    SPELL_ATTR3_SUPPRESS_CASTER_PROCS                 = 0x00010000, // TITLE Cannot trigger procs
+    SPELL_ATTR3_SUPPRESS_TARGET_PROCS                 = 0x00020000, // TITLE No initial aggro
     SPELL_ATTR3_ALWAYS_HIT                            = 0x00040000, // TITLE Ignore hit result DESCRIPTION Spell cannot miss, or be dodged/parried/blocked
     SPELL_ATTR3_INSTANT_TARGET_PROCS                  = 0x00080000, // TITLE Cannot trigger spells during aura proc
     SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD                 = 0x00100000, // TITLE Persists through death
