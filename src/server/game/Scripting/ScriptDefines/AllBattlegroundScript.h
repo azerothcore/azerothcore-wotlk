@@ -44,7 +44,7 @@ enum AllBattlegroundHook
 };
 
 enum BattlegroundBracketId : uint8;
-enum BattlegroundTypeId : uint8;
+enum BattlegroundTypeId : uint16;
 enum TeamId : uint8;
 
 class AllBattlegroundScript : public ScriptObject
