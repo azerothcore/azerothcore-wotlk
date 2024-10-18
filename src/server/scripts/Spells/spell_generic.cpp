@@ -5311,6 +5311,27 @@ class spell_gen_steal_weapon : public AuraScript
     }
 };
 
+// 38054 - Random Rocket Missile
+class spell_random_rocket_missile : public SpellScript
+{
+    PrepareSpellScript(spell_random_rocket_missile);
+
+    void CheckTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if([&](WorldObject const* target) -> bool
+        {
+            if (GameObject const* go = target->ToGameObject())
+                return go->getLootState() == GO_ACTIVATED; // can only hit unused Deathforged Infernal
+            return true;
+        });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_random_rocket_missile::CheckTargets, EFFECT_0, TARGET_GAMEOBJECT_SRC_AREA);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -5468,4 +5489,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_consumption);
     RegisterSpellScript(spell_gen_sober_up);
     RegisterSpellScript(spell_gen_steal_weapon);
+    RegisterSpellScript(spell_random_rocket_missile);
 }
