@@ -22,6 +22,13 @@
 #include "SpellScript.h"
 #include "scholomance.h"
 
+// Lanny - NPCBot
+enum Says
+{
+   YELL_SUMMONED                = 0
+};
+// End Lanny - NPCBot
+
 enum Spells
 {
     SPELL_ARCANE_MISSILES = 15790,
@@ -249,6 +256,7 @@ public:
             {
                 me->SetVisible(true);
                 me->SetFaction(21);
+                Talk(YELL_SUMMONED); // Lanny - NPCBot
             }
             OpenAllGates();
             summons.DespawnAll();
