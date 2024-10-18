@@ -47,45 +47,22 @@ EndContentData */
 // Ours
 enum TheFelAndTheFurious
 {
-    SPELL_ROCKET_LAUNCHER = 38083
+    SPELL_RANDOM_ROCKET_MISSILE = 38054
 };
 
+// 38055 - Destroy Deathforged Infernal
 class spell_q10612_10613_the_fel_and_the_furious : public SpellScript
 {
     PrepareSpellScript(spell_q10612_10613_the_fel_and_the_furious);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_ROCKET_LAUNCHER });
+        return ValidateSpellInfo({ SPELL_RANDOM_ROCKET_MISSILE });
     }
 
     void HandleScriptEffect(SpellEffIndex  /*effIndex*/)
     {
-        Player* charmer = GetCaster()->GetCharmerOrOwnerPlayerOrPlayerItself();
-        if (!charmer)
-            return;
-
-        std::list<GameObject*> gList;
-        GetCaster()->GetGameObjectListWithEntryInGrid(gList, 184979, 30.0f);
-        uint8 counter = 0;
-        for (std::list<GameObject*>::const_iterator itr = gList.begin(); itr != gList.end(); ++itr, ++counter)
-        {
-            if (counter >= 10)
-                break;
-            GameObject* go = *itr;
-            if (!go->isSpawned())
-                continue;
-            Creature* cr2 = go->SummonTrigger(go->GetPositionX(), go->GetPositionY(), go->GetPositionZ() + 2.0f, 0.0f, 100);
-            if (cr2)
-            {
-                cr2->SetFaction(FACTION_MONSTER);
-                cr2->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                GetCaster()->CastSpell(cr2, SPELL_ROCKET_LAUNCHER, true);
-            }
-
-            go->SetLootState(GO_JUST_DEACTIVATED);
-            charmer->KilledMonsterCredit(21959);
-        }
+        GetCaster()->CastSpell(GetCaster(), SPELL_RANDOM_ROCKET_MISSILE);
     }
 
     void Register() override
@@ -2235,6 +2212,57 @@ struct dragonmaw_race_npc : public ScriptedAI
         Player* _player;
 };
 
+// 38054 - Random Rocket Missile
+class spell_random_rocket_missile : public SpellScript
+{
+    PrepareSpellScript(spell_random_rocket_missile);
+
+    void CheckTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.size() > 10)
+            Acore::Containers::RandomResize(targets, 10);
+    }
+
+    void HandleActivateObject(SpellEffIndex /*effIndex*/)
+    {
+        GetHitGObj()->SetLootState(GO_JUST_DEACTIVATED);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_random_rocket_missile::CheckTargets, EFFECT_0, TARGET_GAMEOBJECT_SRC_AREA);
+        OnEffectHitTarget += SpellEffectFn(spell_random_rocket_missile::HandleActivateObject, EFFECT_0, SPELL_EFFECT_ACTIVATE_OBJECT);
+    }
+};
+
+struct npc_fel_reaver_sentinel : public CreatureAI
+{
+    npc_fel_reaver_sentinel(Creature* creature) : CreatureAI(creature) { }
+
+    void UpdateAI(uint32 /*diff*/) override {}
+
+    void OnCharmed(bool apply) override
+    {
+        if (!apply)
+        {
+            me->DespawnOrUnsummon();
+            me->SetRespawnTime(1);
+            me->SetCorpseDelay(1);
+        }
+    }
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == 38020)
+        {
+            Player* charmer = me->GetCharmerOrOwnerPlayerOrPlayerItself();
+            if (!charmer)
+                return;
+            me->CastSpell(charmer, 38022); // FRS Quest Credit
+        }
+    }
+};
+
 void AddSC_shadowmoon_valley()
 {
     // Ours
@@ -2260,4 +2288,6 @@ void AddSC_shadowmoon_valley()
     RegisterCreatureAI(npc_korkron_or_wildhammer);
     RegisterSpellScript(spell_calling_korkron_or_wildhammer);
     RegisterSpellScript(spell_disrupt_summoning_ritual);
+    RegisterSpellScript(spell_random_rocket_missile);
+    RegisterCreatureAI(npc_fel_reaver_sentinel);
 }
