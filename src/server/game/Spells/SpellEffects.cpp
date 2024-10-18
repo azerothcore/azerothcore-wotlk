@@ -714,6 +714,35 @@ void Spell::EffectDummy(SpellEffIndex effIndex)
 
                             return;
                         }
+                    // Fel Reaver Controller
+                    case 38002:
+                    case 38120:
+                    case 38122:
+                    case 38125:
+                    case 38127:
+                    case 38129:
+                        {
+                            if (!unitTarget)
+                                return;
+                            uint32 spellId = 0;
+                            switch (m_spellInfo->Id)
+                            {
+                                case 38002: spellId = 38003; break;
+                                case 38120: spellId = 38121; break;
+                                case 38122: spellId = 38123; break;
+                                case 38125: spellId = 38126; break;
+                                case 38127: spellId = 38128; break;
+                                case 38129: spellId = 38130; break;
+                            }
+                            unitTarget->CastSpell((Unit*)nullptr, spellId);
+                            return;
+                        }
+                    // Fel Reaver Controller Tag
+                    case 38020:
+                        {
+                            unitTarget->CastSpell(unitTarget, 38022); // FRS Quest Credit
+                            return;
+                        }
                 }
                 break;
             }
@@ -3949,8 +3978,19 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                             m_caster->CastSpell(m_caster, 61268, true);
                             return;
                         }
+                    // Destroy Deathforged Infernal
+                    case 38055:
+                        {
+                            if (!unitTarget)
+                                return;
+
+                            for (uint32 i = 0; i < 10; ++i)
+                                m_caster->CastSpell((Unit*)nullptr, 38054, true);
+                            return;
+                        }
                 }
                 break;
+
             }
         case SPELLFAMILY_ROGUE:
             {
