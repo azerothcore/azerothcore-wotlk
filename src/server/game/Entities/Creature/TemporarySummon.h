@@ -61,6 +61,7 @@ public:
     [[nodiscard]] bool IsVisibleBySummonerOnly() const { return _visibleBySummonerOnly; }
 
     const SummonPropertiesEntry* const m_Properties;
+    bool m_InheritsOwnerSpeed = true; /// Adjust whether this summon inherits its owners speed/velocity
 
     std::string GetDebugInfo() const override;
 
