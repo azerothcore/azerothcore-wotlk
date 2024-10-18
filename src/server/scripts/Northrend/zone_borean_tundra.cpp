@@ -475,6 +475,94 @@ public:
 };
 
 /*######
+## Quest 11881: Load'er Up
+######*/
+
+// NPC 25969: Jenny
+enum Jenny
+{
+    EVENT_JENNY_MOVE_TO_FEZZIX                      = 1,
+    EVENT_JENNY_DESPAWN                             = 2,
+    SPELL_CRATES_CARRIED                            = 46340,
+    SPELL_DROP_CRATE                                = 46342,
+    SPELL_GIVE_JENNY_CREDIT                         = 46358,
+    NPC_FEZZIX_GEARTWIST                            = 25849
+};
+
+class npc_jenny : public CreatureScript
+{
+public:
+    npc_jenny() : CreatureScript("npc_jenny") {}
+
+    struct npc_jennyAI : public FollowerAI
+    {
+        npc_jennyAI(Creature* creature) : FollowerAI(creature)
+        {
+            Initialize();
+        }
+
+        void Initialize()
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->CastSpell(me, SPELL_CRATES_CARRIED);
+            // This NPC only moves at its fixed speed_run rate in the db
+            if (TempSummon* summon = me->ToTempSummon())
+                summon->m_InheritsOwnerSpeed = false;
+            if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                StartFollow(summoner);
+        }
+
+        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        {
+            if (me->HasAura(SPELL_CRATES_CARRIED))
+                me->CastSpell(me, SPELL_DROP_CRATE);
+            else
+                me->DespawnOrUnsummon();
+        }
+
+        void UpdateFollowerAI(uint32 diff) override
+        {
+            _events.Update(diff);
+
+            if (uint32 eventId = _events.ExecuteEvent())
+            {
+                switch (eventId)
+                {
+                    case EVENT_JENNY_MOVE_TO_FEZZIX:
+                        me->SetWalk(true);
+                        me->GetMotionMaster()->MovePoint(0, _fezzix);
+                        _events.ScheduleEvent(EVENT_JENNY_DESPAWN, 7s);
+                        break;
+                    case EVENT_JENNY_DESPAWN:
+                        me->DespawnOrUnsummon();
+                        break;
+                }
+            }
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (who->GetEntry() == NPC_FEZZIX_GEARTWIST && me->IsWithinDistInMap(who, 15.0f))
+            {
+                if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
+                    me->CastSpell(summoner, SPELL_GIVE_JENNY_CREDIT);
+                SetFollowComplete(true);
+                _fezzix = who->GetPosition();
+                _events.ScheduleEvent(EVENT_JENNY_MOVE_TO_FEZZIX, 1s);
+            }
+        }
+    private:
+        EventMap _events;
+        Position _fezzix;
+    };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return new npc_jennyAI(creature);
+    }
+};
+
+/*######
 ## Quest 11590: Abduction
 ######*/
 
@@ -2041,6 +2129,7 @@ void AddSC_borean_tundra()
     new npc_thassarian2();
     new npc_leryssa();
     new npc_counselor_talbot();
+    new npc_jenny();
 
     // Theirs
     new npc_sinkhole_kill_credit();
