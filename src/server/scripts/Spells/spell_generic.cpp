@@ -5557,7 +5557,4 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_consumption);
     RegisterSpellScript(spell_gen_sober_up);
     RegisterSpellScript(spell_gen_steal_weapon);
-    RegisterSpellScript(spell_gen_set_health);
-    RegisterSpellScript(spell_pet_spellhit_expertise_spellpen_scaling);
-    RegisterSpellScript(spell_gen_proc_on_victim);
 }
