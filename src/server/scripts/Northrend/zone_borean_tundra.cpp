@@ -2129,6 +2129,7 @@ void AddSC_borean_tundra()
     new npc_thassarian2();
     new npc_leryssa();
     new npc_counselor_talbot();
+    new npc_jenny();
 
     // Theirs
     new npc_sinkhole_kill_credit();
