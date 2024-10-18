@@ -513,8 +513,8 @@ enum SpellAttr3 : uint32
     SPELL_ATTR3_HIDE_CHANNEL_BAR                      = 0x00002000, // TITLE Do not display channel bar (client only)
     SPELL_ATTR3_HIDE_IN_RAID_FILTER                   = 0x00004000, // TITLE Honorless Target
     SPELL_ATTR3_NORMAL_RANGED_ATTACK                  = 0x00008000, // TITLE Unknown attribute 15@Attr3 DESCRIPTION Auto Shoot, Shoot, Throw - ranged normal attack attribute?
-    SPELL_ATTR3_SUPRESS_CASTER_PROCS                  = 0x00010000, // TITLE Cannot trigger procs
-    SPELL_ATTR3_SUPRESS_TARGET_PROCS                  = 0x00020000, // TITLE No initial aggro
+    SPELL_ATTR3_SUPPRESS_CASTER_PROCS                 = 0x00010000, // TITLE Cannot trigger procs
+    SPELL_ATTR3_SUPPRESS_TARGET_PROCS                 = 0x00020000, // TITLE No initial aggro
     SPELL_ATTR3_ALWAYS_HIT                            = 0x00040000, // TITLE Ignore hit result DESCRIPTION Spell cannot miss, or be dodged/parried/blocked
     SPELL_ATTR3_INSTANT_TARGET_PROCS                  = 0x00080000, // TITLE Cannot trigger spells during aura proc
     SPELL_ATTR3_ALLOW_AURA_WHILE_DEAD                 = 0x00100000, // TITLE Persists through death
@@ -557,7 +557,7 @@ enum SpellAttr4 : uint32
     SPELL_ATTR4_AURA_NEVER_BOUNCES                 = 0x00100000, // TITLE Allow self-cast to override stronger aura (client only)
     SPELL_ATTR4_ALLOW_ENETRING_ARENA               = 0x00200000, // TITLE Keep when entering arena
     SPELL_ATTR4_PROC_SUPPRESS_SWING_ANIM           = 0x00400000, // TITLE Unknown attribute 22@Attr4 DESCRIPTION Seal of Command (42058,57770) and Gymer's Smash 55426
-    SPELL_ATTR4_SUPRESS_WEAPON_PROCS               = 0x00800000, // TITLE Cannot trigger item spells
+    SPELL_ATTR4_SUPPRESS_WEAPON_PROCS               = 0x00800000, // TITLE Cannot trigger item spells
     SPELL_ATTR4_AUTO_RANGED_COMBAT                 = 0x01000000, // TITLE Unknown attribute 24@Attr4 DESCRIPTION Shoot-type spell?
     SPELL_ATTR4_OWNER_POWER_SCALING                = 0x02000000, // TITLE Pet Scaling aura
     SPELL_ATTR4_ONLY_FLYING_AREAS                  = 0x04000000, // TITLE Only in Outland/Northrend
