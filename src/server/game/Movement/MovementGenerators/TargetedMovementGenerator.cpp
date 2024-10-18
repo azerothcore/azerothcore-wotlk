@@ -342,7 +342,7 @@ static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const
         if (TempSummon* summon = owner->ToTempSummon())
             if (!summon->m_InheritsOwnerSpeed)
                 return speed;
-        
+
         uint32 moveFlags = target->GetUnitMovementFlags();
         if (target->movespline->isWalking())
         {

@@ -508,7 +508,7 @@ public:
             // This NPC only moves at its fixed speed_run rate in the db
             if (TempSummon* summon = me->ToTempSummon())
                 summon->m_InheritsOwnerSpeed = false;
-            if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer()) 
+            if (Player* summoner = me->ToTempSummon()->GetSummonerUnit()->ToPlayer())
                 StartFollow(summoner);
         }
 
