@@ -227,7 +227,7 @@ enum BotStances
     DRUID_TREE_FORM,
     DRUID_TRAVEL_FORM,
     DRUID_AQUATIC_FORM,
-    //DRUID_FLIGHT_FORM //NYI
+    DRUID_FLIGHT_FORM
 };
 
 enum BotRoles : uint32

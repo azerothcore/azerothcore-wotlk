@@ -80,7 +80,7 @@ enum DruidBaseSpells
     TREE_OF_LIFE_FORM_1                 = 33891,
     TRAVEL_FORM_1                       = 783,
     AQUATIC_FORM_1                      = 1066,
-    //FLIGHT_FORM_1                       = 0,//niy
+    FLIGHT_FORM_1                       = 33943,
     ABOLISH_POISON_1                    = 2893,//manual use only
     CURE_POISON_1                       = 8946,
     REMOVE_CURSE_1                      = 2782,
@@ -315,6 +315,9 @@ public:
                         break;
                     //case FORM_FLIGHT:
                     //case FORM_FLIGHT_EPIC:
+                    case DRUID_FLIGHT_FORM:
+                        me->RemoveAurasDueToSpell(GetSpell(FLIGHT_FORM_1));
+                        break;
                     default:
                         break;
                 }
@@ -1198,9 +1201,9 @@ public:
                     case DRUID_CAT_FORM:     sshift = GetSpell(CAT_FORM_1);         break;
                     case DRUID_MOONKIN_FORM: sshift = GetSpell(MOONKIN_FORM_1);     break;
                     case DRUID_TREE_FORM:    sshift = GetSpell(TREE_OF_LIFE_FORM_1);break;
-                    //case DRUID_FLIGHT_FORM:  sshift = GetSpell(FLIGHT_FORM_1);      break;
                     case DRUID_TRAVEL_FORM:  sshift = GetSpell(TRAVEL_FORM_1);      break;
                     case DRUID_AQUATIC_FORM: sshift = GetSpell(AQUATIC_FORM_1);     break;
+                    case DRUID_FLIGHT_FORM:  sshift = GetSpell(FLIGHT_FORM_1);      break;
                     case BOT_STANCE_NONE:    sshift = GetSpell(TRAVEL_FORM_1);      break;
                     default:                 sshift = 0;                            break;
                 }
@@ -1665,13 +1668,13 @@ public:
                         me->SetPowerType(POWER_MANA);
                     }
                     break;
-                //case DRUID_FLIGHT_FORM:
-                //    if (me->GetPowerType() != POWER_MANA)
-                //    {
-                //        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (flight)");
-                //        me->SetPowerType(POWER_MANA);
-                //    }
-                //    break;
+                case DRUID_FLIGHT_FORM:
+                    if (me->GetPowerType() != POWER_MANA)
+                    {
+                        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (flight)");
+                        me->SetPowerType(POWER_MANA);
+                    }
+                    break;
                 case BOT_STANCE_NONE:
                     if (me->GetPowerType() != POWER_MANA)
                     {
@@ -2461,8 +2464,8 @@ public:
                 setStats(DRUID_TRAVEL_FORM);
             else if (baseId == AQUATIC_FORM_1)
                 setStats(DRUID_AQUATIC_FORM);
-            //else if (baseId == FLIGHT_FORM_1)
-            //    setStats(DRUID_FLIGHT_FORM);
+            else if (baseId == FLIGHT_FORM_1)
+                setStats(DRUID_FLIGHT_FORM);
 
             //Cat Form: delay prowl just a little bit
             if (baseId == CAT_FORM_1 && GetSpell(PROWL_1) && GetSpellCooldown(PROWL_1) < 300)
@@ -2725,6 +2728,7 @@ public:
             InitSpellMap(FAERIE_FIRE_NORMAL_1);
             InitSpellMap(TRAVEL_FORM_1);
             InitSpellMap(AQUATIC_FORM_1);
+            InitSpellMap(FLIGHT_FORM_1);
             InitSpellMap(CURE_POISON_1);
             InitSpellMap(ABOLISH_POISON_1);
             InitSpellMap(REMOVE_CURSE_1);
@@ -2835,6 +2839,8 @@ public:
                     return true;
                 case AQUATIC_FORM_1:
                     return me->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && me->IsUnderWater();
+                case FLIGHT_FORM_1:
+                    return master->IsMounted() && !me->HasUnitMovementFlag(MOVEMENTFLAG_SWIMMING) && !me->IsUnderWater();
                 case TYPHOON_1:
                 case STARFALL_1:
                 case MOONKIN_FORM_1:
