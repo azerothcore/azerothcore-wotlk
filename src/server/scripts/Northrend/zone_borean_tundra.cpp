@@ -512,7 +512,7 @@ public:
                 StartFollow(summoner);
         }
 
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& /*damage*/, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
         {
             if (me->HasAura(SPELL_CRATES_CARRIED))
                 me->CastSpell(me, SPELL_DROP_CRATE);
