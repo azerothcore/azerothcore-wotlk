@@ -177,6 +177,7 @@ struct boss_illidari_council : public BossAI
         else if (param == ACTION_END_ENCOUNTER)
         {
             me->setActive(false);
+            me->GetMap()->UpdateEncounterState(ENCOUNTER_CREDIT_KILL_CREATURE, me->GetEntry(), me);
             for (uint8 i = DATA_GATHIOS_THE_SHATTERER; i <= DATA_VERAS_DARKSHADOW; ++i)
                 if (Creature* member = instance->GetCreature(i))
                     if (member->IsAlive())
@@ -339,7 +340,7 @@ struct boss_gathios_the_shatterer : public boss_illidari_council_memberAI
             if (roll_chance_i(50))
                 Talk(SAY_COUNCIL_SPECIAL);
             DoCastSelf(SPELL_CONSECRATION);
-            events.ScheduleEvent(EVENT_SPELL_AURA, 30s);
+            events.ScheduleEvent(EVENT_SPELL_CONSECRATION, 30s);
             break;
         case EVENT_SPELL_HAMMER_OF_JUSTICE:
             if (Unit* target = me->GetVictim())

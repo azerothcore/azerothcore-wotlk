@@ -175,6 +175,25 @@ Position illidanTakeoffPoint = { 727.6356f, 305.62753, 359.1486f };
 Position illidanLand = { 676.648f, 304.76074f, 354.18906f, 6.230825424194335937f };
 Position roomCenter = { 676.021f, 305.455f, 353.582f, 3.82227f };
 
+Position const BladesPositions[2] =
+{
+    { 676.226013f, 325.230988f },
+    { 678.059998f, 285.220001f }
+};
+
+class ChargeTargetSelector
+{
+public:
+    ChargeTargetSelector() { }
+
+    bool operator()(Unit* unit) const
+    {
+        return unit->IsPlayer()
+            && unit->GetDistance2d(BladesPositions[0].GetPositionX(), BladesPositions[0].GetPositionY()) > 25.0f
+            && unit->GetDistance2d(BladesPositions[1].GetPositionX(), BladesPositions[1].GetPositionY()) > 25.0f;
+    }
+};
+
 struct boss_illidan_stormrage : public BossAI
 {
     boss_illidan_stormrage(Creature* creature) : BossAI(creature, DATA_ILLIDAN_STORMRAGE), _canTalk(true), _dying(false), _inCutscene(false), beamPosId(0) { }
@@ -196,6 +215,7 @@ struct boss_illidan_stormrage : public BossAI
         me->LoadEquipment(EQUIPMENT_GLAIVES, true);
         me->SetStandState(UNIT_STAND_STATE_KNEEL);
         me->SetSheath(SHEATH_STATE_UNARMED);
+        me->SetControlled(false, UNIT_STATE_ROOT);
 
         ScheduleHealthCheckEvent(90, [&] {
             // Call for minions
@@ -604,6 +624,10 @@ struct boss_illidan_stormrage : public BossAI
 
         BossAI::EnterEvadeMode(why);
         me->DespawnOnEvade();
+
+        me->m_Events.CancelEventGroup(GROUP_BERSERK);
+        me->m_Events.CancelEventGroup(GROUP_PHASE_FLYING);
+        me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
     }
 
     void JustSummoned(Creature* summon) override
@@ -1316,19 +1340,8 @@ struct npc_flame_of_azzinoth : public ScriptedAI
     void JustEngagedWith(Unit* /*who*/) override
     {
         ScheduleTimedEvent(10s, [&] {
-            if (Creature* _blade = ObjectAccessor::GetCreature(*me, _bladeGUID))
-            {
-                Unit* offTank = nullptr;
-
-                if (Creature* secondBlaze = me->FindNearestCreature(NPC_BLAZE, 100.0f, true))
-                    offTank = secondBlaze->GetVictim();
-
-                if (Unit* target = _blade->AI()->SelectTarget(SelectTargetMethod::Random, 0, -40.0f, true))
-                {
-                    if (!offTank || offTank != target)
-                        DoCast(target, SPELL_CHARGE);
-                }
-            }
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, ChargeTargetSelector()))
+                DoCast(target, SPELL_CHARGE);
         }, 5s, 20s);
 
         ScheduleTimedEvent(10s, 20s, [&] {

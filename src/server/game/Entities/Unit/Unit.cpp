@@ -1153,7 +1153,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             {
                 if (spellProto && victim->CanHaveThreatList() && !victim->HasUnitState(UNIT_STATE_EVADE) && !victim->IsInCombatWith(attacker))
                 {
-                    victim->CombatStart(attacker, !(spellProto->AttributesEx3 & SPELL_ATTR3_SUPRESS_TARGET_PROCS));
+                    victim->CombatStart(attacker, !(spellProto->AttributesEx3 & SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
                 }
 
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
@@ -5352,10 +5352,13 @@ void Unit::RemoveAurasDueToItemSpell(uint32 spellId, ObjectGuid castItemGuid)
             ++iter;
     }
 
-    for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
+    for (AuraMap::iterator iter = m_ownedAuras.lower_bound(spellId); iter != m_ownedAuras.upper_bound(spellId);)
     {
         if (iter->second->GetCastItemGUID() == castItemGuid)
-                RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
+        {
+            RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
+            iter = m_ownedAuras.lower_bound(spellId);
+        }
         else
             ++iter;
     }
@@ -5376,6 +5379,9 @@ void Unit::RemoveAurasByType(AuraType auraType, ObjectGuid casterGUID, Aura* exc
         if (aura != except && (!casterGUID || aura->GetCasterGUID() == casterGUID)
                 && ((negative && !aurApp->IsPositive()) || (positive && aurApp->IsPositive())))
         {
+            if (aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+                continue;
+
             uint32 removedAuras = m_removedAurasCount;
             RemoveAura(aurApp);
             if (m_removedAurasCount > removedAuras + 1)
@@ -5511,11 +5517,12 @@ void Unit::RemoveAurasWithMechanic(uint32 mechanic_mask, AuraRemoveMode removemo
         Aura const* aura = iter->second->GetBase();
         if (!except || aura->GetId() != except)
         {
-            if (aura->GetSpellInfo()->GetAllEffectsMechanicMask() & mechanic_mask)
-            {
-                RemoveAura(iter, removemode);
-                continue;
-            }
+            if (!aura->GetSpellInfo()->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))
+                if (aura->GetSpellInfo()->GetAllEffectsMechanicMask() & mechanic_mask)
+                {
+                    RemoveAura(iter, removemode);
+                    continue;
+                }
         }
         ++iter;
     }
