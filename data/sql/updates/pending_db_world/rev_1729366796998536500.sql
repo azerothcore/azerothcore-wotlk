@@ -90,5 +90,5 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, 
 
 -- enable all spawns for eventEntry 12
 DELETE FROM `game_event_gameobject` WHERE (`eventEntry` = 12)
-AND (`guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (180408, 180409, 180428, 180429, 188224)));
-INSERT INTO `game_event_gameobject` (SELECT 12, `guid` FROM `gameobject` WHERE `id` IN (180408, 180409, 180428, 180429, 188224));
+AND (`guid` IN (SELECT `guid` FROM `gameobject` WHERE `id` IN (180408, 180409, 180428, 180429)));
+INSERT INTO `game_event_gameobject` (SELECT 12, `guid` FROM `gameobject` WHERE `id` IN (180408, 180409, 180428, 180429));
