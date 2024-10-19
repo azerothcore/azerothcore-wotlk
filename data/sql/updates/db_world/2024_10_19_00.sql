@@ -1,3 +1,4 @@
+-- DB update 2024_10_17_00 -> 2024_10_19_00
 -- Update gameobject 'Burning Blade Pyre' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (182261, 182262, 182264, 182263))
