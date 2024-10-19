@@ -41,7 +41,16 @@ enum Says
 
 enum Creatures
 {
-    NPC_TEMP_TRIGGER                = 23920
+    NPC_TEMP_TRIGGER                = 23920,
+    NPC_ALYSON_ANTILLE              = 24240,
+    NPC_THURG                       = 24241,
+    NPC_GAZAKROTH                   = 24244,
+    NPC_LORD_RADAAN                 = 24243,
+    NPC_DARKHEART                   = 24246,
+    NPC_SLITHER                     = 24242,
+    NPC_FENSTALKER                  = 24245,
+    NPC_KORAGG                      = 24247
+
 };
 
 enum Spells
@@ -49,6 +58,11 @@ enum Spells
     SPELL_SPIRIT_BOLTS              = 43383,
     SPELL_DRAIN_POWER               = 44131,
     SPELL_SIPHON_SOUL               = 43501,
+
+    // Alyson Antille
+    SPELL_ARCANE_TORRENT            = 33390,
+    SPELL_DISPEL_MAGIC              = 43577,
+    SPELL_FLASH_HEAL                = 43575,
 
     // Druid
     SPELL_DR_THORNS                 = 43420,
@@ -116,10 +130,10 @@ const Position addPosition[4] =
 
 static uint32 addEntrySets[4][2] =
 {
-    {24240, 24241}, // Thurg or Alyson Antille
-    {24242, 24243}, // Lord Raadan or Slither
-    {24244, 24245}, // Gazakroth or Fenstalker
-    {24246, 24247}  // Darkheart or Koragg
+    {NPC_THURG,         NPC_ALYSON_ANTILLE  },
+    {NPC_LORD_RADAAN,   NPC_SLITHER         },
+    {NPC_GAZAKROTH,     NPC_FENSTALKER      },
+    {NPC_DARKHEART,     NPC_KORAGG          }
 };
 
 enum Misc
@@ -323,6 +337,95 @@ private:
     std::chrono::milliseconds _classAbilityTimer;
 };
 
+struct boss_alyson_antille : public ScriptedAI
+{
+    boss_alyson_antille(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        scheduler.CancelAll();
+        _friendlyList.clear();
+        ScriptedAI::Reset();
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        ScriptedAI::JustEngagedWith(who);
+        //populate list of friendly adds and malacrass
+        GetNearbyFriendlies();
+        ScheduleTimedEvent(10s, [&]{
+            bool friendlyCast = false;
+            RandomReverseFriendlyList();
+            for (Creature* friendly : _friendlyList)
+            {
+                if (friendly->IsAlive() && friendly->IsWithinDist2d(me, 40.0f))
+                {
+                    DoCast(friendly, SPELL_DISPEL_MAGIC);
+                    friendlyCast = true;
+                    break;
+                }
+            }
+            if (!friendlyCast)
+            {
+                if (Map* map = me->GetMap())
+                {
+                    map->DoForAllPlayers([&](Player* player)
+                    {
+                        if (player->IsWithinDist2d(me, 40.0f))
+                        {
+                            DoCast(player, SPELL_DISPEL_MAGIC);
+                            return;
+                        }
+                    });
+                }
+            }
+        }, 10s);
+        ScheduleTimedEvent(2500ms, [&]{
+            RandomReverseFriendlyList();
+            for (Creature* friendly : _friendlyList)
+            {
+                if (friendly->IsAlive() && friendly->IsWithinDist2d(me, 40.0f) && !friendly->IsFullHealth())
+                {
+                    DoCast(friendly, SPELL_FLASH_HEAL);
+                    break;
+                }
+            }
+        }, 2500ms);
+        ScheduleTimedEvent(30s, [&]{
+            DoCastSelf(SPELL_ARCANE_TORRENT); // timer not checked
+        }, 30s);
+    }
+
+    void RandomReverseFriendlyList()
+    {
+        if (urand(0, 1))
+            _friendlyList.reverse();
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        scheduler.Update(diff);
+
+        DoMeleeAttackIfReady();
+    }
+
+    void GetNearbyFriendlies()
+    {
+        me->GetCreaturesWithEntryInRange(_friendlyList, 100.0f, NPC_HEXLORD);
+        me->GetCreaturesWithEntryInRange(_friendlyList, 100.0f, NPC_GAZAKROTH);
+        me->GetCreaturesWithEntryInRange(_friendlyList, 100.0f, NPC_LORD_RADAAN);
+        me->GetCreaturesWithEntryInRange(_friendlyList, 100.0f, NPC_DARKHEART);
+        me->GetCreaturesWithEntryInRange(_friendlyList, 100.0f, NPC_SLITHER);
+        me->GetCreaturesWithEntryInRange(_friendlyList, 100.0f, NPC_FENSTALKER);
+        me->GetCreaturesWithEntryInRange(_friendlyList, 100.0f, NPC_KORAGG);
+    }
+private:
+    std::list<Creature* > _friendlyList;
+};
+
 class spell_hexlord_unstable_affliction : public AuraScript
 {
     PrepareAuraScript(spell_hexlord_unstable_affliction);
@@ -347,5 +450,6 @@ class spell_hexlord_unstable_affliction : public AuraScript
 void AddSC_boss_hex_lord_malacrass()
 {
     RegisterZulAmanCreatureAI(boss_hexlord_malacrass);
+    RegisterZulAmanCreatureAI(boss_alyson_antille);
     RegisterSpellScript(spell_hexlord_unstable_affliction);
 }
