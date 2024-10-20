@@ -410,6 +410,7 @@ public:
                 me->InterruptNonMeleeSpells(false);
                 me->UpdateEntry(DARK_SHADE_ENTRY, nullptr, false);
                 events.RescheduleEvent(4, 2s, 10s);
+                events.RescheduleEvent(5, 120s); // Lanny - NPCBot
             }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -445,6 +446,11 @@ public:
                     me->CastSpell(me->GetVictim(), SHADOWBOLT_VOLLEY_SPELL, true);
                     events.RepeatEvent(urand(11000, 17000));
                     break;
+                // Lanny - NPCBot 
+                case 5: // Kill self after two minutes. Allows melee to solo
+                    Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_FIRE, nullptr, false);
+                    break;
+                // End Lanny - NPCBot
             }
 
             DoMeleeAttackIfReady();
