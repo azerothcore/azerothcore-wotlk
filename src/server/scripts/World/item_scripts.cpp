@@ -266,34 +266,28 @@ public:
         if (!pPlayer || !pItem)
             return true;
 
-        if (pPlayer->GetAuraCount(71201) >= 100)
+        if (pPlayer->GetAuraCount(71201) >= 50)
             return true;            
 
         uint32 entry = pItem->GetEntry();
         uint32 rate = 0;
 
-        if (pPlayer->GetAuraCount(71201) < 100) {
+        if (pPlayer->GetAuraCount(71201) < 50) {
             switch (entry) {
-                case 600013:
-                    rate = 10000;
+                case 1042:
+                    rate = 50;
                     break;
-                case 600014:
-                    rate = 20000;
+                case 1043:
+                    rate = 100;
                     break;
-                case 600015:
-                    rate = 25000;
+                case 1044:
+                    rate = 250;
                     break;
-                case 600016:
-                    rate = 30000;
+                case 35778:
+                    rate = 1000;
                     break;
-                case 600017:
-                    rate = 50000;
-                    break;
-                case 600018:
-                    rate = 100000;
-                    break;
-                case 600019:
-                    rate = 150000;
+                case 842:
+                    rate = 5000;
                     break;
                 default:
                     break;
@@ -303,7 +297,7 @@ public:
         if (rate != 0)
         {
             pPlayer->DestroyItemCount(entry,1,true);
-            pPlayer->RewardRankPoints(rate, 7);
+            pPlayer->RewardRankPoints(rate, 4);
         }
         else
             ChatHandler(pPlayer->GetSession()).PSendSysMessage(GetText(pPlayer,"Вам нужен более высокий ранг для использование данного предмета.","You need a higher rank to use this item."));
