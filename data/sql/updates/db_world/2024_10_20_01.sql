@@ -1,3 +1,4 @@
+-- DB update 2024_10_20_00 -> 2024_10_20_01
 -- Update gameobject 'G_Pumpkin*' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180405, 180406, 180407, 180431))

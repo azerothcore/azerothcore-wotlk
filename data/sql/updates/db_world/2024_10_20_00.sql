@@ -1,3 +1,4 @@
+-- DB update 2024_10_19_00 -> 2024_10_20_00
 -- Update gameobject 'G_Witch*' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180429, 180428, 180408))

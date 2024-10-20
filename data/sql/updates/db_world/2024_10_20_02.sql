@@ -1,3 +1,4 @@
+-- DB update 2024_10_20_01 -> 2024_10_20_02
 -- Update gameobject 'CandleBlack01' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180415))
