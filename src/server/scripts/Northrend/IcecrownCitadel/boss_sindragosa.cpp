@@ -813,7 +813,7 @@ class spell_sindragosa_s_fury : public SpellScript
         if (ResistFactor > 0.9f)
             ResistFactor = 0.9f;
 
-        uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor) );
+        uint32 damage = uint32( (GetEffectValue() / _targetCount) * (1.0f - ResistFactor));
 
         SpellNonMeleeDamage damageInfo(GetCaster(), GetHitUnit(), GetSpellInfo(), GetSpellInfo()->SchoolMask);
         damageInfo.damage = damage;

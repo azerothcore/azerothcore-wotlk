@@ -82,6 +82,7 @@ public:
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
             { "bg",             HandleDebugBattlegroundCommand,        SEC_ADMINISTRATOR, Console::No },
+            { "cooldown",       HandleDebugCooldownCommand,            SEC_ADMINISTRATOR, Console::No },
             { "getitemstate",   HandleDebugGetItemStateCommand,        SEC_ADMINISTRATOR, Console::No },
             { "lootrecipient",  HandleDebugGetLootRecipientCommand,    SEC_ADMINISTRATOR, Console::No },
             { "getvalue",       HandleDebugGetValueCommand,            SEC_ADMINISTRATOR, Console::No },
@@ -781,6 +782,33 @@ public:
     static bool HandleDebugBattlegroundCommand(ChatHandler* /*handler*/)
     {
         sBattlegroundMgr->ToggleTesting();
+        return true;
+    }
+
+    static bool HandleDebugCooldownCommand(ChatHandler* handler, uint32 spell_id, uint32 end_time, Optional<uint32> item_id)
+    {
+        Player* player = handler->GetPlayer();
+
+        if (!player || !spell_id || !end_time)
+            return false;
+
+        if (!sSpellMgr->GetSpellInfo(spell_id))
+            return false;
+
+        if (!item_id)
+            item_id = 0;
+        else if (!sItemStore.LookupEntry(*item_id))
+            return false;
+
+        if (end_time < player->GetSpellCooldownDelay(spell_id))
+            player->RemoveSpellCooldown(spell_id, true);
+
+        player->AddSpellCooldown(spell_id, *item_id, end_time, true, false);
+
+        WorldPacket data;
+        player->BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, spell_id, end_time);
+        player->SendDirectMessage(&data);
+
         return true;
     }
 

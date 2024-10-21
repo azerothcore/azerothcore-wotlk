@@ -152,6 +152,7 @@ Battleground::Battleground()
     m_LastResurrectTime = 0;
     m_ArenaType         = 0;
     m_IsArena           = false;
+    m_IsTemplate        = true;
     m_WinnerId          = PVP_TEAM_NEUTRAL;
     m_StartTime         = 0;
     m_ResetStatTimer    = 0;
@@ -1122,6 +1123,10 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     // BG subclass specific code
     RemovePlayer(player);
 
+    // should remove spirit of redemption
+    if (player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+        player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+
     // if the player was a match participant
     if (participant)
     {
@@ -1168,9 +1173,6 @@ void Battleground::RemovePlayerAtLeave(Player* player)
             sBattlegroundMgr->ScheduleQueueUpdate(0, 0, bgQueueTypeId, bgTypeId, GetBracketId());
         }
     }
-
-    // Remove shapeshift auras
-    player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
     player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
 
@@ -2286,6 +2288,7 @@ GraveyardStruct const* Battleground::GetClosestGraveyardForBot(Creature* bot) co
 
 void Battleground::SetBracket(PvPDifficultyEntry const* bracketEntry)
 {
+    m_IsTemplate = false;
     m_BracketId = bracketEntry->GetBracketId();
     SetLevelRange(bracketEntry->minLevel, bracketEntry->maxLevel);
 }

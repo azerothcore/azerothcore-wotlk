@@ -299,7 +299,6 @@ void OutdoorPvP::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
 
 void OutdoorPvP::HandlePlayerResurrects(Player* /*player*/, uint32 /*zone*/)
 {
-
 }
 
 bool OutdoorPvP::Update(uint32 diff)

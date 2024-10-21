@@ -217,8 +217,8 @@ public:
     // These two movement types should only be used with creatures having landing/takeoff animations
     void MoveLand(uint32 id, Position const& pos, float speed = 0.0f);
     void MoveLand(uint32 id, float x, float y, float z, float speed = 0.0f); // pussywizard: added for easy calling by passing 3 floats x, y, z
-    void MoveTakeoff(uint32 id, Position const& pos, float speed = 0.0f);
-    void MoveTakeoff(uint32 id, float x, float y, float z, float speed = 0.0f); // pussywizard: added for easy calling by passing 3 floats x, y, z
+    void MoveTakeoff(uint32 id, Position const& pos, float speed = 0.0f, bool skipAnimation = false);
+    void MoveTakeoff(uint32 id, float x, float y, float z, float speed = 0.0f, bool skipAnimation = false); // pussywizard: added for easy calling by passing 3 floats x, y, z
 
     void MoveCharge(float x, float y, float z, float speed = SPEED_CHARGE, uint32 id = EVENT_CHARGE, const Movement::PointsArray* path = nullptr, bool generatePath = false, float orientation = 0.0f, ObjectGuid targetGUID = ObjectGuid::Empty);
     void MoveCharge(PathGenerator const& path, float speed = SPEED_CHARGE, ObjectGuid targetGUID = ObjectGuid::Empty);

@@ -100,7 +100,7 @@ public:
             if (pInstance)
             {
                 pInstance->SetData(DATA_VAROS, NOT_STARTED);
-                if( pInstance->GetData(DATA_CC_COUNT) < 10 )
+                if (pInstance->GetData(DATA_CC_COUNT) < 10 )
                 {
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->CastSpell(me, 50053, true);
@@ -157,23 +157,23 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if( !UpdateVictim() )
+            if (!UpdateVictim())
                 return;
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
             DoMeleeAttackIfReady();
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
                 case EVENT_AMPLIFY_MAGIC:
                     {
-                        if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true) )
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
                             me->CastSpell(target, SPELL_AMPLIFY_MAGIC, false);
                         events.Repeat(17s + 500ms, 22s + 500ms);
                     }
@@ -185,7 +185,7 @@ public:
                     {
                         Talk(SAY_AZURE);
                         Talk(SAY_AZURE_EMOTE);
-                        switch( events.ExecuteEvent() )
+                        switch (events.ExecuteEvent())
                         {
                             case EVENT_CALL_AZURE_RING_CAPTAIN_1:
                                 me->CastSpell(me, SPELL_CALL_AZURE_RING_CAPTAIN_1, true);
@@ -204,11 +204,11 @@ public:
                                 events.ScheduleEvent(EVENT_CALL_AZURE_RING_CAPTAIN_1, 16s);
                                 break;
                         }
-                        if( Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true) )
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
                         {
-                            if( Creature* trigger = me->SummonCreature(NPC_ARCANE_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13000) )
+                            if (Creature* trigger = me->SummonCreature(NPC_ARCANE_BEAM, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13000))
                             {
-                                if( Creature* c = me->FindNearestCreature(NPC_AZURE_RING_CAPTAIN, 500.0f, true) )
+                                if (Creature* c = me->FindNearestCreature(NPC_AZURE_RING_CAPTAIN, 500.0f, true))
                                     c->CastSpell(trigger, SPELL_ARCANE_BEAM_VISUAL, true);
                                 trigger->GetMotionMaster()->MoveChase(target, 0.1f);
                                 trigger->CastSpell(me, SPELL_ARCANE_BEAM_PERIODIC_DAMAGE, true);
@@ -234,7 +234,7 @@ public:
                         me->SetControlled(true, UNIT_STATE_ROOT);
                         me->CastSpell((Unit*)nullptr, SPELL_ENERGIZE_CORES, false);
                         ZapAngle += M_PI / 2;
-                        if( ZapAngle >= 2 * M_PI )
+                        if (ZapAngle >= 2 * M_PI)
                             ZapAngle -= 2 * M_PI;
                         events.ScheduleEvent(EVENT_ENERGIZE_CORES_THIN, 2s);
                     }

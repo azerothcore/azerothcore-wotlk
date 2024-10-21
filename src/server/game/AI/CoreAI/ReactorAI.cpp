@@ -17,7 +17,6 @@
 
 #include "ReactorAI.h"
 #include "CreatureAIImpl.h"
-#include "Errors.h"
 
 int32 ReactorAI::Permissible(Creature const* creature)
 {

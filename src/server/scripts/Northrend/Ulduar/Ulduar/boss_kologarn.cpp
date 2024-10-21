@@ -573,7 +573,7 @@ public:
         {
             float x, y, z;
             // left arm
-            if( me->GetEntry() == NPC_LEFT_ARM )
+            if (me->GetEntry() == NPC_LEFT_ARM )
             {
                 x = 1776.97f;
                 y = -44.8396f;

@@ -456,7 +456,7 @@ public:
 
         uint32 NextStep(uint32 nextStep)
         {
-            switch(nextStep)
+            switch (nextStep)
             {
                 case 1:
                     Talk(SAY_DIALOG_MEDIVH_1);

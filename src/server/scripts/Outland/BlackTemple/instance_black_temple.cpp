@@ -178,6 +178,13 @@ public:
                         for (ObjectGuid const& guid : ashtongueGUIDs)
                             if (Creature* ashtongue = instance->GetCreature(guid))
                                 ashtongue->SetFaction(FACTION_ASHTONGUE_DEATHSWORN);
+                        [[fallthrough]];
+                    case DATA_TERON_GOREFIEND:
+                    case DATA_GURTOGG_BLOODBOIL:
+                    case DATA_RELIQUARY_OF_SOULS:
+                        if (AllBossesDone({ DATA_SHADE_OF_AKAMA, DATA_TERON_GOREFIEND, DATA_GURTOGG_BLOODBOIL, DATA_RELIQUARY_OF_SOULS }))
+                            if (Creature* trigger = GetCreature(DATA_BLACK_TEMPLE_TRIGGER))
+                                trigger->AI()->Talk(EMOTE_LOWER_TEMPLE_DEFEATED);
                         break;
                     case DATA_ILLIDARI_COUNCIL:
                         if (Creature* akama = GetCreature(DATA_AKAMA_ILLIDAN))
@@ -186,10 +193,6 @@ public:
                     default:
                         break;
                 }
-
-                if (AllBossesDone({ DATA_SHADE_OF_AKAMA, DATA_TERON_GOREFIEND, DATA_GURTOGG_BLOODBOIL, DATA_RELIQUARY_OF_SOULS }))
-                    if (Creature* trigger = GetCreature(DATA_BLACK_TEMPLE_TRIGGER))
-                        trigger->AI()->Talk(EMOTE_LOWER_TEMPLE_DEFEATED);
             }
             return true;
         }

@@ -206,7 +206,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_PATCHWERK:
                     _patchwerkGUID = creature->GetGUID();
@@ -277,7 +277,7 @@ public:
                 return;
             }
 
-            switch(pGo->GetEntry())
+            switch (pGo->GetEntry())
             {
                 case GO_PATCHWERK_GATE:
                     _patchwerkGateGUID = pGo->GetGUID();
@@ -621,7 +621,7 @@ public:
 
         void SetData(uint32 id, uint32 data) override
         {
-            switch(id)
+            switch (id)
             {
                 case DATA_ABOMINATION_KILLED:
                     abominationsKilled++;
@@ -768,7 +768,7 @@ public:
                 return false;
 
             // Bosses data
-            switch(bossId)
+            switch (bossId)
             {
                 case BOSS_KELTHUZAD:
                     if (state == NOT_STARTED)
