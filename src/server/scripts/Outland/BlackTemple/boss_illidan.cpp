@@ -207,7 +207,7 @@ struct boss_illidan_stormrage : public BossAI
         _canTalk = true;
         _dying = false;
         _inCutscene = false;
-        beamPosId = 0;
+        beamPosId = RAND(0, int(MAX_EYE_BEAM_POS));
         me->ReplaceAllUnitFlags(UNIT_FLAG_IMMUNE_TO_PC | UNIT_FLAG_IMMUNE_TO_NPC);
         me->SetDisableGravity(false);
         me->SetHover(false);
