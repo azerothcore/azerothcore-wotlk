@@ -1134,11 +1134,52 @@ void Creature::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, 
     float weaponMinDamage = GetWeaponDamageRange(attType, MINDAMAGE);
     float weaponMaxDamage = GetWeaponDamageRange(attType, MAXDAMAGE);
 
-    // Disarm for creatures
-    if (HasWeapon(attType) && !HasWeaponForAttack(attType))
+    //npcbot: support for feral form
+    if (IsNPCBot() && IsInFeralForm())
     {
-        minDamage *= 0.5f;
-        maxDamage *= 0.5f;
+        float att_speed = GetAPMultiplier(attType, false);
+        uint8 lvl = GetLevel();
+        if (lvl > 60)
+            lvl = 60;
+
+        weaponMinDamage = lvl*0.85f*att_speed;
+        weaponMaxDamage = lvl*1.25f*att_speed;
+    }
+    else
+    //end npcbot
+    if (!CanUseAttackType(attType)) // disarm case
+    {
+        //npcbot: mimic player-like disarm (retain damage)
+        if (IsNPCBot())
+        {
+            // Main hand melee is always usable, but disarm reduces damage drastically
+            if (attType == BASE_ATTACK)
+            {
+                weaponMinDamage *= 0.25f;
+                weaponMaxDamage *= 0.25f;
+            }
+            else
+            {
+                weaponMinDamage = 0.0f;
+                weaponMaxDamage = 0.0f;
+            }
+        }
+        else
+        {
+        //end npcbot
+        weaponMinDamage = 0.0f;
+        weaponMaxDamage = 0.0f;
+        //npcbot
+        }
+    }
+    //end npcbot
+    //npcbot: support for ammo
+    else if (attType == RANGED_ATTACK)
+    {
+        float att_speed = GetAPMultiplier(attType, false);
+        weaponMinDamage += GetCreatureAmmoDPS() * att_speed;
+        weaponMaxDamage += GetCreatureAmmoDPS() * att_speed;
+    //end npcbot
     }
 
     float attackPower      = GetTotalAttackPowerValue(attType);
