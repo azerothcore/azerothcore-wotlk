@@ -7091,7 +7091,7 @@ void bot_ai::_OnHealthUpdate() const
         m_totalhp = (m_totalhp * (100 + bonuspct)) / 100;
 
     //m_totalhp = float(uint32(m_totalhp) - (uint32(m_totalhp) % 10));
-    me->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, float(m_totalhp)); //replaces base hp at max lvl
+    me->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, float(m_totalhp) * BotMgr::GetBotHPModByLevel(me->GetLevel())); //replaces base hp at max lvl
     me->UpdateMaxHealth(); //will use our values we just set (update base health and buffs)
     //TC_LOG_ERROR("entities.player", "overall hp: %u", me->GetMaxHealth());
     me->SetHealth(fullhp ? me->GetMaxHealth() : uint32(0.5f + float(me->GetMaxHealth()) * pct / 100.f)); //restore pct
@@ -7154,7 +7154,7 @@ void bot_ai::_OnManaUpdate() const
         m_basemana = (m_basemana * (100 + bonuspct)) / 100;
 
     //m_basemana = float(uint32(m_basemana) - (uint32(m_basemana) % 5));
-    me->SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, m_basemana);
+    me->SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, m_basemana * BotMgr::GetBotMPModByLevel(me->GetLevel()));
     me->UpdateMaxPower(POWER_MANA);
     me->SetPower(POWER_MANA, fullmana ? me->GetMaxPower(POWER_MANA) :
         uint32(0.5f + float(me->GetMaxPower(POWER_MANA)) * pct / 100.f)); //restore pct
@@ -7624,6 +7624,7 @@ void bot_ai::ApplyBotDamageMultiplierSpell(int32& damage, SpellNonMeleeDamage& d
 void bot_ai::ApplyBotDamageMultiplierHeal(Unit const* victim, float& heal, SpellInfo const* spellInfo, DamageEffectType damagetype, uint32 stack) const
 {
     //HEALING SPELLS amount bonus
+    heal *= BotMgr::GetBotHealingModByLevel(me->GetLevel());
     ApplyClassDamageMultiplierHeal(victim, heal, spellInfo, damagetype, stack);
     heal = (heal * (BotMgr::IsWanderingWorldBot(me) ? BotMgr::GetBotWandererHealingMod() : BotMgr::GetBotHealingMod()));
 }

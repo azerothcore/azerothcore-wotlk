@@ -176,6 +176,9 @@ class AC_GAME_API BotMgr
         static PctBrackets GetBotWandererLevelBrackets();
         static float GetBotDamageModByClass(uint8 botclass);
         static float GetBotDamageModByLevel(uint8 botlevel);
+        static float GetBotHealingModByLevel(uint8 botlevel);
+        static float GetBotHPModByLevel(uint8 botlevel);
+        static float GetBotMPModByLevel(uint8 botlevel);
 
         static uint8 GetFollowDistDefault();
         static uint32 GetEngageDelayDPSDefault();

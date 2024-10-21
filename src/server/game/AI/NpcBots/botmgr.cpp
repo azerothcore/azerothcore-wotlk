@@ -184,6 +184,9 @@ float _mult_dmg_seawitch;
 float _mult_dmg_cryptlord;
 float _bothk_rate_honor;
 std::vector<float> _mult_dmg_levels;
+std::vector<float> _mult_heal_levels;
+std::vector<float> _mult_hp_levels;
+std::vector<float> _mult_mp_levels;
 LvlBrackets _max_npcbots;
 PctBrackets _botwanderer_pct_level_brackets;
 std::vector<uint32> _disabled_instance_maps;
@@ -491,6 +494,48 @@ void BotMgr::LoadConfig(bool reload)
         _mult_dmg_levels.push_back(fval);
     }
 
+    _mult_heal_levels.clear();
+    std::string mult_healing_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.Healing.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
+    std::vector<std::string_view> toks5 = Acore::Tokenize(mult_healing_by_levels, ',', false);
+    ASSERT(toks5.size() >= BracketsCount, "NpcBot.Mult.Healing.Levels must have at least %u values", uint32(BracketsCount));
+    for (decltype(toks5)::size_type i = 0; i != toks5.size(); ++i)
+    {
+        Optional<float> val = Acore::StringTo<float>(toks5[i]);
+        if (val == std::nullopt)
+            LOG_ERROR("server.loading", "NpcBot.Mult.Healing.Levels contains invalid float value '{}', set to default", toks5[i]);
+        float fval = val.value_or(1.0f);
+        RoundToInterval(fval, 0.1f, 10.f);
+        _mult_heal_levels.push_back(fval);
+    }
+
+    _mult_hp_levels.clear();
+    std::string mult_hp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.HP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
+    std::vector<std::string_view> toks6 = Acore::Tokenize(mult_hp_by_levels, ',', false);
+    ASSERT(toks6.size() >= BracketsCount, "NpcBot.Mult.HP.Levels must have at least %u values", uint32(BracketsCount));
+    for (decltype(toks6)::size_type i = 0; i != toks6.size(); ++i)
+    {
+        Optional<float> val = Acore::StringTo<float>(toks6[i]);
+        if (val == std::nullopt)
+            LOG_ERROR("server.loading", "NpcBot.Mult.HP.Levels contains invalid float value '{}', set to default", toks6[i]);
+        float fval = val.value_or(1.0f);
+        RoundToInterval(fval, 0.1f, 10.f);
+        _mult_hp_levels.push_back(fval);
+    }
+
+    _mult_mp_levels.clear();
+    std::string mult_mp_by_levels = sConfigMgr->GetStringDefault("NpcBot.Mult.MP.Levels", "1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0");
+    std::vector<std::string_view> toks7 = Acore::Tokenize(mult_mp_by_levels, ',', false);
+    ASSERT(toks7.size() >= BracketsCount, "NpcBot.Mult.MP.Levels must have at least %u values", uint32(BracketsCount));
+    for (decltype(toks7)::size_type i = 0; i != toks7.size(); ++i)
+    {
+        Optional<float> val = Acore::StringTo<float>(toks7[i]);
+        if (val == std::nullopt)
+            LOG_ERROR("server.loading", "NpcBot.Mult.MP.Levels contains invalid float value '{}', set to default", toks7[i]);
+        float fval = val.value_or(1.0f);
+        RoundToInterval(fval, 0.1f, 10.f);
+        _mult_mp_levels.push_back(fval);
+    }
+
     _botwanderer_pct_level_brackets = {};
     std::string wanderers_by_levels = sConfigMgr->GetStringDefault("NpcBot.WanderingBots.Continents.Levels", "20,15,15,10,10,15,15,0,0");
     std::vector<std::string_view> toks2 = Acore::Tokenize(wanderers_by_levels, ',', false);
@@ -500,7 +545,7 @@ void BotMgr::LoadConfig(bool reload)
     {
         Optional<uint32> val = Acore::StringTo<uint32>(toks2[i]);
         if (val == std::nullopt)
-            LOG_ERROR("server.loading", "NpcBot.Mult.Damage.Levels contains invalid uint32 value '{}', set to default", std::string(toks2[i]).c_str());
+            LOG_ERROR("server.loading", "NpcBot.WanderingBots.Continents.Levels contains invalid uint32 value '{}', set to default", std::string(toks2[i]).c_str());
         uint32 uval = val.value_or(uint32(0));
         total_pct += uval;
         _botwanderer_pct_level_brackets[i] = uval;
@@ -3113,6 +3158,27 @@ float BotMgr::GetBotDamageModByLevel(uint8 botlevel)
     uint8 bracket = botlevel / 10;
     if (bracket < _mult_dmg_levels.size())
         return _mult_dmg_levels[bracket];
+    return 1.0f;
+}
+float BotMgr::GetBotHealingModByLevel(uint8 botlevel)
+{
+    uint8 bracket = botlevel / 10;
+    if (bracket < _mult_heal_levels.size())
+        return _mult_heal_levels[bracket];
+    return 1.0f;
+}
+float BotMgr::GetBotHPModByLevel(uint8 botlevel)
+{
+    uint8 bracket = botlevel / 10;
+    if (bracket < _mult_hp_levels.size())
+        return _mult_hp_levels[bracket];
+    return 1.0f;
+}
+float BotMgr::GetBotMPModByLevel(uint8 botlevel)
+{
+    uint8 bracket = botlevel / 10;
+    if (bracket < _mult_mp_levels.size())
+        return _mult_mp_levels[bracket];
     return 1.0f;
 }
 
