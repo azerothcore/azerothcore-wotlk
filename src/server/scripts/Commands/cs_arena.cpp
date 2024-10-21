@@ -23,6 +23,8 @@ Category: commandscripts
 EndScriptData */
 
 #include "ArenaTeamMgr.h"
+#include "ArenaSeasonMgr.h"
+#include "ArenaTeamFilter.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
@@ -36,6 +38,19 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable arenaSeasonSetCommandTable =
+        {
+            { "state",          HandleArenaSeasonSetStateCommand, SEC_ADMINISTRATOR, Console::Yes }
+        };
+
+        static ChatCommandTable arenaSeasonCommandTable =
+        {
+            { "reward",         HandleArenaSeasonRewardCommand,      SEC_ADMINISTRATOR, Console::Yes },
+            { "deleteteams",    HandleArenaSeasonDeleteTeamsCommand, SEC_ADMINISTRATOR, Console::Yes },
+            { "start",          HandleArenaSeasonStartCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "set",            arenaSeasonSetCommandTable }
+        };
+
         static ChatCommandTable arenaCommandTable =
         {
             { "create",         HandleArenaCreateCommand,   SEC_ADMINISTRATOR, Console::Yes },
@@ -44,6 +59,7 @@ public:
             { "captain",        HandleArenaCaptainCommand,  SEC_ADMINISTRATOR, Console::No  },
             { "info",           HandleArenaInfoCommand,     SEC_GAMEMASTER,    Console::Yes },
             { "lookup",         HandleArenaLookupCommand,   SEC_GAMEMASTER,    Console::No  },
+            { "season",         arenaSeasonCommandTable  }
         };
 
         static ChatCommandTable commandTable =
@@ -229,6 +245,80 @@ public:
 
         return true;
     }
+
+    static bool HandleArenaSeasonRewardCommand(ChatHandler* handler, std::string teamsFilterStr)
+    {
+        std::unique_ptr<ArenaTeamFilter> uniqueFilter = ArenaTeamFilterFactoryByUserInput().CreateFilterByUserInput(teamsFilterStr);
+        if (!uniqueFilter)
+        {
+            handler->PSendSysMessage("Invalid filter. Please check your input.");
+            return false;
+        }
+
+        std::shared_ptr<ArenaTeamFilter> sharedFilter = std::move(uniqueFilter);
+
+        if (!sArenaSeasonMgr->CanDeleteArenaTeams())
+        {
+            handler->PSendSysMessage("Cannot proceed. Make sure there are no active arenas and that rewards exist for the current season.");
+            handler->PSendSysMessage("Hint: You can disable the arena queue using the following command: .arena season set state 0");
+            return false;
+        }
+
+        handler->PSendSysMessage("Distributing rewards for arena teams (types: "+teamsFilterStr+")...");
+        sArenaSeasonMgr->RewardTeamsForTheSeason(sharedFilter);
+        handler->PSendSysMessage("Rewards distributed.");
+        return true;
+    }
+
+    static bool HandleArenaSeasonDeleteTeamsCommand(ChatHandler* handler)
+    {
+        handler->PSendSysMessage("Deleting arena teams...");
+        sArenaSeasonMgr->DeleteArenaTeams();
+        handler->PSendSysMessage("Arena teams deleted.");
+        return true;
+    }
+
+    static bool HandleArenaSeasonStartCommand(ChatHandler* handler, uint8 seasonId)
+    {
+        if (seasonId == sArenaSeasonMgr->GetCurrentSeason())
+        {
+            sArenaSeasonMgr->SetSeasonState(ARENA_SEASON_STATE_IN_PROGRESS);
+            handler->PSendSysMessage("Arena season updated.");
+            return true;
+        }
+
+        const uint8 maxSeasonId = 8;
+        if (seasonId > maxSeasonId)
+        {
+            handler->PSendSysMessage("Invalid season id.");
+            return false;
+        }
+
+        sArenaSeasonMgr->ChangeCurrentSeason(seasonId);
+        handler->PSendSysMessage("Arena season changed to season {}.", seasonId);
+        return true;
+    }
+
+    static bool HandleArenaSeasonSetStateCommand(ChatHandler* handler, uint8 state)
+    {
+        ArenaSeasonState seasonState;
+        switch (state) {
+            case ARENA_SEASON_STATE_DISABLED:
+                seasonState = ARENA_SEASON_STATE_DISABLED;
+                break;
+            case ARENA_SEASON_STATE_IN_PROGRESS:
+                seasonState = ARENA_SEASON_STATE_IN_PROGRESS;
+                break;
+            default:
+                handler->PSendSysMessage("Invalid state.");
+                return false;
+        }
+
+        sArenaSeasonMgr->SetSeasonState(seasonState);
+        handler->PSendSysMessage("Arena season updated.");
+        return true;
+    }
+
 };
 
 void AddSC_arena_commandscript()
