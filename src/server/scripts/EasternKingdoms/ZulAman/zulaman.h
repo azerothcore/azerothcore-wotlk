@@ -26,16 +26,17 @@
 enum DataTypes
 {
     DATA_GONGEVENT                      = 0,
-    DATA_NALORAKKEVENT                  = 1,
-    DATA_AKILZONEVENT                   = 2,
-    DATA_JANALAIEVENT                   = 3,
-    DATA_HALAZZIEVENT                   = 4,
-    DATA_HEXLORDEVENT                   = 5,
-    DATA_ZULJINEVENT                    = 6,
-    DATA_SPIRIT_LYNX                    = 7,
-    DATA_CHESTLOOTED                    = 8,
-    TYPE_RAND_VENDOR_1                  = 9,
-    TYPE_RAND_VENDOR_2                  = 10
+    DATA_NALORAKK                       = 1,
+    DATA_AKILZON                        = 2,
+    DATA_JANALAI                        = 3,
+    DATA_HALAZZI                        = 4,
+    DATA_HEXLORD                        = 5,
+    DATA_ZULJIN                         = 6,
+    MAX_ENCOUNTER                       = 7,
+    DATA_SPIRIT_LYNX                    = 8,
+    DATA_CHESTLOOTED                    = 9,
+    TYPE_RAND_VENDOR_1                  = 10,
+    TYPE_RAND_VENDOR_2                  = 11
 };
 
 enum CreatureIds

@@ -142,7 +142,7 @@ public:
 
         void Reset() override
         {
-            instance->SetData(DATA_JANALAIEVENT, NOT_STARTED);
+            instance->SetData(DATA_JANALAI, NOT_STARTED);
 
             FireBreathTimer = 8000;
             BombTimer = 30000;
@@ -166,8 +166,6 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
-
-            instance->SetData(DATA_JANALAIEVENT, DONE);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -177,8 +175,6 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            instance->SetData(DATA_JANALAIEVENT, IN_PROGRESS);
-
             Talk(SAY_AGGRO);
             //        DoZoneInCombat();
         }
@@ -542,7 +538,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!instance || instance->GetData(DATA_JANALAIEVENT) != IN_PROGRESS)
+            if (!instance || instance->GetData(DATA_JANALAI) != IN_PROGRESS)
             {
                 me->DisappearAndDie();
                 return;
@@ -622,7 +618,7 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!instance || instance->GetData(DATA_JANALAIEVENT) != IN_PROGRESS)
+            if (!instance || instance->GetData(DATA_JANALAI) != IN_PROGRESS)
             {
                 me->DisappearAndDie();
                 return;

@@ -85,7 +85,7 @@ public:
 
     struct boss_akilzonAI : public BossAI
     {
-        boss_akilzonAI(Creature* creature) : BossAI(creature, DATA_AKILZONEVENT)
+        boss_akilzonAI(Creature* creature) : BossAI(creature, DATA_AKILZON)
         {
         }
 
@@ -103,9 +103,6 @@ public:
             StormCount = 0;
             isRaining = false;
 
-            if (instance)
-                instance->SetData(DATA_AKILZONEVENT, NOT_STARTED);
-
             SetWeather(WEATHER_STATE_FINE, 0.0f);
         }
 
@@ -120,17 +117,12 @@ public:
 
             Talk(SAY_AGGRO);
             //DoZoneInCombat();
-
-            if (instance)
-                instance->SetData(DATA_AKILZONEVENT, IN_PROGRESS);
         }
 
         void JustDied(Unit* /*killer*/) override
         {
             Talk(SAY_DEATH);
             _JustDied();
-            if (instance)
-                instance->SetData(DATA_AKILZONEVENT, DONE);
         }
 
         void KilledUnit(Unit* who) override
