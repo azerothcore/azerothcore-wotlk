@@ -10582,12 +10582,24 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 {
                     std::ostringstream thresholdstr;
                     thresholdstr << LocalizedNpcText(player, BOT_TEXT_HEAL_TARGET_HEALTH_THRESHOLD) << ": " << uint32(GetHealHpPctThreshold()) << "%";
-                    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, thresholdstr.str(), GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_SET, GOSSIP_ACTION_INFO_DEF + 3, "", 0, true);
+                    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_TALK, thresholdstr.str(), GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_SET, GOSSIP_ACTION_INFO_DEF + 3, "", 0, true);
                 }
             }
 
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 4);
             break;
+        }
+        case GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_PROPAGATE:
+        {
+            uint8 threshold = GetHealHpPctThreshold();
+            BotMap const* bmap = player->GetBotMgr()->GetBotMap(); // player === master
+            for (BotMap::const_iterator citr = bmap->begin(); citr != bmap->end(); ++citr)
+            {
+                if (citr->second && citr->second != me && citr->second->GetBotAI() && citr->second->GetBotAI()->HasRole(BOT_ROLE_HEAL))
+                    citr->second->GetBotAI()->SetHealHpPctThreshold(threshold);
+            }
+
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_ENGAGE_BEHAVIOR, action);
         }
         case GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK:
         case GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS:
@@ -11084,13 +11096,16 @@ bool bot_ai::OnGossipSelectCode(Player* player, Creature* creature/* == me*/, ui
         }
         case GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_SET:
         {
+            subMenu = true;
+
             char* dist = strtok((char*)code, "");
             float threshold = std::min<float>(std::max<float>(atof(dist), 0.f), 99.f);
 
             SetHealHpPctThreshold(uint8(threshold));
 
-            player->PlayerTalkClass->SendCloseGossip();
-            return OnGossipSelect(player, creature, GOSSIP_SENDER_ENGAGE_BEHAVIOR, action);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_SET_FOR_ALL_EVERYONE), GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_PROPAGATE, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_ENGAGE_BEHAVIOR, GOSSIP_ACTION_INFO_DEF + 2);
+            break;
         }
         default:
             break;
