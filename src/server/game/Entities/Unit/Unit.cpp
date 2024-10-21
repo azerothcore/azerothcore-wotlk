@@ -1062,7 +1062,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             {
                 if (spellProto && victim->CanHaveThreatList() && !victim->HasUnitState(UNIT_STATE_EVADE) && !victim->IsInCombatWith(attacker))
                 {
-                    victim->CombatStart(attacker, !(spellProto->AttributesEx3 & SPELL_ATTR3_SUPRESS_TARGET_PROCS));
+                    victim->CombatStart(attacker, !(spellProto->AttributesEx3 & SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
                 }
 
                 victim->AddThreat(attacker, float(damage), damageSchoolMask, spellProto);
@@ -4076,9 +4076,11 @@ void Unit::InterruptSpell(CurrentSpellTypes spellType, bool withDelayed, bool wi
 
         if (spell->getState() != SPELL_STATE_FINISHED)
             spell->cancel(bySelf);
-
-        m_currentSpells[spellType] = nullptr;
-        spell->SetReferencedFromCurrent(false);
+        else
+        {
+            m_currentSpells[spellType] = nullptr;
+            spell->SetReferencedFromCurrent(false);
+        }
     }
 }
 
@@ -5093,10 +5095,13 @@ void Unit::RemoveAurasDueToItemSpell(uint32 spellId, ObjectGuid castItemGuid)
             ++iter;
     }
 
-    for (AuraMap::iterator iter = m_ownedAuras.begin(); iter != m_ownedAuras.end();)
+    for (AuraMap::iterator iter = m_ownedAuras.lower_bound(spellId); iter != m_ownedAuras.upper_bound(spellId);)
     {
         if (iter->second->GetCastItemGUID() == castItemGuid)
-                RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
+        {
+            RemoveOwnedAura(iter, AURA_REMOVE_BY_DEFAULT);
+            iter = m_ownedAuras.lower_bound(spellId);
+        }
         else
             ++iter;
     }
@@ -19787,6 +19792,8 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (!m_vehicle)
         return;
 
+    // This should be done before dismiss, because there may be some aura removal
+    VehicleSeatAddon const* seatAddon = m_vehicle->GetSeatAddonForSeatOfPassenger(this);
     m_vehicle->RemovePassenger(this);
 
     Player* player = ToPlayer();
@@ -19795,7 +19802,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if (player && player->duel && player->duel->IsMounted)
         player->DuelComplete(DUEL_FLED);
 
-    // This should be done before dismiss, because there may be some aura removal
     Vehicle* vehicle = m_vehicle;
     Unit* vehicleBase = m_vehicle->GetBase();
     m_vehicle = nullptr;
@@ -19806,33 +19812,22 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     SetControlled(false, UNIT_STATE_ROOT);      // SMSG_MOVE_FORCE_UNROOT, ~MOVEMENTFLAG_ROOT
 
     Position pos;
-    if (!exitPosition)                          // Exit position not specified
-        pos = vehicleBase->GetPosition();  // This should use passenger's current position, leaving it as it is now
-    // because we calculate positions incorrect (sometimes under map)
-    else
+    // If we ask for a specific exit position, use that one. Otherwise allow scripts to modify it
+    if (exitPosition)
         pos = *exitPosition;
-
-    // HACK
-    VehicleEntry const* vehicleInfo = vehicle->GetVehicleInfo();
-    if (vehicleInfo)
+    else
     {
-        if (vehicleInfo->m_ID == 380) // Kologarn right arm
+        // Set exit position to vehicle position and use the current orientation
+        pos = vehicleBase->GetPosition();  // This should use passenger's current position, leaving it as it is now
+        pos.SetOrientation(vehicleBase->GetOrientation());
+
+        // Change exit position based on seat entry addon data
+        if (seatAddon)
         {
-            pos.Relocate(1776.0f, -24.0f, 448.75f, 0.0f);
-        }
-        else if (vehicleInfo->m_ID == 91) // Helsman's Ship
-        {
-            pos.Relocate(2802.18f, 7054.91f, -0.6f, 4.67f);
-        }
-        else if (vehicleInfo->m_ID == 349) // AT Mounts, dismount to the right
-        {
-            float x = pos.GetPositionX() + 2.0f * cos(pos.GetOrientation() - M_PI / 2.0f);
-            float y = pos.GetPositionY() + 2.0f * std::sin(pos.GetOrientation() - M_PI / 2.0f);
-            float z = GetMapHeight(x, y, pos.GetPositionZ());
-            if (z > INVALID_HEIGHT)
-            {
-                pos.Relocate(x, y, z);
-            }
+            if (seatAddon->ExitParameter == VehicleExitParameters::VehicleExitParamOffset)
+                pos.RelocateOffset({ seatAddon->ExitParameterX, seatAddon->ExitParameterY, seatAddon->ExitParameterZ, seatAddon->ExitParameterO });
+            else if (seatAddon->ExitParameter == VehicleExitParameters::VehicleExitParamDest)
+                pos.Relocate({ seatAddon->ExitParameterX, seatAddon->ExitParameterY, seatAddon->ExitParameterZ, seatAddon->ExitParameterO });
         }
     }
 
@@ -19852,11 +19847,12 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     }
 
     // xinef: hack for flameleviathan seat vehicle
+    VehicleEntry const* vehicleInfo = vehicle->GetVehicleInfo();
     if (!vehicleInfo || vehicleInfo->m_ID != 341)
     {
         Movement::MoveSplineInit init(this);
         init.MoveTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
-        init.SetFacing(GetOrientation());
+        init.SetFacing(vehicleBase->GetOrientation());
         init.SetTransportExit();
         init.Launch();
     }
@@ -19909,10 +19905,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
             setDeathState(DeathState::JustDied);
         // If for other reason we as minion are exiting the vehicle (ejected, master dismounted) - unsummon
         else
-        {
-            SetVisible(false);
             ToTempSummon()->UnSummon(2000); // Approximation
-        }
     }
 
     if (player)

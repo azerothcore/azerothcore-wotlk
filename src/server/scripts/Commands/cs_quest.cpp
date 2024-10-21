@@ -362,7 +362,7 @@ public:
                     continue;
                 }
 
-                questItems.push_back(std::pair(id, count));
+                questItems.emplace_back(id, count);
             }
 
             if (!questItems.empty())
@@ -585,7 +585,7 @@ public:
                 for (uint32 const& itemId : quest->RewardChoiceItemId)
                 {
                     uint8 index = 0;
-                    questRewardItems.push_back(std::pair(itemId, quest->RewardChoiceItemCount[index++]));
+                    questRewardItems.emplace_back(itemId, quest->RewardChoiceItemCount[index++]);
                 }
             }
 
@@ -594,7 +594,7 @@ public:
                 for (uint32 const& itemId : quest->RewardItemId)
                 {
                     uint8 index = 0;
-                    questRewardItems.push_back(std::pair(itemId, quest->RewardItemIdCount[index++]));
+                    questRewardItems.emplace_back(itemId, quest->RewardItemIdCount[index++]);
                 }
             }
 
