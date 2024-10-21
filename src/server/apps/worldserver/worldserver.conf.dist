@@ -4620,13 +4620,19 @@ NpcBot.Mult.Damage.CryptLord         = 1.0
 
 #
 #    NpcBot.Mult.Damage.Levels
-#        Description: Multipliers for bots' damage by level: 0-9, 10-19, 20,29, ... , 70-79, 80+.
-#                     At least 9 values required.
+#    NpcBot.Mult.Healing.Levels
+#    NpcBot.Mult.HP.Levels
+#    NpcBot.Mult.MP.Levels
+#        Description: Multipliers for bots' damage/healing/hp/mp by level: 0-9,10-19,...,70-79,80+
+#                     At least 9 values required each.
 #        Default:     1.0
 #        Minimum:     0.1
 #        Maximum:    10.0
 
-NpcBot.Mult.Damage.Levels = 1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+NpcBot.Mult.Damage.Levels  = 1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+NpcBot.Mult.Healing.Levels = 1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+NpcBot.Mult.HP.Levels      = 1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
+NpcBot.Mult.MP.Levels      = 1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0
 
 #
 #    NpcBot.Enable.Dungeon

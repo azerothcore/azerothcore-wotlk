@@ -2212,9 +2212,10 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
             botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_REGEN_MP_CAST) << ": " << float((_botclass == BOT_CLASS_SPHYNX ? -1.f : 1.f) * me->GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) * sWorld->getRate(RATE_POWER_MANA) * 5.0f);
             botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_REGEN_MP_NOCAST) << ": " << float((_botclass == BOT_CLASS_SPHYNX ? -1.f : 1.f) * me->GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * sWorld->getRate(RATE_POWER_MANA) * 5.0f);
         }
+        int32 bot_expertise = expertise + me->GetTotalAuraModifier(SPELL_AURA_MOD_EXPERTISE);
         botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_HASTE) << ": " << (haste >= 0 ? "+" : "-") << float(haste) << " " << LocalizedNpcText(player, BOT_TEXT_PCT);
         botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_HIT) << ": +" << float(hit) << " " << LocalizedNpcText(player, BOT_TEXT_PCT);
-        botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_EXPERTISE) << ": " << int32(expertise) << " (-" << float(float(expertise) * 0.25f) << " " << LocalizedNpcText(player, BOT_TEXT_PCT) << ")";
+        botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_EXPERTISE) << ": " << int32(bot_expertise) << " (-" << float(float(bot_expertise) * 0.25f) << " " << LocalizedNpcText(player, BOT_TEXT_PCT) << ")";
         botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_ARMOR_PEN) << ": " << float(me->GetCreatureArmorPenetrationCoef()) << " " << LocalizedNpcText(player, BOT_TEXT_PCT);
         botstring << "\n" << LocalizedNpcText(player, BOT_TEXT_SPELL_PEN) << ": " << uint32(spellpen) + uint32(std::abs(me->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, SPELL_SCHOOL_MASK_MAGIC)));
 
@@ -7090,7 +7091,7 @@ void bot_ai::_OnHealthUpdate() const
         m_totalhp = (m_totalhp * (100 + bonuspct)) / 100;
 
     //m_totalhp = float(uint32(m_totalhp) - (uint32(m_totalhp) % 10));
-    me->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, float(m_totalhp)); //replaces base hp at max lvl
+    me->SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, float(m_totalhp) * BotMgr::GetBotHPModByLevel(me->GetLevel())); //replaces base hp at max lvl
     me->UpdateMaxHealth(); //will use our values we just set (update base health and buffs)
     //TC_LOG_ERROR("entities.player", "overall hp: %u", me->GetMaxHealth());
     me->SetHealth(fullhp ? me->GetMaxHealth() : uint32(0.5f + float(me->GetMaxHealth()) * pct / 100.f)); //restore pct
@@ -7153,7 +7154,7 @@ void bot_ai::_OnManaUpdate() const
         m_basemana = (m_basemana * (100 + bonuspct)) / 100;
 
     //m_basemana = float(uint32(m_basemana) - (uint32(m_basemana) % 5));
-    me->SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, m_basemana);
+    me->SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, m_basemana * BotMgr::GetBotMPModByLevel(me->GetLevel()));
     me->UpdateMaxPower(POWER_MANA);
     me->SetPower(POWER_MANA, fullmana ? me->GetMaxPower(POWER_MANA) :
         uint32(0.5f + float(me->GetMaxPower(POWER_MANA)) * pct / 100.f)); //restore pct
@@ -7623,6 +7624,7 @@ void bot_ai::ApplyBotDamageMultiplierSpell(int32& damage, SpellNonMeleeDamage& d
 void bot_ai::ApplyBotDamageMultiplierHeal(Unit const* victim, float& heal, SpellInfo const* spellInfo, DamageEffectType damagetype, uint32 stack) const
 {
     //HEALING SPELLS amount bonus
+    heal *= BotMgr::GetBotHealingModByLevel(me->GetLevel());
     ApplyClassDamageMultiplierHeal(victim, heal, spellInfo, damagetype, stack);
     heal = (heal * (BotMgr::IsWanderingWorldBot(me) ? BotMgr::GetBotWandererHealingMod() : BotMgr::GetBotHealingMod()));
 }
@@ -10581,12 +10583,24 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 {
                     std::ostringstream thresholdstr;
                     thresholdstr << LocalizedNpcText(player, BOT_TEXT_HEAL_TARGET_HEALTH_THRESHOLD) << ": " << uint32(GetHealHpPctThreshold()) << "%";
-                    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_CHAT, thresholdstr.str(), GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_SET, GOSSIP_ACTION_INFO_DEF + 3, "", 0, true);
+                    player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_TALK, thresholdstr.str(), GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_SET, GOSSIP_ACTION_INFO_DEF + 3, "", 0, true);
                 }
             }
 
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), 1, GOSSIP_ACTION_INFO_DEF + 4);
             break;
+        }
+        case GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_PROPAGATE:
+        {
+            uint8 threshold = GetHealHpPctThreshold();
+            BotMap const* bmap = player->GetBotMgr()->GetBotMap(); // player === master
+            for (BotMap::const_iterator citr = bmap->begin(); citr != bmap->end(); ++citr)
+            {
+                if (citr->second && citr->second != me && citr->second->GetBotAI() && citr->second->GetBotAI()->HasRole(BOT_ROLE_HEAL))
+                    citr->second->GetBotAI()->SetHealHpPctThreshold(threshold);
+            }
+
+            return OnGossipSelect(player, creature, GOSSIP_SENDER_ENGAGE_BEHAVIOR, action);
         }
         case GOSSIP_SENDER_PRIORITY_TARGET_SET_TANK:
         case GOSSIP_SENDER_PRIORITY_TARGET_SET_DPS:
@@ -11083,13 +11097,16 @@ bool bot_ai::OnGossipSelectCode(Player* player, Creature* creature/* == me*/, ui
         }
         case GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_SET:
         {
+            subMenu = true;
+
             char* dist = strtok((char*)code, "");
             float threshold = std::min<float>(std::max<float>(atof(dist), 0.f), 99.f);
 
             SetHealHpPctThreshold(uint8(threshold));
 
-            player->PlayerTalkClass->SendCloseGossip();
-            return OnGossipSelect(player, creature, GOSSIP_SENDER_ENGAGE_BEHAVIOR, action);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_SET_FOR_ALL_EVERYONE), GOSSIP_SENDER_HEAL_HEALTH_THRESHOLD_PROPAGATE, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_BACK), GOSSIP_SENDER_ENGAGE_BEHAVIOR, GOSSIP_ACTION_INFO_DEF + 2);
+            break;
         }
         default:
             break;
