@@ -84,7 +84,7 @@ void sServerMenu::CharControlMenu(Player* player) {
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_2, EN_CHAR_CONTROL_2), GOSSIP_SENDER_MAIN + 1, 1);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_3, EN_CHAR_CONTROL_3), GOSSIP_SENDER_MAIN + 1, 5);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_CHAR_CONTROL_7, EN_CHAR_CONTROL_7), GOSSIP_SENDER_MAIN + 1, 6);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HONOR_EXCHANGE_MAIN, EN_HONOR_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 7);
+    //AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HONOR_EXCHANGE_MAIN, EN_HONOR_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 7);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_ARENA_EXCHANGE_MAIN, EN_ARENA_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 11);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_TOKEN_EXCHANGE_MAIN, EN_TOKEN_EXCHANGE_MAIN), GOSSIP_SENDER_MAIN + 1, 9);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_RESET_INSTANCE_CD, EN_RESET_INSTANCE_CD), GOSSIP_SENDER_MAIN + 1, 8);
@@ -238,7 +238,7 @@ void sServerMenu::GossipHelloMenu(Player* player)
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_3, EN_HOME_MENU_3), GOSSIP_SENDER_MAIN, 3);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_4, EN_HOME_MENU_4), GOSSIP_SENDER_MAIN, 4);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_5, EN_HOME_MENU_5), GOSSIP_SENDER_MAIN, 5);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_6, EN_HOME_MENU_6), GOSSIP_SENDER_MAIN, 6);
+   // AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_6, EN_HOME_MENU_6), GOSSIP_SENDER_MAIN, 6);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, RU_HOME_MENU_7, EN_HOME_MENU_7), GOSSIP_SENDER_MAIN, 7);
     player->PlayerTalkClass->GetGossipMenu().SetMenuId(UNIQUE_MENU_ID);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 0), player->GetGUID());
@@ -250,11 +250,11 @@ void sServerMenu::GossipMenuExchangeHonor(Player* player)
         return;
 
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 7500, 50, 1), GOSSIP_SENDER_MAIN + 7, 50);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 15000, 100, 2), GOSSIP_SENDER_MAIN + 7, 100);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 37500, 250, 5), GOSSIP_SENDER_MAIN + 7, 250);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 75000, 500, 10), GOSSIP_SENDER_MAIN + 7, 500);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 187500, 1250, 25), GOSSIP_SENDER_MAIN + 7, 1250);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 750, 1000, 1), GOSSIP_SENDER_MAIN + 7, 1000);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 1500, 5000, 2), GOSSIP_SENDER_MAIN + 7, 5000);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 3750, 25000, 5), GOSSIP_SENDER_MAIN + 7, 25000);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 7500, 50000, 10), GOSSIP_SENDER_MAIN + 7, 50000);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorRang(player, 18750, 125000, 25), GOSSIP_SENDER_MAIN + 7, 125000);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, "Назад", "Back"), GOSSIP_SENDER_MAIN, 5);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 3), player->GetGUID());    
 }
@@ -266,10 +266,10 @@ void sServerMenu::GossipMenuExchangeArena(Player* player)
         return;
 
     ClearGossipMenuFor(player);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorToArena(player, 10000), GOSSIP_SENDER_MAIN + 17, 10);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorToArena(player, 50000), GOSSIP_SENDER_MAIN + 17, 50);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorToArena(player, 200000), GOSSIP_SENDER_MAIN + 17, 200);
-    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorToArena(player, 1000000), GOSSIP_SENDER_MAIN + 17, 1000);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorToArena(player, 1000), GOSSIP_SENDER_MAIN + 17, 10);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorToArena(player, 5000), GOSSIP_SENDER_MAIN + 17, 50);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorToArena(player, 20000), GOSSIP_SENDER_MAIN + 17, 200);
+    AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, ConverterHonorToArena(player, 100000), GOSSIP_SENDER_MAIN + 17, 1000);
     AddGossipItemFor(player, GOSSIP_ICON_INTERACT_1, GetCustomText(player, "Назад", "Back"), GOSSIP_SENDER_MAIN, 5);
     player->PlayerTalkClass->SendGossipMenu(sServerMenuMgr->HeadMenu(player, 7), player->GetGUID());  
 }
@@ -362,7 +362,7 @@ uint32 sServerMenu::CalculHonorForExp(Player* player, uint32 honor, uint8 count)
     if (!player || !honor)
         return 0;
 
-    return uint32(honor - (player->GetRankByExp() * 100 * count));
+    return uint32(honor - (player->GetRankByExp() * 500 * count));
 }
 
 void sServerMenu::ConfirmExchangeHonorForExp(Player* player, uint32 honor, uint32 exp, uint32 count)
@@ -370,7 +370,7 @@ void sServerMenu::ConfirmExchangeHonorForExp(Player* player, uint32 honor, uint3
     if (!player || !honor || !exp)
         return;
 
-    uint8 new_count = count == 1250 ? 25 : count == 500 ? 10 : count == 250 ? 5 : count == 100 ? 2 : 1;    
+    uint8 new_count = count == 125000 ? 25 : count == 50000 ? 10 : count == 5000 ? 5 : count == 1000 ? 2 : 1;    
 
     uint32 total = sServerMenuMgr->CalculHonorForExp(player, honor, new_count);
     if (player->GetHonorPoints() >= total) {

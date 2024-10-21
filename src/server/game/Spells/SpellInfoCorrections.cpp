@@ -393,8 +393,8 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
         spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
-        spellInfo->ProcCharges = 50;
-        spellInfo->StackAmount = 50;
+        spellInfo->ProcCharges = 100;
+        spellInfo->StackAmount = 100;
     });
 
     // rank system
@@ -405,8 +405,8 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx |= SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS;
         spellInfo->DurationEntry = sSpellDurationStore.LookupEntry(21);
         spellInfo->Attributes |= SPELL_ATTR0_NO_IMMUNITIES;
-        spellInfo->ProcCharges = 50;
-        spellInfo->StackAmount = 50;
+        spellInfo->ProcCharges = 100;
+        spellInfo->StackAmount = 100;
     });    
 
     // The Eye of Acherus (no spawn in phase 2 in db)

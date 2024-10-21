@@ -94,7 +94,6 @@ public:
             player->RemoveAura(SPELL_DEMENTIA);
     }
 
-
     void DeleteItem_OnLogin(Player* player)
     {
         /* Удаление шмоток при старте */
