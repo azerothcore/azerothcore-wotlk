@@ -92,6 +92,7 @@
 #include "WhoListCacheMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "TC9Sidecar.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
 
@@ -2495,6 +2496,24 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update playersSaveScheduler"));
         playersSaveScheduler.Update(diff);
+    }
+
+    if (sToCloud9Sidecar->ClusterModeEnabled())
+    {
+        {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 async tasks"));
+            sToCloud9Sidecar->ProcessAsyncTasks();
+        }
+
+        {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 hooks"));
+            sToCloud9Sidecar->ProcessHooks();
+        }
+
+        {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 gRPC and HTTP requests"));
+            sToCloud9Sidecar->ProcessGrpcOrHttpRequests();
+        }
     }
 
     {

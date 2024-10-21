@@ -52,6 +52,7 @@
 #include "World.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
+#include "libsidecar.h"
 #include <boost/asio/signal_set.hpp>
 #include <boost/program_options.hpp>
 #include <csignal>
@@ -406,10 +407,14 @@ int main(int argc, char** argv)
         delete thr;
     });
 
+    sToCloud9Sidecar->Init(worldPort, realm.Id.Realm);
+
     WorldUpdateLoop();
 
     // Shutdown starts here
     threadPool.reset();
+
+    sToCloud9Sidecar->Deinit();
 
     sLog->SetSynchronous();
 
