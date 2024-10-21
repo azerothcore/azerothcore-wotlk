@@ -31,13 +31,6 @@
 #include "ScriptMgr.h"
 #include <unordered_map>
 
-//npcbot
-//non-PCH
-#include "Creature.h"
-#include "botmgr.h"
-#include "botdatamgr.h"
-//end npcbot
-
 /*********************************************************/
 /***            BATTLEGROUND QUEUE SYSTEM              ***/
 /*********************************************************/
