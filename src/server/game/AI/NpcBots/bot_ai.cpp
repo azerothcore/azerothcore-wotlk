@@ -3441,7 +3441,8 @@ void bot_ai::SetStats(bool force)
         if (_botclass != BOT_CLASS_SPHYNX)
             me->SetPower(POWER_MANA, me->GetMaxPower(POWER_MANA));
 
-        me->ResetPlayerDamageReq();
+        if (BotMgr::IsWanderingWorldBot(me))
+            me->ResetPlayerDamageReq();
     }
 
     if (botPet)
@@ -15937,7 +15938,7 @@ void bot_ai::DamageDealt(Unit* victim, uint32& damage, DamageEffectType /*damage
 
             //controlled case is handled in Unit::DealDamage
             if (IAmFree())
-                cre->LowerPlayerDamageReq(std::min<uint32>(cre->GetHealth(), damage) / (IsWanderer() ? 4 : 2));
+                cre->LowerPlayerDamageReq(std::min<uint32>(cre->GetHealth(), damage) / (BotMgr::IsWanderingWorldBot(me) ? 4 : 2));
         }
     }
 

@@ -2279,7 +2279,7 @@ void bot_pet_ai::DamageDealt(Unit* victim, uint32& damage, DamageEffectType /*da
 
             //controlled case is handled in Unit::DealDamage
             if (IAmFree())
-                cre->LowerPlayerDamageReq(cre->GetHealth() < damage ?  cre->GetHealth() : damage);
+                cre->LowerPlayerDamageReq(std::min<uint32>(cre->GetHealth(), damage) / (BotMgr::IsWanderingWorldBot(me) ? 4 : 2));
         }
     }
 }
