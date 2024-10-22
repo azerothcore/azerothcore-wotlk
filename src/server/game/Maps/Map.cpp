@@ -39,7 +39,7 @@
 #include "Transport.h"
 #include "VMapFactory.h"
 #include "Vehicle.h"
-#include "Weather.h"
+#include "MapWeather.h"
 
 union u_map_magic
 {

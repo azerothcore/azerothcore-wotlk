@@ -89,7 +89,7 @@
 #include "Warden.h"
 #include "WardenCheckMgr.h"
 #include "WaypointMovementGenerator.h"
-#include "WeatherMgr.h"
+
 #include "WhoListCacheMgr.h"
 #include "WDataStore.h"
 #include "User.h"

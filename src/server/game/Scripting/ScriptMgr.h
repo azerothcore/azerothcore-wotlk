@@ -35,7 +35,7 @@
 #include "SharedDefines.h"
 #include "Tuples.h"
 #include "Types.h"
-#include "Weather.h"
+#include "MapWeather.h"
 #include "World.h"
 #include <atomic>
 

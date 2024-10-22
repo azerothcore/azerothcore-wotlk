@@ -36,8 +36,7 @@
 #include "SpellMgr.h"
 #include "UpdateFieldFlags.h"
 #include "Vehicle.h"
-#include "Weather.h"
-#include "WeatherMgr.h"
+#include "MapWeather.h"
 #include "WorldStatePackets.h"
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE

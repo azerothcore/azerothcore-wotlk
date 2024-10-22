@@ -20,7 +20,7 @@
 
 #include "GUID.h"
 #include "Packet.h"
-#include "Weather.h"
+#include "MapWeather.h"
 
 enum WeatherState : uint32;
 

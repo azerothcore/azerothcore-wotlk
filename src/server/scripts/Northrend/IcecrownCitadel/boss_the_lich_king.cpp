@@ -30,7 +30,7 @@
 #include "SpellScriptLoader.h"
 #include "Unit.h"
 #include "Vehicle.h"
-#include "Weather.h"
+#include "MapWeather.h"
 #include "icecrown_citadel.h"
 
 enum Texts

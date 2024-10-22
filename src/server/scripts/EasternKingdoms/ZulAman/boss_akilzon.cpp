@@ -29,7 +29,7 @@ EndScriptData */
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "ScriptedCreature.h"
-#include "Weather.h"
+#include "MapWeather.h"
 #include "zulaman.h"
 
 enum Spells

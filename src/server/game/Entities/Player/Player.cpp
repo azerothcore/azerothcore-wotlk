@@ -70,7 +70,7 @@
 #include "Util.h"
 #include "User.h"
 #include "Vehicle.h"
-#include "Weather.h"
+#include "MapWeather.h"
 #include "World.h"
 #include "WDataStore.h"
 
