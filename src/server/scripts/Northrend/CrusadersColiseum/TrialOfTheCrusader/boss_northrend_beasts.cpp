@@ -64,8 +64,8 @@ enum Yells
     EMOTE_SNOBOLLED         = 0,
 
     // Acidmaw & Dreadscale
-    EMOTE_ENRAGE            = 0,
-    EMOTE_SUBMERGE          = 1,
+    EMOTE_ENRAGE            = 1,
+    EMOTE_SUBMERGE          = 0,
     EMOTE_EMERGE            = 2,
 
     // Icehowl
@@ -497,13 +497,15 @@ struct boss_jormungarAI : public ScriptedAI
             case -2:
                 if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                     bIsStationary = true; // it will come out mobile soon
-                else if (me->GetDisplayId() == _MODEL_STATIONARY )
-                    events.RescheduleEvent(EVENT_SUBMERGE, 1s);
-                else
-                    events.CancelEvent(EVENT_SUBMERGE);
-                me->CastSpell(me, SPELL_ENRAGE, true);
-                Talk(EMOTE_ENRAGE);
-                break;
+                else if (me->GetDisplayId() == _MODEL_STATIONARY)
+                    //  events.RescheduleEvent(EVENT_SUBMERGE, 1s);
+                    //  else
+                    //  events.CancelEvent(EVENT_SUBMERGE);
+                {
+                    me->CastSpell(me, SPELL_ENRAGE, true);
+                    Talk(EMOTE_ENRAGE);
+                    break;
+                }
         }
     }
 
