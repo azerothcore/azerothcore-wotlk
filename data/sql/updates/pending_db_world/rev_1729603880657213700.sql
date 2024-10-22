@@ -1,60 +1,94 @@
---
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1549, 4155.55, 6962.69, 164.671, 3.40091, 571, 'Coldarra');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1548, 3954.58, 6045.14, 23.8309, 3.93498, 571, 'TheWestrift');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1547, 3580.99, 6654.6, 195.569, 6.0948, 571, 'TransitusShield');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1546, 4130.43, 6262.65, 28.9689, 2.5307, 571, 'WinterfinCaverns');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1545, 4202.91, 6294, 11.929, 5.96681, 571, 'WinterfinVillage');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1544, 4497.91, 6358.62, 24.8969, 3.65774, 571, 'GlimmerBay');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1543, 4730.28, 5581.22, 6.86127, 4.8162, 571, 'TheLostPassage');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1542, 2803.56, 4696.17, 1.8599, 3.375, 571, 'NjordsBreathBay');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1541, 3998.88, 4818.12, 25.1371, 1.42266, 571, 'FizzcrankPumpingStation');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1540, 4018.28, 4921.16, -12.9943, 5.08653, 571, 'MidPointStation');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1539, 4210.47, 4797.77, -12.9951, 0.994613, 571, 'NorthPointStation');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1538, 4127.8, 5085.07, -0.181869, 2.57327, 571, 'WestPointStation');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1537, 3793.5, 4818.49, -12.9668, 0.282474, 571, 'SouthPointStation');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1536, 3814.71, 4668.49, -8.99847, 1.02861, 571, 'TheGeyserFields');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1535, 3577.14, 4821.72, 0.984557, 5.45434, 571, 'ScaldingPools');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1534, 3704.34, 4336.71, 13.5571, 1.77082, 571, 'SteamSprings');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1533, 3335.1, 3689.79, 32.4327, 3.15905, 571, 'TheWailingZiggurat');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1532, 3180.09, 3923.03, 31.1576, 0.897093, 571, 'FrozenReach');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1531, 3107.09, 3843.45, 22.3012, 4.7691, 571, 'DeathsStand');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1530, 3055.58, 4108.86, 28.187, 3.52252, 571, 'Unupe');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1529, 3567.48, 3470.22, 50.2653, 2.13238, 571, 'Transborea');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1528, 4057.56, 3713.47, 92.6897, 0.400578, 571, 'SpireOfDecay');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1527, 3810.97, 3465.01, 82.904, 4.27652, 571, 'SpireOfPain');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1526, 4053.27, 3517.44, 115.678, 5.76875, 571, 'SpireOfBlood');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1525, 3694.55, 3724.94, 47.8466, 5.80018, 571, 'TempleCityofEnkilah');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1524, 4199.34, 4196.99, 88.6181, 5.40748, 571, 'DensOfDying');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1523, 4314.41, 4609.35, 26.678, 5.6235, 571, 'Talramas');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1522, 4357.79, 5470.73, 48.1204, 5.66279, 571, 'Magmoth');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1521, 4481.6, 5734.88, 79.2641, 5.38793, 571, 'BorgorokOutpost');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1520, 4548.21, 6004.51, 74.8061, 1.57091, 571, 'RuinsOfEldranath');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1519, 4392.41, 6129.05, 0.116559, 2.6626, 571, 'WinterfinRetreat');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1518, 4323.22, 5859.49, 57.4084, 0.561667, 571, 'BlisteringPool');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1517, 3942.05, 5703.13, 63.3935, 5.57644, 571, 'SteeljawsCaravan');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1516, 3639.94, 5592.77, 32.8598, 5.58588, 571, 'ColdrockQuarry');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1515, 2913.33, 6502.97, 79.3253, 4.12898, 571, 'TorpsFarm');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1514, 2788.62, 6559.41, 49.4538, 3.34358, 571, 'WarsongGranary');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1513, 2647.44, 6674.29, 24.8536, 2.68779, 571, 'CoastOfEchoes');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1512, 2481.1, 6542.99, 41.0985, 4.26645, 571, 'PlainsOfNasam');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1511, 2797.04, 6997.76, 26.7684, 4.48636, 571, 'WarsongJetty');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1510, 2425.16, 6822.39, 4.41998, 5.57807, 571, 'Palea');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1509, 2987.91, 6817.53, 4.5871, 3.59886, 571, 'GarroshsLanding');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1508, 3101.81, 6326.78, 91.8155, 2.6446, 571, 'WarsongSlaughterhouse');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1507, 3458.82, 6218.68, 73.441, 3.67738, 571, 'BerylPoint');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1506, 3601.73, 5941.81, 136.218, 1.37617, 571, 'AmberLedge');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1505, 3179.06, 5735.6, 49.8884, 5.0911, 571, 'LakeKumuya');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1504, 2865.25, 5576.93, 56.1496, 1.14841, 571, 'BloodsporePlains');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1503, 3226.48, 5273.91, 47.0191, 2.8645, 571, 'DEHTAEncampment');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1502, 2953.95, 5029.19, 32.5341, 1.29836, 571, 'TheFloodPlains');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1501, 2562.73, 5082.13, 8.78205, 0.697533, 571, 'TheAbandonedReach');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1500, 2452.49, 5149.73, 30.2057, 0.575801, 571, 'FarshireLighthouse');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1499, 2709.2, 5295.72, 31.4857, 5.84583, 571, 'FarshireMine');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1498, 2601.02, 5276.52, 36.8806, 2.46075, 571, 'Farshire');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1497, 2104.41, 5514.25, 0.336683, 5.60234, 571, 'SandsOfNasam');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1496, 1471.34, 5802.38, 3.89735, 4.01848, 571, 'RiplashRuins');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1495, 1818.7, 5813.67, 0.434314, 6.06444, 571, 'RiplashStrand');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1494, 2535.97, 6126.06, 77.0848, 6.23719, 571, 'MightstoneQuarry');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1493, -6165.16, 383.46, 399.154, 6.27642, 0, 'Anvilmar');
-INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1492, -6022.06, 60.0566, 406.509, 5.72273, 0, 'ColdridgePass');
-
+DELETE FROM `game_tele` WHERE `id` IN (1580,1579,1578,1577,1576,1575,1574,1573,1572,1571,1570,1569,1568,1567,1566,1565,1564,1563,1562,1561,1560,1559,1558,1557,1556,1555,1554,1553,1552,1551,1550,1549,1548,1547,1546,1545,1544,1543,1542,1541,1540,1539,1538,1537,1536,1535,1534,1533,1532,1531,1530,1529,1528,1527,1526,1525,1524,1523,1522,1521,1520,1519,1518,1517,1516,1515,1514,1513,1512,1511,1510,1509,1508,1507,1506,1505,1504,1503,1502,1501,1500,1499,1498,1497,1496,1495,1494,1493,1492);
+INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES
+-- Sholazar Basin 
+(1580, 6352, 5812.13, 56.8665, 3.32617, 571, 'TheStormwrightsShelf'),
+(1579, 6200.55, 4732.6, 224.713, 1.43729, 571, 'TheGlimmeringPillar'),
+(1578, 6077.61, 4509.06, -80.9205, 0.32209, 571, 'DeathsHandEncampment'),
+(1577, 6514.13, 4434.68, -49.7989, 3.6993, 571, 'TheBonefields'),
+(1576, 6587.91, 4882.84, -42.9031, 3.11024, 571, 'TheSavageThicket'),
+(1575, 6622.02, 5177.81, -41.6024, 4.14697, 571, 'SpearbornEncampment'),
+(1574, 5196.96, 5504.35, -86.8983, 5.1601, 571, 'SparktouchedHaven'),
+(1573, 5108.43, 5365.51, 224.995, 4.48466, 571, 'TheMosslightPillar'),
+(1572, 4928.71, 5192.91, -92.8246, 3.52253, 571, 'Waygate'),
+(1571, 4991.56, 4569.96, 148.897, 1.9753, 571, 'TheSkyreachPillar'),
+(1570, 4997.3, 4324.79, -84.737, 1.97922, 571, 'SapphireHive'),
+(1569, 5272.1, 4524.57, -83.0975, 3.81705, 571, 'FrenzyheartHill'),
+(1568, 5540.35, 4104.43, 43.2335, 4.64957, 571, 'TheLifebloodPillar'),
+(1567, 5588.53, 3860.26, -97.1207, 4.22938, 571, 'TheSunderedShard'),
+(1566, 5702.6, 3456.26, 300.842, 4.83806, 571, 'MakersOverlook'),
+(1565, 5800.24, 3556, -7.71123, 2.30908, 571, 'MosswalkerVillage'),
+(1564, 5819.48, 3900.97, -57.8919, 2.6036, 571, 'TheLostLands'),
+(1563, 6200.41, 3754.96, 167.473, 2.58396, 571, 'TheAvalanche'),
+(1562, 5732.95, 4385.3, -136.637, 2.47012, 571, 'RainspeakerRapids'),
+(1561, 5438.16, 4621.39, -142.395, 5.72167, 571, 'FrenzyheartRiver'),
+(1560, 5653.33, 4565.95, -134.441, 1.00929, 571, 'RainspeakerCanopy'),
+(1559, 5368.05, 4843.58, -197.195, 5.93375, 571, 'RiversHeart'),
+(1558, 5501.47, 4733, -194.376, 2.29344, 571, 'LakesideLanding'),
+(1557, 5660.99, 5098.01, -133.723, 5.82774, 571, 'WildgrowthMangal'),
+(1556, 5794.79, 5479.6, 203.391, 3.75822, 571, 'TheSuntouchedPillar'),
+(1555, 5923.1, 5326, -95.5351, 2.48981, 571, 'SwindlegrinsDig'),
+(1554, 6092.06, 5317.29, -95.0416, 5.62353, 571, 'BittertideLake'),
+(1553, 6118.86, 5662.16, 5.1509, 0.730512, 571, 'TheMakersPerch'),
+(1552, 5561.69, 5748.65, -76.2847, 1.51591, 571, 'NesingwaryBaseCamp'),
+(1551, 5505.3, 5990.77, -40.6402, 0.435986, 571, 'TheSeabreachFlow'),
+(1550, 4874.82, 5901.06, -40.5268, 1.68084, 571, 'KartaksHold'),
+-- Borean Tundra 
+(1549, 4155.55, 6962.69, 164.671, 3.40091, 571, 'Coldarra'),
+(1548, 3954.58, 6045.14, 23.8309, 3.93498, 571, 'TheWestrift'),
+(1547, 3580.99, 6654.6, 195.569, 6.0948, 571, 'TransitusShield'),
+(1546, 4130.43, 6262.65, 28.9689, 2.5307, 571, 'WinterfinCaverns'),
+(1545, 4202.91, 6294, 11.929, 5.96681, 571, 'WinterfinVillage'),
+(1544, 4497.91, 6358.62, 24.8969, 3.65774, 571, 'GlimmerBay'),
+(1543, 4730.28, 5581.22, 6.86127, 4.8162, 571, 'TheLostPassage'),
+(1542, 2803.56, 4696.17, 1.8599, 3.375, 571, 'NjordsBreathBay'),
+(1541, 3998.88, 4818.12, 25.1371, 1.42266, 571, 'FizzcrankPumpingStation'),
+(1540, 4018.28, 4921.16, -12.9943, 5.08653, 571, 'MidPointStation'),
+(1539, 4210.47, 4797.77, -12.9951, 0.994613, 571, 'NorthPointStation'),
+(1538, 4127.8, 5085.07, -0.181869, 2.57327, 571, 'WestPointStation'),
+(1537, 3793.5, 4818.49, -12.9668, 0.282474, 571, 'SouthPointStation'),
+(1536, 3814.71, 4668.49, -8.99847, 1.02861, 571, 'TheGeyserFields'),
+(1535, 3577.14, 4821.72, 0.984557, 5.45434, 571, 'ScaldingPools'),
+(1534, 3704.34, 4336.71, 13.5571, 1.77082, 571, 'SteamSprings'),
+(1533, 3335.1, 3689.79, 32.4327, 3.15905, 571, 'TheWailingZiggurat'),
+(1532, 3180.09, 3923.03, 31.1576, 0.897093, 571, 'FrozenReach'),
+(1531, 3107.09, 3843.45, 22.3012, 4.7691, 571, 'DeathsStand'),
+(1530, 3055.58, 4108.86, 28.187, 3.52252, 571, 'Unupe'),
+(1529, 3567.48, 3470.22, 50.2653, 2.13238, 571, 'Transborea'),
+(1528, 4057.56, 3713.47, 92.6897, 0.400578, 571, 'SpireOfDecay'),
+(1527, 3810.97, 3465.01, 82.904, 4.27652, 571, 'SpireOfPain'),
+(1526, 4053.27, 3517.44, 115.678, 5.76875, 571, 'SpireOfBlood'),
+(1525, 3694.55, 3724.94, 47.8466, 5.80018, 571, 'TempleCityofEnkilah'),
+(1524, 4199.34, 4196.99, 88.6181, 5.40748, 571, 'DensOfDying'),
+(1523, 4314.41, 4609.35, 26.678, 5.6235, 571, 'Talramas'),
+(1522, 4357.79, 5470.73, 48.1204, 5.66279, 571, 'Magmoth'),
+(1521, 4481.6, 5734.88, 79.2641, 5.38793, 571, 'BorgorokOutpost'),
+(1520, 4548.21, 6004.51, 74.8061, 1.57091, 571, 'RuinsOfEldranath'),
+(1519, 4392.41, 6129.05, 0.116559, 2.6626, 571, 'WinterfinRetreat'),
+(1518, 4323.22, 5859.49, 57.4084, 0.561667, 571, 'BlisteringPool'),
+(1517, 3942.05, 5703.13, 63.3935, 5.57644, 571, 'SteeljawsCaravan'),
+(1516, 3639.94, 5592.77, 32.8598, 5.58588, 571, 'ColdrockQuarry'),
+(1515, 2913.33, 6502.97, 79.3253, 4.12898, 571, 'TorpsFarm'),
+(1514, 2788.62, 6559.41, 49.4538, 3.34358, 571, 'WarsongGranary'),
+(1513, 2647.44, 6674.29, 24.8536, 2.68779, 571, 'CoastOfEchoes'),
+(1512, 2481.1, 6542.99, 41.0985, 4.26645, 571, 'PlainsOfNasam'),
+(1511, 2797.04, 6997.76, 26.7684, 4.48636, 571, 'WarsongJetty'),
+(1510, 2425.16, 6822.39, 4.41998, 5.57807, 571, 'Palea'),
+(1509, 2987.91, 6817.53, 4.5871, 3.59886, 571, 'GarroshsLanding'),
+(1508, 3101.81, 6326.78, 91.8155, 2.6446, 571, 'WarsongSlaughterhouse'),
+(1507, 3458.82, 6218.68, 73.441, 3.67738, 571, 'BerylPoint'),
+(1506, 3601.73, 5941.81, 136.218, 1.37617, 571, 'AmberLedge'),
+(1505, 3179.06, 5735.6, 49.8884, 5.0911, 571, 'LakeKumuya'),
+(1504, 2865.25, 5576.93, 56.1496, 1.14841, 571, 'BloodsporePlains'),
+(1503, 3226.48, 5273.91, 47.0191, 2.8645, 571, 'DEHTAEncampment'),
+(1502, 2953.95, 5029.19, 32.5341, 1.29836, 571, 'TheFloodPlains'),
+(1501, 2562.73, 5082.13, 8.78205, 0.697533, 571, 'TheAbandonedReach'),
+(1500, 2452.49, 5149.73, 30.2057, 0.575801, 571, 'FarshireLighthouse'),
+(1499, 2709.2, 5295.72, 31.4857, 5.84583, 571, 'FarshireMine'),
+(1498, 2601.02, 5276.52, 36.8806, 2.46075, 571, 'Farshire'),
+(1497, 2104.41, 5514.25, 0.336683, 5.60234, 571, 'SandsOfNasam'),
+(1496, 1471.34, 5802.38, 3.89735, 4.01848, 571, 'RiplashRuins'),
+(1495, 1818.7, 5813.67, 0.434314, 6.06444, 571, 'RiplashStrand'),
+(1494, 2535.97, 6126.06, 77.0848, 6.23719, 571, 'MightstoneQuarry'),
+-- Dun Morogh
+(1493, -6165.16, 383.46, 399.154, 6.27642, 0, 'Anvilmar'),
+(1492, -6022.06, 60.0566, 406.509, 5.72273, 0, 'ColdridgePass');
