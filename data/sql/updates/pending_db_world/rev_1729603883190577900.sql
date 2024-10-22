@@ -30,3 +30,4 @@ INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orient
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1552, 5561.69, 5748.65, -76.2847, 1.51591, 571, 'NesingwaryBaseCamp');
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1551, 5505.3, 5990.77, -40.6402, 0.435986, 571, 'TheSeabreachFlow');
 INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (1550, 4874.82, 5901.06, -40.5268, 1.68084, 571, 'KartaksHold');
+
