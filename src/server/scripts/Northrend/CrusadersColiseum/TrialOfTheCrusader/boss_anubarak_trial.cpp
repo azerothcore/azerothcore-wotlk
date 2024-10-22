@@ -208,7 +208,8 @@ public:
             events.RescheduleEvent(EVENT_ENRAGE, 10min);
             events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, 7s, 15s);
             events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 15s, 20s);
-            events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s, 8s);
+            //events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s, 8s);
+            events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 10s);
             events.RescheduleEvent(EVENT_SUBMERGE, 80s);
             if (!IsHeroic())
                 events.RescheduleEvent(EVENT_RESPAWN_SPHERE, 4s);
@@ -352,7 +353,8 @@ public:
                         me->setAttackTimer(BASE_ATTACK, 3000);
                         me->RemoveAura(SPELL_SUBMERGE);
                         me->CastSpell(me, SPELL_EMERGE, false);
-                        events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s, 8s);
+                        //events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 5s, 8s);
+                        events.RescheduleEvent(EVENT_SUMMON_NERUBIAN, 10s);
                         events.RescheduleEvent(EVENT_SPELL_FREEZING_SLASH, 7s, 15s);
                         events.RescheduleEvent(EVENT_SPELL_PENETRATING_COLD, 15s, 20s);
                         events.RescheduleEvent(EVENT_SUBMERGE, 80s);
@@ -679,7 +681,7 @@ public:
                     events.Repeat(30s, 45s);
                     break;
                 case EVENT_SUBMERGE:
-                    if (HealthBelowPct(80) && !me->HasAura(RAID_MODE(66193, 67855, 67856, 67857))) // not having permafrost - allow submerge
+                    if (HealthBelowPct(85) && !me->HasAura(RAID_MODE(66193, 67855, 67856, 67857))) // not having permafrost - allow submerge
                     {
                         me->GetMotionMaster()->MoveIdle();
                         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -794,7 +796,8 @@ public:
             if (TargetGUID)
             {
                 Unit* target = ObjectAccessor::GetPlayer(*me, TargetGUID);
-                if (!target || !target->HasAura(SPELL_MARK) || !me->IsValidAttackTarget(target) || me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE || !me->HasUnitState(UNIT_STATE_CHASE_MOVE))
+		//ignore protect bless;
+                if (!target || !target->HasAura(SPELL_MARK) || target->HasAura(45438) || target->HasAura(642) || (!target->HasAura(10278) && !me->IsValidAttackTarget(target))|| me->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE /*|| !me->HasUnitState(UNIT_STATE_CHASE_MOVE)*/)
                 {
                     SelectNewTarget(true);
                     return;
