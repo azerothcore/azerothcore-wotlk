@@ -704,8 +704,7 @@ public:
             else if (HasRole(BOT_ROLE_DPS))
             {
                 //pure dps goes moonkin
-                if (_form == DRUID_MOONKIN_FORM ||
-                    ((!GetSpell(MOONKIN_FORM_1) || HasRole(BOT_ROLE_HEAL)) && (_form == BOT_STANCE_NONE || removeShapeshiftForm())) ||
+                if (_form == DRUID_MOONKIN_FORM || HasRole(BOT_ROLE_HEAL) || !GetSpell(MOONKIN_FORM_1) ||
                     (!HasRole(BOT_ROLE_HEAL) && IsSpellReady(MOONKIN_FORM_1, diff, false) && doCast(me, GetSpell(MOONKIN_FORM_1))))
                     doBalanceActions(mytar, diff);
             }
@@ -1072,10 +1071,6 @@ public:
 
         void doBalanceActions(Unit* mytar, uint32 diff)
         {
-            //debug
-            if (me->GetPowerType() != POWER_MANA)
-                return;
-
             MoveBehind(mytar);
 
             if (HasRole(BOT_ROLE_HEAL) && GetManaPCT(me) < 25)
