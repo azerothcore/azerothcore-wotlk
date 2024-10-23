@@ -3764,21 +3764,6 @@ Arena.QueueAnnouncer.PlayerOnly = 0
 Arena.QueueAnnouncer.Detail = 3
 
 #
-#    Arena.ArenaSeason.ID
-#        Description: Current arena season id shown in clients.
-#        Default:     8
-
-Arena.ArenaSeason.ID = 8
-
-#
-#    Arena.ArenaSeason.InProgress
-#        Description: State of current arena season.
-#        Default:     1 - (Active)
-#                     0 - (Finished)
-
-Arena.ArenaSeason.InProgress = 1
-
-#
 #    Arena.ArenaStartRating
 #        Description: Start rating for new arena teams.
 #        Default:     0
