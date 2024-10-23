@@ -4448,3 +4448,28 @@ Debug.Arena = 0
 # GAME SETTINGS END                                                                               #
 #                                                                                                 #
 ###################################################################################################
+
+###################################################################################################
+# CLUSTER SETTINGS
+#
+# These enables cluster mode. With this mode you can run several worldservers for single realm and
+# split the load between them. Alongside with worldservers you need to run a bunch of other
+# services. More details here: https://github.com/walkline/ToCloud9.
+#
+#    Cluster.Enabled
+#        Description: Enables/disables cluster mode.
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Cluster.Enabled=0
+
+#
+#    Cluster.AvailableMaps
+#        Description: List of available maps id on this server.
+#        Examples:    "" - (Can handle any map)
+#                     "0,1,573"
+
+Cluster.AvailableMaps=""
+
+#
+###################################################################################################

@@ -683,7 +683,7 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
         }
     }
 
-    if (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid))
+    if (!sToCloud9Sidecar->ClusterModeEnabled() && (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid)))
     {
         LOG_ERROR("network", "Account ({}) can't login with that character ({}).", GetAccountId(), playerGuid.ToString());
         KickPlayer("Account can't login with this character");
@@ -837,20 +837,28 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             chH.PSendSysMessage("{}", GitRevision::GetFullVersion());
     }
 
-    if (uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(pCurrChar->GetGUID()))
+    if (!sToCloud9Sidecar->ClusterModeEnabled())
     {
-        Guild* guild = sGuildMgr->GetGuildById(guildId);
-        Guild::Member const* member = guild ? guild->GetMember(pCurrChar->GetGUID()) : nullptr;
-        if (member)
+        if (uint32 guildId = sCharacterCache->GetCharacterGuildIdByGuid(pCurrChar->GetGUID()))
         {
-            pCurrChar->SetInGuild(guildId);
-            pCurrChar->SetRank(member->GetRankId());
-            guild->SendLoginInfo(this);
+            Guild* guild = sGuildMgr->GetGuildById(guildId);
+            Guild::Member const* member = guild ? guild->GetMember(pCurrChar->GetGUID()) : nullptr;
+            if (member)
+            {
+                pCurrChar->SetInGuild(guildId);
+                pCurrChar->SetRank(member->GetRankId());
+                guild->SendLoginInfo(this);
+            }
+            else
+            {
+                LOG_ERROR("network.opcode", "Player {} ({}) marked as member of not existing guild (id: {}), removing guild membership for player.",
+                    pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), guildId);
+                pCurrChar->SetInGuild(0);
+                pCurrChar->SetRank(0);
+            }
         }
         else
         {
-            LOG_ERROR("network.opcode", "Player {} ({}) marked as member of not existing guild (id: {}), removing guild membership for player.",
-                pCurrChar->GetName(), pCurrChar->GetGUID().ToString(), guildId);
             pCurrChar->SetInGuild(0);
             pCurrChar->SetRank(0);
         }
