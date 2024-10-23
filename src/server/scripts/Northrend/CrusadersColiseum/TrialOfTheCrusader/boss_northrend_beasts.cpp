@@ -64,9 +64,9 @@ enum Yells
     EMOTE_SNOBOLLED         = 0,
 
     // Acidmaw & Dreadscale
-    EMOTE_ENRAGE            = 1,
-    EMOTE_SUBMERGE          = 0,
-    EMOTE_EMERGE            = 2,
+    EMOTE_ENRAGE            = 0,
+    //EMOTE_SUBMERGE          = 0,
+    EMOTE_EMERGE            = 1,
 
     // Icehowl
     EMOTE_TRAMPLE_STARE     = 0,
@@ -497,15 +497,14 @@ struct boss_jormungarAI : public ScriptedAI
             case -2:
                 if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
                     bIsStationary = true; // it will come out mobile soon
-                else if (me->GetDisplayId() == _MODEL_STATIONARY)
+                    //else if (me->GetDisplayId() == _MODEL_STATIONARY)
                     //  events.RescheduleEvent(EVENT_SUBMERGE, 1s);
                     //  else
-                    //  events.CancelEvent(EVENT_SUBMERGE);
-                {
-                    me->CastSpell(me, SPELL_ENRAGE, true);
-                    Talk(EMOTE_ENRAGE);
-                    break;
-                }
+                    //  events.CancelEvent(EVENT_SUBMERGE);               
+                me->CastSpell(me, SPELL_ENRAGE, true);
+                Talk(EMOTE_ENRAGE);
+                break;
+                
         }
     }
 
@@ -572,7 +571,7 @@ struct boss_jormungarAI : public ScriptedAI
                     bIsStationary = (me->GetDisplayId() == _MODEL_STATIONARY);
                     me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     me->CastSpell(me, SPELL_SUBMERGE_0, false);
-                    Talk(EMOTE_SUBMERGE);
+                    //Talk(EMOTE_SUBMERGE);
 
                     // second one submerge 1.5sec after the first one, used also for synchronizing
                     if (pInstance)
@@ -619,7 +618,7 @@ struct boss_jormungarAI : public ScriptedAI
                     }
                     me->RemoveAurasDueToSpell(SPELL_SUBMERGE_0);
                     me->CastSpell(me, SPELL_EMERGE_0, false);
-                    Talk(EMOTE_EMERGE);
+                    //Talk(EMOTE_EMERGE);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                     ScheduleEvents();
                 }
