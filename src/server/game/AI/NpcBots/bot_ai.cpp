@@ -3482,30 +3482,62 @@ void bot_ai::ReceiveEmote(Player* player, uint32 emote)
             break;
         case TEXT_EMOTE_TICKLE:
         {
-            if (master != player)
+            if (master != player && !player->IsGameMaster())
                 break;
+
+            std::ostringstream report;
+            report << "Problems:";
 
             if ((me->HasUnitFlag(UNIT_FLAG_STUNNED) || me->HasUnitState(UNIT_STATE_STUNNED)) &&
                 !me->HasAuraType(SPELL_AURA_MOD_STUN))
             {
+                report << "\n  stunned but no aura";
                 me->ClearUnitState(UNIT_STATE_STUNNED);
                 me->RemoveUnitFlag(UNIT_FLAG_STUNNED);
             }
             if ((me->HasUnitFlag(UNIT_FLAG_CONFUSED) || me->HasUnitState(UNIT_STATE_CONFUSED)) &&
                 !me->HasAuraType(SPELL_AURA_MOD_CONFUSE))
             {
+                report << "\n  confused but no aura";
                 me->ClearUnitState(UNIT_STATE_CONFUSED);
                 me->RemoveUnitFlag(UNIT_FLAG_CONFUSED);
             }
             if ((me->HasUnitFlag(UNIT_FLAG_FLEEING) || me->HasUnitState(UNIT_STATE_FLEEING)) &&
                 !me->HasAuraType(SPELL_AURA_MOD_FEAR))
             {
+                report << "\n  feared but no aura";
                 me->ClearUnitState(UNIT_STATE_FLEEING);
                 me->RemoveUnitFlag(UNIT_FLAG_FLEEING);
             }
-            me->BotStopMovement();
+            if (me->IsInCombat() && !me->GetVictim())
+            {
+                report << "\n  in combat but no target: attackers=" << uint32(me->getAttackers().size());
+                me->CombatStop(true);
+            }
+            if (IsDuringTeleport() && me->IsInWorld() && me->FindMap())
+            {
+                report << "\n  being teleported but in world & in map: home=" << uint32(!!teleHomeEvent) << ", finish=" << uint32(!!teleFinishEvent);
+                AbortTeleport();
+            }
+            if (HasBotCommandState(BOT_COMMAND_ISSUED_ORDER))
+            {
+                report << "\n  pending orders that may have got stuck";
+                CancelAllOrders();
+            }
+            if (HasBotCommandState(BOT_COMMAND_NOGOSSIP))
+            {
+                report << "\n  forgotten NOGOSSIP command state";
+                RemoveBotCommandState(BOT_COMMAND_NOGOSSIP);
+            }
+            if (waitTimer > 10000)
+            {
+                report << "\n  wait timer overflow: " << waitTimer;
+                waitTimer = 0;
+            }
 
+            me->BotStopMovement();
             me->TextEmote(LocalizedNpcText(player, BOT_TEXT_BOT_TICKLED).c_str());
+            ChatHandler(player->GetSession()).SendSysMessage(report.str().c_str());
             break;
         }
         default:
