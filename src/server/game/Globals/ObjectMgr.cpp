@@ -2317,6 +2317,12 @@ void ObjectMgr::LoadCreatureSparring()
         ObjectGuid::LowType spawnId     = fields[0].Get<uint32>();
         float sparringHealthPct         = fields[1].Get<float>();
 
+        if (!sObjectMgr->GetCreatureData(spawnId))
+        {
+            LOG_ERROR("sql.sql", "Entry {} has a record in `creature_sparring` but doesn't exist in 'creatures' table");
+            continue;
+        }
+
         _creatureSparringStore[spawnId].push_back(sparringHealthPct);
 
         ++count;

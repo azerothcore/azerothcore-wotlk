@@ -1040,7 +1040,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
 
         uint32 sparringHealth = victim->GetHealth() * (victim->ToCreature()->GetSparringPct() / 100);
         if (victim->GetHealth() - damage <= sparringHealth)
-            damage = sparringHealth - (victim->GetHealth() - damage);
+            damage = 0;
     }
 
     if (health <= damage)
