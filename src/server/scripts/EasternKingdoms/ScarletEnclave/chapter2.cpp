@@ -204,8 +204,6 @@ enum Koltira
     NPC_CRIMSON_ACOLYTE             = 29007,
     NPC_HIGH_INQUISITOR_VALROTH     = 29001,
 
-    //not sure about this id
-    //NPC_DEATH_KNIGHT_MOUNT        = 29201,
     MODEL_DEATH_KNIGHT_MOUNT        = 25278
 };
 
@@ -214,19 +212,6 @@ class npc_koltira_deathweaver : public CreatureScript
 public:
     npc_koltira_deathweaver() : CreatureScript("npc_koltira_deathweaver") { }
 
-    bool OnQuestAccept(Player* player, Creature* creature, const Quest* quest) override
-    {
-        if (quest->GetQuestId() == QUEST_BREAKOUT)
-        {
-            creature->SetStandState(UNIT_STAND_STATE_STAND);
-            creature->setActive(true);
-
-            if (npc_escortAI* pEscortAI = CAST_AI(npc_koltira_deathweaver::npc_koltira_deathweaverAI, creature->AI()))
-                pEscortAI->Start(false, false, player->GetGUID());
-        }
-        return true;
-    }
-
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_koltira_deathweaverAI(creature);
@@ -234,15 +219,29 @@ public:
 
     struct npc_koltira_deathweaverAI : public npc_escortAI
     {
-        npc_koltira_deathweaverAI(Creature* creature) : npc_escortAI(creature), summons(me)
-        {
-            me->SetReactState(REACT_DEFENSIVE);
-        }
-
         uint32 m_uiWave;
         uint32 m_uiWave_Timer;
         ObjectGuid m_uiValrothGUID;
         SummonList summons;
+        bool active;
+
+        npc_koltira_deathweaverAI(Creature* creature) : npc_escortAI(creature), summons(me)
+        {
+            m_uiWave = 0;
+            m_uiWave_Timer = 3000;
+            active = false;
+        }
+
+        void sQuestAccept(Player* player, Quest const* quest) override
+        {
+            if (quest->GetQuestId() == QUEST_BREAKOUT)
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->setActive(true);
+                npc_escortAI::Start(true, false, player->GetGUID(), quest);
+                active = true;
+            }
+        }
 
         void Reset() override
         {
@@ -252,29 +251,11 @@ public:
                 m_uiWave_Timer = 3000;
                 m_uiValrothGUID.Clear();
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetReactState(REACT_PASSIVE);
                 me->LoadEquipment(0, true);
                 me->RemoveAllAuras();
                 summons.DespawnAll();
-            }
-        }
-
-        void EnterEvadeMode(EvadeReason /*why*/) override
-        {
-            me->GetThreatMgr().ClearAllThreat();
-            me->CombatStop(false);
-            me->SetLootRecipient(nullptr);
-
-            if (HasEscortState(STATE_ESCORT_ESCORTING))
-            {
-                AddEscortState(STATE_ESCORT_RETURNING);
-                ReturnToLastPoint();
-                LOG_DEBUG("scripts.ai", "EscortAI has left combat and is now returning to last point");
-            }
-            else
-            {
-                me->GetMotionMaster()->MoveTargetedHome();
-                me->SetImmuneToNPC(true);
-                Reset();
+                active = false;
             }
         }
 
@@ -286,8 +267,24 @@ public:
             npc_escortAI::AttackStart(who);
         }
 
+        void JustDied(Unit* /*who*/) override
+        {
+            Player* player = GetPlayerForEscort();
+
+            if (!player)
+                return;
+
+            if (player->GetQuestStatus(QUEST_BREAKOUT) == QUEST_STATUS_INCOMPLETE)
+                player->FailQuest(QUEST_BREAKOUT);
+        }
+
         void WaypointReached(uint32 waypointId) override
         {
+            Player* player = GetPlayerForEscort();
+
+            if (!player)
+                return;
+
             switch (waypointId)
             {
                 case 0:
@@ -299,7 +296,6 @@ public:
                     break;
                 case 2:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    //me->UpdateEntry(NPC_KOLTIRA_ALT); //unclear if we must update or not
                     DoCast(me, SPELL_KOLTIRA_TRANSFORM);
                     me->LoadEquipment();
                     break;
@@ -307,7 +303,7 @@ public:
                     SetEscortPaused(true);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     Talk(SAY_BREAKOUT2);
-                    DoCast(me, SPELL_ANTI_MAGIC_ZONE);  // cast again that makes bubble up
+                    DoCast(me, SPELL_ANTI_MAGIC_ZONE);
                     break;
                 case 4:
                     me->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, false);
@@ -315,9 +311,6 @@ public:
                     break;
                 case 9:
                     me->Mount(MODEL_DEATH_KNIGHT_MOUNT);
-                    break;
-                case 10:
-                    me->Dismount();
                     break;
             }
         }
@@ -343,6 +336,22 @@ public:
 
         void UpdateAI(uint32 uiDiff) override
         {
+            if (Player* player = GetPlayerForEscort())
+            {
+                if (!player->IsAlive() || !player->IsWithinDist(me, INTERACTION_DISTANCE * 6))
+                {
+                    summons.DespawnAll();
+                    me->DespawnOrUnsummon();
+                    if (player->GetQuestStatus(QUEST_BREAKOUT) == QUEST_STATUS_INCOMPLETE)
+                        player->FailQuest(QUEST_BREAKOUT);
+                }
+            }
+            else
+            {
+                if (active)
+                    me->DespawnOrUnsummon();
+            }
+
             npc_escortAI::UpdateAI(uiDiff);
 
             if (HasEscortState(STATE_ESCORT_PAUSED))
@@ -391,14 +400,13 @@ public:
                                     }
 
                                     m_uiWave_Timer = 2500;
-                                    return;                         //return, we don't want m_uiWave to increment now
+                                    return;
                                 }
                                 break;
                             }
                         case 5:
                             Talk(SAY_BREAKOUT9);
                             me->RemoveAurasDueToSpell(SPELL_ANTI_MAGIC_ZONE);
-                            // i do not know why the armor will also be removed
                             m_uiWave_Timer = 2500;
                             break;
                         case 6:
@@ -438,7 +446,11 @@ public:
 
     struct npc_scarlet_courierAI : public ScriptedAI
     {
-        npc_scarlet_courierAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_scarlet_courierAI(Creature* creature) : ScriptedAI(creature)
+        {
+            uiStage = 0;
+            uiStage_timer = 0;
+        }
 
         uint32 uiStage;
         uint32 uiStage_timer;
@@ -508,7 +520,6 @@ public:
 
 enum valroth
 {
-    //SAY_VALROTH1                      = 0, Unused
     SAY_VALROTH_AGGRO                 = 1,
     SAY_VALROTH_RAND                  = 2,
     SAY_VALROTH_DEATH                 = 3,
@@ -530,7 +541,12 @@ public:
 
     struct npc_high_inquisitor_valrothAI : public ScriptedAI
     {
-        npc_high_inquisitor_valrothAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_high_inquisitor_valrothAI(Creature* creature) : ScriptedAI(creature)
+        {
+            uiRenew_timer = 0;
+            uiInquisitor_Penance_timer = 0;
+            uiValroth_Smite_timer = 0;
+        }
 
         uint32 uiRenew_timer;
         uint32 uiInquisitor_Penance_timer;
@@ -590,7 +606,7 @@ public:
 
             if (killer)
             {
-                killer->CastSpell(me, SPELL_SUMMON_VALROTH_REMAINS, true);
+                me->CastSpell(me, SPELL_SUMMON_VALROTH_REMAINS, true);
             }
         }
     };
@@ -629,7 +645,11 @@ public:
 
     struct npc_a_special_surpriseAI : public ScriptedAI
     {
-        npc_a_special_surpriseAI(Creature* creature) : ScriptedAI(creature) { }
+        npc_a_special_surpriseAI(Creature* creature) : ScriptedAI(creature)
+        {
+            ExecuteSpeech_Timer = 0;
+            ExecuteSpeech_Counter = 0;
+        }
 
         uint32 ExecuteSpeech_Timer;
         uint32 ExecuteSpeech_Counter;
