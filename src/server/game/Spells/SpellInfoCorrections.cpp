@@ -4856,12 +4856,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
-    // Found Target
-    ApplySpellFix({ 41082 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_ALLOW_CAST_WHILE_CASTING;
-    });
-
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
