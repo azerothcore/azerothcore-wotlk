@@ -217,6 +217,7 @@ struct boss_illidan_stormrage : public BossAI
         me->SetSheath(SHEATH_STATE_UNARMED);
         me->SetControlled(false, UNIT_STATE_ROOT);
         me->SetCombatMovement(true);
+        me->GetMotionMaster()->MoveTargetedHome();
 
         ScheduleHealthCheckEvent(90, [&] {
             // Call for minions
