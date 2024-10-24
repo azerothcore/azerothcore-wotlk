@@ -1,3 +1,4 @@
+-- DB update 2024_10_24_04 -> 2024_10_24_05
 -- Update creature 'Headless Horseman - Fire (DND)' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` IN (23537))
