@@ -896,8 +896,8 @@ public:
                 return;
 
             //Faerie Fire (Feral, Cat)
-            if (IsSpellReady(FAERIE_FIRE_FERAL_1, diff) && me->IsInCombat() && !me->HasAuraType(SPELL_AURA_MOD_STEALTH) &&
-                Rand() < 35 && me->GetDistance(mytar) < 30 &&
+            if (IsSpellReady(FAERIE_FIRE_FERAL_1, diff) && (mytar->IsControlledByPlayer() ? !mytar->IsInCombat() : me->IsInCombat()) && !me->HasAuraType(SPELL_AURA_MOD_STEALTH) &&
+                Rand() < ((mytar->GetClass() == CLASS_ROGUE || mytar->GetShapeshiftForm() == FORM_CAT) ? 35 : 10) && me->GetDistance(mytar) < 30 &&
                 !mytar->HasAuraTypeWithFamilyFlags(SPELL_AURA_MOD_RESISTANCE_PCT, SPELLFAMILY_DRUID, 0x400))
             {
                 if (doCast(mytar, GetSpell(FAERIE_FIRE_FERAL_1)))
@@ -927,7 +927,7 @@ public:
                     {}
                 }
                 //Savage Roar
-                if (IsSpellReady(SAVAGE_ROAR_1, diff) && comboPoints >= 1 && (me->IsInCombat() || mytar->IsInCombat()) &&
+                if (IsSpellReady(SAVAGE_ROAR_1, diff) && comboPoints >= 1 && comboPoints <= 3 && (me->IsInCombat() || mytar->IsInCombat()) &&
                     !me->HasAuraType(SPELL_AURA_MOD_STEALTH) && energy >= acost(SAVAGE_ROAR_1) &&
                     !me->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_DRUID, 0, 0x10000000, 0))
                 {
@@ -953,9 +953,10 @@ public:
                         return;
                 }
             }
+
             //Tiger's Fury (no GCD) cannot use while Berserk is active
-            if (IsSpellReady(TIGERS_FURY_1, diff, false) && mytar->GetHealth() > me->GetHealth() / 4 &&
-                (me->GetLevel() < 55 || energy <= 40) && Rand() < 40 &&
+            if (IsSpellReady(TIGERS_FURY_1, diff, false) && mytar->GetHealth() > me->GetHealth() / 4 && (me->GetLevel() < 55 || energy <= 40) && Rand() < 80 &&
+                !me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DRUID, 0x0, 0x200000, 0x0) &&
                 !me->GetAuraEffect(SPELL_AURA_MECHANIC_IMMUNITY, SPELLFAMILY_DRUID, 0x0, 0x0, 0x40))
             {
                 if (doCast(me, GetSpell(TIGERS_FURY_1)))
@@ -963,7 +964,8 @@ public:
             }
             //Berserk can be used After Tiger's Fury without dispelling it
             //Berserk (Cat)
-            if (IsSpellReady(BERSERK_1, diff) && !HasRole(BOT_ROLE_HEAL) && (!me->HasAuraType(SPELL_AURA_MOD_STEALTH) || energy >= 40) && Rand() < 50 &&
+            if (IsSpellReady(BERSERK_1, diff) && Rand() < 80 && !IsSpellReady(TIGERS_FURY_1, diff, false) && (!HasRole(BOT_ROLE_HEAL) || me->HasAuraType(SPELL_AURA_MOD_FEAR)) &&
+                (!me->HasAuraType(SPELL_AURA_MOD_STEALTH) || energy >= 40 || me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DRUID, 0x0, 0x200000, 0x0)) &&
                 (mytar->GetTypeId() == TYPEID_PLAYER || mytar->GetHealth() + 5000 > me->GetHealth()))
             {
                 if (doCast(me, GetSpell(BERSERK_1)))
@@ -1005,23 +1007,23 @@ public:
             if (comboPoints > 0)
             {
                 //Maim
-                if (IsSpellReady(MAIM_1, diff) && !CCed(mytar) && energy >= acost(MAIM_1) &&
-                    (comboPoints >= 4 || mytar->IsNonMeleeSpellCast(false,false,true)))
+                if (IsSpellReady(MAIM_1, diff) && !CCed(mytar) && mytar->GetHealth() > me->GetMaxHealth() / 8 && energy >= acost(MAIM_1) &&
+                    (comboPoints >= (mytar->IsNonMeleeSpellCast(false, false, true) ? 1 : (!!mytar->GetVictim() || mytar->IsControlledByPlayer()) ? 4 : 6)))
                 {
                     if (doCast(mytar, GetSpell(MAIM_1)))
                         return;
                 }
                 //Ferocious Bite
-                if (IsSpellReady(FEROCIOUS_BITE_1, diff) && (comboPoints >= 4 || mytar->GetHealth() < me->GetMaxHealth() / 4) &&
-                    energy >= acost(FEROCIOUS_BITE_1) && Rand() < (50 + comboPoints * 20))
+                if (IsSpellReady(FEROCIOUS_BITE_1, diff) && Rand() < (50 + comboPoints * 20) &&
+                    ((comboPoints >= 4 && mytar->IsControlledByPlayer()) || mytar->GetHealth() < me->GetMaxHealth() / std::max<int32>(1, 6 - comboPoints)) &&
+                    energy >= acost(FEROCIOUS_BITE_1))
                 {
                     if (doCast(mytar, GetSpell(FEROCIOUS_BITE_1)))
                         return;
                 }
                 //Rip
-                if (IsSpellReady(RIP_1, diff) && (comboPoints < 4 || !GetSpell(FEROCIOUS_BITE_1)) &&
-                    energy >= acost(RIP_1) && mytar->GetHealth() > me->GetMaxHealth() / 4 &&
-                    Rand() < (50 + 40 * (mytar->GetTypeId() == TYPEID_PLAYER && IsMeleeClass(mytar->GetClass()))) &&
+                if (IsSpellReady(RIP_1, diff) && comboPoints >= (mytar->IsControlledByPlayer() ? 4 : 5) && Rand() < 90 &&
+                    mytar->GetHealth() > me->GetMaxHealth() / (mytar->IsControlledByPlayer() ? 4 : 2) && energy >= acost(RIP_1) &&
                     !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x800000, 0x0, 0x0, me->GetGUID()))
                 {
                     if (doCast(mytar, GetSpell(RIP_1)))
@@ -1039,30 +1041,31 @@ public:
                     if (doCast(mytar, GetSpell(SWIPE_CAT_1)))
                         return;
             }
+
             //Shred
-            if (IsSpellReady(SHRED_1, diff) && comboPoints < 4 && energy >= acost(SHRED_1) && Rand() < 85 &&
-                !mytar->HasInArc(float(M_PI), me))
+            if (IsSpellReady(SHRED_1, diff) && ((Rand() < 70 && energy >= acost(SHRED_1)) || !!me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DRUID, 0x0, 0x200000, 0x0)) &&
+                /*comboPoints < 5 && */ !mytar->HasInArc(float(M_PI), me))
             {
                 if (doCast(mytar, GetSpell(SHRED_1)))
                     return;
             }
             //Mangle (Cat)
             if (IsSpellReady(MANGLE_CAT_1, diff) && comboPoints < 5 && energy >= acost(MANGLE_CAT_1) &&
-                (Rand() < 20 || !mytar->GetAuraEffect(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, SPELLFAMILY_DRUID, 0x0, 0x400, 0x0)))
+                !me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DRUID, 0x0, 0x200000, 0x0) &&
+                !mytar->GetAuraEffect(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, SPELLFAMILY_DRUID, 0x0, 0x400, 0x0))
             {
                 if (doCast(mytar, GetSpell(MANGLE_CAT_1)))
                     return;
             }
             //Rake
-            if (IsSpellReady(RAKE_1, diff) && comboPoints < 3 && energy >= acost(RAKE_1) && Rand() < 60 &&
+            if (IsSpellReady(RAKE_1, diff) && (comboPoints <= (mytar->IsControlledByPlayer() ? 4 : 5)) && Rand() < 100 && energy >= acost(RAKE_1) &&
                 !mytar->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x1000, 0x0, 0x0, me->GetGUID()))
             {
                 if (doCast(mytar, GetSpell(RAKE_1)))
                     return;
             }
             //Claw
-            if (IsSpellReady(CLAW_1, diff) && comboPoints < 5 && Rand() < 50 && (!GetSpell(SHRED_1) || mytar->HasInArc(float(M_PI), me)) &&
-                energy >= acost(CLAW_1))
+            if (IsSpellReady(CLAW_1, diff) && comboPoints < 5 && Rand() < 40 && energy >= acost(CLAW_1) && (!GetSpell(SHRED_1) || mytar->HasInArc(float(M_PI), me)))
             {
                 if (doCast(mytar, GetSpell(CLAW_1)))
                     return;
@@ -1884,7 +1887,7 @@ public:
 
             //100% mods
             //Clearcasting: -100% mana/rage/energy cost for any spell
-            if (AuraEffect const* eff = me->GetAuraEffect(OMEN_OF_CLARITY_BUFF, 0, me->GetGUID()))
+            if (AuraEffect const* eff = me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DRUID, 0x0, 0x200000, 0x0))
                 if (eff->IsAffectedOnSpell(spellInfo))
                     pctbonus += 1.0f;
 
@@ -2161,7 +2164,7 @@ public:
 
             //Handle clearcasting
             //Notes: bugged with hurricane (periodic)
-            if (AuraEffect const* eff = me->GetAuraEffect(OMEN_OF_CLARITY_BUFF, 0, me->GetGUID()))
+            if (AuraEffect const* eff = me->GetAuraEffect(SPELL_AURA_ADD_PCT_MODIFIER, SPELLFAMILY_DRUID, 0x0, 0x200000, 0x0))
                 if (eff->IsAffectedOnSpell(spellInfo) && !spellInfo->IsRankOf(sSpellMgr->GetSpellInfo(HURRICANE_DAMAGE_1)))
                     me->RemoveAurasDueToSpell(OMEN_OF_CLARITY_BUFF);
 
