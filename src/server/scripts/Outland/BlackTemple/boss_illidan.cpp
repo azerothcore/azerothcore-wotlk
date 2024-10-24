@@ -234,6 +234,7 @@ struct boss_illidan_stormrage : public BossAI
             scheduler.CancelAll();
             if (me->HasAura(SPELL_DEMON_FORM))
                 DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
+            me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
             DoAction(ACTION_SHADOW_PRISON);
         });
     }
@@ -340,14 +341,13 @@ struct boss_illidan_stormrage : public BossAI
                 DoResetThreatList();
                 DoCastSelf(SPELL_DEMON_TRANSFORM_1, true);
 
-                me->m_Events.AddEventAtOffset([&] {
-                    Talk(SAY_ILLIDAN_MORPH);
-                }, 2630ms);
+                Talk(SAY_ILLIDAN_MORPH, 2630ms);
+
                 me->m_Events.AddEventAtOffset([&] {
                     // me->SetControlled(false, UNIT_STATE_ROOT);
                     me->SetReactState(REACT_AGGRESSIVE);
                     ScheduleAbilities(PHASE_DEMON);
-                }, 12230ms);
+                }, 12230ms, GROUP_DEMON_FORM);
             }
             break;
             case ACTION_ILLIDAN_DEMON_TRANSFORM_BACK:
@@ -558,7 +558,8 @@ struct boss_illidan_stormrage : public BossAI
                 }, 24s);
 
                 ScheduleTimedEvent(60s, [&] {
-                    DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM);
+                    if (!_inCutscene)
+                        DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM);
                 }, 60s);
             }
             break;
