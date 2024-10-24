@@ -1,3 +1,4 @@
+-- DB update 2024_10_24_00 -> 2024_10_24_01
 -- Update gameobject 'Water Bucket(s)' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (186615, 186614))

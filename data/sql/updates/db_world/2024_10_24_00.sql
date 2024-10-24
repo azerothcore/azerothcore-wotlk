@@ -1,3 +1,4 @@
+-- DB update 2024_10_22_00 -> 2024_10_24_00
 -- Update gameobject 'Water Barrel' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (186234))

@@ -1,3 +1,4 @@
+-- DB update 2024_10_24_01 -> 2024_10_24_02
 -- Update gameobject 'Fire Effigy' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (186720))
