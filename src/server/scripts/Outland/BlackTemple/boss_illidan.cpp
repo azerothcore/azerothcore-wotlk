@@ -233,6 +233,7 @@ struct boss_illidan_stormrage : public BossAI
             scheduler.CancelAll();
             if (me->HasAura(SPELL_DEMON_FORM))
                 DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
+            me->m_Events.CancelEventGroup(GROUP_DEMON_FORM);
             DoAction(ACTION_SHADOW_PRISON);
         });
     }
@@ -345,7 +346,7 @@ struct boss_illidan_stormrage : public BossAI
                     // me->SetControlled(false, UNIT_STATE_ROOT);
                     me->SetReactState(REACT_AGGRESSIVE);
                     ScheduleAbilities(PHASE_DEMON);
-                }, 12230ms);
+                }, 12230ms, GROUP_DEMON_FORM);
             }
             break;
             case ACTION_ILLIDAN_DEMON_TRANSFORM_BACK:
