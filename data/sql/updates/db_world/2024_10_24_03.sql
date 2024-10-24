@@ -1,3 +1,4 @@
+-- DB update 2024_10_24_02 -> 2024_10_24_03
 -- Update gameobject 'Apple Bob' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180523))
