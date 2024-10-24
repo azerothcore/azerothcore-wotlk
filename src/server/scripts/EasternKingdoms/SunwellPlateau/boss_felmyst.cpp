@@ -281,7 +281,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_RESTORE_COMBAT:
                     me->SetReactState(REACT_AGGRESSIVE);

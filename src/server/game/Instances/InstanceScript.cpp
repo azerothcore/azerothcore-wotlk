@@ -761,6 +761,24 @@ void InstanceScript::LoadInstanceSavedGameobjectStateData()
     }
 }
 
+bool InstanceScript::AllBossesDone() const
+{
+    for (auto const& boss : bosses)
+        if (boss.state != DONE)
+            return false;
+
+    return true;
+}
+
+bool InstanceScript::AllBossesDone(std::initializer_list<uint32> bossIds) const
+{
+    for (auto const& bossId : bossIds)
+        if (!IsBossDone(bossId))
+            return false;
+
+    return true;
+}
+
 std::string InstanceScript::GetBossStateName(uint8 state)
 {
     // See enum EncounterState in InstanceScript.h

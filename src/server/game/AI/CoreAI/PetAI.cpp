@@ -277,7 +277,7 @@ void PetAI::UpdateAI(uint32 diff)
                 {
                     if (CanAttack(target) && spell->CanAutoCast(target))
                     {
-                        targetSpellStore.push_back(std::make_pair(target, spell));
+                        targetSpellStore.emplace_back(target, spell);
                         spellUsed = true;
                     }
                 }
@@ -295,7 +295,7 @@ void PetAI::UpdateAI(uint32 diff)
 
                         if (spell->CanAutoCast(ally))
                         {
-                            targetSpellStore.push_back(std::make_pair(ally, spell));
+                            targetSpellStore.emplace_back(ally, spell);
                             spellUsed = true;
                             break;
                         }
@@ -310,7 +310,7 @@ void PetAI::UpdateAI(uint32 diff)
             {
                 Spell* spell = new Spell(me, spellInfo, TRIGGERED_NONE);
                 if (spell->CanAutoCast(me->GetVictim()))
-                    targetSpellStore.push_back(std::make_pair(me->GetVictim(), spell));
+                    targetSpellStore.emplace_back(me->GetVictim(), spell);
                 else
                     delete spell;
             }

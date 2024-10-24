@@ -157,7 +157,7 @@ public:
                 return;
             }
 
-            if(me->GetEntry() == NPC_BELGARISTRASZ)
+            if (me->GetEntry() == NPC_BELGARISTRASZ)
             {
                 Talk(SAY_BELGARISTRASZ);
             }
@@ -167,10 +167,10 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if(creature->IsQuestGiver())
+        if (creature->IsQuestGiver())
             player->PrepareQuestMenu(creature->GetGUID());
 
-        if(creature->GetInstanceScript()->GetData(DATA_DRAKOS) == DONE)
+        if (creature->GetInstanceScript()->GetData(DATA_DRAKOS) == DONE)
         {
             switch (creature->GetEntry())
             {
@@ -251,10 +251,10 @@ public:
     bool OnGossipSelect(Player* player, Creature* creature, uint32 /*uiSender*/, uint32 uiAction) override
     {
         ClearGossipMenuFor(player);
-        switch(creature->GetEntry())
+        switch (creature->GetEntry())
         {
         case NPC_VERDISA:
-            switch(uiAction)
+            switch (uiAction)
             {
             case GOSSIP_ACTION_INFO_DEF:
                 SendGossipMenuFor(player, GOSSIP_TEXTID_VERDISA2, creature->GetGUID());
@@ -273,7 +273,7 @@ public:
             CloseGossipMenuFor(player);
             break;
         case NPC_BELGARISTRASZ:
-            switch(uiAction)
+            switch (uiAction)
             {
             case GOSSIP_ACTION_INFO_DEF:
                 openedMenu[player->GetGUID()] = true;
@@ -415,11 +415,11 @@ public:
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
             for( uint8 i = 0; i < 8; ++i )
-                if( me->m_spells[i] == spell->Id )
+                if (me->m_spells[i] == spell->Id)
                 {
-                    if( target && target->IsAlive() && !target->CanFly() && target->IsHostileTo(me) && !spell->IsTargetingArea())
+                    if (target && target->IsAlive() && !target->CanFly() && target->IsHostileTo(me) && !spell->IsTargetingArea())
                     {
-                        if( Unit* charmer = me->GetCharmer() )
+                        if (Unit* charmer = me->GetCharmer())
                             Unit::Kill(charmer, charmer, false);
                     }
                     break;

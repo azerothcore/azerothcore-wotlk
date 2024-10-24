@@ -189,7 +189,7 @@ public:
             else if (s->GetEntry() == NPC_THROW)
             {
                 ThrowGUID = s->GetGUID();
-                if( Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 70.0f, true) )
+                if (Unit* t = SelectTarget(SelectTargetMethod::Random, 0, 70.0f, true))
                     s->GetMotionMaster()->MovePoint(0, t->GetPositionX(), t->GetPositionY(), t->GetPositionZ());
             }
         }
@@ -246,10 +246,10 @@ public:
 
             events.Update(diff);
 
-            if( me->HasUnitState(UNIT_STATE_CASTING) )
+            if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch( events.ExecuteEvent() )
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -263,16 +263,16 @@ public:
                     events.RescheduleEvent(EVENT_ANNHYLDE_YELL, 3s);
                     break;
                 case EVENT_VALKYR_MOVE:
-                    if( Creature* s = ObjectAccessor::GetCreature(*me, ValkyrGUID) )
+                    if (Creature* s = ObjectAccessor::GetCreature(*me, ValkyrGUID))
                         s->GetMotionMaster()->MovePoint(1, s->GetPositionX(), s->GetPositionY(), s->GetPositionZ() - 15.0f);
                     break;
                 case EVENT_ANNHYLDE_YELL:
-                    if( Creature* s = ObjectAccessor::GetCreature(*me, ValkyrGUID) )
+                    if (Creature* s = ObjectAccessor::GetCreature(*me, ValkyrGUID))
                         s->AI()->Talk(YELL_ANHYLDE_2);
                     break;
                 case EVENT_VALKYR_BEAM:
                     me->RemoveAura(SPELL_SUMMON_VALKYR);
-                    if( Creature* c = ObjectAccessor::GetCreature(*me, ValkyrGUID) )
+                    if (Creature* c = ObjectAccessor::GetCreature(*me, ValkyrGUID))
                         c->CastSpell(me, SPELL_RESURRECTION_BEAM, false);
                     events.RescheduleEvent(EVENT_RESURRECTION_BALL, 4s);
                     break;
@@ -291,7 +291,7 @@ public:
                     events.RescheduleEvent(EVENT_START_PHASE_2, 1s);
                     break;
                 case EVENT_START_PHASE_2:
-                    if( Creature* c = ObjectAccessor::GetCreature(*me, ValkyrGUID) )
+                    if (Creature* c = ObjectAccessor::GetCreature(*me, ValkyrGUID))
                     {
                         c->DespawnOrUnsummon();
                         summons.DespawnAll();
@@ -327,7 +327,7 @@ public:
                     events.Repeat(15s, 20s);
                     break;
                 case EVENT_SPELL_CLEAVE_OR_WOE_STRIKE:
-                    if( me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) == 0 )
+                    if (me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) == 0 )
                     {
                         events.Repeat(3s);
                         break;
@@ -339,7 +339,7 @@ public:
                     events.Repeat(3s, 7s);
                     break;
                 case EVENT_SPELL_SMASH:
-                    if( me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) == 0 )
+                    if (me->GetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID) == 0 )
                     {
                         events.Repeat(3s);
                         break;

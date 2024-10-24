@@ -228,7 +228,7 @@ public:
                             }
             }
 
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_SYLVANAS_PART1:
                     creature->SetVisible(false);
@@ -372,7 +372,7 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            switch(go->GetEntry())
+            switch (go->GetEntry())
             {
                 case GO_FROSTMOURNE:
                     GO_FrostmourneGUID = go->GetGUID();
@@ -408,7 +408,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_INTRO:
                     EncounterMask |= (1 << DATA_INTRO);
@@ -597,7 +597,7 @@ public:
                         if (EncounterMask & (1 << DATA_BATTERED_HILT))
                             return;
 
-                        switch(data)
+                        switch (data)
                         {
                             case 1: // talked to leader
                                 EncounterMask |= (1 << DATA_BATTERED_HILT);
@@ -667,7 +667,7 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            switch(type)
+            switch (type)
             {
                 case DATA_INTRO:
                 case DATA_FALRIC:
@@ -687,7 +687,7 @@ public:
 
         ObjectGuid GetGuidData(uint32 type) const override
         {
-            switch(type)
+            switch (type)
             {
                 case NPC_DARK_RANGER_LORALEN:
                     return NPC_GuardGUID;

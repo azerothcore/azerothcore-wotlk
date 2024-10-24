@@ -358,7 +358,7 @@ public:
                     }
                     break;
                 case DATA_SOLAKAR_FLAMEWREATH:
-                    switch(data)
+                    switch (data)
                     {
                         case IN_PROGRESS:
                             if (SolakarState == NOT_STARTED)

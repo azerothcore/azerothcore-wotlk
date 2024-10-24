@@ -231,7 +231,7 @@ public:
             }
             if (GameObject* go = me->GetMap()->GetGameObject(pInstance->GetGuidData(DATA_KELTHUZAD_GATE)))
             {
-                if(!_justSpawned) // Don't open the door if we just spawned and are still doing the conversation
+                if (!_justSpawned) // Don't open the door if we just spawned and are still doing the conversation
                 {
                     go->SetGoState(GO_STATE_ACTIVE);
                 }

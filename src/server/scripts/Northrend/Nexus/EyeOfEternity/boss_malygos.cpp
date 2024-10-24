@@ -382,7 +382,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -799,7 +799,7 @@ public:
             if (!summon)
                 return;
             summons.Summon(summon);
-            switch(summon->GetEntry())
+            switch (summon->GetEntry())
             {
                 case NPC_ARCANE_OVERLOAD:
                     summon->CastSpell(summon, SPELL_ARCANE_OVERLOAD_DMG, true);
@@ -989,7 +989,7 @@ public:
 
         void DoAction(int32 param) override
         {
-            switch(param)
+            switch (param)
             {
                 case 1:
                     MoveTimer = 1;
@@ -1123,7 +1123,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1183,7 +1183,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1321,12 +1321,12 @@ public:
 
         void DoAction(int32 param) override
         {
-            switch(param)
+            switch (param)
             {
                 case 1: // move to next point
                     if (Vehicle* v = me->GetVehicleKit())
                         if (Unit* pass = v->GetPassenger(0))
-                            switch(pass->GetEntry())
+                            switch (pass->GetEntry())
                             {
                                 case NPC_NEXUS_LORD:
                                     {
@@ -1357,7 +1357,7 @@ public:
         {
             events.Update(diff);
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1397,7 +1397,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;

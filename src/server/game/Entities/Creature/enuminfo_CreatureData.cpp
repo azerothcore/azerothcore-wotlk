@@ -42,7 +42,7 @@ AC_API_EXPORT EnumText EnumUtils<CreatureFlagsExtra>::ToString(CreatureFlagsExtr
         case CREATURE_FLAG_EXTRA_NO_TAUNT: return { "CREATURE_FLAG_EXTRA_NO_TAUNT", "CREATURE_FLAG_EXTRA_NO_TAUNT", "creature is immune to taunt auras and 'attack me' effects" };
         case CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE: return { "CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE", "CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE", "creature won't update movement flags" };
         case CREATURE_FLAG_EXTRA_GHOST_VISIBILITY: return { "CREATURE_FLAG_EXTRA_GHOST_VISIBILITY", "CREATURE_FLAG_EXTRA_GHOST_VISIBILITY", "creature will only be visible to dead players" };
-        case CREATURE_FLAG_EXTRA_UNUSED_12: return { "CREATURE_FLAG_EXTRA_UNUSED_12", "CREATURE_FLAG_EXTRA_UNUSED_12", "/ @todo: Implement CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK (creature will use offhand attacks)" };
+        case CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK: return { "CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK", "CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK", "/ @todo: Implement CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK (creature will use offhand attacks)" };
         case CREATURE_FLAG_EXTRA_NO_SELL_VENDOR: return { "CREATURE_FLAG_EXTRA_NO_SELL_VENDOR", "CREATURE_FLAG_EXTRA_NO_SELL_VENDOR", "players can't sell items to this vendor" };
         case CREATURE_FLAG_EXTRA_IGNORE_COMBAT: return { "CREATURE_FLAG_EXTRA_IGNORE_COMBAT", "CREATURE_FLAG_EXTRA_IGNORE_COMBAT", "" };
         case CREATURE_FLAG_EXTRA_WORLDEVENT: return { "CREATURE_FLAG_EXTRA_WORLDEVENT", "CREATURE_FLAG_EXTRA_WORLDEVENT", "custom flag for world event creatures (left room for merging)" };
@@ -86,7 +86,7 @@ AC_API_EXPORT CreatureFlagsExtra EnumUtils<CreatureFlagsExtra>::FromIndex(std::s
         case 8: return CREATURE_FLAG_EXTRA_NO_TAUNT;
         case 9: return CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE;
         case 10: return CREATURE_FLAG_EXTRA_GHOST_VISIBILITY;
-        case 11: return CREATURE_FLAG_EXTRA_UNUSED_12;
+        case 11: return CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK;
         case 12: return CREATURE_FLAG_EXTRA_NO_SELL_VENDOR;
         case 13: return CREATURE_FLAG_EXTRA_IGNORE_COMBAT;
         case 14: return CREATURE_FLAG_EXTRA_WORLDEVENT;
@@ -127,7 +127,7 @@ AC_API_EXPORT std::size_t EnumUtils<CreatureFlagsExtra>::ToIndex(CreatureFlagsEx
         case CREATURE_FLAG_EXTRA_NO_TAUNT: return 8;
         case CREATURE_FLAG_EXTRA_NO_MOVE_FLAGS_UPDATE: return 9;
         case CREATURE_FLAG_EXTRA_GHOST_VISIBILITY: return 10;
-        case CREATURE_FLAG_EXTRA_UNUSED_12: return 11;
+        case CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK: return 11;
         case CREATURE_FLAG_EXTRA_NO_SELL_VENDOR: return 12;
         case CREATURE_FLAG_EXTRA_IGNORE_COMBAT: return 13;
         case CREATURE_FLAG_EXTRA_WORLDEVENT: return 14;

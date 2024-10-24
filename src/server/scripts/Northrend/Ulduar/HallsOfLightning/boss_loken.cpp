@@ -143,7 +143,7 @@ public:
         {
             if (hp)
             {
-                switch(HealthCheck)
+                switch (HealthCheck)
                 {
                     case 75:
                         Talk(SAY_75HEALTH);

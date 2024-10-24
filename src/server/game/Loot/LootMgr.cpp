@@ -700,7 +700,9 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
         }
 
         // Player is not the loot owner, and loot owner still needs this quest item
-        if (!item.freeforall && lootOwner != player && item.AllowedForPlayer(lootOwner, sourceWorldObjectGUID))
+        if (!item.freeforall &&
+            lootOwner && lootOwner != player &&
+            item.AllowedForPlayer(lootOwner, sourceWorldObjectGUID))
         {
             continue;
         }

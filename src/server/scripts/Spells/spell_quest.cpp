@@ -623,9 +623,9 @@ class spell_q12274_a_fall_from_grace_costume : public SpellScript
 
     void HandleScript(SpellEffIndex  /*effIndex*/)
     {
-        if(Unit* target = GetHitUnit())
+        if (Unit* target = GetHitUnit())
         {
-            if(Player* p = target->ToPlayer())
+            if (Player* p = target->ToPlayer())
             {
                 p->CastSpell(p, p->getGender() == GENDER_FEMALE ? SPELL_SCARLET_RAVEN_PRIEST_IMAGE_FEMALE : SPELL_SCARLET_RAVEN_PRIEST_IMAGE_MALE, false);
             }
@@ -2325,8 +2325,8 @@ class spell_q12919_gymers_throw : public SpellScript
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
-            if(GetOwner())
-                if(Player* player = GetOwner()->ToPlayer())
+            if (GetOwner())
+                if (Player* player = GetOwner()->ToPlayer())
                     player->CompleteQuest(QUEST_CROW_TRANSFORM);
         }
 

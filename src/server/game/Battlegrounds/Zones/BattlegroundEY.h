@@ -21,7 +21,6 @@
 #include "Battleground.h"
 #include "BattlegroundScore.h"
 #include "EventMap.h"
-#include "Language.h"
 
 enum BG_EY_Events
 {

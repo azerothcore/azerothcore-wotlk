@@ -193,6 +193,8 @@ public:
     void LoadSparringPct();
     [[nodiscard]] float GetSparringPct() const { return _sparringPct; }
 
+    bool HasWeapon(WeaponAttackType type) const override;
+    bool HasWeaponForAttack(WeaponAttackType type) const override { return (Unit::HasWeaponForAttack(type) && HasWeapon(type)); }
     void SetCanDualWield(bool value) override;
     [[nodiscard]] int8 GetOriginalEquipmentId() const { return m_originalEquipmentId; }
     uint8 GetCurrentEquipmentId() { return m_equipmentId; }

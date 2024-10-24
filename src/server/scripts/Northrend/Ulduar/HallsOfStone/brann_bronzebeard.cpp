@@ -319,7 +319,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 1);
                 pInstance->SetData(DATA_BRANN_ACHIEVEMENT, true);
@@ -586,7 +586,7 @@ public:
             for (int i = 0; i < count; ++i)
             {
                 Creature* cr = me->SummonCreature(entry, 946.5971f + urand(0, 6), 383.5330f + urand(0, 6), 205.9943f, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20000);
-                if(cr)
+                if (cr)
                 {
                     cr->AI()->AttackStart(me);
                     cr->AddThreat(me, 100.0f);
@@ -598,7 +598,7 @@ public:
         void JustDied(Unit* /*killer*/) override
         {
             ResetEvent();
-            if(pInstance)
+            if (pInstance)
             {
                 if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
                 {
@@ -662,7 +662,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
         // In front of Console
         case 11:
             SetEscortPaused(true);
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, IN_PROGRESS);
                 if (GameObject* tribunal = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_TRIBUNAL_CONSOLE)))
@@ -672,7 +672,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
         // Before Sjonnir's door
         case 27:
             SetEscortPaused(true);
-            if(pInstance)
+            if (pInstance)
             {
                 pInstance->SetData(BRANN_BRONZEBEARD, 5);
                 me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);

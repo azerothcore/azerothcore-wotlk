@@ -279,7 +279,7 @@ bool DynamicMapTree::isInLineOfSight(float x1, float y1, float z1, float x2, flo
 
     float maxDist = (v2 - v1).magnitude();
 
-    if (!G3D::fuzzyGt(maxDist, 0) )
+    if (!G3D::fuzzyGt(maxDist, 0))
     {
         return true;
     }

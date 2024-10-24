@@ -337,7 +337,7 @@ struct boss_alar : public BossAI
             return;
         }
 
-        switch(id)
+        switch (id)
         {
             case POINT_QUILL:
                 scheduler.CancelGroup(GROUP_FLAME_BUFFET);

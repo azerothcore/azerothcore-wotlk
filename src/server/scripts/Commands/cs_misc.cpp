@@ -157,9 +157,6 @@ public:
 
         if (args.empty() || !tokens.size())
         {
-            handler->PSendSysMessage("Usage: .skirmish [arena] [XvX] [Nick1] [Nick2] ... [NickN]");
-            handler->PSendSysMessage("[arena] can be \"all\" or comma-separated list of possible arenas (NA, BE, RL, DS, RV).");
-            handler->PSendSysMessage("[XvX] can be 1v1, 2v2, 3v3, 5v5. After [XvX] specify enough nicknames for that mode.");
             handler->SetSentErrorMessage(true);
             return false;
         }
