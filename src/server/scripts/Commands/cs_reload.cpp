@@ -172,6 +172,7 @@ public:
             { "waypoint_data",                 HandleReloadWpCommand,                         SEC_ADMINISTRATOR, Console::Yes },
             { "vehicle_accessory",             HandleReloadVehicleAccessoryCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "vehicle_template_accessory",    HandleReloadVehicleTemplateAccessoryCommand,   SEC_ADMINISTRATOR, Console::Yes },
+            { "creature_sparring",             HandleReloadCreatureSparringCommand,           SEC_ADMINISTRATOR, Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
@@ -1238,6 +1239,26 @@ public:
     {
         LOG_INFO("server.loading", "Reloading game_graveyard table...");
         sGraveyard->LoadGraveyardFromDB();
+        handler->SendGlobalGMSysMessage("DB table `game_graveyard` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadCreatureSparringCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading game_graveyard table...");
+
+        auto const& sparringData = sObjectMgr->GetSparringData();
+
+        for (auto& itr : sparringData)
+        {
+            ObjectGuid::LowType spawnId = itr.first;
+            uint32 mapId = sObjectMgr->GetCreatureData(spawnId)->mapid;
+            float newSparringPct = itr.second[1];
+
+            if (Unit* unit = ObjectAccessor::GetSpawnedCreatureByDBGUID(mapId, spawnId))
+                unit->ToCreature()->UpdateSparringPct(newSparringPct);
+        }
+
         handler->SendGlobalGMSysMessage("DB table `game_graveyard` reloaded.");
         return true;
     }
