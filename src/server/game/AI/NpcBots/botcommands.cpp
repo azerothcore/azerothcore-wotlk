@@ -677,6 +677,7 @@ public:
             { "recall",     npcbotRecallCommandTable                                                                                },
             { "kill",       HandleNpcBotKillCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_KILL,               Console::No  },
             { "suicide",    HandleNpcBotKillCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_KILL,               Console::No  },
+            { "fix",        HandleNpcBotFixCommand,                 rbac::RBAC_PERM_COMMAND_NPCBOT_REVIVE,             Console::No  },
             { "go",         HandleNpcBotGoCommand,                  rbac::RBAC_PERM_COMMAND_NPCBOT_MOVE,               Console::No  },
             { "gs",         HandleNpcBotGearScoreCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_COMMAND_MISC,       Console::No  },
             { "sendto",     npcbotSendToCommandTable                                                                                },
@@ -2270,6 +2271,68 @@ public:
 
         owner->GetBotMgr()->SetBotsHidden(false);
         handler->SendSysMessage("Bots unhidden");
+        return true;
+    }
+
+    static bool HandleNpcBotFixCommand(ChatHandler* handler, Optional<Variant<std::string_view, uint32>> bot_id_or_name)
+    {
+        Creature const* target = handler->getSelectedCreature();
+
+        uint32 bot_id;
+        if (target && target->IsNPCBot())
+            bot_id = target->GetEntry();
+        else if (bot_id_or_name)
+        {
+            if (bot_id_or_name->holds_alternative<uint32>())
+                bot_id = bot_id_or_name->get<uint32>();
+            else if (Creature const* fbot = BotDataMgr::FindBot(bot_id_or_name->get<std::string_view>(), LocaleConstant(handler->GetSessionDbLocaleIndex())))
+            {
+                target = fbot;
+                bot_id = target->GetEntry();
+            }
+            else
+            {
+                char* cre_id = handler->extractKeyFromLink((char*)bot_id_or_name->get<std::string_view>().data(), "Hcreature_entry");
+                bot_id = uint32(atoi(cre_id));
+            }
+        }
+        else if (target)
+        {
+            handler->SendSysMessage("You must select a npcbot");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        else
+        {
+            handler->SendSysMessage(".npcbot fix #[id | name | link | <selection>]");
+            handler->SendSysMessage("Attempts to fix different bot's unit states and ai mishaps which stall its normal function");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Creature const* bot = target ? target : BotDataMgr::FindBot(bot_id);
+        if (!bot)
+        {
+            handler->PSendSysMessage("NpcBot {} is not found!", bot_id);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        NpcBotData const* bot_data = BotDataMgr::SelectNpcBotData(bot_id);
+        Player* owner = !bot->IsFreeBot() ? bot->GetBotOwner() : nullptr;
+        Player* tickler = handler->GetPlayer();
+
+        if (tickler != owner && !tickler->IsGameMaster())
+        {
+            handler->SendSysMessage("Must be in GM mode to fix other player's bot!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        handler->PSendSysMessage("Trying to fix bot {} ({}) owned by {} ({})", bot->GetName().c_str(), bot_id,
+            owner ? owner->GetName().c_str() : "Unknown", owner ? owner->GetGUID().GetCounter() : bot_data->owner);
+
+        bot->GetBotAI()->ReceiveEmote(tickler, TEXT_EMOTE_TICKLE);
         return true;
     }
 
@@ -3892,52 +3955,28 @@ public:
 
         handler->PSendSysMessage("Listing NpcBots for {}, guid {}{}:", master_name, master_guid.GetCounter(), !master ? " (offline)" : "");
         handler->PSendSysMessage("Owned NpcBots: {} (active: {})", uint32(guidvec.size()) + map_size, map_size);
+        LocaleConstant loc = LocaleConstant(handler->GetSessionDbLocaleIndex());
         if (map)
         {
             for (uint8 i = BOT_CLASS_WARRIOR; i != BOT_CLASS_END; ++i)
             {
-                uint8 count = 0;
-                uint8 alivecount = 0;
                 for (BotMap::const_iterator itr = map->begin(); itr != map->end(); ++itr)
                 {
                     if (Creature* cre = itr->second)
                     {
                         if (cre->GetBotClass() == i)
                         {
-                            ++count;
-                            if (cre->IsAlive())
-                                ++alivecount;
+                            std::string ccolor, cname;
+                            GetBotClassNameAndColor(i, ccolor, cname);
+                            std::string base_name = cre->GetName();
+                            if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(cre->GetEntry()))
+                                if (creatureLocale->Name.size() > loc && !creatureLocale->Name[loc].empty())
+                                    base_name = creatureLocale->Name[loc];
+
+                            handler->PSendSysMessage("{} ({}): {} (alive: {})", base_name.c_str(), cre->GetEntry(), "|c" + ccolor + cname + "|r", uint32(cre->IsAlive()));
                         }
                     }
                 }
-                if (count == 0)
-                    continue;
-
-                char const* bclass;
-                switch (i)
-                {
-                    case BOT_CLASS_WARRIOR:         bclass = "Warriors";        break;
-                    case BOT_CLASS_PALADIN:         bclass = "Paladins";        break;
-                    case BOT_CLASS_MAGE:            bclass = "Mages";           break;
-                    case BOT_CLASS_PRIEST:          bclass = "Priests";         break;
-                    case BOT_CLASS_WARLOCK:         bclass = "Warlocks";        break;
-                    case BOT_CLASS_DRUID:           bclass = "Druids";          break;
-                    case BOT_CLASS_DEATH_KNIGHT:    bclass = "Death Knights";   break;
-                    case BOT_CLASS_ROGUE:           bclass = "Rogues";          break;
-                    case BOT_CLASS_SHAMAN:          bclass = "Shamans";         break;
-                    case BOT_CLASS_HUNTER:          bclass = "Hunters";         break;
-                    case BOT_CLASS_BM:              bclass = "Blademasters";    break;
-                    case BOT_CLASS_SPHYNX:          bclass = "Destroyers";      break;
-                    case BOT_CLASS_ARCHMAGE:        bclass = "Archmagi";        break;
-                    case BOT_CLASS_DREADLORD:       bclass = "Dreadlords";      break;
-                    case BOT_CLASS_SPELLBREAKER:    bclass = "Spell Breakers";  break;
-                    case BOT_CLASS_DARK_RANGER:     bclass = "Dark Rangers";    break;
-                    case BOT_CLASS_NECROMANCER:     bclass = "Necromancers";    break;
-                    case BOT_CLASS_SEA_WITCH:       bclass = "Sea Witches";     break;
-                    case BOT_CLASS_CRYPT_LORD:      bclass = "Crypt Lords";     break;
-                    default:                        bclass = "Unknown Class";   break;
-                }
-                handler->PSendSysMessage("{}: {} (alive: {})", bclass, count, alivecount);
             }
         }
 
@@ -3947,7 +3986,11 @@ public:
             Creature const* bot = BotDataMgr::FindBot(guid.GetEntry());
             std::string ccolor, cname;
             GetBotClassNameAndColor(bot ? bot->GetBotClass() : uint8(BOT_CLASS_NONE), ccolor, cname);
-            handler->PSendSysMessage("{} ({})", bot ? bot->GetName().c_str() : "Unknown", "|c" + ccolor + cname + "|r");
+            std::string base_name = bot ? bot->GetName() : "Unknown";
+            if (CreatureLocale const* creatureLocale = sObjectMgr->GetCreatureLocale(guid.GetEntry()))
+                if (creatureLocale->Name.size() > loc && !creatureLocale->Name[loc].empty())
+                    base_name = creatureLocale->Name[loc];
+            handler->PSendSysMessage("{} ({}): {} (alive: {})", base_name.c_str(), guid.GetEntry(), "|c" + ccolor + cname + "|r", bot ? uint32(bot->IsAlive()) : uint32(0));
         }
 
         return true;
