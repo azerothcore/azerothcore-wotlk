@@ -103,7 +103,6 @@ void WorldState::HandleExternalEvent(WorldStateEvent eventId, uint32 param)
 
 void WorldState::Update(uint32 diff)
 {
-    std::lock_guard<std::mutex> guard(_mutex);
     if (_adalSongOfBattleTimer)
     {
         if (_adalSongOfBattleTimer <= diff)
