@@ -1524,6 +1524,27 @@ class spell_illidan_shadow_prison : public SpellScript
     }
 };
 
+class spell_illidan_shadow_prison_aura : public AuraScript
+{
+    PrepareAuraScript(spell_illidan_shadow_prison_aura);
+
+    void HandleOnEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->ApplySpellImmune(GetId(), IMMUNITY_SCHOOL, aurEff->GetMiscValue(), true);
+    }
+
+    void HandleOnEffectRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->ApplySpellImmune(GetId(), IMMUNITY_SCHOOL, aurEff->GetMiscValue(), false);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_illidan_shadow_prison_aura::HandleOnEffectApply, EFFECT_1, SPELL_AURA_DAMAGE_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_illidan_shadow_prison_aura::HandleOnEffectRemove, EFFECT_1, SPELL_AURA_DAMAGE_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 class spell_illidan_demon_transform1_aura : public AuraScript
 {
     PrepareAuraScript(spell_illidan_demon_transform1_aura);
@@ -1714,7 +1735,7 @@ void AddSC_boss_illidan()
     RegisterSpellAndAuraScriptPair(spell_illidan_parasitic_shadowfiend_trigger, spell_illidan_parasitic_shadowfiend_trigger_aura);
     RegisterSpellScript(spell_illidan_glaive_throw);
     RegisterSpellScript(spell_illidan_tear_of_azzinoth_summon_channel_aura);
-    RegisterSpellScript(spell_illidan_shadow_prison);
+    RegisterSpellAndAuraScriptPair(spell_illidan_shadow_prison, spell_illidan_shadow_prison_aura);
     RegisterSpellScript(spell_illidan_demon_transform1_aura);
     RegisterSpellScript(spell_illidan_demon_transform2_aura);
     RegisterSpellScript(spell_illidan_flame_burst);
