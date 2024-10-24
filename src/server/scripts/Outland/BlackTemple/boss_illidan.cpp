@@ -576,7 +576,7 @@ struct boss_illidan_stormrage : public BossAI
                     DoCastSelf(SPELL_FLAME_BURST);
                 }, 19500ms);
 
-                ScheduleTimedEvent(60s, [&] {
+                me->m_Events.AddEventAtOffset([&] {
                     DoAction(ACTION_ILLIDAN_DEMON_TRANSFORM_BACK);
                     if (summons.GetCreatureWithEntry(NPC_MAIEV_SHADOWSONG))
                         ScheduleAbilities(PHASE_MAIEV);
