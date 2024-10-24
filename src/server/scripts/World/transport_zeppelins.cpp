@@ -27,7 +27,7 @@ struct go_transport_the_iron_eagle : GameObjectAI
 
     void EventInform(uint32 eventId) override
     {
-        sWorldState->HandleConditionStateChange(CONDITION_THE_IRON_EAGLE, eventId);
+        sWorldState->HandleConditionStateChange(WORLD_STATE_CONDITION_THE_IRON_EAGLE, static_cast<WorldStateConditionState>(eventId));
         switch (eventId)
         {
             case EVENT_GROMGOL_FROM_OG_ARRIVAL:
@@ -51,7 +51,7 @@ struct go_transport_the_thundercaller : GameObjectAI
 
     void EventInform(uint32 eventId) override
     {
-        sWorldState->HandleConditionStateChange(CONDITION_THE_THUNDERCALLER, eventId);
+        sWorldState->HandleConditionStateChange(WORLD_STATE_CONDITION_THE_THUNDERCALLER, static_cast<WorldStateConditionState>(eventId));
         switch (eventId)
         {
             case EVENT_OG_FROM_UC_ARRIVAL:
@@ -81,7 +81,7 @@ struct go_transport_the_purple_princess : GameObjectAI
 
     void EventInform(uint32 eventId) override
     {
-        sWorldState->HandleConditionStateChange(CONDITION_THE_PURPLE_PRINCESS, eventId);
+        sWorldState->HandleConditionStateChange(WORLD_STATE_CONDITION_THE_PURPLE_PRINCESS, static_cast<WorldStateConditionState>(eventId));
         switch (eventId)
         {
             case EVENT_GROMGOL_FROM_UC_ARRIVAL:

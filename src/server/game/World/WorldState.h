@@ -21,23 +21,29 @@
 #include "Player.h"
 #include <atomic>
 
-enum Conditions
+enum WorldStateCondition
 {
-    CONDITION_TROLLBANES_COMMAND  = 39911,
-    CONDITION_NAZGRELS_FAVOR      = 39913,
-    CONDITION_THE_THUNDERCALLER   = 164871,
-    CONDITION_THE_IRON_EAGLE      = 175080,
-    CONDITION_THE_PURPLE_PRINCESS = 176495,
+    WORLD_STATE_CONDITION_TROLLBANES_COMMAND  = 39911,
+    WORLD_STATE_CONDITION_NAZGRELS_FAVOR      = 39913,
+    // Zeppelins
+    WORLD_STATE_CONDITION_THE_THUNDERCALLER   = 164871,
+    WORLD_STATE_CONDITION_THE_IRON_EAGLE      = 175080,
+    WORLD_STATE_CONDITION_THE_PURPLE_PRINCESS = 176495,
 };
 
-enum Events
+enum WorldStateConditionState
 {
-    CUSTOM_EVENT_ADALS_SONG_OF_BATTLE     = 39953,
-    CUSTOM_EVENT_MAGTHERIDON_HEAD_SPAWN   = 184640,
-    CUSTOM_EVENT_MAGTHERIDON_HEAD_DESPAWN = 184641,
+    WORLD_STATE_CONDITION_STATE_NONE = 0,
 };
 
-enum ZoneIds
+enum WorldStateEvent
+{
+    WORLD_STATE_CUSTOM_EVENT_ON_ADALS_SONG_OF_BATTLE     = 39953,
+    WORLD_STATE_CUSTOM_EVENT_ON_MAGTHERIDON_HEAD_SPAWN   = 184640,
+    WORLD_STATE_CUSTOM_EVENT_ON_MAGTHERIDON_HEAD_DESPAWN = 184641,
+};
+
+enum WorldStateZoneId
 {
     ZONEID_SHATTRATH    = 3703,
     ZONEID_BOTANICA     = 3847,
@@ -52,17 +58,12 @@ enum ZoneIds
     ZONEID_MAGTHERIDON_LAIR     = 3836,
 };
 
-enum SpellId
+enum WorldStateSpells
 {
+    SPELL_ADAL_SONG_OF_BATTLE   = 39953,
+
     SPELL_TROLLBANES_COMMAND    = 39911,
     SPELL_NAZGRELS_FAVOR        = 39913,
-
-    SPELL_ADAL_SONG_OF_BATTLE   = 39953,
-};
-
-enum Misc
-{
-    ZEPPELIN_STATE_UNKOWN = 0,
 };
 
 // Intended for implementing server wide scripts, note: all behaviour must be safeguarded towards multithreading
@@ -72,11 +73,11 @@ class WorldState
         WorldState();
         virtual ~WorldState();
         static WorldState* instance();
-        void HandlePlayerEnterZone(Player* player, uint32 zoneId);
-        void HandlePlayerLeaveZone(Player* player, uint32 zoneId);
-        bool IsConditionFulfilled(uint32 conditionId, uint32 state = 0) const;
-        void HandleConditionStateChange(uint32 conditionId, uint32 state);
-        void HandleExternalEvent(uint32 eventId, uint32 param);
+        void HandlePlayerEnterZone(Player* player, WorldStateZoneId zoneId);
+        void HandlePlayerLeaveZone(Player* player, WorldStateZoneId zoneId);
+        bool IsConditionFulfilled(WorldStateCondition conditionId, WorldStateConditionState state = WORLD_STATE_CONDITION_STATE_NONE) const;
+        void HandleConditionStateChange(WorldStateCondition conditionId, WorldStateConditionState state);
+        void HandleExternalEvent(WorldStateEvent eventId, uint32 param);
         void Update(uint32 diff);
     private:
         void BuffAdalsSongOfBattle();
@@ -86,7 +87,7 @@ class WorldState
         void DispelMagtheridonTeam(TeamId team);
         bool _isMagtheridonHeadSpawnedHorde;
         bool _isMagtheridonHeadSpawnedAlliance;
-        std::map<uint32, std::atomic<uint32>> _transportStates; // atomic to avoid having to lock
+        std::map<WorldStateCondition, std::atomic<WorldStateConditionState>> _transportStates; // atomic to avoid having to lock
         std::mutex _mutex; // all World State operations are threat unsafe
 };
 

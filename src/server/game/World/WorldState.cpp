@@ -28,46 +28,51 @@ WorldState* WorldState::instance()
 
 WorldState::WorldState() : _isMagtheridonHeadSpawnedHorde(false), _isMagtheridonHeadSpawnedAlliance(false)
 {
-    _transportStates[CONDITION_THE_PURPLE_PRINCESS] = ZEPPELIN_STATE_UNKOWN;
-    _transportStates[CONDITION_THE_IRON_EAGLE]      = ZEPPELIN_STATE_UNKOWN;
-    _transportStates[CONDITION_THE_THUNDERCALLER]   = ZEPPELIN_STATE_UNKOWN;
+    _transportStates[WORLD_STATE_CONDITION_THE_IRON_EAGLE]      = WORLD_STATE_CONDITION_STATE_NONE;
+    _transportStates[WORLD_STATE_CONDITION_THE_PURPLE_PRINCESS] = WORLD_STATE_CONDITION_STATE_NONE;
+    _transportStates[WORLD_STATE_CONDITION_THE_THUNDERCALLER]   = WORLD_STATE_CONDITION_STATE_NONE;
 }
 
 WorldState::~WorldState()
 {
 }
 
-bool WorldState::IsConditionFulfilled(uint32 conditionId, uint32 state) const
+bool WorldState::IsConditionFulfilled(WorldStateCondition conditionId, WorldStateConditionState state) const
 {
     switch (conditionId)
     {
-        case CONDITION_TROLLBANES_COMMAND:
+        case WORLD_STATE_CONDITION_TROLLBANES_COMMAND:
             return _isMagtheridonHeadSpawnedAlliance;
-        case CONDITION_NAZGRELS_FAVOR:
+        case WORLD_STATE_CONDITION_NAZGRELS_FAVOR:
             return _isMagtheridonHeadSpawnedHorde;
-        default:
+        case WORLD_STATE_CONDITION_THE_IRON_EAGLE:
+        case WORLD_STATE_CONDITION_THE_PURPLE_PRINCESS:
+        case WORLD_STATE_CONDITION_THE_THUNDERCALLER:
             return _transportStates.at(conditionId) == state;
+        default:
+            LOG_ERROR("scripts", "WorldState::IsConditionFulfilled: Unhandled WorldStateCondition {}", conditionId);
+            return false;
     }
 }
 
-void WorldState::HandleConditionStateChange(uint32 conditionId, uint32 state)
+void WorldState::HandleConditionStateChange(WorldStateCondition conditionId, WorldStateConditionState state)
 {
     _transportStates[conditionId] = state;
 }
 
-void WorldState::HandleExternalEvent(uint32 eventId, uint32 param)
+void WorldState::HandleExternalEvent(WorldStateEvent eventId, uint32 param)
 {
     std::lock_guard<std::mutex> guard(_mutex);
     switch (eventId)
     {
-        case CUSTOM_EVENT_ADALS_SONG_OF_BATTLE:
+        case WORLD_STATE_CUSTOM_EVENT_ON_ADALS_SONG_OF_BATTLE:
             if (!_adalSongOfBattleTimer)
             {
                 _adalSongOfBattleTimer = 120 * MINUTE * IN_MILLISECONDS;
                 BuffAdalsSongOfBattle();
             }
             break;
-        case CUSTOM_EVENT_MAGTHERIDON_HEAD_SPAWN:
+        case WORLD_STATE_CUSTOM_EVENT_ON_MAGTHERIDON_HEAD_SPAWN:
             if (param == TEAM_ALLIANCE)
             {
                 _isMagtheridonHeadSpawnedAlliance = true;
@@ -79,7 +84,7 @@ void WorldState::HandleExternalEvent(uint32 eventId, uint32 param)
                 BuffMagtheridonTeam(TEAM_HORDE);
             }
             break;
-        case CUSTOM_EVENT_MAGTHERIDON_HEAD_DESPAWN:
+        case WORLD_STATE_CUSTOM_EVENT_ON_MAGTHERIDON_HEAD_DESPAWN:
             if (param == TEAM_ALLIANCE)
             {
                 _isMagtheridonHeadSpawnedAlliance = false;
@@ -113,7 +118,7 @@ void WorldState::Update(uint32 diff)
     }
 }
 
-void WorldState::HandlePlayerEnterZone(Player* player, uint32 zoneId)
+void WorldState::HandlePlayerEnterZone(Player* player, WorldStateZoneId zoneId)
 {
     std::lock_guard<std::mutex> guard(_mutex);
     switch (zoneId)
@@ -140,7 +145,7 @@ void WorldState::HandlePlayerEnterZone(Player* player, uint32 zoneId)
             break;
     }
 };
-void WorldState::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
+void WorldState::HandlePlayerLeaveZone(Player* player, WorldStateZoneId zoneId)
 {
     std::lock_guard<std::mutex> guard(_mutex);
     switch (zoneId)

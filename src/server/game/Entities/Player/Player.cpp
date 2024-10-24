@@ -1723,7 +1723,7 @@ void Player::RemoveFromWorld()
             m_session->DoLootRelease(lguid);
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
-        sWorldState->HandlePlayerLeaveZone(this, m_zoneUpdateId);
+        sWorldState->HandlePlayerLeaveZone(this, static_cast<WorldStateZoneId>(m_zoneUpdateId));
     }
 
     // Remove items from world before self - player must be found in Item::RemoveFromObjectUpdate

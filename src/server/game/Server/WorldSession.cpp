@@ -619,7 +619,7 @@ void WorldSession::LogoutPlayer(bool save)
             _player->RepopAtGraveyard();
 
         sOutdoorPvPMgr->HandlePlayerLeaveZone(_player, _player->GetZoneId());
-        sWorldState->HandlePlayerLeaveZone(_player, _player->GetZoneId());
+        sWorldState->HandlePlayerLeaveZone(_player, static_cast<WorldStateZoneId>(_player->GetZoneId()));
 
         // pussywizard: remove from battleground queues on logout
         for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)

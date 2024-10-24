@@ -611,14 +611,14 @@ struct go_magtheridons_head : public GameObjectAI
     {
         me->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE); // spawn head on spike
         me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
-        sWorldState->HandleExternalEvent(CUSTOM_EVENT_MAGTHERIDON_HEAD_SPAWN, me->GetPositionX() > 0.f ? TEAM_HORDE : TEAM_ALLIANCE);
+        sWorldState->HandleExternalEvent(WORLD_STATE_CUSTOM_EVENT_ON_MAGTHERIDON_HEAD_SPAWN, me->GetPositionX() > 0.f ? TEAM_HORDE : TEAM_ALLIANCE);
     }
 
     void OnStateChanged(uint32 state, Unit* /*unit*/) override
     {
         if (state == GO_JUST_DEACTIVATED)
         {
-            sWorldState->HandleExternalEvent(CUSTOM_EVENT_MAGTHERIDON_HEAD_DESPAWN, me->GetPositionX() > 0.f ? TEAM_HORDE : TEAM_ALLIANCE);
+            sWorldState->HandleExternalEvent(WORLD_STATE_CUSTOM_EVENT_ON_MAGTHERIDON_HEAD_DESPAWN, me->GetPositionX() > 0.f ? TEAM_HORDE : TEAM_ALLIANCE);
         }
     }
 };
