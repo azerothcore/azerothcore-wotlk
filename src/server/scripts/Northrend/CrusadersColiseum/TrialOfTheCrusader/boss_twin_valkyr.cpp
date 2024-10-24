@@ -151,7 +151,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     uint32 essenceId1 = 0, empoweredId1 = 0, touchId1 = 0, essenceId2 = 0, empoweredId2 = 0, touchId2 = 0;
                     switch (me->GetMap()->GetDifficulty())
                     {
-                        case 0:
+                        case RAID_DIFFICULTY_10MAN_NORMAL:
                             essenceId1 = 65684;
                             empoweredId1 = 65724;
                             touchId1 = 65950;
@@ -159,7 +159,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             empoweredId2 = 65748;
                             touchId2 = 66001;
                             break;
-                        case 1:
+                        case RAID_DIFFICULTY_25MAN_NORMAL:
                             essenceId1 = 67176;
                             empoweredId1 = 67213;
                             touchId1 = 67296;
@@ -167,7 +167,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             empoweredId2 = 67216;
                             touchId2 = 67281;
                             break;
-                        case 2:
+                        case RAID_DIFFICULTY_10MAN_HEROIC:
                             essenceId1 = 67177;
                             empoweredId1 = 67214;
                             touchId1 = 67297;
@@ -175,7 +175,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                             empoweredId2 = 67217;
                             touchId2 = 67282;
                             break;
-                        case 3:
+                        case RAID_DIFFICULTY_25MAN_HEROIC:
                             essenceId1 = 67178;
                             empoweredId1 = 67215;
                             touchId1 = 67298;
@@ -348,16 +348,16 @@ struct boss_twin_valkyrAI : public ScriptedAI
                         case NPC_LIGHTBANE:
                             switch (GetDifficulty())
                             {
-                                case 0:
+                                case RAID_DIFFICULTY_10MAN_NORMAL:
                                     essenceId = 65684;
                                     break;
-                                case 1:
+                                case RAID_DIFFICULTY_25MAN_NORMAL:
                                     essenceId = 67176;
                                     break;
-                                case 2:
+                                case RAID_DIFFICULTY_10MAN_HEROIC:
                                     essenceId = 67177;
                                     break;
-                                case 3:
+                                case RAID_DIFFICULTY_25MAN_HEROIC:
                                     essenceId = 67178;
                                     break;
                             }
@@ -365,16 +365,16 @@ struct boss_twin_valkyrAI : public ScriptedAI
                         case NPC_DARKBANE:
                             switch (GetDifficulty())
                             {
-                                case 0:
+                                case RAID_DIFFICULTY_10MAN_NORMAL:
                                     essenceId = 65686;
                                     break;
-                                case 1:
+                                case RAID_DIFFICULTY_25MAN_NORMAL:
                                     essenceId = 67222;
                                     break;
-                                case 2:
+                                case RAID_DIFFICULTY_10MAN_HEROIC:
                                     essenceId = 67223;
                                     break;
-                                case 3:
+                                case RAID_DIFFICULTY_25MAN_HEROIC:
                                     essenceId = 67224;
                                     break;
                             }
@@ -584,28 +584,28 @@ public:
                     //uint32 touchId2 = 0;
                     switch (creature->GetMap()->GetDifficulty())
                     {
-                        case 0:
+                        case RAID_DIFFICULTY_10MAN_NORMAL:
                             essenceId = 65684;
                             //empoweredId = 65724;
                             touchId1 = 65950;
                             //touchId2 = 66001;
                             effect2Id = 65827;
                             break;
-                        case 1:
+                        case RAID_DIFFICULTY_25MAN_NORMAL:
                             essenceId = 67176;
                             //empoweredId = 67213;
                             touchId1 = 67296;
                             //touchId2 = 67281;
                             effect2Id = 67179;
                             break;
-                        case 2:
+                        case RAID_DIFFICULTY_10MAN_HEROIC:
                             essenceId = 67177;
                             //empoweredId = 67214;
                             touchId1 = 67297;
                             //touchId2 = 67282;
                             effect2Id = 67180;
                             break;
-                        case 3:
+                        case RAID_DIFFICULTY_25MAN_HEROIC:
                             essenceId = 67178;
                             //empoweredId = 67215;
                             touchId1 = 67298;
@@ -630,28 +630,28 @@ public:
                     uint32 touchId2 = 0;
                     switch (creature->GetMap()->GetDifficulty())
                     {
-                        case 0:
+                        case RAID_DIFFICULTY_10MAN_NORMAL:
                             essenceId = 65686;
                             //empoweredId = 65748;
                             //touchId1 = 65950;
                             touchId2 = 66001;
                             effect2Id = 65811;
                             break;
-                        case 1:
+                        case RAID_DIFFICULTY_25MAN_NORMAL:
                             essenceId = 67222;
                             //empoweredId = 67216;
                             //touchId1 = 67296;
                             touchId2 = 67281;
                             effect2Id = 67511;
                             break;
-                        case 2:
+                        case RAID_DIFFICULTY_10MAN_HEROIC:
                             essenceId = 67223;
                             //empoweredId = 67217;
                             //touchId1 = 67297;
                             touchId2 = 67282;
                             effect2Id = 67512;
                             break;
-                        case 3:
+                        case RAID_DIFFICULTY_25MAN_HEROIC:
                             essenceId = 67224;
                             //empoweredId = 67218;
                             //touchId1 = 67298;
@@ -839,10 +839,11 @@ public:
             if (caster->GetMap()->GetId() == 649 )
             {
                 uint32 excludedID = GetSpellInfo()->ExcludeTargetAuraSpell;
+                uint32 spellID = GetSpellInfo()->Id;
                 Map::PlayerList const& pl = caster->GetMap()->GetPlayers();
                 for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                     if (Player* plr = itr->GetSource())
-                        if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+                        if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) && plr->HasAura(spellID))
                         {
                             uint32 absorb = 0;
                             uint32 resist = 0;
