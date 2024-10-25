@@ -521,7 +521,10 @@ struct boss_illidan_stormrage : public BossAI
                 // Check for Phase Transition
                 scheduler.Schedule(5s, [this](TaskContext context) {
                     if (!SelectTargetFromPlayerList(150.0f))
+                    {
                         EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+                        return;
+                    }
 
                     summons.RemoveNotExisting();
                     if (!summons.HasEntry(NPC_FLAME_OF_AZZINOTH))
