@@ -4075,11 +4075,16 @@ std::tuple<Unit*, Unit*> bot_ai::_getTargets(bool byspell, bool ranged, bool &re
                 if (icetomb)
                 {
                     bool air_phase = sindragosa && sindragosa->GetReactState() == REACT_PASSIVE;
-                    bool above35 = GetHealthPCT(icetomb) > 35;
-                    if (!air_phase || above35)
-                        return { icetomb, nullptr };
+                    uint8 pct = GetHealthPCT(icetomb);
+                    if (!air_phase || pct > 50)
+                    {
+                        if (air_phase || !IsTank())
+                            return { icetomb, nullptr };
+                    }
                     else if (mytar == icetomb || !master->GetVictim())
                     {
+                        if (IsCasting())
+                            me->InterruptNonMeleeSpells(false);
                         if (botPet && botPet->GetVictim())
                             botPet->AttackStop();
                         return { nullptr, nullptr };
