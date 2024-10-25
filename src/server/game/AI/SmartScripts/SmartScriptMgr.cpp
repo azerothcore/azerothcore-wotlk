@@ -777,7 +777,6 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_MOVEMENT_STOP: return NO_PARAMS;
             case SMART_ACTION_MOVEMENT_PAUSE: return sizeof(SmartAction::move);
             case SMART_ACTION_MOVEMENT_RESUME: return sizeof(SmartAction::move);
-            case SMART_ACTION_SET_WORLD_STATE: return sizeof(SmartAction::worldState);
             case SMART_ACTION_WORLD_SCRIPT: return sizeof(SmartAction::worldStateScript);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
@@ -1962,7 +1961,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_MOVEMENT_STOP:
         case SMART_ACTION_MOVEMENT_PAUSE:
         case SMART_ACTION_MOVEMENT_RESUME:
-        case SMART_ACTION_SET_WORLD_STATE:
         case SMART_ACTION_WORLD_SCRIPT:
             break;
         default:

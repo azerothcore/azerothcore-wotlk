@@ -3249,11 +3249,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             break;
         }
-        case SMART_ACTION_SET_WORLD_STATE:
-        {
-            sWorld->setWorldState(e.action.worldState.index, e.action.worldState.value);
-            break;
-        }
         case SMART_ACTION_WORLD_SCRIPT:
         {
             sWorldState->HandleExternalEvent(static_cast<WorldStateEvent>(e.action.worldStateScript.eventId), e.action.worldStateScript.param);
