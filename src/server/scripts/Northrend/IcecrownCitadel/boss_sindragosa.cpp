@@ -1081,10 +1081,6 @@ class spell_sindragosa_ice_tomb_trap : public SpellScript
 
     void FilterTargets(std::list<WorldObject*>& unitList)
     {
-            //npcbot
-            unitList.remove_if(SindragosaIceTombCheck());
-            //end npcbot
-
         unitList.remove_if(Acore::UnitAuraCheck(true, GetSpellInfo()->Id));
         _targetList.clear();
         _targetList = unitList;
