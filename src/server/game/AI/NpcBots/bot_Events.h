@@ -1,5 +1,5 @@
-#ifndef _BOT_EVENTS_H
-#define _BOT_EVENTS_H
+#ifndef BOT_EVENTS_H_
+#define BOT_EVENTS_H_
 
 #include "EventProcessor.h"
 
@@ -17,58 +17,64 @@ All events must be executed through botAI
 class TeleportHomeEvent : public BasicEvent
 {
     friend class bot_ai;
-    protected:
-        TeleportHomeEvent(bot_ai* ai, bool reset) : _ai(ai), _reset(reset) {}
-        ~TeleportHomeEvent() {}
+protected:
+    TeleportHomeEvent(bot_ai* ai, bool reset) : _ai(ai), _reset(reset) {}
+    ~TeleportHomeEvent() {}
 
-        bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
-        {
-            _ai->TeleportHome(_reset);
-            return true;
-        }
+    TeleportHomeEvent(TeleportHomeEvent const&) = delete;
 
-    private:
-        bot_ai* _ai;
-        bool _reset;
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
+    {
+        _ai->TeleportHome(_reset);
+        return true;
+    }
+
+private:
+    bot_ai* _ai;
+    bool _reset;
 };
 //Delayed teleport finish: adds bot back to world on new location
 class TeleportFinishEvent : public BasicEvent
 {
     friend class bot_ai;
     friend class BotMgr;
-    protected:
-        TeleportFinishEvent(bot_ai* ai, bool reset) : _ai(ai), _reset(reset) {}
-        ~TeleportFinishEvent() {}
+protected:
+    TeleportFinishEvent(bot_ai* ai, bool reset) : _ai(ai), _reset(reset) {}
+    ~TeleportFinishEvent() {}
 
-        //Execute is always called while creature is out of world so ai is never deleted
-        bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
-        {
-            _ai->FinishTeleport(_reset);
-            return true;
-        }
+    TeleportFinishEvent(TeleportFinishEvent const&) = delete;
 
-    private:
-        bot_ai* _ai;
-        bool _reset;
+    //Execute is always called while creature is out of world so ai is never deleted
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
+    {
+        _ai->FinishTeleport(_reset);
+        return true;
+    }
+
+private:
+    bot_ai* _ai;
+    bool _reset;
 };
 //Await state removal
 class AwaitStateRemovalEvent : public BasicEvent
 {
     friend class bot_ai;
-    protected:
-        AwaitStateRemovalEvent(bot_ai* ai, uint8 state) : _ai(ai), _state(state) {}
-        ~AwaitStateRemovalEvent() = default;
+protected:
+    AwaitStateRemovalEvent(bot_ai* ai, uint8 state) : _ai(ai), _state(state) {}
+    ~AwaitStateRemovalEvent() = default;
 
-        //Execute is always called while creature is out of world so ai is never deleted
-        bool Execute(uint64 /*e_time*/, uint32 /*p_time*/)
-        {
-            _ai->EventRemoveBotAwaitState(_state);
-            return true;
-        }
+    AwaitStateRemovalEvent(AwaitStateRemovalEvent const&) = delete;
 
-    private:
-        bot_ai* _ai;
-        const uint8 _state;
+    //Execute is always called while creature is out of world so ai is never deleted
+    bool Execute(uint64 /*e_time*/, uint32 /*p_time*/) override
+    {
+        _ai->EventRemoveBotAwaitState(_state);
+        return true;
+    }
+
+private:
+    bot_ai* _ai;
+    const uint8 _state;
 };
 
 #endif

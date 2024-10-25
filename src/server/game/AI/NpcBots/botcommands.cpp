@@ -5,7 +5,9 @@
 #include "botlog.h"
 #include "botmgr.h"
 #include "botwanderful.h"
+#include "bot_InstanceEvents.h"
 #include "Bag.h"
+#include "CellImpl.h"
 #include "Chat.h"
 #include "CharacterCache.h"
 #include "Creature.h"
@@ -13,7 +15,10 @@
 #include "DBCStores.h"
 #include "Language.h"
 //#include "GameClient.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
+#include "InstanceScript.h"
 #include "Item.h"
 #include "Log.h"
 #include "Map.h"
@@ -540,6 +545,11 @@ public:
             { "links",      HandleNpcBotWPLinksCommand,             rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
         };
 
+        static ChatCommandTable npcbotDebugEventCommandTable =
+        {
+            { "launch",     HandleNpcBotDebugEventLaunchCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
+        };
+
         static ChatCommandTable npcbotDebugCommandTable =
         {
             { "raid",       HandleNpcBotDebugRaidCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_RAID,         Console::No  },
@@ -550,6 +560,7 @@ public:
             { "spells",     HandleNpcBotDebugSpellsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "guids",      HandleNpcBotDebugGuidsCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "wbequips",   HandleNpcBotDebugWBEquipsCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::Yes },
+            { "event",      npcbotDebugEventCommandTable                                                                            },
         };
 
         static ChatCommandTable npcbotSetCommandTable =
@@ -1410,6 +1421,80 @@ public:
         }
 
         player->TeleportTo(WorldLocation(wp->GetMapId(), *wp), TELE_TO_GM_MODE);
+
+        return true;
+    }
+
+    static bool HandleNpcBotDebugEventLaunchCommand(ChatHandler* handler, Optional<uint32> event_num)
+    {
+        if (!event_num)
+        {
+            handler->SendSysMessage("Syntax: .npcbot debug event launch #event_num");
+            handler->SendSysMessage("Launches event for this instance");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Player const* player = handler->GetPlayer();
+        if (!player->HaveBot())
+        {
+            handler->SendSysMessage("You have no bots!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        Map* map = player->GetMap();
+        if (!map->IsDungeon())
+        {
+            handler->SendSysMessage("Must be in a dungeon/raid!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+        InstanceScript* script = map->ToInstanceMap()->GetInstanceScript();
+        if (!script)
+        {
+            handler->PSendSysMessage("Instance script is not found for map %u!", map->GetId());
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        switch (*event_num)
+        {
+            case 1:
+                switch (map->GetId())
+                {
+                    case 631: //Icecrown Citadel
+                    {
+                        if (player->GetAreaId() != 4859) // "Frozen Throne"
+                        {
+                            handler->SendSysMessage("Must be in Frozen Throne area!");
+                            handler->SetSentErrorMessage(true);
+                            return false;
+                        }
+                        GameObject* platform = nullptr;
+                        Acore::NearestGameObjectEntryInObjectRangeCheck check(*player, 202161, 100.0f);
+                        Acore::GameObjectSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck> searcher(player, platform, check);
+                        Cell::VisitAllObjects(player, searcher, 100.0f);
+                        if (!platform)
+                        {
+                            handler->SendSysMessage("Cannot find platform id 202161!");
+                            handler->SetSentErrorMessage(true);
+                            return false;
+                        }
+                        FrozenThronePlatformDestructionEvent(script, platform->GetPosition())();
+                        break;
+                    }
+                    default:
+                        handler->PSendSysMessage("Unknown event %u for map %u!", *event_num, map->GetId());
+                        handler->SetSentErrorMessage(true);
+                        return false;
+                }
+                break;
+            default:
+                handler->PSendSysMessage("Unknown event %u!", *event_num);
+                handler->SetSentErrorMessage(true);
+                return false;
+        }
 
         return true;
     }
