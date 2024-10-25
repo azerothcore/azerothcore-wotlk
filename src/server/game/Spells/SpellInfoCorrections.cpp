@@ -40,6 +40,18 @@ void SpellMgr::LoadSpellInfoCorrections()
 {
     uint32 oldMSTime = getMSTime();
 
+    // Secrets of Wyrmskull
+    ApplySpellFix({ 43458 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(3); // 20y
+    });
+
+    // Secrets of Nifflevar
+    ApplySpellFix({ 43468 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(14); // 60y
+    });
+
     ApplySpellFix({
         467,    // Thorns (Rank 1)
         782,    // Thorns (Rank 2)
