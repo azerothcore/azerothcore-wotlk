@@ -31,6 +31,8 @@ struct AuctionEntry;
 class  Player;
 class  WorldSession;
 
+#define AUCTION_HOUSE_BOT_LOOP_BREAKER 32
+
 class AuctionHouseBot
 {
 private:
@@ -61,7 +63,7 @@ private:
     uint32 getNofAuctions(AHBConfig* config, AuctionHouseObject* auctionHouse, ObjectGuid guid);
     uint32 getStackCount(AHBConfig* config, uint32 max);
     uint32 getElapsedTime(uint32 timeClass);
-    uint32 getElement(std::set<uint32> set, int index);
+    uint32 getElement(std::set<uint32> set, int index, uint32 botId, uint32 maxDup, AuctionHouseObject* auctionHouse);
 
 public:
     AuctionHouseBot(uint32 account, uint32 id);
@@ -69,9 +71,6 @@ public:
 
     void Initialize(AHBConfig* allianceConfig, AHBConfig* hordeConfig, AHBConfig* neutralConfig);
     void Update();
-
-    void DecrementItemCounts(AuctionEntry* ah);
-    void IncrementItemCounts(AuctionEntry* ah);
 
     void Commands(AHBotCommand command, uint32 ahMapID, uint32 col, char* args);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE-AGPL3
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE
  */
 
 #ifndef AUCTION_HOUSE_BOT_WORLD_SCRIPT_H
@@ -13,6 +13,10 @@
 
 class AHBot_WorldScript : public WorldScript
 {
+private:
+    void DeleteBots();
+    void PopulateBots();
+
 public:
     AHBot_WorldScript();
 

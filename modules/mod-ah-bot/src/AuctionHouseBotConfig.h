@@ -20,6 +20,7 @@
 #ifndef AUCTION_HOUSE_BOT_CONFIG_H
 #define AUCTION_HOUSE_BOT_CONFIG_H
 
+#include <map>
 #include <set>
 #include <string>
 
@@ -142,6 +143,14 @@ private:
     uint32 orangeItems;
     uint32 yellowItems;
 
+    // 
+    // Per-item statistics
+    //
+
+    std::map<uint32, uint32> itemsCount;
+    std::map<uint32, uint64> itemsSum;
+    std::map<uint32, uint64> itemsPrice;
+
     void   InitializeFromFile();
     void   InitializeFromSql(std::set<uint32> botsIds);
 
@@ -173,6 +182,8 @@ public:
     bool   AHBBuyer;
     bool   BuyMethod;
     bool   SellMethod;
+    bool   SellAtMarketPrice;
+    uint32 MarketResetThreshold;
     bool   ConsiderOnlyBotAuctions;
     uint32 ItemsPerCycle;
 
@@ -343,6 +354,9 @@ public:
     uint32 TotalItemCounts   ();
 
     uint32 GetItemCounts     (uint32 color);
+
+    void   UpdateItemStats   (uint32 id, uint32 stackSize, uint64 buyout);
+    uint64 GetItemPrice      (uint32 id);
 };
 
 //

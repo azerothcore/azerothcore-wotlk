@@ -1,4 +1,9 @@
+/*
+ * Copyright (C) 2016+ AzerothCore <www.azerothcore.org>, released under GNU AGPL v3 license: https://github.com/azerothcore/azerothcore-wotlk/blob/master/LICENSE
+ */
+
 #include "AuctionHouseMgr.h"
+#include "GameTime.h"
 
 #include "AuctionHouseBot.h"
 #include "AuctionHouseBotCommon.h"
@@ -138,9 +143,8 @@ void AHBot_AuctionHouseScript::OnAuctionAdd(AuctionHouseObject* /*ah*/, AuctionE
 
 void AHBot_AuctionHouseScript::OnAuctionRemove(AuctionHouseObject* /*ah*/, AuctionEntry* auction)
 {
-
     // 
-    // The the configuration for the auction house
+    // Get the configuration for the auction house
     // 
 
     AuctionHouseEntry const* ahEntry = sAuctionHouseStore.LookupEntry(auction->GetHouseId());
@@ -198,6 +202,64 @@ void AHBot_AuctionHouseScript::OnAuctionRemove(AuctionHouseObject* /*ah*/, Aucti
     }
 
     config->DecItemCounts(prototype->Class, prototype->Quality);
+}
+
+void AHBot_AuctionHouseScript::OnAuctionSuccessful(AuctionHouseObject* /*ah*/, AuctionEntry* auction)
+{
+    // 
+    // Get the configuration for the auction house
+    // 
+
+    AuctionHouseEntry const* ahEntry = sAuctionHouseStore.LookupEntry(auction->GetHouseId());
+    AHBConfig*               config  = gNeutralConfig;
+
+    if (ahEntry)
+    {
+        if (ahEntry->houseId == AUCTIONHOUSE_ALLIANCE)
+        {
+            config = gAllianceConfig;
+        }
+        else if (ahEntry->houseId == AUCTIONHOUSE_HORDE)
+        {
+            config = gHordeConfig;
+        }
+    }
+
+    // 
+    // If the auction has been won, it means that it has been accepted by the market.
+    // Use the buyout as a reference since the price for the bid is downgraded during selling.
+    // 
+
+    config->UpdateItemStats(auction->item_template, auction->itemCount, auction->buyout);
+}
+
+void AHBot_AuctionHouseScript::OnAuctionExpire(AuctionHouseObject* /*ah*/, AuctionEntry* auction)
+{
+    // 
+    // Get the configuration for the auction house
+    // 
+
+    AuctionHouseEntry const* ahEntry = sAuctionHouseStore.LookupEntry(auction->GetHouseId());
+    AHBConfig*               config  = gNeutralConfig;
+
+    if (ahEntry)
+    {
+        if (ahEntry->houseId == AUCTIONHOUSE_ALLIANCE)
+        {
+            config = gAllianceConfig;
+        }
+        else if (ahEntry->houseId == AUCTIONHOUSE_HORDE)
+        {
+            config = gHordeConfig;
+        }
+    }
+
+    // 
+    // If the auction expired, then it means that the bid was unwanted by the market.
+    // Bid price is usually less or equal to the buyout, so this likely will bring the price down.
+    // 
+
+    config->UpdateItemStats(auction->item_template, auction->itemCount, auction->bid);
 }
 
 void AHBot_AuctionHouseScript::OnBeforeAuctionHouseMgrUpdate()

@@ -508,6 +508,7 @@ void AHBConfig::Reset()
 
     BuyMethod                      = false;
     SellMethod                     = false;
+    SellAtMarketPrice              = false;
     ConsiderOnlyBotAuctions        = false;
     ItemsPerCycle                  = 200;
 
@@ -591,6 +592,10 @@ void AHBConfig::Reset()
     PurpleItemsBin.clear();
     OrangeItemsBin.clear();
     YellowItemsBin.clear();
+
+    itemsCount.clear();
+    itemsSum.clear();
+    itemsPrice.clear();
 }
 
 uint32 AHBConfig::GetAHID()
@@ -1945,10 +1950,73 @@ uint32 AHBConfig::GetBidsPerInterval()
     return buyerBidsPerInterval;
 }
 
+void AHBConfig::UpdateItemStats(uint32 id, uint32 stackSize, uint64 buyout)
+{
+    if (!stackSize)
+    {
+        return;
+    }
+
+    // 
+    // Collects information about the item bought
+    //
+
+    uint32 perUnit = buyout / stackSize;
+
+    if (itemsCount.count(id) == 0)
+    {
+        itemsCount[id] = 1;
+        itemsSum[id]   = perUnit;
+        itemsPrice[id] = perUnit;
+    }
+    else
+    {
+        itemsCount[id]++;
+
+        //
+        // Reset the statistics to force adapt to the market price.
+        // Adds a little of randomness by adding/removing a range of 9 to the threshold.
+        //
+
+        if (itemsCount[id] > MarketResetThreshold + (urand(1, 19) - 10))
+        {
+            itemsCount[id] = 1;
+            itemsSum[id]   = perUnit;
+            itemsPrice[id] = perUnit;
+        }
+        else
+        {
+            //
+            // Here is decided the price for single unit:
+            // right now is a plain, boring average of the ~100 previous auctions.
+            //
+
+            itemsSum[id]   = (itemsSum[id] + perUnit);
+            itemsPrice[id] = itemsSum[id] / itemsCount[id];
+        }
+    }
+
+    if (DebugOutConfig)
+    {
+        LOG_INFO("module", "Updating market price item={}, price={}", id, itemsPrice[id]);
+    }
+}
+
+uint64 AHBConfig::GetItemPrice(uint32 id)
+{
+    if (itemsCount.count(id) != 0)
+    {
+        return itemsPrice[id];
+    }
+
+    return 0;
+}
+
 void AHBConfig::Initialize(std::set<uint32> botsIds)
 {
     InitializeFromFile();
     InitializeFromSql(botsIds);
+    InitializeBins();
 }
 
 void AHBConfig::InitializeFromFile()
@@ -1970,6 +2038,8 @@ void AHBConfig::InitializeFromFile()
     AHBBuyer                       = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.EnableBuyer"            , false);
     SellMethod                     = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.UseBuyPriceForSeller"   , false);
     BuyMethod                      = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.UseBuyPriceForBuyer"    , false);
+    SellAtMarketPrice              = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.UseMarketPriceForSeller", false);
+    MarketResetThreshold           = sConfigMgr->GetOption<uint32>("AuctionHouseBot.MarketResetThreshold"   , 25);
     DuplicatesCount                = sConfigMgr->GetOption<uint32>("AuctionHouseBot.DuplicatesCount"        , 0);
     DivisibleStacks                = sConfigMgr->GetOption<bool>  ("AuctionHouseBot.DivisibleStacks"        , false);
     ElapsingTimeClass              = sConfigMgr->GetOption<uint32>("AuctionHouseBot.DuplicatesCount"        , 1);
@@ -3259,13 +3329,13 @@ void AHBConfig::InitializeBins()
     // Perform reporting and the last check: if no items are disabled or in the whitelist clear the bin making the selling useless
     // 
 
-    LOG_INFO("module", "Configuration for ah {}", AHID);
+    LOG_INFO("module", "AHBot: Configuration for ah {}", AHID);
 
     if (SellerWhiteList.size() == 0)
     {
         if (DisableItemStore.size() == 0)
         {
-            LOG_ERROR("module", "No items are disabled or in the whitelist! Selling will be disabled!");
+            LOG_ERROR("module", "AHBot: No items are disabled or in the whitelist! Selling will be disabled!");
 
             GreyTradeGoodsBin.clear();
             WhiteTradeGoodsBin.clear();
@@ -3287,30 +3357,27 @@ void AHBConfig::InitializeBins()
             return;
         }
 
-        LOG_INFO("module", "{} disabled items", uint32(DisableItemStore.size()));
+        LOG_INFO("module", "AHBot: {} disabled items", uint32(DisableItemStore.size()));
     }
     else
     {
-        LOG_INFO("module", "Using a whitelist of {} items", uint32(SellerWhiteList.size()));
+        LOG_INFO("module", "AHBot: Using a whitelist of {} items", uint32(SellerWhiteList.size()));
     }
 
-    // if (DebugOutConfig)
-    // {
-        LOG_INFO("module", "loaded {} grey   trade goods", uint32(GreyTradeGoodsBin.size()));
-        LOG_INFO("module", "loaded {} white  trade goods", uint32(WhiteTradeGoodsBin.size()));
-        LOG_INFO("module", "loaded {} green  trade goods", uint32(GreenTradeGoodsBin.size()));
-        LOG_INFO("module", "loaded {} blue   trade goods", uint32(BlueTradeGoodsBin.size()));
-        LOG_INFO("module", "loaded {} purple trade goods", uint32(PurpleTradeGoodsBin.size()));
-        LOG_INFO("module", "loaded {} orange trade goods", uint32(OrangeTradeGoodsBin.size()));
-        LOG_INFO("module", "loaded {} yellow trade goods", uint32(YellowTradeGoodsBin.size()));
-        LOG_INFO("module", "loaded {} grey   items"      , uint32(GreyItemsBin.size()));
-        LOG_INFO("module", "loaded {} white  items"      , uint32(WhiteItemsBin.size()));
-        LOG_INFO("module", "loaded {} green  items"      , uint32(GreenItemsBin.size()));
-        LOG_INFO("module", "loaded {} blue   items"      , uint32(BlueItemsBin.size()));
-        LOG_INFO("module", "loaded {} purple items"      , uint32(PurpleItemsBin.size()));
-        LOG_INFO("module", "loaded {} orange items"      , uint32(OrangeItemsBin.size()));
-        LOG_INFO("module", "loaded {} yellow items"      , uint32(YellowItemsBin.size()));
-    // }
+    LOG_INFO("module", "AHBot: loaded {} grey   trade goods", uint32(GreyTradeGoodsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} white  trade goods", uint32(WhiteTradeGoodsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} green  trade goods", uint32(GreenTradeGoodsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} blue   trade goods", uint32(BlueTradeGoodsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} purple trade goods", uint32(PurpleTradeGoodsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} orange trade goods", uint32(OrangeTradeGoodsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} yellow trade goods", uint32(YellowTradeGoodsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} grey   items"      , uint32(GreyItemsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} white  items"      , uint32(WhiteItemsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} green  items"      , uint32(GreenItemsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} blue   items"      , uint32(BlueItemsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} purple items"      , uint32(PurpleItemsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} orange items"      , uint32(OrangeItemsBin.size()));
+    LOG_INFO("module", "AHBot: loaded {} yellow items"      , uint32(YellowItemsBin.size()));
 }
 
 std::set<uint32> AHBConfig::getCommaSeparatedIntegers(std::string text)
