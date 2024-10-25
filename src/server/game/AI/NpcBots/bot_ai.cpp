@@ -4,6 +4,7 @@
 #include "BattlegroundWS.h"
 #include "bot_ai.h"
 #include "bot_Events.h"
+#include "bot_InstanceEvents.h"
 #include "bot_GridNotifiers.h"
 #include "botdatamgr.h"
 #include "botlog.h"
@@ -20276,6 +20277,52 @@ bool bot_ai::IsFlagCarrier(Unit const* unit, BattlegroundTypeId bgTypeId)
     }
 
     return false;
+}
+
+//DEDICATED EVENTS
+//INSTANCES
+bool FrozenThronePlatformDestructionEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    std::vector<Creature*> bots_to_push;
+    bots_to_push.reserve(MAXGROUPSIZE * 5);
+    Map::PlayerList const& players = GetScript()->instance->GetPlayers();
+    for (Map::PlayerList::const_iterator it = players.begin(); it != players.end(); ++it)
+    {
+        if (Player const* player = it->GetSource())
+        {
+            if (player->HaveBot())
+            {
+                for (BotMap::value_type const& bpair : *player->GetBotMgr()->GetBotMap())
+                {
+                    Creature* bot = bpair.second;
+                    if (bot && bot->IsAlive() && bot->IsInMap(player) && bot->CanFreeMove())
+                    {
+                        float dist = bot->GetExactDist2d(_platform_pos);
+                        if (dist > 46 && dist < 100 && bot->GetPositionZ() > _platform_pos.GetPositionZ() + 3.0f && bot->GetPositionZ() < _platform_pos.GetPositionZ() + 20.0f)
+                            bots_to_push.push_back(bot);
+                    }
+                }
+            }
+        }
+    }
+
+    if (!bots_to_push.empty())
+    {
+        float knock_src_dist = 10.0f;
+        float speed_xy = 35.0f;
+        float speed_z = 12.0f;
+
+        for (Creature* bot : bots_to_push)
+        {
+            float knockback_angle = Position::NormalizeOrientation(bot->GetAbsoluteAngle(_platform_pos) + float(M_PI));
+            float knockback_x = bot->GetPositionX() + knock_src_dist * std::cos(knockback_angle);
+            float knockback_y = bot->GetPositionY() + knock_src_dist * std::sin(knockback_angle);
+            bot->GetMotionMaster()->MoveKnockbackFrom(knockback_x, knockback_y, speed_xy, speed_z);
+            bot->m_Events.AddEventAtOffset([=]() { bot->CastSpell(bot, 6869, true); }, 1600ms); // Fall Down
+        }
+    }
+
+    return true;
 }
 
 #ifdef _MSC_VER

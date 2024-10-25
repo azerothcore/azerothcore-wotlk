@@ -29,6 +29,10 @@
 #include "WorldSession.h"
 #include "icecrown_citadel.h"
 
+//npcbot
+#include "bot_InstanceEvents.h"
+//end npcbot
+
 enum EventIds
 {
     EVENT_PLAYERS_GUNSHIP_SPAWN     = 22663,
@@ -1759,6 +1763,11 @@ public:
                         }
                     case EVENT_QUAKE_SHATTER:
                         {
+                            //npcbot
+                            if (GameObject const* platform = instance->GetGameObject(ArthasPlatformGUID))
+                                FrozenThronePlatformDestructionEvent(this, platform->GetPosition())();
+                            //end npcbot
+
                             if (GameObject* platform = instance->GetGameObject(ArthasPlatformGUID))
                                 platform->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
                             if (GameObject* edge = instance->GetGameObject(FrozenThroneEdgeGUID))
