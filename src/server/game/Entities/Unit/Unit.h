@@ -702,15 +702,6 @@ public:
     [[nodiscard]] ObjectGuid GetPetGUID() const { return m_SummonSlot[SUMMON_SLOT_PET]; }
     void SetCritterGUID(ObjectGuid guid) { SetGuidValue(UNIT_FIELD_CRITTER, guid); }
     [[nodiscard]] ObjectGuid GetCritterGUID() const { return GetGuidValue(UNIT_FIELD_CRITTER); }
-    
-    //npcbot
-    void SetControlledByPlayer(bool set) { m_ControlledByPlayer = set; }
-    GameObject* GetFirstGameObjectById(uint32 id) const;
-    void SetCreator(Unit* creator);
-    Unit* GetCreator() const { return m_creator; }
-    Unit* m_creator = nullptr;
-    //end npcbot
-    
     [[nodiscard]] ObjectGuid GetTransGUID() const override;
 
     /// @todo: move this in Object ckass as others casting pointers
@@ -832,12 +823,6 @@ public:
     [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
     void SetFaction(uint32 faction);
     void RestoreFaction();
-    
-    //npcbot
-    bool HasReactive(ReactiveType reactive) const { return m_reactiveTimer[reactive] > 0; }
-    void ClearReactive(ReactiveType reactive);
-    //end npcbot
-    
     [[nodiscard]] uint32 GetOldFactionId() const { return _oldFactionId; }
 
     /*********************************************************/
@@ -947,6 +932,16 @@ public:
 
     void SetLastDamagedTargetGuid(ObjectGuid const& guid) { _lastDamagedTargetGuid = guid; }
     [[nodiscard]] ObjectGuid const& GetLastDamagedTargetGuid() const { return _lastDamagedTargetGuid; }
+    //npcbot: compatibility accessors
+    [[nodiscard]] inline uint8 GetRace(bool original = false) const { return getRace(original); }
+    [[nodiscard]] inline uint32 GetRaceMask() const { return getRaceMask(); }
+    [[nodiscard]] inline uint8 GetClass() const { return getClass(); }
+    [[nodiscard]] inline uint32 GetClassMask() const { return getClassMask(); }
+    [[nodiscard]] inline uint8 GetGender() const { return getGender(); }
+    inline void SetPowerType(Powers power) { setPowerType(power); }
+    [[nodiscard]] inline Powers GetPowerType() const { return getPowerType(); }
+    [[nodiscard]] uint8 GetStandState() const { return getStandState(); }
+    //end npcbot
 
     void AttackerStateUpdate (Unit* victim, WeaponAttackType attType = BASE_ATTACK, bool extra = false, bool ignoreCasting = false);
 
@@ -1056,16 +1051,6 @@ public:
     [[nodiscard]] uint8 GetLevel() const { return uint8(GetUInt32Value(UNIT_FIELD_LEVEL)); }
     uint8 getLevelForTarget(WorldObject const* /*target*/) const override { return GetLevel(); }
     void SetLevel(uint8 lvl, bool showLevelChange = true);
-    //npcbot: compatibility accessors
-    [[nodiscard]] inline uint8 GetRace(bool original = false) const { return getRace(original); }
-    [[nodiscard]] inline uint32 GetRaceMask() const { return getRaceMask(); }
-    [[nodiscard]] inline uint8 GetClass() const { return getClass(); }
-    [[nodiscard]] inline uint32 GetClassMask() const { return getClassMask(); }
-    [[nodiscard]] inline uint8 GetGender() const { return getGender(); }
-    inline void SetPowerType(Powers power) { setPowerType(power); }
-    [[nodiscard]] inline Powers GetPowerType() const { return getPowerType(); }
-    [[nodiscard]] uint8 GetStandState() const { return getStandState(); }
-    //end npcbot
 
     // Health methods
     [[nodiscard]] uint32 GetHealth()    const { return GetUInt32Value(UNIT_FIELD_HEALTH); }
@@ -1244,6 +1229,15 @@ public:
     [[nodiscard]] float GetMeleeCritChanceReduction() const { return GetCombatRatingReduction(CR_CRIT_TAKEN_MELEE); }
     [[nodiscard]] float GetRangedCritChanceReduction() const { return GetCombatRatingReduction(CR_CRIT_TAKEN_RANGED); }
     [[nodiscard]] float GetSpellCritChanceReduction() const { return GetCombatRatingReduction(CR_CRIT_TAKEN_SPELL); }
+
+    //npcbot
+    void SetControlledByPlayer(bool set) { m_ControlledByPlayer = set; }
+    GameObject* GetFirstGameObjectById(uint32 id) const;
+    void SetCreator(Unit* creator);
+    Unit* GetCreator() const { return m_creator; }
+    Unit* m_creator = nullptr;
+    //end npcbot
+
 
     [[nodiscard]] uint32 GetMeleeCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_MELEE, 2.2f, 33.0f, damage); }
     [[nodiscard]] uint32 GetRangedCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_RANGED, 2.2f, 33.0f, damage); }
@@ -1507,10 +1501,6 @@ public:
     void SetInstantCast(bool set) { _instantCast = set; }
     [[nodiscard]] bool CanInstantCast() const { return _instantCast; }
 
-    //npcbot: TC method transfer
-    bool IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType auraType, int32 effectAmount, uint8 auraEffectMask, bool removeOtherAuraApplications = false);
-    //end npcbot
-    
     // set withDelayed to true to account delayed spells as casted
     // delayed+channeled spells are always accounted as casted
     // we can skip channeled or delayed checks using flags
@@ -1648,7 +1638,7 @@ public:
     [[nodiscard]] virtual bool CanSwim() const;
     [[nodiscard]] bool CanFreeMove() const
     {
-    	//npcbot: skip owner guid condition for bots
+        //npcbot: skip owner guid condition for bots
         if (IsNPCBotOrPet())
             return !HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT |
                                  UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED);
@@ -1715,19 +1705,18 @@ public:
     void  RemoveStandFlags(uint8 flags) { RemoveByteFlag(UNIT_FIELD_BYTES_1,  UNIT_BYTES_1_OFFSET_VIS_FLAG, flags); }
 
     // DeathState
-    DeathState getDeathState() { return m_deathState; };
-    virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
-
-    [[nodiscard]] bool IsAlive() const { return (m_deathState == DeathState::Alive); };
-    [[nodiscard]] bool isDying() const { return (m_deathState == DeathState::JustDied); };
-    [[nodiscard]] bool isDead() const { return (m_deathState == DeathState::Dead || m_deathState == DeathState::Corpse); };
     //npcbot
     /*
     DeathState getDeathState() { return m_deathState; };
     */
     DeathState getDeathState() const { return m_deathState; };
     //end npcbot
-    
+    virtual void setDeathState(DeathState s, bool despawn = false);           // overwrited in Creature/Player/Pet
+
+    [[nodiscard]] bool IsAlive() const { return (m_deathState == DeathState::Alive); };
+    [[nodiscard]] bool isDying() const { return (m_deathState == DeathState::JustDied); };
+    [[nodiscard]] bool isDead() const { return (m_deathState == DeathState::Dead || m_deathState == DeathState::Corpse); };
+
     // React methods
     bool IsHostileTo(Unit const* unit) const;
     [[nodiscard]] bool IsHostileToPlayers() const;
@@ -1934,6 +1923,11 @@ public:
 
     void SendTeleportPacket(Position& pos);
 
+    //npcbot: TC method transfer
+    bool IsHighestExclusiveAuraEffect(SpellInfo const* spellInfo, AuraType auraType, int32 effectAmount, uint8 auraEffectMask, bool removeOtherAuraApplications = false);
+    //end npcbot
+
+
     void SendMovementFlagUpdate(bool self = false);
     void SendMovementWaterWalking(Player* sendTo);
     void SendMovementFeatherFall(Player* sendTo);
@@ -1955,6 +1949,11 @@ public:
     // Debug
     void OutDebugInfo() const;
     std::string GetDebugInfo() const override;
+
+    //npcbot
+    bool HasReactive(ReactiveType reactive) const { return m_reactiveTimer[reactive] > 0; }
+    void ClearReactive(ReactiveType reactive);
+    //end npcbot
 
     //----------- Public variables ----------//
     uint32 m_extraAttacks;
