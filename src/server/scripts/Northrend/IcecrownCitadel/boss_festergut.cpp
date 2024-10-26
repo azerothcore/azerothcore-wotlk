@@ -22,6 +22,7 @@
 #include "SpellAuras.h"
 #include "SpellScriptLoader.h"
 #include "icecrown_citadel.h"
+#include "SpellMgr.h"
 
 enum ScriptTexts
 {
