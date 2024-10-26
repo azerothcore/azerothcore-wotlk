@@ -145,8 +145,6 @@ public:
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
                 {
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    if (GameObject* doors = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_SJONNIR_DOOR)))
-                        doors->SetGoState(GO_STATE_ACTIVE);
 
                     if (GameObject* console = me->GetMap()->GetGameObject( pInstance->GetGuidData(GO_SJONNIR_CONSOLE)))
                         console->SetGoState(GO_STATE_READY);
@@ -155,7 +153,7 @@ public:
                     {
                         brann->setDeathState(DeathState::JustDied);
                         brann->Respawn();
-                        brann->AI()->DoAction(5);
+                        brann->AI()->DoAction(7);   //ACTION_SJONNIR_WIPE_START
                     }
                 }
             }
@@ -183,7 +181,7 @@ public:
 
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) == DONE)
                     if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
-                        brann->AI()->DoAction(3);
+                        brann->AI()->DoAction(5);   //ACTION_START_SJONNIR_FIGHT
             }
         }
 
@@ -331,7 +329,7 @@ public:
                     sd->SetGoState(GO_STATE_ACTIVE);
 
                 if (Creature* brann = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(NPC_BRANN)))
-                    brann->AI()->DoAction(4);
+                    brann->AI()->DoAction(6);   //ACTION_SJONNIR_DEAD
             }
         }
 
