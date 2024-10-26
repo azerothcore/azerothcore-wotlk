@@ -288,7 +288,7 @@ public:
 
             GameObject* go = nullptr;
             if (headMask & 0x1) // Kaddrak
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_KADDRAK))))
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_KADDRAK)))) {
                     if (activate) {
                         go->SendCustomAnim(0);
                     }
@@ -297,8 +297,9 @@ public:
                         if (go->GetGoState() == GO_STATE_ACTIVE)
                             go->SetGoState(GO_STATE_READY);
                     }
+                }
             if (headMask & 0x2) // Marnak
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_MARNAK))))
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_MARNAK)))) {
                     if (activate) {
                         go->SendCustomAnim(0);
                     }
@@ -307,8 +308,9 @@ public:
                         if (go->GetGoState() == GO_STATE_ACTIVE)
                             go->SetGoState(GO_STATE_READY);
                     }
+                }
             if (headMask & 0x4) // Abedneum
-                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_ABEDNEUM))))
+                if ((go = me->GetMap()->GetGameObject(pInstance->GetGuidData(GO_ABEDNEUM)))) {
                     if (activate) {
                         go->SendCustomAnim(0);
                     }
@@ -317,6 +319,7 @@ public:
                         if (go->GetGoState() == GO_STATE_ACTIVE)
                             go->SetGoState(GO_STATE_READY);
                     }
+                }
         }
 
         void ResetEvent()
