@@ -13,142 +13,147 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (@PATH, 8+1, -10458.43, -3321.949, 21.13692, NULL, 0,'Cersei Dusksinger'),
 (@PATH, 9+1, -10461.03, -3319.802, 21.13692, NULL, 0,'Cersei Dusksinger');
 
- -- Cersei Dusksinger smart ai
-SET @ENTRY := 17109;
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` IN (1710902, 1710903, 1710904);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 11, 8722, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On reset - Self: Cast spell  召喚魅魔 (8722) on Self'),
-(@ENTRY, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On reset - Set event phase to phase 1'),
-(@ENTRY, 0, 2, 3, 1, 1, 100, 0, 0, 0, 260688, 260688, 22, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 260.688 seconds (0s initially) (OOC) - Set event phase to phase 2'),
-(@ENTRY, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 87, 1710900, 1710900, 1710901, 1710901, 1710901, 1710901, 1, 0, 0, 0, 0, 0, 0, 0, 'Every 260.688 seconds (0s initially) (OOC) - Self: Call random timed action list: Cersei Dusksinger #0 (1710900), Cersei Dusksinger #0 (1710900), Cersei Dusksinger #1 (1710901), Cersei Dusksinger #1 (1710901), Cersei Dusksinger #1 (1710901), Cersei Dusksinger #1 (1710901) (update always)'),
-(@ENTRY, 0, 4, 5, 40, 0, 100, 512, 5, 171090, 0, 0, 54, 8000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On wapoint 5 of path 171090 reached - Self: Pause path for 8000 ms'),
-(@ENTRY, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 67, 1, 200, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On wapoint 5 of path 171090 reached - Trigger timed event timedEvent[1] in 200 - 200 ms // -meta_wait'),
-(@ENTRY, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 67, 2, 6450, 6450, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On wapoint 5 of path 171090 reached - Trigger timed event timedEvent[2] in 6450 - 6450 ms // -meta_wait'),
-(@ENTRY, 0, 7, 0, 59, 0, 100, 0, 1, 0, 0, 0, 1, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On timed event timedEvent[1] triggered - Self: Talk 4 to None'),
-(@ENTRY, 0, 8, 0, 59, 0, 100, 0, 2, 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On timed event timedEvent[2] triggered - Self: Resume path'),
-(@ENTRY, 0, 9, 0, 58, 0, 100, 512, 0, 171090, 0, 0, 67, 3, 500, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On any waypoint of path 171090 ended - Trigger timed event timedEvent[3] in 500 - 500 ms // -meta_wait'),
-(@ENTRY, 0, 10, 11, 59, 0, 100, 0, 3, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0.907571, 'On timed event timedEvent[3] triggered - Self: Set orientation to 0.907571'),
-(@ENTRY, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On timed event timedEvent[3] triggered - Set event phase to phase 1'),
-(@ENTRY, 0, 12, 0, 38, 1, 100, 0, 0, 1, 0, 0, 22, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 1 - Set event phase to phase 2'),
-(@ENTRY, 0, 13, 0, 38, 2, 100, 0, 0, 2, 0, 0, 80, 1710902, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 2 - Self: Start timed action list id #Cersei Dusksinger #2 (1710902) (update out of combat) override existing // -inline'),
-(@ENTRY * 100 + 2, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'After 0 seconds - Set event phase to phase 2'),
-(@ENTRY * 100 + 2, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Set walk'),
-(@ENTRY * 100 + 2, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, -10469, -3332.55, 25.4708, 0, 'After 0 seconds - Self: Move to position (-10469, -3332.55, 25.4708, 0) (point id 1)'),
-(@ENTRY, 0, 14, 0, 34, 0, 100, 0, 8, 1, 0, 0, 80, 1710903, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On movement of type POINT_MOTION_TYPE inform, point 1 - Self: Start timed action list id #Cersei Dusksinger #3 (1710903) (update out of combat) // -inline_wp'),
-(@ENTRY * 100 + 3, 9, 3, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'After 7 seconds - Self: Talk 1 to Self'),
-(@ENTRY * 100 + 3, 9, 4, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1.23918, 'After 5 seconds - Self: Set orientation to 1.23918'),
-(@ENTRY * 100 + 3, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 1, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'After 3 seconds - Self: Talk 2 to Self'),
-(@ENTRY * 100 + 3, 9, 6, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 5, 14, 0, 0, 0, 0, 0, 10, 34151, 12807, 0, 0, 0, 0, 0, 'After 4 seconds - Creature Greshka (12807) with guid 34151 (fetching): Play emote ONESHOT_RUDE(DNR) (14)'),
-(@ENTRY * 100 + 3, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 10, 32091, 988, 0, 0, 0, 0, 0, 'After 0 seconds - Creature Kartosh (988) with guid 32091 (fetching): Play emote ONESHOT_RUDE(DNR) (14)'),
-(@ENTRY * 100 + 3, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 10, 31950, 1386, 0, 0, 0, 0, 0, 'After 0 seconds - Creature Rogvar (1386) with guid 31950 (fetching): Play emote ONESHOT_RUDE(DNR) (14)'),
-(@ENTRY * 100 + 3, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 69, 2, 0, 0, 0, 0, 0, 8, 0, 0, 0, -10461.1, -3319.65, 20.9641, 0, 'After 0 seconds - Self: Move to position (-10461.1, -3319.65, 20.9641, 0) (point id 2)'),
-(@ENTRY, 0, 15, 0, 34, 0, 100, 0, 8, 2, 0, 0, 80, 1710904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On movement of type POINT_MOTION_TYPE inform, point 2 - Self: Start timed action list id #Cersei Dusksinger #4 (1710904) (update out of combat) // -inline_wp'),
-(@ENTRY * 100 + 4, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'After 0 seconds - Set event phase to phase 1');
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17109;
 
--- Timed list 1710900 smart ai
-SET @ENTRY := 1710900;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` = @ENTRY;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 2.54818, 'After 0 seconds - Self: Set orientation to 2.54818'),
-(@ENTRY, 9, 1, 0, 0, 0, 100, 0, 1840, 1840, 0, 0, 1, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'After 1.84 seconds - Self: Talk 3 to None'),
-(@ENTRY, 9, 2, 0, 0, 0, 100, 0, 7800, 7800, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 94506, 27705, 0, 0, 0, 0, 0, 'After 7.8 seconds - Creature Lorrin Foxfire (27705) with guid 94506 (fetching): Talk 1 to invoker'),
-(@ENTRY, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 53, 0, 171090, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Start path #171090, walk, do not repeat, Passive');
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 17109);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(17109, 0, 0, 1, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 8722, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Reset - Cast \'Summon Succubus\''),
+(17109, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Reset - Set Event Phase 1'),
+(17109, 0, 2, 3, 1, 1, 100, 0, 0, 0, 260688, 260688, 0, 0, 22, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Out of Combat - Set Event Phase 2 (Phase 1)'),
+(17109, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 87, 1710900, 1710900, 1710901, 1710901, 1710901, 1710901, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Out of Combat - Run Random Script (Phase 1)'),
+(17109, 0, 4, 5, 40, 0, 100, 512, 5, 171090, 0, 0, 0, 0, 54, 8000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Point 5 of Path 171090 Reached - Pause Waypoint'),
+(17109, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 67, 1, 200, 200, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Point 5 of Path 171090 Reached - Create Timed Event'),
+(17109, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 67, 2, 6450, 6450, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Point 5 of Path 171090 Reached - Create Timed Event'),
+(17109, 0, 7, 0, 59, 0, 100, 0, 1, 0, 0, 0, 0, 0, 1, 4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Timed Event 1 Triggered - Say Line 4'),
+(17109, 0, 8, 0, 59, 0, 100, 0, 2, 0, 0, 0, 0, 0, 65, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Timed Event 2 Triggered - Resume Waypoint'),
+(17109, 0, 9, 0, 58, 0, 100, 512, 0, 171090, 0, 0, 0, 0, 67, 3, 500, 500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Path 171090 Finished - Create Timed Event'),
+(17109, 0, 10, 11, 59, 0, 100, 0, 3, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0.907571, 'Cersei Dusksinger - On Timed Event 3 Triggered - Set Orientation 0.907571'),
+(17109, 0, 11, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Timed Event 3 Triggered - Set Event Phase 1'),
+(17109, 0, 12, 0, 38, 1, 100, 0, 0, 1, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Data Set 0 1 - Set Event Phase 2 (Phase 1)'),
+(17109, 0, 13, 0, 38, 2, 100, 0, 0, 2, 0, 0, 0, 0, 80, 1710902, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Data Set 0 2 - Run Script (Phase 2)'),
+(17109, 0, 14, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 1710903, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Reached Point 1 - Run Script'),
+(17109, 0, 15, 0, 34, 0, 100, 0, 8, 2, 0, 0, 0, 0, 80, 1710904, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - On Reached Point 2 - Run Script');
 
--- Timed list 1710901 smart ai
-SET @ENTRY := 1710901;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` = @ENTRY;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Talk 0 to None');
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1710900);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1710900, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 2.54818, 'Cersei Dusksinger - Actionlist - Set Orientation 2.54818'),
+(1710900, 9, 1, 0, 0, 0, 100, 0, 1840, 1840, 0, 0, 0, 0, 1, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Actionlist - Say Line 3'),
+(1710900, 9, 2, 0, 0, 0, 100, 0, 7800, 7800, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 94506, 27705, 0, 0, 0, 0, 0, 0, 'Creature Lorrin Foxfire (27705) with guid 94506 (fetching) - Talk 1 to invoker'),
+(1710900, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 171090, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Actionlist - Start Waypoint Path 171090');
 
--- Greshka smart ai
-SET @ENTRY := 12807;
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` IN (1280700);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 0, 0, 1, 1, 0, 100, 0, 60000, 60000, 270000, 570000, 45, 0, 1, 0, 0, 0, 0, 10, 34141, 17109, 0, 0, 0, 0, 0, 'Every 270 - 570 seconds (60 - 60s initially) (OOC) - Creature Cersei Dusksinger (17109) with guid 34141 (fetching): Set creature data #0 to 1'),
-(@ENTRY, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 10, 34141, 17109, 0, 0, 0, 0, 0, 'Every 270 - 570 seconds (60 - 60s initially) (OOC) - Self: Talk 0 to Creature Cersei Dusksinger (17109) with guid 34141 (fetching)'),
-(@ENTRY, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 80, 1280700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Every 270 - 570 seconds (60 - 60s initially) (OOC) - Self: Start timed action list id #Greshka #0 (1280700) (update out of combat) // -inline'),
-(@ENTRY * 100, 9, 0, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 1, 1, 0, 1, 0, 0, 0, 10, 31950, 1386, 0, 0, 0, 0, 0, 'After 8 seconds - Self: Talk 1 to Creature Rogvar (1386) with guid 31950 (fetching)'),
-(@ENTRY * 100, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 31950, 1386, 0, 0, 0, 0, 0, 'After 6 seconds - Creature Rogvar (1386) with guid 31950 (fetching): Talk 0 to invoker'),
-(@ENTRY * 100, 9, 2, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 45, 0, 2, 0, 0, 0, 0, 10, 34141, 17109, 0, 0, 0, 0, 0, 'After 2 seconds - Creature Cersei Dusksinger (17109) with guid 34141 (fetching): Set creature data #0 to 2');
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1710901);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1710901, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Actionlist - Say Line 0');
 
--- Lorrin Foxfire smart ai
-SET @ENTRY := 27705;
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 0, 0, 1, 1, 0, 100, 0, 15000, 30000, 134878, 314350, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 134.878 - 314.35 seconds (15 - 30s initially) (OOC) - Self: Talk 0 to None'),
-(@ENTRY, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 67, 1, 3000, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 134.878 - 314.35 seconds (15 - 30s initially) (OOC) - Trigger timed event timedEvent[1] in 3000 - 3000 ms // -meta_wait'),
-(@ENTRY, 0, 2, 0, 59, 0, 100, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 31950, 1386, 0, 0, 0, 0, 0, 'On timed event timedEvent[1] triggered - Creature Rogvar (1386) with guid 31950 (fetching): Talk 1 to invoker');
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1710902);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1710902, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Actionlist - Set Event Phase 2'),
+(1710902, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Actionlist - Set Run Off'),
+(1710902, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -10469, -3332.55, 25.4708, 0, 'Cersei Dusksinger - Actionlist - Move To Position');
 
--- Anchorite Avuun smart ai
-SET @ENTRY := 17127;
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 0, 0, 0, 1, 0, 100, 0, 0, 169109, 169109, 241370, 88, 1712700, 1712703, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'Every 169.109 - 241.37 seconds (0 - 169.109s initially) (OOC) - Self: Call random timed action list between range Anchorite Avuun #0 (1712700) and Anchorite Avuun #3 (1712703) (update always)');
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1710903);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1710903, 9, 3, 0, 0, 0, 100, 0, 7000, 7000, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Actionlist - Say Line 1'),
+(1710903, 9, 4, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 1.23918, 'Cersei Dusksinger - Actionlist - Set Orientation 1.23918'),
+(1710903, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 1, 2, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Actionlist - Say Line 2'),
+(1710903, 9, 6, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 10, 34151, 12807, 0, 0, 0, 0, 0, 0, 'Creature Greshka (12807) with guid 34151 (fetching): Play emote ONESHOT_RUDE(DNR) (14)'),
+(1710903, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 10, 32091, 988, 0, 0, 0, 0, 0, 0, 'Creature Kartosh (988) with guid 32091 (fetching): Play emote ONESHOT_RUDE(DNR) (14)'),
+(1710903, 9, 8, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 5, 14, 0, 0, 0, 0, 0, 10, 31950, 1386, 0, 0, 0, 0, 0, 0, 'Creature Rogvar (1386) with guid 31950 (fetching): Play emote ONESHOT_RUDE(DNR) (14)'),
+(1710903, 9, 9, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 2, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -10461.1, -3319.65, 20.9641, 0, 'Cersei Dusksinger - Actionlist - Move To Position');
 
--- Timed list 1712700 smart ai
-SET @ENTRY := 1712700;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` = @ENTRY;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Look at Creature Magtoor (1776) with guid 34160 (fetching)'),
-(@ENTRY, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'After 3.3 seconds - Self: Talk 0 to None'),
-(@ENTRY, 9, 2, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 'After 3.3 seconds - Creature Magtoor (1776) with guid 34160 (fetching): Set creature data #0 to 1'),
-(@ENTRY, 9, 3, 0, 0, 0, 100, 0, 27410, 27410, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 3.92699, 'After 27.41 seconds - Self: Set orientation to 3.92699');
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1710904);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1710904, 9, 10, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Cersei Dusksinger - Actionlist - Set Event Phase 1');
 
--- Timed list 1712701 smart ai
-SET @ENTRY := 1712701;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` = @ENTRY;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Look at Creature Magtoor (1776) with guid 34160 (fetching)'),
-(@ENTRY, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'After 3.3 seconds - Self: Talk 1 to None'),
-(@ENTRY, 9, 2, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 45, 0, 2, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 'After 3.3 seconds - Creature Magtoor (1776) with guid 34160 (fetching): Set creature data #0 to 2'),
-(@ENTRY, 9, 3, 0, 0, 0, 100, 0, 27410, 27410, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 3.92699, 'After 27.41 seconds - Self: Set orientation to 3.92699');
 
--- Timed list 1712702 smart ai
-SET @ENTRY := 1712702;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` = @ENTRY;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Look at Creature Magtoor (1776) with guid 34160 (fetching)'),
-(@ENTRY, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 1, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'After 3.3 seconds - Self: Talk 2 to None'),
-(@ENTRY, 9, 2, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 45, 0, 3, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 'After 3.3 seconds - Creature Magtoor (1776) with guid 34160 (fetching): Set creature data #0 to 3'),
-(@ENTRY, 9, 3, 0, 0, 0, 100, 0, 27410, 27410, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 3.92699, 'After 27.41 seconds - Self: Set orientation to 3.92699');
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 12807;
 
--- Timed list 1712703 smart ai
-SET @ENTRY := 1712703;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` = @ENTRY;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Look at Creature Magtoor (1776) with guid 34160 (fetching)'),
-(@ENTRY, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 1, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'After 3.3 seconds - Self: Talk 3 to None'),
-(@ENTRY, 9, 2, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 45, 0, 4, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 'After 3.3 seconds - Creature Magtoor (1776) with guid 34160 (fetching): Set creature data #0 to 4'),
-(@ENTRY, 9, 3, 0, 0, 0, 100, 0, 27410, 27410, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 3.92699, 'After 27.41 seconds - Self: Set orientation to 3.92699');
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 12807);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(12807, 0, 0, 1, 1, 0, 100, 0, 60000, 60000, 270000, 570000, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 34141, 17109, 0, 0, 0, 0, 0, 0, 'Creature Cersei Dusksinger (17109) with guid 34141 (fetching): Set creature data #0 to 1'),
+(12807, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 10, 34141, 17109, 0, 0, 0, 0, 0, 0, 'Self: Talk 0 to Creature Cersei Dusksinger (17109) with guid 34141 (fetching)'),
+(12807, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 1280700, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Greshka - Out of Combat - Run Script');
 
--- Magtoor smart ai
-SET @ENTRY := 1776;
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
-DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryOrGuid` = @ENTRY;
-DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryOrGuid` IN (177600, 177601, 177602, 177603);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
-(@ENTRY, 0, 0, 0, 38, 0, 100, 0, 0, 1, 0, 0, 80, 177600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 1 - Self: Start timed action list id #Magtoor #0 (177600) (update out of combat) // -inline'),
-(@ENTRY * 100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Look at Creature Anchorite Avuun (17127) with guid 32101 (fetching)'),
-(@ENTRY * 100, 9, 1, 0, 0, 0, 100, 0, 5590, 5590, 0, 0, 1, 0, 0, 1, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 'After 5.59 seconds - Self: Talk 0 to Creature Anchorite Avuun (17127) with guid 32101 (fetching)'),
-(@ENTRY * 100, 9, 2, 0, 0, 0, 100, 0, 14486, 14486, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 3.10669, 'After 14.486 seconds - Self: Set orientation to 3.10669'),
-(@ENTRY, 0, 1, 0, 38, 0, 100, 0, 0, 2, 0, 0, 80, 177601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 2 - Self: Start timed action list id #Magtoor #1 (177601) (update out of combat) // -inline'),
-(@ENTRY * 100 + 1, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Look at Creature Anchorite Avuun (17127) with guid 32101 (fetching)'),
-(@ENTRY * 100 + 1, 9, 1, 0, 0, 0, 100, 0, 5590, 5590, 0, 0, 1, 1, 0, 1, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 'After 5.59 seconds - Self: Talk 1 to Creature Anchorite Avuun (17127) with guid 32101 (fetching)'),
-(@ENTRY * 100 + 1, 9, 2, 0, 0, 0, 100, 0, 14486, 14486, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 3.10669, 'After 14.486 seconds - Self: Set orientation to 3.10669'),
-(@ENTRY, 0, 2, 0, 38, 0, 100, 0, 0, 3, 0, 0, 80, 177602, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 3 - Self: Start timed action list id #Magtoor #2 (177602) (update out of combat) // -inline'),
-(@ENTRY * 100 + 2, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Look at Creature Anchorite Avuun (17127) with guid 32101 (fetching)'),
-(@ENTRY * 100 + 2, 9, 1, 0, 0, 0, 100, 0, 5590, 5590, 0, 0, 1, 2, 0, 1, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 'After 5.59 seconds - Self: Talk 2 to Creature Anchorite Avuun (17127) with guid 32101 (fetching)'),
-(@ENTRY * 100 + 2, 9, 2, 0, 0, 0, 100, 0, 14486, 14486, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 3.10669, 'After 14.486 seconds - Self: Set orientation to 3.10669'),
-(@ENTRY, 0, 3, 0, 38, 0, 100, 0, 0, 4, 0, 0, 80, 177603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 'On data[0] set to 4 - Self: Start timed action list id #Magtoor #3 (177603) (update out of combat) // -inline'),
-(@ENTRY * 100 + 3, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 'After 0 seconds - Self: Look at Creature Anchorite Avuun (17127) with guid 32101 (fetching)'),
-(@ENTRY * 100 + 3, 9, 1, 0, 0, 0, 100, 0, 5590, 5590, 0, 0, 1, 3, 0, 1, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 'After 5.59 seconds - Self: Talk 3 to Creature Anchorite Avuun (17127) with guid 32101 (fetching)'),
-(@ENTRY * 100 + 3, 9, 2, 0, 0, 0, 100, 0, 14486, 14486, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 3.10669, 'After 14.486 seconds - Self: Set orientation to 3.10669');
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1280700);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1280700, 9, 0, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 10, 31950, 1386, 0, 0, 0, 0, 0, 0, 'Self: Talk 1 to Creature Rogvar (1386) with guid 31950 (fetching)'),
+(1280700, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 31950, 1386, 0, 0, 0, 0, 0, 0, 'Creature Rogvar (1386) with guid 31950 (fetching): Talk 0 to invoker'),
+(1280700, 9, 2, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 45, 0, 2, 0, 0, 0, 0, 10, 34141, 17109, 0, 0, 0, 0, 0, 0, 'Creature Cersei Dusksinger (17109) with guid 34141 (fetching): Set creature data #0 to 2');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 27705;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 27705);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(27705, 0, 0, 1, 1, 0, 100, 0, 15000, 30000, 134878, 314350, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lorrin Foxfire - Out of Combat - Say Line 0'),
+(27705, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 67, 1, 3000, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lorrin Foxfire - Out of Combat - Create Timed Event'),
+(27705, 0, 2, 0, 59, 0, 100, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 31950, 1386, 0, 0, 0, 0, 0, 0, 'Lorrin Foxfire - On Timed Event 1 Triggered - Say Line 1');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 17127;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 17127);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(17127, 0, 0, 0, 1, 0, 100, 0, 0, 169109, 169109, 241370, 0, 0, 88, 1712700, 1712703, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Every 169.109 - 241.37 seconds (0 - 169.109s initially) (OOC) - Self: Call random timed action list between range Anchorite Avuun #0 (1712700) and Anchorite Avuun #3 (1712703) (update always)');
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 1712700) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 3));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1712700, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 0, 'Anchorite Avuun - Actionlist - Set Orientation Closest Creature \'Magtoor\''),
+(1712700, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Avuun - Actionlist - Say Line 0'),
+(1712700, 9, 2, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 0, 45, 0, 1, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 0, 'Creature Magtoor (1776) with guid 34160 (fetching): Set creature data #0 to 1'),
+(1712700, 9, 3, 0, 0, 0, 100, 0, 27410, 27410, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 3.92699, 'Anchorite Avuun - Actionlist - Set Orientation 3.92699');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1712701);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1712701, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 0, 'Anchorite Avuun - Actionlist - Set Orientation Closest Creature \'Magtoor\''),
+(1712701, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Avuun - Actionlist - Say Line 1'),
+(1712701, 9, 2, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 0, 45, 0, 2, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 0, 'Creature Magtoor (1776) with guid 34160 (fetching): Set creature data #0 to 2'),
+(1712701, 9, 3, 0, 0, 0, 100, 0, 27410, 27410, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 3.92699, 'Anchorite Avuun - Actionlist - Set Orientation 3.92699');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1712702);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1712702, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 0, 'Anchorite Avuun - Actionlist - Set Orientation Closest Creature \'Magtoor\''),
+(1712702, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 0, 1, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Avuun - Actionlist - Say Line 2'),
+(1712702, 9, 2, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 0, 45, 0, 3, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 0, 'Creature Magtoor (1776) with guid 34160 (fetching): Set creature data #0 to 3'),
+(1712702, 9, 3, 0, 0, 0, 100, 0, 27410, 27410, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 3.92699, 'Anchorite Avuun - Actionlist - Set Orientation 3.92699');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 1712703);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1712703, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 0, 'Anchorite Avuun - Actionlist - Set Orientation Closest Creature \'Magtoor\''),
+(1712703, 9, 1, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 0, 1, 3, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Anchorite Avuun - Actionlist - Say Line 3'),
+(1712703, 9, 2, 0, 0, 0, 100, 0, 3300, 3300, 0, 0, 0, 0, 45, 0, 4, 0, 0, 0, 0, 10, 34160, 1776, 0, 0, 0, 0, 0, 0, 'Creature Magtoor (1776) with guid 34160 (fetching): Set creature data #0 to 4'),
+(1712703, 9, 3, 0, 0, 0, 100, 0, 27410, 27410, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 3.92699, 'Anchorite Avuun - Actionlist - Set Orientation 3.92699');
+
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 1776;
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 1776);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1776, 0, 0, 0, 38, 0, 100, 0, 0, 1, 0, 0, 0, 0, 80, 177600, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magtoor - On Data Set 0 1 - Run Script'),
+(1776, 0, 1, 0, 38, 0, 100, 0, 0, 2, 0, 0, 0, 0, 80, 177601, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magtoor - On Data Set 0 2 - Run Script'),
+(1776, 0, 2, 0, 38, 0, 100, 0, 0, 3, 0, 0, 0, 0, 80, 177602, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magtoor - On Data Set 0 3 - Run Script'),
+(1776, 0, 3, 0, 38, 0, 100, 0, 0, 4, 0, 0, 0, 0, 80, 177603, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Magtoor - On Data Set 0 4 - Run Script');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 177600);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(177600, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 0, 'Magtoor - Actionlist - Set Orientation Closest Creature \'Anchorite Avuun\''),
+(177600, 9, 1, 0, 0, 0, 100, 0, 5590, 5590, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 0, 'Magtoor - Actionlist - Say Line 0'),
+(177600, 9, 2, 0, 0, 0, 100, 0, 14486, 14486, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 3.10669, 'Magtoor - Actionlist - Set Orientation 3.10669');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 177601);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(177601, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 0, 'Magtoor - Actionlist - Set Orientation Closest Creature \'Anchorite Avuun\''),
+(177601, 9, 1, 0, 0, 0, 100, 0, 5590, 5590, 0, 0, 0, 0, 1, 1, 0, 1, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 0, 'Magtoor - Actionlist - Say Line 1'),
+(177601, 9, 2, 0, 0, 0, 100, 0, 14486, 14486, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 3.10669, 'Magtoor - Actionlist - Set Orientation 3.10669');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 177602);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(177602, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 0, 'Magtoor - Actionlist - Set Orientation Closest Creature \'Anchorite Avuun\''),
+(177602, 9, 1, 0, 0, 0, 100, 0, 5590, 5590, 0, 0, 0, 0, 1, 2, 0, 1, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 0, 'Magtoor - Actionlist - Say Line 2'),
+(177602, 9, 2, 0, 0, 0, 100, 0, 14486, 14486, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 3.10669, 'Magtoor - Actionlist - Set Orientation 3.10669');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 177603);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(177603, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 0, 'Magtoor - Actionlist - Set Orientation Closest Creature \'Anchorite Avuun\''),
+(177603, 9, 1, 0, 0, 0, 100, 0, 5590, 5590, 0, 0, 0, 0, 1, 3, 0, 1, 0, 0, 0, 10, 32101, 17127, 0, 0, 0, 0, 0, 0, 'Magtoor - Actionlist - Say Line 3'),
+(177603, 9, 2, 0, 0, 0, 100, 0, 14486, 14486, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 3.10669, 'Magtoor - Actionlist - Set Orientation 3.10669');
 
 -- page_text_locale
 DELETE FROM `page_text_locale` WHERE (`locale`='zhTW' AND `ID` IN (1958,1957,1956,1955,1954,1953,1952,1951,2038,2037,2036,2035,2034,2033,2032,2031,2030,2216,2215,2214,2213,2212,793,792,791,711));
