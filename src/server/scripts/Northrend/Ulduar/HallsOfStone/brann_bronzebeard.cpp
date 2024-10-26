@@ -34,7 +34,6 @@
 #define TEXT_ID_SJONNIR_DOOR    13883
 #define TEXT_ID_SJONNIR_END     13308
 
-
 enum NPCs
 {
     NPC_DARK_RUNE_PROTECTOR         = 27983,
@@ -81,7 +80,7 @@ enum Misc
     ACTION_START_SJONNIR_FIGHT      = 5,
     ACTION_SJONNIR_DEAD             = 6,
     ACTION_SJONNIR_WIPE_START       = 7,
-    
+
     // QUESTS
     QUEST_HALLS_OF_STONE            = 13207,
 };
@@ -91,7 +90,7 @@ enum events
     // BRANN AND TRIBUNAL
     EVENT_ABEDNEUM_VISUAL = 1,
     EVENT_KADDRAK_VISUAL = 2,
-    EVENT_MARNAK_VISUAL = 3,  
+    EVENT_MARNAK_VISUAL = 3,
     EVENT_ABEDNEUM_HEAD = 4,
     EVENT_KADDRAK_HEAD = 5,
     EVENT_MARNAK_HEAD = 6,
@@ -119,7 +118,6 @@ enum events
     EVENT_TALK_FACE_CHANGE = 21,
     EVENT_SKY_ROOM_FLOOR_CHANGE = 22,
 
-
     //BRANN AND SJONNIR
     EVENT_GO_TO_SJONNIR = 23,
     EVENT_DOOR_OPEN = 24,
@@ -145,11 +143,11 @@ static Yells Conversation[] =
     {14251, "Couple more minutes and I'll--", NPC_BRANN, 102000},
     {13761, "Threat index threshold exceeded. Celestial archive aborted. Security level heightened.", NPC_MARNAK, 105000},
     {14252, "Heightened? What's the good news?", NPC_BRANN, 113000},
-    {14253, "So that was the problem? Now I'm makin' progress...", NPC_BRANN, 201000}, 
+    {14253, "So that was the problem? Now I'm makin' progress...", NPC_BRANN, 201000},
     {13767, "Critical threat index. Void analysis diverted. Initiating sanitization protocol.", NPC_ABEDNEUM, 207500 },
     {14254, "Hang on! Nobody's gonna' be sanitized as long as I have a say in it!", NPC_BRANN, 214000},
     {14255, "Ha! The old magic fingers finally won through! Now let's get down to--", NPC_BRANN, 305000},
-    {13768, "Alert: security fail-safes deactivated. Beginning memory purge and... ", NPC_ABEDNEUM, 310000}, 
+    {13768, "Alert: security fail-safes deactivated. Beginning memory purge and... ", NPC_ABEDNEUM, 310000},
     //The fight is completed at this point.d
     {14256, "Purge? No no no no no.. where did I-- Aha, this should do the trick...", NPC_BRANN, 316000},
     {13769, "System online. Life form pattern recognized. Welcome, Branbronzan. Query?", NPC_ABEDNEUM, 322000},
@@ -202,11 +200,11 @@ public:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
                     SendGossipMenuFor(player, TEXT_ID_TRIBUNAL_START, creature->GetGUID());
                     break;
-                case 3:                   
+                case 3:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                     SendGossipMenuFor(player, TEXT_ID_TRIBUNAL_END, creature->GetGUID());
                     break;
-                case 4:                   
+                case 4:
                     AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_ITEM_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
                     SendGossipMenuFor(player, TEXT_ID_SJONNIR_DOOR, creature->GetGUID());
                     break;
@@ -217,7 +215,6 @@ public:
                     break;
             }
         }
-       
         return true;
     }
 
@@ -236,7 +233,7 @@ public:
                     CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+3:
-                    creature->AI()->DoAction(ACTION_GO_TO_SJONNIR);                   
+                    creature->AI()->DoAction(ACTION_GO_TO_SJONNIR);
                     CloseGossipMenuFor(player);
                     break;
                 case GOSSIP_ACTION_INFO_DEF+4:
@@ -434,9 +431,9 @@ public:
                     me->SendMovementFlagUpdate();
                     break;
                 case ACTION_START_SJONNIR_FIGHT:
-                    me->SetFaction(FACTION_FRIENDLY);      
+                    me->SetFaction(FACTION_FRIENDLY);
                     SetEscortPaused(false);
-                    break;               
+                    break;
                 case ACTION_SJONNIR_DEAD:
                     if (pInstance)
                         pInstance->SetData(BRANN_BRONZEBEARD, 5);
@@ -455,12 +452,12 @@ public:
                     me->StopMovingOnCurrentPos();
                     DoCast(me, 58506, false);
                     if (GameObject* door = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_DOOR)))
-                        door->SetGoState(GO_STATE_READY);                    
+                        door->SetGoState(GO_STATE_READY);
                     break;
                 case ACTION_OPEN_DOOR:
                     Start(false, true, ObjectGuid::Empty, 0, true, false);
                     SetNextWaypoint(34, false);
-                    SetEscortPaused(false);              
+                    SetEscortPaused(false);
                     me->RemoveAura(58506);
                     me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
                     me->SetWalk(true);
@@ -555,7 +552,7 @@ public:
                                 darkMatterTargetGUID = cr->GetGUID();
 
                                 events.RescheduleEvent(EVENT_DARK_MATTER_START, 5000ms);
-                            }                        
+                            }
                         }
                         events.Repeat(30s);
                         break;
@@ -746,7 +743,7 @@ public:
                         break;
                     }
                     case EVENT_SJONNIR_END_BRANN_YELL:
-                    {                   
+                    {
                         me->Yell("Loken? That's downright bothersome... We might've neutralized the iron dwarves, but I'd lay odds there's another machine somewhere else churnin' out a whole mess o' these iron vrykul!", LANG_UNIVERSAL);
                         me->PlayDirectSound(14278);
                         break;
@@ -756,9 +753,9 @@ public:
                         events.Reset();
                         SetEscortPaused(false);
                         me->Yell("I'll use the forge to make batches o' earthen to stand guard... But our greatest challenge still remains: find and stop Loken!", LANG_UNIVERSAL);
-                        me->PlayDirectSound(14279);                    
+                        me->PlayDirectSound(14279);
                         break;
-                    }     
+                    }
                 }
             }
 
@@ -847,7 +844,6 @@ public:
                 }
                 if (pInstance->GetData(BOSS_TRIBUNAL_OF_AGES) != DONE)
                     pInstance->SetData(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
-
             }
         }
     };
@@ -895,7 +891,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
     {
         // Stop before stairs and ask to start
         case 14:
-            SetEscortPaused(true);          
+            SetEscortPaused(true);
             if (pInstance)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
@@ -940,7 +936,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             }
             break;
         // Before Sjonnir's door
-        case 33:                       
+        case 33:
             SetEscortPaused(true);
             break;
         //Walk to the door, run after opening it
@@ -1203,7 +1199,6 @@ public:
         return new spell_hos_dark_matter_size_SpellScript;
     }
 };
-
 
 void AddSC_brann_bronzebeard()
 {

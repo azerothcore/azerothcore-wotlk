@@ -222,7 +222,7 @@ public:
             {
                 GameObject* pA = instance->GetGameObject(goAbedneumGUID);
                 GameObject* pK = instance->GetGameObject(goKaddrakGUID);
-                GameObject* pM = instance->GetGameObject(goMarnakGUID);              
+                GameObject* pM = instance->GetGameObject(goMarnakGUID);
 
                 GameObject* pF = instance->GetGameObject(goSkyRoomFloorGUID);
                 bool skyRoomDown = false;
@@ -271,7 +271,6 @@ public:
                     if(!skyRoomDown)
                         pF->SetGoState(GO_STATE_ACTIVE);
                 }
-                
 
                 // Make sjonnir attackable
                 if (Creature* cr = instance->GetCreature(SjonnirGUID))
