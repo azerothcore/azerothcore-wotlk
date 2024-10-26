@@ -967,6 +967,7 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
             if (pInstance)
                 if (GameObject* console = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(GO_SJONNIR_CONSOLE)))
                     console->SetGoState(GO_STATE_ACTIVE);
+            break;
         //After Sjonnir's death, Brann steps away from the console and talk.
         case 39:
             SetEscortPaused(true);
