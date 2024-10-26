@@ -15,9 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Unit.h"
 #include "Define.h"
 #include "SmartEnum.h"
-#include "Unit.h"
 #include <stdexcept>
 
 namespace Acore::Impl::EnumUtilsImpl
@@ -69,10 +69,10 @@ AC_API_EXPORT EnumText EnumUtils<UnitFlags>::ToString(UnitFlags value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<UnitFlags>::Count() { return 33; }
+AC_API_EXPORT std::size_t EnumUtils<UnitFlags>::Count() { return 33; }
 
 template <>
-AC_API_EXPORT UnitFlags EnumUtils<UnitFlags>::FromIndex(size_t index)
+AC_API_EXPORT UnitFlags EnumUtils<UnitFlags>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -114,7 +114,7 @@ AC_API_EXPORT UnitFlags EnumUtils<UnitFlags>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<UnitFlags>::ToIndex(UnitFlags value)
+AC_API_EXPORT std::size_t EnumUtils<UnitFlags>::ToIndex(UnitFlags value)
 {
     switch (value)
     {
@@ -196,10 +196,10 @@ AC_API_EXPORT EnumText EnumUtils<NPCFlags>::ToString(NPCFlags value)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<NPCFlags>::Count() { return 28; }
+AC_API_EXPORT std::size_t EnumUtils<NPCFlags>::Count() { return 28; }
 
 template <>
-AC_API_EXPORT NPCFlags EnumUtils<NPCFlags>::FromIndex(size_t index)
+AC_API_EXPORT NPCFlags EnumUtils<NPCFlags>::FromIndex(std::size_t index)
 {
     switch (index)
     {
@@ -236,7 +236,7 @@ AC_API_EXPORT NPCFlags EnumUtils<NPCFlags>::FromIndex(size_t index)
 }
 
 template <>
-AC_API_EXPORT size_t EnumUtils<NPCFlags>::ToIndex(NPCFlags value)
+AC_API_EXPORT std::size_t EnumUtils<NPCFlags>::ToIndex(NPCFlags value)
 {
     switch (value)
     {

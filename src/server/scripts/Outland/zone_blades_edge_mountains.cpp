@@ -23,7 +23,6 @@
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
-#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -223,31 +222,30 @@ public:
     }
 };
 
-class spell_npc22275_crystal_prison : public SpellScriptLoader
+enum CrystalPrison
 {
-public:
-    spell_npc22275_crystal_prison() : SpellScriptLoader("spell_npc22275_crystal_prison") { }
+    SPELL_CRYSTAL_SHATTER = 40898
+};
 
-    class spell_npc22275_crystal_prison_AuraScript : public AuraScript
+class spell_npc22275_crystal_prison_aura : public AuraScript
+{
+    PrepareAuraScript(spell_npc22275_crystal_prison_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_npc22275_crystal_prison_AuraScript);
+        return ValidateSpellInfo({ SPELL_CRYSTAL_SHATTER });
+    }
 
-        void OnPeriodic(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            SetDuration(0);
-            GetTarget()->CastSpell(GetTarget(), 40898, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_AuraScript::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnPeriodic(AuraEffect const*  /*aurEff*/)
     {
-        return new spell_npc22275_crystal_prison_AuraScript();
+        PreventDefaultAction();
+        SetDuration(0);
+        GetTarget()->CastSpell(GetTarget(), SPELL_CRYSTAL_SHATTER, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_npc22275_crystal_prison_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -334,7 +332,7 @@ public:
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
         {
-            if (spell->Id == SPELL_T_PHASE_MODULATOR && caster->GetTypeId() == TYPEID_PLAYER)
+            if (spell->Id == SPELL_T_PHASE_MODULATOR && caster->IsPlayer())
             {
                 const uint32 entry_list[4] = {ENTRY_PROTO, ENTRY_ADOLE, ENTRY_MATUR, ENTRY_NIHIL};
                 int cid = rand() % (4 - 1);
@@ -468,7 +466,7 @@ public:
         void MoveInLineOfSight(Unit* who) override
 
         {
-            if (who->GetTypeId() == TYPEID_PLAYER)
+            if (who->IsPlayer())
             {
                 if (who->HasAura(SPELL_LASHHAN_CHANNEL) && me->IsWithinDistInMap(who, 10.0f))
                 {
@@ -1139,31 +1137,25 @@ public:
     }
 };
 
-class spell_oscillating_field : public SpellScriptLoader
+class spell_oscillating_field : public SpellScript
 {
-public:
-    spell_oscillating_field() : SpellScriptLoader("spell_oscillating_field") { }
+    PrepareSpellScript(spell_oscillating_field);
 
-    class spell_oscillating_field_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_oscillating_field_SpellScript);
+        return ValidateSpellInfo({ SPELL_OSCILLATION_FIELD });
+    }
 
-        void HandleEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (Player* player = GetHitPlayer())
-                if (player->GetAuraCount(SPELL_OSCILLATION_FIELD) == 5 && player->GetQuestStatus(QUEST_GAUGING_THE_RESONANT_FREQUENCY) == QUEST_STATUS_INCOMPLETE)
-                    player->CompleteQuest(QUEST_GAUGING_THE_RESONANT_FREQUENCY);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_oscillating_field_SpellScript::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleEffect(SpellEffIndex /*effIndex*/)
     {
-        return new spell_oscillating_field_SpellScript();
+        if (Player* player = GetHitPlayer())
+            if (player->GetAuraCount(SPELL_OSCILLATION_FIELD) == 5 && player->GetQuestStatus(QUEST_GAUGING_THE_RESONANT_FREQUENCY) == QUEST_STATUS_INCOMPLETE)
+                player->CompleteQuest(QUEST_GAUGING_THE_RESONANT_FREQUENCY);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_oscillating_field::HandleEffect, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
@@ -1172,7 +1164,7 @@ void AddSC_blades_edge_mountains()
     // Ours
     new npc_deaths_door_fell_cannon_target_bunny();
     new npc_deaths_fel_cannon();
-    new spell_npc22275_crystal_prison();
+    RegisterSpellScript(spell_npc22275_crystal_prison_aura);
     // Theirs
     new npc_nether_drake();
     new npc_daranelle();
@@ -1180,5 +1172,5 @@ void AddSC_blades_edge_mountains()
     new go_simon_cluster();
     new go_apexis_relic();
     new npc_oscillating_frequency_scanner_master_bunny();
-    new spell_oscillating_field();
+    RegisterSpellScript(spell_oscillating_field);
 }

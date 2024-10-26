@@ -19,8 +19,8 @@
 #define AuthSocketMgr_h__
 
 #include "AuthSession.h"
-#include "SocketMgr.h"
 #include "Config.h"
+#include "SocketMgr.h"
 
 class AuthSocketMgr : public SocketMgr<AuthSession>
 {

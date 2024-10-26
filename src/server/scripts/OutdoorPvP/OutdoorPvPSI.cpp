@@ -264,4 +264,3 @@ void AddSC_outdoorpvp_si()
 {
     new OutdoorPvP_silithus();
 }
-

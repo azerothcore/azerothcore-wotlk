@@ -21,8 +21,8 @@
 #include "Log.h"
 #include "MessageBuffer.h"
 #include <atomic>
-#include <boost/asio/ip/tcp.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/ip/tcp.hpp>
 #include <functional>
 #include <memory>
 #include <queue>
@@ -176,7 +176,7 @@ protected:
     virtual void OnClose() { }
     virtual void ReadHandler() = 0;
 
-    [[nodiscard]] bool AsyncProcessQueue()
+    bool AsyncProcessQueue()
     {
         if (_isWritingAsync)
             return false;
@@ -205,7 +205,7 @@ protected:
     }
 
 private:
-    void ReadHandlerInternal(boost::system::error_code error, size_t transferredBytes)
+    void ReadHandlerInternal(boost::system::error_code error, std::size_t transferredBytes)
     {
         if (error)
         {
@@ -219,7 +219,7 @@ private:
 
     // ProxyReadHeaderHandler reads Proxy Protocol v2 header (v1 is not supported).
     // See https://www.haproxy.org/download/1.8/doc/proxy-protocol.txt (2.2. Binary header format (version 2)) for more details.
-    void ProxyReadHeaderHandler(boost::system::error_code error, size_t transferredBytes)
+    void ProxyReadHeaderHandler(boost::system::error_code error, std::size_t transferredBytes)
     {
         if (error)
         {
@@ -261,7 +261,7 @@ private:
 
         const uint8 addressFamily = readPointer[13];
         const uint16 len = (readPointer[14] << 8) | readPointer[15];
-        if (len+16 > packet.GetActiveSize())
+        if (static_cast<size_t>(len+16) > packet.GetActiveSize())
         {
             AsyncReadProxyHeader();
             return;

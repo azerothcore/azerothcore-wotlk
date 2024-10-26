@@ -178,7 +178,7 @@ struct boss_moroes : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (!_recentlySpoken && victim->GetTypeId() == TYPEID_PLAYER)
+        if (!_recentlySpoken && victim->IsPlayer())
         {
             Talk(SAY_KILL);
             _recentlySpoken = true;
@@ -283,4 +283,3 @@ void AddSC_boss_moroes()
     RegisterKarazhanCreatureAI(boss_moroes);
     RegisterSpellScript(spell_moroes_vanish);
 }
-

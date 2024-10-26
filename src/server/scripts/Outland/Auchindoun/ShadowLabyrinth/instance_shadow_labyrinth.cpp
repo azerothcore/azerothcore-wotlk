@@ -19,6 +19,7 @@
 #include "InstanceScript.h"
 #include "SpellScriptLoader.h"
 #include "shadow_labyrinth.h"
+#include "SpellScript.h"
 
 DoorData const doorData[] =
 {
@@ -137,4 +138,3 @@ void AddSC_instance_shadow_labyrinth()
     new instance_shadow_labyrinth();
     RegisterSpellScript(spell_mark_of_malice);
 }
-

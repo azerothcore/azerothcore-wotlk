@@ -143,7 +143,7 @@ public:
         {
             if (hp)
             {
-                switch(HealthCheck)
+                switch (HealthCheck)
                 {
                     case 75:
                         Talk(SAY_75HEALTH);
@@ -162,7 +162,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER)
+            if (!victim->IsPlayer())
                 return;
 
             Talk(SAY_SLAY);
@@ -290,4 +290,3 @@ void AddSC_boss_loken()
     new boss_loken();
     new spell_loken_pulsing_shockwave();
 }
-

@@ -15,11 +15,16 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "halls_of_reflection.h"
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
+#include "InstanceScript.h"
 #include "MotionMaster.h"
+#include "PassiveAI.h"
+#include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "halls_of_reflection.h"
 
 enum Events
 {
@@ -240,7 +245,7 @@ public:
 
         void DoAction(int32 actionId) override
         {
-            switch(actionId)
+            switch (actionId)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_START_INTRO, 0ms);
@@ -1762,7 +1767,7 @@ public:
             if (me->IsNonMeleeSpellCast(false, true, true))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_LK_CHECK_COMBAT:
                     if (me->isActiveObject()) // during fight
@@ -1948,7 +1953,7 @@ public:
         void DoAction(int32 actionId) override
 
         {
-            switch(actionId)
+            switch (actionId)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_LK_SAY_AGGRO, 0ms);
@@ -1996,7 +2001,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case EVENT_LK_SAY_AGGRO:
                     if (Creature* lkboss = pInstance->instance->GetCreature(pInstance->GetGuidData(NPC_LICH_KING_BOSS)))
@@ -2315,34 +2320,33 @@ public:
     }
 };
 
-class spell_hor_gunship_cannon_fire : public SpellScriptLoader
+enum GunshipCannonFire
 {
-public:
-    spell_hor_gunship_cannon_fire() : SpellScriptLoader("spell_hor_gunship_cannon_fire") { }
+    SPELL_GUNSHIP_CANNON_FIRE = 70021
+};
 
-    class spell_hor_gunship_cannon_fireAuraScript : public AuraScript
+class spell_hor_gunship_cannon_fire_aura : public AuraScript
+{
+    PrepareAuraScript(spell_hor_gunship_cannon_fire_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hor_gunship_cannon_fireAuraScript)
+        return ValidateSpellInfo({ SPELL_GUNSHIP_CANNON_FIRE });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-                if (Creature* c = caster->SummonCreature(WORLD_TRIGGER, CannonFirePos[caster->GetEntry() == NPC_JAINA_PART2 ? 0 : 1][urand(0, 2)], TEMPSUMMON_TIMED_DESPAWN, 1))
-                {
-                    c->CastSpell((Unit*)nullptr, 70021, true);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_hor_gunship_cannon_fireAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_hor_gunship_cannon_fireAuraScript();
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+            if (Creature* creature = caster->SummonCreature(WORLD_TRIGGER, CannonFirePos[caster->GetEntry() == NPC_JAINA_PART2 ? 0 : 1][urand(0, 2)], TEMPSUMMON_TIMED_DESPAWN, 1))
+            {
+                creature->CastSpell((Unit*)nullptr, SPELL_GUNSHIP_CANNON_FIRE, true);
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hor_gunship_cannon_fire_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -2403,7 +2407,7 @@ void AddSC_halls_of_reflection()
     new npc_hor_raging_ghoul();
     new npc_hor_risen_witch_doctor();
     new npc_hor_lumbering_abomination();
-    new spell_hor_gunship_cannon_fire();
+    RegisterSpellScript(spell_hor_gunship_cannon_fire_aura);
 
     new at_hor_battered_hilt_start();
     new at_hor_battered_hilt_throw();

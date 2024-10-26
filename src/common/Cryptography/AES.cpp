@@ -37,7 +37,7 @@ void Acore::Crypto::AES::Init(Key const& key)
     ASSERT(status);
 }
 
-bool Acore::Crypto::AES::Process(IV const& iv, uint8* data, size_t length, Tag& tag)
+bool Acore::Crypto::AES::Process(IV const& iv, uint8* data, std::size_t length, Tag& tag)
 {
     ASSERT(length <= static_cast<size_t>(std::numeric_limits<int>::max()));
     int len = static_cast<int>(length);

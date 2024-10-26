@@ -19,8 +19,6 @@
 #define DEF_MAGTHERIDONS_LAIR_H
 
 #include "CreatureAIImpl.h"
-#include "SpellScript.h"
-
 #define DataHeader "ML"
 
 #define MagtheridonsLairScriptName "instance_magtheridons_lair"

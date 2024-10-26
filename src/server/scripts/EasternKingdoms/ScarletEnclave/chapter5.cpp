@@ -458,7 +458,7 @@ public:
             {
                 Position pos = LightOfDawnFightPos[urand(0, 9)];
                 if (Unit* target = cr->SelectNearbyTarget(nullptr, 10.0f))
-                    if (target->GetTypeId() == TYPEID_UNIT)
+                    if (target->IsCreature())
                         target->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
                 cr->GetMotionMaster()->MoveCharge(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetSpeed(MOVE_RUN));
             }
@@ -1249,4 +1249,3 @@ void AddSC_the_scarlet_enclave_c5()
     new spell_chapter5_light_of_dawn_aura();
     new spell_chapter5_rebuke();
 }
-

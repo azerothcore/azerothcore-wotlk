@@ -346,6 +346,7 @@ void SmartAIMgr::LoadSmartAIFromDB()
         case SMART_EVENT_TRANSPORT_ADDCREATURE:
         case SMART_EVENT_NEAR_PLAYERS:
         case SMART_EVENT_SUMMONED_UNIT_EVADE:
+        case SMART_EVENT_DATA_SET:
             return true;
         default:
             return false;
@@ -479,9 +480,9 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
 
 bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
 {
-    size_t paramsStructSize = [&]() -> size_t
+    std::size_t paramsStructSize = [&]() -> std::size_t
     {
-        constexpr size_t NO_PARAMS = size_t(0);
+        constexpr std::size_t NO_PARAMS = std::size_t(0);
         switch (e.event.type)
         {
             case SMART_EVENT_UPDATE_IC: return sizeof(SmartEvent::minMaxRepeat);
@@ -583,11 +584,11 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
         }
     }();
 
-    static size_t rawCount = sizeof(SmartEvent::raw) / sizeof(uint32);
-    size_t paramsCount = paramsStructSize / sizeof(uint32);
+    static std::size_t rawCount = sizeof(SmartEvent::raw) / sizeof(uint32);
+    std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
-    for (size_t index = paramsCount; index < rawCount; index++)
+    for (std::size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.event.raw)[index];
         if (value != 0)
@@ -603,9 +604,9 @@ bool SmartAIMgr::CheckUnusedEventParams(SmartScriptHolder const& e)
 
 bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
 {
-    size_t paramsStructSize = [&]() -> size_t
+    std::size_t paramsStructSize = [&]() -> std::size_t
     {
-        constexpr size_t NO_PARAMS = size_t(0);
+        constexpr std::size_t NO_PARAMS = std::size_t(0);
         switch (e.action.type)
         {
             case SMART_ACTION_NONE: return NO_PARAMS;
@@ -765,7 +766,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_LOAD_GRID: return NO_PARAMS;
             case SMART_ACTION_MUSIC: return sizeof(SmartAction::music);
             case SMART_ACTION_SET_GUID: return sizeof(SmartAction::setGuid);
-            case SMART_ACTION_DISABLE: return sizeof(SmartAction::disable);
+            case SMART_ACTION_SCRIPTED_SPAWN: return sizeof(SmartAction::scriptSpawn);
             case SMART_ACTION_SET_SCALE: return sizeof(SmartAction::setScale);
             case SMART_ACTION_SUMMON_RADIAL: return sizeof(SmartAction::radialSummon);
             case SMART_ACTION_PLAY_SPELL_VISUAL: return sizeof(SmartAction::spellVisual);
@@ -783,11 +784,11 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
         }
     }();
 
-    static size_t rawCount = sizeof(SmartAction::raw) / sizeof(uint32);
-    size_t paramsCount = paramsStructSize / sizeof(uint32);
+    static std::size_t rawCount = sizeof(SmartAction::raw) / sizeof(uint32);
+    std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
-    for (size_t index = paramsCount; index < rawCount; index++)
+    for (std::size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.action.raw)[index];
         if (value != 0)
@@ -803,9 +804,9 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
 
 bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
 {
-    size_t paramsStructSize = [&]() -> size_t
+    std::size_t paramsStructSize = [&]() -> std::size_t
     {
-        constexpr size_t NO_PARAMS = size_t(0);
+        constexpr std::size_t NO_PARAMS = std::size_t(0);
         switch (e.target.type)
         {
             case SMART_TARGET_NONE: return NO_PARAMS;
@@ -847,11 +848,11 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
         }
     }();
 
-    static size_t rawCount = sizeof(SmartTarget::raw) / sizeof(uint32);
-    size_t paramsCount = paramsStructSize / sizeof(uint32);
+    static std::size_t rawCount = sizeof(SmartTarget::raw) / sizeof(uint32);
+    std::size_t paramsCount = paramsStructSize / sizeof(uint32);
 
     bool valid = true;
-    for (size_t index = paramsCount; index < rawCount; index++)
+    for (std::size_t index = paramsCount; index < rawCount; index++)
     {
         uint32 value = ((uint32*)&e.target.raw)[index];
         if (value != 0)
@@ -1948,7 +1949,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_ATTACK_STOP:
         case SMART_ACTION_PLAY_CINEMATIC:
         case SMART_ACTION_SET_GUID:
-        case SMART_ACTION_DISABLE:
+        case SMART_ACTION_SCRIPTED_SPAWN:
         case SMART_ACTION_SET_SCALE:
         case SMART_ACTION_SUMMON_RADIAL:
         case SMART_ACTION_PLAY_SPELL_VISUAL:

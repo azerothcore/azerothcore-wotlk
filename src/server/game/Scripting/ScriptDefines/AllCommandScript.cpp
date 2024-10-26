@@ -24,9 +24,9 @@ void ScriptMgr::OnHandleDevCommand(Player* player, bool& enable)
     CALL_ENABLED_HOOKS(AllCommandScript, ALLCOMMANDHOOK_ON_HANDLE_DEV_COMMAND, script->OnHandleDevCommand(player, enable));
 }
 
-bool ScriptMgr::CanExecuteCommand(ChatHandler& handler, std::string_view cmdStr)
+bool ScriptMgr::OnTryExecuteCommand(ChatHandler& handler, std::string_view cmdStr)
 {
-    CALL_ENABLED_BOOLEAN_HOOKS(AllCommandScript, ALLCOMMANDHOOK_CAN_EXECUTE_COMMAND, !script->CanExecuteCommand(handler, cmdStr));
+    CALL_ENABLED_BOOLEAN_HOOKS(AllCommandScript, ALLCOMMANDHOOK_ON_TRY_EXECUTE_COMMAND, !script->OnTryExecuteCommand(handler, cmdStr));
 }
 
 AllCommandScript::AllCommandScript(const char* name, std::vector<uint16> enabledHooks)

@@ -18,7 +18,6 @@
 #ifndef __ACORE_SOCIALMGR_H
 #define __ACORE_SOCIALMGR_H
 
-#include "Common.h"
 #include "DatabaseEnv.h"
 #include "ObjectGuid.h"
 #include <map>

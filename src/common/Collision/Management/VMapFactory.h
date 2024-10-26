@@ -18,8 +18,6 @@
 #ifndef _VMAPFACTORY_H
 #define _VMAPFACTORY_H
 
-#include "IVMapMgr.h"
-
 // This is the access point to the VMapMgr.
 namespace VMAP
 {

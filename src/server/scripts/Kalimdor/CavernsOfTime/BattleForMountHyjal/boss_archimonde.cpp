@@ -16,9 +16,10 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "SpellAuras.h"
+#include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "hyjal.h"
@@ -51,6 +52,7 @@ enum ArchiSpells
     SPELL_DOOMFIRE_STRIKE       = 31903,    //summons two creatures
     SPELL_DOOMFIRE_SPAWN        = 32074,
     SPELL_DOOMFIRE              = 31945,
+    SPELL_DOOMFIRE_DOT          = 31969,
     SPELL_SOUL_CHARGE_YELLOW    = 32045,
     SPELL_SOUL_CHARGE_GREEN     = 32051,
     SPELL_SOUL_CHARGE_RED       = 32052,
@@ -143,35 +145,40 @@ struct npc_doomfire_spirit : public ScriptedAI
 {
     npc_doomfire_spirit(Creature* creature) : ScriptedAI(creature){ }
 
+    float const turnConstant = 0.785402f; // 45 degree turns, verified with sniffs
+
     void Reset() override
     {
-        scheduler.CancelAll();
-        ScheduleTimedEvent(0s, [&] {
-            me->GetMotionMaster()->MovePoint(NEAR_POINT, DoomfireMovement(me->GetPosition()));
-            }, 1500ms);
+        ScheduleUniqueTimedEvent(10ms, [&] {
+            TryTeleportInDirection(1.f, M_PI, 1.f, true); //turns around and teleports 1 unit on spawn, assuming same logic as later teleports applies
+
+            ScheduleTimedEvent(10ms, [&] {
+                float angle = irand(-1, 1) * turnConstant;
+                TryTeleportInDirection(8.f, angle, 2.f, false);
+            }, 1600ms);
+        },1);
     }
 
-    Position DoomfireMovement(Position mePos)
+    void TryTeleportInDirection(float dist, float angle, float step, bool alwaysturn)
     {
-        float angle = mePos.GetOrientation();
-        float distance = 100.0f;
-        float newAngle = angle + ((rand() % 181) - 90) * M_PI / 180;
-        float x = mePos.GetPositionX() + distance * cos(newAngle);
-        float y = mePos.GetPositionY() + distance * sin(newAngle);
+        Position pos;
+        while (dist >= 0)
+        {
+            pos = me->WorldObject::GetFirstCollisionPosition(dist, angle);
+            if (fabsf(dist - me->GetExactDist2d(pos)) < 0.001) // Account for small deviation
+                break;
+            dist -= step; // Distance drops with each unsuccessful attempt
+        }
 
-        Position targetPos = Position(x, y, me->GetPositionZ());
-        return targetPos;
+        if (dist || alwaysturn)
+            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), Position::NormalizeOrientation(me->GetOrientation() + angle));
+        else // Orientation does not change if not moving, verified with sniffs
+            me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), me->GetOrientation());
     }
 
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
-
-        if (!UpdateVictim())
-            return;
-
-        if (me->HasUnitState(UNIT_STATE_CASTING))
-            return;
     }
 };
 
@@ -187,21 +194,12 @@ struct boss_archimonde : public BossAI
 
     void Reset() override
     {
-        BossAI::Reset();
+        _Reset();
         _wispCount = 0;
         _isChanneling = false;
         _enraged = false;
         _availableAuras.clear();
         _availableSpells.clear();
-
-        if (Map* map = me->GetMap())
-        {
-            map->DoForAllPlayers([&](Player* player)
-            {
-                player->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, false);
-                player->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, false);
-            });
-        }
 
         if (instance->GetBossState(DATA_AZGALOR) != DONE)
         {
@@ -216,7 +214,7 @@ struct boss_archimonde : public BossAI
         ScheduleHealthCheckEvent(10, [&]{
             scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
-            DoCastProtection();
+            DoCastAOE(SPELL_PROTECTION_OF_ELUNE, true);
             Talk(SAY_ENRAGE);
             _enraged = true;
             me->GetMotionMaster()->Clear(false);
@@ -225,7 +223,7 @@ struct boss_archimonde : public BossAI
             {
                 if (_wispCount >= 30)
                 {
-                    Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                    me->KillSelf();
                 }
                 Position wispPosition = { me->GetPositionX() + float(rand() % WISP_OFFSET), me->GetPositionY() + float(rand() % WISP_OFFSET), me->GetPositionZ(), 0.0f };
                 if (Creature* wisp = me->SummonCreature(CREATURE_ANCIENT_WISP, wispPosition))
@@ -253,8 +251,6 @@ struct boss_archimonde : public BossAI
                 {
                     if (Creature* nordrassil = me->SummonCreature(CREATURE_CHANNEL_TARGET, nordrassilPosition, TEMPSUMMON_TIMED_DESPAWN, 1200000))
                     {
-                        nordrassil->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        nordrassil->SetDisplayId(DISPLAY_ID_TRIGGER);
                         DoCast(nordrassil, SPELL_DRAIN_WORLD_TREE);
                         _isChanneling = true;
                         nordrassil->AI()->DoCast(me, SPELL_DRAIN_WORLD_TREE_2, true);
@@ -264,34 +260,23 @@ struct boss_archimonde : public BossAI
         }
     }
 
-    void DoCastProtection()
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        if (Map* map = me->GetMap())
-        {
-            map->DoForAllPlayers([&](Player* player)
-            {
-                player->AddAura(SPELL_PROTECTION_OF_ELUNE, player);
-                player->ApplySpellImmune(SPELL_HAND_OF_DEATH, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
-                player->ApplySpellImmune(0, IMMUNITY_ID, SPELL_HAND_OF_DEATH, true);
-            });
-        }
-    }
-
-    void JustEngagedWith(Unit* who) override
-    {
-        BossAI::JustEngagedWith(who);
+        _JustEngagedWith();
         me->InterruptNonMeleeSpells(false);
         Talk(SAY_AGGRO);
         ScheduleTimedEvent(25s, 35s, [&]
         {
-            scheduler.DelayGroup(GROUP_FEAR, 5s);
-            Talk(SAY_AIR_BURST);
-            DoCastRandomTarget(SPELL_AIR_BURST);
+            if (DoCastRandomTarget(SPELL_AIR_BURST, 1) == SPELL_CAST_OK)
+            {
+                scheduler.DelayGroup(GROUP_FEAR, 5s);
+                Talk(SAY_AIR_BURST);
+            }
         }, 25s, 40s);
-        ScheduleTimedEvent(25s, 35s, [&]
+        ScheduleTimedEvent(8s, [&]
         {
             DoCastDoomFire();
-        }, 20s);
+        }, 8s);
         ScheduleTimedEvent(25s, 35s, [&]
         {
             DoCastRandomTarget(SPELL_GRIP_OF_THE_LEGION);
@@ -337,7 +322,7 @@ struct boss_archimonde : public BossAI
             DoCastVictim(SPELL_RED_SKY_EFFECT);
             DoCastVictim(SPELL_HAND_OF_DEATH);
         }, 3s);
-        scheduler.Schedule(25s, 35s, GROUP_FEAR, [this](TaskContext context)
+        scheduler.Schedule(40s, GROUP_FEAR, [this](TaskContext context)
         {
             DoCastAOE(SPELL_FEAR);
             context.Repeat(42s);
@@ -345,49 +330,46 @@ struct boss_archimonde : public BossAI
         instance->SetData(DATA_SPAWN_WAVES, 1);
     }
 
-    void KilledUnit(Unit* victim) override
+    void KilledUnit(Unit* /*victim*/) override
     {
         Talk(SAY_SLAY);
-
-        if (victim->IsPlayer())
-        {
-            GainSoulCharge(victim->ToPlayer());
-        }
     }
 
-    void GainSoulCharge(Player* player)
+    void SetGUID(ObjectGuid guid, int32 type) override
     {
-        switch (player->getClass())
+        if (type == GUID_GAIN_SOUL_CHARGE_PLAYER)
         {
-            case CLASS_PALADIN:
-            case CLASS_PRIEST:
-            case CLASS_WARLOCK:
-                player->CastSpell(me, SPELL_SOUL_CHARGE_RED, true);
-                break;
-            case CLASS_DEATH_KNIGHT:
-            case CLASS_MAGE:
-            case CLASS_ROGUE:
-            case CLASS_WARRIOR:
-                player->CastSpell(me, SPELL_SOUL_CHARGE_YELLOW, true);
-                break;
-            case CLASS_DRUID:
-            case CLASS_HUNTER:
-            case CLASS_SHAMAN:
-                player->CastSpell(me, SPELL_SOUL_CHARGE_GREEN, true);
-                break;
-            case CLASS_NONE:
-            default:
-                break;
-        }
-        scheduler.Schedule(2s, 10s, [this](TaskContext)
-        {
-            UnleashSoulCharge();
-        });
-    }
+            if (Player* player = ObjectAccessor::GetPlayer(*me, guid))
+            {
+                switch (player->getClass())
+                {
+                    case CLASS_MAGE:
+                    case CLASS_PRIEST:
+                    case CLASS_WARLOCK:
+                        player->CastSpell(me, SPELL_SOUL_CHARGE_RED, true);
+                        break;
+                    case CLASS_DEATH_KNIGHT:
+                    case CLASS_PALADIN:
+                    case CLASS_ROGUE:
+                    case CLASS_WARRIOR:
+                        player->CastSpell(me, SPELL_SOUL_CHARGE_YELLOW, true);
+                        break;
+                    case CLASS_DRUID:
+                    case CLASS_HUNTER:
+                    case CLASS_SHAMAN:
+                        player->CastSpell(me, SPELL_SOUL_CHARGE_GREEN, true);
+                        break;
+                    case CLASS_NONE:
+                    default:
+                        break;
+                }
 
-    void JustDied(Unit* killer) override
-    {
-        BossAI::JustDied(killer);
+                scheduler.Schedule(2s, 10s, [this](TaskContext)
+                {
+                    UnleashSoulCharge();
+                });
+            }
+        }
     }
 
     void EnterEvadeMode(EvadeReason why) override
@@ -408,11 +390,6 @@ struct boss_archimonde : public BossAI
             summoned->CastSpell(summoned, SPELL_DOOMFIRE_SPAWN);
             summoned->CastSpell(summoned, SPELL_DOOMFIRE, true, 0, 0, me->GetGUID());
         }
-        else if (summoned->GetEntry() == CREATURE_DOOMFIRE_SPIRIT)
-        {
-            Position randomPosition = summoned->GetRandomNearPosition(40.0f);
-            summoned->GetMotionMaster()->MovePoint(0, randomPosition);
-        }
         else
         {
             summoned->SetFaction(me->GetFaction()); //remove?
@@ -428,14 +405,12 @@ struct boss_archimonde : public BossAI
         float angle = 2 * M_PI * rand() / RAND_MAX;
         float x = me->GetPositionX() + DOOMFIRE_OFFSET * cos(angle);
         float y = me->GetPositionY() + DOOMFIRE_OFFSET * sin(angle);
-        Position spiritPosition = Position(x, y, me->GetPositionZ());
+        Position spiritPosition = Position(x, y, me->GetPositionZ(), Position::NormalizeOrientation(angle + M_PI)); //spirit faces archimonde on spawn
         Position doomfirePosition = Position(x, y, me->GetPositionZ());
         if (Creature* doomfireSpirit = me->SummonCreature(CREATURE_DOOMFIRE_SPIRIT, spiritPosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
         {
             if (Creature* doomfire = me->SummonCreature(CREATURE_DOOMFIRE, doomfirePosition, TEMPSUMMON_TIMED_DESPAWN, 27000))
             {
-                doomfireSpirit->SetVisible(false);
-                doomfire->SetVisible(false);
                 doomfireSpirit->SetWalk(false);
                 doomfireSpirit->SetReactState(REACT_PASSIVE);
                 doomfire->SetReactState(REACT_PASSIVE);
@@ -498,68 +473,38 @@ class spell_red_sky_effect : public SpellScript
     }
 };
 
-class spell_finger_of_death : public SpellScript
+class spell_doomfire : public AuraScript
 {
-    PrepareSpellScript(spell_finger_of_death);
+    PrepareAuraScript(spell_doomfire);
 
-    void HandleHit(SpellEffIndex /*effIndex*/)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        if (GetHitUnit() && GetHitUnit()->GetAura(SPELL_PROTECTION_OF_ELUNE))
-            PreventHitDamage();
-        else
-            GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
+        return ValidateSpellInfo({ SPELL_DOOMFIRE_DOT });
+    }
+
+    void PeriodicTick(AuraEffect const* aurEff)
+    {
+        Unit* target = GetTarget();
+        if (!target)
+            return;
+
+        int32 bp = GetSpellInfo()->Effects[EFFECT_1].CalcValue();
+        float tickCoef = (static_cast<float>(aurEff->GetTickNumber() - 1) / aurEff->GetTotalTicks()); // Tick moved back to ensure proper damage on each tick
+        int32 damage = bp - (bp*tickCoef);
+        target->CastCustomSpell(target, SPELL_DOOMFIRE_DOT, &damage, &damage, &damage, true, nullptr, nullptr, target->GetGUID());
     }
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_finger_of_death::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-    }
-};
-
-class spell_hand_of_death : public SpellScript
-{
-    PrepareSpellScript(spell_hand_of_death);
-
-    void HandleHit(SpellEffIndex /*effIndex*/)
-    {
-        if (GetHitUnit() && GetHitUnit()->GetAura(SPELL_PROTECTION_OF_ELUNE))
-            PreventHitDamage();
-        else
-            GetHitUnit()->RemoveAurasByType(SPELL_AURA_EFFECT_IMMUNITY);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_hand_of_death::HandleHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-    }
-};
-
-class spell_air_burst : public SpellScript
-{
-    PrepareSpellScript(spell_air_burst);
-
-    void FilterTargets(std::list<WorldObject*>& targets)
-    {
-        if (Unit* victim = GetCaster()->GetVictim())
-        {
-            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
-        }
-    }
-
-    void Register() override
-    {
-        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_air_burst::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_doomfire::PeriodicTick, EFFECT_ALL, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
 void AddSC_boss_archimonde()
 {
     RegisterSpellScript(spell_red_sky_effect);
-    RegisterSpellScript(spell_hand_of_death);
-    RegisterSpellScript(spell_finger_of_death);
-    RegisterSpellScript(spell_air_burst);
+    RegisterSpellScript(spell_doomfire);
     RegisterHyjalAI(boss_archimonde);
     RegisterHyjalAI(npc_ancient_wisp);
     RegisterHyjalAI(npc_doomfire_spirit);
 }
-

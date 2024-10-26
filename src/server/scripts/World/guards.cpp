@@ -32,7 +32,6 @@ EndContentData */
 #include "GuardAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "SpellInfo.h"
 
 enum GuardShattrath
 {
@@ -82,7 +81,7 @@ public:
             else if (banishTimer <= diff)
             {
                 Unit* temp = me->GetVictim();
-                if (temp && temp->GetTypeId() == TYPEID_PLAYER)
+                if (temp && temp->IsPlayer())
                 {
                     DoCast(temp, SPELL_BANISHED_SHATTRATH_A);
                     banishTimer = 9000;
@@ -149,7 +148,7 @@ public:
             else if (banishTimer <= diff)
             {
                 Unit* temp = me->GetVictim();
-                if (temp && temp->GetTypeId() == TYPEID_PLAYER)
+                if (temp && temp->IsPlayer())
                 {
                     DoCast(temp, SPELL_BANISHED_SHATTRATH_S);
                     banishTimer = 9000;

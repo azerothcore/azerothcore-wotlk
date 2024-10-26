@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "temple_of_ahnqiraj.h"
 #include "AreaTriggerScript.h"
 #include "CreatureScript.h"
 #include "MapReference.h"
@@ -22,7 +23,6 @@
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "temple_of_ahnqiraj.h"
 
 enum Spells
 {
@@ -575,4 +575,3 @@ void AddSC_temple_of_ahnqiraj()
     RegisterSpellScript(spell_nullify);
     new at_battleguard_sartura();
 }
-

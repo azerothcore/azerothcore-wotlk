@@ -417,7 +417,7 @@ public:
                 return;
             }
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 1:
                     me->CastSpell(me, BONE_ARMOR_SPELL, false);
@@ -464,4 +464,3 @@ void AddSC_instance_scholomance()
     new spell_scholomance_boon_of_life();
     new npc_scholomance_occultist();
 }
-

@@ -57,8 +57,8 @@ Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
 
 ObjectData const creatureData[] =
 {
-    { NPC_SPIRIT_LYNX, DATA_SPIRIT_LYNX },
-    { 0,               0                }
+    { NPC_SPIRIT_LYNX, DATA_SPIRIT_LYNX   },
+    { 0,               0                  }
 };
 
 ObjectData const gameObjectData[] =

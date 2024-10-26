@@ -16,6 +16,7 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -145,7 +146,12 @@ class spell_anetheron_sleep : public SpellScript
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         if (!targets.empty())
+        {
+            if (Unit* victim = GetCaster()->GetVictim())
+                targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+
             Acore::Containers::RandomResize(targets, 3);
+        }
     }
 
     void Register() override

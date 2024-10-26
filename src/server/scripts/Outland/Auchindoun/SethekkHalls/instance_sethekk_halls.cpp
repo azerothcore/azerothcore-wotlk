@@ -31,6 +31,14 @@ ObjectData const gameObjectData[] =
     { 0,                         0                         }
 };
 
+ObjectData const creatureData[] =
+{
+    { NPC_VOICE_OF_THE_RAVEN_GOD, DATA_VOICE_OF_THE_RAVEN_GOD },
+    { 0,                          0                           }
+};
+
+const uint32 anzuSummonEventId = 14797;
+
 class instance_sethekk_halls : public InstanceMapScript
 {
 public:
@@ -48,14 +56,14 @@ public:
             SetHeaders(DataHeaders);
             SetBossNumber(EncounterCount);
             LoadDoorData(doorData);
-            LoadObjectData(nullptr, gameObjectData);
+            LoadObjectData(creatureData, gameObjectData);
         }
 
-        void OnCreatureCreate(Creature* creature) override
+        void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
-            if (creature->GetEntry() == NPC_ANZU || creature->GetEntry() == NPC_VOICE_OF_THE_RAVEN_GOD)
-                if (GetBossState(DATA_ANZU) == DONE)
-                    creature->DespawnOrUnsummon(1);
+            if (eventId == anzuSummonEventId)
+                if (!GetCreature(DATA_VOICE_OF_THE_RAVEN_GOD) && GetBossState(DATA_ANZU) != DONE)
+                    instance->SummonCreature(NPC_VOICE_OF_THE_RAVEN_GOD, Position(-88.02f, 288.18f, 75.2f, 6.0f));
         }
     };
 };

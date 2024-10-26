@@ -26,6 +26,7 @@ enum AccountOpResult
     AOR_OK,
     AOR_NAME_TOO_LONG,
     AOR_PASS_TOO_LONG,
+    AOR_EMAIL_TOO_LONG,
     AOR_NAME_ALREADY_EXIST,
     AOR_NAME_NOT_EXIST,
     AOR_DB_INTERNAL_ERROR
@@ -33,6 +34,7 @@ enum AccountOpResult
 
 #define MAX_ACCOUNT_STR 20
 #define MAX_PASS_STR 16
+#define MAX_EMAIL_STR 255
 
 namespace AccountMgr
 {
@@ -40,6 +42,7 @@ namespace AccountMgr
     AccountOpResult DeleteAccount(uint32 accountId);
     AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword);
     AccountOpResult ChangePassword(uint32 accountId, std::string newPassword);
+    AccountOpResult ChangeEmail(uint32 accountId, std::string email);
     bool CheckPassword(uint32 accountId, std::string password);
 
     uint32 GetId(std::string const& username);

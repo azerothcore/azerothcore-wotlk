@@ -18,15 +18,13 @@
 #ifndef __RASESSION_H__
 #define __RASESSION_H__
 
-#include "Common.h"
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/asio/streambuf.hpp>
 #include <future>
-#include <memory>
 
 using boost::asio::ip::tcp;
 
-const size_t bufferSize = 4096;
+const std::size_t bufferSize = 4096;
 
 class RASession : public std::enable_shared_from_this<RASession>
 {

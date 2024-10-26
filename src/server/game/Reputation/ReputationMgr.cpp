@@ -184,7 +184,7 @@ void ReputationMgr::SendState(FactionState const* faction)
     data << uint8(_sendFactionIncreased);
     _sendFactionIncreased = false; // Reset
 
-    size_t p_count = data.wpos();
+    std::size_t p_count = data.wpos();
     data << uint32(count);
 
     data << uint32(faction->ReputationListID);

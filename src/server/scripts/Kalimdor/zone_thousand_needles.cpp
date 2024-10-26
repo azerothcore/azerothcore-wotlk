@@ -360,4 +360,3 @@ void AddSC_thousand_needles()
     new npc_plucky();
     RegisterSpellScript(spell_panther_cage_key);
 }
-

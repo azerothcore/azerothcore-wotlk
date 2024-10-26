@@ -21,7 +21,6 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "Transport.h"
-#include "Vehicle.h"
 #include "WorldPacket.h"
 #include "ulduar.h"
 
@@ -310,7 +309,7 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
-            switch(creature->GetEntry())
+            switch (creature->GetEntry())
             {
                 case NPC_LEVIATHAN:
                     m_uiLeviathanGUID = creature->GetGUID();
@@ -373,11 +372,11 @@ public:
                     break;
                 case NPC_HARPOON_FIRE_STATE:
                     {
-                        if( creature->GetPositionX() > 595 )
+                        if (creature->GetPositionX() > 595 )
                             m_RazorscaleHarpoonFireStateGUID[3] = creature->GetGUID();
-                        else if( creature->GetPositionX() > 585 )
+                        else if (creature->GetPositionX() > 585 )
                             m_RazorscaleHarpoonFireStateGUID[2] = creature->GetGUID();
-                        else if( creature->GetPositionX() > 575 )
+                        else if (creature->GetPositionX() > 575 )
                             m_RazorscaleHarpoonFireStateGUID[1] = creature->GetGUID();
                         else
                             m_RazorscaleHarpoonFireStateGUID[0] = creature->GetGUID();
@@ -446,7 +445,7 @@ public:
                 // Flame Leviathan
                 case GO_REPAIR_STATION_TRAP:
                     {
-                        if(m_RepairSGUID[0])
+                        if (m_RepairSGUID[0])
                             m_RepairSGUID[1] = gameObject->GetGUID();
                         else
                             m_RepairSGUID[0] = gameObject->GetGUID();
@@ -558,15 +557,15 @@ public:
                 case GO_HODIR_FROZEN_DOOR:
                 case GO_HODIR_DOOR:
                     if (GetData(TYPE_HODIR) == DONE)
-                        if( gameObject->GetGoState() != GO_STATE_ACTIVE )
+                        if (gameObject->GetGoState() != GO_STATE_ACTIVE )
                         {
                             gameObject->SetLootState(GO_READY);
                             gameObject->UseDoorOrButton(0, false);
                         }
                     break;
                 case GO_VEZAX_DOOR:
-                    if( GetData(TYPE_VEZAX) == DONE )
-                        if( gameObject->GetGoState() != GO_STATE_ACTIVE )
+                    if (GetData(TYPE_VEZAX) == DONE )
+                        if (gameObject->GetGoState() != GO_STATE_ACTIVE )
                         {
                             gameObject->SetLootState(GO_READY);
                             gameObject->UseDoorOrButton(0, false);
@@ -669,7 +668,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case TYPE_LEVIATHAN:
                     m_auiEncounter[type] = data;
@@ -1056,7 +1055,7 @@ public:
 
         uint32 GetData(uint32 type) const override
         {
-            switch(type)
+            switch (type)
             {
                 case TYPE_LEVIATHAN:
                 case TYPE_IGNIS:
@@ -1097,13 +1096,13 @@ public:
         void OnUnitDeath(Unit* unit) override
         {
             // Feeds on Tears achievement
-            if (unit->GetTypeId() == TYPEID_PLAYER)
+            if (unit->IsPlayer())
             {
                 if (GetData(TYPE_ALGALON) == IN_PROGRESS)
                     if (Creature* algalon = instance->GetCreature(m_uiAlgalonGUID))
                         algalon->AI()->DoAction(ACTION_FEEDS_ON_TEARS_FAILED);
             }
-            else if (unit->GetTypeId() == TYPEID_UNIT && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
+            else if (unit->IsCreature() && unit->GetAreaId() == 4656 /*Conservatory of Life*/)
             {
                 if (GameTime::GetGameTime().count() > (m_conspeedatoryAttempt + DAY))
                 {
@@ -1114,7 +1113,7 @@ public:
             }
 
             // achievement Champion/Conqueror of Ulduar
-            if (unit->GetTypeId() == TYPEID_PLAYER)
+            if (unit->IsPlayer())
                 for (uint8 i = 0; i <= 12; ++i)
                 {
                     bool go = false;
@@ -1348,4 +1347,3 @@ void AddSC_instance_ulduar()
 {
     new instance_ulduar();
 }
-

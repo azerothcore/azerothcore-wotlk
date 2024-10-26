@@ -194,7 +194,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() != TYPEID_PLAYER || urand(0, 2))
+            if (!victim->IsPlayer() || urand(0, 2))
                 return;
 
             Talk(SAY_SLAY);

@@ -74,7 +74,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     if (lang == LANG_UNIVERSAL && type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
     {
         LOG_ERROR("entities.player.cheat", "CMSG_MESSAGECHAT: Possible hacking-attempt: {} tried to send a message in universal language", GetPlayerInfo());
-        SendNotification(LANG_UNKNOWN_LANGUAGE);
+        ChatHandler(this).SendNotification(LANG_UNKNOWN_LANGUAGE);
         recvData.rfinish();
         return;
     }
@@ -85,7 +85,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     LanguageDesc const* langDesc = GetLanguageDescByID(lang);
     if (!langDesc)
     {
-        SendNotification(LANG_UNKNOWN_LANGUAGE);
+        ChatHandler(this).SendNotification(LANG_UNKNOWN_LANGUAGE);
         recvData.rfinish();
         return;
     }
@@ -105,7 +105,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
         if (!foundAura)
         {
-            SendNotification(LANG_NOT_LEARNED_LANGUAGE);
+            ChatHandler(this).SendNotification(LANG_NOT_LEARNED_LANGUAGE);
             recvData.rfinish();
             return;
         }
@@ -131,13 +131,13 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 break;
             default:
             {
-                if (sWorld->getBoolConfig(CONFIG_CHAT_MUTE_FIRST_LOGIN))
+                if (sWorld->getBoolConfig(CONFIG_CHAT_MUTE_FIRST_LOGIN) && lang != LANG_ADDON)
                 {
                     uint32 minutes = sWorld->getIntConfig(CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN);
 
                     if (sender->GetTotalPlayedTime() < minutes * MINUTE)
                     {
-                        SendNotification(LANG_MUTED_PLAYER, minutes);
+                        ChatHandler(this).SendNotification(LANG_MUTED_PLAYER, minutes);
                         recvData.rfinish();
                         return;
                     }
@@ -164,7 +164,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
     if (sender->HasAura(1852) && type != CHAT_MSG_WHISPER)
     {
-        SendNotification(GetAcoreString(LANG_GM_SILENCE), sender->GetName().c_str());
+        ChatHandler(this).SendNotification(LANG_GM_SILENCE, sender->GetName());
         recvData.rfinish();
         return;
     }
@@ -283,14 +283,22 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
         if (msg.empty())
             return;
 
-        if (ChatHandler(this).ParseCommands(msg.c_str()))
-            return;
-
-        if (!_player->CanSpeak())
+        if (lang == LANG_ADDON)
         {
-            std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
-            SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
-            return;
+            if (AddonChannelCommandHandler(this).ParseCommands(msg.c_str()))
+                return;
+        }
+        else
+        {
+            if (ChatHandler(this).ParseCommands(msg.c_str()))
+                return;
+
+            if (!_player->CanSpeak())
+            {
+                std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
+                ChatHandler(this).SendNotification(LANG_WAIT_BEFORE_SPEAKING, timeStr);
+                return;
+            }
         }
     }
 
@@ -353,7 +361,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ))
                 {
-                    SendNotification(GetAcoreString(LANG_SAY_REQ), sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
+                    ChatHandler(this).SendNotification(LANG_SAY_REQ, sWorld->getIntConfig(CONFIG_CHAT_SAY_LEVEL_REQ));
                     return;
                 }
 
@@ -379,7 +387,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
 
                 if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && receiver != sender)
                 {
-                    SendNotification(GetAcoreString(LANG_WHISPER_REQ), sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
+                    ChatHandler(this).SendNotification(LANG_WHISPER_REQ, sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ));
                     return;
                 }
 
@@ -399,7 +407,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 // pussywizard: optimization
                 if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
                 {
-                    SendNotification(GetAcoreString(LANG_GM_SILENCE), GetPlayer()->GetName().c_str());
+                    ChatHandler(this).SendNotification(LANG_GM_SILENCE, GetPlayer()->GetName());
                     return;
                 }
 
@@ -582,7 +590,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 {
                     if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
                     {
-                        SendNotification(GetAcoreString(LANG_CHANNEL_REQ), sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ));
+                        ChatHandler(this).SendNotification(LANG_CHANNEL_REQ, sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ));
                         return;
                     }
                 }
@@ -727,7 +735,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
     if (!GetPlayer()->CanSpeak())
     {
         std::string timeStr = secsToTimeString(m_muteTime - GameTime::GetGameTime().count());
-        SendNotification(GetAcoreString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+        ChatHandler(this).SendNotification(LANG_WAIT_BEFORE_SPEAKING, timeStr);
         return;
     }
 
@@ -783,7 +791,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
     GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_DO_EMOTE, text_emote, 0, unit);
 
     //Send scripted event call
-    if (unit && unit->GetTypeId() == TYPEID_UNIT && ((Creature*)unit)->AI())
+    if (unit && unit->IsCreature() && ((Creature*)unit)->AI())
         ((Creature*)unit)->AI()->ReceiveEmote(GetPlayer(), text_emote);
 }
 

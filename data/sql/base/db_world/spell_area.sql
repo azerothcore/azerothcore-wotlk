@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `spell_area` (
   PRIMARY KEY (`spell`,`area`,`quest_start`,`aura_spell`,`racemask`,`gender`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.spell_area: ~696 rows (approximately)
+-- Dumping data for table acore_world.spell_area: ~698 rows (approximately)
 DELETE FROM `spell_area`;
 INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`) VALUES
 	(27105, 4492, 0, 12951, 0, 0, 2, 1, 64, 11),
@@ -52,6 +52,8 @@ INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spe
 	(32098, 3714, 0, 0, 0, 0, 2, 0, 64, 11),
 	(32098, 3836, 0, 0, 0, 0, 2, 0, 64, 11),
 	(32407, 3674, 0, 0, 0, 0, 2, 1, 64, 11),
+	(32649, 3688, 10045, 0, 0, 0, 2, 1, 64, 11),
+	(32649, 3688, 10252, 0, 0, 0, 2, 1, 64, 11),
 	(33836, 3803, 0, 0, 0, 0, 2, 0, 64, 11),
 	(34102, 3733, 0, 0, 0, 0, 2, 1, 64, 11),
 	(35480, 2367, 0, 0, 0, 690, 0, 1, 64, 11),

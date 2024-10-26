@@ -17,7 +17,6 @@
 
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "Player.h"
@@ -121,7 +120,7 @@ public:
                             if (!PlayerList.IsEmpty())
                                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                                     if (Player* player = i->GetSource())
-                                        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->m_homebindO);
+                                        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
                         }
                     }
                 }
@@ -177,7 +176,7 @@ public:
 
         void SetData(uint32 type, uint32 data) override
         {
-            switch(type)
+            switch (type)
             {
                 case EVENT_ARCHAVON:
                 case EVENT_EMALON:
@@ -269,4 +268,3 @@ void AddSC_instance_vault_of_archavon()
 {
     new instance_vault_of_archavon();
 }
-

@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `page_text` (
   PRIMARY KEY (`ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Item System';
 
--- Dumping data for table acore_world.page_text: ~1 976 rows (approximately)
+-- Dumping data for table acore_world.page_text: ~1 848 rows (approximately)
 DELETE FROM `page_text`;
 INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
 	(15, 'Hello Morgan,$B$BBusiness in Goldshire is brisk, so brisk that I haven\'t had time to send you any shipments!  $B$BI commissioned the person bearing this note to bring you a package of large wax candles (you know, the ones the Kobolds like to wear on their heads?). $B$BPlease give this person our thanks, and fair payment.', 0, 12340),

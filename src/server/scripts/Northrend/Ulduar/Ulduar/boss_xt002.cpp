@@ -225,7 +225,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->GetTypeId() == TYPEID_PLAYER && !urand(0, 2))
+            if (victim->IsPlayer() && !urand(0, 2))
             {
                 Talk(SAY_SLAY);
             }
@@ -308,7 +308,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 // Control events
                 case EVENT_HEALTH_CHECK:
@@ -427,7 +427,7 @@ public:
         {
             summons.Summon(cr);
             if (Unit* owner = me->GetVehicleBase())
-                if (owner->GetTypeId() == TYPEID_UNIT)
+                if (owner->IsCreature())
                     owner->ToCreature()->AI()->JustSummoned(cr);
         }
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -509,7 +509,7 @@ public:
                         _spawnSelection++;
                         break;
                     case 3:
-                        if(_pummelerCount < 2)
+                        if (_pummelerCount < 2)
                             me->SummonCreature(NPC_XM024_PUMMELLER, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 2, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
 
                         _pummelerCount++;
@@ -882,7 +882,7 @@ class spell_xt002_tympanic_tantrum : public SpellScript
 // 64234, 63024 - Gravity Bomb
 enum GravityBomb
 {
-    SPELL_GRAVTY_BOMB_10 = 63025
+    SPELL_GRAVITY_BOMB_TRIGGER_10 = 63025
 };
 
 class spell_xt002_gravity_bomb : public SpellScript
@@ -917,7 +917,7 @@ class spell_xt002_gravity_bomb_aura : public AuraScript
                 if (xt002->HasAura(aurEff->GetAmount()))   // Heartbreak aura indicating hard mode
                     if (Creature* creature = xt002->SummonCreature(NPC_VOID_ZONE, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 180000))
                     {
-                        int32 damage = GetSpellInfo()->Id == SPELL_GRAVTY_BOMB_10 ? 5000 : 7500;
+                        int32 damage = GetSpellInfo()->Id ==  SPELL_GRAVITY_BOMB_TRIGGER_10 ? 5000 : 7500;
                         creature->CastCustomSpell(creature, SPELL_VOID_ZONE_DAMAGE, &damage, 0, 0, true);
                     }
     }

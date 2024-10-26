@@ -19,12 +19,6 @@
 #define BLACK_TEMPLE_H_
 
 #include "CreatureAIImpl.h"
-#include "GridNotifiers.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "ScriptedGossip.h"
-#include "SpellAuraEffects.h"
-#include "SpellScript.h"
 
 #define DataHeader "BT"
 
@@ -48,7 +42,8 @@ enum DataTypes
     DATA_GATHIOS_THE_SHATTERER      = 12,
     DATA_HIGH_NETHERMANCER_ZEREVOR  = 13,
     DATA_LADY_MALANDE               = 14,
-    DATA_VERAS_DARKSHADOW           = 15
+    DATA_VERAS_DARKSHADOW           = 15,
+    DATA_BLACK_TEMPLE_TRIGGER       = 16
 };
 
 enum CreatureIds
@@ -88,7 +83,8 @@ enum CreatureIds
     NPC_ASHTONGUE_STALKER           = 23374,
     NPC_STORM_FURY                  = 22848,
 
-    NPC_DRAGON_TURTLE               = 22885
+    NPC_DRAGON_TURTLE               = 22885,
+    NPC_BLACK_TEMPLE_TRIGGER        = 22984
 };
 
 enum GameObjectIds
@@ -115,7 +111,14 @@ enum MiscIds
     SPELL_SHADOW_INFERNO_DAMAGE     = 39646,
     SPELL_CHAOTIC_CHARGE            = 41033,
     SPELL_DEMENTIA1                 = 41406,
-    SPELL_DEMENTIA2                 = 41409
+    SPELL_DEMENTIA2                 = 41409,
+    SPELL_SUMMON_SHADOWFIENDS       = 41159
+};
+
+enum Texts
+{
+    EMOTE_NAJENTUS_DEFEATED           = 0,
+    EMOTE_LOWER_TEMPLE_DEFEATED       = 1
 };
 
 template <class AI, class T>

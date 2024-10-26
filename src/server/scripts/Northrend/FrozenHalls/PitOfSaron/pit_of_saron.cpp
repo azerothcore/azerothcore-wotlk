@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "pit_of_saron.h"
 #include "AreaTriggerScript.h"
 #include "CreatureGroups.h"
 #include "CreatureScript.h"
@@ -26,7 +27,6 @@
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "pit_of_saron.h"
 
 class npc_pos_leader : public CreatureScript
 {
@@ -73,7 +73,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -469,7 +469,7 @@ public:
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -521,7 +521,7 @@ public:
         {
             if (type != POINT_MOTION_TYPE)
                 return;
-            switch(id)
+            switch (id)
             {
                 case 1:
                     events.RescheduleEvent(id, 0ms);
@@ -532,7 +532,7 @@ public:
         void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -881,7 +881,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            if (target && spell && target->GetTypeId() == TYPEID_PLAYER && spell->Id == 70827 && pInstance)
+            if (target && spell && target->IsPlayer() && spell->Id == 70827 && pInstance)
                 pInstance->SetData(DATA_ACHIEV_DONT_LOOK_UP, 0);
         }
 
@@ -1013,7 +1013,7 @@ public:
         {
             events.Update(diff);
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1130,7 +1130,7 @@ public:
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();
-            me->SetLastDamagedTime(0);
+            me->ClearLastLeashExtensionTimePtr();
         }
     };
 
@@ -1185,7 +1185,7 @@ public:
 
         void SpellHitTarget(Unit* target, SpellInfo const* spell) override
         {
-            if ((spell->Id == SPELL_TELEPORT_JAINA || spell->Id == SPELL_TELEPORT_SYLVANAS) && target && target->GetTypeId() == TYPEID_PLAYER)
+            if ((spell->Id == SPELL_TELEPORT_JAINA || spell->Id == SPELL_TELEPORT_SYLVANAS) && target && target->IsPlayer())
             {
                 float angle = rand_norm() * 2 * M_PI;
                 float dist = urand(1, 4);
@@ -1198,7 +1198,7 @@ public:
             if (type != WAYPOINT_MOTION_TYPE)
                 return;
 
-            switch(id)
+            switch (id)
             {
                 case 0:
                     Talk(me->GetEntry() == NPC_JAINA_PART2 ? SAY_JAINA_OUTRO_2 : SAY_SYLVANAS_OUTRO_2);
@@ -1221,7 +1221,7 @@ public:
         {
             events.Update(diff);
 
-            switch(events.ExecuteEvent())
+            switch (events.ExecuteEvent())
             {
                 case 0:
                     break;
@@ -1301,31 +1301,30 @@ public:
     }
 };
 
-class spell_pos_empowered_blizzard : public SpellScriptLoader
+enum EmpoweredBlizzard
 {
-public:
-    spell_pos_empowered_blizzard() : SpellScriptLoader("spell_pos_empowered_blizzard") { }
+    SPELL_EMPOWERED_BLIZZARD = 70131
+};
 
-    class spell_pos_empowered_blizzardAuraScript : public AuraScript
+class spell_pos_empowered_blizzard_aura : public AuraScript
+{
+    PrepareAuraScript(spell_pos_empowered_blizzard_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_pos_empowered_blizzardAuraScript)
+        return ValidateSpellInfo({ SPELL_EMPOWERED_BLIZZARD });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            PreventDefaultAction();
-            if (Unit* caster = GetCaster())
-                caster->CastSpell((float)urand(447, 480), (float)urand(200, 235), 528.71f, 70131, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_empowered_blizzardAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_pos_empowered_blizzardAuraScript();
+        PreventDefaultAction();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell((float)urand(447, 480), (float)urand(200, 235), 528.71f, SPELL_EMPOWERED_BLIZZARD, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_empowered_blizzard_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
     }
 };
 
@@ -1364,138 +1363,99 @@ private:
     Creature& _owner;
 };
 
-class spell_pos_slave_trigger_closest : public SpellScriptLoader
+class spell_pos_slave_trigger_closest : public SpellScript
 {
-public:
-    spell_pos_slave_trigger_closest() : SpellScriptLoader("spell_pos_slave_trigger_closest") { }
+    PrepareSpellScript(spell_pos_slave_trigger_closest);
 
-    class spell_pos_slave_trigger_closestSpellScript : public SpellScript
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_pos_slave_trigger_closestSpellScript);
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                if (target->GetUInt32Value(UNIT_NPC_EMOTESTATE)) // prevent using multiple times
-                {
-                    if (Unit* caster = GetCaster())
-                        if (Player* p = caster->ToPlayer())
-                        {
-                            p->RewardPlayerAndGroupAtEvent(36764, caster); // alliance
-                            p->RewardPlayerAndGroupAtEvent(36770, caster); // horde
-
-                            target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-                            if (Creature* c = target->ToCreature())
-                            {
-                                c->DespawnOrUnsummon(7000);
-                                c->AI()->Talk(0, p);
-                                c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
-                            }
-                        }
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_pos_slave_trigger_closestSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_pos_slave_trigger_closestSpellScript();
-    }
-};
-
-class spell_pos_rimefang_frost_nova : public SpellScriptLoader
-{
-public:
-    spell_pos_rimefang_frost_nova() : SpellScriptLoader("spell_pos_rimefang_frost_nova") { }
-
-    class spell_pos_rimefang_frost_novaSpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_pos_rimefang_frost_novaSpellScript);
-
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
+        if (Unit* target = GetHitUnit())
+            if (target->GetUInt32Value(UNIT_NPC_EMOTESTATE)) // prevent using multiple times
+            {
                 if (Unit* caster = GetCaster())
-                {
-                    Unit::Kill(caster, target);
-                    if (target->GetTypeId() == TYPEID_UNIT)
-                        target->ToCreature()->DespawnOrUnsummon(30000);
-                }
-        }
+                    if (Player* p = caster->ToPlayer())
+                    {
+                        p->RewardPlayerAndGroupAtEvent(36764, caster); // alliance
+                        p->RewardPlayerAndGroupAtEvent(36770, caster); // horde
 
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_pos_rimefang_frost_novaSpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
+                        target->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+                        if (Creature* c = target->ToCreature())
+                        {
+                            c->DespawnOrUnsummon(7000);
+                            c->AI()->Talk(0, p);
+                            c->m_Events.AddEvent(new SlaveRunEvent(*c), c->m_Events.CalculateTime(3000));
+                        }
+                    }
+            }
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_pos_rimefang_frost_novaSpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_pos_slave_trigger_closest::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_pos_blight : public SpellScriptLoader
+class spell_pos_rimefang_frost_nova : public SpellScript
 {
-public:
-    spell_pos_blight() : SpellScriptLoader("spell_pos_blight") { }
+    PrepareSpellScript(spell_pos_rimefang_frost_nova);
 
-    class spell_pos_blightAuraScript : public AuraScript
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        PrepareAuraScript(spell_pos_blightAuraScript)
+        if (Unit* target = GetHitUnit())
+            if (Unit* caster = GetCaster())
+            {
+                Unit::Kill(caster, target);
+                if (target->IsCreature())
+                    target->ToCreature()->DespawnOrUnsummon(30000);
+            }
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
-                if (Unit* target = GetTarget())
-                    target->CastSpell(target, 69604, true);
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_blightAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_pos_blightAuraScript();
+        OnEffectHitTarget += SpellEffectFn(spell_pos_rimefang_frost_nova::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
-class spell_pos_glacial_strike : public SpellScriptLoader
+class spell_pos_blight_aura : public AuraScript
 {
-public:
-    spell_pos_glacial_strike() : SpellScriptLoader("spell_pos_glacial_strike") { }
+    PrepareAuraScript(spell_pos_blight_aura);
 
-    class spell_pos_glacial_strikeAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_pos_glacial_strikeAuraScript)
+        return ValidateSpellInfo({ 69604 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
+    {
+        if (aurEff->GetTotalTicks() >= 0 && aurEff->GetTickNumber() == uint32(aurEff->GetTotalTicks()))
             if (Unit* target = GetTarget())
-                if (target->GetHealth() == target->GetMaxHealth())
-                {
-                    PreventDefaultAction();
-                    aurEff->GetBase()->Remove(AURA_REMOVE_BY_EXPIRE);
-                    return;
-                }
-        }
+                target->CastSpell(target, 69604, true);
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_glacial_strikeAuraScript::HandleEffectPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_pos_glacial_strikeAuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_blight_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
+class spell_pos_glacial_strike_aura : public AuraScript
+{
+    PrepareAuraScript(spell_pos_glacial_strike_aura);
+
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
+    {
+        if (Unit* target = GetTarget())
+            if (target->GetHealth() == target->GetMaxHealth())
+            {
+                PreventDefaultAction();
+                aurEff->GetBase()->Remove(AURA_REMOVE_BY_EXPIRE);
+                return;
+            }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pos_glacial_strike_aura::HandleEffectPeriodic, EFFECT_2, SPELL_AURA_PERIODIC_DAMAGE_PERCENT);
     }
 };
 
@@ -1537,11 +1497,11 @@ void AddSC_pit_of_saron()
     new npc_pos_freed_slave();
     new npc_pos_leader_second();
 
-    new spell_pos_empowered_blizzard();
-    new spell_pos_slave_trigger_closest();
-    new spell_pos_rimefang_frost_nova();
-    new spell_pos_blight();
-    new spell_pos_glacial_strike();
+    RegisterSpellScript(spell_pos_empowered_blizzard_aura);
+    RegisterSpellScript(spell_pos_slave_trigger_closest);
+    RegisterSpellScript(spell_pos_rimefang_frost_nova);
+    RegisterSpellScript(spell_pos_blight_aura);
+    RegisterSpellScript(spell_pos_glacial_strike_aura);
 
     new at_tyrannus_event_starter();
 }

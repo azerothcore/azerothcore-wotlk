@@ -217,7 +217,7 @@ public:
         void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
         {
             Unit* target = GetTarget();
-            if (target->GetTypeId() == TYPEID_UNIT && GetAura()->GetStackAmount() >= 10)
+            if (target->IsCreature() && GetAura()->GetStackAmount() >= 10)
             {
                 target->CastSpell(target, SPELL_OVERCHARGED_BLAST, true);
                 Unit::Kill(target, target, false);
@@ -278,4 +278,3 @@ void AddSC_boss_emalon()
     new spell_voa_overcharge();
     new spell_voa_lightning_nova();
 }
-

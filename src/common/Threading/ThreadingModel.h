@@ -23,8 +23,6 @@
  *
  */
 
-#include "Define.h"
-
 namespace Acore
 {
     template<typename MUTEX>

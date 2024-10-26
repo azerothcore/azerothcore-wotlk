@@ -56,7 +56,7 @@ bool WMORoot::open()
         flipcc(fourcc);
         fourcc[4] = 0;
 
-        size_t nextpos = f.getPos() + size;
+        std::size_t nextpos = f.getPos() + size;
 
         if (!strcmp(fourcc, "MOHD")) // header
         {
@@ -185,7 +185,7 @@ bool WMOGroup::open(WMORoot* rootWMO)
             size = 68;
         }
         fourcc[4] = 0;
-        size_t nextpos = f.getPos() + size;
+        std::size_t nextpos = f.getPos() + size;
         LiquEx_size = 0;
         liquflags = 0;
 
@@ -568,5 +568,4 @@ void MapObject::Extract(ADT::MODF const& mapObjDef, char const* WmoInstName, uin
     uint32 nlen = strlen(WmoInstName);
     fwrite(&nlen, sizeof(uint32), 1, pDirfile);
     fwrite(WmoInstName, sizeof(char), nlen, pDirfile);
-
 }

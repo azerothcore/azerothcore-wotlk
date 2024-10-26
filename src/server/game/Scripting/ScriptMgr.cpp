@@ -17,8 +17,8 @@
 
 #include "ScriptMgr.h"
 #include "AllScriptsObjects.h"
-#include "LFGScripts.h"
 #include "InstanceScript.h"
+#include "LFGScripts.h"
 #include "ScriptObject.h"
 #include "ScriptSystem.h"
 #include "SmartAI.h"
@@ -102,6 +102,7 @@ void ScriptMgr::Initialize()
     ScriptRegistry<UnitScript>::InitEnabledHooksIfNeeded(UNITHOOK_END);
     ScriptRegistry<WorldObjectScript>::InitEnabledHooksIfNeeded(WORLDOBJECTHOOK_END);
     ScriptRegistry<WorldScript>::InitEnabledHooksIfNeeded(WORLDHOOK_END);
+    ScriptRegistry<AllMapScript>::InitEnabledHooksIfNeeded(ALLMAPHOOK_END);
 }
 
 void ScriptMgr::Unload()

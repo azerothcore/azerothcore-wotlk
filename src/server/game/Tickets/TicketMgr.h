@@ -138,6 +138,8 @@ public:
     void SetGmAction(uint32 needResponse, bool needMoreHelp);
 
     void AppendResponse(std::string const& response) { _response += response; }
+    std::string GetResponse() { return _response; }
+    void DeleteResponse() { _response = ""; }
 
     bool LoadFromDB(Field* fields);
     void SaveToDB(CharacterDatabaseTransaction trans) const;

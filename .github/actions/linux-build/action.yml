@@ -16,6 +16,11 @@ inputs:
     description: Flag to install modules or not
     required: true
     type: boolean
+  tools:
+    default: none
+    description: Flag to enable tools build
+    required: false
+    type: string
   pch:
     default: false
     description: Flag to enable or disable PCH
@@ -94,13 +99,15 @@ runs:
         cmake "$GITHUB_WORKSPACE" \
           -DCMAKE_INSTALL_PREFIX="$GITHUB_WORKSPACE/env/dist" \
           -DAPPS_BUILD="all" \
-          -DTOOLS_BUILD="all" \
+          -DTOOLS_BUILD=${{ inputs.tools }} \
           -DSCRIPTS="static" \
           -DMODULES="static" \
           -DWITH_WARNINGS="ON" \
           -DCMAKE_BUILD_TYPE="Release" \
           -DCMAKE_CXX_COMPILER_LAUNCHER="ccache" \
           -DCMAKE_C_COMPILER_LAUNCHER="ccache" \
+          -DCMAKE_C_FLAGS="-Werror" \
+          -DCMAKE_CXX_FLAGS="-Werror" \
           -DBUILD_TESTING="ON" \
           -DUSE_SCRIPTPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
           -DUSE_COREPCH=${{ inputs.pch == 'true' && 'ON' || '' }} \
@@ -130,6 +137,7 @@ runs:
         AC_CHARACTER_DATABASE_INFO=localhost;3306;root;root;acore_characters
         AC_WORLD_DATABASE_INFO=localhost;3306;root;root;acore_world
         AC_DATA_DIR=env/dist/data
+        AC_LOGS_DIR=env/dist/logs
         EOF
 
     - name: get dbc files
@@ -140,10 +148,6 @@ runs:
     - name: Start MySQL container
       shell: bash
       run: sudo systemctl start mysql.service
-
-    - name: run dbimport
-      shell: bash
-      run: env/dist/bin/dbimport
 
     - name: Dry run authserver
       shell: bash
@@ -156,7 +160,7 @@ runs:
     - name: Check startup errors
       shell: bash
       run: |
-        error_log="./env/dist/bin/Errors.log"
+        error_log="$AC_LOGS_DIR/Errors.log"
         # -s checks if the file's size is greater than 0 bytes
         # ! -s checks if the file's size is less than/equal to 0 bytes
         # if the error log is empty, exit without error

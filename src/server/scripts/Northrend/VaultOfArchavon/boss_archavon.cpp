@@ -235,4 +235,3 @@ void AddSC_boss_archavon()
     new boss_archavon();
     new spell_archavon_rock_shards();
 }
-

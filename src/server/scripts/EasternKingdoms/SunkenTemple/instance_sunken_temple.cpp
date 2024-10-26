@@ -64,7 +64,7 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
-            if (unit->GetTypeId() == TYPEID_UNIT && unit->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && unit->GetEntry() != NPC_SHADE_OF_ERANIKUS)
+            if (unit->IsCreature() && unit->GetCreatureType() == CREATURE_TYPE_DRAGONKIN && unit->GetEntry() != NPC_SHADE_OF_ERANIKUS)
                 _dragonkinList.remove(unit->GetGUID());
             if (unit->GetEntry() == NPC_JAMMAL_AN_THE_PROPHET)
             {
@@ -302,4 +302,3 @@ void AddSC_instance_sunken_temple()
     new spell_temple_of_atal_hakkar_hex_of_jammal_an();
     new spell_temple_of_atal_hakkar_awaken_the_soulflayer();
 }
-

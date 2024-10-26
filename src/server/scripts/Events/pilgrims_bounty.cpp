@@ -118,7 +118,7 @@ struct npc_pilgrims_bounty_chair : public VehicleAI
 
     void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
     {
-        if (apply && who->GetTypeId() == TYPEID_PLAYER)
+        if (apply && who->IsPlayer())
             who->ToPlayer()->SetClientControl(me, 0, true);
     }
 
@@ -571,7 +571,7 @@ class spell_pilgrims_bounty_serve_generic : public AuraScript
     void OnAuraRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
-        if (target->GetTypeId() == TYPEID_UNIT)
+        if (target->IsCreature())
             target->ToCreature()->AI()->DoAction(GetSpellInfo()->Id);
     }
 
@@ -683,4 +683,3 @@ void AddSC_event_pilgrims_end_scripts()
     new achievement_pb_pilgrims_peril();
     new achievement_pb_terokkar_turkey_time();
 }
-

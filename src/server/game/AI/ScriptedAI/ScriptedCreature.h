@@ -25,8 +25,6 @@
 #include "InstanceScript.h"
 #include "TaskScheduler.h"
 
-#define CAST_AI(a, b)   (dynamic_cast<a*>(b))
-
 typedef std::list<WorldObject*> ObjectList;
 
 class InstanceScript;
@@ -180,7 +178,7 @@ class PlayerOrPetCheck
 public:
     bool operator() (WorldObject* unit) const
     {
-        if (unit->GetTypeId() != TYPEID_PLAYER)
+        if (!unit->IsPlayer())
             if (!unit->ToUnit()->GetOwnerGUID().IsPlayer())
                 return true;
 
@@ -281,9 +279,6 @@ struct ScriptedAI : public CreatureAI
     //Pointer to creature we are manipulating
     Creature* me;
 
-    //For fleeing
-    bool IsFleeing;
-
     // *************
     //Pure virtual functions
     // *************
@@ -336,6 +331,7 @@ struct ScriptedAI : public CreatureAI
 
     //Teleports a player without dropping threat (only teleports to same map)
     void DoTeleportPlayer(Unit* unit, float x, float y, float z, float o);
+    void DoTeleportPlayer(Unit* unit, Position pos) { DoTeleportPlayer(unit, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); };
     void DoTeleportAll(float x, float y, float z, float o);
 
     //Returns friendly unit with the most amount of hp missing from max hp
@@ -450,10 +446,11 @@ private:
 
 struct HealthCheckEventData
 {
-    HealthCheckEventData(uint8 healthPct, std::function<void()> exec) : _healthPct(healthPct), _exec(exec) { };
+    HealthCheckEventData(uint8 healthPct, std::function<void()> exec, bool valid = true) : _healthPct(healthPct), _exec(exec), _valid(valid) { };
 
     uint8 _healthPct;
     std::function<void()> _exec;
+    bool _valid;
 };
 
 class BossAI : public ScriptedAI
@@ -488,6 +485,7 @@ public:
 
     void Reset() override { _Reset(); }
     void JustEngagedWith(Unit* /*who*/) override { _JustEngagedWith(); }
+    void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override { _EnterEvadeMode(why); }
     void JustDied(Unit* /*killer*/) override { _JustDied(); }
     void JustReachedHome() override { _JustReachedHome(); }
 
@@ -496,7 +494,7 @@ protected:
     void _JustEngagedWith();
     void _JustDied();
     void _JustReachedHome() { me->setActive(false); }
-    [[nodiscard]] bool _ProccessHealthCheckEvent(uint8 healthPct, uint32 damage, std::function<void()> exec) const;
+    void _EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
     void TeleportCheaters();
 
@@ -505,6 +503,7 @@ protected:
 private:
     uint32 const _bossId;
     std::list<HealthCheckEventData> _healthCheckEvents;
+    HealthCheckEventData _nextHealthCheck;
 };
 
 class WorldBossAI : public ScriptedAI

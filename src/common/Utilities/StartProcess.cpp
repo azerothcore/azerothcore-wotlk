@@ -22,13 +22,7 @@
 #include "Util.h"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/iostreams/copy.hpp>
-#include <boost/process/args.hpp>
-#include <boost/process/child.hpp>
-#include <boost/process/env.hpp>
-#include <boost/process/exe.hpp>
-#include <boost/process/io.hpp>
-#include <boost/process/pipe.hpp>
-#include <boost/process/search_path.hpp>
+#include "boost/process.hpp"
 #include <filesystem>
 
 using namespace boost::process;

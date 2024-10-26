@@ -251,4 +251,3 @@ void AddSC_boss_krystallus()
     new spell_krystallus_shatter();
     new spell_krystallus_shatter_effect();
 }
-

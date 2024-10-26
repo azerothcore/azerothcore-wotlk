@@ -34,7 +34,7 @@ public:
     BigNumber(int32 v) : BigNumber() { SetDword(v); }
     BigNumber(std::string const& v) : BigNumber() { SetHexStr(v); }
 
-    template <size_t Size>
+    template <std::size_t Size>
     BigNumber(std::array<uint8, Size> const& v, bool littleEndian = true) : BigNumber() { SetBinary(v.data(), Size, littleEndian); }
 
     ~BigNumber();
@@ -116,7 +116,7 @@ public:
 
     [[nodiscard]] uint32 AsDword() const;
 
-    void GetBytes(uint8* buf, size_t bufsize, bool littleEndian = true) const;
+    void GetBytes(uint8* buf, std::size_t bufsize, bool littleEndian = true) const;
     [[nodiscard]] std::vector<uint8> ToByteVector(int32 minSize = 0, bool littleEndian = true) const;
 
     template <std::size_t Size>

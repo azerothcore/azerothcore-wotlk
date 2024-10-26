@@ -162,4 +162,3 @@ void AddSC_boss_commander_sarannis()
     RegisterSpellScript(spell_commander_sarannis_arcane_devastation);
     RegisterSpellScript(spell_commander_sarannis_summon_reinforcements);
 }
-

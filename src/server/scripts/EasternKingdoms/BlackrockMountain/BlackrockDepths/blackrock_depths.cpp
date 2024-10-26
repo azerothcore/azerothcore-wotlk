@@ -303,7 +303,7 @@ public:
             bool doReset = false;
             if (resetTimer > 0)
             {
-                for (const auto& sum : summons)
+                for (auto const& sum : summons)
                 {
                     if (Creature* creature = ObjectAccessor::GetCreature(*me, sum))
                     {

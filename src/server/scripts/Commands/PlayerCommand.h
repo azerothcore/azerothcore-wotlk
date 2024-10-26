@@ -19,7 +19,6 @@
 #define _PLAYER_COMMAND_H
 
 #include "Chat.h"
-#include "Common.h"
 
 class Player;
 class SpellInfo;

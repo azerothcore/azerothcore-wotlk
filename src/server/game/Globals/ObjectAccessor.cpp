@@ -21,16 +21,13 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "GridNotifiers.h"
-#include "Log.h"
 #include "Map.h"
 #include "MapMgr.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
-#include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
 #include "Transport.h"
-#include "Vehicle.h"
 
 template<class T>
 void HashMapHolder<T>::Insert(T* o)
@@ -146,7 +143,7 @@ Object* ObjectAccessor::GetObjectByTypeMask(WorldObject const& p, ObjectGuid con
     switch (guid.GetHigh())
     {
         case HighGuid::Item:
-            if (typemask & TYPEMASK_ITEM && p.GetTypeId() == TYPEID_PLAYER)
+            if (typemask & TYPEMASK_ITEM && p.IsPlayer())
                 return ((Player const&)p).GetItemByGuid(guid);
             break;
         case HighGuid::Player:

@@ -156,7 +156,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
     {
         handler->PSendSysMessage("To spectate, please fix the following:");
         for (std::list<std::string>::const_iterator itr = errors.begin(); itr != errors.end(); ++itr)
-            handler->PSendSysMessage("- %s", (*itr).c_str());
+            handler->PSendSysMessage("- {}", (*itr));
 
         return true;
     }
@@ -212,7 +212,7 @@ bool ArenaSpectator::HandleSpectatorWatchCommand(ChatHandler* handler, std::stri
 
 void ArenaSpectator::CreatePacket(WorldPacket& data, std::string const& message)
 {
-    size_t len = message.length();
+    std::size_t len = message.length();
     data.Initialize(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + 8 + 4 + 1 + len + 1);
     data << uint8(CHAT_MSG_WHISPER);
     data << uint32(LANG_ADDON);

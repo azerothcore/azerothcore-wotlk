@@ -223,4 +223,3 @@ void AddSC_boss_mechano_lord_capacitus()
     RegisterSpellScript(spell_capacitus_polarity_charge_aura);
     RegisterSpellScript(spell_capacitus_polarity_shift);
 }
-

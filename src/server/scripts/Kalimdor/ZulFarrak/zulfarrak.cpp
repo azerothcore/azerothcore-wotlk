@@ -17,6 +17,7 @@
 
 #include "zulfarrak.h"
 #include "Cell.h"
+#include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
@@ -28,6 +29,13 @@
 #include "ScriptSystem.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+
+/// @todo: this import is not necessary for compilation and marked as unused by the IDE
+//  however, for some reasons removing it would cause a damn linking issue
+//  there is probably some underlying problem with imports which should properly addressed
+//  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
+#include "GridNotifiersImpl.h"
+
 /* ScriptData
 SDName: Zulfarrak
 SD%Complete: 50
@@ -39,8 +47,6 @@ EndScriptData */
 npc_sergeant_bly
 npc_weegli_blastfuse
 EndContentData */
-
-#include "GridNotifiersImpl.h"
 
 /*######
 ## npc_sergeant_bly
@@ -324,12 +330,12 @@ public:
             instance->SetData(DATA_PYRAMID, PYRAMID_CAGES_OPEN);
 
             //setting gossip option as soon as the cages open
-            if(Creature* bly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
+            if (Creature* bly = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_BLY)))
             {
                 bly->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
 
-            if(Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
+            if (Creature* weegli = ObjectAccessor::GetCreature(*me, instance->GetGuidData(NPC_WEEGLI)))
             {
                 weegli->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             }
@@ -733,4 +739,3 @@ void AddSC_zulfarrak()
     new npc_shadowpriest_sezziz();
     new go_troll_cage();
 }
-

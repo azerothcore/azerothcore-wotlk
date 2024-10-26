@@ -83,7 +83,7 @@ struct boss_exarch_maladaar : public BossAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (!_talked && who->GetTypeId() == TYPEID_PLAYER && me->IsWithinDistInMap(who, 150.0f))
+        if (!_talked && who->IsPlayer() && me->IsWithinDistInMap(who, 150.0f))
         {
             _talked = true;
             Talk(SAY_INTRO);

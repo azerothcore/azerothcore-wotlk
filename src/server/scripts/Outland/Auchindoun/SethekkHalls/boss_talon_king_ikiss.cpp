@@ -180,4 +180,3 @@ void AddSC_boss_talon_king_ikiss()
     RegisterSethekkHallsCreatureAI(boss_talon_king_ikiss);
     RegisterSpellScript(spell_talon_king_ikiss_blink);
 }
-

@@ -19,6 +19,8 @@
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "black_temple.h"
+#include "Player.h"
+#include "SpellScript.h"
 
 enum Yells
 {
@@ -38,18 +40,31 @@ enum Spells
     SPELL_TIDAL_SHIELD              = 39872,
     SPELL_IMPALING_SPINE            = 39837,
     SPELL_SUMMON_IMPALING_SPINE     = 39929,
-    SPELL_BERSERK                   = 26662
+    SPELL_BERSERK                   = 26662,
+    SPELL_REMOVE_SPINES             = 40354
 };
 
 enum Events
 {
-    EVENT_SPELL_BERSERK             = 1,
-    EVENT_TALK_CHECK                = 2
+    EVENT_TALK_CHECK                = 1,
+    EVENT_ENRAGE                    = 2
+};
+
+enum Misc
+{
+    ITEM_NAJENTUS_SPINE             = 32408
 };
 
 struct boss_najentus : public BossAI
 {
     boss_najentus(Creature* creature) : BossAI(creature, DATA_HIGH_WARLORD_NAJENTUS), _canTalk(true) { }
+
+    void Reset() override
+    {
+        _Reset();
+        me->m_Events.CancelEventGroup(EVENT_ENRAGE);
+        DoCastSelf(SPELL_REMOVE_SPINES);
+    }
 
     void JustEngagedWith(Unit* who) override
     {
@@ -57,12 +72,12 @@ struct boss_najentus : public BossAI
 
         BossAI::JustEngagedWith(who);
         Talk(SAY_AGGRO);
+        DoCastSelf(SPELL_REMOVE_SPINES);
 
-        ScheduleUniqueTimedEvent(8min, [&]
-        {
+        me->m_Events.AddEventAtOffset([this] {
             Talk(SAY_ENRAGE);
             DoCastSelf(SPELL_BERSERK, true);
-        }, EVENT_SPELL_BERSERK);
+        }, 8min, EVENT_ENRAGE);
 
         ScheduleTimedEvent(25s, 100s, [&]
         {
@@ -93,7 +108,7 @@ struct boss_najentus : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->GetTypeId() == TYPEID_PLAYER && _canTalk)
+        if (victim->IsPlayer() && _canTalk)
         {
             Talk(SAY_SLAY);
             _canTalk = false;
@@ -107,6 +122,7 @@ struct boss_najentus : public BossAI
     void JustDied(Unit* killer) override
     {
         BossAI::JustDied(killer);
+        me->m_Events.CancelEventGroup(EVENT_ENRAGE);
         Talk(SAY_DEATH);
     }
 
@@ -150,10 +166,31 @@ class spell_najentus_hurl_spine : public SpellScript
     }
 };
 
+class spell_najentus_remove_spines : public SpellScript
+{
+    PrepareSpellScript(spell_najentus_remove_spines);
+
+    void RemoveSpines()
+    {
+        if (Unit* caster = GetCaster())
+        {
+            caster->GetMap()->DoForAllPlayers([&](Player* player)
+            {
+                player->DestroyItemCount(ITEM_NAJENTUS_SPINE, 5, true);
+            });
+        }
+    }
+
+    void Register() override
+    {
+        OnCast += SpellCastFn(spell_najentus_remove_spines::RemoveSpines);
+    }
+};
+
 void AddSC_boss_najentus()
 {
     RegisterBlackTempleCreatureAI(boss_najentus);
     RegisterSpellScript(spell_najentus_needle_spine);
     RegisterSpellScript(spell_najentus_hurl_spine);
+    RegisterSpellScript(spell_najentus_remove_spines);
 }
-

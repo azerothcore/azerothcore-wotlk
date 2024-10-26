@@ -124,13 +124,13 @@ INSERT INTO `worldstates` (`entry`, `value`, `comment`) VALUES
 	(3801, 0, NULL),
 	(3802, 1, NULL),
 	(20001, 1454691600, 'NextArenaPointDistributionTime'),
-	(20002, 1706158800, 'NextWeeklyQuestResetTime'),
-	(20003, 1705813200, 'NextBGRandomDailyResetTime'),
+	(20002, 1721275200, 'NextWeeklyQuestResetTime'),
+	(20003, 1721275200, 'NextBGRandomDailyResetTime'),
 	(20004, 0, 'cleaning_flags'),
-	(20005, 1705813200, 'NextDailyQuestResetTime'),
-	(20006, 1705813200, 'NextGuildDailyResetTime'),
-	(20007, 1706763600, 'NextMonthlyQuestResetTime'),
-	(20008, 1705813200, NULL);
+	(20005, 1721275200, 'NextDailyQuestResetTime'),
+	(20006, 1721275200, 'NextGuildDailyResetTime'),
+	(20007, 1722484800, 'NextMonthlyQuestResetTime'),
+	(20008, 1721275200, NULL);
 
 /*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
 /*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;

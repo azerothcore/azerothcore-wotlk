@@ -18,14 +18,7 @@
 #ifndef RUBY_SANCTUM_H_
 #define RUBY_SANCTUM_H_
 
-#include "Creature.h"
 #include "CreatureAIImpl.h"
-#include "GameObjectAI.h"
-#include "Map.h"
-#include "Opcodes.h"
-#include "PassiveAI.h"
-#include "Player.h"
-#include "SpellScript.h"
 
 #define DataHeader "RS"
 

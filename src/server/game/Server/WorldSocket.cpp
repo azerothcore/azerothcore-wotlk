@@ -30,8 +30,8 @@
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldSession.h"
-#include <memory>
 #include "zlib.h"
+#include <memory>
 
 using boost::asio::ip::tcp;
 

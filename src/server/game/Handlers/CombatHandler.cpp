@@ -19,7 +19,6 @@
 #include "CreatureAI.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
-#include "ObjectDefines.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "Vehicle.h"
@@ -84,9 +83,13 @@ void WorldSession::HandleSetSheathedOpcode(WorldPackets::Combat::SetSheathed& pa
 
 void WorldSession::SendAttackStop(Unit const* enemy)
 {
-    WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));         // we guess size
+    WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4)); // we guess size
     data << GetPlayer()->GetPackGUID();
-    data << (enemy ? enemy->GetPackGUID() : PackedGuid());  // must be packed guid
-    data << uint32(0);                                      // unk, can be 1 also
+
+    if (enemy)
+    {
+        data << enemy->GetPackGUID();               // must be packed guid
+        data << (uint32)enemy->isDead();
+    }
     SendPacket(&data);
 }

@@ -187,7 +187,7 @@ void Quest::LoadQuestTemplateAddon(Field* fields)
     RequiredMaxRepValue = fields[14].Get<int32>();
     StartItemCount = fields[15].Get<uint8>();
     RewardMailSenderEntry = fields[16].Get<uint32>();
-    SpecialFlags = fields[17].Get<uint8>();
+    SpecialFlags = fields[17].Get<uint32>();
 
     if ((SpecialFlags & QUEST_SPECIAL_FLAGS_AUTO_ACCEPT) && !sWorld->getBoolConfig(CONFIG_QUEST_IGNORE_AUTO_ACCEPT))
     {

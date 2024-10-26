@@ -64,7 +64,7 @@ void BattlefieldMgr::InitBattlefield()
     /* For Cataclysm: Tol Barad
        pBf = new BattlefieldTB;
        // respawn, init variables
-       if(!pBf->SetupBattlefield())
+       if (!pBf->SetupBattlefield())
        {
        LOG_DEBUG("bg.battlefield", "Battlefield : Tol Barad init failed.");
        delete pBf;

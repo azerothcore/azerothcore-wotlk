@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `acore_string` (
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.acore_string: ~1 164 rows (approximately)
+-- Dumping data for table acore_world.acore_string: ~1 175 rows (approximately)
 DELETE FROM `acore_string`;
 INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES
 	(1, 'You should select a character or a creature.', NULL, NULL, 'Ihr solltet einen Charakter oder eine Kreatur auswählen.', '你必须选择一个目标或者生物。', NULL, 'Debes seleccionar un personaje o una criatura.', 'Debes seleccionar un personaje o una criatura.', NULL),
@@ -385,6 +385,14 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(362, 'Waterwalk: %s.', NULL, NULL, NULL, '水上行走: %s。', NULL, NULL, NULL, NULL),
 	(363, 'Player %s cannot whisper you any longer.', NULL, NULL, NULL, '玩家 %s 已屏蔽向你发送悄悄话。', NULL, NULL, NULL, NULL),
 	(364, 'Taxinodes: %s.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(365, '|cffffffff%d|r equipped items deleted for %s', NULL, '|cffffffff%d|r objets équipés supprimés pour %s', NULL, NULL, NULL, NULL, NULL, NULL),
+	(366, '|cffffffff%d|r items in equipped bags deleted for %s', NULL, '|cffffffff%d|r objets supprimés dans les sacs de %s', NULL, NULL, NULL, NULL, NULL, NULL),
+	(367, '|cffffffff%d|r items in bank deleted for %s', NULL, '|cffffffff%d|r objets supprimés de la banque de %s', NULL, NULL, NULL, NULL, NULL, NULL),
+	(368, '|cffffffff%d|r keys in keyring deleted for %s', NULL, '|cffffffff%d|r objets supprimés du porte-clés de %s', NULL, NULL, NULL, NULL, NULL, NULL),
+	(369, '|cffffffff%d|r currencies deleted for %s', NULL, '|cffffffff%d|r types de monnaies supprimées l\'inventaire de %s', NULL, NULL, NULL, NULL, NULL, NULL),
+	(370, '|cffffffff%d|r items in vendors buyback deleted for %s', NULL, '|cffffffff%d|r objets supprimés dans l\'onglet rachat des vendeurs pour %s', NULL, NULL, NULL, NULL, NULL, NULL),
+	(371, 'All items were deleted for %s :\n|cffffffff%d|r items equipped\n|cffffffff%d|r items in bags\n|cffffffff%d|r items in bank\n|cffffffff%d|r keys in keyring\n|cffffffff%d|r currency types\n|cffffffff%d|r items in vendor buyback', NULL, 'Tous les objets de %s ont été supprimés :\n|cffffffff%d|r objet équipés\n|cffffffff%d|r objets dans les sacs\n|cffffffff%d|r objets en banque\n|cffffffff%d|r clés dans le porte-clés\n|cffffffff%d|r types de monnaies\n|cffffffff%d|r objets dans l\'onglet rachat des vendeurs', NULL, NULL, NULL, NULL, NULL, NULL),
+	(372, 'All items were deleted for %s (bags included):\n|cffffffff%d|r equipped\n|cffffffff%d|r items in bags\n|cffffffff%d|r items in bank\n|cffffffff%d|r keys in keyring\n|cffffffff%d|r currency types\n|cffffffff%d|r items in vendor buyback\n|cffffffff%d|r standard bags\n|cffffffff%d|r bank bags', NULL, 'Tous les objets de %s ont été supprimés (sacs y-compris):\n|cffffffff%d|r objet équipés\n|cffffffff%d|r objets dans les sacs\n|cffffffff%d|r objets en banque\n|cffffffff%d|r clés dans le porte-clés\n|cffffffff%d|r types de monnaies\n|cffffffff%d|r objets dans l\'onglet rachat des vendeurs\n|cffffffff%d|r sacs standard\n|cffffffff%d|r sacs de banque', NULL, NULL, NULL, NULL, NULL, NULL),
 	(400, '|cffff0000[System Message]:|rScripts reloaded', NULL, NULL, '|cffff0000[System-Nachricht]:|rScripts neu geladen', '|cffff0000[系统消息]:|r脚本加载完毕。', NULL, NULL, NULL, NULL),
 	(401, 'You change security level of account %s to %i.', NULL, NULL, 'Ihr ändert die Berechtigungsstufe von %s auf %i.', '你已经将 %s 的账号级别调整至 %i。', NULL, NULL, NULL, NULL),
 	(402, '%s changed your security level to %i.', NULL, NULL, '%s hat Eure Berechtigungsstufe auf %i geändert.', '%s 已经将你的账号级别调整至 %i。', NULL, NULL, NULL, NULL),
@@ -497,7 +505,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(509, '%d - sender: %s (guid: %u account: %u ) receiver: %s (guid: %u account: %u ) %s', NULL, NULL, '%d - Absender: %s (Guid: %u Account: %u ) Empfänger: %s (Guid: %u Account: %u ) %s', '%d- 寄件人: %s(guid: %u 帐户: %u) 接收器: %s(guid: %u 帐户: %u)%s', NULL, NULL, NULL, NULL),
 	(510, '%d - owner: %s (guid: %u account: %u ) %s', NULL, NULL, '%d - Besitzer: %s (Guid: %u Account: %u ) %s', '%d- 拥有者: %s(guid: %u 帐户: %u)%s', NULL, NULL, NULL, NULL),
 	(511, 'Wrong link type!', NULL, NULL, 'Falscher Linktyp!', '类型错误的链接！', NULL, NULL, NULL, NULL),
-	(512, '%d - |cffffffff|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r ', NULL, NULL, '%d - |cffffffff|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r ', '%d - |cffffffff|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r', NULL, NULL, NULL, NULL),
+	(512, '%d - |c%x|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r ', NULL, NULL, '%d - |c%x|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r ', '%d - |c%x|Hitem:%d:0:0:0:0:0:0:0:0|h[%s]|h|r', NULL, NULL, NULL, NULL),
 	(513, '%d - |cffffffff|Hquest:%d:%d|h[%s]|h|r %s', NULL, NULL, '%d - |cffffffff|Hquest:%d:%d|h[%s]|h|r %s', '%d - |cffffffff|H 任务:%d:%d|h[%s]|h|r %s', NULL, NULL, NULL, NULL),
 	(514, '%d - |cffffffff|Hcreature_entry:%d|h[%s]|h|r ', NULL, NULL, '%d - |cffffffff|Hcreature_entry:%d|h[%s]|h|r ', '%d - |cffffffff|H 生物输入:%d|h[%s]|h|r', NULL, NULL, NULL, NULL),
 	(515, '%d - (entry: %d) |cffffffff|Hcreature:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r', NULL, NULL, '%d - (entry: %d) |cffffffff|Hcreature:%d|h[%s X:%f Y:%f Z:%f MapId:%d]|h|r', '%d%s - (entry: %d) |cffffffff|H生物:%d|h[%s X:%f Y:%f Z:%f 地图号:%d]|h|r', NULL, NULL, NULL, NULL),
@@ -587,6 +595,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(599, 'No gamemasters.', NULL, NULL, 'Keine Gamemaster vorhanden.', '没有游戏管理员。', NULL, NULL, NULL, NULL),
 	(600, 'Event %u (%s) is started', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(601, 'Event %u (%s) is stopped', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(602, ' [rewarded]', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(705, 'You must wait %s before speaking again.', NULL, NULL, 'Ihr müsst %s warten bevor Ihr wieder sprechen könnt', '你必须等待 %s 才能继续喊话。', NULL, NULL, NULL, NULL),
 	(706, 'This item(s) have problems with equipping/storing in inventory.', NULL, NULL, 'Diese(s) Item(s) hat/haben Probleme mit dem ausrüsten/lagern im Inventar', '这些道具在装备/存放中出现一个问题。', NULL, NULL, NULL, NULL),
 	(707, '%s does not wish to be disturbed: %s', NULL, NULL, '%s möchte nicht gestört werden und kann keine Flüsternachrichten erhalten: %s ', '%s 免打扰状态下无法收到悄悄话: %s', NULL, NULL, NULL, NULL),
@@ -929,6 +938,8 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
 	(2028, 'All closed tickets were deleted and counter is reseted to |cffff00ff 1|r', NULL, NULL, 'Alle geschlossenen Tickets wurden gelöscht und der Ticketzähler auf |cffff00ff 1|r zurückgesetzt.', '投票全部被删除，计数器已经被重置到 |cffff00ff 1|r', NULL, NULL, NULL, NULL),
 	(2029, '|cff00ff00Ticket Response|r: [%s]|r', NULL, NULL, NULL, '|cff00ff00意见回复|r: [%s]|r', NULL, NULL, NULL, NULL),
 	(2030, '|cff00ff00Completed by|r:|cff00ccff %s|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(2031, '|cff00ff00Response Appended|r:|cff00ccff [%s]|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+	(2032, '|cff00ff00Response deleted by|r:|cff00ccff %s|r', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 	(5000, 'You froze player %s.', NULL, NULL, 'Ihr habt Spieler %s eingefroren', '玩家 %s 被你冻结了。', NULL, NULL, NULL, NULL),
 	(5001, 'It might be amusing but no... you cant freeze yourself!', NULL, NULL, 'Das könnte zwar recht lustig werden, aber nein... ihr könnt euch nicht selbst einfrieren!', '这可能非常有趣的，但没有...你不能冻结你自己！', NULL, NULL, NULL, NULL),
 	(5002, 'Invalid input check the name of target.', NULL, NULL, 'Falsche Eingabe! Überprüfe den Namen des Ziels.', '检测到输入了无效的目标名称。', NULL, NULL, NULL, NULL),

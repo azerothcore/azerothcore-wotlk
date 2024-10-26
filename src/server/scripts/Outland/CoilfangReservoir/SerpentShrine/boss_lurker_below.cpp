@@ -17,9 +17,12 @@
 
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "serpent_shrine.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 enum Spells
 {

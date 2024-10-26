@@ -45,9 +45,9 @@ enum Spells
     SPELL_HIVEZARA_SWARMER_TELEPORT_5       = 25828,
     SPELL_HIVEZARA_SWARMER_TELEPORT_TRIGGER = 25830,
     SPELL_HIVEZARA_SWARMER_START_LOOP       = 25711,
-    SPELL_HIVEZARA_SWARMER_LOOP_1           = 25833,
-    SPELL_HIVEZARA_SWARMER_LOOP_2           = 25834,
-    SPELL_HIVEZARA_SWARMER_LOOP_3           = 25835,
+    SPELL_HZ_SWARMER_LOOP_1                 = 25833,
+    SPELL_HZ_SWARMER_LOOP_2                 = 25834,
+    SPELL_HZ_SWARMER_LOOP_3                 = 25835,
     SPELL_HIVEZARA_SWARMER_SWARM            = 25844
 };
 
@@ -105,16 +105,13 @@ struct boss_ayamiss : public BossAI
 
     void JustSummoned(Creature* who) override
     {
-        switch (who->GetEntry())
+        if (who->GetEntry() == NPC_HIVEZARA_SWARMER)
         {
-            case NPC_HIVEZARA_SWARMER:
-                who->CastSpell(who, SPELL_HIVEZARA_SWARMER_TELEPORT_TRIGGER, true);
-                _swarmers.push_back(who->GetGUID());
-                break;
-            case NPC_HIVEZARA_LARVA:
-                who->GetMotionMaster()->MovePoint(POINT_PARALYZE, AltarPos);
-                break;
+            who->CastSpell(who, SPELL_HIVEZARA_SWARMER_TELEPORT_TRIGGER, true);
+            _swarmers.push_back(who->GetGUID());
         }
+        else if (who->GetEntry() == NPC_HIVEZARA_LARVA)
+            who->GetMotionMaster()->MovePoint(POINT_PARALYZE, AltarPos);
 
         summons.Summon(who);
     }
@@ -122,9 +119,7 @@ struct boss_ayamiss : public BossAI
     void MovementInform(uint32 type, uint32 id) override
     {
         if (type == POINT_MOTION_TYPE && id == POINT_AIR)
-        {
             me->AddUnitState(UNIT_STATE_ROOT);
-        }
         else if (type == WAYPOINT_MOTION_TYPE && id == POINT_GROUND)
         {
             me->SetCombatMovement(true);
@@ -133,10 +128,7 @@ struct boss_ayamiss : public BossAI
             me->m_Events.AddEventAtOffset([this]()
             {
                 me->SetReactState(REACT_AGGRESSIVE);
-                if (me->GetVictim())
-                {
-                    me->GetMotionMaster()->MoveChase(me->GetVictim());
-                }
+                me->ResumeChasingVictim();
 
             }, 1s);
 
@@ -164,9 +156,7 @@ struct boss_ayamiss : public BossAI
             DoCastAOE(SPELL_SUMMON_HIVEZARA_SWARMER, true);
 
             if (_swarmers.size() >= MAX_SWARMER_COUNT)
-            {
                 DoCastAOE(SPELL_HIVEZARA_SWARMER_SWARM, true);
-            }
 
             context.Repeat(RAND(2400ms, 3600ms));
         }).Schedule(15s, 28s, [this](TaskContext context) {
@@ -185,15 +175,9 @@ struct boss_ayamiss : public BossAI
         if (action == ACTION_SWARMER_SWARM)
         {
             for (ObjectGuid const& guid : _swarmers)
-            {
                 if (Creature* swarmer = me->GetMap()->GetCreature(guid))
-                {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    {
                         swarmer->AI()->AttackStart(target);
-                    }
-                }
-            }
 
             _swarmers.clear();
         }
@@ -231,17 +215,14 @@ struct npc_hive_zara_larva : public ScriptedAI
     npc_hive_zara_larva(Creature* creature) : ScriptedAI(creature)
     {
         _instance = me->GetInstanceScript();
+        me->SetReactState(REACT_PASSIVE);
     }
 
     void MovementInform(uint32 type, uint32 id) override
     {
         if (type == POINT_MOTION_TYPE && id == POINT_PARALYZE)
-        {
             if (Player* target = ObjectAccessor::GetPlayer(*me, _instance->GetGuidData(DATA_PARALYZED)))
-            {
                 DoCast(target, SPELL_FEED);
-            }
-        }
     }
 
     void JustSummoned(Creature* summon) override
@@ -253,29 +234,6 @@ struct npc_hive_zara_larva : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
-            return;
-
-        ScriptedAI::MoveInLineOfSight(who);
-    }
-
-    void AttackStart(Unit* victim) override
-    {
-        if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
-            return;
-
-        ScriptedAI::AttackStart(victim);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (_instance->GetBossState(DATA_AYAMISS) == IN_PROGRESS)
-            return;
-
-        ScriptedAI::UpdateAI(diff);
-    }
 private:
     InstanceScript* _instance;
 };
@@ -369,7 +327,7 @@ class spell_ayamiss_swarmer_start_loop : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_HIVEZARA_SWARMER_LOOP_1, SPELL_HIVEZARA_SWARMER_LOOP_2, SPELL_HIVEZARA_SWARMER_LOOP_3 });
+        return ValidateSpellInfo({ SPELL_HZ_SWARMER_LOOP_1, SPELL_HZ_SWARMER_LOOP_2, SPELL_HZ_SWARMER_LOOP_3 });
     }
 
     bool Load() override
@@ -379,8 +337,7 @@ class spell_ayamiss_swarmer_start_loop : public SpellScript
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        uint32 loopSpells[3] = { SPELL_HIVEZARA_SWARMER_LOOP_1, SPELL_HIVEZARA_SWARMER_LOOP_2, SPELL_HIVEZARA_SWARMER_LOOP_3 };
-        GetCaster()->CastSpell((Unit*)nullptr, Acore::Containers::SelectRandomContainerElement(loopSpells));
+        GetCaster()->GetAI()->DoCastAOE(RAND(SPELL_HZ_SWARMER_LOOP_1, SPELL_HZ_SWARMER_LOOP_2, SPELL_HZ_SWARMER_LOOP_3));
     }
 
     void Register() override
@@ -428,4 +385,3 @@ void AddSC_boss_ayamiss()
     RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_2", (NPC_HIVEZARA_SWARMER + 6) * 10);
     RegisterSpellScriptWithArgs(spell_gen_ayamiss_swarmer_loop, "spell_gen_ayamiss_swarmer_loop_3", (NPC_HIVEZARA_SWARMER + 7) * 10);
 }
-

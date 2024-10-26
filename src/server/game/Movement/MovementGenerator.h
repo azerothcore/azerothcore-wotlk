@@ -18,11 +18,9 @@
 #ifndef ACORE_MOVEMENTGENERATOR_H
 #define ACORE_MOVEMENTGENERATOR_H
 
-#include "Common.h"
 #include "Define.h"
 #include "FactoryHolder.h"
 #include "MotionMaster.h"
-#include "ObjectRegistry.h"
 
 class Unit;
 

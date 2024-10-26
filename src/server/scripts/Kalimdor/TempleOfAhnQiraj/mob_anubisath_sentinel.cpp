@@ -357,4 +357,3 @@ void AddSC_npc_anubisath_sentinel()
     RegisterSpellScript(spell_anubisath_mortal_strike);
     RegisterSpellScript(spell_mana_burn_area);
 }
-

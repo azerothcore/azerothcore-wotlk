@@ -31,7 +31,6 @@ npc_clintar_dreamwalker
 EndContentData */
 
 #include "Cell.h"
-#include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"

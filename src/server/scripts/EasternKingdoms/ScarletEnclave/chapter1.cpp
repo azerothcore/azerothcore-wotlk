@@ -29,7 +29,6 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-#include "Vehicle.h"
 
  /*######
  ## npc_eye_of_acherus
@@ -63,7 +62,7 @@ struct npc_eye_of_acherus : public ScriptedAI
 {
     npc_eye_of_acherus(Creature* creature) : ScriptedAI(creature)
     {
-        creature->SetDisplayId(creature->GetCreatureTemplate()->Modelid1);
+        creature->SetDisplayFromModel(0);
         creature->SetReactState(REACT_PASSIVE);
     }
 
@@ -290,7 +289,7 @@ public:
                 _duelInProgress = true;
 
                 timer = 600000; // clear playerGUIDs after 10 minutes if no one initiates a duel
-                me->GetMotionMaster()->MoveFollow(caster, 2.0f, 0.0f);
+                me->SetFacingToObject(caster);
 
                 events.ScheduleEvent(EVENT_SPEAK, 3s);
                 events.ScheduleEvent(EVENT_SPEAK + 1, 7s);
@@ -968,7 +967,7 @@ public:
         {
             me->SetImmuneToAll(true);
             me->SetFaction(FACTION_FRIENDLY);
-            me->SetDisplayId(me->GetCreatureTemplate()->Modelid1); // Modelid2 is a horse.
+            me->SetDisplayFromModel(0); // Modelid2 is a horse.
         }
 
         ObjectGuid minerGUID;
@@ -1257,4 +1256,3 @@ void AddSC_the_scarlet_enclave_c1()
 
     RegisterSpellScript(spell_death_knight_initiate_visual);
 }
-

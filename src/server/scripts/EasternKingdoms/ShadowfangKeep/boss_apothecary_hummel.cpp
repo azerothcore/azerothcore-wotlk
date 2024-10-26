@@ -16,6 +16,7 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiersImpl.h"
 #include "Group.h"
 #include "LFGMgr.h"
 #include "Player.h"
@@ -26,7 +27,6 @@
 #include "SpellScriptLoader.h"
 #include "TaskScheduler.h"
 #include "shadowfang_keep.h"
-#include "GridNotifiersImpl.h"
 
 enum ApothecarySpells
 {
@@ -531,4 +531,3 @@ void AddSC_boss_apothecary_hummel()
     RegisterSpellScript(spell_apothecary_perfume_spill);
     RegisterSpellScript(spell_apothecary_cologne_spill);
 }
-

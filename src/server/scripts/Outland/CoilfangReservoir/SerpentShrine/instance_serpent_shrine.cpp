@@ -19,10 +19,12 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "ScriptedCreature.h"
 #include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "serpent_shrine.h"
-#include "ScriptedCreature.h"
+#include "SpellAuraEffects.h"
+#include "SpellScript.h"
 
 DoorData const doorData[] =
 {
@@ -376,4 +378,3 @@ void AddSC_instance_serpentshrine_cavern()
     RegisterSerpentShrineAI(npc_rancid_mushroom);
     RegisterSpellScript(spell_rancid_spore_cloud);
 }
-

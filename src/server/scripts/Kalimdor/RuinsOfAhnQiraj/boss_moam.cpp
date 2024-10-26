@@ -204,4 +204,3 @@ void AddSC_boss_moam()
     RegisterSpellScript(spell_moam_mana_drain_filter);
     RegisterSpellScript(spell_moam_summon_mana_fiends);
 }
-

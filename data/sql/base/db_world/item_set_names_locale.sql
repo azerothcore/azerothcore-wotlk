@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `item_set_names_locale` (
   PRIMARY KEY (`ID`,`locale`) USING BTREE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dumping data for table acore_world.item_set_names_locale: ~14 855 rows (approximately)
+-- Dumping data for table acore_world.item_set_names_locale: ~14 628 rows (approximately)
 DELETE FROM `item_set_names_locale`;
 INSERT INTO `item_set_names_locale` (`ID`, `locale`, `Name`, `VerifiedBuild`) VALUES
 	(6473, 'deDE', 'Rüstung des Giftzahns', 15050),

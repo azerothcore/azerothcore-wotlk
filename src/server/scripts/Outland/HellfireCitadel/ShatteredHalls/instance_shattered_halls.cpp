@@ -207,4 +207,3 @@ void AddSC_instance_shattered_halls()
     new instance_shattered_halls();
     new at_shattered_halls_execution();
 }
-

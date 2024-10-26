@@ -11,17 +11,16 @@
 #
 
 if(WIN32)
- set(BOOST_DEBUG ON)
   if(DEFINED ENV{Boost_ROOT})
     set(Boost_ROOT $ENV{Boost_ROOT})
-    list(APPEND BOOST_LIBRARYDIR
-    ${Boost_ROOT}/lib${PLATFORM}-msvc-14.2)
   endif()
 
   set(Boost_USE_STATIC_LIBS        ON)
   set(Boost_USE_MULTITHREADED      ON)
   set(Boost_USE_STATIC_RUNTIME     OFF)
 endif()
+
+set(Boost_NO_WARN_NEW_VERSIONS ON)
 
 include (CheckCXXSourceCompiles)
 
@@ -39,20 +38,6 @@ if(NOT Boost_FOUND)
     message(FATAL_ERROR "No Boost_ROOT environment variable could be found! Please make sure it is set and the points to your Boost installation.")
   endif()
 endif()
-
-# Find if Boost was compiled in C++03 mode because it requires -DBOOST_NO_CXX11_SCOPED_ENUMS
-
-set(CMAKE_REQUIRED_INCLUDES ${Boost_INCLUDE_DIR})
-set(CMAKE_REQUIRED_LIBRARIES ${Boost_SYSTEM_LIBRARY} ${Boost_FILESYSTEM_LIBRARY} ${Boost_IOSTREAMS_LIBRARY})
-set(CMAKE_REQUIRED_FLAGS "-std=c++11")
-check_cxx_source_compiles("
-  #include <boost/filesystem/path.hpp>
-  #include <boost/filesystem/operations.hpp>
-  int main() { boost::filesystem::copy_file(boost::filesystem::path(), boost::filesystem::path()); }"
-boost_filesystem_copy_links_without_NO_SCOPED_ENUM)
-unset(CMAKE_REQUIRED_INCLUDES)
-unset(CMAKE_REQUIRED_LIBRARIES)
-unset(CMAKE_REQUIRED_FLAGS)
 
 add_library(boost INTERFACE)
 
@@ -74,13 +59,3 @@ target_compile_definitions(boost
     -DBOOST_ASIO_NO_DEPRECATED
     -DBOOST_SYSTEM_USE_UTF8
     -DBOOST_BIND_NO_PLACEHOLDERS)
-
-if (NOT boost_filesystem_copy_links_without_NO_SCOPED_ENUM)
-  target_compile_definitions(boost
-    INTERFACE
-      -DBOOST_NO_CXX11_SCOPED_ENUMS)
-endif()
-
-target_compile_definitions(boost
-  INTERFACE
-    -DAC_HAS_BROKEN_WSTRING_REGEX)

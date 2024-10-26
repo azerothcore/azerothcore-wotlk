@@ -19,7 +19,6 @@
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
 #include "MiscPackets.h"
-#include "Opcodes.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"

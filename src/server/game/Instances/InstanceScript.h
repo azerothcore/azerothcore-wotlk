@@ -275,6 +275,10 @@ public:
 
     void LoadInstanceSavedGameobjectStateData();
 
+    [[nodiscard]] bool IsBossDone(uint32 bossId) const { return GetBossState(bossId) == DONE; };
+    [[nodiscard]] bool AllBossesDone() const;
+    [[nodiscard]] bool AllBossesDone(std::initializer_list<uint32> bossIds) const;
+
     TaskScheduler scheduler;
 protected:
     void SetHeaders(std::string const& dataHeaders);
