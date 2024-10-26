@@ -1,3 +1,4 @@
+-- DB update 2024_10_26_01 -> 2024_10_26_02
 -- Update gameobject 'Hallow's End - Misc' with sniffed values
 
 -- assign damage script to Bonfire
