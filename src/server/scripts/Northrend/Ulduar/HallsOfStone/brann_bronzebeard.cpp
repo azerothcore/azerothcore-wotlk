@@ -153,7 +153,7 @@ static Yells Conversation[] =
     {13769, "System online. Life form pattern recognized. Welcome, Branbronzan. Query?", NPC_ABEDNEUM, 322000},
     {14263, "Query? What do you think I'm here for, tea and biscuits? Spill the beans already!", NPC_BRANN, 330000},
     {14264, "Tell me how the dwarves came to be, and start at the beginning!", NPC_BRANN, 336000},
-    {13770, "Accessing prehistoric data... retrieved. In the beginning the earthen were created to--", NPC_ABEDNEUM, 341000}, 
+    {13770, "Accessing prehistoric data... retrieved. In the beginning the earthen were created to--", NPC_ABEDNEUM, 341000},
     {14265, "Right, right... I know the earthen were made from stone to shape the deep regions o' the world. But what about the anomalies? Matrix non-stabilizin' and what-not?", NPC_BRANN, 348000},
     {13771, "Accessing... In the early stages of it's development cycle, Azeroth suffered infection by parasitic necrophotic symbiotes.", NPC_ABEDNEUM, 360000},
     {14266, "Necrowhatinthe-- Speak bloody Common, will ye?", NPC_BRANN, 372000},
@@ -477,7 +477,7 @@ public:
         void UpdateEscortAI(uint32 diff) override
         {
             events.Update(diff);
-            
+
             if (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)

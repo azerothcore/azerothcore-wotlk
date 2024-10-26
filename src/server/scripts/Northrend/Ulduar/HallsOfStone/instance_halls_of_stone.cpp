@@ -255,7 +255,7 @@ public:
                             }
                         }
                     }
-                    else 
+                    else
                     {
                         //Kaddrak talk
                         if (pK->GetGoState() != GO_STATE_ACTIVE)
@@ -268,7 +268,7 @@ public:
                         }
                     }
 
-                    if(!skyRoomDown)
+                    if (!skyRoomDown)
                         pF->SetGoState(GO_STATE_ACTIVE);
                 }
 
