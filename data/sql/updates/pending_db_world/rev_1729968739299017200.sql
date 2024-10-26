@@ -1,5 +1,3 @@
---new Brann waypoints
-
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (51000, 'spell_hos_dark_matter_size');
 
 DELETE FROM `script_waypoint` WHERE `entry` IN (28070);
