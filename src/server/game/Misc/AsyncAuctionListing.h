@@ -20,8 +20,6 @@
 
 #include "AuctionHouseMgr.h"
 
-#include <mutex>
-
 class AuctionListOwnerItemsDelayEvent : public BasicEvent
 {
 public:

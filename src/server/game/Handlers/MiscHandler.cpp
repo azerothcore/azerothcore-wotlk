@@ -45,7 +45,6 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
-#include "UpdateData.h"
 #include "Vehicle.h"
 #include "WhoListCacheMgr.h"
 #include "World.h"
