@@ -886,8 +886,6 @@ void Player::FailQuest(uint32 questId)
         if ((qStatus != QUEST_STATUS_INCOMPLETE) && (!quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_CAN_FAIL_IN_ANY_STATE)))
             return;
 
-        SetQuestStatus(questId, QUEST_STATUS_FAILED);
-
         uint16 log_slot = FindQuestSlot(questId);
 
         if (log_slot < MAX_QUEST_LOG_SIZE)
@@ -907,6 +905,8 @@ void Player::FailQuest(uint32 questId)
         }
         else
             SendQuestFailed(questId);
+
+        SetQuestStatus(questId, QUEST_STATUS_FAILED);
 
         // Destroy quest items on quest failure.
         for (uint8 i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
