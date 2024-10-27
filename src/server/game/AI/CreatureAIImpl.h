@@ -18,9 +18,7 @@
 #ifndef CREATUREAIIMPL_H
 #define CREATUREAIIMPL_H
 
-#include "CreatureAI.h"
 #include "Define.h"
-#include "SpellMgr.h"
 #include "TemporarySummon.h"
 
 template<typename First, typename Second, typename... Rest>

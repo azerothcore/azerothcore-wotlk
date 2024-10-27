@@ -19,7 +19,6 @@
 #define OUTDOOR_PVP_H_
 
 #include "SharedDefines.h"
-#include "Util.h"
 #include "ZoneScript.h"
 #include <array>
 
