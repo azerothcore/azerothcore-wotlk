@@ -30,7 +30,6 @@
 #include "LFGGroupData.h"
 #include "LFGPlayerData.h"
 #include "LFGQueue.h"
-#include "LFGScripts.h"
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"

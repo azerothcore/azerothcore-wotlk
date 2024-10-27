@@ -25,8 +25,6 @@
 #include "MapUpdater.h"
 #include "Object.h"
 
-#include <mutex>
-
 class Transport;
 class StaticTransport;
 class MotionTransport;
