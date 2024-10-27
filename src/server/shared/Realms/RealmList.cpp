@@ -21,6 +21,7 @@
 #include "IoContext.h"
 #include "Log.h"
 #include "Resolver.h"
+#include "QueryResult.h"
 #include "Util.h"
 #include <boost/asio/ip/tcp.hpp>
 
