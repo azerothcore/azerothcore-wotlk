@@ -131,13 +131,14 @@ public:
             me->setActive(true);
             events.Reset();
             events.RescheduleEvent(EVENT_SPELL_FEL_FIREBALL, 5s);
-            events.RescheduleEvent(EVENT_SPELL_FEL_LIGHTNING, 10s, 15s);
-            events.RescheduleEvent(EVENT_SPELL_INCINERATE_FLESH, 24s, 26s);
-            events.RescheduleEvent(EVENT_SPELL_NETHER_POWER, 25s, 45s);
+            events.RescheduleEvent(EVENT_SPELL_FEL_LIGHTNING, 10s);
+            events.RescheduleEvent(EVENT_SPELL_INCINERATE_FLESH, 20s);
+            events.RescheduleEvent(EVENT_SPELL_NETHER_POWER, 15s);
             events.RescheduleEvent(EVENT_SPELL_LEGION_FLAME, 30s);
             //if (GetDifficulty() == RAID_DIFFICULTY_25MAN_HEROIC )
             //  events.RescheduleEvent(EVENT_SPELL_TOUCH_OF_JARAXXUS, 10s, 15s);
-            events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 20s); // it schedules EVENT_SUMMON_VOLCANO
+            events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 20s); 
+            events.RescheduleEvent(EVENT_SUMMON_VOLCANO, 80s); 
 
             me->RemoveAura(SPELL_CHAINS);
             Talk(SAY_AGGRO);
@@ -209,12 +210,12 @@ public:
                 case EVENT_SPELL_FEL_FIREBALL:
                     if (me->GetVictim())
                         me->CastSpell(me->GetVictim(), SPELL_FEL_FIREBALL, false);
-                    events.Repeat(10s, 15s);
+                    events.Repeat(10s);
                     break;
                 case EVENT_SPELL_FEL_LIGHTNING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
                         me->CastSpell(target, SPELL_FEL_LIGHTNING, false);
-                    events.Repeat(10s, 15s);
+                    events.Repeat(10s);
                     break;
                 case EVENT_SPELL_INCINERATE_FLESH:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
@@ -223,12 +224,12 @@ public:
                         Talk(SAY_INCINERATE);
                         me->CastSpell(target, SPELL_INCINERATE_FLESH, false);
                     }
-                    events.Repeat(20s, 25s);
+                    events.Repeat(25s);
                     break;
                 case EVENT_SPELL_NETHER_POWER:
                     me->CastSpell(me, SPELL_NETHER_POWER, false);
-                    events.DelayEvents(5s);
-                    events.Repeat(25s, 45s);
+                    //events.DelayEvents(5s);
+                    events.Repeat(45s);
                     break;
                 case EVENT_SPELL_LEGION_FLAME:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, true))
@@ -247,15 +248,16 @@ public:
                     Talk(EMOTE_NETHER_PORTAL);
                     Talk(SAY_MISTRESS_OF_PAIN);
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_NETHER_PORTAL, false);
-
-                    events.RescheduleEvent(EVENT_SUMMON_VOLCANO, 1min);
+                    events.Repeat(120s);
+                    //events.RescheduleEvent(EVENT_SUMMON_VOLCANO, 1min);
                     break;
                 case EVENT_SUMMON_VOLCANO:
                     Talk(EMOTE_INFERNAL_ERUPTION);
                     Talk(SAY_INFERNAL_ERUPTION);
+		            me->ClearProhibitedSpellTimers();
                     me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOLCANO, false);
-
-                    events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 1min);
+                    events.Repeat(120s);
+                    //events.RescheduleEvent(EVENT_SUMMON_NETHER_PORTAL, 1min);
                     break;
             }
 
