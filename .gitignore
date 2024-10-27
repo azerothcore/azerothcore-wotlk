@@ -101,5 +101,6 @@ local.properties
 !modules/mod-solo-lfg-master
 !modules/mod-transmog
 !modules/mod-weekend-xp
+!modules/mod-server-auto-shutdown
 
 
