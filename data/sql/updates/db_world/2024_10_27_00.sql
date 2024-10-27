@@ -1,3 +1,4 @@
+-- DB update 2024_10_26_03 -> 2024_10_27_00
 -- Remove Iron Rune Laborers from creature_addon
 DELETE FROM `creature_addon`
 WHERE `guid` IN (
