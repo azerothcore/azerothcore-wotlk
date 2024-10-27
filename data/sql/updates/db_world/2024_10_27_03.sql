@@ -1,3 +1,4 @@
+-- DB update 2024_10_27_02 -> 2024_10_27_03
 -- Update gameobject 'Huge Sitting Skeleton 03' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (185456))
