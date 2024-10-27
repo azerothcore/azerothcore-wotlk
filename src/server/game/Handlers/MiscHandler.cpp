@@ -52,6 +52,8 @@
 #include "WorldSession.h"
 #include <zlib.h>
 
+#include "Corpse.h"
+
 void WorldSession::HandleRepopRequestOpcode(WorldPacket& recv_data)
 {
     LOG_DEBUG("network", "WORLD: Recvd CMSG_REPOP_REQUEST Message");
