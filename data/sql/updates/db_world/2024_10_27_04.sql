@@ -1,3 +1,4 @@
+-- DB update 2024_10_27_03 -> 2024_10_27_04
 -- miscelleanous cleanups of 'Hallow's End' gameobject spawns
 -- remove duplicate unrelated 'Keg' spawn
 DELETE FROM `gameobject` WHERE (`id` = 180570)
