@@ -33,11 +33,9 @@
 #include "Position.h"
 #include "SharedDefines.h"
 #include "TaskScheduler.h"
-#include "Timer.h"
 #include <bitset>
 #include <list>
 #include <memory>
-#include <mutex>
 #include <shared_mutex>
 
 class Unit;

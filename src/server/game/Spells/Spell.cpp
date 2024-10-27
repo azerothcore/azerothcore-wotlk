@@ -47,7 +47,6 @@
 #include "SpellScript.h"
 #include "TemporarySummon.h"
 #include "Unit.h"
-#include "UpdateData.h"
 #include "Util.h"
 #include "VMapFactory.h"
 #include "Vehicle.h"
@@ -60,6 +59,8 @@
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
+#include "IVMapMgr.h"
+#include "VMapMgr2.h"
 
 extern pEffect SpellEffects[TOTAL_SPELL_EFFECTS];
 
