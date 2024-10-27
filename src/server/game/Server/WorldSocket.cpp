@@ -33,6 +33,8 @@
 #include "zlib.h"
 #include <memory>
 
+#include "ServerPktHeader.h"
+
 using boost::asio::ip::tcp;
 
 void compressBuff(void* dst, uint32* dst_size, void* src, int src_size)
