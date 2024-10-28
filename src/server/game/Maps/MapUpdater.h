@@ -21,7 +21,6 @@
 #include "Define.h"
 #include "PCQueue.h"
 #include <condition_variable>
-#include <mutex>
 #include <thread>
 
 class Map;
