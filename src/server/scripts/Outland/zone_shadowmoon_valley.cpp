@@ -1915,11 +1915,23 @@ struct dragonmaw_race_npc : public ScriptedAI
     void StartRace()
     {
         me->SetWalk(false);
-        ScheduleTimedEvent(5s, [&]
+
+        ObjectGuid playerGUID = ObjectGuid::Empty;
+        if (_player)
+            playerGUID = _player->GetGUID();
+
+        ScheduleTimedEvent(5s, [playerGUID, this]
         {
-            if (!_player)
+            if (!_player || playerGUID.IsEmpty())
+            {
+                _player = nullptr;
                 FailQuest();
-            else if (!me->IsWithinDist(_player, 100.f))
+                return;
+            }
+
+            // Refresh pointer if player offline or on different map.
+            _player = ObjectAccessor::GetPlayer(me->GetMap(), playerGUID);
+            if (!me->IsWithinDist(_player, 100.f))
                 FailQuest();
         }, 5s);
     }
