@@ -1931,7 +1931,7 @@ struct dragonmaw_race_npc : public ScriptedAI
 
             // Refresh pointer if player offline or on different map.
             _player = ObjectAccessor::GetPlayer(me->GetMap(), playerGUID);
-            if (!me->IsWithinDist(_player, 100.f))
+            if (!_player || !me->IsWithinDist(_player, 100.f))
                 FailQuest();
         }, 5s);
     }
