@@ -227,7 +227,8 @@ public:
                     events.Repeat(25s);
                     break;
                 case EVENT_SPELL_NETHER_POWER:
-                    me->CastSpell(me, SPELL_NETHER_POWER, false);
+                    me->CastSpell(me, SPELL_NETHER_POWER, false);                    
+                    events.RescheduleEvent(EVENT_SPELL_FEL_LIGHTNING, 5s);                    
                     //events.DelayEvents(5s);
                     events.Repeat(45s);
                     break;
