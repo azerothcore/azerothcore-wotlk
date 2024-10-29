@@ -4506,6 +4506,11 @@ void Unit::_ApplyAura(AuraApplication* aurApp, uint8 effMask)
 {
     Aura* aura = aurApp->GetBase();
 
+    if ((this->IsTotem() || GetCreatureType() == CREATURE_TYPE_CRITTER || (IsPet() && !IsInCombat())) && aura->GetCaster() != this)
+    {
+        return;
+    }
+
     _RemoveNoStackAurasDueToAura(aura);
 
     if (aurApp->GetRemoveMode())
