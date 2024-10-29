@@ -21,6 +21,8 @@
 #include "Common.h"
 #include "ArenaTeamMgr.h"
 #include "ArenaTeam.h"
+#include "Tokenize.h"
+#include "StringConvert.h"
 #include <sstream>
 #include <string>
 #include <memory>
@@ -98,21 +100,11 @@ private:
     std::vector<uint8> ParseTypes(const std::string& userInput)
     {
         std::vector<uint8> validTypes;
-        std::istringstream ss(userInput);
-        std::string token;
+        auto tokens = Acore::Tokenize(userInput, ',', false);
 
-        while (std::getline(ss, token, ','))
-        {
-            try
-            {
-                uint8 type = static_cast<uint8>(std::stoi(token)); // Convert token to integer
-                validTypes.push_back(type);                        // Add to valid types vector
-            }
-            catch (const std::exception&)
-            {
-                // Ignore invalid tokens, could log or throw depending on requirements
-            }
-        }
+        for (const auto& token : tokens)
+            if (auto typeOpt = Acore::StringTo<uint8>(token))
+                validTypes.push_back(*typeOpt);
 
         return validTypes;
     }
