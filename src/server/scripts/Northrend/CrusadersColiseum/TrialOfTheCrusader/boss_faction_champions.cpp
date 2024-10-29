@@ -71,7 +71,7 @@ struct boss_faction_championsAI : public ScriptedAI
             UnitAI::AttackStartCaster(who, 18.5f);
     }
 
-    float GetThreatMod(float dist, float  /*armor*/, uint32 health, uint32 /*maxhealth*/, Unit* target)
+    float GetThreatMod(float dist, float  /*armor*/, uint32 health, uint32 maxhealth, Unit* target)
     {
         /*float mod_health = ((float)health)/maxhealth;
         if (mod_health < 0.4f) mod_health = 0.4f;
@@ -91,14 +91,23 @@ struct boss_faction_championsAI : public ScriptedAI
         return dist_mod * 30000.0f / eh;*/
 
         // third try:
-        float unimportant_dist = (mAIType == AI_MELEE || mAIType == AI_PET ? 5.0f : 35.0f);
+        /* float unimportant_dist = (mAIType == AI_MELEE || mAIType == AI_PET ? 5.0f : 35.0f);
         if (dist > unimportant_dist) dist -= unimportant_dist;
         else dist = 0.0f;
         const float dist_factor = (mAIType == AI_MELEE || mAIType == AI_PET ? 15.0f : 25.0f);
         float mod_dist = dist_factor / (dist_factor + dist); // 0.2 .. 1.0
         float mod_health = health > 40000 ? 2.0f : (60000 - health) / 10000.0f; // 2.0 .. 6.0
         float mod_armor = (mAIType == AI_MELEE || mAIType == AI_PET) ? Unit::CalcArmorReducedDamage(me, target, 10000, nullptr) / 10000.0f : 1.0f;
-        return mod_dist * mod_health * mod_armor;
+        return mod_dist * mod_health * mod_armor; */
+
+        //red scarf:
+        float unimportant_dist = (mAIType == AI_MELEE || mAIType == AI_PET ? 5.0f : 35.0f);
+        if (dist > unimportant_dist) dist -= unimportant_dist;
+        else dist = 0.0f;
+        const float dist_factor = (mAIType == AI_MELEE || mAIType == AI_PET ? 15.0f : 25.0f);
+        float mod_dist = dist_factor / (dist_factor + dist); // 0.2 .. 1.0
+        float mod_health = ((float)health) / maxhealth;
+        return mod_dist * mod_health;
     }
 
     void RecalculateThreat()
