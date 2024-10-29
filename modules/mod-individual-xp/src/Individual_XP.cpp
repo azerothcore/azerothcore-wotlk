@@ -34,7 +34,7 @@ public:
 
 enum IndividualXPAcoreString
 {
-    ACORE_STRING_CREDIT = 35411,
+    ACORE_STRING_CREDIT                 = 35411,
     ACORE_STRING_MODULE_DISABLED,
     ACORE_STRING_RATES_DISABLED,
     ACORE_STRING_COMMAND_VIEW,
@@ -155,7 +155,7 @@ public:
         }
         else
         {
-            player->GetSession()->SendAreaTriggerMessage(ACORE_STRING_COMMAND_VIEW, player->CustomData.GetDefault<PlayerXpRate>("IndividualXP")->XPRate);
+            ChatHandler(handler->GetSession()).PSendSysMessage(ACORE_STRING_COMMAND_VIEW, player->CustomData.GetDefault<PlayerXpRate>("IndividualXP")->XPRate);
         }
         return true;
     }
@@ -191,7 +191,7 @@ public:
         }
 
         player->CustomData.GetDefault<PlayerXpRate>("IndividualXP")->XPRate = rate;
-        player->GetSession()->SendAreaTriggerMessage(ACORE_STRING_COMMAND_SET, rate);
+        ChatHandler(handler->GetSession()).PSendSysMessage(ACORE_STRING_COMMAND_SET, rate);
         return true;
     }
 
@@ -249,7 +249,7 @@ public:
             return false;
 
         player->CustomData.GetDefault<PlayerXpRate>("IndividualXP")->XPRate = DefaultRate;
-        player->GetSession()->SendAreaTriggerMessage(ACORE_STRING_COMMAND_DEFAULT, DefaultRate);
+        ChatHandler(handler->GetSession()).PSendSysMessage(ACORE_STRING_COMMAND_DEFAULT, DefaultRate);
         return true;
     }
 };
