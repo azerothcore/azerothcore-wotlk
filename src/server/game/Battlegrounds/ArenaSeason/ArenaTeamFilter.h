@@ -102,7 +102,7 @@ private:
         std::vector<uint8> validTypes;
         auto tokens = Acore::Tokenize(userInput, ',', false);
 
-        for (const auto& token : tokens)
+        for (auto const& token : tokens)
             if (auto typeOpt = Acore::StringTo<uint8>(token))
                 validTypes.push_back(*typeOpt);
 
