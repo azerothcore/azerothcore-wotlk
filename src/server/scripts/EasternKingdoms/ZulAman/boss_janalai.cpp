@@ -130,7 +130,6 @@ struct boss_janalai : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        instance->SetData(DATA_JANALAI, NOT_STARTED);
         HatchAllEggs(HATCH_RESET);
         _isBombing = false;
         _isFlameBreathing = false;
@@ -153,7 +152,6 @@ struct boss_janalai : public BossAI
     void JustDied(Unit* killer) override
     {
         Talk(SAY_DEATH);
-        instance->SetData(DATA_JANALAI, DONE);
         BossAI::JustDied(killer);
     }
 
@@ -169,7 +167,6 @@ struct boss_janalai : public BossAI
     void JustEngagedWith(Unit* who) override
     {
         BossAI::JustEngagedWith(who);
-        instance->SetData(DATA_JANALAI, IN_PROGRESS);
         Talk(SAY_AGGRO);
         //schedule abilities
         ScheduleTimedEvent(30s, [&]{
