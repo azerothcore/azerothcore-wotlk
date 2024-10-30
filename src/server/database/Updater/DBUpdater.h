@@ -20,6 +20,7 @@
 
 #include "DatabaseEnv.h"
 #include "Define.h"
+#include "QueryResult.h"
 #include <filesystem>
 #include <string>
 

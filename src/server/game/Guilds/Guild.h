@@ -22,11 +22,9 @@
 #include "ObjectMgr.h"
 #include "Optional.h"
 #include "Player.h"
-#include "World.h"
 #include "WorldPacket.h"
 #include <set>
 #include <unordered_map>
-#include <unordered_set>
 
 class Item;
 

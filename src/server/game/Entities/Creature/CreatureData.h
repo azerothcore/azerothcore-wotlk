@@ -23,7 +23,6 @@
 #include "ItemTemplate.h"
 #include "LootMgr.h"
 #include "Unit.h"
-#include "World.h"
 #include <list>
 
 #define MAX_AGGRO_RESET_TIME 10 // in seconds

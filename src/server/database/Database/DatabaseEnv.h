@@ -31,7 +31,6 @@
 
 #include "PreparedStatement.h"
 #include "QueryCallback.h"
-#include "QueryResult.h"
 #include "Transaction.h"
 
 /// Accessor to the world database
