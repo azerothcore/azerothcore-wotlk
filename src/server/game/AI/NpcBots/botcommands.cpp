@@ -1453,7 +1453,7 @@ public:
         InstanceScript* script = map->ToInstanceMap()->GetInstanceScript();
         if (!script)
         {
-            handler->PSendSysMessage("Instance script is not found for map %u!", map->GetId());
+            handler->PSendSysMessage("Instance script is not found for map {}!", map->GetId());
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1485,13 +1485,13 @@ public:
                         break;
                     }
                     default:
-                        handler->PSendSysMessage("Unknown event %u for map %u!", *event_num, map->GetId());
+                        handler->PSendSysMessage("Unknown event {} for map {}!", *event_num, map->GetId());
                         handler->SetSentErrorMessage(true);
                         return false;
                 }
                 break;
             default:
-                handler->PSendSysMessage("Unknown event %u!", *event_num);
+                handler->PSendSysMessage("Unknown event {}!", *event_num);
                 handler->SetSentErrorMessage(true);
                 return false;
         }

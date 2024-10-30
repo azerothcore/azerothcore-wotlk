@@ -16243,11 +16243,7 @@ void bot_ai::CastBotItemCombatSpell(DamageInfo const& damageInfo, Item* item, It
                 chance = me->GetWeaponProcChance();
 
             if (roll_chance_f(chance))
-            {
-                //CastSpellExtraArgs args(item);
-                //me->CastSpell(damageInfo.GetVictim(), spellInfo->Id, args);
-                me->CastSpell(damageInfo.GetVictim(), spellInfo, false, item);
-            }
+                me->CastSpell(damageInfo.GetVictim(), spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
         }
     }
 
@@ -16319,11 +16315,7 @@ void bot_ai::CastBotItemCombatSpell(DamageInfo const& damageInfo, Item* item, It
                 chance = 100.0f;
 
             if (roll_chance_f(chance))
-            {
-                //CastSpellExtraArgs args(item);
-                //me->CastSpell(spellInfo->IsPositive() ? me : damageInfo.GetVictim(), spellInfo->Id, args);
-                me->CastSpell(spellInfo->IsPositive() ? me : damageInfo.GetVictim(), spellInfo->Id, false, item);
-            }
+                me->CastSpell(spellInfo->IsPositive() ? me : damageInfo.GetVictim(), spellInfo, TriggerCastFlags(TRIGGERED_FULL_MASK & ~TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD), item);
         }
     }
 }
