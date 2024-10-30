@@ -139,7 +139,7 @@ services:
         GROUP_ID: ${DOCKER_GROUP_ID:-1000}
         DOCKER_USER: ${DOCKER_USER:-acore}
     volumes:
-      - ${DOCKER_VOL_CLIENT_DATA:-ac-client-data}:/azerothcore/env/dist/data
+      - ${DOCKER_VOL_DATA:-ac-client-data}:/azerothcore/env/dist/data
 
   # used for extracting maps from files shipped with game client
   # Most of the time this shouldn't be needed
