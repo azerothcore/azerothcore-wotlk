@@ -242,7 +242,22 @@ public:
                         break;
                     case 24:
                         Talk(WHISPER_CUSTODIAN_14, player);
-                        player->GroupEventHappens(10277, me); // skip casts 34883 (QID 10277)
+                        if (Group* group = player->GetGroup())
+                        {
+                            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                            {
+                                Player* player = itr->GetSource();
+
+                                // for any leave or dead (with not released body) group member at appropriate distance
+                                if (player && player->IsAtGroupRewardDistance(me) && !player->GetCorpse())
+                                    DoCast(player, 34883); // QID 10277
+
+                            }
+                        }
+                        else
+                        {
+                            DoCast(player, 34883); // QID 10277
+                        }
                         break;
                 }
             }
