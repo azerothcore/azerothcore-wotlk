@@ -447,6 +447,10 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     logoutResponse.Instant = instantLogout;
     SendPacket(logoutResponse.Write());
 
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_OFFLINE);
+    stmt->SetData(0, GetPlayer()->GetGUID().GetCounter());
+    CharacterDatabase.Execute(stmt);
+
     if (reason)
     {
         SetLogoutStartTime(0);
@@ -497,6 +501,11 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPackets::Character::LogoutCance
         GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
         GetPlayer()->RemoveUnitFlag(UNIT_FLAG_STUNNED);
     }
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_ONLINE);
+    stmt->SetData(0, GetPlayer()->GetGUID().GetCounter());
+    CharacterDatabase.Execute(stmt);
+
 }
 
 void WorldSession::HandleTogglePvP(WorldPacket& recv_data)
