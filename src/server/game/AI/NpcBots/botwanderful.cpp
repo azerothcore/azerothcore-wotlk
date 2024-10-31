@@ -1,5 +1,6 @@
 #include "botwanderful.h"
 #include "DBCStores.h"
+#include "StringConvert.h"
 #include "TemporarySummon.h"
 
 #include <algorithm>
@@ -364,12 +365,13 @@ bool WanderNode::HasFlag(BotWPFlags flags) const
     return !!(_flags & AsUnderlyingType(flags));
 }
 
-std::string WanderNode::ToString() const
+std::string WanderNode::ToString(int32 link_weight/* = -1*/) const
 {
     std::ostringstream wps;
-    wps << "WP " << _wpId << " '" << _name << "', " << uint32(_links.size()) << " link(s) (avg weight " << GetAverageLinkWeight() << "), Map " << _mapId
-        << ", Zone " << _zoneId << " (" << std::string(sAreaTableStore.LookupEntry(_zoneId)->area_name[0])
-        << "), Area " << _areaId << " (" << std::string(sAreaTableStore.LookupEntry(_areaId)->area_name[0])
+    wps << "WP " << _wpId << (link_weight >= 0 ? (":" + Trinity::ToString(link_weight)) : std::string{})
+        << " '" << _name << "', " << uint32(_links.size()) << " link(s) (avg weight " << GetAverageLinkWeight() << "), Map " << _mapId
+        << ", Zone " << _zoneId << " (" << std::string(sAreaTableStore.LookupEntry(_zoneId)->AreaName[0])
+        << "), Area " << _areaId << " (" << std::string(sAreaTableStore.LookupEntry(_areaId)->AreaName[0])
         << "), minLvl " << uint32(_minLevel) << ", maxLvl " << uint32(_maxLevel)
         << " (" << static_cast<Position const*>(this)->ToString() << ')'
         << ", flags: 0x" << std::hex << std::setw(8) << std::setfill('0') << _flags << std::dec;

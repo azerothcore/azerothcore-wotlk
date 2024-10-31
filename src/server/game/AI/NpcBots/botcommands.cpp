@@ -330,7 +330,7 @@ private:
                 default:                                                                   break;
             }
 
-            handler->PSendSysMessage(stream.str().c_str());
+            handler->SendSysMessage(stream.str());
         }
 #undef FILL_VISUALS_REPORT2
     }
@@ -540,9 +540,9 @@ public:
             { "setflags",   HandleNpcBotWPSetFlagsCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setflags z", HandleNpcBotWPSetFlagsZoneCommand,      rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setname",    HandleNpcBotWPSetNameCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
-            { "setlinks",   HandleNpcBotWPLinksSetCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
-            { "setweights", HandleNpcBotWPLinkWeightsSetCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
-            { "info",       HandleNpcBotWPCommand,                  rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
+            { "setlinks",   HandleNpcBotWPSetLinksCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
+            { "setweights", HandleNpcBotWPSetLinkWeightsCommand,    rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
+            { "info",       HandleNpcBotWPInfoCommand,              rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "links",      HandleNpcBotWPLinksCommand,             rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
         };
 
@@ -811,7 +811,7 @@ public:
                     wp->Link(WanderNodeLink{ .wp = const_cast<WanderNode*>(mwp), .weight = 0 });
             });
 
-            handler->SendSysMessage(wp->ToString().c_str());
+            handler->SendSysMessage(wp->ToString());
         }
 
         handler->PSendSysMessage("Generating wander nodes completed with {} nodes", uint32(WanderNode::GetAllWPsCount()));
@@ -846,7 +846,7 @@ public:
             ss << '(' << wp->GetWPId() << ',' << wp->GetMapId()
                 << ',' << wp->GetPositionX() << ',' << wp->GetPositionY() << ',' << wp->GetPositionZ() << ',' << wp->GetOrientation()
                 << ',' << wp->GetZoneId() << ',' << wp->GetAreaId() << ',' << uint32(minl) << ',' << uint32(maxl)
-                << ',' << wp->GetFlags() << ",'" << wp->GetName().c_str() << "','" << wp->FormatLinks() << "'),";
+                << ',' << wp->GetFlags() << ",'" << wp->GetName() << "','" << wp->FormatLinks() << "'),";
         });
         std::string val_str = ss.str();
         val_str.resize(val_str.size() - 1u);
@@ -906,10 +906,10 @@ public:
         uint32 counter = 0;
         ss << "WP " << wp->GetWPId() << " has " << uint32(links.size()) << " links (avg weight " << wp->GetAverageLinkWeight() << "):";
         WanderNode::DoForContainerWPLinks(links, [&ss, &counter, wp = wp](WanderNodeLink const& wlp) {
-            ss << "\n" << ++counter << ") " << wlp.wp->ToString() << ", weight: " << wlp.weight << " (dist2d: " << wp->GetExactDist2d(wlp.wp) << ")";
+            ss << "\n" << ++counter << ") " << wlp.wp->ToString(static_cast<int32>(wlp.weight)) << " (dist2d: " << wp->GetExactDist2d(wlp.wp) << ")";
         });
 
-        handler->SendSysMessage(ss.str().c_str());
+        handler->SendSysMessage(ss.str());
 
         WanderNode::DoForContainerWPLinks(links, [wp = wp, wpc = wpc, handler = handler](WanderNodeLink const& wlp) {
             if (!wlp.wp->GetCreature())
@@ -938,8 +938,7 @@ public:
                 result = false;
                 continue;
             }
-            std::pair<uint32, int32> vpair{ *val1, val2.value_or(int32(-1)) };
-            link_pairs.push_back(std::move(vpair));
+            link_pairs.emplace_back(*val1, val2.value_or(int32(-1)));
         }
 
         return result;
@@ -1013,7 +1012,7 @@ public:
 
         if (oneway)
         {
-            std::sort(wps_relinks.begin(), wps_relinks.end(), [](WanderNodeLink const* wlp1, WanderNodeLink const* wlp2) {return wlp1->Id() < wlp2->Id(); });
+            std::sort(wps_relinks.begin(), wps_relinks.end(), [](WanderNodeLink const* wlp1, WanderNodeLink const* wlp2) { return wlp1->Id() < wlp2->Id(); });
             for (WanderNodeLink const* wlp : wps_relinks)
             {
                 handler->PSendSysMessage("Adding link %u->%u (w=%u)...", wp->GetWPId(), wlp->Id(), wlp->weight);
@@ -1057,7 +1056,7 @@ public:
                 continue;
             }
 
-            if (std::ranges::find_if(links, [lid = lid, &p](WanderNodeLink const& wpl) { return wpl.Id() == lid; }) == links.end())
+            if (std::ranges::find_if(links, [lid = lid, &p](WanderNodeLink const& wpl) { return wpl.Id() == lid; }) == links.cend())
             {
                 handler->PSendSysMessage("WP %u has no link to WP %u!", wp->GetWPId(), lid);
                 continue;
@@ -1077,14 +1076,14 @@ public:
         if (!avg_weight_links.empty())
         {
             uint32 average_weight = wp->GetAverageLinkWeight(true);
-            for (uint32 lid : avg_weight_links)
-                wp->SetLinkWeight(lid, average_weight);
+            for (uint32 awlid : avg_weight_links)
+                wp->SetLinkWeight(awlid, average_weight);
         }
 
         if (dirty)
             WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET links='{}' WHERE id={}", wp->FormatLinks(), wp->GetWPId());
     }
-    static bool HandleNpcBotWPLinksSetCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> links, Optional<bool> oneway, Optional<bool> keep_reverse_links)
+    static bool HandleNpcBotWPSetLinksCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> links, Optional<bool> oneway, Optional<bool> keep_reverse_links)
     {
         Player* player = handler->GetPlayer();
         Unit* wpc = player->GetSelectedUnit();
@@ -1115,7 +1114,7 @@ public:
 
         return true;
     }
-    static bool HandleNpcBotWPLinkWeightsSetCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> link_weights)
+    static bool HandleNpcBotWPSetLinkWeightsCommand(ChatHandler* handler, Optional<std::vector<std::string_view>> link_weights)
     {
         Player* player = handler->GetPlayer();
         Unit* wpc = player->GetSelectedUnit();
@@ -1147,7 +1146,7 @@ public:
         return true;
     }
 
-    static bool HandleNpcBotWPCommand(ChatHandler* handler, Optional<uint32> wpId)
+    static bool HandleNpcBotWPInfoCommand(ChatHandler* handler, Optional<uint32> wpId)
     {
         Player* player = handler->GetPlayer();
         Unit* wpc = player->GetSelectedUnit();
@@ -1190,8 +1189,7 @@ public:
         player->GetZoneAndAreaId(zoneId, areaId);
         handler->PSendSysMessage("Setting levels min={} max={} for zone {}", uint32(*minlevel), uint32(*maxlevel), zoneId);
         WanderNode::DoForAllZoneWPs(zoneId, [handler = handler, minl = *minlevel, maxl = *maxlevel](WanderNode const* wp) {
-            handler->PSendSysMessage("Setting levels min={} max={} for node {} '{}'",
-                uint32(minl), uint32(maxl), wp->GetWPId(), wp->GetName());
+            handler->PSendSysMessage("Setting levels min={} max={} for node {} '{}'", uint32(minl), uint32(maxl), wp->GetWPId(), wp->GetName());
             const_cast<WanderNode*>(wp)->SetLevels(minl, maxl);
             if (Creature* creature = wp->GetCreature())
                 if (creature->GetLevel() != minl)
@@ -1232,8 +1230,7 @@ public:
         uint32 wpId = wp->GetWPId();
         auto [minlevel_cur, maxlevel_cur] = wp->GetLevels();
 
-        handler->PSendSysMessage("Changing WP {} '{}' levels from {}-{} to {}-{}",
-            wpId, wp->GetName().c_str(), uint32(minlevel_cur), uint32(maxlevel_cur), uint32(*minlevel), uint32(*maxlevel));
+        handler->PSendSysMessage("Changing WP {} '{}' levels from {}-{} to {}-{}", wpId, wp->GetName().c_str(), uint32(minlevel_cur), uint32(maxlevel_cur), uint32(*minlevel), uint32(*maxlevel));
         wp->SetLevels(*minlevel, *maxlevel);
         if (Creature* creature = wp->GetCreature())
             if (creature->GetLevel() != *minlevel)
@@ -1524,13 +1521,13 @@ public:
             ss << "\n" << wp->ToString();
         });
 
-        handler->SendSysMessage(ss.str().c_str());
+        handler->SendSysMessage(ss.str());
         return true;
     }
     static bool HandleNpcBotWPListAllCommand(ChatHandler* handler)
     {
         WanderNode::DoForAllWPs([handler = handler](WanderNode* wp) {
-            handler->SendSysMessage(wp->ToString().c_str());
+            handler->SendSysMessage(wp->ToString());
         });
 
         return true;
@@ -1717,7 +1714,7 @@ public:
             << "\n  creator2 guid:\n" << (target->GetCreator() ? target->GetCreator()->GetGUID().ToString() : std::string{})
             << "\n  owner guid:\n" << target->GetOwnerGUID().ToString();
 
-        handler->SendSysMessage(gss.str().c_str());
+        handler->SendSysMessage(gss.str());
         return true;
     }
 
@@ -1759,7 +1756,7 @@ public:
                 ostr << "\n    0x" << std::hex << (state);
         }
 
-        handler->SendSysMessage(ostr.str().c_str());
+        handler->SendSysMessage(ostr.str());
         return true;
     }
 
@@ -1800,7 +1797,7 @@ public:
             if (subBots[i] > 0)
                 sstr << uint32(subBots[i]) << " bots in subgroup " << uint32(i + 1) << "\n";
 
-        handler->SendSysMessage(sstr.str().c_str());
+        handler->SendSysMessage(sstr.str());
         delete[] subBots;
         return true;
     }
@@ -2542,7 +2539,7 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage("Trying to fix bot {} ({}) owned by {} ({})", bot->GetName().c_str(), bot_id,
+        handler->PSendSysMessage("Trying to fix bot {} ({}) owned by {} ({})", bot->GetName(), bot_id,
             owner ? owner->GetName().c_str() : "Unknown", owner ? owner->GetGUID().GetCounter() : bot_data->owner);
 
         bot->GetBotAI()->ReceiveEmote(tickler, TEXT_EMOTE_TICKLE);
@@ -2598,7 +2595,7 @@ public:
             return false;
         }
 
-        handler->PSendSysMessage(LANG_APPEARING_AT, bot->GetName().c_str());
+        handler->PSendSysMessage(LANG_APPEARING_AT, bot->GetName());
 
         if (player->IsInFlight())
         {
@@ -3641,7 +3638,7 @@ public:
         trans->Append("REPLACE INTO creature_equip_template SELECT {}, 1, ids.itemID1, ids.itemID2, ids.itemID3, -1 FROM (SELECT itemID1, itemID2, itemID3 FROM creature_equip_template WHERE CreatureID = (SELECT entry FROM creature_template_npcbot_extras WHERE class = {} LIMIT 1)) ids", newentry, uint32(*bclass));
         if (can_change_appearance)
             trans->Append("REPLACE INTO creature_template_npcbot_appearance VALUES ({}, \"{}\", {}, {}, {}, {}, {}, {})",
-                newentry, namestr.c_str(), uint32(*gender), uint32(*skin), uint32(*face), uint32(*hairstyle), uint32(*haircolor), uint32(*features));
+                newentry, namestr, uint32(*gender), uint32(*skin), uint32(*face), uint32(*hairstyle), uint32(*haircolor), uint32(*features));
         WorldDatabase.DirectCommitTransaction(trans);
 
         handler->PSendSysMessage("New NPCBot {} (class {}) is created with entry {} and will be available for spawning after server restart.", namestr, uint32(*bclass), newentry);
@@ -3797,7 +3794,7 @@ public:
             }
         }
 
-        handler->SendSysMessage(ss.str().c_str());
+        handler->SendSysMessage(ss.str());
         return true;
     }
 
@@ -3836,7 +3833,7 @@ public:
             }
         }
 
-        handler->SendSysMessage(ss.str().c_str());
+        handler->SendSysMessage(ss.str());
         return true;
     }
 
@@ -4234,7 +4231,7 @@ public:
             msg = "Bots' command state set to 'STAY'";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -4263,7 +4260,7 @@ public:
             msg = "Bots' command state set to 'FULLSTOP'";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -4291,7 +4288,7 @@ public:
             msg = "Bots' command state 'NOLONGCAST' was removed";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -4319,7 +4316,7 @@ public:
             msg = "Bots' command state 'NOCAST' was removed";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -4347,7 +4344,7 @@ public:
             msg = "Bots' command state 'INACTION' was removed";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -4376,7 +4373,7 @@ public:
             msg = "Bots' command state set to 'FOLLOW'";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -4405,7 +4402,7 @@ public:
             msg = "Bots' movement mode is set to 'RUN'";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 
@@ -4434,7 +4431,7 @@ public:
             msg = "Bots' gossip is ENABLED";
         }
 
-        handler->SendSysMessage(msg.c_str());
+        handler->SendSysMessage(msg);
         return true;
     }
 

@@ -172,7 +172,7 @@ public:
 
     void SetName(std::string const& name) { _name = name; }
 
-    std::string ToString() const;
+    std::string ToString(int32 link_weight = -1) const;
 
     uint32 GetWPId() const { return _wpId; }
     uint32 GetMapId() const { return _mapId; }
