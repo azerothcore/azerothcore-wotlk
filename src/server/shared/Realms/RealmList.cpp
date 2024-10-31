@@ -23,6 +23,7 @@
 #include "QueryResult.h"
 #include "Util.h"
 #include <boost/asio/ip/tcp.hpp>
+#include <memory>
 
 RealmList::RealmList() : _updateInterval(0) { }
 

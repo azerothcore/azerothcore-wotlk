@@ -17,6 +17,7 @@
 
 #include "SFMTRand.h"
 #include "Timer.h"
+#include <algorithm>
 #include <array>
 #include <random>
 
