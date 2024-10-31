@@ -1,6 +1,7 @@
 #include "Battleground.h"
 #include "BattlegroundAB.h"
 #include "BattlegroundAV.h"
+#include "BattlegroundEY.h"
 #include "BattlegroundWS.h"
 #include "bot_ai.h"
 #include "bot_Events.h"
@@ -2318,7 +2319,7 @@ void bot_ai::_listAuras(Player const* player, Unit const* unit) const
         //}
     }
 
-    ch.SendSysMessage(botstring.str().c_str());
+    ch.SendSysMessage(botstring.str());
 }
 //SetStats
 // Health, Armor, Powers, Combat Ratings, and global update setup
@@ -3537,8 +3538,8 @@ void bot_ai::ReceiveEmote(Player* player, uint32 emote)
             }
 
             me->BotStopMovement();
-            me->TextEmote(LocalizedNpcText(player, BOT_TEXT_BOT_TICKLED).c_str());
-            ChatHandler(player->GetSession()).SendSysMessage(report.str().c_str());
+            me->TextEmote(LocalizedNpcText(player, BOT_TEXT_BOT_TICKLED));
+            ChatHandler(player->GetSession()).SendSysMessage(report.str());
             break;
         }
         default:
@@ -5087,14 +5088,14 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
     //Additional: aoe coming from spawned npcs
 
     //Molten Core
-    if (unit->GetMapId() == 409)  
+    if (unit->GetMapId() == 409)
     {
         std::list<GameObject*> gListMC;
-        Acore::AllGameObjectsWithEntryInRange checkMC(unit, GAMEOBJECT_HOT_COAL, 60.f);  
+        Acore::AllGameObjectsWithEntryInRange checkMC(unit, GAMEOBJECT_HOT_COAL, 60.f);
         Acore::GameObjectListSearcher<Acore::AllGameObjectsWithEntryInRange> searcherMC(unit, gListMC, checkMC);
         Cell::VisitAllObjects(unit, searcherMC, 60.f);
 
-        float radius = 15.0f + DEFAULT_COMBAT_REACH;  
+        float radius = 15.0f + DEFAULT_COMBAT_REACH;
         for (std::list<GameObject*>::const_iterator ci = gListMC.cbegin(); ci != gListMC.cend(); ++ci)
             spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
     }
@@ -7855,12 +7856,9 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
             }
 
             if (!reason)
-            {
-                player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_TAXI, message2.str().c_str(),
-                    GOSSIP_SENDER_HIRE, GOSSIP_ACTION_INFO_DEF + 0, message1.str().c_str(), cost, false);
-            }
+                player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_TAXI, message2.str(), GOSSIP_SENDER_HIRE, GOSSIP_ACTION_INFO_DEF + 0, message1.str(), cost, false);
             else
-                AddGossipItemFor(player, GOSSIP_ICON_TAXI, message2.str().c_str(), GOSSIP_SENDER_HIRE, GOSSIP_ACTION_INFO_DEF + reason);
+                AddGossipItemFor(player, GOSSIP_ICON_TAXI, message2.str(), GOSSIP_SENDER_HIRE, GOSSIP_ACTION_INFO_DEF + reason);
 
             menus = true;
         }
@@ -7931,7 +7929,7 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
                     {
                         std::ostringstream msg;
                         msg << LocalizedNpcText(player, BOT_TEXT_ROGUE_PICKLOCK) << " (" << uint32(me->GetLevel() * 5) << ")";
-                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, msg.str().c_str(), GOSSIP_SENDER_CLASS, GOSSIP_ACTION_INFO_DEF + 1);
+                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, msg.str(), GOSSIP_SENDER_CLASS, GOSSIP_ACTION_INFO_DEF + 1);
                         menus = true;
                     }
                     break;
@@ -8010,7 +8008,7 @@ bool bot_ai::OnGossipHello(Player* player, uint32 /*option*/)
             std::ostringstream astr;
             astr << LocalizedNpcText(player, BOT_TEXT_ABANDON_WARN_1) << me->GetName() << "? " << (BotMgr::IsEnrageOnDimissEnabled() ? LocalizedNpcText(player, BOT_TEXT_ABANDON_WARN_2) : "");
             player->PlayerTalkClass->GetGossipMenu().AddMenuItem(-1, GOSSIP_ICON_TAXI, LocalizedNpcText(player, BOT_TEXT_UR_DISMISSED),
-                GOSSIP_SENDER_DISMISS, GOSSIP_ACTION_INFO_DEF + 1, astr.str().c_str(), 0, false);
+                GOSSIP_SENDER_DISMISS, GOSSIP_ACTION_INFO_DEF + 1, astr.str(), 0, false);
 
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_PULL_URSELF), GOSSIP_SENDER_TROUBLESHOOTING, GOSSIP_ACTION_INFO_DEF + 1);
         }
@@ -8244,7 +8242,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         {
                             std::ostringstream msg;
                             msg << obj->GetGOInfo()->name << " (" << LocalizedNpcText(player, BOT_TEXT_DISTANCE_SHORT) << " = " << player->GetExactDist(obj) << ")";
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, msg.str().c_str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + ++count);
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, msg.str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + ++count);
                         }
 
                         //2 Inventory
@@ -8268,7 +8266,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                     {
                                         std::ostringstream name;
                                         _AddItemLink(player, item, name, false);
-                                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                                        AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                                         break;
                                     }
                                 }
@@ -8295,7 +8293,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                             {
                                                 std::ostringstream name;
                                                 _AddItemLink(player, item, name, false);
-                                                AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                                                AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_CLASS_ACTION1, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                                                 ++count;
                                                 break;
                                             }
@@ -8461,7 +8459,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                     name = cinfo->Name;
                                 }
                                 bool same = possibleType == curType;
-                                AddGossipItemFor(player, same ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, name.c_str(), GOSSIP_SENDER_CLASS_ACTION4, GOSSIP_ACTION_INFO_DEF + possibleType);
+                                AddGossipItemFor(player, same ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, name, GOSSIP_SENDER_CLASS_ACTION4, GOSSIP_ACTION_INFO_DEF + possibleType);
                             }
                         }
                         bool noPet = curType == BOT_PET_INVALID;
@@ -8492,7 +8490,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                 CreatureTemplate const* cinfo = sObjectMgr->GetCreatureTemplate(possibleType);
                                 ASSERT(cinfo);
                                 bool same = possibleType == curType;
-                                AddGossipItemFor(player, same ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, cinfo->Name.c_str(), GOSSIP_SENDER_CLASS_ACTION4, GOSSIP_ACTION_INFO_DEF + possibleType);
+                                AddGossipItemFor(player, same ? GOSSIP_ICON_BATTLE : GOSSIP_ICON_CHAT, cinfo->Name, GOSSIP_SENDER_CLASS_ACTION4, GOSSIP_ACTION_INFO_DEF + possibleType);
                             }
                         }
                         bool noPet = curType == BOT_PET_INVALID;
@@ -9205,7 +9203,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
 
                 str << " GS: " << uint32(CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot, item->GetTemplate()));
 
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, str.str().c_str(), GOSSIP_SENDER_EQUIPMENT_INFO, action);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, str.str(), GOSSIP_SENDER_EQUIPMENT_INFO, action);
 
                 if (!visual_only && BotMgr::DisplayEquipment() && BotMgr::IsTransmogEnabled() && slot < BOT_TRANSMOG_INVENTORY_SIZE && CanDisplayNonWeaponEquipmentChanges())
                     AddGossipItemFor(player, GOSSIP_ICON_TALK, LocalizedNpcText(player, BOT_TEXT_TRANSMOGRIFICATION), GOSSIP_SENDER_EQUIP_TRANSMOGS, action);
@@ -9213,7 +9211,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
             else
             {
                 str << LocalizedNpcText(player, BOT_TEXT_NOTHING);
-                AddGossipItemFor(player, GOSSIP_ICON_CHAT, str.str().c_str(), GOSSIP_SENDER_EQUIPMENT_SHOW, action);
+                AddGossipItemFor(player, GOSSIP_ICON_CHAT, str.str(), GOSSIP_SENDER_EQUIPMENT_SHOW, action);
             }
 
             if (_equips[slot])
@@ -9256,7 +9254,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                             name << " GS: " << uint32(CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot, item->GetTemplate()));
                             if (BotMgr::SendEquipListItems())
                                 BotWhisper(name.str(), player);
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_EQUIP + slot, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP + slot, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                             ++counter;
                             found = true;
                             break;
@@ -9280,7 +9278,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                     name << " GS: " << uint32(CalculateItemGearScore(me->GetEntry(), me->GetLevel(), GetBotClass(), GetSpec(), slot, item->GetTemplate()));
                                     if (BotMgr::SendEquipListItems())
                                         BotWhisper(name.str(), player);
-                                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_EQUIP + slot, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP + slot, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                                     ++counter;
                                     found = true;
                                     break;
@@ -9519,7 +9517,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                             _AddItemLink(player, item, name);
                             if (BotMgr::SendEquipListItems())
                                 BotWhisper(name.str(), player);
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_EQUIP_AUTOEQUIP_EQUIP + k, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP_AUTOEQUIP_EQUIP + k, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                             ++counter;
                             found = true;
                             break;
@@ -9556,7 +9554,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                                     _AddItemLink(player, item, name);
                                     if (BotMgr::SendEquipListItems())
                                         BotWhisper(name.str(), player);
-                                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_EQUIP_AUTOEQUIP_EQUIP + k, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_EQUIP_AUTOEQUIP_EQUIP + k, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                                     ++counter;
                                     found = true;
                                     break;
@@ -9757,7 +9755,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 std::ostringstream istr;
                 _AddItemLink(player, item, istr, false);
                 ChatHandler ch(player->GetSession());
-                ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_CANT_UNEQUIP_MAILING).c_str(), istr.str().c_str());
+                ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_CANT_UNEQUIP_MAILING).c_str(), istr.str());
 
                 item->SetOwnerGUID(player->GetGUID());
 
@@ -9949,7 +9947,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 std::ostringstream name;
                 name << LocalizedNpcText(player, BOT_TEXT_USE_);
                 _AddSpellLink(player, spellInfo, name);
-                AddGossipItemFor(player, GOSSIP_ICON_TRAINER, name.str().c_str(), GOSSIP_SENDER_ABILITIES_USE, GOSSIP_ACTION_INFO_DEF + basespell);
+                AddGossipItemFor(player, GOSSIP_ICON_TRAINER, name.str(), GOSSIP_SENDER_ABILITIES_USE, GOSSIP_ACTION_INFO_DEF + basespell);
             }
 
             AddGossipItemFor(player, GOSSIP_ICON_CHAT, LocalizedNpcText(player, BOT_TEXT_UPDATE), sender, action);
@@ -10056,7 +10054,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 _AddSpellLink(player, spellInfo, name);
 
                 GossipOptionIcon icon = (GetSpell(*itr) != 0) ? BOT_ICON_ON : BOT_ICON_OFF;
-                AddGossipItemFor(player, icon, name.str().c_str(), toggleSender, GOSSIP_ACTION_INFO_DEF + *itr);
+                AddGossipItemFor(player, icon, name.str(), toggleSender, GOSSIP_ACTION_INFO_DEF + *itr);
                 if (++counter >= BOT_GOSSIP_MAX_ITEMS - 1) //back
                 {
                     LOG_ERROR("scripts", "bot_ai: gossip abilities list overflow with sender {} for bot class {}!",
@@ -10247,7 +10245,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 {
                     std::ostringstream name;
                     _AddItemLink(player, item, name);
-                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_USEITEM_USE, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                    AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_USEITEM_USE, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                     ++counter; //no need to check max counter here
                 }
             }
@@ -10263,7 +10261,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         {
                             std::ostringstream name;
                             _AddItemLink(player, item, name);
-                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str().c_str(), GOSSIP_SENDER_USEITEM_USE, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
+                            AddGossipItemFor(player, GOSSIP_ICON_CHAT, name.str(), GOSSIP_SENDER_USEITEM_USE, GOSSIP_ACTION_INFO_DEF + item->GetGUID().GetCounter());
                             ++counter;
                         }
                     }
@@ -10291,7 +10289,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                     //    ostr << "unknown (" << _ownerGuid << ')';
                     //BotWhisper(ostr.str().c_str(), player);
                     ChatHandler ch(player->GetSession());
-                    ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_HIREFAIL_OWNED).c_str(), me->GetName().c_str());
+                    ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_HIREFAIL_OWNED).c_str(), me->GetName());
                     break;
                 }
 
@@ -10317,13 +10315,13 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                             BotWhisper(LocalizedNpcText(player, BOT_TEXT_HIREDENY_DK), player);
                             break;
                         case BOT_CLASS_SPHYNX:
-                            me->TextEmote((me->GetName() + LocalizedNpcText(player, BOT_TEXT_HIREDENY_SPHYNX)).c_str());
+                            me->TextEmote(me->GetName() + LocalizedNpcText(player, BOT_TEXT_HIREDENY_SPHYNX));
                             break;
                         case BOT_CLASS_ARCHMAGE:
                             BotWhisper(LocalizedNpcText(player, BOT_TEXT_HIREDENY_ARCHMAGE), player);
                             break;
                     }
-                    ch.PSendSysMessage(LocalizedNpcText(player, locStringId).c_str(), me->GetName().c_str());
+                    ch.PSendSysMessage(LocalizedNpcText(player, locStringId).c_str(), me->GetName());
                     break;
                 }
 
@@ -10341,10 +10339,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 if (SetBotOwner(player))
                 {
                     if (_botclass == BOT_CLASS_SPHYNX)
-                    {
-                        std::string msg1 = me->GetName() + LocalizedNpcText(player, BOT_TEXT_HIRE_EMOTE_SPHYNX) + player->GetName();
-                        me->TextEmote(msg1.c_str());
-                    }
+                        me->TextEmote(me->GetName() + LocalizedNpcText(player, BOT_TEXT_HIRE_EMOTE_SPHYNX) + player->GetName());
                     else
                         BotWhisper(LocalizedNpcText(player, BOT_TEXT_HIRE_SUCCESS), player);
                 }
@@ -10375,7 +10370,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         else
                             ostr << LocalizedNpcText(player, BOT_TEXT_UNKNOWN) + " (" << _ownerGuid << ')';
                         BotWhisper(ostr.str().c_str(), player);
-                        ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_HIREFAIL_OWNED).c_str(), me->GetName().c_str());
+                        ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_HIREFAIL_OWNED).c_str(), me->GetName());
                         break;
                     }
                     case 2: //max npcbots exceed
@@ -10387,7 +10382,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                         std::string str = LocalizedNpcText(player, BOT_TEXT_HIREFAIL_COST) + " (";
                         str += BotMgr::GetNpcBotCostStr(player->GetLevel(), _botclass);
                         str += ")!";
-                        ch.SendSysMessage(str.c_str());
+                        ch.SendSysMessage(str);
                         player->SendBuyError(BUY_ERR_NOT_ENOUGHT_MONEY, 0, 0, 0);
                         BotSay("...", player);
                         break;
@@ -10422,8 +10417,7 @@ bool bot_ai::OnGossipSelect(Player* player, Creature* creature/* == me*/, uint32
                 if (!(i <= BOT_SLOT_RANGED ? _resetEquipment(i, player->GetGUID()) : _unequip(i, player->GetGUID())))
                 {
                     ChatHandler ch(player->GetSession());
-                    ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_CANT_DISMISS_EQUIPMENT).c_str(),
-                        uint32(i), LocalizedNpcText(player, BOT_TEXT_SLOT_MH + i).c_str());
+                    ch.PSendSysMessage(LocalizedNpcText(player, BOT_TEXT_CANT_DISMISS_EQUIPMENT).c_str(), uint32(i), LocalizedNpcText(player, BOT_TEXT_SLOT_MH + i));
                     abort = true;
                     break;
                 }
@@ -12622,7 +12616,7 @@ bool bot_ai::_unequip(uint8 slot, ObjectGuid receiver)
                 std::ostringstream istr;
                 _AddItemLink(master, item, istr, false);
                 ChatHandler ch(master->GetSession());
-                ch.PSendSysMessage(LocalizedNpcText(master, BOT_TEXT_CANT_UNEQUIP_MAILING).c_str(), istr.str().c_str());
+                ch.PSendSysMessage(LocalizedNpcText(master, BOT_TEXT_CANT_UNEQUIP_MAILING).c_str(), istr.str());
 
                 item->SetOwnerGUID(master->GetGUID());
 
@@ -14394,7 +14388,7 @@ void bot_ai::DefaultInit()
 
     if (IsWanderer())
     {
-        _travel_node_cur = ASSERT_NOTNULL(BotDataMgr::GetClosestWanderNode(me));
+        _travel_node_cur = ASSERT_NOTNULL(GetClosestWanderNode());
         if (firstspawn && BotMgr::IsWanderingWorldBot(me))
             StartPotionTimer();
     }
@@ -18059,18 +18053,57 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         else if (!IsCasting(mover) && (!IsShootingWand(mover) || Rand() < 10))
         {
             Unit const* mmover = !IAmFree() ? master : nullptr;
-            if (!mmover && me->GetMap()->IsBattleground() && !IsFlagCarrier(me))
+            if (!mmover && me->GetMap()->IsBattleground() && GetBG())
             {
-                //GET BG FOLLOW UNIT
-                static const std::function<bool(Unit const*)> flag_carrier_pred = [](Unit const* u) {
-                    return bot_ai::IsFlagCarrier(u);
-                };
+                Battleground* bg = GetBG();
+                ObjectGuid flag_guid = ObjectGuid::Empty;
+                if (!me->HasInvisibilityAura() && !me->HasStealthAura() && !me->HasAuraTypeWithMiscvalue(SPELL_AURA_FORCE_REACTION, 1059))
+                {
+                    switch (bg->GetBgTypeID())
+                    {
+                        case BATTLEGROUND_WS:
+                            flag_guid = dynamic_cast<BattlegroundWS*>(bg)->GetDroppedFlagGUID(bg->GetBotTeamId(me->GetGUID()));
+                            if (!flag_guid)
+                                flag_guid = dynamic_cast<BattlegroundWS*>(bg)->GetDroppedFlagGUID(bg->GetOtherTeamId(bg->GetBotTeamId(me->GetGUID())));
+                            break;
+                        case BATTLEGROUND_EY:
+                            //flag_guid = dynamic_cast<BattlegroundEY*>(bg)->GetDroppedFlagGUID();
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                if (GameObject* go = flag_guid ? bg->GetBgMap()->GetGameObject(flag_guid) : nullptr)
+                {
+                    float fdist = me->GetDistance(go);
+                    if (fdist < 18.f)
+                    {
+                        if (fdist < INTERACTION_DISTANCE * 0.5f)
+                        {
+                            if (me->IsMounted())
+                                DismountBot();
+                            go->Use(me);
+                        }
+                        else
+                        {
+                            BotMovement(BOT_MOVE_POINT, go);
+                            mmover = nullptr;
+                        }
+                    }
+                }
+                else if (!IsFlagCarrier(me))
+                {
+                    //GET BG FOLLOW UNIT
+                    static const std::function<bool(Unit const*)> flag_carrier_pred = [](Unit const* u) {
+                        return bot_ai::IsFlagCarrier(u);
+                    };
 
-                Unit* nmover = nullptr;
-                Acore::UnitSearcher searcher(me, nmover, flag_carrier_pred);
-                Cell::VisitAllObjects(me, searcher, 80.0f);
-                if (nmover)
-                    mmover = nmover;
+                    Unit* nmover = nullptr;
+                    Acore::UnitSearcher searcher(me, nmover, flag_carrier_pred);
+                    Cell::VisitAllObjects(me, searcher, 80.0f);
+                    if (nmover)
+                        mmover = nmover;
+                }
             }
 
             if (mmover)
@@ -18364,18 +18397,22 @@ void bot_ai::Evade()
                     float angle = Position::NormalizeOrientation(me->GetRelativeAngle(nextNode) + frand(float(-M_PI_2), float(M_PI_2)));
                     Position cnpos = me->GetFirstCollisionPosition(frand(8.0f, 15.0f), angle);
                     homepos.Relocate(cnpos);
+                    evadeDelayTimer = urand(4000, 6000);
                 }
                 else
+                {
                     homepos.Relocate(nextNode);
+                    if (me->GetMap()->GetEntry()->IsContinent())
+                        evadeDelayTimer = urand(3000, 7000);
+                    else if (_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_OPTIONAL_PICKUP) && !IsCasting())
+                        evadeDelayTimer = 2000;
+                    else
+                        evadeDelayTimer = 0;
+                }
 
                 LOG_TRACE("npcbots", "Bot {} id {} class {} level {} wandered from node {} to {}, next {} ('{}'), {}, dist {} yd!",
                     me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), _travel_node_last ? _travel_node_last->GetWPId() : 0, _travel_node_cur->GetWPId(),
                     nextNode->GetWPId(), nextNode->GetName().c_str(), homepos.ToString().c_str(), pos.GetExactDist(homepos));
-
-                if (me->GetMap()->GetEntry()->IsContinent())
-                    evadeDelayTimer = urand(3000, 7000);
-                else if (nextNode == _travel_node_cur)
-                    evadeDelayTimer = urand(4000, 6000);
 
                 _travel_node_last = _travel_node_cur;
                 _travel_node_cur = nextNode;
@@ -18469,10 +18506,13 @@ void bot_ai::GetNextEvadeMovePoint(Position& pos, bool& use_path) const
                 path.ShortenPathUntilDist(path.GetEndPosition(), frand(5.0f, 15.0f));
                 return;
             }
-            //log error and use direct point movement
-            LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} can't find full path to node {} (res {}) from pos {}, falling back to default PF!",
-                me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), IsWanderer() ? _travel_node_cur->GetWPId() : 0, uint32(path.GetPathType()),
-                me->GetPosition().ToString().c_str());
+            if (use_path)
+            {
+                //log error and use direct point movement
+                LOG_DEBUG("npcbots", "Bot {} id {} class {} level {} can't find full path to node {} (res {}) from pos {}, falling back to default PF!",
+                    me->GetName().c_str(), me->GetEntry(), uint32(_botclass), uint32(me->GetLevel()), IsWanderer() ? _travel_node_cur->GetWPId() : 0, uint32(path.GetPathType()),
+                    me->GetPosition().ToString().c_str());
+            }
             break;
         default:
             break;
@@ -18662,24 +18702,136 @@ void bot_ai::GetHomePosition(uint16& mapid, Position* pos) const
     }
 }
 
+//WANDER NODES
+/*static */bool bot_ai::IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport)
+{
+    if (!teleport)
+    {
+        if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_FACTION))
+            return true;
+    }
+    else
+    {
+        MapEntry const* mapEntry = sMapStore.LookupEntry(wp->GetMapId());
+        if (!mapEntry->IsContinent())
+            return false;
+    }
+
+    switch (BotDataMgr::GetTeamIdForFaction(factionTemplateId))
+    {
+        case TEAM_ALLIANCE:
+            return !wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY);
+        case TEAM_HORDE:
+            return !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY);
+        case TEAM_NEUTRAL:
+            return !wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY);
+        default:
+            return true;
+    }
+}
+
+WanderNode const* bot_ai::GetClosestWanderNode() const
+{
+    float mindist = 50000.0f;
+    WanderNode const* closestNode = nullptr;
+    WanderNode::DoForAllMapWPs(me->GetMapId(), [&mindist, &closestNode, loc = me](WanderNode const* wp) {
+        float dist = wp->GetExactDist2d(loc);
+        if (dist < mindist)
+        {
+            mindist = dist;
+            closestNode = wp;
+        }
+    });
+
+    return closestNode;
+}
+
+WanderNode const* bot_ai::GetNextWanderNode(Position const* fromPos, uint8 lvl, bool random) const
+{
+    using NodeList = std::list<WanderNode const*>;
+    using WanderNodeLink = WanderNode::WanderNodeLink;
+    using NodeLinkList = std::list<WanderNodeLink const*>;
+    using LinkWeightExtractor = WanderNodeLink::WeightExtractor;
+
+    static auto node_viable = [](WanderNode const* wp, uint8 lvl) -> bool {
+        return (lvl + 2 >= wp->GetLevels().first && lvl <= wp->GetLevels().second);
+    };
+
+    uint32 faction = me->GetFaction();
+
+    //Node got deleted (or forced)! Select close point and go from there
+    NodeList nlinks;
+    if (_travel_node_cur->GetLinks().empty() || random)
+    {
+        if (me->IsInWorld() && !me->GetMap()->IsBattlegroundOrArena())
+        {
+            WanderNode::DoForAllMapWPs(_travel_node_cur->GetMapId(), [&nlinks, lvl = lvl, fac = faction, pos = fromPos](WanderNode const* wp) {
+                if (pos->GetExactDist2d(wp) < MAX_WANDER_NODE_DISTANCE && IsWanderNodeAvailableForBotFaction(wp, fac, true) && node_viable(wp, lvl))
+                    nlinks.push_back(wp);
+            });
+            if (!nlinks.empty())
+                return nlinks.size() == 1u ? nlinks.front() : Acore::Containers::SelectRandomContainerElement(nlinks);
+        }
+
+        //Select closest
+        WanderNode const* node_new = nullptr;
+        float mindist = 50000.0f; // Anywhere
+        WanderNode::DoForAllMapWPs(_travel_node_cur->GetMapId(), [&node_new, &mindist, lvl = lvl, fac = faction, pos = fromPos](WanderNode const* wp) {
+            float dist = pos->GetExactDist2d(wp);
+            if (dist < mindist && IsWanderNodeAvailableForBotFaction(wp, fac, false) && node_viable(wp, lvl))
+            {
+                mindist = dist;
+                node_new = wp;
+            }
+        });
+        return node_new;
+    }
+
+    NodeLinkList llinks;
+    for (auto const& wpl : _travel_node_cur->GetLinks())
+    {
+        if (IsWanderNodeAvailableForBotFaction(wpl.wp, faction, false) && node_viable(wpl.wp, lvl))
+            llinks.push_back(&wpl);
+    }
+    if (llinks.size() > 1 && _travel_node_last && !_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
+        llinks.remove_if([this](WanderNodeLink const* wpl) { return wpl->wp == _travel_node_last; });
+    if (!llinks.empty())
+    {
+        WanderNodeLink const* wpl = llinks.size() == 1u ? llinks.front() : *Acore::Containers::SelectRandomWeightedContainerElement(llinks, LinkWeightExtractor());
+        return wpl->wp;
+    }
+
+    //Overleveled or died: no viable nodes in reach, find one for teleport
+    WanderNode::DoForAllWPs([&nlinks, lvl = lvl, fac = faction](WanderNode const* wp) {
+        if (IsWanderNodeAvailableForBotFaction(wp, fac, true) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && node_viable(wp, lvl))
+            nlinks.push_back(wp);
+    });
+
+    ASSERT(!nlinks.empty());
+    return nlinks.size() == 1u ? nlinks.front() : Acore::Containers::SelectRandomContainerElement(nlinks);
+}
+
 WanderNode const* bot_ai::GetNextTravelNode(Position const* from, bool random) const
 {
-    ASSERT(IsWanderer());
-
-    int8 mylevelbonus = BotDataMgr::GetLevelBonusForBotRank(me->GetCreatureTemplate()->rank);
-    uint8 mylevelbase = std::max<int8>(int8(me->GetLevel()) - mylevelbonus, int8(BotDataMgr::GetMinLevelForBotClass(_botclass)));
-
     if (!random)
     {
         if (WanderNode const* bgNode = GetNextBGTravelNode())
             return bgNode;
     }
 
-    return BotDataMgr::GetNextWanderNode(_travel_node_cur, _travel_node_last, from, me, mylevelbase, random);
+    int8 mylevelbonus = BotDataMgr::GetLevelBonusForBotRank(me->GetCreatureTemplate()->rank);
+    uint8 mylevelbase = std::max<int8>(int8(me->GetLevel()) - mylevelbonus, int8(BotDataMgr::GetMinLevelForBotClass(_botclass)));
+
+    return GetNextWanderNode(from, mylevelbase, random);
 }
 
 WanderNode const* bot_ai::GetNextBGTravelNode() const
 {
+    using WanderNodeLink = WanderNode::WanderNodeLink;
+    using NodeList = std::list<WanderNode const*>;
+    using NodeLinkList = std::list<WanderNodeLink>;
+    using LinkWeightExtractor = WanderNodeLink::WeightExtractor;
+
     if (!me->GetMap()->IsBattleground() || !GetBG() || !GetGroup() || _travel_node_cur->GetLinks().size() <= 1)
         return nullptr;
 
@@ -18688,31 +18840,26 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
     {
         case BATTLEGROUND_AV:
         {
-            using NodeList = std::list<WanderNode const*>;
-
             constexpr uint32 CRETYPE_CAPTAIN_A = AV_CPLACE_MAX + 61;
             constexpr uint32 CRETYPE_CAPTAIN_H = AV_CPLACE_MAX + 59;
             constexpr uint32 CRETYPE_BOSS_A = AV_CPLACE_MAX + 60;
             constexpr uint32 CRETYPE_BOSS_H = AV_CPLACE_MAX + 122;
 
-            static const std::function boss_room_wp_pred_a = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_BOSS_ROOM); };
-            static const std::function boss_room_wp_pred_h = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_BOSS_ROOM); };
+            static const std::function boss_room_wp_pred_a = [](WanderNode const* wp) { return wp->HasAllFlags(BotWPFlags::BOTWP_FLAG_ALLIANCE_BOSS_ROOM); };
+            static const std::function boss_room_wp_pred_h = [](WanderNode const* wp) { return wp->HasAllFlags(BotWPFlags::BOTWP_FLAG_HORDE_BOSS_ROOM); };
 
             uint32 faction = me->GetFaction();
             TeamId myTeamId = bg->GetBotTeamId(me->GetGUID());
             std::vector<Unit*> const team_members = BotMgr::GetAllGroupMembers(me);
             WanderNode const* curNode = _travel_node_cur;
-            NodeList links;
-            for (WanderNode const* wp : curNode->GetLinks())
+            NodeLinkList links;
+            for (WanderNodeLink const& wpl : curNode->GetLinks())
             {
-                if (BotDataMgr::IsWanderNodeAvailableForBotFaction(wp, faction, false))
-                    links.push_back(wp);
+                if (bot_ai::IsWanderNodeAvailableForBotFaction(wpl.wp, faction, false))
+                    links.push_back(wpl);
             }
             if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-                links.remove(_travel_node_last);
-
-            //if (links.size() == 1)
-            //    return links.front();
+                links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
 
             BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg);
             // Above all: check conditions to rush final boss
@@ -18791,9 +18938,9 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 {
                     auto const& pred = p.first == TEAM_ALLIANCE ? boss_room_wp_pred_a : boss_room_wp_pred_h;
                     WanderNode const* bossWP = ASSERT_NOTNULL(WanderNode::FindInAreaWPs(boss->GetAreaId(), pred));
-                    NodeList vlinks = curNode->GetShortestPathLinks(bossWP, links);
+                    NodeLinkList vlinks = curNode->GetShortestPathLinks(bossWP, links);
                     if (!vlinks.empty())
-                        return vlinks.size() == 1u ? vlinks.front() : Acore::Containers::SelectRandomContainerElement(vlinks);
+                        return vlinks.size() == 1u ? vlinks.front().wp : Acore::Containers::SelectRandomWeightedContainerElement(vlinks, LinkWeightExtractor())->wp;
                 }
             }
             // Secondly: check captain room to defend
@@ -18808,7 +18955,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     float mindist = 50000.0f;
                     WanderNode::DoForAllAreaWPs(captain->GetAreaId(), [&cap_node, &mindist, fac = faction, pos = captain](WanderNode const* wp) {
                         float dist = pos->GetExactDist2d(wp);
-                        if (dist < mindist && BotDataMgr::IsWanderNodeAvailableForBotFaction(wp, fac, false))
+                        if (dist < mindist && bot_ai::IsWanderNodeAvailableForBotFaction(wp, fac, false))
                         {
                             mindist = dist;
                             cap_node = wp;
@@ -18831,8 +18978,8 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 constexpr std::array<uint8, BG_AV_NODES_MAX> defend_priority_h{ 1, 2, 4, 3, 6, 7, 9, 0, 0, 0, 0, 5, 5, 8, 8 };
 
                 static const std::function flag_wp_pred = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET); };
-                static const std::function bunker_wp_pred = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY); };
-                static const std::function tower_wp_pred = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY); };
+                static const std::function bunker_wp_pred = [](WanderNode const* wp) { return wp->HasAllFlags(BotWPFlags::BOTWP_FLAG_ALLIANCE_FLAG_PICKUP_TARGET); };
+                static const std::function tower_wp_pred = [](WanderNode const* wp) { return wp->HasAllFlags(BotWPFlags::BOTWP_FLAG_HORDE_FLAG_PICKUP_TARGET); };
 
                 auto const& def_prio = teamId == TEAM_ALLIANCE ? defend_priority_a : defend_priority_h;
                 auto const& defe_pred = teamId == TEAM_ALLIANCE ? bunker_wp_pred : tower_wp_pred;
@@ -18844,7 +18991,9 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 std::set<std::pair<uint8, BG_AV_NodeInfo const*>> defendable_nodes;
                 std::set<std::pair<uint32, BG_AV_NodeInfo const*>> assaulted_nodes;
                 std::set<std::pair<uint32, BG_AV_NodeInfo const*>> assaultable_nodes;
-                NodeList accessible_nodes = links; //copy
+                NodeList accessible_nodes;
+                for (WanderNodeLink const& alink : links)
+                    accessible_nodes.push_back(alink.wp);
                 accessible_nodes.push_back(curNode);
                 for (BG_AV_Nodes counter = BG_AV_NODES_FIRSTAID_STATION; counter < BG_AV_NODES_MAX; ++counter)
                 {
@@ -18887,9 +19036,9 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 });
                 if (WanderNode const* dnode = defNode.second)
                 {
-                    NodeList defLinks = curNode->GetShortestPathLinks(dnode, links);
+                    NodeLinkList defLinks = curNode->GetShortestPathLinks(dnode, links);
                     if (!defLinks.empty())
-                        return defLinks.size() == 1u ? defLinks.front() : Acore::Containers::SelectRandomContainerElement(defLinks);
+                        return defLinks.size() == 1u ? defLinks.front().wp : Acore::Containers::SelectRandomWeightedContainerElement(defLinks, LinkWeightExtractor())->wp;
                 }
                 WanderNode::DoForContainerWPs(accessible_nodes, [&](WanderNode const* wp) {
                     if (flag_wp_pred(wp))
@@ -18976,8 +19125,8 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     if (mboss->IsAlive() && !mboss->IsInCombat() && me->IsWithinDist2d(mboss, SIZE_OF_GRIDS * 0.75f))
                     {
                         WanderNode const* mineWP = ASSERT_NOTNULL(WanderNode::FindInMapWPs(mboss->GetMapId(), mine_pred));
-                        WanderNode const* mineLink = mineWP->GetLinks().front();
-                        NodeList mlinks = curNode->GetShortestPathLinks(mineWP, links);
+                        WanderNodeLink const& mineLink = mineWP->GetLinks().front();
+                        NodeLinkList mlinks = curNode->GetShortestPathLinks(mineWP, links);
                         if (!mlinks.empty())
                         {
                             uint32 attackers_count = 0;
@@ -18988,8 +19137,8 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                                 WanderNode const* mwp = member->ToCreature()->GetBotAI()->_travel_node_cur;
                                 if (!mwp)
                                     continue;
-                                if (mwp == mineWP || mwp == mineLink || member->GetVictim() == mboss ||
-                                    std::find(mlinks.cbegin(), mlinks.cend(), mwp) != mlinks.cend() ||
+                                if (mwp == mineWP || mwp == mineLink.wp || member->GetVictim() == mboss ||
+                                    std::ranges::find_if(mlinks, [=](WanderNodeLink const& wpl) { return wpl.Id() == mwp->GetWPId(); }) != mlinks.cend() ||
                                     (!mwp->GetLinks().empty() && std::find(mwp->GetLinks().cbegin(), mwp->GetLinks().cend(), mineLink) != mwp->GetLinks().cend()))
                                     ++attackers_count;
                             }
@@ -18997,7 +19146,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                             {
                                 LOG_DEBUG("npcbots", "Bot {} {} team {} goes for a mine! Cur node: {} {}",
                                     me->GetName().c_str(), me->GetEntry(), uint32(myTeamId), curNode->GetWPId(), curNode->GetName().c_str());
-                                return mlinks.size() == 1u ? mlinks.front() : Acore::Containers::SelectRandomContainerElement(mlinks);
+                                return mlinks.size() == 1u ? mlinks.front().wp : Acore::Containers::SelectRandomWeightedContainerElement(mlinks, LinkWeightExtractor())->wp;
                             }
                         }
                     }
@@ -19015,7 +19164,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     float mindist = 50000.0f;
                     WanderNode::DoForAllAreaWPs(captain->GetAreaId(), [&cap_node, &mindist, fac = faction, pos = captain](WanderNode const* wp) {
                         float dist = pos->GetExactDist2d(wp);
-                        if (dist < mindist && BotDataMgr::IsWanderNodeAvailableForBotFaction(wp, fac, false))
+                        if (dist < mindist && bot_ai::IsWanderNodeAvailableForBotFaction(wp, fac, false))
                         {
                             mindist = dist;
                             cap_node = wp;
@@ -19034,9 +19183,9 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 {
                     auto const& pred = teamId == TEAM_ALLIANCE ? boss_room_wp_pred_h : boss_room_wp_pred_a;
                     WanderNode const* bossWP = ASSERT_NOTNULL(WanderNode::FindInAreaWPs(boss->GetAreaId(), pred));
-                    NodeList vlinks = curNode->GetShortestPathLinks(bossWP->GetLinks().front(), links);
+                    NodeLinkList vlinks = curNode->GetShortestPathLinks(bossWP->GetLinks().front().wp, links);
                     if (!vlinks.empty())
-                        return vlinks.size() == 1u ? vlinks.front() : Acore::Containers::SelectRandomContainerElement(vlinks);
+                        return vlinks.size() == 1u ? vlinks.front().wp : Acore::Containers::SelectRandomWeightedContainerElement(vlinks, LinkWeightExtractor())->wp;
                 }
             }
 
@@ -19049,7 +19198,220 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
             break;
         }
         case BATTLEGROUND_WS:
+        {
+            uint32 faction = me->GetFaction();
+            TeamId myTeamId = bg->GetBotTeamId(me->GetGUID());
+            std::vector<Unit*> const team_members = BotMgr::GetAllGroupMembers(me);
+            WanderNode const* curNode = _travel_node_cur;
+            NodeLinkList links;
+            for (WanderNodeLink const& wpl : curNode->GetLinks())
+            {
+                if (bot_ai::IsWanderNodeAvailableForBotFaction(wpl.wp, faction, false))
+                    links.push_back(wpl);
+            }
+            if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
+                links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
+
+            BattlegroundWS* ws = dynamic_cast<BattlegroundWS*>(bg);
+
+            //1) carrier - get next point towards drop point
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                if (ws->GetFlagPickerGUID(bg->GetOtherTeamId(teamId)) == me->GetGUID())
+                {
+                    WanderNode const* dropPoint = WanderNode::FindInMapWPs(bg->GetMapId(), [=](WanderNode const* dwp) {
+                        return dwp->HasAllFlags(teamId == TEAM_ALLIANCE ? BotWPFlags::BOTWP_FLAG_ALLIANCE_FLAG_DELIVER_TARGET : BotWPFlags::BOTWP_FLAG_HORDE_FLAG_DELIVER_TARGET);
+                    });
+                    if (dropPoint)
+                    {
+                        NodeLinkList dlinks = curNode->GetShortestPathLinks(dropPoint, links);
+                        if (!dlinks.empty())
+                            return dlinks.size() == 1u ? dlinks.front().wp : Acore::Containers::SelectRandomWeightedContainerElement(dlinks, LinkWeightExtractor())->wp;
+                    }
+                }
+            }
+            //2) next to enemy base flag - go for it if can pick, mill otherwise
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                NodeLinkList::const_iterator lit = std::ranges::find_if(links, [=](WanderNodeLink const& wpl) {
+                    return wpl.wp->HasAllFlags(teamId == TEAM_ALLIANCE ? BotWPFlags::BOTWP_FLAG_HORDE_FLAG_PICKUP_TARGET : BotWPFlags::BOTWP_FLAG_ALLIANCE_FLAG_PICKUP_TARGET);
+                });
+                if (lit != links.cend())
+                {
+                    if (ws->GetFlagState(bg->GetOtherTeamId(myTeamId)) == BG_WS_FLAG_STATE_ON_BASE)
+                        return lit->wp;
+                    else if (links.size() == 1)
+                        return curNode; //mill
+                    else
+                        links.erase(lit); //prevent going to flag point unless the flag is present
+                }
+            }
+            //3) have a link with a power-up
+            if (GetHealthPCT(me) < 60)
+            {
+                NodeLinkList::const_iterator lit = std::ranges::find_if(links, [=](WanderNodeLink const& wpl) {
+                    return wpl.wp->HasFlag(BotWPFlags::BOTWP_FLAG_WS_PICKUP_RESTORATION);
+                });
+                if (lit != links.cend())
+                {
+                    GameObject const* buff = ws->GetBGObject(lit->wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_1) ? BG_WS_OBJECT_REGENBUFF_1 : BG_WS_OBJECT_REGENBUFF_2);
+                    if (buff && buff->GetGoState() == GO_STATE_READY && buff->isSpawned())
+                    {
+                        bool has_picker = false;
+                        for (Unit const* member : team_members)
+                        {
+                            if (member != me && member->IsAlive() && member->IsNPCBot() && member->ToCreature()->GetBotAI()->_travel_node_cur == lit->wp)
+                            {
+                                has_picker = true;
+                                break;
+                            }
+                        }
+                        if (!has_picker)
+                        {
+                            LOG_DEBUG("npcbots", "Bot {} {} team {} goes for a REGEN buff! Cur node: {} {}",
+                                me->GetName(), me->GetEntry(), uint32(myTeamId), curNode->GetWPId(), curNode->GetName());
+                            return lit->wp;
+                        }
+                    }
+                }
+            }
+            if (!me->HasAuraTypeWithValue(SPELL_AURA_MOD_SCALE, 30) && ws->GetFlagPickerGUID(myTeamId) != me->GetGUID())
+            {
+                NodeLinkList::const_iterator lit = std::ranges::find_if(links, [=](WanderNodeLink const& wpl) {
+                    return wpl.wp->HasFlag(BotWPFlags::BOTWP_FLAG_WS_PICKUP_BERSERKING);
+                });
+                if (lit != links.cend())
+                {
+                    GameObject const* buff = ws->GetBGObject(lit->wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_2) ? BG_WS_OBJECT_BERSERKBUFF_1 : BG_WS_OBJECT_BERSERKBUFF_2);
+                    if (buff && buff->GetGoState() == GO_STATE_READY && buff->isSpawned())
+                    {
+                        bool has_picker = false;
+                        for (Unit const* member : team_members)
+                        {
+                            if (member != me && member->IsAlive() && member->IsNPCBot() && member->ToCreature()->GetBotAI()->_travel_node_cur == lit->wp)
+                            {
+                                has_picker = true;
+                                break;
+                            }
+                        }
+                        if (!has_picker)
+                        {
+                            LOG_DEBUG("npcbots", "Bot {} {} team {} goes for a BERSERKING buff! Cur node: {} {}",
+                                me->GetName(), me->GetEntry(), uint32(myTeamId), curNode->GetWPId(), curNode->GetName());
+                            return lit->wp;
+                        }
+                    }
+                }
+            }
+            //4) 70% attack, rest defend or go for enemy flag carrier, at least 1 defends base flag
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                uint8 my_team_size = static_cast<uint8>(team_members.size());
+                WanderNode const* attackNode = nullptr;
+                WanderNode const* defendNode = nullptr;
+                WanderNode::DoForAllMapWPs(bg->GetMapId(), [=, &attackNode, &defendNode](WanderNode const* mwp) {
+                    if (mwp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET))
+                    {
+                        if ((mwp->HasAllFlags(BotWPFlags::BOTWP_FLAG_HORDE_FLAG_PICKUP_TARGET) && teamId == TEAM_ALLIANCE) ||
+                            (mwp->HasAllFlags(BotWPFlags::BOTWP_FLAG_ALLIANCE_FLAG_PICKUP_TARGET) && teamId == TEAM_HORDE))
+                            attackNode = mwp;
+                        else if ((mwp->HasAllFlags(BotWPFlags::BOTWP_FLAG_ALLIANCE_FLAG_PICKUP_TARGET) && teamId == TEAM_ALLIANCE) ||
+                            (mwp->HasAllFlags(BotWPFlags::BOTWP_FLAG_HORDE_FLAG_PICKUP_TARGET) && teamId == TEAM_HORDE))
+                            defendNode = mwp;
+                    }
+                });
+
+                uint8 max_attackers = std::max<uint8>(my_team_size * 7 / 10, my_team_size / 2 + 2);
+                uint8 max_defenders = my_team_size - max_attackers;
+
+                //attack?
+                if (attackNode)
+                {
+                    std::set<Unit const*> attackers;
+                    for (Unit const* m : team_members)
+                    {
+                        if (m != me && m->IsNPCBot())
+                        {
+                            WanderNode const* mCurNode = m->ToCreature()->GetBotAI()->_travel_node_cur;
+                            if (mCurNode && (mCurNode == attackNode || mCurNode->HasLink(attackNode)))
+                                attackers.insert(m);
+                        }
+                    }
+                    if (attackers.size() < max_attackers)
+                    {
+                        float myDist = me->GetExactDist2d(attackNode);
+                        for (Unit const* m : team_members)
+                        {
+                            if (m != me && (m->GetExactDist2d(attackNode) < myDist || m->HasAuraTypeWithValue(SPELL_AURA_MOD_SCALE, 30)) && !attackers.contains(m))
+                                attackers.insert(m);
+                        }
+                    }
+                    if (attackers.size() < max_attackers || !!ws->GetFlagPickerGUID(teamId) || me->HasAuraTypeWithValue(SPELL_AURA_MOD_SCALE, 30))
+                    {
+                        NodeLinkList alinks = curNode->GetShortestPathLinks(attackNode, links, BotWPLevel::BOTWP_LEVEL_ONE);
+                        if (!alinks.empty())
+                        {
+                            LOG_DEBUG("npcbots", "Bot {} {} team {} goes to ATTACK (attackers: {})! Cur node: {} {}",
+                                me->GetName(), me->GetEntry(), uint32(myTeamId), uint32(attackers.size()), curNode->GetWPId(), curNode->GetName());
+                            return alinks.size() == 1u ? alinks.front().wp : Acore::Containers::SelectRandomWeightedContainerElement(alinks, LinkWeightExtractor())->wp;
+                        }
+                    }
+                }
+
+                //defend?
+                if (defendNode && !ws->GetFlagPickerGUID(teamId) && !me->HasAuraTypeWithValue(SPELL_AURA_MOD_SCALE, 30))
+                {
+                    std::set<Unit const*> defenders;
+                    for (Unit const* m : team_members)
+                    {
+                        if (m != me && m->IsNPCBot())
+                        {
+                            WanderNode const* mCurNode = m->ToCreature()->GetBotAI()->_travel_node_cur;
+                            if (mCurNode && (mCurNode == defendNode || mCurNode->HasLink(defendNode)))
+                                defenders.insert(m);
+                        }
+                    }
+                    if (defenders.size() < max_defenders)
+                    {
+                        float myDist = me->GetExactDist2d(defendNode);
+                        for (Unit const* m : team_members)
+                        {
+                            if (m != me && m->GetExactDist2d(defendNode) < myDist && !defenders.contains(m))
+                                defenders.insert(m);
+                        }
+                    }
+                    if (defenders.size() < max_defenders)
+                    {
+                        NodeLinkList dlinks = curNode->GetShortestPathLinks(defendNode, links);
+                        if (!dlinks.empty())
+                        {
+                            LOG_DEBUG("npcbots", "Bot {} {} team {} goes to DEFEND (defenders: {})! Cur node: {} {}",
+                                me->GetName(), me->GetEntry(), uint32(myTeamId), uint32(defenders.size()), curNode->GetWPId(), curNode->GetName());
+                            return dlinks.size() == 1u ? dlinks.front().wp : Acore::Containers::SelectRandomWeightedContainerElement(dlinks, LinkWeightExtractor())->wp;
+                        }
+                    }
+                }
+            }
+
+            if (links.size() > 1)
+            {
+                LOG_DEBUG("npcbots", "Bot {} {} team {} has no target point in BG_WS! Falling back to random ({} links)!. Cur node: {} {}",
+                    me->GetName(), me->GetEntry(), uint32(myTeamId), uint32(curNode->GetLinks().size()), curNode->GetWPId(), curNode->GetName());
+            }
+
+            break;
+        }
         case BATTLEGROUND_AB:
+            break;
         default:
             break;
     }
@@ -19084,7 +19446,7 @@ void bot_ai::OnWanderNodeReached()
             {
                 case BATTLEGROUND_AV:
                 {
-                    static const uint32 SPELL_OPENING_FLAG = 21651u;
+                    static const uint32 SPELL_OPENING_FLAG_AV = 21651u;
 
                     GameObject* obj = nullptr;
 
@@ -19116,7 +19478,7 @@ void bot_ai::OnWanderNodeReached()
                             continue;
                         if (Spell const* curSpell = member->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                         {
-                            if (curSpell->m_spellInfo->Id == SPELL_OPENING_FLAG && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
+                            if (curSpell->m_spellInfo->Id == SPELL_OPENING_FLAG_AV && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
                             {
                                 already_used = true;
                                 break;
@@ -19126,11 +19488,11 @@ void bot_ai::OnWanderNodeReached()
                     if (already_used)
                         break;
 
-                    //TC_LOG_ERROR("npcbots", "OnWanderNodeReached: [AV] Bot %s USES flag %s at node %u", me->GetName().c_str(), obj->GetName().c_str(), node);
+                    //LOG_ERROR("npcbots", "OnWanderNodeReached: [AV] Bot %s USES flag %s at node %u", me->GetName().c_str(), obj->GetName().c_str(), node);
 
                     if (me->IsMounted())
                         DismountBot();
-                    me->CastSpell(obj, SPELL_OPENING_FLAG, false);
+                    me->CastSpell(obj, SPELL_OPENING_FLAG_AV, false);
 
                     break;
                 }
@@ -19140,7 +19502,7 @@ void bot_ai::OnWanderNodeReached()
                     {
                         if (GameObject* go = bg->GetBGObject(BG_WS_OBJECT_H_FLAG))
                         {
-                            //TC_LOG_ERROR("npcbots", "OnWanderNodeReached: [WSG] Horde flag dist: %f", me->GetExactDist(go));
+                            //LOG_ERROR("npcbots", "OnWanderNodeReached: [WSG] Horde flag dist: %f", me->GetExactDist(go));
                             if (me->IsMounted())
                                 DismountBot();
                             bg->EventBotClickedOnFlag(me, go);
@@ -19150,7 +19512,7 @@ void bot_ai::OnWanderNodeReached()
                     {
                         if (GameObject* go = bg->GetBGObject(BG_WS_OBJECT_A_FLAG))
                         {
-                            //TC_LOG_ERROR("npcbots", "OnWanderNodeReached: [WSG] Alliance flag dist: %f", me->GetExactDist(go));
+                            //LOG_ERROR("npcbots", "OnWanderNodeReached: [WSG] Alliance flag dist: %f", me->GetExactDist(go));
                             if (me->IsMounted())
                                 DismountBot();
                             bg->EventBotClickedOnFlag(me, go);
@@ -19160,7 +19522,7 @@ void bot_ai::OnWanderNodeReached()
                 }
                 case BATTLEGROUND_AB:
                 {
-                    static const uint32 SPELL_OPENING_FLAG = 21651u;
+                    static const uint32 SPELL_OPENING_FLAG_AB = 21651u;
 
                     uint8 node = BG_AB_NODE_STABLES;
                     GameObject* obj = bg->GetBGObject(node*8+BG_AB_OBJECT_BANNER_NEUTRAL);
@@ -19186,8 +19548,7 @@ void bot_ai::OnWanderNodeReached()
                         else
                             new_bg_obj_type = BG_AB_OBJECT_BANNER_NEUTRAL;
 
-                        obj = bg->GetBGObject(node*8+new_bg_obj_type);
-                        ASSERT(obj != nullptr);
+                        obj = ASSERT_NOTNULL(bg->GetBGObject(node*8+new_bg_obj_type));
 
                         bool already_used = false;
                         for (Unit const* member : BotMgr::GetAllGroupMembers(me))
@@ -19196,7 +19557,7 @@ void bot_ai::OnWanderNodeReached()
                                 continue;
                             if (Spell const* curSpell = member->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                             {
-                                if (curSpell->m_spellInfo->Id == SPELL_OPENING_FLAG && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
+                                if (curSpell->m_spellInfo->Id == SPELL_OPENING_FLAG_AB && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
                                 {
                                     already_used = true;
                                     break;
@@ -19206,11 +19567,10 @@ void bot_ai::OnWanderNodeReached()
                         if (already_used)
                             break;
 
-                        //LOG_ERROR("npcbots", "OnWanderNodeReached: [AB] Bot {} USES flag {} at node {}",
-                        //    me->GetName().c_str(), obj->GetName().c_str(), uint32(node));
+                        //LOG_ERROR("npcbots", "OnWanderNodeReached: [AB] Bot {} USES flag {} at node {}", me->GetName(), obj->GetName(), uint32(node));
                         if (me->IsMounted())
                             DismountBot();
-                        me->CastSpell(obj, SPELL_OPENING_FLAG, false);
+                        me->CastSpell(obj, SPELL_OPENING_FLAG_AB, false);
                     }
                     break;
                 }
@@ -19227,11 +19587,19 @@ void bot_ai::OnBotEnterBattleground()
 
     if (bg->GetStatus() != STATUS_IN_PROGRESS && IsWanderer())
     {
+        BotWPFlags myTeamSpawnFlags;
+        switch (bg->GetBotTeamId(me->GetGUID()))
+        {
+            case TEAM_ALLIANCE: myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_ALLIANCE_SPAWN_POINT; break;
+            case TEAM_HORDE:    myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_HORDE_SPAWN_POINT;    break;
+            default:            myTeamSpawnFlags = BotWPFlags::BOTWP_FLAG_SPAWN;                break;
+        }
+
         uint32 mapId = bg->GetBgMap()->GetId();
         float mindist = 50000.0f;
         WanderNode const* startNode = nullptr;
-        WanderNode::DoForAllMapWPs(mapId, [pos = me->GetPosition(), &mindist, &startNode](WanderNode const* wp) {
-            if (wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN))
+        WanderNode::DoForAllMapWPs(mapId, [pos = me->GetPosition(), spawnFlags = myTeamSpawnFlags, &mindist, &startNode](WanderNode const* wp) {
+            if (wp->HasFlag(spawnFlags))
             {
                 float dist = pos.GetExactDist2d(wp);
                 if (dist < mindist)
