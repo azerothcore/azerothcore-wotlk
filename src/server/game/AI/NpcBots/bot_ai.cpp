@@ -18794,7 +18794,7 @@ WanderNode const* bot_ai::GetNextWanderNode(Position const* fromPos, uint8 lvl, 
             llinks.push_back(&wpl);
     }
     if (llinks.size() > 1 && _travel_node_last && !_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-        llinks.remove_if([=](WanderNodeLink const* wpl) { return wpl->wp == _travel_node_last; });
+        llinks.remove_if([this](WanderNodeLink const* wpl) { return wpl->wp == _travel_node_last; });
     if (!llinks.empty())
     {
         WanderNodeLink const* wpl = llinks.size() == 1u ? llinks.front() : *Acore::Containers::SelectRandomWeightedContainerElement(llinks, LinkWeightExtractor());
@@ -18859,7 +18859,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     links.push_back(wpl);
             }
             if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-                links.remove_if([=](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
+                links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
 
             BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg);
             // Above all: check conditions to rush final boss
@@ -19210,7 +19210,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     links.push_back(wpl);
             }
             if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-                links.remove_if([=](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
+                links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
 
             BattlegroundWS* ws = dynamic_cast<BattlegroundWS*>(bg);
 

@@ -499,7 +499,7 @@ public:
             if (mytar->IsControlledByPlayer() || me->GetHealthPct() < 25.f)
             {
                 //Vanish (no GCD)
-                if (IsSpellReady(VANISH_1, diff, false) && !stealthed && !shadowdance && !IsTank() && Rand() < 45 && !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) || !IsFlagCarrier(me))
+                if (IsSpellReady(VANISH_1, diff, false) && !stealthed && !shadowdance && !IsTank() && Rand() < 45 && !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) && !IsFlagCarrier(me))
                 {
                     bool cast = false;
                     //case 1: restealth for opener
