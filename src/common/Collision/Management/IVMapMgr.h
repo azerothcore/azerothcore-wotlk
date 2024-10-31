@@ -19,7 +19,6 @@
 #define _IVMAPMANAGER_H
 
 #include "Define.h"
-#include "ModelIgnoreFlags.h"
 #include "Optional.h"
 #include <string>
 

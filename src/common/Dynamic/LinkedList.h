@@ -19,7 +19,6 @@
 #define _LINKEDLIST
 
 #include "Define.h"
-#include <iterator>
 
 //============================================
 class LinkedListHead;
