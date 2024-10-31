@@ -218,7 +218,7 @@ class BotDataMgr
         static uint8 GetAccountBotsCount(uint32 account_id);
 
         static void DespawnWandererBot(uint32 entry);
-        static void LoadWanderMap(bool reload = false);
+        static void LoadWanderMap(bool reload = false, bool force_all_maps = false);
         static void GenerateWanderingBots();
         static bool GenerateBattlegroundBots(Player const* groupLeader, Group const* group, BattlegroundQueue* queue, PvPDifficultyEntry const* bracketEntry, GroupQueueInfo const* gqinfo);
         static void CreateWanderingBotsSortedGear();
@@ -235,9 +235,6 @@ class BotDataMgr
         static int32 GetBotBaseReputation(Creature const* bot, FactionEntry const* factionEntry);
         static TeamId GetTeamIdForFaction(uint32 factionTemplateId);
         static uint32 GetTeamForFaction(uint32 factionTemplateId);
-        static bool IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32 factionTemplateId, bool teleport);
-        static WanderNode const* GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* fromPos, Creature const* bot, uint8 lvl, bool random);
-        static WanderNode const* GetClosestWanderNode(WorldLocation const* loc);
 
         static BotBankItemContainer const* GetBotBankItems(ObjectGuid playerGuid);
         static Item* WithdrawBotBankItem(ObjectGuid playerGuid, ObjectGuid::LowType itemGuidLow);

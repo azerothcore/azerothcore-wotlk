@@ -29,11 +29,20 @@ enum class BotWPFlags : uint32
     BOTWP_FLAG_BG_FLAG_PICKUP_TARGET    = 0x00000080, // <BG only> flag pick/activate up marker
     BOTWP_FLAG_BG_BOSS_ROOM             = 0x00000100, // <BG only> boss room to attack as group / defend
     BOTWP_FLAG_BG_MISC_OBJECTIVE_1      = 0x00000200, // <BG only> misc objective 1 (AV = mine)
-    BOTWP_FLAG_END                      = 0x00000400,
+    BOTWP_FLAG_BG_MISC_OBJECTIVE_2      = 0x00000400, // <BG only> misc objective 2 (NYI)
+    BOTWP_FLAG_BG_MISC_OBJECTIVE_3      = 0x00000800, // <BG only> misc objective 3 (NYI)
+    BOTWP_FLAG_BG_MISC_OBJECTIVE_4      = 0x00001000, // <BG only> misc objective 4 (NYI)
+    BOTWP_FLAG_BG_OPTIONAL_PICKUP_1     = 0x00002000, // <BG only> optional pickup point 1 (power-ups, etc., NYI)
+    BOTWP_FLAG_BG_OPTIONAL_PICKUP_2     = 0x00004000, // <BG only> optional pickup point 2 (power-ups, etc., NYI)
+    BOTWP_FLAG_BG_OPTIONAL_PICKUP_3     = 0x00008000, // <BG only> optional pickup point 3 (power-ups, etc., NYI)
+    BOTWP_FLAG_BG_OPTIONAL_PICKUP_4     = 0x00010000, // <BG only> optional pickup point 4 (power-ups, etc., NYI)
+    BOTWP_FLAG_END                      = 0x00020000,
 
     BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY   = BOTWP_FLAG_ALLIANCE_ONLY | BOTWP_FLAG_HORDE_ONLY,
-    BOTWP_FLAG_ALLIANCE_BOSS_ROOM       = BOTWP_FLAG_ALLIANCE_ONLY | BOTWP_FLAG_BG_BOSS_ROOM,
-    BOTWP_FLAG_HORDE_BOSS_ROOM          = BOTWP_FLAG_HORDE_ONLY | BOTWP_FLAG_BG_BOSS_ROOM
+    BOTWP_FLAG_ALLIANCE_SPAWN_POINT     = BOTWP_FLAG_SPAWN | BOTWP_FLAG_ALLIANCE_ONLY,
+    BOTWP_FLAG_HORDE_SPAWN_POINT        = BOTWP_FLAG_SPAWN | BOTWP_FLAG_HORDE_ONLY,
+    BOTWP_FLAG_ALLIANCE_BOSS_ROOM       = BOTWP_FLAG_BG_BOSS_ROOM | BOTWP_FLAG_ALLIANCE_ONLY,
+    BOTWP_FLAG_HORDE_BOSS_ROOM          = BOTWP_FLAG_BG_BOSS_ROOM | BOTWP_FLAG_HORDE_ONLY
 };
 
 class WanderNode : public Position
@@ -85,7 +94,6 @@ public:
 
     static mutex_type* GetLock();
 
-    static bool IsWP(Creature const* creature);
     static WanderNode* FindInAllWPs(uint32 wpId);
     static WanderNode* FindInAllWPs(Creature const* creature);
     static WanderNode* FindInMapWPs(uint32 mapId, Creature const* creature);
@@ -172,6 +180,8 @@ public:
 
     void SetName(std::string const& name) { _name = name; }
 
+    void SetId(uint32 newid) { _wpId = newid; }
+
     std::string ToString(int32 link_weight = -1) const;
 
     uint32 GetWPId() const { return _wpId; }
@@ -183,7 +193,7 @@ public:
     uint32 GetFlags() const { return _flags; }
 
 private:
-    const uint32 _wpId;
+    uint32 _wpId;
     const uint32 _mapId;
     const uint32 _zoneId;
     const uint32 _areaId;

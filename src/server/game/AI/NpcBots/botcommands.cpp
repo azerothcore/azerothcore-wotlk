@@ -536,7 +536,7 @@ public:
             { "list all",   HandleNpcBotWPListAllCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::Yes },
             { "go",         HandleNpcBotWPGoCommand,                rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setlevels",  HandleNpcBotWPSetLevelsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
-            { "setlevels z",HandleNpcBotWPSetLevelsZoneCommand,     rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::Yes },
+            { "setlevels z",HandleNpcBotWPSetLevelsZoneCommand,     rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setflags",   HandleNpcBotWPSetFlagsCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setflags z", HandleNpcBotWPSetFlagsZoneCommand,      rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
             { "setname",    HandleNpcBotWPSetNameCommand,           rbac::RBAC_PERM_COMMAND_NPCBOT_SPAWN,              Console::No  },
@@ -561,6 +561,7 @@ public:
             { "spells",     HandleNpcBotDebugSpellsCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "guids",      HandleNpcBotDebugGuidsCommand,          rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::No  },
             { "wbequips",   HandleNpcBotDebugWBEquipsCommand,       rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::Yes },
+            { "wpreid",     HandleNpcBotDebugWPReidCommand,         rbac::RBAC_PERM_COMMAND_NPCBOT_DEBUG_STATES,       Console::Yes },
             { "event",      npcbotDebugEventCommandTable                                                                            },
         };
 
@@ -1620,6 +1621,101 @@ public:
                 handler->SetSentErrorMessage(true);
                 return false;
         }
+
+        return true;
+    }
+
+    static bool HandleNpcBotDebugWPReidCommand(ChatHandler* handler, Optional<uint32> start_id, Optional<uint32> end_id, Optional<uint32> target_start_id)
+    {
+        if (!start_id)
+        {
+            handler->SendSysMessage(".npcbot debug wpreid #start_id [#end_id #target_start_id]");
+            handler->SendSysMessage("Compacts WP IDs to elimnate gaps between them, starting with <start_id>");
+            handler->SendSysMessage("If #end_id and #target_start_id are provided then instead relocates WPs with IDs <start_id>..<end_id> to <target_start_id>...");
+            handler->SendSysMessage("WARNING: THIS IS UNSAFE! Back-up your wander nodes table before proceeding");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (!!end_id != !!target_start_id)
+        {
+            handler->SendSysMessage("Either both #end_id and #target_start_id or none required!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (end_id && *end_id <= *start_id)
+        {
+            handler->SendSysMessage("End id must be greater than start id!");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (static bool all_wps_forced = false; !all_wps_forced)
+        {
+            all_wps_forced = true;
+            handler->SendSysMessage("Force loading all wander nodes...");
+            BotDataMgr::LoadWanderMap(true, true);
+        }
+
+        std::vector<WanderNode*> wander_nodes_copy;
+        wander_nodes_copy.reserve(WanderNode::GetAllWPsCount());
+        WanderNode::DoForAllWPs([&wander_nodes_copy](WanderNode* wp) { wander_nodes_copy.push_back(wp); });
+        std::sort(std::begin(wander_nodes_copy), std::end(wander_nodes_copy), [](WanderNode const* wp1, WanderNode const* wp2) { return wp1->GetWPId() < wp2->GetWPId(); });
+
+        uint32 startid = *start_id;
+        uint32 endid = end_id.value_or((*wander_nodes_copy.rbegin())->GetWPId());
+        const uint32 reid_count = endid - startid + 1;
+        uint32 target_startid = target_start_id.value_or(startid);
+
+        if (target_start_id)
+        {
+            if (std::ranges::any_of(wander_nodes_copy, [st = *target_start_id, en = *target_start_id + reid_count - 1](WanderNode const* wpc) {
+                return wpc->GetWPId() >= st && wpc->GetWPId() <= en; }))
+            {
+                handler->SendSysMessage("Cannot reid onto existing WP ids!");
+                handler->SetSentErrorMessage(true);
+                return false;
+            }
+
+            handler->PSendSysMessage("Running re-id on %u..%u -> %u..%u", startid, endid, target_startid, uint32(target_startid + reid_count - 1));
+        }
+        else
+            handler->PSendSysMessage("Running re-id on %u..%u", startid, endid);
+
+        std::vector<WanderNode*> wander_node_updates;
+        wander_node_updates.reserve(reid_count);
+        for (WanderNode* wp : wander_nodes_copy)
+        {
+            if (wp->GetWPId() >= startid && wp->GetWPId() <= endid)
+            {
+                uint32 prev_id = wp->GetWPId();
+                wp->SetId(target_startid++);
+                wander_node_updates.push_back(wp);
+                handler->PSendSysMessage("%u => %u", prev_id, wp->GetWPId());
+            }
+        }
+
+        std::sort(std::begin(wander_nodes_copy), std::end(wander_nodes_copy), [](WanderNode const* wp1, WanderNode const* wp2) { return wp1->GetWPId() < wp2->GetWPId(); });
+        WanderNode::nextWPId = (*wander_nodes_copy.rbegin())->GetWPId();
+
+        WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
+        trans->PAppend("DELETE FROM `creature_template_npcbot_wander_nodes` WHERE id BETWEEN {} AND {}", startid, endid);
+        std::ostringstream ss;
+        ss << "INSERT INTO `creature_template_npcbot_wander_nodes` (id,mapid,x,y,z,o,zoneid,areaid,minlevel,maxlevel,flags,name,links) VALUES ";
+        WanderNode::DoForContainerWPs(wander_node_updates, [&ss](WanderNode const* wp) {
+            auto [minl, maxl] = wp->GetLevels();
+            ss << '(' << wp->GetWPId() << ',' << wp->GetMapId()
+                << ',' << wp->GetPositionX() << ',' << wp->GetPositionY() << ',' << wp->GetPositionZ() << ',' << wp->GetOrientation()
+                << ',' << wp->GetZoneId() << ',' << wp->GetAreaId() << ',' << uint32(minl) << ',' << uint32(maxl)
+                << ',' << wp->GetFlags() << ",'" << wp->GetName() << "','" << wp->FormatLinks() << "'),";
+        });
+        std::string val_str = ss.str();
+        val_str.resize(val_str.size() - 1u);
+        trans->Append(val_str.c_str());
+        WorldDatabase.CommitTransaction(trans);
+
+        handler->SendSysMessage("Reid complete.");
 
         return true;
     }

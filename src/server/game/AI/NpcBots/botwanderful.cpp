@@ -24,18 +24,6 @@ WanderNode::mutex_type* WanderNode::GetLock()
     return &_lock;
 }
 
-bool WanderNode::IsWP(Creature const* creature)
-{
-    if (!creature)
-        return false;
-
-    lock_type lock(*GetLock());
-
-    return std::find_if(ALL_WPS.cbegin(), ALL_WPS.cend(), [=](WanderNode const* wp) {
-        return wp->GetCreature() == creature;
-    }) != ALL_WPS.cend();
-}
-
 WanderNode* WanderNode::FindInAllWPs(uint32 wpId)
 {
     lock_type lock(*GetLock());
