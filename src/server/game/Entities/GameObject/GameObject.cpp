@@ -739,7 +739,7 @@ void GameObject::Update(uint32 diff)
                         if (!target)
                         {
                             Creature* bot = nullptr;
-                            std::function bot_checker = [=](Creature const* c) { return c->IsNPCBot() && c->IsAlive() && IsWithinDistInMap(c, radius); };
+                            std::function bot_checker = [=, this](Creature const* c) { return c->IsNPCBot() && c->IsAlive() && IsWithinDistInMap(c, radius); };
                             Acore::CreatureSearcher searcher(this, bot, bot_checker);
                             Cell::VisitAllObjects(this, searcher, radius);
                             target = bot;

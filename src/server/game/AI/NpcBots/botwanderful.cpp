@@ -323,7 +323,7 @@ uint32 WanderNode::GetAverageLinkWeight(bool exclude_0/* = false*/) const
         return sum / std::max<uint32>(1u, GetLinks().size() - zeros_count);
     }
 
-    return static_cast<uint32>(std::accumulate(GetLinks().cbegin(), GetLinks().cend(), 0u, [this](size_t total, WanderNodeLink const& wpl) { return total + wpl.weight; }) / GetLinks().size());
+    return static_cast<uint32>(std::accumulate(GetLinks().cbegin(), GetLinks().cend(), 0u, [](size_t total, WanderNodeLink const& wpl) { return total + wpl.weight; }) / GetLinks().size());
 }
 
 std::string WanderNode::FormatLinks() const
