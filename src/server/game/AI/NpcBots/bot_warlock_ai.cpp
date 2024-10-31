@@ -290,7 +290,6 @@ public:
                     return;
             }
 
-            //TODO: soulstone on self/bots
             //BUG: players cannot accept this buff if they are below lvl 20 (should be 8)
             if (hasSoulstone && soulstoneTimer <= diff && GetSpell(CREATE_SOULSTONE_1))
             {
@@ -305,7 +304,7 @@ public:
                             break;
                         for (Unit* member : all_members)
                         {
-                            if ((i >= 2 || (i == 0 ? member->IsPlayer() : member->IsNPCBot())) && me->GetMap() == member->FindMap() &&
+                            if ((i >= 2 || (i == 0 ? member->IsPlayer() : (member->IsNPCBot() && !GetBG()))) && me->GetMap() == member->FindMap() &&
                                 member->IsAlive() && !member->isPossessed() && !member->IsCharmed() &&
                                 !(member->IsNPCBot() && member->ToCreature()->IsTempBot()) &&
                                 me->GetDistance(member) < 30 && !member->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
@@ -320,7 +319,7 @@ public:
                     }
                 }
 
-                if (targets.empty() && master->IsAlive() && !master->isPossessed() && !master->IsCharmed() &&
+                if (targets.empty() && master->IsAlive() && !master->isPossessed() && !master->IsCharmed() && !(GetBG() && IsWanderer()) &&
                     me->GetDistance(master) < 30 && !master->GetDummyAuraEffect(SPELLFAMILY_GENERIC, 92, 0))
                     targets.push_back(master);
 
