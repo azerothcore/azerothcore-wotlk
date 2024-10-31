@@ -18082,7 +18082,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                         {
                             if (me->IsMounted())
                                 DismountBot();
-                            bg->EventBotClickedOnFlag(me, go);
+                            go->Use(me);
                         }
                         else
                         {
