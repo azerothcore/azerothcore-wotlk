@@ -1,5 +1,6 @@
 #include "botwanderful.h"
 #include "DBCStores.h"
+#include "SpellAuras.h"
 #include "StringConvert.h"
 #include "TemporarySummon.h"
 
@@ -174,7 +175,7 @@ size_t WanderNode::GetWPMapsCount()
 
 WanderNode::WanderNode(uint32 wpId, uint32 mapId, float x, float y, float z, float o, uint32 zoneId, uint32 areaId, std::string const& name)
     : Position(x, y, z, o),
-    _wpId(wpId), _mapId(mapId), _zoneId(zoneId), _areaId(areaId), _name(name), _minLevel(1u), _maxLevel(DEFAULT_MAX_LEVEL), _flags(0),
+    _wpId(wpId), _mapId(mapId), _zoneId(zoneId), _areaId(areaId), _name(name), _minLevel(1u), _maxLevel(DEFAULT_MAX_LEVEL), _flags(0), _to_links_count(0),
     _creature(nullptr)
 {
     ASSERT(!!sMapStore.LookupEntry(_mapId), "WanderNode::Ctr(): Invalid value for _mapId");
@@ -357,14 +358,74 @@ std::string WanderNode::ToString(int32 link_weight/* = -1*/) const
 {
     std::ostringstream wps;
     wps << "WP " << _wpId << (link_weight >= 0 ? (":" + Trinity::ToString(link_weight)) : std::string{})
-        << " '" << _name << "', " << uint32(_links.size()) << " link(s) (avg weight " << GetAverageLinkWeight() << "), Map " << _mapId
-        << ", Zone " << _zoneId << " (" << std::string(sAreaTableStore.LookupEntry(_zoneId)->AreaName[0])
-        << "), Area " << _areaId << " (" << std::string(sAreaTableStore.LookupEntry(_areaId)->AreaName[0])
-        << "), minLvl " << uint32(_minLevel) << ", maxLvl " << uint32(_maxLevel)
-        << " (" << static_cast<Position const*>(this)->ToString() << ')'
-        << ", flags: 0x" << std::hex << std::setw(8) << std::setfill('0') << _flags << std::dec;
-
+        << " '" << _name << "', " << uint32(_links.size()) << " link(s) (avg weight " << GetAverageLinkWeight()
+        << "), Map " << _mapId << ", Zone " << _zoneId << ", Area " << _areaId << ", minLvl " << uint32(_minLevel) << ", maxLvl " << uint32(_maxLevel)
+        << " (" << std::setiosflags(std::ios_base::fixed) << std::setprecision(2) << "X: " << m_positionX << " Y: " << m_positionY << " Z: " << m_positionZ
+        << "), flags: 0x" << std::hex << std::setw(8) << std::setfill('0') << _flags << std::dec;
     return wps.str();
+}
+
+void WanderNode::Link(WanderNodeLink&& wpl)
+{
+    if (!HasLink(wpl))
+    {
+        _links.push_back(std::move(wpl));
+        wpl.wp->_setLinkedBy(this);
+        SetupLinkFromAura();
+    }
+}
+void WanderNode::UnLink(uint32 wp_id)
+{
+    auto lit = GetLink(wp_id);
+    if (lit != _links.cend())
+    {
+        WanderNode* lwp = lit->wp;
+        _links.erase(lit);
+        lwp->_setUnLinkedBy(this);
+        SetupLinkFromAura();
+    }
+}
+void WanderNode::_setLinkedBy(WanderNode const*/* lwp*/)
+{
+    ++_to_links_count;
+    SetupLinkToAura();
+}
+void WanderNode::_setUnLinkedBy(WanderNode const*/* lwp*/)
+{
+    --_to_links_count;
+    SetupLinkToAura();
+}
+void WanderNode::SetupLinkFromAura() const
+{
+    if (Creature* wpc = GetCreature())
+    {
+        Aura* linkfrom = wpc->GetAura(WP_SPELL_ID_LINK_FROM);
+        if (GetLinks().empty())
+        {
+            if (linkfrom)
+                linkfrom->Remove();
+            return;
+        }
+        if (!linkfrom)
+            linkfrom = wpc->AddAura(WP_SPELL_ID_LINK_FROM, wpc);
+        linkfrom->SetStackAmount((uint8)GetLinks().size());
+    }
+}
+void WanderNode::SetupLinkToAura() const
+{
+    if (Creature* wpc = GetCreature())
+    {
+        Aura* linkto = wpc->GetAura(WP_SPELL_ID_LINK_TO);
+        if (_to_links_count == 0)
+        {
+            if (linkto)
+                linkto->Remove();
+            return;
+        }
+        if (!linkto)
+            linkto = wpc->AddAura(WP_SPELL_ID_LINK_TO, wpc);
+        linkto->SetStackAmount((uint8)_to_links_count);
+    }
 }
 
 #ifdef _MSC_VER

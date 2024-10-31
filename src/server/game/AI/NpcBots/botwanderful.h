@@ -45,6 +45,9 @@ enum class BotWPFlags : uint32
     BOTWP_FLAG_HORDE_BOSS_ROOM          = BOTWP_FLAG_BG_BOSS_ROOM | BOTWP_FLAG_HORDE_ONLY
 };
 
+constexpr uint32 WP_SPELL_ID_LINK_TO = 64034;
+constexpr uint32 WP_SPELL_ID_LINK_FROM = 64036;
+
 class WanderNode : public Position
 {
 public:
@@ -143,19 +146,8 @@ public:
     std::string FormatLinks() const;
     uint32 GetAverageLinkWeight(bool exclude_0 = false) const;
 
-    void Link(WanderNodeLink&& wpl) {
-        if (!HasLink(wpl))
-            _links.push_back(std::move(wpl));
-    }
-    void UnLink(uint32 wp_id) {
-        auto lit = GetLink(wp_id);
-        if (lit != _links.cend())
-        {
-            WanderNode* lwp = lit->wp;
-            _links.erase(lit);
-            lwp->UnLink(this);
-        }
-    }
+    void Link(WanderNodeLink&& wpl);
+    void UnLink(uint32 wp_id);
     inline void UnLink(WanderNodeLink const& wpl) { return UnLink(wpl.Id()); }
     inline void UnLink(WanderNode const* wp) { return UnLink(wp->GetWPId()); }
     inline bool HasLink(uint32 wp_id) const { return GetLink(wp_id) != _links.cend(); }
@@ -192,7 +184,13 @@ public:
     std::pair<uint8, uint8> GetLevels() const { return { _minLevel, _maxLevel }; }
     uint32 GetFlags() const { return _flags; }
 
+    void SetupLinkFromAura() const;
+    void SetupLinkToAura() const;
+
 private:
+    void _setLinkedBy(WanderNode const*/* lwp*/);
+    void _setUnLinkedBy(WanderNode const*/* lwp*/);
+
     uint32 _wpId;
     const uint32 _mapId;
     const uint32 _zoneId;
@@ -203,6 +201,7 @@ private:
     uint32 _flags;
 
     node_lltype _links;
+    uint32 _to_links_count;
 
     Creature* _creature;
 };
