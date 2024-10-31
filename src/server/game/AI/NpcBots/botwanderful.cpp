@@ -280,7 +280,7 @@ WanderNode::node_lltype WanderNode::GetShortestPathLinks(WanderNode const* targe
                 for (auto const& vlp : validLinks)
                     minlevel = std::min<decltype(minlevel)>(minlevel, vlp.first);
                 decltype(minlevel) inclevel = minlevel + AsUnderlyingType(max_level_diff);
-                validLinks.remove_if([=](decltype(validLinks)::value_type const& p) {
+                validLinks.remove_if([=, this](decltype(validLinks)::value_type const& p) {
                     return p.first > inclevel || (p.first > minlevel && p.second->wp->GetExactDist2d(target) > GetExactDist2d(target));
                 });
             }

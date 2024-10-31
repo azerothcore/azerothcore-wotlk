@@ -1420,7 +1420,6 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
             while (tn != wp)
             {
                 auto const& tnlinks = tn->GetLinks();
-                decltype(tnlinks);
                 if (tnlinks.size() != 2u || !tn->HasLink(prev ? prev : wp))
                 {
                     sc_chain.push_back(tn);

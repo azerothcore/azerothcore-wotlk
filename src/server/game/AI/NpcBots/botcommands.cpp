@@ -969,7 +969,6 @@ public:
     static void HandleWPUpdateLinks(ChatHandler* handler, WanderNode* wp, std::vector<std::pair<uint32, int32>> const& newlinks, bool oneway = false, bool on_delete = false)
     {
         using WanderNodeLink = WanderNode::WanderNodeLink;
-        using NodeLinkList = std::list<WanderNodeLink const*>;
 
         if (oneway && on_delete)
         {
@@ -1106,7 +1105,7 @@ public:
                 continue;
             }
 
-            if (std::ranges::find_if(links, [lid = lid, &p](WanderNodeLink const& wpl) { return wpl.Id() == lid; }) == links.cend())
+            if (std::ranges::find_if(links, [=](WanderNodeLink const& wpl) { return wpl.Id() == lid; }) == links.cend())
             {
                 handler->PSendSysMessage("WP {} has no link to WP {}!", wp->GetWPId(), lid);
                 continue;
