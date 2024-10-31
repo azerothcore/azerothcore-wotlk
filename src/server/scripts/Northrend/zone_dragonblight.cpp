@@ -1663,6 +1663,32 @@ public:
         }
     };
 };
+class spell_spiritual_insight : public SpellScriptLoader
+{
+public:
+    spell_spiritual_insight() : SpellScriptLoader("spell_spiritual_insight") {}
+
+    class spell_spiritual_insight_SpellScript : public SpellScript
+    {
+        PrepareSpellScript(spell_spiritual_insight_SpellScript);
+
+        void HandleApplyTouch()
+        {
+            if (Unit* target = GetHitUnit())
+                target->SetDisplayId(23954);    //Spiritual Insight form
+        }
+
+        void Register() override
+        {
+            AfterHit += SpellHitFn(spell_spiritual_insight_SpellScript::HandleApplyTouch);
+        }
+    };
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new spell_spiritual_insight_SpellScript;
+    }
+};
 
 // Theirs
 
@@ -2266,6 +2292,7 @@ void AddSC_dragonblight()
     new npc_q24545_vegard_dummy();
     new npc_q24545_vegard();
     new npc_spiritual_insight();
+    new spell_spiritual_insight();
 
     // Theirs
     new npc_commander_eligor_dawnbringer();
