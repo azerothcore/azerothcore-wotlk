@@ -229,7 +229,7 @@ WanderNode::node_lltype WanderNode::GetShortestPathLinks(WanderNode const* targe
 
     NodeLinkList retlist;
     if (this == target)
-        retlist.emplace_back(const_cast<WanderNode*>(this), 10000);
+        retlist.push_back(WanderNodeLink{ .wp = const_cast<WanderNode*>(this), .weight = 10000 });
     else
     {
         std::list<std::pair<uint32 /*level*/, WanderNodeLink const*>> validLinks;
