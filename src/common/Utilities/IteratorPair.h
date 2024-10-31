@@ -18,7 +18,7 @@
 #ifndef IteratorPair_h__
 #define IteratorPair_h__
 
-#include <utility>
+#include <vector>
 
 namespace Acore
 {
