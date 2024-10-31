@@ -4,6 +4,7 @@
 
 #include <algorithm>
 #include <iomanip>
+#include <numeric>
 #include <unordered_set>
 
 #ifdef _MSC_VER
@@ -229,21 +230,22 @@ void WanderNode::RemoveAllWPs()
         RemoveWP(ALL_WPS.front());
 }
 
-WanderNode::node_ltype_c WanderNode::GetShortestPathLinks(WanderNode const* target, WanderNode::node_ltype_c const& base_links) const
+WanderNode::node_lltype WanderNode::GetShortestPathLinks(WanderNode const* target, WanderNode::node_lltype const& base_links) const
 {
-    using NodeList = WanderNode::node_ltype_c;
+    using NodeLinkList = WanderNode::node_lltype;
+    using NodeLinkPList = std::vector<WanderNodeLink const*>;
 
-    ASSERT(std::all_of(base_links.cbegin(), base_links.cend(), [this](WanderNode const* wp) { return HasLink(wp); }));
+    ASSERT(std::all_of(base_links.cbegin(), base_links.cend(), [this](WanderNodeLink const& wpl) { return HasLink(wpl.Id()); }));
 
-    NodeList retlist;
+    NodeLinkList retlist;
     if (this == target)
-        retlist.push_back(this);
+        retlist.emplace_back(const_cast<WanderNode*>(this), 10000);
     else
     {
-        std::list<std::pair<uint32 /*level*/, WanderNode const*>> validLinks;
-        for (WanderNode const* link : base_links)
+        std::list<std::pair<uint32 /*level*/, WanderNodeLink const*>> validLinks;
+        for (WanderNodeLink const& link : base_links)
         {
-            if (link == target)
+            if (link.wp == target)
             {
                 retlist.push_back(link);
                 validLinks.clear();
@@ -252,27 +254,27 @@ WanderNode::node_ltype_c WanderNode::GetShortestPathLinks(WanderNode const* targ
 
             std::unordered_set<WanderNode const*> checked_links;
             checked_links.insert(this);
-            NodeList vlinks_cur;
-            NodeList clinks;
+            NodeLinkPList vlinks_cur;
+            NodeLinkList clinks;
             clinks.push_back(link);
             for (uint32 level = 0; !clinks.empty(); ++level)
             {
-                for (WanderNode const* wp : clinks)
+                for (WanderNodeLink const& wpl : clinks)
                 {
-                    if (wp->HasLink(target))
-                        vlinks_cur.push_back(link);
+                    if (wpl.wp->HasLink(target))
+                        vlinks_cur.push_back(&link);
                 }
                 if (!vlinks_cur.empty())
                 {
-                    validLinks.emplace_back(level, link);
+                    validLinks.emplace_back(level, &link);
                     break;
                 }
-                NodeList clinks_new;
-                for (WanderNode const* wp : clinks)
+                decltype(clinks) clinks_new;
+                for (WanderNodeLink const& wpl : clinks)
                 {
-                    checked_links.insert(wp); // cut off all ways back (2-ways, circular)
-                    std::copy_if(wp->GetLinks().begin(), wp->GetLinks().end(), std::back_inserter(clinks_new), [&checked_links](WanderNode const* cwp) {
-                        return !checked_links.contains(cwp);
+                    checked_links.insert(wpl.wp); // cut off all ways back (2-ways, circular)
+                    std::copy_if(wpl.wp->GetLinks().cbegin(), wpl.wp->GetLinks().cend(), std::back_inserter(clinks_new), [&checked_links](WanderNodeLink const& wpl) {
+                        return !checked_links.contains(wpl.wp);
                     });
                 }
                 clinks = std::move(clinks_new);
@@ -285,12 +287,12 @@ WanderNode::node_ltype_c WanderNode::GetShortestPathLinks(WanderNode const* targ
             if (validLinks.size() > 1)
             {
                 auto minlevel = std::numeric_limits<decltype(validLinks)::value_type::first_type>::max();
-                for (auto const& kv : validLinks)
-                    minlevel = std::min<decltype(minlevel)>(minlevel, kv.first);
+                for (auto const& vlp : validLinks)
+                    minlevel = std::min<decltype(minlevel)>(minlevel, vlp.first);
                 validLinks.remove_if([=](decltype(validLinks)::value_type const& p) { return p.first > minlevel; });
             }
             for (decltype(validLinks)::value_type const& vt : validLinks)
-                retlist.emplace_back(std::move(vt.second));
+                retlist.push_back(*vt.second);
         }
     }
 
@@ -310,13 +312,41 @@ Creature* WanderNode::GetCreature() const
     return _creature;
 }
 
+uint32 WanderNode::GetAverageLinkWeight(bool exclude_0/* = false*/) const
+{
+    if (GetLinks().empty())
+        return 0;
+
+    if (exclude_0)
+    {
+        uint32 zeros_count = 0;
+        uint32 sum = 0;
+        for (WanderNodeLink const& wpl : GetLinks())
+        {
+            sum += wpl.weight;
+            if (wpl.weight == 0)
+                ++zeros_count;
+        }
+        return sum / std::max<uint32>(1u, GetLinks().size() - zeros_count);
+    }
+
+    return static_cast<uint32>(std::accumulate(GetLinks().cbegin(), GetLinks().cend(), 0u, [this](size_t total, WanderNodeLink const& wpl) { return total + wpl.weight; }) / GetLinks().size());
+}
+
 std::string WanderNode::FormatLinks() const
 {
     std::ostringstream lss;
-    for (WanderNode* lwp : _links)
-        lss << lwp->GetWPId() << ":0 "; //TODO: chance
+    for (WanderNodeLink const& wpl: _links)
+        lss << uint32(wpl.Id()) << ':' << uint32(wpl.weight) << ' ';
 
     return lss.str();
+}
+
+void WanderNode::SetLinkWeight(uint32 wp_id, uint32 new_weight)
+{
+    auto lit = GetLink(wp_id);
+    ASSERT(lit != GetLinks().cend());
+    lit->weight = new_weight;
 }
 
 void WanderNode::SetFlags(BotWPFlags flags)
@@ -337,7 +367,7 @@ bool WanderNode::HasFlag(BotWPFlags flags) const
 std::string WanderNode::ToString() const
 {
     std::ostringstream wps;
-    wps << "WP " << _wpId << " '" << _name << "', " << uint32(_links.size()) << " link(s)" << ", Map " << _mapId
+    wps << "WP " << _wpId << " '" << _name << "', " << uint32(_links.size()) << " link(s) (avg weight " << GetAverageLinkWeight() << "), Map " << _mapId
         << ", Zone " << _zoneId << " (" << std::string(sAreaTableStore.LookupEntry(_zoneId)->area_name[0])
         << "), Area " << _areaId << " (" << std::string(sAreaTableStore.LookupEntry(_areaId)->area_name[0])
         << "), minLvl " << uint32(_minLevel) << ", maxLvl " << uint32(_maxLevel)

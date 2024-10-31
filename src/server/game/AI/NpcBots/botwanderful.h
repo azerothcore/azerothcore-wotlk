@@ -38,13 +38,32 @@ enum class BotWPFlags : uint32
 
 class WanderNode : public Position
 {
+public:
+    struct WanderNodeLink
+    {
+        WanderNode* wp;
+        uint32 weight;
+
+        inline uint32 Id() const { return wp ? wp->GetWPId() : 0; }
+
+        inline std::strong_ordering operator<=>(WanderNodeLink const& other) const noexcept = default;
+
+        struct WeightExtractor {
+            constexpr uint32 operator()(WanderNodeLink const& wpl) { return wpl.weight; }
+            constexpr uint32 operator()(WanderNodeLink const* wpl) { return wpl->weight; }
+        };
+    };
+
+private:
     using node_ltype = std::list<WanderNode*>;
     using node_ltype_c = std::list<WanderNode const*>;
     using node_mtype = std::unordered_map<uint32, node_ltype>;
+    using node_lltype = std::list<WanderNodeLink>;
 
     using node_proc_ftype = std::function<void(WanderNode*)>;
     using node_proc_ftype_c = std::function<void(WanderNode const*)>;
     using node_check_ftype_c = std::function<bool(WanderNode const*)>;
+    using node_proc_ltype = std::function<void(WanderNodeLink const&)>;
 
     using mutex_type = std::recursive_mutex;
     using lock_type = std::unique_lock<mutex_type>;
@@ -75,6 +94,13 @@ public:
     static WanderNode* FindInZoneWPs(uint32 zoneId, node_check_ftype_c const& pred);
     static WanderNode* FindInAreaWPs(uint32 areaId, node_check_ftype_c const& pred);
 
+    template<typename Func>
+    static void DoForContainerWPLinks(WanderNode::node_lltype const& c, Func&& func) {
+        static_assert(std::is_convertible_v<Func, node_proc_ltype>);
+        for (auto const& wl : c)
+            func(wl);
+    }
+
     template<typename Container, typename Func>
     static void DoForContainerWPs(Container const& c, Func&& func) {
         static_assert(WanderNode::is_container_v<Container>);
@@ -100,40 +126,45 @@ public:
     static void RemoveWP(WanderNode* wp);
 
     //utils
-    WanderNode::node_ltype_c GetShortestPathLinks(WanderNode const* target, WanderNode::node_ltype_c const& base_links) const;
+    WanderNode::node_lltype GetShortestPathLinks(WanderNode const* target, WanderNode::node_lltype const& base_links) const;
 
     //base
     void SetCreature(Creature* creature);
     Creature* GetCreature() const;
 
     std::string FormatLinks() const;
+    uint32 GetAverageLinkWeight(bool exclude_0 = false) const;
 
-    void Link(WanderNode* wp, bool oneway = false) {
-        if (!HasLink(wp)) {
-            _links.push_back(wp);
-            if (!oneway)
-                wp->Link(this);
+    void Link(WanderNodeLink&& wpl) {
+        if (!HasLink(wpl))
+            _links.push_back(std::move(wpl));
+    }
+    void UnLink(uint32 wp_id) {
+        auto lit = GetLink(wp_id);
+        if (lit != _links.cend())
+        {
+            WanderNode* lwp = lit->wp;
+            _links.erase(lit);
+            lwp->UnLink(this);
         }
     }
-    void UnLink(WanderNode* wp) {
-        if (HasLink(wp)) {
-            _links.remove(wp);
-            wp->UnLink(this);
-        }
+    inline void UnLink(WanderNodeLink const& wpl) { return UnLink(wpl.Id()); }
+    inline void UnLink(WanderNode const* wp) { return UnLink(wp->GetWPId()); }
+    inline bool HasLink(uint32 wp_id) const { return GetLink(wp_id) != _links.cend(); }
+    inline bool HasLink(WanderNodeLink const& wpl) const { return HasLink(wpl.Id()); }
+    inline bool HasLink(WanderNode const* wp) const { return HasLink(wp->GetWPId()); }
+    auto GetLinks() const -> typename std::add_const_t<WanderNode::node_lltype>& { return _links; }
+    auto GetLink(uint32 wp_id) -> typename WanderNode::node_lltype::iterator {
+        return std::ranges::find_if(_links, [=](WanderNodeLink const& wpl) { return wpl.Id() == wp_id; });
     }
-    bool HasLink(WanderNode const* wp) const {
-        return std::find(_links.cbegin(), _links.cend(), wp) != _links.cend();
-    }
-    auto GetLinks() const -> typename std::add_const_t<WanderNode::node_ltype>& {
-        return _links;
+    auto GetLink(uint32 wp_id) const -> typename WanderNode::node_lltype::const_iterator {
+        return std::ranges::find_if(_links, [=](WanderNodeLink const& wpl) { return wpl.Id() == wp_id; });
     }
 
-    void SetLevels(std::pair<uint8, uint8> levels) {
-        std::tie(_minLevel, _maxLevel) = levels;
-    }
-    inline void SetLevels(uint8 minLevel, uint8 maxLevel) {
-        SetLevels(std::pair{ minLevel, maxLevel });
-    }
+    void SetLinkWeight(uint32 wp_id, uint32 new_weight);
+
+    void SetLevels(std::pair<uint8, uint8> levels) { std::tie(_minLevel, _maxLevel) = levels; }
+    inline void SetLevels(uint8 minLevel, uint8 maxLevel) { SetLevels(std::pair{ minLevel, maxLevel }); }
 
     void SetFlags(BotWPFlags flags);
     void RemoveFlags(BotWPFlags flags);
@@ -161,7 +192,7 @@ private:
     uint8 _maxLevel;
     uint32 _flags;
 
-    node_ltype _links;
+    node_lltype _links;
 
     Creature* _creature;
 };

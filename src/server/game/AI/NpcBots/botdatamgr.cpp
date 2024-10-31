@@ -27,6 +27,8 @@
 #include "Tokenize.h"
 #include "World.h"
 #include "WorldDatabase.h"
+
+#include <numeric>
 /*
 Npc Bot Data Manager by Trickerer (onlysuffering@gmail.com)
 NpcBots DB Data management
@@ -1107,6 +1109,7 @@ void BotDataMgr::DeleteOldLogs()
 
 void BotDataMgr::LoadWanderMap(bool reload)
 {
+    using WanderNodeLink = WanderNode::WanderNodeLink;
     using SpawnMapEx = std::map<uint32, bool>;
     using SpawnVector = std::vector<WanderNode const*>;
 
@@ -1127,7 +1130,7 @@ void BotDataMgr::LoadWanderMap(bool reload)
 
     LOG_INFO("server.loading", "Setting up wander map...");
 
-    //                                             0    1   2 3 4 5   6      7       8        9      10   11    12
+    //                                             0  1     2 3 4 5 6      7      8        9        10    11   12
     QueryResult wres = WorldDatabase.Query("SELECT id,mapid,x,y,z,o,zoneId,areaId,minlevel,maxlevel,flags,name,links FROM creature_template_npcbot_wander_nodes ORDER BY mapid,id");
     if (!wres)
     {
@@ -1348,6 +1351,11 @@ void BotDataMgr::LoadWanderMap(bool reload)
         for (auto const& p : vt.second.second)
         {
             uint32 lid = *Acore::StringTo<uint32>(p.first);
+            uint32 lweight = *Trinity::StringTo<uint32>(p.second);
+
+            if (lweight >= 1000)
+                TC_LOG_WARN("server.loading", "WP {} has link {} with suspicious weight of {}, error?", vt.first, lid, lweight);
+
             if (lid == vt.first)
             {
                 LOG_ERROR("server.loading", "WP {} has link {} which links to itself! Skipped.", vt.first, lid);
@@ -1373,7 +1381,8 @@ void BotDataMgr::LoadWanderMap(bool reload)
             if (lwpdist2d < MIN_WANDER_NODE_DISTANCE && is_continent)
                 LOG_WARN("server.loading", "Warning! Link distance between WP {} and {} is low ({})", vt.first, lid, lwpdist2d);
 
-            vt.second.first->Link(lwp, true);
+            WanderNodeLink newlink{ .wp = lwp, .weight = lweight };
+            vt.second.first->Link(std::move(newlink));
 
             if (is_continent)
             {
@@ -1384,30 +1393,44 @@ void BotDataMgr::LoadWanderMap(bool reload)
                     maxdist = dist2d;
             }
         }
+
+        if (uint32 avg_weight = vt.second.first->GetAverageLinkWeight())
+        {
+            for (WanderNodeLink const& wpl : vt.second.first->GetLinks())
+            {
+                if (wpl.weight == 0)
+                    TC_LOG_WARN("server.loading", "WP {} has link {} with weight of 0 (average {})! Link will be inaccessible!", vt.first, wpl.Id(), avg_weight);
+                else if (float(wpl.weight) < avg_weight / 100.f)
+                    TC_LOG_WARN("server.loading", "WP {} has link {} with weight of {} below 1% average ({}), error?", vt.first, wpl.Id(), wpl.weight, avg_weight);
+            }
+        }
     }
 
     std::set<WanderNode const*> tops;
     WanderNode::DoForAllWPs([&](WanderNode const* wp) {
-        if (!tops.contains(wp) && wp->GetLinks().size() == 1u)
+        auto const& wplinks = wp->GetLinks();
+        if (!tops.contains(wp) && wplinks.size() == 1u)
         {
             LOG_DEBUG("server.loading", "Node {} ('{}') has single connection!", wp->GetWPId(), wp->GetName().c_str());
-            WanderNode const* tn = wp->GetLinks().front();
+            WanderNode const* tn = wplinks.begin()->wp;
             WanderNode const* prev = nullptr;
             std::vector<WanderNode const*> sc_chain;
             sc_chain.push_back(wp);
             tops.emplace(wp);
             while (tn != wp)
             {
-                if (tn->GetLinks().size() != 2u || !tn->HasLink(prev ? prev : wp))
+                auto const& tnlinks = tn->GetLinks();
+                decltype(tnlinks);
+                if (tnlinks.size() != 2u || !tn->HasLink(prev ? prev : wp))
                 {
                     sc_chain.push_back(tn);
                     break;
                 }
                 prev = sc_chain.back();
                 sc_chain.push_back(tn);
-                tn = *std::find_if_not(std::cbegin(tn->GetLinks()), std::cend(tn->GetLinks()), [=](WanderNode const* lwp) { return lwp == prev; });
+                tn = std::ranges::find_if_not(tnlinks, [=](std::remove_cvref_t<decltype(tnlinks)>::value_type const& lwp) { return lwp.wp == prev; })->wp;
             }
-            if (sc_chain.back()->GetLinks().size() == 1u && prev && sc_chain.back()->GetLinks().front() == prev)
+            if (sc_chain.back()->GetLinks().size() == 1u && prev && sc_chain.back()->GetLinks().begin()->wp == prev)
             {
                 LOG_DEBUG("server.loading", "Node {} ('{}') has single connection!", tn->GetWPId(), tn->GetName().c_str());
                 tops.emplace(sc_chain.back());
@@ -3009,6 +3032,9 @@ bool BotDataMgr::IsWanderNodeAvailableForBotFaction(WanderNode const* wp, uint32
 WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, WanderNode const* lastNode, Position const* fromPos, Creature const* bot, uint8 lvl, bool random)
 {
     using NodeList = std::list<WanderNode const*>;
+    using WanderNodeLink = WanderNode::WanderNodeLink;
+    using NodeLinkList = std::list<WanderNodeLink const*>;
+    using LinkWeightExtractor = WanderNodeLink::WeightExtractor;
 
     static auto node_viable = [](WanderNode const* wp, uint8 lvl) -> bool {
         return (lvl + 2 >= wp->GetLevels().first && lvl <= wp->GetLevels().second);
@@ -3017,18 +3043,17 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
     uint32 faction = bot->GetFaction();
 
     //Node got deleted (or forced)! Select close point and go from there
-    NodeList links;
+    NodeList nlinks;
     if (curNode->GetLinks().empty() || random)
     {
         if (bot->IsInWorld() && !bot->GetMap()->IsBattlegroundOrArena())
         {
-            WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&links, lvl = lvl, fac = faction, pos = fromPos](WanderNode const* wp) {
-                if (pos->GetExactDist2d(wp) < MAX_WANDER_NODE_DISTANCE &&
-                    IsWanderNodeAvailableForBotFaction(wp, fac, true) && node_viable(wp, lvl))
-                    links.push_back(wp);
+            WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&nlinks, lvl = lvl, fac = faction, pos = fromPos](WanderNode const* wp) {
+                if (pos->GetExactDist2d(wp) < MAX_WANDER_NODE_DISTANCE && IsWanderNodeAvailableForBotFaction(wp, fac, true) && node_viable(wp, lvl))
+                    nlinks.push_back(wp);
             });
-            if (!links.empty())
-                return links.size() == 1u ? links.front() : Acore::Containers::SelectRandomContainerElement(links);
+            if (!nlinks.empty())
+                return nlinks.size() == 1u ? nlinks.front() : Trinity::Containers::SelectRandomContainerElement(nlinks);
         }
 
         //Select closest
@@ -3036,8 +3061,7 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
         float mindist = 50000.0f; // Anywhere
         WanderNode::DoForAllMapWPs(curNode->GetMapId(), [&node_new, &mindist, lvl = lvl, fac = faction, pos = fromPos](WanderNode const* wp) {
             float dist = pos->GetExactDist2d(wp);
-            if (dist < mindist &&
-                IsWanderNodeAvailableForBotFaction(wp, fac, false) && node_viable(wp, lvl))
+            if (dist < mindist && IsWanderNodeAvailableForBotFaction(wp, fac, false) && node_viable(wp, lvl))
             {
                 mindist = dist;
                 node_new = wp;
@@ -3048,7 +3072,7 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
 
     if (bot_ai::IsFlagCarrier(bot))
     {
-        NodeList flagDropNodes;
+        NodeLinkList flagDropNodes;
         TeamId teamId = GetTeamIdForFaction(faction);
         static const auto is_my_flag_drop_node = [](WanderNode const* dwp, TeamId tId) {
             if (dwp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_DELIVER_TARGET))
@@ -3061,45 +3085,51 @@ WanderNode const* BotDataMgr::GetNextWanderNode(WanderNode const* curNode, Wande
             return false;
         };
         //check two levels of links, enough for: WSG
-        for (WanderNode const* dwp : curNode->GetLinks())
+        for (auto const& dwp : curNode->GetLinks())
         {
-            if (is_my_flag_drop_node(dwp, teamId))
-                flagDropNodes.push_back(dwp);
+            if (is_my_flag_drop_node(dwp.wp, teamId))
+                flagDropNodes.push_back(&dwp);
             else
             {
-                for (WanderNode const* dwpl : dwp->GetLinks())
+                for (auto const& dwpl : dwp.wp->GetLinks())
                 {
-                    if (dwpl != curNode && is_my_flag_drop_node(dwpl, teamId))
+                    if (dwpl.wp != curNode && is_my_flag_drop_node(dwpl.wp, teamId))
                     {
-                        flagDropNodes.push_back(dwp);
+                        flagDropNodes.push_back(&dwpl);
                         break;
                     }
                 }
             }
         }
         if (!flagDropNodes.empty())
-            return flagDropNodes.size() == 1u ? flagDropNodes.front() : Acore::Containers::SelectRandomContainerElement(flagDropNodes);
+        {
+            WanderNodeLink const* wpl = flagDropNodes.size() == 1u ? flagDropNodes.front() : *Trinity::Containers::SelectRandomWeightedContainerElement(flagDropNodes, LinkWeightExtractor());
+            return wpl->wp;
+        }
     }
 
-    for (WanderNode const* wp : curNode->GetLinks())
+    NodeLinkList llinks;
+    for (auto const& wpl : curNode->GetLinks())
     {
-        if (IsWanderNodeAvailableForBotFaction(wp, faction, false) && node_viable(wp, lvl))
-            links.push_back(wp);
+        if (IsWanderNodeAvailableForBotFaction(wpl.wp, faction, false) && node_viable(wpl.wp, lvl))
+            llinks.push_back(&wpl);
     }
-    if (links.size() > 1 && lastNode && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-        links.remove(lastNode);
+    if (llinks.size() > 1 && lastNode && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
+        llinks.remove_if([=](WanderNodeLink const* wpl) { return wpl->wp == lastNode; });
+    if (!llinks.empty())
+    {
+        WanderNodeLink const* wpl = llinks.size() == 1u ? llinks.front() : *Trinity::Containers::SelectRandomWeightedContainerElement(llinks, LinkWeightExtractor());
+        return wpl->wp;
+    }
 
     //Overleveled or died: no viable nodes in reach, find one for teleport
-    if (links.empty())
-    {
-        WanderNode::DoForAllWPs([&links, lvl = lvl, fac = faction](WanderNode const* wp) {
-            if (IsWanderNodeAvailableForBotFaction(wp, fac, true) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && node_viable(wp, lvl))
-                links.push_back(wp);
-        });
-    }
+    WanderNode::DoForAllWPs([&nlinks, lvl = lvl, fac = faction](WanderNode const* wp) {
+        if (IsWanderNodeAvailableForBotFaction(wp, fac, true) && wp->HasFlag(BotWPFlags::BOTWP_FLAG_SPAWN) && node_viable(wp, lvl))
+            nlinks.push_back(wp);
+    });
 
-    ASSERT(!links.empty());
-    return links.size() == 1u ? links.front() : Acore::Containers::SelectRandomContainerElement(links);
+    ASSERT(!nlinks.empty());
+    return nlinks.size() == 1u ? nlinks.front() : Trinity::Containers::SelectRandomContainerElement(nlinks);
 }
 
 WanderNode const* BotDataMgr::GetClosestWanderNode(WorldLocation const* loc)
