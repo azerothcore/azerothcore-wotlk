@@ -326,7 +326,7 @@ public:
                     for (Unit* member : members)
                     {
                         if (!(i == 0 ? member->IsPlayer() : member->IsNPCBot()) || me->GetMap() != member->FindMap() ||
-                            !member->IsAlive() || me->GetDistance(member) > 40 || member->isPossessed() || member->IsCharmed() || 
+                            !member->IsAlive() || me->GetDistance(member) > 40 || member->isPossessed() || member->IsCharmed() ||
                             member->getAttackers().empty() || (!IsTank(member) && GetHealthPCT(member) > 75) ||
                             (member->IsNPCBot() && member->ToCreature()->IsTempBot()) ||
                             member->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_PALADIN, 0x0, 0x80000, 0x0))

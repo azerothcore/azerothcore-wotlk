@@ -5087,14 +5087,14 @@ void bot_ai::CalculateAoeSpots(Unit const* unit, AoeSpotsVec& spots)
     //Additional: aoe coming from spawned npcs
 
     //Molten Core
-    if (unit->GetMapId() == 409)  
+    if (unit->GetMapId() == 409)
     {
         std::list<GameObject*> gListMC;
-        Acore::AllGameObjectsWithEntryInRange checkMC(unit, GAMEOBJECT_HOT_COAL, 60.f);  
+        Acore::AllGameObjectsWithEntryInRange checkMC(unit, GAMEOBJECT_HOT_COAL, 60.f);
         Acore::GameObjectListSearcher<Acore::AllGameObjectsWithEntryInRange> searcherMC(unit, gListMC, checkMC);
         Cell::VisitAllObjects(unit, searcherMC, 60.f);
 
-        float radius = 15.0f + DEFAULT_COMBAT_REACH;  
+        float radius = 15.0f + DEFAULT_COMBAT_REACH;
         for (std::list<GameObject*>::const_iterator ci = gListMC.cbegin(); ci != gListMC.cend(); ++ci)
             spots.push_back(AoeSpotsVec::value_type(*(*ci), radius));
     }
