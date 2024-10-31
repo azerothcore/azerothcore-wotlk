@@ -32,6 +32,7 @@
 #include "SpellMgr.h"
 #include "Spell.h"
 #include "TemporarySummon.h"
+#include "Tokenize.h"
 #include "Vehicle.h"
 #include "World.h"
 #include "WorldDatabase.h"
@@ -756,7 +757,7 @@ public:
         wpc->SetFullHealth();
         wpc->SetPowerType(POWER_MANA);
         wpc->SetMaxPower(POWER_MANA, wp->GetFlags());
-        wpc->SetFullPower(POWER_MANA);
+        wpc->SetPower(POWER_MANA, wp->GetFlags());
         wpc->SetObjectScale(4.0f);
         wp->SetupLinkFromAura();
         wp->SetupLinkToAura();
@@ -928,7 +929,7 @@ public:
         WanderNode::DoForContainerWPs(to_links, [=](WanderNode const* lwp) {
             if (!lwp->GetCreature())
             {
-                handler->PSendSysMessage("Can't visualise link %u-%u, no creature...", lwp->GetWPId(), wp->GetWPId());
+                handler->PSendSysMessage("Can't visualise link {}-{}, no creature...", lwp->GetWPId(), wp->GetWPId());
                 return;
             }
             for (uint32 spell_id : vis_spell_ids)
@@ -937,7 +938,7 @@ public:
         WanderNode::DoForContainerWPLinks(links, [=](WanderNodeLink const& wlp) {
             if (!wlp.wp->GetCreature())
             {
-                handler->PSendSysMessage("Can't visualise link %u-%u, no creature...", wp->GetWPId(), wlp.wp->GetWPId());
+                handler->PSendSysMessage("Can't visualise link {}-{}, no creature...", wp->GetWPId(), wlp.wp->GetWPId());
                 return;
             }
             for (uint32 spell_id : vis_spell_ids)
@@ -952,12 +953,12 @@ public:
         link_pairs.reserve(links_strings.size());
         for (std::string_view newlink : links_strings)
         {
-            std::vector<std::string_view> toks = Trinity::Tokenize(newlink, ':', false);
-            Optional<uint32> val1 = toks.size() >= 1 ? Trinity::StringTo<uint32>(toks[0]) : std::nullopt;
-            Optional<uint32> val2 = toks.size() >= 2 ? Trinity::StringTo<uint32>(toks[1]) : std::nullopt;
+            std::vector<std::string_view> toks = Acore::Tokenize(newlink, ':', false);
+            Optional<uint32> val1 = toks.size() >= 1 ? Acore::StringTo<uint32>(toks[0]) : std::nullopt;
+            Optional<uint32> val2 = toks.size() >= 2 ? Acore::StringTo<uint32>(toks[1]) : std::nullopt;
             if (toks.size() > 2 || val1 == std::nullopt || val2 == std::nullopt)
             {
-                handler->PSendSysMessage("Invalid link format: %s", newlink);
+                handler->PSendSysMessage("Invalid link format: {}", newlink);
                 result = false;
                 continue;
             }
@@ -988,7 +989,7 @@ public:
             WanderNode::DoForAllMapWPs(wp->GetMapId(), [=, &links, &wps_updates](WanderNode const* mwp) {
                 if (mwp != wp && mwp->HasLink(wp) && std::ranges::none_of(links, [=](WanderNodeLink const& wpl) { return wpl.Id() == mwp->GetWPId(); }))
                 {
-                    handler->PSendSysMessage("Removing link %u->%u...", mwp->GetWPId(), wp->GetWPId());
+                    handler->PSendSysMessage("Removing link {}->{}...", mwp->GetWPId(), wp->GetWPId());
                     const_cast<WanderNode*>(mwp)->UnLink(wp);
                     wps_updates.insert(mwp);
                 }
@@ -1011,7 +1012,7 @@ public:
             {
                 WanderNode* lwp = wp->GetLinks().front().wp;
                 bool removing_reverse_link = (!oneway || std::ranges::any_of(newlinks, [=](auto const& p) { return p.first == lwp->GetWPId(); })) && lwp->HasLink(wp);
-                handler->PSendSysMessage("Removing link %u%s%u...", wp->GetWPId(), removing_reverse_link ? "<->" : "->", lwp->GetWPId());
+                handler->PSendSysMessage("Removing link {}{}{}...", wp->GetWPId(), removing_reverse_link ? "<->" : "->", lwp->GetWPId());
                 wp->UnLink(lwp);
                 if (removing_reverse_link)
                 {
@@ -1040,7 +1041,7 @@ public:
             }
 
             if (p.second < 0 && lweight)
-                handler->PSendSysMessage("Link %u%s%u has no weight assigned, using average (%u)!", wp->GetWPId(), oneway ? "->" : "<->", lid, lweight);
+                handler->PSendSysMessage("Link {}{}{} has no weight assigned, using average ({})!", wp->GetWPId(), oneway ? "->" : "<->", lid, lweight);
 
             if (!wps_relinks.empty())
             {
@@ -1049,7 +1050,7 @@ public:
                     wps_relinks.erase(wpscit);
             }
 
-            handler->PSendSysMessage("Adding link %u%s%u (w=%u, avg was %u)...", wp->GetWPId(), oneway ? "->" : "<->", lid, lweight, average_weight);
+            handler->PSendSysMessage("Adding link {}{}{} (w={}, avg was {})...", wp->GetWPId(), oneway ? "->" : "<->", lid, lweight, average_weight);
             if (wp->GetExactDist2d(lwp) > MAX_VISIBILITY_DISTANCE)
                 handler->PSendSysMessage("Warning! Link distance is too great ({:.2f})", wp->GetExactDist2d(lwp));
 
@@ -1068,22 +1069,22 @@ public:
                 std::sort(wps_relinks.begin(), wps_relinks.end(), [](WanderNodeLink const* wlp1, WanderNodeLink const* wlp2) { return wlp1->Id() < wlp2->Id(); });
                 for (WanderNodeLink const* wlp : wps_relinks)
                 {
-                    handler->PSendSysMessage("Adding link %u->%u (w=%u)...", wp->GetWPId(), wlp->Id(), wlp->weight);
+                    handler->PSendSysMessage("Adding link {}->{} (w={})...", wp->GetWPId(), wlp->Id(), wlp->weight);
                     if (wp->GetExactDist2d(wlp->wp) > MAX_VISIBILITY_DISTANCE)
-                        handler->PSendSysMessage("Warning! Link distance is too great (%.2f)", wp->GetExactDist2d(wlp->wp));
+                        handler->PSendSysMessage("Warning! Link distance is too great ({})", wp->GetExactDist2d(wlp->wp));
                     wp->Link(WanderNodeLink{ .wp = wlp->wp, .weight = wlp->weight });
                 }
             }
             if (!wp->GetLinks().empty() || !links.empty())
             {
-                handler->PSendSysMessage("WP %u links %u -> %u, avg link weight %u -> %u...",
+                handler->PSendSysMessage("WP {} links {} -> {}, avg link weight {} -> {}...",
                     wp->GetWPId(), uint32(links.size()), uint32(wp->GetLinks().size()), average_weight, wp->GetAverageLinkWeight());
             }
         }
 
         WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
         WanderNode::DoForContainerWPs(wps_updates, [&trans](WanderNode const* uwp) {
-            trans->PAppend("UPDATE creature_template_npcbot_wander_nodes SET links='{}' WHERE id={}", uwp->FormatLinks(), uwp->GetWPId());
+            trans->Append("UPDATE creature_template_npcbot_wander_nodes SET links='{}' WHERE id={}", uwp->FormatLinks(), uwp->GetWPId());
         });
         WorldDatabase.DirectCommitTransaction(trans);
     }
@@ -1101,13 +1102,13 @@ public:
 
             if (!WanderNode::FindInMapWPs(wp->GetMapId(), lid))
             {
-                handler->PSendSysMessage("WP %u does not exist!", lid);
+                handler->PSendSysMessage("WP {} does not exist!", lid);
                 continue;
             }
 
             if (std::ranges::find_if(links, [lid = lid, &p](WanderNodeLink const& wpl) { return wpl.Id() == lid; }) == links.cend())
             {
-                handler->PSendSysMessage("WP %u has no link to WP %u!", wp->GetWPId(), lid);
+                handler->PSendSysMessage("WP {} has no link to WP {}!", wp->GetWPId(), lid);
                 continue;
             }
 
@@ -1130,7 +1131,7 @@ public:
         }
 
         if (dirty)
-            WorldDatabase.PExecute("UPDATE creature_template_npcbot_wander_nodes SET links='{}' WHERE id={}", wp->FormatLinks(), wp->GetWPId());
+            WorldDatabase.Execute("UPDATE creature_template_npcbot_wander_nodes SET links='{}' WHERE id={}", wp->FormatLinks(), wp->GetWPId());
     }
     static bool HandleNpcBotWPSetLinksCommand(ChatHandler* handler, Optional<std::vector<uint32>> links, Optional<bool> oneway)
     {
@@ -1456,7 +1457,7 @@ public:
 
         if (*flags >= AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END))
         {
-            handler->PSendSysMessage("Flags must be below %u!", AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END));
+            handler->PSendSysMessage("Flags must be below {}!", AsUnderlyingType(BotWPFlags::BOTWP_FLAG_END));
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -1720,10 +1721,10 @@ public:
                 return false;
             }
 
-            handler->PSendSysMessage("Running re-id on %u..%u -> %u..%u", startid, endid, target_startid, uint32(target_startid + reid_count - 1));
+            handler->PSendSysMessage("Running re-id on {}..{} -> {}..{}", startid, endid, target_startid, uint32(target_startid + reid_count - 1));
         }
         else
-            handler->PSendSysMessage("Running re-id on %u..%u", startid, endid);
+            handler->PSendSysMessage("Running re-id on {}..{}", startid, endid);
 
         std::set<uint32> checked_map_ids;
         std::vector<uint32> wander_node_deletes;
@@ -1742,7 +1743,7 @@ public:
                 }
                 uint32 prev_id = wp->GetWPId();
                 wp->SetId(target_startid++);
-                handler->PSendSysMessage("%u => %u", prev_id, wp->GetWPId());
+                handler->PSendSysMessage("{} => {}", prev_id, wp->GetWPId());
             }
         }
 
@@ -1761,7 +1762,7 @@ public:
             ss << wpid << ',';
         std::string wp_range_str = ss.str();
         wp_range_str.resize(wp_range_str.size() - 1u);
-        trans->PAppend("DELETE FROM `creature_template_npcbot_wander_nodes` WHERE id IN ({})", wp_range_str);
+        trans->Append("DELETE FROM `creature_template_npcbot_wander_nodes` WHERE id IN ({})", wp_range_str);
         ss.str("");
         ss << "INSERT INTO `creature_template_npcbot_wander_nodes` (id,mapid,x,y,z,o,zoneid,areaid,minlevel,maxlevel,flags,name,links) VALUES ";
         WanderNode::DoForContainerWPs(wander_node_inserts, [&ss](WanderNode const* wp) {

@@ -1351,10 +1351,10 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
         for (auto const& p : vt.second.second)
         {
             uint32 lid = *Acore::StringTo<uint32>(p.first);
-            uint32 lweight = *Trinity::StringTo<uint32>(p.second);
+            uint32 lweight = *Acore::StringTo<uint32>(p.second);
 
             if (lweight >= 1000)
-                TC_LOG_WARN("server.loading", "WP {} has link {} with suspicious weight of {}, error?", vt.first, lid, lweight);
+                LOG_WARN("server.loading", "WP {} has link {} with suspicious weight of {}, error?", vt.first, lid, lweight);
 
             if (lid == vt.first)
             {
@@ -1399,9 +1399,9 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
             for (WanderNodeLink const& wpl : vt.second.first->GetLinks())
             {
                 if (wpl.weight == 0)
-                    TC_LOG_WARN("server.loading", "WP {} has link {} with weight of 0 (average {})! Link will be inaccessible!", vt.first, wpl.Id(), avg_weight);
+                    LOG_WARN("server.loading", "WP {} has link {} with weight of 0 (average {})! Link will be inaccessible!", vt.first, wpl.Id(), avg_weight);
                 else if (float(wpl.weight) < avg_weight / 100.f)
-                    TC_LOG_WARN("server.loading", "WP {} has link {} with weight of {} below 1% average ({}), error?", vt.first, wpl.Id(), wpl.weight, avg_weight);
+                    LOG_WARN("server.loading", "WP {} has link {} with weight of {} below 1% average ({}), error?", vt.first, wpl.Id(), wpl.weight, avg_weight);
             }
         }
     }

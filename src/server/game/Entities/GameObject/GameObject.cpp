@@ -740,7 +740,7 @@ void GameObject::Update(uint32 diff)
                         {
                             Creature* bot = nullptr;
                             std::function bot_checker = [=](Creature const* c) { return c->IsNPCBot() && c->IsAlive() && IsWithinDistInMap(c, radius); };
-                            Trinity::CreatureSearcher searcher(this, bot, bot_checker);
+                            Acore::CreatureSearcher searcher(this, bot, bot_checker);
                             Cell::VisitAllObjects(this, searcher, radius);
                             target = bot;
                         }
@@ -836,7 +836,7 @@ void GameObject::Update(uint32 diff)
                         //npcbot
                         if (target->IsNPCBot() && !goInfo->trap.diameter && goInfo->trap.cooldown == 3)
                             if (Battleground* bg = target->ToCreature()->GetBotBG())
-                                bg->HandleTriggerBuff(GetGUID());
+                                bg->HandleTriggerBuff(this);
                         //end npcbot
                         }
                         break;
