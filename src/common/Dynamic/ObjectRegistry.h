@@ -19,7 +19,6 @@
 #define ACORE_OBJECTREGISTRY_H
 
 #include <map>
-#include <memory>
 #include <string>
 
 /** ObjectRegistry holds all registry item of the same type

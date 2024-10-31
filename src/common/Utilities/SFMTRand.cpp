@@ -18,7 +18,6 @@
 #include "SFMTRand.h"
 #include "Timer.h"
 #include <array>
-#include <functional>
 #include <random>
 
 #if defined(__aarch64__)
