@@ -754,6 +754,9 @@ public:
         wpc->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC | UNIT_FLAG_IMMUNE_TO_PC);
         wpc->SetMaxHealth(wp->GetWPId());
         wpc->SetFullHealth();
+        wpc->SetPowerType(POWER_MANA);
+        wpc->SetMaxPower(POWER_MANA, wp->GetFlags());
+        wpc->SetFullPower(POWER_MANA);
         wpc->SetObjectScale(4.0f);
         wp->SetupLinkFromAura();
         wp->SetupLinkToAura();
@@ -976,7 +979,7 @@ public:
         std::remove_cvref_t<decltype(wp->GetLinks())> links = wp->GetLinks(); //copy
         uint32 average_weight = wp->GetAverageLinkWeight();
 
-        std::set<WanderNode const*> wps_updates;
+        std::unordered_set<WanderNode const*> wps_updates;
         std::vector<WanderNodeLink const*> wps_relinks;
 
         if (on_delete)
@@ -1006,7 +1009,7 @@ public:
         {
             while (!wp->GetLinks().empty())
             {
-                WanderNode* lwp = wp->GetLinks().begin()->wp;
+                WanderNode* lwp = wp->GetLinks().front().wp;
                 bool removing_reverse_link = (!oneway || std::ranges::any_of(newlinks, [=](auto const& p) { return p.first == lwp->GetWPId(); })) && lwp->HasLink(wp);
                 handler->PSendSysMessage("Removing link %u%s%u...", wp->GetWPId(), removing_reverse_link ? "<->" : "->", lwp->GetWPId());
                 wp->UnLink(lwp);
@@ -1703,7 +1706,7 @@ public:
         std::sort(std::begin(wander_nodes_copy), std::end(wander_nodes_copy), [](WanderNode const* wp1, WanderNode const* wp2) { return wp1->GetWPId() < wp2->GetWPId(); });
 
         uint32 startid = *start_id;
-        uint32 endid = end_id.value_or((*wander_nodes_copy.rbegin())->GetWPId());
+        uint32 endid = end_id.value_or(wander_nodes_copy.back()->GetWPId());
         const uint32 reid_count = endid - startid + 1;
         uint32 target_startid = target_start_id.value_or(startid);
 
@@ -1750,7 +1753,7 @@ public:
         }
 
         std::sort(std::begin(wander_nodes_copy), std::end(wander_nodes_copy), [](WanderNode const* wp1, WanderNode const* wp2) { return wp1->GetWPId() < wp2->GetWPId(); });
-        WanderNode::nextWPId = (*wander_nodes_copy.rbegin())->GetWPId();
+        WanderNode::nextWPId = wander_nodes_copy.back()->GetWPId();
 
         WorldDatabaseTransaction trans = WorldDatabase.BeginTransaction();
         std::ostringstream ss;

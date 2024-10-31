@@ -5,8 +5,8 @@
 
 #include <functional>
 #include <list>
-#include <shared_mutex>
 #include <mutex>
+#include <shared_mutex>
 #include <unordered_map>
 
 /*
@@ -18,31 +18,42 @@ class Creature;
 
 enum class BotWPFlags : uint32
 {
-    BOTWP_FLAG_NONE                     = 0x00000000,
-    BOTWP_FLAG_SPAWN                    = 0x00000001, // wandering bots can spawn at this WP location
-    BOTWP_FLAG_ALLIANCE_ONLY            = 0x00000002, // only alliance bots can move here, SPAWN+A = only alliance bots can spawn at this WP location
-    BOTWP_FLAG_HORDE_ONLY               = 0x00000004, // only horde bots can move here, SPAWN+H = only horde bots can spawn at this WP location
-    BOTWP_FLAG_CAN_BACKTRACK_FROM       = 0x00000008, // can move back to WPs links even if other links exist
-    BOTWP_FLAG_MOVEMENT_IGNORES_FACTION = 0x00000010, // ignore faction flags when trying to select this WP as move point
-    BOTWP_FLAG_MOVEMENT_IGNORES_PATHING = 0x00000020, // do not generate path between 2 WPs having this flag
-    BOTWP_FLAG_BG_FLAG_DELIVER_TARGET   = 0x00000040, // <BG only> flag carrier destination marker
-    BOTWP_FLAG_BG_FLAG_PICKUP_TARGET    = 0x00000080, // <BG only> flag pick/activate up marker
-    BOTWP_FLAG_BG_BOSS_ROOM             = 0x00000100, // <BG only> boss room to attack as group / defend
-    BOTWP_FLAG_BG_MISC_OBJECTIVE_1      = 0x00000200, // <BG only> misc objective 1 (AV = mine)
-    BOTWP_FLAG_BG_MISC_OBJECTIVE_2      = 0x00000400, // <BG only> misc objective 2 (NYI)
-    BOTWP_FLAG_BG_MISC_OBJECTIVE_3      = 0x00000800, // <BG only> misc objective 3 (NYI)
-    BOTWP_FLAG_BG_MISC_OBJECTIVE_4      = 0x00001000, // <BG only> misc objective 4 (NYI)
-    BOTWP_FLAG_BG_OPTIONAL_PICKUP_1     = 0x00002000, // <BG only> optional pickup point 1 (power-ups, etc., NYI)
-    BOTWP_FLAG_BG_OPTIONAL_PICKUP_2     = 0x00004000, // <BG only> optional pickup point 2 (power-ups, etc., NYI)
-    BOTWP_FLAG_BG_OPTIONAL_PICKUP_3     = 0x00008000, // <BG only> optional pickup point 3 (power-ups, etc., NYI)
-    BOTWP_FLAG_BG_OPTIONAL_PICKUP_4     = 0x00010000, // <BG only> optional pickup point 4 (power-ups, etc., NYI)
-    BOTWP_FLAG_END                      = 0x00020000,
+    BOTWP_FLAG_NONE                         = 0x00000000,
+    BOTWP_FLAG_SPAWN                        = 0x00000001, // wandering bots can spawn at this WP location
+    BOTWP_FLAG_ALLIANCE_ONLY                = 0x00000002, // only alliance bots can move here, SPAWN+A = only alliance bots can spawn at this WP location
+    BOTWP_FLAG_HORDE_ONLY                   = 0x00000004, // only horde bots can move here, SPAWN+H = only horde bots can spawn at this WP location
+    BOTWP_FLAG_CAN_BACKTRACK_FROM           = 0x00000008, // can move back to WPs links even if other links exist
+    BOTWP_FLAG_MOVEMENT_IGNORES_FACTION     = 0x00000010, // ignore faction flags when trying to select this WP as move point
+    BOTWP_FLAG_MOVEMENT_IGNORES_PATHING     = 0x00000020, // do not generate path between 2 WPs having this flag
+    BOTWP_FLAG_BG_FLAG_DELIVER_TARGET       = 0x00000040, // <BG only> flag carrier destination marker
+    BOTWP_FLAG_BG_FLAG_PICKUP_TARGET        = 0x00000080, // <BG only> flag pick/activate up marker
+    BOTWP_FLAG_BG_BOSS_ROOM                 = 0x00000100, // <BG only> boss room to attack as group / defend
+    BOTWP_FLAG_BG_MISC_OBJECTIVE_1          = 0x00000200, // <BG only> misc objective 1 (AV = mine)
+    BOTWP_FLAG_BG_MISC_OBJECTIVE_2          = 0x00000400, // <BG only> misc objective 2 (NYI)
+    BOTWP_FLAG_BG_OPTIONAL_PICKUP_1         = 0x00000800, // <BG only> optional pickup point 1 (WS = healNW)
+    BOTWP_FLAG_BG_OPTIONAL_PICKUP_2         = 0x00001000, // <BG only> optional pickup point 2 (WS = bersNE)
+    BOTWP_FLAG_BG_OPTIONAL_PICKUP_3         = 0x00002000, // <BG only> optional pickup point 3 (WS = healSE)
+    BOTWP_FLAG_BG_OPTIONAL_PICKUP_4         = 0x00004000, // <BG only> optional pickup point 4 (WS = bersSW)
+    BOTWP_FLAG_END                          = 0x00008000,
 
-    BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY   = BOTWP_FLAG_ALLIANCE_ONLY | BOTWP_FLAG_HORDE_ONLY,
-    BOTWP_FLAG_ALLIANCE_SPAWN_POINT     = BOTWP_FLAG_SPAWN | BOTWP_FLAG_ALLIANCE_ONLY,
-    BOTWP_FLAG_HORDE_SPAWN_POINT        = BOTWP_FLAG_SPAWN | BOTWP_FLAG_HORDE_ONLY,
-    BOTWP_FLAG_ALLIANCE_BOSS_ROOM       = BOTWP_FLAG_BG_BOSS_ROOM | BOTWP_FLAG_ALLIANCE_ONLY,
-    BOTWP_FLAG_HORDE_BOSS_ROOM          = BOTWP_FLAG_BG_BOSS_ROOM | BOTWP_FLAG_HORDE_ONLY
+    BOTWP_FLAG_ALLIANCE_OR_HORDE_ONLY       = BOTWP_FLAG_ALLIANCE_ONLY | BOTWP_FLAG_HORDE_ONLY,
+    BOTWP_FLAG_ALLIANCE_SPAWN_POINT         = BOTWP_FLAG_SPAWN | BOTWP_FLAG_ALLIANCE_ONLY,
+    BOTWP_FLAG_HORDE_SPAWN_POINT            = BOTWP_FLAG_SPAWN | BOTWP_FLAG_HORDE_ONLY,
+    BOTWP_FLAG_ALLIANCE_FLAG_DELIVER_TARGET = BOTWP_FLAG_BG_FLAG_DELIVER_TARGET | BOTWP_FLAG_ALLIANCE_ONLY,
+    BOTWP_FLAG_HORDE_FLAG_DELIVER_TARGET    = BOTWP_FLAG_BG_FLAG_DELIVER_TARGET | BOTWP_FLAG_HORDE_ONLY,
+    BOTWP_FLAG_ALLIANCE_FLAG_PICKUP_TARGET  = BOTWP_FLAG_BG_FLAG_PICKUP_TARGET | BOTWP_FLAG_ALLIANCE_ONLY,
+    BOTWP_FLAG_HORDE_FLAG_PICKUP_TARGET     = BOTWP_FLAG_BG_FLAG_PICKUP_TARGET | BOTWP_FLAG_HORDE_ONLY,
+    BOTWP_FLAG_ALLIANCE_BOSS_ROOM           = BOTWP_FLAG_BG_BOSS_ROOM | BOTWP_FLAG_ALLIANCE_ONLY,
+    BOTWP_FLAG_HORDE_BOSS_ROOM              = BOTWP_FLAG_BG_BOSS_ROOM | BOTWP_FLAG_HORDE_ONLY,
+    BOTWP_FLAG_OPTIONAL_PICKUP              = BOTWP_FLAG_BG_OPTIONAL_PICKUP_1 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_2 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_3 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_4,
+    BOTWP_FLAG_WS_PICKUP_RESTORATION        = BOTWP_FLAG_BG_OPTIONAL_PICKUP_1 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_3,
+    BOTWP_FLAG_WS_PICKUP_BERSERKING         = BOTWP_FLAG_BG_OPTIONAL_PICKUP_2 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_4,
+};
+
+enum class BotWPLevel : uint32
+{
+    BOTWP_LEVEL_ZERO                        = 0,
+    BOTWP_LEVEL_ONE                         = 1,
 };
 
 constexpr uint32 WP_SPELL_ID_LINK_TO = 64034;
@@ -137,7 +148,7 @@ public:
     static void RemoveWP(WanderNode* wp);
 
     //utils
-    WanderNode::node_lltype GetShortestPathLinks(WanderNode const* target, WanderNode::node_lltype const& base_links) const;
+    WanderNode::node_lltype GetShortestPathLinks(WanderNode const* target, WanderNode::node_lltype const& base_links, BotWPLevel max_level_diff = BotWPLevel::BOTWP_LEVEL_ZERO) const;
 
     //base
     void SetCreature(Creature* creature);
@@ -169,6 +180,7 @@ public:
     void SetFlags(BotWPFlags flags);
     void RemoveFlags(BotWPFlags flags);
     bool HasFlag(BotWPFlags flags) const;
+    bool HasAllFlags(BotWPFlags flags) const;
 
     void SetName(std::string const& name) { _name = name; }
 

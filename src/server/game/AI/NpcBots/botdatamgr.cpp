@@ -1430,7 +1430,7 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
                 sc_chain.push_back(tn);
                 tn = std::ranges::find_if_not(tnlinks, [=](std::remove_cvref_t<decltype(tnlinks)>::value_type const& lwp) { return lwp.wp == prev; })->wp;
             }
-            if (sc_chain.back()->GetLinks().size() == 1u && prev && sc_chain.back()->GetLinks().begin()->wp == prev)
+            if (sc_chain.back()->GetLinks().size() == 1u && prev && sc_chain.back()->GetLinks().front().wp == prev)
             {
                 LOG_DEBUG("server.loading", "Node {} ('{}') has single connection!", tn->GetWPId(), tn->GetName().c_str());
                 tops.emplace(sc_chain.back());

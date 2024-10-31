@@ -499,7 +499,7 @@ public:
             if (mytar->IsControlledByPlayer() || me->GetHealthPct() < 25.f)
             {
                 //Vanish (no GCD)
-                if (IsSpellReady(VANISH_1, diff, false) && !stealthed && !shadowdance && !IsTank() && Rand() < 45 && !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE))
+                if (IsSpellReady(VANISH_1, diff, false) && !stealthed && !shadowdance && !IsTank() && Rand() < 45 && !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) || !IsFlagCarrier(me))
                 {
                     bool cast = false;
                     //case 1: restealth for opener
@@ -731,7 +731,7 @@ public:
         {
             if (me->IsInCombat() && Rand() < 25)
             {
-                bool canVanish = IsSpellReady(VANISH_1, diff, false);
+                bool canVanish = IsSpellReady(VANISH_1, diff, false) && !IsFlagCarrier(me);
                 bool canSprint = (GetSpec() == BOT_SPEC_ROGUE_COMBAT) && me->GetLevel() >= 25 && !HasBotCommandState(BOT_COMMAND_STAY) && IsSpellReady(SPRINT_1, diff, false);
                 if ((canVanish || canSprint) && me->HasAuraWithMechanic((1<<MECHANIC_SNARE)|(1<<MECHANIC_ROOT)))
                 {

@@ -220,7 +220,7 @@ void WanderNode::RemoveAllWPs()
         RemoveWP(ALL_WPS.front());
 }
 
-WanderNode::node_lltype WanderNode::GetShortestPathLinks(WanderNode const* target, WanderNode::node_lltype const& base_links) const
+WanderNode::node_lltype WanderNode::GetShortestPathLinks(WanderNode const* target, WanderNode::node_lltype const& base_links, BotWPLevel max_level_diff) const
 {
     using NodeLinkList = WanderNode::node_lltype;
     using NodeLinkPList = std::vector<WanderNodeLink const*>;
@@ -242,8 +242,8 @@ WanderNode::node_lltype WanderNode::GetShortestPathLinks(WanderNode const* targe
                 break;
             }
 
-            std::unordered_set<WanderNode const*> checked_links;
-            checked_links.insert(this);
+            std::unordered_set<uint32> checked_links;
+            checked_links.insert(GetWPId());
             NodeLinkPList vlinks_cur;
             NodeLinkList clinks;
             clinks.push_back(link);
@@ -262,9 +262,9 @@ WanderNode::node_lltype WanderNode::GetShortestPathLinks(WanderNode const* targe
                 decltype(clinks) clinks_new;
                 for (WanderNodeLink const& wpl : clinks)
                 {
-                    checked_links.insert(wpl.wp); // cut off all ways back (2-ways, circular)
+                    checked_links.insert(wpl.Id()); // cut off all ways back (2-ways, circular)
                     std::copy_if(wpl.wp->GetLinks().cbegin(), wpl.wp->GetLinks().cend(), std::back_inserter(clinks_new), [&checked_links](WanderNodeLink const& wpl) {
-                        return !checked_links.contains(wpl.wp);
+                        return !checked_links.contains(wpl.Id());
                     });
                 }
                 clinks = std::move(clinks_new);
@@ -279,7 +279,10 @@ WanderNode::node_lltype WanderNode::GetShortestPathLinks(WanderNode const* targe
                 auto minlevel = std::numeric_limits<decltype(validLinks)::value_type::first_type>::max();
                 for (auto const& vlp : validLinks)
                     minlevel = std::min<decltype(minlevel)>(minlevel, vlp.first);
-                validLinks.remove_if([=](decltype(validLinks)::value_type const& p) { return p.first > minlevel; });
+                decltype(minlevel) inclevel = minlevel + AsUnderlyingType(max_level_diff);
+                validLinks.remove_if([=](decltype(validLinks)::value_type const& p) {
+                    return p.first > inclevel || (p.first > minlevel && p.second->wp->GetExactDist2d(target) > GetExactDist2d(target));
+                });
             }
             for (decltype(validLinks)::value_type const& vt : validLinks)
                 retlist.push_back(*vt.second);
@@ -342,16 +345,31 @@ void WanderNode::SetLinkWeight(uint32 wp_id, uint32 new_weight)
 void WanderNode::SetFlags(BotWPFlags flags)
 {
     _flags |= AsUnderlyingType(flags);
+    if (Creature* wpc = GetCreature())
+    {
+        wpc->SetMaxPower(POWER_MANA, GetFlags());
+        wpc->SetFullPower(POWER_MANA);
+    }
 }
 
 void WanderNode::RemoveFlags(BotWPFlags flags)
 {
     _flags &= ~AsUnderlyingType(flags);
+    if (Creature* wpc = GetCreature())
+    {
+        wpc->SetMaxPower(POWER_MANA, GetFlags());
+        wpc->SetFullPower(POWER_MANA);
+    }
 }
 
 bool WanderNode::HasFlag(BotWPFlags flags) const
 {
     return !!(_flags & AsUnderlyingType(flags));
+}
+
+bool WanderNode::HasAllFlags(BotWPFlags flags) const
+{
+    return (_flags & AsUnderlyingType(flags)) == AsUnderlyingType(flags);
 }
 
 std::string WanderNode::ToString(int32 link_weight/* = -1*/) const
