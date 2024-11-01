@@ -32,6 +32,7 @@
 #include "Vehicle.h"
 #include "Weather.h"
 #include "icecrown_citadel.h"
+#include "PassiveAI.h"
 
 enum Texts
 {

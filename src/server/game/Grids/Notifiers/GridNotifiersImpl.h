@@ -19,7 +19,6 @@
 #define ACORE_GRIDNOTIFIERSIMPL_H
 
 #include "Corpse.h"
-#include "CreatureAI.h"
 #include "GridNotifiers.h"
 #include "Object.h"
 #include "Player.h"
