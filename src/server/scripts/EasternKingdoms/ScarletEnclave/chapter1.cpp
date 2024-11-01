@@ -157,20 +157,25 @@ private:
     EventMap _events;
 };
 
+enum DeathComesFromOnHigh
+{
+    SUMMON_GHOULS_ON_SCARLET_CRUSADE = 54522
+};
+
 class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScript
 {
     PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ 54522 });
+        return ValidateSpellInfo({ SUMMON_GHOULS_ON_SCARLET_CRUSADE });
     }
 
     void HandleScriptEffect(SpellEffIndex effIndex)
     {
         PreventHitEffect(effIndex);
         if (Unit* target = GetHitUnit())
-            GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
+            GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SUMMON_GHOULS_ON_SCARLET_CRUSADE, true);
     }
 
     void Register() override
