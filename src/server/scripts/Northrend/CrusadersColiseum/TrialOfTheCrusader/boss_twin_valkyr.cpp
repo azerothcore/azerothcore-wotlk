@@ -868,40 +868,34 @@ class spell_valkyr_touch_aura : public AuraScript
     }
 };
 
-class spell_valkyr_ball_periodic_dummy : public SpellScriptLoader
+class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
 {
-public:
-    spell_valkyr_ball_periodic_dummy() : SpellScriptLoader("spell_valkyr_ball_periodic_dummy") { }
+    PrepareAuraScript(spell_valkyr_ball_periodic_dummy_aura);
 
-    class spell_valkyr_ball_periodic_dummyAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_valkyr_ball_periodic_dummyAuraScript)
+        return ValidateSpellInfo({ SPELL_UNLEASHED_LIGHT, SPELL_UNLEASHED_DARK });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->GetDisplayId() != 11686)
-                    if (Creature* creature = target->ToCreature())
-                        if (Player* player = creature->SelectNearestPlayer(2.75f))
-                            if (creature->GetExactDist2d(player) <= 2.75f)
-                            {
-                                creature->AI()->DoAction(1); // despawning = true;
-                                creature->GetMotionMaster()->MoveIdle();
-                                creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
-                                creature->SetDisplayId(11686);
-                                creature->DespawnOrUnsummon(1500);
-                            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_ball_periodic_dummyAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_valkyr_ball_periodic_dummyAuraScript();
+        if (Unit* target = GetTarget())
+            if (target->GetDisplayId() != 11686)
+                if (Creature* creature = target->ToCreature())
+                    if (Player* player = creature->SelectNearestPlayer(2.75f))
+                        if (creature->GetExactDist2d(player) <= 2.75f)
+                        {
+                            creature->AI()->DoAction(1); // despawning = true;
+                            creature->GetMotionMaster()->MoveIdle();
+                            creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
+                            creature->SetDisplayId(11686);
+                            creature->DespawnOrUnsummon(1500);
+                        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_ball_periodic_dummy_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -913,5 +907,5 @@ void AddSC_boss_twin_valkyr()
     new npc_concentrated_ball();
     RegisterSpellScript(spell_valkyr_essence_aura);
     RegisterSpellScript(spell_valkyr_touch_aura);
-    new spell_valkyr_ball_periodic_dummy();
+    RegisterSpellScript(spell_valkyr_ball_periodic_dummy_aura);
 }
