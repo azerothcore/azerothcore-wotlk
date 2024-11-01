@@ -231,6 +231,11 @@ class spell_temple_of_atal_hakkar_hex_of_jammal_an_aura : public AuraScript
 {
     PrepareAuraScript(spell_temple_of_atal_hakkar_hex_of_jammal_an_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ HEX_OF_JAMMAL_AN, HEX_OF_JAMMAL_AN_CHARM });
+    }
+
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* caster = GetCaster())
