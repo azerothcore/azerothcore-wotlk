@@ -400,37 +400,26 @@ enum GiftOfTheHarvester
     SAY_GOTHIK_PIT              = 0
 };
 
-class spell_item_gift_of_the_harvester : public SpellScriptLoader
+class spell_item_gift_of_the_harvester : public SpellScript
 {
-public:
-    spell_item_gift_of_the_harvester() : SpellScriptLoader("spell_item_gift_of_the_harvester") { }
+    PrepareSpellScript(spell_item_gift_of_the_harvester);
 
-    class spell_item_gift_of_the_harvester_SpellScript : public SpellScript
+    SpellCastResult CheckRequirement()
     {
-        PrepareSpellScript(spell_item_gift_of_the_harvester_SpellScript);
-
-        SpellCastResult CheckRequirement()
+        std::list<Creature*> ghouls;
+        GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
+        if (ghouls.size() >= MAX_GHOULS)
         {
-            std::list<Creature*> ghouls;
-            GetCaster()->GetAllMinionsByEntry(ghouls, NPC_GHOUL);
-            if (ghouls.size() >= MAX_GHOULS)
-            {
-                SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
-                return SPELL_FAILED_CUSTOM_ERROR;
-            }
-
-            return SPELL_CAST_OK;
+            SetCustomCastResultMessage(SPELL_CUSTOM_ERROR_TOO_MANY_GHOULS);
+            return SPELL_FAILED_CUSTOM_ERROR;
         }
 
-        void Register() override
-        {
-            OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester_SpellScript::CheckRequirement);
-        }
-    };
+        return SPELL_CAST_OK;
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_item_gift_of_the_harvester_SpellScript();
+        OnCheckCast += SpellCheckCastFn(spell_item_gift_of_the_harvester::CheckRequirement);
     }
 };
 
@@ -1233,7 +1222,7 @@ void AddSC_the_scarlet_enclave_c1()
     RegisterCreatureAI(npc_eye_of_acherus);
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
     new npc_death_knight_initiate();
-    new spell_item_gift_of_the_harvester();
+    RegisterSpellScript(spell_item_gift_of_the_harvester);
     new spell_q12698_the_gift_that_keeps_on_giving();
     new npc_scarlet_ghoul();
     new npc_dkc1_gothik();
