@@ -232,36 +232,25 @@ class spell_voa_overcharge_aura : public AuraScript
     }
 };
 
-class spell_voa_lightning_nova : public SpellScriptLoader
+class spell_voa_lightning_nova : public SpellScript
 {
-public:
-    spell_voa_lightning_nova() : SpellScriptLoader("spell_voa_lightning_nova") { }
+    PrepareSpellScript(spell_voa_lightning_nova);
 
-    class spell_voa_lightning_nova_SpellScript : public SpellScript
+    void HandleOnHit()
     {
-        PrepareSpellScript(spell_voa_lightning_nova_SpellScript);
-
-        void HandleOnHit()
+        int32 damage = 0;
+        if (Unit* target = GetHitUnit())
         {
-            int32 damage = 0;
-            if (Unit* target = GetHitUnit())
-            {
-                float dist = target->GetDistance(GetCaster());
-                damage = int32(GetHitDamage() * (70.0f - std::min(70.0f, dist)) / 70.0f);
-            }
-
-            SetHitDamage(damage);
+            float dist = target->GetDistance(GetCaster());
+            damage = int32(GetHitDamage() * (70.0f - std::min(70.0f, dist)) / 70.0f);
         }
 
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_voa_lightning_nova_SpellScript::HandleOnHit);
-        }
-    };
+        SetHitDamage(damage);
+    }
 
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_voa_lightning_nova_SpellScript();
+        OnHit += SpellHitFn(spell_voa_lightning_nova::HandleOnHit);
     }
 };
 
@@ -270,5 +259,5 @@ void AddSC_boss_emalon()
     new boss_emalon();
 
     RegisterSpellScript(spell_voa_overcharge_aura);
-    new spell_voa_lightning_nova();
+    RegisterSpellScript(spell_voa_lightning_nova);
 }
