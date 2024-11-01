@@ -1863,7 +1863,6 @@ struct dragonmaw_race_npc : public ScriptedAI
 {
     dragonmaw_race_npc(Creature* creature) : ScriptedAI(creature)
     {
-        _playerGUID = ObjectGuid::Empty;
     }
 
     void Reset() override
