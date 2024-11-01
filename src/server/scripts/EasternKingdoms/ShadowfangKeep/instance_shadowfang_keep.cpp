@@ -175,6 +175,29 @@ class spell_shadowfang_keep_forsaken_skills_aura : public AuraScript
 {
     PrepareAuraScript(spell_shadowfang_keep_forsaken_skills_aura);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+            {
+                SPELL_FORSAKEN_SKILL_SWORD,
+                SPELL_FORSAKEN_SKILL_SWORD+1,
+                SPELL_FORSAKEN_SKILL_SWORD+2,
+                SPELL_FORSAKEN_SKILL_SWORD+3,
+                SPELL_FORSAKEN_SKILL_SWORD+4,
+                SPELL_FORSAKEN_SKILL_SWORD+5,
+                SPELL_FORSAKEN_SKILL_SWORD+6,
+                SPELL_FORSAKEN_SKILL_SWORD+7,
+                SPELL_FORSAKEN_SKILL_SWORD+8,
+                SPELL_FORSAKEN_SKILL_SWORD+9,
+                SPELL_FORSAKEN_SKILL_SWORD+10,
+                SPELL_FORSAKEN_SKILL_SWORD+11,
+                SPELL_FORSAKEN_SKILL_SWORD+12,
+                SPELL_FORSAKEN_SKILL_SWORD+13,
+                // SPELL_FORSAKEN_SKILL_SHADOW-1, // not used
+                SPELL_FORSAKEN_SKILL_SHADOW,
+            });
+    }
+
     bool Load() override
     {
         _forsakenSpell = 0;
