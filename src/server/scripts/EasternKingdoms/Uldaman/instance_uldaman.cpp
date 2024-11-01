@@ -161,44 +161,33 @@ enum UldamanStonedEnum
     MAP_ULDAMAN = 70
 };
 
-class spell_uldaman_stoned : public SpellScriptLoader
+class spell_uldaman_stoned_aura : public AuraScript
 {
-public:
-    spell_uldaman_stoned() : SpellScriptLoader("spell_uldaman_stoned") { }
+    PrepareAuraScript(spell_uldaman_stoned_aura);
 
-    class spell_uldaman_stoned_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_uldaman_stoned_AuraScript);
+        return GetUnitOwner()->IsCreature() && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
+    }
 
-        bool Load() override
-        {
-            return GetUnitOwner()->IsCreature() && GetUnitOwner()->GetMapId() == MAP_ULDAMAN;
-        }
-
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Creature* target = GetUnitOwner()->ToCreature();
-            target->SetReactState(REACT_PASSIVE);
-            target->SetImmuneToAll(true);
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Creature* target = GetUnitOwner()->ToCreature();
-            target->SetReactState(REACT_AGGRESSIVE);
-            target->SetImmuneToAll(false);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_uldaman_stoned_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_uldaman_stoned_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_uldaman_stoned_AuraScript();
+        Creature* target = GetUnitOwner()->ToCreature();
+        target->SetReactState(REACT_PASSIVE);
+        target->SetImmuneToAll(true);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Creature* target = GetUnitOwner()->ToCreature();
+        target->SetReactState(REACT_AGGRESSIVE);
+        target->SetImmuneToAll(false);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_uldaman_stoned_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_uldaman_stoned_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -239,6 +228,6 @@ void AddSC_instance_uldaman()
 {
     new instance_uldaman();
     RegisterSpellScript(spell_uldaman_sub_boss_agro_keepers);
-    new spell_uldaman_stoned();
+    RegisterSpellScript(spell_uldaman_stoned_aura);
     new spell_uldaman_boss_agro_archaedas();
 }
