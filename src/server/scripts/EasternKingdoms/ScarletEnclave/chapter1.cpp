@@ -157,31 +157,25 @@ private:
     EventMap _events;
 };
 
-class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScriptLoader
+class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScript
 {
-public:
-    spell_q12641_death_comes_from_on_high_summon_ghouls() : SpellScriptLoader("spell_q12641_death_comes_from_on_high_summon_ghouls") { }
+    PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
 
-    class spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript);
+        return ValidateSpellInfo({ 54522 });
+    }
 
-        void HandleScriptEffect(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex effIndex)
     {
-        return new spell_q12641_death_comes_from_on_high_summon_ghouls_SpellScript();
+        PreventHitEffect(effIndex);
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 54522, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_summon_ghouls::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1237,7 +1231,7 @@ void AddSC_the_scarlet_enclave_c1()
 {
     // Ours
     RegisterCreatureAI(npc_eye_of_acherus);
-    new spell_q12641_death_comes_from_on_high_summon_ghouls();
+    RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
     new npc_death_knight_initiate();
     new spell_item_gift_of_the_harvester();
     new spell_q12698_the_gift_that_keeps_on_giving();
