@@ -1,3 +1,4 @@
+-- DB update 2024_11_01_01 -> 2024_11_01_02
 --
 UPDATE `spell_script_names` SET `ScriptName`='spell_shadowfang_keep_haunting_spirits_aura' WHERE `spell_id`=7057 AND `ScriptName`='spell_shadowfang_keep_haunting_spirits';
 UPDATE `spell_script_names` SET `ScriptName`='spell_shadowfang_keep_forsaken_skills_aura' WHERE `spell_id`=7054 AND `ScriptName`='spell_shadowfang_keep_forsaken_skills';
