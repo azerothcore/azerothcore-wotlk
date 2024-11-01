@@ -271,50 +271,39 @@ class spell_scholomance_fixate_aura : public AuraScript
     }
 };
 
-class spell_scholomance_boon_of_life : public SpellScriptLoader
+class spell_scholomance_boon_of_life_aura : public AuraScript
 {
-public:
-    spell_scholomance_boon_of_life() : SpellScriptLoader("spell_scholomance_boon_of_life") { }
+    PrepareAuraScript(spell_scholomance_boon_of_life_aura);
 
-    class spell_scholomance_boon_of_life_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_scholomance_boon_of_life_AuraScript);
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Unit* target = GetTarget())
-                    if (Creature* creature = target->ToCreature())
-                    {
-                        creature->AI()->AttackStart(caster);
-                        creature->AddThreat(caster, 10000.0f);
-                    }
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
+        if (Unit* caster = GetCaster())
             if (Unit* target = GetTarget())
                 if (Creature* creature = target->ToCreature())
-                    if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_CANCEL)
-                    {
-                        creature->AI()->Talk(TALK_RAS_HUMAN);
-                        creature->SetDisplayId(MODEL_RAS_HUMAN);
-                        creature->SetHealth(target->GetMaxHealth());
-                        if (InstanceScript* instance = creature->GetInstanceScript())
-                            instance->SetData(DATA_RAS_HUMAN, 1);
-                    }
-        }
+                {
+                    creature->AI()->AttackStart(caster);
+                    creature->AddThreat(caster, 10000.0f);
+                }
+    }
 
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_scholomance_boon_of_life_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-            AfterEffectApply += AuraEffectApplyFn(spell_scholomance_boon_of_life_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_scholomance_boon_of_life_AuraScript();
+        if (Unit* target = GetTarget())
+            if (Creature* creature = target->ToCreature())
+                if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_CANCEL)
+                {
+                    creature->AI()->Talk(TALK_RAS_HUMAN);
+                    creature->SetDisplayId(MODEL_RAS_HUMAN);
+                    creature->SetHealth(target->GetMaxHealth());
+                    if (InstanceScript* instance = creature->GetInstanceScript())
+                        instance->SetData(DATA_RAS_HUMAN, 1);
+                }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_scholomance_boon_of_life_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_scholomance_boon_of_life_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -450,6 +439,6 @@ void AddSC_instance_scholomance()
 {
     new instance_scholomance();
     RegisterSpellScript(spell_scholomance_fixate_aura);
-    new spell_scholomance_boon_of_life();
+    RegisterSpellScript(spell_scholomance_boon_of_life_aura);
     new npc_scholomance_occultist();
 }
