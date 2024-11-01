@@ -470,43 +470,32 @@ class spell_toc25_mistress_kiss_aura : public AuraScript
     }
 };
 
-class spell_mistress_kiss_area : public SpellScriptLoader
+class spell_mistress_kiss_area : public SpellScript
 {
-public:
-    spell_mistress_kiss_area() : SpellScriptLoader("spell_mistress_kiss_area") {}
+    PrepareSpellScript(spell_mistress_kiss_area);
 
-    class spell_mistress_kiss_area_SpellScript : public SpellScript
+    void FilterTargets(std::list<WorldObject*>& targets)
     {
-        PrepareSpellScript(spell_mistress_kiss_area_SpellScript)
+        // get a list of players with mana
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
+        if (targets.empty())
+            return;
 
-        void FilterTargets(std::list<WorldObject*>& targets)
-        {
-            // get a list of players with mana
-            targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-            targets.remove_if(Acore::PowerCheck(POWER_MANA, false));
-            if (targets.empty())
-                return;
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(target);
+    }
 
-            WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
-            targets.clear();
-            targets.push_back(target);
-        }
-
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
-        }
-
-        void Register() override
-        {
-            OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mistress_kiss_area_SpellScript::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
-            OnEffectHitTarget += SpellEffectFn(spell_mistress_kiss_area_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_mistress_kiss_area_SpellScript();
+        GetCaster()->CastSpell(GetHitUnit(), uint32(GetEffectValue()), true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_mistress_kiss_area::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnEffectHitTarget += SpellEffectFn(spell_mistress_kiss_area::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -516,5 +505,5 @@ void AddSC_boss_jaraxxus()
     new npc_fel_infernal();
     new npc_mistress_of_pain();
     RegisterSpellScript(spell_toc25_mistress_kiss_aura);
-    new spell_mistress_kiss_area();
+    RegisterSpellScript(spell_mistress_kiss_area);
 }
