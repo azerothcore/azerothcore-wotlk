@@ -868,42 +868,31 @@ enum eLeechingSwarmSpells
     SPELL_LEECHING_SWARM_HEAL   = 66125,
 };
 
-class spell_gen_leeching_swarm : public SpellScriptLoader
+class spell_gen_leeching_swarm_aura : public AuraScript
 {
-public:
-    spell_gen_leeching_swarm() : SpellScriptLoader("spell_gen_leeching_swarm") { }
+    PrepareAuraScript(spell_gen_leeching_swarm_aura);
 
-    class spell_gen_leeching_swarm_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_gen_leeching_swarm_AuraScript);
+        return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_LEECHING_SWARM_DMG, SPELL_LEECHING_SWARM_HEAL });
-        }
-
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            if (Unit* caster = GetCaster())
-            {
-                int32 lifeLeeched = GetTarget()->CountPctFromCurHealth(aurEff->GetAmount());
-                if (lifeLeeched < 250)
-                    lifeLeeched = 250;
-                // Damage
-                caster->CastCustomSpell(GetTarget(), SPELL_LEECHING_SWARM_DMG, &lifeLeeched, 0, 0, true);
-                // Heal is handled in damage spell. It has to heal the same amount, but some of the dmg can be resisted.
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_leeching_swarm_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_gen_leeching_swarm_AuraScript();
+        if (Unit* caster = GetCaster())
+        {
+            int32 lifeLeeched = GetTarget()->CountPctFromCurHealth(aurEff->GetAmount());
+            if (lifeLeeched < 250)
+                lifeLeeched = 250;
+            // Damage
+            caster->CastCustomSpell(GetTarget(), SPELL_LEECHING_SWARM_DMG, &lifeLeeched, 0, 0, true);
+            // Heal is handled in damage spell. It has to heal the same amount, but some of the dmg can be resisted.
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_gen_leeching_swarm_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -946,6 +935,6 @@ void AddSC_boss_anubarak_trial()
     new npc_nerubian_burrower();
     new npc_anubarak_spike();
     RegisterSpellScript(spell_pursuing_spikes_aura);
-    new spell_gen_leeching_swarm();
+    RegisterSpellScript(spell_gen_leeching_swarm_aura);
     new spell_gen_leeching_swarm_dmg();
 }
