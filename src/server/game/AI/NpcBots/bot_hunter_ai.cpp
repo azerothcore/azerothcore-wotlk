@@ -670,7 +670,7 @@ public:
             if (tanks.empty())
                 return;
 
-            Unit* target = tanks.size() == 1 ? *tanks.begin() : Acore::Containers::SelectRandomContainerElement(tanks);
+            Unit* target = tanks.size() == 1 ? *tanks.begin() : Bcore::Containers::SelectRandomContainerElement(tanks);
             if (doCast(target, GetSpell(MISDIRECTION_1)))
                 return;
         }
@@ -1074,7 +1074,7 @@ public:
             if (targets.empty())
                 return;
 
-            Unit* target = targets.size() == 1u ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+            Unit* target = targets.size() == 1u ? *targets.begin() : Bcore::Containers::SelectRandomContainerElement(targets);
             if (doCast(target, GetSpell(FLARE_1)))
                 return;
         }
@@ -1915,7 +1915,7 @@ public:
 
         void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
         {
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDies: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDies: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
             //if (summon == botPet)
             //    botPet = nullptr;
         }
@@ -1923,7 +1923,7 @@ public:
         void SummonedCreatureDespawn(Creature* summon) override
         {
             //all hunter bot pets despawn at death or manually (gossip, teleport, etc.)
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
             if (summon == botPet)
             {
                 petSummonTimer = 10000;

@@ -171,8 +171,8 @@ public:
                 !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE) && Rand() < 20)
             {
                 WorldObject* result = nullptr;
-                Acore::AnyDeadUnitSpellTargetInRangeCheck check(me, 5.f, sSpellMgr->GetSpellInfo(CARRION_FEEDER_1), TARGET_CHECK_ENEMY);
-                Acore::WorldObjectSearcher<Acore::AnyDeadUnitSpellTargetInRangeCheck> searcher(me, result, check);
+                Bcore::AnyDeadUnitSpellTargetInRangeCheck check(me, 5.f, sSpellMgr->GetSpellInfo(CARRION_FEEDER_1), TARGET_CHECK_ENEMY);
+                Bcore::WorldObjectSearcher<Bcore::AnyDeadUnitSpellTargetInRangeCheck> searcher(me, result, check);
                 Cell::VisitWorldObjects(me, searcher, 5.f);
 
                 if (result)

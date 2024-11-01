@@ -342,7 +342,7 @@ public:
         {
             if (IsInContactWithWater())
             {
-                //TC_LOG_ERROR("scripts", "ApplyClassDamageMultiplierMelee: %s now in water", me->GetName().c_str());
+                //BOT_LOG_ERROR("scripts", "ApplyClassDamageMultiplierMelee: %s now in water", me->GetName().c_str());
                 damage *= 3;
             }
         }
@@ -351,7 +351,7 @@ public:
         {
             if (IsInContactWithWater())
             {
-                //TC_LOG_ERROR("scripts", "ApplyClassDamageMultiplierMelee: %s now in water", me->GetName().c_str());
+                //BOT_LOG_ERROR("scripts", "ApplyClassDamageMultiplierMelee: %s now in water", me->GetName().c_str());
                 damage *= 3;
             }
         }
@@ -365,7 +365,7 @@ public:
 
             if (IsInContactWithWater())
             {
-                //TC_LOG_ERROR("scripts", "ApplyClassDamageMultiplierSpell: %s now in water", me->GetName().c_str());
+                //BOT_LOG_ERROR("scripts", "ApplyClassDamageMultiplierSpell: %s now in water", me->GetName().c_str());
                 fdamage *= 3.f;
             }
 
@@ -657,14 +657,14 @@ public:
 
         void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
         {
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDies: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDies: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
             //if (summon == botPet)
             //    botPet = nullptr;
         }
 
         void SummonedCreatureDespawn(Creature* summon) override
         {
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
             if (_minions.find(summon) != _minions.end())
                 _minions.erase(summon);
         }

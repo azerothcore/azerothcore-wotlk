@@ -1704,7 +1704,7 @@ public:
 
         void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
         {
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDies: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDies: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
             //if (summon == botPet)
             //    botPet = nullptr;
         }
@@ -1712,7 +1712,7 @@ public:
         void SummonedCreatureDespawn(Creature* summon) override
         {
             //all hunter bot pets despawn at death or manually (gossip, teleport, etc.)
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
             if (summon == botPet)
             {
                 petSummonTimer = 30000;

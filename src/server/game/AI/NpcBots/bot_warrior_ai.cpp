@@ -252,7 +252,7 @@ public:
         {
             //Victorious State spell
             //only on targets which give xp or honor
-            if (u->GetLevel() > Acore::XP::GetGrayLevel(me->GetLevel()))
+            if (u->GetLevel() > Bcore::XP::GetGrayLevel(me->GetLevel()))
                 me->CastSpell(me, VICTORIOUS_SPELL, true);
 
             bot_ai::KilledUnit(u);
@@ -1053,7 +1053,7 @@ public:
                 }
 
                 if (!targets.empty())
-                    target = targets.size() == 1 ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+                    target = targets.size() == 1 ? *targets.begin() : Bcore::Containers::SelectRandomContainerElement(targets);
             }
 
             if (!target && !IAmFree() && master->IsAlive() && me->IsWithinDistInMap(master, 30) && !master->HasAura(VIGILANCE))
@@ -1105,7 +1105,7 @@ public:
                     }
                 }
                 if (!targets.empty())
-                    target = targets.size() == 1u ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+                    target = targets.size() == 1u ? *targets.begin() : Bcore::Containers::SelectRandomContainerElement(targets);
             }
 
             if (target && (_inStance(2) || (GetSpec() == BOT_SPEC_WARRIOR_PROTECTION && me->GetLevel() >= 50) || stanceChange(diff, 2)) &&

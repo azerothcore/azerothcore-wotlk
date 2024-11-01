@@ -171,7 +171,7 @@ public:
                     return false;
                 };
                 Creature* creature = nullptr;
-                Acore::CreatureLastSearcher searcher(me, creature, corpse_pred);
+                Bcore::CreatureLastSearcher searcher(me, creature, corpse_pred);
                 Cell::VisitAllObjects(me, searcher, ceinfo->RangeEntry->RangeMax[0]);
 
                 if (creature)
@@ -191,7 +191,7 @@ public:
                     {
                         std::list<Unit*> units;
                         NearbyHostileUnitCheck check(me, ceradius, this, 0, c);
-                        Acore::UnitListSearcher searcher(c, units, check);
+                        Bcore::UnitListSearcher searcher(c, units, check);
                         Cell::VisitAllObjects(c, searcher, ceradius);
                         if (units.size() > maxmob)
                         {
@@ -203,11 +203,11 @@ public:
                     return false;
                 };
                 std::list<Creature*> corpses;
-                Acore::CreatureListSearcher searcher(me, corpses, corpse_pred);
+                Bcore::CreatureListSearcher searcher(me, corpses, corpse_pred);
                 Cell::VisitAllObjects(me, searcher, ceinfo->RangeEntry->RangeMax[0]);
 
                 if (Creature* corpse = corpses.empty() ? nullptr : corpses.size() == 1 ? corpses.front() :
-                    Acore::Containers::SelectRandomContainerElement(corpses))
+                    Bcore::Containers::SelectRandomContainerElement(corpses))
                 {
                     if (doCast(corpse, GetSpell(CORPSE_EXPLOSION_1)))
                     {
@@ -235,7 +235,7 @@ public:
                 return false;
             };
             Creature* creature = nullptr;
-            Acore::CreatureLastSearcher searcher(me, creature, corpse_pred);
+            Bcore::CreatureLastSearcher searcher(me, creature, corpse_pred);
             Cell::VisitAllObjects(me, searcher, 25.f);
 
             if (creature)
@@ -304,7 +304,7 @@ public:
                     }
                 }
                 if (!targets.empty())
-                    target = targets.size() == 1u ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+                    target = targets.size() == 1u ? *targets.begin() : Bcore::Containers::SelectRandomContainerElement(targets);
             }
 
             if (target && doCast(target, GetSpell(UNHOLY_FRENZY_1)))

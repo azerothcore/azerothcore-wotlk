@@ -809,7 +809,7 @@ public:
 
             if (!targets.empty())
             {
-                Unit* target = targets.size() == 1u ? *targets.begin() : Acore::Containers::SelectRandomContainerElement(targets);
+                Unit* target = targets.size() == 1u ? *targets.begin() : Bcore::Containers::SelectRandomContainerElement(targets);
                 if (doCast(target, FOCUSMAGIC))
                 {
                     fmCheckTimer = 30000;
@@ -902,7 +902,7 @@ public:
 
         void CheckWard(uint32 diff)
         {
-            if ((!me->IsInCombat() && !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE)) ||
+            if ((!me->IsInCombat() && !me->HasAuraType(SPELL_AURA_PERIODIC_DAMAGE)) || me->HasAuraType(SPELL_AURA_REFLECT_SPELLS_SCHOOL) ||
                 !IsSpellReady(FROST_WARD_1, diff) || IsCasting())
                 return;
 
@@ -1589,7 +1589,7 @@ public:
 
         void SummonedCreatureDespawn(Creature* summon) override
         {
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
             if (summon == botPet)
                 botPet = nullptr;
         }
