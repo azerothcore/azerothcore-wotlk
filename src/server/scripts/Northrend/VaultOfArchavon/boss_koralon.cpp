@@ -165,30 +165,24 @@ public:
     }
 };
 
-class spell_voa_flaming_cinder : public SpellScriptLoader
+class spell_voa_flaming_cinder : public SpellScript
 {
-public:
-    spell_voa_flaming_cinder() : SpellScriptLoader("spell_voa_flaming_cinder") { }
+    PrepareSpellScript(spell_voa_flaming_cinder);
 
-    class spell_voa_flaming_cinder_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_voa_flaming_cinder_SpellScript);
+        return ValidateSpellInfo({ SPELL_FLAMING_CINDER_MISSILE });
+    }
 
-        void HandleDummy(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-                GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_FLAMING_CINDER_MISSILE, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_voa_flaming_cinder_SpellScript::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        return new spell_voa_flaming_cinder_SpellScript();
+        if (Unit* target = GetHitUnit())
+            GetCaster()->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_FLAMING_CINDER_MISSILE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_voa_flaming_cinder::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -259,7 +253,7 @@ public:
 void AddSC_boss_koralon()
 {
     new boss_koralon();
-    new spell_voa_flaming_cinder();
+    RegisterSpellScript(spell_voa_flaming_cinder);
     new spell_koralon_meteor_fists();
     new spell_flame_warder_meteor_fists();
 }
