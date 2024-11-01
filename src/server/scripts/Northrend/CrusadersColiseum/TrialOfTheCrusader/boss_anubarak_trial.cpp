@@ -829,41 +829,35 @@ public:
     };
 };
 
-class spell_pursuing_spikes : public SpellScriptLoader
+class spell_pursuing_spikes_aura : public AuraScript
 {
-public:
-    spell_pursuing_spikes() : SpellScriptLoader("spell_pursuing_spikes") { }
+    PrepareAuraScript(spell_pursuing_spikes_aura);
 
-    class spell_pursuing_spikesAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_pursuing_spikesAuraScript)
+        return ValidateSpellInfo({ SPELL_SPIKE_FAIL, SPELL_IMPALE });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    {
+        if (Unit* target = GetTarget())
         {
-            if (Unit* target = GetTarget())
+            if (Creature* c = target->FindNearestCreature(NPC_FROST_SPHERE, 8.0f, true))
             {
-                if (Creature* c = target->FindNearestCreature(NPC_FROST_SPHERE, 8.0f, true))
-                {
-                    target->UpdatePosition(*c, false);
-                    target->CastCustomSpell(SPELL_SPIKE_FAIL, SPELLVALUE_MAX_TARGETS, 1);
-                    if (target->IsCreature())
-                        target->ToCreature()->AI()->DoAction(-1);
-                    Remove();
-                    return;
-                }
-                target->CastSpell((Unit*)nullptr, SPELL_IMPALE, true);
+                target->UpdatePosition(*c, false);
+                target->CastCustomSpell(SPELL_SPIKE_FAIL, SPELLVALUE_MAX_TARGETS, 1);
+                if (target->IsCreature())
+                    target->ToCreature()->AI()->DoAction(-1);
+                Remove();
+                return;
             }
+            target->CastSpell((Unit*)nullptr, SPELL_IMPALE, true);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_pursuing_spikesAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_pursuing_spikesAuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_pursuing_spikes_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -951,7 +945,7 @@ void AddSC_boss_anubarak_trial()
     new npc_frost_sphere();
     new npc_nerubian_burrower();
     new npc_anubarak_spike();
-    new spell_pursuing_spikes();
+    RegisterSpellScript(spell_pursuing_spikes_aura);
     new spell_gen_leeching_swarm();
     new spell_gen_leeching_swarm_dmg();
 }
