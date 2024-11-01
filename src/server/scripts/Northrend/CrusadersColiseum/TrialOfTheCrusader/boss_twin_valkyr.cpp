@@ -730,94 +730,88 @@ public:
     };
 };
 
-class spell_valkyr_essence : public SpellScriptLoader
+class spell_valkyr_essence_aura : public AuraScript
 {
-public:
-    spell_valkyr_essence() : SpellScriptLoader("spell_valkyr_essence") { }
+    PrepareAuraScript(spell_valkyr_essence_aura);
 
-    class spell_valkyr_essence_auraAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_valkyr_essence_auraAuraScript)
+        return ValidateSpellInfo({ SPELL_POWERING_UP, SPELL_SURGE_OF_SPEED });
+    }
 
-        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
-        {
-            uint16 count = absorbAmount / 1000;
-            if (!count || !GetOwner())
-                return;
+    void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
+    {
+        uint16 count = absorbAmount / 1000;
+        if (!count || !GetOwner())
+            return;
 
-            if (SpellInfo const* se = GetAura()->GetSpellInfo())
-                if (Unit* owner = GetOwner()->ToUnit())
+        if (SpellInfo const* se = GetAura()->GetSpellInfo())
+            if (Unit* owner = GetOwner()->ToUnit())
+            {
+                uint32 auraId = 0;
+                uint32 empoweredId = 0;
+                switch (se->Id)
                 {
-                    uint32 auraId = 0;
-                    uint32 empoweredId = 0;
-                    switch (se->Id)
+                    case 65686:
+                        auraId = 67590;
+                        empoweredId = 65748;
+                        break;
+                    case 65684:
+                        auraId = 67590;
+                        empoweredId = 65724;
+                        break;
+                    case 67222:
+                        auraId = 67602;
+                        empoweredId = 65748;
+                        break;
+                    case 67176:
+                        auraId = 67602;
+                        empoweredId = 65724;
+                        break;
+                    case 67223:
+                        auraId = 67603;
+                        empoweredId = 65748;
+                        break;
+                    case 67177:
+                        auraId = 67603;
+                        empoweredId = 65724;
+                        break;
+                    case 67224:
+                        auraId = 67604;
+                        empoweredId = 65748;
+                        break;
+                    case 67178:
+                        auraId = 67604;
+                        empoweredId = 65724;
+                        break;
+                }
+                if (!owner->HasAura(auraId))
+                {
+                    owner->CastSpell(owner, SPELL_POWERING_UP, true);
+                    if (--count == 0)
+                        return;
+                }
+                if (Aura* aur = owner->GetAura(auraId))
+                {
+                    if (aur->GetStackAmount() + count < 100 )
                     {
-                        case 65686:
-                            auraId = 67590;
-                            empoweredId = 65748;
-                            break;
-                        case 65684:
-                            auraId = 67590;
-                            empoweredId = 65724;
-                            break;
-                        case 67222:
-                            auraId = 67602;
-                            empoweredId = 65748;
-                            break;
-                        case 67176:
-                            auraId = 67602;
-                            empoweredId = 65724;
-                            break;
-                        case 67223:
-                            auraId = 67603;
-                            empoweredId = 65748;
-                            break;
-                        case 67177:
-                            auraId = 67603;
-                            empoweredId = 65724;
-                            break;
-                        case 67224:
-                            auraId = 67604;
-                            empoweredId = 65748;
-                            break;
-                        case 67178:
-                            auraId = 67604;
-                            empoweredId = 65724;
-                            break;
-                    }
-                    if (!owner->HasAura(auraId))
-                    {
-                        owner->CastSpell(owner, SPELL_POWERING_UP, true);
-                        if (--count == 0)
-                            return;
-                    }
-                    if (Aura* aur = owner->GetAura(auraId))
-                    {
-                        if (aur->GetStackAmount() + count < 100 )
-                        {
-                            aur->ModStackAmount(count);
+                        aur->ModStackAmount(count);
 
-                            if (roll_chance_i(30)) // 30% chance to gain extra speed for collecting
-                                owner->CastSpell(owner, SPELL_SURGE_OF_SPEED, true);
-                        }
-                        else
-                        {
-                            owner->CastSpell(owner, empoweredId, true);
-                            aur->Remove();
-                        }
+                        if (roll_chance_i(30)) // 30% chance to gain extra speed for collecting
+                            owner->CastSpell(owner, SPELL_SURGE_OF_SPEED, true);
+                    }
+                    else
+                    {
+                        owner->CastSpell(owner, empoweredId, true);
+                        aur->Remove();
                     }
                 }
-        }
+            }
+    }
 
-        void Register() override
-        {
-            AfterEffectAbsorb += AuraEffectAbsorbFn(spell_valkyr_essence_auraAuraScript::HandleAfterEffectAbsorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_valkyr_essence_auraAuraScript();
+        AfterEffectAbsorb += AuraEffectAbsorbFn(spell_valkyr_essence_aura::HandleAfterEffectAbsorb, EFFECT_0);
     }
 };
 
@@ -923,7 +917,7 @@ void AddSC_boss_twin_valkyr()
     new boss_eydis();
     new npc_essence_of_twin();
     new npc_concentrated_ball();
-    new spell_valkyr_essence();
+    RegisterSpellScript(spell_valkyr_essence_aura);
     new spell_valkyr_touch();
     new spell_valkyr_ball_periodic_dummy();
 }
