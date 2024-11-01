@@ -191,36 +191,25 @@ class spell_uldaman_stoned_aura : public AuraScript
     }
 };
 
-class spell_uldaman_boss_agro_archaedas : public SpellScriptLoader
+class spell_uldaman_boss_agro_archaedas : public SpellScript
 {
-public:
-    spell_uldaman_boss_agro_archaedas() : SpellScriptLoader("spell_uldaman_boss_agro_archaedas") { }
+    PrepareSpellScript(spell_uldaman_boss_agro_archaedas);
 
-    class spell_uldaman_boss_agro_archaedas_SpellScript : public SpellScript
+    void HandleSendEvent(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_uldaman_boss_agro_archaedas_SpellScript);
+        InstanceScript* instance = GetCaster()->GetInstanceScript();
 
-        void HandleSendEvent(SpellEffIndex  /*effIndex*/)
-        {
-            InstanceScript* instance = GetCaster()->GetInstanceScript();
+        if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS || instance->GetData(DATA_ARCHAEDAS) == DONE)
+            return;
 
-            if (!instance || instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS || instance->GetData(DATA_ARCHAEDAS) == DONE)
-                return;
+        instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS);
+        if (Creature* archaedas = GetCaster()->FindNearestCreature(NPC_ARCHAEDAS, 100.0f, true))
+            archaedas->AI()->SetData(1, 1);
+    }
 
-            instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS);
-            if (Creature* archaedas = GetCaster()->FindNearestCreature(NPC_ARCHAEDAS, 100.0f, true))
-                archaedas->AI()->SetData(1, 1);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_uldaman_boss_agro_archaedas_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_uldaman_boss_agro_archaedas_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_uldaman_boss_agro_archaedas::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -229,5 +218,5 @@ void AddSC_instance_uldaman()
     new instance_uldaman();
     RegisterSpellScript(spell_uldaman_sub_boss_agro_keepers);
     RegisterSpellScript(spell_uldaman_stoned_aura);
-    new spell_uldaman_boss_agro_archaedas();
+    RegisterSpellScript(spell_uldaman_boss_agro_archaedas);
 }
