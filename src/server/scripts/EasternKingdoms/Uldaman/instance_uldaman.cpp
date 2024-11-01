@@ -140,30 +140,19 @@ public:
     }
 };
 
-class spell_uldaman_sub_boss_agro_keepers : public SpellScriptLoader
+class spell_uldaman_sub_boss_agro_keepers : public SpellScript
 {
-public:
-    spell_uldaman_sub_boss_agro_keepers() : SpellScriptLoader("spell_uldaman_sub_boss_agro_keepers") { }
+    PrepareSpellScript(spell_uldaman_sub_boss_agro_keepers);
 
-    class spell_uldaman_sub_boss_agro_keepers_SpellScript : public SpellScript
+    void HandleSendEvent(SpellEffIndex  /*effIndex*/)
     {
-        PrepareSpellScript(spell_uldaman_sub_boss_agro_keepers_SpellScript);
+        if (Creature* keeper = GetCaster()->FindNearestCreature(NPC_STONE_KEEPER, 100.0f, true))
+            keeper->AI()->SetData(1, 1);
+    }
 
-        void HandleSendEvent(SpellEffIndex  /*effIndex*/)
-        {
-            if (Creature* keeper = GetCaster()->FindNearestCreature(NPC_STONE_KEEPER, 100.0f, true))
-                keeper->AI()->SetData(1, 1);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunch += SpellEffectFn(spell_uldaman_sub_boss_agro_keepers_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_uldaman_sub_boss_agro_keepers_SpellScript();
+        OnEffectLaunch += SpellEffectFn(spell_uldaman_sub_boss_agro_keepers::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -249,7 +238,7 @@ public:
 void AddSC_instance_uldaman()
 {
     new instance_uldaman();
-    new spell_uldaman_sub_boss_agro_keepers();
+    RegisterSpellScript(spell_uldaman_sub_boss_agro_keepers);
     new spell_uldaman_stoned();
     new spell_uldaman_boss_agro_archaedas();
 }
