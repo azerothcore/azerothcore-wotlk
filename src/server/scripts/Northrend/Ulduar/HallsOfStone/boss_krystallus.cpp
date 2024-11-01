@@ -180,33 +180,27 @@ public:
     };
 };
 
-class spell_krystallus_shatter : public SpellScriptLoader
+class spell_krystallus_shatter : public SpellScript
 {
-public:
-    spell_krystallus_shatter() : SpellScriptLoader("spell_krystallus_shatter") { }
+    PrepareSpellScript(spell_krystallus_shatter);
 
-    class spell_krystallus_shatter_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_krystallus_shatter_SpellScript);
+        return ValidateSpellInfo({ SPELL_SHATTER_EFFECT });
+    }
 
-        void HandleScript(SpellEffIndex /*effIndex*/)
-        {
-            if (Unit* target = GetHitUnit())
-            {
-                target->RemoveAurasDueToSpell(GROUND_SLAM_STONED_EFFECT);
-                target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
-            }
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_krystallus_shatter_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        return new spell_krystallus_shatter_SpellScript();
+        if (Unit* target = GetHitUnit())
+        {
+            target->RemoveAurasDueToSpell(GROUND_SLAM_STONED_EFFECT);
+            target->CastSpell((Unit*)nullptr, SPELL_SHATTER_EFFECT, true);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_krystallus_shatter::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -248,6 +242,6 @@ public:
 void AddSC_boss_krystallus()
 {
     new boss_krystallus();
-    new spell_krystallus_shatter();
+    RegisterSpellScript(spell_krystallus_shatter);
     new spell_krystallus_shatter_effect();
 }
