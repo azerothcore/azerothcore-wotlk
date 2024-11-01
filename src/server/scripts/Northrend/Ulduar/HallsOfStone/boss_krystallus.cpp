@@ -204,38 +204,27 @@ class spell_krystallus_shatter : public SpellScript
     }
 };
 
-class spell_krystallus_shatter_effect : public SpellScriptLoader
+class spell_krystallus_shatter_effect : public SpellScript
 {
-public:
-    spell_krystallus_shatter_effect() : SpellScriptLoader("spell_krystallus_shatter_effect") { }
+    PrepareSpellScript(spell_krystallus_shatter_effect);
 
-    class spell_krystallus_shatter_effect_SpellScript : public SpellScript
+    void CalculateDamage()
     {
-        PrepareSpellScript(spell_krystallus_shatter_effect_SpellScript);
+        if (!GetHitUnit())
+            return;
 
-        void CalculateDamage()
-        {
-            if (!GetHitUnit())
-                return;
+        float radius = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
+        if (!radius)
+            return;
 
-            float radius = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(GetCaster());
-            if (!radius)
-                return;
+        float distance = GetCaster()->GetDistance2d(GetHitUnit());
+        if (distance > 1.0f)
+            SetHitDamage(int32(GetHitDamage() * ((radius - distance) / radius)));
+    }
 
-            float distance = GetCaster()->GetDistance2d(GetHitUnit());
-            if (distance > 1.0f)
-                SetHitDamage(int32(GetHitDamage() * ((radius - distance) / radius)));
-        }
-
-        void Register() override
-        {
-            OnHit += SpellHitFn(spell_krystallus_shatter_effect_SpellScript::CalculateDamage);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_krystallus_shatter_effect_SpellScript();
+        OnHit += SpellHitFn(spell_krystallus_shatter_effect::CalculateDamage);
     }
 };
 
@@ -243,5 +232,5 @@ void AddSC_boss_krystallus()
 {
     new boss_krystallus();
     RegisterSpellScript(spell_krystallus_shatter);
-    new spell_krystallus_shatter_effect();
+    RegisterSpellScript(spell_krystallus_shatter_effect);
 }
