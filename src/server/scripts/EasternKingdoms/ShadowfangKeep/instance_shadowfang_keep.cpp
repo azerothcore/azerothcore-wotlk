@@ -137,42 +137,31 @@ public:
     };
 };
 
-class spell_shadowfang_keep_haunting_spirits : public SpellScriptLoader
+class spell_shadowfang_keep_haunting_spirits_aura : public AuraScript
 {
-public:
-    spell_shadowfang_keep_haunting_spirits() : SpellScriptLoader("spell_shadowfang_keep_haunting_spirits") { }
+    PrepareAuraScript(spell_shadowfang_keep_haunting_spirits_aura);
 
-    class spell_shadowfang_keep_haunting_spirits_AuraScript : public AuraScript
+    void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
     {
-        PrepareAuraScript(spell_shadowfang_keep_haunting_spirits_AuraScript);
+        isPeriodic = true;
+        amplitude = irand(30 * IN_MILLISECONDS, 90 * IN_MILLISECONDS);
+    }
 
-        void CalcPeriodic(AuraEffect const* /*aurEff*/, bool& isPeriodic, int32& amplitude)
-        {
-            isPeriodic = true;
-            amplitude = irand(30 * IN_MILLISECONDS, 90 * IN_MILLISECONDS);
-        }
-
-        void HandleDummyTick(AuraEffect const* aurEff)
-        {
-            GetTarget()->CastSpell((Unit*)nullptr, aurEff->GetAmount(), true);
-        }
-
-        void HandleUpdatePeriodic(AuraEffect* aurEff)
-        {
-            aurEff->CalculatePeriodic(GetCaster());
-        }
-
-        void Register() override
-        {
-            DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_shadowfang_keep_haunting_spirits_AuraScript::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadowfang_keep_haunting_spirits_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_DUMMY);
-            OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_shadowfang_keep_haunting_spirits_AuraScript::HandleUpdatePeriodic, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleDummyTick(AuraEffect const* aurEff)
     {
-        return new spell_shadowfang_keep_haunting_spirits_AuraScript();
+        GetTarget()->CastSpell((Unit*)nullptr, aurEff->GetAmount(), true);
+    }
+
+    void HandleUpdatePeriodic(AuraEffect* aurEff)
+    {
+        aurEff->CalculatePeriodic(GetCaster());
+    }
+
+    void Register() override
+    {
+        DoEffectCalcPeriodic += AuraEffectCalcPeriodicFn(spell_shadowfang_keep_haunting_spirits_aura::CalcPeriodic, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadowfang_keep_haunting_spirits_aura::HandleDummyTick, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_shadowfang_keep_haunting_spirits_aura::HandleUpdatePeriodic, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -234,6 +223,6 @@ public:
 void AddSC_instance_shadowfang_keep()
 {
     new instance_shadowfang_keep();
-    new spell_shadowfang_keep_haunting_spirits();
+    RegisterSpellScript(spell_shadowfang_keep_haunting_spirits_aura);
     new spell_shadowfang_keep_forsaken_skills();
 }
