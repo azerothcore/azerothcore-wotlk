@@ -205,36 +205,30 @@ public:
     }
 };
 
-class spell_voa_overcharge : public SpellScriptLoader
+class spell_voa_overcharge_aura : public AuraScript
 {
-public:
-    spell_voa_overcharge() : SpellScriptLoader("spell_voa_overcharge") { }
+    PrepareAuraScript(spell_voa_overcharge_aura);
 
-    class spell_voa_overcharge_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_voa_overcharge_AuraScript);
+        return ValidateSpellInfo({ SPELL_OVERCHARGED_BLAST });
+    }
 
-        void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
+    void HandlePeriodicDummy(AuraEffect const*  /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        if (target->IsCreature() && GetAura()->GetStackAmount() >= 10)
         {
-            Unit* target = GetTarget();
-            if (target->IsCreature() && GetAura()->GetStackAmount() >= 10)
-            {
-                target->CastSpell(target, SPELL_OVERCHARGED_BLAST, true);
-                Unit::Kill(target, target, false);
-            }
-
-            PreventDefaultAction();
+            target->CastSpell(target, SPELL_OVERCHARGED_BLAST, true);
+            Unit::Kill(target, target, false);
         }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_voa_overcharge_AuraScript::HandlePeriodicDummy, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
+        PreventDefaultAction();
+    }
 
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_voa_overcharge_AuraScript();
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_voa_overcharge_aura::HandlePeriodicDummy, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -275,6 +269,6 @@ void AddSC_boss_emalon()
 {
     new boss_emalon();
 
-    new spell_voa_overcharge();
+    RegisterSpellScript(spell_voa_overcharge_aura);
     new spell_voa_lightning_nova();
 }
