@@ -444,35 +444,29 @@ public:
     };
 };
 
-class spell_toc25_mistress_kiss : public SpellScriptLoader
+class spell_toc25_mistress_kiss_aura : public AuraScript
 {
-public:
-    spell_toc25_mistress_kiss() : SpellScriptLoader("spell_toc25_mistress_kiss") { }
+    PrepareAuraScript(spell_toc25_mistress_kiss_aura);
 
-    class spell_toc25_mistress_kiss_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_toc25_mistress_kiss_AuraScript)
+        return ValidateSpellInfo({ 66359 });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (Unit* target = GetTarget())
-                    if (target->HasUnitState(UNIT_STATE_CASTING))
-                    {
-                        caster->CastSpell(target, 66359, true);
-                        SetDuration(0);
-                    }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_toc25_mistress_kiss_AuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
     {
-        return new spell_toc25_mistress_kiss_AuraScript();
+        if (Unit* caster = GetCaster())
+            if (Unit* target = GetTarget())
+                if (target->HasUnitState(UNIT_STATE_CASTING))
+                {
+                    caster->CastSpell(target, 66359, true);
+                    SetDuration(0);
+                }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_toc25_mistress_kiss_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -521,6 +515,6 @@ void AddSC_boss_jaraxxus()
     new boss_jaraxxus();
     new npc_fel_infernal();
     new npc_mistress_of_pain();
-    new spell_toc25_mistress_kiss();
+    RegisterSpellScript(spell_toc25_mistress_kiss_aura);
     new spell_mistress_kiss_area();
 }
