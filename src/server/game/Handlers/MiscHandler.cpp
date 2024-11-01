@@ -45,13 +45,14 @@
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
-#include "UpdateData.h"
 #include "Vehicle.h"
 #include "WhoListCacheMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include <zlib.h>
+
+#include "Corpse.h"
 
 void WorldSession::HandleRepopRequestOpcode(WorldPacket& recv_data)
 {

@@ -1707,6 +1707,27 @@ bool BattlegroundAV::SetupBattleground()
                 return false;
         }
 
+    // Hallow's End decorations
+    if (IsHolidayActive(HOLIDAY_HALLOWS_END))
+        for (uint16 i = 0; i <= (BG_AV_OBJECT_HALLOWS_END_MAX - BG_AV_OBJECT_HALLOWS_END_MIN); i++)
+        {
+            if (!AddObject(BG_AV_OBJECT_HALLOWS_END_MIN + i,
+                std::get<0>(BG_AV_HallowsEndObjectPos[i]),
+                std::get<1>(BG_AV_HallowsEndObjectPos[i]).GetPositionX(),
+                std::get<1>(BG_AV_HallowsEndObjectPos[i]).GetPositionY(),
+                std::get<1>(BG_AV_HallowsEndObjectPos[i]).GetPositionZ(),
+                std::get<1>(BG_AV_HallowsEndObjectPos[i]).GetOrientation(),
+                std::get<2>(BG_AV_HallowsEndObjectPos[i])[0],
+                std::get<2>(BG_AV_HallowsEndObjectPos[i])[1],
+                std::get<2>(BG_AV_HallowsEndObjectPos[i])[2],
+                std::get<2>(BG_AV_HallowsEndObjectPos[i])[3],
+                RESPAWN_ONE_DAY))
+            {
+                LOG_ERROR("bg.battleground", "BatteGroundAV: Failed to spawn some object Battleground not created!11.{}", i);
+                return false;
+            }
+        }
+
     // Generic gameobjects
     for (uint16 i = 0; i <= (BG_AV_OBJECT_GENERIC_MAX - BG_AV_OBJECT_GENERIC_MIN); i++)
     {
@@ -1780,6 +1801,11 @@ bool BattlegroundAV::SetupBattleground()
     // Handpacked snowdrift, only during holiday
     if (IsHolidayActive(HOLIDAY_FEAST_OF_WINTER_VEIL))
         for (i = BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MIN ; i <= BG_AV_OBJECT_HANDPACKED_SNOWDRIFT_MAX; i++)
+            SpawnBGObject(i, RESPAWN_IMMEDIATELY);
+
+    // Hallow's End decorations
+    if (IsHolidayActive(HOLIDAY_HALLOWS_END))
+        for (uint16 i = BG_AV_OBJECT_HALLOWS_END_MIN; i <= BG_AV_OBJECT_HALLOWS_END_MAX; i++)
             SpawnBGObject(i, RESPAWN_IMMEDIATELY);
 
     // Generic gameobjects

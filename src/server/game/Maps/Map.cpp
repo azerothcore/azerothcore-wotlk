@@ -26,6 +26,7 @@
 #include "GridNotifiers.h"
 #include "Group.h"
 #include "InstanceScript.h"
+#include "IVMapMgr.h"
 #include "LFGMgr.h"
 #include "MapInstanced.h"
 #include "Metric.h"
@@ -39,6 +40,7 @@
 #include "Transport.h"
 #include "VMapFactory.h"
 #include "Vehicle.h"
+#include "VMapMgr2.h"
 #include "Weather.h"
 
 //npcbot

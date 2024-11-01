@@ -730,190 +730,172 @@ public:
     };
 };
 
-class spell_valkyr_essence : public SpellScriptLoader
+class spell_valkyr_essence_aura : public AuraScript
 {
-public:
-    spell_valkyr_essence() : SpellScriptLoader("spell_valkyr_essence") { }
+    PrepareAuraScript(spell_valkyr_essence_aura);
 
-    class spell_valkyr_essence_auraAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_valkyr_essence_auraAuraScript)
+        return ValidateSpellInfo({ SPELL_POWERING_UP, SPELL_SURGE_OF_SPEED });
+    }
 
-        void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
-        {
-            uint16 count = absorbAmount / 1000;
-            if (!count || !GetOwner())
-                return;
+    void HandleAfterEffectAbsorb(AuraEffect* /*aurEff*/, DamageInfo& /*dmgInfo*/, uint32& absorbAmount)
+    {
+        uint16 count = absorbAmount / 1000;
+        if (!count || !GetOwner())
+            return;
 
-            if (SpellInfo const* se = GetAura()->GetSpellInfo())
-                if (Unit* owner = GetOwner()->ToUnit())
+        if (SpellInfo const* se = GetAura()->GetSpellInfo())
+            if (Unit* owner = GetOwner()->ToUnit())
+            {
+                uint32 auraId = 0;
+                uint32 empoweredId = 0;
+                switch (se->Id)
                 {
-                    uint32 auraId = 0;
-                    uint32 empoweredId = 0;
-                    switch (se->Id)
+                    case 65686:
+                        auraId = 67590;
+                        empoweredId = 65748;
+                        break;
+                    case 65684:
+                        auraId = 67590;
+                        empoweredId = 65724;
+                        break;
+                    case 67222:
+                        auraId = 67602;
+                        empoweredId = 65748;
+                        break;
+                    case 67176:
+                        auraId = 67602;
+                        empoweredId = 65724;
+                        break;
+                    case 67223:
+                        auraId = 67603;
+                        empoweredId = 65748;
+                        break;
+                    case 67177:
+                        auraId = 67603;
+                        empoweredId = 65724;
+                        break;
+                    case 67224:
+                        auraId = 67604;
+                        empoweredId = 65748;
+                        break;
+                    case 67178:
+                        auraId = 67604;
+                        empoweredId = 65724;
+                        break;
+                }
+                if (!owner->HasAura(auraId))
+                {
+                    owner->CastSpell(owner, SPELL_POWERING_UP, true);
+                    if (--count == 0)
+                        return;
+                }
+                if (Aura* aur = owner->GetAura(auraId))
+                {
+                    if (aur->GetStackAmount() + count < 100 )
                     {
-                        case 65686:
-                            auraId = 67590;
-                            empoweredId = 65748;
-                            break;
-                        case 65684:
-                            auraId = 67590;
-                            empoweredId = 65724;
-                            break;
-                        case 67222:
-                            auraId = 67602;
-                            empoweredId = 65748;
-                            break;
-                        case 67176:
-                            auraId = 67602;
-                            empoweredId = 65724;
-                            break;
-                        case 67223:
-                            auraId = 67603;
-                            empoweredId = 65748;
-                            break;
-                        case 67177:
-                            auraId = 67603;
-                            empoweredId = 65724;
-                            break;
-                        case 67224:
-                            auraId = 67604;
-                            empoweredId = 65748;
-                            break;
-                        case 67178:
-                            auraId = 67604;
-                            empoweredId = 65724;
-                            break;
-                    }
-                    if (!owner->HasAura(auraId))
-                    {
-                        owner->CastSpell(owner, SPELL_POWERING_UP, true);
-                        if (--count == 0)
-                            return;
-                    }
-                    if (Aura* aur = owner->GetAura(auraId))
-                    {
-                        if (aur->GetStackAmount() + count < 100 )
-                        {
-                            aur->ModStackAmount(count);
+                        aur->ModStackAmount(count);
 
-                            if (roll_chance_i(30)) // 30% chance to gain extra speed for collecting
-                                owner->CastSpell(owner, SPELL_SURGE_OF_SPEED, true);
-                        }
-                        else
-                        {
-                            owner->CastSpell(owner, empoweredId, true);
-                            aur->Remove();
-                        }
+                        if (roll_chance_i(30)) // 30% chance to gain extra speed for collecting
+                            owner->CastSpell(owner, SPELL_SURGE_OF_SPEED, true);
+                    }
+                    else
+                    {
+                        owner->CastSpell(owner, empoweredId, true);
+                        aur->Remove();
                     }
                 }
-        }
-
-        void Register() override
-        {
-            AfterEffectAbsorb += AuraEffectAbsorbFn(spell_valkyr_essence_auraAuraScript::HandleAfterEffectAbsorb, EFFECT_0);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_valkyr_essence_auraAuraScript();
-    }
-};
-
-class spell_valkyr_touch : public SpellScriptLoader
-{
-public:
-    spell_valkyr_touch() : SpellScriptLoader("spell_valkyr_touch") { }
-
-    class spell_valkyr_touchAuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_valkyr_touchAuraScript)
-
-        void HandleEffectPeriodic(AuraEffect const* aurEff)
-        {
-            PreventDefaultAction();
-            Unit* caster = GetCaster();
-            if (!caster)
-                return;
-            if (caster->GetMap()->GetId() == 649 )
-            {
-                uint32 excludedID = GetSpellInfo()->ExcludeTargetAuraSpell;
-                Map::PlayerList const& pl = caster->GetMap()->GetPlayers();
-                for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
-                    if (Player* plr = itr->GetSource())
-                        if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
-                        {
-                            uint32 absorb = 0;
-                            uint32 resist = 0;
-                            CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
-                            int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
-                            uint32 damage = dmg;
-                            int32 resilienceReduction = damage;
-                            if (caster->CanApplyResilience())
-                                Unit::ApplyResilience(plr, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
-                            resilienceReduction = damage - resilienceReduction;
-                            damage -= resilienceReduction;
-                            uint32 mitigated_damage = resilienceReduction;
-                            DamageInfo dmgInfo(caster, plr, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
-                            Unit::CalcAbsorbResist(dmgInfo);
-                            Unit::DealDamageMods(plr, damage, &absorb);
-                            int32 overkill = damage - plr->GetHealth();
-                            if (overkill < 0)
-                                overkill = 0;
-                            SpellPeriodicAuraLogInfo pInfo(aurEff, damage, overkill, absorb, resist, 0.0f, false);
-                            plr->SendPeriodicAuraLog(&pInfo);
-                            Unit::DealDamage(caster, plr, damage, 0, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
-                        }
             }
-        }
+    }
 
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_touchAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_valkyr_touchAuraScript();
+        AfterEffectAbsorb += AuraEffectAbsorbFn(spell_valkyr_essence_aura::HandleAfterEffectAbsorb, EFFECT_0);
     }
 };
 
-class spell_valkyr_ball_periodic_dummy : public SpellScriptLoader
+class spell_valkyr_touch_aura : public AuraScript
 {
-public:
-    spell_valkyr_ball_periodic_dummy() : SpellScriptLoader("spell_valkyr_ball_periodic_dummy") { }
+    PrepareAuraScript(spell_valkyr_touch_aura);
 
-    class spell_valkyr_ball_periodic_dummyAuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_valkyr_ball_periodic_dummyAuraScript)
+        return ValidateSpellInfo({ SPELL_AURA_SPIRIT_OF_REDEMPTION });
+    }
 
-        void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
-        {
-            if (Unit* target = GetTarget())
-                if (target->GetDisplayId() != 11686)
-                    if (Creature* creature = target->ToCreature())
-                        if (Player* player = creature->SelectNearestPlayer(2.75f))
-                            if (creature->GetExactDist2d(player) <= 2.75f)
-                            {
-                                creature->AI()->DoAction(1); // despawning = true;
-                                creature->GetMotionMaster()->MoveIdle();
-                                creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
-                                creature->SetDisplayId(11686);
-                                creature->DespawnOrUnsummon(1500);
-                            }
-        }
-
-        void Register() override
-        {
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_ball_periodic_dummyAuraScript::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
-        return new spell_valkyr_ball_periodic_dummyAuraScript();
+        PreventDefaultAction();
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+        if (caster->GetMap()->GetId() == 649 )
+        {
+            uint32 excludedID = GetSpellInfo()->ExcludeTargetAuraSpell;
+            Map::PlayerList const& pl = caster->GetMap()->GetPlayers();
+            for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
+                if (Player* plr = itr->GetSource())
+                    if (plr->IsAlive() && !plr->HasAura(excludedID) && !plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
+                    {
+                        uint32 absorb = 0;
+                        uint32 resist = 0;
+                        CleanDamage(0, 0, BASE_ATTACK, MELEE_HIT_NORMAL);
+                        int32 dmg = urand(2925, 3075) * (caster->GetMap()->GetDifficulty() - 1);
+                        uint32 damage = dmg;
+                        int32 resilienceReduction = damage;
+                        if (caster->CanApplyResilience())
+                            Unit::ApplyResilience(plr, nullptr, &dmg, false, CR_CRIT_TAKEN_SPELL);
+                        resilienceReduction = damage - resilienceReduction;
+                        damage -= resilienceReduction;
+                        uint32 mitigated_damage = resilienceReduction;
+                        DamageInfo dmgInfo(caster, plr, damage, GetSpellInfo(), GetSpellInfo()->GetSchoolMask(), DOT, mitigated_damage);
+                        Unit::CalcAbsorbResist(dmgInfo);
+                        Unit::DealDamageMods(plr, damage, &absorb);
+                        int32 overkill = damage - plr->GetHealth();
+                        if (overkill < 0)
+                            overkill = 0;
+                        SpellPeriodicAuraLogInfo pInfo(aurEff, damage, overkill, absorb, resist, 0.0f, false);
+                        plr->SendPeriodicAuraLog(&pInfo);
+                        Unit::DealDamage(caster, plr, damage, 0, DOT, GetSpellInfo()->GetSchoolMask(), GetSpellInfo(), true);
+                    }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_touch_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
+class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
+{
+    PrepareAuraScript(spell_valkyr_ball_periodic_dummy_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_UNLEASHED_LIGHT, SPELL_UNLEASHED_DARK });
+    }
+
+    void HandleEffectPeriodic(AuraEffect const*   /*aurEff*/)
+    {
+        if (Unit* target = GetTarget())
+            if (target->GetDisplayId() != 11686)
+                if (Creature* creature = target->ToCreature())
+                    if (Player* player = creature->SelectNearestPlayer(2.75f))
+                        if (creature->GetExactDist2d(player) <= 2.75f)
+                        {
+                            creature->AI()->DoAction(1); // despawning = true;
+                            creature->GetMotionMaster()->MoveIdle();
+                            creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
+                            creature->SetDisplayId(11686);
+                            creature->DespawnOrUnsummon(1500);
+                        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_valkyr_ball_periodic_dummy_aura::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -923,7 +905,7 @@ void AddSC_boss_twin_valkyr()
     new boss_eydis();
     new npc_essence_of_twin();
     new npc_concentrated_ball();
-    new spell_valkyr_essence();
-    new spell_valkyr_touch();
-    new spell_valkyr_ball_periodic_dummy();
+    RegisterSpellScript(spell_valkyr_essence_aura);
+    RegisterSpellScript(spell_valkyr_touch_aura);
+    RegisterSpellScript(spell_valkyr_ball_periodic_dummy_aura);
 }

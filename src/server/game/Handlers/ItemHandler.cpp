@@ -25,7 +25,6 @@
 #include "ScriptMgr.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "UpdateData.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include <cmath>

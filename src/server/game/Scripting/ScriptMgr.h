@@ -31,10 +31,8 @@
 #include "LFGMgr.h"
 #include "ObjectMgr.h"
 #include "PetDefines.h"
-#include "QuestDef.h"
 #include "SharedDefines.h"
 #include "Tuples.h"
-#include "Types.h"
 #include "Weather.h"
 #include "World.h"
 #include <atomic>
