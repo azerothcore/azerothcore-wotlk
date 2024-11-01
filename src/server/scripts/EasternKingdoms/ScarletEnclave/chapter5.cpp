@@ -1177,41 +1177,30 @@ public:
     };
 };
 
-class spell_chapter5_light_of_dawn_aura : public SpellScriptLoader
+class spell_chapter5_light_of_dawn_aura : public AuraScript
 {
-public:
-    spell_chapter5_light_of_dawn_aura() : SpellScriptLoader("spell_chapter5_light_of_dawn_aura") { }
+    PrepareAuraScript(spell_chapter5_light_of_dawn_aura);
 
-    class spell_chapter5_light_of_dawn_aura_AuraScript : public AuraScript
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_chapter5_light_of_dawn_aura_AuraScript);
+        GetUnitOwner()->Dismount();
+        GetUnitOwner()->SetCanFly(true);
+        GetUnitOwner()->SetDisableGravity(true);
+        GetUnitOwner()->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
+    }
 
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->Dismount();
-            GetUnitOwner()->SetCanFly(true);
-            GetUnitOwner()->SetDisableGravity(true);
-            GetUnitOwner()->AddUnitMovementFlag(MOVEMENTFLAG_FLYING);
-        }
-
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            GetUnitOwner()->SetCanFly(false);
-            GetUnitOwner()->SetDisableGravity(false);
-            GetUnitOwner()->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
-            GetUnitOwner()->GetMotionMaster()->MoveFall();
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_chapter5_light_of_dawn_aura_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_chapter5_light_of_dawn_aura_AuraScript();
+        GetUnitOwner()->SetCanFly(false);
+        GetUnitOwner()->SetDisableGravity(false);
+        GetUnitOwner()->RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
+        GetUnitOwner()->GetMotionMaster()->MoveFall();
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_chapter5_light_of_dawn_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_chapter5_light_of_dawn_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1246,6 +1235,6 @@ public:
 void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
-    new spell_chapter5_light_of_dawn_aura();
+    RegisterSpellScript(spell_chapter5_light_of_dawn_aura);
     new spell_chapter5_rebuke();
 }
