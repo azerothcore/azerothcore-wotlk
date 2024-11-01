@@ -29,15 +29,14 @@
 template<class T>
 RandomMovementGenerator<T>::~RandomMovementGenerator() { }
 
-template<>
-RandomMovementGenerator<Creature>::~RandomMovementGenerator()
-{
-    delete _pathGenerator;
-}
+template RandomMovementGenerator<Creature>::~RandomMovementGenerator();
 
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 {
+    if (!creature)
+        return;
+
     if (creature->_moveState != MAP_OBJECT_CELL_MOVE_NONE)
         return;
 
@@ -135,7 +134,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         else // ground
         {
             if (!_pathGenerator)
-                _pathGenerator = new PathGenerator(creature);
+                _pathGenerator = std::make_unique<PathGenerator>(creature);
             else
                 _pathGenerator->Clear();
 
@@ -242,6 +241,8 @@ void RandomMovementGenerator<Creature>::DoInitialize(Creature* creature)
     if (!_wanderDistance)
         _wanderDistance = creature->GetWanderDistance();
 
+    _pathGenerator.reset();
+
     _nextMoveTime.Reset(creature->GetSpawnId() && creature->GetWanderDistance() == _wanderDistance ? urand(1, 5000) : 0);
     _wanderDistance = std::max((creature->GetWanderDistance() == _wanderDistance && creature->GetInstanceId() == 0) ? (creature->CanFly() ? MIN_WANDER_DISTANCE_AIR : MIN_WANDER_DISTANCE_GROUND) : 0.0f, _wanderDistance);
 
@@ -280,6 +281,7 @@ bool RandomMovementGenerator<Creature>::DoUpdate(Creature* creature, const uint3
     {
         _nextMoveTime.Reset(0);  // Expire the timer
         creature->StopMoving();
+        _pathGenerator.reset();
         return true;
     }
 
