@@ -207,35 +207,24 @@ class spell_koralon_meteor_fists_aura : public AuraScript
     }
 };
 
-class spell_flame_warder_meteor_fists : public SpellScriptLoader
+class spell_flame_warder_meteor_fists_aura : public AuraScript
 {
-public:
-    spell_flame_warder_meteor_fists() : SpellScriptLoader("spell_flame_warder_meteor_fists") { }
+    PrepareAuraScript(spell_flame_warder_meteor_fists_aura);
 
-    class spell_flame_warder_meteor_fists_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_flame_warder_meteor_fists_AuraScript);
+        return ValidateSpellInfo({ SPELL_FW_METEOR_FISTS_DAMAGE });
+    }
 
-        bool Validate(SpellInfo const* /*spellInfo*/) override
-        {
-            return ValidateSpellInfo({ SPELL_FW_METEOR_FISTS_DAMAGE });
-        }
-
-        void TriggerFists(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-        {
-            PreventDefaultAction();
-            GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_FW_METEOR_FISTS_DAMAGE, true, nullptr, aurEff);
-        }
-
-        void Register() override
-        {
-            OnEffectProc += AuraEffectProcFn(spell_flame_warder_meteor_fists_AuraScript::TriggerFists, EFFECT_0, SPELL_AURA_DUMMY);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void TriggerFists(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
-        return new spell_flame_warder_meteor_fists_AuraScript();
+        PreventDefaultAction();
+        GetTarget()->CastSpell(eventInfo.GetProcTarget(), SPELL_FW_METEOR_FISTS_DAMAGE, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_flame_warder_meteor_fists_aura::TriggerFists, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -244,5 +233,5 @@ void AddSC_boss_koralon()
     new boss_koralon();
     RegisterSpellScript(spell_voa_flaming_cinder);
     RegisterSpellScript(spell_koralon_meteor_fists_aura);
-    new spell_flame_warder_meteor_fists();
+    RegisterSpellScript(spell_flame_warder_meteor_fists_aura);
 }
