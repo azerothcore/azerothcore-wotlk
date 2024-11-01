@@ -243,6 +243,9 @@ WanderNode::node_lltype WanderNode::GetShortestPathLinks(WanderNode const* targe
                 break;
             }
 
+            if (link.wp->GetLinks().size() == 1 && link.wp->GetLinks().front().wp == this)
+                continue;
+
             std::unordered_set<uint32> checked_links;
             checked_links.insert(GetWPId());
             NodeLinkPList vlinks_cur;

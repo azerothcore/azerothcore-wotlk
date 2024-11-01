@@ -50,10 +50,6 @@
 NpcBot System by Trickerer (https://github.com/trickerer/Trinity-Bots; onlysuffering@gmail.com)
 Version 5.2.77a
 Original idea: https://bitbucket.org/lordpsyan/trinitycore-patches/src/3b8b9072280e/Individual/11185-BOTS-NPCBots.patch
-TODO:
-dk pets (garg, aod, rdw)
-'Go there and do stuff' scenarios
-Encounter Scenarios
 Notes:
 Methods may have null arg1 (Unit*):
 DamageTaken(Unit*, ), JustDied(Unit*, ), OwnerAttackedBy(Unit*, ), HealReceived(Unit*, )
@@ -1177,6 +1173,10 @@ void bot_ai::BotMovement(BotMovementType type, Position const* pos, Unit* target
             break;
         case BOT_MOVE_POINT:
             mover->GetMotionMaster()->Add(new PointMovementGenerator<Creature>(1, pos->m_positionX, pos->m_positionY, pos->m_positionZ, speed, 0.0f, nullptr, generatePath));
+            break;
+        case BOT_MOVE_JUMP:
+            mover->GetMotionMaster()->MoveJump(pos->m_positionX, pos->m_positionY, pos->m_positionZ,
+                22.0f, mover->GetExactDist2d(pos) * Movement::gravity / (22.0f * 2.0f), 1, nullptr);
             break;
         default:
             BOT_LOG_ERROR("scripts", "BotMovement: unhandled bot movement type {}", uint32(type));
@@ -18357,25 +18357,37 @@ void bot_ai::Evade()
 
             if (dist > (me->GetMap()->GetEntry()->IsContinent() ? 15.0f : 3.0f))
             {
-                bool use_path =
-                    !(_travel_node_cur && _travel_node_last &&
-                    _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_PATHING) &&
-                    _travel_node_last->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_PATHING));
-                GetNextEvadeMovePoint(pos, use_path);
-                if (pos.m_positionZ <= INVALID_HEIGHT)
+                if (_travel_node_last && _travel_node_last->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_FORCE_JUMP_BEGIN) &&
+                    _travel_node_cur && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_FORCE_JUMP_END) &&
+                    me->GetDistance(*_travel_node_last) < 10.0f)
                 {
-                    BOT_LOG_ERROR("npcbots", "Bot {} '{}' class {} level {} evade move point has invalid height {} (usepath: {})!\nWPs: cur {}, last {}\nPositions:\ncurrent: {}\ntarget: {}",
-                        me->GetEntry(), me->GetName().c_str(), uint32(_botclass), uint32(me->GetLevel()), pos.m_positionZ, uint32(use_path),
-                        _travel_node_cur->GetWPId(), _travel_node_last ? _travel_node_last->GetWPId() : 0, me->GetPosition().ToString().c_str(), pos.ToString().c_str());
-                    _evadeCount = 100;
-                    return;
+                    BOT_LOG_DEBUG("npcbots", "Bot wanderer {} id {} JUMPS from node {} to {} ('{}' -> '{}'), dist2d {} yd, zdiff {} yd!",
+                        me->GetName(), me->GetEntry(), _travel_node_last->GetWPId(), _travel_node_cur->GetWPId(), _travel_node_last->GetName(), _travel_node_cur->GetName(),
+                        _travel_node_last->GetExactDist2d(_travel_node_cur), _travel_node_last->GetPositionZ() - _travel_node_cur->GetPositionZ());
+                    BotMovement(BOT_MOVE_JUMP, &pos, nullptr, false);
                 }
+                else
+                {
+                    bool use_path =
+                        !(_travel_node_cur && _travel_node_last &&
+                            _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_PATHING) &&
+                            _travel_node_last->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_IGNORES_PATHING));
+                    GetNextEvadeMovePoint(pos, use_path);
+                    if (pos.m_positionZ <= INVALID_HEIGHT)
+                    {
+                        BOT_LOG_ERROR("npcbots", "Bot {} '{}' class {} level {} evade move point has invalid height {} (usepath: {})!\nWPs: cur {}, last {}\nPositions:\ncurrent: {}\ntarget: {}",
+                            me->GetEntry(), me->GetName(), uint32(_botclass), uint32(me->GetLevel()), pos.m_positionZ, uint32(use_path),
+                            _travel_node_cur->GetWPId(), _travel_node_last ? _travel_node_last->GetWPId() : 0, me->GetPosition().ToString(), pos.ToString());
+                        _evadeCount = 100;
+                        return;
+                    }
 
-                //if (TempSummon* wpc = me->GetMap()->SummonCreature(VISUAL_WAYPOINT, pos, nullptr, 20000))
-                //    wpc->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN);
+                    //if (TempSummon* wpc = me->GetMap()->SummonCreature(VISUAL_WAYPOINT, pos, nullptr, 20000))
+                    //    wpc->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN);
 
-                movepos.Relocate(me);
-                BotMovement(BOT_MOVE_POINT, &pos, nullptr, use_path);
+                    movepos.Relocate(me);
+                    BotMovement(BOT_MOVE_POINT, &pos, nullptr, use_path);
+                }
                 return;
             }
             else if (IsWanderer())
@@ -18405,7 +18417,7 @@ void bot_ai::Evade()
                     if (me->GetMap()->GetEntry()->IsContinent())
                         evadeDelayTimer = urand(3000, 7000);
                     else if (_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_OPTIONAL_PICKUP) && !IsCasting())
-                        evadeDelayTimer = 2000;
+                        evadeDelayTimer = 1000;
                     else
                         evadeDelayTimer = 0;
                 }
@@ -19411,7 +19423,183 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
             break;
         }
         case BATTLEGROUND_AB:
+        {
+            uint32 faction = me->GetFaction();
+            TeamId myTeamId = bg->GetBotTeamId(me->GetGUID());
+            std::vector<Unit*> const team_members = BotMgr::GetAllGroupMembers(me);
+            WanderNode const* curNode = _travel_node_cur;
+            NodeLinkList links;
+            for (WanderNodeLink const& wpl : curNode->GetLinks())
+            {
+                if (bot_ai::IsWanderNodeAvailableForBotFaction(wpl.wp, faction, false))
+                    links.push_back(wpl);
+            }
+            if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
+                links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
+
+            BattlegroundAB* ab = dynamic_cast<BattlegroundAB*>(bg);
+
+            //1 have buff linked - try going there (buff spawned, noone goes there, need that buff (scratch that, get anyway, let respawn))
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                NodeLinkList::const_iterator lit = std::ranges::find_if(links, [=](WanderNodeLink const& wpl) {
+                    return wpl.wp->HasFlag(BotWPFlags::BOTWP_FLAG_OPTIONAL_PICKUP);
+                });
+                if (lit != links.cend())
+                {
+                    uint32 object_type;
+                    switch (lit->wp->GetFlags() & AsUnderlyingType(BotWPFlags::BOTWP_FLAG_OPTIONAL_PICKUP))
+                    {
+                        case AsUnderlyingType(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_1): object_type = BG_AB_OBJECT_SPEEDBUFF_STABLES;     break;
+                        case AsUnderlyingType(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_2): object_type = BG_AB_OBJECT_SPEEDBUFF_FARM;        break;
+                        case AsUnderlyingType(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_3): object_type = BG_AB_OBJECT_SPEEDBUFF_LUMBER_MILL; break;
+                        case AsUnderlyingType(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_4): object_type = BG_AB_OBJECT_SPEEDBUFF_GOLD_MINE;   break;
+                        case AsUnderlyingType(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_5): object_type = BG_AB_OBJECT_SPEEDBUFF_BLACKSMITH;  break;
+                        default:                                                            object_type = 0;                                  break;
+                    }
+                    if (object_type)
+                    {
+                        for (uint8 i = 0; i != 2; ++i)
+                        {
+                            GameObject const* go = ab->GetBGObject(object_type + i);
+                            if (go && go->IsInWorld() && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
+                            {
+                                bool has_picker = false;
+                                for (Unit const* member : team_members)
+                                {
+                                    if (member != me && member->IsAlive() && member->IsNPCBot() && member->ToCreature()->GetBotAI()->_travel_node_cur == lit->wp)
+                                    {
+                                        has_picker = true;
+                                        break;
+                                    }
+                                }
+                                if (!has_picker)
+                                {
+                                    BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} goes for AB buff at {}! Cur node: {} {}",
+                                        me->GetName(), me->GetEntry(), uint32(myTeamId), lit->wp->GetName(), curNode->GetWPId(), curNode->GetName());
+                                    return lit->wp;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    links.erase(lit);
+                }
+            }
+            //2 all bases occupied or assaulted - lock enemy team on their base
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                bool all_nodes_controlled = true;
+                uint8 node = BG_AB_NODE_STABLES;
+                do
+                {
+                    if (!ab->IsNodeOccupied(node, teamId) && !ab->IsNodeContested(node, teamId))
+                        all_nodes_controlled = false;
+                    ++node;
+                } while (node < BG_AB_DYNAMIC_NODES_COUNT && all_nodes_controlled);
+
+                if (all_nodes_controlled)
+                {
+                    WanderNode const* enemy_base = WanderNode::FindInMapWPs(me->GetMapId(), [=, &enemy_base](WanderNode const* mwp) {
+                        return (mwp->HasAllFlags(teamId == TEAM_ALLIANCE ? BotWPFlags::BOTWP_FLAG_HORDE_SPAWN_POINT : BotWPFlags::BOTWP_FLAG_ALLIANCE_SPAWN_POINT));
+                    });
+                    if (enemy_base)
+                    {
+                        NodeLinkList elinks = curNode->GetShortestPathLinks(enemy_base, links);
+                        if (!elinks.empty())
+                        {
+                            BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} goes for AB PIN at {}! Cur node: {} {}",
+                                me->GetName(), me->GetEntry(), uint32(myTeamId), enemy_base->GetName(), curNode->GetWPId(), curNode->GetName());
+                            return elinks.size() == 1u ? elinks.front().wp : Bcore::Containers::SelectRandomWeightedContainerElement(elinks, LinkWeightExtractor())->wp;
+                        }
+
+                    }
+                }
+            }
+            //3 closest (linked) base is not captured / not assaulted - go there, otherwise find all not captured / not assaulted bases and select at random (max 2 per base)
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                std::list<uint8> attackable_points;
+                uint8 node = BG_AB_NODE_STABLES;
+                do
+                {
+                    if (!ab->IsNodeOccupied(node, teamId) && !ab->IsNodeContested(node, teamId))
+                        attackable_points.push_back(node);
+                    ++node;
+                } while (node < BG_AB_DYNAMIC_NODES_COUNT);
+
+                NodeList bgFlags;
+                WanderNode::DoForAllMapWPs(me->GetMapId(), [&bgFlags, &attackable_points](WanderNode const* mwp) {
+                    if (mwp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET) &&
+                        std::ranges::any_of(attackable_points, [=](uint8 n) { return mwp->GetExactDist2d(BG_AB_NodePositions[n][0], BG_AB_NodePositions[n][1]) < 10.0f; }))
+                        bgFlags.push_back(mwp);
+                });
+                NodeList attackableFlags;
+                WanderNode::DoForContainerWPs(bgFlags, [this, &attackableFlags, &team_members](WanderNode const* mwp) {
+                    uint8 advancing_members = 0;
+                    for (Unit const* m : team_members)
+                    {
+                        if (m == me)
+                            continue;
+                        Spell const* curSpell = m->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+                        WanderNode const* mCurNode = m->IsNPCBot() ? m->ToCreature()->GetBotAI()->_travel_node_cur : nullptr;
+                        if (curSpell && curSpell->m_spellInfo->Id == 21651u && m->GetExactDist2d(mwp) < 10.0f)
+                            ++advancing_members;
+                        else if (mCurNode && mCurNode == mwp)
+                            ++advancing_members;
+                        else if (m->GetExactDist2d(mwp) < 60.0f)
+                            ++advancing_members;
+                        if (advancing_members >= 3)
+                            break;
+                    }
+                    if (advancing_members < 3)
+                        attackableFlags.push_back(mwp);
+                });
+                if (attackableFlags.empty())
+                {
+                    for (WanderNode const* bgFlag : bgFlags)
+                        attackableFlags.push_back(bgFlag);
+                }
+                NodeLinkList olinks;
+                for (WanderNodeLink const& wpl : links)
+                    if (std::ranges::any_of(attackableFlags, [&wpl](WanderNode const* wp) { return wpl.wp == wp; }))
+                        olinks.push_back(wpl);
+                if (!olinks.empty())
+                {
+                    BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} goes for AB DIRECT ASSAULT! Cur node: {} {}",
+                        me->GetName(), me->GetEntry(), uint32(myTeamId), curNode->GetWPId(), curNode->GetName());
+                    return olinks.size() == 1u ? olinks.front().wp : Bcore::Containers::SelectRandomWeightedContainerElement(olinks, LinkWeightExtractor())->wp;
+                }
+
+                std::set<WanderNodeLink> dlinks;
+                for (WanderNode const* fwp : attackableFlags)
+                    for (WanderNodeLink const& fwpl : curNode->GetShortestPathLinks(fwp, links, BotWPLevel::BOTWP_LEVEL_ONE))
+                        dlinks.insert(fwpl);
+                if (!dlinks.empty())
+                {
+                    BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} goes for AB ASSAULT! Cur node: {} {}",
+                        me->GetName(), me->GetEntry(), uint32(myTeamId), curNode->GetWPId(), curNode->GetName());
+                    return dlinks.size() == 1u ? dlinks.begin()->wp : Bcore::Containers::SelectRandomWeightedContainerElement(dlinks, LinkWeightExtractor())->wp;
+                }
+            }
+
+            if (links.size() > 1)
+            {
+                BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} has no target point in BG_AB! Falling back to random ({} links)!. Cur node: {} {}",
+                    me->GetName(), me->GetEntry(), uint32(myTeamId), uint32(curNode->GetLinks().size()), curNode->GetWPId(), curNode->GetName());
+            }
+
             break;
+        }
         default:
             break;
     }
@@ -19421,9 +19609,6 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
 
 void bot_ai::OnWanderNodeReached()
 {
-    ASSERT(me->IsInWorld());
-    ASSERT(_travel_node_cur != nullptr, me->GetGUID().ToString().c_str());
-
     if (Battleground* bg = GetBG())
     {
         if (_travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_DELIVER_TARGET) && IsFlagCarrier(me, bg->GetBgTypeID()))

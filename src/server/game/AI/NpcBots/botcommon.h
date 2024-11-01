@@ -533,8 +533,8 @@ enum BotAIResetType
 enum BotMovementType
 {
     BOT_MOVE_POINT                      = 1,
-    //BOT_MOVE_FOLLOW
-    BOT_MOVE_CHASE
+    BOT_MOVE_CHASE,
+    BOT_MOVE_JUMP
 };
 
 enum BotCommandStates : uint32
