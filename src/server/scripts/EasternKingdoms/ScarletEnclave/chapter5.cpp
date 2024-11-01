@@ -1204,31 +1204,20 @@ class spell_chapter5_light_of_dawn_aura : public AuraScript
     }
 };
 
-class spell_chapter5_rebuke : public SpellScriptLoader
+class spell_chapter5_rebuke : public SpellScript
 {
-public:
-    spell_chapter5_rebuke() : SpellScriptLoader("spell_chapter5_rebuke") { }
+    PrepareSpellScript(spell_chapter5_rebuke);
 
-    class spell_chapter5_rebuke_SpellScript : public SpellScript
+    void HandleLeapBack(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_chapter5_rebuke_SpellScript);
+        PreventHitEffect(effIndex);
+        if (Unit* unitTarget = GetHitUnit())
+            unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
+    }
 
-        void HandleLeapBack(SpellEffIndex effIndex)
-        {
-            PreventHitEffect(effIndex);
-            if (Unit* unitTarget = GetHitUnit())
-                unitTarget->KnockbackFrom(2282.86f, -5263.45f, 40.0f, 8.0f);
-        }
-
-        void Register() override
-        {
-            OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke_SpellScript::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_chapter5_rebuke_SpellScript();
+        OnEffectLaunchTarget += SpellEffectFn(spell_chapter5_rebuke::HandleLeapBack, EFFECT_0, SPELL_EFFECT_LEAP_BACK);
     }
 };
 
@@ -1236,5 +1225,5 @@ void AddSC_the_scarlet_enclave_c5()
 {
     new npc_highlord_darion_mograine();
     RegisterSpellScript(spell_chapter5_light_of_dawn_aura);
-    new spell_chapter5_rebuke();
+    RegisterSpellScript(spell_chapter5_rebuke);
 }
