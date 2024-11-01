@@ -227,34 +227,23 @@ public:
     }
 };
 
-class spell_temple_of_atal_hakkar_hex_of_jammal_an : public SpellScriptLoader
+class spell_temple_of_atal_hakkar_hex_of_jammal_an_aura : public AuraScript
 {
-public:
-    spell_temple_of_atal_hakkar_hex_of_jammal_an() : SpellScriptLoader("spell_temple_of_atal_hakkar_hex_of_jammal_an") { }
+    PrepareAuraScript(spell_temple_of_atal_hakkar_hex_of_jammal_an_aura);
 
-    class spell_temple_of_atal_hakkar_hex_of_jammal_an_AuraScript : public AuraScript
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_temple_of_atal_hakkar_hex_of_jammal_an_AuraScript);
+        if (Unit* caster = GetCaster())
+            if (caster->IsAlive() && caster->IsInCombat())
+            {
+                caster->CastSpell(GetTarget(), HEX_OF_JAMMAL_AN, true);
+                caster->CastSpell(GetTarget(), HEX_OF_JAMMAL_AN_CHARM, true);
+            }
+    }
 
-        void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                if (caster->IsAlive() && caster->IsInCombat())
-                {
-                    caster->CastSpell(GetTarget(), HEX_OF_JAMMAL_AN, true);
-                    caster->CastSpell(GetTarget(), HEX_OF_JAMMAL_AN_CHARM, true);
-                }
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_temple_of_atal_hakkar_hex_of_jammal_an_AuraScript::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void Register() override
     {
-        return new spell_temple_of_atal_hakkar_hex_of_jammal_an_AuraScript();
+        OnEffectRemove += AuraEffectRemoveFn(spell_temple_of_atal_hakkar_hex_of_jammal_an_aura::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -299,6 +288,6 @@ void AddSC_instance_sunken_temple()
 {
     new instance_sunken_temple();
     new at_malfurion_stormrage();
-    new spell_temple_of_atal_hakkar_hex_of_jammal_an();
+    RegisterSpellScript(spell_temple_of_atal_hakkar_hex_of_jammal_an_aura);
     new spell_temple_of_atal_hakkar_awaken_the_soulflayer();
 }
