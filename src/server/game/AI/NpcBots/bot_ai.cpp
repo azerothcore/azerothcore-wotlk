@@ -19506,7 +19506,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
 
                 if (all_nodes_controlled)
                 {
-                    WanderNode const* enemy_base = WanderNode::FindInMapWPs(me->GetMapId(), [=, &enemy_base](WanderNode const* mwp) {
+                    WanderNode const* enemy_base = WanderNode::FindInMapWPs(me->GetMapId(), [=](WanderNode const* mwp) {
                         return (mwp->HasAllFlags(teamId == TEAM_ALLIANCE ? BotWPFlags::BOTWP_FLAG_HORDE_SPAWN_POINT : BotWPFlags::BOTWP_FLAG_ALLIANCE_SPAWN_POINT));
                     });
                     if (enemy_base)
