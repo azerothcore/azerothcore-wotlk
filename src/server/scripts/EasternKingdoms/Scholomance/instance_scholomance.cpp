@@ -246,39 +246,28 @@ public:
     };
 };
 
-class spell_scholomance_fixate : public SpellScriptLoader
+class spell_scholomance_fixate_aura : public AuraScript
 {
-public:
-    spell_scholomance_fixate() : SpellScriptLoader("spell_scholomance_fixate") { }
+    PrepareAuraScript(spell_scholomance_fixate_aura);
 
-    class spell_scholomance_fixate_AuraScript : public AuraScript
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        PrepareAuraScript(spell_scholomance_fixate_AuraScript);
+        Unit* target = GetTarget();
+        if (Unit* caster = GetCaster())
+            caster->TauntApply(target);
+    }
 
-        void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (Unit* caster = GetCaster())
-                caster->TauntApply(target);
-        }
-
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            Unit* target = GetTarget();
-            if (Unit* caster = GetCaster())
-                caster->TauntFadeOut(target);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_scholomance_fixate_AuraScript::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectRemove += AuraEffectRemoveFn(spell_scholomance_fixate_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_scholomance_fixate_AuraScript();
+        Unit* target = GetTarget();
+        if (Unit* caster = GetCaster())
+            caster->TauntFadeOut(target);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_scholomance_fixate_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_scholomance_fixate_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -460,7 +449,7 @@ public:
 void AddSC_instance_scholomance()
 {
     new instance_scholomance();
-    new spell_scholomance_fixate();
+    RegisterSpellScript(spell_scholomance_fixate_aura);
     new spell_scholomance_boon_of_life();
     new npc_scholomance_occultist();
 }
