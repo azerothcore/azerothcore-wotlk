@@ -171,58 +171,47 @@ enum ForsakenSpells
     SPELL_FORSAKEN_SKILL_SHADOW         = 7053
 };
 
-class spell_shadowfang_keep_forsaken_skills : public SpellScriptLoader
+class spell_shadowfang_keep_forsaken_skills_aura : public AuraScript
 {
-public:
-    spell_shadowfang_keep_forsaken_skills() : SpellScriptLoader("spell_shadowfang_keep_forsaken_skills") { }
+    PrepareAuraScript(spell_shadowfang_keep_forsaken_skills_aura);
 
-    class spell_shadowfang_keep_forsaken_skills_AuraScript : public AuraScript
+    bool Load() override
     {
-        PrepareAuraScript(spell_shadowfang_keep_forsaken_skills_AuraScript);
-
-        bool Load() override
-        {
-            _forsakenSpell = 0;
-            return true;
-        }
-
-        void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
-            if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
-                ++_forsakenSpell;
-            GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
-        }
-
-        void HandleDummyTick(AuraEffect const*  /*aurEff*/)
-        {
-            PreventDefaultAction();
-            GetUnitOwner()->RemoveAurasDueToSpell(_forsakenSpell);
-            _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
-            if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
-                ++_forsakenSpell;
-            GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
-        }
-
-        void Register() override
-        {
-            OnEffectApply += AuraEffectApplyFn(spell_shadowfang_keep_forsaken_skills_AuraScript::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
-            OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadowfang_keep_forsaken_skills_AuraScript::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-        }
-
-    private:
-        uint32 _forsakenSpell;
-    };
-
-    AuraScript* GetAuraScript() const override
-    {
-        return new spell_shadowfang_keep_forsaken_skills_AuraScript();
+        _forsakenSpell = 0;
+        return true;
     }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
+        if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
+            ++_forsakenSpell;
+        GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
+    }
+
+    void HandleDummyTick(AuraEffect const*  /*aurEff*/)
+    {
+        PreventDefaultAction();
+        GetUnitOwner()->RemoveAurasDueToSpell(_forsakenSpell);
+        _forsakenSpell = urand(SPELL_FORSAKEN_SKILL_SWORD, SPELL_FORSAKEN_SKILL_SHADOW);
+        if (_forsakenSpell == SPELL_FORSAKEN_SKILL_SHADOW - 1)
+            ++_forsakenSpell;
+        GetUnitOwner()->CastSpell(GetUnitOwner(), _forsakenSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_shadowfang_keep_forsaken_skills_aura::OnApply, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_shadowfang_keep_forsaken_skills_aura::HandleDummyTick, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+
+private:
+    uint32 _forsakenSpell;
 };
 
 void AddSC_instance_shadowfang_keep()
 {
     new instance_shadowfang_keep();
     RegisterSpellScript(spell_shadowfang_keep_haunting_spirits_aura);
-    new spell_shadowfang_keep_forsaken_skills();
+    RegisterSpellScript(spell_shadowfang_keep_forsaken_skills_aura);
 }
