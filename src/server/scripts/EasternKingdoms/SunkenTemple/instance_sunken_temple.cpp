@@ -247,40 +247,29 @@ class spell_temple_of_atal_hakkar_hex_of_jammal_an_aura : public AuraScript
     }
 };
 
-class spell_temple_of_atal_hakkar_awaken_the_soulflayer : public SpellScriptLoader
+class spell_temple_of_atal_hakkar_awaken_the_soulflayer : public SpellScript
 {
-public:
-    spell_temple_of_atal_hakkar_awaken_the_soulflayer() : SpellScriptLoader("spell_temple_of_atal_hakkar_awaken_the_soulflayer") { }
+    PrepareSpellScript(spell_temple_of_atal_hakkar_awaken_the_soulflayer);
 
-    class spell_temple_of_atal_hakkar_awaken_the_soulflayer_SpellScript : public SpellScript
+    void HandleSendEvent(SpellEffIndex effIndex)
     {
-        PrepareSpellScript(spell_temple_of_atal_hakkar_awaken_the_soulflayer_SpellScript);
+        PreventHitDefaultEffect(effIndex);
+        InstanceScript* instanceScript = GetCaster()->GetInstanceScript();
+        Map* map = GetCaster()->FindMap();
+        if (!map || !instanceScript || instanceScript->GetData(TYPE_HAKKAR_EVENT) != NOT_STARTED)
+            return;
 
-        void HandleSendEvent(SpellEffIndex effIndex)
+        Position pos = {-466.795f, 272.863f, -90.447f, 1.57f};
+        if (TempSummon* summon = map->SummonCreature(NPC_SHADE_OF_HAKKAR, pos))
         {
-            PreventHitDefaultEffect(effIndex);
-            InstanceScript* instanceScript = GetCaster()->GetInstanceScript();
-            Map* map = GetCaster()->FindMap();
-            if (!map || !instanceScript || instanceScript->GetData(TYPE_HAKKAR_EVENT) != NOT_STARTED)
-                return;
-
-            Position pos = {-466.795f, 272.863f, -90.447f, 1.57f};
-            if (TempSummon* summon = map->SummonCreature(NPC_SHADE_OF_HAKKAR, pos))
-            {
-                summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
-                instanceScript->SetData(TYPE_HAKKAR_EVENT, IN_PROGRESS);
-            }
+            summon->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+            instanceScript->SetData(TYPE_HAKKAR_EVENT, IN_PROGRESS);
         }
+    }
 
-        void Register() override
-        {
-            OnEffectHit += SpellEffectFn(spell_temple_of_atal_hakkar_awaken_the_soulflayer_SpellScript::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_temple_of_atal_hakkar_awaken_the_soulflayer_SpellScript();
+        OnEffectHit += SpellEffectFn(spell_temple_of_atal_hakkar_awaken_the_soulflayer::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
 };
 
@@ -289,5 +278,5 @@ void AddSC_instance_sunken_temple()
     new instance_sunken_temple();
     new at_malfurion_stormrage();
     RegisterSpellScript(spell_temple_of_atal_hakkar_hex_of_jammal_an_aura);
-    new spell_temple_of_atal_hakkar_awaken_the_soulflayer();
+    RegisterSpellScript(spell_temple_of_atal_hakkar_awaken_the_soulflayer);
 }
