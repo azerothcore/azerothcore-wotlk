@@ -18,7 +18,7 @@
 #include "Realm.h"
 #include "IpNetwork.h"
 #include <boost/asio/ip/tcp.hpp>
-#include <memory>
+#include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 
 boost::asio::ip::tcp_endpoint Realm::GetAddressForClient(boost::asio::ip::address const& clientAddr) const
 {
