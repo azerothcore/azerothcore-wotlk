@@ -325,7 +325,7 @@ public:
 
                 if (!targets.empty())
                 {
-                    Unit* target = targets.size() == 1 ? targets.front() : Acore::Containers::SelectRandomContainerElement(targets);
+                    Unit* target = targets.size() == 1 ? targets.front() : Bcore::Containers::SelectRandomContainerElement(targets);
                     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(CREATE_SOULSTONE_1);
                     uint32 rank = spellInfo->GetRank();
 
@@ -346,7 +346,7 @@ public:
                         case 27238: spellId = SOULSTONE_RESURRECTION_6; break; //rank 6
                         case 47884: spellId = SOULSTONE_RESURRECTION_7; break; //rank 7
                         default:
-                            LOG_ERROR("entities.player", "bot_warlockAI: unknown soulstone Id {}", spellInfo->Id);
+                            BOT_LOG_ERROR("entities.player", "bot_warlockAI: unknown soulstone Id {}", spellInfo->Id);
                             spellId = SOULSTONE_RESURRECTION_1;
                             break;
                     }
@@ -1798,7 +1798,7 @@ public:
         void SummonedCreatureDespawn(Creature* summon) override
         {
             //all warlock bot pets despawn at death or manually (gossip, teleport, etc.)
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
             if (summon == botPet)
             {
                 petSummonTimer = 10000;

@@ -96,7 +96,7 @@ enum rbac
 //end Acore only
 #endif
 
-using namespace Acore::ChatCommands;
+using namespace Bcore::ChatCommands;
 
 static uint32 last_model_id = 0;
 
@@ -404,7 +404,7 @@ private:
             case 493: // Moonglade
                 return { 46, 60 };
             default:
-                LOG_ERROR("scripts", "GetZoneLevels: no choice for zoneId {}", zoneId);
+                BOT_LOG_ERROR("scripts", "GetZoneLevels: no choice for zoneId {}", zoneId);
                 return { 1, 60 };
         }
     }
@@ -738,8 +738,8 @@ public:
 
     static TempSummon* HandleWPSummon(WanderNode* wp, Map* map)
     {
-        CellCoord c = Acore::ComputeCellCoord(wp->m_positionX, wp->m_positionY);
-        GridCoord g = Acore::ComputeGridCoord(wp->m_positionX, wp->m_positionY);
+        CellCoord c = Bcore::ComputeCellCoord(wp->m_positionX, wp->m_positionY);
+        GridCoord g = Bcore::ComputeGridCoord(wp->m_positionX, wp->m_positionY);
         ASSERT(c.IsCoordValid(), "Invalid Cell coord!");
         ASSERT(g.IsCoordValid(), "Invalid Grid coord!");
         map->LoadGrid(wp->m_positionX, wp->m_positionY);
@@ -953,9 +953,9 @@ public:
         link_pairs.reserve(links_strings.size());
         for (std::string_view newlink : links_strings)
         {
-            std::vector<std::string_view> toks = Acore::Tokenize(newlink, ':', false);
-            Optional<uint32> val1 = toks.size() >= 1 ? Acore::StringTo<uint32>(toks[0]) : std::nullopt;
-            Optional<uint32> val2 = toks.size() >= 2 ? Acore::StringTo<uint32>(toks[1]) : std::nullopt;
+            std::vector<std::string_view> toks = Bcore::Tokenize(newlink, ':', false);
+            Optional<uint32> val1 = toks.size() >= 1 ? Bcore::StringTo<uint32>(toks[0]) : std::nullopt;
+            Optional<uint32> val2 = toks.size() >= 2 ? Bcore::StringTo<uint32>(toks[1]) : std::nullopt;
             if (toks.size() > 2 || val1 == std::nullopt || val2 == std::nullopt)
             {
                 handler->PSendSysMessage("Invalid link format: {}", newlink);
@@ -1640,8 +1640,8 @@ public:
                             return false;
                         }
                         GameObject* platform = nullptr;
-                        Acore::NearestGameObjectEntryInObjectRangeCheck check(*player, 202161, 100.0f);
-                        Acore::GameObjectSearcher<Acore::NearestGameObjectEntryInObjectRangeCheck> searcher(player, platform, check);
+                        Bcore::NearestGameObjectEntryInObjectRangeCheck check(*player, 202161, 100.0f);
+                        Bcore::GameObjectSearcher<Bcore::NearestGameObjectEntryInObjectRangeCheck> searcher(player, platform, check);
                         Cell::VisitAllObjects(player, searcher, 100.0f);
                         if (!platform)
                         {
@@ -2163,7 +2163,7 @@ public:
                 return true;
             }
 
-            bot = cBots.size() == 1 ? cBots.front() : Acore::Containers::SelectRandomContainerElement(cBots);
+            bot = cBots.size() == 1 ? cBots.front() : Bcore::Containers::SelectRandomContainerElement(cBots);
 
             if (!bot)
             {
@@ -2356,9 +2356,9 @@ public:
                     ++it;
             }
 
-            bot = ccBots.empty() ? nullptr : ccBots.size() == 1 ? ccBots.front() : Acore::Containers::SelectRandomContainerElement(ccBots);
+            bot = ccBots.empty() ? nullptr : ccBots.size() == 1 ? ccBots.front() : Bcore::Containers::SelectRandomContainerElement(ccBots);
             if (!bot)
-                bot = cBots.empty() ? nullptr : cBots.size() == 1 ? cBots.front() : Acore::Containers::SelectRandomContainerElement(cBots);
+                bot = cBots.empty() ? nullptr : cBots.size() == 1 ? cBots.front() : Bcore::Containers::SelectRandomContainerElement(cBots);
 
             if (!bot)
             {
@@ -4868,7 +4868,7 @@ public:
 
     static bool HandleNpcBotReloadConfigCommand(ChatHandler* handler)
     {
-        LOG_INFO("misc", "Re-Loading config settings...");
+        BOT_LOG_INFO("misc", "Re-Loading config settings...");
         sWorld->LoadConfigSettings(true);
         sMapMgr->InitializeVisibilityDistanceInfo();
         handler->SendGlobalGMSysMessage("World config settings reloaded.");

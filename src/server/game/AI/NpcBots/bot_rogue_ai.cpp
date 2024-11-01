@@ -524,7 +524,7 @@ public:
             if (dist > 5)
             {
                 //if (mytar->IsPolymorphed())
-                //    TC_LOG_ERROR("entities.player", "rogue_bot: cannot attack target (dist)...");
+                //    BOT_LOG_ERROR("entities.player", "rogue_bot: cannot attack target (dist)...");
                 return;
             }
 
@@ -583,7 +583,7 @@ public:
 
             if (!hasnormalstun && duration > 300 && uint32(energy) < me->GetMaxPower(POWER_ENERGY))
             {
-                //TC_LOG_ERROR("entities.player", "bot_rogue: delaying attacks on gouged or blinded target...");
+                //BOT_LOG_ERROR("entities.player", "bot_rogue: delaying attacks on gouged or blinded target...");
                 return;
             }
 
@@ -1346,7 +1346,7 @@ public:
                     if (irand(1,100) <= 20 * comboPoints)
                     {
                         me->CastSpell(me, RELENTLESS_STRIKES_EFFECT, true);
-                        //TC_LOG_ERROR("entities.player", "rogue_bot CP SPEND1: RS proc!");
+                        //BOT_LOG_ERROR("entities.player", "rogue_bot CP SPEND1: RS proc!");
                     }
                 }
             }
@@ -1454,11 +1454,11 @@ public:
                 baseId == SETUP_EFFECT || baseId == INITIATIVE_EFFECT || baseId == HONOR_AMONG_THIEVES_EFFECT)
             {
                 ++comboPoints;
-                //TC_LOG_ERROR("entities.player", "rogue_bot CP GEN2: %s adds 1, now %u", spell->SpellName[0], uint32(comboPoints));
+                //BOT_LOG_ERROR("entities.player", "rogue_bot CP GEN2: %s adds 1, now %u", spell->SpellName[0], uint32(comboPoints));
                 if (comboPoints > 5)
                 {
                     comboPoints = 5;
-                    //TC_LOG_ERROR("entities.player", "rogue_bot CP NOR2: now %u", uint32(comboPoints));
+                    //BOT_LOG_ERROR("entities.player", "rogue_bot CP NOR2: now %u", uint32(comboPoints));
                 }
             }
             //Combo point generating from spells
@@ -1470,7 +1470,7 @@ public:
                 (baseId == MUTILATE_1 || baseId == PREMEDITATION_1 || baseId == CHEAP_SHOT_1) ?
                     comboPoints += 2 : ++comboPoints;
 
-                //TC_LOG_ERROR("entities.player", "rogue_bot CP GEN1: %s adds %u, now %u",
+                //BOT_LOG_ERROR("entities.player", "rogue_bot CP GEN1: %s adds %u, now %u",
                 //    spell->SpellName[0], (baseId == MUTILATE_1 || baseId == PREMEDITATION_1 || baseId == CHEAP_SHOT_1) ?
                 //    2 : 1, uint32(comboPoints));
 
@@ -1478,13 +1478,13 @@ public:
                 if (baseId == SINISTER_STRIKE_1 && glyphSSProc)
                 {
                     ++comboPoints;
-                    //TC_LOG_ERROR("entities.player", "rogue_bot CP GEN1: glyphSS proc, now %u", uint32(comboPoints));
+                    //BOT_LOG_ERROR("entities.player", "rogue_bot CP GEN1: glyphSS proc, now %u", uint32(comboPoints));
                 }
 
                 if (comboPoints > 5)
                 {
                     comboPoints = 5;
-                    //TC_LOG_ERROR("entities.player", "rogue_bot CP NOR1: now %u", uint32(comboPoints));
+                    //BOT_LOG_ERROR("entities.player", "rogue_bot CP NOR1: now %u", uint32(comboPoints));
                 }
             }
             //if (spellId == EVISCERATE || spellId == KIDNEY_SHOT || spellId == SLICE_DICE || spellId == RUPTURE || spellId == EXPOSE_ARMOR || spellId == ENVENOM)
@@ -1495,7 +1495,7 @@ public:
                 //comboPoints = 0;
                 combopointsSpent = true; //envenom problem - cps spent before aura application
 
-                //TC_LOG_ERROR("entities.player", "rogue_bot CP SPEND1: %u to 0", tempCP);
+                //BOT_LOG_ERROR("entities.player", "rogue_bot CP SPEND1: %u to 0", tempCP);
 
                 //Relentless Strikes: moved to OnClassSpellGo (triggered even without hitting the target)
 
@@ -1505,7 +1505,7 @@ public:
                     if (urand(1,100) <= 60)
                     {
                         me->CastSpell(target, RUTHLESSNESS_EFFECT, true);
-                        //TC_LOG_ERROR("entities.player", "rogue_bot CP SPEND1: RU proc!");
+                        //BOT_LOG_ERROR("entities.player", "rogue_bot CP SPEND1: RU proc!");
                     }
                 }
             }
@@ -1513,7 +1513,7 @@ public:
             //Preparation: handle effect
             if (baseId == PREPARATION_1)
             {
-                //TC_LOG_ERROR("entities.player", "rogue_bot Preparation hit!");
+                //BOT_LOG_ERROR("entities.player", "rogue_bot Preparation hit!");
                 if (GetSpell(EVASION_1))
                     SetSpellCooldown(EVASION_1, 0);
                 if (GetSpell(SPRINT_1))

@@ -1,6 +1,7 @@
 #ifndef _BOTCOMMON_H
 #define _BOTCOMMON_H
 
+#include "botdefine.h"
 #include "ObjectGuid.h"
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
@@ -12,15 +13,6 @@
 NpcBot System by Trickerer (onlysuffering@gmail.com)
 Original patch from: LordPsyan https://bitbucket.org/lordpsyan/trinitycore-patches/src/3b8b9072280e/Individual/11185-BOTS-NPCBots.patch
 */
-
-#ifdef _MSC_VER
- #define __PRAGMA_STR2__(x) #x
- #define __PRAGMA_STR1__(x) __PRAGMA_STR2__(x)
- #define __PRAGMA_LOC__ __FILE__ "("__PRAGMA_STR1__(__LINE__)") "
- #define PRAGMA_WARN(x) __pragma(message(__PRAGMA_LOC__ ": warning: " #x))
-#else
- #define PRAGMA_WARN(x)
-#endif
 
 constexpr std::size_t MAX_BOT_LOG_PARAMS = 5;
 constexpr std::size_t MAX_BOT_LOG_PARAM_LENGTH = 50;

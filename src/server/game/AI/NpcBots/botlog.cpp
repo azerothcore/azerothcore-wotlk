@@ -18,7 +18,7 @@ static void BotLogImpl(uint16 log_type, uint32 entry, int32 owner, int32 mapid, 
     {
         if (sparams[i].size() > MAX_BOT_LOG_PARAM_LENGTH)
         {
-            LOG_DEBUG("npcbots", "Bot logger: while writing type {} entry {} owner {} param {} '{}' was truncated to {} symbols!",
+            BOT_LOG_DEBUG("npcbots", "Bot logger: while writing type {} entry {} owner {} param {} '{}' was truncated to {} symbols!",
                 log_type, entry, owner, uint32(i+1), sparams[i], MAX_BOT_LOG_PARAM_LENGTH);
             sparams[i] = sparams[i].substr(0, MAX_BOT_LOG_PARAM_LENGTH);
         }
@@ -70,7 +70,7 @@ void BotLogger::Log(uint16 log_type, uint32 entry, Args&&... params)
             std::stringstream ss;
             using compounder = int[];
             (void)compounder { 0, ((void)(ss << ' ' << params), 0) ... };
-            LOG_DEBUG("npcbots", "Logging unregistered bot entry {}: type {} params:{}", entry, log_type, ss.str());
+            BOT_LOG_DEBUG("npcbots", "Logging unregistered bot entry {}: type {} params:{}", entry, log_type, ss.str());
         }
         BotLogImpl(log_type, entry, -1, -1, -1, -1, std::forward<Args>(params)...);
     }

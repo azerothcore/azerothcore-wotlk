@@ -1,3 +1,4 @@
+#include "botdefine.h"
 #include "botwanderful.h"
 #include "DBCStores.h"
 #include "SpellAuras.h"
@@ -375,7 +376,7 @@ bool WanderNode::HasAllFlags(BotWPFlags flags) const
 std::string WanderNode::ToString(int32 link_weight/* = -1*/) const
 {
     std::ostringstream wps;
-    wps << "WP " << _wpId << (link_weight >= 0 ? (":" + Acore::ToString(link_weight)) : std::string{})
+    wps << "WP " << _wpId << (link_weight >= 0 ? (":" + Bcore::ToString(link_weight)) : std::string{})
         << " '" << _name << "', " << uint32(_links.size()) << " link(s) (avg weight " << GetAverageLinkWeight()
         << "), Map " << _mapId << ", Zone " << _zoneId << ", Area " << _areaId << ", minLvl " << uint32(_minLevel) << ", maxLvl " << uint32(_maxLevel)
         << " (" << std::setiosflags(std::ios_base::fixed) << std::setprecision(2) << "X: " << m_positionX << " Y: " << m_positionY << " Z: " << m_positionZ

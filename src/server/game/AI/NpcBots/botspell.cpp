@@ -1,3 +1,4 @@
+#include "botdefine.h"
 #include "botspell.h"
 #include "DBCStores.h"
 #include "Log.h"
@@ -1902,7 +1903,7 @@ void GenerateBotCustomSpells()
         }
     }
 
-    LOG_INFO("server.loading", ">> Bot spellInfo overrides generated for {} spells", uint32(botSpellInfoOverrides.size()));
+    BOT_LOG_INFO("server.loading", ">> Bot spellInfo overrides generated for {} spells", uint32(botSpellInfoOverrides.size()));
 
     GenerateBotCustomSpellProcs();
 }

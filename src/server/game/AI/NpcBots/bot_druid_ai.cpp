@@ -324,12 +324,12 @@ public:
 
                 if (me->GetPowerType() != POWER_MANA)
                 {
-                    //TC_LOG_ERROR("entities.player", "druid_bot::removeShapeshiftForm(): still has poweType %u!", uint32(me->GetPowerType()));
+                    //BOT_LOG_ERROR("entities.player", "druid_bot::removeShapeshiftForm(): still has poweType %u!", uint32(me->GetPowerType()));
                     me->SetPowerType(POWER_MANA);
                 }
                 if (me->GetShapeshiftForm() != FORM_NONE)
                 {
-                    //TC_LOG_ERROR("entities.player", "druid_bot::removeShapeshiftForm(): still speshifted into %u!", uint32(me->GetShapeshiftForm()));
+                    //BOT_LOG_ERROR("entities.player", "druid_bot::removeShapeshiftForm(): still speshifted into %u!", uint32(me->GetShapeshiftForm()));
                     me->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT, me->GetGUID(), nullptr, false);
                 }
 
@@ -1576,7 +1576,7 @@ public:
                     targets.push_back(bot);
             }
 
-            if (Unit* targetOrCorpse = !targets.empty() ? Acore::Containers::SelectRandomContainerElement(targets) : nullptr)
+            if (Unit* targetOrCorpse = !targets.empty() ? Bcore::Containers::SelectRandomContainerElement(targets) : nullptr)
             {
                 if (me->GetExactDist(targetOrCorpse) > 30 && !HasBotCommandState(BOT_COMMAND_STAY))
                 {
@@ -1610,7 +1610,7 @@ public:
                 case DRUID_BEAR_FORM:
                     if (me->GetPowerType() != POWER_RAGE)
                     {
-                        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_RAGE");
+                        //BOT_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_RAGE");
                         me->SetPowerType(POWER_RAGE);
                     }
                     RefreshAura(MASTER_SHAPESHIFTER_BEAR_BUFF, me->GetLevel() >= 20);
@@ -1624,7 +1624,7 @@ public:
                 case DRUID_CAT_FORM:
                     if (me->GetPowerType() != POWER_ENERGY)
                     {
-                        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_ENERGY");
+                        //BOT_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_ENERGY");
                         me->SetPowerType(POWER_ENERGY);
                     }
                     RefreshAura(MASTER_SHAPESHIFTER_CAT_BUFF, me->GetLevel() >= 20);
@@ -1638,7 +1638,7 @@ public:
                 case DRUID_MOONKIN_FORM:
                     if (me->GetPowerType() != POWER_MANA)
                     {
-                        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (moonkin)");
+                        //BOT_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (moonkin)");
                         me->SetPowerType(POWER_MANA);
                     }
                     RefreshAura(MASTER_SHAPESHIFTER_MOONKIN_BUFF, me->GetLevel() >= 20);
@@ -1647,7 +1647,7 @@ public:
                 case DRUID_TREE_FORM:
                     if (me->GetPowerType() != POWER_MANA)
                     {
-                        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (tree)");
+                        //BOT_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (tree)");
                         me->SetPowerType(POWER_MANA);
                     }
                     RefreshAura(MASTER_SHAPESHIFTER_TREE_BUFF, me->GetLevel() >= 20);
@@ -1655,33 +1655,33 @@ public:
                 case DRUID_TRAVEL_FORM:
                     if (me->GetPowerType() != POWER_MANA)
                     {
-                        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (travel)");
+                        //BOT_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (travel)");
                         me->SetPowerType(POWER_MANA);
                     }
                     break;
                 case DRUID_AQUATIC_FORM:
                     if (me->GetPowerType() != POWER_MANA)
                     {
-                        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (aquatic)");
+                        //BOT_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (aquatic)");
                         me->SetPowerType(POWER_MANA);
                     }
                     break;
                 case DRUID_FLIGHT_FORM:
                     if (me->GetPowerType() != POWER_MANA)
                     {
-                        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (flight)");
+                        //BOT_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (flight)");
                         me->SetPowerType(POWER_MANA);
                     }
                     break;
                 case BOT_STANCE_NONE:
                     if (me->GetPowerType() != POWER_MANA)
                     {
-                        //TC_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (deshape)");
+                        //BOT_LOG_ERROR("entities.player", "druid_bot::setStats(): has to set powerType to POWER_MANA (deshape)");
                         me->SetPowerType(POWER_MANA);
                     }
                     break;
                 default:
-                    LOG_ERROR("entities.player", "druid_bot::setStats(): NYI form {}", uint32(form));
+                    BOT_LOG_ERROR("entities.player", "druid_bot::setStats(): NYI form {}", uint32(form));
                     setStats(BOT_STANCE_NONE);
                     return;
             }
@@ -2200,18 +2200,18 @@ public:
                 {
                     comboPoints++;
                     //debug
-                    //TC_LOG_ERROR("entities.player", "druid_bot CP GEN: %s adds 1, now %u", spell->SpellName[0], uint32(comboPoints));
+                    //BOT_LOG_ERROR("entities.player", "druid_bot CP GEN: %s adds 1, now %u", spell->SpellName[0], uint32(comboPoints));
                     if (primalFuryProc)
                     {
                         comboPoints++;
                         //debug
-                        //TC_LOG_ERROR("entities.player", "druid_bot CP EX: now %u", uint32(comboPoints));
+                        //BOT_LOG_ERROR("entities.player", "druid_bot CP EX: now %u", uint32(comboPoints));
                     }
                     if (comboPoints > 5)
                     {
                         comboPoints = 5;
                         //debug
-                        //TC_LOG_ERROR("entities.player", "druid_bot CP NOR: now %u", uint32(comboPoints));
+                        //BOT_LOG_ERROR("entities.player", "druid_bot CP NOR: now %u", uint32(comboPoints));
                     }
                 }
                 //Combo point spending
@@ -2219,14 +2219,14 @@ public:
                 else if (spell->NeedsComboPoints())
                 {
                     //debug
-                    //TC_LOG_ERROR("entities.player", "druid_bot CP SPEND1: %u to 0", uint32(comboPoints));
+                    //BOT_LOG_ERROR("entities.player", "druid_bot CP SPEND1: %u to 0", uint32(comboPoints));
                     if (lvl >= 25 && comboPoints > 0)
                     {
                         if (urand(1,100) <= uint32(comboPoints * 20))
                         {
                             me->CastSpell(me, PREDATORS_SWIFTNESS_BUFF, true);
                             //debug
-                            //TC_LOG_ERROR("entities.player", "druid_bot CP SPEND1: PS proc!");
+                            //BOT_LOG_ERROR("entities.player", "druid_bot CP SPEND1: PS proc!");
                         }
                     }
                     comboPoints = 0;
@@ -2559,7 +2559,7 @@ public:
                 }
                 if (!found)
                 {
-                    LOG_ERROR("entities.unit", "Druid_bot:JustSummoned() treants array is full");
+                    BOT_LOG_ERROR("entities.unit", "Druid_bot:JustSummoned() treants array is full");
                     ASSERT(false);
                 }
             }
@@ -2567,7 +2567,7 @@ public:
 
         void SummonedCreatureDespawn(Creature* summon) override
         {
-            //TC_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
+            //BOT_LOG_ERROR("entities.unit", "SummonedCreatureDespawn: %s's %s", me->GetName().c_str(), summon->GetName().c_str());
             //if (summon == botPet)
             //    botPet = nullptr;
             if (summon->GetEntry() == BOT_PET_FORCE_OF_NATURE)
@@ -2584,7 +2584,7 @@ public:
                 }
                 //if (!found)
                 //{
-                //    LOG_ERROR("entities.unit", "Druid_bot:SummonedCreatureDespawn() treant is not found in array");
+                //    BOT_LOG_ERROR("entities.unit", "Druid_bot:SummonedCreatureDespawn() treant is not found in array");
                 //    ASSERT(false);
                 //}
             }

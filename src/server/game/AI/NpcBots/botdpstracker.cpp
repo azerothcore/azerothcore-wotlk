@@ -82,7 +82,7 @@ void DPSTracker::_Release()
             total_damage += dmgs[i];
 
         _DPSes[itr->first] = uint32(total_damage / (0.001f * std::max<uint32>(1 * IN_MILLISECONDS, std::min<uint32>(_trackTimer, MAX_DPS_TRACK_TIME))));
-        //TC_LOG_ERROR("entities.player", "DPSTracker::Release(): guidlow = %u, time = %u, tick damage %u, total %u, dps = %u",
+        //BOT_LOG_ERROR("entities.player", "DPSTracker::Release(): guidlow = %u, time = %u, tick damage %u, total %u, dps = %u",
         //    itr->first, _trackTimer, dmgs[0], total_damage, _DPSes[itr->first]);
 
         //shift
@@ -112,7 +112,7 @@ void DPSTracker::_AccumulateDamage(uint64 guid, uint32 damage)
 //victim is bot owner, bot, party player or party bot; checked in Unit::DealDamage()
 void DPSTracker::TrackDamage(Unit const* victim, uint32 damage)
 {
-    //TC_LOG_ERROR("entities.player", "DPSTracker::OnDamage(): on %s, damage %u", victim->GetName().c_str(), damage);
+    //BOT_LOG_ERROR("entities.player", "DPSTracker::OnDamage(): on %s, damage %u", victim->GetName().c_str(), damage);
 
     _SetActive();
     _AccumulateDamage(victim->GetGUID().GetRawValue(), damage);
@@ -128,6 +128,6 @@ void DPSTracker::_SetActive()
 uint32 DPSTracker::GetDPSTaken(uint64 guid) const
 {
     DPSTakenMap::const_iterator itr = _DPSes.find(guid);
-    //TC_LOG_ERROR("entities.player", "DPSTracker::GetDPSTaken(): from %u, damage %u", guid, itr != _DPSes.end() ? itr->second : 0);
+    //BOT_LOG_ERROR("entities.player", "DPSTracker::GetDPSTaken(): from %u, damage %u", guid, itr != _DPSes.end() ? itr->second : 0);
     return itr != _DPSes.end() ? itr->second : 0;
 }
