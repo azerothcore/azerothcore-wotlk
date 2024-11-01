@@ -896,34 +896,28 @@ class spell_gen_leeching_swarm_aura : public AuraScript
     }
 };
 
-class spell_gen_leeching_swarm_dmg : public SpellScriptLoader
+class spell_gen_leeching_swarm_dmg : public SpellScript
 {
-public:
-    spell_gen_leeching_swarm_dmg() : SpellScriptLoader("spell_gen_leeching_swarm_dmg") {}
+    PrepareSpellScript(spell_gen_leeching_swarm_dmg);
 
-    class spell_gen_leeching_swarm_dmg_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_gen_leeching_swarm_dmg_SpellScript);
+        return ValidateSpellInfo({ SPELL_LEECHING_SWARM_HEAL });
+    }
 
-        void HandleAfterHit()
-        {
-            if (Unit* caster = GetCaster())
-                if (GetHitDamage() > 0)
-                {
-                    int32 damage = GetHitDamage();
-                    caster->CastCustomSpell(caster, SPELL_LEECHING_SWARM_HEAL, &damage, 0, 0, true);
-                }
-        }
-
-        void Register() override
-        {
-            AfterHit += SpellHitFn(spell_gen_leeching_swarm_dmg_SpellScript::HandleAfterHit);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleAfterHit()
     {
-        return new spell_gen_leeching_swarm_dmg_SpellScript();
+        if (Unit* caster = GetCaster())
+            if (GetHitDamage() > 0)
+            {
+                int32 damage = GetHitDamage();
+                caster->CastCustomSpell(caster, SPELL_LEECHING_SWARM_HEAL, &damage, 0, 0, true);
+            }
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_gen_leeching_swarm_dmg::HandleAfterHit);
     }
 };
 
@@ -936,5 +930,5 @@ void AddSC_boss_anubarak_trial()
     new npc_anubarak_spike();
     RegisterSpellScript(spell_pursuing_spikes_aura);
     RegisterSpellScript(spell_gen_leeching_swarm_aura);
-    new spell_gen_leeching_swarm_dmg();
+    RegisterSpellScript(spell_gen_leeching_swarm_dmg);
 }
