@@ -423,30 +423,24 @@ class spell_item_gift_of_the_harvester : public SpellScript
     }
 };
 
-class spell_q12698_the_gift_that_keeps_on_giving : public SpellScriptLoader
+class spell_q12698_the_gift_that_keeps_on_giving : public SpellScript
 {
-public:
-    spell_q12698_the_gift_that_keeps_on_giving() : SpellScriptLoader("spell_q12698_the_gift_that_keeps_on_giving") { }
+    PrepareSpellScript(spell_q12698_the_gift_that_keeps_on_giving);
 
-    class spell_q12698_the_gift_that_keeps_on_giving_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareSpellScript(spell_q12698_the_gift_that_keeps_on_giving_SpellScript);
+        return ValidateSpellInfo({ SPELL_SUMMON_SCARLET_GHOST });
+    }
 
-        void HandleScriptEffect(SpellEffIndex /*effIndex*/)
-        {
-            if (GetOriginalCaster() && GetHitUnit())
-                GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving_SpellScript::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
-        return new spell_q12698_the_gift_that_keeps_on_giving_SpellScript();
+        if (GetOriginalCaster() && GetHitUnit())
+            GetOriginalCaster()->CastSpell(GetHitUnit(), urand(0, 1) ? GetEffectValue() : SPELL_SUMMON_SCARLET_GHOST, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q12698_the_gift_that_keeps_on_giving::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
 
@@ -1223,7 +1217,7 @@ void AddSC_the_scarlet_enclave_c1()
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
     new npc_death_knight_initiate();
     RegisterSpellScript(spell_item_gift_of_the_harvester);
-    new spell_q12698_the_gift_that_keeps_on_giving();
+    RegisterSpellScript(spell_q12698_the_gift_that_keeps_on_giving);
     new npc_scarlet_ghoul();
     new npc_dkc1_gothik();
     new npc_scarlet_cannon();
