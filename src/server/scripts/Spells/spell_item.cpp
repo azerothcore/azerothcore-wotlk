@@ -4096,29 +4096,23 @@ class spell_item_skyguard_blasting_charges : public SpellScript
 class spell_item_luffa : public SpellScript
 {
     PrepareSpellScript(spell_item_luffa);
-    std::list<uint32> removeList;
-    std::list<ObjectGuid> casterList;
 
     SpellCastResult CheckCast()
     {
-        if (Unit* caster = GetCaster())
+        if (GetCaster())
         {
-            Unit::AuraApplicationMap const& auras = caster->GetAppliedAuras();
+            Unit::AuraApplicationMap const& auras = GetCaster()->GetAppliedAuras();
             for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
                 Aura const* aura = itr->second->GetBase();
-                if (aura->GetSpellInfo()->GetEffectMechanic(EFFECT_0) != MECHANIC_BLEED || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
                     continue;
 
-                removeList.push_back(aura->GetId());
-                casterList.push_back(aura->GetCasterGUID());
+                return SPELL_CAST_OK;
             }
         }
 
-        if (removeList.empty() || casterList.empty())
-            return SPELL_FAILED_NOTHING_TO_DISPEL;
-        else
-            return SPELL_CAST_OK;
+        return SPELL_FAILED_NOTHING_TO_DISPEL;
     }
 
     void HandleEffect(SpellEffIndex effIndex)
@@ -4126,19 +4120,18 @@ class spell_item_luffa : public SpellScript
         PreventHitDefaultEffect(effIndex);
 
         if (Player* player = GetCaster()->ToPlayer())
-            for (std::list<ObjectGuid>::iterator itr = casterList.begin(); itr != casterList.end(); ++itr)
+        {
+            Unit::AuraApplicationMap const& auras = player->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
-                for (uint32 aura : removeList)
-                {
-                    if (aura)
-                    {
-                        player->RemoveAurasDueToSpell(aura, *itr);
-                        break; // Remove only 1 aura
-                    }
-                }
+                Aura const* aura = itr->second->GetBase();
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                    continue;
 
-                break;
+                    player->RemoveAurasDueToSpell(aura->GetId(), aura->GetCasterGUID());
+                    return;
             }
+        }
     }
 
     void Register() override
