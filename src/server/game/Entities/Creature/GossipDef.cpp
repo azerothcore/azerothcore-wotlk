@@ -194,11 +194,23 @@ void PlayerMenu::SendGossipMenu(std::string text, ObjectGuid objectGuid, uint32 
 {
     WorldPacket data(SMSG_NPC_TEXT_UPDATE, 100);            // guess size
     data << textid;                                         // can be < 0
-    for (uint32 i = 0; i < 8; ++i)
+    for (uint32 i = 0; i < 20; ++i)
     {
         data << float(0);
         data << text;
         data << text;
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
+        data << uint32(0);
         data << uint32(0);
         data << uint32(0);
         data << uint32(0);
