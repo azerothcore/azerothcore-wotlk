@@ -819,11 +819,6 @@ class spell_valkyr_touch_aura : public AuraScript
 {
     PrepareAuraScript(spell_valkyr_touch_aura);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_AURA_SPIRIT_OF_REDEMPTION });
-    }
-
     void HandleEffectPeriodic(AuraEffect const* aurEff)
     {
         PreventDefaultAction();
