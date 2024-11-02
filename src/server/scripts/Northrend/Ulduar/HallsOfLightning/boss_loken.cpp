@@ -254,39 +254,28 @@ public:
     };
 };
 
-class spell_loken_pulsing_shockwave : public SpellScriptLoader
+class spell_loken_pulsing_shockwave : public SpellScript
 {
-public:
-    spell_loken_pulsing_shockwave() : SpellScriptLoader("spell_loken_pulsing_shockwave") { }
+    PrepareSpellScript(spell_loken_pulsing_shockwave);
 
-    class spell_loken_pulsing_shockwave_SpellScript : public SpellScript
+    void CalculateDamage(SpellEffIndex /*effIndex*/)
     {
-        PrepareSpellScript(spell_loken_pulsing_shockwave_SpellScript);
+        if (!GetHitUnit())
+            return;
 
-        void CalculateDamage(SpellEffIndex /*effIndex*/)
-        {
-            if (!GetHitUnit())
-                return;
+        float distance = GetCaster()->GetDistance2d(GetHitUnit());
+        if (distance > 1.0f)
+            SetHitDamage(int32(GetHitDamage() * distance));
+    }
 
-            float distance = GetCaster()->GetDistance2d(GetHitUnit());
-            if (distance > 1.0f)
-                SetHitDamage(int32(GetHitDamage() * distance));
-        }
-
-        void Register() override
-        {
-            OnEffectHitTarget += SpellEffectFn(spell_loken_pulsing_shockwave_SpellScript::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
+    void Register() override
     {
-        return new spell_loken_pulsing_shockwave_SpellScript();
+        OnEffectHitTarget += SpellEffectFn(spell_loken_pulsing_shockwave::CalculateDamage, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
     }
 };
 
 void AddSC_boss_loken()
 {
     new boss_loken();
-    new spell_loken_pulsing_shockwave();
+    RegisterSpellScript(spell_loken_pulsing_shockwave);
 }

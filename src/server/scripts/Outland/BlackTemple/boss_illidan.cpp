@@ -1233,7 +1233,7 @@ struct npc_parasitic_shadowfiend : public ScriptedAI
 
     bool CanAIAttack(Unit const* who) const override
     {
-        return !who->HasAura(SPELL_PARASITIC_SHADOWFIEND) && !who->HasAura(SPELL_PARASITIC_SHADOWFIEND_TRIGGER);
+        return !who->HasAura(SPELL_PARASITIC_SHADOWFIEND) && !who->HasAura(SPELL_PARASITIC_SHADOWFIEND_TRIGGER) && who->IsPlayer();
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override
