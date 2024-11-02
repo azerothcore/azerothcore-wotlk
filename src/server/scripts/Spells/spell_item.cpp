@@ -4092,6 +4092,63 @@ class spell_item_skyguard_blasting_charges : public SpellScript
     }
 };
 
+// 23595 - Luffa
+class spell_item_luffa : public SpellScript
+{
+    PrepareSpellScript(spell_item_luffa);
+    std::list<uint32> removeList;
+    std::list<ObjectGuid> casterList;
+
+    SpellCastResult CheckCast()
+    {
+
+        if (Unit* caster = GetCaster())
+        {
+            Unit::AuraApplicationMap const& auras = caster->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+            {
+                Aura const* aura = itr->second->GetBase();
+                if (aura->GetSpellInfo()->GetEffectMechanic(EFFECT_0) != MECHANIC_BLEED || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                    continue;
+
+                removeList.push_back(aura->GetId());
+                casterList.push_back(aura->GetCasterGUID());
+            }
+        }
+
+        if (removeList.empty() || casterList.empty())
+            return SPELL_FAILED_NOTHING_TO_DISPEL;
+        else
+            return SPELL_CAST_OK;
+    }
+
+    void HandleEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        if (Player* player = GetCaster()->ToPlayer())
+            for (std::list<ObjectGuid>::iterator itr = casterList.begin(); itr != casterList.end(); ++itr)
+            {
+                for (uint32 aura : removeList)
+                {
+                    if (aura)
+                    {
+                        player->RemoveAurasDueToSpell(aura, *itr);
+                        break; // Remove only 1 aura
+                    }
+                }
+
+                break;
+            }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_luffa::CheckCast);
+        OnEffectHitTarget += SpellEffectFn(spell_item_luffa::HandleEffect, EFFECT_0, SPELL_EFFECT_DISPEL_MECHANIC);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4217,4 +4274,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_fel_mana_potion);
     RegisterSpellScript(spell_item_gor_dreks_ointment);
     RegisterSpellScript(spell_item_skyguard_blasting_charges);
+    RegisterSpellScript(spell_item_luffa);
 }
