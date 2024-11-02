@@ -4128,8 +4128,8 @@ class spell_item_luffa : public SpellScript
                 if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
                     continue;
 
-                    player->RemoveAurasDueToSpell(aura->GetId(), aura->GetCasterGUID());
-                    return;
+                player->RemoveAurasDueToSpell(aura->GetId(), aura->GetCasterGUID());
+                return;
             }
         }
     }
