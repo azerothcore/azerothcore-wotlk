@@ -4101,7 +4101,6 @@ class spell_item_luffa : public SpellScript
 
     SpellCastResult CheckCast()
     {
-
         if (Unit* caster = GetCaster())
         {
             Unit::AuraApplicationMap const& auras = caster->GetAppliedAuras();
