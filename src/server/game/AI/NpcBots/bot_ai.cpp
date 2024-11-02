@@ -18361,9 +18361,9 @@ void bot_ai::Evade()
                     _travel_node_cur && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_FORCE_JUMP_END) &&
                     me->GetDistance(*_travel_node_last) < 10.0f)
                 {
-                    BOT_LOG_DEBUG("npcbots", "Bot wanderer {} id {} JUMPS from node {} to {} ('{}' -> '{}'), dist2d {} yd, zdiff {} yd!",
-                        me->GetName(), me->GetEntry(), _travel_node_last->GetWPId(), _travel_node_cur->GetWPId(), _travel_node_last->GetName(), _travel_node_cur->GetName(),
-                        _travel_node_last->GetExactDist2d(_travel_node_cur), _travel_node_last->GetPositionZ() - _travel_node_cur->GetPositionZ());
+                    //BOT_LOG_DEBUG("npcbots", "Bot wanderer {} id {} JUMPS from node {} to {} ('{}' -> '{}'), dist2d {} yd, zdiff {} yd!",
+                    //    me->GetName(), me->GetEntry(), _travel_node_last->GetWPId(), _travel_node_cur->GetWPId(), _travel_node_last->GetName(), _travel_node_cur->GetName(),
+                    //    _travel_node_last->GetExactDist2d(_travel_node_cur), _travel_node_last->GetPositionZ() - _travel_node_cur->GetPositionZ());
                     BotMovement(BOT_MOVE_JUMP, &pos, nullptr, false);
                 }
                 else
@@ -18848,6 +18848,17 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
         return nullptr;
 
     Battleground* bg = GetBG();
+    TeamId myTeamId = bg->GetBotTeamId(me->GetGUID());
+    //uint32 myTeam = myTeamId == TEAM_ALLIANCE ? ALLIANCE : HORDE;
+    WanderNode const* curNode = _travel_node_cur;
+    std::vector<Unit*> const team_members = BotMgr::GetAllGroupMembers(me);
+    NodeLinkList links;
+    for (WanderNodeLink const& wpl : curNode->GetLinks())
+        if (bot_ai::IsWanderNodeAvailableForBotFaction(wpl.wp, me->GetFaction(), false))
+            links.push_back(wpl);
+    if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
+        links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
+
     switch (bg->GetBgTypeID())
     {
         case BATTLEGROUND_AV:
@@ -18859,19 +18870,6 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
 
             static const std::function boss_room_wp_pred_a = [](WanderNode const* wp) { return wp->HasAllFlags(BotWPFlags::BOTWP_FLAG_ALLIANCE_BOSS_ROOM); };
             static const std::function boss_room_wp_pred_h = [](WanderNode const* wp) { return wp->HasAllFlags(BotWPFlags::BOTWP_FLAG_HORDE_BOSS_ROOM); };
-
-            uint32 faction = me->GetFaction();
-            TeamId myTeamId = bg->GetBotTeamId(me->GetGUID());
-            std::vector<Unit*> const team_members = BotMgr::GetAllGroupMembers(me);
-            WanderNode const* curNode = _travel_node_cur;
-            NodeLinkList links;
-            for (WanderNodeLink const& wpl : curNode->GetLinks())
-            {
-                if (bot_ai::IsWanderNodeAvailableForBotFaction(wpl.wp, faction, false))
-                    links.push_back(wpl);
-            }
-            if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-                links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
 
             BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg);
             // Above all: check conditions to rush final boss
@@ -18965,7 +18963,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 {
                     WanderNode const* cap_node = nullptr;
                     float mindist = 50000.0f;
-                    WanderNode::DoForAllAreaWPs(captain->GetAreaId(), [&cap_node, &mindist, fac = faction, pos = captain](WanderNode const* wp) {
+                    WanderNode::DoForAllAreaWPs(captain->GetAreaId(), [&cap_node, &mindist, fac = me->GetFaction(), pos = captain](WanderNode const* wp) {
                         float dist = pos->GetExactDist2d(wp);
                         if (dist < mindist && bot_ai::IsWanderNodeAvailableForBotFaction(wp, fac, false))
                         {
@@ -19174,7 +19172,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 {
                     WanderNode const* cap_node = nullptr;
                     float mindist = 50000.0f;
-                    WanderNode::DoForAllAreaWPs(captain->GetAreaId(), [&cap_node, &mindist, fac = faction, pos = captain](WanderNode const* wp) {
+                    WanderNode::DoForAllAreaWPs(captain->GetAreaId(), [&cap_node, &mindist, fac = me->GetFaction(), pos = captain](WanderNode const* wp) {
                         float dist = pos->GetExactDist2d(wp);
                         if (dist < mindist && bot_ai::IsWanderNodeAvailableForBotFaction(wp, fac, false))
                         {
@@ -19201,29 +19199,10 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 }
             }
 
-            if (links.size() > 1)
-            {
-                BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} has no target point in BG_AV! Falling back to random (%u links)!. Cur node: {} {}",
-                    me->GetName().c_str(), me->GetEntry(), uint32(myTeamId), uint32(curNode->GetLinks().size()), curNode->GetWPId(), curNode->GetName().c_str());
-            }
-
             break;
         }
         case BATTLEGROUND_WS:
         {
-            uint32 faction = me->GetFaction();
-            TeamId myTeamId = bg->GetBotTeamId(me->GetGUID());
-            std::vector<Unit*> const team_members = BotMgr::GetAllGroupMembers(me);
-            WanderNode const* curNode = _travel_node_cur;
-            NodeLinkList links;
-            for (WanderNodeLink const& wpl : curNode->GetLinks())
-            {
-                if (bot_ai::IsWanderNodeAvailableForBotFaction(wpl.wp, faction, false))
-                    links.push_back(wpl);
-            }
-            if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-                links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
-
             BattlegroundWS* ws = dynamic_cast<BattlegroundWS*>(bg);
 
             //1) carrier - get next point towards drop point
@@ -19414,29 +19393,10 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 }
             }
 
-            if (links.size() > 1)
-            {
-                BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} has no target point in BG_WS! Falling back to random ({} links)!. Cur node: {} {}",
-                    me->GetName(), me->GetEntry(), uint32(myTeamId), uint32(curNode->GetLinks().size()), curNode->GetWPId(), curNode->GetName());
-            }
-
             break;
         }
         case BATTLEGROUND_AB:
         {
-            uint32 faction = me->GetFaction();
-            TeamId myTeamId = bg->GetBotTeamId(me->GetGUID());
-            std::vector<Unit*> const team_members = BotMgr::GetAllGroupMembers(me);
-            WanderNode const* curNode = _travel_node_cur;
-            NodeLinkList links;
-            for (WanderNodeLink const& wpl : curNode->GetLinks())
-            {
-                if (bot_ai::IsWanderNodeAvailableForBotFaction(wpl.wp, faction, false))
-                    links.push_back(wpl);
-            }
-            if (links.size() > 1 && _travel_node_last && !curNode->HasFlag(BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM))
-                links.remove_if([this](WanderNodeLink const& wpl) { return wpl.Id() == _travel_node_last->GetWPId(); });
-
             BattlegroundAB* ab = dynamic_cast<BattlegroundAB*>(bg);
 
             //1 have buff linked - try going there (buff spawned, noone goes there, need that buff (scratch that, get anyway, let respawn))
@@ -19495,16 +19455,9 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 if (myTeamId != teamId)
                     continue;
 
-                bool all_nodes_controlled = true;
-                uint8 node = BG_AB_NODE_STABLES;
-                do
-                {
-                    if (!ab->IsNodeOccupied(node, teamId) && !ab->IsNodeContested(node, teamId))
-                        all_nodes_controlled = false;
-                    ++node;
-                } while (node < BG_AB_DYNAMIC_NODES_COUNT && all_nodes_controlled);
-
-                if (all_nodes_controlled)
+                bool all_nodes_assaulted = std::ranges::all_of(([]<typename T, T... I>(std::integer_sequence<T, I...>&&) { return std::array{ I... }; })(std::make_integer_sequence<uint8, 5>{}),
+                    [=](uint8 n) { return ab->IsNodeOccupied(n, teamId) || ab->IsNodeContested(n, teamId); });
+                if (all_nodes_assaulted)
                 {
                     WanderNode const* enemy_base = WanderNode::FindInMapWPs(me->GetMapId(), [=](WanderNode const* mwp) {
                         return (mwp->HasAllFlags(teamId == TEAM_ALLIANCE ? BotWPFlags::BOTWP_FLAG_HORDE_SPAWN_POINT : BotWPFlags::BOTWP_FLAG_ALLIANCE_SPAWN_POINT));
@@ -19582,7 +19535,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
 
                 std::set<WanderNodeLink> dlinks;
                 for (WanderNode const* fwp : attackableFlags)
-                    for (WanderNodeLink const& fwpl : curNode->GetShortestPathLinks(fwp, links, BotWPLevel::BOTWP_LEVEL_ONE))
+                    for (WanderNodeLink const& fwpl : curNode->GetShortestPathLinks(fwp, links))
                         dlinks.insert(fwpl);
                 if (!dlinks.empty())
                 {
@@ -19592,17 +19545,17 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 }
             }
 
-            if (links.size() > 1)
-            {
-                //BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} has no target point in BG_AB! Falling back to random ({} links)!. Cur node: {} {}",
-                //    me->GetName(), me->GetEntry(), uint32(myTeamId), uint32(curNode->GetLinks().size()), curNode->GetWPId(), curNode->GetName());
-            }
-
             break;
         }
         default:
             break;
     }
+
+    //if (links.size() > 1)
+    //{
+    //    BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} has no target point in BG_AB! Falling back to random ({} links)!. Cur node: {} {}",
+    //        me->GetName(), me->GetEntry(), uint32(myTeamId), uint32(curNode->GetLinks().size()), curNode->GetWPId(), curNode->GetName());
+    //}
 
     return nullptr;
 }

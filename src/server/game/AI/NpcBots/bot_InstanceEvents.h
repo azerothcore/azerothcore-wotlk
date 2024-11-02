@@ -20,12 +20,14 @@ class NpcBotInstanceEventBase : public BasicEvent
 {
 public:
     InstanceScript* GetScript() const { return _instance; }
+
+    bool operator()() { return Execute(0, 0); }
+
 protected:
     NpcBotInstanceEventBase(InstanceScript* instance) : _instance(instance) {}
     ~NpcBotInstanceEventBase() = default;
     NpcBotInstanceEventBase(NpcBotInstanceEventBase const&) = delete;
 
-    bool operator()() { return Execute(0, 0); }
 private:
     InstanceScript* _instance;
 };
