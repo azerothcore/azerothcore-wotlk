@@ -19503,13 +19503,11 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     {
                         if (m == me)
                             continue;
-                        Spell const* curSpell = m->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-                        WanderNode const* mCurNode = m->IsNPCBot() ? m->ToCreature()->GetBotAI()->_travel_node_cur : nullptr;
-                        if (curSpell && curSpell->m_spellInfo->Id == 21651u && m->GetExactDist2d(mwp) < 10.0f)
+                        if (m->GetCurrentSpell(CURRENT_GENERIC_SPELL) && m->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == 21651u && m->GetExactDist2d(mwp) < 10.0f)
                             ++advancing_members;
-                        else if (mCurNode && mCurNode == mwp)
+                        else if (m->IsNPCBot() && m->ToCreature()->GetBotAI()->_travel_node_cur == mwp)
                             ++advancing_members;
-                        else if (m->GetExactDist2d(mwp) < 60.0f)
+                        else if (m->GetExactDist2d(mwp) < 60.0f && m->GetExactDist2d(mwp) < me->GetExactDist2d(mwp))
                             ++advancing_members;
                         if (advancing_members >= 3)
                             break;
@@ -19519,8 +19517,19 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 });
                 if (attackableFlags.empty())
                 {
+                    float maxdist = 0.0f;
+                    WanderNode const* farthestAttackableFlag = nullptr;
                     for (WanderNode const* bgFlag : bgFlags)
-                        attackableFlags.push_back(bgFlag);
+                    {
+                        float dist2d = me->GetExactDist2d(bgFlag);
+                        if (dist2d > maxdist)
+                        {
+                            maxdist = dist2d;
+                            farthestAttackableFlag = bgFlag;
+                        }
+                    }
+                    if (farthestAttackableFlag)
+                        attackableFlags.push_back(farthestAttackableFlag);
                 }
                 NodeLinkList olinks;
                 for (WanderNodeLink const& wpl : links)
@@ -19535,7 +19544,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
 
                 std::set<WanderNodeLink> dlinks;
                 for (WanderNode const* fwp : attackableFlags)
-                    for (WanderNodeLink const& fwpl : curNode->GetShortestPathLinks(fwp, links))
+                    for (WanderNodeLink const& fwpl : curNode->GetShortestPathLinks(fwp, links, BotWPLevel::BOTWP_LEVEL_ONE))
                         dlinks.insert(fwpl);
                 if (!dlinks.empty())
                 {
