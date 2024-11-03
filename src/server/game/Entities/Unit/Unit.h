@@ -1142,7 +1142,11 @@ public:
     [[nodiscard]] uint32 GetRangedCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_RANGED, 2.2f, 33.0f, damage); }
     [[nodiscard]] uint32 GetSpellCritDamageReduction(uint32 damage) const { return GetCombatRatingDamageReduction(CR_CRIT_TAKEN_SPELL, 2.2f, 33.0f, damage); }
 
-    [[nodiscard]] Player* GetSpellModOwner() const;
+    /*********************************************************/
+    /***         METHODS RELATED TO CHARM SYSTEM           ***/
+    /*********************************************************/
+    CharmInfo* GetCharmInfo() { return m_charmInfo; }
+    CharmInfo* InitCharmInfo();
 
     [[nodiscard]] Unit* GetOwner() const;
     [[nodiscard]] Guardian* GetGuardianPet() const;
@@ -1362,6 +1366,7 @@ public:
     // delayed+channeled spells are always interrupted
     void InterruptNonMeleeSpells(bool withDelayed, uint32 spellid = 0, bool withInstant = true, bool bySelf = false);
 
+    [[nodiscard]] Player* GetSpellModOwner() const;
     [[nodiscard]] Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
     [[nodiscard]] Spell* GetCurrentSpell(uint32 spellType) const { return m_currentSpells[spellType]; }
     [[nodiscard]] Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
