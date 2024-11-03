@@ -1,14 +1,12 @@
-DELETE FROM creature_formations WHERE leaderGUID = 42583;
-DELETE FROM creature_formations WHERE leaderGUID = 42588;
+DELETE FROM `creature_formations` WHERE `leaderGUID` IN (42583, 42588);
 
-INSERT INTO creature_formations (leaderGUID, memberGUID, dist, angle, groupAI) VALUES
+INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`) VALUES
 (42583, 42583, 0, 0, 515),
 (42583, 42645, 1.0, 0.0, 515),
 (42583, 54992, 1.0, 1.57, 515),
 (42583, 54823, 1.0, 3.14, 515),
 (42583, 42871, 1.0, 4.71, 515),
 (42583, 54822, 1.0, 6.28, 515),
-
 (42588, 42588, 0, 0, 515),
 (42588, 42874, 1.0, 0.0, 515),
 (42588, 54821, 1.0, 1.57, 515),
