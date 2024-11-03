@@ -6,6 +6,6 @@ INSERT INTO `smart_scripts` (
     `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`,
     `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`,
     `target_param2`, `target_param3`, `target_param4`, `comment`
-) VALUES 
-(23196, 0, 1, 0, 0, 0, 100, 0, 15000, 15000, 15000, 15000, 11, 41274, 0, 0, 0, 0, 0, 1, 0, 0, 0, 'Bonechewer Behemoth - In Combat - Cast Fel Stomp every 15 seconds'),
+) VALUES
+(23196, 0, 1, 0, 0, 0, 100, 0, 15000, 15000, 15000, 15000, 11, 41274, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 'Bonechewer Behemoth - In Combat - Cast Fel Stomp every 15 seconds'),
 (23196, 0, 2, 0, 0, 0, 100, 0, 1000, 1000, 15000, 15000, 11, 41277, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 'Bonechewer Behemoth - In Combat - Cast Fiery Comet every 15 seconds');
