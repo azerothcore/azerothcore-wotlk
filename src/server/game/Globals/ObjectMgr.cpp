@@ -54,9 +54,7 @@
 #include <boost/algorithm/string.hpp>
 #include <numeric>
 
-//npcbot
-#include "botdatamgr.h"
-//end npcbot
+#include "ItemEnchantmentMgr.h"
 
 ScriptMapMap sSpellScripts;
 ScriptMapMap sEventScripts;
