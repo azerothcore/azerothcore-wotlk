@@ -19,6 +19,7 @@
 #include "Containers.h"
 #include "DisableMgr.h"
 #include "Group.h"
+#include "ItemEnchantmentMgr.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Player.h"

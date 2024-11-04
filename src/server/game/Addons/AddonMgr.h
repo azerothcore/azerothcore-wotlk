@@ -22,7 +22,6 @@
 #include <array>
 #include <list>
 #include <string>
-#include <utility>
 
 struct AddonInfo
 {

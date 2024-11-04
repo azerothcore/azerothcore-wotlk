@@ -22,6 +22,7 @@
 #include "Realm.h"
 #include <array>
 #include <map>
+#include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 #include <vector>
 
 struct RealmBuildInfo

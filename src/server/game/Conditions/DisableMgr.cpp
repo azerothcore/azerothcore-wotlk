@@ -25,6 +25,7 @@
 #include "SpellMgr.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
+#include "VMapMgr2.h"
 #include "World.h"
 
 namespace DisableMgr

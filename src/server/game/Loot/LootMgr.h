@@ -20,7 +20,6 @@
 
 #include "ByteBuffer.h"
 #include "ConditionMgr.h"
-#include "ItemEnchantmentMgr.h"
 #include "ObjectGuid.h"
 #include "RefMgr.h"
 #include "SharedDefines.h"

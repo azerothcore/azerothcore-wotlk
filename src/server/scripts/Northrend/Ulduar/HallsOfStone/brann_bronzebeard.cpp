@@ -1152,32 +1152,32 @@ class spell_hos_dark_matter : public AuraScript
 {
     PrepareAuraScript(spell_hos_dark_matter);
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, caster->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
-        }
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, caster->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
+    }
 
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
 
 class spell_hos_dark_matter_size : public SpellScript
-    {
+{
     PrepareSpellScript(spell_hos_dark_matter_size);
 
-        void HandleApplyTouch()
+    void HandleApplyTouch()
+    {
+        if (Unit* target = GetHitUnit())
         {
-            if (Unit* target = GetHitUnit())
-            {
-                target->SetObjectScale(0.35f);
-            }
+            target->SetObjectScale(0.35f);
         }
+    }
 
-        void Register() override
-        {
+    void Register() override
+    {
         AfterHit += SpellHitFn(spell_hos_dark_matter_size::HandleApplyTouch);
     }
 };

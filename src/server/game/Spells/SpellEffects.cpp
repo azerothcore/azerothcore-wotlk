@@ -19,7 +19,6 @@
 #include "BattlegroundIC.h"
 #include "BattlegroundMgr.h"
 #include "BattlegroundSA.h"
-#include "BattlegroundWS.h"
 #include "CellImpl.h"
 #include "Chat.h"
 #include "Common.h"
