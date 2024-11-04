@@ -19097,7 +19097,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                         return team_ready ? enemy_captain_wp : curNode;
                     }
                 }
-                WanderNode::DoForAllMapWPs(me->GetMapId(), [&, myTeamId = myTeamId, av = av](WanderNode const* wp) {
+                WanderNode::DoForAllMapWPs(me->GetMapId(), [&, av = av](WanderNode const* wp) {
                     if (flag_wp_pred(wp))
                     {
                         for (auto const& vt : assaulted_nodes)
