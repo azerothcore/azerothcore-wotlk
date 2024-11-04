@@ -29,7 +29,7 @@ enum class BotWPFlags : uint32
     BOTWP_FLAG_BG_FLAG_PICKUP_TARGET        = 0x00000080, // <BG only> flag pick/activate up marker
     BOTWP_FLAG_BG_BOSS_ROOM                 = 0x00000100, // <BG only> boss room to attack as group / defend
     BOTWP_FLAG_BG_MISC_OBJECTIVE_1          = 0x00000200, // <BG only> misc objective 1 (AV = mine)
-    BOTWP_FLAG_BG_MISC_OBJECTIVE_2          = 0x00000400, // <BG only> misc objective 2 (NYI)
+    BOTWP_FLAG_BG_MISC_OBJECTIVE_2          = 0x00000400, // <BG only> misc objective 2 (AV = captain)
     BOTWP_FLAG_BG_OPTIONAL_PICKUP_1         = 0x00000800, // <BG only> optional pickup point 1 (WS = healNW, AB = stables)
     BOTWP_FLAG_BG_OPTIONAL_PICKUP_2         = 0x00001000, // <BG only> optional pickup point 2 (WS = bersNE, AB = farm)
     BOTWP_FLAG_BG_OPTIONAL_PICKUP_3         = 0x00002000, // <BG only> optional pickup point 3 (WS = healSE, AB = mill)
@@ -48,6 +48,8 @@ enum class BotWPFlags : uint32
     BOTWP_FLAG_HORDE_FLAG_PICKUP_TARGET     = BOTWP_FLAG_BG_FLAG_PICKUP_TARGET | BOTWP_FLAG_HORDE_ONLY,
     BOTWP_FLAG_ALLIANCE_BOSS_ROOM           = BOTWP_FLAG_BG_BOSS_ROOM | BOTWP_FLAG_ALLIANCE_ONLY,
     BOTWP_FLAG_HORDE_BOSS_ROOM              = BOTWP_FLAG_BG_BOSS_ROOM | BOTWP_FLAG_HORDE_ONLY,
+    BOTWP_FLAG_ALLIANCE_DEMIBOSS_ROOM       = BOTWP_FLAG_BG_MISC_OBJECTIVE_2 | BOTWP_FLAG_ALLIANCE_ONLY,
+    BOTWP_FLAG_HORDE_DEMIBOSS_ROOM          = BOTWP_FLAG_BG_MISC_OBJECTIVE_2 | BOTWP_FLAG_HORDE_ONLY,
     BOTWP_FLAG_OPTIONAL_PICKUP              = (BOTWP_FLAG_BG_OPTIONAL_PICKUP_1 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_2 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_3 |
                                                BOTWP_FLAG_BG_OPTIONAL_PICKUP_4 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_5),
     BOTWP_FLAG_WS_PICKUP_RESTORATION        = BOTWP_FLAG_BG_OPTIONAL_PICKUP_1 | BOTWP_FLAG_BG_OPTIONAL_PICKUP_3,
