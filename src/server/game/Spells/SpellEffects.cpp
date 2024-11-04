@@ -3289,6 +3289,11 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
     if (m_spellInfo->Id == 62124 && unitTarget->GetVictim() != m_caster)
     {
         m_caster->CastSpell(unitTarget, 67485, true);
+        // trick here: check has wrath to replace lack glyph of Reckoning 
+        if (!m_caster->HasAura(25780)) {
+            unitTarget->RemoveAura(62124);
+            return;
+        }
         unitTarget->CombatStart(m_caster);
     }
 
