@@ -475,7 +475,15 @@ public:
                 return;
 
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
-                player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+                if (Group* group = player->GetGroup())
+                {
+                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                        if (Player* member = itr->GetSource())
+                            if (member->IsAtGroupRewardDistance(player))
+                                member->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
+                }
+                else
+                    player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
 
             _movementComplete = true;
             _events.ScheduleEvent(EVENT_DESPAWN, 3500ms);
