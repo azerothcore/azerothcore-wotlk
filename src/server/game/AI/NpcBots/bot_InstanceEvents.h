@@ -35,6 +35,7 @@ class FrozenThronePlatformDestructionEvent : public NpcBotInstanceEventBase
 {
     friend class bot_ai;
     friend class instance_icecrown_citadel;
+    friend struct instance_icecrown_citadel_InstanceMapScript;
     friend class script_bot_commands;
 
 public:
