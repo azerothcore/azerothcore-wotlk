@@ -222,10 +222,10 @@ public:
 
         void CheckInstanceStatus()
         {
-            if (BossKilled > DATA_HALAZZI)
+            if (BossKilled >= DATA_HALAZZI)
                 HandleGameObject(HexLordGateGUID, true);
 
-            if (BossKilled > DATA_HEXLORD)
+            if (BossKilled >= DATA_HEXLORD)
                 HandleGameObject(ZulJinGateGUID, true);
         }
 
@@ -340,7 +340,7 @@ public:
             if (data == DONE)
             {
                 ++BossKilled;
-                if (QuestMinute && BossKilled > DATA_HALAZZI)
+                if (QuestMinute && BossKilled >= DATA_HALAZZI)
                 {
                     QuestMinute = 0;
                     DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
