@@ -25,22 +25,6 @@
 #include "SpellAuras.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Azuremyst_Isle
-SD%Complete: 75
-SDComment: Quest support: 9283, 9537, 9582, 9554, 9531, ? (special flight path, proper model for mount missing). Injured Draenei cosmetic only, 9582.
-SDCategory: Azuremyst Isle
-EndScriptData */
-
-/* ContentData
-npc_draenei_survivor
-npc_injured_draenei
-npc_magwin
-npc_geezle
-go_ravager_cage
-npc_death_ravager
-EndContentData */
-
 #include "GridNotifiersImpl.h"
 
 /*######
@@ -475,19 +459,7 @@ public:
                 return;
 
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
-            {
-                if (Group* group = player->GetGroup())
-                {
-                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                        if (Player* member = itr->GetSource())
-                            if (member->IsAtGroupRewardDistance(player))
-                                member->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-                }
-                else
-                {
-                    player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
-                }
-            }
+                player->RewardPlayerAndGroupAtEvent(me->GetEntry(), player);
 
             _movementComplete = true;
             _events.ScheduleEvent(EVENT_DESPAWN, 3500ms);
