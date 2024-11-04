@@ -1,4 +1,4 @@
-DELETE FROM `smart_scripts` WHERE `entryorguid` = 23196 AND `id` IN (1, 2);
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 23196 AND `id` IN (1, 2, 3);
 
 INSERT INTO `smart_scripts` (
     `entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`,
@@ -8,4 +8,5 @@ INSERT INTO `smart_scripts` (
     `target_param2`, `target_param3`, `target_param4`, `comment`
 ) VALUES
 (23196, 0, 1, 0, 0, 0, 100, 0, 15000, 15000, 15000, 15000, 11, 41274, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 'Bonechewer Behemoth - In Combat - Cast Fel Stomp every 15 seconds'),
-(23196, 0, 2, 0, 0, 0, 100, 0, 1000, 1000, 15000, 15000, 11, 41277, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 'Bonechewer Behemoth - In Combat - Cast Fiery Comet every 15 seconds');
+(23196, 0, 2, 0, 0, 0, 100, 0, 10000, 10000, 20000, 20000, 11, 41277, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 'Bonechewer Behemoth - In Combat - Cast Fiery Comet every 20 seconds'),
+(23196, 0, 3, 0, 0, 0, 100, 0, 17000, 20000, 0, 0, 11, 41276, 0, 0, 0, 0, 0, 5, 40, 0, 0, 0, 'Bonechewer Behemoth - In Combat - Cast Meteor every 17-20 seconds on random target');
