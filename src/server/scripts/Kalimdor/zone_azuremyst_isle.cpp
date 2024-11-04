@@ -475,6 +475,7 @@ public:
                 return;
 
             if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
+            {
                 if (Group* group = player->GetGroup())
                 {
                     for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
@@ -486,6 +487,7 @@ public:
                 {
                     player->KilledMonsterCredit(me->GetEntry(), me->GetGUID());
                 }
+            }
 
             _movementComplete = true;
             _events.ScheduleEvent(EVENT_DESPAWN, 3500ms);
