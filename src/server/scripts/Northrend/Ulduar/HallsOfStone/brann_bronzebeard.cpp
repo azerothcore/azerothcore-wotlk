@@ -1148,14 +1148,9 @@ public:
     };
 };
 
-class spell_hos_dark_matter : public SpellScriptLoader
+class spell_hos_dark_matter : public AuraScript
 {
-public:
-    spell_hos_dark_matter() : SpellScriptLoader("spell_hos_dark_matter") { }
-
-    class spell_hos_dark_matter_AuraScript : public AuraScript
-    {
-        PrepareAuraScript(spell_hos_dark_matter_AuraScript);
+    PrepareAuraScript(spell_hos_dark_matter);
 
         void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
         {
@@ -1165,24 +1160,13 @@ public:
 
         void Register() override
         {
-            OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+            OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         }
     };
 
-    AuraScript* GetAuraScript() const override
+class spell_hos_dark_matter_size : public SpellScript
     {
-        return new spell_hos_dark_matter_AuraScript();
-    }
-};
-
-class spell_hos_dark_matter_size : public SpellScriptLoader
-{
-public:
-    spell_hos_dark_matter_size() : SpellScriptLoader("spell_hos_dark_matter_size") { }
-
-    class spell_hos_dark_matter_size_SpellScript : public SpellScript
-    {
-        PrepareSpellScript(spell_hos_dark_matter_size_SpellScript);
+    PrepareSpellScript(spell_hos_dark_matter_size);
 
         void HandleApplyTouch()
         {
@@ -1194,13 +1178,7 @@ public:
 
         void Register() override
         {
-            AfterHit += SpellHitFn(spell_hos_dark_matter_size_SpellScript::HandleApplyTouch);
-        }
-    };
-
-    SpellScript* GetSpellScript() const override
-    {
-        return new spell_hos_dark_matter_size_SpellScript;
+        AfterHit += SpellHitFn(spell_hos_dark_matter_size::HandleApplyTouch);
     }
 };
 
@@ -1210,6 +1188,6 @@ void AddSC_brann_bronzebeard()
     new dark_rune_protectors();
     new dark_rune_stormcaller();
     new iron_golem_custodian();
-    new spell_hos_dark_matter();
-    new spell_hos_dark_matter_size();
+    RegisterSpellScript(spell_hos_dark_matter);
+    RegisterSpellScript(spell_hos_dark_matter_size);
 }
