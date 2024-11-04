@@ -1,3 +1,4 @@
+-- DB update 2024_11_04_03 -> 2024_11_04_04
 -- Spotlight
 DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (29683,32214);
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES

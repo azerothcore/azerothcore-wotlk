@@ -1,3 +1,4 @@
+-- DB update 2024_11_04_02 -> 2024_11_04_03
 -- Update gameobject 'Christmas Tree' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (178667, 178805, 178425, 178557, 178647))

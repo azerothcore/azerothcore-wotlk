@@ -1,3 +1,4 @@
+-- DB update 2024_11_04_00 -> 2024_11_04_01
 -- Update creature 'Hallow's End' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` IN (23712, 24519, 23973, 23971, 15199, 15197, 15195, 15310, 15354, 15309, 15353))
