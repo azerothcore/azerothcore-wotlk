@@ -1916,7 +1916,7 @@ public:
     void EventBotDefendsPoint(Creature* bot, uint32 object);
     BG_AV_NodeInfo const (&GetNodes() const)[BG_AV_NODES_MAX] { return m_Nodes; }
     uint32 GetObjectThroughNodeForBot(BG_AV_Nodes node, bool log = false) { return GetObjectThroughNode(node, log); }
-    uint32 GetMineOwner(uint8 mine_idx) const { return m_Mine_Owner[mine_idx]; }
+    TeamId GetMineOwner(uint8 mine_idx) const { return m_Mine_Owner[mine_idx]; }
     //end npcbot
 
     /* achievement req. */
