@@ -1,4 +1,8 @@
+DELETE FROM `spell_script_names` WHERE `spell_id`=51000;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (51000, 'spell_hos_dark_matter_size');
+
+DELETE FROM `spell_script_names` WHERE `spell_id`=51001;
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES (51001, 'spell_hos_dark_matter');
 
 DELETE FROM `script_waypoint` WHERE `entry` IN (28070);
 INSERT INTO `script_waypoint` (`entry`, `pointid`, `location_x`, `location_y`, `location_z`, `waittime`, `point_comment`) 
