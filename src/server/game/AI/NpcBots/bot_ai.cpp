@@ -18849,7 +18849,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
 
     Battleground* bg = GetBG();
     TeamId myTeamId = bg->GetBotTeamId(me->GetGUID());
-    uint32 myTeam = myTeamId == TEAM_ALLIANCE ? ALLIANCE : HORDE;
+    //uint32 myTeam = myTeamId == TEAM_ALLIANCE ? ALLIANCE : HORDE;
     WanderNode const* curNode = _travel_node_cur;
     std::vector<Unit*> const team_members = BotMgr::GetAllGroupMembers(me);
     NodeLinkList links;
@@ -18986,8 +18986,8 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
 
                 constexpr std::array<uint8, BG_AV_NODES_MAX> defend_priority_a{ 9, 7, 6, 3, 4, 2, 1, 8, 8, 5, 5, 0, 0, 0, 0 };
                 constexpr std::array<uint8, BG_AV_NODES_MAX> defend_priority_h{ 1, 2, 4, 3, 6, 7, 9, 0, 0, 0, 0, 5, 5, 8, 8 };
-                const std::array<uint8, BG_AV_NODES_MAX> req_attackers_count{ uint8(team_members.size()) / 2u, 4, 4, 4, 4, 4, uint8(team_members.size()) / 2u, 4, 4, 4, 4, 4, 4, 4, 4 };
-                const std::array<uint8, BG_AV_NODES_MAX> req_defenders_count{ uint8(team_members.size()) / 2u, 4, 4, 4, 4, 4, uint8(team_members.size()) / 2u, 0, 0, 0, 0, 0, 0, 0, 0 };
+                const std::array<uint8, BG_AV_NODES_MAX> req_attackers_count{ uint8(team_members.size() / 2u), 4, 4, 4, 4, 4, uint8(team_members.size() / 2u), 4, 4, 4, 4, 4, 4, 4, 4 };
+                const std::array<uint8, BG_AV_NODES_MAX> req_defenders_count{ uint8(team_members.size() / 2u), 4, 4, 4, 4, 4, uint8(team_members.size() / 2u), 0, 0, 0, 0, 0, 0, 0, 0 };
 
                 static const std::function flag_wp_pred = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET); };
                 static const std::function flag_or_bunker_wp_pred = [](WanderNode const* wp) { return wp->HasFlag(BotWPFlags::BOTWP_FLAG_ALLIANCE_FLAG_PICKUP_TARGET); };
@@ -19038,12 +19038,12 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 }
                 for (uint8 mine_idx : { AV_NORTH_MINE, AV_SOUTH_MINE })
                 {
-                    if (av->GetMineOwner(mine_idx) == myTeam)
+                    if (av->GetMineOwner(mine_idx) == myTeamId)
                         continue;
                     uint32 cre_type = (mine_idx == AV_NORTH_MINE) ? AV_CPLACE_MINE_N_3 : AV_CPLACE_MINE_S_3;
                     WanderNode const* mineWP = nullptr;
                     WanderNode::DoForAllMapWPs(me->GetMapId(), [=, &mineWP, mindist = 50000.f](WanderNode const* mwp) mutable {
-                        if (av->GetMineOwner(mine_idx) == myTeam || !mine_pred(mwp))
+                        if (!mine_pred(mwp))
                             return;
                         float dist2d = mwp->GetExactDist2d(BG_AV_CreaturePos[cre_type][0], BG_AV_CreaturePos[cre_type][1]);
                         if (!mineWP || dist2d < mindist)
@@ -19097,7 +19097,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                         return team_ready ? enemy_captain_wp : curNode;
                     }
                 }
-                WanderNode::DoForAllMapWPs(me->GetMapId(), [&, myTeamId = myTeamId, av = av](WanderNode const* wp) {
+                WanderNode::DoForAllMapWPs(me->GetMapId(), [&](WanderNode const* wp) {
                     if (flag_wp_pred(wp))
                     {
                         for (auto const& vt : assaulted_nodes)
