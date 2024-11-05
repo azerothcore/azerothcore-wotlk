@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef ObjectGuid_h__
-#define ObjectGuid_h__
+#ifndef OBJECT_GUID_H
+#define OBJECT_GUID_H
 
 #include "ByteBuffer.h"
 #include "Define.h"
@@ -26,6 +26,15 @@
 #include <set>
 #include <unordered_set>
 #include <vector>
+
+/***********************************************************************************
+ * @brief This file defines the ObjectGuid class, which is used to manipulate unique
+ * identifiers (GUID) for objects. GUIDs are essential to identifying in-game
+ * entities such as players, creatures, items... Each object has a GUID.
+ *
+ * @note: GUIDs are divided into two parts: The HighGUID, giving the object type and
+ * the LowGUID, which is a simple unique identifier for this object type.
+ ***********************************************************************************/
 
 enum TypeID
 {
@@ -45,29 +54,31 @@ enum TypeMask
 {
     TYPEMASK_OBJECT         = 0x0001,
     TYPEMASK_ITEM           = 0x0002,
-    TYPEMASK_CONTAINER      = 0x0006,             // TYPEMASK_ITEM | 0x0004
-    TYPEMASK_UNIT           = 0x0008,             // creature
+    TYPEMASK_CONTAINER      = 0x0004,
+    TYPEMASK_UNIT           = 0x0008,
     TYPEMASK_PLAYER         = 0x0010,
     TYPEMASK_GAMEOBJECT     = 0x0020,
     TYPEMASK_DYNAMICOBJECT  = 0x0040,
     TYPEMASK_CORPSE         = 0x0080,
-    TYPEMASK_SEER           = TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT
+
+    TYPEMASK_SEER           = TYPEMASK_PLAYER | TYPEMASK_UNIT | TYPEMASK_DYNAMICOBJECT,
+    TYPEMASK_WORLDOBJECT    = TYPEMASK_UNIT | TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT | TYPEMASK_CORPSE
 };
 
 enum class HighGuid
 {
-    Item           = 0x4000,                      // blizz 4000
-    Container      = 0x4000,                      // blizz 4000
-    Player         = 0x0000,                      // blizz 0000
-    GameObject     = 0xF110,                      // blizz F110
-    Transport      = 0xF120,                      // blizz F120 (for GAMEOBJECT_TYPE_TRANSPORT)
-    Unit           = 0xF130,                      // blizz F130
-    Pet            = 0xF140,                      // blizz F140
-    Vehicle        = 0xF150,                      // blizz F550
-    DynamicObject  = 0xF100,                      // blizz F100
-    Corpse         = 0xF101,                      // blizz F100
-    Mo_Transport   = 0x1FC0,                      // blizz 1FC0 (for GAMEOBJECT_TYPE_MO_TRANSPORT)
-    Instance       = 0x1F40,                      // blizz 1F40
+    Item           = 0x4000,
+    Container      = 0x4000,
+    Player         = 0x0000,
+    GameObject     = 0xF110,
+    Transport      = 0xF120,
+    Unit           = 0xF130,
+    Pet            = 0xF140,
+    Vehicle        = 0xF150,
+    DynamicObject  = 0xF100,
+    Corpse         = 0xF101,
+    Mo_Transport   = 0x1FC0,
+    Instance       = 0x1F40,
     Group          = 0x1F50,
 };
 
@@ -156,7 +167,7 @@ class ObjectGuid
                    : LowType(0xFFFFFFFF);
         }
 
-        [[nodiscard]] ObjectGuid::LowType GetMaxCounter() const { return GetMaxCounter(GetHigh()); }
+        [[nodiscard]] LowType GetMaxCounter() const { return GetMaxCounter(GetHigh()); }
 
         [[nodiscard]] bool IsEmpty()             const { return _guid == 0; }
         [[nodiscard]] bool IsCreature()          const { return GetHigh() == HighGuid::Unit; }
@@ -264,17 +275,16 @@ class PackedGuid
     friend ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
 
     public:
-        explicit PackedGuid() : _packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { _packedGuid.appendPackGUID(0); }
-        explicit PackedGuid(uint64 guid) : _packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { _packedGuid.appendPackGUID(guid); }
-        explicit PackedGuid(ObjectGuid guid) : _packedGuid(PACKED_GUID_MIN_BUFFER_SIZE) { _packedGuid.appendPackGUID(guid.GetRawValue()); }
+        explicit PackedGuid() : _packedSize(1), _packedGuid() { }
+        explicit PackedGuid(ObjectGuid guid) { Set(guid); }
 
-        void Set(uint64 guid) { _packedGuid.wpos(0); _packedGuid.appendPackGUID(guid); }
-        void Set(ObjectGuid guid) { _packedGuid.wpos(0); _packedGuid.appendPackGUID(guid.GetRawValue()); }
+        void Set(ObjectGuid guid);
 
-        [[nodiscard]] std::size_t size() const { return _packedGuid.size(); }
+        [[nodiscard]] std::size_t size() const { return _packedSize; }
 
     private:
-        ByteBuffer _packedGuid;
+        uint8 _packedSize;
+        std::array<uint8, PACKED_GUID_MIN_BUFFER_SIZE> _packedGuid;
 };
 
 class ObjectGuidGeneratorBase
@@ -308,7 +318,7 @@ public:
 };
 
 ByteBuffer& operator<<(ByteBuffer& buf, ObjectGuid const& guid);
-ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid&       guid);
+ByteBuffer& operator>>(ByteBuffer& buf, ObjectGuid& guid);
 
 ByteBuffer& operator<<(ByteBuffer& buf, PackedGuid const& guid);
 ByteBuffer& operator>>(ByteBuffer& buf, PackedGuidReader const& guid);
@@ -328,4 +338,4 @@ namespace std
     };
 }
 
-#endif // ObjectGuid_h__
+#endif
