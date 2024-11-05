@@ -4092,6 +4092,34 @@ class spell_item_skyguard_blasting_charges : public SpellScript
     }
 };
 
+// 46273 - Multiphase Goggles
+class spell_item_multiphase_goggles : public AuraScript
+{
+    PrepareAuraScript(spell_item_multiphase_goggles);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+        {
+            player->SetFlag(PLAYER_TRACK_CREATURES, uint32(1) << (CREATURE_TYPE_GAS_CLOUD - 1));
+        }
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+        {
+            player->RemoveFlag(PLAYER_TRACK_CREATURES, uint32(1) << (CREATURE_TYPE_GAS_CLOUD - 1));
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_item_multiphase_goggles::OnApply, EFFECT_0, SPELL_AURA_MOD_INVISIBILITY_DETECT , AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_item_multiphase_goggles::OnRemove, EFFECT_0, SPELL_AURA_MOD_INVISIBILITY_DETECT , AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4217,4 +4245,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_fel_mana_potion);
     RegisterSpellScript(spell_item_gor_dreks_ointment);
     RegisterSpellScript(spell_item_skyguard_blasting_charges);
+    RegisterSpellScript(spell_item_multiphase_goggles);
 }
