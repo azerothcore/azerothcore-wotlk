@@ -124,7 +124,7 @@ static TransformStruct Transform[4] =
 
 struct boss_zuljin : public BossAI
 {
-    boss_zuljin(Creature* creature) : BossAI(creature, DATA_ZULJINEVENT) { }
+    boss_zuljin(Creature* creature) : BossAI(creature, DATA_ZULJIN) { }
 
     ObjectGuid ClawTargetGUID;
     ObjectGuid TankGUID;
