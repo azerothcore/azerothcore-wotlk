@@ -214,7 +214,7 @@ struct boss_zuljin : public BossAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        instance->SetBossState(DATA_ZULJINEVENT, DONE);
+        instance->SetBossState(DATA_ZULJIN, DONE);
         Talk(SAY_DEATH);
         summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
 
@@ -256,45 +256,12 @@ struct boss_zuljin : public BossAI
     {
         for (auto const& spiritInfo : SpiritInfo)
         {
-<<<<<<< Updated upstream
-            Phase = 0;
-
-            health_20 = me->CountPctFromMaxHealth(20);
-
-            Intro_Timer = 37000;
-            Berserk_Timer = 600000;
-
-            Whirlwind_Timer = 7000;
-            Grievous_Throw_Timer = 8000;
-
-            Creeping_Paralysis_Timer = 7000;
-            Overpower_Timer = 0;
-
-            Claw_Rage_Timer = 5000;
-            Lynx_Rush_Timer = 14000;
-            Claw_Loop_Timer = 0;
-            Claw_Counter = 0;
-
-            Flame_Whirl_Timer = 5000;
-            Flame_Breath_Timer = 6000;
-            Pillar_Of_Fire_Timer = 7000;
-
-            ClawTargetGUID.Clear();
-            TankGUID.Clear();
-
-            Summons.DespawnAll();
-
-            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 33975);
-            //me->SetUInt32Value(UNIT_VIRTUAL_ITEM_INFO, 218172674);
-            //me->SetByteValue(UNIT_FIELD_BYTES_2, 0, SHEATH_STATE_MELEE);
-=======
             if (Creature* creature = me->SummonCreature(spiritInfo.entry, spiritInfo.x, spiritInfo.y, spiritInfo.z, spiritInfo.orient, TEMPSUMMON_DEAD_DESPAWN, 0))
             {
                 creature->CastSpell(creature, SPELL_SPIRIT_AURA, true);
                 creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
->>>>>>> Stashed changes
         }
     }
 
@@ -302,13 +269,6 @@ struct boss_zuljin : public BossAI
     {
         switch (NextPhase)
         {
-<<<<<<< Updated upstream
-            DoZoneInCombat();
-
-            Talk(YELL_INTRO);
-            SpawnAdds();
-            EnterPhase(0);
-=======
         case 0:
             break;
         case 1:
@@ -357,9 +317,7 @@ struct boss_zuljin : public BossAI
             break;
         default:
             break;
->>>>>>> Stashed changes
         }
-        Phase = NextPhase;
     }
 
     void UpdateAI(uint32 diff) override
@@ -375,15 +333,8 @@ struct boss_zuljin : public BossAI
 
         switch (Phase)
         {
-<<<<<<< Updated upstream
-            instance->SetData(DATA_ZULJIN, DONE);
-=======
         case 0:
->>>>>>> Stashed changes
-
-
         case 1:
-
         case 2:
             return;
 
