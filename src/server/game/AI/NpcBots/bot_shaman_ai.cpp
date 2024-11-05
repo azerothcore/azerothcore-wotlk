@@ -1680,6 +1680,31 @@ public:
             casttime = std::max<int32>((float(casttime) * (1.0f - pctbonus)) - timebonus, 0);
         }
 
+        void ApplyClassSpellNotLoseCastTimeMods(SpellInfo const* spellInfo, int32& delayReduce) const override
+        {
+            uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
+            //SpellSchoolMask schools = spellInfo->GetSchoolMask();
+            uint8 lvl = me->GetLevel();
+            int32 reduceBonus = 0;
+
+            if (lvl >= 20 && (baseId == HEALING_WAVE_1 || baseId == LESSER_HEALING_WAVE_1 || baseId == CHAIN_HEAL_1))
+                reduceBonus += 70;
+
+            if (GetSpec() == BOT_SPEC_SHAMAN_ELEMENTAL && lvl >= 25)
+            {
+                switch (baseId)
+                {
+                    case LIGHTNING_BOLT_1: case CHAIN_LIGHTNING_1: case LAVA_BURST_1: case HEX_1:
+                        reduceBonus += 70;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            delayReduce += reduceBonus;
+        }
+
         void ApplyClassSpellCooldownMods(SpellInfo const* spellInfo, uint32& cooldown) const override
         {
             //cooldown is in milliseconds

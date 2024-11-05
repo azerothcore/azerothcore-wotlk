@@ -150,6 +150,7 @@ class bot_ai : public CreatureAI
         void ApplyBotCritMultiplierAll(Unit const* victim, float& crit_chance, SpellInfo const* spellInfo, SpellSchoolMask schoolMask, WeaponAttackType attackType) const;
         void ApplyBotSpellCostMods(SpellInfo const* spellInfo, int32& cost) const;
         void ApplyBotSpellCastTimeMods(SpellInfo const* spellInfo, int32& casttime) const;
+        void ApplyBotSpellNotLoseCastTimeMods(SpellInfo const* spellInfo, int32& delayReduce) const;
         void ApplyBotSpellCooldownMods(SpellInfo const* spellInfo, uint32& cooldown) const;
         void ApplyBotSpellCategoryCooldownMods(SpellInfo const* spellInfo, uint32& cooldown) const;
         void ApplyBotSpellGlobalCooldownMods(SpellInfo const* spellInfo, float& cooldown) const;
@@ -488,6 +489,7 @@ class bot_ai : public CreatureAI
         virtual void ApplyClassSpellCritMultiplierAll(Unit const* /*victim*/, float& /*crit_chance*/, SpellInfo const* /*spellInfo*/, SpellSchoolMask /*schoolMask*/, WeaponAttackType /*attackType*/) const {}
         virtual void ApplyClassSpellCostMods(SpellInfo const* /*spellInfo*/, int32& /*cost*/) const {}
         virtual void ApplyClassSpellCastTimeMods(SpellInfo const* /*spellInfo*/, int32& /*casttime*/) const {}
+        virtual void ApplyClassSpellNotLoseCastTimeMods(SpellInfo const* /*spellInfo*/, int32& /*delayReduce*/) const {}
         virtual void ApplyClassSpellCooldownMods(SpellInfo const* /*spellInfo*/, uint32& /*cooldown*/) const {}
         virtual void ApplyClassSpellCategoryCooldownMods(SpellInfo const* /*spellInfo*/, uint32& /*cooldown*/) const {}
         virtual void ApplyClassSpellGlobalCooldownMods(SpellInfo const* /*spellInfo*/, float& /*cooldown*/) const {}

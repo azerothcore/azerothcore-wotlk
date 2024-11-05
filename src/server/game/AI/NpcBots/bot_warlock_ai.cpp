@@ -1312,6 +1312,32 @@ public:
             instaCast = (casttime <= 500); //triggered GCD is too long
         }
 
+        void ApplyClassSpellNotLoseCastTimeMods(SpellInfo const* spellInfo, int32& delayReduce) const override
+        {
+            uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
+            //SpellSchoolMask schools = spellInfo->GetSchoolMask();
+            uint8 lvl = me->GetLevel();
+            int32 reduceBonus = 0;
+
+            if (lvl >= 20 && (/*baseId == DRAIN_LIFE_1 || */baseId == DRAIN_MANA_1 || baseId == DRAIN_SOUL_1 || baseId == UNSTABLE_AFFLICTION_1 || baseId == HAUNT_1))
+                reduceBonus += 70;
+
+            if (GetSpec() == BOT_SPEC_WARLOCK_DESTRUCTION && lvl >= 25)
+            {
+                switch (baseId)
+                {
+                    case CHAOS_BOLT_1: case HELLFIRE_1: case IMMOLATE_1: case INCINERATE_1: case RAIN_OF_FIRE_1:
+                    case SEARING_PAIN_1: case SHADOW_BOLT_1: case SOUL_FIRE_1: case SHADOWBURN_1: case SHADOWFURY_1:
+                        reduceBonus += 70;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            delayReduce += reduceBonus;
+        }
+
         void ApplyClassSpellCooldownMods(SpellInfo const* /*spellInfo*/, uint32& cooldown) const override
         {
             //cooldown is in milliseconds

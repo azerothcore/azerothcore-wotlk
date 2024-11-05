@@ -1640,6 +1640,19 @@ public:
             casttime = std::max<int32>(casttime - timebonus, 0);
         }
 
+        void ApplyClassSpellNotLoseCastTimeMods(SpellInfo const* spellInfo, int32& delayReduce) const override
+        {
+            uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
+            //SpellSchoolMask schools = spellInfo->GetSchoolMask();
+            uint8 lvl = me->GetLevel();
+            int32 reduceBonus = 0;
+
+            if (lvl >= 10 && (baseId == HOLY_LIGHT_1 || baseId == FLASH_OF_LIGHT_1))
+                reduceBonus += 70;
+
+            delayReduce += reduceBonus;
+        }
+
         void ApplyClassSpellCooldownMods(SpellInfo const* spellInfo, uint32& cooldown) const override
         {
             //cooldown is in milliseconds

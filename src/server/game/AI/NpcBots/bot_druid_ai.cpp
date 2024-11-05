@@ -1990,6 +1990,35 @@ public:
             casttime = std::max<int32>(int32((float(casttime) * (1.0f - pctbonus)) - timebonus), 0);
         }
 
+        void ApplyClassSpellNotLoseCastTimeMods(SpellInfo const* spellInfo, int32& delayReduce) const override
+        {
+            uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
+            //SpellSchoolMask schools = spellInfo->GetSchoolMask();
+            uint8 lvl = me->GetLevel();
+            int32 reduceBonus = 0;
+
+            if (lvl >= 15 && baseId == WRATH_1)
+                reduceBonus += 50;
+
+            if (GetSpec() == BOT_SPEC_DRUID_BALANCE && lvl >= 25)
+            {
+                if (AuraEffect const* ofre = me->GetAuraEffect(SPELL_AURA_PERIODIC_ENERGIZE, SPELLFAMILY_DRUID, 2853, EFFECT_2))
+                    if (ofre->IsAffectedOnSpell(spellInfo))
+                        reduceBonus += 100;
+
+                switch (baseId)
+                {
+                    case STARFIRE_1: case HIBERNATE_1: case HURRICANE_1:
+                        reduceBonus += 70;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            delayReduce += reduceBonus;
+        }
+
         void ApplyClassSpellCooldownMods(SpellInfo const* spellInfo, uint32& cooldown) const override
         {
             //cooldown is in milliseconds

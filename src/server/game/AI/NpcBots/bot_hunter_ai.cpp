@@ -1315,6 +1315,25 @@ public:
             cost = int32(fcost * (1.0f - pctbonus)) - flatbonus;
         }
 
+        void ApplyClassSpellNotLoseCastTimeMods(SpellInfo const* spellInfo, int32& delayReduce) const override
+        {
+            uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
+            //SpellSchoolMask schools = spellInfo->GetSchoolMask();
+            uint8 lvl = me->GetLevel();
+            int32 reduceBonus = 0;
+
+            if (lvl >= 10 && baseId == STEADY_SHOT_1)
+                reduceBonus += 70;
+
+            if (lvl >= 15 && baseId == SCARE_BEAST_1)
+                reduceBonus += 75;
+
+            if (GetSpec() == BOT_SPEC_HUNTER_MARKSMANSHIP && lvl >= 40 && baseId == VOLLEY_1)
+                reduceBonus += 100;
+
+            delayReduce += reduceBonus;
+        }
+
         void ApplyClassSpellCooldownMods(SpellInfo const* spellInfo, uint32& cooldown) const override
         {
             //cooldown is in milliseconds

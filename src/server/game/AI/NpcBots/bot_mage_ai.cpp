@@ -1151,6 +1151,26 @@ public:
             casttime = std::max<int32>(casttime - timebonus, 0);
         }
 
+        void ApplyClassSpellNotLoseCastTimeMods(SpellInfo const* spellInfo, int32& delayReduce) const override
+        {
+            uint32 baseId = spellInfo->GetFirstRankSpell()->Id;
+            SpellSchoolMask schools = spellInfo->GetSchoolMask();
+            uint8 lvl = me->GetLevel();
+            int32 reduceBonus = 0;
+
+            if (AuraEffect const* vei = me->GetAuraEffect(SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, SPELLFAMILY_MAGE, 0x0, 0x4000, 0x0))
+                if (vei->IsAffectedOnSpell(spellInfo))
+                    reduceBonus += 100;
+
+            if (lvl >= 20 && (schools & SPELL_SCHOOL_MASK_FIRE))
+                reduceBonus += 70;
+
+            if (GetSpec() == BOT_SPEC_MAGE_ARCANE && lvl >= 10 && (baseId == ARCANEMISSILES_1 || baseId == ARCANE_BLAST_1))
+                reduceBonus += 100;
+
+            delayReduce += reduceBonus;
+        }
+
         void ApplyClassSpellCooldownMods(SpellInfo const* spellInfo, uint32& cooldown) const override
         {
             //cooldown is in milliseconds

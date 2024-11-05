@@ -7684,6 +7684,11 @@ void bot_ai::ApplyBotSpellCastTimeMods(SpellInfo const* spellInfo, int32& castti
     //ALL SPELLS cast time bonus
     ApplyClassSpellCastTimeMods(spellInfo, casttime);
 }
+void bot_ai::ApplyBotSpellNotLoseCastTimeMods(SpellInfo const* spellInfo, int32& delayReduce) const
+{
+    //ALL SPELLS pushback reduce bonus
+    ApplyClassSpellNotLoseCastTimeMods(spellInfo, delayReduce);
+}
 void bot_ai::ApplyBotSpellCooldownMods(SpellInfo const* spellInfo, uint32& cooldown) const
 {
     //ALL SPELLS cooldown bonus

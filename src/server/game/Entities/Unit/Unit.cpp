@@ -955,6 +955,17 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             }
         }
 
+        //npcbot
+        if (!damage && damagetype != DOT && cleanDamage && cleanDamage->absorbed_damage && victim->IsNPCBotOrPet() && attacker && victim != attacker &&
+            (attacker->IsNPCBotOrPet() || attacker->IsControlledByPlayer()))
+        {
+            if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
+                if (spell->getState() == SPELL_STATE_PREPARING)
+                    if ((spell->m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG) != 0)
+                        victim->InterruptNonMeleeSpells(false);
+        }
+        //end npcbot
+
         // We're going to call functions which can modify content of the list during iteration over it's elements
         // Let's copy the list so we can prevent iterator invalidation
         AuraEffectList vCopyDamageCopy(victim->GetAuraEffectsByType(SPELL_AURA_SHARE_DAMAGE_PCT));
@@ -1236,6 +1247,28 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
                 }
             }
         }
+
+        //npcbot
+        if (victim->IsNPCBotOrPet() && attacker && victim != attacker && damagetype != NODAMAGE && damagetype != DOT && damage &&
+            (attacker->IsNPCBotOrPet() || attacker->IsControlledByPlayer()) &&
+            (!spellProto || !(spellProto->HasAttribute(SPELL_ATTR7_DONT_CAUSE_SPELL_PUSHBACK) || spellProto->HasAttribute(SPELL_ATTR3_TREAT_AS_PERIODIC))))
+        {
+            if (Spell* spell = victim->m_currentSpells[CURRENT_GENERIC_SPELL])
+            {
+                if (spell->getState() == SPELL_STATE_PREPARING)
+                {
+                    if (spell->m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_ABORT_ON_DMG)
+                        victim->InterruptNonMeleeSpells(false);
+                    else
+                        spell->Delayed();
+                }
+            }
+
+            if (Spell* spell = victim->m_currentSpells[CURRENT_CHANNELED_SPELL])
+                if (spell->getState() == SPELL_STATE_CASTING)
+                    spell->DelayedChannel();
+        }
+        //end npcbot
 
         // last damage from duel opponent
         if (duel_hasEnded)
