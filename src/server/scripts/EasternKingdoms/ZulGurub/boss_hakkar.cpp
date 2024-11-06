@@ -349,7 +349,7 @@ public:
     }
 };
 
-// 24324 - Blood Siphon
+// 24324 - Blood Siphon (channel)
 class spell_blood_siphon : public SpellScript
 {
     PrepareSpellScript(spell_blood_siphon);
@@ -386,6 +386,7 @@ class spell_blood_siphon : public SpellScript
     }
 };
 
+// 24323 - Blood Siphon (aura)
 class spell_blood_siphon_aura : public AuraScript
 {
     PrepareAuraScript(spell_blood_siphon_aura);
@@ -410,6 +411,7 @@ class spell_blood_siphon_aura : public AuraScript
     }
 };
 
+// 24693 - Serverside - Hakkar Power Down
 class spell_hakkar_power_down : public SpellScript
 {
     PrepareSpellScript(spell_hakkar_power_down);
@@ -435,6 +437,7 @@ void AddSC_boss_hakkar()
     new at_zulgurub_temple_speech();
     new at_zulgurub_bloodfire_pit_speech();
     new at_zulgurub_edge_of_madness_speech();
-    RegisterSpellAndAuraScriptPair(spell_blood_siphon, spell_blood_siphon_aura);
+    RegisterSpellScript(spell_blood_siphon);
+    RegisterSpellScript(spell_blood_siphon_aura);
     RegisterSpellScript(spell_hakkar_power_down);
 }
