@@ -351,7 +351,7 @@ const std::string& bot_ai::LocalizedNpcText(Player const* forPlayer, uint32 text
 
 void bot_ai::InitializeAI()
 {
-    me->RefreshCanSwimFlag();
+    me->RefreshSwimmingFlag();
 
     if (!me->GetSpawnId() && !IsTempBot())
         SetWanderer();
