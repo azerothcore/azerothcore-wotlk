@@ -4151,34 +4151,42 @@ class spell_item_unstable_power : public AuraScript
 {
     PrepareAuraScript(spell_item_unstable_power);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_UNTABLE_POWER });
+    }
+
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        //LOG_ERROR("error", "{}", eventInfo.GetSpellInfo()->Id);
-        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
-        {
-            LOG_ERROR("error", "{}", procSpell->Effects[EFFECT_ALL].ChainTarget);
-            if (procSpell->Id == SPELL_UNTABLE_POWER || procSpell->Effects[EFFECT_ALL].ChainTarget != 0)
-                return false;
-        }
-        else
-        {
+        Unit* caster = GetCaster();
+        if (!eventInfo.GetSpellInfo() || !caster)
             return false;
-        }
+
+        if (eventInfo.GetSpellInfo()->Id == SPELL_UNTABLE_POWER)
+            return false;
+
+        if (caster->HasSpellCooldown(SPELL_UNTABLE_POWER))
+            return false;
 
         return true;
     }
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        ModStackAmount(12);
+        SetStackAmount(12);
     }
 
     void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
 
-        if (Unit* target = GetTarget())
+        if (Unit* caster = GetCaster())
+        {
             ModStackAmount(-1);
+
+            // Apply cooldown to prevent chain spells from consuming more than 1 stack.
+            caster->AddSpellCooldown(SPELL_UNTABLE_POWER, 0, 500);
+        }
     }
 
     void Register() override
