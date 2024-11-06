@@ -24,7 +24,6 @@
 #include "GameObject.h"
 #include "ObjectMgr.h"
 #include "Player.h"
-#include "SharedDefines.h"
 #include "SpellAuras.h"
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"
@@ -1112,7 +1111,9 @@ void BattlegroundAV::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
             packet.Worldstates.emplace_back(BG_AV_NodeWorldStates[i][GetWorldStateType(j, TEAM_HORDE)], (m_Nodes[i].OwnerId == TEAM_HORDE && stateok) ? 1 : 0);
         }
     if (m_Nodes[BG_AV_NODES_SNOWFALL_GRAVE].OwnerId == TEAM_NEUTRAL) //cause neutral teams aren't handled generic
+    {
         packet.Worldstates.emplace_back(AV_SNOWFALL_N, 1);
+    }
     packet.Worldstates.emplace_back(AV_Alliance_Score, m_Team_Scores[0]);
     packet.Worldstates.emplace_back(AV_Horde_Score, m_Team_Scores[1]);
 
