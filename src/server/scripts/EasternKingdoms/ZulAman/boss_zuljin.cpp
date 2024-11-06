@@ -201,6 +201,7 @@ struct boss_zuljin : public BossAI
         // Phase 2: Bear Form.
         ScheduleHealthCheckEvent({ 80 }, [&] {
             scheduler.CancelAll();
+            EnterPhase(PHASE_BEAR);
             ScheduleTimedEvent(7s, [&] {
                 DoCastAOE(SPELL_CREEPING_PARALYSIS);
             }, 20s);
@@ -217,6 +218,7 @@ struct boss_zuljin : public BossAI
         // Phase 3: Eagle Form.
         ScheduleHealthCheckEvent({ 60 }, [&] {
             scheduler.CancelAll();
+            EnterPhase(PHASE_EAGLE);
             me->GetMotionMaster()->Clear();
             DoCast(me, SPELL_ENERGY_STORM, true); // enemy aura
             for (uint8 i = 0; i < 4; ++i)
@@ -235,6 +237,7 @@ struct boss_zuljin : public BossAI
         // Phase 4: Lynx Form.
         ScheduleHealthCheckEvent({ 40 }, [&] {
             scheduler.CancelAll();
+            EnterPhase(PHASE_LYNX);
             me->RemoveAurasDueToSpell(SPELL_ENERGY_STORM);
             summons.DespawnEntry(CREATURE_FEATHER_VORTEX);
             me->ResumeChasingVictim();
@@ -242,10 +245,23 @@ struct boss_zuljin : public BossAI
             ScheduleTimedEvent(5s, [&] {
                 DoCastRandomTarget(SPELL_CLAW_RAGE_CHARGE);
             }, 15s, 20s);
+
+            ScheduleTimedEvent(14s, [&] {
+                DoCastSelf(SPELL_LYNX_RUSH_HASTE);
+
+                for (int8 count = 0; count <= 8; ++count)
+                {
+                    me->m_Events.AddEventAtOffset([&] {
+                        DoCastRandomTarget(SPELL_LYNX_RUSH_DAMAGE);
+                    }, Seconds(1 * count));
+                }
+
+            }, 15s, 20s);
         });
 
         // Phase 5: Dragonhawk Form.
         ScheduleHealthCheckEvent({ 20 }, [&] {
+            EnterPhase(PHASE_DRAGONHAWK);
         });
     }
 
@@ -296,31 +312,19 @@ struct boss_zuljin : public BossAI
 
     void EnterPhase(uint32 NextPhase)
     {
-        switch (NextPhase)
+        me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, me->GetOrientation());
+        DoResetThreatList();
+        me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
+        me->RemoveAurasDueToSpell(Transform[Phase].unaura);
+        DoCast(me, Transform[Phase].spell);
+        Talk(Transform[Phase].text);
+        if (Phase > 0)
         {
-        case 0:
-            break;
-        case 1:
-        case 2:
-        case 3:
-        case 4:
-            me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, me->GetOrientation());
-            DoResetThreatList();
-            me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
-            me->RemoveAurasDueToSpell(Transform[Phase].unaura);
-            DoCast(me, Transform[Phase].spell);
-            Talk(Transform[Phase].text);
-            if (Phase > 0)
-            {
-                //if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[Phase - 1]))
-                    //Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
-            }
-            //if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[NextPhase - 1]))
-                //Temp->CastSpell(me, SPELL_SIPHON_SOUL, false); // should m cast on temp
-            break;
-        default:
-            break;
+            //if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[Phase - 1]))
+                //Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
         }
+        //if (Unit* Temp = ObjectAccessor::GetUnit(*me, SpiritGUID[NextPhase - 1]))
+            //Temp->CastSpell(me, SPELL_SIPHON_SOUL, false); // should m cast on temp
     }
 
     private:
