@@ -23,7 +23,6 @@
 #include "Pet.h"
 #include "Player.h"
 #include "ScriptMgr.h"
-#include "SharedDefines.h"
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldStatePackets.h"

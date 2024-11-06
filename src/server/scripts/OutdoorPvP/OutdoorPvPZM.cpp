@@ -23,7 +23,6 @@
 #include "OutdoorPvPMgr.h"
 #include "OutdoorPvPScript.h"
 #include "Player.h"
-#include "SharedDefines.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldStatePackets.h"

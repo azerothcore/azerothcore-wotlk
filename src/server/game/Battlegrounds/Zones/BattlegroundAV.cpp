@@ -16,7 +16,6 @@
  */
 
 #include "BattlegroundAV.h"
-#include "Battleground.h"
 #include "CreatureTextMgr.h"
 #include "Formulas.h"
 #include "GameEventMgr.h"
