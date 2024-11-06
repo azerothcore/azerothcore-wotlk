@@ -397,13 +397,10 @@ class spell_blood_siphon_aura : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (Unit* caster = GetCaster())
+        if (Player* player = GetTarget()->ToPlayer())
         {
-            caster->GetMap()->DoForAllPlayers([&](Player* player)
-            {
-                if (player->HasAura(SPELL_POISONOUS_BLOOD))
-                    player->RemoveAurasDueToSpell(SPELL_POISONOUS_BLOOD);
-            });
+            if (player->HasAura(SPELL_POISONOUS_BLOOD))
+                player->RemoveAurasDueToSpell(SPELL_POISONOUS_BLOOD);
         }
     }
 
