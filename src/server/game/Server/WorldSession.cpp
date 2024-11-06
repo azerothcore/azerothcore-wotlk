@@ -43,7 +43,6 @@
 #include "QueryHolder.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
-#include "Tokenize.h"
 #include "Transport.h"
 #include "Vehicle.h"
 #include "WardenWin.h"

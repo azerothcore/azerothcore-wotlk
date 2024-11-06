@@ -20,8 +20,6 @@
 
 #include "Define.h"
 #include "Map.h"
-#include "VMapMgr2.h"
-
 class Unit;
 
 enum DisableType

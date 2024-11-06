@@ -30,7 +30,6 @@
 #include "SharedDefines.h"
 #include "Spell.h"
 #include "SpellAuraDefines.h"
-#include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "World.h"
 

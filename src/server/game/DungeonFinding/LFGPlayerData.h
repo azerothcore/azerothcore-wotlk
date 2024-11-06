@@ -19,6 +19,7 @@
 #define _LFGPLAYERDATA_H
 
 #include "LFG.h"
+#include "SharedDefines.h"
 
 namespace lfg
 {

@@ -184,54 +184,48 @@ class boss_archavon : public CreatureScript
 };
 
 // 58941 - Rock Shards
-class spell_archavon_rock_shards : public SpellScriptLoader
+class spell_archavon_rock_shards : public SpellScript
 {
-    public:
-        spell_archavon_rock_shards() : SpellScriptLoader("spell_archavon_rock_shards") { }
+    PrepareSpellScript(spell_archavon_rock_shards);
 
-        class spell_archavon_rock_shards_SpellScript : public SpellScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROCK_SHARDS_LEFT_HAND_VISUAL, SPELL_ROCK_SHARDS_RIGHT_HAND_VISUAL });
+    }
+
+        void HandleScript(SpellEffIndex effIndex)
         {
-            PrepareSpellScript(spell_archavon_rock_shards_SpellScript);
+            PreventHitDefaultEffect(effIndex);
 
-            void HandleScript(SpellEffIndex effIndex)
+            Unit* caster = GetCaster();
+            Unit* target = GetHitUnit();
+
+            if (!caster || !target)
             {
-                PreventHitDefaultEffect(effIndex);
-
-                Unit* caster = GetCaster();
-                Unit* target = GetHitUnit();
-
-                if (!caster || !target)
-                {
-                    return;
-                }
-
-                Map* map = caster->GetMap();
-                if (!map)
-                {
-                    return;
-                }
-
-                caster->CastSpell(target, SPELL_ROCK_SHARDS_LEFT_HAND_VISUAL, true);
-                caster->CastSpell(target, SPELL_ROCK_SHARDS_RIGHT_HAND_VISUAL, true);
-
-                uint32 spellId = map->Is25ManRaid() ? SPELL_ROCK_SHARDS_DAMAGE_25 : SPELL_ROCK_SHARDS_DAMAGE_10;
-                caster->CastSpell(target, spellId, true);
+                return;
             }
 
-            void Register() override
+            Map* map = caster->GetMap();
+            if (!map)
             {
-                OnEffectHitTarget += SpellEffectFn(spell_archavon_rock_shards_SpellScript::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+                return;
             }
-        };
 
-        SpellScript* GetSpellScript() const override
-        {
-            return new spell_archavon_rock_shards_SpellScript();
+            caster->CastSpell(target, SPELL_ROCK_SHARDS_LEFT_HAND_VISUAL, true);
+            caster->CastSpell(target, SPELL_ROCK_SHARDS_RIGHT_HAND_VISUAL, true);
+
+            uint32 spellId = map->Is25ManRaid() ? SPELL_ROCK_SHARDS_DAMAGE_25 : SPELL_ROCK_SHARDS_DAMAGE_10;
+            caster->CastSpell(target, spellId, true);
         }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_archavon_rock_shards::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
 };
 
 void AddSC_boss_archavon()
 {
     new boss_archavon();
-    new spell_archavon_rock_shards();
+    RegisterSpellScript(spell_archavon_rock_shards);
 }

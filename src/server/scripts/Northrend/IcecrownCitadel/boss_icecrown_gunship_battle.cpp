@@ -28,6 +28,8 @@
 #include "TransportMgr.h"
 #include "Vehicle.h"
 #include "icecrown_citadel.h"
+#include "PassiveAI.h"
+#include "SpellAuraEffects.h"
 
 enum Texts
 {

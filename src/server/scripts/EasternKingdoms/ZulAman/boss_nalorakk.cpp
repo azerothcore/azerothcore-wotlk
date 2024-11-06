@@ -87,7 +87,7 @@ enum NalorakkGroups
 
 struct boss_nalorakk : public BossAI
 {
-    boss_nalorakk(Creature* creature) : BossAI(creature, DATA_NALORAKKEVENT)
+    boss_nalorakk(Creature* creature) : BossAI(creature, DATA_NALORAKK)
     {
         _phase = PHASE_SEND_GUARDS_1;
         _ranIntro = false;
@@ -346,6 +346,13 @@ struct boss_nalorakk : public BossAI
         }
         return true;
     }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
+    }
+
 private:
     uint8 _phase;
     bool _ranIntro;
