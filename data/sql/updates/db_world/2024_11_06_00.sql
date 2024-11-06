@@ -1,3 +1,4 @@
+-- DB update 2024_11_05_03 -> 2024_11_06_00
 -- Update gameobject 'Gypsy Wagon' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (178666))
