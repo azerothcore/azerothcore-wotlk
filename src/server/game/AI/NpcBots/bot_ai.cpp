@@ -351,6 +351,8 @@ const std::string& bot_ai::LocalizedNpcText(Player const* forPlayer, uint32 text
 
 void bot_ai::InitializeAI()
 {
+    me->RefreshSwimmingFlag();
+
     if (!me->GetSpawnId() && !IsTempBot())
         SetWanderer();
 
@@ -7683,6 +7685,11 @@ void bot_ai::ApplyBotSpellCastTimeMods(SpellInfo const* spellInfo, int32& castti
 {
     //ALL SPELLS cast time bonus
     ApplyClassSpellCastTimeMods(spellInfo, casttime);
+}
+void bot_ai::ApplyBotSpellNotLoseCastTimeMods(SpellInfo const* spellInfo, int32& delayReduce) const
+{
+    //ALL SPELLS pushback reduce bonus
+    ApplyClassSpellNotLoseCastTimeMods(spellInfo, delayReduce);
 }
 void bot_ai::ApplyBotSpellCooldownMods(SpellInfo const* spellInfo, uint32& cooldown) const
 {
