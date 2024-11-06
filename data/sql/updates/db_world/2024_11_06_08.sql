@@ -1,3 +1,4 @@
+-- DB update 2024_11_06_07 -> 2024_11_06_08
 -- Update creature 'Winter Veil' with sniffed values
 -- updated spawns
 DELETE FROM `creature` WHERE (`id1` IN (15732, 13431, 9550, 13418, 13420, 13429, 13445, 13435, 13436, 13434, 1365, 13433, 13444, 13430, 15760, 23064, 23065, 13636, 15664))
