@@ -5675,21 +5675,6 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     case 11196:
                         target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, GetMiscValue(), apply);
                         break;
-                    // Unstable Power
-                    case 24658:
-                        {
-                            uint32 spellId = 24659;
-                            if (apply && caster)
-                            {
-                                SpellInfo const* spell = sSpellMgr->AssertSpellInfo(spellId);
-
-                                for (uint32 i = 0; i < spell->StackAmount; ++i)
-                                    caster->CastSpell(target, spell->Id, true, nullptr, nullptr, GetCasterGUID());
-                                break;
-                            }
-                            target->RemoveAurasDueToSpell(spellId);
-                            break;
-                        }
                     // Restless Strength
                     case 24661:
                         {

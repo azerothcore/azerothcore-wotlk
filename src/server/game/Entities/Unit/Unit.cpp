@@ -6615,15 +6615,6 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                             triggered_spell_id = 58427;
                             break;
                         }
-                    // Unstable Power
-                    case 24658:
-                        {
-                            if (!procSpell || procSpell->Id == 24659)
-                                return false;
-                            // Need remove one 24659 aura
-                            RemoveAuraFromStack(24659);
-                            return true;
-                        }
                     // Restless Strength
                     case 24661:
                         {

@@ -4141,6 +4141,54 @@ class spell_item_luffa : public SpellScript
     }
 };
 
+ // 24659 - Unstable Power
+ enum UnstablePower
+{
+    SPELL_UNTABLE_POWER = 24659
+};
+
+class spell_item_unstable_power : public AuraScript
+{
+    PrepareAuraScript(spell_item_unstable_power);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        //LOG_ERROR("error", "{}", eventInfo.GetSpellInfo()->Id);
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
+        {
+            LOG_ERROR("error", "{}", procSpell->Effects[EFFECT_ALL].ChainTarget);
+            if (procSpell->Id == SPELL_UNTABLE_POWER || procSpell->Effects[EFFECT_ALL].ChainTarget != 0)
+                return false;
+        }
+        else
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        ModStackAmount(12);
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        if (Unit* target = GetTarget())
+            ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_item_unstable_power::CheckProc);
+        AfterEffectApply += AuraEffectApplyFn(spell_item_unstable_power::OnApply, EFFECT_0, SPELL_AURA_MOD_DAMAGE_DONE , AURA_EFFECT_HANDLE_REAL);
+        OnEffectProc += AuraEffectProcFn(spell_item_unstable_power::HandleProc, EFFECT_0, SPELL_AURA_MOD_DAMAGE_DONE);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4267,4 +4315,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_gor_dreks_ointment);
     RegisterSpellScript(spell_item_skyguard_blasting_charges);
     RegisterSpellScript(spell_item_luffa);
+    RegisterSpellScript(spell_item_unstable_power);
 }
