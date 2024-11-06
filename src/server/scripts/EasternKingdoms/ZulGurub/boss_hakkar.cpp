@@ -386,7 +386,7 @@ class spell_blood_siphon : public SpellScript
     }
 };
 
-// 24323 - Blood Siphon (aura)
+// 24323 - Blood Siphon (aura) | Effects changed in SpellInfoCorrections
 class spell_blood_siphon_aura : public AuraScript
 {
     PrepareAuraScript(spell_blood_siphon_aura);
@@ -407,7 +407,7 @@ class spell_blood_siphon_aura : public AuraScript
 
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_blood_siphon_aura::OnRemove, EFFECT_1, SPELL_AURA_STATE_IMMUNITY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_blood_siphon_aura::OnRemove, EFFECT_1, SPELL_AURA_MOD_STUN, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
