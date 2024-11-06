@@ -176,6 +176,7 @@ struct boss_zuljin : public BossAI
         Pillar_Of_Fire_Timer = 7000;
 
         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 33975);
+        me->m_Events.KillAllEvents(false);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
