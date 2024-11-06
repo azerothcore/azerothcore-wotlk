@@ -322,16 +322,6 @@ struct boss_zuljin : public BossAI
         }
     }
 
-    void UpdateAI(uint32 diff) override
-    {
-        if (!UpdateVictim())
-            return;
-
-        scheduler.Update(diff);
-
-        DoMeleeAttackIfReady();
-    }
-
     private:
         ObjectGuid _chargeTargetGUID;
 };
@@ -371,8 +361,17 @@ class spell_claw_rage_aura : public AuraScript
     void OnPeriodic(AuraEffect const* aurEff)
     {
         if (Creature* caster = GetCaster()->ToCreature())
-            if (Player* target = ObjectAccessor::FindConnectedPlayer(caster->AI()->GetGUID(GUID_CHARGE_TARGET)))
-                GetCaster()->CastSpell(target, SPELL_CLAW_RAGE_DAMAGE);
+        {
+            if (Player* target = ObjectAccessor::GetPlayer(*caster, caster->AI()->GetGUID(GUID_CHARGE_TARGET)))
+            {
+                if (caster->CanSeeOrDetect(target) && !target->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+                    GetCaster()->CastSpell(target, SPELL_CLAW_RAGE_DAMAGE);
+                else
+                    GetCaster()->RemoveAurasDueToSpell(SPELL_CLAW_RAGE_AURA);
+            }
+            else
+                GetCaster()->RemoveAurasDueToSpell(SPELL_CLAW_RAGE_AURA);
+        }
     }
 
     void Register() override
