@@ -323,7 +323,7 @@ private:
             {
                 case EXPANSION_CLASSIC:                max_expansion_level = 60;                break;
                 case EXPANSION_THE_BURNING_CRUSADE:    max_expansion_level = 70;                break;
-                case EXPANSION_WRATH_OF_THE_LICH_KING: max_expansion_level = 70;                break;
+                case EXPANSION_WRATH_OF_THE_LICH_KING: max_expansion_level = 80;                break;
                 default:                               max_expansion_level = DEFAULT_MAX_LEVEL; break;
             }
 
