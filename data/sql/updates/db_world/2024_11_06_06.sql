@@ -1,3 +1,4 @@
+-- DB update 2024_11_06_05 -> 2024_11_06_06
 -- Update gameobject 'Lauranna's Guide to Zangarmarsh Plants' with sniffed values
 -- new spawns
 DELETE FROM `gameobject` WHERE (`id` IN (182066))
