@@ -2926,9 +2926,8 @@ bool Player::addTalent(uint32 spellId, uint8 addSpecMask, uint8 oldTalentRank)
         newTalent->specMask = addSpecMask;
         newTalent->talentID = talentInfo->TalentID;
         newTalent->inSpellBook = talentInfo->addToSpellBook && !spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL);
-
         m_talents[spellId] = newTalent;
-        
+
         if (GetActiveSpecMask() & addSpecMask)
         {
             m_usedTalentCount += (talentPos->rank + 1) - oldTalentRank;
