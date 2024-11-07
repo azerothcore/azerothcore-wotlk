@@ -4860,6 +4860,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 43149 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
+    }
+
+    // Black Qiraji Battle Tank
+    ApplySpellFix({ 26655, 26656 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AuraInterruptFlags &= ~(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_TELEPORTED);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
