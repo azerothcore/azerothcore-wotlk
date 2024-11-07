@@ -1,3 +1,4 @@
+-- DB update 2024_11_07_04 -> 2024_11_07_05
 -- Update gameobject 'Winter Veil' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (180719, 180742, 180844, 178554, 180796, 178671, 178437, 180797, 180798, 180799, 178746, 180715, 178649, 187193, 187235, 178609, 187194, 187567))

@@ -1,3 +1,4 @@
+-- DB update 2024_11_07_05 -> 2024_11_07_06
 -- Update gameobject 'Zul' Aman doors' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (186728, 186305))
