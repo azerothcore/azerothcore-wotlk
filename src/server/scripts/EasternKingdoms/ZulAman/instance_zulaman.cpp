@@ -30,7 +30,6 @@ EndScriptData */
 
 enum Misc
 {
-    MAX_ENCOUNTER                  = 7,
     RAND_VENDOR                    = 2,
     WORLDSTATE_SHOW_TIMER          = 3104,
     WORLDSTATE_TIME_TO_SACRIFICE   = 3106
@@ -64,6 +63,11 @@ ObjectData const creatureData[] =
 ObjectData const gameObjectData[] =
 {
     { 0,               0                }
+};
+
+BossBoundaryData const boundaries =
+{
+    { DATA_HEXLORD,    new RectangleBoundary(80.50557f, 920.9858f, 155.88986f, 1015.27563f)}
 };
 
 class instance_zulaman : public InstanceMapScript
@@ -105,6 +109,8 @@ public:
             SetHeaders(DataHeader);
             LoadObjectData(creatureData, gameObjectData);
             memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
+            SetBossNumber(MAX_ENCOUNTER);
+            LoadBossBoundaries(boundaries);
 
             QuestTimer = 0;
             QuestMinute = 0;
@@ -216,10 +222,10 @@ public:
 
         void CheckInstanceStatus()
         {
-            if (BossKilled >= DATA_HALAZZIEVENT)
+            if (BossKilled >= DATA_HALAZZI)
                 HandleGameObject(HexLordGateGUID, true);
 
-            if (BossKilled >= DATA_HEXLORDEVENT)
+            if (BossKilled >= DATA_HEXLORD)
                 HandleGameObject(ZulJinGateGUID, true);
         }
 
@@ -267,8 +273,8 @@ public:
                     else if (data == DONE)
                         QuestMinute = 21;
                     break;
-                case DATA_NALORAKKEVENT:
-                    m_auiEncounter[DATA_NALORAKKEVENT] = data;
+                case DATA_NALORAKK:
+                    m_auiEncounter[DATA_NALORAKK] = data;
                     if (data == DONE)
                     {
                         if (QuestMinute)
@@ -280,8 +286,8 @@ public:
                         SaveToDB();
                     }
                     break;
-                case DATA_AKILZONEVENT:
-                    m_auiEncounter[DATA_AKILZONEVENT] = data;
+                case DATA_AKILZON:
+                    m_auiEncounter[DATA_AKILZON] = data;
                     HandleGameObject(AkilzonDoorGUID, data != IN_PROGRESS);
                     if (data == DONE)
                     {
@@ -294,28 +300,28 @@ public:
                         SaveToDB();
                     }
                     break;
-                case DATA_JANALAIEVENT:
-                    m_auiEncounter[DATA_JANALAIEVENT] = data;
+                case DATA_JANALAI:
+                    m_auiEncounter[DATA_JANALAI] = data;
                     if (data == DONE)
                         SummonHostage(2);
                     SaveToDB();
                     break;
-                case DATA_HALAZZIEVENT:
-                    m_auiEncounter[DATA_HALAZZIEVENT] = data;
+                case DATA_HALAZZI:
+                    m_auiEncounter[DATA_HALAZZI] = data;
                     HandleGameObject(HalazziDoorGUID, data != IN_PROGRESS);
                     if (data == DONE) SummonHostage(3);
                     SaveToDB();
                     break;
-                case DATA_HEXLORDEVENT:
-                    m_auiEncounter[DATA_HEXLORDEVENT] = data;
+                case DATA_HEXLORD:
+                    m_auiEncounter[DATA_HEXLORD] = data;
                     if (data == IN_PROGRESS)
                         HandleGameObject(HexLordGateGUID, false);
                     else if (data == NOT_STARTED)
                         CheckInstanceStatus();
                     SaveToDB();
                     break;
-                case DATA_ZULJINEVENT:
-                    m_auiEncounter[DATA_ZULJINEVENT] = data;
+                case DATA_ZULJIN:
+                    m_auiEncounter[DATA_ZULJIN] = data;
                     HandleGameObject(ZulJinDoorGUID, data != IN_PROGRESS);
                     SaveToDB();
                     break;
@@ -334,7 +340,7 @@ public:
             if (data == DONE)
             {
                 ++BossKilled;
-                if (QuestMinute && BossKilled >= DATA_HALAZZIEVENT)
+                if (QuestMinute && BossKilled >= DATA_HALAZZI)
                 {
                     QuestMinute = 0;
                     DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
@@ -350,18 +356,18 @@ public:
             {
                 case DATA_GONGEVENT:
                     return m_auiEncounter[DATA_GONGEVENT];
-                case DATA_NALORAKKEVENT:
-                    return m_auiEncounter[DATA_NALORAKKEVENT];
-                case DATA_AKILZONEVENT:
-                    return m_auiEncounter[DATA_AKILZONEVENT];
-                case DATA_JANALAIEVENT:
-                    return m_auiEncounter[DATA_JANALAIEVENT];
-                case DATA_HALAZZIEVENT:
-                    return m_auiEncounter[DATA_HALAZZIEVENT];
-                case DATA_HEXLORDEVENT:
-                    return m_auiEncounter[DATA_HEXLORDEVENT];
-                case DATA_ZULJINEVENT:
-                    return m_auiEncounter[DATA_ZULJINEVENT];
+                case DATA_NALORAKK:
+                    return m_auiEncounter[DATA_NALORAKK];
+                case DATA_AKILZON:
+                    return m_auiEncounter[DATA_AKILZON];
+                case DATA_JANALAI:
+                    return m_auiEncounter[DATA_JANALAI];
+                case DATA_HALAZZI:
+                    return m_auiEncounter[DATA_HALAZZI];
+                case DATA_HEXLORD:
+                    return m_auiEncounter[DATA_HEXLORD];
+                case DATA_ZULJIN:
+                    return m_auiEncounter[DATA_ZULJIN];
                 case DATA_CHESTLOOTED:
                     return ChestLooted;
                 case TYPE_RAND_VENDOR_1:

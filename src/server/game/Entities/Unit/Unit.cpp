@@ -7772,7 +7772,12 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                         {
                             if (!victim || !victim->IsAlive() || victim->HasSpellCooldown(20267))
                                 return false;
-                            // 2% of base mana
+
+                            auto* caster = triggeredByAura->GetBase()->GetCaster();
+                            if (!caster || !victim->IsFriendlyTo(caster))
+                                return false;
+
+                            // 2% of base health
                             basepoints0 = int32(victim->CountPctFromMaxHealth(2));
                             victim->CastCustomSpell(victim, 20267, &basepoints0, 0, 0, true, 0, triggeredByAura);
                             victim->AddSpellCooldown(20267, 0, 4 * IN_MILLISECONDS);
@@ -7782,6 +7787,10 @@ bool Unit::HandleDummyAuraProc(Unit* victim, uint32 damage, AuraEffect* triggere
                     case 20186:
                         {
                             if (!victim || !victim->IsAlive() || !victim->HasActivePowerType(POWER_MANA) || victim->HasSpellCooldown(20268))
+                                return false;
+
+                            auto* caster = triggeredByAura->GetBase()->GetCaster();
+                            if (!caster || !victim->IsFriendlyTo(caster))
                                 return false;
 
                             // 2% of base mana
