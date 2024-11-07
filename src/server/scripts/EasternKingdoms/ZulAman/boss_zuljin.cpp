@@ -72,7 +72,7 @@ enum Spells
     SPELL_PILLAR_TRIGGER          = 43218, // trigger 43217
     // Cosmetic
     SPELL_SPIRIT_AURA             = 42466,
-    SPELL_SIPHON_SOUL             = 43501,
+    SPELL_SPIRIT_DRAIN            = 42542,
     // Transforms:
     SPELL_SHAPE_OF_THE_BEAR       = 42594, // 15% dmg
     SPELL_SHAPE_OF_THE_EAGLE      = 42606,
@@ -94,7 +94,8 @@ enum Phase
 enum Misc
 {
     GUID_CHARGE_TARGET            = 0,
-    GROUP_LYNX                    = 1
+    GROUP_LYNX                    = 1,
+    POINT_CENTER                  = 0
 };
 
 enum CreatureEntries
@@ -105,10 +106,7 @@ enum CreatureEntries
     NPC_SPIRIT_DRAGONHAWK = 23879
 };
 
-//coords for going for changing form
-#define CENTER_X 120.148811f
-#define CENTER_Y 703.713684f
-#define CENTER_Z 45.111477f
+const Position CenterPosition = { 120.148811f, 703.713684f, 45.111477f };
 
 struct SpiritInfoStruct
 {
@@ -118,10 +116,10 @@ struct SpiritInfoStruct
 
 static SpiritInfoStruct SpiritInfo[4] =
 {
-    { NPC_SPIRIT_BEAR,       147.87f, 706.51f, 45.11f, 3.04f },
-    { NPC_SPIRIT_EAGLE,      88.95f,  705.49f, 45.11f, 6.11f },
-    { NPC_SPIRIT_LYNX_ZJ,    137.23f, 725.98f, 45.11f, 3.71f },
-    { NPC_SPIRIT_DRAGONHAWK, 104.29f, 726.43f, 45.11f, 5.43f }
+    { NPC_SPIRIT_LYNX_ZJ,    147.87f, 706.51f, 45.11f, 3.04f },
+    { NPC_SPIRIT_DRAGONHAWK, 88.95f,  705.49f, 45.11f, 6.11f },
+    { NPC_SPIRIT_BEAR,       137.23f, 725.98f, 45.11f, 3.71f },
+    { NPC_SPIRIT_EAGLE,      104.29f, 726.43f, 45.11f, 5.43f }
 };
 
 struct TransformStruct
@@ -148,7 +146,9 @@ struct boss_zuljin : public BossAI
     {
         _Reset();
         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 33975);
+        me->SetCombatMovement(true);
         me->m_Events.KillAllEvents(false);
+        _nextPhase = 0;
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -194,19 +194,6 @@ struct boss_zuljin : public BossAI
         // Phase 3: Eagle Form.
         ScheduleHealthCheckEvent({ 60 }, [&] {
             EnterPhase(PHASE_EAGLE);
-            me->GetMotionMaster()->Clear();
-            DoCast(me, SPELL_ENERGY_STORM, true); // enemy aura
-            for (uint8 i = 0; i < 4; ++i)
-            {
-                if (Creature* vortex = DoSpawnCreature(CREATURE_FEATHER_VORTEX, 0, 0, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 0))
-                {
-                    vortex->CastSpell(vortex, SPELL_CYCLONE_PASSIVE, true);
-                    vortex->CastSpell(vortex, SPELL_CYCLONE_VISUAL, true);
-                    vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    vortex->SetSpeed(MOVE_RUN, 1.0f);
-                    DoZoneInCombat(vortex);
-                }
-            }
         });
 
         // Phase 4: Lynx Form.
@@ -280,9 +267,6 @@ struct boss_zuljin : public BossAI
         instance->SetBossState(DATA_ZULJIN, DONE);
         Talk(SAY_DEATH);
         summons.DespawnEntry(CREATURE_COLUMN_OF_FIRE);
-
-        if (Unit* Temp = summons.GetCreatureWithEntry(NPC_SPIRIT_LYNX_ZJ))
-            Temp->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
     }
 
     void SpawnAdds()
@@ -291,35 +275,82 @@ struct boss_zuljin : public BossAI
         {
             if (Creature* creature = me->SummonCreature(spiritInfo.entry, spiritInfo.x, spiritInfo.y, spiritInfo.z, spiritInfo.orient, TEMPSUMMON_DEAD_DESPAWN, 0))
             {
-                creature->CastSpell(creature, SPELL_SPIRIT_AURA, true);
-                creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                creature->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                creature->m_Events.AddEventAtOffset([creature] {
+                    creature->CastSpell(creature, SPELL_SPIRIT_AURA);
+                }, 1s);
             }
+        }
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_CENTER)
+        {
+            if (Creature* spirit = summons.GetCreatureWithEntry(Transform[_nextPhase].spiritEntry))
+            {
+                spirit->CastSpell(me, SPELL_SPIRIT_DRAIN, false);
+                me->SetFacingToObject(spirit);
+            }
+
+            if (_nextPhase)
+                if (Creature* spirit = summons.GetCreatureWithEntry(Transform[_nextPhase - 1].spiritEntry))
+                {
+                    spirit->CastStop();
+                    spirit->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
+                }
+
+            Talk(Transform[_nextPhase].text);
+
+            me->m_Events.AddEventAtOffset([&] {
+                me->SetReactState(REACT_AGGRESSIVE);
+                DoCastSelf(Transform[_nextPhase].spell);
+
+                if (_nextPhase == PHASE_EAGLE)
+                {
+                    me->SetCombatMovement(false);
+                    DoCastSelf(SPELL_ENERGY_STORM, true); // enemy aura
+                    for (uint8 i = 0; i < 4; ++i)
+                    {
+                        if (Creature* vortex = DoSpawnCreature(CREATURE_FEATHER_VORTEX, 0, 0, 0, 0, TEMPSUMMON_CORPSE_DESPAWN, 0))
+                        {
+                            vortex->CastSpell(vortex, SPELL_CYCLONE_PASSIVE, true);
+                            vortex->CastSpell(vortex, SPELL_CYCLONE_VISUAL, true);
+                            vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                            vortex->SetSpeed(MOVE_RUN, 1.0f);
+                            DoZoneInCombat(vortex);
+                        }
+                    }
+                }
+                else
+                {
+                    me->SetCombatMovement(true);
+                    me->ResumeChasingVictim();
+                }
+            }, 2s);
         }
     }
 
     void EnterPhase(uint32 NextPhase)
     {
         scheduler.CancelAll();
-        me->NearTeleportTo(CENTER_X, CENTER_Y, CENTER_Z, me->GetOrientation());
+        me->SetReactState(REACT_PASSIVE);
+        DoStopAttack();
+        me->GetMotionMaster()->Clear();
         DoResetThreatList();
+
         me->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID, 0);
         me->RemoveAurasDueToSpell(Transform[NextPhase].unaura);
-        DoCastSelf(Transform[NextPhase].spell);
-        Talk(Transform[NextPhase].text);
 
-        if (NextPhase)
-        {
-            if (Creature* spirit = summons.GetCreatureWithEntry(Transform[NextPhase].spiritEntry))
-            {
-                spirit->CastSpell(me, SPELL_SIPHON_SOUL, false);
-                spirit->SetUInt32Value(UNIT_FIELD_BYTES_1, UNIT_STAND_STATE_DEAD);
-            }
-        }
+        me->m_Events.AddEventAtOffset([&] {
+            me->GetMotionMaster()->MovePoint(POINT_CENTER, CenterPosition);
+        }, 1s);
+
+        _nextPhase = NextPhase;
     }
 
     private:
         ObjectGuid _chargeTargetGUID;
+        uint8 _nextPhase;
 };
 
 struct npc_zuljin_vortex : public ScriptedAI
