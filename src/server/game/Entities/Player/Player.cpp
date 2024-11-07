@@ -8751,9 +8751,8 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(3932, 0);  // WORLDSTATE_TIME_GUARDIAN_SHOW
                 }
                 break;
-                if (instance && mapId == 578)
             case 4228: // The Oculus
-                if (instance)
+                if (instance && mapId == 578)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
