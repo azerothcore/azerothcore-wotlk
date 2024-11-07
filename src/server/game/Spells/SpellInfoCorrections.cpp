@@ -4860,7 +4860,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 43149 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TriggerSpell = 0;
-    }
+    });
 
     // Black Qiraji Battle Tank
     ApplySpellFix({ 26655, 26656 }, [](SpellInfo* spellInfo)
