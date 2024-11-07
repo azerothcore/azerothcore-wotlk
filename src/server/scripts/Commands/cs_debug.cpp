@@ -28,7 +28,6 @@
 #include "Channel.h"
 #include "Chat.h"
 #include "CommandScript.h"
-#include "GossipDef.h"
 #include "GridNotifiersImpl.h"
 #include "LFGMgr.h"
 #include "Language.h"

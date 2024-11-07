@@ -16,7 +16,7 @@
  */
 
 #include "Cell.h"
-#include "CellImpl.h"
+#include "CellImpl.h" // NOTE: this import is NEEDED (even though some IDEs report it as unused)
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
