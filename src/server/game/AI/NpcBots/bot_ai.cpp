@@ -19737,7 +19737,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                 std::list<uint8> attackable_points;
                 for (uint8 upoint : unowned_points)
                 {
-                    uint8 attackers_count = std::ranges::count_if(team_members, [=, this, &attackable_points](Unit const* m) {
+                    uint8 attackers_count = std::ranges::count_if(team_members, [=, this](Unit const* m) {
                         return (m != me && (m->GetExactDist2d(BG_EY_TriggerPositions[upoint][0], BG_EY_TriggerPositions[upoint][1]) < float(BG_EY_POINT_RADIUS) * 0.5f ||
                             (m->IsNPCBot() && m->GetExactDist2d(BG_EY_TriggerPositions[upoint][0], BG_EY_TriggerPositions[upoint][1]) < me->GetExactDist2d(BG_EY_TriggerPositions[upoint][0], BG_EY_TriggerPositions[upoint][1]))));
                     });
