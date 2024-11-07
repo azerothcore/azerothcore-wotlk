@@ -133,9 +133,9 @@ class spell_rajaxx_thundercrash : public SpellScript
     void HandleDamageCalc(SpellEffIndex /*effIndex*/)
     {
         int32 damage = GetHitUnit()->GetHealth() / 2;
-        if (damage < 200)
+        if (damage < 100)
         {
-            damage = 200;
+            damage = 100;
         }
 
         SetHitDamage(damage);
