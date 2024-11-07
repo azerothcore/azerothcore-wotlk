@@ -1205,12 +1205,29 @@ void BotDataMgr::LoadWanderMap(bool reload, bool force_all_maps)
             flags &= ~nonbg_flags;
         }
 
-        const uint32 conflicting_flags_1 = AsUnderlyingType(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY) | AsUnderlyingType(BotWPFlags::BOTWP_FLAG_HORDE_ONLY);
-        if ((flags & conflicting_flags_1) == conflicting_flags_1)
+        const std::array conflicting_flags{
+            std::pair{BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY, BotWPFlags::BOTWP_FLAG_HORDE_ONLY },
+            std::pair{BotWPFlags::BOTWP_FLAG_CAN_BACKTRACK_FROM, BotWPFlags::BOTWP_FLAG_MOVEMENT_FORCE_JUMP_END },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_MISC_OBJECTIVE_1, BotWPFlags::BOTWP_FLAG_BG_MISC_OBJECTIVE_2 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_1, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_2 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_1, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_3 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_1, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_4 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_1, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_5 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_2, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_3 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_2, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_4 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_2, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_5 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_3, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_4 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_3, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_5 },
+            std::pair{BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_4, BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_5 },
+        };
+        for (std::pair<BotWPFlags, BotWPFlags> const& p : conflicting_flags)
         {
-            BOT_LOG_WARN("server.loading", "WP {} has conflicting flags {}+{}! Removing both...",
-                id, AsUnderlyingType(BotWPFlags::BOTWP_FLAG_ALLIANCE_ONLY), AsUnderlyingType(BotWPFlags::BOTWP_FLAG_HORDE_ONLY));
-            flags &= ~conflicting_flags_1;
+            const uint32 cflags = AsUnderlyingType(p.first) | AsUnderlyingType(p.second);
+            if ((flags & cflags) == cflags)
+            {
+                BOT_LOG_WARN("server.loading", "WP {} has conflicting flags {}+{}! Removing both...", id, AsUnderlyingType(p.first), AsUnderlyingType(p.second));
+                flags &= ~cflags;
+            }
         }
 
         if (!force_all_maps && mapEntry->IsContinent() && !BotMgr::IsBotGenerationEnabledWorldMapId(mapId))
