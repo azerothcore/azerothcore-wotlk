@@ -176,7 +176,7 @@ bool BattlegroundDS::HandlePlayerUnderMap(Player* player)
 
 void BattlegroundDS::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    packet.Worldstates.emplace_back(3610, 1); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
+    packet.Worldstates.emplace_back(0xe1a, 1); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
     Arena::FillInitialWorldStates(packet);
 }
 

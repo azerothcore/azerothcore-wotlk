@@ -90,7 +90,7 @@ void BattlegroundBE::HandleAreaTrigger(Player* player, uint32 trigger)
 
 void BattlegroundBE::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
-    packet.Worldstates.emplace_back(2547, 1); // BATTLEGROUND_BLADES_EDGE_ARENA_SHOW
+    packet.Worldstates.emplace_back(0x9f3, 1); // BATTLEGROUND_BLADES_EDGE_ARENA_SHOW
     Arena::FillInitialWorldStates(packet);
 }
 
