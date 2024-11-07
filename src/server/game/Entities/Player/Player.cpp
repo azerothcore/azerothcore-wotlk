@@ -8392,14 +8392,15 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
-                packet.Worldstates.emplace_back(1581, 0); // alliance flag captures
-                packet.Worldstates.emplace_back(1582, 0); // horde flag captures
-                packet.Worldstates.emplace_back(1545, 0); // unk, set to 1 on alliance flag pickup...
-                packet.Worldstates.emplace_back(1546, 0); // unk, set to 1 on horde flag pickup, after drop it's -1
-                packet.Worldstates.emplace_back(1547, 2); // unk
-                packet.Worldstates.emplace_back(1601, 3); // unk (max flag captures?)
-                packet.Worldstates.emplace_back(2338, 1); // horde (0 - hide, 1 - flag ok, 2 - flag picked up (flashing), 3 - flag picked up (not flashing)
-                packet.Worldstates.emplace_back(2339, 1); // alliance (0 - hide, 1 - flag ok, 2 - flag picked up (flashing), 3 - flag picked up (not flashing)
+                    packet.Worldstates.reserve(8);
+                    packet.Worldstates.emplace_back(1581, 0); // alliance flag captures
+                    packet.Worldstates.emplace_back(1582, 0); // horde flag captures
+                    packet.Worldstates.emplace_back(1545, 0); // unk, set to 1 on alliance flag pickup...
+                    packet.Worldstates.emplace_back(1546, 0); // unk, set to 1 on horde flag pickup, after drop it's -1
+                    packet.Worldstates.emplace_back(1547, 2); // unk
+                    packet.Worldstates.emplace_back(1601, 3); // unk (max flag captures?)
+                    packet.Worldstates.emplace_back(2338, 1); // horde (0 - hide, 1 - flag ok, 2 - flag picked up (flashing), 3 - flag picked up (not flashing)
+                    packet.Worldstates.emplace_back(2339, 1); // alliance (0 - hide, 1 - flag ok, 2 - flag picked up (flashing), 3 - flag picked up (not flashing)
                 }
                 break;
             case 3358: // Arathi Basin
@@ -8787,13 +8788,12 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
-                packet.Worldstates.emplace_back(3816, 0);   // WORLD_STATE_VH_SHOW
-                packet.Worldstates.emplace_back(3815, 100); // WORLD_STATE_VH_PRISON_STATE
-                packet.Worldstates.emplace_back(3810, 0);   // WORLD_STATE_VH_WAVE_COUNT
+                    packet.Worldstates.emplace_back(3816, 0);   // WORLD_STATE_VH_SHOW
+                    packet.Worldstates.emplace_back(3815, 100); // WORLD_STATE_VH_PRISON_STATE
+                    packet.Worldstates.emplace_back(3810, 0);   // WORLD_STATE_VH_WAVE_COUNT
                 }
                 break;
-            // Halls of Refection
-            case 4820:
+            case 4820: // Halls of Refection
                 if (instance && mapId == 668)
                     instance->FillInitialWorldStates(packet);
                 else
@@ -8802,8 +8802,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     packet.Worldstates.emplace_back(4882, 0); // WORLD_STATE_HOR_WAVE_COUNT
                 }
                 break;
-            // Scarlet Enclave (DK starting zone)
-            case 4298:
+            case 4298: // Scarlet Enclave (DK starting zone)
                 // Get Mograine, GUID and ENTRY should NEVER change
                 if (Creature* mograine = ObjectAccessor::GetCreature(*this, ObjectGuid::Create<HighGuid::Unit>(29173, 130956)))
                 {
