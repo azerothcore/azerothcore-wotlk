@@ -111,15 +111,15 @@ const Position CenterPosition = { 120.148811f, 703.713684f, 45.111477f };
 struct SpiritInfoStruct
 {
     uint32 entry;
-    float x, y, z, orient;
+    Position pos;
 };
 
 static SpiritInfoStruct SpiritInfo[4] =
 {
-    { NPC_SPIRIT_LYNX_ZJ,    147.87f, 706.51f, 45.11f, 3.04f },
-    { NPC_SPIRIT_DRAGONHAWK, 88.95f,  705.49f, 45.11f, 6.11f },
-    { NPC_SPIRIT_BEAR,       137.23f, 725.98f, 45.11f, 3.71f },
-    { NPC_SPIRIT_EAGLE,      104.29f, 726.43f, 45.11f, 5.43f }
+    { NPC_SPIRIT_LYNX_ZJ,    { 147.87f, 706.51f, 45.11f, 3.04f } },
+    { NPC_SPIRIT_DRAGONHAWK, { 88.95f,  705.49f, 45.11f, 6.11f } },
+    { NPC_SPIRIT_BEAR,       { 137.23f, 725.98f, 45.11f, 3.71f } },
+    { NPC_SPIRIT_EAGLE,      { 104.29f, 726.43f, 45.11f, 5.43f } }
 };
 
 struct TransformStruct
@@ -273,7 +273,7 @@ struct boss_zuljin : public BossAI
     {
         for (auto const& spiritInfo : SpiritInfo)
         {
-            if (Creature* creature = me->SummonCreature(spiritInfo.entry, spiritInfo.x, spiritInfo.y, spiritInfo.z, spiritInfo.orient, TEMPSUMMON_DEAD_DESPAWN, 0))
+            if (Creature* creature = me->SummonCreature(spiritInfo.entry, spiritInfo.pos, TEMPSUMMON_DEAD_DESPAWN, 0))
             {
                 creature->m_Events.AddEventAtOffset([creature] {
                     creature->CastSpell(creature, SPELL_SPIRIT_AURA);
