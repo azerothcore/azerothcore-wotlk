@@ -262,6 +262,18 @@ struct boss_zuljin : public BossAI
         // Phase 5: Dragonhawk Form.
         ScheduleHealthCheckEvent({ 20 }, [&] {
             EnterPhase(PHASE_DRAGONHAWK);
+
+            ScheduleTimedEvent(5s, [&] {
+                DoCastSelf(SPELL_FLAME_WHIRL);
+            }, 12s);
+
+            ScheduleTimedEvent(6s, [&] {
+                DoCastRandomTarget(SPELL_SUMMON_PILLAR);
+            }, 10s);
+
+            ScheduleTimedEvent(7s, [&] {
+                DoCastAOE(SPELL_FLAME_BREATH);
+            }, 10s);
         });
     }
 
