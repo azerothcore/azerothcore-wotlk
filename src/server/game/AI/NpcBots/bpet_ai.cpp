@@ -466,6 +466,8 @@ uint32 bot_pet_ai::GetData(uint32 data) const
 
 void bot_pet_ai::SetPetStats(bool force)
 {
+    shouldUpdateStats = false;
+
     switch (myType)
     {
         //warlock
@@ -708,6 +710,36 @@ void bot_pet_ai::SetPetStats(bool force)
 
             for (uint8 i = STAT_STRENGTH; i != MAX_STATS; ++i)
                 me->SetCreateStat(Stats(i), pInfo->stats[i]);
+
+            float mindamage, maxdamage;
+            switch (myType)
+            {
+                case BOT_PET_SHADOWFIEND:       mindamage = float(level * 3 + spdtotal * 0.3f);  maxdamage = float(level * 5 + spdtotal * 0.3f);  break;
+                case BOT_PET_SPIRIT_WOLF:       mindamage = float(level * 3);                    maxdamage = float(level * 5);                    break;
+                case BOT_PET_FORCE_OF_NATURE:   mindamage = float(level * 2) + spdtotal * 0.15f; maxdamage = float(level * 3) + spdtotal * 0.15f; break;
+                case BOT_PET_DARK_MINION:       mindamage = float(level);                        maxdamage = float(level + level / 2);            break;
+                case BOT_PET_DARK_MINION_ELITE: mindamage = float(level * 3);                    maxdamage = float(level * 4);                    break;
+                case BOT_PET_NECROSKELETON:     mindamage = float(level);                        maxdamage = float(level + level / 3);            break;
+                case BOT_PET_CARRION_BEETLE1:   mindamage = float(level / 2 + 2);                maxdamage = float(level / 4 * 3 + 2);            break;
+                case BOT_PET_CARRION_BEETLE2:   mindamage = float(level / 4 * 3 + 8);            maxdamage = float(level + level / 2 + 8);        break;
+                case BOT_PET_CARRION_BEETLE3:   mindamage = float(level + level / 2 + 10);       maxdamage = float(level + level / 4 * 3 + 15);   break;
+                default:
+                    if (myType < BOT_PET_AWATER_ELEMENTAL)
+                    {
+                        //we have to compensate for a different way damage is calculated for non-guardians
+                        mindamage = pInfo->min_dmg * 0.75f;
+                        maxdamage = pInfo->max_dmg * 0.75f;
+                    }
+                    else
+                    {
+                        mindamage = float(level - (level / 4));
+                        maxdamage = float(level + (level / 4));
+                    }
+                    break;
+            }
+
+            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, mindamage);
+            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, maxdamage);
         }
         else
         {
@@ -786,59 +818,6 @@ void bot_pet_ai::SetPetStats(bool force)
     //Spd     x1.0  -- spd
 
     //attack power
-    if (force)
-    {
-        if (myType == BOT_PET_SHADOWFIEND)
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level * 3 + spdtotal * 0.3f));
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level * 5 + spdtotal * 0.3f));
-        }
-        else if (myType == BOT_PET_SPIRIT_WOLF)
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level * 3));
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level * 5));
-        }
-        else if (myType == BOT_PET_FORCE_OF_NATURE)
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level * 2) + spdtotal * 0.15f);
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level * 3) + spdtotal * 0.15f);
-        }
-        else if (myType == BOT_PET_DARK_MINION)
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level));
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level + level / 2));
-        }
-        else if (myType == BOT_PET_DARK_MINION_ELITE)
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level * 3));
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level * 4));
-        }
-        else if (myType == BOT_PET_NECROSKELETON)
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level));
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level + level / 3));
-        }
-        else if (myType == BOT_PET_CARRION_BEETLE1)
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level / 2 + 2));
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level / 4 * 3 + 2));
-        }
-        else if (myType == BOT_PET_CARRION_BEETLE2)
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level / 4 * 3 + 8));
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level + level / 2 + 8));
-        }
-        else if (myType == BOT_PET_CARRION_BEETLE3)
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level + level / 2 + 10));
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level + level / 4 * 3 + 15));
-        }
-        else
-        {
-            me->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float(level - (level / 4)));
-            me->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float(level + (level / 4)));
-        }
-    }
     float atpower = /*IAmFree() ? 1000.f :*/ 0.f; //+1000/+0 base pet ap
     switch (myType)
     {
