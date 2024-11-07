@@ -1427,7 +1427,7 @@ void bot_ai::BuffAndHealGroup(uint32 diff)
         if (!targets2.empty() && BuffTarget(targets2.size() == 1 ? targets2.front() : Bcore::Containers::SelectRandomContainerElement(targets2), diff))
             return;
         for (std::list<Unit*>::const_iterator itr = targets2.begin(); itr != targets2.end(); ++itr)
-            if (GetHealthPCT(*itr) < 95 && urand(1, 100) <= (30 + 30*uint32(GetBG() != nullptr)) && HealTarget(*itr, diff))
+            if (GetHealthPCT(*itr) < 95 && urand(1, 100) <= (30 + 30*uint32(!!GetBG())) && HealTarget(*itr, diff))
                 break;
 
         return;
@@ -1827,39 +1827,37 @@ void bot_ai::CureGroup(uint32 cureSpell, uint32 diff)
     if (IsTank() && me->GetVictim() && me->GetMap()->IsRaid()) return;
     if (IsCasting()) return;
 
-    if (IAmFree())
+    Group const* pGroup = !IAmFree() ? master->GetGroup() : me->GetBotGroup();
+    std::list<Unit*> targets;
+    if (IAmFree() && (!IsWanderer() || !pGroup || me->IsInCombat()))
     {
-        std::list<Unit*> cureTargets;
-
         if (_canCureTarget(me, cureSpell))
-            cureTargets.push_back(me);
-        if (botPet && _canCureTarget(botPet, cureSpell))
-            cureTargets.push_back(botPet);
+            targets.push_back(me);
+        if (botPet && !me->IsInCombat() && _canCureTarget(botPet, cureSpell))
+            targets.push_back(botPet);
 
         if (!(me->GetFaction() == 14 || me->HasAura(BERSERK)))
         {
             std::list<Unit*> targets1;
-            GetNearbyFriendlyTargetsList(targets1, 38);
+            GetNearbyFriendlyTargetsList(targets1, 30);
             for (std::list<Unit*>::const_iterator itr = targets1.begin(); itr != targets1.end(); ++itr)
                 if (((*itr)->IsPlayer() || (*itr)->ToPet()) && _canCureTarget(*itr, cureSpell))
-                    cureTargets.push_back(*itr);
+                    targets.push_back(*itr);
         }
 
-        if (!cureTargets.empty())
+        if (!targets.empty())
         {
-            if (doCast(Bcore::Containers::SelectRandomContainerElement(cureTargets), cureSpell))
+            if (doCast(Bcore::Containers::SelectRandomContainerElement(targets), cureSpell))
                 return;
         }
 
         return;
     }
 
-    if (!master->GetMap()->IsRaid() && Rand() > 35)
+    if (!me->GetMap()->IsRaid() && Rand() > 35)
         return;
 
     //BOT_LOG_ERROR("entities.player", "%s: CureGroup() on %s", me->GetName().c_str(), pTarget->GetName().c_str());
-    std::list<Unit*> targets;
-    Group const* pGroup = master->GetGroup();
     BotMap const* map;
     Unit* u;
     if (!pGroup)
@@ -1919,13 +1917,16 @@ void bot_ai::CureGroup(uint32 cureSpell, uint32 diff)
                 }
             }
 
-            for (Unit::ControlSet::const_iterator bitr = tPlayer->m_Controlled.begin(); bitr != tPlayer->m_Controlled.end(); ++bitr)
+            if (!me->IsInCombat())
             {
-                u = *bitr;
-                if (!u || !u->IsPet() || !u->IsAlive() || me->GetDistance(u) > 30) continue;
+                for (Unit::ControlSet::const_iterator bitr = tPlayer->m_Controlled.begin(); bitr != tPlayer->m_Controlled.end(); ++bitr)
+                {
+                    u = *bitr;
+                    if (!u || !u->IsPet() || !u->IsAlive() || me->GetDistance(u) > 30) continue;
 
-                if (_canCureTarget(u, cureSpell))
-                    targets.push_back(u);
+                    if (_canCureTarget(u, cureSpell))
+                        targets.push_back(u);
+                }
             }
         }
     }
@@ -18074,7 +18075,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                                 flag_guid = dynamic_cast<BattlegroundWS*>(bg)->GetDroppedFlagGUID(bg->GetOtherTeamId(bg->GetBotTeamId(me->GetGUID())));
                             break;
                         case BATTLEGROUND_EY:
-                            //flag_guid = dynamic_cast<BattlegroundEY*>(bg)->GetDroppedFlagGUID();
+                            flag_guid = dynamic_cast<BattlegroundEY*>(bg)->GetDroppedFlagGUID();
                             break;
                         default:
                             break;
@@ -18083,7 +18084,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                 if (GameObject* go = flag_guid ? bg->GetBgMap()->GetGameObject(flag_guid) : nullptr)
                 {
                     float fdist = me->GetDistance(go);
-                    if (fdist < 18.f)
+                    if (fdist < 30.f)
                     {
                         if (fdist < INTERACTION_DISTANCE * 0.5f)
                         {
@@ -18101,15 +18102,15 @@ bool bot_ai::GlobalUpdate(uint32 diff)
                 else if (!IsFlagCarrier(me))
                 {
                     //GET BG FOLLOW UNIT
-                    static const std::function<bool(Unit const*)> flag_carrier_pred = [](Unit const* u) {
-                        return bot_ai::IsFlagCarrier(u);
-                    };
-
-                    Unit* nmover = nullptr;
-                    Bcore::UnitSearcher searcher(me, nmover, flag_carrier_pred);
-                    Cell::VisitAllObjects(me, searcher, 80.0f);
-                    if (nmover)
-                        mmover = nmover;
+                    if (bg->GetBgTypeID() == BATTLEGROUND_WS)
+                    {
+                        static const std::function<bool(Unit const*)> flag_carrier_pred = [](Unit const* u) { return bot_ai::IsFlagCarrier(u); };
+                        Unit* nmover = nullptr;
+                        Bcore::UnitSearcher searcher(me, nmover, flag_carrier_pred);
+                        Cell::VisitAllObjects(me, searcher, 80.0f);
+                        if (nmover)
+                            mmover = nmover;
+                    }
                 }
             }
 
@@ -18362,7 +18363,7 @@ void bot_ai::Evade()
         {
             ++_evadeCount;
 
-            if (dist > (me->GetMap()->GetEntry()->IsContinent() ? 15.0f : 3.0f))
+            if (dist > (me->GetMap()->GetEntry()->IsContinent() ? 15.0f : INTERACTION_DISTANCE))
             {
                 if (_travel_node_last && _travel_node_last->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_FORCE_JUMP_BEGIN) &&
                     _travel_node_cur && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_MOVEMENT_FORCE_JUMP_END) &&
@@ -18413,8 +18414,9 @@ void bot_ai::Evade()
                 if (nextNode == _travel_node_cur)
                 {
                     //same node: mill about
-                    float angle = Position::NormalizeOrientation(me->GetRelativeAngle(nextNode) + frand(float(-M_PI_2), float(M_PI_2)));
-                    Position cnpos = me->GetFirstCollisionPosition(frand(8.0f, 15.0f), angle);
+                    float cangle = Position::NormalizeOrientation(me->GetRelativeAngle(nextNode) + frand(float(-M_PI_2), float(M_PI_2)));
+                    float cdist = nextNode->HasFlag(BotWPFlags::BOTWP_FLAG_INTERACTION_MILL_RADIUS) ? frand(INTERACTION_DISTANCE * 0.25f, INTERACTION_DISTANCE) : frand(8.0f, 15.0f);
+                    Position cnpos = me->GetFirstCollisionPosition(cdist, cangle);
                     homepos.Relocate(cnpos);
                     evadeDelayTimer = urand(4000, 6000);
                 }
@@ -18879,6 +18881,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
             static const std::function boss_room_wp_pred_h = [](WanderNode const* wp) { return wp->HasAllFlags(BotWPFlags::BOTWP_FLAG_HORDE_BOSS_ROOM); };
 
             BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg);
+
             // 1) check conditions to rush final boss
             for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
             {
@@ -19460,7 +19463,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     }
                 }
             }
-            //3) closest (linked) base is not captured / not assaulted - go there, otherwise find all not captured / not assaulted bases and select at random (max 2 per base)
+            //3) closest (linked) base is not captured / not assaulted - go there, otherwise find all not captured / not assaulted bases and select farthest (max 2 per base)
             for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
             {
                 if (myTeamId != teamId)
@@ -19488,7 +19491,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     {
                         if (m == me)
                             continue;
-                        if (m->GetCurrentSpell(CURRENT_GENERIC_SPELL) && m->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == 21651 && m->GetExactDist2d(mwp) < 10.0f)
+                        if (m->GetCurrentSpell(CURRENT_GENERIC_SPELL) && m->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == OPEN_FLAG_BG && m->GetExactDist2d(mwp) < 10.0f)
                             ++advancing_members;
                         else if (m->IsNPCBot() && m->ToCreature()->GetBotAI()->_travel_node_cur == mwp)
                             ++advancing_members;
@@ -19541,6 +19544,266 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
 
             break;
         }
+        case BATTLEGROUND_EY:
+        {
+            const std::array ey_points{ ([]<typename T, T... I>(std::integer_sequence<T, I...>&&) { return std::array{ I... }; })(std::make_integer_sequence<uint8, EY_POINTS_MAX>{}) };
+
+            BattlegroundEY* ey = dynamic_cast<BattlegroundEY*>(bg);
+
+            //1) at the point near buff - grab the buff unconditionally
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                NodeLinkList::const_iterator lit = std::ranges::find_if(links, [=](WanderNodeLink const& wpl) {
+                    return wpl.wp->HasFlag(BotWPFlags::BOTWP_FLAG_OPTIONAL_PICKUP);
+                });
+                if (lit != links.cend())
+                {
+                    uint32 object_type;
+                    switch (lit->wp->GetFlags() & AsUnderlyingType(BotWPFlags::BOTWP_FLAG_OPTIONAL_PICKUP))
+                    {
+                        case AsUnderlyingType(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_1): object_type = BG_EY_OBJECT_SPEEDBUFF_MAGE_TOWER;    break;
+                        case AsUnderlyingType(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_2): object_type = BG_EY_OBJECT_SPEEDBUFF_DRAENEI_RUINS; break;
+                        case AsUnderlyingType(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_3): object_type = BG_EY_OBJECT_SPEEDBUFF_FEL_REAVER;    break;
+                        case AsUnderlyingType(BotWPFlags::BOTWP_FLAG_BG_OPTIONAL_PICKUP_4): object_type = BG_EY_OBJECT_SPEEDBUFF_BLOOD_ELF;     break;
+                        default:                                                            object_type = 0;                                    break;
+                    }
+                    if (object_type)
+                    {
+                        for (uint8 i = 0; i != 2; ++i)
+                        {
+                            GameObject const* go = ey->GetBGObject(object_type + i);
+                            if (go && go->IsInWorld() && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
+                            {
+                                bool has_picker = false;
+                                for (Unit const* member : team_members)
+                                {
+                                    if (member != me && member->IsAlive() && member->IsNPCBot() && member->ToCreature()->GetBotAI()->_travel_node_cur == lit->wp)
+                                    {
+                                        has_picker = true;
+                                        break;
+                                    }
+                                }
+                                if (!has_picker)
+                                {
+                                    //BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} goes for EY BUFF at {}! Cur node: {} {}",
+                                    //    me->GetName(), me->GetEntry(), uint32(myTeamId), lit->wp->GetName(), curNode->GetWPId(), curNode->GetName());
+                                    return lit->wp;
+                                }
+                                break;
+                            }
+                        }
+                    }
+                    links.erase(lit);
+                }
+            }
+            //2) would be carrier - set to current point for the next move
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                if (curNode->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET))
+                {
+                    if (Spell const* curSpell = me->GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                    {
+                        if (curSpell->GetSpellInfo()->Id == OPEN_FLAG_BG)
+                        {
+                            //BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} is AT FLAG POINT and goes for same EY point {}!", me->GetName(), me->GetEntry(), uint32(myTeamId), curNode->GetWPId());
+                            return curNode;
+                        }
+                    }
+                }
+            }
+            //3) carrier - get next point towards drop point (equal dist, get the one with most allies, random if none)
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                if (ey->GetFlagPickerGUID() == me->GetGUID())
+                {
+                    WanderNode const* dropPoint = nullptr;
+                    NodeList dropPoints;
+                    WanderNode::DoForAllMapWPs(bg->GetMapId(), [&dropPoints](WanderNode const* dwp) {
+                        if (dwp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_DELIVER_TARGET))
+                            dropPoints.push_back(dwp);
+                    });
+                    std::vector<uint8> owned_points;
+                    owned_points.reserve(EY_POINTS_MAX);
+                    for (uint8 index : ey_points)
+                        if (ey->GetPointOwner(index) == myTeamId)
+                            owned_points.push_back(index);
+                    uint8 targetPoint = EY_POINTS_MAX;
+                    if (!owned_points.empty())
+                    {
+                        for (uint8 owned_point : owned_points)
+                            for (WanderNode const* dwp : dropPoints)
+                                if (dwp->GetExactDist2d(BG_EY_TriggerPositions[owned_point][0], BG_EY_TriggerPositions[owned_point][1]) < INTERACTION_DISTANCE && curNode->HasLink(dwp))
+                                    return dwp;
+                        targetPoint = owned_points.size() == 1u ? owned_points.front() : Bcore::Containers::SelectRandomContainerElement(owned_points);
+                    }
+                    if (targetPoint >= EY_POINTS_MAX)
+                    {
+                        int8 maxAllies = 0;
+                        for (uint8 index : ey_points)
+                        {
+                            int8 alliesCount = ey->GetPlayersCountNearPoint(index, myTeamId);
+                            if (maxAllies < alliesCount)
+                            {
+                                maxAllies = alliesCount;
+                                targetPoint = index;
+                            }
+                        }
+                    }
+                    if (targetPoint < EY_POINTS_MAX)
+                    {
+                        for (WanderNode const* dwp : dropPoints)
+                        {
+                            if (dwp->GetExactDist2d(BG_EY_TriggerPositions[targetPoint][0], BG_EY_TriggerPositions[targetPoint][1]) < INTERACTION_DISTANCE)
+                            {
+                                dropPoint = dwp;
+                                break;
+                            }
+                        }
+                    }
+                    if (!dropPoint)
+                        dropPoint = Bcore::Containers::SelectRandomContainerElement(dropPoints);
+                    NodeLinkList dlinks = curNode->GetShortestPathLinks(dropPoint, links);
+                    if (!dlinks.empty())
+                    {
+                        //BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} GOT A FLAG and goes for EY point {}! Cur node: {} {}",
+                        //    me->GetName(), me->GetEntry(), uint32(myTeamId), dropPoint->GetName(), curNode->GetWPId(), curNode->GetName());
+                        return dlinks.size() == 1u ? dlinks.front().wp : Bcore::Containers::SelectRandomWeightedContainerElement(dlinks, LinkWeightExtractor())->wp;
+                    }
+                }
+            }
+            //4) at least one bot should camp the flag point for recapture
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                WanderNode const* flagWP = WanderNode::FindInMapWPs(me->GetMapId(), [](WanderNode const* mwp) { return mwp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_PICKUP_TARGET); });
+                if (flagWP)
+                {
+                    bool has_attacker = std::ranges::any_of(team_members, [=, this](Unit const* m) {
+                        WanderNode const* mn = m->IsNPCBot() ? m->ToCreature()->GetBotAI()->_travel_node_cur : nullptr;
+                        return (m != me && ((std::fabs(m->m_positionZ - flagWP->m_positionZ) < 15.f && m->GetExactDist2d(flagWP) < 35.f) ||
+                            (mn && (mn == flagWP || (mn->HasLink(flagWP) && mn->GetExactDist2d(flagWP) < me->GetExactDist2d(flagWP))))));
+                    });
+                    if (!has_attacker)
+                    {
+                        NodeLinkList flinks = curNode->GetShortestPathLinks(flagWP, links);
+                        if (!flinks.empty())
+                        {
+                            //BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} goes for EY FLAG POINT at {}! Cur node: {} {}",
+                            //    me->GetName(), me->GetEntry(), uint32(myTeamId), flagWP->GetName(), curNode->GetWPId(), curNode->GetName());
+                            return flinks.size() == 1u ? flinks.front().wp : Bcore::Containers::SelectRandomWeightedContainerElement(flinks, LinkWeightExtractor())->wp;
+                        }
+                    }
+                }
+            }
+            //5) all bases controlled - lock enemy team on their spawn (go for interception wp)
+            //6) closest (linked) point is not controlled - go there, otherwise find all non-captured bases and select one (max 2 per base), closest to me or farthest from spawn
+            for (TeamId teamId : { TEAM_ALLIANCE, TEAM_HORDE })
+            {
+                if (myTeamId != teamId)
+                    continue;
+
+                std::list<uint8> unowned_points;
+                for (uint8 index : ey_points)
+                    if (ey->GetPointOwner(index) != myTeamId)
+                        unowned_points.push_back(index);
+                if (unowned_points.empty())
+                {
+                    WanderNode const* lockWP = WanderNode::FindInMapWPs(me->GetMapId(), [=](WanderNode const* mwp) {
+                        return mwp->HasAllFlags(myTeamId == TEAM_ALLIANCE ? BotWPFlags::BOTWP_FLAG_SPAWN_INTERCEPT_ALLIANCE : BotWPFlags::BOTWP_FLAG_SPAWN_INTERCEPT_HORDE);
+                    });
+                    if (lockWP)
+                    {
+                        NodeLinkList llinks = curNode->GetShortestPathLinks(lockWP, links);
+                        if (!llinks.empty())
+                        {
+                            //BOT_LOG_DEBUG("npcbots", "Bot {} {} team {} goes for EY PIN at {}! Cur node: {} {}",
+                            //    me->GetName(), me->GetEntry(), uint32(myTeamId), lockWP->GetName(), curNode->GetWPId(), curNode->GetName());
+                            return llinks.size() == 1u ? llinks.front().wp : Bcore::Containers::SelectRandomWeightedContainerElement(llinks, LinkWeightExtractor())->wp;
+                        }
+                    }
+                }
+
+                std::list<uint8> attackable_points;
+                for (uint8 upoint : unowned_points)
+                {
+                    uint8 attackers_count = std::ranges::count_if(team_members, [=, this, &attackable_points](Unit const* m) {
+                        return (m != me && (m->GetExactDist2d(BG_EY_TriggerPositions[upoint][0], BG_EY_TriggerPositions[upoint][1]) < float(BG_EY_POINT_RADIUS) * 0.5f ||
+                            (m->IsNPCBot() && m->GetExactDist2d(BG_EY_TriggerPositions[upoint][0], BG_EY_TriggerPositions[upoint][1]) < me->GetExactDist2d(BG_EY_TriggerPositions[upoint][0], BG_EY_TriggerPositions[upoint][1]))));
+                    });
+                    if (attackers_count < uint8(team_members.size() / 5u) + uint8(1))
+                        attackable_points.push_back(upoint);
+                }
+                NodeList attackableWPs;
+                WanderNode::DoForAllMapWPs(bg->GetMapId(), [&attackableWPs](WanderNode const* dwp) {
+                    if (dwp->HasFlag(BotWPFlags::BOTWP_FLAG_BG_FLAG_DELIVER_TARGET))
+                        attackableWPs.push_back(dwp);
+                });
+                Position const* fromPos;
+                if (!attackable_points.empty())
+                {
+                    for (uint8 apoint : attackable_points)
+                        for (WanderNode const* awp : attackableWPs)
+                            if (awp->GetExactDist2d(BG_EY_TriggerPositions[apoint][0], BG_EY_TriggerPositions[apoint][1]) < INTERACTION_DISTANCE && curNode->HasLink(awp))
+                                return awp;
+                    fromPos = me;
+                }
+                else
+                    fromPos = WanderNode::FindInMapWPs(me->GetMapId(), [](WanderNode const* mwp) { return mwp->HasAllFlags(BotWPFlags::BOTWP_FLAG_ALLIANCE_SPAWN_POINT); });
+                uint8 target_point = EY_POINTS_MAX;
+                if (fromPos)
+                {
+                    float maxdist = 0.0f;
+                    float dist2d;
+                    for (uint8 apoint : attackable_points)
+                    {
+                        dist2d = fromPos->GetExactDist2d(BG_EY_TriggerPositions[apoint][0], BG_EY_TriggerPositions[apoint][1]);
+                        if (dist2d > maxdist)
+                        {
+                            maxdist = dist2d;
+                            target_point = apoint;
+                        }
+                    }
+                    if (target_point >= EY_POINTS_MAX)
+                    {
+                        maxdist = 0.0f;
+                        for (uint8 upoint : unowned_points)
+                        {
+                            dist2d = fromPos->GetExactDist2d(BG_EY_TriggerPositions[upoint][0], BG_EY_TriggerPositions[upoint][1]);
+                            if (dist2d > maxdist)
+                            {
+                                maxdist = dist2d;
+                                target_point = upoint;
+                            }
+                        }
+                    }
+                }
+                if (target_point != EY_POINTS_MAX)
+                {
+                    for (WanderNode const* awp : attackableWPs)
+                    {
+                        if (awp->GetExactDist2d(BG_EY_TriggerPositions[target_point][0], BG_EY_TriggerPositions[target_point][1]) < INTERACTION_DISTANCE)
+                        {
+                            NodeLinkList alinks = curNode->GetShortestPathLinks(awp, links);
+                            if (!alinks.empty())
+                                return alinks.size() == 1u ? alinks.front().wp : Bcore::Containers::SelectRandomWeightedContainerElement(alinks, LinkWeightExtractor())->wp;
+                        }
+                    }
+                }
+            }
+
+            break;
+        }
         default:
             break;
     }
@@ -19568,6 +19831,15 @@ void bot_ai::OnWanderNodeReached()
                     if (bg->GetBotTeamId(me->GetGUID()) == TEAM_HORDE && _travel_node_cur->HasFlag(BotWPFlags::BOTWP_FLAG_HORDE_ONLY))
                         bg->HandleBotAreaTrigger(me, 3647);
                     break;
+                case BATTLEGROUND_EY:
+                {
+                    const std::array dFlagTriggers{ AT_FEL_REAVER_POINT, AT_BLOOD_ELF_POINT, AT_DRAENEI_RUINS_POINT, AT_MAGE_TOWER_POINT };
+                    const std::array index_range{ ([]<typename T, T... I>(std::integer_sequence<T, I...>&&) { return std::array{ I... }; })(std::make_integer_sequence<uint8, EY_POINTS_MAX>{}) };
+                    auto cit = std::ranges::find_if(index_range, [this](uint8 index) { return me->GetExactDist2d(BG_EY_TriggerPositions[index][0], BG_EY_TriggerPositions[index][1]) < INTERACTION_DISTANCE; });
+                    if (cit != index_range.cend())
+                        bg->HandleBotAreaTrigger(me, dFlagTriggers[*cit]);
+                    break;
+                }
                 default:
                     break;
             }
@@ -19578,8 +19850,6 @@ void bot_ai::OnWanderNodeReached()
             {
                 case BATTLEGROUND_AV:
                 {
-                    static const uint32 SPELL_OPENING_FLAG_AV = 21651u;
-
                     GameObject* obj = nullptr;
 
                     BattlegroundAV* av = dynamic_cast<BattlegroundAV*>(bg);
@@ -19610,7 +19880,7 @@ void bot_ai::OnWanderNodeReached()
                             continue;
                         if (Spell const* curSpell = member->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                         {
-                            if (curSpell->m_spellInfo->Id == SPELL_OPENING_FLAG_AV && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
+                            if (curSpell->m_spellInfo->Id == OPEN_FLAG_BG && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
                             {
                                 already_used = true;
                                 break;
@@ -19624,7 +19894,7 @@ void bot_ai::OnWanderNodeReached()
 
                     if (me->IsMounted())
                         DismountBot();
-                    me->CastSpell(obj, SPELL_OPENING_FLAG_AV, false);
+                    me->CastSpell(obj, OPEN_FLAG_BG, false);
 
                     break;
                 }
@@ -19654,8 +19924,6 @@ void bot_ai::OnWanderNodeReached()
                 }
                 case BATTLEGROUND_AB:
                 {
-                    static const uint32 SPELL_OPENING_FLAG_AB = 21651u;
-
                     uint8 node = BG_AB_NODE_STABLES;
                     GameObject* obj = bg->GetBGObject(node*8+BG_AB_OBJECT_BANNER_NEUTRAL);
                     while (node < BG_AB_DYNAMIC_NODES_COUNT && (!obj || !me->IsWithinDistInMap(obj, 10.0f)))
@@ -19689,7 +19957,7 @@ void bot_ai::OnWanderNodeReached()
                                 continue;
                             if (Spell const* curSpell = member->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                             {
-                                if (curSpell->m_spellInfo->Id == SPELL_OPENING_FLAG_AB && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
+                                if (curSpell->m_spellInfo->Id == OPEN_FLAG_BG && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID())
                                 {
                                     already_used = true;
                                     break;
@@ -19702,7 +19970,27 @@ void bot_ai::OnWanderNodeReached()
                         //BOT_LOG_ERROR("npcbots", "OnWanderNodeReached: [AB] Bot {} USES flag {} at node {}", me->GetName(), obj->GetName(), uint32(node));
                         if (me->IsMounted())
                             DismountBot();
-                        me->CastSpell(obj, SPELL_OPENING_FLAG_AB, false);
+                        me->CastSpell(obj, OPEN_FLAG_BG, false);
+                    }
+                    break;
+                }
+                case BATTLEGROUND_EY:
+                {
+                    GameObject* obj = bg->GetBGObject(BG_EY_OBJECT_FLAG_NETHERSTORM);
+                    if (obj && obj->IsInWorld() && obj->isSpawned() && obj->GetGoState() == GO_STATE_READY)
+                    {
+                        bool already_used = std::ranges::any_of(BotMgr::GetAllGroupMembers(me), [=, this](Unit const* member) {
+                            if (member == me)
+                                return false;
+                            Spell const* curSpell = member->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+                            return  curSpell && curSpell->m_spellInfo->Id == OPEN_FLAG_BG && curSpell->m_targets.GetGOTargetGUID() == obj->GetGUID();
+                        });
+                        if (already_used)
+                            break;
+                        //BOT_LOG_ERROR("npcbots", "OnWanderNodeReached: [EY] Bot {} USES flag {} at node {}", me->GetName(), obj->GetName(), _travel_node_cur->GetWPId());
+                        if (me->IsMounted())
+                            DismountBot();
+                        me->CastSpell(obj, OPEN_FLAG_BG, false);
                     }
                     break;
                 }
@@ -19749,7 +20037,7 @@ void bot_ai::OnBotEnterBattleground()
             {
                 wpc->SetTempSummonType(TEMPSUMMON_TIMED_DESPAWN);
                 float angle = bg->GetBgTypeID() == BATTLEGROUND_WS ? frand(float(M_PI * 0.75), float(M_PI * 1.25)) : frand(0.001f, float(M_PI * 1.995));
-                Position myStartPos = wpc->GetFirstCollisionPosition(frand(5.0f, 20.0f), angle);
+                Position myStartPos = wpc->GetFirstCollisionPosition(bg->GetBgTypeID() == BATTLEGROUND_EY ? frand(6.0f, 8.0f) : frand(5.0f, 20.0f), angle);
                 BotMovement(BOT_MOVE_POINT, &myStartPos);
             }
         }
@@ -20742,6 +21030,7 @@ bool bot_ai::IsFlagCarrier(Unit const* unit, BattlegroundTypeId bgTypeId)
                 {
                     case 23333: // Warsong Flag (WSG)
                     case 23335: // Silverwing Flag (WSG)
+                    case BG_EY_NETHERSTORM_FLAG_SPELL: // Nethersorm Flag (EY)
                         return true;
                     default:
                         break;
@@ -20760,7 +21049,16 @@ bool bot_ai::IsFlagCarrier(Unit const* unit, BattlegroundTypeId bgTypeId)
                 }
                 break;
             case BATTLEGROUND_AB:
+                break;
             case BATTLEGROUND_EY:
+                switch (spellId)
+                {
+                    case BG_EY_NETHERSTORM_FLAG_SPELL:
+                        return true;
+                    default:
+                        break;
+                }
+                break;
             case BATTLEGROUND_SA:
             case BATTLEGROUND_IC:
             default:

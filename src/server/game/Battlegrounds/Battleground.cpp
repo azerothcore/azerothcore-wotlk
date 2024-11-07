@@ -2188,6 +2188,14 @@ TeamId Battleground::GetBotTeamId(ObjectGuid guid) const
         return itr->second.Team;
     return TEAM_NEUTRAL;
 }
+
+TeamId Battleground::GetPlayerTeamId(ObjectGuid guid) const
+{
+    BattlegroundPlayerMap::const_iterator itr = m_Players.find(guid);
+    if (itr != m_Players.end())
+        return itr->second->GetTeamId();
+    return TEAM_NEUTRAL;
+}
 //end npcbot
 
 TeamId Battleground::GetOtherTeamId(TeamId teamId)
