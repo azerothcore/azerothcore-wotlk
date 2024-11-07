@@ -11366,6 +11366,13 @@ void bot_ai::OnOwnerVehicleDamagedBy(Unit* attacker)
     SetBotCommandState(BOT_COMMAND_ATTACK);
     me->GetVehicleBase()->Attack(attacker, false);
 }
+void bot_ai::OnAttackStop(Unit const* target)
+{
+    if (opponent == target)
+        opponent = nullptr;
+    if (disttarget == target)
+        disttarget = nullptr;
+}
 //////////
 ///LOOT///
 //////////

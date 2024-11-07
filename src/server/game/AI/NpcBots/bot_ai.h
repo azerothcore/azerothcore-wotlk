@@ -288,6 +288,7 @@ class bot_ai : public CreatureAI
         void OnBotOwnerSpellGo(Spell const* spell, bool ok = true);
         void OnBotChannelFinish(Spell const* spell);
         void OnOwnerVehicleDamagedBy(Unit* attacker);
+        void OnAttackStop(Unit const* target);
         virtual void OnClassSpellStart(SpellInfo const* /*spellInfo*/) {}
         virtual void OnClassSpellGo(SpellInfo const* /*spell*/) {}
         virtual void OnClassChannelFinish(Spell const* /*spell*/) {}

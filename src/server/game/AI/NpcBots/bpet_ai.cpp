@@ -1409,6 +1409,11 @@ void bot_pet_ai::OnOwnerDamagedBy(Unit* attacker)
     SetBotCommandState(BOT_COMMAND_COMBATRESET);
     me->Attack(attacker, IsPetMelee());
 }
+void bot_pet_ai::OnAttackStop(Unit const* target)
+{
+    if (opponent == target)
+        opponent = nullptr;
+}
 
 bool bot_pet_ai::IsPetMelee() const
 {

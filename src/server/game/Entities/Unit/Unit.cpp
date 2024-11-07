@@ -11061,6 +11061,11 @@ bool Unit::AttackStop()
         {
             creature->SetNoSearchAssistance(false);
         }
+
+        //npcbot
+        if (IsNPCBotOrPet())
+            BotMgr::OnBotAttackStop(creature, victim);
+        //end npcbot
     }
 
     SendMeleeAttackStop(victim);
