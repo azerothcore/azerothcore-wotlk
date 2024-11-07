@@ -19410,7 +19410,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     }
                     if (object_type)
                     {
-                        for (uint8 i = 0; i != 2; ++i)
+                        for (uint8 i = 0; i != 3; ++i)
                         {
                             GameObject const* go = ab->GetBGObject(object_type + i);
                             if (go && go->IsInWorld() && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
@@ -19572,7 +19572,7 @@ WanderNode const* bot_ai::GetNextBGTravelNode() const
                     }
                     if (object_type)
                     {
-                        for (uint8 i = 0; i != 2; ++i)
+                        for (uint8 i = 0; i != 3; ++i)
                         {
                             GameObject const* go = ey->GetBGObject(object_type + i);
                             if (go && go->IsInWorld() && go->isSpawned() && go->GetGoState() == GO_STATE_READY)
