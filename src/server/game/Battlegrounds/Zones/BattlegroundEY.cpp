@@ -571,6 +571,7 @@ bool BattlegroundEY::UpdatePlayerScore(Player* player, uint32 type, uint32 value
 
 void BattlegroundEY::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
+    packet.Worldstates.reserve(22);
     packet.Worldstates.emplace_back(EY_HORDE_BASE, _ownedPointsCount[TEAM_HORDE]);
     packet.Worldstates.emplace_back(EY_ALLIANCE_BASE, _ownedPointsCount[TEAM_ALLIANCE]);
     packet.Worldstates.emplace_back(DRAENEI_RUINS_HORDE_CONTROL, _capturePointInfo[POINT_DRAENEI_RUINS].IsUnderControl(TEAM_HORDE));

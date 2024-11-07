@@ -60,6 +60,7 @@ void OPvPCapturePointTF::FillInitialWorldStates(WorldPackets::WorldState::InitWo
 
 void OutdoorPvPTF::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
+    packet.Worldstates.reserve(12);
     packet.Worldstates.emplace_back(TF_UI_TOWER_SLIDER_POS, 50);
     packet.Worldstates.emplace_back(TF_UI_TOWER_SLIDER_N, 100);
     packet.Worldstates.emplace_back(TF_UI_TOWER_SLIDER_DISPLAY, 0);

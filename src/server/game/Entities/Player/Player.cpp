@@ -8202,6 +8202,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     packet.ZoneID = zoneId;
     packet.AreaID = areaId;
 
+    packet.Worldstates.reserve(8);
     packet.Worldstates.emplace_back(2264, 0); // SCOURGE_EVENT_WORLDSTATE_EASTERN_PLAGUELANDS
     packet.Worldstates.emplace_back(2263, 0); // SCOURGE_EVENT_WORLDSTATE_TANARIS
     packet.Worldstates.emplace_back(2262, 0); // SCOURGE_EVENT_WORLDSTATE_BURNING_STEPPES
@@ -8252,6 +8253,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(32);
                     packet.Worldstates.emplace_back(2426, 0);  // GENERAL_WORLDSTATES_01 "Progress: %2427w"
                     packet.Worldstates.emplace_back(2327, 0);  // EP_UI_TOWER_COUNT_A
                     packet.Worldstates.emplace_back(2328, 0);  // EP_UI_TOWER_COUNT_H
@@ -8307,6 +8309,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(75);
                     packet.Worldstates.emplace_back(1966, 1); // AV_SNOWFALL_N
                     packet.Worldstates.emplace_back(1330, 1); // AV_FROSTWOLFHUT_H_C
                     packet.Worldstates.emplace_back(1329, 0); // AV_FROSTWOLFHUT_A_C
@@ -8404,6 +8407,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(32);
                     packet.Worldstates.emplace_back(1767, 0);    // stables alliance
                     packet.Worldstates.emplace_back(1768, 0);    // stables horde
                     packet.Worldstates.emplace_back(1769, 0);    // stables alliance controlled
@@ -8443,6 +8447,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(32);
                     packet.Worldstates.emplace_back(2753, 0);   // Horde Bases
                     packet.Worldstates.emplace_back(2752, 0);   // Alliance Bases
                     packet.Worldstates.emplace_back(2742, 0);   // Mage Tower - Horde conflict
@@ -8485,6 +8490,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(16);
                     packet.Worldstates.emplace_back(2490, 1);   // add ally tower main gui icon       // maybe should be sent only on login?
                     packet.Worldstates.emplace_back(2489, 1);   // add horde tower main gui icon      // maybe should be sent only on login?
                     packet.Worldstates.emplace_back(2485, 0);   // show neutral broken hill icon
@@ -8508,6 +8514,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 outdoorPvP->FillInitialWorldStates(packet);
             else
             {
+                packet.Worldstates.reserve(28);
                 packet.Worldstates.emplace_back(2503, 0); // NA_UI_HORDE_GUARDS_SHOW
                 packet.Worldstates.emplace_back(2502, 0); // NA_UI_ALLIANCE_GUARDS_SHOW
                 packet.Worldstates.emplace_back(2493, 0); // NA_UI_GUARDS_MAX
@@ -8543,6 +8550,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(28);
                     packet.Worldstates.emplace_back(2625, 0);  // TF_UI_CAPTURE_BAR_POS
                     packet.Worldstates.emplace_back(2624, 20); // TF_UI_CAPTURE_BAR_NEUTRAL
                     packet.Worldstates.emplace_back(2623, 0);  // TF_UI_SHOW CAPTURE BAR
@@ -8578,6 +8586,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(26);
                     packet.Worldstates.emplace_back(2529, 0); // ZM_UNK_1
                     packet.Worldstates.emplace_back(2528, 0); // ZM_UNK_2
                     packet.Worldstates.emplace_back(2527, 0); // ZM_UNK_3
@@ -8651,6 +8660,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(24);
                     // 1-3 A defend, 4-6 H defend, 7-9 unk defend, 1 - ok, 2 - half destroyed, 3 - destroyed
                     packet.Worldstates.emplace_back(3849, 0); // Gate of Temple
                     packet.Worldstates.emplace_back(3638, 0); // Gate of Yellow Moon
@@ -8697,6 +8707,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(18);
                     packet.Worldstates.emplace_back(4221, 1);   // BG_IC_ALLIANCE_RENFORT_SET
                     packet.Worldstates.emplace_back(4222, 1);   // BG_IC_HORDE_RENFORT_SET
                     packet.Worldstates.emplace_back(4226, 300); // BG_IC_ALLIANCE_RENFORT
@@ -8732,6 +8743,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(5);
                     packet.Worldstates.emplace_back(4903, 0);  // WORLDSTATE_SHOW_TIMER (Blood Quickening weekly)
                     packet.Worldstates.emplace_back(4904, 30); // WORLDSTATE_EXECUTION_TIME
                     packet.Worldstates.emplace_back(4940, 0);  // WORLDSTATE_SHOW_ATTEMPTS
@@ -8744,6 +8756,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
+                    packet.Worldstates.reserve(5);
                     packet.Worldstates.emplace_back(3479, 0);  // WORLDSTATE_SHOW_CRATES
                     packet.Worldstates.emplace_back(3480, 0);  // WORLDSTATE_CRATES_REVEALED
                     packet.Worldstates.emplace_back(3504, 0);  // WORLDSTATE_WAVE_COUNT
@@ -8796,6 +8809,7 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
                 {
                     if (CreatureAI* mograineAI = mograine->AI())
                     {
+                        packet.Worldstates.reserve(6);
                         packet.Worldstates.emplace_back(3590, mograineAI->GetData(3590));
                         packet.Worldstates.emplace_back(3591, mograineAI->GetData(3591));
                         packet.Worldstates.emplace_back(3592, mograineAI->GetData(3592));

@@ -306,6 +306,7 @@ void OutdoorPvPNA::FillInitialWorldStates(WorldPackets::WorldState::InitWorldSta
 
 void OPvPCapturePointNA::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
+    packet.Worldstates.reserve(25);
     if (m_ControllingFaction == TEAM_ALLIANCE)
     {
         packet.Worldstates.emplace_back(NA_UI_HORDE_GUARDS_SHOW, 0);

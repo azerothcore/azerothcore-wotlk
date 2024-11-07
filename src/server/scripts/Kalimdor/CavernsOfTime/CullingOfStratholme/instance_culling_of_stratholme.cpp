@@ -56,6 +56,7 @@ public:
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
         {
+            packet.Worldstates.reserve(5);
             packet.Worldstates.emplace_back(WORLDSTATE_SHOW_CRATES, 0);
             packet.Worldstates.emplace_back(WORLDSTATE_CRATES_REVEALED, _crateCount);
             packet.Worldstates.emplace_back(WORLDSTATE_WAVE_COUNT, 0);

@@ -472,6 +472,7 @@ void BattlegroundSA::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
     bool const ally_attacks = Attackers == TEAM_ALLIANCE;
     bool const horde_attacks = Attackers == TEAM_HORDE;
 
+    packet.Worldstates.reserve(25);
     packet.Worldstates.emplace_back(BG_SA_ANCIENT_GATEWS, GateStatus[BG_SA_ANCIENT_GATE]);
     packet.Worldstates.emplace_back(BG_SA_YELLOW_GATEWS, GateStatus[BG_SA_YELLOW_GATE]);
     packet.Worldstates.emplace_back(BG_SA_GREEN_GATEWS, GateStatus[BG_SA_GREEN_GATE]);
