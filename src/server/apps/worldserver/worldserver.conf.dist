@@ -4977,14 +4977,14 @@ NpcBot.WanderingBots.BG.CapLevelByFirstPlayer = 0
 #        Default:     30 - (NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AV)
 #                     8  - (NpcBot.WanderingBots.BG.TargetTeamPlayersCount.WS)
 #                     12 - (NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AB)
-#                     0  - (NpcBot.WanderingBots.BG.TargetTeamPlayersCount.EY) (NYI, Disabled)
+#                     12 - (NpcBot.WanderingBots.BG.TargetTeamPlayersCount.EY)
 #                     0  - (NpcBot.WanderingBots.BG.TargetTeamPlayersCount.SA) (NYI, Disabled)
 #                     0  - (NpcBot.WanderingBots.BG.TargetTeamPlayersCount.IC) (NYI, Disabled)
 
 NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AV = 30
 NpcBot.WanderingBots.BG.TargetTeamPlayersCount.WS = 8
 NpcBot.WanderingBots.BG.TargetTeamPlayersCount.AB = 12
-NpcBot.WanderingBots.BG.TargetTeamPlayersCount.EY = 0
+NpcBot.WanderingBots.BG.TargetTeamPlayersCount.EY = 12
 NpcBot.WanderingBots.BG.TargetTeamPlayersCount.SA = 0
 NpcBot.WanderingBots.BG.TargetTeamPlayersCount.IC = 0
 
