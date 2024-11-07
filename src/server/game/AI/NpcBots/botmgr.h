@@ -207,6 +207,7 @@ class AC_GAME_API BotMgr
         static void OnBotOwnerEnterVehicle(Player const* passenger, Vehicle const* vehicle);
         static void OnBotOwnerExitVehicle(Player const* passenger, Vehicle const* vehicle);
         static void OnBotPartyEngage(Player const* owner);
+        static void OnBotAttackStop(Creature const* bot, Unit const* target);
         //mod hooks
         static void ApplyBotEffectMods(Unit const* caster, SpellInfo const* spellInfo, uint8 effIndex, float& value);
         static void ApplyBotThreatMods(Unit const* attacker, SpellInfo const* spellInfo, float& threat);

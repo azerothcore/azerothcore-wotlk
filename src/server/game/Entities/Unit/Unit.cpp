@@ -1251,7 +1251,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         }
 
         //npcbot
-        if (victim->IsNPCBotOrPet() && attacker && victim != attacker && damagetype != NODAMAGE && damagetype != DOT && damage &&
+        if (victim->IsNPCBot() && attacker && victim != attacker && damagetype != NODAMAGE && damagetype != DOT && damage &&
             (attacker->IsNPCBotOrPet() || attacker->IsControlledByPlayer()) &&
             (!spellProto || !(spellProto->HasAttribute(SPELL_ATTR7_DONT_CAUSE_SPELL_PUSHBACK) || spellProto->HasAttribute(SPELL_ATTR3_TREAT_AS_PERIODIC))))
         {
@@ -11073,6 +11073,11 @@ bool Unit::AttackStop()
         {
             creature->SetNoSearchAssistance(false);
         }
+
+        //npcbot
+        if (IsNPCBotOrPet())
+            BotMgr::OnBotAttackStop(creature, victim);
+        //end npcbot
     }
 
     SendMeleeAttackStop(victim);

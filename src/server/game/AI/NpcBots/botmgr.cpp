@@ -3036,6 +3036,14 @@ void BotMgr::OnBotPartyEngage(Player const* owner)
         owner->GetBotMgr()->PropagateEngageTimers();
 }
 
+void BotMgr::OnBotAttackStop(Creature const* bot, Unit const* target)
+{
+    if (bot->IsNPCBot())
+        bot->GetBotAI()->OnAttackStop(target);
+    else if (bot->IsNPCBotPet())
+        bot->GetBotPetAI()->OnAttackStop(target);
+}
+
 void BotMgr::ApplyBotEffectMods(Unit const* caster, SpellInfo const* spellInfo, uint8 effIndex, float& value)
 {
     caster->ToCreature()->GetBotAI()->ApplyBotEffectMods(spellInfo, effIndex, value);

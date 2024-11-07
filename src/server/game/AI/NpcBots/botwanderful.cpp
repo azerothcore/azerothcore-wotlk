@@ -202,7 +202,7 @@ void WanderNode::RemoveWP(WanderNode* wp)
         wp->UnLink(wp->GetLinks().front());
 
     if (wp->GetCreature() && wp->GetCreature()->IsInWorld())
-        wp->GetCreature()->ToTempSummon()->DespawnOrUnsummon();
+        Unit::Kill(wp->GetCreature(), wp->GetCreature());
 
     ALL_WPS_PER_AREA.at(wp->_areaId).remove(wp);
     ALL_WPS_PER_ZONE.at(wp->_zoneId).remove(wp);

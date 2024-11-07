@@ -563,6 +563,7 @@ public:
     virtual void HandlePlayerKillBot(Creature* victim, Player* killer);
     virtual void HandleBotKillUnit(Creature* /*killer*/, Creature* /*victim*/) { }
     TeamId GetBotTeamId(ObjectGuid guid) const;
+    TeamId GetPlayerTeamId(ObjectGuid guid) const;
     virtual GraveyardStruct const* GetClosestGraveyardForBot(Creature* bot) const;
     virtual void RemoveBot(ObjectGuid /*guid*/) {}
     virtual void EventBotDroppedFlag(Creature* /*bot*/) { }

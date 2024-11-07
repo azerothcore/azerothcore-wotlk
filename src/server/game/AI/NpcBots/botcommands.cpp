@@ -879,7 +879,7 @@ public:
             Player* player = handler->GetPlayer();
             WanderNode::DoForAllMapWPs(player->GetMapId(), [map = player->GetMap()](WanderNode const* wp) {
                 if (Creature* wpc = wp->GetCreature())
-                    wpc->ToTempSummon()->DespawnOrUnsummon();
+                    Unit::Kill(wpc, wpc);
                 ASSERT_NOTNULL(HandleWPSummon(const_cast<WanderNode*>(wp), map));
             });
         }

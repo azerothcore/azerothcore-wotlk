@@ -22,6 +22,7 @@ enum BotSpells : uint32
     WANDERER_HEARTHSTONE                = 54318,//"Hearthsone" no CD
     SUMMONING_STONE_EFFECT              = 59782,//Cast time 5s + Channeled 2m
     SHOOT_WAND                          = 5019,
+    OPEN_FLAG_BG                        = 21651,
 ///Portals
     PORTAL_STORMWIND                    = 10059,
     PORTAL_IRONFORGE                    = 11416,
