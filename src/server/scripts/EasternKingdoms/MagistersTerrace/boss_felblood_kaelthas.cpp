@@ -120,6 +120,19 @@ struct boss_felblood_kaelthas : public ScriptedAI
     {
         instance->SetBossState(DATA_KAELTHAS, DONE);
 
+        std::list<Creature*> summonsList;
+        me->GetCreatureListWithEntryInGrid(summonsList, CREATURE_ARCANE_SPHERE, 100.0f);
+        for (Creature* sphere : summonsList)
+        {
+            sphere->DespawnOrUnsummon();
+        }
+
+        me->GetCreatureListWithEntryInGrid(summonsList, NPC_PHOENIX, 100.0f);
+        for (Creature* phoenix : summonsList)
+        {
+            phoenix->DespawnOrUnsummon();
+        }
+
         if (GameObject* orb = instance->GetGameObject(DATA_ESCAPE_ORB))
         {
             orb->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
