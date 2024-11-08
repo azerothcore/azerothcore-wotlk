@@ -375,7 +375,7 @@ struct npc_zuljin_vortex : public ScriptedAI
     }
 };
 
-// 43149 
+// 43149 - Claw Rage
 class spell_claw_rage_aura : public AuraScript
 {
     PrepareAuraScript(spell_claw_rage_aura);
