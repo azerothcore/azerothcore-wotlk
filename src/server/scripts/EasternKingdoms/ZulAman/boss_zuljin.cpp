@@ -391,7 +391,7 @@ class spell_claw_rage_aura : public AuraScript
         {
             if (Player* target = ObjectAccessor::GetPlayer(*caster, caster->AI()->GetGUID(GUID_CHARGE_TARGET)))
             {
-                if (caster->CanSeeOrDetect(target) && !target->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+                if (target->isTargetableForAttack(true, caster))
                     GetCaster()->CastSpell(target, SPELL_CLAW_RAGE_DAMAGE);
                 else
                     GetCaster()->RemoveAurasDueToSpell(SPELL_CLAW_RAGE_AURA);
