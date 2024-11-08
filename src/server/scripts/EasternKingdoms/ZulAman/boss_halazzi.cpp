@@ -76,7 +76,7 @@ enum Groups
 
 struct boss_halazzi : public BossAI
 {
-    boss_halazzi(Creature* creature) : BossAI(creature, DATA_HALAZZIEVENT)
+    boss_halazzi(Creature* creature) : BossAI(creature, DATA_HALAZZI)
     {
         scheduler.SetValidator([this]
         {

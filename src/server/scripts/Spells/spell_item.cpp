@@ -4092,6 +4092,55 @@ class spell_item_skyguard_blasting_charges : public SpellScript
     }
 };
 
+// 23595 - Luffa
+class spell_item_luffa : public SpellScript
+{
+    PrepareSpellScript(spell_item_luffa);
+
+    SpellCastResult CheckCast()
+    {
+        if (GetCaster())
+        {
+            Unit::AuraApplicationMap const& auras = GetCaster()->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+            {
+                Aura const* aura = itr->second->GetBase();
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                    continue;
+
+                return SPELL_CAST_OK;
+            }
+        }
+
+        return SPELL_FAILED_NOTHING_TO_DISPEL;
+    }
+
+    void HandleEffect(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        if (Player* player = GetCaster()->ToPlayer())
+        {
+            Unit::AuraApplicationMap const& auras = player->GetAppliedAuras();
+            for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+            {
+                Aura const* aura = itr->second->GetBase();
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                    continue;
+
+                player->RemoveAurasDueToSpell(aura->GetId(), aura->GetCasterGUID());
+                return;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_luffa::CheckCast);
+        OnEffectHitTarget += SpellEffectFn(spell_item_luffa::HandleEffect, EFFECT_0, SPELL_EFFECT_DISPEL_MECHANIC);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
     RegisterSpellScript(spell_item_massive_seaforium_charge);
@@ -4217,4 +4266,5 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_fel_mana_potion);
     RegisterSpellScript(spell_item_gor_dreks_ointment);
     RegisterSpellScript(spell_item_skyguard_blasting_charges);
+    RegisterSpellScript(spell_item_luffa);
 }

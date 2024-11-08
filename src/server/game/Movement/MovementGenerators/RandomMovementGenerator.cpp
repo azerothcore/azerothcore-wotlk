@@ -29,15 +29,14 @@
 template<class T>
 RandomMovementGenerator<T>::~RandomMovementGenerator() { }
 
-template<>
-RandomMovementGenerator<Creature>::~RandomMovementGenerator()
-{
-    delete _pathGenerator;
-}
+template RandomMovementGenerator<Creature>::~RandomMovementGenerator();
 
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 {
+    if (!creature)
+        return;
+
     if (creature->_moveState != MAP_OBJECT_CELL_MOVE_NONE)
         return;
 
@@ -135,7 +134,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         else // ground
         {
             if (!_pathGenerator)
-                _pathGenerator = new PathGenerator(creature);
+                _pathGenerator = std::make_unique<PathGenerator>(creature);
             else
                 _pathGenerator->Clear();
 

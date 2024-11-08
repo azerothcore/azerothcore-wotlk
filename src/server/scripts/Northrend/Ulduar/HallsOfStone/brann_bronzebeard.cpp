@@ -864,30 +864,24 @@ public:
     };
 };
 
-class spell_hos_dark_matter : public SpellScriptLoader
+class spell_hos_dark_matter_aura : public AuraScript
 {
-public:
-    spell_hos_dark_matter() : SpellScriptLoader("spell_hos_dark_matter") { }
+    PrepareAuraScript(spell_hos_dark_matter_aura);
 
-    class spell_hos_dark_matter_AuraScript : public AuraScript
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        PrepareAuraScript(spell_hos_dark_matter_AuraScript);
+        return ValidateSpellInfo({ SPELL_DARK_MATTER_H, SPELL_DARK_MATTER });
+    }
 
-        void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-        {
-            if (Unit* caster = GetCaster())
-                caster->CastSpell(caster, caster->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
-        }
-
-        void Register() override
-        {
-            OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter_AuraScript::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        }
-    };
-
-    AuraScript* GetAuraScript() const override
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        return new spell_hos_dark_matter_AuraScript();
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, caster->GetMap()->IsHeroic() ? SPELL_DARK_MATTER_H : SPELL_DARK_MATTER, true);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_hos_dark_matter_aura::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -897,5 +891,5 @@ void AddSC_brann_bronzebeard()
     new dark_rune_protectors();
     new dark_rune_stormcaller();
     new iron_golem_custodian();
-    new spell_hos_dark_matter();
+    RegisterSpellScript(spell_hos_dark_matter_aura);
 }
