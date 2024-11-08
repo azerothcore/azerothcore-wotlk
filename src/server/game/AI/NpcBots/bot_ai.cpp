@@ -17686,7 +17686,7 @@ bool bot_ai::GlobalUpdate(uint32 diff)
         uint32 fac_orig = rEntry ? rEntry->FactionID : 0;
         if (master->GetFaction() == fac_orig)
         {
-            uint32 fac = (!IAmFree() && me->GetMap()->IsBattleArena()) ? FACTION_MONSTER : fac_orig;
+            uint32 fac = (!IAmFree() && me->GetMap()->IsBattleArena()) ? uint32(FACTION_MONSTER) : fac_orig;
             if (me->GetFaction() != fac)
             {
                 //std::ostringstream msg;

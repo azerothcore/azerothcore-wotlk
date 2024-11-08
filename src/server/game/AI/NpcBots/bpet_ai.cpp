@@ -2440,7 +2440,7 @@ bool bot_pet_ai::GlobalUpdate(uint32 diff)
         uint32 fac_orig = rEntry ? rEntry->FactionID : 0;
         if (petOwner->GetBotOwner()->GetFaction() == fac_orig)
         {
-            uint32 fac = (!IAmFree() && me->GetMap()->IsBattleArena()) ? FACTION_MONSTER : fac_orig;
+            uint32 fac = (!IAmFree() && me->GetMap()->IsBattleArena()) ? uint32(FACTION_MONSTER) : fac_orig;
             if (me->GetFaction() != fac)
                 me->SetFaction(fac);
         }
